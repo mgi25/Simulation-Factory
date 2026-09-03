@@ -19,18 +19,35 @@ const REPLAY_VERSION := 4
 const FLOOR_THICKNESS := 0.25
 const WALL_HEIGHT := 0.9
 const WALL_THICKNESS := 0.16
+const WALL_TRIM_HEIGHT := 0.07
+const WALL_TRIM_OVERHANG := 0.06
 
+# The plinth the arena stands on. It reaches past the walls so the portrait
+# frame reads as a stage in a dark room rather than a rectangle floating in
+# black, and it is what fills the space the arena itself cannot reach.
+const STAGE_APRON := 1.05
+const STAGE_DROP := 0.14
+
+# One restrained slate accent for every piece of arena chrome. Competitor
+# colour belongs to fighters, powers and combat, never to the furniture, and
+# nothing here is ever allowed to outshine a Pulse bolt or an impact ring.
+const ACCENT_COLOR := Color(0.44, 0.50, 0.64)
+const MARKING_HEIGHT := 0.014
+const MARKING_WIDTH := 0.055
+const MARKING_INSET := 0.52
+const MARKING_EMISSION := 0.42
+const CENTRE_RING_RADIUS := 1.30
+const CENTRE_DOT_RADIUS := 0.17
+const RIM_EMISSION := 0.55
+const RIM_HEIGHT := 0.05
+const RIM_DROP := 0.14
+
+# Nearly overhead: the arena is deeper than it is wide, and a portrait frame
+# only gets its height back by looking down on it. Still angled enough to keep
+# real perspective, sphere volume and cast shadows.
 const CAMERA_FOV := 50.0
-const CAMERA_ELEVATION_DEG := 68.0
-const CAMERA_MARGIN := 0.45
-
-const HUD_WIDTH := 1080.0
-const HEALTH_BAR_POSITION := Vector2(480.0, 0.0)
-const HEALTH_BAR_SIZE := Vector2(340.0, 34.0)
-const HEALTH_ROW_Y := [160.0, 250.0]
-
-const POWER_ACTIVE_COLOR := Color(1.0, 0.925, 0.588)
-const POWER_IDLE_COLOR := Color(0.60, 0.62, 0.70)
+const CAMERA_ELEVATION_DEG := 78.0
+const CAMERA_MARGIN := 0.15
 
 # Rush trail: ghost copies sampled from earlier replay frames, so the effect
 # is driven purely by exported state and needs no particle system.
@@ -61,6 +78,7 @@ const ORB_EMISSION_ENERGY := 2.2
 const ORB_CORE_LIGHTEN := 0.45
 
 const CombatVFX := preload("res://scripts/combat_vfx.gd")
+const BattleHud := preload("res://scripts/battle_hud.gd")
 
 var _replay: Dictionary = {}
 var _frames: Array = []
@@ -77,12 +95,11 @@ var _base_radius_units: Array[float] = []
 var _power_names: Array[String] = []
 var _trails: Array = []
 
-var _timer_label: Label
-var _result_label: Label
-var _health_labels: Array[Label] = []
-var _health_fills: Array[ColorRect] = []
-var _power_labels: Array[Label] = []
-var _power_label_text: Array[String] = []
+var _hud: CanvasLayer
+# Per-fighter presentation state, refreshed from the frames every tick and
+# handed to the overlay: the HUD reads the battle, it never guesses at it.
+var _healths: Array[float] = []
+var _powered: Array[bool] = []
 
 # Dynamic entity visuals, keyed by the replay's entity id. Nodes are created
 # when an id first appears and freed when it stops appearing, so the scene
@@ -107,7 +124,10 @@ var _ticks_per_frame := 2.0
 func _ready() -> void:
 	var path := _resolve_path(_replay_path_argument())
 	if not _load_replay(path):
-		_build_hud_root_error(path)
+		var error_hud := BattleHud.new()
+		add_child(error_hud)
+		error_hud.show_error("No replay at
+%s" % path)
 		return
 
 	_read_arena()
@@ -121,6 +141,7 @@ func _ready() -> void:
 	_build_hud()
 	_apply_playhead(0.0)
 	_vfx.update_to_tick(0.0)
+	_hud.update_hud(0.0, _healths, _powered)
 
 	print("replay loaded: seed=%d frames=%d duration=%.2fs" % [
 		int(_replay.get("seed", 0)),
@@ -138,6 +159,9 @@ func _process(delta: float) -> void:
 	var last := float(_frames.size() - 1)
 	_apply_playhead(minf(_replay_tick / _ticks_per_frame, last))
 	_vfx.update_to_tick(_replay_tick)
+	# The overlay is driven by the raw tick, not the clamped playhead: the
+	# result panel has to keep animating after the last frame is reached.
+	_hud.update_hud(_replay_tick, _healths, _powered)
 
 
 # --- coordinate conversion -----------------------------------------------
@@ -233,7 +257,7 @@ func _build_environment() -> void:
 	environment.sky = sky
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
 	environment.ambient_light_sky_contribution = 1.0
-	environment.ambient_light_energy = 0.55
+	environment.ambient_light_energy = 0.62
 	environment.tonemap_mode = Environment.TONE_MAPPER_ACES
 	# Restrained glow: highlights pop without washing the arena out.
 	environment.glow_enabled = true
@@ -261,7 +285,7 @@ func _build_lights() -> void:
 	key.shadow_bias = 0.04
 	# Yaw past 180 degrees so the light travels towards the camera and the
 	# sphere shadows land in front of them instead of hiding behind them.
-	key.rotation_degrees = Vector3(-48.0, 215.0, 0.0)
+	key.rotation_degrees = Vector3(-64.0, 202.0, 0.0)
 	add_child(key)
 
 	var fill := DirectionalLight3D.new()
@@ -280,8 +304,12 @@ func _build_camera() -> void:
 	camera.near = 0.1
 	camera.far = 300.0
 
-	# Vertical 9:16 framing: the horizontal field of view is the tight one,
-	# so the distance has to satisfy both the arena width and its depth.
+	# Vertical 9:16 framing. Looking down at the arena centre from elevation e,
+	# a floor point at depth z sits `distance - z * cos(e)` along the view
+	# axis, so the *near* edge is the widest thing on screen and the one the
+	# horizontal field of view has to accommodate. Fitting the near edge
+	# rather than the centre is what keeps the closest corners on screen, and
+	# it is why the arena can be framed this tightly.
 	var viewport_width := float(ProjectSettings.get_setting(
 		"display/window/size/viewport_width", 1080))
 	var viewport_height := float(ProjectSettings.get_setting(
@@ -289,9 +317,14 @@ func _build_camera() -> void:
 	var half_v := deg_to_rad(CAMERA_FOV * 0.5)
 	var half_h := atan(tan(half_v) * viewport_width / viewport_height)
 	var elevation := deg_to_rad(CAMERA_ELEVATION_DEG)
+	var half_depth := _arena_units.y * 0.5
 
-	var fit_width := (_arena_units.x * 0.5 + CAMERA_MARGIN) / tan(half_h)
-	var fit_depth := (_arena_units.y * 0.5 * sin(elevation) + CAMERA_MARGIN) / tan(half_v)
+	var fit_width := (_arena_units.x * 0.5 + CAMERA_MARGIN) / tan(half_h) \
+		+ half_depth * cos(elevation)
+	# The far edge has to clear the top of the frame too. At this elevation
+	# the width is what binds, but a squarer arena would not be.
+	var fit_depth := (half_depth * sin(elevation) + CAMERA_MARGIN) / tan(half_v) \
+		- half_depth * cos(elevation)
 	var distance := maxf(fit_width, fit_depth)
 
 	camera.position = Vector3(0.0, distance * sin(elevation), distance * cos(elevation))
@@ -304,40 +337,149 @@ func _build_arena() -> void:
 	var outer_x := _arena_units.x + WALL_THICKNESS * 2.0
 	var outer_z := _arena_units.y + WALL_THICKNESS * 2.0
 
-	var floor_mesh := BoxMesh.new()
-	floor_mesh.size = Vector3(outer_x, FLOOR_THICKNESS, outer_z)
-	var floor_node := MeshInstance3D.new()
-	floor_node.name = "Floor"
-	floor_node.mesh = floor_mesh
+	_build_stage(outer_x, outer_z)
+	_build_floor(outer_x, outer_z)
+	_build_markings(half)
+	_build_walls(half, outer_x, outer_z)
+
+
+func _build_stage(outer_x: float, outer_z: float) -> void:
+	## A plinth reaching past the walls. It is what the frame shows to either
+	## side of the arena, so the portrait crop reads as a lit stage in a dark
+	## room rather than a rectangle stranded in black.
+	var mesh := BoxMesh.new()
+	mesh.size = Vector3(
+		outer_x + STAGE_APRON * 2.0, FLOOR_THICKNESS,
+		outer_z + STAGE_APRON * 2.0)
+
+	var node := MeshInstance3D.new()
+	node.name = "Stage"
+	node.mesh = mesh
+	node.material_override = _make_material(Color(0.105, 0.115, 0.145), 0.0, 0.85, 0.15)
+	node.position = Vector3(0.0, -STAGE_DROP - FLOOR_THICKNESS * 0.5, 0.0)
+	add_child(node)
+
+
+func _build_floor(outer_x: float, outer_z: float) -> void:
+	var mesh := BoxMesh.new()
+	mesh.size = Vector3(outer_x, FLOOR_THICKNESS, outer_z)
+
+	var node := MeshInstance3D.new()
+	node.name = "Floor"
+	node.mesh = mesh
 	# Matte floor: with the key light behind the camera, any gloss here would
 	# mirror it straight back and wash the arena out.
-	floor_node.material_override = _make_material(Color(0.20, 0.21, 0.26), 0.05, 0.72, 0.25)
-	floor_node.position = Vector3(0.0, -FLOOR_THICKNESS * 0.5, 0.0)
-	add_child(floor_node)
+	node.material_override = _make_material(Color(0.225, 0.235, 0.285), 0.05, 0.74, 0.22)
+	node.position = Vector3(0.0, -FLOOR_THICKNESS * 0.5, 0.0)
+	add_child(node)
 
-	# Wall inner faces sit exactly on the arena bounds, like the Pymunk walls.
-	var wall_material := _make_material(Color(0.24, 0.26, 0.33), 0.25, 0.55, 0.35)
-	var side_size := Vector3(WALL_THICKNESS, WALL_HEIGHT, outer_z)
-	var end_size := Vector3(outer_x, WALL_HEIGHT, WALL_THICKNESS)
+
+func _build_markings(half: Vector2) -> void:
+	## Three pieces only - an inset border, a centre ring and a centre mark -
+	## lit dimly enough that they never compete with a projectile or a hit.
+	var material := _make_emissive(ACCENT_COLOR, MARKING_EMISSION, 0.55)
+	var inset := Vector2(half.x - MARKING_INSET, half.y - MARKING_INSET)
+
+	var strips := [
+		[Vector3(inset.x * 2.0, MARKING_HEIGHT, MARKING_WIDTH), Vector3(0.0, 0.0, -inset.y)],
+		[Vector3(inset.x * 2.0, MARKING_HEIGHT, MARKING_WIDTH), Vector3(0.0, 0.0, inset.y)],
+		[Vector3(MARKING_WIDTH, MARKING_HEIGHT, inset.y * 2.0), Vector3(-inset.x, 0.0, 0.0)],
+		[Vector3(MARKING_WIDTH, MARKING_HEIGHT, inset.y * 2.0), Vector3(inset.x, 0.0, 0.0)],
+	]
+	for index in strips.size():
+		var mesh := BoxMesh.new()
+		mesh.size = strips[index][0]
+		_add_decor("Border%d" % index, mesh, strips[index][1], material)
+
+	var ring := TorusMesh.new()
+	ring.inner_radius = CENTRE_RING_RADIUS - MARKING_WIDTH
+	ring.outer_radius = CENTRE_RING_RADIUS
+	ring.rings = 64
+	ring.ring_segments = 6
+	_add_decor("CentreRing", ring, Vector3.ZERO, material)
+
+	var dot := CylinderMesh.new()
+	dot.top_radius = CENTRE_DOT_RADIUS
+	dot.bottom_radius = CENTRE_DOT_RADIUS
+	dot.height = MARKING_HEIGHT
+	dot.radial_segments = 32
+	_add_decor("CentreMark", dot, Vector3.ZERO, material)
+
+
+func _add_decor(piece: String, mesh: Mesh, position: Vector3,
+		material: StandardMaterial3D) -> void:
+	var node := MeshInstance3D.new()
+	node.name = piece
+	node.mesh = mesh
+	node.material_override = material
+	# Flush with the floor and casting nothing: a marking is paint, not an
+	# object standing on the arena.
+	node.position = position + Vector3(0.0, MARKING_HEIGHT * 0.5, 0.0)
+	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(node)
+
+
+func _build_walls(half: Vector2, outer_x: float, outer_z: float) -> void:
+	## Wall inner faces sit exactly on the arena bounds, like the Pymunk walls.
+	## Everything added on top of that - the capping rail and the lit inner
+	## rim - is decoration, and none of it changes where anything bounces.
+	var body := _make_material(Color(0.175, 0.19, 0.245), 0.10, 0.68, 0.30)
+	var trim := _make_material(Color(0.215, 0.235, 0.30), 0.15, 0.62, 0.32)
+	var rim := _make_emissive(ACCENT_COLOR, RIM_EMISSION, 0.4)
+
 	var wall_y := WALL_HEIGHT * 0.5
 	var wall_x := half.x + WALL_THICKNESS * 0.5
 	var wall_z := half.y + WALL_THICKNESS * 0.5
+	var side := Vector3(WALL_THICKNESS, WALL_HEIGHT, outer_z)
+	var end := Vector3(outer_x, WALL_HEIGHT, WALL_THICKNESS)
 
 	var walls := [
-		["WallLeft", side_size, Vector3(-wall_x, wall_y, 0.0)],
-		["WallRight", side_size, Vector3(wall_x, wall_y, 0.0)],
-		["WallTop", end_size, Vector3(0.0, wall_y, -wall_z)],
-		["WallBottom", end_size, Vector3(0.0, wall_y, wall_z)],
+		["Left", side, Vector3(-wall_x, wall_y, 0.0), Vector3(1.0, 0.0, 0.0)],
+		["Right", side, Vector3(wall_x, wall_y, 0.0), Vector3(-1.0, 0.0, 0.0)],
+		["Top", end, Vector3(0.0, wall_y, -wall_z), Vector3(0.0, 0.0, 1.0)],
+		["Bottom", end, Vector3(0.0, wall_y, wall_z), Vector3(0.0, 0.0, -1.0)],
 	]
 	for wall in walls:
+		var piece: String = wall[0]
+		var size: Vector3 = wall[1]
+		var position: Vector3 = wall[2]
+		var inward: Vector3 = wall[3]
+
 		var mesh := BoxMesh.new()
-		mesh.size = wall[1]
-		var node := MeshInstance3D.new()
-		node.name = wall[0]
-		node.mesh = mesh
-		node.material_override = wall_material
-		node.position = wall[2]
-		add_child(node)
+		mesh.size = size
+		_add_wall_piece("Wall" + piece, mesh, position, body)
+
+		# A capping rail, standing slightly proud of both faces.
+		var cap := BoxMesh.new()
+		cap.size = Vector3(
+			size.x + absf(inward.x) * WALL_TRIM_OVERHANG,
+			WALL_TRIM_HEIGHT,
+			size.z + absf(inward.z) * WALL_TRIM_OVERHANG)
+		_add_wall_piece("Trim" + piece, cap,
+			Vector3(position.x, WALL_HEIGHT + WALL_TRIM_HEIGHT * 0.5, position.z), trim)
+
+		# A thin lit line under the rail, on the inside face only, so the arena
+		# has a defined edge without the walls glowing at the viewer.
+		var strip := BoxMesh.new()
+		strip.size = Vector3(
+			0.03 if absf(inward.x) > 0.5 else size.x,
+			RIM_HEIGHT,
+			0.03 if absf(inward.z) > 0.5 else size.z)
+		var strip_position := position + inward * (WALL_THICKNESS * 0.5 + 0.015)
+		strip_position.y = WALL_HEIGHT - RIM_DROP
+		_add_wall_piece("Rim" + piece, strip, strip_position, rim, false)
+
+
+func _add_wall_piece(piece: String, mesh: Mesh, position: Vector3,
+		material: StandardMaterial3D, shadows := true) -> void:
+	var node := MeshInstance3D.new()
+	node.name = piece
+	node.mesh = mesh
+	node.material_override = material
+	node.position = position
+	if not shadows:
+		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(node)
 
 
 func _build_fighters() -> void:
@@ -503,6 +645,17 @@ func _make_material(color: Color, metallic: float, roughness: float,
 	return material
 
 
+func _make_emissive(color: Color, energy: float,
+		darken := 0.0) -> StandardMaterial3D:
+	## Arena chrome: lit enough to be seen, kept well under the glow threshold
+	## so nothing decorative ever blooms the way a hit or a projectile does.
+	var material := _make_material(color.darkened(darken), 0.0, 0.55, 0.3)
+	material.emission_enabled = true
+	material.emission = color
+	material.emission_energy_multiplier = energy
+	return material
+
+
 func _color_of(meta: Dictionary) -> Color:
 	var raw: Variant = meta.get("color", [])
 	if raw is Array and (raw as Array).size() >= 3:
@@ -513,95 +666,18 @@ func _color_of(meta: Dictionary) -> Color:
 
 # --- HUD -----------------------------------------------------------------
 
-func _build_hud_root() -> Control:
-	var layer := CanvasLayer.new()
-	layer.name = "HUD"
-	add_child(layer)
-
-	var root := Control.new()
-	root.name = "HudRoot"
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	layer.add_child(root)
-	return root
-
-
-func _build_hud_root_error(path: String) -> void:
-	var root := _build_hud_root()
-	_make_label(root, "No replay at\n%s" % path, 40, Color(1.0, 0.5, 0.5),
-		Rect2(40.0, 800.0, HUD_WIDTH - 80.0, 320.0), HORIZONTAL_ALIGNMENT_CENTER)
-
-
 func _build_hud() -> void:
-	var root := _build_hud_root()
+	## The overlay owns its own layout, animation and timing; the viewer only
+	## tells it what the current frame says.
+	_hud = BattleHud.new()
+	_hud.name = "HUD"
+	add_child(_hud)
+	_hud.configure(_replay)
+	_hud.set_events(_replay.get("events", []))
 
-	_timer_label = _make_label(root, "0.0", 76, Color(0.91, 0.92, 0.94),
-		Rect2(0.0, 30.0, HUD_WIDTH, 84.0), HORIZONTAL_ALIGNMENT_CENTER)
-
-	for i in _fighter_meta.size():
-		var meta: Dictionary = _fighter_meta[i]
-		var row_y := float(HEALTH_ROW_Y[i]) if i < HEALTH_ROW_Y.size() else 160.0 + 90.0 * i
-		var color := _color_of(meta)
-
-		_make_label(root, str(meta.get("name", "?")), 44, color,
-			Rect2(60.0, row_y, 130.0, 60.0), HORIZONTAL_ALIGNMENT_LEFT)
-
-		_power_labels.append(_make_label(root, "", 32, POWER_IDLE_COLOR,
-			Rect2(196.0, row_y, 276.0, 60.0), HORIZONTAL_ALIGNMENT_LEFT))
-		_power_label_text.append("")
-
-		var track := ColorRect.new()
-		track.color = Color(0.16, 0.17, 0.22, 0.92)
-		track.position = Vector2(HEALTH_BAR_POSITION.x, row_y + (60.0 - HEALTH_BAR_SIZE.y) * 0.5)
-		track.size = HEALTH_BAR_SIZE
-		root.add_child(track)
-
-		var fill := ColorRect.new()
-		fill.color = color
-		fill.position = track.position
-		fill.size = HEALTH_BAR_SIZE
-		root.add_child(fill)
-		_health_fills.append(fill)
-
-		_health_labels.append(_make_label(root, "", 44, Color(0.91, 0.92, 0.94),
-			Rect2(820.0, row_y, 200.0, 60.0), HORIZONTAL_ALIGNMENT_RIGHT))
-
-	_result_label = _make_label(root, _result_text(), 92, Color(0.96, 0.97, 1.0),
-		Rect2(0.0, 1620.0, HUD_WIDTH, 120.0), HORIZONTAL_ALIGNMENT_CENTER)
-	_result_label.visible = false
-
-
-func _make_label(parent: Control, text: String, font_size: int, color: Color,
-		rect: Rect2, alignment: int) -> Label:
-	var label := Label.new()
-	label.text = text
-	label.position = rect.position
-	label.size = rect.size
-	label.horizontal_alignment = alignment
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-
-	# Built-in Godot font only - no external font assets.
-	var settings := LabelSettings.new()
-	settings.font_size = font_size
-	settings.font_color = color
-	settings.outline_size = 6
-	settings.outline_color = Color(0.0, 0.0, 0.0, 0.65)
-	label.label_settings = settings
-
-	parent.add_child(label)
-	return label
-
-
-func _result_text() -> String:
-	var result: Dictionary = _replay.get("result", {})
-	var winner_id: Variant = result.get("winner_id")
-	if bool(result.get("is_draw", false)) or winner_id == null:
-		return "DRAW"
-	for meta in _fighter_meta:
-		if int(meta.get("id", -1)) == int(winner_id):
-			return "WINNER: %s" % str(meta.get("name", "?"))
-	return "DRAW"
+	for _meta in _fighter_meta:
+		_healths.append(0.0)
+		_powered.append(false)
 
 
 # --- playback ------------------------------------------------------------
@@ -647,12 +723,10 @@ func _apply_playhead(playhead: float) -> void:
 			_spheres[i].material_override = _live_materials[i]
 
 		_update_trail(i, index, powered)
-		_update_power_label(i, powered)
-		_update_health_row(i, health)
+		_healths[i] = health
+		_powered[i] = powered
 
 	_update_entities(current_entities, upcoming_entities, blend)
-	_update_timer(int(frame.get("tick", 0)))
-	_result_label.visible = playhead >= float(_frames.size() - 1)
 
 
 func _update_entities(current: Array, upcoming: Array, blend: float) -> void:
@@ -729,33 +803,3 @@ func _update_trail(fighter: int, index: int, powered: bool) -> void:
 			float(past.get("x", 0.0)), float(past.get("y", 0.0)), radius)
 		ghost.scale = Vector3.ONE * (radius / maxf(0.001, _base_radius_units[fighter]))
 		ghost.visible = true
-
-
-func _update_power_label(index: int, powered: bool) -> void:
-	if index >= _power_labels.size():
-		return
-	var text := "— %s" % _power_names[index].to_upper()
-	if powered:
-		text += " [ACTIVE]"
-	if text == _power_label_text[index]:
-		return
-	_power_label_text[index] = text
-
-	var label := _power_labels[index]
-	label.text = text
-	label.label_settings.font_color = POWER_ACTIVE_COLOR if powered else POWER_IDLE_COLOR
-
-
-func _update_health_row(index: int, health: float) -> void:
-	if index >= _health_fills.size():
-		return
-	var max_health := maxf(1.0, float((_fighter_meta[index] as Dictionary).get("max_health", 100.0)))
-	var fraction := clampf(health / max_health, 0.0, 1.0)
-	_health_fills[index].size = Vector2(HEALTH_BAR_SIZE.x * fraction, HEALTH_BAR_SIZE.y)
-	_health_labels[index].text = "%d HP" % int(round(health))
-
-
-func _update_timer(tick: int) -> void:
-	var limit := float(_replay.get("limit_seconds", 35.0))
-	var hz := maxf(1.0, float(_replay.get("physics_hz", 120.0)))
-	_timer_label.text = "%.1f" % maxf(0.0, limit - float(tick) / hz)
