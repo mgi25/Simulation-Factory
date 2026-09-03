@@ -9,11 +9,17 @@ changeable without ever touching the game.
 
 from evaluation.battle_metrics import BattleMetrics, collect_metrics, evaluate_seed
 from evaluation.battle_score import ScoreBreakdown, score_battle
+from evaluation.candidate import Candidate
+from evaluation.candidate_curation import CurationConfig, CurationResult, curate
 
 __all__ = [
     "BattleMetrics",
+    "Candidate",
+    "CurationConfig",
+    "CurationResult",
     "ScoreBreakdown",
     "collect_metrics",
+    "curate",
     "evaluate_seed",
     "score_battle",
 ]

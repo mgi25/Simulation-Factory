@@ -25,33 +25,20 @@ import statistics
 import sys
 import time
 from collections import Counter
-from dataclasses import dataclass
 from concurrent.futures import ProcessPoolExecutor
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from engine.arena_layout import LAYOUT_CLASSIC, LAYOUT_PROCEDURAL, LAYOUT_TYPES  # noqa: E402
 from evaluation.battle_metrics import BattleMetrics, evaluate_seed  # noqa: E402
-from evaluation.battle_score import ScoreBreakdown, score_battle  # noqa: E402
+from evaluation.battle_score import score_battle  # noqa: E402
+from evaluation.candidate import Candidate  # noqa: E402
 
 # The share of a range treated as its best when comparing the top against
 # everything else.
 TOP_DECILE = 0.10
 # How many candidates the diversity audit looks at.
 AUDIT_SIZE = 100
-
-
-@dataclass(frozen=True)
-class Candidate:
-    """One evaluated battle: its metrics and what they scored."""
-
-    metrics: BattleMetrics
-    score: ScoreBreakdown
-
-    @property
-    def rank_key(self) -> tuple[float, int]:
-        """Best first, and ties broken by seed so ordering is total."""
-        return (-self.score.total, self.metrics.seed)
 
 
 def evaluate(job: tuple[int, str]) -> Candidate:

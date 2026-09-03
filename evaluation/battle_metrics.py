@@ -32,6 +32,18 @@ LEAD_THRESHOLD = 1.0
 # How close two fighters have to be for the fight to read as close.
 CLOSE_HEALTH_GAP = 20.0
 
+# How often the running battle is checked for non-finite or out-of-arena
+# state, matching the arena harness: every tick is wasteful over thousands of
+# battles and misses nothing that survives a twenty-fourth of a second.
+VALIDITY_CHECK_EVERY = 5
+
+# The four things an arena can contain, named coarsely. A curator wants to
+# know that a layout is "two bumpers and a rotor", not where they are.
+SHAPE_BUMPER = "bumper"
+SHAPE_BAR = "bar"
+SHAPE_ROTOR = "rotor"
+SHAPE_GATE = "gate"
+
 
 @dataclass(frozen=True)
 class BattleMetrics:
@@ -72,6 +84,19 @@ class BattleMetrics:
     distinct_obstacles_contacted: int
     kinetic_obstacle_contacts: int
 
+    # --- appended after the scoring fields, and defaulted, so that a
+    # hand-written metrics record stays short. Nothing here feeds the score;
+    # it is what a production curator needs on top of it. ---
+
+    # What the arena was made of, coarsely: sorted (kind, count) pairs, with
+    # no coordinates in it, so two layouts that look alike compare equal.
+    layout_shape: tuple[tuple[str, int], ...] = ()
+    # Whether the battle stayed physically sane the whole way through, and
+    # whether it cleaned up after itself. Both should always be true; a
+    # production batch is exactly where it matters that they were checked.
+    state_valid: bool = True
+    entities_leaked: bool = False
+
     @property
     def is_elimination(self) -> bool:
         return not self.is_timeout and not self.is_draw
@@ -106,6 +131,7 @@ class _Collector:
     contacts: int = 0
     kinetic_contacts: int = 0
     touched: set[int] = field(default_factory=set)
+    state_valid: bool = True
 
     def observe_health(self, first_health: float, second_health: float) -> None:
         """Fold one tick of the health picture in.
@@ -142,6 +168,9 @@ class _Collector:
     def sample(self, sim: Simulation, kinetic_ids: frozenset[int]) -> None:
         first, second = sim.balls[0], sim.balls[1]
         self.observe_health(first.health, second.health)
+
+        if sim.ticks % VALIDITY_CHECK_EVERY == 0 and not sim.is_state_valid():
+            self.state_valid = False
 
         for ball in sim.balls:
             self.max_speed = max(self.max_speed, ball.velocity.length)
@@ -211,7 +240,40 @@ def _finish(
         obstacle_contacts=collector.contacts,
         distinct_obstacles_contacted=len(collector.touched),
         kinetic_obstacle_contacts=collector.kinetic_contacts,
+        layout_shape=layout_shape(sim.layout),
+        state_valid=collector.state_valid,
+        entities_leaked=_leaked(sim),
     )
+
+
+def layout_shape(layout) -> tuple[tuple[str, int], ...]:
+    """An arena's composition as sorted (kind, count) pairs.
+
+    Deliberately coarse and coordinate-free: this is how a curator tells
+    "bumper plus rotor" from "two bars", not how it tells one rotor from an
+    identical rotor two pixels to the left.
+    """
+    counts: Counter[str] = Counter()
+    for spec in layout.obstacles:
+        if spec.is_circle:
+            counts[SHAPE_BUMPER] += 1
+        elif spec.is_rotor:
+            counts[SHAPE_ROTOR] += 1
+        elif spec.is_gate:
+            counts[SHAPE_GATE] += 1
+        else:
+            counts[SHAPE_BAR] += 1
+    return tuple(sorted(counts.items()))
+
+
+def _leaked(sim: Simulation) -> bool:
+    """True if anything temporary outlived the battle it belonged to.
+
+    A clean space ends holding the fighters and one body per moving
+    obstacle, and nothing else.
+    """
+    expected = len(sim.balls) + len(sim.kinetic_obstacles)
+    return bool(sim.dynamic_entities) or len(sim.space.bodies) != expected
 
 
 def _subtype_counts(hits: Iterable) -> tuple[tuple[str, int], ...]:
