@@ -68,6 +68,21 @@ class Impact:
 
 
 @dataclass(frozen=True)
+class ObstacleContact:
+    """One fighter touching one arena obstacle, reported when contact begins.
+
+    Purely observational: no damage, no event, no effect on the solver. It
+    exists so tooling outside the simulation can tell how much a battle
+    actually used the arena it was given. Reported on collision *begin*, so a
+    fighter resting against a bumper is one contact rather than one per tick.
+    """
+
+    tick: int
+    fighter_id: int
+    obstacle_id: int
+
+
+@dataclass(frozen=True)
 class EntityContact:
     """A dynamic entity touching a fighter, a static obstacle or the wall.
 
@@ -139,8 +154,12 @@ class Simulation:
         self._ball_by_shape = {ball.shape: ball for ball in self.balls}
         self._ball_by_id = {ball.ball_id: ball for ball in self.balls}
         self.impacts: list[Impact] = []
+        self.obstacle_contacts: list[ObstacleContact] = []
         self.space.on_collision(
             COLLISION_TYPE_BALL, COLLISION_TYPE_BALL, begin=self._on_ball_impact
+        )
+        self.space.on_collision(
+            COLLISION_TYPE_BALL, COLLISION_TYPE_OBSTACLE, begin=self._on_ball_obstacle
         )
 
         # Temporary entities. Ids continue past the fighters, so 0..n-1 are
@@ -309,6 +328,24 @@ class Simulation:
 
     # --- collision reporting ---
 
+    def _on_ball_obstacle(self, arbiter: pymunk.Arbiter, space, data) -> None:
+        """Note that a fighter touched an obstacle. Changes nothing about it.
+
+        Returning None accepts the collision exactly as the default handler
+        would, so registering this callback leaves the bounce, the impulse
+        and therefore the whole battle bit-for-bit unchanged.
+        """
+        ball: Ball | None = None
+        spec: ObstacleSpec | None = None
+        for shape in arbiter.shapes:
+            ball = ball or self._ball_by_shape.get(shape)
+            spec = spec or self._obstacle_by_shape.get(shape)
+        if ball is None or spec is None:
+            return
+        self.obstacle_contacts.append(
+            ObstacleContact(self.ticks, ball.ball_id, spec.obstacle_id)
+        )
+
     def _on_ball_impact(self, arbiter: pymunk.Arbiter, space, data) -> None:
         """Collision-begin callback: one report per physical impact."""
         shape_a, shape_b = arbiter.shapes
@@ -332,6 +369,7 @@ class Simulation:
         """Advance the physics by exactly one fixed tick."""
         self.impacts.clear()
         self.entity_contacts.clear()
+        self.obstacle_contacts.clear()
 
         # The arena moves first: a fighter resolving against a bar this tick
         # should meet the velocity the bar is about to have, not last tick's.
