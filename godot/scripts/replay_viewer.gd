@@ -18,7 +18,7 @@ const WALL_THICKNESS := 0.16
 
 const CAMERA_FOV := 50.0
 const CAMERA_ELEVATION_DEG := 68.0
-const CAMERA_MARGIN := 0.7
+const CAMERA_MARGIN := 0.45
 
 const HUD_WIDTH := 1080.0
 const HEALTH_BAR_POSITION := Vector2(300.0, 0.0)
@@ -60,8 +60,8 @@ func _ready() -> void:
 	_build_hud()
 	_apply_playhead(0.0)
 
-	print("replay loaded: seed=%s frames=%d duration=%.2fs" % [
-		str(_replay.get("seed", "?")),
+	print("replay loaded: seed=%d frames=%d duration=%.2fs" % [
+		int(_replay.get("seed", 0)),
 		_frames.size(),
 		float(_replay.get("result", {}).get("duration", 0.0)),
 	])
@@ -154,8 +154,8 @@ func _build_environment() -> void:
 	var sky_material := ProceduralSkyMaterial.new()
 	sky_material.sky_top_color = Color(0.09, 0.11, 0.19)
 	sky_material.sky_horizon_color = Color(0.19, 0.21, 0.29)
-	sky_material.ground_horizon_color = Color(0.10, 0.11, 0.16)
-	sky_material.ground_bottom_color = Color(0.04, 0.04, 0.07)
+	sky_material.ground_horizon_color = Color(0.13, 0.145, 0.20)
+	sky_material.ground_bottom_color = Color(0.055, 0.06, 0.09)
 
 	var sky := Sky.new()
 	sky.sky_material = sky_material
@@ -165,13 +165,16 @@ func _build_environment() -> void:
 	environment.sky = sky
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
 	environment.ambient_light_sky_contribution = 1.0
-	environment.ambient_light_energy = 1.0
+	environment.ambient_light_energy = 0.55
 	environment.tonemap_mode = Environment.TONE_MAPPER_ACES
 	# Restrained glow: highlights pop without washing the arena out.
 	environment.glow_enabled = true
 	environment.glow_intensity = 0.25
-	environment.glow_bloom = 0.05
+	environment.glow_bloom = 0.02
 	environment.glow_hdr_threshold = 1.1
+	environment.ssao_enabled = true
+	environment.ssao_radius = 0.6
+	environment.ssao_intensity = 1.2
 
 	var world := WorldEnvironment.new()
 	world.name = "WorldEnvironment"
@@ -183,20 +186,22 @@ func _build_lights() -> void:
 	var key := DirectionalLight3D.new()
 	key.name = "KeyLight"
 	key.light_color = Color(1.0, 0.97, 0.92)
-	key.light_energy = 1.7
+	key.light_energy = 1.5
 	key.shadow_enabled = true
 	key.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
 	key.directional_shadow_max_distance = 60.0
 	key.shadow_bias = 0.04
-	key.rotation_degrees = Vector3(-52.0, 38.0, 0.0)
+	# Yaw past 180 degrees so the light travels towards the camera and the
+	# sphere shadows land in front of them instead of hiding behind them.
+	key.rotation_degrees = Vector3(-48.0, 215.0, 0.0)
 	add_child(key)
 
 	var fill := DirectionalLight3D.new()
 	fill.name = "FillLight"
 	fill.light_color = Color(0.70, 0.79, 1.0)
-	fill.light_energy = 0.45
+	fill.light_energy = 0.38
 	fill.shadow_enabled = false
-	fill.rotation_degrees = Vector3(-24.0, -140.0, 0.0)
+	fill.rotation_degrees = Vector3(-22.0, 30.0, 0.0)
 	add_child(fill)
 
 
@@ -236,12 +241,14 @@ func _build_arena() -> void:
 	var floor_node := MeshInstance3D.new()
 	floor_node.name = "Floor"
 	floor_node.mesh = floor_mesh
-	floor_node.material_override = _make_material(Color(0.13, 0.14, 0.19), 0.15, 0.55)
+	# Matte floor: with the key light behind the camera, any gloss here would
+	# mirror it straight back and wash the arena out.
+	floor_node.material_override = _make_material(Color(0.20, 0.21, 0.26), 0.05, 0.72, 0.25)
 	floor_node.position = Vector3(0.0, -FLOOR_THICKNESS * 0.5, 0.0)
 	add_child(floor_node)
 
 	# Wall inner faces sit exactly on the arena bounds, like the Pymunk walls.
-	var wall_material := _make_material(Color(0.30, 0.33, 0.42), 0.55, 0.35)
+	var wall_material := _make_material(Color(0.24, 0.26, 0.33), 0.25, 0.55, 0.35)
 	var side_size := Vector3(WALL_THICKNESS, WALL_HEIGHT, outer_z)
 	var end_size := Vector3(outer_x, WALL_HEIGHT, WALL_THICKNESS)
 	var wall_y := WALL_HEIGHT * 0.5
@@ -276,7 +283,7 @@ func _build_fighters() -> void:
 		mesh.radial_segments = 48
 		mesh.rings = 24
 
-		var live := _make_material(color, 0.45, 0.24)
+		var live := _make_material(color, 0.40, 0.22)
 		var dead := _make_material(color.darkened(0.72), 0.15, 0.7)
 
 		var node := MeshInstance3D.new()
@@ -291,11 +298,12 @@ func _build_fighters() -> void:
 		_dead_materials.append(dead)
 
 
-func _make_material(color: Color, metallic: float, roughness: float) -> StandardMaterial3D:
+func _make_material(color: Color, metallic: float, roughness: float,
+		specular := 0.6) -> StandardMaterial3D:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
 	material.metallic = metallic
-	material.metallic_specular = 0.6
+	material.metallic_specular = specular
 	material.roughness = roughness
 	return material
 
