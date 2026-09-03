@@ -676,9 +676,9 @@ def orbit_replay() -> dict:
     return record_battle(SEED, powers=["orbit", "titan"])
 
 
-def test_replay_stays_at_version_3(orbit_replay: dict) -> None:
+def test_replay_is_current_version(orbit_replay: dict) -> None:
     """Python exports final positions, so Orbit needs no new fields."""
-    assert orbit_replay["version"] == REPLAY_VERSION == 3
+    assert orbit_replay["version"] == REPLAY_VERSION == 4
 
 
 def test_orbit_travels_through_the_generic_entities_list(orbit_replay: dict) -> None:

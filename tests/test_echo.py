@@ -589,9 +589,9 @@ def echo_replay() -> dict:
     return record_battle(SEED, powers=["echo", "titan"])
 
 
-def test_replay_stays_at_version_3(echo_replay: dict) -> None:
-    """Echo needs no new fields, so the schema does not move."""
-    assert echo_replay["version"] == REPLAY_VERSION == 3
+def test_replay_is_current_version(echo_replay: dict) -> None:
+    """Echo needs no fields of its own; it rides the shared schema."""
+    assert echo_replay["version"] == REPLAY_VERSION == 4
 
 
 def test_echo_travels_through_the_generic_entities_list(echo_replay: dict) -> None:

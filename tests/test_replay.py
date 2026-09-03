@@ -27,7 +27,7 @@ def replay() -> dict:
 
 
 def test_metadata_describes_the_simulation(replay: dict) -> None:
-    assert replay["version"] == REPLAY_VERSION == 3
+    assert replay["version"] == REPLAY_VERSION == 4
     assert replay["seed"] == SEED
     assert replay["fps"] == REPLAY_FPS == 60
     assert replay["physics_hz"] == PHYSICS_HZ

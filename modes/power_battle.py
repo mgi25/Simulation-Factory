@@ -3,6 +3,10 @@
 The mode reads impacts reported by the simulation and owns every combat
 consequence, plus the lifecycle of each fighter's power. Physics stays in
 `engine`, power effects stay in `powers`, presentation stays in `rendering`.
+
+It also records the moments a renderer needs - see `modes.events`. Recording
+is write-only: nothing in the rules reads the list back, so it cannot change
+the outcome of a battle.
 """
 
 from __future__ import annotations
@@ -13,6 +17,13 @@ from typing import Iterable
 from engine.randomizer import make_power_rng
 from engine.simulation import PHYSICS_DT, PHYSICS_HZ, Simulation
 from entities.ball import Ball
+from modes.events import (
+    EVENT_ELIMINATION,
+    EVENT_HIT,
+    EVENT_POWER_ACTIVATE,
+    HIT_IMPACT,
+    BattleEvent,
+)
 from powers import Power, PowerSpec, assign_powers
 from powers.power import seconds_to_ticks
 
@@ -67,6 +78,11 @@ class PowerBattleMode:
         self.is_draw = False
         self.finished_tick: int | None = None
         self._last_damage_tick: dict[tuple[int, int], int] = {}
+
+        # Every drawable moment of the battle, in the order it happened. A
+        # whole battle produces a few hundred of these, so keeping the lot is
+        # simpler than draining and cannot drop or duplicate anything.
+        self.events: list[BattleEvent] = []
 
     # --- clock (simulated time only, never wall-clock) ---
 
@@ -149,8 +165,20 @@ class PowerBattleMode:
         if self.warming_up:
             return
         for power in self.powers:
-            if power.owner is not None and power.owner.alive:
-                power.update(self.sim.ticks)
+            owner = power.owner
+            if owner is None or not owner.alive:
+                continue
+            # Activation is noticed here rather than reported by each power,
+            # so adding a power never means remembering to announce itself.
+            before = power.activations
+            power.update(self.sim.ticks)
+            if power.activations > before:
+                self._record(
+                    EVENT_POWER_ACTIVATE,
+                    owner.position,
+                    source_id=owner.ball_id,
+                    subtype=power.name,
+                )
 
     def _deactivate_powers(self) -> None:
         for power in self.powers:
@@ -180,10 +208,16 @@ class PowerBattleMode:
 
             victim = contact.ball
             if victim is not None and victim.alive and entity.contact_damage > 0.0:
-                dealt = victim.take_damage(entity.contact_damage)
-                attacker = self.sim.fighter(entity.owner_id)
-                if attacker is not None:
-                    attacker.damage_dealt += dealt
+                # The entity names the hit: a renderer draws a projectile
+                # strike differently from a clone or an orbiter without the
+                # mode listing which power made which.
+                self._deal_damage(
+                    attacker=self.sim.fighter(entity.owner_id),
+                    victim=victim,
+                    amount=entity.contact_damage,
+                    subtype=entity.kind,
+                    position=tuple(entity.position),
+                )
 
             if entity.despawn_on_ball_contact:
                 self.sim.despawn(entity)
@@ -214,7 +248,67 @@ class PowerBattleMode:
                 continue
             self._last_damage_tick[key] = impact.tick
 
-            attacker.damage_dealt += victim.take_damage(damage)
+            # Halfway between the two centres: the contact is somewhere on
+            # the line between them, and the midpoint needs no randomness to
+            # land somewhere a viewer accepts.
+            contact = (attacker.position + victim.position) * 0.5
+            self._deal_damage(attacker, victim, damage, HIT_IMPACT, tuple(contact))
+
+    def _deal_damage(
+        self,
+        attacker: Ball | None,
+        victim: Ball,
+        amount: float,
+        subtype: str,
+        position: tuple[float, float],
+    ) -> float:
+        """Hurt a fighter, credit the attacker and record the moment.
+
+        The single place a fighter loses health during a battle, which is
+        what keeps the event stream complete: there is no other path that
+        could remove health without leaving a hit behind.
+        """
+        dealt = victim.take_damage(amount)
+        if dealt <= 0.0:
+            return 0.0
+
+        source_id = None
+        if attacker is not None:
+            attacker.damage_dealt += dealt
+            source_id = attacker.ball_id
+
+        self._record(
+            EVENT_HIT,
+            position,
+            source_id=source_id,
+            target_id=victim.ball_id,
+            subtype=subtype,
+            magnitude=dealt,
+        )
+        # A fighter can only run out of health on the hit that takes the last
+        # of it, so this fires exactly once, and always after its own hit.
+        if not victim.alive:
+            self._record(
+                EVENT_ELIMINATION,
+                tuple(victim.position),
+                source_id=source_id,
+                target_id=victim.ball_id,
+                subtype=subtype,
+            )
+        return dealt
+
+    def _record(self, event_type: str, position, **fields) -> None:
+        """Append one drawable moment, stamped with the current tick."""
+        x, y = position
+        self.events.append(
+            BattleEvent(
+                tick=self.sim.ticks,
+                type=event_type,
+                x=float(x),
+                y=float(y),
+                **fields,
+            )
+        )
 
     @staticmethod
     def impact_damage(closing_speed: float) -> float:

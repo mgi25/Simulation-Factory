@@ -12,6 +12,10 @@ const PIXELS_PER_UNIT := 100.0
 
 const DEFAULT_REPLAY := "../output/replay_12345.json"
 
+# The only replay schema this viewer understands. Anything older is rejected
+# with a message rather than half-played.
+const REPLAY_VERSION := 4
+
 const FLOOR_THICKNESS := 0.25
 const WALL_HEIGHT := 0.9
 const WALL_THICKNESS := 0.16
@@ -56,10 +60,11 @@ const CLONE_RIM_AMOUNT := 1.0
 const ORB_EMISSION_ENERGY := 2.2
 const ORB_CORE_LIGHTEN := 0.45
 
+const CombatVFX := preload("res://scripts/combat_vfx.gd")
+
 var _replay: Dictionary = {}
 var _frames: Array = []
 var _fighter_meta: Array = []
-var _fps := 60.0
 
 var _arena_center := Vector2.ZERO
 var _arena_units := Vector2.ONE
@@ -87,7 +92,16 @@ var _entity_materials: Dictionary = {}
 var _entity_root: Node3D
 var _entity_mesh: SphereMesh
 
+var _vfx: Node3D
+
 var _playhead := 0.0
+# The authoritative playback clock, in simulation ticks. Frames are sampled
+# from it and every visual effect is aged against it, so nothing on screen is
+# timed by wall-clock seconds. It keeps advancing once the last frame is
+# reached, which is what lets a final elimination flash finish and clear.
+var _replay_tick := 0.0
+var _physics_hz := 120.0
+var _ticks_per_frame := 2.0
 
 
 func _ready() -> void:
@@ -103,8 +117,10 @@ func _ready() -> void:
 	_build_arena()
 	_build_fighters()
 	_build_entity_pool()
+	_build_vfx()
 	_build_hud()
 	_apply_playhead(0.0)
+	_vfx.update_to_tick(0.0)
 
 	print("replay loaded: seed=%d frames=%d duration=%.2fs" % [
 		int(_replay.get("seed", 0)),
@@ -116,8 +132,12 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if _frames.size() < 2:
 		return
+	# One clock drives everything: real time advances the replay tick, the
+	# replay tick decides which frames to blend and how old each effect is.
+	_replay_tick += delta * _physics_hz
 	var last := float(_frames.size() - 1)
-	_apply_playhead(minf(_playhead + delta * _fps, last))
+	_apply_playhead(minf(_replay_tick / _ticks_per_frame, last))
+	_vfx.update_to_tick(_replay_tick)
 
 
 # --- coordinate conversion -----------------------------------------------
@@ -167,8 +187,9 @@ func _load_replay(path: String) -> bool:
 		return false
 
 	var data: Dictionary = parsed
-	if int(data.get("version", 0)) != 3:
-		push_error("Unsupported replay version: %s" % str(data.get("version")))
+	if int(data.get("version", 0)) != REPLAY_VERSION:
+		push_error("Unsupported replay version: %s (expected %d)" % [
+			str(data.get("version")), REPLAY_VERSION])
 		return false
 
 	var frames: Array = data.get("frames", [])
@@ -180,7 +201,8 @@ func _load_replay(path: String) -> bool:
 	_replay = data
 	_frames = frames
 	_fighter_meta = fighters
-	_fps = float(data.get("fps", 60.0))
+	_physics_hz = maxf(1.0, float(data.get("physics_hz", 120.0)))
+	_ticks_per_frame = maxf(1.0, float(data.get("ticks_per_frame", 2.0)))
 	return true
 
 
@@ -370,6 +392,21 @@ func _build_entity_pool() -> void:
 	_entity_mesh.height = 2.0
 	_entity_mesh.radial_segments = 20
 	_entity_mesh.rings = 10
+
+
+func _build_vfx() -> void:
+	## Combat feedback lives under its own node, so a temporary flash is never
+	## mistaken for a fighter, an entity or part of the HUD.
+	_vfx = CombatVFX.new()
+	_vfx.name = "VFXRoot"
+	add_child(_vfx)
+
+	var colors: Array[Color] = []
+	for meta in _fighter_meta:
+		colors.append(_color_of(meta))
+
+	_vfx.configure(colors, get_node_or_null("Camera3D"), _physics_hz, to_world)
+	_vfx.set_events(_replay.get("events", []))
 
 
 func _entity_material(kind: String, color: Color) -> StandardMaterial3D:

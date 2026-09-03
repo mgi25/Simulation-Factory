@@ -13,6 +13,7 @@ from typing import Any, Iterable
 
 from engine.arena import CANVAS_HEIGHT, CANVAS_WIDTH
 from engine.simulation import PHYSICS_HZ, Simulation
+from modes.events import BattleEvent
 from modes.power_battle import BATTLE_DURATION_SECONDS, PowerBattleMode
 from powers import PowerSpec
 
@@ -22,7 +23,11 @@ from powers import PowerSpec
 # v3 adds a per-frame `entities` list for temporary objects that come and go.
 # It is deliberately generic - id, type, owner, position, radius, colour - so
 # later powers reuse the same collection instead of adding their own fields.
-REPLAY_VERSION = 3
+# v4 adds a top-level `events` list: the discrete moments a renderer needs in
+# order to show that something happened. It sits beside `frames` rather than
+# inside them because physics runs at 120 Hz and frames are sampled at 60, so
+# a per-frame home would round every event to the nearest sample.
+REPLAY_VERSION = 4
 REPLAY_FPS = 60
 TICKS_PER_FRAME = PHYSICS_HZ // REPLAY_FPS
 
@@ -62,6 +67,26 @@ def _frame(sim: Simulation) -> dict[str, Any]:
             for entity in sim.dynamic_entities
             if entity.active
         ],
+    }
+
+
+def _event(event: BattleEvent) -> dict[str, Any]:
+    """One battle event as plain JSON.
+
+    Every event carries the same keys, absent values included as null, so a
+    renderer reads one shape rather than probing for optional fields.
+    """
+    return {
+        "tick": event.tick,
+        "type": event.type,
+        "x": round(event.x, DECIMALS),
+        "y": round(event.y, DECIMALS),
+        "source_id": event.source_id,
+        "target_id": event.target_id,
+        "subtype": event.subtype,
+        "magnitude": (
+            None if event.magnitude is None else round(event.magnitude, DECIMALS)
+        ),
     }
 
 
@@ -110,6 +135,10 @@ def record_battle(
             for ball in sim.balls
         ],
         "frames": frames,
+        # Recorded in the order the battle produced them, which is already
+        # tick order: a lethal hit is therefore immediately followed by its
+        # elimination, and nothing has to be sorted afterwards.
+        "events": [_event(event) for event in mode.events],
         "result": {
             "winner_id": None if mode.winner is None else mode.winner.ball_id,
             "is_draw": mode.is_draw,
