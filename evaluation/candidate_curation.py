@@ -306,7 +306,14 @@ def curate(
         if is_mirror(metrics.powers) and mirrors >= config.mirror_cap:
             result.rejected[REJECT_MIRROR] += 1
             continue
-        if any(powers[power] >= config.power_cap for power in set(metrics.powers)):
+        # What the count would become, not where it already stands: a mirror
+        # matchup brings two appearances of one power at once, so testing the
+        # running total alone lets it step over the cap by one.
+        appearances = Counter(metrics.powers)
+        if any(
+            powers[power] + count > config.power_cap
+            for power, count in appearances.items()
+        ):
             result.rejected[REJECT_POWER] += 1
             continue
         if motions[motion] >= config.motion_cap:
@@ -322,8 +329,7 @@ def curate(
         result.selected.append(candidate)
         matchups[key] += 1
         motions[motion] += 1
-        for power in metrics.powers:
-            powers[power] += 1
+        powers.update(appearances)
         if is_mirror(metrics.powers):
             mirrors += 1
 

@@ -245,6 +245,101 @@ def test_no_single_power_can_dominate_a_batch() -> None:
     assert result.rejected[REJECT_POWER] > 0
 
 
+def fill_appearances(power: str, count: int) -> list[Candidate]:
+    """Battles that between them use `power` exactly `count` times.
+
+    Each one is a cross matchup against a rotating cast, and every one
+    differs in length, hits, lead changes and arena, so nothing but the power
+    cap can turn any of them away.
+    """
+    others = ["orbit", "pulse", "rush", "titan", "echo"]
+    return [
+        candidate(
+            total=99.0 - index * 0.1,
+            seed=900 + index,
+            powers=(power, next(o for o in others[index % len(others):] + others
+                                if o != power)),
+            duration=8.0 + index * 4.0,
+            damaging_hits=4 + index * 4,
+            lead_changes=index,
+            layout_shape=(("bumper", index % 3 + 1),),
+            kinetic_obstacles=index % 3,
+        )
+        for index in range(count)
+    ]
+
+
+def power_cap_config() -> CurationConfig:
+    """Only the power cap binds: every other quota is opened right up."""
+    return config(
+        size=10,
+        power_share=0.30,      # 30% of 20 appearance slots, so a cap of six
+        matchup_share=1.0,
+        mirror_share=1.0,
+        motion_share=1.0,
+    )
+
+
+def test_a_cross_matchup_may_land_exactly_on_the_power_cap() -> None:
+    settings = power_cap_config()
+    assert settings.power_cap == 6
+    pool = fill_appearances("echo", 5) + [
+        candidate(total=90.0, seed=1, powers=("echo", "titan"), duration=30.0,
+                  damaging_hits=40, lead_changes=9, layout_shape=(("gate", 2),))
+    ]
+    result = curate(pool, settings)
+    assert result.rejected[REJECT_POWER] == 0
+    assert 1 in [c.metrics.seed for c in result.selected]
+    assert summarise(result.selected)["powers"]["echo"] == settings.power_cap
+
+
+def test_a_cross_matchup_that_would_pass_the_power_cap_is_rejected() -> None:
+    settings = power_cap_config()
+    pool = fill_appearances("echo", 6) + [
+        candidate(total=90.0, seed=1, powers=("echo", "titan"), duration=30.0,
+                  damaging_hits=40, lead_changes=9, layout_shape=(("gate", 2),))
+    ]
+    result = curate(pool, settings)
+    assert result.rejected[REJECT_POWER] == 1
+    assert 1 not in [c.metrics.seed for c in result.selected]
+    assert summarise(result.selected)["powers"]["echo"] == settings.power_cap
+
+
+def test_a_mirror_may_land_exactly_on_the_power_cap() -> None:
+    """A mirror brings two appearances, and two is exactly what is left."""
+    settings = power_cap_config()
+    pool = fill_appearances("echo", 4) + [
+        candidate(total=90.0, seed=1, powers=("echo", "echo"), duration=30.0,
+                  damaging_hits=40, lead_changes=9, layout_shape=(("gate", 2),))
+    ]
+    result = curate(pool, settings)
+    assert result.rejected[REJECT_POWER] == 0
+    assert 1 in [c.metrics.seed for c in result.selected]
+    assert summarise(result.selected)["powers"]["echo"] == settings.power_cap
+
+
+def test_a_mirror_that_would_overshoot_the_power_cap_by_one_is_rejected() -> None:
+    """The case a running-total check misses: five plus two is seven, not six."""
+    settings = power_cap_config()
+    pool = fill_appearances("echo", 5) + [
+        candidate(total=90.0, seed=1, powers=("echo", "echo"), duration=30.0,
+                  damaging_hits=40, lead_changes=9, layout_shape=(("gate", 2),))
+    ]
+    result = curate(pool, settings)
+    assert result.rejected[REJECT_POWER] == 1
+    assert 1 not in [c.metrics.seed for c in result.selected]
+    assert summarise(result.selected)["powers"]["echo"] <= settings.power_cap
+
+
+def test_no_batch_ever_exceeds_the_power_cap(pool: list[Candidate]) -> None:
+    """The invariant itself, over a real pool rather than a built one."""
+    for share in (0.20, 0.30, 0.40):
+        settings = config(size=10, power_share=share, matchup_share=1.0,
+                          mirror_share=1.0, motion_share=1.0)
+        counts = summarise(curate(pool, settings).selected)["powers"]
+        assert all(count <= settings.power_cap for count in counts.values())
+
+
 def test_mirrors_are_allowed_but_capped() -> None:
     mirrors = [
         candidate(total=95.0 - index, seed=index, powers=(power, power),
