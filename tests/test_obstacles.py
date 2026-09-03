@@ -12,6 +12,8 @@ from engine.arena_layout import (
     COLLISION_TYPE_OBSTACLE,
     LAYOUT_CLASSIC,
     LAYOUT_PROCEDURAL,
+    MOTION_KINDS,
+    MOTION_STATIC,
     OBSTACLE_BOX,
     OBSTACLE_CIRCLE,
     OBSTACLE_ELASTICITY,
@@ -371,8 +373,8 @@ def procedural_replay() -> dict:
     return record_battle(SEED, arena_mode=LAYOUT_PROCEDURAL)
 
 
-def test_the_replay_is_version_5(classic_replay: dict) -> None:
-    assert classic_replay["version"] == REPLAY_VERSION == 5
+def test_the_replay_is_version_6(classic_replay: dict) -> None:
+    assert classic_replay["version"] == REPLAY_VERSION == 6
 
 
 def test_a_classic_replay_still_carries_an_empty_layout(classic_replay: dict) -> None:
@@ -403,7 +405,14 @@ def test_a_procedural_replay_carries_its_geometry(procedural_replay: dict) -> No
             "width",
             "height",
             "rotation_degrees",
+            "motion",
+            "angular_speed",
+            "slide_axis",
+            "slide_distance",
+            "slide_speed",
+            "slide_phase",
         }
+        assert obstacle["motion"] in MOTION_KINDS
         assert all(
             math.isfinite(obstacle[key])
             for key in ("x", "y", "radius", "width", "height", "rotation_degrees")
@@ -445,6 +454,12 @@ def test_a_pinned_layout_round_trips_through_the_replay() -> None:
         "width": 0.0,
         "height": 0.0,
         "rotation_degrees": 0.0,
+        "motion": MOTION_STATIC,
+        "angular_speed": 0.0,
+        "slide_axis": "",
+        "slide_distance": 0.0,
+        "slide_speed": 0.0,
+        "slide_phase": 0.0,
     }
     assert box["type"] == OBSTACLE_BOX
     assert box["rotation_degrees"] == 45.0
@@ -452,10 +467,23 @@ def test_a_pinned_layout_round_trips_through_the_replay() -> None:
 
 
 def test_frames_never_repeat_the_static_geometry(procedural_replay: dict) -> None:
+    """A frame carries transforms, never geometry.
+
+    Whatever an obstacle *is* - its size, its shape, how it moves - is in the
+    layout and appears exactly once. A frame says only where the moving ones
+    currently are, so a thousand-frame replay never repeats a single width.
+    """
     assert "layout" in procedural_replay
+    static_ids = {
+        obstacle["id"]
+        for obstacle in procedural_replay["layout"]["obstacles"]
+        if obstacle["motion"] == MOTION_STATIC
+    }
     for frame in procedural_replay["frames"]:
         assert "layout" not in frame
-        assert "obstacles" not in frame
+        for state in frame["obstacles"]:
+            assert set(state) == {"id", "x", "y", "rotation_degrees"}
+            assert state["id"] not in static_ids, "a still obstacle was resent"
         # Frames only ever carry things that come and go.
         for entity in frame["entities"]:
             assert entity["type"] in ("projectile", "echo", "orbit", "entity")

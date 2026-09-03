@@ -678,11 +678,11 @@ def orbit_replay() -> dict:
 
 def test_replay_is_current_version(orbit_replay: dict) -> None:
     """Python exports final positions, so Orbit needs no new fields."""
-    assert orbit_replay["version"] == REPLAY_VERSION == 5
+    assert orbit_replay["version"] == REPLAY_VERSION == 6
 
 
 def test_orbit_travels_through_the_generic_entities_list(orbit_replay: dict) -> None:
-    assert set(orbit_replay["frames"][0]) == {"tick", "fighters", "entities"}
+    assert set(orbit_replay["frames"][0]) == {"tick", "fighters", "entities", "obstacles"}
     owner_color = orbit_replay["fighters"][0]["color"]
 
     seen = 0

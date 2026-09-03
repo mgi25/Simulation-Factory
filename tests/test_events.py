@@ -454,8 +454,8 @@ def replay() -> dict:
     return record_battle(SEED)
 
 
-def test_the_replay_is_version_5(replay: dict) -> None:
-    assert replay["version"] == REPLAY_VERSION == 5
+def test_the_replay_is_version_6(replay: dict) -> None:
+    assert replay["version"] == REPLAY_VERSION == 6
 
 
 def test_the_replay_carries_a_top_level_event_list(replay: dict) -> None:
@@ -464,7 +464,7 @@ def test_the_replay_carries_a_top_level_event_list(replay: dict) -> None:
     # Events live beside the frames, not inside them: the frame contract is
     # unchanged and event timing survives 60 Hz sampling.
     for frame in replay["frames"][:20]:
-        assert set(frame) == {"tick", "fighters", "entities"}
+        assert set(frame) == {"tick", "fighters", "entities", "obstacles"}
 
 
 def test_every_event_record_has_the_agreed_fields(replay: dict) -> None:

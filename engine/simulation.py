@@ -18,11 +18,10 @@ from engine.arena_generator import layout_for_mode
 from engine.arena_layout import (
     COLLISION_TYPE_OBSTACLE,
     LAYOUT_CLASSIC,
-    OBSTACLE_ELASTICITY,
-    OBSTACLE_FRICTION,
     ArenaLayout,
     ObstacleSpec,
 )
+from engine.obstacle_runtime import ObstacleRuntime
 from engine.randomizer import generate_ball_spawns, make_rng
 from entities.ball import COLLISION_TYPE_BALL, COLLISION_TYPE_WALL, Ball
 from entities.dynamic_entity import COLLISION_TYPE_DYNAMIC_ENTITY, DynamicEntity
@@ -192,29 +191,19 @@ class Simulation:
             self.walls.append(wall)
 
     def _build_obstacles(self) -> None:
-        """Turn the layout's plain data into static shapes on the arena floor.
-
-        A bar's polygon is built from the same `corners()` the layout uses for
-        every clearance check, so a rotated obstacle is physically exactly
-        where the replay says it is - there is no second rotation maths here
-        that could disagree with the first.
-        """
-        self.obstacle_shapes: list[pymunk.Shape] = []
-        self._obstacle_by_shape: dict[pymunk.Shape, ObstacleSpec] = {}
-
-        for spec in self.layout.obstacles:
-            if spec.is_circle:
-                shape: pymunk.Shape = pymunk.Circle(
-                    self.space.static_body, spec.radius, offset=spec.center
-                )
-            else:
-                shape = pymunk.Poly(self.space.static_body, spec.corners())
-            shape.elasticity = OBSTACLE_ELASTICITY
-            shape.friction = OBSTACLE_FRICTION
-            shape.collision_type = COLLISION_TYPE_OBSTACLE
-            self.space.add(shape)
-            self.obstacle_shapes.append(shape)
-            self._obstacle_by_shape[shape] = spec
+        """Give every obstacle in the layout a body and a shape in the space."""
+        self.obstacles: list[ObstacleRuntime] = [
+            ObstacleRuntime(spec, self.space) for spec in self.layout.obstacles
+        ]
+        self.obstacle_shapes: list[pymunk.Shape] = [
+            runtime.shape for runtime in self.obstacles
+        ]
+        self._obstacle_by_shape: dict[pymunk.Shape, ObstacleSpec] = {
+            runtime.shape: runtime.spec for runtime in self.obstacles
+        }
+        # Only these need a tick hook, so a battle on a static arena pays
+        # nothing at all for the kinetic machinery.
+        self.kinetic_obstacles = [r for r in self.obstacles if r.is_kinetic]
 
     @property
     def arena_mode(self) -> str:
@@ -225,6 +214,12 @@ class Simulation:
         for spec in self.layout.obstacles:
             if spec.obstacle_id == obstacle_id:
                 return spec
+        return None
+
+    def obstacle_runtime(self, obstacle_id: int) -> ObstacleRuntime | None:
+        for runtime in self.obstacles:
+            if runtime.obstacle_id == obstacle_id:
+                return runtime
         return None
 
     # --- dynamic entities ---
@@ -338,6 +333,11 @@ class Simulation:
         self.impacts.clear()
         self.entity_contacts.clear()
 
+        # The arena moves first: a fighter resolving against a bar this tick
+        # should meet the velocity the bar is about to have, not last tick's.
+        for runtime in self.kinetic_obstacles:
+            runtime.before_step(self.elapsed)
+
         # Entities that position themselves relative to something else get
         # their chance immediately before collisions are solved.
         for entity in list(self.dynamic_entities):
@@ -404,5 +404,10 @@ class Simulation:
                 return False
         for entity in self.dynamic_entities:
             if not all(math.isfinite(v) for v in entity.position):
+                return False
+        # A moving obstacle is driven, never solved, so this should never
+        # trip - which is exactly why it is worth asserting.
+        for runtime in self.kinetic_obstacles:
+            if not runtime.is_finite():
                 return False
         return True

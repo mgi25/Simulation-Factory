@@ -14,7 +14,7 @@ const DEFAULT_REPLAY := "../output/replay_12345.json"
 
 # The only replay schema this viewer understands. Anything older is rejected
 # with a message rather than half-played.
-const REPLAY_VERSION := 5
+const REPLAY_VERSION := 6
 
 const FLOOR_THICKNESS := 0.25
 const WALL_HEIGHT := 0.9
@@ -55,6 +55,15 @@ const BAR_HEIGHT := 0.42
 const BAR_STRIP_HEIGHT := 0.022
 const BAR_STRIP_LENGTH := 0.88
 const BAR_STRIP_WIDTH := 0.26
+
+# Enough to tell a moving piece from a still one at a glance, and no more: a
+# hub disc where a bar turns, and a cap at each end of a gate. Both are lit
+# from the same restrained slate accent as the rest of the arena chrome, so
+# neither ever competes with a Pulse bolt or an impact ring.
+const ROTOR_HUB_RADIUS := 0.13
+const ROTOR_HUB_HEIGHT := 0.06
+const GATE_CAP_LENGTH := 0.05
+const GATE_CAP_RISE := 0.06
 
 # Nearly overhead: the arena is deeper than it is wide, and a portrait frame
 # only gets its height back by looking down on it. Still angled enough to keep
@@ -122,6 +131,11 @@ var _entity_nodes: Dictionary = {}
 var _entity_materials: Dictionary = {}
 var _entity_root: Node3D
 var _entity_mesh: SphereMesh
+
+# Pivots of the obstacles that move, keyed by the replay's obstacle id. Built
+# once from the layout; every frame writes a transform into them and nothing
+# is ever created or freed while playing back.
+var _obstacle_pivots: Dictionary = {}
 
 var _vfx: Node3D
 
@@ -498,11 +512,15 @@ func _add_wall_piece(piece: String, mesh: Mesh, position: Vector3,
 
 
 func _build_obstacles() -> void:
-	## Static layout geometry, rebuilt from the replay and nothing else.
+	## Arena geometry, rebuilt from the replay and nothing else.
 	##
-	## The viewer does not know how these were generated and must not: the
-	## replay carries the finished geometry, so playback cannot drift from the
+	## The viewer does not know how these were generated or how the moving
+	## ones move, and must not: the layout gives it the geometry once and
+	## every frame gives it the transform, so playback cannot drift from the
 	## simulation that produced it. A classic arena simply lists none.
+	##
+	## Every mesh is built here and only here. A moving obstacle is animated
+	## by writing its pivot transform each frame, never by rebuilding it.
 	var layout: Dictionary = _replay.get("layout", {})
 	var obstacles: Array = layout.get("obstacles", [])
 	if obstacles.is_empty():
@@ -524,10 +542,19 @@ func _build_obstacles() -> void:
 			float(spec.get("x", 0.0)), float(spec.get("y", 0.0)), 0.0)
 		root.add_child(pivot)
 
+		var motion := str(spec.get("motion", "static"))
 		if str(spec.get("type", "")) == "circle":
 			_build_bumper(pivot, spec, body, accent)
 		else:
 			_build_bar(pivot, spec, body, accent)
+			if motion == "rotate":
+				_build_rotor_hub(pivot, accent)
+			elif motion == "slide":
+				_build_gate_caps(pivot, spec, accent)
+
+		# Only the ones that move are looked up again while playing back.
+		if motion != "static":
+			_obstacle_pivots[int(spec.get("id", 0))] = pivot
 
 
 func _build_bumper(pivot: Node3D, spec: Dictionary,
@@ -573,6 +600,32 @@ func _build_bar(pivot: Node3D, spec: Dictionary,
 		width * BAR_STRIP_LENGTH, BAR_STRIP_HEIGHT, depth * BAR_STRIP_WIDTH)
 	_add_obstacle_piece(pivot, "Strip", strip,
 		Vector3(0.0, BAR_HEIGHT, 0.0), accent, false)
+
+
+func _build_rotor_hub(pivot: Node3D, accent: StandardMaterial3D) -> void:
+	## A small lit disc at the pivot, so the bar reads as turning about a
+	## point rather than drifting.
+	var hub := CylinderMesh.new()
+	hub.top_radius = ROTOR_HUB_RADIUS
+	hub.bottom_radius = ROTOR_HUB_RADIUS
+	hub.height = ROTOR_HUB_HEIGHT
+	hub.radial_segments = 24
+	_add_obstacle_piece(pivot, "Hub", hub,
+		Vector3(0.0, BAR_HEIGHT + ROTOR_HUB_HEIGHT * 0.4, 0.0), accent, false)
+
+
+func _build_gate_caps(pivot: Node3D, spec: Dictionary,
+		accent: StandardMaterial3D) -> void:
+	## A lit cap on each end, so a gate reads as a door on a track rather
+	## than a bar that happens to be somewhere new.
+	var width := to_units(float(spec.get("width", 0.0)))
+	var depth := to_units(float(spec.get("height", 0.0)))
+	var cap := BoxMesh.new()
+	cap.size = Vector3(GATE_CAP_LENGTH, BAR_HEIGHT + GATE_CAP_RISE, depth)
+	for side in [-1.0, 1.0]:
+		_add_obstacle_piece(pivot, "Cap%d" % int(side), cap,
+			Vector3(side * (width - GATE_CAP_LENGTH) * 0.5,
+				(BAR_HEIGHT + GATE_CAP_RISE) * 0.5, 0.0), accent, false)
 
 
 func _add_obstacle_piece(pivot: Node3D, piece: String, mesh: Mesh,
@@ -834,6 +887,46 @@ func _apply_playhead(playhead: float) -> void:
 		_powered[i] = powered
 
 	_update_entities(current_entities, upcoming_entities, blend)
+	_update_obstacles(frame.get("obstacles", []), next_frame.get("obstacles", []), blend)
+
+
+func _update_obstacles(current: Array, upcoming: Array, blend: float) -> void:
+	## Move the obstacles that move, purely from what the replay recorded.
+	##
+	## No motion is computed here: the viewer never reads angular speed,
+	## travel or phase, only the transform Python actually had. Interpolation
+	## between two sampled frames is cosmetic, and the angle is blended the
+	## short way round so a bar crossing 359 to 1 degree keeps turning
+	## forwards instead of unwinding almost a full circle.
+	if _obstacle_pivots.is_empty():
+		return
+
+	var next_by_id := {}
+	for raw in upcoming:
+		var soon: Dictionary = raw
+		next_by_id[int(soon.get("id", -1))] = soon
+
+	for raw in current:
+		var now: Dictionary = raw
+		var id := int(now.get("id", -1))
+		var pivot: Node3D = _obstacle_pivots.get(id)
+		if pivot == null:
+			continue
+
+		var x := float(now.get("x", 0.0))
+		var y := float(now.get("y", 0.0))
+		var angle := deg_to_rad(float(now.get("rotation_degrees", 0.0)))
+		if next_by_id.has(id):
+			var soon: Dictionary = next_by_id[id]
+			x = lerpf(x, float(soon.get("x", x)), blend)
+			y = lerpf(y, float(soon.get("y", y)), blend)
+			angle = lerp_angle(
+				angle, deg_to_rad(float(soon.get("rotation_degrees", 0.0))), blend)
+
+		pivot.position = to_world(x, y, 0.0)
+		# Simulation y becomes world Z, which mirrors the plane, so the
+		# rotation is negated here exactly as it is when the bar is built.
+		pivot.rotation.y = -angle
 
 
 func _update_entities(current: Array, upcoming: Array, blend: float) -> void:

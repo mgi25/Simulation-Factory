@@ -589,7 +589,7 @@ def mixed_replay() -> dict:
 
 
 def test_replay_is_current_version(mixed_replay: dict) -> None:
-    assert mixed_replay["version"] == REPLAY_VERSION == 5
+    assert mixed_replay["version"] == REPLAY_VERSION == 6
 
 
 def test_replay_carries_fighter_power_metadata(mixed_replay: dict) -> None:

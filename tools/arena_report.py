@@ -30,10 +30,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from engine.arena import Arena  # noqa: E402
 from engine.arena_generator import (  # noqa: E402
     MAX_FIGHTER_RADIUS,
-    OBSTACLE_PAIR_CLEARANCE,
     OBSTACLE_SPAWN_CLEARANCE,
     OBSTACLE_WALL_CLEARANCE,
     generate_layout,
+    pair_clearance,
 )
 from engine.arena_layout import LAYOUT_CLASSIC, LAYOUT_PROCEDURAL  # noqa: E402
 from engine.randomizer import generate_ball_spawns, make_rng  # noqa: E402
@@ -67,6 +67,7 @@ class LayoutCheck:
     circles: int
     boxes: int
     rotations: tuple[float, ...]
+    kinetic: int
     outside: int
     spawn_conflicts: int
     overlaps: int
@@ -96,24 +97,36 @@ def check_layout(seed: int) -> LayoutCheck:
             obstacle.width,
             obstacle.height,
             obstacle.rotation_degrees,
+            obstacle.angular_speed,
+            obstacle.slide_distance,
+            obstacle.slide_speed,
+            obstacle.slide_phase,
         )
         if not all(math.isfinite(value) for value in values):
             non_finite += 1
-        if obstacle.clearance_to_bounds(arena) < OBSTACLE_WALL_CLEARANCE:
+
+        # Everywhere the obstacle ever reaches, not the pose it starts in:
+        # for a still one those are the same thing, for a rotor or a gate
+        # they are not, and it is the sweep that has to be safe.
+        envelope = obstacle.envelope()
+        if envelope.clearance_to_bounds(arena) < OBSTACLE_WALL_CLEARANCE:
             outside += 1
         for spawn in spawns:
-            if obstacle.distance_to_point(spawn.x, spawn.y) < (
+            if envelope.distance_to_point(spawn.x, spawn.y) < (
                 MAX_FIGHTER_RADIUS + OBSTACLE_SPAWN_CLEARANCE
             ):
                 spawn_conflicts += 1
         for other in layout.obstacles[index + 1 :]:
-            if obstacle.clearance_to(other) < OBSTACLE_PAIR_CLEARANCE:
+            if envelope.clearance_to(other.envelope()) < pair_clearance(
+                obstacle, other
+            ):
                 overlaps += 1
 
     return LayoutCheck(
         seed=seed,
         requested=layout.requested_obstacles,
         placed=len(layout),
+        kinetic=len(layout.kinetic),
         circles=sum(1 for o in layout if o.is_circle),
         boxes=sum(1 for o in layout if not o.is_circle),
         rotations=tuple(o.rotation_degrees for o in layout if not o.is_circle),
@@ -148,6 +161,7 @@ def report_layouts(checks: list[LayoutCheck]) -> None:
 
     print(f"\nobstacles         {sum(c.placed for c in checks)}")
     _distribution("obstacle count", Counter(c.placed for c in checks), total)
+    _distribution("moving obstacles", Counter(c.kinetic for c in checks), total)
     _distribution("circles", Counter(c.circles for c in checks), total)
     _distribution("boxes", Counter(c.boxes for c in checks), total)
 
@@ -173,6 +187,7 @@ class BattleCheck:
     seed: int
     mode: str
     obstacles: int
+    kinetic: int
     fallback: bool
     winner_id: int | None
     duration: float
@@ -181,6 +196,7 @@ class BattleCheck:
     leaked: bool
     penetration: float
     overlap_ticks: int
+    top_speed: float
 
     @property
     def is_draw(self) -> bool:
@@ -192,8 +208,15 @@ class BattleCheck:
 
 
 def static_penetration(sim: Simulation) -> float:
-    """How deep the worst fighter currently is inside a wall or an obstacle."""
+    """How deep the worst fighter currently is inside a wall or an obstacle.
+
+    Measured against where each obstacle *is* this tick, not against the
+    anchor its layout entry records: a gate's anchor is the midpoint of its
+    travel, so a fighter standing there while the gate is at one end is not
+    inside anything at all.
+    """
     arena, worst = sim.arena, 0.0
+    poses = [runtime.placed() for runtime in sim.obstacles]
     for ball in sim.balls:
         x, y = ball.position
         worst = max(
@@ -203,8 +226,8 @@ def static_penetration(sim: Simulation) -> float:
             arena.top + ball.radius - y,
             y - (arena.bottom - ball.radius),
         )
-        for obstacle in sim.layout.obstacles:
-            worst = max(worst, -obstacle.clearance_to_circle(x, y, ball.radius))
+        for pose in poses:
+            worst = max(worst, -pose.clearance_to_circle(x, y, ball.radius))
     return worst
 
 
@@ -215,9 +238,12 @@ def run_battle(job: tuple[int, str]) -> BattleCheck:
     battle = PowerBattleMode(sim)
 
     invalid = False
-    deepest = 0.0
+    deepest = top_speed = 0.0
     overlapping = longest = 0
     while battle.step():
+        # A kinematic obstacle can hand a fighter momentum, so watch what
+        # that adds up to over a whole battle.
+        top_speed = max(top_speed, max(b.velocity.length for b in sim.balls))
         # Every tick: a run of overlapping ticks is only meaningful if none
         # of them are skipped.
         depth = static_penetration(sim)
@@ -227,12 +253,16 @@ def run_battle(job: tuple[int, str]) -> BattleCheck:
         if sim.ticks % VALIDITY_CHECK_EVERY == 0 and not sim.is_state_valid():
             invalid = True
 
-    leaked = bool(sim.dynamic_entities) or len(sim.space.bodies) != len(sim.balls)
+    # The fighters plus one body per moving obstacle is what a clean space
+    # holds at the end; anything more is a temporary entity left behind.
+    expected_bodies = len(sim.balls) + len(sim.kinetic_obstacles)
+    leaked = bool(sim.dynamic_entities) or len(sim.space.bodies) != expected_bodies
     finished_tick = battle.finished_tick or 0
     return BattleCheck(
         seed=seed,
         mode=mode,
         obstacles=len(sim.layout),
+        kinetic=len(sim.layout.kinetic),
         fallback=sim.layout.fallback,
         winner_id=None if battle.winner is None else battle.winner.ball_id,
         duration=finished_tick * PHYSICS_DT,
@@ -241,6 +271,7 @@ def run_battle(job: tuple[int, str]) -> BattleCheck:
         leaked=leaked,
         penetration=deepest,
         overlap_ticks=longest,
+        top_speed=top_speed,
     )
 
 
@@ -266,6 +297,13 @@ def report_battles(results: list[BattleCheck], title: str) -> None:
           f"  (median peak {statistics.median([r.overlap_ticks for r in results]):.0f})")
     print(f"layout fallbacks  {sum(r.fallback for r in results)}")
     print(f"obstacles present {sum(r.obstacles for r in results)}")
+    kinetic = Counter(r.kinetic for r in results)
+    for count in sorted(kinetic):
+        print(f"  {count} moving        {kinetic[count]:>6} ({_percent(kinetic[count], total)})")
+    speeds = sorted(r.top_speed for r in results)
+    print(f"peak fighter speed {speeds[-1]:.0f} px/s"
+          f"  (median peak {statistics.median(speeds):.0f},"
+          f" p99 {speeds[int(0.99 * (total - 1))]:.0f})")
     print(f"median duration   {statistics.median(durations):.2f} s")
     print(f"duration range    {durations[0]:.2f} - {durations[-1]:.2f} s")
 

@@ -16,6 +16,7 @@ from engine.arena_generator import (
     BAR_SHORT_MIN,
     BUMPER_RADIUS_MAX,
     BUMPER_RADIUS_MIN,
+    KINETIC_PAIR_CLEARANCE,
     MAX_FIGHTER_RADIUS,
     MAX_FIGHTER_RADIUS_SCALE,
     MAX_LAYOUT_ATTEMPTS,
@@ -294,10 +295,13 @@ def test_every_obstacle_stays_inside_the_arena(
 ) -> None:
     for layout, _ in layouts:
         for obstacle in layout:
-            left, top, right, bottom = obstacle.bounds()
+            # The envelope, so a rotor's whole sweep and a gate's whole
+            # travel are inside the arena, not just their starting pose.
+            envelope = obstacle.envelope()
+            left, top, right, bottom = envelope.bounds()
             assert arena.left <= left and right <= arena.right
             assert arena.top <= top and bottom <= arena.bottom
-            assert obstacle.clearance_to_bounds(arena) >= OBSTACLE_WALL_CLEARANCE
+            assert envelope.clearance_to_bounds(arena) >= OBSTACLE_WALL_CLEARANCE
 
 
 def test_no_obstacle_touches_a_starting_fighter(
@@ -305,35 +309,63 @@ def test_no_obstacle_touches_a_starting_fighter(
 ) -> None:
     for layout, spawns in layouts:
         for obstacle in layout:
+            envelope = obstacle.envelope()
             for spawn in spawns:
                 # Clear of the circle the fighter starts in, and still clear
-                # of the one it would occupy fully grown.
-                assert obstacle.distance_to_point(spawn.x, spawn.y) >= (
+                # of the one it would occupy fully grown - over the whole
+                # motion, not merely where the obstacle happens to begin.
+                assert envelope.distance_to_point(spawn.x, spawn.y) >= (
                     MAX_FIGHTER_RADIUS + OBSTACLE_SPAWN_CLEARANCE
                 )
-                assert obstacle.clearance_to_circle(spawn.x, spawn.y, spawn.radius) > 0.0
+                assert envelope.clearance_to_circle(spawn.x, spawn.y, spawn.radius) > 0.0
 
 
 def test_obstacles_never_overlap_each_other(
     layouts: list[tuple[ArenaLayout, list]],
 ) -> None:
+    """Measured between envelopes, so a sweep cannot reach another obstacle.
+
+    Two still obstacles keep the full Titan lane between them that phase 5A1
+    established. A pair where either one moves keeps a smaller gap, because
+    that gap is the closest their whole reachable *regions* ever come rather
+    than a distance that is there for the entire battle - but it is still a
+    real separation, so no two sweeps ever touch.
+    """
     for layout, _ in layouts:
         for index, obstacle in enumerate(layout.obstacles):
             for other in layout.obstacles[index + 1 :]:
-                assert obstacle.clearance_to(other) >= OBSTACLE_PAIR_CLEARANCE
+                gap = obstacle.envelope().clearance_to(other.envelope())
+                if obstacle.is_kinetic or other.is_kinetic:
+                    assert gap >= KINETIC_PAIR_CLEARANCE
+                else:
+                    assert gap >= OBSTACLE_PAIR_CLEARANCE
+                assert gap > 0.0
 
 
 def test_every_passage_fits_a_fully_grown_titan(
     arena: Arena, layouts: list[tuple[ArenaLayout, list]]
 ) -> None:
-    """No gap anywhere is narrower than the widest a fighter can ever be."""
+    """The lanes a fighter has to be able to use are wide enough for any of them.
+
+    Against the wall the guarantee is absolute and applies to the whole
+    sweep: there is nowhere along any obstacle's motion that a fully grown
+    Titan cannot get past it, so a moving obstacle can never pin one against
+    the boundary. Between two obstacles the same holds while both are still;
+    where one moves, a full-size fighter is what is guaranteed to fit.
+    """
     titan_diameter = 2.0 * MAX_FIGHTER_RADIUS
+    fighter_diameter = 2.0 * BALL_RADIUS_MAX
     assert MIN_PASSAGE_WIDTH > titan_diameter
+    assert KINETIC_PAIR_CLEARANCE > fighter_diameter
+
     for layout, _ in layouts:
         for index, obstacle in enumerate(layout.obstacles):
-            assert obstacle.clearance_to_bounds(arena) > titan_diameter
+            envelope = obstacle.envelope()
+            assert envelope.clearance_to_bounds(arena) > titan_diameter
             for other in layout.obstacles[index + 1 :]:
-                assert obstacle.clearance_to(other) > titan_diameter
+                gap = envelope.clearance_to(other.envelope())
+                moving = obstacle.is_kinetic or other.is_kinetic
+                assert gap > (fighter_diameter if moving else titan_diameter)
 
 
 def test_the_titan_bound_still_covers_every_power() -> None:

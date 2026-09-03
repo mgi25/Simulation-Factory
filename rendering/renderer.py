@@ -130,13 +130,16 @@ class Renderer:
         )
 
     def _draw_obstacles(self, sim: Simulation) -> None:
-        """Static layout geometry, drawn straight from the obstacle specs.
+        """Arena geometry, drawn where the simulation currently has it.
 
-        A rotated bar is drawn from the same `corners()` the physics polygon
-        is built from, so this view shows where an obstacle actually is
-        rather than an axis-aligned approximation of it.
+        Read from the live runtimes rather than the layout, so a rotating bar
+        and a sliding gate are shown at this tick's transform. A rotated bar
+        is drawn from the same `corners()` the physics polygon is built from,
+        so this view shows where an obstacle actually is rather than an
+        axis-aligned approximation of it.
         """
-        for spec in sim.layout.obstacles:
+        for runtime in sim.obstacles:
+            spec = runtime.placed()
             if spec.is_circle:
                 center = (self._px(spec.x), self._px(spec.y))
                 radius = max(1, self._px(spec.radius))

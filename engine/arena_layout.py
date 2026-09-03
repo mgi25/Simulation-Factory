@@ -1,14 +1,19 @@
-"""Static arena geometry as plain data.
+"""Arena geometry as plain data, including how a moving obstacle moves.
 
-An `ArenaLayout` is the authoritative description of everything static in an
-arena beyond its four walls. It is deliberately data-only: no Pymunk shapes,
-no space, no rendering state. The simulation turns it into static bodies, the
-replay serialises it verbatim, and a renderer rebuilds the same geometry from
-the replay without ever knowing which generator produced it.
+An `ArenaLayout` is the authoritative description of everything in an arena
+beyond its four walls. It is deliberately data-only: no Pymunk shapes, no
+space, no rendering state. The simulation turns it into bodies, the replay
+serialises it verbatim, and a renderer rebuilds the same geometry from the
+replay without ever knowing which generator produced it.
 
 The distance helpers live here rather than in the generator because the
 generator, the simulation and the tests all have to agree on exactly what
 "these two obstacles are 40 pixels apart" means.
+
+A kinetic obstacle carries its motion here too - the definition of the path,
+not a frame of it. The simulation is the only thing that evaluates it: a
+renderer is handed the resulting transform every frame and never the formula,
+so playback cannot drift from the battle that was simulated.
 """
 
 from __future__ import annotations
@@ -27,11 +32,26 @@ LAYOUT_CLASSIC = "classic"
 LAYOUT_PROCEDURAL = "procedural"
 LAYOUT_TYPES: tuple[str, ...] = (LAYOUT_CLASSIC, LAYOUT_PROCEDURAL)
 
-# The two static primitives this phase supports. Both are immovable, elastic
-# and harmless: they change where things bounce and nothing else.
+# The two geometric primitives. Both are elastic and harmless: they change
+# where things bounce and nothing else, moving or not.
 OBSTACLE_CIRCLE = "circle"
 OBSTACLE_BOX = "box"
 OBSTACLE_KINDS: tuple[str, ...] = (OBSTACLE_CIRCLE, OBSTACLE_BOX)
+
+# How an obstacle moves, if it moves at all. Three named behaviours rather
+# than a general animation model: each one is a couple of numbers the
+# simulation knows how to evaluate, and adding a fourth should be a
+# deliberate decision rather than a configuration change.
+MOTION_STATIC = "static"
+MOTION_ROTATE = "rotate"
+MOTION_SLIDE = "slide"
+MOTION_KINDS: tuple[str, ...] = (MOTION_STATIC, MOTION_ROTATE, MOTION_SLIDE)
+
+# Which way a gate slides. Axis-aligned only: a diagonal path would sweep a
+# far larger envelope for no gain in readability.
+AXIS_X = "x"
+AXIS_Y = "y"
+SLIDE_AXES: tuple[str, ...] = (AXIS_X, AXIS_Y)
 
 # Continues the numbering in `entities.ball` (ball 1, wall 2) and
 # `entities.dynamic_entity` (3). Obstacles get their own collision type
@@ -48,12 +68,19 @@ OBSTACLE_FRICTION = 0.0
 
 @dataclass(frozen=True)
 class ObstacleSpec:
-    """One static obstacle, in logical simulation pixels.
+    """One obstacle's immutable definition, in logical simulation pixels.
 
-    A single record covers both primitives: a circle reads `radius`, a box
-    reads `width`, `height` and `rotation_degrees`, and the unused fields
-    stay at zero. That keeps the replay one flat shape per obstacle instead
-    of a tagged union a renderer has to probe.
+    A single record covers both primitives and all three motions: a circle
+    reads `radius`, a box reads `width`, `height` and `rotation_degrees`, a
+    rotor reads `angular_speed`, a gate reads the `slide_*` fields, and every
+    field a given obstacle does not use stays at zero. That keeps the replay
+    one flat shape per obstacle instead of a tagged union a renderer has to
+    probe.
+
+    `x` and `y` are the obstacle's anchor, which is not always where it is:
+    a static obstacle sits there, a rotor pivots about it, and a gate uses it
+    as the midpoint of its travel. Where a moving obstacle actually is at a
+    given moment is `position_at`, and the replay exports that per frame.
     """
 
     obstacle_id: int
@@ -64,6 +91,16 @@ class ObstacleSpec:
     width: float = 0.0
     height: float = 0.0
     rotation_degrees: float = 0.0
+
+    motion: str = MOTION_STATIC
+    # Rotors: signed degrees per simulated second. The sign is the direction.
+    angular_speed: float = 0.0
+    # Gates: an axis, the full end-to-end travel centred on the anchor, the
+    # speed along it, and where in the there-and-back cycle it starts.
+    slide_axis: str = ""
+    slide_distance: float = 0.0
+    slide_speed: float = 0.0
+    slide_phase: float = 0.0
 
     @classmethod
     def circle(
@@ -96,6 +133,163 @@ class ObstacleSpec:
             height=float(height),
             rotation_degrees=float(rotation_degrees),
         )
+
+    @classmethod
+    def rotor(
+        cls,
+        obstacle_id: int,
+        x: float,
+        y: float,
+        width: float,
+        height: float,
+        angular_speed: float,
+        rotation_degrees: float = 0.0,
+    ) -> "ObstacleSpec":
+        """A bar that turns about its own centre at a constant rate."""
+        return cls(
+            obstacle_id=obstacle_id,
+            kind=OBSTACLE_BOX,
+            x=float(x),
+            y=float(y),
+            width=float(width),
+            height=float(height),
+            rotation_degrees=float(rotation_degrees),
+            motion=MOTION_ROTATE,
+            angular_speed=float(angular_speed),
+        )
+
+    @classmethod
+    def gate(
+        cls,
+        obstacle_id: int,
+        x: float,
+        y: float,
+        width: float,
+        height: float,
+        axis: str,
+        distance: float,
+        speed: float,
+        phase: float = 0.0,
+        rotation_degrees: float = 0.0,
+    ) -> "ObstacleSpec":
+        """A bar that slides back and forth along one axis about `x, y`."""
+        if axis not in SLIDE_AXES:
+            raise ValueError(f"slide axis must be one of {SLIDE_AXES}, got {axis!r}")
+        return cls(
+            obstacle_id=obstacle_id,
+            kind=OBSTACLE_BOX,
+            x=float(x),
+            y=float(y),
+            width=float(width),
+            height=float(height),
+            rotation_degrees=float(rotation_degrees),
+            motion=MOTION_SLIDE,
+            slide_axis=axis,
+            slide_distance=float(distance),
+            slide_speed=float(speed),
+            slide_phase=float(phase) % 1.0,
+        )
+
+    # --- motion ---
+
+    @property
+    def is_kinetic(self) -> bool:
+        return self.motion != MOTION_STATIC
+
+    @property
+    def is_rotor(self) -> bool:
+        return self.motion == MOTION_ROTATE
+
+    @property
+    def is_gate(self) -> bool:
+        return self.motion == MOTION_SLIDE
+
+    def slide_endpoints(self) -> tuple[tuple[float, float], tuple[float, float]]:
+        """The two ends of a gate's travel, centred on its anchor."""
+        if not self.is_gate:
+            return (self.center, self.center)
+        half = self.slide_distance / 2.0
+        if self.slide_axis == AXIS_X:
+            return ((self.x - half, self.y), (self.x + half, self.y))
+        return ((self.x, self.y - half), (self.x, self.y + half))
+
+    def slide_offset_at(self, seconds: float) -> float:
+        """Distance travelled from the first endpoint, as a triangle wave.
+
+        Continuous everywhere: the gate decelerates through no endpoint but
+        it never jumps either - at a turn the offset simply starts coming
+        back down the same path it went up.
+        """
+        if not self.is_gate or self.slide_distance <= 0.0:
+            return 0.0
+        cycle = 2.0 * self.slide_distance
+        travelled = (self.slide_phase * cycle + self.slide_speed * seconds) % cycle
+        return travelled if travelled <= self.slide_distance else cycle - travelled
+
+    def position_at(self, seconds: float) -> tuple[float, float]:
+        """Where this obstacle's centre is after `seconds` of simulated time."""
+        if not self.is_gate:
+            return self.center
+        start, _ = self.slide_endpoints()
+        offset = self.slide_offset_at(seconds)
+        if self.slide_axis == AXIS_X:
+            return (start[0] + offset, start[1])
+        return (start[0], start[1] + offset)
+
+    def rotation_at(self, seconds: float) -> float:
+        """This obstacle's angle in degrees after `seconds` of simulated time."""
+        if not self.is_rotor:
+            return self.rotation_degrees
+        return self.rotation_degrees + self.angular_speed * seconds
+
+    def at(self, x: float, y: float, rotation_degrees: float) -> "ObstacleSpec":
+        """This obstacle's geometry placed somewhere else, motion stripped.
+
+        Used to ask geometric questions about a moving obstacle at one
+        instant: the result is a plain static shape, so every existing
+        distance helper applies to it unchanged.
+        """
+        return ObstacleSpec(
+            obstacle_id=self.obstacle_id,
+            kind=self.kind,
+            x=float(x),
+            y=float(y),
+            radius=self.radius,
+            width=self.width,
+            height=self.height,
+            rotation_degrees=float(rotation_degrees),
+        )
+
+    def placed_at(self, seconds: float) -> "ObstacleSpec":
+        """This obstacle's geometry at one moment of its motion."""
+        x, y = self.position_at(seconds)
+        return self.at(x, y, self.rotation_at(seconds))
+
+    def envelope(self) -> "ObstacleSpec":
+        """A static shape covering everywhere this obstacle ever reaches.
+
+        Generation validates the envelope rather than the starting pose, so a
+        rotor cannot sweep through a wall it happened to start clear of and a
+        gate cannot slide into a fighter's spawn halfway along its travel.
+        Conservative by construction: a rotor becomes the circle it turns
+        inside, and a gate becomes its own bounding box stretched along its
+        axis by the full travel.
+        """
+        if self.is_rotor:
+            return ObstacleSpec.circle(
+                self.obstacle_id, self.x, self.y, self.bounding_radius
+            )
+        if self.is_gate:
+            left, top, right, bottom = self.at(
+                self.x, self.y, self.rotation_degrees
+            ).bounds()
+            width, height = right - left, bottom - top
+            if self.slide_axis == AXIS_X:
+                width += self.slide_distance
+            else:
+                height += self.slide_distance
+            return ObstacleSpec.box(self.obstacle_id, self.x, self.y, width, height)
+        return self
 
     # --- geometry ---
 
@@ -210,6 +404,11 @@ class ArenaLayout:
     @property
     def is_empty(self) -> bool:
         return not self.obstacles
+
+    @property
+    def kinetic(self) -> tuple[ObstacleSpec, ...]:
+        """The obstacles that move, in layout order."""
+        return tuple(obstacle for obstacle in self.obstacles if obstacle.is_kinetic)
 
     @property
     def fallback(self) -> bool:

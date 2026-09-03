@@ -28,17 +28,31 @@ from powers import PowerSpec
 # order to show that something happened. It sits beside `frames` rather than
 # inside them because physics runs at 120 Hz and frames are sampled at 60, so
 # a per-frame home would round every event to the nearest sample.
-# v5 adds a top-level `layout`: the static obstacles standing in the arena.
-# It is exported as real geometry rather than as the seed that produced it,
-# so a renderer rebuilds the exact battle environment without knowing - or
-# being able to disagree with - the generator that made it. Static by
-# definition, so it appears once and never inside a frame.
-REPLAY_VERSION = 5
+# v5 adds a top-level `layout`: the obstacles standing in the arena. It is
+# exported as real geometry rather than as the seed that produced it, so a
+# renderer rebuilds the exact battle environment without knowing - or being
+# able to disagree with - the generator that made it.
+# v6 adds a per-frame `obstacles` list carrying the transform of every
+# obstacle that moves. The layout still describes the motion, but a renderer
+# never evaluates it: it is handed where each obstacle actually was, which is
+# what keeps playback correct once movement can be interrupted, blocked or
+# stopped by something the formula does not know about. Obstacles that do not
+# move stay in the layout only and are never repeated per frame.
+REPLAY_VERSION = 6
 REPLAY_FPS = 60
 TICKS_PER_FRAME = PHYSICS_HZ // REPLAY_FPS
 
 # Enough precision for pixel-accurate playback without bloating the file.
 DECIMALS = 3
+
+
+def _wrapped_degrees(value: float) -> float:
+    """An angle reduced to [0, 360), rounded, and still in range afterwards.
+
+    Rounding last would let 359.9996 land on 360.0 and quietly leave the
+    interval it is supposed to be in, so the wrap is applied again after it.
+    """
+    return round(value % 360.0, DECIMALS) % 360.0
 
 
 def _frame(sim: Simulation) -> dict[str, Any]:
@@ -72,6 +86,23 @@ def _frame(sim: Simulation) -> dict[str, Any]:
             }
             for entity in sim.dynamic_entities
             if entity.active
+        ],
+        # Only the obstacles that move. Their geometry is in the layout and
+        # never repeated; this is purely where each one currently is.
+        "obstacles": [
+            {
+                "id": runtime.obstacle_id,
+                "x": round(runtime.position[0], DECIMALS),
+                "y": round(runtime.position[1], DECIMALS),
+                # Wrapped into one turn. A rotor's angle grows without bound
+                # in the simulation - after thirty seconds it is thousands of
+                # degrees - and exporting that would cost a renderer float
+                # precision for no information. It is also why a renderer has
+                # to interpolate angles the short way round: here is where a
+                # bar's angle steps from 359 back to 0.
+                "rotation_degrees": _wrapped_degrees(runtime.rotation_degrees),
+            }
+            for runtime in sim.kinetic_obstacles
         ],
     }
 
@@ -112,6 +143,16 @@ def _obstacle(spec: ObstacleSpec) -> dict[str, Any]:
         "width": round(spec.width, DECIMALS),
         "height": round(spec.height, DECIMALS),
         "rotation_degrees": round(spec.rotation_degrees, DECIMALS),
+        # How it moves, if it does. A renderer needs none of this to play a
+        # replay back - the per-frame transform is what it animates - but it
+        # is what makes an exported layout readable on its own, and it is
+        # what a debugging tool reproduces a battle's arena from.
+        "motion": spec.motion,
+        "angular_speed": round(spec.angular_speed, DECIMALS),
+        "slide_axis": spec.slide_axis,
+        "slide_distance": round(spec.slide_distance, DECIMALS),
+        "slide_speed": round(spec.slide_speed, DECIMALS),
+        "slide_phase": round(spec.slide_phase, DECIMALS),
     }
 
 

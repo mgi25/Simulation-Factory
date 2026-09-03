@@ -428,7 +428,7 @@ def pulse_replay() -> dict:
 
 
 def test_replay_is_current_version(pulse_replay: dict) -> None:
-    assert pulse_replay["version"] == REPLAY_VERSION == 5
+    assert pulse_replay["version"] == REPLAY_VERSION == 6
 
 
 def test_every_frame_has_an_entities_list(pulse_replay: dict) -> None:
@@ -469,7 +469,7 @@ def test_entity_records_carry_exactly_the_agreed_fields(pulse_replay: dict) -> N
 
 def test_replay_has_no_pulse_specific_positional_fields(pulse_replay: dict) -> None:
     """Entities live in one reusable collection, not in bespoke keys."""
-    assert set(pulse_replay["frames"][0]) == {"tick", "fighters", "entities"}
+    assert set(pulse_replay["frames"][0]) == {"tick", "fighters", "entities", "obstacles"}
     flat = " ".join(pulse_replay["frames"][0]).lower()
     assert "pulse" not in flat and "projectile" not in flat
     for meta in pulse_replay["fighters"]:

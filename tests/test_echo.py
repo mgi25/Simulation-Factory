@@ -591,11 +591,11 @@ def echo_replay() -> dict:
 
 def test_replay_is_current_version(echo_replay: dict) -> None:
     """Echo needs no fields of its own; it rides the shared schema."""
-    assert echo_replay["version"] == REPLAY_VERSION == 5
+    assert echo_replay["version"] == REPLAY_VERSION == 6
 
 
 def test_echo_travels_through_the_generic_entities_list(echo_replay: dict) -> None:
-    assert set(echo_replay["frames"][0]) == {"tick", "fighters", "entities"}
+    assert set(echo_replay["frames"][0]) == {"tick", "fighters", "entities", "obstacles"}
     owner_color = echo_replay["fighters"][0]["color"]
     expected_radius = echo_replay["fighters"][0]["radius"] * EchoPower.CLONE_RADIUS_FRACTION
 
