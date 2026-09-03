@@ -42,6 +42,7 @@ RESULT_FONT_SIZE = 92
 
 POWER_ACTIVE_COLOR = (255, 236, 150)
 POWER_IDLE_COLOR = (140, 145, 165)
+ENTITY_CORE_COLOR = (255, 252, 240)
 
 
 class Renderer:
@@ -84,6 +85,7 @@ class Renderer:
     def draw(self, sim: Simulation, mode: PowerBattleMode) -> None:
         self.screen.fill(BACKGROUND_COLOR)
         self._draw_arena(sim)
+        self._draw_entities(sim)
         self._draw_balls(sim)
         self._draw_hud(sim, mode)
         pygame.display.flip()
@@ -131,6 +133,19 @@ class Renderer:
                 pygame.draw.circle(
                     self.screen, POWER_ACTIVE_COLOR, center, radius, max(1, self._px(6))
                 )
+
+    def _draw_entities(self, sim: Simulation) -> None:
+        """Temporary entities as plain circles - debugging, not presentation."""
+        for entity in sim.dynamic_entities:
+            if not entity.active:
+                continue
+            center = (self._px(entity.position.x), self._px(entity.position.y))
+            pygame.draw.circle(
+                self.screen, entity.color, center, max(1, self._px(entity.radius))
+            )
+            pygame.draw.circle(
+                self.screen, ENTITY_CORE_COLOR, center, max(1, self._px(entity.radius / 2))
+            )
 
     def _draw_hud(self, sim: Simulation, mode: PowerBattleMode) -> None:
         timer = self._text(f"{mode.remaining:.1f}", TIMER_FONT_SIZE)

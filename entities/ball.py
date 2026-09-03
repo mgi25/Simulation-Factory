@@ -30,6 +30,16 @@ COLLISION_TYPE_BALL = 1
 COLLISION_TYPE_WALL = 2
 
 
+def shape_group(ball_id: int) -> int:
+    """Pymunk filter group shared by a fighter and everything it spawns.
+
+    Chipmunk never collides two shapes in the same non-zero group, so this is
+    what keeps a fighter's own projectiles from touching it. Group 0 (walls)
+    is the "no group" value and still collides with everything.
+    """
+    return ball_id + 1
+
+
 class Ball:
     """A single competitor: physics body plus health."""
 
@@ -70,6 +80,7 @@ class Ball:
         self.shape.elasticity = BALL_ELASTICITY
         self.shape.friction = BALL_FRICTION
         self.shape.collision_type = COLLISION_TYPE_BALL
+        self.shape.filter = pymunk.ShapeFilter(group=shape_group(ball_id))
 
         self.space: pymunk.Space | None = None
 
@@ -147,10 +158,7 @@ class Ball:
     def clamp_into(self, arena: "Arena") -> None:
         """Move the centre the minimum needed to fit the circle in `arena`."""
         x, y = self.body.position
-        clamped = (
-            _clamp_axis(x, arena.left, arena.right, self.radius),
-            _clamp_axis(y, arena.top, arena.bottom, self.radius),
-        )
+        clamped = arena.clamp_circle(x, y, self.radius)
         if clamped != (x, y):
             self.body.position = clamped
 
@@ -167,10 +175,3 @@ class Ball:
     def add_to_space(self, space: pymunk.Space) -> None:
         space.add(self.body, self.shape)
         self.space = space
-
-
-def _clamp_axis(value: float, low: float, high: float, radius: float) -> float:
-    """Keep `value` at least `radius` away from both bounds when possible."""
-    if high - low <= 2.0 * radius:
-        return (low + high) / 2.0
-    return min(max(value, low + radius), high - radius)

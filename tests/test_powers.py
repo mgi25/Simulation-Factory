@@ -109,8 +109,8 @@ def run_until_impact(sim: Simulation, mode: PowerBattleMode, settle: int = 60):
 # --- assignment ---
 
 
-def test_registry_holds_exactly_the_phase_3a_powers() -> None:
-    assert POWER_NAMES == ("rush", "titan")
+def test_registry_holds_exactly_the_implemented_powers() -> None:
+    assert POWER_NAMES == ("rush", "titan", "pulse")
     assert power_class("RUSH ") is RushPower
     assert power_class("titan") is TitanPower
 
@@ -549,8 +549,8 @@ def mixed_replay() -> dict:
     return record_battle(SEED, powers=["rush", "titan"])
 
 
-def test_replay_is_version_2(mixed_replay: dict) -> None:
-    assert mixed_replay["version"] == REPLAY_VERSION == 2
+def test_replay_is_current_version(mixed_replay: dict) -> None:
+    assert mixed_replay["version"] == REPLAY_VERSION == 3
 
 
 def test_replay_carries_fighter_power_metadata(mixed_replay: dict) -> None:

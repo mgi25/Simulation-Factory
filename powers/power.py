@@ -15,6 +15,7 @@ from engine.simulation import PHYSICS_DT, PHYSICS_HZ
 
 if TYPE_CHECKING:  # pragma: no cover - typing only, avoids an import cycle
     from engine.arena import Arena
+    from engine.simulation import Simulation
     from entities.ball import Ball
 
 
@@ -35,7 +36,7 @@ class Power:
 
     def __init__(self, initial_delay_ticks: int = 0) -> None:
         self.owner: "Ball | None" = None
-        self.arena: "Arena | None" = None
+        self.sim: "Simulation | None" = None
 
         self.cooldown_ticks = seconds_to_ticks(self.COOLDOWN_SECONDS)
         self.duration_ticks = seconds_to_ticks(self.DURATION_SECONDS)
@@ -55,11 +56,30 @@ class Power:
 
     # --- wiring ---
 
-    def attach(self, owner: "Ball", arena: "Arena | None" = None) -> None:
-        """Bind this power to its fighter (and the arena it must stay inside)."""
+    def attach(self, owner: "Ball", simulation: "Simulation | None" = None) -> None:
+        """Bind this power to its fighter and the world it acts on.
+
+        Everything a power needs beyond its owner - the arena, the other
+        fighters, somewhere to spawn entities - is derived from the
+        simulation, so powers that need none of it ignore it entirely.
+        """
         self.owner = owner
-        self.arena = arena
+        self.sim = simulation
         owner.power = self
+
+    @property
+    def arena(self) -> "Arena | None":
+        return None if self.sim is None else self.sim.arena
+
+    def opponents(self) -> list["Ball"]:
+        """Living fighters other than the owner, in fighter order."""
+        if self.sim is None or self.owner is None:
+            return []
+        return [
+            ball
+            for ball in self.sim.balls
+            if ball is not self.owner and ball.alive
+        ]
 
     # --- state ---
 

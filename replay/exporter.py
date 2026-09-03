@@ -16,10 +16,13 @@ from engine.simulation import PHYSICS_HZ, Simulation
 from modes.power_battle import BATTLE_DURATION_SECONDS, PowerBattleMode
 from powers import PowerSpec
 
-# v2 adds power metadata plus per-frame radius and power state. Radius is no
-# longer static metadata: Titan makes it change during a battle, so the
-# per-frame value is the authoritative one for renderers.
-REPLAY_VERSION = 2
+# v2 added power metadata plus per-frame radius and power state: Titan makes
+# radius change during a battle, so the per-frame value is the authoritative
+# one for renderers.
+# v3 adds a per-frame `entities` list for temporary objects that come and go.
+# It is deliberately generic - id, type, owner, position, radius, colour - so
+# later powers reuse the same collection instead of adding their own fields.
+REPLAY_VERSION = 3
 REPLAY_FPS = 60
 TICKS_PER_FRAME = PHYSICS_HZ // REPLAY_FPS
 
@@ -45,6 +48,19 @@ def _frame(sim: Simulation) -> dict[str, Any]:
                 ),
             }
             for ball in sim.balls
+        ],
+        "entities": [
+            {
+                "id": entity.entity_id,
+                "type": entity.kind,
+                "owner_id": entity.owner_id,
+                "x": round(entity.position.x, DECIMALS),
+                "y": round(entity.position.y, DECIMALS),
+                "radius": round(entity.radius, DECIMALS),
+                "color": list(entity.color),
+            }
+            for entity in sim.dynamic_entities
+            if entity.active
         ],
     }
 

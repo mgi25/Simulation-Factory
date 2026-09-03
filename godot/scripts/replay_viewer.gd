@@ -34,6 +34,14 @@ const RUSH_TRAIL_COUNT := 6
 const RUSH_TRAIL_FRAME_STEP := 2
 const POWER_EMISSION_ENERGY := 0.85
 
+# Temporary entities (Pulse projectiles today) read as energy: bright and
+# self-lit, but still the owner's colour - past roughly 2.0 the tonemapper
+# clips them to white and they stop belonging to anyone. The height bias
+# lifts a small projectile to about fighter-centre height so it reads as
+# flying at its target rather than rolling along the floor.
+const ENTITY_EMISSION_ENERGY := 1.6
+const ENTITY_HEIGHT_BIAS := 3.0
+
 var _replay: Dictionary = {}
 var _frames: Array = []
 var _fighter_meta: Array = []
@@ -57,6 +65,14 @@ var _health_fills: Array[ColorRect] = []
 var _power_labels: Array[Label] = []
 var _power_label_text: Array[String] = []
 
+# Dynamic entity visuals, keyed by the replay's entity id. Nodes are created
+# when an id first appears and freed when it stops appearing, so the scene
+# holds exactly the entities the current frame describes.
+var _entity_nodes: Dictionary = {}
+var _entity_materials: Dictionary = {}
+var _entity_root: Node3D
+var _entity_mesh: SphereMesh
+
 var _playhead := 0.0
 
 
@@ -72,6 +88,7 @@ func _ready() -> void:
 	_build_camera()
 	_build_arena()
 	_build_fighters()
+	_build_entity_pool()
 	_build_hud()
 	_apply_playhead(0.0)
 
@@ -136,7 +153,7 @@ func _load_replay(path: String) -> bool:
 		return false
 
 	var data: Dictionary = parsed
-	if int(data.get("version", 0)) != 2:
+	if int(data.get("version", 0)) != 3:
 		push_error("Unsupported replay version: %s" % str(data.get("version")))
 		return false
 
@@ -327,6 +344,38 @@ func _build_fighters() -> void:
 		_trails.append(_build_trail(mesh, color, power))
 
 
+func _build_entity_pool() -> void:
+	## One shared unit sphere for every temporary entity; per-entity size comes
+	## from the replay and is applied as node scale.
+	_entity_root = Node3D.new()
+	_entity_root.name = "DynamicEntities"
+	add_child(_entity_root)
+
+	_entity_mesh = SphereMesh.new()
+	_entity_mesh.radius = 1.0
+	_entity_mesh.height = 2.0
+	_entity_mesh.radial_segments = 20
+	_entity_mesh.rings = 10
+
+
+func _entity_material(color: Color) -> StandardMaterial3D:
+	## Cached per colour: entities come and go every second, so this must
+	## never allocate per frame.
+	var key := color.to_rgba32()
+	if _entity_materials.has(key):
+		return _entity_materials[key]
+
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.metallic = 0.0
+	material.roughness = 0.35
+	material.emission_enabled = true
+	material.emission = color
+	material.emission_energy_multiplier = ENTITY_EMISSION_ENERGY
+	_entity_materials[key] = material
+	return material
+
+
 func _build_trail(mesh: SphereMesh, color: Color, power: String) -> Array:
 	## Rush only: a handful of additive ghosts that replay earlier positions.
 	var ghosts: Array = []
@@ -472,8 +521,11 @@ func _apply_playhead(playhead: float) -> void:
 	var blend := playhead - float(index)
 
 	var frame: Dictionary = _frames[index]
+	var next_frame: Dictionary = _frames[next_index]
 	var current: Array = frame.get("fighters", [])
-	var upcoming: Array = (_frames[next_index] as Dictionary).get("fighters", [])
+	var upcoming: Array = next_frame.get("fighters", [])
+	var current_entities: Array = frame.get("entities", [])
+	var upcoming_entities: Array = next_frame.get("entities", [])
 
 	for i in _spheres.size():
 		if i >= current.size():
@@ -505,8 +557,52 @@ func _apply_playhead(playhead: float) -> void:
 		_update_power_label(i, powered)
 		_update_health_row(i, health)
 
+	_update_entities(current_entities, upcoming_entities, blend)
 	_update_timer(int(frame.get("tick", 0)))
 	_result_label.visible = playhead >= float(_frames.size() - 1)
+
+
+func _update_entities(current: Array, upcoming: Array, blend: float) -> void:
+	## Entities are addressed by replay id, so one appearing or disappearing
+	## between frames is normal rather than an error.
+	var next_by_id := {}
+	for raw in upcoming:
+		var soon: Dictionary = raw
+		next_by_id[int(soon.get("id", -1))] = soon
+
+	var seen := {}
+	for raw in current:
+		var now: Dictionary = raw
+		var id := int(now.get("id", -1))
+		seen[id] = true
+
+		var node: MeshInstance3D = _entity_nodes.get(id)
+		if node == null:
+			node = MeshInstance3D.new()
+			node.name = "Entity%d" % id
+			node.mesh = _entity_mesh
+			node.material_override = _entity_material(_color_of(now))
+			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			_entity_root.add_child(node)
+			_entity_nodes[id] = node
+
+		# Interpolation is cosmetic and only possible while the entity exists
+		# in both frames; on its last frame it simply holds still.
+		var x := float(now.get("x", 0.0))
+		var y := float(now.get("y", 0.0))
+		if next_by_id.has(id):
+			var soon: Dictionary = next_by_id[id]
+			x = lerpf(x, float(soon.get("x", x)), blend)
+			y = lerpf(y, float(soon.get("y", y)), blend)
+
+		var radius := to_units(float(now.get("radius", 8.0)))
+		node.scale = Vector3.ONE * radius
+		node.position = to_world(x, y, radius * ENTITY_HEIGHT_BIAS)
+
+	for id in _entity_nodes.keys():
+		if not seen.has(id):
+			(_entity_nodes[id] as Node).queue_free()
+			_entity_nodes.erase(id)
 
 
 func _update_trail(fighter: int, index: int, powered: bool) -> void:

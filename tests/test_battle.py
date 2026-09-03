@@ -14,6 +14,7 @@ from modes.power_battle import (
     BattleState,
     PowerBattleMode,
 )
+from powers import Power
 
 
 def make_ball(**kwargs) -> Ball:
@@ -28,13 +29,24 @@ def make_ball(**kwargs) -> Ball:
     return Ball(**{**defaults, **kwargs})
 
 
+def inert_power() -> Power:
+    """A power whose cooldown never becomes ready inside a battle.
+
+    These tests script health by hand and assert exact totals, so no power
+    may contribute damage of its own. Rush and Titan happened to be harmless
+    here because they only matter on impact; Pulse fires across an empty
+    arena, so the assumption has to be stated rather than assumed.
+    """
+    return Power(initial_delay_ticks=10**9)
+
+
 def non_colliding_battle(seed: int = 1):
     """Both fighters skate horizontally on separate lanes and never meet.
 
     Lets tests exercise the timer and scripted health without any impacts.
     """
     sim = Simulation(seed)
-    mode = PowerBattleMode(sim)
+    mode = PowerBattleMode(sim, powers=[inert_power(), inert_power()])
     a, b = sim.balls
     mid_x = (sim.arena.left + sim.arena.right) / 2
     a.body.position = (mid_x, sim.arena.top + 200)

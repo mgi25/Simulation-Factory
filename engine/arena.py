@@ -53,3 +53,17 @@ class Arena:
             self.left + radius <= x <= self.right - radius
             and self.top + radius <= y <= self.bottom - radius
         )
+
+    def clamp_circle(self, x: float, y: float, radius: float) -> tuple[float, float]:
+        """Move a centre the minimum needed to fit its circle inside."""
+        return (
+            _clamp_axis(x, self.left, self.right, radius),
+            _clamp_axis(y, self.top, self.bottom, radius),
+        )
+
+
+def _clamp_axis(value: float, low: float, high: float, radius: float) -> float:
+    """Keep `value` at least `radius` away from both bounds when possible."""
+    if high - low <= 2.0 * radius:
+        return (low + high) / 2.0
+    return min(max(value, low + radius), high - radius)

@@ -51,13 +51,14 @@ class PowerBattleMode:
             self.power_rng, len(simulation.balls), powers
         )
         for ball, power in zip(simulation.balls, self.powers):
-            power.attach(ball, simulation.arena)
+            power.attach(ball, simulation)
 
         self.state = BattleState.RUNNING
         self.winner: Ball | None = None
         self.is_draw = False
         self.finished_tick: int | None = None
         self._last_damage_tick: dict[tuple[int, int], int] = {}
+        self._ball_by_id = {ball.ball_id: ball for ball in simulation.balls}
 
     # --- clock (simulated time only, never wall-clock) ---
 
@@ -114,12 +115,14 @@ class PowerBattleMode:
 
     def _after_tick(self) -> bool:
         self._apply_impact_damage()
+        self._apply_entity_contacts()
         self._update_state()
         if self.finished:
-            # No new activations once the battle is over, and any temporary
-            # effect still running is rolled back so the final state is
-            # internally consistent.
+            # No new activations once the battle is over. Any effect still
+            # running is rolled back and every temporary entity retired, so
+            # the final state is internally consistent.
             self._deactivate_powers()
+            self.sim.clear_entities()
             return False
         self._update_powers()
         return True
@@ -136,6 +139,27 @@ class PowerBattleMode:
             power.deactivate()
 
     # --- combat rules ---
+
+    def _apply_entity_contacts(self) -> None:
+        """Resolve what a dynamic entity touching something means.
+
+        The entity states its own contribution; the mode decides who it lands
+        on. Projectile damage is a flat value and deliberately never goes
+        through the closing-speed impact formula, nor through a fighter's
+        collision damage multiplier.
+        """
+        for contact in self.sim.entity_contacts:
+            entity = contact.entity
+            victim = contact.ball
+
+            if victim is not None and victim.alive and entity.contact_damage > 0.0:
+                dealt = victim.take_damage(entity.contact_damage)
+                attacker = self._ball_by_id.get(entity.owner_id)
+                if attacker is not None:
+                    attacker.damage_dealt += dealt
+
+            if entity.despawn_on_contact:
+                self.sim.despawn(entity)
 
     def _apply_impact_damage(self) -> None:
         for impact in self.sim.impacts:

@@ -1,7 +1,8 @@
-"""Headless simulation: seeded setup, fixed-timestep physics, impact reports.
+"""Headless simulation: seeded setup, fixed-timestep physics, contact reports.
 
-The simulation owns the physics world only. It reports ball-to-ball impacts
-as plain data; deciding what an impact means is a game-mode concern.
+The simulation owns the physics world and the temporary entities living in
+it. It reports ball-to-ball impacts and dynamic-entity contacts as plain
+data; deciding what a contact means is a game-mode concern.
 """
 
 from __future__ import annotations
@@ -15,6 +16,8 @@ import pymunk
 from engine.arena import WALL_THICKNESS, Arena
 from engine.randomizer import generate_ball_spawns, make_rng
 from entities.ball import COLLISION_TYPE_BALL, COLLISION_TYPE_WALL, Ball
+from entities.dynamic_entity import DynamicEntity
+from entities.projectile import COLLISION_TYPE_PROJECTILE
 
 PHYSICS_HZ = 120
 PHYSICS_DT = 1.0 / PHYSICS_HZ
@@ -49,6 +52,19 @@ class Impact:
         return self.speed_a_into_b + self.speed_b_into_a
 
 
+@dataclass(frozen=True)
+class EntityContact:
+    """A dynamic entity touching a fighter, or a wall when `ball` is None."""
+
+    tick: int
+    entity: DynamicEntity
+    ball: Ball | None = None
+
+    @property
+    def is_wall(self) -> bool:
+        return self.ball is None
+
+
 class Simulation:
     """Owns the physics space, the entities and the simulation clock."""
 
@@ -73,6 +89,21 @@ class Simulation:
         self.impacts: list[Impact] = []
         self.space.on_collision(
             COLLISION_TYPE_BALL, COLLISION_TYPE_BALL, begin=self._on_ball_impact
+        )
+
+        # Temporary entities. Ids continue past the fighters, so 0..n-1 are
+        # always fighters and everything spawned later is unique and ordered.
+        self.dynamic_entities: list[DynamicEntity] = []
+        self.entity_contacts: list[EntityContact] = []
+        self._entity_by_shape: dict[pymunk.Shape, DynamicEntity] = {}
+        self._next_entity_id = len(self.balls)
+        self._pending_removal: list[DynamicEntity] = []
+        self._stepping = False
+        self.space.on_collision(
+            COLLISION_TYPE_PROJECTILE, COLLISION_TYPE_BALL, begin=self._on_entity_ball
+        )
+        self.space.on_collision(
+            COLLISION_TYPE_PROJECTILE, COLLISION_TYPE_WALL, begin=self._on_entity_wall
         )
 
         self.ticks = 0
@@ -102,6 +133,78 @@ class Simulation:
             self.space.add(wall)
             self.walls.append(wall)
 
+    # --- dynamic entities ---
+
+    def spawn(self, factory: Callable[..., DynamicEntity], **kwargs) -> DynamicEntity:
+        """Build, register and activate a temporary entity.
+
+        The simulation allocates the id so it stays deterministic, unique and
+        monotonic; the caller supplies the class and its own arguments.
+        """
+        entity = factory(entity_id=self._next_entity_id, **kwargs)
+        self._next_entity_id += 1
+
+        self.dynamic_entities.append(entity)
+        entity.add_to_space(self.space)
+        for shape in entity.shapes:
+            self._entity_by_shape[shape] = entity
+        return entity
+
+    def despawn(self, entity: DynamicEntity) -> None:
+        """Retire an entity. Safe to call from inside a collision callback."""
+        if not entity.active:
+            return
+        entity.active = False
+        if self._stepping:
+            # Chipmunk forbids touching the space mid-step; finish first.
+            self._pending_removal.append(entity)
+        else:
+            self._remove_entity(entity)
+
+    def clear_entities(self) -> None:
+        for entity in list(self.dynamic_entities):
+            self.despawn(entity)
+
+    def entity(self, entity_id: int) -> DynamicEntity | None:
+        for entity in self.dynamic_entities:
+            if entity.entity_id == entity_id:
+                return entity
+        return None
+
+    def _remove_entity(self, entity: DynamicEntity) -> None:
+        entity.remove_from_space(self.space)
+        for shape in entity.shapes:
+            self._entity_by_shape.pop(shape, None)
+        if entity in self.dynamic_entities:
+            self.dynamic_entities.remove(entity)
+
+    def _flush_removals(self) -> None:
+        while self._pending_removal:
+            self._remove_entity(self._pending_removal.pop())
+
+    def _contact_pair(self, arbiter: pymunk.Arbiter) -> tuple[DynamicEntity | None, Ball | None]:
+        """Resolve an arbiter into (entity, ball) regardless of shape order."""
+        entity: DynamicEntity | None = None
+        ball: Ball | None = None
+        for shape in arbiter.shapes:
+            entity = entity or self._entity_by_shape.get(shape)
+            ball = ball or self._ball_by_shape.get(shape)
+        return entity, ball
+
+    def _on_entity_ball(self, arbiter: pymunk.Arbiter, space, data) -> None:
+        entity, ball = self._contact_pair(arbiter)
+        if entity is None or ball is None or not entity.active:
+            return
+        self.entity_contacts.append(EntityContact(self.ticks, entity, ball))
+
+    def _on_entity_wall(self, arbiter: pymunk.Arbiter, space, data) -> None:
+        entity, _ = self._contact_pair(arbiter)
+        if entity is None or not entity.active:
+            return
+        self.entity_contacts.append(EntityContact(self.ticks, entity))
+
+    # --- collision reporting ---
+
     def _on_ball_impact(self, arbiter: pymunk.Arbiter, space, data) -> None:
         """Collision-begin callback: one report per physical impact."""
         shape_a, shape_b = arbiter.shapes
@@ -124,9 +227,25 @@ class Simulation:
     def step(self) -> None:
         """Advance the physics by exactly one fixed tick."""
         self.impacts.clear()
-        self.space.step(PHYSICS_DT)
+        self.entity_contacts.clear()
+
+        self._stepping = True
+        try:
+            self.space.step(PHYSICS_DT)
+        finally:
+            self._stepping = False
+        self._flush_removals()
+
         self.ticks += 1
         self.elapsed += PHYSICS_DT
+
+        # Age entities and retire the ones that ran out of lifetime. Contacts
+        # recorded above are still readable by the mode: reports hold direct
+        # references, so a retired entity's hit is not lost.
+        for entity in list(self.dynamic_entities):
+            entity.advance()
+            if entity.expired:
+                self.despawn(entity)
 
     def advance(
         self, frame_seconds: float, on_tick: Callable[[], bool | None] | None = None
@@ -156,12 +275,19 @@ class Simulation:
         return ticks
 
     def is_state_valid(self) -> bool:
-        """True while every ball has finite state and is inside the arena."""
+        """True while every ball has finite state and is inside the arena.
+
+        Dynamic entities are only checked for finite positions: a projectile
+        legitimately reaches the arena boundary before it despawns.
+        """
         for ball in self.balls:
             x, y = ball.position
             vx, vy = ball.velocity
             if not all(math.isfinite(v) for v in (x, y, vx, vy)):
                 return False
             if not self.arena.contains_circle(x, y, 0.0):
+                return False
+        for entity in self.dynamic_entities:
+            if not all(math.isfinite(v) for v in entity.position):
                 return False
         return True
