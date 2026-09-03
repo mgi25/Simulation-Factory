@@ -110,7 +110,7 @@ def run_until_impact(sim: Simulation, mode: PowerBattleMode, settle: int = 60):
 
 
 def test_registry_holds_exactly_the_implemented_powers() -> None:
-    assert POWER_NAMES == ("rush", "titan", "pulse", "echo")
+    assert POWER_NAMES == ("rush", "titan", "pulse", "echo", "orbit")
     assert power_class("RUSH ") is RushPower
     assert power_class("titan") is TitanPower
 

@@ -85,6 +85,7 @@ class Simulation:
             ball.add_to_space(self.space)
 
         self._ball_by_shape = {ball.shape: ball for ball in self.balls}
+        self._ball_by_id = {ball.ball_id: ball for ball in self.balls}
         self.impacts: list[Impact] = []
         self.space.on_collision(
             COLLISION_TYPE_BALL, COLLISION_TYPE_BALL, begin=self._on_ball_impact
@@ -164,6 +165,10 @@ class Simulation:
         for entity in list(self.dynamic_entities):
             self.despawn(entity)
 
+    def fighter(self, ball_id: int) -> Ball | None:
+        """Look a fighter up by id rather than by position in the list."""
+        return self._ball_by_id.get(ball_id)
+
     def entity(self, entity_id: int) -> DynamicEntity | None:
         for entity in self.dynamic_entities:
             if entity.entity_id == entity_id:
@@ -227,6 +232,12 @@ class Simulation:
         """Advance the physics by exactly one fixed tick."""
         self.impacts.clear()
         self.entity_contacts.clear()
+
+        # Entities that position themselves relative to something else get
+        # their chance immediately before collisions are solved.
+        for entity in list(self.dynamic_entities):
+            if entity.active:
+                entity.before_step(self)
 
         self._stepping = True
         try:

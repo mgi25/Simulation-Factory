@@ -10,6 +10,7 @@ import random
 from typing import Iterable, Sequence
 
 from powers.echo import EchoPower
+from powers.orbit import OrbitPower
 from powers.power import Power, seconds_to_ticks
 from powers.pulse import PulsePower
 from powers.rush import RushPower
@@ -20,6 +21,7 @@ POWER_CLASSES: dict[str, type[Power]] = {
     TitanPower.name: TitanPower,
     PulsePower.name: PulsePower,
     EchoPower.name: EchoPower,
+    OrbitPower.name: OrbitPower,
 }
 POWER_NAMES: tuple[str, ...] = tuple(POWER_CLASSES)
 
@@ -34,6 +36,7 @@ __all__ = [
     "POWER_CLASSES",
     "POWER_NAMES",
     "EchoPower",
+    "OrbitPower",
     "Power",
     "PowerSpec",
     "PulsePower",

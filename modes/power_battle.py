@@ -58,7 +58,6 @@ class PowerBattleMode:
         self.is_draw = False
         self.finished_tick: int | None = None
         self._last_damage_tick: dict[tuple[int, int], int] = {}
-        self._ball_by_id = {ball.ball_id: ball for ball in simulation.balls}
 
     # --- clock (simulated time only, never wall-clock) ---
 
@@ -163,7 +162,7 @@ class PowerBattleMode:
             victim = contact.ball
             if victim is not None and victim.alive and entity.contact_damage > 0.0:
                 dealt = victim.take_damage(entity.contact_damage)
-                attacker = self._ball_by_id.get(entity.owner_id)
+                attacker = self.sim.fighter(entity.owner_id)
                 if attacker is not None:
                     attacker.damage_dealt += dealt
 

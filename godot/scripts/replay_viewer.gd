@@ -49,6 +49,13 @@ const CLONE_EMISSION_ENERGY := 0.9
 const CLONE_ALPHA := 0.30
 const CLONE_RIM_AMOUNT := 1.0
 
+# An Orbit satellite is a hot little bead: a near-white core inside an
+# owner-coloured glow, glossy rather than matte. Distinct from a Pulse bolt,
+# which is the owner's colour all the way through, and from an Echo ghost,
+# which is translucent and pale.
+const ORB_EMISSION_ENERGY := 2.2
+const ORB_CORE_LIGHTEN := 0.45
+
 var _replay: Dictionary = {}
 var _frames: Array = []
 var _fighter_meta: Array = []
@@ -375,6 +382,8 @@ func _entity_material(kind: String, color: Color) -> StandardMaterial3D:
 	var material: StandardMaterial3D
 	if kind == "echo":
 		material = _make_clone_material(color)
+	elif kind == "orbit":
+		material = _make_orb_material(color)
 	else:
 		material = _make_projectile_material(color)
 	_entity_materials[key] = material
@@ -389,6 +398,17 @@ func _make_projectile_material(color: Color) -> StandardMaterial3D:
 	material.emission_enabled = true
 	material.emission = color
 	material.emission_energy_multiplier = ENTITY_EMISSION_ENERGY
+	return material
+
+
+func _make_orb_material(color: Color) -> StandardMaterial3D:
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color.lightened(ORB_CORE_LIGHTEN)
+	material.metallic = 0.0
+	material.roughness = 0.1
+	material.emission_enabled = true
+	material.emission = color
+	material.emission_energy_multiplier = ORB_EMISSION_ENERGY
 	return material
 
 

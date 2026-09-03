@@ -72,6 +72,14 @@ class DynamicEntity:
     def expired(self) -> bool:
         return self.lifetime_ticks > 0 and self.age_ticks >= self.lifetime_ticks
 
+    def before_step(self, simulation) -> None:
+        """Reposition before the physics step, for entities that need to.
+
+        Pulse and Echo are carried by Pymunk and want nothing here. Orbit
+        drives its own position from its owner's, so it has to be placed
+        before collisions are solved rather than after.
+        """
+
     def advance(self) -> None:
         """One simulation tick of bookkeeping."""
         self.age_ticks += 1
