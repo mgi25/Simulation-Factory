@@ -56,9 +56,9 @@ def non_colliding_battle(seed: int = 1):
     return sim, mode, a, b
 
 
-def run_battle(seed: int):
+def run_battle(seed: int, powers=None):
     sim = Simulation(seed)
-    mode = PowerBattleMode(sim)
+    mode = PowerBattleMode(sim, powers=powers)
     while mode.step():
         pass
     return (
@@ -269,7 +269,14 @@ def test_same_seed_reproduces_the_same_battle() -> None:
 
 
 def test_real_battle_reaches_a_decision() -> None:
-    result, finished_tick, healths = run_battle(12345)
+    """A pure collision battle: no power may contribute to the outcome.
+
+    Pinned rather than left to the seed, so which powers happen to exist in
+    the registry cannot change what this asserts.
+    """
+    result, finished_tick, healths = run_battle(
+        12345, powers=[inert_power(), inert_power()]
+    )
     assert result.startswith("WINNER:")
     assert 0 < finished_tick <= BATTLE_DURATION_TICKS
     assert min(healths) == 0.0

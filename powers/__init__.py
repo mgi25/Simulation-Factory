@@ -9,6 +9,7 @@ from __future__ import annotations
 import random
 from typing import Iterable, Sequence
 
+from powers.echo import EchoPower
 from powers.power import Power, seconds_to_ticks
 from powers.pulse import PulsePower
 from powers.rush import RushPower
@@ -18,6 +19,7 @@ POWER_CLASSES: dict[str, type[Power]] = {
     RushPower.name: RushPower,
     TitanPower.name: TitanPower,
     PulsePower.name: PulsePower,
+    EchoPower.name: EchoPower,
 }
 POWER_NAMES: tuple[str, ...] = tuple(POWER_CLASSES)
 
@@ -31,6 +33,7 @@ __all__ = [
     "INITIAL_OFFSET_MAX_TICKS",
     "POWER_CLASSES",
     "POWER_NAMES",
+    "EchoPower",
     "Power",
     "PowerSpec",
     "PulsePower",

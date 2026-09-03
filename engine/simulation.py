@@ -16,8 +16,7 @@ import pymunk
 from engine.arena import WALL_THICKNESS, Arena
 from engine.randomizer import generate_ball_spawns, make_rng
 from entities.ball import COLLISION_TYPE_BALL, COLLISION_TYPE_WALL, Ball
-from entities.dynamic_entity import DynamicEntity
-from entities.projectile import COLLISION_TYPE_PROJECTILE
+from entities.dynamic_entity import COLLISION_TYPE_DYNAMIC_ENTITY, DynamicEntity
 
 PHYSICS_HZ = 120
 PHYSICS_DT = 1.0 / PHYSICS_HZ
@@ -100,10 +99,10 @@ class Simulation:
         self._pending_removal: list[DynamicEntity] = []
         self._stepping = False
         self.space.on_collision(
-            COLLISION_TYPE_PROJECTILE, COLLISION_TYPE_BALL, begin=self._on_entity_ball
+            COLLISION_TYPE_DYNAMIC_ENTITY, COLLISION_TYPE_BALL, begin=self._on_entity_ball
         )
         self.space.on_collision(
-            COLLISION_TYPE_PROJECTILE, COLLISION_TYPE_WALL, begin=self._on_entity_wall
+            COLLISION_TYPE_DYNAMIC_ENTITY, COLLISION_TYPE_WALL, begin=self._on_entity_wall
         )
 
         self.ticks = 0

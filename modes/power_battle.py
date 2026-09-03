@@ -143,22 +143,31 @@ class PowerBattleMode:
     def _apply_entity_contacts(self) -> None:
         """Resolve what a dynamic entity touching something means.
 
-        The entity states its own contribution; the mode decides who it lands
-        on. Projectile damage is a flat value and deliberately never goes
-        through the closing-speed impact formula, nor through a fighter's
-        collision damage multiplier.
+        The entity states its own contribution and whether the touch spends
+        it; the mode decides who it lands on. Entity damage is a flat value
+        and deliberately never goes through the closing-speed impact formula,
+        nor through a fighter's collision damage multiplier.
         """
         for contact in self.sim.entity_contacts:
             entity = contact.entity
-            victim = contact.ball
+            # A single step can report a wall and a fighter for the same
+            # entity, so an already-spent one must not act twice.
+            if not entity.active:
+                continue
 
+            if contact.is_wall:
+                if entity.despawn_on_wall_contact:
+                    self.sim.despawn(entity)
+                continue
+
+            victim = contact.ball
             if victim is not None and victim.alive and entity.contact_damage > 0.0:
                 dealt = victim.take_damage(entity.contact_damage)
                 attacker = self._ball_by_id.get(entity.owner_id)
                 if attacker is not None:
                     attacker.damage_dealt += dealt
 
-            if entity.despawn_on_contact:
+            if entity.despawn_on_ball_contact:
                 self.sim.despawn(entity)
 
     def _apply_impact_damage(self) -> None:

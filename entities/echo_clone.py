@@ -1,4 +1,9 @@
-"""A straight-flying projectile: the first dynamic entity."""
+"""A bouncing temporary copy of a fighter: the second dynamic entity.
+
+An EchoClone deliberately does not inherit from `Ball`. It has no health, no
+power, no place in the winner decision and cannot spawn anything of its own.
+It is a temporary object with a radius, a velocity and a lifetime.
+"""
 
 from __future__ import annotations
 
@@ -7,18 +12,19 @@ import pymunk
 from entities.ball import shape_group
 from entities.dynamic_entity import COLLISION_TYPE_DYNAMIC_ENTITY, DynamicEntity
 
-# Never used to resolve an impulse - the shape is a sensor - but a Pymunk
-# dynamic body still needs a positive mass.
-PROJECTILE_MASS = 0.01
+# Bouncy and frictionless like the fighters, so a clone keeps its energy for
+# its whole lifetime instead of dribbling to a halt in a corner.
+CLONE_ELASTICITY = 1.0
+CLONE_FRICTION = 0.0
 
 
-class Projectile(DynamicEntity):
-    """Travels in a straight line, hits once, never bounces."""
+class EchoClone(DynamicEntity):
+    """A real physical body that rebounds off walls until it hits or expires."""
 
-    kind = "projectile"
-    # Spent by whatever it touches first.
+    kind = "echo"
+    # Spent by the opposing fighter, but walls only turn it around.
     despawn_on_ball_contact = True
-    despawn_on_wall_contact = True
+    despawn_on_wall_contact = False
 
     def __init__(
         self,
@@ -30,6 +36,7 @@ class Projectile(DynamicEntity):
         color: tuple[int, int, int],
         damage: float,
         lifetime_ticks: int,
+        mass: float,
     ) -> None:
         super().__init__(
             entity_id=entity_id,
@@ -41,20 +48,19 @@ class Projectile(DynamicEntity):
         )
         self.contact_damage = float(damage)
 
-        moment = pymunk.moment_for_circle(PROJECTILE_MASS, 0.0, radius)
-        self.body = pymunk.Body(PROJECTILE_MASS, moment)
+        moment = pymunk.moment_for_circle(mass, 0.0, radius)
+        self.body = pymunk.Body(mass, moment)
         self.body.position = position
         self.body.velocity = velocity
 
         self.shape = pymunk.Circle(self.body, radius)
         self.shape.collision_type = COLLISION_TYPE_DYNAMIC_ENTITY
-        # A sensor reports contacts but never generates a real collision, so
-        # the projectile neither bounces off a wall nor shoves the fighter it
-        # hits. With zero gravity and no impulses, its velocity is constant.
-        self.shape.sensor = True
-        # Sharing the owner's filter group makes Chipmunk skip that pair
-        # outright: a projectile physically cannot touch the fighter that
-        # fired it, so self-damage is impossible rather than merely unlikely.
+        # Not a sensor: Pymunk does the wall bounces, so there is no
+        # hand-written reflection maths anywhere.
+        self.shape.elasticity = CLONE_ELASTICITY
+        self.shape.friction = CLONE_FRICTION
+        # Sharing the owner's filter group keeps a clone from touching the
+        # fighter that made it - and, incidentally, from jostling its twin.
         self.shape.filter = pymunk.ShapeFilter(group=shape_group(owner_id))
 
     @property

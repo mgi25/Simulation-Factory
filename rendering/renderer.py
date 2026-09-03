@@ -43,6 +43,7 @@ RESULT_FONT_SIZE = 92
 POWER_ACTIVE_COLOR = (255, 236, 150)
 POWER_IDLE_COLOR = (140, 145, 165)
 ENTITY_CORE_COLOR = (255, 252, 240)
+ENTITY_GHOST_COLOR = (58, 62, 78)
 
 
 class Renderer:
@@ -135,17 +136,28 @@ class Renderer:
                 )
 
     def _draw_entities(self, sim: Simulation) -> None:
-        """Temporary entities as plain circles - debugging, not presentation."""
+        """Temporary entities as plain circles - debugging, not presentation.
+
+        A clone is drawn as an outline so it reads as a hollow copy; anything
+        else gets a bright core so it reads as a projectile.
+        """
         for entity in sim.dynamic_entities:
             if not entity.active:
                 continue
             center = (self._px(entity.position.x), self._px(entity.position.y))
-            pygame.draw.circle(
-                self.screen, entity.color, center, max(1, self._px(entity.radius))
-            )
-            pygame.draw.circle(
-                self.screen, ENTITY_CORE_COLOR, center, max(1, self._px(entity.radius / 2))
-            )
+            radius = max(1, self._px(entity.radius))
+            if entity.kind == "echo":
+                pygame.draw.circle(
+                    self.screen, ENTITY_GHOST_COLOR, center, radius
+                )
+                pygame.draw.circle(
+                    self.screen, entity.color, center, radius, max(1, self._px(5))
+                )
+            else:
+                pygame.draw.circle(self.screen, entity.color, center, radius)
+                pygame.draw.circle(
+                    self.screen, ENTITY_CORE_COLOR, center, max(1, self._px(entity.radius / 2))
+                )
 
     def _draw_hud(self, sim: Simulation, mode: PowerBattleMode) -> None:
         timer = self._text(f"{mode.remaining:.1f}", TIMER_FONT_SIZE)

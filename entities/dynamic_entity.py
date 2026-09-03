@@ -6,13 +6,19 @@ shared shape that spawning, updating, colliding, despawning, replay export
 and rendering can all agree on.
 
 Gameplay meaning stays out of here. An entity exposes what it contributes
-(`contact_damage`, `despawn_on_contact`) and the battle mode decides what to
-do with it, exactly as powers expose a damage multiplier.
+(`contact_damage`) and how it reacts to being touched, and the battle mode
+decides what to do with it, exactly as powers expose a damage multiplier.
 """
 
 from __future__ import annotations
 
 import pymunk
+
+# One collision type for every physical dynamic entity. The shape-to-entity
+# lookup already identifies which entity was actually hit, so a shared type
+# keeps the simulation at two collision handlers however many powers spawn
+# things.
+COLLISION_TYPE_DYNAMIC_ENTITY = 3
 
 
 class DynamicEntity:
@@ -22,7 +28,11 @@ class DynamicEntity:
 
     # Inert by default; physical subclasses opt in.
     contact_damage = 0.0
-    despawn_on_contact = False
+    # Touching a fighter and touching a wall are separate questions: a
+    # projectile is spent by either, while a bouncing clone is spent only by
+    # a fighter and rebounds off walls for its whole lifetime.
+    despawn_on_ball_contact = False
+    despawn_on_wall_contact = False
 
     def __init__(
         self,

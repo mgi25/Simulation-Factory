@@ -7,8 +7,8 @@ import math
 import pytest
 
 from engine.simulation import Simulation
-from entities.dynamic_entity import DynamicEntity
-from entities.projectile import COLLISION_TYPE_PROJECTILE, Projectile
+from entities.dynamic_entity import COLLISION_TYPE_DYNAMIC_ENTITY, DynamicEntity
+from entities.projectile import Projectile
 
 SEED = 12345
 
@@ -77,7 +77,7 @@ def test_spawn_registers_the_entity_and_its_physics() -> None:
     assert projectile in sim.dynamic_entities
     assert projectile.body in sim.space.bodies
     assert projectile.shape in sim.space.shapes
-    assert projectile.shape.collision_type == COLLISION_TYPE_PROJECTILE
+    assert projectile.shape.collision_type == COLLISION_TYPE_DYNAMIC_ENTITY
     assert sim.entity(projectile.entity_id) is projectile
 
 
@@ -220,7 +220,8 @@ def test_a_non_physical_entity_needs_no_space() -> None:
     assert marker.kind == "entity"
     assert marker.shapes == ()
     assert marker.contact_damage == 0.0
-    assert marker.despawn_on_contact is False
+    assert marker.despawn_on_ball_contact is False
+    assert marker.despawn_on_wall_contact is False
     assert tuple(marker.position) == (10.0, 20.0)
     assert len(sim.space.bodies) == len(sim.balls)
 
@@ -234,5 +235,6 @@ def test_entity_carries_its_own_gameplay_contribution() -> None:
     projectile = shot(sim, damage=18.0)
     assert projectile.kind == "projectile"
     assert projectile.contact_damage == pytest.approx(18.0)
-    assert projectile.despawn_on_contact is True
+    assert projectile.despawn_on_ball_contact is True
+    assert projectile.despawn_on_wall_contact is True
     assert projectile.owner_id == 0

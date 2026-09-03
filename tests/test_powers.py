@@ -110,14 +110,14 @@ def run_until_impact(sim: Simulation, mode: PowerBattleMode, settle: int = 60):
 
 
 def test_registry_holds_exactly_the_implemented_powers() -> None:
-    assert POWER_NAMES == ("rush", "titan", "pulse")
+    assert POWER_NAMES == ("rush", "titan", "pulse", "echo")
     assert power_class("RUSH ") is RushPower
     assert power_class("titan") is TitanPower
 
 
 def test_unknown_power_name_is_rejected() -> None:
     with pytest.raises(ValueError):
-        power_class("echo")
+        power_class("nonesuch")
 
 
 def test_same_seed_reproduces_the_same_matchup() -> None:

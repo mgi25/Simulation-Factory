@@ -34,13 +34,20 @@ const RUSH_TRAIL_COUNT := 6
 const RUSH_TRAIL_FRAME_STEP := 2
 const POWER_EMISSION_ENERGY := 0.85
 
-# Temporary entities (Pulse projectiles today) read as energy: bright and
-# self-lit, but still the owner's colour - past roughly 2.0 the tonemapper
-# clips them to white and they stop belonging to anyone. The height bias
-# lifts a small projectile to about fighter-centre height so it reads as
-# flying at its target rather than rolling along the floor.
+# Temporary entities read as energy: bright and self-lit, but still the
+# owner's colour - past roughly 2.0 the tonemapper clips them to white and
+# they stop belonging to anyone. The height bias lifts a small projectile to
+# about fighter-centre height so it reads as flying at its target rather
+# than rolling along the floor.
 const ENTITY_EMISSION_ENERGY := 1.6
 const ENTITY_HEIGHT_BIAS := 3.0
+
+# An Echo clone is a ghost of its owner: translucent, softly lit and ringed,
+# so a glance separates it from a hard, bright Pulse bolt. It sits at its own
+# radius like a fighter, because it rolls around the floor like one.
+const CLONE_EMISSION_ENERGY := 0.9
+const CLONE_ALPHA := 0.30
+const CLONE_RIM_AMOUNT := 1.0
 
 var _replay: Dictionary = {}
 var _frames: Array = []
@@ -358,13 +365,23 @@ func _build_entity_pool() -> void:
 	_entity_mesh.rings = 10
 
 
-func _entity_material(color: Color) -> StandardMaterial3D:
-	## Cached per colour: entities come and go every second, so this must
-	## never allocate per frame.
-	var key := color.to_rgba32()
+func _entity_material(kind: String, color: Color) -> StandardMaterial3D:
+	## Cached per (type, colour): entities come and go every second, so this
+	## must never allocate per frame.
+	var key := "%s:%d" % [kind, color.to_rgba32()]
 	if _entity_materials.has(key):
 		return _entity_materials[key]
 
+	var material: StandardMaterial3D
+	if kind == "echo":
+		material = _make_clone_material(color)
+	else:
+		material = _make_projectile_material(color)
+	_entity_materials[key] = material
+	return material
+
+
+func _make_projectile_material(color: Color) -> StandardMaterial3D:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
 	material.metallic = 0.0
@@ -372,7 +389,26 @@ func _entity_material(color: Color) -> StandardMaterial3D:
 	material.emission_enabled = true
 	material.emission = color
 	material.emission_energy_multiplier = ENTITY_EMISSION_ENERGY
-	_entity_materials[key] = material
+	return material
+
+
+func _make_clone_material(color: Color) -> StandardMaterial3D:
+	## A hollow shell of light: additive over the dark floor so the arena
+	## shows through it, with a hot edge where the sphere turns away. Reads as
+	## an apparition rather than a solid ball, and nothing like a Pulse bolt.
+	var material := StandardMaterial3D.new()
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	material.albedo_color = Color(color.r, color.g, color.b, CLONE_ALPHA)
+	material.metallic = 0.0
+	material.roughness = 0.55
+	material.emission_enabled = true
+	material.emission = color.lightened(0.45)
+	material.emission_energy_multiplier = CLONE_EMISSION_ENERGY
+	# Grazing angles glow, so the silhouette is an outline, not a surface.
+	material.rim_enabled = true
+	material.rim = CLONE_RIM_AMOUNT
+	material.rim_tint = 0.0
 	return material
 
 
@@ -576,12 +612,13 @@ func _update_entities(current: Array, upcoming: Array, blend: float) -> void:
 		var id := int(now.get("id", -1))
 		seen[id] = true
 
+		var kind := str(now.get("type", "entity"))
 		var node: MeshInstance3D = _entity_nodes.get(id)
 		if node == null:
 			node = MeshInstance3D.new()
 			node.name = "Entity%d" % id
 			node.mesh = _entity_mesh
-			node.material_override = _entity_material(_color_of(now))
+			node.material_override = _entity_material(kind, _color_of(now))
 			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			_entity_root.add_child(node)
 			_entity_nodes[id] = node
@@ -596,8 +633,11 @@ func _update_entities(current: Array, upcoming: Array, blend: float) -> void:
 			y = lerpf(y, float(soon.get("y", y)), blend)
 
 		var radius := to_units(float(now.get("radius", 8.0)))
+		# A clone is fighter-sized and sits on the floor like one; a small
+		# bolt is lifted so it reads as flying rather than rolling.
+		var height := radius if kind == "echo" else radius * ENTITY_HEIGHT_BIAS
 		node.scale = Vector3.ONE * radius
-		node.position = to_world(x, y, radius * ENTITY_HEIGHT_BIAS)
+		node.position = to_world(x, y, height)
 
 	for id in _entity_nodes.keys():
 		if not seen.has(id):
