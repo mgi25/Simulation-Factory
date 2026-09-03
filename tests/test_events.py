@@ -454,8 +454,8 @@ def replay() -> dict:
     return record_battle(SEED)
 
 
-def test_the_replay_is_version_4(replay: dict) -> None:
-    assert replay["version"] == REPLAY_VERSION == 4
+def test_the_replay_is_version_5(replay: dict) -> None:
+    assert replay["version"] == REPLAY_VERSION == 5
 
 
 def test_the_replay_carries_a_top_level_event_list(replay: dict) -> None:

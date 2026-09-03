@@ -64,6 +64,10 @@ def generate_seed() -> int:
 # same seed keeps power choices reproducible without coupling them to how
 # many draws the spawn generator happened to make.
 POWER_STREAM_SALT = 0x9E3779B9
+# Salt for the arena-layout stream, for the same reason one draw further out:
+# changing how many candidates the obstacle generator rejects must not move a
+# fighter's spawn or repick the matchup, and vice versa.
+ARENA_STREAM_SALT = 0x7F4A7C15
 
 
 def make_rng(seed: int) -> random.Random:
@@ -73,6 +77,11 @@ def make_rng(seed: int) -> random.Random:
 def make_power_rng(seed: int) -> random.Random:
     """Seeded RNG for power assignment, independent of the spawn stream."""
     return make_rng((seed ^ POWER_STREAM_SALT) % SEED_MAX)
+
+
+def make_arena_rng(seed: int) -> random.Random:
+    """Seeded RNG for arena generation, independent of spawns and powers."""
+    return make_rng((seed ^ ARENA_STREAM_SALT) % SEED_MAX)
 
 
 def _launch_angle(rng: random.Random) -> float:

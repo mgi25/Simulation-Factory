@@ -678,7 +678,7 @@ def orbit_replay() -> dict:
 
 def test_replay_is_current_version(orbit_replay: dict) -> None:
     """Python exports final positions, so Orbit needs no new fields."""
-    assert orbit_replay["version"] == REPLAY_VERSION == 4
+    assert orbit_replay["version"] == REPLAY_VERSION == 5
 
 
 def test_orbit_travels_through_the_generic_entities_list(orbit_replay: dict) -> None:

@@ -428,7 +428,7 @@ def pulse_replay() -> dict:
 
 
 def test_replay_is_current_version(pulse_replay: dict) -> None:
-    assert pulse_replay["version"] == REPLAY_VERSION == 4
+    assert pulse_replay["version"] == REPLAY_VERSION == 5
 
 
 def test_every_frame_has_an_entities_list(pulse_replay: dict) -> None:

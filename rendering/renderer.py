@@ -45,6 +45,12 @@ POWER_IDLE_COLOR = (140, 145, 165)
 ENTITY_CORE_COLOR = (255, 252, 240)
 ENTITY_GHOST_COLOR = (58, 62, 78)
 
+# Static obstacles: arena furniture, so they read as part of the floor rather
+# than as anything a fighter or a power put there.
+OBSTACLE_COLOR = (62, 68, 86)
+OBSTACLE_EDGE_COLOR = (108, 116, 142)
+OBSTACLE_EDGE_WIDTH = 4
+
 
 class Renderer:
     """Owns the pygame window and draws simulation and battle state."""
@@ -86,6 +92,7 @@ class Renderer:
     def draw(self, sim: Simulation, mode: PowerBattleMode) -> None:
         self.screen.fill(BACKGROUND_COLOR)
         self._draw_arena(sim)
+        self._draw_obstacles(sim)
         self._draw_entities(sim)
         self._draw_balls(sim)
         self._draw_hud(sim, mode)
@@ -121,6 +128,35 @@ class Renderer:
         pygame.draw.rect(
             self.screen, WALL_COLOR, rect, max(1, self._px(WALL_THICKNESS))
         )
+
+    def _draw_obstacles(self, sim: Simulation) -> None:
+        """Static layout geometry, drawn straight from the obstacle specs.
+
+        A rotated bar is drawn from the same `corners()` the physics polygon
+        is built from, so this view shows where an obstacle actually is
+        rather than an axis-aligned approximation of it.
+        """
+        for spec in sim.layout.obstacles:
+            if spec.is_circle:
+                center = (self._px(spec.x), self._px(spec.y))
+                radius = max(1, self._px(spec.radius))
+                pygame.draw.circle(self.screen, OBSTACLE_COLOR, center, radius)
+                pygame.draw.circle(
+                    self.screen,
+                    OBSTACLE_EDGE_COLOR,
+                    center,
+                    radius,
+                    max(1, self._px(OBSTACLE_EDGE_WIDTH)),
+                )
+            else:
+                corners = [(self._px(x), self._px(y)) for x, y in spec.corners()]
+                pygame.draw.polygon(self.screen, OBSTACLE_COLOR, corners)
+                pygame.draw.polygon(
+                    self.screen,
+                    OBSTACLE_EDGE_COLOR,
+                    corners,
+                    max(1, self._px(OBSTACLE_EDGE_WIDTH)),
+                )
 
     def _draw_balls(self, sim: Simulation) -> None:
         for ball in sim.balls:

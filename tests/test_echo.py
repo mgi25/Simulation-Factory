@@ -591,7 +591,7 @@ def echo_replay() -> dict:
 
 def test_replay_is_current_version(echo_replay: dict) -> None:
     """Echo needs no fields of its own; it rides the shared schema."""
-    assert echo_replay["version"] == REPLAY_VERSION == 4
+    assert echo_replay["version"] == REPLAY_VERSION == 5
 
 
 def test_echo_travels_through_the_generic_entities_list(echo_replay: dict) -> None:

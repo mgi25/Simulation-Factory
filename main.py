@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 
+from engine.arena_layout import LAYOUT_CLASSIC, LAYOUT_TYPES
 from engine.randomizer import generate_seed
 from engine.simulation import PHYSICS_HZ, Simulation
 from modes.power_battle import BATTLE_DURATION_SECONDS, PowerBattleMode
@@ -34,6 +35,12 @@ def parse_args() -> argparse.Namespace:
         help=f"pin the matchup, one per fighter ({', '.join(POWER_NAMES)})",
     )
     parser.add_argument(
+        "--arena",
+        choices=LAYOUT_TYPES,
+        default=LAYOUT_CLASSIC,
+        help="arena layout: the empty classic arena, or seeded procedural obstacles",
+    )
+    parser.add_argument(
         "--export-replay",
         metavar="PATH",
         default=None,
@@ -46,6 +53,10 @@ def report_start(sim: Simulation) -> None:
     print(
         f"seed={sim.seed} physics={PHYSICS_HZ}Hz render<={TARGET_FPS}fps "
         f"limit={BATTLE_DURATION_SECONDS:.0f}s"
+    )
+    print(
+        f"  arena={sim.layout.layout_id} obstacles={len(sim.layout)}"
+        + (" (reduced)" if sim.layout.fallback else "")
     )
     for ball in sim.balls:
         x, y = ball.position
@@ -64,15 +75,22 @@ def report_result(mode: PowerBattleMode) -> None:
     print(f"{mode.result_text} after {mode.duration:.1f}s  |  {health}")
 
 
-def export_replay(seed: int, path: str, powers: list[str] | None = None) -> None:
+def export_replay(
+    seed: int,
+    path: str,
+    powers: list[str] | None = None,
+    arena_mode: str = LAYOUT_CLASSIC,
+) -> None:
     """Headless path: no pygame, no window, just simulation plus JSON."""
-    replay = record_battle(seed, powers=powers)
+    replay = record_battle(seed, powers=powers, arena_mode=arena_mode)
     write_replay(replay, path)
     result = replay["result"]
     winner = "DRAW" if result["is_draw"] else replay["fighters"][result["winner_id"]]["name"]
     matchup = " vs ".join(meta["power"] for meta in replay["fighters"])
+    layout = replay["layout"]
     print(
-        f"seed={seed} matchup={matchup} frames={len(replay['frames'])} "
+        f"seed={seed} matchup={matchup} arena={layout['id']} "
+        f"obstacles={len(layout['obstacles'])} frames={len(replay['frames'])} "
         f"duration={result['duration']:.1f}s result={winner} -> {path}"
     )
 
@@ -102,10 +120,10 @@ def main() -> None:
     seed = args.seed if args.seed is not None else generate_seed()
 
     if args.export_replay:
-        export_replay(seed, args.export_replay, args.powers)
+        export_replay(seed, args.export_replay, args.powers, args.arena)
         return
 
-    sim = Simulation(seed)
+    sim = Simulation(seed, arena_mode=args.arena)
     mode = PowerBattleMode(sim, powers=args.powers)
     report_start(sim)
     run_preview(sim, mode, args.scale)

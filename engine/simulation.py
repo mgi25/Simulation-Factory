@@ -14,6 +14,15 @@ from typing import Callable
 import pymunk
 
 from engine.arena import WALL_THICKNESS, Arena
+from engine.arena_generator import layout_for_mode
+from engine.arena_layout import (
+    COLLISION_TYPE_OBSTACLE,
+    LAYOUT_CLASSIC,
+    OBSTACLE_ELASTICITY,
+    OBSTACLE_FRICTION,
+    ArenaLayout,
+    ObstacleSpec,
+)
 from engine.randomizer import generate_ball_spawns, make_rng
 from entities.ball import COLLISION_TYPE_BALL, COLLISION_TYPE_WALL, Ball
 from entities.dynamic_entity import COLLISION_TYPE_DYNAMIC_ENTITY, DynamicEntity
@@ -29,6 +38,14 @@ WALL_ELASTICITY = 1.0
 WALL_FRICTION = 0.0
 
 BALL_COUNT = 2
+
+# What a dynamic entity touched. A fighter is a gameplay target; the outer
+# wall and a static obstacle are both arena geometry, and entities react to
+# them the same way - but the report still says which, so a renderer or a
+# future rule can tell them apart.
+CONTACT_FIGHTER = "fighter"
+CONTACT_WALL = "wall"
+CONTACT_OBSTACLE = "obstacle"
 
 
 @dataclass(frozen=True)
@@ -53,21 +70,47 @@ class Impact:
 
 @dataclass(frozen=True)
 class EntityContact:
-    """A dynamic entity touching a fighter, or a wall when `ball` is None."""
+    """A dynamic entity touching a fighter, a static obstacle or the wall.
+
+    Exactly one of `ball` and `obstacle` is set for the first two; both are
+    None for the outer wall.
+    """
 
     tick: int
     entity: DynamicEntity
     ball: Ball | None = None
+    obstacle: ObstacleSpec | None = None
+
+    @property
+    def kind(self) -> str:
+        if self.ball is not None:
+            return CONTACT_FIGHTER
+        return CONTACT_WALL if self.obstacle is None else CONTACT_OBSTACLE
 
     @property
     def is_wall(self) -> bool:
+        return self.kind == CONTACT_WALL
+
+    @property
+    def is_obstacle(self) -> bool:
+        return self.kind == CONTACT_OBSTACLE
+
+    @property
+    def is_static(self) -> bool:
+        """True for arena geometry - the outer wall or a static obstacle."""
         return self.ball is None
 
 
 class Simulation:
     """Owns the physics space, the entities and the simulation clock."""
 
-    def __init__(self, seed: int, arena: Arena | None = None) -> None:
+    def __init__(
+        self,
+        seed: int,
+        arena: Arena | None = None,
+        arena_mode: str = LAYOUT_CLASSIC,
+        arena_layout: ArenaLayout | None = None,
+    ) -> None:
         self.seed = seed
         self.arena = arena if arena is not None else Arena.default()
         self.rng = make_rng(seed)
@@ -77,12 +120,22 @@ class Simulation:
 
         self._build_walls()
 
-        self.balls: list[Ball] = [
-            Ball.from_spawn(spawn)
-            for spawn in generate_ball_spawns(self.rng, self.arena, BALL_COUNT)
-        ]
+        # Fighter spawns are drawn first and from their own stream, so the
+        # same seed puts the same fighters in the same places whatever the
+        # arena mode is: only the geometry around them changes.
+        spawns = generate_ball_spawns(self.rng, self.arena, BALL_COUNT)
+        self.balls: list[Ball] = [Ball.from_spawn(spawn) for spawn in spawns]
         for ball in self.balls:
             ball.add_to_space(self.space)
+
+        # A ready-made layout wins over a mode name, which is how a test pins
+        # exact geometry instead of hunting for a seed that generates it.
+        self.layout = (
+            arena_layout
+            if arena_layout is not None
+            else layout_for_mode(arena_mode, seed, self.arena, spawns)
+        )
+        self._build_obstacles()
 
         self._ball_by_shape = {ball.shape: ball for ball in self.balls}
         self._ball_by_id = {ball.ball_id: ball for ball in self.balls}
@@ -104,6 +157,11 @@ class Simulation:
         )
         self.space.on_collision(
             COLLISION_TYPE_DYNAMIC_ENTITY, COLLISION_TYPE_WALL, begin=self._on_entity_wall
+        )
+        self.space.on_collision(
+            COLLISION_TYPE_DYNAMIC_ENTITY,
+            COLLISION_TYPE_OBSTACLE,
+            begin=self._on_entity_obstacle,
         )
 
         self.ticks = 0
@@ -132,6 +190,42 @@ class Simulation:
             wall.collision_type = COLLISION_TYPE_WALL
             self.space.add(wall)
             self.walls.append(wall)
+
+    def _build_obstacles(self) -> None:
+        """Turn the layout's plain data into static shapes on the arena floor.
+
+        A bar's polygon is built from the same `corners()` the layout uses for
+        every clearance check, so a rotated obstacle is physically exactly
+        where the replay says it is - there is no second rotation maths here
+        that could disagree with the first.
+        """
+        self.obstacle_shapes: list[pymunk.Shape] = []
+        self._obstacle_by_shape: dict[pymunk.Shape, ObstacleSpec] = {}
+
+        for spec in self.layout.obstacles:
+            if spec.is_circle:
+                shape: pymunk.Shape = pymunk.Circle(
+                    self.space.static_body, spec.radius, offset=spec.center
+                )
+            else:
+                shape = pymunk.Poly(self.space.static_body, spec.corners())
+            shape.elasticity = OBSTACLE_ELASTICITY
+            shape.friction = OBSTACLE_FRICTION
+            shape.collision_type = COLLISION_TYPE_OBSTACLE
+            self.space.add(shape)
+            self.obstacle_shapes.append(shape)
+            self._obstacle_by_shape[shape] = spec
+
+    @property
+    def arena_mode(self) -> str:
+        """Which kind of arena this simulation is running: classic or generated."""
+        return self.layout.layout_type
+
+    def obstacle(self, obstacle_id: int) -> ObstacleSpec | None:
+        for spec in self.layout.obstacles:
+            if spec.obstacle_id == obstacle_id:
+                return spec
+        return None
 
     # --- dynamic entities ---
 
@@ -206,6 +300,17 @@ class Simulation:
         if entity is None or not entity.active:
             return
         self.entity_contacts.append(EntityContact(self.ticks, entity))
+
+    def _on_entity_obstacle(self, arbiter: pymunk.Arbiter, space, data) -> None:
+        entity, _ = self._contact_pair(arbiter)
+        if entity is None or not entity.active:
+            return
+        obstacle = None
+        for shape in arbiter.shapes:
+            obstacle = obstacle or self._obstacle_by_shape.get(shape)
+        self.entity_contacts.append(
+            EntityContact(self.ticks, entity, obstacle=obstacle)
+        )
 
     # --- collision reporting ---
 

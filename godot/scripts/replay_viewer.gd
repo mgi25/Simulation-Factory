@@ -14,7 +14,7 @@ const DEFAULT_REPLAY := "../output/replay_12345.json"
 
 # The only replay schema this viewer understands. Anything older is rejected
 # with a message rather than half-played.
-const REPLAY_VERSION := 4
+const REPLAY_VERSION := 5
 
 const FLOOR_THICKNESS := 0.25
 const WALL_HEIGHT := 0.9
@@ -41,6 +41,20 @@ const CENTRE_DOT_RADIUS := 0.17
 const RIM_EMISSION := 0.55
 const RIM_HEIGHT := 0.05
 const RIM_DROP := 0.14
+
+# Static obstacles. They are arena furniture, so they borrow the wall's slate
+# palette and are lit *below* the wall rim: a bumper must never compete with a
+# Pulse bolt or an impact ring for attention. Kept low enough that the 78
+# degree camera still sees a fighter standing behind one.
+const OBSTACLE_BODY_COLOR := Color(0.165, 0.185, 0.24)
+const OBSTACLE_ACCENT_EMISSION := 0.34
+const BUMPER_HEIGHT := 0.56
+const BUMPER_RING_INNER := 0.58
+const BUMPER_RING_OUTER := 0.80
+const BAR_HEIGHT := 0.42
+const BAR_STRIP_HEIGHT := 0.022
+const BAR_STRIP_LENGTH := 0.88
+const BAR_STRIP_WIDTH := 0.26
 
 # Nearly overhead: the arena is deeper than it is wide, and a portrait frame
 # only gets its height back by looking down on it. Still angled enough to keep
@@ -135,6 +149,7 @@ func _ready() -> void:
 	_build_lights()
 	_build_camera()
 	_build_arena()
+	_build_obstacles()
 	_build_fighters()
 	_build_entity_pool()
 	_build_vfx()
@@ -480,6 +495,98 @@ func _add_wall_piece(piece: String, mesh: Mesh, position: Vector3,
 	if not shadows:
 		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(node)
+
+
+func _build_obstacles() -> void:
+	## Static layout geometry, rebuilt from the replay and nothing else.
+	##
+	## The viewer does not know how these were generated and must not: the
+	## replay carries the finished geometry, so playback cannot drift from the
+	## simulation that produced it. A classic arena simply lists none.
+	var layout: Dictionary = _replay.get("layout", {})
+	var obstacles: Array = layout.get("obstacles", [])
+	if obstacles.is_empty():
+		return
+
+	var root := Node3D.new()
+	root.name = "Obstacles"
+	add_child(root)
+
+	# Two shared materials for the whole layout, allocated once.
+	var body := _make_material(OBSTACLE_BODY_COLOR, 0.22, 0.52, 0.35)
+	var accent := _make_emissive(ACCENT_COLOR, OBSTACLE_ACCENT_EMISSION, 0.5)
+
+	for raw in obstacles:
+		var spec: Dictionary = raw
+		var pivot := Node3D.new()
+		pivot.name = "Obstacle%d" % int(spec.get("id", 0))
+		pivot.position = to_world(
+			float(spec.get("x", 0.0)), float(spec.get("y", 0.0)), 0.0)
+		root.add_child(pivot)
+
+		if str(spec.get("type", "")) == "circle":
+			_build_bumper(pivot, spec, body, accent)
+		else:
+			_build_bar(pivot, spec, body, accent)
+
+
+func _build_bumper(pivot: Node3D, spec: Dictionary,
+		body: StandardMaterial3D, accent: StandardMaterial3D) -> void:
+	## A dark round post with one lit ring inlaid in its top face.
+	var radius := to_units(float(spec.get("radius", 0.0)))
+
+	var post := CylinderMesh.new()
+	post.top_radius = radius
+	post.bottom_radius = radius
+	post.height = BUMPER_HEIGHT
+	post.radial_segments = 32
+	_add_obstacle_piece(pivot, "Post", post, Vector3(0.0, BUMPER_HEIGHT * 0.5, 0.0),
+		body)
+
+	var ring := TorusMesh.new()
+	ring.inner_radius = radius * BUMPER_RING_INNER
+	ring.outer_radius = radius * BUMPER_RING_OUTER
+	ring.rings = 32
+	ring.ring_segments = 6
+	_add_obstacle_piece(pivot, "Ring", ring, Vector3(0.0, BUMPER_HEIGHT, 0.0),
+		accent, false)
+
+
+func _build_bar(pivot: Node3D, spec: Dictionary,
+		body: StandardMaterial3D, accent: StandardMaterial3D) -> void:
+	## A low slab with a single lit line down its length.
+	##
+	## Simulation y becomes world Z, which mirrors the plane, so a rotation
+	## that turns one way in simulation coordinates turns the other way here.
+	## Negating it is what puts a 45 degree bar where the replay says it is.
+	var width := to_units(float(spec.get("width", 0.0)))
+	var depth := to_units(float(spec.get("height", 0.0)))
+	pivot.rotation_degrees = Vector3(
+		0.0, -float(spec.get("rotation_degrees", 0.0)), 0.0)
+
+	var slab := BoxMesh.new()
+	slab.size = Vector3(width, BAR_HEIGHT, depth)
+	_add_obstacle_piece(pivot, "Slab", slab, Vector3(0.0, BAR_HEIGHT * 0.5, 0.0), body)
+
+	var strip := BoxMesh.new()
+	strip.size = Vector3(
+		width * BAR_STRIP_LENGTH, BAR_STRIP_HEIGHT, depth * BAR_STRIP_WIDTH)
+	_add_obstacle_piece(pivot, "Strip", strip,
+		Vector3(0.0, BAR_HEIGHT, 0.0), accent, false)
+
+
+func _add_obstacle_piece(pivot: Node3D, piece: String, mesh: Mesh,
+		position: Vector3, material: StandardMaterial3D, shadows := true) -> void:
+	var node := MeshInstance3D.new()
+	node.name = piece
+	node.mesh = mesh
+	node.material_override = material
+	node.position = position
+	# Only the solid body casts: an accent is a lit surface on top of it, and
+	# doubling the shadow would only darken the floor for nothing.
+	if not shadows:
+		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	pivot.add_child(node)
 
 
 func _build_fighters() -> void:

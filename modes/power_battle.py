@@ -201,7 +201,12 @@ class PowerBattleMode:
             if not entity.active:
                 continue
 
-            if contact.is_wall:
+            # Arena geometry, whether that is the outer wall or a static
+            # obstacle: an entity is spent by both or by neither, so
+            # `despawn_on_wall_contact` answers for the pair. A Pulse bolt is
+            # blocked by a bumper exactly as a wall blocks it; an Echo clone
+            # rebounds off either and lives on.
+            if contact.is_static:
                 if entity.despawn_on_wall_contact:
                     self.sim.despawn(entity)
                 continue

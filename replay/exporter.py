@@ -12,6 +12,7 @@ import os
 from typing import Any, Iterable
 
 from engine.arena import CANVAS_HEIGHT, CANVAS_WIDTH
+from engine.arena_layout import LAYOUT_CLASSIC, ArenaLayout, ObstacleSpec
 from engine.simulation import PHYSICS_HZ, Simulation
 from modes.events import BattleEvent
 from modes.power_battle import BATTLE_DURATION_SECONDS, PowerBattleMode
@@ -27,7 +28,12 @@ from powers import PowerSpec
 # order to show that something happened. It sits beside `frames` rather than
 # inside them because physics runs at 120 Hz and frames are sampled at 60, so
 # a per-frame home would round every event to the nearest sample.
-REPLAY_VERSION = 4
+# v5 adds a top-level `layout`: the static obstacles standing in the arena.
+# It is exported as real geometry rather than as the seed that produced it,
+# so a renderer rebuilds the exact battle environment without knowing - or
+# being able to disagree with - the generator that made it. Static by
+# definition, so it appears once and never inside a frame.
+REPLAY_VERSION = 5
 REPLAY_FPS = 60
 TICKS_PER_FRAME = PHYSICS_HZ // REPLAY_FPS
 
@@ -90,16 +96,55 @@ def _event(event: BattleEvent) -> dict[str, Any]:
     }
 
 
+def _obstacle(spec: ObstacleSpec) -> dict[str, Any]:
+    """One static obstacle as plain JSON.
+
+    Every obstacle carries the same keys whichever primitive it is, with the
+    fields that primitive does not use left at zero, so a renderer switches
+    on `type` and reads one flat shape rather than probing for fields.
+    """
+    return {
+        "id": spec.obstacle_id,
+        "type": spec.kind,
+        "x": round(spec.x, DECIMALS),
+        "y": round(spec.y, DECIMALS),
+        "radius": round(spec.radius, DECIMALS),
+        "width": round(spec.width, DECIMALS),
+        "height": round(spec.height, DECIMALS),
+        "rotation_degrees": round(spec.rotation_degrees, DECIMALS),
+    }
+
+
+def _layout(layout: ArenaLayout) -> dict[str, Any]:
+    """The whole static layout, including the empty classic one.
+
+    A classic arena still exports a layout section, with no obstacles in it,
+    so a renderer has exactly one code path for arena geometry.
+    """
+    return {
+        "id": layout.layout_id,
+        "type": layout.layout_type,
+        "requested_obstacles": layout.requested_obstacles,
+        "fallback": layout.fallback,
+        "obstacles": [_obstacle(spec) for spec in layout.obstacles],
+    }
+
+
 def record_battle(
-    seed: int, powers: Iterable[PowerSpec] | None = None
+    seed: int,
+    powers: Iterable[PowerSpec] | None = None,
+    arena_mode: str = LAYOUT_CLASSIC,
+    arena_layout: ArenaLayout | None = None,
 ) -> dict[str, Any]:
     """Run one battle headlessly and capture it as replay data.
 
     Visual state is sampled every `TICKS_PER_FRAME` physics ticks, which is
     60 frames per simulated second at the 120 Hz physics rate. `powers` pins
-    the matchup; left out, it is drawn from the seed.
+    the matchup; left out, it is drawn from the seed. `arena_mode` picks the
+    empty classic arena or a generated one, and `arena_layout` pins exact
+    geometry the same way `powers` pins the matchup.
     """
-    sim = Simulation(seed)
+    sim = Simulation(seed, arena_mode=arena_mode, arena_layout=arena_layout)
     mode = PowerBattleMode(sim, powers=powers)
 
     frames = [_frame(sim)]
@@ -123,6 +168,9 @@ def record_battle(
             "right": sim.arena.right,
             "bottom": sim.arena.bottom,
         },
+        # Static for the whole battle, so it is exported once here and never
+        # repeated inside a frame.
+        "layout": _layout(sim.layout),
         "fighters": [
             {
                 "id": ball.ball_id,
