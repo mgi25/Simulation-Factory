@@ -21,12 +21,13 @@ class EchoPower(Power):
     name = "echo"
 
     # Trimmed from 6.0s / 12 HP / 4.0s life / 0.35 mass after the Phase 3B2
-    # smoke test, which had Echo winning ~75% of its battles and 79-94% of
-    # its cross-matchups. Two clones that persist and ricochet get many
-    # chances to land for no risk to the owner, so lifetime is the strongest
-    # lever here. Left deliberately short of parity: a dedicated multi-power
-    # balance pass follows once all five powers exist.
-    COOLDOWN_SECONDS = 7.0
+    # smoke test, then again in the Phase 4A1 balance pass, which still had
+    # Echo winning 69% of its cross-matchups. Two clones that persist and
+    # ricochet get many chances to land for no risk to the owner, so how long
+    # they stay on the board is the strongest lever; the damage per clone was
+    # raised to keep the same threat as a shorter, sharper burst rather than
+    # a lingering cloud.
+    COOLDOWN_SECONDS = 8.5
     # Long enough to read as a release; the clones far outlive it.
     DURATION_SECONDS = 0.30
 
@@ -34,8 +35,10 @@ class EchoPower(Power):
     # A clone is unmistakably a smaller copy of its owner.
     CLONE_RADIUS_FRACTION = 0.55
     CLONE_SPEED = 1300.0
-    CLONE_DAMAGE = 8.0
-    CLONE_LIFETIME_SECONDS = 2.5
+    CLONE_DAMAGE = 10.0
+    # Still over two arena-widths of travel, so a clone visibly ricochets
+    # several times before it expires.
+    CLONE_LIFETIME_SECONDS = 1.6
     # Light enough that a hit nudges a fighter rather than launching it.
     CLONE_MASS = 0.30
 

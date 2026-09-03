@@ -12,7 +12,11 @@ from entities.dynamic_entity import DynamicEntity
 from entities.echo_clone import EchoClone
 from entities.orbit_orb import OrbitOrb
 from entities.projectile import Projectile
-from modes.power_battle import BATTLE_DURATION_TICKS, PowerBattleMode
+from modes.power_battle import (
+    BATTLE_DURATION_TICKS,
+    POWER_WARMUP_TICKS,
+    PowerBattleMode,
+)
 from powers import POWER_NAMES, EchoPower, OrbitPower, Power, PulsePower, power_class
 from powers.power import seconds_to_ticks
 from replay.exporter import REPLAY_VERSION, record_battle
@@ -23,6 +27,17 @@ SEED = 12345
 def inert_power() -> Power:
     """A power whose cooldown never becomes ready inside a battle."""
     return Power(initial_delay_ticks=10**9)
+
+
+def warm_up(mode: PowerBattleMode) -> None:
+    """Step to the tick *before* powers are first allowed to fire.
+
+    The opening warmup holds every power back, so a scripted duel has to get
+    past it before a deployment can be watched. The fighters are parked, so
+    nothing moves while it runs.
+    """
+    while mode.sim.ticks < POWER_WARMUP_TICKS - 1:
+        mode.step()
 
 
 def orbit_duel(*specs, seed: int = SEED, opponent_far: bool = True):
@@ -42,6 +57,7 @@ def orbit_duel(*specs, seed: int = SEED, opponent_far: bool = True):
     if opponent_far:
         opponent.body.position = (sim.arena.right - 120.0, sim.arena.bottom - 120.0)
     opponent.body.velocity = (0.0, 0.0)
+    warm_up(mode)
     return sim, mode, owner, opponent
 
 
@@ -97,8 +113,8 @@ def test_orbit_activation_period_is_deterministic() -> None:
         was_active = mode.powers[0].active
 
     period = 330 + 780
-    assert ticks[0] == 1
-    assert ticks == [1 + period * i for i in range(len(ticks))]
+    assert ticks[0] == POWER_WARMUP_TICKS
+    assert ticks == [POWER_WARMUP_TICKS + period * i for i in range(len(ticks))]
     assert ticks[-1] <= BATTLE_DURATION_TICKS
 
 
@@ -231,6 +247,7 @@ def test_rotation_direction_is_deterministic_and_differs_per_fighter() -> None:
     assert second.spin_direction() == -1
     assert first.angular_step() == pytest.approx(-second.angular_step())
 
+    warm_up(mode)
     mode.step()
     by_owner: dict[int, OrbitOrb] = {}
     for orb in orbs_of(sim):
@@ -481,6 +498,7 @@ def test_orbiters_stay_fully_inside_the_arena_in_a_corner() -> None:
     opponent.body.position = (sim.arena.right - 150.0, sim.arena.bottom - 150.0)
     opponent.body.velocity = (0.0, 0.0)
 
+    warm_up(mode)
     mode.step()
     assert len(orbs_of(sim)) == 3
 
@@ -509,6 +527,7 @@ def test_wall_proximity_never_despawns_an_orb(corner: str) -> None:
     opponent.body.position = (arena.right - 130.0, arena.bottom - 130.0)
     opponent.body.velocity = (0.0, 0.0)
 
+    warm_up(mode)
     mode.step()
     for _ in range(240):
         mode.step()

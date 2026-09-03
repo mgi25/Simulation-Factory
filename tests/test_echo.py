@@ -9,7 +9,11 @@ import pytest
 from engine.simulation import PHYSICS_HZ, Simulation
 from entities.echo_clone import EchoClone
 from entities.projectile import Projectile
-from modes.power_battle import BATTLE_DURATION_TICKS, PowerBattleMode
+from modes.power_battle import (
+    BATTLE_DURATION_TICKS,
+    POWER_WARMUP_TICKS,
+    PowerBattleMode,
+)
 from powers import POWER_NAMES, EchoPower, Power, PulsePower, power_class
 from powers.power import seconds_to_ticks
 from replay.exporter import REPLAY_VERSION, record_battle
@@ -21,6 +25,17 @@ LIFETIME_TICKS = seconds_to_ticks(EchoPower.CLONE_LIFETIME_SECONDS)
 def inert_power() -> Power:
     """A power whose cooldown never becomes ready inside a battle."""
     return Power(initial_delay_ticks=10**9)
+
+
+def warm_up(mode: PowerBattleMode) -> None:
+    """Step to the tick *before* powers are first allowed to fire.
+
+    The opening warmup holds every power back, so a scripted duel has to get
+    past it before an activation can be watched. The fighters are parked, so
+    nothing moves while it runs.
+    """
+    while mode.sim.ticks < POWER_WARMUP_TICKS - 1:
+        mode.step()
 
 
 def echo_duel(*specs, seed: int = SEED):
@@ -39,6 +54,7 @@ def echo_duel(*specs, seed: int = SEED):
     owner.body.velocity = (0.0, 0.0)
     opponent.body.position = (sim.arena.right - 140.0, sim.arena.bottom - 140.0)
     opponent.body.velocity = (0.0, 0.0)
+    warm_up(mode)
     return sim, mode, owner, opponent
 
 
@@ -92,9 +108,9 @@ def test_echo_appears_in_seeded_assignment_and_stays_deterministic() -> None:
 
 def test_echo_timing_is_expressed_in_simulation_ticks() -> None:
     echo = EchoPower()
-    assert echo.cooldown_ticks == round(7.0 * PHYSICS_HZ) == 840
+    assert echo.cooldown_ticks == round(8.5 * PHYSICS_HZ) == 1020
     assert echo.duration_ticks == round(0.30 * PHYSICS_HZ) == 36
-    assert LIFETIME_TICKS == round(2.5 * PHYSICS_HZ) == 300
+    assert LIFETIME_TICKS == round(1.6 * PHYSICS_HZ) == 192
 
 
 def test_echo_activation_period_is_deterministic() -> None:
@@ -106,9 +122,9 @@ def test_echo_activation_period_is_deterministic() -> None:
             ticks.append(sim.ticks)
         was_active = mode.powers[0].active
 
-    period = 36 + 840
-    assert ticks[0] == 1
-    assert ticks == [1 + period * i for i in range(len(ticks))]
+    period = 36 + 1020
+    assert ticks[0] == POWER_WARMUP_TICKS
+    assert ticks == [POWER_WARMUP_TICKS + period * i for i in range(len(ticks))]
     assert ticks[-1] <= BATTLE_DURATION_TICKS
 
 
@@ -176,6 +192,7 @@ def test_clones_stay_inside_the_arena_when_released_against_a_wall() -> None:
     opponent.body.position = (sim.arena.right - 200.0, sim.arena.bottom - 200.0)
     opponent.body.velocity = (0.0, 0.0)
 
+    warm_up(mode)
     mode.step()
     clones = live(sim)
     assert len(clones) == 2
@@ -361,7 +378,7 @@ def test_clone_hit_deals_the_flat_clone_damage_and_is_spent() -> None:
 
 
 def test_clone_damage_ignores_the_fighter_impact_formula() -> None:
-    """A flat 12 HP, not anything derived from closing speed."""
+    """A flat clone damage, not anything derived from closing speed."""
     sim, mode, owner, opponent = echo_duel(inert_power(), inert_power())
     owner.body.position = (sim.arena.left + 150.0, sim.arena.top + 150.0)
     owner.body.velocity = (0.0, 0.0)

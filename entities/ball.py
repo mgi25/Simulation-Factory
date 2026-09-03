@@ -110,8 +110,17 @@ class Ball:
         return self._health / self.max_health
 
     def take_damage(self, amount: float) -> float:
-        """Apply damage and return how much was actually removed."""
+        """Apply damage and return how much was actually removed.
+
+        Every source of damage goes through here, so this is the single place
+        a defensive power's mitigation is applied. Assigning to `health`
+        directly deliberately bypasses it: that is how tests and the battle
+        mode script an exact health value.
+        """
         if amount <= 0.0 or not self.alive:
+            return 0.0
+        amount *= self.incoming_damage_multiplier
+        if amount <= 0.0:
             return 0.0
         before = self._health
         self.health = before - amount
@@ -133,6 +142,13 @@ class Ball:
     def damage_multiplier(self) -> float:
         """Impact damage multiplier contributed by this ball's power."""
         return 1.0 if self.power is None else self.power.damage_multiplier
+
+    @property
+    def incoming_damage_multiplier(self) -> float:
+        """Fraction of incoming damage this ball's power lets through."""
+        if self.power is None:
+            return 1.0
+        return max(0.0, self.power.incoming_damage_multiplier)
 
     # --- temporary physical effects ---
 

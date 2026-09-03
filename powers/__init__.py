@@ -28,11 +28,17 @@ POWER_NAMES: tuple[str, ...] = tuple(POWER_CLASSES)
 # Spread out the first activation a little so two identical powers do not
 # fire in permanent lockstep. Seeded, therefore reproducible.
 INITIAL_OFFSET_MAX_TICKS = seconds_to_ticks(1.5)
+# Offsets are drawn one-based. A power activates on the tick its counter
+# reaches zero, so a counter of 0 and a counter of 1 both fire on the first
+# legal tick; drawing from 1..N instead of 0..N-1 means every distinct draw
+# is a distinct first-activation tick.
+INITIAL_OFFSET_MIN_TICKS = 1
 
 PowerSpec = str | Power | type[Power]
 
 __all__ = [
     "INITIAL_OFFSET_MAX_TICKS",
+    "INITIAL_OFFSET_MIN_TICKS",
     "POWER_CLASSES",
     "POWER_NAMES",
     "EchoPower",
@@ -66,7 +72,11 @@ def create_power(spec: PowerSpec, rng: random.Random | None = None) -> Power:
     if isinstance(spec, Power):
         return spec
     cls = spec if isinstance(spec, type) and issubclass(spec, Power) else power_class(spec)
-    delay = 0 if rng is None else rng.randrange(INITIAL_OFFSET_MAX_TICKS)
+    delay = (
+        0
+        if rng is None
+        else rng.randrange(INITIAL_OFFSET_MIN_TICKS, INITIAL_OFFSET_MAX_TICKS + 1)
+    )
     return cls(initial_delay_ticks=delay)
 
 

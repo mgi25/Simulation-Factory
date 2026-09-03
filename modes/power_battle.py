@@ -14,9 +14,18 @@ from engine.randomizer import make_power_rng
 from engine.simulation import PHYSICS_DT, PHYSICS_HZ, Simulation
 from entities.ball import Ball
 from powers import Power, PowerSpec, assign_powers
+from powers.power import seconds_to_ticks
 
 BATTLE_DURATION_SECONDS = 35.0
 BATTLE_DURATION_TICKS = int(BATTLE_DURATION_SECONDS * PHYSICS_HZ)
+
+# Opening grace period before any power may fire. Fighters still move, still
+# collide and still take ordinary collision damage - this is not
+# invulnerability - but a viewer gets a moment to read the matchup before the
+# first ability lands. Counted in simulation ticks, so it is unaffected by the
+# render framerate.
+POWER_WARMUP_SECONDS = 1.25
+POWER_WARMUP_TICKS = seconds_to_ticks(POWER_WARMUP_SECONDS)
 
 # Damage is driven by the closing speed of an impact: below the threshold a
 # touch is harmless, above it damage grows linearly up to a hard cap.
@@ -128,7 +137,17 @@ class PowerBattleMode:
 
     # --- power lifecycle ---
 
+    @property
+    def warming_up(self) -> bool:
+        """True while the opening grace period is still holding powers back."""
+        return self.sim.ticks < POWER_WARMUP_TICKS
+
     def _update_powers(self) -> None:
+        # The warmup is a single gate here rather than something each power
+        # has to remember, so no power can opt out of it and every seeded
+        # initial delay starts counting from the same tick.
+        if self.warming_up:
+            return
         for power in self.powers:
             if power.owner is not None and power.owner.alive:
                 power.update(self.sim.ticks)

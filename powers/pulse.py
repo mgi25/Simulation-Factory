@@ -16,12 +16,12 @@ class PulsePower(Power):
 
     name = "pulse"
 
-    # Tuned from 4.5 s / 24 HP after the Phase 3B1 smoke test, which put
-    # Pulse at ~67% of its battles: unlike Rush and Titan it deals damage
-    # without exposing itself to the return collision. Damage and cooldown
-    # are a weak lever on that structural edge, so this is a modest trim
-    # rather than an attempt to force parity.
-    COOLDOWN_SECONDS = 5.5
+    # Tuned from 4.5 s / 24 HP after the Phase 3B1 smoke test, then from
+    # 5.5 s in the Phase 4A1 balance pass: unlike Rush and Titan, Pulse deals
+    # damage without exposing itself to the return collision, and rate of
+    # fire is the honest lever on that. The damage stays flat, so a hit reads
+    # the same as it always did.
+    COOLDOWN_SECONDS = 6.5
     # Just long enough to read as a muzzle flash; the projectile outlives it.
     DURATION_SECONDS = 0.25
 

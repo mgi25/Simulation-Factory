@@ -9,7 +9,11 @@ import pytest
 
 from engine.simulation import PHYSICS_HZ, Simulation
 from entities.ball import BALL_MASS, Ball
-from modes.power_battle import BATTLE_DURATION_TICKS, PowerBattleMode
+from modes.power_battle import (
+    BATTLE_DURATION_TICKS,
+    POWER_WARMUP_TICKS,
+    PowerBattleMode,
+)
 from powers import (
     POWER_NAMES,
     Power,
@@ -48,6 +52,17 @@ def inert_power() -> Power:
     return Power(initial_delay_ticks=10**9)
 
 
+def warm_up(mode: PowerBattleMode) -> None:
+    """Step to the tick *before* powers are first allowed to fire.
+
+    The opening warmup holds every power back, so a test that wants to watch
+    an activation has to get past it first. The next `mode.step()` is then
+    the earliest tick on which anything can fire.
+    """
+    while mode.sim.ticks < POWER_WARMUP_TICKS - 1:
+        mode.step()
+
+
 def scripted_battle(*specs, seed: int = 1):
     """Two powered fighters on separate lanes that never meet.
 
@@ -66,10 +81,17 @@ def scripted_battle(*specs, seed: int = 1):
 
 
 def activation_ticks(sim: Simulation, mode: PowerBattleMode, index: int) -> list[int]:
-    """Ticks on which fighter `index`'s power switched on, over a full battle."""
+    """Ticks on which fighter `index`'s power switched on, over a full battle.
+
+    Health is topped back up every tick. A power that spawns things can shove
+    a fighter off its lane and end the battle early, and this is a question
+    about the clock, not about combat.
+    """
     ticks: list[int] = []
     was_active = False
     while mode.step():
+        for ball in sim.balls:
+            ball.health = ball.max_health
         is_active = mode.powers[index].active
         if is_active and not was_active:
             ticks.append(sim.ticks)
@@ -78,15 +100,23 @@ def activation_ticks(sim: Simulation, mode: PowerBattleMode, index: int) -> list
 
 
 def ram_battle(*specs, seed: int = 5):
-    """Fighter 0 charges a stationary fighter 1 from near the left wall."""
+    """Fighter 0 charges a stationary fighter 1 from near the left wall.
+
+    Both fighters sit still through the opening warmup and the charge starts
+    the moment powers are allowed to fire; otherwise the impact would land
+    while the rammer's power was still held back.
+    """
     sim = Simulation(seed)
     mode = PowerBattleMode(sim, powers=specs)
     rammer, victim = sim.balls
     mid_y = (sim.arena.top + sim.arena.bottom) / 2
     rammer.body.position = (sim.arena.left + 140, mid_y)
-    rammer.body.velocity = (900.0, 0.0)
+    rammer.body.velocity = (0.0, 0.0)
     victim.body.position = ((sim.arena.left + sim.arena.right) / 2, mid_y)
     victim.body.velocity = (0.0, 0.0)
+
+    warm_up(mode)
+    rammer.body.velocity = (900.0, 0.0)
     return sim, mode, rammer, victim
 
 
@@ -179,7 +209,7 @@ def test_timing_constants_are_expressed_in_simulation_ticks() -> None:
     assert rush.cooldown_ticks == round(5.0 * PHYSICS_HZ) == 600
     assert rush.duration_ticks == round(1.25 * PHYSICS_HZ) == 150
     assert titan.cooldown_ticks == round(6.0 * PHYSICS_HZ) == 720
-    assert titan.duration_ticks == round(1.75 * PHYSICS_HZ) == 210
+    assert titan.duration_ticks == round(1.90 * PHYSICS_HZ) == 228
 
 
 @pytest.mark.parametrize("name", POWER_NAMES)
@@ -189,8 +219,8 @@ def test_activation_ticks_are_a_fixed_simulated_period(name: str) -> None:
     ticks = activation_ticks(sim, mode, 0)
 
     period = cls().duration_ticks + cls().cooldown_ticks
-    assert ticks[0] == 1
-    assert ticks == [1 + period * i for i in range(len(ticks))]
+    assert ticks[0] == POWER_WARMUP_TICKS
+    assert ticks == [POWER_WARMUP_TICKS + period * i for i in range(len(ticks))]
     assert ticks[-1] <= BATTLE_DURATION_TICKS
     assert mode.powers[0].activations == len(ticks) >= 4
 
@@ -198,6 +228,7 @@ def test_activation_ticks_are_a_fixed_simulated_period(name: str) -> None:
 def test_active_duration_matches_the_declared_duration() -> None:
     sim, mode, _, _ = scripted_battle(RushPower(), inert_power())
     power = mode.powers[0]
+    warm_up(mode)
 
     active_ticks = 0
     for _ in range(power.duration_ticks + power.cooldown_ticks):
@@ -208,10 +239,16 @@ def test_active_duration_matches_the_declared_duration() -> None:
 
 
 def test_initial_delay_shifts_only_the_first_activation() -> None:
-    """A delay of N ticks means the first burst lands on tick N."""
+    """A delay counts down from the first tick after the warmup.
+
+    Like a cooldown, the power fires on the tick the counter reaches zero,
+    so N ticks of delay land the first burst N-1 ticks after the earliest
+    legal one. Seeded offsets are drawn from 1 upwards for exactly that
+    reason: every distinct offset is then a distinct activation tick.
+    """
     sim, mode, _, _ = scripted_battle(RushPower(initial_delay_ticks=90), inert_power())
     ticks = activation_ticks(sim, mode, 0)
-    assert ticks[0] == 90
+    assert ticks[0] == POWER_WARMUP_TICKS + 89
     assert ticks[1] - ticks[0] == 150 + 600
 
 
@@ -233,6 +270,7 @@ def test_activation_ticks_are_deterministic_for_a_seed() -> None:
 
 def test_a_dead_fighter_stops_activating() -> None:
     sim, mode, a, b = scripted_battle(RushPower(), RushPower())
+    warm_up(mode)
     mode.step()
     assert mode.powers[0].activations == 1
 
@@ -495,6 +533,7 @@ def test_one_impact_still_causes_exactly_one_damage_event_with_powers() -> None:
 
 def test_finishing_the_battle_rolls_back_active_powers() -> None:
     sim, mode, a, b = scripted_battle(RushPower(), TitanPower())
+    warm_up(mode)
     speed_before = a.velocity.length
 
     mode.step()

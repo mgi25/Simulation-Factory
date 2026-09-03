@@ -8,7 +8,11 @@ import pytest
 
 from engine.simulation import PHYSICS_HZ, Simulation
 from entities.projectile import Projectile
-from modes.power_battle import BATTLE_DURATION_TICKS, PowerBattleMode
+from modes.power_battle import (
+    BATTLE_DURATION_TICKS,
+    POWER_WARMUP_TICKS,
+    PowerBattleMode,
+)
 from powers import POWER_NAMES, Power, PulsePower, power_class
 from powers.power import seconds_to_ticks
 from replay.exporter import REPLAY_VERSION, record_battle
@@ -20,6 +24,17 @@ LIFETIME_TICKS = seconds_to_ticks(PulsePower.PROJECTILE_LIFETIME_SECONDS)
 def inert_power() -> Power:
     """A power whose cooldown never becomes ready inside a battle."""
     return Power(initial_delay_ticks=10**9)
+
+
+def warm_up(mode: PowerBattleMode) -> None:
+    """Step to the tick *before* powers are first allowed to fire.
+
+    The opening warmup holds every power back, so a scripted duel has to get
+    past it before an activation can be watched. The fighters are parked, so
+    nothing moves while it runs.
+    """
+    while mode.sim.ticks < POWER_WARMUP_TICKS - 1:
+        mode.step()
 
 
 def pulse_duel(*specs, seed: int = SEED, gap: float = 600.0):
@@ -37,6 +52,7 @@ def pulse_duel(*specs, seed: int = SEED, gap: float = 600.0):
     shooter.body.velocity = (0.0, 0.0)
     target.body.position = (left + gap, mid_y)
     target.body.velocity = (0.0, 0.0)
+    warm_up(mode)
     return sim, mode, shooter, target
 
 
@@ -75,7 +91,7 @@ def test_pulse_appears_in_seeded_assignment_and_stays_deterministic() -> None:
 
 def test_pulse_timing_is_expressed_in_simulation_ticks() -> None:
     pulse = PulsePower()
-    assert pulse.cooldown_ticks == round(5.5 * PHYSICS_HZ) == 660
+    assert pulse.cooldown_ticks == round(6.5 * PHYSICS_HZ) == 780
     assert pulse.duration_ticks == round(0.25 * PHYSICS_HZ) == 30
 
 
@@ -88,9 +104,9 @@ def test_pulse_activation_period_is_deterministic() -> None:
             ticks.append(sim.ticks)
         was_active = mode.powers[0].active
 
-    period = 30 + 660
-    assert ticks[0] == 1
-    assert ticks == [1 + period * i for i in range(len(ticks))]
+    period = 30 + 780
+    assert ticks[0] == POWER_WARMUP_TICKS
+    assert ticks == [POWER_WARMUP_TICKS + period * i for i in range(len(ticks))]
     assert ticks[-1] <= BATTLE_DURATION_TICKS
 
 
@@ -142,6 +158,7 @@ def test_projectile_muzzle_stays_in_the_arena_when_firing_from_a_wall() -> None:
     target.body.position = (sim.arena.left + 60.0, sim.arena.top + 120.0)
     target.body.velocity = (0.0, 0.0)
 
+    warm_up(mode)
     mode.step()
     projectile = only_projectile(sim)
     x, y = projectile.position
@@ -332,6 +349,7 @@ def test_two_pulse_fighters_can_have_projectiles_in_flight_at_once() -> None:
     for ball in sim.balls:
         ball.body.velocity = (0.0, 0.0)
 
+    warm_up(mode)
     mode.step()
     live = [e for e in sim.dynamic_entities if e.active]
     assert len(live) == 2

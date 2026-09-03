@@ -33,6 +33,11 @@ class Power:
     DURATION_SECONDS = 0.0
     # Impact damage multiplier applied to the owner's hits while active.
     DAMAGE_MULTIPLIER = 1.0
+    # Multiplier applied to damage the owner *receives* while active. Because
+    # `Ball.take_damage` is the one place damage is applied, a power that
+    # lowers this is defended against every source - impacts, projectiles,
+    # clones, orbiters - without any of them knowing the power exists.
+    INCOMING_DAMAGE_MULTIPLIER = 1.0
 
     def __init__(self, initial_delay_ticks: int = 0) -> None:
         self.owner: "Ball | None" = None
@@ -46,7 +51,11 @@ class Power:
         self.last_activation_tick: int | None = None
 
         # A seeded initial delay keeps two identical powers from firing in
-        # permanent lockstep without making activation non-deterministic.
+        # permanent lockstep without making activation non-deterministic. It
+        # counts from the first tick the owning mode lets powers update, and
+        # like a cooldown it fires on the tick it reaches zero - so 0 and 1
+        # both mean "the first legal tick", which is why seeded offsets are
+        # drawn one-based.
         self._cooldown_remaining = max(0, int(initial_delay_ticks))
         self._active_remaining = 0
 
@@ -103,6 +112,11 @@ class Power:
     @property
     def damage_multiplier(self) -> float:
         return self.DAMAGE_MULTIPLIER if self.active else 1.0
+
+    @property
+    def incoming_damage_multiplier(self) -> float:
+        """How much of an incoming hit reaches the owner, 1.0 being all of it."""
+        return max(0.0, self.INCOMING_DAMAGE_MULTIPLIER) if self.active else 1.0
 
     # --- lifecycle (one call per physics tick) ---
 
