@@ -1,14 +1,20 @@
-"""Headless simulation: seeded setup plus fixed-timestep physics."""
+"""Headless simulation: seeded setup, fixed-timestep physics, impact reports.
+
+The simulation owns the physics world only. It reports ball-to-ball impacts
+as plain data; deciding what an impact means is a game-mode concern.
+"""
 
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
+from typing import Callable
 
 import pymunk
 
 from engine.arena import WALL_THICKNESS, Arena
 from engine.randomizer import generate_ball_spawns, make_rng
-from entities.ball import Ball
+from entities.ball import COLLISION_TYPE_BALL, COLLISION_TYPE_WALL, Ball
 
 PHYSICS_HZ = 120
 PHYSICS_DT = 1.0 / PHYSICS_HZ
@@ -21,6 +27,26 @@ WALL_ELASTICITY = 1.0
 WALL_FRICTION = 0.0
 
 BALL_COUNT = 2
+
+
+@dataclass(frozen=True)
+class Impact:
+    """One ball-to-ball collision, reported once when contact begins.
+
+    The two approach speeds are the components of each ball's velocity along
+    the contact normal, measured before the collision is solved.
+    """
+
+    tick: int
+    ball_a: Ball
+    ball_b: Ball
+    speed_a_into_b: float
+    speed_b_into_a: float
+
+    @property
+    def closing_speed(self) -> float:
+        """Relative speed along the contact normal."""
+        return self.speed_a_into_b + self.speed_b_into_a
 
 
 class Simulation:
@@ -42,6 +68,12 @@ class Simulation:
         ]
         for ball in self.balls:
             ball.add_to_space(self.space)
+
+        self._ball_by_shape = {ball.shape: ball for ball in self.balls}
+        self.impacts: list[Impact] = []
+        self.space.on_collision(
+            COLLISION_TYPE_BALL, COLLISION_TYPE_BALL, begin=self._on_ball_impact
+        )
 
         self.ticks = 0
         self.elapsed = 0.0
@@ -66,30 +98,58 @@ class Simulation:
             wall = pymunk.Segment(self.space.static_body, start, end, t)
             wall.elasticity = WALL_ELASTICITY
             wall.friction = WALL_FRICTION
+            wall.collision_type = COLLISION_TYPE_WALL
             self.space.add(wall)
             self.walls.append(wall)
 
+    def _on_ball_impact(self, arbiter: pymunk.Arbiter, space, data) -> None:
+        """Collision-begin callback: one report per physical impact."""
+        shape_a, shape_b = arbiter.shapes
+        ball_a = self._ball_by_shape.get(shape_a)
+        ball_b = self._ball_by_shape.get(shape_b)
+        if ball_a is None or ball_b is None:
+            return
+
+        normal = arbiter.normal  # unit vector pointing from shape a to shape b
+        self.impacts.append(
+            Impact(
+                tick=self.ticks,
+                ball_a=ball_a,
+                ball_b=ball_b,
+                speed_a_into_b=max(0.0, ball_a.velocity.dot(normal)),
+                speed_b_into_a=max(0.0, -ball_b.velocity.dot(normal)),
+            )
+        )
+
     def step(self) -> None:
         """Advance the physics by exactly one fixed tick."""
+        self.impacts.clear()
         self.space.step(PHYSICS_DT)
         self.ticks += 1
         self.elapsed += PHYSICS_DT
 
-    def advance(self, frame_seconds: float) -> int:
+    def advance(
+        self, frame_seconds: float, on_tick: Callable[[], bool | None] | None = None
+    ) -> int:
         """Consume real elapsed time and run whole fixed ticks.
 
         Returns the number of ticks executed. Leftover time is kept in the
         accumulator, so physics never depends on the render framerate.
+        `on_tick` runs after every tick and may return False to stop early.
         """
         self._accumulator += max(0.0, frame_seconds)
 
         ticks = 0
+        stopped = False
         while self._accumulator >= PHYSICS_DT and ticks < MAX_TICKS_PER_ADVANCE:
             self.step()
             self._accumulator -= PHYSICS_DT
             ticks += 1
+            if on_tick is not None and on_tick() is False:
+                stopped = True
+                break
 
-        if self._accumulator >= PHYSICS_DT:
+        if not stopped and self._accumulator >= PHYSICS_DT:
             # Fell too far behind: drop the backlog instead of accumulating it.
             self._accumulator = 0.0
 

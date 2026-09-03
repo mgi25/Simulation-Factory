@@ -12,11 +12,11 @@ from dataclasses import dataclass
 
 from engine.arena import Arena
 
-BALL_RADIUS_MIN = 35.0
-BALL_RADIUS_MAX = 45.0
+BALL_RADIUS_MIN = 50.0
+BALL_RADIUS_MAX = 65.0
 
-SPEED_MIN = 520.0
-SPEED_MAX = 780.0
+SPEED_MIN = 850.0
+SPEED_MAX = 1150.0
 
 # Keep spawns away from the walls and from each other so nothing starts
 # overlapping or immediately resolving a penetration.
@@ -36,6 +36,7 @@ BALL_COLORS: tuple[tuple[int, int, int], ...] = (
     (96, 214, 128),
     (246, 196, 64),
 )
+BALL_NAMES: tuple[str, ...] = ("RED", "BLUE", "GREEN", "GOLD")
 
 SEED_MAX = 2**32
 
@@ -45,6 +46,7 @@ class BallSpawn:
     """Fully resolved starting state of a single ball."""
 
     ball_id: int
+    name: str
     x: float
     y: float
     vx: float
@@ -89,6 +91,7 @@ def generate_ball_spawns(
         spawns.append(
             BallSpawn(
                 ball_id=index,
+                name=BALL_NAMES[index % len(BALL_NAMES)],
                 x=x,
                 y=y,
                 vx=math.cos(angle) * speed,
