@@ -7,6 +7,7 @@ import argparse
 from engine.randomizer import generate_seed
 from engine.simulation import PHYSICS_HZ, Simulation
 from modes.power_battle import BATTLE_DURATION_SECONDS, PowerBattleMode
+from powers import POWER_NAMES
 from replay.exporter import record_battle, write_replay
 
 TARGET_FPS = 60
@@ -23,6 +24,14 @@ def parse_args() -> argparse.Namespace:
         type=float,
         default=PREVIEW_SCALE,
         help="preview scale relative to the 1080x1920 logical canvas",
+    )
+    parser.add_argument(
+        "--powers",
+        nargs="+",
+        choices=POWER_NAMES,
+        default=None,
+        metavar="POWER",
+        help=f"pin the matchup, one per fighter ({', '.join(POWER_NAMES)})",
     )
     parser.add_argument(
         "--export-replay",
@@ -43,7 +52,8 @@ def report_start(sim: Simulation) -> None:
         vx, vy = ball.velocity
         print(
             f"  {ball.name} (id {ball.ball_id}): pos=({x:.1f}, {y:.1f}) "
-            f"vel=({vx:.1f}, {vy:.1f}) r={ball.radius:.1f}"
+            f"vel=({vx:.1f}, {vy:.1f}) r={ball.radius:.1f} "
+            f"power={ball.power_name}"
         )
 
 
@@ -54,14 +64,15 @@ def report_result(mode: PowerBattleMode) -> None:
     print(f"{mode.result_text} after {mode.duration:.1f}s  |  {health}")
 
 
-def export_replay(seed: int, path: str) -> None:
+def export_replay(seed: int, path: str, powers: list[str] | None = None) -> None:
     """Headless path: no pygame, no window, just simulation plus JSON."""
-    replay = record_battle(seed)
+    replay = record_battle(seed, powers=powers)
     write_replay(replay, path)
     result = replay["result"]
     winner = "DRAW" if result["is_draw"] else replay["fighters"][result["winner_id"]]["name"]
+    matchup = " vs ".join(meta["power"] for meta in replay["fighters"])
     print(
-        f"seed={seed} frames={len(replay['frames'])} "
+        f"seed={seed} matchup={matchup} frames={len(replay['frames'])} "
         f"duration={result['duration']:.1f}s result={winner} -> {path}"
     )
 
@@ -91,11 +102,11 @@ def main() -> None:
     seed = args.seed if args.seed is not None else generate_seed()
 
     if args.export_replay:
-        export_replay(seed, args.export_replay)
+        export_replay(seed, args.export_replay, args.powers)
         return
 
     sim = Simulation(seed)
-    mode = PowerBattleMode(sim)
+    mode = PowerBattleMode(sim, powers=args.powers)
     report_start(sim)
     run_preview(sim, mode, args.scale)
 

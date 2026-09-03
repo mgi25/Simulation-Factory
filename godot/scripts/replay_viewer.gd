@@ -21,9 +21,18 @@ const CAMERA_ELEVATION_DEG := 68.0
 const CAMERA_MARGIN := 0.45
 
 const HUD_WIDTH := 1080.0
-const HEALTH_BAR_POSITION := Vector2(300.0, 0.0)
-const HEALTH_BAR_SIZE := Vector2(500.0, 34.0)
+const HEALTH_BAR_POSITION := Vector2(480.0, 0.0)
+const HEALTH_BAR_SIZE := Vector2(340.0, 34.0)
 const HEALTH_ROW_Y := [160.0, 250.0]
+
+const POWER_ACTIVE_COLOR := Color(1.0, 0.925, 0.588)
+const POWER_IDLE_COLOR := Color(0.60, 0.62, 0.70)
+
+# Rush trail: ghost copies sampled from earlier replay frames, so the effect
+# is driven purely by exported state and needs no particle system.
+const RUSH_TRAIL_COUNT := 6
+const RUSH_TRAIL_FRAME_STEP := 2
+const POWER_EMISSION_ENERGY := 0.85
 
 var _replay: Dictionary = {}
 var _frames: Array = []
@@ -36,11 +45,17 @@ var _arena_units := Vector2.ONE
 var _spheres: Array[MeshInstance3D] = []
 var _live_materials: Array[StandardMaterial3D] = []
 var _dead_materials: Array[StandardMaterial3D] = []
+var _active_materials: Array[StandardMaterial3D] = []
+var _base_radius_units: Array[float] = []
+var _power_names: Array[String] = []
+var _trails: Array = []
 
 var _timer_label: Label
 var _result_label: Label
 var _health_labels: Array[Label] = []
 var _health_fills: Array[ColorRect] = []
+var _power_labels: Array[Label] = []
+var _power_label_text: Array[String] = []
 
 var _playhead := 0.0
 
@@ -121,7 +136,7 @@ func _load_replay(path: String) -> bool:
 		return false
 
 	var data: Dictionary = parsed
-	if int(data.get("version", 0)) != 1:
+	if int(data.get("version", 0)) != 2:
 		push_error("Unsupported replay version: %s" % str(data.get("version")))
 		return false
 
@@ -273,9 +288,12 @@ func _build_arena() -> void:
 
 
 func _build_fighters() -> void:
+	## The sphere mesh is built at the fighter's base radius; per-frame growth
+	## arrives as node scale, so Titan never rebuilds a mesh at runtime.
 	for meta in _fighter_meta:
 		var radius := to_units(float(meta.get("radius", 40.0)))
 		var color := _color_of(meta)
+		var power := str(meta.get("power", "none"))
 
 		var mesh := SphereMesh.new()
 		mesh.radius = radius
@@ -285,6 +303,13 @@ func _build_fighters() -> void:
 
 		var live := _make_material(color, 0.40, 0.22)
 		var dead := _make_material(color.darkened(0.72), 0.15, 0.7)
+		# Cached up front: showing a power is a material swap per frame, never
+		# a fresh allocation. Emissive but still recognisably the fighter's
+		# colour - any brighter and both spheres blow out to white.
+		var powered := _make_material(color, 0.30, 0.18)
+		powered.emission_enabled = true
+		powered.emission = color
+		powered.emission_energy_multiplier = POWER_EMISSION_ENERGY
 
 		var node := MeshInstance3D.new()
 		node.name = "Fighter%s" % str(meta.get("id", 0))
@@ -296,6 +321,34 @@ func _build_fighters() -> void:
 		_spheres.append(node)
 		_live_materials.append(live)
 		_dead_materials.append(dead)
+		_active_materials.append(powered)
+		_base_radius_units.append(radius)
+		_power_names.append(power)
+		_trails.append(_build_trail(mesh, color, power))
+
+
+func _build_trail(mesh: SphereMesh, color: Color, power: String) -> Array:
+	## Rush only: a handful of additive ghosts that replay earlier positions.
+	var ghosts: Array = []
+	if power != "rush":
+		return ghosts
+	for k in RUSH_TRAIL_COUNT:
+		var fade := 1.0 - float(k) / float(RUSH_TRAIL_COUNT)
+		var material := StandardMaterial3D.new()
+		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		material.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+		material.albedo_color = Color(color.r, color.g, color.b, 0.26 * fade)
+
+		var ghost := MeshInstance3D.new()
+		ghost.name = "Trail%d" % k
+		ghost.mesh = mesh
+		ghost.material_override = material
+		ghost.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		ghost.visible = false
+		add_child(ghost)
+		ghosts.append(ghost)
+	return ghosts
 
 
 func _make_material(color: Color, metallic: float, roughness: float,
@@ -349,7 +402,11 @@ func _build_hud() -> void:
 		var color := _color_of(meta)
 
 		_make_label(root, str(meta.get("name", "?")), 44, color,
-			Rect2(60.0, row_y, 220.0, 60.0), HORIZONTAL_ALIGNMENT_LEFT)
+			Rect2(60.0, row_y, 130.0, 60.0), HORIZONTAL_ALIGNMENT_LEFT)
+
+		_power_labels.append(_make_label(root, "", 32, POWER_IDLE_COLOR,
+			Rect2(196.0, row_y, 276.0, 60.0), HORIZONTAL_ALIGNMENT_LEFT))
+		_power_label_text.append("")
 
 		var track := ColorRect.new()
 		track.color = Color(0.16, 0.17, 0.22, 0.92)
@@ -428,16 +485,72 @@ func _apply_playhead(playhead: float) -> void:
 		var x := lerpf(float(now.get("x", 0.0)), float(soon.get("x", 0.0)), blend)
 		var y := lerpf(float(now.get("y", 0.0)), float(soon.get("y", 0.0)), blend)
 		var health := lerpf(float(now.get("health", 0.0)), float(soon.get("health", 0.0)), blend)
-		var radius := to_units(float((_fighter_meta[i] as Dictionary).get("radius", 40.0)))
+		# Radius is per-frame replay state now, not static metadata: Titan's
+		# size is decided in Python and only displayed here.
+		var radius := to_units(lerpf(
+			float(now.get("radius", 40.0)), float(soon.get("radius", 40.0)), blend))
+		var alive := bool(now.get("alive", true))
+		var powered := alive and bool(now.get("power_active", false))
 
 		_spheres[i].position = to_world(x, y, radius)
-		var alive := bool(now.get("alive", true))
-		_spheres[i].material_override = _live_materials[i] if alive else _dead_materials[i]
+		_spheres[i].scale = Vector3.ONE * (radius / maxf(0.001, _base_radius_units[i]))
+		if not alive:
+			_spheres[i].material_override = _dead_materials[i]
+		elif powered:
+			_spheres[i].material_override = _active_materials[i]
+		else:
+			_spheres[i].material_override = _live_materials[i]
 
+		_update_trail(i, index, powered)
+		_update_power_label(i, powered)
 		_update_health_row(i, health)
 
 	_update_timer(int(frame.get("tick", 0)))
 	_result_label.visible = playhead >= float(_frames.size() - 1)
+
+
+func _update_trail(fighter: int, index: int, powered: bool) -> void:
+	var ghosts: Array = _trails[fighter]
+	for k in ghosts.size():
+		var ghost: MeshInstance3D = ghosts[k]
+		var source := index - (k + 1) * RUSH_TRAIL_FRAME_STEP
+		if not powered or source < 0:
+			ghost.visible = false
+			continue
+
+		var past_frame: Dictionary = _frames[source]
+		var past_list: Array = past_frame.get("fighters", [])
+		if fighter >= past_list.size():
+			ghost.visible = false
+			continue
+
+		# A ghost only shows where the power was already active, so the trail
+		# grows out of the burst instead of snapping into place.
+		var past: Dictionary = past_list[fighter]
+		if not bool(past.get("power_active", false)):
+			ghost.visible = false
+			continue
+
+		var radius := to_units(float(past.get("radius", 40.0)))
+		ghost.position = to_world(
+			float(past.get("x", 0.0)), float(past.get("y", 0.0)), radius)
+		ghost.scale = Vector3.ONE * (radius / maxf(0.001, _base_radius_units[fighter]))
+		ghost.visible = true
+
+
+func _update_power_label(index: int, powered: bool) -> void:
+	if index >= _power_labels.size():
+		return
+	var text := "— %s" % _power_names[index].to_upper()
+	if powered:
+		text += " [ACTIVE]"
+	if text == _power_label_text[index]:
+		return
+	_power_label_text[index] = text
+
+	var label := _power_labels[index]
+	label.text = text
+	label.label_settings.font_color = POWER_ACTIVE_COLOR if powered else POWER_IDLE_COLOR
 
 
 func _update_health_row(index: int, health: float) -> void:

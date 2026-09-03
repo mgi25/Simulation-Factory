@@ -27,6 +27,8 @@ BAR_BACK_COLOR = (46, 48, 60)
 # Logical-canvas layout of the debug HUD.
 TIMER_Y = 70
 HEALTH_ROW_Y = (190, 275)
+# The power tag sits under the fighter name, in the gutter left of the bars.
+POWER_TAG_OFFSET_Y = 26
 HEALTH_BAR_X = (300, 800)
 HEALTH_BAR_HEIGHT = 34
 LABEL_X = 60
@@ -35,7 +37,11 @@ RESULT_Y = 1680
 
 TIMER_FONT_SIZE = 76
 LABEL_FONT_SIZE = 44
+POWER_FONT_SIZE = 30
 RESULT_FONT_SIZE = 92
+
+POWER_ACTIVE_COLOR = (255, 236, 150)
+POWER_IDLE_COLOR = (140, 145, 165)
 
 
 class Renderer:
@@ -53,7 +59,12 @@ class Renderer:
         # Bundled pygame default font, sized in screen pixels.
         self._fonts = {
             size: pygame.font.Font(None, max(8, round(size * scale)))
-            for size in (TIMER_FONT_SIZE, LABEL_FONT_SIZE, RESULT_FONT_SIZE)
+            for size in (
+                TIMER_FONT_SIZE,
+                LABEL_FONT_SIZE,
+                POWER_FONT_SIZE,
+                RESULT_FONT_SIZE,
+            )
         }
         self._text_cache: dict[tuple[str, int, tuple[int, int, int]], pygame.Surface] = {}
 
@@ -111,12 +122,15 @@ class Renderer:
     def _draw_balls(self, sim: Simulation) -> None:
         for ball in sim.balls:
             color = ball.color if ball.alive else tuple(c // 3 for c in ball.color)
-            pygame.draw.circle(
-                self.screen,
-                color,
-                (self._px(ball.position.x), self._px(ball.position.y)),
-                max(1, self._px(ball.radius)),
-            )
+            # `ball.radius` is the live radius, so Titan's growth shows up here
+            # for free.
+            center = (self._px(ball.position.x), self._px(ball.position.y))
+            radius = max(1, self._px(ball.radius))
+            pygame.draw.circle(self.screen, color, center, radius)
+            if ball.alive and ball.power_active:
+                pygame.draw.circle(
+                    self.screen, POWER_ACTIVE_COLOR, center, radius, max(1, self._px(6))
+                )
 
     def _draw_hud(self, sim: Simulation, mode: PowerBattleMode) -> None:
         timer = self._text(f"{mode.remaining:.1f}", TIMER_FONT_SIZE)
@@ -147,7 +161,16 @@ class Renderer:
 
         self._blit(
             self._text(ball.name, LABEL_FONT_SIZE, ball.color),
-            midleft=(self._px(LABEL_X), self._px(row_y)),
+            midleft=(self._px(LABEL_X), self._px(row_y - POWER_TAG_OFFSET_Y)),
+        )
+        tag = ball.power_name.upper()
+        color = POWER_IDLE_COLOR
+        if ball.power_active:
+            tag = f"{tag} [ACTIVE]"
+            color = POWER_ACTIVE_COLOR
+        self._blit(
+            self._text(tag, POWER_FONT_SIZE, color),
+            midleft=(self._px(LABEL_X), self._px(row_y + POWER_TAG_OFFSET_Y)),
         )
         self._blit(
             self._text(f"{round(ball.health)} HP", LABEL_FONT_SIZE),

@@ -27,7 +27,7 @@ def replay() -> dict:
 
 
 def test_metadata_describes_the_simulation(replay: dict) -> None:
-    assert replay["version"] == REPLAY_VERSION == 1
+    assert replay["version"] == REPLAY_VERSION == 2
     assert replay["seed"] == SEED
     assert replay["fps"] == REPLAY_FPS == 60
     assert replay["physics_hz"] == PHYSICS_HZ
@@ -48,7 +48,7 @@ def test_metadata_describes_the_simulation(replay: dict) -> None:
         assert meta["id"] == ball.ball_id
         assert meta["name"] == ball.name
         assert meta["color"] == list(ball.color)
-        assert meta["radius"] == pytest.approx(ball.radius, abs=1e-3)
+        assert meta["radius"] == pytest.approx(ball.base_radius, abs=1e-3)
         assert meta["max_health"] == ball.max_health
 
 

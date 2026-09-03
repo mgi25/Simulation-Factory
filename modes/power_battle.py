@@ -1,15 +1,19 @@
-"""Minimal duel rules: collision damage, elimination, timer, winner.
+"""Duel rules: collision damage, powers, elimination, timer, winner.
 
 The mode reads impacts reported by the simulation and owns every combat
-consequence. Physics stays in `engine`, presentation stays in `rendering`.
+consequence, plus the lifecycle of each fighter's power. Physics stays in
+`engine`, power effects stay in `powers`, presentation stays in `rendering`.
 """
 
 from __future__ import annotations
 
 from enum import Enum
+from typing import Iterable
 
+from engine.randomizer import make_power_rng
 from engine.simulation import PHYSICS_DT, PHYSICS_HZ, Simulation
 from entities.ball import Ball
+from powers import Power, PowerSpec, assign_powers
 
 BATTLE_DURATION_SECONDS = 35.0
 BATTLE_DURATION_TICKS = int(BATTLE_DURATION_SECONDS * PHYSICS_HZ)
@@ -31,10 +35,24 @@ class BattleState(Enum):
 
 
 class PowerBattleMode:
-    """A bare duel: two fighters, impact damage, 35 simulated seconds."""
+    """A duel: two powered fighters, impact damage, 35 simulated seconds."""
 
-    def __init__(self, simulation: Simulation) -> None:
+    def __init__(
+        self,
+        simulation: Simulation,
+        powers: Iterable[PowerSpec] | None = None,
+    ) -> None:
         self.sim = simulation
+
+        # `powers=None` draws the matchup from a seeded stream; passing names
+        # or ready-made instances pins it for tests and debugging.
+        self.power_rng = make_power_rng(simulation.seed)
+        self.powers: list[Power] = assign_powers(
+            self.power_rng, len(simulation.balls), powers
+        )
+        for ball, power in zip(simulation.balls, self.powers):
+            power.attach(ball, simulation.arena)
+
         self.state = BattleState.RUNNING
         self.winner: Ball | None = None
         self.is_draw = False
@@ -61,6 +79,11 @@ class PowerBattleMode:
         if self.finished_tick is None:
             return None
         return self.finished_tick * PHYSICS_DT
+
+    @property
+    def matchup(self) -> tuple[str, ...]:
+        """Assigned power names, in fighter order."""
+        return tuple(power.name for power in self.powers)
 
     @property
     def result_text(self) -> str:
@@ -92,7 +115,25 @@ class PowerBattleMode:
     def _after_tick(self) -> bool:
         self._apply_impact_damage()
         self._update_state()
-        return not self.finished
+        if self.finished:
+            # No new activations once the battle is over, and any temporary
+            # effect still running is rolled back so the final state is
+            # internally consistent.
+            self._deactivate_powers()
+            return False
+        self._update_powers()
+        return True
+
+    # --- power lifecycle ---
+
+    def _update_powers(self) -> None:
+        for power in self.powers:
+            if power.owner is not None and power.owner.alive:
+                power.update(self.sim.ticks)
+
+    def _deactivate_powers(self) -> None:
+        for power in self.powers:
+            power.deactivate()
 
     # --- combat rules ---
 
@@ -107,17 +148,21 @@ class PowerBattleMode:
             if last is not None and impact.tick - last < IMPACT_COOLDOWN_TICKS:
                 continue
 
-            damage = self.impact_damage(impact.closing_speed)
-            if damage <= 0.0:
-                continue
-            self._last_damage_tick[key] = impact.tick
-
             # Only the rammed fighter is hurt: the one that drove into the
             # contact less takes the hit, so health actually diverges.
             if impact.speed_a_into_b >= impact.speed_b_into_a:
                 attacker, victim = a, b
             else:
                 attacker, victim = b, a
+
+            # The base formula stays the single source of truth; a power only
+            # contributes a multiplier, and only while it is active.
+            damage = self.impact_damage(impact.closing_speed)
+            damage *= attacker.damage_multiplier
+            if damage <= 0.0:
+                continue
+            self._last_damage_tick[key] = impact.tick
+
             attacker.damage_dealt += victim.take_damage(damage)
 
     @staticmethod

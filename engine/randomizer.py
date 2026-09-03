@@ -60,8 +60,19 @@ def generate_seed() -> int:
     return random.SystemRandom().randrange(SEED_MAX)
 
 
+# Salt for the power-assignment stream. Deriving a separate RNG from the
+# same seed keeps power choices reproducible without coupling them to how
+# many draws the spawn generator happened to make.
+POWER_STREAM_SALT = 0x9E3779B9
+
+
 def make_rng(seed: int) -> random.Random:
     return random.Random(seed)
+
+
+def make_power_rng(seed: int) -> random.Random:
+    """Seeded RNG for power assignment, independent of the spawn stream."""
+    return make_rng((seed ^ POWER_STREAM_SALT) % SEED_MAX)
 
 
 def _launch_angle(rng: random.Random) -> float:

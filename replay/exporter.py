@@ -9,13 +9,17 @@ from __future__ import annotations
 
 import json
 import os
-from typing import Any
+from typing import Any, Iterable
 
 from engine.arena import CANVAS_HEIGHT, CANVAS_WIDTH
 from engine.simulation import PHYSICS_HZ, Simulation
 from modes.power_battle import BATTLE_DURATION_SECONDS, PowerBattleMode
+from powers import PowerSpec
 
-REPLAY_VERSION = 1
+# v2 adds power metadata plus per-frame radius and power state. Radius is no
+# longer static metadata: Titan makes it change during a battle, so the
+# per-frame value is the authoritative one for renderers.
+REPLAY_VERSION = 2
 REPLAY_FPS = 60
 TICKS_PER_FRAME = PHYSICS_HZ // REPLAY_FPS
 
@@ -33,20 +37,29 @@ def _frame(sim: Simulation) -> dict[str, Any]:
                 "y": round(ball.position.y, DECIMALS),
                 "health": round(ball.health, DECIMALS),
                 "alive": ball.alive,
+                "radius": round(ball.radius, DECIMALS),
+                "power_active": ball.power_active,
+                "power_cooldown_remaining": round(
+                    0.0 if ball.power is None else ball.power.cooldown_remaining,
+                    DECIMALS,
+                ),
             }
             for ball in sim.balls
         ],
     }
 
 
-def record_battle(seed: int) -> dict[str, Any]:
+def record_battle(
+    seed: int, powers: Iterable[PowerSpec] | None = None
+) -> dict[str, Any]:
     """Run one battle headlessly and capture it as replay data.
 
     Visual state is sampled every `TICKS_PER_FRAME` physics ticks, which is
-    60 frames per simulated second at the 120 Hz physics rate.
+    60 frames per simulated second at the 120 Hz physics rate. `powers` pins
+    the matchup; left out, it is drawn from the seed.
     """
     sim = Simulation(seed)
-    mode = PowerBattleMode(sim)
+    mode = PowerBattleMode(sim, powers=powers)
 
     frames = [_frame(sim)]
     while not mode.finished:
@@ -74,8 +87,9 @@ def record_battle(seed: int) -> dict[str, Any]:
                 "id": ball.ball_id,
                 "name": ball.name,
                 "color": list(ball.color),
-                "radius": round(ball.radius, DECIMALS),
+                "radius": round(ball.base_radius, DECIMALS),
                 "max_health": ball.max_health,
+                "power": ball.power_name,
             }
             for ball in sim.balls
         ],
