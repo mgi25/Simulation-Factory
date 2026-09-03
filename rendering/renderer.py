@@ -37,13 +37,11 @@ TIMER_FONT_SIZE = 76
 LABEL_FONT_SIZE = 44
 RESULT_FONT_SIZE = 92
 
-DEFAULT_SCALE = 0.5
-
 
 class Renderer:
     """Owns the pygame window and draws simulation and battle state."""
 
-    def __init__(self, seed: int, scale: float = DEFAULT_SCALE) -> None:
+    def __init__(self, seed: int, scale: float) -> None:
         self.scale = scale
         self.size = (round(CANVAS_WIDTH * scale), round(CANVAS_HEIGHT * scale))
 

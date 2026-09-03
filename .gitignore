@@ -9,13 +9,16 @@ __pycache__/
 venv/
 env/
 
-# Generated simulation output
+# Generated simulation output (replays, frames, videos)
 output/
 frames/
 videos/
 *.mp4
-*.png
-*.jpg
+
+# Godot
+godot/.godot/
+godot/android/
+godot/export_presets.cfg
 
 # IDE / editor
 .vscode/

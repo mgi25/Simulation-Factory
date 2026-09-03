@@ -1,0 +1,25 @@
+; Engine configuration file.
+; Simulation Factory - replay viewer only. All physics and game rules live
+; in the Python simulation; this project just renders exported replays.
+
+config_version=5
+
+[application]
+
+config/name="Simulation Factory Replay Viewer"
+run/main_scene="res://scenes/ReplayViewer.tscn"
+config/features=PackedStringArray("4.2", "Forward Plus")
+
+[display]
+
+window/size/viewport_width=1080
+window/size/viewport_height=1920
+window/size/window_width_override=540
+window/size/window_height_override=960
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep"
+
+[rendering]
+
+renderer/rendering_method="forward_plus"
+anti_aliasing/quality/msaa_3d=2
