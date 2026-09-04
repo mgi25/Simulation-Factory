@@ -391,8 +391,21 @@ def extract_frame_command(ffmpeg: str, path: str, index: int, output: str) -> li
     ]
 
 
-def loudness_command(ffmpeg: str, path: str) -> list[str]:
-    """Measure integrated loudness and true peak. Reporting only."""
+# The band a phone or laptop speaker actually reproduces. Measuring inside
+# it is how Phase 6B.1 found that a Titan-heavy Short was six decibels down
+# on the rest of a batch while its full-band loudness looked normal.
+PHONE_BAND = "highpass=f=180,lowpass=f=5000"
+
+
+def loudness_command(ffmpeg: str, path: str, band: str | None = None) -> list[str]:
+    """Measure integrated loudness and true peak. Reporting only.
+
+    `band` prepends a filter, so the same measurement can be taken over the
+    whole spectrum or over just the part a small speaker has.
+    """
+    graph = "ebur128=peak=true:framelog=quiet"
+    if band:
+        graph = f"{band},{graph}"
     return [
         ffmpeg,
         "-hide_banner",
@@ -400,7 +413,7 @@ def loudness_command(ffmpeg: str, path: str) -> list[str]:
         "-i",
         path,
         "-filter_complex",
-        "ebur128=peak=true:framelog=quiet",
+        graph,
         "-f",
         "null",
         "-",

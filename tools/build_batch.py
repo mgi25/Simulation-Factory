@@ -60,6 +60,33 @@ class VerificationError(RuntimeError):
     """An exported replay is not the battle that was selected."""
 
 
+def replay_facts(replay: dict) -> dict:
+    """The few facts that say which battle a replay actually is.
+
+    Shared with production, which asks the same question from the other
+    direction: verification here compares a fresh replay against what
+    curation chose, and production compares a replay on disk against what
+    the manifest recorded. One definition of the comparison, so the two can
+    never drift apart.
+    """
+    return {
+        "powers": [fighter["power"] for fighter in replay["fighters"]],
+        "winner_id": replay["result"]["winner_id"],
+        "duration": round(replay["result"]["duration"], 3),
+        "layout_id": replay["layout"]["id"],
+    }
+
+
+def manifest_facts(entry: dict) -> dict:
+    """The same facts, as a manifest item records them."""
+    return {
+        "powers": list(entry.get("powers") or ()),
+        "winner_id": entry.get("winner_id"),
+        "duration": round(float(entry.get("duration", 0.0)), 3),
+        "layout_id": entry.get("layout_id", ""),
+    }
+
+
 def batch_id_for(start: int, count: int, arena: str, explicit: str | None) -> str:
     """A stable name for a batch. Never a timestamp, never a random id.
 
@@ -169,12 +196,7 @@ def verify_and_export(
         metrics = candidate.metrics
         replay = record_battle(metrics.seed, arena_mode=metrics.arena_mode)
 
-        actual = {
-            "powers": [fighter["power"] for fighter in replay["fighters"]],
-            "winner_id": replay["result"]["winner_id"],
-            "duration": round(replay["result"]["duration"], 3),
-            "layout_id": replay["layout"]["id"],
-        }
+        actual = replay_facts(replay)
         expected = {
             "powers": list(metrics.powers),
             "winner_id": metrics.winner_id,
