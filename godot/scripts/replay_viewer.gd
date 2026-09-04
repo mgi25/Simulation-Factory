@@ -100,6 +100,16 @@ const CLONE_RIM_AMOUNT := 1.0
 const ORB_EMISSION_ENERGY := 2.2
 const ORB_CORE_LIGHTEN := 0.45
 
+# How near a whole frame the playhead has to be to *be* that frame. Sample
+# times are computed by dividing and multiplying - an output frame index by
+# the frame rate, seconds by the physics rate - and floating point lands
+# either side of the integer, so frame 123 can arrive as 122.99999999999999.
+# Left alone, that draws frame 122 blended 0.99999 of the way to 123: the
+# numbers are indistinguishable, but an entity that vanished at 123 is still
+# in frame 122's list and gets one extra frame on screen. A millionth of a
+# frame is far below anything visible and well above the error.
+const PLAYHEAD_SNAP := 1.0e-6
+
 const CombatVFX := preload("res://scripts/combat_vfx.gd")
 const BattleHud := preload("res://scripts/battle_hud.gd")
 
@@ -148,6 +158,13 @@ var _replay_tick := 0.0
 var _physics_hz := 120.0
 var _ticks_per_frame := 2.0
 
+# Offline rendering owns the clock. Set this before the node enters the tree
+# and the viewer stops advancing on its own: the renderer calls
+# `seek_to_seconds()` with an exact output time instead, so a frame shows the
+# same moment of the battle whether it took 5 ms or 500 ms to draw.
+var offline_mode := false
+var _loaded := false
+
 
 func _ready() -> void:
 	var path := _resolve_path(_replay_path_argument())
@@ -168,9 +185,7 @@ func _ready() -> void:
 	_build_entity_pool()
 	_build_vfx()
 	_build_hud()
-	_apply_playhead(0.0)
-	_vfx.update_to_tick(0.0)
-	_hud.update_hud(0.0, _healths, _powered)
+	_present(0.0)
 
 	print("replay loaded: seed=%d frames=%d duration=%.2fs" % [
 		int(_replay.get("seed", 0)),
@@ -180,17 +195,39 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if _frames.size() < 2:
+	## Interactive playback: real time drives the replay clock.
+	if offline_mode or _frames.size() < 2:
 		return
 	# One clock drives everything: real time advances the replay tick, the
 	# replay tick decides which frames to blend and how old each effect is.
-	_replay_tick += delta * _physics_hz
+	_present(_replay_tick + delta * _physics_hz)
+
+
+func is_loaded() -> bool:
+	return _loaded
+
+
+func seek_to_seconds(seconds: float) -> void:
+	## Offline rendering's only entry point.
+	##
+	## The output frame index is the authority: the renderer passes
+	## `frame / fps` and the whole scene is rebuilt for that instant. Nothing
+	## here reads a real delta, so rendering at 5 frames a second and
+	## rendering at 200 produce the same picture at the same moment.
+	if _frames.size() < 1:
+		return
+	_present(seconds * _physics_hz)
+
+
+func _present(tick: float) -> void:
+	## Show the battle as it stood at `tick`, in simulation ticks.
+	_replay_tick = tick
 	var last := float(_frames.size() - 1)
-	_apply_playhead(minf(_replay_tick / _ticks_per_frame, last))
-	_vfx.update_to_tick(_replay_tick)
+	_apply_playhead(clampf(tick / _ticks_per_frame, 0.0, last))
+	_vfx.update_to_tick(tick)
 	# The overlay is driven by the raw tick, not the clamped playhead: the
 	# result panel has to keep animating after the last frame is reached.
-	_hud.update_hud(_replay_tick, _healths, _powered)
+	_hud.update_hud(tick, _healths, _powered)
 
 
 # --- coordinate conversion -----------------------------------------------
@@ -256,6 +293,7 @@ func _load_replay(path: String) -> bool:
 	_fighter_meta = fighters
 	_physics_hz = maxf(1.0, float(data.get("physics_hz", 120.0)))
 	_ticks_per_frame = maxf(1.0, float(data.get("ticks_per_frame", 2.0)))
+	_loaded = true
 	return true
 
 
@@ -842,7 +880,11 @@ func _build_hud() -> void:
 
 # --- playback ------------------------------------------------------------
 
-func _apply_playhead(playhead: float) -> void:
+func _apply_playhead(raw_playhead: float) -> void:
+	var playhead := raw_playhead
+	var whole := roundf(playhead)
+	if absf(playhead - whole) < PLAYHEAD_SNAP:
+		playhead = whole
 	_playhead = playhead
 
 	var index := int(floor(playhead))
