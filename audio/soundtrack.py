@@ -59,23 +59,76 @@ EVENT_POWER_ACTIVATE = "power_activate"
 EVENT_HIT = "hit"
 EVENT_ELIMINATION = "elimination"
 
-# Master ceiling. Left a decibel below full scale so that a lossy encode,
-# which does not preserve sample peaks, still has somewhere to put its
-# overshoot.
-PEAK_CEILING_DBFS = -1.0
+# Two ceilings, because there are two files.
+#
+# `DELIVERY_PEAK_DBFS` is what the finished MP4 must not exceed, measured as
+# a true peak - the peak of the waveform a player reconstructs, not of the
+# samples in it.
+#
+# `PEAK_CEILING_DBFS` is what the PCM master is allowed to reach, and it
+# sits below the delivery figure on purpose. AAC does not give back the
+# waveform it was handed; its inter-sample peaks can land a few tenths of a
+# decibel above the samples that went in. Measured on this material at
+# 192 kbps the worst overshoot was 0.2 dB, so the master reserves half as
+# much again and the encoded Short comes out under the delivery ceiling
+# rather than just over it. Reserving more would only make the Short
+# quieter for nothing.
+DELIVERY_PEAK_DBFS = -1.0
+CODEC_OVERSHOOT_DB = 0.3
+PEAK_CEILING_DBFS = DELIVERY_PEAK_DBFS - CODEC_OVERSHOOT_DB
 PEAK_CEILING = db_to_gain(PEAK_CEILING_DBFS)
 # Look-ahead and release of the safety limiter, as one number: the gain
 # envelope is a sliding minimum over this radius followed by a moving average
 # over the same radius, which is what makes it provably unable to leave a
 # sample above the ceiling. See `master`.
 LIMITER_RADIUS_SECONDS = 0.024
-# How far the master stage may lift a mix that came out under the ceiling.
-# Cue levels already land a normal battle within a decibel or two of it, so
-# this only ever spends the last of the headroom - which is worth doing
-# because five Shorts watched one after another should peak at the same
-# place. Capped so that a soundtrack with almost nothing in it, such as an
-# audit of the ambient bed on its own, cannot be inflated to look loud.
-MASTER_MAKEUP_MAX_DB = 3.0
+
+# The bus compressor. This format is sparse - about one event a second - so
+# the mix arrives with a peak-to-loudness ratio around 25 dB and its peak
+# already on the ceiling, which is why Phase 6B measured near -26 LUFS.
+#
+# The arithmetic is unforgiving here and worth stating plainly: at a fixed
+# ceiling, loudness can only be bought with peak reduction. A compressor
+# that pulls the body of a cue down but lets its transient through gives
+# nothing back - the make-up gain it earns is set by the peak it did not
+# move, so the mix simply ends up quieter. That is measurable, and it is why
+# this stage has look-ahead.
+#
+# What "gentle" and "transient clarity" then have to mean:
+#
+# * The ratio is a little over two to one with a 14 dB soft knee, so a light
+#   hit is touched barely and a heavy one meaningfully, and the difference
+#   between them survives. It is not a wall: nothing here has an infinite
+#   ratio or a release measured in microseconds.
+# * The look-ahead is eight milliseconds and the attack four, so the gain is
+#   settled by the time a transient lands. The onset is still an onset - it
+#   goes from silence to full level in a millisecond - it is simply a few
+#   decibels shorter. What is preserved is the shape, not the height.
+# * The release is a quarter of a second, long enough that the gain does not
+#   chase individual hits and turn a battle into a pumping wash.
+#
+# The provable look-ahead limiter in `master` still sits after all of this,
+# and it is still the only thing that guarantees the ceiling.
+COMPRESSOR_THRESHOLD_DBFS = -15.0
+COMPRESSOR_RATIO = 2.2
+COMPRESSOR_KNEE_DB = 14.0
+COMPRESSOR_ATTACK = 0.004
+COMPRESSOR_RELEASE = 0.260
+COMPRESSOR_LOOKAHEAD = 0.008
+# Gain reduction below this is treated as none, so a mix that never reaches
+# the threshold takes the untouched path and the release cannot leave a
+# vanishing gain trailing behind it forever.
+COMPRESSOR_FLOOR_DB = 0.002
+# The make-up half of the compression above. The compressor pulls the loudest
+# moments down; this gives the room back to the whole timeline, which is what
+# raises the average without moving the peak. It is a fixed number rather
+# than whatever each mix happens to have spare, so every Short in a batch
+# gets the same treatment and a quiet battle stays quieter than a busy one.
+# The cap bounds the final trim that follows the limiter, and keeps a
+# soundtrack with almost nothing in it - an audit of the bed on its own -
+# from being inflated to look loud.
+MASTER_MAKEUP_DB = 7.0
+MASTER_MAKEUP_MAX_DB = 9.0
 
 # How far a cue is allowed to be pushed off centre. Restrained on purpose:
 # the arena is 960 logical pixels wide on a phone screen held at arm's
@@ -267,6 +320,123 @@ def pan_gains(pan: float) -> tuple[float, float]:
 
 
 @dataclass(frozen=True)
+class CompressorReport:
+    """What the bus compressor did, in the terms a mix engineer would ask."""
+
+    threshold_dbfs: float
+    ratio: float
+    max_reduction_db: float
+    mean_reduction_db: float
+    engaged_fraction: float
+
+
+def compress(
+    left: array,
+    right: array,
+    *,
+    threshold_dbfs: float = COMPRESSOR_THRESHOLD_DBFS,
+    ratio: float = COMPRESSOR_RATIO,
+    knee_db: float = COMPRESSOR_KNEE_DB,
+    attack: float = COMPRESSOR_ATTACK,
+    release: float = COMPRESSOR_RELEASE,
+    lookahead: float = COMPRESSOR_LOOKAHEAD,
+    sample_rate: int = SAMPLE_RATE,
+) -> CompressorReport:
+    """Gentle soft-knee bus compression, in place, over both channels together.
+
+    A feed-forward compressor with look-ahead: the detector is a sliding
+    maximum over the next few milliseconds of whichever channel is louder,
+    then a soft-knee static curve, then separate attack and release times on
+    the gain. One gain envelope drives both channels, so the stereo image
+    does not move when it works.
+
+    The look-ahead is what makes this stage worth having. The gain is already
+    settled by the time a transient arrives, so the peak actually comes down,
+    and it is peak reduction - nothing else - that the make-up gain after it
+    can spend. A causal version of exactly these settings was measured first
+    and made the mix quieter, because it pulled the body of every cue down
+    and left the transient that set the peak untouched.
+
+    Nothing is delayed. The look-ahead reads forward into the signal but the
+    signal itself is never shifted, so a cue still begins on the sample its
+    tick maps to; and gain applied to silence is still silence, so the run-up
+    to a cue stays silent. Compression scales samples, it never moves them.
+    """
+    length = len(left)
+    if length == 0 or ratio <= 1.0:
+        return CompressorReport(threshold_dbfs, ratio, 0.0, 0.0, 0.0)
+
+    attack_coefficient = math.exp(-1.0 / max(1.0, attack * sample_rate))
+    release_coefficient = math.exp(-1.0 / max(1.0, release * sample_rate))
+    slope = 1.0 - 1.0 / ratio
+    half_knee = 0.5 * knee_db
+    # Below this the static curve is flat, so the whole dB conversion can be
+    # skipped - which on a sparse mix is most of the timeline.
+    knee_start = db_to_gain(threshold_dbfs - half_knee)
+
+    louder = silence(length)
+    for index in range(length):
+        one = left[index]
+        other = right[index]
+        if one < 0.0:
+            one = -one
+        if other < 0.0:
+            other = -other
+        louder[index] = one if one > other else other
+    detector = _sliding_max(
+        louder, max(1, seconds_to_samples(lookahead, sample_rate))
+    )
+
+    log10 = math.log10
+    exp = math.exp
+    per_db = math.log(10.0) / 20.0
+
+    reduction = 0.0
+    worst = 0.0
+    total = 0.0
+    engaged = 0
+
+    for index in range(length):
+        level = detector[index]
+        if level <= knee_start:
+            target = 0.0
+        else:
+            over = 20.0 * log10(level) - threshold_dbfs
+            if over >= half_knee:
+                target = -slope * over
+            else:
+                above = over + half_knee
+                target = -slope * above * above / (2.0 * knee_db)
+
+        if target < reduction:
+            reduction = target + attack_coefficient * (reduction - target)
+        elif reduction < 0.0:
+            reduction = target + release_coefficient * (reduction - target)
+            if reduction > -COMPRESSOR_FLOOR_DB:
+                reduction = 0.0
+                continue
+        else:
+            continue
+
+        gain = exp(reduction * per_db)
+        left[index] *= gain
+        right[index] *= gain
+
+        engaged += 1
+        total -= reduction
+        if reduction < worst:
+            worst = reduction
+
+    return CompressorReport(
+        threshold_dbfs=threshold_dbfs,
+        ratio=ratio,
+        max_reduction_db=-worst,
+        mean_reduction_db=(total / engaged) if engaged else 0.0,
+        engaged_fraction=engaged / length,
+    )
+
+
+@dataclass(frozen=True)
 class MasterReport:
     """What the master stage found, and what it had to do about it."""
 
@@ -295,6 +465,28 @@ def _sliding_min(values: array, radius: int) -> array:
     return out
 
 
+def _sliding_max(values: array, radius: int) -> array:
+    """Maximum of every window [i, i + radius]: the compressor's look-ahead.
+
+    Forward-looking only, unlike the limiter's symmetric window. The point is
+    to know what is about to arrive, not what has just been.
+    """
+    length = len(values)
+    out = silence(length)
+    window: deque[int] = deque()
+    filled = 0
+    for index in range(length):
+        while filled <= min(length - 1, index + radius):
+            while window and values[window[-1]] <= values[filled]:
+                window.pop()
+            window.append(filled)
+            filled += 1
+        while window[0] < index:
+            window.popleft()
+        out[index] = values[window[0]]
+    return out
+
+
 def _boxcar(values: array, radius: int) -> array:
     """Mean of every window [i - radius, i + radius], clipped at the ends."""
     length = len(values)
@@ -316,85 +508,109 @@ def master(
     ceiling: float = PEAK_CEILING,
     radius_seconds: float = LIMITER_RADIUS_SECONDS,
     sample_rate: int = SAMPLE_RATE,
-    makeup: bool = False,
+    makeup_db: float = 0.0,
+    trim: bool = False,
 ) -> MasterReport:
-    """Bring the finished mix under the ceiling, in place, without clipping.
+    """Make-up gain, then the limiter, then an exact trim to the ceiling.
 
     The mix is mastered once, globally, after everything is in it - never by
     trimming individual effects that have already been placed, which would
     change the balance the cue levels were designed to give.
 
-    Below the ceiling nothing happens at all, which is the normal case: cue
-    levels are budgeted so a real battle never needs this. When something
-    does need holding back, the gain envelope is built in two passes - a
-    sliding minimum of the gain each sample needs, then a moving average of
-    that over the same radius. The order matters: every minimum inside the
-    averaging window already accounts for the loudest sample at the centre,
-    so the average can never exceed what that sample needs. That is a proof
-    rather than a tuning, and it is why nothing can slip through.
+    In order:
 
-    Both channels get the same envelope, so the stereo image does not move
-    when the limiter engages.
+    1. `makeup_db` lifts the whole timeline by a fixed amount. Fixed rather
+       than "whatever is spare", so every Short in a batch is treated the
+       same way and a quiet battle stays quieter than a busy one.
+    2. The limiter catches whatever that pushed over the ceiling. Its gain
+       envelope is built in two passes - a sliding minimum of the gain each
+       sample needs, then a moving average of that over the same radius. The
+       order matters: every minimum inside the averaging window already
+       accounts for the loudest sample at the centre, so the average can
+       never exceed what that sample needs. That is a proof rather than a
+       tuning, and it is why no sample can slip through above the ceiling.
+    3. `trim` spends any headroom still left, bounded by
+       `MASTER_MAKEUP_MAX_DB`, so the finished peak lands exactly on the
+       ceiling and five Shorts watched in a row peak in the same place.
 
-    `makeup` then spends whatever headroom is left over, up to
-    `MASTER_MAKEUP_MAX_DB`, as one linear gain over the whole timeline. It is
-    off by default: the ambient bed is calibrated by RMS and an audit of it
-    alone must hear the level it will really have, not a version lifted to
-    the ceiling to fill a Short that has no events in it.
+    Both the make-up and the limiter envelope are applied identically to the
+    two channels, so nothing here moves the stereo image. Steps 1 and 3 are
+    off by default: an audit of the ambient bed on its own must hear the
+    level the bed will really have, not a version lifted to fill a Short that
+    has no events in it.
+
+    `peak_before` is the mix as it arrived, before any of this.
     """
     peak_before = max(peak(left), peak(right))
     if peak_before <= 0.0:
         return MasterReport(peak_before, peak_before, 1.0, False)
-    if peak_before <= ceiling:
-        return MasterReport(
-            peak_before,
-            _makeup(left, right, peak_before, ceiling) if makeup else peak_before,
-            1.0,
-            False,
-            makeup_gain=(
-                min(ceiling / peak_before, db_to_gain(MASTER_MAKEUP_MAX_DB))
-                if makeup
-                else 1.0
-            ),
+
+    applied = 1.0
+    if makeup_db:
+        applied = db_to_gain(makeup_db)
+        scale(left, applied)
+        scale(right, applied)
+
+    limiter_gain = 1.0
+    limited = False
+    current = max(peak(left), peak(right))
+    if current > ceiling:
+        limited = True
+        length = len(left)
+        needed = silence(length)
+        for index in range(length):
+            loudest = max(abs(left[index]), abs(right[index]))
+            needed[index] = 1.0 if loudest <= ceiling else ceiling / loudest
+
+        radius = max(1, seconds_to_samples(radius_seconds, sample_rate))
+        envelope = _boxcar(_sliding_min(needed, radius), radius)
+
+        for index in range(length):
+            gain = envelope[index]
+            left[index] *= gain
+            right[index] *= gain
+            if gain < limiter_gain:
+                limiter_gain = gain
+        current = max(peak(left), peak(right))
+
+    if trim and 0.0 < current < ceiling:
+        # Bounded against the total already given, so the two stages together
+        # can never exceed the cap.
+        room = min(
+            ceiling / current, db_to_gain(MASTER_MAKEUP_MAX_DB) / max(applied, 1e-12)
         )
+        if room > 1.0:
+            scale(left, room)
+            scale(right, room)
+            applied *= room
+            current = max(peak(left), peak(right))
 
-    length = len(left)
-    needed = silence(length)
-    for index in range(length):
-        loudest = max(abs(left[index]), abs(right[index]))
-        needed[index] = 1.0 if loudest <= ceiling else ceiling / loudest
+    # The limiter's proof holds in real arithmetic; in float the sliding
+    # minimum and the moving average that follows it can leave a couple of
+    # parts in a million million above the ceiling. That is 230 dB down and
+    # quantises to the same integer either way, but "no sample is above the
+    # ceiling" is worth being true rather than nearly true, so the last word
+    # is an exact clamp. It is a rounding backstop, not a limiting stage: if
+    # it ever had real work to do, the limiter above it would be broken.
+    for index in range(len(left)):
+        value = left[index]
+        if value > ceiling:
+            left[index] = ceiling
+        elif value < -ceiling:
+            left[index] = -ceiling
+        value = right[index]
+        if value > ceiling:
+            right[index] = ceiling
+        elif value < -ceiling:
+            right[index] = -ceiling
 
-    radius = max(1, seconds_to_samples(radius_seconds, sample_rate))
-    envelope = _boxcar(_sliding_min(needed, radius), radius)
-
-    smallest = 1.0
-    for index in range(length):
-        gain = envelope[index]
-        left[index] *= gain
-        right[index] *= gain
-        if gain < smallest:
-            smallest = gain
-
-    limited_peak = max(peak(left), peak(right))
-    gain = 1.0
-    if makeup:
-        gain = min(ceiling / limited_peak, db_to_gain(MASTER_MAKEUP_MAX_DB))
-        _makeup(left, right, limited_peak, ceiling)
     return MasterReport(
-        peak_before,
-        max(peak(left), peak(right)),
-        smallest,
-        True,
-        makeup_gain=gain,
+        peak_before=peak_before,
+        peak_after=max(peak(left), peak(right)),
+        limiter_gain=limiter_gain,
+        limited=limited,
+        makeup_gain=applied,
     )
-
-
-def _makeup(left: array, right: array, current: float, ceiling: float) -> float:
-    """Lift both channels toward the ceiling, by the same bounded gain."""
-    gain = min(ceiling / current, db_to_gain(MASTER_MAKEUP_MAX_DB))
-    scale(left, gain)
-    scale(right, gain)
-    return current * gain
 
 
 # --- building one soundtrack ------------------------------------------------
@@ -429,6 +645,7 @@ class Soundtrack:
     limiter_gain: float = 1.0
     limited: bool = False
     makeup_gain: float = 1.0
+    compression: CompressorReport | None = None
     has_ambience: bool = True
     cue_counts: dict[str, int] = field(default_factory=dict)
 
@@ -536,8 +753,20 @@ def build_soundtrack(
             )
             counts[cue.name] = counts.get(cue.name, 0) + 1
 
+    # Compression before the master stage, and only when there are events to
+    # compress: an audit of the bed on its own must hear the bed, not a bed
+    # with a compressor breathing on it.
+    squeeze = (
+        compress(left, right, sample_rate=plan.sample_rate)
+        if schedule
+        else CompressorReport(COMPRESSOR_THRESHOLD_DBFS, COMPRESSOR_RATIO, 0.0, 0.0, 0.0)
+    )
     report = master(
-        left, right, sample_rate=plan.sample_rate, makeup=bool(schedule)
+        left,
+        right,
+        sample_rate=plan.sample_rate,
+        makeup_db=MASTER_MAKEUP_DB if schedule else 0.0,
+        trim=bool(schedule),
     )
 
     if len(left) != length or len(right) != length:
@@ -560,6 +789,7 @@ def build_soundtrack(
         limiter_gain=report.limiter_gain,
         limited=report.limited,
         makeup_gain=report.makeup_gain,
+        compression=squeeze,
         has_ambience=include_ambience,
         cue_counts=counts,
     )
@@ -584,6 +814,9 @@ def audio_metadata(
     synthesis took is console output, not metadata.
     """
     plan = soundtrack.plan
+    squeeze = soundtrack.compression or CompressorReport(
+        COMPRESSOR_THRESHOLD_DBFS, COMPRESSOR_RATIO, 0.0, 0.0, 0.0
+    )
     return {
         "audio_version": SOUNDTRACK_VERSION,
         "replay": {
@@ -617,15 +850,36 @@ def audio_metadata(
             "past_end": soundtrack.events_past_end,
             "by_cue": dict(sorted(soundtrack.cue_counts.items())),
         },
+        "compression": {
+            "threshold_dbfs": round(squeeze.threshold_dbfs, 3),
+            "ratio": round(squeeze.ratio, 3),
+            "knee_db": round(COMPRESSOR_KNEE_DB, 3),
+            "attack": round(COMPRESSOR_ATTACK, 4),
+            "release": round(COMPRESSOR_RELEASE, 4),
+            "max_reduction_db": round(squeeze.max_reduction_db, 3),
+            "mean_reduction_db": round(squeeze.mean_reduction_db, 3),
+            "engaged_fraction": round(squeeze.engaged_fraction, 4),
+        },
         "levels": {
             "ambience": soundtrack.has_ambience,
             "ceiling_dbfs": round(PEAK_CEILING_DBFS, 3),
+            "delivery_peak_dbfs": round(DELIVERY_PEAK_DBFS, 3),
             "peak": round(soundtrack.peak, 6),
             "peak_dbfs": round(gain_to_db(soundtrack.peak), 3),
             "rms_dbfs": round(gain_to_db(soundtrack.level_rms), 3),
             "limited": soundtrack.limited,
             "limiter_gain": round(soundtrack.limiter_gain, 6),
             "makeup_gain": round(soundtrack.makeup_gain, 6),
+            "makeup_db": round(gain_to_db(soundtrack.makeup_gain), 3),
+            "crest_db": round(
+                gain_to_db(soundtrack.peak) - gain_to_db(soundtrack.level_rms), 3
+            ),
+            "ambience_low_dbfs": round(
+                cues.AMBIENCE_LOW_RMS_DBFS + gain_to_db(soundtrack.makeup_gain), 3
+            ),
+            "ambience_mid_dbfs": round(
+                cues.AMBIENCE_MID_RMS_DBFS + gain_to_db(soundtrack.makeup_gain), 3
+            ),
         },
     }
 
@@ -635,8 +889,14 @@ __all__ = [
     "EVENT_HIT",
     "EVENT_POWER_ACTIVATE",
     "LIMITER_RADIUS_SECONDS",
+    "COMPRESSOR_KNEE_DB",
+    "COMPRESSOR_RATIO",
+    "COMPRESSOR_THRESHOLD_DBFS",
+    "MASTER_MAKEUP_DB",
     "MASTER_MAKEUP_MAX_DB",
     "MAX_PAN",
+    "CODEC_OVERSHOOT_DB",
+    "DELIVERY_PEAK_DBFS",
     "PEAK_CEILING",
     "PEAK_CEILING_DBFS",
     "PHYSICS_HZ",
@@ -644,6 +904,7 @@ __all__ = [
     "SAMPLES_PER_TICK",
     "SOUNDTRACK_VERSION",
     "VIDEO_FPS",
+    "CompressorReport",
     "MasterReport",
     "ScheduledCue",
     "Soundtrack",
@@ -651,6 +912,7 @@ __all__ = [
     "SoundtrackPlan",
     "audio_metadata",
     "build_soundtrack",
+    "compress",
     "cue_for_event",
     "cue_seed",
     "frame_to_sample",

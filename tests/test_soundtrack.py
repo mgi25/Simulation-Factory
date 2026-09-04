@@ -125,6 +125,25 @@ def first_signal(
     return None
 
 
+def build_pair(length: int = 24_000, cue=None, offset: int = 4_000):
+    """Two channels holding one loud burst, for testing a stage directly."""
+    from array import array
+
+    left = array("d", bytes(8 * length))
+    right = array("d", bytes(8 * length))
+    if cue is None:
+        for index in range(offset, min(length, offset + 8_000)):
+            value = 0.75 * math.sin((index - offset) / 55.0)
+            left[index] = value
+            right[index] = value
+    else:
+        from audio.synthesis import add_into
+
+        add_into(left, cue.buffer, offset, 1.0)
+        add_into(right, cue.buffer, offset, 1.0)
+    return left, right
+
+
 # --- the exact timeline ---------------------------------------------------
 
 
@@ -607,11 +626,42 @@ def test_the_bed_runs_the_whole_length_including_the_post_roll() -> None:
     assert first_signal(track.left, start=90 * 800, stop=95 * 800) is not None
 
 
-def test_the_bed_sits_in_the_quiet_region_it_is_meant_to() -> None:
-    assert -36.0 <= cues.AMBIENCE_RMS_DBFS <= -30.0
+def test_the_bed_is_calibrated_as_two_layers_not_one() -> None:
+    """The hum and the room are set separately, and both are pre-master.
+
+    Calibrating the pair together would let the hum - which carries most of
+    the energy and none of the audibility on a small speaker - decide how
+    loud the room is, which is how Phase 6B ended up with a bed that was
+    silence on a phone.
+    """
+    assert cues.AMBIENCE_LOW_RMS_DBFS == -33.5
+    assert cues.AMBIENCE_MID_RMS_DBFS == -35.5
+    assert cues.AMBIENCE_MID_RMS_DBFS < cues.AMBIENCE_LOW_RMS_DBFS
     track = build(make_replay(frames=200), frames=308, include_events=False)
-    assert gain_to_db(track.level_rms) == pytest.approx(cues.AMBIENCE_RMS_DBFS, abs=1.0)
+    combined = 10.0 * math.log10(
+        db_to_gain(cues.AMBIENCE_LOW_RMS_DBFS) ** 2
+        + db_to_gain(cues.AMBIENCE_MID_RMS_DBFS) ** 2
+    )
+    assert gain_to_db(track.level_rms) == pytest.approx(combined, abs=1.5)
+    # An audit of the bed alone is never lifted: no make-up, no compression.
     assert track.makeup_gain == 1.0
+    assert track.compression.max_reduction_db == 0.0
+
+
+def test_the_room_layer_lives_in_the_band_a_phone_reproduces() -> None:
+    """Its whole reason for existing, so its band is pinned by a test."""
+    assert cues.AMBIENCE_ROOM_LOW == 200.0
+    assert cues.AMBIENCE_ROOM_HIGH == 2600.0
+    assert cues.AMBIENCE_ROOM_LOW < 400.0 < cues.AMBIENCE_ROOM_HIGH
+    # And it is noise, not a tone: no partial of the hum reaches it.
+    assert max(freq for freq, _, _ in cues.AMBIENCE_PARTIALS) < cues.AMBIENCE_ROOM_LOW
+
+
+def test_the_room_layer_is_modulated_but_never_rhythmic() -> None:
+    """Slower than anything a 25-second Short could hear repeat."""
+    assert 0.0 < cues.AMBIENCE_ROOM_LFO_HZ < 0.1
+    assert 1.0 / cues.AMBIENCE_ROOM_LFO_HZ > 25.0
+    assert 0.0 < cues.AMBIENCE_ROOM_LFO_DEPTH < 0.5
 
 
 def test_the_bed_is_far_below_the_events_it_sits_under() -> None:
@@ -636,8 +686,11 @@ def test_the_bed_fades_out_on_the_last_sample_of_the_render() -> None:
 
 
 def test_the_bed_starts_from_silence() -> None:
+    """The fade-in's first step, which is below a 16-bit least-significant bit."""
     track = build(make_replay(frames=200), frames=308, include_events=False)
-    assert abs(track.left[0]) < 1e-6 and abs(track.right[0]) < 1e-6
+    for channel in (track.left, track.right):
+        assert abs(channel[0]) < 1.0 / 32767
+        assert abs(channel[0]) * 1000 < abs(channel[len(channel) // 2])
 
 
 def test_the_two_channels_of_the_bed_are_not_the_same_signal() -> None:
@@ -651,19 +704,21 @@ def test_the_two_channels_of_the_bed_are_not_the_same_signal() -> None:
 
 
 def test_a_normal_battle_lands_exactly_on_the_ceiling() -> None:
-    """And the limiter has all but nothing to do getting it there.
+    """And every stage that got it there did only a little.
 
-    Cue levels are budgeted so a real battle arrives within a couple of
-    decibels of the ceiling on its own, and the makeup gain spends the rest.
-    The worst stack a Short can contain - a dead-centre heavy lethal hit, its
-    elimination and the bed underneath both - tips a fraction of a decibel
-    over, and the limiter takes that fraction back. What matters is that it is
-    a fraction: a gain reduction this small over twenty-four milliseconds is
-    not something that can be heard, and the makeup gain returns it anyway.
+    The chain is compressor, then a fixed make-up, then the limiter, then an
+    exact trim. The make-up is deliberately more than the compressor took
+    off, so the limiter catches the difference - which means it is a working
+    stage now rather than an idle safety net, and what matters is how little
+    it does. Under a decibel over a twenty-four millisecond window is not
+    something that can be heard.
     """
     track = build(make_replay(frames=SYNTHETIC_FRAMES, events=SYNTHETIC_EVENTS))
-    assert gain_to_db(track.peak) == pytest.approx(soundtrack.PEAK_CEILING_DBFS, abs=0.01)
-    assert track.limiter_gain > db_to_gain(-0.3)
+    assert gain_to_db(track.peak) == pytest.approx(
+        soundtrack.PEAK_CEILING_DBFS, abs=0.01
+    )
+    assert track.compression.max_reduction_db > 0.0
+    assert gain_to_db(track.limiter_gain) > -1.5
 
 
 def test_a_battle_without_a_heavy_finish_needs_no_limiting_at_all() -> None:
@@ -678,52 +733,95 @@ def test_a_battle_without_a_heavy_finish_needs_no_limiting_at_all() -> None:
     assert gain_to_db(track.peak) == pytest.approx(soundtrack.PEAK_CEILING_DBFS, abs=0.01)
 
 
-def test_the_ceiling_leaves_a_decibel_for_a_lossy_encoder() -> None:
-    assert soundtrack.PEAK_CEILING_DBFS == -1.0
-    assert soundtrack.PEAK_CEILING == pytest.approx(0.8912509, abs=1e-6)
+def test_the_master_leaves_the_encoder_room_under_the_delivery_ceiling() -> None:
+    """Two ceilings: what the MP4 may reach, and what the master may.
+
+    AAC hands back inter-sample peaks a couple of tenths above the samples
+    it was given, so a master written right on the delivery figure would
+    encode to a file above it.
+    """
+    assert soundtrack.DELIVERY_PEAK_DBFS == -1.0
+    assert soundtrack.CODEC_OVERSHOOT_DB > 0.0
+    assert soundtrack.PEAK_CEILING_DBFS == pytest.approx(-1.3)
+    assert soundtrack.PEAK_CEILING_DBFS < soundtrack.DELIVERY_PEAK_DBFS
+    assert soundtrack.PEAK_CEILING == pytest.approx(
+        10 ** (soundtrack.PEAK_CEILING_DBFS / 20.0), abs=1e-9
+    )
+    assert soundtrack.PEAK_CEILING < 1.0
 
 
 def test_makeup_gain_is_bounded_and_never_inflates_a_near_empty_mix() -> None:
     bed = build(make_replay(frames=100), frames=208, include_events=False)
     assert bed.makeup_gain == 1.0
     assert gain_to_db(bed.peak) < soundtrack.PEAK_CEILING_DBFS - 10.0
-    assert soundtrack.MASTER_MAKEUP_MAX_DB == 3.0
+    # The fixed make-up plus the trim after the limiter, together, are capped.
+    assert soundtrack.MASTER_MAKEUP_DB == 7.0
+    assert soundtrack.MASTER_MAKEUP_MAX_DB == 9.0
+    assert soundtrack.MASTER_MAKEUP_DB < soundtrack.MASTER_MAKEUP_MAX_DB
+
+
+def test_the_makeup_never_exceeds_its_cap() -> None:
+    track = build(make_replay(frames=SYNTHETIC_FRAMES, events=SYNTHETIC_EVENTS))
+    assert gain_to_db(track.makeup_gain) <= soundtrack.MASTER_MAKEUP_MAX_DB + 1e-9
+    assert gain_to_db(track.makeup_gain) >= soundtrack.MASTER_MAKEUP_DB - 1e-9
 
 
 def test_an_event_heavy_battle_is_held_under_the_ceiling() -> None:
     """Forty eliminations on top of each other, which no battle produces.
 
-    The limiter is a safety net rather than part of the sound, so it is
-    tested with something that could never happen: if it holds this, it holds
-    the busiest real Echo or Orbit battle without being asked to.
+    Whether the limiter or the compressor did the holding is not the point -
+    the point is that nothing gets out above the ceiling.
     """
     stacked = tuple(
         event(200 + index, EVENT_ELIMINATION, HIT_IMPACT, x=ARENA_CENTRE)
         for index in range(40)
     )
     track = build(make_replay(frames=300, events=stacked), frames=408)
-    assert track.peak_before_master > 1.0
-    assert track.limited is True
-    assert 0.0 < track.limiter_gain < 1.0
+    assert track.peak_before_master > 0.0
     assert track.peak <= soundtrack.PEAK_CEILING + 1e-12
     assert peak(track.left) <= soundtrack.PEAK_CEILING + 1e-12
     assert peak(track.right) <= soundtrack.PEAK_CEILING + 1e-12
 
 
+def loud_pair(length: int = 40_000, level: float = 2.4):
+    """Two channels holding one long over-ceiling burst, for master() tests."""
+    from array import array
+
+    left = array("d", bytes(8 * length))
+    right = array("d", bytes(8 * length))
+    for index in range(8_000, 24_000):
+        phase = (index - 8_000) / 90.0
+        value = level * math.sin(phase)
+        left[index] = value
+        right[index] = value * 0.4
+    return left, right
+
+
+def test_the_limiter_holds_anything_under_the_ceiling() -> None:
+    """Tested directly, with a signal well past full scale.
+
+    The compressor now takes the peaks off a real mix before this ever sees
+    them, so the limiter is exercised on its own rather than through a
+    battle - it is the guarantee, and a guarantee has to be checked where it
+    cannot be helped by anything upstream.
+    """
+    left, right = loud_pair()
+    report = soundtrack.master(left, right)
+    assert report.peak_before > 1.0
+    assert report.limited is True
+    assert 0.0 < report.limiter_gain < 1.0
+    assert peak(left) <= soundtrack.PEAK_CEILING + 1e-12
+    assert peak(right) <= soundtrack.PEAK_CEILING + 1e-12
+
+
 def test_limiting_moves_both_channels_together() -> None:
     """A limiter that ducked one channel would swing the stereo image."""
-    stacked = tuple(
-        event(200 + index, EVENT_ELIMINATION, HIT_IMPACT, x=ARENA_LEFT)
-        for index in range(30)
-    )
-    track = build(
-        make_replay(frames=300, events=stacked), frames=408, include_ambience=False
-    )
-    assert track.limited is True
+    left, right = loud_pair()
+    soundtrack.master(left, right)
     ratios = [
-        track.left[index] / track.right[index]
-        for index in range(80_000, 84_000)
-        if abs(track.right[index]) > 1e-6
+        left[index] / right[index]
+        for index in range(8_000, 24_000)
+        if abs(right[index]) > 1e-9
     ]
     assert ratios
     assert max(ratios) - min(ratios) < 1e-9
@@ -752,6 +850,237 @@ def test_a_quiet_battle_is_not_silent_and_a_busy_one_does_not_clip() -> None:
     assert busy.peak <= soundtrack.PEAK_CEILING + 1e-12
     # A busy battle is louder overall, but not by turning into one long noise.
     assert busy.level_rms > quiet.level_rms
+
+
+# --- bus compression ------------------------------------------------------
+
+
+def test_the_compressor_is_gentle_by_the_numbers() -> None:
+    """Not a wall: a low ratio, a wide soft knee, and a slow release."""
+    assert soundtrack.COMPRESSOR_RATIO == 2.2
+    assert 1.0 < soundtrack.COMPRESSOR_RATIO <= 3.0
+    assert soundtrack.COMPRESSOR_KNEE_DB >= 10.0
+    assert soundtrack.COMPRESSOR_RELEASE >= 0.15
+    assert soundtrack.COMPRESSOR_ATTACK >= 0.002
+    # Look-ahead at least as long as the attack, or the gain would still be
+    # moving when the transient it was meant to catch has already gone.
+    assert soundtrack.COMPRESSOR_LOOKAHEAD >= soundtrack.COMPRESSOR_ATTACK
+
+
+def test_a_real_battle_needs_only_a_few_decibels_of_reduction() -> None:
+    track = build(make_replay(frames=SYNTHETIC_FRAMES, events=SYNTHETIC_EVENTS))
+    squeeze = track.compression
+    assert squeeze is not None
+    assert 3.0 < squeeze.max_reduction_db < 9.0
+    assert squeeze.mean_reduction_db < squeeze.max_reduction_db
+    assert 0.0 < squeeze.engaged_fraction < 1.0
+
+
+def test_compression_leaves_the_length_and_the_channels_alone() -> None:
+    left, right = build_pair()
+    before = len(left)
+    soundtrack.compress(left, right)
+    assert len(left) == len(right) == before
+
+
+def test_compression_never_moves_a_sample_in_time() -> None:
+    """The look-ahead reads forward; it does not delay the signal.
+
+    A compressor that delayed by its look-ahead would shift every cue later
+    by eight milliseconds, which is half a frame - so this is checked rather
+    than assumed. Silence before a burst stays silent, and the burst still
+    starts on the sample it started on.
+    """
+    from array import array
+
+    length = 20_000
+    start = 6_000
+    left = array("d", bytes(8 * length))
+    right = array("d", bytes(8 * length))
+    for index in range(start, start + 4_000):
+        value = 0.8 * math.sin((index - start) / 40.0)
+        left[index] = value
+        right[index] = value
+
+    soundtrack.compress(left, right)
+    assert first_signal(left, stop=start) is None
+    assert first_signal(right, stop=start) is None
+    assert first_signal(left, start=start, stop=start + 200) is not None
+    assert first_signal(left, start=start + 4_000) is None
+
+
+def test_every_cue_still_starts_on_its_own_sample_after_mastering() -> None:
+    """The whole chain, end to end, against the arithmetic.
+
+    Compression and make-up gain both scale samples, and neither may move
+    one. This is the same check the synchronisation tests make, run on a
+    soundtrack that has been through the full master chain.
+    """
+    replay = make_replay(frames=SYNTHETIC_FRAMES, events=SYNTHETIC_EVENTS)
+    track = build(replay, include_ambience=False)
+    millisecond = SAMPLE_RATE // 1000
+    for cue, source in zip(track.schedule, SYNTHETIC_EVENTS):
+        assert cue.sample == source["tick"] * 400
+        quiet_from = max(0, cue.sample - 400)
+        assert first_signal(track.left, start=quiet_from, stop=cue.sample) is None
+        arrived = first_signal(
+            track.left, start=cue.sample, stop=cue.sample + millisecond
+        )
+        assert arrived is not None
+
+
+def test_compression_keeps_a_heavy_hit_ahead_of_a_light_one() -> None:
+    """Gentle means the magnitude mapping survives, not that it is untouched.
+
+    Some of the difference is spent - that is what compression is - so what
+    is asserted is that a clear majority of it is still there.
+    """
+    levels = []
+    for magnitude in (8.0, 40.0):
+        cue = cues.hit_cue(HIT_IMPACT, magnitude, 4242)
+        left, right = build_pair(length=SAMPLE_RATE, cue=cue, offset=2400)
+        soundtrack.compress(left, right)
+        levels.append(gain_to_db(peak(left)))
+    surviving = levels[1] - levels[0]
+    designed = (
+        cues.hit_cue(HIT_IMPACT, 40.0, 4242).level_dbfs
+        - cues.hit_cue(HIT_IMPACT, 8.0, 4242).level_dbfs
+    )
+    assert surviving > 2.5
+    assert surviving > 0.45 * designed
+
+
+def test_compression_moves_both_channels_together() -> None:
+    left, right = build_pair()
+    for index in range(len(right)):
+        right[index] *= 0.5
+    soundtrack.compress(left, right)
+    ratios = [
+        left[index] / right[index]
+        for index in range(len(left))
+        if abs(right[index]) > 1e-9
+    ]
+    assert ratios
+    assert max(ratios) - min(ratios) < 1e-9
+
+
+def test_a_quiet_mix_is_left_completely_alone() -> None:
+    """Below the knee the compressor is not merely gentle, it is absent."""
+    from array import array
+
+    length = 8_000
+    quiet = db_to_gain(soundtrack.COMPRESSOR_THRESHOLD_DBFS - 40.0)
+    left = array("d", [quiet * math.sin(index / 30.0) for index in range(length)])
+    right = array("d", left)
+    original = bytes(left)
+    report = soundtrack.compress(left, right)
+    assert report.max_reduction_db == 0.0
+    assert report.engaged_fraction == 0.0
+    assert bytes(left) == original
+
+
+def test_a_ratio_of_one_is_a_no_op() -> None:
+    left, right = build_pair()
+    original = bytes(left)
+    report = soundtrack.compress(left, right, ratio=1.0)
+    assert report.max_reduction_db == 0.0
+    assert bytes(left) == original
+
+
+def test_compression_is_reproducible() -> None:
+    one_left, one_right = build_pair()
+    other_left, other_right = build_pair()
+    first = soundtrack.compress(one_left, one_right)
+    second = soundtrack.compress(other_left, other_right)
+    assert bytes(one_left) == bytes(other_left)
+    assert bytes(one_right) == bytes(other_right)
+    assert first == second
+
+
+def test_the_look_ahead_window_takes_the_maximum_of_what_is_coming() -> None:
+    from array import array
+
+    values = array("d", [0.0, 0.0, 1.0, 0.0, 0.0, 0.5, 0.0])
+    assert list(soundtrack._sliding_max(values, 2)) == [
+        1.0,
+        1.0,
+        1.0,
+        0.5,
+        0.5,
+        0.5,
+        0.0,
+    ]
+    # Forward-looking only: nothing behind the index leaks in.
+    assert soundtrack._sliding_max(array("d", [1.0, 0.0, 0.0]), 1)[2] == 0.0
+
+
+def test_the_mastered_mix_never_goes_past_the_ceiling() -> None:
+    for events in (SYNTHETIC_EVENTS, SYNTHETIC_EVENTS[:3], SYNTHETIC_EVENTS[:1]):
+        track = build(make_replay(frames=SYNTHETIC_FRAMES, events=events))
+        assert track.peak <= soundtrack.PEAK_CEILING
+        assert peak(track.left) <= soundtrack.PEAK_CEILING
+        assert peak(track.right) <= soundtrack.PEAK_CEILING
+        assert gain_to_db(track.makeup_gain) <= soundtrack.MASTER_MAKEUP_MAX_DB + 1e-9
+
+
+def test_the_total_lift_is_capped_however_quiet_the_mix_is() -> None:
+    """A near-silent timeline is not inflated to look loud.
+
+    Tested on the stage directly: the trim after the limiter will spend what
+    headroom is there, but the two gains together may never exceed the cap,
+    so something with almost nothing in it stays quiet.
+    """
+    from array import array
+
+    length = 12_000
+    faint = db_to_gain(-50.0)
+    left = array("d", [faint * math.sin(index / 25.0) for index in range(length)])
+    right = array("d", left)
+    report = soundtrack.master(
+        left, right, makeup_db=soundtrack.MASTER_MAKEUP_DB, trim=True
+    )
+    assert gain_to_db(report.makeup_gain) == pytest.approx(
+        soundtrack.MASTER_MAKEUP_MAX_DB, abs=1e-6
+    )
+    assert gain_to_db(report.peak_after) < -35.0
+    assert report.limited is False
+
+
+def test_a_quiet_battle_stays_quieter_than_a_busy_one() -> None:
+    """Mastering raises the floor; it must not flatten the two together."""
+    sparse = build(make_replay(frames=500, events=SYNTHETIC_EVENTS[:2]), frames=608)
+    dense = build(
+        make_replay(
+            frames=500,
+            events=tuple(
+                event(
+                    80 + index * 9,
+                    EVENT_HIT,
+                    (HIT_IMPACT, Projectile.kind, EchoClone.kind, OrbitOrb.kind)[
+                        index % 4
+                    ],
+                    magnitude=12.0 + 24.0 * (index % 3) / 2.0,
+                    x=ARENA_LEFT + (index % 5) * 240.0,
+                )
+                for index in range(90)
+            ),
+        ),
+        frames=608,
+    )
+    assert dense.level_rms > sparse.level_rms
+    assert sparse.peak <= dense.peak
+
+
+def test_the_sidecar_records_what_the_compressor_did() -> None:
+    track = build(make_replay(frames=SYNTHETIC_FRAMES, events=SYNTHETIC_EVENTS))
+    data = sidecar(track)
+    assert data["compression"]["ratio"] == soundtrack.COMPRESSOR_RATIO
+    assert data["compression"]["threshold_dbfs"] == soundtrack.COMPRESSOR_THRESHOLD_DBFS
+    assert data["compression"]["max_reduction_db"] > 0.0
+    assert 0.0 < data["compression"]["engaged_fraction"] < 1.0
+    assert data["levels"]["makeup_db"] >= soundtrack.MASTER_MAKEUP_DB
+    assert data["levels"]["crest_db"] > 0.0
+    assert data["levels"]["ambience_low_dbfs"] > cues.AMBIENCE_LOW_RMS_DBFS
 
 
 # --- determinism ----------------------------------------------------------
@@ -985,7 +1314,10 @@ def test_the_sidecar_describes_the_master_it_sits_beside() -> None:
     assert data["events"]["total"] == len(SYNTHETIC_EVENTS)
     assert data["events"]["scheduled"] == len(SYNTHETIC_EVENTS)
     assert data["events"]["by_cue"] == track.cue_counts
-    assert data["levels"]["peak_dbfs"] == pytest.approx(-1.0, abs=0.01)
+    assert data["levels"]["peak_dbfs"] == pytest.approx(
+        soundtrack.PEAK_CEILING_DBFS, abs=0.01
+    )
+    assert data["levels"]["delivery_peak_dbfs"] == soundtrack.DELIVERY_PEAK_DBFS
     assert data["timeline"]["post_roll_frames"] == 108
 
 

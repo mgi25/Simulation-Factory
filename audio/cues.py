@@ -30,6 +30,7 @@ from audio.synthesis import (
     SAMPLE_RATE,
     Noise,
     db_to_gain,
+    high_pass,
     layer,
     low_pass,
     noise_burst,
@@ -100,9 +101,20 @@ LEVEL_ELIMINATION = -2.9
 VOICE_PITCH_SPREAD = 0.02
 VOICE_LEVEL_TRIM_DB = 0.9
 
-# The ambient bed's target level, as RMS rather than peak: it is a continuous
-# sound and its peak says almost nothing about how present it feels.
-AMBIENCE_RMS_DBFS = -33.0
+# The ambient bed's two target levels, as RMS rather than peak: it is a
+# continuous sound and its peak says almost nothing about how present it
+# feels. Both are pre-master, so the master stage's make-up gain lifts them
+# with the rest of the mix - which is why they sit lower than the finished
+# levels they produce.
+#
+# The split is deliberate. `LOW` is the hum, all of it under 130 Hz, which a
+# phone reproduces none of. `MID` is the room layer in the band a phone does
+# have, and it is set directly instead of as a fraction of the hum: measured
+# on the Phase 6B bed, 99.3% of the energy was below 400 Hz and the gaps
+# between events were silent on a phone. Turning the hum up would only have
+# added more of what nobody hears.
+AMBIENCE_LOW_RMS_DBFS = -33.5
+AMBIENCE_MID_RMS_DBFS = -35.5
 AMBIENCE_FADE_IN = 0.5
 AMBIENCE_FADE_OUT = 0.4
 
@@ -115,21 +127,19 @@ AMBIENCE_LFO_DEPTH = 0.35
 # Both widen the bed without the phase cancellation a delay would cause, so
 # it survives being folded to mono on a phone speaker.
 AMBIENCE_DETUNE = 0.0009
-# The air layer is weighed against the partials by RMS, and it is the only
-# part of the bed a small speaker can reproduce: the three partials are all
-# under 130 Hz, and a phone rolls off long before that. Measured, the bed put
-# 0.7% of its energy above 400 Hz, which meant the gaps between events were
-# silent on the device most Shorts are watched on - the one thing the bed is
-# there to prevent. Raised and opened up until that passband holds a faint
-# room tone, and no further: it is still far below any event, still has no
-# pitch of its own and still nothing that repeats.
-AMBIENCE_AIR_LEVEL = 0.26
-AMBIENCE_AIR_CUTOFF = 1300.0
+# The room layer's band, chosen to sit inside what a small speaker has:
+# above the hum and below where filtered noise starts to read as hiss. Its
+# own modulation is slower and shallower than the partials' - it is a room,
+# not a texture, and nothing in a 25-second Short hears it repeat.
+AMBIENCE_ROOM_LOW = 200.0
+AMBIENCE_ROOM_HIGH = 2600.0
+AMBIENCE_ROOM_LFO_HZ = 0.037
+AMBIENCE_ROOM_LFO_DEPTH = 0.28
 # How many samples an ambience LFO is held for, and how far below the output
-# rate its noise layer is generated. Both are shortcuts taken only because the
-# bed is slow and band-limited; see `ambience` and `_air_layer`.
+# rate the room layer is generated. Both are shortcuts taken only because the
+# bed is slow and band-limited; see `ambience` and `_room_layer`.
 AMBIENCE_LFO_BLOCK = 128
-AMBIENCE_AIR_DECIMATION = 8
+AMBIENCE_ROOM_DECIMATION = 4
 
 
 @dataclass(frozen=True)
@@ -980,20 +990,32 @@ def ambience(
     *,
     seed: int,
     sample_rate: int = SAMPLE_RATE,
-    target_dbfs: float = AMBIENCE_RMS_DBFS,
+    low_dbfs: float = AMBIENCE_LOW_RMS_DBFS,
+    mid_dbfs: float = AMBIENCE_MID_RMS_DBFS,
     fade_in: float = AMBIENCE_FADE_IN,
     fade_out: float = AMBIENCE_FADE_OUT,
 ) -> tuple[array, array]:
-    """The arena's room tone: a quiet hum that runs the whole length.
+    """The arena's room tone: a quiet hum and a quieter room, running throughout.
 
     It exists so the gaps between events are not digital silence. There is no
     beat and no melody in it by construction - three partials at inharmonic
-    ratios, each on its own very slow amplitude LFO, with a whisper of
-    low-passed noise for air. It is calibrated by RMS rather than trimmed by
-    ear, so a longer battle is exactly as present as a shorter one.
+    ratios, each on its own very slow amplitude LFO, and a band-limited noise
+    layer that breathes on another. It is calibrated by RMS rather than
+    trimmed by ear, so a longer battle is exactly as present as a shorter one.
 
-    Returns the two channels. The fade-out is measured back from `length`, so
-    a Short's ambience always ends on the last sample of the post-roll.
+    The two layers are calibrated separately, and that split is the point.
+    The partials are all below 130 Hz, which a phone or laptop speaker does
+    not reproduce at all, so a bed made only of them is silence on the device
+    most Shorts are watched on - the one thing it is there to prevent. The
+    room layer sits in the 200 Hz to 2.6 kHz band those speakers do have, and
+    `mid_dbfs` sets it directly rather than as a fraction of a hum that would
+    drown it in the measurement. Raising the hum instead would only add
+    energy nobody hears.
+
+    Both numbers are pre-master levels: the master stage's make-up gain lifts
+    the whole mix, the bed with it. Returns the two channels; the fade-out is
+    measured back from `length`, so a Short's ambience always ends on the
+    last sample of the post-roll.
     """
     left = silence(length)
     right = silence(length)
@@ -1002,8 +1024,9 @@ def ambience(
 
     two_pi = 2.0 * math.pi
     sin = math.sin
+    hum = [silence(length), silence(length)]
     for index, (channel, detune, lfo_phase) in enumerate(
-        ((left, 1.0 - AMBIENCE_DETUNE, 0.0), (right, 1.0 + AMBIENCE_DETUNE, two_pi / 3.0))
+        ((hum[0], 1.0 - AMBIENCE_DETUNE, 0.0), (hum[1], 1.0 + AMBIENCE_DETUNE, two_pi / 3.0))
     ):
         # All three partials in one pass. Their LFOs are held for a block at a
         # time: at a twelfth of a hertz the level moves by well under a
@@ -1033,55 +1056,66 @@ def ambience(
             angles[1] += steps[1]
             angles[2] += steps[2]
 
-        air = _air_layer(
-            length,
-            stable_seed(seed, "ambience-air", index),
-            sample_rate,
-            AMBIENCE_AIR_CUTOFF,
-        )
-        # Three one-pole stages take a lot of level out of white noise, so the
-        # air layer is matched to the partials by RMS before it is weighed in.
-        air_rms = rms(air)
-        if air_rms > 0.0:
-            scale(air, AMBIENCE_AIR_LEVEL * rms(channel) / air_rms)
-            for position in range(length):
-                channel[position] += air[position]
+    room = [
+        _room_layer(length, stable_seed(seed, "ambience-room", index), sample_rate)
+        for index in range(2)
+    ]
 
-    gain = db_to_gain(target_dbfs) / max(1e-12, 0.5 * (rms(left) + rms(right)))
-    scale(left, gain)
-    scale(right, gain)
+    # Each layer to its own target, then summed. Calibrating the pair together
+    # would let the hum - which carries most of the energy and none of the
+    # audibility on a small speaker - decide how loud the room is.
+    hum_gain = db_to_gain(low_dbfs) / max(1e-12, 0.5 * (rms(hum[0]) + rms(hum[1])))
+    room_gain = db_to_gain(mid_dbfs) / max(1e-12, 0.5 * (rms(room[0]) + rms(room[1])))
+    for index, channel in enumerate((left, right)):
+        one, other = hum[index], room[index]
+        for position in range(length):
+            channel[position] = one[position] * hum_gain + other[position] * room_gain
 
     _fade(left, right, length, fade_in, fade_out, sample_rate)
     return left, right
 
 
-def _air_layer(
+def _room_layer(
     length: int,
     seed: int,
     sample_rate: int,
-    cutoff: float,
-    decimation: int = AMBIENCE_AIR_DECIMATION,
+    decimation: int = AMBIENCE_ROOM_DECIMATION,
 ) -> array:
-    """Low-passed noise for the bed, generated below the output rate.
+    """Band-limited noise for the bed, generated below the output rate.
 
-    The air is band-limited to well under a kilohertz, so there is nothing
-    above 3 kHz for a full-rate generator to contribute. Producing it at an
-    eighth of the rate and interpolating back up is the same sound for an
-    eighth of the work, and just as deterministic - the PRNG is still seeded
-    from the replay and still draws the same numbers in the same order.
+    The room is bounded well under 3 kHz, so there is nothing above 6 kHz for
+    a full-rate generator to contribute. Producing it at a quarter of the rate
+    and interpolating back up is the same sound for a quarter of the work, and
+    just as deterministic - the PRNG is still seeded from the replay and still
+    draws the same numbers in the same order.
+
+    A very slow amplitude modulation on top, at a rate nothing in a Short is
+    long enough to hear repeat. It is what stops the layer reading as tape
+    hiss, and it is deliberately not a rhythm.
     """
     if length == 0:
         return silence(0)
     coarse_rate = max(1, sample_rate // decimation)
     coarse = Noise(seed).fill(length // decimation + 2)
-    low_pass(coarse, cutoff, sample_rate=coarse_rate, stages=2)
+    high_pass(coarse, AMBIENCE_ROOM_LOW, sample_rate=coarse_rate, stages=2)
+    low_pass(coarse, AMBIENCE_ROOM_HIGH, sample_rate=coarse_rate, stages=2)
 
     out = silence(length)
+    two_pi = 2.0 * math.pi
+    sin = math.sin
+    lfo_step = two_pi * AMBIENCE_ROOM_LFO_HZ / sample_rate
+    lfo_angle = 0.0
+    depth = 1.0
     for index in range(length):
+        if index % AMBIENCE_LFO_BLOCK == 0:
+            depth = 1.0 - AMBIENCE_ROOM_LFO_DEPTH * (0.5 - 0.5 * sin(lfo_angle))
+            lfo_angle += lfo_step * AMBIENCE_LFO_BLOCK
         position = index / decimation
         base = int(position)
         fraction = position - base
-        out[index] = coarse[base] * (1.0 - fraction) + coarse[base + 1] * fraction
+        out[index] = depth * (
+            coarse[base] * (1.0 - fraction) + coarse[base + 1] * fraction
+        )
     return out
 
 

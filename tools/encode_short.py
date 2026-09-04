@@ -644,7 +644,8 @@ def main() -> int:
         f"audio:   v{soundtrack.SOUNDTRACK_VERSION} original synthesis,"
         f" {soundtrack.SAMPLES_PER_FRAME} samples/frame,"
         f" {soundtrack.SAMPLES_PER_TICK} samples/tick,"
-        f" bed {cues.AMBIENCE_RMS_DBFS:.0f} dBFS RMS"
+        f" bed {cues.AMBIENCE_LOW_RMS_DBFS:.0f}/"
+        f"{cues.AMBIENCE_MID_RMS_DBFS:.0f} dBFS RMS pre-master"
     )
 
     started = time.perf_counter()
