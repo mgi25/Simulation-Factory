@@ -6,15 +6,33 @@ extends Node3D
 ## position, health value and result comes from the replay file. The scene
 ## (arena, walls, spheres, camera, lights, HUD) is built from replay data so
 ## nothing here duplicates the simulation's numbers.
+##
+## Two kinds of replay arrive here. A battle is built and played by this file
+## directly, exactly as it always has been. A race is handed to
+## `race_scene.gd`, which owns everything about it. The two are told apart by
+## the replay's `mode`, and a replay with no `mode` at all is a battle -
+## which is what keeps every file exported before race mode existed valid.
+##
+## The split is a whole scene rather than a branch per function on purpose.
+## A race and a duel share the canvas and the replay contract and nothing
+## else: no arena, no health, no powers, no fixed camera. Threading both
+## through one set of builders would mean every one of them beginning by
+## asking which kind of replay it was looking at.
 
 # The single place where logical simulation pixels become Godot world units.
 const PIXELS_PER_UNIT := 100.0
 
 const DEFAULT_REPLAY := "../output/replay_12345.json"
 
-# The only replay schema this viewer understands. Anything older is rejected
-# with a message rather than half-played.
+# The battle replay schema this viewer plays. Race replays are versioned
+# separately, on their own counter, because they describe a different thing.
 const REPLAY_VERSION := 6
+const RACE_REPLAY_VERSION := 1
+
+const MODE_BATTLE := "battle"
+const MODE_RACE := "race"
+
+const RaceScene := preload("res://scripts/race_scene.gd")
 
 const FLOOR_THICKNESS := 0.25
 const WALL_HEIGHT := 0.9
@@ -165,6 +183,12 @@ var _ticks_per_frame := 2.0
 var offline_mode := false
 var _loaded := false
 
+# Set when the replay turned out to be a race. While it is, this file builds
+# nothing and presents nothing: it resolves the path, validates the file and
+# hands the whole scene over.
+var _race: Node3D = null
+var _mode := MODE_BATTLE
+
 
 func _ready() -> void:
 	var path := _resolve_path(_replay_path_argument())
@@ -173,6 +197,20 @@ func _ready() -> void:
 		add_child(error_hud)
 		error_hud.show_error("No replay at
 %s" % path)
+		return
+
+	if _mode == MODE_RACE:
+		_race = RaceScene.new()
+		_race.name = "RaceScene"
+		add_child(_race)
+		_race.build(_replay)
+		_present(0.0)
+		print("race replay loaded: seed=%d course=%s frames=%d duration=%.2fs" % [
+			int(_replay.get("seed", 0)),
+			str(_replay.get("course_id", "?")),
+			_frames.size(),
+			float(_replay.get("result", {}).get("duration", 0.0)),
+		])
 		return
 
 	_read_arena()
@@ -220,8 +258,11 @@ func seek_to_seconds(seconds: float) -> void:
 
 
 func _present(tick: float) -> void:
-	## Show the battle as it stood at `tick`, in simulation ticks.
+	## Show the replay as it stood at `tick`, in simulation ticks.
 	_replay_tick = tick
+	if _race != null:
+		_race.present(tick)
+		return
 	var last := float(_frames.size() - 1)
 	_apply_playhead(clampf(tick / _ticks_per_frame, 0.0, last))
 	_vfx.update_to_tick(tick)
@@ -277,20 +318,41 @@ func _load_replay(path: String) -> bool:
 		return false
 
 	var data: Dictionary = parsed
-	if int(data.get("version", 0)) != REPLAY_VERSION:
-		push_error("Unsupported replay version: %s (expected %d)" % [
-			str(data.get("version")), REPLAY_VERSION])
+	# A replay with no mode is a battle. Every file exported before race mode
+	# existed is one, and none of them are going to grow the field.
+	var mode := str(data.get("mode", MODE_BATTLE))
+	if mode != MODE_BATTLE and mode != MODE_RACE:
+		push_error("Unknown replay mode: %s" % mode)
+		return false
+
+	var wanted := RACE_REPLAY_VERSION if mode == MODE_RACE else REPLAY_VERSION
+	if int(data.get("version", 0)) != wanted:
+		push_error("Unsupported %s replay version: %s (expected %d)" % [
+			mode, str(data.get("version")), wanted])
 		return false
 
 	var frames: Array = data.get("frames", [])
-	var fighters: Array = data.get("fighters", [])
-	if frames.is_empty() or fighters.is_empty():
-		push_error("Replay contains no frames or no fighters: %s" % path)
+	if frames.is_empty():
+		push_error("Replay contains no frames: %s" % path)
 		return false
 
+	if mode == MODE_RACE:
+		if (data.get("racers", []) as Array).is_empty():
+			push_error("Race replay contains no racers: %s" % path)
+			return false
+		if (data.get("course", {}) as Dictionary).is_empty():
+			push_error("Race replay contains no course: %s" % path)
+			return false
+	else:
+		var fighters: Array = data.get("fighters", [])
+		if fighters.is_empty():
+			push_error("Replay contains no fighters: %s" % path)
+			return false
+		_fighter_meta = fighters
+
+	_mode = mode
 	_replay = data
 	_frames = frames
-	_fighter_meta = fighters
 	_physics_hz = maxf(1.0, float(data.get("physics_hz", 120.0)))
 	_ticks_per_frame = maxf(1.0, float(data.get("ticks_per_frame", 2.0)))
 	_loaded = true

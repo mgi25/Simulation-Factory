@@ -194,7 +194,7 @@ def encode_command(
     ffmpeg: str,
     *,
     frames: str,
-    audio: str,
+    audio: str | None,
     output: str,
     frame_count: int,
     spec: EncodeSpec = DEFAULT_SPEC,
@@ -216,6 +216,11 @@ def encode_command(
       which is what makes two encodes of the same inputs comparable.
     * no `-shortest`. The soundtrack is generated at exactly the right
       length; trimming to the shorter stream would hide a wrong one.
+    * `audio=None` produces a video-only MP4. That is not a convenience: a
+      race has no soundtrack yet, and the alternative - muxing a silent WAV
+      so the command shape never changes - would put a stream in the file
+      that claims to be audio and is not. A file with no audio track says
+      what it is.
     """
     command = [
         ffmpeg,
@@ -231,12 +236,16 @@ def encode_command(
         str(start_number),
         "-i",
         frames,
-        "-i",
-        audio,
+    ]
+    if audio is not None:
+        command += ["-i", audio]
+    command += [
         "-map",
         "0:v:0",
-        "-map",
-        "1:a:0",
+    ]
+    if audio is not None:
+        command += ["-map", "1:a:0"]
+    command += [
         "-map_metadata",
         "-1",
         "-map_chapters",
@@ -273,18 +282,21 @@ def encode_command(
         str(spec.fps),
         "-video_track_timescale",
         str(spec.fps * 1000),
-        "-c:a",
-        AUDIO_CODEC,
-        "-profile:a",
-        AUDIO_ENCODER_PROFILE,
-        "-b:a",
-        spec.audio_bitrate,
-        "-ar",
-        str(spec.sample_rate),
-        "-ac",
-        str(spec.channels),
-        "-bitexact",
     ]
+    if audio is not None:
+        command += [
+            "-c:a",
+            AUDIO_CODEC,
+            "-profile:a",
+            AUDIO_ENCODER_PROFILE,
+            "-b:a",
+            spec.audio_bitrate,
+            "-ar",
+            str(spec.sample_rate),
+            "-ac",
+            str(spec.channels),
+        ]
+    command += ["-bitexact"]
     if spec.faststart:
         command += ["-movflags", "+faststart"]
     command.append(output)
@@ -547,6 +559,7 @@ def probe_problems(
     frame_count: int,
     spec: EncodeSpec = DEFAULT_SPEC,
     duration: float | None = None,
+    expect_audio: bool = True,
 ) -> list[str]:
     """Everything about a finished Short that is not what production requires.
 
@@ -554,6 +567,11 @@ def probe_problems(
     warning level: a file that is not 1080x1920 H.264 High at exactly 60 fps
     with 48 kHz stereo AAC-LC beside it is not the format, and uploading it
     would put the wrong thing in front of an audience.
+
+    `expect_audio=False` is for a silent encode. It does not relax the audio
+    checks, it inverts them: a file that was meant to be silent and has an
+    audio stream is as wrong as one that was meant to have a soundtrack and
+    has none.
     """
     problems: list[str] = []
     expected = duration if duration is not None else frame_count / spec.fps
@@ -596,7 +614,10 @@ def probe_problems(
                 f"video runs {video.duration:.4f}s, expected {expected:.4f}s"
             )
 
-    if probe.audio is None:
+    if not expect_audio:
+        if probe.audio is not None:
+            problems.append("a silent encode should have no audio stream")
+    elif probe.audio is None:
         problems.append("no audio stream")
     else:
         audio = probe.audio

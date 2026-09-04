@@ -95,8 +95,9 @@ class Racer:
         self.space: pymunk.Space | None = None
 
         # --- race state, written by the manager ---
-        self.checkpoint = -1        # highest checkpoint plane crossed
-        self.progress = 0.0         # continuous position on the ladder
+        self.checkpoint = -1        # furthest progress node credited
+        self.branch = ""            # which path of a split it committed to
+        self.progress = 0.0         # continuous position along its route
         self.best_progress = 0.0    # high-water mark, for stuck detection
         self.rank = racer_id + 1    # 1-based, current standing
         self.finished = False
@@ -109,7 +110,11 @@ class Racer:
         self.recovery_cooldown = 0  # ticks left before it may recover again
 
     def __repr__(self) -> str:  # pragma: no cover - debugging aid
-        return f"<Racer {self.name} cp={self.checkpoint} p={self.progress:.2f}>"
+        where = f"/{self.branch}" if self.branch else ""
+        return (
+            f"<Racer {self.name} cp={self.checkpoint}{where}"
+            f" p={self.progress:.2f}>"
+        )
 
     # --- physics state ---
 

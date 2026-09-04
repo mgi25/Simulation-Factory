@@ -267,18 +267,28 @@ class RaceRenderer:
         )
 
     def _draw_checkpoints(self, manager: RaceManager, camera: RaceCamera) -> None:
-        for checkpoint in manager.course.checkpoints:
+        """Every progress plane, drawn across the width it actually spans.
+
+        A branch plane only exists inside its own corridor, and drawing it
+        edge to edge would show a course that forks as one that does not -
+        which is exactly the thing this overlay is there to make visible.
+        """
+        course = manager.course
+        for checkpoint in course.checkpoints:
             if not camera.visible(checkpoint.y, 40.0):
                 continue
             y = self._point(0.0, checkpoint.y, camera)[1]
+            left = 0.0 if checkpoint.x_min is None else checkpoint.x_min
+            right = course.width if checkpoint.x_max is None else checkpoint.x_max
+            start = self._point(left, checkpoint.y, camera)[0]
+            end = self._point(right, checkpoint.y, camera)[0]
             pygame.draw.line(
-                self.screen, CHECKPOINT_COLOR, (0, y), (self.size[0], y), max(1, self._px(3))
+                self.screen, CHECKPOINT_COLOR, (start, y), (end, y), max(1, self._px(3))
             )
+            label = f"{checkpoint.index} {checkpoint.name}"
             self._blit(
-                self._text(
-                    f"{checkpoint.index} {checkpoint.name}", DEBUG_FONT_SIZE, CHECKPOINT_COLOR
-                ),
-                midright=(self.size[0] - self._px(20), y - self._px(20)),
+                self._text(label, DEBUG_FONT_SIZE, CHECKPOINT_COLOR),
+                midright=(end - self._px(20), y - self._px(20)),
             )
 
     def _draw_racers(self, manager: RaceManager, camera: RaceCamera) -> None:
@@ -360,8 +370,9 @@ class RaceRenderer:
         ]
         for racer in manager.ranked:
             state = "FIN" if racer.finished else ("RET" if racer.retired else "   ")
+            branch = f" {racer.branch[:1].upper()}" if racer.branch else "  "
             lines.append(
-                f"{racer.rank:2d} {racer.name} cp{racer.checkpoint:2d} "
+                f"{racer.rank:2d} {racer.name} cp{racer.checkpoint:2d}{branch} "
                 f"p{racer.progress:5.2f} v{racer.speed:6.1f} {state}"
                 + (f" x{racer.recoveries}" if racer.recoveries else "")
             )

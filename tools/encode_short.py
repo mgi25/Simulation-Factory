@@ -35,9 +35,19 @@ from rendering import encode, png_frames  # noqa: E402
 from rendering.render_plan import (  # noqa: E402
     FRAMES_SUBDIR,
     METADATA_NAME,
+    MODE_BATTLE,
+    MODE_RACE,
     frame_filename,
 )
 from replay.exporter import REPLAY_VERSION  # noqa: E402
+from replay.race_exporter import RACE_REPLAY_VERSION  # noqa: E402
+
+# Which schema version each mode is played at. A replay with no `mode` is a
+# battle, which is what every replay exported before race mode existed is.
+REPLAY_VERSIONS = {
+    MODE_BATTLE: REPLAY_VERSION,
+    MODE_RACE: RACE_REPLAY_VERSION,
+}
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -101,10 +111,15 @@ def resolve_replay(metadata: dict, render_dir: str) -> str:
 def load_replay(path: str) -> dict:
     with open(path, "r", encoding="utf-8") as handle:
         replay = json.load(handle)
+    mode = str(replay.get("mode", MODE_BATTLE))
+    wanted = REPLAY_VERSIONS.get(mode)
+    if wanted is None:
+        raise ShortError(f"{path}: unknown replay mode {mode!r}")
     version = int(replay.get("version", 0))
-    if version != REPLAY_VERSION:
+    if version != wanted:
         raise ShortError(
-            f"{path}: replay version {version}, this pipeline plays v{REPLAY_VERSION}"
+            f"{path}: {mode} replay version {version},"
+            f" this pipeline plays v{wanted}"
         )
     return replay
 
@@ -232,7 +247,12 @@ def run(command: list[str], *, capture: bool = False) -> subprocess.CompletedPro
 
 
 def encode_video(
-    ffmpeg: str, render_dir: str, audio_path: str, frame_count: int, output: str, spec
+    ffmpeg: str,
+    render_dir: str,
+    audio_path: str | None,
+    frame_count: int,
+    output: str,
+    spec,
 ) -> float:
     frames = encode.frames_pattern(os.path.join(render_dir, FRAMES_SUBDIR))
     command = encode.encode_command(
@@ -276,15 +296,32 @@ def measure_loudness(ffmpeg: str, path: str) -> encode.Loudness:
 
 
 def validate_short(
-    ffmpeg: str, ffprobe: str, path: str, frame_count: int, expected_samples: int, spec
+    ffmpeg: str,
+    ffprobe: str,
+    path: str,
+    frame_count: int,
+    expected_samples: int,
+    spec,
+    silent: bool = False,
 ) -> tuple[encode.Probe, int]:
-    """Everything the finished file has to report before it is accepted."""
-    result = probe(ffprobe, path)
-    problems = encode.probe_problems(result, frame_count=frame_count, spec=spec)
+    """Everything the finished file has to report before it is accepted.
 
-    pcm = decoded_audio(ffmpeg, path, spec.sample_rate)
-    samples = len(pcm) // (2 * spec.channels)
-    problems += encode.decoded_audio_problems(samples, expected_samples, spec.sample_rate)
+    A silent encode is held to the same standard with the audio clause
+    inverted rather than dropped: the file must have no audio stream at all,
+    not an audio stream that happens to be quiet.
+    """
+    result = probe(ffprobe, path)
+    problems = encode.probe_problems(
+        result, frame_count=frame_count, spec=spec, expect_audio=not silent
+    )
+
+    samples = 0
+    if not silent:
+        pcm = decoded_audio(ffmpeg, path, spec.sample_rate)
+        samples = len(pcm) // (2 * spec.channels)
+        problems += encode.decoded_audio_problems(
+            samples, expected_samples, spec.sample_rate
+        )
 
     if problems:
         raise ShortError(
@@ -448,8 +485,22 @@ def encode_short(
         f" {spec.width}x{spec.height}"
     )
 
-    audio_path = os.path.join(render_dir, AUDIO_NAME)
-    if args.skip_audio:
+    mode = str(replay.get("mode", MODE_BATTLE))
+    # A race has no soundtrack yet, so it is encoded silent unless the caller
+    # asks otherwise. Making that the default rather than a flag to remember
+    # is what stops a race render failing at the audio stage with a message
+    # about a battle's cue schedule - the soundtrack is written for a duel,
+    # and it is honest about not being written for anything else.
+    silent = args.silent or (mode == MODE_RACE and not args.force_audio)
+
+    audio_path: str | None = os.path.join(render_dir, AUDIO_NAME)
+    if silent:
+        track = None
+        audio_seconds = 0.0
+        audio_path = None
+        expected_samples = 0
+        print(f"    audio      none - {mode} encoded silent")
+    elif args.skip_audio:
         if not os.path.isfile(audio_path):
             raise ShortError(f"--skip-audio but there is no {AUDIO_NAME} to reuse")
         track = None
@@ -489,24 +540,34 @@ def encode_short(
     short = encode.output_path(render_dir)
     encode_seconds = encode_video(ffmpeg, render_dir, audio_path, frame_count, short, spec)
     result, decoded = validate_short(
-        ffmpeg, ffprobe, short, frame_count, expected_samples, spec
+        ffmpeg, ffprobe, short, frame_count, expected_samples, spec, silent
     )
 
     video, audio = result.video, result.audio
-    print(
+    header = (
         f"    encode     {encode_seconds:.1f}s"
         f"  ({frame_count / max(encode_seconds, 1e-6):.0f} frames/sec)\n"
         f"    validated  {video.codec} {video.profile} {video.width}x{video.height}"
-        f" {video.pix_fmt} {video.frame_rate}, {video.frames} frames\n"
-        f"               {audio.codec} {audio.profile} {audio.sample_rate} Hz"
-        f" x{audio.channels}, {decoded} samples decoded"
-        f" (+{decoded - expected_samples} AAC padding)\n"
-        f"               video {video.duration:.4f}s, audio {audio.duration:.4f}s,"
-        f" planned {frame_count / spec.fps:.4f}s,"
-        f" sync {abs(video.duration - audio.duration) * 1000:.2f} ms"
+        f" {video.pix_fmt} {video.frame_rate}, {video.frames} frames"
     )
+    if silent:
+        print(
+            f"{header}, no audio track\n"
+            f"               video {video.duration:.4f}s,"
+            f" planned {frame_count / spec.fps:.4f}s"
+        )
+    else:
+        print(
+            f"{header}\n"
+            f"               {audio.codec} {audio.profile} {audio.sample_rate} Hz"
+            f" x{audio.channels}, {decoded} samples decoded"
+            f" (+{decoded - expected_samples} AAC padding)\n"
+            f"               video {video.duration:.4f}s, audio {audio.duration:.4f}s,"
+            f" planned {frame_count / spec.fps:.4f}s,"
+            f" sync {abs(video.duration - audio.duration) * 1000:.2f} ms"
+        )
 
-    if args.loudness:
+    if args.loudness and not silent:
         level = measure_loudness(ffmpeg, short)
         print(
             f"    loudness   {level.integrated_lufs} LUFS integrated,"
@@ -530,9 +591,13 @@ def encode_short(
         os.path.getsize(os.path.join(frames_dir, frame_filename(index)))
         for index in range(frame_count)
     )
+    wav_size = (
+        ""
+        if audio_path is None
+        else f" wav {os.path.getsize(audio_path) / MIB:.1f} MiB,"
+    )
     print(
-        f"    sizes      frames {frames_size / MIB:.0f} MiB,"
-        f" wav {os.path.getsize(audio_path) / MIB:.1f} MiB,"
+        f"    sizes      frames {frames_size / MIB:.0f} MiB,{wav_size}"
         f" mp4 {os.path.getsize(short) / MIB:.1f} MiB\n"
         f"    {os.path.relpath(short, PROJECT_ROOT)}"
     )
@@ -580,6 +645,16 @@ def parse_args() -> argparse.Namespace:
         "--skip-audio", action="store_true", help="reuse the audio.wav already there"
     )
     parser.add_argument(
+        "--silent",
+        action="store_true",
+        help="encode video only, with no audio track (the default for races)",
+    )
+    parser.add_argument(
+        "--force-audio",
+        action="store_true",
+        help="generate the battle soundtrack even for a race replay",
+    )
+    parser.add_argument(
         "--no-loudness",
         dest="loudness",
         action="store_false",
@@ -623,6 +698,12 @@ def main() -> int:
         return 2
     if args.audio_only and args.skip_audio:
         print("--audio-only and --skip-audio cannot both be given", file=sys.stderr)
+        return 2
+    if args.silent and (args.audio_only or args.skip_audio or args.force_audio):
+        print(
+            "--silent cannot be combined with an audio option",
+            file=sys.stderr,
+        )
         return 2
 
     try:

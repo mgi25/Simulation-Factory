@@ -11,9 +11,15 @@ Typical use::
     python tools/render_replay.py --manifest output/batch_audit10/manifest.json --limit 3
 
 Godot is handed the *exported replay* and nothing else. It never re-runs a
-seed: the point of a replay is that the selected battle is frozen, so the
-images come from the file that was selected, not from a simulation that would
-have to agree with it.
+seed: the point of a replay is that the selected run is frozen, so the images
+come from the file that was selected, not from a simulation that would have to
+agree with it.
+
+Battles and races both come through here. The two are told apart by the
+replay's `mode` and validated against their own schema version; everything
+after that - the plan, the Godot invocation, the sequence checks, the metadata
+- is identical, because from here down a render is a count of images at a
+resolution and nothing else.
 
 Finding Godot, in order: `--godot`, then `$GODOT_BIN`, then the PATH. No
 machine-specific path is committed anywhere in this project.
@@ -32,6 +38,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from rendering import png_frames  # noqa: E402
+from rendering import render_plan as render_plan_module  # noqa: E402
 from rendering.render_plan import (  # noqa: E402
     FRAMES_SUBDIR,
     METADATA_NAME,
@@ -48,6 +55,14 @@ from rendering.render_plan import (  # noqa: E402
     sequence_problems,
 )
 from replay.exporter import REPLAY_VERSION  # noqa: E402
+from replay.race_exporter import RACE_REPLAY_VERSION  # noqa: E402
+
+# Which schema version each mode is played at. A replay with no `mode` is a
+# battle, which is what every replay exported before race mode existed is.
+REPLAY_VERSIONS = {
+    render_plan_module.MODE_BATTLE: REPLAY_VERSION,
+    render_plan_module.MODE_RACE: RACE_REPLAY_VERSION,
+}
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GODOT_PROJECT = os.path.join(PROJECT_ROOT, "godot")
@@ -101,10 +116,17 @@ def load_replay(path: str) -> dict:
         raise RenderError(f"no replay at {path}")
     with open(path, "r", encoding="utf-8") as handle:
         replay = json.load(handle)
-    version = int(replay.get("version", 0))
-    if version != REPLAY_VERSION:
+    mode = str(replay.get("mode", render_plan_module.MODE_BATTLE))
+    if mode not in REPLAY_VERSIONS:
         raise RenderError(
-            f"{path}: replay version {version}, this renderer plays v{REPLAY_VERSION}"
+            f"{path}: unknown replay mode {mode!r};"
+            f" this renderer plays {', '.join(sorted(REPLAY_VERSIONS))}"
+        )
+    version = int(replay.get("version", 0))
+    if version != REPLAY_VERSIONS[mode]:
+        raise RenderError(
+            f"{path}: {mode} replay version {version},"
+            f" this renderer plays v{REPLAY_VERSIONS[mode]}"
         )
     return replay
 
@@ -177,15 +199,15 @@ def verify_sequence(frames_dir: str, plan: RenderPlan) -> list[str]:
 
 
 def verify_content(frames_dir: str, plan: RenderPlan) -> list[str]:
-    """A handful of frames decoded, to prove the sequence is a battle.
+    """A handful of frames decoded, to prove the sequence is a simulation.
 
-    Not image quality - just that something was drawn, that the battle moved
-    and that the ending is not the middle. Four frames is enough to catch a
+    Not image quality - just that something was drawn, that the run moved and
+    that the ending is not the middle. Four frames is enough to catch a
     renderer that wrote two thousand copies of one picture.
     """
     checkpoints = {
         "frame 0": 0,
-        "mid-battle": plan.gameplay_frames // 2,
+        "midpoint": plan.gameplay_frames // 2,
         "final gameplay": plan.gameplay_frames - 1,
         "final hold": plan.frame_count - 1,
     }
@@ -200,10 +222,10 @@ def verify_content(frames_dir: str, plan: RenderPlan) -> list[str]:
         elif frame.is_blank:
             problems.append(f"{label} ({frame_filename(index)}) is a flat colour")
 
-    if samples["frame 0"].digest == samples["mid-battle"].digest:
-        problems.append("frame 0 and the mid-battle frame are the same image")
-    if samples["final hold"].digest == samples["mid-battle"].digest:
-        problems.append("the final hold and the mid-battle frame are the same image")
+    if samples["frame 0"].digest == samples["midpoint"].digest:
+        problems.append("frame 0 and the midpoint frame are the same image")
+    if samples["final hold"].digest == samples["midpoint"].digest:
+        problems.append("the final hold and the midpoint frame are the same image")
     return problems
 
 
@@ -253,7 +275,7 @@ def render(
     replay_sha256 = png_frames.file_digest(replay_path)
 
     print(
-        f"\n=== seed {plan.seed}  {plan.replay_path} ===\n"
+        f"\n=== {plan.mode} seed {plan.seed}  {plan.replay_path} ===\n"
         f"    {plan.width}x{plan.height} @ {plan.fps}fps  "
         f"{plan.gameplay_frames} gameplay + {plan.post_roll_frames} post-roll "
         f"= {plan.frame_count} frames ({plan.total_seconds:.2f}s)"

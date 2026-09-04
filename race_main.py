@@ -51,6 +51,12 @@ def parse_args() -> argparse.Namespace:
         help="run with no window and print the summary",
     )
     parser.add_argument(
+        "--export-replay",
+        metavar="PATH",
+        default=None,
+        help="run headlessly and write a deterministic race replay to PATH",
+    )
+    parser.add_argument(
         "--debug", action="store_true", help="start with the debug overlay visible"
     )
     parser.add_argument(
@@ -83,6 +89,46 @@ def run_headless(args: argparse.Namespace, seed: int) -> None:
     manager, _ = new_race(args, seed)
     manager.run()
     print(format_summary(manager))
+
+
+def run_export(args: argparse.Namespace, seed: int) -> None:
+    """Record one race to a replay file and report what is in it.
+
+    The production front door: no window, no display driver, no pygame at
+    all. The race is run by the exporter rather than here, because the
+    exporter owns the sampling clock and the camera track - a second loop
+    that stepped the race its own way would eventually step it differently.
+    """
+    from replay.race_exporter import RACE_REPLAY_VERSION, record_race, write_replay
+
+    replay = record_race(seed, course_name=args.course, racer_count=max(1, args.racers))
+    path = write_replay(replay, args.export_replay)
+
+    course = replay["course"]
+    result = replay["result"]
+    routes = len(course["branches"]) or 1
+    winner_time = result["winner_time"]
+    duration = result["duration"]
+    size = os.path.getsize(path)
+
+    print(f"=== RACE REPLAY v{RACE_REPLAY_VERSION} ===")
+    print(f"Seed: {replay['seed']}")
+    print(
+        f"Course: {course['id']}  {len(course['pieces'])} pieces,"
+        f" {len(course['spinners'])} spinners,"
+        f" {len(course['checkpoints'])} checkpoints, {routes} route(s)"
+    )
+    print(f"Racers: {len(replay['racers'])}")
+    print(f"Winner: {result['winner_name'] or 'NONE'}")
+    print(f"Time: {'n/a' if winner_time is None else f'{winner_time:.2f}s'}")
+    print(f"Duration: {'n/a' if duration is None else f'{duration:.2f}s'}")
+    print(f"Finished: {result['racers_finished']}/{len(replay['racers'])}")
+    print(
+        f"Frames: {len(replay['frames'])} @ {replay['fps']}fps"
+        f"  ({len(replay['frames']) / replay['fps']:.2f}s)"
+    )
+    print(f"Events: {len(replay['events'])}")
+    print(f"Wrote {path}  ({size / 1024 / 1024:.1f} MiB)")
 
 
 def run_snapshots(args: argparse.Namespace, seed: int) -> None:
@@ -186,7 +232,9 @@ def main() -> None:
     args = parse_args()
     seed = args.seed if args.seed is not None else generate_seed()
 
-    if args.snapshot:
+    if args.export_replay:
+        run_export(args, seed)
+    elif args.snapshot:
         run_snapshots(args, seed)
     elif args.headless:
         run_headless(args, seed)

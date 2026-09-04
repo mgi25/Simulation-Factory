@@ -196,6 +196,9 @@ def test_metadata_describes_the_render() -> None:
     assert data["replay"] == {
         "name": "replay_21465.json",
         "path": "output/replay_21465.json",
+        # A replay with no `mode` is a battle, so a sidecar for one says so
+        # explicitly even though the replay it describes never did.
+        "mode": "battle",
         "version": REPLAY_VERSION,
         "seed": SEED,
         "sha256": "a" * 64,

@@ -42,6 +42,7 @@ __all__ = [
     "RacerSpawn",
     "CourseSection",
     "RaceCourse",
+    "progress_along",
     "box_between",
 ]
 
@@ -188,23 +189,68 @@ class SpinnerSpec:
 
 @dataclass(frozen=True)
 class Checkpoint:
-    """One rung of the progress ladder.
+    """One node of the progress graph.
 
-    A checkpoint is a horizontal plane at `y`: a racer has reached it once
-    its centre is at or below that line. Planes rather than trigger volumes
-    because progress has to be a total order that no racer can skip, sneak
-    past or register twice - and because ranking needs to interpolate
-    between two rungs, which a volume cannot answer.
+    A checkpoint is a horizontal plane at `y`, optionally narrowed to a
+    corridor between `x_min` and `x_max`: a racer has reached it once its
+    centre is at or below the line *and* inside the corridor. Planes rather
+    than trigger volumes because progress has to be an order that no racer
+    can skip, sneak past or register twice - and because ranking needs to
+    interpolate between two nodes, which a volume cannot answer.
 
     `respawn` is a point known to be clear of geometry just past the plane.
     It is where a stuck or escaped racer is put back, so it is part of the
     course description rather than something recovery code guesses at.
+
+    Two fields make branching possible, and both are inert on a course that
+    does not branch:
+
+    `branch` names the path this node belongs to. The empty string is the
+    shared main line every racer travels; anything else is a node only
+    racers on that branch can reach. A corridor is mandatory on a branch
+    node, because the corridor is what physically separates one path from
+    the other.
+
+    `progress` is the course progress at this plane, and it - not `y`, and
+    not `index` - is what ranking compares. On a linear course it is simply
+    the node's position in the ladder, which is why the prototype behaves
+    exactly as it always did. On a branching course, the nodes of both
+    branches carry values inside the interval between the split and the
+    rejoin, so two racers on different paths are compared by how far
+    through their own route they are rather than by how far down the
+    canvas they happen to be.
     """
 
     index: int
     name: str
     y: float
     respawn: tuple[float, float]
+    branch: str = ""
+    x_min: float | None = None
+    x_max: float | None = None
+    progress: float | None = None
+
+    @property
+    def value(self) -> float:
+        """Course progress at this plane. Defaults to the ladder position."""
+        return float(self.index) if self.progress is None else self.progress
+
+    @property
+    def corridor(self) -> bool:
+        """Whether this plane is narrowed to part of the course width."""
+        return self.x_min is not None or self.x_max is not None
+
+    def covers(self, x: float) -> bool:
+        """Whether `x` is inside this plane's corridor. Always true if open."""
+        if self.x_min is not None and x < self.x_min:
+            return False
+        if self.x_max is not None and x > self.x_max:
+            return False
+        return True
+
+    def reached_by(self, x: float, y: float) -> bool:
+        """Whether a racer centred at `(x, y)` has passed this plane."""
+        return y >= self.y and self.covers(x)
 
 
 @dataclass(frozen=True)
@@ -253,63 +299,150 @@ class RaceCourse:
             raise ValueError("checkpoints must be indexed 0..n-1 in order")
         if len(indices) < 2:
             raise ValueError("a course needs at least a start and a finish")
-        ys = [checkpoint.y for checkpoint in self.checkpoints]
-        if any(later <= earlier for earlier, later in zip(ys, ys[1:])):
-            raise ValueError("checkpoint planes must increase down the course")
 
-    # --- the ladder ---
+        names = [checkpoint.name for checkpoint in self.checkpoints]
+        if len(set(names)) != len(names):
+            raise ValueError("checkpoint names must be unique within a course")
+
+        planes: dict[float, float] = {}
+        for checkpoint in self.checkpoints:
+            if checkpoint.branch and not checkpoint.corridor:
+                raise ValueError(
+                    f"branch checkpoint {checkpoint.name!r} needs a corridor:"
+                    " a branch is only a branch if geometry separates it"
+                )
+            # Two nodes at the same course progress are alternatives - the
+            # entries to the two sides of one split - and a racer choosing
+            # between them must not be ranked by which one it takes. That
+            # only holds if the two are the same plane.
+            seen = planes.setdefault(checkpoint.value, checkpoint.y)
+            if seen != checkpoint.y:
+                raise ValueError(
+                    f"checkpoints at progress {checkpoint.value} disagree about"
+                    f" their plane: {seen} and {checkpoint.y}"
+                )
+
+        # Every route has to be a ladder in its own right: strictly further
+        # along the course, and strictly further down it, at every rung.
+        for branch in ("",) + self.branches:
+            route = self.route(branch)
+            label = branch or "main"
+            values = [checkpoint.value for checkpoint in route]
+            ys = [checkpoint.y for checkpoint in route]
+            if any(later <= earlier for earlier, later in zip(values, values[1:])):
+                raise ValueError(f"route {label} repeats or reverses course progress")
+            if any(later <= earlier for earlier, later in zip(ys, ys[1:])):
+                raise ValueError(
+                    f"route {label} has planes that do not increase down the course"
+                )
+
+        finish = self.finish
+        if finish.branch:
+            raise ValueError("the finish must be on the main line, not on a branch")
+        if sum(1 for cp in self.checkpoints if cp.value == finish.value) != 1:
+            raise ValueError("a course needs exactly one finish plane")
+
+        # Branches leaving the same point on the main line have to start at
+        # the same course progress, or a racer would be ranked by which one
+        # it entered rather than by how far along it has got.
+        entries: dict[float, set[float]] = {}
+        for branch in self.branches:
+            first = next(cp for cp in self.route(branch) if cp.branch == branch)
+            preceding = max(
+                (cp.value for cp in self.main_line if cp.value < first.value),
+                default=float("-inf"),
+            )
+            entries.setdefault(preceding, set()).add(first.value)
+        for preceding, values in entries.items():
+            if len(values) > 1:
+                raise ValueError(
+                    "branches leaving the same point must start at the same"
+                    f" course progress; after {preceding} they start at"
+                    f" {sorted(values)}"
+                )
+
+    # --- the progress graph ---
+
+    @property
+    def branches(self) -> tuple[str, ...]:
+        """Every named path, in a fixed order. Empty on a linear course."""
+        return tuple(sorted({cp.branch for cp in self.checkpoints if cp.branch}))
+
+    @property
+    def branching(self) -> bool:
+        return bool(self.branches)
+
+    @property
+    def main_line(self) -> tuple[Checkpoint, ...]:
+        """The nodes every racer passes, whichever branch it takes."""
+        return tuple(cp for cp in self.checkpoints if not cp.branch)
+
+    def route(self, branch: str = "") -> tuple[Checkpoint, ...]:
+        """One complete path from start to finish, in progress order.
+
+        The main line plus the nodes of `branch`. `branch=""` gives the
+        shared spine on its own, which on a linear course is the whole
+        ladder and is what `progress_at` reads.
+        """
+        nodes = [cp for cp in self.checkpoints if not cp.branch or cp.branch == branch]
+        return tuple(sorted(nodes, key=lambda cp: (cp.value, cp.index)))
 
     @property
     def start(self) -> Checkpoint:
-        return self.checkpoints[0]
+        return self.route()[0]
 
     @property
     def finish(self) -> Checkpoint:
-        return self.checkpoints[-1]
+        return max(self.checkpoints, key=lambda checkpoint: checkpoint.value)
 
     @property
     def finish_y(self) -> float:
         return self.finish.y
 
     @property
+    def finish_index(self) -> int:
+        return self.finish.index
+
+    @property
+    def max_progress(self) -> float:
+        """Course progress at the finish plane. The top of the scale."""
+        return self.finish.value
+
+    @property
     def last_index(self) -> int:
-        return len(self.checkpoints) - 1
+        """Index of the finish plane. The linear reading of the ladder."""
+        return self.finish.index
 
     def checkpoint(self, index: int) -> Checkpoint:
-        return self.checkpoints[max(0, min(self.last_index, index))]
+        return self.checkpoints[max(0, min(len(self.checkpoints) - 1, index))]
 
-    def reached_index(self, y: float) -> int:
-        """The highest checkpoint a racer at height `y` has passed."""
+    def reached_index(self, y: float, x: float | None = None) -> int:
+        """The furthest checkpoint a racer at `(x, y)` has passed.
+
+        With no `x` only the main line is considered, which on a linear
+        course is every checkpoint there is. Branch nodes cannot be answered
+        without an x, because a corridor is what tells the two paths apart.
+        """
         reached = -1
+        best = float("-inf")
         for checkpoint in self.checkpoints:
-            if y >= checkpoint.y:
-                reached = checkpoint.index
-            else:
-                break
+            if checkpoint.branch and x is None:
+                continue
+            passed = y >= checkpoint.y if x is None else checkpoint.reached_by(x, y)
+            if passed and checkpoint.value > best:
+                best, reached = checkpoint.value, checkpoint.index
         return reached
 
     def progress_at(self, y: float) -> float:
-        """Course progress as a continuous number, in checkpoint units.
+        """Main-line course progress at height `y`, as a continuous number.
 
-        0.0 is the start plane, `last_index` is the finish plane, and the
-        fraction between two rungs is the racer share of the gap. This is
-        the primary ranking key, and it is monotonic in `y` by construction,
-        so it cannot rank a racer that is further down the course lower than
-        one that is not.
+        0.0 is the start plane, `max_progress` is the finish plane, and the
+        fraction between two nodes is the racer's share of the gap. On a
+        linear course this is the whole ranking key. On a branching one it
+        is the coarse reading that ignores which path was taken, and
+        `race.progress` is what actually ranks a field there.
         """
-        index = self.reached_index(y)
-        if index < 0:
-            # Still above the start plane, in the pen. Report the shortfall
-            # as a negative fraction of the run-up so grid order still ranks.
-            first = self.checkpoints[0]
-            run_up = max(1.0, first.y - self.top)
-            return (y - first.y) / run_up
-        if index >= self.last_index:
-            return float(self.last_index)
-        here = self.checkpoints[index]
-        following = self.checkpoints[index + 1]
-        span = following.y - here.y
-        return index + max(0.0, min(1.0, (y - here.y) / span))
+        return progress_along(self.main_line, y, self.top)
 
     # --- geometry ---
 
@@ -345,6 +478,41 @@ class RaceCourse:
 
     def __len__(self) -> int:
         return len(self.pieces)
+
+
+def progress_along(
+    route: tuple[Checkpoint, ...], y: float, top: float, reached: Checkpoint | None = None
+) -> float:
+    """Continuous course progress along one route at height `y`.
+
+    `reached` is the furthest node the racer has actually passed, which on a
+    branching course is not simply the last node above it: a racer can be
+    below a plane it never entered the corridor of. Left out, the furthest
+    node above `y` is used, which is the linear reading.
+
+    Above the first node the shortfall is reported as a negative fraction of
+    the run-up, so a field still on the grid ranks by how near the line it
+    is rather than all tying on zero.
+    """
+    if not route:
+        return 0.0
+    if reached is None:
+        passed = [node for node in route if y >= node.y]
+        reached = passed[-1] if passed else None
+    if reached is None:
+        first = route[0]
+        run_up = max(1.0, first.y - top)
+        return (y - first.y) / run_up
+
+    following = [node for node in route if node.value > reached.value]
+    if not following:
+        return reached.value
+    upcoming = following[0]
+    span = upcoming.y - reached.y
+    if span <= 0.0:
+        return reached.value
+    share = max(0.0, min(1.0, (y - reached.y) / span))
+    return reached.value + share * (upcoming.value - reached.value)
 
 
 def box_between(

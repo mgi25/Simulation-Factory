@@ -71,6 +71,10 @@ class CourseBuilder:
         self._sections: list[CourseSection] = []
         self._next_piece_id = 0
         self._next_spinner_id = 0
+        # Main-line planes laid down so far. The progress scale a linear
+        # course numbers itself on, and the integer grid a split's branch
+        # values sit between.
+        self._stages = 0
 
     # --- sections ---
 
@@ -202,10 +206,66 @@ class CourseBuilder:
     # --- ladder and grid ---
 
     def checkpoint(self, name: str, y: float, respawn: Point) -> Checkpoint:
+        """A plane every racer crosses, one rung further along the course.
+
+        Its course progress is the number of main-line planes laid down
+        before it, so a course with no branches numbers itself 0, 1, 2 ...
+        and needs to know nothing about the progress scale at all.
+        """
+        return self._checkpoint(name, y, respawn, "", None, None, float(self._stages))
+
+    def branch_checkpoint(
+        self,
+        name: str,
+        y: float,
+        respawn: Point,
+        *,
+        branch: str,
+        x_range: tuple[float | None, float | None],
+        progress: float,
+    ) -> Checkpoint:
+        """A plane only racers in one corridor of a split can cross.
+
+        `x_range` is the corridor, as `(x_min, x_max)` with either end left
+        open by `None`. It is what separates one path from the other, and a
+        branch node without one would be reachable from both.
+
+        `progress` is stated rather than counted, because a branch
+        subdivides the interval between two main-line planes and only the
+        course knows how. Every branch of one split must enter at the same
+        value - two racers taking different paths have to start level - and
+        the interval belongs to the split, so the values are part of how
+        the course is laid out rather than something a builder can infer.
+        """
+        if not branch:
+            raise ValueError("a branch checkpoint needs a branch name")
+        return self._checkpoint(
+            name, y, respawn, branch, x_range[0], x_range[1], progress
+        )
+
+    def _checkpoint(
+        self,
+        name: str,
+        y: float,
+        respawn: Point,
+        branch: str,
+        x_min: float | None,
+        x_max: float | None,
+        progress: float,
+    ) -> Checkpoint:
         checkpoint = Checkpoint(
-            index=len(self._checkpoints), name=name, y=y, respawn=respawn
+            index=len(self._checkpoints),
+            name=name,
+            y=y,
+            respawn=respawn,
+            branch=branch,
+            x_min=x_min,
+            x_max=x_max,
+            progress=progress,
         )
         self._checkpoints.append(checkpoint)
+        if not branch:
+            self._stages += 1
         return checkpoint
 
     def spawn(self, x: float, y: float) -> RacerSpawn:

@@ -6,10 +6,18 @@ Short contains, what each one is called, where the sequence lives and what the
 metadata beside it says. No clocks, no wall time, no machine paths - two runs
 of the same replay plan the same render, on any machine.
 
-The production timeline is the battle plus a fixed post-roll. The post-roll is
-presentation only: it exists because the result panel takes a moment to arrive
-and then needs a moment to be read, and it never touches the simulation, the
-replay or the recorded result.
+The production timeline is the simulation plus a fixed post-roll. The
+post-roll is presentation only: it exists because the result panel takes a
+moment to arrive and then needs a moment to be read, and it never touches the
+simulation, the replay or the recorded result.
+
+Everything here is mode-aware without being mode-specific. A race replay and a
+battle replay disagree about almost everything inside a frame and agree about
+the four things this module reads - how many frames there are, what rate they
+were sampled at, which tick the last one is, and how long the run was - so
+planning a render never has to know which kind it is holding. The mode is
+carried into the plan and the metadata all the same, because a sequence of
+images that does not say what it is a recording of is harder to check later.
 """
 
 from __future__ import annotations
@@ -19,10 +27,21 @@ import posixpath
 from dataclasses import dataclass
 from typing import Any
 
-# The render manifest's own schema version. Nothing to do with the replay
-# format (v6) or the batch manifest (v1): those describe a battle and a
-# decision about many battles, this describes one sequence of images.
+# The render manifest's own schema version. Nothing to do with either replay
+# format or with the batch manifest (v1): those describe a simulation and a
+# decision about many of them, this describes one sequence of images.
+#
+# It stays at 1 through the arrival of race mode. `replay.mode` was added to
+# the sidecar rather than replacing anything, and a sidecar without it
+# describes a battle - so every render written before races existed is still
+# exactly as readable as it was, and still passes production QC.
 RENDER_FORMAT_VERSION = 1
+
+# What a replay is a recording of. A replay with no `mode` at all is a
+# battle: the field was added when races arrived, and nothing exported
+# before that is going to grow it.
+MODE_BATTLE = "battle"
+MODE_RACE = "race"
 
 # True production resolution. Portrait 9:16 at 1:1 pixel aspect, and the
 # resolution the frames are actually rendered at - never a smaller render
@@ -104,6 +123,7 @@ class RenderPlan:
     """Exactly which images a replay produces, and what they show."""
 
     seed: int
+    mode: str
     replay_version: int
     replay_name: str
     replay_path: str
@@ -178,6 +198,7 @@ def plan_render(
 
     return RenderPlan(
         seed=int(replay.get("seed", 0)),
+        mode=str(replay.get("mode", MODE_BATTLE)),
         replay_version=int(replay.get("version", 0)),
         replay_name=os.path.basename(replay_path),
         replay_path=relative_replay_path(replay_path, root),
@@ -190,9 +211,9 @@ def plan_render(
         finished_tick=None if finished is None else int(finished),
         battle_duration=float(result.get("duration", 0.0) or 0.0),
         # What is actually rendered, which is the last *sampled* moment of the
-        # battle. Normally the same instant as `finished_tick`, and taken from
-        # the frames rather than the result so it stays true if a battle ever
-        # ends between two samples.
+        # run. Normally the same instant as `finished_tick`, and taken from
+        # the frames rather than the result so it stays true if a simulation
+        # ever ends between two samples.
         gameplay_seconds=last_tick / max(1, physics_hz),
         post_roll_seconds=tail_seconds,
     )
@@ -211,6 +232,7 @@ def metadata(plan: RenderPlan, replay_sha256: str) -> dict[str, Any]:
         "replay": {
             "name": plan.replay_name,
             "path": plan.replay_path,
+            "mode": plan.mode,
             "version": plan.replay_version,
             "seed": plan.seed,
             "sha256": replay_sha256,

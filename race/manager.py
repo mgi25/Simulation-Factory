@@ -49,7 +49,12 @@ from race.events import (
     REASON_STUCK,
     RaceEvent,
 )
-from race.progress import assign_ranks, count_inversions, update_progress
+from race.progress import (
+    assign_ranks,
+    count_inversions,
+    reset_progress,
+    update_progress,
+)
 from race.racer import Racer
 from race.simulation import RaceSimulation
 
@@ -186,9 +191,7 @@ class RaceManager:
         # actually is, so a racer that spent the countdown resting against
         # the gate is not immediately suspected of being stuck there.
         for racer in self.sim.racers:
-            racer.progress = self.course.progress_at(racer.position.y)
-            racer.best_progress = racer.progress
-            racer.stuck_ticks = 0
+            reset_progress(self.course, racer)
         self._record(EVENT_START, detail="go")
 
     # --- per-tick rules ---
@@ -208,14 +211,15 @@ class RaceManager:
             if racer.retired:
                 continue
             for index in update_progress(self.course, racer):
-                if index >= self.course.last_index:
+                checkpoint = self.course.checkpoint(index)
+                if index == self.course.finish_index:
                     self._finish_racer(racer)
                 else:
                     self._record(
                         EVENT_CHECKPOINT,
                         racer,
-                        value=float(index),
-                        detail=self.course.checkpoint(index).name,
+                        value=checkpoint.value,
+                        detail=checkpoint.name,
                     )
 
     def _finish_racer(self, racer: Racer) -> None:
@@ -294,13 +298,14 @@ class RaceManager:
         racer.recoveries += 1
         racer.time_penalty += RECOVERY_PENALTY_SECONDS
         racer.recovery_cooldown = RECOVERY_COOLDOWN_TICKS
-        racer.progress = self.course.progress_at(checkpoint.respawn[1])
-        racer.best_progress = racer.progress
+        # Put back on the branch it was on, at the node it last reached, so
+        # a rescue never moves a racer between paths.
+        reset_progress(self.course, racer)
         self.recoveries += 1
         self._record(
             EVENT_RECOVERY,
             racer,
-            value=float(checkpoint.index),
+            value=checkpoint.value,
             detail=reason,
         )
 

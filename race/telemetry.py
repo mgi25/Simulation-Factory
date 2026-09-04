@@ -15,10 +15,46 @@ from __future__ import annotations
 from typing import Any
 
 from race.config import RACER_COUNT
+from race.events import EVENT_CHECKPOINT
 from race.manager import RaceManager, RaceState
 from race.racer import Racer
 
-__all__ = ["race_summary", "format_summary", "format_finish_order"]
+__all__ = [
+    "race_summary",
+    "branch_usage",
+    "format_summary",
+    "format_finish_order",
+]
+
+
+def branch_usage(manager: RaceManager) -> dict[str, list[int]]:
+    """Which racers travelled each branch of a split course.
+
+    Read back out of the recorded crossings rather than off the racers,
+    because a racer's branch is cleared the moment its route rejoins the main
+    line - which is correct for ranking and useless afterwards. The events are
+    the only record of where a racer actually went, which is one of the
+    reasons they are written.
+
+    Counted per branch rather than per racer, so a course with two splits in
+    it reports both without this needing to know that it has.
+    """
+    course = manager.course
+    if not course.branching:
+        return {}
+    branch_of = {
+        checkpoint.name: checkpoint.branch
+        for checkpoint in course.checkpoints
+        if checkpoint.branch
+    }
+    travelled: dict[str, list[int]] = {branch: [] for branch in course.branches}
+    for event in manager.events:
+        if event.type != EVENT_CHECKPOINT or event.racer_id is None:
+            continue
+        branch = branch_of.get(event.detail or "")
+        if branch is not None and event.racer_id not in travelled[branch]:
+            travelled[branch].append(event.racer_id)
+    return travelled
 
 
 def race_summary(manager: RaceManager) -> dict[str, Any]:
@@ -28,6 +64,18 @@ def race_summary(manager: RaceManager) -> dict[str, Any]:
     finished = manager.finish_order
     stuck = [racer for racer in racers if racer.recoveries > 0]
     retired = [racer for racer in racers if racer.retired]
+
+    travelled = branch_usage(manager)
+    winner_branch = None
+    if manager.winner is not None:
+        winner_branch = next(
+            (
+                branch
+                for branch, ids in travelled.items()
+                if manager.winner.racer_id in ids
+            ),
+            None,
+        )
 
     return {
         "seed": sim.seed,
@@ -58,6 +106,11 @@ def race_summary(manager: RaceManager) -> dict[str, Any]:
         "spinner_contacts": sim.spinner_contacts,
         "finish_spread": _finish_spread(finished),
         "unfinished": [racer.name for racer in racers if not racer.finished],
+        # Empty on a linear course, which is how a reader tells the two kinds
+        # of course apart without having to ask the course.
+        "branches": list(sim.course.branches),
+        "branch_entries": {branch: len(ids) for branch, ids in travelled.items()},
+        "winner_branch": winner_branch,
         "events": len(manager.events),
     }
 
@@ -98,7 +151,7 @@ def format_finish_order(manager: RaceManager) -> str:
         state = "RETIRED" if racer.retired else "DNF"
         lines.append(
             f"  - {racer.name} - {state} at {racer.progress:.2f}/"
-            f"{manager.course.last_index}"
+            f"{manager.course.max_progress:g}"
         )
     return "\n".join(lines)
 
@@ -124,6 +177,13 @@ def format_summary(manager: RaceManager, finish_order: bool = True) -> str:
         f"Retired: {summary['racers_retired']}",
         f"Large Collisions: {summary['large_collisions']}",
     ]
+    if summary["branches"]:
+        entries = "  ".join(
+            f"{branch} {count}"
+            for branch, count in sorted(summary["branch_entries"].items())
+        )
+        lines.append(f"Branches: {entries}")
+        lines.append(f"Winner's Branch: {summary['winner_branch'] or 'n/a'}")
     if summary["finish_spread"] is not None:
         lines.append(f"Finish Spread: {summary['finish_spread']:.2f}s")
     if finish_order and manager.finish_order:

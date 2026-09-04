@@ -105,6 +105,7 @@ def batch_report(summaries: list[dict]) -> str:
         # starting slot would show one or two winners across the whole batch.
         f"Distinct winners: {len(unique_winners)}/10 racers",
     ]
+    lines.extend(_branch_lines(summaries))
     if failures:
         lines.append("Failures:")
         for summary in failures:
@@ -113,6 +114,41 @@ def batch_report(summaries: list[dict]) -> str:
             )
             lines.append(f"  seed {summary['seed']}: {reason}")
     return "\n".join(lines)
+
+
+def _branch_lines(summaries: list[dict]) -> list[str]:
+    """How a split course actually split, over the whole batch.
+
+    Two numbers decide whether a fork is real. If almost every racer takes
+    one side, the course has a fork on paper only. If almost every winner
+    comes from one side, it has a fork that is really a punishment - and
+    nothing about ranking across branches is being exercised by it.
+
+    Silent on a course with no branches, so the report shape follows the
+    course rather than the tool.
+    """
+    branches = sorted({branch for s in summaries for branch in s.get("branches", ())})
+    if not branches:
+        return []
+
+    entries = {branch: 0 for branch in branches}
+    winners = {branch: 0 for branch in branches}
+    for summary in summaries:
+        for branch, count in (summary.get("branch_entries") or {}).items():
+            entries[branch] = entries.get(branch, 0) + count
+        if summary.get("winner_branch"):
+            winners[summary["winner_branch"]] += 1
+
+    total = sum(entries.values()) or 1
+    return [
+        "Branch entries: "
+        + "  ".join(
+            f"{branch} {entries[branch]} ({100.0 * entries[branch] / total:.0f}%)"
+            for branch in branches
+        ),
+        "Branch winners: "
+        + "  ".join(f"{branch} {winners[branch]}" for branch in branches),
+    ]
 
 
 def main() -> None:

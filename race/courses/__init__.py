@@ -1,12 +1,21 @@
-"""Course builders. One per course; V0.1 ships the prototype only."""
+"""Course builders. One module per course, one entry in the registry.
+
+Every course is reached through `build_course`, so nothing downstream - a
+CLI flag, a batch tool, the replay exporter - ever imports a course module
+by hand or knows how many there are.
+"""
 
 from __future__ import annotations
 
 from race.courses.prototype import PROTOTYPE_COURSE_ID, build_prototype_course
+from race.courses.split import SPLIT_COURSE_ID, build_split_course
 
-# Name to builder, so a CLI flag or a future batch tool can pick a course
-# without importing each module by hand.
-COURSE_BUILDERS = {PROTOTYPE_COURSE_ID: build_prototype_course}
+# Name to builder, so a CLI flag or a batch tool can pick a course without
+# importing each module by hand.
+COURSE_BUILDERS = {
+    PROTOTYPE_COURSE_ID: build_prototype_course,
+    SPLIT_COURSE_ID: build_split_course,
+}
 COURSE_NAMES: tuple[str, ...] = tuple(COURSE_BUILDERS)
 DEFAULT_COURSE = PROTOTYPE_COURSE_ID
 
@@ -15,7 +24,9 @@ __all__ = [
     "COURSE_NAMES",
     "DEFAULT_COURSE",
     "PROTOTYPE_COURSE_ID",
+    "SPLIT_COURSE_ID",
     "build_prototype_course",
+    "build_split_course",
     "build_course",
 ]
 
