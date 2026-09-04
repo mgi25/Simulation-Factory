@@ -132,6 +132,18 @@ def pixel_digest(path: str) -> str:
     return sample(path).digest
 
 
+def rgb_bytes(path: str) -> tuple[int, int, bytes]:
+    """One frame's size and its decoded RGB bytes.
+
+    What comparing a lossy encode against its source needs: H.264 will never
+    give back the same bytes, so the question is how far off it is, and that
+    cannot be answered by a digest.
+    """
+    surface = _load_surface(path)
+    width, height = surface.get_size()
+    return width, height, _pygame().image.tobytes(surface, "RGB")
+
+
 def _pygame():
     import pygame  # imported here so planning a render never needs it
 
