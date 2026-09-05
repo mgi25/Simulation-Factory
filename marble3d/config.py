@@ -45,26 +45,42 @@ REPLAY_FPS = 60
 class PhysicsConfig:
     """The clock and the solver.
 
-    ## The rate, and why it is 240 rather than 120
+    ## The rate, and the finding that makes choosing it a real decision
 
-    Measured on this machine with `tools/marble3d_validate.py --rates`, on the
-    full start-bowl-curve machine rather than on a test rig, because the thing
-    that decides the rate is the fastest contact in the real geometry.
+    Measured with `tools/marble3d_validate.py --rates`, on the full
+    start-bowl-curve machine rather than on a test rig, seed 7:
 
-    | rate | worst penetration | resting-height error | drained | throughput |
-    | ---: | ---: | ---: | ---: | ---: |
-    | see docs/marble3d_physics_core.md section 5 |
+        rate     bowl turns   run     wall    worst pen.   travel/tick
+        120 Hz   2.08         7.5 s   0.6 s   -0.274       0.42 diam
+        240 Hz   3.20         9.2 s   1.2 s   -0.069       0.20 diam
+        480 Hz   5.01        14.5 s   3.4 s   -0.067       0.10 diam
+        960 Hz  15.27        43.2 s  18.0 s   -0.027       0.055 diam
+       1920 Hz   0.42*      45.0 s   20.6 s   -0.004       0.053 diam
+                             * hit the time limit; 5 marbles escaped
 
-    The short version: trajectories are essentially rate-independent between
-    120 and 480 Hz - the lab established that on the bowl and it holds here -
-    so the rate is not chosen for accuracy. It is chosen for **contact safety**.
-    A marble leaving the bowl drain has fallen far enough to be moving at about
-    70 wu/s, which is 0.58 wu per tick at 120 Hz and 0.29 at 240. The curve's
-    wall is 0.30 wu thick. At 120 Hz a marble crosses a wall in a single step
-    and is relying entirely on continuous collision detection to catch it; at
-    240 Hz it does not. Since CCD is a fallback with its own failure modes and
-    the cost of the higher rate is under a factor of two, 240 is the lowest
-    rate this machine is safe at.
+    The lab reported that bowl trajectories were essentially rate-independent
+    between 120 and 480 Hz. **That is not true of this machine, and the
+    difference matters.** The orbit lifetime rises monotonically with the rate
+    and does not converge: a rigid sphere loses energy at every triangle edge
+    it rolls over, and how much it loses is a function of the *timestep*, not
+    only of the mesh. At 960 Hz the marbles orbit for forty seconds; at 1920 Hz
+    they keep enough energy to climb over the dish edge and five of eight leave
+    the bowl entirely.
+
+    So there is no converged answer to run towards, and the rate is a physics
+    parameter of this machine rather than only a safety one. Two consequences
+    worth carrying into any decision about the architecture: **the geometry is
+    tuned against the dissipation at the chosen rate** - the bowl's containment
+    works because marbles lose energy at the rate 240 Hz makes them lose it -
+    and **changing the rate is changing the machine**, not refining it.
+
+    240 is chosen on three grounds. It is the lowest rate whose contact
+    behaviour is clean: 0.20 marble diameters of travel per tick against a
+    measured discrete-detection failure onset of 0.83, and a worst penetration
+    of 7% of a diameter against 27% at 120 Hz. It puts the bowl at 3.2
+    revolutions, between the production 2D bowl's 0.46 and the lab's PyBullet
+    prototype's 4.06. And it costs 1.2 s a seed, so a thousand-seed search is
+    about twenty minutes where 480 Hz would be an hour.
 
     ## deterministicOverlappingPairs
 
