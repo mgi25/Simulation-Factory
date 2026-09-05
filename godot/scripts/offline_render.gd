@@ -35,6 +35,12 @@ var _viewer: Node3D
 
 var _out_dir := ""
 var _frame_count := 0
+# When set, only these output frame indices are written, and they are named
+# `still_%06d.png` rather than `frame_%06d.png`. It is how a camera sweep is
+# produced without rendering the whole race five times: the scene, the replay
+# and the clock are identical, and only the handful of moments being compared
+# are kept.
+var _stills: Array[int] = []
 var _fps := DEFAULT_FPS
 var _width := DEFAULT_WIDTH
 var _height := DEFAULT_HEIGHT
@@ -48,6 +54,9 @@ func _ready() -> void:
 	_fps = maxf(1.0, float(options.get("fps", DEFAULT_FPS)))
 	_width = int(options.get("width", DEFAULT_WIDTH))
 	_height = int(options.get("height", DEFAULT_HEIGHT))
+	for part in str(options.get("stills", "")).split(",", false):
+		if part.strip_edges().is_valid_int():
+			_stills.append(int(part.strip_edges()))
 
 	if _out_dir.is_empty():
 		_fail("--out-dir is required")
@@ -122,7 +131,8 @@ func _render_all() -> void:
 	for _i in WARMUP_DRAWS:
 		await RenderingServer.frame_post_draw
 
-	for index in _frame_count:
+	var wanted: Array = _stills if not _stills.is_empty() else range(_frame_count)
+	for index in wanted:
 		_viewer.seek_to_seconds(float(index) / _fps)
 		await RenderingServer.frame_post_draw
 
@@ -135,13 +145,14 @@ func _render_all() -> void:
 				index, image.get_width(), image.get_height(), _width, _height])
 			return
 
-		var path := _out_dir.path_join("frame_%06d.png" % index)
+		var prefix := "still" if not _stills.is_empty() else "frame"
+		var path := _out_dir.path_join("%s_%06d.png" % [prefix, index])
 		var error := image.save_png(path)
 		if error != OK:
 			_fail("frame %d: could not write %s (error %d)" % [index, path, error])
 			return
 
-		if index > 0 and index % PROGRESS_EVERY == 0:
+		if index > 0 and index % PROGRESS_EVERY == 0 and _stills.is_empty():
 			_report_progress(index, started)
 
 	_report_done(started)

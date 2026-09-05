@@ -1,0 +1,38 @@
+course: machine   racers: 10   seeds: 400
+
+=== BATCH HEALTH ===
+Races: 400   completed: 400   failures: 1
+Winner time: min 14.32s  mean 17.03s  max 20.29s   in 15-22s band: 98.8%
+Race duration: mean 23.25s  max 26.79s
+Racers finished: mean 8.39/10   recoveries 72   retirements 1
+
+=== RACE QUALITY ===
+Races analysed: 400  (decided: 400)
+Winner lock (fraction of winner race):  p10 0.38  median 0.90  p90 0.97  mean 0.77
+  locked before halfway: 18.0%   locked at/after 75%: 66.5%
+Winner lock (seconds): p10 6.00  median 14.92  p90 17.50
+At 10%: leader wins  13.2%   competitive 9.88   gap 1-2 0.003   gap 1-med 0.027   winner rank 4.53
+At 25%: leader wins  17.0%   competitive 9.48   gap 1-2 0.010   gap 1-med 0.039   winner rank 4.21
+At 50%: leader wins  40.8%   competitive 8.70   gap 1-2 0.021   gap 1-med 0.054   winner rank 2.90
+At 75%: leader wins  44.0%   competitive 3.54   gap 1-2 0.041   gap 1-med 0.171   winner rank 2.12
+Lead changes: mean 9.52  p10 5  median 9  p90 14
+Podium racers: mean 8.63  (set changes mean 17.1)
+Winner worst rank after 25%: mean 5.58   1:6  2:44  3:60  4:53  5:46  6:32  7:50  8:36  9:42  10:31
+Final margin: mean 0.86s  p10 0.15  median 0.56  p90 2.28
+Overtakes by third: 73.3 / 55.5 / 28.1
+
+Starting slot:
+  slot  starts   wins    win%   avg final   prog@25%   prog@50%
+     0     400     41   10.2%     5.93      0.266      0.436
+     1     400     29    7.2%     5.92      0.272      0.440
+     2     400     45   11.2%     5.75      0.272      0.441
+     3     400     39    9.8%     5.88      0.262      0.434
+     4     400     50   12.5%     5.48      0.269      0.440
+     5     400     39    9.8%     5.50      0.280      0.447
+     6     400     34    8.5%     5.58      0.272      0.443
+     7     400     44   11.0%     5.62      0.279      0.445
+     8     400     40   10.0%     5.33      0.280      0.449
+     9     400     39    9.8%     5.47      0.280      0.448
+  strongest slot 4 (12.5%)   weakest slot 1 (7.2%)   ratio 1.72x
+
+wrote docs/validation/race_v04/machine_400_r10.json

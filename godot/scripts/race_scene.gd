@@ -63,11 +63,22 @@ const VERIFY_HEIGHT := 40.0
 # Modest, because a wide lens on a portrait frame stretches the corners and
 # makes a racer at the edge of the course read as the wrong shape.
 const PROD_FOV := 40.0
-# Steep. A race course is six times longer than it is wide and a 9:16 frame
-# only gets its height back by looking down the length of it - the same reason
-# the duel's camera sits at 78 degrees over a square arena. Shallower than this
-# and most of the frame is spent on course the racers have already left.
-const PROD_ELEVATION_DEG := 74.0
+# How far above the course the lens sits, in degrees off the horizontal.
+#
+# V0.3 shot at 74 degrees on the argument that a course six times longer than
+# it is wide only gets its height back by looking down the length of it. The
+# argument is sound and the picture it produced was still wrong: at 74 degrees
+# a viewer sees the *plan* of the machine. Every vertical surface is edge-on,
+# nothing occludes anything, and a frame paused at random is indistinguishable
+# from a diagram - which is exactly the complaint the V0.4 brief opens with.
+#
+# The replacement was measured rather than argued: `tools/race_camera_test.py`
+# renders the same five moments of the same race at 45, 50, 55, 60 and 74 and
+# the frames are compared side by side. See `docs/race_v04.md` for what each
+# one looks like. `--race-elevation=` overrides this at render time, which is
+# how that sweep is produced and the only reason the constant is not simply
+# edited between runs.
+const PROD_ELEVATION_DEG := 52.0
 # Clearance past the course wall at the *nearest* visible ground point, in
 # world units. The near edge is the narrowest part of the view frustum where
 # it meets the ground, so fitting the course there fits it everywhere.
@@ -77,7 +88,7 @@ const PROD_EDGE_MARGIN := 0.25
 # leaders sit at `camera_y + 806`; aiming past them pushes the leaders below
 # centre and fills the top of the frame with the course they are about to
 # reach, which is the shot.
-const PROD_AIM_LEAD := 980.0
+const PROD_AIM_LEAD := 820.0
 
 # A gentle dolly. The camera pulls back when the field is strung out and
 # closes in when it is tight, which reads as the race breathing. Computed
@@ -98,26 +109,88 @@ const PROD_FINISH_SECONDS := 2.4
 # simulation's boundary is a flat 80px box, and drawing it flat leaves the
 # course reading as markings on a floor. Given real height it reads as a
 # channel, which is what a perspective camera is for.
-const WALL_HEIGHT := 1.35
-const RAMP_HEIGHT := 0.30
-const PEG_HEIGHT := 0.62
-const GATE_HEIGHT := 0.66
-const PAD_HEIGHT := 0.20
-const SPINNER_HUB_HEIGHT := 0.72
-const SPINNER_ARM_HEIGHT := 0.46
+const WALL_HEIGHT := 2.30
+const PEG_HEIGHT := 0.98
+const GATE_HEIGHT := 0.80
+const PAD_HEIGHT := 0.34
+const SPINNER_HUB_HEIGHT := 0.86
+const SPINNER_ARM_HEIGHT := 0.52
+
+# What the measuring lens draws everything that is not a racer at.
+#
+# A racer's centre sits one radius up, at 0.30 units. Anything drawn taller
+# than that and standing on the same spot wins the depth test straight down,
+# and the instrument loses the racer it was pointing at: a rotor arm 0.52 tall
+# hid racer 6 completely in five of thirty sampled frames of the V0.3
+# reference replay, in every case while it was riding an arm. The heights are
+# presentation - the solver's pieces are flat bars in a plane - so on this lens
+# they are flattened to well under a racer, and nothing can stand in front of
+# the thing being measured.
+const MEASURED_HEIGHT := 0.16
+
+# A travelling surface is a *beam*, and how deep a beam depends on how steep
+# it is. This is the single change that stopped the course reading as markings
+# on a floor: the simulation's pieces are all 26px-thick bars in a plane, and
+# drawn at one height they are all the same flat slab. Read as machinery they
+# are two different objects - a near-flat piece is a platform racers run along
+# and wants a deck's thickness, a near-vertical piece is a wall of the machine
+# and wants a wall's. The angle in the replay says which, so nothing here has
+# to know what a funnel or a divider is: the bowl's walls come out tall
+# because they are steep, and the shelves come out as decks because they lie
+# flat.
+const BEAM_HEIGHT := 0.62           # a flat platform
+const BEAM_WALL_HEIGHT := 1.55      # a vertical face
+# Below this a beam is not worth supporting; above it, it gets posts.
+const STRUT_MIN_LENGTH := 2.2
+const STRUT_SPACING := 2.4
+const STRUT_WIDTH := 0.20
+const STRUT_DROP := 1.5             # how far a post reaches below its beam
 
 # The lit line down the length of a travelling surface.
 const EDGE_INSET := 0.86
 const EDGE_THICKNESS := 0.055
 const EDGE_RISE := 0.012
 
-# Checkpoint bars: the course's rhythm. A thin lit line across the track at
-# every progress plane, so a viewer reads the course as a sequence of gates
-# rather than a slope. Drawn from exported checkpoint data, so a course this
-# viewer has never seen gets them for free - and a branch plane is drawn
-# across its corridor only, because that is the width it exists across.
+# --- the deck ------------------------------------------------------------
+#
+# The authoritative physics is two-dimensional: every piece of this course
+# lies in one plane, and the only reason the render has a vertical axis at all
+# is that nothing in the simulation uses it. So it is spent on the one thing a
+# flat course cannot show - that a marble machine is a stack of levels, and
+# that a racer moving down the course is descending through it.
+#
+# The mapping is a single monotone function of course height, applied to
+# *everything*: pieces, spinners, racers, trails, effects and the camera's aim
+# all read their vertical offset from `_deck()`. That is what keeps it
+# truthful. Two things at the same point on the course are at the same visual
+# height, so a racer can never appear to pass through geometry it is really
+# resting on, and because the function only ever decreases, visual descent and
+# course progress mean the same thing.
+#
+# It is invisible to the verification camera, which is orthographic and points
+# straight down: screen position there depends on X and Z only, so the
+# measuring lens sees exactly the picture it saw before.
+const DECK_TOTAL := 4.0             # units dropped from the first level to the last
+# Course pixels a step is blended over. Wide enough that no racer visibly
+# steps down, narrow enough that each level reads as a level.
+const DECK_BLEND := 300.0
+# How finely a long piece is cut up so it can follow the deck. A boundary wall
+# runs the whole length of the course and has to descend with everything else.
+const DECK_SEGMENT := 220.0
+
+# Checkpoint markers. In V0.3 every progress plane got a lit bar the full
+# width of the course, and the effect on a finished frame was the opposite of
+# what was wanted: a dozen glowing horizontal lines across the track read as
+# the diagram of a course rather than as a machine. Course progress is not
+# something a viewer needs drawn; it is something they can see.
+#
+# So in production a checkpoint is marked at the edges only - two short lit
+# studs let into the deck beside the track, which read as machine markings
+# rather than as gates. The full bar survives on the measuring lens, where
+# there is nobody to mislead and it is useful to see the ladder.
 const CHECKPOINT_HEIGHT := 0.035
 const CHECKPOINT_THICKNESS := 0.10
+const CHECKPOINT_STUD_WIDTH := 0.55
 const FINISH_BAR_HEIGHT := 0.09
 const FINISH_BAR_THICKNESS := 0.24
 const FINISH_POST_HEIGHT := 1.9
@@ -145,9 +218,20 @@ const PAD_FLARE := 4.5
 # begins. Cheap architecture that gives the run a beat, and it marks the
 # funnel - the moment the prototype course is built around - without this
 # file knowing what a funnel is.
-const PORTAL_HEIGHT := 1.55
-const PORTAL_WIDTH := 0.20
-const PORTAL_DEPTH := 0.34
+const PORTAL_HEIGHT := 3.55
+const PORTAL_WIDTH := 0.30
+const PORTAL_DEPTH := 0.46
+# Two posts, no lintel. A gantry with a beam across it looked like the right
+# idea and produced the wrong picture - see `_build_section_portals`. The
+# posts alone still mark the boundary, still give the frame something near the
+# lens to sweep past, and cross nothing.
+# The riser: the vertical face of the step down to the next level. Without it
+# the deck change is a slope nobody can see; with it, the machine has floors.
+# Drawn as two wings from the walls inwards rather than across the track, so
+# it never stands between the lens and a racer.
+const RISER_HEIGHT := 0.52
+const RISER_DEPTH := 0.30
+const RISER_SPAN := 0.62        # share of a half-width each wing covers
 
 # --- racers ---------------------------------------------------------------
 
@@ -172,17 +256,35 @@ const SQUASH_MAX := 0.30
 
 # --- environment ----------------------------------------------------------
 
-const COURSE_FLOOR_DROP := 0.12
-const COURSE_FLOOR_THICKNESS := 0.5
+const COURSE_FLOOR_DROP := 0.55
+const COURSE_FLOOR_THICKNESS := 1.1
+# Recessed rails down the deck, as fractions of a half-width from the centre.
+const FLOOR_RAIL_X := [-0.72, -0.30, 0.30, 0.72]
+const FLOOR_RAIL_SIZE := Vector2(0.30, 0.07)
 const SIDE_STRUCTURE_GAP := 1.0       # units outside the course wall
 const SIDE_STRUCTURE_WIDTH := 2.6
-const SIDE_STRUCTURE_TOP := 3.2
-const SIDE_STRUCTURE_BOTTOM := -2.4
+const SIDE_STRUCTURE_TOP := 3.4
+const SIDE_STRUCTURE_BOTTOM := -3.6
 const STRIP_HEIGHT := 0.10
 const STRIP_DEPTH := 0.12
-const DEEP_FLOOR_DROP := 7.0
-const RIB_SPACING := 6.0              # world units between structural ribs
-const RIB_SIZE := Vector3(0.34, 1.10, 0.5)
+const DEEP_FLOOR_DROP := 8.0
+const RIB_SPACING := 4.0              # world units between structural ribs
+const RIB_SIZE := Vector3(0.40, 2.30, 0.55)
+# A second rank of ribs, taller and nearer the lens than the first. Two ranks
+# at different distances is the cheapest parallax there is: at a 50 degree
+# elevation the near rank crosses the frame in half the time the far one
+# takes, and that difference is the cue that tells a viewer the picture has
+# depth rather than being a drawing of it.
+const RIB_NEAR_SPACING := 7.0
+const RIB_NEAR_SIZE := Vector3(0.5, 3.4, 0.7)
+const RIB_NEAR_OFFSET := 0.55         # units further out than the far rank
+# How far the room runs past each end of the course, in course pixels. The
+# machine has to continue past the finish or the top of the frame is a void:
+# at 52 degrees the lens sees a long way down the course, and when it runs out
+# there is nothing behind it but the background colour. Carried far enough
+# that the fog closes over it instead.
+const ROOM_OVERRUN_TOP := 1400.0
+const ROOM_OVERRUN_BOTTOM := 3200.0
 
 # --- playback -------------------------------------------------------------
 
@@ -213,6 +315,15 @@ var camera_mode := CAMERA_PRODUCTION
 # So the measuring lens gets flat unshaded racers, no glow, no trails, no
 # effects and no deformation. Same course, same transforms, same frames - only
 # the presentation is gone, and what is left is the thing being measured.
+#
+# V0.4 extends that to anything *standing over* the track as well as anything
+# drawn on it. A gantry post, a pinch gate and a finish post are all several
+# times a racer's height and sit at the course edges, and straight down they
+# cover the exact lane a racer running along the wall is in: racer 6 went
+# unmeasurable in five of thirty sampled frames until they were switched off,
+# every time while it was hugging the left-hand side. None of them exists in
+# the simulation, so none of them may stand between the instrument and the
+# thing it is measuring.
 var _measuring := false
 
 var _replay: Dictionary = {}
@@ -230,8 +341,15 @@ var _hud: CanvasLayer
 var _trails: Node3D
 var _vfx: Node3D
 
+# Where each level of the machine begins, in course pixels, and how far the
+# deck has dropped by then. Built once from the course's own sections, so a
+# course this file has never seen gets its levels for free.
+var _deck_steps: Array[float] = []
+var _deck_drop := 0.0
+
 var _prod_offset := Vector3.ZERO
 var _prod_distance := 0.0
+var _prod_elevation := PROD_ELEVATION_DEG
 var _final_tick := 0.0
 var _winner_tick := -1.0
 
@@ -283,6 +401,7 @@ func build(replay: Dictionary, mode := CAMERA_PRODUCTION) -> void:
 	_winner_tick = _find_winner_tick()
 
 	_palette = RaceMaterials.new()
+	_build_deck()
 
 	_build_environment()
 	_build_lights()
@@ -338,8 +457,38 @@ func to_world(sim_x: float, sim_y: float, height: float) -> Vector3:
 	## replay without an offset in between.
 	return Vector3(
 		(sim_x - _course_width * 0.5) / PIXELS_PER_UNIT,
-		height,
+		height + _deck(sim_y),
 		sim_y / PIXELS_PER_UNIT)
+
+
+func _deck(sim_y: float) -> float:
+	## How far the machine has stepped down by this point on the course.
+	##
+	## Smoothstepped across each boundary rather than stepped at it, so a
+	## racer crossing between two levels descends over a third of a second
+	## instead of teleporting a metre downwards. Monotone by construction:
+	## every term is non-increasing in `sim_y`, so visual height and course
+	## progress can never disagree about which way is forward.
+	if _deck_steps.is_empty():
+		return 0.0
+	var total := 0.0
+	for boundary in _deck_steps:
+		total += smoothstep(
+			boundary - DECK_BLEND * 0.5, boundary + DECK_BLEND * 0.5, sim_y)
+	return -_deck_drop * total
+
+
+func _build_deck() -> void:
+	## One level per named section of the course, and nothing hard-coded.
+	var sections: Array = _course.get("sections", [])
+	_deck_steps.clear()
+	for raw in sections:
+		var section: Dictionary = raw
+		var top := float(section.get("top", 0.0))
+		if top > _course_top + 1.0:
+			_deck_steps.append(top)
+	_deck_drop = 0.0 if _deck_steps.is_empty() \
+		else DECK_TOTAL / float(_deck_steps.size())
 
 
 func to_units(pixels: float) -> float:
@@ -401,10 +550,19 @@ func _build_environment() -> void:
 
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
 	environment.ambient_light_sky_contribution = 1.0
-	environment.ambient_light_energy = 0.85
+	environment.ambient_light_energy = 1.20
 	environment.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
 
-	environment.tonemap_mode = Environment.TONE_MAPPER_ACES
+	# ACES for the picture, and nothing at all for the instrument.
+	#
+	# A tone curve is a deliberate distortion of colour, which is exactly what
+	# a production frame wants and exactly what a measurement must not have.
+	# Under ACES a flat unshaded racer does not reach the PNG as its own
+	# colour - red (235, 72, 72) arrives as (239, 0, 21) - and
+	# `verify_race_render.py` finds a racer by looking for its colour. Linear,
+	# with the albedo converted out of sRGB where it is set, the pixel is the
+	# number the replay carries.
+	environment.tonemap_mode = Environment.TONE_MAPPER_LINEAR if _measuring 		else Environment.TONE_MAPPER_ACES
 	environment.tonemap_white = 2.2
 	environment.tonemap_exposure = 1.0
 
@@ -468,7 +626,7 @@ func _build_lights() -> void:
 	var key := DirectionalLight3D.new()
 	key.name = "KeyLight"
 	key.light_color = Color(1.0, 0.96, 0.90)
-	key.light_energy = 2.1
+	key.light_energy = 2.35
 	key.light_specular = 1.0
 	key.shadow_enabled = true
 	key.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
@@ -487,7 +645,7 @@ func _build_lights() -> void:
 	var fill := DirectionalLight3D.new()
 	fill.name = "FillLight"
 	fill.light_color = Color(0.42, 0.62, 1.0)
-	fill.light_energy = 0.55
+	fill.light_energy = 0.85
 	fill.light_specular = 0.25
 	fill.shadow_enabled = false
 	fill.rotation_degrees = Vector3(-24.0, -132.0, 0.0)
@@ -509,21 +667,56 @@ func _build_lights() -> void:
 func _build_course_floor() -> void:
 	## The slab the course stands on, and what its shadows land on.
 	var mesh := BoxMesh.new()
+	mesh.size = Vector3(to_units(_course_width) + 0.6, COURSE_FLOOR_THICKNESS, 1.0)
+	var rail_mesh := BoxMesh.new()
+
+	# Cut into slabs so the floor descends with the machine standing on it.
+	# One slab spanning the whole course would sit at one height and every
+	# level but the middle one would float above it or be swallowed by it.
+	var root := Node3D.new()
+	root.name = "CourseFloor"
+	add_child(root)
+
+	var floor_top := _course_top - ROOM_OVERRUN_TOP
+	var floor_bottom := _course_bottom + ROOM_OVERRUN_BOTTOM
+	var slabs := maxi(1, int((floor_bottom - floor_top) / 400.0))
+	var slab_span := (floor_bottom - floor_top) / float(slabs)
 	mesh.size = Vector3(
 		to_units(_course_width) + 0.6,
 		COURSE_FLOOR_THICKNESS,
-		to_units(_course_bottom - _course_top) + 0.6)
+		to_units(slab_span) + 0.05)
+	rail_mesh.size = Vector3(
+		FLOOR_RAIL_SIZE.x, FLOOR_RAIL_SIZE.y, to_units(slab_span) + 0.05)
+	for index in slabs:
+		var y := floor_top + (float(index) + 0.5) * slab_span
+		var node := MeshInstance3D.new()
+		node.name = "Slab%d" % index
+		node.mesh = mesh
+		node.material_override = _palette.structure()
+		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		node.position = to_world(
+			_course_width * 0.5, y,
+			-COURSE_FLOOR_DROP - COURSE_FLOOR_THICKNESS * 0.5)
+		root.add_child(node)
 
-	var node := MeshInstance3D.new()
-	node.name = "CourseFloor"
-	node.mesh = mesh
-	node.material_override = _palette.structure()
-	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	node.position = to_world(
-		_course_width * 0.5,
-		(_course_top + _course_bottom) * 0.5,
-		-COURSE_FLOOR_DROP - COURSE_FLOOR_THICKNESS * 0.5)
-	add_child(node)
+		if _measuring:
+			continue
+		# Rails let into the deck, running *along* the course rather than
+		# across it. Along matters: anything drawn across the track reads as a
+		# rung and puts the frame back in diagram territory, while a line down
+		# the direction of travel is what a machined floor actually looks like
+		# - and, moving under the lens at the deck's own rate, it is a third
+		# distance for the eye to compare the walls and the near ribs against.
+		for lane in FLOOR_RAIL_X:
+			var rail := MeshInstance3D.new()
+			rail.name = "Rail%d_%d" % [index, int(lane * 10.0)]
+			rail.mesh = rail_mesh
+			rail.material_override = _palette.structure(true)
+			rail.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			rail.position = node.position + Vector3(
+				lane * to_units(_course_width) * 0.5,
+				COURSE_FLOOR_THICKNESS * 0.5 + FLOOR_RAIL_SIZE.y * 0.5, 0.0)
+			root.add_child(rail)
 
 
 func _build_side_structures() -> void:
@@ -535,8 +728,10 @@ func _build_side_structures() -> void:
 	## they do the whole job of making the course a place rather than a shape
 	## on a black background. They also give the perspective camera something
 	## to run past, which is most of what sells speed.
-	var length := to_units(_course_bottom - _course_top) + 4.0
-	var centre_z := (_course_top + _course_bottom) * 0.5
+	var room_top := _course_top - ROOM_OVERRUN_TOP
+	var room_bottom := _course_bottom + ROOM_OVERRUN_BOTTOM
+	var length := to_units(room_bottom - room_top)
+	var centre_z := (room_top + room_bottom) * 0.5
 	var offset := to_units(_course_width) * 0.5 + SIDE_STRUCTURE_GAP
 	var height := SIDE_STRUCTURE_TOP - SIDE_STRUCTURE_BOTTOM
 
@@ -544,34 +739,45 @@ func _build_side_structures() -> void:
 	root.name = "Environment"
 	add_child(root)
 
-	for side in [-1.0, 1.0]:
-		var wall := BoxMesh.new()
-		wall.size = Vector3(SIDE_STRUCTURE_WIDTH, height, length)
-		var node := MeshInstance3D.new()
-		node.name = "SideWall%d" % int(side)
-		node.mesh = wall
-		node.material_override = _palette.structure()
-		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		node.position = Vector3(
-			side * (offset + SIDE_STRUCTURE_WIDTH * 0.5),
-			SIDE_STRUCTURE_BOTTOM + height * 0.5,
-			to_units(centre_z))
-		root.add_child(node)
+	# Cut into runs, so the room descends with the machine inside it. A
+	# single wall the length of the course would cross every level and the
+	# whole point of the deck - that there are levels - would be lost behind
+	# one continuous horizontal line down the side of the frame.
+	var runs := maxi(1, int((room_bottom - room_top) / 500.0))
+	var run_span := (room_bottom - room_top) / float(runs)
+	var wall := BoxMesh.new()
+	wall.size = Vector3(SIDE_STRUCTURE_WIDTH, height, to_units(run_span) + 0.05)
+	var strip := BoxMesh.new()
+	strip.size = Vector3(STRIP_DEPTH, STRIP_HEIGHT, to_units(run_span) + 0.05)
 
-		var strip := BoxMesh.new()
-		strip.size = Vector3(STRIP_DEPTH, STRIP_HEIGHT, length)
-		var lit := MeshInstance3D.new()
-		lit.name = "SideStrip%d" % int(side)
-		lit.mesh = strip
-		lit.material_override = _palette.light_strip()
-		lit.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		lit.position = Vector3(
-			side * (offset + STRIP_DEPTH * 0.5),
-			SIDE_STRUCTURE_TOP - 0.35,
-			to_units(centre_z))
-		root.add_child(lit)
+	for side in [-1.0, 1.0]:
+		for index in runs:
+			var y := room_top + (float(index) + 0.5) * run_span
+			var drop := _deck(y)
+			var node := MeshInstance3D.new()
+			node.name = "SideWall%d_%d" % [int(side), index]
+			node.mesh = wall
+			node.material_override = _palette.structure()
+			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			node.position = Vector3(
+				side * (offset + SIDE_STRUCTURE_WIDTH * 0.5),
+				drop + SIDE_STRUCTURE_BOTTOM + height * 0.5,
+				to_units(y))
+			root.add_child(node)
+
+			var lit := MeshInstance3D.new()
+			lit.name = "SideStrip%d_%d" % [int(side), index]
+			lit.mesh = strip
+			lit.material_override = _palette.light_strip()
+			lit.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			lit.position = Vector3(
+				side * (offset + STRIP_DEPTH * 0.5),
+				drop + SIDE_STRUCTURE_TOP - 0.35,
+				to_units(y))
+			root.add_child(lit)
 
 	_build_ribs(root, offset, length, centre_z)
+	_build_near_ribs(root, offset)
 	_build_deep_floor(root, length, centre_z)
 
 
@@ -598,19 +804,65 @@ func _build_ribs(root: Node3D, offset: float, length: float, centre_z: float) ->
 	var start := to_units(centre_z) - length * 0.5
 	for index in count:
 		var z := start + float(index) * RIB_SPACING
+		var drop := _deck(z * PIXELS_PER_UNIT)
 		for side_index in 2:
 			var side := -1.0 if side_index == 0 else 1.0
 			multi.set_instance_transform(
 				index * 2 + side_index,
 				Transform3D(Basis(), Vector3(
 					side * (offset - RIB_SIZE.x * 0.5),
-					SIDE_STRUCTURE_TOP - 1.4,
+					drop + SIDE_STRUCTURE_TOP - 2.1,
 					z)))
 
 	var node := MultiMeshInstance3D.new()
 	node.name = "Ribs"
 	node.multimesh = multi
 	node.material_override = _palette.structure(true)
+	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	root.add_child(node)
+
+
+func _build_near_ribs(root: Node3D, offset: float) -> void:
+	## A second rank of ribs, taller and further out than the first.
+	##
+	## This exists for one reason and it is worth stating plainly: parallax.
+	## A tilted lens moving down a course sweeps near geometry across the
+	## frame far faster than distant geometry, and a viewer reads that
+	## difference as depth without ever thinking about it. One rank of ribs
+	## gives a rate; two ranks at different distances give a *comparison*,
+	## which is the actual cue. They are placed outside the course walls and
+	## well above the racing surface, so nothing they do can hide a racer.
+	if _measuring:
+		return
+	var span := (_course_bottom + ROOM_OVERRUN_BOTTOM) 		- (_course_top - ROOM_OVERRUN_TOP)
+	var count := int(to_units(span) / RIB_NEAR_SPACING)
+	if count < 2:
+		return
+
+	var mesh := BoxMesh.new()
+	mesh.size = RIB_NEAR_SIZE
+
+	var multi := MultiMesh.new()
+	multi.transform_format = MultiMesh.TRANSFORM_3D
+	multi.mesh = mesh
+	multi.instance_count = count * 2
+
+	for index in count:
+		var z := to_units(_course_top - ROOM_OVERRUN_TOP) 			+ float(index) * RIB_NEAR_SPACING
+		var drop := _deck(z * PIXELS_PER_UNIT)
+		for side_index in 2:
+			var side := -1.0 if side_index == 0 else 1.0
+			multi.set_instance_transform(
+				index * 2 + side_index,
+				Transform3D(Basis(), Vector3(
+					side * (offset + RIB_NEAR_OFFSET + RIB_NEAR_SIZE.x * 0.5),
+					drop + SIDE_STRUCTURE_TOP - 1.0,
+					z)))
+
+	var node := MultiMeshInstance3D.new()
+	node.name = "NearRibs"
+	node.multimesh = multi
+	node.material_override = _palette.structure()
 	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	root.add_child(node)
 
@@ -626,7 +878,8 @@ func _build_deep_floor(root: Node3D, length: float, centre_z: float) -> void:
 	node.mesh = mesh
 	node.material_override = _palette.floor_deep()
 	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	node.position = Vector3(0.0, -DEEP_FLOOR_DROP, to_units(centre_z))
+	node.position = Vector3(
+		0.0, -DEEP_FLOOR_DROP - DECK_TOTAL * 0.5, to_units(centre_z))
 	root.add_child(node)
 
 
@@ -684,7 +937,8 @@ func _build_production_camera() -> void:
 	_camera.projection = Camera3D.PROJECTION_PERSPECTIVE
 	_camera.keep_aspect = Camera3D.KEEP_HEIGHT
 	_camera.fov = PROD_FOV
-	_camera.far = 220.0
+	_camera.far = 260.0
+	_prod_elevation = _elevation_argument()
 
 	var viewport_width := float(ProjectSettings.get_setting(
 		"display/window/size/viewport_width", 1080))
@@ -692,7 +946,7 @@ func _build_production_camera() -> void:
 		"display/window/size/viewport_height", 1920))
 	var half_v := deg_to_rad(PROD_FOV * 0.5)
 	var half_h := atan(tan(half_v) * viewport_width / viewport_height)
-	var elevation := deg_to_rad(PROD_ELEVATION_DEG)
+	var elevation := deg_to_rad(_prod_elevation)
 
 	var needed := to_units(_course_width) * 0.5 + PROD_EDGE_MARGIN
 	var shrink := 1.0 - tan(half_v) / tan(elevation)
@@ -717,12 +971,32 @@ func _update_camera(frame: Dictionary, next_frame: Dictionary, blend: float,
 			0.0, VERIFY_HEIGHT, to_units(top + VIEW_HEIGHT * 0.5))
 		return
 
-	var aim := Vector3(0.0, 0.0, to_units(top + PROD_AIM_LEAD))
+	# The aim point rides the deck, so a camera looking at the machine keeps
+	# looking at the machine as it steps down rather than gradually pointing
+	# over the top of it.
+	var aim_y := top + PROD_AIM_LEAD
+	var aim := Vector3(0.0, _deck(aim_y), to_units(aim_y))
 	var dolly := 1.0 + _spread_pull(index) - _finish_push(tick)
 	_camera.position = aim + _prod_offset * dolly
 	_camera.look_at(aim, Vector3.UP)
 	# Applied after the aim, so a jolt moves the lens without re-pointing it.
 	_camera.position += _vfx.camera_shake(tick)
+
+
+func _elevation_argument() -> float:
+	## `--race-elevation=50` shoots this render at fifty degrees.
+	##
+	## A render-time override rather than an edit to the constant, because the
+	## whole point of the sweep is that the five candidate frames come out of
+	## one build of one scene from one replay: anything else and the thing
+	## being compared is not only the lens.
+	for argument in OS.get_cmdline_user_args():
+		var arg: String = argument
+		if arg.begins_with("--race-elevation="):
+			var value := arg.substr(17).to_float()
+			if value >= 20.0 and value <= 89.0:
+				return value
+	return PROD_ELEVATION_DEG
 
 
 func _spread_pull(index: int) -> float:
@@ -811,75 +1085,240 @@ func _build_pieces() -> void:
 
 func _build_peg(root: Node3D, spec: Dictionary, role: String,
 		physical: String) -> void:
+	## A post standing on the deck, not a disc lying on it.
+	##
+	## Three parts, because that is what makes a cylinder read as a machined
+	## object rather than as a circle: a flared base that seats it in the
+	## deck, a shaft, and a lit cap. The cap is also the only part of a peg a
+	## racer ever touches at speed, so lighting it says something true.
 	var radius := to_units(float(spec.get("radius", 0.0)))
+	var x := float(spec.get("x", 0.0))
+	var y := float(spec.get("y", 0.0))
+
+	var pivot := Node3D.new()
+	pivot.name = "Peg%d" % int(spec.get("id", 0))
+	pivot.position = to_world(x, y, 0.0)
+	root.add_child(pivot)
+
+	# The flare is wider than the peg the solver used, so it is presentation
+	# and it is left off the measuring lens. Straight down, a base at 1.22x
+	# the radius covers ground the collision shape does not - and it covered
+	# enough of a racer standing beside one that the alignment check could no
+	# longer find it.
+	if not _measuring:
+		var base := CylinderMesh.new()
+		base.top_radius = radius * 1.02
+		base.bottom_radius = radius * 1.22
+		base.height = PEG_HEIGHT * 0.22
+		base.radial_segments = 20
+		var base_node := MeshInstance3D.new()
+		base_node.name = "Base"
+		base_node.mesh = base
+		base_node.material_override = _palette.structure()
+		base_node.position = Vector3(0.0, PEG_HEIGHT * 0.11, 0.0)
+		pivot.add_child(base_node)
+
+	var height := MEASURED_HEIGHT if _measuring else PEG_HEIGHT
 	var mesh := CylinderMesh.new()
 	mesh.top_radius = radius
-	mesh.bottom_radius = radius * 0.86
-	mesh.height = PEG_HEIGHT
+	mesh.bottom_radius = radius if _measuring else radius * 1.02
+	mesh.height = height
 	mesh.radial_segments = 20
-
 	var node := MeshInstance3D.new()
-	node.name = "Peg%d" % int(spec.get("id", 0))
+	node.name = "Shaft"
 	node.mesh = mesh
 	node.material_override = _palette.surface(role, physical)
-	node.position = to_world(
-		float(spec.get("x", 0.0)), float(spec.get("y", 0.0)), PEG_HEIGHT * 0.5)
-	root.add_child(node)
+	node.position = Vector3(0.0, height * 0.5, 0.0)
+	pivot.add_child(node)
+
+	if _measuring:
+		return
+	var cap := CylinderMesh.new()
+	cap.top_radius = radius * 0.72
+	cap.bottom_radius = radius * 0.94
+	cap.height = PEG_HEIGHT * 0.13
+	cap.radial_segments = 20
+	var cap_node := MeshInstance3D.new()
+	cap_node.name = "Cap"
+	cap_node.mesh = cap
+	cap_node.material_override = _palette.edge(physical)
+	cap_node.position = Vector3(0.0, PEG_HEIGHT * 1.02, 0.0)
+	cap_node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	pivot.add_child(cap_node)
 
 
 func _build_box(root: Node3D, spec: Dictionary, role: String,
 		physical: String) -> void:
-	var width := to_units(float(spec.get("width", 0.0)))
-	var depth := to_units(float(spec.get("height", 0.0)))
-	var height := _box_height(role)
+	## One solid piece, cut into as many segments as the deck needs.
+	##
+	## The simulation's piece is a single rotated bar. Drawn as one mesh it
+	## can only sit at one height, and a bar that runs a thousand pixels down
+	## the course would either float above the level below it or sink into the
+	## one above. So a piece is cut along its own length into segments short
+	## enough that each can take the deck height at its own midpoint and tilt
+	## to meet its neighbours. A short piece is one segment and this costs
+	## nothing; a boundary wall is thirty and follows the machine down.
+	##
+	## Nothing about the collision shape changes. The union of the segments is
+	## the bar the solver used, to within the tilt - which is a fraction of a
+	## degree except where the deck is actually stepping.
+	var length := float(spec.get("width", 0.0))
+	var thickness := float(spec.get("height", 0.0))
+	var angle := deg_to_rad(float(spec.get("rotation_degrees", 0.0)))
+	var centre_x := float(spec.get("x", 0.0))
+	var centre_y := float(spec.get("y", 0.0))
+	var height := _box_height(role, angle)
+	var piece_id := int(spec.get("id", 0))
 
 	var pivot := Node3D.new()
-	pivot.name = "Piece%d" % int(spec.get("id", 0))
-	pivot.position = to_world(
-		float(spec.get("x", 0.0)), float(spec.get("y", 0.0)), 0.0)
-	# Simulation y becomes world Z, which mirrors the plane, so a rotation
-	# that turns one way in simulation coordinates turns the other way here.
-	# Negating it is what puts a ramp where the replay says it is.
-	pivot.rotation_degrees = Vector3(
-		0.0, -float(spec.get("rotation_degrees", 0.0)), 0.0)
+	pivot.name = "Piece%d" % piece_id
 	root.add_child(pivot)
 
-	var slab := BoxMesh.new()
-	slab.size = Vector3(width, height, depth)
-	var body := MeshInstance3D.new()
-	body.name = "Body"
-	body.mesh = slab
-	body.position = Vector3(0.0, height * 0.5, 0.0)
-	pivot.add_child(body)
-
-	var piece_id := int(spec.get("id", 0))
+	# How much course the piece spans vertically decides how finely it is cut.
+	var span := absf(sin(angle)) * length
+	var cuts := maxi(1, int(ceil(span / DECK_SEGMENT)))
+	var step := length / float(cuts)
+	var material: StandardMaterial3D = _palette.surface(role, physical)
 	if role == "jump_pad":
-		# Its own material, not the shared one. A pad has to be able to flare
-		# on the tick it launches somebody without dragging every other pad
-		# on the course up with it.
-		var pad: StandardMaterial3D = _palette.surface(role, physical).duplicate()
-		body.material_override = pad
-		_pad_materials[piece_id] = pad
-		_pad_base_energy[piece_id] = pad.emission_energy_multiplier
-		return
+		# Its own material, not the shared one: a pad has to be able to flare
+		# on the tick it launches somebody without dragging every other pad on
+		# the course up with it.
+		material = material.duplicate()
+		_pad_materials[piece_id] = material
+		_pad_base_energy[piece_id] = material.emission_energy_multiplier
 
-	body.material_override = _palette.surface(role, physical)
+	for index in cuts:
+		var offset := (float(index) + 0.5) * step - length * 0.5
+		var seg_x := centre_x + offset * cos(angle)
+		var seg_y := centre_y + offset * sin(angle)
+		var half := step * 0.5
+		var back_y := seg_y - half * sin(angle)
+		var front_y := seg_y + half * sin(angle)
+		# The deck at each end of this segment. Tilting to join them is what
+		# keeps a cut piece a continuous surface rather than a staircase.
+		var rise := _deck(front_y) - _deck(back_y)
+		var seg_length := to_units(step)
+
+		var seat := Node3D.new()
+		seat.name = "Seg%d" % index
+		seat.position = to_world(seg_x, seg_y, 0.0)
+		# Simulation y becomes world Z, which mirrors the plane, so a rotation
+		# that turns one way in simulation coordinates turns the other way
+		# here. Negating it is what puts a ramp where the replay says it is.
+		seat.rotation_degrees = Vector3(0.0, -rad_to_deg(angle), 0.0)
+		pivot.add_child(seat)
+
+		var tilt := Node3D.new()
+		tilt.name = "Tilt"
+		# About local Z, after the yaw, so the beam's own length axis rises to
+		# meet the deck instead of the whole piece leaning sideways.
+		tilt.rotation = Vector3(0.0, 0.0, atan2(rise, maxf(seg_length, 0.001)))
+		seat.add_child(tilt)
+
+		var slab := BoxMesh.new()
+		slab.size = Vector3(seg_length, height, to_units(thickness))
+		var body := MeshInstance3D.new()
+		body.name = "Body"
+		body.mesh = slab
+		body.material_override = material
+		# Hung below the deck line rather than standing on it: a racer runs
+		# along the *top* of a simulation bar, so the top of the drawn beam is
+		# where the bar is and all of the depth is underneath, where it cannot
+		# lift a racer off its surface.
+		body.position = Vector3(0.0, -height * 0.5, 0.0)
+		tilt.add_child(body)
+
+		if role == "jump_pad" or role == "gate" or _measuring:
+			continue
+		_build_beam_edge(tilt, seg_length, to_units(thickness), height)
+
 	if role == "gate":
 		_gate_nodes.append(pivot)
 		return
+	if role == "jump_pad" or _measuring:
+		return
+	_build_struts(pivot, spec, angle, length, height)
 
+
+func _build_beam_edge(tilt: Node3D, seg_length: float, depth: float,
+		height: float) -> void:
+	## A lit line along the top of the beam and a dark web down its side.
+	##
+	## The lit line is the racing surface, which is the one part of a piece a
+	## viewer has to be able to read instantly. The web is what stops a deep
+	## beam looking like a solid block: a machine is built out of members with
+	## faces, and one darker inset face down the length of each is enough to
+	## say so.
 	var strip := BoxMesh.new()
-	strip.size = Vector3(width * EDGE_INSET, EDGE_THICKNESS, depth * 0.30)
+	strip.size = Vector3(seg_length * EDGE_INSET, EDGE_THICKNESS, depth * 0.34)
 	var edge := MeshInstance3D.new()
 	edge.name = "Edge"
 	edge.mesh = strip
-	edge.material_override = _palette.edge(physical)
-	edge.position = Vector3(0.0, height + EDGE_RISE, 0.0)
+	edge.material_override = _palette.edge("track")
+	edge.position = Vector3(0.0, EDGE_RISE, 0.0)
 	edge.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	pivot.add_child(edge)
+	tilt.add_child(edge)
+
+	if height < BEAM_HEIGHT * 0.9:
+		return
+	var web := BoxMesh.new()
+	web.size = Vector3(seg_length * 0.94, height * 0.46, depth * 1.06)
+	var web_node := MeshInstance3D.new()
+	web_node.name = "Web"
+	web_node.mesh = web
+	web_node.material_override = _palette.structure(true)
+	web_node.position = Vector3(0.0, -height * 0.56, 0.0)
+	web_node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	tilt.add_child(web_node)
 
 
-func _box_height(role: String) -> float:
+func _build_struts(pivot: Node3D, spec: Dictionary, angle: float,
+		length: float, height: float) -> void:
+	## Posts under a platform, so it stands on something.
+	##
+	## Only under pieces that are flat enough to read as platforms - a wall
+	## does not need legs - and only if they are long enough for a post to be
+	## more than clutter. Cheap, and the single most effective depth cue in
+	## the frame after the deck itself: a slab with air and a shadow beneath
+	## it is unmistakably an object, where the same slab flat on a floor is a
+	## marking.
+	if absf(sin(angle)) > 0.55:
+		return
+	var units := to_units(length)
+	if units < STRUT_MIN_LENGTH:
+		return
+	var count := maxi(2, int(units / STRUT_SPACING))
+	var centre_x := float(spec.get("x", 0.0))
+	var centre_y := float(spec.get("y", 0.0))
+	var mesh := BoxMesh.new()
+	mesh.size = Vector3(STRUT_WIDTH, STRUT_DROP, STRUT_WIDTH)
+
+	for index in count:
+		var t := (float(index) + 0.5) / float(count)
+		var offset := (t - 0.5) * length
+		var post := MeshInstance3D.new()
+		post.name = "Strut%d" % index
+		post.mesh = mesh
+		post.material_override = _palette.structure()
+		post.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		post.position = to_world(
+			centre_x + offset * cos(angle),
+			centre_y + offset * sin(angle),
+			-height - STRUT_DROP * 0.5)
+		pivot.add_child(post)
+
+
+func _box_height(role: String, angle: float) -> float:
+	## How deep to draw a piece, from how steep the simulation made it.
+	##
+	## The replay has no idea what a wall is - every piece is a bar with an
+	## angle - so the angle is what decides. A near-vertical bar is a face of
+	## the machine and is drawn as one; a near-flat bar is something racers
+	## run along and is drawn as a deck. Nothing here needs to know that this
+	## particular course has a bowl in it, which is why the prototype and the
+	## split course get the same treatment for free.
+	if _measuring:
+		return MEASURED_HEIGHT
 	match role:
 		"wall":
 			return WALL_HEIGHT
@@ -887,43 +1326,118 @@ func _box_height(role: String) -> float:
 			return GATE_HEIGHT
 		"jump_pad":
 			return PAD_HEIGHT
-	return RAMP_HEIGHT
+	return lerpf(BEAM_HEIGHT, BEAM_WALL_HEIGHT, absf(sin(angle)))
 
 
 func _build_section_portals(root: Node3D) -> void:
-	## A pair of lit posts where each named stretch of course begins.
+	## A gantry and a riser wherever the machine steps down a level.
 	##
-	## Course sections are exported, so this needs no idea what a funnel or a
-	## chaos section is - it marks wherever the course says one starts. The
-	## effect is architecture: the run stops being a slope and becomes a
-	## sequence of rooms, and the moments the course was designed around get
-	## announced a beat before they arrive.
+	## Course sections are exported, so this needs no idea what a bowl or a
+	## carousel is - it builds a doorway wherever the course says one stretch
+	## ends and the next begins, and those are exactly the heights `_deck()`
+	## steps at. The two together are what turn a run down a slope into a
+	## descent through a building:
+	##
+	## The **riser** is the vertical face of the step. It is the piece of
+	## geometry that makes the level change legible instead of merely present
+	## - without it the deck drops smoothly and reads as a camera drift.
+	##
+	## The **gantry** is a pair of posts and a beam across the top of them.
+	## It stands well above the racing surface so it never hides anybody, and
+	## because it is close to the lens and the course behind it is not, it is
+	## where most of the frame's parallax comes from: the beam sweeps over the
+	## top of the picture while the course slides under it at a quite
+	## different rate, which is the cue that says this is a space.
 	var sections: Array = _course.get("sections", [])
-	if sections.size() < 2:
+	if sections.size() < 2 or _measuring:
 		return
 
 	var half := to_units(_course_width) * 0.5
-	var mesh := BoxMesh.new()
-	mesh.size = Vector3(PORTAL_WIDTH, PORTAL_HEIGHT, PORTAL_DEPTH)
+	var post_mesh := BoxMesh.new()
+	post_mesh.size = Vector3(PORTAL_WIDTH, PORTAL_HEIGHT, PORTAL_DEPTH)
 
-	for raw in sections:
-		var section: Dictionary = raw
+	for index in sections.size():
+		var section: Dictionary = sections[index]
 		var top := float(section.get("top", 0.0))
-		# The first section starts at the top of the course, where a portal
+		# The first section starts at the top of the course, where a gantry
 		# would only frame the ceiling.
 		if top <= _course_top + 1.0:
 			continue
+
+		var zone := _zone_material(index)
+		var pivot := Node3D.new()
+		pivot.name = "Portal_%s" % str(section.get("name", "?"))
+		pivot.position = to_world(_course_width * 0.5, top, 0.0)
+		root.add_child(pivot)
+
+		if not _measuring:
+			# The step face, in two wings with the middle left open.
+			#
+			# A step across the whole width was the first thing tried and it
+			# was wrong twice over. It read as a rung - nine of them down the
+			# frame, which is the schematic look this render exists to get
+			# away from - and, worse, it stood between the lens and the track
+			# behind it: a racer arriving at a boundary spent half a second
+			# hidden behind the edge of the floor it was about to run onto.
+			# Open in the middle, it says "the machine steps down here"
+			# without ever crossing the racing line.
+			var riser := BoxMesh.new()
+			riser.size = Vector3(half * RISER_SPAN, RISER_HEIGHT, RISER_DEPTH)
+			for side in [-1.0, 1.0]:
+				var face := MeshInstance3D.new()
+				face.name = "Riser%d" % int(side)
+				face.mesh = riser
+				face.material_override = _palette.structure(true)
+				face.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+				face.position = Vector3(
+					side * (half - half * RISER_SPAN * 0.5),
+					-RISER_HEIGHT * 0.5, 0.0)
+				pivot.add_child(face)
+
 		for side in [-1.0, 1.0]:
 			var post := MeshInstance3D.new()
-			post.name = "Portal_%s_%d" % [str(section.get("name", "?")), int(side)]
-			post.mesh = mesh
-			post.material_override = _palette.light_strip()
+			post.name = "Post%d" % int(side)
+			post.mesh = post_mesh
+			post.material_override = _palette.structure()
 			post.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			post.position = Vector3(
-				side * (half - PORTAL_WIDTH * 0.5),
-				PORTAL_HEIGHT * 0.5,
-				to_units(top))
-			root.add_child(post)
+				side * (half - PORTAL_WIDTH * 0.5), PORTAL_HEIGHT * 0.5, 0.0)
+			pivot.add_child(post)
+
+			if _measuring:
+				continue
+			# The zone light, on the post rather than on a cross-beam.
+			#
+			# V0.3 hung a lit bar over the track at every section and the
+			# finished frame read as a course diagram: a dozen horizontal
+			# lines is what a plan view looks like, whatever lens drew it. A
+			# vertical light on a vertical post says the same thing - a new
+			# stretch starts here, and it is this colour - and adds no line
+			# across the picture at all.
+			var strip := BoxMesh.new()
+			strip.size = Vector3(
+				PORTAL_WIDTH * 0.42, PORTAL_HEIGHT * 0.62, PORTAL_DEPTH * 0.5)
+			var lit := MeshInstance3D.new()
+			lit.name = "Strip%d" % int(side)
+			lit.mesh = strip
+			lit.material_override = _zone_material(index)
+			lit.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			lit.position = Vector3(
+				side * (half - PORTAL_WIDTH * 1.05),
+				PORTAL_HEIGHT * 0.52, 0.0)
+			pivot.add_child(lit)
+
+
+func _zone_material(index: int) -> StandardMaterial3D:
+	## The colour of one level of the machine.
+	##
+	## Deliberately a two-colour ramp rather than a rainbow: cool at the top
+	## of the course, warm at the bottom, and nothing in between that a viewer
+	## would read as a separate idea. It says only "you are further along",
+	## which is the one thing the environment is allowed to say.
+	var sections: Array = _course.get("sections", [])
+	var span := maxf(1.0, float(sections.size() - 1))
+	return _palette.light_strip(float(index) / span > 0.55)
 
 
 func _build_checkpoints() -> void:
@@ -953,17 +1467,40 @@ func _build_checkpoints() -> void:
 			else float(node.get("x_max"))
 		var span := maxf(0.1, to_units(right - left))
 
-		var mesh := BoxMesh.new()
-		mesh.size = Vector3(span, CHECKPOINT_HEIGHT, CHECKPOINT_THICKNESS)
-		var bar := MeshInstance3D.new()
-		bar.name = "Checkpoint%d" % int(node.get("index", 0))
-		bar.mesh = mesh
-		bar.material_override = _palette.checkpoint_bar(false)
-		bar.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		bar.position = to_world(
-			(left + right) * 0.5, float(node.get("y", 0.0)),
-			CHECKPOINT_HEIGHT * 0.5)
-		root.add_child(bar)
+		var y := float(node.get("y", 0.0))
+		if _measuring:
+			# The measuring lens keeps the full bar: there is nobody to
+			# mislead, and seeing the ladder is useful when checking one.
+			var mesh := BoxMesh.new()
+			mesh.size = Vector3(span, CHECKPOINT_HEIGHT, CHECKPOINT_THICKNESS)
+			var bar := MeshInstance3D.new()
+			bar.name = "Checkpoint%d" % int(node.get("index", 0))
+			bar.mesh = mesh
+			bar.material_override = _palette.checkpoint_bar(false)
+			bar.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			bar.position = to_world((left + right) * 0.5, y, CHECKPOINT_HEIGHT * 0.5)
+			root.add_child(bar)
+			continue
+
+		# Production gets two short studs let into the deck at the edges of
+		# the plane instead. The V0.3 render drew a dozen lit lines the full
+		# width of the track and the frame read as a diagram of a course
+		# rather than a machine - progress is something a viewer can see, not
+		# something that has to be drawn across the floor.
+		var stud := BoxMesh.new()
+		stud.size = Vector3(
+			CHECKPOINT_STUD_WIDTH, CHECKPOINT_HEIGHT, CHECKPOINT_THICKNESS)
+		for side in [-1.0, 1.0]:
+			var mark := MeshInstance3D.new()
+			mark.name = "Checkpoint%d_%d" % [int(node.get("index", 0)), int(side)]
+			mark.mesh = stud
+			mark.material_override = _palette.checkpoint_bar(false)
+			mark.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			var edge_x := left if side < 0.0 else right
+			var inset := CHECKPOINT_STUD_WIDTH * PIXELS_PER_UNIT * 0.5
+			mark.position = to_world(
+				edge_x - side * inset, y, CHECKPOINT_HEIGHT * 0.5)
+			root.add_child(mark)
 
 	_build_finish_gate(root, finish)
 	_build_pinch_gates(root)
@@ -987,7 +1524,7 @@ func _build_pinch_gates(root: Node3D) -> void:
 	var width := _course_width
 	var threshold := width * PINCH_FRACTION
 	var samples := int((_course_bottom - _course_top) / PINCH_STEP)
-	if samples < 2:
+	if samples < 2 or _measuring:
 		return
 
 	var best_y := 0.0
@@ -1145,6 +1682,8 @@ func _build_finish_gate(root: Node3D, finish: Dictionary) -> void:
 	_finish_gate.add_child(bar)
 	_finish_materials.append(bar.material_override)
 
+	if _measuring:
+		return
 	var post_mesh := BoxMesh.new()
 	post_mesh.size = Vector3(FINISH_POST_WIDTH, FINISH_POST_HEIGHT, FINISH_POST_WIDTH)
 	for side in [-1.0, 1.0]:
@@ -1188,34 +1727,25 @@ func _build_spinners() -> void:
 			float(spec.get("x", 0.0)), float(spec.get("y", 0.0)), 0.0)
 		root.add_child(pivot)
 
+		var hub_height := MEASURED_HEIGHT if _measuring else SPINNER_HUB_HEIGHT
+		var arm_height := MEASURED_HEIGHT if _measuring else SPINNER_ARM_HEIGHT
 		var hub_radius := to_units(float(spec.get("hub_radius", 0.0)))
 		var hub := CylinderMesh.new()
-		hub.top_radius = hub_radius * 0.82
+		hub.top_radius = hub_radius if _measuring else hub_radius * 0.82
 		hub.bottom_radius = hub_radius
-		hub.height = SPINNER_HUB_HEIGHT
+		hub.height = hub_height
 		hub.radial_segments = 24
 		var hub_node := MeshInstance3D.new()
 		hub_node.name = "Hub"
 		hub_node.mesh = hub
 		hub_node.material_override = body_material
-		hub_node.position = Vector3(0.0, SPINNER_HUB_HEIGHT * 0.5, 0.0)
+		hub_node.position = Vector3(0.0, hub_height * 0.5, 0.0)
 		pivot.add_child(hub_node)
 
 		# A lit collar around the hub, so the axis of rotation is obvious even
 		# when an arm is pointing straight at the camera.
-		var collar := TorusMesh.new()
-		collar.inner_radius = hub_radius * 0.92
-		collar.outer_radius = hub_radius * 1.16
-		collar.rings = 28
-		collar.ring_segments = 6
-		var collar_node := MeshInstance3D.new()
-		collar_node.name = "Collar"
-		collar_node.mesh = collar
-		collar_node.material_override = edge_material
-		collar_node.position = Vector3(0.0, SPINNER_HUB_HEIGHT * 0.86, 0.0)
-		collar_node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		pivot.add_child(collar_node)
-
+		if not _measuring:
+			_build_collar(pivot, hub_radius, hub_height, edge_material)
 		var arm_count := maxi(1, int(spec.get("arm_count", 1)))
 		var arm_length := to_units(float(spec.get("arm_length", 0.0)))
 		var arm_thickness := to_units(float(spec.get("arm_thickness", 0.0)))
@@ -1236,26 +1766,29 @@ func _build_spinners() -> void:
 			pivot.add_child(arm_node)
 
 			var arm := BoxMesh.new()
-			arm.size = Vector3(arm_length, SPINNER_ARM_HEIGHT, arm_thickness)
+			arm.size = Vector3(arm_length, arm_height, arm_thickness)
 			var body := MeshInstance3D.new()
 			body.name = "Body"
 			body.mesh = arm
 			body.material_override = body_material
-			body.position = Vector3(0.0, SPINNER_ARM_HEIGHT * 0.5, 0.0)
+			body.position = Vector3(0.0, arm_height * 0.5, 0.0)
 			arm_node.add_child(body)
+
+			if _measuring:
+				continue
 
 			# The lit tip. A spinner is the one piece of course that can pick
 			# a racer up and put it somewhere else, and the end of the arm is
 			# the part that does it - so that is the part that glows.
 			var tip := BoxMesh.new()
 			tip.size = Vector3(
-				arm_length * 0.26, SPINNER_ARM_HEIGHT * 1.06, arm_thickness * 1.08)
+				arm_length * 0.26, arm_height * 1.06, arm_thickness * 1.08)
 			var tip_node := MeshInstance3D.new()
 			tip_node.name = "Tip"
 			tip_node.mesh = tip
 			tip_node.material_override = edge_material
 			tip_node.position = Vector3(
-				arm_length * 0.37, SPINNER_ARM_HEIGHT * 0.53, 0.0)
+				arm_length * 0.37, arm_height * 0.53, 0.0)
 			tip_node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			arm_node.add_child(tip_node)
 
@@ -1263,6 +1796,24 @@ func _build_spinners() -> void:
 
 
 # --- racers ---------------------------------------------------------------
+
+func _build_collar(pivot: Node3D, hub_radius: float, hub_height: float,
+		edge_material: StandardMaterial3D) -> void:
+	## A lit collar around a hub, so the axis of rotation is obvious even when
+	## an arm points straight at the camera.
+	var collar := TorusMesh.new()
+	collar.inner_radius = hub_radius * 0.92
+	collar.outer_radius = hub_radius * 1.16
+	collar.rings = 28
+	collar.ring_segments = 6
+	var node := MeshInstance3D.new()
+	node.name = "Collar"
+	node.mesh = collar
+	node.material_override = edge_material
+	node.position = Vector3(0.0, hub_height * 0.86, 0.0)
+	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	pivot.add_child(node)
+
 
 func _build_racers() -> void:
 	var root := Node3D.new()

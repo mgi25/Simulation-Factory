@@ -1,0 +1,48 @@
+course: machine   racers: 20   seeds: 400
+
+=== BATCH HEALTH ===
+Races: 400   completed: 400   failures: 1
+Winner time: min 14.42s  mean 16.76s  max 19.07s   in 15-22s band: 97.2%
+Race duration: mean 23.26s  max 25.57s
+Racers finished: mean 13.08/20   recoveries 415   retirements 1
+
+=== RACE QUALITY ===
+Races analysed: 400  (decided: 400)
+Winner lock (fraction of winner race):  p10 0.38  median 0.92  p90 0.97  mean 0.78
+  locked before halfway: 17.0%   locked at/after 75%: 68.0%
+Winner lock (seconds): p10 6.00  median 14.75  p90 17.08
+At 10%: leader wins  12.0%   competitive 19.64   gap 1-2 0.002   gap 1-med 0.031   winner rank 6.75
+At 25%: leader wins  16.8%   competitive 17.30   gap 1-2 0.009   gap 1-med 0.055   winner rank 5.88
+At 50%: leader wins  34.0%   competitive 15.41   gap 1-2 0.019   gap 1-med 0.070   winner rank 3.80
+At 75%: leader wins  41.0%   competitive 4.55   gap 1-2 0.035   gap 1-med 0.248   winner rank 2.27
+Lead changes: mean 10.56  p10 6  median 10  p90 16
+Podium racers: mean 12.38  (set changes mean 22.4)
+Winner worst rank after 25%: mean 7.98   1:2  2:37  3:37  4:43  5:33  6:36  7:25  8:24  9:27  10:18  11:23  12:18  13:17  14:15  15:13  16:8  17:8  18:4  19:8  20:4
+Final margin: mean 0.83s  p10 0.14  median 0.53  p90 2.13
+Overtakes by third: 291.8 / 193.5 / 114.0
+
+Starting slot:
+  slot  starts   wins    win%   avg final   prog@25%   prog@50%
+     0     400     11    2.8%    13.05      0.233      0.402
+     1     400     18    4.5%    10.75      0.263      0.427
+     2     400     25    6.2%    11.39      0.259      0.424
+     3     400     32    8.0%    10.73      0.258      0.426
+     4     400     12    3.0%    13.09      0.248      0.409
+     5     400     24    6.0%    11.08      0.262      0.424
+     6     400     21    5.2%    11.87      0.262      0.424
+     7     400     27    6.8%    11.40      0.252      0.421
+     8     400     11    2.8%    12.66      0.255      0.416
+     9     400     32    8.0%    10.78      0.277      0.435
+    10     400     21    5.2%    11.69      0.266      0.425
+    11     400     15    3.8%    11.65      0.245      0.414
+    12     400     11    2.8%    12.94      0.251      0.414
+    13     400     18    4.5%    11.63      0.256      0.423
+    14     400     24    6.0%    10.09      0.275      0.435
+    15     400     14    3.5%    12.52      0.238      0.406
+    16     400     10    2.5%    12.82      0.245      0.410
+    17     400     32    8.0%    11.06      0.259      0.423
+    18     400     24    6.0%    11.53      0.256      0.419
+    19     400     18    4.5%    11.81      0.250      0.417
+  strongest slot 3 (8.0%)   weakest slot 16 (2.5%)   ratio 3.20x
+
+wrote docs/validation/race_v04/machine_400_r20.json

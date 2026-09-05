@@ -46,16 +46,31 @@ const FINISH_SECONDS := 0.55
 const WINNER_SECONDS := 1.10
 const RETIRE_SECONDS := 0.60
 
-# World-unit sizes. A racer's radius is 0.30, so the weakest ring is already
-# wider than the ball it happened to and cannot be swallowed by it.
-const IMPACT_RING := Vector2(0.62, 1.55)
-const IMPACT_FLASH := Vector2(0.085, 0.26)
-const JUMP_RING := 0.95
-const JUMP_FLASH := 0.22
-const FINISH_RING := 1.30
-const WINNER_RING := 3.20
-const WINNER_FLASH := 0.55
-const RETIRE_RING := 0.95
+# World-unit sizes, and the scale that matters is the racer: a radius of 0.30.
+#
+# Every number here came down for V0.4, and the reason is a rule rather than a
+# preference. An effect exists to say *something happened to that racer*, and
+# the moment it is large enough to cover the racer it has stopped saying that
+# and started hiding the thing it was pointing at. So the tiers are set
+# against the ball:
+#
+#     ordinary contact   ring peaks at  1.5 racer radii   - a highlight
+#     hard contact       ring peaks at  3.7 racer radii   - unmissable
+#     the win            ring peaks at  8.0 racer radii   - once, at the end
+#
+# V0.3 ran at 2.1 / 5.2 / 10.7. On a 1080-wide frame a 5.2-radius ring is 310
+# pixels of additive white across a third of the course, several times a
+# second in a pile-up, and it was routinely the brightest thing in a shot
+# where the brightest thing should be a racer. `tests/test_race_visuals.py`
+# holds the ratios so they cannot drift back up.
+const IMPACT_RING := Vector2(0.45, 1.10)
+const IMPACT_FLASH := Vector2(0.065, 0.17)
+const JUMP_RING := 0.70
+const JUMP_FLASH := 0.16
+const FINISH_RING := 0.95
+const WINNER_RING := 2.40
+const WINNER_FLASH := 0.40
+const RETIRE_RING := 0.70
 
 # Rings start as a bright point and open outwards.
 const RING_START_FRACTION := 0.16
@@ -69,9 +84,9 @@ const RING_HEIGHT := 0.66
 # Roughly where two spheres visibly meet.
 const FLASH_HEIGHT := 0.06
 
-const IMPACT_RING_ALPHA := 0.95
-const JUMP_RING_ALPHA := 0.80
-const FINISH_RING_ALPHA := 0.85
+const IMPACT_RING_ALPHA := 0.72
+const JUMP_RING_ALPHA := 0.62
+const FINISH_RING_ALPHA := 0.68
 const FLASH_ALPHA := 1.0
 const FLASH_GROWTH := 0.65
 const FLASH_LIFE_FRACTION := 0.5
@@ -80,7 +95,7 @@ const FLASH_LIFE_FRACTION := 0.5
 # ball. Driven past 1.0 so it clears the environment's glow threshold and
 # blooms - written straight into the HDR buffer, the same value every time.
 const FLASH_LIGHTEN := 0.70
-const FLASH_OVERDRIVE := 2.6
+const FLASH_OVERDRIVE := 1.7
 
 # --- squash ---------------------------------------------------------------
 #
@@ -104,7 +119,7 @@ const PAD_PULSE_SECONDS := 0.40
 # moves on every contact is a camera nobody can follow a racer through.
 const SHAKE_SECONDS := 0.16
 const SHAKE_MIN_STRENGTH := 0.45
-const SHAKE_MAX_UNITS := 0.055
+const SHAKE_MAX_UNITS := 0.040
 const SHAKE_FREQUENCY := 46.0
 const SHAKE_CROSS_RATE := 1.41
 const SHAKE_VERTICAL_RATIO := 0.55

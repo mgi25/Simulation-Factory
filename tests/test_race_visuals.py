@@ -435,3 +435,225 @@ def test_the_overlay_leaves_the_middle_of_the_frame_clear() -> None:
     """The course has to be visible where the race actually happens."""
     for _, y, _, h in verify_race_render.HUD_RECTS[:2]:
         assert y + h <= 700, "the standings reach into the middle of the frame"
+
+
+# --- V0.4: the machine, the lens and the effects --------------------------
+#
+# The V0.4 brief's two visual complaints were that a paused frame looked like a
+# board rather than a machine, and that ordinary collisions whited out large
+# parts of the picture. Neither can be settled by comparing images - a tenth of
+# a degree on a light changes every byte and says nothing about whether the
+# change was good - but both reduce to numbers in the scene, and those are what
+# is asserted here.
+
+
+def test_the_production_camera_is_meaningfully_lower_than_v03() -> None:
+    """74 degrees is a plan view, whatever the projection says.
+
+    Under a near-overhead lens every vertical surface is edge-on and nothing
+    occludes anything, so the frame reads as a diagram of the course however
+    much depth the geometry has. The replacement was chosen by rendering the
+    same moments at 45, 50, 55, 60 and 74 - see `tools/race_camera_test.py` -
+    and wherever it settles, it has to be a long way below where it started.
+    """
+    text = source("race_scene.gd")
+    elevation = float(constant(text, "PROD_ELEVATION_DEG"))
+    assert 40.0 <= elevation <= 62.0, "the production lens is back near plan view"
+    assert elevation <= 74.0 - 15.0
+
+
+def test_the_elevation_can_be_swept_from_the_command_line() -> None:
+    """The sweep has to shoot one scene, not five builds of it.
+
+    An elevation edited into the constant between runs changes the file the
+    other four frames came from, and then what is being compared is not only
+    the lens.
+    """
+    assert "--race-elevation=" in source("race_scene.gd")
+    assert "_elevation_argument" in code("race_scene.gd")
+
+
+def test_a_travelling_surface_is_drawn_with_real_depth() -> None:
+    """A racer's radius is 0.30 units, so a beam has to be worth more.
+
+    V0.3 drew every piece 0.30 tall - one racer radius - and at 74 degrees
+    that is invisible. This depth is what the lower lens exists to show.
+    """
+    text = source("race_scene.gd")
+    beam = float(constant(text, "BEAM_HEIGHT"))
+    wall = float(constant(text, "BEAM_WALL_HEIGHT"))
+    assert beam >= 0.5, "a platform is no thicker than it was in V0.3"
+    assert wall > beam, "a vertical face is drawn no deeper than a flat one"
+    assert float(constant(text, "WALL_HEIGHT")) >= 2.0
+
+
+def test_a_pieces_depth_comes_from_its_own_angle() -> None:
+    """Nothing in the renderer may know what a funnel is.
+
+    The replay describes every piece as a bar with an angle, and that is all
+    the scene may use: steep pieces are drawn as faces of the machine, flat
+    ones as decks. A course this file has never seen therefore gets the same
+    treatment, which is what keeps the prototype and the split course working.
+    """
+    text = code("race_scene.gd")
+    assert "func _box_height(role: String, angle: float)" in text
+    assert "lerpf(BEAM_HEIGHT, BEAM_WALL_HEIGHT" in text
+
+
+def test_the_machine_has_levels_and_they_only_ever_go_down() -> None:
+    """The deck is a monotone function of course height, or it is a lie.
+
+    Visual descent and course progress have to mean the same thing. If the
+    deck could rise, a racer moving forwards would sometimes be drawn moving
+    up the machine, and the mapping would imply physics the simulation does
+    not have.
+    """
+    text = source("race_scene.gd")
+    assert float(constant(text, "DECK_TOTAL")) >= 2.0
+    body = code("race_scene.gd")
+    assert "func _deck(sim_y: float) -> float:" in body
+    # Every term is a smoothstep in sim_y scaled by a negative drop, so the
+    # sum can only decrease as sim_y grows.
+    assert "total += smoothstep(" in body
+    assert "return -_deck_drop * total" in body
+
+
+def test_everything_in_the_frame_reads_its_height_from_the_deck() -> None:
+    """One mapping, applied in one place.
+
+    Racers, trails and effects all reach the world through `to_world`, so
+    adding the deck there is what guarantees a racer cannot be drawn sunk into
+    a ramp it is really resting on.
+    """
+    assert "height + _deck(sim_y)" in code("race_scene.gd")
+
+
+def test_the_deck_is_invisible_to_the_measuring_lens() -> None:
+    """The verification camera is orthographic and points straight down.
+
+    Screen position under that projection depends on X and Z only, so the one
+    change in this release that moves geometry cannot move a measured pixel.
+    That is why the alignment check still means what it meant in V0.3.
+    """
+    text = source("race_scene.gd")
+    assert "PROJECTION_ORTHOGONAL" in text
+    assert "_camera.rotation_degrees = Vector3(-90.0, 0.0, 0.0)" in text
+    assert "VERIFY_SIZE := VIEW_HEIGHT / PIXELS_PER_UNIT" in text
+
+
+def test_presentation_that_is_wider_than_its_collision_shape_is_measured_off() -> None:
+    """A peg's flared base covers ground the solver's circle does not.
+
+    Straight down, that flare covered enough of a racer standing beside a peg
+    that the alignment check could no longer find it - a placement that was
+    exactly right and could not be proven right, which is worse than either.
+    """
+    body = code("race_scene.gd")
+    peg = body[body.index("func _build_peg") : body.index("func _build_box")]
+    assert "if not _measuring:" in peg
+    assert "radius if _measuring else" in peg
+
+
+def test_no_checkpoint_is_drawn_across_the_track_in_production() -> None:
+    """The board-like element the brief named first.
+
+    V0.3 drew a lit bar the full width of the course at every progress plane.
+    A dozen horizontal lines down a frame is what a plan view looks like,
+    whatever lens drew it - so in production a checkpoint is two studs at the
+    edges, and the full bar survives only on the measuring lens.
+    """
+    body = code("race_scene.gd")
+    assert "CHECKPOINT_STUD_WIDTH" in body
+    marker = body[
+        body.index("func _build_checkpoints") : body.index("func _build_pinch_gates")
+    ]
+    assert "if _measuring:" in marker, "the full bar is still drawn in production"
+
+
+def test_nothing_is_drawn_across_the_track_at_a_section_boundary() -> None:
+    """The same complaint, one level up.
+
+    A gantry with a beam over the track marks a boundary and puts another
+    horizontal line in the frame. There are nine boundaries on the machine
+    course, so that is nine rungs - and a full-width step face is a tenth,
+    which also stands between the lens and the racer arriving at it.
+    """
+    body = code("race_scene.gd")
+    portals = body[
+        body.index("func _build_section_portals") : body.index("func _zone_material")
+    ]
+    assert "beam_mesh" not in portals, "the gantry lintel is back"
+    assert "RISER_SPAN" in portals, "the step face spans the whole track"
+    assert float(constant(source("race_scene.gd"), "RISER_SPAN")) < 1.0
+
+
+def test_an_ordinary_impact_cannot_cover_the_racer_it_happened_to() -> None:
+    """The VFX rule, as the ratio it is actually about.
+
+    An effect exists to say *something happened to that racer*. The moment it
+    is large enough to hide the racer, it has stopped saying that. So the
+    weakest ring is measured against the ball: a highlight, not a flare.
+    """
+    text = source("race_vfx.gd")
+    low, high = _vector2(constant(text, "IMPACT_RING"))
+    racer_radius = 0.30
+    assert low / racer_radius <= 1.8, "an ordinary collision is a flare"
+    assert high / racer_radius <= 4.0, "a hard collision takes over the frame"
+    assert low < high, "collision strength changes nothing about the effect"
+
+
+def test_the_win_is_the_only_effect_allowed_to_be_large() -> None:
+    text = source("race_vfx.gd")
+    winner = float(constant(text, "WINNER_RING"))
+    _, impact = _vector2(constant(text, "IMPACT_RING"))
+    assert winner > impact
+    assert winner / 0.30 <= 9.0, "even the win whites out the frame"
+
+
+def test_effect_brightness_came_down_from_v03() -> None:
+    """Additive white over a whole neighbourhood was the specific complaint."""
+    text = source("race_vfx.gd")
+    assert float(constant(text, "FLASH_OVERDRIVE")) <= 2.0
+    assert float(constant(text, "IMPACT_RING_ALPHA")) <= 0.8
+    assert float(constant(text, "SHAKE_MAX_UNITS")) <= 0.05
+
+
+def test_the_frame_has_two_ranks_of_scenery_at_different_distances() -> None:
+    """Parallax needs a comparison, not just a rate.
+
+    One rank of ribs sweeping past gives the eye a speed. Two ranks at
+    different distances, moving at visibly different speeds, is what says the
+    picture has depth rather than being a drawing of it.
+    """
+    text = source("race_scene.gd")
+    assert float(constant(text, "RIB_NEAR_SPACING")) != float(
+        constant(text, "RIB_SPACING")
+    )
+    assert float(constant(text, "RIB_NEAR_OFFSET")) > 0.0
+    assert "_build_near_ribs" in code("race_scene.gd")
+
+
+def test_platforms_stand_on_something() -> None:
+    """A slab with air and a shadow beneath it is an object; flat, it is paint."""
+    text = source("race_scene.gd")
+    assert float(constant(text, "STRUT_DROP")) > 0.5
+    assert "_build_struts" in code("race_scene.gd")
+
+
+def test_the_room_runs_past_both_ends_of_the_course() -> None:
+    """At 52 degrees the lens sees a long way down the course.
+
+    Where the machine stops there is nothing behind it but the background
+    colour, and the top of the frame becomes a void. The room is carried far
+    enough past the finish that the fog closes over it instead.
+    """
+    text = source("race_scene.gd")
+    assert float(constant(text, "ROOM_OVERRUN_BOTTOM")) >= 2000.0
+    assert float(constant(text, "ROOM_OVERRUN_TOP")) >= 500.0
+
+
+def _vector2(literal: str) -> tuple[float, float]:
+    """`Vector2(a, b)` as two numbers."""
+    inner = literal.strip().removeprefix("Vector2(").rstrip(")")
+    first, second = inner.split(",")
+    return (float(first), float(second))

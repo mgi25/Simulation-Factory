@@ -86,7 +86,22 @@ RACER_MASS = 1.0
 RACER_ELASTICITY = 0.32
 RACER_FRICTION = 0.42
 
-# Ten hues a viewer can tell apart at Shorts scale, in racer order.
+# Hues a viewer can tell apart at Shorts scale, in racer order.
+#
+# The first ten are V0.1's and have not moved: a racer's colour is presentation
+# only, but it is what `tools/verify_race_render.py` finds a racer *by*, and
+# every stored validation frame was shot with these.
+#
+# Six more were added for V0.4, when the field grew past ten. `Racer.color`
+# wraps with `racer_id % len`, so before this a sixteen-racer field contained
+# six pairs of identically coloured balls - and at the size a Short is watched,
+# a number plate is not enough to tell two red balls apart in a pile-up.
+#
+# They are not six more hues around the wheel, because there are not sixteen
+# hues that survive a 400-pixel-wide viewport. Each is separated from its
+# nearest neighbour in the first ten by *value* or *saturation* as well: a
+# deeper blue, a paler yellow, a darker red. Sixteen is where that stops
+# working, which is one of the reasons V0.4 settled on a field of sixteen.
 RACER_COLORS: tuple[tuple[int, int, int], ...] = (
     (235, 72, 72),      # 01 red
     (64, 156, 248),     # 02 blue
@@ -95,9 +110,15 @@ RACER_COLORS: tuple[tuple[int, int, int], ...] = (
     (198, 108, 246),    # 05 violet
     (255, 141, 58),     # 06 orange
     (72, 226, 224),     # 07 cyan
-    (245, 122, 186),     # 08 pink
+    (245, 122, 186),    # 08 pink
     (176, 186, 200),    # 09 silver
     (140, 200, 70),     # 10 lime
+    (150, 62, 196),     # 11 deep purple  - darker than violet
+    (250, 240, 138),    # 12 pale yellow  - lighter than gold
+    (28, 148, 138),     # 13 teal         - darker than cyan
+    (196, 84, 40),      # 14 rust         - darker than orange
+    (126, 150, 250),    # 15 periwinkle   - lighter than blue
+    (152, 44, 60),      # 16 brick        - darker than red
 )
 
 # --- starting grid ---

@@ -24,9 +24,15 @@ extends RefCounted
 
 # --- the palette ----------------------------------------------------------
 
-# Structure. Almost black, faintly blue, and metallic enough to catch the key
-# light along an edge - which is what stops a dark course reading as a hole.
-const STRUCTURE := Color(0.055, 0.065, 0.090)
+# Structure. Dark, faintly blue, and metallic enough to catch the key light
+# along an edge - which is what stops a dark course reading as a hole.
+#
+# Lifted for V0.4, and the reason is the geometry rather than taste. Under the
+# V0.3 top-down camera every structural surface faced the lens and a value
+# this low read as "dark metal". With real volumes and a 52 degree lens, half
+# of every beam, post and rib faces away from the key, and at 0.055 those
+# faces resolved to black: the machine had shape and none of it was visible.
+const STRUCTURE := Color(0.105, 0.122, 0.152)
 const WALL := Color(0.105, 0.120, 0.158)
 
 # Track surface. Three finishes of one colour, so the differences read as
@@ -53,7 +59,7 @@ const SPINNER_GLOW := Color(1.00, 0.62, 0.22)
 const FINISH_GLOW := Color(1.00, 0.86, 0.42)
 
 # Environment.
-const STRUCTURE_FAR := Color(0.030, 0.036, 0.052)
+const STRUCTURE_FAR := Color(0.058, 0.068, 0.090)
 const FLOOR_DEEP := Color(0.018, 0.022, 0.032)
 
 # --- emission strengths ---------------------------------------------------
@@ -67,7 +73,7 @@ const EMISSION_PAD := 1.35         # over threshold: a pad is an event
 const EMISSION_GATE := 0.70
 const EMISSION_SPINNER := 1.10     # over threshold: a spinner is a hazard
 const EMISSION_CHECKPOINT := 0.45
-const EMISSION_FINISH := 2.20      # the brightest static thing on the course
+const EMISSION_FINISH := 1.45      # the brightest static thing on the course
 const EMISSION_STRIP := 0.70
 
 var _cache := {}
@@ -284,6 +290,20 @@ func racer_flat(color: Color) -> StandardMaterial3D:
 	cyan. The pixel a check looks at is then exactly the colour the replay
 	names, which is the only property the verification camera needs a racer
 	to have.
+
+	"Exactly" was not true for two releases, and unshaded was never what was
+	standing in the way. The *tone curve* was: ACES is applied to the whole
+	frame, unshaded surfaces included, and it lifted racer 7's
+	(72, 226, 224) to (157, 230, 228) in the PNG. The hue survived - which is
+	why the check worked at all - but cyan drifted far enough that
+	`verify_race_render.py` lost that racer whenever a neighbour covered part
+	of it, in four of thirty sampled frames of the V0.3 reference replay.
+
+	The fix is in `race_scene.gd`, which gives the measuring lens a linear
+	tone mapper: a tone curve is a deliberate distortion of colour, which is
+	exactly what a production frame wants and exactly what a measurement must
+	not have. With it, every racer reaches the file as the number the replay
+	carries, and this material can be what it says it is.
 	"""
 	var name := "racer_flat:%d" % color.to_rgba32()
 	var cached := _cached(name)
