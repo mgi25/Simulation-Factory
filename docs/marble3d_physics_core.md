@@ -262,9 +262,9 @@ Measured on the whole machine, seed 7:
 
 | rate | bowl turns | run | wall | worst penetration | travel/tick |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| 120 Hz | 2.32 | 8.7 s | 0.52 s | −0.269 | 0.41 diam |
+| 120 Hz | 2.32 | 7.1 s | 0.52 s | −0.269 | 0.41 diam |
 | 240 Hz | **2.97** | 8.8 s | 1.12 s | −0.140 | 0.21 diam |
-| 480 Hz | 4.58 | 12.9 s | 3.10 s | −0.071 | 0.10 diam |
+| 480 Hz | 4.58 | 13.1 s | 3.10 s | −0.071 | 0.10 diam |
 | 960 Hz | 15.27 | 43.2 s | 17.98 s | −0.027 | 0.055 diam |
 | 1920 Hz | 0.42 † | 45.0 s | 20.64 s | −0.004 | 0.053 diam |
 
