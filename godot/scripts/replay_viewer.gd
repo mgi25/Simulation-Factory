@@ -50,6 +50,14 @@ const RaceScene := preload("res://scripts/race_scene.gd")
 const STYLE_STANDARD := "standard"
 const STYLE_NEON := "neon"
 const NeonScene := preload("res://scripts/neon_scene.gd")
+# `toy` is the premium-toy art-direction prototype in `toy_scene.gd`. It plays
+# the same replay through the same contract as the other two and shares the
+# neon course's bowl mapping; what it disagrees about is entirely look. It is
+# a third scene rather than a palette switch inside the second because the
+# geometry differs - rounded shells, a filleted channel, a mechanical element
+# - and a scene that could draw both would be a scene that draws neither well.
+const STYLE_TOY := "toy"
+const ToyScene := preload("res://scripts/toy_scene.gd")
 
 const FLOOR_THICKNESS := 0.25
 const WALL_HEIGHT := 0.9
@@ -219,8 +227,8 @@ func _ready() -> void:
 	if _mode == MODE_RACE:
 		var camera := _race_camera_argument()
 		var style := _race_style_argument()
-		_race = NeonScene.new() if style == STYLE_NEON else RaceScene.new()
-		_race.name = "NeonScene" if style == STYLE_NEON else "RaceScene"
+		_race = _race_scene_for(style)
+		_race.name = _race_scene_name(style)
 		add_child(_race)
 		_race.build(_replay, camera)
 		_present(0.0)
@@ -340,10 +348,30 @@ func _race_style_argument() -> String:
 	for argument in OS.get_cmdline_user_args():
 		var arg: String = argument
 		if arg.begins_with("--race-style="):
-			if arg.substr(13) == STYLE_NEON:
+			var value := arg.substr(13)
+			if value == STYLE_NEON:
 				return STYLE_NEON
+			if value == STYLE_TOY:
+				return STYLE_TOY
 			return STYLE_STANDARD
 	return STYLE_STANDARD
+
+
+func _race_scene_for(style: String) -> Node3D:
+	## The scene a style names. One place, so adding a fourth is one entry.
+	if style == STYLE_NEON:
+		return NeonScene.new()
+	if style == STYLE_TOY:
+		return ToyScene.new()
+	return RaceScene.new()
+
+
+func _race_scene_name(style: String) -> String:
+	if style == STYLE_NEON:
+		return "NeonScene"
+	if style == STYLE_TOY:
+		return "ToyScene"
+	return "RaceScene"
 
 
 func _resolve_path(path: String) -> String:
