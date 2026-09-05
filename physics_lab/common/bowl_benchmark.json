@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "name": "bowl_benchmark",
+  "comment": "The single machine-readable definition of the bowl benchmark. Read by the Python 2.5D prototype, by the Godot true-3D prototype and by the analysis. Neither implementation may hold a copy of any number in here.",
+
+  "units": {
+    "length": "m",
+    "mass": "kg",
+    "time": "s",
+    "frame": "y up, x and z horizontal, gravity along -y, bowl centred on the y axis with the drain plane at y = 0"
+  },
+
+  "world": {
+    "gravity": 9.81
+  },
+
+  "bowl": {
+    "comment": "rim_depth and profile_power describe the CENTRE surface - the surface a marble's centre travels on. The collider a 3D engine needs is that surface offset by one marble radius along its inward normal, so the two prototypes constrain the same points.",
+    "rim_radius": 0.50,
+    "rim_depth": 0.18,
+    "profile_power": 2.0,
+    "surface_max_radius": 0.60,
+    "drain_radius": 0.060,
+    "drain_exit_y": -0.25
+  },
+
+  "marble": {
+    "count": 8,
+    "radius": 0.020,
+    "mass": 0.0838,
+    "restitution": 0.55,
+    "friction": 0.15
+  },
+
+  "contact": {
+    "comment": "linear_damping is the calibrated dissipation both engines share; see EXPERIMENT_PLAN.md section 5.3. rolling_resistance is the physically nicer model and is only used by the 2.5D sweep. rolling_inertia_factor 0.4 is 2/5, a solid sphere.",
+    "linear_damping": 0.15,
+    "rolling_resistance": 0.0,
+    "rolling_inertia_factor": 0.4,
+    "surface_restitution": 0.25
+  },
+
+  "sim": {
+    "physics_hz": 240,
+    "sample_hz": 60,
+    "duration_limit": 30.0
+  },
+
+  "entry": {
+    "comment": "Eight marbles placed on the bowl wall, evenly spaced in angle with a seeded jitter, at seeded radii, each given a prograde tangential velocity as a seeded fraction of the local circular-orbit speed plus a modest inward radial component. Nothing is dropped at the drain.",
+    "radius_min": 0.40,
+    "radius_max": 0.47,
+    "speed_factor_min": 0.78,
+    "speed_factor_max": 1.14,
+    "radial_inward_fraction": 0.12,
+    "angle_jitter_deg": 12.0
+  },
+
+  "seeds": [7, 11, 19, 23, 31, 42, 57, 68, 73, 89,
+            101, 113, 127, 149, 163, 181, 197, 211, 233, 257]
+}
