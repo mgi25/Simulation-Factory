@@ -42,14 +42,21 @@ from race.courses.neon import (
     BOWL_RADIUS,
     BOWL_TOP,
     DRAIN_HALF,
+    LANE_COUNT,
+    LANE_RIB,
+    LANE_WIDTH,
     NEON_COURSE_ID,
     NEON_RACER_COUNT,
     NEON_SECTIONS,
+    PLATFORM_LEFT,
+    PLATFORM_RIGHT,
     SPOUT_INNER,
     SPOUT_OUTER,
     THROAT_END,
     bridge_centre_x,
+    lane_bounds,
 )
+from rendering.deck_geometry import DECK_MARGIN
 from replay.race_exporter import record_race
 from tools import neon_proof
 
@@ -58,9 +65,12 @@ RACER_DIAMETER = 2.0 * RACER_RADIUS
 # The renderer clamps a bowl radius at this, and draws a flat lip out to it.
 # Anything past it is a racer standing on nothing, so it is the number the
 # recorded race is measured against. It mirrors `FLANGE_OUTER` in
-# `neon_scene.gd`; `test_the_scene_and_the_tool_agree_on_the_lip` keeps the
-# two from drifting apart.
-FLANGE_OUTER = 1.16
+# `neon_scene.gd`; `test_the_scene_and_the_tool_agree_on_the_lip` keeps the two
+# from drifting apart.
+#
+# V1.1 widened it from 1.16, because the acrylic wall now stands on the flange
+# and a flange with a wall bolted to it wants some width to bolt it to.
+FLANGE_OUTER = 1.20
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCENE_PATH = os.path.join(PROJECT_ROOT, "godot", "scripts", "neon_scene.gd")
@@ -304,8 +314,15 @@ def test_the_video_opens_before_the_release_and_reaches_the_bridge(replay: dict)
     assert furthest > replay["course"]["metadata"]["bridge_top"]
 
 
-def test_the_camera_sweep_is_the_four_angles_the_brief_names():
-    assert neon_proof.CAMERA_ANGLES == (42.0, 48.0, 52.0, 56.0)
+def test_the_camera_sweep_is_the_angles_the_brief_names():
+    """48, 52 and 55, which is what V1.1 asks to be compared.
+
+    V1 swept 42 to 56 to find the range; those two ends are settled - 42 hides
+    the bridge's supports behind the deck and 56 flattens the bowl towards a
+    plan of itself - so this revision compares inside the range rather than
+    re-deciding it.
+    """
+    assert neon_proof.CAMERA_ANGLES == (48.0, 52.0, 55.0)
     assert neon_proof.SELECTED_ELEVATION in neon_proof.CAMERA_ANGLES
 
 
@@ -335,12 +352,25 @@ def test_every_section_still_the_brief_asks_for_is_produced(replay: dict):
 
 def test_the_godot_command_selects_the_prototype_scene():
     command = neon_proof.godot_command(
-        "godot", "replay.json", "out", 100, 52.0, (1, 2), True
+        "godot", "replay.json", "out", 100, 52.0, (1, 2), "flag"
     )
     assert "--race-style=neon" in command
     assert "--race-elevation=52" in command
     assert "--stills=1,2" in command
-    assert "--neon-countries=1" in command
+    assert "--neon-countries=flag" in command
+
+
+def test_the_plain_treatment_asks_for_no_country_badges_at_all():
+    """The 'number' arm of the comparison is the scene's own default.
+
+    It has to be: the comparison is only about the badge, so the control has
+    to be the thing that ships rather than a third treatment that happens to
+    look like it.
+    """
+    command = neon_proof.godot_command(
+        "godot", "replay.json", "out", 100, 52.0, (1,), ""
+    )
+    assert not [arg for arg in command if arg.startswith("--neon-countries")]
 
 
 def test_a_missing_godot_is_reported_rather_than_raised(monkeypatch, capsys):
@@ -366,3 +396,216 @@ def test_the_replay_viewer_knows_how_to_reach_the_prototype_scene():
         source = handle.read()
     assert "--race-style=" in source
     assert "neon_scene.gd" in source
+
+
+# --- the launch channels ----------------------------------------------------
+
+
+def test_the_start_is_four_channels_of_the_width_the_brief_asks_for():
+    """Several narrow lanes rather than one giant slab, measured.
+
+    V1's chute was one apron eight hundred and ninety pixels wide. The four
+    channels are what replace it, and the two numbers that matter are the
+    lane - wide enough for racers to pass each other - and the rib, which has
+    to be wide enough that the two decks either side of it still leave a gap
+    once each has reached its rail's width past its own wall.
+    """
+    assert LANE_COUNT == 4
+    assert LANE_WIDTH > 2.0 * RACER_DIAMETER
+    assert LANE_RIB > 2.0 * DECK_MARGIN
+    for index in range(LANE_COUNT):
+        left, right = lane_bounds(index)
+        assert right - left == pytest.approx(LANE_WIDTH)
+        assert PLATFORM_LEFT <= left < right <= PLATFORM_RIGHT
+    for earlier, later in zip(range(LANE_COUNT), range(1, LANE_COUNT)):
+        gap = lane_bounds(later)[0] - lane_bounds(earlier)[1]
+        assert gap == pytest.approx(LANE_RIB)
+
+
+def test_the_channels_and_the_platform_are_the_same_block():
+    """A marble leaving the platform is already over a lane."""
+    assert lane_bounds(0)[0] == pytest.approx(PLATFORM_LEFT)
+    assert lane_bounds(LANE_COUNT - 1)[1] == pytest.approx(PLATFORM_RIGHT)
+
+
+def test_every_starting_slot_stands_inside_a_lane_with_room_to_spare(
+    course: RaceCourse,
+):
+    """The grid is derived from the channels, so it cannot drift off them.
+
+    Four racers to a bay is also what makes 'synchronised lane release' mean
+    anything: the gate opens once and four channels empty at the same instant.
+    """
+    per_lane = [0] * LANE_COUNT
+    for spawn in course.spawns:
+        inside = [
+            index
+            for index in range(LANE_COUNT)
+            if lane_bounds(index)[0] + RACER_RADIUS
+            <= spawn.x
+            <= lane_bounds(index)[1] - RACER_RADIUS
+        ]
+        assert len(inside) == 1, f"spawn at x={spawn.x} is not in exactly one lane"
+        per_lane[inside[0]] += 1
+    assert per_lane == [NEON_RACER_COUNT // LANE_COUNT] * LANE_COUNT
+
+
+def test_the_feed_spouts_stay_inside_the_drawn_bowl():
+    """Where the chute hands over, every point has to be on the flange.
+
+    A racer arriving at the seam plane is at bowl radius `hypot(dx, R) / R`,
+    and the renderer draws the bowl out to `FLANGE_OUTER` and no further. This
+    is the same argument the V1 report made for `SPOUT_OUTER`, re-checked
+    because V1.1 moved both numbers.
+    """
+    reach = SPOUT_OUTER - RACER_RADIUS
+    worst = math.hypot(reach, BOWL_RADIUS) / BOWL_RADIUS
+    assert worst < FLANGE_OUTER, f"a racer at the spout edge is at rho {worst:.3f}"
+
+
+def test_the_course_exports_the_channels_to_the_renderer(course: RaceCourse):
+    """The scene builds the bays, the gate blades and the frame under the
+    channels from these, rather than counting clear spans and hoping."""
+    for key in ("lane_count", "lane_width", "lane_rib", "lane_end_y",
+                "splitter_y", "converge_end_y", "spout_y",
+                "spout_inner", "spout_outer"):
+        assert key in course.metadata
+    assert course.metadata["lane_count"] == float(LANE_COUNT)
+    assert course.metadata["lane_width"] == LANE_WIDTH
+    assert course.metadata["spout_inner"] < course.metadata["spout_outer"]
+
+
+# --- the presentation contract, after the revision --------------------------
+
+
+def test_the_throat_window_covers_ground_no_racer_can_stand_on(replay: dict):
+    """The window in the far half of the bowl's floor costs no racing surface.
+
+    Two halves to that, and they are different kinds of claim.
+
+    The first is geometry: the window is a sector centred on the point of the
+    disc furthest from the lens, so every point of it is past the drain plane.
+    The second is the mapping: `deck_height` sends anything past the drain
+    plane down the *throat*, below the floor, so the far half of the disc is
+    scenery and nothing is ever drawn standing on it.
+
+    Both are asserted, because if either stopped holding the failure would be
+    marbles rolling across a sheet of glass.
+    """
+    half = math.radians(scene_constant("THROAT_WINDOW_HALF"))
+    inner = scene_constant("THROAT_WINDOW_INNER")
+    assert half < math.pi / 2.0 and inner > 0.0
+    # The nearest point of the sector to the drain plane, in course pixels.
+    nearest = BOWL_CENTRE_Y + inner * BOWL_RADIUS * math.cos(half)
+    assert nearest > BOWL_CENTRE_Y
+
+    with open(SCENE_PATH, "r", encoding="utf-8") as handle:
+        source = handle.read()
+    mapping = "if sim_y <= _drain_y:\n\t\treturn bowl_surface_y"
+    assert mapping in source, (
+        "the mapping no longer sends everything past the drain down the throat"
+    )
+
+    # ...and the window is a window onto something: the field does cross it.
+    seen = 0
+    for frame in replay["frames"]:
+        for racer in frame["racers"]:
+            if racer["retired"]:
+                continue
+            rho = bowl_rho(racer["x"], racer["y"])
+            if racer["y"] > BOWL_CENTRE_Y and inner <= rho <= scene_constant(
+                "THROAT_WINDOW_OUTER"
+            ):
+                seen += 1
+    assert seen > 200, "nothing ever passes under the window"
+
+
+def test_the_scene_reads_the_window_from_the_same_disc_the_bowl_is_built_on():
+    """The window's radii are fractions of the bowl radius, so a bowl that
+    moved would take its own window with it."""
+    inner = scene_constant("THROAT_WINDOW_INNER")
+    outer = scene_constant("THROAT_WINDOW_OUTER")
+    assert 0.0 < inner < outer < 1.0
+    # The throat runs from the drain to `throat_end`, which is this far out.
+    reach = (THROAT_END - BOWL_CENTRE_Y) / BOWL_RADIUS
+    assert outer > reach, "the window stops before the throat does"
+
+
+def test_the_cradle_stands_outside_the_flange_it_is_holding():
+    """V1's hoop was inside the rim and invisible from any lens that can see
+    into the bowl; the brief calls that out and this is the fix, as a number."""
+    assert scene_constant("CRADLE_RHO") > FLANGE_OUTER
+
+
+def test_the_acrylic_wall_stands_on_the_flange_and_leaves_the_field_a_way_in():
+    """The gap in the glass has to be wider than the arc the spouts arrive on,
+    or the feed would be drawn through it."""
+    gap = scene_constant("GLASS_GAP_HALF")
+    entry = math.degrees(math.atan2(SPOUT_OUTER, BOWL_RADIUS))
+    assert gap > entry, f"the spouts reach {entry:.1f} degrees either side"
+
+
+# --- the country experiment -------------------------------------------------
+
+
+def test_the_experiment_compares_three_treatments_at_three_moments():
+    assert neon_proof.COUNTRY_MODES == ("number", "flag", "code")
+    assert len(neon_proof.COUNTRY_MOMENTS) == 3
+    assert {label for label, _ in neon_proof.COUNTRY_MOMENTS} == {
+        "start", "bowl", "bridge"
+    }
+
+
+def test_the_five_countries_are_the_ones_the_brief_names():
+    """Read out of the GDScript, because that is where they are declared and a
+    list that drifted would make the report describe a comparison nobody ran."""
+    path = os.path.join(PROJECT_ROOT, "godot", "scripts", "neon_flags.gd")
+    with open(path, "r", encoding="utf-8") as handle:
+        source = handle.read()
+    codes = re.findall(r'\{"code": "([A-Z]{3})"', source)
+    assert codes == ["IND", "JPN", "BRA", "USA", "GER"]
+    assert "albedo_texture" not in source, "no wrapped flags; the brief rules them out"
+
+
+def test_the_badge_is_small_enough_not_to_own_the_marble():
+    """A plate the size of the ball it labels is a label with a marble
+    attached, and a pile-up of sixteen is where it would show."""
+    plate = scene_constant("COUNTRY_PLATE_SIZE")
+    assert plate < 2.0 * RACER_RADIUS / 100.0 * 1.2
+
+
+# --- the hero stills the brief asks to be judged on -------------------------
+
+
+def test_the_three_hero_moments_are_inside_the_video(replay: dict):
+    """A hero still that is not a frame of the clip is a picture of something
+    the viewer never sees."""
+    start, count = neon_proof.video_window(replay)
+    for name, at in neon_proof.HERO_MOMENTS:
+        index = neon_proof.moment_frame(replay, at)
+        assert start <= index < start + count, name
+
+
+def test_the_hero_moments_are_one_per_section(replay: dict):
+    """Each hero answers a different question, so each has to be somewhere
+    different: over the platform, inside the bowl, out on the bridge."""
+    metadata = replay["course"]["metadata"]
+    wanted = {
+        "start_hero": lambda y: y < metadata["bowl_top"],
+        "bowl_hero": lambda y: metadata["bowl_top"] <= y <= metadata["drain_y"],
+        "bridge_hero": lambda y: y > metadata["throat_end"],
+    }
+    for name, at in neon_proof.HERO_MOMENTS:
+        frame = replay["frames"][neon_proof.moment_frame(replay, at)]
+        heights = [racer["y"] for racer in frame["racers"] if not racer["retired"]]
+        matching = sum(1 for y in heights if wanted[name](y))
+        assert matching >= len(heights) * 0.5, (
+            f"{name} at {at:+.1f}s has only {matching} of {len(heights)} racers"
+            " where it says it does"
+        )
+
+
+def test_the_phone_preview_is_actually_phone_sized():
+    """The brief asks explicitly not to judge only at desktop full-screen."""
+    assert 0.2 <= neon_proof.PHONE_SCALE <= 0.35
+    assert int(1080 * neon_proof.PHONE_SCALE) < 400

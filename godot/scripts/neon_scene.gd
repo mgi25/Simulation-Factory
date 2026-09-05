@@ -58,6 +58,25 @@ extends Node3D
 ## draws. Nothing here integrates, accumulates or randomises. The camera's
 ## framing, the shutter's animation and the racer transforms are all computed
 ## from the playhead, so two renders of one replay are identical.
+##
+## ## What V1.1 changed
+##
+## The mapping above is untouched - it was the thing V1 set out to prove and it
+## proved. What this revision changes is everything the mapping is dressed in,
+## and each piece carries its own argument at the function that builds it:
+##
+##     _build_start_platform   four loading bays over four launch channels,
+##                             replacing one nine-hundred-pixel apron
+##     _build_bowl             an acrylic wall standing *on* the rim with the
+##                             near side cut away, a machined rim, a cradle
+##                             outside the flange, and a window into the throat
+##     _build_room             a hall at three distances instead of a void
+##     _build_ribbon           a five-value cross-section on a deep girder
+##     _support_positions      supports at the ends and the apexes, three
+##                             designs, splayed clear of the deck
+##
+## `docs/neon_machine_visual_polish_v11.md` has the measurements, the camera
+## comparison, the country verdict and the real limitations.
 
 const NeonMaterials := preload("res://scripts/neon_materials.gd")
 const NeonFlags := preload("res://scripts/neon_flags.gd")
@@ -96,7 +115,7 @@ const H_FINISH_DROP := 0.55
 # worst case on the reference replay is 1.11 - and every one of those has to
 # have something under it. Anything further out is clamped onto the lip.
 const FLOOR_RHO := 0.26
-const FLANGE_OUTER := 1.16
+const FLANGE_OUTER := 1.20
 const BOWL_PROFILE_POWER := 1.9
 
 # --- the camera -----------------------------------------------------------
@@ -129,7 +148,16 @@ const CAM_EDGE_MARGIN := 0.70
 const CAM_LEAD := 780.0
 # Added to the lead once the field is on the bridge, so the shot moves along
 # the S-curve rather than holding the emptying bowl in the foreground.
-const LEAD_BRIDGE := 520.0
+# Added to the lead once the field is on the bridge, so the shot moves along
+# the S-curve rather than holding the emptying bowl in the foreground.
+#
+# Nine hundred and fifty rather than V1's five hundred and twenty, and the
+# reason is the supports. Every post under the bridge projects about nine
+# units down the frame from the deck it holds, and at the shorter lead that
+# lands them on the back of the bowl, which is ten units nearer the lens.
+# Carrying the aim three and a half units further along puts the bowl out of
+# the bottom of the frame and the floor of the hall behind the posts.
+const LEAD_BRIDGE := 950.0
 const CAM_AIM_LIFT := 0.95
 
 # The move, as one flowing shot. Each term is a smoothstep of the aim's
@@ -151,7 +179,13 @@ const DOLLY_WIDE := 0.15
 const DOLLY_BOWL := 0.03
 const DOLLY_BRIDGE := 0.03
 const DIP_BOWL := 3.0                    # degrees of elevation given up
-const DIP_BRIDGE := 1.0
+# Negative on the bridge, which is the one change to the move. The bridge is
+# the stretch whose whole point is that there is air under it, and a lens that
+# climbs while the field crosses it looks further down onto the deck and hides
+# the girder, the posts and the space they stand in behind the deck they hold
+# up. Four degrees lower is enough to put all three in view and is nowhere
+# near enough to lose the bowl behind it.
+const DIP_BRIDGE := -4.0
 const LIFT_BOWL := 0.35
 
 # A slow orbit: eight degrees over the whole shot, applied to the camera
@@ -164,17 +198,64 @@ const ORBIT_SPAN := Vector2(600.0, 3400.0)
 
 # --- the room -------------------------------------------------------------
 
-const VOID_FLOOR_Y := -19.0
-const ROOM_OVERRUN_TOP := 1500.0
-const ROOM_OVERRUN_BOTTOM := 2400.0
-# Two ranks of columns outside the machine. The near rank has to clear the
-# bowl's lip, which reaches 5.45 units from the centre line.
-const COLUMN_FAR_X := 15.5
-const COLUMN_NEAR_X := 11.0
-const COLUMN_FAR_SPACING := 5.4
-const COLUMN_NEAR_SPACING := 11.0
-const COLUMN_FAR_SIZE := Vector3(0.85, 13.0, 0.85)
-const COLUMN_NEAR_SIZE := Vector3(1.15, 15.0, 1.15)
+# The floor of the hall.
+#
+# V1 put it at -19 and the reasoning was that more air under the bridge is
+# more obviously air. What it actually bought was posts ten units long, which
+# at a lens looking down from fifty-two degrees project sixteen units *down
+# the frame* - past the bridge, past the throat, and onto the back of the bowl
+# ten units nearer the camera. Every support on the bridge was drawn behind
+# the bowl's acrylic wall.
+#
+# At -15 the same posts project nine units, which lands them on the floor
+# directly under the deck they hold up, where they read against it and cast
+# onto it. Six units of air under a deck three and a half wide is still
+# unmistakably air.
+const VOID_FLOOR_Y := -15.0
+const ROOM_OVERRUN_TOP := 2200.0
+const ROOM_OVERRUN_BOTTOM := 3200.0
+const FLOOR_WIDTH := 76.0
+
+# Three ranks of structure at three distances, which is what the brief's
+# foreground / midground / background hierarchy comes down to once the
+# machine's own near frame is counted as the foreground it is.
+#
+# The offsets are chosen against the lens rather than by eye. The frustum is
+# about six units wide at the subject and grows by one unit for every five
+# units past it, so a rank at 8.7 first crosses the frame ten units beyond the
+# aim, one at 12.9 about thirty beyond, and the wall at 17.4 further again.
+# That is the parallax: three ranks entering and leaving the frame at three
+# rates as the shot orbits.
+const TOWER_NEAR_X := 8.7
+const TOWER_NEAR_SPACING := 9.4
+const TOWER_NEAR_SIZE := Vector3(1.05, 13.5, 1.05)
+const TOWER_NEAR_SINK := 1.6
+const TOWER_MID_X := 12.9
+const TOWER_MID_SPACING := 6.1
+const TOWER_MID_SIZE := Vector3(1.70, 27.0, 1.70)
+const TOWER_MID_SINK := 2.4
+const WALL_X := 17.4
+const WALL_PANEL := Vector3(0.45, 4.4, 3.4)
+const WALL_PANEL_PITCH := 4.1
+const WALL_PANEL_RISE := 5.1
+const WALL_ROWS := 7
+const WALL_BASE := -12.0
+const STRIP_HEIGHT := 3.4
+
+const CONDUIT_SPACING := 13.0
+const CONDUIT_RADIUS := 0.13
+const CONDUIT_HEIGHT := 15.0
+
+# Plant on the floor of the hall, under and behind the machine. Three sizes on
+# a fixed cycle - deterministic by index, because two renders of one replay
+# have to agree and nothing in this scene may randomise.
+const PLANT_SPACING := 7.2
+const PLANT_X := 3.4
+const PLANT_SIZES := [
+	Vector3(1.5, 1.1, 2.6), Vector3(2.1, 1.9, 1.7), Vector3(1.2, 2.8, 1.2)]
+const FLOOR_LINE_X := 7.2
+const FLOOR_LINE_LENGTH := 5.6
+const PLATE_PITCH := 3.9
 
 # --- decks ----------------------------------------------------------------
 
@@ -184,17 +265,22 @@ const COLUMN_NEAR_SIZE := Vector3(1.15, 15.0, 1.15)
 # is a line.
 const DECK_THICKNESS := 0.42
 const DECK_MARGIN := 32.0        # course px the deck reaches past the walls
+# The launch channels use less, and the reason is the gaps between them. The
+# ribs are ninety course pixels wide; at the full margin the four decks close
+# to within twenty-six pixels of each other and the negative space the whole
+# section exists to open is a seam. At twenty-two it is forty-six - still well
+# past the rail's own twenty, so the rails have something to stand on.
+const CHUTE_MARGIN := 22.0
 const DECK_STEP := 26.0          # course px between deck cross-sections
 const RAIL_WIDTH := 0.20
 const RAIL_HEIGHT := 0.30
 const RAIL_LIGHT_HEIGHT := 0.045
-const RAIL_LIGHT_INSET := 0.055
+const RAIL_LIGHT_INSET := 0.068
 
 # Pillars under a raised deck. The single most effective depth cue in the
 # frame after the height hierarchy itself: a deck with air and a shadow
 # beneath it is unmistakably an object, where the same deck lying on a floor
 # is a marking.
-const PILLAR_SPACING := 2.6
 const PILLAR_WIDTH := 0.28
 const PILLAR_CAP := 0.16
 const PILLAR_FOOT := 0.44
@@ -209,13 +295,54 @@ const BRACE_DROP := 2.4
 # Samples either side of a cross-section that its edges are averaged over.
 # Three is a hair over one wall box at the sampling rate above.
 const EDGE_SMOOTHING := 3
+# Below this much of a slope, a piece is a floor rather than the wall of a
+# channel. Skipping them is what stops the finish apron's own floor being read
+# as a wall right across the section it is the floor of.
+#
+# Every constant in this block is mirrored in `rendering/deck_geometry.py`,
+# which is the Python twin of this builder, and
+# `tests/test_deck_geometry.py::test_the_scene_and_the_port_agree_on_every_shared_constant`
+# parses this file and asserts each one. A value edited on one side and not the
+# other fails the suite rather than the render.
+const WALL_SIN_MIN := 0.25
 # The recessed centre panel: how much of the deck it covers, and how far it
 # is let into it.
-const PANEL_INSET := 0.62
+const PANEL_INSET := 0.54
 # Laid on rather than let in: a swept solid cannot cut a recess, and a
 # panel a hair proud of the deck reads as an inlay just as well.
 const PANEL_SPINE := 0.16
 const PANEL_DEPTH := 0.012
+# The bevel between the running surface and the foot of the rail, in course
+# pixels inward from the rail, and how far it is raised.
+const BEVEL_WIDTH := 22.0
+const BEVEL_RISE := 0.030
+# The keel: a beam under the middle of a deck, as a share of the deck width.
+# It is what a support meets - a post that ends at a flat underside ends in
+# mid-air, and one that meets a beam is a joint.
+const KEEL_INSET := 0.34
+const KEEL_DEPTH := 0.30
+# The bridge carries a deep girder instead, with web stiffeners down it. It is
+# the single strongest cue that the deck is in the air: the brief asks for the
+# space underneath to be obvious, and a dark fabricated beam under a pale deck
+# says so from any angle, where a flat underside says nothing to a lens
+# looking down at it.
+const GIRDER_DEPTH := 0.82
+const STIFFENER_SPACING := 1.05
+
+# The support family. Three silhouettes rather than one pole repeated: see
+# `_support_positions` for where each is used and why.
+const SUPPORT_PILLAR := 0
+const SUPPORT_YFRAME := 1
+const SUPPORT_BRACKET := 2
+# World units of course height a deck may cross unsupported before a pillar is
+# filled in. Six is a little over half the bridge's longest natural span.
+const SUPPORT_MAX_SPAN := 3.8
+
+# The frame under the launch channels: one structure under all four, rather
+# than a post under each.
+const CHANNEL_BEAM := 0.24
+const CHANNEL_BEAM_SPACING := 1.15
+const CHANNEL_HANGER := 0.62
 
 # --- the bowl -------------------------------------------------------------
 
@@ -223,32 +350,70 @@ const PANEL_DEPTH := 0.012
 # shell around it, and how much wider that shell is.
 const BOWL_WALL := 0.26
 const FLANGE_SINK := 0.05
-const BOWL_GLASS_DROP := 0.95
-const BOWL_GLASS_SWELL := 1.115
 const DRAIN_WELL_DEPTH := 2.60
 const BOWL_LEGS := 6
+const RIM_CLAMPS := 12
+
+# The acrylic wall standing on the rim: how far out it flares, in bowl radii,
+# and how far it rises, in world units. The gap in it is measured either side
+# of the point of the disc nearest the lens - which is also where the feed
+# spouts arrive, so one opening serves both.
+const GLASS_FLARE := 0.22
+const GLASS_RISE := 0.95
+const GLASS_GAP_HALF := 44.0
+const GLASS_MULLIONS := 5
+
+# The window let into the far half of the floor, in bowl radii and degrees
+# either side of the far point. Its outer edge stops at 0.88, which is a
+# little past where the throat hands over to the bridge - past that the
+# racers are out from under the bowl and there is nothing left to see.
+const THROAT_WINDOW_INNER := 0.30
+const THROAT_WINDOW_OUTER := 0.88
+const THROAT_WINDOW_HALF := 25.0
+
+# The cradle: where the hoop sits, in bowl radii, and how far below the rim.
+# Outside the flange rather than under the dish, which is the whole point.
+# Outside the *flange*, not just outside the dish. V1's hoop was at 1.05,
+# which is inside the flange's 1.20 - so from any lens high enough to see into
+# the bowl it was hidden under the rim it was supposedly holding. At 1.30 it
+# stands proud of everything except the acrylic wall flaring over it, and the
+# whole ring, its arms and its legs are in view from every frame in the shot.
+# Outside the acrylic wall's own flare, which is what finally made it read.
+# At 1.30 the hoop was still under the glass at the bowl's silhouette edges and
+# only showed as a smudge through it; at 1.42 it is the outermost thing on the
+# bowl at any angle in the shot - a dark machined ring standing below and
+# outside the vessel, with six arms into it and six legs dropping away.
+const CRADLE_RHO := 1.42
+const CRADLE_DROP := 1.30
+const UNDER_STRIPS := 8
 
 # --- the start platform ---------------------------------------------------
 
 const PLATFORM_OVERHANG := 150.0
 const PLATFORM_THICKNESS := 0.52
 const PLATFORM_HOUSING := 0.42
-const GRID_LANES := 8
-const GATE_BLADES := 8
+# How far the bay floors sit below the top of the block they are cut into, and
+# how far past its walls a bay deck reaches. The bay margin is small on
+# purpose - the ribs between the bays are only ninety course pixels wide, and
+# a deck that reached a full rail's width past each wall would close the gap
+# the ribs exist to open.
+const BAY_RECESS := 0.09
+const BAY_MARGIN := 12.0
+const RIB_HEIGHT := 0.21
+# The front of the machine: a deep beam under the lip of the deck.
+const FASCIA_HEIGHT := 0.68
+const FASCIA_DEPTH := 0.30
+const LEG_WIDTH := 0.34
 const GATE_HEIGHT := 0.74
 const GATE_DEPTH := 0.16
-const GATE_GAP := 0.05
 const GATE_LIGHT := 0.10
 const GATE_HOUSING := 0.34
 const SIGN_HEIGHT := 2.55
 const SIGN_PANEL := Vector3(0.0, 0.86, 0.22)
 
-# How far a column is pushed into the floor, so a rank of them does not read
-# as a row of identical objects standing on nothing.
-const COLUMN_SINK := 1.2
-# Cross-beams between the far columns: how far apart, and at what heights
+# Cross-beams between the mid towers: how far apart, and at what heights
 # above the machine's own deck.
-const GANTRY_SPACING := 1700.0
+const GANTRY_SPACING := 1450.0
 const GANTRY_HIGH := 6.4
 const GANTRY_REACH := 7.0
 
@@ -258,6 +423,12 @@ const BADGE_RISE := 0.42
 const BADGE_FONT_SIZE := 120
 const BADGE_PIXEL_SIZE := 0.0020
 const BADGE_OUTLINE := 26
+# The country experiment's plate, in world units across, and the size of the
+# three-letter code under it. Both are small on purpose: the brief asks the
+# badge to stay small enough not to clutter a pile-up, and a marble is only
+# 0.30 units across.
+const COUNTRY_PLATE_SIZE := 0.40
+const COUNTRY_CODE_SIZE := 0.0025
 
 # --- the shutter ----------------------------------------------------------
 
@@ -328,7 +499,7 @@ var _gate_tick := -1.0
 
 var _physics_hz := 120.0
 var _ticks_per_frame := 2.0
-var _countries := false
+var _countries := ""
 
 
 func build(replay: Dictionary, mode := "production") -> void:
@@ -342,7 +513,7 @@ func build(replay: Dictionary, mode := "production") -> void:
 	_course_bottom = float(_course.get("bottom", 4120.0))
 	_physics_hz = maxf(1.0, float(replay.get("physics_hz", 120.0)))
 	_ticks_per_frame = maxf(1.0, float(replay.get("ticks_per_frame", 2.0)))
-	_countries = _flag("--neon-countries")
+	_countries = _argument("--neon-countries")
 
 	_read_machine()
 	_gate_tick = _find_gate_tick()
@@ -354,11 +525,11 @@ func build(replay: Dictionary, mode := "production") -> void:
 	_build_camera()
 	_build_room()
 	_build_start_platform()
-	_build_deck("chute", true)
+	_build_deck("chute", "frame", true, CHUTE_MARGIN)
 	_build_bowl()
-	_build_deck("throat", false, false, -8.0)
-	_build_deck("bridge", true)
-	_build_deck("finish", false)
+	_build_deck("throat", "none", false, -8.0)
+	_build_deck("bridge", "posts")
+	_build_deck("finish", "none")
 	_build_racers()
 
 
@@ -476,14 +647,19 @@ func _phase(span: Vector2, sim_y: float) -> float:
 	return smoothstep(span.x, span.y, sim_y)
 
 
-func _flag(name: String) -> bool:
+func _argument(name: String) -> String:
+	## `--name=value` out of the command line, or "" if it is not there.
+	##
+	## `--name` on its own counts as "1", and `--name=0` counts as absent, so a
+	## flag and a valued option are read the same way.
 	for argument in OS.get_cmdline_user_args():
 		var arg: String = argument
 		if arg == name:
-			return true
-		if arg.begins_with(name + "=") and not arg.ends_with("=0"):
-			return true
-	return false
+			return "1"
+		if arg.begins_with(name + "="):
+			var value := arg.substr(name.length() + 1)
+			return "" if value == "0" else value
+	return ""
 
 
 # --- environment ----------------------------------------------------------
@@ -551,7 +727,12 @@ func _build_environment() -> void:
 	# treatment and the drain collar, so those two bloom and nothing else
 	# does. Turn it loose and a machine made of pale decks hazes over into one
 	# bright shape.
-	environment.glow_enabled = true
+	# `--neon-no-glow` renders the same frame with it switched off, which is
+	# how the brief's "the image should still look good with bloom disabled"
+	# gets answered by looking rather than by asserting. A render-time flag
+	# rather than an edit to this line, so the two frames come out of one build
+	# of one scene from one replay and differ in exactly one thing.
+	environment.glow_enabled = _argument("--neon-no-glow") == ""
 	environment.glow_intensity = 0.42
 	environment.glow_strength = 1.0
 	environment.glow_bloom = 0.0
@@ -824,10 +1005,8 @@ func _piece_span(spec: Dictionary, y: float) -> Vector2:
 	var half_w := float(spec.get("width", 0.0)) * 0.5
 	var half_h := float(spec.get("height", 0.0)) * 0.5
 	var angle := deg_to_rad(float(spec.get("rotation_degrees", 0.0)))
-	# A near-horizontal piece is a floor, not the wall of a channel. Skipping
-	# them is what stops the finish apron's own floor being read as a wall
-	# right across the section it is the floor of.
-	if absf(sin(angle)) < 0.25:
+	# A near-horizontal piece is a floor, not the wall of a channel.
+	if absf(sin(angle)) < WALL_SIN_MIN:
 		return Vector2.ZERO
 
 	# Where the plane actually cuts the box, found by clipping its outline
@@ -970,15 +1149,32 @@ func _deck_ribbons(section: String) -> Array:
 		if (run as Array).size() >= 2:
 			ribbons.append(run)
 
-	# A wall's first box only just reaches the plane its section begins at, so
-	# the top sample can fall on either side of it depending on rounding. The
-	# first run is pulled back to the section top rather than left to chance,
-	# because the gap that leaves is the seam between two stretches of track.
-	if not ribbons.is_empty():
-		var first: Array = ribbons[0]
-		var head: Vector3 = first[0]
-		if head.z > start + 1.0:
-			first.insert(0, Vector3(head.x, head.y, start))
+	# A wall's first and last boxes only just reach the planes their section
+	# begins and ends at, so a sample there can fall on either side of one
+	# depending on rounding - and the sweep deliberately stops two pixels short
+	# of the bottom, because at the plane itself this section's walls have
+	# ended and the next section's have begun, which reads as a change of
+	# channel count and splits every run.
+	#
+	# So every run that reaches a plane is carried to it. What that closes is
+	# the seam between two stretches of track: two course pixels of nothing is
+	# a fiftieth of a world unit and invisible, but a racer standing over it is
+	# standing over nothing, and that is the one thing this builder exists to
+	# prevent. `rendering/deck_geometry.py` is the same fix in Python and
+	# `tests/test_deck_geometry.py` measures it against a recorded race.
+	#
+	# Every run, not only the first and the last: the list is in the order runs
+	# *closed*, so on a section that ends in two channels - the chute does -
+	# both of the last two end at the sweep's final plane and only one of them
+	# is the list's last.
+	for raw_run in ribbons:
+		var run: Array = raw_run
+		var head: Vector3 = run[0]
+		if head.z <= start + DECK_STEP and head.z > start + 1.0e-6:
+			run.insert(0, Vector3(head.x, head.y, start))
+		var tail: Vector3 = run[run.size() - 1]
+		if tail.z >= finish - 1.0e-6:
+			run.append(Vector3(tail.x, tail.y, bounds.y))
 
 	var smoothed: Array = []
 	for run in ribbons:
@@ -1042,10 +1238,18 @@ func _solid_ribbon(node_name: String, samples: Array, rise: float,
 		var l1: Vector3 = next[0]
 		var r1: Vector3 = next[1]
 
+		# The side faces get the normal the segment actually has, not a
+		# constant one. This is the single change that stopped the S-curve
+		# reading as generated: with `Vector3.RIGHT` on every right-hand face,
+		# a bridge that turns through ninety degrees has its whole outer wall
+		# claiming to face the same way, so the key light lands on it in flat
+		# bands that switch value at the sample joints. Taking the normal from
+		# the edge's own direction gives the wall a continuous gradient around
+		# each bend - which is what a manufactured surface does.
 		_quad(top, l0, r0, r1, l1, Vector3.UP)
 		_quad(under, l0 + drop, l1 + drop, r1 + drop, r0 + drop, Vector3.DOWN)
-		_quad(side, r0, r0 + drop, r1 + drop, r1, Vector3.RIGHT)
-		_quad(side, l0, l1, l1 + drop, l0 + drop, Vector3.LEFT)
+		_quad(side, r0, r0 + drop, r1 + drop, r1, _side_normal(r0, r1, 1.0))
+		_quad(side, l0, l1, l1 + drop, l0 + drop, _side_normal(l0, l1, -1.0))
 
 	var first := _ribbon_edges(samples[0], rise)
 	_quad(side, first[0], first[0] + drop, first[1] + drop, first[1],
@@ -1058,6 +1262,19 @@ func _solid_ribbon(node_name: String, samples: Array, rise: float,
 	side.commit(mesh)
 	under.commit(mesh)
 	return _mesh_node(node_name, mesh, materials, shadows)
+
+
+func _side_normal(here: Vector3, next: Vector3, side: float) -> Vector3:
+	## The outward normal of one side face, from the direction it runs in.
+	##
+	## Taken in the horizontal plane only. A deck's side face is vertical
+	## whatever the deck's slope, so tipping the normal with the gradient
+	## would light it as though it leaned.
+	var delta := Vector3(next.x - here.x, 0.0, next.z - here.z)
+	if delta.length_squared() < 1.0e-12:
+		return Vector3(side, 0.0, 0.0)
+	delta = delta.normalized()
+	return Vector3(side * delta.z, 0.0, -side * delta.x)
 
 
 func _ribbon_edges(sample: Vector3, rise: float) -> Array:
@@ -1111,15 +1328,38 @@ func _band(samples: Array, side: float, inner: float, outer: float) -> Array:
 	return moved
 
 
-func _build_deck(section: String, pillars: bool, rails := true,
+func _build_deck(section: String, supports: String, rails := true,
 		margin := DECK_MARGIN) -> void:
-	## One named stretch of track: deck, rails, lit edges and supports.
+	## One named stretch of track: deck, bevel, rails, lit edges, keel and
+	## whatever is holding it up.
 	##
 	## `margin` is how far past the walls the deck reaches, and the throat
-	## passes a negative one. It has to: the drain is a hole cut in the bowl
-	## at exactly the radius of the throat's walls, so a throat that reached
-	## past them would meet the bowl's floor at its own height and fight it
-	## for the depth buffer all the way round the opening.
+	## passes a negative one. It has to: the drain is a hole cut in the bowl at
+	## exactly the radius of the throat's walls, so a throat that reached past
+	## them would meet the bowl's floor at its own height and fight it for the
+	## depth buffer all the way round the opening.
+	##
+	## ## The cross-section
+	##
+	## V1 drew a deck as a flat ribbon with a rail at each edge, and the brief
+	## is right that it read as a ribbon. A manufactured channel has a
+	## *profile*, and this is it, from the outside in:
+	##
+	##     rail            rail        polished, near-mirror
+	##      | bevel  bevel |           one value down, catching the key
+	##      |   \_______/  |           the running surface
+	##      |    panel     |           one value down again, inlaid
+	##     ========================    the keel, underneath and dark
+	##
+	## Five values across a deck instead of two. None of them is decoration:
+	## the bevel is what gives the edge a highlight that is not the rail's, the
+	## panel is what stops a wide pale surface reading as paper, and the keel
+	## is what the supports meet - a post that ends at a flat underside ends in
+	## mid-air, and one that meets a beam is a joint.
+	##
+	## Every one of them runs *along* the direction of travel. A line drawn
+	## across a deck reads as a rung, which is the diagram look this prototype
+	## exists to get away from.
 	var ribbons := _deck_ribbons(section)
 	if ribbons.is_empty():
 		return
@@ -1128,109 +1368,389 @@ func _build_deck(section: String, pillars: bool, rails := true,
 	root.name = "Deck_%s" % section
 	add_child(root)
 
-	var deck_materials := [
-		_palette.track_top(), _palette.track_side(), _palette.track_web()]
-	var rail_materials := [
-		_palette.rail(), _palette.rail(), _palette.track_web()]
-	var light_materials := [
-		_palette.edge_light(), _palette.edge_light(), _palette.edge_light()]
+	for index in ribbons.size():
+		var raw: Array = ribbons[index]
+		var deck := _widen(raw, -margin, margin)
+		_build_ribbon(root, "%d" % index, deck, rails,
+			GIRDER_DEPTH if supports == "posts" else KEEL_DEPTH,
+			supports == "posts")
+		if supports == "posts":
+			_build_supports(root, deck, index)
+	if supports == "frame":
+		_build_channel_frame(root, ribbons, margin)
+
+
+func _build_ribbon(root: Node3D, tag: String, deck: Array, rails: bool,
+		keel_depth := KEEL_DEPTH, stiffeners := false) -> void:
+	## One channel, as the profile above.
+	root.add_child(_solid_ribbon("Surface%s" % tag, deck, 0.0, DECK_THICKNESS,
+		[_palette.track_top(), _palette.track_side(), _palette.track_web()]))
 
 	var rail_px := RAIL_WIDTH * PIXELS_PER_UNIT
 	var light_px := RAIL_LIGHT_INSET * PIXELS_PER_UNIT
 
-	for index in ribbons.size():
-		var raw: Array = ribbons[index]
-		# The deck reaches past the walls by exactly a rail's width, so the
-		# rails have something to stand on and the racing surface still ends
-		# where the simulation says it does.
-		var deck := _widen(raw, -margin, margin)
-		root.add_child(_solid_ribbon(
-			"Surface%d" % index, deck, 0.0, DECK_THICKNESS, deck_materials))
-
+	for raw_side in ([-1.0, 1.0] if rails else []):
+		var side := float(raw_side)
+		var suffix := ("L" if side < 0.0 else "R") + tag
+		# The bevel between the running surface and the foot of the rail.
+		root.add_child(_solid_ribbon("Bevel%s" % suffix,
+			_band(deck, side, rail_px, rail_px + BEVEL_WIDTH),
+			BEVEL_RISE, DECK_THICKNESS * 0.5,
+			[_palette.track_top(true), _palette.track_side(),
+				_palette.track_web()], false))
 		# A polished rail is the one near-mirror surface on the track. The
 		# highlight running along it is most of how a viewer reads an S-bend
 		# as a bend rather than as a shape.
-		for side in ([-1.0, 1.0] if rails else []):
-			var tag := "L" if side < 0.0 else "R"
-			root.add_child(_solid_ribbon(
-				"Rail%s%d" % [tag, index], _band(deck, side, 0.0, rail_px),
-				RAIL_HEIGHT, RAIL_HEIGHT + 0.06, rail_materials))
-			root.add_child(_solid_ribbon(
-				"Edge%s%d" % [tag, index],
-				_band(deck, side, light_px, rail_px - light_px),
-				RAIL_HEIGHT + RAIL_LIGHT_HEIGHT, RAIL_LIGHT_HEIGHT,
-				light_materials, false))
+		root.add_child(_solid_ribbon("Rail%s" % suffix,
+			_band(deck, side, 0.0, rail_px),
+			RAIL_HEIGHT, RAIL_HEIGHT + 0.06,
+			[_palette.rail(), _palette.rail(), _palette.track_web()]))
+		root.add_child(_solid_ribbon("Edge%s" % suffix,
+			_band(deck, side, light_px, rail_px - light_px),
+			RAIL_HEIGHT + RAIL_LIGHT_HEIGHT, RAIL_LIGHT_HEIGHT,
+			[_palette.edge_light(), _palette.edge_light(),
+				_palette.edge_light()], false))
 
-		# A recessed centre panel. Two values across a deck rather than one is
-		# what stops a wide pale surface reading as a sheet of paper, and it
-		# runs *along* the direction of travel - a line drawn across a deck
-		# reads as a rung and puts the frame back into diagram territory.
-		root.add_child(_solid_ribbon("Panel%d" % index,
-			_inset(deck, PANEL_INSET), PANEL_DEPTH, DECK_THICKNESS * 0.5,
-			[_palette.track_top(true), _palette.track_side(),
-				_palette.track_web()], false))
-		root.add_child(_solid_ribbon("Spine%d" % index,
-			_inset(deck, PANEL_SPINE), PANEL_DEPTH * 2.0, DECK_THICKNESS * 0.5,
-			[_palette.track_side(), _palette.track_side(),
-				_palette.track_web()], false))
+	root.add_child(_solid_ribbon("Panel%s" % tag,
+		_inset(deck, PANEL_INSET), PANEL_DEPTH, DECK_THICKNESS * 0.5,
+		[_palette.track_panel(), _palette.track_side(),
+			_palette.track_web()], false))
+	root.add_child(_solid_ribbon("Spine%s" % tag,
+		_inset(deck, PANEL_SPINE), PANEL_DEPTH * 2.0, DECK_THICKNESS * 0.5,
+		[_palette.track_top(true), _palette.track_side(),
+			_palette.track_web()], false))
 
-		if pillars:
-			_build_pillars(root, deck, index)
+	if keel_depth <= 0.0:
+		return
+
+	# The girder. On the bridge this is deep rather than shallow, and it is
+	# the difference between a deck that is *up* and a deck that is merely
+	# drawn high in the frame: a pale surface with a dark beam under it, lit
+	# on one face and shadowed on the other, is an object standing in air. A
+	# flat underside at a lens looking down on it is nothing at all.
+	root.add_child(_solid_ribbon("Keel%s" % tag,
+		_inset(deck, KEEL_INSET), -DECK_THICKNESS + 0.01, keel_depth,
+		[_palette.structure(false, true), _palette.structure(false, true),
+			_palette.structure()]))
+
+	if not stiffeners:
+		return
+	# Web stiffeners down the girder, which is what turns a beam into a
+	# fabricated one. Spaced on the ribbon's own samples rather than on a
+	# distance, so they follow the curve instead of drifting across it.
+	var step := maxi(1, int(STIFFENER_SPACING * PIXELS_PER_UNIT / DECK_STEP))
+	var index := step
+	while index < deck.size() - 1:
+		var sample: Vector3 = deck[index]
+		var next: Vector3 = deck[mini(index + 1, deck.size() - 1)]
+		var centre := _centre_of(sample)
+		var top := deck_height(centre, sample.z) - DECK_THICKNESS
+		var web := _box("Web%s_%d" % [tag, index],
+			Vector3(to_units(sample.y - sample.x) * (KEEL_INSET + 0.30),
+				keel_depth * 0.92, 0.09),
+			Vector3(to_units(centre - _course_width * 0.5),
+				top - keel_depth * 0.5, to_units(sample.z)),
+			_palette.structure(), false)
+		web.rotation.y = -atan2(
+			to_units(next.z - sample.z),
+			to_units(_centre_of(next) - centre) + 1.0e-6) + PI * 0.5
+		root.add_child(web)
+		index += step
 
 
-func _build_pillars(root: Node3D, samples: Array, ribbon: int) -> void:
-	## Posts from the underside of a deck down to the floor of the room.
+# --- supports -------------------------------------------------------------
+
+func _centre_of(sample: Vector3) -> float:
+	return (sample.x + sample.y) * 0.5
+
+
+func _support_positions(samples: Array) -> Array:
+	## Where a raised deck is held up, chosen rather than stepped out.
+	##
+	## V1 dropped a post every fixed distance and the brief is right that it
+	## looked generated: a bridge whose supports fall on a metronome is a
+	## bridge nobody designed. A real one is held where the load asks, so this
+	## picks those places:
+	##
+	##   * the two ends, where the deck hands over to the next stretch
+	##   * every apex of the swing, where the centre line turns back and the
+	##     deck is furthest out over the room
+	##   * the middle of any span still longer than `SUPPORT_MAX_SPAN`
+	##
+	## Returned as `[sample index, type]`. On this bridge that comes out as a
+	## bracket, a Y-frame, a filled pillar, a Y-frame and a bracket - which is
+	## a shape a viewer can read as engineering rather than as spacing.
+	var count := samples.size()
+	if count < 3:
+		return []
+
+	var chosen: Array = [[1, SUPPORT_BRACKET]]
+	# An apex is a sample whose centre line is further from the middle of the
+	# course than both of its neighbours a window away.
+	#
+	# The turn is flat at its extreme, so that test is true for a run of
+	# consecutive samples rather than for one - four of them either side of
+	# this bridge's two apexes. The first version took them all and built four
+	# Y-frames inside a quarter of a unit of each other, which draws as one
+	# support and costs three. So a candidate only opens a new apex if it is
+	# clear of the last one by the window; otherwise it replaces it if it is
+	# further out.
+	var window := maxi(2, count / 14)
+	var apexes: Array = []
+	for index in range(window + 1, count - window - 1):
+		var here := absf(_centre_of(samples[index]) - _course_width * 0.5)
+		var before := absf(
+			_centre_of(samples[index - window]) - _course_width * 0.5)
+		var after := absf(
+			_centre_of(samples[index + window]) - _course_width * 0.5)
+		if not (here > before and here >= after):
+			continue
+		if apexes.is_empty() or index - int((apexes[apexes.size() - 1] as Array)[0]) > window:
+			apexes.append([index, here])
+		elif here > float((apexes[apexes.size() - 1] as Array)[1]):
+			apexes[apexes.size() - 1] = [index, here]
+	for raw_apex in apexes:
+		chosen.append([int((raw_apex as Array)[0]), SUPPORT_YFRAME])
+	chosen.append([count - 2, SUPPORT_BRACKET])
+
+	# Fill anything left unsupported for too long, measured in world units of
+	# course height - which is what a viewer reads as an unsupported span.
+	var filled: Array = []
+	for entry_index in chosen.size():
+		var entry: Array = chosen[entry_index]
+		if entry_index > 0:
+			var previous: Array = chosen[entry_index - 1]
+			var from_z := float((samples[int(previous[0])] as Vector3).z)
+			var to_z := float((samples[int(entry[0])] as Vector3).z)
+			var extra := int(to_units(to_z - from_z) / SUPPORT_MAX_SPAN)
+			for step in range(1, extra + 1):
+				var here_index := int(previous[0])
+				var next_index := int(entry[0])
+				filled.append([
+					here_index + (next_index - here_index) * step / (extra + 1),
+					SUPPORT_PILLAR])
+		filled.append(entry)
+	return filled
+
+
+func _build_supports(root: Node3D, samples: Array, ribbon: int) -> void:
+	## Supports from the underside of a deck down to the floor of the room.
 	##
 	## The brief calls the empty space under the bridge essential and it is
 	## right: a deck with air and a shadow beneath it is unmistakably an
-	## object, where the same deck lying on a floor is a marking. The posts
+	## object, where the same deck lying on a floor is a marking. The supports
 	## are what make that space readable - without something crossing it,
 	## twelve units of darkness is only darkness.
-	var span := float((samples[samples.size() - 1] as Vector3).z) \
-		- float((samples[0] as Vector3).z)
-	var count := maxi(1, int(to_units(span) / PILLAR_SPACING))
+	##
+	## Three designs rather than one, because a row of identical poles is the
+	## other half of what made V1's bridge look generated. A pillar under a
+	## straight run, a Y-frame at an apex, and a raked bracket at each end
+	## where the load turns into the next stretch.
+	var chosen := _support_positions(samples)
 	var previous := Vector3.ZERO
+	var placed := 0
 
-	for index in count:
-		var t := (float(index) + 0.5) / float(count)
-		var at := int(round(t * float(samples.size() - 1)))
-		var sample: Vector3 = samples[clampi(at, 0, samples.size() - 1)]
-		var centre := (sample.x + sample.y) * 0.5
-		var top := deck_height(centre, sample.z) - DECK_THICKNESS
+	for raw_entry in chosen:
+		var entry: Array = raw_entry
+		var sample: Vector3 = samples[clampi(int(entry[0]), 0, samples.size() - 1)]
+		var centre := _centre_of(sample)
+		var half := to_units(sample.y - sample.x) * 0.5
+		var top := deck_height(centre, sample.z) - DECK_THICKNESS - KEEL_DEPTH * 0.55
 		var x := to_units(centre - _course_width * 0.5)
 		var z := to_units(sample.z)
-		var length := top - VOID_FLOOR_Y
+		var tag := "%d_%d" % [ribbon, placed]
 
-		# A cap where the post meets the deck, so the join is a joint rather
-		# than a box ending in mid-air.
-		root.add_child(_box("Cap%d_%d" % [ribbon, index],
-			Vector3(PILLAR_WIDTH * 2.2, PILLAR_CAP, PILLAR_WIDTH * 2.2),
+		root.add_child(_box("Cap%s" % tag,
+			Vector3(PILLAR_WIDTH * 2.4, PILLAR_CAP, PILLAR_WIDTH * 2.4),
 			Vector3(x, top - PILLAR_CAP * 0.5, z),
 			_palette.structure(false, true)))
-		root.add_child(_box("Pillar%d_%d" % [ribbon, index],
-			Vector3(PILLAR_WIDTH, length, PILLAR_WIDTH),
-			Vector3(x, top - length * 0.5, z),
-			_palette.structure()))
-		root.add_child(_box("Foot%d_%d" % [ribbon, index],
-			Vector3(PILLAR_FOOT, 0.24, PILLAR_FOOT),
-			Vector3(x, VOID_FLOOR_Y + 0.12, z),
-			_palette.structure(false, true)))
+		# A short lit line on the cap. It is the only thing on a support that
+		# is emissive, and it is there so a viewer can find the tops of them
+		# against a dark room without the supports themselves being lit.
+		root.add_child(_box("CapLight%s" % tag,
+			Vector3(PILLAR_WIDTH * 2.6, 0.035, 0.055),
+			Vector3(x, top - PILLAR_CAP - 0.02, z),
+			_palette.strip(false, true), false))
 
-		# One brace between neighbouring posts, well under the deck so it can
-		# never cross a racer, and horizontal so it reads as a frame.
-		if index > 0:
+		match int(entry[1]):
+			SUPPORT_YFRAME:
+				_build_yframe(root, tag, x, z, top, half)
+			SUPPORT_BRACKET:
+				_build_bracket(root, tag, x, z, top, half)
+			_:
+				_build_pillar(root, tag, x, z, top, half)
+
+		# One brace between neighbouring supports, well under the deck so it
+		# can never cross a racer, and horizontal so it reads as a frame.
+		if placed > 0:
 			var here := Vector3(x, top, z)
 			var delta := here - previous
 			var flat := Vector2(delta.x, delta.z).length()
-			var brace := _box("Brace%d_%d" % [ribbon, index],
-				Vector3(flat, BRACE_WIDTH, BRACE_WIDTH),
-				Vector3((previous.x + x) * 0.5,
-					(previous.y + top) * 0.5 - BRACE_DROP,
-					(previous.z + z) * 0.5),
-				_palette.structure(false, true))
-			brace.rotation.y = -atan2(delta.z, delta.x)
-			root.add_child(brace)
+			if flat > 0.25:
+				var brace := _box("Brace%s" % tag,
+					Vector3(flat, BRACE_WIDTH, BRACE_WIDTH),
+					Vector3((previous.x + x) * 0.5,
+						(previous.y + top) * 0.5 - BRACE_DROP,
+						(previous.z + z) * 0.5),
+					_palette.structure(false, true))
+				brace.rotation.y = -atan2(delta.z, delta.x)
+				root.add_child(brace)
 		previous = Vector3(x, top, z)
+		placed += 1
+
+
+func _foot(root: Node3D, node_name: String, x: float, z: float) -> void:
+	root.add_child(_box(node_name, Vector3(PILLAR_FOOT, 0.24, PILLAR_FOOT),
+		Vector3(x, VOID_FLOOR_Y + 0.12, z), _palette.structure(false, true)))
+
+
+func _leg(root: Node3D, node_name: String, from: Vector3, to: Vector3,
+		width: float, material: StandardMaterial3D) -> void:
+	## One member between two points, in the plane of the screen's X and Y.
+	##
+	## Every support here splays *sideways* rather than standing straight
+	## under the deck, and that is the whole reason they read. A vertical post
+	## under a deck at a lens looking down on it from fifty-two degrees is
+	## drawn nine units further down the frame than the deck is - which on an
+	## S-curve is exactly where the next bend of the same deck is. V1's posts
+	## were not missing; they were behind the track they held up. A leg whose
+	## foot is a metre and a half outside the deck's own edge is beside it
+	## instead, against the floor, with its shadow next to it.
+	var delta := to - from
+	var leg := _box(node_name, Vector3(width, delta.length(), width),
+		(from + to) * 0.5, material)
+	leg.rotation.z = atan2(-delta.x, delta.y)
+	root.add_child(leg)
+
+
+func _build_pillar(root: Node3D, tag: String, x: float, z: float,
+		top: float, half := 0.0) -> void:
+	## Type A: a narrow pair, splayed just past the deck's edge.
+	var spread := maxf(0.42, half * 1.15)
+	for raw_side in [-1.0, 1.0]:
+		var side := float(raw_side)
+		var foot_x := x + side * spread
+		_leg(root, "Pillar%s_%d" % [tag, int(side)],
+			Vector3(x + side * PILLAR_WIDTH * 0.6, top, z),
+			Vector3(foot_x, VOID_FLOOR_Y, z),
+			PILLAR_WIDTH, _palette.structure(false, true))
+		_foot(root, "Foot%s_%d" % [tag, int(side)], foot_x, z)
+	root.add_child(_box("PillarTie%s" % tag,
+		Vector3(spread * 1.9, BRACE_WIDTH, BRACE_WIDTH),
+		Vector3(x, lerpf(VOID_FLOOR_Y, top, 0.42), z),
+		_palette.structure()))
+
+
+func _build_yframe(root: Node3D, tag: String, x: float, z: float, top: float,
+		half: float) -> void:
+	## Type B: a mast to a yoke, and two legs splayed well outside the deck.
+	##
+	## Used at an apex, where the deck is furthest out over the room and a
+	## single pole would look like it was balancing rather than holding.
+	var knee := lerpf(VOID_FLOOR_Y, top, 0.46)
+	var spread := maxf(0.85, half * 1.85)
+	root.add_child(_box("Mast%s" % tag,
+		Vector3(PILLAR_WIDTH * 1.2, top - knee, PILLAR_WIDTH * 1.2),
+		Vector3(x, (top + knee) * 0.5, z), _palette.structure(false, true)))
+	root.add_child(_box("Yoke%s" % tag,
+		Vector3(spread * 1.35, 0.17, PILLAR_WIDTH * 1.4),
+		Vector3(x, knee, z), _palette.structure(false, true)))
+	for raw_side in [-1.0, 1.0]:
+		var side := float(raw_side)
+		var foot_x := x + side * spread
+		_leg(root, "Leg%s_%d" % [tag, int(side)],
+			Vector3(x + side * spread * 0.66, knee, z),
+			Vector3(foot_x, VOID_FLOOR_Y, z),
+			PILLAR_WIDTH * 0.9, _palette.structure(false, true))
+		_foot(root, "Foot%s_%d" % [tag, int(side)], foot_x, z)
+
+
+func _build_bracket(root: Node3D, tag: String, x: float, z: float, top: float,
+		half: float) -> void:
+	## Type C: a leaning post with a raked strut behind it.
+	##
+	## Used where one stretch of track hands over to the next and the load
+	## turns a corner. The lean and the strut are what say so, and the lean is
+	## what puts it clear of the deck.
+	var lean := maxf(0.55, half * 1.25)
+	var side := 1.0 if x < 0.0 else -1.0
+	_leg(root, "Post%s" % tag,
+		Vector3(x, top, z), Vector3(x + side * lean, VOID_FLOOR_Y, z),
+		PILLAR_WIDTH, _palette.structure(false, true))
+	_foot(root, "Foot%s" % tag, x + side * lean, z)
+
+	var reach := maxf(0.8, half * 1.30)
+	var knee := lerpf(VOID_FLOOR_Y, top, 0.40)
+	var rise := knee - VOID_FLOOR_Y
+	var strut := _box("Strut%s" % tag,
+		Vector3(PILLAR_WIDTH * 0.85, Vector2(reach, rise).length(),
+			PILLAR_WIDTH * 0.85),
+		Vector3(x + side * lean * 0.4, (knee + VOID_FLOOR_Y) * 0.5,
+			z - reach * 0.5),
+		_palette.structure(false, true))
+	strut.rotation.x = atan2(reach, rise)
+	root.add_child(strut)
+	_foot(root, "StrutFoot%s" % tag, x + side * lean * 0.4, z - reach)
+
+
+func _build_channel_frame(root: Node3D, ribbons: Array, margin: float) -> void:
+	## One frame under the whole launch block, rather than a post per channel.
+	##
+	## Four channels with their own posts would be sixteen legs in rows under a
+	## stretch three units long, and a thicket reads as noise. A machine
+	## carries a bank of parallel channels on one structure: cross beams under
+	## all of them, hangers at the ends of each, and a stringer down each side.
+	##
+	## It is also what makes the gaps between the channels worth having. The
+	## brief asks for visible structure below them, and structure below them is
+	## only visible if it spans the gaps.
+	var lowest := INF
+	var highest := -INF
+	var left := INF
+	var right := -INF
+	for raw in ribbons:
+		for raw_sample in raw as Array:
+			var sample: Vector3 = raw_sample
+			lowest = minf(lowest, sample.z)
+			highest = maxf(highest, sample.z)
+			left = minf(left, sample.x - margin)
+			right = maxf(right, sample.y + margin)
+	if lowest >= highest:
+		return
+
+	var x_left := to_units(left - _course_width * 0.5)
+	var x_right := to_units(right - _course_width * 0.5)
+	var width := x_right - x_left
+	var middle := (x_left + x_right) * 0.5
+	var beams := maxi(2, int(to_units(highest - lowest) / CHANNEL_BEAM_SPACING))
+	for index in beams:
+		var y := lerpf(lowest, highest, (float(index) + 0.5) / float(beams))
+		var deck := deck_height(_course_width * 0.5, y)
+		var z := to_units(y)
+		root.add_child(_box("CrossBeam%d" % index,
+			Vector3(width, CHANNEL_BEAM, CHANNEL_BEAM * 1.3),
+			Vector3(middle, deck - DECK_THICKNESS - CHANNEL_BEAM * 0.6, z),
+			_palette.structure(false, true)))
+		for raw_side in [-1.0, 1.0]:
+			var side := float(raw_side)
+			root.add_child(_box("Hanger%d_%d" % [index, int(side)],
+				Vector3(CHANNEL_BEAM * 0.8, CHANNEL_HANGER, CHANNEL_BEAM * 0.8),
+				Vector3(middle + side * width * 0.5,
+					deck - DECK_THICKNESS - CHANNEL_HANGER * 0.5, z),
+				_palette.structure()))
+
+	# A stringer down each side, tying the beams into one frame.
+	var mid_y := (lowest + highest) * 0.5
+	var mid_deck := deck_height(_course_width * 0.5, mid_y)
+	for raw_side in [-1.0, 1.0]:
+		var side := float(raw_side)
+		root.add_child(_box("Stringer%d" % int(side),
+			Vector3(CHANNEL_BEAM * 0.9, CHANNEL_BEAM * 0.9,
+				to_units(highest - lowest)),
+			Vector3(middle + side * width * 0.5,
+				mid_deck - DECK_THICKNESS - CHANNEL_HANGER * 0.8,
+				to_units(mid_y)),
+			_palette.structure()))
 
 
 # --- the bowl -------------------------------------------------------------
@@ -1277,7 +1797,8 @@ func _bowl_normal(rho: float, angle: float) -> Vector3:
 
 
 func _bowl_revolution(inner: float, outer: float, rings: int, segments: int,
-		drop: float, swell: float, upward: bool) -> ArrayMesh:
+		drop: float, swell: float, upward: bool,
+		arc_from := 0.0, arc_to := TAU) -> ArrayMesh:
 	## A surface of revolution built from the same height function the racers
 	## are placed by.
 	##
@@ -1294,8 +1815,10 @@ func _bowl_revolution(inner: float, outer: float, rings: int, segments: int,
 		var rho_a := lerpf(inner, outer, float(ring) / float(rings))
 		var rho_b := lerpf(inner, outer, float(ring + 1) / float(rings))
 		for segment in segments:
-			var angle_a := TAU * float(segment) / float(segments)
-			var angle_b := TAU * float(segment + 1) / float(segments)
+			var angle_a := lerpf(arc_from, arc_to,
+				float(segment) / float(segments))
+			var angle_b := lerpf(arc_from, arc_to,
+				float(segment + 1) / float(segments))
 			var points := [
 				_bowl_point(rho_a, angle_a, drop, swell),
 				_bowl_point(rho_b, angle_a, drop, swell),
@@ -1344,76 +1867,301 @@ func _ring(node_name: String, rho: float, thickness: float, height: float,
 
 
 func _build_bowl() -> void:
-	## The hero object: a real vessel, not a pair of ramps.
+	## The hero object: a premium vessel in a cradle, not a metal dish.
 	##
-	## Six parts, and each one is answering a line of the brief.
+	## V1 built the right *shape* and the report was honest about what it read
+	## as - a satellite dish. Three things were missing and all three are here.
 	##
-	## The **inner surface** is the racing surface and the thing the mapping
-	## is built on. Opaque, so a marble on it has a contact shadow and the
-	## curve has a terminator across it - the two cues that say "curved solid"
-	## rather than "shape on a floor".
+	## **The glass is above the rim, not under the vessel.** V1's acrylic shell
+	## sat beneath the bowl where, at a fifty-two degree lens, there is almost
+	## none of it in view. The reference's bowl is a flared transparent wall
+	## standing *on* the rim with the racers inside it, and that is what reads:
+	## it is silhouetted against the dark room, it catches a Fresnel edge all
+	## the way round, and it turns a dish into a vessel. It costs nothing in
+	## readability because it is cut away on the side the lens is on.
 	##
-	## The **underside** gives the vessel wall a thickness at the rim, which
-	## is where a viewer looks to decide whether a bowl is an object.
+	## **The rim is a machined assembly.** A flange, a structural band under
+	## it, twelve clamps around it and one lit inset - so the eye has
+	## something to read the diameter with, and the glass has something to be
+	## bolted to.
 	##
-	## The **acrylic shell** is a second, larger vessel around the first with
-	## an air gap between them. Putting the glass outside the racing surface
-	## rather than making the racing surface glass is what buys the acrylic
-	## look without costing readability.
+	## **The cradle is outside the vessel's silhouette.** V1's hoop was at
+	## radius 0.86, underneath the dish and invisible from any angle that can
+	## see into the bowl. This one is at 1.05, just below and just outside the
+	## flange, with six arms and six legs, and it is lit from beneath.
 	##
-	## The **lip**, the **accent ring** and the **drain collar** are the only
-	## lit parts, and only the collar is bright enough to bloom - the exit has
-	## to read as a hole in the middle of a pale bowl.
+	## The parts, in the order the brief lists its layers:
 	##
-	## The **cradle** is the metallic support underneath, and the reason the
-	## bowl looks supported rather than placed.
+	##     acrylic wall        rho 1.20 -> 1.42, rising 0.95 above the rim
+	##     racing surface      rho 0.23 -> 1.00, opaque light silver
+	##     flange and rim      rho 1.00 -> 1.20, one value down, clamped
+	##     structural shell    the same shape 0.26 below, dark
+	##     cradle              hoop at 1.05, six arms, six legs to the floor
+	##     underlighting       cyan at the drain side, violet opposite
 	var root := Node3D.new()
 	root.name = "Bowl"
 	add_child(root)
 
-	var inner := _mesh_node("Surface",
-		_bowl_revolution(_hole_rho, 1.0, 44, 128, 0.0, 1.0, true),
-		[_palette.bowl_surface()])
-	root.add_child(inner)
+	var window_from := deg_to_rad(90.0 - THROAT_WINDOW_HALF)
+	var window_to := deg_to_rad(90.0 + THROAT_WINDOW_HALF)
 
-	# The lip is drawn as its own part in its own value. A dish and a flange
-	# in one tone read as a satellite dish; two tones read as a vessel seated
-	# in a machined rim, which is what the reference is.
-	var flange := _mesh_node("Flange",
+	# The racing surface, in three pieces so the throat window can be cut out
+	# of it. The floor around the drain stays a full ring - a racer waiting its
+	# turn at the hole has to stand on something opaque.
+	root.add_child(_mesh_node("Floor",
+		_bowl_revolution(_hole_rho, THROAT_WINDOW_INNER, 6, 128, 0.0, 1.0, true),
+		[_palette.bowl_surface()]))
+	root.add_child(_mesh_node("Surface",
+		_bowl_revolution(THROAT_WINDOW_INNER, 1.0, 40, 128, 0.0, 1.0, true,
+			window_to, window_from + TAU),
+		[_palette.bowl_surface()]))
+	root.add_child(_mesh_node("SurfaceOuter",
+		_bowl_revolution(THROAT_WINDOW_OUTER, 1.0, 8, 40, 0.0, 1.0, true,
+			window_from, window_to),
+		[_palette.bowl_surface()]))
+
+	_build_throat_window(root, window_from, window_to)
+
+	# The lip is drawn as its own part in its own value. A dish and a flange in
+	# one tone read as a satellite dish; two tones read as a vessel seated in a
+	# machined rim, which is what the reference is.
+	root.add_child(_mesh_node("Flange",
 		_bowl_revolution(1.0, FLANGE_OUTER, 8, 128, 0.0, 1.0, true),
-		[_palette.track_top(true)])
-	root.add_child(flange)
+		[_palette.track_top(true)]))
 
-	var under := _mesh_node("Underside",
-		_bowl_revolution(_hole_rho, FLANGE_OUTER, 32, 128, BOWL_WALL, 1.0, false),
-		[_palette.bowl_shell()])
-	root.add_child(under)
+	# The structural shell: the same surface 0.26 below, wound over, and dark
+	# rather than mid-grey. It is the layer the brief calls the dark structural
+	# cradle, and against a light silver racing surface it is what gives the
+	# vessel a wall with thickness at the rim.
+	root.add_child(_mesh_node("Shell",
+		_bowl_revolution(_hole_rho, THROAT_WINDOW_INNER, 6, 128, BOWL_WALL,
+			1.0, false),
+		[_palette.structure(false, true)]))
+	root.add_child(_mesh_node("ShellOuter",
+		_bowl_revolution(THROAT_WINDOW_INNER, FLANGE_OUTER, 28, 128, BOWL_WALL,
+			1.0, false, window_to, window_from + TAU),
+		[_palette.structure(false, true)]))
+	root.add_child(_mesh_node("ShellWindow",
+		_bowl_revolution(THROAT_WINDOW_OUTER, FLANGE_OUTER, 8, 40, BOWL_WALL,
+			1.0, false, window_from, window_to),
+		[_palette.structure(false, true)]))
 
-	var shell := _mesh_node("Acrylic",
-		_bowl_revolution(FLOOR_RHO * 0.8, FLANGE_OUTER * 0.995, 20, 72,
-			BOWL_GLASS_DROP, BOWL_GLASS_SWELL, false),
-		[_palette.bowl_glass()], false)
-	root.add_child(shell)
+	_build_bowl_rim(root)
+	_build_bowl_glass(root)
+	_build_drain_well(root)
+	_build_bowl_cradle(root)
+	_build_bowl_lights(root)
 
-	# The lip, the ring let into the flange, and the collar round the drain.
-	root.add_child(_ring("Lip", FLANGE_OUTER, 0.075, H_RIM - 0.03, 0.0,
+
+func _build_throat_window(root: Node3D, window_from: float,
+		window_to: float) -> void:
+	## A glazed panel let into the far half of the bowl's floor.
+	##
+	## The brief asks for the half second the racers spend under the bowl to be
+	## intentional or removed, and this is the one place the lens can see the
+	## throat from at all. Between the drain and where the bridge comes out
+	## from under the far rim, the racers are below a solid dish - the only
+	## surface between them and the camera is the bowl's own floor, and it is
+	## the far half of it.
+	##
+	## Which is free to glaze. A racer past the drain plane is in the throat,
+	## *below*, so nothing ever stands on the far half: the mapping sends
+	## anything with `sim_y > drain_y` down the throat channel and
+	## `test_racers_only_ever_leave_the_bowl_through_the_drain` measures that
+	## it does. So the panel costs no racing surface, and what it buys is the
+	## field visibly travelling on rather than being swallowed.
+	##
+	## Framed on all three sides, because an unframed hole in a machine is a
+	## missing piece rather than a window.
+	root.add_child(_mesh_node("ThroatWindow",
+		_bowl_revolution(THROAT_WINDOW_INNER, THROAT_WINDOW_OUTER, 14, 40,
+			0.0, 1.0, true, window_from, window_to),
+		[_palette.throat_glass()], false))
+
+	for raw_angle in [window_from, window_to]:
+		var angle := float(raw_angle)
+		var inner := _bowl_point(THROAT_WINDOW_INNER, angle, -0.012)
+		var outer := _bowl_point(THROAT_WINDOW_OUTER, angle, -0.012)
+		var delta := outer - inner
+		var mullion := _box("WindowFrame%d" % int(rad_to_deg(angle)),
+			Vector3(delta.length(), 0.07, 0.10), (inner + outer) * 0.5,
+			_palette.structure(false, true), false)
+		mullion.rotation.y = -atan2(delta.z, delta.x)
+		mullion.rotation.z = atan2(delta.y, Vector2(delta.x, delta.z).length())
+		root.add_child(mullion)
+
+	# The sill at the outer end, in the same lit graphite as the frames.
+	var steps := 12
+	for index in steps:
+		var angle := lerpf(window_from, window_to, (float(index) + 0.5) / float(steps))
+		var here := _bowl_point(THROAT_WINDOW_OUTER, angle, -0.012)
+		var span := (window_to - window_from) / float(steps) \
+			* THROAT_WINDOW_OUTER * _bowl_r / PIXELS_PER_UNIT
+		var sill := _box("WindowSill%d" % index,
+			Vector3(0.10, 0.06, span * 1.25), here,
+			_palette.structure(false, true), false)
+		sill.rotation.y = -angle
+		root.add_child(sill)
+
+
+func _build_bowl_rim(root: Node3D) -> void:
+	## The machined assembly the vessel is finished with.
+	##
+	## Thickness, a structural band beneath, clamps around, one lit inset. The
+	## brief asks for the rim to feel engineered without decorating every
+	## centimetre, so it is four elements repeated rather than forty different
+	## ones - which is also what a manufactured rim is.
+	root.add_child(_ring("Lip", FLANGE_OUTER, 0.105, H_RIM - 0.045, 0.0,
 		_palette.bowl_shell()))
-	root.add_child(_ring("Accent", FLANGE_OUTER * 0.90, 0.038, H_RIM + 0.012,
+	# The dark band under the flange, deeper than the lip and one value below
+	# it, so the rim has a shadow line of its own all the way round.
+	root.add_child(_ring("RimBand", FLANGE_OUTER * 0.985, 0.135,
+		H_RIM - 0.30, 0.0, _palette.structure(false, true)))
+	root.add_child(_ring("Accent", FLANGE_OUTER * 0.925, 0.040, H_RIM + 0.012,
 		0.0, _palette.bowl_accent(), false))
-	root.add_child(_ring("Collar", _hole_rho, 0.055,
-		bowl_surface_y(0.0) + 0.02, 0.0, _palette.drain_collar(), false))
 
-	# Two machined seams across the dish. Restrained on purpose: a bowl with
-	# no surface incident at all renders as one enormous smooth gradient, and
-	# a gradient is the one thing that does not read as a manufactured object.
+	# Clamps: the fixings the acrylic wall is bolted down by, and the only
+	# thing on the rim that has a rhythm to it.
+	for index in RIM_CLAMPS:
+		var angle := TAU * float(index) / float(RIM_CLAMPS)
+		var at := _bowl_point(FLANGE_OUTER * 0.955, angle, -0.02)
+		var clamp := _box("Clamp%d" % index, Vector3(0.30, 0.14, 0.17), at,
+			_palette.structure(false, true))
+		clamp.rotation.y = -angle
+		root.add_child(clamp)
+
+	# Two machined seams across the dish. Restrained on purpose: a bowl with no
+	# surface incident at all renders as one enormous smooth gradient, and a
+	# gradient is the one thing that does not read as a manufactured object.
 	for raw_seam in [0.52, 0.78]:
 		var seam := float(raw_seam)
 		root.add_child(_ring("Seam%d" % int(seam * 100.0), seam, 0.016,
 			bowl_surface_y(seam) + 0.004, 0.0, _palette.bowl_shell(), false))
+	root.add_child(_ring("Collar", _hole_rho, 0.055,
+		bowl_surface_y(0.0) + 0.02, 0.0, _palette.drain_collar(), false))
 
-	_build_drain_well(root)
-	_build_bowl_cradle(root)
-	_build_bowl_lights(root)
+
+func _glass_profile(t: float) -> Vector2:
+	## One point up the acrylic wall, as (bowl radius, height above the rim).
+	##
+	## Nearly upright where it meets the rim and flaring as it rises, which is
+	## what the reference's wall does and what keeps the opening it leaves
+	## wide enough to see through at a fifty-two degree lens.
+	return Vector2(
+		FLANGE_OUTER + GLASS_FLARE * pow(t, 1.45),
+		GLASS_RISE * pow(t, 0.82))
+
+
+func _build_bowl_glass(root: Node3D) -> void:
+	## The acrylic wall standing on the rim, with a gap where the field enters.
+	##
+	## The gap is the whole design. A closed ring of glass would put a
+	## transparent film between the lens and every marble in the bowl; an arc
+	## with seventy-odd degrees cut out of the near side puts glass everywhere
+	## it can be seen *against* the dark room and nowhere it would be seen
+	## *through*. It is also where the feed spouts arrive, so the opening is a
+	## thing the machine needs rather than a thing the camera needs - the two
+	## happen to be the same place, because the lens and the field come in
+	## from the same side.
+	var opening := deg_to_rad(GLASS_GAP_HALF)
+	var arc_from := -PI * 0.5 + opening
+	var arc_to := 1.5 * PI - opening
+
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var rings := 10
+	var segments := 96
+	var centre := _bowl_centre()
+	var lip := H_RIM - FLANGE_SINK
+	for ring in rings:
+		var a := _glass_profile(float(ring) / float(rings))
+		var b := _glass_profile(float(ring + 1) / float(rings))
+		for segment in segments:
+			var angle_a := lerpf(arc_from, arc_to, float(segment) / float(segments))
+			var angle_b := lerpf(arc_from, arc_to,
+				float(segment + 1) / float(segments))
+			var points := [
+				_glass_point(centre, lip, a, angle_a),
+				_glass_point(centre, lip, b, angle_a),
+				_glass_point(centre, lip, b, angle_b),
+				_glass_point(centre, lip, a, angle_b),
+			]
+			var slope := (b.y - a.y) / maxf(1.0e-5,
+				(b.x - a.x) * _bowl_r / PIXELS_PER_UNIT)
+			var normals := [
+				_glass_normal(angle_a, slope), _glass_normal(angle_a, slope),
+				_glass_normal(angle_b, slope), _glass_normal(angle_b, slope),
+			]
+			_quad_smooth(surface, points, normals)
+	var mesh := ArrayMesh.new()
+	surface.commit(mesh)
+	root.add_child(_mesh_node("Acrylic", mesh, [_palette.bowl_wall_glass()],
+		false))
+
+	# The cap along the top edge, which is what draws the silhouette of a
+	# transparent object - the one thing a transparent object cannot do for
+	# itself. Built as a run of short bars rather than a torus, because the
+	# wall is an arc and a torus is not.
+	var top := _glass_profile(1.0)
+	var bars := 64
+	for index in bars:
+		var angle := lerpf(arc_from, arc_to, (float(index) + 0.5) / float(bars))
+		var here := _glass_point(centre, lip, top, angle)
+		var span := (arc_to - arc_from) / float(bars) \
+			* top.x * _bowl_r / PIXELS_PER_UNIT
+		var bar := _box("GlassCap%d" % index,
+			Vector3(0.085, 0.075, span * 1.3), here,
+			_palette.structure(false, true), false)
+		bar.rotation.y = -angle
+		root.add_child(bar)
+		var light := _box("GlassLine%d" % index,
+			Vector3(0.030, 0.030, span * 1.3),
+			here + Vector3(0.0, 0.055, 0.0), _palette.glass_rim(), false)
+		light.rotation.y = -angle
+		root.add_child(light)
+
+	# The jambs: a post at each end of the arc, so the glass is held in a frame
+	# rather than stopping in mid-air where the field comes in.
+	for raw_angle in [arc_from, arc_to]:
+		var angle := float(raw_angle)
+		var foot := _glass_point(centre, lip, _glass_profile(0.0), angle)
+		var head := _glass_point(centre, lip, top, angle)
+		var delta := head - foot
+		var post := _box("Jamb%d" % int(rad_to_deg(angle)),
+			Vector3(0.20, delta.length() + 0.10, 0.16),
+			(foot + head) * 0.5, _palette.structure(false, true))
+		post.rotation.y = -angle
+		post.rotation.z = atan2(-Vector2(delta.x, delta.z).length(), delta.y)
+		root.add_child(post)
+
+	# Mullions on the far half only, where they read against the room and
+	# never between the lens and a marble.
+	for index in GLASS_MULLIONS:
+		var angle := lerpf(arc_from, arc_to,
+			(float(index) + 1.0) / float(GLASS_MULLIONS + 1))
+		var foot := _glass_point(centre, lip, _glass_profile(0.0), angle)
+		var head := _glass_point(centre, lip, top, angle)
+		var delta := head - foot
+		var mullion := _box("Mullion%d" % index,
+			Vector3(0.09, delta.length(), 0.075), (foot + head) * 0.5,
+			_palette.structure(false, true), false)
+		mullion.rotation.y = -angle
+		mullion.rotation.z = atan2(-Vector2(delta.x, delta.z).length(), delta.y)
+		root.add_child(mullion)
+
+
+func _glass_point(centre: Vector3, lip: float, profile: Vector2,
+		angle: float) -> Vector3:
+	var radius := profile.x * _bowl_r / PIXELS_PER_UNIT
+	return Vector3(
+		centre.x + radius * cos(angle),
+		lip + profile.y,
+		centre.z + radius * sin(angle))
+
+
+func _glass_normal(angle: float, slope: float) -> Vector3:
+	## Outward and up the flare, from the profile's own gradient.
+	return Vector3(cos(angle), 1.0 / maxf(slope, 0.05), sin(angle)).normalized()
 
 
 func _build_drain_well(root: Node3D) -> void:
@@ -1438,25 +2186,31 @@ func _build_drain_well(root: Node3D) -> void:
 
 
 func _build_bowl_cradle(root: Node3D) -> void:
-	## The metallic support shell: a hoop under the vessel and legs to the
-	## floor of the room. Without it the bowl is a shape hanging in the air.
-	var hoop_rho := 0.86
-	var hoop_y := bowl_surface_y(hoop_rho) - BOWL_GLASS_DROP - 0.20
-	root.add_child(_ring("Cradle", hoop_rho, 0.16, hoop_y, 0.0,
+	## The machinery holding the vessel up, and it has to be obvious.
+	##
+	## V1 put the hoop at radius 0.86 - underneath the dish, inside its own
+	## silhouette, and invisible from any lens high enough to see into the
+	## bowl. The report listed it as working and the brief correctly says it
+	## does not read. This one is at 1.05: below the flange and just outside
+	## it, so from every angle in the shot there is a ring of dark structure
+	## standing proud of the vessel's edge with six arms into it and six legs
+	## dropping away to the floor.
+	var hoop_rho := CRADLE_RHO
+	var hoop_y := bowl_surface_y(1.0) - CRADLE_DROP
+	root.add_child(_ring("Cradle", hoop_rho, 0.20, hoop_y, 0.0,
 		_palette.structure(false, true)))
 
-	# Radial ribs from the hoop in towards the drain, following the dish.
-	# The brief asks for metallic structural support under the bowl and this
-	# is it: from any angle low enough to see beneath the lip, the vessel is
-	# sitting in a frame rather than floating.
+	# Radial arms from the hoop in under the dish. From any angle low enough to
+	# see beneath the lip, the vessel is sitting in a frame rather than
+	# floating.
 	for index in BOWL_LEGS:
-		var rib_angle := TAU * (float(index) + 0.5) / float(BOWL_LEGS)
-		var inner := _bowl_point(0.34, rib_angle, BOWL_GLASS_DROP + 0.10)
-		var outer := _bowl_point(hoop_rho, rib_angle, BOWL_GLASS_DROP + 0.20)
+		var rib_angle := TAU * float(index) / float(BOWL_LEGS)
+		var inner := _bowl_point(0.36, rib_angle, BOWL_WALL + 0.16)
+		var outer := _bowl_point(hoop_rho, rib_angle, CRADLE_DROP + 0.02)
 		var delta := outer - inner
-		var rib := _box("Rib%d" % index,
-			Vector3(Vector2(delta.x, delta.z).length(), 0.13, 0.20),
-			(inner + outer) * 0.5, _palette.bowl_shell())
+		var rib := _box("Arm%d" % index,
+			Vector3(Vector2(delta.x, delta.z).length(), 0.16, 0.26),
+			(inner + outer) * 0.5, _palette.structure(false, true))
 		rib.rotation.y = -atan2(delta.z, delta.x)
 		rib.rotation.z = atan2(delta.y, Vector2(delta.x, delta.z).length())
 		root.add_child(rib)
@@ -1464,31 +2218,50 @@ func _build_bowl_cradle(root: Node3D) -> void:
 	var centre := _bowl_centre()
 	var radius := hoop_rho * _bowl_r / PIXELS_PER_UNIT
 	for index in BOWL_LEGS:
-		# Offset half a step so no leg stands on the centre line, where it
-		# would sit directly under the drain and in front of the throat.
-		var angle := TAU * (float(index) + 0.5) / float(BOWL_LEGS)
+		# On the axes rather than half a step off them, which is what keeps a
+		# leg away from the far centre line - a leg there would stand directly
+		# under the throat and across the window that looks into it.
+		var angle := TAU * float(index) / float(BOWL_LEGS)
 		var x := centre.x + radius * cos(angle)
 		var z := centre.z + radius * sin(angle)
 		var length := hoop_y - VOID_FLOOR_Y
 		root.add_child(_box("Leg%d" % index,
-			Vector3(0.34, length, 0.34),
-			Vector3(x, hoop_y - length * 0.5, z),
-			_palette.structure()))
+			Vector3(0.38, length, 0.38),
+			Vector3(x, hoop_y - length * 0.5, z), _palette.structure()))
 		root.add_child(_box("LegFoot%d" % index,
-			Vector3(0.44, 0.24, 0.44),
-			Vector3(x, VOID_FLOOR_Y + 0.12, z),
+			Vector3(0.52, 0.26, 0.52),
+			Vector3(x, VOID_FLOOR_Y + 0.13, z),
 			_palette.structure(false, true)))
 
-	# A collar low on the legs, so they read as one frame rather than six
+	# Two collars down the legs, so they read as one frame rather than six
 	# unrelated posts.
-	root.add_child(_ring("CradleBrace", hoop_rho, 0.07, VOID_FLOOR_Y + 4.2,
-		0.0, _palette.structure(true)))
+	for raw_level in [4.2, 8.6]:
+		var level := float(raw_level)
+		root.add_child(_ring("CradleBrace%d" % int(level * 10.0), hoop_rho,
+			0.075, VOID_FLOOR_Y + level, 0.0, _palette.structure(true)))
+
+	# The underlighting, as strips on the hoop rather than as a glow in the
+	# air: cyan on the drain side, violet opposite. Under the glow threshold on
+	# purpose - the brief wants light that describes the machinery, and a strip
+	# that bloomed would describe itself.
+	for index in UNDER_STRIPS:
+		var angle := TAU * float(index) / float(UNDER_STRIPS)
+		var at := _bowl_point(hoop_rho, angle, CRADLE_DROP - 0.16)
+		var warm := sin(angle) > 0.0
+		var strip := _box("Underlight%d" % index,
+			Vector3(0.16, 0.05, 0.62), at + Vector3(0.0, -0.14, 0.0),
+			_palette.under_light(warm), false)
+		strip.rotation.y = -angle
+		root.add_child(strip)
 
 
 func _build_bowl_lights(root: Node3D) -> void:
 	## The one place on the machine allowed its own colour, and it is kept
-	## quiet: a cool light down in the drain and a violet one across the rim,
-	## both well under the energy that would flatten the curve they are lit by.
+	## quiet: a cool light down in the drain, a violet one across the rim, and
+	## two under the cradle - all well below the energy that would flatten the
+	## curve they are lighting.
+	var centre := _bowl_centre()
+
 	var drain := OmniLight3D.new()
 	drain.name = "DrainLight"
 	drain.light_color = NeonMaterials.CYAN
@@ -1496,7 +2269,6 @@ func _build_bowl_lights(root: Node3D) -> void:
 	drain.omni_range = 5.2
 	drain.omni_attenuation = 1.4
 	drain.shadow_enabled = false
-	var centre := _bowl_centre()
 	drain.position = Vector3(centre.x, centre.y + 0.45, centre.z)
 	root.add_child(drain)
 
@@ -1510,115 +2282,214 @@ func _build_bowl_lights(root: Node3D) -> void:
 	rim.position = Vector3(centre.x, H_RIM + 1.9, centre.z + 1.2)
 	root.add_child(rim)
 
+	# Down the throat, so the window into it shows a lit channel rather than a
+	# dark wedge. Placed under the far half of the floor and pointed at
+	# nothing in particular: what it is for is the surface the racers are
+	# travelling on while they are out of sight of the key.
+	var throat := OmniLight3D.new()
+	throat.name = "ThroatLight"
+	throat.light_color = NeonMaterials.CYAN_PALE
+	throat.light_energy = 1.5
+	throat.omni_range = 6.5
+	throat.omni_attenuation = 1.7
+	throat.shadow_enabled = false
+	throat.position = Vector3(centre.x, H_THROAT + 0.55,
+		centre.z + THROAT_WINDOW_OUTER * 0.6 * _bowl_r / PIXELS_PER_UNIT)
+	root.add_child(throat)
+
+	# Under the vessel, lighting the cradle and the legs from below. This is
+	# what the brief means by underlighting: the structure is what gets lit,
+	# and it is lit from a direction the key never reaches.
+	var reach := CRADLE_RHO * _bowl_r / PIXELS_PER_UNIT * 0.72
+	for raw in [[-reach, false], [reach, true]]:
+		var entry: Array = raw
+		var under := OmniLight3D.new()
+		under.name = "UnderLight%s" % ("Warm" if bool(entry[1]) else "Cool")
+		under.light_color = NeonMaterials.VIOLET if bool(entry[1]) \
+			else NeonMaterials.CYAN
+		under.light_energy = 1.35
+		under.omni_range = 7.5
+		under.omni_attenuation = 1.5
+		under.shadow_enabled = false
+		under.position = Vector3(centre.x + float(entry[0]),
+			bowl_surface_y(1.0) - CRADLE_DROP - 1.1, centre.z)
+		root.add_child(under)
+
 
 # --- the start platform ---------------------------------------------------
 
 func _build_start_platform() -> void:
-	## A raised deck with a shuttered lip, standing on its own frame.
+	## A raised deck of four loading bays, standing on its own frame.
+	##
+	## V1 built this as one slab, and the brief is right that a slab is what it
+	## looked like: nine hundred pixels of unbroken pale deck taking the bottom
+	## of every frame in the first two seconds. It is four bays now, because
+	## the *course* is four bays - the ribs that divide the launch channels are
+	## carried up through the platform, so the field stands in the channels it
+	## is about to be released into and the pale area is broken into four with
+	## structure showing between them.
 	##
 	## The release is worth a note, because the mapping decides what it looks
-	## like. Simulation y runs down the course and becomes world Z, so a
-	## marble falling in the simulation travels *forward and down* on screen.
-	## The gate in the simulation is the platform floor, removed on one tick;
-	## on screen that is sixteen marbles rolling forward over the lip
-	## together, which is why the drawn gate is a barrier across the front and
-	## not a trapdoor underneath. Same event, and the honest picture of it.
+	## like. Simulation y runs down the course and becomes world Z, so a marble
+	## falling in the simulation travels *forward and down* on screen. The gate
+	## in the simulation is the platform floor, removed on one tick; on screen
+	## that is sixteen marbles rolling forward over the lip together, which is
+	## why the drawn gate is a barrier across the front and not a trapdoor
+	## underneath. Same event, and the honest picture of it.
 	var root := Node3D.new()
 	root.name = "StartPlatform"
 	add_child(root)
 
 	var back := _platform_top - PLATFORM_OVERHANG
-	var samples := [
+	var bays := _deck_ribbons("start")
+	if bays.is_empty():
+		bays = [[
+			Vector3(_platform_left, _platform_right, _platform_top),
+			Vector3(_platform_left, _platform_right, _gate_y)]]
+
+	# The block the bays are let into. One dark solid under all of them, so
+	# the platform reads as a machined component with channels cut in it
+	# rather than as four planks side by side, and so the gaps between the
+	# bays have a floor a long way down rather than a hole through to the
+	# room.
+	var body := [
 		Vector3(_platform_left, _platform_right, back),
 		Vector3(_platform_left, _platform_right, _gate_y),
 	]
-	var deck := _widen(samples, -DECK_MARGIN, DECK_MARGIN)
-	root.add_child(_solid_ribbon("Deck", deck, 0.0, PLATFORM_THICKNESS,
-		[_palette.track_top(), _palette.track_side(), _palette.track_web()]))
+	root.add_child(_solid_ribbon("Body", _widen(body, -DECK_MARGIN, DECK_MARGIN),
+		-BAY_RECESS, PLATFORM_THICKNESS,
+		[_palette.structure(false, true), _palette.track_side(),
+			_palette.track_web()]))
 
-	root.add_child(_solid_ribbon("Panel", _inset(deck, PANEL_INSET),
-		PANEL_DEPTH, DECK_THICKNESS * 0.5,
-		[_palette.track_top(true), _palette.track_side(),
-			_palette.track_web()], false))
-	root.add_child(_solid_ribbon("Spine", _inset(deck, PANEL_SPINE),
-		PANEL_DEPTH * 2.0, DECK_THICKNESS * 0.5,
-		[_palette.track_side(), _palette.track_side(),
-			_palette.track_web()], false))
+	for index in bays.size():
+		var raw: Array = bays[index]
+		# Carried forward to the gate and back under the overhang: the sweep
+		# stops where the walls do, and the deck a marble stands on runs the
+		# length of the bay.
+		var head: Vector3 = raw[0]
+		var tail: Vector3 = raw[raw.size() - 1]
+		var bay := [Vector3(head.x, head.y, back)]
+		bay.append_array(raw)
+		bay.append(Vector3(tail.x, tail.y, _gate_y))
+		_build_ribbon(root, "Bay%d" % index,
+			_widen(bay, -BAY_MARGIN, BAY_MARGIN), true, 0.0)
 
-	var rail_px := RAIL_WIDTH * PIXELS_PER_UNIT
-	var light_px := RAIL_LIGHT_INSET * PIXELS_PER_UNIT
-	for side in [-1.0, 1.0]:
-		var tag := "L" if side < 0.0 else "R"
-		root.add_child(_solid_ribbon("Rail%s" % tag,
-			_band(deck, side, 0.0, rail_px), RAIL_HEIGHT, RAIL_HEIGHT + 0.06,
-			[_palette.rail(), _palette.rail(), _palette.track_web()]))
-		root.add_child(_solid_ribbon("Edge%s" % tag,
-			_band(deck, side, light_px, rail_px - light_px),
-			RAIL_HEIGHT + RAIL_LIGHT_HEIGHT, RAIL_LIGHT_HEIGHT,
-			[_palette.edge_light(), _palette.edge_light(),
-				_palette.edge_light()], false))
-
-	# Lane grooves let into the deck, running the way the marbles will travel.
-	# Along, not across: a line drawn across a deck reads as a rung and puts
-	# the frame straight back into diagram territory, while a line down the
-	# direction of travel is what a machined floor actually looks like.
-	var half_span := (_platform_right - _platform_left) * 0.5
-	for index in GRID_LANES:
-		var lane := _platform_left + (_platform_right - _platform_left) \
-			* (float(index) + 0.5) / float(GRID_LANES)
-		root.add_child(_box("Lane%d" % index,
-			Vector3(0.035, 0.02, to_units(_gate_y - back) - 0.10),
-			Vector3(to_units(lane - _course_width * 0.5), H_START - 0.004,
-				to_units((back + _gate_y) * 0.5)),
-			_palette.structure(true), false))
-
-	_build_start_frame(root, back, half_span)
-	_build_start_gate(root)
+	_build_start_ribs(root, bays, back)
+	_build_start_frame(root, back)
+	_build_start_gate(root, bays)
 	_build_start_sign(root, back)
 
 
-func _build_start_frame(root: Node3D, back: float, half_span: float) -> void:
-	## The dark support structure under the deck. The brief asks for it by
-	## name, and it is what makes a platform read as suspended in a machine
-	## rather than as a rectangle floating in a dark frame.
-	var housing := _box("Housing",
-		Vector3(to_units(_platform_right - _platform_left) * 0.86,
-			PLATFORM_HOUSING, to_units(_gate_y - back) * 0.80),
-		Vector3(0.0, H_START - PLATFORM_THICKNESS - PLATFORM_HOUSING * 0.5,
-			to_units((back + _gate_y) * 0.5)),
-		_palette.structure())
-	root.add_child(housing)
+func _build_start_ribs(root: Node3D, bays: Array, back: float) -> void:
+	## The fins between the bays, above the deck.
+	##
+	## The rib is a wall in the simulation and the sweep already leaves a strip
+	## with no deck over it; this is what stands in that strip. Dark body,
+	## polished cap, one thin cyan line along the top - the same three parts a
+	## rail has, at a different scale, so the platform and the channels below
+	## it read as the same machine.
+	if bays.size() < 2:
+		return
+	var top := H_START + RIB_HEIGHT
+	var length := to_units(_gate_y - back)
+	var centre_z := to_units((back + _gate_y) * 0.5)
+	for index in bays.size() - 1:
+		var left: Array = bays[index]
+		var right: Array = bays[index + 1]
+		var inner := float((left[0] as Vector3).y)
+		var outer := float((right[0] as Vector3).x)
+		var width := to_units(outer - inner)
+		var x := to_units((inner + outer) * 0.5 - _course_width * 0.5)
+		root.add_child(_box("Rib%d" % index,
+			Vector3(width, RIB_HEIGHT + BAY_RECESS, length),
+			Vector3(x, top - (RIB_HEIGHT + BAY_RECESS) * 0.5, centre_z),
+			_palette.structure(false, true)))
+		root.add_child(_box("RibCap%d" % index,
+			Vector3(width * 0.72, 0.05, length - 0.08),
+			Vector3(x, top + 0.01, centre_z), _palette.rail()))
+		root.add_child(_box("RibLight%d" % index,
+			Vector3(width * 0.22, 0.035, length - 0.55),
+			Vector3(x, top + 0.045, centre_z), _palette.edge_light(), false))
 
-	var top := H_START - PLATFORM_THICKNESS - PLATFORM_HOUSING
+
+func _build_start_frame(root: Node3D, back: float) -> void:
+	## The dark support structure under the deck.
+	##
+	## The brief asks for it by name, and it is what makes a platform read as
+	## suspended in a machine rather than as a rectangle floating in a dark
+	## frame. Two things were added over V1: a fascia across the front, which
+	## is the face a viewer sees first and the only place on the platform with
+	## any depth to it, and legs thick enough to look like they are carrying
+	## something.
+	var half_span := (_platform_right - _platform_left) * 0.5
+	var deck_under := H_START - PLATFORM_THICKNESS - BAY_RECESS
+	var width := to_units(_platform_right - _platform_left)
+	var length := to_units(_gate_y - back)
 	var middle := to_units((back + _gate_y) * 0.5)
-	var reach := to_units(_gate_y - back) * 0.34
+
+	root.add_child(_box("Housing",
+		Vector3(width * 0.90, PLATFORM_HOUSING, length * 0.84),
+		Vector3(0.0, deck_under - PLATFORM_HOUSING * 0.5, middle),
+		_palette.structure()))
+
+	# The fascia: a deep beam across the front of the machine, with one lit
+	# line let into it. It is the platform's own front face and the piece that
+	# tells a viewer how thick the deck is.
+	var fascia_z := to_units(_gate_y) + FASCIA_DEPTH * 0.5
+	root.add_child(_box("Fascia",
+		Vector3(width + 0.30, FASCIA_HEIGHT, FASCIA_DEPTH),
+		Vector3(0.0, deck_under - FASCIA_HEIGHT * 0.5 + 0.10, fascia_z),
+		_palette.structure(false, true)))
+	root.add_child(_box("FasciaLight",
+		Vector3(width * 0.70, 0.055, FASCIA_DEPTH * 0.45),
+		Vector3(0.0, deck_under - FASCIA_HEIGHT + 0.22,
+			fascia_z - FASCIA_DEPTH * 0.32),
+		_palette.edge_light(), false))
+
+	var top := deck_under - PLATFORM_HOUSING
+	var reach := length * 0.34
 	for raw_x in [-1.0, 1.0]:
 		var sx := float(raw_x)
 		for raw_z in [-1.0, 1.0]:
 			var sz := float(raw_z)
-			var x := sx * to_units(half_span) * 0.82
+			var x := sx * to_units(half_span) * 0.84
 			var z := middle + sz * reach
-			var length := top - VOID_FLOOR_Y
+			var length_leg := top - VOID_FLOOR_Y
 			root.add_child(_box("Leg%d_%d" % [int(sx), int(sz)],
-				Vector3(0.30, length, 0.30),
-				Vector3(x, top - length * 0.5, z),
-				_palette.structure()))
+				Vector3(LEG_WIDTH, length_leg, LEG_WIDTH),
+				Vector3(x, top - length_leg * 0.5, z), _palette.structure()))
 			root.add_child(_box("Foot%d_%d" % [int(sx), int(sz)],
-				Vector3(0.50, 0.26, 0.50),
+				Vector3(LEG_WIDTH * 1.7, 0.26, LEG_WIDTH * 1.7),
 				Vector3(x, VOID_FLOOR_Y + 0.13, z),
 				_palette.structure(false, true)))
-		# Two cross-braces per side, at different depths, so the frame has a
+		# Cross-braces per side, at different depths, so the frame has a
 		# silhouette instead of four parallel lines.
-		for raw_level in [2.6, 6.4]:
+		for raw_level in [2.4, 6.0, 9.6]:
 			var level := float(raw_level)
 			root.add_child(_box("Tie%d_%d" % [int(sx), int(level * 10.0)],
-				Vector3(0.16, 0.16, to_units(_gate_y - back) * 0.70),
-				Vector3(sx * to_units(half_span) * 0.82, top - level, middle),
+				Vector3(0.17, 0.17, length * 0.72),
+				Vector3(sx * to_units(half_span) * 0.84, top - level, middle),
 				_palette.structure(false, true)))
+	# One diagonal per side, which is what stops four verticals reading as a
+	# table and starts them reading as a frame.
+	for raw_x in [-1.0, 1.0]:
+		var sx := float(raw_x)
+		var rise := 7.6
+		var run := reach * 2.0
+		var brace := _box("Diagonal%d" % int(sx),
+			Vector3(0.15, Vector2(run, rise).length(), 0.15),
+			Vector3(sx * to_units(half_span) * 0.84, top - rise * 0.5, middle),
+			_palette.structure())
+		brace.rotation.x = atan2(run, rise)
+		root.add_child(brace)
 
 
-func _build_start_gate(root: Node3D) -> void:
-	## The release: blades standing across the lip, dropping into the housing.
+func _build_start_gate(root: Node3D, bays: Array) -> void:
+	## The release: one blade across each bay, dropping into the housing.
+	##
+	## One per launch channel rather than a fixed eight, which is what makes
+	## 'synchronised lane release' a thing a viewer can see: four shutters, one
+	## instant, four channels emptying together.
 	##
 	## They are animated to *finish* moving on the tick the simulation removes
 	## the floor, so a marble is never drawn passing through a blade that has
@@ -1631,11 +2502,11 @@ func _build_start_gate(root: Node3D) -> void:
 		Vector3(0.0, H_START - GATE_HOUSING * 0.5 - 0.02, housing_z),
 		_palette.structure()))
 
-	var span := _platform_right - _platform_left
-	for index in GATE_BLADES:
-		var centre := _platform_left + span * (float(index) + 0.5) \
-			/ float(GATE_BLADES)
-		var width := to_units(span) / float(GATE_BLADES) - GATE_GAP
+	for index in bays.size():
+		var raw: Array = bays[index]
+		var sample: Vector3 = raw[raw.size() - 1]
+		var centre := (sample.x + sample.y) * 0.5
+		var width := to_units(sample.y - sample.x) + BAY_MARGIN * 2.0 / PIXELS_PER_UNIT
 		var blade := Node3D.new()
 		blade.name = "Blade%d" % index
 		blade.position = Vector3(
@@ -1648,11 +2519,11 @@ func _build_start_gate(root: Node3D) -> void:
 			Vector3(0.0, GATE_HEIGHT * 0.5, 0.0),
 			_palette.structure(false, true)))
 		blade.add_child(_box("Face",
-			Vector3(width * 0.90, GATE_HEIGHT * 0.72, GATE_DEPTH * 0.45),
+			Vector3(width * 0.88, GATE_HEIGHT * 0.70, GATE_DEPTH * 0.45),
 			Vector3(0.0, GATE_HEIGHT * 0.46, -GATE_DEPTH * 0.34),
 			_palette.rail()))
 		blade.add_child(_box("Light",
-			Vector3(width * 0.86, GATE_LIGHT, GATE_DEPTH * 0.55),
+			Vector3(width * 0.84, GATE_LIGHT, GATE_DEPTH * 0.55),
 			Vector3(0.0, GATE_HEIGHT - GATE_LIGHT * 0.5, 0.0),
 			_palette.start_light(), false))
 
@@ -1661,45 +2532,59 @@ func _build_start_gate(root: Node3D) -> void:
 
 
 func _build_start_sign(root: Node3D, back: float) -> void:
-	## The cyan and white treatment. The one place on this machine with text
-	## on it, and the brightest thing in the first second of the shot.
-	var z := to_units(back) - 0.35
-	var half := to_units(_platform_right - _platform_left) * 0.30
+	## The cyan and white treatment, on a gantry over the near end of the deck.
+	##
+	## The one place on this machine with text on it, and the brightest thing
+	## in the first second of the shot. The brief asks for it to be part of the
+	## machine rather than HUD text floating in space, and what makes the
+	## difference is the bezel: V1 hung a bare white slab off two posts, and a
+	## bare emissive rectangle is a sticker. This is a graphite frame with a
+	## lit panel let into it, on posts with feet that stand on the deck, under
+	## a header beam - so it is built out of the same parts as everything else
+	## and lit the same way.
+	var z := to_units(back) - 0.30
+	var half := to_units(_platform_right - _platform_left) * 0.27
 	var sign := Node3D.new()
 	sign.name = "StartSign"
 	sign.position = Vector3(0.0, H_START, z)
 	root.add_child(sign)
 
-	for side in [-1.0, 1.0]:
+	for raw_side in [-1.0, 1.0]:
+		var side := float(raw_side)
 		sign.add_child(_box("Post%d" % int(side),
-			Vector3(0.16, SIGN_HEIGHT, 0.16),
+			Vector3(0.15, SIGN_HEIGHT, 0.15),
 			Vector3(side * half, SIGN_HEIGHT * 0.5, 0.0),
 			_palette.structure(false, true)))
+		sign.add_child(_box("Shoe%d" % int(side),
+			Vector3(0.34, 0.12, 0.34), Vector3(side * half, 0.06, 0.0),
+			_palette.structure()))
+	sign.add_child(_box("Header", Vector3(half * 2.0 + 0.34, 0.13, 0.20),
+		Vector3(0.0, SIGN_HEIGHT, 0.0), _palette.structure(false, true)))
 
 	var panel := Node3D.new()
 	panel.name = "Panel"
-	panel.position = Vector3(0.0, SIGN_HEIGHT - SIGN_PANEL.y * 0.5, 0.0)
+	panel.position = Vector3(0.0, SIGN_HEIGHT - SIGN_PANEL.y * 0.62, 0.0)
 	# Leaned back towards the lens, so the face is square to a camera looking
 	# down at it rather than edge-on.
 	panel.rotation_degrees = Vector3((90.0 - _elevation) * 0.85, 0.0, 0.0)
 	sign.add_child(panel)
 
-	panel.add_child(_box("Frame",
-		Vector3(half * 2.0 + 0.16, SIGN_PANEL.y + 0.10, SIGN_PANEL.z),
+	panel.add_child(_box("Bezel",
+		Vector3(half * 2.0 + 0.10, SIGN_PANEL.y + 0.14, SIGN_PANEL.z),
 		Vector3.ZERO, _palette.structure(false, true)))
 	panel.add_child(_box("Face",
-		Vector3(half * 2.0, SIGN_PANEL.y, SIGN_PANEL.z * 0.5),
+		Vector3(half * 2.0 - 0.10, SIGN_PANEL.y, SIGN_PANEL.z * 0.5),
 		Vector3(0.0, 0.0, -SIGN_PANEL.z * 0.4),
 		_palette.start_light(), false))
 
 	var label := Label3D.new()
 	label.name = "Text"
 	label.text = "START"
-	label.font_size = 220
-	label.pixel_size = 0.0029
+	label.font_size = 200
+	label.pixel_size = 0.0026
 	label.shaded = false
 	label.double_sided = false
-	label.modulate = Color(0.03, 0.10, 0.16)
+	label.modulate = Color(0.02, 0.08, 0.14)
 	label.outline_size = 0
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -1711,69 +2596,122 @@ func _build_start_sign(root: Node3D, back: float) -> void:
 # --- the room -------------------------------------------------------------
 
 func _build_room() -> void:
-	## A dark chamber the machine stands in, and a floor a long way below it.
+	## The chamber the machine stands in.
 	##
-	## Deliberately not a slab under the track. The brief is explicit that the
-	## machine has to have visible space around and underneath it, and that is
-	## the one thing a background plane immediately behind the course cannot
-	## give: the floor is nineteen units down, the two ranks of columns are
-	## eleven and fifteen and a half units out - the near rank clearing the
-	## bowl's lip, which reaches 5.6 - and everything between them is air that
-	## the pillars and the bowl's legs cross.
+	## V1 built a dark void with two ranks of columns in it, and the brief is
+	## right that the result was mostly empty black. The columns were there;
+	## they were four percent brighter than the background and eleven units to
+	## the side of a lens whose frustum is only six units wide at the subject,
+	## so almost none of them ever crossed the frame.
+	##
+	## What fills a portrait frame at this focal length is not what stands
+	## *beside* the machine - it is what stands *beyond* it. The frustum is
+	## six units wide at the aim and twenty at forty units past it, so the top
+	## half of every frame looks up the hall the machine is standing in. So
+	## this is a hall: three ranks of structure at three distances, running
+	## the length of the course, plus a floor with plant on it under the
+	## machine and a light run down each side.
+	##
+	##     near towers   8.7 out    the fastest thing in the parallax
+	##     mid towers   12.9 out    taller, banded, with braces between them
+	##     wall panels  17.4 out    the back of the room, barely there
+	##
+	## Nothing here is bright. Every rank is a step darker than the machine's
+	## own structure, and the whole room is inside the depth fog. The brief
+	## asks for enough to sell scale and depth and no more: the machine stays
+	## the subject because it is the only thing in the picture with a light
+	## surface on it.
 	var root := Node3D.new()
 	root.name = "Room"
 	add_child(root)
 
 	var top := _course_top - ROOM_OVERRUN_TOP
 	var bottom := _course_bottom + ROOM_OVERRUN_BOTTOM
+
+	_build_floor(root, top, bottom)
+	_build_rank(root, "Near", TOWER_NEAR_X, TOWER_NEAR_SPACING,
+		TOWER_NEAR_SIZE, _palette.room(0), top, bottom, TOWER_NEAR_SINK)
+	_build_rank(root, "Mid", TOWER_MID_X, TOWER_MID_SPACING,
+		TOWER_MID_SIZE, _palette.room(1), top, bottom, TOWER_MID_SINK)
+	_build_wall(root, top, bottom)
+	_build_conduits(root, top, bottom)
+	_build_braces(root, top, bottom)
+	_build_wall_strips(root, top, bottom)
+
+
+func _build_floor(root: Node3D, top: float, bottom: float) -> void:
+	## The floor of the hall, and the plant standing on it.
+	##
+	## The floor is nineteen units below the deck and it is the single largest
+	## surface in the picture, so what it looks like decides how much of the
+	## frame is empty. A bare plane at that value is indistinguishable from the
+	## background: what makes it a floor is things standing on it casting
+	## shadows across it, and a lit line running away down each side.
 	var length := to_units(bottom - top)
 	var centre := to_units((top + bottom) * 0.5)
-
-	root.add_child(_box("Floor", Vector3(70.0, 0.8, length),
+	root.add_child(_box("Floor", Vector3(FLOOR_WIDTH, 0.8, length),
 		Vector3(0.0, VOID_FLOOR_Y - 0.4, centre), _palette.void_floor(), false))
 
-	# Two ranks of columns at different distances. One rank gives the camera
-	# a rate to sweep past; two at different distances give a *comparison*,
-	# and the comparison is the parallax cue a viewer actually reads.
-	_build_columns(root, "Far", COLUMN_FAR_X, COLUMN_FAR_SPACING,
-		COLUMN_FAR_SIZE, _palette.structure(true), top, bottom)
-	_build_columns(root, "Near", COLUMN_NEAR_X, COLUMN_NEAR_SPACING,
-		COLUMN_NEAR_SIZE, _palette.structure(false, true), top, bottom)
-	_build_wall_strips(root, top, bottom)
-	_build_gantries(root, top, bottom)
-
-
-func _build_gantries(root: Node3D, top: float, bottom: float) -> void:
-	## Beams across the room, well behind and well above the machine.
-	##
-	## Distant machinery. Brackets reaching in from each wall and stopping
-	## well short of the middle, never a beam right across.
-	##
-	## The first version ran them the full width and it was the race scene's
-	## gantry lesson over again in a new place: a horizontal bar across a
-	## portrait frame reads as letterboxing, and two of them read as a fault
-	## in the render. Reaching in from the sides they still say the machine is
-	## standing inside a structure, and they cross nothing.
-	var count := maxi(1, int((bottom - top) / GANTRY_SPACING))
+	# Plant: low blocks either side of the machine's own footprint, at three
+	# sizes on a fixed cycle. Deterministic by index - nothing in this scene is
+	# allowed to randomise, because two renders of one replay have to agree.
+	var count := maxi(2, int(to_units(bottom - top) / PLANT_SPACING))
 	for index in count:
-		var y := top + (float(index) + 0.5) * (bottom - top) / float(count)
-		var height := deck_height(_course_width * 0.5, y)
+		var z := to_units(top) + (float(index) + 0.5) * PLANT_SPACING
 		for raw_side in [-1.0, 1.0]:
 			var side := float(raw_side)
-			root.add_child(_box("Gantry%d_%d" % [index, int(raw_side)],
-				Vector3(GANTRY_REACH, 0.40, 0.60),
-				Vector3(side * (COLUMN_FAR_X - GANTRY_REACH * 0.5),
-					height + GANTRY_HIGH, to_units(y)),
-				_palette.structure(true), false))
+			var step := (index * 2 + (0 if side < 0.0 else 1)) % 3
+			var size: Vector3 = PLANT_SIZES[step]
+			var x := side * (PLANT_X + float(step) * 1.15)
+			root.add_child(_box("Plant%d_%d" % [index, int(side)], size,
+				Vector3(x, VOID_FLOOR_Y + size.y * 0.5, z),
+				_palette.room(1), false))
+			# One lit line on the block facing the machine, so the floor has
+			# something on it a viewer can track past.
+			if step == 1:
+				root.add_child(_box("PlantLight%d_%d" % [index, int(side)],
+					Vector3(0.06, 0.05, size.z * 0.55),
+					Vector3(x - side * (size.x * 0.5 + 0.03),
+						VOID_FLOOR_Y + size.y * 0.62, z),
+					_palette.strip(index % 2 == 1, true), false))
+
+	# Plate joints across the floor. A large flat surface at a low value is
+	# indistinguishable from a background at a low value; a rhythm on it is
+	# what makes it a plane, and a plane running away from the lens is what
+	# makes the space under the machine a space.
+	var plates := maxi(2, int(to_units(bottom - top) / PLATE_PITCH))
+	for index in plates:
+		var z := to_units(top) + (float(index) + 0.5) * PLATE_PITCH
+		root.add_child(_box("Plate%d" % index,
+			Vector3(FLOOR_WIDTH * 0.62, 0.10, 0.16),
+			Vector3(0.0, VOID_FLOOR_Y + 0.05, z),
+			_palette.room(1), false))
+
+	# A run of light down each side of the floor. Dim, continuous and a long
+	# way from the machine: this is the cheapest depth cue in the scene,
+	# because a straight line running away from the lens is a ruler.
+	var runs := maxi(1, int(to_units(bottom - top) / FLOOR_LINE_LENGTH))
+	for raw_side in [-1.0, 1.0]:
+		var side := float(raw_side)
+		for index in runs:
+			var z := to_units(top) + (float(index) + 0.5) * FLOOR_LINE_LENGTH
+			root.add_child(_box("FloorLine%d_%d" % [index, int(side)],
+				Vector3(0.11, 0.04, FLOOR_LINE_LENGTH - 2.4),
+				Vector3(side * FLOOR_LINE_X, VOID_FLOOR_Y + 0.05, z),
+				_palette.strip(false, true), false))
 
 
-func _build_columns(root: Node3D, tag: String, offset: float, spacing: float,
-		size: Vector3, material: StandardMaterial3D,
-		top: float, bottom: float) -> void:
-	## One rank of columns down each side, as a single MultiMesh.
+func _build_rank(root: Node3D, tag: String, offset: float, spacing: float,
+		size: Vector3, material: StandardMaterial3D, top: float, bottom: float,
+		sink: float) -> void:
+	## One rank of towers down each side, as a single MultiMesh.
 	##
 	## Two hundred boxes would be two hundred draw calls for scenery nobody
 	## looks at directly. As instances of one mesh they are one.
+	##
+	## The rank follows the machine down rather than crossing every level at
+	## one height, which is what keeps a hall that descends nine units from
+	## looking like a flat room the machine happens to be sinking through.
 	var count := int(to_units(bottom - top) / spacing)
 	if count < 2:
 		return
@@ -1788,35 +2726,151 @@ func _build_columns(root: Node3D, tag: String, offset: float, spacing: float,
 
 	for index in count:
 		var z := to_units(top) + float(index) * spacing
-		# The columns follow the machine down, so the room descends with it
-		# rather than crossing every level at one height.
 		var height := deck_height(_course_width * 0.5, z * PIXELS_PER_UNIT)
 		for side_index in 2:
 			var side := -1.0 if side_index == 0 else 1.0
 			multi.set_instance_transform(index * 2 + side_index,
 				Transform3D(Basis(), Vector3(
-					side * offset, height + size.y * 0.5 - COLUMN_SINK, z)))
+					side * offset, height + size.y * 0.5 - sink, z)))
 
 	var node := MultiMeshInstance3D.new()
-	node.name = "Columns%s" % tag
+	node.name = "Towers%s" % tag
 	node.multimesh = multi
 	node.material_override = material
 	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	root.add_child(node)
 
 
+func _build_wall(root: Node3D, top: float, bottom: float) -> void:
+	## The back of the room: a grid of panels down each side.
+	##
+	## Panels rather than a plane, because a plane at this value is a colour
+	## and a grid is a surface. The gaps between them are what read - a
+	## rhythm at a distance is what tells a viewer how far away a distance is.
+	var rows := WALL_ROWS
+	var columns := int(to_units(bottom - top) / WALL_PANEL_PITCH)
+	if columns < 2:
+		return
+
+	var mesh := BoxMesh.new()
+	mesh.size = WALL_PANEL
+
+	var multi := MultiMesh.new()
+	multi.transform_format = MultiMesh.TRANSFORM_3D
+	multi.mesh = mesh
+	multi.instance_count = columns * rows * 2
+
+	var at := 0
+	for column in columns:
+		var z := to_units(top) + (float(column) + 0.5) * WALL_PANEL_PITCH
+		var height := deck_height(_course_width * 0.5, z * PIXELS_PER_UNIT)
+		for row in rows:
+			var y := height + WALL_BASE + float(row) * WALL_PANEL_RISE
+			for side_index in 2:
+				var side := -1.0 if side_index == 0 else 1.0
+				multi.set_instance_transform(at, Transform3D(Basis(),
+					Vector3(side * WALL_X, y, z)))
+				at += 1
+
+	# The wall itself, behind the grid. Without it the panels are bright
+	# rectangles on nothing, which is a worse background than no background.
+	for raw_side in [-1.0, 1.0]:
+		var side := float(raw_side)
+		var mid := to_units((top + bottom) * 0.5)
+		root.add_child(_box("WallBack%d" % int(side),
+			Vector3(0.5, 52.0, to_units(bottom - top)),
+			Vector3(side * (WALL_X + 0.5),
+				deck_height(_course_width * 0.5, (top + bottom) * 0.5) + 5.0,
+				mid),
+			_palette.room(2), false))
+
+	var node := MultiMeshInstance3D.new()
+	node.name = "WallPanels"
+	node.multimesh = multi
+	node.material_override = _palette.room(2)
+	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	root.add_child(node)
+
+
+func _build_conduits(root: Node3D, top: float, bottom: float) -> void:
+	## Pipe runs climbing the near towers.
+	##
+	## Round against everything else being square, which is the whole reason
+	## they are here: a room of boxes reads as a room of boxes, and three
+	## cylinders per side is enough to say the boxes are machinery.
+	var count := maxi(1, int(to_units(bottom - top) / CONDUIT_SPACING))
+	for index in count:
+		var z := to_units(top) + (float(index) + 0.5) * CONDUIT_SPACING
+		var height := deck_height(_course_width * 0.5, z * PIXELS_PER_UNIT)
+		for raw_side in [-1.0, 1.0]:
+			var side := float(raw_side)
+			for pipe in 3:
+				var mesh := CylinderMesh.new()
+				mesh.top_radius = CONDUIT_RADIUS
+				mesh.bottom_radius = CONDUIT_RADIUS
+				mesh.height = CONDUIT_HEIGHT
+				mesh.radial_segments = 10
+				mesh.rings = 1
+				var node := MeshInstance3D.new()
+				node.name = "Conduit%d_%d_%d" % [index, int(side), pipe]
+				node.mesh = mesh
+				node.material_override = _palette.room(0)
+				node.position = Vector3(
+					side * (TOWER_NEAR_X - 0.75 - float(pipe) * 0.34),
+					height + CONDUIT_HEIGHT * 0.5 - 6.0, z)
+				node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+				root.add_child(node)
+
+
+func _build_braces(root: Node3D, top: float, bottom: float) -> void:
+	## Beams reaching in from each wall, well behind and well above the
+	## machine, and stopping well short of the middle.
+	##
+	## The first version ran them the full width and it was the race scene's
+	## gantry lesson over again in a new place: a horizontal bar across a
+	## portrait frame reads as letterboxing, and two of them read as a fault in
+	## the render. Reaching in from the sides they still say the machine is
+	## standing inside a structure, and they cross nothing.
+	var count := maxi(1, int((bottom - top) / GANTRY_SPACING))
+	for index in count:
+		var y := top + (float(index) + 0.5) * (bottom - top) / float(count)
+		var height := deck_height(_course_width * 0.5, y)
+		for raw_side in [-1.0, 1.0]:
+			var side := float(raw_side)
+			for raw_level in [GANTRY_HIGH, GANTRY_HIGH - 5.6]:
+				var level := float(raw_level)
+				root.add_child(_box(
+					"Brace%d_%d_%d" % [index, int(raw_side), int(level)],
+					Vector3(GANTRY_REACH, 0.34, 0.52),
+					Vector3(side * (TOWER_MID_X - GANTRY_REACH * 0.5),
+						height + level, to_units(y)),
+					_palette.room(1), false))
+			# A diagonal off each brace into the tower under it, so the reach
+			# reads as bracketed rather than cantilevered out of nothing.
+			var rise := 2.2
+			var run := 1.9
+			var stay := _box("Stay%d_%d" % [index, int(raw_side)],
+				Vector3(0.20, Vector2(run, rise).length(), 0.20),
+				Vector3(side * (TOWER_MID_X - run * 0.5),
+					height + GANTRY_HIGH - rise * 0.5, to_units(y)),
+				_palette.room(1), false)
+			stay.rotation.z = atan2(side * run, rise)
+			root.add_child(stay)
+
+
 func _build_wall_strips(root: Node3D, top: float, bottom: float) -> void:
-	## A lit line down each far wall. Low energy: this is depth, not a light.
-	var runs := maxi(1, int((bottom - top) / 600.0))
+	## A lit line up each mid tower. Low energy: this is depth, not a light.
+	var runs := maxi(1, int((bottom - top) / 520.0))
 	var span := (bottom - top) / float(runs)
-	for side in [-1.0, 1.0]:
+	for raw_side in [-1.0, 1.0]:
+		var side := float(raw_side)
 		for index in runs:
 			var y := top + (float(index) + 0.5) * span
 			var height := deck_height(_course_width * 0.5, y)
 			root.add_child(_box("Strip%d_%d" % [int(side), index],
-				Vector3(0.10, 0.09, to_units(span) - 0.6),
-				Vector3(side * (COLUMN_FAR_X - COLUMN_FAR_SIZE.x * 0.6),
-					height + 2.6, to_units(y)),
+				Vector3(0.10, STRIP_HEIGHT, 0.30),
+				Vector3(side * (TOWER_MID_X - TOWER_MID_SIZE.x * 0.55),
+					height + 1.8, to_units(y)),
 				_palette.strip(index % 3 == 1), false))
 
 
@@ -1826,20 +2880,27 @@ func _build_racers() -> void:
 	## Premium glossy marbles, and nothing stuck to them.
 	##
 	## No trail, no glow, no impact ring. The brief asks for architecture and
-	## art direction to be judged first, and every one of those would be
-	## judged instead: a trail is the brightest thing in a dark frame, and a
-	## glow on a sphere removes the terminator that makes it a sphere.
+	## art direction to be judged first, and every one of those would be judged
+	## instead: a trail is the brightest thing in a dark frame, and a glow on a
+	## sphere removes the terminator that makes it a sphere.
+	##
+	## `--neon-countries=flag` and `=code` swap the first five racers for the
+	## country experiment and change nothing else, so the comparison stills
+	## differ in exactly one thing.
 	var root := Node3D.new()
 	root.name = "Racers"
 	add_child(root)
 
-	var flags: RefCounted = NeonFlags.new() if _countries else null
+	var flags: RefCounted = NeonFlags.new() if _countries != "" else null
 
 	for index in _racer_meta.size():
 		var meta: Dictionary = _racer_meta[index]
 		var radius := to_units(float(meta.get("radius", 30.0)))
 		var color := _color_of(meta)
 		var racer_id := int(meta.get("id", 0))
+		var country: bool = flags != null and index < flags.country_count()
+		if country:
+			color = flags.body_of(index)
 
 		var pivot := Node3D.new()
 		pivot.name = "Racer%d" % racer_id
@@ -1851,18 +2912,16 @@ func _build_racers() -> void:
 		mesh.radial_segments = 48
 		mesh.rings = 24
 
-		var material: StandardMaterial3D = _palette.racer(color)
-		if flags != null and index < flags.country_count():
-			material = _palette.racer_textured(
-				flags.texture(index), flags.name_of(index))
-
 		var sphere := MeshInstance3D.new()
 		sphere.name = "Body"
 		sphere.mesh = mesh
-		sphere.material_override = material
+		sphere.material_override = _palette.racer(color)
 		pivot.add_child(sphere)
 
-		_build_badge(pivot, racer_id, color, radius)
+		if country:
+			_build_country_badge(pivot, flags, index, radius)
+		else:
+			_build_badge(pivot, racer_id, color, radius)
 
 		_racer_nodes.append(pivot)
 		_racer_spheres.append(sphere)
@@ -1900,6 +2959,53 @@ func _build_badge(pivot: Node3D, racer_id: int, color: Color,
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.render_priority = 2
 	label.outline_render_priority = 1
+	badge.add_child(label)
+
+
+func _build_country_badge(pivot: Node3D, flags: RefCounted, index: int,
+		radius: float) -> void:
+	## A plate on a billboard above the marble, and the country's code under it.
+	##
+	## Both candidates are the same object with a different graphic on the
+	## plate, which is what makes the comparison a comparison. The plate is
+	## deliberately small - a fifth of a unit against a marble three tenths
+	## across - because the failure mode the brief warns about is a pile-up of
+	## sixteen where every label overlaps every other one.
+	var badge := Node3D.new()
+	badge.name = "CountryBadge"
+	badge.position = Vector3(0.0, radius + BADGE_RISE, 0.0)
+	pivot.add_child(badge)
+
+	var plate := Sprite3D.new()
+	plate.name = "Plate"
+	plate.texture = flags.plate(index) if _countries == "flag" \
+		else flags.plate_plain(index)
+	plate.pixel_size = COUNTRY_PLATE_SIZE / float(NeonFlags.PLATE)
+	plate.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	plate.shaded = false
+	plate.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
+	plate.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	plate.render_priority = 2
+	plate.position = Vector3(0.0, COUNTRY_PLATE_SIZE * 0.42, 0.0)
+	badge.add_child(plate)
+
+	var label := Label3D.new()
+	label.name = "Code"
+	label.text = flags.code_of(index)
+	label.font_size = BADGE_FONT_SIZE
+	label.pixel_size = COUNTRY_CODE_SIZE
+	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	label.shaded = false
+	label.double_sided = true
+	label.alpha_cut = Label3D.ALPHA_CUT_DISCARD
+	label.modulate = Color(0.94, 0.97, 1.0)
+	label.outline_modulate = Color(0.0, 0.0, 0.0, 0.9)
+	label.outline_size = BADGE_OUTLINE
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.render_priority = 3
+	label.outline_render_priority = 2
+	label.position = Vector3(0.0, -COUNTRY_PLATE_SIZE * 0.42, 0.0)
 	badge.add_child(label)
 
 

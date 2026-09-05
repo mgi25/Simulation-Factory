@@ -32,29 +32,55 @@ extends RefCounted
 
 # --- track ----------------------------------------------------------------
 
-# The racing surface. Light silver with a faint warm bias so it does not read
-# as blue-grey next to the cyan accents, and deliberately *not* white: pure
-# white clips under ACES and takes the surface's shading with it, which is how
-# a deck stops looking like a solid object.
-const TRACK_TOP := Color(0.520, 0.542, 0.562)
-# The same material one step down in value, for the flange and the wide aprons
-# so a big pale area is not one flat tone.
-const TRACK_TOP_DEEP := Color(0.290, 0.308, 0.332)
+# The racing surface. Light silver, and warm rather than cool: V1's was a
+# blue-grey a hair darker, and against cyan accents on a graphite machine that
+# read as the same grey as the structure lit a little harder. Warming it past
+# neutral - red above green above blue - is what separates track from frame
+# without adding a colour to the palette, and lifting it a step is what stops
+# the machine reading as one value.
+#
+# Still deliberately *not* white: pure white clips under ACES and takes the
+# surface's shading with it, which is how a deck stops looking like a solid.
+const TRACK_TOP := Color(0.605, 0.592, 0.566)
+# One step down in value, for the flange and the bevel along a deck's edge.
+const TRACK_TOP_DEEP := Color(0.352, 0.342, 0.326)
+# A much smaller step, for the panel inlaid down the middle of a deck.
+#
+# The panel used the deep value in V1, where every deck was wide enough that
+# it read as an inlay. On a launch channel a unit and three quarters across it
+# read as a dark stripe with the track either side of it, which turns a light
+# silver deck into a dark one with pale edges - the opposite of the brief's
+# palette. One step is enough to break a flat surface; three is a different
+# material.
+const TRACK_PANEL := Color(0.512, 0.500, 0.478)
 # The side and underside of a deck. Much darker: this is the part of a beam
 # that tells a viewer the beam has thickness.
-const TRACK_SIDE := Color(0.170, 0.183, 0.205)
-const TRACK_WEB := Color(0.108, 0.118, 0.136)
+const TRACK_SIDE := Color(0.168, 0.176, 0.194)
+const TRACK_WEB := Color(0.100, 0.108, 0.124)
 
 # --- structure ------------------------------------------------------------
 
-const GRAPHITE := Color(0.098, 0.107, 0.126)
-const GRAPHITE_LIT := Color(0.150, 0.163, 0.188)
-const GRAPHITE_FAR := Color(0.046, 0.052, 0.064)
-const VOID_FLOOR := Color(0.017, 0.020, 0.027)
+const GRAPHITE := Color(0.126, 0.136, 0.158)
+# The members that face the key. Lifted well clear of the base graphite,
+# because V1's cradle, legs and braces all fell within a few hundredths of
+# each other and the whole support frame read as one silhouette - and a
+# silhouette has no depth. The brief asks for the machinery holding the bowl
+# to be obvious; this is most of how that is bought.
+const GRAPHITE_LIT := Color(0.205, 0.218, 0.244)
+# The room. Also lifted, and for the opposite reason: at V1's value the
+# columns and gantries were inside a few percent of the background and the
+# frame was mostly empty black. They are still the darkest structure in the
+# picture - they just exist now.
+const GRAPHITE_FAR := Color(0.082, 0.092, 0.113)
+const GRAPHITE_DIM := Color(0.055, 0.062, 0.078)
+# The nearest rank, between the lens and the machine. A step above the far
+# ranks so a paused frame has three distances in it rather than two.
+const GRAPHITE_NEAR := Color(0.132, 0.143, 0.166)
+const VOID_FLOOR := Color(0.079, 0.086, 0.101)
 
 # --- rails ----------------------------------------------------------------
 
-const RAIL_METAL := Color(0.560, 0.605, 0.650)
+const RAIL_METAL := Color(0.655, 0.672, 0.700)
 
 # --- accents --------------------------------------------------------------
 
@@ -72,7 +98,13 @@ const VIOLET := Color(0.560, 0.430, 0.980)
 
 const GLASS := Color(0.620, 0.780, 0.870)
 const GLASS_ALPHA := 0.26
-const BOWL_SHELL := Color(0.255, 0.285, 0.315)
+# The tall outer wall is thinner in body and much stronger at its edges than
+# the shell under the vessel. That is what acrylic looks like and it is also
+# what keeps it free: the body is where the racers are seen through, so it has
+# to cost as little as possible, and the Fresnel that draws the silhouette
+# happens at grazing angles where there is nothing behind it to obscure.
+const GLASS_WALL_ALPHA := 0.155
+const BOWL_SHELL := Color(0.290, 0.312, 0.338)
 const BOWL_DARK := Color(0.030, 0.036, 0.048)
 
 # --- emission strengths ---------------------------------------------------
@@ -80,11 +112,16 @@ const BOWL_DARK := Color(0.030, 0.036, 0.048)
 # The environment's glow threshold is 1.05. Everything below that is a lit
 # surface; the two entries above it are the only things in the machine that
 # are allowed to bloom.
-const EMISSION_EDGE := 0.62
-const EMISSION_START := 1.25        # over threshold: the start is the title card
+const EMISSION_EDGE := 0.54
+const EMISSION_START := 1.12        # over threshold: the start is the title card
 const EMISSION_DRAIN := 1.15        # over threshold: the exit has to read as a hole
 const EMISSION_BOWL := 0.55
 const EMISSION_STRIP := 0.40
+# Under the bowl, and under threshold on purpose. The brief asks for
+# underlighting that leaves the track's shading visible and the marbles
+# dominant; a strip that bloomed would do neither.
+const EMISSION_UNDER := 0.85
+const EMISSION_GLASS_RIM := 0.34
 
 var _cache := {}
 
@@ -123,6 +160,16 @@ func emissive(color: Color, energy: float, body := Color.BLACK,
 
 
 # --- the machine ----------------------------------------------------------
+
+func track_panel() -> StandardMaterial3D:
+	## The inlay down the middle of a deck. One step below the running
+	## surface, and the same finish, so it reads as a recess in one material
+	## rather than as a second material.
+	var cached := _cached("track_panel")
+	if cached != null:
+		return cached
+	return _put("track_panel", metal(TRACK_PANEL, 0.28, 0.315, 0.60))
+
 
 func track_top(deep := false) -> StandardMaterial3D:
 	## The surface a racer rolls on.
@@ -186,27 +233,61 @@ func structure(far := false, lit := false) -> StandardMaterial3D:
 	if cached != null:
 		return cached
 	if far:
-		return _put(key, metal(GRAPHITE_FAR, 0.28, 0.74, 0.28))
+		return _put(key, metal(GRAPHITE_FAR, 0.30, 0.70, 0.30))
 	if lit:
-		return _put(key, metal(GRAPHITE_LIT, 0.58, 0.44, 0.44))
+		return _put(key, metal(GRAPHITE_LIT, 0.58, 0.42, 0.48))
 	return _put(key, metal(GRAPHITE, 0.55, 0.52, 0.40))
 
 
+func room(depth := 0) -> StandardMaterial3D:
+	## The chamber the machine stands in, at three distances.
+	##
+	## 0 is the near rank, between the lens and the machine; 1 is the far
+	## ranks and the towers; 2 is the back wall behind everything. The brief
+	## asks a paused frame to contain a foreground, a midground and a
+	## background, and three values a viewer can tell apart is what makes the
+	## difference between three distances and one dark mass.
+	var key := "room:%d" % depth
+	var cached := _cached(key)
+	if cached != null:
+		return cached
+	if depth <= 0:
+		return _put(key, metal(GRAPHITE_NEAR, 0.42, 0.56, 0.36))
+	if depth == 1:
+		return _put(key, metal(GRAPHITE_FAR, 0.30, 0.70, 0.30))
+	return _put(key, metal(GRAPHITE_DIM, 0.16, 0.86, 0.20))
+
+
 func void_floor() -> StandardMaterial3D:
+	## The floor of the hall, nineteen units under the deck.
+	##
+	## Lifted well above V1's near-black, and that is a deliberate reversal.
+	## V1 reasoned that a dark void keeps the machine the subject; what it
+	## actually produced was a frame that is mostly nothing, and plant standing
+	## on an invisible floor reads as boxes floating in space. A floor a viewer
+	## can see is a floor that can take a shadow, and the shadows the machine
+	## throws onto it are worth more than the contrast the darkness bought.
 	var cached := _cached("void_floor")
 	if cached != null:
 		return cached
-	return _put("void_floor", metal(VOID_FLOOR, 0.08, 0.92, 0.18))
+	return _put("void_floor", metal(VOID_FLOOR, 0.10, 0.88, 0.20))
 
 
-func strip(warm := false) -> StandardMaterial3D:
-	## A machine light on a wall or a column, well below glow threshold.
-	var key := "strip:%s" % ("warm" if warm else "cool")
+func strip(warm := false, dim := false) -> StandardMaterial3D:
+	## A machine light on a tower or a floor run, well below glow threshold.
+	##
+	## `dim` is a third of the energy, for the runs on the floor. They are the
+	## longest continuous lines in the picture and the first version had them
+	## at full strength: two bright dashed rules crossing a dark frame, which
+	## is the most attention-grabbing shape there is and belonged to nothing.
+	var key := "strip:%s:%s" % [
+		"warm" if warm else "cool", "dim" if dim else "full"]
 	var cached := _cached(key)
 	if cached != null:
 		return cached
 	var color := VIOLET if warm else CYAN
-	return _put(key, emissive(color, EMISSION_STRIP, color.darkened(0.90), 0.34))
+	var energy := EMISSION_STRIP * (0.30 if dim else 1.0)
+	return _put(key, emissive(color, energy, color.darkened(0.92), 0.34))
 
 
 # --- the bowl -------------------------------------------------------------
@@ -294,6 +375,85 @@ func bowl_accent() -> StandardMaterial3D:
 		emissive(CYAN, EMISSION_BOWL, CYAN.darkened(0.86), 0.26))
 
 
+func under_light(warm := false) -> StandardMaterial3D:
+	## The lit strip beneath the bowl's cradle. Cyan on the drain side, violet
+	## opposite it, and both kept under the environment's glow threshold: the
+	## brief wants the underlighting to describe the machinery, not to become
+	## the brightest thing in the picture.
+	var key := "under:%s" % ("warm" if warm else "cool")
+	var cached := _cached(key)
+	if cached != null:
+		return cached
+	var color := VIOLET if warm else CYAN
+	return _put(key, emissive(color, EMISSION_UNDER, color.darkened(0.88), 0.30))
+
+
+func glass_rim() -> StandardMaterial3D:
+	## The cap on top of the acrylic wall. Just bright enough to draw the
+	## silhouette of a transparent object, which is the one thing a
+	## transparent object cannot do for itself.
+	var cached := _cached("glass_rim")
+	if cached != null:
+		return cached
+	return _put("glass_rim",
+		emissive(CYAN, EMISSION_GLASS_RIM, CYAN.darkened(0.90), 0.24))
+
+
+func bowl_wall_glass() -> StandardMaterial3D:
+	## The tall acrylic wall standing on the bowl's rim.
+	##
+	## The V1 shell was underneath the vessel, where at a fifty-two degree
+	## lens there is almost none of it in view - the report said so and it was
+	## the honest reading. This is the other half of the reference's bowl and
+	## the half that reads: a flared wall rising *above* the rim, seen against
+	## the dark room, with the racers below and inside it.
+	##
+	## Two things keep it from costing readability. It is broken by a wide
+	## opening on the side the lens is on, so nothing is seen through glass
+	## that could be seen without it; and its body is far thinner than the
+	## shell's while its rim is far stronger, so what a viewer reads is an
+	## edge rather than a film.
+	var cached := _cached("bowl_wall_glass")
+	if cached != null:
+		return cached
+	var material := StandardMaterial3D.new()
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.albedo_color = Color(GLASS.r, GLASS.g, GLASS.b, GLASS_WALL_ALPHA)
+	material.metallic = 0.0
+	material.metallic_specular = 0.95
+	material.roughness = 0.03
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	material.rim_enabled = true
+	material.rim = 1.0
+	material.rim_tint = 0.05
+	# No shadow: a fifteen percent wall casting a solid one would put a dark
+	# ring across the machine underneath it.
+	return _put("bowl_wall_glass", material)
+
+
+func throat_glass() -> StandardMaterial3D:
+	## The window let into the far half of the bowl's floor.
+	##
+	## Nothing ever stands on that half - a racer past the drain plane is in
+	## the throat, below - so it costs no racing surface, and it is the only
+	## place the lens can see the throat from at all. Darker and clearer than
+	## the wall: it is being looked *through* on purpose.
+	var cached := _cached("throat_glass")
+	if cached != null:
+		return cached
+	var material := StandardMaterial3D.new()
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.albedo_color = Color(0.400, 0.560, 0.660, 0.215)
+	material.metallic = 0.0
+	material.metallic_specular = 0.85
+	material.roughness = 0.05
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	material.rim_enabled = true
+	material.rim = 0.70
+	material.rim_tint = 0.10
+	return _put("throat_glass", material)
+
+
 # --- racers ---------------------------------------------------------------
 
 func racer(color: Color) -> StandardMaterial3D:
@@ -322,24 +482,3 @@ func racer(color: Color) -> StandardMaterial3D:
 	material.rim = 0.55
 	material.rim_tint = 0.25
 	return _put(key, material)
-
-
-func racer_textured(texture: Texture2D, key: String) -> StandardMaterial3D:
-	## A marble whose body is a generated pattern rather than a flat colour.
-	##
-	## Only the country experiment uses this. Same coat, same rim, same
-	## roughness as `racer()` - the comparison still is meant to isolate the
-	## *pattern*, so nothing else about the material is allowed to differ.
-	var cache_key := "racer_tex:%s" % key
-	var cached := _cached(cache_key)
-	if cached != null:
-		return cached
-	var material := metal(Color.WHITE, 0.12, 0.115, 0.95)
-	material.albedo_texture = texture
-	material.clearcoat_enabled = true
-	material.clearcoat = 0.85
-	material.clearcoat_roughness = 0.035
-	material.rim_enabled = true
-	material.rim = 0.55
-	material.rim_tint = 0.25
-	return _put(cache_key, material)

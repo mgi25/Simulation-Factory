@@ -10,11 +10,14 @@ FFmpeg encodes it - with the V1 scene selected by one flag:
 Steps, and each one can be asked for on its own:
 
     --replay     simulate the neon course and export a race replay
-    --cameras    the same four moments at 42, 48, 52 and 56 degrees
+    --cameras    the same four moments at 48, 52 and 55 degrees
     --frames     the full 1080x1920 sequence at the chosen elevation
     --sections   the five section stills, pulled out of that sequence
+    --heroes     the three hero stills the brief asks to be judged on
     --video      the 5-8 second proof, cut from that sequence
-    --countries  one still with five stylised country marbles
+    --countries  the badge experiment: three treatments at three moments
+    --phone      every still again at the size a Short is actually watched at
+    --before     V1 against V1.1 at matched timestamps, side by side
 
 Nothing here re-simulates between steps. The replay is written once and every
 later step reads it, so the camera comparison, the section stills and the
@@ -56,29 +59,33 @@ from tools.render_replay import (  # noqa: E402
 )
 
 DEFAULT_SEED = 7
-DEFAULT_ROOT = os.path.join("output", "neon_v1")
-DEFAULT_STILLS = os.path.join("docs", "validation", "neon_v1")
+DEFAULT_ROOT = os.path.join("output", "neon_v11")
+DEFAULT_STILLS = os.path.join("docs", "validation", "neon_v11")
+# Where V1's committed stills live, for the before-and-after.
+V1_STILLS = os.path.join("docs", "validation", "neon_v1", "sections")
 
-# The four elevations the brief asks to be compared, and the one this
-# prototype ships on. `SELECTED_ELEVATION` is what `--frames` and `--video`
-# shoot with unless `--elevation` says otherwise; it must match the scene's
-# own `CAM_ELEVATION`, and `tests/test_neon_proof.py` checks that it does.
-CAMERA_ANGLES = (42.0, 48.0, 52.0, 56.0)
+# The elevations the brief asks to be compared for V1.1, and the one this
+# revision ships on. `SELECTED_ELEVATION` is what `--frames` and `--video`
+# shoot with unless `--elevation` says otherwise; it must match the scene's own
+# `CAM_ELEVATION`, and `tests/test_neon_proof.py` checks that it does.
+CAMERA_ANGLES = (48.0, 52.0, 55.0)
 SELECTED_ELEVATION = 52.0
 
-# The proof, in seconds. Opens on the platform, holds through the release,
-# the bowl and the bridge.
+# The proof, in seconds. Opens on the platform, holds through the release, the
+# bowl and the bridge.
 VIDEO_LEAD_IN = 1.2
 VIDEO_SECONDS = 7.0
 
-# The moments the camera comparison is judged on, as seconds from the tick
-# the gate opens. Negative is before the release.
-CAMERA_MOMENTS = (-0.6, 1.4, 2.2, 3.6)
+# The moments the camera comparison is judged on, as seconds from the tick the
+# gate opens. Negative is before the release. The last is late enough to be
+# past the bowl, because 'visible support structure' is one of the four things
+# the brief asks the elevation to be chosen on and the supports are under the
+# bridge.
+CAMERA_MOMENTS = (-0.6, 2.0, 2.8, 5.3)
 
-# The five section stills the brief asks for, as (name, seconds after the
-# gate opens). Chosen from the reference replay's own timings and stated here
-# rather than searched for, so the same five moments come out of any render
-# of it.
+# The five section stills, as (name, seconds after the gate opens). Chosen from
+# the reference replay's own timings and stated here rather than searched for,
+# so the same five moments come out of any render of it.
 SECTION_MOMENTS = (
     ("start_platform", -0.6),
     ("entering_bowl", 1.3),
@@ -87,9 +94,26 @@ SECTION_MOMENTS = (
     ("s_curve_bridge", 4.3),
 )
 
-# The country comparison: the same instant with plain marbles and with
-# stylised ones, so the two stills differ in exactly one thing.
-COUNTRY_MOMENT = -0.6
+# The three the brief asks to be judged on, and each one is a different
+# question. The start has to show the platform, the feed channels and the bowl
+# below them in one frame; the bowl has to show the glass and the cradle with
+# the field mixing inside; the bridge has to show the supports and the room.
+HERO_MOMENTS = (
+    ("start_hero", 0.90),
+    ("bowl_hero", 2.0),
+    ("bridge_hero", 5.3),
+)
+
+# The country experiment: three treatments of the same five racers, at three
+# moments. Nine stills, and the only thing that differs across a row is the
+# badge - which is the only thing the experiment is asking about.
+COUNTRY_MODES = ("number", "flag", "code")
+COUNTRY_MOMENTS = (("start", 0.55), ("bowl", 2.0), ("bridge", 5.3))
+
+# What a Short is actually watched at. The brief asks explicitly not to judge
+# only at desktop full-screen, and 0.28 of 1080x1920 is 302x538 - about a
+# phone's worth of pixels for a portrait video in a feed.
+PHONE_SCALE = 0.28
 
 
 class ProofError(RuntimeError):
@@ -128,8 +152,8 @@ def gate_frame(replay: dict) -> int:
     """The output frame the starting gate is first recorded open on.
 
     Every moment in this file is measured from here rather than from frame
-    zero, because frame zero is three seconds of countdown that no part of
-    the proof is about.
+    zero, because frame zero is three seconds of countdown that no part of the
+    proof is about.
     """
     for index, frame in enumerate(replay.get("frames", [])):
         if frame.get("gates_open"):
@@ -153,7 +177,7 @@ def godot_command(
     total: int,
     elevation: float,
     stills: tuple[int, ...] = (),
-    countries: bool = False,
+    countries: str = "",
 ) -> list[str]:
     """One Godot invocation, as an argument list.
 
@@ -180,7 +204,7 @@ def godot_command(
     if stills:
         command.append(f"--stills={','.join(str(index) for index in stills)}")
     if countries:
-        command.append("--neon-countries=1")
+        command.append(f"--neon-countries={countries}")
     return command
 
 
@@ -241,26 +265,35 @@ def render_frames(
 
 def render_countries(
     godot: str, replay: dict, replay_path: str, out_dir: str, elevation: float
-) -> list[str]:
-    """One instant, twice: plain marbles and stylised country ones.
+) -> list[tuple[str, str, str]]:
+    """The three badge treatments at the three moments.
 
-    Both stills come out of the same replay at the same frame through the same
-    scene, so the only thing that differs between them is the racer material -
+    Every still comes out of the same replay at the same frames through the
+    same scene, so the only thing that differs down a column is the badge -
     which is the only thing the experiment is asking about.
     """
     total = len(replay["frames"])
-    index = moment_frame(replay, COUNTRY_MOMENT)
-    written = []
-    for label, countries in (("plain", False), ("countries", True)):
-        target = os.path.join(out_dir, label)
+    indices = tuple(moment_frame(replay, at) for _, at in COUNTRY_MOMENTS)
+    written: list[tuple[str, str, str]] = []
+    for mode in COUNTRY_MODES:
+        target = os.path.join(out_dir, mode)
         os.makedirs(target, exist_ok=True)
         run_godot(
             godot_command(
-                godot, replay_path, target, total, elevation, (index,), countries
+                godot,
+                replay_path,
+                target,
+                total,
+                elevation,
+                indices,
+                "" if mode == "number" else mode,
             ),
-            f"the {label} marbles",
+            f"the {mode} badges",
         )
-        written.append(os.path.join(target, f"still_{index:06d}.png"))
+        for (label, _), index in zip(COUNTRY_MOMENTS, indices):
+            written.append(
+                (mode, label, os.path.join(target, f"still_{index:06d}.png"))
+            )
     return written
 
 
@@ -272,13 +305,13 @@ def save_stills(sources: list[str], targets: list[str], scale: float) -> list[st
 
     Half size by default, and `tools/race_moments.py`'s own resampler is used
     rather than a second one, for the reason that file gives: these are judged
-    by eye, and a point-sampled downscale of a 1080p frame turns every thin
-    lit edge on the machine into a dashed line.
+    by eye, and a point-sampled downscale of a 1080p frame turns every thin lit
+    edge on the machine into a dashed line.
 
     Half size is also what keeps them committable. Full-size PNGs of a machine
-    this pale come out near a megabyte each, and twenty-three of them is
-    eighteen megabytes of repository for pictures nobody measures - the
-    measuring is done on the sequence under `output/`, which is not committed.
+    this pale come out near a megabyte each, and thirty of them is thirty
+    megabytes of repository for pictures nobody measures - the measuring is
+    done on the sequence under `output/`, which is not committed.
     `--still-scale 1` writes them full size if that is ever wanted.
     """
     written = []
@@ -294,13 +327,17 @@ def save_stills(sources: list[str], targets: list[str], scale: float) -> list[st
     return written
 
 
-def extract_sections(
-    replay: dict, frames_dir: str, out_dir: str, scale: float
+def extract_moments(
+    replay: dict,
+    frames_dir: str,
+    out_dir: str,
+    moments: tuple[tuple[str, float], ...],
+    scale: float,
 ) -> list[str]:
-    """The five named moments, copied out of the finished sequence."""
+    """Named moments, copied out of the finished sequence."""
     sources = []
     targets = []
-    for name, at in SECTION_MOMENTS:
+    for name, at in moments:
         index = moment_frame(replay, at)
         sources.append(os.path.join(frames_dir, frame_filename(index)))
         targets.append(os.path.join(out_dir, f"{name}.png"))
@@ -343,6 +380,129 @@ def encode_video(replay: dict, frames_dir: str, output: str) -> str:
     return output
 
 
+# --- comparison sheets ------------------------------------------------------
+
+
+CAPTION = 44
+
+
+def _caption(surface, text: str, x: int, width: int) -> None:
+    import pygame
+
+    font = pygame.font.SysFont("dejavusans,arial", 22)
+    label = font.render(text, True, (214, 224, 236))
+    surface.blit(label, (x + (width - label.get_width()) // 2, 12))
+
+
+def compose(pairs: list[tuple[str, str]], target: str) -> str:
+    """Several stills side by side under their labels, as one sheet.
+
+    A comparison the reviewer has to open two files to make is a comparison
+    that does not get made. `pairs` is `(caption, path)` in the order they
+    should read left to right.
+    """
+    import pygame
+
+    pygame.init()
+    if not pygame.font.get_init():
+        pygame.font.init()
+    images = []
+    for caption, path in pairs:
+        if not os.path.isfile(path):
+            raise ProofError(f"expected a still at {path}")
+        images.append((caption, pygame.image.load(path)))
+
+    width = sum(image.get_width() for _, image in images)
+    height = max(image.get_height() for _, image in images)
+    sheet = pygame.Surface((width, height + CAPTION))
+    sheet.fill((10, 12, 17))
+    x = 0
+    for caption, image in images:
+        sheet.blit(image, (x, CAPTION))
+        _caption(sheet, caption, x, image.get_width())
+        x += image.get_width()
+
+    os.makedirs(os.path.dirname(os.path.abspath(target)), exist_ok=True)
+    pygame.image.save(sheet, target)
+    return target
+
+
+def before_after(stills_root: str, out_dir: str) -> list[str]:
+    """V1 against V1.1 at matched timestamps.
+
+    Both sides are the same seconds from the release of the same seed. The
+    *races* differ - the chute is four launch channels now instead of one
+    apron, so the field arrives differently - and that is what is being
+    compared: this is an art-direction revision, not a re-render.
+    """
+    written = []
+    for name, at in SECTION_MOMENTS:
+        old = os.path.join(V1_STILLS, f"{name}.png")
+        new = os.path.join(stills_root, "sections", f"{name}.png")
+        if not os.path.isfile(old):
+            print(f"    skipped {name}: no V1 still at {old}")
+            continue
+        target = os.path.join(out_dir, f"{name}.png")
+        compose(
+            [(f"V1   {name}  {at:+.1f}s", old), (f"V1.1   {name}  {at:+.1f}s", new)],
+            target,
+        )
+        written.append(target)
+        print(f"    {name}")
+    return written
+
+
+def country_sheets(
+    written: list[tuple[str, str, str]], out_dir: str, scale: float
+) -> list[str]:
+    """One sheet per moment: numbers, flags and codes side by side."""
+    sheets = []
+    for label, _ in COUNTRY_MOMENTS:
+        pairs = []
+        for mode in COUNTRY_MODES:
+            source = next(
+                path for m, l, path in written if m == mode and l == label
+            )
+            scaled = os.path.join(out_dir, f".{mode}_{label}.png")
+            save_stills([source], [scaled], scale)
+            pairs.append((f"{mode}   {label}", scaled))
+        target = os.path.join(out_dir, f"{label}.png")
+        compose(pairs, target)
+        for _, path in pairs:
+            os.remove(path)
+        sheets.append(target)
+        print(f"    {label}")
+    return sheets
+
+
+def phone_previews(stills_root: str, out_dir: str) -> list[str]:
+    """Every judged still again at the size a Short is watched at.
+
+    The brief is explicit that this must not be optimised only for a desktop
+    full-screen view, so the review set includes the review size. These are
+    downscaled from the committed stills rather than re-rendered, which is
+    what a viewer's phone does to the video too.
+    """
+    written = []
+    for name, _ in HERO_MOMENTS:
+        source = os.path.join(stills_root, f"{name}.png")
+        if not os.path.isfile(source):
+            continue
+        target = os.path.join(out_dir, f"{name}.png")
+        # The committed stills are already at half size, so the extra factor
+        # is what takes 1080x1920 to a phone's worth of pixels.
+        write_thumb(source, target, PHONE_SCALE / THUMB_SCALE)
+        written.append(target)
+    for label, _ in COUNTRY_MOMENTS:
+        source = os.path.join(stills_root, "countries", f"{label}.png")
+        if not os.path.isfile(source):
+            continue
+        target = os.path.join(out_dir, f"countries_{label}.png")
+        write_thumb(source, target, PHONE_SCALE / THUMB_SCALE)
+        written.append(target)
+    return written
+
+
 # --- the run ----------------------------------------------------------------
 
 
@@ -377,8 +537,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--cameras", action="store_true")
     parser.add_argument("--frames", action="store_true")
     parser.add_argument("--sections", action="store_true")
+    parser.add_argument("--heroes", action="store_true")
     parser.add_argument("--video", action="store_true")
     parser.add_argument("--countries", action="store_true")
+    parser.add_argument("--phone", action="store_true")
+    parser.add_argument("--before", action="store_true")
     return parser.parse_args()
 
 
@@ -389,8 +552,11 @@ def main() -> int:
         "cameras": args.cameras or args.all,
         "frames": args.frames or args.all,
         "sections": args.sections or args.all,
+        "heroes": args.heroes or args.all,
         "video": args.video or args.all,
         "countries": args.countries or args.all,
+        "phone": args.phone or args.all,
+        "before": args.before or args.all,
     }
     if not any(steps.values()):
         print("nothing to do; pass --all or one of the step flags", file=sys.stderr)
@@ -435,21 +601,28 @@ def main() -> int:
 
         if steps["sections"]:
             print("=== section stills ===")
-            extract_sections(
+            extract_moments(
                 replay,
                 frames_dir,
                 os.path.join(args.stills, "sections"),
+                SECTION_MOMENTS,
                 args.still_scale,
+            )
+
+        if steps["heroes"]:
+            print("=== hero stills ===")
+            extract_moments(
+                replay, frames_dir, args.stills, HERO_MOMENTS, args.still_scale
             )
 
         if steps["video"]:
             print("=== video ===")
             encode_video(
-                replay, frames_dir, os.path.join(args.root, "neon_machine_proof.mp4")
+                replay, frames_dir, os.path.join(args.root, "neon_machine_polish.mp4")
             )
 
         if steps["countries"]:
-            print("=== country comparison ===")
+            print("=== country badge experiment ===")
             written = render_countries(
                 godot,
                 replay,
@@ -457,20 +630,25 @@ def main() -> int:
                 os.path.join(args.root, "countries"),
                 args.elevation,
             )
-            save_stills(
-                written,
-                [
-                    os.path.join(args.stills, "countries", "plain_marbles.png"),
-                    os.path.join(args.stills, "countries", "country_marbles.png"),
-                ],
-                args.still_scale,
+            country_sheets(
+                written, os.path.join(args.stills, "countries"), args.still_scale
             )
-            print("    2 stills")
+
+        if steps["before"]:
+            print("=== before and after ===")
+            before_after(args.stills, os.path.join(args.stills, "before_after"))
+
+        if steps["phone"]:
+            print("=== phone-size review ===")
+            written_phone = phone_previews(
+                args.stills, os.path.join(args.stills, "phone")
+            )
+            print(f"    {len(written_phone)} previews at {PHONE_SCALE:.2f}")
     # `RenderError` is in here because `find_godot` is borrowed from
-    # `render_replay.py` and raises its error, not this file's. It is a
-    # sibling of `ProofError` rather than an ancestor, so leaving it out meant
-    # a mistyped `--godot` came back as a traceback instead of one line
-    # saying which executable was not found.
+    # `render_replay.py` and raises its error, not this file's. It is a sibling
+    # of `ProofError` rather than an ancestor, so leaving it out meant a
+    # mistyped `--godot` came back as a traceback instead of one line saying
+    # which executable was not found.
     except (
         ProofError,
         RenderError,
