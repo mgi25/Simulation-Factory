@@ -76,6 +76,7 @@ class Benchmark:
     marble_mass: float
     restitution: float
     friction: float
+    surface_friction: float
     linear_damping: float
     rolling_resistance: float
     rolling_inertia_factor: float
@@ -157,6 +158,7 @@ def load_benchmark(path: str = CONFIG_PATH) -> Benchmark:
         marble_mass=float(marble["mass"]),
         restitution=float(marble["restitution"]),
         friction=float(marble["friction"]),
+        surface_friction=float(marble["surface_friction"]),
         linear_damping=float(contact["linear_damping"]),
         rolling_resistance=float(contact["rolling_resistance"]),
         rolling_inertia_factor=float(contact["rolling_inertia_factor"]),

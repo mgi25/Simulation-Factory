@@ -30,7 +30,9 @@
     "radius": 0.020,
     "mass": 0.0838,
     "restitution": 0.55,
-    "friction": 0.15
+    "friction": 0.15,
+    "friction_comment": "friction is marble on marble. surface_friction is marble on bowl and is a different pair of materials, so it is a different number - and it has to clear (2/7) tan(theta) at the steepest wall, 0.230 here, or a rigid-body marble cannot roll and skids instead. 0.50 clears it with margin. The 2.5D model assumes rolling and never uses it.",
+    "surface_friction": 0.50
   },
 
   "contact": {
@@ -55,6 +57,16 @@
     "speed_factor_max": 1.14,
     "radial_inward_fraction": 0.12,
     "angle_jitter_deg": 12.0
+  },
+
+  "calibration": {
+    "comment": "Section 5.3: the two engines are matched on what they DO, not on what they are told. tools/physics_lab_calibrate.py launches one marble into the bowl with no collisions and measures the time for its mechanical energy above the drain lip to halve. PyBullet has a dissipation FLOOR it cannot go below - a sphere loses energy at every triangle edge it rolls over - so it sets the target and the 2.5D damping is bisected to match it. The benchmark's own 0.25/s is what the sweep wanted and is simply not reachable in a rigid-body engine on a tessellated bowl.",
+    "rigid3d_linear_damping": 0.0,
+    "rigid3d_half_life_seconds": 1.917,
+    "surface25d_half_life_at_benchmark_damping": 2.783,
+    "surface25d_calibrated_linear_damping": 0.3594,
+    "surface25d_calibrated_half_life_seconds": 1.933,
+    "agreement_percent": 0.87
   },
 
   "seeds": [7, 11, 19, 23, 31, 42, 57, 68, 73, 89,

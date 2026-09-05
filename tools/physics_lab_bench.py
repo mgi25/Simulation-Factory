@@ -68,6 +68,30 @@ def parse_overrides(assignments: list[str]) -> dict[str, float]:
     return overrides
 
 
+def widen_entry_for(benchmark: Benchmark, count: int) -> Benchmark:
+    """Make room on the entry ring for a field bigger than the benchmark's.
+
+    Only the scaling test in section 29 of the brief needs this. Eight marbles
+    fit on one band with twelve degrees of jitter and metres of clearance;
+    sixty-four on the same band would start in contact, and a scaling
+    measurement that begins with the solver untangling a pile-up is measuring
+    the pile-up. So the band is widened inward and the jitter cut in
+    proportion, and nothing else about the benchmark moves.
+    """
+    if count <= benchmark.marble_count:
+        return benchmark.with_overrides(marble_count=count)
+    crowding = count / benchmark.marble_count
+    span = benchmark.entry_radius_max - benchmark.entry_radius_min
+    return benchmark.with_overrides(
+        marble_count=count,
+        entry_radius_min=max(
+            4.0 * benchmark.marble_radius,
+            benchmark.entry_radius_max - span * crowding,
+        ),
+        entry_angle_jitter_deg=benchmark.entry_angle_jitter_deg / crowding,
+    )
+
+
 def run_one(approach: str, benchmark: Benchmark, seed: int) -> LabRun:
     """Simulate one seed with one approach, timed.
 
@@ -111,9 +135,7 @@ def main(argv: list[str] | None = None) -> int:
     benchmark = load_benchmark()
     overrides = parse_overrides(args.overrides)
     if args.marbles:
-        overrides["marble_count"] = args.marbles
-        benchmark = benchmark.with_overrides(marble_count=args.marbles)
-        overrides.pop("marble_count")
+        benchmark = widen_entry_for(benchmark, args.marbles)
     if overrides:
         benchmark = benchmark.with_overrides(**overrides)
 
