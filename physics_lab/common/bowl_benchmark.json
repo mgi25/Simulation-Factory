@@ -15,10 +15,11 @@
   },
 
   "bowl": {
+    "profile_comment": "profile_power 1.9 is the shape godot/scripts/neon_scene.gd already draws the production bowl with, and the sweep says it is also the right benchmark. A true paraboloid, power exactly 2.0, is very nearly a harmonic oscillator: every orbit has the same period whatever its amplitude, so eight marbles never lap each other and the run records 48 collisions instead of 166. Off the isochronous point the periods depend on energy, the field mixes, and the benchmark actually exercises the collision handling it is supposed to compare.",
     "comment": "rim_depth and profile_power describe the CENTRE surface - the surface a marble's centre travels on. The collider a 3D engine needs is that surface offset by one marble radius along its inward normal, so the two prototypes constrain the same points.",
     "rim_radius": 0.50,
     "rim_depth": 0.18,
-    "profile_power": 2.0,
+    "profile_power": 1.9,
     "surface_max_radius": 0.60,
     "drain_radius": 0.060,
     "drain_exit_y": -0.25
@@ -33,8 +34,8 @@
   },
 
   "contact": {
-    "comment": "linear_damping is the calibrated dissipation both engines share; see EXPERIMENT_PLAN.md section 5.3. rolling_resistance is the physically nicer model and is only used by the 2.5D sweep. rolling_inertia_factor 0.4 is 2/5, a solid sphere.",
-    "linear_damping": 0.15,
+    "comment": "linear_damping is the calibrated dissipation both engines share; see EXPERIMENT_PLAN.md section 5.3. 0.25 was chosen by the sweep in docs/physics_lab_bowl_comparison.md: 0.10 drains nothing inside the limit, 0.15 takes 28.4 s of a 30 s budget, 0.40 empties the bowl in 11 s but costs half the collisions and three of the eight revolutions. rolling_resistance is the physically nicer model and is only used by the 2.5D sweep. rolling_inertia_factor 0.4 is 2/5, a solid sphere.",
+    "linear_damping": 0.25,
     "rolling_resistance": 0.0,
     "rolling_inertia_factor": 0.4,
     "surface_restitution": 0.25

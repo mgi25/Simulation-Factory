@@ -44,6 +44,7 @@ class MarbleSample:
     position: tuple[float, float, float]
     velocity: tuple[float, float, float]
     orientation: tuple[float, float, float, float]  # quaternion, x y z w
+    spin: tuple[float, float, float]                # angular velocity, rad/s
     state: str
 
 
@@ -83,9 +84,9 @@ class LabRun:
     def digest(self) -> str:
         """A hash of every sampled float, from its raw bytes.
 
-        Orientation is included; state is not, because a state name is derived
-        from the numbers and hashing it would only make the digest agree with
-        itself more slowly.
+        Orientation and spin are included; state is not, because a state name
+        is derived from the numbers and hashing it would only make the digest
+        agree with itself more slowly.
         """
         hasher = hashlib.sha256()
         for frame in self.frames:
@@ -95,6 +96,7 @@ class LabRun:
                 hasher.update(struct.pack("<3d", *marble.position))
                 hasher.update(struct.pack("<3d", *marble.velocity))
                 hasher.update(struct.pack("<4d", *marble.orientation))
+                hasher.update(struct.pack("<3d", *marble.spin))
         return hasher.hexdigest()
 
     def to_json(self) -> dict[str, Any]:
@@ -119,6 +121,7 @@ class LabRun:
                             "orientation": [
                                 round(value, DECIMALS) for value in marble.orientation
                             ],
+                            "spin": [round(value, DECIMALS) for value in marble.spin],
                             "state": marble.state,
                         }
                         for marble in frame.marbles
@@ -156,6 +159,7 @@ def read_run(path: str) -> LabRun:
                     position=tuple(float(value) for value in marble["position"]),
                     velocity=tuple(float(value) for value in marble["velocity"]),
                     orientation=tuple(float(value) for value in marble["orientation"]),
+                    spin=tuple(float(value) for value in marble["spin"]),
                     state=str(marble["state"]),
                 )
                 for marble in frame["marbles"]
