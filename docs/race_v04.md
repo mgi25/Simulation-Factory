@@ -140,9 +140,10 @@ y        section     classification        what it is
    6580  finish      -                     chute into a sloped paddock
 ```
 
-Two of nine named sections are pure SPRINT; MIX and COMPRESS appear four times
-each. `tests/test_race_analysis.py` asserts that classification so the course
-cannot quietly become a corridor of sprints again.
+Eight sections carry a classification. MIX and COMPRESS appear three times
+each, SPRINT and RISK twice, and exactly one section - the rapids - is a pure
+sprint. `tests/test_race_analysis.py` asserts that shape so the course cannot
+quietly become a corridor of sprints again.
 
 ### The three order-mixing mechanisms
 
@@ -615,8 +616,11 @@ Ten stills each, one per section, in `docs/validation/race_v04/moments_*/`.
    bowl      1.65s    carousel    2.17s    sluice        1.65s
    rapids    1.86s    plunge      0.70s    run-in        2.89s
    ```
-7. **Does any effect obscure the race?** No. The largest thing in the finish
-   still is a racer.
+7. **Does any effect obscure the race?** No. The hardest collision the tuning
+   allows peaks at 3.7 racer radii - 220px across on a 1080px frame - and an
+   ordinary one at 1.5, which is a highlight around the ball rather than a
+   flare over it. The brightest element in the finish still is the finish
+   bar itself, which is the one thing that should be.
 8. **Does the ending have tension?** Yes. Four racers cross within 0.4s, the
    winner having taken the lead inside the last half second.
 
