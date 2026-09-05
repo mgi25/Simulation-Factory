@@ -25,11 +25,17 @@ bouncing it back off geometry that only exists to hide the problem.
 ## The faceting, which is a real difference and not a detail
 
 The 2.5D prototype's bowl is the analytic surface. This one is a polygon
-approximation to it, and a sphere rolling across a facet edge gets a real, if
-tiny, bump. At the default resolution the worst sagitta - the gap between the
-chord and the true arc - is about 4e-5 m against a marble radius of 0.02 m,
-two parts in a thousand. It is measurable in the adherence metrics and it is
-one of the things the comparison is for.
+approximation to it, and a sphere rolling across a facet edge gets a real bump
+and loses a little energy to it. At the default resolution the worst sagitta -
+the gap between the chord and the true arc - is 0.74 mm against a marble radius
+of 0.02 m, 3.7%.
+
+That number cannot simply be reduced, which is the surprise. A finer collider
+has more edges to cross, so it dissipates *more*: measured on this bowl, an
+orbit's energy half-life is 1.20 s at 128 segments and 3.22 s at 32. The
+resolution is therefore a physics parameter rather than an art one, and there
+is no equivalent choice to make in the 2.5D prototype at all. See section 4.3
+of `docs/physics_lab_bowl_comparison.md`.
 """
 
 from __future__ import annotations

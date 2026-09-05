@@ -1,0 +1,74 @@
+[
+  {
+    "approach": "surface25d",
+    "marbles": 8,
+    "wall": 0.4629679400008172,
+    "sim": 11.921666666666667,
+    "realtime": 25.750523171530244,
+    "steps_per_s": 6180.125561167259,
+    "drained": 1.0
+  },
+  {
+    "approach": "surface25d",
+    "marbles": 16,
+    "wall": 1.262118160026148,
+    "sim": 12.3875,
+    "realtime": 9.814849664902502,
+    "steps_per_s": 2355.5639195766003,
+    "drained": 1.0
+  },
+  {
+    "approach": "surface25d",
+    "marbles": 32,
+    "wall": 3.0534849799703805,
+    "sim": 12.343333333333334,
+    "realtime": 4.042375650871244,
+    "steps_per_s": 970.1701562090984,
+    "drained": 1.0
+  },
+  {
+    "approach": "surface25d",
+    "marbles": 64,
+    "wall": 7.157897820044309,
+    "sim": 13.023333333333335,
+    "realtime": 1.8194354908034602,
+    "steps_per_s": 436.66451779283045,
+    "drained": 1.0
+  },
+  {
+    "approach": "rigid3d",
+    "marbles": 8,
+    "wall": 0.40549010001122954,
+    "sim": 8.370000000000001,
+    "realtime": 20.641687675650292,
+    "steps_per_s": 4954.00504215607,
+    "drained": 1.0
+  },
+  {
+    "approach": "rigid3d",
+    "marbles": 16,
+    "wall": 0.5880902000004425,
+    "sim": 8.24,
+    "realtime": 14.011456065742635,
+    "steps_per_s": 3362.7494557782325,
+    "drained": 1.0
+  },
+  {
+    "approach": "rigid3d",
+    "marbles": 32,
+    "wall": 1.0131078600184993,
+    "sim": 8.294166666666666,
+    "realtime": 8.186854523579767,
+    "steps_per_s": 1964.845085659144,
+    "drained": 1.0
+  },
+  {
+    "approach": "rigid3d",
+    "marbles": 64,
+    "wall": 1.8206955400062725,
+    "sim": 8.7125,
+    "realtime": 4.785259154295498,
+    "steps_per_s": 1148.4621970309195,
+    "drained": 1.0
+  }
+]

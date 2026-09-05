@@ -1,0 +1,30 @@
+{
+  "racers_through_the_bowl": 16,
+  "median_revolutions": 0.4555629119360178,
+  "mean_revolutions": 0.4565548138926657,
+  "min_revolutions": 0.42071725040677127,
+  "max_revolutions": 0.542263716679911,
+  "fraction_over_one_revolution": 0.0,
+  "fraction_over_half_a_revolution": 0.125,
+  "mean_seconds_in_the_bowl": 1.9666666666666666,
+  "per_racer_revolutions": {
+    "0": 0.4413,
+    "1": 0.4217,
+    "2": 0.4608,
+    "3": 0.4701,
+    "4": 0.4576,
+    "5": 0.4535,
+    "6": 0.4576,
+    "7": 0.4207,
+    "8": 0.4324,
+    "9": 0.5423,
+    "10": 0.4585,
+    "11": 0.4439,
+    "12": 0.4228,
+    "13": 0.5124,
+    "14": 0.4777,
+    "15": 0.4315
+  },
+  "replay": "neon_7.json",
+  "seed": 7
+}

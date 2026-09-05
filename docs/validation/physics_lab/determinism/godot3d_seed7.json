@@ -1,0 +1,23 @@
+{
+  "approach": "godot3d",
+  "seed": 7,
+  "linear_damping": 0.25,
+  "repeats": 8,
+  "in_process_unique_digests": 1,
+  "cross_process_unique_digests": 1,
+  "in_process_matches_cross_process": true,
+  "spec_digest_stable": true,
+  "drain_orders": [
+    [
+      4,
+      7,
+      1,
+      2,
+      6,
+      0,
+      3,
+      5
+    ]
+  ],
+  "unique_drain_orders": 1
+}

@@ -1,0 +1,23 @@
+{
+  "approach": "surface25d",
+  "seed": 163,
+  "linear_damping": 0.3594,
+  "repeats": 20,
+  "in_process_unique_digests": 1,
+  "cross_process_unique_digests": 1,
+  "in_process_matches_cross_process": true,
+  "spec_digest_stable": true,
+  "drain_orders": [
+    [
+      3,
+      4,
+      6,
+      1,
+      0,
+      2,
+      5,
+      7
+    ]
+  ],
+  "unique_drain_orders": 1
+}

@@ -1,0 +1,10 @@
+{
+  "calibration_seed": 7,
+  "rigid3d_linear_damping": 0.0,
+  "rigid3d_half_life": 1.9166666666666667,
+  "benchmark_linear_damping": 0.25,
+  "surface25d_half_life_at_benchmark": 2.783333333333333,
+  "surface25d_calibrated_linear_damping": 0.359375,
+  "surface25d_half_life_calibrated": 1.9333333333333333,
+  "agreement_percent": 0.8695652173913012
+}

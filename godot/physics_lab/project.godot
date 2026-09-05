@@ -1,0 +1,31 @@
+; Engine configuration file.
+; Physics lab cross-check ONLY. Deliberately a separate project from
+; ../project.godot so that nothing in the production replay viewer - its
+; settings, its scenes, its materials - is touched by this experiment.
+;
+; The one setting that matters is the physics engine. Jolt is selectable in
+; Godot 4.4+ and is what a modern Godot game would actually use; it cannot be
+; chosen from the command line, which is the whole reason this project exists
+; rather than a flag on the production one.
+
+config_version=5
+
+[application]
+
+config/name="Physics Lab Bowl Benchmark"
+run/main_scene=""
+config/features=PackedStringArray("4.4")
+run/disable_stdout=false
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+common/physics_ticks_per_second=240
+common/max_physics_steps_per_frame=64
+3d/sleep_threshold_linear=0.0
+3d/sleep_threshold_angular=0.0
+3d/time_before_sleep=1e20
+
+[rendering]
+
+renderer/rendering_method="forward_plus"
