@@ -41,6 +41,16 @@ const CAMERA_PRODUCTION := "production"
 
 const RaceScene := preload("res://scripts/race_scene.gd")
 
+# Which scene plays a race. The production race is `standard`, and it is what
+# every replay has always been played through; `neon` is the V1 art-direction
+# prototype in `neon_scene.gd`, which is a different machine rather than a
+# different setting of this one. Chosen by flag rather than by course name on
+# purpose - the same replay has to be renderable both ways, or the two
+# directions cannot be compared.
+const STYLE_STANDARD := "standard"
+const STYLE_NEON := "neon"
+const NeonScene := preload("res://scripts/neon_scene.gd")
+
 const FLOOR_THICKNESS := 0.25
 const WALL_HEIGHT := 0.9
 const WALL_THICKNESS := 0.16
@@ -208,14 +218,16 @@ func _ready() -> void:
 
 	if _mode == MODE_RACE:
 		var camera := _race_camera_argument()
-		_race = RaceScene.new()
-		_race.name = "RaceScene"
+		var style := _race_style_argument()
+		_race = NeonScene.new() if style == STYLE_NEON else RaceScene.new()
+		_race.name = "NeonScene" if style == STYLE_NEON else "RaceScene"
 		add_child(_race)
 		_race.build(_replay, camera)
 		_present(0.0)
-		print("race replay loaded: seed=%s course=%s camera=%s frames=%d duration=%.2fs" % [
+		print("race replay loaded: seed=%s course=%s style=%s camera=%s frames=%d duration=%.2fs" % [
 			str(_replay.get("seed", 0)),
 			str(_replay.get("course_id", "?")),
+			style,
 			camera,
 			_frames.size(),
 			float(_replay.get("result", {}).get("duration", 0.0)),
@@ -317,6 +329,21 @@ func _race_camera_argument() -> String:
 				return CAMERA_VERIFICATION
 			return CAMERA_PRODUCTION
 	return CAMERA_PRODUCTION
+
+
+func _race_style_argument() -> String:
+	## `--race-style=neon` plays a race through the V1 prototype scene.
+	##
+	## Parsed here beside the camera for the reason given there: every
+	## command-line argument this project understands is read in one place,
+	## so a render command can be checked against one function.
+	for argument in OS.get_cmdline_user_args():
+		var arg: String = argument
+		if arg.begins_with("--race-style="):
+			if arg.substr(13) == STYLE_NEON:
+				return STYLE_NEON
+			return STYLE_STANDARD
+	return STYLE_STANDARD
 
 
 func _resolve_path(path: String) -> String:

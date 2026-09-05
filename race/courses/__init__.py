@@ -8,6 +8,7 @@ by hand or knows how many there are.
 from __future__ import annotations
 
 from race.courses.machine import MACHINE_COURSE_ID, build_machine_course
+from race.courses.neon import NEON_COURSE_ID, build_neon_course
 from race.courses.prototype import PROTOTYPE_COURSE_ID, build_prototype_course
 from race.courses.split import SPLIT_COURSE_ID, build_split_course
 
@@ -17,6 +18,7 @@ COURSE_BUILDERS = {
     PROTOTYPE_COURSE_ID: build_prototype_course,
     SPLIT_COURSE_ID: build_split_course,
     MACHINE_COURSE_ID: build_machine_course,
+    NEON_COURSE_ID: build_neon_course,
 }
 COURSE_NAMES: tuple[str, ...] = tuple(COURSE_BUILDERS)
 DEFAULT_COURSE = PROTOTYPE_COURSE_ID
@@ -26,9 +28,11 @@ __all__ = [
     "COURSE_NAMES",
     "DEFAULT_COURSE",
     "MACHINE_COURSE_ID",
+    "NEON_COURSE_ID",
     "PROTOTYPE_COURSE_ID",
     "SPLIT_COURSE_ID",
     "build_machine_course",
+    "build_neon_course",
     "build_prototype_course",
     "build_split_course",
     "build_course",
