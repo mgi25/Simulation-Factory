@@ -104,7 +104,16 @@ class BowlSpec:
     rim_radius: float = 25.0 * MARBLE_RADIUS       # 12.5 wu
     rim_depth: float = 9.0 * MARBLE_RADIUS         # 4.5 wu
     profile_power: float = 1.9
-    max_radius_factor: float = 1.25                # dish continues past the rim
+    # How far the dish continues past the nominal rim. This is the bowl's
+    # containment: there is no lip and no wall, so a marble that gets past
+    # `max_radius` has escaped and the run says so rather than bouncing it back
+    # off geometry that only exists to hide the problem. At 1.25 the fastest
+    # marble in the field climbed to 15.42 against an edge at 15.62 - 0.4 of a
+    # marble radius of headroom, which is not a margin, it is a coincidence
+    # waiting for a seed. 1.35 with the release inset moved out to match leaves
+    # the entry speeds untouched and puts 1.5 wu of wall above the highest
+    # climb measured.
+    max_radius_factor: float = 1.35                # dish continues past the rim
     drain_radius: float = 3.0 * MARBLE_RADIUS      # a 3-diameter hole
     lip_radius: float = 1.2 * MARBLE_RADIUS
     # Deep enough that a marble leaving it is clear of the underside of the
@@ -122,7 +131,10 @@ class BowlSpec:
     # less than a marble, so an orbiting marble would have hit its underside.
     # Where a marble is released into a bowl is not a free parameter - it is
     # the rim, which is also where a real vortex funnel is fed.
-    entry_inset: float = MARBLE_DIAMETER           # inside the dish edge
+    # Chosen with `max_radius_factor` so that the release radius comes out at
+    # 14.625 either way: the extra dish is headroom above the marbles, not a
+    # further-out release with more energy behind it.
+    entry_inset: float = 2.25 * MARBLE_DIAMETER    # inside the dish edge
     spout_clearance: float = 1.0                   # how far outside the dish it starts
     spout_rise_factor: float = 2.0                 # of the dish's own rise; see _spout_path
     spout_width: float = 2.4 * MARBLE_RADIUS

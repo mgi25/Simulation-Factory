@@ -72,7 +72,15 @@ class StartSpec:
     transition: float = 4.0
     # The incline of the running section, as a tangent. Everything below the
     # gate is at this angle and it sets how fast a marble arrives at the bowl.
-    incline: float = 0.30
+    #
+    # Note that the chute is only *part* of the drop. The bowl's own feed spout
+    # has to climb over the edge of the dish, so a deeper bowl feeds from
+    # higher up and contributes more, and the two have to be traded against
+    # each other: widening the dish from 1.25 to 1.35 of the rim radius - for
+    # headroom above the marbles - raised the spout's drop from 1.81 to 2.89 wu
+    # on its own, and this came down from 0.30 to keep the field arriving at
+    # the same speed.
+    incline: float = 0.16
     # The staging shelf, behind the gate, where the marbles wait. Shallow, and
     # the reason is measured rather than aesthetic. The marble at the back of a
     # queue starts a queue-length further up the slope than the one at the
