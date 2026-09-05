@@ -69,6 +69,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from rendering import png_frames  # noqa: E402
 from rendering.render_plan import (  # noqa: E402
+    CAMERA_VERIFICATION,
     FRAMES_SUBDIR,
     METADATA_NAME,
     MODE_RACE,
@@ -122,17 +123,25 @@ MIN_SATURATION_FRACTION = 0.6
 MIN_PIXELS = 40
 
 # Where the overlay covers the race, in frame pixels, as (x, y, width, height).
-# Taken from `race_hud.gd`; a racer whose centre falls inside one of these is
-# behind the HUD and is not looked for.
+#
+# These have to agree with `godot/scripts/race_hud.gd`, and the agreement is
+# not decorative: a rect this tool does not know about is a racer it looks for
+# behind an opaque panel and reports as missing, and a rect that is here but
+# not in the HUD is a racer it silently stops checking. `tests/test_race_hud.py`
+# parses the GDScript and fails if the two ever drift apart.
 HUD_RECTS = (
-    (425, 24, 230, 76),      # the clock
-    (42, 116, 380, 190),     # the standings
-    (112, 1560, 856, 190),   # the result panel
+    (48, 200, 220, 68),      # the clock
+    (48, 284, 300, 184),     # the standings column, three rows merged
+    (90, 1148, 792, 268),    # the result
 )
 # The countdown numeral, which covers a third of the frame - but only while
 # there is a countdown. Excluding it for the whole race would throw away most
 # of the measurements in the busiest part of the frame.
-COUNTDOWN_RECT = (380, 700, 320, 320)
+COUNTDOWN_RECT = (370, 646, 340, 340)
+
+# What the overlay is allowed to occupy: YouTube draws its own chrome over a
+# Short, and everything the HUD says has to live inside this.
+SAFE_RECT = (48, 192, 876, 1248)
 
 
 class VerifyError(RuntimeError):
@@ -147,9 +156,14 @@ def load_json(path: str) -> dict:
 
 
 def resolve_replay(render_dir: str, explicit: str | None) -> str:
-    """The replay a render was made from, from the sidecar if not given."""
-    if explicit:
-        return explicit
+    """The replay a render was made from, from the sidecar if not given.
+
+    Also the place the camera is checked. Everything below assumes one
+    simulation pixel is one frame pixel, which is true of the orthographic
+    verification camera and false of the production one - so a production
+    render is refused here rather than measured and reported as wrong by
+    several hundred pixels.
+    """
     metadata = load_json(os.path.join(render_dir, METADATA_NAME))
     section = metadata.get("replay") or {}
     mode = str(section.get("mode", "battle"))
@@ -157,6 +171,23 @@ def resolve_replay(render_dir: str, explicit: str | None) -> str:
         raise VerifyError(
             f"{render_dir} is a {mode} render; this tool only checks races"
         )
+    # Checked before the explicit replay short-circuit, not after. Naming a
+    # replay by hand says which race to measure against; it does not say the
+    # pictures can be measured at all, and an earlier version let `--replay`
+    # walk straight past this and report a production render as 191 pixels
+    # out on every racer.
+    #
+    # Absent on sidecars written before the production camera existed, and
+    # every one of those was shot on the verification camera.
+    camera = str((metadata.get("video") or {}).get("camera", CAMERA_VERIFICATION))
+    if camera != CAMERA_VERIFICATION:
+        raise VerifyError(
+            f"{render_dir} was shot on the {camera} camera, which does not map"
+            " simulation pixels to frame pixels. Re-render with"
+            f" --race-camera={CAMERA_VERIFICATION} to check alignment."
+        )
+    if explicit:
+        return explicit
     name = str(section.get("path") or section.get("name") or "")
     if not name:
         raise VerifyError(f"{render_dir}: the sidecar does not name a replay")

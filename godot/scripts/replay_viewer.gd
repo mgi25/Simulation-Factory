@@ -32,6 +32,13 @@ const RACE_REPLAY_VERSION := 1
 const MODE_BATTLE := "battle"
 const MODE_RACE := "race"
 
+# Which lens a race is shot on. Parsed here rather than in the race scene so
+# every command-line argument this project understands is read in one place.
+# Anything but the verification camera means the production one - an unknown
+# value should give a finished-looking render, not a broken one.
+const CAMERA_VERIFICATION := "verification"
+const CAMERA_PRODUCTION := "production"
+
 const RaceScene := preload("res://scripts/race_scene.gd")
 
 const FLOOR_THICKNESS := 0.25
@@ -200,14 +207,16 @@ func _ready() -> void:
 		return
 
 	if _mode == MODE_RACE:
+		var camera := _race_camera_argument()
 		_race = RaceScene.new()
 		_race.name = "RaceScene"
 		add_child(_race)
-		_race.build(_replay)
+		_race.build(_replay, camera)
 		_present(0.0)
-		print("race replay loaded: seed=%d course=%s frames=%d duration=%.2fs" % [
-			int(_replay.get("seed", 0)),
+		print("race replay loaded: seed=%s course=%s camera=%s frames=%d duration=%.2fs" % [
+			str(_replay.get("seed", 0)),
 			str(_replay.get("course_id", "?")),
+			camera,
 			_frames.size(),
 			float(_replay.get("result", {}).get("duration", 0.0)),
 		])
@@ -296,6 +305,18 @@ func _replay_path_argument() -> String:
 		if arg == "--replay" and i + 1 < args.size():
 			return args[i + 1]
 	return DEFAULT_REPLAY
+
+
+func _race_camera_argument() -> String:
+	## `--race-camera=verification` picks the measuring lens; anything else,
+	## including the flag being absent, gives the production one.
+	for argument in OS.get_cmdline_user_args():
+		var arg: String = argument
+		if arg.begins_with("--race-camera="):
+			if arg.substr(14) == CAMERA_VERIFICATION:
+				return CAMERA_VERIFICATION
+			return CAMERA_PRODUCTION
+	return CAMERA_PRODUCTION
 
 
 func _resolve_path(path: String) -> String:

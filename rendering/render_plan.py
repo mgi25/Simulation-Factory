@@ -43,6 +43,32 @@ RENDER_FORMAT_VERSION = 1
 MODE_BATTLE = "battle"
 MODE_RACE = "race"
 
+# Which camera a race was rendered through. The two are not styles of one
+# camera, they are different instruments:
+#
+# `production` is the perspective camera a finished Short is shot on. It has
+# depth, so a racer's screen position depends on how high it is standing as
+# well as where it is - which is exactly what makes it look like an object
+# rather than a disc, and exactly what makes it unusable for verification.
+#
+# `verification` is the orthographic top-down camera V0.2 shipped. One
+# simulation pixel is one frame pixel everywhere in the frame, so a render
+# can be checked against the replay position by position. It is kept, and
+# kept working, because it is the only mechanical proof that Godot is
+# drawing the race Python simulated.
+CAMERA_PRODUCTION = "production"
+CAMERA_VERIFICATION = "verification"
+RACE_CAMERAS = (CAMERA_PRODUCTION, CAMERA_VERIFICATION)
+
+# A battle has one camera and always has. It is named rather than left blank
+# so a sidecar reads the same way whatever it describes.
+CAMERA_BATTLE = "battle"
+
+
+def default_camera(mode: str) -> str:
+    """The camera a mode is rendered through unless something says otherwise."""
+    return CAMERA_PRODUCTION if mode == MODE_RACE else CAMERA_BATTLE
+
 # True production resolution. Portrait 9:16 at 1:1 pixel aspect, and the
 # resolution the frames are actually rendered at - never a smaller render
 # scaled up.
@@ -124,6 +150,7 @@ class RenderPlan:
 
     seed: int
     mode: str
+    camera: str
     replay_version: int
     replay_name: str
     replay_path: str
@@ -173,6 +200,7 @@ def plan_render(
     height: int = RENDER_HEIGHT,
     fps: int = RENDER_FPS,
     tail_seconds: float = POST_ROLL_SECONDS,
+    camera: str | None = None,
 ) -> RenderPlan:
     """Turn one loaded replay into the render it produces.
 
@@ -196,9 +224,22 @@ def plan_render(
     result = replay.get("result") or {}
     finished = result.get("finished_tick")
 
+    mode = str(replay.get("mode", MODE_BATTLE))
+    chosen = default_camera(mode) if camera is None else camera
+    if mode == MODE_RACE and chosen not in RACE_CAMERAS:
+        raise RenderPlanError(
+            f"unknown race camera {chosen!r}; known cameras:"
+            f" {', '.join(RACE_CAMERAS)}"
+        )
+    if mode != MODE_RACE and chosen != CAMERA_BATTLE:
+        raise RenderPlanError(
+            f"a {mode} replay has one camera; {chosen!r} was asked for"
+        )
+
     return RenderPlan(
         seed=int(replay.get("seed", 0)),
-        mode=str(replay.get("mode", MODE_BATTLE)),
+        mode=mode,
+        camera=chosen,
         replay_version=int(replay.get("version", 0)),
         replay_name=os.path.basename(replay_path),
         replay_path=relative_replay_path(replay_path, root),
@@ -242,6 +283,10 @@ def metadata(plan: RenderPlan, replay_sha256: str) -> dict[str, Any]:
             "height": plan.height,
             "fps": plan.fps,
             "frame_count": plan.frame_count,
+            # Which instrument the sequence was shot on. It changes nothing
+            # about how many images there are, and everything about whether
+            # they can be checked against the replay position by position.
+            "camera": plan.camera,
         },
         "timeline": {
             "physics_hz": plan.physics_hz,

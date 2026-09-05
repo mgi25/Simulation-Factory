@@ -208,6 +208,9 @@ def test_metadata_describes_the_render() -> None:
         "height": RENDER_HEIGHT,
         "fps": RENDER_FPS,
         "frame_count": 969,
+        # A battle has one camera and always has. It is named rather than
+        # left out so a sidecar reads the same way whatever it describes.
+        "camera": "battle",
     }
     assert data["timeline"]["post_roll_seconds"] == POST_ROLL_SECONDS
     assert data["timeline"]["gameplay_frames"] == 861

@@ -40,6 +40,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from rendering import png_frames  # noqa: E402
 from rendering import render_plan as render_plan_module  # noqa: E402
 from rendering.render_plan import (  # noqa: E402
+    CAMERA_PRODUCTION,
+    CAMERA_VERIFICATION,
+    RACE_CAMERAS,
     FRAMES_SUBDIR,
     METADATA_NAME,
     POST_ROLL_SECONDS,
@@ -146,6 +149,15 @@ def prepare_frames_dir(render_dir: str) -> str:
 
 
 def run_godot(godot: str, replay_path: str, frames_dir: str, plan: RenderPlan) -> None:
+    """Hand Godot the replay, the sequence to produce, and the camera.
+
+    The camera is the only thing on this command line that is not simply a
+    description of the output file. It is passed rather than left to the
+    viewer's default because a verification render and a production render
+    of the same replay must be requestable from the same tool - and because
+    a sidecar that claims one and a sequence shot on the other would be
+    worse than no sidecar at all.
+    """
     command = [
         godot,
         "--path",
@@ -158,6 +170,7 @@ def run_godot(godot: str, replay_path: str, frames_dir: str, plan: RenderPlan) -
         f"--fps={plan.fps}",
         f"--width={plan.width}",
         f"--height={plan.height}",
+        f"--race-camera={plan.camera}",
     ]
     completed = subprocess.run(command, cwd=PROJECT_ROOT, check=False)
     if completed.returncode != 0:
@@ -252,6 +265,7 @@ def render(
     width: int,
     height: int,
     tail_seconds: float,
+    camera: str | None = None,
 ) -> RenderPlan:
     """Plan one render, produce it, and refuse to accept anything less.
 
@@ -269,13 +283,15 @@ def render(
         height=height,
         fps=fps,
         tail_seconds=tail_seconds,
+        camera=camera,
     )
     # Hashed before and after: rendering reads the replay and must never touch
     # it, and the only way to say that with confidence is to check.
     replay_sha256 = png_frames.file_digest(replay_path)
 
     print(
-        f"\n=== {plan.mode} seed {plan.seed}  {plan.replay_path} ===\n"
+        f"\n=== {plan.mode} seed {plan.seed}"
+        f"  camera {plan.camera}  {plan.replay_path} ===\n"
         f"    {plan.width}x{plan.height} @ {plan.fps}fps  "
         f"{plan.gameplay_frames} gameplay + {plan.post_roll_frames} post-roll "
         f"= {plan.frame_count} frames ({plan.total_seconds:.2f}s)"
@@ -362,6 +378,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--width", type=int, default=RENDER_WIDTH)
     parser.add_argument("--height", type=int, default=RENDER_HEIGHT)
     parser.add_argument(
+        "--race-camera",
+        choices=RACE_CAMERAS,
+        default=None,
+        help=(
+            f"which race camera to shoot on (default {CAMERA_PRODUCTION};"
+            f" {CAMERA_VERIFICATION} is the orthographic top-down camera"
+            " tools/verify_race_render.py needs)"
+        ),
+    )
+    parser.add_argument(
         "--post-roll",
         type=float,
         default=POST_ROLL_SECONDS,
@@ -410,6 +436,7 @@ def main() -> int:
                 args.width,
                 args.height,
                 args.post_roll,
+                args.race_camera,
             )
         except (RenderError, RenderPlanError, png_frames.PngError) as error:
             print(f"    FAILED: {error}", file=sys.stderr)
