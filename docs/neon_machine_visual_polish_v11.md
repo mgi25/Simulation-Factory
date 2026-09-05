@@ -770,6 +770,15 @@ Real limitations, which is a different list:
   V1's apron by area and it is broken by the wedge and four rails, but it is
   still the thing the eye lands on after the bowl. The hero course should route
   the field into the bowl on two *tracks* rather than on two feeds.
+* **The bridge hero is the weakest of the three, and it is a composition
+  problem rather than a modelling one.** Three of the bridge's five supports
+  are in that frame; the other two are behind the bowl, because on an S-curve
+  seen down its own length a support under the far bend projects onto the near
+  one. Splaying the legs, deepening the girder, raising the floor, dipping the
+  lens four degrees and carrying the aim 950 pixels further along each bought
+  some of it back, and together they are the difference between one support
+  visible and three. Getting all five would take a lower lens than the bowl can
+  afford, or a second angle - and the brief asks for one flowing shot.
 * **The bowl's cradle reads as a dark mass rather than as machinery.** It is
   outside the flange now and unmistakably present, but it is seen through the
   acrylic wall at the bowl's edges, which tints it and flattens its own
