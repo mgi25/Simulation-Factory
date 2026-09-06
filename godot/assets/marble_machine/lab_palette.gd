@@ -332,6 +332,15 @@ func _build(key: String) -> StandardMaterial3D:
 			dish_metal.metallic = 0.62
 			dish_metal.metallic_specular = 0.65
 			return dish_metal
+		"pan_polished":
+			# The collector's floor. Half the metallic of the bowl's dish: a
+			# pan seen almost from above reflects mostly sky, and at 0.62
+			# metallic that made it a dark blue mirror with white bars lying
+			# on it instead of a silver surface with a rotor over it.
+			var pan_metal := _moulded("#8E9AA8", 0.20, 1.0, 0.04)
+			pan_metal.metallic = 0.32
+			pan_metal.metallic_specular = 0.68
+			return pan_metal
 		"dish_floor":
 			# Rougher and far less lacquered than a track floor. A bowl is a
 			# wide smooth surface facing the key, and a clearcoat lobe on it
@@ -342,6 +351,118 @@ func _build(key: String) -> StandardMaterial3D:
 			return _emissive(CYAN, 0.62, 0.34)
 		"pearl_soft":
 			return _moulded("#DFDDD7", 0.30, 0.7, 0.09)
+
+		# --- HERO retunes of shared keys ----------------------------------
+		#
+		# Seven surfaces the hero build wanted at a different setting from
+		# the one the V2 lab shipped with. They live here as `_hero` keys
+		# rather than as edits to the originals, because the earlier lab's
+		# committed proofs have to keep reproducing from any later branch -
+		# the same rule the `_v2` keys above were added under.
+		"lit_cyan_line_hero":
+			return _emissive(CYAN, 10.0, 0.24)
+		"neon_violet_hero":
+			return _emissive(VIOLET, 10.0, 0.20)
+		"lit_violet_ring_hero":
+			return _emissive(VIOLET, 9.5, 0.24)
+		"rock_ledge_hero":
+			return _matte("#080C12", 0.94)
+		"lit_valley_hero":
+			return _emissive("#FF9C4A", 6.5, 0.24)
+		"lit_far_window_hero":
+			return _emissive("#FFCE93", 1.9, 0.36)
+		"lit_horizon_cool_hero":
+			return _emissive("#5A87A8", 1.6, 0.42)
+
+		# --- HERO build ---------------------------------------------------
+		#
+		# Additive only, like the `_v2` keys above: everything the seven-stage
+		# machine needs that the three-module slice never had. The zone story
+		# runs cyan at the top, violet through the mixer, silver and graphite
+		# through the middle, cyan *against* orange at the choice, and gold at
+		# the bottom - so the frame has a temperature gradient down its own
+		# height rather than one colour repeated seven times.
+		"pearl_warm":
+			# The finale's shell. The same moulding, half a step warmer, so
+			# the bottom of the tower is made of the same product as the top
+			# and still reads as being lit by something golden.
+			return _moulded("#F2ECDF", 0.22, 0.9, 0.05)
+		"pearl_warm_shade":
+			return _moulded("#D2C8B4", 0.34, 0.55, 0.12)
+		"running_warm":
+			# The finish arena's floor: the polished running surface, pushed
+			# warm and darkened, so gold hardware reads against it.
+			var warm_run := _moulded("#9C8F76", 0.19, 1.0, 0.03)
+			warm_run.metallic = 0.55
+			warm_run.metallic_specular = 0.7
+			return warm_run
+		# The two branch identities. Painted bodies, not tints on pearl: the
+		# split has to be readable as a *decision* at phone size, and two
+		# shells that differ only in their edge lights are not.
+		"blue_machine":
+			return _moulded("#2E8FD8", 0.24, 0.95, 0.04)
+		"blue_deep":
+			return _moulded("#1C5C93", 0.32, 0.7, 0.08)
+		"orange_deep":
+			return _moulded("#B8500F", 0.32, 0.7, 0.08)
+		"running_blue":
+			var blue_run := _moulded("#9FC8E4", 0.18, 1.0, 0.03)
+			blue_run.metallic = 0.5
+			blue_run.metallic_specular = 0.7
+			return blue_run
+		"running_orange":
+			var orange_run := _moulded("#D9B49A", 0.18, 1.0, 0.03)
+			orange_run.metallic = 0.5
+			orange_run.metallic_specular = 0.7
+			return orange_run
+		"acrylic_blue":
+			return _acrylic_soft("#63B8F0", 0.135, 0.32)
+		"acrylic_amber":
+			return _acrylic_soft("#F0A659", 0.135, 0.32)
+		"acrylic_gold":
+			return _acrylic_soft("#F2CE7E", 0.14, 0.34)
+		"neon_blue":
+			return _emissive("#3FA8FF", 8.5, 0.22)
+		"lit_blue":
+			return _emissive("#3FA8FF", 2.8, 0.42)
+		"lit_orange_line":
+			return _emissive(ORANGE, 8.0, 0.26)
+		"lit_gold_line":
+			return _emissive(GOLD_LIGHT, 7.0, 0.26)
+		"lit_gold_wash":
+			# The finale's own practical, as a surface. Lower energy than a
+			# neon line because it is read over a large area, and a large
+			# area at line energy is a blown patch.
+			return _emissive("#FFC868", 1.5, 0.44)
+		"gold_dark":
+			return _metal("#A97C23", 0.24, 0.8)
+		# The finish floor motif. Two moulded tiles rather than a texture: at
+		# this scale a checker is geometry, and geometry keeps its contrast
+		# when the whole arena is under a warm wash.
+		"checker_light":
+			return _moulded("#DED8CA", 0.24, 0.85, 0.06)
+		"checker_dark":
+			return _moulded("#14171C", 0.36, 0.55, 0.14)
+		# Environment, second pass. Rock that is smooth-shaded and lower in
+		# contrast than the V2 set, because the faceted blocks were reading as
+		# primitives rather than as distance.
+		"rock_soft_near":
+			return _matte("#141C27", 0.96)
+		"rock_soft_mid":
+			return _matte("#243449", 0.96)
+		"rock_soft_far":
+			return _matte("#3B5471", 0.97)
+		"far_structure":
+			# Distant architecture, one value above the rock it stands on.
+			# In the layer's own colour a building at two hundred units is
+			# indistinguishable from the crest behind it, and the whole point
+			# of putting one there is that it reads as built rather than
+			# geological.
+			return _matte("#44566C", 0.95)
+		"rock_soft_haze":
+			return _matte("#4E6C88", 0.98)
+		"lit_dusk_band":
+			return _emissive("#D89A63", 1.9, 0.42)
 	push_error("lab_palette: unknown material key '%s'" % key)
 	return _moulded("#FF00FF", 0.5, 0.0)
 

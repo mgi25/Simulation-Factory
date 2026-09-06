@@ -263,45 +263,72 @@ static func build(palette, controls: Array, node_name: String,
 		float(options.get("exit_flare", 0.09)))
 	root.set_meta("widths", widths)
 
-	var body := channel_section()
+	# Material identity per run. Defaults reproduce the V2.2 channel exactly;
+	# the hero build overrides them so the two split branches can be read as
+	# two different routes rather than as one route drawn twice.
+	var shell_key := str(options.get("shell", "pearl_shell"))
+	var floor_key := str(options.get("floor", "running_polished"))
+	var keel_key := str(options.get("keel", "graphite"))
+	var guard_key := str(options.get("guard", "acrylic_guard"))
+	var scale: float = float(options.get("scale", 1.0))
+
+	var body := _sized(channel_section(), scale)
 	var body_set: Array = V2Forms.scaled_sections(
 		body, V2Forms.section_normals(body), path.size(), widths)
 	root.add_child(Forms.mesh_node(
 		V2Forms.banked_sweep(path, body_set[0], body_set[1], banks),
-		palette.get_material("pearl_shell"), "Shell"))
+		palette.get_material(shell_key), "Shell"))
 
-	var floor_pts := floor_section()
+	var floor_pts := _sized(floor_section(), scale)
 	var floor_set: Array = V2Forms.scaled_sections(
 		floor_pts, V2Forms.section_normals(floor_pts), path.size(), widths)
 	root.add_child(Forms.mesh_node(
 		V2Forms.banked_sweep(path, floor_set[0], floor_set[1], banks),
-		palette.get_material("running_polished"), "RunningSurface", false))
+		palette.get_material(floor_key), "RunningSurface", false))
 
-	var keel := keel_section()
+	var keel := _sized(keel_section(), scale)
 	var keel_set: Array = V2Forms.scaled_sections(
 		keel, V2Forms.section_normals(keel), path.size(), widths)
 	root.add_child(Forms.mesh_node(
 		V2Forms.banked_sweep(path, keel_set[0], keel_set[1], banks),
-		palette.get_material("graphite"), "Keel"))
+		palette.get_material(keel_key), "Keel"))
 
 	for side in [1.0, -1.0]:
-		var guard := guard_section(side)
+		var guard := _sized(guard_section(side), scale)
 		var guard_set: Array = V2Forms.scaled_sections(
 			guard, V2Forms.section_normals(guard), path.size(), widths)
 		root.add_child(Forms.mesh_node(
 			V2Forms.banked_sweep(path, guard_set[0], guard_set[1], banks),
-			palette.get_material("acrylic_guard"),
+			palette.get_material(guard_key),
 			"Guard%s" % ("L" if side > 0.0 else "R"), false))
 
 	_edge_details(root, palette, path, banks, widths,
-		str(options.get("edge_light", "lit_cyan_line")))
+		str(options.get("edge_light", "lit_cyan_line")), scale,
+		float(options.get("edge_stock", 0.044)))
 	if bool(options.get("ribs", true)):
-		_ribs(root, palette, path, banks, widths)
+		_ribs(root, palette, path, banks, widths, scale)
+	root.set_meta("scale", scale)
 	return root
 
 
+static func _sized(points: Array, scale: float) -> Array:
+	## A section at a fraction of the hero channel's size.
+	##
+	## One scalar rather than a second authored profile: a narrower branch and
+	## a narrower compression channel are the *same* moulding in a smaller
+	## size, which is what a real product family does, and it keeps every
+	## proportion of the six-feature section intact as it shrinks.
+	if is_equal_approx(scale, 1.0):
+		return points
+	var out: Array = []
+	for point in points:
+		out.append((point as Vector2) * scale)
+	return out
+
+
 static func _edge_details(root: Node3D, palette, path: Array, banks: Array,
-		widths: Array, light_key: String) -> void:
+		widths: Array, light_key: String, scale := 1.0,
+		edge_stock := 0.044) -> void:
 	## Chrome bead on each lip crown, lit line sunk into each shoulder.
 	##
 	## The light is a tube of emissive stock half-buried in the shell rather
@@ -317,21 +344,25 @@ static func _edge_details(root: Node3D, palette, path: Array, banks: Array,
 			var factor: float = float(widths[index])
 			var frame: Basis = V2Forms.banked_basis(path, banks, index)
 			bead.append(path[index]
-				+ frame.x * 1.030 * PROFILE_SCALE * factor * side
-				+ frame.y * (LIP_CROWN + 0.018) * PROFILE_SCALE)
+				+ frame.x * 1.030 * PROFILE_SCALE * scale * factor * side
+				+ frame.y * (LIP_CROWN + 0.018) * PROFILE_SCALE * scale)
 			light.append(path[index]
-				+ frame.x * 1.148 * PROFILE_SCALE * factor * side
-				+ frame.y * 0.128 * PROFILE_SCALE)
+				+ frame.x * 1.148 * PROFILE_SCALE * scale * factor * side
+				+ frame.y * 0.128 * PROFILE_SCALE * scale)
 		root.add_child(Forms.mesh_node(
-			Geometry.tube(bead, 0.026 * PROFILE_SCALE, 8),
+			Geometry.tube(bead, 0.026 * PROFILE_SCALE * scale, 8),
 			palette.get_material("chrome"), "Bead%s" % suffix, false))
+		# `edge_stock` defaults to the V2.2 hairline so that branch's proofs
+		# reproduce unchanged; the hero build passes 0.062, because an edge
+		# light is the one feature of a channel that has to survive being
+		# shrunk to phone size and 0.044 is what the resize averages away.
 		root.add_child(Forms.mesh_node(
-			Geometry.tube(light, 0.044 * PROFILE_SCALE, 8),
+			Geometry.tube(light, edge_stock * PROFILE_SCALE * scale, 8),
 			palette.get_material(light_key), "EdgeLight%s" % suffix, false))
 
 
 static func _ribs(root: Node3D, palette, path: Array, banks: Array,
-		widths: Array) -> void:
+		widths: Array, scale := 1.0) -> void:
 	## Transverse joints under the channel, at a fixed arc-length interval.
 	##
 	## The mechanical seam language: a graphite strap wrapping the underside
@@ -348,9 +379,11 @@ static func _ribs(root: Node3D, palette, path: Array, banks: Array,
 	# passed straight through the running cradle - the trough is only 0.35
 	# deep now, so there is no longer room for a band across its waist.
 	var strap := Geometry.rounded_box(
-		Vector3(1.70 * PROFILE_SCALE, 0.28 * PROFILE_SCALE, 0.17), 0.08, 3)
+		Vector3(1.70 * PROFILE_SCALE * scale, 0.28 * PROFILE_SCALE * scale,
+			0.17 * scale), 0.08 * scale, 3)
 	var block := Geometry.rounded_box(
-		Vector3(0.40 * PROFILE_SCALE, 0.20, 0.24), 0.07, 3)
+		Vector3(0.40 * PROFILE_SCALE * scale, 0.20 * scale, 0.24 * scale),
+		0.07 * scale, 3)
 	var ribs := Node3D.new()
 	ribs.name = "Ribs"
 	root.add_child(ribs)
@@ -361,7 +394,7 @@ static func _ribs(root: Node3D, palette, path: Array, banks: Array,
 			0, path.size() - 1)
 		var frame: Basis = V2Forms.banked_basis(path, banks, index)
 		var factor: float = float(widths[index])
-		var centre: Vector3 = path[index] + frame.y * -0.54 * PROFILE_SCALE
+		var centre: Vector3 = path[index] + frame.y * -0.54 * PROFILE_SCALE * scale
 
 		var node := Forms.mesh_node(strap, palette.get_material("graphite_soft"),
 			"Rib%d" % step)
@@ -372,14 +405,15 @@ static func _ribs(root: Node3D, palette, path: Array, banks: Array,
 		var cap := Forms.mesh_node(block, palette.get_material("gold"),
 			"RibBlock%d" % step, false)
 		cap.transform = Transform3D(Basis(frame.x, frame.y, frame.z),
-			centre + frame.y * -0.34)
+			centre + frame.y * -0.34 * scale)
 		ribs.add_child(cap)
 
 
 static func running_point(path: Array, banks: Array, t: float,
-		marble_radius: float) -> Vector3:
+		marble_radius: float, scale := 1.0) -> Vector3:
 	## Where a marble of `marble_radius` rests on the floor at fraction `t`.
 	var at: float = clampf(t, 0.0, 1.0) * float(path.size() - 1)
 	var index: int = clampi(int(round(at)), 0, path.size() - 1)
 	var frame: Basis = V2Forms.banked_basis(path, banks, index)
-	return Forms.sample_at(path, t) + frame.y * (marble_radius + floor_offset())
+	return Forms.sample_at(path, t) \
+		+ frame.y * (marble_radius + floor_offset() * scale)
