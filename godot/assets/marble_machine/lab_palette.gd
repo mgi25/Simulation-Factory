@@ -105,6 +105,18 @@ func _moulded(hex: String, roughness: float, clearcoat: float,
 	material.clearcoat_roughness = clearcoat_roughness
 	return material
 
+func _matte(hex: String, roughness: float) -> StandardMaterial3D:
+	## Unpainted, unlacquered surface: rock, cloud, far terrain.
+	##
+	## No clearcoat. A cliff with a gloss lobe on it picks up the key as a
+	## sheen and immediately reads as wet plastic at distance, which is the
+	## fastest way to lose a background's believability.
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color(hex)
+	material.metallic = 0.0
+	material.roughness = roughness
+	return material
+
 
 func _metal(hex: String, roughness: float, specular := 0.6) -> StandardMaterial3D:
 	## Real metal, for hardware only.
@@ -137,6 +149,19 @@ func _acrylic(hex: String, alpha: float, roughness := 0.04) -> StandardMaterial3
 	material.rim_enabled = true
 	material.rim = 0.9
 	material.rim_tint = 0.3
+	return material
+
+
+func _acrylic_soft(hex: String, alpha: float, rim: float) -> StandardMaterial3D:
+	## Cast acrylic without the frosted edge: for large guards and shells.
+	##
+	## The stock `_acrylic` rim term is a face-on brightening, which sells a
+	## small canopy and turns a large wall into frosted milk. These carry the
+	## cast-plastic read on wall thickness and backlight instead.
+	var material := _acrylic(hex, alpha, 0.03)
+	material.rim = rim
+	material.rim_tint = 0.15
+	material.backlight = Color(hex).darkened(0.7)
 	return material
 
 
@@ -207,6 +232,14 @@ func _build(key: String) -> StandardMaterial3D:
 			return _acrylic(ACRYLIC_AQUA, 0.26)
 		"acrylic_clear":
 			return _acrylic(ACRYLIC_CLEAR, 0.13)
+		# V2 guards. The stock acrylic carries a strong rim term, which reads
+		# as frosting when a wall is large and seen face on - beautiful on a
+		# small canopy, milk on a bowl. These two drop the rim and lean on
+		# thickness and backlight for the cast-plastic read instead.
+		"acrylic_guard":
+			return _acrylic_soft(ACRYLIC_AQUA, 0.115, 0.30)
+		"acrylic_bowl":
+			return _acrylic_soft(ACRYLIC_AQUA, 0.095, 0.24)
 
 		# Lit.
 		"lit_cyan":
@@ -241,6 +274,57 @@ func _build(key: String) -> StandardMaterial3D:
 			return _moulded("#191F27", 0.9, 0.0)
 		"backdrop_far":
 			return _moulded("#151A22", 0.95, 0.0)
+
+		# V2 environment. Rock is matte, blue-leaning and *lit* - the cliff
+		# gorge only reads as depth if each layer is a different value, so
+		# the three are separated by lightness rather than by fog alone.
+		"rock_near":
+			return _matte("#121821", 0.94)
+		"rock_mid":
+			return _matte("#1D2B3A", 0.95)
+		"rock_far":
+			return _matte("#2C4055", 0.96)
+		"rock_ledge":
+			return _matte("#10161D", 0.92)
+		"cloud_bank":
+			return _matte("#26405A", 0.98)
+		"lit_valley":
+			return _emissive("#FF9C4A", 4.0, 0.30)
+		# Read through three hundred units of haze, so its energy is set for
+		# what survives rather than for what it emits.
+		"lit_horizon":
+			return _emissive("#FFB668", 11.0, 0.20)
+		"lit_horizon_cool":
+			return _emissive("#8FC4E8", 7.0, 0.25)
+		"lit_far_window":
+			return _emissive("#FFCE93", 2.6, 0.30)
+		"lit_cyan_line":
+			return _emissive(CYAN, 8.5, 0.28)
+		"lit_violet_ring":
+			return _emissive(VIOLET, 7.5, 0.28)
+		"track_floor":
+			return _moulded("#C6CDD5", 0.24, 0.9, 0.05)
+		# V2 only. The two keys above are what the earlier visual lab renders
+		# with, so its committed proofs stay reproducible; these carry the
+		# tuning this branch needed without reaching back into them.
+		"pearl_lip_v2":
+			# A broader, dimmer clearcoat lobe: the start pod's top lip was the
+			# one surface in the frame that clipped.
+			return _moulded(PEARL_LIP, 0.21, 0.85, 0.06)
+		"track_floor_v2":
+			# Darker than the shell it sits inside, which is the whole point of
+			# having a separate running surface at all.
+			return _moulded("#AEB8C3", 0.26, 0.9, 0.05)
+		"dish_floor":
+			# Rougher and far less lacquered than a track floor. A bowl is a
+			# wide smooth surface facing the key, and a clearcoat lobe on it
+			# returns one enormous blown highlight that erases the dish. The
+			# broad, dim specular of a rougher surface keeps the curvature.
+			return _moulded("#B0BAC6", 0.44, 0.28, 0.22)
+		"sign_face":
+			return _emissive(CYAN, 0.62, 0.34)
+		"pearl_soft":
+			return _moulded("#DFDDD7", 0.30, 0.7, 0.09)
 	push_error("lab_palette: unknown material key '%s'" % key)
 	return _moulded("#FF00FF", 0.5, 0.0)
 
