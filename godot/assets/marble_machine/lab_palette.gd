@@ -46,11 +46,11 @@ const VARIANTS := [VARIANT_TOWER, VARIANT_DECK, VARIANT_SPINE]
 # --- the palette, as displayed --------------------------------------------
 #
 # Primary: the moulded body of the machine.
-const PEARL_LIP := "#F7F4EE"      # brightest edge: rim caps, top lips
-const PEARL_TRACK := "#F2F1EC"    # running surfaces
-const PEARL_SHELL := "#E8E6E0"    # module shells, housings
-const PEARL_SHADE := "#CBC9C3"    # shell undersides, inner returns
-const SILVER := "#C8CED5"         # cool trim, guard frames
+const PEARL_LIP := "#D6D2C8"      # brightest edge: rim caps, top lips
+const PEARL_TRACK := "#D2D0C7"    # running surfaces
+const PEARL_SHELL := "#C9C6BE"    # module shells, housings
+const PEARL_SHADE := "#B2AFA8"    # shell undersides, inner returns
+const SILVER := "#A8B0BA"         # cool trim, guard frames
 const SILVER_DEEP := "#8E979F"    # recessed silver, section breaks
 
 # Structure: dark, blue-leaning, never black.
@@ -129,14 +129,14 @@ func _acrylic(hex: String, alpha: float, roughness := 0.04) -> StandardMaterial3
 	material.metallic = 0.0
 	material.roughness = roughness
 	material.clearcoat_enabled = true
-	material.clearcoat = 1.0
-	material.clearcoat_roughness = 0.02
+	material.clearcoat = 0.70
+	material.clearcoat_roughness = 0.08
 	material.cull_mode = BaseMaterial3D.CULL_DISABLED
 	material.backlight_enabled = true
-	material.backlight = Color(hex).darkened(0.55)
+	material.backlight = Color(hex).darkened(0.72)
 	material.rim_enabled = true
-	material.rim = 0.9
-	material.rim_tint = 0.3
+	material.rim = 0.30
+	material.rim_tint = 0.55
 	return material
 
 
@@ -168,17 +168,17 @@ func _build(key: String) -> StandardMaterial3D:
 	match key:
 		# Moulded body.
 		"pearl_lip":
-			return _moulded(PEARL_LIP, 0.16, 1.0, 0.03)
+			return _moulded(PEARL_LIP, 0.30, 0.50, 0.11)
 		"pearl_track":
-			return _moulded(PEARL_TRACK, 0.19, 0.95, 0.04)
+			return _moulded(PEARL_TRACK, 0.34, 0.45, 0.13)
 		"pearl_shell":
-			return _moulded(PEARL_SHELL, 0.26, 0.8, 0.07)
+			return _moulded(PEARL_SHELL, 0.38, 0.42, 0.15)
 		"pearl_shade":
 			return _moulded(PEARL_SHADE, 0.34, 0.55, 0.12)
 		"silver":
-			return _moulded(SILVER, 0.24, 0.85, 0.05)
+			return _moulded(SILVER, 0.34, 0.50, 0.11)
 		"track_silver":
-			return _moulded("#D2D8DE", 0.20, 0.95, 0.04)
+			return _moulded("#9EAAB6", 0.38, 0.42, 0.15)
 		"silver_deep":
 			return _moulded(SILVER_DEEP, 0.38, 0.5, 0.12)
 
@@ -212,13 +212,13 @@ func _build(key: String) -> StandardMaterial3D:
 		"lit_cyan":
 			return _emissive(CYAN, 3.4, 0.45)
 		"neon_cyan":
-			return _emissive(CYAN, 8.5, 0.22)
+			return _emissive(CYAN, 4.2, 0.22)
 		"neon_violet":
-			return _emissive(VIOLET, 8.0, 0.22)
+			return _emissive(VIOLET, 4.0, 0.22)
 		"neon_orange":
-			return _emissive(ORANGE, 9.0, 0.20)
+			return _emissive(ORANGE, 4.4, 0.20)
 		"neon_gold":
-			return _emissive(GOLD_LIGHT, 4.5, 0.25)
+			return _emissive(GOLD_LIGHT, 3.0, 0.25)
 		"lit_cyan_soft":
 			return _emissive(CYAN, 0.85, 0.62)
 		"lit_violet":
@@ -228,9 +228,9 @@ func _build(key: String) -> StandardMaterial3D:
 		"lit_gold":
 			return _emissive(GOLD_LIGHT, 3.0, 0.35)
 		"lit_white":
-			return _emissive("#EAF7FF", 2.2, 0.4)
+			return _emissive("#EAF7FF", 1.7, 0.40)
 		"lit_sign":
-			return _emissive(CYAN, 1.15, 0.30)
+			return _emissive(CYAN, 0.95, 0.30)
 		"lit_window":
 			return _emissive("#FFD9A0", 1.4, 0.6)
 
@@ -260,5 +260,31 @@ func marble(index: int) -> StandardMaterial3D:
 	material.rim_enabled = true
 	material.rim = 0.22
 	material.rim_tint = 0.85
+	_cache[key] = material
+	return material
+
+
+func marble_core(index: int) -> StandardMaterial3D:
+	## The ribbon suspended inside one marble, in a lighter cast of its hue.
+	##
+	## A gloss sphere in a single colour is very nearly rotation-invariant on
+	## screen: it can be spinning at fifty radians a second and still read as
+	## sliding, which is the one thing a clip whose whole job is to prove real
+	## physics cannot afford. The ribbon is what makes the roll legible, and a
+	## cast core is what a candy marble actually has - so the motion gets
+	## carried without putting a number or a flag on a racer.
+	##
+	## Lightened from the same hex rather than authored as a second constant,
+	## so changing a racer's colour cannot leave its core behind.
+	var key := "marble_core_%d" % (index % MARBLE_COLOURS.size())
+	if _cache.has(key):
+		return _cache[key]
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color(
+		MARBLE_COLOURS[index % MARBLE_COLOURS.size()]).lightened(0.55)
+	material.metallic = 0.0
+	material.roughness = 0.22
+	material.clearcoat_enabled = true
+	material.clearcoat = 0.4
 	_cache[key] = material
 	return material

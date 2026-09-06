@@ -297,6 +297,72 @@ static func rounded_disc(radius: float, thickness: float, fillet: float,
 
 
 # --- swept sections -------------------------------------------------------
+#
+# ## Why a sweep has to be told which way is up
+#
+# The frame a cross-section is carried in has two axes. The lateral one a
+# sweep can work out for itself, from the path. The vertical one it cannot,
+# and every sweep here used to assume it was world up. For authored track that
+# assumption is right and deliberate: a channel's walls stand up whatever the
+# channel's gradient, so tilting the frame with the slope would light them as
+# though they leaned.
+#
+# A banked bend is the case where it is wrong, and it is not a small wrong.
+# The simulated curve rolls 27.7 degrees into its turn - the angle at which a
+# marble at the design speed needs no sideways force from the wall at all - so
+# its running surface is tilted and its walls are tilted with it. Swept with an
+# upright section, the drawn floor is level where the solved floor is banked.
+# The marbles are placed by the solver and not by the drawing, so they ride up
+# the drawn wall, clip the drawn guard and hover over the drawn floor, and
+# there is no lighting trick that hides a surface being in the wrong place.
+#
+# So the sweeps come in pairs. The `_framed` one takes an up vector per sample
+# and is the real implementation; the plain one calls it with world up at every
+# sample, and is what every existing caller gets.
+
+
+static func world_ups(count: int) -> Array:
+	## `count` copies of world up: the frame an unbanked sweep runs in.
+	var ups: Array = []
+	for _index in count:
+		ups.append(Vector3.UP)
+	return ups
+
+
+static func lateral_frame(path: Array, ups: Array, index: int) -> Vector3:
+	## The lateral axis at one sample, square to both the path and its up.
+	##
+	## `up.cross(tangent)`, and the order of the two is load-bearing: the other
+	## order names the same axis pointing the other way, which mirrors every
+	## cross-section in the machine and turns a channel inside out.
+	##
+	## With `up` equal to world up this is exactly the rule the unbanked sweeps
+	## have always used - the path's horizontal direction, turned ninety
+	## degrees - because crossing with world up annihilates the tangent's
+	## vertical component, so projecting the tangent flat first would change
+	## nothing. That equivalence is the whole reason the plain sweeps can
+	## delegate here and still hand back the mesh they handed back before.
+	var before: Vector3 = path[maxi(index - 1, 0)]
+	var after: Vector3 = path[mini(index + 1, path.size() - 1)]
+	var up: Vector3 = ups[index]
+	var side := up.cross(after - before)
+	if side.length_squared() < 1.0e-12:
+		# The path stalls or doubles back here and has no tangent to speak of.
+		# Any axis square to `up` will do; the candidates are tried in a fixed
+		# order so the choice is a property of the input and nothing else.
+		side = up.cross(Vector3(0.0, 0.0, 1.0))
+		if side.length_squared() < 1.0e-12:
+			side = up.cross(Vector3(1.0, 0.0, 0.0))
+	return side.normalized()
+
+
+static func lateral_frames(path: Array, ups: Array) -> Array:
+	## `lateral_frame` at every sample of a path.
+	var frames: Array = []
+	for index in path.size():
+		frames.append(lateral_frame(path, ups, index))
+	return frames
+
 
 static func sweep_profiles(path: Array, sections: Array, normals: Array,
 		cap_ends := true) -> ArrayMesh:
@@ -313,15 +379,29 @@ static func sweep_profiles(path: Array, sections: Array, normals: Array,
 	##
 	## Every section must have the same point count, which they do when they
 	## come from `channel_section` with the same `rounds`.
+	return sweep_profiles_framed(
+		path, world_ups(path.size()), sections, normals, cap_ends)
+
+
+static func sweep_profiles_framed(path: Array, ups: Array, sections: Array,
+		normals: Array, cap_ends := true) -> ArrayMesh:
+	## `sweep_profiles`, banked: one up vector per sample rather than world up.
+	##
+	## `ups` must be as long as `path`. It need not be exactly square to the
+	## path: the lateral axis is derived from the two, so it comes out square
+	## to the up whatever the tangent does, and a frame handed over by a solver
+	## whose samples are a finite distance apart stays orthonormal here.
 	var surface := SurfaceTool.new()
 	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
 
-	var frames := _frames_along(path)
+	var frames := lateral_frames(path, ups)
 	for index in path.size() - 1:
 		var c0: Vector3 = path[index]
 		var c1: Vector3 = path[index + 1]
 		var l0: Vector3 = frames[index]
 		var l1: Vector3 = frames[index + 1]
+		var u0: Vector3 = ups[index]
+		var u1: Vector3 = ups[index + 1]
 		var s0: Array = sections[index]
 		var s1: Array = sections[index + 1]
 		var n0: Array = normals[index]
@@ -337,40 +417,26 @@ static func sweep_profiles(path: Array, sections: Array, normals: Array,
 			var nb1: Vector2 = n1[at + 1]
 			quad_smooth_auto(surface,
 				[
-					c0 + l0 * a0.x + Vector3.UP * a0.y,
-					c1 + l1 * a1.x + Vector3.UP * a1.y,
-					c1 + l1 * b1.x + Vector3.UP * b1.y,
-					c0 + l0 * b0.x + Vector3.UP * b0.y,
+					c0 + l0 * a0.x + u0 * a0.y,
+					c1 + l1 * a1.x + u1 * a1.y,
+					c1 + l1 * b1.x + u1 * b1.y,
+					c0 + l0 * b0.x + u0 * b0.y,
 				],
 				[
-					l0 * na0.x + Vector3.UP * na0.y,
-					l1 * na1.x + Vector3.UP * na1.y,
-					l1 * nb1.x + Vector3.UP * nb1.y,
-					l0 * nb0.x + Vector3.UP * nb0.y,
+					l0 * na0.x + u0 * na0.y,
+					l1 * na1.x + u1 * na1.y,
+					l1 * nb1.x + u1 * nb1.y,
+					l0 * nb0.x + u0 * nb0.y,
 				])
 
 	if cap_ends and path.size() >= 2:
-		_cap(surface, path[0], frames[0], sections[0], -1.0)
+		_cap(surface, path[0], frames[0], ups[0], sections[0], -1.0)
 		_cap(surface, path[path.size() - 1], frames[frames.size() - 1],
-			sections[sections.size() - 1], 1.0)
+			ups[ups.size() - 1], sections[sections.size() - 1], 1.0)
 
 	var mesh := ArrayMesh.new()
 	surface.commit(mesh)
 	return mesh
-
-
-static func _frames_along(path: Array) -> Array:
-	## The lateral axis at each sample, taken in the horizontal plane.
-	var frames: Array = []
-	for index in path.size():
-		var before: Vector3 = path[maxi(index - 1, 0)]
-		var after: Vector3 = path[mini(index + 1, path.size() - 1)]
-		var forward := Vector3(after.x - before.x, 0.0, after.z - before.z)
-		if forward.length_squared() < 1.0e-12:
-			forward = Vector3(0.0, 0.0, 1.0)
-		forward = forward.normalized()
-		frames.append(Vector3(forward.z, 0.0, -forward.x))
-	return frames
 
 
 static func sweep(path: Array, section: Array, section_normals: Array,
@@ -383,21 +449,35 @@ static func sweep(path: Array, section: Array, section_normals: Array,
 	## the same rule `neon_scene.gd` takes its side normals under and for the
 	## same reason - a track's walls stand up whatever the track's gradient,
 	## so tilting the frame with the slope would light them as though they
-	## leaned.
+	## leaned. Track that is genuinely banked wants `sweep_framed` instead.
 	##
 	## `section` is a list of `Vector2(lateral, vertical)` in world units,
 	## read left to right across the channel; `section_normals` is its
 	## outward normal per point, in the same frame.
+	return sweep_framed(
+		path, world_ups(path.size()), section, section_normals, cap_ends)
+
+
+static func sweep_framed(path: Array, ups: Array, section: Array,
+		section_normals: Array, cap_ends := true) -> ArrayMesh:
+	## `sweep`, banked: one up vector per sample rather than world up.
+	##
+	## The section's `y` is measured along the supplied up and its `x` along
+	## the lateral axis that falls out of it, so one authored cross-section
+	## serves level track and banked track alike and the two meet at a joint
+	## without a step in the running surface.
 	var surface := SurfaceTool.new()
 	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
 
-	var frames := _frames_along(path)
+	var frames := lateral_frames(path, ups)
 
 	for index in path.size() - 1:
 		var c0: Vector3 = path[index]
 		var c1: Vector3 = path[index + 1]
 		var l0: Vector3 = frames[index]
 		var l1: Vector3 = frames[index + 1]
+		var u0: Vector3 = ups[index]
+		var u1: Vector3 = ups[index + 1]
 		for at in section.size() - 1:
 			var sa: Vector2 = section[at]
 			var sb: Vector2 = section[at + 1]
@@ -405,22 +485,22 @@ static func sweep(path: Array, section: Array, section_normals: Array,
 			var nb: Vector2 = section_normals[at + 1]
 			quad_smooth_auto(surface,
 				[
-					c0 + l0 * sa.x + Vector3.UP * sa.y,
-					c1 + l1 * sa.x + Vector3.UP * sa.y,
-					c1 + l1 * sb.x + Vector3.UP * sb.y,
-					c0 + l0 * sb.x + Vector3.UP * sb.y,
+					c0 + l0 * sa.x + u0 * sa.y,
+					c1 + l1 * sa.x + u1 * sa.y,
+					c1 + l1 * sb.x + u1 * sb.y,
+					c0 + l0 * sb.x + u0 * sb.y,
 				],
 				[
-					l0 * na.x + Vector3.UP * na.y,
-					l1 * na.x + Vector3.UP * na.y,
-					l1 * nb.x + Vector3.UP * nb.y,
-					l0 * nb.x + Vector3.UP * nb.y,
+					l0 * na.x + u0 * na.y,
+					l1 * na.x + u1 * na.y,
+					l1 * nb.x + u1 * nb.y,
+					l0 * nb.x + u0 * nb.y,
 				])
 
 	if cap_ends and path.size() >= 2:
-		_cap(surface, path[0], frames[0], section, -1.0)
+		_cap(surface, path[0], frames[0], ups[0], section, -1.0)
 		_cap(surface, path[path.size() - 1], frames[frames.size() - 1],
-			section, 1.0)
+			ups[ups.size() - 1], section, 1.0)
 
 	var mesh := ArrayMesh.new()
 	surface.commit(mesh)
@@ -428,21 +508,21 @@ static func sweep(path: Array, section: Array, section_normals: Array,
 
 
 static func _cap(surface: SurfaceTool, centre: Vector3, lateral: Vector3,
-		section: Array, facing: float) -> void:
+		up: Vector3, section: Array, facing: float) -> void:
 	## Close a swept solid with a fan from the section's own midpoint.
-	var forward := lateral.cross(Vector3.UP).normalized() * facing
+	var forward := lateral.cross(up).normalized() * facing
 	var mid := Vector2.ZERO
 	for raw in section:
 		mid += raw as Vector2
 	mid /= float(maxi(section.size(), 1))
-	var hub := centre + lateral * mid.x + Vector3.UP * mid.y
+	var hub := centre + lateral * mid.x + up * mid.y
 	for at in section.size() - 1:
 		var sa: Vector2 = section[at]
 		var sb: Vector2 = section[at + 1]
 		quad_auto(surface,
 			hub,
-			centre + lateral * sa.x + Vector3.UP * sa.y,
-			centre + lateral * sb.x + Vector3.UP * sb.y,
+			centre + lateral * sa.x + up * sa.y,
+			centre + lateral * sb.x + up * sb.y,
 			hub,
 			forward)
 
@@ -453,6 +533,18 @@ static func tube(path: Array, radius: float, sides := 12) -> ArrayMesh:
 	## Rounded stock rather than square is most of what separates a toy's
 	## hardware from a factory's, and a tube costs the same as the box it
 	## replaces.
+	return tube_framed(path, world_ups(path.size()), radius, sides)
+
+
+static func tube_framed(path: Array, ups: Array, radius: float,
+		sides := 12) -> ArrayMesh:
+	## `tube`, banked.
+	##
+	## A round bar is rotationally symmetric, so the frame changes nothing
+	## about its shape - but it changes where it *is*, because a lip, an edge
+	## light or a guard cap is only ever drawn on an offset path, and that
+	## path was built in the channel's frame. Rolling the two apart is how a
+	## neon rope ends up inside the channel it is meant to run outboard of.
 	var section: Array = []
 	var normals: Array = []
 	for step in sides + 1:
@@ -460,8 +552,7 @@ static func tube(path: Array, radius: float, sides := 12) -> ArrayMesh:
 		var n := Vector2(cos(t), sin(t))
 		normals.append(n)
 		section.append(n * radius)
-	return sweep(path, section, normals, false)
-
+	return sweep_framed(path, ups, section, normals, false)
 
 static func arc_path(centre: Vector3, radius: float, from_angle: float,
 		to_angle: float, height_from: float, height_to: float,

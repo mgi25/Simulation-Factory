@@ -29,3 +29,6 @@ godot/export_presets.cfg
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Godot 4.4+ regenerates these on import; this project has never tracked them.
+godot/**/*.uid

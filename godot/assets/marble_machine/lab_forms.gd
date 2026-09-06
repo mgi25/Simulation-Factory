@@ -166,16 +166,27 @@ static func offset_path(path: Array, lateral: float, vertical: float) -> Array:
 	## exactly. The frame is the path's horizontal direction with world up -
 	## the same rule `toy_geometry.sweep` uses, so an offset path and the
 	## sweep it decorates never drift apart.
+	return offset_path_framed(
+		path, Geometry.world_ups(path.size()), lateral, vertical)
+
+
+static func offset_path_framed(path: Array, ups: Array, lateral: float,
+		vertical: float) -> Array:
+	## `offset_path`, banked: the offset is taken in the supplied frame.
+	##
+	## The reason this exists is that "never drift apart" above is only true
+	## while the sweep and the offset agree about which way is up. On the
+	## simulated curve they do not: the channel is swept along frames rolled
+	## 27.7 degrees into the turn, and the same offsets taken against world up
+	## put the lip, the fascia, the keel, the underlight and the guards
+	## somewhere else entirely - the acrylic guard by more than a marble
+	## diameter, which is enough to leave it standing clear of the wall it is
+	## meant to be mounted on. Banked track therefore takes its offsets in the
+	## frame it was swept in, and the five stacked layers stay stacked.
 	var out: Array = []
 	for index in path.size():
-		var before: Vector3 = path[maxi(index - 1, 0)]
-		var after: Vector3 = path[mini(index + 1, path.size() - 1)]
-		var forward := Vector3(after.x - before.x, 0.0, after.z - before.z)
-		if forward.length_squared() < 1.0e-12:
-			forward = Vector3(0.0, 0.0, 1.0)
-		forward = forward.normalized()
-		var side := Vector3(forward.z, 0.0, -forward.x)
-		out.append(path[index] + side * lateral + Vector3.UP * vertical)
+		var side := Geometry.lateral_frame(path, ups, index)
+		out.append(path[index] + side * lateral + (ups[index] as Vector3) * vertical)
 	return out
 
 
@@ -187,6 +198,28 @@ static func sample_at(path: Array, t: float) -> Vector3:
 	var low := int(floor(at))
 	var high: int = mini(low + 1, path.size() - 1)
 	return (path[low] as Vector3).lerp(path[high], at - float(low))
+
+
+static func sample_basis(path: Array, ups: Array, t: float) -> Basis:
+	## The track's own axes a fraction of the way along it.
+	##
+	## `sample_at` answers where a bracket goes; this answers which way it
+	## faces. On level track the two are separable and nobody notices, because
+	## a part bolted to a flat channel is upright whatever the channel does in
+	## plan. On a 27.7 degree bank they are not: an upright post on a tilted
+	## channel is a part that missed its mounting face, and it reads as one
+	## from any angle that shows the track's section.
+	##
+	## Columns are lateral, up, flow - the same frame `sweep_framed` carries
+	## its cross-section in, so a part placed by this and a surface swept along
+	## that agree about where the track's own X and Y are.
+	if path.is_empty():
+		return Basis.IDENTITY
+	var at: float = clampf(t, 0.0, 1.0) * float(path.size() - 1)
+	var index := mini(int(floor(at)), path.size() - 1)
+	var side := Geometry.lateral_frame(path, ups, index)
+	var up: Vector3 = (ups[index] as Vector3).normalized()
+	return Basis(side, up, side.cross(up))
 
 
 # --- mechanism ------------------------------------------------------------

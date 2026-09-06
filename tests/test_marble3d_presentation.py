@@ -343,6 +343,67 @@ def test_the_start_bays_are_where_the_marbles_rest(contract):
     assert gaps[0] >= 2.0 * DEFAULT_CONFIG.marble.radius
 
 
+def test_the_start_hands_over_the_swept_chute(contract):
+    """The drawn chute floor is the solved chute floor, not a straight ramp.
+
+    The chute has two slopes joined by a blend, so `incline_deg` describes none
+    of it exactly. A renderer given only that number would draw a straight ramp
+    at the mean angle, and the place a straight line through this curve is
+    furthest from it is the exit - which is the end the marbles leave from and
+    the end the eye is on.
+    """
+    visual = contract.module("start").visual
+    centreline = visual["centreline"]
+    assert len(centreline) >= 8
+
+    fractions = [sample["t"] for sample in centreline]
+    assert fractions == sorted(fractions)
+    assert fractions[0] == pytest.approx(0.0)
+    assert fractions[-1] == pytest.approx(1.0)
+
+    # Flow order: the last sample is the exit, and it is the exit socket.
+    exit_socket = contract.module("start").sockets["exit"]
+    assert centreline[-1]["position"] == pytest.approx(exit_socket["position"])
+
+    # It descends the whole way, and never climbs.
+    heights = [sample["position"][1] for sample in centreline]
+    assert heights == sorted(heights, reverse=True)
+
+    # And it is not a straight line. If it were, the mid sample would sit on
+    # the chord between the ends - this asserts the blend survives the trip
+    # through the contract, which is the whole reason it is exported.
+    first = centreline[0]["position"]
+    last = centreline[-1]["position"]
+    middle = centreline[len(centreline) // 2]["position"]
+    chord = [
+        0.5 * (start + finish) for start, finish in zip(first, last)
+    ]
+    assert math.dist(middle, chord) > 0.05
+
+
+def test_the_start_chute_carries_its_marbles(contract):
+    """Every bay sits over the drawn floor, one radius up, in the chute."""
+    visual = contract.module("start").visual
+    centreline = [sample["position"] for sample in visual["centreline"]]
+    radius = DEFAULT_CONFIG.marble.radius
+    half_width = 0.5 * float(visual["channel_width"])
+
+    for bay in visual["bays"]:
+        gap = min(math.dist(bay["position"], point) for point in centreline)
+        # A marble resting on the floor is one radius off the centreline, and
+        # the centreline is sampled coarsely enough that the nearest sample can
+        # be a little along the run from it as well as below it.
+        assert radius <= gap <= radius + half_width + 0.5
+
+
+def test_the_gate_is_wide_enough_to_close_the_chute(contract):
+    """A bar narrower than the channel is a bar the queue rolls around."""
+    visual = contract.module("start").visual
+    half = visual["gate_half_extents"]
+    assert 2.0 * half[2] >= float(visual["channel_width"])
+    assert 2.0 * half[1] >= 2.0 * DEFAULT_CONFIG.marble.radius
+
+
 def test_the_gate_keeps_the_rotation_the_replay_drops(contract):
     """`LinearGate.to_json()` writes only the rest position.
 

@@ -323,6 +323,11 @@ def _world_bounds(module: Any) -> tuple[tuple[float, ...], tuple[float, ...]]:
 # authored fillets, hoop stocks, bolt sizes and guard height by it. Primary
 # dimensions are never scaled this way - they come from the physics directly.
 AUTHORED_BOWL_DISH_RADIUS = 2.52
+
+# The lane pitch start_platform.gd drew its bays at. Every detail size on that
+# asset was drawn against it, so it is the denominator that turns an authored
+# fillet into one that suits a 1.2 wu channel.
+AUTHORED_START_CHANNEL_WIDTH = 0.52
 # s_curve.gd: WALL_HEIGHT 0.25 / HALF_WIDTH 0.40
 CURVE_WALL_OVER_HALF_WIDTH = 0.25 / 0.40
 
@@ -434,7 +439,28 @@ def _start_visual(module: Any, spec: dict[str, Any]) -> dict[str, Any]:
     bays - so the bays are placed from `marble_starts()`, which is where the
     solver puts the marbles on tick zero. The bay is then correct by
     construction rather than by a number matching in two files.
+
+    The chute floor is handed over as a centreline for the same reason the
+    curve's is, and it is not a convenience here either. `incline_deg` is a
+    single number and this chute does not have a single slope: it runs at
+    `incline` for most of its length, flattens to `shelf_slope` near the exit,
+    and joins the two over `shelf_blend`. A renderer that drew a straight ramp
+    at the average angle would put its floor a marble clear of the solved
+    floor at the exit, which is precisely where the marbles are looked at. So
+    the drawn floor is swept along the same frames the collider was.
     """
+    centreline = []
+    frames = module._frames()
+    for index, frame in enumerate(frames):
+        placed = module.transform.compose(frame)
+        centreline.append(
+            {
+                "t": index / max(1, len(frames) - 1),
+                "position": list(to_render_position(placed.position)),
+                "rotation": list(to_render_quaternion(placed.rotation)),
+            }
+        )
+
     bays = []
     for index, placement in enumerate(module.marble_starts()):
         bays.append(
@@ -444,7 +470,9 @@ def _start_visual(module: Any, spec: dict[str, Any]) -> dict[str, Any]:
                 "rotation": list(to_render_quaternion(placement.rotation)),
             }
         )
+    gate = module.local_actuators()[0]
     return {
+        "centreline": centreline,
         "bays": bays,
         "channel_width": float(spec["width"]),
         "wall": float(spec["wall"]),
@@ -453,6 +481,11 @@ def _start_visual(module: Any, spec: dict[str, Any]) -> dict[str, Any]:
         "gate_offset": float(spec["gate_offset"]),
         "marble_spacing": float(spec["marble_spacing"]),
         "drop": float(spec["drop"]),
+        # The bar's own dimensions, so the asset can draw it. Where it sits and
+        # when it moves stay in `actuators`, which is the schedule; this is the
+        # size, which is what a `visual` block is for.
+        "gate_half_extents": list(to_render_position(gate.half_extents)),
+        "detail_scale": float(spec["width"]) / AUTHORED_START_CHANNEL_WIDTH,
     }
 
 
