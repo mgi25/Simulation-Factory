@@ -62,6 +62,148 @@ static func ring_positions(count: int, radius: float, phase := 0.0,
 	return points
 
 
+# --- protected volumes ----------------------------------------------------
+#
+# A module can claim the air it needs to be *seen* in, and the frame builders
+# read that claim before they place a member.
+#
+# The rule this expresses is the one the first hero frame broke: a support
+# system built only from "is there room for it" clearances will happily put a
+# diagonal straight across the mouth of a bowl, because there genuinely is
+# room - the bar misses every surface. What it does not miss is the shot. A
+# module's action volume is therefore declared once, by the module, in the
+# same units as everything else, and the tower and the chutes route around it.
+#
+# The volume is a capped vertical cylinder because every module here is a
+# lathe and the camera orbits: a box would have to be re-authored for each
+# azimuth and a cylinder is right from all of them.
+
+static func clearance(centre: Vector3, radius: float, bottom: float,
+		top: float, owner := "") -> Dictionary:
+	## One protected cylinder, in world units.
+	##
+	## `owner` names the node whose own parts are allowed inside it - a bowl
+	## is not intruding on itself - and is only read by the audit.
+	return {
+		"x": centre.x, "z": centre.z,
+		"radius": radius, "bottom": bottom, "top": top, "owner": owner,
+	}
+
+
+static func point_clears(point: Vector3, volume: Dictionary) -> bool:
+	if point.y < float(volume["bottom"]) or point.y > float(volume["top"]):
+		return true
+	var dx := point.x - float(volume["x"])
+	var dz := point.z - float(volume["z"])
+	var radius := float(volume["radius"])
+	return dx * dx + dz * dz >= radius * radius
+
+
+static func segment_clears(from: Vector3, to: Vector3,
+		volume: Dictionary) -> bool:
+	## True when no part of the segment is inside the cylinder.
+	##
+	## Solved rather than sampled. Sampling a member against a volume is the
+	## kind of test that passes in the lab and fails in the render, because
+	## the case that matters - a long brace grazing the rim of a bowl - is
+	## exactly the case a coarse sample walks straight past.
+	##
+	## Clip the segment to the volume's height band first, then the question
+	## is a two-dimensional one: how close does the surviving piece come to
+	## the axis.
+	var bottom := float(volume["bottom"])
+	var top := float(volume["top"])
+	var low := 0.0
+	var high := 1.0
+	var rise := to.y - from.y
+	if absf(rise) < 1.0e-9:
+		if from.y < bottom or from.y > top:
+			return true
+	else:
+		var at_bottom := (bottom - from.y) / rise
+		var at_top := (top - from.y) / rise
+		low = maxf(0.0, minf(at_bottom, at_top))
+		high = minf(1.0, maxf(at_bottom, at_top))
+		if low > high:
+			return true
+
+	var flat_from := Vector2(from.x, from.z)
+	var flat_to := Vector2(to.x, to.z)
+	var head := flat_from.lerp(flat_to, low)
+	var tail := flat_from.lerp(flat_to, high)
+	var axis := Vector2(float(volume["x"]), float(volume["z"]))
+	var span := tail - head
+	var nearest := 0.0
+	if span.length_squared() > 1.0e-12:
+		nearest = clampf((axis - head).dot(span) / span.length_squared(), 0.0, 1.0)
+	return head.lerp(tail, nearest).distance_to(axis) >= float(volume["radius"])
+
+
+static func point_clears_all(point: Vector3, volumes: Array) -> bool:
+	for volume in volumes:
+		if not point_clears(point, volume):
+			return false
+	return true
+
+
+static func segment_clears_all(from: Vector3, to: Vector3,
+		volumes: Array) -> bool:
+	for volume in volumes:
+		if not segment_clears(from, to, volume):
+			return false
+	return true
+
+
+static func ceiling_above(point: Vector3, volumes: Array) -> float:
+	## The highest protected top the point sits inside the footprint of.
+	##
+	## What a bracket asks before it decides how far to drop: a leg that would
+	## end inside a bowl can often be shortened until it ends above one, and a
+	## short honest bracket beats a deleted one.
+	var ceiling := -INF
+	for volume in volumes:
+		var dx := point.x - float(volume["x"])
+		var dz := point.z - float(volume["z"])
+		var radius := float(volume["radius"])
+		if dx * dx + dz * dz < radius * radius:
+			ceiling = maxf(ceiling, float(volume["top"]))
+	return ceiling
+
+
+static func longest_clear_run(path: Array, from_drop: float, to_drop: float,
+		volumes: Array) -> Array:
+	## The longest stretch of a track whose understructure clears every volume.
+	##
+	## A chute that ends over a bowl cannot carry its dark keel all the way to
+	## the lip - the keel hangs half a unit below the running line and that is
+	## exactly the half unit the bowl's mouth occupies. Trimming the spine and
+	## cantilevering the last stretch is both what the picture needs and what
+	## a moulded part would actually do.
+	if volumes.is_empty() or path.size() < 2:
+		return path.duplicate()
+
+	var best_start := 0
+	var best_length := 0
+	var run_start := -1
+	for index in path.size():
+		var point: Vector3 = path[index]
+		var clear := segment_clears_all(
+			point - Vector3(0.0, from_drop, 0.0),
+			point - Vector3(0.0, to_drop, 0.0), volumes)
+		if clear:
+			if run_start < 0:
+				run_start = index
+			if index - run_start + 1 > best_length:
+				best_length = index - run_start + 1
+				best_start = run_start
+		else:
+			run_start = -1
+
+	if best_length < 4:
+		return []
+	return path.slice(best_start, best_start + best_length)
+
+
 # --- structure ------------------------------------------------------------
 
 static func column(height: float, half_width: float, fillet: float) -> ArrayMesh:

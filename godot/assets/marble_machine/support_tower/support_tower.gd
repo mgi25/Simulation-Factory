@@ -57,19 +57,71 @@ const MAST_BACK := Vector3(0.0, 0.0, -3.90)
 const GAP_LOWER := Vector2(3.30, 9.80)
 const GAP_UPPER := Vector2(12.85, 14.60)
 
+# Where the brackets that carry the bowl meet its cradle. Low enough that the
+# gold pad on the end of each arm tucks under the rim's flank, which is both
+# how a real fitting would be hidden and what keeps the arm out of the volume
+# the bowl claims for the camera.
+const BOWL_YOKE_Y := 10.86
 
-static func build(palette, levels: Array, top: float) -> Node3D:
+
+static func build(palette, levels: Array, top: float,
+		clearances: Array = []) -> Node3D:
 	var root := Node3D.new()
 	root.name = "SupportTower"
 	_base(root, palette)
 	match palette.variant:
 		"deck":
-			_build_deck(root, palette, levels, top)
+			_build_deck(root, palette, levels, top, clearances)
 		"spine":
-			_build_spine(root, palette, levels, top)
+			_build_spine(root, palette, levels, top, clearances)
 		_:
-			_build_tower(root, palette, levels, top)
+			_build_tower(root, palette, levels, top, clearances)
+	for volume in clearances:
+		_module_ring(root, palette, _feet_for(palette), volume)
 	return root
+
+
+static func anchors(palette) -> Array:
+	## Every upright in this frame a chute's bracket may legitimately land on.
+	##
+	## A bracket has to reach *something*. The old rule pointed each one at
+	## the machine's axis, which is a place no member of this frame occupies,
+	## and it is why the feed chute's legs ended in the bowl: they were aimed
+	## at a support that was never built. Publishing the frame's uprights lets
+	## a chute reach the nearest real one instead.
+	var points: Array = _feet_for(palette)
+	var gaps := [GAP_LOWER, GAP_UPPER]
+	var half_x := 1.15
+	var offsets := [-1.35, -0.75]
+	if palette.variant == "deck":
+		half_x = 1.45
+	elif palette.variant == "spine":
+		half_x = 1.00
+		gaps = [GAP_LOWER]
+		offsets = [-1.45]
+	for index in gaps.size():
+		var z: float = offsets[index]
+		for side in 2:
+			var x: float = half_x * (1.0 if side == 0 else -1.0)
+			points.append(Vector3(x, 0.0, z + 0.55))
+			points.append(Vector3(x, 0.0, z - 0.55))
+	return points
+
+
+static func _feet_for(palette) -> Array:
+	match palette.variant:
+		"deck":
+			return [
+				MAST_RIGHT + Vector3(0.45, 0.0, 0.0),
+				MAST_LEFT + Vector3(-0.45, 0.0, 0.0),
+				MAST_BACK + Vector3(0.0, 0.0, -0.4),
+			]
+		"spine":
+			return [
+				Vector3(4.60, 0.0, -2.40), Vector3(-4.60, 0.0, -2.40),
+				Vector3(0.0, 0.0, -4.05),
+			]
+	return [MAST_RIGHT, MAST_LEFT, MAST_BACK]
 
 
 # --- shared parts ---------------------------------------------------------
@@ -141,12 +193,24 @@ static func _light_strip(root: Node3D, palette, at: Vector3, from_y: float,
 
 
 static func _service_deck(root: Node3D, palette, at: Vector3, span: float,
-		seed_index: int, yaw := 0.0) -> void:
+		seed_index: int, yaw := 0.0, clearances: Array = []) -> void:
 	## A small platform with a rack of housings on it.
 	##
 	## The reference scatters these all down its tower and they are most of
 	## what makes it look inhabited by machinery. Four or five per frame is
 	## enough; more and the silhouette starts to blur.
+	# A deck is a slab with a rack of housings on it and it stands at module
+	# height by design, so it is the one piece of scenery most likely to end
+	# up beside a bowl at exactly rim level. Half a span each way is the
+	# footprint to test.
+	var reach := span * 0.5 + 0.3
+	if not Forms.segment_clears_all(at + Vector3(-reach, 0.28, 0.0),
+			at + Vector3(reach, 0.28, 0.0), clearances):
+		return
+	if not Forms.segment_clears_all(at + Vector3(0.0, 0.28, -reach),
+			at + Vector3(0.0, 0.28, reach), clearances):
+		return
+
 	var deck := Node3D.new()
 	deck.name = "ServiceDeck%d" % seed_index
 	deck.position = at
@@ -204,6 +268,19 @@ static func _post_cluster(root: Node3D, palette, gap: Vector2, half_x: float,
 		gap.x + 0.4, gap.y - 0.4, "lit_cyan_soft", "ClusterStrip" + suffix)
 
 
+static func _pair_clears(a: Vector3, b: Vector3, low: float, high: float,
+		clearances: Array) -> bool:
+	## Whether both diagonals of one cross-braced bay stay out of every
+	## protected volume.
+	if clearances.is_empty():
+		return true
+	if not Forms.segment_clears_all(
+			a + Vector3(0.0, low, 0.0), b + Vector3(0.0, high, 0.0), clearances):
+		return false
+	return Forms.segment_clears_all(
+			a + Vector3(0.0, high, 0.0), b + Vector3(0.0, low, 0.0), clearances)
+
+
 static func _yoke(root: Node3D, palette, y: float, reach: float,
 		suffix: String) -> void:
 	## Two brackets reaching in from the side masts to take a module, plus a
@@ -221,9 +298,14 @@ static func _yoke(root: Node3D, palette, y: float, reach: float,
 		pad.position = inner + Vector3(0.0, 0.10, 0.0)
 		root.add_child(pad)
 
+		# The tie lands part way along the arm, not on its tip. Run to the
+		# tip it crosses whatever the arm reaches under - over the bowl that
+		# put a chrome rod through the guard wall - and a knee brace at the
+		# span's third is the more believable joint anyway.
 		root.add_child(Forms.mesh_node(
 			Forms.brace(Vector3(mast.x, y + 1.35, mast.z),
-				inner + Vector3(0.0, 0.10, 0.0), 0.045, 6),
+				Vector3(mast.x, y, mast.z).lerp(inner, 0.34)
+					+ Vector3(0.0, 0.08, 0.0), 0.045, 6),
 			palette.get_material("chrome"), "YokeTie%s_%d" % [suffix, side]))
 
 	root.add_child(Forms.mesh_node(
@@ -262,6 +344,79 @@ static func _base(root: Node3D, palette) -> void:
 
 	Forms.bolt_ring(root, palette.get_material("chrome"), 16, radius * 0.70,
 		0.90, 0.075, 0.055)
+
+
+static func _module_ring(root: Node3D, palette, feet: Array,
+		volume: Dictionary) -> void:
+	## What stands in for the diagonals a protected module displaces.
+	##
+	## Dropping the braces across the bowl's bay leaves a two-and-a-half unit
+	## hole in the lattice at exactly the height the eye is drawn to, and a
+	## hole is not a design. The answer is a hoop: a heavy band at the module's
+	## waist, passing outboard of its guard, tying all three masts, with a
+	## gusset down to each. It ties the frame at the same height the diagonals
+	## did, it is stiffer in the plane that matters than a cross ever was, and
+	## it does the composition's work - the module now sits *in* something.
+	##
+	## The band opens toward the camera. A closed ring in front of a bowl is
+	## just a bar across a bowl seen from a different angle, so the arc stops
+	## either side of the hero bearing and the front stays air.
+	var axis := Vector3(float(volume["x"]), 0.0, float(volume["z"]))
+	var radius := INF
+	for foot in feet:
+		radius = minf(radius, Vector3(foot.x - axis.x, 0.0, foot.z - axis.z).length())
+	radius -= 0.13
+	if radius <= float(volume["radius"]) + 0.10:
+		return
+
+	var y := float(volume["bottom"]) + 0.05
+	var ring := Node3D.new()
+	ring.name = "ModuleRing%d" % int(roundf(y * 10.0))
+	ring.position = Vector3(axis.x, y, axis.z)
+	root.add_child(ring)
+
+	# 250 degrees, centred behind the hero bearing of 57 degrees in the ring's
+	# own frame. The 110 degree opening is the wedge the camera looks through.
+	var from_angle := deg_to_rad(112.0)
+	var to_angle := deg_to_rad(362.0)
+
+	ring.add_child(Forms.mesh_node(
+		Forms.arc_hoop(radius, 0.105, from_angle, to_angle, 44, 8),
+		palette.get_material("graphite"), "Band"))
+	var trim := Forms.mesh_node(
+		Forms.arc_hoop(radius, 0.036, from_angle, to_angle, 44, 6),
+		palette.get_material("gold"), "BandTrim", false)
+	trim.position = Vector3(0.0, 0.115, 0.0)
+	ring.add_child(trim)
+	var glow := Forms.mesh_node(
+		Forms.arc_hoop(radius - 0.02, 0.026, from_angle, to_angle, 44, 6),
+		palette.get_material("lit_cyan_soft"), "BandGlow", false)
+	glow.position = Vector3(0.0, -0.115, 0.0)
+	ring.add_child(glow)
+
+	# Two gussets per mast, in the mast's own vertical plane so neither ever
+	# leans in over the module, and a pad where the band lands on it.
+	for index in feet.size():
+		var foot: Vector3 = feet[index]
+		var bearing := atan2(foot.z - axis.z, foot.x - axis.x)
+		if bearing < from_angle - TAU * 0.5:
+			bearing += TAU
+		var knee := Vector3(foot.x - axis.x, 1.62, foot.z - axis.z)
+		for side in 2:
+			var spread: float = deg_to_rad(15.0) * (1.0 if side == 0 else -1.0)
+			var at := Vector3(cos(bearing + spread) * radius, 0.0,
+				sin(bearing + spread) * radius)
+			ring.add_child(Forms.mesh_node(
+				Forms.brace(knee, at, 0.052, 6),
+				palette.get_material("graphite_soft"),
+				"Gusset%d_%d" % [index, side]))
+
+		var pad := Forms.mesh_node(
+			Geometry.rounded_box(Vector3(0.40, 0.22, 0.30), 0.07, 3),
+			palette.get_material("gold"), "BandPad%d" % index, false)
+		pad.position = Vector3(cos(bearing) * radius, 0.0, sin(bearing) * radius)
+		pad.rotation.y = -bearing
+		ring.add_child(pad)
 
 
 static func _ring_deck(root: Node3D, palette, y: float, radius: float,
@@ -348,7 +503,7 @@ static func _ring_deck(root: Node3D, palette, y: float, radius: float,
 # --- variant: tower -------------------------------------------------------
 
 static func _build_tower(root: Node3D, palette, levels: Array,
-		top: float) -> void:
+		top: float, clearances: Array) -> void:
 	var feet := [MAST_RIGHT, MAST_LEFT, MAST_BACK]
 
 	for index in feet.size():
@@ -385,6 +540,11 @@ static func _build_tower(root: Node3D, palette, levels: Array,
 			var pair: Array = pairs[pair_index]
 			var a: Vector3 = feet[int(pair[0])]
 			var b: Vector3 = feet[int(pair[1])]
+			# Both diagonals of a pair stand or fall together. Keeping the one
+			# that happens to miss a protected volume leaves a single leaning
+			# bar in an otherwise cross-braced frame, which reads as damage.
+			if not _pair_clears(a, b, low, high, clearances):
+				continue
 			for cross in 2:
 				root.add_child(Forms.mesh_node(
 					Forms.brace(
@@ -397,7 +557,7 @@ static func _build_tower(root: Node3D, palette, levels: Array,
 	_post_cluster(root, palette, GAP_LOWER, 1.15, -1.35, 0.17, "Low")
 	_post_cluster(root, palette, GAP_UPPER, 1.15, -0.75, 0.15, "High")
 
-	_yoke(root, palette, 10.95, 2.70, "Bowl")
+	_yoke(root, palette, BOWL_YOKE_Y, 2.70, "Bowl")
 	_yoke(root, palette, 14.60, 1.80, "Start")
 
 	_light_strip(root, palette, MAST_RIGHT + Vector3(0.0, 0.0, 0.21), 1.4,
@@ -410,19 +570,19 @@ static func _build_tower(root: Node3D, palette, levels: Array,
 	_ring_deck(root, palette, 13.95, 2.85, 2, "neon_cyan")
 
 	_service_deck(root, palette, MAST_RIGHT + Vector3(-0.85, 6.55, 0.42),
-		1.7, 0, -0.35)
+		1.7, 0, -0.35, clearances)
 	_service_deck(root, palette, MAST_LEFT + Vector3(0.85, 4.10, 0.42),
-		1.7, 1, 0.35)
+		1.7, 1, 0.35, clearances)
 	_service_deck(root, palette, MAST_RIGHT + Vector3(-0.80, 13.25, 0.42),
-		1.4, 2, -0.35)
+		1.4, 2, -0.35, clearances)
 	_service_deck(root, palette, MAST_LEFT + Vector3(0.80, 16.20, 0.42),
-		1.4, 3, 0.35)
+		1.4, 3, 0.35, clearances)
 
 
 # --- variant: deck --------------------------------------------------------
 
 static func _build_deck(root: Node3D, palette, levels: Array,
-		top: float) -> void:
+		top: float, clearances: Array) -> void:
 	## Heavier masts carrying solid back-plates. Calmer, more horizontal.
 	var feet := [
 		MAST_RIGHT + Vector3(0.45, 0.0, 0.0),
@@ -443,22 +603,26 @@ static func _build_deck(root: Node3D, palette, levels: Array,
 		var high := float(edges[index + 1])
 		if high - low < 1.1:
 			continue
+		var panel_z: float = feet[0].z - 0.10
+		if not _pair_clears(Vector3(4.3, 0.0, panel_z),
+				Vector3(-4.3, 0.0, panel_z), low + 0.25, high - 0.25, clearances):
+			continue
 		var panel := Forms.mesh_node(
 			Forms.plate(Vector3(8.6, high - low - 0.5, 0.26), 0.09),
 			palette.get_material("graphite_soft"), "Panel%d" % index)
-		panel.position = Vector3(0.0, (low + high) * 0.5, feet[0].z - 0.10)
+		panel.position = Vector3(0.0, (low + high) * 0.5, panel_z)
 		root.add_child(panel)
 
 		var fascia := Forms.mesh_node(
 			Forms.plate(Vector3(8.7, 0.14, 0.34), 0.05),
 			palette.get_material("gold"), "PanelFascia%d" % index, false)
-		fascia.position = Vector3(0.0, low + 0.34, feet[0].z - 0.10)
+		fascia.position = Vector3(0.0, low + 0.34, panel_z)
 		root.add_child(fascia)
 
 		var glow := Forms.mesh_node(
 			Forms.plate(Vector3(8.2, 0.05, 0.10), 0.02),
 			palette.get_material("lit_cyan_soft"), "PanelGlow%d" % index, false)
-		glow.position = Vector3(0.0, low + 0.22, feet[0].z + 0.06)
+		glow.position = Vector3(0.0, low + 0.22, panel_z + 0.16)
 		root.add_child(glow)
 
 	for index in edges.size():
@@ -467,21 +631,25 @@ static func _build_deck(root: Node3D, palette, levels: Array,
 	_post_cluster(root, palette, GAP_LOWER, 1.45, -1.35, 0.24, "Low")
 	_post_cluster(root, palette, GAP_UPPER, 1.45, -0.75, 0.20, "High")
 
-	_yoke(root, palette, 10.95, 2.90, "Bowl")
+	_yoke(root, palette, BOWL_YOKE_Y, 2.90, "Bowl")
 	_yoke(root, palette, 14.60, 2.00, "Start")
 
 	_ring_deck(root, palette, 6.20, 3.55, 0, "neon_violet")
 	_ring_deck(root, palette, 8.55, 3.55, 1, "neon_cyan")
 	_ring_deck(root, palette, 13.95, 3.05, 2, "neon_cyan")
 
-	_service_deck(root, palette, Vector3(-3.30, 5.10, -1.30), 2.1, 4)
-	_service_deck(root, palette, Vector3(3.30, 12.10, -1.30), 2.1, 5)
+	_service_deck(root, palette, Vector3(-3.30, 5.10, -1.30), 2.1, 4, 0.0,
+		clearances)
+	# 12.10 put this one against the bowl's rim; 9.10 is the same relationship
+	# to the frame one bay lower, where nothing is claiming the air.
+	_service_deck(root, palette, Vector3(3.30, 9.10, -1.30), 2.1, 5, 0.0,
+		clearances)
 
 
 # --- variant: spine -------------------------------------------------------
 
 static func _build_spine(root: Node3D, palette, levels: Array,
-		top: float) -> void:
+		top: float, clearances: Array) -> void:
 	## One mast, two thin outriggers, a cantilever yoke per module.
 	var mast := Forms.mesh_node(
 		Geometry.rounded_box(Vector3(1.55, top - 0.85, 1.35), 0.30, 4),
@@ -514,6 +682,9 @@ static func _build_spine(root: Node3D, palette, levels: Array,
 	# whole point of this variant.
 	for index in levels.size():
 		var y := float(levels[index])
+		if not Forms.segment_clears_all(Vector3(0.0, y - 0.35, -0.40),
+				Vector3(0.0, y + 1.55, -3.30), clearances):
+			continue
 		var arm := Forms.mesh_node(
 			Geometry.rounded_box(Vector3(0.70, 0.40, 3.9), 0.12, 4),
 			palette.get_material("graphite_soft"), "Arm%d" % index)
@@ -531,11 +702,13 @@ static func _build_spine(root: Node3D, palette, levels: Array,
 			palette.get_material("chrome"), "Tie%d" % index))
 
 	_post_cluster(root, palette, GAP_LOWER, 1.00, -1.45, 0.20, "Low")
-	_yoke(root, palette, 10.95, 2.55, "Bowl")
+	_yoke(root, palette, BOWL_YOKE_Y, 2.55, "Bowl")
 	_yoke(root, palette, 14.60, 1.70, "Start")
 
 	_ring_deck(root, palette, 7.10, 3.10, 0, "neon_orange")
 	_ring_deck(root, palette, 13.95, 2.70, 2, "neon_cyan")
 
-	_service_deck(root, palette, Vector3(0.0, 7.00, -3.20), 1.9, 2)
-	_service_deck(root, palette, Vector3(0.0, 13.60, -3.20), 1.6, 3)
+	_service_deck(root, palette, Vector3(0.0, 7.00, -3.20), 1.9, 2, 0.0,
+		clearances)
+	_service_deck(root, palette, Vector3(0.0, 13.60, -3.20), 1.6, 3, 0.0,
+		clearances)

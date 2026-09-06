@@ -45,16 +45,24 @@ static func path_for(controls: Array) -> Array:
 
 
 static func build(palette, controls: Array, node_name := "SCurve",
-		accent := "neon_cyan") -> Node3D:
+		accent := "neon_cyan", mounts: Dictionary = {}) -> Node3D:
+	## `mounts` is what the chute is told about the machine around it:
+	##
+	##     "anchors"  uprights a bracket may reach to, from `Tower.anchors`
+	##     "clear"    protected volumes nothing of this chute may enter
+	##
+	## Both are optional and both default to the module's old behaviour, so a
+	## chute in open air still builds exactly as it did.
 	var root := Node3D.new()
 	root.name = node_name
 	var path := path_for(controls)
+	var volumes: Array = mounts.get("clear", [])
 
 	_channel(root, palette, path)
-	_understructure(root, palette, path)
+	_understructure(root, palette, path, volumes)
 	_guards(root, palette, path)
 	_neon(root, palette, path, accent)
-	_supports(root, palette, path)
+	_supports(root, palette, path, mounts.get("anchors", []), volumes)
 
 	return root
 
@@ -81,25 +89,60 @@ static func _channel(root: Node3D, palette, path: Array) -> void:
 			palette.get_material("pearl_lip"), "TopLip%d" % side, false))
 
 
-static func _understructure(root: Node3D, palette, path: Array) -> void:
+static func _understructure(root: Node3D, palette, path: Array,
+		volumes: Array) -> void:
 	## Warm fascia over dark keel: the 1:5 structure-to-track value split the
 	## concept builds every one of its beams from.
+	##
+	## The spine stops short of any protected volume. A chute that ends over a
+	## bowl hangs two thirds of a unit of dark structure below its running
+	## line, and that is precisely the depth the bowl's mouth occupies: the
+	## first hero frame had the feed chute's keel driven into the dish like a
+	## bar. Trimming it and cantilevering the last stretch is what a moulded
+	## delivery lip does anyway, and the cut end gets a nose so it reads as
+	## finished rather than broken off.
+	var spine := Forms.longest_clear_run(path, 0.18, 0.70, volumes)
+	if spine.size() < 4:
+		spine = path
+
 	var fascia_section: Array = Geometry.beam_section(HALF_WIDTH - 0.05, 0.20, 0.06, 3)
 	root.add_child(Forms.mesh_node(
-		Geometry.sweep(Forms.offset_path(path, 0.0, -0.28),
+		Geometry.sweep(Forms.offset_path(spine, 0.0, -0.28),
 			fascia_section[0], fascia_section[1], true),
 		palette.get_material("gold"), "Fascia", false))
 
 	var keel_section: Array = Geometry.beam_section(HALF_WIDTH - 0.19, 0.30, 0.09, 3)
 	root.add_child(Forms.mesh_node(
-		Geometry.sweep(Forms.offset_path(path, 0.0, -0.53),
+		Geometry.sweep(Forms.offset_path(spine, 0.0, -0.53),
 			keel_section[0], keel_section[1], true),
 		palette.get_material("graphite_deep"), "Keel"))
 
 	# The underlight, tucked in the shadow between fascia and keel.
 	root.add_child(Forms.mesh_node(
-		Geometry.tube(Forms.offset_path(path, 0.0, -0.41), 0.030, 6),
+		Geometry.tube(Forms.offset_path(spine, 0.0, -0.41), 0.030, 6),
 		palette.get_material("lit_cyan_soft"), "UnderLight", false))
+
+	if spine.size() < path.size():
+		_noses(root, palette, path, spine)
+
+
+static func _noses(root: Node3D, palette, path: Array, spine: Array) -> void:
+	## A cap on each end the spine was cut back to.
+	for which in 2:
+		var edge: Vector3 = spine[0] if which == 0 else spine[spine.size() - 1]
+		if edge.is_equal_approx(path[0]) or edge.is_equal_approx(
+				path[path.size() - 1]):
+			continue
+		var cap := Forms.mesh_node(
+			Geometry.rounded_box(Vector3(HALF_WIDTH * 1.5, 0.30, 0.26), 0.09, 3),
+			palette.get_material("silver_deep"), "SpineNose%d" % which)
+		cap.position = edge + Vector3(0.0, -0.38, 0.0)
+		root.add_child(cap)
+
+		var boss := Forms.mesh_node(Forms.collar(0.17, 0.11),
+			palette.get_material("gold"), "SpineNoseBoss%d" % which, false)
+		boss.position = edge + Vector3(0.0, -0.24, 0.0)
+		root.add_child(boss)
 
 
 static func _guards(root: Node3D, palette, path: Array) -> void:
@@ -164,24 +207,76 @@ static func _neon(root: Node3D, palette, path: Array, accent: String) -> void:
 			palette.get_material(accent), "Neon%d" % side, false))
 
 
-static func _supports(root: Node3D, palette, path: Array) -> void:
+static func _supports(root: Node3D, palette, path: Array, anchors: Array,
+		volumes: Array) -> void:
 	## Where the track is held. Three brackets, each a collar, a leg and a tie.
+	##
+	## The leg reaches *outward*, to the nearest upright the frame published,
+	## and not inward toward the machine's axis. The old inward rule aimed
+	## every leg at a point in the middle of the air - there is no column on
+	## the axis of this machine, the frame stands behind the run - and where
+	## the chute happened to pass over a module the leg simply landed in it.
+	## Two of the feed chute's three brackets ended inside the bowl.
+	##
+	## A bracket that still cannot be built without entering a protected
+	## volume is dropped rather than moved somewhere it does not belong. Three
+	## is the number that looks right, not a number the module owes anyone.
 	var count := 3
 	for index in count:
 		var t := (float(index) + 0.6) / float(count + 0.4)
 		var at := Forms.sample_at(path, t)
-		var anchor := Vector3(at.x * 0.14, at.y - 2.15, at.z * 0.14 - 0.55)
+		var anchor := _bracket_foot(at, anchors, volumes)
+		var head := at + Vector3(0.0, -0.55, 0.0)
+		# The collar has a body of its own. Testing only the leg lets a
+		# bracket whose leg rises clear of a volume still hang its fitting
+		# four centimetres into one.
+		if not Forms.segment_clears_all(head + Vector3(0.0, 0.17, 0.0),
+				head - Vector3(0.0, 0.17, 0.0), volumes):
+			continue
+		if not Forms.segment_clears_all(head, anchor, volumes):
+			continue
 
 		var collar := Forms.mesh_node(Forms.collar(0.30, 0.16),
 			palette.get_material("gold"), "SupportCollar%d" % index, false)
-		collar.position = at + Vector3(0.0, -0.55, 0.0)
+		collar.position = head
 		root.add_child(collar)
 
 		root.add_child(Forms.mesh_node(
-			Forms.brace(at + Vector3(0.0, -0.55, 0.0), anchor, 0.075, 8),
+			Forms.brace(head, anchor, 0.075, 8),
 			palette.get_material("graphite"), "SupportLeg%d" % index))
 
+		var tie_end := anchor.lerp(at, 0.30) + Vector3(0.0, 0.55, 0.0)
+		if not Forms.segment_clears_all(
+				at + Vector3(0.0, -0.30, 0.0), tie_end, volumes):
+			continue
 		root.add_child(Forms.mesh_node(
-			Forms.brace(at + Vector3(0.0, -0.30, 0.0),
-				anchor.lerp(at, 0.30) + Vector3(0.0, 0.55, 0.0), 0.038, 6),
+			Forms.brace(at + Vector3(0.0, -0.30, 0.0), tie_end, 0.038, 6),
 			palette.get_material("chrome"), "SupportTie%d" % index))
+
+
+static func _bracket_foot(at: Vector3, anchors: Array,
+		volumes: Array) -> Vector3:
+	## Where one bracket's leg lands.
+	##
+	## Four fifths of the way to the nearest published upright, dropped a
+	## fixed reach - and then lifted back up if that drop would have ended the
+	## leg inside a protected volume. Shortening a bracket keeps it; only a
+	## bracket that cannot clear the volume at any length is abandoned.
+	if anchors.is_empty():
+		return Vector3(at.x * 0.14, at.y - 2.15, at.z * 0.14 - 0.55)
+
+	var best: Vector3 = anchors[0]
+	var closest := INF
+	for candidate in anchors:
+		var distance := Vector2(at.x - candidate.x,
+			at.z - candidate.z).length_squared()
+		if distance < closest:
+			closest = distance
+			best = candidate
+
+	var foot := Vector3(lerpf(at.x, best.x, 0.80), at.y - 1.55,
+		lerpf(at.z, best.z, 0.80))
+	var ceiling := Forms.ceiling_above(foot, volumes)
+	if ceiling > foot.y:
+		foot.y = minf(ceiling + 0.30, at.y - 0.35)
+	return foot

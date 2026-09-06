@@ -44,10 +44,35 @@ const DRAIN_RADIUS := 0.56
 const SHELL := 0.19
 const RIM_OUTER := 2.98
 
+# The action volume: the air the bowl has to be seen through.
+#
+# Wide enough to hold the guard at its flare (3.20) with a working margin,
+# floored just under the rim's top face so the bowl's own flank still hides
+# the cradle and the yoke that carry it, and capped over the *tallest*
+# variant's guard - the volume is claimed before a palette exists, so it is
+# claimed for the worst case. Nothing decorative belongs inside it, and
+# `Forms.clearance` is how the frame and the chutes are told so.
+const GUARD_HEIGHT := 1.42
+const ACTION_RADIUS := 3.45
+const ACTION_FLOOR := -0.20
+const ACTION_CEILING := GUARD_HEIGHT + 0.03
+
 
 static func drain_local() -> Vector3:
 	## Where the track picks up: the centre of the aperture, at its underside.
 	return Vector3(0.0, -DEPTH - SHELL, 0.0)
+
+
+static func action_clearance(at: Vector3) -> Dictionary:
+	## The volume the frame must route around, for a bowl placed at `at`.
+	##
+	## Declared by the module rather than by the scene because the numbers it
+	## is derived from - the guard's flare, the rim's top face - live here and
+	## a copy in the scene would be a copy that drifts. The first hero frame
+	## had a brace across the dish and a chute bracket landing in it, and both
+	## were placed by builders that had no way to ask this question.
+	return Forms.clearance(at, ACTION_RADIUS, at.y + ACTION_FLOOR,
+		at.y + ACTION_CEILING, "HeroBowl")
 
 
 static func build(palette) -> Node3D:
@@ -164,7 +189,7 @@ static func _rim_hardware(root: Node3D, palette) -> void:
 
 static func _guard(root: Node3D, palette) -> void:
 	## The aqua acrylic wall, standing outboard of the rim on its shoulder.
-	var height: float = 1.42
+	var height: float = GUARD_HEIGHT
 	match palette.variant:
 		"deck":
 			height = 1.00

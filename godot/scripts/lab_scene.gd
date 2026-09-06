@@ -32,6 +32,19 @@ extends Node3D
 ## single S reads as a squiggle, and two curves mirroring each other around a
 ## central bowl read as a machine with a plan.
 ##
+## ## Protected volumes
+##
+## The bowl declares the air it needs to be seen through, and the frame and
+## the chutes are handed that declaration before they place anything. It is
+## the answer to the first hero frame's worst fault: four separate builders -
+## the tower's cross-bracing, the feed chute's brackets, the chute's own dark
+## keel, and a yoke tie - each put a member across the mouth of the bowl, and
+## every one of them was correct by its own local rule. None of them had any
+## way to ask whether the shot could spare the pixels.
+##
+## `--lab-audit=1` prints what is standing in a claimed volume, so the rule is
+## checkable without a render and without switching parts off one at a time.
+##
 ## ## What the camera is for
 ##
 ## `--lab-shot` selects a lens. The hero shot frames the whole run at a fixed
@@ -117,6 +130,7 @@ var _no_glow := false
 var _feed_path: Array = []
 var _s_path: Array = []
 var _travellers: Array = []
+var _clearances: Array = []
 var _orbit := 0.0
 
 
@@ -135,6 +149,8 @@ func _ready() -> void:
 	_build_lights()
 	_build_machine()
 	_build_camera()
+	if str(options.get("lab-audit", "")) != "":
+		audit_clearances()
 	set_time(0.0)
 
 
@@ -316,7 +332,15 @@ func _build_machine() -> void:
 	machine.name = "Machine"
 	add_child(machine)
 
-	machine.add_child(Tower.build(_palette, LEVELS, TOWER_TOP))
+	# What the frame and the chutes must route around. The bowl is the only
+	# module that claims a volume, and it claims it because it is the only one
+	# the camera looks *into*: a chute is read from the side and a collector
+	# from above, but a bowl with a bar across its mouth is a bowl the shot
+	# cannot use. See `HeroBowl.action_clearance`.
+	_clearances = [HeroBowl.action_clearance(Vector3(0.0, BOWL_Y, 0.0))]
+	var mounts := {"anchors": Tower.anchors(_palette), "clear": _clearances}
+
+	machine.add_child(Tower.build(_palette, LEVELS, TOWER_TOP, _clearances))
 
 	var collector := Collector.build(_palette)
 	collector.position = Vector3(0.0, COLLECTOR_Y, 0.0)
@@ -334,8 +358,10 @@ func _build_machine() -> void:
 
 	_feed_path = SCurve.path_for(FEED_CONTROLS)
 	_s_path = SCurve.path_for(S_CONTROLS)
-	machine.add_child(SCurve.build(_palette, FEED_CONTROLS, "FeedChute", "neon_cyan"))
-	machine.add_child(SCurve.build(_palette, S_CONTROLS, "SCurve", "neon_violet"))
+	machine.add_child(SCurve.build(
+		_palette, FEED_CONTROLS, "FeedChute", "neon_cyan", mounts))
+	machine.add_child(SCurve.build(
+		_palette, S_CONTROLS, "SCurve", "neon_violet", mounts))
 
 	_build_marbles(machine, platform)
 
@@ -459,6 +485,102 @@ func set_time(seconds: float) -> void:
 
 	_orbit = sin(seconds * 0.42) * 5.0
 	_place_camera(_orbit)
+
+
+# --- the sightline rule ---------------------------------------------------
+
+func audit_clearances() -> int:
+	## Name every mesh standing in a volume a module claimed, and count them.
+	##
+	## The rule this enforces - "structure frames the bowl, it does not cross
+	## it" - is the kind that is obvious in a render and invisible in a diff.
+	## Four separate builders put geometry into the bowl's mouth in the first
+	## hero frame, and finding out which took a dozen renders with parts
+	## switched off. Asking the scene is faster and it does not depend on
+	## anyone remembering to look.
+	##
+	## The test is deliberately crude: a mesh's world axis-aligned box against
+	## the volume, so a member that merely passes near is reported too. A
+	## false positive costs a glance; a false negative costs a hero frame.
+	var found := 0
+	for volume in _clearances:
+		found += _audit_volume(self, volume, "")
+	print("clearance audit: %d intrusions" % found)
+	return found
+
+
+# The module that claims a volume may stand in it, and so may the racers -
+# they are what the volume is protected *for*. The backdrop is sixty units
+# away and only shares a footprint by accident of a cylinder being infinite
+# in neither direction.
+const AUDIT_EXEMPT := ["Field", "Backdrop"]
+
+
+func _audit_volume(node: Node, volume: Dictionary, module: String) -> int:
+	var found := 0
+	for child in node.get_children():
+		# `Machine` is a grouping node, not a module, so it is transparent to
+		# the label - otherwise every part in the machine is attributed to it
+		# and the owner exemption can never match anything.
+		var owner_name := module
+		if owner_name == "":
+			owner_name = str(child.name)
+		if owner_name == "Machine":
+			owner_name = ""
+		if owner_name != "" and (owner_name in AUDIT_EXEMPT
+				or owner_name == str(volume.get("owner", ""))):
+			continue
+		if child is MeshInstance3D:
+			var mesh := child as MeshInstance3D
+			var inside := _mesh_enters(mesh, volume)
+			if inside > 0:
+				found += 1
+				var box: AABB = mesh.global_transform * mesh.get_aabb()
+				print("  intrusion %s / %s  %d verts  x[%.2f %.2f] y[%.2f %.2f] z[%.2f %.2f]"
+					% [owner_name, mesh.name, inside, box.position.x, box.end.x,
+						box.position.y, box.end.y, box.position.z, box.end.z])
+		found += _audit_volume(child, volume, owner_name)
+	return found
+
+
+func _mesh_enters(mesh: MeshInstance3D, volume: Dictionary) -> int:
+	## How many of a mesh's vertices are inside the volume.
+	##
+	## Vertices and not the bounding box. Almost every part of this machine is
+	## a ring, an arc or a long diagonal, and the box of a ring centred on the
+	## bowl contains the bowl - an audit that reported the frame's own halo as
+	## an intrusion every run is an audit nobody would read twice.
+	##
+	## The box is still the first question asked, because it rejects the
+	## thousand parts that are nowhere near in one test each.
+	var box: AABB = mesh.global_transform * mesh.get_aabb()
+	if box.end.y < float(volume["bottom"]) or box.position.y > float(volume["top"]):
+		return 0
+	var axis := Vector2(float(volume["x"]), float(volume["z"]))
+	var near := Vector2(
+		clampf(axis.x, box.position.x, box.end.x),
+		clampf(axis.y, box.position.z, box.end.z))
+	if near.distance_to(axis) >= float(volume["radius"]):
+		return 0
+
+	var data := mesh.mesh
+	if data == null:
+		return 0
+	var inside := 0
+	var to_world := mesh.global_transform
+	for surface in data.get_surface_count():
+		var arrays := data.surface_get_arrays(surface)
+		if arrays.size() <= Mesh.ARRAY_VERTEX:
+			continue
+		var points: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+		for point in points:
+			if not Forms.point_clears(to_world * point, volume):
+				inside += 1
+	return inside
+
+
+func clearances() -> Array:
+	return _clearances.duplicate()
 
 
 func shot_names() -> Array:

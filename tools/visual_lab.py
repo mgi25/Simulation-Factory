@@ -16,6 +16,7 @@ Typical use::
     python tools/visual_lab.py lenses        # the five-way field-of-view sweep
     python tools/visual_lab.py compare       # reference | hero comparison
     python tools/visual_lab.py motion        # the short clip
+    python tools/visual_lab.py audit         # sightline check, every variant
     python tools/visual_lab.py all
 """
 
@@ -317,6 +318,38 @@ def task_compare() -> None:
         title="")
 
 
+def task_audit(godot: str) -> None:
+    """Fail if anything is standing in a module's protected volume.
+
+    The sightline rule - structure frames the bowl, it does not cross it - is
+    obvious in a render and invisible in a diff, and it is broken by builders
+    that each look correct on their own. The scene knows the answer, so ask it
+    rather than rendering three variants and squinting.
+    """
+    out = os.path.join(OUT_MEDIA, "audit")
+    os.makedirs(out, exist_ok=True)
+    failures = []
+    for variant in VARIANTS:
+        command = [
+            godot, "--path", GODOT_PROJECT, RENDER_SCENE, "--",
+            f"--out-dir={os.path.abspath(out)}",
+            "--shots=hero", "--width=320", "--height=568",
+            f"--lab-variant={variant}", "--lab-audit=1",
+        ]
+        result = subprocess.run(command, cwd=REPO, capture_output=True,
+                                text=True, encoding="utf-8", errors="replace")
+        report = [line for line in (result.stdout or "").splitlines()
+                  if "intrusion" in line or "clearance audit" in line]
+        print(f"  {variant}:")
+        for line in report:
+            print(f"    {line.strip()}")
+        if not any(line.strip().endswith("0 intrusions") for line in report):
+            failures.append(variant)
+    if failures:
+        raise LabError(
+            "structure crosses a protected volume in: " + ", ".join(failures))
+
+
 def task_motion(godot: str, variant: str) -> None:
     frames = os.path.join(OUT_MEDIA, "frames")
     render_clip(godot, frames, variant, "hero")
@@ -328,7 +361,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "task",
         choices=["hero", "variants", "lenses", "product", "control", "compare",
-                 "motion", "all"],
+                 "motion", "audit", "all"],
         help="what to render")
     parser.add_argument("--godot", default=None, help="path to the Godot 4 binary")
     parser.add_argument("--variant", default="tower", choices=list(VARIANTS),
@@ -351,6 +384,8 @@ def main(argv: list[str] | None = None) -> int:
             task_product(godot, arguments.variant)
         if arguments.task in ("control", "all"):
             task_control(godot, arguments.variant)
+        if arguments.task in ("audit", "all"):
+            task_audit(godot)
         if arguments.task in ("compare", "all"):
             task_compare()
         if arguments.task in ("motion", "all"):

@@ -24,6 +24,8 @@ extends Node
 ##     --lab-variant=NAME     tower | deck | spine
 ##     --lab-shot=NAME        the lens for a clip
 ##     --lab-no-glow=1        bloom off, for the control frame
+##     --lab-audit=1          list every part standing in a module's
+##                            protected volume, then render as normal
 
 const LabScene := preload("res://scripts/lab_scene.gd")
 
