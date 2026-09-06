@@ -48,6 +48,49 @@ const POD_DEPTH := 2.44
 const POD_HEIGHT := 1.05
 const GATE_Z := 1.16
 
+# --- V2.1 shuffle deck ----------------------------------------------------
+#
+# The fairness fix. Eight bays on a straight line feeding one chute means the
+# bay a racer starts in decides where it sits in the stream, and on a chute
+# that curves, the inside lane is simply shorter. That is a positional
+# advantage that survives the whole first transition, which the course rules
+# forbid.
+#
+# A deflector field destroys lane identity outright. Four staggered rows of
+# pins, each gap wider than a marble and each pin narrower than the gap it
+# splits, so a racer arriving in any bay leaves the deck at a lateral position
+# uncorrelated with the one it started at. It is the classic answer because it
+# is the *provable* one - no path through the field is shorter than another by
+# construction, and the outcome does not depend on tuning a curve.
+#
+# It is also the right answer visually. The brief wants the start advantage
+# broken by the first obstacle, and an obstacle you can see is worth more than
+# a geometric trick you cannot: a wide chrome-pinned apron under the pod reads
+# instantly as "the order gets scrambled here".
+#
+# The deck is wider than the pod on purpose. Pin pitch has to clear a marble
+# in every gap including the two against the walls, and the arithmetic - six
+# pins at 0.90 pitch, outermost at 2.25, plus a 0.10 pin radius - puts the
+# wall at 2.95 if the edge gap is to stay above the 0.57 marble diameter. The
+# step it puts in the silhouette under the pod is a bonus.
+const DECK_HALF := 2.95
+const DECK_ENTRY_Z := 1.40
+const DECK_EXIT_Z := 3.45
+const DECK_ENTRY_Y := -0.34
+const DECK_EXIT_Y := -1.22
+const PIN_PITCH := 0.90
+const PIN_RADIUS := 0.115
+const PIN_HEIGHT := 0.30
+const PIN_ROWS := 4
+# The mouth the deck actually hands over to. The pin field has to be full
+# width for its gaps to clear a marble, but the chute below it is the hero
+# section plus its entry flare - about 3.6 across - so the last stretch of the
+# deck converges. The taper sits *after* every pin row, so it costs nothing in
+# fairness: by the time a racer reaches it, its lateral position no longer has
+# anything to do with the bay it left.
+const DECK_MOUTH_HALF := 1.72
+const DECK_TAPER := 0.92
+
 
 static func bay_x(index: int) -> float:
 	## The centreline of one bay, in pod-local X.
@@ -353,42 +396,173 @@ static func _chassis(root: Node3D, palette) -> void:
 		palette.get_material("lit_cyan_line"), "SeamLight", false))
 
 
-static func build_sill(palette) -> Node3D:
-	## The handover at the front of the pod: a gold sill and three lane ribs.
+static func deck_floor_y(z: float) -> float:
+	## The deck's sloping floor at a given pod-local z.
+	var t: float = clampf((z - DECK_ENTRY_Z) / (DECK_EXIT_Z - DECK_ENTRY_Z),
+		0.0, 1.0)
+	return lerpf(DECK_ENTRY_Y, DECK_EXIT_Y, t)
+
+
+static func deck_exit_local() -> Vector3:
+	## Where the deck hands over to the feed chute, in pod-local space.
+	return Vector3(0.0, DECK_EXIT_Y + 0.02, DECK_EXIT_Z)
+
+
+static func pin_positions() -> Array:
+	## Every deflector, in pod-local space.
 	##
-	## What used to be here was a separate funnel - a wide moulded fan that
-	## narrowed to a throat. It was the right idea and the wrong part: seen
-	## from any hero angle it was a large white triangle, and a shape with no
-	## length reads as a skirt rather than as a chute.
-	##
-	## The transition is now made by the *track* instead. `FEED_CONTROLS`
-	## starts at the pod's lip with a large entry flare, so the signature
-	## channel itself opens to the full width of the tray and closes to single
-	## file within a couple of units. One component, one material language,
-	## and the same rolled lip running all the way from the start line to the
-	## bowl. All that is left here is the sill it pours over.
+	## Rows alternate five and six pins at half a pitch of offset, which is
+	## what makes a gap in one row sit behind a pin in the next - the whole
+	## mechanism. Placement is arithmetic on the row index, so two renders of
+	## this deck are identical and a physics pass can rebuild the field from
+	## the same four numbers rather than from a list.
+	var out: Array = []
+	for row in PIN_ROWS:
+		var z: float = lerpf(DECK_ENTRY_Z + 0.52, DECK_EXIT_Z - 0.42,
+			float(row) / float(PIN_ROWS - 1))
+		var offset := row % 2 == 1
+		var count := 6 if offset else 5
+		for index in count:
+			var centre: float = (float(index) - float(count - 1) * 0.5) * PIN_PITCH
+			out.append(Vector3(centre, deck_floor_y(z), z))
+	return out
+
+
+static func build_shuffle(palette) -> Node3D:
+	## The deflector deck: the first obstacle, and the one that makes the
+	## start fair.
 	var root := Node3D.new()
-	root.name = "Sill"
+	root.name = "ShuffleDeck"
 
-	var band := Forms.mesh_node(
-		Geometry.rounded_box(Vector3(BAY_PITCH * float(BAYS) + 0.26, 0.16, 0.30),
-			0.06, 3),
-		palette.get_material("gold"), "Band")
-	band.position = Vector3(0.0, -0.14, POD_DEPTH * 0.5 + 0.16)
-	root.add_child(band)
+	var mid_z := (DECK_ENTRY_Z + DECK_EXIT_Z) * 0.5
+	var mid_y := (DECK_ENTRY_Y + DECK_EXIT_Y) * 0.5
+	var length := DECK_EXIT_Z - DECK_ENTRY_Z
+	var drop := DECK_ENTRY_Y - DECK_EXIT_Y
+	var tilt := atan2(drop, length)
+	var run := sqrt(length * length + drop * drop)
 
-	var apron := Forms.mesh_node(
-		Geometry.rounded_box(Vector3(BAY_PITCH * float(BAYS) + 0.10, 0.20, 0.62),
-			0.09, 3),
-		palette.get_material("pearl_shade"), "Apron")
-	apron.position = Vector3(0.0, -0.30, POD_DEPTH * 0.5 + 0.38)
-	root.add_child(apron)
+	# The tray: one moulded pearl pan, tilted, with a shaded underside.
+	var pan := Forms.mesh_node(
+		Geometry.rounded_box(Vector3(DECK_HALF * 2.0, 0.24, run + 0.30),
+			0.11, 4),
+		palette.get_material("pearl_shell"), "Pan")
+	pan.position = Vector3(0.0, mid_y - 0.13, mid_z)
+	pan.rotation.x = tilt
+	root.add_child(pan)
 
-	for index in [2, 4, 6]:
-		var x: float = (float(index) - float(BAYS) * 0.5) * BAY_PITCH
+	# A recessed floor inset into the pan, several stops under the pearl.
+	#
+	# Without it the deck is six units of unbroken top-value white right under
+	# a pod made of the same thing, and forty chrome pins standing on white
+	# have nothing to be read against. The bay tray gets away with a light
+	# silver because it is small; a surface this size needs the darker one.
+	# Offset along the pan's own normal, not straight up: the pan is tilted
+	# twenty-six degrees, so a vertical offset puts the inset barely proud at
+	# the middle and inside the pan at the ends.
+	var deck_up := Vector3(0.0, cos(tilt), sin(tilt))
+	var floor_inset := Forms.mesh_node(
+		Geometry.rounded_box(Vector3(DECK_HALF * 1.92, 0.14, run - 0.06),
+			0.05, 3),
+		palette.get_material("graphite_soft"), "Deck", false)
+	floor_inset.position = pan.position + deck_up * 0.15
+	floor_inset.rotation.x = tilt
+	root.add_child(floor_inset)
+
+	var under = Forms.mesh_node(
+		Geometry.rounded_box(Vector3(DECK_HALF * 1.72, 0.30, run - 0.20),
+			0.13, 4),
+		palette.get_material("graphite"), "PanUnder")
+	under.position = Vector3(0.0, mid_y - 0.40, mid_z - 0.04)
+	under.rotation.x = tilt
+	root.add_child(under)
+
+	# Side walls, and a lit line sunk along the inside of each.
+	for side in [1.0, -1.0]:
+		var suffix := "R" if side > 0.0 else "L"
+		var wall := Forms.mesh_node(
+			Geometry.rounded_box(Vector3(0.20, 0.46, run + 0.28), 0.08, 3),
+			palette.get_material("silver"), "Wall%s" % suffix)
+		wall.position = Vector3(side * DECK_HALF, mid_y + 0.12, mid_z)
+		wall.rotation.x = tilt
+		root.add_child(wall)
+
 		root.add_child(Forms.mesh_node(
 			Geometry.tube([
-				Vector3(x, -0.16, POD_DEPTH * 0.5 + 0.10),
-				Vector3(x * 0.86, -0.24, POD_DEPTH * 0.5 + 0.66)], 0.05, 8),
-			palette.get_material("silver"), "LaneRib%d" % index, false))
+				Vector3(side * (DECK_HALF - 0.13), DECK_ENTRY_Y + 0.20,
+					DECK_ENTRY_Z),
+				Vector3(side * (DECK_HALF - 0.13), DECK_EXIT_Y + 0.20,
+					DECK_EXIT_Z)], 0.045, 8),
+			palette.get_material("lit_cyan_line"), "DeckLight%s" % suffix,
+			false))
+
+	# The pins: chrome capsules, fully rounded top and bottom.
+	#
+	# The fillet is the pin's whole radius, so there is no cylindrical waist
+	# and no flat top. Anything less rounded reads as a canister rather than
+	# as a deflector, and a separate cap on top - tried at two sizes - reads
+	# as the rim of one. A marble has to glance off these, and a shape that
+	# looks like it would glance is worth more than a shape with hardware on
+	# it. The gold in this module lives on the sill and the exit lip instead.
+	var post := Geometry.rounded_disc(PIN_RADIUS, PIN_HEIGHT,
+		PIN_RADIUS * 0.99, 16, 5)
+	var pins := Node3D.new()
+	pins.name = "Pins"
+	root.add_child(pins)
+	var index := 0
+	for at in pin_positions():
+		var place: Vector3 = at
+		var pin := Forms.mesh_node(post, palette.get_material("chrome"),
+			"Pin%d" % index)
+		pin.position = place + Vector3(0.0, PIN_HEIGHT * 0.5 - 0.02, 0.0)
+		pins.add_child(pin)
+		index += 1
+
+	# The entry sill the tray pours over, and the exit lip it pours off.
+	var sill := Forms.mesh_node(
+		Geometry.rounded_box(Vector3(BAY_PITCH * float(BAYS) + 0.26, 0.16, 0.30),
+			0.06, 3),
+		palette.get_material("gold"), "Sill")
+	sill.position = Vector3(0.0, DECK_ENTRY_Y + 0.04, DECK_ENTRY_Z - 0.10)
+	root.add_child(sill)
+
+	# The converging vanes, and a lip sized to the mouth they make.
+	for side in [1.0, -1.0]:
+		var suffix := "R" if side > 0.0 else "L"
+		var from := Vector3(side * (DECK_HALF - 0.10), 0.0,
+			DECK_EXIT_Z - DECK_TAPER)
+		var to := Vector3(side * DECK_MOUTH_HALF, 0.0, DECK_EXIT_Z)
+		var span := to - from
+		var vane := Forms.mesh_node(
+			Geometry.rounded_box(Vector3(0.18, 0.52, span.length() + 0.10),
+				0.07, 3),
+			palette.get_material("pearl_lip_v2"), "Vane%s" % suffix)
+		vane.position = Vector3((from.x + to.x) * 0.5,
+			deck_floor_y((from.z + to.z) * 0.5) + 0.16, (from.z + to.z) * 0.5)
+		vane.rotation.y = atan2(span.x, span.z)
+		root.add_child(vane)
+
+		root.add_child(Forms.mesh_node(
+			Geometry.tube([
+				from + Vector3(0.0, deck_floor_y(from.z) + 0.40, 0.0),
+				to + Vector3(0.0, deck_floor_y(to.z) + 0.40, 0.0)], 0.04, 8),
+			palette.get_material("lit_cyan_line"), "VaneLight%s" % suffix,
+			false))
+
+	var lip := Forms.mesh_node(
+		Geometry.rounded_box(Vector3(DECK_MOUTH_HALF * 2.16, 0.18, 0.34),
+			0.07, 3),
+		palette.get_material("gold"), "ExitLip")
+	lip.position = Vector3(0.0, DECK_EXIT_Y + 0.06, DECK_EXIT_Z + 0.02)
+	root.add_child(lip)
+
+	# Two brackets carrying the deck off the pod's chassis.
+	for side in [1.0, -1.0]:
+		var stay := Forms.mesh_node(
+			Geometry.tube([
+				Vector3(side * (DECK_HALF - 0.60), -1.55, DECK_ENTRY_Z + 0.30),
+				Vector3(side * (DECK_HALF - 0.30), DECK_EXIT_Y - 0.26,
+					DECK_EXIT_Z - 0.20)], 0.075, 8),
+			palette.get_material("graphite"),
+			"DeckStay%s" % ("R" if side > 0.0 else "L"))
+		root.add_child(stay)
 	return root

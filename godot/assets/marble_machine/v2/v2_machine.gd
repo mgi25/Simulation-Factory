@@ -13,7 +13,8 @@ extends RefCounted
 ## ## The layout, and the reason for the two-chute plan
 ##
 ##     19.80  START POD        eight bays, sign, gate, chassis
-##              │  funnel, then the feed chute swinging LEFT
+##              │  SHUFFLE DECK  four rows of deflector pins
+##              │  then the feed chute swinging LEFT
 ##     12.60  BOWL             dish, rim, acrylic shell, cradle
 ##              │  the S, swinging RIGHT then hooking back LEFT
 ##      1.95   exit, still descending
@@ -52,29 +53,30 @@ const PANEL_LEVELS := [3.0, 7.4, 11.6, 15.8, 19.4]
 
 # The feed chute: the funnel throat, out to the left, back over the bowl rim.
 const FEED_CONTROLS := [
-	Vector3(0.15, 19.20, 1.80),
-	Vector3(-1.10, 18.50, 2.60),
-	Vector3(-2.40, 17.30, 2.70),
-	Vector3(-3.00, 15.90, 1.85),
-	Vector3(-2.85, 14.55, 0.65),
-	Vector3(-2.00, 13.55, 0.00),
+	Vector3(0.62, 18.42, 3.55),
+	Vector3(-0.35, 18.05, 4.10),
+	Vector3(-2.05, 17.20, 4.00),
+	Vector3(-3.05, 16.00, 3.05),
+	Vector3(-3.25, 14.80, 1.75),
+	Vector3(-2.80, 14.15, 0.80),
+	Vector3(-2.30, 13.85, 0.25),
 ]
 
 # The S: bowl drain, out to the right, down, and hooking back left.
 const S_CONTROLS := [
 	Vector3(0.00, 11.44, 0.10),
-	Vector3(1.20, 10.90, 1.25),
-	Vector3(2.55, 10.05, 1.70),
-	Vector3(2.95, 8.90, 0.80),
-	Vector3(2.35, 7.85, -0.50),
-	Vector3(0.90, 7.15, -1.15),
-	Vector3(-0.90, 6.65, -0.90),
-	Vector3(-2.20, 5.95, 0.15),
-	Vector3(-2.70, 4.95, 1.45),
-	Vector3(-2.20, 3.95, 2.45),
-	Vector3(-0.75, 3.25, 2.80),
-	Vector3(0.95, 2.65, 2.35),
-	Vector3(2.05, 2.10, 1.30),
+	Vector3(1.10, 10.90, 1.15),
+	Vector3(2.30, 10.05, 1.55),
+	Vector3(2.65, 8.90, 0.70),
+	Vector3(2.15, 7.85, -0.45),
+	Vector3(0.85, 7.15, -1.05),
+	Vector3(-0.85, 6.65, -0.85),
+	Vector3(-2.00, 5.95, 0.15),
+	Vector3(-2.45, 4.95, 1.35),
+	Vector3(-2.00, 3.95, 2.25),
+	Vector3(-0.70, 3.25, 2.60),
+	Vector3(0.85, 2.65, 2.20),
+	Vector3(1.90, 2.10, 1.20),
 ]
 
 
@@ -87,11 +89,11 @@ static func build(palette) -> Node3D:
 	root.add_child(Spine.build(palette, PLINTH_Y + 0.70, PYLON_TOP,
 		PANEL_LEVELS))
 	root.add_child(Spine.plinth(palette, PLINTH_Y))
-	root.add_child(Spine.deck(palette, Vector3(0.0, 15.95, -2.65), 3.0, 3,
+	root.add_child(Spine.deck(palette, Vector3(0.0, 15.95, -3.25), 3.0, 3,
 		"UpperDeck"))
-	root.add_child(Spine.deck(palette, Vector3(0.0, 11.75, -2.65), 3.4, 11,
+	root.add_child(Spine.deck(palette, Vector3(0.0, 11.75, -3.25), 3.4, 11,
 		"MidDeck"))
-	root.add_child(Spine.deck(palette, Vector3(0.0, 7.55, -2.65), 3.6, 7,
+	root.add_child(Spine.deck(palette, Vector3(0.0, 7.55, -3.25), 3.6, 7,
 		"LowerDeck"))
 
 	# Yokes: three, all behind the modules, tying the pylons together.
@@ -109,18 +111,18 @@ static func build(palette) -> Node3D:
 	start.rotation.y = START_YAW
 	root.add_child(start)
 
-	var sill := Start.build_sill(palette)
-	sill.position = Vector3(0.0, START_Y, START_Z)
-	sill.rotation.y = START_YAW
-	root.add_child(sill)
+	var shuffle := Start.build_shuffle(palette)
+	shuffle.position = Vector3(0.0, START_Y, START_Z)
+	shuffle.rotation.y = START_YAW
+	root.add_child(shuffle)
 
-	# The big entry flare is the start-to-bowl transition: the channel opens
-	# to the full width of the start tray at its mouth and closes to single
-	# file within two units, so eight lanes become one stream inside a part
-	# that is visibly the same component as the rest of the track.
+	# The entry flare catches the shuffle deck's full-width exit lip and
+	# closes to the hero section within two units. The transition is the
+	# track itself rather than a separate funnel, so one rolled lip runs
+	# unbroken from the deflector field to the bowl.
 	var feed := Track.build(palette, FEED_CONTROLS, "FeedChute", {
 		"bank_gain": 2.6, "bank_max": 20.0,
-		"entry_flare": 0.80, "exit_flare": 0.10,
+		"entry_flare": 0.34, "exit_flare": 0.10,
 		"edge_light": "lit_cyan_line", "samples": 112,
 	})
 	root.add_child(feed)
@@ -167,7 +169,7 @@ static func _brackets(root: Node3D, palette, feed: Node3D,
 		var index: int = clampi(int(round(t * float(path.size() - 1))),
 			0, path.size() - 1)
 		var frame: Basis = V2Forms.banked_basis(path, banks, index)
-		var at: Vector3 = path[index] + frame.y * -1.15
+		var at: Vector3 = path[index] + frame.y * -1.62
 		root.add_child(Spine.saddle(palette, at,
 			atan2(frame.z.x, frame.z.z), str(entry[1])))
 		root.add_child(Spine.cantilever(palette,
@@ -208,9 +210,9 @@ static func _marbles(root: Node3D, palette, feed: Node3D,
 
 	# The bowl: six circulating, at radii and bearings that avoid the cradle
 	# arms so every one of them is against the silver dish.
-	for pair in [[2.42, 0.30], [1.95, 1.20], [2.62, -0.55], [1.35, -1.75],
-			[1.80, 2.45], [2.20, -2.55], [2.55, 1.85], [1.55, 0.85],
-			[2.30, 2.95], [1.15, -0.35]]:
+	for pair in [[2.62, 0.30], [2.10, 1.20], [2.84, -0.55], [1.45, -1.75],
+			[1.95, 2.45], [2.38, -2.55], [2.76, 1.85], [1.68, 0.85],
+			[2.48, 2.95], [1.24, -0.35]]:
 		var radius: float = pair[0]
 		var bearing: float = pair[1]
 		# The dish's own profile, so a racer rests on the surface it is
@@ -268,6 +270,24 @@ static func module_table() -> Dictionary:
 					"centre": Vector3(0.0, START_Y + 0.5, START_Z + 0.9),
 					"size": Vector3(6.6, 1.8, 3.4),
 				},
+			},
+			"shuffle_deck_v21": {
+				"origin": Vector3(0.0, START_Y, START_Z),
+				"yaw": START_YAW,
+				"entry_anchor": Vector3(0.0, START_Y + Start.DECK_ENTRY_Y,
+					START_Z + Start.DECK_ENTRY_Z),
+				"exit_anchor": feed_entry,
+				"half_width": Start.DECK_HALF,
+				"mouth_half_width": Start.DECK_MOUTH_HALF,
+				"pin_rows": Start.PIN_ROWS,
+				"pin_pitch": Start.PIN_PITCH,
+				"pin_radius": Start.PIN_RADIUS,
+				"pin_height": Start.PIN_HEIGHT,
+				"pins_local": Start.pin_positions(),
+				"floor_entry_local_y": Start.DECK_ENTRY_Y,
+				"floor_exit_local_y": Start.DECK_EXIT_Y,
+				"preferred_camera": "start",
+				"note": "breaks start-lane advantage; every gap clears a 0.57 racer",
 			},
 			"bowl_v2": {
 				"origin": Vector3(0.0, BOWL_Y, 0.0),

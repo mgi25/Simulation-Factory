@@ -24,26 +24,26 @@ const Forms := preload("res://assets/marble_machine/lab_forms.gd")
 
 const SHOTS := {
 	# aim: the height the lens looks at. extent: the vertical span it fits.
-	"hero": {"aim": 11.3, "extent": 25.0, "fov": 34.0, "elevation": 22.0, "azimuth": 34.0},
-	"phone": {"aim": 11.3, "extent": 25.0, "fov": 34.0, "elevation": 22.0, "azimuth": 34.0},
+	"hero": {"aim": 11.3, "extent": 25.8, "fov": 34.0, "elevation": 22.0, "azimuth": 34.0},
+	"phone": {"aim": 11.3, "extent": 25.8, "fov": 34.0, "elevation": 22.0, "azimuth": 34.0},
 
-	"e16": {"aim": 11.3, "extent": 25.0, "fov": 34.0, "elevation": 16.0, "azimuth": 34.0},
-	"e20": {"aim": 11.3, "extent": 25.0, "fov": 34.0, "elevation": 20.0, "azimuth": 34.0},
-	"e24": {"aim": 11.4, "extent": 25.2, "fov": 34.0, "elevation": 24.0, "azimuth": 34.0},
-	"e28": {"aim": 11.5, "extent": 25.4, "fov": 34.0, "elevation": 28.0, "azimuth": 34.0},
+	"e16": {"aim": 11.3, "extent": 25.8, "fov": 34.0, "elevation": 16.0, "azimuth": 34.0},
+	"e20": {"aim": 11.3, "extent": 25.8, "fov": 34.0, "elevation": 20.0, "azimuth": 34.0},
+	"e24": {"aim": 11.4, "extent": 26.0, "fov": 34.0, "elevation": 24.0, "azimuth": 34.0},
+	"e28": {"aim": 11.5, "extent": 26.2, "fov": 34.0, "elevation": 28.0, "azimuth": 34.0},
 
-	"a18": {"aim": 11.3, "extent": 25.0, "fov": 34.0, "elevation": 20.0, "azimuth": 18.0},
-	"a34": {"aim": 11.3, "extent": 25.0, "fov": 34.0, "elevation": 20.0, "azimuth": 34.0},
-	"a50": {"aim": 11.3, "extent": 25.0, "fov": 34.0, "elevation": 20.0, "azimuth": 50.0},
-	"a66": {"aim": 11.3, "extent": 25.0, "fov": 34.0, "elevation": 20.0, "azimuth": 66.0},
+	"a18": {"aim": 11.3, "extent": 25.8, "fov": 34.0, "elevation": 20.0, "azimuth": 18.0},
+	"a34": {"aim": 11.3, "extent": 25.8, "fov": 34.0, "elevation": 20.0, "azimuth": 34.0},
+	"a50": {"aim": 11.3, "extent": 25.8, "fov": 34.0, "elevation": 20.0, "azimuth": 50.0},
+	"a66": {"aim": 11.3, "extent": 25.8, "fov": 34.0, "elevation": 20.0, "azimuth": 66.0},
 
-	"f30": {"aim": 11.3, "extent": 25.0, "fov": 30.0, "elevation": 20.0, "azimuth": 34.0},
-	"f40": {"aim": 11.3, "extent": 25.0, "fov": 40.0, "elevation": 20.0, "azimuth": 34.0},
+	"f30": {"aim": 11.3, "extent": 25.8, "fov": 30.0, "elevation": 20.0, "azimuth": 34.0},
+	"f40": {"aim": 11.3, "extent": 25.8, "fov": 40.0, "elevation": 20.0, "azimuth": 34.0},
 
 	# Product lenses.
-	"start": {"aim": 19.2, "extent": 10.8, "fov": 30.0, "elevation": 21.0, "azimuth": 30.0},
-	"bowl": {"aim": 12.1, "extent": 12.4, "fov": 30.0, "elevation": 27.0, "azimuth": 40.0},
-	"track": {"aim": 6.6, "extent": 13.0, "fov": 32.0, "elevation": 17.0, "azimuth": 58.0},
+	"start": {"aim": 18.9, "extent": 11.6, "fov": 30.0, "elevation": 24.0, "azimuth": 30.0},
+	"bowl": {"aim": 12.1, "extent": 13.2, "fov": 30.0, "elevation": 27.0, "azimuth": 40.0},
+	"track": {"aim": 6.6, "extent": 13.8, "fov": 32.0, "elevation": 17.0, "azimuth": 58.0},
 	"upper": {"aim": 16.2, "extent": 12.0, "fov": 33.0, "elevation": 14.0, "azimuth": 30.0},
 }
 
@@ -114,7 +114,7 @@ func _practicals() -> void:
 		["BowlViolet", Vector3(0.0, Machine.BOWL_Y - 1.3, 0.0),
 			"#A379FF", 2.4, 6.0],
 		["BowlTop", Vector3(1.4, Machine.BOWL_Y + 2.9, 2.6),
-			"#E4F1FF", 3.6, 7.5],
+			"#E4F1FF", 2.5, 7.5],
 		["BowlFar", Vector3(-1.8, Machine.BOWL_Y + 2.2, -2.0),
 			"#CFE6FF", 2.4, 6.5],
 		["TrackViolet", Vector3(2.6, 8.4, 0.8), "#9B6BFF", 2.0, 6.0],

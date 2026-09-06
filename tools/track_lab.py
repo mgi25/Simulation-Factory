@@ -44,6 +44,13 @@ HEIGHT = 1920
 CLIP_FPS = 30
 CLIP_SECONDS = 4.0
 
+# Output revision. Renders are written as `<module>_<TAG>.png` so a refinement
+# pass lands beside the version it refines instead of overwriting it - the
+# point of a review branch is that the previous answer is still on disk to be
+# compared against.
+TAG = "v21"
+TAG_LABEL = "V2.1"
+
 # The reference sheet is a multi-panel infographic; its left column is the
 # hero render of the machine and the only part a hero frame can be compared
 # against. This fraction is the column's right edge.
@@ -186,8 +193,9 @@ def _row(panels: list[Image.Image], gap: int = 14) -> Image.Image:
 
 def module_sheet(source: str, destination: str) -> None:
     """Start, bowl, track and the assembled machine, at one height."""
-    names = [("start", "START V2"), ("bowl", "BOWL V2"),
-             ("track", "TRACK V2"), ("hero", "MACHINE V2")]
+    label = TAG_LABEL
+    names = [("start", f"START {label}"), ("bowl", f"BOWL {label}"),
+             ("track", f"TRACK {label}"), ("hero", f"MACHINE {label}")]
     panels = [_labelled(Image.open(os.path.join(source, f"{n}.png")), t, 900)
               for n, t in names]
     _row(panels).save(destination)
@@ -206,7 +214,7 @@ def target_comparison(hero: str, destination: str) -> None:
     column = reference.crop(
         (0, 0, int(reference.width * REFERENCE_HERO_FRACTION), reference.height))
     panels = [_labelled(column, "TARGET CONCEPT", 1180),
-              _labelled(Image.open(hero), "OUR MACHINE V2", 1180)]
+              _labelled(Image.open(hero), "OUR MACHINE " + TAG_LABEL, 1180)]
     _row(panels, 20).save(destination)
     print(f"  comparison -> {destination}")
 
@@ -279,18 +287,18 @@ def main(argv: list[str]) -> int:
         render_stills(godot, OUT_DOCS, HERO_SHOTS, options.width,
                       options.height,
                       dump_modules=os.path.join(OUT_DOCS, "modules.json"))
-        for source, target in (("hero", "machine_v2"), ("start", "start_v2"),
-                               ("bowl", "bowl_v2"), ("track", "track_v2")):
+        for source, target in (("hero", f"machine_{TAG}"), ("start", f"start_{TAG}"),
+                               ("bowl", f"bowl_{TAG}"), ("track", f"track_{TAG}")):
             shutil.copyfile(os.path.join(OUT_DOCS, f"{source}.png"),
                             os.path.join(OUT_DOCS, f"{target}.png"))
 
     if options.command in ("sheets", "all"):
         print("sheets:")
-        module_sheet(OUT_DOCS, os.path.join(OUT_DOCS, "module_sheet.png"))
-        target_comparison(os.path.join(OUT_DOCS, "machine_v2.png"),
-                          os.path.join(OUT_DOCS, "target_comparison.png"))
-        phone_sheet(os.path.join(OUT_DOCS, "machine_v2.png"),
-                    os.path.join(OUT_DOCS, "phone.png"))
+        module_sheet(OUT_DOCS, os.path.join(OUT_DOCS, f"module_sheet_{TAG}.png"))
+        target_comparison(os.path.join(OUT_DOCS, f"machine_{TAG}.png"),
+                          os.path.join(OUT_DOCS, f"target_comparison_{TAG}.png"))
+        phone_sheet(os.path.join(OUT_DOCS, f"machine_{TAG}.png"),
+                    os.path.join(OUT_DOCS, f"phone_{TAG}.png"))
 
     if options.command in ("sweeps", "all"):
         print("sweeps:")
@@ -298,15 +306,15 @@ def main(argv: list[str]) -> int:
         render_stills(godot, sweeps, ELEVATION_SHOTS + AZIMUTH_SHOTS, 540, 960)
         sweep_sheet(sweeps, ELEVATION_SHOTS, ("16 deg", "20 deg", "24 deg",
                                               "28 deg"),
-                    os.path.join(OUT_DOCS, "camera_elevation.png"))
+                    os.path.join(OUT_DOCS, f"camera_elevation_{TAG}.png"))
         sweep_sheet(sweeps, AZIMUTH_SHOTS, ("18 deg", "34 deg", "50 deg",
                                             "66 deg"),
-                    os.path.join(OUT_DOCS, "camera_azimuth.png"))
+                    os.path.join(OUT_DOCS, f"camera_azimuth_{TAG}.png"))
 
     if options.command in ("motion", "all"):
         print("motion:")
         render_clip(godot, scratch, "hero")
-        encode(scratch, os.path.join(OUT_MEDIA, "motion_proof.mp4"))
+        encode(scratch, os.path.join(OUT_MEDIA, f"motion_proof_{TAG}.mp4"))
 
     return 0
 

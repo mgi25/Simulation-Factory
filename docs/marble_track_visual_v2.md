@@ -1,11 +1,58 @@
-# Marble machine — Track + Environment Visual Direction V2
+# Marble machine — Track + Environment Visual Direction V2 / V2.1
 
 The art that should replace the placeholder Start / Bowl / S-curve visuals in
 `marble-v1`. No physics, no replay, no race logic: this branch owns the design
 and hands `marble-v1` a table of anchors to adapt to.
 
-Renders: [`docs/validation/track_visual_v2/`](validation/track_visual_v2/).
+Renders: [`docs/validation/track_visual_v2/`](validation/track_visual_v2/) —
+`*_v2.png` is the V2 direction lock, `*_v21.png` the current refinement.
 Reference breakdown: [`docs/track_visual_lab/VISUAL_BREAKDOWN.md`](track_visual_lab/VISUAL_BREAKDOWN.md).
+
+## V2.1 refinement pass
+
+Two problems with V2, both course rather than style, fixed without touching the
+approved visual language.
+
+**Start fairness.** Eight bays on a straight line feeding one chute meant the
+bay a racer started in decided where it sat in the stream, and on a chute that
+curves the inside lane is simply shorter — a positional advantage that survived
+the whole first transition. The fix is a **shuffle deck**: a tilted pan between
+the gate and the chute carrying **four staggered rows of chrome deflector
+pins**, five and six per row at half a pitch of offset, so every gap in one row
+sits behind a pin in the next.
+
+The arithmetic is the design. Pitch 0.90, pin radius 0.115, so every gap —
+including the two against the walls — is **0.67 clear against a 0.57 racer**;
+the deck's half width of 2.95 falls straight out of needing the edge gaps to
+clear as well, which is why the deck is wider than the pod it hangs under.
+
+A deflector field is the answer because it is the *provable* one: no path
+through it is shorter than another by construction, and the outcome does not
+depend on tuning a curve. It is also the right answer visually — the brief asks
+for the advantage to be broken by the first obstacle, and an obstacle you can
+see is worth more than a geometric trick you cannot.
+
+The last 0.92 of the deck converges through two vanes to a **3.44 mouth**, which
+is what the chute's flared entry actually accepts; the full-width pin field
+would otherwise have thrown the outer lanes past it. The taper sits after every
+pin row, so it costs nothing in fairness — by the time a racer reaches it, its
+lateral position no longer has anything to do with the bay it left. The bowl
+then scrambles the order a second time before the hero descent.
+
+**Track width.** The V2 channel was 1.24 clear — two marbles and change, and it
+read as undersized beside a bowl twelve marbles across. `HERO_CLEAR_WIDTH` is
+now **1.90**: three racers of 0.57 abreast plus working clearance. The whole
+profile is authored at unit scale and multiplied by `PROFILE_SCALE`, which is
+derived from that one number, so the shell, floor, keel, guards, beads, light
+lines and joint straps grew together and the section's proportions are
+untouched. Joint spacing went 1.35 to 1.80 to keep the same rhythm on a bigger
+part.
+
+Everything the wider channel touched moved with it: the bowl grew to rim 4.15
+and dish 3.48 to stay the widest module, the S's swings pulled in to ±2.65 so
+the track stays inside the bowl's silhouette, the equipment decks stepped back
+to z −3.25, the saddles dropped to clear the deeper keel, and the plinth grew so
+the base still reads as a foundation rather than a lid.
 
 ## Selected direction
 
@@ -16,8 +63,8 @@ threading from the start line to the bottom of the frame.
 The proportion is the decision that mattered most. The first assembled build
 was 17 units tall and 9.5 wide and read as a chunky stack of discs; the target
 concept is roughly 1 : 3.5. Shrinking the bowl, narrowing the start pod, scaling
-the track profile to 0.84 and lengthening the descent brought it to **22.4 tall
-by about 8 wide**, and that single change did more for the "same class as the
+the track profile and lengthening the descent brought it to **22.4 tall by about
+8.6 wide**, and that single change did more for the "same class as the
 reference" test than any material or lighting work.
 
 ## START V2 — a moulded launch pod
@@ -31,6 +78,12 @@ acrylic gate bar on gold pivots with an orange paddle per bay; and a lit
 **START** sign — real 3D text, not a bright rectangle — in a graphite frame
 carried on the pod's own back wall rather than on stilts. Dark chassis under it
 with orange drums, gold collars and an equipment rack.
+
+V2.1 adds the **shuffle deck** below the gate: a graphite-floored pan in a pearl
+surround, forty chrome capsule pins, converging vanes and a gold exit lip. The
+pins are capsules with the fillet set to their whole radius — anything less
+rounded reads as a canister rather than as a deflector, and a cap on top, tried
+at two sizes, reads as the rim of one.
 
 It is deliberately wider relative to the bowl than the reference's start is. A
 bay has to be wider than a marble, and "all eight racers readable at the line"
@@ -48,10 +101,10 @@ violet ring light under the dish's outer edge, a visible gold-collared drain
 throat you can see down, and a three-arm graphite cradle with gold collars and
 orange jacks.
 
-**Racer scale:** the dish is 6.44 across and a racer is 0.57 — about eleven end
-to end. Reached by shrinking the bowl, not by inflating the marbles.
+**Racer scale (V2.1):** the dish is 6.96 across and a racer is 0.57 — about
+twelve end to end. Reached by shrinking the bowl, not by inflating the marbles.
 
-**Action clearance:** a cylinder of radius 3.37 and height 2.98 over the whole
+**Action clearance:** a cylinder of radius 3.63 and height 2.98 over the whole
 running surface. Cradle arms sit on rear bearings only (138°, 200°, 262°); the
 one thing that crosses the sightline is the guard, and it is transparent.
 
@@ -64,18 +117,21 @@ previous toolkit could not express, and the reason a new `banked_sweep` exists.
 Across the channel: a full-round pearl shell, a rolled lip with a chrome bead, a
 recessed emissive line sunk into each shoulder, a darker silver running insert,
 and a graphite keel hung below with transverse strap-and-gold-block joints every
-1.35 units.
+1.80 units.
 
 The section is per-sample: `width_curve` flares the mouth, pinches the fast
-middle and opens again at the exit. The feed chute uses a large entry flare so
-the channel itself opens to the width of the start tray and closes to single
-file within two units — **the start-to-bowl transition is the track, not a
+middle and opens again at the exit. The feed chute uses an entry flare so the
+channel itself opens to catch the shuffle deck's mouth and closes to the hero
+section within two units — **the start-to-bowl transition is the track, not a
 separate funnel.** An earlier build had a moulded funnel there and it read as a
 white skirt from every hero angle.
 
 Bank is derived from smoothed horizontal curvature, clamped to 20° on the feed
 and 27° on the S, and eased to zero at both ends so a banked run meets a level
 module square.
+
+**V2.1 width:** clear span **1.90** (three racers abreast), overall section 2.72
+across, driven by the single `HERO_CLEAR_WIDTH` constant.
 
 ## Support system V2
 
@@ -115,19 +171,26 @@ Written by the scene itself to
 [`docs/validation/track_visual_v2/modules.json`](validation/track_visual_v2/modules.json),
 derived from the same constants the geometry is built from.
 
-| | value |
+| | value (V2.1) |
 | --- | --- |
 | visual marble diameter | 0.57 |
 | start origin / yaw | (0, 19.80, 0.55), 0.16 rad |
 | start bays / pitch / floor | 8 / 0.63 / local y −0.02 |
-| start exit → feed entry | (0.15, 19.20, 1.80) |
-| feed exit → bowl entry | (−2.00, 13.55, 0.00) |
-| bowl centre / rim / dish / drain | (0, 12.60, 0) / r 3.86 / r 3.22 / r 0.70, depth 1.16 |
+| shuffle deck entry | (0.00, 19.64, 1.87) |
+| shuffle deck pins | 4 rows, pitch 0.90, r 0.115, h 0.30 — **0.67 clear gap** |
+| shuffle deck half width / mouth | 2.95 / 1.72 (3.44 across) |
+| deck exit → feed entry | (0.62, 18.42, 3.55) |
+| feed exit → bowl entry | (−2.30, 13.85, 0.25) |
+| bowl centre / rim / dish / drain | (0, 12.60, 0) / r 4.15 / r 3.48 / r 0.70, depth 1.16 |
 | bowl exit → S entry | (0.00, 11.44, 0.10) |
-| S exit | (2.05, 2.10, 1.30) |
-| channel clear width | 1.243 |
-| marble contact offset below section origin | −0.084 |
+| S exit | (1.90, 2.10, 1.20) |
+| **hero channel clear width** | **1.90** |
+| marble contact offset below section origin | −0.128 |
 | pylons / plinth / top | x ±3.30, z −3.70 / y 0.10 / y 21.40 |
+
+Pin positions are not listed here: `Start.pin_positions()` generates them from
+the four numbers above and `modules.json` carries the resulting list, so a
+physics pass rebuilds the field rather than transcribing it.
 
 ## Camera
 
@@ -140,10 +203,11 @@ the sign crops.
 
 ## Performance
 
-~195k triangles, 634 mesh instances, **≈420 ms/frame at 1080×1920** on an
+~203k triangles, 654 mesh instances, **≈420 ms/frame at 1080×1920** on an
 RTX 3050 Laptop (offline render with MSAA, SSAO, SSR and glow all on). The
-environment is a small fraction of that; the ribs, bolt rings and swept
-channels are most of it.
+environment is a small fraction of that; the ribs, bolt rings and swept channels
+are most of it. V2.1 added ~8k triangles — the pin field is forty capsules and
+costs almost nothing.
 
 ## Integration considerations for marble-v1
 
@@ -157,6 +221,13 @@ channels are most of it.
   needs, and it is the only thing that knows about the roll.
 - The bowl's drain is at (0, 11.44, 0) with clear radius 0.70; the S's first
   sample is the same point.
+- The shuffle deck's floor is a plane: `Start.deck_floor_y(z)` gives its height
+  at any pod-local z, and the pins are upright capsules of radius 0.115 and
+  height 0.30 standing on it. Colliders are one tilted box plus forty capsules
+  plus two vane boxes; nothing about it needs special handling.
+- Fairness is geometric, not tuned. If a physics pass changes marble diameter,
+  the one number to re-check is the pin gap: `PIN_PITCH - 2 * PIN_RADIUS` must
+  stay comfortably above it, or racers will jam instead of scattering.
 - Nothing in this branch imports from `race` or `engine`, and the scene is
   unreachable from `ReplayViewer.tscn` or `OfflineRender.tscn`.
 

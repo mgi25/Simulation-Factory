@@ -330,20 +330,20 @@ static func saddle(palette, at: Vector3, heading: float,
 	node.rotation.y = heading
 
 	node.add_child(Forms.mesh_node(
-		Geometry.rounded_box(Vector3(1.24, 0.30, 0.62), 0.12, 4),
+		Geometry.rounded_box(Vector3(1.76, 0.34, 0.70), 0.14, 4),
 		palette.get_material("graphite_soft"), "Bed"))
 	for side in [1.0, -1.0]:
 		var cheek := Forms.mesh_node(
-			Geometry.rounded_box(Vector3(0.20, 0.46, 0.58), 0.08, 3),
+			Geometry.rounded_box(Vector3(0.24, 0.54, 0.66), 0.09, 3),
 			palette.get_material("graphite"),
 			"Cheek%s" % ("R" if side > 0.0 else "L"))
-		cheek.position = Vector3(side * 0.60, 0.20, 0.0)
+		cheek.position = Vector3(side * 0.86, 0.22, 0.0)
 		node.add_child(cheek)
 		var bolt := Forms.mesh_node(
 			Geometry.rounded_disc(0.11, 0.10, 0.04, 14, 2),
 			palette.get_material("gold"),
 			"SaddleBolt%s" % ("R" if side > 0.0 else "L"), false)
-		bolt.position = Vector3(side * 0.60, 0.30, 0.32)
+		bolt.position = Vector3(side * 0.86, 0.34, 0.36)
 		bolt.rotation.x = PI * 0.5
 		node.add_child(bolt)
 	return node
@@ -362,17 +362,17 @@ static func plinth(palette, y: float) -> Node3D:
 	node.position = Vector3(0.0, y, 0.0)
 
 	node.add_child(Forms.mesh_node(
-		Geometry.rounded_disc(3.75, 0.56, 0.19, 56, 4),
+		Geometry.rounded_disc(4.15, 0.60, 0.20, 56, 4),
 		palette.get_material("graphite_deep"), "Lower"))
 
 	var upper := Forms.mesh_node(
-		Geometry.rounded_disc(3.00, 0.42, 0.15, 56, 4),
+		Geometry.rounded_disc(3.32, 0.44, 0.16, 56, 4),
 		palette.get_material("graphite"), "Upper")
 	upper.position = Vector3(0.0, 0.48, 0.0)
 	node.add_child(upper)
 
 	var deck := Forms.mesh_node(
-		Geometry.rounded_disc(2.42, 0.16, 0.07, 48, 3),
+		Geometry.rounded_disc(2.68, 0.16, 0.07, 48, 3),
 		palette.get_material("graphite_soft"), "Deck")
 	deck.position = Vector3(0.0, 0.74, 0.0)
 	node.add_child(deck)
@@ -381,25 +381,25 @@ static func plinth(palette, y: float) -> Node3D:
 	# as one dead disc; a lit ring gives it a centre, and it is also the
 	# source the whole machine's underside light is meant to be coming from.
 	var hearth := Forms.mesh_node(
-		Forms.hoop(1.92, 0.075, 56, 8), palette.get_material("lit_gold"),
+		Forms.hoop(2.12, 0.075, 56, 8), palette.get_material("lit_gold"),
 		"Hearth", false)
 	hearth.position = Vector3(0.0, 0.80, 0.0)
 	node.add_child(hearth)
 
 	var inlay := Forms.mesh_node(
-		Forms.hoop(2.68, 0.06, 64, 8), palette.get_material("gold"),
+		Forms.hoop(2.96, 0.06, 64, 8), palette.get_material("gold"),
 		"Inlay", false)
 	inlay.position = Vector3(0.0, 0.70, 0.0)
 	node.add_child(inlay)
 
 	var edge := Forms.mesh_node(
-		Forms.hoop(3.73, 0.06, 72, 8), palette.get_material("lit_cyan_line"),
+		Forms.hoop(4.13, 0.06, 72, 8), palette.get_material("lit_cyan_line"),
 		"EdgeLight", false)
 	edge.position = Vector3(0.0, 0.22, 0.0)
 	node.add_child(edge)
 
-	Forms.bolt_ring(node, palette.get_material("chrome"), 24, 3.40, 0.30,
-		0.075, 0.065)
+	Forms.bolt_ring(node, palette.get_material("chrome"), 26, 3.78, 0.32,
+		0.08, 0.07)
 
 	# Four orange service blocks around the rim: the machinery read at the
 	# base, and the warm anchor the brief asks for at the bottom of the frame.
@@ -409,7 +409,7 @@ static func plinth(palette, y: float) -> Node3D:
 		var block := Forms.mesh_node(
 			Geometry.rounded_box(Vector3(0.76, 0.40, 0.56), 0.13, 3),
 			palette.get_material("orange_machine"), "Service%d" % index)
-		block.position = direction * 3.14 + Vector3(0.0, 0.50, 0.0)
+		block.position = direction * 3.48 + Vector3(0.0, 0.52, 0.0)
 		block.rotation.y = -bearing
 		node.add_child(block)
 	return node

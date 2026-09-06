@@ -29,7 +29,7 @@ extends RefCounted
 ##
 ## ## Racer scale
 ##
-## The running dish is 6.4 units across and a racer is 0.57, so about eleven fit
+## The running dish is 6.96 units across and a racer is 0.57, so about twelve fit
 ## end to end. That is the proportion the brief asks for: large enough that a
 ## collision is followable, small enough that a dozen racers still read as a
 ## field rather than as a crowd. It was reached by shrinking the *bowl* rather
@@ -48,8 +48,8 @@ const Forms := preload("res://assets/marble_machine/lab_forms.gd")
 const V2Forms := preload("res://assets/marble_machine/v2/v2_forms.gd")
 
 # Local origin: the centre of the rim plane. The dish hangs below it.
-const RIM_RADIUS := 3.86       # outer edge of the machined rim
-const DISH_RADIUS := 3.22      # where the running surface meets the rim
+const RIM_RADIUS := 4.15       # outer edge of the machined rim
+const DISH_RADIUS := 3.48      # where the running surface meets the rim
 const DRAIN_RADIUS := 0.70
 const DISH_DEPTH := 1.16
 const SHELL_TOP := 1.22        # how far the acrylic guard stands above the rim

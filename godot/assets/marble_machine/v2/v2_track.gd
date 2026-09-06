@@ -61,8 +61,15 @@ const V2Forms := preload("res://assets/marble_machine/v2/v2_forms.gd")
 #
 # The channel's own origin is the top of the floor at its centreline, so a
 # marble's rest height is a single number.
-const PROFILE_SCALE := 0.84
-const CHANNEL_HALF := 0.74     # clear half width between the inner walls
+const CHANNEL_HALF := 0.74     # authored half width between the inner walls
+# V2.1: the finished channel's clear span, in world units. Three racers of
+# 0.57 abreast plus working clearance - the V2 channel was 1.24, which is two
+# marbles and change, and it read as undersized next to a bowl eleven marbles
+# across. Everything else in the profile follows from this number, so the
+# shell, floor, keel, guards, beads, light lines and joint straps all grow
+# together and the section's proportions are untouched.
+const HERO_CLEAR_WIDTH := 1.90
+const PROFILE_SCALE := HERO_CLEAR_WIDTH / (CHANNEL_HALF * 2.0)
 const FLOOR_Y := -0.100        # floor centre, below the section origin
 const FLOOR_EDGE_Y := -0.055   # floor at the foot of the inner wall
 const LIP_CROWN := 0.295       # top of the rolled lip
@@ -74,12 +81,12 @@ const KEEL_HALF := 0.460
 const GUARD_HEIGHT := 0.34
 
 const SAMPLES := 132
-const RIB_SPACING := 1.35
+const RIB_SPACING := 1.80
 
 
 static func clear_width() -> float:
 	## The finished channel's clear span, for the module table.
-	return CHANNEL_HALF * 2.0 * PROFILE_SCALE
+	return HERO_CLEAR_WIDTH
 
 
 static func floor_offset() -> float:
