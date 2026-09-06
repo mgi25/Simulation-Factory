@@ -113,8 +113,11 @@ const SHOTS := {
 	"azi55": {"aim": 9.2, "extent": 20.4, "fov": 35.0, "elevation": 10.0, "azimuth": 55.0},
 	# Product lenses: one module each, same rig, longer glass.
 	"bowl": {"aim": 11.5, "extent": 9.4, "fov": 30.0, "elevation": 22.0, "azimuth": 38.0},
-	"start": {"aim": 17.2, "extent": 5.6, "fov": 30.0, "elevation": 12.0, "azimuth": 30.0},
+	"start": {"aim": 17.30, "extent": 8.4, "fov": 30.0, "elevation": 12.0, "azimuth": 30.0},
 	"collector": {"aim": 3.3, "extent": 9.0, "fov": 30.0, "elevation": 26.0, "azimuth": 44.0},
+	# The S alone, from outside its own swing, at the elevation that shows the
+	# channel's section rather than looking down into it.
+	"curve": {"aim": 6.9, "extent": 8.2, "fov": 32.0, "elevation": 14.0, "azimuth": 42.0},
 	"upper": {"aim": 13.4, "extent": 12.0, "fov": 33.0, "elevation": 8.0, "azimuth": 34.0},
 }
 
@@ -200,7 +203,7 @@ func _build_environment() -> void:
 
 	_environment.tonemap_mode = Environment.TONE_MAPPER_ACES
 	_environment.tonemap_exposure = 1.0
-	_environment.tonemap_white = 6.0
+	_environment.tonemap_white = 9.5
 
 	# Depth haze. The reference's background sits three or four stops under
 	# its subject and gets there through atmosphere, not through a darker
@@ -227,7 +230,7 @@ func _build_environment() -> void:
 		_environment.glow_enabled = true
 		_environment.glow_intensity = 0.95
 		_environment.glow_bloom = 0.18
-		_environment.glow_hdr_threshold = 0.92
+		_environment.glow_hdr_threshold = 1.08
 		_environment.glow_hdr_scale = 2.0
 		_environment.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
 		for level in 7:
@@ -238,7 +241,7 @@ func _build_environment() -> void:
 		_environment.set_glow_level(4, 0.5)
 
 	_environment.adjustment_enabled = true
-	_environment.adjustment_contrast = 1.16
+	_environment.adjustment_contrast = 1.10
 	_environment.adjustment_saturation = 1.14
 	_environment.adjustment_brightness = 1.0
 
@@ -260,7 +263,7 @@ func _build_lights() -> void:
 	var key := DirectionalLight3D.new()
 	key.name = "Key"
 	key.light_color = Color("#FFF3E2")
-	key.light_energy = 3.0
+	key.light_energy = 2.2
 	key.light_specular = 1.0
 	key.shadow_enabled = true
 	key.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
@@ -275,7 +278,7 @@ func _build_lights() -> void:
 	rim.name = "Rim"
 	rim.light_color = Color("#8FD9FF")
 	rim.light_energy = 1.9
-	rim.light_specular = 1.4
+	rim.light_specular = 0.9
 	rim.shadow_enabled = false
 	rim.rotation_degrees = Vector3(-12.0, 158.0, 0.0)
 	add_child(rim)
@@ -390,9 +393,14 @@ func _build_marbles(machine: Node3D, platform: Node3D) -> void:
 		var at: Vector3 = slots[index]
 		var node := Forms.mesh_node(sphere, _palette.marble(colour_index),
 			"BayMarble%d" % index)
+		# The slot is reported at the module's own marble radius and the scene
+		# draws the field at the simulation's, which is larger - so a racer
+		# dropped straight into a slot sits six centimetres into the deck.
+		# Lifting by the difference rests it on the lane instead.
+		var seat: float = at.y + MARBLE_RADIUS - StartPlatform.MARBLE_RADIUS
 		node.position = platform.position + Vector3(
 			at.x * cos(platform.rotation.y) + at.z * sin(platform.rotation.y),
-			at.y - MARBLE_RADIUS + MARBLE_RADIUS,
+			seat,
 			-at.x * sin(platform.rotation.y) + at.z * cos(platform.rotation.y))
 		field.add_child(node)
 		colour_index += 1

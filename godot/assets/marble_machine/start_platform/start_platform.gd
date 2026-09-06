@@ -130,6 +130,84 @@ static func _shell(root: Node3D, palette) -> void:
 	trim.position = Vector3(0.0, -0.46, 0.0)
 	root.add_child(trim)
 
+	_fairings(root, palette)
+
+
+static func _fairings(root: Node3D, palette) -> void:
+	## The shoulders, the hood and the nose blade.
+	##
+	## What the module was short of was a silhouette. Four stacked bands read
+	## as four bands; they do not read as a shape, and against a dark backdrop
+	## the outline is most of what a viewer gets. So the shell now flares into
+	## a rounded shoulder at each end, a raked hood closes the back of the bays
+	## and carries the eye up to the sign, and a gold blade runs along the nose
+	## where the field leaves. None of them touches a bay, a slot or the exit
+	## lip - they are the parts that are only ever seen from outside.
+	for side in 2:
+		var x: float = (DECK_WIDTH * 0.5 + 0.10) * (1.0 if side == 0 else -1.0)
+		var shoulder := Forms.mesh_node(
+			Geometry.rounded_box(
+				Vector3(0.46, 0.72, BAY_DEPTH + 0.34), 0.21, 4),
+			palette.get_material("pearl_shell"), "Shoulder%d" % side)
+		shoulder.position = Vector3(x, -0.20, -0.04)
+		root.add_child(shoulder)
+
+		var band := Forms.mesh_node(
+			Geometry.rounded_box(
+				Vector3(0.50, 0.09, BAY_DEPTH + 0.38), 0.03, 3),
+			palette.get_material("gold"), "ShoulderBand%d" % side, false)
+		band.position = Vector3(x, -0.44, -0.04)
+		root.add_child(band)
+
+		var vent := Forms.mesh_node(
+			Geometry.rounded_box(Vector3(0.28, 0.30, 0.06), 0.02, 2),
+			palette.get_material("lit_cyan_soft"), "ShoulderVent%d" % side,
+			false)
+		vent.position = Vector3(x, -0.12, BAY_DEPTH * 0.5 + 0.14)
+		root.add_child(vent)
+
+	# The hood: a raked plate over the back of the bays, on two ribs. It is
+	# what turns the module's profile from a slab into a wedge.
+	var hood := Forms.mesh_node(
+		Geometry.rounded_box(
+			Vector3(DECK_WIDTH - 0.30, 0.11, 0.62), 0.05, 3),
+		palette.get_material("pearl_shade"), "Hood")
+	hood.position = Vector3(0.0, 0.40, -BAY_DEPTH * 0.5 - 0.10)
+	hood.rotation.x = -0.62
+	root.add_child(hood)
+
+	var hood_lip := Forms.mesh_node(
+		Geometry.rounded_box(
+			Vector3(DECK_WIDTH - 0.24, 0.06, 0.10), 0.025, 2),
+		palette.get_material("gold"), "HoodLip", false)
+	hood_lip.position = Vector3(0.0, 0.62, -BAY_DEPTH * 0.5 - 0.02)
+	root.add_child(hood_lip)
+
+	for side in 2:
+		var x: float = (DECK_WIDTH * 0.5 - 0.34) * (1.0 if side == 0 else -1.0)
+		var rib := Forms.mesh_node(
+			Geometry.rounded_box(Vector3(0.09, 0.52, 0.11), 0.03, 3),
+			palette.get_material("silver_deep"), "HoodRib%d" % side)
+		rib.position = Vector3(x, 0.28, -BAY_DEPTH * 0.5 - 0.16)
+		rib.rotation.x = -0.28
+		root.add_child(rib)
+
+	# The nose blade, under the exit lip and clear of it.
+	var blade := Forms.mesh_node(
+		Geometry.rounded_box(
+			Vector3(DECK_WIDTH - 0.34, 0.09, 0.30), 0.035, 3),
+		palette.get_material("gold"), "NoseBlade", false)
+	blade.position = Vector3(0.0, -0.34, BAY_DEPTH * 0.5 + 0.40)
+	blade.rotation.x = 0.24
+	root.add_child(blade)
+
+	var under := Forms.mesh_node(
+		Geometry.rounded_box(
+			Vector3(DECK_WIDTH - 0.62, 0.04, 0.05), 0.015, 2),
+		palette.get_material("lit_cyan"), "NoseLight", false)
+	under.position = Vector3(0.0, -0.42, BAY_DEPTH * 0.5 + 0.34)
+	root.add_child(under)
+
 
 # --- bays -----------------------------------------------------------------
 
@@ -193,6 +271,48 @@ static func _gate(root: Node3D, palette) -> void:
 	apron.rotation.x = 0.20
 	root.add_child(apron)
 
+	_readiness(root, palette)
+
+
+static func _readiness(root: Node3D, palette) -> void:
+	## Whether the gate is armed, said in hardware.
+	##
+	## A start gate that gives no signal is a bar. The module now carries the
+	## state a start line actually has: one lamp per lane along the release
+	## bar, and a stack of three discs on each pillar with the bottom one lit -
+	## armed, not away. It is the one place in this machine where a light
+	## means something rather than decorating something, and at hero distance
+	## the row of eight is also the medium-scale rhythm the front of the
+	## module was missing.
+	var lamp := Geometry.rounded_disc(0.045, 0.05, 0.018, 12, 2)
+	for index in BAYS:
+		var x := (float(index) - float(BAYS - 1) * 0.5) * BAY_PITCH
+		var pip := Forms.mesh_node(lamp, palette.get_material("lit_gold"),
+			"LaneReady%d" % index, false)
+		pip.position = Vector3(x, 0.27, BAY_DEPTH * 0.5 + 0.02)
+		pip.rotation.x = PI * 0.5
+		root.add_child(pip)
+
+	var disc := Geometry.rounded_disc(0.058, 0.06, 0.02, 14, 2)
+	for side in 2:
+		var x: float = (DECK_WIDTH * 0.5 - 0.20) * (1.0 if side == 0 else -1.0)
+		var stack := Forms.mesh_node(
+			Geometry.rounded_box(Vector3(0.17, 0.42, 0.13), 0.05, 3),
+			palette.get_material("graphite_deep"), "SignalStack%d" % side)
+		stack.position = Vector3(x, 0.62, BAY_DEPTH * 0.5 + 0.02)
+		root.add_child(stack)
+
+		for step in 3:
+			# Dark, dark, lit: the machine is holding, and the reading only
+			# works because the two above the live one are unlit stock.
+			var key := "lit_gold" if step == 2 else "graphite_soft"
+			var light := Forms.mesh_node(disc, palette.get_material(key),
+				"Signal%d_%d" % [side, step], false)
+			light.position = Vector3(x, 0.76 - 0.14 * float(step),
+				BAY_DEPTH * 0.5 + 0.08)
+			light.rotation.x = PI * 0.5
+			root.add_child(light)
+
 
 static func _canopy(root: Node3D, palette) -> void:
 	## A clear cover arched over the bays on two silver ribs.
@@ -200,13 +320,18 @@ static func _canopy(root: Node3D, palette) -> void:
 	## Curved rather than flat: a flat pane over a row of spheres reads as a
 	## lid on a box, and an arch reads as a display case. The difference is
 	## the whole "collectible" note the brief is asking for.
+	# The arch clears the racers. It used to spring from 0.30, and the scene
+	# draws its field at the simulation's radius rather than this module's, so
+	# the pane cut the two outer marbles in half - a display case with the
+	# exhibits through the glass. Springing from 0.52 the whole row passes
+	# under it at any radius the race is likely to want.
 	var span := DECK_WIDTH * 0.5 - 0.10
 	var controls: Array = [
-		Vector3(-span, 0.30, 0.0),
-		Vector3(-span * 0.55, 0.54, 0.0),
-		Vector3(0.0, 0.60, 0.0),
-		Vector3(span * 0.55, 0.54, 0.0),
-		Vector3(span, 0.30, 0.0),
+		Vector3(-span, 0.52, 0.0),
+		Vector3(-span * 0.55, 0.74, 0.0),
+		Vector3(0.0, 0.80, 0.0),
+		Vector3(span * 0.55, 0.74, 0.0),
+		Vector3(span, 0.52, 0.0),
 	]
 	var arch := Forms.smooth_path(controls, 10)
 
@@ -227,33 +352,94 @@ static func _canopy(root: Node3D, palette) -> void:
 
 
 static func _sign(root: Node3D, palette) -> void:
-	## START, lit, on two posts above the canopy.
+	## START, and it says so.
+	##
+	## The old sign was a lit rectangle, and a lit rectangle at the top of a
+	## machine is a placeholder for a sign rather than one. It made this the
+	## weakest of the four modules in the hero frame by a distance: everything
+	## else in the picture is a *part*, and the one element the eye goes to
+	## first was a blank panel.
+	##
+	## So: a dark hood, a recessed face two shades under everything around it,
+	## and the word standing proud of that face in lit stock, extruded far
+	## enough that the key catches the top edge of every stroke. The value
+	## order is what makes it read at phone size - dark surround, darker
+	## recess, bright letters - and it survives being three centimetres tall
+	## because it is a shape and not a texture.
 	var height := 1.42
+	var board := DECK_WIDTH - 0.42
+	var y := height + 0.14
+
 	for side in 2:
 		var x: float = (DECK_WIDTH * 0.5 - 0.26) * (1.0 if side == 0 else -1.0)
 		var post := Forms.mesh_node(
-			Geometry.rounded_box(Vector3(0.11, height, 0.11), 0.04, 3),
+			Geometry.rounded_box(Vector3(0.13, height, 0.13), 0.045, 3),
 			palette.get_material("graphite"), "SignPost%d" % side)
 		post.position = Vector3(x, height * 0.5 + 0.05, -0.05)
 		root.add_child(post)
 
+		# A stay back to the canopy rib, so the sign is braced rather than
+		# balanced. The posts alone read as two sticks under a board.
+		root.add_child(Forms.mesh_node(
+			Forms.brace(Vector3(x, height * 0.30, -0.05),
+				Vector3(x * 0.82, 0.62, -BAY_DEPTH * 0.5 + 0.05), 0.035, 6),
+			palette.get_material("silver_deep"), "SignStay%d" % side))
+
 	var frame := Forms.mesh_node(
-		Geometry.rounded_box(Vector3(DECK_WIDTH - 0.42, 0.56, 0.20), 0.08, 4),
+		Geometry.rounded_box(Vector3(board, 0.74, 0.22), 0.09, 4),
 		palette.get_material("graphite"), "SignFrame")
-	frame.position = Vector3(0.0, height + 0.10, -0.05)
+	frame.position = Vector3(0.0, y, -0.05)
 	root.add_child(frame)
 
-	var face := Forms.mesh_node(
-		Geometry.rounded_box(Vector3(DECK_WIDTH - 0.70, 0.36, 0.05), 0.05, 3),
-		palette.get_material("lit_sign"), "SignFace", false)
-	face.position = Vector3(0.0, height + 0.10, 0.06)
-	root.add_child(face)
+	# The recess. Darker than the frame around it, so the letters have
+	# somewhere to be bright against.
+	var recess := Forms.mesh_node(
+		Geometry.rounded_box(Vector3(board - 0.22, 0.54, 0.06), 0.04, 3),
+		palette.get_material("graphite_deep"), "SignRecess")
+	recess.position = Vector3(0.0, y, 0.05)
+	root.add_child(recess)
 
-	var bezel := Forms.mesh_node(
-		Geometry.rounded_box(Vector3(DECK_WIDTH - 0.36, 0.10, 0.24), 0.035, 3),
-		palette.get_material("gold"), "SignBezel", false)
-	bezel.position = Vector3(0.0, height + 0.40, -0.05)
-	root.add_child(bezel)
+	# A bar under the letters, not a lit panel behind them. A full-area
+	# backlight blooms over its own legend and takes the word away, which is
+	# how the sign ended up blank in the first place.
+	var glow := Forms.mesh_node(
+		Geometry.rounded_box(Vector3(board - 0.34, 0.045, 0.02), 0.015, 2),
+		palette.get_material("lit_sign"), "SignBacklight", false)
+	glow.position = Vector3(0.0, y - 0.23, 0.07)
+	root.add_child(glow)
+
+	var word := Node3D.new()
+	word.name = "SignLegend"
+	word.position = Vector3(0.0, y, 0.115)
+	root.add_child(word)
+	Forms.legend(word, palette.get_material("lit_white"), "START",
+		board - 0.86, 0.40, 0.07, 0.34)
+
+	# Top and bottom bezels rather than one: a single band on top makes the
+	# board look like it is hanging, and two make it look built.
+	for edge in 2:
+		var lift: float = 0.42 if edge == 0 else -0.42
+		var bezel := Forms.mesh_node(
+			Geometry.rounded_box(Vector3(board + 0.08, 0.10, 0.26), 0.035, 3),
+			palette.get_material("gold"), "SignBezel%d" % edge, false)
+		bezel.position = Vector3(0.0, y + lift, -0.05)
+		root.add_child(bezel)
+
+	# End caps, and a cyan pip on each: the sign gets the same corner
+	# hardware as every other assembly in the machine.
+	for side in 2:
+		var x: float = (board * 0.5 + 0.02) * (1.0 if side == 0 else -1.0)
+		var cap := Forms.mesh_node(
+			Geometry.rounded_box(Vector3(0.16, 0.80, 0.30), 0.06, 3),
+			palette.get_material("graphite_soft"), "SignCap%d" % side)
+		cap.position = Vector3(x, y, -0.05)
+		root.add_child(cap)
+
+		var pip := Forms.mesh_node(
+			Geometry.rounded_box(Vector3(0.07, 0.07, 0.03), 0.02, 2),
+			palette.get_material("neon_cyan"), "SignPip%d" % side, false)
+		pip.position = Vector3(x, y + 0.30, 0.10)
+		root.add_child(pip)
 
 	# Two lamps raking the sign face, which is what a real product shot does
 	# and what stops the sign reading as a flat emissive rectangle.
@@ -262,7 +448,7 @@ static func _sign(root: Node3D, palette) -> void:
 		var lamp := Forms.mesh_node(
 			Geometry.rounded_disc(0.075, 0.10, 0.03, 16, 2),
 			palette.get_material("chrome"), "SignLamp%d" % side, false)
-		lamp.position = Vector3(x, height + 0.46, 0.16)
+		lamp.position = Vector3(x, y + 0.50, 0.16)
 		lamp.rotation.x = 0.6
 		root.add_child(lamp)
 

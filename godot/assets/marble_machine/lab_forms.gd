@@ -256,6 +256,106 @@ static func plate(size: Vector3, fillet: float) -> ArrayMesh:
 	return Geometry.rounded_box(size, fillet, 3)
 
 
+# --- signage --------------------------------------------------------------
+#
+# A stroke alphabet, because a sign that does not say anything is a lit
+# rectangle and a lit rectangle is what the start platform had. There is no
+# text in this project's render path - no font, no label, no viewport that
+# could bake one - so a legend has to be built out of the same solids as
+# everything else, and at hero distance that is not a compromise: extruded
+# letters standing proud of a recessed face catch the key on their top edges
+# and read as a moulded sign, which a texture would not.
+#
+# Each glyph is a list of strokes in a unit box, given as centre, size and
+# roll: `[cx, cy, w, h, degrees]`. Only the characters this machine needs
+# exist. Adding one is four numbers a stroke, and an unknown character builds
+# nothing rather than failing a render.
+
+const GLYPH_STROKES := {
+	"S": [
+		[0.50, 0.92, 1.00, 0.16, 0.0],
+		[0.08, 0.71, 0.16, 0.42, 0.0],
+		[0.50, 0.50, 1.00, 0.16, 0.0],
+		[0.92, 0.29, 0.16, 0.42, 0.0],
+		[0.50, 0.08, 1.00, 0.16, 0.0],
+	],
+	"T": [
+		[0.50, 0.92, 1.00, 0.16, 0.0],
+		[0.50, 0.42, 0.18, 0.84, 0.0],
+	],
+	"A": [
+		[0.50, 0.92, 0.84, 0.16, 0.0],
+		[0.06, 0.42, 0.18, 0.84, 0.0],
+		[0.94, 0.42, 0.18, 0.84, 0.0],
+		[0.50, 0.44, 0.76, 0.15, 0.0],
+	],
+	"R": [
+		[0.06, 0.50, 0.18, 1.00, 0.0],
+		[0.52, 0.92, 0.76, 0.16, 0.0],
+		[0.94, 0.72, 0.18, 0.42, 0.0],
+		[0.48, 0.53, 0.68, 0.15, 0.0],
+		[0.66, 0.24, 0.18, 0.56, 28.0],
+	],
+	"E": [
+		[0.06, 0.50, 0.18, 1.00, 0.0],
+		[0.54, 0.92, 0.80, 0.16, 0.0],
+		[0.50, 0.50, 0.70, 0.15, 0.0],
+		[0.54, 0.08, 0.80, 0.16, 0.0],
+	],
+	"D": [
+		[0.06, 0.50, 0.18, 1.00, 0.0],
+		[0.50, 0.92, 0.74, 0.16, 0.0],
+		[0.50, 0.08, 0.74, 0.16, 0.0],
+		[0.90, 0.50, 0.18, 0.72, 0.0],
+	],
+	"Y": [
+		[0.24, 0.74, 0.17, 0.50, 22.0],
+		[0.76, 0.74, 0.17, 0.50, -22.0],
+		[0.50, 0.24, 0.18, 0.48, 0.0],
+	],
+	"-": [
+		[0.50, 0.50, 0.80, 0.15, 0.0],
+	],
+}
+
+
+static func legend(parent: Node3D, material: Material, text: String,
+		width: float, height: float, depth: float, spacing := 0.30) -> void:
+	## Extruded lettering centred on its parent's origin, facing +Z.
+	##
+	## `width` is the whole word's span and `height` one letter's cap height,
+	## so a caller sizes the legend to the sign it has rather than to a point
+	## size that would mean nothing here. The strokes are rounded boxes for
+	## the same reason every other edge in this machine is: a square letter
+	## catches a one-pixel highlight and a filleted one catches a band.
+	var letters := text.to_upper()
+	if letters.is_empty() or width <= 0.0:
+		return
+	var count := letters.length()
+	var pitch := width / (float(count) + spacing * float(count - 1))
+	var advance := pitch * (1.0 + spacing)
+	var left := -width * 0.5 + pitch * 0.5
+
+	for index in count:
+		var glyph := letters[index]
+		if not GLYPH_STROKES.has(glyph):
+			continue
+		var origin := Vector3(left + advance * float(index), 0.0, 0.0)
+		var strokes: Array = GLYPH_STROKES[glyph]
+		for stroke_index in strokes.size():
+			var stroke: Array = strokes[stroke_index]
+			var size := Vector3(float(stroke[2]) * pitch,
+				float(stroke[3]) * height, depth)
+			var bar := mesh_node(
+				Geometry.rounded_box(size, minf(size.x, size.y) * 0.28, 2),
+				material, "Glyph%d_%d" % [index, stroke_index], false)
+			bar.position = origin + Vector3(
+				(float(stroke[0]) - 0.5) * pitch,
+				(float(stroke[1]) - 0.5) * height, 0.0)
+			bar.rotation.z = deg_to_rad(float(stroke[4]))
+			parent.add_child(bar)
+
+
 # --- spline track ---------------------------------------------------------
 
 static func smooth_path(controls: Array, samples: int) -> Array:
