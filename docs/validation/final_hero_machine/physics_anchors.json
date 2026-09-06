@@ -1,0 +1,687 @@
+{
+  "fairness": "UNVERIFIED - no simulation has been run against this art",
+  "machine_height": 31.95,
+  "marble_diameter": 0.57,
+  "modules": {
+    "bowl": {
+      "action_clearance": {
+        "centre": [
+          0.0,
+          0.2,
+          0.0
+        ],
+        "height": 3.42,
+        "radius": 3.29,
+        "shape": "cylinder"
+      },
+      "centre": [
+        0.0,
+        25.0,
+        0.0
+      ],
+      "dish_depth": 1.2,
+      "dish_radius": 3.14,
+      "drain": [
+        0.0,
+        23.8,
+        0.0
+      ],
+      "drain_radius": 0.66,
+      "entry_socket": [
+        -2.3,
+        25.05,
+        0.2
+      ],
+      "exit_socket": [
+        0.0,
+        23.8,
+        0.0
+      ],
+      "origin": [
+        0.0,
+        25.0,
+        0.0
+      ],
+      "preferred_camera": "bowl",
+      "rim_radius": 3.72,
+      "stage": 2
+    },
+    "collector": {
+      "action_clearance": {
+        "centre": [
+          0.0,
+          0.24,
+          0.0
+        ],
+        "height": 1.52,
+        "radius": 2.78,
+        "shape": "cylinder"
+      },
+      "blades": 5,
+      "centre": [
+        0.0,
+        14.6,
+        0.0
+      ],
+      "entry_socket": [
+        -2.6,
+        16.4,
+        -1.15
+      ],
+      "exit_socket": [
+        2.9,
+        14.35,
+        1.06
+      ],
+      "gate_bearing_degrees": 20.0,
+      "gate_half_angle_degrees": 15.0,
+      "hub_radius": 0.62,
+      "origin": [
+        0.0,
+        14.6,
+        0.0
+      ],
+      "pan_drop": 0.16,
+      "pan_radius": 2.58,
+      "preferred_camera": "collector",
+      "radius": 3.02,
+      "stage": 4
+    },
+    "collector_out": {
+      "channel_clear_width": 1.692,
+      "controls": [
+        [
+          2.9,
+          14.35,
+          1.06
+        ],
+        [
+          2.45,
+          13.85,
+          1.35
+        ],
+        [
+          1.6,
+          13.3,
+          1.2
+        ],
+        [
+          0.7,
+          12.85,
+          0.7
+        ],
+        [
+          0.1,
+          12.62,
+          0.34
+        ]
+      ],
+      "entry_socket": [
+        2.9,
+        14.35,
+        1.06
+      ],
+      "exit_socket": [
+        0.1,
+        12.62,
+        0.34
+      ],
+      "stage": 4
+    },
+    "compression": {
+      "channel_clear_width": 1.6168,
+      "drop_controls": [
+        [
+          0.0,
+          4.66,
+          0.58
+        ],
+        [
+          0.02,
+          4.15,
+          0.88
+        ],
+        [
+          0.18,
+          3.66,
+          1.42
+        ],
+        [
+          0.58,
+          3.28,
+          2.06
+        ],
+        [
+          1.22,
+          3.04,
+          2.62
+        ]
+      ],
+      "drop_entry_socket": [
+        0.0,
+        4.66,
+        0.58
+      ],
+      "entry_sockets": [
+        [
+          -0.26,
+          5.06,
+          0.58
+        ],
+        [
+          0.26,
+          5.06,
+          0.58
+        ]
+      ],
+      "exit_socket": [
+        1.22,
+        3.04,
+        2.62
+      ],
+      "merge_block_at": [
+        0.0,
+        4.98,
+        0.58
+      ],
+      "preferred_camera": "compression",
+      "stage": 6
+    },
+    "feed_chute": {
+      "channel_clear_width": 1.88,
+      "controls": [
+        [
+          0.3,
+          28.3,
+          2.3
+        ],
+        [
+          -0.75,
+          27.7,
+          2.6
+        ],
+        [
+          -2.1,
+          26.8,
+          2.4
+        ],
+        [
+          -2.95,
+          25.9,
+          1.55
+        ],
+        [
+          -2.85,
+          25.35,
+          0.7
+        ],
+        [
+          -2.3,
+          25.05,
+          0.2
+        ]
+      ],
+      "entry_socket": [
+        0.3,
+        28.3,
+        2.3
+      ],
+      "exit_socket": [
+        -2.3,
+        25.05,
+        0.2
+      ],
+      "floor_offset": -0.26,
+      "stage": 1
+    },
+    "finish": {
+      "action_clearance": {
+        "centre": [
+          0.0,
+          0.2,
+          0.0
+        ],
+        "height": 1.64,
+        "radius": 3.66,
+        "shape": "cylinder"
+      },
+      "centre": [
+        0.0,
+        2.05,
+        0.0
+      ],
+      "entry_socket": [
+        1.22,
+        3.04,
+        2.62
+      ],
+      "origin": [
+        0.0,
+        2.05,
+        0.0
+      ],
+      "pad_radius": 1.72,
+      "podium_top_local_y": 0.16,
+      "preferred_camera": "finish",
+      "radius": 4.18,
+      "stage": 7,
+      "trough_drop": 0.3,
+      "trough_inner": 1.98,
+      "trough_outer": 3.66
+    },
+    "s_bridge": {
+      "bank_max_degrees": 24.0,
+      "channel_clear_width": 1.88,
+      "controls": [
+        [
+          0.0,
+          23.8,
+          0.0
+        ],
+        [
+          1.4,
+          23.0,
+          1.45
+        ],
+        [
+          2.95,
+          22.05,
+          1.45
+        ],
+        [
+          3.45,
+          20.95,
+          0.05
+        ],
+        [
+          2.5,
+          19.9,
+          -1.35
+        ],
+        [
+          0.55,
+          19.3,
+          -1.85
+        ],
+        [
+          -1.5,
+          18.9,
+          -1.35
+        ],
+        [
+          -3.1,
+          18.2,
+          0.1
+        ],
+        [
+          -3.55,
+          17.25,
+          1.55
+        ],
+        [
+          -3.35,
+          16.7,
+          0.35
+        ],
+        [
+          -2.6,
+          16.4,
+          -1.15
+        ]
+      ],
+      "entry_socket": [
+        0.0,
+        23.8,
+        0.0
+      ],
+      "exit_socket": [
+        -2.6,
+        16.4,
+        -1.15
+      ],
+      "floor_offset": -0.26,
+      "preferred_camera": "s_bridge",
+      "stage": 3
+    },
+    "split": {
+      "action_clearance": {
+        "centre": [
+          0.0,
+          8.775,
+          0.2
+        ],
+        "shape": "box",
+        "size": [
+          11.84,
+          8.65,
+          4.4
+        ]
+      },
+      "branch_clear_width": 1.504,
+      "branch_scale": 0.8,
+      "left": {
+        "controls": [
+          [
+            -0.42,
+            12.3,
+            0.42
+          ],
+          [
+            -1.85,
+            11.65,
+            1.15
+          ],
+          [
+            -3.3,
+            10.65,
+            1.2
+          ],
+          [
+            -4.3,
+            9.35,
+            0.45
+          ],
+          [
+            -4.35,
+            8.15,
+            -0.35
+          ],
+          [
+            -3.7,
+            7.15,
+            -0.55
+          ],
+          [
+            -2.7,
+            6.45,
+            -0.05
+          ],
+          [
+            -1.55,
+            5.85,
+            0.38
+          ],
+          [
+            -0.62,
+            5.32,
+            0.56
+          ],
+          [
+            -0.26,
+            5.06,
+            0.58
+          ]
+        ],
+        "entry_socket": [
+          -0.42,
+          12.3,
+          0.42
+        ],
+        "exit_socket": [
+          -0.26,
+          5.06,
+          0.58
+        ],
+        "identity": "cool"
+      },
+      "preferred_camera": "split",
+      "right": {
+        "controls": [
+          [
+            0.42,
+            12.3,
+            0.42
+          ],
+          [
+            1.85,
+            11.6,
+            1.15
+          ],
+          [
+            3.35,
+            10.55,
+            1.2
+          ],
+          [
+            4.25,
+            9.2,
+            0.45
+          ],
+          [
+            4.05,
+            8.05,
+            -0.4
+          ],
+          [
+            3.2,
+            7.3,
+            -0.4
+          ],
+          [
+            2.55,
+            6.55,
+            0.1
+          ],
+          [
+            1.5,
+            5.9,
+            0.42
+          ],
+          [
+            0.62,
+            5.32,
+            0.56
+          ],
+          [
+            0.26,
+            5.06,
+            0.58
+          ]
+        ],
+        "entry_socket": [
+          0.42,
+          12.3,
+          0.42
+        ],
+        "exit_socket": [
+          0.26,
+          5.06,
+          0.58
+        ],
+        "identity": "warm"
+      },
+      "splitter_at": [
+        0.0,
+        12.78,
+        0.34
+      ],
+      "stage": 5
+    },
+    "start": {
+      "action_clearance": {
+        "centre": [
+          0.0,
+          30.7,
+          1.2
+        ],
+        "shape": "box",
+        "size": [
+          6.6,
+          1.8,
+          3.4
+        ]
+      },
+      "bay_floor_local_y": -0.02,
+      "bay_pitch": 0.63,
+      "bays": 8,
+      "entry_anchor": [
+        0.0,
+        30.5,
+        -0.7
+      ],
+      "exit_socket": [
+        0.3,
+        28.3,
+        2.3
+      ],
+      "mixer": {
+        "half_width": 2.3,
+        "housing_y": [
+          -1.36,
+          -0.44
+        ],
+        "housing_z": [
+          1.3,
+          2.32
+        ],
+        "note": "intended to break start-lane advantage; UNVERIFIED",
+        "pin_height": 0.34,
+        "pin_pitch": 0.86,
+        "pin_radius": 0.115,
+        "pin_rows": 2,
+        "pins_local": [
+          [
+            -1.72,
+            -1.0,
+            1.54
+          ],
+          [
+            -0.86,
+            -1.0,
+            1.54
+          ],
+          [
+            0.0,
+            -1.0,
+            1.54
+          ],
+          [
+            0.86,
+            -1.0,
+            1.54
+          ],
+          [
+            1.72,
+            -1.0,
+            1.54
+          ],
+          [
+            -2.15,
+            -1.0,
+            2.06
+          ],
+          [
+            -1.29,
+            -1.0,
+            2.06
+          ],
+          [
+            -0.43,
+            -1.0,
+            2.06
+          ],
+          [
+            0.43,
+            -1.0,
+            2.06
+          ],
+          [
+            1.29,
+            -1.0,
+            2.06
+          ],
+          [
+            2.15,
+            -1.0,
+            2.06
+          ]
+        ],
+        "throat_local": [
+          0.0,
+          -1.86,
+          2.52
+        ]
+      },
+      "origin": [
+        0.0,
+        30.2,
+        0.3
+      ],
+      "preferred_camera": "start",
+      "stage": 1,
+      "yaw": 0.1
+    }
+  },
+  "stage_order": [
+    "start",
+    "bowl",
+    "s_bridge",
+    "collector",
+    "split",
+    "compression",
+    "finish"
+  ],
+  "support": {
+    "core_segments": [
+      [
+        27.55,
+        1.9,
+        1.06,
+        -0.55
+      ],
+      [
+        21.3,
+        2.3,
+        1.34,
+        -1.25
+      ],
+      [
+        19.0,
+        2.4,
+        1.22,
+        -1.25
+      ],
+      [
+        16.75,
+        2.2,
+        1.12,
+        -1.25
+      ],
+      [
+        11.55,
+        2.1,
+        1.0,
+        -1.55
+      ],
+      [
+        9.15,
+        2.3,
+        0.92,
+        -1.55
+      ],
+      [
+        5.2,
+        2.6,
+        0.74,
+        -1.35
+      ]
+    ],
+    "panel_levels": [
+      3.1,
+      28.6
+    ],
+    "plinth_y": -0.55,
+    "tower_half": 0.25,
+    "tower_span_y": [
+      0.1,
+      31.4
+    ],
+    "tower_x": 3.34,
+    "tower_z": -8.8,
+    "yoke_levels": [
+      4.3,
+      13.6,
+      26.1
+    ]
+  }
+}
