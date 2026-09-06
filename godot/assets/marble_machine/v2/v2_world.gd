@@ -78,8 +78,8 @@ const V2Forms := preload("res://assets/marble_machine/v2/v2_forms.gd")
 #
 # bearing (deg), radius, height, base radius, seed
 const GORGE_WALLS := [
-	[190.0, 84.0, 30.0, 24.0, 3],
-	[242.0, 90.0, 32.0, 26.0, 11],
+	[190.0, 84.0, 42.0, 26.0, 3],
+	[242.0, 90.0, 44.0, 28.0, 11],
 	[150.0, 102.0, 28.0, 26.0, 19],
 	[284.0, 98.0, 26.0, 24.0, 27],
 	[108.0, 120.0, 24.0, 26.0, 35],
@@ -89,6 +89,8 @@ const GORGE_WALLS := [
 
 const FAR_RANGE := [
 	[214.0, 196.0, 24.0, 44.0, 5],
+	[206.0, 148.0, 44.0, 40.0, 67],
+	[224.0, 156.0, 40.0, 38.0, 73],
 	[202.0, 232.0, 54.0, 50.0, 13],
 	[228.0, 224.0, 52.0, 48.0, 21],
 	[178.0, 180.0, 46.0, 44.0, 29],
@@ -140,12 +142,12 @@ static func build_environment(no_glow: bool) -> Environment:
 	## brighter and warmer at the horizon so the sheen has a colour gradient
 	## in it instead of one flat blue.
 	var sky_material := ProceduralSkyMaterial.new()
-	sky_material.sky_top_color = Color("#081226")
-	sky_material.sky_horizon_color = Color("#3E657C")
+	sky_material.sky_top_color = Color("#050B16")
+	sky_material.sky_horizon_color = Color("#2C4A5E")
 	sky_material.sky_curve = 0.09
 	sky_material.sky_energy_multiplier = 1.0
-	sky_material.ground_bottom_color = Color("#152534")
-	sky_material.ground_horizon_color = Color("#345168")
+	sky_material.ground_bottom_color = Color("#0C1520")
+	sky_material.ground_horizon_color = Color("#2A4056")
 	sky_material.ground_curve = 0.40
 	sky_material.sun_angle_max = 42.0
 	sky_material.energy_multiplier = 1.0
@@ -156,7 +158,7 @@ static func build_environment(no_glow: bool) -> Environment:
 	var env := Environment.new()
 	env.background_mode = Environment.BG_SKY
 	env.sky = sky
-	env.background_energy_multiplier = 0.72
+	env.background_energy_multiplier = 0.58
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
 	env.ambient_light_sky_contribution = 1.0
 	env.ambient_light_energy = 0.30
@@ -172,14 +174,14 @@ static func build_environment(no_glow: bool) -> Environment:
 	# which is the difference between haze and dirty glass.
 	env.fog_enabled = true
 	env.fog_mode = Environment.FOG_MODE_DEPTH
-	env.fog_light_color = Color("#25455C")
-	env.fog_light_energy = 1.20
+	env.fog_light_color = Color("#1E3A50")
+	env.fog_light_energy = 1.05
 	env.fog_sun_scatter = 0.28
 	env.fog_density = 0.0078
 	env.fog_sky_affect = 0.18
 	env.fog_aerial_perspective = 0.50
-	env.fog_height = 2.0
-	env.fog_height_density = 0.045
+	env.fog_height = 6.0
+	env.fog_height_density = 0.052
 
 	env.ssao_enabled = true
 	env.ssao_radius = 0.85
@@ -234,12 +236,14 @@ static func build(palette) -> Node3D:
 
 
 static func _sun_pocket(root: Node3D, palette) -> void:
-	## The warm band low in the haze, behind the crests.
+	## Sparse warm lights deep in the haze, behind the crests.
 	##
 	## Fog only subtracts contrast; something has to put light back into the
-	## background or the gorge reads as a cave. Two large soft masses in a
-	## warm tone, partly occluded by the near crest, give the frame a
-	## direction to be lit from and the machine a warm edge to sit against.
+	## background or the gorge reads as a cave. But at 230 wide these were a
+	## continuous glowing band across the top of the frame - the "bright empty
+	## upper region" the review named. Five small masses at different bearings
+	## and depths read as distant settlement instead: the same warmth, spent
+	## on points rather than on a wash.
 	var group := Node3D.new()
 	group.name = "SunPocket"
 	root.add_child(group)
@@ -248,10 +252,11 @@ static func _sun_pocket(root: Node3D, palette) -> void:
 	# was reading as a cave: there was a sun in the scene and nothing that
 	# could see it.
 	var layout := [
-		[214.0, 262.0, -8.0, 240.0, 26.0, "lit_horizon"],
-		[194.0, 292.0, -10.0, 200.0, 20.0, "lit_horizon"],
-		[236.0, 280.0, -9.0, 210.0, 22.0, "lit_horizon_cool"],
-		[214.0, 232.0, -24.0, 180.0, 12.0, "lit_horizon"],
+		[210.0, 236.0, -14.0, 46.0, 7.0, "lit_horizon"],
+		[219.0, 258.0, -17.0, 38.0, 6.0, "lit_horizon"],
+		[201.0, 274.0, -19.0, 34.0, 5.0, "lit_horizon_cool"],
+		[229.0, 246.0, -15.0, 30.0, 5.0, "lit_horizon"],
+		[214.0, 208.0, -24.0, 26.0, 4.0, "lit_horizon_cool"],
 	]
 	for index in layout.size():
 		var entry: Array = layout[index]

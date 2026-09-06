@@ -53,35 +53,53 @@ const Geometry := preload("res://scripts/toy_geometry.gd")
 const Forms := preload("res://assets/marble_machine/lab_forms.gd")
 const V2Forms := preload("res://assets/marble_machine/v2/v2_forms.gd")
 
-# --- the profile. Authored at unit scale and multiplied by `PROFILE_SCALE`
-# on the way out, so the whole cross-section can be resized against the rest
-# of the machine without every one of its forty numbers being retyped - and
-# without the shell, the floor, the keel, the guards, the beads and the light
-# lines ever drifting apart from each other.
+# --- the profile ----------------------------------------------------------
 #
-# The channel's own origin is the top of the floor at its centreline, so a
-# marble's rest height is a single number.
-const CHANNEL_HALF := 0.74     # authored half width between the inner walls
-# V2.1: the finished channel's clear span, in world units. Three racers of
-# 0.57 abreast plus working clearance - the V2 channel was 1.24, which is two
-# marbles and change, and it read as undersized next to a bowl eleven marbles
-# across. Everything else in the profile follows from this number, so the
-# shell, floor, keel, guards, beads, light lines and joint straps all grow
-# together and the section's proportions are untouched.
-const HERO_CLEAR_WIDTH := 1.90
+# V2.2. The V2.1 channel met its width requirement and lost the silhouette
+# doing it: at 2.72 across with a 0.41 wall each side it read as a road, and
+# the racer inside looked small against all that white shell. The usable width
+# is the same requirement; everything wrapped around it is now half as thick.
+#
+#            acrylic guard (lower)      chrome bead
+#                    ╲                       │
+#                     ╲   ╭─────────────────▼╮   thin rolled lip
+#     ────────────────╳───╯                   ╰───── recessed light line
+#                      ╲   polished running U   ╱
+#                       ╲_____________________╱   slim pearl trough
+#                          ╲               ╱      graphite keel, deep
+#                            ╲___________╱
+#
+# Three changes, all aimed at the same thing - less white, more racer:
+#
+# **The floor is a real U.** A circular cradle of radius `FLOOR_RADIUS` rather
+# than a nearly flat pan with a dip in it. A marble sitting in a cradle is held
+# by it and reads as *in* the track; one sitting on a flat floor reads as on
+# top of it. It is also what lets the walls be short.
+#
+# **The wall is thin.** 0.19 from the channel edge to the outer shoulder,
+# against 0.41 before. The lip still rolls and still carries a bead, but there
+# is no longer a slab of shell either side of the running surface.
+#
+# **The underside is graphite, not pearl.** The pearl trough now stops at
+# `TROUGH_BASE` and a deep keel hangs below it, so the bottom half of every
+# section in frame is dark. That is most of the "flat white surface" the review
+# called out: it was never the running surface, it was the belly.
+const CHANNEL_HALF := 0.94     # authored half width between the inner walls
+const HERO_CLEAR_WIDTH := 1.88 # three 0.57 racers abreast plus clearance
 const PROFILE_SCALE := HERO_CLEAR_WIDTH / (CHANNEL_HALF * 2.0)
-const FLOOR_Y := -0.100        # floor centre, below the section origin
-const FLOOR_EDGE_Y := -0.055   # floor at the foot of the inner wall
-const LIP_CROWN := 0.295       # top of the rolled lip
-const SHELL_HALF := 1.060      # widest half width, at the shoulder
-const BELLY_Y := -0.605        # underside of the pearl shell at the centreline
-const KEEL_TOP := -0.500
+
+const FLOOR_RADIUS := 2.20     # the running cradle's radius
+const FLOOR_Y := -0.260        # the cradle's lowest point
+const LIP_CROWN := 0.302
+const SHELL_HALF := 1.130      # widest half width, at the shoulder
+const TROUGH_BASE := -0.350    # underside of the pearl trough at the centre
+const KEEL_TOP := -0.280
 const KEEL_BOTTOM := -0.980
-const KEEL_HALF := 0.460
-const GUARD_HEIGHT := 0.34
+const KEEL_HALF := 0.720
+const GUARD_HEIGHT := 0.26
 
 const SAMPLES := 132
-const RIB_SPACING := 1.80
+const RIB_SPACING := 1.70
 
 
 static func clear_width() -> float:
@@ -102,65 +120,63 @@ static func _scaled(points: Array) -> Array:
 
 
 static func _floor_y_at(x: float) -> float:
-	## The dished running floor: flattest at the centre, rising to the walls.
-	var t: float = clampf(absf(x) / (CHANNEL_HALF - 0.14), 0.0, 1.0)
-	return lerpf(FLOOR_Y, FLOOR_EDGE_Y, t * t)
+	## The running cradle: a circular arc, not a dished pan.
+	var span: float = clampf(absf(x), 0.0, CHANNEL_HALF)
+	var rise := FLOOR_RADIUS - sqrt(maxf(
+		FLOOR_RADIUS * FLOOR_RADIUS - span * span, 0.0))
+	return FLOOR_Y + rise
 
 
 static func channel_section() -> Array:
-	## The pearl body, authored as one half and mirrored.
+	## The pearl trough, authored as one half and mirrored.
 	##
-	## The walk starts at the belly centreline and ends at the floor
-	## centreline, so `mirror_close` puts the only seam under the keel where
-	## nothing sees it, and the floor's centre - where the marble runs and any
-	## crease would show - lands in the middle of the list with a neighbour on
-	## each side and a properly averaged normal.
+	## The walk starts at the trough's underside centreline and ends at the
+	## cradle's centreline, so `mirror_close` puts the only seam underneath
+	## where the keel covers it, and the point the marble actually runs on
+	## lands mid-list with a neighbour either side and a properly averaged
+	## normal.
 	var half: Array = [
-		# Underside, centre outwards.
-		Vector2(0.000, BELLY_Y),
-		Vector2(0.290, -0.590),
-		Vector2(0.520, -0.545),
-		Vector2(0.700, -0.470),
-		Vector2(0.850, -0.360),
-		Vector2(0.955, -0.230),
-		Vector2(1.020, -0.090),
+		# Underside of the trough, centre outwards. Shallow: the keel below
+		# does the deep work, so this only has to close the section.
+		Vector2(0.000, TROUGH_BASE),
+		Vector2(0.450, -0.340),
+		Vector2(0.780, -0.300),
+		Vector2(0.980, -0.220),
+		Vector2(1.080, -0.100),
+		Vector2(1.115, 0.030),
 		# The shoulder: the widest point, and the shell's main highlight.
-		Vector2(1.055, 0.040),
-		Vector2(SHELL_HALF, 0.150),
-		# The rolled lip, over the top and back down inside.
-		Vector2(1.045, 0.225),
-		Vector2(0.995, 0.278),
-		Vector2(0.920, LIP_CROWN),
-		Vector2(0.850, 0.268),
-		Vector2(0.800, 0.210),
-		# Inner wall, with a fillet into the floor.
-		Vector2(0.775, 0.130),
-		Vector2(0.760, 0.060),
-		Vector2(0.735, 0.000),
-		Vector2(0.685, -0.045),
+		Vector2(SHELL_HALF, 0.160),
+		# A thin rolled lip, over the top and back down inside.
+		Vector2(1.115, 0.250),
+		Vector2(1.075, 0.298),
+		Vector2(1.030, LIP_CROWN),
+		Vector2(1.000, 0.265),
+		Vector2(0.985, 0.180),
+		Vector2(0.970, 0.080),
+		Vector2(0.950, -0.010),
 	]
+	# The cradle, wall foot to centreline.
 	for step in range(4, -1, -1):
-		var x: float = (CHANNEL_HALF - 0.14) * float(step) / 4.0
+		var x: float = CHANNEL_HALF * float(step) / 4.0
 		half.append(Vector2(x, _floor_y_at(x)))
 	return _scaled(V2Forms.ensure_ccw(V2Forms.mirror_close(half)))
 
 
 static func floor_section() -> Array:
-	## A thin silver insert laid in the channel: the running surface proper.
+	## The polished running insert laid in the cradle.
 	##
-	## Separate geometry from the shell because they are different materials
-	## in the brief's hierarchy, and because a silver floor inside a pearl
-	## shell puts a value break exactly where the marble runs. That break is
-	## what stops the whole track reading as one white stripe - the failure
-	## the marble-v1 curve was called out for.
-	var span := CHANNEL_HALF - 0.145
+	## Separate geometry from the trough because they are different materials,
+	## and because a metal surface inside a pearl shell puts a hard value and
+	## specular break exactly where the racer runs. That break is what stops a
+	## track reading as one white stripe.
+	var span := CHANNEL_HALF - 0.03
 	var top: Array = []
 	var bottom: Array = []
-	var steps := 10
+	var steps := 12
 	for step in steps + 1:
 		var x: float = lerpf(span, -span, float(step) / float(steps))
 		top.append(Vector2(x, _floor_y_at(x) + 0.014))
-		bottom.append(Vector2(-x, _floor_y_at(x) - 0.030))
+		bottom.append(Vector2(-x, _floor_y_at(x) - 0.026))
 	var points: Array = top
 	points.append_array(bottom)
 	points.append(top[0])
@@ -168,33 +184,40 @@ static func floor_section() -> Array:
 
 
 static func guard_section(side: float) -> Array:
-	## One acrylic wall, standing on a lip: a thin blade with a rounded head.
-	var base := 0.255
-	var inner := 0.806 * side
-	var outer := 0.862 * side
+	## One acrylic wall, standing on the lip: lower than V2.1's, and thinner.
+	##
+	## A guard is a safety rail, not a windscreen. At 0.44 it stood as tall as
+	## the trough was deep and boxed the racer in from every camera above the
+	## horizontal; at 0.26 it reads as trim on the lip and the marble stays the
+	## tallest thing in the channel.
+	var base := 0.280
+	var inner := 1.002 * side
+	var outer := 1.058 * side
 	var mid := (inner + outer) * 0.5
 	return _scaled(V2Forms.ensure_ccw([
 		Vector2(inner, base),
 		Vector2(outer, base),
-		Vector2(outer, base + GUARD_HEIGHT - 0.09),
-		Vector2(mid + (outer - mid) * 0.72, base + GUARD_HEIGHT - 0.02),
+		Vector2(outer, base + GUARD_HEIGHT - 0.07),
+		Vector2(mid + (outer - mid) * 0.72, base + GUARD_HEIGHT - 0.015),
 		Vector2(mid, base + GUARD_HEIGHT),
-		Vector2(mid + (inner - mid) * 0.72, base + GUARD_HEIGHT - 0.02),
-		Vector2(inner, base + GUARD_HEIGHT - 0.09),
+		Vector2(mid + (inner - mid) * 0.72, base + GUARD_HEIGHT - 0.015),
+		Vector2(inner, base + GUARD_HEIGHT - 0.07),
 		Vector2(inner, base),
 	]))
 
 
 static func keel_section() -> Array:
-	## The graphite belly: a narrow tapered spine hung under the shell.
+	## The graphite underside. Wide at the top and deep, because it is now the
+	## whole bottom half of the track rather than a spine tucked under it.
 	return _scaled(V2Forms.ensure_ccw([
 		Vector2(KEEL_HALF, KEEL_TOP),
-		Vector2(KEEL_HALF * 0.95, KEEL_BOTTOM + 0.24),
-		Vector2(KEEL_HALF * 0.72, KEEL_BOTTOM + 0.07),
-		Vector2(KEEL_HALF * 0.34, KEEL_BOTTOM),
-		Vector2(-KEEL_HALF * 0.34, KEEL_BOTTOM),
-		Vector2(-KEEL_HALF * 0.72, KEEL_BOTTOM + 0.07),
-		Vector2(-KEEL_HALF * 0.95, KEEL_BOTTOM + 0.24),
+		Vector2(KEEL_HALF * 0.92, KEEL_BOTTOM + 0.46),
+		Vector2(KEEL_HALF * 0.70, KEEL_BOTTOM + 0.20),
+		Vector2(KEEL_HALF * 0.36, KEEL_BOTTOM + 0.04),
+		Vector2(0.0, KEEL_BOTTOM),
+		Vector2(-KEEL_HALF * 0.36, KEEL_BOTTOM + 0.04),
+		Vector2(-KEEL_HALF * 0.70, KEEL_BOTTOM + 0.20),
+		Vector2(-KEEL_HALF * 0.92, KEEL_BOTTOM + 0.46),
 		Vector2(-KEEL_HALF, KEEL_TOP),
 		Vector2(KEEL_HALF, KEEL_TOP),
 	]))
@@ -252,7 +275,7 @@ static func build(palette, controls: Array, node_name: String,
 		floor_pts, V2Forms.section_normals(floor_pts), path.size(), widths)
 	root.add_child(Forms.mesh_node(
 		V2Forms.banked_sweep(path, floor_set[0], floor_set[1], banks),
-		palette.get_material("track_floor_v2"), "RunningSurface", false))
+		palette.get_material("running_polished"), "RunningSurface", false))
 
 	var keel := keel_section()
 	var keel_set: Array = V2Forms.scaled_sections(
@@ -294,16 +317,16 @@ static func _edge_details(root: Node3D, palette, path: Array, banks: Array,
 			var factor: float = float(widths[index])
 			var frame: Basis = V2Forms.banked_basis(path, banks, index)
 			bead.append(path[index]
-				+ frame.x * 0.920 * PROFILE_SCALE * factor * side
-				+ frame.y * (LIP_CROWN + 0.022) * PROFILE_SCALE)
+				+ frame.x * 1.030 * PROFILE_SCALE * factor * side
+				+ frame.y * (LIP_CROWN + 0.018) * PROFILE_SCALE)
 			light.append(path[index]
-				+ frame.x * 1.105 * PROFILE_SCALE * factor * side
-				+ frame.y * 0.168 * PROFILE_SCALE)
+				+ frame.x * 1.148 * PROFILE_SCALE * factor * side
+				+ frame.y * 0.128 * PROFILE_SCALE)
 		root.add_child(Forms.mesh_node(
-			Geometry.tube(bead, 0.030 * PROFILE_SCALE, 8),
+			Geometry.tube(bead, 0.026 * PROFILE_SCALE, 8),
 			palette.get_material("chrome"), "Bead%s" % suffix, false))
 		root.add_child(Forms.mesh_node(
-			Geometry.tube(light, 0.058 * PROFILE_SCALE, 8),
+			Geometry.tube(light, 0.044 * PROFILE_SCALE, 8),
 			palette.get_material(light_key), "EdgeLight%s" % suffix, false))
 
 
@@ -321,10 +344,13 @@ static func _ribs(root: Node3D, palette, path: Array, banks: Array,
 	# Sized and sited to hug the belly rather than to cross the widest part
 	# of the shell: a strap as wide as the shoulder sticks out as two black
 	# tabs and reads as a fin, which is the opposite of a joint.
+	# Sited in the keel, not at the shoulder. At shoulder height the strap
+	# passed straight through the running cradle - the trough is only 0.35
+	# deep now, so there is no longer room for a band across its waist.
 	var strap := Geometry.rounded_box(
-		Vector3(1.84 * PROFILE_SCALE, 0.46 * PROFILE_SCALE, 0.19), 0.10, 3)
+		Vector3(1.70 * PROFILE_SCALE, 0.28 * PROFILE_SCALE, 0.17), 0.08, 3)
 	var block := Geometry.rounded_box(
-		Vector3(0.36 * PROFILE_SCALE, 0.18, 0.23), 0.06, 3)
+		Vector3(0.40 * PROFILE_SCALE, 0.20, 0.24), 0.07, 3)
 	var ribs := Node3D.new()
 	ribs.name = "Ribs"
 	root.add_child(ribs)
@@ -335,7 +361,7 @@ static func _ribs(root: Node3D, palette, path: Array, banks: Array,
 			0, path.size() - 1)
 		var frame: Basis = V2Forms.banked_basis(path, banks, index)
 		var factor: float = float(widths[index])
-		var centre: Vector3 = path[index] + frame.y * -0.50 * PROFILE_SCALE
+		var centre: Vector3 = path[index] + frame.y * -0.54 * PROFILE_SCALE
 
 		var node := Forms.mesh_node(strap, palette.get_material("graphite_soft"),
 			"Rib%d" % step)
@@ -346,7 +372,7 @@ static func _ribs(root: Node3D, palette, path: Array, banks: Array,
 		var cap := Forms.mesh_node(block, palette.get_material("gold"),
 			"RibBlock%d" % step, false)
 		cap.transform = Transform3D(Basis(frame.x, frame.y, frame.z),
-			centre + frame.y * -0.28)
+			centre + frame.y * -0.34)
 		ribs.add_child(cap)
 
 

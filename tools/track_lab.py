@@ -48,8 +48,8 @@ CLIP_SECONDS = 4.0
 # pass lands beside the version it refines instead of overwriting it - the
 # point of a review branch is that the previous answer is still on disk to be
 # compared against.
-TAG = "v21"
-TAG_LABEL = "V2.1"
+TAG = "v22"
+TAG_LABEL = "V2.2"
 
 # The reference sheet is a multi-panel infographic; its left column is the
 # hero render of the machine and the only part a hero frame can be compared

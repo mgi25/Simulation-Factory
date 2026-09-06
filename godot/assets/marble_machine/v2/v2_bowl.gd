@@ -29,7 +29,7 @@ extends RefCounted
 ##
 ## ## Racer scale
 ##
-## The running dish is 6.96 units across and a racer is 0.57, so about twelve fit
+## The running dish is 6.84 units across and a racer is 0.57, so about twelve fit
 ## end to end. That is the proportion the brief asks for: large enough that a
 ## collision is followable, small enough that a dozen racers still read as a
 ## field rather than as a crowd. It was reached by shrinking the *bowl* rather
@@ -48,11 +48,11 @@ const Forms := preload("res://assets/marble_machine/lab_forms.gd")
 const V2Forms := preload("res://assets/marble_machine/v2/v2_forms.gd")
 
 # Local origin: the centre of the rim plane. The dish hangs below it.
-const RIM_RADIUS := 4.15       # outer edge of the machined rim
-const DISH_RADIUS := 3.48      # where the running surface meets the rim
+const RIM_RADIUS := 3.86       # outer edge of the machined rim
+const DISH_RADIUS := 3.26      # where the running surface meets the rim
 const DRAIN_RADIUS := 0.70
-const DISH_DEPTH := 1.16
-const SHELL_TOP := 1.22        # how far the acrylic guard stands above the rim
+const DISH_DEPTH := 1.24
+const SHELL_TOP := 1.28        # how far the acrylic guard stands above the rim
 const CRADLE_BEARINGS := [200.0, 262.0, 138.0]
 
 
@@ -84,7 +84,7 @@ static func _dish(root: Node3D, palette) -> void:
 		DISH_RADIUS, DRAIN_RADIUS, DISH_DEPTH, 18)
 	root.add_child(Forms.mesh_node(
 		Geometry.lathe(profile, Geometry.profile_normals(profile, false), 72),
-		palette.get_material("dish_floor"), "RunningSurface"))
+		palette.get_material("dish_polished"), "RunningSurface"))
 
 	# Underside: the same profile dropped and thickened, in pearl. Without it
 	# the dish is a one-sided surface and from below the bowl has no bottom.
@@ -93,7 +93,7 @@ static func _dish(root: Node3D, palette) -> void:
 		under.append(Vector2((point as Vector2).x, (point as Vector2).y - 0.16))
 	root.add_child(Forms.mesh_node(
 		Geometry.lathe(under, Geometry.profile_normals(under, true), 72),
-		palette.get_material("pearl_shade"), "DishUnder"))
+		palette.get_material("graphite"), "DishUnder"))
 
 	# The mixer zone's violet, as a ring sunk under the dish's outer edge. It
 	# lights the pearl underside and grazes up through the acrylic, which is
@@ -160,31 +160,40 @@ static func _rim(root: Node3D, palette) -> void:
 static func _shell(root: Node3D, palette) -> void:
 	## The aqua guard: a flared acrylic wall with a real edge on it.
 	var outer: Array = [
-		Vector2(RIM_RADIUS - 0.30, 0.12),
-		Vector2(RIM_RADIUS - 0.14, 0.34),
-		Vector2(RIM_RADIUS - 0.02, 0.66),
-		Vector2(RIM_RADIUS + 0.10, 1.02),
-		Vector2(RIM_RADIUS + 0.30, SHELL_TOP - 0.20),
-		Vector2(RIM_RADIUS + 0.44, SHELL_TOP),
+		Vector2(RIM_RADIUS - 0.34, 0.10),
+		Vector2(RIM_RADIUS - 0.10, 0.32),
+		Vector2(RIM_RADIUS + 0.14, 0.60),
+		Vector2(RIM_RADIUS + 0.36, 0.94),
+		Vector2(RIM_RADIUS + 0.48, SHELL_TOP - 0.16),
+		Vector2(RIM_RADIUS + 0.60, SHELL_TOP),
 	]
 	root.add_child(Forms.mesh_node(
-		V2Forms.shell_lathe(outer, 0.10, 72, false),
+		V2Forms.shell_lathe(outer, 0.13, 72, false),
 		palette.get_material("acrylic_bowl"), "Guard", false))
 
 	# A pearl coping capping the guard's top edge. Cast acrylic in a premium
 	# toy is always trimmed at its rim - an untrimmed edge is what a cheap
 	# vacuum-formed part looks like.
 	var coping: Array = [
-		Vector2(RIM_RADIUS + 0.36, SHELL_TOP - 0.02),
-		Vector2(RIM_RADIUS + 0.34, SHELL_TOP + 0.09),
-		Vector2(RIM_RADIUS + 0.44, SHELL_TOP + 0.14),
-		Vector2(RIM_RADIUS + 0.54, SHELL_TOP + 0.09),
 		Vector2(RIM_RADIUS + 0.52, SHELL_TOP - 0.02),
-		Vector2(RIM_RADIUS + 0.36, SHELL_TOP - 0.02),
+		Vector2(RIM_RADIUS + 0.50, SHELL_TOP + 0.08),
+		Vector2(RIM_RADIUS + 0.60, SHELL_TOP + 0.13),
+		Vector2(RIM_RADIUS + 0.70, SHELL_TOP + 0.08),
+		Vector2(RIM_RADIUS + 0.68, SHELL_TOP - 0.02),
+		Vector2(RIM_RADIUS + 0.52, SHELL_TOP - 0.02),
 	]
 	root.add_child(Forms.mesh_node(
 		Geometry.lathe(coping, Geometry.profile_normals(coping), 72),
 		palette.get_material("pearl_lip_v2"), "Coping"))
+
+	# A chrome bead riding the coping. The mouth is the bowl's outermost
+	# silhouette, and it needs one bright continuous line on it or the glass
+	# has no edge to be read by against the gorge behind it.
+	var mouth_bead := Forms.mesh_node(
+		Forms.hoop(RIM_RADIUS + 0.60, 0.05, 80, 8),
+		palette.get_material("chrome"), "MouthBead", false)
+	mouth_bead.position = Vector3(0.0, SHELL_TOP + 0.13, 0.0)
+	root.add_child(mouth_bead)
 
 	# Three stays, on the cradle's own bearings so structure lines up with
 	# structure, and heavy enough to read as fittings rather than as wire.
@@ -192,8 +201,8 @@ static func _shell(root: Node3D, palette) -> void:
 		var bearing := deg_to_rad(float(CRADLE_BEARINGS[index]))
 		var foot := Vector3(cos(bearing) * (RIM_RADIUS - 0.24), 0.16,
 			sin(bearing) * (RIM_RADIUS - 0.24))
-		var head := Vector3(cos(bearing) * (RIM_RADIUS + 0.36), SHELL_TOP + 0.04,
-			sin(bearing) * (RIM_RADIUS + 0.36))
+		var head := Vector3(cos(bearing) * (RIM_RADIUS + 0.54), SHELL_TOP + 0.04,
+			sin(bearing) * (RIM_RADIUS + 0.54))
 		root.add_child(Forms.mesh_node(
 			Geometry.tube([foot, head], 0.085, 10),
 			palette.get_material("silver"), "Stay%d" % index))

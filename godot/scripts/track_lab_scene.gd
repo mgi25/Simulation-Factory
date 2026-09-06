@@ -24,26 +24,26 @@ const Forms := preload("res://assets/marble_machine/lab_forms.gd")
 
 const SHOTS := {
 	# aim: the height the lens looks at. extent: the vertical span it fits.
-	"hero": {"aim": 11.3, "extent": 25.8, "fov": 34.0, "elevation": 22.0, "azimuth": 34.0},
-	"phone": {"aim": 11.3, "extent": 25.8, "fov": 34.0, "elevation": 22.0, "azimuth": 34.0},
+	"hero": {"aim": 10.9, "extent": 28.6, "fov": 34.0, "elevation": 22.0, "azimuth": 34.0},
+	"phone": {"aim": 10.9, "extent": 28.6, "fov": 34.0, "elevation": 22.0, "azimuth": 34.0},
 
-	"e16": {"aim": 11.3, "extent": 25.8, "fov": 34.0, "elevation": 16.0, "azimuth": 34.0},
-	"e20": {"aim": 11.3, "extent": 25.8, "fov": 34.0, "elevation": 20.0, "azimuth": 34.0},
-	"e24": {"aim": 11.4, "extent": 26.0, "fov": 34.0, "elevation": 24.0, "azimuth": 34.0},
-	"e28": {"aim": 11.5, "extent": 26.2, "fov": 34.0, "elevation": 28.0, "azimuth": 34.0},
+	"e16": {"aim": 10.9, "extent": 28.6, "fov": 34.0, "elevation": 16.0, "azimuth": 34.0},
+	"e20": {"aim": 10.9, "extent": 28.6, "fov": 34.0, "elevation": 20.0, "azimuth": 34.0},
+	"e24": {"aim": 11.0, "extent": 28.8, "fov": 34.0, "elevation": 24.0, "azimuth": 34.0},
+	"e28": {"aim": 11.1, "extent": 29.0, "fov": 34.0, "elevation": 28.0, "azimuth": 34.0},
 
-	"a18": {"aim": 11.3, "extent": 25.8, "fov": 34.0, "elevation": 20.0, "azimuth": 18.0},
-	"a34": {"aim": 11.3, "extent": 25.8, "fov": 34.0, "elevation": 20.0, "azimuth": 34.0},
-	"a50": {"aim": 11.3, "extent": 25.8, "fov": 34.0, "elevation": 20.0, "azimuth": 50.0},
-	"a66": {"aim": 11.3, "extent": 25.8, "fov": 34.0, "elevation": 20.0, "azimuth": 66.0},
+	"a18": {"aim": 10.9, "extent": 28.6, "fov": 34.0, "elevation": 20.0, "azimuth": 18.0},
+	"a34": {"aim": 10.9, "extent": 28.6, "fov": 34.0, "elevation": 20.0, "azimuth": 34.0},
+	"a50": {"aim": 10.9, "extent": 28.6, "fov": 34.0, "elevation": 20.0, "azimuth": 50.0},
+	"a66": {"aim": 10.9, "extent": 28.6, "fov": 34.0, "elevation": 20.0, "azimuth": 66.0},
 
-	"f30": {"aim": 11.3, "extent": 25.8, "fov": 30.0, "elevation": 20.0, "azimuth": 34.0},
-	"f40": {"aim": 11.3, "extent": 25.8, "fov": 40.0, "elevation": 20.0, "azimuth": 34.0},
+	"f30": {"aim": 10.9, "extent": 28.6, "fov": 30.0, "elevation": 20.0, "azimuth": 34.0},
+	"f40": {"aim": 10.9, "extent": 28.6, "fov": 40.0, "elevation": 20.0, "azimuth": 34.0},
 
 	# Product lenses.
-	"start": {"aim": 18.9, "extent": 11.6, "fov": 30.0, "elevation": 24.0, "azimuth": 30.0},
-	"bowl": {"aim": 12.1, "extent": 13.2, "fov": 30.0, "elevation": 27.0, "azimuth": 40.0},
-	"track": {"aim": 6.6, "extent": 13.8, "fov": 32.0, "elevation": 17.0, "azimuth": 58.0},
+	"start": {"aim": 18.7, "extent": 13.0, "fov": 30.0, "elevation": 23.0, "azimuth": 35.0},
+	"bowl": {"aim": 12.2, "extent": 12.4, "fov": 30.0, "elevation": 27.0, "azimuth": 40.0},
+	"track": {"aim": 6.4, "extent": 12.6, "fov": 32.0, "elevation": 17.0, "azimuth": 58.0},
 	"upper": {"aim": 16.2, "extent": 12.0, "fov": 33.0, "elevation": 14.0, "azimuth": 30.0},
 }
 
@@ -189,9 +189,10 @@ func _collect_travellers() -> void:
 	var s_path: Array = _machine.get_meta("s_path")
 	var s_banks: Array = _machine.get_meta("s_banks")
 	var phases := [
-		[feed_path, feed_banks, 0.30], [feed_path, feed_banks, 0.68],
-		[s_path, s_banks, 0.16], [s_path, s_banks, 0.44],
-		[s_path, s_banks, 0.72], [s_path, s_banks, 0.93],
+		[feed_path, feed_banks, 0.34], [feed_path, feed_banks, 0.72],
+		[s_path, s_banks, 0.10], [s_path, s_banks, 0.28],
+		[s_path, s_banks, 0.46], [s_path, s_banks, 0.63],
+		[s_path, s_banks, 0.79], [s_path, s_banks, 0.94],
 	]
 	var index := 0
 	for child in field.get_children():

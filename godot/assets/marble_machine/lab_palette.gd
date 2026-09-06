@@ -239,7 +239,7 @@ func _build(key: String) -> StandardMaterial3D:
 		"acrylic_guard":
 			return _acrylic_soft(ACRYLIC_AQUA, 0.115, 0.30)
 		"acrylic_bowl":
-			return _acrylic_soft(ACRYLIC_AQUA, 0.095, 0.24)
+			return _acrylic_soft(ACRYLIC_AQUA, 0.175, 0.38)
 
 		# Lit.
 		"lit_cyan":
@@ -293,9 +293,9 @@ func _build(key: String) -> StandardMaterial3D:
 		# Read through three hundred units of haze, so its energy is set for
 		# what survives rather than for what it emits.
 		"lit_horizon":
-			return _emissive("#FFB668", 11.0, 0.20)
+			return _emissive("#C87F4C", 2.0, 0.42)
 		"lit_horizon_cool":
-			return _emissive("#8FC4E8", 7.0, 0.25)
+			return _emissive("#5A87A8", 1.5, 0.42)
 		"lit_far_window":
 			return _emissive("#FFCE93", 2.6, 0.30)
 		"lit_cyan_line":
@@ -315,6 +315,23 @@ func _build(key: String) -> StandardMaterial3D:
 			# Darker than the shell it sits inside, which is the whole point of
 			# having a separate running surface at all.
 			return _moulded("#AEB8C3", 0.26, 0.9, 0.05)
+		# V2.2 running surfaces. Part metal rather than painted: a dielectric
+		# gloss returns one bright specular and stays whatever value its
+		# albedo is, which is how both the track floor and the bowl dish kept
+		# reading as white paint. A partly metallic surface trades diffuse for
+		# reflection, so it darkens where it sees nothing and flares where it
+		# sees a light - which is what "polished" actually looks like, and it
+		# is what makes a candy-coloured racer pop off it.
+		"running_polished":
+			var track_metal := _moulded("#AEBAC6", 0.17, 1.0, 0.03)
+			track_metal.metallic = 0.55
+			track_metal.metallic_specular = 0.7
+			return track_metal
+		"dish_polished":
+			var dish_metal := _moulded("#7D8A99", 0.20, 1.0, 0.04)
+			dish_metal.metallic = 0.62
+			dish_metal.metallic_specular = 0.65
+			return dish_metal
 		"dish_floor":
 			# Rougher and far less lacquered than a track floor. A bowl is a
 			# wide smooth surface facing the key, and a clearcoat lobe on it

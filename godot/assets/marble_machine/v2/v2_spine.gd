@@ -140,44 +140,36 @@ static func backwall(palette, base_y: float, top_y: float,
 	var mid := (top_y + base_y) * 0.5
 	var z := PYLON_Z - 0.85
 
+	# V2.2: 1.15x the pylon spacing rather than 1.86x. The wall's job is to
+	# give the modules something to be read against, not to close the frame -
+	# at full width it left no gap between itself and the pylons and the
+	# gorge could not be seen through the machine at any height.
 	var slab := Forms.mesh_node(
-		Geometry.rounded_box(Vector3(PYLON_X * 1.86, height, 0.90), 0.22, 4),
+		Geometry.rounded_box(Vector3(PYLON_X * 1.15, height, 0.82), 0.22, 4),
 		palette.get_material("graphite"), "Slab")
 	slab.position = Vector3(0.0, mid, z)
 	node.add_child(slab)
-
-	# Two shallower wings, stepped back, so the wall has a silhouette of its
-	# own rather than being one rectangle.
-	for side in [1.0, -1.0]:
-		var wing := Forms.mesh_node(
-			Geometry.rounded_box(
-				Vector3(1.30, height * 0.78, 0.62), 0.18, 3),
-			palette.get_material("graphite"),
-			"Wing%s" % ("R" if side > 0.0 else "L"))
-		wing.position = Vector3(side * (PYLON_X * 0.93 + 0.30),
-			mid - height * 0.06, z - 0.20)
-		node.add_child(wing)
 
 	# Recessed panels: a lighter inset with a gold sill under each. Regular
 	# and banded, so they read as one texture and not as scattered detail.
 	for index in panel_levels.size():
 		var y: float = float(panel_levels[index])
 		var inset := Forms.mesh_node(
-			Geometry.rounded_box(Vector3(PYLON_X * 1.40, 1.05, 0.16), 0.10, 3),
+			Geometry.rounded_box(Vector3(PYLON_X * 0.92, 0.95, 0.16), 0.10, 3),
 			palette.get_material("graphite_soft"), "Panel%d" % index)
 		inset.position = Vector3(0.0, y + 0.9, z + 0.50)
 		node.add_child(inset)
 
 		var sill := Forms.mesh_node(
-			Geometry.rounded_box(Vector3(PYLON_X * 1.46, 0.09, 0.22), 0.03, 2),
+			Geometry.rounded_box(Vector3(PYLON_X * 0.98, 0.09, 0.22), 0.03, 2),
 			palette.get_material("gold"), "PanelSill%d" % index, false)
 		sill.position = Vector3(0.0, y + 0.32, z + 0.52)
 		node.add_child(sill)
 
 		var glow := Forms.mesh_node(
 			Geometry.tube([
-				Vector3(-PYLON_X * 0.62, y + 1.36, z + 0.58),
-				Vector3(PYLON_X * 0.62, y + 1.36, z + 0.58)], 0.030, 8),
+				Vector3(-PYLON_X * 0.42, y + 1.30, z + 0.54),
+				Vector3(PYLON_X * 0.42, y + 1.30, z + 0.54)], 0.030, 8),
 			palette.get_material("lit_cyan"), "PanelLight%d" % index, false)
 		node.add_child(glow)
 
@@ -186,9 +178,9 @@ static func backwall(palette, base_y: float, top_y: float,
 	# needs a direction as well as a value, and a regular set of shallow
 	# uprights gives it one without adding a single silhouette edge.
 	var louvre := Geometry.rounded_box(
-		Vector3(0.22, height - 1.4, 0.20), 0.07, 3)
-	for index in 9:
-		var x: float = (float(index) - 4.0) * PYLON_X * 0.195
+		Vector3(0.17, height - 1.4, 0.10), 0.06, 3)
+	for index in 6:
+		var x: float = (float(index) - 2.5) * PYLON_X * 0.185
 		var fin := Forms.mesh_node(louvre,
 			palette.get_material("graphite_deep"), "Louvre%d" % index)
 		fin.position = Vector3(x, mid, z + 0.52)
@@ -197,19 +189,19 @@ static func backwall(palette, base_y: float, top_y: float,
 	for side in [1.0, -1.0]:
 		node.add_child(Forms.mesh_node(
 			Geometry.tube([
-				Vector3(side * PYLON_X * 0.88, base_y + 0.8, z + 0.60),
-				Vector3(side * PYLON_X * 0.88, top_y - 0.8, z + 0.60)], 0.035, 8),
+				Vector3(side * PYLON_X * 0.55, base_y + 0.8, z + 0.56),
+				Vector3(side * PYLON_X * 0.55, top_y - 0.8, z + 0.56)], 0.035, 8),
 			palette.get_material("lit_cyan"),
 			"WallLight%s" % ("R" if side > 0.0 else "L"), false))
 
 	var cap := Forms.mesh_node(
-		Geometry.rounded_box(Vector3(PYLON_X * 2.02, 0.46, 1.20), 0.16, 4),
+		Geometry.rounded_box(Vector3(PYLON_X * 1.30, 0.44, 1.06), 0.16, 4),
 		palette.get_material("graphite_soft"), "Cap")
 	cap.position = Vector3(0.0, top_y - 0.10, z)
 	node.add_child(cap)
 
 	var capTrim := Forms.mesh_node(
-		Geometry.rounded_box(Vector3(PYLON_X * 2.06, 0.07, 1.26), 0.03, 2),
+		Geometry.rounded_box(Vector3(PYLON_X * 1.34, 0.07, 1.12), 0.03, 2),
 		palette.get_material("gold"), "CapTrim", false)
 	capTrim.position = Vector3(0.0, top_y + 0.16, z)
 	node.add_child(capTrim)

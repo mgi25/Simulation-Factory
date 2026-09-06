@@ -13,8 +13,8 @@ extends RefCounted
 ## ## The layout, and the reason for the two-chute plan
 ##
 ##     19.80  START POD        eight bays, sign, gate, chassis
-##              │  SHUFFLE DECK  four rows of deflector pins
-##              │  then the feed chute swinging LEFT
+##              │  MIXER         housed deflector rows, then a throat
+##              │  then a short feed chute swinging LEFT
 ##     12.60  BOWL             dish, rim, acrylic shell, cradle
 ##              │  the S, swinging RIGHT then hooking back LEFT
 ##      1.95   exit, still descending
@@ -53,30 +53,32 @@ const PANEL_LEVELS := [3.0, 7.4, 11.6, 15.8, 19.4]
 
 # The feed chute: the funnel throat, out to the left, back over the bowl rim.
 const FEED_CONTROLS := [
-	Vector3(0.62, 18.42, 3.55),
-	Vector3(-0.35, 18.05, 4.10),
-	Vector3(-2.05, 17.20, 4.00),
-	Vector3(-3.05, 16.00, 3.05),
-	Vector3(-3.25, 14.80, 1.75),
-	Vector3(-2.80, 14.15, 0.80),
-	Vector3(-2.30, 13.85, 0.25),
+	Vector3(0.40, 17.94, 3.04),
+	Vector3(-0.55, 17.40, 3.15),
+	Vector3(-1.70, 16.35, 2.90),
+	Vector3(-2.35, 15.20, 2.05),
+	Vector3(-2.35, 14.20, 1.05),
+	Vector3(-1.90, 13.62, 0.35),
 ]
 
 # The S: bowl drain, out to the right, down, and hooking back left.
 const S_CONTROLS := [
 	Vector3(0.00, 11.44, 0.10),
-	Vector3(1.10, 10.90, 1.15),
-	Vector3(2.30, 10.05, 1.55),
-	Vector3(2.65, 8.90, 0.70),
-	Vector3(2.15, 7.85, -0.45),
-	Vector3(0.85, 7.15, -1.05),
-	Vector3(-0.85, 6.65, -0.85),
-	Vector3(-2.00, 5.95, 0.15),
-	Vector3(-2.45, 4.95, 1.35),
-	Vector3(-2.00, 3.95, 2.25),
-	Vector3(-0.70, 3.25, 2.60),
-	Vector3(0.85, 2.65, 2.20),
-	Vector3(1.90, 2.10, 1.20),
+	Vector3(1.50, 10.85, 1.25),
+	Vector3(2.45, 9.95, 1.00),
+	Vector3(2.50, 9.00, -0.25),
+	Vector3(1.50, 8.25, -1.25),
+	Vector3(0.05, 7.80, -1.45),
+	Vector3(-1.45, 7.40, -1.10),
+	Vector3(-2.35, 6.80, -0.05),
+	Vector3(-2.45, 6.10, 1.15),
+	Vector3(-1.55, 5.40, 2.15),
+	Vector3(-0.15, 4.90, 2.50),
+	Vector3(1.30, 4.40, 2.10),
+	Vector3(2.25, 3.80, 0.95),
+	Vector3(2.30, 3.15, -0.25),
+	Vector3(1.40, 2.60, -1.15),
+	Vector3(0.10, 2.15, -1.45),
 ]
 
 
@@ -111,24 +113,24 @@ static func build(palette) -> Node3D:
 	start.rotation.y = START_YAW
 	root.add_child(start)
 
-	var shuffle := Start.build_shuffle(palette)
-	shuffle.position = Vector3(0.0, START_Y, START_Z)
-	shuffle.rotation.y = START_YAW
-	root.add_child(shuffle)
+	var mixer := Start.build_mixer(palette)
+	mixer.position = Vector3(0.0, START_Y, START_Z)
+	mixer.rotation.y = START_YAW
+	root.add_child(mixer)
 
 	# The entry flare catches the shuffle deck's full-width exit lip and
 	# closes to the hero section within two units. The transition is the
 	# track itself rather than a separate funnel, so one rolled lip runs
 	# unbroken from the deflector field to the bowl.
 	var feed := Track.build(palette, FEED_CONTROLS, "FeedChute", {
-		"bank_gain": 2.6, "bank_max": 20.0,
-		"entry_flare": 0.34, "exit_flare": 0.10,
+		"bank_gain": 2.4, "bank_max": 18.0,
+		"entry_flare": 0.16, "exit_flare": 0.08,
 		"edge_light": "lit_cyan_line", "samples": 112,
 	})
 	root.add_child(feed)
 
 	var main = Track.build(palette, S_CONTROLS, "SCurve", {
-		"bank_gain": 3.4, "bank_max": 27.0,
+		"bank_gain": 3.0, "bank_max": 22.0,
 		"entry_flare": 0.30, "exit_flare": 0.18,
 		"edge_light": "neon_violet",
 	})
@@ -164,7 +166,7 @@ static func _brackets(root: Node3D, palette, feed: Node3D,
 	# visibly carried rather than floating past its own supports.
 	var path: Array = main.get_meta("path")
 	var banks: Array = main.get_meta("banks")
-	for entry in [[0.44, "SaddleUpper"], [0.72, "SaddleLower"]]:
+	for entry in [[0.30, "SaddleUpper"], [0.58, "SaddleMid"], [0.84, "SaddleLower"]]:
 		var t := float(entry[0])
 		var index: int = clampi(int(round(t * float(path.size() - 1))),
 			0, path.size() - 1)
@@ -228,8 +230,8 @@ static func _marbles(root: Node3D, palette, feed: Node3D,
 		field.add_child(node)
 		colour += 1
 
-	for entry in [[feed, 0.30], [feed, 0.68], [main, 0.16], [main, 0.44],
-			[main, 0.72], [main, 0.93]]:
+	for entry in [[feed, 0.34], [feed, 0.72], [main, 0.10], [main, 0.28],
+			[main, 0.46], [main, 0.63], [main, 0.79], [main, 0.94]]:
 		var chute: Node3D = entry[0]
 		var t: float = entry[1]
 		var node := Forms.mesh_node(sphere, palette.marble(colour),
@@ -271,23 +273,23 @@ static func module_table() -> Dictionary:
 					"size": Vector3(6.6, 1.8, 3.4),
 				},
 			},
-			"shuffle_deck_v21": {
+			"mixer_v22": {
 				"origin": Vector3(0.0, START_Y, START_Z),
 				"yaw": START_YAW,
-				"entry_anchor": Vector3(0.0, START_Y + Start.DECK_ENTRY_Y,
-					START_Z + Start.DECK_ENTRY_Z),
+				"entry_anchor": Vector3(0.0, START_Y + Start.MIX_TOP_Y,
+					START_Z + Start.MIX_BACK_Z),
 				"exit_anchor": feed_entry,
-				"half_width": Start.DECK_HALF,
-				"mouth_half_width": Start.DECK_MOUTH_HALF,
+				"half_width": Start.MIX_HALF,
+				"housing_z": [Start.MIX_BACK_Z, Start.MIX_FRONT_Z],
+				"housing_y": [Start.MIX_BOTTOM_Y, Start.MIX_TOP_Y],
+				"throat_local": Start.mixer_exit_local(),
 				"pin_rows": Start.PIN_ROWS,
 				"pin_pitch": Start.PIN_PITCH,
 				"pin_radius": Start.PIN_RADIUS,
 				"pin_height": Start.PIN_HEIGHT,
 				"pins_local": Start.pin_positions(),
-				"floor_entry_local_y": Start.DECK_ENTRY_Y,
-				"floor_exit_local_y": Start.DECK_EXIT_Y,
 				"preferred_camera": "start",
-				"note": "breaks start-lane advantage; every gap clears a 0.57 racer",
+				"note": "intended to break start-lane advantage; UNVERIFIED until a PyBullet Monte-Carlo pass measures it",
 			},
 			"bowl_v2": {
 				"origin": Vector3(0.0, BOWL_Y, 0.0),
