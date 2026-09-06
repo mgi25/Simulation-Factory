@@ -483,7 +483,7 @@ func _build(key: String) -> StandardMaterial3D:
 		"slope_rock":
 			return _matte("#24303E", 0.94)
 		"slope_earth":
-			return _matte("#34382F", 0.93)
+			return _matte("#3B4352", 0.93)
 		"slope_scree":
 			return _matte("#2C3646", 0.94)
 		"slope_moss":

@@ -353,9 +353,11 @@ static func _metrics(table: Dictionary, length: float, clearances: Array,
 		hi = Vector3(maxf(hi.x, (point as Vector3).x),
 			maxf(hi.y, (point as Vector3).y), maxf(hi.z, (point as Vector3).z))
 	var worst := 1.0e9
+	var tallest := -1.0e9
 	var buried := 0
 	for gap in clearances:
 		worst = minf(worst, float(gap))
+		tallest = maxf(tallest, float(gap))
 		if float(gap) < -0.2:
 			buried += 1
 	var start: Vector3 = nodes["start"]
@@ -367,6 +369,7 @@ static func _metrics(table: Dictionary, length: float, clearances: Array,
 		"span_z": hi.z - lo.z,
 		"start_to_finish": start.distance_to(finish),
 		"min_clearance": worst,
+		"max_clearance": tallest,
 		"buried_piers": buried,
 		"mean_grade_deg": rad_to_deg(atan((hi.y - lo.y) / maxf(length, 1.0))),
 	}

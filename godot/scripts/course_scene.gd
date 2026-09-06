@@ -112,9 +112,9 @@ func _report() -> void:
 	print("  length %.1f  drop %.1f  span x %.1f z %.1f  grade %.1f deg" % [
 		metrics["length"], metrics["drop"], metrics["span_x"],
 		metrics["span_z"], metrics["mean_grade_deg"]])
-	print("  start->finish %.1f  min ground clearance %.2f  buried piers %d" % [
+	print("  start->finish %.1f  clearance %.2f..%.2f  buried piers %d" % [
 		metrics["start_to_finish"], metrics["min_clearance"],
-		metrics["buried_piers"]])
+		metrics["max_clearance"], metrics["buried_piers"]])
 
 
 func _practicals() -> void:

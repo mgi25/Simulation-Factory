@@ -139,6 +139,17 @@ static func height(x: float, z: float, cfg: Dictionary,
 	if fade > 0.0:
 		h = lerpf(h, float(cfg.get("edge_y", -74.0)), fade)
 
+	# Flattened shelves, *before* the bench and not after it. A pad pulls the
+	# surface toward its own height over a radius so that a module stands on
+	# ground rather than on a slope - and applied last it also pulls the ground
+	# back up over the track leaving the start chute buried four units deep,
+	# which is exactly what the first build of this layout did.
+	for entry in cfg.get("pads", []):
+		var pad: Array = entry
+		var distance := Vector2(x - float(pad[0]), z - float(pad[1])).length()
+		var blend := 1.0 - smoothstep(float(pad[2]),
+			float(pad[2]) + float(pad[3]), distance)
+		h = lerpf(h, float(pad[4]), blend)
 	# The bench. Where the hill would stand higher than the racing line, it is
 	# cut away to `cut_depth` below it. A real installation benches its route
 	# into the slope rather than tunnelling through it, and doing it here means
@@ -165,15 +176,6 @@ static func height(x: float, z: float, cfg: Dictionary,
 					var blend := 1.0 - smoothstep(inner, reach, d)
 					h = minf(h, lerpf(h, p.y - depth, blend))
 
-	# Flattened shelves. A pad pulls the surface toward its own height over a
-	# radius, so a module stands on ground rather than on a slope, and the
-	# blend is wide enough that the shelf reads as cut rather than dropped in.
-	for entry in cfg.get("pads", []):
-		var pad: Array = entry
-		var distance := Vector2(x - float(pad[0]), z - float(pad[1])).length()
-		var blend := 1.0 - smoothstep(float(pad[2]),
-			float(pad[2]) + float(pad[3]), distance)
-		h = lerpf(h, float(pad[4]), blend)
 	return h
 
 
