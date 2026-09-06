@@ -17,12 +17,14 @@ import os
 from dataclasses import asdict, dataclass, replace
 from typing import Any
 
+from marble3d.hardening import HardeningConfig
 from marble3d.units import GRAVITY, MARBLE_DIAMETER, MARBLE_RADIUS
 
 __all__ = [
     "PhysicsConfig",
     "MarbleConfig",
     "ColliderConfig",
+    "HardeningConfig",
     "CoreConfig",
     "DEFAULT_CONFIG",
     "MESH_CACHE",
@@ -361,6 +363,15 @@ class CoreConfig:
     # A run that has not finished by now is a jam, and is reported as one
     # rather than being allowed to consume a batch slot indefinitely.
     duration_limit: float = 45.0
+    # The research block, in `marble3d.hardening`. Every field of it defaults to
+    # the value that reproduces this branch's parent exactly: no extra engine
+    # parameter is sent, no resistance term is applied, and `to_json` below
+    # omits the block entirely, so a default run writes a byte-identical replay
+    # and a byte-identical digest. It is a field of `CoreConfig` rather than a
+    # separate argument threaded through the call sites so that a sweep can
+    # carry it the same way it carries the physics rate, and so that any run
+    # that *was* configured says so in its own replay file.
+    hardening: HardeningConfig = HardeningConfig()
 
     def with_overrides(self, **changes: Any) -> "CoreConfig":
         """A copy with named fields replaced - how a sweep works.
@@ -386,19 +397,32 @@ class CoreConfig:
             if unknown:
                 raise ValueError(f"unknown field(s) on {group}: {sorted(unknown)}")
             top[group] = replace(current, **fields)
-        unknown = set(top) - {"physics", "marble", "collider", "gravity", "duration_limit"}
+        unknown = set(top) - {
+            "physics", "marble", "collider", "gravity", "duration_limit", "hardening",
+        }
         if unknown:
             raise ValueError(f"unknown configuration field(s): {sorted(unknown)}")
         return replace(self, **top)
 
     def to_json(self) -> dict[str, Any]:
-        return {
+        """The block a replay records, and the block a config digest is taken over.
+
+        The hardening group is omitted when it is the default, and that is not
+        tidiness: it is what makes this branch's default replay byte-identical
+        to its parent's, so that "the digest did not move" is evidence that
+        nothing changed rather than evidence that the comparison was rebased.
+        A run that *did* configure hardening writes the whole block.
+        """
+        payload = {
             "gravity": self.gravity,
             "duration_limit": self.duration_limit,
             "physics": self.physics.to_json(),
             "marble": self.marble.to_json(),
             "collider": self.collider.to_json(),
         }
+        if not self.hardening.is_default:
+            payload["hardening"] = self.hardening.to_json()
+        return payload
 
 
 DEFAULT_CONFIG = CoreConfig()

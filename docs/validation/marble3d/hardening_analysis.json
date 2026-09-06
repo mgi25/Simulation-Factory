@@ -1,0 +1,3154 @@
+{
+ "environment": {
+  "machine": "AMD64",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+  "pybullet_api": 202010061,
+  "python": "3.13.0"
+ },
+ "rates": {
+  "crr_spread": 1.668384906899024,
+  "g_dt": {
+   "120": 2.04375,
+   "1920": 0.127734375,
+   "240": 1.021875,
+   "480": 0.5109375,
+   "960": 0.25546875
+  },
+  "rows": [
+   {
+    "contact_fraction": 0.7395106082421015,
+    "energy_decay": 0.750476670654736,
+    "energy_loss_rate": 431.5784632677472,
+    "equivalent_crr": 0.07728680106473766,
+    "mean_contacts": 1.687301350139904,
+    "outcomes": [
+     "drained"
+    ],
+    "peak_radius": 11.335810150038132,
+    "phases": 4,
+    "physics_hz": 120,
+    "radial_rate": -2.0846863862015077,
+    "seconds": 4.550000000000001,
+    "surface_rms": 0.01522970933859167,
+    "turns": 2.6189862498421457,
+    "turns_max": 2.756405085761993,
+    "turns_min": 2.5552027089348606,
+    "wall_seconds": 0.22069480025675148,
+    "worst_penetration": -0.05053893515939562
+   },
+   {
+    "contact_fraction": 0.8703635336740456,
+    "energy_decay": 0.7975343081290318,
+    "energy_loss_rate": 397.34034688849795,
+    "equivalent_crr": 0.07619699947947174,
+    "mean_contacts": 2.4385169412137717,
+    "outcomes": [
+     "drained"
+    ],
+    "peak_radius": 11.190984167828743,
+    "phases": 4,
+    "physics_hz": 240,
+    "radial_rate": -2.1362314843356414,
+    "seconds": 4.910416666666666,
+    "surface_rms": 0.009373762629078361,
+    "turns": 2.820770585786444,
+    "turns_max": 3.002215342813578,
+    "turns_min": 2.7029842741098693,
+    "wall_seconds": 0.26496160007081926,
+    "worst_penetration": -0.01114960271338296
+   },
+   {
+    "contact_fraction": 0.994088623575742,
+    "energy_decay": 0.41211995474040114,
+    "energy_loss_rate": 198.9172776777882,
+    "equivalent_crr": 0.04632432284968837,
+    "mean_contacts": 3.5220554105450086,
+    "outcomes": [
+     "drained"
+    ],
+    "peak_radius": 11.442635271584198,
+    "phases": 4,
+    "physics_hz": 480,
+    "radial_rate": -0.9626537570616368,
+    "seconds": 9.473958333333334,
+    "surface_rms": 0.00538680543334847,
+    "turns": 5.279648379356255,
+    "turns_max": 5.470169654816745,
+    "turns_min": 5.061785566152418,
+    "wall_seconds": 0.5178214999614283,
+    "worst_penetration": -0.006735667315530559
+   },
+   {
+    "contact_fraction": 0.9998372608459005,
+    "energy_decay": 0.10565087746639044,
+    "energy_loss_rate": 51.44260811521986,
+    "equivalent_crr": 0.012860143720156224,
+    "mean_contacts": 3.5911550539087713,
+    "outcomes": [
+     "drained"
+    ],
+    "peak_radius": 12.039572813976571,
+    "phases": 4,
+    "physics_hz": 960,
+    "radial_rate": -0.2327479039279091,
+    "seconds": 35.759375,
+    "surface_rms": 0.0034100677926078423,
+    "turns": 19.168036144226527,
+    "turns_max": 19.545160803773925,
+    "turns_min": 18.73413586619917,
+    "wall_seconds": 2.820338600082323,
+    "worst_penetration": -0.006735667315530559
+   },
+   {
+    "contact_fraction": 1.0,
+    "energy_decay": 0.033122584291889176,
+    "energy_loss_rate": 27.35525080292721,
+    "equivalent_crr": 0.005027307316185276,
+    "mean_contacts": 2.8005772569444445,
+    "outcomes": [
+     "timeout"
+    ],
+    "peak_radius": 12.410649583309871,
+    "phases": 4,
+    "physics_hz": 1920,
+    "radial_rate": -0.114213850967856,
+    "seconds": 60.0,
+    "surface_rms": 0.004084013149916217,
+    "turns": 30.97051191279774,
+    "turns_max": 30.98066241510464,
+    "turns_min": 30.96187285423227,
+    "wall_seconds": 10.164594199857675,
+    "worst_penetration": -0.006735667315530559
+   }
+  ],
+  "turns_spread": 2.01591298147307
+ },
+ "resistance": {
+  "bowl": [
+   {
+    "model": "off (baseline)",
+    "rates": [
+     {
+      "contact_fraction": 0.7287047606257973,
+      "energy_decay": 0.7297316820682114,
+      "energy_loss_rate": 431.5784632677472,
+      "equivalent_crr": 0.07728680106473766,
+      "mean_contacts": 1.6684046196199556,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.012776098768166,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.0463477985707574,
+      "seconds": 4.550000000000001,
+      "surface_rms": 0.015254985219967446,
+      "turns": 2.6189862498421457,
+      "turns_max": 2.625431707315437,
+      "turns_min": 2.6125407923688546,
+      "wall_seconds": 0.13695780001580715,
+      "worst_penetration": -0.04373025363054287
+     },
+     {
+      "contact_fraction": 0.8703635336740456,
+      "energy_decay": 0.7818597218566341,
+      "energy_loss_rate": 386.24042461217005,
+      "equivalent_crr": 0.07504548091642607,
+      "mean_contacts": 2.4681288140729825,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.190984167828743,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.068186357254084,
+      "seconds": 5.027083333333334,
+      "surface_rms": 0.009444077169275023,
+      "turns": 2.879294141437391,
+      "turns_max": 3.002215342813578,
+      "turns_min": 2.756372940061204,
+      "wall_seconds": 0.14923909993376583,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.994088623575742,
+      "energy_decay": 0.41806938531417087,
+      "energy_loss_rate": 201.60549120347764,
+      "equivalent_crr": 0.047169625770156695,
+      "mean_contacts": 3.5220554105450086,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.435782361797651,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.9782669780948121,
+      "seconds": 9.363541666666666,
+      "surface_rms": 0.005436061836815519,
+      "turns": 5.2280820102377215,
+      "turns_max": 5.394378454323025,
+      "turns_min": 5.061785566152418,
+      "wall_seconds": 0.29091690003406256,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.9999564219517155,
+      "energy_decay": 0.1047245223478239,
+      "energy_loss_rate": 51.14265134947712,
+      "equivalent_crr": 0.012837245937267787,
+      "mean_contacts": 3.5911550539087713,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 12.039572813976571,
+      "phases": 2,
+      "physics_hz": 960,
+      "radial_rate": -0.22968740249815134,
+      "seconds": 36.162499999999994,
+      "surface_rms": 0.0034259057870438116,
+      "turns": 19.383606734303818,
+      "turns_max": 19.545160803773925,
+      "turns_min": 19.22205266483371,
+      "wall_seconds": 1.67437839997001,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "spread": 1.996223542812733
+   },
+   {
+    "model": "rolling crr=0.010",
+    "rates": [
+     {
+      "contact_fraction": 0.7508212132942542,
+      "energy_decay": 0.8016166180104041,
+      "energy_loss_rate": 453.56838062596466,
+      "equivalent_crr": 0.07940624152563372,
+      "mean_contacts": 1.724389389666169,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.249399794633309,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.336714604790588,
+      "seconds": 4.341666666666667,
+      "surface_rms": 0.014744859727279805,
+      "turns": 2.5019764675936047,
+      "turns_max": 2.6150416697929435,
+      "turns_min": 2.388911265394266,
+      "wall_seconds": 0.17590409994591027,
+      "worst_penetration": -0.03918593668753494
+     },
+     {
+      "contact_fraction": 0.8706771381534559,
+      "energy_decay": 0.8963746400755089,
+      "energy_loss_rate": 444.7866618058437,
+      "equivalent_crr": 0.08677110082694606,
+      "mean_contacts": 2.5115469732545272,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.089523114725422,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.3782015753723527,
+      "seconds": 4.39375,
+      "surface_rms": 0.009327224541449042,
+      "turns": 2.5126961454200027,
+      "turns_max": 2.5677472227421045,
+      "turns_min": 2.457645068097901,
+      "wall_seconds": 0.21349640004336834,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.9836665178317536,
+      "energy_decay": 0.5491995462271246,
+      "energy_loss_rate": 260.0777569190169,
+      "equivalent_crr": 0.058613071507191444,
+      "mean_contacts": 3.456811335008835,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.427802844204582,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -1.311455361792641,
+      "seconds": 7.335416666666667,
+      "surface_rms": 0.0056535767535688865,
+      "turns": 4.076370622452878,
+      "turns_max": 4.106156884273545,
+      "turns_min": 4.046584360632211,
+      "wall_seconds": 0.3889750000089407,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.9970900427055993,
+      "energy_decay": 0.23346355520030934,
+      "energy_loss_rate": 115.90490565105651,
+      "equivalent_crr": 0.02529006157894456,
+      "mean_contacts": 3.575188723322151,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.86038788656329,
+      "phases": 2,
+      "physics_hz": 960,
+      "radial_rate": -0.5754211752213093,
+      "seconds": 16.121875000000003,
+      "surface_rms": 0.003851115275520019,
+      "turns": 8.668515060377562,
+      "turns_max": 8.70465997832667,
+      "turns_min": 8.632370142428451,
+      "wall_seconds": 1.3702214000513777,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "spread": 1.6292601770045914
+   },
+   {
+    "model": "rolling crr=0.030",
+    "rates": [
+     {
+      "contact_fraction": 0.7087642914571495,
+      "energy_decay": 1.0320583434004984,
+      "energy_loss_rate": 618.4189396296651,
+      "equivalent_crr": 0.11160518169082884,
+      "mean_contacts": 1.670805908725454,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 10.999343564223926,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -3.1195739317407183,
+      "seconds": 3.1958333333333333,
+      "surface_rms": 0.015288664462750722,
+      "turns": 1.8561850222393055,
+      "turns_max": 1.997161589904618,
+      "turns_min": 1.7152084545739932,
+      "wall_seconds": 0.12582229997497052,
+      "worst_penetration": -0.03034828597715697
+     },
+     {
+      "contact_fraction": 0.8761499473483227,
+      "energy_decay": 1.0356784845597118,
+      "energy_loss_rate": 568.891843868129,
+      "equivalent_crr": 0.10850292329721559,
+      "mean_contacts": 2.4835029565941884,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 10.980174818976963,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -3.012156469014508,
+      "seconds": 3.464583333333333,
+      "surface_rms": 0.009244012388007143,
+      "turns": 2.086416619956915,
+      "turns_max": 2.1024556270219894,
+      "turns_min": 2.070377612891841,
+      "wall_seconds": 0.15994950011372566,
+      "worst_penetration": -0.00754512872277938
+     },
+     {
+      "contact_fraction": 0.9753443149859381,
+      "energy_decay": 0.7625184354447938,
+      "energy_loss_rate": 371.48039634268935,
+      "equivalent_crr": 0.07993632592195177,
+      "mean_contacts": 3.4010600241060667,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.205912226615139,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -1.9116155377094552,
+      "seconds": 5.196875,
+      "surface_rms": 0.005684135322976215,
+      "turns": 2.8948405364931586,
+      "turns_max": 2.900936115700059,
+      "turns_min": 2.888744957286258,
+      "wall_seconds": 0.26800810010172427,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.989004358130372,
+      "energy_decay": 0.45587631096564984,
+      "energy_loss_rate": 227.47456528246008,
+      "equivalent_crr": 0.047285101934221585,
+      "mean_contacts": 3.5469740434496515,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.604101824497112,
+      "phases": 2,
+      "physics_hz": 960,
+      "radial_rate": -1.1643007956331197,
+      "seconds": 8.336458333333333,
+      "surface_rms": 0.004170194040877108,
+      "turns": 4.462287272018125,
+      "turns_max": 4.471590594962167,
+      "turns_min": 4.452983949074083,
+      "wall_seconds": 0.7115372000262141,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "spread": 1.5595646456627568
+   },
+   {
+    "model": "rolling crr=0.060",
+    "rates": [
+     {
+      "contact_fraction": 0.758947266552883,
+      "energy_decay": 1.5003698457060977,
+      "energy_loss_rate": 728.943741382836,
+      "equivalent_crr": 0.1407133180307651,
+      "mean_contacts": 1.856060739359175,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 10.774105181796108,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -3.8248763392436373,
+      "seconds": 2.8125,
+      "surface_rms": 0.013706431554500277,
+      "turns": 1.5074800634997811,
+      "turns_max": 1.5823034096697597,
+      "turns_min": 1.4326567173298028,
+      "wall_seconds": 0.11734660004731268,
+      "worst_penetration": -0.03731900661371802
+     },
+     {
+      "contact_fraction": 0.8516162412535724,
+      "energy_decay": 1.3762961928865667,
+      "energy_loss_rate": 679.7712167095333,
+      "equivalent_crr": 0.13472458458389025,
+      "mean_contacts": 2.5032669754607273,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 10.903481931014417,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -3.693926934908541,
+      "seconds": 2.96875,
+      "surface_rms": 0.008983807570937936,
+      "turns": 1.6416814836721327,
+      "turns_max": 1.6754701568495272,
+      "turns_min": 1.6078928104947383,
+      "wall_seconds": 0.1447025000816211,
+      "worst_penetration": -0.007604881826524618
+     },
+     {
+      "contact_fraction": 0.9629403375623826,
+      "energy_decay": 1.1377847922474364,
+      "energy_loss_rate": 517.5423532663162,
+      "equivalent_crr": 0.11006593758100688,
+      "mean_contacts": 3.3741539521501043,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.050621586371252,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -2.7785841488904044,
+      "seconds": 3.8197916666666667,
+      "surface_rms": 0.005681171149736736,
+      "turns": 2.093225566065466,
+      "turns_max": 2.0940539081474507,
+      "turns_min": 2.0923972239834807,
+      "wall_seconds": 0.24118749995250255,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.9826165367097975,
+      "energy_decay": 0.7981594732301364,
+      "energy_loss_rate": 380.75425551076154,
+      "equivalent_crr": 0.07875113422870551,
+      "mean_contacts": 3.5369022947272244,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.363252373963233,
+      "phases": 2,
+      "physics_hz": 960,
+      "radial_rate": -2.0130616724939836,
+      "seconds": 5.09375,
+      "surface_rms": 0.004305777386926101,
+      "turns": 2.6829557760138565,
+      "turns_max": 2.690130569915616,
+      "turns_min": 2.675780982112097,
+      "wall_seconds": 0.448329099919647,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "spread": 1.3885593692070541
+   },
+   {
+    "model": "exponential k=0.20",
+    "rates": [
+     {
+      "contact_fraction": 0.7672397089439944,
+      "energy_decay": 0.9185632139970217,
+      "energy_loss_rate": 483.475673482035,
+      "equivalent_crr": 0.08964637141041311,
+      "mean_contacts": 1.7706800239111167,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 10.909361325492265,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.468939954165519,
+      "seconds": 4.108333333333333,
+      "surface_rms": 0.014909735571938355,
+      "turns": 2.326239853283986,
+      "turns_max": 2.3763653873059556,
+      "turns_min": 2.2761143192620166,
+      "wall_seconds": 0.13010479998774827,
+      "worst_penetration": -0.04601321107829436
+     },
+     {
+      "contact_fraction": 0.8688681079062892,
+      "energy_decay": 0.9325962306003202,
+      "energy_loss_rate": 458.5486665646199,
+      "equivalent_crr": 0.09104912004897994,
+      "mean_contacts": 2.5142528180385257,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 10.991296649753146,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.469886544156388,
+      "seconds": 4.247916666666667,
+      "surface_rms": 0.00904317280998785,
+      "turns": 2.4597079163035094,
+      "turns_max": 2.507761419157056,
+      "turns_min": 2.411654413449963,
+      "wall_seconds": 0.14609379996545613,
+      "worst_penetration": -0.009057349614541736
+     },
+     {
+      "contact_fraction": 0.9848078025363617,
+      "energy_decay": 0.597846758150528,
+      "energy_loss_rate": 274.1759962885213,
+      "equivalent_crr": 0.06260381248116212,
+      "mean_contacts": 3.4515705380812496,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.477397951316897,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -1.3989503164768116,
+      "seconds": 6.9625,
+      "surface_rms": 0.005375717138169967,
+      "turns": 3.8845499958177636,
+      "turns_max": 3.9369092916708612,
+      "turns_min": 3.832190699964666,
+      "wall_seconds": 0.3577264999039471,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.9996638477975455,
+      "energy_decay": 0.3112228514775425,
+      "energy_loss_rate": 151.04060099157567,
+      "equivalent_crr": 0.03453436917157226,
+      "mean_contacts": 3.5642327961980254,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.679365065507104,
+      "phases": 2,
+      "physics_hz": 960,
+      "radial_rate": -0.7443798765001786,
+      "seconds": 12.402604166666666,
+      "surface_rms": 0.003754166766288835,
+      "turns": 6.736504739968042,
+      "turns_max": 6.744330967168623,
+      "turns_min": 6.728678512767463,
+      "wall_seconds": 0.9714373999740928,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "spread": 1.6698836924893574
+   },
+   {
+    "model": "exponential k=0.35",
+    "rates": [
+     {
+      "contact_fraction": 0.7130343711320575,
+      "energy_decay": 1.1781250664184495,
+      "energy_loss_rate": 620.5216793528349,
+      "equivalent_crr": 0.11703617823850317,
+      "mean_contacts": 1.74409352429918,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 10.921353524074343,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -3.2870776883019737,
+      "seconds": 3.1958333333333333,
+      "surface_rms": 0.0148975711564839,
+      "turns": 1.8140869223911296,
+      "turns_max": 1.9113420514426975,
+      "turns_min": 1.7168317933395616,
+      "wall_seconds": 0.1443229999858886,
+      "worst_penetration": -0.09098382094889358
+     },
+     {
+      "contact_fraction": 0.8650304981282567,
+      "energy_decay": 1.1224231796601596,
+      "energy_loss_rate": 513.5958878658654,
+      "equivalent_crr": 0.10242085137809699,
+      "mean_contacts": 2.50032684963976,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.165243712467529,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.8356038339416507,
+      "seconds": 3.84375,
+      "surface_rms": 0.009391440417945934,
+      "turns": 2.209653187444621,
+      "turns_max": 2.2525762216225926,
+      "turns_min": 2.1667301532666494,
+      "wall_seconds": 0.16409620002377778,
+      "worst_penetration": -0.007929967983443632
+     },
+     {
+      "contact_fraction": 0.9783867255773915,
+      "energy_decay": 0.72117590746099,
+      "energy_loss_rate": 326.809463497336,
+      "equivalent_crr": 0.07474041401709769,
+      "mean_contacts": 3.444803313300871,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.274401793882053,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -1.6861918940176075,
+      "seconds": 5.876041666666667,
+      "surface_rms": 0.005269399328593741,
+      "turns": 3.3103668190542814,
+      "turns_max": 3.311864237685729,
+      "turns_min": 3.3088694004228345,
+      "wall_seconds": 0.27722419996280223,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 1.0,
+      "energy_decay": 0.4559582360602167,
+      "energy_loss_rate": 223.17896710687114,
+      "equivalent_crr": 0.05030762773346195,
+      "mean_contacts": 3.5829308993537827,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.48004408204477,
+      "phases": 2,
+      "physics_hz": 960,
+      "radial_rate": -1.1142417237505151,
+      "seconds": 8.455729166666666,
+      "surface_rms": 0.0038186702175700008,
+      "turns": 4.6558176462833964,
+      "turns_max": 4.668921945236083,
+      "turns_min": 4.64271334733071,
+      "wall_seconds": 0.7733474000124261,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "spread": 1.8248115777665828
+   },
+   {
+    "model": "exponential k=0.60",
+    "rates": [
+     {
+      "contact_fraction": 0.7524688622659724,
+      "energy_decay": 1.32107005409622,
+      "energy_loss_rate": 681.0311221705488,
+      "equivalent_crr": 0.13019019235756285,
+      "mean_contacts": 1.7694066817541585,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 10.759109073752267,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -3.578222395310461,
+      "seconds": 2.9625,
+      "surface_rms": 0.01430978123001681,
+      "turns": 1.654295305289926,
+      "turns_max": 1.700762955794001,
+      "turns_min": 1.6078276547858514,
+      "wall_seconds": 0.1267935000360012,
+      "worst_penetration": -0.029516893881512282
+     },
+     {
+      "contact_fraction": 0.8542258522727273,
+      "energy_decay": 1.1981341843871893,
+      "energy_loss_rate": 607.1480199374287,
+      "equivalent_crr": 0.1212818695001445,
+      "mean_contacts": 2.5118963068181817,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 10.830395112329283,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -3.231934207685478,
+      "seconds": 3.25,
+      "surface_rms": 0.008890582133091678,
+      "turns": 1.8784010117563668,
+      "turns_max": 1.9016008290332167,
+      "turns_min": 1.8552011944795166,
+      "wall_seconds": 0.13390220003202558,
+      "worst_penetration": -0.0074422020786408345
+     },
+     {
+      "contact_fraction": 0.9777037933817594,
+      "energy_decay": 0.9087979865578324,
+      "energy_loss_rate": 442.6063130783255,
+      "equivalent_crr": 0.09745545525456933,
+      "mean_contacts": 3.442651902397665,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.08541927773978,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -2.3075553951581895,
+      "seconds": 4.378125,
+      "surface_rms": 0.005291224925400044,
+      "turns": 2.513442075747726,
+      "turns_max": 2.5422370432429173,
+      "turns_min": 2.4846471082525348,
+      "wall_seconds": 0.24516599997878075,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.9913482743289164,
+      "energy_decay": 0.7114554026244697,
+      "energy_loss_rate": 330.801946699572,
+      "equivalent_crr": 0.07511126327689924,
+      "mean_contacts": 3.5234920134895935,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.216552380634953,
+      "phases": 2,
+      "physics_hz": 960,
+      "radial_rate": -1.70489106733922,
+      "seconds": 5.808854166666666,
+      "surface_rms": 0.003875784138615423,
+      "turns": 3.230769210540095,
+      "turns_max": 3.2888889975916955,
+      "turns_min": 3.1726494234884948,
+      "wall_seconds": 0.5206886001396924,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "spread": 1.5193430506092314
+   }
+  ],
+  "calibration": [
+   {
+    "model": "off",
+    "rates": [
+     {
+      "contact_fraction": 1.0,
+      "crr": -5.432283912538992e-17,
+      "deceleration": -1.3322676295501878e-14,
+      "final_speed": 30.000000000000057,
+      "floor": "plane",
+      "height_rms": 1.0000000000214353e-05,
+      "mean_contacts": 1.0,
+      "physics_hz": 120,
+      "seconds": 4.0,
+      "slip_fraction": 4.736951571733992e-16,
+      "speed": 30.0,
+      "wall_seconds": 0.03263839997816831,
+      "worst_penetration": -1.0000000000787157e-05
+     },
+     {
+      "contact_fraction": 1.0,
+      "crr": -1.4848242694273247e-16,
+      "deceleration": -3.6415315207705135e-14,
+      "final_speed": 30.000000000000163,
+      "floor": "plane",
+      "height_rms": 1.0000000000163719e-05,
+      "mean_contacts": 2.0,
+      "physics_hz": 240,
+      "seconds": 4.0,
+      "slip_fraction": 2.368475785866988e-16,
+      "speed": 30.0,
+      "wall_seconds": 0.03947580000385642,
+      "worst_penetration": -1.0000000000676135e-05
+     },
+     {
+      "contact_fraction": 1.0,
+      "crr": 1.7383308520124775e-16,
+      "deceleration": 4.263256414560601e-14,
+      "final_speed": 29.99999999999984,
+      "floor": "plane",
+      "height_rms": 1.0000000000197317e-05,
+      "mean_contacts": 3.0,
+      "physics_hz": 480,
+      "seconds": 4.0,
+      "slip_fraction": 3.55271367880052e-16,
+      "speed": 30.0,
+      "wall_seconds": 0.06323929992504418,
+      "worst_penetration": -1.000000000095369e-05
+     },
+     {
+      "contact_fraction": 1.0,
+      "crr": -1.0502415564242052e-16,
+      "deceleration": -2.5757174171303632e-14,
+      "final_speed": 30.000000000000142,
+      "floor": "plane",
+      "height_rms": 1.0000000000159472e-05,
+      "mean_contacts": 3.5611979166666665,
+      "physics_hz": 960,
+      "seconds": 4.0,
+      "slip_fraction": 4.7369515717339785e-16,
+      "speed": 30.0,
+      "wall_seconds": 0.09575149999000132,
+      "worst_penetration": -1.0000000000787157e-05
+     }
+    ]
+   },
+   {
+    "model": "rolling crr=0.002",
+    "rates": [
+     {
+      "contact_fraction": 1.0,
+      "crr": 0.0014285714285713813,
+      "deceleration": 0.35035714285713127,
+      "final_speed": 28.516821428571482,
+      "floor": "plane",
+      "height_rms": 1.00000000002147e-05,
+      "mean_contacts": 1.0,
+      "physics_hz": 120,
+      "seconds": 4.0,
+      "slip_fraction": 0.0003583411294837231,
+      "speed": 30.0,
+      "wall_seconds": 0.03734389995224774,
+      "worst_penetration": -1.0000000000731646e-05
+     },
+     {
+      "contact_fraction": 1.0,
+      "crr": 0.00142857142857145,
+      "deceleration": 0.35035714285714814,
+      "final_speed": 28.51390178571429,
+      "floor": "plane",
+      "height_rms": 1.0000000000169082e-05,
+      "mean_contacts": 2.0,
+      "physics_hz": 240,
+      "seconds": 4.0,
+      "slip_fraction": 0.0001791889106724554,
+      "speed": 30.0,
+      "wall_seconds": 0.056242499966174364,
+      "worst_penetration": -1.0000000000787157e-05
+     },
+     {
+      "contact_fraction": 1.0,
+      "crr": 0.0014285714285719065,
+      "deceleration": 0.35035714285726005,
+      "final_speed": 28.51244196428514,
+      "floor": "plane",
+      "height_rms": 1.0000000000177166e-05,
+      "mean_contacts": 3.0,
+      "physics_hz": 480,
+      "seconds": 4.0,
+      "slip_fraction": 8.959904252344755e-05,
+      "speed": 30.0,
+      "wall_seconds": 0.10311390005517751,
+      "worst_penetration": -1.0000000001009202e-05
+     },
+     {
+      "contact_fraction": 1.0,
+      "crr": 0.0014285714285722795,
+      "deceleration": 0.35035714285735153,
+      "final_speed": 28.5117120535705,
+      "floor": "plane",
+      "height_rms": 1.0000000000179008e-05,
+      "mean_contacts": 3.5713541666666666,
+      "physics_hz": 960,
+      "seconds": 4.0,
+      "slip_fraction": 4.4800668146510705e-05,
+      "speed": 30.0,
+      "wall_seconds": 0.16325740003958344,
+      "worst_penetration": -1.000000000089818e-05
+     }
+    ]
+   },
+   {
+    "model": "rolling crr=0.010",
+    "rates": [
+     {
+      "contact_fraction": 1.0,
+      "crr": 0.007142857142857243,
+      "deceleration": 1.751785714285739,
+      "final_speed": 22.58410714285705,
+      "floor": "plane",
+      "height_rms": 1.0000000000202548e-05,
+      "mean_contacts": 1.0,
+      "physics_hz": 120,
+      "seconds": 4.0,
+      "slip_fraction": 0.0022623763550541965,
+      "speed": 30.0,
+      "wall_seconds": 0.03424419998191297,
+      "worst_penetration": -1.0000000000787157e-05
+     },
+     {
+      "contact_fraction": 1.0,
+      "crr": 0.007142857142857062,
+      "deceleration": 1.7517857142856945,
+      "final_speed": 22.569508928571533,
+      "floor": "plane",
+      "height_rms": 1.0000000000158152e-05,
+      "mean_contacts": 2.0,
+      "physics_hz": 240,
+      "seconds": 4.0,
+      "slip_fraction": 0.0011319198428663714,
+      "speed": 30.0,
+      "wall_seconds": 0.049857899895869195,
+      "worst_penetration": -1.0000000000731646e-05
+     },
+     {
+      "contact_fraction": 1.0,
+      "crr": 0.007142857142857388,
+      "deceleration": 1.7517857142857745,
+      "final_speed": 22.562209821428304,
+      "floor": "plane",
+      "height_rms": 1.0000000000184086e-05,
+      "mean_contacts": 3.0,
+      "physics_hz": 480,
+      "seconds": 4.0,
+      "slip_fraction": 0.0005661430152942631,
+      "speed": 30.0,
+      "wall_seconds": 0.09318799991160631,
+      "worst_penetration": -1.000000000089818e-05
+     },
+     {
+      "contact_fraction": 1.0,
+      "crr": 0.0071428571428577906,
+      "deceleration": 1.751785714285873,
+      "final_speed": 22.558560267856475,
+      "floor": "plane",
+      "height_rms": 1.0000000000172499e-05,
+      "mean_contacts": 3.6356770833333334,
+      "physics_hz": 960,
+      "seconds": 4.0,
+      "slip_fraction": 0.00028311730332814016,
+      "speed": 30.0,
+      "wall_seconds": 0.19916509999893606,
+      "worst_penetration": -1.000000000089818e-05
+     }
+    ]
+   },
+   {
+    "model": "rolling crr=0.030",
+    "rates": [
+     {
+      "contact_fraction": 1.0,
+      "crr": 0.021432404460104363,
+      "deceleration": 5.256297193840595,
+      "final_speed": 7.748561224637629,
+      "floor": "plane",
+      "height_rms": 1.0000000000203026e-05,
+      "mean_contacts": 1.4041666666666666,
+      "physics_hz": 120,
+      "seconds": 4.0,
+      "slip_fraction": 0.019781898284887103,
+      "speed": 30.0,
+      "wall_seconds": 0.035552100045606494,
+      "worst_penetration": -1.0000000000787157e-05
+     },
+     {
+      "contact_fraction": 1.0,
+      "crr": 0.021429617914194177,
+      "deceleration": 5.255613793456122,
+      "final_speed": 7.707500183318364,
+      "floor": "plane",
+      "height_rms": 1.0000000000141437e-05,
+      "mean_contacts": 2.433333333333333,
+      "physics_hz": 240,
+      "seconds": 4.0,
+      "slip_fraction": 0.00994364231944928,
+      "speed": 30.0,
+      "wall_seconds": 0.05097450001630932,
+      "worst_penetration": -1.0000000000676135e-05
+     },
+     {
+      "contact_fraction": 1.0,
+      "crr": 0.021428695371059715,
+      "deceleration": 5.2553875397523955,
+      "final_speed": 7.686507876704728,
+      "floor": "plane",
+      "height_rms": 1.0000000000182203e-05,
+      "mean_contacts": 3.244270833333333,
+      "physics_hz": 480,
+      "seconds": 4.0,
+      "slip_fraction": 0.004985399496712302,
+      "speed": 30.0,
+      "wall_seconds": 0.11092920007649809,
+      "worst_penetration": -1.0000000000731646e-05
+     },
+     {
+      "contact_fraction": 1.0,
+      "crr": 0.021428571428571398,
+      "deceleration": 5.255357142857135,
+      "final_speed": 7.675680803571466,
+      "floor": "plane",
+      "height_rms": 1.0000000000176853e-05,
+      "mean_contacts": 2.53125,
+      "physics_hz": 960,
+      "seconds": 4.0,
+      "slip_fraction": 0.002496215871962476,
+      "speed": 30.0,
+      "wall_seconds": 0.15020080003887415,
+      "worst_penetration": -1.0000000000787157e-05
+     }
+    ]
+   },
+   {
+    "model": "exponential k=0.35",
+    "rates": [
+     {
+      "contact_fraction": 1.0,
+      "crr": 0.021163835375628368,
+      "deceleration": 5.190430625872857,
+      "final_speed": 6.805129824398667,
+      "floor": "plane",
+      "height_rms": 1.0000000000195859e-05,
+      "mean_contacts": 1.7104166666666667,
+      "physics_hz": 120,
+      "seconds": 4.0,
+      "slip_fraction": 2.6103202807849705e-16,
+      "speed": 30.0,
+      "wall_seconds": 0.03553480003029108,
+      "worst_penetration": -1.0000000000676135e-05
+     },
+     {
+      "contact_fraction": 1.0,
+      "crr": 0.02113951787430698,
+      "deceleration": 5.184466758673787,
+      "final_speed": 6.788812933015722,
+      "floor": "plane",
+      "height_rms": 1.0000000000154105e-05,
+      "mean_contacts": 2.7270833333333333,
+      "physics_hz": 240,
+      "seconds": 4.0,
+      "slip_fraction": 2.6165941776969227e-16,
+      "speed": 30.0,
+      "wall_seconds": 0.054125400027260184,
+      "worst_penetration": -1.0000000000787157e-05
+     },
+     {
+      "contact_fraction": 1.0,
+      "crr": 0.0211249523490184,
+      "deceleration": 5.1808945635967625,
+      "final_speed": 6.783037491817124,
+      "floor": "plane",
+      "height_rms": 1.0000000000172655e-05,
+      "mean_contacts": 3.073958333333333,
+      "physics_hz": 480,
+      "seconds": 4.0,
+      "slip_fraction": 1.309411043019591e-16,
+      "speed": 30.0,
+      "wall_seconds": 0.07983539998531342,
+      "worst_penetration": -1.0000000000676135e-05
+     },
+     {
+      "contact_fraction": 1.0,
+      "crr": 0.021117241309459682,
+      "deceleration": 5.179003431144987,
+      "final_speed": 6.780575395848378,
+      "floor": "plane",
+      "height_rms": 1.0000000000170995e-05,
+      "mean_contacts": 1.9614583333333333,
+      "physics_hz": 960,
+      "seconds": 4.0,
+      "slip_fraction": 1.3098865035022553e-16,
+      "speed": 30.0,
+      "wall_seconds": 0.13025769998785108,
+      "worst_penetration": -1.000000000089818e-05
+     }
+    ]
+   }
+  ],
+  "rates": [
+   120,
+   240,
+   480,
+   960
+  ]
+ },
+ "solver": {
+  "rates": [
+   120,
+   240,
+   480
+  ],
+  "variants": [
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.7287047606257973,
+      "energy_decay": 0.7297316820682114,
+      "energy_loss_rate": 431.5784632677472,
+      "equivalent_crr": 0.07728680106473766,
+      "mean_contacts": 1.6684046196199556,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.012776098768166,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.0463477985707574,
+      "seconds": 4.550000000000001,
+      "surface_rms": 0.015254985219967446,
+      "turns": 2.6189862498421457,
+      "turns_max": 2.625431707315437,
+      "turns_min": 2.6125407923688546,
+      "wall_seconds": 0.15840919991023839,
+      "worst_penetration": -0.04373025363054287
+     },
+     {
+      "contact_fraction": 0.8703635336740456,
+      "energy_decay": 0.7818597218566341,
+      "energy_loss_rate": 386.24042461217005,
+      "equivalent_crr": 0.07504548091642607,
+      "mean_contacts": 2.4681288140729825,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.190984167828743,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.068186357254084,
+      "seconds": 5.027083333333334,
+      "surface_rms": 0.009444077169275023,
+      "turns": 2.879294141437391,
+      "turns_max": 3.002215342813578,
+      "turns_min": 2.756372940061204,
+      "wall_seconds": 0.20338670001365244,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.994088623575742,
+      "energy_decay": 0.41806938531417087,
+      "energy_loss_rate": 201.60549120347764,
+      "equivalent_crr": 0.047169625770156695,
+      "mean_contacts": 3.5220554105450086,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.435782361797651,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.9782669780948121,
+      "seconds": 9.363541666666666,
+      "surface_rms": 0.005436061836815519,
+      "turns": 5.2280820102377215,
+      "turns_max": 5.394378454323025,
+      "turns_min": 5.061785566152418,
+      "wall_seconds": 0.37398249993566424,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "reason": "production, unchanged",
+    "spread": 1.996223542812733,
+    "variant": "baseline"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.8475069538534268,
+      "energy_decay": 0.9083011525266587,
+      "energy_loss_rate": 490.40352137304075,
+      "equivalent_crr": 0.08853381521872453,
+      "mean_contacts": 1.9912480636842127,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.24458669692611,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.6235276700299144,
+      "seconds": 4.066666666666666,
+      "surface_rms": 0.011365123513485438,
+      "turns": 2.380753326985446,
+      "turns_max": 2.4925304501677457,
+      "turns_min": 2.2689762038031462,
+      "wall_seconds": 0.15152530011255294,
+      "worst_penetration": -0.054817097759313205
+     },
+     {
+      "contact_fraction": 0.9558261672699737,
+      "energy_decay": 0.6658635194283076,
+      "energy_loss_rate": 319.892594349719,
+      "equivalent_crr": 0.06528172928072488,
+      "mean_contacts": 2.8382745228520454,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.106899704252722,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -1.672960082726879,
+      "seconds": 6.033333333333333,
+      "surface_rms": 0.0072360176181772585,
+      "turns": 3.387364212734492,
+      "turns_max": 3.5235948707913005,
+      "turns_min": 3.251133554677684,
+      "wall_seconds": 0.20552629989106208,
+      "worst_penetration": -0.009260045044437053
+     },
+     {
+      "contact_fraction": 0.9976537642634278,
+      "energy_decay": 0.3034311476811227,
+      "energy_loss_rate": 140.70737930563558,
+      "equivalent_crr": 0.03185389005379059,
+      "mean_contacts": 3.5435919553020163,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.792843812448558,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.7081164561748676,
+      "seconds": 13.321875,
+      "surface_rms": 0.00401829639233155,
+      "turns": 7.294244818845554,
+      "turns_max": 7.314159531716025,
+      "turns_min": 7.274330105975083,
+      "wall_seconds": 0.4981896000681445,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "reason": "no bounce off the track at all: does the loss survive without restitution?",
+    "spread": 3.0638389690214827,
+    "variant": "restitution=0"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.20965735836944313,
+      "energy_decay": 1.3862146251191927,
+      "energy_loss_rate": 1025.2374916570013,
+      "equivalent_crr": 0.15553066215198713,
+      "mean_contacts": 0.5292689776921843,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.279906082301691,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -6.0862120801062325,
+      "seconds": 1.8916666666666666,
+      "surface_rms": 0.05299874780077576,
+      "turns": 1.1730460271173055,
+      "turns_max": 1.3444418974776666,
+      "turns_min": 1.0016501567569442,
+      "wall_seconds": 0.13366479997057468,
+      "worst_penetration": -0.12968615930567928
+     },
+     {
+      "contact_fraction": 0.7051945331727496,
+      "energy_decay": 0.7837938468241887,
+      "energy_loss_rate": 405.2603254557241,
+      "equivalent_crr": 0.0748235150600393,
+      "mean_contacts": 1.8965211439343501,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.466145305524105,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.114455605978492,
+      "seconds": 4.81875,
+      "surface_rms": 0.012401905219248274,
+      "turns": 2.739519917106442,
+      "turns_max": 2.8059193989240407,
+      "turns_min": 2.673120435288843,
+      "wall_seconds": 0.18176690000109375,
+      "worst_penetration": -0.014774316339105722
+     },
+     {
+      "contact_fraction": 0.9158035832222582,
+      "energy_decay": 0.5854082619377539,
+      "energy_loss_rate": 268.83003562202714,
+      "equivalent_crr": 0.06301866497658537,
+      "mean_contacts": 3.2006381885583224,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.392070084910612,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -1.3465076736136452,
+      "seconds": 7.113541666666666,
+      "surface_rms": 0.006613724333879213,
+      "turns": 3.9975339749171095,
+      "turns_max": 4.003353979528952,
+      "turns_min": 3.9917139703052675,
+      "wall_seconds": 0.3344968999736011,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "reason": "a bouncier track, to see which way restitution moves the loss",
+    "spread": 3.4078236339462515,
+    "variant": "restitution=0.60"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.7839080459770116,
+      "energy_decay": 0.8557536481927683,
+      "energy_loss_rate": 489.3764521682163,
+      "equivalent_crr": 0.09144527514362791,
+      "mean_contacts": 1.8597381864623244,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 10.99390372044313,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.427663698470025,
+      "seconds": 4.0625,
+      "surface_rms": 0.01350640274102714,
+      "turns": 2.431794021985761,
+      "turns_max": 2.6137751869824517,
+      "turns_min": 2.2498128569890703,
+      "wall_seconds": 0.15118209994398057,
+      "worst_penetration": -0.06407561281563084
+     },
+     {
+      "contact_fraction": 0.8843552971067195,
+      "energy_decay": 0.6910741356568767,
+      "energy_loss_rate": 337.5610119051964,
+      "equivalent_crr": 0.06838084065293133,
+      "mean_contacts": 2.6845141181995236,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.16068362771832,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -1.7861367204870153,
+      "seconds": 5.710416666666666,
+      "surface_rms": 0.007286972603747239,
+      "turns": 3.2433639031797057,
+      "turns_max": 3.256387425582659,
+      "turns_min": 3.230340380776753,
+      "wall_seconds": 0.2564534000121057,
+      "worst_penetration": -0.009346582624854424
+     },
+     {
+      "contact_fraction": 0.9951162869597807,
+      "energy_decay": 0.32480410739177557,
+      "energy_loss_rate": 160.0721934057685,
+      "equivalent_crr": 0.03858295700419242,
+      "mean_contacts": 3.55107494329053,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.462669121588704,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.7305010232823237,
+      "seconds": 11.727083333333333,
+      "surface_rms": 0.004645044410534337,
+      "turns": 6.462294583464098,
+      "turns_max": 6.469732742399229,
+      "turns_min": 6.454856424528969,
+      "wall_seconds": 0.4535567999118939,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "reason": "suppress restitution below 5 wu/s, above g*dt at every rate in the matrix",
+    "spread": 2.657418566308959,
+    "variant": "restitution_threshold=5"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.7185832310721726,
+      "energy_decay": 0.7542355179875169,
+      "energy_loss_rate": 442.9745886924428,
+      "equivalent_crr": 0.07878740145534857,
+      "mean_contacts": 1.6789867583687679,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.016026151080869,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.14708096066646,
+      "seconds": 4.4125,
+      "surface_rms": 0.015010291463532981,
+      "turns": 2.58759307747624,
+      "turns_max": 2.643914879852042,
+      "turns_min": 2.5312712751004383,
+      "wall_seconds": 0.14849799999501556,
+      "worst_penetration": -0.05281568215842703
+     },
+     {
+      "contact_fraction": 0.8702575462907526,
+      "energy_decay": 0.7837612557074034,
+      "energy_loss_rate": 386.63416442895743,
+      "equivalent_crr": 0.07376428996947111,
+      "mean_contacts": 2.456339145742407,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.19261093587907,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.085892737093342,
+      "seconds": 5.022916666666666,
+      "surface_rms": 0.009381315518517057,
+      "turns": 2.853221286111497,
+      "turns_max": 2.8787443714802086,
+      "turns_min": 2.8276982007427858,
+      "wall_seconds": 0.18290439993143082,
+      "worst_penetration": -0.00705326610443037
+     },
+     {
+      "contact_fraction": 0.9924803717904712,
+      "energy_decay": 0.4089191298684522,
+      "energy_loss_rate": 192.9408774272707,
+      "equivalent_crr": 0.045490012981654504,
+      "mean_contacts": 3.5253928805049317,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.534756471162433,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.9394939401316444,
+      "seconds": 9.811458333333334,
+      "surface_rms": 0.005239651928343423,
+      "turns": 5.431765032894566,
+      "turns_max": 5.682178884584779,
+      "turns_min": 5.181351181204353,
+      "wall_seconds": 0.4002824000781402,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "reason": "the opposite: apply restitution to everything, at every rate",
+    "spread": 2.09915735212599,
+    "variant": "restitution_threshold=0.01"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.6368613138686132,
+      "energy_decay": 0.48700848329809254,
+      "energy_loss_rate": 280.1660632445744,
+      "equivalent_crr": 0.048017389973347535,
+      "mean_contacts": 1.210462287104623,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.850147617789325,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -1.4218183052867017,
+      "seconds": 6.85,
+      "surface_rms": 0.009826147842584284,
+      "turns": 3.807919738281891,
+      "turns_max": 3.8222302534832084,
+      "turns_min": 3.793609223080573,
+      "wall_seconds": 0.1703967999201268,
+      "worst_penetration": -0.07966644522267906
+     },
+     {
+      "contact_fraction": 0.8290751978683482,
+      "energy_decay": 0.1573926482483613,
+      "energy_loss_rate": 87.71997018859003,
+      "equivalent_crr": 0.017955597327073827,
+      "mean_contacts": 1.3528313759767987,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 12.212277093994246,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -0.4136239862726734,
+      "seconds": 21.535416666666666,
+      "surface_rms": 0.004189137305939026,
+      "turns": 11.565381203574017,
+      "turns_max": 12.601900429200768,
+      "turns_min": 10.528861977947264,
+      "wall_seconds": 0.3365080999210477,
+      "worst_penetration": -0.02018077648279564
+     },
+     {
+      "contact_fraction": 0.9415805631732217,
+      "energy_decay": 0.11688014994087333,
+      "energy_loss_rate": 64.37843373909443,
+      "equivalent_crr": 0.01211135283004752,
+      "mean_contacts": 1.806305028124088,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 12.18943905269316,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.3249392516094545,
+      "seconds": 29.005208333333336,
+      "surface_rms": 0.004425151276433173,
+      "turns": 15.358864795830277,
+      "turns_max": 15.582059343281731,
+      "turns_min": 15.135670248378823,
+      "wall_seconds": 0.7574030000250787,
+      "worst_penetration": -0.00829712227489387
+     }
+    ],
+    "reason": "a tenth of the manifold's persistence distance: fewer stale points",
+    "spread": 4.033400347550418,
+    "variant": "break_threshold=0.002"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.8692137320044296,
+      "energy_decay": 1.8891368760215985,
+      "energy_loss_rate": 967.9476278928548,
+      "equivalent_crr": 0.18710572417727683,
+      "mean_contacts": 2.6663977218794495,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 10.579470292504292,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -5.396850657731065,
+      "seconds": 2.095833333333333,
+      "surface_rms": 0.037636224621602606,
+      "turns": 1.2582869254261622,
+      "turns_max": 1.3036460645251415,
+      "turns_min": 1.2129277863271828,
+      "wall_seconds": 0.1415938000427559,
+      "worst_penetration": -0.04114261287063007
+     },
+     {
+      "contact_fraction": 0.9886363636363636,
+      "energy_decay": 1.3738144431099468,
+      "energy_loss_rate": 644.0878838547189,
+      "equivalent_crr": 0.14076571364033158,
+      "mean_contacts": 3.5504855577689245,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 10.730814278835961,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -3.481865569213282,
+      "seconds": 3.0354166666666664,
+      "surface_rms": 0.01656108321739887,
+      "turns": 1.842731880529489,
+      "turns_max": 1.915524954218093,
+      "turns_min": 1.7699388068408848,
+      "wall_seconds": 0.16627820010762662,
+      "worst_penetration": -0.01719582823915172
+     },
+     {
+      "contact_fraction": 0.9962871287128713,
+      "energy_decay": 0.5169782636556909,
+      "energy_loss_rate": 274.9271519431667,
+      "equivalent_crr": 0.058426422530709815,
+      "mean_contacts": 3.636409118938669,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.15011284115972,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -1.3193229042444048,
+      "seconds": 6.945833333333333,
+      "surface_rms": 0.005965984419703981,
+      "turns": 3.8200108817397282,
+      "turns_max": 3.955514996649834,
+      "turns_min": 3.684506766829622,
+      "wall_seconds": 0.3140994000714272,
+      "worst_penetration": -0.019699010859117887
+     }
+    ],
+    "reason": "five times it: more stale points, held longer",
+    "spread": 3.0358822018642133,
+    "variant": "break_threshold=0.10"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.72287995914293,
+      "energy_decay": 0.8358246793979692,
+      "energy_loss_rate": 464.4031485465072,
+      "equivalent_crr": 0.08617886544246162,
+      "mean_contacts": 1.7114121224783527,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.02890894427623,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.2715025934149002,
+      "seconds": 4.237500000000001,
+      "surface_rms": 0.015131329519874408,
+      "turns": 2.4544770516365007,
+      "turns_max": 2.555829613211986,
+      "turns_min": 2.353124490061015,
+      "wall_seconds": 0.1523470999673009,
+      "worst_penetration": -0.07970636172995162
+     },
+     {
+      "contact_fraction": 0.8663294314811102,
+      "energy_decay": 0.7888533963244249,
+      "energy_loss_rate": 400.1287825518956,
+      "equivalent_crr": 0.07698216538114763,
+      "mean_contacts": 2.4866853791068406,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.190984167828743,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.115959633746728,
+      "seconds": 4.870833333333334,
+      "surface_rms": 0.009171748982007467,
+      "turns": 2.8198169197493077,
+      "turns_max": 2.9738569114336326,
+      "turns_min": 2.665776928064983,
+      "wall_seconds": 0.1801532000536099,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.9947376095024303,
+      "energy_decay": 0.42013125999406276,
+      "energy_loss_rate": 202.7221212281766,
+      "equivalent_crr": 0.04735663245333266,
+      "mean_contacts": 3.5132960110740052,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.436062689953607,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.9800496747434857,
+      "seconds": 9.310416666666667,
+      "surface_rms": 0.005434978128870279,
+      "turns": 5.172668605590488,
+      "turns_max": 5.180551797082308,
+      "turns_min": 5.164785414098668,
+      "wall_seconds": 0.3743324000388384,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "reason": "a quarter of production's 40",
+    "spread": 2.1074422358692075,
+    "variant": "iterations=10"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.7249814174218817,
+      "energy_decay": 0.7217286260988982,
+      "energy_loss_rate": 440.4330961539779,
+      "equivalent_crr": 0.07612240961071651,
+      "mean_contacts": 1.6494289430801339,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.056726832338628,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.177358240063829,
+      "seconds": 4.408333333333333,
+      "surface_rms": 0.015070936215164102,
+      "turns": 2.5973024231142805,
+      "turns_max": 2.648088690687454,
+      "turns_min": 2.5465161555411067,
+      "wall_seconds": 0.14822470012586564,
+      "worst_penetration": -0.05070760892196628
+     },
+     {
+      "contact_fraction": 0.8600153637568364,
+      "energy_decay": 0.7944962641921007,
+      "energy_loss_rate": 407.176867529573,
+      "equivalent_crr": 0.0776063016258349,
+      "mean_contacts": 2.442209167449647,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.190984167828743,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.161984808670712,
+      "seconds": 4.766666666666667,
+      "surface_rms": 0.0091471210330521,
+      "turns": 2.762593036282828,
+      "turns_max": 2.8402829529661258,
+      "turns_min": 2.684903119599531,
+      "wall_seconds": 0.19156379997730255,
+      "worst_penetration": -0.008970826799172854
+     },
+     {
+      "contact_fraction": 0.9939064907550077,
+      "energy_decay": 0.41539812276269306,
+      "energy_loss_rate": 200.79489881235514,
+      "equivalent_crr": 0.04687963062710872,
+      "mean_contacts": 3.50539205233326,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.435782361797651,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.9708349220477583,
+      "seconds": 9.398958333333333,
+      "surface_rms": 0.005406583337731603,
+      "turns": 5.2227689610288826,
+      "turns_max": 5.253108084482389,
+      "turns_min": 5.192429837575376,
+      "wall_seconds": 0.3685053000226617,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "reason": "nearly four times it; is 40 already converged?",
+    "spread": 2.010843602404433,
+    "variant": "iterations=150"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.7147372842790632,
+      "energy_decay": 0.755957553472496,
+      "energy_loss_rate": 441.0225279031548,
+      "equivalent_crr": 0.07907694634953927,
+      "mean_contacts": 1.6388735253964364,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.012776098768166,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.130216408863731,
+      "seconds": 4.454166666666667,
+      "surface_rms": 0.015562092962288065,
+      "turns": 2.590875758668969,
+      "turns_max": 2.6125407923688546,
+      "turns_min": 2.5692107249690834,
+      "wall_seconds": 0.13158299995120615,
+      "worst_penetration": -0.04373025363054287
+     },
+     {
+      "contact_fraction": 0.8703635336740456,
+      "energy_decay": 0.7818597218566341,
+      "energy_loss_rate": 386.24042461217005,
+      "equivalent_crr": 0.07504548091642607,
+      "mean_contacts": 2.4681288140729825,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.190984167828743,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.068186357254084,
+      "seconds": 5.027083333333334,
+      "surface_rms": 0.009444077169275023,
+      "turns": 2.879294141437391,
+      "turns_max": 3.002215342813578,
+      "turns_min": 2.756372940061204,
+      "wall_seconds": 0.1595320999622345,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.994088623575742,
+      "energy_decay": 0.41806938531417087,
+      "energy_loss_rate": 201.60549120347764,
+      "equivalent_crr": 0.047169625770156695,
+      "mean_contacts": 3.5220554105450086,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.435782361797651,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.9782669780948121,
+      "seconds": 9.363541666666666,
+      "surface_rms": 0.005436061836815519,
+      "turns": 5.2280820102377215,
+      "turns_max": 5.394378454323025,
+      "turns_min": 5.061785566152418,
+      "wall_seconds": 0.3584211999550462,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "reason": "penetration recovery through Baumgarte only, which can inject energy",
+    "spread": 2.0178821746835074,
+    "variant": "no_split_impulse"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.7287047606257973,
+      "energy_decay": 0.7297316820682114,
+      "energy_loss_rate": 431.5784632677472,
+      "equivalent_crr": 0.07728680106473766,
+      "mean_contacts": 1.6684046196199556,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.012776098768166,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.0463477985707574,
+      "seconds": 4.550000000000001,
+      "surface_rms": 0.015254985219967446,
+      "turns": 2.6189862498421457,
+      "turns_max": 2.625431707315437,
+      "turns_min": 2.6125407923688546,
+      "wall_seconds": 0.14508329995442182,
+      "worst_penetration": -0.04373025363054287
+     },
+     {
+      "contact_fraction": 0.8703635336740456,
+      "energy_decay": 0.7818597218566341,
+      "energy_loss_rate": 386.24042461217005,
+      "equivalent_crr": 0.07504548091642607,
+      "mean_contacts": 2.4681288140729825,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.190984167828743,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.068186357254084,
+      "seconds": 5.027083333333334,
+      "surface_rms": 0.009444077169275023,
+      "turns": 2.879294141437391,
+      "turns_max": 3.002215342813578,
+      "turns_min": 2.756372940061204,
+      "wall_seconds": 0.17510780016891658,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.994088623575742,
+      "energy_decay": 0.41806938531417087,
+      "energy_loss_rate": 201.60549120347764,
+      "equivalent_crr": 0.047169625770156695,
+      "mean_contacts": 3.5220554105450086,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.435782361797651,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.9782669780948121,
+      "seconds": 9.363541666666666,
+      "surface_rms": 0.005436061836815519,
+      "turns": 5.2280820102377215,
+      "turns_max": 5.394378454323025,
+      "turns_min": 5.061785566152418,
+      "wall_seconds": 0.30372059997171164,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "reason": "send almost every penetration down the split-impulse path",
+    "spread": 1.996223542812733,
+    "variant": "split_threshold=-0.001"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.7312384306869602,
+      "energy_decay": 0.7276161473631225,
+      "energy_loss_rate": 418.7530522370675,
+      "equivalent_crr": 0.07394994758431311,
+      "mean_contacts": 1.6641749794323324,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.235083209701795,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.11957282502803,
+      "seconds": 4.65,
+      "surface_rms": 0.015083199793952038,
+      "turns": 2.65366056505221,
+      "turns_max": 2.7032723583868408,
+      "turns_min": 2.6040487717175793,
+      "wall_seconds": 0.1258787999395281,
+      "worst_penetration": -0.03291141269444681
+     },
+     {
+      "contact_fraction": 0.8678966131907309,
+      "energy_decay": 0.7546760597448754,
+      "energy_loss_rate": 373.4330175398054,
+      "equivalent_crr": 0.07339836409859578,
+      "mean_contacts": 2.480871819802301,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 10.9409431836129,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -1.978725916229081,
+      "seconds": 5.177083333333334,
+      "surface_rms": 0.009171207863301684,
+      "turns": 2.9578824035044398,
+      "turns_max": 3.0290382964465756,
+      "turns_min": 2.886726510562304,
+      "wall_seconds": 0.14792390004731715,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.9973373006096196,
+      "energy_decay": 0.3435915108954812,
+      "energy_loss_rate": 167.9656762766781,
+      "equivalent_crr": 0.04136049652782592,
+      "mean_contacts": 3.5397772890692147,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.569049487542037,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.7706786672073314,
+      "seconds": 11.270833333333332,
+      "surface_rms": 0.005190347256616681,
+      "turns": 6.238710569975968,
+      "turns_max": 6.431619365826154,
+      "turns_min": 6.045801774125781,
+      "wall_seconds": 0.3357033000793308,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "reason": "four times the default error reduction",
+    "spread": 2.3509828846000973,
+    "variant": "erp=0.8"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.6561283163522647,
+      "energy_decay": 0.8977958672081743,
+      "energy_loss_rate": 529.1186935686351,
+      "equivalent_crr": 0.09507512914573772,
+      "mean_contacts": 1.5577499243417734,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.116559436688256,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.74812061778962,
+      "seconds": 3.7125000000000004,
+      "surface_rms": 0.01702603090083335,
+      "turns": 2.2643159045548336,
+      "turns_max": 2.316208720615353,
+      "turns_min": 2.2124230884943143,
+      "wall_seconds": 0.14313440001569688,
+      "worst_penetration": -0.0689963257658262
+     },
+     {
+      "contact_fraction": 0.8522306437048883,
+      "energy_decay": 0.8280862235191755,
+      "energy_loss_rate": 401.13452267573655,
+      "equivalent_crr": 0.07783982434472253,
+      "mean_contacts": 2.429170404447566,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.044191426685854,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.148260225932093,
+      "seconds": 4.856249999999999,
+      "surface_rms": 0.009468244672248334,
+      "turns": 2.7783877619685997,
+      "turns_max": 2.8811616182528805,
+      "turns_min": 2.6756139056843184,
+      "wall_seconds": 0.15523299993947148,
+      "worst_penetration": -0.007691416761570372
+     },
+     {
+      "contact_fraction": 0.992227442098238,
+      "energy_decay": 0.43102973599313793,
+      "energy_loss_rate": 207.72924228370442,
+      "equivalent_crr": 0.04825450860160784,
+      "mean_contacts": 3.5080903005138198,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.396548237313281,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -1.0072301477635421,
+      "seconds": 9.095833333333333,
+      "surface_rms": 0.005321880210059839,
+      "turns": 5.061587861641721,
+      "turns_max": 5.1573093716574245,
+      "turns_min": 4.965866351626016,
+      "wall_seconds": 0.27254460006952286,
+      "worst_penetration": -0.00697828777593781
+     }
+    ],
+    "reason": "a quarter of it",
+    "spread": 2.2353717745213797,
+    "variant": "erp=0.05"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.7078142346120637,
+      "energy_decay": 0.7899853241893335,
+      "energy_loss_rate": 460.5592072977957,
+      "equivalent_crr": 0.08436781437052912,
+      "mean_contacts": 1.6378130011101517,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.05126632988953,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.304063065053505,
+      "seconds": 4.25,
+      "surface_rms": 0.015526295200093708,
+      "turns": 2.4581900674664663,
+      "turns_max": 2.617086684584379,
+      "turns_min": 2.2992934503485536,
+      "wall_seconds": 0.13810389989521354,
+      "worst_penetration": -0.032813647294533385
+     },
+     {
+      "contact_fraction": 0.8699848189112991,
+      "energy_decay": 0.8291583948620245,
+      "energy_loss_rate": 401.38409465238635,
+      "equivalent_crr": 0.07801360275066876,
+      "mean_contacts": 2.4754546581156864,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.254742432284154,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.167893225141178,
+      "seconds": 4.85625,
+      "surface_rms": 0.009420160871542986,
+      "turns": 2.786874765153418,
+      "turns_max": 2.878754831297384,
+      "turns_min": 2.6949946990094515,
+      "wall_seconds": 0.19667869992554188,
+      "worst_penetration": -0.008010443781436066
+     },
+     {
+      "contact_fraction": 0.9913949850820721,
+      "energy_decay": 0.3872143107740891,
+      "energy_loss_rate": 185.69743992914658,
+      "equivalent_crr": 0.04492773035516881,
+      "mean_contacts": 3.5234288863924834,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.422214996117997,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.8733652816627235,
+      "seconds": 10.163541666666667,
+      "surface_rms": 0.00514828187212638,
+      "turns": 5.617474340149155,
+      "turns_max": 5.637945063208902,
+      "turns_min": 5.597003617089407,
+      "wall_seconds": 0.38429019995965064,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "reason": "a softer constraint",
+    "spread": 2.2852074843581174,
+    "variant": "cfm=1e-5"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.7264905610254196,
+      "energy_decay": 0.7343202686284922,
+      "energy_loss_rate": 431.1161903692882,
+      "equivalent_crr": 0.07751839491049689,
+      "mean_contacts": 1.6611084361354165,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.012776098768166,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.0457104845756993,
+      "seconds": 4.574999999999999,
+      "surface_rms": 0.015239070169774695,
+      "turns": 2.625193838046851,
+      "turns_max": 2.6367735548626765,
+      "turns_min": 2.613614121231025,
+      "wall_seconds": 0.12194130010902882,
+      "worst_penetration": -0.04373025363054287
+     },
+     {
+      "contact_fraction": 0.8628152498842154,
+      "energy_decay": 0.7945136728623505,
+      "energy_loss_rate": 391.14113335578935,
+      "equivalent_crr": 0.07574594527073131,
+      "mean_contacts": 2.4552987242642415,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.190984167828743,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.0938707933956726,
+      "seconds": 4.98125,
+      "surface_rms": 0.009215319417510227,
+      "turns": 2.8219233383809006,
+      "turns_max": 2.9579724094202655,
+      "turns_min": 2.6858742673415357,
+      "wall_seconds": 0.13747800001874566,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.992827551185985,
+      "energy_decay": 0.4119195416878943,
+      "energy_loss_rate": 193.10992999460484,
+      "equivalent_crr": 0.04583095042706983,
+      "mean_contacts": 3.518513900479262,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.435782361797648,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.9345881261560289,
+      "seconds": 9.802083333333332,
+      "surface_rms": 0.005420575108555028,
+      "turns": 5.432999860729147,
+      "turns_max": 5.671318915942728,
+      "turns_min": 5.194680805515565,
+      "wall_seconds": 0.34392029989976436,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "reason": "no impulse carried between steps",
+    "spread": 2.0695614099000434,
+    "variant": "no_warm_start"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.7287047606257973,
+      "energy_decay": 0.7297316820682114,
+      "energy_loss_rate": 431.5784632677472,
+      "equivalent_crr": 0.07728680106473766,
+      "mean_contacts": 1.6684046196199556,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.012776098768166,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.0463477985707574,
+      "seconds": 4.550000000000001,
+      "surface_rms": 0.015254985219967446,
+      "turns": 2.6189862498421457,
+      "turns_max": 2.625431707315437,
+      "turns_min": 2.6125407923688546,
+      "wall_seconds": 0.11850930005311966,
+      "worst_penetration": -0.04373025363054287
+     },
+     {
+      "contact_fraction": 0.8703635336740456,
+      "energy_decay": 0.7818597218566341,
+      "energy_loss_rate": 386.24042461217005,
+      "equivalent_crr": 0.07504548091642607,
+      "mean_contacts": 2.4681288140729825,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.190984167828743,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.068186357254084,
+      "seconds": 5.027083333333334,
+      "surface_rms": 0.009444077169275023,
+      "turns": 2.879294141437391,
+      "turns_max": 3.002215342813578,
+      "turns_min": 2.756372940061204,
+      "wall_seconds": 0.1406977002043277,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.994088623575742,
+      "energy_decay": 0.41806938531417087,
+      "energy_loss_rate": 201.60549120347764,
+      "equivalent_crr": 0.047169625770156695,
+      "mean_contacts": 3.5220554105450086,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.435782361797651,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.9782669780948121,
+      "seconds": 9.363541666666666,
+      "surface_rms": 0.005436061836815519,
+      "turns": 5.2280820102377215,
+      "turns_max": 5.394378454323025,
+      "turns_min": 5.061785566152418,
+      "wall_seconds": 0.3406658999156207,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "reason": "box friction instead of the friction cone",
+    "spread": 1.996223542812733,
+    "variant": "no_cone_friction"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.7287047606257973,
+      "energy_decay": 0.7297316820682114,
+      "energy_loss_rate": 431.5784632677472,
+      "equivalent_crr": 0.07728680106473766,
+      "mean_contacts": 1.6684046196199556,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.012776098768166,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.0463477985707574,
+      "seconds": 4.550000000000001,
+      "surface_rms": 0.015254985219967446,
+      "turns": 2.6189862498421457,
+      "turns_max": 2.625431707315437,
+      "turns_min": 2.6125407923688546,
+      "wall_seconds": 0.11425379989668727,
+      "worst_penetration": -0.04373025363054287
+     },
+     {
+      "contact_fraction": 0.8703635336740456,
+      "energy_decay": 0.7818597218566341,
+      "energy_loss_rate": 386.24042461217005,
+      "equivalent_crr": 0.07504548091642607,
+      "mean_contacts": 2.4681288140729825,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.190984167828743,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.068186357254084,
+      "seconds": 5.027083333333334,
+      "surface_rms": 0.009444077169275023,
+      "turns": 2.879294141437391,
+      "turns_max": 3.002215342813578,
+      "turns_min": 2.756372940061204,
+      "wall_seconds": 0.1274338000221178,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.994088623575742,
+      "energy_decay": 0.41806938531417087,
+      "energy_loss_rate": 201.60549120347764,
+      "equivalent_crr": 0.047169625770156695,
+      "mean_contacts": 3.5220554105450086,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.435782361797651,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.9782669780948121,
+      "seconds": 9.363541666666666,
+      "surface_rms": 0.005436061836815519,
+      "turns": 5.2280820102377215,
+      "turns_max": 5.394378454323025,
+      "turns_min": 5.061785566152418,
+      "wall_seconds": 0.3143349001184106,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "reason": "drop GEOM_CONCAVE_INTERNAL_EDGE: does the flag do anything on this build?",
+    "spread": 1.996223542812733,
+    "variant": "no_internal_edge"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.7479197667202712,
+      "energy_decay": 0.776993475801548,
+      "energy_loss_rate": 431.2490733226352,
+      "equivalent_crr": 0.07826630681954302,
+      "mean_contacts": 1.7453724401620145,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.012776098768166,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.1045368103728177,
+      "seconds": 4.5625,
+      "surface_rms": 0.01491821707745734,
+      "turns": 2.623538897150825,
+      "turns_max": 2.6406159751051765,
+      "turns_min": 2.6064618191964737,
+      "wall_seconds": 0.11637979990337044,
+      "worst_penetration": -0.031696419760036204
+     },
+     {
+      "contact_fraction": 0.8705883561362422,
+      "energy_decay": 0.7724520628087769,
+      "energy_loss_rate": 386.2220053509533,
+      "equivalent_crr": 0.07518186530575571,
+      "mean_contacts": 2.506028048262733,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.190984167828743,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.0486165585253255,
+      "seconds": 5.039583333333333,
+      "surface_rms": 0.00916990012889872,
+      "turns": 2.8694068299576947,
+      "turns_max": 2.9611971168090863,
+      "turns_min": 2.777616543106303,
+      "wall_seconds": 0.15301379992160946,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.9946504927945736,
+      "energy_decay": 0.41651566895198977,
+      "energy_loss_rate": 201.3736572320393,
+      "equivalent_crr": 0.046751933511656525,
+      "mean_contacts": 3.531753442438705,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.435782361797651,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.9759518972293115,
+      "seconds": 9.367708333333333,
+      "surface_rms": 0.005399426727077151,
+      "turns": 5.204478837699593,
+      "turns_max": 5.269845333396779,
+      "turns_min": 5.1391123420024085,
+      "wall_seconds": 0.3310912000015378,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "reason": "Bullet's own default mesh margin instead of this package's 0.001",
+    "spread": 1.9837627882520363,
+    "variant": "margin=0.04"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.7278779639329841,
+      "energy_decay": 0.7347712103857351,
+      "energy_loss_rate": 430.49115128725373,
+      "equivalent_crr": 0.07724443116710564,
+      "mean_contacts": 1.6641575699414877,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.012776098768166,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.0497110497723314,
+      "seconds": 4.566666666666666,
+      "surface_rms": 0.015255354925401341,
+      "turns": 2.632312178312735,
+      "turns_max": 2.6391926493100324,
+      "turns_min": 2.625431707315437,
+      "wall_seconds": 0.12090280000120401,
+      "worst_penetration": -0.04373025363054287
+     },
+     {
+      "contact_fraction": 0.8727414995020628,
+      "energy_decay": 0.7938568037907185,
+      "energy_loss_rate": 382.671644621558,
+      "equivalent_crr": 0.07512600705051278,
+      "mean_contacts": 2.483510362729071,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.190984167828743,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.062825776665451,
+      "seconds": 5.091666666666667,
+      "surface_rms": 0.009474513094585682,
+      "turns": 2.8936020080465648,
+      "turns_max": 3.0100900979642002,
+      "turns_min": 2.777113918128929,
+      "wall_seconds": 0.15148170001339167,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.9940882786765108,
+      "energy_decay": 0.39955115928739693,
+      "energy_loss_rate": 197.93730236748786,
+      "equivalent_crr": 0.046046592645948334,
+      "mean_contacts": 3.52600449649469,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.435782361797651,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.9428752316032291,
+      "seconds": 9.527083333333334,
+      "surface_rms": 0.005320186760381116,
+      "turns": 5.304867147087345,
+      "turns_max": 5.344266924804973,
+      "turns_min": 5.265467369369716,
+      "wall_seconds": 0.3642959001008421,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "reason": "no mesh margin at all",
+    "spread": 2.0152880007141363,
+    "variant": "margin=0.0"
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.993334759392182,
+      "energy_decay": 0.41813956018582776,
+      "energy_loss_rate": 201.43358303256883,
+      "equivalent_crr": 0.047120446459719426,
+      "mean_contacts": 3.5191052272979353,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.433781349911104,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -0.9778292446904937,
+      "seconds": 9.366666666666667,
+      "surface_rms": 0.0053969588642695685,
+      "turns": 5.233573649525283,
+      "turns_max": 5.405361732898137,
+      "turns_min": 5.061785566152429,
+      "wall_seconds": 0.23518319998402148,
+      "worst_penetration": -0.006049567918044258
+     },
+     {
+      "contact_fraction": 0.9999419009993028,
+      "energy_decay": 0.1047245223478239,
+      "energy_loss_rate": 51.14265134947712,
+      "equivalent_crr": 0.01283650452815318,
+      "mean_contacts": 3.5915140704455926,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 12.039340061702958,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -0.22968740249815134,
+      "seconds": 36.16458333333333,
+      "surface_rms": 0.0034258763260738975,
+      "turns": 19.38711090269052,
+      "turns_max": 19.54692920397459,
+      "turns_min": 19.22729260140645,
+      "wall_seconds": 0.9413802000926808,
+      "worst_penetration": -0.005247196430594995
+     },
+     {
+      "contact_fraction": 1.0,
+      "energy_decay": 0.033155675989811596,
+      "energy_loss_rate": 27.373115481963616,
+      "equivalent_crr": 0.005027385071664047,
+      "mean_contacts": 2.8012847222222224,
+      "outcomes": [
+       "timeout"
+      ],
+      "peak_radius": 12.410493687557832,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.11432765881044635,
+      "seconds": 60.0,
+      "surface_rms": 0.004084191345593725,
+      "turns": 30.97051191279732,
+      "turns_max": 30.975282985719993,
+      "turns_min": 30.965740839874652,
+      "wall_seconds": 2.340698300045915,
+      "worst_penetration": -0.004833185853971085
+     }
+    ],
+    "reason": "integrate four times finer than the tick, with the tick unchanged",
+    "spread": 5.917660471942825,
+    "variant": "substeps=4"
+   }
+  ]
+ },
+ "tessellation": {
+  "circumferential": [
+   {
+    "over_marble_radius": 0.01,
+    "rates": [
+     {
+      "contact_fraction": 0.46311475409836067,
+      "energy_decay": 2.1620087300351987,
+      "energy_loss_rate": 1236.987759375662,
+      "equivalent_crr": 0.23328912424027048,
+      "mean_contacts": 1.328514654744163,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 10.735841999137609,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -6.070455729824793,
+      "seconds": 1.6791666666666667,
+      "surface_rms": 0.024108986968747467,
+      "turns": 1.0555717579109616,
+      "turns_max": 1.1942251898261902,
+      "turns_min": 0.9169183259957328,
+      "wall_seconds": 0.3075843999395147,
+      "worst_penetration": -0.11406278285414913
+     },
+     {
+      "contact_fraction": 0.7971392750597126,
+      "energy_decay": 1.1165369082380123,
+      "energy_loss_rate": 591.5637938765137,
+      "equivalent_crr": 0.10982446721156988,
+      "mean_contacts": 2.311539159860634,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 10.998282654580898,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -3.205228956486079,
+      "seconds": 3.33125,
+      "surface_rms": 0.010290065190074006,
+      "turns": 2.0394341726786247,
+      "turns_max": 2.11858900458345,
+      "turns_min": 1.9602793407737995,
+      "wall_seconds": 0.2721684999996796,
+      "worst_penetration": -0.005250179514968763
+     },
+     {
+      "contact_fraction": 0.9782403180171312,
+      "energy_decay": 0.6505463370089856,
+      "energy_loss_rate": 288.46298092858046,
+      "equivalent_crr": 0.0708764007198309,
+      "mean_contacts": 3.5159335904703415,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.081849648478522,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -1.4061387229387978,
+      "seconds": 6.629166666666666,
+      "surface_rms": 0.0051209528797925945,
+      "turns": 3.763255167413286,
+      "turns_max": 3.950577992413744,
+      "turns_min": 3.5759323424128273,
+      "wall_seconds": 0.5219876000192016,
+      "worst_penetration": -0.0038158637514497944
+     }
+    ],
+    "sagitta": 0.005,
+    "segments": 132,
+    "spread": 3.5651343825842674,
+    "triangles": 12472
+   },
+   {
+    "over_marble_radius": 0.02,
+    "rates": [
+     {
+      "contact_fraction": 0.6387877373171491,
+      "energy_decay": 0.9711202572688247,
+      "energy_loss_rate": 630.0025054319761,
+      "equivalent_crr": 0.10853180908473975,
+      "mean_contacts": 1.509267040149393,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.326852948959772,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -3.228389918212658,
+      "seconds": 2.9916666666666667,
+      "surface_rms": 0.01749341522097527,
+      "turns": 1.9556429550476744,
+      "turns_max": 2.038790159021627,
+      "turns_min": 1.872495751073722,
+      "wall_seconds": 0.22050870000384748,
+      "worst_penetration": -0.09966008827030935
+     },
+     {
+      "contact_fraction": 0.8239163338584232,
+      "energy_decay": 1.006862441784858,
+      "energy_loss_rate": 476.64296470264566,
+      "equivalent_crr": 0.093152056861172,
+      "mean_contacts": 2.411949940978806,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.168230587674362,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.5853633043270987,
+      "seconds": 4.110416666666667,
+      "surface_rms": 0.009722393757205551,
+      "turns": 2.3858911381843546,
+      "turns_max": 2.4528240812802515,
+      "turns_min": 2.3189581950884577,
+      "wall_seconds": 0.2506185999372974,
+      "worst_penetration": -0.008190791929168332
+     },
+     {
+      "contact_fraction": 0.991369321297942,
+      "energy_decay": 0.5298245803905324,
+      "energy_loss_rate": 243.9935816282313,
+      "equivalent_crr": 0.057689727046704914,
+      "mean_contacts": 3.527625644953349,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.324370132072787,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -1.203766747838913,
+      "seconds": 7.745833333333334,
+      "surface_rms": 0.005126415176885283,
+      "turns": 4.363852375502578,
+      "turns_max": 4.391531200231849,
+      "turns_min": 4.336173550773307,
+      "wall_seconds": 0.4156081998953596,
+      "worst_penetration": -0.004077649825953552
+     }
+    ],
+    "sagitta": 0.01,
+    "segments": 92,
+    "spread": 2.2314156908034355,
+    "triangles": 9032
+   },
+   {
+    "over_marble_radius": 0.04,
+    "rates": [
+     {
+      "contact_fraction": 0.7287047606257973,
+      "energy_decay": 0.7297316820682114,
+      "energy_loss_rate": 431.5784632677472,
+      "equivalent_crr": 0.07728680106473766,
+      "mean_contacts": 1.6684046196199556,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.012776098768166,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.0463477985707574,
+      "seconds": 4.550000000000001,
+      "surface_rms": 0.015254985219967446,
+      "turns": 2.6189862498421457,
+      "turns_max": 2.625431707315437,
+      "turns_min": 2.6125407923688546,
+      "wall_seconds": 0.1620268999831751,
+      "worst_penetration": -0.04373025363054287
+     },
+     {
+      "contact_fraction": 0.8703635336740456,
+      "energy_decay": 0.7818597218566341,
+      "energy_loss_rate": 386.24042461217005,
+      "equivalent_crr": 0.07504548091642607,
+      "mean_contacts": 2.4681288140729825,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.190984167828743,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.068186357254084,
+      "seconds": 5.027083333333334,
+      "surface_rms": 0.009444077169275023,
+      "turns": 2.879294141437391,
+      "turns_max": 3.002215342813578,
+      "turns_min": 2.756372940061204,
+      "wall_seconds": 0.1885198000818491,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.994088623575742,
+      "energy_decay": 0.41806938531417087,
+      "energy_loss_rate": 201.60549120347764,
+      "equivalent_crr": 0.047169625770156695,
+      "mean_contacts": 3.5220554105450086,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.435782361797651,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.9782669780948121,
+      "seconds": 9.363541666666666,
+      "surface_rms": 0.005436061836815519,
+      "turns": 5.2280820102377215,
+      "turns_max": 5.394378454323025,
+      "turns_min": 5.061785566152418,
+      "wall_seconds": 0.39978940004948527,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "sagitta": 0.02,
+    "segments": 68,
+    "spread": 1.996223542812733,
+    "triangles": 6968
+   },
+   {
+    "over_marble_radius": 0.08,
+    "rates": [
+     {
+      "contact_fraction": 0.8526069376463077,
+      "energy_decay": 0.570614116901302,
+      "energy_loss_rate": 309.07425518349066,
+      "equivalent_crr": 0.05605225635511066,
+      "mean_contacts": 1.9171330779598497,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.418595744430775,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -1.602434236766216,
+      "seconds": 6.258333333333333,
+      "surface_rms": 0.013706017994706941,
+      "turns": 3.4947679020976885,
+      "turns_max": 3.5239212128946247,
+      "turns_min": 3.4656145913007523,
+      "wall_seconds": 0.17411579994950444,
+      "worst_penetration": -0.036015180624638383
+     },
+     {
+      "contact_fraction": 0.8895880738319535,
+      "energy_decay": 0.5829607915438814,
+      "energy_loss_rate": 296.56282124677887,
+      "equivalent_crr": 0.05828859030659926,
+      "mean_contacts": 2.565596147812144,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.489846114691254,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -1.5747768117765002,
+      "seconds": 6.49375,
+      "surface_rms": 0.0092672097694501,
+      "turns": 3.636435756887604,
+      "turns_max": 3.683442615598239,
+      "turns_min": 3.5894288981769686,
+      "wall_seconds": 0.20467629993800074,
+      "worst_penetration": -0.0199185832220735
+     },
+     {
+      "contact_fraction": 0.9959556284257338,
+      "energy_decay": 0.28701760965698403,
+      "energy_loss_rate": 135.4538245244786,
+      "equivalent_crr": 0.0316099566204911,
+      "mean_contacts": 3.5058111602940087,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.8246500221355,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.6668822673155141,
+      "seconds": 13.739583333333334,
+      "surface_rms": 0.006397935490853366,
+      "turns": 7.527591757563553,
+      "turns_max": 7.682107499796053,
+      "turns_min": 7.373076015331054,
+      "wall_seconds": 0.4952741999877617,
+      "worst_penetration": -0.012640654358996514
+     }
+    ],
+    "sagitta": 0.04,
+    "segments": 48,
+    "spread": 2.153960425539337,
+    "triangles": 5248
+   },
+   {
+    "over_marble_radius": 0.16,
+    "rates": [
+     {
+      "contact_fraction": 0.8601673778162555,
+      "energy_decay": 0.48186664795465484,
+      "energy_loss_rate": 272.56360633729054,
+      "equivalent_crr": 0.050607076707431475,
+      "mean_contacts": 1.9001216168861954,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.085536472957765,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -1.2891798926355453,
+      "seconds": 7.133333333333333,
+      "surface_rms": 0.014917237831459741,
+      "turns": 3.9644275552593973,
+      "turns_max": 4.307263095027689,
+      "turns_min": 3.621592015491106,
+      "wall_seconds": 0.14260669995564967,
+      "worst_penetration": -0.045839586001082636
+     },
+     {
+      "contact_fraction": 0.9359364540580013,
+      "energy_decay": 0.41579255225971745,
+      "energy_loss_rate": 217.2731418359654,
+      "equivalent_crr": 0.042257924349877615,
+      "mean_contacts": 2.6667059969031666,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.61896529827578,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -1.12818132375397,
+      "seconds": 8.777083333333334,
+      "surface_rms": 0.011928185698624378,
+      "turns": 4.836004516560778,
+      "turns_max": 4.893995210869883,
+      "turns_min": 4.7780138222516735,
+      "wall_seconds": 0.18580740003380924,
+      "worst_penetration": -0.02180891896549244
+     },
+     {
+      "contact_fraction": 0.9951353232518609,
+      "energy_decay": 0.2132562619094715,
+      "energy_loss_rate": 99.3863003619903,
+      "equivalent_crr": 0.0240313817425405,
+      "mean_contacts": 3.4661273335384797,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.651642705982159,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.4750638068751677,
+      "seconds": 18.853125,
+      "surface_rms": 0.009089571049049481,
+      "turns": 10.244999299028587,
+      "turns_max": 10.278342778341115,
+      "turns_min": 10.211655819716059,
+      "wall_seconds": 0.5266887999605387,
+      "worst_penetration": -0.02180891896549244
+     }
+    ],
+    "sagitta": 0.08,
+    "segments": 36,
+    "spread": 2.584231684455196,
+    "triangles": 4216
+   }
+  ],
+  "meridian": [
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.7610367932016622,
+      "energy_decay": 0.978159785876231,
+      "energy_loss_rate": 470.2969881085579,
+      "equivalent_crr": 0.09382164297743005,
+      "mean_contacts": 2.0639853854414714,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 10.788521305624535,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.397157399090389,
+      "seconds": 4.229166666666666,
+      "surface_rms": 0.01437341729412421,
+      "turns": 2.429029714093916,
+      "turns_max": 2.4945985099494195,
+      "turns_min": 2.3634609182384123,
+      "wall_seconds": 0.2843347998568788,
+      "worst_penetration": -0.09392828025702768
+     },
+     {
+      "contact_fraction": 0.866611531052915,
+      "energy_decay": 0.7248808130297886,
+      "energy_loss_rate": 357.0266619638214,
+      "equivalent_crr": 0.06979859979787534,
+      "mean_contacts": 2.6721089722698235,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.495092162163049,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -1.9213287510488204,
+      "seconds": 5.4520833333333325,
+      "surface_rms": 0.007989716630009937,
+      "turns": 3.099615331612008,
+      "turns_max": 3.1058141947318214,
+      "turns_min": 3.0934164684921943,
+      "wall_seconds": 0.2768699999433011,
+      "worst_penetration": -0.010494926276004863
+     },
+     {
+      "contact_fraction": 0.9966059293703331,
+      "energy_decay": 0.37595470063701036,
+      "energy_loss_rate": 171.97532963740167,
+      "equivalent_crr": 0.04174891585370881,
+      "mean_contacts": 3.676741641762226,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.74539878535175,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.8352087279639588,
+      "seconds": 10.978124999999999,
+      "surface_rms": 0.004714232239926163,
+      "turns": 6.067474895487643,
+      "turns_max": 6.169691996381645,
+      "turns_min": 5.965257794593641,
+      "wall_seconds": 0.576468100072816,
+      "worst_penetration": -0.006134300868182625
+     }
+    ],
+    "ring_step": 0.25,
+    "rings": 92,
+    "spread": 2.497900647440598,
+    "triangles": 12544
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.7287047606257973,
+      "energy_decay": 0.7297316820682114,
+      "energy_loss_rate": 431.5784632677472,
+      "equivalent_crr": 0.07728680106473766,
+      "mean_contacts": 1.6684046196199556,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.012776098768166,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.0463477985707574,
+      "seconds": 4.550000000000001,
+      "surface_rms": 0.015254985219967446,
+      "turns": 2.6189862498421457,
+      "turns_max": 2.625431707315437,
+      "turns_min": 2.6125407923688546,
+      "wall_seconds": 0.157603400060907,
+      "worst_penetration": -0.04373025363054287
+     },
+     {
+      "contact_fraction": 0.8703635336740456,
+      "energy_decay": 0.7818597218566341,
+      "energy_loss_rate": 386.24042461217005,
+      "equivalent_crr": 0.07504548091642607,
+      "mean_contacts": 2.4681288140729825,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.190984167828743,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.068186357254084,
+      "seconds": 5.027083333333334,
+      "surface_rms": 0.009444077169275023,
+      "turns": 2.879294141437391,
+      "turns_max": 3.002215342813578,
+      "turns_min": 2.756372940061204,
+      "wall_seconds": 0.1945559000596404,
+      "worst_penetration": -0.006735667315530559
+     },
+     {
+      "contact_fraction": 0.994088623575742,
+      "energy_decay": 0.41806938531417087,
+      "energy_loss_rate": 201.60549120347764,
+      "equivalent_crr": 0.047169625770156695,
+      "mean_contacts": 3.5220554105450086,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.435782361797651,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -0.9782669780948121,
+      "seconds": 9.363541666666666,
+      "surface_rms": 0.005436061836815519,
+      "turns": 5.2280820102377215,
+      "turns_max": 5.394378454323025,
+      "turns_min": 5.061785566152418,
+      "wall_seconds": 0.3801540998974815,
+      "worst_penetration": -0.006735667315530559
+     }
+    ],
+    "ring_step": 0.5,
+    "rings": 51,
+    "spread": 1.996223542812733,
+    "triangles": 6968
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.6674713082967076,
+      "energy_decay": 0.8294542991074776,
+      "energy_loss_rate": 546.8534738232913,
+      "equivalent_crr": 0.1046823194545215,
+      "mean_contacts": 1.5061711048413384,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.303025160261571,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -2.481835170848875,
+      "seconds": 3.5625,
+      "surface_rms": 0.018176069546679198,
+      "turns": 2.1982475744694714,
+      "turns_max": 2.365770694295253,
+      "turns_min": 2.0307244546436896,
+      "wall_seconds": 0.15678690001368523,
+      "worst_penetration": -0.07601598650257327
+     },
+     {
+      "contact_fraction": 0.8349222552837017,
+      "energy_decay": 0.837661817598091,
+      "energy_loss_rate": 432.30713264942966,
+      "equivalent_crr": 0.08231289288740105,
+      "mean_contacts": 2.260766960625923,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.096623860957088,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.315552392116059,
+      "seconds": 4.46875,
+      "surface_rms": 0.012270112642291033,
+      "turns": 2.585799371666885,
+      "turns_max": 2.5962913759662194,
+      "turns_min": 2.5753073673675506,
+      "wall_seconds": 0.14458570000715554,
+      "worst_penetration": -0.009332728499931223
+     },
+     {
+      "contact_fraction": 0.9939824292192453,
+      "energy_decay": 0.45303567195659566,
+      "energy_loss_rate": 213.22267118137398,
+      "equivalent_crr": 0.049993003292718136,
+      "mean_contacts": 3.441544644273796,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.164107205468296,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -1.0497982840237723,
+      "seconds": 8.845833333333333,
+      "surface_rms": 0.007797128991541247,
+      "turns": 4.961339648039136,
+      "turns_max": 5.020718215082998,
+      "turns_min": 4.9019610809952745,
+      "wall_seconds": 0.33807059994433075,
+      "worst_penetration": -0.009332728499931223
+     }
+    ],
+    "ring_step": 1.0,
+    "rings": 31,
+    "spread": 2.256952176661227,
+    "triangles": 4248
+   },
+   {
+    "rates": [
+     {
+      "contact_fraction": 0.5770492947912302,
+      "energy_decay": 1.3544988094278,
+      "energy_loss_rate": 700.3881199940802,
+      "equivalent_crr": 0.13664880910930416,
+      "mean_contacts": 1.3735162686775588,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.738059839965008,
+      "phases": 2,
+      "physics_hz": 120,
+      "radial_rate": -3.6344129899596744,
+      "seconds": 2.833333333333333,
+      "surface_rms": 0.032244038290826824,
+      "turns": 1.5981992498355204,
+      "turns_max": 1.7042415182684145,
+      "turns_min": 1.4921569814026263,
+      "wall_seconds": 0.09565230004955083,
+      "worst_penetration": -0.06299193517480084
+     },
+     {
+      "contact_fraction": 0.8012597631645251,
+      "energy_decay": 0.8895640979983857,
+      "energy_loss_rate": 465.1601051886237,
+      "equivalent_crr": 0.09122523831985976,
+      "mean_contacts": 2.15167128579827,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.032984370223474,
+      "phases": 2,
+      "physics_hz": 240,
+      "radial_rate": -2.4679666438221153,
+      "seconds": 4.066666666666666,
+      "surface_rms": 0.02510564102019615,
+      "turns": 2.315409809671354,
+      "turns_max": 2.3256808294011977,
+      "turns_min": 2.3051387899415094,
+      "wall_seconds": 0.11118269991129637,
+      "worst_penetration": -0.03619725933246275
+     },
+     {
+      "contact_fraction": 0.988343272446428,
+      "energy_decay": 0.4502434331842586,
+      "energy_loss_rate": 229.75065270011498,
+      "equivalent_crr": 0.05275622391709991,
+      "mean_contacts": 3.396365988820203,
+      "outcomes": [
+       "drained"
+      ],
+      "peak_radius": 11.397998876528796,
+      "phases": 2,
+      "physics_hz": 480,
+      "radial_rate": -1.1024935295885436,
+      "seconds": 8.135416666666668,
+      "surface_rms": 0.01892738968186955,
+      "turns": 4.648832605924173,
+      "turns_max": 4.70064821417553,
+      "turns_min": 4.5970169976728155,
+      "wall_seconds": 0.2672465001232922,
+      "worst_penetration": -0.021523394157489745
+     }
+    ],
+    "ring_step": 2.0,
+    "rings": 22,
+    "spread": 2.908794135901772,
+    "triangles": 3024
+   }
+  ]
+ },
+ "wall_seconds": 50.802649799967185
+}

@@ -67,6 +67,7 @@ from typing import Any, Iterable, Sequence
 
 from marble3d.config import MESH_CACHE, ColliderConfig, CoreConfig
 from marble3d.geometry import IDENTITY, Transform, Vec3
+from marble3d.hardening import SolverConfig, engine_parameters
 from marble3d.materials import BodyMaterial, SolvedMaterials, solve_materials
 from marble3d.mesh import Aabb, TriMesh, cached_obj
 
@@ -151,6 +152,15 @@ class MarbleWorld:
             allowedCcdPenetration=physics.allowed_ccd_penetration,
             physicsClientId=self.client,
         )
+        # The research knobs, in a second call so that the production settings
+        # above read as one block and so that a default `HardeningConfig` sends
+        # nothing at all - `engine_parameters` returns an empty dict, no call is
+        # made, and Bullet keeps its own defaults rather than being pinned to
+        # this package's belief about what they are.
+        self.solver_config: SolverConfig = config.hardening.solver
+        extra = engine_parameters(self.solver_config)
+        if extra:
+            pybullet.setPhysicsEngineParameter(physicsClientId=self.client, **extra)
 
         self.colliders: list[ColliderRecord] = []
         self.bodies: dict[int, _Body] = {}
@@ -185,19 +195,22 @@ class MarbleWorld:
         )
         records: list[ColliderRecord] = []
         surface = material or self.materials.surface
+        # FORCE_CONCAVE_TRIMESH keeps a static mesh concave rather than letting
+        # Bullet build a convex hull of it, which would fill in the bowl.
+        # INTERNAL_EDGE is meant to suppress the spurious normals a sphere picks
+        # up rolling across a shared triangle edge. Production sets both; the
+        # second is switchable only so that the hardening study can A/B whether
+        # it does anything on this build rather than assuming that it does.
+        flags = pybullet.GEOM_FORCE_CONCAVE_TRIMESH
+        if self.solver_config.internal_edge:
+            flags |= pybullet.GEOM_CONCAVE_INTERNAL_EDGE
         for index, chunk in enumerate(chunks):
             path = cached_obj(chunk, self.mesh_cache)
             shape = pybullet.createCollisionShape(
                 pybullet.GEOM_MESH,
                 fileName=path,
                 meshScale=[1.0, 1.0, 1.0],
-                # FORCE_CONCAVE_TRIMESH keeps a static mesh concave rather than
-                # letting Bullet build a convex hull of it, which would fill in
-                # the bowl. INTERNAL_EDGE suppresses the spurious normals a
-                # sphere picks up rolling across a shared triangle edge, which
-                # is a direct reduction of the tessellation dissipation the lab
-                # measured.
-                flags=pybullet.GEOM_FORCE_CONCAVE_TRIMESH | pybullet.GEOM_CONCAVE_INTERNAL_EDGE,
+                flags=flags,
                 physicsClientId=self.client,
             )
             body = pybullet.createMultiBody(
@@ -271,6 +284,51 @@ class MarbleWorld:
             physicsClientId=self.client,
         )
         self.bodies[body] = _Body(kind="kinematic", owner=owner)
+        return body
+
+    def add_static_plane(
+        self,
+        normal: Sequence[float] = (0.0, 1.0, 0.0),
+        offset: float = 0.0,
+        owner: str = "world",
+        material: BodyMaterial | None = None,
+    ) -> int:
+        """An infinite analytic half-space: `btStaticPlaneShape`, no triangles.
+
+        Not used by any module and it never will be - a machine is made of
+        shapes a marble can fall off. It exists for one measurement, and that
+        measurement is the load-bearing one in the hardening study: a marble
+        rolling on this loses energy at a rate that has *nothing* to do with
+        tessellation, because there is no tessellation. Comparing it against
+        the same marble on a flat triangle mesh separates "the collider has
+        edges" from "the solver does this to any sustained contact", and those
+        two answers imply completely different remedies.
+        """
+        pybullet = self.pybullet
+        shape = pybullet.createCollisionShape(
+            pybullet.GEOM_PLANE,
+            planeNormal=[float(value) for value in normal],
+            physicsClientId=self.client,
+        )
+        body = pybullet.createMultiBody(
+            baseMass=0.0,
+            baseCollisionShapeIndex=shape,
+            basePosition=[0.0, float(offset), 0.0],
+            baseOrientation=[0.0, 0.0, 0.0, 1.0],
+            useMaximalCoordinates=True,
+            physicsClientId=self.client,
+        )
+        surface = material or self.materials.surface
+        pybullet.changeDynamics(
+            body,
+            -1,
+            lateralFriction=surface.friction,
+            restitution=surface.restitution,
+            rollingFriction=surface.rolling_friction,
+            spinningFriction=surface.spinning_friction,
+            physicsClientId=self.client,
+        )
+        self.bodies[body] = _Body(kind="static", owner=owner)
         return body
 
     def move_kinematic(self, body: int, transform: Transform) -> None:

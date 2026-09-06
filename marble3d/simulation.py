@@ -55,6 +55,7 @@ from typing import Any, Sequence
 
 from marble3d.config import REPLAY_FPS, CoreConfig, DEFAULT_CONFIG
 from marble3d.geometry import Transform
+from marble3d.hardening import apply_resistance
 from marble3d.machine import Machine
 from marble3d.machines import start_bowl_curve
 from marble3d.modules.base import BuiltModule
@@ -162,6 +163,7 @@ class MarbleSimulation:
         self.config = config or DEFAULT_CONFIG
         self.machine = machine or start_bowl_curve()
         self.seed = int(seed)
+        self.resistance = self.config.hardening.resistance
         self.dt = self.config.physics.dt
         self.stride = self.config.physics.ticks_per_replay_frame
         self.ticks = 0
@@ -256,6 +258,15 @@ class MarbleSimulation:
     def step(self) -> None:
         for record in self.built:
             record.apply_actuators(self.world, self.ticks, self.dt)
+        # The only thing in this loop that touches a marble without being an
+        # actuator, and it is off in production: `ResistanceConfig()` is
+        # inactive, so this costs one attribute test per tick and makes no
+        # engine call at all. When it is on it applies a torque or a decay
+        # derived entirely from the marble's own contact state and its own
+        # velocity - never a radial, attracting or spiralling force. See
+        # `marble3d.hardening`, and section 10 of the hardening brief.
+        if self.resistance.active:
+            apply_resistance(self.world, self.resistance, self.dt)
         self.world.step()
         self.ticks += 1
         self.elapsed = self.ticks * self.dt
