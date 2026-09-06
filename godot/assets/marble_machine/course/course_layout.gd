@@ -146,8 +146,13 @@ const B_TERRAIN := {
 	"edge_from": 58.0, "edge_to": 94.0, "edge_y": -82.0,
 	"valley_below": -60.0, "cap_above": 34.0,
 	"cut_depth": 2.8, "cut_inner": 3.2, "cut_reach": 8.0,
-	"noise": 2.2, "cell": 1.75,
-	"x_min": -96.0, "x_max": 96.0, "z_min": -110.0, "z_max": 130.0,
+	# Cell 1.3 over a tighter footprint rather than 1.75 over a wider one.
+	# Beyond about eighty units the massif has already faded to the valley
+	# floor and the distant ranges carry the horizon, so the extra area was
+	# buying nothing while the near ground - which fills a third of every
+	# section shot - was reading as smooth clay.
+	"noise": 2.3, "cell": 1.3,
+	"x_min": -80.0, "x_max": 80.0, "z_min": -90.0, "z_max": 108.0,
 	"pads": [
 		[-19.4, -38.9, 6.6, 7.0, 37.2],   # start shelf
 		[-8.6, 3.2, 5.0, 6.0, 16.4],      # obstacle terrace

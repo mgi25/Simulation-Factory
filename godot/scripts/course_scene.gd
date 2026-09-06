@@ -22,32 +22,58 @@ const Machine := preload("res://assets/marble_machine/course/course_machine.gd")
 const Layout := preload("res://assets/marble_machine/course/course_layout.gd")
 const Track := preload("res://assets/marble_machine/v2/v2_track.gd")
 const V2Forms := preload("res://assets/marble_machine/v2/v2_forms.gd")
+const Terrain := preload("res://assets/marble_machine/course/course_terrain.gd")
 
 # at: ["node", name] or ["path", run, t]. `bearing` is measured from the
 # track's own forward direction at the aim point - 0 looks up the course from
 # in front of it, 90 is a side tracking position, 180 follows from behind.
-const SHOTS := {
+static var SHOTS := {
 	"hero": {"at": ["hero"], "extent": 0.0, "fov": 0.0, "elevation": 0.0,
 		"bearing": 0.0},
 	"phone": {"at": ["hero"], "extent": 0.0, "fov": 0.0, "elevation": 0.0,
 		"bearing": 0.0},
-	"start": {"at": ["node", "start"], "extent": 10.5, "fov": 34.0,
-		"elevation": 17.0, "bearing": 26.0},
-	"descent": {"at": ["path", "launch", 0.72], "extent": 15.0, "fov": 36.0,
-		"elevation": 11.0, "bearing": 134.0},
-	"long_track": {"at": ["long", 0.46], "extent": 22.0, "fov": 34.0,
-		"elevation": 9.0, "bearing": 74.0},
+	"start": {"at": ["node", "start"], "extent": 12.6, "fov": 34.0,
+		"elevation": 18.0, "bearing": 26.0},
+	"descent": {"at": ["path", "launch", 0.60], "extent": 14.0, "fov": 36.0,
+		"elevation": 12.0, "bearing": 42.0},
+	# Along the track, not across it. A side-on shot of a long straight shows
+	# a line; a shot down its axis shows a road running away into the hill,
+	# which is the only framing that makes "long" a fact rather than a claim.
+	"long_track": {"at": ["path", "leg2", 0.34], "extent": 18.0, "fov": 36.0,
+		"elevation": 10.0, "bearing": 16.0},
 	"obstacle": {"at": ["node", "obstacle"], "extent": 9.5, "fov": 34.0,
 		"elevation": 14.0, "bearing": 44.0},
 	"split": {"at": ["node", "split"], "extent": 15.0, "fov": 34.0,
 		"elevation": 17.0, "bearing": 24.0},
 	"merge": {"at": ["node", "merge"], "extent": 14.0, "fov": 34.0,
 		"elevation": 15.0, "bearing": 32.0},
-	"final_run": {"at": ["path", "final", 0.34], "extent": 20.0, "fov": 36.0,
-		"elevation": 10.0, "bearing": 62.0},
-	"finish": {"at": ["node", "finish"], "extent": 15.5, "fov": 34.0,
-		"elevation": 16.0, "bearing": 44.0},
+	"final_run": {"at": ["path", "final", 0.46], "extent": 24.0, "fov": 36.0,
+		"elevation": 13.0, "bearing": 40.0},
+	"finish": {"at": ["node", "finish"], "extent": 24.0, "fov": 34.0,
+		"elevation": 21.0, "bearing": 34.0},
 }
+
+# The motion proof's cut list. `shot` reuses a still's lens and animates the
+# orbit and dolly across the cut; `follow` walks the aim along a named run and
+# carries the camera with it. Explicitly not an orbit of the whole course - the
+# brief's own rule, and the right one: a course this long has to be *travelled*
+# by the camera or its length is a claim rather than an experience.
+const SEQUENCE := [
+	{"shot": "hero", "seconds": 0.9, "orbit": [-3.0, 3.0],
+		"dolly": [0.05, -0.02]},
+	{"shot": "start", "seconds": 1.2, "orbit": [-9.0, 5.0],
+		"dolly": [0.12, -0.05]},
+	{"follow": "leg1", "seconds": 1.5, "t": [0.16, 0.68], "extent": 11.5,
+		"fov": 36.0, "elevation": 15.0, "bearing": 164.0},
+	{"follow": "leg2", "seconds": 1.2, "t": [0.18, 0.70], "extent": 15.0,
+		"fov": 34.0, "elevation": 17.0, "bearing": 74.0},
+	{"shot": "obstacle", "seconds": 0.9, "orbit": [-11.0, 6.0],
+		"dolly": [0.07, -0.03]},
+	{"shot": "split", "seconds": 1.0, "orbit": [9.0, -9.0],
+		"dolly": [0.06, -0.06]},
+	{"shot": "finish", "seconds": 1.3, "orbit": [-13.0, 6.0],
+		"dolly": [0.16, -0.07]},
+]
 
 const DEFAULT_SHOT := "hero"
 
@@ -62,6 +88,7 @@ var _travellers: Array = []
 var _orbit := 0.0
 var _dolly := 0.0
 var _fitted: Dictionary = {}
+var _sequenced := false
 
 
 func _ready() -> void:
@@ -69,6 +96,7 @@ func _ready() -> void:
 	_layout = str(options.get("layout", "a"))
 	_shot = str(options.get("shot", DEFAULT_SHOT))
 	_no_glow = str(options.get("no-glow", "")) != ""
+	_sequenced = str(options.get("sequence", "")) != ""
 	if not SHOTS.has(_shot):
 		push_error("course_scene: unknown shot '%s'" % _shot)
 		_shot = DEFAULT_SHOT
@@ -103,6 +131,8 @@ func _ready() -> void:
 
 	_build_camera()
 	set_time(0.0)
+	if str(options.get("dump-physics", "")) != "":
+		_dump_physics(str(options["dump-physics"]))
 
 
 func _options() -> Dictionary:
@@ -202,9 +232,23 @@ func _aim_of(spec: Dictionary) -> Dictionary:
 		var path: Array = _course.get_meta("%s_path" % run)
 		point = _sample_at(path, t)
 		forward = _heading_on(path, t)
+	# Which way a bearing swings is decided by the ground, not by its sign.
+	#
+	# A side-on bearing of seventy-eight degrees is a tracking shot on one
+	# layout and a camera buried in the mountain on the next, because "the
+	# track's left" is uphill on a leg running one way and downhill on the leg
+	# running back. So both candidates are tested against the terrain and the
+	# one standing over lower ground wins. That is also the correct answer
+	# artistically - the open side is the side with the view.
 	var bearing: float = deg_to_rad(float(spec["bearing"]))
 	var side := Vector3(forward.z, 0.0, -forward.x).normalized()
 	var flat := Vector3(forward.x, 0.0, forward.z).normalized()
+	var probe := 9.0
+	var cfg: Dictionary = _table["terrain"]
+	var left := point + side * probe
+	var right := point - side * probe
+	if Terrain.height(left.x, left.z, cfg) > Terrain.height(right.x, right.z, cfg):
+		side = -side
 	var direction := flat * cos(bearing) + side * sin(bearing)
 	var fov: float = float(spec["fov"])
 	var half := tan(deg_to_rad(fov) * 0.5)
@@ -418,9 +462,239 @@ func set_time(seconds: float) -> void:
 		var frame: Basis = V2Forms.banked_basis(path, banks, index)
 		node.position = centre + frame.x * float(entry["lane"]) * scale
 
-	_orbit = sin(seconds * 0.32) * 4.0
-	_dolly = -0.03 * (1.0 - cos(seconds * 0.28))
-	_place_camera(_orbit, _dolly)
+	if _sequenced:
+		_place_sequence(seconds)
+	else:
+		_orbit = sin(seconds * 0.32) * 4.0
+		_dolly = -0.03 * (1.0 - cos(seconds * 0.28))
+		_place_camera(_orbit, _dolly)
+
+
+func _place_sequence(seconds: float) -> void:
+	## The camera for one instant of the cut list.
+	var total := 0.0
+	for entry in SEQUENCE:
+		total += float((entry as Dictionary)["seconds"])
+	var clock: float = fposmod(seconds, maxf(total, 0.001))
+	var cursor := 0.0
+	for entry in SEQUENCE:
+		var cut: Dictionary = entry
+		var length: float = float(cut["seconds"])
+		if clock > cursor + length and cut != SEQUENCE[SEQUENCE.size() - 1]:
+			cursor += length
+			continue
+		var t: float = clampf((clock - cursor) / maxf(length, 0.001), 0.0, 1.0)
+		# Eased across the cut, so a move settles rather than stopping dead.
+		var eased := smoothstep(0.0, 1.0, t)
+		if cut.has("follow"):
+			var span: Array = cut["t"]
+			_shot = "_follow"
+			SHOTS["_follow"] = {
+				"at": ["path", str(cut["follow"]),
+					lerpf(float(span[0]), float(span[1]), eased)],
+				"extent": float(cut["extent"]), "fov": float(cut["fov"]),
+				"elevation": float(cut["elevation"]),
+				"bearing": float(cut["bearing"]),
+			}
+			_place_camera(0.0, 0.0)
+			return
+		var orbit: Array = cut["orbit"]
+		var dolly: Array = cut["dolly"]
+		_shot = str(cut["shot"])
+		_place_camera(lerpf(float(orbit[0]), float(orbit[1]), eased),
+			lerpf(float(dolly[0]), float(dolly[1]), eased))
+		return
+
+
+# --- physics metadata -----------------------------------------------------
+
+
+func _dump_physics(path: String) -> void:
+	## Everything a PyBullet pass would need, and nothing it would not.
+	##
+	## Written from the *built* scene rather than from the layout table, so it
+	## records the geometry that was actually photographed - the resampled
+	## centrelines, the solved bank angles, the module yaws the placer worked
+	## out - and cannot drift from it. Read it as a description of a shape, not
+	## as a set of colliders: no collider in this branch exists.
+	var metrics: Dictionary = _course.get_meta("metrics")
+	var terrain: Dictionary = (_table["terrain"] as Dictionary).duplicate()
+	terrain.erase("cut_index")
+
+	var runs: Array = []
+	for entry in _table["runs"]:
+		var spec: Dictionary = entry
+		var name := str(spec["name"])
+		var path_points: Array = _course.get_meta("%s_path" % name)
+		var banks: Array = _course.get_meta("%s_banks" % name)
+		var scale: float = float(_course.get_meta("%s_scale" % name))
+		runs.append({
+			"name": name,
+			"role": str(spec["role"]),
+			"profile_scale": scale,
+			"clear_width": Track.clear_width() * scale,
+			"floor_offset": Track.floor_offset() * scale,
+			"origin": path_points[0],
+			"entry_socket": {"at": path_points[0],
+				"heading_deg": rad_to_deg(_heading_on(path_points, 0.0).angle_to(
+					Vector3(0.0, 0.0, 1.0)))},
+			"exit_socket": {"at": path_points[path_points.size() - 1],
+				"heading_deg": rad_to_deg(_heading_on(path_points,
+					1.0).angle_to(Vector3(0.0, 0.0, 1.0)))},
+			"length": V2Forms.path_length(path_points),
+			"drop": float((path_points[0] as Vector3).y)
+				- float((path_points[path_points.size() - 1] as Vector3).y),
+			"slope_deg": _slope_profile(path_points),
+			"bank_max_deg": _bank_extreme(banks),
+			"bounds": _bounds(path_points, 1.13 * scale, 0.98 * scale, 0.32),
+			"centreline": _thinned(path_points, 26),
+		})
+
+	var modules: Array = []
+	var nodes: Dictionary = _table["nodes"]
+	var course_modules := _course.get_node_or_null("Modules")
+	if course_modules != null:
+		for child in course_modules.get_children():
+			var node: Node3D = child
+			var key := node.name.to_lower()
+			modules.append({
+				"name": node.name,
+				"origin": node.position,
+				"yaw_deg": rad_to_deg(node.rotation.y),
+				"anchor": nodes.get(key, node.position),
+				"action_clearance": _module_clearance(node.name),
+			})
+
+	var cameras: Array = []
+	var was := _shot
+	for name in SHOTS.keys():
+		if str(name).begins_with("_"):
+			continue
+		_shot = str(name)
+		_place_camera(0.0, 0.0)
+		cameras.append({
+			"name": str(name),
+			"position": _camera.position,
+			"aim": _aim_of(SHOTS[name])["point"],
+			"fov": _camera.fov,
+		})
+	_shot = was
+	_place_camera(0.0, 0.0)
+
+	var table := {
+		"branch": "marble-sloped-course-lab",
+		"layout": _layout,
+		"title": str(_table["title"]),
+		"fairness": "UNVERIFIED. Nothing in this branch simulates. The start"
+			+ " grid, the mixer pin rows and the two branch lengths are"
+			+ " shapes, not proofs, and no lane-bias claim may be made from"
+			+ " them until a PyBullet pass measures one.",
+		"physics": "NOT ATTACHED. No collider, no solver, no seed. Every"
+			+ " number here describes photographed geometry.",
+		"marble": {"radius": Layout.MARBLE_RADIUS,
+			"diameter": Layout.MARBLE_RADIUS * 2.0},
+		"course": metrics,
+		"terrain": terrain,
+		"runs": runs,
+		"modules": modules,
+		"cameras": cameras,
+	}
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		push_error("course_scene: cannot write %s" % path)
+		return
+	file.store_string(JSON.stringify(_jsonable(table), "  "))
+	file.close()
+	print("  physics -> %s" % path)
+
+
+func _slope_profile(path: Array) -> Dictionary:
+	## Gradient over the first, middle and last third of a run.
+	var out := {}
+	var names := ["entry", "middle", "exit"]
+	for third in 3:
+		var a: int = int(float(third) * float(path.size() - 1) / 3.0)
+		var b: int = int(float(third + 1) * float(path.size() - 1) / 3.0)
+		var run := 0.0
+		for index in range(a, b):
+			run += Vector2((path[index + 1] as Vector3).x
+				- (path[index] as Vector3).x,
+				(path[index + 1] as Vector3).z
+				- (path[index] as Vector3).z).length()
+		var fall: float = float((path[a] as Vector3).y) 			- float((path[b] as Vector3).y)
+		out[names[third]] = rad_to_deg(atan(fall / maxf(run, 0.001)))
+	return out
+
+
+func _bank_extreme(banks: Array) -> float:
+	var most := 0.0
+	for value in banks:
+		most = maxf(most, absf(float(value)))
+	return rad_to_deg(most)
+
+
+func _bounds(path: Array, half: float, below: float, above: float) -> Dictionary:
+	var lo := Vector3(1.0e9, 1.0e9, 1.0e9)
+	var hi := -lo
+	for point in path:
+		var p: Vector3 = point
+		lo = Vector3(minf(lo.x, p.x - half), minf(lo.y, p.y - below),
+			minf(lo.z, p.z - half))
+		hi = Vector3(maxf(hi.x, p.x + half), maxf(hi.y, p.y + above),
+			maxf(hi.z, p.z + half))
+	return {"min": lo, "max": hi}
+
+
+func _thinned(path: Array, count: int) -> Array:
+	var out: Array = []
+	for step in count:
+		var index: int = clampi(int(round(float(step)
+			* float(path.size() - 1) / float(count - 1))), 0, path.size() - 1)
+		out.append(path[index])
+	return out
+
+
+func _module_clearance(name: String) -> Dictionary:
+	## The volume each module needs kept free above the running surface.
+	match name:
+		"Start":
+			return {"above": 1.10, "lateral": 3.30,
+				"note": "eight bays at 0.63 pitch, gate bar at +0.26"}
+		"Mixer":
+			return {"above": 0.90, "lateral": 1.60,
+				"note": "two staggered pin rows behind the window"}
+		"Obstacle":
+			return {"above": 1.70, "lateral": 1.80,
+				"note": "three spinners, hub at +1.46, blade tips reach -0.05"}
+		"Split":
+			return {"above": 2.60, "lateral": 3.60,
+				"note": "wedge nose on the centreline, portals at +/-2.05"}
+		"Merge":
+			return {"above": 1.20, "lateral": 2.60,
+				"note": "two inlets at +/-1.10, one exit"}
+		"Finish":
+			return {"above": 4.20, "lateral": 6.30,
+				"note": "deck 12.6 by 9.8, eight catch lanes at 1.32 pitch"}
+	return {"above": 1.0, "lateral": 2.0, "note": ""}
+
+
+func _jsonable(value):
+	if value is Dictionary:
+		var out := {}
+		for key in value:
+			out[str(key)] = _jsonable(value[key])
+		return out
+	if value is Array:
+		var list: Array = []
+		for item in value:
+			list.append(_jsonable(item))
+		return list
+	if value is Vector3:
+		return [snappedf(value.x, 0.001), snappedf(value.y, 0.001),
+			snappedf(value.z, 0.001)]
+	if value is float:
+		return snappedf(value, 0.0001)
+	return value
 
 
 func shot_names() -> Array:

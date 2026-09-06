@@ -165,7 +165,9 @@ static func _mouth(root: Node3D, palette, entry_local: Vector3) -> void:
 	## under it, and a channel widened to two and a half times its section
 	## drags a metre-deep white belly across the arena floor with it.
 	var samples := 40
-	var exit_at := Vector3(0.0, 0.30, -DECK_DEPTH * 0.5 + 4.40)
+	# The apron stops a unit short of the checker and lands flat. Run further
+	# in, its walls cross the landing and read as a flap lying over it.
+	var exit_at := Vector3(0.0, 0.20, -DECK_DEPTH * 0.5 + 3.30)
 	var path: Array = []
 	var sections: Array = []
 	var normals: Array = []
@@ -174,7 +176,7 @@ static func _mouth(root: Node3D, palette, entry_local: Vector3) -> void:
 		var t := float(index) / float(samples - 1)
 		path.append(entry_local.lerp(exit_at, t))
 		var built := Modules.trough_section(
-			lerpf(1.02, 2.90, smoothstep(0.16, 1.0, t)))
+			lerpf(1.02, 2.40, smoothstep(0.16, 1.0, t)))
 		sections.append(built[0])
 		normals.append(built[1])
 		banks.append(0.0)
@@ -187,7 +189,7 @@ static func _mouth(root: Node3D, palette, entry_local: Vector3) -> void:
 	for index in samples:
 		var t := float(index) / float(samples - 1)
 		var built := Modules.floor_section(
-			lerpf(0.97, 2.85, smoothstep(0.16, 1.0, t)))
+			lerpf(0.97, 2.35, smoothstep(0.16, 1.0, t)))
 		inner.append(built[0])
 		inner_normals.append(built[1])
 	root.add_child(Forms.mesh_node(
@@ -198,7 +200,7 @@ static func _mouth(root: Node3D, palette, entry_local: Vector3) -> void:
 		var line: Array = []
 		for index in samples:
 			var t := float(index) / float(samples - 1)
-			var half := lerpf(1.02, 2.90, smoothstep(0.16, 1.0, t)) + 0.20
+			var half := lerpf(1.02, 2.40, smoothstep(0.16, 1.0, t)) + 0.20
 			var centre: Vector3 = path[index]
 			line.append(Vector3(side * half, centre.y + 0.04, centre.z))
 		root.add_child(Forms.mesh_node(Geometry.tube(line, 0.055, 8),

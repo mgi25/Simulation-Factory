@@ -107,7 +107,7 @@ static func build_environment(no_glow: bool) -> Environment:
 
 	env.fog_enabled = true
 	env.fog_mode = Environment.FOG_MODE_DEPTH
-	env.fog_light_color = Color("#4A5570")
+	env.fog_light_color = Color("#5E5A6E")
 	env.fog_light_energy = 0.85
 	env.fog_sun_scatter = 0.52
 	env.fog_density = 0.0016
@@ -129,9 +129,9 @@ static func build_environment(no_glow: bool) -> Environment:
 
 	if not no_glow:
 		env.glow_enabled = true
-		env.glow_intensity = 0.92
-		env.glow_bloom = 0.18
-		env.glow_hdr_threshold = 1.35
+		env.glow_intensity = 1.10
+		env.glow_bloom = 0.26
+		env.glow_hdr_threshold = 1.16
 		env.glow_hdr_scale = 2.2
 		env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
 		for level in 7:
@@ -143,7 +143,7 @@ static func build_environment(no_glow: bool) -> Environment:
 
 	env.adjustment_enabled = true
 	env.adjustment_contrast = 1.06
-	env.adjustment_saturation = 1.15
+	env.adjustment_saturation = 1.20
 	env.adjustment_brightness = 1.0
 	return env
 
@@ -210,8 +210,8 @@ static func build_lights(parent: Node3D) -> void:
 	var world_warm := DirectionalLight3D.new()
 	world_warm.name = "WorldWarm"
 	world_warm.light_cull_mask = WORLD_LAYER
-	world_warm.light_color = Color("#F2A166")
-	world_warm.light_energy = 1.9
+	world_warm.light_color = Color("#FF9C46")
+	world_warm.light_energy = 2.3
 	world_warm.light_specular = 0.1
 	world_warm.shadow_enabled = false
 	# From +X and +Z: the camera's own side of the hill, and the opposite side

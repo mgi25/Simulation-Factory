@@ -253,7 +253,7 @@ static func _valley(root: Node3D, palette, cfg: Dictionary) -> void:
 static func _practicals(root: Node3D, cfg: Dictionary,
 		centreline: Array) -> void:
 	## A handful of omnis carrying the spill the emissive dressing implies.
-	var walk: Array = V2Forms.resample(centreline, 9)
+	var walk: Array = V2Forms.resample(centreline, 11)
 	for index in walk.size():
 		var at: Vector3 = walk[index]
 		var lamp := OmniLight3D.new()
@@ -265,3 +265,16 @@ static func _practicals(root: Node3D, cfg: Dictionary,
 		lamp.omni_attenuation = 1.6
 		lamp.shadow_enabled = false
 		root.add_child(lamp)
+		# And a warm one under the deck. The concept lights the ground beneath
+		# its machine as hard as it lights the machine, and that underlight is
+		# most of what separates "a premium product photographed at dusk" from
+		# "a white model on a blue hill".
+		var under := OmniLight3D.new()
+		under.name = "CourseUnder%d" % index
+		under.position = at - Vector3(0.0, 3.4, 0.0)
+		under.light_color = Color("#FFA658")
+		under.light_energy = 2.1
+		under.omni_range = 15.0
+		under.omni_attenuation = 1.4
+		under.shadow_enabled = false
+		root.add_child(under)

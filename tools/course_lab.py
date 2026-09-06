@@ -114,13 +114,14 @@ def run_godot(command: list[str], label: str) -> None:
     for line in (result.stdout or "").splitlines():
         stripped = line.strip()
         if stripped.startswith(("scene:", "rendered", "layout", "length",
-                                "start->finish", "hero lens")):
+                                "start->finish", "hero lens", "physics")):
             print(f"    {stripped}")
     print(f"  {label}: {elapsed:.1f}s")
 
 
 def render(godot: str, out_dir: str, shots: tuple[str, ...], layout: str,
-           width: int, height: int, detail: str = "block") -> None:
+           width: int, height: int, detail: str = "block",
+           dump_physics: str | None = None) -> None:
     os.makedirs(out_dir, exist_ok=True)
     command = [
         godot, "--path", GODOT_PROJECT, RENDER_SCENE, "--",
@@ -129,6 +130,8 @@ def render(godot: str, out_dir: str, shots: tuple[str, ...], layout: str,
         f"--width={width}", f"--height={height}",
         f"--layout={layout}", f"--detail={detail}",
     ]
+    if dump_physics:
+        command.append(f"--dump-physics={os.path.abspath(dump_physics)}")
     run_godot(command, f"{layout}/{detail} [{', '.join(shots)}] {width}x{height}")
     missing = [n for n in shots
                if not os.path.isfile(os.path.join(out_dir, f"{n}.png"))]
@@ -145,6 +148,7 @@ def render_clip(godot: str, out_dir: str, layout: str, detail: str) -> None:
         f"--frames={frames}", f"--fps={CLIP_FPS}",
         f"--width={WIDTH}", f"--height={HEIGHT}",
         f"--layout={layout}", f"--detail={detail}", "--shot=hero",
+        "--sequence=1",
     ]
     run_godot(command, f"clip {layout} ({frames} frames)")
 
@@ -306,7 +310,8 @@ def main(argv: list[str]) -> int:
         print("stills:")
         render(godot, OUT_DOCS, ("hero",), options.layout,
                options.width or WIDTH, options.height or HEIGHT,
-               options.detail)
+               options.detail,
+               dump_physics=os.path.join(OUT_DOCS, "physics_layout.json"))
         render(godot, OUT_DOCS, SECTION_SHOTS, options.layout,
                options.width or WIDTH, options.height or HEIGHT,
                options.detail)

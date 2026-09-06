@@ -124,8 +124,9 @@ static func height(x: float, z: float, cfg: Dictionary,
 	# fine the detail on it is. Landform first, then roughness.
 	h += _noise(x, z, 0.0085, 3) * amplitude * 3.4
 	h += _noise(x, z, 0.031, 7) * amplitude
-	h += _noise(x, z, 0.098, 23) * amplitude * 0.42
-	h += _noise(x, z, 0.240, 41) * amplitude * 0.16
+	h += _noise(x, z, 0.098, 23) * amplitude * 0.55
+	h += _noise(x, z, 0.240, 41) * amplitude * 0.24
+	h += _noise(x, z, 0.520, 59) * amplitude * 0.10
 
 	# Beyond the massif the ground falls away to nothing. Without this the
 	# heightfield is a rectangle a hundred and seventy units across whose far
@@ -320,7 +321,7 @@ static func build(palette, cfg: Dictionary) -> Node3D:
 
 
 static func scatter(root: Node3D, palette, cfg: Dictionary, count: int,
-		avoid: Array, clearance: float) -> void:
+		avoid: Array, clearance: float, gauge := 1.0) -> void:
 	## Boulders on the flank, kept clear of the racing line.
 	##
 	## Deterministic siting, rejected wherever the sample falls within
@@ -328,7 +329,7 @@ static func scatter(root: Node3D, palette, cfg: Dictionary, count: int,
 	## than no rock at all, and at this density rejection is cheaper than
 	## authoring every position by hand.
 	var group := Node3D.new()
-	group.name = "Scatter"
+	group.name = "Scatter%d" % int(gauge * 100.0)
 	root.add_child(group)
 	var x0: float = float(cfg["x_min"]) + 4.0
 	var x1: float = float(cfg["x_max"]) - 4.0
@@ -353,11 +354,12 @@ static func scatter(root: Node3D, palette, cfg: Dictionary, count: int,
 		if normal(x, z, cfg).y < 0.66:
 			continue
 		placed += 1
-		var scale: float = 0.9 + 3.4 * _lattice(attempt, 17, 131)
+		var scale: float = (0.9 + 3.4 * _lattice(attempt, 17, 131)) * gauge
 		# Two values, both darker than the ground they sit on. A boulder
 		# lighter than the hillside reads as a sheet of paper lying on it,
 		# which is what the lighter scree value gave at this size.
 		var shade := "slope_boulder" if placed % 3 == 0 else "slope_cliff"
+		var salt: int = attempt * 7 + 3 + int(gauge * 1000.0)
 		# The same smooth mass the distant ranges use, at a fiftieth of the
 		# size. A rounded box on a hillside reads as a crate: it has four
 		# vertical faces and a flat top, and no rock does.
@@ -365,7 +367,7 @@ static func scatter(root: Node3D, palette, cfg: Dictionary, count: int,
 		# came out as a handful of flat plates, and a flat dark plate lying on
 		# a hillside reads as a hole in it rather than as a rock on it.
 		var boulder := Forms.mesh_node(
-			HeroWorld.smooth_mass(scale * 1.35, scale, attempt * 7 + 3, 13, 7,
+			HeroWorld.smooth_mass(scale * 1.35, scale, salt, 13, 7,
 				0.46),
 			palette.get_material(shade), "Rock%d" % placed, false)
 		boulder.position = Vector3(x, height(x, z, cfg) - scale * 0.55, z)

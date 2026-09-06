@@ -32,7 +32,9 @@ const FinishArena := preload("res://assets/marble_machine/course/course_finish.g
 const Dressing := preload("res://assets/marble_machine/course/course_dressing.gd")
 
 const KEEL_DROP := 0.98         # v2_track's keel bottom, in profile units
-const SUPPORT_SPACING := 5.6
+# Fewer piers, each carrying more. At 5.6 a viaduct over the gorge came
+# out as a picket fence of thin frames; at 7.4 each one is a structure.
+const SUPPORT_SPACING := 7.4
 const RACERS := 8
 
 # The colour story, read *along* the course rather than down a tower. Cyan off
@@ -127,8 +129,14 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 	_markers(root, palette, table, detail)
 	_modules(root, palette, table, detail)
 	_field(root, palette, table)
+	# Two scatters at two scales. The large one reads at a hundred units and
+	# the small one at ten, and a section shot is framed at ten - one pass at
+	# a single size leaves the near ground smooth in exactly the frames where
+	# the ground is a third of the picture.
 	Terrain.scatter(ground, palette, terrain_cfg,
 		int(options.get("rocks", 64)), centreline, 5.4)
+	Terrain.scatter(ground, palette, terrain_cfg,
+		int(options.get("pebbles", 110)), centreline, 3.1, 0.34)
 	if detail != "block":
 		Dressing.build(root, palette, terrain_cfg, centreline,
 			table["nodes"])
@@ -237,31 +245,41 @@ static func _trestle(pier: Node3D, graphite, deep, gold, keel: float,
 	## The width at the foot is a fraction of the height, so a tall trestle is
 	## visibly a *tower of structure* and a short one is a stool. That taper is
 	## the whole reason a bridge over a gorge reads as engineered.
-	var half_top: float = 0.95 * scale
-	var half_foot: float = half_top + gap * 0.20
-	var depth: float = 0.62 * scale
+	# Stock scaled to the span. At a fixed radius a ten-unit trestle is four
+	# hairlines and two diagonals, and a group of them under a viaduct reads
+	# as loose sticks rather than as structure - which is what the first pass
+	# shipped. A leg on a tall frame is a member, not a wire.
+	var stock: float = (0.22 + gap * 0.023) * scale
+	var half_top: float = 1.05 * scale
+	var half_foot: float = half_top + gap * 0.22
+	var depth: float = 0.70 * scale
 	for sx in [-1.0, 1.0]:
 		for sz in [-1.0, 1.0]:
 			var top := Vector3(sx * half_top, keel + 0.05, sz * depth)
 			var foot := Vector3(sx * half_foot, ground - 0.4,
-				sz * (depth + gap * 0.10))
+				sz * (depth + gap * 0.12))
 			pier.add_child(Forms.mesh_node(
-				Forms.brace(foot, top, 0.145 * scale), graphite,
+				Forms.brace(foot, top, stock, 10), graphite,
 				"Leg%d%d" % [int(sx), int(sz)], false))
-	var levels := maxi(int(gap / 3.2), 1)
+	# Horizontal ties at each level, and exactly one diagonal per face over
+	# the whole height. A diagonal *per level per face* is four more members
+	# in a frame that already has four legs, and at close range the result is
+	# a tangle of crossing tubes rather than a truss.
+	var levels := maxi(int(gap / 4.6), 1)
 	for level in levels:
-		var t := (float(level) + 0.55) / float(levels + 0.4)
+		var t := (float(level) + 0.62) / float(levels + 0.5)
 		var y: float = lerpf(ground - 0.2, keel, t)
 		var half: float = lerpf(half_foot, half_top, t)
 		for sz in [-1.0, 1.0]:
 			pier.add_child(Forms.mesh_node(
 				Forms.brace(Vector3(-half, y, sz * depth),
-					Vector3(half, y, sz * depth), 0.085 * scale),
+					Vector3(half, y, sz * depth), stock * 0.58, 8),
 				deep, "Tie%d%d" % [level, int(sz)], false))
+	for sz in [-1.0, 1.0]:
 		pier.add_child(Forms.mesh_node(
-			Forms.brace(Vector3(-half, y - 1.1, -depth),
-				Vector3(half, y + 1.1, depth), 0.065 * scale),
-			deep, "Brace%d" % level, false))
+			Forms.brace(Vector3(-half_foot, ground - 0.1, sz * depth),
+				Vector3(half_top, keel - 0.1, sz * depth), stock * 0.48, 8),
+			deep, "Diagonal%d" % int(sz), false))
 	var cap := Forms.mesh_node(
 		Geometry.rounded_box(Vector3(2.3 * scale, 0.3, 1.5 * scale),
 			0.12, 3), gold, "Cap", false)
@@ -426,26 +444,30 @@ static func _field(root: Node3D, palette, table: Dictionary) -> void:
 	sphere.radial_segments = 24
 	sphere.rings = 12
 
+	# Three abreast is the claim the brief makes about the hero channel's
+	# width, so the field is placed in threes and the picture has to support it
+	# rather than a note asserting it. Two packs per run, half a lap apart, so
+	# that a camera anywhere on two hundred and thirty units of course has
+	# racers in frame - this is a display field, not a race.
 	var travellers: Array = []
-	var runs: Array = table["runs"]
 	var index := 0
-	for entry in runs:
+	for entry in table["runs"]:
 		var spec: Dictionary = entry
 		var name := str(spec["name"])
-		# Three abreast on the hero runs is the claim the brief makes about
-		# width, so the field is placed in threes and the picture has to
-		# support it rather than the note asserting it.
-		var lanes := [0.0] if float(spec["scale"]) < 0.9 else [-0.52, 0.0, 0.52]
-		for lane in lanes:
-			var node := MeshInstance3D.new()
-			node.name = "Racer%d" % index
-			node.mesh = sphere
-			node.material_override = palette.marble(index)
-			field.add_child(node)
-			travellers.append({"node": node.name, "run": name,
-				"lane": lane,
-				"phase": fmod(0.16 + 0.37 * float(index), 1.0)})
-			index += 1
+		var narrow: bool = float(spec["scale"]) < 0.9
+		var lanes := [-0.40, 0.0, 0.40] if narrow else [-0.54, 0.0, 0.54]
+		for pack in 2:
+			for at in lanes.size():
+				var node := MeshInstance3D.new()
+				node.name = "Racer%d" % index
+				node.mesh = sphere
+				node.material_override = palette.marble(index)
+				field.add_child(node)
+				travellers.append({"node": node.name, "run": name,
+					"lane": float(lanes[at]),
+					"phase": fposmod(0.10 + 0.5 * float(pack)
+						+ 0.055 * float(at), 1.0)})
+				index += 1
 	root.set_meta("travellers", travellers)
 
 

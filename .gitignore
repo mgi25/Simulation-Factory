@@ -15,6 +15,10 @@ frames/
 videos/
 *.mp4
 
+# Iteration frames from the art labs: kept out of the branch on purpose,
+# because they are the working set and change every render.
+docs/validation/**/_preview/
+
 # Godot
 godot/.godot/
 godot/android/
