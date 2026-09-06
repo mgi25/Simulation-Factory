@@ -463,6 +463,33 @@ func _build(key: String) -> StandardMaterial3D:
 			return _matte("#4E6C88", 0.98)
 		"lit_dusk_band":
 			return _emissive("#D89A63", 1.9, 0.42)
+
+		# --- SLOPED COURSE ------------------------------------------------
+		#
+		# Additive, like every block above it. The near ground of the sloped
+		# course is a heightfield rather than a backdrop ring, which is a
+		# different job from anything the tower needed: it is *under* the
+		# subject, it fills a third of the frame, and it has to carry a
+		# readable landform at ten units as well as at two hundred.
+		#
+		# So the four values are separated by warmth as much as by lightness.
+		# A mountainside where every plane is the same blue-grey reads as one
+		# extruded mass however well it is modelled; a warm shelf against a
+		# cool cliff face reads as two kinds of ground. The warm ones are also
+		# where the course's own supports land, so the frame's warmest large
+		# area sits directly under its whitest object.
+		"slope_cliff":
+			return _matte("#131A24", 0.95)
+		"slope_rock":
+			return _matte("#24303E", 0.94)
+		"slope_earth":
+			return _matte("#34382F", 0.93)
+		"slope_scree":
+			return _matte("#2C3646", 0.94)
+		"slope_moss":
+			return _matte("#2A3830", 0.95)
+		"slope_cap":
+			return _matte("#3E4B5D", 0.94)
 	push_error("lab_palette: unknown material key '%s'" % key)
 	return _moulded("#FF00FF", 0.5, 0.0)
 
