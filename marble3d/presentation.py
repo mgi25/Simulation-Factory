@@ -327,7 +327,7 @@ AUTHORED_BOWL_DISH_RADIUS = 2.52
 CURVE_WALL_OVER_HALF_WIDTH = 0.25 / 0.40
 
 
-def _bowl_visual(spec: Any, describe: dict[str, Any]) -> dict[str, Any]:
+def _bowl_visual(module: Any, spec: Any, describe: dict[str, Any]) -> dict[str, Any]:
     """The authored bowl, dimensioned by the simulated one.
 
     `outer_radius` is the number that matters most here, and it is not the rim
@@ -363,6 +363,18 @@ def _bowl_visual(spec: Any, describe: dict[str, Any]) -> dict[str, Any]:
         "drain_rim_height": float(describe.get("drain_rim_height", 0.0)),
         "segments": int(describe.get("segments", 64)),
         "detail_scale": outer / AUTHORED_BOWL_DISH_RADIUS,
+        # The polyline the collider is actually revolved from: dish, then the
+        # rolled lip, then the shaft. Carried rather than left to be
+        # re-derived from `profile_power`, because the power law is only the
+        # first of those three pieces. Near the drain the real surface rolls
+        # away under a fillet and drops to `drain_rim_height`, half a marble
+        # radius below where the bare power law puts it - which is exactly the
+        # width of the gap a marble rolls onto to leave the bowl, and exactly
+        # the amount by which a renderer trusting the exponent alone would
+        # draw the floor too high.
+        "profile": [
+            [float(radius), float(height)] for radius, height in module._profile()
+        ],
     }
 
 
@@ -371,14 +383,28 @@ def _curve_visual(module: Any, spec: dict[str, Any]) -> dict[str, Any]:
 
     The visual lab's S-curve already builds from a list of control points, so
     this is the one asset that needs no re-parameterising - only feeding. The
-    points handed over are the exact frames the collider was swept along, in
-    module-local space, so the drawn channel and the solved channel are the
-    same curve sampled the same way.
+    points handed over are the exact frames the collider was swept along, so
+    the drawn channel and the solved channel are the same curve sampled the
+    same way. The asset must not re-smooth them: a spline resampled through
+    these points is a different surface from the one the solver touched, and
+    the difference lands on the running surface where it shows.
+
+    Placed into world space, like the sockets and the start bays and for the
+    same reason. `frame_at` works in the module's own frame, where the entry
+    is the origin and the arc turns toward +Z; this curve is yawed a quarter
+    turn and dropped five units, so a renderer that read the frames raw would
+    draw the channel side-on to the collider it is meant to clothe. Every
+    other position in this document is in world space and a single exception
+    is exactly the kind of thing nobody remembers.
+
+    The rotation carries the bank. Its +X is the flow direction and its +Y is
+    the banked up - not world up - which is what the swept visual has to be
+    framed on if its floor is to sit where the solved floor sits.
     """
     fractions = module._fractions()
     centreline = []
     for fraction in fractions:
-        frame = module.frame_at(fraction)
+        frame = module.transform.compose(module.frame_at(fraction))
         centreline.append(
             {
                 "t": fraction,
@@ -451,7 +477,7 @@ def _actuator_json(module: Any, actuator: Any) -> dict[str, Any]:
 
 
 _VISUAL_BUILDERS = {
-    "BowlModule": lambda module, spec, describe: _bowl_visual(spec, describe),
+    "BowlModule": lambda module, spec, describe: _bowl_visual(module, spec, describe),
     "CurveModule": lambda module, spec, describe: _curve_visual(module, spec),
     "StartModule": lambda module, spec, describe: _start_visual(module, spec),
 }
