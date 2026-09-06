@@ -261,6 +261,17 @@ static func build(palette, controls: Array, node_name: String,
 	var widths := width_curve(path.size(),
 		float(options.get("entry_flare", 0.14)),
 		float(options.get("exit_flare", 0.09)))
+	# An explicit curve, for a mouth that has to open much further than a
+	# flare: the sloped course's start fan takes eight lanes down to one and
+	# its finish opens one back out onto a deck. Additive - without the key
+	# every existing build gets `width_curve` exactly as before.
+	if options.has("widths"):
+		var given: Array = options["widths"]
+		if given.size() == path.size():
+			widths = given
+		else:
+			push_error("v2_track: widths has %d entries for %d samples"
+				% [given.size(), path.size()])
 	root.set_meta("widths", widths)
 
 	# Material identity per run. Defaults reproduce the V2.2 channel exactly;

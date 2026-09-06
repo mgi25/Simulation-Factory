@@ -31,20 +31,22 @@ const SHOTS := {
 		"bearing": 0.0},
 	"phone": {"at": ["hero"], "extent": 0.0, "fov": 0.0, "elevation": 0.0,
 		"bearing": 0.0},
-	"start": {"at": ["node", "start"], "extent": 11.0, "fov": 34.0,
-		"elevation": 13.0, "bearing": 152.0},
+	"start": {"at": ["node", "start"], "extent": 10.5, "fov": 34.0,
+		"elevation": 17.0, "bearing": 26.0},
 	"descent": {"at": ["path", "launch", 0.72], "extent": 15.0, "fov": 36.0,
 		"elevation": 11.0, "bearing": 134.0},
 	"long_track": {"at": ["long", 0.46], "extent": 22.0, "fov": 34.0,
 		"elevation": 9.0, "bearing": 74.0},
-	"obstacle": {"at": ["node", "obstacle"], "extent": 12.0, "fov": 34.0,
-		"elevation": 15.0, "bearing": 118.0},
-	"split": {"at": ["node", "split"], "extent": 26.0, "fov": 34.0,
-		"elevation": 26.0, "bearing": 168.0},
-	"final_run": {"at": ["path", "final", 0.30], "extent": 17.0, "fov": 36.0,
-		"elevation": 8.0, "bearing": 158.0},
-	"finish": {"at": ["node", "finish"], "extent": 13.0, "fov": 34.0,
-		"elevation": 12.0, "bearing": 24.0},
+	"obstacle": {"at": ["node", "obstacle"], "extent": 9.5, "fov": 34.0,
+		"elevation": 14.0, "bearing": 44.0},
+	"split": {"at": ["node", "split"], "extent": 15.0, "fov": 34.0,
+		"elevation": 17.0, "bearing": 24.0},
+	"merge": {"at": ["node", "merge"], "extent": 14.0, "fov": 34.0,
+		"elevation": 15.0, "bearing": 32.0},
+	"final_run": {"at": ["path", "final", 0.34], "extent": 20.0, "fov": 36.0,
+		"elevation": 10.0, "bearing": 62.0},
+	"finish": {"at": ["node", "finish"], "extent": 15.5, "fov": 34.0,
+		"elevation": 16.0, "bearing": 44.0},
 }
 
 const DEFAULT_SHOT := "hero"
@@ -70,6 +72,15 @@ func _ready() -> void:
 	if not SHOTS.has(_shot):
 		push_error("course_scene: unknown shot '%s'" % _shot)
 		_shot = DEFAULT_SHOT
+
+	# Shadow quality set here rather than in `project.godot`, so the earlier
+	# labs' committed frames keep reproducing byte for byte from this branch.
+	# A course a hundred and eighty units long puts far more world inside one
+	# cascade than a tower did, and at the default atlas the terrace lips came
+	# back as a row of sawteeth across the mountainside.
+	RenderingServer.directional_shadow_atlas_set_size(8192, false)
+	RenderingServer.directional_soft_shadow_filter_set_quality(
+		RenderingServer.SHADOW_QUALITY_SOFT_HIGH)
 
 	_palette = Palette.new("tower")
 	_table = Layout.table(_layout)

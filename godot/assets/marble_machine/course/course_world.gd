@@ -36,20 +36,20 @@ const NEAR_RANGE := [
 ]
 
 const MID_RANGE := [
-	[160.0, 372.0, 162.0, 74.0, 5], [182.0, 358.0, 172.0, 78.0, 13],
-	[202.0, 350.0, 176.0, 80.0, 21], [222.0, 362.0, 170.0, 78.0, 29],
-	[242.0, 380.0, 160.0, 74.0, 37], [130.0, 404.0, 154.0, 72.0, 45],
-	[268.0, 408.0, 152.0, 72.0, 53], [100.0, 436.0, 148.0, 70.0, 61],
-	[298.0, 440.0, 148.0, 70.0, 69], [ 40.0, 470.0, 142.0, 68.0, 77],
-	[336.0, 474.0, 142.0, 68.0, 85],
+	[160.0, 372.0, 144.0, 74.0, 5], [182.0, 358.0, 154.0, 78.0, 13],
+	[202.0, 350.0, 158.0, 80.0, 21], [222.0, 362.0, 152.0, 78.0, 29],
+	[242.0, 380.0, 142.0, 74.0, 37], [130.0, 404.0, 136.0, 72.0, 45],
+	[268.0, 408.0, 134.0, 72.0, 53], [100.0, 436.0, 130.0, 70.0, 61],
+	[298.0, 440.0, 130.0, 70.0, 69], [ 40.0, 470.0, 124.0, 68.0, 77],
+	[336.0, 474.0, 124.0, 68.0, 85],
 ]
 
 const FAR_RANGE := [
-	[176.0, 596.0, 214.0, 116.0, 7], [200.0, 580.0, 224.0, 120.0, 15],
-	[224.0, 600.0, 212.0, 116.0, 23], [150.0, 634.0, 200.0, 112.0, 31],
-	[252.0, 640.0, 200.0, 112.0, 39], [120.0, 686.0, 192.0, 108.0, 47],
-	[282.0, 690.0, 192.0, 108.0, 55], [ 60.0, 740.0, 184.0, 104.0, 63],
-	[320.0, 744.0, 184.0, 104.0, 71],
+	[176.0, 596.0, 188.0, 116.0, 7], [200.0, 580.0, 198.0, 120.0, 15],
+	[224.0, 600.0, 186.0, 116.0, 23], [150.0, 634.0, 174.0, 112.0, 31],
+	[252.0, 640.0, 174.0, 112.0, 39], [120.0, 686.0, 166.0, 108.0, 47],
+	[282.0, 690.0, 166.0, 108.0, 55], [ 60.0, 740.0, 158.0, 104.0, 63],
+	[320.0, 744.0, 158.0, 104.0, 71],
 ]
 
 # Distant lit architecture on the mid crests: what says inhabited rather than
@@ -77,11 +77,14 @@ static func build_environment(no_glow: bool) -> Environment:
 	## valley, it does not fill a mountainside evenly.
 	var sky_material := ProceduralSkyMaterial.new()
 	sky_material.sky_top_color = Color("#040A16")
-	sky_material.sky_horizon_color = Color("#33546A")
-	sky_material.sky_curve = 0.10
+	# The horizon carries the warmth. A dusk whose only warm pixels are the
+	# lamps on the subject reads as night, and the concept's frame is warm
+	# behind its machine as well as on it.
+	sky_material.sky_horizon_color = Color("#6A5C63")
+	sky_material.sky_curve = 0.16
 	sky_material.sky_energy_multiplier = 1.0
 	sky_material.ground_bottom_color = Color("#080F19")
-	sky_material.ground_horizon_color = Color("#2C4A5C")
+	sky_material.ground_horizon_color = Color("#4A4048")
 	sky_material.ground_curve = 0.28
 	sky_material.sun_angle_max = 46.0
 	sky_material.energy_multiplier = 1.0
@@ -92,7 +95,7 @@ static func build_environment(no_glow: bool) -> Environment:
 	var env := Environment.new()
 	env.background_mode = Environment.BG_SKY
 	env.sky = sky
-	env.background_energy_multiplier = 0.50
+	env.background_energy_multiplier = 0.78
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
 	env.ambient_light_sky_contribution = 1.0
 	env.ambient_light_energy = 0.42
@@ -104,10 +107,10 @@ static func build_environment(no_glow: bool) -> Environment:
 
 	env.fog_enabled = true
 	env.fog_mode = Environment.FOG_MODE_DEPTH
-	env.fog_light_color = Color("#33566F")
+	env.fog_light_color = Color("#4A5570")
 	env.fog_light_energy = 0.85
-	env.fog_sun_scatter = 0.34
-	env.fog_density = 0.0013
+	env.fog_sun_scatter = 0.52
+	env.fog_density = 0.0016
 	env.fog_sky_affect = 0.30
 	env.fog_aerial_perspective = 0.72
 	env.fog_height = -14.0
@@ -155,7 +158,7 @@ static func build_lights(parent: Node3D) -> void:
 	key.light_specular = 1.0
 	key.shadow_enabled = true
 	key.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
-	key.directional_shadow_max_distance = 150.0
+	key.directional_shadow_max_distance = 110.0
 	key.directional_shadow_split_1 = 0.05
 	key.directional_shadow_split_2 = 0.16
 	key.directional_shadow_split_3 = 0.44
@@ -174,13 +177,13 @@ static func build_lights(parent: Node3D) -> void:
 	world_key.shadow_enabled = true
 	world_key.directional_shadow_mode = \
 		DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
-	world_key.directional_shadow_max_distance = 420.0
-	world_key.directional_shadow_split_1 = 0.05
-	world_key.directional_shadow_split_2 = 0.17
-	world_key.directional_shadow_split_3 = 0.46
+	world_key.directional_shadow_max_distance = 300.0
+	world_key.directional_shadow_split_1 = 0.07
+	world_key.directional_shadow_split_2 = 0.22
+	world_key.directional_shadow_split_3 = 0.52
 	world_key.directional_shadow_blend_splits = true
-	world_key.shadow_bias = 0.07
-	world_key.shadow_normal_bias = 1.8
+	world_key.shadow_bias = 0.045
+	world_key.shadow_normal_bias = 1.1
 	world_key.rotation_degrees = Vector3(-26.0, -78.0, 0.0)
 	parent.add_child(world_key)
 
@@ -198,6 +201,24 @@ static func build_lights(parent: Node3D) -> void:
 	world_fill.shadow_enabled = false
 	world_fill.rotation_degrees = Vector3(-14.0, 26.0, 0.0)
 	parent.add_child(world_fill)
+
+	# The warm half of the dusk, on the world only and raking in from the same
+	# bearing as the sky's warm horizon. One light, and it is what turns a
+	# uniformly blue mountainside into a lit one - the concept's environment is
+	# warm behind its machine as well as in front of it, and no amount of warm
+	# paint on the subject substitutes for that.
+	var world_warm := DirectionalLight3D.new()
+	world_warm.name = "WorldWarm"
+	world_warm.light_cull_mask = WORLD_LAYER
+	world_warm.light_color = Color("#F2A166")
+	world_warm.light_energy = 1.9
+	world_warm.light_specular = 0.1
+	world_warm.shadow_enabled = false
+	# From +X and +Z: the camera's own side of the hill, and the opposite side
+	# from the cool key. Aimed the other way it lit only the uphill faces,
+	# which this camera never sees, and the mountainside stayed uniformly blue.
+	world_warm.rotation_degrees = Vector3(-8.0, 52.0, 0.0)
+	parent.add_child(world_warm)
 
 	var rim := DirectionalLight3D.new()
 	rim.name = "Rim"

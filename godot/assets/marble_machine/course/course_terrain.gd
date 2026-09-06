@@ -103,7 +103,9 @@ static func height(x: float, z: float, cfg: Dictionary,
 	# units of drift in it reads as a bench cut by the mountain.
 	for entry in cfg.get("steps", []):
 		var step: Array = entry
-		var edge: float = float(step[0]) + _noise(x, float(step[0]), 0.021, 5) * 7.0
+		# Two units of drift, not seven. At seven the terrace lips came out as
+		# a row of sawteeth on the skyline rather than as a bench line.
+		var edge: float = float(step[0]) + _noise(x, float(step[0]), 0.014, 5) * 2.4
 		h -= float(step[1]) * smoothstep(
 			edge - float(step[2]), edge + float(step[2]), z)
 
@@ -156,6 +158,14 @@ static func height(x: float, z: float, cfg: Dictionary,
 	# every support has a positive length by construction rather than by
 	# hand-tuned coordinates - and the cut faces it leaves behind are the most
 	# rock-like thing in the frame.
+	#
+	# Cut from the *nearest* centreline sample, not from the union of a disc
+	# per sample. Those two are not the same surface: a union of smoothstep
+	# discs scallops wherever two of them meet at a shallow angle, and along
+	# the ridge between two adjacent switchback benches that scalloping came
+	# out as a band of sawteeth across the mountainside - the last low-poly
+	# artefact in the hero frame, and one that survived a shadow-quality pass
+	# and a material-band pass because it was neither.
 	var cut: Dictionary = cfg.get("cut_index", {})
 	if not cut.is_empty():
 		var reach: float = float(cfg["cut_reach"])
@@ -163,6 +173,8 @@ static func height(x: float, z: float, cfg: Dictionary,
 		var depth: float = float(cfg["cut_depth"])
 		var gx := int(floor(x / reach))
 		var gz := int(floor(z / reach))
+		var nearest := reach
+		var nearest_y := 0.0
 		for ox in [-1, 0, 1]:
 			for oz in [-1, 0, 1]:
 				var bucket = cut.get(Vector2i(gx + ox, gz + oz), null)
@@ -171,10 +183,12 @@ static func height(x: float, z: float, cfg: Dictionary,
 				for point in bucket:
 					var p: Vector3 = point
 					var d := Vector2(x - p.x, z - p.z).length()
-					if d >= reach:
-						continue
-					var blend := 1.0 - smoothstep(inner, reach, d)
-					h = minf(h, lerpf(h, p.y - depth, blend))
+					if d < nearest:
+						nearest = d
+						nearest_y = p.y
+		if nearest < reach:
+			var blend := 1.0 - smoothstep(inner, reach, nearest)
+			h = minf(h, lerpf(h, nearest_y - depth, blend))
 
 	return h
 
@@ -222,22 +236,23 @@ static func _material_of(x: float, z: float, cfg: Dictionary) -> String:
 		var reach: float = float(pad[2]) + float(pad[3]) * 0.55
 		if Vector2(x - float(pad[0]), z - float(pad[1])).length() < reach:
 			return "Shelf"
-	var e := 3.2
+	# Two rock values and one very steep one, and that is deliberately all.
+	#
+	# The four-band version - cliff by slope, then valley / rock / cap by
+	# height - was the largest remaining artefact in the hero frame. A band
+	# boundary on a heightfield is assigned per quad, so it is a staircase at
+	# cell resolution, and with a value jump either side of it that staircase
+	# is the most visible edge on the mountain: the frame read as low-poly
+	# terrain even though the surface under it is smooth-shaded. Nearly-equal
+	# values make the same boundary invisible, and the *form* is carried by
+	# the two-key lighting, the boulders and the scrub instead - which is how
+	# the concept's environment carries it too.
+	var e := 3.6
 	var dx := height(x + e, z, cfg, false) - height(x - e, z, cfg, false)
 	var dz := height(x, z + e, cfg, false) - height(x, z - e, cfg, false)
-	# 0.62 is a gradient of about 1.26, or fifty degrees. At 0.80 the wall on
-	# -X and the gorge lip on +X both qualified and the whole massif came back
-	# as cliff; a cliff band that covers everything separates nothing.
-	if Vector3(-dx, 2.0 * e, -dz).normalized().y < 0.62:
+	if Vector3(-dx, 2.0 * e, -dz).normalized().y < 0.45:
 		return "Cliff"
-	# Height bands above that. Elevation is the strongest cue a mountain has
-	# and the cheapest to paint: a warm valley floor, rock through the middle,
-	# a pale cool cap on the crests. Slope alone put large tan blobs part way
-	# up a face, which reads as camouflage rather than as ground.
-	var h := height(x, z, cfg, false)
-	if h < float(cfg.get("valley_below", 2.0)):
-		return "Shelf"
-	if h > float(cfg.get("cap_above", 34.0)):
+	if _noise(x, z, 0.017, 67) > 0.20:
 		return "High"
 	return "Flank"
 
@@ -338,18 +353,24 @@ static func scatter(root: Node3D, palette, cfg: Dictionary, count: int,
 		if normal(x, z, cfg).y < 0.66:
 			continue
 		placed += 1
-		var scale: float = 0.7 + 2.6 * _lattice(attempt, 17, 131)
-		var shade := "slope_scree" if placed % 3 == 0 else "slope_rock"
+		var scale: float = 0.9 + 3.4 * _lattice(attempt, 17, 131)
+		# Two values, both darker than the ground they sit on. A boulder
+		# lighter than the hillside reads as a sheet of paper lying on it,
+		# which is what the lighter scree value gave at this size.
+		var shade := "slope_boulder" if placed % 3 == 0 else "slope_cliff"
 		# The same smooth mass the distant ranges use, at a fiftieth of the
 		# size. A rounded box on a hillside reads as a crate: it has four
 		# vertical faces and a flat top, and no rock does.
+		# Thirteen facets over seven tiers. At nine and five a mass this small
+		# came out as a handful of flat plates, and a flat dark plate lying on
+		# a hillside reads as a hole in it rather than as a rock on it.
 		var boulder := Forms.mesh_node(
-			HeroWorld.smooth_mass(scale * 1.5, scale, attempt * 7 + 3, 9, 5,
-				0.42),
+			HeroWorld.smooth_mass(scale * 1.35, scale, attempt * 7 + 3, 13, 7,
+				0.46),
 			palette.get_material(shade), "Rock%d" % placed, false)
 		boulder.position = Vector3(x, height(x, z, cfg) - scale * 0.55, z)
 		boulder.rotation.y = _lattice(attempt, 23, 7) * TAU
 		boulder.rotation.z = (_lattice(attempt, 29, 11) - 0.5) * 0.45
-		boulder.scale = Vector3(1.0, 0.62 + 0.5 * _lattice(attempt, 31, 13), 1.0)
+		boulder.scale = Vector3(1.0, 0.90 + 0.30 * _lattice(attempt, 31, 13), 1.0)
 		group.add_child(boulder)
 	_to_world_layer(group)

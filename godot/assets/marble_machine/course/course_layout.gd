@@ -137,22 +137,22 @@ const A_HERO := {"aim": Vector3(-1.0, 16.0, 1.0), "fov": 30.0,
 
 const B_TERRAIN := {
 	"top_y": 39.6, "z_top": -34.0, "grade": 0.45,
-	"steps": [[-30.0, 5.2, 2.4], [-13.0, 2.2, 3.2], [1.5, 2.4, 3.2],
-		[16.0, 2.2, 3.5], [32.0, 2.8, 4.0]],
+	"steps": [[-30.0, 5.2, 4.4], [-13.0, 2.2, 5.0], [1.5, 2.4, 5.0],
+		[16.0, 2.2, 5.4], [32.0, 2.8, 6.0]],
 	"left_at": 20.0, "left_span": 26.0, "left_rise": 17.0,
 	"gorge_at": 15.0, "gorge_span": 24.0, "gorge_depth": 28.0,
 	"crest_rise": 5.5, "crest_scale": 24.0,
 	"centre_x": 1.0, "centre_z": 6.0,
-	"edge_from": 74.0, "edge_to": 116.0, "edge_y": -80.0,
-	"valley_below": -60.0, "cap_above": 36.0,
-	"cut_depth": 2.8, "cut_inner": 4.0, "cut_reach": 11.0,
-	"noise": 1.9, "cell": 2.2,
+	"edge_from": 58.0, "edge_to": 94.0, "edge_y": -82.0,
+	"valley_below": -60.0, "cap_above": 34.0,
+	"cut_depth": 2.8, "cut_inner": 3.2, "cut_reach": 8.0,
+	"noise": 2.2, "cell": 1.75,
 	"x_min": -96.0, "x_max": 96.0, "z_min": -110.0, "z_max": 130.0,
 	"pads": [
-		[-17.4, -34.6, 5.5, 6.5, 37.6],   # start shelf
+		[-19.4, -38.9, 6.6, 7.0, 37.2],   # start shelf
 		[-8.6, 3.2, 5.0, 6.0, 16.4],      # obstacle terrace
 		[6.0, 18.0, 4.6, 6.0, 9.8],       # choice promontory
-		[20.6, 44.8, 10.5, 12.0, 0.0],    # finish mesa
+		[24.2, 46.2, 11.0, 12.5, -2.4],   # finish mesa
 	],
 }
 
@@ -164,18 +164,19 @@ const B_RUNS := [
 		Vector3(-9.40, 32.20, -29.00), Vector3(-6.80, 31.60, -28.50)]},
 	{"name": "leg1", "role": "long", "scale": HERO_SCALE,
 		"bank_gain": 3.6, "bank_max": 28.0, "controls": [
-		Vector3(-4.80, 31.20, -28.20), Vector3(0.60, 30.20, -27.40),
+		Vector3(-6.80, 31.60, -28.50), Vector3(0.60, 30.20, -27.40),
 		Vector3(6.20, 29.00, -26.20), Vector3(11.60, 27.60, -24.40),
 		Vector3(16.00, 26.20, -21.80), Vector3(18.60, 24.90, -18.80),
 		Vector3(18.80, 24.00, -16.00), Vector3(17.00, 23.50, -13.80),
 		Vector3(14.00, 23.20, -12.60), Vector3(11.20, 23.15, -12.40)]},
 	{"name": "leg2", "role": "long", "scale": HERO_SCALE,
 		"bank_gain": 3.0, "bank_max": 22.0, "controls": [
-		Vector3(9.20, 23.00, -12.30), Vector3(3.80, 22.20, -11.40),
+		Vector3(11.20, 23.15, -12.40), Vector3(3.80, 22.20, -11.40),
 		Vector3(-1.80, 21.20, -10.20), Vector3(-7.40, 20.20, -8.60),
 		Vector3(-12.60, 19.40, -6.20), Vector3(-16.20, 18.60, -3.00),
 		Vector3(-16.80, 17.90, 0.40), Vector3(-14.40, 17.50, 2.40),
-		Vector3(-11.40, 17.30, 2.90)]},
+		Vector3(-11.40, 17.20, 2.90), Vector3(-9.00, 17.05, 3.16),
+		Vector3(-6.40, 16.90, 3.50)]},
 	{"name": "leg3", "role": "long", "scale": HERO_SCALE,
 		"bank_gain": 3.4, "bank_max": 26.0, "controls": [
 		Vector3(-6.40, 16.90, 3.50), Vector3(-0.60, 16.00, 4.60),
@@ -185,18 +186,18 @@ const B_RUNS := [
 		Vector3(6.00, 10.60, 17.80)]},
 	{"name": "blue", "role": "branch", "scale": BRANCH_SCALE,
 		"bank_gain": 3.0, "bank_max": 24.0, "controls": [
-		Vector3(4.80, 10.15, 19.00), Vector3(-0.80, 9.30, 21.40),
+		Vector3(5.20, 10.40, 18.55), Vector3(-0.80, 9.30, 21.40),
 		Vector3(-6.80, 8.50, 23.40), Vector3(-12.40, 7.60, 25.40),
 		Vector3(-15.20, 6.70, 28.60), Vector3(-13.40, 5.90, 31.80),
-		Vector3(-9.60, 5.40, 33.80), Vector3(-6.00, 5.15, 34.80),
-		Vector3(-3.00, 5.05, 35.20)]},
+		Vector3(-9.60, 5.40, 33.80), Vector3(-6.00, 5.18, 34.60),
+		Vector3(-3.20, 5.00, 35.40), Vector3(-1.10, 4.90, 36.05)]},
 	{"name": "orange", "role": "branch", "scale": BRANCH_SCALE,
 		"bank_gain": 4.0, "bank_max": 32.0, "controls": [
-		Vector3(7.20, 10.15, 19.00), Vector3(13.00, 9.20, 21.00),
+		Vector3(6.90, 10.40, 18.55), Vector3(13.00, 9.20, 21.00),
 		Vector3(18.40, 8.20, 23.60), Vector3(21.00, 7.20, 27.00),
 		Vector3(19.40, 6.30, 30.60), Vector3(15.00, 5.60, 33.20),
-		Vector3(10.00, 5.20, 34.60), Vector3(5.40, 5.05, 35.20),
-		Vector3(3.00, 5.05, 35.30)]},
+		Vector3(10.00, 5.20, 34.60), Vector3(5.60, 5.18, 34.70),
+		Vector3(3.20, 5.00, 35.45), Vector3(1.10, 4.90, 36.05)]},
 	{"name": "final", "role": "sprint", "scale": HERO_SCALE,
 		"bank_gain": 2.2, "bank_max": 14.0, "controls": [
 		Vector3(0.00, 4.85, 36.40), Vector3(2.60, 4.15, 37.60),
@@ -206,12 +207,12 @@ const B_RUNS := [
 ]
 
 const B_NODES := {
-	"start": Vector3(-17.40, 38.10, -34.60),
+	"start": Vector3(-18.60, 38.55, -37.20),
 	"mix": Vector3(-5.60, 31.45, -28.35),
-	"obstacle": Vector3(-8.60, 17.10, 3.20),
+	"obstacle": Vector3(-9.00, 17.05, 3.16),
 	"split": Vector3(6.00, 10.50, 18.00),
-	"merge": Vector3(0.00, 4.95, 35.60),
-	"finish": Vector3(21.40, 0.85, 45.00),
+	"merge": Vector3(0.00, 4.88, 36.10),
+	"finish": Vector3(24.20, 0.70, 46.20),
 }
 
 const B_HERO := {"aim": Vector3(1.0, 18.0, 6.0), "fov": 30.0,

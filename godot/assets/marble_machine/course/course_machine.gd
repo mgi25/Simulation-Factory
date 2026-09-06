@@ -27,19 +27,27 @@ const V2Forms := preload("res://assets/marble_machine/v2/v2_forms.gd")
 const Track := preload("res://assets/marble_machine/v2/v2_track.gd")
 const Terrain := preload("res://assets/marble_machine/course/course_terrain.gd")
 const Layout := preload("res://assets/marble_machine/course/course_layout.gd")
+const Modules := preload("res://assets/marble_machine/course/course_modules.gd")
+const FinishArena := preload("res://assets/marble_machine/course/course_finish.gd")
+const Dressing := preload("res://assets/marble_machine/course/course_dressing.gd")
 
 const KEEL_DROP := 0.98         # v2_track's keel bottom, in profile units
 const SUPPORT_SPACING := 5.6
 const RACERS := 8
 
-# Edge-light key per run role: the colour story read along the course rather
-# than down a tower. Cyan from the line, violet through the middle, the two
-# branch identities at the choice, gold from the merge to the flag.
+# The colour story, read *along* the course rather than down a tower. Cyan off
+# the line, cooling through the first two legs, violet on the approach to the
+# choice, the two route identities at the choice itself and gold from the merge
+# to the flag - so a viewer who has seen four seconds of the Short can tell
+# roughly how far through the race a frame is from its edge lights alone.
 const EDGE_LIGHTS := {
-	"descent": "lit_cyan_line_hero",
-	"long": "lit_cyan_line_hero",
-	"branch": "neon_blue",
-	"sprint": "lit_gold_line",
+	"launch": "lit_cyan_line_hero",
+	"leg1": "lit_cyan_line_hero",
+	"leg2": "lit_cyan_line_hero",
+	"leg3": "neon_violet_hero",
+	"blue": "neon_blue",
+	"orange": "lit_orange_line",
+	"final": "lit_gold_line",
 }
 
 
@@ -63,7 +71,7 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 		var spec: Dictionary = entry
 		var name := str(spec["name"])
 		var role := str(spec["role"])
-		var light := str(EDGE_LIGHTS.get(role, "lit_cyan_line_hero"))
+		var light := str(EDGE_LIGHTS.get(name, "lit_cyan_line_hero"))
 		var shell := "pearl_shell"
 		var floor_key := "running_polished"
 		var guard := "acrylic_guard"
@@ -117,9 +125,13 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 			float(spec["scale"]), str(spec["name"])))
 
 	_markers(root, palette, table, detail)
+	_modules(root, palette, table, detail)
 	_field(root, palette, table)
 	Terrain.scatter(ground, palette, terrain_cfg,
-		int(options.get("rocks", 46)), centreline, 5.4)
+		int(options.get("rocks", 64)), centreline, 5.4)
+	if detail != "block":
+		Dressing.build(root, palette, terrain_cfg, centreline,
+			table["nodes"])
 
 	root.set_meta("metrics", _metrics(table, total_length, clearances,
 		centreline))
@@ -303,6 +315,104 @@ static func _markers(root: Node3D, palette, table: Dictionary,
 			palette.get_material(str(entry[3])), "Crown", false)
 		crown.position.y = 0.24
 		pad.add_child(crown)
+
+
+static func _modules(root: Node3D, palette, table: Dictionary,
+		detail: String) -> void:
+	## The six authored race moments, each placed on its anchor and yawed to
+	## the direction of travel there.
+	##
+	## Nothing in `course_modules` or `course_finish` knows a world coordinate.
+	## They are built in a frame where +Z is downhill and handed the couple of
+	## points they have to meet exactly - where the first run begins, where the
+	## two branches arrive, where the last run ends - already transformed into
+	## that frame. Re-route the course and every module follows it.
+	if detail == "block":
+		return
+	var nodes: Dictionary = table["nodes"]
+	var group := Node3D.new()
+	group.name = "Modules"
+	root.add_child(group)
+
+	var launch: Array = root.get_meta("launch_path")
+	var final_run: Array = root.get_meta("final_path")
+	var blue: Array = root.get_meta("blue_path")
+	var orange: Array = root.get_meta("orange_path")
+
+	var start_at: Vector3 = nodes["start"]
+	var start_yaw := _yaw_to(start_at, launch[0])
+	group.add_child(_placed(Modules.start(palette,
+		_to_local(start_at, start_yaw, launch[0])), start_at, start_yaw))
+
+	group.add_child(_placed(Modules.mixer(palette), nodes["mix"],
+		_yaw_at(launch, launch.size() - 2)))
+
+	# Yawed to the *track under it*, not to the gap between two runs. Those
+	# two runs now share a control point exactly - which is what closed the
+	# joints - so the delta between them is zero and the module came out
+	# pointing down +Z while the channel ran across it.
+	group.add_child(_placed(Modules.obstacle(palette), nodes["obstacle"],
+		_yaw_near(root, table, nodes["obstacle"])))
+
+	var split_at: Vector3 = nodes["split"]
+	group.add_child(_placed(Modules.split(palette), split_at,
+		_yaw_to(split_at, (blue[0] + orange[0]) * 0.5)))
+
+	var merge_at: Vector3 = nodes["merge"]
+	var merge_yaw := _yaw_to(merge_at, final_run[0])
+	group.add_child(_placed(Modules.merge(palette,
+		_to_local(merge_at, merge_yaw, blue[-1]),
+		_to_local(merge_at, merge_yaw, orange[-1]),
+		_to_local(merge_at, merge_yaw, final_run[0])), merge_at, merge_yaw))
+
+	var finish_at: Vector3 = nodes["finish"]
+	var finish_yaw := _yaw_at(final_run, final_run.size() - 2)
+	group.add_child(_placed(FinishArena.build(palette,
+		_to_local(finish_at, finish_yaw, final_run[-1])),
+		finish_at, finish_yaw))
+
+
+static func _placed(node: Node3D, at: Vector3, yaw: float) -> Node3D:
+	node.position = at
+	node.rotation.y = yaw
+	return node
+
+
+static func _yaw_to(from: Vector3, to: Vector3) -> float:
+	var delta := to - from
+	if absf(delta.x) < 1.0e-6 and absf(delta.z) < 1.0e-6:
+		return 0.0
+	return atan2(delta.x, delta.z)
+
+
+static func _yaw_near(root: Node3D, table: Dictionary,
+		point: Vector3) -> float:
+	## The direction of travel at the nearest sample of any run.
+	var best := 1.0e9
+	var yaw := 0.0
+	for entry in table["runs"]:
+		var path: Array = root.get_meta("%s_path"
+			% str((entry as Dictionary)["name"]))
+		for index in path.size():
+			var distance: float = (path[index] as Vector3).distance_to(point)
+			if distance < best:
+				best = distance
+				yaw = _yaw_at(path, index)
+	return yaw
+
+
+static func _yaw_at(path: Array, index: int) -> float:
+	var at: int = clampi(index, 0, path.size() - 2)
+	return _yaw_to(path[at], path[at + 1])
+
+
+static func _to_local(origin: Vector3, yaw: float, point: Vector3) -> Vector3:
+	## `point` in the frame of a node placed at `origin` and yawed by `yaw`.
+	var delta := point - origin
+	var c := cos(yaw)
+	var s := sin(yaw)
+	return Vector3(delta.x * c - delta.z * s, delta.y,
+		delta.x * s + delta.z * c)
 
 
 static func _field(root: Node3D, palette, table: Dictionary) -> void:

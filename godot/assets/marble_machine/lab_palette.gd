@@ -479,9 +479,9 @@ func _build(key: String) -> StandardMaterial3D:
 		# where the course's own supports land, so the frame's warmest large
 		# area sits directly under its whitest object.
 		"slope_cliff":
-			return _matte("#131A24", 0.95)
+			return _matte("#212C39", 0.95)
 		"slope_rock":
-			return _matte("#24303E", 0.94)
+			return _matte("#28343F", 0.94)
 		"slope_earth":
 			return _matte("#3B4352", 0.93)
 		"slope_scree":
@@ -489,7 +489,16 @@ func _build(key: String) -> StandardMaterial3D:
 		"slope_moss":
 			return _matte("#2A3830", 0.95)
 		"slope_cap":
-			return _matte("#3E4B5D", 0.94)
+			return _matte("#2E3A45", 0.94)
+		# Scattered cover. Both darker than any ground value, because a bush
+		# or a boulder is a shadow at every distance this course is read at,
+		# and anything lighter reads as debris lying on the hill.
+		"scrub_dark":
+			return _matte("#1B2A22", 0.96)
+		"scrub_dry":
+			return _matte("#2A2A20", 0.95)
+		"slope_boulder":
+			return _matte("#212A36", 0.94)
 	push_error("lab_palette: unknown material key '%s'" % key)
 	return _moulded("#FF00FF", 0.5, 0.0)
 
