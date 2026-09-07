@@ -50,6 +50,7 @@ from sloped import course as _course
 from sloped import layout
 from sloped.race import LATERAL_SLACK, VERTICAL_SLACK
 from sloped.scale import LAYOUT_TO_SIM
+from sloped.basin import StartBasin
 from sloped.stations import Mixer, Spinners, StartGrid
 from sloped.track import TrackRun
 
@@ -114,6 +115,10 @@ class StartPlan:
     # The launch's width profile, as (factor, hold to sample, blended by
     # sample) - the wide mixing stretch. See `sloped.track.TrackRun`.
     launch_width: tuple[float, int, int] | None = None
+    # "basin" or "fan"; see `sloped.course.START_KIND`.
+    start_kind: str = "basin"
+    # (radius, z, rise) of the basin's island, or None for none.
+    island: tuple[float, float, float] | None = None
     # Paddle wheels, as (run name, sample, rate in rad/s). One wheel each.
     wheels: tuple[tuple[str, int, float], ...] = ()
 
@@ -127,6 +132,8 @@ class StartPlan:
             "fall_profile": list(self.fall_profile) if self.fall_profile else None,
             "mixers": [list(m) for m in self.mixers],
             "launch_width": list(self.launch_width) if self.launch_width else None,
+            "start_kind": self.start_kind,
+            "island": list(self.island) if self.island else None,
             "wheels": [list(w) for w in self.wheels],
         }
 
@@ -134,7 +141,7 @@ class StartPlan:
 # V1's start: one stud row on leg1 at the recorded `mix` node, nothing on the
 # launch. Kept as the scan's baseline - `tools/sloped_start_scan.py` quotes
 # every candidate against it - and not as anything the course still builds.
-V1_PLAN = StartPlan(name="v1")
+V1_PLAN = StartPlan(name="v1", start_kind="fan")
 
 # What `sloped.course` builds. Read from the course's own constants rather than
 # retyped, so the lab cannot drift away from the thing it is measuring.
@@ -177,19 +184,25 @@ def start_machine(config: CoreConfig | None = None, plan: StartPlan | None = Non
     front_half = 0.5 * runs["launch"].clear_width * runs["launch"].widths[0] / LAYOUT_TO_SIM
     if plan.launch_width is None:
         front_half = None
-    machine.add(
-        StartGrid(
-            "start",
-            runs["launch"],
-            fin_schedule=plan.fins,
-            bay_stagger=plan.stagger,
-            deflectors=plan.deflectors,
-            tray=plan.tray,
-            fall_profile=plan.fall_profile,
-            front_half=front_half,
-        ),
-        Transform(),
-    )
+    if plan.start_kind == "basin":
+        basin = StartBasin("start", runs["launch"])
+        if plan.island is not None:
+            basin.ISLAND_R, basin.ISLAND_Z, basin.ISLAND_RISE = plan.island
+        machine.add(basin, Transform())
+    else:
+        machine.add(
+            StartGrid(
+                "start",
+                runs["launch"],
+                fin_schedule=plan.fins,
+                bay_stagger=plan.stagger,
+                deflectors=plan.deflectors,
+                tray=plan.tray,
+                fall_profile=plan.fall_profile,
+                front_half=front_half,
+            ),
+            Transform(),
+        )
     machine.add(runs["launch"], Transform())
     for order, row in enumerate(plan.mixers):
         run_name, sample, height = row[0], row[1], row[2]

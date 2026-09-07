@@ -77,6 +77,7 @@ from marble3d.units import MARBLE_DIAMETER
 from sloped import joins, layout
 from sloped.pathing import build_path
 from sloped.scale import to_sim
+from sloped.basin import StartBasin
 from sloped.stations import FinishDeck, ForkRidge, MergeCatch, Mixer, Spinners, StartGrid
 from sloped.track import TrackRun
 
@@ -84,6 +85,8 @@ __all__ = [
     "CHAIN",
     "BRANCH_MODULES",
     "OBSTRUCTIONS",
+    "START_KIND",
+    "start_module",
     "sloped_course",
     "check",
     "check_probes",
@@ -205,6 +208,37 @@ MIXER_SAMPLE = 5
 SHUFFLE_SAMPLE = 32
 SHUFFLE_RATE = 9.0
 
+# Which start the course is built with.
+#
+# **"fan", because the basin was measured and is worse.** `sloped.basin` builds
+# the architecture V1.3 was asked for - one wide flat ramp feeding a shallow
+# stadium dish with a single spillway - and it works: all eight marbles drain,
+# every seed, with no jam. It is still worse than the taper it replaced. Over
+# 100 seeds of the real course, blue route:
+#
+#     start          finish   win ratio   win spread
+#     fan             0.985       11.50      21 pts
+#     basin           0.968       29.00      28 pts
+#     basin + island  0.965       16.00      30 pts
+#
+# and the basin's win rates by bay come out 1 1 13 12 29 28 14 2 - the same
+# centre-heavy V the taper produces, from the same cause. `sloped.basin` has
+# the mechanism; the short version is that a single common exit orders the
+# field by distance to that exit, and distance to the exit is a function of
+# which bay you started in. Room to mill is not a reason to mill.
+#
+# The basin stays in the tree because it is the only clean test of that claim
+# in a second topology, and because it is one line to switch back to.
+START_KIND = "fan"
+
+
+def start_module(kind: str, launch):
+    if kind == "basin":
+        return StartBasin("start", launch)
+    if kind == "fan":
+        return StartGrid("start", launch)
+    raise ValueError(f"start must be 'basin' or 'fan', not {kind!r}")
+
 
 def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Machine:
     """Layout B, made physical. Every module placed at its recorded position.
@@ -283,7 +317,7 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
             ),
         )
 
-    start = StartGrid("start", runs["launch"])
+    start = start_module(START_KIND, runs["launch"])
     # Declaration order is the build order and therefore the body numbering, so
     # it is part of the run; the wedge is declared where it belongs in flow even
     # though it needs the lead that is declared after it.

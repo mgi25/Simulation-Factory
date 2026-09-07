@@ -95,7 +95,7 @@ def _rows(marks, counts, height, span=0.72):
 
 
 CANDIDATES: dict[str, StartPlan] = {
-    "v1": StartPlan(name="v1"),
+    "v1": StartPlan(name="v1", start_kind="fan"),
     # One row of studs moved from leg1 to the launch's own entry, where the
     # field is still a clump. No new geometry at all.
     "mix-launch": StartPlan(name="mix-launch", mixers=(("launch", 5, 0.07),)),
@@ -411,6 +411,32 @@ CANDIDATES: dict[str, StartPlan] = {
         launch_width=(1.85, 34, 100),
         tray=(0.16, 1.0, 1.98),
         fall_profile=(0.42, 1.0),
+    ),
+    # --- V1.3: the basin ------------------------------------------------
+    #
+    # A different topology rather than another shape inside the old one. Eight
+    # congruent feeders - same length, same drop, same heading - into a shallow
+    # dish with one drain, so that arrivals at the constriction are
+    # *simultaneous* instead of staggered by bay. See `sloped.basin`.
+    "basin": StartPlan(
+        name="basin",
+        start_kind="basin",
+        mixers=(("launch", 5, 0.07),),
+        wheels=(("launch", 32, 9.0),),
+    ),
+    "basin-island": StartPlan(
+        name="basin-island",
+        start_kind="basin",
+        mixers=(("launch", 5, 0.07),),
+        wheels=(("launch", 32, 9.0),),
+        island=(1.05, 1.10, 0.55),
+    ),
+    "basin-island-big": StartPlan(
+        name="basin-island-big",
+        start_kind="basin",
+        mixers=(("launch", 5, 0.07),),
+        wheels=(("launch", 32, 9.0),),
+        island=(1.45, 1.05, 0.65),
     ),
 }
 

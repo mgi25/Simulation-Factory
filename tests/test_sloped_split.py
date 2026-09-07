@@ -254,3 +254,51 @@ def test_the_aprons_upstream_edge_is_answered_by_blue_and_only_there():
             assert gap < 0.09, finding.detail
     finally:
         world.close()
+
+
+def test_oranges_mouth_puts_its_floor_on_leg3s_lip():
+    """Not its centreline on the lip, which is 0.456 lower.
+
+    A channel's running floor sits `FLOOR_Y` below its centreline, so placing
+    orange's *centreline* on leg3's east lip started orange's floor 0.456
+    simulation units under the surface a marble crosses from - a drop at the
+    seam rather than a join, and it grew to 0.76 eight samples on.
+    """
+    machine = sloped_course(routes="both")
+    leg3 = machine.runs["leg3"]
+    lead = machine.runs["orange_lead"]
+    sample = joins.FORK_SAMPLE
+
+    lip = leg3.surface_point(sample, layout.CHANNEL_HALF * leg3.scale)
+    floor = lead.surface_point(0, 0.0)
+    assert math.dist(
+        (lip[0], lip[2]), (floor[0], floor[2])
+    ) < 0.2, "orange's mouth is not over leg3's lip"
+    assert abs(floor[1] - lip[1]) < 0.12, (
+        f"orange's floor is {floor[1] - lip[1]:+.3f} from leg3's lip; "
+        "the mouth needs lifting by the channel's own floor offset"
+    )
+
+
+def test_the_orange_seam_has_no_cliff_through_the_crossing_window():
+    """The gap that made every crossing marble an ejection."""
+    machine = sloped_course(routes="both")
+    leg3 = machine.runs["leg3"]
+    lead = machine.runs["orange_lead"]
+    worst = 0.0
+    for sample in range(joins.FORK_SAMPLE, joins.FORK_SAMPLE + 10):
+        lip = leg3.surface_point(sample, layout.CHANNEL_HALF * leg3.scale)
+        best = None
+        for index in range(len(lead.sim_path)):
+            for step in range(-4, 5):
+                point = lead.surface_point(
+                    index, (step / 4.0) * layout.CHANNEL_HALF * lead.scale
+                )
+                flat = math.hypot(point[0] - lip[0], point[2] - lip[2])
+                if best is None or flat < best[0]:
+                    best = (flat, point[1])
+        if best is not None and best[0] < 0.6:
+            worst = max(worst, abs(best[1] - lip[1]))
+    # A third of a marble diameter. It was 0.76 before the mouth was lifted and
+    # the hold gradient taken from the lip rather than the centreline.
+    assert worst < 0.35, f"the seam drops {worst:.3f} inside the crossing window"

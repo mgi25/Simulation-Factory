@@ -525,23 +525,57 @@ def _leg3_fork_pose():
     return point, heading, grade_of(path, FORK_SAMPLE, span=FORK_WINDOW_ORANGE)
 
 
-def fork_mouth(across: float = ORANGE_MOUTH_ACROSS):
-    """Orange's mouth: a point up leg3's east bank, and leg3's heading there.
+def _leg3_lip(leg3, sample: int, across: float = ORANGE_MOUTH_ACROSS):
+    """A point on leg3's east lip, in **layout** units.
 
-    Built through a `TrackRun` rather than from `build_path` so the point is
-    the one the collider has a vertex at - `surface_point` applies the profile
-    scale and the per-sample width factor in the same order `ring_points`
-    does. `ORANGE_MOUTH_ACROSS` says why it is not on the centreline.
+    `surface_point` applies the profile scale and the per-sample width factor
+    in the same order `ring_points` does, so this is a point the collider has a
+    vertex at rather than one near it.
+    """
+    point = leg3.surface_point(sample, across)
+    return tuple(value / LAYOUT_TO_SIM for value in point)
+
+
+def fork_mouth(across: float = ORANGE_MOUTH_ACROSS):
+    """Orange's mouth, and the gradient of the lip it has to stay level with.
+
+    Two corrections over V1.2, and the second is the one that was missing.
+
+    **The mouth is lifted by the channel's own floor offset.** V1.2 put
+    orange's *centreline* on leg3's east lip, and a channel's running floor
+    sits `FLOOR_Y` - 0.26 layout units, 0.456 simulation - below its
+    centreline. So orange's floor started 0.456 under the lip a marble crosses
+    from, which is a drop at the seam rather than a join. Measured at the fork
+    sample itself: leg3's lip at world y 22.213, the nearest point of orange's
+    floor at 21.751.
+
+    **The gradient held over the overlap is the lip's, not the centreline's.**
+    `_held_heights` keeps the lead level with whatever it is given for the
+    first `ORANGE_LEAD_HOLD` of its length, and what it has to stay level with
+    is the surface the marble is actually running on. leg3's east lip sits 0.59
+    to 0.62 above its own centreline through the window - the bank times the
+    half width - and that offset is not constant, because both the bank and the
+    width change through the tail.
+
+    Together these close a gap that ran 0.46 at the fork to 0.76 eight samples
+    on, and that gap is why every marble crossing east ended up on orange's
+    west lip three quarters of a diameter down instead of on its floor.
     """
     from sloped.track import TrackRun
 
     leg3 = TrackRun("leg3")
-    point = leg3.surface_point(FORK_SAMPLE, across)
-    # Back to layout units: `join_paths` works in layout throughout and
-    # `TrackRun` converts once, on the way into the collider.
-    layout_point = tuple(value / LAYOUT_TO_SIM for value in point)
-    heading = leg3.heading_deg(FORK_SAMPLE)
-    return layout_point, heading, grade_of(leg3.path, FORK_SAMPLE, span=FORK_WINDOW_ORANGE)
+    lip = _leg3_lip(leg3, FORK_SAMPLE, across)
+    # Lift by the floor offset, along the channel's own up axis, so it is the
+    # lead's *floor* that lands on the lip rather than its centreline.
+    _lateral, up, _forward = leg3.frames[FORK_SAMPLE]
+    lift = -layout.FLOOR_Y * float(layout.run("leg3")["scale"])
+    mouth = tuple(lip[axis] + up[axis] * lift for axis in range(3))
+
+    # The lip's own chord grade across the window the two channels share.
+    far = _leg3_lip(leg3, min(FORK_SAMPLE + FORK_WINDOW_ORANGE, len(leg3.path) - 1), across)
+    run = math.hypot(far[0] - lip[0], far[2] - lip[2])
+    grade = (far[1] - lip[1]) / run if run > 1e-9 else 0.0
+    return mouth, leg3.heading_deg(FORK_SAMPLE), grade
 
 
 def fork_bank_deg() -> float:
