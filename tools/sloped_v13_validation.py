@@ -1,13 +1,13 @@
 """Split one benchmark run into the four validation files section 29 asks for.
 
-    python tools/sloped_v11_validation.py --bench bench600.json
+    python tools/sloped_v13_validation.py --bench bench600.json
 
 Writes, under `docs/validation/sloped_race_v1/`:
 
-    fairness_v12.json      slot win rates, checkpoint ranks, strongest/weakest
-    reliability_v12.json   finish, all-eight, escape, stopped, loss locations
-    routes_v12.json        usage, travel time, failure and win rate per route
-    determinism_v12.json   written by `tools/sloped_determinism.py`, not here
+    fairness_v13.json      slot win rates, checkpoint ranks, strongest/weakest
+    reliability_v13.json   finish, all-eight, escape, stopped, loss locations
+    routes_v13.json        usage, travel time, failure and win rate per route
+    determinism_v13.json   written by `tools/sloped_determinism.py`, not here
 
 Each file carries the V1 baseline beside the V1.1 number, labelled, because
 section 18 is explicit that the old benchmark was taken on a physically
@@ -152,9 +152,9 @@ def main(argv: list[str] | None = None) -> int:
 
     written = []
     for name, payload in (
-        ("fairness_v12.json", fairness),
-        ("reliability_v12.json", reliability),
-        ("routes_v12.json", routes),
+        ("fairness_v13.json", fairness),
+        ("reliability_v13.json", reliability),
+        ("routes_v13.json", routes),
     ):
         path = out_dir / name
         with open(path, "w", encoding="utf-8", newline="\n") as handle:

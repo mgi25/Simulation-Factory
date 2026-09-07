@@ -1,0 +1,53 @@
+{
+ "fairness_ratio_note": "slot win ratio 7.8 with both routes, against 18.42 blue-only",
+ "note": "measured at FORK_GUARD_WINDOW (-1,0,12,14); not shipped - orange completes 46.7% of its traffic",
+ "per_route": {
+  "blue": {
+   "entries": 1009,
+   "entry_share": 0.6435,
+   "escape_rate": 0.0486,
+   "finish_rate": 0.9504,
+   "mean_finish_rank": 3.713,
+   "mean_rank_change_from_half": 0.703,
+   "mean_time": 18.1593,
+   "median_time": 18.1,
+   "stuck_rate": 0.001,
+   "win_rate": 0.1388
+  },
+  "orange": {
+   "entries": 559,
+   "entry_share": 0.3565,
+   "escape_rate": 0.4436,
+   "finish_rate": 0.4669,
+   "mean_finish_rank": 3.437,
+   "mean_rank_change_from_half": 1.031,
+   "mean_time": 18.0358,
+   "median_time": 17.8333,
+   "stuck_rate": 0.0894,
+   "win_rate": 0.1073
+  }
+ },
+ "racers": 1600,
+ "races": 200,
+ "reliability": {
+  "all_finished_rate": 0.1,
+  "escape_rate": 0.1981,
+  "finish_rate": 0.7625,
+  "loss_sites": {
+   "final[0]": 64,
+   "leg1[60]": 5,
+   "leg1[80]": 10,
+   "leg2[100]": 2,
+   "leg2[80]": 12,
+   "leg3[100]": 39,
+   "leg3[80]": 10,
+   "orange[100]": 44,
+   "orange[20]": 6,
+   "orange[80]": 10,
+   "orange_lead[0]": 124,
+   "orange_lead[20]": 48
+  },
+  "stuck_rate": 0.0394
+ },
+ "routes_built": "both"
+}

@@ -1,0 +1,27 @@
+{
+ "per_route": {
+  "blue": {
+   "entries": 4800,
+   "entry_share": 1.0,
+   "escape_rate": 0.0123,
+   "finish_rate": 0.9769,
+   "mean_finish_rank": 4.418,
+   "mean_rank_change_from_half": 0.005,
+   "mean_time": 16.9202,
+   "median_time": 16.8167,
+   "stuck_rate": 0.0108,
+   "win_rate": 0.125
+  }
+ },
+ "races": 600,
+ "routes_built": "blue",
+ "v1_baseline": {
+  "note": "orange was unreachable to a completed finish in V1",
+  "source": "docs/sloped_race_v1.md, 600 seeds / 4800 racers",
+  "usage": {
+   "blue": 1.0,
+   "orange": 0.0
+  },
+  "warning": "taken on a physically defective course: the orange route was unreachable, the merge apron trapped marbles on the sprint's guard rails (319 of 747 losses) and the stud row stood where the field arrives at 50 wu/s (193 more). Not a like-for-like comparison."
+ }
+}
