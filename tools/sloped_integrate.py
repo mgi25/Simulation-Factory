@@ -59,7 +59,7 @@ RENDER_SCENE = "res://scenes/SlopedRaceRender.tscn"
 OUT_DIR = os.path.join("output", "sloped_race_v1")
 STILLS_DIR = os.path.join("docs", "validation", "sloped_race_v1")
 FRAMES_DIR = os.path.join(OUT_DIR, "frames")
-VIDEO_PATH = os.path.join(OUT_DIR, "real_race.mp4")
+VIDEO_PATH = os.path.join(OUT_DIR, "real_race_v11.mp4")
 
 WIDTH = 1080
 HEIGHT = 1920

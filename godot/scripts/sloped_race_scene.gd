@@ -185,22 +185,32 @@ func _load_cameras(path: String) -> void:
 
 
 func _collect_wheels() -> void:
-	## The obstacle's three visual paddle wheels, so the replay can turn them.
+	## Every visual paddle wheel on the course, so the replay can turn them.
+	##
+	## Each entry carries the replay key of the blade that drives it, so a
+	## module with one wheel and a module with three are the same case. The
+	## shuffle wheel on the launch is the V1.1 addition - a physical actuator
+	## like the obstacle's, turned from the replay the same way.
 	if _course == null:
 		return
 	var modules := _course.get_node_or_null("Modules")
 	if modules == null:
 		return
-	var obstacle := modules.get_node_or_null("Obstacle")
-	if obstacle == null:
-		return
-	for index in 3:
-		var spinner := obstacle.get_node_or_null("Spinner%d" % index)
-		if spinner == null:
+	for entry in [["Obstacle", "obstacle", 3], ["Shuffle", "shuffle", 1]]:
+		var row: Array = entry
+		var owner := modules.get_node_or_null(str(row[0]))
+		if owner == null:
 			continue
-		var wheel := spinner.get_node_or_null("Wheel")
-		if wheel != null:
-			_wheels.append({"wheel": wheel, "index": index})
+		for index in int(row[2]):
+			var spinner := owner.get_node_or_null("Spinner%d" % index)
+			if spinner == null:
+				continue
+			var wheel := spinner.get_node_or_null("Wheel")
+			if wheel != null:
+				_wheels.append({
+					"wheel": wheel,
+					"key": "%s.wheel%d_blade0" % [str(row[1]), index],
+				})
 
 
 # --- playback -------------------------------------------------------------
@@ -282,7 +292,7 @@ func _turn_wheels(low: Dictionary, high: Dictionary, blend: float) -> void:
 	var next_actuators: Dictionary = high.get("actuators", {})
 	for entry in _wheels:
 		var record: Dictionary = entry
-		var key := "obstacle.wheel%d_blade0" % int(record["index"])
+		var key := str(record["key"])
 		if not actuators.has(key):
 			continue
 		# An actuator's pose is `{"p": [...], "q": [...]}`, not a two-element

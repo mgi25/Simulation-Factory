@@ -448,6 +448,81 @@ static func obstacle(palette) -> Node3D:
 	return root
 
 
+# --- SHUFFLE --------------------------------------------------------------
+
+
+static func shuffle(palette) -> Node3D:
+	## One paddle wheel on the launch, thirty-two samples down.
+	##
+	## The physics gained this in V1.1 and the render has to show it, because a
+	## marble bouncing off nothing is a worse defect than an extra part. It is
+	## the same mechanism as the obstacle's wheels - four blades on a shaft,
+	## turning about the channel's up axis - built once instead of three times,
+	## and dressed in the start's chrome and pearl rather than the obstacle's
+	## amber, because it is not the race's set piece and should not read as one.
+	##
+	## No gantry and no guards. The obstacle needs a frame because it spans a
+	## corridor the field runs through at 40 wu/s; this stands over a channel
+	## the field is still accelerating down, and a frame here would read as a
+	## second obstacle at the top of the course.
+	##
+	## `docs/sloped_race_v11.md` has what it does. The short version: at the
+	## launch entry the same wheel jammed a fifth of the field, and thirty-two
+	## samples down it takes the finish rate from 0.906 to 0.969.
+	var root := Node3D.new()
+	root.name = "Shuffle"
+
+	var spinner := Node3D.new()
+	spinner.name = "Spinner0"
+	spinner.position = Vector3(0.0, 1.34, 0.0)
+	spinner.set_meta("spin_phase", 0.0)
+	root.add_child(spinner)
+
+	var mast := Forms.mesh_node(
+		Geometry.tube([Vector3(0.0, 0.0, 0.0), Vector3(0.0, -1.14, 0.0)],
+			0.065, 10),
+		palette.get_material("chrome"), "Shaft", false)
+	spinner.add_child(mast)
+	var head := Forms.mesh_node(
+		Geometry.rounded_disc(0.26, 0.28, 0.08, 18, 3),
+		palette.get_material("gold_dark"), "Head", false)
+	head.position = Vector3(0.0, 0.14, 0.0)
+	spinner.add_child(head)
+
+	var wheel := Node3D.new()
+	wheel.name = "Wheel"
+	wheel.position = Vector3(0.0, -1.18, 0.0)
+	spinner.add_child(wheel)
+	var hub := Forms.mesh_node(
+		Geometry.rounded_disc(0.22, 0.19, 0.06, 16, 3),
+		palette.get_material("chrome"), "Hub", false)
+	wheel.add_child(hub)
+	for blade in 4:
+		var pivot := Node3D.new()
+		pivot.name = "Arm%d" % blade
+		pivot.rotation.y = TAU * float(blade) / 4.0
+		wheel.add_child(pivot)
+		var arm := Forms.mesh_node(
+			Geometry.rounded_box(Vector3(0.13, 0.70, 1.34), 0.05, 3),
+			palette.get_material("pearl_shade"), "Blade%d" % blade)
+		arm.position = Vector3(0.0, -0.18, 0.72)
+		pivot.add_child(arm)
+		var tip := Forms.mesh_node(
+			Geometry.rounded_box(Vector3(0.17, 0.14, 0.22), 0.05, 2),
+			palette.get_material("gold"), "Tip%d" % blade, false)
+		tip.position = Vector3(0.0, -0.48, 1.28)
+		pivot.add_child(tip)
+
+	# A collar where the shaft is driven, so the wheel stands on something
+	# rather than hanging over the channel from nothing.
+	var collar := Forms.mesh_node(
+		Geometry.rounded_disc(0.34, 0.30, 0.10, 16, 3),
+		palette.get_material("graphite"), "Collar", false)
+	collar.position = Vector3(0.0, 1.50, 0.0)
+	root.add_child(collar)
+	return root
+
+
 # --- SPLIT ----------------------------------------------------------------
 
 

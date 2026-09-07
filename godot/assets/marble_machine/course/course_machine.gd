@@ -362,8 +362,23 @@ static func _modules(root: Node3D, palette, table: Dictionary,
 	group.add_child(_placed(Modules.start(palette,
 		_to_local(start_at, start_yaw, launch[0])), start_at, start_yaw))
 
-	group.add_child(_placed(Modules.mixer(palette), nodes["mix"],
-		_yaw_at(launch, launch.size() - 2)))
+	# The mixer and the shuffle wheel stand on the *launch* run's own samples,
+	# not on the recorded `mix` node, because that is where the physics has
+	# them - and a drawn part in the wrong place is a marble bouncing off
+	# nothing.
+	#
+	# V1 put the stud row at `mix`, 1.2 units into leg1.
+	# `docs/sloped_race_v11.md` records why it moved: at the leg1 seam the
+	# field arrives at 50 wu/s and a stud levers a marble out of the channel,
+	# while at launch sample 5 it arrives at 13 and the same stud deflects it.
+	# These two numbers are `sloped.course.MIXER_SAMPLE` and `SHUFFLE_SAMPLE`,
+	# and `tests/test_sloped_render.py` asserts the three agree.
+	var mixer_sample := 5
+	var shuffle_sample := 32
+	group.add_child(_placed(Modules.mixer(palette), launch[mixer_sample],
+		_yaw_at(launch, mixer_sample)))
+	group.add_child(_placed(Modules.shuffle(palette), launch[shuffle_sample],
+		_yaw_at(launch, shuffle_sample)))
 
 	# Yawed to the *track under it*, not to the gap between two runs. Those
 	# two runs now share a control point exactly - which is what closed the
