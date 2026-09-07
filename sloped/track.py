@@ -87,6 +87,11 @@ __all__ = [
 CRADLE_POINTS = 5
 
 
+def _ease(t: float) -> float:
+    t = min(1.0, max(0.0, t))
+    return t * t * (3.0 - 2.0 * t)
+
+
 def channel_profile(scale: float = 1.0) -> list[tuple[float, float]]:
     """The inner containment surface as (across, up) pairs, in layout units.
 
@@ -176,19 +181,71 @@ class TrackRun(MarbleModule):
     do, to zero.
     """
 
-    def __init__(self, name: str, samples: int | None = None) -> None:
+    def __init__(
+        self,
+        name: str,
+        samples: int | None = None,
+        spec: dict | None = None,
+        path: Sequence[Sequence[float]] | None = None,
+        open_side: tuple[float, int, int] | None = None,
+        taper: tuple[float, float] | None = None,
+    ) -> None:
         super().__init__(name)
-        spec = layout.run(name)
+        # (side, a, b, c, d): the wall on `side` is at full height before
+        # sample `a`, eases open between `a` and `b`, is open between `b` and
+        # `c`, eases back between `c` and `d`, and is full again after. A
+        # *window* rather than a ramp, because at the fork the wall has to be
+        # there at the nose and gone in the middle - see `section_at`.
+        self.open_side = open_side
+        # (entry factor, exit factor) on the lateral width, eased between.
+        #
+        # This is how a 0.82-scale branch lead is fed by a full-width channel.
+        # Without it the lead's mouth is 1.54 wide where leg3 hands over 1.88,
+        # so a marble running the outside line arrives 0.17 layout units
+        # outside the lead's own wall - on top of its guard, with nothing
+        # beyond. Measured on the first run that reached the fork: three of
+        # eight marbles left the course on the orange lead at 22 to 52 wu/s.
+        self.taper = taper
+        spec = layout.run(name) if spec is None else spec
         self.spec = spec
         self.scale = float(spec["scale"])
         self.role = str(spec["role"])
-        self.path, self.banks, self.tangents, self.widths = build_path(
-            spec["controls"],
-            float(spec["bank_gain"]),
-            float(spec["bank_max"]),
-            **({} if samples is None else {"samples": samples}),
-        )
+        if path is None:
+            self.path, self.banks, self.tangents, self.widths = build_path(
+                spec["controls"],
+                float(spec["bank_gain"]),
+                float(spec["bank_max"]),
+                **({} if samples is None else {"samples": samples}),
+            )
+        else:
+            # A join authored as a path rather than as controls, so its end
+            # tangents are the ones that were solved for rather than whatever
+            # a second pass of Catmull-Rom through them happens to produce.
+            # Everything downstream - bank, width, section, collider - is the
+            # channel's, so a join is the same moulding as the runs it joins.
+            from sloped.pathing import auto_bank, flat_tangents, resample, width_curve
+
+            self.path = resample(
+                [tuple(float(v) for v in point) for point in path],
+                len(path) if samples is None else samples,
+            )
+            self.banks = auto_bank(
+                self.path, float(spec["bank_gain"]), float(spec["bank_max"])
+            )
+            self.tangents = flat_tangents(self.path)
+            self.widths = width_curve(
+                len(self.path),
+                float(spec.get("entry_flare", 0.14)),
+                float(spec.get("exit_flare", 0.09)),
+            )
         self.frames = frames_for(self.path, self.banks, self.tangents)
+        if taper is not None:
+            entry, leaving = taper
+            count = len(self.path)
+            self.widths = [
+                width * (entry + (leaving - entry) * _ease(index / max(count - 1, 1)))
+                for index, width in enumerate(self.widths)
+            ]
         self.section = channel_profile(self.scale)
         self.arc = arc_lengths(self.path)
         self._mesh: TriMesh | None = None
@@ -202,13 +259,63 @@ class TrackRun(MarbleModule):
 
     # --- geometry -------------------------------------------------------
 
+    OPEN_FLOOR = 0.05
+
+    def wall_factor(self, index: int) -> float:
+        """How much of one wall stands at one sample, as a fraction of full.
+
+        One at both ends of the window and `OPEN_FLOOR` through the middle. Not
+        zero, because scaling a wall to nothing puts the guard's two
+        coincident-across points at the same height as well, and a pair of
+        coincident vertices is a degenerate triangle the solver takes a
+        meaningless normal from. A 5% guard is a 0.04 layout unit lip.
+        """
+        if self.open_side is None:
+            return 1.0
+        _side, a, b, c, d = self.open_side
+        if index <= a or index >= d:
+            return 1.0
+        if b <= index <= c:
+            return self.OPEN_FLOOR
+        if index < b:
+            t = (index - a) / max(b - a, 1)
+            return 1.0 + (self.OPEN_FLOOR - 1.0) * (t * t * (3.0 - 2.0 * t))
+        t = (index - c) / max(d - c, 1)
+        return self.OPEN_FLOOR + (1.0 - self.OPEN_FLOOR) * (t * t * (3.0 - 2.0 * t))
+
+    def section_at(self, index: int) -> list[tuple[float, float]]:
+        """The cross-section at one sample, with any opened wall applied.
+
+        Opening a wall scales its points' height toward the cradle's own edge
+        rather than deleting them, so the section keeps its point count and the
+        strip builder keeps its invariant.
+        """
+        if self.open_side is None:
+            return self.section
+        factor = self.wall_factor(index)
+        if factor >= 1.0:
+            return self.section
+        side = self.open_side[0]
+        half = layout.CHANNEL_HALF * self.scale
+        edge = layout.floor_y_at(layout.CHANNEL_HALF) * self.scale
+        out: list[tuple[float, float]] = []
+        for across, up in self.section:
+            if across * side > half * 0.98 and up > edge:
+                out.append((across, edge + (up - edge) * factor))
+            else:
+                out.append((across, up))
+        return out
+
     def local_colliders(self) -> list[TriMesh]:
         if self._mesh is None:
             rings = [
                 [
                     to_sim_point(point)
                     for point in ring_points(
-                        self.path[index], self.frames[index], self.section, self.widths[index]
+                        self.path[index],
+                        self.frames[index],
+                        self.section_at(index),
+                        self.widths[index],
                     )
                 ]
                 for index in range(len(self.path))
@@ -354,6 +461,7 @@ class TrackRun(MarbleModule):
             "layout_length": round(self.arc[-1], 6),
             "drop": round(self.sim_path[0][1] - self.sim_path[-1][1], 6),
             "bank_max_deg": round(max(abs(math.degrees(v)) for v in self.banks), 4),
+            "taper": None if self.taper is None else [round(v, 4) for v in self.taper],
             "entry_heading_deg": round(self.heading_deg(0), 4),
             "exit_heading_deg": round(self.heading_deg(len(self.path) - 1), 4),
         }
