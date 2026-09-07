@@ -139,6 +139,7 @@ __all__ = [
     "FORK_SAMPLE",
     "FORK_WINDOW_BLUE",
     "FORK_GUARD_WINDOW",
+    "LEAD_MOUTH_FLARE",
     "FORK_WINDOW_ORANGE",
     "blue_controls",
     "LEAD_TENSION",
@@ -185,13 +186,37 @@ FORK_SAMPLE = 82
 # +11. And by sample +8 the ridge has grown to 0.94 of the channel's own 1.40
 # of containment with its west flank inside leg3's channel, so from there the
 # ridge *is* blue's east wall and the guard is redundant. So the guard is full
-# at the nose, open from +8 to +18, and full again by +22 - by which point the
-# ridge's west foot has swept out to leg3's own edge and handed the job back.
+# at the nose, open from +7 to +12, and full again by +14. Both edges are set
+# by which wall is the *outer* one at that sample, which is the only thing that
+# decides whether opening it is safe:
+#
+#     step | leg3's east edge | orange's east edge | outer wall
+#        0 |             1.61 |               1.44 | leg3's
+#        6 |             1.63 |               2.51 | orange's
+#       12 |             1.65 |               4.57 | orange's
+#       14 |             1.65 |               5.81 | each its own
+#
+# At the nose leg3's guard is outside orange's, so opening it leaves a strip of
+# floor with nothing on its edge and the field goes over it - 11 of 24 lost
+# there, against 1 with it shut. From six samples on, orange's guard is the
+# outer wall and leg3's is an obstruction between an orange-bound marble and
+# orange's floor. By +14 the two channels have parted and each needs its own
+# again.
 #
 # **orange's west wall.** Open from its first sample, because leg3's floor is
 # west of it there and a wall in the middle of leg3's floor is a step a marble
 # climbs; full by +14, where the two channels have parted.
-FORK_GUARD_WINDOW = (8, 12, 18, 22)
+FORK_GUARD_WINDOW = (-1, 0, 12, 14)
+
+# Orange's mouth is flared so its own east guard is outside leg3's from the
+# nose. That is what makes opening leg3's east guard safe *at* the nose: with
+# orange at hero width its guard only passes leg3's at about six samples in, so
+# for the first six there is a strip of leg3's floor with nothing on its edge,
+# and the field goes over it. At 1.28 the flare puts orange's guard at 2.11
+# against leg3's 1.61 from the first sample, so the combined channel has an
+# outer wall everywhere: blue's west guard on one side, orange's east on the
+# other, and no divider between them until they part.
+LEAD_MOUTH_FLARE = 1.28
 FORK_WINDOW_ORANGE = 14
 FORK_WINDOW_BLUE = 20          # how far the ridge runs
 

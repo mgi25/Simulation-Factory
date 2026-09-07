@@ -15,24 +15,52 @@ heading change and bank step, every join's worst turn radius against what the
 measured arrival speed can hold, and the fork sample against the heading it is
 supposed to sit on. A gap is a finding, not a shrug.
 
-## Flow order
+## Flow order, and which routes are on offer
 
-    START -> launch -> leg1(mixer) -> leg2(spinners) -> leg3(fork at 82)
-                 |                                          |
-                 |                                     +----+----+
-                 |                                     |         |
-                 |                          leg3 tail  |         | orange_lead
-                 |                          blue_lead  |         | orange lobe
-                 |                          blue lobe  |         |
-                 |                                     +----+----+
-                 |                                          |
-                 +--------------------> merge catch -> final -> FINISH
+    START -> launch -> leg1(mixer) -> leg2(spinners) -> leg3
+          -> blue_lead -> blue -> merge catch -> final -> FINISH
 
-`leg3` is one collider and one module for its whole length; the fork is a
-wedge standing on it at sample 82, so blue's route is leg3's own tail and
-orange's leaves from the middle of it. Which route a marble takes is decided by
-which side of a 3.3-diameter channel it is running on when it reaches the
-wedge, and by nothing else.
+`routes="both"` adds the fork at leg3 sample 82, `orange_lead` and orange's
+lobe. It is not the default, and that is a measurement rather than a
+preference.
+
+## Why the second route is off by default
+
+The two branch lobes diverge at 56 degrees from a common point, so a fork
+between them has to split a 3.3-diameter channel into two inside 3.4 layout
+units while eight marbles arrive at 43 wu/s. Six configurations were built and
+measured, over 32 seeds of eight marbles each:
+
+    divider                       guard window   finished   lost at the fork
+    straight blade on the tangent  +8 to +22       -         13 of 24
+    blade on the bisector          +8 to +22       -          4 dead, rest queued
+    ridge, foot <= half width      +8 to +22      68%        40 of 256
+    ridge, foot <= 0.55            +7 to +16      57%        73 of 256
+    ridge in the cradle gap        +5 to +14      41%        14 of 32
+    ridge in the gap, mouth flared  0 to +14       0%        21 of 32
+    no fork at all                 shut           85%         0 of 48
+
+Each failure had a different cause and each is recorded where it was fixed -
+in `sloped.stations.ForkRidge` and `sloped.joins.FORK_GUARD_WINDOW` - and none
+of them was the last one. The pattern across all six is the same trade: a
+divider big enough to sort the field is big enough to queue it, a guard open
+enough to let a marble cross is open enough to lose one, and a guard shut
+enough to hold the field is shut enough that orange is unreachable. With the
+route attribution corrected - the first version fixed a marble's route on its
+first contact with a branch collider, and the two channels *overlap* at the
+fork, so it credited orange with marbles that ran down leg3's tail - **no
+configuration ever put a marble on the orange lobe and got it to the finish.**
+
+The through route does work, and it is the majority of the course: 196 layout
+units, five clean seams, 85% of marbles finishing, four to six lead changes a
+race and final margins from 0.03 to 0.67 seconds.
+
+So the course ships with one route and the second is a documented, measured
+blocker rather than a broken feature.
+`docs/sloped_race_v1_junction_finding.md` has the geometry and
+`docs/sloped_race_v1.md` has these numbers; the fork's own geometry stays in
+the tree, behind `routes="both"`, because the next person to look at this
+needs the shapes as much as the numbers.
 """
 
 from __future__ import annotations
@@ -84,10 +112,21 @@ BRANCH_MODULES = {
 }
 
 
-def sloped_course(config: CoreConfig | None = None) -> Machine:
-    """Layout B, made physical. Every module placed at its recorded position."""
+ROUTE_CHOICES = ("blue", "both")
+
+
+def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Machine:
+    """Layout B, made physical. Every module placed at its recorded position.
+
+    `routes` is `"blue"` - the through route only - or `"both"`, which adds the
+    fork, orange's lead and orange's lobe. See the module docstring for the six
+    measurements behind that default.
+    """
+    if routes not in ROUTE_CHOICES:
+        raise ValueError(f"routes must be one of {ROUTE_CHOICES}, not {routes!r}")
     config = config or DEFAULT_CONFIG
-    machine = Machine("sloped_b")
+    machine = Machine("sloped_b" if routes == "blue" else "sloped_b_split")
+    forked = routes == "both"
 
     runs: dict[str, TrackRun] = {
         name: TrackRun(
@@ -96,7 +135,7 @@ def sloped_course(config: CoreConfig | None = None) -> Machine:
             # `sloped.joins.FORK_GUARD_WINDOW` for why it is where it is.
             open_side=(
                 (1.0, *(joins.FORK_SAMPLE + n for n in joins.FORK_GUARD_WINDOW))
-                if name == "leg3"
+                if (name == "leg3" and forked)
                 else None
             ),
         )
@@ -109,11 +148,14 @@ def sloped_course(config: CoreConfig | None = None) -> Machine:
     blue_spec["controls"] = joins.blue_controls()
     runs["blue"] = TrackRun("blue", spec=blue_spec)
     # Orange's lobe entered at its second authored control; see `sloped.joins`.
-    orange_spec = dict(layout.run("orange"))
-    orange_spec["controls"] = joins.orange_controls()
-    runs["orange"] = TrackRun("orange", spec=orange_spec)
+    if forked:
+        orange_spec = dict(layout.run("orange"))
+        orange_spec["controls"] = joins.orange_controls()
+        runs["orange"] = TrackRun("orange", spec=orange_spec)
 
     paths = joins.join_paths()
+    if not forked:
+        paths.pop("orange_lead", None)
     for name, path in paths.items():
         runs[name] = TrackRun(
             name,
@@ -142,7 +184,10 @@ def sloped_course(config: CoreConfig | None = None) -> Machine:
             # well, and a lead is the only thing catching a marble that has been
             # thrown across the fork's combined channel at 43 wu/s - with 1.16
             # of containment instead of 1.40 it does not catch it.
-            taper=(1.0, layout.BRANCH_SCALE),
+            taper=(
+                joins.LEAD_MOUTH_FLARE if name == "orange_lead" else 1.0,
+                layout.BRANCH_SCALE,
+            ),
         )
 
     start = StartGrid("start", runs["launch"])
@@ -155,23 +200,26 @@ def sloped_course(config: CoreConfig | None = None) -> Machine:
         machine.add(runs[name], Transform())
     machine.add(Mixer("mixer", runs["leg1"]), Transform())
     machine.add(Spinners("obstacle", runs["leg2"]), Transform())
-    machine.add(
-        ForkRidge(
-            "fork",
-            runs["leg3"],
-            joins.FORK_SAMPLE,
-            runs["orange_lead"],
-            joins.FORK_WINDOW_BLUE,
-        ),
-        Transform(),
-    )
-    for name in ("blue_lead", "blue", "orange_lead", "orange"):
+    if forked:
+        machine.add(
+            ForkRidge(
+                "fork",
+                runs["leg3"],
+                joins.FORK_SAMPLE,
+                runs["orange_lead"],
+                joins.FORK_WINDOW_BLUE,
+            ),
+            Transform(),
+        )
+    branch = ("blue_lead", "blue", "orange_lead", "orange") if forked else ("blue_lead", "blue")
+    for name in branch:
         machine.add(runs[name], Transform())
     machine.add(MergeCatch("merge", runs["final"], runs["blue"]), Transform())
     machine.add(runs["final"], Transform())
     machine.add(FinishDeck("finish", runs["final"]), Transform())
 
     machine.runs = runs                      # type: ignore[attr-defined]
+    machine.routes = routes                  # type: ignore[attr-defined]
     machine.finish_line = runs["final"].socket("exit")   # type: ignore[attr-defined]
     return machine
 
@@ -187,6 +235,12 @@ SEAMS = (
     ("blue_lead", "exit", "blue", "entry"),
     ("orange_lead", "exit", "orange", "entry"),
 )
+
+
+def _seams_for(machine: Machine):
+    return tuple(
+        seam for seam in SEAMS if seam[0] in machine.modules and seam[2] in machine.modules
+    )
 
 POSITION_BUDGET = 0.5 * MARBLE_DIAMETER
 HEADING_BUDGET = 24.0
@@ -209,7 +263,7 @@ def check(machine: Machine | None = None, config: CoreConfig | None = None) -> l
     def report(check_name: str, subject: str, detail: str) -> None:
         findings.append(Finding(check=check_name, subject=subject, detail=detail))
 
-    for up_name, up_socket, down_name, down_socket in SEAMS:
+    for up_name, up_socket, down_name, down_socket in _seams_for(machine):
         upstream = machine.modules[up_name]
         downstream = machine.modules[down_name]
         try:
@@ -246,6 +300,8 @@ def check(machine: Machine | None = None, config: CoreConfig | None = None) -> l
 
     # Turn radii on the joins, against what the measured arrival speed holds.
     for name, spec in joins.JOIN_SPECS.items():
+        if name not in runs:
+            continue
         run = runs[name]
         speed = float(spec["design_speed"])
         allowed = joins.min_radius_layout(speed, float(spec["bank_max"]))
@@ -260,6 +316,8 @@ def check(machine: Machine | None = None, config: CoreConfig | None = None) -> l
             )
 
     # The fork is where leg3 crosses south, and nothing may move it silently.
+    # Checked whether or not the fork is built, because `FORK_SAMPLE` is also
+    # what the guard window and the route attribution are measured from.
     leg3 = runs["leg3"]
     crossing = min(range(len(leg3.path)), key=lambda index: abs(leg3.heading_deg(index)))
     if crossing != joins.FORK_SAMPLE:
@@ -358,13 +416,17 @@ def facts(machine: Machine | None = None) -> dict[str, Any]:
         + runs["final"].sim_arc[-1]
     )
     orange_route = (
-        runs["launch"].sim_arc[-1]
-        + runs["leg1"].sim_arc[-1]
-        + runs["leg2"].sim_arc[-1]
-        + shared
-        + runs["orange_lead"].sim_arc[-1]
-        + runs["orange"].sim_arc[-1]
-        + runs["final"].sim_arc[-1]
+        (
+            runs["launch"].sim_arc[-1]
+            + runs["leg1"].sim_arc[-1]
+            + runs["leg2"].sim_arc[-1]
+            + shared
+            + runs["orange_lead"].sim_arc[-1]
+            + runs["orange"].sim_arc[-1]
+            + runs["final"].sim_arc[-1]
+        )
+        if "orange" in runs
+        else 0.0
     )
     bounds = machine.bounds()
     triangles = sum(
@@ -382,21 +444,31 @@ def facts(machine: Machine | None = None) -> dict[str, Any]:
             [round(v, 3) for v in bounds.upper],
         ],
         "runs": {name: run.describe() for name, run in runs.items()},
+        "routes": getattr(machine, "routes", "blue"),
         "route_length_sim": {
             "blue": round(blue_route, 4),
             "orange": round(orange_route, 4),
             "difference": round(orange_route - blue_route, 4),
-            "difference_pct": round(100.0 * (orange_route - blue_route) / blue_route, 3),
+            "difference_pct": (
+                round(100.0 * (orange_route - blue_route) / blue_route, 3)
+                if orange_route
+                else None
+            ),
         },
         "route_length_layout": {
             "blue": round(blue_route * 0.57, 4),
             "orange": round(orange_route * 0.57, 4),
         },
         "fork": {
+            "built": "fork" in machine.modules,
             "sample": joins.FORK_SAMPLE,
             "stem_heading_deg": round(runs["leg3"].heading_deg(joins.FORK_SAMPLE), 3),
             "blue_heading_deg": round(runs["leg3"].heading_deg(joins.FORK_SAMPLE + 8), 3),
-            "orange_heading_deg": round(runs["orange_lead"].heading_deg(8), 3),
+            "orange_heading_deg": (
+                round(runs["orange_lead"].heading_deg(8), 3)
+                if "orange_lead" in runs
+                else None
+            ),
         },
         "join_radius_layout": {
             name: {
@@ -409,5 +481,6 @@ def facts(machine: Machine | None = None) -> dict[str, Any]:
                 ),
             }
             for name, spec in joins.JOIN_SPECS.items()
+            if name in runs
         },
     }

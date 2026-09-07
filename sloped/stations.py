@@ -834,25 +834,42 @@ class ForkRidge(MarbleModule):
     feet stand on the two cradles, so the region between the channels is floor
     all the way across until their own guards have grown back to full height.
 
-    ## The height is bounded by the width, which is the whole trick
+    ## It spans cradle edge to cradle edge, and only where there is a gap
 
-    A crest that rises on a schedule of its own becomes a blade again: on the
-    first try the ridge stood 0.70 tall on a 0.11 foot at the fourth sample,
-    which is a spike. So the crest is capped at `MAX_FLANK` times the foot, and
-    the foot is half the distance between the two centrelines. The divider can
-    therefore only be as tall as the gap it stands in - nothing at the nose,
-    0.94 where the centrelines are 0.89 apart, and the channel's full 1.40 once
-    they are a clear width apart and each has its own wall back.
+    Two wrong versions of that, both measured. The first tied the crest's
+    height to a schedule of its own and it became a spike: 0.70 tall on an 0.11
+    foot at the fourth sample. The second tied it to half the *three
+    dimensional* distance between the two centrelines - and most of that
+    distance is along the flow rather than across it, because the two channels
+    diverge in heading. So at ten samples past the fork the ridge came out
+    spanning -0.32 to +1.50 in leg3's own frame at its full 1.40 height: a wall
+    down the middle of blue's channel, leaving it 1.33 marble diameters to
+    queue eight marbles through. 73 of 256 were lost at the fork's nose and
+    *no* marble ever reached orange, because orange's floor was under the ridge
+    too.
 
-    That is not a compromise, it is the correct answer to *when* a fork divides:
-    until the two channels have parted there is nothing to divide, and a marble
-    is sorted by which side of a 3.3-diameter channel it is running on. The
-    flanks are cosine rather than straight, so a marble meets a curve at 50
-    degrees instead of a face.
+    So the ridge is defined by the two things that actually bound it: leg3's
+    east cradle edge and orange's west cradle edge, both taken from the runs'
+    own sections. Where those two cross - which is everywhere from the nose to
+    about twelve samples past it - the channels overlap, there is nothing to
+    divide, and the ridge is a hairline. Where they part it fills the gap
+    exactly, feet on the two cradles, crest raised to at most `MAX_FLANK` times
+    half the gap so a marble meets a 61-degree curve rather than a face.
+
+        step | leg3 east | orange west | ridge
+           0 |      1.61 |       -1.44 | overlap, no ridge
+           8 |      1.64 |       -0.37 | overlap, no ridge
+          12 |      1.65 |       +1.69 | just parted
+          16 |      1.65 |       +4.22 | 1.65 to 4.22, full height
+
+    Until they part the two are one channel, walled by blue's west guard and
+    orange's east guard, and which route a marble takes is decided by which
+    side of it the marble is running on. That is the fork.
     """
 
     NOSE_BACK = 0.30           # layout units of nose upstream of the fork
-    MAX_FLANK = 1.2            # crest height per unit of foot; 50 degrees
+    MAX_FLANK = 1.8            # crest height per unit of foot; 61 degrees
+    HAIRLINE = 0.06            # of a marble diameter, where the channels overlap
     FLANK_POINTS = 5           # per side, plus the crest
 
     def __init__(
@@ -871,56 +888,75 @@ class ForkRidge(MarbleModule):
         self._mesh: TriMesh | None = None
 
     def _stations(self):
-        """(crest point, lateral, up, half width, height) per step, in sim units."""
+        """(west foot, east foot, up, crest height) per step, in sim units.
+
+        The feet are the two runs' own cradle edges, so the ridge cannot be
+        anywhere but between them.
+        """
         out = []
         containment = self.run.containment
-        half = to_sim(layout.CHANNEL_HALF * self.run.scale)
         for step in range(self.window + 1):
             a_index = min(self.index + step, len(self.run.sim_path) - 1)
             b_index = min(step, len(self.other.sim_path) - 1)
-            a = self.run.surface_point(a_index, 0.0)
-            b = self.other.surface_point(b_index, 0.0)
-            crest = tuple(0.5 * (a[axis] + b[axis]) for axis in range(3))
-            la, ua, _fa = self.run.frames[a_index]
-            lb, ub, _fb = self.other.frames[b_index]
-            lateral = _unit(tuple(0.5 * (la[i] + lb[i]) for i in range(3)))
+            west = self.run.surface_point(a_index, layout.CHANNEL_HALF)
+            east = self.other.surface_point(b_index, -layout.CHANNEL_HALF)
+            _la, ua, _fa = self.run.frames[a_index]
+            _lb, ub, _fb = self.other.frames[b_index]
             up = _unit(tuple(0.5 * (ua[i] + ub[i]) for i in range(3)))
-            separation = math.dist(a, b)
-            # The feet reach halfway to each centreline, capped at the channel's
-            # own half width - so at the nose the ridge is a hairline and once
-            # the centrelines are a clear width apart it spans from one cradle
-            # edge to the other with nothing uncovered between them.
-            foot = min(max(0.5 * separation, 0.04 * MARBLE_DIAMETER), half)
-            height = min(containment, self.MAX_FLANK * foot)
-            out.append((crest, lateral, up, foot, height))
+            lateral = self.run.frames[a_index][0]
+            gap = sum((east[i] - west[i]) * lateral[i] for i in range(3))
+            if gap <= self.HAIRLINE * MARBLE_DIAMETER:
+                # The channels still overlap: no gap, so no ridge, and nothing
+                # is emitted at all. The first version put a zero-height
+                # hairline on the midline here, which sounds like nothing and
+                # is not: its feet are the two *cradle edges*, which sit 0.37
+                # simulation units above the cradle's own bottom, so the
+                # "hairline" was a ledge a third of a marble diameter high
+                # across the middle of the channel. Marbles stopped dead on it
+                # at leg3 sample 81, one sample before the fork.
+                continue
+            height = min(containment, self.MAX_FLANK * 0.5 * gap)
+            out.append((west, east, up, height))
         return out
 
     def local_colliders(self) -> list[TriMesh]:
         if self._mesh is not None:
             return [self._mesh]
         stations = self._stations()
-        crest, lateral, up, foot, _height = stations[0]
+        if len(stations) < 2:
+            # No gap anywhere in the window, so no divider. Not a silent empty
+            # mesh: `local_colliders` returning nothing would make the module's
+            # own bounds undefined, so this is refused loudly instead.
+            raise ValueError(
+                f"{self.id}: the two channels never part within {self.window} samples; "
+                "there is nothing for a ridge to stand in"
+            )
+        west, east, up, _height = stations[0]
         _la, _ua, forward = self.run.frames[self.index]
-        nose = tuple(crest[axis] - forward[axis] * to_sim(self.NOSE_BACK) for axis in range(3))
-        stations.insert(0, (nose, lateral, up, foot, 0.0))
+        back = to_sim(self.NOSE_BACK)
+        # A nose upstream of the first station, on the same feet, so the
+        # divider begins as an edge in the floor rather than as a step.
+        stations.insert(
+            0,
+            (
+                tuple(west[i] - forward[i] * back for i in range(3)),
+                tuple(east[i] - forward[i] * back for i in range(3)),
+                up,
+                0.0,
+            ),
+        )
 
         rings: list[list[tuple[float, float, float]]] = []
-        for crest, lateral, up, foot, height in stations:
+        for west, east, up, height in stations:
             ring: list[tuple[float, float, float]] = []
             span = 2 * self.FLANK_POINTS
             for point in range(span + 1):
-                # u runs -1 to +1 across the ridge; the profile is a raised
-                # cosine, so the flanks are tangent to the floor at the feet
-                # and to the horizontal at the crest.
-                u = -1.0 + 2.0 * point / span
-                across = u * foot
-                rise = height * 0.5 * (1.0 + math.cos(math.pi * u))
-                ring.append(
-                    tuple(
-                        crest[axis] + lateral[axis] * across + up[axis] * rise
-                        for axis in range(3)
-                    )
-                )
+                u = point / span
+                base = tuple(west[i] + (east[i] - west[i]) * u for i in range(3))
+                # A raised cosine across the gap: tangent to each cradle at its
+                # own foot and to the horizontal at the crest.
+                rise = height * math.sin(math.pi * u) ** 2
+                ring.append(tuple(base[i] + up[i] * rise for i in range(3)))
             rings.append(ring)
         self._mesh = _strip(rings, f"{self.id}_ridge")
         return [self._mesh]
@@ -937,17 +973,20 @@ class ForkRidge(MarbleModule):
 
     def describe(self) -> dict[str, Any]:
         stations = self._stations()
+        lateral = self.run.frames[self.index][0]
+        rows = []
+        for step, (west, east, _up, height) in enumerate(stations):
+            gap = sum((east[i] - west[i]) * lateral[i] for i in range(3))
+            rows.append([step, round(gap, 4), round(height, 4)])
         return {
             "kind": "ForkRidge",
             "on": self.run.id,
             "sample": self.index,
             "against": self.other.id,
             "window": self.window,
-            "crest": round(stations[-1][4], 6),
-            "foot": round(stations[-1][3], 6),
-            "profile": [
-                [step, round(st[3], 4), round(st[4], 4)] for step, st in enumerate(stations)
-            ],
+            "crest": round(max(row[2] for row in rows), 6),
+            "gap": round(max(row[1] for row in rows), 6),
+            "profile": rows,
         }
 
 

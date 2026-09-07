@@ -60,6 +60,31 @@ from sloped.course import facts as course_facts, sloped_course
 from sloped.race import CHECKPOINTS, run_race
 
 
+def warm_mesh_cache() -> int:
+    """Write every collider OBJ once, in the parent, before any worker starts.
+
+    `marble3d.mesh.cached_obj` writes a content-named file through a `.partial`
+    and `os.replace`, which is atomic on POSIX and *fails* on Windows when the
+    destination is open in another process. Eight workers building the same
+    course at the same moment therefore collide on the same fifteen files, and
+    the whole sweep dies on a PermissionError several minutes in - which is how
+    the first 32-seed run ended.
+
+    Building the course once here fills the cache, so every worker finds the
+    files present and takes the `os.path.exists` branch. Returns the count, so
+    the report can say the cache was warm rather than assuming it.
+    """
+    from marble3d.world import MarbleWorld
+
+    world = MarbleWorld(DEFAULT_CONFIG)
+    try:
+        machine = sloped_course()
+        machine.build(world)
+        return len(world.colliders)
+    finally:
+        world.close()
+
+
 def run_batch(args: tuple[Sequence[int], int, float]) -> list[dict[str, Any]]:
     """One worker: build the course once, then run its seeds through it.
 
@@ -411,6 +436,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         for index in range(0, len(seeds), args.chunk)
     ]
 
+    chunks = warm_mesh_cache()
+    print(f"mesh cache warm: {chunks} collider chunks", file=sys.stderr, flush=True)
+
     started = time.perf_counter()
     races: list[dict[str, Any]] = []
     if args.workers <= 1:
@@ -433,6 +461,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     report["config"] = DEFAULT_CONFIG.to_json()
     report["performance"]["wall_seconds_total"] = round(elapsed, 3)
     report["performance"]["workers"] = args.workers
+    report["performance"]["collider_chunks"] = chunks
     report["performance"]["seeds_per_second"] = round(len(seeds) / max(elapsed, 1e-9), 4)
 
     if args.out:

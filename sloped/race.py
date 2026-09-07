@@ -35,9 +35,19 @@ recorded rather than normalised away, because it is one of the two things the
 route balance is made of.
 
 The nearest sample is found in a window around the last one rather than by
-searching all 800, which is what makes a thousand-seed benchmark affordable.
-A marble that leaves the channel and falls loses its window and keeps its last
-progress, which is what a rank should do for a marble that is no longer racing.
+searching all 800, and it is done every fourth tick rather than every tick.
+Both are what make a thousand-seed benchmark affordable: at 240 Hz over 25
+seconds the search is six thousand ticks times eight marbles times
+twenty-nine candidates, and a rank does not need 240 Hz - the course's own
+sample spacing is half a marble diameter and a marble covers a quarter of one
+in four ticks. A marble that leaves the channel and falls loses its window and
+keeps its last progress, which is what a rank should do for a marble that is
+no longer racing.
+
+The contact stream is read once. `MarbleSimulation._read_contacts` already
+fetches it to count collisions and track penetration, and asking Bullet for it
+a second time to build the touch map doubled the cost of the most expensive
+call in the loop.
 """
 
 from __future__ import annotations
@@ -206,6 +216,7 @@ class SlopedRace(MarbleSimulation):
     """`MarbleSimulation` with a course under it."""
 
     WINDOW = 14          # samples either side of the last known position
+    LOCATE_EVERY = 4     # ticks; see the module docstring
 
     def __init__(
         self,
@@ -219,9 +230,13 @@ class SlopedRace(MarbleSimulation):
         self.runs = machine.runs                              # type: ignore[attr-defined]
         self.finish_line = machine.finish_line                # type: ignore[attr-defined]
 
+        # A route the machine does not carry every run of is simply not on
+        # offer, so `sloped_course(routes="blue")` needs no other change here.
         self.offsets: dict[str, dict[str, float]] = {}
         self.route_length: dict[str, float] = {}
         for route, names in ROUTE_RUNS.items():
+            if any(name not in self.runs for name in names):
+                continue
             total = 0.0
             table: dict[str, float] = {}
             for name in names:
@@ -229,11 +244,15 @@ class SlopedRace(MarbleSimulation):
                 total += self.runs[name].sim_arc[-1]
             self.offsets[route] = table
             self.route_length[route] = total
+        if not self.offsets:
+            raise ValueError("the machine carries no complete route")
+        self.default_route = "blue" if "blue" in self.offsets else next(iter(self.offsets))
 
         self.results = {
             marble_id: RacerResult(marble_id=marble_id, start_slot=marble.start_index)
             for marble_id, marble in self.marbles.items()
         }
+        self._contacts: list = []
         self._where: dict[int, tuple[str, int]] = {}
         # The last place a marble was in contact with something, which is where
         # it left the course. The `escaped` position that `marble3d` records is
@@ -250,8 +269,38 @@ class SlopedRace(MarbleSimulation):
 
     # --- where a marble is ----------------------------------------------
 
+    def _route_from_place(self, marble_id: int) -> str | None:
+        """The route a marble is committed to, or None while it is still open.
+
+        Not "the first branch collider it touched", which is what this was and
+        which was wrong: the two branch channels *overlap* through the fork - at
+        the nose they are the same channel - so every marble touches orange's
+        lead there whichever way it ends up going. Over 32 seeds that attributed
+        125 of 225 marbles to orange and then reported ten of them lost on
+        leg3's tail, which is blue's route.
+
+        A marble is committed when it is located on a run only one route uses,
+        past the samples where the two still share floor.
+        """
+        place = self._where.get(marble_id)
+        if place is None:
+            return None
+        run, sample = place
+        if run in ("blue_lead", "blue"):
+            return "blue"
+        if "orange_lead" not in self.runs:
+            return "blue" if run in self.runs else None
+        if run == "orange":
+            return "orange"
+        if run == "orange_lead" and sample > joins.FORK_WINDOW_ORANGE:
+            return "orange"
+        if run == "leg3" and sample > joins.FORK_SAMPLE + joins.FORK_GUARD_WINDOW[3]:
+            return "blue"
+        return None
+
     def _route_of(self, marble_id: int) -> str:
-        return self.results[marble_id].route or "blue"
+        route = self.results[marble_id].route
+        return route if route in self.offsets else self.default_route
 
     def _locate(self, marble_id: int, position: Sequence[float], touched: set[str]) -> None:
         """Update a marble's run, sample and progress from what it touched.
@@ -263,6 +312,7 @@ class SlopedRace(MarbleSimulation):
         """
         result = self.results[marble_id]
         route = ROUTE_RUNS[self._route_of(marble_id)]
+        route = tuple(name for name in route if name in self.runs)
         previous = self._where.get(marble_id)
         candidates = [name for name in route if name in touched]
         if previous and previous[0] not in candidates:
@@ -328,32 +378,37 @@ class SlopedRace(MarbleSimulation):
 
     # --- the loop --------------------------------------------------------
 
+    def _read_contacts(self) -> None:
+        # The parent's own contact pass, with the list kept so the touch map
+        # below does not have to ask Bullet for it again.
+        self._contacts = self.world.contacts()
+        super()._read_contacts()
+
     def step(self) -> None:
         super().step()
+        if self.ticks % self.LOCATE_EVERY:
+            return
         touched: dict[int, set[str]] = {}
-        for contact in self.world.contacts():
+        for contact in getattr(self, "_contacts", ()):
             for body, other in ((contact.body_a, contact.body_b), (contact.body_b, contact.body_a)):
                 marble_id = self.world.marble_of(body)
                 if marble_id is None:
                     continue
-                owner = self.world.owner_of(other)
                 if self.world.marble_of(other) is None:
-                    touched.setdefault(marble_id, set()).add(owner)
+                    touched.setdefault(marble_id, set()).add(self.world.owner_of(other))
 
         for marble_id in list(self.world.marbles):
             marble = self.marbles[marble_id]
             result = self.results[marble_id]
             hits = touched.get(marble_id, set())
-            if result.route is None:
-                for owner in hits:
-                    route = BRANCH_MODULES.get(owner)
-                    if route is not None:
-                        result.route = route
-                        self.events.append(
-                            Event(self.elapsed, "route", {"id": marble_id, "route": route})
-                        )
-                        break
             self._locate(marble_id, marble.pose[0], hits)
+            if result.route is None:
+                route = self._route_from_place(marble_id)
+                if route is not None:
+                    result.route = route
+                    self.events.append(
+                        Event(self.elapsed, "route", {"id": marble_id, "route": route})
+                    )
             if hits:
                 place = self._where.get(marble_id)
                 if place is not None:

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/sloped_race_render.gd" id="1_sloped_race_render"]
+
+[node name="SlopedRaceRender" type="Node"]
+script = ExtResource("1_sloped_race_render")
