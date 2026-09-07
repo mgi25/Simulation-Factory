@@ -176,3 +176,49 @@ def test_the_course_still_assembles_clean_both_ways():
 
     for routes in ("blue", "both"):
         assert check(sloped_course(routes=routes)) == []
+
+
+def test_the_merge_apron_stays_flush_with_blue_where_it_overlaps_it():
+    """`blue[100..119]` was the dominant loss site in V1 and V1.1.
+
+    The apron's floor used to continue upstream past blue's mouth on the chord
+    to the sprint - falling at 0.159 per unit of `along` where blue's own
+    channel falls at 0.200 - so the apron, a height field spanning the full
+    width, rose into a shelf across blue's channel: +0.114 simulation units at
+    the apron's back edge. A marble needs 7.5 wu/s to climb that, so the fast
+    ones never noticed and the slow ones stopped dead.
+    """
+    machine = sloped_course()
+    blue = machine.runs["blue"]
+    merge = machine.modules["merge"]
+
+    def apron_frame(point):
+        offset = [point[axis] - merge.origin[axis] for axis in range(3)]
+        return (
+            sum(offset[axis] * merge.forward[axis] for axis in range(3)),
+            sum(offset[axis] * merge.lateral[axis] for axis in range(3)),
+            sum(offset[axis] * merge.up[axis] for axis in range(3)),
+        )
+
+    back = merge.BACK * 1.754386
+    worst = 0.0
+    for index in range(len(blue.sim_path) - 24, len(blue.sim_path)):
+        along, across, rise = apron_frame(blue.surface_point(index, 0.0))
+        if along < back:
+            continue                       # upstream of the apron's own edge
+        worst = max(worst, merge._floor(along, across) - rise)
+    # What is left is blue's centreline riding the sprint cradle's wall, which
+    # is a curved surface rather than a step, and it is a third of what a step
+    # a marble could not climb would be.
+    assert worst < 0.05, f"the apron stands {worst:.4f} over blue's channel"
+
+
+def test_the_apron_follows_blues_gradient_and_not_the_chord():
+    machine = sloped_course()
+    merge = machine.modules["merge"]
+    along, rise = merge._blue_frame_pose()
+    chord = rise / along
+    assert merge._blue_frame_slope() > chord + 0.02, (
+        "blue falls faster than the chord to the sprint; if these agree the "
+        "shelf is back"
+    )

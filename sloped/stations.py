@@ -138,9 +138,24 @@ class StartGrid(MarbleModule):
     # is ordered by lateral distance, which is to say by bay index.
     BAY_STAGGER: tuple[float, ...] = (0.0,) * 8
 
-    # Studs on the trough floor, as (t along the fan, across as a fraction of
-    # the half width there, height in layout units). See `local_colliders`.
-    DEFLECTORS: tuple[tuple[float, float, float], ...] = ()
+    # Bumpers on the trough floor, as (t along the fan, across as a fraction of
+    # the half width there, height in layout units, radius in layout units).
+    # See `local_colliders`.
+    DEFLECTORS: tuple[tuple[float, float, float, float], ...] = ()
+
+    # The mixing tray, as (converge by t, hold until t, half width). `None` is
+    # V1.1's single continuous funnel. See `_half_at`.
+    TRAY: tuple[float, float, float] | None = None
+
+    # How far down the fan the trough stays at its full gate width. The eight
+    # marbles rest at t = 0.090 and are laid out at a fraction of their pitch
+    # equal to the local half width over the gate's, so anything that narrows
+    # the trough before this narrows the grid itself.
+    GRID_HOLD = 0.10
+
+    # How much of the fan's drop is spent by the tray's two ends, as
+    # (fraction by `opening`, fraction by `closing`). See `_fall_at`.
+    FALL_PROFILE: tuple[float, float] | None = None
 
     def __init__(
         self,
@@ -148,10 +163,25 @@ class StartGrid(MarbleModule):
         launch: TrackRun | None = None,
         fin_schedule: tuple[float, ...] | None = None,
         bay_stagger: tuple[float, ...] | None = None,
-        deflectors: tuple[tuple[float, float, float], ...] | None = None,
+        deflectors: tuple[tuple[float, float, float, float], ...] | None = None,
+        tray: tuple[float, float, float] | None = None,
+        fall_profile: tuple[float, float] | None = None,
     ) -> None:
         super().__init__(module_id)
         self.deflectors = self.DEFLECTORS if deflectors is None else tuple(deflectors)
+        self.tray = self.TRAY if tray is None else tray
+        self.fall_profile = self.FALL_PROFILE if fall_profile is None else fall_profile
+        if self.tray is not None:
+            opening, closing, tray_half = self.tray
+            if not self.GRID_HOLD < opening < closing < 1.0:
+                raise ValueError(
+                    f"a tray converges after the grid and closes inside the fan; "
+                    f"got {self.tray} against a grid held to {self.GRID_HOLD}"
+                )
+            if tray_half > layout.START_BACK_HALF:
+                raise ValueError(
+                    f"a tray {tray_half} wide is wider than the gate's {layout.START_BACK_HALF}"
+                )
         schedule = fin_schedule if fin_schedule is not None else self.FIN_SCHEDULE
         if schedule is not None and len(schedule) != layout.BAYS - 1:
             raise ValueError(
@@ -206,14 +236,75 @@ class StartGrid(MarbleModule):
         # 0.08 difference puts the physical apron wall a seventh of a marble
         # diameter inside the drawn one, at the one place the drawn one is
         # hidden behind the launch channel's own lip.
-        eased = _smoothstep(0.10, 1.0, t)
         front = layout.CHANNEL_HALF
-        return layout.START_BACK_HALF + (front - layout.START_BACK_HALF) * eased
+        back = layout.START_BACK_HALF
+        if self.tray is None:
+            eased = _smoothstep(0.10, 1.0, t)
+            return back + (front - back) * eased
+
+        # **The mixing tray.** V1.1's fan narrows from 5.46 to 1.88 over
+        # essentially its whole 7.34 units, so it is one long funnel, and a
+        # funnel is a queue ordered by how far each bay has to travel sideways
+        # to reach the line - which is bay index. Eleven geometries were
+        # scanned inside that topology and every static one made the ordering
+        # *stronger*, because each was one more restriction in a narrowing
+        # channel.
+        #
+        # So the topology changes: a short converge to a **plateau**, a wide
+        # stretch held at constant width where several marbles run abreast and
+        # meet the bumpers, and only then the narrowing. The convergence is not
+        # the defect - a marble's lateral position at the convergence being a
+        # perfect function of its bay is the defect. Scramble that position in
+        # the tray and the same funnel produces a scrambled queue.
+        # Full width until `GRID_HOLD` - the same 0.10 the single taper holds
+        # for, and not decoration. The eight marbles rest at t = 0.090 and the
+        # bays are laid out at `half / START_BACK_HALF` of their pitch, so a
+        # trough already narrowing under the grid narrows the *grid*: at a tray
+        # half of 2.10 reached by t = 0.14, the resting pitch comes out 0.527
+        # against a 0.57 marble. The field is seeded overlapping itself and
+        # never leaves - measured, 100% of every trial trailing.
+        opening, closing, tray_half = self.tray
+        if t <= self.GRID_HOLD:
+            return back
+        if t <= opening:
+            return back + (tray_half - back) * _smoothstep(self.GRID_HOLD, opening, t)
+        if t <= closing:
+            return tray_half
+        return tray_half + (front - tray_half) * _smoothstep(closing, 1.0, t)
+
+    def _fall_at(self, t: float) -> float:
+        """The fraction of the fan's total drop used up by `t`.
+
+        Linear when nothing is asked for, which is what the fan always did.
+
+        With `fall_profile` the drop is redistributed without moving either
+        end: most of it into the short run before the tray, so the field
+        arrives at the bumpers with some speed; very little across the tray,
+        so it stays a tray and not a chute; the rest into the narrowing. The
+        whole fan only falls 0.63 layout units - 4.9 degrees - so where that
+        0.63 is spent is the only speed control there is.
+        """
+        if self.fall_profile is None or self.tray is None:
+            return t
+        opening, closing, _half = self.tray
+        by_opening, by_closing = self.fall_profile
+        if t <= opening:
+            return by_opening * (t / opening) if opening > 1e-9 else by_opening
+        if t <= closing:
+            span = max(closing - opening, 1e-9)
+            return by_opening + (by_closing - by_opening) * (t - opening) / span
+        span = max(1.0 - closing, 1e-9)
+        return by_closing + (1.0 - by_closing) * (t - closing) / span
 
     def _path_at(self, t: float) -> tuple[float, float, float]:
         back = (0.0, layout.DECK_TOP - 0.02, -layout.GROOVE_LENGTH)
         front = self.exit_local
-        return tuple(back[axis] + (front[axis] - back[axis]) * t for axis in range(3))
+        fall = self._fall_at(t)
+        return (
+            back[0] + (front[0] - back[0]) * t,
+            back[1] + (front[1] - back[1]) * fall,
+            back[2] + (front[2] - back[2]) * t,
+        )
 
     # Where the trough's own dish gives way to the channel's cradle. A third of
     # the fan, which is the shortest blend that leaves no step a slow marble
@@ -334,45 +425,38 @@ class StartGrid(MarbleModule):
                     )
                 )
 
-        # Deflectors: studs standing on the trough floor at chosen places in
-        # the fan, as (t along, across as a fraction of the half width there,
-        # height in layout units).
+        # Bumpers: rounded posts standing on the trough floor, as (t along,
+        # across as a fraction of the half width there, height, radius), the
+        # last two in layout units.
         #
-        # The fan's second half is where the slot bias is made -
-        # `docs/sloped_race_v1_start_finding.md` measures the eight slots
-        # within three ticks of each other at t = 0.25 and 76 ticks apart at
-        # the seam - because the bare converging trough funnels all eight onto
-        # one line and the queue that forms there is ordered by how far each
-        # bay had to come. A stud row is what turns that funnel into a
-        # scattering region: which side of a stud a marble passes is decided by
-        # a fraction of its own radius, so the delay it takes is not monotone
-        # in where it started.
+        # These only do anything inside a **tray**. V1.1 put three rows of thin
+        # studs in the fan's converging second half and every one of them made
+        # the slot bias worse - the worst reached a rank span of 7.0 out of a
+        # possible 7 - because an obstacle in a narrowing channel is one more
+        # queue, and a queue leaves in arrival order. In a stretch held at
+        # constant width there is somewhere for a deflected marble to go, and
+        # which side of a bumper it passes is decided by a fraction of its own
+        # radius.
         #
-        # They stand on the *floor* at the marble's own contact height for the
+        # They stand on the floor at the marble's own contact height for the
         # same reason the lane dividers do, and `Mixer.PIN_HEIGHT` records what
-        # happens when a stud in a channel is tall enough to lever rather than
-        # deflect. Here the field is at 7 to 11 wu/s rather than the 50 it
-        # reaches by leg1, so the same stud is a much gentler thing.
-        for order, (at, across_fraction, height) in enumerate(self.deflectors):
+        # happens when something in a channel is tall enough to lever rather
+        # than deflect. `radius` is theirs rather than the mixer's 0.075,
+        # because a post a marble is meant to be turned by has to be a
+        # noticeable fraction of a 0.285 marble.
+        for order, (at, across_fraction, height, radius) in enumerate(self.deflectors):
             half = self._half_at(at)
             centre = self._path_at(at)
             across = across_fraction * half
-            foot = _place(
-                self.origin,
-                self.frame,
-                (across, centre[1] + self._cradle(across, half, at), centre[2]),
-            )
-            head = _place(
-                self.origin,
-                self.frame,
-                (across, centre[1] + self._cradle(across, half, at) + height, centre[2]),
-            )
+            floor = centre[1] + self._cradle(across, half, at)
+            foot = _place(self.origin, self.frame, (across, floor, centre[2]))
+            head = _place(self.origin, self.frame, (across, floor + height, centre[2]))
             pieces.append(
                 tube(
                     foot,
                     head,
-                    to_sim(layout.MIXER_PIN_RADIUS),
-                    segments=8,
+                    to_sim(radius),
+                    segments=12,
                     name=f"{self.id}_deflector{order}",
                     caps=True,
                 )
@@ -1305,6 +1389,29 @@ class MergeCatch(MarbleModule):
         rise = sum(offset[axis] * self.up[axis] for axis in range(3))
         return (along, rise)
 
+    def _blue_frame_slope(self, span: int = 4) -> float:
+        """Blue's own fall per unit of `along`, at its exit, in the apron frame.
+
+        Measured off blue's last samples rather than taken from the chord to
+        the sprint, and measured over `span` of them rather than one, because a
+        single sample of a 118-point run is half a marble diameter and the rise
+        across it is within the rounding of the control points. Falls back to
+        the chord if the merge is built without blue, which is what the station
+        tests do.
+        """
+        if self.blue is None:
+            return 0.1594
+        last = len(self.blue.sim_path) - 1
+        near_along, near_rise = self._blue_frame_pose()
+        back = self.blue.surface_point(max(0, last - span), 0.0)
+        offset = [back[axis] - self.origin[axis] for axis in range(3)]
+        far_along = sum(offset[axis] * self.forward[axis] for axis in range(3))
+        far_rise = sum(offset[axis] * self.up[axis] for axis in range(3))
+        run = near_along - far_along
+        if abs(run) < 1e-6:
+            return 0.1594
+        return (near_rise - far_rise) / run
+
     def _floor(self, along: float, across: float) -> float:
         # Nothing along the sprint: the frame's forward axis carries the
         # gradient already. Upstream, the line that joins the sprint's contact
@@ -1313,7 +1420,35 @@ class MergeCatch(MarbleModule):
             fall = 0.0
         else:
             blue_along, blue_rise = self._blue_frame_pose()
-            fall = along * (blue_rise / blue_along) if abs(blue_along) > 1e-6 else 0.0
+            chord = blue_rise / blue_along if abs(blue_along) > 1e-6 else 0.0
+            if along >= blue_along:
+                fall = along * chord
+            else:
+                # **Past blue's mouth the apron follows blue, not the chord.**
+                #
+                # It used to continue on the same line, and that line is the
+                # one joining the sprint's contact point to blue's - a chord,
+                # falling at 0.159 per unit of `along`, while blue's own
+                # channel there falls at 0.200. Extended 2.1 units upstream to
+                # the apron's back edge the two part company, and the apron -
+                # a height field spanning the full width - becomes a shelf
+                # across blue's channel:
+                #
+                #     blue sample | apron - blue floor
+                #             117 |  +0.009   (blue's mouth)
+                #             115 |  +0.060
+                #             113 |  +0.114   (the apron's back edge)
+                #
+                # A marble needs 7.5 wu/s to climb 0.114, so the fast ones
+                # never noticed and the slow ones stopped dead against it.
+                # That is `blue[100..119]`: 285 of V1.1's 384 losses, six of
+                # them coming to rest at the same point to two decimals -
+                # deterministic, because a step is deterministic.
+                #
+                # Following blue's own gradient instead keeps the apron flush
+                # with the channel everywhere the two overlap, which is what
+                # the chord already does between blue's mouth and the sprint.
+                fall = blue_rise + (along - blue_along) * self._blue_frame_slope()
         half = layout.CHANNEL_HALF * self.sprint.scale
         edge = self.ACROSS
         across_layout = abs(across) / LAYOUT_TO_SIM

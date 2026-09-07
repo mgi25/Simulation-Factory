@@ -192,6 +192,42 @@ def split_machine(
     return machine
 
 
+def merge_machine(
+    config: CoreConfig | None = None,
+    speed: float = 30.0,
+    offsets: Sequence[float] = OFFSETS,
+    yaw_deg: float = 0.0,
+    entry_at: int = 96,
+) -> Machine:
+    """Blue's tail, the merge apron and the sprint, entered on purpose.
+
+    The section D test: `blue[100..119]` was the course's dominant loss site in
+    both V1 and V1.1, and in V1.1 the marbles lost there came to rest at the
+    same point to two decimals. A trap that reproducible is a shape, and a
+    shape is testable directly rather than by waiting for a full race to
+    deliver a slow enough marble.
+
+    `speed` defaults to 30 rather than the 41 the lobes self-limit to, because
+    the marbles that stopped were the slow ones - a step only catches what
+    cannot climb it, and a sweep that only launches fast marbles proves nothing
+    about a step.
+    """
+    config = config or DEFAULT_CONFIG
+    full = sloped_course(config, routes="both")
+    runs = full.runs                                      # type: ignore[attr-defined]
+
+    machine = Machine("sloped_b_merge_entry")
+    injector = Injector("inject", runs["blue"], entry_at, offsets, speed, yaw_deg)
+    machine.add(injector, Transform())
+    for name in ("blue", "merge", "final"):
+        machine.add(full.modules[name], Transform())
+    machine.add(full.modules["finish"], Transform())
+    machine.runs = runs                                   # type: ignore[attr-defined]
+    machine.injector = injector                           # type: ignore[attr-defined]
+    machine.finish_line = runs["final"].socket("exit")    # type: ignore[attr-defined]
+    return machine
+
+
 @dataclass
 class EntryOutcome:
     """What became of one injected marble."""
@@ -493,6 +529,36 @@ def entry_sweep(
                     # A sweep is a few hundred worlds; each one left open is a
                     # Bullet client that is never given back.
                     entry.sim.close()
+    return out
+
+
+def merge_sweep(
+    speeds: Sequence[float] = (8.0, 12.0, 18.0, 25.0, 35.0),
+    offsets: Sequence[float] = OFFSETS,
+    config: CoreConfig | None = None,
+    duration: float = 14.0,
+    together: bool = True,
+) -> list[EntryOutcome]:
+    """Blue's tail through the merge, at speeds that bracket what stops there.
+
+    The slow end matters more than the fast end here. 8 wu/s carries 0.13
+    simulation units of climb and the step that was trapping marbles was 0.114,
+    so a sweep that starts at 30 would have walked straight over the defect.
+    """
+    config = config or DEFAULT_CONFIG
+    out: list[EntryOutcome] = []
+    max_ticks = int(round(duration * config.physics.physics_hz))
+    for speed in speeds:
+        groups = [tuple(offsets)] if together else [(o,) for o in offsets]
+        for group in groups:
+            machine = merge_machine(config, speed=speed, offsets=group)
+            entry = SplitEntry(machine, config)
+            try:
+                while entry.sim.ticks < max_ticks and not entry.done():
+                    entry.step()
+                out.extend(entry.outcomes.values())
+            finally:
+                entry.sim.close()
     return out
 
 
