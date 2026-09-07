@@ -1,0 +1,536 @@
+{
+  "units": "1 world unit = 1 engine metre = 0.040 m of the 25x-smaller toy modelled\nmarble radius   0.500 wu (20 mm toy)\ngravity         245.25 wu/s^2 (= 9.81 m/s^2 scaled; time is unchanged)\naxes            +Y up, gravity -Y, machine laid out in XZ",
+  "environment": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+    "python": "3.13.0",
+    "pybullet_api": 202010061
+  },
+  "colliders": {
+    "facts": {
+      "colliders": 4,
+      "triangles": 8732,
+      "vertices": 4582,
+      "probes": 459
+    },
+    "findings": []
+  },
+  "margins": {
+    "resting_height": [
+      {
+        "margin": 0.04,
+        "resting_height_error": -1.0000000000010001e-05
+      },
+      {
+        "margin": 0.01,
+        "resting_height_error": -1.0000000000010001e-05
+      },
+      {
+        "margin": 0.001,
+        "resting_height_error": -1.000011155255498e-05
+      },
+      {
+        "margin": 0.0001,
+        "resting_height_error": -1.000011155255498e-05
+      }
+    ],
+    "contact_touch": 1.0,
+    "contact_clear": 1.002,
+    "diameter": 1.0,
+    "tessellation_crr": 0.002312755274871297
+  },
+  "friction": {
+    "inclines": [
+      {
+        "slope_degrees": 10.0,
+        "measured_acceleration": 30.418638425862614,
+        "rolling_prediction": 30.41943969486762,
+        "sliding_prediction": -78.17483514030734,
+        "inferred_friction": 0.05038245489826636,
+        "threshold_friction": 0.0503791373452757,
+        "rolls": true
+      },
+      {
+        "slope_degrees": 20.0,
+        "measured_acceleration": 59.91460153292209,
+        "rolling_prediction": 59.9146001075859,
+        "sliding_prediction": -31.349367473251768,
+        "inferred_friction": 0.1039914893198745,
+        "threshold_friction": 0.10399149550462923,
+        "rolls": true
+      },
+      {
+        "slope_degrees": 30.0,
+        "measured_acceleration": 87.58928671248901,
+        "rolling_prediction": 87.58928571428571,
+        "sliding_prediction": 16.42863486093319,
+        "inferred_friction": 0.1649572150686647,
+        "threshold_friction": 0.16495721976846447,
+        "rolls": true
+      },
+      {
+        "slope_degrees": 41.86351887294112,
+        "measured_acceleration": 116.90690500719003,
+        "rolling_prediction": 116.90690957564719,
+        "sliding_prediction": 72.34634600922712,
+        "inferred_friction": 0.2560286058982154,
+        "threshold_friction": 0.2560285808856732,
+        "rolls": true
+      },
+      {
+        "starved": {
+          "slope_degrees": 30.0,
+          "measured_acceleration": 101.38572845035524,
+          "rolling_prediction": 87.58928571428571,
+          "sliding_prediction": 101.38572697218662,
+          "inferred_friction": 0.09999999304039918,
+          "threshold_friction": 0.16495721976846447,
+          "rolls": false
+        }
+      }
+    ]
+  },
+  "rates": {
+    "rates": [
+      {
+        "hz": 120,
+        "top_speed": 49.708515019704215,
+        "travel_per_tick": 0.4142376251642018,
+        "travel_in_diameters": 0.4142376251642018,
+        "worst_penetration": -0.26892417825645887,
+        "finished": 8,
+        "escaped": 0,
+        "sim_seconds": 7.091666666666667,
+        "wall_seconds": 0.5175296999514103,
+        "revolutions_median": 2.322270595203589,
+        "max_energy_rise": 0.0
+      },
+      {
+        "hz": 240,
+        "top_speed": 51.358331228072075,
+        "travel_per_tick": 0.21399304678363365,
+        "travel_in_diameters": 0.21399304678363365,
+        "worst_penetration": -0.13956963154340857,
+        "finished": 8,
+        "escaped": 0,
+        "sim_seconds": 8.783333333333333,
+        "wall_seconds": 1.119628999964334,
+        "revolutions_median": 2.969967374901038,
+        "max_energy_rise": 0.0
+      },
+      {
+        "hz": 480,
+        "top_speed": 49.39834802293636,
+        "travel_per_tick": 0.10291322504778408,
+        "travel_in_diameters": 0.10291322504778408,
+        "worst_penetration": -0.07073077670792947,
+        "finished": 8,
+        "escaped": 0,
+        "sim_seconds": 13.0625,
+        "wall_seconds": 3.099817000096664,
+        "revolutions_median": 4.5816160378353485,
+        "max_energy_rise": 0.0
+      }
+    ],
+    "tunnelling": [
+      {
+        "speed": 60.0,
+        "travel_in_diameters": 0.25,
+        "tunnelled_with_ccd": 0,
+        "tunnelled_without_ccd": 0
+      },
+      {
+        "speed": 100.0,
+        "travel_in_diameters": 0.4166666666666667,
+        "tunnelled_with_ccd": 0,
+        "tunnelled_without_ccd": 0
+      },
+      {
+        "speed": 150.0,
+        "travel_in_diameters": 0.625,
+        "tunnelled_with_ccd": 0,
+        "tunnelled_without_ccd": 0
+      },
+      {
+        "speed": 200.0,
+        "travel_in_diameters": 0.8333333333333334,
+        "tunnelled_with_ccd": 0,
+        "tunnelled_without_ccd": 1
+      },
+      {
+        "speed": 300.0,
+        "travel_in_diameters": 1.25,
+        "tunnelled_with_ccd": 0,
+        "tunnelled_without_ccd": 7
+      },
+      {
+        "speed": 400.0,
+        "travel_in_diameters": 1.6666666666666667,
+        "tunnelled_with_ccd": 0,
+        "tunnelled_without_ccd": 11
+      }
+    ]
+  },
+  "entry": {
+    "orbit_speed": 44.92624448852634,
+    "release_radius": 14.625,
+    "entry_speeds": {
+      "0": 41.21983453580614,
+      "1": 40.38649441243417,
+      "2": 43.452021107303445,
+      "3": 44.92173149863143,
+      "4": 42.27273185279189,
+      "5": 43.58152551079416,
+      "6": 38.35709378292546,
+      "7": 42.41293891861439
+    },
+    "peak_radius": 16.373980114961313,
+    "dish_edge": 16.875,
+    "headroom": 0.5010198850386871,
+    "shelf_slope": 0.1
+  },
+  "behaviour": {
+    "seeds": [
+      {
+        "seed": 7,
+        "finished": 8,
+        "escaped": 0,
+        "unfinished": 0,
+        "sim_seconds": 8.783333333333333,
+        "collisions": 71,
+        "revolutions": [
+          2.659564129260236,
+          3.0341854810753333,
+          3.4845262873369394,
+          2.9057492687267423,
+          3.2524784514158416,
+          3.1958147898510707,
+          2.8817695525777025,
+          2.7198994829217757
+        ],
+        "revolutions_median": 2.969967374901038,
+        "peak_radius": 16.373980114961313,
+        "finish_order": [
+          7,
+          0,
+          3,
+          6,
+          4,
+          1,
+          5,
+          2
+        ],
+        "max_energy_rise": 0.0,
+        "worst_penetration": -0.13956963154340857,
+        "failure": null
+      },
+      {
+        "seed": 11,
+        "finished": 8,
+        "escaped": 0,
+        "unfinished": 0,
+        "sim_seconds": 9.204166666666666,
+        "collisions": 51,
+        "revolutions": [
+          2.9001725366733546,
+          3.0100274106981653,
+          3.364776927337077,
+          3.269662456160293,
+          3.306033509403841,
+          3.711812529053514,
+          3.4891508817541443,
+          2.970398475494134
+        ],
+        "revolutions_median": 3.287847982782067,
+        "peak_radius": 16.40401264774745,
+        "finish_order": [
+          0,
+          7,
+          1,
+          3,
+          4,
+          6,
+          2,
+          5
+        ],
+        "max_energy_rise": 0.0,
+        "worst_penetration": -0.14588338931824824,
+        "failure": null
+      },
+      {
+        "seed": 19,
+        "finished": 8,
+        "escaped": 0,
+        "unfinished": 0,
+        "sim_seconds": 8.745833333333334,
+        "collisions": 62,
+        "revolutions": [
+          2.610195204841106,
+          3.120768181096964,
+          3.474494467327398,
+          2.846692046825417,
+          3.0180502767922253,
+          3.0889588490520823,
+          2.771075130273147,
+          3.4685390345430402
+        ],
+        "revolutions_median": 3.0535045629221536,
+        "peak_radius": 16.456560271771025,
+        "finish_order": [
+          0,
+          3,
+          6,
+          5,
+          4,
+          1,
+          2,
+          7
+        ],
+        "max_energy_rise": 0.0,
+        "worst_penetration": -0.15290788991948595,
+        "failure": null
+      },
+      {
+        "seed": 23,
+        "finished": 8,
+        "escaped": 0,
+        "unfinished": 0,
+        "sim_seconds": 8.7375,
+        "collisions": 79,
+        "revolutions": [
+          3.471619163386818,
+          2.7647122195258054,
+          2.9756658970092826,
+          3.2843390161655854,
+          3.0709030268732382,
+          2.535324171903943,
+          2.7531556796569276,
+          2.828073590098627
+        ],
+        "revolutions_median": 2.901869743553955,
+        "peak_radius": 16.320804776107217,
+        "finish_order": [
+          7,
+          5,
+          6,
+          1,
+          2,
+          4,
+          3,
+          0
+        ],
+        "max_energy_rise": 0.0,
+        "worst_penetration": -0.11916649132393906,
+        "failure": null
+      },
+      {
+        "seed": 31,
+        "finished": 8,
+        "escaped": 0,
+        "unfinished": 0,
+        "sim_seconds": 9.025,
+        "collisions": 62,
+        "revolutions": [
+          2.6991302305275764,
+          3.365053903584257,
+          3.364032770275747,
+          3.6490472683512993,
+          2.839180083415004,
+          3.1042311086920233,
+          3.1715445970644573,
+          2.617370411435639
+        ],
+        "revolutions_median": 3.13788785287824,
+        "peak_radius": 16.354938736979506,
+        "finish_order": [
+          7,
+          0,
+          4,
+          6,
+          5,
+          2,
+          1,
+          3
+        ],
+        "max_energy_rise": 0.0,
+        "worst_penetration": -0.14775554975592808,
+        "failure": null
+      },
+      {
+        "seed": 42,
+        "finished": 8,
+        "escaped": 0,
+        "unfinished": 0,
+        "sim_seconds": 9.1125,
+        "collisions": 59,
+        "revolutions": [
+          3.0791726116988563,
+          3.5459289678882513,
+          3.309805776591399,
+          3.2592446146225287,
+          2.791631390151044,
+          3.568995142163653,
+          2.9601725750960024,
+          2.815910462095771
+        ],
+        "revolutions_median": 3.1692086131606922,
+        "peak_radius": 16.36954718937283,
+        "finish_order": [
+          4,
+          7,
+          0,
+          3,
+          6,
+          2,
+          1,
+          5
+        ],
+        "max_energy_rise": 0.0,
+        "worst_penetration": -0.12014266307217311,
+        "failure": null
+      },
+      {
+        "seed": 57,
+        "finished": 8,
+        "escaped": 0,
+        "unfinished": 0,
+        "sim_seconds": 8.929166666666667,
+        "collisions": 76,
+        "revolutions": [
+          3.5811868758441654,
+          3.279248109554561,
+          3.0094484488616815,
+          2.669189737337862,
+          2.9374364994376387,
+          3.275730529675734,
+          3.0725990199451565,
+          2.7255245695705095
+        ],
+        "revolutions_median": 3.041023734403419,
+        "peak_radius": 16.416112779943685,
+        "finish_order": [
+          3,
+          7,
+          2,
+          4,
+          5,
+          6,
+          1,
+          0
+        ],
+        "max_energy_rise": 0.0,
+        "worst_penetration": -0.1451957834003218,
+        "failure": null
+      },
+      {
+        "seed": 68,
+        "finished": 8,
+        "escaped": 0,
+        "unfinished": 0,
+        "sim_seconds": 8.808333333333334,
+        "collisions": 77,
+        "revolutions": [
+          2.6561255842032394,
+          3.2118365849973762,
+          2.9774355247831155,
+          2.7297719657281836,
+          3.512827932610688,
+          3.0273000333551674,
+          3.061907374926281,
+          2.729919003245528
+        ],
+        "revolutions_median": 3.002367779069141,
+        "peak_radius": 16.468545465506434,
+        "finish_order": [
+          3,
+          0,
+          7,
+          2,
+          6,
+          5,
+          1,
+          4
+        ],
+        "max_energy_rise": 0.0,
+        "worst_penetration": -0.11540312915681286,
+        "failure": null
+      }
+    ],
+    "median_revolutions": 3.0472641486627863,
+    "distinct_orders": 8
+  },
+  "determinism": {
+    "seeds": [
+      {
+        "seed": 7,
+        "repeats": 20,
+        "same_process_digests": 1,
+        "cross_process_digests": 1,
+        "same_process_event_digests": 1,
+        "cross_process_event_digests": 1,
+        "drain_orders": 1,
+        "agree": true,
+        "digest": "e5fd4c658a703ab48e9331b362058189522ba8e6dc0e6f9698e9a68795bd13cf"
+      },
+      {
+        "seed": 31,
+        "repeats": 20,
+        "same_process_digests": 1,
+        "cross_process_digests": 1,
+        "same_process_event_digests": 1,
+        "cross_process_event_digests": 1,
+        "drain_orders": 1,
+        "agree": true,
+        "digest": "c897677395295136de1ce725ab49feff0364eb76bb25714e5d3efb3a8d91e069"
+      }
+    ],
+    "environment": {
+      "platform": "Windows-11-10.0.26200-SP0",
+      "machine": "AMD64",
+      "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+      "python": "3.13.0",
+      "pybullet_api": 202010061
+    }
+  },
+  "throughput": {
+    "rows": [
+      {
+        "marbles": 8,
+        "wall_seconds": 1.4998453999869525,
+        "sim_seconds": 9.15,
+        "times_realtime": 6.100628771525117,
+        "finished": 8,
+        "escaped": 0,
+        "unfinished": 0
+      },
+      {
+        "marbles": 16,
+        "wall_seconds": 2.701761200092733,
+        "sim_seconds": 9.170833333333333,
+        "times_realtime": 3.3943907896147745,
+        "finished": 16,
+        "escaped": 0,
+        "unfinished": 0
+      },
+      {
+        "marbles": 32,
+        "wall_seconds": 4.345510000013746,
+        "sim_seconds": 9.3875,
+        "times_realtime": 2.16027577890059,
+        "finished": 32,
+        "escaped": 0,
+        "unfinished": 0
+      },
+      {
+        "marbles": 64,
+        "wall_seconds": 9.847442799946293,
+        "sim_seconds": 10.95,
+        "times_realtime": 1.1119638085188694,
+        "finished": 64,
+        "escaped": 0,
+        "unfinished": 0
+      }
+    ]
+  }
+}
