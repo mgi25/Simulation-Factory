@@ -9,9 +9,14 @@ for any of it. The candidate list is in `CANDIDATES` below and each entry is a
 `sloped.startlab.StartPlan` - physical geometry only, so a candidate cannot
 score well by cheating.
 
-The number to read is `span`: the gap in mean rank between the strongest and
-the weakest of the eight bays at the earliest checkpoint, in places. V1 is
-3.615 and a fair start is 0.
+Two numbers to read. `span` is the gap in mean rank between the strongest and
+the weakest of the eight bays at the earliest checkpoint, in places: V1 is
+3.615 and a fair start is 0. `trail%` is the share of marbles that had not got
+85% of the way down the lab when the field settled, and it is there because the
+first version of this scan did not have it - a paddle wheel that scored 0.55%
+lost went on to jam 17% of the full course's field at the launch entry, and the
+lab could not see it because a marble grinding along behind an obstruction has
+neither left the channel nor stopped dead.
 """
 
 from __future__ import annotations
@@ -239,7 +244,9 @@ def main(argv: list[str] | None = None) -> int:
     report = {}
     print(f"{len(jobs)} trials over {len(names)} candidates in {wall:.1f}s")
     header = (
-        f"{'candidate':>12} | " + " | ".join(f"{m + ' span':>13}" for m in marks) + " | lost% | best/worst"
+        f"{'candidate':>16} | "
+        + " | ".join(f"{m + ' span':>13}" for m in marks)
+        + " | lost% | trail% | best/worst"
     )
     print(header)
     print("-" * len(header))
@@ -258,7 +265,8 @@ def main(argv: list[str] | None = None) -> int:
         )
         first = block["rank_span"][marks[0]]
         print(
-            f"{name:>12} | {spans} | {block['lost_pct']:5.2f} | "
+            f"{name:>16} | {spans} | {block['lost_pct']:5.2f} | "
+            f"{block['trailing_pct']:6.2f} | "
             f"{first['best_slot']}/{first['worst_slot']}"
         )
     print("-" * len(header))

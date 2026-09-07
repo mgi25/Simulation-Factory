@@ -208,15 +208,25 @@ FORK_SAMPLE = 82
 # climbs; full by +14, where the two channels have parted.
 FORK_GUARD_WINDOW = (-1, 0, 12, 14)
 
-# Orange's mouth is flared so its own east guard is outside leg3's from the
-# nose. That is what makes opening leg3's east guard safe *at* the nose: with
-# orange at hero width its guard only passes leg3's at about six samples in, so
-# for the first six there is a strip of leg3's floor with nothing on its edge,
-# and the field goes over it. At 1.28 the flare puts orange's guard at 2.11
-# against leg3's 1.61 from the first sample, so the combined channel has an
-# outer wall everywhere: blue's west guard on one side, orange's east on the
-# other, and no divider between them until they part.
-LEAD_MOUTH_FLARE = 1.28
+# Orange's mouth is at hero width, and the 1.28 flare it used to carry is gone.
+#
+# The flare existed to put orange's east guard outside leg3's from the nose,
+# because with the mouth on leg3's *centreline* orange's own guard only passed
+# leg3's about six samples in, leaving a strip of leg3's floor with nothing on
+# its edge. `ORANGE_MOUTH_ACROSS` solves that better: the mouth is now a channel
+# half-width east, so orange's east edge is at 3.30 against leg3's 1.61 from the
+# first sample and orange's guard is the outer wall throughout the window.
+#
+# Keeping the flare on top of the moved mouth was actively harmful, and this is
+# the measurement. A 1.28 flare makes orange's half 2.111 against leg3's 1.649,
+# so orange's *west* lip sits at leg3-frame across -0.505 - past leg3's own
+# centreline - and about 0.97 simulation units above leg3's floor, because the
+# mouth is up a 26-degree bank. That is a lip a marble diameter up, overhanging
+# the middle of leg3's channel, and a marble arriving at 43 wu/s hits it: 53 of
+# 158 losses over 28 seeds were booked to leg3[80..99] and 26 more to
+# orange_lead[0..19]. At hero width orange's west edge lands on leg3's
+# centreline instead of past it, and nothing overhangs.
+LEAD_MOUTH_FLARE = 1.0
 FORK_WINDOW_ORANGE = 14
 FORK_WINDOW_BLUE = 20          # how far the ridge runs
 

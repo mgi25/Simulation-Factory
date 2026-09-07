@@ -46,6 +46,7 @@ from marble3d.geometry import Transform
 from marble3d.machine import Machine
 from marble3d.units import MARBLE_RADIUS
 
+from sloped import course as _course
 from sloped import layout
 from sloped.race import LATERAL_SLACK, VERTICAL_SLACK
 from sloped.stations import Mixer, Spinners, StartGrid
@@ -54,6 +55,9 @@ from sloped.track import TrackRun
 __all__ = [
     "LAB_RUNS",
     "LAB_CHECKPOINTS",
+    "StartPlan",
+    "V1_PLAN",
+    "SHIPPED_PLAN",
     "start_machine",
     "SlotRow",
     "TrialResult",
@@ -71,6 +75,11 @@ LAB_RUNS = ("launch", "leg1")
 # course's 9% checkpoint falls (31.1 of 345.8 simulation units, which is 32.5%
 # of the lab), and `exit` is the lab's end - 27.7% of the full route.
 LAB_CHECKPOINTS = (("descent", 0.325), ("half", 0.60), ("exit", 0.98))
+
+# How far down the lab a marble has to have got by the end of the trial to
+# count as having come through the start. Below this it is trailing, whether
+# it fell out, stopped dead or is merely grinding along behind something.
+THROUGH_MARK = 0.85
 
 
 @dataclass(frozen=True)
@@ -109,7 +118,18 @@ class StartPlan:
         }
 
 
-V1_PLAN = StartPlan()
+# V1's start: one stud row on leg1 at the recorded `mix` node, nothing on the
+# launch. Kept as the scan's baseline - `tools/sloped_start_scan.py` quotes
+# every candidate against it - and not as anything the course still builds.
+V1_PLAN = StartPlan(name="v1")
+
+# What `sloped.course` builds. Read from the course's own constants rather than
+# retyped, so the lab cannot drift away from the thing it is measuring.
+SHIPPED_PLAN = StartPlan(
+    name="shipped",
+    mixers=(("launch", _course.MIXER_SAMPLE, Mixer.PIN_HEIGHT),),
+    wheels=(("launch", _course.SHUFFLE_SAMPLE, _course.SHUFFLE_RATE),),
+)
 
 
 def start_machine(config: CoreConfig | None = None, plan: StartPlan | None = None) -> Machine:
@@ -132,7 +152,7 @@ def start_machine(config: CoreConfig | None = None, plan: StartPlan | None = Non
     in this instrument and then confirmed on full races.
     """
     config = config or DEFAULT_CONFIG
-    plan = plan or V1_PLAN
+    plan = plan or SHIPPED_PLAN
     machine = Machine("sloped_b_start")
     runs = {name: TrackRun(name) for name in LAB_RUNS}
     machine.add(
@@ -183,6 +203,8 @@ class SlotRow:
     collisions: list[int] = field(default_factory=list)
     wall_ticks: list[int] = field(default_factory=list)
     lost: int = 0
+    stuck: int = 0
+    trailing: int = 0
 
     def mean_rank(self, checkpoint: str) -> float | None:
         values = self.ranks.get(checkpoint) or []
@@ -213,6 +235,10 @@ class SlotRow:
             ),
             "lost": self.lost,
             "lost_pct": round(100.0 * self.lost / self.trials, 3) if self.trials else None,
+            "stuck": self.stuck,
+            "stuck_pct": round(100.0 * self.stuck / self.trials, 3) if self.trials else None,
+            "trailing": self.trailing,
+            "trailing_pct": round(100.0 * self.trailing / self.trials, 3) if self.trials else None,
         }
 
 
@@ -227,6 +253,12 @@ class TrialResult:
     collisions: dict[int, int]
     wall_ticks: dict[int, int]
     lost: dict[int, tuple[str, int]]
+    stuck: dict[int, tuple[str, int]]
+    # Final arc progress per marble, as a fraction of the lab's length. The
+    # honest test of a start is whether the whole field got through it, and
+    # neither "left the channel" nor "stopped dead" catches a marble that is
+    # grinding along at 4 wu/s behind an obstruction with the leader long gone.
+    through: dict[int, float]
     reached: int
 
 
@@ -265,6 +297,14 @@ class StartTrial:
         self.collisions: dict[int, int] = {mid: 0 for mid in self.slot_of}
         self.wall_ticks: dict[int, int] = {mid: 0 for mid in self.slot_of}
         self.lost: dict[int, tuple[str, int]] = {}
+        # A marble that has stopped is as lost to a race as one that fell off,
+        # and the first version of this lab could not see the difference:
+        # `wheel-6.0-early` scored 0.55% lost here and then put 17.2% of the
+        # full course's field into the "stuck" column, all of it at launch[0],
+        # because a paddle wheel at the launch entry holds a slow field up. A
+        # lab that cannot see a jam cannot be used to choose a jamming part.
+        self.stuck: dict[int, tuple[str, int]] = {}
+        self._slow: dict[int, int] = {}
         self._where: dict[int, tuple[str, int]] = {}
         self._left_start: dict[int, int] = {}
         self.ranks: dict[str, dict[int, int]] = {}
@@ -326,6 +366,25 @@ class StartTrial:
         if abs(across) > half + LATERAL_SLACK or height > run.containment + VERTICAL_SLACK:
             self.lost[marble_id] = (name, index)
 
+    # Under this speed for this many ticks and a marble is not racing. One
+    # second at 240 Hz, and 1.5 wu/s is a thirtieth of the speed the launch
+    # delivers - slow enough that a marble merely being nudged along by the
+    # field does not count.
+    STOPPED_SPEED = 1.5
+    STOPPED_FOR = 240
+
+    def _stall(self, marble_id: int, velocity: Sequence[float]) -> None:
+        if marble_id in self.lost or marble_id in self.stuck:
+            return
+        if math.hypot(*velocity) >= self.STOPPED_SPEED:
+            self._slow[marble_id] = 0
+            return
+        self._slow[marble_id] = self._slow.get(marble_id, 0) + self.LOCATE_EVERY
+        if self._slow[marble_id] >= self.STOPPED_FOR:
+            place = self._where.get(marble_id)
+            if place is not None:
+                self.stuck[marble_id] = place
+
     def step(self) -> None:
         sim = self.sim
         sim.step()
@@ -348,6 +407,7 @@ class StartTrial:
             position = sim.marbles[marble_id].pose[0]
             self._locate(marble_id, position, touched.get(marble_id, set()))
             self._containment(marble_id, position)
+            self._stall(marble_id, sim.marbles[marble_id].pose[2])
             place = self._where.get(marble_id)
             if marble_id not in self._left_start and place is not None:
                 # Past the launch run's own first eight samples is out of the
@@ -369,6 +429,23 @@ class StartTrial:
                 self.ranks[name] = {mid: rank for rank, mid in enumerate(order, start=1)}
                 self.checkpoint_progress[name] = dict(self.progress)
 
+    def settled(self) -> bool:
+        """Every checkpoint taken and every marble accounted for.
+
+        Not "the leader has finished", which is what this was. A trial that
+        stops with the leader leaves the back of the field wherever it happens
+        to be, so a start that holds four marbles up looks the same as one that
+        does not - which is exactly how a wheel that put 17% of the full
+        course's field into the stuck column scored 0.55% here.
+        """
+        if len(self._done) < len(LAB_CHECKPOINTS):
+            return False
+        mark = THROUGH_MARK * self.length
+        return all(
+            self.progress[marble] >= mark or marble in self.lost or marble in self.stuck
+            for marble in self.slot_of
+        )
+
     def result(self, seconds: float) -> TrialResult:
         by_tick = sorted(self._left_start, key=lambda mid: self._left_start[mid])
         exit_order = {mid: place for place, mid in enumerate(by_tick, start=1)}
@@ -382,6 +459,10 @@ class StartTrial:
             collisions=dict(self.collisions),
             wall_ticks=dict(self.wall_ticks),
             lost=dict(self.lost),
+            stuck=dict(self.stuck),
+            through={
+                marble: self.progress[marble] / self.length for marble in self.slot_of
+            },
             reached=len(self._done),
         )
 
@@ -391,14 +472,14 @@ def run_trial(
     machine: Machine | None = None,
     config: CoreConfig | None = None,
     marble_count: int = 8,
-    duration: float = 9.0,
+    duration: float = 14.0,
 ) -> TrialResult:
     """One seed of the start lab, run for `duration` seconds of sim time.
 
-    Nine seconds is what the field needs to clear leg1 at the speeds the launch
-    gives it, with room for the last marble off a slow gate. A trial that has
-    not reached its last checkpoint by then reports `reached` short, and
-    `summarise` counts those rather than averaging over them.
+    Fourteen seconds is what the whole field needs to clear leg1, not what the
+    leader needs - the difference is the point, and `settled` explains it. A
+    trial that has not reached its last checkpoint by then reports `reached`
+    short, and `summarise` counts those rather than averaging over them.
     """
     config = config or DEFAULT_CONFIG
     machine = machine or start_machine(config)
@@ -410,7 +491,7 @@ def run_trial(
     # trials in one worker exhausts them - measured, as a `BrokenProcessPool`
     # part way through a nine-candidate sweep.
     try:
-        while trial.sim.ticks < max_ticks and len(trial._done) < len(LAB_CHECKPOINTS):
+        while trial.sim.ticks < max_ticks and not trial.settled():
             trial.step()
         return trial.result(time.perf_counter() - started)
     finally:
@@ -445,6 +526,10 @@ def summarise(results: Sequence[TrialResult], slots: int = layout.BAYS) -> dict[
             row.wall_ticks.append(result.wall_ticks.get(marble_id, 0))
             if marble_id in result.lost:
                 row.lost += 1
+            if marble_id in result.stuck:
+                row.stuck += 1
+            if result.through.get(marble_id, 0.0) < THROUGH_MARK:
+                row.trailing += 1
 
     spans: dict[str, Any] = {}
     for name, _ in LAB_CHECKPOINTS:
@@ -466,6 +551,8 @@ def summarise(results: Sequence[TrialResult], slots: int = layout.BAYS) -> dict[
         }
 
     lost_total = sum(row.lost for row in rows.values())
+    stuck_total = sum(row.stuck for row in rows.values())
+    trailing_total = sum(row.trailing for row in rows.values())
     trials_total = sum(row.trials for row in rows.values())
     first = LAB_CHECKPOINTS[0][0]
     last = LAB_CHECKPOINTS[-1][0]
@@ -475,6 +562,12 @@ def summarise(results: Sequence[TrialResult], slots: int = layout.BAYS) -> dict[
         "racers": trials_total,
         "lost": lost_total,
         "lost_pct": round(100.0 * lost_total / trials_total, 3) if trials_total else None,
+        "stuck": stuck_total,
+        "stuck_pct": round(100.0 * stuck_total / trials_total, 3) if trials_total else None,
+        "trailing": trailing_total,
+        "trailing_pct": (
+            round(100.0 * trailing_total / trials_total, 3) if trials_total else None
+        ),
         "checkpoints": [name for name, _ in LAB_CHECKPOINTS],
         "rank_span": spans,
         "early_rank_span": spans[first]["span"],

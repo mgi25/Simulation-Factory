@@ -40,6 +40,33 @@ POINT_TOLERANCE = 2.0e-3
 SCALAR_TOLERANCE = 5.0e-3
 ANGLE_TOLERANCE = 0.05
 
+# The one place the reconstruction is *meant* to disagree with the record, and
+# by how much. Named here rather than absorbed into a looser tolerance, because
+# a tolerance wide enough to hide this would be wide enough to hide the next
+# thing, and the value of the contract is that a gap is a finding.
+#
+# Orange's three tail control heights were redistributed to stop the run
+# climbing; `sloped.layout` carries the measurement. The plan curve is
+# untouched, so the deviation is in height alone, and the recorded 26-point
+# centreline moves only at the samples that fall in that tail. `drop` is
+# unchanged because both endpoints are.
+#
+# A deviation still has a budget. If the reconstruction ever moves further than
+# this it is a finding again.
+DEVIATIONS: dict[tuple[str, str], tuple[float, str]] = {
+    ("orange", "centreline"): (
+        0.16,
+        "orange's tail heights are redistributed so the run stops climbing "
+        "(sloped.layout); plan unchanged, height moves by at most 0.145",
+    ),
+    # And the run is 0.0076 shorter for it, because a tail that no longer
+    # overshoots in height is a shorter curve through the same plan points.
+    ("orange", "length"): (
+        0.01,
+        "the redistributed tail is 0.0076 shorter than the overshooting one",
+    ),
+}
+
 
 def load(path: str = CONTRACT_PATH) -> dict[str, Any]:
     with open(path, "r", encoding="utf-8") as handle:
@@ -99,16 +126,22 @@ def check(contract: dict[str, Any] | None = None) -> list[Finding]:
             gap = math.dist(mine, theirs)
             if gap > worst:
                 worst, worst_at = gap, index
-        if worst > POINT_TOLERANCE:
+        allowed, why = DEVIATIONS.get((name, "centreline"), (POINT_TOLERANCE, ""))
+        if worst > allowed:
             report(
                 "centreline",
                 name,
                 f"sample {worst_at} of 26 is {worst:.5f} from the recorded point "
-                f"(budget {POINT_TOLERANCE})",
+                f"(budget {allowed})" + (f" - {why}" if why else ""),
             )
 
         pairs = (
-            ("length", path_length(path), float(recorded["length"]), SCALAR_TOLERANCE),
+            (
+                "length",
+                path_length(path),
+                float(recorded["length"]),
+                DEVIATIONS.get((name, "length"), (SCALAR_TOLERANCE, ""))[0],
+            ),
             ("drop", path[0][1] - path[-1][1], float(recorded["drop"]), SCALAR_TOLERANCE),
             (
                 "clear_width",
@@ -194,6 +227,27 @@ def facts(contract: dict[str, Any] | None = None) -> dict[str, Any]:
             "recorded_bank_max_deg": recorded["bank_max_deg"],
         }
     out["worst_centreline_gap"] = round(worst_point, 6)
+    out["per_run_centreline_gap"] = {
+        name: block["worst_centreline_gap"] for name, block in out["runs"].items()
+    }
+    # The same number with the named deviations left out, which is what says
+    # whether the *port* is still exact. A report that quoted only the first
+    # would read as though the reconstruction had drifted.
+    out["worst_centreline_gap_excluding_deviations"] = round(
+        max(
+            (
+                gap
+                for name, gap in out["per_run_centreline_gap"].items()
+                if (name, "centreline") not in DEVIATIONS
+            ),
+            default=0.0,
+        ),
+        6,
+    )
+    out["deviations"] = {
+        f"{name}.{what}": {"budget": budget, "why": why}
+        for (name, what), (budget, why) in DEVIATIONS.items()
+    }
     out["total_hero_length"] = round(
         sum(out["runs"][name]["length"] for name in ("launch", "leg1", "leg2", "leg3", "final")), 4
     )

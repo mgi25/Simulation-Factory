@@ -45,8 +45,21 @@ def test_the_reconstruction_agrees_with_the_recorded_contract():
 
 
 def test_the_worst_recorded_point_is_within_json_rounding():
+    """Every run but orange still agrees to the JSON writer's own rounding.
+
+    Orange is the named deviation - its three tail heights were redistributed
+    to stop the run climbing - so it is checked against its own budget in
+    `contract.DEVIATIONS` and excluded here rather than being allowed to widen
+    the tolerance for the other six.
+    """
     facts = contract.facts()
-    assert facts["worst_centreline_gap"] < 1.0e-3, facts["worst_centreline_gap"]
+    assert facts["worst_centreline_gap_excluding_deviations"] < 1.0e-3, facts
+
+    # And the deviation itself is the size it is supposed to be, in height only.
+    orange = facts["per_run_centreline_gap"]["orange"]
+    budget, _why = contract.DEVIATIONS[("orange", "centreline")]
+    assert orange < budget
+    assert orange > 1.0e-3, "the deviation is gone; drop it from DEVIATIONS"
 
 
 def test_the_sample_count_is_the_one_the_stills_were_taken_at():

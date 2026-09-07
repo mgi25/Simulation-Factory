@@ -196,13 +196,25 @@ const B_RUNS := [
 		Vector3(-15.20, 6.70, 28.60), Vector3(-13.40, 5.90, 31.80),
 		Vector3(-9.60, 5.40, 33.80), Vector3(-6.00, 5.18, 34.60),
 		Vector3(-3.20, 5.00, 35.40), Vector3(-1.10, 4.90, 36.05)]},
+	# The three tail heights marked below were 5.20, 5.18 and 5.00 as first
+	# authored. Four control points inside half a unit of each other over
+	# fourteen units of travel make a Catmull-Rom overshoot, and orange was the
+	# only run of the nine that climbed: ten uphill samples, 86 to 95. A marble
+	# arriving at orange[102] with 10 wu/s crawled the flat and stopped at
+	# orange[114], which is where every orange-bound marble died.
+	#
+	# The fall from control 5 to control 9 is now spread linearly in horizontal
+	# arc length, which makes the tail monotone at -0.049 - blue's own tail
+	# grade. Every x and z is untouched, so the silhouette is unchanged; three
+	# heights move, by at most 0.145. Kept in step with `sloped/layout.py`,
+	# which is the physics' copy of this table.
 	{"name": "orange", "role": "branch", "scale": BRANCH_SCALE,
 		"bank_gain": 4.0, "bank_max": 32.0, "controls": [
 		Vector3(6.90, 10.40, 18.55), Vector3(13.00, 9.20, 21.00),
 		Vector3(18.40, 8.20, 23.60), Vector3(21.00, 7.20, 27.00),
 		Vector3(19.40, 6.30, 30.60), Vector3(15.00, 5.60, 33.20),
-		Vector3(10.00, 5.20, 34.60), Vector3(5.60, 5.18, 34.70),
-		Vector3(3.20, 5.00, 35.45), Vector3(1.10, 4.90, 36.05)]},
+		Vector3(10.00, 5.3456, 34.60), Vector3(5.60, 5.1300, 34.70),
+		Vector3(3.20, 5.0069, 35.45), Vector3(1.10, 4.90, 36.05)]},
 	{"name": "final", "role": "sprint", "scale": HERO_SCALE,
 		"bank_gain": 2.2, "bank_max": 14.0, "controls": [
 		Vector3(0.00, 4.85, 36.40), Vector3(2.60, 4.15, 37.60),

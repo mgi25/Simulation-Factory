@@ -270,10 +270,13 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
     # than on leg1. `sloped.startlab` measured them; `MIXER_SAMPLE` and
     # `SHUFFLE_SAMPLE` carry the argument.
     machine.add(Mixer("mixer", runs["launch"], at=MIXER_SAMPLE), Transform())
-    machine.add(
-        Spinners("shuffle", runs["launch"], at=SHUFFLE_SAMPLE, offsets=(0.0,), rate=SHUFFLE_RATE),
-        Transform(),
-    )
+    if SHUFFLE_SAMPLE is not None:
+        machine.add(
+            Spinners(
+                "shuffle", runs["launch"], at=SHUFFLE_SAMPLE, offsets=(0.0,), rate=SHUFFLE_RATE
+            ),
+            Transform(),
+        )
     machine.add(Spinners("obstacle", runs["leg2"]), Transform())
     if forked:
         machine.add(
