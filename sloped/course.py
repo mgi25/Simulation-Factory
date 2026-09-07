@@ -166,19 +166,44 @@ MERGE_GUARD_WINDOW = (0.0, -1, 0, 9, 14)
 # the channel; here it arrives at 13 and the same stud deflects it. Losses over
 # the start and leg1 fell from 15.95% to 1.19% on that move alone.
 #
-# **A single four-blade wheel at launch sample 7**, turning at 6.0 rad/s. It is
-# the one mechanism tried that *reduces* the bias rather than sharpening it,
-# and the reason is arithmetic: a marble's wait at a wheel is its arrival time
-# modulo the blade period, so the output order is not monotone in the input
-# order. Four blades at 6.0 rad/s pass every 0.26 s against the 0.32 s spread
-# to be undone. Over 250 seeds it takes the rank span at the early checkpoint
-# from 3.796 places to 2.444 and the loss rate to 0.55%.
+# **A single four-blade wheel at launch sample 32**, turning at 9.0 rad/s - the
+# same `Spinners` class as the course's own obstacle, one wheel instead of
+# three, so it is native to the machine rather than bolted on.
 #
-# It is the same `Spinners` class as the course's own obstacle, one wheel
-# instead of three, so it is native to the machine rather than bolted on.
+# It went in as a fairness mechanism at sample 7 and stayed as a reliability
+# one, and the correction is worth recording because the lab got it wrong
+# first. A wheel is the only mechanism scanned whose output order is not
+# monotone in its input order - a marble's wait is its arrival time modulo the
+# blade period - and at sample 7, where the field is still a clump, it did take
+# the rank span from 3.71 places to 2.33. It also held 13% of the field up
+# doing it, and on the real course that was **18.8% stuck**, all at launch[0].
+# The lab could not see it, because a marble grinding along behind an
+# obstruction has neither left the channel nor stopped dead; `startlab`'s
+# `trailing` exists because of this row.
+#
+# A span bought by jamming a fifth of the field is not fairness. Faster is
+# worse, not better - at 12 rad/s the same wheel bats a 13 wu/s marble back up
+# the channel and 80% of the field never leaves. On the real course, 16 seeds
+# of eight:
+#
+#     wheel             finish  escape   stuck
+#     none               0.906   0.031   0.062
+#     sample  7,  6.0    0.802   0.010   0.188
+#     sample  7, 12.0    0.177   0.021   0.802
+#     sample 24,  9.0    0.922   0.016   0.062
+#     sample 32,  9.0    0.969   0.016   0.016
+#     sample 40,  9.0    0.930   0.016   0.055
+#
+# So the wheel belongs downstream, where the field is at 30 wu/s and the blade
+# tip at 9.5 is a tap rather than a gate. At sample 32 it beats having no wheel
+# at all on every count, and it still takes the span from 3.705 to 3.345.
+#
+# **That 10% is the honest size of the fairness win.** The bias is diagnosed
+# exactly - see above - and no physical geometry scanned in this session
+# removes it without wrecking the race. `docs/sloped_race_v11.md` says so.
 MIXER_SAMPLE = 5
-SHUFFLE_SAMPLE = 7
-SHUFFLE_RATE = 6.0
+SHUFFLE_SAMPLE = 32
+SHUFFLE_RATE = 9.0
 
 
 def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Machine:

@@ -188,6 +188,39 @@ CANDIDATES: dict[str, StartPlan] = {
         wheels=(("launch", 5, 6.0), ("launch", 14, -6.0)),
     ),
     "wheel-e7-only": StartPlan(name="wheel-e7-only", mixers=(), wheels=(("launch", 7, 6.0),)),
+    # --- after the real course said the early wheel jams ---------------------
+    #
+    # `wheel-6.0-early` scored best of everything here and then put 18.8% of the
+    # full course's field into the stuck column, all of it at launch[0]. The lab
+    # could not see it, because a marble grinding along behind an obstruction
+    # has neither left the channel nor stopped dead; `THROUGH_MARK` and
+    # `trailing` exist because of that, and this row is what they were added to
+    # separate. On the real course, 12 seeds of eight:
+    #
+    #     wheel            finish  escape   stuck
+    #     none              0.906   0.010   0.083
+    #     sample  7, 6.0    0.802   0.010   0.188
+    #     sample  7, 12.0   0.177   0.021   0.802
+    #     sample 16, 6.0    0.885   0.010   0.104
+    #     sample 24, 9.0    0.927   0.021   0.052
+    #
+    # A *faster* blade at sample 7 is worse, not better: it bats a 13 wu/s
+    # marble back up the channel instead of flicking it through. Downstream is
+    # where a wheel can be a wheel, because the field is at 30 wu/s there and
+    # the blade tip is not.
+    "no-wheel": StartPlan(name="no-wheel", mixers=(("launch", 5, 0.07),)),
+    "wheel-s16-r6": StartPlan(
+        name="wheel-s16-r6", mixers=(("launch", 5, 0.07),), wheels=(("launch", 16, 6.0),)
+    ),
+    "wheel-s24-r9": StartPlan(
+        name="wheel-s24-r9", mixers=(("launch", 5, 0.07),), wheels=(("launch", 24, 9.0),)
+    ),
+    "wheel-s24-r6": StartPlan(
+        name="wheel-s24-r6", mixers=(("launch", 5, 0.07),), wheels=(("launch", 24, 6.0),)
+    ),
+    "wheel-s32-r9": StartPlan(
+        name="wheel-s32-r9", mixers=(("launch", 5, 0.07),), wheels=(("launch", 32, 9.0),)
+    ),
 }
 
 

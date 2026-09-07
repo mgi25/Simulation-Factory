@@ -53,17 +53,10 @@ def test_lab_carries_the_shipped_start_correction():
     assert len(shuffle._stations()) == 1
 
 
-@pytest.fixture(scope="module")
-def shipped_plan() -> StartPlan:
-    return StartPlan(
-        name="shipped",
-        mixers=(("launch", MIXER_SAMPLE, 0.07),),
-        wheels=(("launch", SHUFFLE_SAMPLE, 6.0),),
-    )
+def test_start_machine_matches_the_course_module_for_module():
+    from sloped.startlab import SHIPPED_PLAN
 
-
-def test_start_machine_matches_the_course_module_for_module(shipped_plan):
-    lab = start_machine(plan=shipped_plan)
+    lab = start_machine(plan=SHIPPED_PLAN)
     course = sloped_course(routes="both")
     assert lab.modules["mixer"].describe()["pins"] == course.modules["mixer"].describe()["pins"]
     assert (
@@ -129,6 +122,8 @@ def test_summarise_reports_a_span_per_checkpoint_and_a_row_per_slot():
             collisions={m: 0 for m in range(8)},
             wall_ticks={m: 0 for m in range(8)},
             lost={},
+            stuck={},
+            through={m: 1.0 for m in range(8)},
             reached=len(LAB_CHECKPOINTS),
         )
         for seed in range(3)
