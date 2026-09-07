@@ -309,6 +309,29 @@ class StartGrid(MarbleModule):
         two rails, and a kinematic box that starts inside static geometry is a
         contact the solver has to resolve on tick one. Eight paddles in eight
         bays touch nothing.
+
+        ## The axis order, and why it was wrong
+
+        `basis_from_forward_up` is explicit that "`forward` becomes +X
+        exactly", so a box built with that rotation has its local **X** along
+        whatever was passed as forward, its Y along up, and its Z across. The
+        `Spinner` below passes the blade's own long axis as forward and so its
+        extents read (long, height, thin) correctly. This gate passes the
+        *direction the marbles travel* - a second, equally natural reading of
+        the word - and for a while still listed its extents as (bay width,
+        height, thin).
+
+        That made every paddle a 0.9-long, 0.16-wide blade lying **down the
+        middle of its own bay** instead of a barrier across it, and it showed
+        up as the deepest overlap anywhere in the project: all eight marbles
+        seeded 0.34 simulation units - a third of a diameter - inside their own
+        paddle, with a contact normal along the flow rather than across it,
+        pushed out over the first forty ticks. A gate rotated into a rail does
+        not gate; the field left the grid because the fan is downhill, not
+        because anything released it.
+
+        The extents are therefore (thin, height, bay width): thin along the
+        flow, which is the axis a gate is thin on.
         """
         from marble3d.modules.base import LinearGate
 
@@ -328,10 +351,12 @@ class StartGrid(MarbleModule):
             gates.append(
                 LinearGate(
                     name=f"paddle{index}",
+                    # (along, up, across). See the docstring: the rotation puts
+                    # the flow direction on local X, so the thin axis is X.
                     half_extents=(
-                        to_sim(0.5 * (layout.BAY_PITCH - 0.12)),
-                        to_sim(0.5 * layout.GATE_HEIGHT),
                         to_sim(0.045),
+                        to_sim(0.5 * layout.GATE_HEIGHT),
+                        to_sim(0.5 * (layout.BAY_PITCH - 0.12)),
                     ),
                     rest=Transform(position=position, rotation=self._rotation()),
                     travel=(0.0, to_sim(self.release_travel), 0.0),
