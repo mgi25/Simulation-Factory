@@ -100,6 +100,24 @@ def terrain_config(runs: dict[str, Any] | None = None) -> dict[str, Any]:
     `index_cut`, and it hands it every run whether or not the physics races it.
     Cutting from five runs instead would move the bench under the two branch
     lobes and put every camera near them a couple of units out.
+
+    ## Why the runs are always the *drawn* ones
+
+    `runs` is accepted and deliberately not used for the cut. The scene builds
+    its bench from the layout table, and the raced build's `blue` is not the
+    layout's `blue`: `joins.blue_controls` enters the lobe at its second
+    authored control so the join has room for its turn radius, which makes the
+    raced lobe a shorter curve over the same corridor. It lies on the drawn
+    ribbon to within 0.064 layout units - a ninth of a marble radius - but its
+    118 samples sit at different arc positions, and a bench indexed from those
+    samples is a slightly different bench. Measured against the scene's own
+    dump, cutting from the raced runs put the port 0.021 layout units out at
+    its worst; cutting from the drawn ones puts it at 1.7e-5.
+
+    0.021 would never have mattered against a sight margin of 0.6. It is fixed
+    because "the port is exact" is a claim worth being able to make without a
+    footnote, and because the next thing to consult this will not necessarily
+    have a 0.6-unit tolerance.
     """
     from sloped.track import TrackRun
 
@@ -129,8 +147,7 @@ def terrain_config(runs: dict[str, Any] | None = None) -> dict[str, Any]:
     }
     centreline: list[tuple[float, float, float]] = []
     for name in layout.run_names():
-        run = runs[name] if runs and name in runs else TrackRun(name)
-        centreline.extend(run.path)
+        centreline.extend(TrackRun(name).path)
     index_cut(cfg, resample(centreline, max(len(centreline) // 3, 8)))
     return cfg
 

@@ -157,3 +157,46 @@ def test_clearance_is_positive_from_high_above(cfg):
     above = (aim[0], aim[1] + 120.0, aim[2] + 1.0)
     assert terrain.clearance(above, aim, cfg) > 0.0
     assert not terrain.sight_line_blocked(above, aim, cfg)
+
+
+def test_the_port_is_exact_not_merely_close(dump, cfg):
+    ## Tighter than the tolerance above, and the reason the bench is cut from
+    ## the drawn layout rather than from the raced build: at 1.7e-5 the port is
+    ## the scene's terrain, and cutting from the raced runs put it 0.021 out.
+    worst = max(abs(terrain.height(x, z, cfg) - y) for x, z, y in dump["samples"])
+    assert worst < 1e-4, worst
+
+
+def test_the_raced_blue_lobe_lies_on_the_drawn_ribbon():
+    """The physics runs where the video draws, on the one run that differs.
+
+    `joins.blue_controls` enters blue at its second authored control so the
+    join has room for its turn radius, which makes the raced lobe a shorter
+    curve than the drawn one - and comparing them sample for sample says they
+    are 6.73 layout units apart, which is a statement about parameterisation
+    and not about geometry. What matters for an honest render is the
+    perpendicular distance from the raced path to the drawn ribbon, and that is
+    a ninth of a marble radius.
+    """
+    import math
+
+    from sloped.course import sloped_course
+    from sloped.track import TrackRun
+
+    def nearest(point, polyline):
+        best = math.inf
+        for a, b in zip(polyline, polyline[1:]):
+            span = [b[axis] - a[axis] for axis in range(3)]
+            length = sum(value * value for value in span)
+            if length < 1e-12:
+                best = min(best, math.dist(point, a))
+                continue
+            t = sum((point[axis] - a[axis]) * span[axis] for axis in range(3)) / length
+            t = max(0.0, min(1.0, t))
+            best = min(best, math.dist(point, [a[axis] + span[axis] * t for axis in range(3)]))
+        return best
+
+    drawn = TrackRun("blue").path
+    raced = sloped_course().runs["blue"].path
+    worst = max(nearest(point, drawn) for point in raced)
+    assert worst < 0.5 * layout.MARBLE_RADIUS, worst
