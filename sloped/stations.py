@@ -166,14 +166,20 @@ class StartGrid(MarbleModule):
         deflectors: tuple[tuple[float, float, float, float], ...] | None = None,
         tray: tuple[float, float, float] | None = None,
         fall_profile: tuple[float, float] | None = None,
+        front_half: float | None = None,
     ) -> None:
         super().__init__(module_id)
         self.deflectors = self.DEFLECTORS if deflectors is None else tuple(deflectors)
         self.tray = self.TRAY if tray is None else tray
+        # What the fan hands over to, in layout units. `CHANNEL_HALF` unless
+        # the launch has been opened out to carry the mixing stretch, in which
+        # case the fan has to meet it there or the field is single file before
+        # it arrives - which is the whole thing being avoided.
+        self.front_half = layout.CHANNEL_HALF if front_half is None else float(front_half)
         self.fall_profile = self.FALL_PROFILE if fall_profile is None else fall_profile
         if self.tray is not None:
             opening, closing, tray_half = self.tray
-            if not self.GRID_HOLD < opening < closing < 1.0:
+            if not self.GRID_HOLD < opening <= closing <= 1.0:
                 raise ValueError(
                     f"a tray converges after the grid and closes inside the fan; "
                     f"got {self.tray} against a grid held to {self.GRID_HOLD}"
@@ -236,7 +242,7 @@ class StartGrid(MarbleModule):
         # 0.08 difference puts the physical apron wall a seventh of a marble
         # diameter inside the drawn one, at the one place the drawn one is
         # hidden behind the launch channel's own lip.
-        front = layout.CHANNEL_HALF
+        front = self.front_half
         back = layout.START_BACK_HALF
         if self.tray is None:
             eased = _smoothstep(0.10, 1.0, t)
@@ -723,6 +729,8 @@ class Mixer(MarbleModule):
         run: TrackRun,
         at: int | None = None,
         pin_height: float | None = None,
+        pin_radius: float | None = None,
+        span: float | None = None,
     ) -> None:
         super().__init__(module_id)
         self.run = run
@@ -731,19 +739,37 @@ class Mixer(MarbleModule):
         # rather than eighteen units of single file.
         self.index = run.index_near(layout.NODES["mix"]) if at is None else int(at)
         self.pin_height = self.PIN_HEIGHT if pin_height is None else float(pin_height)
+        self.pin_radius = (
+            layout.MIXER_PIN_RADIUS if pin_radius is None else float(pin_radius)
+        )
+        # How much of the channel's *local* clear width the row spans. The
+        # asset's 0.86 is right for a 1.88 channel; the start's mixing stretch
+        # opens the launch to 4.7 and the row has to open with it, or nine pins
+        # sit in the middle of a wide floor with a clear lane either side.
+        self.span = 0.86 if span is None else float(span)
         self._mesh: TriMesh | None = None
 
     def _pins(self) -> list[tuple[int, float]]:
-        """(sample offset, across in profile units) for each pin."""
-        half = layout.CHANNEL_HALF * self.run.scale
+        """(sample offset, across in profile units) for each pin.
+
+        The row spans the channel's width *at its own sample*, including any
+        `width_profile` the run carries, rather than the authored 1.88. A row
+        that ignores the local width leaves a clear lane down each side of a
+        widened stretch, which is a lane a marble takes every time.
+        """
+        half = layout.CHANNEL_HALF * self.run.scale * self.run.widths[self.index]
         spacing = self.run.arc[-1] / (len(self.run.path) - 1)
         rows: list[tuple[int, float]] = []
         for row, count in enumerate(layout.MIXER_ROW_COUNTS):
             offset = int(round(layout.MIXER_ROW_Z[row] / spacing))
             for pin in range(count):
                 # Five across the clear width, four in the gaps between them.
-                span = (pin - (count - 1) * 0.5) * (2.0 * half * 0.86 / (count - 1)) if count > 1 else 0.0
-                rows.append((offset, span / self.run.scale))
+                across = (
+                    (pin - (count - 1) * 0.5) * (2.0 * half * self.span / (count - 1))
+                    if count > 1
+                    else 0.0
+                )
+                rows.append((offset, across / self.run.scale))
         return rows
 
     # The drawn pin runs from y = -0.62 to -0.06 in the module's frame and the
@@ -782,7 +808,7 @@ class Mixer(MarbleModule):
         if self._mesh is not None:
             return [self._mesh]
         pieces: list[TriMesh] = []
-        radius = to_sim(layout.MIXER_PIN_RADIUS * self.run.scale)
+        radius = to_sim(self.pin_radius * self.run.scale)
         height = to_sim(self.pin_height * self.run.scale)
         for offset, across in self._pins():
             index = min(max(self.index + offset, 0), len(self.run.path) - 1)
@@ -811,7 +837,7 @@ class Mixer(MarbleModule):
             "on": self.run.id,
             "sample": self.index,
             "rows": list(layout.MIXER_ROW_COUNTS),
-            "pin_radius": round(to_sim(layout.MIXER_PIN_RADIUS * self.run.scale), 6),
+            "pin_radius": round(to_sim(self.pin_radius * self.run.scale), 6),
             "pin_height": round(to_sim(self.pin_height * self.run.scale), 6),
             "pins": [[offset, round(across, 4)] for offset, across in self._pins()],
         }

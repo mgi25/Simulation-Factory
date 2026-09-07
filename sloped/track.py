@@ -189,6 +189,7 @@ class TrackRun(MarbleModule):
         path: Sequence[Sequence[float]] | None = None,
         open_side: tuple[float, int, int] | None = None,
         taper: tuple[float, float] | None = None,
+        width_profile: tuple[float, int, int] | None = None,
     ) -> None:
         super().__init__(name)
         # (side, a, b, c, d): the wall on `side` is at full height before
@@ -206,6 +207,18 @@ class TrackRun(MarbleModule):
         # beyond. Measured on the first run that reached the fork: three of
         # eight marbles left the course on the orange lead at 22 to 52 wu/s.
         self.taper = taper
+        # (factor, hold to sample, blended by sample): the run opens `factor`
+        # times its authored width, holds it, then eases back to authored.
+        #
+        # This is how the start's mixing region gets somewhere to happen. The
+        # fan has 0.63 layout units of drop over 7.34 - 4.9 degrees - so a
+        # stretch held wide inside it runs at 1.7 degrees once the drop either
+        # side is paid for, and a marble that loses speed on a bumper there
+        # never gets it back: measured, three quarters of the field trailing.
+        # The launch runs at 25 to 43 degrees. So the fan stays wide to the
+        # seam and the *launch* carries the wide mixing stretch and the
+        # convergence, where there is energy to spend.
+        self.width_profile = width_profile
         spec = layout.run(name) if spec is None else spec
         self.spec = spec
         self.scale = float(spec["scale"])
@@ -254,6 +267,20 @@ class TrackRun(MarbleModule):
             count = len(self.path)
             self.widths = [
                 width * (entry + (leaving - entry) * _ease(index / max(count - 1, 1)))
+                for index, width in enumerate(self.widths)
+            ]
+        if width_profile is not None:
+            factor, hold_to, blend_to = width_profile
+            span = max(blend_to - hold_to, 1)
+            self.widths = [
+                width
+                * (
+                    factor
+                    if index <= hold_to
+                    else 1.0
+                    if index >= blend_to
+                    else factor + (1.0 - factor) * _ease((index - hold_to) / span)
+                )
                 for index, width in enumerate(self.widths)
             ]
         self.section = channel_profile(self.scale)

@@ -62,6 +62,23 @@ def _stagger(gain: float, skew: float = 0.0) -> tuple[float, ...]:
     return tuple(gain * abs(x) + skew * x for x in _BAY_X)
 
 
+def _bumpers(marks, counts, height, radius, span=0.62, stagger=False):
+    """Staggered bumper rows across a tray: `counts[i]` posts at `marks[i]`.
+
+    Alternating counts put one row's posts in the previous row's gaps, so a
+    marble that threads one meets the next off-centre. `span` is a fraction of
+    the local half width and keeps the outermost post off the wall, because a
+    post *at* the wall is a wall and narrows the tray instead of stirring it.
+    """
+    out = []
+    for row, (at, count) in enumerate(zip(marks, counts)):
+        shift = span * 0.5 if (stagger and row % 2) else 0.0
+        for post in range(count):
+            across = 0.0 if count == 1 else (post - (count - 1) * 0.5) * (2.0 * span / (count - 1))
+            out.append((at, across + shift, height, radius))
+    return tuple(out)
+
+
 def _rows(marks, counts, height, span=0.72):
     """Staggered stud rows in the fan: `counts[i]` studs across at `marks[i]`.
 
@@ -73,7 +90,7 @@ def _rows(marks, counts, height, span=0.72):
     for at, count in zip(marks, counts):
         for pin in range(count):
             across = 0.0 if count == 1 else (pin - (count - 1) * 0.5) * (2.0 * span / (count - 1))
-            out.append((at, across, height))
+            out.append((at, across, height, 0.075))
     return tuple(out)
 
 
@@ -220,6 +237,180 @@ CANDIDATES: dict[str, StartPlan] = {
     ),
     "wheel-s32-r9": StartPlan(
         name="wheel-s32-r9", mixers=(("launch", 5, 0.07),), wheels=(("launch", 32, 9.0),)
+    ),
+    # --- V1.2: a different topology, not another variation of the funnel -----
+    #
+    # Everything above lives inside one continuous 7.34-unit taper from 5.46
+    # wide to 1.88, and inside that topology the ordering is not removable: the
+    # queue at the throat is ordered by lateral distance to it, which is bay
+    # index. `tray` replaces the taper with converge-hold-converge, and the
+    # bumpers only mean anything in the held stretch, where a deflected marble
+    # has somewhere to go.
+    #
+    # The point is not that the funnel stops ordering the field. It is that
+    # what the funnel orders is no longer a function of the bay.
+    #
+    # Bumpers have to be sparse. The first set - three posts a row at 0.62 of
+    # the half width, 0.30 tall and 0.22 across - left gaps of one marble
+    # diameter at the wall and stood taller than a marble's own centre, so they
+    # were a barrier and not a bumper: two thirds of the field trailed. A post
+    # is a bumper when a marble can pass either side without queueing, which
+    # needs the gaps near two diameters and the height near the equator.
+    "tray-plain": StartPlan(
+        name="tray-plain",
+    mixers=(("launch", 5, 0.07),),
+        wheels=(("launch", 32, 9.0),),
+        tray=(0.16, 0.56, 2.10),
+        fall_profile=(0.42, 0.56),
+    ),
+    "tray-2x2": StartPlan(
+        name="tray-2x2",
+    mixers=(("launch", 5, 0.07),),
+        wheels=(("launch", 32, 9.0),),
+        tray=(0.16, 0.56, 2.10),
+        fall_profile=(0.42, 0.56),
+        deflectors=_bumpers((0.26, 0.44), (2, 2), 0.26, 0.24, span=0.50, stagger=True),
+    ),
+    "tray-212": StartPlan(
+        name="tray-212",
+    mixers=(("launch", 5, 0.07),),
+        wheels=(("launch", 32, 9.0),),
+        tray=(0.16, 0.56, 2.10),
+        fall_profile=(0.42, 0.56),
+        deflectors=_bumpers((0.24, 0.36, 0.48), (2, 1, 2), 0.26, 0.24, span=0.52),
+    ),
+    "tray-212-low": StartPlan(
+        name="tray-212-low",
+    mixers=(("launch", 5, 0.07),),
+        wheels=(("launch", 32, 9.0),),
+        tray=(0.16, 0.56, 2.10),
+        fall_profile=(0.42, 0.56),
+        deflectors=_bumpers((0.24, 0.36, 0.48), (2, 1, 2), 0.18, 0.24, span=0.52),
+    ),
+    "tray-212-fat": StartPlan(
+        name="tray-212-fat",
+    mixers=(("launch", 5, 0.07),),
+        wheels=(("launch", 32, 9.0),),
+        tray=(0.16, 0.56, 2.10),
+        fall_profile=(0.42, 0.56),
+        deflectors=_bumpers((0.24, 0.36, 0.48), (2, 1, 2), 0.26, 0.34, span=0.52),
+    ),
+    # A wider, longer tray - five marbles abreast rather than four.
+    "tray-wide": StartPlan(
+        name="tray-wide",
+        mixers=(("launch", 5, 0.07),),
+        wheels=(("launch", 32, 9.0),),
+        tray=(0.15, 0.62, 2.45),
+        fall_profile=(0.40, 0.55),
+        deflectors=_bumpers((0.24, 0.38, 0.52), (2, 1, 2), 0.26, 0.26, span=0.52),
+    ),
+    # --- V1.2b: the mixing stretch moves onto the launch ---------------------
+    #
+    # The tray in the fan fails, and the reason is energy rather than shape.
+    # The fan has 0.63 layout units of drop over 7.34, so once the run in and
+    # the run out are paid for a held stretch inside it sits at 1.7 degrees. A
+    # marble that loses speed on a bumper there never gets it back: every
+    # bumper set trailed 60 to 75% of the field. And a *plain* wide tray is
+    # worse than no tray, because it makes the final convergence sharper
+    # without scrambling anything - slot means came out a clean symmetric V,
+    # 7.38 5.67 4.01 1.85 1.34 3.25 5.19 7.32, which is the bias in its purest
+    # form.
+    #
+    # The launch runs at 25 to 43 degrees. So the fan holds its width to the
+    # seam and hands over to a launch that has been opened out, and the wide
+    # mixing stretch and the convergence both happen there, where a deflected
+    # marble is falling hard enough to carry on.
+    "lw-plain": StartPlan(
+        name="lw-plain",
+        mixers=(("launch", 70, 0.07),),
+        wheels=(("launch", 84, 9.0),),
+        launch_width=(2.20, 26, 62),
+        tray=(0.16, 1.0, 2.36),
+        fall_profile=(0.42, 1.0),
+    ),
+    "lw-mix": StartPlan(
+        name="lw-mix",
+        mixers=(("launch", 14, 0.16, 0.16, 0.80), ("launch", 70, 0.07)),
+        wheels=(("launch", 84, 9.0),),
+        launch_width=(2.20, 26, 62),
+        tray=(0.16, 1.0, 2.36),
+        fall_profile=(0.42, 1.0),
+    ),
+    "lw-mix2": StartPlan(
+        name="lw-mix2",
+        mixers=(
+            ("launch", 12, 0.16, 0.16, 0.80),
+            ("launch", 24, 0.16, 0.16, 0.80),
+            ("launch", 70, 0.07),
+        ),
+        wheels=(("launch", 84, 9.0),),
+        launch_width=(2.20, 26, 62),
+        tray=(0.16, 1.0, 2.36),
+        fall_profile=(0.42, 1.0),
+    ),
+    "lw-mix2-tall": StartPlan(
+        name="lw-mix2-tall",
+        mixers=(
+            ("launch", 12, 0.26, 0.22, 0.80),
+            ("launch", 24, 0.26, 0.22, 0.80),
+            ("launch", 70, 0.07),
+        ),
+        wheels=(("launch", 84, 9.0),),
+        launch_width=(2.20, 26, 62),
+        tray=(0.16, 1.0, 2.36),
+        fall_profile=(0.42, 1.0),
+    ),
+    # Wider still, and converging later.
+    "lw-wide-mix2": StartPlan(
+        name="lw-wide-mix2",
+        mixers=(
+            ("launch", 12, 0.22, 0.20, 0.82),
+            ("launch", 26, 0.22, 0.20, 0.82),
+            ("launch", 78, 0.07),
+        ),
+        wheels=(("launch", 92, 9.0),),
+        launch_width=(2.70, 32, 72),
+        tray=(0.16, 1.0, 2.71),
+        fall_profile=(0.42, 1.0),
+    ),
+    # A gentler opening, converging over most of the launch rather than a
+    # third of it. `lw-plain` at 2.2x lost 34% of the field - not in the wide
+    # stretch, which is fine, but at launch[70..100], *after* the convergence:
+    # a wide fast field squeezed back to 1.88 over 36 samples is thrown
+    # sideways and leaves where the launch banks into its first turn. The
+    # convergence has to happen somewhere, and it either orders the field
+    # slowly or ejects it quickly.
+    "lw-soft-plain": StartPlan(
+        name="lw-soft-plain",
+        mixers=(("launch", 104, 0.07),),
+        wheels=(("launch", 112, 9.0),),
+        launch_width=(1.55, 30, 96),
+        tray=(0.16, 1.0, 1.66),
+        fall_profile=(0.42, 1.0),
+    ),
+    "lw-soft": StartPlan(
+        name="lw-soft",
+        mixers=(
+            ("launch", 14, 0.16, 0.16, 0.80),
+            ("launch", 30, 0.16, 0.16, 0.80),
+            ("launch", 104, 0.07),
+        ),
+        wheels=(("launch", 112, 9.0),),
+        launch_width=(1.55, 30, 96),
+        tray=(0.16, 1.0, 1.66),
+        fall_profile=(0.42, 1.0),
+    ),
+    "lw-mid": StartPlan(
+        name="lw-mid",
+        mixers=(
+            ("launch", 14, 0.18, 0.18, 0.80),
+            ("launch", 32, 0.18, 0.18, 0.80),
+            ("launch", 104, 0.07),
+        ),
+        wheels=(("launch", 112, 9.0),),
+        launch_width=(1.85, 34, 100),
+        tray=(0.16, 1.0, 1.98),
+        fall_profile=(0.42, 1.0),
     ),
 }
 

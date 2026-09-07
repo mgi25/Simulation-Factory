@@ -49,6 +49,7 @@ from marble3d.units import MARBLE_RADIUS
 from sloped import course as _course
 from sloped import layout
 from sloped.race import LATERAL_SLACK, VERTICAL_SLACK
+from sloped.scale import LAYOUT_TO_SIM
 from sloped.stations import Mixer, Spinners, StartGrid
 from sloped.track import TrackRun
 
@@ -98,12 +99,21 @@ class StartPlan:
     fins: tuple[float, ...] | None = None
     # How far down the fan each bay waits, in layout units, west to east.
     stagger: tuple[float, ...] | None = None
-    # Studs on the trough floor, as (t along the fan, across as a fraction of
-    # the half width there, height in layout units).
-    deflectors: tuple[tuple[float, float, float], ...] | None = None
-    # Stud rows, as (run name, sample, layout height). A sample of -1 means the
-    # recorded `mix` node, which is where the V1 course's one row stands.
-    mixers: tuple[tuple[str, int, float], ...] = (("leg1", -1, 0.07),)
+    # Bumpers on the trough floor, as (t along the fan, across as a fraction
+    # of the half width there, height, radius), the last two in layout units.
+    deflectors: tuple[tuple[float, float, float, float], ...] | None = None
+    # The mixing tray, as (converge by t, hold until t, half width).
+    tray: tuple[float, float, float] | None = None
+    # Where the fan's drop is spent, as (fraction by the tray's start,
+    # fraction by its end).
+    fall_profile: tuple[float, float] | None = None
+    # Stud rows, as (run name, sample, height) or (run, sample, height,
+    # radius, span). Heights and radii are layout units; a sample of -1 means
+    # the recorded `mix` node, which is where the V1 course's one row stood.
+    mixers: tuple[tuple, ...] = (("leg1", -1, 0.07),)
+    # The launch's width profile, as (factor, hold to sample, blended by
+    # sample) - the wide mixing stretch. See `sloped.track.TrackRun`.
+    launch_width: tuple[float, int, int] | None = None
     # Paddle wheels, as (run name, sample, rate in rad/s). One wheel each.
     wheels: tuple[tuple[str, int, float], ...] = ()
 
@@ -113,7 +123,10 @@ class StartPlan:
             "fins": list(self.fins) if self.fins else None,
             "stagger": list(self.stagger) if self.stagger else None,
             "deflectors": [list(d) for d in self.deflectors] if self.deflectors else None,
+            "tray": list(self.tray) if self.tray else None,
+            "fall_profile": list(self.fall_profile) if self.fall_profile else None,
             "mixers": [list(m) for m in self.mixers],
+            "launch_width": list(self.launch_width) if self.launch_width else None,
             "wheels": [list(w) for w in self.wheels],
         }
 
@@ -154,7 +167,16 @@ def start_machine(config: CoreConfig | None = None, plan: StartPlan | None = Non
     config = config or DEFAULT_CONFIG
     plan = plan or SHIPPED_PLAN
     machine = Machine("sloped_b_start")
-    runs = {name: TrackRun(name) for name in LAB_RUNS}
+    runs = {
+        name: TrackRun(
+            name, width_profile=plan.launch_width if name == "launch" else None
+        )
+        for name in LAB_RUNS
+    }
+    # The fan hands over to whatever the launch actually opens at.
+    front_half = 0.5 * runs["launch"].clear_width * runs["launch"].widths[0] / LAYOUT_TO_SIM
+    if plan.launch_width is None:
+        front_half = None
     machine.add(
         StartGrid(
             "start",
@@ -162,17 +184,25 @@ def start_machine(config: CoreConfig | None = None, plan: StartPlan | None = Non
             fin_schedule=plan.fins,
             bay_stagger=plan.stagger,
             deflectors=plan.deflectors,
+            tray=plan.tray,
+            fall_profile=plan.fall_profile,
+            front_half=front_half,
         ),
         Transform(),
     )
     machine.add(runs["launch"], Transform())
-    for order, (run_name, sample, height) in enumerate(plan.mixers):
+    for order, row in enumerate(plan.mixers):
+        run_name, sample, height = row[0], row[1], row[2]
+        radius = row[3] if len(row) > 3 else None
+        span = row[4] if len(row) > 4 else None
         machine.add(
             Mixer(
                 f"mixer{order}" if order else "mixer",
                 runs[run_name],
                 at=None if sample < 0 else sample,
                 pin_height=height,
+                pin_radius=radius,
+                span=span,
             ),
             Transform(),
         )
