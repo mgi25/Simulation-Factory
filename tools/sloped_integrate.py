@@ -75,12 +75,13 @@ GODOT_ON_PATH = ("godot", "godot4")
 # `long_track` and the establishing frame is not a validation still.
 STILL_NAMES = {
     "start": "start",
+    "descent": "first_descent",
     "hairpin": "first_turn",
+    "straight": "long_track",
     "obstacle": "obstacle",
     "split": "split",
+    "branch": "final_sprint",
     "merge": "merge",
-    "straight": "long_track",
-    "descent": "first_descent",
     "finish": "finish",
 }
 
@@ -130,6 +131,7 @@ def stage_race(seed: int, marbles: int, duration: float, out: str) -> dict[str, 
             "the course does not check out; refusing to render it\n  "
             + "\n  ".join(str(f) for f in findings)
         )
+    os.makedirs(os.path.dirname(out) or '.', exist_ok=True)
     started = time.perf_counter()
     outcome, replay = run_race(
         seed=seed, machine=machine, marble_count=marbles, duration=duration, with_replay=True
@@ -159,13 +161,18 @@ def stage_cameras(replay_path: str, out: str) -> dict[str, Any]:
         replay = json.load(handle)
     machine = sloped_course()
     track = cameras_module.build_track(replay, machine, fps=FPS)
-    problems = cameras_module.check_track(track)
+    problems = cameras_module.check_track(track, replay)
     cameras_module.write_track(track, out)
     print(f"cameras: {len(track['cuts'])} cuts over {track['duration']:.2f} s -> {out}")
+    rows = {row["cut"]: row for row in cameras_module.frame_report(track, replay)}
     for cut in track["cuts"]:
+        row = rows.get(cut["name"], {})
         print(
             f"    {cut['name']:11s} {cut['from']:6.2f}-{cut['to']:6.2f}s  "
             f"target {cut['target']:6s} fov {cut['fov']:.0f} dist {cut['distance']:.1f}"
+            f"  lift {cut.get('lift_deg', 0.0):.0f} deg"
+            f"  racers {row.get('in_frame', '-')}/{row.get('of', '-')}"
+            f"  nearest {row.get('nearest_px', 0.0):.0f} px"
         )
     if problems:
         print("  camera findings:")
@@ -203,16 +210,13 @@ def stage_check(replay_path: str, out: str, stride: int) -> dict[str, Any]:
 
 
 def godot_command(godot: str, extra: Sequence[str]) -> list[str]:
-    return [
-        godot,
-        "--headless" if False else "--rendering-driver",
-        "vulkan",
-        "--path",
-        GODOT_PROJECT,
-        RENDER_SCENE,
-        "--",
-        *extra,
-    ]
+    """The invocation `tools/course_lab.py` already proves works, and no more.
+
+    No `--rendering-driver`, no `--headless`: the layout proof's frames were
+    taken with the defaults and the point of extending its scene is that the
+    course in frame is the course it photographed.
+    """
+    return [godot, "--path", GODOT_PROJECT, RENDER_SCENE, "--", *extra]
 
 
 def run_godot(godot: str, extra: Sequence[str], label: str) -> float:
@@ -278,6 +282,23 @@ def stage_clip(godot: str, replay_path: str, cameras_path: str, fps: int) -> dic
     if os.path.isdir(FRAMES_DIR):
         shutil.rmtree(FRAMES_DIR)
     os.makedirs(FRAMES_DIR, exist_ok=True)
+
+    # The clip is as long as the *race*, which is the camera track's span: from
+    # the gate to the last crossing plus the finish cut's hold. The renderer on
+    # its own would use the replay's duration, and the replay is as long as the
+    # simulation window it was asked for - 30 s for the production seed, whose
+    # last marble crosses at 18.85. Rendering to 30 spends nine and a half
+    # seconds on a parked field under a camera that has run out of cuts, at
+    # 371 ms a frame.
+    #
+    # This is not section 40's forbidden shortening. Nothing is sped up, no
+    # frame between the gate and the last crossing is dropped, and gravity is
+    # untouched: what is cut is the simulation continuing after the race is
+    # over.
+    with open(cameras_path, "r", encoding="utf-8") as handle:
+        track = json.load(handle)
+    end = float(track["duration"])
+
     elapsed = run_godot(
         godot,
         [
@@ -285,6 +306,7 @@ def stage_clip(godot: str, replay_path: str, cameras_path: str, fps: int) -> dic
             f"--replay={os.path.abspath(replay_path)}",
             f"--cameras={os.path.abspath(cameras_path)}",
             "--clip=1",
+            f"--end={end:.6f}",
             f"--fps={fps}",
             f"--width={WIDTH}",
             f"--height={HEIGHT}",

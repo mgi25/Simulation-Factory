@@ -42,7 +42,11 @@ extends "res://scripts/course_scene.gd"
 ##     --layout=b --detail=hero
 ##     --shot=NAME          override with a still lens from SHOTS
 
-const Palette := preload("res://assets/marble_machine/lab_palette.gd")
+# `Palette`, `World`, `Machine`, `Layout`, `Track`, `V2Forms` and `Terrain` all
+# come from the parent class, and re-declaring one is a parse error rather than
+# a shadow - "The member \"Palette\" already exists in parent class". So does
+# `_palette`, `_camera`, `_course`, `_table` and `_travellers`, all of which are
+# used below and none of which is declared here.
 
 var _replay: Dictionary = {}
 var _camera_track: Dictionary = {}
@@ -69,19 +73,39 @@ func _ready() -> void:
 
 
 func _strip_display_field() -> void:
-	## The layout proof's eight travelling spheres, removed rather than hidden.
+	## Every sphere the layout proof draws, removed rather than hidden.
 	##
 	## Hidden would be enough for the render and not enough for the claim: a
 	## hidden node is one `visible = true` away from being in a frame beside the
 	## real field, and "these are the physics marbles" has to be true of the
 	## scene and not only of this run.
+	##
+	## There are *two* sets and the second one cost a full-resolution still pass
+	## to find. `course_machine._field` builds the travelling display pack under
+	## a node called `Field`, which is the obvious one. `course_modules`'
+	## `_start_field` builds eight more - `Waiting0` to `Waiting7` - parked on
+	## the line inside the start module, where they are static decoration rather
+	## than travellers and so appear in no traveller list. In the first
+	## full-resolution start frame they sat in the bays in a neat row while the
+	## real eight were already on the fan below them: sixteen marbles in a
+	## frame captioned as an eight-marble race. Section 32 forbids exactly that,
+	## so the strip walks the whole course and takes both.
 	_travellers.clear()
 	if _course == null:
 		return
-	var field := _course.get_node_or_null("Field")
-	if field != null:
-		field.get_parent().remove_child(field)
-		field.queue_free()
+	var doomed: Array[Node] = []
+	var stack: Array[Node] = [_course]
+	while not stack.is_empty():
+		var node: Node = stack.pop_back()
+		for child in node.get_children():
+			if child.name == "Field" or str(child.name).begins_with("Waiting"):
+				doomed.append(child)
+			else:
+				stack.append(child)
+	for node in doomed:
+		node.get_parent().remove_child(node)
+		node.queue_free()
+	print("scene: stripped %d display marble node(s)" % doomed.size())
 
 
 # --- the replay -----------------------------------------------------------
@@ -254,18 +278,20 @@ func _turn_wheels(low: Dictionary, high: Dictionary, blend: float) -> void:
 	## cannot drift apart. The angle is the blade's offset from its hub,
 	## projected into the wheel's parent frame - which is exact, and does not
 	## depend on either side agreeing about a sign convention.
-	var actuators: Dictionary = low.get("a", {})
-	var next_actuators: Dictionary = high.get("a", {})
+	var actuators: Dictionary = low.get("actuators", {})
+	var next_actuators: Dictionary = high.get("actuators", {})
 	for entry in _wheels:
 		var record: Dictionary = entry
 		var key := "obstacle.wheel%d_blade0" % int(record["index"])
 		if not actuators.has(key):
 			continue
-		var pose: Array = actuators[key]
-		var position := _vec(pose[0]) * _render_scale
+		# An actuator's pose is `{"p": [...], "q": [...]}`, not a two-element
+		# array; `marble3d.replay` names the fields the way it names a marble's.
+		var pose: Dictionary = actuators[key]
+		var position := _vec(pose["p"]) * _render_scale
 		if next_actuators.has(key):
-			var later: Array = next_actuators[key]
-			position = position.lerp(_vec(later[0]) * _render_scale, blend)
+			var later: Dictionary = next_actuators[key]
+			position = position.lerp(_vec(later["p"]) * _render_scale, blend)
 		var wheel: Node3D = record["wheel"]
 		var parent := wheel.get_parent() as Node3D
 		if parent == null:
@@ -307,6 +333,44 @@ func _place_from_track(seconds: float) -> void:
 	_camera.position = position
 	if position.distance_to(aim) > 1.0e-4:
 		_camera.look_at(aim, Vector3.UP)
+
+
+func dump_terrain(path: String, step: float = 7.0) -> void:
+	## A grid of ground heights, so `sloped.terrain` can be checked against the
+	## surface the renderer actually stands the course on.
+	##
+	## Written from `_table["terrain"]` *after* the course has been built, which
+	## matters: `course_machine.build` calls `Terrain.index_cut` on the way past
+	## and the bench is the deepest feature anywhere near the racing line.
+	# `Machine.build` calls `Layout.table` again for its own copy, so the
+	# terrain dict this scene holds never gets the bench index and a height read
+	# from it is the surface *before* the cut. Index it here from the same
+	# centreline the machine used - every run's path, concatenated in the
+	# layout table's order, resampled to a third of its own point count - or
+	# this dump describes a mountain the renderer does not draw.
+	var cfg: Dictionary = _table["terrain"]
+	var centreline: Array = []
+	for entry in _table["runs"]:
+		centreline.append_array(_course.get_meta("%s_path"
+			% str((entry as Dictionary)["name"])))
+	Terrain.index_cut(cfg, V2Forms.resample(centreline,
+		maxi(centreline.size() / 3, 8)))
+	var rows: Array = []
+	var x := -60.0
+	while x <= 60.0:
+		var z := -60.0
+		while z <= 90.0:
+			rows.append([snappedf(x, 0.001), snappedf(z, 0.001),
+				snappedf(Terrain.height(x, z, cfg), 0.00001)])
+			z += step
+		x += step
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		push_error("dump_terrain: cannot write %s" % path)
+		return
+	file.store_string(JSON.stringify({"step": step, "samples": rows}))
+	file.close()
+	print("terrain: %d samples -> %s" % [rows.size(), path])
 
 
 func replay_duration() -> float:

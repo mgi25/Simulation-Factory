@@ -24,6 +24,7 @@ extends Node
 ##     --fps=60             output rate; 60 matches the replay's sampling
 ##     --width= --height=   default 1080x1920
 ##     --start= --end=      seconds, to render part of a clip
+##     --dump-terrain=PATH  write a grid of ground heights and exit
 ##     --layout=b --detail=hero
 
 const RaceScene := preload("res://scripts/sloped_race_scene.gd")
@@ -63,7 +64,7 @@ func _ready() -> void:
 	if _out_dir.is_empty():
 		_fail("--out-dir is required")
 		return
-	if _stills.is_empty() and not _clip:
+	if _stills.is_empty() and not _clip and str(options.get("dump-terrain", "")) == "":
 		_fail("give either --stills=NAME,... or --clip=1")
 		return
 	if DirAccess.make_dir_recursive_absolute(_out_dir) != OK \
@@ -75,6 +76,11 @@ func _ready() -> void:
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 
 	_build_viewport()
+	var dump := str(options.get("dump-terrain", ""))
+	if dump != "":
+		_scene.dump_terrain(dump)
+		get_tree().quit(0)
+		return
 	if _clip:
 		await _render_clip()
 	else:

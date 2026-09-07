@@ -69,10 +69,42 @@ FLOAT_BUDGET = 0.06
 # legitimately do.
 RESTING_SPEED = 3.0
 
+# A marble at rest is not merely slow, it is also not rising. Both of the float
+# findings on the production seed were marbles that had just been hit - one at
+# the obstacle with a neighbour touching it and a blade 1.6 units away, one at
+# the merge - climbing at 1.97 and 1.30 world units a second while their total
+# speed dipped under the resting threshold at the top of the arc. A collider
+# holding a marble up wrongly has no vertical velocity at all, so requiring
+# that is what separates the two cases.
+RESTING_RISE = 0.5
+
 # How far off any centreline a marble has to be before it is treated as being
 # on a station - the start fan, the merge apron, the finish deck - rather than
 # in a channel. Two diameters: further than any channel is wide.
 OFF_CHANNEL = 2.0 * 2.0 * MARBLE_RADIUS
+
+# How far along its own run a marble may be from the sample it is measured
+# against before that measurement means nothing.
+#
+# A cross-section is a plane. Comparing a marble to one throws away the
+# along-track component of the offset, which is harmless while the marble is
+# beside the sample and nonsense once it is not - and the nearest-sample search
+# will hand back a run's *first* sample for a marble that is still upstream of
+# the run entirely, because that is the nearest sample it has.
+#
+# That is what the first full check of the production seed reported: sixty
+# penetrations up to -0.4993, all at `launch[0]`, all between 1.70 and 1.77 s.
+# Measured, they sat 1.294 units upstream of that sample - 6.3 sample steps -
+# still on the start grid's fan, where the surface under them is the trough's
+# blended dish and not the launch channel at all. The value -0.4993 is one
+# marble radius to four decimals, which is the signature: a centre that lands
+# on the section outline, because the outline it is being compared to is 1.3
+# units away in the one direction the comparison cannot see.
+#
+# Inside a run the nearest sample is never more than half a step away, so the
+# gate below is loose by a factor of one and a half and still excludes 1.294 by
+# six times over.
+ALONG_TOLERANCE = 1.5
 
 
 @dataclass
@@ -161,7 +193,7 @@ def check_replay(
     routes: dict[int, str] = {}
     for event in replay["events"]:
         if event["kind"] == "route":
-            routes[int(event["data"]["id"])] = str(event["data"]["route"])
+            routes[int(event["id"])] = str(event["route"])
 
     report = ContactReport()
     where: dict[int, tuple[str, int]] = {}
@@ -213,9 +245,25 @@ def check_replay(
             report.channel_samples += 1
 
             run = runs[name]
-            lateral, up_axis, _forward = run.frames[at]
+            lateral, up_axis, forward = run.frames[at]
             centre = run.sim_path[at]
             offset = [position[axis] - centre[axis] for axis in range(3)]
+            along = sum(offset[axis] * forward[axis] for axis in range(3))
+
+            # Half a sample step, times the tolerance above: past that the
+            # marble is upstream of a run's first sample or downstream of its
+            # last, and belongs to whatever station sits in the gap.
+            if at + 1 < len(run.sim_path):
+                step = math.dist(run.sim_path[at], run.sim_path[at + 1])
+            elif at > 0:
+                step = math.dist(run.sim_path[at - 1], run.sim_path[at])
+            else:
+                step = 2.0 * radius
+            if abs(along) > ALONG_TOLERANCE * 0.5 * step:
+                report.off_channel_samples += 1
+                report.channel_samples -= 1
+                continue
+
             across = sum(offset[axis] * lateral[axis] for axis in range(3))
             up = sum(offset[axis] * up_axis[axis] for axis in range(3))
             width = run.widths[at]
@@ -233,13 +281,22 @@ def check_replay(
                     ContactFinding("penetration", marble_id, index, when, name, at,
                                    clearance, position)
                 )
-            elif speed < RESTING_SPEED and clearance > FLOAT_BUDGET:
+            elif (
+                speed < RESTING_SPEED
+                and abs(float(sample["v"][1])) < RESTING_RISE
+                and clearance > FLOAT_BUDGET
+            ):
                 report.findings.append(
                     ContactFinding("floating", marble_id, index, when, name, at,
                                    clearance, position)
                 )
             report.worst_penetration = min(report.worst_penetration, clearance)
-            if speed < RESTING_SPEED:
+            # Recorded under the *same* condition as the finding, not merely
+            # under "slow". While this tested only speed it reported a worst
+            # float of 0.076 against a budget of 0.06 on a replay with zero
+            # findings - the excluded samples, marbles rising away from a hit,
+            # setting the headline number for a fault that had not occurred.
+            if speed < RESTING_SPEED and abs(float(sample["v"][1])) < RESTING_RISE:
                 report.worst_float = max(report.worst_float, clearance)
 
     return report
