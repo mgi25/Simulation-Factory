@@ -96,7 +96,7 @@ __all__ = [
 # a hit owned by one of these answers the probe rather than failing it - which
 # is the honest reading: the surface a marble meets there really is the pin.
 # Anything else that intercepts a probe is a finding.
-OBSTRUCTIONS = ("start", "mixer", "obstacle", "fork", "merge")
+OBSTRUCTIONS = ("start", "mixer", "shuffle", "obstacle", "fork", "merge")
 
 # The runs a marble meets in order, before the fork.
 CHAIN = ("launch", "leg1", "leg2", "leg3")
@@ -113,6 +113,72 @@ BRANCH_MODULES = {
 
 
 ROUTE_CHOICES = ("blue", "both")
+
+# The sprint's guard rails, opened on **both** sides over the samples the merge
+# apron is built around - `(side, full-before, open-from, open-to, full-after)`,
+# with a side of zero meaning both.
+#
+# `sloped.stations.MergeCatch` runs from 2.30 layout units behind the sprint's
+# entry to 1.70 in front of it, and 1.70 layout is 2.98 simulation units, which
+# is the sprint's sample 9. So the rails are open from the sprint's first sample
+# to its ninth and back to full by its fourteenth, which is 1.4 units clear of
+# the apron's front edge.
+#
+# Why they have to be: a rail standing inside the apron leaves a ledge along its
+# own top with the apron's roof over it, and a marble that strays outside the
+# channel while crossing the apron comes to rest on that ledge. Measured, an
+# orange marble stopped on the east rail at apron-frame across +2.337 with its
+# centre 0.43 simulation units above the apron floor beneath it, at 0.52 wu/s.
+# V1 lost 319 of its 747 marbles there, every one booked to `blue[100]`.
+# Containment over the window is the apron's own outer walls and roof, which
+# span the whole of it.
+MERGE_GUARD_WINDOW = (0.0, -1, 0, 9, 14)
+
+# --- the start correction -------------------------------------------------
+#
+# V1 put its one stud row on leg1 at the recorded `mix` node and called it the
+# fairness mechanism. `sloped.startlab` measured what it actually does, over
+# 400 seeds of the start, the launch and leg1 alone:
+#
+#   * The eight bays are within three ticks of each other a quarter of the way
+#     down the start fan and **76 ticks** apart at the launch seam. The whole
+#     slot bias is made in the fan's second half, where the bare converging
+#     trough funnels all eight marbles onto one line; the queue that forms
+#     there is ordered by how far each bay had to travel sideways to reach it.
+#   * The rest of the course preserves that order because it is a 3.3-diameter
+#     channel in which everyone runs at the same terminal speed. By the launch
+#     exit the field is strung out over eighteen simulation units.
+#   * leg1's stud row is *downstream* of that. It can deflect a marble; it can
+#     no longer reorder the field, because the field is no longer a field.
+#
+# Nine candidates were scanned before these two. A longitudinal bay stagger, a
+# merge tree in the lane dividers, longer and shorter dividers, and three
+# densities of deflector in the fan all made the bias **worse** - up to a span
+# of 7.0 places out of a possible 7 - and they fail for one reason: every
+# restriction added to a converging funnel is another queue, and a queue leaves
+# in arrival order. Their numbers are in `tools/sloped_start_scan.py`.
+#
+# So the correction is two things on the launch run, where the field is still
+# one channel-width long:
+#
+# **The stud row moves to launch sample 5.** Same nine studs, same 0.07 height.
+# At leg1's seam the field arrives at 50 wu/s and a stud levers a marble out of
+# the channel; here it arrives at 13 and the same stud deflects it. Losses over
+# the start and leg1 fell from 15.95% to 1.19% on that move alone.
+#
+# **A single four-blade wheel at launch sample 7**, turning at 6.0 rad/s. It is
+# the one mechanism tried that *reduces* the bias rather than sharpening it,
+# and the reason is arithmetic: a marble's wait at a wheel is its arrival time
+# modulo the blade period, so the output order is not monotone in the input
+# order. Four blades at 6.0 rad/s pass every 0.26 s against the 0.32 s spread
+# to be undone. Over 250 seeds it takes the rank span at the early checkpoint
+# from 3.796 places to 2.444 and the loss rate to 0.55%.
+#
+# It is the same `Spinners` class as the course's own obstacle, one wheel
+# instead of three, so it is native to the machine rather than bolted on.
+MIXER_SAMPLE = 5
+SHUFFLE_SAMPLE = 7
+SHUFFLE_RATE = 6.0
 
 
 def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Machine:
@@ -141,7 +207,9 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
         )
         for name in CHAIN
     }
-    runs["final"] = TrackRun("final")
+    # The sprint's two guard rails are opened where the merge apron is built
+    # around them; see `MERGE_GUARD_WINDOW`.
+    runs["final"] = TrackRun("final", open_side=MERGE_GUARD_WINDOW)
     # Both lobes entered one control in, so a lead can exist at all; see
     # `sloped.joins`.
     blue_spec = dict(layout.run("blue"))
@@ -198,7 +266,14 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
     machine.add(start, Transform())
     for name in CHAIN:
         machine.add(runs[name], Transform())
-    machine.add(Mixer("mixer", runs["leg1"]), Transform())
+    # The two pieces of the start correction, both on the *launch* run rather
+    # than on leg1. `sloped.startlab` measured them; `MIXER_SAMPLE` and
+    # `SHUFFLE_SAMPLE` carry the argument.
+    machine.add(Mixer("mixer", runs["launch"], at=MIXER_SAMPLE), Transform())
+    machine.add(
+        Spinners("shuffle", runs["launch"], at=SHUFFLE_SAMPLE, offsets=(0.0,), rate=SHUFFLE_RATE),
+        Transform(),
+    )
     machine.add(Spinners("obstacle", runs["leg2"]), Transform())
     if forked:
         machine.add(

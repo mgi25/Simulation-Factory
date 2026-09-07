@@ -242,19 +242,53 @@ def smooth_series(values, passes: int = 3) -> list[float]:
 
 
 def auto_bank(
-    path, gain: float, max_degrees: float, ease_ends: int = BANK_EASE_ENDS
+    path,
+    gain: float,
+    max_degrees: float,
+    ease_ends: int = BANK_EASE_ENDS,
+    entry_bank: float = 0.0,
+    exit_bank: float = 0.0,
 ) -> list[float]:
-    """A bank angle in radians per sample, from the path's own curvature."""
+    """A bank angle in radians per sample, from the path's own curvature.
+
+    Both ends ease to level, which is what a run beginning and finishing in a
+    straight channel wants, and what every authored run here does.
+
+    `entry_bank` and `exit_bank` ease to a **given** roll instead, in radians,
+    for a join that begins or ends inside a banked turn. The fork needs it. It
+    is placed 82 samples along leg3, in the middle of a hairpin rolled 26
+    degrees, and that 26 degrees is not decoration - it is what a marble at
+    43 wu/s needs to hold leg3's 3.5-unit radius, so it cannot be levelled. A
+    lead that eases from zero butts a level cradle against a 26-degree one, and
+    two cradles rolled 26 degrees apart have their edges 0.7 to 1.5 simulation
+    units apart in world height while their centrelines coincide. That is the
+    trench an orange-bound marble fell into at leg3[90..95], and it is why six
+    divider configurations could not fix the fork: nothing put *between* two
+    channels helps when the two are not the same surface.
+
+    With neither pinned this is the expression it always was, so no authored
+    run's recorded bank extremes move - which `sloped.contract` checks to the
+    digit.
+    """
     limit = math.radians(max_degrees)
     raw = [min(limit, max(-limit, k * gain)) for k in curvature(path)]
     banks = smooth_series(raw, 4)
     count = len(banks)
     divisor = max(ease_ends, 1)
+    if entry_bank == 0.0 and exit_bank == 0.0:
+        for index in range(count):
+            from_start = index / divisor
+            from_end = (count - 1 - index) / divisor
+            ease = min(1.0, max(0.0, min(from_start, from_end)))
+            banks[index] = banks[index] * _smoothstep(0.0, 1.0, ease)
+        return banks
     for index in range(count):
-        from_start = index / divisor
-        from_end = (count - 1 - index) / divisor
-        ease = min(1.0, max(0.0, min(from_start, from_end)))
-        banks[index] = banks[index] * _smoothstep(0.0, 1.0, ease)
+        from_start = min(1.0, max(0.0, index / divisor))
+        from_end = min(1.0, max(0.0, (count - 1 - index) / divisor))
+        value = banks[index]
+        value = entry_bank + (value - entry_bank) * _smoothstep(0.0, 1.0, from_start)
+        value = exit_bank + (value - exit_bank) * _smoothstep(0.0, 1.0, from_end)
+        banks[index] = value
     return banks
 
 

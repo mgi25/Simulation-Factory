@@ -78,7 +78,7 @@ def warm_mesh_cache() -> int:
 
     world = MarbleWorld(DEFAULT_CONFIG)
     try:
-        machine = sloped_course()
+        machine = sloped_course(routes="both")
         machine.build(world)
         return len(world.colliders)
     finally:
@@ -94,11 +94,14 @@ def run_batch(args: tuple[Sequence[int], int, float]) -> list[dict[str, Any]]:
     else - which is exactly what is wanted, and is why the course is built here
     rather than passed in.
     """
-    seeds, marble_count, duration = args
+    seeds, marble_count, duration, routes = args
     out: list[dict[str, Any]] = []
     for seed in seeds:
         outcome, _ = run_race(
-            seed=seed, machine=sloped_course(), marble_count=marble_count, duration=duration
+            seed=seed,
+            machine=sloped_course(routes=routes),
+            marble_count=marble_count,
+            duration=duration,
         )
         out.append(outcome.to_json())
     return out
@@ -428,11 +431,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--chunk", type=int, default=8)
     parser.add_argument("--out", default="")
     parser.add_argument("--races-out", default="", help="every race's own JSON, for seed picking")
+    parser.add_argument(
+        "--routes",
+        default="both",
+        choices=("blue", "both"),
+        help="which routes the course offers; \"both\" builds the fork",
+    )
     args = parser.parse_args(argv)
 
     seeds = list(range(args.first_seed, args.first_seed + args.seeds))
     batches = [
-        (seeds[index : index + args.chunk], args.marbles, args.duration)
+        (seeds[index : index + args.chunk], args.marbles, args.duration, args.routes)
         for index in range(0, len(seeds), args.chunk)
     ]
 
@@ -455,7 +464,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     report = summarise(races, slots=args.marbles)
     report["selection"] = pick_seed(races, slots=args.marbles)
-    report["course"] = course_facts()
+    report["course"] = course_facts(sloped_course(routes=args.routes))
+    report["routes_built"] = args.routes
     report["checkpoints"] = {name: fraction for name, fraction in CHECKPOINTS}
     report["fork_sample"] = joins.FORK_SAMPLE
     report["config"] = DEFAULT_CONFIG.to_json()

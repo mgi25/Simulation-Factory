@@ -120,8 +120,51 @@ class StartGrid(MarbleModule):
     FIN_RADIUS = 0.055          # the asset's round stock
     FIN_END = 0.50              # the fraction of the fan the dividers cover
 
-    def __init__(self, module_id: str = "start", launch: TrackRun | None = None) -> None:
+    # How far along the fan each of the seven dividers runs, west to east.
+    # `None` is the flat `FIN_END` for all seven - what V1 shipped, and what
+    # `docs/sloped_race_v1.md` measured its 8.87x slot bias on.
+    # `sloped.startlab` scans alternatives.
+    FIN_SCHEDULE: tuple[float, ...] | None = None
+
+    # How far down the fan each bay's paddle and resting place sit, in layout
+    # units, west to east. Zero is V1's straight line across all eight.
+    #
+    # A stagger is the standard physical answer to unequal path length - an
+    # athletics track and a swimming pool both use one - and here the path
+    # lengths really are unequal: `docs/sloped_race_v1.md` measures the outer
+    # bay reaching the launch seam 76 ticks after the inner one because it has
+    # 1.27 layout units further to travel sideways through a trough that
+    # funnels eight marbles onto one line. The queue that forms at the funnel
+    # is ordered by lateral distance, which is to say by bay index.
+    BAY_STAGGER: tuple[float, ...] = (0.0,) * 8
+
+    # Studs on the trough floor, as (t along the fan, across as a fraction of
+    # the half width there, height in layout units). See `local_colliders`.
+    DEFLECTORS: tuple[tuple[float, float, float], ...] = ()
+
+    def __init__(
+        self,
+        module_id: str = "start",
+        launch: TrackRun | None = None,
+        fin_schedule: tuple[float, ...] | None = None,
+        bay_stagger: tuple[float, ...] | None = None,
+        deflectors: tuple[tuple[float, float, float], ...] | None = None,
+    ) -> None:
         super().__init__(module_id)
+        self.deflectors = self.DEFLECTORS if deflectors is None else tuple(deflectors)
+        schedule = fin_schedule if fin_schedule is not None else self.FIN_SCHEDULE
+        if schedule is not None and len(schedule) != layout.BAYS - 1:
+            raise ValueError(
+                f"a fin schedule needs {layout.BAYS - 1} entries, one per divider, "
+                f"not {len(schedule)}"
+            )
+        self.fin_schedule = schedule
+        stagger = self.BAY_STAGGER if bay_stagger is None else bay_stagger
+        if len(stagger) != layout.BAYS:
+            raise ValueError(
+                f"a bay stagger needs {layout.BAYS} entries, one per bay, not {len(stagger)}"
+            )
+        self.bay_stagger = tuple(float(v) for v in stagger)
         self.origin = layout.NODES["start"]
         launch_entry = (launch.path[0] if launch is not None else layout.run("launch")["controls"][0])
         self.yaw_deg = math.degrees(
@@ -148,6 +191,14 @@ class StartGrid(MarbleModule):
 
     def _field_z(self) -> float:
         return -layout.GROOVE_LENGTH + 0.66
+
+    def _field_z_for(self, index: int) -> float:
+        """Where bay `index` waits, with its stagger applied."""
+        return self._field_z() + self.bay_stagger[index]
+
+    def _gate_z_for(self, index: int) -> float:
+        """The downstream face of bay `index`'s waiting marble."""
+        return self._field_z_for(index) + layout.MARBLE_RADIUS + 0.06
 
     def _half_at(self, t: float) -> float:
         # The asset eases to 1.02; the physics eases to the channel's own 0.94,
@@ -254,8 +305,11 @@ class StartGrid(MarbleModule):
         # convergence belongs: eight grooves that bend inward and become one
         # chute at the lip.
         for index in range(layout.BAYS - 1):
+            end = self.FIN_END if self.fin_schedule is None else self.fin_schedule[index]
+            if end <= 0.0:
+                continue
             lane: list[tuple[float, float, float]] = []
-            for row in range(int(round(self.FIN_END * (rows - 1))) + 1):
+            for row in range(int(round(end * (rows - 1))) + 1):
                 t = row / (rows - 1)
                 half = self._half_at(t)
                 spread = half / layout.START_BACK_HALF
@@ -279,6 +333,50 @@ class StartGrid(MarbleModule):
                         caps=step in (0, len(lane) - 2),
                     )
                 )
+
+        # Deflectors: studs standing on the trough floor at chosen places in
+        # the fan, as (t along, across as a fraction of the half width there,
+        # height in layout units).
+        #
+        # The fan's second half is where the slot bias is made -
+        # `docs/sloped_race_v1_start_finding.md` measures the eight slots
+        # within three ticks of each other at t = 0.25 and 76 ticks apart at
+        # the seam - because the bare converging trough funnels all eight onto
+        # one line and the queue that forms there is ordered by how far each
+        # bay had to come. A stud row is what turns that funnel into a
+        # scattering region: which side of a stud a marble passes is decided by
+        # a fraction of its own radius, so the delay it takes is not monotone
+        # in where it started.
+        #
+        # They stand on the *floor* at the marble's own contact height for the
+        # same reason the lane dividers do, and `Mixer.PIN_HEIGHT` records what
+        # happens when a stud in a channel is tall enough to lever rather than
+        # deflect. Here the field is at 7 to 11 wu/s rather than the 50 it
+        # reaches by leg1, so the same stud is a much gentler thing.
+        for order, (at, across_fraction, height) in enumerate(self.deflectors):
+            half = self._half_at(at)
+            centre = self._path_at(at)
+            across = across_fraction * half
+            foot = _place(
+                self.origin,
+                self.frame,
+                (across, centre[1] + self._cradle(across, half, at), centre[2]),
+            )
+            head = _place(
+                self.origin,
+                self.frame,
+                (across, centre[1] + self._cradle(across, half, at) + height, centre[2]),
+            )
+            pieces.append(
+                tube(
+                    foot,
+                    head,
+                    to_sim(layout.MIXER_PIN_RADIUS),
+                    segments=8,
+                    name=f"{self.id}_deflector{order}",
+                    caps=True,
+                )
+            )
 
         # A back stop, so a marble nudged up-course at release cannot leave.
         t_back = 0.0
@@ -335,18 +433,19 @@ class StartGrid(MarbleModule):
         """
         from marble3d.modules.base import LinearGate
 
-        t = self._t_at_z(self.gate_z)
-        half = self._half_at(t)
-        centre = self._path_at(t)
         gates: list[Actuator] = []
         for index in range(layout.BAYS):
+            gate_z = self._gate_z_for(index)
+            t = self._t_at_z(gate_z)
+            half = self._half_at(t)
+            centre = self._path_at(t)
             spread = half / layout.START_BACK_HALF
             across = _bay_x(index) * spread
             rise = self._cradle(across, half, t)
             position = _place(
                 self.origin,
                 self.frame,
-                (across, centre[1] + rise + 0.5 * layout.GATE_HEIGHT, self.gate_z),
+                (across, centre[1] + rise + 0.5 * layout.GATE_HEIGHT, gate_z),
             )
             gates.append(
                 LinearGate(
@@ -380,13 +479,14 @@ class StartGrid(MarbleModule):
         across these, which is what keeps a slot-bias measurement about the
         geometry rather than about which colour started where.
         """
-        t = self._t_at_z(self._field_z())
-        half = self._half_at(t)
-        centre = self._path_at(t)
-        spread = half / layout.START_BACK_HALF
         rotation = self._rotation()
         starts: list[Transform] = []
         for index in range(layout.BAYS):
+            field_z = self._field_z_for(index)
+            t = self._t_at_z(field_z)
+            half = self._half_at(t)
+            centre = self._path_at(t)
+            spread = half / layout.START_BACK_HALF
             across = _bay_x(index) * spread
             rise = self._cradle(across, half, t)
             starts.append(
@@ -394,7 +494,7 @@ class StartGrid(MarbleModule):
                     position=_place(
                         self.origin,
                         self.frame,
-                        (across, centre[1] + rise, self._field_z()),
+                        (across, centre[1] + rise, field_z),
                     ),
                     rotation=rotation,
                 )
@@ -439,13 +539,18 @@ class StartGrid(MarbleModule):
         # because a fin sits at every bay boundary and a probe on the boundary
         # measures the fin instead of the floor. The first version put one on
         # the centreline, where fin 3 is.
-        gate_row = int(round(self._t_at_z(self.gate_z) * (self.SAMPLES - 1)))
+        # One row per bay, because a stagger puts the eight paddles on
+        # different rows; with no stagger this is the one row it always was.
+        gate_rows = {
+            int(round(self._t_at_z(self._gate_z_for(index)) * (self.SAMPLES - 1)))
+            for index in range(layout.BAYS)
+        }
         for row in range(0, self.SAMPLES, 6):
             # The gate is a kinematic body owned by this module, so a probe
             # fired where it stands measures the paddle and reports the floor
             # as 0.76 too high. Skipped rather than loosened, because the
             # tolerance is what makes the rest of the check worth running.
-            if abs(row - gate_row) <= 1:
+            if any(abs(row - gate_row) <= 1 for gate_row in gate_rows):
                 continue
             t = row / (self.SAMPLES - 1)
             half = self._half_at(t)
@@ -479,6 +584,11 @@ class StartGrid(MarbleModule):
             "yaw_deg": round(self.yaw_deg, 4),
             "gate_z": round(self.gate_z, 4),
             "release_time": self.release_time,
+            "bay_stagger": [round(v, 4) for v in self.bay_stagger],
+            "fin_schedule": (
+                None if self.fin_schedule is None else [round(v, 4) for v in self.fin_schedule]
+            ),
+            "deflectors": [[round(v, 4) for v in row] for row in self.deflectors],
         }
 
 
@@ -523,10 +633,20 @@ class Mixer(MarbleModule):
     here rather than on the field that goes in.
     """
 
-    def __init__(self, module_id: str, run: TrackRun) -> None:
+    def __init__(
+        self,
+        module_id: str,
+        run: TrackRun,
+        at: int | None = None,
+        pin_height: float | None = None,
+    ) -> None:
         super().__init__(module_id)
         self.run = run
-        self.index = run.index_near(layout.NODES["mix"])
+        # `at` overrides the recorded `mix` node so `sloped.startlab` can ask
+        # what the same nine pins do earlier, where the field is still a clump
+        # rather than eighteen units of single file.
+        self.index = run.index_near(layout.NODES["mix"]) if at is None else int(at)
+        self.pin_height = self.PIN_HEIGHT if pin_height is None else float(pin_height)
         self._mesh: TriMesh | None = None
 
     def _pins(self) -> list[tuple[int, float]]:
@@ -579,7 +699,7 @@ class Mixer(MarbleModule):
             return [self._mesh]
         pieces: list[TriMesh] = []
         radius = to_sim(layout.MIXER_PIN_RADIUS * self.run.scale)
-        height = to_sim(self.PIN_HEIGHT * self.run.scale)
+        height = to_sim(self.pin_height * self.run.scale)
         for offset, across in self._pins():
             index = min(max(self.index + offset, 0), len(self.run.path) - 1)
             _lateral, up, _forward = self.run.frames[index]
@@ -608,7 +728,7 @@ class Mixer(MarbleModule):
             "sample": self.index,
             "rows": list(layout.MIXER_ROW_COUNTS),
             "pin_radius": round(to_sim(layout.MIXER_PIN_RADIUS * self.run.scale), 6),
-            "pin_height": round(to_sim(self.PIN_HEIGHT * self.run.scale), 6),
+            "pin_height": round(to_sim(self.pin_height * self.run.scale), 6),
             "pins": [[offset, round(across, 4)] for offset, across in self._pins()],
         }
 
@@ -713,21 +833,36 @@ class Spinners(MarbleModule):
     FLOOR_CLEARANCE = 0.03
     RATE = 3.6                 # rad/s; the tip runs at 0.16 of the marbles' speed
 
-    def __init__(self, module_id: str, run: TrackRun) -> None:
+    def __init__(
+        self,
+        module_id: str,
+        run: TrackRun,
+        at: int | None = None,
+        offsets: Sequence[float] | None = None,
+        rate: float | None = None,
+    ) -> None:
         super().__init__(module_id)
         self.run = run
-        self.index = run.index_near(layout.NODES["obstacle"])
+        # `at`, `offsets` and `rate` override the recorded `obstacle` node and
+        # the asset's three-wheel spacing, so the same wheel can be asked to
+        # stand somewhere else. `sloped.startlab` puts one at the launch's
+        # entry: a turning wheel is the one mechanism whose *output* order is
+        # not monotone in its input order, because a marble's wait is its
+        # arrival time modulo the blade period.
+        self.index = run.index_near(layout.NODES["obstacle"]) if at is None else int(at)
+        self.offsets = tuple(layout.SPINNER_Z if offsets is None else offsets)
+        self.rate = self.RATE if rate is None else float(rate)
         self.spacing = run.arc[-1] / (len(run.path) - 1)
         self._mesh: TriMesh | None = None
 
     def _stations(self) -> list[tuple[int, float, float]]:
         """(sample, phase, rate) per wheel."""
         out: list[tuple[int, float, float]] = []
-        for wheel, offset in enumerate(layout.SPINNER_Z):
+        for wheel, offset in enumerate(self.offsets):
             index = int(round(self.index + offset / self.spacing))
             index = min(max(index, 1), len(self.run.path) - 2)
             sense = 1.0 if wheel % 2 == 0 else -1.0
-            out.append((index, wheel * layout.SPINNER_PHASE, sense * self.RATE))
+            out.append((index, wheel * layout.SPINNER_PHASE, sense * self.rate))
         return out
 
     def _hub_of(self, index: int) -> tuple[tuple[float, float, float], float]:

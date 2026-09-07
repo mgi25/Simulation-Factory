@@ -227,6 +227,34 @@ RUNS = (
         "scale": BRANCH_SCALE,
         "bank_gain": 4.0,
         "bank_max": 32.0,
+        # The three heights marked below are **not** the authored ones, and they
+        # are the one place this table departs from
+        # `docs/validation/sloped_course/physics_layout.json`.
+        #
+        # As authored the tail runs 5.60, 5.20, 5.18, 5.00, 4.90 - four controls
+        # inside half a layout unit of each other over fourteen units of travel
+        # - and a Catmull-Rom through heights that nearly equal overshoots.
+        # Measured on the built path, orange is the **only** run of the nine
+        # that climbs at all: ten consecutive uphill samples, 86 to 95, for
+        # 0.017 layout units of total rise. Every other run is strictly
+        # monotone.
+        #
+        # A gravity course cannot go uphill, and the cost is not the 0.017. It
+        # is that the grade either side of the bump sits between -0.06 and
+        # +0.01, so a marble arriving at orange[102] with 10 wu/s crawls the
+        # flat at 2 to 5 and stops at orange[114] - which is where every
+        # orange-bound marble in `sloped.splitlab` died once the fork itself
+        # was fixed.
+        #
+        # So the fall from control 5 to control 9 is redistributed linearly in
+        # horizontal arc length, 0.70 layout units over 14.291, which makes the
+        # tail monotone at -0.049 - the grade blue's own tail runs at (-0.053)
+        # and demonstrably enough, because blue's marbles finish. Every
+        # control's x and z is untouched, so the plan curve, the silhouette and
+        # the route's position are exactly as photographed; three heights move,
+        # by at most 0.145 layout units, a quarter of a marble diameter.
+        # `sloped.contract` reports it as a named deviation rather than letting
+        # it pass, and `docs/sloped_race_v11.md` carries it.
         "controls": (
             (6.90, 10.40, 18.55),
             (13.00, 9.20, 21.00),
@@ -234,9 +262,9 @@ RUNS = (
             (21.00, 7.20, 27.00),
             (19.40, 6.30, 30.60),
             (15.00, 5.60, 33.20),
-            (10.00, 5.20, 34.60),
-            (5.60, 5.18, 34.70),
-            (3.20, 5.00, 35.45),
+            (10.00, 5.3456, 34.60),      # authored 5.20
+            (5.60, 5.1300, 34.70),       # authored 5.18
+            (3.20, 5.0069, 35.45),       # authored 5.00
             (1.10, 4.90, 36.05),
         ),
     },

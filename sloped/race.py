@@ -302,6 +302,37 @@ class SlopedRace(MarbleSimulation):
         route = self.results[marble_id].route
         return route if route in self.offsets else self.default_route
 
+    def _runs_open_to(self, marble_id: int) -> tuple[str, ...]:
+        """The runs a marble may be located on.
+
+        Once its route is fixed, that route's runs. **Before** that, every run
+        the machine carries - and getting this wrong is what made the second
+        route unreportable.
+
+        `_route_of` falls back to `default_route`, which is blue, so filtering
+        the candidates by it while `result.route` is still None left
+        `orange_lead` and `orange` out of every search. `_route_from_place`
+        only ever returns "orange" for a marble located on one of those two, so
+        no marble could be assigned the orange route, and an orange-bound
+        marble crossing east of leg3's opened guard was located on leg3 - two
+        channel widths outside it - and booked as having left the course.
+
+        That is the instrument `docs/sloped_race_v1.md` measured its six fork
+        configurations with, so its "no configuration ever put a marble on the
+        orange lobe" is a statement about this function and not only about the
+        geometry. `tests/test_sloped_race.py` now pins the fix.
+        """
+        if self.results[marble_id].route in self.offsets:
+            return tuple(
+                name for name in ROUTE_RUNS[self._route_of(marble_id)] if name in self.runs
+            )
+        seen: list[str] = []
+        for names in ROUTE_RUNS.values():
+            for name in names:
+                if name in self.runs and name not in seen:
+                    seen.append(name)
+        return tuple(seen)
+
     def _locate(self, marble_id: int, position: Sequence[float], touched: set[str]) -> None:
         """Update a marble's run, sample and progress from what it touched.
 
@@ -311,8 +342,7 @@ class SlopedRace(MarbleSimulation):
         nearest in a straight line.
         """
         result = self.results[marble_id]
-        route = ROUTE_RUNS[self._route_of(marble_id)]
-        route = tuple(name for name in route if name in self.runs)
+        route = self._runs_open_to(marble_id)
         previous = self._where.get(marble_id)
         candidates = [name for name in route if name in touched]
         if previous and previous[0] not in candidates:

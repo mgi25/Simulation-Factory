@@ -223,14 +223,24 @@ class TrackRun(MarbleModule):
             # a second pass of Catmull-Rom through them happens to produce.
             # Everything downstream - bank, width, section, collider - is the
             # channel's, so a join is the same moulding as the runs it joins.
-            from sloped.pathing import auto_bank, flat_tangents, resample, width_curve
+            from sloped.pathing import BANK_EASE_ENDS, auto_bank, flat_tangents, resample, width_curve
 
             self.path = resample(
                 [tuple(float(v) for v in point) for point in path],
                 len(path) if samples is None else samples,
             )
+            # `entry_bank_deg` and `exit_bank_deg` are degrees in the spec and
+            # radians in `auto_bank`. A join that starts inside a banked turn
+            # has to start at that turn's own roll, or the two cradles either
+            # side of the seam are not the same surface; see
+            # `sloped.pathing.auto_bank` for what that cost the fork.
             self.banks = auto_bank(
-                self.path, float(spec["bank_gain"]), float(spec["bank_max"])
+                self.path,
+                float(spec["bank_gain"]),
+                float(spec["bank_max"]),
+                ease_ends=int(spec.get("bank_ease_ends", BANK_EASE_ENDS)),
+                entry_bank=math.radians(float(spec.get("entry_bank_deg", 0.0))),
+                exit_bank=math.radians(float(spec.get("exit_bank_deg", 0.0))),
             )
             self.tangents = flat_tangents(self.path)
             self.widths = width_curve(
@@ -300,7 +310,19 @@ class TrackRun(MarbleModule):
         edge = layout.floor_y_at(layout.CHANNEL_HALF) * self.scale
         out: list[tuple[float, float]] = []
         for across, up in self.section:
-            if across * side > half * 0.98 and up > edge:
+            # `side` of zero opens **both** guards. The sprint needs it: the
+            # merge apron is built around its first three units and the
+            # sprint's own guard rails stand up inside that apron, so the strip
+            # of apron outside the channel has a ledge along the top of each
+            # rail with the apron's roof over it. Measured, an orange marble
+            # crossing the apron came to rest on the east rail at across
+            # +2.337, its centre 0.43 simulation units above the apron floor
+            # under it and 0.74 below the roof - held there by geometry, at
+            # 0.52 wu/s. It is also where V1 lost 319 of its 747 marbles, all
+            # booked to `blue[100]`, which is the sample blue's exit hands over
+            # on. With both rails opened the apron is one surface from its
+            # outer wall to the cradle and there is no ledge to sit on.
+            if (side == 0.0 or across * side > half * 0.98) and abs(across) > half * 0.98 and up > edge:
                 out.append((across, edge + (up - edge) * factor))
             else:
                 out.append((across, up))

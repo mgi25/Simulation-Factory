@@ -220,6 +220,42 @@ LEAD_MOUTH_FLARE = 1.28
 FORK_WINDOW_ORANGE = 14
 FORK_WINDOW_BLUE = 20          # how far the ridge runs
 
+# Where orange's mouth sits across leg3's channel, in profile units, and why it
+# is not on the centreline.
+#
+# The fork is 82 samples along leg3, in the middle of a hairpin that turns
+# **left** and is therefore banked with its **east** side raised - 26 degrees of
+# it, which `min_radius_layout` says is 1.7 degrees more than a marble at
+# 43 wu/s needs to hold the 3.5-unit radius there, so it is a requirement.
+# Orange's lobe is to the east. So orange is on the *outside* of a banked turn,
+# and a branch mouth on leg3's centreline is a channel underneath leg3's floor
+# that a marble would have to fall into: measured, with the mouth on the
+# centreline no marble ever reached orange's floor at any entry speed or
+# lateral position, and the ones thrown east by the hook went over leg3's
+# opened lip into the void between the two channels at leg3[92..95].
+#
+# So the mouth is at the *top* of leg3's east bank, where the outward throw of
+# the hook actually delivers a marble, and the fork sorts the field the way the
+# geometry already wants to: a marble carrying enough speed rides up the bank
+# and onto orange's floor, one that does not stays low and follows leg3 round
+# to blue. Nothing chooses for it - the choice is momentum against a bank,
+# which is section 8's requirement exactly.
+#
+# In profile units, so `CHANNEL_HALF` is the cradle's edge and 1.0 is the top of
+# the rolled lip. `sloped.splitlab` scans it; see `docs/sloped_race_v11.md`.
+ORANGE_MOUTH_ACROSS = 0.94
+
+# How much of orange's lead holds leg3's own gradient before it starts to
+# fall - the correction in `_held_heights`, whose docstring has the numbers.
+#
+# It is set from the geometry rather than chosen. The two channels stop
+# overlapping when their centrelines are `HERO_CLEAR_WIDTH` apart, which the
+# built lead reaches about 13 of its 44 samples in, and 13/44 is 0.30. A tenth
+# is added so the changeover is past the parting rather than on it.
+# `sloped.course.check` asserts the built geometry still parts inside the hold,
+# so a change to the path law cannot leave this behind.
+ORANGE_LEAD_HOLD = 0.40
+
 
 def min_radius_layout(speed: float, bank_deg: float, mu: float = MU_TRACK) -> float:
     """The tightest arc a marble at `speed` holds on a channel banked so."""
@@ -233,6 +269,82 @@ def _norm2(x: float, z: float) -> tuple[float, float]:
     return (x / length, z / length) if length > 1e-12 else (0.0, 1.0)
 
 
+def _held_heights(
+    plan: Sequence[tuple[float, float]],
+    y0: float,
+    y1: float,
+    start_grade: float,
+    end_grade: float,
+    hold: float,
+) -> list[float]:
+    """Heights along a plan curve that hold `start_grade` before falling away.
+
+    A grade is height per unit of *horizontal* travel, so this works in the
+    plan curve's own arc length rather than in the Hermite's parameter, where
+    equal steps are not equal distances.
+
+    Over the first `hold` of the horizontal length the channel falls at exactly
+    `start_grade` - the gradient of the run it branches from - and the whole
+    remaining drop is absorbed by a cubic Hermite over what is left, joined C1
+    at the changeover and arriving at `end_grade`.
+
+    ## Why a fork needs this, and why a plain cubic will not do
+
+    A fork has to separate in **plan** before it separates in **elevation**,
+    and V1's two branches did the opposite. Measured in leg3's own frame at the
+    samples past the fork:
+
+        samples past  lateral apart  vertical apart
+                   4          0.349         -0.246
+                   8          0.707         -0.551
+                  12          1.109         -1.078
+
+    The two channels need 1.88 of lateral separation before they stop
+    overlapping, and by the time they have half of it orange's cradle is more
+    than half a marble diameter *below* leg3's floor. That is not a fork; it is
+    a trench under leg3's east half with no continuous surface into it. A
+    marble steered east ran off leg3's opened guard, dropped in and stopped
+    against orange's west wall from the inside - all seven controlled entries
+    in `sloped.splitlab` died that way, at leg3[90..95].
+
+    The cause is the gradients rather than the curve family: leg3's tail eases
+    from -0.32 at the fork to -0.07 at its exit while orange's lead needs an
+    average of -0.33, and a plain cubic between matched end gradients has
+    steepened to -0.39 by a quarter of the way along. Holding leg3's own
+    gradient over the overlap costs almost nothing - the drop moves back into a
+    stretch already at -0.38 - and it is the only thing that changes: both
+    endpoints, the plan curve, the macro route and the lobe are untouched.
+    """
+    span = [0.0]
+    for index in range(1, len(plan)):
+        span.append(
+            span[-1]
+            + math.hypot(
+                plan[index][0] - plan[index - 1][0], plan[index][1] - plan[index - 1][1]
+            )
+        )
+    total = span[-1]
+    if total <= 1e-9:
+        return [y0] * len(plan)
+    held = max(0.0, min(0.95, hold)) * total
+    y_held = y0 + start_grade * held
+    tail = total - held
+    out: list[float] = []
+    for distance in span:
+        if distance <= held or tail <= 1e-9:
+            out.append(y0 + start_grade * distance)
+            continue
+        u = (distance - held) / tail
+        u2, u3 = u * u, u * u * u
+        out.append(
+            (2 * u3 - 3 * u2 + 1) * y_held
+            + (u3 - 2 * u2 + u) * (start_grade * tail)
+            + (-2 * u3 + 3 * u2) * y1
+            + (u3 - u2) * (end_grade * tail)
+        )
+    return out
+
+
 def hermite(
     start: Sequence[float],
     start_heading_deg: float,
@@ -242,6 +354,7 @@ def hermite(
     tension: float = 0.62,
     start_grade: float | None = None,
     end_grade: float | None = None,
+    hold_grade: float = 0.0,
 ) -> list[tuple[float, float, float]]:
     """A cubic Hermite between two poses, in the horizontal plane, with height
     carried as a cubic of its own.
@@ -260,6 +373,12 @@ def hermite(
     channels came out 0.25 layout units apart in height while still
     overlapping laterally, which put a marble-deep pocket between orange's
     cradle and leg3's east wall. Six of eight marbles ended up in it.
+
+    Matching the end gradients was necessary and not sufficient: a cubic
+    between them still steepens in the middle, and at a fork the middle is
+    where the two channels still share floor. `hold_grade` is the fraction of
+    the join's horizontal length over which `start_grade` is held exactly
+    before the drop is made up; `_held_heights` has the measurement.
     """
     sx, sy, sz = (float(v) for v in start)
     ex, ey, ez = (float(v) for v in end)
@@ -277,7 +396,8 @@ def hermite(
     g1 = 0.0 if end_grade is None else end_grade * scale
     eased = start_grade is None and end_grade is None
 
-    out: list[tuple[float, float, float]] = []
+    plan: list[tuple[float, float]] = []
+    heights: list[float] = []
     for step in range(samples):
         t = step / (samples - 1)
         t2, t3 = t * t, t * t * t
@@ -285,14 +405,27 @@ def hermite(
         h10 = t3 - 2 * t2 + t
         h01 = -2 * t3 + 3 * t2
         h11 = t3 - t2
-        x = h00 * sx + h10 * m0[0] + h01 * ex + h11 * m1[0]
-        z = h00 * sz + h10 * m0[1] + h01 * ez + h11 * m1[1]
+        plan.append(
+            (
+                h00 * sx + h10 * m0[0] + h01 * ex + h11 * m1[0],
+                h00 * sz + h10 * m0[1] + h01 * ez + h11 * m1[1],
+            )
+        )
         if eased:
-            y = sy + (ey - sy) * (t * t * (3.0 - 2.0 * t))
+            heights.append(sy + (ey - sy) * (t * t * (3.0 - 2.0 * t)))
         else:
-            y = h00 * sy + h10 * g0 + h01 * ey + h11 * g1
-        out.append((x, y, z))
-    return out
+            heights.append(h00 * sy + h10 * g0 + h01 * ey + h11 * g1)
+
+    if hold_grade > 0.0 and not eased:
+        heights = _held_heights(
+            plan,
+            sy,
+            ey,
+            0.0 if start_grade is None else start_grade,
+            0.0 if end_grade is None else end_grade,
+            hold_grade,
+        )
+    return [(plan[i][0], heights[i], plan[i][1]) for i in range(samples)]
 
 
 def path_span(path) -> float:
@@ -365,9 +498,53 @@ def _run_pose(name: str, which: str):
 
 
 def _leg3_fork_pose():
+    """leg3's pose at the fork, with the gradient of its tail over the overlap.
+
+    The gradient is the *chord* over `FORK_WINDOW_ORANGE` samples rather than
+    the local one over four, because it is what orange's lead has to hold to
+    stay level with leg3 while the two still share floor, and leg3's tail is
+    not a straight line there: it falls at -0.32 at the fork and eases to -0.25
+    by fourteen samples on, with a chord of -0.282. Holding the local -0.321
+    instead puts orange's floor 0.10 simulation units *under* leg3's in the
+    middle of the window; holding the chord puts it 0.10 *over*, which is the
+    safe side - a marble crossing east climbs a tenth of a diameter rather than
+    dropping into a gap.
+    """
     path, _banks, tangents, _widths = _built("leg3")
     point, heading = pose_of(path, tangents, FORK_SAMPLE)
-    return point, heading, grade_of(path, FORK_SAMPLE)
+    return point, heading, grade_of(path, FORK_SAMPLE, span=FORK_WINDOW_ORANGE)
+
+
+def fork_mouth(across: float = ORANGE_MOUTH_ACROSS):
+    """Orange's mouth: a point up leg3's east bank, and leg3's heading there.
+
+    Built through a `TrackRun` rather than from `build_path` so the point is
+    the one the collider has a vertex at - `surface_point` applies the profile
+    scale and the per-sample width factor in the same order `ring_points`
+    does. `ORANGE_MOUTH_ACROSS` says why it is not on the centreline.
+    """
+    from sloped.track import TrackRun
+
+    leg3 = TrackRun("leg3")
+    point = leg3.surface_point(FORK_SAMPLE, across)
+    # Back to layout units: `join_paths` works in layout throughout and
+    # `TrackRun` converts once, on the way into the collider.
+    layout_point = tuple(value / LAYOUT_TO_SIM for value in point)
+    heading = leg3.heading_deg(FORK_SAMPLE)
+    return layout_point, heading, grade_of(leg3.path, FORK_SAMPLE, span=FORK_WINDOW_ORANGE)
+
+
+def fork_bank_deg() -> float:
+    """leg3's own roll at the fork, in degrees.
+
+    Read off the built run rather than typed, so the lead follows leg3 if the
+    path law or the bank law ever moves. This is 26.0 degrees on the shipped
+    geometry - `bank_max` for leg3, because the fork sits in the middle of its
+    hairpin - and `min_radius_layout` says a marble at 43 wu/s needs 24.3 of it
+    to hold the 3.5-unit radius there, so it is a requirement and not a choice.
+    """
+    _path, banks, _tangents, _widths = _built("leg3")
+    return math.degrees(banks[FORK_SAMPLE])
 
 
 # --- the specs ------------------------------------------------------------
@@ -391,10 +568,30 @@ JOIN_SPECS: dict[str, dict] = {
         "name": "orange_lead",
         "role": "join",
         "scale": layout.HERO_SCALE,
-        "bank_gain": 3.4,
+        # **The lead carries no bank of its own, and that is measured.** Its
+        # worst turn radius is 10.5 layout units and `min_radius_layout(43, 0)`
+        # is 8.6, so friction alone holds a marble on it at the arrival speed
+        # with the channel dead level. So its whole roll budget can go on the
+        # one thing it does need: matching leg3 at the seam.
+        #
+        # With a curvature-driven bank it could not. leg3's hairpin turns left
+        # and the lead turns right, so their banks have opposite sign, and a
+        # lead pinned to leg3's +26 at the nose has to reverse to its own -17.
+        # Over six samples that is a 43-degree twist in 1.7 layout units; over
+        # eighteen the reversal simply moves into the middle of the overlap,
+        # where the roll mismatch against leg3 measured -1.27 simulation units
+        # of step at leg3[89]. Either way it is the sign change that does the
+        # damage, and with `bank_gain` at zero there is no sign change: the roll
+        # decays monotonically from leg3's 26 degrees to level over the lead's
+        # whole length, 2.3 degrees per layout unit.
+        "bank_gain": 0.0,
         "bank_max": 30.0,
         "entry_flare": 0.0,
         "design_speed": SPLIT_DESIGN_SPEED,
+        # Measured off leg3 rather than typed. The two directions at the seam
+        # agree by construction, because the lead's start heading is leg3's own.
+        "entry_bank_deg": fork_bank_deg(),
+        "bank_ease_ends": 40,
     },
 }
 
@@ -406,7 +603,9 @@ def join_paths() -> dict[str, list[tuple[float, float, float]]]:
     with the runs instead of leaving them behind at coordinates that used to be
     right. `sloped.course` then checks each seam and each radius.
     """
-    fork_point, fork_heading, fork_grade = _leg3_fork_pose()
+    # Orange leaves from the top of leg3's east bank, not from its centreline;
+    # `ORANGE_MOUTH_ACROSS` has the measurement.
+    fork_point, fork_heading, fork_grade = fork_mouth()
     leg3_exit, leg3_heading, leg3_grade = _run_pose("leg3", "exit")
     blue_lobe = blue_controls()
     orange_lobe = orange_controls()
@@ -442,6 +641,9 @@ def join_paths() -> dict[str, list[tuple[float, float, float]]]:
             start_grade=leg3_grade,
             end_grade=blue_grade,
         ),
+        # Orange's lead holds leg3's gradient over the stretch where the two
+        # channels still share floor, then makes up its drop; see
+        # `ORANGE_LEAD_HOLD` and `_held_heights`.
         "orange_lead": hermite(
             fork_point,
             fork_heading,
@@ -451,5 +653,6 @@ def join_paths() -> dict[str, list[tuple[float, float, float]]]:
             tension=LEAD_TENSION,
             start_grade=fork_grade,
             end_grade=orange_grade,
+            hold_grade=ORANGE_LEAD_HOLD,
         ),
     }
