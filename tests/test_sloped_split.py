@@ -222,3 +222,35 @@ def test_the_apron_follows_blues_gradient_and_not_the_chord():
         "blue falls faster than the chord to the sprint; if these agree the "
         "shelf is back"
     )
+
+
+def test_the_aprons_upstream_edge_is_answered_by_blue_and_only_there():
+    """The one probe the merge correction changes, pinned so it cannot widen.
+
+    With the apron following blue's gradient the two surfaces agree to about
+    0.03 at the apron's back edge, so a ray aimed at one reaches the other.
+    That is the correction working. What must not happen is the exemption
+    quietly covering the rest of the apron.
+    """
+    from marble3d.world import MarbleWorld
+    from marble3d.config import DEFAULT_CONFIG
+    from marble3d.validation import probe_world
+    from sloped.course import check_probes
+
+    machine = sloped_course()
+    world = MarbleWorld(DEFAULT_CONFIG)
+    try:
+        machine.build(world)
+        assert check_probes(machine, world) == []
+        raw = [f for f in probe_world(world, machine.probes())]
+        excused = [
+            f
+            for f in raw
+            if f.subject.startswith("merge.apron[0]") and "on 'blue'" in f.detail
+        ]
+        assert len(excused) <= 3, [str(f) for f in excused]
+        for finding in excused:
+            gap = float(finding.detail.split("is ")[1].split(" from")[0])
+            assert gap < 0.09, finding.detail
+    finally:
+        world.close()

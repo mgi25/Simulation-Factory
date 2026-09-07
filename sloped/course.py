@@ -486,6 +486,14 @@ def check_probes(machine: Machine, world) -> list[Finding]:
       and the surface steps by up to 0.06 simulation units. That step is in the
       render too, because both runs are drawn with their own flare, so the
       collider is reproducing a seam rather than inventing one.
+    * the merge apron's own upstream edge, answered by **blue's** collider.
+      The apron there is built to follow blue's channel rather than a chord to
+      the sprint - that correction is what closed the `blue[100..119]` stop
+      trap - so the two surfaces now agree to about 0.03 and the ray reaches
+      whichever is a hair higher. A probe aimed at the apron and answered by
+      blue at 0.053 is the two being one surface, which is the thing that was
+      wanted; before the correction the apron stood 0.114 clear of blue there
+      and the probe hit it cleanly, which is the thing that was wrong.
     """
     from marble3d.validation import probe_world
 
@@ -495,6 +503,8 @@ def check_probes(machine: Machine, world) -> list[Finding]:
         if any(f"on '{name}'" in detail for name in OBSTRUCTIONS):
             continue
         if "[0]" in finding.subject and "cradle" in finding.subject:
+            continue
+        if finding.subject.startswith("merge.apron[0]") and "on 'blue'" in detail:
             continue
         findings.append(finding)
     return findings

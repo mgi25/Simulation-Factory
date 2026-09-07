@@ -77,7 +77,12 @@ def build(directory: str, out: str, cameras: str = "") -> str:
         for entry in os.listdir(directory)
         if entry.endswith(".png")
         and os.path.splitext(entry)[0] not in ORDER
-        and os.path.splitext(entry)[0] != "contact_sheet"
+        # Any sheet, not just one called exactly `contact_sheet`. The
+        # versioned ones - `contact_sheet_v11` and up - live in the same
+        # directory, and a sheet that tiles the previous sheet is a sheet with
+        # a thumbnail of itself in the corner. Measured, because that is what
+        # v12 came out as on its first build.
+        and not os.path.splitext(entry)[0].startswith("contact_sheet")
     )
     names.extend(extra)
     if not names:
