@@ -51,6 +51,7 @@ from sloped import layout
 from sloped.race import LATERAL_SLACK, VERTICAL_SLACK
 from sloped.scale import LAYOUT_TO_SIM
 from sloped.basin import StartBasin
+from sloped.radial import RadialStart
 from sloped.stations import Mixer, Spinners, StartGrid
 from sloped.track import TrackRun
 
@@ -115,8 +116,12 @@ class StartPlan:
     # The launch's width profile, as (factor, hold to sample, blended by
     # sample) - the wide mixing stretch. See `sloped.track.TrackRun`.
     launch_width: tuple[float, int, int] | None = None
-    # "basin" or "fan"; see `sloped.course.START_KIND`.
+    # "basin", "fan" or "radial"; see `sloped.course.START_KIND`.
     start_kind: str = "basin"
+    # Whether the radial start's port ring holds the field for a synchronised
+    # release. False measures the passive architecture, which is what section 7
+    # of the V1.4 brief asks to be tried first.
+    port_gate: bool = True
     # (radius, z, rise) of the basin's island, or None for none.
     island: tuple[float, float, float] | None = None
     # Paddle wheels, as (run name, sample, rate in rad/s). One wheel each.
@@ -133,6 +138,7 @@ class StartPlan:
             "mixers": [list(m) for m in self.mixers],
             "launch_width": list(self.launch_width) if self.launch_width else None,
             "start_kind": self.start_kind,
+            "port_gate": self.port_gate,
             "island": list(self.island) if self.island else None,
             "wheels": [list(w) for w in self.wheels],
         }
@@ -184,7 +190,11 @@ def start_machine(config: CoreConfig | None = None, plan: StartPlan | None = Non
     front_half = 0.5 * runs["launch"].clear_width * runs["launch"].widths[0] / LAYOUT_TO_SIM
     if plan.launch_width is None:
         front_half = None
-    if plan.start_kind == "basin":
+    if plan.start_kind == "radial":
+        machine.add(
+            RadialStart("start", runs["launch"], port_gate=plan.port_gate), Transform()
+        )
+    elif plan.start_kind == "basin":
         basin = StartBasin("start", runs["launch"])
         if plan.island is not None:
             basin.ISLAND_R, basin.ISLAND_Z, basin.ISLAND_RISE = plan.island
@@ -339,6 +349,16 @@ class StartTrial:
         self.progress: dict[int, float] = {mid: 0.0 for mid in self.slot_of}
         self.collisions: dict[int, int] = {mid: 0 for mid in self.slot_of}
         self.wall_ticks: dict[int, int] = {mid: 0 for mid in self.slot_of}
+        # No stall or containment verdict before every gate on the start has
+        # finished releasing. Read off the machine's own actuators rather than
+        # typed, so a change to a release time cannot leave the instrument
+        # measuring the old one.
+        release = 0.0
+        for module in machine:
+            for actuator in getattr(module, "local_actuators", lambda: [])():
+                release = max(release, getattr(actuator, "release_time", 0.0)
+                              + getattr(actuator, "duration", 0.0))
+        self._grace_ticks = int(round(release * self.sim.config.physics.physics_hz)) + 12
         self.lost: dict[int, tuple[str, int]] = {}
         # A marble that has stopped is as lost to a race as one that fell off,
         # and the first version of this lab could not see the difference:
@@ -418,6 +438,14 @@ class StartTrial:
 
     def _stall(self, marble_id: int, velocity: Sequence[float]) -> None:
         if marble_id in self.lost or marble_id in self.stuck:
+            return
+        # A marble waiting in a holding cup is not stuck, it is waiting. The
+        # radial start's port ring holds the field for a synchronised release,
+        # and a detector that calls a second of stillness a stall reports all
+        # eight racers stuck before the race has started - which is what the
+        # first radial trial did, and the mechanism was the instrument.
+        if self.sim.ticks < self._grace_ticks:
+            self._slow[marble_id] = 0
             return
         if math.hypot(*velocity) >= self.STOPPED_SPEED:
             self._slow[marble_id] = 0

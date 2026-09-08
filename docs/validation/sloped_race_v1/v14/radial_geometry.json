@@ -1,0 +1,401 @@
+{
+  "heights": {
+    "shelf_floor": -0.94,
+    "port_floor": -3.14,
+    "dish_edge": -3.28,
+    "drain_lip": -3.66,
+    "exit_y": -4.95
+  },
+  "feeders": [
+    {
+      "bay": 0,
+      "slot": 2,
+      "port_deg": 112.5,
+      "length": 7.3665,
+      "drop": 2.2,
+      "grade_deg": 16.628,
+      "steepest_deg": 56.403,
+      "shape": 0.62,
+      "port_radius": 1.35,
+      "entry_tangent_deg": 202.5,
+      "fall_seconds": 3.6678
+    },
+    {
+      "bay": 1,
+      "slot": 3,
+      "port_deg": 157.5,
+      "length": 4.2483,
+      "drop": 2.2,
+      "grade_deg": 27.378,
+      "steepest_deg": 55.984,
+      "shape": 0.68,
+      "port_radius": 1.35,
+      "entry_tangent_deg": 247.5,
+      "fall_seconds": 2.2824
+    },
+    {
+      "bay": 2,
+      "slot": 4,
+      "port_deg": 202.5,
+      "length": 1.6215,
+      "drop": 2.2,
+      "grade_deg": 53.608,
+      "steepest_deg": 57.126,
+      "shape": 1.15,
+      "port_radius": 1.35,
+      "entry_tangent_deg": 292.5,
+      "fall_seconds": 1.3039
+    },
+    {
+      "bay": 3,
+      "slot": 5,
+      "port_deg": 247.5,
+      "length": 0.6285,
+      "drop": 2.2,
+      "grade_deg": 74.057,
+      "steepest_deg": 78.03,
+      "shape": 1.45,
+      "port_radius": 1.35,
+      "entry_tangent_deg": 337.5,
+      "fall_seconds": 1.0916
+    },
+    {
+      "bay": 4,
+      "slot": 6,
+      "port_deg": 292.5,
+      "length": 0.5273,
+      "drop": 2.2,
+      "grade_deg": 76.521,
+      "steepest_deg": 79.913,
+      "shape": 1.45,
+      "port_radius": 1.35,
+      "entry_tangent_deg": 22.5,
+      "fall_seconds": 1.0793
+    },
+    {
+      "bay": 5,
+      "slot": 7,
+      "port_deg": 337.5,
+      "length": 1.7727,
+      "drop": 2.2,
+      "grade_deg": 51.139,
+      "steepest_deg": 54.777,
+      "shape": 1.15,
+      "port_radius": 1.35,
+      "entry_tangent_deg": 67.5,
+      "fall_seconds": 1.3479
+    },
+    {
+      "bay": 6,
+      "slot": 0,
+      "port_deg": 22.5,
+      "length": 4.6092,
+      "drop": 2.2,
+      "grade_deg": 25.516,
+      "steepest_deg": 55.513,
+      "shape": 0.68,
+      "port_radius": 1.35,
+      "entry_tangent_deg": 112.5,
+      "fall_seconds": 2.4366
+    },
+    {
+      "bay": 7,
+      "slot": 1,
+      "port_deg": 67.5,
+      "length": 7.0596,
+      "drop": 2.2,
+      "grade_deg": 17.309,
+      "steepest_deg": 56.519,
+      "shape": 0.62,
+      "port_radius": 1.35,
+      "entry_tangent_deg": 157.5,
+      "fall_seconds": 3.5278
+    }
+  ],
+  "spread": {
+    "length": [
+      0.5273,
+      7.3665
+    ],
+    "length_spread": 6.8392,
+    "drop_spread": 0.0,
+    "radius_spread": 0.0,
+    "fall_seconds": [
+      1.0793,
+      3.6678
+    ],
+    "release_margin": -0.2678
+  },
+  "isolation": [
+    {
+      "pair": [
+        6,
+        7
+      ],
+      "plan": 0.5769,
+      "rise": 0.2947,
+      "slack": 0.6271
+    },
+    {
+      "pair": [
+        5,
+        6
+      ],
+      "plan": 0.8141,
+      "rise": 0.4048,
+      "slack": 0.8849
+    },
+    {
+      "pair": [
+        0,
+        1
+      ],
+      "plan": 0.83,
+      "rise": 0.061,
+      "slack": 0.9022
+    },
+    {
+      "pair": [
+        3,
+        4
+      ],
+      "plan": 0.9484,
+      "rise": 0.4361,
+      "slack": 1.0308
+    },
+    {
+      "pair": [
+        2,
+        3
+      ],
+      "plan": 0.996,
+      "rise": 0.386,
+      "slack": 1.0826
+    },
+    {
+      "pair": [
+        4,
+        5
+      ],
+      "plan": 1.0058,
+      "rise": 0.4952,
+      "slack": 1.0933
+    },
+    {
+      "pair": [
+        1,
+        2
+      ],
+      "plan": 1.0332,
+      "rise": 0.0,
+      "slack": 1.1231
+    },
+    {
+      "pair": [
+        0,
+        7
+      ],
+      "plan": 1.0332,
+      "rise": 0.0,
+      "slack": 1.1231
+    },
+    {
+      "pair": [
+        0,
+        6
+      ],
+      "plan": 1.7765,
+      "rise": 0.5805,
+      "slack": 1.931
+    },
+    {
+      "pair": [
+        5,
+        7
+      ],
+      "plan": 1.8093,
+      "rise": 0.4048,
+      "slack": 1.9666
+    },
+    {
+      "pair": [
+        3,
+        5
+      ],
+      "plan": 1.8928,
+      "rise": 0.6132,
+      "slack": 2.0574
+    },
+    {
+      "pair": [
+        0,
+        2
+      ],
+      "plan": 1.9058,
+      "rise": 0.1571,
+      "slack": 2.0715
+    },
+    {
+      "pair": [
+        1,
+        7
+      ],
+      "plan": 1.9092,
+      "rise": 0.0,
+      "slack": 2.0752
+    },
+    {
+      "pair": [
+        4,
+        6
+      ],
+      "plan": 1.9092,
+      "rise": 0.0,
+      "slack": 2.0752
+    },
+    {
+      "pair": [
+        1,
+        3
+      ],
+      "plan": 1.9092,
+      "rise": 0.0,
+      "slack": 2.0752
+    },
+    {
+      "pair": [
+        2,
+        4
+      ],
+      "plan": 1.9092,
+      "rise": 0.0,
+      "slack": 2.0752
+    },
+    {
+      "pair": [
+        0,
+        5
+      ],
+      "plan": 2.4945,
+      "rise": 0.0,
+      "slack": 2.7114
+    },
+    {
+      "pair": [
+        1,
+        6
+      ],
+      "plan": 2.4945,
+      "rise": 0.0,
+      "slack": 2.7114
+    },
+    {
+      "pair": [
+        2,
+        7
+      ],
+      "plan": 2.4945,
+      "rise": 0.0,
+      "slack": 2.7114
+    },
+    {
+      "pair": [
+        3,
+        6
+      ],
+      "plan": 2.4945,
+      "rise": 0.0,
+      "slack": 2.7114
+    },
+    {
+      "pair": [
+        4,
+        7
+      ],
+      "plan": 2.4945,
+      "rise": 0.0,
+      "slack": 2.7114
+    },
+    {
+      "pair": [
+        0,
+        3
+      ],
+      "plan": 2.4945,
+      "rise": 0.0,
+      "slack": 2.7114
+    },
+    {
+      "pair": [
+        1,
+        4
+      ],
+      "plan": 2.4945,
+      "rise": 0.0,
+      "slack": 2.7114
+    },
+    {
+      "pair": [
+        2,
+        5
+      ],
+      "plan": 2.4945,
+      "rise": 0.0,
+      "slack": 2.7114
+    },
+    {
+      "pair": [
+        1,
+        5
+      ],
+      "plan": 2.7,
+      "rise": 0.0,
+      "slack": 2.9348
+    },
+    {
+      "pair": [
+        2,
+        6
+      ],
+      "plan": 2.7,
+      "rise": 0.0,
+      "slack": 2.9348
+    },
+    {
+      "pair": [
+        3,
+        7
+      ],
+      "plan": 2.7,
+      "rise": 0.0,
+      "slack": 2.9348
+    },
+    {
+      "pair": [
+        0,
+        4
+      ],
+      "plan": 2.7,
+      "rise": 0.0,
+      "slack": 2.9348
+    }
+  ],
+  "containment": {
+    "over_rim": 0.2448,
+    "over_foreign_cup": -0.2152
+  },
+  "mesh_findings": [],
+  "findings": [
+    "port release 3.4s leaves only -0.27s over the slowest chute",
+    "bay 0 chute reaches 56.4 deg, a drop",
+    "bay 1 chute reaches 56.0 deg, a drop",
+    "bay 2 chute reaches 57.1 deg, a drop",
+    "bay 3 chute reaches 78.0 deg, a drop",
+    "bay 4 chute reaches 79.9 deg, a drop",
+    "bay 5 chute reaches 54.8 deg, a drop",
+    "bay 6 chute reaches 55.5 deg, a drop",
+    "bay 7 chute reaches 56.5 deg, a drop",
+    "chutes 6 and 7 are not isolated: plan 0.58, rise 0.29",
+    "a chute floor is only -0.215 over a foreign cup"
+  ]
+}

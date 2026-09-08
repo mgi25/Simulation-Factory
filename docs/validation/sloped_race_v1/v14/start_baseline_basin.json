@@ -1,0 +1,258 @@
+{
+  "trials": 300,
+  "incomplete": 0,
+  "racers": 2400,
+  "lost": 49,
+  "lost_pct": 2.042,
+  "stuck": 0,
+  "stuck_pct": 0.0,
+  "trailing": 52,
+  "trailing_pct": 2.167,
+  "checkpoints": [
+    "descent",
+    "half",
+    "exit"
+  ],
+  "rank_span": {
+    "descent": {
+      "means": [
+        6.9333,
+        5.94,
+        3.5233,
+        4.3533,
+        2.49,
+        2.33,
+        4.0767,
+        6.3533
+      ],
+      "span": 4.6033,
+      "best_slot": 5,
+      "worst_slot": 0
+    },
+    "half": {
+      "means": [
+        6.86,
+        5.8933,
+        3.5333,
+        4.2933,
+        2.5567,
+        2.57,
+        4.0,
+        6.2933
+      ],
+      "span": 4.3033,
+      "best_slot": 4,
+      "worst_slot": 0
+    },
+    "exit": {
+      "means": [
+        6.8467,
+        5.8867,
+        3.5133,
+        4.3,
+        2.5667,
+        2.63,
+        4.0267,
+        6.23
+      ],
+      "span": 4.28,
+      "best_slot": 4,
+      "worst_slot": 0
+    }
+  },
+  "early_rank_span": 4.6033,
+  "exit_rank_span": 4.28,
+  "slots": [
+    {
+      "slot": 0,
+      "trials": 300,
+      "mean_rank": {
+        "descent": 6.9333,
+        "half": 6.86,
+        "exit": 6.8467
+      },
+      "mean_exit_order": 6.9498,
+      "mean_progress": {
+        "descent": 8.2119,
+        "half": 25.2524,
+        "exit": 58.8029
+      },
+      "mean_collisions": 34.343,
+      "mean_wall_ticks": 18.86,
+      "lost": 5,
+      "lost_pct": 1.667,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 6,
+      "trailing_pct": 2.0
+    },
+    {
+      "slot": 1,
+      "trials": 300,
+      "mean_rank": {
+        "descent": 5.94,
+        "half": 5.8933,
+        "exit": 5.8867
+      },
+      "mean_exit_order": 5.9833,
+      "mean_progress": {
+        "descent": 11.2586,
+        "half": 29.9712,
+        "exit": 64.8681
+      },
+      "mean_collisions": 52.333,
+      "mean_wall_ticks": 21.54,
+      "lost": 2,
+      "lost_pct": 0.667,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 3,
+      "trailing_pct": 1.0
+    },
+    {
+      "slot": 2,
+      "trials": 300,
+      "mean_rank": {
+        "descent": 3.5233,
+        "half": 3.5333,
+        "exit": 3.5133
+      },
+      "mean_exit_order": 3.6296,
+      "mean_progress": {
+        "descent": 19.7267,
+        "half": 42.4537,
+        "exit": 78.3226
+      },
+      "mean_collisions": 53.41,
+      "mean_wall_ticks": 22.06,
+      "lost": 4,
+      "lost_pct": 1.333,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 6,
+      "trailing_pct": 2.0
+    },
+    {
+      "slot": 3,
+      "trials": 300,
+      "mean_rank": {
+        "descent": 4.3533,
+        "half": 4.2933,
+        "exit": 4.3
+      },
+      "mean_exit_order": 4.1933,
+      "mean_progress": {
+        "descent": 17.1138,
+        "half": 38.7297,
+        "exit": 74.4025
+      },
+      "mean_collisions": 62.663,
+      "mean_wall_ticks": 21.41,
+      "lost": 5,
+      "lost_pct": 1.667,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 1,
+      "trailing_pct": 0.333
+    },
+    {
+      "slot": 4,
+      "trials": 300,
+      "mean_rank": {
+        "descent": 2.49,
+        "half": 2.5567,
+        "exit": 2.5667
+      },
+      "mean_exit_order": 2.5436,
+      "mean_progress": {
+        "descent": 24.5356,
+        "half": 48.6543,
+        "exit": 84.3073
+      },
+      "mean_collisions": 45.46,
+      "mean_wall_ticks": 21.73,
+      "lost": 6,
+      "lost_pct": 2.0,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 8,
+      "trailing_pct": 2.667
+    },
+    {
+      "slot": 5,
+      "trials": 300,
+      "mean_rank": {
+        "descent": 2.33,
+        "half": 2.57,
+        "exit": 2.63
+      },
+      "mean_exit_order": 2.4055,
+      "mean_progress": {
+        "descent": 25.3628,
+        "half": 47.757,
+        "exit": 81.0163
+      },
+      "mean_collisions": 31.077,
+      "mean_wall_ticks": 18.84,
+      "lost": 18,
+      "lost_pct": 6.0,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 24,
+      "trailing_pct": 8.0
+    },
+    {
+      "slot": 6,
+      "trials": 300,
+      "mean_rank": {
+        "descent": 4.0767,
+        "half": 4.0,
+        "exit": 4.0267
+      },
+      "mean_exit_order": 3.7433,
+      "mean_progress": {
+        "descent": 17.8492,
+        "half": 40.2616,
+        "exit": 76.4399
+      },
+      "mean_collisions": 46.363,
+      "mean_wall_ticks": 21.84,
+      "lost": 8,
+      "lost_pct": 2.667,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 3,
+      "trailing_pct": 1.0
+    },
+    {
+      "slot": 7,
+      "trials": 300,
+      "mean_rank": {
+        "descent": 6.3533,
+        "half": 6.2933,
+        "exit": 6.23
+      },
+      "mean_exit_order": 6.2933,
+      "mean_progress": {
+        "descent": 10.1828,
+        "half": 28.0978,
+        "exit": 62.8584
+      },
+      "mean_collisions": 38.31,
+      "mean_wall_ticks": 20.68,
+      "lost": 1,
+      "lost_pct": 0.333,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 1,
+      "trailing_pct": 0.333
+    }
+  ],
+  "wall_seconds": 621.41,
+  "label": "V1.3 BASIN baseline (mislabelled 'fan' when recorded)",
+  "seeds": [
+    0,
+    300
+  ],
+  "correction": "tools/sloped_start_bench.py builds SHIPPED_PLAN, whose start_kind defaults to 'basin' and is not overridden, while course.START_KIND is 'fan'. This run is the basin's early-rank profile, not the taper's. See docs/sloped_race_v14_radial.md section 5."
+}

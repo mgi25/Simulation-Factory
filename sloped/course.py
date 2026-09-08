@@ -78,6 +78,7 @@ from sloped import joins, layout
 from sloped.pathing import build_path
 from sloped.scale import to_sim
 from sloped.basin import StartBasin
+from sloped.radial import RadialStart
 from sloped.stations import FinishDeck, ForkRidge, MergeCatch, Mixer, Spinners, StartGrid
 from sloped.track import TrackRun
 
@@ -232,12 +233,20 @@ SHUFFLE_RATE = 9.0
 START_KIND = "fan"
 
 
-def start_module(kind: str, launch):
+def start_module(kind: str, launch, **options):
+    """One of the three start topologies, by name.
+
+    `fan` is V1.1's taper, `basin` V1.3's stadium dish - both falsified for
+    slot bias, and both kept because they are the two topologies the mechanism
+    was measured in. `radial` is V1.4's ring: see `sloped.radial`.
+    """
     if kind == "basin":
         return StartBasin("start", launch)
     if kind == "fan":
         return StartGrid("start", launch)
-    raise ValueError(f"start must be 'basin' or 'fan', not {kind!r}")
+    if kind == "radial":
+        return RadialStart("start", launch, **options)
+    raise ValueError(f"start must be 'basin', 'fan' or 'radial', not {kind!r}")
 
 
 def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Machine:
