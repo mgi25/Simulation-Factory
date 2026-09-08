@@ -39,12 +39,13 @@ from sloped.stations import StartGrid
 def test_the_start_classes_declare_distinct_kinds():
     """One row per topology tried, and every one of them still named.
 
-    Grown as topologies were added - fan, basin, radial, and V1.6's
-    unconstricted wide launch. The registry is what makes a benchmark say which
+    Grown as topologies were added - fan, basin, radial, V1.6's unconstricted
+    wide launch, V1.7's rotor chamber and V1.8's full-floor release. The registry is what makes a benchmark say which
     it measured, so a new kind that forgot to declare itself would collide
     silently, which is the whole failure this file exists about.
     """
     from sloped.shuffle import ShuffleChamber
+    from sloped.trapdoor import ShuffleFloor
     from sloped.widelaunch import WideLaunch
 
     kinds = [
@@ -53,8 +54,9 @@ def test_the_start_classes_declare_distinct_kinds():
         RadialStart.START_KIND,
         WideLaunch.START_KIND,
         ShuffleChamber.START_KIND,
+        ShuffleFloor.START_KIND,
     ]
-    assert kinds == ["fan", "basin", "radial", "wide_launch", "rotor"]
+    assert kinds == ["fan", "basin", "radial", "wide_launch", "rotor", "floor"]
     # Distinctness and completeness rather than a count: the count grows every
     # session a topology is tried, and a test that pins it fails for the one
     # reason that is never interesting.

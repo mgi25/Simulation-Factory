@@ -128,10 +128,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     catch = described["catch"]
     print(
-        f"  dish {catch['width']} across, back {catch['back_z']} to spillway "
-        f"{catch['spill_z']}, depth {catch['dish_depth']} = {catch['slope_deg']} "
-        f"deg, rim {catch['rim_rise']}; lift {described['lift']}"
+        f"  catch: a {catch['kind']}, {catch['width']} across, throat "
+        f"{catch['throat_width']}, rim to throat {catch['rim_to_throat']} at "
+        f"{catch['slope_deg']} deg, rim {catch['rim_rise']}; lift "
+        f"{described['lift']}"
     )
+    print(f"  it orders the field by {catch['orders_the_field_by']}")
     print(f"  chute {heights['chute_run']} long at {heights['chute_grade_deg']} deg")
     print()
 
@@ -375,11 +377,11 @@ def main(argv: list[str] | None = None) -> int:
                 continue
             if not floor._inside(x, floor.CHAMBER_Z + z):
                 outside += 1
-    print(f"dish coverage: {outside} point(s) of the chamber disc are not over "
-          f"the dish")
+    print(f"catch coverage: {outside} point(s) of the chamber disc are not over "
+          f"the cone")
     if outside:
         findings.append(
-            f"{outside} points of the chamber floor are not over the dish; a "
+            f"{outside} points of the chamber floor are not over the cone; a "
             f"marble there falls out of the machine"
         )
     report["chamber_points_off_dish"] = outside
@@ -393,6 +395,8 @@ def main(argv: list[str] | None = None) -> int:
             z = row * floor.R_WALL / 24.0
             if math.hypot(x, z) > floor.R_WALL - layout.MARBLE_RADIUS:
                 continue
+            if math.hypot(x, z) <= floor.THROAT_R:
+                continue          # a hole is not a surface to land on
             falls.append(floor.fall_to_dish(x, floor.CHAMBER_Z + z))
     low, high = min(falls), max(falls)
     mean = sum(falls) / len(falls)
@@ -403,13 +407,20 @@ def main(argv: list[str] | None = None) -> int:
           f"per second at g = {GRAVITY:.1f}")
     print(f"  rebound at restitution 0.15 rises "
           f"{0.7 * (0.15 * speed(high)) ** 2 / GRAVITY:.3f}, against a "
-          f"{floor.DISH_RIM_RISE} rim")
+          f"{floor.CONE_RIM_RISE} rim")
+    # And what the catch's own ordering statistic spans over the chamber, which
+    # is the number the fairness turns on: for a cone on the axis it is the
+    # radius, and the pre-release table says the radius is the one coordinate
+    # the rotor equalises.
+    print(f"  the exit is on the chamber's axis, so the path to it is the "
+          f"marble's own chamber radius: 0 to "
+          f"{floor.R_WALL - layout.MARBLE_RADIUS:.3f}")
     report["fall"] = {
         "min": round(low, 4), "max": round(high, 4), "mean": round(mean, 4),
         "speed_min": round(speed(low), 3), "speed_max": round(speed(high), 3),
         "gravity": round(GRAVITY, 3),
     }
-    if 0.7 * (0.15 * speed(high)) ** 2 / GRAVITY > floor.DISH_RIM_RISE:
+    if 0.7 * (0.15 * speed(high)) ** 2 / GRAVITY > floor.CONE_RIM_RISE:
         findings.append("a marble could rebound over the dish's rim")
 
     # --- the rotor's clearances, which are now constant everywhere --------

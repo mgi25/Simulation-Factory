@@ -5,6 +5,14 @@ Tools: tools/sloped_floor_check.py (geometry, before any marble),
        tools/sloped_floor_trace.py (stages a, b, c),
        tools/sloped_start_bench.py --start-kind floor (stage d).
 
+READ THE LAST SECTION FIRST. Sections 0 to D below were measured against the
+**stadium dish** the release was first built over, and the dish is superseded:
+the numbers that describe the *release* carry over unchanged, but every number
+that describes the catch - the 0.89 chute, the 0.70 dish depth, the 2.81 lift,
+the stage-D fairness table - belongs to a catch that no longer exists. The
+final section is why, and it is the session's main finding. The staged run was
+repeated on the cone and is quoted there.
+
 
 0. GEOMETRY, BEFORE ANY MARBLE
 ------------------------------
@@ -155,3 +163,95 @@ Removing the outlet removed three things with it, and each is a simplification:
 `START_LIFT` is re-derived at **2.81**, against V1.7's 2.14 and the radial
 start's 4.30. The whole of the increase is the marble diameter the well has to
 carry, and it is the price of a hinged floor.
+
+
+THE CATCH IS WHERE THE SELECTION WENT
+=====================================
+
+The release is provably position-independent - eighteen boxes, one (release,
+duration, sweep) triple, nothing in `FloorPanel` reads a position, an id, a bay
+or a rank - and it delivers 100% of the field. It did not make the start fair.
+
+Two catches were built and measured in the same instrument, over 96 seeds each,
+behind the same chamber and the same downstream:
+
+  catch                      delivered   exit span   slot r   centre r   lift
+  stadium dish, rim notch      98.958%      2.479     +0.264    +0.886    2.81
+  cone on the axis, throat     98.177%      1.208     -0.074    -0.928    3.93
+
+and for scale, in the same instrument:
+
+  fan, as shipped (V1.3)       99.35%       2.927     -0.387    +0.574      -
+  rotor + central outlet (V1.7) 88.93%      2.200     -0.206    -0.182    2.14
+
+The finding is general enough to state as one:
+
+> A catch with one exit orders the field by path length to that exit. So a
+> position-independent release does not remove the selection - it **moves** it
+> to the catch, and the statistic that then decides the race is "how far from
+> the exit was this marble when the floor went". The catch's exit therefore has
+> to sit wherever the mixing has actually equalised the field.
+
+The rotor equalises exactly one coordinate, and the pre-release table says
+which. With the paddles stopped, `bay -> radius` is -0.065 and
+`|bay-3.5| -> radius` is -0.202, while the bearing still carries the bay at a
+per-bay concentration of 0.358 against a 0.090 noise floor. Distance to a point
+**on the chamber's axis** is the radius. Distance to a notch on the rim is a
+function of radius *and* bearing, and it reads back the one thing the chamber
+did not erase - amplified, because the notch is 2.75 downstream of a chamber
+only 2.70 across, so the dominant term is the bay's residual z.
+
+That is also why V1.7's central outlet was, in hindsight, the fairest catch
+this tree has built. Its problem was throughput and never fairness.
+
+Moving the exit onto the axis took the **exit rank span from 2.479 to 1.208
+places** - less than half V1.7's 2.200 and under half the shipped fan's 2.927,
+the best figure this project has measured - and the slot correlation from
++0.264 to -0.074, which is indistinguishable from none.
+
+The stadium dish is **not** kept in the tree. The basin is kept because it is
+one line to switch back to; this is not - the dish and the cone differ in every
+term of the height chain, in the mesh, in the probes and in the lift, so a
+switch would be a second module pretending to be a flag. Its numbers are above
+and its report is `startlab_floor_tuned_96.json`.
+
+
+WHAT THE COST OF THE AXIAL CATCH IS
+-----------------------------------
+`START_LIFT` goes 2.81 to **3.93**, against V1.7's 2.14 and the radial start's
+4.30, and the containment losses go 8 to 14 of 768 with it:
+
+  leg1[70..79%] x6, leg1[80..89%] x2     the pre-existing trap, in both
+  launch[30..39%] x3, launch[40..49%] x2  new, and the lift is why
+  leg1[50..59%] x1
+
+The five launch losses are the mechanism V1.7 already measured on its own chute
+grade: a steeper feed puts the field onto the launch's banked plunge faster and
+it leaves over the guard. Nothing is stuck and nothing is unreleased - the
+start's own contribution to the loss column is **zero** - so this is a
+downstream repair of the kind section 18 owns rather than a start defect.
+
+
+AND WHAT REMAINS, MEASURED RATHER THAN ASSUMED
+----------------------------------------------
+The centre correlation is -0.928 and the span is 1.208 places, and those two
+numbers are not in conflict: a correlation measures shape and a span measures
+size. Grouped by distance from the middle of the pan:
+
+  |bay - 3.5|   mean exit rank
+      0.5            5.172        bays 3 and 4
+      1.5            4.589
+      2.5            4.130
+      3.5            4.110        bays 0 and 7
+
+**Six of the eight bays sit within 0.5 places of each other.** What is left is
+a penalty of about one place on the two centre bays, and its seed is visible in
+the chamber: `|bay-3.5| -> drain distance` is -0.202 there, with the same sign.
+Bays 3 and 4 are the only ones with no lateral distance to travel across the
+apron, so they enter first and fastest, cross the chamber and come to rest
+furthest from its axis - and an axial catch reads exactly that.
+
+So the residual is the chamber's, not the release's and not the catch's
+position. The release is falsified as *the* cause of start bias and confirmed
+as a working mechanism; the remaining bias is a small entry-order effect that
+2.39 revolutions of stirring does not erase.

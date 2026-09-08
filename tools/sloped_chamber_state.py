@@ -143,7 +143,22 @@ def main(argv: list[str] | None = None) -> int:
         samples = [_one(job) for job in jobs]
     wall = time.perf_counter() - started
 
-    report = summarise_chamber(samples)
+    # **Where the catch's exit is, in the chamber's own frame**, because that
+    # is what a catch with one exit orders the field by. Read off the module
+    # rather than typed.
+    #
+    # For both chambers in the tree the exit is on the chamber's own axis - a
+    # 1.90 outlet under the rotor for `ShuffleChamber`, a 1.90 throat under the
+    # cone for `ShuffleFloor` - so the drain distance *is* the radius column
+    # and reporting it separately would be reporting the same number twice.
+    # It is passed anyway, so that a catch whose exit moves off the axis is
+    # measured for it rather than assumed about: the first build of the
+    # full-floor release drained to a notch on its rim and that one change took
+    # the centre-versus-rank correlation to +0.886.
+    drain = (0.0, 0.0)
+    if hasattr(start, "spill_z"):
+        drain = (0.0, start.spill_z - start.CHAMBER_Z)
+    report = summarise_chamber(samples, drain=drain)
     report["candidate"] = args.candidate
     report["mix_seconds"] = start.mix_seconds
     report["rotor_rate"] = start.rotor_rate
@@ -161,7 +176,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     print()
     header = ("slot | racers |  radius |       x |       z |   speed | "
-              "bearing | concentration")
+              "bearing | concentration |   drain")
     print(header)
     print("-" * len(header))
     for row in report["slots"]:
@@ -171,7 +186,8 @@ def main(argv: list[str] | None = None) -> int:
             f"  {row['slot']}  |   {row['racers']:>4} | {maybe(row['mean_radius'])} | "
             f"{maybe(row['mean_x'])} | {maybe(row['mean_z'])} | {maybe(row['mean_speed'])}"
             f" | {maybe(row['bearing_mean_deg'], '7.1f')} | "
-            f"{maybe(row['bearing_resultant'], '13.3f')}"
+            f"{maybe(row['bearing_resultant'], '13.3f')} | "
+            f"{maybe(row['mean_drain'])}"
         )
     print("-" * len(header))
 
@@ -192,6 +208,13 @@ def main(argv: list[str] | None = None) -> int:
           f"    (circular-linear, 0..1)")
     print(f"  bay -> blade sector         R   {show(report['bay_to_blade_sector_R'], '.3f')}"
           f"    (bearing folded into one blade pitch)")
+    if report["drain"] is not None:
+        print(f"  bay -> drain distance       r  {show(report['bay_to_drain_r'])}"
+              f"    (what a catch with one exit reads)")
+        print(f"  |bay-3.5| -> drain distance r  "
+              f"{show(report['centre_to_drain_r'])}"
+              f"    (the shape a centre bias takes)")
+        print(f"  drain order kept          rho  {show(report['drain_order_rho'])}")
     print(f"  lateral order kept        rho  {show(report['lateral_order_rho'])}"
           f"    (1.0 = the field is still in bay order across x)")
     print(f"  radial order kept         rho  {show(report['radial_order_rho'])}")
@@ -213,6 +236,10 @@ def main(argv: list[str] | None = None) -> int:
         f"concentration {show(report['field_bearing_resultant'], '.3f')}"
     )
     print()
+    if report["drain"] is not None:
+        print(f"  mean drain distance {report['mean_drain']} (span across bays "
+              f"{report['drain_span']}), exit at chamber-relative z "
+              f"{report['drain'][1]}")
     print(f"  mean radius {report['mean_radius']} (span across bays "
           f"{report['radius_span']}), mean x span {report['x_span']}, "
           f"mean speed {report['mean_speed']}")

@@ -54,7 +54,12 @@ def chamber():
 def test_rotor_is_a_registered_start_kind():
     assert ShuffleChamber.START_KIND == "rotor"
     assert _course.START_CLASSES["rotor"] is ShuffleChamber
-    assert len(set(_course.START_KINDS)) == 5
+    # Membership rather than a count. The count grows every session a topology
+    # is tried - V1.8 added `floor` - and pinning it fails for the one reason
+    # that is never interesting, which the sibling assertion in
+    # `tests/test_sloped_start_kind.py` says in as many words and then did.
+    assert "rotor" in _course.START_KINDS
+    assert len(set(_course.START_KINDS)) == len(_course.START_CLASSES)
 
 
 def test_every_topology_still_builds_the_class_its_name_promises():

@@ -50,6 +50,16 @@ building. Only a pre-release measurement separates those.
   the bay index and the rank of x (and of radius) within that trial. Per trial
   rather than pooled, because pooling over trials averages away the thing being
   asked - whether *this* field kept *its* order.
+* **distance to the drain**, which is the statistic a *catch* reads.
+
+The last one was added after the full-floor release measured a centre-versus-
+rank correlation of +0.886 while every pre-release correlation in this table
+was under 0.4. A position-independent release does not remove the selection -
+it moves it downstream, to the receiving apron, which has one exit and
+therefore orders the field by path length to it. So the number that predicts
+the outcome is not `bay -> x` or `bay -> z` but `bay -> how far from the exit`,
+and its centre-shaped version: eight bays whose mean drain distances form a U
+give a centre bias whatever their individual correlations look like.
 
 `in_chamber` is reported because a racer that never arrived is not evidence
 about mixing either way, and V1.7's first clean-looking runs were a start that
@@ -365,7 +375,9 @@ def sample_chamber(
 
 
 def summarise_chamber(
-    samples: Sequence[ChamberSample], slots: int = layout.BAYS
+    samples: Sequence[ChamberSample],
+    slots: int = layout.BAYS,
+    drain: tuple[float, float] | None = None,
 ) -> dict[str, Any]:
     """The pre-release table section 3 of the brief reads its decision off.
 
@@ -382,11 +394,14 @@ def summarise_chamber(
     absolute: list[float] = []
     relative: list[float] = []
     per_bay: dict[int, dict[str, list[float]]] = {
-        slot: {"radius": [], "x": [], "z": [], "speed": [], "bearing": []}
+        slot: {"radius": [], "x": [], "z": [], "speed": [], "bearing": [],
+               "drain": []}
         for slot in range(slots)
     }
     lateral: list[float] = []
     radial: list[float] = []
+    drains: list[float] = []
+    drain_order: list[float] = []
     agree = 0
     total = 0
     present = 0
@@ -417,6 +432,11 @@ def summarise_chamber(
             row["z"].append(sample.z[index])
             row["speed"].append(sample.speed[index])
             row["bearing"].append(sample.bearing[index])
+            if drain is not None:
+                far = math.hypot(sample.x[index] - drain[0],
+                                 sample.z[index] - drain[1])
+                drains.append(far)
+                row["drain"].append(far)
         # The order statistics are per trial and need the whole field: a
         # cyclic order over six of eight racers is not this field's order.
         if len(keep) == len(sample.bays):
@@ -432,6 +452,13 @@ def summarise_chamber(
                 lateral.append(rho_x)
             if rho_r is not None:
                 radial.append(rho_r)
+            if drain is not None:
+                rho_d = _spearman(trial_bays, [
+                    math.hypot(sample.x[i] - drain[0], sample.z[i] - drain[1])
+                    for i in keep
+                ])
+                if rho_d is not None:
+                    drain_order.append(rho_d)
 
     def mean(values: Sequence[float]) -> float | None:
         return sum(values) / len(values) if values else None
@@ -492,6 +519,13 @@ def summarise_chamber(
         "cyclic_triples": total,
         "lateral_order_rho": rounded(mean(lateral)),
         "radial_order_rho": rounded(mean(radial)),
+        # What a catch with one exit actually reads. See the module header.
+        "drain": None if drain is None else [round(drain[0], 4), round(drain[1], 4)],
+        "bay_to_drain_r": rounded(pearson(bays, drains) if drains else None),
+        "centre_to_drain_r": rounded(pearson(centre, drains) if drains else None),
+        "drain_order_rho": rounded(mean(drain_order)),
+        "mean_drain": rounded(mean(drains)),
+        "drain_span": rounded(span("drain")),
         "mean_radius": rounded(mean(radii)),
         "mean_speed": rounded(mean(speeds)),
         "radius_span": rounded(span("radius")),
@@ -510,6 +544,7 @@ def summarise_chamber(
                 "bearing_resultant": rounded(
                     None if per_bay_bearing[slot] is None
                     else per_bay_bearing[slot][1]),
+                "mean_drain": rounded(mean(per_bay[slot]["drain"])),
             }
             for slot in range(slots)
         ],

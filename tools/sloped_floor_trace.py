@@ -24,9 +24,12 @@ it is on the instance rather than on a copy, because `local_actuators` and
 `marble_starts` are read when the simulation is built.
 
 What is reported per marble: whether it was released at all, how far it fell,
-where it came to rest relative to the dish and the spillway, its top speed, and
-whether it left the machine. A marble that is still in the chamber when the run
-ends is the failure V1.7 could not see, so it has its own column.
+whether it stopped on the catch or went through it, and its top speed. Those
+are the three states this tool can see honestly. **Containment is not one of
+them** - it needs the run's own frame at the marble's own sample, so stage D's
+`sloped.startlab.StartTrial` is what answers it, and two attempts at a depth
+threshold here were both wrong in the direction that either flatters or libels
+the mechanism.
 """
 
 from __future__ import annotations
@@ -215,14 +218,22 @@ def run(machine: Machine, floor: ShuffleFloor, seed: int, duration: float,
             # above the dish's rim. Both readings were wrong in the direction
             # that flatters the mechanism.
             row["in_chamber"] = local[1] > floor.rim_floor - 0.5
-            row["past_spill"] = local[2] > floor.spill_z + 0.2
+            # **Through the throat**, which for a cone on the axis is a height
+            # rather than a downstream distance: the throat's lip is the cone's
+            # lowest surface, so anything below it has left the catch. A marble
+            # resting anywhere on the cone is above it.
+            row["past_spill"] = local[1] < floor.dish_lip
             row["on_dish"] = not row["in_chamber"] and not row["past_spill"]
-            # Out of the machine altogether: below the dish's lowest floor and
-            # not downstream of the notch, so it went over a rim rather than
-            # through the exit.
-            row["escaped"] = (
-                local[1] < floor.dish_lip - 1.0 and not row["past_spill"]
-            )
+            # **There is deliberately no escape column.** Two attempts at one
+            # were both wrong in this tool: a depth threshold called a marble
+            # 34 units down leg1 "left the machine", and moving the threshold
+            # with the lift made it fire on every delivered racer. Containment
+            # needs the run's own frame at the marble's own sample, which is
+            # what `sloped.startlab.StartTrial._containment` does with the
+            # channel width and the guard height - so that is the instrument
+            # that answers it, in stage D, and this one reports the three
+            # states it can actually see.
+            row["escaped"] = False
             row["top_speed"] = round(row["top_speed"], 2)
             row["min_y"] = round(row["min_y"], 3)
         return [rows[key] for key in sorted(rows)]

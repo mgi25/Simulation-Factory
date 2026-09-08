@@ -25,9 +25,9 @@ whole field is standing on stops being there.
       |  the rotor stops; the field settles
     SIX FLOOR SLATS ROTATE DOWN TOGETHER, on one global clock
       |  every racer loses support at the same tick, wherever it stands
-    a broad receiving dish, 6.10 across, sloping to a spillway notch
-      |
-    a short chute onto the launch run
+    a cone on the chamber's own axis, 5.80 across
+      |  through a 1.90 throat directly under the chamber's centre
+    the exit chute onto the launch run
 
 Three things follow from the release no longer reading position, and each is a
 simplification rather than a cost:
@@ -106,24 +106,50 @@ marble on it, and the difference was six of fifteen stage-A traces landing
 cleanly and then rolling along a slat's face for the rest of the run. See
 `PANEL_CLEAR`.
 
-## Why the receiving dish is the basin's shape
+## Why the catch is a cone on the chamber's own axis
 
 Section 7 asks for a broad catch that does not drop eight marbles into a
-one-marble throat. `sloped.basin` already contains a measured answer to
-exactly that at exactly this scale - a stadium dish 5.5 across that "drains all
-eight marbles, every seed, with no jam" - and three of its findings are
-load-bearing here:
+one-marble throat, and the first build of this module used the basin's answer:
+a stadium dish 5.5 across draining to a notch in its downstream rim, which
+`sloped.basin` measured as passing all eight marbles every seed with no jam.
 
-* **conical, not quadratic.** A dish that is level at its drain has a flat spot,
-  and with `surface_friction` at 0.50 a pile on a level floor is statically
-  stable. A constant slope has no flat spot anywhere.
-* **the drain is a notch in the downstream rim, not a hole in the middle.** A
-  hole needs a throat, a tunnel and a roof, and each was a defect in turn.
-* **the rim is emitted as runs and broken at the openings.** Run the whole way
-  round and it stands as a wall across the very place the field has to leave.
+**It delivered 98.96% of the field and produced a centre-versus-rank
+correlation of +0.886**, worse than the shipped taper's +0.574 and far worse
+than V1.7's own -0.182. The mechanism is general enough to be worth stating,
+because it is the same shape of finding as V1.7's:
 
-What is new is that this dish is fed from *above* rather than from an upstream
-ramp, so it needs no open upstream edge and its whole rim can carry a guard.
+> A catch with one exit orders the field by path length to that exit, so the
+> statistic that decides the race is "how far from the exit was this marble
+> when the floor went". A position-independent release does not remove the
+> selection - it *moves* it to the catch. So the catch's exit has to sit
+> wherever the mixing has actually equalised the field.
+
+The rotor equalises exactly one coordinate and the pre-release table says which:
+with the paddles stopped, the field's **radius** is nearly bay-free
+(`bay -> radius` is -0.10, `|bay-3.5| -> radius` is +0.10) while its bearing
+still carries the bay at a concentration of 0.36. Distance to a point *on the
+chamber's axis* is the radius. Distance to a notch on the rim is a function of
+radius **and** bearing, so it reads back the one thing the chamber did not
+erase - and it reads it back amplified, because the notch is 2.75 downstream
+and the chamber is only 2.70 across, so the dominant term is the bay's
+residual z.
+
+That is also, in hindsight, why V1.7's central outlet was the fairest catch
+this tree has built. Its problem was throughput and never fairness.
+
+So the catch is a **cone on the chamber's own axis**, draining through a
+1.90-wide throat directly under the chamber's centre into the exit chute. The
+basin's other two findings still hold and are still used: conical rather than
+quadratic, because a dish that is level at its drain has a flat spot and with
+`surface_friction` at 0.50 a pile on a level floor is statically stable; and
+the throat is 1.90 because V1.5 measured a 1.24 drain arching and a 1.90 one
+passing 98.4%, and V1.7 measured the same at 1.50 against 1.90.
+
+The basin's warning about a central hole - "a throat, a tunnel and a roof, and
+every one of them was a defect in turn" - is answered by V1.7's exit chute,
+which is inherited whole: it starts well below the throat and grows its walls
+afterwards, because full walls from the first ring come up through the hole and
+make a slot the field wedges in.
 
 Everything is in layout units, in the start module's own frame.
 """
@@ -402,42 +428,52 @@ class ShuffleFloor(ShuffleChamber):
     # So the well carries a whole marble diameter of it.
     PANEL_CLEAR = 0.11
 
-    # --- the receiving dish -------------------------------------------------
+    # --- the receiving cone -------------------------------------------------
     #
-    # A stadium: straight sides to `CATCH_Z`, then a semicircular cap, with the
-    # spillway at the cap's downstream point. `CATCH_HALF` has to cover the
-    # whole chamber disc from the cap's centre, which forces
-    # `CATCH_HALF >= |CHAMBER_Z - CATCH_Z| + R_WALL` - and therefore puts the
-    # spillway at or downstream of the chamber's own far edge. That is not a
-    # choice: a spillway upstream of the region it drains would leave part of
-    # the dish sloping away from the exit.
-    CATCH_HALF = 3.05
-    CATCH_Z = 0.00
-    CATCH_BACK = -2.85
-    # Rim edge down to the spillway. Shallow, and the basin's finding is why
-    # that is enough: `rolling_friction` is zero, so a sphere rolls on any
-    # non-zero slope and only an exactly level floor is a trap. 0.70 over a
-    # 6.6-unit reach is about 6 degrees, and it keeps the drop onto the dish
-    # down - which is the number that matters, because gravity at layout scale
-    # is 139.8 units per second squared and every tenth of a unit of fall is
-    # speed at the bottom of it.
-    DISH_DEPTH = 0.70
-    DISH_RIM_RISE = 0.78
-    RINGS_ROUND = 40               # points round the dish's rim
-    DISH_ROWS = 22
-    DISH_COLUMNS = 24
+    # **Concentric with the chamber, and that is the fairness decision rather
+    # than a shape.** See the module docstring: a catch with one exit orders
+    # the field by path length to it, and the only coordinate the rotor
+    # equalises is the radius, so the exit has to sit on the axis.
+    #
+    # 2.90 rather than 2.70, so a marble that lands near the chamber wall and
+    # bounces outward still lands on the cone.
+    CATCH_HALF = 2.90
+    # **1.90 across, and that figure is measured rather than chosen.** V1.5's
+    # drain arched at 1.24 and passed 98.4% of the field at 1.90; V1.7's
+    # outlet arched at 1.50 and passed at 1.90.
+    THROAT_R = 0.95
+    # Rim to throat. Every tenth of it is lift, and it does not have to do what
+    # V1.7's chamber cone did: that one had to deliver a field *from rest* and
+    # failed on 10% of it at 7 degrees, where these marbles arrive at 23 layout
+    # units per second with the whole drop behind them. What it does have to do
+    # is have no flat spot, which any non-zero slope satisfies because
+    # `rolling_friction` is zero.
+    FUNNEL_TILT = 14.0
+    CONE_RIM_RISE = 0.82
+    RINGS_ROUND = 48               # points round the cone
+    CONE_STEPS = 12                # radial steps across it
 
     # --- the chute ----------------------------------------------------------
-    SPILL_HALF = 0.95
+    #
+    # V1.7's exit chute, inherited whole, and the basin's warning about a
+    # central hole is why: a chute under a drain is a landing and a landing has
+    # no kerb, so it starts well below the throat and grows its walls
+    # afterwards. Full walls from the first ring come up through the hole and
+    # make a slot the field wedges in.
     CHUTE_HALF = 0.95
-    CHUTE_DEPTH = 0.26
-    CHUTE_WALL = 0.72
-    CHUTE_STEPS = 10
-    # The grade the lift is sized from. The run available is fixed by the
-    # spillway's position - about 0.89 units - so this is the one term in the
-    # height chain that is chosen rather than derived, and 22 degrees keeps the
-    # total lift at V1.7's own 2.14.
-    CHUTE_GRADE = 22.0
+    CHUTE_LEAD = 0.15
+    CHUTE_STEPS = 14
+    # How far below the throat's lip the chute's landing sits. **Named and
+    # included in the height chain**, which closes V1.7's own remaining issue
+    # 3: there the same 0.24 was applied to the chute's geometry but left out
+    # of `derived_lift`, so the realised grade came out 2.7 degrees shallower
+    # than the target the lift was sized from and the two names disagreed.
+    CHUTE_LANDING = 0.24
+    # 17 degrees, measured over 24 seeds in V1.7: 22 lost 3.65% of the field to
+    # escapes on the launch's banked plunge and 17 lost 2.60%, with no jams at
+    # either, while below about 15 the clump stacks in the chute instead and 13
+    # delivered nothing at all. The trade is between two different failures.
+    CHUTE_GRADE = 17.0
 
     # --- the height chain ---------------------------------------------------
 
@@ -481,28 +517,37 @@ class ShuffleFloor(ShuffleChamber):
 
     @property
     def dish_edge(self) -> float:
-        """The dish's highest surface: its rim, all the way round."""
+        """The cone's highest surface: its rim, all the way round."""
         return self.rim_floor - self.panel_well
 
     @property
+    def funnel_drop(self) -> float:
+        """Rim to throat."""
+        return (self.CATCH_HALF - self.THROAT_R) * math.tan(
+            math.radians(self.FUNNEL_TILT)
+        )
+
+    @property
     def dish_lip(self) -> float:
-        return self.dish_edge - self.DISH_DEPTH
+        """The throat's lip: the cone's lowest surface, on the axis."""
+        return self.dish_edge - self.funnel_drop
 
     @property
-    def spill_z(self) -> float:
-        return self.CATCH_Z + self.CATCH_HALF
+    def outlet_lip(self) -> float:
+        """What `ShuffleChamber._exit_chute` calls the height it starts from."""
+        return self.dish_lip
 
     @property
-    def dish_reach(self) -> float:
-        """The furthest the dish extends from its spillway.
+    def chute_mouth_z(self) -> float:
+        """Where the exit chute begins: clear of the throat's upstream edge.
 
-        The normaliser for the conical floor. By fraction of this rather than
-        by absolute radius, because a stadium's wall is not the same distance
-        away in every direction - keyed to radius, the floor would meet the
-        wall at a different height upstream and downstream. The basin records
-        the same reasoning.
+        A chute whose first ring is downstream of that leaves the throat's
+        upstream half opening onto nothing, and every racer falls through and
+        out of the machine - which is what V1.5 built, and it reported no ranks
+        at any checkpoint over 96 racers with nothing registered as lost,
+        because a marble that never touches a run is never located on one.
         """
-        return math.hypot(self.CATCH_HALF, self.spill_z - self.CATCH_BACK)
+        return self.CHAMBER_Z - self.THROAT_R - self.CHUTE_LEAD
 
     @property
     def gate_time(self) -> float:
@@ -517,16 +562,22 @@ class ShuffleFloor(ShuffleChamber):
     def derived_lift(self, plain) -> float:
         """The elevation this chain needs, and no more.
 
-        Four terms, and V1.7's cone drop and outlet fall are replaced by the
-        well and the dish rather than added to. Computed before the lift is
-        applied, which is safe because the lift moves only `y`.
+        Five terms: the apron, the step into the chamber, the well the slats
+        hang in, the cone, and the chute. **The chute's landing is in the sum**
+        rather than left out of it, which is V1.7's remaining issue 3 closed -
+        there the same 0.24 shaped the geometry but not the lift, so the
+        realised grade came out 2.7 degrees shallower than the target.
+
+        Computed before the lift is applied, which is safe because the lift
+        moves only `y`.
         """
-        run = plain[2] - self.spill_z
+        run = plain[2] - self.chute_mouth_z
         needed = (
             self.apron_drop
             + self.INLET_STEP
             + self.panel_well
-            + self.DISH_DEPTH
+            + self.funnel_drop
+            + self.CHUTE_LANDING
             + max(run, 0.0) * math.tan(math.radians(self.CHUTE_GRADE))
         )
         seat = plain[1] + layout.FLOOR_Y
@@ -535,38 +586,20 @@ class ShuffleFloor(ShuffleChamber):
     # --- the dish's shape ---------------------------------------------------
 
     def _inside(self, x: float, z: float) -> bool:
-        """The stadium: straight sides, then a semicircular downstream cap."""
-        if z > self.CATCH_Z:
-            return x * x + (z - self.CATCH_Z) ** 2 <= self.CATCH_HALF ** 2
-        return abs(x) <= self.CATCH_HALF and z >= self.CATCH_BACK
-
-    def _wall_reach(self, cos: float, sin: float) -> float:
-        """Distance from the spillway to the dish wall along one direction.
-
-        Bisection on `_inside` rather than a closed form per boundary: the
-        stadium has three of them and a formula that has to pick the right one
-        in every direction is a place to get a sign wrong. The basin learnt
-        this and this borrows it.
-        """
-        low, high = 0.0, 2.0 * (self.CATCH_HALF + abs(self.spill_z - self.CATCH_BACK))
-        for _ in range(30):
-            mid = 0.5 * (low + high)
-            if self._inside(cos * mid, self.spill_z + sin * mid):
-                low = mid
-            else:
-                high = mid
-        # The low point is *on* the rim, so straight downstream the wall is no
-        # distance away and the dish would divide by nothing.
-        return max(low, 0.5)
+        """Inside the cone: one circle, concentric with the chamber."""
+        return x * x + (z - self.CHAMBER_Z) ** 2 <= self.CATCH_HALF ** 2
 
     def dish_at(self, x: float, z: float) -> float:
-        """The dish floor at a point: a cone about the spillway.
+        """The cone's surface at a point, in the module's own frame.
 
-        Lowest at the notch and rising evenly in every direction, so it slopes
-        toward the exit from everywhere and has a flat spot nowhere.
+        Conical about the chamber's axis, so it is the same height at every
+        bearing and its only gradient is radial - which is the whole fairness
+        argument, because the radius is the coordinate the rotor equalises.
+        Flat across the throat, which is a 1.90-wide hole rather than a floor.
         """
-        span = min(1.0, math.hypot(x, z - self.spill_z) / self.dish_reach)
-        return self.dish_lip + (self.dish_edge - self.dish_lip) * span
+        radius = math.hypot(x, z - self.CHAMBER_Z)
+        span = max(min(radius, self.CATCH_HALF) - self.THROAT_R, 0.0)
+        return self.dish_lip + span * math.tan(math.radians(self.FUNNEL_TILT))
 
     def fall_to_dish(self, x: float, z: float) -> float:
         """How far a marble resting at (x, z) falls when the floor opens.
@@ -576,7 +609,7 @@ class ShuffleFloor(ShuffleChamber):
         at 20 layout units per second. `tools/sloped_floor_check.py` prints the
         range over the whole chamber and the impact speeds it implies.
         """
-        return (self.rim_floor - MARBLE_RADIUS) - self.dish_at(x, z) + MARBLE_RADIUS
+        return self.rim_floor - self.dish_at(x, z)
 
     # --- geometry -----------------------------------------------------------
 
@@ -586,8 +619,8 @@ class ShuffleFloor(ShuffleChamber):
         pieces: list[TriMesh] = []
         pieces.extend(self._apron())
         pieces.extend(self._chamber())
-        pieces.extend(self._dish())
-        pieces.extend(self._chute())
+        pieces.extend(self._funnel())
+        pieces.extend(self._exit_chute())
         pieces.append(self._backstop())
         self._mesh = merge_meshes(pieces, f"{self.id}_floor")
         return [self._mesh]
@@ -615,93 +648,45 @@ class ShuffleFloor(ShuffleChamber):
             pieces.append(self._wall_arc(arc, len(pieces)))
         return pieces
 
-    def _dish(self) -> list[TriMesh]:
-        """The receiving dish, as a grid, with a guard round all of its rim.
+    def _funnel(self) -> list[TriMesh]:
+        """The receiving cone, and a guard right round its rim.
 
-        A grid over the dish's own extent rather than rings about its low
-        point, because the low point is *on* the rim - that is what a spillway
-        is - and rings about it collapse sideways and leave the far two thirds
-        of the floor unbuilt. The basin measured that as one marble of eight
-        finding the exit and the other seven sitting on nothing.
+        Rings about the chamber's axis rather than a grid, which is the right
+        way round for *this* shape and was the wrong way round for the basin's:
+        rings only work when the low point is inside the surface, and the
+        basin's low point was on its rim. Here it is the throat, dead centre.
 
-        The rim runs the whole way round except across the notch. The basin had
-        to break it at its upstream edge as well, because a ramp arrived there;
-        this dish is fed from above and has no such edge, so it is closed all
-        round and a marble cannot leave it except through the notch.
+        The rim is unbroken. The basin had to break its own wherever the
+        boundary was an open edge a ramp arrived at; this cone is fed from
+        directly above and has no such edge, so a marble cannot leave it except
+        through the throat.
         """
         pieces: list[TriMesh] = []
         rings: list[list[tuple[float, float, float]]] = []
-        for row in range(self.DISH_ROWS + 1):
-            z = self.CATCH_BACK + (self.spill_z - self.CATCH_BACK) * row / self.DISH_ROWS
-            ring = []
-            for column in range(self.DISH_COLUMNS + 1):
-                x = -self.CATCH_HALF + 2.0 * self.CATCH_HALF * column / self.DISH_COLUMNS
-                ring.append(_place(self.origin, self.frame, (x, self.dish_at(x, z), z)))
-            rings.append(ring)
-        pieces.append(_strip(rings, f"{self.id}_dish"))
-
-        runs: list[list[tuple[float, float]]] = []
-        current: list[tuple[float, float]] = []
-        for point in range(self.RINGS_ROUND + 1):
-            theta = 2.0 * math.pi * point / self.RINGS_ROUND
-            cos, sin = math.cos(theta), math.sin(theta)
-            reach = self._wall_reach(cos, sin)
-            x = cos * reach
-            z = self.spill_z + sin * reach
-            if z > self.CATCH_Z and abs(x) <= self.SPILL_HALF and sin > -0.2:
-                if len(current) > 1:
-                    runs.append(current)
-                current = []
-                continue
-            current.append((x, z))
-        if len(current) > 1:
-            runs.append(current)
-        for order, run in enumerate(runs):
-            wall = [
-                [
-                    _place(self.origin, self.frame, (x, self.dish_at(x, z) + rise, z))
-                    for x, z in run
-                ]
-                for rise in (0.0, self.DISH_RIM_RISE)
-            ]
-            pieces.append(_strip(wall, f"{self.id}_dishrim{order}"))
-        return pieces
-
-    def _chute(self) -> list[TriMesh]:
-        """From the notch in the rim to the launch's entry.
-
-        A cradle with a wall each side from its first ring, unlike the outlet
-        chute this replaces: that one had to grow its walls, because it sat
-        under a hole and full walls came up through the hole and made a slot the
-        field wedged in. A notch has no hole over it, so the chute is a channel
-        from the start and the field arrives already converged and moving.
-        """
-        end_x, end_y, end_z = self.exit_local
-        seat = end_y + layout.FLOOR_Y
-        rings: list[list[tuple[float, float, float]]] = []
-        for step in range(self.CHUTE_STEPS + 1):
-            t = step / self.CHUTE_STEPS
-            z = self.spill_z + (end_z - self.spill_z) * t
-            x = end_x * t
-            y = self.dish_lip + (seat - self.dish_lip) * t
-            half = self.CHUTE_HALF + (layout.CHANNEL_HALF - self.CHUTE_HALF) * t
-            ring = [
-                _place(self.origin, self.frame,
-                       (x - (half + 0.10), y + self.CHUTE_WALL, z))
-            ]
-            for column in range(9):
-                across = -half + 2.0 * half * column / 8
-                u = abs(across) / max(half, 1e-9)
-                ring.append(
-                    _place(self.origin, self.frame,
-                           (x + across, y + self.CHUTE_DEPTH * u * u, z))
-                )
-            ring.append(
-                _place(self.origin, self.frame,
-                       (x + half + 0.10, y + self.CHUTE_WALL, z))
+        for step in range(self.CONE_STEPS + 1):
+            radius = self.CATCH_HALF - (self.CATCH_HALF - self.THROAT_R) * (
+                step / self.CONE_STEPS
             )
-            rings.append(ring)
-        return [_strip(rings, f"{self.id}_chute")]
+            y = self.dish_at(radius, self.CHAMBER_Z)
+            rings.append([
+                _place(self.origin, self.frame,
+                       self._ring_point(radius, 360.0 * p / self.RINGS_ROUND, y))
+                for p in range(self.RINGS_ROUND + 1)
+            ])
+        pieces.append(_strip(rings, f"{self.id}_cone"))
+
+        wall = [
+            [
+                _place(self.origin, self.frame,
+                       self._ring_point(self.CATCH_HALF,
+                                        360.0 * p / self.RINGS_ROUND,
+                                        self.dish_edge + rise))
+                for p in range(self.RINGS_ROUND + 1)
+            ]
+            for rise in (0.0, self.CONE_RIM_RISE)
+        ]
+        pieces.append(_strip(wall, f"{self.id}_conerim"))
+        return pieces
 
     # --- the floor, as actuators --------------------------------------------
 
@@ -816,21 +801,22 @@ class ShuffleFloor(ShuffleChamber):
                         label=f"{self.id}.apron[{step}]{fraction:+.1f}",
                     )
                 )
-        # The dish, where a marble lands and where it runs. Kept clear of the
-        # notch: a ray fired at the spillway measures the chute's floor through
-        # the gap, which is the geometry being right rather than a finding, and
-        # there is no honest expected point to give it.
-        for row in range(1, 8):
-            z = self.CATCH_BACK + (self.spill_z - self.CATCH_BACK) * row / 8.0
-            for fraction in (-0.75, -0.3, 0.0, 0.3, 0.75):
-                x = fraction * self.CATCH_HALF
-                if not self._inside(x, z):
-                    continue
-                if z > self.CATCH_Z and abs(x) <= self.SPILL_HALF and (
-                    self.spill_z - z
-                ) < 0.35:
-                    continue
-                surface = _place(self.origin, self.frame, (x, self.dish_at(x, z), z))
+        # The cone, where a marble lands and where it runs. **Not the throat:**
+        # a ray fired down it measures the chute's floor through the hole,
+        # which is the geometry being right rather than a finding, and there is
+        # no honest `expected_point` to give it. The basin skips its own drain
+        # for the same reason.
+        for step in range(1, self.CONE_STEPS):
+            radius = self.CATCH_HALF - (self.CATCH_HALF - self.THROAT_R) * (
+                step / self.CONE_STEPS
+            )
+            if radius <= self.THROAT_R + 0.12:
+                continue
+            y = self.dish_at(radius, self.CHAMBER_Z)
+            for point in range(0, self.RINGS_ROUND, 7):
+                deg = 360.0 * point / self.RINGS_ROUND
+                surface = _place(self.origin, self.frame,
+                                 self._ring_point(radius, deg, y))
                 probes.append(
                     Probe(
                         start=(surface[0], surface[1] + reach, surface[2]),
@@ -838,7 +824,7 @@ class ShuffleFloor(ShuffleChamber):
                         expect_hit=True,
                         expected_point=surface,
                         tolerance=0.05,
-                        label=f"{self.id}.dish[{row}]{fraction:+.2f}",
+                        label=f"{self.id}.cone[{radius:.2f}@{deg:.0f}]",
                     )
                 )
         return probes
@@ -851,18 +837,17 @@ class ShuffleFloor(ShuffleChamber):
         table = floor_table(self)
         data["floor"] = table["floor"]
         data["catch"] = {
+            "kind": "cone on the chamber axis",
             "half_width": self.CATCH_HALF,
             "width": round(2.0 * self.CATCH_HALF, 4),
-            "cap_z": self.CATCH_Z,
-            "back_z": self.CATCH_BACK,
-            "spill_z": round(self.spill_z, 4),
-            "spill_half": self.SPILL_HALF,
-            "dish_depth": self.DISH_DEPTH,
-            "rim_rise": self.DISH_RIM_RISE,
-            "reach": round(self.dish_reach, 4),
-            "slope_deg": round(
-                math.degrees(math.atan2(self.DISH_DEPTH, self.dish_reach)), 3
-            ),
+            "throat_radius": self.THROAT_R,
+            "throat_width": round(2.0 * self.THROAT_R, 4),
+            "rim_to_throat": round(self.funnel_drop, 4),
+            "rim_rise": self.CONE_RIM_RISE,
+            "slope_deg": self.FUNNEL_TILT,
+            # The one number the whole catch was rebuilt for: what a marble's
+            # distance to the exit is a function of. See the module docstring.
+            "orders_the_field_by": "radius from the chamber axis",
         }
         data["heights"] = {
             "pan_floor": round(self.pan_floor, 4),
@@ -870,11 +855,13 @@ class ShuffleFloor(ShuffleChamber):
             "dish_edge": round(self.dish_edge, 4),
             "dish_lip": round(self.dish_lip, 4),
             "exit_seat": round(self.exit_local[1] + layout.FLOOR_Y, 4),
-            "chute_run": round(self.exit_local[2] - self.spill_z, 4),
+            "chute_mouth_z": round(self.chute_mouth_z, 4),
+            "chute_run": round(self.exit_local[2] - self.chute_mouth_z, 4),
             "chute_grade_deg": round(
                 math.degrees(math.atan2(
-                    self.dish_lip - (self.exit_local[1] + layout.FLOOR_Y),
-                    self.exit_local[2] - self.spill_z)), 3),
+                    (self.dish_lip - self.CHUTE_LANDING)
+                    - (self.exit_local[1] + layout.FLOOR_Y),
+                    self.exit_local[2] - self.chute_mouth_z)), 3),
         }
         data["release"] = {
             "opens_at": round(self.floor_open, 4),

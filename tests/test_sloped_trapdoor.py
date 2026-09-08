@@ -205,22 +205,53 @@ def test_the_dish_catches_the_whole_chamber(floor):
             assert floor._inside(x, floor.CHAMBER_Z + z)
 
 
-def test_the_dish_has_no_flat_spot(floor):
+def test_the_cone_has_no_flat_spot(floor):
     """The basin's finding: a level floor is statically stable under a pile."""
     previous = None
     for step in range(60):
-        z = floor.CATCH_BACK + (floor.spill_z - floor.CATCH_BACK) * step / 59.0
-        here = floor.dish_at(0.0, z)
+        radius = floor.CATCH_HALF * (1.0 - step / 59.0)
+        here = floor.dish_at(radius, floor.CHAMBER_Z)
         if previous is not None:
-            assert here < previous - 1e-6
+            assert here <= previous - 1e-6 or radius <= floor.THROAT_R
         previous = here
 
 
-def test_the_spillway_is_the_dish_low_point(floor):
-    lip = floor.dish_at(0.0, floor.spill_z)
+def test_the_throat_is_the_low_point_and_it_is_on_the_axis(floor):
+    """The fairness decision, as an assertion.
+
+    A catch with one exit orders the field by path length to it, so the exit's
+    position decides which coordinate decides the race. On the chamber's axis
+    that coordinate is the radius, which is the one the rotor equalises. The
+    first build drained to a notch 2.75 downstream and measured a
+    centre-versus-rank correlation of +0.886.
+    """
+    lip = floor.dish_at(0.0, floor.CHAMBER_Z)
     assert lip == pytest.approx(floor.dish_lip, abs=1e-9)
-    assert floor.dish_at(0.0, floor.CATCH_BACK) > lip
-    assert floor.dish_at(floor.CATCH_HALF, 0.0) > lip
+    # The same height at every bearing at a given radius, which is what makes
+    # the ordering statistic the radius and nothing else.
+    for radius in (1.2, 1.9, 2.6):
+        heights = {
+            round(floor.dish_at(radius * math.cos(math.radians(deg)),
+                                floor.CHAMBER_Z
+                                + radius * math.sin(math.radians(deg))), 9)
+            for deg in range(0, 360, 15)
+        }
+        assert len(heights) == 1
+        assert heights.pop() > lip
+    assert floor.describe()["catch"]["orders_the_field_by"] == (
+        "radius from the chamber axis"
+    )
+
+
+def test_the_chute_grade_the_lift_is_sized_from_is_the_one_it_gets(floor):
+    """V1.7's remaining issue 3, closed.
+
+    There the chute's 0.24 landing shaped the geometry but was left out of
+    `derived_lift`, so the realised grade came out 2.7 degrees shallower than
+    the target the lift was sized from and the two names disagreed.
+    """
+    realised = floor.describe()["heights"]["chute_grade_deg"]
+    assert realised == pytest.approx(floor.CHUTE_GRADE, abs=0.05)
 
 
 # --- the paddles get out of the way -------------------------------------
