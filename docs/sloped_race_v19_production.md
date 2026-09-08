@@ -401,7 +401,7 @@ The video's job here is to be the physics lock.
 
 ## 13. Tests
 
-The full suite is **1,579 passed, 1 failed, 1 skipped**. The failure is
+The full suite is **1,580 passed, 1 failed, 1 skipped**. The failure is
 `test_neon_proof.py::test_a_missing_godot_is_reported_rather_than_raised`,
 which needs a gitignored render output, predates this session and is unrelated.
 
