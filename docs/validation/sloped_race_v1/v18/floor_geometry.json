@@ -1,0 +1,200 @@
+{
+  "start_kind": "floor",
+  "described": {
+    "kind": "ShuffleFloor",
+    "start_kind": "floor",
+    "bays": 8,
+    "bay_pitch": 1.105263,
+    "yaw_deg": 23.9625,
+    "lift": 2.8134,
+    "chamber": {
+      "centre_z": 0.3,
+      "wall_radius": 2.7,
+      "width": 5.4,
+      "floor_tilt_deg": 0.0,
+      "inlet_half": 1.3,
+      "inlet_half_deg": 28.782,
+      "inlet_step": 0.28
+    },
+    "rotor": {
+      "paddles": 4,
+      "root_radius": 1.1,
+      "tip_radius": 2.55,
+      "rate": 5.0,
+      "phase": 0.0,
+      "tip_speed": 12.75,
+      "turns_while_mixing": 2.3873,
+      "holds_until_field_in": true,
+      "starts_at": 1.6,
+      "stops_at": 4.6,
+      "lifts_by": 0.68,
+      "lifts_at": 5.2,
+      "lifts_over": 0.45,
+      "spin_down": 0.3,
+      "tail_rate": 0.0,
+      "blade_floor_clearance": 0.03
+    },
+    "release_time": 0.3,
+    "mix_seconds": 3.0,
+    "settle_seconds": 1.2,
+    "heights": {
+      "pan_floor": -0.32,
+      "chamber_floor": -0.984,
+      "dish_edge": -2.664,
+      "dish_lip": -3.364,
+      "exit_seat": -3.7234,
+      "chute_run": 0.8895,
+      "chute_grade_deg": 22.0
+    },
+    "clearances": {
+      "marble_diameter": 0.57,
+      "tip_to_wall": 0.15,
+      "root_to_gate_ring": 1.1,
+      "between_paddles_at_root": 1.7279,
+      "free_radial_travel": 2.415,
+      "free_radial_diameters": 4.237,
+      "chamber_area": 22.9022,
+      "field_area": 2.0414,
+      "area_ratio": 11.219,
+      "wall_polygon_error": 0.0,
+      "gate_polygon_error": 0.0
+    },
+    "floor": {
+      "panels": 6,
+      "pitch": 0.9,
+      "pitch_diameters": 1.579,
+      "thickness": 0.1,
+      "splits_per_panel": 3,
+      "boxes": 18,
+      "sweep_deg": 90.0,
+      "duration": 0.2,
+      "depth_at_full_sweep": 1.0,
+      "well": 1.68,
+      "opens_at": 6.1,
+      "final_seam": 0.8,
+      "final_seam_diameters": 1.404,
+      "widest_seam": 0.8,
+      "seam_passes_a_marble_at_deg": 75.0,
+      "seam_passes_freely_at_deg": 84.4
+    },
+    "catch": {
+      "half_width": 3.05,
+      "width": 6.1,
+      "cap_z": 0.0,
+      "back_z": -2.85,
+      "spill_z": 3.05,
+      "spill_half": 0.95,
+      "dish_depth": 0.7,
+      "rim_rise": 0.78,
+      "reach": 6.6417,
+      "slope_deg": 6.016
+    },
+    "release": {
+      "opens_at": 6.1,
+      "duration": 0.2,
+      "sweep_deg": 90.0,
+      "reads_marble_positions": false,
+      "reads_marble_ids": false,
+      "reads_start_bays": false
+    }
+  },
+  "release_triples": [
+    [
+      6.1,
+      0.2,
+      1.570796
+    ]
+  ],
+  "coverage_samples": 5025,
+  "coverage_gap": null,
+  "seams": [
+    {
+      "seam": "0|1",
+      "at_rest": 0.0,
+      "at_90": 0.8,
+      "final": 0.8,
+      "final_diameters": 1.404,
+      "worst_narrowing": 0.0
+    },
+    {
+      "seam": "1|2",
+      "at_rest": 0.0,
+      "at_90": 0.8,
+      "final": 0.8,
+      "final_diameters": 1.404,
+      "worst_narrowing": 0.0
+    },
+    {
+      "seam": "2|3",
+      "at_rest": 0.0,
+      "at_90": 0.8,
+      "final": 0.8,
+      "final_diameters": 1.404,
+      "worst_narrowing": 0.0
+    },
+    {
+      "seam": "3|4",
+      "at_rest": 0.0,
+      "at_90": 0.8,
+      "final": 0.8,
+      "final_diameters": 1.404,
+      "worst_narrowing": 0.0
+    },
+    {
+      "seam": "4|5",
+      "at_rest": 0.0,
+      "at_90": 0.8,
+      "final": 0.8,
+      "final_diameters": 1.404,
+      "worst_narrowing": 0.0
+    }
+  ],
+  "worst_seam_narrowing": 0.0,
+  "worst_wall_crescent": 0.0,
+  "wall_marble_conflicts": [],
+  "worst_wall_encroachment": -0.00388,
+  "deepest_sweep": 0.95138,
+  "deepest_sweep_deg": 87.0,
+  "panel_well": 1.68,
+  "marble_top_on_dish": 1.11,
+  "dish_clearance": 0.15862,
+  "chamber_points_off_dish": 0,
+  "fall": {
+    "min": 1.8391,
+    "max": 2.3392,
+    "mean": 2.0611,
+    "speed_min": 22.676,
+    "speed_max": 25.573,
+    "gravity": 139.792
+  },
+  "clearances": {
+    "marble_diameter": 0.57,
+    "tip_to_wall": 0.15,
+    "root_to_gate_ring": 1.1,
+    "between_paddles_at_root": 1.7279,
+    "free_radial_travel": 2.415,
+    "free_radial_diameters": 4.237,
+    "chamber_area": 22.9022,
+    "field_area": 2.0414,
+    "area_ratio": 11.219,
+    "wall_polygon_error": 0.0,
+    "gate_polygon_error": 0.0
+  },
+  "rotor_lift": {
+    "by": 0.68,
+    "at": 5.2,
+    "over": 0.45,
+    "blade_clearance": 0.14
+  },
+  "mesh": {
+    "vertices": 1445,
+    "triangles": 2466,
+    "findings": []
+  },
+  "actuators": {
+    "paddle": 8,
+    "rotor": 4,
+    "panel": 18
+  },
+  "findings": []
+}

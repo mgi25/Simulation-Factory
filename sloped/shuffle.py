@@ -130,12 +130,17 @@ class Rotor(Spinner):
     """
 
     def __init__(self, *args, stop_time: float, start_time: float = 0.0,
-                 spin_down: float = 0.30, tail_rate: float = 0.0, **kwargs):
+                 spin_down: float = 0.30, tail_rate: float = 0.0,
+                 lift_time: float = 0.0, lift_by: float = 0.0,
+                 lift_over: float = 0.30, **kwargs):
         super().__init__(*args, **kwargs)
         self.start_time = float(start_time)
         self.stop_time = max(float(stop_time), self.start_time)
         self.spin_down = max(float(spin_down), 1e-6)
         self.tail_rate = float(tail_rate)
+        self.lift_time = float(lift_time)
+        self.lift_by = float(lift_by)
+        self.lift_over = max(float(lift_over), 1e-6)
 
     def angle_at(self, tick: int, dt: float) -> float:
         """The integral of the rate profile, so the angle never jumps.
@@ -175,6 +180,44 @@ class Rotor(Spinner):
                 turned += self.tail_rate * (now - self.stop_time - self.spin_down)
         return self.phase + self.offset + turned
 
+    def lift_at(self, tick: int, dt: float) -> float:
+        """How far the paddle assembly has been raised by `tick`.
+
+        Zero unless `lift_by` is set, and then a smoothstep over `lift_over`
+        starting at `lift_time`, clamped at both ends. A pure function of the
+        tick like everything else here.
+
+        **This exists because a stopped paddle in a chamber with no floor is a
+        hazard with no purpose**, and a measured one. With a full-floor release
+        the blades no longer have to be anywhere in particular once the mixing
+        is over, and left where they were they form the third wall of a pocket:
+        two racers of 96 in `docs/validation/sloped_race_v1/v18/` were held at
+        the chamber's radius limit between the wall, the top edge of a hanging
+        floor slat, and a stopped blade beside them. The first two of those
+        three are structural. The blade is not, so it goes.
+        """
+        if self.lift_by == 0.0:
+            return 0.0
+        elapsed = tick * dt - self.lift_time
+        if elapsed <= 0.0:
+            return 0.0
+        if elapsed >= self.lift_over:
+            return self.lift_by
+        u = elapsed / self.lift_over
+        return self.lift_by * u * u * (3.0 - 2.0 * u)
+
+    def pose_at(self, tick: int, dt: float) -> Transform:
+        pose = super().pose_at(tick, dt)
+        raised = self.lift_at(tick, dt)
+        if raised == 0.0:
+            return pose
+        return Transform(
+            position=tuple(
+                pose.position[axis] + self.up[axis] * raised for axis in range(3)
+            ),
+            rotation=pose.rotation,
+        )
+
     def to_json(self):
         data = super().to_json()
         data.update({
@@ -182,6 +225,9 @@ class Rotor(Spinner):
             "stop_time": self.stop_time,
             "spin_down": self.spin_down,
             "tail_rate": self.tail_rate,
+            "lift_time": self.lift_time,
+            "lift_by": self.lift_by,
+            "lift_over": self.lift_over,
         })
         return data
 
@@ -295,6 +341,17 @@ class ShuffleChamber(StartGrid):
     # Off here so V1.7 recorded numbers stay reproducible in this class;
     # `sloped.startlab` scans it.
     ROTOR_HOLD_ENTRY = False
+    # How far the paddle assembly rises once the mixing is done, and how long
+    # it takes. **Zero here**: V1.7's outlet needs the blades where they are,
+    # because a marble has to be persuaded toward a hole and a raised paddle
+    # cannot do it. `ShuffleFloor` sets it - see `Rotor.lift_at`.
+    ROTOR_LIFT = 0.0
+    ROTOR_LIFT_OVER = 0.45
+    # When the lift starts, as a fraction of the settle between the rotor
+    # stopping and the release opening. A quarter of the way in, so the field
+    # has begun to settle before the blades move and has time to settle again
+    # after they have.
+    ROTOR_LIFT_AT = 0.25
 
     # --- the outlet ---------------------------------------------------------
     #
@@ -489,6 +546,21 @@ class ShuffleChamber(StartGrid):
         opening before the field has arrived.
         """
         return self.rotor_stop + self.SPIN_DOWN + self.SETTLE_SECONDS
+
+    @property
+    def rotor_lift_time(self) -> float:
+        """When the paddle assembly starts to rise.
+
+        Inside the settle rather than after it, so raising the blades does not
+        push the release later and does not change the interval the field has
+        to come to rest in. Derived from the settle rather than typed, so a
+        change to either cannot leave the lift happening after the floor has
+        opened - which `tools/sloped_floor_check.py` asserts.
+        """
+        return (
+            self.rotor_stop + self.SPIN_DOWN
+            + self.ROTOR_LIFT_AT * self.SETTLE_SECONDS
+        )
 
     @property
     def rotor_turns(self) -> float:
@@ -730,6 +802,9 @@ class ShuffleChamber(StartGrid):
                     stop_time=self.rotor_stop,
                     spin_down=self.SPIN_DOWN,
                     tail_rate=self.ROTOR_TAIL_RATE,
+                    lift_time=self.rotor_lift_time,
+                    lift_by=to_sim(self.ROTOR_LIFT),
+                    lift_over=self.ROTOR_LIFT_OVER,
                 )
             )
 
@@ -886,6 +961,9 @@ class ShuffleChamber(StartGrid):
                 "holds_until_field_in": self.rotor_hold,
                 "starts_at": round(self.rotor_start, 4),
                 "stops_at": round(self.rotor_stop, 4),
+                "lifts_by": self.ROTOR_LIFT,
+                "lifts_at": round(self.rotor_lift_time, 4),
+                "lifts_over": self.ROTOR_LIFT_OVER,
                 "spin_down": self.SPIN_DOWN,
                 "tail_rate": self.ROTOR_TAIL_RATE,
                 "blade_floor_clearance": round(

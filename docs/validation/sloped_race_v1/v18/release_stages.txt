@@ -1,0 +1,157 @@
+THE FULL-FLOOR RELEASE - section 11's staged validation, in order
+=================================================================
+
+Tools: tools/sloped_floor_check.py (geometry, before any marble),
+       tools/sloped_floor_trace.py (stages a, b, c),
+       tools/sloped_start_bench.py --start-kind floor (stage d).
+
+
+0. GEOMETRY, BEFORE ANY MARBLE
+------------------------------
+Six slats at pitch 0.900, 0.10 thick, three boxes each sharing one hinge,
+sweeping 90 degrees in 0.20s, hinged on their upstream edges.
+
+  18 boxes, ONE (release, duration, sweep) triple between them
+  5025 points of the chamber disc sampled: every one over a slat
+  seam at rest 0.000, at 90 deg 0.800 = 1.404 marble diameters
+  worst narrowing anywhere in the sweep  +0.000000
+  worst crescent between a slat end and the wall  +0.0000
+  a marble against the wall: 0 panel-angles push into it
+  slats' deepest sweep 0.951 at 87 deg; a marble on the dish reaches 1.110
+  0 points of the chamber disc are off the dish
+  the fall 1.839 to 2.339, landing 22.7 to 25.6 layout units per second
+  rebound at restitution 0.15 rises 0.074 against a 0.78 rim
+
+Three defects were found here rather than by running marbles, and each is now
+asserted in tests/test_sloped_trapdoor.py:
+
+**The seam is `pitch - thickness`, not `pitch`.** A slat rotated by an angle
+has a horizontal footprint of `(t/2) sin + (w/2) cos`, so the clear gap is
+`pitch (1 - cos) - thickness sin` to 90 degrees and `pitch (1 + cos) -
+thickness sin` past it. It **peaks at 90** at `pitch - thickness`: beyond
+that the slat folds back over its own hinge, the hinge edge becomes its
+downstream extreme, and the seam closes again. Built at a 120-degree sweep on
+a closed form that had the fold's sign wrong, the final seam measured 0.299
+instead of the predicted 1.070. The check tool walks the real box corners
+every degree, which is what caught it.
+
+That one term set the slat count:
+
+  slats   pitch   seam = pitch - t   diameters
+    8     0.675       0.575            1.01     a marble rubs both sides
+    7     0.771       0.671            1.18     inside the catchable band
+    6     0.900       0.800            1.40     passes freely
+    5     1.080       0.980            1.72     and 0.18 more well depth
+
+**The well has to clear a marble standing on the dish, not the dish.** The
+first build set the dish 0.16 below the slats' deepest sweep and the geometry
+check reported a healthy +0.159 clearance - to the *surface*. A marble resting
+on the dish has its top 0.285 above that surface, which put it 0.023 into the
+hanging plate. See stage A below. The well now carries a whole marble
+diameter and the check asks the right question.
+
+**The chute is 0.89 long, and that is geometry rather than a choice.** The
+dish's cap has to cover the whole chamber disc from its own centre, which
+forces `CATCH_HALF >= |CHAMBER_Z - CATCH_Z| + R_WALL` and therefore puts the
+spillway at or downstream of the chamber's far edge, `CHAMBER_Z + R_WALL =
+3.00`. The launch entry is at 3.94. A spillway upstream of the region it
+drains would leave part of the dish sloping away from the exit.
+
+
+A. ONE STATIONARY MARBLE, 33 CHAMBER POSITIONS
+----------------------------------------------
+Fifteen positions from the centre to 0.95 of the free radius at eight
+bearings, on seams and on hinge lines; then eighteen more **hard against the
+wall** at every 20 degrees of bearing, added after stage C found a failure that
+0.95 of the way out could not reproduce.
+
+  first build      9 of 15 delivered, 6 stopped on the dish
+  well corrected  33 of 33 delivered, 0 not delivered, 0 left the machine
+
+The six were the marble-diameter defect above. Traced tick by tick, one landed
+cleanly at (-0.22, +0.01), settled exactly on the dish surface, and then rolled
+back and forth in x between -0.54 and -0.15 for five seconds while z crept
+0.016. It was resting on the top edge of a hanging slat.
+
+**And the tool's own verdicts were wrong before that.** It called a marble 34
+units down leg1 "left the machine" because it was below the dish's lip, and a
+marble stopped on the dish "still in the chamber" because it was above the
+dish's rim. Both readings flatter the mechanism. There are now three states -
+never released, stopped on the dish, delivered - and the middle one is the
+interesting failure.
+
+
+B. EIGHT STATIONARY MARBLES, RELEASED TOGETHER
+----------------------------------------------
+Two groups: four at 0.90 of the free radius on the cardinals plus four inner at
+0.45 on the diagonals; and eight sitting on the slat seams.
+
+  ring and inner   8 of 8 delivered
+  on the seams     8 of 8 delivered
+
+Release times 6.27 to 6.43s against a floor that opens at 6.10 - a spread of
+0.17s over sixteen marbles, which is the position independence showing up as a
+number rather than as an argument.
+
+
+C. THE REAL FIELD, 12 THEN 24 SEEDS
+-----------------------------------
+The bays, the gate, the apron and the rotor, with the shipped downstream.
+
+  before the paddles were lifted   94 of 96 delivered (97.92%)
+  after                           192 of 192 delivered (100.00%)
+
+The two were both at radius 2.412 against a free radius of 2.415, and neither
+was reproducible from a resting position: 18 stage-A marbles at the exact
+radius limit at every 20 degrees all delivered. Traced, the pocket had three
+walls - the chamber wall, the **top edge of a hanging slat** (a 0.10-wide
+horizontal ledge at the hinge line, 0.05 below where the floor was), and a
+**stopped rotor blade** beside it. The marble sat dead still, velocity 0.00,
+for seven seconds.
+
+Two of those three walls are structural: the hinge stays where it is, so a
+hinged trapdoor always leaves a fin. The blade is not. With the full-floor
+release the paddles have no further job once the mixing is over, so they rise
+0.68 - a blade's underside sits 0.03 above the floor and a marble standing on
+it reaches 0.57 - starting a quarter of the way into the settle and finishing
+0.45s before the floor opens. `Rotor.lift_at` is a smoothstep in the tick like
+everything else, and `ShuffleChamber` keeps `ROTOR_LIFT = 0.0` so V1.7's
+outlet, which does need its blades where they are, is unchanged.
+
+
+D. 96 SEEDS IN THE START LAB
+----------------------------
+768 racers, the full instrument - containment, stalls, trailing, ranks.
+
+  lost      7  (0.911%)   leg1[70..79%] x5, leg1[80..89%] x2
+  stuck     1  (0.130%)   start[0..9%] x1
+  trailing 19  (2.474%)
+  delivered           98.958%
+  incomplete trials    0
+
+**Seven of the eight losses are the pre-existing `leg1[70..89%]` trap**, which
+V1.7 recorded as its own remaining issue and which the shipped fan has too. The
+start's own contribution is one racer in 768, or 0.130%.
+
+So the throughput gate is met on the release's own account and the combined
+figure is short of 99.5% because of a downstream trap that section 18 owns.
+
+
+WHAT THE RELEASE COST, AND WHAT IT DID NOT
+------------------------------------------
+Removing the outlet removed three things with it, and each is a simplification:
+
+  the chamber floor is flat and level      V1.7 needed 7 degrees of cone to
+                                           persuade the field toward a hole,
+                                           and measured that a floor steep
+                                           enough to deliver packs the field
+                                           against the closed outlet and
+                                           recreates the taper's centre bias
+  blade clearance is one number            0.030 everywhere, against 0.030 at
+                                           the tip and 0.208 at the root
+  free radial travel is the whole disc     4.24 marble diameters, against 2.07
+                                           either side of a gate ring
+
+`START_LIFT` is re-derived at **2.81**, against V1.7's 2.14 and the radial
+start's 4.30. The whole of the increase is the marble diameter the well has to
+carry, and it is the price of a hinged floor.

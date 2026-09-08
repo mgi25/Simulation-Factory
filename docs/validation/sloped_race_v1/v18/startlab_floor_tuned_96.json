@@ -1,0 +1,510 @@
+{
+  "start_kind": "floor",
+  "trials": 96,
+  "incomplete": 0,
+  "racers": 768,
+  "lost": 7,
+  "lost_pct": 0.911,
+  "stuck": 1,
+  "stuck_pct": 0.13,
+  "trailing": 19,
+  "trailing_pct": 2.474,
+  "checkpoints": [
+    "wide",
+    "descent",
+    "prenarrow",
+    "half",
+    "postnarrow",
+    "exit"
+  ],
+  "rank_span": {
+    "wide": {
+      "means": [
+        4.5,
+        4.0417,
+        3.9271,
+        3.1146,
+        3.8438,
+        5.1354,
+        5.3646,
+        6.0729
+      ],
+      "span": 2.9583,
+      "best_slot": 3,
+      "worst_slot": 7
+    },
+    "descent": {
+      "means": [
+        5.3333,
+        4.3229,
+        4.0,
+        3.1042,
+        3.8333,
+        4.8958,
+        4.8438,
+        5.6667
+      ],
+      "span": 2.5625,
+      "best_slot": 3,
+      "worst_slot": 7
+    },
+    "prenarrow": {
+      "means": [
+        5.3229,
+        4.3646,
+        4.0208,
+        3.1562,
+        3.8229,
+        4.875,
+        4.8438,
+        5.5938
+      ],
+      "span": 2.4375,
+      "best_slot": 3,
+      "worst_slot": 7
+    },
+    "half": {
+      "means": [
+        5.3646,
+        4.4167,
+        3.9896,
+        3.1354,
+        3.8229,
+        4.8542,
+        4.8021,
+        5.6146
+      ],
+      "span": 2.4792,
+      "best_slot": 3,
+      "worst_slot": 7
+    },
+    "postnarrow": {
+      "means": [
+        5.375,
+        4.3854,
+        3.9896,
+        3.1354,
+        3.8125,
+        4.8646,
+        4.8125,
+        5.625
+      ],
+      "span": 2.4896,
+      "best_slot": 3,
+      "worst_slot": 7
+    },
+    "exit": {
+      "means": [
+        5.3438,
+        4.3646,
+        4.0,
+        3.1458,
+        3.8438,
+        4.8854,
+        4.7917,
+        5.625
+      ],
+      "span": 2.4792,
+      "best_slot": 3,
+      "worst_slot": 7
+    }
+  },
+  "slot_rank_correlation": {
+    "wide": 0.6644,
+    "descent": 0.2881,
+    "prenarrow": 0.2692,
+    "half": 0.2452,
+    "postnarrow": 0.2513,
+    "exit": 0.2642
+  },
+  "lateral_order_correlation": {
+    "wide": 0.1627,
+    "descent": 0.0417,
+    "prenarrow": 0.0312,
+    "half": -0.0052,
+    "postnarrow": -0.0002,
+    "exit": -0.0407
+  },
+  "loss_sites": {
+    "leg1[70..79%]": 5,
+    "leg1[80..89%]": 2,
+    "start[0..9%]": 1
+  },
+  "centre_rank_correlation": {
+    "wide": 0.6931,
+    "descent": 0.8805,
+    "prenarrow": 0.8896,
+    "half": 0.8981,
+    "postnarrow": 0.8956,
+    "exit": 0.8863
+  },
+  "mean_reach": 0.7513,
+  "mean_crossings": 4.6654,
+  "crossed_pct": 97.92,
+  "early_rank_span": 2.9583,
+  "exit_rank_span": 2.4792,
+  "slots": [
+    {
+      "slot": 0,
+      "trials": 96,
+      "mean_rank": {
+        "wide": 4.5,
+        "descent": 5.3333,
+        "prenarrow": 5.3229,
+        "half": 5.3646,
+        "postnarrow": 5.375,
+        "exit": 5.3438
+      },
+      "mean_exit_order": 5.3895,
+      "mean_progress": {
+        "wide": 2.825,
+        "descent": 9.1177,
+        "prenarrow": 11.9254,
+        "half": 24.2047,
+        "postnarrow": 31.944,
+        "exit": 55.4866
+      },
+      "mean_collisions": 86.323,
+      "mean_across": {
+        "wide": -0.0147,
+        "descent": -0.1334,
+        "prenarrow": -0.09,
+        "half": -0.0198,
+        "postnarrow": -0.0227,
+        "exit": 0.1443
+      },
+      "mean_reach": 0.7599,
+      "mean_crossings": 4.583,
+      "crossed_pct": 98.96,
+      "mean_wall_ticks": 20.65,
+      "lost": 1,
+      "lost_pct": 1.042,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 1,
+      "trailing_pct": 1.042
+    },
+    {
+      "slot": 1,
+      "trials": 96,
+      "mean_rank": {
+        "wide": 4.0417,
+        "descent": 4.3229,
+        "prenarrow": 4.3646,
+        "half": 4.4167,
+        "postnarrow": 4.3854,
+        "exit": 4.3646
+      },
+      "mean_exit_order": 4.2979,
+      "mean_progress": {
+        "wide": 4.3059,
+        "descent": 12.4394,
+        "prenarrow": 16.0686,
+        "half": 30.6737,
+        "postnarrow": 39.4085,
+        "exit": 64.5197
+      },
+      "mean_collisions": 99.542,
+      "mean_across": {
+        "wide": -0.1105,
+        "descent": -0.0744,
+        "prenarrow": -0.0617,
+        "half": -0.0216,
+        "postnarrow": 0.0177,
+        "exit": 0.2583
+      },
+      "mean_reach": 0.7512,
+      "mean_crossings": 4.375,
+      "crossed_pct": 97.92,
+      "mean_wall_ticks": 19.76,
+      "lost": 1,
+      "lost_pct": 1.042,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 2,
+      "trailing_pct": 2.083
+    },
+    {
+      "slot": 2,
+      "trials": 96,
+      "mean_rank": {
+        "wide": 3.9271,
+        "descent": 4.0,
+        "prenarrow": 4.0208,
+        "half": 3.9896,
+        "postnarrow": 3.9896,
+        "exit": 4.0
+      },
+      "mean_exit_order": 3.8526,
+      "mean_progress": {
+        "wide": 4.8773,
+        "descent": 13.9123,
+        "prenarrow": 18.0091,
+        "half": 33.6135,
+        "postnarrow": 42.7586,
+        "exit": 68.4128
+      },
+      "mean_collisions": 86.125,
+      "mean_across": {
+        "wide": -0.0309,
+        "descent": -0.086,
+        "prenarrow": -0.064,
+        "half": -0.0395,
+        "postnarrow": 0.0869,
+        "exit": 0.2729
+      },
+      "mean_reach": 0.7614,
+      "mean_crossings": 4.625,
+      "crossed_pct": 98.96,
+      "mean_wall_ticks": 21.78,
+      "lost": 1,
+      "lost_pct": 1.042,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 1,
+      "trailing_pct": 1.042
+    },
+    {
+      "slot": 3,
+      "trials": 96,
+      "mean_rank": {
+        "wide": 3.1146,
+        "descent": 3.1042,
+        "prenarrow": 3.1562,
+        "half": 3.1354,
+        "postnarrow": 3.1354,
+        "exit": 3.1458
+      },
+      "mean_exit_order": 3.0316,
+      "mean_progress": {
+        "wide": 6.9062,
+        "descent": 18.7479,
+        "prenarrow": 23.4236,
+        "half": 40.243,
+        "postnarrow": 49.9035,
+        "exit": 75.1994
+      },
+      "mean_collisions": 82.344,
+      "mean_across": {
+        "wide": 0.0289,
+        "descent": -0.1839,
+        "prenarrow": -0.0458,
+        "half": 0.003,
+        "postnarrow": 0.1574,
+        "exit": 0.25
+      },
+      "mean_reach": 0.7547,
+      "mean_crossings": 4.865,
+      "crossed_pct": 98.96,
+      "mean_wall_ticks": 18.83,
+      "lost": 0,
+      "lost_pct": 0.0,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 1,
+      "trailing_pct": 1.042
+    },
+    {
+      "slot": 4,
+      "trials": 96,
+      "mean_rank": {
+        "wide": 3.8438,
+        "descent": 3.8333,
+        "prenarrow": 3.8229,
+        "half": 3.8229,
+        "postnarrow": 3.8125,
+        "exit": 3.8438
+      },
+      "mean_exit_order": 3.6344,
+      "mean_progress": {
+        "wide": 4.9865,
+        "descent": 14.4756,
+        "prenarrow": 18.6045,
+        "half": 34.0038,
+        "postnarrow": 42.6947,
+        "exit": 67.0954
+      },
+      "mean_collisions": 81.74,
+      "mean_across": {
+        "wide": -0.0171,
+        "descent": -0.096,
+        "prenarrow": -0.1011,
+        "half": 0.025,
+        "postnarrow": 0.0851,
+        "exit": 0.2954
+      },
+      "mean_reach": 0.7434,
+      "mean_crossings": 4.917,
+      "crossed_pct": 96.88,
+      "mean_wall_ticks": 18.25,
+      "lost": 1,
+      "lost_pct": 1.042,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 4,
+      "trailing_pct": 4.167
+    },
+    {
+      "slot": 5,
+      "trials": 96,
+      "mean_rank": {
+        "wide": 5.1354,
+        "descent": 4.8958,
+        "prenarrow": 4.875,
+        "half": 4.8542,
+        "postnarrow": 4.8646,
+        "exit": 4.8854
+      },
+      "mean_exit_order": 4.9896,
+      "mean_progress": {
+        "wide": 3.2123,
+        "descent": 10.503,
+        "prenarrow": 13.6683,
+        "half": 27.5349,
+        "postnarrow": 35.7441,
+        "exit": 60.2149
+      },
+      "mean_collisions": 78.156,
+      "mean_across": {
+        "wide": -0.0629,
+        "descent": -0.1294,
+        "prenarrow": -0.0878,
+        "half": -0.0399,
+        "postnarrow": 0.0308,
+        "exit": 0.2228
+      },
+      "mean_reach": 0.7683,
+      "mean_crossings": 4.781,
+      "crossed_pct": 100.0,
+      "mean_wall_ticks": 20.82,
+      "lost": 1,
+      "lost_pct": 1.042,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 1,
+      "trailing_pct": 1.042
+    },
+    {
+      "slot": 6,
+      "trials": 96,
+      "mean_rank": {
+        "wide": 5.3646,
+        "descent": 4.8438,
+        "prenarrow": 4.8438,
+        "half": 4.8021,
+        "postnarrow": 4.8125,
+        "exit": 4.7917
+      },
+      "mean_exit_order": 4.8132,
+      "mean_progress": {
+        "wide": 3.1909,
+        "descent": 10.5964,
+        "prenarrow": 13.7756,
+        "half": 27.0627,
+        "postnarrow": 34.9574,
+        "exit": 58.8106
+      },
+      "mean_collisions": 88.625,
+      "mean_across": {
+        "wide": -0.0644,
+        "descent": -0.1385,
+        "prenarrow": -0.0099,
+        "half": -0.0687,
+        "postnarrow": 0.0418,
+        "exit": 0.1618
+      },
+      "mean_reach": 0.7249,
+      "mean_crossings": 4.51,
+      "crossed_pct": 94.79,
+      "mean_wall_ticks": 19.55,
+      "lost": 0,
+      "lost_pct": 0.0,
+      "stuck": 1,
+      "stuck_pct": 1.042,
+      "trailing": 5,
+      "trailing_pct": 5.208
+    },
+    {
+      "slot": 7,
+      "trials": 96,
+      "mean_rank": {
+        "wide": 6.0729,
+        "descent": 5.6667,
+        "prenarrow": 5.5938,
+        "half": 5.6146,
+        "postnarrow": 5.625,
+        "exit": 5.625
+      },
+      "mean_exit_order": 5.4301,
+      "mean_progress": {
+        "wide": 2.6323,
+        "descent": 8.6784,
+        "prenarrow": 11.5664,
+        "half": 23.5957,
+        "postnarrow": 30.9317,
+        "exit": 53.9203
+      },
+      "mean_collisions": 75.521,
+      "mean_across": {
+        "wide": -0.0514,
+        "descent": -0.0748,
+        "prenarrow": -0.0857,
+        "half": -0.0029,
+        "postnarrow": 0.0041,
+        "exit": 0.1614
+      },
+      "mean_reach": 0.7461,
+      "mean_crossings": 4.667,
+      "crossed_pct": 96.88,
+      "mean_wall_ticks": 19.24,
+      "lost": 2,
+      "lost_pct": 2.083,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 4,
+      "trailing_pct": 4.167
+    }
+  ],
+  "wall_seconds": 71.16,
+  "label": "floor-tuned, stage D",
+  "plan": {
+    "name": "floor-tuned",
+    "fins": null,
+    "stagger": null,
+    "deflectors": null,
+    "tray": null,
+    "fall_profile": null,
+    "mixers": [
+      [
+        "launch",
+        5,
+        0.07
+      ]
+    ],
+    "launch_width": null,
+    "leg1_width": null,
+    "cross_flow": false,
+    "wide_bank_max": null,
+    "mix_seconds": 3.0,
+    "rotor_rate": null,
+    "rotor_phase": null,
+    "rotor_hold": true,
+    "settle_seconds": 1.2,
+    "seed_phase": true,
+    "start_kind": "floor",
+    "port_gate": true,
+    "island": null,
+    "wheels": [
+      [
+        "launch",
+        32,
+        9.0
+      ]
+    ]
+  },
+  "seeds": [
+    0,
+    96
+  ],
+  "candidate": "floor-tuned"
+}

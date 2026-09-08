@@ -53,11 +53,13 @@ from sloped.scale import LAYOUT_TO_SIM
 from sloped.basin import StartBasin
 from sloped.radial import RadialStart
 from sloped.shuffle import ShuffleChamber
+from sloped.trapdoor import ShuffleFloor
 from sloped.widelaunch import WideLaunch
 from sloped.stations import Mixer, Spinners, StartGrid
 from sloped.track import TrackRun
 
 __all__ = [
+    "FLOOR_CANDIDATES",
     "ROTOR_CANDIDATES",
     "seed_phase_for",
     "WIDE_CANDIDATES",
@@ -167,6 +169,12 @@ class StartPlan:
     # When true, the rotor's initial angle is a deterministic function of the
     # trial's seed. See `run_trial`.
     seed_phase: bool = False
+    # How long after the rotor stops before the release opens. On the plan
+    # because the pre-release table measured it as a separate residual from the
+    # azimuthal one: at V1.7's 0.55 half the field was still moving and the
+    # residual energy carried the bay. See
+    # `docs/validation/sloped_race_v1/v18/prerelease_trade.txt`.
+    settle_seconds: float | None = None
     # When true, the rotor holds still until the whole field is in the chamber
     # rather than turning from tick zero. Measured rather than assumed: with
     # the rotor running during entry, a racer's transport angle is the rotor
@@ -237,6 +245,7 @@ class StartPlan:
             "rotor_rate": self.rotor_rate,
             "rotor_phase": self.rotor_phase,
             "rotor_hold": self.rotor_hold,
+            "settle_seconds": self.settle_seconds,
             "seed_phase": self.seed_phase,
             "start_kind": self.start_kind,
             "port_gate": self.port_gate,
@@ -392,6 +401,27 @@ BARE_FAN = bench_plan("fan", name="bare-fan", mixers=(), wheels=())
 # The dynamic equaliser, with and without a seed-derived rotor phase. Section 7
 # of the V1.7 brief asks for the fixed-phase case to be *tested* rather than
 # assumed bad, so both are named and both are measured.
+# V1.8's full-floor release, at the rotor configuration the pre-release table
+# chose. `floor-plain` is the release on its own so the two changes - the rotor
+# schedule and the release architecture - can be told apart; `floor-tuned` is
+# both, and is the candidate the throughput and fairness gates are read on.
+#
+# The settle and the mixing are named here rather than left to the class so a
+# recorded run says which numbers produced it, and so the class's own defaults
+# and the plan cannot silently disagree - which is the mistake that cost V1.4 a
+# mislabelled 300-seed baseline.
+FLOOR_CANDIDATES: dict[str, StartPlan] = {
+    "floor-plain": bench_plan(
+        "floor", name="floor-plain", seed_phase=True,
+        rotor_hold=False, mix_seconds=1.50, settle_seconds=0.55,
+    ),
+    "floor-tuned": bench_plan(
+        "floor", name="floor-tuned", seed_phase=True,
+        rotor_hold=True, mix_seconds=3.00, settle_seconds=1.20,
+    ),
+}
+
+
 ROTOR_CANDIDATES: dict[str, StartPlan] = {
     "rotor-fixed": bench_plan("rotor", name="rotor-fixed"),
     "rotor-seeded": bench_plan("rotor", name="rotor-seeded", seed_phase=True),
@@ -462,8 +492,9 @@ def start_machine(config: CoreConfig | None = None, plan: StartPlan | None = Non
         start = StartBasin("start", runs["launch"])
         if plan.island is not None:
             start.ISLAND_R, start.ISLAND_Z, start.ISLAND_RISE = plan.island
-    elif plan.start_kind == "rotor":
-        start = ShuffleChamber(
+    elif plan.start_kind in ("rotor", "floor"):
+        chamber = ShuffleChamber if plan.start_kind == "rotor" else ShuffleFloor
+        start = chamber(
             "start",
             runs["launch"],
             rotor_phase=plan.rotor_phase,
@@ -471,6 +502,8 @@ def start_machine(config: CoreConfig | None = None, plan: StartPlan | None = Non
             rotor_rate=plan.rotor_rate,
             rotor_hold=plan.rotor_hold,
         )
+        if plan.settle_seconds is not None:
+            start.SETTLE_SECONDS = float(plan.settle_seconds)
     elif plan.start_kind == "wide_launch":
         start = WideLaunch("start", runs["launch"], cross_flow=plan.cross_flow)
     elif plan.start_kind == "fan":

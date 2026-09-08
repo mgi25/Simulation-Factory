@@ -80,6 +80,7 @@ from sloped.scale import to_sim
 from sloped.basin import StartBasin
 from sloped.radial import RadialStart
 from sloped.shuffle import ShuffleChamber
+from sloped.trapdoor import ShuffleFloor
 from sloped.widelaunch import WideLaunch
 from sloped.stations import FinishDeck, ForkRidge, MergeCatch, Mixer, Spinners, StartGrid
 from sloped.track import TrackRun
@@ -246,12 +247,13 @@ START_CLASSES = {
     RadialStart.START_KIND: RadialStart,
     WideLaunch.START_KIND: WideLaunch,
     ShuffleChamber.START_KIND: ShuffleChamber,
+    ShuffleFloor.START_KIND: ShuffleFloor,
 }
 START_KINDS = tuple(START_CLASSES)
 
 
 def start_module(kind: str, launch, **options):
-    """One of the three start topologies, by name.
+    """One of the start topologies, by name.
 
     `fan` is V1.1's taper and `basin` V1.3's stadium dish, both falsified for
     slot bias; `radial` is V1.4's ring, falsified in V1.5 - see
@@ -259,8 +261,10 @@ def start_module(kind: str, launch, **options):
     topologies the mechanism was measured in. `wide_launch` is V1.6's
     unconstricted raceway, falsified in the same session - see
     `docs/sloped_race_v16_widelaunch.md`, which concludes that passive start
-    geometry is exhausted. `rotor` is V1.7's dynamic equaliser, and the only
-    one of the five that is not a shape: see `sloped.shuffle`.
+    geometry is exhausted. `rotor` is V1.7's dynamic equaliser and `floor`
+    is V1.8's - the same chamber, with its selective outlet replaced by a floor
+    that opens under the whole field at once. They are the only two of the six
+    that are not shapes: see `sloped.shuffle` and `sloped.trapdoor`.
 
     **The built module is asked what it is, and the answer is checked against
     what was requested.** That is not defensive noise: V1.4 recorded a

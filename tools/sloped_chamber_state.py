@@ -28,7 +28,15 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from sloped.chamberstate import sample_chamber, summarise_chamber  # noqa: E402
-from sloped.startlab import ROTOR_CANDIDATES, start_machine  # noqa: E402
+from sloped.startlab import (  # noqa: E402
+    FLOOR_CANDIDATES,
+    ROTOR_CANDIDATES,
+    start_machine,
+)
+
+# Both chambers answer `gate_time` and both carry a rotor, so one
+# instrument characterises either without a special case.
+CANDIDATES = dict(ROTOR_CANDIDATES, **FLOOR_CANDIDATES)
 
 
 def _build(candidate: str, mix: float | None, rate: float | None,
@@ -39,11 +47,15 @@ def _build(candidate: str, mix: float | None, rate: float | None,
     class constant, set on the instance so it shadows the class and so
     `gate_time` - which is derived from it rather than typed - moves with it.
     """
-    from sloped.startlab import ROTOR_CANDIDATES, start_machine
+    from sloped.startlab import FLOOR_CANDIDATES, ROTOR_CANDIDATES, start_machine
 
-    plan = ROTOR_CANDIDATES[candidate]
+    plan = dict(ROTOR_CANDIDATES, **FLOOR_CANDIDATES)[candidate]
     if mix is not None or rate is not None:
-        plan = replace(plan, mix_seconds=mix, rotor_rate=rate)
+        plan = replace(
+            plan,
+            mix_seconds=mix if mix is not None else plan.mix_seconds,
+            rotor_rate=rate if rate is not None else plan.rotor_rate,
+        )
     machine = start_machine(plan=plan)
     if settle is not None:
         machine.modules["start"].SETTLE_SECONDS = float(settle)
@@ -77,7 +89,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--candidate",
         default="rotor-seeded",
-        choices=sorted(ROTOR_CANDIDATES),
+        choices=sorted(CANDIDATES),
         help="which rotor configuration to characterise (default: the fairest)",
     )
     parser.add_argument(
