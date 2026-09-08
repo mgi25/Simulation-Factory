@@ -43,13 +43,28 @@ const RACERS := 8
 # to the flag - so a viewer who has seen four seconds of the Short can tell
 # roughly how far through the race a frame is from its edge lights alone.
 const EDGE_LIGHTS := {
-	"launch": "lit_cyan_line_hero",
-	"leg1": "lit_cyan_line_hero",
-	"leg2": "lit_cyan_line_hero",
-	"leg3": "neon_violet_hero",
-	"blue": "neon_blue",
-	"orange": "lit_orange_line",
-	"final": "lit_gold_line",
+	"launch": "lit_cyan_line_polish",
+	"leg1": "lit_aqua_line_polish",
+	"leg2": "lit_violet_cool_polish",
+	"leg3": "lit_violet_line_polish",
+	"blue": "lit_blue_line_polish",
+	"orange": "lit_orange_line_polish",
+	"final": "lit_gold_line_polish",
+}
+
+# The guard tint follows the same journey. Carrying temperature in the guard
+# as well as in the edge light is what makes a zone read at phone size, where
+# a 0.062 tube is two pixels and a wall down both sides of the channel is
+# twenty - and it does it without touching the shell, so the track is still
+# visibly one product from end to end rather than seven painted sections.
+const GUARDS := {
+	"launch": "acrylic_guard_polish",
+	"leg1": "acrylic_guard_polish",
+	"leg2": "acrylic_violet_polish",
+	"leg3": "acrylic_violet_polish",
+	"blue": "acrylic_blue_polish",
+	"orange": "acrylic_amber_polish",
+	"final": "acrylic_gold_polish",
 }
 
 
@@ -73,23 +88,19 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 		var spec: Dictionary = entry
 		var name := str(spec["name"])
 		var role := str(spec["role"])
-		var light := str(EDGE_LIGHTS.get(name, "lit_cyan_line_hero"))
-		var shell := "pearl_shell"
-		var floor_key := "running_polished"
-		var guard := "acrylic_guard"
+		var light := str(EDGE_LIGHTS.get(name, "lit_cyan_line_polish"))
+		var shell := "shell_pearl_polish"
+		var floor_key := "running_pearl_polish"
+		var guard := str(GUARDS.get(name, "acrylic_guard_polish"))
 		if name == "blue":
 			shell = "blue_machine"
-			floor_key = "running_blue"
-			guard = "acrylic_blue"
+			floor_key = "running_blue_polish"
 		elif name == "orange":
 			shell = "orange_machine"
-			floor_key = "running_orange"
-			guard = "acrylic_amber"
-			light = "lit_orange_line"
+			floor_key = "running_orange_polish"
 		elif role == "sprint":
-			shell = "pearl_warm"
-			floor_key = "running_warm"
-			guard = "acrylic_gold"
+			shell = "shell_pearl_warm_polish"
+			floor_key = "running_warm_polish"
 
 		var run := Track.build(palette, spec["controls"], name.capitalize(), {
 			"scale": float(spec["scale"]),
@@ -120,9 +131,25 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 	var ground := Terrain.build(palette, terrain_cfg)
 	root.add_child(ground)
 
-	for entry in runs.get_children():
-		var run: Node3D = entry
-		var spec: Dictionary = _spec_for(table, run.name.to_lower())
+	# Paired by index rather than by name, and that is a bug fix.
+	#
+	# `Track.build` is handed `name.capitalize()`, and GDScript's `capitalize`
+	# inserts a space before a digit - so the run called "leg1" becomes a node
+	# called "Leg 1", and looking its spec back up by `name.to_lower()` asks
+	# the table for "leg 1" and misses. The old lookup pushed an error and
+	# fell back to `runs[0]`, which is `launch`, three times per build.
+	#
+	# It has been harmless so far only by coincidence: launch, leg1, leg2 and
+	# leg3 all carry `HERO_SCALE`, so the wrong spec supplied the right
+	# number. The moment a leg is given a scale of its own - which is exactly
+	# the kind of change a start-fairness pass makes - the supports under
+	# three of the four longest runs would silently be built at the wrong
+	# gauge. The children of `runs` are appended in table order, so the index
+	# is the reliable key and no string has to round-trip.
+	var run_nodes: Array = runs.get_children()
+	for at in run_nodes.size():
+		var run: Node3D = run_nodes[at]
+		var spec: Dictionary = table["runs"][at]
 		clearances.append_array(_supports(root, palette, run, terrain_cfg,
 			float(spec["scale"]), str(spec["name"])))
 
@@ -137,21 +164,37 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 		int(options.get("rocks", 64)), centreline, 5.4)
 	Terrain.scatter(ground, palette, terrain_cfg,
 		int(options.get("pebbles", 110)), centreline, 3.1, 0.34)
+	# Rock structure, on top of the two boulder gauges rather than instead of
+	# them. Boulders are objects lying ON the hill and read at ten and at a
+	# hundred units; crags are outcrops OF it and are the only thing in the
+	# frame that gives a steep face an arris. The crest teeth are separate
+	# because they are sited against the horizon rather than against the
+	# gradient - a silhouette is a different job from a surface.
+	Terrain.crags(ground, palette, terrain_cfg,
+		int(options.get("crags", 38)), centreline, 7.2)
+	Terrain.crest_ridge(ground, palette, terrain_cfg,
+		int(options.get("crest_teeth", 13)))
 	if detail != "block":
 		Dressing.build(root, palette, terrain_cfg, centreline,
 			table["nodes"])
 
 	root.set_meta("metrics", _metrics(table, total_length, clearances,
 		centreline))
+	# The terrain config as it ended up, bench index and all.
+	#
+	# `Layout.table` hands out a fresh deep copy each time it is called, and
+	# it is called once here and once in `course_scene` - so the scene has
+	# always been holding a DIFFERENT terrain dictionary from the one the
+	# ground was built from, and only this one ever receives `cut_index` from
+	# `Terrain.index_cut`. Anything asking the scene's copy for a height was
+	# therefore being told about the mountain as it would be if the route had
+	# never been benched into it, which along the whole racing line is up to
+	# `cut_depth` too high.
+	#
+	# Published rather than returned so the fix is one line at each end and
+	# nothing about the build order changes.
+	root.set_meta("terrain_cfg", terrain_cfg)
 	return root
-
-
-static func _spec_for(table: Dictionary, name: String) -> Dictionary:
-	for entry in table["runs"]:
-		if str((entry as Dictionary)["name"]) == name:
-			return entry
-	push_error("course_machine: no run named '%s'" % name)
-	return table["runs"][0]
 
 
 # --- supports -------------------------------------------------------------
@@ -160,6 +203,38 @@ static func _spec_for(table: Dictionary, name: String) -> Dictionary:
 static func _supports(root: Node3D, palette, run: Node3D, cfg: Dictionary,
 		scale: float, name: String) -> Array:
 	## Local structure under one run, and the ground clearance it measured.
+	##
+	## ## What is deliberately unchanged
+	##
+	## `SUPPORT_SPACING`, `KEEL_DROP`, the sample loop and the `clearances`
+	## array it returns. Those feed `min_clearance`, `max_clearance` and
+	## `buried_piers` in the course metrics, and the metrics are written into
+	## `physics_layout.json` - so a presentation pass that moved a pier would
+	## be editing physics metadata to make a frame look better. Every pier
+	## stands exactly where it stood; only what is built on it changed.
+	##
+	## ## What changed, and why plates rather than more tubes
+	##
+	## The review called the trestles loose sticks, and the temptation is to
+	## add members. The previous pass already went the other way for a good
+	## reason, written down in `_trestle`: a diagonal per level per face is
+	## four more tubes in a frame that already has four legs, and at close
+	## range that is a tangle rather than a truss. Both notes are correct, and
+	## together they say the missing thing is not a member - it is a FLAT. A
+	## bundle of cylinders has no plane to catch the key, so it has no
+	## highlight, so it has no silhouette at any distance. Gussets, base
+	## plates and a web give the same frame flats without adding a single
+	## crossing line.
+	##
+	## And two new kinds, both from the brief:
+	##
+	##     cantilever    where the uphill bench stands above the keel, the
+	##                   bracket comes off the hill instead of a column
+	##                   rising past it - which is what an installation on a
+	##                   benched route actually does
+	##     plate girder  between two adjacent trestles, a web under the keel,
+	##                   so a gorge crossing reads as one bridge rather than
+	##                   as two towers with track lying across them
 	var path: Array = run.get_meta("path")
 	var banks: Array = run.get_meta("banks")
 	var group := Node3D.new()
@@ -170,8 +245,11 @@ static func _supports(root: Node3D, palette, run: Node3D, cfg: Dictionary,
 	var count: int = maxi(int(round(total / SUPPORT_SPACING)), 2)
 	var graphite = palette.get_material("graphite")
 	var deep = palette.get_material("graphite_deep")
+	var plate = palette.get_material("graphite_plate_polish")
 	var gold = palette.get_material("gold_dark")
 	var clearances: Array = []
+	# Where each trestle ended up, so the girders can span between them.
+	var trestles: Array = []
 
 	for step in count + 1:
 		var t := float(step) / float(count)
@@ -204,15 +282,79 @@ static func _supports(root: Node3D, palette, run: Node3D, cfg: Dictionary,
 			continue
 
 		if gap < 8.0:
-			_yoke(pier, graphite, gold, keel, ground, gap, scale)
+			# The bench either side, at the pier's own station. Where the
+			# uphill ground stands above the keel the track is running in a
+			# cut, and a column rising out of a cut wall is the tell that the
+			# support was placed by a rule rather than designed.
+			var across := Vector3(frame.x.x, 0.0, frame.x.z).normalized()
+			var reach: float = 2.6 * scale
+			var a := centre + across * reach
+			var b := centre - across * reach
+			var ha: float = Terrain.height(a.x, a.z, cfg)
+			var hb: float = Terrain.height(b.x, b.z, cfg)
+			var uphill: float = 1.0 if ha > hb else -1.0
+			var bench: float = maxf(ha, hb)
+			if bench > keel - 0.35 * scale and gap < 5.4:
+				_cantilever(pier, graphite, plate, gold, keel, bench,
+					uphill, reach, scale)
+			else:
+				_yoke(pier, graphite, plate, gold, keel, ground, gap, scale)
 			continue
-		_trestle(pier, graphite, deep, gold, keel, ground, gap, scale)
+		_trestle(pier, graphite, deep, plate, gold, keel, ground, gap, scale)
+		trestles.append({"at": Vector3(centre.x, keel, centre.z),
+			"ground": ground, "gap": gap})
+	_girders(group, palette, trestles, scale)
 	return clearances
 
 
-static func _yoke(pier: Node3D, graphite, gold, keel: float, ground: float,
-		gap: float, scale: float) -> void:
+static func _cantilever(pier: Node3D, graphite, plate, gold, keel: float,
+		bench: float, uphill: float, reach: float, scale: float) -> void:
+	## A bracket off the uphill bench, carrying the keel out over the drop.
+	##
+	## Three parts and no column: a pad set into the cut face, a pair of
+	## raking struts from the pad up to the keel, and a plate knee where they
+	## meet. The point is that the load path is visibly into the HILL rather
+	## than down to ground the track is flying over, which is the structural
+	## reading a benched route should have and the one thing a column under
+	## the centreline cannot say.
+	var root_x: float = uphill * reach * 0.86
+	var pad := Forms.mesh_node(
+		Geometry.rounded_box(Vector3(1.35 * scale, 1.05, 1.55 * scale),
+			0.16, 3), plate, "BenchPad", false)
+	pad.position = Vector3(root_x, bench - 0.45, 0.0)
+	pier.add_child(pad)
+
+	# Two struts, not one: two members read as a bracket, one reads as a prop.
+	for offset in [-0.42, 0.42]:
+		var strut := Forms.mesh_node(
+			Forms.brace(Vector3(root_x, bench - 0.30, offset * scale),
+				Vector3(uphill * 0.30 * scale, keel - 0.06, offset * scale),
+				0.20 * scale, 10),
+			graphite, "Strut%d" % int(offset * 100.0), false)
+		pier.add_child(strut)
+	# The knee: a flat, and the only surface on the assembly that faces the
+	# key square on.
+	var knee := Forms.mesh_node(
+		Geometry.rounded_box(Vector3(1.9 * scale, 0.70, 0.20 * scale),
+			0.09, 3), plate, "Knee", false)
+	knee.position = Vector3(root_x * 0.46, lerpf(bench, keel, 0.52), 0.0)
+	knee.rotation.z = atan2(keel - bench, -root_x) * 0.9
+	pier.add_child(knee)
+	var cap := Forms.mesh_node(
+		Geometry.rounded_box(Vector3(2.0 * scale, 0.26, 0.9 * scale),
+			0.10, 3), gold, "Cap", false)
+	cap.position.y = keel + 0.02
+	pier.add_child(cap)
+
+
+static func _yoke(pier: Node3D, graphite, plate, gold, keel: float,
+		ground: float, gap: float, scale: float) -> void:
 	## A Y: one leg into the ground, two arms opening under the channel.
+	##
+	## The arms and the stem are unchanged in geometry. What is added is a
+	## base plate, a collar where the arms spring and a tie between their
+	## tips - three flats on an assembly that previously presented none, and
+	## the reason a Y-frame at forty units used to read as a bent wire.
 	var stem_top: float = keel - gap * 0.42
 	var column := Forms.mesh_node(
 		Forms.column(gap * 0.58 + 0.6, 0.30 * scale, 0.09), graphite,
@@ -226,11 +368,32 @@ static func _yoke(pier: Node3D, graphite, gold, keel: float, ground: float,
 		var arm := Forms.mesh_node(Forms.brace(foot, top, 0.13 * scale),
 			graphite, "Arm%s" % ("L" if side < 0.0 else "R"), false)
 		pier.add_child(arm)
+	# The spring collar: where the two arms leave the stem, which is the one
+	# place on a Y that a real fabrication puts a machined part.
+	var collar := Forms.mesh_node(
+		Geometry.rounded_disc(0.44 * scale, 0.34 * scale, 0.10, 14, 3),
+		plate, "Collar", false)
+	collar.position.y = stem_top
+	pier.add_child(collar)
+	# A tie across the arm tips, under the cap. It closes the Y into a frame
+	# and gives the assembly a horizontal in silhouette.
+	var tie := Forms.mesh_node(
+		Geometry.rounded_box(Vector3(1.86 * scale, 0.16, 0.22 * scale),
+			0.06, 3), plate, "Tie", false)
+	tie.position.y = keel - 0.22
+	pier.add_child(tie)
 	var cap := Forms.mesh_node(
 		Geometry.rounded_box(Vector3(2.0 * scale, 0.26, 0.7 * scale),
 			0.10, 3), gold, "Cap", false)
 	cap.position.y = keel + 0.02
 	pier.add_child(cap)
+	# A square base plate under the round foot: the flat that reads as
+	# bolted down rather than as pushed in.
+	var base := Forms.mesh_node(
+		Geometry.rounded_box(Vector3(1.9, 0.24, 1.9), 0.07, 3), plate,
+		"BasePlate", false)
+	base.position.y = ground - 0.42
+	pier.add_child(base)
 	var pad := Forms.mesh_node(
 		Geometry.rounded_box(Vector3(1.5, 0.5, 1.5), 0.18, 3), graphite,
 		"Foot", false)
@@ -238,7 +401,7 @@ static func _yoke(pier: Node3D, graphite, gold, keel: float, ground: float,
 	pier.add_child(pad)
 
 
-static func _trestle(pier: Node3D, graphite, deep, gold, keel: float,
+static func _trestle(pier: Node3D, graphite, deep, plate, gold, keel: float,
 		ground: float, gap: float, scale: float) -> void:
 	## A braced frame for a real span: four splayed legs and X bracing.
 	##
@@ -249,7 +412,7 @@ static func _trestle(pier: Node3D, graphite, deep, gold, keel: float,
 	# hairlines and two diagonals, and a group of them under a viaduct reads
 	# as loose sticks rather than as structure - which is what the first pass
 	# shipped. A leg on a tall frame is a member, not a wire.
-	var stock: float = (0.22 + gap * 0.023) * scale
+	var stock: float = (0.26 + 0.027 * gap) * scale
 	var half_top: float = 1.05 * scale
 	var half_foot: float = half_top + gap * 0.22
 	var depth: float = 0.70 * scale
@@ -261,6 +424,15 @@ static func _trestle(pier: Node3D, graphite, deep, gold, keel: float,
 			pier.add_child(Forms.mesh_node(
 				Forms.brace(foot, top, stock, 10), graphite,
 				"Leg%d%d" % [int(sx), int(sz)], false))
+			# A base plate per leg. Four small flats at the feet, which is
+			# where the eye looks to decide whether a frame is standing on
+			# the ground or stuck into it.
+			var shoe := Forms.mesh_node(
+				Geometry.rounded_box(Vector3(stock * 3.4, 0.22, stock * 3.4),
+					0.06, 3), plate, "Shoe%d%d" % [int(sx), int(sz)], false)
+			shoe.position = Vector3(sx * half_foot, ground - 0.46,
+				sz * (depth + gap * 0.12))
+			pier.add_child(shoe)
 	# Horizontal ties at each level, and exactly one diagonal per face over
 	# the whole height. A diagonal *per level per face* is four more members
 	# in a frame that already has four legs, and at close range the result is
@@ -275,16 +447,98 @@ static func _trestle(pier: Node3D, graphite, deep, gold, keel: float,
 				Forms.brace(Vector3(-half, y, sz * depth),
 					Vector3(half, y, sz * depth), stock * 0.58, 8),
 				deep, "Tie%d%d" % [level, int(sz)], false))
+		# A gusset where each tie meets each leg. Four small plates per
+		# level, no new crossing lines, and the difference between a bundle
+		# of tubes and a fabrication.
+		for sx in [-1.0, 1.0]:
+			for sz in [-1.0, 1.0]:
+				var gusset := Forms.mesh_node(
+					Geometry.rounded_box(Vector3(stock * 4.6, stock * 4.6,
+						stock * 0.7), 0.05, 2), plate,
+					"Gusset%d%d%d" % [level, int(sx), int(sz)], false)
+				gusset.position = Vector3(sx * half, y, sz * depth)
+				pier.add_child(gusset)
 	for sz in [-1.0, 1.0]:
 		pier.add_child(Forms.mesh_node(
 			Forms.brace(Vector3(-half_foot, ground - 0.1, sz * depth),
 				Vector3(half_top, keel - 0.1, sz * depth), stock * 0.48, 8),
 			deep, "Diagonal%d" % int(sz), false))
+	# The head: a solid web between the leg tops, under the cap. One flat at
+	# the top of the frame, where the frame meets the thing it carries, and
+	# the surface that finally gives a trestle a highlight of its own.
+	var web := Forms.mesh_node(
+		Geometry.rounded_box(Vector3(half_top * 2.0, 0.72 * scale,
+			depth * 1.5), 0.08, 3), plate, "Web", false)
+	web.position.y = keel - 0.48 * scale
+	pier.add_child(web)
 	var cap := Forms.mesh_node(
 		Geometry.rounded_box(Vector3(2.3 * scale, 0.3, 1.5 * scale),
 			0.12, 3), gold, "Cap", false)
 	cap.position.y = keel + 0.04
 	pier.add_child(cap)
+
+
+static func _girders(group: Node3D, palette, trestles: Array,
+		scale: float) -> void:
+	## A plate girder between adjacent trestles: the bridge frames.
+	##
+	## Two tall frames with track lying across the top of them are two
+	## towers. The same two with a web spanning between them are a bridge, and
+	## a bridge is the strongest silhouette a course over a gorge can have -
+	## which is the brief's "occasional bridge frames", and also what the
+	## viaduct sprint into the finish was missing.
+	##
+	## A plate girder rather than a truss, on purpose. A truss between two
+	## trestles is another dozen crossing tubes in the part of the frame that
+	## already has the most, and the note in `_trestle` about tangles applies
+	## twice as hard to the span. A web plate has one edge, casts one shadow,
+	## and is what a real span of this proportion is built from anyway.
+	##
+	## Hung UNDER the keel and never over it. The brief's camera rule - that
+	## supports must not cross the action area - is a rule about geometry
+	## before it is a rule about framing: anything above the running surface
+	## can occlude a racer from some camera, and the fix is not to build it.
+	if trestles.size() < 2:
+		return
+	var web = palette.get_material("graphite_plate_polish")
+	var chord = palette.get_material("graphite_deep")
+	for index in range(trestles.size() - 1):
+		var a: Dictionary = trestles[index]
+		var b: Dictionary = trestles[index + 1]
+		var from: Vector3 = a["at"]
+		var to: Vector3 = b["at"]
+		var span := from.distance_to(to)
+		# Only between neighbours that are actually a pair. Two trestles ten
+		# units apart are a span; the same two twenty-five apart are two
+		# separate structures, and a plate between them is a fence.
+		if span > SUPPORT_SPACING * 1.6 or span < 1.0:
+			continue
+		var mid: Vector3 = (from + to) * 0.5
+		# The web's depth follows the shallower of the two towers, so a span
+		# never hangs lower than the ground it crosses.
+		var drop: float = clampf(minf(float(a["gap"]), float(b["gap"]))
+			* 0.30, 0.6, 2.4) * scale
+		var bridge := Node3D.new()
+		bridge.name = "Girder%d" % index
+		bridge.position = mid
+		bridge.rotation.y = atan2(to.x - from.x, to.z - from.z)
+		group.add_child(bridge)
+		for side in [-1.0, 1.0]:
+			var suffix := "L" if side < 0.0 else "R"
+			var sheet := Forms.mesh_node(
+				Geometry.rounded_box(Vector3(0.16 * scale, drop, span),
+					0.05, 2), web, "Web%s" % suffix, false)
+			sheet.position = Vector3(side * 0.86 * scale,
+				-drop * 0.5 - 0.30 * scale, 0.0)
+			bridge.add_child(sheet)
+			# A bottom chord along each web's lower edge. It is what stops a
+			# plate hanging in space reading as a card.
+			var rail := Forms.mesh_node(
+				Geometry.rounded_box(Vector3(0.34 * scale, 0.20 * scale,
+					span), 0.07, 2), chord, "Chord%s" % suffix, false)
+			rail.position = Vector3(side * 0.86 * scale,
+				-drop - 0.34 * scale, 0.0)
+			bridge.add_child(rail)
 
 
 # --- markers --------------------------------------------------------------
@@ -446,9 +700,26 @@ static func _field(root: Node3D, palette, table: Dictionary) -> void:
 
 	# Three abreast is the claim the brief makes about the hero channel's
 	# width, so the field is placed in threes and the picture has to support it
-	# rather than a note asserting it. Two packs per run, half a lap apart, so
-	# that a camera anywhere on two hundred and thirty units of course has
-	# racers in frame - this is a display field, not a race.
+	# rather than a note asserting it.
+	#
+	# ## Why the phases are a table and not a formula
+	#
+	# Two packs at 0.10 and 0.60 leave a third of every run without a racer on
+	# it, and a section camera aimed into one of those gaps photographs empty
+	# channel - which is the brief's first camera failure and the reason the
+	# committed finish frame has nothing arriving in it. A camera cannot solve
+	# that: the only fix is that the display field has a pack wherever a shot
+	# is worth taking.
+	#
+	# So the stations come from the shot list rather than from an interval.
+	# Three packs at 0.06, 0.40 and 0.68 put a pack within a few hundredths of
+	# every candidate's aim point, and the sprint gets a fourth at 0.96 so the
+	# finish has a field in its mouth. Display only - `travellers` is read by
+	# `course_scene.set_time` to move them at a constant rate and by nothing
+	# else, it is not written to the physics dump, and no lane, phase or count
+	# here is a claim about a race.
+	var stations := [0.06, 0.40, 0.68]
+	var sprint_stations := [0.06, 0.40, 0.68, 0.96]
 	var travellers: Array = []
 	var index := 0
 	for entry in table["runs"]:
@@ -456,7 +727,9 @@ static func _field(root: Node3D, palette, table: Dictionary) -> void:
 		var name := str(spec["name"])
 		var narrow: bool = float(spec["scale"]) < 0.9
 		var lanes := [-0.40, 0.0, 0.40] if narrow else [-0.54, 0.0, 0.54]
-		for pack in 2:
+		var packs: Array = sprint_stations if str(spec["role"]) == "sprint" \
+			else stations
+		for pack in packs.size():
 			for at in lanes.size():
 				var node := MeshInstance3D.new()
 				node.name = "Racer%d" % index
@@ -465,7 +738,7 @@ static func _field(root: Node3D, palette, table: Dictionary) -> void:
 				field.add_child(node)
 				travellers.append({"node": node.name, "run": name,
 					"lane": float(lanes[at]),
-					"phase": fposmod(0.10 + 0.5 * float(pack)
+					"phase": fposmod(float(packs[pack])
 						+ 0.055 * float(at), 1.0)})
 				index += 1
 	root.set_meta("travellers", travellers)
