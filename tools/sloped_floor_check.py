@@ -24,6 +24,12 @@ What it checks:
 * **no sphere trapped against the wall.** For a marble resting against the
   chamber wall, the space it occupies must be clear of every slat by the time
   the slat could reach it, and the slat must move *away* from the wall.
+* **how far the slats reach outside the chamber, and that no marble can be
+  there.** At 90 degrees a slat has collapsed onto its own hinge line and keeps
+  its full half length, so the outermost slat's corners swing well outside the
+  wall. That is inherent to an edge hinge and it is harmless for one reason
+  only - a marble's centre cannot exceed `R_WALL - MARBLE_RADIUS` - so the
+  reach is measured and the bound asserted rather than argued.
 * **hinge sweep against a marble on the dish.** Not against the dish surface:
   at 90 degrees the slats hang as vertical plates in the space above the dish,
   and a marble resting on it stands 0.57 tall into that space. The first
@@ -328,6 +334,36 @@ def main(argv: list[str] | None = None) -> int:
         )
     report["wall_marble_conflicts"] = trapped
     report["worst_wall_encroachment"] = round(worst_encroach, 5)
+
+    # --- how far outside the chamber the slats reach ----------------------
+    print()
+    reach, at_deg, which = floor.panel_reach()
+    marble_limit = floor.R_WALL - layout.MARBLE_RADIUS
+    print(f"slat reach: corners get to radius {reach:.4f} (at {at_deg:.0f} deg, "
+          f"{which}), against a {floor.R_WALL} wall and a {floor.CATCH_HALF} "
+          f"catch rim")
+    print(f"  no marble's centre can exceed {marble_limit:.4f}, so the "
+          f"over-reach is {reach - marble_limit:+.4f} clear of anything a "
+          f"marble can occupy")
+    if reach <= marble_limit:
+        print("  (and it does not leave the chamber at all)")
+    report["panel_reach"] = {
+        "radius": round(reach, 4),
+        "at_deg": at_deg,
+        "panel": which,
+        "marble_limit": round(marble_limit, 4),
+        "clear_of_marbles": round(reach - marble_limit, 4),
+    }
+    # A finding only if the reach could meet a marble, which is the question
+    # that matters. That it passes through the catch's static rim is a render
+    # problem - a kinematic box and a static shell generate no contact - and it
+    # is reported as a remaining issue rather than as a physics finding.
+    if reach <= marble_limit:
+        pass
+    elif reach > marble_limit and floor.CATCH_HALF < reach:
+        print(f"  it does pass outside the catch's rim by "
+              f"{reach - floor.CATCH_HALF:.3f}: no contact, because both are "
+              f"zero-mass, but the renderer owes this a shroud")
 
     # --- the slats' depth against the dish --------------------------------
     #

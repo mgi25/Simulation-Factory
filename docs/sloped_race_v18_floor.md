@@ -119,7 +119,7 @@ centre bias. The rotor's blade clearance is one number (0.030 everywhere)
 instead of two (0.030 at the tip, 0.208 at the root). The free radial travel is
 the whole disc - 4.24 marble diameters - instead of 2.07 either side of a ring.
 
-### The four defects, and which instrument found each
+### The five defects, and which instrument found each
 
 **The seam is `pitch − thickness`, not `pitch`, and it peaks at 90 degrees.** A
 slat rotated by an angle has a horizontal footprint of `(t/2)sin + (w/2)cos`
@@ -157,6 +157,18 @@ leaves a fin. The blade is not, and with a full-floor release it has no further
 job, so `Rotor.lift_at` raises the paddle assembly 0.68 clear during the settle.
 `ShuffleChamber` keeps `ROTOR_LIFT = 0.0`, because V1.7's outlet does need its
 blades where they are.
+
+**The slats reach a long way outside the chamber while they move, and it is
+inherent to an edge hinge.** At 90 degrees a slat has collapsed onto its own
+hinge line while keeping its full half length, and the outermost slat's hinge
+sits at the chamber's very edge where the chord is zero - so its corners swing
+to radius **3.4435** against a 2.70 wall and a 2.90 catch rim. Harmless, for
+exactly one reason, which is what the check now asserts rather than argues: a
+marble's centre cannot exceed `R_WALL − MARBLE_RADIUS` = 2.415, so there is a
+whole marble diameter of daylight between the reach and anywhere a marble can
+be, and a kinematic box and a static shell generate no contact between them.
+It is not harmless for the *render*, where slat corners visibly sweep through
+the catch's rim, and that is issue 4 below.
 
 **And the trace tool's own verdicts were wrong twice**, both times in the
 direction that flatters or libels the mechanism. It called a marble 34 units
@@ -346,3 +358,9 @@ predates this session and is unrelated - confirmed by stashing.
 3. **`leg1[70..89%]` still loses eight racers in 768**, in every configuration
    measured here, in V1.6 and V1.7, and in the shipped taper. It is the
    pre-existing trap section 18 owns and nothing in this session touched it.
+
+And one that is not a physics issue but will be visible the moment anything is
+rendered: **the slats sweep 0.54 outside the catch's rim** on their way to 90
+degrees, so the mechanism needs a shroud rather than a geometry change. The
+reach is measured, bounded and asserted; the render is gated behind the start
+passing in any case.

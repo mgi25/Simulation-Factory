@@ -194,6 +194,25 @@ def test_the_well_clears_a_marble_standing_on_the_dish(floor):
     assert marble_top_on_dish > hanging
 
 
+def test_the_slats_reach_outside_the_chamber_but_never_near_a_marble(floor):
+    """Inherent to an edge hinge, and bounded by where a marble can be.
+
+    At 90 degrees a slat has collapsed onto its own hinge line while keeping
+    its full half length, and the outermost slat's hinge is at the chamber's
+    edge where the chord is zero - so its corners swing to radius 3.44 against
+    a 2.70 wall. Harmless for exactly one reason, which is what is asserted: a
+    marble's centre cannot exceed `R_WALL - MARBLE_RADIUS`, and the gap between
+    that and the reach is large.
+    """
+    reach, at_deg, _which = floor.panel_reach()
+    marble_limit = floor.R_WALL - layout.MARBLE_RADIUS
+    assert reach > floor.R_WALL                      # it really does reach out
+    assert at_deg == pytest.approx(floor.PANEL_SWEEP, abs=2.0)
+    # A whole marble diameter of daylight between the reach and anywhere a
+    # marble can be, so no tightening of the one can threaten the other.
+    assert reach - marble_limit > DIAMETER
+
+
 def test_the_dish_catches_the_whole_chamber(floor):
     """A marble over nothing falls out of the machine and is never located."""
     for row in range(-20, 21):

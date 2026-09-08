@@ -154,3 +154,37 @@ mean chamber speed 0.64 -> under 0.2, cyclic order still broken.
 **The residual is halved and it is not zero.** A release that does not read
 position will carry whatever is left faithfully downstream, so this is the
 ceiling the release can be measured against - not a clean slate.
+
+
+7. THE ROTOR RATE, WHICH ONLY A TRAPDOOR MAKES USABLE
+-----------------------------------------------------
+The third knob section 3 allows, tested last because V1.7 could not use it: a
+fast rotor centrifuges the field away from a central outlet and starves the
+delivery - six of eight racers simply stayed put when its gate dropped. A
+full-floor release does not care where the field is, so the rate is free.
+
+And what it buys is measured on the statistic an *axial* catch actually reads,
+which is the marble's own chamber radius. 96 seeds each, held for entry, mix
+3.00, settle 1.20, the `floor` chamber with its flat level floor:
+
+  rate   turns   bay -> radius   |bay-3.5| -> radius   drain span   in chamber
+   5.0    2.39       -0.065            -0.202            0.375         100%
+   9.0    4.30       +0.006            -0.119            0.317         100%
+  13.0    6.21       +0.019            -0.047            0.419         100%
+
+**The centre-shaped residual falls from -0.202 to -0.047** - four times down,
+and it is the residual the whole session's remaining bias is made of. The plain
+`bay -> radius` correlation is already at zero by 9 rad/s.
+
+Nothing is thrown out of the chamber at 13 rad/s, which is the property the
+rotor was moved out of the channel to get: the wall contains the field, the
+tip-to-wall clearance is 0.150 at every blade angle, and a gap with no angle in
+it cannot close on a marble. The earlier in-channel wheel put 80.2% of the
+field in the stuck column at 12 rad/s for exactly the opposite reason.
+
+Note what the rate does *not* fix. The per-bay bearing concentration is 0.358
+at 5 rad/s, 0.391 at 9 and 0.384 at 13 - flat, like the mixing duration before
+it. A rotor is a rotation whatever its speed, and the bay's bearing residual is
+not something more of it removes. What changes is the *radius*, and the radius
+is the coordinate an axial catch reads. So this is not the rotor mixing better;
+it is the rotor equalising the one number the catch asks about.

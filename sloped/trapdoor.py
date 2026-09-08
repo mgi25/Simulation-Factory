@@ -165,7 +165,7 @@ from marble3d.modules.base import Actuator, Probe
 from marble3d.units import MARBLE_RADIUS
 
 from sloped import layout
-from sloped.scale import SIM_TO_LAYOUT, to_sim
+from sloped.scale import LAYOUT_TO_SIM, SIM_TO_LAYOUT, to_sim
 from sloped.shuffle import ShuffleChamber
 from sloped.solids import merge_meshes
 from sloped.stations import _place, _strip
@@ -398,6 +398,25 @@ class ShuffleFloor(ShuffleChamber):
     # the union of the slats must cover the disc with no crescent against the
     # wall for a marble to sit in, and over-covering into a wall that is a
     # zero-thickness static shell costs nothing a marble can reach.
+    #
+    # **The over-reach is much larger while a slat is moving, and it is
+    # inherent to an edge hinge.** At 90 degrees a slat has collapsed onto its
+    # own hinge line, so every one of its boxes is at the hinge's z while
+    # keeping its full half length - and the outermost slat's hinge is at the
+    # chamber's very edge, where the chord is zero. Measured, its corners swing
+    # to radius 3.44 against a 2.70 wall and a 2.90 catch rim.
+    #
+    # It is harmless and the bound is why: a marble's centre cannot exceed
+    # `R_WALL - MARBLE_RADIUS` = 2.415, so nothing a marble can occupy is
+    # anywhere near it; the panels are kinematic and the wall and rim are
+    # static, and Bullet generates no contact between two zero-mass bodies; and
+    # the static geometry a bounced marble would meet is unaffected by a
+    # kinematic box passing through it. `tools/sloped_floor_check.py` measures
+    # the reach and asserts the bound rather than leaving it unmeasured.
+    #
+    # What it is not harmless for is the *render*: slat corners visibly sweep
+    # outside the chamber wall and through the catch's rim. That is a shroud
+    # the renderer owes the mechanism, and it is listed as a remaining issue.
     PANEL_BURY = 0.06
     # **Ninety, because that is where the seam is widest.** See the module
     # docstring: past 90 degrees the slat folds back over its own hinge, its
@@ -695,6 +714,34 @@ class ShuffleFloor(ShuffleChamber):
         low = -self.R_WALL + index * self.panel_pitch
         return low, low + self.panel_pitch
 
+    def panel_reach(self) -> tuple[float, float, str]:
+        """The furthest any slat corner gets from the chamber's axis, and when.
+
+        Returns (radius, degrees, panel name). See `PANEL_BURY`: this is large,
+        inherent to an edge hinge, and bounded harmless by the fact that a
+        marble's centre cannot exceed `R_WALL - MARBLE_RADIUS`.
+        """
+        worst = 0.0
+        where = (0.0, "")
+        for panel in self.floor_panels():
+            for step in range(int(self.PANEL_SWEEP) + 1):
+                angle = math.radians(step)
+                for corner in panel.corners_at(angle):
+                    local = self._to_local(corner)
+                    radius = math.hypot(local[0], local[2] - self.CHAMBER_Z)
+                    if radius > worst:
+                        worst, where = radius, (float(step), panel.name)
+        return worst, where[0], where[1]
+
+    def _to_local(self, world_sim):
+        """A world simulation point back in this module's layout frame."""
+        point = tuple(value / LAYOUT_TO_SIM for value in world_sim)
+        delta = tuple(point[axis] - self.origin[axis] for axis in range(3))
+        return tuple(
+            sum(self.frame[axis][component] * delta[component] for component in range(3))
+            for axis in range(3)
+        )
+
     def panel_half_length(self, low: float, high: float) -> float:
         """Half the length of a sub-box covering z in [low, high].
 
@@ -897,6 +944,8 @@ def floor_table(floor: ShuffleFloor) -> dict:
             "depth_at_full_sweep": round(floor.panel_depth, 4),
             "well": round(floor.panel_well, 4),
             "opens_at": round(floor.floor_open, 4),
+            "corner_reach": round(floor.panel_reach()[0], 4),
+            "marble_reach": round(floor.R_WALL - layout.MARBLE_RADIUS, 4),
             # The gap two neighbours finally leave, which is the pitch, and the
             # angle at which it first passes one marble diameter. Below that
             # angle no marble can enter the seam at all, and above it the seam

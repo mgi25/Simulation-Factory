@@ -419,6 +419,26 @@ FLOOR_CANDIDATES: dict[str, StartPlan] = {
         "floor", name="floor-tuned", seed_phase=True,
         rotor_hold=True, mix_seconds=3.00, settle_seconds=1.20,
     ),
+    # **And the same again at 13 rad/s**, which is the one knob section 3
+    # allows that V1.7 could not use. A fast rotor centrifuged its field away
+    # from the outlet and starved the delivery; a trapdoor does not care where
+    # the field is, so the rate is free - and what it buys is measured on the
+    # statistic an axial catch actually reads, the radius:
+    #
+    #     rate   bay -> radius   |bay-3.5| -> radius   in the chamber
+    #      5.0       -0.065            -0.202              100%
+    #      9.0       +0.006            -0.119              100%
+    #     13.0       +0.019            -0.047              100%
+    #
+    # 96 seeds each, `docs/validation/sloped_race_v1/v18/prerelease_rate*.json`.
+    # Nothing is thrown out of the chamber at 13, because the wall contains the
+    # field and the 0.15 tip clearance is constant and cannot pinch - which is
+    # the property the chamber was moved out of the channel to get.
+    "floor-fast": bench_plan(
+        "floor", name="floor-fast", seed_phase=True,
+        rotor_hold=True, mix_seconds=3.00, settle_seconds=1.20,
+        rotor_rate=13.0,
+    ),
 }
 
 
