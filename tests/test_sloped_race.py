@@ -156,7 +156,17 @@ def test_the_start_offers_eight_bays_wide_enough_to_stand_in(machine):
 
 
 def test_the_gate_is_a_pure_function_of_the_tick(machine):
-    gates = machine.modules["start"].local_actuators()
+    """The bay paddles, whatever else the start carries.
+
+    Written when the start was the fan and its only moving parts were eight
+    bay gates. The frozen V1 start is `sloped.trapdoor.ShuffleFloor`, which
+    also carries four rotor blades and eighteen floor slats, so the paddles are
+    selected by name rather than by the actuator list being nothing else. What
+    is asserted is unchanged: there are eight of them and each one's pose is a
+    clamped, monotonic, pure function of the tick.
+    """
+    actuators = machine.modules["start"].local_actuators()
+    gates = [a for a in actuators if a.name.startswith("paddle")]
     assert len(gates) == layout.BAYS
     gate = gates[0]
     dt = DEFAULT_CONFIG.physics.dt
