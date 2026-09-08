@@ -37,6 +37,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from marble3d.config import DEFAULT_CONFIG  # noqa: E402
 from sloped.course import sloped_course  # noqa: E402
+from marble3d.simulation import STATE_ESCAPED  # noqa: E402
 from sloped.race import LATERAL_SLACK, VERTICAL_SLACK, SlopedRace  # noqa: E402
 from sloped.scale import SIM_TO_LAYOUT  # noqa: E402
 
@@ -55,8 +56,15 @@ class EscapeRace(SlopedRace):
         self.peak_reach: dict[int, float] = {}
 
     def _containment(self, marble_id, position):
+        # **`RacerResult.state` is not set during the race.** It keeps its
+        # "running" default until `run_race` assigns it at the end, so a gate
+        # written against it never fires - the first version of this tool
+        # reported 0 finished and 0 escaped over 176 racers while the benchmark
+        # reported 74% finishing the same course. What the simulation does set
+        # per tick is `_Marble.state`, and what the race sets is
+        # `RacerResult.finish_order`, so those are the two facts read here.
         place = self._where.get(marble_id)
-        already = self.results[marble_id].state != "running"
+        already = marble_id in self.escapes
         super()._containment(marble_id, position)
         if place is None:
             return
@@ -77,9 +85,9 @@ class EscapeRace(SlopedRace):
         self.peak_reach[marble_id] = max(
             self.peak_reach.get(marble_id, 0.0), abs(across) / max(half, 1e-9)
         )
-        if already or self.results[marble_id].state == "running":
+        if already:
             return
-        if marble_id in self.escapes:
+        if self.marbles[marble_id].state != STATE_ESCAPED:
             return
         velocity = self.marbles[marble_id].pose[2]
         across_v = sum(velocity[axis] * lateral[axis] for axis in range(3))
@@ -90,7 +98,7 @@ class EscapeRace(SlopedRace):
             "pct": round(100.0 * index / max(len(run.sim_path) - 1, 1), 1),
             "slot": self.results[marble_id].start_slot,
             "route": self.results[marble_id].route,
-            "state": self.results[marble_id].state,
+            "state": self.marbles[marble_id].state,
             "reach": round(across / max(half, 1e-9), 4),
             "height": round(height * SIM_TO_LAYOUT, 4),
             "ceiling": round(ceiling * SIM_TO_LAYOUT, 4),
@@ -133,8 +141,10 @@ def _one(job):
                 "escapes": list(race.escapes.values()),
                 "peak_height": max(race.peak_height.values(), default=-9.9),
                 "peak_reach": max(race.peak_reach.values(), default=0.0),
+                # `finish_order` is set by the race as each marble crosses,
+                # unlike `state`, which `run_race` assigns afterwards.
                 "finished": sum(
-                    1 for r in race.results.values() if r.state == "finished"
+                    1 for r in race.results.values() if r.finish_order is not None
                 ),
             })
         finally:

@@ -59,6 +59,10 @@ RENDER_SCENE = "res://scenes/SlopedRaceRender.tscn"
 OUT_DIR = os.path.join("output", "sloped_race_v1")
 STILLS_DIR = os.path.join("docs", "validation", "sloped_race_v1")
 FRAMES_DIR = os.path.join(OUT_DIR, "frames")
+# The default name, kept so an existing invocation reproduces V1.3's clip.
+# `--video` overrides it: the V1.9 physics lock writes
+# `real_race_final_physics.mp4`, and a render that silently overwrote a
+# previous version's deliverable would be the wrong kind of convenience.
 VIDEO_PATH = os.path.join(OUT_DIR, "real_race_v13.mp4")
 
 WIDTH = 1080
@@ -278,7 +282,8 @@ def stage_stills(godot: str, replay_path: str, cameras_path: str) -> dict[str, A
     return {"stills": written}
 
 
-def stage_clip(godot: str, replay_path: str, cameras_path: str, fps: int) -> dict[str, Any]:
+def stage_clip(godot: str, replay_path: str, cameras_path: str, fps: int,
+               video_path: str = "") -> dict[str, Any]:
     if os.path.isdir(FRAMES_DIR):
         shutil.rmtree(FRAMES_DIR)
     os.makedirs(FRAMES_DIR, exist_ok=True)
@@ -324,7 +329,8 @@ def stage_clip(godot: str, replay_path: str, cameras_path: str, fps: int) -> dic
     if ffmpeg is None:
         raise IntegrationError("ffmpeg is not on PATH; the frames are rendered but not encoded")
     first = int(frames[0].split("_")[1].split(".")[0])
-    os.makedirs(os.path.dirname(os.path.abspath(VIDEO_PATH)), exist_ok=True)
+    video = video_path or VIDEO_PATH
+    os.makedirs(os.path.dirname(os.path.abspath(video)), exist_ok=True)
     command = [
         ffmpeg, "-y",
         "-framerate", str(fps),
@@ -337,7 +343,7 @@ def stage_clip(godot: str, replay_path: str, cameras_path: str, fps: int) -> dic
         "-crf", str(VIDEO_CRF),
         "-pix_fmt", "yuv420p",
         "-movflags", "+faststart",
-        VIDEO_PATH,
+        video,
     ]
     completed = subprocess.run(
         command, capture_output=True, text=True, encoding="utf-8", errors="replace"
@@ -345,12 +351,12 @@ def stage_clip(godot: str, replay_path: str, cameras_path: str, fps: int) -> dic
     if completed.returncode != 0:
         tail = "\n".join((completed.stderr or "").splitlines()[-15:])
         raise IntegrationError(f"ffmpeg exited {completed.returncode}\n{tail}")
-    size = os.path.getsize(VIDEO_PATH) / (1024 * 1024)
+    size = os.path.getsize(video) / (1024 * 1024)
     print(
-        f"video: {VIDEO_PATH}  {size:.1f} MiB  {len(frames)} frames at {fps} fps "
+        f"video: {video}  {size:.1f} MiB  {len(frames)} frames at {fps} fps "
         f"= {len(frames) / fps:.2f} s"
     )
-    return {"video": VIDEO_PATH, "frames": len(frames), "seconds": len(frames) / fps}
+    return {"video": video, "frames": len(frames), "seconds": len(frames) / fps}
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -366,6 +372,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--fps", type=int, default=FPS)
     parser.add_argument("--stride", type=int, default=1)
     parser.add_argument("--godot", default="")
+    parser.add_argument(
+        "--video", default="",
+        help="where to write the clip; defaults to VIDEO_PATH",
+    )
     args = parser.parse_args(argv)
 
     paths = paths_for(args.seed)
@@ -392,7 +402,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         elif stage == "stills":
             stage_stills(godot, paths["replay"], paths["cameras"])
         elif stage == "clip":
-            stage_clip(godot, paths["replay"], paths["cameras"], args.fps)
+            stage_clip(godot, paths["replay"], paths["cameras"], args.fps,
+                       args.video)
     return 0
 
 

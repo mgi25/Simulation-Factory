@@ -1,0 +1,12 @@
+{
+  "routes": "both",
+  "label": "before",
+  "seeds": [
+    1,
+    23
+  ],
+  "racers": 176,
+  "finished": 0,
+  "escapes": [],
+  "wall_seconds": 715.14
+}
