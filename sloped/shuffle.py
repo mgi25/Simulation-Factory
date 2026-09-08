@@ -129,28 +129,46 @@ class Rotor(Spinner):
     process.
     """
 
-    def __init__(self, *args, stop_time: float, spin_down: float = 0.30,
-                 tail_rate: float = 0.0, **kwargs):
+    def __init__(self, *args, stop_time: float, start_time: float = 0.0,
+                 spin_down: float = 0.30, tail_rate: float = 0.0, **kwargs):
         super().__init__(*args, **kwargs)
-        self.stop_time = float(stop_time)
+        self.start_time = float(start_time)
+        self.stop_time = max(float(stop_time), self.start_time)
         self.spin_down = max(float(spin_down), 1e-6)
         self.tail_rate = float(tail_rate)
 
     def angle_at(self, tick: int, dt: float) -> float:
         """The integral of the rate profile, so the angle never jumps.
 
-        Full `rate` to `stop_time`, a linear ramp to `tail_rate` over
-        `spin_down`, and `tail_rate` after that. Integrated rather than sampled
-        because a sampled rate change puts a step in the angle, and a kinematic
-        box that teleports a paddle-width hands a marble an impulse from
-        nowhere.
+        Still, then full `rate` from `start_time` to `stop_time`, then a linear
+        ramp to `tail_rate` over `spin_down`, then `tail_rate`. Integrated
+        rather than sampled because a sampled rate change puts a step in the
+        angle, and a kinematic box that teleports a paddle-width hands a
+        marble an impulse from nowhere.
+
+        **`start_time` is what makes every racer see the same rotor**, and it
+        is a measured correction rather than a convenience. With the rotor
+        turning from tick zero, a racer transport angle is
+        `rate * (stop_time - its own arrival time)`, and the eight bays arrive
+        at systematically different times because they have different
+        distances to travel across the apron. So the bay is written into the
+        final bearing, and no amount of extra mixing removes it: the residual
+        is a *difference* in residence, and a longer run adds the same constant
+        to everyone. `docs/validation/sloped_race_v1/v18/` records the per-bay
+        bearing concentration holding at 0.60 from 1.19 turns to 7.16.
+
+        Held still until the whole field is in the chamber, every racer gets
+        the same number of degrees of rotor, and the difference cancels.
         """
         now = tick * dt
-        if now <= self.stop_time:
-            turned = self.rate * now
+        if now <= self.start_time:
+            turned = 0.0
+        elif now <= self.stop_time:
+            turned = self.rate * (now - self.start_time)
         else:
+            span = self.stop_time - self.start_time
             over = min(now - self.stop_time, self.spin_down)
-            turned = self.rate * self.stop_time + over * (
+            turned = self.rate * span + over * (
                 self.rate - 0.5 * (self.rate - self.tail_rate) * over / self.spin_down
             )
             if now - self.stop_time > self.spin_down:
@@ -160,6 +178,7 @@ class Rotor(Spinner):
     def to_json(self):
         data = super().to_json()
         data.update({
+            "start_time": self.start_time,
             "stop_time": self.stop_time,
             "spin_down": self.spin_down,
             "tail_rate": self.tail_rate,
@@ -269,6 +288,13 @@ class ShuffleChamber(StartGrid):
     # report.
     ROTOR_TAIL_RATE = 0.0
     ROTOR_PHASE = 0.0
+    # **Whether the rotor holds still until the whole field is in the
+    # chamber.** See `Rotor.angle_at`: turning from tick zero writes each bay
+    # arrival time into its final bearing, and that is the residual the
+    # pre-release measurement found and that no amount of mixing removes.
+    # Off here so V1.7 recorded numbers stay reproducible in this class;
+    # `sloped.startlab` scans it.
+    ROTOR_HOLD_ENTRY = False
 
     # --- the outlet ---------------------------------------------------------
     #
@@ -332,8 +358,12 @@ class ShuffleChamber(StartGrid):
         rotor_phase: float | None = None,
         mix_seconds: float | None = None,
         rotor_rate: float | None = None,
+        rotor_hold: bool | None = None,
     ) -> None:
         super().__init__(module_id, launch)
+        self.rotor_hold = (
+            self.ROTOR_HOLD_ENTRY if rotor_hold is None else bool(rotor_hold)
+        )
         self.rotor_phase = self.ROTOR_PHASE if rotor_phase is None else float(rotor_phase)
         self.mix_seconds = self.MIX_SECONDS if mix_seconds is None else float(mix_seconds)
         self.rotor_rate = self.ROTOR_RATE if rotor_rate is None else float(rotor_rate)
@@ -432,6 +462,19 @@ class ShuffleChamber(StartGrid):
     # --- the release timeline ----------------------------------------------
 
     @property
+    def rotor_start(self) -> float:
+        """When the rotor begins to turn.
+
+        Zero unless `rotor_hold`, in which case it waits for the whole field to
+        be in the chamber - the same `ENTRY_ALLOWANCE` that `rotor_stop` is
+        already chained off, so the mixing interval keeps its length and only
+        its placement moves.
+        """
+        if not self.rotor_hold:
+            return 0.0
+        return self.release_time + self.ENTRY_ALLOWANCE
+
+    @property
     def rotor_stop(self) -> float:
         """When the rotor stops: after the field is in, plus the mixing."""
         return self.release_time + self.ENTRY_ALLOWANCE + self.mix_seconds
@@ -449,8 +492,8 @@ class ShuffleChamber(StartGrid):
 
     @property
     def rotor_turns(self) -> float:
-        """How many revolutions the rotor makes during the mixing interval."""
-        return self.rotor_rate * self.mix_seconds / (2.0 * math.pi)
+        """How many revolutions the rotor makes while it is turning."""
+        return self.rotor_rate * (self.rotor_stop - self.rotor_start) / (2.0 * math.pi)
 
     # --- geometry ------------------------------------------------------------
 
@@ -683,6 +726,7 @@ class ShuffleChamber(StartGrid):
                     blades=self.PADDLES,
                     phase=self.rotor_phase,
                     rate=self.rotor_rate,
+                    start_time=self.rotor_start,
                     stop_time=self.rotor_stop,
                     spin_down=self.SPIN_DOWN,
                     tail_rate=self.ROTOR_TAIL_RATE,
@@ -839,6 +883,8 @@ class ShuffleChamber(StartGrid):
                 "phase": round(self.rotor_phase, 9),
                 "tip_speed": round(self.rotor_rate * self.TIP_R, 4),
                 "turns_while_mixing": round(self.rotor_turns, 4),
+                "holds_until_field_in": self.rotor_hold,
+                "starts_at": round(self.rotor_start, 4),
                 "stops_at": round(self.rotor_stop, 4),
                 "spin_down": self.SPIN_DOWN,
                 "tail_rate": self.ROTOR_TAIL_RATE,

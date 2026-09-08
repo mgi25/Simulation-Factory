@@ -1,0 +1,156 @@
+PRE-RELEASE CHAMBER STATE - what is left of the starting bay before anything opens
+==================================================================================
+
+Instrument: tools/sloped_chamber_state.py, sloped/chamberstate.py.
+Each trial runs the rotor start to the tick before the release opens and reads
+the field in the start module's own frame. No exit statistics are involved.
+
+Sampled at `ShuffleChamber.gate_time`, read off the module rather than typed.
+
+  bay->(x,z)   the magnitude of the (bay->x, bay->z) correlation vector.
+               Invariant to how far the rotor carried the field round, which
+               the two components separately are not.
+  conc         per-bay bearing concentration (mean resultant length), averaged
+               over the eight bays. 0 = that bay's racers end up anywhere;
+               1 = that bay always ends up at one bearing. The noise floor for
+               a genuinely uniform angle is 0.886/sqrt(n): 0.064 at 192 seeds,
+               0.090 at 96.
+  sector R     bay -> bearing folded into one blade pitch. V1.7's fixed-phase
+               defect shows here and nowhere else.
+
+Mardia's coefficient tops out at about 0.81, not 1.0, when the bays are spread
+round the whole circle - the bay index is deterministic in the bearing but not
+monotone in any linear embedding of a circle it goes all the way round. So the
+measured 0.22 to 0.53 below are fractions of 0.81. Pinned in
+tests/test_sloped_chamberstate.py.
+  cyclic       |2p-1| for the fraction of bay triples whose cyclic order round
+               the chamber matches their cyclic order across the pan.
+               0 = broken; 1 = the necklace merely rotated.
+
+
+1. THE INSTRUMENT REPRODUCES V1.7's FIXED-PHASE DEFECT INDEPENDENTLY
+--------------------------------------------------------------------
+192 seeds each, everything else at V1.7's shipped rotor values.
+
+  configuration        bay->(x,z)   conc    sector R   cyclic
+  rotor, fixed phase       0.446      -        0.529    0.026
+  rotor, seed phase        0.406      -        0.026    0.002
+
+V1.7 traced the fixed-phase defect one marble at a time and found four parking
+bearings 90 degrees apart. The sector column is that finding, measured over
+1536 racers: 0.529 against 0.026, a twentyfold difference in the one statistic
+that can see it. The seed-derived global phase is confirmed.
+
+
+2. THE CYCLIC ORDER IS COMPLETELY DESTROYED, AND THAT IS NOT ENOUGH
+-------------------------------------------------------------------
+At the shipped configuration, over 10752 triples, cyclic order retained is
+0.002 - indistinguishable from a random cyclic permutation. The rotor really
+does break the necklace.
+
+But every bay still has its own preferred arc of the chamber:
+
+  slot  bearing  concentration        (192 seeds, settle 1.20)
+    0    111.6      0.560
+    1     57.0      0.714
+    2    348.5      0.757
+    3      2.2      0.638
+    4    354.4      0.551
+    5     59.8      0.619
+    6    151.3      0.563
+    7    219.1      0.577
+
+Mean 0.622 against a 0.064 noise floor - ten times it - and the eight means
+span 230.6 degrees rather than clustering. The field as a whole concentrates at
+only 0.253, *less* than any individual bay, which is the signature that
+separates the two cases: a field that all ends up in one arc because the inlet
+is at one bearing is fair, and a field whose eight bays each prefer a different
+arc is the sectoring five earlier topologies died of.
+
+Both statements are consistent. A concentration of 0.62 is a circular standard
+deviation of about 56 degrees, and the bay means are about 33 degrees apart, so
+neighbouring bays overlap enough for their pairwise order to be a coin flip
+while each still has a strong absolute preference.
+
+
+3. MIXING DURATION DOES NOTHING, AND THE REASON IS MECHANICAL
+-------------------------------------------------------------
+96 seeds each, settle 1.20, rotor running from tick zero.
+
+  mix     turns   bay->(x,z)   bay->x    bay->z    conc
+  1.50     1.19      0.354     -0.291    -0.203   0.622
+  3.00     2.39      0.380     -0.292    +0.244     -
+  4.50     3.58      0.370     +0.173    +0.327   0.624
+  9.00     7.16      0.409        -         -     0.598
+
+Six times the mixing changes nothing. `bay->x` and `bay->z` swing sign while
+their *magnitude* holds at 0.35 to 0.41 and the concentration holds at 0.60.
+That is a bulk rotation, not a residual order: the two components are the
+projections of one vector that the rotor carries round, and a longer run turns
+it further without shrinking it.
+
+The mechanism: a racer's transport angle is `rate * (stop_time - its own
+arrival time)`, and the eight bays arrive at systematically different times
+because they have different distances to travel across the apron. So the bay is
+written into the final bearing as an arrival-time *difference*, and a longer
+run adds the same constant to every racer and cancels none of it.
+
+
+4. WHAT DOES WORK: HOLD THE ROTOR UNTIL THE FIELD IS IN
+-------------------------------------------------------
+If the differential is in the residence time, remove the differential. The
+rotor holds still through entry and turns only for the mixing interval, so
+every racer sees the same number of degrees of rotor.
+
+  configuration                   bay->(x,z)   conc    sector R  cyclic  x span
+  running from tick 0, mix 1.5       0.406     0.622     0.026   0.002   1.570
+  held, mix 1.5                      0.302     0.410     0.075   0.015   1.084
+  held, mix 3.0                      0.218     0.361       -     0.028     -
+  held, mix 4.5                      0.274     0.384       -     0.027     -
+
+192 seeds for the first two, 96 for the last two.
+
+Held, the residual falls by a quarter and the concentration by a third - and
+now that the residual is entry *position* rather than entry *time*, mixing
+starts to bite: mix 3.0 takes it to 0.218 and 0.361. Mix 4.5 is no better,
+so 3.0 is where it flattens.
+
+Per-bay concentrations, held at mix 1.5: bays 3 to 7 are 0.22 to 0.35, close to
+noise for 192 seeds; bays 0, 1 and 2 are 0.73, 0.59 and 0.52. The outer western
+bays are the last to arrive and are still near the inlet when the rotor starts.
+
+
+5. THE SETTLE, WHICH IS A SEPARATE RESIDUAL
+-------------------------------------------
+96 to 192 seeds each, rotor running from tick zero, mix 1.50.
+
+  settle   bay->radius   bay->speed   radial rho   mean speed
+   0.55       -0.343       -0.357       -0.389      0.644
+   1.20       -0.174       -0.040       -0.119      0.192
+   2.00       -0.149       +0.027       +0.026      0.080
+
+At V1.7's 0.55 the field has not finished settling and half of it is still
+moving: bays 0 to 3 at 0.81 to 1.34 layout units per second, bays 4 to 7 at
+0.24 to 0.37. That residual energy carries the bay. 1.20 removes essentially
+all of it and 2.00 buys nothing further, so 1.20 is the answer.
+
+This is a different residual from the azimuthal one and it responds to a
+different knob, which is why both were measured separately.
+
+
+6. THE ANSWER TO SECTION 3
+--------------------------
+A strong systematic bay -> position relationship remained at the configuration
+V1.7 reported, so section 3's second branch applies and three small changes
+were justified by the measurement rather than scanned:
+
+    SETTLE_SECONDS   0.55 -> 1.20     the field had not stopped moving
+    rotor held for entry              equalises the residence time
+    MIX_SECONDS      1.50 -> 3.00     now that the residual is spatial
+
+Together: bay->(x,z) 0.406 -> 0.218, per-bay bearing concentration 0.62 -> 0.36,
+mean chamber speed 0.64 -> under 0.2, cyclic order still broken.
+
+**The residual is halved and it is not zero.** A release that does not read
+position will carry whatever is left faithfully downstream, so this is the
+ceiling the release can be measured against - not a clean slate.

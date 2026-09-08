@@ -1,0 +1,131 @@
+{
+  "trials": 192,
+  "racers": 1536,
+  "in_chamber": 1536,
+  "in_chamber_pct": 100.0,
+  "bay_to_radius_r": -0.1022,
+  "bay_to_x_r": 0.2145,
+  "bay_to_z_r": -0.2132,
+  "bay_to_speed_r": 0.0385,
+  "centre_to_radius_r": 0.1044,
+  "bay_to_bearing_R": 0.2992,
+  "bay_to_plan_r": 0.3024,
+  "bearing_resultant_mean": 0.4099,
+  "bearing_resultant_max": 0.7309,
+  "bearing_noise_floor": 0.064,
+  "bay_bearing_mean_span_deg": 239.68,
+  "field_bearing_mean_deg": 108.12,
+  "field_bearing_resultant": 0.242,
+  "bay_to_blade_sector_R": 0.0752,
+  "cyclic_order_agreement": 0.4926,
+  "cyclic_order_retained": 0.0149,
+  "cyclic_triples": 10752,
+  "lateral_order_rho": 0.2056,
+  "radial_order_rho": -0.1169,
+  "mean_radius": 1.2772,
+  "mean_speed": 0.1673,
+  "radius_span": 0.047,
+  "x_span": 1.0838,
+  "slots": [
+    {
+      "slot": 0,
+      "racers": 192,
+      "mean_radius": 1.3044,
+      "mean_x": -0.7162,
+      "mean_z": 0.6353,
+      "mean_speed": 0.1229,
+      "bearing_mean_deg": 137.52,
+      "bearing_resultant": 0.7309
+    },
+    {
+      "slot": 1,
+      "racers": 192,
+      "mean_radius": 1.3008,
+      "mean_x": -0.4323,
+      "mean_z": 0.6358,
+      "mean_speed": 0.1186,
+      "bearing_mean_deg": 123.33,
+      "bearing_resultant": 0.5852
+    },
+    {
+      "slot": 2,
+      "racers": 192,
+      "mean_radius": 1.2764,
+      "mean_x": 0.3117,
+      "mean_z": 0.5965,
+      "mean_speed": 0.2456,
+      "bearing_mean_deg": 62.06,
+      "bearing_resultant": 0.5231
+    },
+    {
+      "slot": 3,
+      "racers": 192,
+      "mean_radius": 1.2654,
+      "mean_x": -0.0939,
+      "mean_z": 0.2735,
+      "mean_speed": 0.1802,
+      "bearing_mean_deg": 109.31,
+      "bearing_resultant": 0.2227
+    },
+    {
+      "slot": 4,
+      "racers": 192,
+      "mean_radius": 1.2614,
+      "mean_x": -0.3641,
+      "mean_z": -0.1909,
+      "mean_speed": 0.1473,
+      "bearing_mean_deg": 208.47,
+      "bearing_resultant": 0.3242
+    },
+    {
+      "slot": 5,
+      "racers": 192,
+      "mean_radius": 1.2574,
+      "mean_x": 0.3675,
+      "mean_z": -0.2177,
+      "mean_speed": 0.1768,
+      "bearing_mean_deg": 328.79,
+      "bearing_resultant": 0.3453
+    },
+    {
+      "slot": 6,
+      "racers": 192,
+      "mean_radius": 1.28,
+      "mean_x": 0.1127,
+      "mean_z": 0.2764,
+      "mean_speed": 0.1698,
+      "bearing_mean_deg": 63.24,
+      "bearing_resultant": 0.2495
+    },
+    {
+      "slot": 7,
+      "racers": 192,
+      "mean_radius": 1.2719,
+      "mean_x": -0.061,
+      "mean_z": 0.3723,
+      "mean_speed": 0.1773,
+      "bearing_mean_deg": 96.89,
+      "bearing_resultant": 0.2983
+    }
+  ],
+  "candidate": "rotor-held",
+  "mix_seconds": 1.5,
+  "rotor_rate": 5.0,
+  "settle_seconds": 1.2,
+  "label": "rotor-held, settle 1.20",
+  "seeds": [
+    0,
+    192
+  ],
+  "sample_time": 4.6,
+  "wall_seconds": 50.04,
+  "chamber": {
+    "centre_z": 0.3,
+    "wall_radius": 2.7,
+    "width": 5.4,
+    "floor_tilt_deg": 7.0,
+    "inlet_half": 1.3,
+    "inlet_half_deg": 28.782,
+    "inlet_step": 0.28
+  }
+}

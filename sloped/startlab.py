@@ -167,6 +167,14 @@ class StartPlan:
     # When true, the rotor's initial angle is a deterministic function of the
     # trial's seed. See `run_trial`.
     seed_phase: bool = False
+    # When true, the rotor holds still until the whole field is in the chamber
+    # rather than turning from tick zero. Measured rather than assumed: with
+    # the rotor running during entry, a racer's transport angle is the rotor
+    # rate times its own residence, the eight bays arrive at systematically
+    # different times, and so the bay is written into the final bearing. See
+    # `sloped.shuffle.Rotor.angle_at` and
+    # `docs/validation/sloped_race_v1/v18/`.
+    rotor_hold: bool | None = None
     # The bank ceiling on whichever runs carry a width profile, in degrees.
     #
     # **Bank times width is lateral energy, and a wide field cannot carry the
@@ -228,6 +236,7 @@ class StartPlan:
             "mix_seconds": self.mix_seconds,
             "rotor_rate": self.rotor_rate,
             "rotor_phase": self.rotor_phase,
+            "rotor_hold": self.rotor_hold,
             "seed_phase": self.seed_phase,
             "start_kind": self.start_kind,
             "port_gate": self.port_gate,
@@ -386,6 +395,11 @@ BARE_FAN = bench_plan("fan", name="bare-fan", mixers=(), wheels=())
 ROTOR_CANDIDATES: dict[str, StartPlan] = {
     "rotor-fixed": bench_plan("rotor", name="rotor-fixed"),
     "rotor-seeded": bench_plan("rotor", name="rotor-seeded", seed_phase=True),
+    # V1.8: the same rotor, held still until the whole field is in the
+    # chamber. The pre-release measurement is why - see `StartPlan.rotor_hold`.
+    "rotor-held": bench_plan(
+        "rotor", name="rotor-held", seed_phase=True, rotor_hold=True
+    ),
 }
 
 
@@ -455,6 +469,7 @@ def start_machine(config: CoreConfig | None = None, plan: StartPlan | None = Non
             rotor_phase=plan.rotor_phase,
             mix_seconds=plan.mix_seconds,
             rotor_rate=plan.rotor_rate,
+            rotor_hold=plan.rotor_hold,
         )
     elif plan.start_kind == "wide_launch":
         start = WideLaunch("start", runs["launch"], cross_flow=plan.cross_flow)
