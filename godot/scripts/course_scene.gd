@@ -53,6 +53,169 @@ static var SHOTS := {
 		"elevation": 21.0, "bearing": 34.0},
 }
 
+# --- PRESENTATION CAMERA CANDIDATES --------------------------------------
+#
+# Candidates, not cuts. The final replay does not exist yet - the physics
+# session still owns the start mechanism, the orange transition and the seed -
+# so timing a cut list now would be timing it against a race that is going to
+# change. What CAN be settled now, and what this table settles, is the shot
+# LANGUAGE: where a camera stands for each kind of section, how high, how far
+# round from the direction of travel, and how much of the course is in frame.
+# A later pass picks moments; it does not have to rediscover angles.
+#
+# Nine sections from the brief, plus two frames that exist to photograph the
+# work of this branch rather than the race: `environment` looks out across the
+# valley so the haze, the ranges and the warm accents are actually in shot,
+# and `track_materials` stands close enough to one length of channel to read
+# the pearl against the silver.
+#
+# `candidate` keeps them out of `physics_layout.json`. The physics dump
+# records the course's own cameras and must not gain eleven entries because a
+# presentation branch was authored; these are published to
+# `docs/validation/presentation_polish/cameras.json` instead.
+#
+# ## Two rules the numbers come from
+#
+# **A shot's `t` lands on a pack.** The display field puts marbles at fixed
+# phases along each run, so an arbitrary `t` frames empty channel - which is
+# the brief's first camera failure and it is entirely avoidable. The packs sit
+# at 0.06, 0.40 and 0.68 (plus 0.96 on the sprint), so every candidate's `t`
+# is within a few hundredths of one of those.
+#
+# **Elevation is bought against the guard.** The acrylic wall's top arris
+# stands 0.23 above a racer's crown, so a side-on camera below about 27
+# degrees sees the centre and near lanes through the acrylic rather than over
+# it. That is acceptable at alpha 0.150 and it is measured rather than
+# assumed - `_camera_report` writes the per-shot count into cameras.json - but
+# it is why the hairpin and the split are the two highest candidates at 33 and
+# 30 degrees, and why the two follow shots - the first descent at 11 and the
+# final sprint at 162 degrees of bearing - are deliberately near-axial, where a
+# guard is edge-on and occludes nothing at all whatever the elevation is.
+const CANDIDATES := {
+	"environment": {
+		"at": ["path", "leg3", 0.40], "extent": 62.0, "fov": 42.0,
+		"elevation": 9.0, "bearing": 118.0, "candidate": true,
+		"style": "environment plate - out across the valley",
+		"notes": "Looks off the flank rather than along it, so the layered"
+			+ " haze, the three ranges, the warm outposts and the valley"
+			+ " platforms are all in frame. The course crosses the lower"
+			+ " third; it is the subject of the branch, not of this frame.",
+	},
+	"track_materials": {
+		"at": ["path", "leg2", 0.40], "extent": 8.6, "fov": 30.0,
+		"elevation": 22.0, "bearing": 52.0, "candidate": true,
+		"style": "material plate - one length of channel, close",
+		"notes": "Close enough that the pearl shoulder, the rolled lip, the"
+			+ " chrome bead, the silver running insert and the graphite keel"
+			+ " are five separable surfaces. Aimed at a pack rather than at a"
+			+ " round number, because a material plate with no racer on it"
+			+ " does not show the one thing the running surface is for.",
+	},
+	"start_event": {
+		"at": ["node", "start"], "extent": 17.4, "fov": 34.0,
+		"elevation": 20.0, "bearing": 30.0, "candidate": true,
+		"style": "close three-quarter event view",
+		"notes": "Extent up from the committed 12.6, which cropped both the"
+			+ " sign and the outer bays at phone size. Non-geometric only:"
+			+ " the start mechanism is the physics session's and nothing here"
+			+ " touches it.",
+	},
+	"first_descent": {
+		"at": ["path", "launch", 0.62], "extent": 13.0, "fov": 36.0,
+		"elevation": 11.0, "bearing": 26.0, "candidate": true,
+		"style": "low follow, from behind",
+		"notes": "Low and in FRONT, looking back up the plunge, which is the"
+			+ " reverse of what a follow shot usually means and is what the"
+			+ " terrain forces. On this run behind means uphill: at bearing"
+			+ " 158 the camera stood inside the hill and the ground crossed"
+			+ " every sightline. Reversed to 26 the same low elevation reads"
+			+ " the 32-degree plunge against the sky and the field comes at"
+			+ " the lens. Near-axial, so the guards are edge-on.",
+	},
+	"fast_turn": {
+		"at": ["path", "leg1", 0.60], "extent": 17.0, "fov": 36.0,
+		"elevation": 24.0, "bearing": 70.0, "candidate": true,
+		"style": "outside tracking",
+		"notes": "On the outside of leg 1's long right-hander, where the"
+			+ " bank rolls the running surface toward the lens. The rig picks"
+			+ " the open side against the terrain, which on this leg is the"
+			+ " gorge side and is also the correct one artistically.",
+	},
+	"hairpin": {
+		"at": ["path", "leg2", 0.64], "extent": 19.0, "fov": 34.0,
+		"elevation": 33.0, "bearing": 30.0, "candidate": true,
+		"style": "high three-quarter",
+		"notes": "Leg 2's hairpin against the rock wall. High enough that"
+			+ " the reversal is legible as a shape and that the centre and"
+			+ " far lanes clear the near guard rather than reading through"
+			+ " it.",
+	},
+	"long_straight": {
+		"at": ["path", "leg2", 0.36], "extent": 16.0, "fov": 36.0,
+		"elevation": 11.0, "bearing": 22.0, "candidate": true,
+		"style": "side follow, angled off square",
+		"notes": "The brief asks for a side follow; the sloped-course pass"
+			+ " found that square side-on makes a straight read as a line;"
+			+ " and this frame settled the argument in favour of the second."
+			+ " A side bearing was tried at 66, 48 and 42 and each one put"
+			+ " the channel across the top third of a portrait frame with"
+			+ " the rest of it hillside. At 22 the run recedes down the"
+			+ " frame instead and carries five racers strung out along it,"
+			+ " which is what makes 'long' a fact. It is still a follow -"
+			+ " the camera is off the axis and ahead of the pack - it is"
+			+ " just not square to it.",
+	},
+	"obstacle_action": {
+		"at": ["path", "leg3", 0.05], "extent": 17.0, "fov": 34.0,
+		"elevation": 22.0, "bearing": 48.0, "candidate": true,
+		"style": "tight action, above the gantry",
+		"notes": "Aimed at leg 3's entry rather than at the obstacle anchor,"
+			+ " which is where the pack actually is, and raised to 22"
+			+ " degrees, because at the committed 14 the spinner gantry's"
+			+ " own legs crossed the channel and the racers behind them were"
+			+ " read through two guard walls and a support. The extent is 17"
+			+ " for a reason worth remembering: the frame is portrait and the"
+			+ " camera keeps height, so `extent` is the VERTICAL span and the"
+			+ " horizontal one is only 0.5625 of it. At 12 this shot framed"
+			+ " under seven units across and lost the machinery off the"
+			+ " left edge while reporting no occlusion at all.",
+	},
+	"split_wide": {
+		"at": ["pair", "blue", 0.46, "orange", 0.46], "extent": 48.0,
+		"fov": 38.0, "elevation": 30.0, "bearing": 6.0, "candidate": true,
+		"style": "wide elevated, both branches",
+		"notes": "Aimed at the midpoint of the two branches at matching"
+			+ " progress, not at the split module. The committed shot aimed"
+			+ " at the module with an extent of 15 and the branches diverge"
+			+ " by 36 units, so neither route was in frame - the single"
+			+ " worst framing failure on the course. Bearing 6 looks back up"
+			+ " at the fork from below, which is the only station from which"
+			+ " a choice reads as a choice.",
+	},
+	"final_sprint": {
+		"at": ["path", "final", 0.64], "extent": 15.0, "fov": 36.0,
+		"elevation": 20.0, "bearing": 162.0, "candidate": true,
+		"style": "low forward tracking",
+		"notes": "On the viaduct, behind the pack and nearly on the axis, so"
+			+ " the girders and the valley run away underneath. Started at 8"
+			+ " degrees on the brief's 'low forward tracking' and came up to"
+			+ " 20: from under the deck the nearest trestle filled a third of"
+			+ " the frame and the pack was a row of dots above it. Near-axial"
+			+ " at 162, so the guards stay edge-on and the elevation costs"
+			+ " nothing in occlusion.",
+	},
+	"finish_push": {
+		"at": ["node", "finish"], "extent": 18.0, "fov": 34.0,
+		"elevation": 16.0, "bearing": 42.0, "candidate": true,
+		"style": "warm dramatic push-in",
+		"notes": "Extent down from 24 and elevation down from 21: the"
+			+ " committed frame read as a board seen from above with an empty"
+			+ " deck. Lower and tighter puts the gantry sign against the sky"
+			+ " and the arriving pack in the mouth. Paired with a sprint pack"
+			+ " at phase 0.96 so there is something to finish.",
+	},
+}
+
 # The motion proof's cut list. `shot` reuses a still's lens and animates the
 # orbit and dolly across the cut; `follow` walks the aim along a named run and
 # carries the camera with it. Explicitly not an orbit of the whole course - the
@@ -75,7 +238,38 @@ const SEQUENCE := [
 		"dolly": [0.16, -0.07]},
 ]
 
+# The camera proof's cut list, and it is a proof of the CAMERAS rather than a
+# cut of a race. Eight seconds over six of the candidates, each held just long
+# enough to see the move settle - what it is for is watching the pearl take a
+# highlight as the lens swings, watching a guard's arris catch and lose the
+# key, and watching the environment hold together across a cut. It cannot be
+# the final race video: there is no race in it, the marbles are a display
+# field moving at a constant rate, and the physics session has not frozen the
+# start, the orange transition or the seed.
+const POLISH_SEQUENCE := [
+	{"shot": "start_event", "seconds": 1.2, "orbit": [-8.0, 5.0],
+		"dolly": [0.10, -0.04]},
+	{"shot": "first_descent", "seconds": 1.3, "orbit": [6.0, -6.0],
+		"dolly": [0.12, -0.05]},
+	{"shot": "fast_turn", "seconds": 1.3, "orbit": [-10.0, 6.0],
+		"dolly": [0.08, -0.05]},
+	{"shot": "obstacle_action", "seconds": 1.1, "orbit": [-9.0, 6.0],
+		"dolly": [0.07, -0.03]},
+	{"shot": "split_wide", "seconds": 1.6, "orbit": [8.0, -8.0],
+		"dolly": [0.06, -0.06]},
+	{"shot": "finish_push", "seconds": 1.5, "orbit": [-11.0, 5.0],
+		"dolly": [0.18, -0.08]},
+]
+
 const DEFAULT_SHOT := "hero"
+
+# `v2_track`'s guard strip, in profile units, for the occlusion test. Quoted
+# here rather than imported because `v2_track` exposes the section as points
+# and not as named edges, and reaching into that file to add accessors would
+# be an edit to an asset four other branches' committed proofs render from.
+const GUARD_X := 1.030
+const GUARD_BASE := 0.280
+const GUARD_TOP := 0.540
 
 var _palette
 var _camera: Camera3D
@@ -89,6 +283,10 @@ var _orbit := 0.0
 var _dolly := 0.0
 var _fitted: Dictionary = {}
 var _sequenced := false
+var _action: Array = []
+var _pier_cache: Array = []
+var _camera_target := Vector3.ZERO
+var _polish_cut := false
 
 
 func _ready() -> void:
@@ -97,6 +295,9 @@ func _ready() -> void:
 	_shot = str(options.get("shot", DEFAULT_SHOT))
 	_no_glow = str(options.get("no-glow", "")) != ""
 	_sequenced = str(options.get("sequence", "")) != ""
+	# `--sequence=polish` runs the candidate proof; any other truthy value
+	# keeps the sloped-course cut list, so that clip still reproduces.
+	_polish_cut = str(options.get("sequence", "")) == "polish"
 	if not SHOTS.has(_shot):
 		push_error("course_scene: unknown shot '%s'" % _shot)
 		_shot = DEFAULT_SHOT
@@ -109,6 +310,9 @@ func _ready() -> void:
 	RenderingServer.directional_shadow_atlas_set_size(8192, false)
 	RenderingServer.directional_soft_shadow_filter_set_quality(
 		RenderingServer.SHADOW_QUALITY_SOFT_HIGH)
+
+	for name in CANDIDATES:
+		SHOTS[name] = CANDIDATES[name]
 
 	_palette = Palette.new("tower")
 	_table = Layout.table(_layout)
@@ -124,6 +328,18 @@ func _ready() -> void:
 	_course = Machine.build(_palette, _layout, {
 		"detail": str(options.get("detail", "block")),
 	})
+	# Adopt the terrain config the ground was actually built from.
+	#
+	# Without this the camera rig queries a copy that never received the
+	# bench index, so `Terrain.height` reports the un-cut hill - which is
+	# `cut_depth` too high everywhere the track runs, and the track is
+	# exactly where every camera is looking. Two things were reading it: the
+	# bearing probe that decides which side of a leg is the open one, and the
+	# occlusion walk in `_terrain_blocks`. The occlusion walk is what found
+	# it, by reporting three candidate cameras as one hundred per cent
+	# blocked by ground while their rendered frames were clear - a figure too
+	# round to be geometry.
+	_table["terrain"] = _course.get_meta("terrain_cfg")
 	add_child(_course)
 	_practicals()
 	_collect_travellers()
@@ -133,6 +349,8 @@ func _ready() -> void:
 	set_time(0.0)
 	if str(options.get("dump-physics", "")) != "":
 		_dump_physics(str(options["dump-physics"]))
+	if str(options.get("dump-cameras", "")) != "":
+		_dump_cameras(str(options["dump-cameras"]))
 
 
 func _options() -> Dictionary:
@@ -222,7 +440,20 @@ func _aim_of(spec: Dictionary) -> Dictionary:
 
 	var point := Vector3.ZERO
 	var forward := Vector3(0.0, 0.0, 1.0)
-	if kind == "node":
+	if kind == "pair":
+		# The midpoint of two runs at matching progress, and the average of
+		# their headings. The one primitive the section table was missing: a
+		# split is the only race moment whose subject is not ON a run, and
+		# aiming at either branch or at the module between them frames one
+		# route and half of nothing.
+		var first: Array = _course.get_meta("%s_path" % str(at[1]))
+		var second: Array = _course.get_meta("%s_path" % str(at[3]))
+		var a := _sample_at(first, float(at[2]))
+		var b := _sample_at(second, float(at[4]))
+		point = (a + b) * 0.5
+		forward = (_heading_on(first, float(at[2]))
+			+ _heading_on(second, float(at[4]))).normalized()
+	elif kind == "node":
 		var nodes: Dictionary = _table["nodes"]
 		point = nodes[str(at[1])]
 		forward = _heading_near(point)
@@ -445,6 +676,7 @@ func _place_camera(orbit_offset: float, dolly: float) -> void:
 	_camera.fov = fov
 	_camera.position = target + direction * distance
 	_camera.look_at(target, Vector3.UP)
+	_camera_target = target
 
 
 func set_time(seconds: float) -> void:
@@ -472,15 +704,16 @@ func set_time(seconds: float) -> void:
 
 func _place_sequence(seconds: float) -> void:
 	## The camera for one instant of the cut list.
+	var cuts: Array = POLISH_SEQUENCE if _polish_cut else SEQUENCE
 	var total := 0.0
-	for entry in SEQUENCE:
+	for entry in cuts:
 		total += float((entry as Dictionary)["seconds"])
 	var clock: float = fposmod(seconds, maxf(total, 0.001))
 	var cursor := 0.0
-	for entry in SEQUENCE:
+	for entry in cuts:
 		var cut: Dictionary = entry
 		var length: float = float(cut["seconds"])
-		if clock > cursor + length and cut != SEQUENCE[SEQUENCE.size() - 1]:
+		if clock > cursor + length and cut != cuts[cuts.size() - 1]:
 			cursor += length
 			continue
 		var t: float = clampf((clock - cursor) / maxf(length, 0.001), 0.0, 1.0)
@@ -505,6 +738,395 @@ func _place_sequence(seconds: float) -> void:
 			lerpf(float(dolly[0]), float(dolly[1]), eased))
 		return
 
+
+
+# --- camera candidate verification ---------------------------------------
+
+
+func _progress_table() -> Dictionary:
+	## Cumulative course fraction at the start and end of every run.
+	##
+	## The two branches share one window rather than following each other:
+	## they are alternatives, so a racer on either is at the same point in the
+	## race, and a progress number that ran blue then orange would say the
+	## choice takes twice as long as it does.
+	var lengths: Dictionary = {}
+	var trunk := 0.0
+	var branch := 0.0
+	for entry in _table["runs"]:
+		var spec: Dictionary = entry
+		var name := str(spec["name"])
+		var length: float = V2Forms.path_length(
+			_course.get_meta("%s_path" % name))
+		lengths[name] = length
+		if str(spec["role"]) == "branch":
+			branch = maxf(branch, length)
+		else:
+			trunk += length
+	var total: float = trunk + branch
+	var out: Dictionary = {}
+	var cursor := 0.0
+	var branch_from := -1.0
+	for entry in _table["runs"]:
+		var spec: Dictionary = entry
+		var name := str(spec["name"])
+		var length: float = float(lengths[name])
+		if str(spec["role"]) == "branch":
+			if branch_from < 0.0:
+				branch_from = cursor
+			out[name] = [branch_from / total, (branch_from + branch) / total]
+			continue
+		if branch_from >= 0.0 and cursor < branch_from + branch:
+			cursor = branch_from + branch
+		out[name] = [cursor / total, (cursor + length) / total]
+		cursor += length
+	return out
+
+
+func _action_points() -> Array:
+	## Every running-surface point and every display racer, with provenance.
+	##
+	## The running surface rather than the centreline: a camera has to see
+	## where a marble actually sits, and the cradle floor is a quarter of a
+	## unit below the path and inside two guard walls.
+	if not _action.is_empty():
+		return _action
+	var progress := _progress_table()
+	for entry in _table["runs"]:
+		var spec: Dictionary = entry
+		var name := str(spec["name"])
+		var path: Array = _course.get_meta("%s_path" % name)
+		var banks: Array = _course.get_meta("%s_banks" % name)
+		var scale: float = float(_course.get_meta("%s_scale" % name))
+		var window: Array = progress[name]
+		for index in path.size():
+			var t := float(index) / float(maxi(path.size() - 1, 1))
+			_action.append({
+				"at": Track.running_point(path, banks, t,
+					Layout.MARBLE_RADIUS, scale),
+				"run": name, "t": t, "racer": false, "lane": 0.0,
+				"scale": scale, "index": index,
+				"progress": lerpf(float(window[0]), float(window[1]), t),
+			})
+	for entry in _travellers:
+		var record: Dictionary = entry
+		var node: Node3D = record["node"]
+		var name := ""
+		for spec in _table["runs"]:
+			if _course.get_meta("%s_path" % str((spec as Dictionary)["name"])) \
+					== record["path"]:
+				name = str((spec as Dictionary)["name"])
+				break
+		var phase: float = float(record["phase"])
+		var window: Array = progress.get(name, [0.0, 1.0])
+		_action.append({
+			"at": node.position, "run": name, "t": phase, "racer": true,
+			"lane": float(record["lane"]), "scale": float(record["scale"]),
+			"index": clampi(int(round(phase * float(
+				(record["path"] as Array).size() - 1))), 0,
+				(record["path"] as Array).size() - 1),
+			"progress": lerpf(float(window[0]), float(window[1]), phase),
+		})
+	return _action
+
+
+func _piers() -> Array:
+	## Every support, as a vertical capsule: axis, radius, top, bottom.
+	##
+	## Read off the built scene rather than recomputed, so what is tested for
+	## occlusion is what was photographed. The radius is the pier's own child
+	## bounds projected onto the ground plane, which for a splayed trestle is
+	## its foot spread and for a plinth is its box - both conservative in the
+	## right direction, because a support that is reported as blocking and is
+	## not costs a camera nudge, and one that blocks and is not reported costs
+	## a reshoot after the physics is frozen.
+	if not _pier_cache.is_empty():
+		return _pier_cache
+	for child in _course.get_children():
+		if not str(child.name).begins_with("Support"):
+			continue
+		for entry in child.get_children():
+			var pier: Node3D = entry
+			var radius := 0.0
+			var top := -1.0e9
+			var bottom := 1.0e9
+			var stack: Array = [pier]
+			while not stack.is_empty():
+				var node: Node = stack.pop_back()
+				for grandchild in node.get_children():
+					stack.append(grandchild)
+				if not (node is VisualInstance3D):
+					continue
+				var box: AABB = (node as VisualInstance3D).get_aabb()
+				var world := (node as Node3D).global_transform
+				for corner in 8:
+					var point: Vector3 = world * box.get_endpoint(corner)
+					var local := point - pier.global_position
+					radius = maxf(radius, Vector2(local.x, local.z).length())
+					top = maxf(top, point.y)
+					bottom = minf(bottom, point.y)
+			if top < bottom:
+				continue
+			_pier_cache.append({"at": pier.global_position, "radius": radius,
+				"top": top, "bottom": bottom, "name": str(pier.name)})
+	return _pier_cache
+
+
+func _terrain_blocks(from: Vector3, to: Vector3) -> bool:
+	## Does the ground stand in front of `to`, seen from `from`?
+	##
+	## Walked rather than solved, because `height` is four octaves of value
+	## noise plus a bench cut and has no closed form. Forty-eight steps over a
+	## sightline of at most a hundred units is a sample every two units, which
+	## is under the terrain's own cell size of 1.3 and so cannot step over a
+	## ridge. The near end is skipped: a camera standing on the hill is
+	## legitimately below the ground at its own feet.
+	var cfg: Dictionary = _table["terrain"]
+	var steps := 48
+	for step in range(4, steps):
+		var t := float(step) / float(steps)
+		var probe: Vector3 = from.lerp(to, t)
+		# A margin, so that grazing the bench lip a metre short of the target
+		# is not reported as an occlusion. Below this the check fires on the
+		# cut face the track itself sits in.
+		if Terrain.height(probe.x, probe.z, cfg) > probe.y + 0.45:
+			return true
+	return false
+
+
+func _support_blocks(from: Vector3, to: Vector3) -> String:
+	## The name of the first support standing in the sightline, or "".
+	var direction := to - from
+	var span := direction.length()
+	if span < 0.001:
+		return ""
+	direction /= span
+	for entry in _piers():
+		var pier: Dictionary = entry
+		var axis: Vector3 = pier["at"]
+		# Closest approach in plan, then a height test at that station: a
+		# capsule test rather than a sphere, because a trestle is twelve
+		# units tall and a sphere around it would swallow the whole frame.
+		var to_axis := Vector2(axis.x - from.x, axis.z - from.z)
+		var flat := Vector2(direction.x, direction.z)
+		var flat_len := flat.length()
+		if flat_len < 0.001:
+			continue
+		var along: float = to_axis.dot(flat / flat_len)
+		if along <= 0.4 or along >= span * flat_len - 0.4:
+			continue
+		var reach: float = (to_axis - (flat / flat_len) * along).length()
+		if reach > float(pier["radius"]):
+			continue
+		var at: Vector3 = from + direction * (along / flat_len)
+		if at.y < float(pier["bottom"]) or at.y > float(pier["top"]):
+			continue
+		return str(pier["name"])
+	return ""
+
+
+func _through_guard(from: Vector3, record: Dictionary) -> bool:
+	## Is this racer seen through an acrylic wall rather than over one?
+	##
+	## The wall is a thin vertical strip in the section's own rolled frame -
+	## |x| at `GUARD_X`, y from `GUARD_BASE` to `GUARD_TOP` - so the test is
+	## done in that frame: take the sightline into section coordinates at the
+	## racer's own station and ask whether it crosses either strip. Working in
+	## world space would need the swept guard mesh, whose bounding box is the
+	## whole run.
+	var path: Array = _course.get_meta("%s_path" % str(record["run"]))
+	var banks: Array = _course.get_meta("%s_banks" % str(record["run"]))
+	var index: int = int(record["index"])
+	var frame: Basis = V2Forms.banked_basis(path, banks, index)
+	var origin: Vector3 = path[index]
+	var scale: float = float(record["scale"])
+	var eye := Vector3(
+		(from - origin).dot(frame.x), (from - origin).dot(frame.y),
+		(from - origin).dot(frame.z))
+	var target := Vector3(float(record["lane"]) * scale,
+		(Layout.MARBLE_RADIUS + Track.floor_offset() * scale), 0.0)
+	for side in [1.0, -1.0]:
+		var wall: float = side * GUARD_X * scale
+		# Only a wall the sightline actually passes through: same side as the
+		# eye and between it and the racer.
+		if (eye.x - wall) * (target.x - wall) >= 0.0:
+			continue
+		var t: float = (wall - eye.x) / (target.x - eye.x)
+		var y: float = lerpf(eye.y, target.y, t)
+		if y >= GUARD_BASE * scale and y <= GUARD_TOP * scale:
+			return true
+	return false
+
+
+func _in_frame(point: Vector3) -> bool:
+	var tan_v := tan(deg_to_rad(_camera.fov) * 0.5)
+	var tan_h := tan_v * _aspect()
+	var back := (_camera.position - _camera_target).normalized()
+	var right := Vector3.UP.cross(back)
+	if right.length_squared() < 1.0e-8:
+		right = Vector3.RIGHT
+	right = right.normalized()
+	var up := back.cross(right).normalized()
+	var v := point - _camera.position
+	var depth := -v.dot(back)
+	if depth < 0.2:
+		return false
+	return absf(v.dot(right)) <= depth * tan_h \
+		and absf(v.dot(up)) <= depth * tan_v
+
+
+func _camera_report(name: String) -> Dictionary:
+	## One candidate, placed and then measured against the brief's own rules.
+	var spec: Dictionary = SHOTS[name]
+	_shot = name
+	_place_camera(0.0, 0.0)
+	var aim := _aim_of(spec)
+	var focus: Vector3 = aim["point"]
+	# The region a shot is about: everything within three quarters of the
+	# framed extent of the aim point. Wider than that and a wide establishing
+	# lens would be judged on track it is not asking anyone to look at.
+	var reach: float = maxf(float(spec["extent"]) * 0.75, 6.0)
+
+	var considered := 0
+	var visible := 0
+	var terrain_hits := 0
+	var support_hits: Dictionary = {}
+	var racers := 0
+	var racers_visible := 0
+	var racers_through_guard := 0
+	var lo := 2.0
+	var hi := -1.0
+	for entry in _action_points():
+		var record: Dictionary = entry
+		var at: Vector3 = record["at"]
+		if at.distance_to(focus) > reach:
+			continue
+		if not _in_frame(at):
+			continue
+		considered += 1
+		lo = minf(lo, float(record["progress"]))
+		hi = maxf(hi, float(record["progress"]))
+		var blocked := false
+		if _terrain_blocks(_camera.position, at):
+			terrain_hits += 1
+			blocked = true
+		var pier := _support_blocks(_camera.position, at)
+		if pier != "":
+			support_hits[pier] = int(support_hits.get(pier, 0)) + 1
+			blocked = true
+		if not blocked:
+			visible += 1
+		if not bool(record["racer"]):
+			continue
+		racers += 1
+		if not blocked:
+			racers_visible += 1
+		if _through_guard(_camera.position, record):
+			racers_through_guard += 1
+
+	var occlusions: Array = []
+	if terrain_hits > 0:
+		occlusions.append("terrain crosses %d of %d action samples"
+			% [terrain_hits, considered])
+	for pier in support_hits:
+		occlusions.append("support %s crosses %d samples"
+			% [str(pier), int(support_hits[pier])])
+	if racers_through_guard > 0:
+		occlusions.append("%d of %d racers read through an acrylic wall"
+			% [racers_through_guard, racers])
+	if racers == 0:
+		occlusions.append("NO RACER IN FRAME - the shot is empty track")
+	return {
+		"name": name,
+		"style": str(spec.get("style", "")),
+		"position": _camera.position,
+		"aim": focus,
+		"fov": _camera.fov,
+		"elevation_deg": float(spec["elevation"]),
+		"bearing_deg": float(spec["bearing"]),
+		"framed_extent": float(spec["extent"]),
+		"target_region": {"centre": focus, "radius": reach,
+			"at": spec["at"]},
+		"progress_range": [snappedf(lo, 0.001), snappedf(hi, 0.001)]
+			if hi >= lo else [],
+		"action_samples_in_frame": considered,
+		"action_samples_clear": visible,
+		"racers_in_frame": racers,
+		"racers_clear": racers_visible,
+		"racers_through_guard": racers_through_guard,
+		"known_occlusions": occlusions,
+		"notes": str(spec.get("notes", "")),
+	}
+
+
+func _dump_cameras(path: String) -> void:
+	## The camera-candidate file, with every clearance claim measured.
+	##
+	## Deliberately not a camera director. There is no interpolation, no cut
+	## list and no selection logic here: this writes down where eleven cameras
+	## stand and what each one can and cannot see, and a later pass that owns
+	## the finished replay decides which of them to use and for how long.
+	var records: Array = []
+	var was := _shot
+	for name in CANDIDATES.keys():
+		records.append(_camera_report(str(name)))
+	_shot = was
+	_place_camera(0.0, 0.0)
+
+	var empty: Array = []
+	var occluded: Array = []
+	for entry in records:
+		var record: Dictionary = entry
+		if int(record["racers_in_frame"]) == 0:
+			empty.append(str(record["name"]))
+		if int(record["action_samples_clear"]) \
+				< int(record["action_samples_in_frame"]):
+			occluded.append(str(record["name"]))
+
+	var table := {
+		"branch": "marble-sloped-presentation-polish",
+		"layout": _layout,
+		"status": "CANDIDATES, NOT CUTS. No timing, no selection, no final"
+			+ " replay. Positions, lenses and bearings only, verified against"
+			+ " the built scene.",
+		"physics": "UNTOUCHED. This file changes no route, no collider, no"
+			+ " module anchor and no metadata. Camera positions are the only"
+			+ " thing in it that moved.",
+		"verification": "Every clearance number is measured, not asserted."
+			+ " Terrain occlusion is walked against course_terrain.height at"
+			+ " 48 samples per sightline; support occlusion is a capsule test"
+			+ " against the built piers' own bounds; guard occlusion is a"
+			+ " strip crossing in the section's rolled frame.",
+		"guard_geometry": {
+			"note": "The acrylic wall's top arris stands 0.23 above a"
+				+ " racer's crown, so a side-on camera below the elevations"
+				+ " here sees a racer THROUGH the acrylic, not over it.",
+			"clear_over_guard_deg": {"far_lane": 18.2, "centre_lane": 26.6,
+				"near_lane": 46.4},
+			"guard_top_above_marble_crown": 0.23,
+		},
+		"marble": {"radius": Layout.MARBLE_RADIUS},
+		"empty_shots": empty,
+		"shots_with_occlusion": occluded,
+		"cameras": records,
+	}
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		push_error("course_scene: cannot write %s" % path)
+		return
+	file.store_string(JSON.stringify(_jsonable(table), "  "))
+	file.close()
+	print("  cameras -> %s" % path)
+	print("  candidates %d  empty %d  with occlusion %d" % [
+		records.size(), empty.size(), occluded.size()])
+	for entry in records:
+		var record: Dictionary = entry
+		print("    %-16s racers %d/%d  clear %d/%d  %s" % [
+			str(record["name"]), int(record["racers_clear"]),
+			int(record["racers_in_frame"]),
+			int(record["action_samples_clear"]),
+			int(record["action_samples_in_frame"]),
+			"; ".join(record["known_occlusions"])])
 
 # --- physics metadata -----------------------------------------------------
 
@@ -569,6 +1191,11 @@ func _dump_physics(path: String) -> void:
 	var was := _shot
 	for name in SHOTS.keys():
 		if str(name).begins_with("_"):
+			continue
+		# The presentation candidates are published to their own file. This
+		# dump describes the course, and it must not gain eleven camera
+		# entries because an art branch was authored on top of it.
+		if bool((SHOTS[name] as Dictionary).get("candidate", false)):
 			continue
 		_shot = str(name)
 		_place_camera(0.0, 0.0)
