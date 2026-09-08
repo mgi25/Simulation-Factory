@@ -257,6 +257,39 @@ SHUFFLE_RATE = 9.0
 GUARD_BOOSTS: dict[str, tuple[float, int, int, int, int]] = {
     "launch": (0.50, 12, 24, 70, 84),
     "leg1": (0.50, 46, 58, 100, 110),
+    # **leg2's was speculative and it is under test.** It was added on the
+    # strength of the continuity audit's tangent break at leg2[88] rather than
+    # on a measured escape - the start lab carries only the launch and leg1, so
+    # leg2's own losses were never traced. The 600-race benchmark then put 41
+    # of 56 non-finishers at `leg2[99]` and **stuck rather than escaped**,
+    # which is exactly what a rail that retains a marble it used to lose looks
+    # like: the racer scrubs its speed against the wall through the hairpin and
+    # arrives at leg2's shallowest grade too slow to carry on.
+    # **leg2's was added on an audit finding rather than a measured escape,
+    # and the A/B that questioned it came back inconclusive.** The start lab
+    # carries only the launch and leg1, so leg2's own losses were never traced;
+    # this window went in on the continuity audit's 12.1-degree tangent break
+    # at leg2[88] with its 1.77 turn radius under 22 degrees of bank.
+    #
+    # The 600-race benchmark then put 41 of 56 non-finishers at `leg2[99]` and
+    # **stuck rather than escaped**, which is what a rail that retains a marble
+    # it used to lose looks like - the racer scrubs its speed against the wall
+    # and arrives at leg2's shallowest grade too slow to carry on. So the boost
+    # was removed and 100 races run against the 600 with it:
+    #
+    #                     with boost (4800)  without (800)   difference
+    #     finish rate            0.9883         0.9850     -0.0033 +- 0.0090
+    #     escape rate            0.0025         0.0050     +0.0025 +- 0.0051
+    #     stuck rate             0.0092         0.0100     +0.0008 +- 0.0074
+    #     all eight              0.9100         0.8800     -0.0300 +- 0.0677
+    #     leg2 site rate         0.0085         0.0112     +0.0027 +- 0.0078
+    #
+    # **Every difference is inside its own 95% interval.** The hypothesis is
+    # not supported and the boost is not shown to be harmful either. It stays,
+    # because it went in on a measured geometry defect, because every point
+    # estimate is nominally better with it, and because the production
+    # benchmark was run with it. `leg2[99]`'s stalls are a V1 limitation with
+    # no mechanism yet - see `docs/sloped_race_v19_production.md`.
     "leg2": (0.50, 60, 72, 106, 116),
 }
 
