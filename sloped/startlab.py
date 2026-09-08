@@ -411,13 +411,17 @@ BARE_FAN = bench_plan("fan", name="bare-fan", mixers=(), wheels=())
 # and the plan cannot silently disagree - which is the mistake that cost V1.4 a
 # mislabelled 300-seed baseline.
 FLOOR_CANDIDATES: dict[str, StartPlan] = {
+    # Each names its rate as well, because the class default is now 13 and
+    # these two are the 5 rad/s A/B the rate was chosen against. A plan that
+    # let the class supply a number the report then attributes to the plan is
+    # the mistake that cost V1.4 a mislabelled 300-seed baseline.
     "floor-plain": bench_plan(
         "floor", name="floor-plain", seed_phase=True,
-        rotor_hold=False, mix_seconds=1.50, settle_seconds=0.55,
+        rotor_hold=False, mix_seconds=1.50, settle_seconds=0.55, rotor_rate=5.0,
     ),
     "floor-tuned": bench_plan(
         "floor", name="floor-tuned", seed_phase=True,
-        rotor_hold=True, mix_seconds=3.00, settle_seconds=1.20,
+        rotor_hold=True, mix_seconds=3.00, settle_seconds=1.20, rotor_rate=5.0,
     ),
     # **And the same again at 13 rad/s**, which is the one knob section 3
     # allows that V1.7 could not use. A fast rotor centrifuged its field away
@@ -1068,7 +1072,29 @@ def summarise(
     for name, _ in LAB_CHECKPOINTS:
         means = [rows[s].mean_rank(name) for s in range(slots)]
         present = [m for m in means if m is not None]
+        # **The standard deviation of the eight slot means, which is the one
+        # magnitude that privileges no shape.**
+        #
+        # Added in V1.8 because the two correlations disagreed about which of
+        # two starts was fairer and each was measuring its own shape. The rotor
+        # rate turns out to *rotate* the residual rather than remove it: at 5
+        # rad/s the slot correlation is -0.074 and the centre correlation
+        # -0.928, at 13 rad/s they are +0.378 and -0.090, and the span is 1.21
+        # against 1.18 either way. A reader picking whichever correlation
+        # flattered the configuration in front of them would have concluded
+        # both were the fairer one.
+        #
+        # The span is honest but reads only the two extreme slots; this reads
+        # all eight, and it is what says 13 rad/s is the better of the two
+        # (0.376 against 0.439) rather than merely differently shaped.
+        deviation = None
+        if len(present) == slots:
+            average = sum(present) / slots
+            deviation = (
+                sum((m - average) ** 2 for m in present) / slots
+            ) ** 0.5
         spans[name] = {
+            "slot_mean_sd": None if deviation is None else round(deviation, 4),
             "means": [None if m is None else round(m, 4) for m in means],
             "span": round(max(present) - min(present), 4) if present else None,
             "best_slot": (
@@ -1213,5 +1239,6 @@ def summarise(
         ),
         "early_rank_span": spans[first]["span"],
         "exit_rank_span": spans[last]["span"],
+        "exit_slot_mean_sd": spans[last]["slot_mean_sd"],
         "slots": [rows[s].to_json() for s in range(slots)],
     }

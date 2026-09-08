@@ -255,3 +255,44 @@ So the residual is the chamber's, not the release's and not the catch's
 position. The release is falsified as *the* cause of start bias and confirmed
 as a working mechanism; the remaining bias is a small entry-order effect that
 2.39 revolutions of stirring does not erase.
+
+
+THE FULL TABLE, ONE INSTRUMENT, ONE SESSION
+===========================================
+96 seeds and 768 racers each, including the fan - whose numbers came out
+identical to V1.7's recorded ones, which is the instrument checking itself
+before the new rows are read.
+
+  start                        delivered  span  slot r  centre r    sd
+  fan, as shipped               99.349%  2.927  -0.387   +0.574   0.863
+  floor + stadium dish, 5rad/s  98.958%  2.479  +0.264   +0.886   0.770
+  floor + axial cone,   5rad/s  98.177%  1.208  -0.074   -0.928   0.439
+  floor + axial cone,  13rad/s  98.307%  1.177  +0.378   -0.090   0.376
+
+`sd` is the standard deviation of the eight slot mean ranks, added to
+`sloped.startlab.summarise` in this session because **the two correlations
+disagreed about which of the last two rows was fairer and each was measuring
+its own shape**: at 5 rad/s the residual is a clean centre-versus-edge shape
+with no slot correlation, at 13 it is a clean west-to-east shape with no centre
+correlation, and the span is the same within noise. A reader picking whichever
+correlation flattered the configuration in front of them would have concluded
+that both were the fairer one. The sd privileges no shape and reads all eight
+slots rather than the two extremes, and it is what says 13 rad/s is better
+rather than merely different.
+
+**0.863 to 0.376 is a 2.3x reduction in the shape-free magnitude of the start
+bias, and 2.927 to 1.177 a 2.5x reduction in the span.** Each slot mean carries
+a standard error of about 0.235 over 96 trials, so the taper's span is roughly
+8.8 sigma of real difference and the floor's is roughly 3.5. Real, and small.
+
+Loss sites, and none of them is the start:
+
+  fan            leg1[70..79%] x4, leg1[60..69%] x1
+  dish 5         leg1[70..79%] x5, leg1[80..89%] x2, start[0..9%] x1
+  cone 5         leg1[70..79%] x6, launch[30..49%] x5, leg1[50..59%] x1
+  cone 13        leg1[70..79%] x5, launch[20..59%] x6, start[0..9%] x1
+
+`leg1[70..89%]` is the pre-existing trap in every row including the shipped
+taper's. The `launch` entries appear only with the axial catch and its 3.93
+lift, which feeds the banked plunge faster - V1.7's own measured chute-grade
+trade. One racer in 768 is booked to the start itself.

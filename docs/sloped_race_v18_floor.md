@@ -1,12 +1,13 @@
 # V1.8: the full-floor release, and the catch that turned out to be the start
 
-**Status: built, and it is the best start this project has measured. The exit
-rank span is 1.208 places against the shipped taper's 2.927 and V1.7's 2.200,
-the slot correlation is −0.074, and the release delivers 100% of the field. It
-is not clean: a penalty of about one place remains on the two centre bays, and
-the measurement says that residual is the chamber's rather than the release's.
-Sections 16 to 21 - orange, the remaining traps, the fresh benchmark, the seed,
-the replay and the render - are gated on the start passing and are untouched.**
+**Status: built, and it is the best start this project has measured. The
+shape-free magnitude of the start bias - the standard deviation of the eight
+slot mean ranks - falls from the shipped taper's 0.863 places to 0.376, and the
+rank span from 2.927 to 1.177, with the release delivering 100% of the field.
+It is not zero: about 1.2 places of systematic difference remain, and the rotor
+rate turns out to *rotate* that residual rather than remove it. Sections 16 to
+21 - orange, the remaining traps, the fresh benchmark, the seed, the replay and
+the render - are gated on the start passing and are untouched.**
 
 The shipped course is unchanged: `sloped.course.START_KIND` is still `"fan"`,
 and `sloped.course.check()` reports zero findings. `floor` is reachable as
@@ -205,22 +206,26 @@ start's 4.30. Neither figure was assumed, as section 9 asks.
 
 ---
 
-## 3. Start fairness, and the finding the session turns on
+## 3. Start fairness, and the two findings the session turns on
 
-96 seeds each, same chamber, same downstream, same instrument.
+96 seeds each, 768 racers each, **the same instrument in the same session** -
+including the fan, whose numbers came out identical to V1.7's recorded ones
+(span 2.927, slot r −0.387, centre r +0.574), which is the instrument checking
+itself before the new rows are read.
 
-| catch | delivered | exit span | **slot r** | **centre r** | lift |
+| start | delivered | exit span | slot r | centre r | **slot-mean sd** |
 |---|---|---|---|---|---|
-| fan, as shipped (V1.3) | 99.35% | 2.927 | −0.387 | +0.574 | – |
-| rotor + central outlet (V1.7) | 88.93% | 2.200 | −0.206 | −0.182 | 2.14 |
-| floor + stadium dish, rim notch | 98.96% | 2.479 | +0.264 | +0.886 | 2.81 |
-| **floor + cone on the axis** | **98.18%** | **1.208** | **−0.074** | −0.928 | 3.93 |
+| fan, as shipped | 99.349% | 2.927 | −0.387 | +0.574 | **0.863** |
+| floor + stadium dish, 5 rad/s | 98.958% | 2.479 | +0.264 | +0.886 | 0.770 |
+| floor + axial cone, 5 rad/s | 98.177% | 1.208 | −0.074 | −0.928 | 0.439 |
+| **floor + axial cone, 13 rad/s** | 98.307% | **1.177** | +0.378 | −0.090 | **0.376** |
+
+### The first finding: a catch is a selection
 
 The release was built over the basin's stadium dish, which
 `docs/sloped_race_v13_basin.md` measured as draining all eight marbles every
 seed with no jam. It delivered, and it produced a centre-versus-rank
-correlation of **+0.886** - worse than the taper it was meant to beat. That is
-the session's main finding, and it generalises:
+correlation of **+0.886** - worse than the taper it was meant to beat.
 
 > A catch with one exit orders the field by path length to that exit. So a
 > position-independent release does not remove the selection - it **moves** it
@@ -231,43 +236,70 @@ the session's main finding, and it generalises:
 The pre-release table says where that is. With the paddles stopped,
 `bay -> radius` is −0.065 and `|bay−3.5| -> radius` is −0.202, while the
 bearing still carries the bay at a concentration of 0.358 against a 0.090 noise
-floor. Distance to a point **on the chamber's axis** is the radius. Distance to
-a notch on the rim is a function of radius *and* bearing, so it reads back the
-one thing the chamber did not erase - amplified, because the notch sat 2.75
+floor. Distance to a point **on the chamber's axis** *is* the radius. Distance
+to a notch on the rim is a function of radius *and* bearing, so it reads back
+the one thing the chamber did not erase - amplified, because the notch sat 2.75
 downstream of a chamber only 2.70 across, making the dominant term the bay's
 residual z.
 
 That is also, in hindsight, why V1.7's central outlet was the fairest catch
 this tree has built. **Its problem was throughput and never fairness.**
 
-Moving the exit onto the axis took the exit rank span from 2.479 to **1.208
-places** - under half the shipped fan's 2.927 and well under V1.7's 2.200, the
-best figure this project has measured - and the slot correlation from +0.264 to
-**−0.074**, which is indistinguishable from none.
+### The second finding: the rate rotates the residual, it does not remove it
 
-### What remains, and why the two numbers do not contradict each other
+Moving the exit onto the axis halved the bias, and the untested knob then
+halved it again - but not in the way the correlations first suggested. The
+rotor rate is the one lever section 3 allows that V1.7 could not use, because a
+fast rotor centrifuges the field away from a central outlet and starves the
+delivery; a trapdoor does not care where the field is when the floor goes.
+Measured on the statistic an axial catch actually reads:
 
-The centre correlation is −0.928 and the span is 1.208 places. A correlation
-measures shape; a span measures size. Grouped by distance from the middle of
-the pan:
+| rate | turns | `bay -> radius` | `\|bay−3.5\| -> radius` | in the chamber |
+|---|---|---|---|---|
+| 5.0 | 2.39 | −0.065 | −0.202 | 100% |
+| 9.0 | 4.30 | +0.006 | −0.119 | 100% |
+| 13.0 | 6.21 | +0.019 | **−0.047** | 100% |
 
-| \|bay − 3.5\| | mean exit rank | |
-|---|---|---|
-| 0.5 | 5.172 | bays 3 and 4 |
-| 1.5 | 4.589 | |
-| 2.5 | 4.130 | |
-| 3.5 | 4.110 | bays 0 and 7 |
+Nothing is thrown out of the chamber at 13 rad/s, because the tip-to-wall
+clearance is 0.150 at every blade angle and a gap with no angle in it cannot
+close on a marble - which is the property the rotor was moved out of the
+channel to get. The earlier in-channel wheel put 80.2% of its field in the
+stuck column at 12 rad/s for exactly the opposite reason.
 
-**Six of the eight bays sit within 0.5 places of each other.** What is left is
-a penalty of about one place on the two centre bays, and its seed is visible in
-the chamber at the same sign: `|bay−3.5| -> drain distance` is −0.202 there.
-Bays 3 and 4 are the only ones with no lateral distance to travel across the
-apron, so they enter first and fastest, cross the chamber, come to rest
-furthest from its axis - and an axial catch reads exactly that.
+Downstream, though, **the two correlations disagreed about which start was
+fairer, and each was measuring its own shape**:
 
-So the residual is the chamber's, not the release's and not the catch's
-position. The full-area release is **not** falsified: it is confirmed as a
-working mechanism and falsified only as a sufficient cure for start bias.
+| rate | exit span | slot r | centre r |
+|---|---|---|---|
+| 5.0 | 1.208 | −0.074 | −0.928 |
+| 13.0 | 1.177 | +0.378 | −0.090 |
+
+At 5 rad/s the residual is a clean centre-versus-edge shape and the slot
+correlation is nothing; at 13 it is a clean west-to-east shape and the centre
+correlation is nothing. **The span is the same within noise either way.** A
+reader picking whichever correlation flattered the configuration in front of
+them would have concluded that both were the fairer one.
+
+So `summarise` now also reports the **standard deviation of the eight slot
+means**, which privileges no shape and reads all eight rather than the two
+extremes. That is the column the choice was made on, and 13 rad/s wins it -
+0.376 against 0.439 - as well as trading a *strong* correlation for a moderate
+one, which is the direction section 14 asks for. It is `ROTOR_RATE` on
+`ShuffleFloor`; `floor-tuned` names 5.0 explicitly so the A/B survives.
+
+### How big what remains actually is
+
+**0.376 places against the shipped taper's 0.863** is a 2.3× reduction in the
+shape-free magnitude of the start bias, and the span falls 2.5×. In σ terms:
+each slot mean carries a standard error of about 0.235 over 96 trials, so the
+taper's 2.927-place span is roughly 8.8σ of real difference and the floor's
+1.177 is roughly 3.5σ. Real, and small.
+
+What it is *not* is zero, and the mechanism of the remainder is measured rather
+than guessed: `|bay−3.5| -> radius` is still −0.047 in the chamber at 13 rad/s,
+the per-bay bearing concentration is flat at 0.36 to 0.39 across every rate
+tried, and a rotor is a rotation whatever its speed. **More rotor does not
+remove a bearing residual; it only equalises the radius the catch asks about.**
 
 ---
 
@@ -297,25 +329,31 @@ form, and **Godot does not simulate the trapdoor** - it displays transforms.
 
 Sections 16 to 21 are explicitly gated on the start passing, and the brief's
 section 14 asks for throughput *and* for the original bay not to strongly
-predict post-start order. The throughput is met on the release's own account
-and the slot correlation is gone, but a clean one-place centre penalty is not
-"no longer predicts". So the orange lead, the `leg1[80..99%]` and
-`leg2[80..99%]` traps, the 600-race benchmark, the seed selection, the
-determinism repeats, the authoritative replay and `real_race_v17.mp4` are
-untouched, and V1.3's numbers remain the current baseline.
+predict post-start order. The throughput is met on the release's own account -
+nothing stuck, nothing unreleased, 100% of the field through the floor - and
+the bias is down 2.3× on the shape-free measure. But 1.177 places at 3.5σ is
+not "no longer predicts", and all four knobs section 3 allows have now been
+tried: settle, hold, mixing duration and rate. So the orange lead, the
+`leg1[80..99%]` and `leg2[80..99%]` traps, the 600-race benchmark, the seed
+selection, the determinism repeats, the authoritative replay and
+`real_race_v17.mp4` are untouched, and V1.3's numbers remain the baseline.
 
 The two things a next session would do first, in this order:
 
-1. **Install `floor` in the complete course and run fresh full-race statistics.**
-   The 1.208-place span is an early-checkpoint proxy and the brief's target is a
-   full-race win ratio. The proxy has improved 2.4× over the shipped fan; whether
-   that clears 2.5 on win rate is a measurement nobody has taken.
-2. **Attack the one-place centre penalty at its measured cause**, which is that
-   bays 3 and 4 have no lateral distance to travel and so enter first. The three
-   knobs section 3 allows are exhausted; the untested one is the rotor rate, and
-   with a trapdoor a *fast* rotor is newly harmless - it centrifuges the field to
-   a common radius, which is exactly the coordinate an axial catch reads. V1.7
-   could not use that because centrifuging starved its outlet.
+1. **Install `floor` in the complete course and run fresh full-race
+   statistics.** 1.177 places is an early-checkpoint proxy and the brief's
+   target is a full-race win ratio of 2.5 or less. The proxy has improved 2.5×
+   over the shipped fan and the shape-free magnitude 2.3×; whether that clears
+   2.5 on win rate is a measurement nobody has taken, and it is cheap next to
+   another round of start geometry.
+2. **Accept or attack the last 1.2 places on the evidence above, not on a new
+   topology.** The residual is a *bearing* residual: per-bay concentration is
+   flat at 0.36 to 0.39 across 2.39 to 6.21 revolutions and across every rate,
+   because a rotor is a rotation whatever its speed. Nothing that only spins
+   will remove it. What would is a mechanism that moves the field *radially* at
+   random - the trapdoor's own precedent is that a second moving part is
+   cheaper than a new architecture - or the honest conclusion that 1.2 places
+   is inside the entertainment budget and the start is done.
 
 ---
 
@@ -340,21 +378,27 @@ degree by degree, panel-to-wall, a marble against the wall through the whole
 sweep, the slats against a marble on the catch, the catch against the chamber's
 footprint, the fall and its impact speed, and that the panels share one clock.
 
-The full suite is 1540 passed, 1 failed, 1 skipped. The failure is
-`test_neon_proof.py::test_a_missing_godot_is_reported_rather_than_raised`, which
-predates this session and is unrelated - confirmed by stashing.
+The full suite is **1559 passed, 1 failed, 1 skipped** in 26 minutes. The
+failure is
+`test_neon_proof.py::test_a_missing_godot_is_reported_rather_than_raised`,
+which needs a gitignored render output, predates this session and is unrelated
+- confirmed by stashing this session's work and seeing it fail identically.
 
 ---
 
 ## 7. Remaining issues
 
-1. **A one-place penalty on bays 3 and 4**, with the other six inside 0.5
-   places. Measured to a cause - they are the only bays with no lateral travel
-   across the apron - and the untested lever is the rotor rate, which a
-   trapdoor makes newly usable.
-2. **The lift costs five launch escapes.** 3.93 against V1.7's 2.14 feeds the
-   banked plunge faster; `launch[30..49%]` ×5 of 768 are new. The mechanism is
-   V1.7's own measured chute-grade trade and the repair is local.
+1. **About 1.2 places of systematic slot difference remain**, at 3.5σ, down
+   from the taper's 2.9 at 8.8σ. The rotor rate rotates its shape - a centre
+   bias at 5 rad/s, a west-to-east one at 13 - without shrinking it, and the
+   per-bay bearing concentration is flat at 0.36 to 0.39 across every rate and
+   every mixing duration tried. Nothing that only rotates the field will
+   remove it.
+2. **The lift costs five or six launch escapes.** 3.93 against V1.7's 2.14
+   feeds the banked plunge faster; `launch[20..59%]` ×6 of 768 are new at 13
+   rad/s. The mechanism is V1.7's own measured chute-grade trade, and the
+   repair is local - it is why delivered sits at 98.31% rather than over 99.5%,
+   together with issue 3.
 3. **`leg1[70..89%]` still loses eight racers in 768**, in every configuration
    measured here, in V1.6 and V1.7, and in the shipped taper. It is the
    pre-existing trap section 18 owns and nothing in this session touched it.

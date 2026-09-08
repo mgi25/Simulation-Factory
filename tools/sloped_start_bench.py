@@ -200,8 +200,10 @@ def main(argv: list[str] | None = None) -> int:
         else:
             slot_r = report["slot_rank_correlation"].get(name)
             centre_r = report["centre_rank_correlation"].get(name)
+            spread = block.get("slot_mean_sd")
             print(
-                f"{name:>13}: span {block['span']:.3f} places, "
+                f"{name:>13}: span {block['span']:.3f} places, sd "
+                f"{'  n/a' if spread is None else format(spread, '.3f')}, "
                 f"best slot {block['best_slot']}, worst slot {block['worst_slot']}, "
                 f"slot r {'  n/a' if slot_r is None else format(slot_r, '+.3f')}, "
                 f"centre r {'  n/a' if centre_r is None else format(centre_r, '+.3f')}"

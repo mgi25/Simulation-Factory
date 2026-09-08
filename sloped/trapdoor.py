@@ -381,6 +381,36 @@ class ShuffleFloor(ShuffleChamber):
     # `tools/sloped_floor_check.py` asserts the clearance rather than the
     # number.
     ROTOR_LIFT = 0.68
+    # **13 rad/s, and the rate is the knob V1.7 could not touch.** A fast rotor
+    # centrifuges the field away from a central outlet and starves the
+    # delivery - six of eight racers stayed put when V1.7's gate dropped - and
+    # a trapdoor does not care where the field is when the floor goes.
+    #
+    # What it buys is measured on the statistic an axial catch reads, which is
+    # the marble's own chamber radius. 96 seeds each:
+    #
+    #     rate   bay -> radius   |bay-3.5| -> radius   in the chamber
+    #      5.0       -0.065            -0.202              100%
+    #      9.0       +0.006            -0.119              100%
+    #     13.0       +0.019            -0.047              100%
+    #
+    # and downstream, at the exit checkpoint:
+    #
+    #     rate   exit span   slot r   centre r   slot-mean sd
+    #      5.0     1.208     -0.074    -0.928       0.439
+    #     13.0     1.177     +0.378    -0.090       0.376
+    #
+    # **The rate rotates the residual rather than removing it** - the span is
+    # the same within noise and only the shape moves - so the choice is made on
+    # the standard deviation of the eight slot means, which privileges no
+    # shape. 13 wins it, and it also trades a *strong* correlation for a
+    # moderate one, which is the direction section 14 asks for.
+    #
+    # Nothing is thrown out of the chamber at 13, because the tip-to-wall
+    # clearance is 0.150 at every blade angle and a gap with no angle in it
+    # cannot close on a marble. The earlier in-channel wheel put 80.2% of its
+    # field in the stuck column at 12 rad/s for exactly the opposite reason.
+    ROTOR_RATE = 13.0
 
     # --- the louvre ---------------------------------------------------------
     #
