@@ -62,7 +62,7 @@ const AXES := ["track", "guard", "support", "env", "finish"]
 # The locked direction, applied by `--style=lock`. Named rather than inlined
 # so the report, the tool and the scene all quote the same four words.
 const LOCK := {
-	"track": "pearl", "guard": "cast", "support": "brass",
+	"track": "pearl", "guard": "cast_low", "support": "brass",
 	"env": "valley", "finish": "gold",
 }
 
@@ -232,14 +232,39 @@ static func _guard(palette, name: String) -> void:
 			recipe = {"alpha": 0.40, "rim": 0.26, "glow": 0.0,
 				"backlight": 0.45}
 		"cast":
-			# The pick, and a combination rather than a fifth idea. `glass`
-			# gave the strongest aqua and the best thickness read; `lit` was
-			# the only one that survived being resized to phone width,
-			# because emission does not average away and a tint does. So:
-			# most of glass's pigment, a rim between the two, and enough
+			# A combination rather than a fifth idea. `glass` gave the
+			# strongest aqua and the best thickness read; `lit` was the only
+			# one that survived being resized to phone width, because
+			# emission does not average away and a tint does. So: most of
+			# glass's pigment, a rim between the two, and enough
 			# self-emission to keep the rail on a 390-pixel frame.
+			#
+			# Superseded by `cast_low` - see below. Kept because it is what
+			# the candidate sheet was shot with and because it is the right
+			# recipe if the occlusion constraint ever lifts.
 			recipe = {"alpha": 0.34, "rim": 0.32, "glow": 0.40,
 				"backlight": 0.50}
+		"cast_low":
+			# The pick, and it is `cast` with its pigment cut to less than
+			# half and the shortfall spent on emission instead.
+			#
+			# Not an aesthetic decision. A parallel session measured the
+			# guard's geometry against a 0.285 marble on this same course:
+			# the acrylic's top arris stands 0.23 *above* the marble's crown,
+			# so clearing it side-on needs 18.2 degrees of elevation in the
+			# far lane, 26.6 in the centre and 46.4 in the near one - while
+			# every section camera on the shot list sits between 9 and 33.
+			# A racer in the near half of the channel is therefore always
+			# seen *through* the rail, and that branch put its alpha ceiling
+			# at 0.150 for exactly that reason.
+			#
+			# 0.34 would tint every near-lane racer on the course. The
+			# constraint costs almost nothing here because of R7: it is the
+			# emission, not the pigment, that carries the rail through a
+			# resize to phone width. So the pigment goes to their ceiling and
+			# the glow goes up to compensate.
+			recipe = {"alpha": 0.15, "rim": 0.40, "glow": 0.72,
+				"backlight": 0.62}
 		_:
 			push_error("course_style: unknown guard '%s'" % name)
 			return

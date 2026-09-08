@@ -61,7 +61,7 @@ CONCEPT_HERO_FRACTION = 0.335
 
 # Kept in step with `course_style.LOCK`. Asserted against the scene's own
 # report on every render, so the two cannot drift apart silently.
-LOCK = {"track": "pearl", "guard": "cast", "support": "brass",
+LOCK = {"track": "pearl", "guard": "cast_low", "support": "brass",
         "env": "valley", "finish": "gold"}
 
 # One axis, the shot that shows it, and the candidates in the order a sheet
@@ -96,13 +96,15 @@ AXES = {
     },
     "guard": {
         "shot": "descent",
-        "options": ["base", "tint", "lit", "glass", "cast"],
+        "options": ["base", "tint", "lit", "glass", "cast",
+                    "cast_low"],
         "labels": {
             "base": "BASE  12% aqua tint",
             "tint": "TINT  30% + frosted edge",
             "lit": "LIT  22% + self-emission",
             "glass": "GLASS  40% cast",
-            "cast": "CAST  34% + 0.40 emission  (PICK)",
+            "cast": "CAST  34% + 0.40 emission",
+            "cast_low": "CAST-LOW  15% + 0.72 em  (PICK)",
         },
         "title": "GUARD SYSTEM",
         "file": "guard_candidates.png",
@@ -343,7 +345,12 @@ NOTES = {
     ("guard", "cast"):
         "34% pigment, a 0.32 rim and 0.40 self-emission: glass's pigment and "
         "lit's survival at phone width, which no single candidate had both "
-        "of. The lock.",
+        "of. Superseded on an occlusion measurement, not on looks.",
+    ("guard", "cast_low"):
+        "15% - a parallel session measured that the rail's arris stands 0.23 "
+        "above a marble's crown, so every section camera sees near-lane "
+        "racers through it, and capped alpha there. The shortfall goes into "
+        "emission, which is what carried the rail at phone width anyway.",
     ("support", "base"):
         "Graphite #2A2E35 with metal caps. Metal reflects an unlit sky, so "
         "every warm accent renders dull olive; the piers are hairlines.",

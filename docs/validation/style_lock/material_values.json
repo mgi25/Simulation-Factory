@@ -1,0 +1,565 @@
+{
+  "field": [
+    "#E02532",
+    "#2062DE",
+    "#18A94E",
+    "#F5C518",
+    "#F2701F",
+    "#8E3FD4",
+    "#18C6C6",
+    "#F0559B"
+  ],
+  "groups": [
+    {
+      "swatches": [
+        {
+          "albedo": "#D8D4CB",
+          "alpha": 1.0,
+          "clearcoat": 0.72,
+          "key": "pearl_shell",
+          "metallic": 0.0,
+          "name": "start shell",
+          "roughness": 0.3
+        },
+        {
+          "albedo": "#EDE9DF",
+          "alpha": 1.0,
+          "clearcoat": 0.85,
+          "key": "pearl_lip_v2",
+          "metallic": 0.0,
+          "name": "start lip",
+          "roughness": 0.22
+        },
+        {
+          "albedo": "#63D2E0",
+          "alpha": 0.15,
+          "clearcoat": 1.0,
+          "emission": "#63D2E0",
+          "emission_energy": 0.72,
+          "key": "acrylic_guard",
+          "metallic": 0.0,
+          "name": "start rail",
+          "rim": 0.4,
+          "roughness": 0.03,
+          "transparent": true
+        },
+        {
+          "albedo": "#4CCFDE",
+          "alpha": 1.0,
+          "emission": "#54E6F7",
+          "emission_energy": 5.2,
+          "key": "lit_cyan_line_hero",
+          "metallic": 0.0,
+          "name": "start edge light",
+          "roughness": 0.35
+        },
+        {
+          "albedo": "#2E7F88",
+          "alpha": 1.0,
+          "emission": "#54E6F7",
+          "emission_energy": 3.4,
+          "key": "lit_cyan",
+          "metallic": 0.0,
+          "name": "start practical",
+          "roughness": 0.35
+        }
+      ],
+      "zone": "START ZONE"
+    },
+    {
+      "swatches": [
+        {
+          "albedo": "#D8D4CB",
+          "alpha": 1.0,
+          "clearcoat": 0.72,
+          "key": "pearl_shell",
+          "metallic": 0.0,
+          "name": "channel shell",
+          "roughness": 0.3
+        },
+        {
+          "albedo": "#7F8B99",
+          "alpha": 1.0,
+          "clearcoat": 0.45,
+          "key": "running_polished",
+          "metallic": 0.58,
+          "name": "running surface",
+          "roughness": 0.24
+        },
+        {
+          "albedo": "#191D24",
+          "alpha": 1.0,
+          "clearcoat": 0.3,
+          "key": "keel_graphite",
+          "metallic": 0.0,
+          "name": "keel / underside",
+          "roughness": 0.48
+        },
+        {
+          "albedo": "#C3C9D1",
+          "alpha": 1.0,
+          "key": "chrome",
+          "metallic": 1.0,
+          "name": "lip bead",
+          "roughness": 0.14
+        },
+        {
+          "albedo": "#4CCFDE",
+          "alpha": 1.0,
+          "emission": "#54E6F7",
+          "emission_energy": 5.2,
+          "key": "lit_cyan_line_hero",
+          "metallic": 0.0,
+          "name": "edge light",
+          "roughness": 0.35
+        }
+      ],
+      "zone": "UPPER TRACK"
+    },
+    {
+      "swatches": [
+        {
+          "albedo": "#7D8A99",
+          "alpha": 1.0,
+          "clearcoat": 1.0,
+          "key": "dish_polished",
+          "metallic": 0.62,
+          "name": "dish",
+          "roughness": 0.2
+        },
+        {
+          "albedo": "#63D2E0",
+          "alpha": 0.15,
+          "clearcoat": 1.0,
+          "emission": "#63D2E0",
+          "emission_energy": 0.72,
+          "key": "acrylic_bowl",
+          "metallic": 0.0,
+          "name": "bowl wall",
+          "rim": 0.4,
+          "roughness": 0.03,
+          "transparent": true
+        },
+        {
+          "albedo": "#B4B0A7",
+          "alpha": 1.0,
+          "clearcoat": 0.5,
+          "key": "pearl_shade",
+          "metallic": 0.0,
+          "name": "mixer shell",
+          "roughness": 0.36
+        },
+        {
+          "albedo": "#9265F0",
+          "alpha": 1.0,
+          "emission": "#9B6BFF",
+          "emission_energy": 6.0,
+          "key": "neon_violet_hero",
+          "metallic": 0.0,
+          "name": "mixer light",
+          "roughness": 0.35
+        },
+        {
+          "albedo": "#8C60E6",
+          "alpha": 1.0,
+          "emission": "#9B6BFF",
+          "emission_energy": 5.6,
+          "key": "lit_violet_ring_hero",
+          "metallic": 0.0,
+          "name": "mixer ring",
+          "roughness": 0.35
+        }
+      ],
+      "zone": "BOWL / MIX ZONE"
+    },
+    {
+      "swatches": [
+        {
+          "albedo": "#333A44",
+          "alpha": 1.0,
+          "key": "strut",
+          "metallic": 0.0,
+          "name": "pier stock",
+          "roughness": 0.58
+        },
+        {
+          "albedo": "#181C23",
+          "alpha": 1.0,
+          "key": "strut_deep",
+          "metallic": 0.0,
+          "name": "tie / diagonal",
+          "roughness": 0.66
+        },
+        {
+          "albedo": "#C89A4C",
+          "alpha": 1.0,
+          "clearcoat": 0.9,
+          "key": "strut_accent",
+          "metallic": 0.34,
+          "name": "bearing cap",
+          "roughness": 0.22
+        },
+        {
+          "albedo": "#353C46",
+          "alpha": 1.0,
+          "key": "graphite_soft",
+          "metallic": 0.0,
+          "name": "rib strap",
+          "roughness": 0.46
+        },
+        {
+          "albedo": "#D2A455",
+          "alpha": 1.0,
+          "clearcoat": 0.9,
+          "key": "gold",
+          "metallic": 0.34,
+          "name": "rib block",
+          "roughness": 0.22
+        }
+      ],
+      "zone": "MID SUPPORTS"
+    },
+    {
+      "swatches": [
+        {
+          "albedo": "#2E8FD8",
+          "alpha": 1.0,
+          "clearcoat": 0.95,
+          "key": "blue_machine",
+          "metallic": 0.0,
+          "name": "blue shell",
+          "roughness": 0.24
+        },
+        {
+          "albedo": "#7CA4C6",
+          "alpha": 1.0,
+          "clearcoat": 0.45,
+          "key": "running_blue",
+          "metallic": 0.52,
+          "name": "blue running",
+          "roughness": 0.22
+        },
+        {
+          "albedo": "#5AB6F2",
+          "alpha": 0.15,
+          "clearcoat": 1.0,
+          "emission": "#5AB6F2",
+          "emission_energy": 0.72,
+          "key": "acrylic_blue",
+          "metallic": 0.0,
+          "name": "blue rail",
+          "rim": 0.4,
+          "roughness": 0.03,
+          "transparent": true
+        },
+        {
+          "albedo": "#3A9BEB",
+          "alpha": 1.0,
+          "emission": "#3FA8FF",
+          "emission_energy": 5.2,
+          "key": "neon_blue",
+          "metallic": 0.0,
+          "name": "blue edge light",
+          "roughness": 0.35
+        }
+      ],
+      "zone": "SPLIT - BLUE ROUTE"
+    },
+    {
+      "swatches": [
+        {
+          "albedo": "#F0813A",
+          "alpha": 1.0,
+          "clearcoat": 0.9,
+          "key": "orange_machine",
+          "metallic": 0.0,
+          "name": "orange shell",
+          "roughness": 0.28
+        },
+        {
+          "albedo": "#C08F6E",
+          "alpha": 1.0,
+          "clearcoat": 0.45,
+          "key": "running_orange",
+          "metallic": 0.52,
+          "name": "orange running",
+          "roughness": 0.22
+        },
+        {
+          "albedo": "#F2A254",
+          "alpha": 0.15,
+          "clearcoat": 1.0,
+          "emission": "#F2A254",
+          "emission_energy": 0.72,
+          "key": "acrylic_amber",
+          "metallic": 0.0,
+          "name": "orange rail",
+          "rim": 0.4,
+          "roughness": 0.03,
+          "transparent": true
+        },
+        {
+          "albedo": "#E27937",
+          "alpha": 1.0,
+          "emission": "#F0813A",
+          "emission_energy": 5.0,
+          "key": "lit_orange_line",
+          "metallic": 0.0,
+          "name": "orange edge light",
+          "roughness": 0.35
+        }
+      ],
+      "zone": "SPLIT - ORANGE ROUTE"
+    },
+    {
+      "swatches": [
+        {
+          "albedo": "#D6CDB8",
+          "alpha": 1.0,
+          "clearcoat": 0.7,
+          "key": "pearl_warm",
+          "metallic": 0.0,
+          "name": "arena shell",
+          "roughness": 0.31
+        },
+        {
+          "albedo": "#93856B",
+          "alpha": 1.0,
+          "clearcoat": 0.45,
+          "key": "running_warm",
+          "metallic": 0.55,
+          "name": "arena running",
+          "roughness": 0.22
+        },
+        {
+          "albedo": "#A37B3F",
+          "alpha": 1.0,
+          "emission": "#FFC062",
+          "emission_energy": 2.4,
+          "key": "lit_gold_wash",
+          "metallic": 0.0,
+          "name": "gold wash",
+          "roughness": 0.35
+        },
+        {
+          "albedo": "#C2A56A",
+          "alpha": 1.0,
+          "emission": "#FFD98C",
+          "emission_energy": 8.0,
+          "key": "lit_gold_line",
+          "metallic": 0.0,
+          "name": "gold line",
+          "roughness": 0.35
+        },
+        {
+          "albedo": "#EDE2CB",
+          "alpha": 1.0,
+          "clearcoat": 0.88,
+          "key": "checker_light",
+          "metallic": 0.0,
+          "name": "checker light",
+          "roughness": 0.22
+        },
+        {
+          "albedo": "#0D1014",
+          "alpha": 1.0,
+          "clearcoat": 0.58,
+          "key": "checker_dark",
+          "metallic": 0.0,
+          "name": "checker dark",
+          "roughness": 0.34
+        },
+        {
+          "albedo": "#A87F2E",
+          "alpha": 1.0,
+          "clearcoat": 0.9,
+          "key": "gold_dark",
+          "metallic": 0.34,
+          "name": "finish hardware",
+          "roughness": 0.22
+        }
+      ],
+      "zone": "FINISH ZONE"
+    },
+    {
+      "swatches": [
+        {
+          "albedo": "#1A222C",
+          "alpha": 1.0,
+          "key": "slope_cliff",
+          "metallic": 0.0,
+          "name": "cliff face",
+          "roughness": 0.95
+        },
+        {
+          "albedo": "#232C38",
+          "alpha": 1.0,
+          "key": "slope_rock",
+          "metallic": 0.0,
+          "name": "flank",
+          "roughness": 0.94
+        },
+        {
+          "albedo": "#333B4C",
+          "alpha": 1.0,
+          "key": "slope_earth",
+          "metallic": 0.0,
+          "name": "shelf",
+          "roughness": 0.93
+        },
+        {
+          "albedo": "#28323E",
+          "alpha": 1.0,
+          "key": "slope_cap",
+          "metallic": 0.0,
+          "name": "crest cap",
+          "roughness": 0.94
+        },
+        {
+          "albedo": "#1E2732",
+          "alpha": 1.0,
+          "key": "slope_boulder",
+          "metallic": 0.0,
+          "name": "boulder",
+          "roughness": 0.94
+        },
+        {
+          "albedo": "#16221C",
+          "alpha": 1.0,
+          "key": "scrub_dark",
+          "metallic": 0.0,
+          "name": "scrub",
+          "roughness": 0.96
+        }
+      ],
+      "zone": "ENVIRONMENT ROCK"
+    },
+    {
+      "swatches": [
+        {
+          "albedo": "#141B26",
+          "alpha": 1.0,
+          "key": "rock_soft_near",
+          "metallic": 0.0,
+          "name": "near range",
+          "roughness": 0.96
+        },
+        {
+          "albedo": "#22344B",
+          "alpha": 1.0,
+          "key": "rock_soft_mid",
+          "metallic": 0.0,
+          "name": "mid range",
+          "roughness": 0.96
+        },
+        {
+          "albedo": "#3B5877",
+          "alpha": 1.0,
+          "key": "rock_soft_far",
+          "metallic": 0.0,
+          "name": "far range",
+          "roughness": 0.97
+        },
+        {
+          "albedo": "#2C4A68",
+          "alpha": 1.0,
+          "key": "cloud_bank",
+          "metallic": 0.0,
+          "name": "haze bank",
+          "roughness": 0.98
+        },
+        {
+          "albedo": "#41556E",
+          "alpha": 1.0,
+          "key": "far_structure",
+          "metallic": 0.0,
+          "name": "far structure",
+          "roughness": 0.95
+        }
+      ],
+      "zone": "DISTANCE"
+    },
+    {
+      "swatches": [
+        {
+          "albedo": "#4CCFDE",
+          "alpha": 1.0,
+          "emission": "#54E6F7",
+          "emission_energy": 5.2,
+          "key": "lit_cyan_line_hero",
+          "metallic": 0.0,
+          "name": "cyan accent",
+          "roughness": 0.35
+        },
+        {
+          "albedo": "#9265F0",
+          "alpha": 1.0,
+          "emission": "#9B6BFF",
+          "emission_energy": 6.0,
+          "key": "neon_violet_hero",
+          "metallic": 0.0,
+          "name": "violet accent",
+          "roughness": 0.35
+        },
+        {
+          "albedo": "#E27937",
+          "alpha": 1.0,
+          "emission": "#F0813A",
+          "emission_energy": 5.0,
+          "key": "lit_orange_line",
+          "metallic": 0.0,
+          "name": "orange accent",
+          "roughness": 0.35
+        },
+        {
+          "albedo": "#C2A56A",
+          "alpha": 1.0,
+          "emission": "#FFD98C",
+          "emission_energy": 8.0,
+          "key": "lit_gold_line",
+          "metallic": 0.0,
+          "name": "gold accent",
+          "roughness": 0.35
+        },
+        {
+          "albedo": "#7E5335",
+          "alpha": 1.0,
+          "emission": "#D98F5C",
+          "emission_energy": 0.85,
+          "key": "lit_dusk_band",
+          "metallic": 0.0,
+          "name": "dusk band",
+          "roughness": 0.35
+        },
+        {
+          "albedo": "#BD783F",
+          "alpha": 1.0,
+          "emission": "#FFA255",
+          "emission_energy": 5.5,
+          "key": "lit_valley_hero",
+          "metallic": 0.0,
+          "name": "valley ember",
+          "roughness": 0.35
+        },
+        {
+          "albedo": "#B3946C",
+          "alpha": 1.0,
+          "emission": "#FFD39A",
+          "emission_energy": 2.4,
+          "key": "lit_far_window_hero",
+          "metallic": 0.0,
+          "name": "far window",
+          "roughness": 0.35
+        }
+      ],
+      "zone": "ACCENT + WARM LIGHT"
+    }
+  ],
+  "style": {
+    "env": "valley",
+    "finish": "gold",
+    "guard": "cast_low",
+    "support": "brass",
+    "track": "pearl"
+  }
+}
