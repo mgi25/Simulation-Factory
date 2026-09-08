@@ -1,0 +1,615 @@
+{
+  "entries": 28,
+  "sorted_to": {
+    "blue": 21,
+    "orange": 1
+  },
+  "unrouted": 6,
+  "routes": {
+    "blue": {
+      "entries": 21,
+      "reached_lobe": 20,
+      "reached_merge": 20,
+      "finished": 20,
+      "finished_pct": 95.24,
+      "left": 0,
+      "stopped": 0,
+      "median_time": 5.8833
+    },
+    "orange": {
+      "entries": 1,
+      "reached_lobe": 0,
+      "reached_merge": 0,
+      "finished": 0,
+      "finished_pct": 0.0,
+      "left": 1,
+      "stopped": 0,
+      "median_time": null
+    }
+  },
+  "loss_sites": {
+    "leg3[80]": {
+      "left": 0,
+      "stopped": 2
+    },
+    "leg3[81]": {
+      "left": 0,
+      "stopped": 3
+    },
+    "leg3[79]": {
+      "left": 0,
+      "stopped": 1
+    },
+    "orange_lead[15]": {
+      "left": 1,
+      "stopped": 0
+    }
+  },
+  "together": true,
+  "entries_detail": [
+    {
+      "offset": -0.8,
+      "speed": 30.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": null,
+      "stopped_at": null,
+      "time": 4.5,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": -0.5,
+      "speed": 30.0,
+      "yaw_deg": 0.0,
+      "route": null,
+      "reached_lobe": false,
+      "reached_merge": false,
+      "finished": false,
+      "verdict": "stopped",
+      "lost_at": null,
+      "stopped_at": [
+        "leg3",
+        80
+      ],
+      "time": null,
+      "visited": [
+        "leg3"
+      ]
+    },
+    {
+      "offset": -0.2,
+      "speed": 30.0,
+      "yaw_deg": 0.0,
+      "route": null,
+      "reached_lobe": false,
+      "reached_merge": false,
+      "finished": false,
+      "verdict": "stopped",
+      "lost_at": null,
+      "stopped_at": [
+        "leg3",
+        81
+      ],
+      "time": null,
+      "visited": [
+        "leg3"
+      ]
+    },
+    {
+      "offset": 0.0,
+      "speed": 30.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": null,
+      "stopped_at": null,
+      "time": 5.9,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": 0.2,
+      "speed": 30.0,
+      "yaw_deg": 0.0,
+      "route": null,
+      "reached_lobe": false,
+      "reached_merge": false,
+      "finished": false,
+      "verdict": "stopped",
+      "lost_at": null,
+      "stopped_at": [
+        "leg3",
+        79
+      ],
+      "time": null,
+      "visited": [
+        "leg3"
+      ]
+    },
+    {
+      "offset": 0.5,
+      "speed": 30.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": null,
+      "stopped_at": null,
+      "time": 5.8667,
+      "visited": [
+        "leg3",
+        "orange_lead",
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": 0.8,
+      "speed": 30.0,
+      "yaw_deg": 0.0,
+      "route": null,
+      "reached_lobe": false,
+      "reached_merge": false,
+      "finished": false,
+      "verdict": "stopped",
+      "lost_at": null,
+      "stopped_at": [
+        "leg3",
+        81
+      ],
+      "time": null,
+      "visited": [
+        "leg3"
+      ]
+    },
+    {
+      "offset": -0.8,
+      "speed": 36.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": [
+        "final",
+        117
+      ],
+      "stopped_at": null,
+      "time": 5.4833,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": -0.5,
+      "speed": 36.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": [
+        "final",
+        117
+      ],
+      "stopped_at": null,
+      "time": 5.7167,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": -0.2,
+      "speed": 36.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": null,
+      "stopped_at": null,
+      "time": 7.0667,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": 0.0,
+      "speed": 36.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": null,
+      "stopped_at": null,
+      "time": 6.6333,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": 0.2,
+      "speed": 36.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": null,
+      "stopped_at": null,
+      "time": 6.8167,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": 0.5,
+      "speed": 36.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": [
+        "final",
+        117
+      ],
+      "stopped_at": null,
+      "time": 5.5333,
+      "visited": [
+        "leg3",
+        "orange_lead",
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": 0.8,
+      "speed": 36.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": null,
+      "stopped_at": null,
+      "time": 6.6667,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": -0.8,
+      "speed": 43.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": null,
+      "stopped_at": null,
+      "time": 5.2333,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": -0.5,
+      "speed": 43.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": [
+        "final",
+        117
+      ],
+      "stopped_at": null,
+      "time": 5.4833,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": -0.2,
+      "speed": 43.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": null,
+      "stopped_at": null,
+      "time": 5.6,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": 0.0,
+      "speed": 43.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": null,
+      "stopped_at": null,
+      "time": 6.0333,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": 0.2,
+      "speed": 43.0,
+      "yaw_deg": 0.0,
+      "route": null,
+      "reached_lobe": false,
+      "reached_merge": false,
+      "finished": false,
+      "verdict": "stopped",
+      "lost_at": null,
+      "stopped_at": [
+        "leg3",
+        80
+      ],
+      "time": null,
+      "visited": [
+        "leg3"
+      ]
+    },
+    {
+      "offset": 0.5,
+      "speed": 43.0,
+      "yaw_deg": 0.0,
+      "route": "orange",
+      "reached_lobe": false,
+      "reached_merge": false,
+      "finished": false,
+      "verdict": "left",
+      "lost_at": [
+        "orange_lead",
+        15
+      ],
+      "stopped_at": null,
+      "time": null,
+      "visited": [
+        "leg3",
+        "orange_lead"
+      ]
+    },
+    {
+      "offset": 0.8,
+      "speed": 43.0,
+      "yaw_deg": 0.0,
+      "route": null,
+      "reached_lobe": false,
+      "reached_merge": false,
+      "finished": false,
+      "verdict": "stopped",
+      "lost_at": null,
+      "stopped_at": [
+        "leg3",
+        81
+      ],
+      "time": null,
+      "visited": [
+        "leg3"
+      ]
+    },
+    {
+      "offset": -0.8,
+      "speed": 50.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": null,
+      "stopped_at": [
+        "final",
+        117
+      ],
+      "time": 5.0333,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": -0.5,
+      "speed": 50.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": [
+        "blue",
+        117
+      ],
+      "stopped_at": null,
+      "time": 6.5,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": -0.2,
+      "speed": 50.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": [
+        "final",
+        117
+      ],
+      "stopped_at": null,
+      "time": 5.5833,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": 0.0,
+      "speed": 50.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": [
+        "final",
+        117
+      ],
+      "stopped_at": null,
+      "time": 6.4667,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": 0.2,
+      "speed": 50.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": null,
+      "stopped_at": [
+        "final",
+        117
+      ],
+      "time": 6.75,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    },
+    {
+      "offset": 0.5,
+      "speed": 50.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": false,
+      "reached_merge": false,
+      "finished": false,
+      "verdict": "running",
+      "lost_at": null,
+      "stopped_at": null,
+      "time": null,
+      "visited": [
+        "leg3"
+      ]
+    },
+    {
+      "offset": 0.8,
+      "speed": 50.0,
+      "yaw_deg": 0.0,
+      "route": "blue",
+      "reached_lobe": true,
+      "reached_merge": true,
+      "finished": true,
+      "verdict": "finished",
+      "lost_at": [
+        "final",
+        117
+      ],
+      "stopped_at": null,
+      "time": 5.8833,
+      "visited": [
+        "leg3",
+        "blue_lead",
+        "blue",
+        "final"
+      ]
+    }
+  ]
+}

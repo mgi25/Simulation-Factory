@@ -281,7 +281,27 @@ GUARD_BOOSTS: dict[str, tuple[float, int, int, int, int]] = {
 #
 # The basin stays in the tree because it is the only clean test of that claim
 # in a second topology, and because it is one line to switch back to.
-START_KIND = "fan"
+#
+# --- V1.9: "floor", and the start is now frozen -------------------------
+#
+# `sloped.trapdoor.ShuffleFloor` - the rotor chamber with a full-floor louvre
+# release and a catch cone on the chamber's own axis. Measured against the
+# taper in one instrument over 96 seeds each, 768 racers each:
+#
+#     start                   delivered  exit span  slot r  centre r    sd
+#     fan, as shipped           99.349%     2.927   -0.387   +0.574   0.863
+#     floor, as frozen          98.307%     1.177   +0.378   -0.090   0.376
+#
+# `sd` is the standard deviation of the eight slot mean ranks, which privileges
+# no shape - the two correlations disagreed about which start was fairer and
+# each was measuring its own. **0.863 to 0.376 is a 2.3x cut in the shape-free
+# magnitude of the start bias**, and that is what the V1 decision was taken on.
+# `docs/sloped_race_v18_floor.md` has the architecture and
+# `docs/sloped_race_v19_production.md` the full-race numbers.
+#
+# The residual is a bearing residual that no amount of rotor removes, and it is
+# recorded as a V1 limitation rather than reopened.
+START_KIND = "floor"
 
 
 # The three start topologies, by the name every plan, tool and report names

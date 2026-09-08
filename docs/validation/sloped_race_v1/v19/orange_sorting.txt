@@ -1,0 +1,108 @@
+ORANGE - the transition is exact, and it is not the blocker
+===========================================================
+
+Section 2 of the V1.9 brief asks for the orange transition to be finished from
+the actual banked leg3 east running edge, using the true edge frame equivalent
+of `leg3.surface_point(s, +CHANNEL_HALF)` with the floor/contact offset, the
+tangent, the elevation, the bank and the guard edge, as one continuous swept
+transition.
+
+**That is already what `sloped.joins.fork_mouth` builds, and it measures
+exact.** Not approximately - exact:
+
+  lead sample | lead floor (world y) | leg3 east lip y | floor step | lateral gap
+       0      |          12.6562     |     12.6612     |   -0.0050  |   0.0160
+       2      |          12.5133     |     12.4833     |   +0.0300  |   0.1360
+       4      |          12.3694     |     12.3967     |   -0.0273  |   0.2371
+       6      |          12.2244     |     12.2287     |   -0.0043  |   0.4820
+       8      |          12.0787     |     12.1472     |   -0.0685  |   0.7687
+
+A five-thousandth of a floor step and a sixteen-thousandth of a lateral gap at
+the mouth, against a marble 0.570 across. `fork_mouth` already reads the lip
+through `surface_point` - the same expression `ring_points` uses, so it is a
+point the collider has a vertex at rather than one near it - lifts it by the
+channel's own `FLOOR_Y` so it is the lead's *floor* that lands on the lip
+rather than its centreline, holds the lip's own chord grade over the shared
+window rather than the centreline's, and takes leg3's roll at the fork from
+`fork_bank_deg()` off the built run. The lead's west guard is opened over
+samples -1 to 14 and leg3's east guard over 81 to 96, so there is no rail
+between them where the two channels are the same channel.
+
+So the transition is finished, and finishing it changes nothing.
+
+
+WHAT THE BLOCKER ACTUALLY IS
+----------------------------
+`tools/sloped_split_test.py --alone`, 4 speeds x 7 lateral offsets, each marble
+on its own with the shipped fork, leads, lobes, merge and sprint:
+
+  sorted to: {'blue': 28, 'orange': 0}, unrouted 0
+  blue:  28 entered, 28 reached the lobe, 28 reached the merge, 28 finished (100%)
+  orange: no entries - the fork never sorted a marble onto it
+
+  speed | -0.80 | -0.50 | -0.20 | +0.00 | +0.20 | +0.50 | +0.80
+     30 |  b  f |  b  f |  b  f |  b  f |  b  f |  b  f |  b  f
+     36 |  b  f |  b  f |  b  f |  b  f |  b  f |  b  f |  b  f
+     43 |  b  f |  b  f |  b  f |  b  f |  b  f |  b  f |  b  f
+     50 |  b  f |  b  f |  b  f |  b  f |  b  f |  b  f |  b  f
+
+**Nothing reaches orange in isolation at any speed from any lateral position,
+including the east edge.** Launched as a field instead, 1 of 28 sorts orange
+and that one leaves at `orange_lead[15]`, while 6 stop in leg3's hairpin at
+samples 79 to 81 from congestion. The ~35.6% orange usage the full race shows
+is traffic pushing marbles east, not the fork sorting them.
+
+So the failure is **sorting**, not the transition, and the two have different
+repairs. The sorting rule at the fork is the ridge's crest line: a marble west
+of it goes blue and a marble east of it goes orange, and the ridge is nothing
+at the nose because the two channels are the same channel there. Changing which
+marbles end up east of it means changing the divider or the guard window, which
+is the full-split redesign section 2 excludes - and which the course's own
+history records six configurations of:
+
+    divider                       guard window   finished   lost at the fork
+    straight blade on the tangent  +8 to +22       -         13 of 24
+    blade on the bisector          +8 to +22       -          4 dead, rest queued
+    ridge, foot <= half width      +8 to +22      68%        40 of 256
+    ridge, foot <= 0.55            +7 to +16      57%        73 of 256
+    ridge in the cradle gap        +5 to +14      41%        14 of 32
+    ridge in the gap, mouth flared  0 to +14       0%        21 of 32
+    no fork at all                 shut           85%         0 of 48
+
+"With the route attribution corrected, no configuration ever put a marble on
+the orange lobe and got it to the finish." That was written before this
+session and it is still true after it.
+
+
+TWO INSTRUMENT ERRORS ON THE WAY, BOTH MINE
+-------------------------------------------
+Recorded because both produced a confident wrong mechanism before they were
+caught, and because it is the same failure mode as the guard work's.
+
+**An unwindowed nearest-sample search across a hairpin.** leg3's tail doubles
+back, so points thirty samples apart are spatially close there. A diagnostic
+that took the globally nearest centreline sample jumped across the bend, and
+because it then read *that* sample's frame it reported the wrong side of the
+channel as well as the wrong sample - making a marble look as though it crossed
+from the east edge to the west. `sloped.race._locate` windows its search for
+exactly this reason and the diagnostic now does too.
+
+**A bare `MarbleSimulation` does not apply the injector's velocity.**
+`MarbleSimulation._spawn` places marbles at `marble_starts()` with zero
+velocity; it is `splitlab.SplitEntry.__init__` that writes `linearVelocity`
+before the first step. So a hand-rolled trial measured a marble *dropped from
+rest* - 1.6 layout units per second building to 11 - and at that speed it
+slides down leg3's 26-degree bank to the inside of the turn, which looked like
+a geometry finding and was an initial condition. The bank alone holds a marble
+at 14 to 22 units per second there, so below that a marble goes to the inside
+whatever the fork looks like.
+
+The `--alone` sweep, which does apply the velocity, is the number above.
+
+
+CONCLUSION
+----------
+The named correction is complete and correct. The blocker is upstream of it and
+is excluded from this session's scope. **Orange stays off: `routes="blue"` is
+still the default and the shipped course is the through route.** Recorded as a
+V1 limitation.
