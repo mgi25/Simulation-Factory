@@ -320,6 +320,171 @@ static func build(palette, cfg: Dictionary) -> Node3D:
 	return root
 
 
+
+static func crags(root: Node3D, palette, cfg: Dictionary, count: int,
+		avoid: Array, clearance: float) -> void:
+	## Bedded rock outcrops on the steep ground: the cliff silhouette.
+	##
+	## The mountainside was reading as clay, and the reason is worth being
+	## precise about because the obvious fix is the wrong one. The obvious fix
+	## is to separate the ground materials again - and the sloped-course pass
+	## already measured that and rejected it: a band boundary on a heightfield
+	## is assigned per quad, so a value jump either side of it is a staircase
+	## at cell resolution and the most visible edge on the mountain. Nothing
+	## here touches `height`, `normal` or `_material_of`.
+	##
+	## What was actually missing is an arris. A smooth heightfield under a
+	## raking key has a bright side and a dark side and no line between them,
+	## and "rock" is read from lines: a bedding plane, a fracture, a ledge with
+	## a shadow under it. So each outcrop is a short stack of slabs, tilted to
+	## the dip of the surface under it and stepped back as it rises, and every
+	## slab contributes one horizontal arris for the warm rake to catch and one
+	## overhang for it to cast into.
+	##
+	## Sited only where the macro surface is steep. On a shelf an outcrop is a
+	## boulder, and `scatter` already puts boulders on shelves; on a 40-degree
+	## face it is a crag, and that face is exactly where the frame had nothing.
+	var group := Node3D.new()
+	group.name = "Crags"
+	root.add_child(group)
+	var x0: float = float(cfg["x_min"]) + 6.0
+	var x1: float = float(cfg["x_max"]) - 6.0
+	var z0: float = float(cfg["z_min"]) + 6.0
+	var z1: float = float(cfg["z_max"]) - 6.0
+	# Biased toward the lit face and the body value. An even cycle over
+	# three shades puts a third of the slabs at the darkest value, and the
+	# darkest value is the one that reads as a hole.
+	var shades := ["crag_face", "crag_rock", "crag_face", "crag_rock",
+		"crag_shadow"]
+
+	var placed := 0
+	for attempt in count * 14:
+		if placed >= count:
+			break
+		var x: float = lerpf(x0, x1, _lattice(attempt, 37, 809))
+		var z: float = lerpf(z0, z1, _lattice(attempt, 41, 907))
+		# The macro gradient, at the same epsilon `_material_of` uses. Read
+		# off the detail surface a crag sites itself on noise roughness
+		# rather than on landform, and comes out sprinkled evenly over the
+		# whole flank - which is the confetti failure in three dimensions.
+		var e := 3.6
+		var dx := height(x + e, z, cfg, false) - height(x - e, z, cfg, false)
+		var dz := height(x, z + e, cfg, false) - height(x, z - e, cfg, false)
+		var macro := Vector3(-dx, 2.0 * e, -dz).normalized()
+		if macro.y > 0.86 or macro.y < 0.24:
+			continue
+		var too_close := false
+		for point in avoid:
+			var offset := Vector2(x - (point as Vector3).x,
+				z - (point as Vector3).z)
+			if offset.length() < clearance:
+				too_close = true
+				break
+		if too_close:
+			continue
+		placed += 1
+		var y: float = height(x, z, cfg)
+		var outcrop := Node3D.new()
+		outcrop.name = "Crag%d" % placed
+		outcrop.position = Vector3(x, y, z)
+		# Yawed to the dip, so the stack steps back INTO the hill rather than
+		# out of it. A slab stack leaning downhill is a landslide.
+		outcrop.rotation.y = atan2(macro.x, macro.z)
+		group.add_child(outcrop)
+
+		# Fewer and larger. At 2.6 the outcrops were the size of the
+		# boulders already on the hill and read as more of them; a crag has
+		# to be a landform, which at this camera distance starts at about
+		# four units and is still subordinate to the track at ten.
+		# Fewer and larger. At 2.6 the outcrops were the size of the
+		# boulders already on the hill and read as more of them; a crag has
+		# to be a landform, which at this camera distance starts at about
+		# four units and is still subordinate to the track at ten.
+		var scale: float = 4.2 + 6.4 * _lattice(attempt, 43, 1009)
+		var lobes: int = 2 + int(_lattice(attempt, 47, 1103) * 3.0)
+		# A cluster of overlapping masses, not a stack of slabs.
+		#
+		# The slab version is written out because it was tried and it failed
+		# in the way this file already had a note about: `rounded_box` on a
+		# hillside reads as a crate, because it has four vertical faces and a
+		# flat top and no rock does. Tinting it did not help and neither did
+		# tilting it - the first pass came back as grey packing cases stacked
+		# on the mountain.
+		#
+		# `smooth_mass` is the answer the boulder scatter already found, and
+		# the only thing a crag needs beyond it is a BROKEN OUTLINE: one mass
+		# is a dome whatever its taper, and a dome on a slope is a bump. Two
+		# or three overlapping masses at different sizes, offset across the
+		# dip and buried to different depths, give the silhouette the
+		# concavities that read as fracture - and a concavity is the one
+		# feature a heightfield cannot produce, because a heightfield is a
+		# function.
+		for lobe in lobes:
+			var l := float(lobe)
+			var size: float = scale * (1.0 - 0.34 * l / float(lobes))
+			var salt: int = attempt * 11 + lobe * 3 + 17
+			# Taper low, tiers high. At the 0.46 the boulders use a mass is
+			# a rounded cobble; at 0.30 it keeps its width most of the way up
+			# and breaks at the top, which is what an outcrop does.
+			var mass := Forms.mesh_node(
+				HeroWorld.smooth_mass(size * 1.55, size * 0.72, salt,
+					17, 11, 0.30),
+				palette.get_material(str(shades[
+					(placed + lobe) % shades.size()])),
+				"Lobe%d" % lobe, false)
+			var swing := TAU * _lattice(attempt + lobe, 59, 1301)
+			var reach: float = scale * 0.30 * l
+			mass.position = Vector3(cos(swing) * reach,
+				# Buried between a third and two thirds of its own height.
+				# Every lobe at one depth gives the cluster a common base
+				# line, and a common base line is a plinth.
+				-size * (0.30 + 0.34 * _lattice(attempt + lobe, 61, 1409)),
+				sin(swing) * reach)
+			mass.rotation.y = _lattice(attempt + lobe, 67, 1511) * TAU
+			# Leaned a few degrees into the dip. A mass standing plumb on a
+			# forty-degree face reads as placed; the strata it belongs to are
+			# parallel to the hill.
+			mass.rotation.z = (_lattice(attempt + lobe, 71, 1601) - 0.5) * 0.30
+			mass.scale = Vector3(1.0 + 0.34 * _lattice(attempt + lobe, 73,
+				1709), 1.0, 0.72 + 0.30 * _lattice(attempt + lobe, 79, 1801))
+			outcrop.add_child(mass)
+	_to_world_layer(group)
+
+
+static func crest_ridge(root: Node3D, palette, cfg: Dictionary,
+		count: int) -> void:
+	## A rock skyline on the crest above the start.
+	##
+	## `height` gives the flank a shoulder uphill of `z_top` and then stops,
+	## which is correct - it is what put a horizon over the start line instead
+	## of filling the top third of the frame with rock. But the shoulder it
+	## leaves is a smooth exponential dome, and a smooth dome against a dusk
+	## sky is the one silhouette in the frame the eye can measure precisely.
+	## So the crest gets teeth: masses standing on the shoulder line, tall
+	## enough to break the horizon and thin enough not to close it.
+	var group := Node3D.new()
+	group.name = "CrestRidge"
+	root.add_child(group)
+	var z_top: float = float(cfg["z_top"])
+	var centre_x: float = float(cfg.get("centre_x", 0.0))
+	for index in count:
+		var t := float(index) / float(maxi(count - 1, 1))
+		var x: float = centre_x + lerpf(-62.0, 58.0, t) \
+			+ (_lattice(index, 79, 1709) - 0.5) * 7.0
+		# Uphill of the start, on the band where the shoulder flattens out.
+		var z: float = z_top - 16.0 - 22.0 * _lattice(index, 83, 1801)
+		var y: float = height(x, z, cfg)
+		var tall: float = 7.0 + 13.0 * _lattice(index, 89, 1901)
+		var mass := Forms.mesh_node(
+			HeroWorld.smooth_mass(tall, tall * (0.42 + 0.20
+				* _lattice(index, 97, 2003)), index * 13 + 5, 15, 9, 0.40),
+			palette.get_material("crag_rock" if index % 3 else "crag_face"),
+			"Tooth%d" % index, false)
+		mass.position = Vector3(x, y - tall * 0.30, z)
+		mass.rotation.y = _lattice(index, 101, 2111) * TAU
+		group.add_child(mass)
+	_to_world_layer(group)
+
 static func scatter(root: Node3D, palette, cfg: Dictionary, count: int,
 		avoid: Array, clearance: float, gauge := 1.0) -> void:
 	## Boulders on the flank, kept clear of the racing line.

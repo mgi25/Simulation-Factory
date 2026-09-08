@@ -179,6 +179,26 @@ func _emissive(hex: String, energy: float, albedo_darken := 0.0) -> StandardMate
 	return material
 
 
+func _veil(hex: String, alpha: float) -> StandardMaterial3D:
+	## A layer of haze, as translucent geometry rather than as opaque cloud.
+	##
+	## The first environment banked its distance with opaque slabs, and an
+	## opaque mass at four hundred units is another range, not a veil in front
+	## of one - so the cloud banks read as slate shapes hanging in the sky. A
+	## low alpha with no cull and no depth write lets the range behind show
+	## through at exactly the strength the alpha says, which is what stacks
+	## distance into layers rather than into silhouettes.
+	var material := StandardMaterial3D.new()
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.albedo_color = Color(hex, alpha)
+	material.metallic = 0.0
+	material.roughness = 0.99
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	material.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+	material.backlight_enabled = true
+	material.backlight = Color(hex).lightened(0.18)
+	return material
+
 # --- the named surfaces ---------------------------------------------------
 
 func get_material(key: String) -> StandardMaterial3D:
@@ -499,6 +519,234 @@ func _build(key: String) -> StandardMaterial3D:
 			return _matte("#2A2A20", 0.95)
 		"slope_boulder":
 			return _matte("#212A36", 0.94)
+
+		# --- PRESENTATION POLISH ------------------------------------------
+		#
+		# Additive, like every block above it, and for the same reason: the
+		# sloped course's committed proofs render from the keys above and have
+		# to keep rendering from them. Nothing here is an edit; every key is a
+		# `_polish` sibling that `course_machine` and `course_dressing` opt
+		# into.
+		#
+		# ## The running surface was never the problem. The lobe was.
+		#
+		# `running_polished` is a bright albedo under a clearcoat of roughness
+		# 0.03. A lobe that tight returns almost all of its energy into a
+		# two-pixel band, and with the environment's glow threshold at 1.16
+		# that band is over the knee down the whole length of a straight - so
+		# a hundred units of channel came back as one white stripe with no
+		# curvature in it. Widening the lobe and dropping the albedo half a
+		# step is the whole fix: the same surface, the same metallic read, and
+		# a highlight that falls off across the cradle instead of clipping.
+		#
+		# ## Pearl against silver, not white against white
+		#
+		# The shell and the running floor were separated in albedo already and
+		# both were clipping, which erases any separation there is. Held below
+		# the knee the pair reads as the two materials they are: a warm pearl
+		# moulding with a cool silver insert laid in it.
+		"shell_pearl_polish":
+			return _moulded("#E4E0D6", 0.29, 0.72, 0.10)
+		"shell_pearl_warm_polish":
+			return _moulded("#EDE6D6", 0.26, 0.78, 0.09)
+		"running_pearl_polish":
+			var run_pearl := _moulded("#97A6B6", 0.23, 1.0, 0.09)
+			run_pearl.metallic = 0.58
+			run_pearl.metallic_specular = 0.72
+			return run_pearl
+		"running_warm_polish":
+			var run_warm := _moulded("#8C806A", 0.23, 1.0, 0.09)
+			run_warm.metallic = 0.56
+			run_warm.metallic_specular = 0.72
+			return run_warm
+		"running_blue_polish":
+			var run_blue := _moulded("#8AAFC9", 0.23, 1.0, 0.09)
+			run_blue.metallic = 0.54
+			run_blue.metallic_specular = 0.72
+			return run_blue
+		"running_orange_polish":
+			var run_orange := _moulded("#C39C81", 0.23, 1.0, 0.09)
+			run_orange.metallic = 0.54
+			run_orange.metallic_specular = 0.72
+			return run_orange
+
+		# ## The guard has to be seen and not looked through
+		#
+		# At alpha 0.115 with the rim dropped to 0.30 the acrylic wall was
+		# invisible in every section frame: a safety rail that cannot be seen
+		# is not read as transparent, it is read as absent, and the channel
+		# lost the one feature that says the run is enclosed. The fix is edge
+		# light, not body density - a cast wall is visible because its top
+		# arris catches the key - so the rim goes back up and the alpha only
+		# moves a third of a step.
+		#
+		# ## How much of a racer a guard is actually in front of
+		#
+		# Measured against `v2_track`, because the intuition here is wrong and
+		# it matters for every camera on the course. In profile units the
+		# guard spans y 0.28 to 0.54 at |x| 1.03, and a 0.285 racer sitting in
+		# the cradle has its centre at y 0.025 and its crown at y 0.31. So the
+		# guard's top arris stands 0.23 ABOVE the top of a racer: the wall is
+		# taller than the thing it is protecting, and a racer is never seen
+		# over it from a side-on camera unless the camera is very high.
+		#
+		# Clear-over-the-near-guard elevation, by lane, side-on:
+		#
+		#     far lane      18.2 degrees
+		#     centre lane   26.6 degrees
+		#     near lane     46.4 degrees
+		#
+		# Every section camera on this course sits between 8 and 30 degrees,
+		# so in practice a racer in the near half of the channel is always
+		# seen THROUGH the acrylic and not over it. That is the whole reason
+		# the alpha is a trade rather than a free improvement, and it is why
+		# it stops at 0.150: at that value a racer behind one wall loses
+		# about a seventh of its value and picks up a slight aqua cast, which
+		# reads as glass in front of it. Anything heavier starts reading as
+		# a racer painted the wrong colour.
+		#
+		# The consequence for the physics session is the useful one: the
+		# guard must not get TALLER. At 0.26 it is already over the racer,
+		# and every degree it grows is a degree of camera elevation the whole
+		# shot list has to buy back.
+		"acrylic_guard_polish":
+			var guard := _acrylic_soft(ACRYLIC_AQUA, 0.150, 0.52)
+			guard.rim_tint = 0.24
+			guard.roughness = 0.025
+			return guard
+		"acrylic_violet_polish":
+			var violet_guard := _acrylic_soft("#A9B8F0", 0.150, 0.52)
+			violet_guard.rim_tint = 0.24
+			violet_guard.roughness = 0.025
+			return violet_guard
+		"acrylic_blue_polish":
+			var blue_guard := _acrylic_soft("#63B8F0", 0.150, 0.50)
+			blue_guard.rim_tint = 0.24
+			blue_guard.roughness = 0.025
+			return blue_guard
+		"acrylic_amber_polish":
+			var amber_guard := _acrylic_soft("#F0A659", 0.150, 0.50)
+			amber_guard.rim_tint = 0.24
+			amber_guard.roughness = 0.025
+			return amber_guard
+		"acrylic_gold_polish":
+			var gold_guard := _acrylic_soft("#F2CE7E", 0.155, 0.52)
+			gold_guard.rim_tint = 0.24
+			gold_guard.roughness = 0.025
+			return gold_guard
+
+		# ## Seven edge lights, one per zone, all below the bloom knee
+		#
+		# The hero keys run at energy 7 to 10, which is over the glow
+		# threshold across the whole strip rather than at its core, so the
+		# lines bloomed into the shell beside them and took the pearl with
+		# them. At six the tube is still the brightest thing in its own
+		# neighbourhood and the bloom stays a halo on it.
+		#
+		# The zone order is the journey, read along the course rather than
+		# down a tower: cyan off the line, aqua through the first leg, a
+		# neutral violet through the middle, full violet on the approach to
+		# the choice, the two route identities at the choice, gold to the
+		# flag. Seven hues over two hundred and thirty units means a frame's
+		# edge lights say roughly how far through the race it is.
+		"lit_cyan_line_polish":
+			return _emissive(CYAN, 6.2, 0.26)
+		"lit_aqua_line_polish":
+			return _emissive("#7FE8E4", 6.0, 0.26)
+		"lit_violet_cool_polish":
+			return _emissive("#B4A8F5", 5.8, 0.26)
+		"lit_violet_line_polish":
+			return _emissive(VIOLET, 6.0, 0.24)
+		"lit_blue_line_polish":
+			return _emissive("#3FA8FF", 6.0, 0.24)
+		"lit_orange_line_polish":
+			return _emissive(ORANGE, 5.6, 0.28)
+		"lit_gold_line_polish":
+			return _emissive(GOLD_LIGHT, 5.4, 0.28)
+
+		# --- environment: rock that has a silhouette ----------------------
+		#
+		# The ground values are deliberately NOT touched. Three nearly-equal
+		# rock surfaces is what the sloped-course pass measured its way to,
+		# because a band boundary on a heightfield is assigned per quad and a
+		# value jump either side of it is a staircase at cell resolution - the
+		# most visible edge on the mountain. Reintroducing separation in the
+		# ground material would undo that finding.
+		#
+		# So the silhouette is bought with geometry instead. These are the
+		# values for the crag masses and strata benches that stand on the
+		# steep ground: one step darker than the flank they rise out of, and
+		# one lit face value that catches the raking world key, so a crag has
+		# a bright plane and a dark one rather than a single flat tone.
+		# All three within a step of the flank they stand in, and one of them
+		# LIGHTER than it. The first pass made them darker on the theory that
+		# had held for boulders - "a boulder lighter than the hillside reads
+		# as a sheet of paper lying on it" - and on a crag it inverts, for a
+		# reason worth writing down: a boulder is sited on a shelf, which is
+		# in shadow, and a crag is sited on a steep face, which is what the
+		# key is raking. A value darker than a LIT plane is not a rock on it,
+		# it is a hole in it, and the first crag pass came back as black
+		# rectangles lying on the mountainside.
+		#
+		# So the value carries nothing and the form carries everything: a lit
+		# plane a step above the flank, a body at the flank's own value, and
+		# an underside a step below it. Which is what a rock outcrop is.
+		# Within half a step of the flank, and that is the point. At #36434F
+		# the lit face was a pale patch and the outcrops competed with the
+		# track for attention; the form was already doing the work by then,
+		# so the value only has to stay out of its way.
+		"crag_shadow":
+			return _matte("#1C2530", 0.95)
+		"crag_rock":
+			return _matte("#232C36", 0.94)
+		"crag_face":
+			return _matte("#2C3742", 0.93)
+		# Vegetation as masses rather than as pebbles. `scrub_dark` is correct
+		# for a bush read at ten units and vanishes at sixty; a canopy value
+		# a step lighter and a shade greener is what makes a stand of scrub
+		# read as cover on a hillside at a hundred.
+		# Darker and less saturated than the first pass. At #24352B a stand
+		# came back as a bright olive blob against cool rock - "subtle" is
+		# the brief's own word for this, and a value that reads as a distinct
+		# hue rather than as a dark mass is competing with the track. Cover
+		# on a hillside at dusk is nearly black with a green bias, and the
+		# bias is all that needs to survive.
+		"foliage_canopy":
+			return _matte("#1B2620", 0.95)
+		"foliage_deep":
+			return _matte("#121A16", 0.96)
+		"foliage_dry":
+			return _matte("#31301F", 0.95)
+		# Layered haze. Three alphas at three distances: what turns the flat
+		# grey wall behind the finish into air with depth in it.
+		"haze_near_polish":
+			return _veil("#5C6E86", 0.19)
+		"haze_mid_polish":
+			return _veil("#6E7F97", 0.24)
+		"haze_far_polish":
+			return _veil("#8695AC", 0.30)
+		# Warm architecture. The concept's environment is inhabited and warm
+		# behind its machine; ours had six cool slab towers at three hundred
+		# units, which is too far to read as anything but crest. These are for
+		# accents at sixty to a hundred and forty - close enough to have a
+		# silhouette and far enough to stay subordinate to the race.
+		"warm_structure":
+			return _matte("#4A4034", 0.94)
+		"warm_structure_deep":
+			return _matte("#302921", 0.95)
+		"lit_far_warm_polish":
+			return _emissive("#FFB570", 2.4, 0.32)
+		"lit_ridge_warm_polish":
+			return _emissive("#FF9A52", 3.0, 0.30)
+		"lit_valley_warm_polish":
+			return _emissive("#FF8C3C", 5.0, 0.28)
+		# The support family's plate value. A trestle built entirely from tube
+		# stock reads as loose sticks whatever the stock radius is, because a
+		# bundle of cylinders has no flat to catch a highlight. One plate
+		# value against the tube graphite is what makes the same frame read
+		# as fabricated.
+		"graphite_plate_polish":
+			return _moulded("#31373F", 0.40, 0.48, 0.13)
 	push_error("lab_palette: unknown material key '%s'" % key)
 	return _moulded("#FF00FF", 0.5, 0.0)
 
