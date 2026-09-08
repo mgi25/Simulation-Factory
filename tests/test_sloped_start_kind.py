@@ -36,10 +36,24 @@ from sloped.stations import StartGrid
 # --- the three kinds are named, and named on the class --------------------
 
 
-def test_the_three_start_classes_declare_distinct_kinds():
-    kinds = [StartGrid.START_KIND, StartBasin.START_KIND, RadialStart.START_KIND]
-    assert kinds == ["fan", "basin", "radial"]
-    assert len(set(kinds)) == 3
+def test_the_start_classes_declare_distinct_kinds():
+    """One row per topology tried, and every one of them still named.
+
+    Grown as topologies were added - fan, basin, radial, and V1.6's
+    unconstricted wide launch. The registry is what makes a benchmark say which
+    it measured, so a new kind that forgot to declare itself would collide
+    silently, which is the whole failure this file exists about.
+    """
+    from sloped.widelaunch import WideLaunch
+
+    kinds = [
+        StartGrid.START_KIND,
+        StartBasin.START_KIND,
+        RadialStart.START_KIND,
+        WideLaunch.START_KIND,
+    ]
+    assert kinds == ["fan", "basin", "radial", "wide_launch"]
+    assert len(set(kinds)) == len(kinds)
     assert set(_course.START_KINDS) == set(kinds)
 
 
@@ -135,16 +149,24 @@ def test_a_plan_whose_kind_disagrees_with_its_module_is_an_error():
 
 
 def _result(kind: str, seed: int = 0) -> TrialResult:
+    names = [name for name, _ in LAB_CHECKPOINTS]
     return TrialResult(
         start_kind=kind,
         seed=seed,
         seconds=0.0,
         slot_of={m: m for m in range(8)},
-        ranks={name: {m: m + 1 for m in range(8)} for name, _ in LAB_CHECKPOINTS},
-        progress={name: {m: float(m) for m in range(8)} for name, _ in LAB_CHECKPOINTS},
+        ranks={name: {m: m + 1 for m in range(8)} for name in names},
+        progress={name: {m: float(m) for m in range(8)} for name in names},
         exit_order={m: m + 1 for m in range(8)},
         collisions={m: 0 for m in range(8)},
         wall_ticks={m: 0 for m in range(8)},
+        # The lateral columns V1.6 added: where across the course each racer
+        # was at each checkpoint, its widest excursion, and how many times it
+        # changed sides. See `tests/test_sloped_widelaunch.py` for what they
+        # are for and why counting crossings alone was not enough.
+        across={name: {m: 0.0 for m in range(8)} for name in names},
+        reach={m: 0.0 for m in range(8)},
+        crossings={m: 0 for m in range(8)},
         lost={},
         stuck={},
         through={m: 1.0 for m in range(8)},

@@ -52,10 +52,15 @@ from sloped.race import LATERAL_SLACK, VERTICAL_SLACK
 from sloped.scale import LAYOUT_TO_SIM
 from sloped.basin import StartBasin
 from sloped.radial import RadialStart
+from sloped.widelaunch import WideLaunch
 from sloped.stations import Mixer, Spinners, StartGrid
 from sloped.track import TrackRun
 
 __all__ = [
+    "WIDE_CANDIDATES",
+    "BARE_FAN",
+    "WIDE_BANK_MAX",
+    "WIDE_FACTOR",
     "LAB_RUNS",
     "LAB_CHECKPOINTS",
     "StartPlan",
@@ -79,7 +84,28 @@ LAB_RUNS = ("launch", "leg1")
 # Arc marks, as a fraction of the lab's own length. `descent` is where the full
 # course's 9% checkpoint falls (31.1 of 345.8 simulation units, which is 32.5%
 # of the lab), and `exit` is the lab's end - 27.7% of the full route.
-LAB_CHECKPOINTS = (("descent", 0.325), ("half", 0.60), ("exit", 0.98))
+#
+# `wide`, `prenarrow` and `postnarrow` were added for the wide-launch
+# architecture and are where its three questions are asked: is the field still
+# abreast in the open section, has the slot order gone *before* the channel
+# closes, and does the narrowing itself put it back. The three historical names
+# keep their fractions exactly, so every number recorded in earlier sessions
+# stays comparable in the same instrument.
+#
+#   wide        0.125   mid-launch, the field at its widest
+#   descent     0.325   the full course's own 9% mark
+#   prenarrow   0.390   leg1[22], where the narrowing begins
+#   half        0.600
+#   postnarrow  0.720   leg1[74], where the channel is back to 1.88
+#   exit        0.980
+LAB_CHECKPOINTS = (
+    ("wide", 0.125),
+    ("descent", 0.325),
+    ("prenarrow", 0.390),
+    ("half", 0.600),
+    ("postnarrow", 0.720),
+    ("exit", 0.980),
+)
 
 # How far down the lab a marble has to have got by the end of the trial to
 # count as having come through the start. Below this it is trailing, whether
@@ -118,6 +144,29 @@ class StartPlan:
     # The launch's width profile, as (factor, hold to sample, blended by
     # sample) - the wide mixing stretch. See `sloped.track.TrackRun`.
     launch_width: tuple[float, int, int] | None = None
+    # And leg1's, which is where the wide-launch architecture does its
+    # narrowing. Separate from the launch's because the two runs are shaped
+    # nothing alike: the launch is 13.7 units at 26 to 43 degrees under 18
+    # degrees of bank, and leg1's first eight units are the only long gentle
+    # low-bank stretch in the whole start region.
+    leg1_width: tuple[float, int, int] | None = None
+    # Candidate C: shallow chevron ridges on the apron that steer a marble
+    # across the field rather than along it. See `sloped.widelaunch`.
+    cross_flow: bool = False
+    # The bank ceiling on whichever runs carry a width profile, in degrees.
+    #
+    # **Bank times width is lateral energy, and a wide field cannot carry the
+    # hero channel's bank.** The launch rolls to 18 degrees, which is what
+    # holds a marble in a 1.88 channel through its first turn. Held open to
+    # 5.57 the same roll is a hill 2.79 units long: a marble crossing it
+    # arrives at the low guard with 13.1 layout units per second of lateral
+    # speed, and clearing the 0.54 guard needs 10.4. Measured, 8.85% of the
+    # field left the course that way.
+    #
+    # A ceiling of 6 degrees leaves 7.6, which the guard holds. The bank only
+    # rolls the section - the centreline, the arc lengths and therefore every
+    # checkpoint are untouched.
+    wide_bank_max: float | None = None
     # Which start topology this plan builds: see `sloped.course.START_KINDS`.
     #
     # **There is deliberately no default.** V1.4 recorded a 300-seed "fan"
@@ -159,6 +208,9 @@ class StartPlan:
             "fall_profile": list(self.fall_profile) if self.fall_profile else None,
             "mixers": [list(m) for m in self.mixers],
             "launch_width": list(self.launch_width) if self.launch_width else None,
+            "leg1_width": list(self.leg1_width) if self.leg1_width else None,
+            "cross_flow": self.cross_flow,
+            "wide_bank_max": self.wide_bank_max,
             "start_kind": self.start_kind,
             "port_gate": self.port_gate,
             "island": list(self.island) if self.island else None,
@@ -172,7 +224,28 @@ class StartPlan:
 V1_PLAN = StartPlan(name="v1", start_kind="fan")
 
 
-def bench_plan(kind: str, name: str | None = None) -> StartPlan:
+# How wide the wide-launch architecture holds the course, and where it gives
+# that width back. Both read off measured geometry rather than chosen:
+#
+# * 2.6 puts the launch's entry at 2.786 half width against the drawn pod's
+#   2.73, so the apron between them needs no taper at all. That is the whole
+#   architecture in one number.
+# * leg1's first 22 samples are 7.6 layout units at 10.5 to 11.3 degrees under
+#   0 to 2 degrees of bank - **the only long gentle low-bank stretch anywhere
+#   in the start region**, and so the only place a field can be held open
+#   without either stalling or being thrown sideways. The narrowing then runs
+#   to sample 74, eighteen units, and stops short of sample 80 where leg1 rolls
+#   into 26 degrees of bank. `lw-plain` narrowed into a banked turn and lost
+#   34% of the field there; see `tools/sloped_start_scan.py`.
+WIDE_FACTOR = 2.6
+# See `StartPlan.wide_bank_max`. The hero channel's 18 degrees is a hill on a
+# 5.57-wide field and it threw 8.85% of the field over the guards.
+WIDE_BANK_MAX = 6.0
+WIDE_LAUNCH_WIDTH = (WIDE_FACTOR, 117, 118)      # the whole launch, held open
+WIDE_LEG1_WIDTH = (WIDE_FACTOR, 22, 74)          # open, then eighteen units of narrowing
+
+
+def bench_plan(kind: str, name: str | None = None, **extra) -> StartPlan:
     """One start topology behind the shipped downstream, for a start-only A/B.
 
     The mixer and the shuffle wheel are the course's own, on the course's own
@@ -180,18 +253,98 @@ def bench_plan(kind: str, name: str | None = None) -> StartPlan:
     `bench_plan("radial")` is the start module. A comparison where the
     downstream also moved is not a comparison of starts, and this is the one
     constructor the benchmarks use so that cannot drift.
+
+    `wide_launch` is the one kind that also changes the runs, because the
+    architecture *is* a change to the runs: holding the launch and leg1 open is
+    not a downstream feature bolted on, it is the hypothesis. Its width profiles
+    come from the module constants above so every wide-launch candidate shares
+    them and the candidates differ only in what mixes the field.
     """
-    return StartPlan(
-        name=name or kind,
-        start_kind=kind,
+    fields = dict(
         mixers=(("launch", _course.MIXER_SAMPLE, Mixer.PIN_HEIGHT),),
         wheels=(("launch", _course.SHUFFLE_SAMPLE, _course.SHUFFLE_RATE),),
     )
+    if kind == "wide_launch":
+        fields["launch_width"] = WIDE_LAUNCH_WIDTH
+        fields["leg1_width"] = WIDE_LEG1_WIDTH
+        fields["wide_bank_max"] = WIDE_BANK_MAX
+    fields.update(extra)
+    return StartPlan(name=name or kind, start_kind=kind, **fields)
+
+
+def _bumpers(run: str, samples, height: float, radius: float, span: float):
+    """Sparse symmetric bumper rows, for candidate B.
+
+    Sparse is the operative word and the scan records why: the first bumper set
+    tried on this course was three posts a row at 0.62 of the half width, 0.30
+    tall and 0.22 across, which left gaps of one marble diameter and stood
+    taller than a marble's own centre. That is a barrier, not a bumper, and two
+    thirds of the field trailed. On a 5.57-wide field a `Mixer`'s five-and-four
+    rows at 0.72 span sit 0.98 apart, so the gaps are a marble and a half.
+    """
+    return tuple((run, sample, height, radius, span) for sample in samples)
+
+
+# The three structural candidates section 7 of the brief asks for - and only
+# three. They are alternatives in *what mixes the field*, not a parameter scan:
+# all three share the apron, the width profiles and the downstream.
+#
+#   open-sweep   nothing but the wide banked field and the long narrowing. The
+#                launch banks -18 degrees and leg1 rolls to +28, so the field is
+#                pushed to one wall and then the other; the question is whether
+#                that reorders it or merely translates it.
+#   deflectors   plus two sparse symmetric bumper rows on leg1's gentle open
+#                stretch, where a deflected marble is still falling hard enough
+#                to carry on. The fan's own scan found bumpers useless inside a
+#                1.7-degree trough for exactly that reason.
+#   cross-flow   plus shallow chevron ridges on the apron that steer a marble
+#                across the field rather than stopping it. See
+#                `sloped.widelaunch.WideLaunch._chevron`.
+# **The shipped downstream is removed from the wide candidates, and that is a
+# correction rather than a convenience.** The mixer and the shuffle wheel are
+# sized for a 1.88 channel: the wheel's blade reaches 0.90 layout units from
+# the centreline and the mixer's pins 1.14, against a half width of 2.38 once
+# the launch is held open. So on a widened channel both stop being devices that
+# span the course and become *obstructions that only touch its middle*.
+#
+# Measured, six seeds: bays 3 and 4 finished 7th and 8th in every single one,
+# with the two lowest collision counts in the field, and the centre-versus-rank
+# correlation was -0.67. That is not the architecture ordering the field, it is
+# a rotating blade parked in front of the centre bays. Keeping the same devices
+# at the same samples is only a control if they still do the same thing, and
+# here they do not.
+#
+# So candidate A is bare - which is also the honest test of the hypothesis,
+# since the claim is that the wide field decorrelates the order by itself - and
+# B and C add mixing that spans the whole width. `BARE_FAN` is the matching
+# control: the shipped taper with its devices removed too, so architecture can
+# be compared against architecture.
+WIDE_CANDIDATES: dict[str, StartPlan] = {
+    "open-sweep": bench_plan("wide_launch", name="open-sweep", mixers=(), wheels=()),
+    "deflectors": bench_plan(
+        "wide_launch",
+        name="deflectors",
+        # Two sparse rows, spanning 0.94 of the *local* half width, so they
+        # reach across the open field instead of sitting in its middle. On
+        # leg1's gentle first stretch, where a deflected marble is still
+        # falling hard enough to carry on: the fan's own scan found bumpers
+        # useless inside a 1.7-degree trough for exactly that reason.
+        mixers=(("leg1", 8, 0.17, 0.13, 0.94), ("leg1", 16, 0.17, 0.13, 0.94)),
+        wheels=(),
+    ),
+    "cross-flow": bench_plan(
+        "wide_launch", name="cross-flow", mixers=(), wheels=(), cross_flow=True
+    ),
+}
+
+# The taper, stripped of the same devices, so the comparison is architecture
+# against architecture rather than architecture against furniture.
+BARE_FAN = bench_plan("fan", name="bare-fan", mixers=(), wheels=())
 
 
 # One per topology, named the way every report names them. `tools/
 # sloped_start_bench.py` takes the kind on the command line and looks it up
-# here, so a recorded run always says which of the three it measured.
+# here, so a recorded run always says which of the four it measured.
 BENCH_PLANS = {kind: bench_plan(kind) for kind in _course.START_KINDS}
 
 # What `sloped.course` actually builds - read from the course's own
@@ -223,12 +376,21 @@ def start_machine(config: CoreConfig | None = None, plan: StartPlan | None = Non
     config = config or DEFAULT_CONFIG
     plan = plan or SHIPPED_PLAN
     machine = Machine("sloped_b_start")
-    runs = {
-        name: TrackRun(
-            name, width_profile=plan.launch_width if name == "launch" else None
+    def _run(name: str) -> TrackRun:
+        profile = (
+            plan.launch_width if name == "launch"
+            else plan.leg1_width if name == "leg1"
+            else None
         )
-        for name in LAB_RUNS
-    }
+        spec = None
+        if profile is not None and plan.wide_bank_max is not None:
+            spec = dict(layout.run(name))
+            spec["bank_max"] = min(
+                float(spec["bank_max"]), float(plan.wide_bank_max)
+            )
+        return TrackRun(name, spec=spec, width_profile=profile)
+
+    runs = {name: _run(name) for name in LAB_RUNS}
     # The fan hands over to whatever the launch actually opens at.
     front_half = 0.5 * runs["launch"].clear_width * runs["launch"].widths[0] / LAYOUT_TO_SIM
     if plan.launch_width is None:
@@ -239,6 +401,8 @@ def start_machine(config: CoreConfig | None = None, plan: StartPlan | None = Non
         start = StartBasin("start", runs["launch"])
         if plan.island is not None:
             start.ISLAND_R, start.ISLAND_Z, start.ISLAND_RISE = plan.island
+    elif plan.start_kind == "wide_launch":
+        start = WideLaunch("start", runs["launch"], cross_flow=plan.cross_flow)
     elif plan.start_kind == "fan":
         start = StartGrid(
             "start",
@@ -308,6 +472,18 @@ class SlotRow:
     progress: dict[str, list[float]] = field(default_factory=dict)
     collisions: list[int] = field(default_factory=list)
     wall_ticks: list[int] = field(default_factory=list)
+    # Where across the course this bay's racers actually went, as a fraction of
+    # the local half width so a 5.6-wide field and a 1.88 channel are on one
+    # scale. `across` at each checkpoint, the widest excursion either way, and
+    # how many times the racer changed sides of the centreline.
+    #
+    # These are the wide-launch architecture's own question. A start that keeps
+    # the field abreast has only decorrelated the slot order if the racers
+    # genuinely moved sideways; a rank span that falls while every racer stays
+    # in its own lateral band has not mixed anything, it has just added noise.
+    across: dict[str, list[float]] = field(default_factory=dict)
+    reach: list[float] = field(default_factory=list)
+    crossings: list[int] = field(default_factory=list)
     lost: int = 0
     stuck: int = 0
     trailing: int = 0
@@ -336,6 +512,18 @@ class SlotRow:
             "mean_collisions": (
                 round(sum(self.collisions) / len(self.collisions), 3) if self.collisions else None
             ),
+            "mean_across": {
+                name: round(sum(v) / len(v), 4) for name, v in self.across.items() if v
+            },
+            "mean_reach": round(sum(self.reach) / len(self.reach), 4) if self.reach else None,
+            "mean_crossings": (
+                round(sum(self.crossings) / len(self.crossings), 3)
+                if self.crossings else None
+            ),
+            "crossed_pct": (
+                round(100.0 * sum(1 for c in self.crossings if c) / len(self.crossings), 2)
+                if self.crossings else None
+            ),
             "mean_wall_ticks": (
                 round(sum(self.wall_ticks) / len(self.wall_ticks), 2) if self.wall_ticks else None
             ),
@@ -362,6 +550,11 @@ class TrialResult:
     exit_order: dict[int, int]
     collisions: dict[int, int]
     wall_ticks: dict[int, int]
+    # Lateral position as a fraction of the local half width: per checkpoint,
+    # the widest excursion, and the number of midline crossings.
+    across: dict[str, dict[int, float]]
+    reach: dict[int, float]
+    crossings: dict[int, int]
     lost: dict[int, tuple[str, int]]
     stuck: dict[int, tuple[str, int]]
     # Final arc progress per marble, as a fraction of the lab's length. The
@@ -409,6 +602,12 @@ class StartTrial:
         self.progress: dict[int, float] = {mid: 0.0 for mid in self.slot_of}
         self.collisions: dict[int, int] = {mid: 0 for mid in self.slot_of}
         self.wall_ticks: dict[int, int] = {mid: 0 for mid in self.slot_of}
+        # Signed lateral position, as a fraction of the local half width.
+        self.across: dict[int, float] = {mid: 0.0 for mid in self.slot_of}
+        self.reach: dict[int, float] = {mid: 0.0 for mid in self.slot_of}
+        self.crossings: dict[int, int] = {mid: 0 for mid in self.slot_of}
+        self._side: dict[int, int] = {}
+        self.checkpoint_across: dict[str, dict[int, float]] = {}
         # No stall or containment verdict before every gate on the start has
         # finished releasing. Read off the machine's own actuators rather than
         # typed, so a change to a release time cannot leave the instrument
@@ -484,6 +683,19 @@ class StartTrial:
         across = sum(offset[axis] * lateral[axis] for axis in range(3))
         height = sum(offset[axis] * up[axis] for axis in range(3))
         half = 0.5 * run.clear_width * run.widths[index]
+        # Normalised, so the wide field and the hero channel are comparable and
+        # a "reach" of 1.0 means the racer got to the edge whatever the width.
+        fraction = across / max(half, 1e-9)
+        self.across[marble_id] = fraction
+        self.reach[marble_id] = max(self.reach[marble_id], abs(fraction))
+        # A crossing needs the racer to be properly on the other side, not
+        # merely to jitter about the centreline: a marble is 0.285 against a
+        # 2.79 half width, so a 0.15 dead band is about half a marble.
+        if abs(fraction) > 0.15:
+            side = 1 if fraction > 0 else -1
+            if self._side.get(marble_id, side) != side:
+                self.crossings[marble_id] += 1
+            self._side[marble_id] = side
         if abs(across) > half - MARBLE_RADIUS:
             self.wall_ticks[marble_id] += 1
         if abs(across) > half + LATERAL_SLACK or height > run.containment + VERTICAL_SLACK:
@@ -559,6 +771,7 @@ class StartTrial:
                 self._done.add(name)
                 self.ranks[name] = {mid: rank for rank, mid in enumerate(order, start=1)}
                 self.checkpoint_progress[name] = dict(self.progress)
+                self.checkpoint_across[name] = dict(self.across)
 
     def settled(self) -> bool:
         """Every checkpoint taken and every marble accounted for.
@@ -590,6 +803,9 @@ class StartTrial:
             exit_order=exit_order,
             collisions=dict(self.collisions),
             wall_ticks=dict(self.wall_ticks),
+            across={k: dict(v) for k, v in self.checkpoint_across.items()},
+            reach=dict(self.reach),
+            crossings=dict(self.crossings),
             lost=dict(self.lost),
             stuck=dict(self.stuck),
             through={
@@ -690,6 +906,13 @@ def summarise(
                 row.exit_orders.append(result.exit_order[marble_id])
             row.collisions.append(result.collisions.get(marble_id, 0))
             row.wall_ticks.append(result.wall_ticks.get(marble_id, 0))
+            for name, _ in LAB_CHECKPOINTS:
+                if name in result.across and marble_id in result.across[name]:
+                    row.across.setdefault(name, []).append(result.across[name][marble_id])
+            if marble_id in result.reach:
+                row.reach.append(result.reach[marble_id])
+            if marble_id in result.crossings:
+                row.crossings.append(result.crossings[marble_id])
             if marble_id in result.lost:
                 row.lost += 1
             if marble_id in result.stuck:
@@ -716,6 +939,101 @@ def summarise(
             ),
         }
 
+    # Slot/rank correlation: Pearson's r between the bay index and the mean
+    # rank at each checkpoint. This is the number the whole session turns on -
+    # a span can fall because the ranks got noisier, but a correlation only
+    # falls if the *bay* has stopped predicting the rank.
+    #
+    # Computed on the eight slot means rather than on every racer, because a
+    # single trial's ranks are a permutation and correlate with nothing; the
+    # question is whether a bay is *consistently* ahead.
+    correlation: dict[str, Any] = {}
+    for name, _ in LAB_CHECKPOINTS:
+        means = [rows[s].mean_rank(name) for s in range(slots)]
+        present = [(s, m) for s, m in enumerate(means) if m is not None]
+        if len(present) < 3:
+            correlation[name] = None
+            continue
+        xs = [float(s) for s, _ in present]
+        ys = [m for _, m in present]
+        mx = sum(xs) / len(xs)
+        my = sum(ys) / len(ys)
+        sxy = sum((x - mx) * (y - my) for x, y in zip(xs, ys))
+        sxx = sum((x - mx) ** 2 for x in xs)
+        syy = sum((y - my) ** 2 for y in ys)
+        correlation[name] = (
+            None if sxx * syy < 1e-12 else round(sxy / (sxx * syy) ** 0.5, 4)
+        )
+    # And the same against |bay - 3.5|, which is the shape a centre-versus-edge
+    # advantage takes. The taper and the basin both produced one, and a plain
+    # slot correlation cannot see it: it is symmetric.
+    centre_correlation: dict[str, Any] = {}
+    for name, _ in LAB_CHECKPOINTS:
+        means = [rows[s].mean_rank(name) for s in range(slots)]
+        present = [(abs(s - (slots - 1) / 2.0), m)
+                   for s, m in enumerate(means) if m is not None]
+        if len(present) < 3:
+            centre_correlation[name] = None
+            continue
+        xs = [x for x, _ in present]
+        ys = [m for _, m in present]
+        mx, my = sum(xs) / len(xs), sum(ys) / len(ys)
+        sxy = sum((x - mx) * (y - my) for x, y in zip(xs, ys))
+        sxx = sum((x - mx) ** 2 for x in xs)
+        syy = sum((y - my) ** 2 for y in ys)
+        centre_correlation[name] = (
+            None if sxx * syy < 1e-12 else round(sxy / (sxx * syy) ** 0.5, 4)
+        )
+
+    # **Lateral *order*, not lateral movement.** The first version of this
+    # counted midline crossings and reported 95% of racers crossing - which the
+    # wide field satisfies trivially, because the launch banks 18 degrees and
+    # the whole field slides across together. A bulk translation moves every
+    # racer over the midline and reorders nothing.
+    #
+    # So this is the number section 8 of the brief actually asks for: the rank
+    # correlation between where a racer started across the pan and where it is
+    # across the course at each checkpoint, per trial, averaged. 1.0 is a field
+    # that has kept its lateral order exactly - translated, banked, but not
+    # mixed. 0.0 is a field whose lateral order has no relation to the start.
+    lateral_order: dict[str, Any] = {}
+    for name, _ in LAB_CHECKPOINTS:
+        per_trial = []
+        for result in results:
+            here = result.across.get(name) or {}
+            pairs = [(result.slot_of[mid], value) for mid, value in here.items()
+                     if mid in result.slot_of]
+            if len(pairs) < 4:
+                continue
+            order = sorted(range(len(pairs)), key=lambda k: pairs[k][1])
+            lateral_rank = [0] * len(pairs)
+            for rank, index in enumerate(order):
+                lateral_rank[index] = rank
+            xs = [float(slot) for slot, _ in pairs]
+            ys = [float(r) for r in lateral_rank]
+            mx, my = sum(xs) / len(xs), sum(ys) / len(ys)
+            sxy = sum((x - mx) * (y - my) for x, y in zip(xs, ys))
+            sxx = sum((x - mx) ** 2 for x in xs)
+            syy = sum((y - my) ** 2 for y in ys)
+            if sxx * syy > 1e-12:
+                per_trial.append(sxy / (sxx * syy) ** 0.5)
+        lateral_order[name] = (
+            round(sum(per_trial) / len(per_trial), 4) if per_trial else None
+        )
+
+    # **Where the field is lost, not just how much of it.** A start that loses
+    # 9% of its racers has a place it loses them, and a percentage cannot say
+    # whether that place is the release, the seam, the open field or the
+    # narrowing - which are four different repairs. Bucketed by run and by
+    # tenth of that run, because a loss site is a stretch and not a sample.
+    sites: dict[str, int] = {}
+    for result in results:
+        for run_name, index in list(result.lost.values()) + list(result.stuck.values()):
+            bucket = f"{run_name}[{10 * index // 118 * 10}..{10 * index // 118 * 10 + 9}%]"
+            sites[bucket] = sites.get(bucket, 0) + 1
+
+    reaches = [v for row in rows.values() for v in row.reach]
+    crossings = [v for row in rows.values() for v in row.crossings]
     lost_total = sum(row.lost for row in rows.values())
     stuck_total = sum(row.stuck for row in rows.values())
     trailing_total = sum(row.trailing for row in rows.values())
@@ -737,6 +1055,18 @@ def summarise(
         ),
         "checkpoints": [name for name, _ in LAB_CHECKPOINTS],
         "rank_span": spans,
+        "slot_rank_correlation": correlation,
+        "lateral_order_correlation": lateral_order,
+        "loss_sites": dict(sorted(sites.items(), key=lambda kv: -kv[1])),
+        "centre_rank_correlation": centre_correlation,
+        "mean_reach": round(sum(reaches) / len(reaches), 4) if reaches else None,
+        "mean_crossings": (
+            round(sum(crossings) / len(crossings), 4) if crossings else None
+        ),
+        "crossed_pct": (
+            round(100.0 * sum(1 for c in crossings if c) / len(crossings), 2)
+            if crossings else None
+        ),
         "early_rank_span": spans[first]["span"],
         "exit_rank_span": spans[last]["span"],
         "slots": [rows[s].to_json() for s in range(slots)],

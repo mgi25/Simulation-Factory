@@ -1,0 +1,17 @@
+Does the slot bias scale with the width of the open field?
+
+One mechanism probe at three widths; the layout is identical in all three, only
+`launch_width` / `leg1_width` change. 24 seeds each, candidate `open-sweep`.
+
+  gap = the inside/outside path-length difference the wide stretch's 90.2
+  degrees of plan turning produces at that width, in layout units.
+
+ factor  width    gap  lost%  span@wide   r@wide  span@exit   r@exit
+    1.4   3.00   4.72   8.33      6.792   -0.650      4.708   -0.724
+    2.0   4.29   6.75   9.90      5.833   -0.888      4.292   -0.834
+    2.6   5.57   8.77   8.85      6.375   -0.952      3.833   -0.977
+
+The slot/rank correlation rises monotonically with width, which is the
+prediction of the width-times-curvature mechanism and the opposite of the
+architecture's premise: the extra width that is supposed to buy lateral mixing
+is what strengthens the bias.

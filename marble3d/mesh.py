@@ -261,7 +261,28 @@ def cached_obj(mesh: TriMesh, directory: str) -> str:
         temporary = f"{path}.{os.getpid()}.partial"
         with open(temporary, "w", encoding="ascii", newline="\n") as handle:
             handle.write(mesh.to_obj())
-        os.replace(temporary, path)
+        try:
+            os.replace(temporary, path)
+        except OSError:
+            # **The race here is benign, and on Windows it is not rare.** Seven
+            # benchmark workers meeting a *fresh* cache key install it at the
+            # same instant; the existence check above is a TOCTOU, and Windows
+            # refuses `os.replace` onto a destination another process holds
+            # open for reading. The name is a content hash, so whoever won
+            # wrote byte-identical bytes and the loser has nothing to do but
+            # tidy up its temporary.
+            #
+            # Left unhandled this surfaced as `PermissionError: Access is
+            # denied` part way through a start benchmark - and only ever on the
+            # first run of a new geometry, which is exactly when a candidate is
+            # being measured for the first time and least wants a spurious
+            # crash.
+            if not os.path.exists(path):
+                raise
+            try:
+                os.unlink(temporary)
+            except OSError:
+                pass
     return path
 
 

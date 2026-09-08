@@ -38,8 +38,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from sloped.startlab import (  # noqa: E402
+    BARE_FAN,
     BENCH_PLANS,
     LAB_CHECKPOINTS,
+    WIDE_CANDIDATES,
     run_trial,
     start_machine,
     summarise,
@@ -51,7 +53,7 @@ def _one(job):
     # holds meshes and a worker builds it once and reuses it across its chunk.
     # The kind travels with the job, so a worker cannot quietly reuse a machine
     # built for a different topology.
-    kind, seed = job
+    kind, candidate, seed = job
     global _MACHINE
     try:
         machine = _MACHINE
@@ -59,12 +61,19 @@ def _one(job):
         _MACHINE = {}
         machine = None
     else:
-        machine = _MACHINE.get(kind)
+        machine = _MACHINE.get((kind, candidate))
     if machine is None:
-        from sloped.startlab import BENCH_PLANS, start_machine
+        from sloped.startlab import (
+            BARE_FAN,
+            BENCH_PLANS,
+            WIDE_CANDIDATES,
+            start_machine,
+        )
 
         _MACHINE.clear()
-        machine = _MACHINE[kind] = start_machine(plan=BENCH_PLANS[kind])
+        table = dict(WIDE_CANDIDATES, **{BARE_FAN.name: BARE_FAN})
+        plan = table[candidate] if candidate else BENCH_PLANS[kind]
+        machine = _MACHINE[(kind, candidate)] = start_machine(plan=plan)
     return run_trial(seed, machine=machine)
 
 
@@ -78,6 +87,15 @@ def main(argv: list[str] | None = None) -> int:
         choices=list(BENCH_PLANS),
         help="which start topology to measure; there is deliberately no default",
     )
+    # Which structural candidate, for the topologies that have more than one.
+    # Named rather than numbered, and looked up in one table, for the reason
+    # `--start-kind` is required: a recorded run has to say what it measured.
+    parser.add_argument(
+        "--candidate",
+        default=None,
+        choices=sorted(dict(WIDE_CANDIDATES, **{BARE_FAN.name: BARE_FAN})),
+        help="a named candidate plan; its own start_kind must match --start-kind",
+    )
     parser.add_argument("--seeds", type=int, default=200)
     parser.add_argument("--first", type=int, default=0)
     parser.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1))
@@ -86,15 +104,34 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     kind = args.start_kind
-    plan = BENCH_PLANS[kind]
+    candidates = dict(WIDE_CANDIDATES, **{BARE_FAN.name: BARE_FAN})
+    if args.candidate and candidates[args.candidate].start_kind != kind:
+        parser.error(
+            f"candidate {args.candidate!r} is a "
+            f"{candidates[args.candidate].start_kind!r} plan, not {kind!r}"
+        )
+    plan = candidates[args.candidate] if args.candidate else BENCH_PLANS[kind]
     # Built once here as well as in the workers, so a bad kind fails before a
     # pool is spun up and so the plan that goes into the report is the plan the
     # machine agreed to.
     probe = start_machine(plan=plan)
     if probe.start_kind != kind:                     # pragma: no cover - guarded
         raise AssertionError(f"asked for {kind!r}, machine built {probe.start_kind!r}")
+    # **Warm the mesh cache here, in the parent.** `marble3d` caches colliders
+    # as OBJ files keyed by content hash and installs them with an atomic
+    # rename; seven workers meeting a *fresh* key at the same instant race on
+    # that rename, and on Windows the loser gets PermissionError rather than
+    # simply finding the file already there. Building the meshes once before
+    # the pool exists costs a second and removes the race entirely - and it is
+    # a race that only appears the first time a geometry is benchmarked, which
+    # is exactly when a new candidate is being measured.
+    for module in probe:
+        getattr(module, "local_colliders", list)()
 
-    jobs = [(kind, seed) for seed in range(args.first, args.first + args.seeds)]
+    jobs = [
+        (kind, args.candidate, seed)
+        for seed in range(args.first, args.first + args.seeds)
+    ]
     started = time.perf_counter()
     if args.workers > 1:
         with ProcessPoolExecutor(max_workers=args.workers) as pool:
@@ -110,27 +147,41 @@ def main(argv: list[str] | None = None) -> int:
     report["seeds"] = [args.first, args.first + args.seeds]
 
     names = [name for name, _ in LAB_CHECKPOINTS]
+    report["candidate"] = args.candidate
     print(
-        f"{args.label or 'start lab'} [start_kind={report['start_kind']}]: "
+        f"{args.label or 'start lab'} [start_kind={report['start_kind']}"
+        f"{'' if not args.candidate else ' candidate=' + args.candidate}]: "
         f"{len(results)} trials in {wall:.1f}s"
     )
     print(f"lost {report['lost']} of {report['racers']} ({report['lost_pct']}%)")
-    header = "slot | " + " | ".join(f"{n:>8}" for n in names) + " |  exit | coll | wall"
+    header = ("slot | " + " | ".join(f"{n:>9}" for n in names)
+              + " | reach | cross | xed% | coll")
     print(header)
     print("-" * len(header))
     for row in report["slots"]:
         ranks = " | ".join(
-            f"{row['mean_rank'][n]:8.3f}" if row["mean_rank"][n] is not None else "       -"
+            f"{row['mean_rank'][n]:9.3f}" if row["mean_rank"][n] is not None else "        -"
             for n in names
         )
-        exit_order = row["mean_exit_order"]
+
+        def maybe(value, fmt="5.2f"):
+            return format(value, fmt) if value is not None else "    -"
+
         print(
-            f"  {row['slot']}  | {ranks} | "
-            f"{exit_order:5.2f} | {row['mean_collisions']:4.1f} | {row['mean_wall_ticks']:5.1f}"
-            if exit_order is not None
-            else f"  {row['slot']}  | {ranks} |     - |    - |     -"
+            f"  {row['slot']}  | {ranks} | {maybe(row['mean_reach'])} | "
+            f"{maybe(row['mean_crossings'])} | {maybe(row['crossed_pct'], '4.0f')} | "
+            f"{maybe(row['mean_collisions'], '4.0f')}"
         )
     print("-" * len(header))
+    print(
+        f"  lateral: mean reach {report['mean_reach']}, mean crossings "
+        f"{report['mean_crossings']}, crossed the midline {report['crossed_pct']}%"
+    )
+    lateral = " ".join(
+        f"{n}={'n/a' if report['lateral_order_correlation'][n] is None else format(report['lateral_order_correlation'][n], '+.3f')}"
+        for n in names
+    )
+    print(f"  lateral order kept (1.0 = translated but not mixed): {lateral}")
     for name in names:
         block = report["rank_span"][name]
         if block['span'] is None:
@@ -139,10 +190,18 @@ def main(argv: list[str] | None = None) -> int:
             # total jam - which is exactly the case worth describing.
             print(f"{name:>13}: no ranks - nothing reached this checkpoint")
         else:
+            slot_r = report["slot_rank_correlation"].get(name)
+            centre_r = report["centre_rank_correlation"].get(name)
             print(
                 f"{name:>13}: span {block['span']:.3f} places, "
-                f"best slot {block['best_slot']}, worst slot {block['worst_slot']}"
+                f"best slot {block['best_slot']}, worst slot {block['worst_slot']}, "
+                f"slot r {'  n/a' if slot_r is None else format(slot_r, '+.3f')}, "
+                f"centre r {'  n/a' if centre_r is None else format(centre_r, '+.3f')}"
             )
+    if report["loss_sites"]:
+        top = list(report["loss_sites"].items())[:6]
+        print("  lost and stuck at: "
+              + ", ".join(f"{where} x{count}" for where, count in top))
     if report["incomplete"]:
         print(f"incomplete trials: {report['incomplete']}")
 

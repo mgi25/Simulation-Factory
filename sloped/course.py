@@ -79,6 +79,7 @@ from sloped.pathing import build_path
 from sloped.scale import to_sim
 from sloped.basin import StartBasin
 from sloped.radial import RadialStart
+from sloped.widelaunch import WideLaunch
 from sloped.stations import FinishDeck, ForkRidge, MergeCatch, Mixer, Spinners, StartGrid
 from sloped.track import TrackRun
 
@@ -242,6 +243,7 @@ START_CLASSES = {
     StartGrid.START_KIND: StartGrid,
     StartBasin.START_KIND: StartBasin,
     RadialStart.START_KIND: RadialStart,
+    WideLaunch.START_KIND: WideLaunch,
 }
 START_KINDS = tuple(START_CLASSES)
 
@@ -249,9 +251,11 @@ START_KINDS = tuple(START_CLASSES)
 def start_module(kind: str, launch, **options):
     """One of the three start topologies, by name.
 
-    `fan` is V1.1's taper, `basin` V1.3's stadium dish - both falsified for
-    slot bias, and both kept because they are the two topologies the mechanism
-    was measured in. `radial` is V1.4's ring: see `sloped.radial`.
+    `fan` is V1.1's taper and `basin` V1.3's stadium dish, both falsified for
+    slot bias; `radial` is V1.4's ring, falsified in V1.5 - see
+    `docs/sloped_race_v15_apron.md`. All three are kept because they are the
+    topologies the mechanism was measured in. `wide_launch` is V1.6's
+    unconstricted raceway: see `sloped.widelaunch`.
 
     **The built module is asked what it is, and the answer is checked against
     what was requested.** That is not defensive noise: V1.4 recorded a

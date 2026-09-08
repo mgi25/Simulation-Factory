@@ -1,5 +1,13 @@
 # V1.5: the shared apron works, and the radial architecture does not
 
+> **Followed by `docs/sloped_race_v16_widelaunch.md`, which closes the
+> question.** Section 4 of this report names the untested quadrant - a start
+> with no constriction at all - and V1.6 built it. The wide field produces more
+> lateral crossover than the shipped taper does, and the slot correlation more
+> than doubles, because a 5.6-wide channel through 90 degrees of turning makes
+> the inside line 8.8 units shorter than the outside. Passive start geometry is
+> now considered exhausted.
+
 **Status: the apron the V1.4 report asked for is built and delivers 100% of the
 field to the ring with both fairness invariants exact. The radial start is
 nevertheless *less* fair than the taper it was meant to replace, and this
