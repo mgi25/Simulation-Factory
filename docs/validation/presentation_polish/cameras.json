@@ -1,0 +1,497 @@
+{
+  "branch": "marble-sloped-presentation-polish",
+  "cameras": [
+    {
+      "action_samples_clear": 387,
+      "action_samples_in_frame": 387,
+      "aim": [
+        6.726,
+        14.75,
+        6.693
+      ],
+      "bearing_deg": 118.0,
+      "elevation_deg": 9.0,
+      "fov": 42.0,
+      "framed_extent": 62.0,
+      "known_occlusions": [
+        "7 of 29 racers read through an acrylic wall"
+      ],
+      "name": "environment",
+      "notes": "Looks off the flank rather than along it, so the layered haze, the three ranges, the warm outposts and the valley platforms are all in frame. The course crosses the lower third; it is the subject of the branch, not of this frame.",
+      "position": [
+        -53.722,
+        27.383,
+        58.733
+      ],
+      "progress_range": [
+        0.161,
+        0.854
+      ],
+      "racers_clear": 29,
+      "racers_in_frame": 29,
+      "racers_through_guard": 7,
+      "style": "environment plate - out across the valley",
+      "target_region": {
+        "at": [
+          "path",
+          "leg3",
+          0.4
+        ],
+        "centre": [
+          6.726,
+          14.75,
+          6.693
+        ],
+        "radius": 46.5
+      }
+    },
+    {
+      "action_samples_clear": 18,
+      "action_samples_in_frame": 18,
+      "aim": [
+        -6.273,
+        20.393,
+        -8.988
+      ],
+      "bearing_deg": 52.0,
+      "elevation_deg": 22.0,
+      "fov": 30.0,
+      "framed_extent": 8.6,
+      "known_occlusions": [],
+      "name": "track_materials",
+      "notes": "Close enough that the pearl shoulder, the rolled lip, the chrome bead, the silver running insert and the graphite keel are five separable surfaces. Aimed at a pack rather than at a round number, because a material plate with no racer on it does not show the one thing the running surface is for.",
+      "position": [
+        -11.405,
+        26.405,
+        4.978
+      ],
+      "progress_range": [
+        0.354,
+        0.384
+      ],
+      "racers_clear": 2,
+      "racers_in_frame": 2,
+      "racers_through_guard": 0,
+      "style": "material plate - one length of channel, close",
+      "target_region": {
+        "at": [
+          "path",
+          "leg2",
+          0.4
+        ],
+        "centre": [
+          -6.273,
+          20.393,
+          -8.988
+        ],
+        "radius": 6.45
+      }
+    },
+    {
+      "action_samples_clear": 59,
+      "action_samples_in_frame": 59,
+      "aim": [
+        -18.6,
+        38.55,
+        -37.2
+      ],
+      "bearing_deg": 30.0,
+      "elevation_deg": 20.0,
+      "fov": 34.0,
+      "framed_extent": 17.4,
+      "known_occlusions": [],
+      "name": "start_event",
+      "notes": "Extent up from the committed 12.6, which cropped both the sign and the outer bays at phone size. Non-geometric only: the start mechanism is the physics session's and nothing here touches it.",
+      "position": [
+        4.38,
+        48.283,
+        -23.527
+      ],
+      "progress_range": [
+        0.0,
+        0.032
+      ],
+      "racers_clear": 5,
+      "racers_in_frame": 5,
+      "racers_through_guard": 0,
+      "style": "close three-quarter event view",
+      "target_region": {
+        "at": [
+          "node",
+          "start"
+        ],
+        "centre": [
+          -18.6,
+          38.55,
+          -37.2
+        ],
+        "radius": 13.05
+      }
+    },
+    {
+      "action_samples_clear": 129,
+      "action_samples_in_frame": 129,
+      "aim": [
+        -11.631,
+        33.006,
+        -29.55
+      ],
+      "bearing_deg": 26.0,
+      "elevation_deg": 11.0,
+      "fov": 36.0,
+      "framed_extent": 13.0,
+      "known_occlusions": [
+        "1 of 9 racers read through an acrylic wall"
+      ],
+      "name": "first_descent",
+      "notes": "Low and in FRONT, looking back up the plunge, which is the reverse of what a follow shot usually means and is what the terrain forces. On this run behind means uphill: at bearing 158 the camera stood inside the hill and the ground crossed every sightline. Reversed to 26 the same low elevation reads the 32-degree plunge against the sky and the field comes at the lens. Near-axial, so the guards are edge-on.",
+      "position": [
+        2.919,
+        36.823,
+        -16.362
+      ],
+      "progress_range": [
+        0.0,
+        0.072
+      ],
+      "racers_clear": 9,
+      "racers_in_frame": 9,
+      "racers_through_guard": 1,
+      "style": "low follow, from behind",
+      "target_region": {
+        "at": [
+          "path",
+          "launch",
+          0.62
+        ],
+        "centre": [
+          -11.631,
+          33.006,
+          -29.55
+        ],
+        "radius": 9.75
+      }
+    },
+    {
+      "action_samples_clear": 42,
+      "action_samples_in_frame": 42,
+      "aim": [
+        15.857,
+        26.254,
+        -21.912
+      ],
+      "bearing_deg": 70.0,
+      "elevation_deg": 24.0,
+      "fov": 36.0,
+      "framed_extent": 17.0,
+      "known_occlusions": [],
+      "name": "fast_turn",
+      "notes": "On the outside of leg 1's long right-hander, where the bank rolls the running surface toward the lens. The rig picks the open side against the terrain, which on this leg is the gorge side and is also the correct one artistically.",
+      "position": [
+        8.524,
+        36.895,
+        0.833
+      ],
+      "progress_range": [
+        0.169,
+        0.257
+      ],
+      "racers_clear": 3,
+      "racers_in_frame": 3,
+      "racers_through_guard": 0,
+      "style": "outside tracking",
+      "target_region": {
+        "at": [
+          "path",
+          "leg1",
+          0.6
+        ],
+        "centre": [
+          15.857,
+          26.254,
+          -21.912
+        ],
+        "radius": 12.75
+      }
+    },
+    {
+      "action_samples_clear": 54,
+      "action_samples_in_frame": 54,
+      "aim": [
+        -15.49,
+        18.808,
+        -3.896
+      ],
+      "bearing_deg": 30.0,
+      "elevation_deg": 33.0,
+      "fov": 34.0,
+      "framed_extent": 19.0,
+      "known_occlusions": [],
+      "name": "hairpin",
+      "notes": "Leg 2's hairpin against the rock wall. High enough that the reversal is legible as a shape and that the centre and far lanes clear the near guard rather than reading through it.",
+      "position": [
+        -21.371,
+        35.732,
+        21.492
+      ],
+      "progress_range": [
+        0.382,
+        0.476
+      ],
+      "racers_clear": 5,
+      "racers_in_frame": 5,
+      "racers_through_guard": 0,
+      "style": "high three-quarter",
+      "target_region": {
+        "at": [
+          "path",
+          "leg2",
+          0.64
+        ],
+        "centre": [
+          -15.49,
+          18.808,
+          -3.896
+        ],
+        "radius": 14.25
+      }
+    },
+    {
+      "action_samples_clear": 68,
+      "action_samples_in_frame": 68,
+      "aim": [
+        -4.457,
+        20.718,
+        -9.521
+      ],
+      "bearing_deg": 22.0,
+      "elevation_deg": 11.0,
+      "fov": 36.0,
+      "framed_extent": 16.0,
+      "known_occlusions": [
+        "1 of 5 racers read through an acrylic wall"
+      ],
+      "name": "long_straight",
+      "notes": "The brief asks for a side follow; the sloped-course pass found that square side-on makes a straight read as a line; and this frame settled the argument in favour of the second. A side bearing was tried at 66, 48 and 42 and each one put the channel across the top third of a portrait frame with the rest of it hillside. At 22 the run recedes down the frame instead and carries five racers strung out along it, which is what makes 'long' a fact. It is still a follow - the camera is off the axis and ahead of the pack - it is just not square to it.",
+      "position": [
+        -23.716,
+        25.416,
+        5.082
+      ],
+      "progress_range": [
+        0.3,
+        0.421
+      ],
+      "racers_clear": 5,
+      "racers_in_frame": 5,
+      "racers_through_guard": 1,
+      "style": "side follow, angled off square",
+      "target_region": {
+        "at": [
+          "path",
+          "leg2",
+          0.36
+        ],
+        "centre": [
+          -4.457,
+          20.718,
+          -9.521
+        ],
+        "radius": 12.0
+      }
+    },
+    {
+      "action_samples_clear": 46,
+      "action_samples_in_frame": 46,
+      "aim": [
+        -4.697,
+        16.639,
+        3.803
+      ],
+      "bearing_deg": 48.0,
+      "elevation_deg": 22.0,
+      "fov": 34.0,
+      "framed_extent": 17.0,
+      "known_occlusions": [
+        "1 of 4 racers read through an acrylic wall"
+      ],
+      "name": "obstacle_action",
+      "notes": "Aimed at leg 3's entry rather than at the obstacle anchor, which is where the pack actually is, and raised to 22 degrees, because at the committed 14 the spinner gantry's own legs crossed the channel and the racers behind them were read through two guard walls and a support. The extent is 17 for a reason worth remembering: the frame is portrait and the camera keeps height, so `extent` is the VERTICAL span and the horizontal one is only 0.5625 of it. At 12 this shot framed under seven units across and lost the machinery off the left edge while reporting no occlusion at all.",
+      "position": [
+        8.95,
+        27.054,
+        25.672
+      ],
+      "progress_range": [
+        0.395,
+        0.545
+      ],
+      "racers_clear": 4,
+      "racers_in_frame": 4,
+      "racers_through_guard": 1,
+      "style": "tight action, above the gantry",
+      "target_region": {
+        "at": [
+          "path",
+          "leg3",
+          0.05
+        ],
+        "centre": [
+          -4.697,
+          16.639,
+          3.803
+        ],
+        "radius": 12.75
+      }
+    },
+    {
+      "action_samples_clear": 380,
+      "action_samples_in_frame": 380,
+      "aim": [
+        4.345,
+        7.235,
+        26.885
+      ],
+      "bearing_deg": 6.0,
+      "elevation_deg": 30.0,
+      "fov": 38.0,
+      "framed_extent": 48.0,
+      "known_occlusions": [
+        "6 of 27 racers read through an acrylic wall"
+      ],
+      "name": "split_wide",
+      "notes": "Aimed at the midpoint of the two branches at matching progress, not at the split module. The committed shot aimed at the module with an extent of 15 and the branches diverge by 36 units, so neither route was in frame - the single worst framing failure on the course. Bearing 6 looks back up at the fork from below, which is the only station from which a choice reads as a choice.",
+      "position": [
+        -30.838,
+        42.085,
+        75.935
+      ],
+      "progress_range": [
+        0.547,
+        0.946
+      ],
+      "racers_clear": 27,
+      "racers_in_frame": 27,
+      "racers_through_guard": 6,
+      "style": "wide elevated, both branches",
+      "target_region": {
+        "at": [
+          "pair",
+          "blue",
+          0.46,
+          "orange",
+          0.46
+        ],
+        "centre": [
+          4.345,
+          7.235,
+          26.885
+        ],
+        "radius": 36.0
+      }
+    },
+    {
+      "action_samples_clear": 96,
+      "action_samples_in_frame": 96,
+      "aim": [
+        12.551,
+        1.958,
+        41.682
+      ],
+      "bearing_deg": 162.0,
+      "elevation_deg": 20.0,
+      "fov": 36.0,
+      "framed_extent": 15.0,
+      "known_occlusions": [
+        "2 of 7 racers read through an acrylic wall"
+      ],
+      "name": "final_sprint",
+      "notes": "On the viaduct, behind the pack and nearly on the axis, so the girders and the valley run away underneath. Started at 8 degrees on the brief's 'low forward tracking' and came up to 20: from under the deck the nearest trestle filled a third of the frame and the pack was a row of dots above it. Near-axial at 162, so the guards stay edge-on and the elevation costs nothing in occlusion.",
+      "position": [
+        -9.115,
+        9.853,
+        40.652
+      ],
+      "progress_range": [
+        0.917,
+        1.0
+      ],
+      "racers_clear": 7,
+      "racers_in_frame": 7,
+      "racers_through_guard": 2,
+      "style": "low forward tracking",
+      "target_region": {
+        "at": [
+          "path",
+          "final",
+          0.64
+        ],
+        "centre": [
+          12.551,
+          1.958,
+          41.682
+        ],
+        "radius": 11.25
+      }
+    },
+    {
+      "action_samples_clear": 23,
+      "action_samples_in_frame": 23,
+      "aim": [
+        24.2,
+        0.7,
+        46.2
+      ],
+      "bearing_deg": 42.0,
+      "elevation_deg": 16.0,
+      "fov": 34.0,
+      "framed_extent": 18.0,
+      "known_occlusions": [],
+      "name": "finish_push",
+      "notes": "Extent down from 24 and elevation down from 21: the committed frame read as a board seen from above with an empty deck. Lower and tighter puts the gantry sign against the sky and the arriving pack in the mouth. Paired with a sprint pack at phase 0.96 so there is something to finish.",
+      "position": [
+        50.291,
+        8.814,
+        35.246
+      ],
+      "progress_range": [
+        0.98,
+        1.0
+      ],
+      "racers_clear": 1,
+      "racers_in_frame": 1,
+      "racers_through_guard": 0,
+      "style": "warm dramatic push-in",
+      "target_region": {
+        "at": [
+          "node",
+          "finish"
+        ],
+        "centre": [
+          24.2,
+          0.7,
+          46.2
+        ],
+        "radius": 13.5
+      }
+    }
+  ],
+  "empty_shots": [],
+  "guard_geometry": {
+    "clear_over_guard_deg": {
+      "centre_lane": 26.6,
+      "far_lane": 18.2,
+      "near_lane": 46.4
+    },
+    "guard_top_above_marble_crown": 0.23,
+    "note": "The acrylic wall's top arris stands 0.23 above a racer's crown, so a side-on camera below the elevations here sees a racer THROUGH the acrylic, not over it."
+  },
+  "layout": "b",
+  "marble": {
+    "radius": 0.285
+  },
+  "physics": "UNTOUCHED. This file changes no route, no collider, no module anchor and no metadata. Camera positions are the only thing in it that moved.",
+  "shots_with_occlusion": [],
+  "status": "CANDIDATES, NOT CUTS. No timing, no selection, no final replay. Positions, lenses and bearings only, verified against the built scene.",
+  "verification": "Every clearance number is measured, not asserted. Terrain occlusion is walked against course_terrain.height at 48 samples per sightline; support occlusion is a capsule test against the built piers' own bounds; guard occlusion is a strip crossing in the section's rolled frame."
+}
