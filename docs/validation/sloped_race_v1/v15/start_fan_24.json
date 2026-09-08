@@ -1,0 +1,284 @@
+{
+  "start_kind": "fan",
+  "trials": 24,
+  "incomplete": 0,
+  "racers": 192,
+  "lost": 2,
+  "lost_pct": 1.042,
+  "stuck": 0,
+  "stuck_pct": 0.0,
+  "trailing": 2,
+  "trailing_pct": 1.042,
+  "checkpoints": [
+    "descent",
+    "half",
+    "exit"
+  ],
+  "rank_span": {
+    "descent": {
+      "means": [
+        6.625,
+        5.2083,
+        3.75,
+        4.0417,
+        3.75,
+        4.4583,
+        3.4583,
+        4.7083
+      ],
+      "span": 3.1667,
+      "best_slot": 6,
+      "worst_slot": 0
+    },
+    "half": {
+      "means": [
+        6.7917,
+        5.1667,
+        3.625,
+        4.0833,
+        3.7083,
+        4.4167,
+        3.4583,
+        4.75
+      ],
+      "span": 3.3333,
+      "best_slot": 6,
+      "worst_slot": 0
+    },
+    "exit": {
+      "means": [
+        6.75,
+        5.0417,
+        3.625,
+        4.0417,
+        3.7083,
+        4.625,
+        3.4167,
+        4.7917
+      ],
+      "span": 3.3333,
+      "best_slot": 6,
+      "worst_slot": 0
+    }
+  },
+  "early_rank_span": 3.1667,
+  "exit_rank_span": 3.3333,
+  "slots": [
+    {
+      "slot": 0,
+      "trials": 24,
+      "mean_rank": {
+        "descent": 6.625,
+        "half": 6.7917,
+        "exit": 6.75
+      },
+      "mean_exit_order": 6.7083,
+      "mean_progress": {
+        "descent": 8.0212,
+        "half": 24.6318,
+        "exit": 59.3559
+      },
+      "mean_collisions": 122.5,
+      "mean_wall_ticks": 20.25,
+      "lost": 0,
+      "lost_pct": 0.0,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 0,
+      "trailing_pct": 0.0
+    },
+    {
+      "slot": 1,
+      "trials": 24,
+      "mean_rank": {
+        "descent": 5.2083,
+        "half": 5.1667,
+        "exit": 5.0417
+      },
+      "mean_exit_order": 5.5,
+      "mean_progress": {
+        "descent": 12.2236,
+        "half": 32.5268,
+        "exit": 69.0596
+      },
+      "mean_collisions": 343.25,
+      "mean_wall_ticks": 23.75,
+      "lost": 1,
+      "lost_pct": 4.167,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 1,
+      "trailing_pct": 4.167
+    },
+    {
+      "slot": 2,
+      "trials": 24,
+      "mean_rank": {
+        "descent": 3.75,
+        "half": 3.625,
+        "exit": 3.625
+      },
+      "mean_exit_order": 3.4583,
+      "mean_progress": {
+        "descent": 19.2244,
+        "half": 41.5024,
+        "exit": 78.3791
+      },
+      "mean_collisions": 518.083,
+      "mean_wall_ticks": 20.96,
+      "lost": 0,
+      "lost_pct": 0.0,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 0,
+      "trailing_pct": 0.0
+    },
+    {
+      "slot": 3,
+      "trials": 24,
+      "mean_rank": {
+        "descent": 4.0417,
+        "half": 4.0833,
+        "exit": 4.0417
+      },
+      "mean_exit_order": 4.25,
+      "mean_progress": {
+        "descent": 17.2738,
+        "half": 38.8632,
+        "exit": 74.4979
+      },
+      "mean_collisions": 556.5,
+      "mean_wall_ticks": 22.46,
+      "lost": 0,
+      "lost_pct": 0.0,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 0,
+      "trailing_pct": 0.0
+    },
+    {
+      "slot": 4,
+      "trials": 24,
+      "mean_rank": {
+        "descent": 3.75,
+        "half": 3.7083,
+        "exit": 3.7083
+      },
+      "mean_exit_order": 3.4167,
+      "mean_progress": {
+        "descent": 18.9339,
+        "half": 41.8341,
+        "exit": 78.7876
+      },
+      "mean_collisions": 531.958,
+      "mean_wall_ticks": 25.0,
+      "lost": 0,
+      "lost_pct": 0.0,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 0,
+      "trailing_pct": 0.0
+    },
+    {
+      "slot": 5,
+      "trials": 24,
+      "mean_rank": {
+        "descent": 4.4583,
+        "half": 4.4167,
+        "exit": 4.625
+      },
+      "mean_exit_order": 4.6667,
+      "mean_progress": {
+        "descent": 16.2651,
+        "half": 37.7301,
+        "exit": 72.4808
+      },
+      "mean_collisions": 449.083,
+      "mean_wall_ticks": 17.54,
+      "lost": 1,
+      "lost_pct": 4.167,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 1,
+      "trailing_pct": 4.167
+    },
+    {
+      "slot": 6,
+      "trials": 24,
+      "mean_rank": {
+        "descent": 3.4583,
+        "half": 3.4583,
+        "exit": 3.4167
+      },
+      "mean_exit_order": 3.2917,
+      "mean_progress": {
+        "descent": 20.7979,
+        "half": 43.3026,
+        "exit": 79.8853
+      },
+      "mean_collisions": 290.167,
+      "mean_wall_ticks": 19.83,
+      "lost": 0,
+      "lost_pct": 0.0,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 0,
+      "trailing_pct": 0.0
+    },
+    {
+      "slot": 7,
+      "trials": 24,
+      "mean_rank": {
+        "descent": 4.7083,
+        "half": 4.75,
+        "exit": 4.7917
+      },
+      "mean_exit_order": 4.7083,
+      "mean_progress": {
+        "descent": 13.7483,
+        "half": 34.2064,
+        "exit": 70.9745
+      },
+      "mean_collisions": 134.292,
+      "mean_wall_ticks": 23.96,
+      "lost": 0,
+      "lost_pct": 0.0,
+      "stuck": 0,
+      "stuck_pct": 0.0,
+      "trailing": 0,
+      "trailing_pct": 0.0
+    }
+  ],
+  "wall_seconds": 9.23,
+  "label": "V1.5 like-for-like, fan",
+  "plan": {
+    "name": "fan",
+    "fins": null,
+    "stagger": null,
+    "deflectors": null,
+    "tray": null,
+    "fall_profile": null,
+    "mixers": [
+      [
+        "launch",
+        5,
+        0.07
+      ]
+    ],
+    "launch_width": null,
+    "start_kind": "fan",
+    "port_gate": true,
+    "island": null,
+    "wheels": [
+      [
+        "launch",
+        32,
+        9.0
+      ]
+    ]
+  },
+  "seeds": [
+    0,
+    24
+  ]
+}

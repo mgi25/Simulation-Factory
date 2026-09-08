@@ -98,6 +98,7 @@ def run(seed: int, bays=None, hold: float = 0.0, after: float = 1.4,
             "arrived": None, "rest_radius": None, "rest_y": None,
             "after_radius": None, "after_y": None, "min_radius": None,
             "escaped": None, "max_drop": 0.0, "seated": None,
+            "rest_bearing": None, "bearing_drift": None,
         }
         for mid, m in sim.marbles.items()
     }
@@ -133,6 +134,16 @@ def run(seed: int, bays=None, hold: float = 0.0, after: float = 1.4,
                 if row["arrived"] is not None and now <= release + 1e-6:
                     row["rest_radius"] = round(radius, 4)
                     row["rest_y"] = round(y, 4)
+                    # Bearing round the ring, and how far it has drifted from
+                    # the bearing this bay's guide delivers at. This is the one
+                    # coordinate the trough does *not* equalise, and whether it
+                    # stays tied to the bay decides whether the architecture
+                    # can be fair at all.
+                    bearing = math.degrees(math.atan2(z - start.DISH_Z, x)) % 360.0
+                    row["rest_bearing"] = round(bearing, 2)
+                    want = start.guides().bearing(row["bay"])
+                    row["bearing_drift"] = round(
+                        (bearing - want + 180.0) % 360.0 - 180.0, 2)
                 if abs(now - (release + after)) < 1.0 / hz * 8.5:
                     row["after_radius"] = round(radius, 4)
                     row["after_y"] = round(y, 4)
@@ -190,7 +201,8 @@ def main(argv: list[str] | None = None) -> int:
             head += f", arriving {result['arrival'][0]:.2f}..{result['arrival'][1]:.2f}s"
         print(head)
         print(
-            f"{'bay':>3} {'arrive':>7} {'restR':>7} {'restY':>8} {'minR':>6} "
+            f"{'bay':>3} {'arrive':>7} {'restR':>7} {'restY':>8} "
+            f"{'restBrg':>8} {'drift':>7} {'minR':>6} "
             f"{'drop':>6} {'afterR':>7} {'afterY':>8} {'escaped':>8}"
         )
         for row in result["rows"]:
@@ -198,10 +210,18 @@ def main(argv: list[str] | None = None) -> int:
                 return format(value, fmt) if value is not None else "      -"
             print(
                 f"{row['bay']:>3} {show(row['arrived'])} {show(row['rest_radius'])} "
-                f"{show(row['rest_y'], '8.3f')} {show(row['min_radius'], '6.2f')} "
+                f"{show(row['rest_y'], '8.3f')} {show(row['rest_bearing'], '8.2f')} "
+                f"{show(row['bearing_drift'], '7.2f')} "
+                f"{show(row['min_radius'], '6.2f')} "
                 f"{show(row['max_drop'], '6.2f')} {show(row['after_radius'])} "
                 f"{show(row['after_y'], '8.3f')} {show(row['escaped'], '8.2f')}"
             )
+        drifts = [abs(r["bearing_drift"]) for r in result["rows"]
+                  if r["bearing_drift"] is not None]
+        if drifts:
+            print(f"  bearing drift from the delivery bearing: "
+                  f"{min(drifts):.1f}..{max(drifts):.1f} deg, mean "
+                  f"{sum(drifts) / len(drifts):.1f}")
         if result["rest_radius_spread"] is not None:
             print(
                 f"  resting radius {result['rest_radius'][0]:.3f}.."

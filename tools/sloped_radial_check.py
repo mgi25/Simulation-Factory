@@ -73,7 +73,7 @@ def main(argv: list[str] | None = None) -> int:
     exit_run = math.hypot(
         start.exit_local[0], start.exit_local[2] - start.DISH_Z + start.CHUTE_LEAD
     )
-    exit_drop = (start.drain_lip - 0.30) - start.exit_local[1]
+    exit_drop = (start.drain_lip - (0.24 if start.FUNNEL else 0.30)) - start.exit_local[1]
     print(
         f"  exit chute {exit_drop:.2f} over {exit_run:.2f} = "
         f"{math.degrees(math.atan2(exit_drop, exit_run)):.1f} deg"

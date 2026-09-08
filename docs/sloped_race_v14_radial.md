@@ -1,5 +1,13 @@
 # V1.4, part one: the line-to-radial start
 
+> **Superseded by `docs/sloped_race_v15_apron.md`.** The shared apron this
+> report identifies as the fix was built and it works - 100% delivery to the
+> ring, both fairness invariants exact. The *architecture* it serves is
+> falsified: the radial start's early-rank span is 4.583 places against the
+> shipped taper's 3.167, because a marble's bearing round the ring survives the
+> drain and is a function of its bay. Section 5's mislabelled-baseline finding
+> is fixed; section 3's feasibility wall stands.
+
 **Status: built, geometrically validated, and traced in simulation to three
 named stall sites. Not production-viable and not fairness-benchmarked.**
 Throughput is 41.7% of the field (20 of 48 racers over six seeds of the start

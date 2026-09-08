@@ -83,10 +83,47 @@ both.
 entry. The basin's notes record what a typed chain costs: its feeders ended
 0.18 below the dish's edge and the field stopped dead against the step.
 
-`START_LIFT` is **3.40**, which is 0.90 *less* than the 4.30 the brief approved
-for this experiment. The apron spends 1.70 where the chutes spent 2.20 and the
-drain moved downhill, so the exit chute has less to make up: it runs at about
-28 degrees rather than the 40 that 4.30 would have forced.
+`START_LIFT` is **4.30**, the figure the brief approved for this experiment,
+and not a unit more. V1.4 spent 2.20 of it on walled chutes; this spends 1.70
+on the apron and the rest on the converging funnel below the trough, and the
+exit chute runs at about 18 degrees.
+
+## Why the funnel is off, which is the session's finding
+
+The first build of this trough ran straight into a 1.90-wide drain and then
+into the exit chute, and the start lab measured an early-rank span of **4.583
+places** - worse than the taper's 3.615. The slot table named the mechanism
+without ambiguity: bays 3 and 4 deliver at bearings 247.5 and 292.5, the two
+furthest from the chute's mouth at 90, and they finished last in every seed.
+
+Equal radius and equal height are not sufficient. **A marble's bearing round
+the ring survives the drain.** It falls where it was standing, lands that far
+along a chute that runs one way, and a 1.9-unit head start on a 2.9-unit chute
+decides the order. That is the taper's mechanism and the basin's, one stage
+further down: a single common exit ordering the field by distance to it.
+
+The remedy is to converge the field to a *point* before the chute: a steep
+cone from the trough's inner edge to a throat one marble wide, with eight vanes
+to spiral the field through rather than let it arch over. `FUNNEL = True`
+builds it, and it works geometrically - every racer starts that descent at the
+same radius, so every racer travels the same distance, and past the throat they
+are all in the same place.
+
+**It does not work physically, and the reason is not a tuning problem.** A
+throat one marble wide serialises eight marbles. Measured at throat radii 0.40,
+0.44 and 0.62, with throat depths 0.22 and 0.68: **zero of 192 racers reached
+the start lab's first checkpoint** - 9% of the course - within fourteen seconds
+of the release, against 192 of 192 with the wide drain. Traced directly, six
+seconds after the release the field is still strung vertically through the cone
+with two or three racers on the chute and the rest stacked above them. A
+serialised release is not a race, and it is not fast enough for the window
+either.
+
+So the drain stays wide, and the architecture's fairness claim is falsified
+rather than fixed. The general form of the argument is in
+`docs/sloped_race_v15_apron.md`; the short version is that the resting cyclic
+order round the ring *cannot* be decoupled from the bay order, because
+equalising the radius is what makes the marbles unable to pass each other.
 """
 
 from __future__ import annotations
@@ -115,8 +152,11 @@ __all__ = ["START_LIFT", "RadialStart", "guide_table"]
 # apron's 1.70, the trough's fall and an exit chute that is a delivery rather
 # than a drop. 3.40 leaves the exit at 28 degrees. The basin lifted 1.90 for
 # the same reason and the brief allowed it as a local adjustment; V1.4's chutes
-# needed 4.30, and this gives 0.90 of that back.
-START_LIFT = 3.40
+# needed 4.30, and this is that number exactly - not more. What V1.4 spent
+# on 2.20 of walled chute, this spends on 1.70 of apron plus the converging
+# funnel below the trough, which is what stops the field's bearing round the
+# ring becoming a head start down the exit chute. See `_funnel`.
+START_LIFT = 4.30
 
 
 class RadialStart(StartGrid):
@@ -203,8 +243,31 @@ class RadialStart(StartGrid):
     # azimuthal asymmetry in the one quantity the architecture exists to make
     # equal. Sixteen takes that to 0.021, under a tenth of a marble's radius.
     PADDLE_SEGMENTS = 16
-    DRAIN_R = 0.95
-    DRAIN_FALL = 0.46              # trough floor at the drain, down to its lip
+    DRAIN_R = 0.95                 # the drain, at the trough's inner edge
+    DRAIN_FALL = 0.46              # the drain's own lip, under the gate ring
+    # **The converging funnel is off, and section "Why the funnel is off" in
+    # the module docstring is why.** Kept behind a flag rather than deleted,
+    # because it is the measurement that falsifies the architecture's fairness
+    # claim and a falsification nobody can re-run is an assertion.
+    FUNNEL = False
+    THROAT_R = 0.44                # one marble wide: the common point
+    FUNNEL_FALL = 0.62             # mouth to throat, about 50 degrees
+    # **The throat has to be deeper than a marble, and that is the whole of it.**
+    # At 0.22 - less than half a diameter - a marble that had entered the throat
+    # was still standing in the cone above it, so it remained part of the arch
+    # the seven behind it were forming. Traced in simulation, exactly one racer
+    # per seed went through and the other seven sat piled on the cone: the start
+    # lab reported no ranks at all at any checkpoint. At 0.68 a marble that
+    # enters drops clear and the next one has the throat to itself.
+    THROAT_FALL = 0.46
+    # Eight vanes, one per sector, that turn a radially-inward marble into the
+    # ring's rotational sense. Without them the field converges head-on and
+    # arches over the throat, which V1.4's notes record in a different shape.
+    # Eight-fold, so every racer sees the same geometry: the delivery bearings
+    # are exactly 22.5 + 45k, so the swirl costs no symmetry.
+    VANE_RISE = 0.26
+    VANE_FROM = (0.92, -14.0)      # (radius, degrees clockwise of a bearing)
+    VANE_TO = (0.46, -44.0)
     # The catch over the drain's own sector: see `_catch`. It stops short of
     # the launch entry at z 3.94 and clears the exit chute's walls by about a
     # unit, both of which `tools/sloped_radial_check.py` measures.
@@ -310,7 +373,16 @@ class RadialStart(StartGrid):
 
     @property
     def drain_lip(self) -> float:
-        return self.trough_y(self.DRAIN_R) - self.DRAIN_FALL
+        """Where the field leaves the ring, and drops onto the exit chute."""
+        if not self.FUNNEL:
+            return self.trough_y(self.DRAIN_R) - self.DRAIN_FALL
+        return self.trough_y(self.DRAIN_R) - self.FUNNEL_FALL - self.THROAT_FALL
+
+    def funnel_y(self, radius: float) -> float:
+        """The cone's floor at `radius`, between the mouth and the throat."""
+        span = max(0.0, min(1.0, (self.DRAIN_R - radius)
+                            / max(self.DRAIN_R - self.THROAT_R, 1e-9)))
+        return self.trough_y(self.DRAIN_R) - self.FUNNEL_FALL * span
 
     # --- the guides -------------------------------------------------------
 
@@ -350,6 +422,7 @@ class RadialStart(StartGrid):
         pieces.extend(self._apron())
         pieces.extend(self._catch())
         pieces.extend(self._trough())
+        pieces.extend(self._funnel() if self.FUNNEL else self._drain())
         pieces.extend(self._exit_chute())
         self._mesh = merge_meshes(pieces, f"{self.id}_radial")
         return [self._mesh]
@@ -562,14 +635,64 @@ class RadialStart(StartGrid):
                        self._ring_point(radius, 360.0 * p / self.RINGS, y))
                 for p in range(self.RINGS + 1)
             ])
-        # And the lip of the drain, dropping away under the gate ring.
+        return [_strip(rings, f"{self.id}_trough")]
+
+    def _drain(self) -> list[TriMesh]:
+        """The plain wide drain: a short shaft under the trough's inner edge."""
+        rings = [
+            [
+                _place(self.origin, self.frame,
+                       self._ring_point(self.DRAIN_R, 360.0 * p / self.RINGS, y))
+                for p in range(self.RINGS + 1)
+            ]
+            for y in (self.trough_y(self.DRAIN_R), self.drain_lip)
+        ]
+        return [_strip(rings, f"{self.id}_drain")]
+
+    def _funnel(self) -> list[TriMesh]:
+        """The cone and its vanes: where the field stops being a ring.
+
+        Steep - 57 degrees - because a shallow dish into a narrow hole is
+        exactly what arched V1.4's field, and a marble on a 57-degree wall has
+        no purchase to hold an arch with. The vanes start well inside the
+        resting radius: V1.4 put a vane's foot at 1.02 against a cup lip at
+        0.99 and the field sat wedged between the two.
+        """
+        pieces: list[TriMesh] = []
+        rings: list[list[tuple[float, float, float]]] = []
+        steps = 7
+        for step in range(steps + 1):
+            t = step / steps
+            radius = self.DRAIN_R + (self.THROAT_R - self.DRAIN_R) * t
+            rings.append([
+                _place(self.origin, self.frame,
+                       self._ring_point(radius, 360.0 * p / self.RINGS,
+                                        self.funnel_y(radius)))
+                for p in range(self.RINGS + 1)
+            ])
+        # The throat: a short straight section, so a marble that has entered is
+        # committed and cannot be pushed back up the cone by the next one.
         rings.append([
             _place(self.origin, self.frame,
-                   self._ring_point(self.DRAIN_R, 360.0 * p / self.RINGS,
-                                    self.trough_y(self.DRAIN_R) - 0.12))
+                   self._ring_point(self.THROAT_R, 360.0 * p / self.RINGS,
+                                    self.drain_lip))
             for p in range(self.RINGS + 1)
         ])
-        return [_strip(rings, f"{self.id}_trough")]
+        pieces.append(_strip(rings, f"{self.id}_funnel"))
+
+        guides = self.guides()
+        for index in range(layout.BAYS):
+            bearing = guides.bearing(index)
+            foot = self._ring_point(self.VANE_FROM[0], bearing + self.VANE_FROM[1],
+                                    self.funnel_y(self.VANE_FROM[0]))
+            head = self._ring_point(self.VANE_TO[0], bearing + self.VANE_TO[1],
+                                    self.funnel_y(self.VANE_TO[0]))
+            low = [_place(self.origin, self.frame, foot),
+                   _place(self.origin, self.frame, head)]
+            high = [_place(self.origin, self.frame,
+                           (p[0], p[1] + self.VANE_RISE, p[2])) for p in (foot, head)]
+            pieces.append(_strip([low, high], f"{self.id}_vane{index}"))
+        return pieces
 
     def _ring_point(self, radius: float, deg: float, y: float):
         angle = math.radians(deg)
@@ -590,7 +713,8 @@ class RadialStart(StartGrid):
         and the whole start froze. A chute under a drain is a landing, and a
         landing has no kerb.
         """
-        start = (0.0, self.drain_lip - 0.30, self.DISH_Z - self.CHUTE_LEAD)
+        start = (0.0, self.drain_lip - (0.24 if self.FUNNEL else 0.30),
+                 self.DISH_Z - self.CHUTE_LEAD)
         end = tuple(self.exit_local)
         rings: list[list[tuple[float, float, float]]] = []
         for step in range(self.CHUTE_STEPS + 1):
@@ -816,6 +940,7 @@ class RadialStart(StartGrid):
             "release": self.RELEASE,
             "paddle_segments": self.PADDLE_SEGMENTS,
             "drain_radius": self.DRAIN_R,
+            "throat_radius": self.THROAT_R,
             "release_time": self.release_time,
             "gate_z": round(self.gate_z, 4),
             "heights": {

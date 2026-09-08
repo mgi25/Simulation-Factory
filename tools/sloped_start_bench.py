@@ -133,10 +133,16 @@ def main(argv: list[str] | None = None) -> int:
     print("-" * len(header))
     for name in names:
         block = report["rank_span"][name]
-        print(
-            f"{name:>13}: span {block['span']:.3f} places, "
-            f"best slot {block['best_slot']}, worst slot {block['worst_slot']}"
-        )
+        if block['span'] is None:
+            # A start that delivers nothing produces no ranks at all, and a
+            # report that crashes on that is a report that cannot describe a
+            # total jam - which is exactly the case worth describing.
+            print(f"{name:>13}: no ranks - nothing reached this checkpoint")
+        else:
+            print(
+                f"{name:>13}: span {block['span']:.3f} places, "
+                f"best slot {block['best_slot']}, worst slot {block['worst_slot']}"
+            )
     if report["incomplete"]:
         print(f"incomplete trials: {report['incomplete']}")
 

@@ -1,0 +1,250 @@
+{
+  "start_kind": "radial",
+  "lift": 4.3,
+  "heights": {
+    "rest_floor": -0.32,
+    "trough_floor": -2.02,
+    "paddle_floor": -2.4041,
+    "drain_lip": -2.9204,
+    "exit_y": -4.95
+  },
+  "rest_radius": 1.305,
+  "delivery_bearings": [
+    112.5,
+    157.5,
+    202.5,
+    247.5,
+    292.5,
+    337.5,
+    22.5,
+    67.5
+  ],
+  "guides": [
+    {
+      "bay": 0,
+      "slot": 2,
+      "bearing_deg": 112.5,
+      "sweep_deg": -134.281,
+      "length": 7.8813,
+      "apron_length": 4.8339,
+      "drop": 1.7,
+      "mean_grade_deg": 12.172,
+      "min_grade_deg": 8.723,
+      "max_grade_deg": 15.534,
+      "min_curve": 0.4681,
+      "groove_margin": 0.2192,
+      "margin_at": 0.7866,
+      "bank_needed_deg": 35.36,
+      "entry_tangent_deg": 90.0,
+      "delivery_tangent_deg": 19.68,
+      "delivery_radius": 1.71,
+      "speed_at_trough": 18.425,
+      "roll_seconds": 4.3758
+    },
+    {
+      "bay": 1,
+      "slot": 3,
+      "bearing_deg": 157.5,
+      "sweep_deg": -95.464,
+      "length": 5.9997,
+      "apron_length": 2.9595,
+      "drop": 1.7,
+      "mean_grade_deg": 15.82,
+      "min_grade_deg": 8.749,
+      "max_grade_deg": 22.431,
+      "min_curve": 0.5242,
+      "groove_margin": 0.2852,
+      "margin_at": 0.7266,
+      "bank_needed_deg": 31.23,
+      "entry_tangent_deg": 90.0,
+      "delivery_tangent_deg": 64.68,
+      "delivery_radius": 1.71,
+      "speed_at_trough": 18.425,
+      "roll_seconds": 3.3844
+    },
+    {
+      "bay": 2,
+      "slot": 4,
+      "bearing_deg": 202.5,
+      "sweep_deg": -57.082,
+      "length": 4.6466,
+      "apron_length": 1.6048,
+      "drop": 1.7,
+      "mean_grade_deg": 20.095,
+      "min_grade_deg": 8.78,
+      "max_grade_deg": 29.997,
+      "min_curve": 0.2922,
+      "groove_margin": 0.1852,
+      "margin_at": 0.6732,
+      "bank_needed_deg": 37.55,
+      "entry_tangent_deg": 90.0,
+      "delivery_tangent_deg": 98.98,
+      "delivery_radius": 1.71,
+      "speed_at_trough": 18.425,
+      "roll_seconds": 2.6853
+    },
+    {
+      "bay": 3,
+      "slot": 5,
+      "bearing_deg": 247.5,
+      "sweep_deg": -18.993,
+      "length": 3.6078,
+      "apron_length": 0.5988,
+      "drop": 1.7,
+      "mean_grade_deg": 25.23,
+      "min_grade_deg": 8.819,
+      "max_grade_deg": 38.212,
+      "min_curve": 0.4926,
+      "groove_margin": 0.2184,
+      "margin_at": 0.8605,
+      "bank_needed_deg": 35.41,
+      "entry_tangent_deg": 90.0,
+      "delivery_tangent_deg": 101.46,
+      "delivery_radius": 1.71,
+      "speed_at_trough": 18.425,
+      "roll_seconds": 2.1645
+    },
+    {
+      "bay": 4,
+      "slot": 6,
+      "bearing_deg": 292.5,
+      "sweep_deg": 18.993,
+      "length": 3.6078,
+      "apron_length": 0.5988,
+      "drop": 1.7,
+      "mean_grade_deg": 25.23,
+      "min_grade_deg": 8.819,
+      "max_grade_deg": 38.212,
+      "min_curve": 0.4926,
+      "groove_margin": 0.2184,
+      "margin_at": 0.8605,
+      "bank_needed_deg": 35.41,
+      "entry_tangent_deg": 90.0,
+      "delivery_tangent_deg": 78.54,
+      "delivery_radius": 1.71,
+      "speed_at_trough": 18.425,
+      "roll_seconds": 2.1645
+    },
+    {
+      "bay": 5,
+      "slot": 7,
+      "bearing_deg": 337.5,
+      "sweep_deg": 57.082,
+      "length": 4.6466,
+      "apron_length": 1.6048,
+      "drop": 1.7,
+      "mean_grade_deg": 20.095,
+      "min_grade_deg": 8.78,
+      "max_grade_deg": 29.997,
+      "min_curve": 0.2922,
+      "groove_margin": 0.1852,
+      "margin_at": 0.6732,
+      "bank_needed_deg": 37.55,
+      "entry_tangent_deg": 90.0,
+      "delivery_tangent_deg": 81.02,
+      "delivery_radius": 1.71,
+      "speed_at_trough": 18.425,
+      "roll_seconds": 2.6853
+    },
+    {
+      "bay": 6,
+      "slot": 0,
+      "bearing_deg": 22.5,
+      "sweep_deg": 95.464,
+      "length": 5.9997,
+      "apron_length": 2.9595,
+      "drop": 1.7,
+      "mean_grade_deg": 15.82,
+      "min_grade_deg": 8.749,
+      "max_grade_deg": 22.431,
+      "min_curve": 0.5242,
+      "groove_margin": 0.2852,
+      "margin_at": 0.7266,
+      "bank_needed_deg": 31.23,
+      "entry_tangent_deg": 90.0,
+      "delivery_tangent_deg": 115.32,
+      "delivery_radius": 1.71,
+      "speed_at_trough": 18.425,
+      "roll_seconds": 3.3844
+    },
+    {
+      "bay": 7,
+      "slot": 1,
+      "bearing_deg": 67.5,
+      "sweep_deg": 134.281,
+      "length": 7.8813,
+      "apron_length": 4.8339,
+      "drop": 1.7,
+      "mean_grade_deg": 12.172,
+      "min_grade_deg": 8.723,
+      "max_grade_deg": 15.534,
+      "min_curve": 0.4681,
+      "groove_margin": 0.2192,
+      "margin_at": 0.7866,
+      "bank_needed_deg": 35.36,
+      "entry_tangent_deg": 90.0,
+      "delivery_tangent_deg": 160.32,
+      "delivery_radius": 1.71,
+      "speed_at_trough": 18.425,
+      "roll_seconds": 4.3758
+    }
+  ],
+  "spread": {
+    "length": [
+      3.6078,
+      7.8813
+    ],
+    "length_spread": 4.2735,
+    "length_ratio": 2.1845,
+    "drop_spread": 0.0,
+    "delivery_radius_spread": 0.0,
+    "rest_radius": 1.305,
+    "grade": [
+      8.723,
+      38.212
+    ],
+    "mean_grade": [
+      12.172,
+      25.23
+    ],
+    "groove_margin": 0.1852,
+    "bank_needed_deg": 37.55,
+    "worst_lane_pair": [
+      [
+        0,
+        1
+      ],
+      0.5359
+    ],
+    "worst_delivery_gap": [
+      [
+        1,
+        2
+      ],
+      0.4706
+    ],
+    "trough_rim_slack": 0.168,
+    "apron_width": 5.5701,
+    "roll_seconds": [
+      2.1645,
+      4.3758
+    ],
+    "release_margin": 1.2242
+  },
+  "exit_chute": {
+    "run": 2.9395,
+    "drop": 1.7296,
+    "grade_deg": 30.473
+  },
+  "worst_uphill_step": 0.0,
+  "lane_needed": 0.64,
+  "mesh": {
+    "vertices": 7351,
+    "triangles": 12298,
+    "findings": []
+  },
+  "findings": [
+    "guides 0 and 1 pass within 0.536, so no rib fits between them there",
+    "route 1 passes 0.471 from route 2's delivery point, closer than two marbles"
+  ]
+}
