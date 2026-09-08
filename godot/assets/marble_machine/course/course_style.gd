@@ -62,7 +62,7 @@ const AXES := ["track", "guard", "support", "env", "finish"]
 # The locked direction, applied by `--style=lock`. Named rather than inlined
 # so the report, the tool and the scene all quote the same four words.
 const LOCK := {
-	"track": "pearl", "guard": "lit", "support": "brass",
+	"track": "pearl", "guard": "cast", "support": "brass",
 	"env": "valley", "finish": "gold",
 }
 
@@ -231,6 +231,15 @@ static func _guard(palette, name: String) -> void:
 		"glass":
 			recipe = {"alpha": 0.40, "rim": 0.26, "glow": 0.0,
 				"backlight": 0.45}
+		"cast":
+			# The pick, and a combination rather than a fifth idea. `glass`
+			# gave the strongest aqua and the best thickness read; `lit` was
+			# the only one that survived being resized to phone width,
+			# because emission does not average away and a tint does. So:
+			# most of glass's pigment, a rim between the two, and enough
+			# self-emission to keep the rail on a 390-pixel frame.
+			recipe = {"alpha": 0.34, "rim": 0.32, "glow": 0.40,
+				"backlight": 0.50}
 		_:
 			push_error("course_style: unknown guard '%s'" % name)
 			return
@@ -276,41 +285,72 @@ static func _guard(palette, name: String) -> void:
 #           "not too busy".
 
 
+static func _structural(palette, hex: String,
+		roughness: float) -> StandardMaterial3D:
+	## A structural member: matte, no clearcoat, and *low specular*.
+	##
+	## The third attempt at this, and the first that worked. A pier is a
+	## vertical cylinder and the rim light rakes in from nine degrees above
+	## the horizontal with `light_specular 1.5`, so it lays a bright stripe
+	## down every leg's full length. Raising roughness made that worse rather
+	## than better - a broader lobe spreads the stripe across more of the
+	## cylinder - and dropping the clearcoat only removed the second, thinner
+	## one on top of it.
+	##
+	## `metallic_specular` is the dielectric F0 scale in Godot 4 and applies
+	## to non-metals, so it is the one dial that turns the stripe down without
+	## touching a light every other surface in the frame depends on. At 0.12
+	## a graphite member reads as graphite; the rim keeps its full strength on
+	## the pearl channel, which is what it is there for.
+	var material: StandardMaterial3D = palette.make_moulded(hex, roughness,
+		0.0)
+	material.clearcoat_enabled = false
+	material.metallic_specular = 0.12
+	return material
+
+
 static func _support(palette, name: String) -> void:
+	## Every candidate here is rough and barely lacquered, and that is the
+	## finding rather than a taste. A support is a long thin cylinder, and a
+	## clearcoat lobe on one - under a rim light carrying `light_specular
+	## 1.5` for the pearl channel's benefit - returns a single bright streak
+	## running its whole length. The first pass kept the palette's graphite
+	## gloss and every pier came back reading as a polished steel tube, on
+	## all three candidates equally. Graphite is a matte structural finish.
 	match name:
 		"base":
 			return
 		"brass":
 			palette.override("strut",
-				palette.make_moulded("#333A44", 0.44, 0.38, 0.15))
+				_structural(palette, "#333A44", 0.58))
 			palette.override("strut_deep",
-				palette.make_moulded("#181C23", 0.52, 0.28, 0.20))
+				_structural(palette, "#181C23", 0.66))
 			palette.override("strut_accent", _warm_metal(palette, "#C89A4C"))
 			palette.override("gold", _warm_metal(palette, "#D2A455"))
 			palette.override("gold_dark", _warm_metal(palette, "#A87F2E"))
 			palette.override("graphite_soft",
-				palette.make_moulded("#353C46", 0.38, 0.50, 0.12))
+				_structural(palette, "#353C46", 0.46))
 		"copper":
 			palette.override("strut",
-				palette.make_moulded("#2B323C", 0.46, 0.36, 0.16))
+				_structural(palette, "#2B323C", 0.60))
 			palette.override("strut_deep",
-				palette.make_moulded("#14181E", 0.54, 0.26, 0.21))
+				_structural(palette, "#14181E", 0.68))
 			palette.override("strut_accent", _warm_metal(palette, "#BE7A42"))
 			palette.override("gold", _warm_metal(palette, "#C98A4A"))
 			palette.override("gold_dark", _warm_metal(palette, "#9C6430"))
 			palette.override("graphite_soft",
-				palette.make_moulded("#2E353F", 0.40, 0.48, 0.13))
+				_structural(palette, "#2E353F", 0.48))
 		"mono":
 			palette.override("strut",
-				palette.make_moulded("#394252", 0.44, 0.40, 0.14))
+				_structural(palette, "#394252", 0.58))
 			palette.override("strut_deep",
-				palette.make_moulded("#171B22", 0.52, 0.28, 0.20))
+				_structural(palette, "#171B22", 0.66))
 			palette.override("strut_accent",
-				palette.make_moulded("#5B677A", 0.34, 0.60, 0.10))
+				_structural(palette, "#5B677A", 0.42))
 			palette.override("gold",
-				palette.make_moulded("#6B7788", 0.32, 0.65, 0.09))
+				_structural(palette, "#6B7788", 0.40))
 			palette.override("graphite_soft",
-				palette.make_moulded("#2F3743", 0.40, 0.48, 0.13))
+				_structural(palette, "#2F3743", 0.48))
 		_:
 			push_error("course_style: unknown support '%s'" % name)
 
@@ -336,6 +376,15 @@ static func mast_stock(opts: Dictionary) -> float:
 	## the single most debug-looking detail in the committed section frames.
 	## A mast is a member; it gets member stock.
 	return 0.10 if str(opts.get("support", "base")) == "base" else 0.145
+
+
+static func mast_foot(opts: Dictionary) -> float:
+	## Footing size for the trackside lamp masts.
+	##
+	## Held at the base value while the column thickens, which is the whole
+	## correction: the box-on-a-wire read comes from the *ratio* between the
+	## two, so scaling the footing off the column preserves it exactly.
+	return 0.62
 
 
 # --- E: environment --------------------------------------------------------
@@ -454,7 +503,12 @@ static func tune_environment(env: Environment, name: String) -> void:
 	sky_material.sun_curve = 0.22
 	sky_material.energy_multiplier = 1.0
 	sky_material.ground_bottom_color = Color("#070D18")
-	sky_material.ground_horizon_color = Color("#4E4149")
+	# The sky's *ground* half, and it matters more than the dome does. Every
+	# camera on this course is pitched down, and `fog_aerial_perspective`
+	# blends this colour into the fog over anything far away - so the pale
+	# region filling the upper third of the finish frame is largely this
+	# swatch, seen through 1400 units of haze.
+	sky_material.ground_horizon_color = Color("#2A2632")
 	env.background_energy_multiplier = 0.92
 
 	env.ambient_light_energy = 0.46
@@ -466,16 +520,30 @@ static func tune_environment(env: Environment, name: String) -> void:
 	# mountainside evenly. The colour is the important change: `#5E5A6E` is a
 	# desaturated mauve, and a mauve haze over a blue mountain is the whole
 	# muddy cast on the committed frames.
-	env.fog_light_color = Color("#3E5B7A" if name != "warm"
-		else "#6B5A62")
-	env.fog_light_energy = 0.62
-	env.fog_sun_scatter = 0.66
+	# Dark, and that is the point. Aerial perspective blends a distant
+	# surface toward the fog's own lit colour, and the terrain fades to a
+	# valley floor at y -82 that runs to the horizon - so at 0.62 energy and
+	# 0.80 aerial the upper third of every low camera's frame is that floor
+	# washed to pale grey. It is the "empty pale sheet" behind the finish
+	# arena on the committed frames, and it is not the sky: at elevation 21
+	# with a 34-degree lens there is no sky in that shot at all.
+	env.fog_light_color = Color("#2F4A66" if name != "warm"
+		else "#5A4A54")
+	env.fog_light_energy = 0.30
+	# 0.14, against the 0.52 this branch inherited. `fog_sun_scatter` adds
+	# every directional light's colour into the fog along the view ray, and
+	# this rig has six of them at energies 1.2 to 2.7 - so the term is
+	# multiplied six times over. That, and not the fog colour or the sky, is
+	# why the far valley floor renders as a bright pale sheet however dark
+	# the fog is set: at 1400 units the fog is 93% opaque and almost all of
+	# what it carries is scattered key light.
+	env.fog_sun_scatter = 0.14
 	env.fog_density = 0.0019
 	# The near-camera haze wall was the worst artefact in the finish frame:
 	# at 0.30 sky affect the sky behind a close-up subject resolves to one
 	# flat pale sheet and half the picture is empty grey.
 	env.fog_sky_affect = 0.22
-	env.fog_aerial_perspective = 0.80
+	env.fog_aerial_perspective = 0.62
 	env.fog_height = -26.0
 	env.fog_height_density = 0.030
 
@@ -773,11 +841,15 @@ static func _finish(palette, name: String) -> void:
 			return
 		"gold":
 			palette.override("lit_gold_wash",
-				palette.make_emissive("#FFC062", 2.1, 0.40))
+				palette.make_emissive("#FFC062", 2.4, 0.36))
 			palette.override("lit_gold_line",
 				palette.make_emissive("#FFD98C", 8.0, 0.24))
-			palette.override("sign_face",
-				palette.make_emissive("#FFDA96", 1.30, 0.26))
+			# `sign_face` is deliberately NOT touched here. It reads as the
+			# finish arena's sign and it is not: `course_finish` lights its
+			# own face with `lit_gold_wash`, and the only user of
+			# `sign_face` in the whole course is the START gantry
+			# (`course_modules.start`). Warming it turned the start sign
+			# gold, which inverts the one thing the zone story is for.
 			# The checker is two moulded tiles rather than a texture, so its
 			# contrast is a material decision. Under a gold wash the shipped
 			# pair converge; the light tile goes warmer and the dark one goes
@@ -787,16 +859,14 @@ static func _finish(palette, name: String) -> void:
 			palette.override("checker_dark",
 				palette.make_moulded("#0D1014", 0.34, 0.58, 0.13))
 			palette.override("pearl_warm",
-				palette.make_moulded("#E3DBCA", 0.28, 0.80, 0.06))
+				palette.make_moulded("#D6CDB8", 0.31, 0.70, 0.08))
 			palette.override("pearl_warm_shade",
-				palette.make_moulded("#BCB19A", 0.36, 0.50, 0.13))
+				palette.make_moulded("#ADA189", 0.38, 0.44, 0.15))
 		"contrast":
 			palette.override("lit_gold_wash",
 				palette.make_emissive("#FFC569", 2.0, 0.40))
 			palette.override("lit_gold_line",
 				palette.make_emissive("#FFD98C", 8.0, 0.24))
-			palette.override("sign_face",
-				palette.make_emissive("#FFDA96", 1.30, 0.26))
 			palette.override("checker_light",
 				palette.make_moulded("#E6E7E2", 0.22, 0.88, 0.055))
 			palette.override("checker_dark",

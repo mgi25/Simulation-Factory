@@ -44,6 +44,18 @@ static var SHOTS := {
 		"elevation": 10.0, "bearing": 16.0},
 	"obstacle": {"at": ["node", "obstacle"], "extent": 9.5, "fov": 34.0,
 		"elevation": 14.0, "bearing": 44.0},
+	# Added for the style lock, and additive: a lens whose whole job is to
+	# photograph the cross-section. Every other shot in this table is framed
+	# on a race moment, and at a bearing of sixteen to forty-four degrees the
+	# surface facing the camera is the channel's *outer shell wall* - so a
+	# comparison of running-surface materials made from any of them is a
+	# comparison of the one surface that never changes. High and well off the
+	# axis, this one sees into the cradle, across the lip, along the guard and
+	# under the keel at once.
+	"material": {"at": ["path", "leg2", 0.46], "extent": 6.6, "fov": 32.0,
+		"elevation": 25.0, "bearing": 58.0},
+	"underside": {"at": ["path", "leg1", 0.52], "extent": 9.0, "fov": 32.0,
+		"elevation": -4.0, "bearing": 74.0},
 	"split": {"at": ["node", "split"], "extent": 15.0, "fov": 34.0,
 		"elevation": 17.0, "bearing": 24.0},
 	"merge": {"at": ["node", "merge"], "extent": 14.0, "fov": 34.0,
@@ -138,6 +150,7 @@ func _ready() -> void:
 	_course = Machine.build(_palette, _layout, {
 		"detail": str(options.get("detail", "block")),
 		"mast_stock": Style.mast_stock(_style),
+		"mast_foot": Style.mast_foot(_style),
 	})
 	add_child(_course)
 	# After the build, because the ground is authored on the world layer and

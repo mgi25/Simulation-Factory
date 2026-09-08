@@ -61,7 +61,7 @@ CONCEPT_HERO_FRACTION = 0.335
 
 # Kept in step with `course_style.LOCK`. Asserted against the scene's own
 # report on every render, so the two cannot drift apart silently.
-LOCK = {"track": "pearl", "guard": "lit", "support": "brass",
+LOCK = {"track": "pearl", "guard": "cast", "support": "brass",
         "env": "valley", "finish": "gold"}
 
 # One axis, the shot that shows it, and the candidates in the order a sheet
@@ -73,7 +73,17 @@ LOCK = {"track": "pearl", "guard": "lit", "support": "brass",
 # on the final run. Each axis is photographed where it lives.
 AXES = {
     "track": {
-        "shot": "long_track",
+        # Two lenses, and neither is a race framing. `descent` is the only
+        # shot on this course that looks down *into* the cradle with racers
+        # sitting in it, which is where a running surface is either working
+        # or not; `material` is a close section, added for this sheet, that
+        # shows the value ladder across shell, lip, band and keel at once.
+        # The first version of this sheet used `long_track`, whose bearing
+        # of sixteen degrees shows the channel's *outer shell wall* - the one
+        # surface none of these candidates change - and all four panels came
+        # back indistinguishable.
+        "shot": "descent",
+        "second": "material",
         "options": ["base", "pearl", "silver", "fascia"],
         "labels": {
             "base": "BASE  shipped pearl",
@@ -86,12 +96,13 @@ AXES = {
     },
     "guard": {
         "shot": "descent",
-        "options": ["base", "tint", "lit", "glass"],
+        "options": ["base", "tint", "lit", "glass", "cast"],
         "labels": {
             "base": "BASE  12% aqua tint",
             "tint": "TINT  30% + frosted edge",
             "lit": "LIT  22% + self-emission",
             "glass": "GLASS  40% cast",
+            "cast": "CAST  34% + 0.40 emission  (PICK)",
         },
         "title": "GUARD SYSTEM",
         "file": "guard_candidates.png",
@@ -329,6 +340,10 @@ NOTES = {
     ("guard", "glass"):
         "40% and almost no rim. Reads as thick cast glass and darkens the "
         "channel it is standing on.",
+    ("guard", "cast"):
+        "34% pigment, a 0.32 rim and 0.40 self-emission: glass's pigment and "
+        "lit's survival at phone width, which no single candidate had both "
+        "of. The lock.",
     ("support", "base"):
         "Graphite #2A2E35 with metal caps. Metal reflects an unlit sky, so "
         "every warm accent renders dull olive; the piers are hairlines.",
@@ -369,22 +384,37 @@ NOTES = {
 
 
 def axis_sheet(godot: str, axis: str) -> str:
+    """One sheet: the axis swept, every other axis held at the lock."""
     spec = AXES[axis]
-    shot = str(spec["shot"])
-    panels = []
+    shots = tuple(s for s in (spec["shot"], spec.get("second")) if s)
+    panels: list[Image.Image] = []
+    seconds: list[Image.Image] = []
     for value in spec["options"]:
         out_dir = os.path.join(FRAMES, f"{axis}_{value}")
-        render(godot, out_dir, (shot,), style_of(axis, value), PANEL)
+        render(godot, out_dir, shots, style_of(axis, value), PANEL)
         panels.append(_panel(
-            Image.open(os.path.join(out_dir, f"{shot}.png")),
+            Image.open(os.path.join(out_dir, f"{shots[0]}.png")),
             str(spec["labels"][value]), NOTES.get((axis, value), ""),
             PANEL[1]))
+        if len(shots) > 1:
+            # A landscape band out of the middle of the second frame, so the
+            # lower row is the same total width as the upper one and the four
+            # candidates still line up column for column.
+            full = Image.open(os.path.join(out_dir, f"{shots[1]}.png"))
+            band = full.crop((0, int(full.height * 0.30), full.width,
+                              int(full.height * 0.74)))
+            seconds.append(_panel(
+                band, str(spec["labels"][value]).split("  ")[0], "",
+                band.height))
+
     destination = os.path.join(OUT, str(spec["file"]))
-    subtitle = (f"one axis varied, the other four held at the lock "
-                f"({', '.join(f'{a}={v}' for a, v in LOCK.items() if a != axis)})"
-                f".  shot: {shot}")
-    _row(panels, 16, f"{spec['title']}  —  CANDIDATES", subtitle) \
-        .save(destination)
+    held = ", ".join(f"{a}={v}" for a, v in LOCK.items() if a != axis)
+    subtitle = (f"one axis varied, the other four held at the lock ({held})."
+                f"  shot: {' + '.join(shots)}")
+    top = _row(panels, 16, str(spec["title"]) + "  —  CANDIDATES",
+               subtitle)
+    sheet = _stack([top, _row(seconds, 16)]) if seconds else top
+    sheet.save(destination)
     print(f"  sheet -> {destination}")
     return destination
 
@@ -398,8 +428,12 @@ def board(godot: str) -> None:
     panels = [_panel(Image.open(os.path.join(out_dir, f"{shot}.png")),
                      label, "", 1180)
               for shot, label in zip(BOARD_SHOTS, BOARD_LABELS)]
-    subtitle = ("track=pearl  guard=lit  support=brass  env=valley  "
-                "finish=gold  —  layout B, 1080x1920, glow on")
+    # Derived, never typed. The first board went out labelled `guard=lit`
+    # after the lock had moved to `cast`, which is exactly the kind of wrong
+    # caption a reviewer has no way to catch.
+    subtitle = ("  ".join(f"{a}={v}" for a, v in LOCK.items())
+                + f"  —  layout {LAYOUT.upper()}, {FULL[0]}x{FULL[1]},"
+                  " glow on")
     _row(panels, 18, "SLOPED COURSE  —  LOCKED STYLE", subtitle) \
         .save(os.path.join(OUT, "final_style_board.png"))
     print(f"  board -> {os.path.join(OUT, 'final_style_board.png')}")
@@ -435,13 +469,10 @@ def _target_comparison(hero: str) -> None:
 def _phone_check(out_dir: str) -> None:
     """Mandatory: the five readability questions, at 390 CSS pixels."""
     checks = [
-        ("hero", "WHOLE COURSE  390px",
-         "does the route read, and does the environment add beauty rather "
-         "than clutter?"),
-        ("long_track", "TRACK  390px",
-         "channel, guard, running surface and racers separable at width?"),
-        ("split", "SPLIT  390px", "is the blue/orange choice obvious?"),
-        ("finish", "FINISH  390px", "is the gold zone clearly the finish?"),
+        ("hero", "WHOLE COURSE  390px", "route legible? environment adding?"),
+        ("long_track", "TRACK  390px", "channel / guard / band / racer?"),
+        ("split", "SPLIT  390px", "blue against orange?"),
+        ("finish", "FINISH  390px", "gold zone unmistakable?"),
     ]
     panels = []
     for shot, heading, note in checks:
@@ -481,16 +512,23 @@ def palette_sheet() -> None:
 
     swatch = 116
     gap = 10
-    label_h = 62
     columns = 5
     rows = (len(groups) + columns - 1) // columns
-    tallest = max(len(g["swatches"]) for g in groups)
     col_w = swatch + 200
     head = 128
-    zone_h = 44 + tallest * (swatch // 2 + 8) + 18
+    step = swatch // 2 + 4
+
+    # Row heights are per row, not one global maximum. With a global one the
+    # five-swatch top row is padded out to the seven-swatch bottom row's
+    # height and the sheet carries 150 pixels of dead band across its middle.
+    row_h = []
+    for row in range(rows):
+        block = groups[row * columns:(row + 1) * columns]
+        row_h.append(44 + max(len(g["swatches"]) for g in block) * step + 26)
+    row_y = [head + sum(row_h[:r]) for r in range(rows)]
 
     width = columns * col_w + (columns + 1) * gap
-    height = head + rows * (zone_h + 24) + 150
+    height = row_y[-1] + row_h[-1] + 168
     sheet = Image.new("RGB", (width, height), INK)
     draw = ImageDraw.Draw(sheet)
     draw.text((gap + 6, 20), "FINAL PALETTE  —  SLOPED RACE COURSE",
@@ -502,7 +540,7 @@ def palette_sheet() -> None:
 
     for index, group in enumerate(groups):
         cx = gap + (index % columns) * (col_w + gap)
-        cy = head + (index // columns) * (zone_h + 24)
+        cy = row_y[index // columns]
         draw.text((cx + 4, cy), str(group["zone"]), font=_font(24),
                   fill=(150, 214, 246))
         y = cy + 38
@@ -531,9 +569,9 @@ def palette_sheet() -> None:
                 detail += f"  r{entry['roughness']:.2f}"
             draw.text((cx + box + 16, y + 25), detail, font=_font(17, False),
                       fill=DIM)
-            y += box + 4
+            y += step
 
-    fy = head + rows * (zone_h + 24) + 16
+    fy = row_y[-1] + row_h[-1] + 8
     draw.text((gap + 6, fy), "THE FIELD  —  EIGHT RACERS",
               font=_font(24), fill=(150, 214, 246))
     for index, colour in enumerate(data["field"]):

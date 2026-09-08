@@ -28,7 +28,8 @@ static func build(root: Node3D, palette, cfg: Dictionary, centreline: Array,
 	group.name = "Dressing"
 	root.add_child(group)
 	_lamps(group, palette, cfg, centreline,
-		float(options.get("mast_stock", 0.10)))
+		float(options.get("mast_stock", 0.10)),
+		float(options.get("mast_foot", 0.62)))
 	_scrub(group, palette, cfg, centreline)
 	_pylons(group, palette, cfg)
 	_valley(group, palette, cfg)
@@ -40,7 +41,7 @@ static func build(root: Node3D, palette, cfg: Dictionary, centreline: Array,
 
 
 static func _lamps(root: Node3D, palette, cfg: Dictionary,
-		centreline: Array, stock := 0.10) -> void:
+		centreline: Array, stock := 0.10, foot_span := 0.62) -> void:
 	## Masts along the course, leaning out over the drop.
 	##
 	## The single most valuable item in this file. A track on stilts reads as a
@@ -88,8 +89,13 @@ static func _lamps(root: Node3D, palette, cfg: Dictionary,
 			Geometry.tube([Vector3.ZERO, Vector3(0.0, height, 0.0)], stock, 8),
 			palette.get_material("graphite"), "Column", false)
 		mast.add_child(column)
+		# `foot_span` is its own parameter and not a multiple of `stock`.
+		# Scaling the foot off the column keeps the very proportion that made
+		# the pair read as a box hanging on a wire - the foot has to shrink
+		# *relative* to the column, not grow with it - and a multiple also
+		# changes the default build, which has to keep reproducing exactly.
 		var foot := Forms.mesh_node(
-			Geometry.rounded_box(Vector3(stock * 6.2, 0.34, stock * 6.2),
+			Geometry.rounded_box(Vector3(foot_span, 0.34, foot_span),
 				0.10, 2),
 			palette.get_material("graphite_deep"), "Foot", false)
 		foot.position = Vector3(0.0, 0.10, 0.0)

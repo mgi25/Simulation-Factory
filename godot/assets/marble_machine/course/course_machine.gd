@@ -143,8 +143,9 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 		int(options.get("pebbles", 110)), centreline, 3.1, 0.34)
 	if detail != "block":
 		Dressing.build(root, palette, terrain_cfg, centreline,
-			table["nodes"], {"mast_stock": float(
-				options.get("mast_stock", 0.10))})
+			table["nodes"], {
+				"mast_stock": float(options.get("mast_stock", 0.10)),
+				"mast_foot": float(options.get("mast_foot", 0.62))})
 
 	root.set_meta("metrics", _metrics(table, total_length, clearances,
 		centreline))
