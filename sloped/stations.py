@@ -116,6 +116,13 @@ class StartGrid(MarbleModule):
     way it does on the real sample.
     """
 
+    # Which name in `sloped.course.start_module` builds this class. Declared on
+    # the class rather than inferred from its name, so `sloped.startlab` can
+    # assert that the kind a plan *asked* for is the kind it *got*: the V1.4
+    # session shipped a 300-seed "fan" baseline that was a basin, because a
+    # plan's `start_kind` defaulted and nothing compared the two.
+    START_KIND = "fan"
+
     SAMPLES = 40
     FIN_RADIUS = 0.055          # the asset's round stock
     FIN_END = 0.50              # the fraction of the fan the dividers cover

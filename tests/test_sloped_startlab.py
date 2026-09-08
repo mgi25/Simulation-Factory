@@ -113,6 +113,7 @@ def test_summarise_reports_a_span_per_checkpoint_and_a_row_per_slot():
 
     results = [
         TrialResult(
+            start_kind="fan",
             seed=seed,
             seconds=0.0,
             slot_of={marble: marble for marble in range(8)},
@@ -129,6 +130,7 @@ def test_summarise_reports_a_span_per_checkpoint_and_a_row_per_slot():
         for seed in range(3)
     ]
     report = summarise(results)
+    assert report["start_kind"] == "fan"
     assert report["trials"] == 3
     assert report["racers"] == 24
     assert len(report["slots"]) == 8

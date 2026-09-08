@@ -61,6 +61,8 @@ __all__ = [
     "StartPlan",
     "V1_PLAN",
     "SHIPPED_PLAN",
+    "BENCH_PLANS",
+    "bench_plan",
     "start_machine",
     "SlotRow",
     "TrialResult",
@@ -116,8 +118,16 @@ class StartPlan:
     # The launch's width profile, as (factor, hold to sample, blended by
     # sample) - the wide mixing stretch. See `sloped.track.TrackRun`.
     launch_width: tuple[float, int, int] | None = None
-    # "basin", "fan" or "radial"; see `sloped.course.START_KIND`.
-    start_kind: str = "basin"
+    # Which start topology this plan builds: see `sloped.course.START_KINDS`.
+    #
+    # **There is deliberately no default.** V1.4 recorded a 300-seed "fan"
+    # start baseline that was really the basin's, because this field defaulted
+    # to `"basin"` while `sloped.course.START_KIND` said `"fan"`, and a basin
+    # ignores every other field on this plan - fins, stagger, deflectors, the
+    # tray, the fall profile, the launch width. So a plan that does not say
+    # which topology it is is not a comparable plan, and `__post_init__`
+    # refuses to build one.
+    start_kind: str | None = None
     # Whether the radial start's port ring holds the field for a synchronised
     # release. False measures the passive architecture, which is what section 7
     # of the V1.4 brief asks to be tried first.
@@ -126,6 +136,18 @@ class StartPlan:
     island: tuple[float, float, float] | None = None
     # Paddle wheels, as (run name, sample, rate in rad/s). One wheel each.
     wheels: tuple[tuple[str, int, float], ...] = ()
+
+    def __post_init__(self) -> None:
+        if self.start_kind is None:
+            raise ValueError(
+                f"plan {self.name!r} does not declare a start_kind; pass one of "
+                f"{_course.START_KINDS} explicitly - see the field's comment"
+            )
+        if self.start_kind not in _course.START_KINDS:
+            raise ValueError(
+                f"plan {self.name!r} names start_kind {self.start_kind!r}, "
+                f"which is not one of {_course.START_KINDS}"
+            )
 
     def describe(self) -> dict[str, Any]:
         return {
@@ -149,13 +171,34 @@ class StartPlan:
 # every candidate against it - and not as anything the course still builds.
 V1_PLAN = StartPlan(name="v1", start_kind="fan")
 
-# What `sloped.course` builds. Read from the course's own constants rather than
-# retyped, so the lab cannot drift away from the thing it is measuring.
-SHIPPED_PLAN = StartPlan(
-    name="shipped",
-    mixers=(("launch", _course.MIXER_SAMPLE, Mixer.PIN_HEIGHT),),
-    wheels=(("launch", _course.SHUFFLE_SAMPLE, _course.SHUFFLE_RATE),),
-)
+
+def bench_plan(kind: str, name: str | None = None) -> StartPlan:
+    """One start topology behind the shipped downstream, for a start-only A/B.
+
+    The mixer and the shuffle wheel are the course's own, on the course's own
+    samples, so the *only* difference between `bench_plan("fan")` and
+    `bench_plan("radial")` is the start module. A comparison where the
+    downstream also moved is not a comparison of starts, and this is the one
+    constructor the benchmarks use so that cannot drift.
+    """
+    return StartPlan(
+        name=name or kind,
+        start_kind=kind,
+        mixers=(("launch", _course.MIXER_SAMPLE, Mixer.PIN_HEIGHT),),
+        wheels=(("launch", _course.SHUFFLE_SAMPLE, _course.SHUFFLE_RATE),),
+    )
+
+
+# One per topology, named the way every report names them. `tools/
+# sloped_start_bench.py` takes the kind on the command line and looks it up
+# here, so a recorded run always says which of the three it measured.
+BENCH_PLANS = {kind: bench_plan(kind) for kind in _course.START_KINDS}
+
+# What `sloped.course` actually builds - read from the course's own
+# `START_KIND` rather than retyped, so the lab cannot drift away from the thing
+# it is measuring. This is the field whose silent default cost V1.4 a
+# mislabelled 300-seed baseline.
+SHIPPED_PLAN = bench_plan(_course.START_KIND, name="shipped")
 
 
 def start_machine(config: CoreConfig | None = None, plan: StartPlan | None = None) -> Machine:
@@ -191,28 +234,35 @@ def start_machine(config: CoreConfig | None = None, plan: StartPlan | None = Non
     if plan.launch_width is None:
         front_half = None
     if plan.start_kind == "radial":
-        machine.add(
-            RadialStart("start", runs["launch"], port_gate=plan.port_gate), Transform()
-        )
+        start = RadialStart("start", runs["launch"], port_gate=plan.port_gate)
     elif plan.start_kind == "basin":
-        basin = StartBasin("start", runs["launch"])
+        start = StartBasin("start", runs["launch"])
         if plan.island is not None:
-            basin.ISLAND_R, basin.ISLAND_Z, basin.ISLAND_RISE = plan.island
-        machine.add(basin, Transform())
-    else:
-        machine.add(
-            StartGrid(
-                "start",
-                runs["launch"],
-                fin_schedule=plan.fins,
-                bay_stagger=plan.stagger,
-                deflectors=plan.deflectors,
-                tray=plan.tray,
-                fall_profile=plan.fall_profile,
-                front_half=front_half,
-            ),
-            Transform(),
+            start.ISLAND_R, start.ISLAND_Z, start.ISLAND_RISE = plan.island
+    elif plan.start_kind == "fan":
+        start = StartGrid(
+            "start",
+            runs["launch"],
+            fin_schedule=plan.fins,
+            bay_stagger=plan.stagger,
+            deflectors=plan.deflectors,
+            tray=plan.tray,
+            fall_profile=plan.fall_profile,
+            front_half=front_half,
         )
+    else:                                            # pragma: no cover - guarded
+        raise ValueError(f"unknown start_kind {plan.start_kind!r}")
+    # **The built module is asked what it is.** `StartPlan.__post_init__` has
+    # already refused an undeclared kind and `sloped.course.start_module`
+    # checks its own table; this is the third gate, on the branch the lab
+    # actually takes, and it is the one that would have caught V1.4's
+    # mislabelled baseline at the moment the machine was built.
+    if start.START_KIND != plan.start_kind:
+        raise AssertionError(
+            f"plan {plan.name!r} asked for start_kind {plan.start_kind!r} and "
+            f"got a {type(start).__name__}, which declares {start.START_KIND!r}"
+        )
+    machine.add(start, Transform())
     machine.add(runs["launch"], Transform())
     for order, row in enumerate(plan.mixers):
         run_name, sample, height = row[0], row[1], row[2]
@@ -243,6 +293,9 @@ def start_machine(config: CoreConfig | None = None, plan: StartPlan | None = Non
     machine.add(runs["leg1"], Transform())
     machine.plan = plan                                   # type: ignore[attr-defined]
     machine.runs = runs                                   # type: ignore[attr-defined]
+    # Read off the module rather than off the plan, so anything downstream that
+    # reports a start kind is reporting what was *instantiated*.
+    machine.start_kind = start.START_KIND                 # type: ignore[attr-defined]
     return machine
 
 
@@ -297,6 +350,10 @@ class SlotRow:
 
 @dataclass
 class TrialResult:
+    # Which start topology produced this trial, read off the instantiated
+    # module. Carried per trial rather than per batch so `summarise` can refuse
+    # to average two topologies together.
+    start_kind: str
     seed: int
     seconds: float
     slot_of: dict[int, int]
@@ -337,6 +394,9 @@ class StartTrial:
         from marble3d.simulation import MarbleSimulation
 
         self.sim = MarbleSimulation(machine, config, seed, marble_count)
+        self.start_kind: str = getattr(machine, "start_kind", None) or machine.modules[
+            "start"
+        ].START_KIND
         self.runs: dict[str, TrackRun] = machine.runs      # type: ignore[attr-defined]
         self.offsets: dict[str, float] = {}
         total = 0.0
@@ -521,6 +581,7 @@ class StartTrial:
         by_tick = sorted(self._left_start, key=lambda mid: self._left_start[mid])
         exit_order = {mid: place for place, mid in enumerate(by_tick, start=1)}
         return TrialResult(
+            start_kind=self.start_kind,
             seed=self.sim.seed,
             seconds=seconds,
             slot_of=dict(self.slot_of),
@@ -569,7 +630,11 @@ def run_trial(
         trial.sim.close()
 
 
-def summarise(results: Sequence[TrialResult], slots: int = layout.BAYS) -> dict[str, Any]:
+def summarise(
+    results: Sequence[TrialResult],
+    slots: int = layout.BAYS,
+    expect_kind: str | None = None,
+) -> dict[str, Any]:
     """Slot rows, and the numbers that decide whether the start is fair.
 
     The full-race win-rate ratio the brief's target is written against can only
@@ -577,7 +642,23 @@ def summarise(results: Sequence[TrialResult], slots: int = layout.BAYS) -> dict[
     visible in: the *span* of mean rank across the eight slots, in places. A
     fair start's span is zero and a start that fully determines the early order
     has a span of seven; the V1 course's 9% checkpoint spanned 3.61.
+
+    Every report carries `start_kind`, and a batch that mixes two topologies is
+    an error rather than an average. `expect_kind` is what the caller *asked*
+    for; passing it makes this the last of the four gates between a named start
+    and a recorded number.
     """
+    kinds = sorted({result.start_kind for result in results})
+    if len(kinds) > 1:
+        raise ValueError(
+            f"cannot summarise a batch that mixes start kinds {kinds}: a slot "
+            f"table averaged over two topologies is not a measurement of either"
+        )
+    kind = kinds[0] if kinds else expect_kind
+    if expect_kind is not None and kinds and kind != expect_kind:
+        raise AssertionError(
+            f"asked to summarise {expect_kind!r} trials and got {kind!r}"
+        )
     rows = {slot: SlotRow(slot=slot) for slot in range(slots)}
     incomplete = 0
     for result in results:
@@ -628,6 +709,7 @@ def summarise(results: Sequence[TrialResult], slots: int = layout.BAYS) -> dict[
     first = LAB_CHECKPOINTS[0][0]
     last = LAB_CHECKPOINTS[-1][0]
     return {
+        "start_kind": kind,
         "trials": len(results),
         "incomplete": incomplete,
         "racers": trials_total,

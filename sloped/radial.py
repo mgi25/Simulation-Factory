@@ -109,6 +109,8 @@ class RadialStart(StartGrid):
     changes is everything downstream of the shelf.
     """
 
+    START_KIND = "radial"
+
     # --- the shelf, which is also the fan --------------------------------
     #
     # It reaches further back than the drawn pod's groove because the ridges

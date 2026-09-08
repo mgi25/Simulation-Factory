@@ -91,6 +91,8 @@ class StartBasin(StartGrid):
     shelf.
     """
 
+    START_KIND = "basin"
+
     # --- the shelf the field waits on -----------------------------------
     #
     # Flat and full width, rather than the fan's taper. The bays rest at

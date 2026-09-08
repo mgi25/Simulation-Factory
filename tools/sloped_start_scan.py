@@ -94,61 +94,70 @@ def _rows(marks, counts, height, span=0.72):
     return tuple(out)
 
 
+# **Every candidate declares its `start_kind`, and forty-five of these say
+# `"fan"` because that is what they are.** `fins`, `stagger`, `deflectors`,
+# `tray`, `fall_profile` and `launch_width` are all `StartGrid` fields, and a
+# `StartBasin` ignores every one of them - so between the commit that added
+# `start_kind` (defaulting to `"basin"`) and this one, re-running any of these
+# would have built forty-five identical plain basins under forty-five
+# different names. The numbers quoted in the comments below were measured
+# before that field existed, on the fan, and remain the fan's; a re-run now
+# builds the fan again because the kind is written down.
 CANDIDATES: dict[str, StartPlan] = {
     "v1": StartPlan(name="v1", start_kind="fan"),
     # One row of studs moved from leg1 to the launch's own entry, where the
     # field is still a clump. No new geometry at all.
-    "mix-launch": StartPlan(name="mix-launch", mixers=(("launch", 5, 0.07),)),
+    "mix-launch": StartPlan(name="mix-launch", start_kind="fan", mixers=(("launch", 5, 0.07),)),
     "mix-both": StartPlan(
-        name="mix-both", mixers=(("leg1", -1, 0.07), ("launch", 5, 0.07))
+        name="mix-both", start_kind="fan", mixers=(("leg1", -1, 0.07), ("launch", 5, 0.07))
     ),
     # The stagger family. Every one of these scored worse than V1; kept so the
     # scan can be re-run against them rather than re-derived.
-    "stagger-15": StartPlan(name="stagger-15", stagger=_stagger(0.15)),
-    "stagger-30": StartPlan(name="stagger-30", stagger=_stagger(0.30)),
-    "stagger-45": StartPlan(name="stagger-45", stagger=_stagger(0.45)),
-    "stagger-60": StartPlan(name="stagger-60", stagger=_stagger(0.60)),
+    "stagger-15": StartPlan(name="stagger-15", start_kind="fan", stagger=_stagger(0.15)),
+    "stagger-30": StartPlan(name="stagger-30", start_kind="fan", stagger=_stagger(0.30)),
+    "stagger-45": StartPlan(name="stagger-45", start_kind="fan", stagger=_stagger(0.45)),
+    "stagger-60": StartPlan(name="stagger-60", start_kind="fan", stagger=_stagger(0.60)),
     # A merge tree in the fins: the four single-lane dividers stop where a lane
     # first narrows below a marble, the two that bound a merged pair run on,
     # and the centre one runs longest.
-    "tree": StartPlan(name="tree", fins=(0.30, 0.70, 0.30, 0.92, 0.30, 0.70, 0.30)),
-    "fins-long": StartPlan(name="fins-long", fins=(0.65,) * 7),
-    "fins-short": StartPlan(name="fins-short", fins=(0.30,) * 7),
+    "tree": StartPlan(name="tree", start_kind="fan", fins=(0.30, 0.70, 0.30, 0.92, 0.30, 0.70, 0.30)),
+    "fins-long": StartPlan(name="fins-long", start_kind="fan", fins=(0.65,) * 7),
+    "fins-short": StartPlan(name="fins-short", start_kind="fan", fins=(0.30,) * 7),
     # --- deflectors in the fan's second half, on top of mix-launch ---------
     #
     # Three staggered rows between FIN_END and the seam, which is the stretch
     # the measurement blames. The heights bracket what a marble at 8 to 11 wu/s
     # can be turned by without being levered over a 1.40 wall.
     "defl-3x10": StartPlan(
-        name="defl-3x10",
+        name="defl-3x10", start_kind="fan",
         mixers=(("launch", 5, 0.07),),
         deflectors=_rows((0.58, 0.70, 0.82), (4, 3, 4), 0.10),
     ),
     "defl-3x16": StartPlan(
-        name="defl-3x16",
+        name="defl-3x16", start_kind="fan",
         mixers=(("launch", 5, 0.07),),
         deflectors=_rows((0.58, 0.70, 0.82), (4, 3, 4), 0.16),
     ),
     "defl-3x22": StartPlan(
-        name="defl-3x22",
+        name="defl-3x22", start_kind="fan",
         mixers=(("launch", 5, 0.07),),
         deflectors=_rows((0.58, 0.70, 0.82), (4, 3, 4), 0.22),
     ),
     # Five rows over a longer stretch, starting earlier - a longer shared
     # mixing tray rather than a denser one.
     "defl-5x16": StartPlan(
-        name="defl-5x16",
+        name="defl-5x16", start_kind="fan",
         mixers=(("launch", 5, 0.07),),
         deflectors=_rows((0.52, 0.62, 0.72, 0.82, 0.92), (4, 3, 4, 3, 4), 0.16),
     ),
     # Studs on the launch's own first samples instead of in the trough, where
     # the field is one channel-width long and still only at 13 wu/s.
     "mix-launch-3row": StartPlan(
-        name="mix-launch-3row",
+        name="mix-launch-3row", start_kind="fan",
         mixers=(("launch", 4, 0.10), ("launch", 10, 0.10), ("launch", 16, 0.10)),
     ),
     "mix-launch-tall": StartPlan(
-        name="mix-launch-tall", mixers=(("launch", 5, 0.14), ("launch", 12, 0.14))
+        name="mix-launch-tall", start_kind="fan", mixers=(("launch", 5, 0.14), ("launch", 12, 0.14))
     ),
     # --- a paddle wheel at the launch entry --------------------------------
     #
@@ -165,19 +174,19 @@ CANDIDATES: dict[str, StartPlan] = {
     # every 1.571/rate seconds, against the 0.32 s spread to be undone: 3.6
     # gives 0.44 s, 6.0 gives 0.26, 9.0 gives 0.17.
     "wheel-3.6": StartPlan(
-        name="wheel-3.6", mixers=(("launch", 5, 0.07),), wheels=(("launch", 12, 3.6),)
+        name="wheel-3.6", start_kind="fan", mixers=(("launch", 5, 0.07),), wheels=(("launch", 12, 3.6),)
     ),
     "wheel-6.0": StartPlan(
-        name="wheel-6.0", mixers=(("launch", 5, 0.07),), wheels=(("launch", 12, 6.0),)
+        name="wheel-6.0", start_kind="fan", mixers=(("launch", 5, 0.07),), wheels=(("launch", 12, 6.0),)
     ),
     "wheel-9.0": StartPlan(
-        name="wheel-9.0", mixers=(("launch", 5, 0.07),), wheels=(("launch", 12, 9.0),)
+        name="wheel-9.0", start_kind="fan", mixers=(("launch", 5, 0.07),), wheels=(("launch", 12, 9.0),)
     ),
     "wheel-6.0-early": StartPlan(
-        name="wheel-6.0-early", mixers=(("launch", 5, 0.07),), wheels=(("launch", 7, 6.0),)
+        name="wheel-6.0-early", start_kind="fan", mixers=(("launch", 5, 0.07),), wheels=(("launch", 7, 6.0),)
     ),
     "wheel-2x6": StartPlan(
-        name="wheel-2x6",
+        name="wheel-2x6", start_kind="fan",
         mixers=(("launch", 5, 0.07),),
         wheels=(("launch", 10, 6.0), ("launch", 20, -6.0)),
     ),
@@ -188,23 +197,23 @@ CANDIDATES: dict[str, StartPlan] = {
     # losses at 0.56% against 16.31%. Earlier is better because the field is
     # tighter and slower there, so this scans the sample and the rate around it.
     "wheel-e4-6.0": StartPlan(
-        name="wheel-e4-6.0", mixers=(("launch", 12, 0.07),), wheels=(("launch", 4, 6.0),)
+        name="wheel-e4-6.0", start_kind="fan", mixers=(("launch", 12, 0.07),), wheels=(("launch", 4, 6.0),)
     ),
     "wheel-e7-4.5": StartPlan(
-        name="wheel-e7-4.5", mixers=(("launch", 14, 0.07),), wheels=(("launch", 7, 4.5),)
+        name="wheel-e7-4.5", start_kind="fan", mixers=(("launch", 14, 0.07),), wheels=(("launch", 7, 4.5),)
     ),
     "wheel-e7-7.5": StartPlan(
-        name="wheel-e7-7.5", mixers=(("launch", 14, 0.07),), wheels=(("launch", 7, 7.5),)
+        name="wheel-e7-7.5", start_kind="fan", mixers=(("launch", 14, 0.07),), wheels=(("launch", 7, 7.5),)
     ),
     "wheel-e7-6.0-rev": StartPlan(
-        name="wheel-e7-6.0-rev", mixers=(("launch", 14, 0.07),), wheels=(("launch", 7, -6.0),)
+        name="wheel-e7-6.0-rev", start_kind="fan", mixers=(("launch", 14, 0.07),), wheels=(("launch", 7, -6.0),)
     ),
     "wheel-e5e14": StartPlan(
-        name="wheel-e5e14",
+        name="wheel-e5e14", start_kind="fan",
         mixers=(("launch", 22, 0.07),),
         wheels=(("launch", 5, 6.0), ("launch", 14, -6.0)),
     ),
-    "wheel-e7-only": StartPlan(name="wheel-e7-only", mixers=(), wheels=(("launch", 7, 6.0),)),
+    "wheel-e7-only": StartPlan(name="wheel-e7-only", start_kind="fan", mixers=(), wheels=(("launch", 7, 6.0),)),
     # --- after the real course said the early wheel jams ---------------------
     #
     # `wheel-6.0-early` scored best of everything here and then put 18.8% of the
@@ -225,18 +234,18 @@ CANDIDATES: dict[str, StartPlan] = {
     # marble back up the channel instead of flicking it through. Downstream is
     # where a wheel can be a wheel, because the field is at 30 wu/s there and
     # the blade tip is not.
-    "no-wheel": StartPlan(name="no-wheel", mixers=(("launch", 5, 0.07),)),
+    "no-wheel": StartPlan(name="no-wheel", start_kind="fan", mixers=(("launch", 5, 0.07),)),
     "wheel-s16-r6": StartPlan(
-        name="wheel-s16-r6", mixers=(("launch", 5, 0.07),), wheels=(("launch", 16, 6.0),)
+        name="wheel-s16-r6", start_kind="fan", mixers=(("launch", 5, 0.07),), wheels=(("launch", 16, 6.0),)
     ),
     "wheel-s24-r9": StartPlan(
-        name="wheel-s24-r9", mixers=(("launch", 5, 0.07),), wheels=(("launch", 24, 9.0),)
+        name="wheel-s24-r9", start_kind="fan", mixers=(("launch", 5, 0.07),), wheels=(("launch", 24, 9.0),)
     ),
     "wheel-s24-r6": StartPlan(
-        name="wheel-s24-r6", mixers=(("launch", 5, 0.07),), wheels=(("launch", 24, 6.0),)
+        name="wheel-s24-r6", start_kind="fan", mixers=(("launch", 5, 0.07),), wheels=(("launch", 24, 6.0),)
     ),
     "wheel-s32-r9": StartPlan(
-        name="wheel-s32-r9", mixers=(("launch", 5, 0.07),), wheels=(("launch", 32, 9.0),)
+        name="wheel-s32-r9", start_kind="fan", mixers=(("launch", 5, 0.07),), wheels=(("launch", 32, 9.0),)
     ),
     # --- V1.2: a different topology, not another variation of the funnel -----
     #
@@ -257,14 +266,14 @@ CANDIDATES: dict[str, StartPlan] = {
     # is a bumper when a marble can pass either side without queueing, which
     # needs the gaps near two diameters and the height near the equator.
     "tray-plain": StartPlan(
-        name="tray-plain",
+        name="tray-plain", start_kind="fan",
     mixers=(("launch", 5, 0.07),),
         wheels=(("launch", 32, 9.0),),
         tray=(0.16, 0.56, 2.10),
         fall_profile=(0.42, 0.56),
     ),
     "tray-2x2": StartPlan(
-        name="tray-2x2",
+        name="tray-2x2", start_kind="fan",
     mixers=(("launch", 5, 0.07),),
         wheels=(("launch", 32, 9.0),),
         tray=(0.16, 0.56, 2.10),
@@ -272,7 +281,7 @@ CANDIDATES: dict[str, StartPlan] = {
         deflectors=_bumpers((0.26, 0.44), (2, 2), 0.26, 0.24, span=0.50, stagger=True),
     ),
     "tray-212": StartPlan(
-        name="tray-212",
+        name="tray-212", start_kind="fan",
     mixers=(("launch", 5, 0.07),),
         wheels=(("launch", 32, 9.0),),
         tray=(0.16, 0.56, 2.10),
@@ -280,7 +289,7 @@ CANDIDATES: dict[str, StartPlan] = {
         deflectors=_bumpers((0.24, 0.36, 0.48), (2, 1, 2), 0.26, 0.24, span=0.52),
     ),
     "tray-212-low": StartPlan(
-        name="tray-212-low",
+        name="tray-212-low", start_kind="fan",
     mixers=(("launch", 5, 0.07),),
         wheels=(("launch", 32, 9.0),),
         tray=(0.16, 0.56, 2.10),
@@ -288,7 +297,7 @@ CANDIDATES: dict[str, StartPlan] = {
         deflectors=_bumpers((0.24, 0.36, 0.48), (2, 1, 2), 0.18, 0.24, span=0.52),
     ),
     "tray-212-fat": StartPlan(
-        name="tray-212-fat",
+        name="tray-212-fat", start_kind="fan",
     mixers=(("launch", 5, 0.07),),
         wheels=(("launch", 32, 9.0),),
         tray=(0.16, 0.56, 2.10),
@@ -297,7 +306,7 @@ CANDIDATES: dict[str, StartPlan] = {
     ),
     # A wider, longer tray - five marbles abreast rather than four.
     "tray-wide": StartPlan(
-        name="tray-wide",
+        name="tray-wide", start_kind="fan",
         mixers=(("launch", 5, 0.07),),
         wheels=(("launch", 32, 9.0),),
         tray=(0.15, 0.62, 2.45),
@@ -321,7 +330,7 @@ CANDIDATES: dict[str, StartPlan] = {
     # mixing stretch and the convergence both happen there, where a deflected
     # marble is falling hard enough to carry on.
     "lw-plain": StartPlan(
-        name="lw-plain",
+        name="lw-plain", start_kind="fan",
         mixers=(("launch", 70, 0.07),),
         wheels=(("launch", 84, 9.0),),
         launch_width=(2.20, 26, 62),
@@ -329,7 +338,7 @@ CANDIDATES: dict[str, StartPlan] = {
         fall_profile=(0.42, 1.0),
     ),
     "lw-mix": StartPlan(
-        name="lw-mix",
+        name="lw-mix", start_kind="fan",
         mixers=(("launch", 14, 0.16, 0.16, 0.80), ("launch", 70, 0.07)),
         wheels=(("launch", 84, 9.0),),
         launch_width=(2.20, 26, 62),
@@ -337,7 +346,7 @@ CANDIDATES: dict[str, StartPlan] = {
         fall_profile=(0.42, 1.0),
     ),
     "lw-mix2": StartPlan(
-        name="lw-mix2",
+        name="lw-mix2", start_kind="fan",
         mixers=(
             ("launch", 12, 0.16, 0.16, 0.80),
             ("launch", 24, 0.16, 0.16, 0.80),
@@ -349,7 +358,7 @@ CANDIDATES: dict[str, StartPlan] = {
         fall_profile=(0.42, 1.0),
     ),
     "lw-mix2-tall": StartPlan(
-        name="lw-mix2-tall",
+        name="lw-mix2-tall", start_kind="fan",
         mixers=(
             ("launch", 12, 0.26, 0.22, 0.80),
             ("launch", 24, 0.26, 0.22, 0.80),
@@ -362,7 +371,7 @@ CANDIDATES: dict[str, StartPlan] = {
     ),
     # Wider still, and converging later.
     "lw-wide-mix2": StartPlan(
-        name="lw-wide-mix2",
+        name="lw-wide-mix2", start_kind="fan",
         mixers=(
             ("launch", 12, 0.22, 0.20, 0.82),
             ("launch", 26, 0.22, 0.20, 0.82),
@@ -381,7 +390,7 @@ CANDIDATES: dict[str, StartPlan] = {
     # convergence has to happen somewhere, and it either orders the field
     # slowly or ejects it quickly.
     "lw-soft-plain": StartPlan(
-        name="lw-soft-plain",
+        name="lw-soft-plain", start_kind="fan",
         mixers=(("launch", 104, 0.07),),
         wheels=(("launch", 112, 9.0),),
         launch_width=(1.55, 30, 96),
@@ -389,7 +398,7 @@ CANDIDATES: dict[str, StartPlan] = {
         fall_profile=(0.42, 1.0),
     ),
     "lw-soft": StartPlan(
-        name="lw-soft",
+        name="lw-soft", start_kind="fan",
         mixers=(
             ("launch", 14, 0.16, 0.16, 0.80),
             ("launch", 30, 0.16, 0.16, 0.80),
@@ -401,7 +410,7 @@ CANDIDATES: dict[str, StartPlan] = {
         fall_profile=(0.42, 1.0),
     ),
     "lw-mid": StartPlan(
-        name="lw-mid",
+        name="lw-mid", start_kind="fan",
         mixers=(
             ("launch", 14, 0.18, 0.18, 0.80),
             ("launch", 32, 0.18, 0.18, 0.80),
@@ -494,14 +503,14 @@ def main(argv: list[str] | None = None) -> int:
     report = {}
     print(f"{len(jobs)} trials over {len(names)} candidates in {wall:.1f}s")
     header = (
-        f"{'candidate':>16} | "
+        f"{'candidate':>16} {'kind':>6} | "
         + " | ".join(f"{m + ' span':>13}" for m in marks)
         + " | lost% | trail% | best/worst"
     )
     print(header)
     print("-" * len(header))
     for name in names:
-        block = summarise(by_name[name])
+        block = summarise(by_name[name], expect_kind=CANDIDATES[name].start_kind)
         block["plan"] = CANDIDATES[name].describe()
         report[name] = block
         # A candidate can fail to reach a checkpoint at all - `defl-3x22`
@@ -515,7 +524,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         first = block["rank_span"][marks[0]]
         print(
-            f"{name:>16} | {spans} | {block['lost_pct']:5.2f} | "
+            f"{name:>16} {block['start_kind']:>6} | {spans} | {block['lost_pct']:5.2f} | "
             f"{block['trailing_pct']:6.2f} | "
             f"{first['best_slot']}/{first['worst_slot']}"
         )

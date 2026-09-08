@@ -87,6 +87,8 @@ __all__ = [
     "BRANCH_MODULES",
     "OBSTRUCTIONS",
     "START_KIND",
+    "START_KINDS",
+    "START_CLASSES",
     "start_module",
     "sloped_course",
     "check",
@@ -233,20 +235,43 @@ SHUFFLE_RATE = 9.0
 START_KIND = "fan"
 
 
+# The three start topologies, by the name every plan, tool and report names
+# them with. One table rather than a chain of `if`s, because the table is what
+# lets `start_module` check its own answer - see below.
+START_CLASSES = {
+    StartGrid.START_KIND: StartGrid,
+    StartBasin.START_KIND: StartBasin,
+    RadialStart.START_KIND: RadialStart,
+}
+START_KINDS = tuple(START_CLASSES)
+
+
 def start_module(kind: str, launch, **options):
     """One of the three start topologies, by name.
 
     `fan` is V1.1's taper, `basin` V1.3's stadium dish - both falsified for
     slot bias, and both kept because they are the two topologies the mechanism
     was measured in. `radial` is V1.4's ring: see `sloped.radial`.
+
+    **The built module is asked what it is, and the answer is checked against
+    what was requested.** That is not defensive noise: V1.4 recorded a
+    300-seed "fan" start baseline that was really the basin's, because a
+    `StartPlan`'s `start_kind` defaulted to `"basin"` while
+    `sloped.course.START_KIND` said `"fan"` and nothing in the chain compared
+    the two. Every layer that names a start kind now re-checks it, so the three
+    cannot be silently confused again.
     """
-    if kind == "basin":
-        return StartBasin("start", launch)
-    if kind == "fan":
-        return StartGrid("start", launch)
-    if kind == "radial":
-        return RadialStart("start", launch, **options)
-    raise ValueError(f"start must be 'basin', 'fan' or 'radial', not {kind!r}")
+    if kind not in START_CLASSES:
+        raise ValueError(
+            f"start must be one of {START_KINDS}, not {kind!r}"
+        )
+    module = START_CLASSES[kind]("start", launch, **options)
+    if module.START_KIND != kind:
+        raise AssertionError(
+            f"start_module({kind!r}) built a {type(module).__name__}, which "
+            f"declares START_KIND {module.START_KIND!r}"
+        )
+    return module
 
 
 def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Machine:
