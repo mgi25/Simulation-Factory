@@ -1,0 +1,49 @@
+The dynamic start equaliser's two trade curves, both measured on 48 seeds
+(384 racers) of the isolated start lab with `--start-kind rotor --candidate
+rotor-seeded`, everything else held.
+
+"delivered" is 100% minus escapes minus racers still in the chamber when the
+trial ended. "held%" is that second term - the fraction the mechanism never
+released - which only became visible after `StartTrial._stall` was taught that
+a marble which has never touched a run is still stuck. Before that fix both
+this and V1.5's converging funnel reported `lost 0, stuck 0` while delivering
+zero racers.
+
+CHAMBER FLOOR TILT
+ tilt  lift  lost%  stuck%  trail%   span   slotr  centrer  held
+  7.0  2.14   1.56    7.55    8.33   2.52  -0.294   -0.166   7.55%
+ 11.0  2.26   1.04   13.54   13.80   0.94  -0.288   -0.349  13.54%
+ 15.0  2.39   1.56    4.69    4.17   2.02  +0.135   +0.643   4.69%
+
+Not monotone, and 15 degrees is the tell: a floor steep enough to deliver the
+field is a floor that packs it against the closed outlet while it is being
+mixed, where the paddles cannot get between the marbles. Throughput improves
+and the centre-versus-rank correlation climbs to +0.64 - the shipped taper's
+own bias, recreated.
+
+ROTOR TAIL SWEEP (the rate the rotor slows to rather than stopping dead)
+ tail  lost%  held%  trail%   span   slotr  centrer  delivered
+  0.0   1.82   6.77    7.29   2.58  -0.100   -0.099     91.41%
+  1.2   1.30   7.03    6.77   3.75  -0.696   -0.507     91.67%
+  2.2   1.30   2.34    2.87   2.48  -0.866   -0.123     96.35%
+
+Monotone in the wrong direction: every unit of sweep that buys throughput
+costs slot fairness. Delivering the field requires a rule that reads where each
+marble is, and the field's positions still carry what the mixing left of the
+bay.
+
+EXIT CHUTE GRADE (24 seeds)
+ target  realised  lift  drop     v  lost%  stuck%  span   slotr
+   22.0      19.3  2.60  2.00  19.9   3.65    0.00  2.96  -0.462
+   17.0      14.3  2.14  1.85  19.2   2.60    0.00  3.12  -0.208
+   13.0      10.6  1.87  1.55  17.6  (delivered nothing - the clump stacks)
+
+CHAMBER POSITION (24 seeds) - shortening the chute to slow the delivery
+    z  fall  grade  lift  chute  drop     v  lost%  held%
+ 0.30  0.40   17.0  2.14   4.74  1.85  19.2   2.60   ~7%
+ 1.70  0.28   17.0  1.94   3.34  1.30  16.1   0.00   100%
+ 2.60  0.22   15.0  1.74   2.44  0.87  13.2   0.00   100%
+
+The last two delivered nothing: with the chamber overhanging the launch the
+field never left it at all. Recorded because they are what forced the stall
+detector's blind spot into the open.

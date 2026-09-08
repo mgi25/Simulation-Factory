@@ -44,6 +44,7 @@ def test_the_start_classes_declare_distinct_kinds():
     it measured, so a new kind that forgot to declare itself would collide
     silently, which is the whole failure this file exists about.
     """
+    from sloped.shuffle import ShuffleChamber
     from sloped.widelaunch import WideLaunch
 
     kinds = [
@@ -51,10 +52,15 @@ def test_the_start_classes_declare_distinct_kinds():
         StartBasin.START_KIND,
         RadialStart.START_KIND,
         WideLaunch.START_KIND,
+        ShuffleChamber.START_KIND,
     ]
-    assert kinds == ["fan", "basin", "radial", "wide_launch"]
+    assert kinds == ["fan", "basin", "radial", "wide_launch", "rotor"]
+    # Distinctness and completeness rather than a count: the count grows every
+    # session a topology is tried, and a test that pins it fails for the one
+    # reason that is never interesting.
     assert len(set(kinds)) == len(kinds)
     assert set(_course.START_KINDS) == set(kinds)
+    assert len(_course.START_CLASSES) == len(kinds)
 
 
 def test_start_module_builds_the_class_the_name_promises():

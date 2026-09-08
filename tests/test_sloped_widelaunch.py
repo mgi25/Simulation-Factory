@@ -52,7 +52,10 @@ def start():
 def test_wide_launch_is_a_registered_start_kind():
     assert WideLaunch.START_KIND == "wide_launch"
     assert _course.START_CLASSES["wide_launch"] is WideLaunch
-    assert len(set(_course.START_KINDS)) == 4
+    # Membership and distinctness, not a count - see the note in
+    # tests/test_sloped_start_kind.py.
+    assert "wide_launch" in _course.START_KINDS
+    assert len(set(_course.START_KINDS)) == len(_course.START_KINDS)
 
 
 def test_every_topology_still_builds_the_class_its_name_promises():

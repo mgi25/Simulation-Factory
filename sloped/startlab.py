@@ -52,11 +52,14 @@ from sloped.race import LATERAL_SLACK, VERTICAL_SLACK
 from sloped.scale import LAYOUT_TO_SIM
 from sloped.basin import StartBasin
 from sloped.radial import RadialStart
+from sloped.shuffle import ShuffleChamber
 from sloped.widelaunch import WideLaunch
 from sloped.stations import Mixer, Spinners, StartGrid
 from sloped.track import TrackRun
 
 __all__ = [
+    "ROTOR_CANDIDATES",
+    "seed_phase_for",
     "WIDE_CANDIDATES",
     "BARE_FAN",
     "WIDE_BANK_MAX",
@@ -153,6 +156,17 @@ class StartPlan:
     # Candidate C: shallow chevron ridges on the apron that steer a marble
     # across the field rather than along it. See `sloped.widelaunch`.
     cross_flow: bool = False
+    # The rotor start's knobs: how long the field is stirred, how fast, and the
+    # rotor's initial angle. The phase is on the plan rather than inside the
+    # module because section 7 of the V1.7 brief allows it to be *derived from
+    # the seed* - one global angle for the whole field, never a per-racer
+    # randomisation - and `run_trial` is where a seed is known.
+    mix_seconds: float | None = None
+    rotor_rate: float | None = None
+    rotor_phase: float | None = None
+    # When true, the rotor's initial angle is a deterministic function of the
+    # trial's seed. See `run_trial`.
+    seed_phase: bool = False
     # The bank ceiling on whichever runs carry a width profile, in degrees.
     #
     # **Bank times width is lateral energy, and a wide field cannot carry the
@@ -211,6 +225,10 @@ class StartPlan:
             "leg1_width": list(self.leg1_width) if self.leg1_width else None,
             "cross_flow": self.cross_flow,
             "wide_bank_max": self.wide_bank_max,
+            "mix_seconds": self.mix_seconds,
+            "rotor_rate": self.rotor_rate,
+            "rotor_phase": self.rotor_phase,
+            "seed_phase": self.seed_phase,
             "start_kind": self.start_kind,
             "port_gate": self.port_gate,
             "island": list(self.island) if self.island else None,
@@ -243,6 +261,27 @@ WIDE_FACTOR = 2.6
 WIDE_BANK_MAX = 6.0
 WIDE_LAUNCH_WIDTH = (WIDE_FACTOR, 117, 118)      # the whole launch, held open
 WIDE_LEG1_WIDTH = (WIDE_FACTOR, 22, 74)          # open, then eighteen units of narrowing
+
+
+def seed_phase_for(seed: int) -> float:
+    """The rotor's initial angle for a trial, from its seed alone.
+
+    Section 7 of the V1.7 brief allows this and says exactly why it is not
+    cheating: **one global angle applies to the entire field.** It does not
+    depend on racer identity, it cannot favour a particular racer, it is a pure
+    function of the seed so the trial stays deterministic and replayable, and
+    it is recorded in the report and the replay.
+
+    It exists because a *fixed* phase gives the rotor four fixed parking
+    bearings - a single marble stopped at 40.4, 130.4, 220.4 or 310.4 degrees
+    in every trial, being wherever the paddle that last touched it came to
+    rest. Quantised parking is a geometric sector by another name, and a
+    geometric sector is what the previous five topologies died of.
+
+    Knuth's multiplicative constant, so consecutive seeds do not give
+    consecutive angles.
+    """
+    return (seed * 2654435761 % (2 ** 32)) / float(2 ** 32) * 2.0 * math.pi
 
 
 def bench_plan(kind: str, name: str | None = None, **extra) -> StartPlan:
@@ -341,6 +380,14 @@ WIDE_CANDIDATES: dict[str, StartPlan] = {
 # against architecture rather than architecture against furniture.
 BARE_FAN = bench_plan("fan", name="bare-fan", mixers=(), wheels=())
 
+# The dynamic equaliser, with and without a seed-derived rotor phase. Section 7
+# of the V1.7 brief asks for the fixed-phase case to be *tested* rather than
+# assumed bad, so both are named and both are measured.
+ROTOR_CANDIDATES: dict[str, StartPlan] = {
+    "rotor-fixed": bench_plan("rotor", name="rotor-fixed"),
+    "rotor-seeded": bench_plan("rotor", name="rotor-seeded", seed_phase=True),
+}
+
 
 # One per topology, named the way every report names them. `tools/
 # sloped_start_bench.py` takes the kind on the command line and looks it up
@@ -401,6 +448,14 @@ def start_machine(config: CoreConfig | None = None, plan: StartPlan | None = Non
         start = StartBasin("start", runs["launch"])
         if plan.island is not None:
             start.ISLAND_R, start.ISLAND_Z, start.ISLAND_RISE = plan.island
+    elif plan.start_kind == "rotor":
+        start = ShuffleChamber(
+            "start",
+            runs["launch"],
+            rotor_phase=plan.rotor_phase,
+            mix_seconds=plan.mix_seconds,
+            rotor_rate=plan.rotor_rate,
+        )
     elif plan.start_kind == "wide_launch":
         start = WideLaunch("start", runs["launch"], cross_flow=plan.cross_flow)
     elif plan.start_kind == "fan":
@@ -724,9 +779,16 @@ class StartTrial:
             return
         self._slow[marble_id] = self._slow.get(marble_id, 0) + self.LOCATE_EVERY
         if self._slow[marble_id] >= self.STOPPED_FOR:
-            place = self._where.get(marble_id)
-            if place is not None:
-                self.stuck[marble_id] = place
+            # **A marble that has never touched a run is still stuck.**
+            # `_where` is only set once a marble has made contact with the
+            # launch or leg1, so a start that never delivers its field leaves
+            # every racer unlocated - and this used to record nothing at all.
+            # Both V1.5's converging funnel and V1.6's rotor at two chamber
+            # positions reported `lost 0, stuck 0` while delivering *zero of
+            # 192 racers* to the first checkpoint, which reads as a clean run.
+            # A report that cannot say "it never delivered" cannot describe the
+            # most complete failure a start can have.
+            self.stuck[marble_id] = self._where.get(marble_id) or ("start", 0)
 
     def step(self) -> None:
         sim = self.sim
@@ -839,6 +901,20 @@ def run_trial(
     """
     config = config or DEFAULT_CONFIG
     machine = machine or start_machine(config)
+    # The rotor's initial angle, if the plan asks for it to come from the seed.
+    # Set on the module before the simulation is built, because that is when
+    # `local_actuators` is read - so this is one attribute rather than a
+    # rebuilt machine, and a worker keeps its cached geometry across a whole
+    # chunk of seeds.
+    plan = getattr(machine, "plan", None)
+    start = machine.modules.get("start")
+    if plan is not None and getattr(plan, "seed_phase", False):
+        if not hasattr(start, "rotor_phase"):
+            raise TypeError(
+                f"plan {plan.name!r} asks for a seed-derived rotor phase, but a "
+                f"{type(start).__name__} has no rotor"
+            )
+        start.rotor_phase = seed_phase_for(seed)
     release = 0.0
     for module in machine:
         for actuator in getattr(module, "local_actuators", lambda: [])():

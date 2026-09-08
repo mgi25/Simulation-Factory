@@ -40,6 +40,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from sloped.startlab import (  # noqa: E402
     BARE_FAN,
     BENCH_PLANS,
+    ROTOR_CANDIDATES,
     LAB_CHECKPOINTS,
     WIDE_CANDIDATES,
     run_trial,
@@ -71,7 +72,10 @@ def _one(job):
         )
 
         _MACHINE.clear()
-        table = dict(WIDE_CANDIDATES, **{BARE_FAN.name: BARE_FAN})
+        from sloped.startlab import ROTOR_CANDIDATES
+
+        table = dict(WIDE_CANDIDATES, **ROTOR_CANDIDATES,
+                     **{BARE_FAN.name: BARE_FAN})
         plan = table[candidate] if candidate else BENCH_PLANS[kind]
         machine = _MACHINE[(kind, candidate)] = start_machine(plan=plan)
     return run_trial(seed, machine=machine)
@@ -93,7 +97,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--candidate",
         default=None,
-        choices=sorted(dict(WIDE_CANDIDATES, **{BARE_FAN.name: BARE_FAN})),
+        choices=sorted(dict(WIDE_CANDIDATES, **ROTOR_CANDIDATES,
+                            **{BARE_FAN.name: BARE_FAN})),
         help="a named candidate plan; its own start_kind must match --start-kind",
     )
     parser.add_argument("--seeds", type=int, default=200)
@@ -104,7 +109,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     kind = args.start_kind
-    candidates = dict(WIDE_CANDIDATES, **{BARE_FAN.name: BARE_FAN})
+    candidates = dict(WIDE_CANDIDATES, **ROTOR_CANDIDATES,
+                      **{BARE_FAN.name: BARE_FAN})
     if args.candidate and candidates[args.candidate].start_kind != kind:
         parser.error(
             f"candidate {args.candidate!r} is a "
