@@ -69,8 +69,19 @@ def test_every_topology_still_builds_the_class_its_name_promises():
         assert type(machine.modules["start"]) is _course.START_CLASSES[kind]
 
 
-def test_the_shipped_course_is_untouched():
-    assert _course.START_KIND == "fan"
+def test_the_rotor_chamber_is_not_what_ships():
+    """V1.7's chamber stays a named candidate and nothing more.
+
+    Written when the course shipped the fan and this file was adding `rotor`
+    to the registry; the point was that adding a topology must not silently
+    change what races. V1.9 froze `floor` in by instruction, so the invariant
+    is now stated as what it always meant - the kind under test here is *not*
+    the shipped one - rather than as a literal that goes stale the next time
+    the ship decision moves.
+    """
+    assert _course.START_KIND == "floor"
+    assert ShuffleChamber.START_KIND == "rotor"
+    assert _course.START_KIND != ShuffleChamber.START_KIND
     assert _course.check() == []
 
 

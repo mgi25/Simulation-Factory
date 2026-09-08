@@ -66,8 +66,17 @@ def test_every_topology_still_builds_the_class_its_name_promises():
         assert type(machine.modules["start"]) is _course.START_CLASSES[kind]
 
 
-def test_the_shipped_course_is_untouched():
-    assert _course.START_KIND == "fan"
+def test_the_wide_launch_is_not_what_ships():
+    """V1.6's unconstricted raceway stays a named candidate.
+
+    Same correction as `tests/test_sloped_shuffle.py`: this asserted the
+    literal `"fan"` because that was what shipped when the file was written,
+    and what it meant was that adding a topology must not change what races.
+    V1.9 froze `floor` in, so the invariant is stated rather than spelled.
+    """
+    assert _course.START_KIND == "floor"
+    assert WideLaunch.START_KIND == "wide_launch"
+    assert _course.START_KIND != WideLaunch.START_KIND
     assert _course.check() == []
 
 

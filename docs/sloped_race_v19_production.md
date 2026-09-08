@@ -399,7 +399,37 @@ The video's job here is to be the physics lock.
 
 ---
 
-## 13. Known V1 limitations
+## 13. Tests
+
+The full suite is **1,579 passed, 1 failed, 1 skipped**. The failure is
+`test_neon_proof.py::test_a_missing_godot_is_reported_rather_than_raised`,
+which needs a gitignored render output, predates this session and is unrelated.
+
+Three tests failed on the first full run *because the ship decision moved*, and
+all three were right to. `tests/test_sloped_shuffle.py`,
+`tests/test_sloped_widelaunch.py` and `tests/test_sloped_trapdoor.py` each
+asserted `START_KIND == "fan"`, written when the file in question was adding a
+*candidate* topology and the point was that adding one must not silently change
+what races. Freezing `floor` in by instruction is exactly the change they exist
+to notice.
+
+They now state the invariant rather than spell a literal that goes stale the
+next time the decision moves: the rotor chamber and the wide launch each assert
+that the shipped kind is *not* the kind under test, and the floor start's own
+file is the single place that pins what does ship - the name, the registered
+class, and the class the course actually builds, because V1.4 lost a 300-seed
+baseline to a start whose name and geometry disagreed. A second test pins the
+four numbers the frozen configuration was chosen on (13 rad/s, held for entry,
+3.00 mixing, 1.20 settle), because the choice rests on a measurement and a
+silent drift in any of them would invalidate it without failing anything else.
+
+New this session: `tests/test_sloped_guards.py` (9) for the rail-boost window,
+including parsing the GDScript constant to check the render carries the same
+table, and `tests/test_sloped_identity.py` (9) for the racer/slot decoupling.
+
+---
+
+## 14. Known V1 limitations
 
 1. **Orange is not a viable route.** 47.1% completion in traffic and 0 of 28
    in isolation. The transition is exact and the lead's geometry is sound; the

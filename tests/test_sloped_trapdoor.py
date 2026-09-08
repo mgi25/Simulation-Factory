@@ -376,13 +376,39 @@ def test_the_release_timeline_is_ordered(floor):
 # --- and the wiring ----------------------------------------------------
 
 
-def test_the_course_knows_the_kind_and_still_ships_the_fan():
+def test_the_course_ships_the_frozen_floor_start():
+    """The V1 ship decision, in one place.
+
+    This asserted `START_KIND == "fan"` when the floor start was a candidate
+    being added. V1.9 froze it in, so this is now the single test that pins
+    what races - and it pins the *class* as well as the name, because V1.4 lost
+    a 300-seed baseline to a start whose name and geometry disagreed.
+    """
+    assert course.START_KIND == "floor"
     assert "floor" in course.START_KINDS
     assert course.START_CLASSES["floor"] is ShuffleFloor
-    assert course.START_KIND == "fan"
-    built = course.start_module("floor", TrackRun("launch"))
+    built = course.start_module(course.START_KIND, TrackRun("launch"))
     assert built.START_KIND == "floor"
     assert isinstance(built, ShuffleFloor)
+    # And the one the course actually builds is the same class, not merely a
+    # registry entry that agrees with itself.
+    assert isinstance(course.sloped_course().modules["start"], ShuffleFloor)
+
+
+def test_the_frozen_start_is_at_the_configuration_that_was_chosen():
+    """The numbers V1.8 selected, pinned where the course reads them.
+
+    13 rad/s, held for entry, 3.00 of mixing and a 1.20 settle. Recorded
+    because the choice was made on a measurement - the standard deviation of
+    the eight slot mean ranks, 0.376 against the taper's 0.863 - and a silent
+    drift in any of the four would invalidate that number without failing
+    anything else.
+    """
+    start = course.sloped_course().modules["start"]
+    assert start.rotor_rate == 13.0
+    assert start.rotor_hold is True
+    assert start.mix_seconds == 3.00
+    assert start.SETTLE_SECONDS == 1.20
 
 
 def test_the_shipped_course_still_checks_clean():
