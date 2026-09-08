@@ -193,3 +193,241 @@ All three are gates before a simulation rather than reports after one, and each
 was wrong at least once before it was right — recorded in the files that carry
 them, and the fourth session running in which an instrument had to be corrected
 before the geometry could be judged.
+
+---
+
+## 6. The production benchmark (section 5)
+
+**600 fresh races, 4,800 racers, the shipped blue route with the frozen start.**
+`docs/validation/sloped_race_v1/v19/production_blue_600.json`.
+
+| | measured | target |
+|---|---|---|
+| per-racer finish | **98.83%** | ≥99% — 0.17 points short |
+| all-eight races | **91.0%** | ≥90% — met |
+| escapes | **0.25%** | near zero — met |
+| stuck | 0.92% | near zero — the dominant remaining loss |
+
+Every non-finisher, by site: **`leg2[99]` ×41 stuck**, `final[8..14]` ×8
+escaped, `blue[9..12]` ×2 escaped, `blue[112]` ×2 stuck, `leg2[108]` ×1,
+`leg1` ×1. So 41 of 56 are one sample of one run, and they **stall** rather
+than leave. The loss-site histogram buckets by decile and had been reporting
+that as `leg2[80]`, which is why it took an A/B to find.
+
+---
+
+## 7. Start fairness on full races (section 6)
+
+Per physical bay, 600 starts each. This is a characterisation, not an
+optimisation loop.
+
+| bay | win % | podium % | finish % | rank @9% | @half | @¾ | final rank |
+|---|---|---|---|---|---|---|---|
+| 0 | 18.00 | 43.17 | 98.50 | 3.918 | 4.132 | 4.237 | 4.164 |
+| 1 | **21.83** | **49.00** | 98.50 | 3.527 | 3.817 | 3.953 | **3.931** |
+| 2 | 6.17 | 29.17 | 99.17 | 5.425 | 4.895 | 4.877 | 4.834 |
+| 3 | 10.50 | 36.00 | 98.83 | 4.892 | 4.615 | 4.643 | 4.616 |
+| 4 | 13.00 | 39.67 | 99.17 | 4.423 | 4.450 | 4.407 | 4.371 |
+| 5 | **4.33** | **23.50** | 98.33 | 5.622 | 5.247 | 5.160 | **5.092** |
+| 6 | 12.17 | 37.33 | 98.83 | 4.502 | 4.550 | 4.507 | 4.462 |
+| 7 | 14.00 | 42.17 | 99.33 | 3.692 | 4.295 | 4.217 | 4.205 |
+
+| statistic | value | |
+|---|---|---|
+| **win-rate ratio** | **5.04** | against the ≤2.5 target — **missed** |
+| podium-rate ratio | 2.09 | inside 2.5 |
+| slot-mean rank SD | **0.354** | against the isolated start's 0.376 |
+| slot-mean rank span | 1.161 | against the isolated start's 1.177 |
+| slot/rank correlation | +0.267 | |
+| centre bias | −0.535 | |
+| Spearman(slot, finish rate) | +0.041 | |
+| win-rate spread | 17.5 points | 4.33% to 21.83% |
+
+**The one thing section 6 asked to be checked is answered: the full-race result
+is not dramatically worse than the isolated-start result. It is marginally
+better** — SD 0.354 against 0.376, span 1.161 against 1.177. The start's bias
+is transmitted, not amplified. The per-checkpoint columns show it *decaying*:
+the span is 2.095 places at the 9% mark and 1.161 at the finish, so the course
+dilutes what the start hands it.
+
+**The win ratio misses its target and is reported as a miss.** It is also the
+wrong single number, which is why all four statistics are above rather than
+one: a win is a tail event, and a 1.16-place shift in mean rank barely moves
+the middle of the distribution while moving P(rank 1) a great deal. The podium
+ratio over the same races is 2.09 and inside target. Slot 1 is 6.9 sigma above
+the expected 12.5% win rate and slot 5 is 6.1 sigma below, so the effect is
+real and not sampling noise — it is the same ~1.2-place residual V1.8 measured,
+seen through a tail.
+
+---
+
+## 8. Routes (sections 2 and 3)
+
+The shipped course is the through route, so the production benchmark is 100%
+blue at 98.8% completion. Orange's numbers come from the 12-race both-routes
+probe and the isolated split sweep, and the mechanism is in section 3 above:
+
+| | usage | completion |
+|---|---|---|
+| blue, 600 races | 100% | 98.83% |
+| blue, both-routes probe | 64.2% | 90.2% |
+| orange, both-routes probe | 35.8% | **47.1%** |
+| orange, isolated sweep | **0 of 28** | — |
+
+Orange misses the ≥95% target and is a V1 limitation. Turning both routes on
+also costs the whole course: finish 74%, escape 23%, all-eight 8%.
+
+---
+
+## 9. Entertainment (section 9)
+
+600 races.
+
+| | mean | median |
+|---|---|---|
+| lead changes | 4.19 | |
+| overtakes | 35.41 | |
+| winner lock fraction | 0.226 | 0.236 |
+| winner's worst rank | 1.878 | |
+| final margin | 0.567 s | 0.517 s |
+| collisions per race | 104.6 | |
+| top speed | 64.6 | |
+
+Not measured over the 600: **competitive pack size and top-3 turnover.**
+Turnover is computed per race inside the seed scorer — it is 1.0 for every
+shortlisted seed — but is not aggregated across the benchmark, and pack size
+has no instrument at all. Both are gaps rather than results.
+
+---
+
+## 10. The selected seed (section 10)
+
+**Seed 182**, from 546 eligible races.
+
+| | |
+|---|---|
+| all eight finish | yes, 0 escaped, 0 jammed |
+| lead changes | 10 |
+| overtakes | 41 |
+| final margin | 0.4667 s |
+| winner lock | 0.4825 — the winner settles only at halfway |
+| winner's worst rank | 5 — a real comeback |
+| top-3 turnover term | 1.0 |
+| winner | marble 4 from **slot 1**, 20.217 s |
+| contact validation | **no findings** |
+
+**It was picked over the top-scoring seed on physics cleanliness rather than on
+score.** Seed 130 scored higher (3.513 against 3.371) and had the closer finish
+(0.25 s), but its contact validation reported four floating findings with a
+worst resting gap of **0.3799** — a marble visibly hovering above the track.
+Seed 27 was worse again at 0.7414. Seed 182 has zero findings and a worst gap
+of 0.0280. For the video that *is* the physics lock, a clean contact validation
+outranks a tenth of a point of entertainment score.
+
+That comparison also settled a question about my own work: the floating is
+**seed-dependent, not an artifact of the raised rails**.
+
+What was traded away, stated plainly: 130's winner came from slot 5, the
+weakest bay by win rate, where 182's comes from slot 1, the strongest. A single
+race cannot show a win-rate distribution, so "no visually obvious start-slot
+domination" is weakly served either way — but 182 is the less flattering pick
+on that axis and it was still the right one.
+
+---
+
+## 11. Determinism (section 11)
+
+Seed 182's race was re-run through the integration pipeline and its state and
+event digests match the benchmark's exactly, so the authoritative replay is the
+race that was measured.
+
+Seed 130, 20 runs in one process, 20 in fresh processes, and the two sets
+against each other — **identical on every compared key**:
+
+```
+state      27a6b6b1c2b0cd21d796afe9883122d1a75bf6a4bcf099d9ba9c67e684d553e1
+events     f428ca8bfaf287b8a16ad26dcc32ab2bff6d46ec6bf796ec115021840bdf8d88
+actuators  0c5d4b64fdb6be9105eeacf9f9648dbf417951c3b3cbaca8f51452afb33bf2a5
+order      [1, 5, 3, 4, 6, 7, 2, 0]
+```
+
+with the finish times, the route and the start slot of every racer compared too.
+
+**The check had a hole and it is now closed.** `Replay.digest()` hashes marble
+position, orientation, velocity and spin — and nothing else — so the machine's
+own moving parts were not covered, and a replay whose marbles agreed while a
+gate, a paddle or a floor slat had moved differently would have compared as
+identical. Harmless when the only actuators were eight start gates on a fixed
+clock; not harmless now that the start carries a seed-derived rotor phase and
+eighteen sweeping slats. `Replay.actuator_digest()` covers them, keyed by name
+and sorted, and it was verified to discriminate rather than assumed to: two
+replays with identical marbles and one panel moved differently agree on
+`digest` and differ on the new one.
+
+Cross-machine determinism is **not tested** — one machine was available. The
+environment block in the JSON is what a second machine's report would be
+diffed against.
+
+---
+
+## 12. The video (section 12)
+
+`output/sloped_race_v1/real_race_final_physics.mp4`
+
+| | |
+|---|---|
+| resolution | 1080 × 1920 |
+| frame rate | 60/1 |
+| codec | h264, yuv420p |
+| audio streams | **0** |
+| frames | 1515 |
+| duration | 25.25 s |
+| size | 32.3 MiB |
+
+Rendered from the authoritative replay through Godot, which plays it back and
+simulates nothing. Eleven camera cuts covering the visible start, the descent,
+the long track, the hairpin, the obstacle, the split, the branch, the merge and
+the finish.
+
+**The framing is weak on at least two cuts and that is not fixed here.** The
+camera solver reports one finding — "merge: the aim is 7.7 layout units from
+the nearest racer, so it is not following the field" — and the rendered frame
+confirms it: at t=20 s the frame is track structure and support columns with
+the marbles at the edges. Section 21 says only minor adjustments and explicitly
+defers the cinematic camera director, so this is reported rather than chased.
+The video's job here is to be the physics lock.
+
+---
+
+## 13. Known V1 limitations
+
+1. **Orange is not a viable route.** 47.1% completion in traffic and 0 of 28
+   in isolation. The transition is exact and the lead's geometry is sound; the
+   blocker is that nothing sorts a marble east of the fork's ridge, which needs
+   the divider or the guard window and is excluded from this session. Seven
+   configurations have now failed on it.
+2. **`leg2[99]` stalls 41 racers in 4,800** — 0.85%, and three quarters of all
+   non-finishers. It has no mechanism yet: the rail boost there was the
+   candidate cause and a 100-race A/B put every difference inside its own 95%
+   interval, so the boost is neither the cause nor shown to be harmless.
+   Per-racer finish is 98.83% against a 99% target because of it.
+3. **About 1.2 places of start bias remain**, showing as a 5.04 win-rate ratio
+   against a ≤2.5 target. The underlying residual is unchanged from the frozen
+   start's own measurement and is *diluted* rather than amplified by the
+   course; it is a bearing residual that no amount of rotor removes, and it is
+   deferred to V2 by instruction.
+
+Three smaller things, recorded rather than fixed:
+
+* `max_travel_per_tick` reached **0.53335** against the config's 0.5 travel
+  budget, and `worst_penetration` **−1.0396** simulation units over 600 races.
+  Both are single-worst-case figures across 4,800 racers and neither produced a
+  containment failure, but both exceed the thresholds `marble3d.config` sets
+  for itself and neither has been traced to a site.
+* `course_machine.gd` builds run nodes with `name.capitalize()` — which turns
+  `orange_lead` into `Orange Lead` — and looks them up with `to_lower()`, so
+  the two `*_lead` runs fall back to the wrong spec and their support columns
+  are misplaced. **Pre-existing**, verified against `HEAD~6`, and left alone
+  because it is the drawn course's geometry.
+* Competitive pack size and top-3 turnover are not aggregated over the
+  benchmark. See section 9.
