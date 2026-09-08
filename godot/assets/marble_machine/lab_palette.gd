@@ -189,6 +189,57 @@ func get_material(key: String) -> StandardMaterial3D:
 	return material
 
 
+# --- public builders ------------------------------------------------------
+#
+# The five recipes above, reachable by name. A style variant is a table of
+# values, and a table needs a constructor it can call; without these the only
+# way to build a retuned surface outside this file is to reach into a private,
+# which is how a palette stops being the single place the rules live.
+
+func make_moulded(hex: String, roughness: float, clearcoat: float,
+		clearcoat_roughness := 0.06) -> StandardMaterial3D:
+	return _moulded(hex, roughness, clearcoat, clearcoat_roughness)
+
+
+func make_matte(hex: String, roughness: float) -> StandardMaterial3D:
+	return _matte(hex, roughness)
+
+
+func make_metal(hex: String, roughness: float,
+		specular := 0.6) -> StandardMaterial3D:
+	return _metal(hex, roughness, specular)
+
+
+func make_acrylic(hex: String, alpha: float, rim: float,
+		roughness := 0.03, backlight_darken := 0.7) -> StandardMaterial3D:
+	var material := _acrylic(hex, alpha, roughness)
+	material.rim = rim
+	material.rim_tint = 0.15
+	material.backlight = Color(hex).darkened(backlight_darken)
+	return material
+
+
+func make_emissive(hex: String, energy: float,
+		albedo_darken := 0.0) -> StandardMaterial3D:
+	return _emissive(hex, energy, albedo_darken)
+
+
+func override(key: String, material: StandardMaterial3D) -> void:
+	## Replace one named surface for the life of this palette.
+	##
+	## Additive, and the only way a style variant reaches the modules: every
+	## authored asset asks for its surfaces by name through `get_material`, so
+	## seeding the cache retunes a whole machine without any module knowing a
+	## variant exists. Nothing calls this unless a `--track/--guard/--support`
+	## option was given, so an un-styled build is the palette exactly as
+	## written above.
+	_cache[key] = material
+
+
+func has_override(key: String) -> bool:
+	return _cache.has(key)
+
+
 func _build(key: String) -> StandardMaterial3D:
 	match key:
 		# Moulded body.
@@ -499,6 +550,24 @@ func _build(key: String) -> StandardMaterial3D:
 			return _matte("#2A2A20", 0.95)
 		"slope_boulder":
 			return _matte("#212A36", 0.94)
+
+		# --- STYLE LOCK: separately addressable surfaces ------------------
+		#
+		# Four aliases whose base values are *identical* to the shared keys
+		# they stand in for, added so a style variant can move one of them
+		# without dragging the others with it. Before this, the track's keel
+		# and every support column were both `graphite`, so darkening a
+		# track's belly darkened the piers under it and no single-variable
+		# comparison of either was possible. An alias with equal values
+		# changes no committed frame; it only makes the two separable.
+		"keel_graphite":
+			return _moulded(GRAPHITE, 0.42, 0.45, 0.14)
+		"strut":
+			return _moulded(GRAPHITE, 0.42, 0.45, 0.14)
+		"strut_deep":
+			return _moulded(GRAPHITE_DEEP, 0.52, 0.3, 0.2)
+		"strut_accent":
+			return _metal("#A97C23", 0.24, 0.8)
 	push_error("lab_palette: unknown material key '%s'" % key)
 	return _moulded("#FF00FF", 0.5, 0.0)
 

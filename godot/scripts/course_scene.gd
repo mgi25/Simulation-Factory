@@ -23,6 +23,7 @@ const Layout := preload("res://assets/marble_machine/course/course_layout.gd")
 const Track := preload("res://assets/marble_machine/v2/v2_track.gd")
 const V2Forms := preload("res://assets/marble_machine/v2/v2_forms.gd")
 const Terrain := preload("res://assets/marble_machine/course/course_terrain.gd")
+const Style := preload("res://assets/marble_machine/course/course_style.gd")
 
 # at: ["node", name] or ["path", run, t]. `bearing` is measured from the
 # track's own forward direction at the aim point - 0 looks up the course from
@@ -89,6 +90,7 @@ var _orbit := 0.0
 var _dolly := 0.0
 var _fitted: Dictionary = {}
 var _sequenced := false
+var _style: Dictionary = {}
 
 
 func _ready() -> void:
@@ -112,19 +114,38 @@ func _ready() -> void:
 
 	_palette = Palette.new("tower")
 	_table = Layout.table(_layout)
+	# Every retuned surface is seeded into the palette before a single module
+	# asks for one, so the style reaches the whole machine without any asset
+	# knowing a variant exists. With no `--style/--track/...` option this is a
+	# no-op and the frame is the one this branch inherited.
+	_style = Style.options(options)
+	Style.apply(_palette, _style)
+	if Style.styled(_style):
+		print("style: %s" % Style.label(_style))
 
 	var world_env := WorldEnvironment.new()
 	world_env.name = "WorldEnvironment"
 	world_env.environment = World.build_environment(_no_glow)
+	Style.tune_environment(world_env.environment, str(_style["env"]))
 	add_child(world_env)
 
 	World.build_lights(self)
-	add_child(World.build(_palette))
+	Style.tune_lights(self, str(_style["env"]))
+	var world := World.build(_palette)
+	Style.world_extras(world, _palette, str(_style["env"]))
+	add_child(world)
 
 	_course = Machine.build(_palette, _layout, {
 		"detail": str(options.get("detail", "block")),
+		"mast_stock": Style.mast_stock(_style),
 	})
 	add_child(_course)
+	# After the build, because the ground is authored on the world layer and
+	# only the environment axis separates the two. A no-op on `env=base`.
+	if str(_style["env"]) != "base":
+		var ground := _course.get_node_or_null("Terrain")
+		if ground != null:
+			Style.to_ground_layer(ground)
 	_practicals()
 	_collect_travellers()
 	_report()
@@ -133,6 +154,8 @@ func _ready() -> void:
 	set_time(0.0)
 	if str(options.get("dump-physics", "")) != "":
 		_dump_physics(str(options["dump-physics"]))
+	if str(options.get("dump-style", "")) != "":
+		_dump_style(str(options["dump-style"]))
 
 
 func _options() -> Dictionary:
@@ -507,6 +530,22 @@ func _place_sequence(seconds: float) -> void:
 
 
 # --- physics metadata -----------------------------------------------------
+
+
+func _dump_style(path: String) -> void:
+	## The resolved palette, as a document.
+	##
+	## Written from the live palette after the whole machine has been built,
+	## so every value in it is a value that was actually rendered. A swatch
+	## sheet drawn from hexes retyped into a Python table is a drawing of the
+	## table, not of the frame.
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		push_error("course_scene: cannot write %s" % path)
+		return
+	file.store_string(JSON.stringify(Style.dump(_palette, _style), "  "))
+	file.close()
+	print("style dump -> %s" % path)
 
 
 func _dump_physics(path: String) -> void:

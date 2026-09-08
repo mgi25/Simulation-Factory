@@ -18,6 +18,7 @@ videos/
 # Iteration frames from the art labs: kept out of the branch on purpose,
 # because they are the working set and change every render.
 docs/validation/**/_preview/
+docs/validation/**/_frames/
 
 # Godot
 godot/.godot/

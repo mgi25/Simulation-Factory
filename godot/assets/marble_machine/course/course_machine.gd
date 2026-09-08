@@ -100,6 +100,10 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 			"shell": shell,
 			"floor": floor_key,
 			"guard": guard,
+			# The alias, not `graphite`: a track's belly and the piers under
+			# it were the same palette key, so neither could be retuned on
+			# its own. `keel_graphite` carries the identical base values.
+			"keel": "keel_graphite",
 			"samples": int(options.get("samples", 118)),
 			"ribs": detail != "block",
 		})
@@ -139,7 +143,8 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 		int(options.get("pebbles", 110)), centreline, 3.1, 0.34)
 	if detail != "block":
 		Dressing.build(root, palette, terrain_cfg, centreline,
-			table["nodes"])
+			table["nodes"], {"mast_stock": float(
+				options.get("mast_stock", 0.10))})
 
 	root.set_meta("metrics", _metrics(table, total_length, clearances,
 		centreline))
@@ -168,9 +173,9 @@ static func _supports(root: Node3D, palette, run: Node3D, cfg: Dictionary,
 
 	var total: float = V2Forms.path_length(path)
 	var count: int = maxi(int(round(total / SUPPORT_SPACING)), 2)
-	var graphite = palette.get_material("graphite")
-	var deep = palette.get_material("graphite_deep")
-	var gold = palette.get_material("gold_dark")
+	var graphite = palette.get_material("strut")
+	var deep = palette.get_material("strut_deep")
+	var gold = palette.get_material("strut_accent")
 	var clearances: Array = []
 
 	for step in count + 1:
