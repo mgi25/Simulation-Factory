@@ -1,75 +1,92 @@
-"""The line-to-radial start: eight bays abreast, eight cups around a ring.
+"""The line-to-radial start: eight bays abreast, one shared apron, one ring.
 
-## Why the topology had to change
+## Why the topology changed, and what survived V1.4
 
-`docs/sloped_race_v13_basin.md` measured the mechanism twice, in two different
-start topologies, and it is not a tuning problem:
+`docs/sloped_race_v13_basin.md` measured one mechanism in two different start
+topologies, and it is not a tuning problem:
 
     a single common exit orders the field by distance to that exit, and
     distance to the exit is a function of which bay a marble started in.
 
 The taper orders the field at its throat and the basin orders it at its notch.
-Twenty-four geometries inside that family have been falsified. What breaks it is
-**equal distance from every bay to the exit**, which needs the launch points
-arranged *about* the exit rather than beside it.
+Twenty-four geometries inside that family have been falsified. What breaks the
+mechanism is **equal distance from every bay to the exit**, which needs the
+launch points arranged *about* the exit rather than beside it. That is the
+radial architecture, and it is not what failed.
+
+What failed was the transport. V1.4 ran eight independently walled chutes from
+the shelf to the ring, and `docs/sloped_race_v14_radial.md` section 3 records
+why they cannot fit: a walled chute needs clear width over a 0.57 racer plus a
+wall each side, and eight of those cannot simultaneously satisfy clearance,
+mutual separation, a grade above the stall threshold and a grade below a fall,
+in the two units of plan available. Throughput was 41.7% of the field.
 
 ## What this builds
 
-    visible 8-bay shelf, flat, one synchronised gate    <- unchanged, and seen
+    eight bays abreast on a flat pan, one synchronised gate   <- unchanged, seen
       |
-    the same shelf, fanning: 0.63 pitch eased out to 1.00
+    ONE continuous apron: eight solved guide grooves with
+    shallow ribs between them, and no walls                   <- the rewrite
       |
-    eight walled chutes, hidden under the platform
+    an inward-tilted annular trough, closed inward by one
+    gate ring in sixteen segments                             <- the fairness surface
       |
-    eight identical cups on one circle about the drain  <- the fairness surface
+    one synchronised release
       |
-    one synchronised port release
-      |
-    a conical dish, eight-fold symmetric, central drain
+    a wide central drain, rotationally symmetric
       |
     a chute onto the launch run
 
-## The cups are the design
+`sloped.apron` solves the guides and carries the reasoning for how. What
+matters here is the ring, and one change from the V1.4 brief that has to be
+argued rather than assumed.
 
-Each is the same short tangential channel, at the same radius from the drain, on
-the same level, closed by the same paddle, and all eight paddles lift together.
-So whatever the chutes did - and they cannot be congruent, because eight
-collinear bays cannot be mapped onto eight points of a circle by congruent
-curves - the field is re-presented to the course from a C8-symmetric ring, at
-rest, simultaneously. **Distance from bay to exit is identical for all eight**,
-which is the measured mechanism removed at its root rather than diluted.
+## The ring is a trough, not eight pockets, and why
 
-Section 7 of the brief permits exactly this: "A deterministic global mechanism
-is allowed only if genuinely necessary, but first test the passive radial
-architecture." `port_gate` is a constructor flag so both are measurable, and
-both are reported. Nothing here is per-marble: one release time, one paddle
-geometry, one cup, eight times over.
+The brief asks to preserve "exact 45 degree radial port spacing", and the eight
+delivery bearings still are exactly 22.5 + 45k. What is *not* preserved is the
+eight separate walled cups, and the reason is measured rather than preferred.
 
-Cups launch tangentially - floor tilted inward, paddle across the ring at the
-counterclockwise end - so the field spirals in rather than converging head-on
-on the hole, where eight marbles can arch across it. The same geometry in all
-eight, so the swirl costs no symmetry.
+A cup is a pocket in the ring, so a guide route may not pass over a foreign
+cup: on one single-valued surface, passing over it means dropping into it. So
+each route has to hold outside the ring's rim until it reaches its own sector,
+and then descend 0.70 in radius inside its own 45 degrees. At the radius
+available that is a turn of about 0.30 units, taken at 18 layout units per
+second, and holding it needs a side slope of 83 degrees. No groove and no bank
+supplies that. Measured across four parametrisations the number came out 0.25
+to 0.32 every time, and it belongs to the route rather than to the curve
+fitting: the constraint genuinely steps by 0.70 at the sector boundary.
 
-## Two constraints that shaped everything else
+A continuous trough removes the constraint instead of fighting it, and it
+**strengthens** the fairness invariants rather than weakening them:
 
-**Eight walled chutes cannot start at the bays' pitch.** A chute needs clear
-width over a 0.57 racer plus a wall each side; the bays are 0.63 apart. So the
-shelf itself is the fan: one shared surface with the 0.11 ridges `StartGrid`
-proved a marble will follow, easing the lane pitch out to `FAN_PITCH` before any
-wall exists. That also keeps the feed **congruent** - one flat-across pan at one
-grade, so every bay reaches the chutes with the same speed and heading and only
-its lateral position differs.
+* every marble comes to rest against the same inward gate ring, so its radius
+  from the drain is `PADDLE_R + MARBLE_RADIUS` **exactly**, for all eight,
+  rather than "somewhere inside its own pocket";
+* the floor it rests on is one height, exactly;
+* the release is one motion of one ring;
+* and everything below the trough is *rotationally* symmetric rather than
+  eight-fold symmetric, so a marble's bearing round the ring - the one thing
+  the trough does not control - stops mattering at all. The eight vanes V1.4
+  needed are gone with the dish they stood in, and with them the last piece of
+  geometry a marble could be lucky or unlucky about the orientation of.
 
-**The shelf's pan is flat across.** The fan's trough is a dish, `-0.30 + 0.16
-u^2`, so its outer bays rest 0.10 layout units higher than its inner ones - a
-systematic per-bay energy difference that sat under three sessions of
-measurement without being noticed. Flat, every bay starts at the same height.
+The trough's floor tilts inward by `TROUGH_TILT`. A truly level annulus is
+tempting - no azimuthal bias whatsoever - but a marble on a level floor has no
+reason to settle against the ring in the first place and no reason to leave
+when the ring lifts. A rotationally symmetric tilt costs no symmetry and buys
+both.
 
 ## The height chain, derived and not typed
 
-`shelf_floor` -> `port_floor` -> `dish_edge` -> `drain_lip` -> the launch entry.
-The basin's notes record what a typed chain costs: its feeders ended 0.18 below
-the dish's edge and the field stopped dead against the step.
+`rest_floor` -> `trough_floor` -> `paddle_floor` -> `drain_lip` -> the launch
+entry. The basin's notes record what a typed chain costs: its feeders ended
+0.18 below the dish's edge and the field stopped dead against the step.
+
+`START_LIFT` is **3.40**, which is 0.90 *less* than the 4.30 the brief approved
+for this experiment. The apron spends 1.70 where the chutes spent 2.20 and the
+drain moved downhill, so the exit chute has less to make up: it runs at about
+28 degrees rather than the 40 that 4.30 would have forced.
 """
 
 from __future__ import annotations
@@ -84,204 +101,139 @@ from marble3d.modules.base import Actuator, Probe
 from marble3d.units import MARBLE_DIAMETER, MARBLE_RADIUS
 
 from sloped import layout
+from sloped.apron import ApronGuides, bay_x
 from sloped.scale import to_sim
-from sloped.solids import merge_meshes, plate, tube
-from sloped.stations import StartGrid, _bay_x, _place, _strip
+from sloped.solids import merge_meshes, plate
+from sloped.stations import StartGrid, _place, _strip
 from sloped.track import TrackRun
 
-__all__ = ["START_LIFT", "RadialStart", "feeder_table"]
+__all__ = ["START_LIFT", "RadialStart", "guide_table"]
 
 # How far the whole start module rises above its recorded node.
 #
-# The height chain needs 2.24 layout units of fall between the shelf's pan and
-# the launch entry, plus the exit chute's own grade, and the recorded geometry
-# offers 0.65. The basin lifted 1.90 for the same reason and the brief allowed
-# it as a local adjustment; this is the same kind of change, 0.63 further.
-START_LIFT = 4.30
+# The chain needs the pan to stand far enough over the launch entry for the
+# apron's 1.70, the trough's fall and an exit chute that is a delivery rather
+# than a drop. 3.40 leaves the exit at 28 degrees. The basin lifted 1.90 for
+# the same reason and the brief allowed it as a local adjustment; V1.4's chutes
+# needed 4.30, and this gives 0.90 of that back.
+START_LIFT = 3.40
 
 
 class RadialStart(StartGrid):
-    """The eight bays and the gate of `StartGrid`, on a radial ring.
+    """The eight bays and the gate of `StartGrid`, on a shared radial apron.
 
     Subclassed for the reason `StartBasin` is: the bays, the paddles, the
     release and the resting pitch carry three sessions of corrections - fin
     pinch, gate axis order, resting pitch - and none of them changes. What
-    changes is everything downstream of the shelf.
+    changes is everything downhill of the gate.
     """
 
     START_KIND = "radial"
 
-    # --- the shelf, which is also the fan --------------------------------
+    # --- the pan the field waits on --------------------------------------
     #
-    # It reaches further back than the drawn pod's groove because the ridges
-    # have to fan the lane pitch out before any wall exists, and 22 degrees of
-    # divergence is what a 0.11 ridge can turn. Over the 1.45 units the drawn
-    # groove offers it would have to be 43 degrees, and a marble rides over a
-    # ridge at that angle instead of following it.
-    SHELF_BACK = -4.60
-    SHELF_END = -0.95
-    SHELF_DROP = 0.62              # 8.7 degrees over 4.05 units
-    SHELF_PAN = 0.30
-    FAN_PITCH = 1.20               # the lane pitch the chutes need
+    # Flat *across*, which is a fairness correction and not a plumbing one: the
+    # fan's trough was a dish, so its outer bays rested 0.10 layout units
+    # higher than its inner ones - a systematic per-bay energy difference that
+    # sat under three sessions of measurement without being noticed.
+    PAN_BACK = -4.60
+    PAN_SINK = 0.30                # how far the pan sits under the deck
+    PAN_HALF = 2.86                # a little over the drawn pod's 2.73
 
-    # --- the ring --------------------------------------------------------
-    DISH_Z = 0.75                  # the drain, just past the fan's lip
-    PORT_R = 1.35                  # every cup, at one radius from the drain
-    PORT_DEG0 = 22.5               # cups every 45 degrees from here
-    PASS_BY_R = 2.25               # the radius a chute passes a foreign cup at
-    DELIVERY_LEAD = 13.0           # how far clockwise of its port a chute lands
-    CUP_ARC = 26.0                 # how much ring one cup occupies
-    CUP_HALF = 0.36                # radial half width of a cup and a chute
-    CUP_WALL = 0.62
-    # **The paddle has to be taller than a resting marble's centre.** At the
-    # gate's own 0.42 its top stood at exactly the height of a marble sitting
-    # on the cup floor, and traced in simulation every racer rolled over it:
-    # a cup floor at `port_floor` puts a 0.285 marble's centre at
-    # `port_floor + 0.285`, and the paddle's base is a further `CUP_TILT`
-    # down. 0.62 clears that by 0.19.
-    PORT_GATE_HEIGHT = 0.62
-    CUP_TILT = 0.14                # how far a cup's floor falls inward
+    # --- the apron --------------------------------------------------------
+    APRON_DROP = 1.70              # pan to trough rim, identical for all eight
+    HEAD_GRADE = 8.7               # the drawn shelf's own grade, at the line
+    LANE = 0.64                    # least separation between guide centrelines
+    # **The groove is a circular cradle, and its radius is the constraint.**
+    # The first build used a cosine rib 0.24 tall across a 0.63 lane, whose
+    # curvature radius at the bottom is `W^2 / (2 R pi^2)` = 0.084 - smaller
+    # than the 0.285 marble that has to sit in it. So the marble bridged the V
+    # on two flanks instead of reaching the floor, and bay 0, which sits in the
+    # tightest V of all with the kerb on its other side, was squeezed straight
+    # through the surface: it fell 4.64 units, every seed. The basin's notes
+    # record the same failure in a different shape and the same arithmetic.
+    #
+    # A 0.60 cradle across a 0.63 lane crests at 0.089. Shallow, and
+    # deliberately so - section 6 of the brief asks for minimal guide strength,
+    # and this is about all a groove can be given without closing on the
+    # marble. It steers the release while the field is slow and lets it drift
+    # on the fast bends, which the brief permits and the trough absorbs.
+    CRADLE_R = 0.60
+    # **And the crest is capped, which matters more than the cradle's radius.**
+    # A cradle scaled to the strip's own width crests at half that width, and
+    # the strips widen from 0.63 at the line to 1.34 at the ring - so the crest
+    # rose along the flow, and a crest that rises along the flow is a
+    # *transverse ridge*. Traced in simulation, both outer racers climbed 0.18
+    # of it at 3.25 units from the drain and stopped there for eleven seconds.
+    # The local-minimum check missed it because a ridge is not a basin: there
+    # is always a way downhill sideways, just not forwards.
+    #
+    # Capped, the crest is one height everywhere and the middle of a wide strip
+    # is a plateau instead. `cradle_rise(LANE / 2)` - the crest the narrowest
+    # strip, the resting line's own, would have had.
+    LANE_CREST = 0.0925
+    LIP_Z = -0.95                  # where the visible pan becomes transport
+    KERB_OUT = 0.42                # the outer boundary: containment, not a divider
+    KERB_RISE = 0.78
+    ROWS = 96                      # rows along the apron
+    COLUMNS = 6                    # columns across one lane strip
+    HEEL_ROWS = 8                  # rows behind the resting line; see `_lane_rows`
 
-    # --- the chutes ------------------------------------------------------
-    # Short chutes, so a modest drop. The first build put the ring a full 2.5
-    # units past the fan and needed 1.34 of drop over a 2.3-unit chute - 30
-    # degrees mean and 60 at its steepest, which is a fall onto a paddle rather
-    # than a delivery. With the ring at the lip the same drop would be absurd.
-    # Steep enough that the longest chute delivers in about two seconds, and
-    # therefore that the port release can be short. The first build gave the
-    # chutes 1.05 and the longest took 4.5 s, which is dead time in the Short
-    # and - more to the point - longer than the stall detector's own patience.
-    FEEDER_DROP = 2.20             # fan lip to cup floor, every chute
-    FEEDER_FLOOR_R = 0.60          # the cradle's radius; > a marble's own
-    FEEDER_WALL = 0.34
-    WALL_THICK = 0.09
-    SAMPLES_PER_UNIT = 6
+    # --- the ring ---------------------------------------------------------
+    DISH_Z = 1.20                  # the drain, on the module's centreline
+    TROUGH_R = 1.35                # the trough's mid radius
+    TROUGH_HALF = 0.36
+    TROUGH_TILT = 9.0              # degrees, inward; see the module docstring
+    # **The trough's lip is a one-way valve, and it is needed.** Without it the
+    # apron ran flush into the trough floor, and traced in simulation eight
+    # racers arriving at 18 layout units per second knocked each other back
+    # *out*: two of eight per seed ended up 1.5 units further out and 1.9
+    # higher than the ring, so they would have been released from the wrong
+    # radius entirely. A marble falls over a 0.20 step easily and has to climb
+    # it, plus the apron's grade, to get back. Rotationally symmetric, so it
+    # costs no fairness, and it is a feature of the ring rather than of the
+    # apron - section 5's ban on elevation steps is about the guided surface.
+    RIM_STEP = 0.32
+    PADDLE_R = 1.02                # the gate ring, and so the resting radius
+    PADDLE_THICK = 0.06
+    PADDLE_HEIGHT = 0.62
+    # Sixteen segments rather than eight. A box cannot be curved, so a
+    # segmented ring is a polygon, and eight segments put a marble resting on a
+    # flat 0.084 further from the drain than one resting against a vertex - an
+    # azimuthal asymmetry in the one quantity the architecture exists to make
+    # equal. Sixteen takes that to 0.021, under a tenth of a marble's radius.
+    PADDLE_SEGMENTS = 16
+    DRAIN_R = 0.95
+    DRAIN_FALL = 0.46              # trough floor at the drain, down to its lip
+    # The catch over the drain's own sector: see `_catch`. It stops short of
+    # the launch entry at z 3.94 and clears the exit chute's walls by about a
+    # unit, both of which `tools/sloped_radial_check.py` measures.
+    CATCH_FROM = 63.0
+    CATCH_TO = 117.0
+    CATCH_R = 2.30
+    CATCH_RISE = 0.80
+    RINGS = 64                     # points around the trough
 
-    # --- the dish --------------------------------------------------------
-    # 1.24 across. One marble is 0.57, so two *could* line up abreast - but
-    # eight converging on a 0.84 hole arched across it and the whole field
-    # stopped, every trial, which is the failure the basin warned about in a
-    # different shape. A wider hole plus the vanes below is the answer; a
-    # narrower one is a plug.
-    DRAIN_R = 0.62
-    DISH_FALL = 0.38               # dish edge down to the drain lip
-    RIM_RISE = 0.30
-    RIM_R = 1.70
-    # Eight identical vanes, one per sector, that turn a radially-inward marble
-    # into the ring's own rotational sense. Without them the field converges
-    # head-on on the drain and arches; with them it arrives as a rotating queue
-    # and goes through one at a time. Eight-fold symmetric, so the swirl costs
-    # no symmetry - which a spiral floor could not manage, because a spiral has
-    # a riser and a riser has an azimuth.
-    # Their inner end, not their outer one, is what matters: at a foot radius
-    # of 1.02 a vane stands exactly where a released marble leaves its cup's
-    # inner lip at 0.99, and traced in simulation the field sat wedged between
-    # the two. They start well inside the lip now.
-    VANE_RISE = 0.22
-    VANE_FROM = (0.88, -30.0)      # (radius, degrees clockwise of its port)
-    VANE_TO = (0.66, -56.0)
-
-    # --- the exit --------------------------------------------------------
+    # --- the exit ---------------------------------------------------------
     CHUTE_HALF = 0.80
     CHUTE_WALL = 0.58
     CHUTE_LEAD = 0.20
+    CHUTE_STEPS = 14
 
-    RINGS = 48                     # points around the dish
-    STEPS = 6                      # radial steps across it
-    CHUTE_STEPS = 12
-
-    # One synchronised release for all eight cups, in seconds, on the same
-    # clock as the start gate's own 0.30. `feeder_table` reports each chute's
-    # rolling time and `tools/sloped_radial_check.py` asserts the margin over
-    # the slowest of them.
-    PORT_RELEASE = 3.40
+    # One synchronised release of the whole ring, in seconds, on the same clock
+    # as the start gate's own 0.30.
+    #
+    # **Set from the measured seating time, not from the rolling time.** The
+    # slowest guide delivers its marble in about 2.3 seconds, but a marble that
+    # has reached the trough still has to find a bearing of its own among
+    # seven others and stop moving; over twelve seeds
+    # `tools/sloped_radial_trace.py` measured the whole field seated between
+    # 2.20 and 4.87 seconds. Releasing on the rolling time would release a
+    # field that is still circulating, which is the one thing the ring exists
+    # to prevent. `tools/sloped_radial_check.py` asserts the margin.
+    RELEASE = 5.60
+    RELEASE_DURATION = 0.18
     PORT_GATE = True
-
-    # Plan waypoints for the west four chutes, between the fan's lip and the
-    # approach point outside the rim; the east four are mirrored, so bays `i`
-    # and `7 - i` are reflections and the left-right half of any bias is gone
-    # by construction. Authored rather than solved, and *checked* rather than
-    # asserted - `tools/sloped_radial_check.py` measures the clearance every
-    # pair actually has, in three dimensions.
-    #
-    # Bays 0 and 1 both head for x = -1.35 and would otherwise run within 0.38
-    # of each other with no height between them, so bay 0 is held out west and
-    # comes in behind. Bay 3 bridges the dish, which is a height separation and
-    # is measured as one.
-    # One authored route per bay, as plan waypoints between the fan's lip and
-    # the approach point outside the rim. Eight rather than four mirrored,
-    # because the ring is C8-symmetric and *not* mirror-symmetric: every cup is
-    # handed the same way round, so a cup's delivery point is 13 degrees
-    # clockwise of it whichever side of the module it is on, and the east
-    # routes are rotations of the west ones rather than reflections. The
-    # fairness argument does not need the mirror - it needs the cups.
-    #
-    # Authored and then *checked*: `tools/sloped_radial_check.py` measures the
-    # three-dimensional clearance every pair actually has.
-    # One authored route per bay, as plan waypoints between the fan's lip and
-    # the delivery point in its own cup. Eight rather than four mirrored,
-    # because the ring is C8-symmetric and not mirror-symmetric: every cup is
-    # handed the same way round, so a delivery point is `DELIVERY_LEAD`
-    # clockwise of its port whichever side of the module it is on, and the east
-    # routes are rotations of the west ones rather than reflections. The
-    # fairness argument does not need the mirror - it needs the cups.
-    #
-    # Authored and then *checked*: `tools/sloped_radial_check.py` measures the
-    # three-dimensional clearance every pair actually has. The odd chutes carry
-    # a `PASS_BY_R` waypoint because they have to get round the outside of an
-    # even chute's cup, whose outer wall reaches 1.80 from the drain.
-    # One authored route per bay, as plan waypoints between the fan's lip and
-    # the delivery point in its own cup.
-    #
-    # The four wrapping routes carry waypoints that hold them at a radius of
-    # two or more from the drain until they are at their own cup's angle,
-    # because a cup's outer wall reaches 1.80 and a chute crossing inside that
-    # runs through someone else's cup. The four short routes need none: their
-    # cups are the nearest ones and they go straight there.
-    # One authored route per bay, as plan waypoints between the fan's lip and
-    # the delivery point in its own cup.
-    #
-    # **The wrapping routes are held out at a radius of two and a half to
-    # three and a half from the drain**, and that width is why the undercroft
-    # is wider than the pod above it. It is not a preference. A cup's outer
-    # wall reaches 1.80, so a chute crossing inside that runs through someone
-    # else's cup; and two chutes cannot be separated in *height* here, because
-    # a profile shallow enough to hold one high through the crossing is
-    # shallower than the 8 degrees the basin measured a marble stalling on.
-    # Plan separation is the only budget with room in it, so it is spent.
-    ROUTES = {
-        0: ((-4.10, 0.35), (-3.75, 2.10), (-2.20, 3.20)),
-        1: ((-2.85, 0.20), (-2.40, 1.45), (-1.70, 2.05)),
-        2: ((-1.80, -0.30), (-1.62, 0.20)),
-        3: (),
-        4: (),
-        5: ((1.80, -0.30), (1.62, 0.20)),
-        6: ((2.85, 0.20), (2.40, 1.45), (1.70, 2.05)),
-        7: ((4.10, 0.35), (3.75, 2.10), (2.20, 3.20)),
-    }
-
-    # How each chute spends its drop, as an exponent on the remaining fraction:
-    # above one drops early and runs low, below one runs high and drops late.
-    #
-    # **This is what isolates the chutes, and with this little plan to work in
-    # it is the only thing that can be.** A wrapping route and a short route
-    # cross wherever the short one's cup lies under the long one's path, and
-    # eight 0.90-wide channels do not fit side by side in the two units between
-    # the fan's lip and the ring. So the wrapping routes stay high and drop at
-    # the end - which also clears the dish rim they pass over - and the short
-    # ones drop first and get out from under them. Graded by wrap, so that two
-    # neighbours are never on the same level.
-    # How each chute spends its drop, as an exponent on the remaining fraction.
-    #
-    # Near one for every chute, and deliberately so. A shaped profile was the
-    # first attempt at isolating the crossings, and it cannot be: a chute held
-    # high through a crossing has to be nearly level to get there, and the
-    # basin measured a marble stalling at 0.9 degrees and running at 7.9. The
-    # exponents here only *lean* the profile - the wrapping chutes a little
-    # late, so they clear the dish rim they pass over, the short ones a little
-    # early - and every grade stays over ten degrees.
-    DROP_SHAPE = {0: 0.62, 1: 0.68, 2: 1.15, 3: 1.45,
-                  4: 1.45, 5: 1.15, 6: 0.68, 7: 0.62}
 
     def __init__(
         self,
@@ -305,175 +257,89 @@ class RadialStart(StartGrid):
             delta[1],
             delta[0] * sin + delta[2] * cos,
         )
-        self._mesh = None
-        self._feeders_cache: list[dict] | None = None
+        self._mesh: TriMesh | None = None
+        self._guides: ApronGuides | None = None
         self.gate_z = self._field_z() + layout.MARBLE_RADIUS + 0.06
 
     # --- what the bays stand on ------------------------------------------
 
     def _field_z(self) -> float:
-        return self.SHELF_BACK + 0.66
-
-    def _t_at_z(self, z: float) -> float:
-        back = self.SHELF_BACK
-        return min(max((z - back) / (self.SHELF_END - back), 0.0), 1.0)
-
-    def _path_at(self, t: float) -> tuple[float, float, float]:
-        back = (0.0, layout.DECK_TOP - 0.02, self.SHELF_BACK)
-        front = (0.0, layout.DECK_TOP - 0.02 - self.SHELF_DROP, self.SHELF_END)
-        return tuple(back[axis] + (front[axis] - back[axis]) * t for axis in range(3))
+        return self.PAN_BACK + 0.66
 
     def _cradle(self, across: float, half: float, t: float = 0.0) -> float:
         """Flat. The fairness change, not the plumbing one - see the docstring."""
-        return -self.SHELF_PAN
-
-    def _half_at(self, t: float) -> float:
-        """The shelf's half width, widening with the fan it carries."""
-        return abs(self.lane_x(0, t)) + 0.5 * self.FAN_PITCH + 0.10
-
-    def lane_x(self, index: int, t: float) -> float:
-        """Lane `index`'s centre at `t` along the shelf: the fan.
-
-        Held at the drawn pitch until the gate, then eased out to `FAN_PITCH`
-        by the lip. Held first because the resting field is what the viewer
-        sees and it has to be at the pitch the drawn module has; eased rather
-        than broken, because a ridge that changes direction at a point is a
-        kerb rather than a guide.
-        """
-        gate_t = self._t_at_z(self._gate_z_for(index)) + 0.05
-        if t <= gate_t:
-            spread = 1.0
-        else:
-            u = (t - gate_t) / max(1.0 - gate_t, 1e-6)
-            spread = 1.0 + (self.FAN_PITCH / layout.BAY_PITCH - 1.0) * _smoothstep(
-                0.0, 1.0, u
-            )
-        return _bay_x(index) * spread
+        return -self.PAN_SINK
 
     # --- the height chain -------------------------------------------------
 
     @property
-    def shelf_y(self) -> float:
-        return layout.DECK_TOP - 0.02 - self.SHELF_DROP
+    def rest_floor(self) -> float:
+        """What a marble rests on at the line, and where a guide starts."""
+        return layout.DECK_TOP - 0.02 - self.PAN_SINK
 
     @property
-    def shelf_floor(self) -> float:
-        """What a marble rests on at the lip, and where a chute starts."""
-        return self.shelf_y - self.SHELF_PAN
+    def trough_floor(self) -> float:
+        """The trough's floor at its outer rim. One height for all eight."""
+        return self.rest_floor - self.APRON_DROP
 
     @property
-    def port_floor(self) -> float:
-        """The cup floors at their outer edge. One height for all eight."""
-        return self.shelf_floor - self.FEEDER_DROP
+    def rest_radius(self) -> float:
+        """Where a marble comes to rest: touching the gate ring, exactly."""
+        return self.PADDLE_R + layout.MARBLE_RADIUS
 
     @property
-    def dish_edge(self) -> float:
-        """The dish's outer floor, level with the cups' inner lip."""
-        return self.port_floor - self.CUP_TILT
+    def paddle_floor(self) -> float:
+        """The floor a marble actually rests on, against the gate ring.
+
+        The trough tilts inward, so the floor at the resting radius is lower
+        than at the rim, and it is this height - not the rim's - that is common
+        to all eight racers. Derived rather than typed, for the reason the
+        basin's notes give.
+        """
+        return self.trough_y(self.rest_radius)
+
+    def trough_drop_to(self, radius: float) -> float:
+        """How far the trough floor has fallen at `radius`, from its rim."""
+        rim = self.TROUGH_R + self.TROUGH_HALF
+        return max(rim - radius, 0.0) * math.tan(math.radians(self.TROUGH_TILT))
+
+    def trough_y(self, radius: float) -> float:
+        """The trough's floor at `radius`, below the apron's own inner edge."""
+        return (self.trough_floor - self.RIM_STEP
+                - self.trough_drop_to(max(radius, self.DRAIN_R)))
 
     @property
     def drain_lip(self) -> float:
-        return self.dish_edge - self.DISH_FALL
+        return self.trough_y(self.DRAIN_R) - self.DRAIN_FALL
 
-    # --- the ring ---------------------------------------------------------
+    # --- the guides -------------------------------------------------------
 
-    @staticmethod
-    def _port_slot(index: int) -> int:
-        """Which of the eight ring positions bay `index` feeds.
-
-        **A linear map from the fan's lip to the ring, and it comes out
-        exact.** Take the lip parameter `v = (i - 3.5) / 3.5`, so the eight
-        bays sit at v = -1, -5/7, ... , +1, and send it to the ring angle
-        `270 + 157.5 v` degrees. Then v = 1/7 lands on 292.5, 3/7 on 337.5,
-        5/7 on 22.5 and 1 on 67.5 - the eight cups at exactly 45 degrees, with
-        no rounding, because 157.5 / 3.5 is 45. The outer bays take the far
-        cups and the inner bays the near ones, which is the nesting order that
-        keeps the routes from crossing: read outward, each route wraps further
-        round the ring than the one inside it.
-        
-        The first build had this backwards - inner bays to far cups - and every
-        route then had to cut across the ones outside it.
-        """
-        return (2, 3, 4, 5, 6, 7, 0, 1)[index]
-
-    def port_angle(self, index: int) -> float:
-        return (self.PORT_DEG0 + 45.0 * self._port_slot(index)) % 360.0
-
-    def _ring_point(self, radius: float, deg: float, y: float):
-        angle = math.radians(deg)
-        return (radius * math.cos(angle), y, self.DISH_Z + radius * math.sin(angle))
-
-    def port_point(self, index: int) -> tuple[float, float, float]:
-        return self._ring_point(self.PORT_R, self.port_angle(index), self.port_floor)
-
-    # --- the chutes -------------------------------------------------------
-
-    def fan_outlet(self, index: int) -> tuple[float, float, float]:
-        return (self.lane_x(index, 1.0), self.shelf_floor, self.SHELF_END)
-
-    def route_plan(self, index: int) -> list[tuple[float, float]]:
-        """A chute's plan controls: the fan's lip, its waypoints, its cup."""
-        outlet = self.fan_outlet(index)
-        deg = self.port_angle(index) - self.DELIVERY_LEAD
-        cup = self._ring_point(self.PORT_R, deg, 0.0)
-        controls = [(outlet[0], outlet[2])]
-        controls.extend(self.ROUTES[index])
-        controls.append((cup[0], cup[2]))
-        return controls
-
-    def feeders(self) -> list[dict]:
-        """One chute per bay, as samples and a description.
-
-        **Not congruent, and they cannot be.** Eight collinear mouths cannot be
-        mapped onto eight points of a circle by congruent curves, and forcing
-        equal length with detours only trades a length difference for a
-        curvature difference - the same inequality in different clothes. So the
-        chutes equalise what geometry allows: every one drops exactly
-        `FEEDER_DROP` at a constant grade onto a cup at exactly `PORT_R`. The
-        cups absorb the rest, and `feeder_table` reports the residual rather
-        than hiding it.
-        """
-        if self._feeders_cache is None:
-            self._feeders_cache = [self._feeder(i) for i in range(layout.BAYS)]
-        return self._feeders_cache
-
-    def _feeder(self, index: int) -> dict:
-        outlet = self.fan_outlet(index)
-        plan = _smooth(self.route_plan(index), self.SAMPLES_PER_UNIT)
-        span = _polyline_length(plan)
-        # Constant grade, so a chute has no flat spot anywhere. The basin's
-        # note about a level dish applies to a chute too: a marble that comes
-        # to rest in a feeder never reaches its cup.
-        shape = self.DROP_SHAPE[index]
-        samples: list[tuple[float, float, float]] = []
-        run = 0.0
-        for order, point in enumerate(plan):
-            if order:
-                run += math.dist(plan[order - 1], point)
-            u = min(1.0, run / max(span, 1e-6))
-            # Exactly `shelf_floor` at the lip and exactly `port_floor` at the
-            # cup for every chute whatever the shape, so the drop stays equal
-            # while the height *at a given plan point* becomes free.
-            samples.append(
-                (
-                    point[0],
-                    self.port_floor + self.FEEDER_DROP * (1.0 - u) ** shape,
-                    point[1],
-                )
+    def guides(self) -> ApronGuides:
+        if self._guides is None:
+            self._guides = ApronGuides(
+                field_z=self._field_z(),
+                rest_hold=self.gate_z - self._field_z() + 0.12,
+                dish_z=self.DISH_Z,
+                trough_r=self.TROUGH_R,
+                trough_half=self.TROUGH_HALF,
+                drop=self.APRON_DROP,
+                lip_z=self.LIP_Z,
+                head_grade=self.HEAD_GRADE,
+                lane=self.LANE,
+                shelf_half=self.PAN_HALF - 0.20,
             )
-        return {
-            "bay": index,
-            "slot": self._port_slot(index),
-            "angle": self.port_angle(index),
-            "mouth": outlet,
-            "plan_length": span,
-            "length": span,
-            "grade": self.FEEDER_DROP / max(span, 1e-6),
-            "shape": shape,
-            "steepest_deg": _steepest(samples),
-            "drop": self.FEEDER_DROP,
-            "samples": samples,
-        }
+        return self._guides
+
+    def guide_point(self, index: int, fraction: float) -> tuple[float, float, float]:
+        """The guide's floor at `fraction` along it, in the module's frame."""
+        guides = self.guides()
+        path = guides.paths()[index]
+        step = max(0.0, min(1.0, fraction)) * (len(path) - 1)
+        low = max(0, min(len(path) - 2, int(step)))
+        t = step - low
+        x = path[low][0] + (path[low + 1][0] - path[low][0]) * t
+        z = path[low][1] + (path[low + 1][1] - path[low][1]) * t
+        return (x, self.rest_floor - guides.fall(index, fraction), z)
 
     # --- the collider -----------------------------------------------------
 
@@ -481,293 +347,233 @@ class RadialStart(StartGrid):
         if self._mesh is not None:
             return [self._mesh]
         pieces: list[TriMesh] = []
-        pieces.extend(self._shelf())
-        pieces.extend(self._chutes())
-        pieces.extend(self._cups())
-        pieces.extend(self._dish())
+        pieces.extend(self._apron())
+        pieces.extend(self._catch())
+        pieces.extend(self._trough())
         pieces.extend(self._exit_chute())
         self._mesh = merge_meshes(pieces, f"{self.id}_radial")
         return [self._mesh]
 
-    def _shelf(self) -> list[TriMesh]:
+    def _lane_rows(self) -> list[list[tuple[float, float, float]]]:
+        """Each guide sampled at a common parameter, in the module's frame.
+
+        A common *parameter* rather than a common arc length: the eight guides
+        are 3.6 to 7.9 long, and the apron between two of them is the strip
+        swept between their whole extents. Both endpoints of every guide are
+        common - the resting line and the trough's rim - so a common parameter
+        closes the strips cleanly at both ends.
+
+        **The heel matters as much as the rest of it.** A guide begins at its
+        bay's resting place, so an apron built from the guides alone begins
+        there too - and the drawn pod's floor runs 0.66 further back, behind
+        the field. Built without the heel there was simply no surface there,
+        and traced in simulation the release itself put marbles into the hole:
+        eight racers 0.63 apart in 0.089-deep grooves jostle when the gate
+        lifts, one gets pushed backwards, and it falls 4.6 units. Four of eight
+        went that way on the first seed. Single marbles never showed it, which
+        is exactly what step C of the brief's validation order is for.
+        """
+        rows = []
+        heel = self.HEEL_ROWS
+        grade = math.tan(math.radians(self.HEAD_GRADE))
+        for index in range(layout.BAYS):
+            lane = []
+            for row in range(heel):
+                # Behind the line, on the same grade, so the resting marble is
+                # on a slope and rolls into the gate rather than sitting level.
+                z = self.PAN_BACK + (self._field_z() - self.PAN_BACK) * row / heel
+                lane.append((bay_x(index),
+                             self.rest_floor + (self._field_z() - z) * grade, z))
+            lane.extend(self.guide_point(index, row / self.ROWS)
+                        for row in range(self.ROWS + 1))
+            rows.append(lane)
+        return rows
+
+    def _apron(self) -> list[TriMesh]:
+        """One surface: seven lane strips, two kerbs and a backstop.
+
+        Cross-strip interpolation is **polar about the drain**, not a straight
+        chord. Near the ring a strip spans 45 degrees of a 1.71 radius, and a
+        chord there cuts 0.065 inside the rim - a step at exactly the place the
+        field is delivered. Upstream, where the guides are nearly parallel and
+        five units from the drain, polar and linear agree to a hundredth.
+
+        The strips run 0-1 through 6-7 and deliberately **not** 7-0: the sheet
+        is a 315-degree annulus, and the 45 degrees it does not cover is where
+        the drain and the exit chute are.
+        """
+        lanes = self._lane_rows()
         pieces: list[TriMesh] = []
-        rows, columns = 20, 16
-        rings: list[list[tuple[float, float, float]]] = []
-        for row in range(rows + 1):
-            t = row / rows
-            centre = self._path_at(t)
-            half = self._half_at(t)
-            floor = centre[1] - self.SHELF_PAN
-            ring = [_place(self.origin, self.frame, (-half, centre[1] + 0.34, centre[2]))]
-            for column in range(columns + 1):
-                across = -half + 2.0 * half * column / columns
-                ring.append(_place(self.origin, self.frame, (across, floor, centre[2])))
-            ring.append(_place(self.origin, self.frame, (half, centre[1] + 0.34, centre[2])))
-            rings.append(ring)
-        pieces.append(_strip(rings, f"{self.id}_shelf"))
-
-        # Seven fanning ridges, the whole length of the shelf. Past the gate a
-        # ridge is not a lane divider any more - it is the steering that fans
-        # the field out to the chutes' pitch. On the pan at the drawn stock's
-        # radius rather than as tubes in the marble's path; `StartGrid` records
-        # the measurement that forced that.
         for index in range(layout.BAYS - 1):
-            lane: list[tuple[float, float, float]] = []
-            for row in range(21):
-                t = row / 20
-                centre = self._path_at(t)
-                across = 0.5 * (self.lane_x(index, t) + self.lane_x(index + 1, t))
-                lane.append(
-                    _place(
-                        self.origin,
-                        self.frame,
-                        (across, centre[1] - self.SHELF_PAN, centre[2]),
-                    )
-                )
-            for step in range(len(lane) - 1):
-                pieces.append(
-                    tube(
-                        lane[step],
-                        lane[step + 1],
-                        to_sim(self.FIN_RADIUS),
-                        segments=8,
-                        name=f"{self.id}_fin{index}_{step}",
-                        caps=step in (0, len(lane) - 2),
-                    )
-                )
-
-        back = self._path_at(0.0)
-        half = self._half_at(0.0)
-        pieces.append(
-            plate(
-                [
-                    _place(self.origin, self.frame, (-half, back[1] - self.SHELF_PAN, back[2])),
-                    _place(self.origin, self.frame, (half, back[1] - self.SHELF_PAN, back[2])),
-                    _place(self.origin, self.frame, (half, back[1] + 0.34, back[2])),
-                    _place(self.origin, self.frame, (-half, back[1] + 0.34, back[2])),
-                ],
-                name=f"{self.id}_backstop",
-                steps=5,
-            )
-        )
+            rings: list[list[tuple[float, float, float]]] = []
+            for row in range(len(lanes[index])):
+                inner, outer = lanes[index][row], lanes[index + 1][row]
+                rings.append([
+                    _place(self.origin, self.frame,
+                           self._between(inner, outer, column / self.COLUMNS))
+                    for column in range(self.COLUMNS + 1)
+                ])
+            pieces.append(_strip(rings, f"{self.id}_lane{index}"))
+        for side, index in ((-1.0, 0), (1.0, layout.BAYS - 1)):
+            pieces.append(self._kerb(lanes, index, side))
+        pieces.append(self._backstop())
         return pieces
 
-    def _chute_section(self) -> list[tuple[float, float]]:
-        """A chute read across: two walls and a cradle wider than a marble.
+    def _between(self, a, b, t: float) -> tuple[float, float, float]:
+        """A point across a lane strip: polar in plan, with the rib on top."""
+        ra = math.hypot(a[0], a[2] - self.DISH_Z)
+        rb = math.hypot(b[0], b[2] - self.DISH_Z)
+        pa = math.atan2(a[2] - self.DISH_Z, a[0])
+        pb = math.atan2(b[2] - self.DISH_Z, b[0])
+        # Shortest way round, so a strip never wraps the long way.
+        span = (pb - pa + math.pi) % (2.0 * math.pi) - math.pi
+        radius = ra + (rb - ra) * t
+        angle = pa + span * t
+        blend = t * t * (3.0 - 2.0 * t)
+        # Two circular cradles, one centred on each guide, meeting at the
+        # crest. A cradle rather than a bump because the marble has to be able
+        # to reach the bottom of it - see `CRADLE_R`.
+        height = a[1] + (b[1] - a[1]) * blend
+        width = math.hypot(a[0] - b[0], a[2] - b[2])
+        height += min(self._cradle_rise(t * width),
+                      self._cradle_rise((1.0 - t) * width),
+                      self.LANE_CREST)
+        return (radius * math.cos(angle), height,
+                self.DISH_Z + radius * math.sin(angle))
 
-        The cradle's radius matters and the basin's notes say why: a cradle
-        0.30 wide and 0.20 deep has a curvature radius of 0.225 at its bottom,
-        *smaller* than the 0.285 marble that has to sit in it, so the marble
-        never reaches the floor and wedges between the walls instead - all
-        eight stopped four fifths of the way down their own feeder.
-        `FEEDER_FLOOR_R` is 0.60, over twice a marble's radius.
+    def _cradle_rise(self, across: float) -> float:
+        """How far a circular cradle of radius `CRADLE_R` rises at `across`."""
+        radius = self.CRADLE_R
+        span = min(abs(across), radius)
+        return radius - math.sqrt(max(radius * radius - span * span, 0.0))
+
+    def _kerb(self, lanes, index: int, side: float) -> TriMesh:
+        """The apron's outer boundary, outboard of the outermost guide.
+
+        **It is a floor that rises, not a wall standing off at a distance.**
+        The first version offset a wall 0.30 outboard and left no surface in
+        between, so the marble resting exactly on guide 0 had floor under its
+        inboard half and a 0.30 hole under its outboard half; traced in
+        simulation it wedged 0.057 high against the wall's foot and never moved
+        at all, for the whole run, every seed.
+
+        So the section is the rib's own shape, mirrored: zero cross-slope at
+        the guide, rising to `KERB_RISE` at `KERB_OUT`. The outermost lane then
+        has a symmetric groove like every other lane, and the boundary is
+        containment rather than a kerb to trip over.
+
+        Offset along the guide's own plan normal rather than radially, because
+        near the resting line the guides run downhill and a radial offset there
+        points along them rather than across.
         """
-        half = self.CUP_HALF
-        radius = self.FEEDER_FLOOR_R
-        points: list[tuple[float, float]] = [(-(half + self.WALL_THICK), self.FEEDER_WALL)]
+        path = lanes[index]
+        columns = 4
+        rings: list[list[tuple[float, float, float]]] = []
+        for row in range(len(path)):
+            behind = path[max(row - 1, 0)]
+            ahead = path[min(row + 1, len(path) - 1)]
+            dx, dz = ahead[0] - behind[0], ahead[2] - behind[2]
+            span = math.hypot(dx, dz) or 1.0
+            nx, nz = side * dz / span, -side * dx / span
+            ring = []
+            for column in range(columns + 1):
+                t = column / columns
+                # The cradle's own flank for the first stretch, so the marble
+                # in the outermost lane sits in the same shape as every other,
+                # then on up to `KERB_RISE`.
+                rise = min(self._cradle_rise(t * self.KERB_OUT), self.LANE_CREST)
+                rise += max(0.0, self.KERB_RISE - self.LANE_CREST) * (t ** 3)
+                ring.append(_place(self.origin, self.frame, (
+                    path[row][0] + nx * self.KERB_OUT * t,
+                    path[row][1] + rise,
+                    path[row][2] + nz * self.KERB_OUT * t,
+                )))
+            rings.append(ring if side > 0 else list(reversed(ring)))
+        return _strip(rings, f"{self.id}_kerb{index}")
+
+    def _backstop(self) -> TriMesh:
+        floor = self.rest_floor
+        corners = [
+            (-self.PAN_HALF, floor, self.PAN_BACK),
+            (self.PAN_HALF, floor, self.PAN_BACK),
+            (self.PAN_HALF, floor + 0.42, self.PAN_BACK),
+            (-self.PAN_HALF, floor + 0.42, self.PAN_BACK),
+        ]
+        return plate([_place(self.origin, self.frame, p) for p in corners],
+                     name=f"{self.id}_backstop", steps=5)
+
+    def _catch(self) -> list[TriMesh]:
+        """The apron's slit, closed - over the exit chute, under nothing.
+
+        The apron is a 315-degree annulus and the 45 degrees it does not cover
+        is the sector the drain empties through. **That sector was an open hole
+        at apron level, and the two outermost guides deliver at its two
+        edges.** Traced in simulation, bay 0 reached the trough and was then
+        knocked straight out through it: it ended 3.9 units from the drain and
+        4.7 below the pan, every seed once the field was eight.
+
+        So the sector gets a floor at the apron's own inner-edge height, rising
+        outward into a catch wall, and an overshooting racer is returned to the
+        trough instead of leaving the machine. It sits a clear unit above the
+        exit chute's own walls and stops short of the launch entry.
+
+        The wall is steeper than the apron is elsewhere, which is an azimuthal
+        asymmetry - and it costs nothing, because the field comes to rest
+        against the gate ring at 1.305 and the surround begins at 1.71.
+        """
+        rim = self.TROUGH_R + self.TROUGH_HALF
+        rings: list[list[tuple[float, float, float]]] = []
+        steps = 6
+        for step in range(steps + 1):
+            t = step / steps
+            radius = rim + (self.CATCH_R - rim) * t
+            y = self.trough_floor + self.CATCH_RISE * t * t
+            rings.append([
+                _place(self.origin, self.frame,
+                       self._ring_point(radius, self.CATCH_FROM
+                                        + (self.CATCH_TO - self.CATCH_FROM) * p / 24,
+                                        y))
+                for p in range(25)
+            ])
+        return [_strip(rings, f"{self.id}_catch")]
+
+    def _trough(self) -> list[TriMesh]:
+        """The annular holding floor, from the rim in to the drain's lip.
+
+        Rotationally symmetric, and that is the point: the trough does not
+        control where round the ring a marble comes to rest, so nothing below
+        it may care. V1.4's dish had eight vanes and therefore eight
+        orientations to be lucky about; this has none.
+        """
+        rim = self.TROUGH_R + self.TROUGH_HALF
+        rings: list[list[tuple[float, float, float]]] = []
+        # The lip: the apron's inner edge, then straight down `RIM_STEP`.
+        rings.append([
+            _place(self.origin, self.frame,
+                   self._ring_point(rim, 360.0 * p / self.RINGS, self.trough_floor))
+            for p in range(self.RINGS + 1)
+        ])
         steps = 8
         for step in range(steps + 1):
-            across = -half + 2.0 * half * step / steps
-            points.append(
-                (across, radius - math.sqrt(max(radius * radius - across * across, 0.0)))
-            )
-        points.append((half + self.WALL_THICK, self.FEEDER_WALL))
-        return points
-
-    def _chutes(self) -> list[TriMesh]:
-        pieces: list[TriMesh] = []
-        section = self._chute_section()
-        for feeder in self.feeders():
-            samples = feeder["samples"]
-            rings: list[list[tuple[float, float, float]]] = []
-            for order, point in enumerate(samples):
-                behind = samples[max(order - 1, 0)]
-                ahead = samples[min(order + 1, len(samples) - 1)]
-                forward = (ahead[0] - behind[0], ahead[2] - behind[2])
-                span = math.hypot(*forward) or 1.0
-                side = (forward[1] / span, -forward[0] / span)
-                rings.append(
-                    [
-                        _place(
-                            self.origin,
-                            self.frame,
-                            (
-                                point[0] + side[0] * across,
-                                point[1] + rise,
-                                point[2] + side[1] * across,
-                            ),
-                        )
-                        for across, rise in section
-                    ]
-                )
-            pieces.append(_strip(rings, f"{self.id}_chute{feeder['bay']}"))
-        return pieces
-
-    def _cup_section(self) -> list[tuple[float, float]]:
-        """A cup read radially: outer wall, floor falling inward, inner lip.
-
-        The floor falls `CUP_TILT` toward the drain, so a released marble
-        leaves inward as well as along the ring. That is the swirl, and it is
-        the same swirl in every cup.
-        """
-        half = self.CUP_HALF
-        return [
-            (half + self.WALL_THICK, self.CUP_WALL),
-            (half, 0.0),
-            (half * 0.5, -self.CUP_TILT * 0.45),
-            (0.0, -self.CUP_TILT * 0.72),
-            (-half * 0.5, -self.CUP_TILT * 0.90),
-            (-half, -self.CUP_TILT),
-        ]
-
-    def _cups(self) -> list[TriMesh]:
-        pieces: list[TriMesh] = []
-        section = self._cup_section()
-        for index in range(layout.BAYS):
-            end = self.port_angle(index)
-            start = end - self.CUP_ARC
-            rings: list[list[tuple[float, float, float]]] = []
-            for step in range(7):
-                deg = start + (end - start) * step / 6
-                rings.append(
-                    [
-                        _place(
-                            self.origin,
-                            self.frame,
-                            self._ring_point(
-                                self.PORT_R + across, deg, self.port_floor + rise
-                            ),
-                        )
-                        for across, rise in section
-                    ]
-                )
-            pieces.append(_strip(rings, f"{self.id}_cup{index}"))
-            # A back stop at the clockwise end, so a marble delivered into the
-            # middle of the cup cannot run out of the end it arrived by.
-            low = [
-                _place(
-                    self.origin,
-                    self.frame,
-                    self._ring_point(self.PORT_R + across, start, self.port_floor + rise),
-                )
-                for across, rise in section
-            ]
-            # `+ 0.06`, because the section's own first point is already at
-            # `CUP_WALL` and a top ring at exactly that height duplicates it -
-            # two coincident vertices are a zero-area triangle, which
-            # `check_mesh` reports and rightly: the solver takes a meaningless
-            # normal from one.
-            high = [
-                _place(
-                    self.origin,
-                    self.frame,
-                    self._ring_point(
-                        self.PORT_R + across,
-                        start,
-                        self.port_floor + self.CUP_WALL + 0.06,
-                    ),
-                )
-                for across, _rise in section
-            ]
-            pieces.append(_strip([low, high], f"{self.id}_cupback{index}"))
-        return pieces
-
-    def _dish(self) -> list[TriMesh]:
-        """A cone from the cup ring to the drain, the rim, and the apron.
-
-        **Conical rather than dished**, and the basin's notes carry the
-        measurement: a floor level at the drain's mouth is a flat spot eight
-        marbles settle on, and with `surface_friction` at 0.50 a pile on a
-        level floor is statically stable. A constant slope has no flat spot
-        anywhere.
-        """
-        pieces: list[TriMesh] = []
-        outer = self.PORT_R - self.CUP_HALF
-        rings: list[list[tuple[float, float, float]]] = []
-        for step in range(self.STEPS + 1):
-            radius = outer - (outer - self.DRAIN_R) * step / self.STEPS
-            fraction = (radius - self.DRAIN_R) / max(outer - self.DRAIN_R, 1e-6)
-            y = self.drain_lip + (self.dish_edge - self.drain_lip) * fraction
-            rings.append(
-                [
-                    _place(
-                        self.origin,
-                        self.frame,
-                        self._ring_point(radius, 360.0 * point / self.RINGS, y),
-                    )
-                    for point in range(self.RINGS + 1)
-                ]
-            )
-        pieces.append(_strip(rings, f"{self.id}_dish"))
-
-        # The apron between the cup ring and the rim, and the rim itself. The
-        # rim is unbroken: the cups are inside it and the chutes arrive over
-        # the top of it, so unlike the basin's rim it has nothing to leave a
-        # gap for - which is the failure that note warns about.
-        apron = [
-            [
-                _place(
-                    self.origin,
-                    self.frame,
-                    self._ring_point(radius, 360.0 * p / self.RINGS, self.dish_edge - 0.02),
-                )
+            radius = rim - (rim - self.DRAIN_R) * step / steps
+            y = self.trough_y(radius)
+            rings.append([
+                _place(self.origin, self.frame,
+                       self._ring_point(radius, 360.0 * p / self.RINGS, y))
                 for p in range(self.RINGS + 1)
-            ]
-            for radius in (self.RIM_R, self.PORT_R + self.CUP_HALF + self.WALL_THICK)
-        ]
-        pieces.append(_strip(apron, f"{self.id}_apron"))
-        wall = [
-            [
-                _place(
-                    self.origin,
-                    self.frame,
-                    self._ring_point(self.RIM_R, 360.0 * p / self.RINGS, self.dish_edge - 0.02),
-                )
-                for p in range(self.RINGS + 1)
-            ],
-            [
-                _place(
-                    self.origin,
-                    self.frame,
-                    self._ring_point(
-                        self.RIM_R, 360.0 * p / self.RINGS, self.dish_edge + self.RIM_RISE
-                    ),
-                )
-                for p in range(self.RINGS + 1)
-            ],
-        ]
-        pieces.append(_strip(wall, f"{self.id}_rim"))
+            ])
+        # And the lip of the drain, dropping away under the gate ring.
+        rings.append([
+            _place(self.origin, self.frame,
+                   self._ring_point(self.DRAIN_R, 360.0 * p / self.RINGS,
+                                    self.trough_y(self.DRAIN_R) - 0.12))
+            for p in range(self.RINGS + 1)
+        ])
+        return [_strip(rings, f"{self.id}_trough")]
 
-        for index in range(layout.BAYS):
-            port = self.port_angle(index)
-            foot = self._ring_point(
-                self.VANE_FROM[0], port + self.VANE_FROM[1], self._dish_y(self.VANE_FROM[0])
-            )
-            head = self._ring_point(
-                self.VANE_TO[0], port + self.VANE_TO[1], self._dish_y(self.VANE_TO[0])
-            )
-            low = [
-                _place(self.origin, self.frame, foot),
-                _place(self.origin, self.frame, head),
-            ]
-            high = [
-                _place(
-                    self.origin,
-                    self.frame,
-                    (point[0], point[1] + self.VANE_RISE, point[2]),
-                )
-                for point in (foot, head)
-            ]
-            pieces.append(_strip([low, high], f"{self.id}_vane{index}"))
-        return pieces
-
-    def _dish_y(self, radius: float) -> float:
-        """The dish's floor at a radius. One expression, used by the vanes too."""
-        outer = self.PORT_R - self.CUP_HALF
-        fraction = (radius - self.DRAIN_R) / max(outer - self.DRAIN_R, 1e-6)
-        return self.drain_lip + (self.dish_edge - self.drain_lip) * min(
-            max(fraction, 0.0), 1.0
-        )
+    def _ring_point(self, radius: float, deg: float, y: float):
+        angle = math.radians(deg)
+        return (radius * math.cos(angle), y, self.DISH_Z + radius * math.sin(angle))
 
     def _exit_chute(self) -> list[TriMesh]:
         """From under the drain to the launch run's entry.
@@ -776,14 +582,15 @@ class RadialStart(StartGrid):
         notes record the cost of getting wrong: a chute narrower than the drain
         and starting at the drain's own centre lost seven of eight marbles over
         its edges, every trial.
+
+        **The chute has to start well below the drain and grow its walls
+        afterwards.** At `drain_lip - 0.05` with full walls from its first ring
+        the walls stood 0.46 *above* the inner floor - they came up through the
+        hole and made a slot - and traced in simulation the field wedged in it
+        and the whole start froze. A chute under a drain is a landing, and a
+        landing has no kerb.
         """
-        # **The chute has to start well below the drain and grow its walls
-        # afterwards.** At `drain_lip - 0.05` with full walls from its first
-        # ring, the walls stood 0.46 *above* the dish's inner floor - they came
-        # up through the hole and made a slot, and traced in simulation the
-        # field wedged in it and the whole start froze. A chute under a drain
-        # is a landing, and a landing has no kerb.
-        start = (0.0, self.drain_lip - 0.44, self.DISH_Z - self.CHUTE_LEAD)
+        start = (0.0, self.drain_lip - 0.30, self.DISH_Z - self.CHUTE_LEAD)
         end = tuple(self.exit_local)
         rings: list[list[tuple[float, float, float]]] = []
         for step in range(self.CHUTE_STEPS + 1):
@@ -791,63 +598,97 @@ class RadialStart(StartGrid):
             centre = tuple(start[axis] + (end[axis] - start[axis]) * t for axis in range(3))
             half = self.CHUTE_HALF + (layout.CHANNEL_HALF - self.CHUTE_HALF) * t
             wall = self.CHUTE_WALL * _smoothstep(0.06, 0.34, t)
-            ring = [
-                _place(
-                    self.origin,
-                    self.frame,
-                    (centre[0] - (half + 0.10), centre[1] + wall, centre[2]),
-                )
-            ]
+            ring = [_place(self.origin, self.frame,
+                           (centre[0] - (half + 0.10), centre[1] + wall, centre[2]))]
             for column in range(9):
                 across = -half + 2.0 * half * column / 8
-                rise = (
-                    layout.floor_y_at(min(abs(across), layout.CHANNEL_HALF)) - layout.FLOOR_Y
-                )
-                ring.append(
-                    _place(
-                        self.origin,
-                        self.frame,
-                        (centre[0] + across, centre[1] + rise, centre[2]),
-                    )
-                )
-            ring.append(
-                _place(
-                    self.origin,
-                    self.frame,
-                    (centre[0] + half + 0.10, centre[1] + wall, centre[2]),
-                )
-            )
+                rise = (layout.floor_y_at(min(abs(across), layout.CHANNEL_HALF))
+                        - layout.FLOOR_Y)
+                ring.append(_place(self.origin, self.frame,
+                                   (centre[0] + across, centre[1] + rise, centre[2])))
+            ring.append(_place(self.origin, self.frame,
+                               (centre[0] + half + 0.10, centre[1] + wall, centre[2])))
             rings.append(ring)
         return [_strip(rings, f"{self.id}_exit")]
 
     # --- the two gates ----------------------------------------------------
 
     def local_actuators(self) -> list[Actuator]:
-        gates = list(super().local_actuators())
-        if not self.port_gate:
-            return gates
+        """The eight release paddles, and the ring.
+
+        **The paddles are placed here rather than inherited, and that was a
+        bug worth the whole diagnosis it took.** `StartGrid.local_actuators`
+        reads `_t_at_z`, `_half_at` and `_path_at` to find each bay's gate, and
+        those describe the *fan's* trough. This module does not have one, so
+        the inherited builder placed eight paddles by a geometry that no longer
+        exists - clamped to the fan's back edge, spread by the fan's own width
+        factor, at the fan's height. They stood on the apron, downhill of the
+        field, and bay 7's racer ran into one at 3.45 units from the drain and
+        stopped there for the remaining eleven seconds. Bay 0's cleared its own
+        by a hair and went on, which is why the failure looked like a
+        left-right asymmetry in a geometry that is exactly mirror-symmetric.
+
+        Placed from the pan's own numbers, a paddle stands at its bay's x, at
+        the gate line, on the guide's own floor there.
+        """
         from marble3d.modules.base import LinearGate
 
+        gates: list[Actuator] = []
+        guides = self.guides()
         for index in range(layout.BAYS):
-            # **The paddle is the cup's inner wall.** The first build stood it
-            # across the ring at the cup's counterclockwise end, on the
-            # reasoning that a marble would run along the ring into it - and
-            # traced in simulation, every marble arrived *radially* off its
-            # chute, crossed the cup and left over the inner lip onto the dish.
-            # A cup that does not close inward is not a cup. So the paddle
-            # closes the one face the marble is actually travelling toward, and
-            # lifting it releases the field down the dish.
-            deg = self.port_angle(index) - 0.5 * self.CUP_ARC
+            gate_z = self._gate_z_for(index)
+            # The guides run straight down their bay's x for the first stretch
+            # (`ApronGuides` pins that, so the resting field is abreast), so
+            # the arc from the resting place to the gate line is exactly the
+            # distance between them.
+            fraction = (gate_z - self._field_z_for(index)) / guides.length(index)
+            floor = self.rest_floor - guides.fall(index, fraction)
+            position = _place(
+                self.origin,
+                self.frame,
+                (bay_x(index), floor + 0.5 * layout.GATE_HEIGHT, gate_z),
+            )
+            gates.append(
+                LinearGate(
+                    name=f"paddle{index}",
+                    # (thin along the flow, up, across). `basis_from_forward_up`
+                    # puts `forward` on local X, and `_rotation` passes the flow
+                    # direction - see `StartGrid.local_actuators` for the cost
+                    # of reading that the other way round.
+                    half_extents=(
+                        to_sim(0.045),
+                        to_sim(0.5 * layout.GATE_HEIGHT),
+                        to_sim(0.5 * (layout.BAY_PITCH - 0.12)),
+                    ),
+                    rest=Transform(position=position, rotation=self._rotation()),
+                    travel=(0.0, to_sim(self.release_travel), 0.0),
+                    release_time=self.release_time,
+                    duration=0.16,
+                )
+            )
+        if not self.port_gate:
+            return gates
+
+        count = self.PADDLE_SEGMENTS
+        for index in range(count):
+            deg = 360.0 * (index + 0.5) / count
             angle = math.radians(deg)
+            # The ring's inner face stands at `PADDLE_R`, so a marble comes to
+            # rest with its centre at `PADDLE_R + MARBLE_RADIUS` - the same
+            # radius from the drain, exactly, for all eight racers. That is the
+            # invariant the whole architecture exists to establish, and here it
+            # is one number rather than eight pockets' worth of tolerance.
+            # Centred so the ring's *outer* face stands at `PADDLE_R`: the
+            # marble arrives from outside and rests against that face, so it is
+            # the outer one that sets the resting radius. Centring on
+            # `PADDLE_R` instead put the field at 1.427 where `rest_radius`
+            # claimed 1.305 - the invariant was still exact, but the number
+            # documenting it was wrong by half a marble.
             point = self._ring_point(
-                self.PORT_R - self.CUP_HALF,
-                deg,
-                self.port_floor - self.CUP_TILT + 0.5 * self.PORT_GATE_HEIGHT,
+                self.PADDLE_R - self.PADDLE_THICK, deg,
+                self.trough_y(self.PADDLE_R) + 0.5 * self.PADDLE_HEIGHT,
             )
             world = _place(self.origin, self.frame, point)
-            # Thin along the radius, which is the axis the marble crosses it
-            # on: `basis_from_forward_up` puts `forward` on local X and the
-            # extents are read (thin, height, along the arc).
             radial = (math.cos(angle), 0.0, math.sin(angle))
             forward = tuple(
                 self.frame[0][axis] * radial[0] + self.frame[2][axis] * radial[2]
@@ -857,17 +698,17 @@ class RadialStart(StartGrid):
                 LinearGate(
                     name=f"port{index}",
                     half_extents=(
-                        to_sim(0.05),
-                        to_sim(0.5 * self.PORT_GATE_HEIGHT),
-                        to_sim(self.PORT_R * math.radians(0.5 * self.CUP_ARC) + 0.08),
+                        to_sim(self.PADDLE_THICK),
+                        to_sim(0.5 * self.PADDLE_HEIGHT),
+                        to_sim(self.PADDLE_R * math.tan(math.pi / count) + 0.05),
                     ),
                     rest=Transform(
                         position=world,
                         rotation=basis_from_forward_up(forward, self.frame[1]),
                     ),
-                    travel=(0.0, to_sim(0.80), 0.0),
-                    release_time=self.PORT_RELEASE,
-                    duration=0.16,
+                    travel=(0.0, to_sim(0.90), 0.0),
+                    release_time=self.RELEASE,
+                    duration=self.RELEASE_DURATION,
                 )
             )
         return gates
@@ -875,33 +716,20 @@ class RadialStart(StartGrid):
     # --- what the simulation needs ----------------------------------------
 
     def marble_starts(self) -> list[Transform]:
-        """Eight resting places on the flat pan, outermost bay first.
-
-        `StartGrid`'s version reads the fan's shrinking width factor; this
-        shelf holds the drawn pitch until the gate, so the resting pitch is
-        exactly `BAY_PITCH` - which is what the viewer sees.
-        """
+        """Eight resting places on the flat pan, at the drawn bay pitch."""
         rotation = self._rotation()
-        starts: list[Transform] = []
-        for index in range(layout.BAYS):
-            field_z = self._field_z_for(index)
-            t = self._t_at_z(field_z)
-            centre = self._path_at(t)
-            starts.append(
-                Transform(
-                    position=_place(
-                        self.origin,
-                        self.frame,
-                        (
-                            self.lane_x(index, t),
-                            centre[1] - self.SHELF_PAN + MARBLE_RADIUS,
-                            field_z,
-                        ),
-                    ),
-                    rotation=rotation,
-                )
+        return [
+            Transform(
+                position=_place(
+                    self.origin,
+                    self.frame,
+                    (bay_x(index), self.rest_floor + MARBLE_RADIUS,
+                     self._field_z_for(index)),
+                ),
+                rotation=rotation,
             )
-        return starts
+            for index in range(layout.BAYS)
+        ]
 
     def local_sockets(self) -> dict[str, Socket]:
         exit_point = _place(self.origin, self.frame, self.exit_local)
@@ -927,46 +755,22 @@ class RadialStart(StartGrid):
         )
 
     def local_probes(self) -> list[Probe]:
-        """Rays at the shelf, at every chute and around the dish.
+        """Rays down every guide, and round the trough.
 
-        The cups and the ring paddles are skipped for the reason `StartGrid`
-        skips its gate rows: a probe fired where a kinematic body stands
-        measures the paddle and reports the floor as missing, and loosening the
-        tolerance is what would make the rest of the check worthless.
+        The gate ring is skipped for the reason `StartGrid` skips its gate
+        rows: a probe fired where a kinematic body stands measures the paddle
+        and reports the floor as missing, and loosening the tolerance is what
+        would make the rest of the check worthless.
         """
         probes: list[Probe] = []
         reach = 3.0 * MARBLE_RADIUS
-        gate_rows = {
-            int(round(self._t_at_z(self._gate_z_for(index)) * 12))
-            for index in range(layout.BAYS)
-        }
-        for row in range(0, 13, 3):
-            if any(abs(row - gate_row) <= 1 for gate_row in gate_rows):
-                continue
-            t = row / 12.0
-            centre = self._path_at(t)
-            for bay in (0, 3, 7):
-                surface = _place(
-                    self.origin,
-                    self.frame,
-                    (self.lane_x(bay, t), centre[1] - self.SHELF_PAN, centre[2]),
-                )
-                probes.append(
-                    Probe(
-                        start=(surface[0], surface[1] + reach, surface[2]),
-                        end=(surface[0], surface[1] - reach, surface[2]),
-                        expect_hit=True,
-                        expected_point=surface,
-                        tolerance=0.05,
-                        label=f"{self.id}.shelf[{row}]bay{bay}",
-                    )
-                )
-        for feeder in self.feeders():
-            samples = feeder["samples"]
-            for fraction in (0.25, 0.55, 0.82):
-                order = int(fraction * (len(samples) - 1))
-                point = samples[order]
-                surface = _place(self.origin, self.frame, point)
+        gate_at = (self.gate_z - self._field_z()) / max(self.guides().length(0), 1e-6)
+        for index in range(layout.BAYS):
+            for fraction in (0.02, 0.18, 0.36, 0.54, 0.72, 0.88, 0.97):
+                if abs(fraction - gate_at) < 0.04:
+                    continue
+                surface = _place(self.origin, self.frame,
+                                 self.guide_point(index, fraction))
                 probes.append(
                     Probe(
                         start=(surface[0], surface[1] + reach, surface[2]),
@@ -974,16 +778,14 @@ class RadialStart(StartGrid):
                         expect_hit=True,
                         expected_point=surface,
                         tolerance=0.06,
-                        label=f"{self.id}.chute{feeder['bay']}[{order}]",
+                        label=f"{self.id}.guide{index}[{fraction:.2f}]",
                     )
                 )
-        outer = self.PORT_R - self.CUP_HALF
-        radius = 0.5 * (self.DRAIN_R + outer)
-        fraction = (radius - self.DRAIN_R) / max(outer - self.DRAIN_R, 1e-6)
-        y = self.drain_lip + (self.dish_edge - self.drain_lip) * fraction
-        for point in range(0, self.RINGS, 6):
+        radius = 0.5 * (self.TROUGH_R + self.TROUGH_HALF + self.rest_radius)
+        for point in range(0, self.RINGS, 8):
             deg = 360.0 * point / self.RINGS
-            surface = _place(self.origin, self.frame, self._ring_point(radius, deg, y))
+            surface = _place(self.origin, self.frame,
+                             self._ring_point(radius, deg, self.trough_y(radius)))
             probes.append(
                 Probe(
                     start=(surface[0], surface[1] + reach, surface[2]),
@@ -991,36 +793,40 @@ class RadialStart(StartGrid):
                     expect_hit=True,
                     expected_point=surface,
                     tolerance=0.05,
-                    label=f"{self.id}.dish[{deg:.0f}]",
+                    label=f"{self.id}.trough[{deg:.0f}]",
                 )
             )
         return probes
 
     def describe(self) -> dict[str, Any]:
-        table = feeder_table(self)
+        table = guide_table(self)
         return {
             "kind": "RadialStart",
+            "start_kind": self.START_KIND,
             "bays": layout.BAYS,
             "bay_pitch": round(to_sim(layout.BAY_PITCH), 6),
-            "fan_pitch": self.FAN_PITCH,
             "yaw_deg": round(self.yaw_deg, 4),
             "lift": START_LIFT,
-            "port_radius": self.PORT_R,
-            "port_angles": [round(self.port_angle(i), 2) for i in range(layout.BAYS)],
+            "apron_drop": self.APRON_DROP,
+            "trough_radius": self.TROUGH_R,
+            "rest_radius": round(self.rest_radius, 6),
+            "delivery_bearings": [round(self.guides().bearing(i), 2)
+                                  for i in range(layout.BAYS)],
             "port_gate": self.port_gate,
-            "port_release": self.PORT_RELEASE,
+            "release": self.RELEASE,
+            "paddle_segments": self.PADDLE_SEGMENTS,
             "drain_radius": self.DRAIN_R,
             "release_time": self.release_time,
             "gate_z": round(self.gate_z, 4),
             "heights": {
-                "shelf_floor": round(self.shelf_floor, 4),
-                "port_floor": round(self.port_floor, 4),
-                "dish_edge": round(self.dish_edge, 4),
+                "rest_floor": round(self.rest_floor, 4),
+                "trough_floor": round(self.trough_floor, 4),
+                "paddle_floor": round(self.paddle_floor, 4),
                 "drain_lip": round(self.drain_lip, 4),
                 "exit_y": round(self.exit_local[1], 4),
             },
-            "feeders": table["rows"],
-            "feeder_spread": table["spread"],
+            "guides": table["rows"],
+            "spread": table["spread"],
         }
 
 
@@ -1029,102 +835,41 @@ def _smoothstep(edge0: float, edge1: float, value: float) -> float:
     return u * u * (3.0 - 2.0 * u)
 
 
-def _steepest(samples) -> float:
-    """The steepest pitch anywhere along a chute, in degrees.
+def guide_table(start: RadialStart) -> dict:
+    """The per-bay guide measurement section 4 of the V1.4 brief asks for.
 
-    A constant-grade chute is described by one number; a shaped one is not, and
-    what matters for reliability is the *worst* pitch rather than the mean.
+    Length, drop, mean and extreme local grade, entry and delivery tangents,
+    and the rolling time down the guide - which is what `RELEASE` has to clear.
+    The lengths are not equal and cannot be: eight collinear bays cannot be
+    mapped onto a circle by congruent curves. What *is* equal, exactly, is the
+    drop and the radius the field comes to rest at, and those are the two the
+    fairness argument uses. The residual spread is reported, not hidden.
     """
-    worst = 0.0
-    for index in range(len(samples) - 1):
-        a, b = samples[index], samples[index + 1]
-        run = math.hypot(b[0] - a[0], b[2] - a[2])
-        if run < 1e-9:
-            continue
-        worst = max(worst, abs(a[1] - b[1]) / run)
-    return math.degrees(math.atan(worst))
-
-
-def _polyline_length(points) -> float:
-    return sum(math.dist(points[i], points[i + 1]) for i in range(len(points) - 1))
-
-
-def _smooth(controls, per_unit: int) -> list[tuple[float, float]]:
-    """A Catmull-Rom through plan controls, sampled at a fixed density.
-
-    At a density rather than a fixed count, so a short chute and a long one
-    have the same facet size - which is a physics parameter and not a cosmetic
-    one: the collider's sagitta is what the core is calibrated at.
-    """
-    if len(controls) < 2:
-        return [tuple(controls[0])]
-    pts = [tuple(controls[0])] + [tuple(p) for p in controls] + [tuple(controls[-1])]
-    out: list[tuple[float, float]] = []
-    for index in range(len(pts) - 3):
-        p0, p1, p2, p3 = pts[index], pts[index + 1], pts[index + 2], pts[index + 3]
-        steps = max(2, int(math.dist(p1, p2) * per_unit))
-        for step in range(steps):
-            t = step / steps
-            t2, t3 = t * t, t * t * t
-            out.append(
-                tuple(
-                    0.5
-                    * (
-                        2 * p1[axis]
-                        + (-p0[axis] + p2[axis]) * t
-                        + (2 * p0[axis] - 5 * p1[axis] + 4 * p2[axis] - p3[axis]) * t2
-                        + (-p0[axis] + 3 * p1[axis] - 3 * p2[axis] + p3[axis]) * t3
-                    )
-                    for axis in range(2)
-                )
-            )
-    out.append(tuple(pts[-1]))
-    return out
-
-
-def feeder_table(start: RadialStart) -> dict:
-    """The per-bay chute measurement section 5 of the brief asks for.
-
-    Length, drop, grade, the radius and the tangent each chute delivers at, and
-    the rolling time down its own grade - which is what `PORT_RELEASE` has to
-    clear. Reported rather than asserted: the chutes are not congruent, the
-    spread is real, and the cups are the answer to it.
-    """
-    rows = []
-    for feeder in start.feeders():
-        grade = feeder["grade"]
-        sin_theta = grade / math.hypot(1.0, grade)
-        # A solid sphere rolling without slip accelerates at 5/7 g sin(theta).
-        accel = (5.0 / 7.0) * 9.81 * sin_theta
-        span = to_sim(feeder["plan_length"] * math.hypot(1.0, grade))
-        seconds = math.sqrt(2.0 * span / accel) if accel > 1e-6 else float("inf")
-        rows.append(
-            {
-                "bay": feeder["bay"],
-                "slot": feeder["slot"],
-                "port_deg": round(feeder["angle"], 2),
-                "length": round(feeder["length"], 4),
-                "drop": round(feeder["drop"], 4),
-                "grade_deg": round(math.degrees(math.atan(grade)), 3),
-                "steepest_deg": round(feeder["steepest_deg"], 3),
-                "shape": feeder["shape"],
-                "port_radius": round(start.PORT_R, 4),
-                "entry_tangent_deg": round((feeder["angle"] + 90.0) % 360.0, 2),
-                "fall_seconds": round(seconds, 4),
-            }
-        )
-    lengths = [row["length"] for row in rows]
-    drops = [row["drop"] for row in rows]
-    radii = [row["port_radius"] for row in rows]
-    falls = [row["fall_seconds"] for row in rows]
-    return {
-        "rows": rows,
-        "spread": {
-            "length": [round(min(lengths), 4), round(max(lengths), 4)],
-            "length_spread": round(max(lengths) - min(lengths), 4),
-            "drop_spread": round(max(drops) - min(drops), 6),
-            "radius_spread": round(max(radii) - min(radii), 6),
-            "fall_seconds": [round(min(falls), 4), round(max(falls), 4)],
-            "release_margin": round(start.PORT_RELEASE - max(falls), 4),
-        },
+    table = start.guides().table()
+    for row in table["rows"]:
+        # A solid sphere rolling without slip down the guide's own mean grade.
+        grade = math.tan(math.radians(row["mean_grade_deg"]))
+        accel = (5.0 / 7.0) * 9.81 * grade / math.hypot(1.0, grade)
+        span = to_sim(row["length"] * math.hypot(1.0, grade))
+        row["roll_seconds"] = round(
+            math.sqrt(2.0 * span / accel) if accel > 1e-6 else float("inf"), 4)
+    falls = [row["roll_seconds"] for row in table["rows"]]
+    table["spread"] = {
+        "length": table["length"],
+        "length_spread": table["length_spread"],
+        "length_ratio": table["length_ratio"],
+        "drop_spread": table["drop_spread"],
+        "delivery_radius_spread": table["delivery_radius_spread"],
+        "rest_radius": round(start.rest_radius, 6),
+        "grade": table["grade"],
+        "mean_grade": table["mean_grade"],
+        "groove_margin": table["groove_margin"],
+        "bank_needed_deg": table["bank_needed_deg"],
+        "worst_lane_pair": table["worst_lane_pair"],
+        "worst_delivery_gap": table["worst_delivery_gap"],
+        "trough_rim_slack": table["trough_rim_slack"],
+        "apron_width": table["apron_width"],
+        "roll_seconds": [round(min(falls), 4), round(max(falls), 4)],
+        "release_margin": round(start.RELEASE - max(falls), 4),
     }
+    return table

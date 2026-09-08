@@ -3,19 +3,25 @@
     python tools/sloped_radial_check.py
     python tools/sloped_radial_check.py --json out.json
 
-Section 5 of the V1.4 brief asks for a per-bay feeder report with an explicit
-tolerance, before trials. This prints it, and three things it does not ask for
+Section 4 of the V1.4 brief asks for a per-guide report with explicit
+tolerances, before trials. This prints it, plus four things it does not ask for
 and needs anyway:
 
-* **isolation** - the minimum three-dimensional distance between every pair of
-  chute centrelines, against the width a chute actually occupies. Eight hidden
-  channels that cross in plan are only isolated if they are separated in
-  height, and "they should be" is not a measurement.
-* **containment** - every chute's floor against the dish rim and against the
-  cups it does not own, so a chute bridging the dish is above it rather than
-  through it.
-* **the mesh and the probes** - the same `check_mesh` and cradle probes every
+* **the two exact invariants.** Drop from the pan to the trough, and radius
+  from the drain at rest. Both are single derived numbers rather than eight, so
+  both spreads should be exactly zero, and a non-zero one means an edit has
+  broken the derivation.
+* **lane separation.** The guides are grooves, not channels, so what matters is
+  the least distance between two centrelines anywhere - and whether a rib fits
+  between them there.
+* **rim clearance.** A guide that strays inside the trough's rim before its own
+  delivery bearing drops its marble into the ring at the wrong place.
+* **the mesh and the probes**, the same `check_mesh` and floor probes every
   other module in the tree answers.
+
+The chute-era checks are gone with the chutes: there is no pairwise chute
+isolation to measure because there are no walls to isolate, and no foreign-cup
+containment because there are no cups.
 """
 
 from __future__ import annotations
@@ -30,179 +36,168 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from marble3d.validation import check_mesh  # noqa: E402
 from sloped import layout  # noqa: E402
-from sloped.radial import RadialStart, feeder_table  # noqa: E402
-from sloped.scale import to_sim  # noqa: E402
+from sloped.radial import RadialStart, guide_table  # noqa: E402
 from sloped.track import TrackRun  # noqa: E402
 
-# What a chute occupies: the cradle's clear width plus a wall each side. Two
-# centrelines closer than this in 3D are the same channel.
-CHUTE_WIDTH = 2.0 * (RadialStart.CUP_HALF + 0.10)
-# And how much height clears a chute standing over another one: the wall it
-# carries plus the floor structure under the one above.
-CHUTE_HEIGHT = RadialStart.FEEDER_WALL + 0.14
-
-
-def _dense(samples, step: float = 0.05):
-    """Resample a chute's centreline finely, so a crossing cannot be missed."""
-    out = []
-    for index in range(len(samples) - 1):
-        a, b = samples[index], samples[index + 1]
-        span = math.dist(a, b)
-        count = max(1, int(span / step))
-        for k in range(count):
-            t = k / count
-            out.append(tuple(a[axis] + (b[axis] - a[axis]) * t for axis in range(3)))
-    out.append(tuple(samples[-1]))
-    return out
-
-
-def _separated(a, b) -> tuple[float, float, tuple]:
-    """Worst approach between two centrelines, as (plan, height, at).
-
-    Two channels are isolated if at every point *either* the plan distance
-    exceeds one channel width *or* the height difference exceeds one channel
-    height. So the worst case is the point that minimises the slack in both at
-    once, and that is what is reported.
-    """
-    worst = (1e9, 1e9, None)
-    worst_slack = 1e9
-    for pa in a:
-        for pb in b:
-            plan = math.hypot(pa[0] - pb[0], pa[2] - pb[2])
-            rise = abs(pa[1] - pb[1])
-            slack = max(plan / CHUTE_WIDTH, rise / CHUTE_HEIGHT)
-            if slack < worst_slack:
-                worst_slack = slack
-                worst = (plan, rise, pa)
-    return worst[0], worst[1], worst[2], worst_slack
+# A marble's own width plus a rib. Two centrelines closer than this share one
+# groove, and the rib between them has nowhere to stand.
+LANE_NEEDED = 2.0 * layout.MARBLE_RADIUS + 0.07
+# The grade band. Below the first a marble stops - the basin measured 0.9
+# degrees moving nothing and 7.9 working - and above the second the guide is a
+# fall onto the ring rather than a delivery.
+GRADE_MIN = 8.0
+GRADE_MAX = 42.0
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json", type=Path, default=None)
-    parser.add_argument("--step", type=float, default=0.06)
     options = parser.parse_args(argv)
 
     launch = TrackRun("launch")
     start = RadialStart("start", launch)
-    table = feeder_table(start)
+    table = guide_table(start)
+    described = start.describe()
+    heights = described["heights"]
 
     print("RadialStart geometry, layout units")
-    heights = start.describe()["heights"]
     print(
-        "  shelf floor {shelf_floor}  port floor {port_floor}  "
+        "  pan {rest_floor}  trough rim {trough_floor}  at rest {paddle_floor}  "
         "drain lip {drain_lip}  launch entry {exit_y}".format(**heights)
     )
     print(
-        f"  port radius {start.PORT_R}  drain radius {start.DRAIN_R}  "
-        f"lift {start.describe()['lift']}  port release {start.PORT_RELEASE}s"
+        f"  trough radius {start.TROUGH_R}  resting radius "
+        f"{described['rest_radius']}  drain radius {start.DRAIN_R}  "
+        f"lift {described['lift']}  release {start.RELEASE}s"
+    )
+    exit_run = math.hypot(
+        start.exit_local[0], start.exit_local[2] - start.DISH_Z + start.CHUTE_LEAD
+    )
+    exit_drop = (start.drain_lip - 0.30) - start.exit_local[1]
+    print(
+        f"  exit chute {exit_drop:.2f} over {exit_run:.2f} = "
+        f"{math.degrees(math.atan2(exit_drop, exit_run)):.1f} deg"
     )
     print()
+
     header = (
-        f"{'bay':>3} {'slot':>4} {'port deg':>8} {'length':>7} {'drop':>6} "
-        f"{'grade':>7} {'worst':>7} {'shape':>6} {'radius':>7} {'fall s':>7}"
+        f"{'bay':>3} {'slot':>4} {'bearing':>8} {'sweep':>7} {'length':>7} "
+        f"{'apron':>6} {'drop':>5} {'mean':>6} {'gmin':>6} {'gmax':>6} "
+        f"{'curve':>6} {'bank':>5} {'entryT':>7} {'outT':>7} {'roll s':>7}"
     )
     print(header)
     print("-" * len(header))
     for row in table["rows"]:
         print(
-            f"{row['bay']:>3} {row['slot']:>4} {row['port_deg']:>8.1f} "
-            f"{row['length']:>7.3f} {row['drop']:>6.3f} {row['grade_deg']:>7.2f} "
-            f"{row['steepest_deg']:>7.2f} {row['shape']:>6.2f} "
-            f"{row['port_radius']:>7.3f} {row['fall_seconds']:>7.3f}"
+            f"{row['bay']:>3} {row['slot']:>4} {row['bearing_deg']:>8.1f} "
+            f"{row['sweep_deg']:>7.1f} {row['length']:>7.3f} "
+            f"{row['apron_length']:>6.3f} {row['drop']:>5.2f} "
+            f"{row['mean_grade_deg']:>6.2f} {row['min_grade_deg']:>6.2f} "
+            f"{row['max_grade_deg']:>6.2f} {row['min_curve']:>6.2f} "
+            f"{row['bank_needed_deg']:>5.1f} {row['entry_tangent_deg']:>7.1f} "
+            f"{row['delivery_tangent_deg']:>7.1f} {row['roll_seconds']:>7.3f}"
         )
     print("-" * len(header))
     spread = table["spread"]
     print(
-        f"  drop spread {spread['drop_spread']:.6f}   "
-        f"radius spread {spread['radius_spread']:.6f}   "
-        f"length spread {spread['length_spread']:.3f}"
+        f"  drop spread {spread['drop_spread']:.9f}   delivery radius spread "
+        f"{spread['delivery_radius_spread']:.9f}   resting radius "
+        f"{spread['rest_radius']:.6f}"
     )
     print(
-        f"  fall {spread['fall_seconds'][0]:.2f}..{spread['fall_seconds'][1]:.2f}s, "
+        f"  length {spread['length'][0]:.3f}..{spread['length'][1]:.3f}, spread "
+        f"{spread['length_spread']:.3f}, ratio {spread['length_ratio']:.2f}"
+    )
+    print(
+        f"  local grade {spread['grade'][0]:.1f}..{spread['grade'][1]:.1f} deg, "
+        f"mean {spread['mean_grade'][0]:.1f}..{spread['mean_grade'][1]:.1f}"
+    )
+    print(
+        f"  roll {spread['roll_seconds'][0]:.2f}..{spread['roll_seconds'][1]:.2f}s, "
         f"release margin {spread['release_margin']:+.2f}s"
+    )
+    print(
+        f"  running lane pair {spread['worst_lane_pair'][0]} at "
+        f"{spread['worst_lane_pair'][1]:.3f} ({LANE_NEEDED:.2f} needed)   "
+        f"rim slack {spread['trough_rim_slack']:+.3f}   apron width "
+        f"{spread['apron_width']:.2f}"
+    )
+    print(
+        f"  closest pass to another route's delivery point: "
+        f"{spread['worst_delivery_gap'][1]:.3f} "
+        f"(route {spread['worst_delivery_gap'][0][0]} past "
+        f"{spread['worst_delivery_gap'][0][1]}'s, "
+        f"{2.0 * layout.MARBLE_RADIUS:.2f} = two marbles touching)"
+    )
+    print(
+        f"  groove-only curvature margin {spread['groove_margin']:.2f}, so the "
+        f"apron wants up to {spread['bank_needed_deg']:.0f} deg of bank"
     )
 
     # --- the tolerances, stated ------------------------------------------
     findings: list[str] = []
-    if spread["drop_spread"] > 1e-6:
-        findings.append(f"drop spread {spread['drop_spread']:.6f} is not zero")
-    if spread["radius_spread"] > 1e-6:
-        findings.append(f"port radius spread {spread['radius_spread']:.6f} is not zero")
-    if spread["release_margin"] < 0.35:
+    if spread["drop_spread"] > 1e-9:
+        findings.append(f"drop spread {spread['drop_spread']:.9f} is not zero")
+    if spread["delivery_radius_spread"] > 1e-9:
         findings.append(
-            f"port release {start.PORT_RELEASE}s leaves only "
-            f"{spread['release_margin']:.2f}s over the slowest chute"
+            f"delivery radius spread {spread['delivery_radius_spread']:.9f} is not zero"
+        )
+    if spread["release_margin"] < 0.30:
+        findings.append(
+            f"release at {start.RELEASE}s leaves only "
+            f"{spread['release_margin']:.2f}s over the slowest guide"
         )
     for row in table["rows"]:
-        if row["grade_deg"] < 9.0:
-            findings.append(f"bay {row['bay']} chute at {row['grade_deg']:.1f} deg will stall")
-        if row["steepest_deg"] > 46.0:
+        if row["min_grade_deg"] < GRADE_MIN:
             findings.append(
-                f"bay {row['bay']} chute reaches {row['steepest_deg']:.1f} deg, a drop"
+                f"bay {row['bay']} guide falls to {row['min_grade_deg']:.1f} deg "
+                f"and will stall"
             )
-
-    # --- isolation --------------------------------------------------------
-    print()
-    print("chute isolation, worst approach per pair (plan / rise / slack)")
-    tracks = {f["bay"]: _dense(f["samples"], options.step) for f in start.feeders()}
-    worst_overall = (1e9, None)
-    pairs = []
-    for a in range(layout.BAYS):
-        for b in range(a + 1, layout.BAYS):
-            plan, rise, at, slack = _separated(tracks[a], tracks[b])
-            pairs.append((slack, a, b, plan, rise, at))
-            if slack < worst_overall[0]:
-                worst_overall = (slack, (a, b, plan, rise, at))
-    pairs.sort()
-    for slack, a, b, plan, rise, at in pairs[:6]:
-        flag = "  <-- too close" if slack < 1.0 else ""
-        print(
-            f"  {a}-{b}: plan {plan:5.2f} ({CHUTE_WIDTH:.2f} needed)  "
-            f"rise {rise:5.2f} ({CHUTE_HEIGHT:.2f} needed)  slack {slack:4.2f}{flag}"
-        )
-    if worst_overall[0] < 1.0:
-        a, b, plan, rise, at = worst_overall[1]
+        if row["max_grade_deg"] > GRADE_MAX:
+            findings.append(
+                f"bay {row['bay']} guide reaches {row['max_grade_deg']:.1f} deg, a fall"
+            )
+        if abs(row["entry_tangent_deg"] - 90.0) > 12.0:
+            findings.append(
+                f"bay {row['bay']} leaves the line at {row['entry_tangent_deg']:.0f} "
+                f"deg rather than downhill"
+            )
+    if spread["worst_lane_pair"][1] < LANE_NEEDED:
+        pair = spread["worst_lane_pair"][0]
         findings.append(
-            f"chutes {a} and {b} are not isolated: plan {plan:.2f}, rise {rise:.2f}"
+            f"guides {pair[0]} and {pair[1]} pass within "
+            f"{spread['worst_lane_pair'][1]:.3f}, so no rib fits between them there"
         )
+    if spread["worst_delivery_gap"][1] < 2.0 * layout.MARBLE_RADIUS - 0.06:
+        pair = spread["worst_delivery_gap"][0]
+        findings.append(
+            f"route {pair[0]} passes {spread['worst_delivery_gap'][1]:.3f} from "
+            f"route {pair[1]}'s delivery point, closer than two marbles"
+        )
+    if spread["trough_rim_slack"] is not None and spread["trough_rim_slack"] < 0.05:
+        findings.append(
+            f"a guide runs {spread['trough_rim_slack']:.3f} inside the trough rim "
+            f"before its own delivery bearing"
+        )
+    if exit_drop / max(exit_run, 1e-6) > math.tan(math.radians(GRADE_MAX)):
+        findings.append(f"the exit chute is a {exit_drop / exit_run:.2f} grade fall")
 
-    # --- containment: a chute over the dish must be over it ---------------
-    print()
-    inner = start.port_floor - start.CUP_TILT
-    rim_top = inner + start.RIM_RISE
-    cup_top = start.port_floor + start.CUP_WALL
-    worst_rim = 1e9
-    worst_cup = 1e9
-    for bay, track in tracks.items():
-        own = start.port_angle(bay)
-        for point in track:
-            radius = math.hypot(point[0], point[2] - start.DISH_Z)
-            if radius > start.RIM_R + 0.2:
-                continue
-            # Inside the rim: the floor has to be above the rim's top, unless
-            # this is the chute's own last approach into its own cup.
-            deg = math.degrees(math.atan2(point[2] - start.DISH_Z, point[0])) % 360.0
-            own_arc = ((own - deg) % 360.0) <= start.CUP_ARC + 12.0
-            if own_arc and radius > start.PORT_R - start.CUP_HALF - 0.2:
-                continue
-            worst_rim = min(worst_rim, point[1] - rim_top)
-            if radius > start.PORT_R - start.CUP_HALF - 0.2:
-                worst_cup = min(worst_cup, point[1] - cup_top)
-    print(
-        f"containment: lowest chute floor over the rim {worst_rim:+.3f}, "
-        f"over a foreign cup {worst_cup:+.3f}"
-    )
-    if worst_rim < 0.10:
-        findings.append(f"a chute floor is only {worst_rim:.3f} over the dish rim")
-    if worst_cup < 0.10:
-        findings.append(f"a chute floor is only {worst_cup:.3f} over a foreign cup")
+    # --- no hidden uphill anywhere along a guide --------------------------
+    worst_rise = 0.0
+    for index in range(layout.BAYS):
+        previous = None
+        for step in range(241):
+            point = start.guide_point(index, step / 240.0)
+            if previous is not None:
+                worst_rise = max(worst_rise, point[1] - previous[1])
+            previous = point
+    print(f"  worst uphill step along any guide {worst_rise:+.6f}")
+    if worst_rise > 1e-6:
+        findings.append(f"a guide climbs {worst_rise:.4f} somewhere")
 
     # --- mesh and probes --------------------------------------------------
     print()
     mesh = start.local_colliders()[0]
-    # `expect_components=None` because this module *is* many pieces - the
-    # shelf, eight chutes, eight cups, the dish and seven ridge tubes.
     mesh_findings = check_mesh(mesh, expect_components=None)
     print(
         f"mesh: {len(mesh.vertices)} vertices, {len(mesh.indices) // 3} triangles, "
@@ -210,8 +205,10 @@ def main(argv: list[str] | None = None) -> int:
     )
     for finding in mesh_findings[:8]:
         print(f"  {finding}")
+    if mesh_findings:
+        findings.append(f"{len(mesh_findings)} mesh findings")
     probes = start.local_probes()
-    print(f"probes: {len(probes)} declared")
+    print(f"probes: {len(probes)} declared   actuators: {len(start.local_actuators())}")
 
     print()
     if findings:
@@ -219,30 +216,37 @@ def main(argv: list[str] | None = None) -> int:
         for finding in findings:
             print(f"  - {finding}")
     else:
-        print("no findings: drops and radii equal, chutes isolated, dish clear")
+        print(
+            "no findings: drop and resting radius exact, grades in band, "
+            "lanes clear, rim clear, mesh clean"
+        )
 
     if options.json:
         options.json.parent.mkdir(parents=True, exist_ok=True)
         options.json.write_text(
             json.dumps(
                 {
+                    "start_kind": start.START_KIND,
+                    "lift": described["lift"],
                     "heights": heights,
-                    "feeders": table["rows"],
-                    "spread": table["spread"],
-                    "isolation": [
-                        {
-                            "pair": [a, b],
-                            "plan": round(plan, 4),
-                            "rise": round(rise, 4),
-                            "slack": round(slack, 4),
-                        }
-                        for slack, a, b, plan, rise, _at in pairs
-                    ],
-                    "containment": {
-                        "over_rim": round(worst_rim, 4),
-                        "over_foreign_cup": round(worst_cup, 4),
+                    "rest_radius": described["rest_radius"],
+                    "delivery_bearings": described["delivery_bearings"],
+                    "guides": table["rows"],
+                    "spread": spread,
+                    "exit_chute": {
+                        "run": round(exit_run, 4),
+                        "drop": round(exit_drop, 4),
+                        "grade_deg": round(
+                            math.degrees(math.atan2(exit_drop, exit_run)), 3
+                        ),
                     },
-                    "mesh_findings": [str(f) for f in mesh_findings],
+                    "worst_uphill_step": round(worst_rise, 6),
+                    "lane_needed": round(LANE_NEEDED, 4),
+                    "mesh": {
+                        "vertices": len(mesh.vertices),
+                        "triangles": len(mesh.indices) // 3,
+                        "findings": [str(f) for f in mesh_findings],
+                    },
                     "findings": findings,
                 },
                 indent=2,

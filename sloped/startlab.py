@@ -606,15 +606,29 @@ def run_trial(
     marble_count: int = 8,
     duration: float = 14.0,
 ) -> TrialResult:
-    """One seed of the start lab, run for `duration` seconds of sim time.
+    """One seed of the start lab, run for `duration` seconds of *racing*.
 
     Fourteen seconds is what the whole field needs to clear leg1, not what the
     leader needs - the difference is the point, and `settled` explains it. A
     trial that has not reached its last checkpoint by then reports `reached`
     short, and `summarise` counts those rather than averaging over them.
+
+    **The clock starts when the last gate has finished releasing, not at tick
+    zero.** The fan's grid opens at 0.30 seconds; the radial start holds its
+    field in the ring until 5.60 while it settles. A fixed fourteen-second
+    budget measured on the radial start what the fan gets twenty on, and would
+    have reported most of the field trailing for no reason but the instrument's
+    own arithmetic. Read off the machine's own actuators, so a change to a
+    release time cannot leave this measuring the old one.
     """
     config = config or DEFAULT_CONFIG
     machine = machine or start_machine(config)
+    release = 0.0
+    for module in machine:
+        for actuator in getattr(module, "local_actuators", lambda: [])():
+            release = max(release, getattr(actuator, "release_time", 0.0)
+                          + getattr(actuator, "duration", 0.0))
+    duration += release
     trial = StartTrial(machine, config, seed, marble_count)
     max_ticks = int(round(duration * config.physics.physics_hz))
     started = time.perf_counter()
