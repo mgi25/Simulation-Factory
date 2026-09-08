@@ -1,0 +1,19 @@
+Section 9: the rotor's angle and the outlet's state must be deterministic
+functions of the tick, the seed-derived phase and fixed configuration.
+
+Checked by hashing every actuator's pose at ticks 0, 240, 600, 900, 1200 and
+2000 - 24 actuators, so 144 poses - in three separate fresh processes:
+
+  seed 41 phase 2.132471986338   digest 4bd568cab6fe63da3bc37825721a63e0
+  seed 41 phase 2.132471986338   digest 4bd568cab6fe63da3bc37825721a63e0
+  seed 41 phase 2.132471986338   digest 4bd568cab6fe63da3bc37825721a63e0
+  seed 42 phase 6.015694051358   digest 88a23c71c292a944d727fd8ee4ff7833
+
+Identical across processes for one seed, and different between seeds because
+the global phase is part of the pose. That is the property section 24's
+determinism repeats would rest on, and section 25's replay export: the poses
+are reproducible without simulating the mechanism, so Godot can play them back.
+
+Note this is the *actuator* half only. The full 20 same-process and 20
+fresh-child repeats of section 24 are gated on the start passing the throughput
+gate, and were not run.
