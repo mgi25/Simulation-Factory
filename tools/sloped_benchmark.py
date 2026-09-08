@@ -137,6 +137,25 @@ def _spearman(pairs: Sequence[tuple[float, float]]) -> float | None:
     return None if left * right == 0.0 else top / (left * right)
 
 
+def _pearson(xs: Sequence[float], ys: Sequence[float]) -> float | None:
+    """Pearson's r, or None when one side does not vary.
+
+    Used on eight slot means rather than on every racer, because a single
+    race's finish order is a permutation and correlates with nothing; the
+    question is whether a bay is *consistently* ahead.
+    """
+    if len(xs) < 3:
+        return None
+    mx = sum(xs) / len(xs)
+    my = sum(ys) / len(ys)
+    sxy = sum((x - mx) * (y - my) for x, y in zip(xs, ys))
+    sxx = sum((x - mx) ** 2 for x in xs)
+    syy = sum((y - my) ** 2 for y in ys)
+    if sxx * syy < 1e-15:
+        return None
+    return round(sxy / (sxx * syy) ** 0.5, 4)
+
+
 def summarise(races: Sequence[dict[str, Any]], slots: int = 8) -> dict[str, Any]:
     """Everything the brief asks to be read out of a sweep."""
     by_slot: dict[int, dict[str, Any]] = {
@@ -279,6 +298,58 @@ def summarise(races: Sequence[dict[str, Any]], slots: int = 8) -> dict[str, Any]
     if positive and min(win_rates.values()) > 0.0:
         ratio = max(win_rates.values()) / min(win_rates.values())
 
+    # --- the fairness shapes section 6 asks for ---------------------------
+    #
+    # **A win ratio alone is the wrong single number and this course is why.**
+    # It is undefined the moment any bay wins nothing - which happens at every
+    # sample size this benchmark runs, because eight bays sharing a few hundred
+    # wins leave one at zero often enough - and when it is defined it is a ratio
+    # of two extremes out of eight and moves on one race. So the same three
+    # statistics the start lab reports are computed here on the *full race*,
+    # where the brief's own target lives:
+    #
+    #   sd            the standard deviation of the eight slot mean finish
+    #                 ranks, which privileges no shape. The start lab's own
+    #                 numbers moved from 0.863 to 0.376 on this measure while
+    #                 the two correlations disagreed about which start was
+    #                 fairer, each measuring its own shape.
+    #   slot r        Pearson's r between the bay index and its mean finish
+    #                 rank: a west-to-east tilt.
+    #   centre r      the same against |bay - 3.5|: a centre-versus-edge
+    #                 advantage, which is symmetric and which a slot r cannot
+    #                 see at all.
+    #
+    # All three on **finish rank** rather than win rate, because a rank uses
+    # every racer of every race and a win uses one of eight.
+    ranked = [
+        (int(slot), data["mean_finish_rank"])
+        for slot, data in sorted(slots_out.items(), key=lambda kv: int(kv[0]))
+        if data["mean_finish_rank"] is not None
+    ]
+    fairness: dict[str, Any] = {
+        "slots_ranked": len(ranked),
+        "win_rate_ratio": None if ratio is None else round(ratio, 4),
+        "win_rate_spread_points": (
+            None if not win_rates
+            else round(100.0 * (max(win_rates.values()) - min(win_rates.values())), 2)
+        ),
+    }
+    if len(ranked) >= 3:
+        means = [value for _slot, value in ranked]
+        average = sum(means) / len(means)
+        fairness["slot_mean_rank_sd"] = round(
+            (sum((m - average) ** 2 for m in means) / len(means)) ** 0.5, 4
+        )
+        fairness["slot_mean_rank_span"] = round(max(means) - min(means), 4)
+        fairness["slot_rank_correlation"] = _pearson(
+            [float(slot) for slot, _v in ranked], means
+        )
+        fairness["centre_rank_correlation"] = _pearson(
+            [abs(slot - (len(slots_out) - 1) / 2.0) for slot, _v in ranked], means
+        )
+        fairness["best_slot"] = min(ranked, key=lambda row: row[1])[0]
+        fairness["worst_slot"] = max(ranked, key=lambda row: row[1])[0]
+
     routes_out = {}
     for route, lane in by_route.items():
         entries = max(lane["entries"], 1)
@@ -339,6 +410,9 @@ def summarise(races: Sequence[dict[str, Any]], slots: int = 8) -> dict[str, Any]
                 name: None if _spearman(pairs) is None else round(_spearman(pairs), 4)
                 for name, pairs in sorted(slot_rank_pairs.items())
             },
+            # The three shapes section 6 asks for, on finish rank. See
+            # `_pearson` and the block that builds `fairness` above.
+            **fairness,
         },
         "routes": routes_out,
         "quality": {
