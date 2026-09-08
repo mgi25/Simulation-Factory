@@ -15,8 +15,11 @@ broadphase pair order depends on allocation addresses, so the same seed gives
 different answers in different processes and every determinism claim rests on
 that flag being set. `marble3d.world` sets it and this is what proves it.
 
-Compared, in this order: the state digest, the event digest, the finish order,
-the finish times, the route of every racer and the race duration. The digest is
+Compared, in this order: the state digest, the event digest, the **actuator**
+digest, the finish order, the finish times, the route and start slot of every
+racer, and the race duration. The actuator digest is its own thing because the
+state digest does not cover the machine's moving parts at all - see
+`marble3d.replay.Replay.actuator_digest`. The state digest is
 a SHA-256 over the raw IEEE-754 bytes of the sampled state taken *before* the
 numbers are rounded for storage, so it cannot be fooled by two trajectories
 that agree to six decimals at one instant and are elsewhere entirely by tick
@@ -59,6 +62,12 @@ def one_run(seed: int, marbles: int, duration: float, routes: str) -> dict[str, 
     return {
         "digest": replay.digest(),
         "event_digest": replay.event_digest(),
+        # The machine's own moving parts, which `digest` does not cover at all.
+        # See `Replay.actuator_digest`: the frozen start carries a rotor whose
+        # initial angle comes from the seed and eighteen sweeping floor slats,
+        # and a replay a renderer draws those from has to be pinned as tightly
+        # as the marbles are.
+        "actuator_digest": replay.actuator_digest(),
         "seconds": round(outcome.seconds, 9),
         "frames": len(replay.frames),
         "order": [
@@ -114,7 +123,8 @@ def child_run(seed: int, marbles: int, duration: float, routes: str) -> dict[str
     raise RuntimeError(f"child printed no result\n{(completed.stdout or '')[-800:]}")
 
 
-KEYS = ("digest", "event_digest", "seconds", "frames", "order", "times", "routes", "slots")
+KEYS = ("digest", "event_digest", "actuator_digest", "seconds", "frames",
+        "order", "times", "routes", "slots")
 
 
 def compare(runs: Sequence[dict[str, Any]]) -> dict[str, Any]:
@@ -128,7 +138,10 @@ def compare(runs: Sequence[dict[str, Any]]) -> dict[str, Any]:
         "runs": len(runs),
         "identical": not disagreements,
         "disagreements": disagreements,
-        "reference": {key: reference[key] for key in ("digest", "event_digest", "seconds", "order")},
+        "reference": {
+            key: reference[key]
+            for key in ("digest", "event_digest", "actuator_digest", "seconds", "order")
+        },
     }
 
 
@@ -194,6 +207,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     print(f"digest {same_process['reference']['digest']}")
     print(f"events {same_process['reference']['event_digest']}")
+    print(f"actors {same_process['reference']['actuator_digest']}")
     print(f"order  {same_process['reference']['order']}")
     print(f"{report['wall_seconds']:.0f} s wall")
 

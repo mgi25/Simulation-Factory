@@ -162,6 +162,32 @@ class Replay:
                 hasher.update(struct.pack("<3d", *marble.spin))
         return hasher.hexdigest()
 
+    def actuator_digest(self) -> str:
+        """A third hash, over every moving part's pose in every frame.
+
+        **`digest` does not cover the machine's own moving parts** - it hashes
+        marble position, orientation, velocity and spin and nothing else - so a
+        replay whose marbles agreed while a gate, a paddle or a floor slat had
+        moved differently would compare as identical. That was harmless while
+        the only actuators were eight start gates opening once on a fixed
+        clock. It is not harmless now: the frozen V1 start carries a rotor
+        whose initial angle is derived from the seed and eighteen floor slats
+        that sweep, and a replay a renderer draws those from has to be pinned
+        as tightly as the marbles are.
+
+        Keyed by name and sorted, so the hash does not depend on the order the
+        modules happened to be built in.
+        """
+        hasher = hashlib.sha256()
+        for frame in self.frames:
+            hasher.update(struct.pack("<d", frame.time))
+            for name in sorted(frame.actuators):
+                position, rotation = frame.actuators[name]
+                hasher.update(name.encode("utf-8"))
+                hasher.update(struct.pack("<3d", *position))
+                hasher.update(struct.pack("<4d", *rotation))
+        return hasher.hexdigest()
+
     def event_digest(self) -> str:
         """A separate hash over the event stream, kinds and order included.
 

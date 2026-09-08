@@ -1,0 +1,114 @@
+{
+ "config": {
+  "collider": {
+   "max_chunk_indices": 24000,
+   "max_chunk_vertices": 6000,
+   "max_triangle_edge": 4.0,
+   "mesh_margin": 0.001,
+   "min_triangle_area": 1e-06,
+   "sagitta_budget": 0.04
+  },
+  "duration_limit": 45.0,
+  "gravity": 245.25,
+  "marble": {
+   "angular_damping": 0.0,
+   "ccd_swept_radius": 0.2,
+   "friction": 0.15,
+   "linear_damping": 0.0,
+   "mass": 1.0,
+   "radius": 0.5,
+   "restitution": 0.6,
+   "rolling_friction": 0.0,
+   "spinning_friction": 0.0,
+   "surface_friction": 0.5,
+   "surface_restitution": 0.25,
+   "travel_budget": 0.5
+  },
+  "physics": {
+   "allowed_ccd_penetration": 0.02,
+   "contact_breaking_threshold": 0.02,
+   "deterministic_overlapping_pairs": true,
+   "physics_hz": 240,
+   "solver_iterations": 40,
+   "split_impulse": true,
+   "substeps": 1
+  }
+ },
+ "cross_machine": "not tested: one machine was available. The environment block above is what a second machine's report would be diffed against.",
+ "duration": 45.0,
+ "environment": {
+  "machine": "AMD64",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+  "pybullet_api": 202010061,
+  "python": "3.13.0"
+ },
+ "fresh_process": {
+  "disagreements": {},
+  "identical": true,
+  "reference": {
+   "actuator_digest": "0c5d4b64fdb6be9105eeacf9f9648dbf417951c3b3cbaca8f51452afb33bf2a5",
+   "digest": "27a6b6b1c2b0cd21d796afe9883122d1a75bf6a4bcf099d9ba9c67e684d553e1",
+   "event_digest": "f428ca8bfaf287b8a16ad26dcc32ab2bff6d46ec6bf796ec115021840bdf8d88",
+   "order": [
+    1,
+    5,
+    3,
+    4,
+    6,
+    7,
+    2,
+    0
+   ],
+   "seconds": 45.0
+  },
+  "runs": 20
+ },
+ "in_process": {
+  "disagreements": {},
+  "identical": true,
+  "reference": {
+   "actuator_digest": "0c5d4b64fdb6be9105eeacf9f9648dbf417951c3b3cbaca8f51452afb33bf2a5",
+   "digest": "27a6b6b1c2b0cd21d796afe9883122d1a75bf6a4bcf099d9ba9c67e684d553e1",
+   "event_digest": "f428ca8bfaf287b8a16ad26dcc32ab2bff6d46ec6bf796ec115021840bdf8d88",
+   "order": [
+    1,
+    5,
+    3,
+    4,
+    6,
+    7,
+    2,
+    0
+   ],
+   "seconds": 45.0
+  },
+  "runs": 20
+ },
+ "in_process_vs_fresh": {
+  "disagreements": {},
+  "identical": true,
+  "reference": {
+   "actuator_digest": "0c5d4b64fdb6be9105eeacf9f9648dbf417951c3b3cbaca8f51452afb33bf2a5",
+   "digest": "27a6b6b1c2b0cd21d796afe9883122d1a75bf6a4bcf099d9ba9c67e684d553e1",
+   "event_digest": "f428ca8bfaf287b8a16ad26dcc32ab2bff6d46ec6bf796ec115021840bdf8d88",
+   "order": [
+    1,
+    5,
+    3,
+    4,
+    6,
+    7,
+    2,
+    0
+   ],
+   "seconds": 45.0
+  },
+  "runs": 2
+ },
+ "marbles": 8,
+ "physics_hz": 240,
+ "routes": "blue",
+ "seed": 130,
+ "wall_seconds": 1587.174
+}
