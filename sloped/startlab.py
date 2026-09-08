@@ -503,7 +503,17 @@ def start_machine(config: CoreConfig | None = None, plan: StartPlan | None = Non
             spec["bank_max"] = min(
                 float(spec["bank_max"]), float(plan.wide_bank_max)
             )
-        return TrackRun(name, spec=spec, width_profile=profile)
+        # The course's own rail boosts, so a containment measured in the lab is
+        # the containment the course has. `tests/test_sloped_startlab.py`
+        # asserts the lab and the course agree sample for sample, and a boost
+        # applied in one and not the other is exactly the drift it exists to
+        # catch.
+        return TrackRun(
+            name,
+            spec=spec,
+            width_profile=profile,
+            guard_boost=_course.GUARD_BOOSTS.get(name),
+        )
 
     runs = {name: _run(name) for name in LAB_RUNS}
     # The fan hands over to whatever the launch actually opens at.
@@ -825,7 +835,11 @@ class StartTrial:
             self._side[marble_id] = side
         if abs(across) > half - MARBLE_RADIUS:
             self.wall_ticks[marble_id] += 1
-        if abs(across) > half + LATERAL_SLACK or height > run.containment + VERTICAL_SLACK:
+        # `containment_at` rather than `containment`, because a run may carry a
+        # local guard boost and a check that read the scalar while the collider
+        # carried the boost would book a contained marble as an escape.
+        ceiling = run.containment_at(index)
+        if abs(across) > half + LATERAL_SLACK or height > ceiling + VERTICAL_SLACK:
             self.lost[marble_id] = (name, index)
 
     # Under this speed for this many ticks and a marble is not racing. One

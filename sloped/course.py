@@ -214,6 +214,52 @@ MIXER_SAMPLE = 5
 SHUFFLE_SAMPLE = 32
 SHUFFLE_RATE = 9.0
 
+# --- the local rail boosts, one per concentrated escape site -------------
+#
+# `(extra, a, b, c, d)`: the rail is authored height before sample `a`, eases up
+# to `authored + extra` by `b`, holds it to `c` and eases back by `d`. See
+# `sloped.track.TrackRun.guard_extra`.
+#
+# **Three sites, each measured before it was given a rail.**
+# `tools/sloped_escape_trace.py` records where the field leaves and with what,
+# and `tools/sloped_continuity_check.py` audits the geometry it leaves on. The
+# joins are exact - zero centreline gap, zero floor step, zero bank step on all
+# three - and no run has a grade break worth naming, so the escapes are not a
+# step or a seam. They are marbles going over the top of a 0.26 rail:
+#
+#     launch[27..51%]   7 of 768, centres 0.66 to 1.39 high against a 0.800
+#                       containment, 0.3 outside the rail's face, at 19 to 26
+#                       layout units per second with 4 to 9 of that lateral
+#     leg1[72..76%]     5 of 768, the same picture at 25 to 29, in the +28
+#                       degree hairpin
+#     leg2[63..76%]     the audit's tightest turns - radius 1.77 at sample 88
+#                       under 22 degrees of bank, with a 12.1 degree tangent
+#                       break in the same place
+#
+# The launch site is the one the V1.8 start created: the axial catch's 3.93 lift
+# delivers the field to launch[0] with 4.26 of drop behind it against the fan's
+# 0.59, so it arrives as a clump at roughly three times the speed and the
+# marbles throw *each other* into the rails. The other two are pre-existing and
+# the fan loses the same 5 of 768 at leg1.
+#
+# **Why a rail and not a bank, a radius or a slope.** `sloped.contract` pins the
+# centreline, the widths, the drops and the bank extremes of every run against
+# `physics_layout.json` and the drawn asset, and `course.check()` has to stay at
+# zero findings - so none of those is available. The rail's height is not
+# pinned, it is the surface the marbles are demonstrably clearing, and
+# `v2_track.gd` carries the same windows so the drawn rail and the collider
+# agree. Section 1 of the V1.9 brief lists "guard" first for the same reason.
+#
+# A shallower exit chute was tried first and is falsified: at 11 degrees the
+# clump stacks in the chute and *none* of 768 racers ever reached a run, which
+# is V1.7's own measured floor of about 15 degrees confirmed at the higher
+# arrival speed.
+GUARD_BOOSTS: dict[str, tuple[float, int, int, int, int]] = {
+    "launch": (0.50, 12, 24, 70, 84),
+    "leg1": (0.50, 46, 58, 100, 110),
+    "leg2": (0.50, 60, 72, 106, 116),
+}
+
 # Which start the course is built with.
 #
 # **"fan", because the basin was measured and is worse.** `sloped.basin` builds
@@ -310,6 +356,7 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
                 if (name == "leg3" and forked)
                 else None
             ),
+            guard_boost=GUARD_BOOSTS.get(name),
         )
         for name in CHAIN
     }

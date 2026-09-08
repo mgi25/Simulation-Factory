@@ -388,7 +388,11 @@ class SlopedRace(MarbleSimulation):
         height = sum(offset[axis] * up[axis] for axis in range(3))
         half = 0.5 * run.clear_width * run.widths[index]
         result = self.results[marble_id]
-        if abs(across) > half + LATERAL_SLACK or height > run.containment + VERTICAL_SLACK:
+        # `containment_at` rather than `containment`, because a run may carry a
+        # local guard boost and a check that read the scalar while the collider
+        # carried the boost would book a contained marble as an escape.
+        ceiling = run.containment_at(index)
+        if abs(across) > half + LATERAL_SLACK or height > ceiling + VERTICAL_SLACK:
             if result.lost_at is None:
                 result.lost_at = (name, index)
                 result.lost_time = self.elapsed

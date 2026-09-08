@@ -206,6 +206,60 @@ static func guard_section(side: float) -> Array:
 	]))
 
 
+static func guard_rise(count: int, boost: Array) -> Array:
+	## Extra rail height per sample, from a `[extra, a, b, c, d]` window.
+	##
+	## Smoothstepped in and out rather than stepped: a step in a rail's top is a
+	## kerb a marble riding the wall trips on, which would be a new defect in
+	## the place an old one is being fixed.
+	var out: Array = []
+	if boost.size() != 5:
+		for _index in count:
+			out.append(0.0)
+		return out
+	var extra := float(boost[0])
+	var a := float(boost[1])
+	var b := float(boost[2])
+	var c := float(boost[3])
+	var d := float(boost[4])
+	for index in count:
+		var i := float(index)
+		var value := 0.0
+		if i <= a or i >= d:
+			value = 0.0
+		elif i >= b and i <= c:
+			value = extra
+		elif i < b:
+			value = extra * _smooth((i - a) / maxf(b - a, 1.0))
+		else:
+			value = extra * _smooth((d - i) / maxf(d - c, 1.0))
+		out.append(value)
+	return out
+
+
+static func _smooth(t: float) -> float:
+	var u := clampf(t, 0.0, 1.0)
+	return u * u * (3.0 - 2.0 * u)
+
+
+static func _raise_rail(section: Array, extra: float) -> Array:
+	## One guard section with its top points lifted.
+	##
+	## Only the points above the rail's base move, so the rail grows taller
+	## rather than floating: its foot stays on the lip where it was moulded.
+	if extra <= 0.0:
+		return section
+	var base := 0.280
+	var out: Array = []
+	for point in section:
+		var value: Vector2 = point
+		if value.y > base + 0.001:
+			out.append(Vector2(value.x, value.y + extra))
+		else:
+			out.append(value)
+	return out
+
+
 static func keel_section() -> Array:
 	## The graphite underside. Wide at the top and deep, because it is now the
 	## whole bottom half of the track rather than a spine tucked under it.
@@ -304,10 +358,27 @@ static func build(palette, controls: Array, node_name: String,
 		V2Forms.banked_sweep(path, keel_set[0], keel_set[1], banks),
 		palette.get_material(keel_key), "Keel"))
 
+	# boost: the sloped race raises the acrylic rail over three stretches where
+	# a marble at speed was measured going over the top of it. Additive - without
+	# the key every existing build gets the authored 0.26 rail exactly as before,
+	# which is what keeps the earlier labs' committed frames reproducing.
+	#
+	# `[extra, a, b, c, d]` in profile units: authored before sample `a`, eased
+	# up to `authored + extra` by `b`, held to `c`, eased back by `d`. The same
+	# window and the same numbers as `sloped.course.GUARD_BOOSTS`, because a
+	# rail the physics has and the render does not is one a viewer watches a
+	# marble bounce off nothing on.
+	var boost: Array = options.get("guard_boost", [])
+	var rise := guard_rise(path.size(), boost)
 	for side in [1.0, -1.0]:
 		var guard := _sized(guard_section(side), scale)
 		var guard_set: Array = V2Forms.scaled_sections(
 			guard, V2Forms.section_normals(guard), path.size(), widths)
+		if not boost.is_empty():
+			var raised: Array = []
+			for index in path.size():
+				raised.append(_raise_rail(guard_set[0][index], rise[index] * scale))
+			guard_set[0] = raised
 		root.add_child(Forms.mesh_node(
 			V2Forms.banked_sweep(path, guard_set[0], guard_set[1], banks),
 			palette.get_material(guard_key),

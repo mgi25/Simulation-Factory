@@ -1,0 +1,43 @@
+{
+  "start_kind": "floor",
+  "candidate": "floor-fast",
+  "label": "boost 0.50",
+  "seeds": [
+    0,
+    96
+  ],
+  "racers": 768,
+  "escapes": [
+    {
+      "run": "launch",
+      "sample": 60,
+      "pct": 51.3,
+      "slot": 7,
+      "across": -1.2468,
+      "reach": -1.4031,
+      "height": 1.1919,
+      "containment": 0.8,
+      "over_by": 0.3919,
+      "wide_by": 0.0732,
+      "speed": 23.616,
+      "across_speed": -4.281,
+      "up_speed": -4.631,
+      "along_speed": 22.759,
+      "bank_deg": -11.93,
+      "tick": 1844,
+      "which_test": "lateral",
+      "above_guard": true,
+      "verdict": "over the guard"
+    }
+  ],
+  "stuck": [
+    {
+      "slot": 5,
+      "run": "start",
+      "sample": 0
+    }
+  ],
+  "peak_height": 1.5271491752232849,
+  "peak_reach": 3.411127335192138,
+  "wall_seconds": 182.72
+}

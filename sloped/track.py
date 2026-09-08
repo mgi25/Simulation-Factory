@@ -190,8 +190,28 @@ class TrackRun(MarbleModule):
         open_side: tuple[float, int, int] | None = None,
         taper: tuple[float, float] | None = None,
         width_profile: tuple[float, int, int] | None = None,
+        guard_boost: tuple[float, int, int, int, int] | None = None,
     ) -> None:
         super().__init__(name)
+        # (extra, a, b, c, d): the guard rail is authored height before sample
+        # `a`, eases up to `authored + extra` by `b`, holds it to `c`, and eases
+        # back by `d`. A *window*, the same shape `open_side` uses, because a
+        # containment repair belongs to a stretch and not to a whole run.
+        #
+        # **Why a guard rather than a bank or a radius.** The escapes this
+        # exists for are marbles going over the top of a 0.26 rail: measured on
+        # the launch's plunge, eleven of twelve left with their centres above
+        # the 0.800 containment and 0.3 outside the rail's face, at 19 to 26
+        # layout units per second with 4 to 9 of that lateral. The centreline,
+        # the widths, the drops and the bank extremes are all pinned by
+        # `sloped.contract` against the drawn asset, so they are not available;
+        # the rail's height is not pinned, and it is the surface the marbles are
+        # actually clearing.
+        #
+        # `v2_track.gd` carries the same window, so the drawn rail and the
+        # collider agree. A physics-only wall is one a viewer watches a marble
+        # bounce off nothing on.
+        self.guard_boost = guard_boost
         # (side, a, b, c, d): the wall on `side` is at full height before
         # sample `a`, eases open between `a` and `b`, is open between `b` and
         # `c`, eases back between `c` and `d`, and is full again after. A
@@ -320,23 +340,65 @@ class TrackRun(MarbleModule):
         t = (index - c) / max(d - c, 1)
         return self.OPEN_FLOOR + (1.0 - self.OPEN_FLOOR) * (t * t * (3.0 - 2.0 * t))
 
+    def guard_extra(self, index: int) -> float:
+        """How much taller the rail is at this sample, in layout units.
+
+        Zero unless `guard_boost` is set. Eased in and out with the same
+        smoothstep the gates use, so the rail's top is a curve rather than a
+        step - a step in a rail is a kerb a marble riding the wall trips on,
+        which would be a new defect in the place an old one was being fixed.
+        """
+        if self.guard_boost is None:
+            return 0.0
+        extra, a, b, c, d = self.guard_boost
+        if index <= a or index >= d:
+            return 0.0
+        if b <= index <= c:
+            return float(extra) * self.scale
+        if index < b:
+            return float(extra) * self.scale * _ease((index - a) / max(b - a, 1))
+        return float(extra) * self.scale * _ease((d - index) / max(d - c, 1))
+
+    def containment_at(self, index: int) -> float:
+        """The containment height at one sample, in simulation units.
+
+        Per sample rather than the one scalar `containment`, because a local
+        guard boost raises it locally - and a containment *check* that used the
+        scalar while the collider used the boost would call a contained marble
+        an escape. Both `sloped.race` and `sloped.startlab` read this.
+        """
+        return self.containment + to_sim(self.guard_extra(index))
+
     def section_at(self, index: int) -> list[tuple[float, float]]:
-        """The cross-section at one sample, with any opened wall applied.
+        """The cross-section at one sample, with any opened wall and any local
+        guard boost applied.
 
         Opening a wall scales its points' height toward the cradle's own edge
         rather than deleting them, so the section keeps its point count and the
         strip builder keeps its invariant.
         """
+        extra = self.guard_extra(index)
+        if extra > 0.0:
+            crown = layout.LIP_CROWN * self.scale
+            section = [
+                # Only the rail's own points move, and only upward. The lip and
+                # the cradle are the running surface and are left exactly as
+                # the asset draws them.
+                (across, up + extra) if up > crown else (across, up)
+                for across, up in self.section
+            ]
+        else:
+            section = self.section
         if self.open_side is None:
-            return self.section
+            return section
         factor = self.wall_factor(index)
         if factor >= 1.0:
-            return self.section
+            return section
         side = self.open_side[0]
         half = layout.CHANNEL_HALF * self.scale
         edge = layout.floor_y_at(layout.CHANNEL_HALF) * self.scale
         out: list[tuple[float, float]] = []
-        for across, up in self.section:
+        for across, up in section:
             # `side` of zero opens **both** guards. The sprint needs it: the
             # merge apron is built around its first three units and the
             # sprint's own guard rails stand up inside that apron, so the strip
@@ -503,6 +565,9 @@ class TrackRun(MarbleModule):
             "role": self.role,
             "profile_scale": self.scale,
             "samples": len(self.path),
+            "guard_boost": (
+                None if self.guard_boost is None else list(self.guard_boost)
+            ),
             "clear_width": round(self.clear_width, 6),
             "floor_offset": round(self.floor_offset, 6),
             "containment": round(self.containment, 6),

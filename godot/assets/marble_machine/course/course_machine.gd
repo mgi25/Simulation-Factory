@@ -32,6 +32,23 @@ const FinishArena := preload("res://assets/marble_machine/course/course_finish.g
 const Dressing := preload("res://assets/marble_machine/course/course_dressing.gd")
 
 const KEEL_DROP := 0.98         # v2_track's keel bottom, in profile units
+
+## Where the acrylic rail is raised, and by how much. **The same table as
+## `sloped.course.GUARD_BOOSTS`, and it has to stay the same table**: the
+## physics collider carries these windows, so a render without them draws a
+## marble bouncing off nothing.
+##
+## `[extra, a, b, c, d]` in profile units - authored height before sample `a`,
+## eased to `authored + extra` by `b`, held to `c`, eased back by `d`.
+## `tools/sloped_escape_trace.py` measured the three stretches: marbles at 16 to
+## 31 layout units per second going over the top of the 0.26 rail, their centres
+## above the containment and outside the rail's face, on the launch's plunge and
+## in leg1's and leg2's banked hairpins.
+const GUARD_BOOSTS := {
+	"launch": [0.50, 12, 24, 70, 84],
+	"leg1": [0.50, 46, 58, 100, 110],
+	"leg2": [0.50, 60, 72, 106, 116],
+}
 # Fewer piers, each carrying more. At 5.6 a viaduct over the gorge came
 # out as a picket fence of thin frames; at 7.4 each one is a structure.
 const SUPPORT_SPACING := 7.4
@@ -101,6 +118,7 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 			"floor": floor_key,
 			"guard": guard,
 			"samples": int(options.get("samples", 118)),
+			"guard_boost": GUARD_BOOSTS.get(name, []),
 			"ribs": detail != "block",
 		})
 		runs.add_child(run)

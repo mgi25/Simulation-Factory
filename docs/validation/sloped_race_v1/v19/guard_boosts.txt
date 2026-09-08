@@ -1,0 +1,142 @@
+LOCAL RAIL BOOSTS - the start-lift escapes, and leg1's trap with them
+=====================================================================
+
+Tools: tools/sloped_escape_trace.py (where the field leaves and with what),
+       tools/sloped_continuity_check.py (the geometry it leaves on).
+
+
+1. WHAT THE ESCAPES ACTUALLY ARE
+--------------------------------
+A loss-site histogram says where a racer left. It does not say whether it went
+over a guard, through a floor, or was outside the channel before the instrument
+found it - three different repairs. So the trace records the state at the tick
+the verdict fires.
+
+96 seeds, 768 racers, the frozen floor-fast start:
+
+  run    sample   %  | reach  height  over  | speed across    up | bank
+  launch    32  27.4 | -0.09  +1.387 +0.587 |   9.2   -1.9  +5.5 | -18.0
+  launch    46  39.3 | +1.41  +0.756 -0.044 |  18.9   +8.9  -1.2 | -12.4
+  launch    48  41.0 | +1.37  +0.857 +0.057 |  18.9   +4.0  -3.8 | -11.8
+  launch    49  41.9 | -1.40  +0.657 -0.143 |  18.2   -4.1  -4.3 | -11.6
+  launch    54  46.2 | -1.42  +0.919 +0.119 |  26.5   -5.1  -7.3 | -11.6
+  launch    56  47.9 | -1.32  +0.721 -0.079 |  22.1   -2.9  -3.9 | -11.5
+  launch    60  51.3 | -1.38  +0.689 -0.111 |  20.0   -4.0  -2.8 | -11.9
+  leg1      85  72.6 | +1.34  +0.748 -0.052 |  26.7   +5.5  -5.3 | +28.0
+  leg1      86  73.5 | +1.37  +0.805 +0.005 |  27.9   +9.3  -2.9 | +28.0
+  leg1      86  73.5 | +1.31  +0.741 -0.059 |  29.1   +8.7  -5.7 | +28.0
+  leg1      87  74.4 | +1.33  +1.056 +0.256 |  25.2   +6.7  -0.2 | +28.0
+  leg1      89  76.1 | +1.46  +0.761 -0.039 |  28.3   +8.6  -3.0 | +28.0
+
+Every one is 31 to 46 per cent of a half width *outside* the channel with its
+centre near the 0.800 containment, at 18 to 29 layout units per second with 3
+to 9 of that lateral, and every vertical speed is negative. **They have gone
+over the top of the rail and are falling outside it.** The worst height any
+racer reached was 1.510, nearly double the rail.
+
+**The tool's first verdict labels were wrong and said the opposite.** They read
+"over the guard" only when the *vertical* test fired, and the vertical slack is
+a whole marble diameter - so eleven of twelve escapes were labelled "outside
+the wall" while their centres were above the rail and 0.3 outside its face. The
+verdict now reports the test that fired and the height against the rail top as
+two separate facts.
+
+
+2. WHAT IT IS NOT
+-----------------
+`tools/sloped_continuity_check.py` audits the whole chain for the defects
+section 4 names, and rules three of them out:
+
+  launch -> leg1: centreline gap 0.0000, floor step -0.0000, bank step 0.00 deg
+  leg1   -> leg2: centreline gap 0.0000, floor step +0.0000, bank step 0.00 deg
+  leg2   -> leg3: centreline gap 0.0000, floor step +0.0000, bank step 0.00 deg
+
+No run has a grade break over 8 degrees anywhere. So it is not a seam, not a
+kerb and not a step. What the audit does find is a 12.1-degree tangent break at
+leg2[88] with a 1.77 turn radius under 22 degrees of bank, and one of 6.6
+degrees at leg1[92] - the two hairpins, in the two bands the brief names.
+
+**The audit's first speed model was wrong and had to be replaced.** It computed
+`tan(bank + wall)` with the sum clamped at 89 degrees, so a positive bank put
+the argument at the clamp, `tan(89)` made almost any turn look able to hold
+anything, and leg1 reported zero tight samples while marbles were demonstrably
+leaving it. It also added the bank to the wall without checking which way the
+corner went. It now walks the channel's own profile outward, with the bank's
+sign taken from the turn's direction, and reports the height a marble rides to.
+
+That model says the channel holds 27 units/s *in equilibrium* everywhere. So
+the escapes are dynamic rather than static: the marbles arrive with 3 to 9
+units/s of lateral velocity - from each other, in a clump - and climb past
+their equilibrium point ballistically.
+
+
+3. THE LEVER THAT IS FALSIFIED
+------------------------------
+The launch site is the one V1.8's start created: its axial catch delivers the
+field to launch[0] with 4.26 of drop behind it against the fan's 0.59, so the
+field arrives as a clump at about three times the speed. The fan loses **zero**
+racers on the launch and the same 5 of 768 at leg1.
+
+So the first thing tried was less arrival energy - a shallower exit chute and a
+shallower catch cone, which also lowers the lift. It does not work, and the
+failure is total:
+
+  chute  cone   lift   field falls   delivered   escapes
+   17     14    3.929      4.259       99.87%      12
+   11      9    3.224      3.554        0.00%       0     768 stopped in the chute
+    8      6    2.865      3.195        0.00%       0     768 stopped in the chute
+
+**Below about 15 degrees the clump stacks in the chute and none of 768 racers
+ever reaches a run.** That is V1.7's own measured floor, confirmed at the higher
+arrival speed rather than assumed to have moved. The lift is what the
+architecture costs.
+
+
+4. THE CORRECTION
+-----------------
+The centreline, the widths, the drops and the bank extremes of every run are
+pinned by `sloped.contract` against `physics_layout.json` and the drawn asset,
+and `course.check()` has to stay at zero findings - so none of those is
+available. The rail's height is not pinned, and it is the surface the marbles
+are demonstrably clearing.
+
+`TrackRun.guard_boost` is a window - authored height before sample `a`, eased to
+`authored + extra` by `b`, held to `c`, eased back by `d`. Smoothstepped rather
+than stepped, because a step in a rail's top is a kerb a marble riding the wall
+trips on. Only the points above the lip's crown move, and only upward: the lip
+and the cradle are the running surface and are left exactly as the asset draws
+them.
+
+  launch  (0.50, 12, 24, 70, 84)
+  leg1    (0.50, 46, 58, 100, 110)
+  leg2    (0.50, 60, 72, 106, 116)
+
+Measured, 96 seeds each:
+
+  configuration                       escapes   rate     launch   leg1
+  authored 0.26 rail                    12     1.562%      7        5
+  +0.34 over the narrower windows        6     0.781%      4        2
+  +0.50 over these windows               1     0.130%      1        0
+
+**And the containment check had to move with the collider.** `run.containment`
+is a scalar; the boost is per sample. A check reading the scalar while the
+collider carried the boost would book a contained marble as an escape and the
+histogram would say the repair had done nothing. Both `sloped.race` and
+`sloped.startlab` now read `containment_at(index)`.
+
+The intermediate +0.34 row is why the windows were widened as well as raised:
+one of its six remaining escapes was at leg1[59], outside leg1's window
+entirely, and four of the others were within 0.10 of the raised rail's top.
+
+
+5. THE RENDER CARRIES THE SAME RAILS
+------------------------------------
+`v2_track.gd` grows an additive `guard_boost` option and `course_machine.gd`
+passes the same three windows. Additive is deliberate: without the key every
+existing build gets the authored 0.26 rail, which is what keeps the earlier
+labs' committed frames reproducing.
+
+A rail the physics has and the render does not is one a viewer watches a marble
+bounce off nothing on. `tests/test_sloped_guards.py` parses the GDScript
+constant and compares it to `sloped.course.GUARD_BOOSTS` number for number,
+because the alternative is a third file neither tree can import.
