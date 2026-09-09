@@ -206,6 +206,39 @@ static func guard_section(side: float) -> Array:
 	]))
 
 
+static func slewed_bank(banks: Array, path: Array, slew: Array, profile_scale: float) -> Array:
+	## `banks` with the roll's unwind rate bounded by the local drop.
+	##
+	## The mirror of `sloped.track._slewed_bank`, which carries the measurement.
+	## On this course the outside of a turn is the low side, so a roll coming off
+	## raises what rides it; requiring that neither channel edge ever rises along
+	## the run is one slew-rate limit on the *signed* sine of the roll:
+	##
+	##     abs(sin(b[s + 1]) - sin(b[s])) <= drop / half
+	##
+	## Signed, because at leg2's inflection the roll crosses zero, and a limit on
+	## the magnitude alone permits the flip and lets the old low edge rise by the
+	## whole of it. `margin` is the fraction of the drop the roll may spend.
+	var out: Array = banks.duplicate()
+	if slew.size() != 3:
+		return out
+	var first := int(slew[0])
+	var last := int(slew[1])
+	var margin := float(slew[2])
+	var half: float = CHANNEL_HALF * profile_scale
+	if margin <= 0.0 or half <= 0.0:
+		return out
+	var stop: int = min(last, out.size() - 1)
+	for index in range(max(first, 0), stop):
+		var drop: float = float(path[index].y) - float(path[index + 1].y)
+		var cap: float = max(0.0, drop / half) * margin
+		var here: float = sin(float(out[index]))
+		var want: float = sin(float(banks[index + 1]))
+		var bounded: float = max(here - cap, min(here + cap, want))
+		out[index + 1] = asin(clamp(bounded, -1.0, 1.0))
+	return out
+
+
 static func guard_rise(count: int, boost: Array) -> Array:
 	## Extra rail height per sample, from a `[extra, a, b, c, d]` window.
 	##
@@ -309,6 +342,18 @@ static func build(palette, controls: Array, node_name: String,
 	var banks: Array = V2Forms.auto_bank(path,
 		float(options.get("bank_gain", 3.2)),
 		float(options.get("bank_max", 26.0)))
+	# Bound the roll's unwind rate by the drop that pays for it,
+	# `[first, last, margin]`, the same numbers as `sloped.course.BANK_SLEWS`.
+	# Applied here rather than at any one sweep, so the floor, both guards, the
+	# ribs, the edge lights and the `banks` meta all read one roll - and before
+	# `set_meta`, because the camera rig and `course_machine.gd` take a run's
+	# roll from that meta.
+	#
+	# A roll the physics has and the render does not is one a viewer watches a
+	# marble corner on the wrong surface. Empty by default, so every existing
+	# build gets `auto_bank` exactly as before.
+	banks = slewed_bank(banks, path, options.get("bank_slew", []),
+		float(options.get("scale", 1.0)))
 	root.set_meta("path", path)
 	root.set_meta("banks", banks)
 

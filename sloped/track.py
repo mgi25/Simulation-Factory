@@ -132,6 +132,135 @@ def _interpolate_rise(section: Sequence[tuple[float, float]], across: float) -> 
     return section[-1][1]
 
 
+def _slewed_bank(
+    banks: "Sequence[float]",
+    path: "Sequence[Sequence[float]]",
+    first: int,
+    last: int,
+    margin: float,
+    half: float,
+) -> list[float]:
+    """`banks` with the roll's unwind rate bounded by the drop that pays for it.
+
+    ## The defect: an unwinding roll lifts the outside faster than the run falls
+
+    On this course the outside of a turn is the low side, so a roll that comes
+    off *raises* whatever is riding it. At leg2's inflection the roll unwinds
+    about five degrees a sample - from -19.64 at sample 98 to -0.59 at 102 -
+    while the centreline falls at only 10%. Over 98 to 103 the centreline drops
+    0.3176 and the outside edge rises 0.2849: the unwind eats **89.7% of the
+    drop**, and what is left is not a weak gradient but a closed pocket.
+
+    Measured on the authored run, the deepest climb along the run at a fixed
+    lateral fraction of the half width:
+
+        fraction   0.00     0.40     0.55     0.60     0.70     0.80     0.95
+        climb    0.0000   0.0000   0.0449   0.0685   0.1159   0.1637   0.2504
+
+    A marble on the centreline runs downhill throughout. Anything past about
+    half a width out sits in a local minimum at sample 99 and has to climb back
+    out.
+
+    ## Why that traps marbles, and why one lever fixes both halves
+
+    The climb only asks 1.37 units per second of forward speed and the field
+    runs at 30 to 70, so the pocket cannot stop a moving marble. What stops them
+    is each other, and it happens *in* the pocket: the same inflection sweeps
+    every marble clean across the channel, from a lateral fraction of -0.7 to
+    +0.7, so 99 to 101 is where the field crosses and collides. Traced, three
+    racers went from +37.11, +35.74 and +37.95 units per second of forward speed
+    to -12.29, +3.17 and +2.32 in a single marble-to-marble contact, then
+    oscillated laterally in the pocket for the rest of the race. Re-run at 90
+    seconds - more than twice the race - all seven of a sample were still there,
+    so it is a trap and not a slow finish.
+
+    ## The constraint, which is exact
+
+    A section point at profile coordinate `a` rides at about `y + a * sin(bank)`,
+    so requiring that **neither** edge of the channel ever rises along the run
+    is two inequalities on consecutive samples:
+
+        y(s+1) + h*sin(b(s+1)) <= y(s) + h*sin(b(s))
+        y(s+1) - h*sin(b(s+1)) <= y(s) - h*sin(b(s))
+
+    which together are one slew-rate limit on the *signed* sine of the roll:
+
+        abs(sin(b(s+1)) - sin(b(s))) <= drop(s) / h
+
+    Signed, so a roll that changes sign is bounded by the same rule - which the
+    first attempt at this was not, and it is why that attempt did nothing: at
+    102 the authored roll crosses from -0.59 to +1.89 degrees, and a limit that
+    tracked only the magnitude permitted the flip and let the old low edge rise
+    by the whole of it.
+
+    `margin` is the fraction of the local drop the roll may spend on lifting an
+    edge, so anything under 1.0 leaves the rest as net descent. `first` is the
+    roll the limit starts *from*, so the samples it can change are `first + 1`
+    through `last` inclusive.
+
+        setting              0.55     0.60     0.70     0.80     0.95   samples
+        authored           0.0449   0.0685   0.1159   0.1637   0.2504         -
+        98-112 m=1.00      0.0000   0.0000   0.0000   0.0000   0.0000        12
+        98-108 m=1.00      0.0000   0.0020   0.0430   0.0968   0.1828        10
+        98-108 m=0.80      0.0370   0.0743   0.0929   0.1115   0.1395        10
+        98-108 m=0.60      0.0790   0.1391   0.1692   0.1995   0.2449        10
+
+    **The window has to be wide enough for the limit to rejoin the authored
+    curve on its own.** Cut off at 108 the roll is still 0.95 degrees from
+    authored, so it snaps back there - a step in the roll, and the residue in
+    the row above. Given until 112 it rejoins at 110 of its own accord and the
+    run descends monotonically at *every* lateral position. Its roll rate is
+    then smoother than the authored one as well: 2.54, 2.39, 2.26, 2.15, 2.05,
+    1.96, 1.80, 1.58, 1.41, 1.29 degrees a sample, against an authored 2.95,
+    4.97, 6.02, 5.11, 2.49, -0.42, -1.78, -1.12, 0.53, 1.65 that reverses sign
+    twice.
+
+    **A margin of 1.0 is the best setting, not the weakest.** It is the
+    least-restrictive rule that still forbids an edge from rising, and
+    tightening it makes the pocket *worse*, because the roll then lags far
+    enough that it has to catch up inside the window and digs a fresh climb
+    where it does.
+
+    ## Why a window rather than the whole run, and why this and not a hold
+
+    **Windowed, because the authored roll is fine everywhere else and a global
+    limit is not safe.** Applied to every run at `margin` 0.75 it moves leg1 by
+    up to 20.54 degrees and leg3 by 7.85, and neither has this defect.
+
+    **And a limit rather than a hold, because a hold only moves the pocket.**
+    Holding the roll at sample 99 for eight samples relocates the deepest climb
+    from sample 102 to sample 112 and barely changes its depth - 0.0685 to
+    0.0613 at a fraction of 0.6 - which saves the traced racers only by putting
+    the trap somewhere the field is no longer crossing, and it rolls the channel
+    16.7 degrees where the path is straightening, which left a marble hovering
+    0.84 above the floor at `leg2[104]` in contact validation.
+
+    ## Why this is available when bank, radius and slope are not
+
+    `sloped.contract` pins the centreline, the widths, the drops and the bank
+    **extreme** - `max(abs(banks))` over the run, and nothing about the profile
+    between. A limit only ever unwinds more slowly through an angle the run
+    already reaches, so the extreme is untouched and `contract.check()` stays at
+    zero findings. The same argument `guard_boost` is built on.
+
+    `v2_track.gd` carries the same table, because a roll the physics has and the
+    render does not is one a viewer watches a marble corner on the wrong
+    surface; `tests/test_sloped_bank_slew.py` compares the two.
+    """
+    out = list(banks)
+    if margin <= 0.0 or half <= 0.0:
+        return out
+    stop = min(last, len(out) - 1)
+    for index in range(max(first, 0), stop):
+        drop = path[index][1] - path[index + 1][1]
+        cap = max(0.0, drop / half) * margin
+        here = math.sin(out[index])
+        want = math.sin(banks[index + 1])
+        bounded = max(here - cap, min(here + cap, want))
+        out[index + 1] = math.asin(max(-1.0, min(1.0, bounded)))
+    return out
+
+
 def frames_for(path, banks, tangents):
     """The rolled frame at every sample, as (lateral, up, forward) triples."""
     return [banked_basis(tangents, banks, index) for index in range(len(path))]
@@ -210,11 +339,17 @@ class TrackRun(MarbleModule):
         width_profile: tuple[float, int, int] | None = None,
         guard_boost: tuple[float, int, int, int, int] | None = None,
         entry_trim: Sequence[float | None] | None = None,
+        bank_slew: tuple[int, int, float] | None = None,
     ) -> None:
         super().__init__(name)
         # Per-sample section trim in profile units, or None. Usually installed
         # after construction by `set_entry_trim`; see there.
         self.entry_trim = None if entry_trim is None else list(entry_trim)
+        # (first, last, margin): between these samples the roll may only
+        # unwind as fast as `margin` of the local drop pays for, so neither edge
+        # of the channel ever rises along the run. See `_slewed_bank` for the
+        # defect, the arithmetic and why a hold was not enough.
+        self.bank_slew = bank_slew
         # (extra, a, b, c, d): the guard rail is authored height before sample
         # `a`, eases up to `authored + extra` by `b`, holds it to `c`, and eases
         # back by `d`. A *window*, the same shape `open_side` uses, because a
@@ -302,6 +437,11 @@ class TrackRun(MarbleModule):
                 len(self.path),
                 float(spec.get("entry_flare", 0.14)),
                 float(spec.get("exit_flare", 0.09)),
+            )
+        if bank_slew is not None:
+            first, last, margin = bank_slew
+            self.banks = _slewed_bank(
+                self.banks, self.path, first, last, margin, layout.CHANNEL_HALF * self.scale
             )
         self.frames = frames_for(self.path, self.banks, self.tangents)
         if taper is not None:

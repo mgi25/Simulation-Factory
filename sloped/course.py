@@ -306,9 +306,56 @@ GUARD_BOOSTS: dict[str, tuple[float, int, int, int, int]] = {
     # not supported and the boost is not shown to be harmful either. It stays,
     # because it went in on a measured geometry defect, because every point
     # estimate is nominally better with it, and because the production
-    # benchmark was run with it. `leg2[99]`'s stalls are a V1 limitation with
-    # no mechanism yet - see `docs/sloped_race_v19_production.md`.
+    # benchmark was run with it. **`leg2[99]`'s stalls are not this window's
+    # doing, and the mechanism is now measured** - see `BANK_SLEWS` below and
+    # `sloped.track._slewed_bank`. The guess recorded above, that the racer
+    # scrubs its speed against the rail and arrives too slow, is wrong: what
+    # takes the speed is another marble, and what keeps it is a pocket the
+    # unwinding roll digs on the outside of the inflection.
     "leg2": (0.50, 60, 72, 106, 116),
+}
+
+# Where a run's roll is not allowed to unwind faster than the drop pays for,
+# as (first sample, last sample, margin).
+#
+# **This is the mechanism `leg2[99]` was missing.** On this course the outside
+# of a turn is the low side, so a roll coming off *raises* what rides it. At
+# leg2's inflection the roll unwinds about five degrees a sample against a 10%
+# fall, so over samples 98 to 103 the unwind eats 89.7% of the drop - which
+# leaves a closed pocket on the outside, 0.0685 deep at a lateral fraction of
+# 0.6 and 0.2504 at the rail, while the centreline runs downhill the whole way.
+#
+# The pocket cannot stop a moving marble: the climb asks 1.37 units per second
+# and the field runs at 30 to 70. What stops them is each other, in the pocket,
+# because the same inflection sweeps every marble across the channel from a
+# fraction of -0.7 to +0.7 - so 99 to 101 is both where the field crosses and
+# where anything stopped is kept. Traced, three racers lost +37.11, +35.74 and
+# +37.95 of forward speed to a single marble contact and never left; re-run at
+# 90 seconds, more than twice the race, all seven of a sample were still there.
+#
+# Installed, the pocket is **0.0000 at every lateral fraction** - the run
+# descends monotonically everywhere - for twelve changed samples, a worst
+# deviation of 10.14 degrees, and `max(abs(banks))` untouched at 22.0000.
+#
+# `sloped.track._slewed_bank` has the constraint, which is exact, and the three
+# things that are counter-intuitive about it. **A margin of 1.0 is the best
+# setting, not the weakest**: it is the least-restrictive rule that still
+# forbids an edge rising, and tightening it makes the pocket *worse* (0.0743 at
+# a fraction of 0.6 for margin 0.8, 0.1391 for 0.6) because the roll then lags
+# far enough to have to catch up inside the window. **The window must be wide
+# enough for the limit to rejoin the authored curve on its own** - ended at 108
+# it snaps back with a 0.95 degree step and leaves a residue; given until 112 it
+# rejoins at 110. And **a hold is not a substitute** - holding the roll for
+# eight samples moves the pocket from sample 102 to 112 at the same depth
+# (0.0685 to 0.0613 at a fraction of 0.6) and left a marble hovering 0.84 above
+# the floor at `leg2[104]` in contact validation.
+#
+# Available where bank, radius and slope are not, for the same reason
+# `GUARD_BOOSTS` is: `sloped.contract` pins the bank **extreme** and nothing
+# about the profile between, and a limit only unwinds more slowly through an
+# angle the run already reaches. `v2_track.gd` carries the same table.
+BANK_SLEWS: dict[str, tuple[int, int, float]] = {
+    "leg2": (98, 112, 1.0),
 }
 
 # Which start the course is built with.
@@ -432,6 +479,7 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
                 else None
             ),
             guard_boost=GUARD_BOOSTS.get(name),
+            bank_slew=BANK_SLEWS.get(name),
         )
         for name in CHAIN
     }

@@ -49,6 +49,20 @@ const GUARD_BOOSTS := {
 	"leg1": [0.50, 46, 58, 100, 110],
 	"leg2": [0.50, 60, 72, 106, 116],
 }
+
+## Where a run's roll may not unwind faster than the drop pays for. **The same
+## table as `sloped.course.BANK_SLEWS`, and it has to stay the same table**: the
+## collider is swept along this roll, so a render without it draws marbles
+## cornering on a surface that is not the one they ride.
+##
+## `[first sample, last sample, margin]` - between those samples the roll only
+## unwinds as fast as `margin` of the local drop allows, so neither channel edge
+## ever rises along the run. leg2's inflection unwinds about five degrees a
+## sample against a 10% fall, which eats 89.7% of the drop and leaves a pocket
+## on the outside; it held 41 of the 56 non-finishers in the 600-race benchmark.
+const BANK_SLEWS := {
+	"leg2": [98, 112, 1.0],
+}
 # Fewer piers, each carrying more. At 5.6 a viaduct over the gorge came
 # out as a picket fence of thin frames; at 7.4 each one is a structure.
 const SUPPORT_SPACING := 7.4
@@ -119,6 +133,7 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 			"guard": guard,
 			"samples": int(options.get("samples", 118)),
 			"guard_boost": GUARD_BOOSTS.get(name, []),
+			"bank_slew": BANK_SLEWS.get(name, []),
 			"ribs": detail != "block",
 		})
 		runs.add_child(run)
