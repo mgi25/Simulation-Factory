@@ -482,7 +482,7 @@ at less than half its own limit, and they ship:
     blue              24.0     1.618      3.534  5.8369                6.643
 
 Full suite: **1587 passed, 2 skipped, 0 failed**, excluding the pre-existing
-`test_neon_proof` missing-artifact failure. 's
+`test_neon_proof` missing-artifact failure. `tests/test_sloped_bank_slew.py`'s
 `..._on_leg2_only` is renamed and strengthened: it skipped every name in
 `BANK_SLEWS` and so kept passing when the table grew to three without checking
 that any of them was installed - and blue and orange are built outside the
