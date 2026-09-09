@@ -60,8 +60,16 @@ const GUARD_BOOSTS := {
 ## ever rises along the run. leg2's inflection unwinds about five degrees a
 ## sample against a 10% fall, which eats 89.7% of the drop and leaves a pocket
 ## on the outside; it held 41 of the 56 non-finishers in the 600-race benchmark.
+## **blue's tail carries the same defect and it was never surveyed**, because
+## `tools/sloped_pocket_survey.py` walks the four chain runs and the sprint only.
+## blue's roll reverses from -17.45 degrees at sample 89 to +10.50 at 99 while
+## the centreline falls 0.164 layout units; the reversal costs 0.372, so its
+## east edge climbs 0.3013 where its centre descends throughout. That climb tops
+## out at sample 98 and `blue[100]` is the loss site - 8 of V1.11's 24 remaining
+## non-finishers, and where V1 lost 319 of its 747 marbles.
 const BANK_SLEWS := {
 	"leg2": [98, 112, 1.0],
+	"blue": [84, 117, 1.0],
 }
 # Fewer piers, each carrying more. At 5.6 a viaduct over the gorge came
 # out as a picket fence of thin frames; at 7.4 each one is a structure.

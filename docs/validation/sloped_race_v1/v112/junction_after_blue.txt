@@ -1,0 +1,125 @@
+========================================================================================
+MERGE JUNCTION AUDIT - routes=blue
+========================================================================================
+
+--- closed basins on each run's own surface ---------------------------------
+deepest climb above a running minimum, in simulation units, per lateral fraction
+and the forward speed a rolling marble needs to leave it
+run               0.00     0.40     0.55     0.70     0.85     0.95    worst  needs  @sample
+launch          0.0000   0.0000   0.0000   0.0202   0.0605   0.0941   0.0941   5.74  6
+leg1            0.0000   0.1955   0.2953   0.3963   0.4997   0.5719   0.5719  14.15  116
+leg2            0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.00  None
+leg3            0.0000   0.0106   0.0502   0.1224   0.2037   0.2586   0.2586   9.52  110
+blue_lead       0.0000   0.0661   0.1440   0.2331   0.3223   0.3834   0.3834  11.59  5
+blue            0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.00  None
+merge_lead      0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.00  None
+final           0.0000   0.0000   0.0000   0.0000   0.0032   0.0068   0.0068   1.54  114
+
+  A basin is only a trap for a marble that has already lost its speed - which is
+  what a collision in the merge does. leg2's was 0.0685 before V1.11 fixed it.
+
+  11818 triangles indexed over 8 modules
+
+--- endpoint frames, in the sprint's own frame at its entry -----------------
+(along down the sprint, across to its side, rise above its contact point)
+  blue[117]      contact [-1.899, -0.2573, -0.3027]  tangent [0.97238, 0.13018, 0.19375]
+                 heading   +72.60  bank   -0.00  grade   +4.28%  half 1.474  scale 0.82
+                   west_running   [-1.7719, -1.717, 0.0405]
+                   east_running   [-2.1451, 1.2058, -0.0507]
+                   west_guard     [-1.8525, -1.8108, 0.5077]
+                   east_guard     [-2.2502, 1.3049, 0.4104]
+  merge_lead[0]  contact [-1.8961, -0.2571, -0.3021]  tangent [0.96982, 0.13985, 0.19974]
+                 heading   +73.16  bank   +0.00  grade   +3.64%  half 1.649  scale 1.0
+                   west_running   [-1.7469, -1.8881, 0.1151]
+                   east_running   [-2.1952, 1.3777, 0.0055]
+                   west_guard     [-1.8489, -1.9928, 0.6841]
+                   east_guard     [-2.3269, 1.4884, 0.5672]
+  merge_lead[11] contact [0.0105, -0.0021, 0.0001]  tangent [0.99952, 0.02103, 0.02284]
+                 heading   +66.34  bank   +0.00  grade  +22.04%  half 1.880  scale 1.0
+                   west_running   [0.0413, -1.88, 0.3797]
+                   east_running   [-0.0374, 1.8792, 0.3605]
+                   west_guard     [0.0307, -2.0013, 0.9575]
+                   east_guard     [-0.0532, 2.0058, 0.937]
+  final[0]       contact [0.0, 0.0, 0.0]  tangent [1.0, 0.0, -0.0]
+                 heading   +65.11  bank   +0.00  grade  +24.45%  half 1.880  scale 1.0
+                   west_running   [0.0, -1.88, 0.3701]
+                   east_running   [0.0, 1.88, 0.3701]
+                   west_guard     [-0.0, -2.004, 0.9474]
+                   east_guard     [0.0, 2.004, 0.9474]
+  blue -> sprint: -7.49 degrees of heading change
+
+--- blue tail -> merge -> final sprint --------------------------------
+floor Y, grade in percent of horizontal travel (POSITIVE = A CLIMB), owner
+     station                W-edge                 W-mid                centre                 E-mid                E-edge
+    blue[86]   9.565      %   blue    9.307      %   blue    9.132      %   blue    9.079      %   blue    9.134      %   blue 
+    blue[87]   9.559  -1.0%   blue    9.284  -4.3%   blue    9.089  -8.4%   blue    9.016 -12.9%   blue    9.051 -17.3%   blue 
+    blue[88]   9.554  -0.9%   blue    9.263  -3.9%   blue    9.050  -7.7%   blue    8.957 -12.0%   blue    8.974 -16.4%   blue 
+    blue[89]   9.548  -1.2%   blue    9.244  -3.7%   blue    9.015  -6.9%   blue    8.904 -10.7%   blue    8.906 -14.4%   blue 
+    blue[90]   9.503  -8.3%   blue    9.203  -7.7%   blue    8.979  -7.0%   blue    8.874  -6.2%   blue    8.880  -5.4%   blue 
+    blue[91]   9.445 -11.0%   blue    9.156  -9.0%   blue    8.945  -6.7%   blue    8.854  -4.0%   blue    8.874  -1.4%   blue 
+    blue[92]   9.391 -10.2%   blue    9.113  -8.3%   blue    8.914  -6.1%   blue    8.836  -3.6%   blue    8.868  -1.2%   blue 
+    blue[93]   9.341  -9.6%   blue    9.072  -7.8%   blue    8.885  -5.6%   blue    8.819  -3.3%   blue    8.862  -1.1%   blue 
+    blue[94]   9.293  -9.2%   blue    9.034  -7.4%   blue    8.858  -5.3%   blue    8.804  -3.1%   blue    8.857  -1.0%   blue 
+    blue[95]   9.247  -9.1%   blue    8.997  -7.2%   blue    8.832  -5.1%   blue    8.789  -2.9%   blue    8.853  -0.8%   blue 
+    blue[96]   9.201  -9.1%   blue    8.961  -7.2%   blue    8.807  -5.0%   blue    8.775  -2.8%   blue    8.849  -0.8%   blue 
+    blue[97]   9.155  -9.5%   blue    8.924  -7.4%   blue    8.781  -5.1%   blue    8.760  -2.8%   blue    8.845  -0.8%   blue 
+    blue[98]   9.106 -10.1%   blue    8.885  -7.9%   blue    8.754  -5.3%   blue    8.745  -2.9%   blue    8.841  -0.8%   blue 
+    blue[99]   9.053 -11.1%   blue    8.844  -8.6%   blue    8.725  -5.8%   blue    8.729  -3.1%   blue    8.836  -0.8%   blue 
+   blue[100]   8.996 -11.8%   blue    8.799  -9.1%   blue    8.693  -6.2%   blue    8.711  -3.4%   blue    8.831  -0.9%   blue 
+   blue[101]   8.937 -11.8%   blue    8.753  -9.2%   blue    8.661  -6.3%   blue    8.693  -3.5%   blue    8.826  -1.0%   blue 
+   blue[102]   8.878 -11.9%   blue    8.706  -9.3%   blue    8.629  -6.4%   blue    8.675  -3.5%   blue    8.821  -1.0%   blue 
+   blue[103]   8.818 -12.0%   blue    8.659  -9.3%   blue    8.597  -6.4%   blue    8.658  -3.5%   blue    8.816  -0.9%   blue 
+   blue[104]   8.759 -12.0%   blue    8.612  -9.3%   blue    8.564  -6.4%   blue    8.640  -3.5%   blue    8.811  -0.9%   blue 
+   blue[105]   8.706 -10.6%   blue    8.569  -8.6%   blue    8.532  -6.3%   blue    8.619  -4.0%   blue    8.801  -2.1%   blue 
+   blue[106]   8.691  -3.0%   blue    8.546  -4.6%   blue    8.500  -6.3%   blue    8.578  -8.1%   blue    8.751  -9.6%   blue 
+   blue[107]   8.673  -3.5%   blue    8.522  -4.8%   blue    8.468  -6.2%   blue    8.539  -7.7%   blue    8.706  -9.0%   blue 
+   blue[108]   8.649  -4.8%   blue    8.494  -5.4%   blue    8.438  -6.0%   blue    8.505  -6.7%   blue    8.669  -7.3%   blue 
+   blue[109]   8.616  -6.4%   blue    8.463  -6.1%   blue    8.409  -5.8%   blue    8.477  -5.4%   blue    8.643  -5.1%   blue 
+   blue[110]   8.579  -7.3%   blue    8.431  -6.4%   blue    8.381  -5.4%   blue    8.455  -4.4%   blue    8.625  -3.6%   blue 
+   blue[111]   8.546  -6.6%   blue    8.401  -5.9%   blue    8.355  -5.0%   blue    8.434  -4.2%   blue    8.607  -3.4%   blue 
+   blue[112]   8.523  -4.6%   blue    8.378  -4.7%   blue    8.331  -4.8%   blue    8.409  -4.8%   blue    8.582  -4.8%   blue 
+   blue[113]   8.509  -2.6%   blue    8.360  -3.5%   blue    8.308  -4.5%   blue    8.381  -5.5%   blue    8.549  -6.4%   blue 
+   blue[114]   8.498  -2.2%   blue    8.343  -3.2%   blue    8.286  -4.4%   blue    8.353  -5.5%   blue    8.516  -6.5%   blue 
+   blue[115]   8.484  -2.9%   blue    8.325  -3.5%   blue    8.265  -4.2%   blue    8.328  -4.9%   blue    8.488  -5.6%   blue 
+   blue[116]   8.464  -3.8%   blue    8.305  -3.9%   blue    8.243  -4.2%   blue    8.305  -4.4%   blue    8.465  -4.6%   blue 
+   blue[117]   8.432  -6.4%   merge   8.285  -4.0%   merge   8.222  -4.3%   merge   8.284  -4.2%   merge   8.431  -6.7%   merge
+merge_lead[0]   8.492      %   merge   8.298      %   merge   8.222      %   merge   8.298      %   merge   8.499      %   blue 
+merge_lead[1]   8.485  -3.5%   merge   8.291  -3.5%   merge   8.216  -3.6%   merge   8.291  -3.7%   merge   8.485  -8.0%   merge
+merge_lead[2]   8.481  -2.3%   merge   8.286  -2.6%   merge   8.210  -2.8%   merge   8.286  -2.9%   merge   8.481  -2.8%   merge
+merge_lead[3]   8.476  -2.6%   merge   8.281  -2.6%   merge   8.206  -2.6%   merge   8.281  -2.7%   merge   8.476  -2.8%   merge
+merge_lead[4]   8.470  -3.2%   merge   8.276  -3.0%   merge   8.200  -3.0%   merge   8.276  -3.0%   merge   8.470  -3.1%   merge
+merge_lead[5]   8.462  -4.5%   merge   8.268  -4.1%   merge   8.193  -4.0%   merge   8.269  -3.9%   merge   8.462  -3.9%   merge
+merge_lead[6]   8.451  -6.4%   merge   8.258  -5.9%   merge   8.183  -5.6%   merge   8.259  -5.3%   merge   8.452  -5.1%   merge
+merge_lead[7]   8.437  -9.1%   merge   8.245  -8.4%   merge   8.170  -7.8%   merge   8.245  -7.1%   merge   8.438  -6.6%   merge
+merge_lead[8]   8.418 -12.5%   merge   8.226 -11.7%   merge   8.152 -10.5%   merge   8.227  -9.3%   merge   8.420  -8.4%   merge
+merge_lead[9]   8.394 -17.1%   merge   8.203 -16.0%   merge   8.128 -13.9%   merge   8.203 -12.0%   merge   8.396 -10.5%   merge
+merge_lead[10]   8.364 -25.7%   merge   8.173 -21.6%   merge   8.099 -17.9%   merge   8.174 -15.1%   merge   8.365 -13.4%   merge
+merge_lead[11]   8.318 -31.2%   final   8.131 -27.0%   final   8.061 -22.3%   final   8.203      %   merge   8.428      %   merge
+    final[0]   8.333      %   merge   8.140      %   merge   8.062      %   final   8.136      %   final   8.325      %   final
+    final[1]   8.247 -27.4%   final   8.058 -25.9%   final   7.984 -24.5%   final   8.059 -24.2%   final   8.248 -24.0%   final
+    final[2]   8.168 -24.9%   final   7.980 -24.7%   final   7.907 -24.5%   final   7.982 -24.2%   final   8.172 -23.9%   final
+    final[3]   8.091 -24.2%   final   7.903 -24.4%   final   7.830 -24.5%   final   7.904 -24.5%   final   8.094 -24.6%   final
+    final[4]   8.017 -23.3%   final   7.827 -23.9%   final   7.752 -24.5%   final   7.825 -25.1%   final   8.013 -25.6%   final
+    final[5]   7.944 -22.8%   final   7.752 -23.6%   final   7.675 -24.5%   final   7.745 -25.3%   final   7.931 -26.0%   final
+    final[6]   7.871 -23.1%   final   7.677 -23.7%   final   7.597 -24.5%   final   7.665 -25.2%   final   7.850 -25.8%   final
+    final[7]   7.796 -23.5%   final   7.601 -24.0%   final   7.520 -24.5%   final   7.587 -25.0%   final   7.770 -25.4%   final
+    final[8]   7.721 -23.6%   final   7.524 -24.0%   final   7.442 -24.5%   final   7.508 -24.9%   final   7.690 -25.3%   final
+    final[9]   7.646 -23.5%   final   7.448 -24.0%   final   7.365 -24.4%   final   7.429 -24.9%   final   7.610 -25.4%   final
+   final[10]   7.571 -23.5%   final   7.372 -23.9%   final   7.288 -24.4%   final   7.350 -25.0%   final   7.530 -25.4%   final
+   final[11]   7.496 -23.3%   final   7.296 -23.8%   final   7.210 -24.4%   final   7.272 -25.0%   final   7.450 -25.6%   final
+   final[12]   7.422 -23.3%   final   7.221 -23.8%   final   7.133 -24.4%   final   7.193 -25.1%   final   7.369 -25.6%   final
+   final[13]   7.347 -23.4%   final   7.145 -23.9%   final   7.055 -24.4%   final   7.114 -25.0%   final   7.289 -25.5%   final
+   final[14]   7.271 -23.9%   final   7.068 -24.1%   final   6.978 -24.4%   final   7.036 -24.7%   final   7.211 -25.0%   final
+   final[15]   7.192 -24.7%   final   6.990 -24.6%   final   6.901 -24.4%   final   6.960 -24.3%   final   7.135 -24.1%   final
+   final[16]   7.111 -25.5%   final   6.910 -25.0%   final   6.824 -24.4%   final   6.884 -23.9%   final   7.062 -23.4%   final
+   final[17]   7.029 -25.9%   final   6.831 -25.3%   final   6.746 -24.5%   final   6.809 -23.8%   final   6.989 -23.2%   final
+   final[18]   6.947 -25.8%   final   6.751 -25.3%   final   6.668 -24.7%   final   6.733 -24.1%   final   6.914 -23.6%   final
+   final[19]   6.867 -25.4%   final   6.671 -25.1%   final   6.590 -24.9%   final   6.655 -24.6%   final   6.837 -24.3%   final
+   final[20]   6.788 -25.0%   final   6.592 -25.0%   final   6.511 -24.9%   final   6.577 -24.9%   final   6.759 -24.9%   final
+   final[21]   6.709 -24.8%   final   6.513 -24.9%   final   6.432 -25.0%   final   6.498 -25.1%   final   6.680 -25.2%   final
+  findings: 0 holes, 0 climbs, 0 ledges, 0 tight clearances
+
+--- verdict -----------------------------------------------------------------
+  blue     CLEAN    holes   0  climbs   0  ledges   0  tight   0
+
+wrote docs\validation\sloped_race_v1\v112\junction_after_blue.json

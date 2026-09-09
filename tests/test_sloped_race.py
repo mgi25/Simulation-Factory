@@ -132,8 +132,39 @@ def test_the_two_routes_differ_by_less_than_a_tenth(forked):
 
 
 def test_the_join_radii_hold_the_measured_arrival_speed(machine):
+    """Every join either clears the steady-state radius or costs no drift.
+
+    The two branch leads clear it outright. The merge lead does not and cannot:
+    it is 1.16 layout units long and has 7.5 degrees to turn in, so its
+    tightest sample comes out at 2.686 against a 7.814 budget - and that budget
+    is a steady-state balance, which a marble crossing the sample in four
+    milliseconds never reaches. `joins.turn_drift` asks what the shortfall
+    costs instead, and both tables are in `joins.TURN_DRIFT_BUDGET`.
+    """
     for name, entry in facts(machine)["join_radius_layout"].items():
-        assert entry["worst"] > entry["allowed"], (name, entry)
+        if entry["worst"] > entry["allowed"]:
+            assert entry["drift"] == 0.0, (name, entry)
+            continue
+        assert entry["drift"] < entry["drift_budget"], (name, entry)
+
+
+def test_the_merge_leads_radius_shortfall_is_smaller_than_the_courses_own():
+    """The merge lead's drift against the runs the contract pins.
+
+    Guards the exemption above from widening into a shrug: leg2's own worst
+    radius is less than half what its bank holds and it carries 99.5% of the
+    field, so the merge lead's 0.0131 is not a new kind of compromise - it is
+    two orders of magnitude less of the same one.
+    """
+    machine = sloped_course()
+    runs = machine.runs
+    lead = joins.turn_drift(runs["merge_lead"].path, 41.0, 0.0)
+    assert lead < 0.05, lead
+    for name in ("launch", "leg2", "leg3"):
+        authored = joins.turn_drift(
+            runs[name].path, 43.0, float(runs[name].spec["bank_max"])
+        )
+        assert authored > lead, (name, authored, lead)
 
 
 def test_the_start_offers_eight_bays_wide_enough_to_stand_in(machine):
@@ -347,4 +378,10 @@ def test_route_runs_share_their_prefix_and_differ_only_in_the_branch():
     orange = ROUTE_RUNS["orange"]
     assert blue[:4] == orange[:4] == tuple(CHAIN)
     assert blue[-1] == orange[-1] == "final"
-    assert set(blue) & set(orange) == set(CHAIN) | {"final"}
+    # `merge_lead` joined the shared tail with the merge rebuild: blue runs
+    # down it, and an orange marble through the back wall's opening runs up it.
+    # A shared run the locator cannot search is a marble booked to whichever
+    # neighbour is nearest.
+    assert set(blue) & set(orange) == set(CHAIN) | {"merge_lead", "final"}
+    assert blue[-2] == orange[-2] == "merge_lead"
+    assert set(blue) ^ set(orange) == {"blue_lead", "blue", "orange_lead", "orange"}

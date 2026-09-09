@@ -1423,7 +1423,7 @@ class MergeCatch(MarbleModule):
     # `final[14]`'s own station, where `MERGE_GUARD_WINDOW` puts the sprint's
     # rails back at full height. The apron used to end at 1.70, five samples
     # short of it, which left a stretch with neither an apron wall nor a rail.
-    FRONT = 2.60
+    FRONT = 2.61
     # Where the outer rim starts easing in to the channel's edge, so the
     # shoulder converges into the channel rather than ending in a free lip.
     TAPER_FROM = 1.20
@@ -1434,10 +1434,16 @@ class MergeCatch(MarbleModule):
     # requirement rather than a physical one: a row whose inner and outer
     # coincide is a ring of identical points, and `check_mesh` reports the
     # zero-area triangles between it and its neighbour rather than letting the
-    # solver take a meaningless normal from them. A quarter of a diameter
-    # leaves a sliver that no marble can enter - a marble is four times as
-    # wide - and by `FRONT` the sprint's own rail is at full height inside it.
-    RIM_MIN = 0.5 * MARBLE_RADIUS
+    # solver take a meaningless normal from them.
+    #
+    # **Smaller than the channel's own lip, on purpose.** The lip runs from the
+    # cradle's clear edge out to `GUARD_INNER` - 0.109 simulation units at hero
+    # scale - and it is steeper than the shoulder, so a sliver narrower than
+    # that is buried under the lip and is not a surface a marble can reach at
+    # all. At a quarter of a diameter the sliver stood *outside* the lip, and
+    # where orange's channel overlaps the sprint's that put 0.09 of step in
+    # orange's own floor.
+    RIM_MIN = 0.08
 
     def __init__(
         self,
@@ -1445,11 +1451,13 @@ class MergeCatch(MarbleModule):
         sprint: TrackRun,
         lead: TrackRun | None = None,
         blue: TrackRun | None = None,
+        orange: TrackRun | None = None,
     ) -> None:
         super().__init__(module_id)
         self.sprint = sprint
         self.lead = lead
         self.blue = blue
+        self.orange = orange
         self.lateral, self.up, self.forward = sprint.frames[0]
         self.origin = sprint.surface_point(0, 0.0)
         self.slope = math.atan2(
@@ -1460,6 +1468,7 @@ class MergeCatch(MarbleModule):
             ),
         )
         self._stations = self._build_stations()
+        self._crossing = self._build_crossing()
         self._mesh: TriMesh | None = None
 
     # --- the channel under the station ----------------------------------
@@ -1473,15 +1482,20 @@ class MergeCatch(MarbleModule):
             sum(offset[axis] * self.up[axis] for axis in range(3)),
         )
 
-    def _build_stations(self) -> list[tuple[float, float, float, float, float]]:
-        """The junction channel as `(along, across, rise, half, edge)` rows.
+    def _build_stations(self) -> list[tuple[float, ...]]:
+        """The junction channel as `(along, across, rise, half, edge, guard, scale)`.
 
         One row per sample of blue's tail, the merge lead and the sprint's head,
         in flow order, taken from each run's own `surface_point` so the width
         factor and the profile scale are the ones the collider was swept with.
-        `half` is the clear half width at that sample and `edge` is how far the
+        `half` is the clear half width at that sample, `edge` is how far the
         cradle rises over its own contact point at that half width - the two
-        numbers the shoulder's inner edge is made of.
+        numbers the shoulder's inner edge is made of - and `guard` is how far
+        out the run's own lip and rail reach. The shoulder starts at `half`,
+        because that is where the two surfaces are flush; but the run's lip
+        stands *over* the first 0.11 units of it, so anything that has to be
+        fired at bare shoulder starts at `guard` instead. A probe placed at
+        `half + 0.125` was answered by the sprint's own lip 0.4275 higher.
 
         Built once, in the constructor, because `local_colliders`,
         `local_probes` and `describe` all read it and a re-solve per query would
@@ -1490,7 +1504,7 @@ class MergeCatch(MarbleModule):
         Falls back to the sprint alone when the station is built without the
         upstream runs, which is what the station tests do.
         """
-        rows: list[tuple[float, float, float, float, float]] = []
+        rows: list[tuple[float, ...]] = []
         back, front = to_sim(self.BACK), to_sim(self.FRONT)
         reach = back - 2.0 * MARBLE_DIAMETER
         for run in (self.blue, self.lead, self.sprint):
@@ -1504,13 +1518,21 @@ class MergeCatch(MarbleModule):
                 edge = to_sim(
                     (layout.floor_y_at(layout.CHANNEL_HALF) - layout.FLOOR_Y) * run.scale
                 )
-                rows.append((along, across, rise, half, edge))
+                guard = to_sim(layout.GUARD_INNER * run.scale * run.widths[index])
+                # The **profile** scale, carried separately from the width
+                # factor. `ring_points` applies the width to `across` only -
+                # scaling the rise too would change the cradle's depth - so a
+                # shoulder that recovers one scale from `half` recovers the
+                # product of the two and gets the depth wrong. Measured: 0.0666
+                # units of step at blue's own cradle edge, where the profile
+                # scale is 0.82 and the width factor 1.09.
+                rows.append((along, across, rise, half, edge, guard, run.scale))
         rows.sort(key=lambda row: row[0])
         # Two runs share a station at every seam - blue's last sample and the
         # lead's first are the same `along` - and an interpolation over a
         # zero-width span is a division by nothing. The downstream row wins,
         # which is the wider channel at both seams and therefore the safe one.
-        out: list[tuple[float, float, float, float, float]] = []
+        out: list[tuple[float, ...]] = []
         for row in rows:
             if out and row[0] - out[-1][0] < 1e-6:
                 out[-1] = row
@@ -1518,8 +1540,62 @@ class MergeCatch(MarbleModule):
                 out.append(row)
         return out
 
-    def _channel_at(self, along: float) -> tuple[float, float, float, float]:
-        """`(across, rise, half, edge)` of the channel at one station.
+    def _build_crossing(self) -> list[tuple[float, float]]:
+        """Where orange's channel crosses the shoulder, as `(along, near)` rows.
+
+        **Orange's tail runs straight through the apron's east side**, and that
+        is what the front taper found out the hard way. The rim eases in from
+        `ACROSS` to the channel's edge between `TAPER_FROM` and `FRONT`, and on
+        the east side that line sweeps across orange's channel: at `along`
+        +3.67 the tapering wall stands at across +2.69 while orange's own
+        centreline is at +3.27. Traced, a marble at 40 wu/s lost **19.13 wu/s
+        in a single tick** there, in contact with `merge` and `orange` at once,
+        and every one of 28 marbles launched on orange's tail stopped within
+        four samples of it. Nothing in orange's own channel does that: the
+        control - orange's tail built with the merge, the lead and the sprint
+        absent - carries a marble from sample 96 to its exit at every speed
+        from 30 to 70 wu/s.
+
+        So where orange is present the shoulder stops at orange's **near**
+        edge - the lower-across side of its channel - and orange's own walls
+        are the containment from there out. `near` is that edge in the apron's
+        frame, per orange sample inside the apron's span.
+        """
+        rows: list[tuple[float, float]] = []
+        if self.orange is None:
+            return rows
+        back, front = to_sim(self.BACK), to_sim(self.FRONT)
+        reach = 2.0 * MARBLE_DIAMETER
+        for index in range(len(self.orange.sim_path)):
+            along, across, _rise = self._local(self.orange.surface_point(index, 0.0))
+            if along < back - reach or along > front + reach:
+                continue
+            half = 0.5 * self.orange.clear_width * self.orange.widths[index]
+            # Orange travels against the sprint, so its own lateral axis points
+            # the other way; the near edge is the smaller `across` whichever
+            # way its frame happens to be signed.
+            west = self._local(self.orange.surface_point(index, layout.CHANNEL_HALF))[1]
+            east = self._local(self.orange.surface_point(index, -layout.CHANNEL_HALF))[1]
+            rows.append((along, min(west, east)))
+        rows.sort(key=lambda row: row[0])
+        return rows
+
+    def orange_near(self, along: float) -> float | None:
+        """Orange's near channel edge at one station, or None if it is not there."""
+        rows = self._crossing
+        if not rows or along < rows[0][0] or along > rows[-1][0]:
+            return None
+        for lower, upper in zip(rows, rows[1:]):
+            if lower[0] <= along <= upper[0]:
+                span = upper[0] - lower[0]
+                if span < 1e-9:
+                    return lower[1]
+                t = (along - lower[0]) / span
+                return lower[1] + (upper[1] - lower[1]) * t
+        return rows[-1][1]
+
+    def _channel_at(self, along: float) -> tuple[float, ...]:
+        """`(across, rise, half, edge, guard, scale)` of the channel at one station.
 
         Linear between the samples either side, clamped at both ends. The
         clamp is why `_build_stations` reaches two diameters past each end of
@@ -1533,50 +1609,83 @@ class MergeCatch(MarbleModule):
             edge = to_sim(
                 (layout.floor_y_at(layout.CHANNEL_HALF) - layout.FLOOR_Y) * self.sprint.scale
             )
-            return (0.0, 0.0, half, edge)
+            guard = to_sim(layout.GUARD_INNER * self.sprint.scale * self.sprint.widths[0])
+            return (0.0, 0.0, half, edge, guard, self.sprint.scale)
         if along <= rows[0][0]:
-            _a, across, rise, half, edge = rows[0]
-            return (across, rise, half, edge)
+            return rows[0][1:]
         if along >= rows[-1][0]:
-            _a, across, rise, half, edge = rows[-1]
-            return (across, rise, half, edge)
+            return rows[-1][1:]
         for lower, upper in zip(rows, rows[1:]):
             if lower[0] <= along <= upper[0]:
                 t = (along - lower[0]) / (upper[0] - lower[0])
                 return tuple(
-                    lower[axis] + (upper[axis] - lower[axis]) * t for axis in range(1, 5)
+                    lower[axis] + (upper[axis] - lower[axis]) * t for axis in range(1, 7)
                 )  # type: ignore[return-value]
-        _a, across, rise, half, edge = rows[-1]
-        return (across, rise, half, edge)
+        return rows[-1][1:]
 
     # --- the shoulder ---------------------------------------------------
 
-    def rim(self, along: float) -> float:
+    def rim(self, along: float, side: float = -1.0) -> float:
         """How far out the shoulder reaches at one station, in simulation units.
 
         `ACROSS` until `TAPER_FROM`, then eased in to the channel's own edge by
         `FRONT` with the same smoothstep the guard windows use. A shoulder that
         keeps its full reach to the front edge is the open lip `final[9..11]`
         was; one that converges into the channel hands its marbles over.
+
+        **On the east side it also yields to orange**, because orange's tail
+        crosses that region and the tapering wall stood across its channel; see
+        `_build_crossing` for the 19.13 wu/s a marble lost to it in one tick.
+        Clamped to orange's near edge rather than stopped short of it, so the
+        shoulder and orange's channel are adjacent and there is no strip
+        between them with nothing under it.
         """
-        _across, _rise, half, _edge = self._channel_at(along)
+        _across, _rise, half, _edge, _guard, _scale = self._channel_at(along)
         wide = to_sim(self.ACROSS)
         start, stop = to_sim(self.TAPER_FROM), to_sim(self.FRONT)
-        if along <= start:
-            return max(wide, half)
-        if along >= stop:
-            return half + self.RIM_MIN
-        t = (along - start) / max(stop - start, 1e-6)
-        ease = t * t * (3.0 - 2.0 * t)
         shut = half + self.RIM_MIN
-        return max(wide, shut) + (shut - max(wide, shut)) * ease
+        if along <= start:
+            reach = max(wide, shut)
+        elif along >= stop:
+            reach = shut
+        else:
+            t = (along - start) / max(stop - start, 1e-6)
+            ease = t * t * (3.0 - 2.0 * t)
+            reach = max(wide, shut) + (shut - max(wide, shut)) * ease
+        if side > 0.0:
+            near = self.orange_near(along)
+            if near is not None:
+                centre = self._channel_at(along)[0]
+                reach = min(reach, max(shut, near - centre))
+        return reach
+
+    def orange_overlaps(self, along: float) -> bool:
+        """Whether orange's channel reaches inside the sprint's own at a station.
+
+        Near its mouth orange arrives *inside* the sprint's channel - its near
+        edge crosses the sprint's clear edge about four samples out - so from
+        there on there is no band of bare shoulder between them for a wall to
+        stand on, and `rim`'s clamp bottoms out at `RIM_MIN`. A wall on that
+        sliver is a wall across orange's channel: it was measured at 19.13
+        wu/s of loss in one tick at `along` +3.67, and after `rim` learned to
+        yield the same wall still took every one of 28 marbles at
+        `orange[113]`. So where this is true the east wall is simply absent,
+        and the containment there is orange's own channel walls upstream and
+        the sprint's rails downstream - which `MERGE_GUARD_WINDOW` brings back
+        to full height at `final[14]`, inside the apron's own front edge.
+        """
+        near = self.orange_near(along)
+        if near is None:
+            return False
+        centre, _rise, half, _edge, _guard, _scale = self._channel_at(along)
+        return near - centre <= half + self.RIM_MIN
 
     def _bounds(self, side: float):
         """`bounds(along)` for one side of the shoulder, for `flank_field`."""
 
         def at(along: float) -> tuple[float, float]:
-            across, _rise, half, _edge = self._channel_at(along)
-            return (across + side * half, across + side * self.rim(along))
+            across, _rise, half, _edge, _guard, _scale = self._channel_at(along)
+            return (across + side * half, across + side * self.rim(along, side))
 
         return at
 
@@ -1589,17 +1698,20 @@ class MergeCatch(MarbleModule):
         quadratic to the rim, so the shoulder leans a marble back toward the
         channel rather than away from it.
         """
-        centre, rise, half, edge = self._channel_at(along)
+        centre, rise, half, edge, _guard, scale = self._channel_at(along)
         offset = abs(across - centre)
         if offset <= half:
-            # The channel's own arc, read in *profile* coordinates so the width
-            # factor stretches it exactly as `ring_points` does. Reading it in
-            # physical units instead is what put the shoulder's rise 0.083
-            # units above the sprint's floor at a lateral fraction of 0.85.
-            scale = half / max(to_sim(layout.CHANNEL_HALF), 1e-9)
-            profile = (offset / max(scale, 1e-9)) / LAYOUT_TO_SIM
-            return rise + to_sim(layout.floor_y_at(profile) - layout.FLOOR_Y)
-        span = max(self.rim(along) - half, 1e-6)
+            # The channel's own arc, read in *profile* coordinates so the
+            # width factor stretches it exactly as `ring_points` does - and
+            # with the **profile scale** applied to the rise and nothing else.
+            # Reading it in physical units instead is what put the old apron's
+            # shoulder 0.083 units above the sprint's floor at a lateral
+            # fraction of 0.85; recovering one scale from `half` and using it
+            # for both put it 0.0666 above blue's cradle edge.
+            profile = layout.CHANNEL_HALF * offset / max(half, 1e-9)
+            return rise + to_sim((layout.floor_y_at(profile) - layout.FLOOR_Y) * scale)
+        side = 1.0 if across >= centre else -1.0
+        span = max(self.rim(along, side) - half, 1e-6)
         over = min(1.0, (offset - half) / span)
         return rise + edge + to_sim(self.FUNNEL) * over * over
 
@@ -1618,7 +1730,7 @@ class MergeCatch(MarbleModule):
         than square - see `_wall_top`.
         """
         wall = to_sim(self.WALL_AT)
-        across, _rise, half, _edge = self._channel_at(wall)
+        across, _rise, half, _edge, _guard, _scale = self._channel_at(wall)
         return (across - half, across + half)
 
     # --- geometry -------------------------------------------------------
@@ -1645,40 +1757,42 @@ class MergeCatch(MarbleModule):
             # it holds down is a marble crossing the channel at 40 wu/s.
             flank_field(
                 self.origin, self.forward, self.lateral, (back, front),
-                lambda a: (
-                    self._channel_at(a)[0] - self.rim(a),
-                    self._channel_at(a)[0] + self.rim(a),
+                    lambda a: (
+                    self._channel_at(a)[0] - self.rim(a, -1.0),
+                    self._channel_at(a)[0] + self.rim(a, +1.0),
                 ),
                 self.up,
                 lambda a, c: self._floor(a, c) + roof,
                 steps=(12, 10), name=f"{self.id}_roof",
             ),
         ]
-        rim_back, rim_front = self.rim(back), self.rim(front)
         centre_back = self._channel_at(back)[0]
-        centre_front = self._channel_at(front)[0]
         walls = [
-            ("back_left", [(wall, centre_back - rim_back), (wall, low)]),
-            ("back_right", [(wall, high), (wall, centre_back + rim_back)]),
             (
-                "left",
-                [
-                    (back, centre_back + rim_back),
-                    (to_sim(self.TAPER_FROM), self._channel_at(to_sim(self.TAPER_FROM))[0]
-                     + self.rim(to_sim(self.TAPER_FROM))),
-                    (front, centre_front + rim_front),
-                ],
+                "back_west",
+                [(wall, centre_back - self.rim(back, -1.0)), (wall, low)],
             ),
             (
-                "right",
-                [
-                    (back, centre_back - rim_back),
-                    (to_sim(self.TAPER_FROM), self._channel_at(to_sim(self.TAPER_FROM))[0]
-                     - self.rim(to_sim(self.TAPER_FROM))),
-                    (front, centre_front - rim_front),
-                ],
+                "back_east",
+                [(wall, high), (wall, centre_back + self.rim(back, +1.0))],
             ),
         ]
+        # **The side walls are sampled rather than drawn through three
+        # stations.** A three-station polyline is a straight line in the
+        # (along, across) plane between them, and on the east side that line
+        # cut through orange's channel even after `rim` learned to yield to it -
+        # the clamp only binds at the stations it is evaluated on. Sampled at
+        # the same count as the shoulder, the wall follows the rim it stands on.
+        for label, side in (("west", -1.0), ("east", +1.0)):
+            stations = []
+            for step in range(15):
+                along = back + (front - back) * step / 14
+                if side > 0.0 and self.orange_overlaps(along):
+                    break
+                centre = self._channel_at(along)[0]
+                stations.append((along, centre + side * self.rim(along, side)))
+            if len(stations) >= 2:
+                walls.append((label, stations))
         for label, stations in walls:
             if max(abs(a[1] - b[1]) for a, b in zip(stations, stations[1:])) < 1e-6:
                 continue
@@ -1686,7 +1800,7 @@ class MergeCatch(MarbleModule):
                 wall_strip(
                     self.origin, self.forward, self.lateral, self.up, stations,
                     base=self._floor, top=lambda a, c: self._floor(a, c) + roof,
-                    name=f"{self.id}_{label}", steps=6,
+                    name=f"{self.id}_{label}", steps=2,
                 )
             )
         self._mesh = merge_meshes(pieces, f"{self.id}_catch")
@@ -1714,12 +1828,15 @@ class MergeCatch(MarbleModule):
         back, front = to_sim(self.BACK), to_sim(self.FRONT)
         for step in range(5):
             along = back + (front - back) * step / 4
-            centre, _rise, half, _edge = self._channel_at(along)
-            rim = self.rim(along)
-            if rim - half < 0.25 * MARBLE_DIAMETER:
-                continue
+            centre, _rise, _half, _edge, guard, _scale = self._channel_at(along)
+            # Outside the run's own lip and rail, not merely outside its clear
+            # edge: the lip stands over the shoulder's first 0.11 units and a
+            # probe inside it is answered by the channel 0.4275 higher.
             for side in (-1.0, 1.0):
-                across = centre + side * (half + 0.5 * (rim - half))
+                rim = self.rim(along, side)
+                if rim - guard < 0.25 * MARBLE_DIAMETER:
+                    continue
+                across = centre + side * (guard + 0.5 * (rim - guard))
                 rise = self._floor(along, across)
                 surface = tuple(
                     self.origin[axis]
@@ -1755,8 +1872,27 @@ class MergeCatch(MarbleModule):
             "wall_at": round(wall, 6),
             "blue_opening": [round(low, 4), round(high, 4)],
             "wall_channel": [round(v, 4) for v in self._channel_at(wall)],
-            "rim_at_front": round(self.rim(to_sim(self.FRONT)), 4),
+            "rim_at_front": [
+                round(self.rim(to_sim(self.FRONT), -1.0), 4),
+                round(self.rim(to_sim(self.FRONT), +1.0), 4),
+            ],
             "stations": len(self._stations),
+            "orange_crossing": len(self._crossing),
+            "east_wall_ends": round(
+                next(
+                    (
+                        to_sim(self.BACK)
+                        + (to_sim(self.FRONT) - to_sim(self.BACK)) * step / 14
+                        for step in range(15)
+                        if self.orange_overlaps(
+                            to_sim(self.BACK)
+                            + (to_sim(self.FRONT) - to_sim(self.BACK)) * step / 14
+                        )
+                    ),
+                    to_sim(self.FRONT),
+                ),
+                4,
+            ),
             "entry_slope_deg": round(math.degrees(self.slope), 4),
         }
 

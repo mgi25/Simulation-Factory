@@ -356,6 +356,43 @@ GUARD_BOOSTS: dict[str, tuple[float, int, int, int, int]] = {
 # angle the run already reaches. `v2_track.gd` carries the same table.
 BANK_SLEWS: dict[str, tuple[int, int, float]] = {
     "leg2": (98, 112, 1.0),
+    # **blue's tail carries the same defect, 4.4x deeper, and it was never
+    # surveyed.** `tools/sloped_pocket_survey.py` walks `CHAIN + ("final",)`
+    # only, so neither branch lobe was ever measured; `sloped.junction`'s
+    # survey covers them and `tools/sloped_junction_audit.py` prints it. blue's
+    # roll reverses from -17.45 degrees at sample 89 to +10.50 at 99 while the
+    # centreline falls 0.164 layout units, and the reversal costs 0.372 - a
+    # ratio of 2.28 - so its east edge climbs where its centre descends:
+    #
+    #     fraction   0.00     0.40     0.55     0.70     0.85     0.95
+    #     authored 0.0000   0.0442   0.1181   0.2083   0.3013   0.3635
+    #     limited  0.0000   0.0000   0.0000   0.0000   0.0000   0.0000
+    #
+    # **The top of that climb is sample 98, and `blue[100]` is the loss site.**
+    # It was 8 of V1.11's 24 remaining non-finishers over 4800 racers, and it
+    # is where V1 lost 319 of 747 marbles. Injected at blue[96] at 4 to 12
+    # wu/s, two of 28 marbles came to rest at `blue[90]` and `blue[92]`.
+    #
+    # Three things this costs and one it buys back, all measured against the
+    # authored run at 41 and 50 wu/s:
+    #
+    # * the bank extreme is untouched - 24.0000 degrees, at sample 54, well
+    #   outside the window - so `contract.check()` stays at zero findings;
+    # * the roll's **sign flip moves from sample 95 to 103**, out of the
+    #   stretch where blue's own inflection sweeps the field across the
+    #   channel, which is the mechanism rather than a side effect;
+    # * over samples 95 to 103 the roll is then banked the *wrong way* for its
+    #   corner, and that is measured to cost nothing: `ride_height` is
+    #   **0.2050 layout units either way** at both speeds, against a
+    #   containment of 0.6560, and `runs_out` is zero on every sample of the
+    #   whole run before and after;
+    # * and the worst bank *rate* falls from 13.65 degrees per layout unit -
+    #   over the 12.0 the continuity audit flags - to 6.86.
+    #
+    # The window opens at 84 and the constraint does not bind until 86, which
+    # is deliberate slack; opening it at 86 leaves 0.0152 at the edge. It
+    # rejoins the authored curve inside its own window with a residual of 0.00.
+    "blue": (84, 117, 1.0),
 }
 
 # Which start the course is built with.
@@ -490,12 +527,14 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
     # `sloped.joins`.
     blue_spec = dict(layout.run("blue"))
     blue_spec["controls"] = joins.blue_controls()
-    runs["blue"] = TrackRun("blue", spec=blue_spec)
+    runs["blue"] = TrackRun("blue", spec=blue_spec, bank_slew=BANK_SLEWS.get("blue"))
     # Orange's lobe entered at its second authored control; see `sloped.joins`.
     if forked:
         orange_spec = dict(layout.run("orange"))
         orange_spec["controls"] = joins.orange_controls()
-        runs["orange"] = TrackRun("orange", spec=orange_spec)
+        runs["orange"] = TrackRun(
+            "orange", spec=orange_spec, bank_slew=BANK_SLEWS.get("orange")
+        )
 
     paths = joins.join_paths()
     if not forked:
@@ -599,7 +638,14 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
         machine.add(runs[name], Transform())
     machine.add(runs["merge_lead"], Transform())
     machine.add(
-        MergeCatch("merge", runs["final"], runs["merge_lead"], runs["blue"]), Transform()
+        MergeCatch(
+            "merge",
+            runs["final"],
+            runs["merge_lead"],
+            runs["blue"],
+            runs.get("orange"),
+        ),
+        Transform(),
     )
     machine.add(runs["final"], Transform())
     machine.add(FinishDeck("finish", runs["final"]), Transform())
@@ -886,6 +932,25 @@ def facts(machine: Machine | None = None) -> dict[str, Any]:
                     joins.min_radius_layout(
                         float(spec["design_speed"]), float(spec["bank_max"])
                     ),
+                    4,
+                ),
+                # What the shortfall actually costs, and what the check is on.
+                # See `joins.TURN_DRIFT_BUDGET` for why the radius alone is the
+                # wrong test on a join a marble crosses in four milliseconds.
+                "drift": round(
+                    joins.turn_drift(
+                        runs[name].path,
+                        float(spec["design_speed"]),
+                        float(spec["bank_max"]),
+                    ),
+                    4,
+                ),
+                "drift_budget": round(
+                    joins.TURN_DRIFT_BUDGET
+                    * 0.5
+                    * runs[name].clear_width
+                    * max(runs[name].widths)
+                    / to_sim(1.0),
                     4,
                 ),
             }

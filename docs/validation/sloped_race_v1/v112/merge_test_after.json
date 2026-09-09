@@ -1,0 +1,652 @@
+{
+ "entries": 35,
+ "finished": 35,
+ "stopped": 0,
+ "left": 0,
+ "resting_places": {},
+ "reproducible": [],
+ "detail": [
+  {
+   "offset": -0.8,
+   "speed": 8.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.4667,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": -0.5,
+   "speed": 8.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": [
+    "final",
+    117
+   ],
+   "stopped_at": null,
+   "time": 2.9,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": -0.2,
+   "speed": 8.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": [
+    "final",
+    117
+   ],
+   "stopped_at": null,
+   "time": 3.4667,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.0,
+   "speed": 8.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.7667,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.2,
+   "speed": 8.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 3.9667,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.5,
+   "speed": 8.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 3.15,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.8,
+   "speed": 8.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 3.5833,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": -0.8,
+   "speed": 12.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.4333,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": -0.5,
+   "speed": 12.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 3.05,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": -0.2,
+   "speed": 12.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 3.1667,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.0,
+   "speed": 12.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": [
+    "final",
+    117
+   ],
+   "stopped_at": null,
+   "time": 2.6667,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.2,
+   "speed": 12.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 3.6667,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.5,
+   "speed": 12.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.8167,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.8,
+   "speed": 12.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 3.3833,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": -0.8,
+   "speed": 18.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.3167,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": -0.5,
+   "speed": 18.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.5667,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": -0.2,
+   "speed": 18.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 3.15,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.0,
+   "speed": 18.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 1.95,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.2,
+   "speed": 18.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 3.1667,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.5,
+   "speed": 18.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.5333,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.8,
+   "speed": 18.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.85,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": -0.8,
+   "speed": 25.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": [
+    "final",
+    117
+   ],
+   "stopped_at": null,
+   "time": 2.1333,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": -0.5,
+   "speed": 25.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.65,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": -0.2,
+   "speed": 25.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 3.05,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.0,
+   "speed": 25.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 1.7833,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.2,
+   "speed": 25.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.4833,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.5,
+   "speed": 25.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.3333,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.8,
+   "speed": 25.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.85,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": -0.8,
+   "speed": 35.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 1.9,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": -0.5,
+   "speed": 35.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.1333,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": -0.2,
+   "speed": 35.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.4,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.0,
+   "speed": 35.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 1.3833,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.2,
+   "speed": 35.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.6667,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.5,
+   "speed": 35.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.2667,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  },
+  {
+   "offset": 0.8,
+   "speed": 35.0,
+   "yaw_deg": 0.0,
+   "route": "blue",
+   "reached_lobe": true,
+   "reached_merge": true,
+   "finished": true,
+   "verdict": "finished",
+   "lost_at": null,
+   "stopped_at": null,
+   "time": 2.0667,
+   "visited": [
+    "blue",
+    "merge_lead",
+    "final"
+   ]
+  }
+ ]
+}

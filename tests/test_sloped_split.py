@@ -12,9 +12,11 @@ import math
 
 import pytest
 
+from marble3d.units import MARBLE_DIAMETER
 from sloped import joins, layout
 from sloped.course import MERGE_GUARD_WINDOW, sloped_course
 from sloped.race import ROUTE_RUNS, SlopedRace
+from sloped.scale import to_sim
 from sloped.track import TrackRun
 
 
@@ -213,24 +215,107 @@ def test_the_merge_apron_stays_flush_with_blue_where_it_overlaps_it():
     assert worst < 0.05, f"the apron stands {worst:.4f} over blue's channel"
 
 
-def test_the_apron_follows_blues_gradient_and_not_the_chord():
+def test_the_shoulder_is_flush_with_the_channel_and_never_over_it():
+    """The property that replaced the chord, and the defect it replaced.
+
+    The apron used to carry blue across the junction on a height field, and the
+    two corrections made to that height field were both to its *gradient* -
+    first the chord to the sprint, then blue's own fall. Neither could fix what
+    was wrong, because the apron's cradle was centred on the sprint's
+    centreline while blue's is up to 0.52 units off it, and its
+    cradle-to-shoulder changeover ignored the width flare entirely.
+
+    So there is no gradient to pin any more. What is pinned instead is that the
+    shoulder's inner edge **is** the channel's own clear edge at every station,
+    to within rounding, and that its surface there is the channel's own surface
+    - which is what makes a step across the seam impossible rather than small.
+    """
     machine = sloped_course()
     merge = machine.modules["merge"]
-    along, rise = merge._blue_frame_pose()
-    chord = rise / along
-    assert merge._blue_frame_slope() > chord + 0.02, (
-        "blue falls faster than the chord to the sprint; if these agree the "
-        "shelf is back"
+    runs = machine.runs
+    back, front = to_sim(merge.BACK), to_sim(merge.FRONT)
+    for step in range(21):
+        along = back + (front - back) * step / 20
+        centre, rise, half, edge, guard, scale = merge._channel_at(along)
+        assert guard > half, (along, half, guard)
+        for side in (-1.0, 1.0):
+            inner, outer = merge._bounds(side)(along)
+            assert abs(inner - (centre + side * half)) < 1e-9, (along, side)
+            assert abs(outer) >= abs(inner), (along, side, inner, outer)
+            # The shoulder's own height at its inner edge is the cradle's rise
+            # at the clear edge, so the two surfaces meet rather than step.
+            assert abs(merge._floor(along, inner) - (rise + edge)) < 1e-6, (along, side)
+
+
+def test_the_shoulder_reads_the_width_flare_the_old_apron_ignored():
+    """`final[0]` is 1.140 of its authored width, and that has to show.
+
+    The old apron took its cradle-to-shoulder changeover from
+    `CHANNEL_HALF * scale` - 1.649 units - while the sprint's own cradle edge
+    is at 1.880, so the shoulder's quadratic rise began 0.23 units *inside* the
+    running surface and stood 0.083 above the channel's floor at a lateral
+    fraction of 0.85. Pinned numerically, because the two expressions differ by
+    a factor nothing in the old code named.
+    """
+    machine = sloped_course()
+    merge = machine.modules["merge"]
+    sprint = machine.runs["final"]
+    _centre, _rise, half, _edge, _guard, _scale = merge._channel_at(0.0)
+    assert half > to_sim(layout.CHANNEL_HALF) + 0.2, half
+    assert abs(half - 0.5 * sprint.clear_width * sprint.widths[0]) < 1e-9, half
+
+
+def test_the_apron_front_is_closed_and_the_rim_hands_over_to_the_rail():
+    """No free lip, and the handover is at one station.
+
+    The apron used to span `across` +/-4.035 out to `along` +2.982 with side
+    walls, no front wall and no floor beyond it, so anything riding the
+    shoulder outside the channel ran off the edge - `final[9..11]`, 14 of 128
+    in six of seven of V1.10's fork configurations. Two properties close it:
+    the rim eases in to the channel by the front, and the front is where the
+    sprint's rails are back to full height.
+    """
+    from sloped.course import MERGE_GUARD_WINDOW
+
+    machine = sloped_course()
+    merge = machine.modules["merge"]
+    sprint = machine.runs["final"]
+    front = to_sim(merge.FRONT)
+    _c, _r, half, _e, _g, _s = merge._channel_at(front)
+    assert merge.rim(front) == half + merge.RIM_MIN
+    assert merge.rim(to_sim(merge.TAPER_FROM)) > half + 2.0 * MARBLE_DIAMETER
+    # The rails are full height by the sample the apron ends on, and not five
+    # samples later the way they were when the apron ended at 1.70.
+    # The property, stated as coverage rather than as a coincidence of one
+    # sample: from the apron's front edge onward there is no station where the
+    # sprint's rail is anything but full height. When the apron ended at 1.70
+    # layout units the window still had five samples to run.
+    closes = MERGE_GUARD_WINDOW[4]
+    assert sprint.wall_factor(closes) == 1.0
+    for index in range(len(sprint.sim_path)):
+        along, _across, _rise = _in_frame(merge, sprint.surface_point(index, 0.0))
+        if along >= front:
+            assert sprint.wall_factor(index) == 1.0, (index, along)
+    along, _across, _rise = _in_frame(merge, sprint.surface_point(closes, 0.0))
+    assert along <= front, (along, front)
+
+
+def _in_frame(merge, point):
+    offset = [point[axis] - merge.origin[axis] for axis in range(3)]
+    return (
+        sum(offset[axis] * merge.forward[axis] for axis in range(3)),
+        sum(offset[axis] * merge.lateral[axis] for axis in range(3)),
+        sum(offset[axis] * merge.up[axis] for axis in range(3)),
     )
 
 
-def test_the_aprons_upstream_edge_is_answered_by_blue_and_only_there():
-    """The one probe the merge correction changes, pinned so it cannot widen.
+def test_no_merge_probe_needs_an_exemption_any_more():
+    """The exemption the chord correction needed, and why it is gone.
 
-    With the apron following blue's gradient the two surfaces agree to about
-    0.03 at the apron's back edge, so a ray aimed at one reaches the other.
-    That is the correction working. What must not happen is the exemption
-    quietly covering the rest of the apron.
+    With the apron following blue's gradient the two surfaces agreed to about
+    0.03 at the apron's back edge, so a ray aimed at one reached the other and
+    the exemption had to be bounded. The rebuild removes the overlap instead of
+    bounding it.
     """
     from marble3d.world import MarbleWorld
     from marble3d.config import DEFAULT_CONFIG
@@ -242,16 +327,14 @@ def test_the_aprons_upstream_edge_is_answered_by_blue_and_only_there():
     try:
         machine.build(world)
         assert check_probes(machine, world) == []
+        # **Nothing is excused any more.** The exemption this test was written
+        # to bound existed because the apron and blue's channel were two
+        # surfaces over the same ground and a ray aimed at one reached the
+        # other. The shoulder is only ever outside the channel now, so every
+        # merge probe is answered by the merge.
         raw = [f for f in probe_world(world, machine.probes())]
-        excused = [
-            f
-            for f in raw
-            if f.subject.startswith("merge.apron[0]") and "on 'blue'" in f.detail
-        ]
-        assert len(excused) <= 3, [str(f) for f in excused]
-        for finding in excused:
-            gap = float(finding.detail.split("is ")[1].split(" from")[0])
-            assert gap < 0.09, finding.detail
+        merge_findings = [f for f in raw if f.subject.startswith("merge.")]
+        assert merge_findings == [], [str(f) for f in merge_findings]
     finally:
         world.close()
 

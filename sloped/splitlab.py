@@ -66,6 +66,8 @@ __all__ = [
     "SPEEDS",
     "OFFSETS",
     "entry_sweep",
+    "tail_machine",
+    "tail_sweep",
     "summarise_sweep",
 ]
 
@@ -229,6 +231,90 @@ def merge_machine(
     machine.injector = injector                           # type: ignore[attr-defined]
     machine.finish_line = runs["final"].socket("exit")    # type: ignore[attr-defined]
     return machine
+
+
+def tail_machine(
+    config: CoreConfig | None = None,
+    run: str = "orange",
+    speed: float = 40.0,
+    offsets: Sequence[float] = OFFSETS,
+    yaw_deg: float = 0.0,
+    entry_at: int = 100,
+) -> Machine:
+    """One branch's tail, the merge and the sprint, entered on purpose.
+
+    Section 5 of the V1.12 brief asks for orange tail -> merge -> final to be
+    tested at a single marble, at small packs and at eight-marble traffic. None
+    of the existing harnesses can do that. `split_machine` injects into
+    **leg3** and measures the *fork*: with `FORK_CREST` at its open 0.05 it
+    still sorted only 2 of 28 marbles onto orange, so every orange number it
+    produced was a sample of two and said nothing about the merge.
+    `merge_machine` injects on blue and cannot be pointed at orange, because
+    orange arrives at the junction 139 degrees from the sprint and its `_route`
+    attribution goes through a different chain.
+
+    So this injects on the named branch directly, at its own sample, and builds
+    only what is downstream of it: the lobe, the merge, the sprint and the
+    finish. The fork is not built at all, which is the point - a marble's route
+    is given rather than earned, so a merge failure cannot be a sorting
+    failure in disguise.
+    """
+    config = config or DEFAULT_CONFIG
+    full = sloped_course(config, routes="both")
+    runs = full.runs                                      # type: ignore[attr-defined]
+
+    machine = Machine(f"sloped_b_{run}_tail")
+    injector = Injector("inject", runs[run], entry_at, offsets, speed, yaw_deg)
+    machine.add(injector, Transform())
+    for name in (run, "merge_lead", "merge", "final"):
+        machine.add(full.modules[name], Transform())
+    machine.add(full.modules["finish"], Transform())
+    machine.runs = runs                                   # type: ignore[attr-defined]
+    machine.injector = injector                           # type: ignore[attr-defined]
+    machine.finish_line = runs["final"].socket("exit")    # type: ignore[attr-defined]
+    return machine
+
+
+def tail_sweep(
+    run: str = "orange",
+    speeds: Sequence[float] = (30.0, 36.0, 40.0, 46.0),
+    offsets: Sequence[float] = OFFSETS,
+    entry_at: int = 100,
+    config: CoreConfig | None = None,
+    duration: float = 18.0,
+    together: bool = True,
+) -> list[EntryOutcome]:
+    """Every entry condition on one branch's tail through the merge.
+
+    `together` launches one field per speed, which is the traffic a real race
+    delivers; without it each offset runs alone, and the difference between the
+    two is what separates a marble the merge cannot pass from a marble its
+    neighbours pushed.
+    """
+    config = config or DEFAULT_CONFIG
+    out: list[EntryOutcome] = []
+    max_ticks = int(round(duration * config.physics.physics_hz))
+    for speed in speeds:
+        groups = [tuple(offsets)] if together else [(o,) for o in offsets]
+        for group in groups:
+            machine = tail_machine(
+                config, run=run, speed=speed, offsets=group, entry_at=entry_at
+            )
+            entry = SplitEntry(machine, config)
+            # A marble injected on orange is on orange; nothing upstream chose
+            # it, so the route is asserted rather than inferred. Without this
+            # `_chain` searches every run until the locator commits it, and a
+            # marble that reaches the sprint through the back wall's opening
+            # gets attributed to blue.
+            for outcome in entry.outcomes.values():
+                outcome.route = "orange" if run == "orange" else "blue"
+            try:
+                while entry.sim.ticks < max_ticks and not entry.done():
+                    entry.step()
+                out.extend(entry.outcomes.values())
+            finally:
+                entry.sim.close()
+    return out
 
 
 @dataclass
