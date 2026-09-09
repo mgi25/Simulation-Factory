@@ -1,0 +1,34 @@
+==============================================================================
+deepest climb along each AUTHORED run, by lateral fraction of half width
+==============================================================================
+run          0.00     0.40     0.55     0.60     0.70     0.80     0.95   worst at sample
+launch     0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000 @ None (frac None)
+leg1       0.0000   0.0000   0.0012   0.0041   0.0098   0.0156   0.0309   0.0309 @ 110 (frac 0.95)
+leg2       0.0000   0.0000   0.0449   0.0685   0.1159   0.1637   0.2504   0.2504 @ 103 (frac 0.95)
+leg3       0.0000   0.0001   0.0146   0.0224   0.0393   0.0560   0.0809   0.0809 @ 113 (frac 0.95)
+final      0.0000   0.0000   0.0000   0.0000   0.0000   0.0018   0.0068   0.0068 @ 114 (frac 0.95)
+
+leg2 is the defect. leg1's 0.0309 is at the rail and only 0.0041 where the
+traced racers rode, which asks 0.34 units/s to leave - not a trap. And
+leg1's own worst point is sample 110, not the leg1[80..99] the brief names,
+so that hotspot is a different mechanism.
+
+==============================================================================
+what a GLOBAL limit would cost, margin 1.0, correct units
+==============================================================================
+run       changed  worst d(deg)  bank_max before     after
+launch          5          4.45          18.0000   18.0000
+leg1           11         20.78          28.0000   28.0000
+leg2           12         10.14          22.0000   22.0000
+leg3           11         10.24          26.0000   26.0000
+final           3          0.27           2.8686    2.8686
+
+So it is windowed. leg1 would move 20.78 degrees for a pocket of 0.0309,
+because the constraint forbids EITHER edge rising - which also forbids
+winding *on* faster than the drop pays for, and leg1 banks to 28 degrees.
+The rule is stronger than 'no pocket': it is 'no point on the section ever
+rises'. Inside leg2's window the roll is coming off throughout, so the two
+coincide there; applied globally they do not.
+
+Every bank extreme is preserved in every case, which is the whole reason
+this is available where bank, radius and slope are not.
