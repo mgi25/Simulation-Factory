@@ -1,0 +1,171 @@
+========================================================================================
+MERGE JUNCTION AUDIT - routes=both
+========================================================================================
+
+--- closed basins on each run's own surface ---------------------------------
+deepest climb above a running minimum, in simulation units, per lateral fraction
+and the forward speed a rolling marble needs to leave it
+run               0.00     0.40     0.55     0.70     0.85     0.95    worst  needs  @sample
+launch          0.0000   0.0000   0.0000   0.0202   0.0605   0.0941   0.0941   5.74  6
+leg1            0.0000   0.1955   0.2953   0.3963   0.4997   0.5719   0.5719  14.15  116
+leg2            0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.00  None
+leg3            0.0000   0.0106   0.0502   0.1224   0.2037   0.2586   0.2586   9.52  110
+blue_lead       0.0000   0.0661   0.1440   0.2331   0.3223   0.3834   0.3834  11.59  5
+blue            0.0000   0.0442   0.1181   0.2083   0.3013   0.3635   0.3635  11.29  98
+orange_lead     0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.00  None
+orange          0.0000   0.2910   0.4602   0.6308   0.8035   0.9223   0.9223  17.98  107
+final           0.0000   0.0000   0.0000   0.0000   0.0032   0.0068   0.0068   1.54  114
+
+  A basin is only a trap for a marble that has already lost its speed - which is
+  what a collision in the merge does. leg2's was 0.0685 before V1.11 fixed it.
+
+  17394 triangles indexed over 7 modules
+
+--- endpoint frames, in the sprint's own frame at its entry -----------------
+(along down the sprint, across to its side, rise above its contact point)
+  blue[117]      contact [-1.899, -0.2573, -0.3027]  tangent [0.97238, 0.13018, 0.19375]
+                 heading   +72.60  bank   -0.00  grade   +4.28%  half 1.474  scale 0.82
+                   west_running   [-1.7719, -1.717, 0.0405]
+                   east_running   [-2.1451, 1.2058, -0.0507]
+                   west_guard     [-1.8525, -1.8108, 0.5077]
+                   east_guard     [-2.2502, 1.3049, 0.4104]
+  orange[117]    contact [1.5308, 1.3811, 0.5362]  tangent [-0.72442, -0.65074, -0.22748]
+                 heading   -74.23  bank   -0.00  grade   +4.89%  half 1.474  scale 0.82
+                   west_running   [0.5151, 2.4897, 0.5998]
+                   east_running   [2.3807, 0.2532, 1.0561]
+                   west_guard     [0.3242, 2.5483, 1.0399]
+                   east_guard     [2.3129, 0.1644, 1.5263]
+  final[0]       contact [0.0, 0.0, 0.0]  tangent [1.0, 0.0, -0.0]
+                 heading   +65.11  bank   +0.00  grade  +24.45%  half 1.880  scale 1.0
+                   west_running   [0.0, -1.88, 0.3701]
+                   east_running   [0.0, 1.88, 0.3701]
+                   west_guard     [-0.0, -2.004, 0.9474]
+                   east_guard     [0.0, 2.004, 0.9474]
+  blue -> sprint: -7.49 degrees of heading change
+  orange -> sprint: +139.34 degrees (-220.66 the other way)
+
+--- blue tail -> merge -> final sprint --------------------------------
+floor Y, grade in percent of horizontal travel (POSITIVE = A CLIMB), owner
+     station                W-edge                 W-mid                centre                 E-mid                E-edge
+    blue[86]   9.580      %   blue    9.317      %   blue    9.135      %   blue    9.075      %   blue    9.123      %   blue 
+    blue[87]   9.599  +3.6%!  blue    9.308  -1.6%   blue    9.094  -8.0%   blue    9.000 -15.1%   blue    9.017 -22.2%   blue 
+    blue[88]   9.602  +0.4%   blue    9.292  -3.1%   blue    9.056  -7.5%   blue    8.939 -12.5%   blue    8.934 -17.7%   blue 
+    blue[89]   9.570  -5.7% L blue    9.258  -6.4%   blue    9.018  -7.4%   blue    8.897  -8.4%   blue    8.889  -9.5%   blue 
+    blue[90]   9.506 -12.0%   blue    9.205  -9.9%   blue    8.980  -7.4%   blue    8.875  -4.5%   blue    8.881  -1.6%   blue 
+    blue[91]   9.422 -15.8%   blue    9.143 -11.9%   blue    8.944  -7.1%   blue    8.866  -1.8%   blue    8.898  +3.4%!  blue 
+    blue[92]   9.330 -17.5%   blue    9.078 -12.5%   blue    8.911  -6.5%   blue    8.866  -0.1%   blue    8.928  +6.2%!  blue 
+    blue[93]   9.234 -18.3%   blue    9.013 -12.6%   blue    8.881  -5.9%   blue    8.871  +1.1%!  blue    8.966  +7.7%!  blue 
+    blue[94]   9.135 -19.3%   blue    8.947 -12.8%   blue    8.853  -5.4%   blue    8.883  +2.2%!  blue    9.013  +9.2%!  blue 
+    blue[95]   9.032 -20.4%   blue    8.881 -13.1%   blue    8.828  -4.9%   blue    8.899  +3.2%!  blue    9.066 +10.6%!  blue 
+    blue[96]   8.928 -20.8%   blue    8.815 -13.0%   blue    8.805  -4.5%   blue    8.918  +3.7%!  blue    9.123 +10.9%!  blue 
+    blue[97]   8.835 -18.9%   blue    8.756 -11.8%   blue    8.783  -4.4%   blue    8.932  +2.7%!  blue    9.168  +8.6%!  blue 
+    blue[98]   8.770 -13.6%   blue    8.710  -9.2%   blue    8.759  -4.7%   blue    8.929  -0.5%   blue    9.183  +2.9%!  blue 
+    blue[99]   8.739  -6.5%   blue    8.681  -6.0%   blue    8.731  -5.5%   blue    8.903  -5.1%   blue    9.158  -4.7%   blue 
+   blue[100]   8.736  -0.6%   blue    8.664  -3.4%   blue    8.698  -6.3%   blue    8.856  -9.1%   blue    9.098 -11.3%   blue 
+   blue[101]   8.743  +1.5%!  blue    8.652  -2.4%   blue    8.665  -6.6%   blue    8.801 -10.6%   blue    9.026 -14.0%   blue 
+   blue[102]   8.746  +0.5%   blue    8.638  -2.9%   blue    8.632  -6.5%   blue    8.750 -10.1%   blue    8.959 -13.1%   blue 
+   blue[103]   8.737  -1.7%   blue    8.617  -4.0%   blue    8.599  -6.5%   blue    8.705  -8.9%   blue    8.902 -11.0%   blue 
+   blue[104]   8.722  -3.0%   blue    8.594  -4.6%   blue    8.566  -6.5%   blue    8.663  -8.2%   blue    8.852  -9.8%   blue 
+   blue[105]   8.706  -3.1%   blue    8.570  -4.7%   blue    8.534  -6.4%   blue    8.621  -8.1%   blue    8.803  -9.6%   blue 
+   blue[106]   8.692  -2.9%   blue    8.547  -4.6%   blue    8.502  -6.3%   blue    8.580  -8.1%   blue    8.754  -9.7%   blue 
+   blue[107]   8.675  -3.4%   blue    8.523  -4.7%   blue    8.470  -6.2%   blue    8.541  -7.7%   blue    8.708  -9.0%   blue 
+   blue[108]   8.650  -4.7%   blue    8.496  -5.3%   blue    8.439  -6.0%   blue    8.507  -6.7%   blue    8.670  -7.3%   blue 
+   blue[109]   8.618  -6.3%   blue    8.465  -6.1%   blue    8.410  -5.8%   blue    8.479  -5.5%   blue    8.644  -5.2%   blue 
+   blue[110]   8.581  -7.3%   blue    8.433  -6.4%   blue    8.382  -5.4%   blue    8.456  -4.5%   blue    8.626  -3.6%   blue 
+   blue[111]   8.547  -6.7%   blue    8.403  -5.9%   blue    8.357  -5.0%   blue    8.435  -4.2%   blue    8.608  -3.4%   blue 
+   blue[112]   8.523  -4.8%   blue    8.378  -4.8%   blue    8.332  -4.8%   blue    8.410  -4.8%   blue    8.584  -4.8%   blue 
+   blue[113]   8.655 +26.0%!  merge   8.502 +24.3%!  merge   8.363  +6.0%!  merge   8.382  -5.5%   blue    8.551  -6.4%   blue 
+   blue[114]   8.630  -4.9%   merge   8.461  -8.0%   merge   8.335  -5.5%   merge   8.354  -5.5%   blue    8.518  -6.5%   blue 
+   blue[115]   8.604  -5.2%   merge   8.420  -8.0%   merge   8.306  -5.6%   merge   8.329  -4.9%   blue    8.489  -5.6%   blue 
+   blue[116]   8.564  -7.7%   merge   8.379  -8.1%   merge   8.278  -5.6%   merge   8.307  -4.4%   blue    8.466  -4.6%   blue 
+   blue[117]   8.520  -8.7%   merge   8.334  -8.8%   merge   8.249  -5.8%   merge   8.285  -4.3%   blue    8.444  -4.3%   blue 
+    final[0]   8.386  -7.4%   merge   8.141 -10.5%   merge   8.066  -9.5%   final   8.141  -7.0%   merge   8.386  -2.6%   merge
+    final[1]   8.323 -19.7%   merge   8.081 -19.0%   merge   7.988 -24.4%   merge   8.081 -19.0%   merge   8.323 -19.7%   merge
+    final[2]   8.239 -26.9%   merge   8.000 -25.8%   merge   7.911 -24.5%   merge   7.999 -25.8%   merge   8.237 -26.9%   merge
+    final[3]   8.154 -26.6%   merge   7.919 -25.6%   merge   7.834 -24.4%   merge   7.917 -25.7%   merge   8.152 -26.8%   merge
+    final[4]   8.070 -26.4%   merge   7.839 -25.0%   merge   7.756 -24.4%   merge   7.838 -25.0%   merge   8.068 -26.6%   merge
+    final[5]   7.987 -26.2%   merge   7.761 -24.7%   merge   7.679 -24.4%   merge   7.760 -24.8%   merge   8.231 +51.7%!  orang
+    final[6]   7.904 -26.0%   merge   7.683 -24.7%   merge   7.602 -24.4%   merge   7.682 -24.8%   merge   8.246  +5.1%!  orang
+    final[7]   7.822 -25.8%   merge   7.604 -24.7%   merge   7.525 -24.4%   merge   7.603 -24.7% L merge   7.820-135.4% L merge
+    final[8]   7.740 -25.7%   merge   7.528 -24.0%   final   7.447 -24.4%   merge   7.525 -24.7% L merge   7.738 -25.8% L merge
+    final[9]   7.659 -25.6%   merge   7.452 -24.0%   final   7.370 -24.4%   merge   7.448 -24.7%   merge   7.658 -25.6% L merge
+   final[10]   7.574 -26.4%   final   7.376 -23.9%   final   7.291 -24.8%   final   7.354 -29.5%   final   7.534 -39.3% L final
+   final[11]   7.500 -23.3%   final   7.300 -23.8%   final   7.214 -24.4%   final   7.275 -25.0%   final   7.454 -25.5%   final
+   final[12]   7.426 -23.3%   final   7.224 -23.8%   final   7.137 -24.4%   final   7.197 -25.1%   final   7.373 -25.6%   final
+   final[13]   7.351 -23.4%   final   7.148 -23.9%   final   7.059 -24.4%   final   7.118 -25.0%   final   7.293 -25.5%   final
+   final[14]   7.275 -23.9%   final   7.072 -24.1%   final   6.982 -24.4%   final   7.040 -24.7%   final   7.215 -25.0%   final
+   final[15]   7.196 -24.6%   final   6.994 -24.5%   final   6.905 -24.4%   final   6.963 -24.3%   final   7.139 -24.2%   final
+   final[16]   7.115 -25.4%   final   6.914 -25.0%   final   6.828 -24.4%   final   6.888 -23.9%   final   7.065 -23.4%   final
+   final[17]   7.033 -25.9%   final   6.835 -25.3%   final   6.750 -24.5%   final   6.813 -23.8%   final   6.992 -23.1%   final
+   final[18]   6.951 -25.8%   final   6.755 -25.3%   final   6.672 -24.7%   final   6.737 -24.1%   final   6.918 -23.6%   final
+   final[19]   6.871 -25.4%   final   6.675 -25.1%   final   6.594 -24.9%   final   6.659 -24.6%   final   6.841 -24.3%   final
+   final[20]   6.792 -25.0%   final   6.596 -25.0%   final   6.515 -24.9%   final   6.581 -24.9%   final   6.763 -24.9%   final
+   final[21]   6.713 -24.8%   final   6.517 -24.9%   final   6.436 -25.0%   final   6.502 -25.1%   final   6.684 -25.2%   final
+  findings: 0 holes, 20 climbs, 7 ledges, 8 tight clearances
+
+--- orange tail -> merge -> final sprint ------------------------------
+floor Y, grade in percent of horizontal travel (POSITIVE = A CLIMB), owner
+     station                W-edge                 W-mid                centre                 E-mid                E-edge
+  orange[86]   8.844      %   orang   8.802      %   orang   8.869      %   orang   9.058      %   orang   9.328      %   orang
+  orange[87]   8.877  +8.1%!  orang   8.808  +1.4%!  orang   8.845  -5.7%   orang   9.005 -12.4%   orang   9.251 -18.0%   orang
+  orange[88]   8.913  +8.8%!  orang   8.816  +1.9%!  orang   8.822  -5.5%   orang   8.952 -12.6%   orang   9.171 -18.6%   orang
+  orange[89]   8.955  +9.9%!  orang   8.827  +2.6%!  orang   8.800  -5.3%   orang   8.897 -13.0%   orang   9.087 -19.7%   orang
+  orange[90]   9.003 +11.3%!  orang   8.842  +3.6%!  orang   8.779  -5.0%   orang   8.840 -13.6%   orang   8.998 -21.2%   orang
+  orange[91]   9.061 +13.6%!  orang   8.864  +5.1%!  orang   8.759  -4.6%   orang   8.779 -14.6%   orang   8.900 -23.6%   orang
+  orange[92]   9.132 +16.5%!  orang   8.894  +7.0%!  orang   8.742  -4.1%   orang   8.713 -15.7%   orang   8.790 -26.6%   orang
+  orange[93]   9.217 +19.4%!  orang   8.933  +9.1%!  orang   8.728  -3.3%   orang   8.644 -16.7%   orang   8.670 -29.6%   orang
+  orange[94]   9.307 +20.3%!L orang   8.977 +10.2%!  orang   8.718  -2.4%   orang   8.576 -16.5%   orang   8.548 -30.4%   orang
+  orange[95]   9.387 +17.6%!L orang   9.018  +9.1%!  orang   8.710  -1.9%   orang   8.516 -14.7%   orang   8.437 -27.8%   orang
+  orange[96]   9.441 +11.7%!L orang   9.043  +5.8%!  orang   8.700  -2.2%   orang   8.467 -11.8%   orang   8.352 -22.0%   orang
+  orange[97]   9.465  +5.1%!L orang   9.051  +1.6%!  orang   8.687  -3.1%   orang   8.431  -8.9%   orang   8.293 -15.4%   orang
+  orange[98]   9.464  -0.3% L orang   9.042  -1.8%   orang   8.669  -4.0%   orang   8.404  -6.7%   orang   8.256  -9.8%   orang
+  orange[99]   9.448  -3.4% L orang   9.025  -3.9%   orang   8.650  -4.6%   orang   8.382  -5.6%   orang   8.231  -6.6%   orang
+ orange[100]   9.422  -5.6% L orang   9.001  -5.4%   orang   8.628  -5.1%   orang   8.363  -4.7%   orang   8.215  -4.3%   orang
+ orange[101]   9.375  -9.9% L orang   8.963  -8.2%   orang   8.602  -5.9%   orang   8.350  -3.0%   orang   8.216  +0.2%   orang
+ orange[102]   9.284 -19.6% L orang   8.898 -14.5%   orang   8.570  -7.5%   orang   8.354  +1.0%!  orang   8.255 +10.2%!  orang
+ orange[103]   9.122 -35.5% L orang   8.792 -24.1%   orang   8.531  -9.1%   orang   8.389  +8.3%!  orang   8.360 +26.2%!  orang
+ orange[104]   8.885 -54.3%   orang   8.646 -33.7%   orang   8.494  -8.7%   orang   8.465 +18.0%!  orang   8.541 +43.7%!  orang
+ orange[105]   8.619 -64.0%   orang   8.494 -36.0%   orang   8.471  -5.5%   orang   8.570 +24.5%!  orang   8.763 +51.5%!  orang
+ orange[106]   8.405 -54.1%   orang   8.377 -28.4%   orang   8.460  -2.5%   orang   8.663 +21.1%!  orang   8.946 +40.5%!  orang
+ orange[107]   8.297 -28.3%   orang   8.316 -15.3%   orang   8.447  -2.9%   orang   8.698  +7.7%!  orang   9.020 +15.8%!  orang
+ orange[108]   8.296  -0.3%   orang   8.304  -2.9%   orang   8.425  -5.4%   orang   8.664  -7.5%   orang   8.978  -9.1%   orang
+ orange[109]   8.363 +16.2%!  orang   8.325  +5.0%!  orang   8.396  -6.7%   orang   8.589 -17.5%   orang   8.863 -26.4%   orang
+ orange[110]   8.439 +17.9%!  orang   8.352  +6.4%!  orang   8.370  -6.2%   orang   8.512 -18.4%   orang   8.741 -29.0%   orang
+ orange[111]   8.487 +11.4%!  orang   8.366  +3.4%!  orang   8.348  -5.4%   orang   8.453 -14.1%   orang   8.650 -21.7%   orang
+ orange[112]   8.505  +4.3%!  orang   8.366  -0.2%   orang   8.326  -5.0%   orang   8.411  -9.9%   orang   8.590 -14.1%   orang
+ orange[113]   8.506  +0.3%   orang   8.356  -2.2%   orang   8.305  -4.9%   orang   8.378  -7.7% L orang   8.548 -10.1%   orang
+ orange[114]   8.498  -1.8%   orang   8.343  -3.2%   orang   8.285  -4.9%   orang   8.351  -6.6%   orang   8.514  -8.0%   orang
+ orange[115]   8.484  -3.3%   orang   8.326  -4.1%   orang   8.264  -4.9%   orang   8.327  -5.7%   orang   8.486  -6.5% L orang
+ orange[116]   8.465  -4.6%   orang   8.306  -4.7%   orang   8.244  -4.9%   orang   8.305  -5.1%   orang   8.464  -5.2% L orang
+ orange[117]   8.444  -5.0%   orang   8.285  -4.9%   orang   8.223  -4.9%   orang   8.285  -4.9%   orang   8.444  -4.8% L orang
+    final[0]   8.386  -1.5%   merge   8.141  -4.9%   merge   8.066  -7.4%   final   8.141  -7.1%   merge   8.386  -2.2%   merge
+    final[1]   8.323 -19.7%   merge   8.081 -19.0%   merge   7.988 -24.4%   merge   8.081 -19.0%   merge   8.323 -19.7%   merge
+    final[2]   8.239 -26.9%   merge   8.000 -25.8%   merge   7.911 -24.5%   merge   7.999 -25.8%   merge   8.237 -26.9%   merge
+    final[3]   8.154 -26.6%   merge   7.919 -25.6%   merge   7.834 -24.4%   merge   7.917 -25.7%   merge   8.152 -26.8%   merge
+    final[4]   8.070 -26.4%   merge   7.839 -25.0%   merge   7.756 -24.4%   merge   7.838 -25.0%   merge   8.068 -26.6%   merge
+    final[5]   7.987 -26.2%   merge   7.761 -24.7%   merge   7.679 -24.4%   merge   7.760 -24.8%   merge   8.231 +51.7%!  orang
+    final[6]   7.904 -26.0%   merge   7.683 -24.7%   merge   7.602 -24.4%   merge   7.682 -24.8%   merge   8.246  +5.1%!  orang
+    final[7]   7.822 -25.8%   merge   7.604 -24.7%   merge   7.525 -24.4%   merge   7.603 -24.7% L merge   7.820-135.4% L merge
+    final[8]   7.740 -25.7%   merge   7.528 -24.0%   final   7.447 -24.4%   merge   7.525 -24.7% L merge   7.738 -25.8% L merge
+    final[9]   7.659 -25.6%   merge   7.452 -24.0%   final   7.370 -24.4%   merge   7.448 -24.7%   merge   7.658 -25.6% L merge
+   final[10]   7.574 -26.4%   final   7.376 -23.9%   final   7.291 -24.8%   final   7.354 -29.5%   final   7.534 -39.3% L final
+   final[11]   7.500 -23.3%   final   7.300 -23.8%   final   7.214 -24.4%   final   7.275 -25.0%   final   7.454 -25.5%   final
+   final[12]   7.426 -23.3%   final   7.224 -23.8%   final   7.137 -24.4%   final   7.197 -25.1%   final   7.373 -25.6%   final
+   final[13]   7.351 -23.4%   final   7.148 -23.9%   final   7.059 -24.4%   final   7.118 -25.0%   final   7.293 -25.5%   final
+   final[14]   7.275 -23.9%   final   7.072 -24.1%   final   6.982 -24.4%   final   7.040 -24.7%   final   7.215 -25.0%   final
+   final[15]   7.196 -24.6%   final   6.994 -24.5%   final   6.905 -24.4%   final   6.963 -24.3%   final   7.139 -24.2%   final
+   final[16]   7.115 -25.4%   final   6.914 -25.0%   final   6.828 -24.4%   final   6.888 -23.9%   final   7.065 -23.4%   final
+   final[17]   7.033 -25.9%   final   6.835 -25.3%   final   6.750 -24.5%   final   6.813 -23.8%   final   6.992 -23.1%   final
+   final[18]   6.951 -25.8%   final   6.755 -25.3%   final   6.672 -24.7%   final   6.737 -24.1%   final   6.918 -23.6%   final
+   final[19]   6.871 -25.4%   final   6.675 -25.1%   final   6.594 -24.9%   final   6.659 -24.6%   final   6.841 -24.3%   final
+   final[20]   6.792 -25.0%   final   6.596 -25.0%   final   6.515 -24.9%   final   6.581 -24.9%   final   6.763 -24.9%   final
+   final[21]   6.713 -24.8%   final   6.517 -24.9%   final   6.436 -25.0%   final   6.502 -25.1%   final   6.684 -25.2%   final
+  findings: 0 holes, 43 climbs, 20 ledges, 23 tight clearances
+
+--- verdict -----------------------------------------------------------------
+  blue     DEFECTS  holes   0  climbs  20  ledges   7  tight   8
+      worst climb +51.7% at final[5] E-edge (owner orange)
+  orange   DEFECTS  holes   0  climbs  43  ledges  20  tight  23
+      worst climb +51.7% at final[5] E-edge (owner orange)
+
+wrote docs\validation\sloped_race_v1\v112\junction_before.json
