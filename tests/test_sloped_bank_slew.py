@@ -180,12 +180,81 @@ def test_the_limit_rejoins_the_authored_curve_inside_its_window(limited, authore
     )
 
 
-def test_the_course_installs_the_limit_on_leg2_only(limited):
+def test_every_run_named_in_the_table_is_wired_to_it_and_no_other_is(limited):
+    """The table is only a table if the course reads it, run by run.
+
+    This was `..._on_leg2_only` and it skipped every name in `BANK_SLEWS`, so
+    it kept passing when the table grew to three and stopped checking that any
+    of them was installed. That is not hypothetical: blue and orange are built
+    outside the `CHAIN` comprehension that passes `bank_slew`, so each needed
+    the argument adding by hand and either could have been named in the table
+    and never wired.
+    """
     assert limited.bank_slew == BANK_SLEWS["leg2"]
-    for name, run in sloped_course(routes="blue").runs.items():
-        if name in BANK_SLEWS:
-            continue
-        assert getattr(run, "bank_slew", None) is None, name
+    for routes in ("blue", "both"):
+        runs = sloped_course(routes=routes).runs
+        for name, run in runs.items():
+            expected = BANK_SLEWS.get(name)
+            assert getattr(run, "bank_slew", None) == expected, (routes, name)
+        # And every name in the table reaches a run on at least one route.
+        assert set(BANK_SLEWS) <= set(sloped_course(routes="both").runs)
+
+
+def test_each_limit_drives_its_own_runs_basin_to_zero(limited):
+    """The property each window exists for, on the run it is installed on.
+
+    Per-fraction rather than per-centreline, because the centreline of all
+    three descends throughout and that is exactly what hid leg2's for three
+    versions and blue's and orange's for four.
+    """
+    from sloped.junction import climb_survey
+
+    runs = sloped_course(routes="both").runs
+    for name in BANK_SLEWS:
+        survey = climb_survey(runs[name], fractions=(0.0, 0.4, 0.55, 0.7, 0.85, 0.95))
+        assert survey["worst"]["climb"] < 0.001, (name, survey["worst"])
+
+
+def test_orange_needs_the_whole_run_and_a_tail_window_does_not_do_it():
+    """The measurement `BANK_SLEWS["orange"]`'s comment is built on.
+
+    Orange's tail asks 3.96 times the drop it has, so a rate cap started there
+    lags and leaves a basin; over the whole run the ratio is 0.82. If a future
+    reader narrows the window to look like leg2's and blue's, this says what it
+    costs.
+    """
+    import math
+
+    from sloped.junction import climb_survey
+    from sloped import joins, layout
+    from sloped.track import TrackRun
+
+    spec = dict(layout.run("orange"))
+    spec["controls"] = joins.orange_controls()
+    fractions = (0.0, 0.4, 0.55, 0.7, 0.85, 0.95)
+
+    def worst(window):
+        run = TrackRun("orange", spec=spec, bank_slew=window)
+        return climb_survey(run, fractions=fractions)["worst"]["climb"]
+
+    assert worst((0, 117, 1.0)) < 0.001
+    assert worst((84, 117, 1.0)) > 0.15
+    assert worst((70, 117, 1.0)) > 0.02
+
+    # And the ratio that explains it, on the authored roll.
+    base = TrackRun("orange", spec=spec)
+    half = layout.CHANNEL_HALF * base.scale
+
+    def ratio(low, high):
+        drop = sum(base.path[i][1] - base.path[i + 1][1] for i in range(low, high))
+        cost = sum(
+            abs(math.sin(base.banks[i + 1]) - math.sin(base.banks[i])) * half
+            for i in range(low, high)
+        )
+        return cost / max(drop, 1e-9)
+
+    assert ratio(84, 117) > 3.5, ratio(84, 117)
+    assert ratio(0, 117) < 1.0, ratio(0, 117)
 
 
 # --- both trees carry the same table --------------------------------------

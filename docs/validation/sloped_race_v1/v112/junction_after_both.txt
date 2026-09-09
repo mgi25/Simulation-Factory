@@ -13,7 +13,7 @@ leg3            0.0000   0.0106   0.0502   0.1224   0.2037   0.2586   0.2586   9
 blue_lead       0.0000   0.0661   0.1440   0.2331   0.3223   0.3834   0.3834  11.59  5
 blue            0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.00  None
 orange_lead     0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.00  None
-orange          0.0000   0.2910   0.4602   0.6308   0.8035   0.9223   0.9223  17.98  107
+orange          0.0000   0.0000   0.0000   0.0000   0.0000   0.0002   0.0002   0.28  110
 merge_lead      0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.0000   0.00  None
 final           0.0000   0.0000   0.0000   0.0000   0.0032   0.0068   0.0068   1.54  114
 
@@ -131,37 +131,37 @@ merge_lead[11]   8.318 -31.2%   final   8.131 -27.0%   final   8.061 -22.3%   fi
 --- orange tail -> merge -> final sprint ------------------------------
 floor Y, grade in percent of horizontal travel (POSITIVE = A CLIMB), owner
      station                W-edge                 W-mid                centre                 E-mid                E-edge
-  orange[86]   8.846      %   orang   8.803      %   orang   8.869      %   orang   9.057      %   orang   9.325      %   orang
-  orange[87]   8.879  +8.1%!  orang   8.808  +1.4%!  orang   8.844  -5.7%   orang   9.004 -12.4%   orang   9.247 -18.0%   orang
-  orange[88]   8.916  +8.8%!  orang   8.816  +1.9%!  orang   8.821  -5.5%   orang   8.950 -12.6%   orang   9.167 -18.7%   orang
-  orange[89]   8.957  +9.9%!  orang   8.828  +2.7%!  orang   8.799  -5.3%   orang   8.895 -13.0%   orang   9.083 -19.8%   orang
-  orange[90]   9.006 +11.5%!  orang   8.843  +3.7%!  orang   8.778  -5.0%   orang   8.838 -13.6%   orang   8.994 -21.3%   orang
-  orange[91]   9.065 +13.8%!  orang   8.865  +5.2%!  orang   8.758  -4.6%   orang   8.776 -14.6%   orang   8.895 -23.7%   orang
-  orange[92]   9.137 +16.7%!  orang   8.896  +7.1%!  orang   8.741  -4.1%   orang   8.711 -15.7%   orang   8.785 -26.7%   orang
-  orange[93]   9.223 +19.6%!  orang   8.935  +9.2%!  orang   8.727  -3.3%   orang   8.642 -16.7%   orang   8.665 -29.7%   orang
-  orange[94]   9.313 +20.3%!L orang   8.980 +10.2%!  orang   8.717  -2.4%   orang   8.574 -16.4%   orang   8.543 -30.4%   orang
-  orange[95]   9.392 +17.4%!L orang   9.019  +9.0%!  orang   8.709  -1.9%   orang   8.514 -14.6%   orang   8.433 -27.6%   orang
-  orange[96]   9.445 +11.3%!L orang   9.044  +5.6%!  orang   8.699  -2.2%   orang   8.466 -11.7%   orang   8.349 -21.7%   orang
-  orange[97]   9.467  +4.7%!L orang   9.051  +1.5%!  orang   8.686  -3.1%   orang   8.430  -8.8%   orang   8.291 -15.1%   orang
-  orange[98]   9.464  -0.5% L orang   9.042  -2.0%   orang   8.669  -4.0%   orang   8.403  -6.7%   orang   8.255  -9.6%   orang
-  orange[99]   9.448  -3.5% L orang   9.024  -4.0%   orang   8.649  -4.6%   orang   8.381  -5.5%   orang   8.230  -6.5%   orang
- orange[100]   9.419  -6.0% L orang   8.999  -5.5%   orang   8.627  -5.1%   orang   8.362  -4.6%   orang   8.215  -4.0%   orang
- orange[101]   9.369 -10.7% L orang   8.960  -8.6%   orang   8.602  -5.9%   orang   8.350  -2.9%   orang   8.218  +0.7%!  orang
- orange[102]   9.273 -20.6% L orang   8.893 -14.9%   orang   8.569  -7.5%   orang   8.355  +1.2%!  orang   8.260 +11.0%!  orang
- orange[103]   9.107 -36.4% L orang   8.785 -24.5%   orang   8.530  -9.1%   orang   8.391  +8.5%!  orang   8.368 +26.9%!  orang
- orange[104]   8.869 -54.4%   orang   8.639 -33.8%   orang   8.493  -8.7%   orang   8.467 +18.0%!  orang   8.550 +43.9%!  orang
- orange[105]   8.607 -63.3%   orang   8.488 -35.8%   orang   8.469  -5.5%   orang   8.572 +24.3%!  orang   8.771 +51.1%!  orang
- orange[106]   8.398 -52.6%   orang   8.373 -27.7%   orang   8.459  -2.5%   orang   8.664 +20.8%!  orang   8.949 +39.6%!  orang
- orange[107]   8.297 -26.4%   orang   8.315 -14.4%   orang   8.447  -2.9%   orang   8.697  +7.3%!  orang   9.018 +14.7%!L orang
- orange[108]   8.300  +0.8%!  orang   8.306  -2.4%   orang   8.424  -5.3%   orang   8.662  -7.7%   orang   8.973  -9.9%   orang
- orange[109]   8.367 +16.3%!  orang   8.327  +5.0%!  orang   8.396  -6.7%   orang   8.587 -17.5%   orang   8.857 -26.5%   orang
- orange[110]   8.441 +17.5%!  orang   8.353  +6.2%!  orang   8.369  -6.2%   orang   8.510 -18.3%   orang   8.737 -28.6%   orang
- orange[111]   8.488 +11.0%!  orang   8.366  +3.2%!  orang   8.347  -5.4%   orang   8.451 -14.0%   orang   8.647 -21.3% L orang
- orange[112]   8.505  +4.0%!  orang   8.365  -0.3%   orang   8.325  -5.0%   orang   8.409  -9.8%   orang   8.588 -14.0% L orang
- orange[113]   8.505  +0.1%   orang   8.356  -2.2%   orang   8.304  -4.9%   orang   8.377  -7.6%   orang   8.546 -10.0% L orang
- orange[114]   8.497  -1.9%   orang   8.342  -3.3%   orang   8.284  -4.9%   orang   8.350  -6.5%   orang   8.512  -8.0% L orang
- orange[115]   8.483  -3.4%   orang   8.325  -4.1%   orang   8.263  -4.9%   orang   8.326  -5.7%   orang   8.485  -6.4% L orang
- orange[116]   8.464  -4.6%   orang   8.305  -4.7%   orang   8.242  -4.9%   orang   8.304  -5.1%   orang   8.463  -5.2% L orang
+  orange[86]   8.782      %   orang   8.772      %   orang   8.874      %   orang   9.095      %   orang   9.392      %   orang
+  orange[87]   8.777  -1.1%   orang   8.759  -3.2%   orang   8.852  -5.2%   orang   9.065  -7.1%   orang   9.355  -8.7%   orang
+  orange[88]   8.773  -1.1%   orang   8.746  -3.1%   orang   8.830  -5.2%   orang   9.034  -7.2%   orang   9.317  -8.8%   orang
+  orange[89]   8.768  -1.1%   orang   8.733  -3.1%   orang   8.808  -5.2%   orang   9.004  -7.2%   orang   9.279  -8.8%   orang
+  orange[90]   8.764  -1.0%   orang   8.721  -3.0%   orang   8.786  -5.2%   orang   8.973  -7.2%   orang   9.242  -8.9%   orang
+  orange[91]   8.760  -1.0%   orang   8.708  -3.0%   orang   8.765  -5.1%   orang   8.943  -7.2%   orang   9.204  -9.0%   orang
+  orange[92]   8.756  -1.0%   orang   8.696  -2.9%   orang   8.743  -5.1%   orang   8.913  -7.3%   orang   9.166  -9.1%   orang
+  orange[93]   8.752  -0.9%   orang   8.683  -2.9%   orang   8.721  -5.1%   orang   8.882  -7.3%   orang   9.128  -9.3%   orang
+  orange[94]   8.748  -0.8%   orang   8.671  -2.8%   orang   8.700  -5.1%   orang   8.852  -7.4%   orang   9.090  -9.5%   orang
+  orange[95]   8.745  -0.8%   orang   8.659  -2.8%   orang   8.679  -5.1%   orang   8.821  -7.6%   orang   9.051  -9.8%   orang
+  orange[96]   8.741  -0.7%   orang   8.647  -2.7%   orang   8.657  -5.1%   orang   8.791  -7.7%   orang   9.013 -10.1%   orang
+  orange[97]   8.738  -0.7%   orang   8.635  -2.7%   orang   8.636  -5.1%   orang   8.760  -7.8%   orang   8.974 -10.5%   orang
+  orange[98]   8.735  -0.7%   orang   8.623  -2.7%   orang   8.614  -5.1%   orang   8.729  -7.8%   orang   8.935 -10.6%   orang
+  orange[99]   8.731  -0.7%   orang   8.611  -2.6%   orang   8.593  -5.1%   orang   8.699  -7.8%   orang   8.896 -10.5%   orang
+ orange[100]   8.728  -0.7%   orang   8.599  -2.6%   orang   8.572  -5.0%   orang   8.668  -7.8%   orang   8.858 -10.5%   orang
+ orange[101]   8.725  -0.7%   orang   8.588  -2.6%   orang   8.551  -5.0%   orang   8.638  -7.7%   orang   8.819 -10.5%   orang
+ orange[102]   8.721  -0.7%   orang   8.576  -2.6%   orang   8.530  -4.9%   orang   8.608  -7.6%   orang   8.781 -10.3%   orang
+ orange[103]   8.718  -0.7%   orang   8.565  -2.6%   orang   8.509  -4.9%   orang   8.578  -7.5%   orang   8.743 -10.0%   orang
+ orange[104]   8.713  -1.1%   orang   8.553  -2.8%   orang   8.489  -4.8%   orang   8.549  -7.1%   orang   8.707  -9.2%   orang
+ orange[105]   8.675  -8.9%   orang   8.523  -7.0%   orang   8.469  -4.8%   orang   8.538  -2.6%   orang   8.704  -0.7%   orang
+ orange[106]   8.637  -9.5%   orang   8.494  -7.2%   orang   8.449  -4.8%   orang   8.527  -2.5%   orang   8.702  -0.6%   orang
+ orange[107]   8.599 -10.1%   orang   8.464  -7.4%   orang   8.428  -4.8%   orang   8.516  -2.4%   orang   8.699  -0.5%   orang
+ orange[108]   8.561 -10.1%   orang   8.434  -7.5%   orang   8.408  -4.8%   orang   8.506  -2.4%   orang   8.697  -0.5%   orang
+ orange[109]   8.522  -9.6%   orang   8.404  -7.3%   orang   8.388  -4.8%   orang   8.495  -2.5%   orang   8.694  -0.5%   orang
+ orange[110]   8.485  -8.9%   orang   8.375  -6.9%   orang   8.368  -4.8%   orang   8.484  -2.6%   orang   8.691  -0.8%   orang
+ orange[111]   8.482  -0.8%   orang   8.363  -2.8%   orang   8.347  -5.0%   orang   8.454  -7.2%   orang   9.116+100.2%!  merge
+ orange[112]   8.479  -0.7%   orang   8.352  -2.7%   orang   8.326  -5.0%   orang   8.423  -7.2%   orang   8.614-118.6% L orang
+ orange[113]   8.476  -0.7%   orang   8.340  -2.7%   orang   8.305  -5.0%   orang   8.393  -7.2%   orang   8.575  -9.2% L orang
+ orange[114]   8.474  -0.6%   orang   8.329  -2.6%   orang   8.284  -4.9%   orang   8.363  -7.2%   orang   8.536  -9.2% L orang
+ orange[115]   8.471  -0.6%   orang   8.318  -2.6%   orang   8.263  -4.9%   orang   8.332  -7.2%   orang   8.497  -9.3% L orang
+ orange[116]   8.464  -1.7%   orang   8.305  -3.2%   orang   8.242  -4.9%   orang   8.304  -6.6%   orang   8.463  -8.1% L orang
  orange[117]   8.273 -45.1%   merge   8.182 -29.0%   final   7.900 -81.4%   final   7.655-154.3%   final   7.495-230.3%   final
     final[0]   8.333      %   merge   8.140      %   merge   8.062      %   final   8.136      %   final   8.325      %   final
     final[1]   8.247 -27.4%   final   8.058 -25.9%   final   7.984 -24.5%   final   8.059 -24.2%   final   8.248 -24.0%   final
@@ -185,12 +185,12 @@ floor Y, grade in percent of horizontal travel (POSITIVE = A CLIMB), owner
    final[19]   6.867 -25.4%   final   6.671 -25.1%   final   6.590 -24.9%   final   6.655 -24.6%   final   6.837 -24.3%   final
    final[20]   6.788 -25.0%   final   6.592 -25.0%   final   6.511 -24.9%   final   6.577 -24.9%   final   6.759 -24.9%   final
    final[21]   6.709 -24.8%   final   6.513 -24.9%   final   6.432 -25.0%   final   6.498 -25.1%   final   6.680 -25.2%   final
-  findings: 0 holes, 45 climbs, 23 ledges, 23 tight clearances
+  findings: 0 holes, 3 climbs, 11 ledges, 12 tight clearances
 
 --- verdict -----------------------------------------------------------------
   blue     DEFECTS  holes   0  climbs   2  ledges   6  tight   6
       worst climb +68.9% at final[5] E-edge (owner orange)
-  orange   DEFECTS  holes   0  climbs  45  ledges  23  tight  23
-      worst climb +68.9% at final[5] E-edge (owner orange)
+  orange   DEFECTS  holes   0  climbs   3  ledges  11  tight  12
+      worst climb +100.2% at orange[111] E-edge (owner merge)
 
 wrote docs\validation\sloped_race_v1\v112\junction_after_both.json

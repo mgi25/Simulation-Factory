@@ -12,7 +12,7 @@ import math
 
 import pytest
 
-from marble3d.units import MARBLE_DIAMETER
+from marble3d.units import MARBLE_DIAMETER, MARBLE_RADIUS
 from sloped import joins, layout
 from sloped.course import MERGE_GUARD_WINDOW, sloped_course
 from sloped.race import ROUTE_RUNS, SlopedRace
@@ -385,3 +385,168 @@ def test_the_orange_seam_has_no_cliff_through_the_crossing_window():
     # A third of a marble diameter. It was 0.76 before the mouth was lifted and
     # the hold gradient taken from the lip rather than the centreline.
     assert worst < 0.35, f"the seam drops {worst:.3f} inside the crossing window"
+
+
+def test_the_merge_lead_closes_both_seams_on_the_contact_point():
+    """What has to be continuous is where the marble touches, not the centreline.
+
+    The two runs' profile scales differ, so their centrelines sit at different
+    heights over their own cradle bottoms; `merge_lead_path` lifts its start by
+    `FLOOR_Y * (blue.scale - sprint.scale)` to make the contacts meet. Pinned in
+    both directions, because getting the sign wrong would put the lead's floor
+    0.05 units under blue's and the seam would still look closed on the
+    centreline.
+    """
+    machine = sloped_course()
+    blue = machine.runs["blue"]
+    lead = machine.runs["merge_lead"]
+    sprint = machine.runs["final"]
+    entry = math.dist(
+        blue.surface_point(len(blue.sim_path) - 1, 0.0), lead.surface_point(0, 0.0)
+    )
+    exit_gap = math.dist(
+        lead.surface_point(len(lead.sim_path) - 1, 0.0), sprint.surface_point(0, 0.0)
+    )
+    assert entry < 0.01, entry
+    assert exit_gap < 0.02, exit_gap
+    # And the headings agree far more closely than the seam budget asks.
+    assert abs(lead.heading_deg(0) - blue.heading_deg(len(blue.sim_path) - 1)) < 2.0
+    assert abs(lead.heading_deg(len(lead.sim_path) - 1) - sprint.heading_deg(0)) < 2.0
+
+
+def test_the_leads_surface_is_never_above_blues_at_the_seam():
+    """The direction of the step across the seam, at every lateral position.
+
+    A scale-1.0 cradle is deeper than a scale-0.82 one, so a lead narrow enough
+    to match blue's edge stands *above* it - an uphill lip at the running edge,
+    which is the whole defect this rebuild removes. `MERGE_LEAD_WIDTH` opens at
+    1.00 for that reason and the property is checked rather than the constant.
+    """
+    machine = sloped_course()
+    blue = machine.runs["blue"]
+    lead = machine.runs["merge_lead"]
+    last = len(blue.sim_path) - 1
+    for step in range(21):
+        fraction = -1.0 + 2.0 * step / 20
+        profile = fraction * layout.CHANNEL_HALF
+        on_blue = blue.surface_point(last, profile)
+        # the same physical lateral offset, in the lead's own profile units
+        offset = 0.5 * blue.clear_width * blue.widths[last] * fraction
+        lead_profile = offset / (0.5 * lead.clear_width * lead.widths[0]) * layout.CHANNEL_HALF
+        on_lead = lead.surface_point(0, lead_profile)
+        assert on_lead[1] <= on_blue[1] + 1e-6, (fraction, on_lead[1], on_blue[1])
+
+
+def test_the_east_rim_yields_to_orange_and_the_east_wall_stops_short_of_it():
+    """Orange's tail crosses the apron, so the apron cannot wall across it.
+
+    Measured before this was written: the front taper's east wall stood at
+    across +2.69 while orange's centreline was at +3.27, and a marble at 40 wu/s
+    lost 19.13 wu/s in a single tick against it. Two properties, both derived:
+    the rim never reaches past orange's near edge, and the wall ends where
+    orange's channel comes inside the sprint's own.
+    """
+    machine = sloped_course(routes="both")
+    merge = machine.modules["merge"]
+    back, front = to_sim(merge.BACK), to_sim(merge.FRONT)
+    crossed = 0
+    for step in range(41):
+        along = back + (front - back) * step / 40
+        near = merge.orange_near(along)
+        if near is None:
+            continue
+        crossed += 1
+        centre = merge._channel_at(along)[0]
+        east = centre + merge.rim(along, +1.0)
+        assert east <= max(near, centre + merge._channel_at(along)[2] + merge.RIM_MIN) + 1e-9
+    assert crossed > 5, crossed
+    assert merge.describe()["east_wall_ends"] < front
+    # The blue-only course has no orange, so nothing is clamped and the rim
+    # tapers the whole way.
+    plain = sloped_course(routes="blue").modules["merge"]
+    assert plain.orange_near(0.0) is None
+    assert plain.describe()["east_wall_ends"] == round(to_sim(plain.FRONT), 4)
+
+
+def test_the_shoulder_descends_in_world_height_on_every_line():
+    """A taper has to remove shoulder, not lift it.
+
+    Normalising the funnel by the *local* rim makes the region outside the rim a
+    plateau at full funnel height, and the plateau's inner edge moves inward as
+    the rim narrows. Measured in the apron's own frame that reads as a 0.3857
+    climb, which is an artefact of the frame - its forward axis descends at 13.7
+    degrees - but the plateau is real. Checked in world height, which is the
+    quantity gravity reads.
+    """
+    machine = sloped_course(routes="both")
+    merge = machine.modules["merge"]
+
+    def world_y(along, across):
+        rise = merge._floor(along, across)
+        return (
+            merge.origin[1]
+            + merge.forward[1] * along
+            + merge.lateral[1] * across
+            + merge.up[1] * rise
+        )
+
+    for across in (-2.19, -2.60, -3.20, +2.19, +3.20):
+        lowest = None
+        worst = 0.0
+        for step in range(121):
+            along = -4.0 + 8.5 * step / 120
+            y = world_y(along, across)
+            lowest = y if lowest is None else min(lowest, y)
+            worst = max(worst, y - lowest)
+        # A tenth of a diameter, which is 4.4 wu/s of escape speed; the seam
+        # between blue's half width and the lead's contributes 0.055 of it.
+        assert worst < 0.10, (across, worst)
+
+
+def test_the_merge_trim_is_solved_and_not_installed():
+    """The falsified fold, pinned so it cannot be reinstalled by accident.
+
+    `merge_trim` removes orange's mouth from over the sprint's east running
+    edge, by exactly the argument `fork_trim` is built on, and it made orange
+    worse: 22 of 28 to 19 in traffic and 17 to 2 alone. At the fork the folded
+    part has leg3's bank under it at the same height; here the sprint's floor is
+    0.34 to 0.9 below, so the fold drops the marble instead of handing it over.
+    """
+    machine = sloped_course(routes="both")
+    orange = machine.runs["orange"]
+    assert orange.exit_trim is None, "merge_trim is falsified; see joins.merge_trim"
+    # And it still solves, so the measurement stays reproducible.
+    table = joins.merge_trim(orange, machine.runs["final"], machine.runs["merge_lead"])
+    active = [v for v in table if v is not None]
+    assert len(active) >= 4, table
+    assert all(-layout.CHANNEL_HALF <= v <= layout.CHANNEL_HALF for v in active)
+
+
+def test_the_apron_holds_a_marble_on_its_shoulder_and_not_beyond_it():
+    """`MergeCatch.holds` is what excuses the run-relative containment tests.
+
+    Orange is designed to cross the shoulder, so a marble standing on it is not
+    off the course - eleven of 28 were being booked as escapes in that state.
+    The exemption has to stop somewhere, and it stops at the rim and the roof.
+    """
+    machine = sloped_course(routes="both")
+    merge = machine.modules["merge"]
+
+    def point(along, across, rise):
+        return tuple(
+            merge.origin[axis]
+            + merge.forward[axis] * along
+            + merge.lateral[axis] * across
+            + merge.up[axis] * rise
+            for axis in range(3)
+        )
+
+    along = -1.0
+    centre, _rise, half, _edge, _guard, _scale = merge._channel_at(along)
+    on_shoulder = centre - (half + 0.5 * (merge.rim(along, -1.0) - half))
+    floor = merge._floor(along, on_shoulder)
+    assert merge.holds(point(along, on_shoulder, floor + MARBLE_RADIUS))
+    # Outside the rim, above the roof, and behind the back edge: all no.
+    assert not merge.holds(point(along, centre - merge.rim(along, -1.0) - 2.0, floor))
+    assert not merge.holds(point(along, on_shoulder, floor + to_sim(merge.ROOF) + 1.0))
+    assert not merge.holds(point(to_sim(merge.BACK) - 3.0, on_shoulder, floor))

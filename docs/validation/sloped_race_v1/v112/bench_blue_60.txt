@@ -8,3 +8,25 @@ pybullet build time: Sep  6 2026 01:40:34
 pybullet build time: Sep  6 2026 01:40:34
 pybullet build time: Sep  6 2026 01:40:34
 pybullet build time: Sep  6 2026 01:40:34
+  8/60
+  16/60
+  24/60
+  32/60
+  40/60
+  48/60
+  56/60
+  60/60
+wrote docs/validation/sloped_race_v1/v112/bench_blue_60.json
+60 races, 480 racers in 208.5 s (0.29 seeds/s, 1.57 sim s / wall s)
+  finish 0.996  escape 0.002  stuck 0.002  all-eight races 0.967
+  slot win rates: 0:0.117 1:0.200 2:0.033 3:0.100 4:0.133 5:0.083 6:0.167 7:0.167
+  strongest 1 weakest 2 ratio 6.006  spearman(finish) -0.0721
+  route blue      entries   480 share 1.000 finish 0.996 win 0.125 median 21.3417
+  loss sites: {'blue[0]': 1, 'final[0]': 1}
+  validation: travel 0.40628 in the machine, 0.41028 falling out of it; penetration track -0.36017, actuator -1.03766, marble-on-marble -0.22759
+  eligible seeds 58
+    seed   3040 score 3.345 lock 0.2867 margin 0.2667 leads 6 routes {'blue': 8}
+    seed   3027 score 3.296 lock 0.3125 margin 0.45 leads 11 routes {'blue': 8}
+    seed   3025 score 3.217 lock 0.4704 margin 0.3333 leads 9 routes {'blue': 8}
+    seed   3017 score 2.662 lock 0.3125 margin 0.5167 leads 6 routes {'blue': 8}
+    seed   3026 score 2.577 lock 0.2963 margin 0.7 leads 5 routes {'blue': 8}

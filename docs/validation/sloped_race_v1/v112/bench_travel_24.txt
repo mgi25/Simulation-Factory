@@ -1,0 +1,23 @@
+pybullet build time: Sep  6 2026 01:40:34
+mesh cache warm: 17 collider chunks
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+  8/24
+  16/24
+  24/24
+wrote docs/validation/sloped_race_v1/v112/bench_travel_24.json
+wrote docs/validation/sloped_race_v1/v112/races_travel
+24 races, 192 racers in 247.6 s (0.10 seeds/s, 1.31 sim s / wall s)
+  finish 1.000  escape 0.000  stuck 0.000  all-eight races 1.000
+  slot win rates: 0:0.083 1:0.167 2:0.042 3:0.083 4:0.208 5:0.083 6:0.125 7:0.208
+  strongest 4 weakest 2 ratio 4.9952  spearman(finish) -0.0863
+  route blue      entries   192 share 1.000 finish 1.000 win 0.125 median 21.3417
+  loss sites: {}
+  validation: travel 0.27311 in the machine, 0.14239 falling out of it; penetration track -0.22193, actuator -0.89465, marble-on-marble -0.19165
+  eligible seeds 24
+    seed   3124 score 3.075 lock 0.305 margin 0.4667 leads 8 routes {'blue': 8}
+    seed   3116 score 2.893 lock 0.2758 margin 0.7333 leads 8 routes {'blue': 8}
+    seed   3120 score 2.701 lock 0.3254 margin 0.4833 leads 12 routes {'blue': 8}
+    seed   3107 score 2.499 lock 0.3146 margin 0.45 leads 12 routes {'blue': 8}
+    seed   3118 score 2.494 lock 0.3017 margin 0.4833 leads 5 routes {'blue': 8}

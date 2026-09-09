@@ -1,0 +1,26 @@
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+5 configurations x 24 seeds in 411s
+configuration                 finish   all8    esc    stk |  blue%  blue fin |  orng%  orng fin
+-----------------------------------------------------------------------------------------------
+crest 0.05                     0.552   0.00  0.333  0.115 |  0.188     0.361 |  0.807     0.600
+crest 0.09                     0.365   0.00  0.500  0.135 |  0.286     0.309 |  0.708     0.390
+crest 0.12                     0.359   0.00  0.583  0.057 |  0.516     0.343 |  0.479     0.380
+crest 0.15                     0.417   0.00  0.573  0.010 |  0.766     0.483 |  0.229     0.204
+crest 0.19                     0.729   0.04  0.271  0.000 |  0.922     0.785 |  0.073     0.071
+
+  crest 0.05: {'final[10]': 17, 'orange_lead[17]': 6, 'leg3[92]': 6, 'final[8]': 4, 'orange_lead[16]': 4, 'orange_lead[11]': 4, 'leg3[89]': 3, 'orange[23]': 3, 'leg3[88]': 3, 'leg3[95]': 3}
+  crest 0.09: {'final[10]': 17, 'orange_lead[8]': 8, 'orange_lead[12]': 7, 'final[8]': 7, 'orange_lead[11]': 6, 'orange_lead[17]': 6, 'orange_lead[10]': 5, 'leg3[92]': 5, 'orange_lead[15]': 4, 'leg3[101]': 4}
+  crest 0.12: {'leg3[92]': 10, 'final[10]': 10, 'leg3[93]': 8, 'orange_lead[9]': 8, 'orange_lead[8]': 7, 'orange_lead[10]': 7, 'leg3[91]': 6, 'orange_lead[11]': 5, 'leg3[102]': 4, 'leg3[89]': 4}
+  crest 0.15: {'leg3[92]': 16, 'orange_lead[10]': 8, 'leg3[95]': 8, 'orange_lead[8]': 7, 'leg3[96]': 7, 'leg3[100]': 6, 'leg3[91]': 6, 'leg3[99]': 5, 'leg3[93]': 5, 'orange_lead[17]': 4}
+  crest 0.19: {'leg3[91]': 6, 'leg3[101]': 5, 'leg3[92]': 4, 'leg3[95]': 4, 'orange_lead[10]': 4, 'orange_lead[17]': 3, 'leg3[103]': 3, 'orange_lead[15]': 2, 'leg3[96]': 2, 'leg3[88]': 2}
+wrote docs/validation/sloped_race_v1/v112/fork_lab_crest_v112.json

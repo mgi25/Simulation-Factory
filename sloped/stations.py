@@ -1711,19 +1711,26 @@ class MergeCatch(MarbleModule):
             profile = layout.CHANNEL_HALF * offset / max(half, 1e-9)
             return rise + to_sim((layout.floor_y_at(profile) - layout.FLOOR_Y) * scale)
         # **Normalised by the shoulder's widest span, not by the local rim.**
-        # The rim tapers in toward the front, so dividing by `rim - half` makes
-        # `over` grow downstream at a fixed `across` and the whole shoulder
-        # *rises* as it narrows. Measured on the shoulder's own surface along
-        # `across` = -2.19, from `along` -1.00 to +4.76:
+        # The rim tapers in toward the front, so dividing by `rim - half` sends
+        # `over` to 1 within a fraction of a unit there: everything outside the
+        # rim becomes a plateau at full funnel height, and the plateau's inner
+        # edge moves inward as the rim narrows. A taper has to *remove*
+        # shoulder, not lift it.
         #
-        #     local rim   0.2655 -> 0.6512, a closed basin 0.3857 deep
-        #     fixed span  no climb anywhere
+        # Measured in **world height**, which is the quantity gravity reads,
+        # over five `across` lines from `along` -4.0 to +4.5:
         #
-        # That basin was the leading orange loss at 30 to 36 wu/s and it came
-        # in with the front taper: six of six marbles came to rest at the same
-        # point to two decimals, `along` +3.27, `across` -2.19, which is a
-        # shape and not a scatter. A taper has to *remove* shoulder, not lift
-        # it, and dividing by a constant is what makes it do that.
+        #     local rim   0.2460 of closed basin, 9.3 wu/s to leave
+        #     fixed span  0.0571, and that is the blue-to-lead seam
+        #
+        # Six of six marbles at 30 to 36 wu/s came to rest in it at the same
+        # point to two decimals - `along` +3.27, `across` -2.19 - which is a
+        # shape and not a scatter.
+        #
+        # **The apron's own frame is not the frame to measure this in**, and it
+        # was measured there first: the frame's forward axis descends at 13.7
+        # degrees, so the same surface reads 0.3857 as a frame-relative rise.
+        # The defect was real either way; the magnitude was not.
         span = max(to_sim(self.ACROSS) - half, 1e-6)
         over = min(1.0, (offset - half) / span)
         return rise + edge + to_sim(self.FUNNEL) * over * over

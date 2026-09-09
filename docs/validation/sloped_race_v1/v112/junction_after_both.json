@@ -566,71 +566,71 @@
      "escape_speed": 0.0
     },
     "-0.40": {
-     "climb": 0.2015,
-     "from_sample": 85,
-     "to_sample": 97,
-     "escape_speed": 8.403
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
     },
     "+0.40": {
-     "climb": 0.291,
-     "from_sample": 102,
-     "to_sample": 107,
-     "escape_speed": 10.097
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
     },
     "-0.55": {
-     "climb": 0.3695,
-     "from_sample": 82,
-     "to_sample": 97,
-     "escape_speed": 11.378
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
     },
     "+0.55": {
-     "climb": 0.4602,
-     "from_sample": 101,
-     "to_sample": 107,
-     "escape_speed": 12.698
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
     },
     "-0.70": {
-     "climb": 0.5465,
-     "from_sample": 82,
-     "to_sample": 97,
-     "escape_speed": 13.837
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
     },
     "+0.70": {
-     "climb": 0.6308,
-     "from_sample": 101,
-     "to_sample": 107,
-     "escape_speed": 14.866
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
     },
     "-0.85": {
-     "climb": 0.7226,
-     "from_sample": 82,
-     "to_sample": 97,
-     "escape_speed": 15.911
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
     },
     "+0.85": {
-     "climb": 0.8035,
-     "from_sample": 100,
-     "to_sample": 107,
-     "escape_speed": 16.778
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
     },
     "-0.95": {
-     "climb": 0.8395,
-     "from_sample": 82,
-     "to_sample": 98,
-     "escape_speed": 17.15
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
     },
     "+0.95": {
-     "climb": 0.9223,
-     "from_sample": 100,
-     "to_sample": 107,
-     "escape_speed": 17.976
+     "climb": 0.0002,
+     "from_sample": 109,
+     "to_sample": 110,
+     "escape_speed": 0.282
     }
    },
    "worst": {
-    "climb": 0.9223,
+    "climb": 0.0002,
     "fraction": 0.95,
-    "at_sample": 107,
-    "escape_speed": 17.976
+    "at_sample": 110,
+    "escape_speed": 0.282
    }
   },
   "merge_lead": {
@@ -1289,8 +1289,8 @@
     "floor": 7.7695,
     "owner": "final",
     "grade_pct": -151.63,
-    "clearance": 0.5021,
-    "ledge": 0.5021
+    "clearance": 0.5034,
+    "ledge": 0.5034
    },
    {
     "station": "final[8]",
@@ -1307,8 +1307,8 @@
     "floor": 7.6897,
     "owner": "final",
     "grade_pct": -25.33,
-    "clearance": 0.6264,
-    "ledge": 0.6264
+    "clearance": 0.6318,
+    "ledge": 0.6318
    },
    {
     "station": "final[9]",
@@ -1316,8 +1316,8 @@
     "floor": 7.6099,
     "owner": "final",
     "grade_pct": -25.35,
-    "clearance": 0.7625,
-    "ledge": 0.7625
+    "clearance": 0.7739,
+    "ledge": 0.7739
    },
    {
     "station": "final[10]",
@@ -1325,8 +1325,8 @@
     "floor": 7.53,
     "owner": "final",
     "grade_pct": -25.42,
-    "clearance": 0.9136,
-    "ledge": 0.9136
+    "clearance": 0.9331,
+    "ledge": 0.9331
    }
   ],
   "tight": [
@@ -1345,8 +1345,8 @@
     "floor": 7.7695,
     "owner": "final",
     "grade_pct": -151.63,
-    "clearance": 0.5021,
-    "ledge": 0.5021
+    "clearance": 0.5034,
+    "ledge": 0.5034
    },
    {
     "station": "final[8]",
@@ -1363,8 +1363,8 @@
     "floor": 7.6897,
     "owner": "final",
     "grade_pct": -25.33,
-    "clearance": 0.6264,
-    "ledge": 0.6264
+    "clearance": 0.6318,
+    "ledge": 0.6318
    },
    {
     "station": "final[9]",
@@ -1372,8 +1372,8 @@
     "floor": 7.6099,
     "owner": "final",
     "grade_pct": -25.35,
-    "clearance": 0.7625,
-    "ledge": 0.7625
+    "clearance": 0.7739,
+    "ledge": 0.7739
    },
    {
     "station": "final[10]",
@@ -1381,8 +1381,8 @@
     "floor": 7.53,
     "owner": "final",
     "grade_pct": -25.42,
-    "clearance": 0.9136,
-    "ledge": 0.9136
+    "clearance": 0.9331,
+    "ledge": 0.9331
    }
   ],
   "readings": [
@@ -3723,8 +3723,8 @@
     "floor": 7.7695,
     "owner": "final",
     "grade_pct": -151.63,
-    "clearance": 0.5021,
-    "ledge": 0.5021
+    "clearance": 0.5034,
+    "ledge": 0.5034
    },
    {
     "station": "final[8]",
@@ -3768,8 +3768,8 @@
     "floor": 7.6897,
     "owner": "final",
     "grade_pct": -25.33,
-    "clearance": 0.6264,
-    "ledge": 0.6264
+    "clearance": 0.6318,
+    "ledge": 0.6318
    },
    {
     "station": "final[9]",
@@ -3804,7 +3804,7 @@
     "floor": 7.4292,
     "owner": "final",
     "grade_pct": -24.92,
-    "clearance": 1.0661,
+    "clearance": 1.0711,
     "ledge": null
    },
    {
@@ -3813,8 +3813,8 @@
     "floor": 7.6099,
     "owner": "final",
     "grade_pct": -25.35,
-    "clearance": 0.7625,
-    "ledge": 0.7625
+    "clearance": 0.7739,
+    "ledge": 0.7739
    },
    {
     "station": "final[10]",
@@ -3849,7 +3849,7 @@
     "floor": 7.3505,
     "owner": "final",
     "grade_pct": -24.96,
-    "clearance": 1.4909,
+    "clearance": 1.5203,
     "ledge": null
    },
    {
@@ -3858,8 +3858,8 @@
     "floor": 7.53,
     "owner": "final",
     "grade_pct": -25.42,
-    "clearance": 0.9136,
-    "ledge": 0.9136
+    "clearance": 0.9331,
+    "ledge": 0.9331
    },
    {
     "station": "final[11]",
@@ -3903,7 +3903,7 @@
     "floor": 7.4497,
     "owner": "final",
     "grade_pct": -25.56,
-    "clearance": 1.0905,
+    "clearance": 1.1177,
     "ledge": null
    },
    {
@@ -3948,7 +3948,7 @@
     "floor": 7.3692,
     "owner": "final",
     "grade_pct": -25.62,
-    "clearance": 1.3406,
+    "clearance": 1.3816,
     "ledge": null
    },
    {
@@ -3957,7 +3957,7 @@
     "floor": 7.3474,
     "owner": "final",
     "grade_pct": -23.39,
-    "clearance": 1.6681,
+    "clearance": 1.6664,
     "ledge": null
    },
    {
@@ -3993,7 +3993,7 @@
     "floor": 7.2893,
     "owner": "final",
     "grade_pct": -25.49,
-    "clearance": 1.7388,
+    "clearance": 1.7367,
     "ledge": null
    },
    {
@@ -4002,7 +4002,7 @@
     "floor": 7.271,
     "owner": "final",
     "grade_pct": -23.9,
-    "clearance": 1.6673,
+    "clearance": 1.6664,
     "ledge": null
    },
    {
@@ -4038,7 +4038,7 @@
     "floor": 7.211,
     "owner": "final",
     "grade_pct": -24.95,
-    "clearance": 1.7433,
+    "clearance": 1.7388,
     "ledge": null
    },
    {
@@ -4047,7 +4047,7 @@
     "floor": 7.1922,
     "owner": "final",
     "grade_pct": -24.69,
-    "clearance": 1.6692,
+    "clearance": 1.6689,
     "ledge": null
    },
    {
@@ -4083,7 +4083,7 @@
     "floor": 7.1352,
     "owner": "final",
     "grade_pct": -24.13,
-    "clearance": 1.7436,
+    "clearance": 1.7422,
     "ledge": null
    },
    {
@@ -4364,389 +4364,11 @@
   "holes": [],
   "climbs": [
    {
-    "station": "orange[87]",
-    "line": "W-edge",
-    "floor": 8.8792,
-    "owner": "orange",
-    "grade_pct": 8.13,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[87]",
-    "line": "W-mid",
-    "floor": 8.8084,
-    "owner": "orange",
-    "grade_pct": 1.39,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[88]",
-    "line": "W-edge",
-    "floor": 8.9158,
-    "owner": "orange",
-    "grade_pct": 8.82,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[88]",
-    "line": "W-mid",
-    "floor": 8.8165,
-    "owner": "orange",
-    "grade_pct": 1.91,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[89]",
-    "line": "W-edge",
-    "floor": 8.9574,
-    "owner": "orange",
-    "grade_pct": 9.95,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[89]",
-    "line": "W-mid",
-    "floor": 8.8277,
-    "owner": "orange",
-    "grade_pct": 2.67,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[90]",
-    "line": "W-edge",
-    "floor": 9.0059,
-    "owner": "orange",
-    "grade_pct": 11.47,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[90]",
-    "line": "W-mid",
-    "floor": 8.8432,
-    "owner": "orange",
-    "grade_pct": 3.68,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[91]",
-    "line": "W-edge",
-    "floor": 9.0649,
-    "owner": "orange",
-    "grade_pct": 13.8,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[91]",
-    "line": "W-mid",
-    "floor": 8.8653,
-    "owner": "orange",
-    "grade_pct": 5.19,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[92]",
-    "line": "W-edge",
-    "floor": 9.137,
-    "owner": "orange",
-    "grade_pct": 16.7,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[92]",
-    "line": "W-mid",
-    "floor": 8.8957,
-    "owner": "orange",
-    "grade_pct": 7.11,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[93]",
-    "line": "W-edge",
-    "floor": 9.2229,
-    "owner": "orange",
-    "grade_pct": 19.58,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[93]",
-    "line": "W-mid",
-    "floor": 8.9354,
-    "owner": "orange",
-    "grade_pct": 9.2,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[94]",
-    "line": "W-edge",
-    "floor": 9.3131,
-    "owner": "orange",
-    "grade_pct": 20.25,
-    "clearance": 0.8761,
-    "ledge": 0.8761
-   },
-   {
-    "station": "orange[94]",
-    "line": "W-mid",
-    "floor": 8.9797,
-    "owner": "orange",
-    "grade_pct": 10.15,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[95]",
-    "line": "W-edge",
-    "floor": 9.392,
-    "owner": "orange",
-    "grade_pct": 17.38,
-    "clearance": 0.6972,
-    "ledge": 0.6972
-   },
-   {
-    "station": "orange[95]",
-    "line": "W-mid",
-    "floor": 9.0193,
-    "owner": "orange",
-    "grade_pct": 8.99,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[96]",
-    "line": "W-edge",
-    "floor": 9.4445,
-    "owner": "orange",
-    "grade_pct": 11.34,
-    "clearance": 0.6008,
-    "ledge": 0.6008
-   },
-   {
-    "station": "orange[96]",
-    "line": "W-mid",
-    "floor": 9.0443,
-    "owner": "orange",
-    "grade_pct": 5.6,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[97]",
-    "line": "W-edge",
-    "floor": 9.4666,
-    "owner": "orange",
-    "grade_pct": 4.7,
-    "clearance": 0.5336,
-    "ledge": 0.5336
-   },
-   {
-    "station": "orange[97]",
-    "line": "W-mid",
-    "floor": 9.051,
-    "owner": "orange",
-    "grade_pct": 1.47,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[101]",
-    "line": "E-edge",
-    "floor": 8.2176,
-    "owner": "orange",
-    "grade_pct": 0.73,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[102]",
-    "line": "E-mid",
-    "floor": 8.3554,
-    "owner": "orange",
-    "grade_pct": 1.23,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[102]",
-    "line": "E-edge",
-    "floor": 8.2601,
-    "owner": "orange",
-    "grade_pct": 10.98,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[103]",
-    "line": "E-mid",
-    "floor": 8.3908,
-    "owner": "orange",
-    "grade_pct": 8.53,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[103]",
-    "line": "E-edge",
-    "floor": 8.3676,
-    "owner": "orange",
-    "grade_pct": 26.92,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[104]",
-    "line": "E-mid",
-    "floor": 8.4672,
-    "owner": "orange",
-    "grade_pct": 18.03,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[104]",
-    "line": "E-edge",
-    "floor": 8.5503,
-    "owner": "orange",
-    "grade_pct": 43.92,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[105]",
-    "line": "E-mid",
-    "floor": 8.5722,
-    "owner": "orange",
-    "grade_pct": 24.34,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[105]",
-    "line": "E-edge",
-    "floor": 8.7706,
-    "owner": "orange",
-    "grade_pct": 51.12,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[106]",
-    "line": "E-mid",
-    "floor": 8.6637,
-    "owner": "orange",
-    "grade_pct": 20.8,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[106]",
-    "line": "E-edge",
-    "floor": 8.9492,
-    "owner": "orange",
-    "grade_pct": 39.6,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[107]",
-    "line": "E-mid",
-    "floor": 8.6966,
-    "owner": "orange",
-    "grade_pct": 7.33,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[107]",
-    "line": "E-edge",
-    "floor": 9.018,
-    "owner": "orange",
-    "grade_pct": 14.72,
-    "clearance": 0.9644,
-    "ledge": 0.9644
-   },
-   {
-    "station": "orange[108]",
-    "line": "W-edge",
-    "floor": 8.3002,
-    "owner": "orange",
-    "grade_pct": 0.77,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[109]",
-    "line": "W-edge",
-    "floor": 8.3672,
-    "owner": "orange",
-    "grade_pct": 16.28,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[109]",
-    "line": "W-mid",
-    "floor": 8.3266,
-    "owner": "orange",
-    "grade_pct": 5.02,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[110]",
-    "line": "W-edge",
-    "floor": 8.4414,
-    "owner": "orange",
-    "grade_pct": 17.54,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[110]",
-    "line": "W-mid",
-    "floor": 8.3528,
-    "owner": "orange",
-    "grade_pct": 6.19,
-    "clearance": null,
-    "ledge": null
-   },
-   {
     "station": "orange[111]",
-    "line": "W-edge",
-    "floor": 8.4878,
-    "owner": "orange",
-    "grade_pct": 10.99,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[111]",
-    "line": "W-mid",
-    "floor": 8.3663,
-    "owner": "orange",
-    "grade_pct": 3.2,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[112]",
-    "line": "W-edge",
-    "floor": 8.5047,
-    "owner": "orange",
-    "grade_pct": 4.02,
+    "line": "E-edge",
+    "floor": 9.116,
+    "owner": "merge",
+    "grade_pct": 100.24,
     "clearance": null,
     "ledge": null
    },
@@ -4771,155 +4393,47 @@
   ],
   "ledges": [
    {
-    "station": "orange[94]",
-    "line": "W-edge",
-    "floor": 9.3131,
-    "owner": "orange",
-    "grade_pct": 20.25,
-    "clearance": 0.8761,
-    "ledge": 0.8761
-   },
-   {
-    "station": "orange[95]",
-    "line": "W-edge",
-    "floor": 9.392,
-    "owner": "orange",
-    "grade_pct": 17.38,
-    "clearance": 0.6972,
-    "ledge": 0.6972
-   },
-   {
-    "station": "orange[96]",
-    "line": "W-edge",
-    "floor": 9.4445,
-    "owner": "orange",
-    "grade_pct": 11.34,
-    "clearance": 0.6008,
-    "ledge": 0.6008
-   },
-   {
-    "station": "orange[97]",
-    "line": "W-edge",
-    "floor": 9.4666,
-    "owner": "orange",
-    "grade_pct": 4.7,
-    "clearance": 0.5336,
-    "ledge": 0.5336
-   },
-   {
-    "station": "orange[98]",
-    "line": "W-edge",
-    "floor": 9.4641,
-    "owner": "orange",
-    "grade_pct": -0.53,
-    "clearance": 0.5092,
-    "ledge": 0.5092
-   },
-   {
-    "station": "orange[99]",
-    "line": "W-edge",
-    "floor": 9.4475,
-    "owner": "orange",
-    "grade_pct": -3.55,
-    "clearance": 0.5039,
-    "ledge": 0.5039
-   },
-   {
-    "station": "orange[100]",
-    "line": "W-edge",
-    "floor": 9.4195,
-    "owner": "orange",
-    "grade_pct": -5.97,
-    "clearance": 0.5127,
-    "ledge": 0.5127
-   },
-   {
-    "station": "orange[101]",
-    "line": "W-edge",
-    "floor": 9.3693,
-    "owner": "orange",
-    "grade_pct": -10.69,
-    "clearance": 0.551,
-    "ledge": 0.551
-   },
-   {
-    "station": "orange[102]",
-    "line": "W-edge",
-    "floor": 9.2734,
-    "owner": "orange",
-    "grade_pct": -20.6,
-    "clearance": 0.6575,
-    "ledge": 0.6575
-   },
-   {
-    "station": "orange[103]",
-    "line": "W-edge",
-    "floor": 9.1074,
-    "owner": "orange",
-    "grade_pct": -36.38,
-    "clearance": 0.8874,
-    "ledge": 0.8874
-   },
-   {
-    "station": "orange[107]",
-    "line": "E-edge",
-    "floor": 9.018,
-    "owner": "orange",
-    "grade_pct": 14.72,
-    "clearance": 0.9644,
-    "ledge": 0.9644
-   },
-   {
-    "station": "orange[111]",
-    "line": "E-edge",
-    "floor": 8.647,
-    "owner": "orange",
-    "grade_pct": -21.34,
-    "clearance": 0.688,
-    "ledge": 0.688
-   },
-   {
     "station": "orange[112]",
     "line": "E-edge",
-    "floor": 8.588,
+    "floor": 8.614,
     "owner": "orange",
-    "grade_pct": -13.97,
-    "clearance": 0.7669,
-    "ledge": 0.7669
+    "grade_pct": -118.61,
+    "clearance": 0.5783,
+    "ledge": 0.5783
    },
    {
     "station": "orange[113]",
     "line": "E-edge",
-    "floor": 8.5458,
+    "floor": 8.5753,
     "owner": "orange",
-    "grade_pct": -9.99,
-    "clearance": 0.7596,
-    "ledge": 0.7596
+    "grade_pct": -9.17,
+    "clearance": 0.6152,
+    "ledge": 0.6152
    },
    {
     "station": "orange[114]",
     "line": "E-edge",
-    "floor": 8.5122,
+    "floor": 8.5363,
     "owner": "orange",
-    "grade_pct": -7.95,
-    "clearance": 0.6608,
-    "ledge": 0.6608
+    "grade_pct": -9.23,
+    "clearance": 0.634,
+    "ledge": 0.634
    },
    {
     "station": "orange[115]",
     "line": "E-edge",
-    "floor": 8.4851,
+    "floor": 8.4973,
     "owner": "orange",
-    "grade_pct": -6.43,
-    "clearance": 0.6851,
-    "ledge": 0.6851
+    "grade_pct": -9.26,
+    "clearance": 0.6724,
+    "ledge": 0.6724
    },
    {
     "station": "orange[116]",
     "line": "E-edge",
     "floor": 8.4632,
     "owner": "orange",
-    "grade_pct": -5.21,
+    "grade_pct": -8.13,
     "clearance": 0.7176,
     "ledge": 0.7176
    },
@@ -4938,8 +4452,8 @@
     "floor": 7.7695,
     "owner": "final",
     "grade_pct": -151.63,
-    "clearance": 0.5021,
-    "ledge": 0.5021
+    "clearance": 0.5034,
+    "ledge": 0.5034
    },
    {
     "station": "final[8]",
@@ -4956,8 +4470,8 @@
     "floor": 7.6897,
     "owner": "final",
     "grade_pct": -25.33,
-    "clearance": 0.6264,
-    "ledge": 0.6264
+    "clearance": 0.6318,
+    "ledge": 0.6318
    },
    {
     "station": "final[9]",
@@ -4965,8 +4479,8 @@
     "floor": 7.6099,
     "owner": "final",
     "grade_pct": -25.35,
-    "clearance": 0.7625,
-    "ledge": 0.7625
+    "clearance": 0.7739,
+    "ledge": 0.7739
    },
    {
     "station": "final[10]",
@@ -4974,161 +4488,62 @@
     "floor": 7.53,
     "owner": "final",
     "grade_pct": -25.42,
-    "clearance": 0.9136,
-    "ledge": 0.9136
+    "clearance": 0.9331,
+    "ledge": 0.9331
    }
   ],
   "tight": [
    {
-    "station": "orange[94]",
-    "line": "W-edge",
-    "floor": 9.3131,
-    "owner": "orange",
-    "grade_pct": 20.25,
-    "clearance": 0.8761,
-    "ledge": 0.8761
-   },
-   {
-    "station": "orange[95]",
-    "line": "W-edge",
-    "floor": 9.392,
-    "owner": "orange",
-    "grade_pct": 17.38,
-    "clearance": 0.6972,
-    "ledge": 0.6972
-   },
-   {
-    "station": "orange[96]",
-    "line": "W-edge",
-    "floor": 9.4445,
-    "owner": "orange",
-    "grade_pct": 11.34,
-    "clearance": 0.6008,
-    "ledge": 0.6008
-   },
-   {
-    "station": "orange[97]",
-    "line": "W-edge",
-    "floor": 9.4666,
-    "owner": "orange",
-    "grade_pct": 4.7,
-    "clearance": 0.5336,
-    "ledge": 0.5336
-   },
-   {
-    "station": "orange[98]",
-    "line": "W-edge",
-    "floor": 9.4641,
-    "owner": "orange",
-    "grade_pct": -0.53,
-    "clearance": 0.5092,
-    "ledge": 0.5092
-   },
-   {
-    "station": "orange[99]",
-    "line": "W-edge",
-    "floor": 9.4475,
-    "owner": "orange",
-    "grade_pct": -3.55,
-    "clearance": 0.5039,
-    "ledge": 0.5039
-   },
-   {
-    "station": "orange[100]",
-    "line": "W-edge",
-    "floor": 9.4195,
-    "owner": "orange",
-    "grade_pct": -5.97,
-    "clearance": 0.5127,
-    "ledge": 0.5127
-   },
-   {
-    "station": "orange[101]",
-    "line": "W-edge",
-    "floor": 9.3693,
-    "owner": "orange",
-    "grade_pct": -10.69,
-    "clearance": 0.551,
-    "ledge": 0.551
-   },
-   {
-    "station": "orange[102]",
-    "line": "W-edge",
-    "floor": 9.2734,
-    "owner": "orange",
-    "grade_pct": -20.6,
-    "clearance": 0.6575,
-    "ledge": 0.6575
-   },
-   {
-    "station": "orange[103]",
-    "line": "W-edge",
-    "floor": 9.1074,
-    "owner": "orange",
-    "grade_pct": -36.38,
-    "clearance": 0.8874,
-    "ledge": 0.8874
-   },
-   {
-    "station": "orange[107]",
-    "line": "E-edge",
-    "floor": 9.018,
-    "owner": "orange",
-    "grade_pct": 14.72,
-    "clearance": 0.9644,
-    "ledge": 0.9644
-   },
-   {
-    "station": "orange[111]",
-    "line": "E-edge",
-    "floor": 8.647,
-    "owner": "orange",
-    "grade_pct": -21.34,
-    "clearance": 0.688,
-    "ledge": 0.688
-   },
-   {
     "station": "orange[112]",
     "line": "E-edge",
-    "floor": 8.588,
+    "floor": 8.614,
     "owner": "orange",
-    "grade_pct": -13.97,
-    "clearance": 0.7669,
-    "ledge": 0.7669
+    "grade_pct": -118.61,
+    "clearance": 0.5783,
+    "ledge": 0.5783
    },
    {
     "station": "orange[113]",
     "line": "E-edge",
-    "floor": 8.5458,
+    "floor": 8.5753,
     "owner": "orange",
-    "grade_pct": -9.99,
-    "clearance": 0.7596,
-    "ledge": 0.7596
+    "grade_pct": -9.17,
+    "clearance": 0.6152,
+    "ledge": 0.6152
+   },
+   {
+    "station": "orange[114]",
+    "line": "E-mid",
+    "floor": 8.3626,
+    "owner": "orange",
+    "grade_pct": -7.22,
+    "clearance": 1.0404,
+    "ledge": null
    },
    {
     "station": "orange[114]",
     "line": "E-edge",
-    "floor": 8.5122,
+    "floor": 8.5363,
     "owner": "orange",
-    "grade_pct": -7.95,
-    "clearance": 0.6608,
-    "ledge": 0.6608
+    "grade_pct": -9.23,
+    "clearance": 0.634,
+    "ledge": 0.634
    },
    {
     "station": "orange[115]",
     "line": "E-edge",
-    "floor": 8.4851,
+    "floor": 8.4973,
     "owner": "orange",
-    "grade_pct": -6.43,
-    "clearance": 0.6851,
-    "ledge": 0.6851
+    "grade_pct": -9.26,
+    "clearance": 0.6724,
+    "ledge": 0.6724
    },
    {
     "station": "orange[116]",
     "line": "E-edge",
     "floor": 8.4632,
     "owner": "orange",
-    "grade_pct": -5.21,
+    "grade_pct": -8.13,
     "clearance": 0.7176,
     "ledge": 0.7176
    },
@@ -5147,8 +4562,8 @@
     "floor": 7.7695,
     "owner": "final",
     "grade_pct": -151.63,
-    "clearance": 0.5021,
-    "ledge": 0.5021
+    "clearance": 0.5034,
+    "ledge": 0.5034
    },
    {
     "station": "final[8]",
@@ -5165,8 +4580,8 @@
     "floor": 7.6897,
     "owner": "final",
     "grade_pct": -25.33,
-    "clearance": 0.6264,
-    "ledge": 0.6264
+    "clearance": 0.6318,
+    "ledge": 0.6318
    },
    {
     "station": "final[9]",
@@ -5174,8 +4589,8 @@
     "floor": 7.6099,
     "owner": "final",
     "grade_pct": -25.35,
-    "clearance": 0.7625,
-    "ledge": 0.7625
+    "clearance": 0.7739,
+    "ledge": 0.7739
    },
    {
     "station": "final[10]",
@@ -5183,15 +4598,15 @@
     "floor": 7.53,
     "owner": "final",
     "grade_pct": -25.42,
-    "clearance": 0.9136,
-    "ledge": 0.9136
+    "clearance": 0.9331,
+    "ledge": 0.9331
    }
   ],
   "readings": [
    {
     "station": "orange[86]",
     "line": "W-edge",
-    "floor": 8.8457,
+    "floor": 8.7822,
     "owner": "orange",
     "grade_pct": null,
     "clearance": null,
@@ -5200,7 +4615,7 @@
    {
     "station": "orange[86]",
     "line": "W-mid",
-    "floor": 8.8026,
+    "floor": 8.7724,
     "owner": "orange",
     "grade_pct": null,
     "clearance": null,
@@ -5209,7 +4624,7 @@
    {
     "station": "orange[86]",
     "line": "centre",
-    "floor": 8.8686,
+    "floor": 8.8738,
     "owner": "orange",
     "grade_pct": null,
     "clearance": null,
@@ -5218,7 +4633,7 @@
    {
     "station": "orange[86]",
     "line": "E-mid",
-    "floor": 9.0567,
+    "floor": 9.0953,
     "owner": "orange",
     "grade_pct": null,
     "clearance": null,
@@ -5227,7 +4642,7 @@
    {
     "station": "orange[86]",
     "line": "E-edge",
-    "floor": 9.3248,
+    "floor": 9.3924,
     "owner": "orange",
     "grade_pct": null,
     "clearance": null,
@@ -5236,1314 +4651,1314 @@
    {
     "station": "orange[87]",
     "line": "W-edge",
-    "floor": 8.8792,
+    "floor": 8.7775,
     "owner": "orange",
-    "grade_pct": 8.13,
+    "grade_pct": -1.15,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[87]",
     "line": "W-mid",
-    "floor": 8.8084,
+    "floor": 8.7592,
     "owner": "orange",
-    "grade_pct": 1.39,
+    "grade_pct": -3.16,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[87]",
     "line": "centre",
-    "floor": 8.8445,
+    "floor": 8.8517,
     "owner": "orange",
-    "grade_pct": -5.71,
+    "grade_pct": -5.23,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[87]",
     "line": "E-mid",
-    "floor": 9.0037,
+    "floor": 9.0647,
     "owner": "orange",
-    "grade_pct": -12.39,
+    "grade_pct": -7.14,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[87]",
     "line": "E-edge",
-    "floor": 9.2471,
+    "floor": 9.3547,
     "owner": "orange",
-    "grade_pct": -17.98,
+    "grade_pct": -8.71,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[88]",
     "line": "W-edge",
-    "floor": 8.9158,
+    "floor": 8.7729,
     "owner": "orange",
-    "grade_pct": 8.82,
+    "grade_pct": -1.11,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[88]",
     "line": "W-mid",
-    "floor": 8.8165,
+    "floor": 8.7463,
     "owner": "orange",
-    "grade_pct": 1.91,
+    "grade_pct": -3.11,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[88]",
     "line": "centre",
-    "floor": 8.8213,
+    "floor": 8.8297,
     "owner": "orange",
-    "grade_pct": -5.5,
+    "grade_pct": -5.2,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[88]",
     "line": "E-mid",
-    "floor": 8.9501,
+    "floor": 9.0342,
     "owner": "orange",
-    "grade_pct": -12.6,
+    "grade_pct": -7.15,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[88]",
     "line": "E-edge",
-    "floor": 9.1672,
+    "floor": 9.317,
     "owner": "orange",
-    "grade_pct": -18.67,
+    "grade_pct": -8.77,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[89]",
     "line": "W-edge",
-    "floor": 8.9574,
+    "floor": 8.7684,
     "owner": "orange",
-    "grade_pct": 9.95,
+    "grade_pct": -1.08,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[89]",
     "line": "W-mid",
-    "floor": 8.8277,
-    "owner": "orange",
-    "grade_pct": 2.67,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[89]",
-    "line": "centre",
-    "floor": 8.799,
-    "owner": "orange",
-    "grade_pct": -5.27,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[89]",
-    "line": "E-mid",
-    "floor": 8.895,
-    "owner": "orange",
-    "grade_pct": -13.02,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[89]",
-    "line": "E-edge",
-    "floor": 9.0832,
-    "owner": "orange",
-    "grade_pct": -19.77,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[90]",
-    "line": "W-edge",
-    "floor": 9.0059,
-    "owner": "orange",
-    "grade_pct": 11.47,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[90]",
-    "line": "W-mid",
-    "floor": 8.8432,
-    "owner": "orange",
-    "grade_pct": 3.68,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[90]",
-    "line": "centre",
-    "floor": 8.7779,
-    "owner": "orange",
-    "grade_pct": -5.0,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[90]",
-    "line": "E-mid",
-    "floor": 8.8376,
-    "owner": "orange",
-    "grade_pct": -13.62,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[90]",
-    "line": "E-edge",
-    "floor": 8.9935,
-    "owner": "orange",
-    "grade_pct": -21.32,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[91]",
-    "line": "W-edge",
-    "floor": 9.0649,
-    "owner": "orange",
-    "grade_pct": 13.8,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[91]",
-    "line": "W-mid",
-    "floor": 8.8653,
-    "owner": "orange",
-    "grade_pct": 5.19,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[91]",
-    "line": "centre",
-    "floor": 8.7584,
-    "owner": "orange",
-    "grade_pct": -4.62,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[91]",
-    "line": "E-mid",
-    "floor": 8.7765,
-    "owner": "orange",
-    "grade_pct": -14.59,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[91]",
-    "line": "E-edge",
-    "floor": 8.8949,
-    "owner": "orange",
-    "grade_pct": -23.72,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[92]",
-    "line": "W-edge",
-    "floor": 9.137,
-    "owner": "orange",
-    "grade_pct": 16.7,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[92]",
-    "line": "W-mid",
-    "floor": 8.8957,
-    "owner": "orange",
-    "grade_pct": 7.11,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[92]",
-    "line": "centre",
-    "floor": 8.7412,
-    "owner": "orange",
-    "grade_pct": -4.07,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[92]",
-    "line": "E-mid",
-    "floor": 8.7109,
-    "owner": "orange",
-    "grade_pct": -15.72,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[92]",
-    "line": "E-edge",
-    "floor": 8.7851,
-    "owner": "orange",
-    "grade_pct": -26.68,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[93]",
-    "line": "W-edge",
-    "floor": 9.2229,
-    "owner": "orange",
-    "grade_pct": 19.58,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[93]",
-    "line": "W-mid",
-    "floor": 8.9354,
-    "owner": "orange",
-    "grade_pct": 9.2,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[93]",
-    "line": "centre",
-    "floor": 8.7273,
-    "owner": "orange",
-    "grade_pct": -3.28,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[93]",
-    "line": "E-mid",
-    "floor": 8.6416,
-    "owner": "orange",
-    "grade_pct": -16.69,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[93]",
-    "line": "E-edge",
-    "floor": 8.6646,
-    "owner": "orange",
-    "grade_pct": -29.67,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[94]",
-    "line": "W-edge",
-    "floor": 9.3131,
-    "owner": "orange",
-    "grade_pct": 20.25,
-    "clearance": 0.8761,
-    "ledge": 0.8761
-   },
-   {
-    "station": "orange[94]",
-    "line": "W-mid",
-    "floor": 8.9797,
-    "owner": "orange",
-    "grade_pct": 10.15,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[94]",
-    "line": "centre",
-    "floor": 8.717,
-    "owner": "orange",
-    "grade_pct": -2.43,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[94]",
-    "line": "E-mid",
-    "floor": 8.5737,
-    "owner": "orange",
-    "grade_pct": -16.43,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[94]",
-    "line": "E-edge",
-    "floor": 8.5426,
-    "owner": "orange",
-    "grade_pct": -30.35,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[95]",
-    "line": "W-edge",
-    "floor": 9.392,
-    "owner": "orange",
-    "grade_pct": 17.38,
-    "clearance": 0.6972,
-    "ledge": 0.6972
-   },
-   {
-    "station": "orange[95]",
-    "line": "W-mid",
-    "floor": 9.0193,
-    "owner": "orange",
-    "grade_pct": 8.99,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[95]",
-    "line": "centre",
-    "floor": 8.7087,
-    "owner": "orange",
-    "grade_pct": -1.93,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[95]",
-    "line": "E-mid",
-    "floor": 8.5136,
-    "owner": "orange",
-    "grade_pct": -14.6,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[95]",
-    "line": "E-edge",
-    "floor": 8.4333,
-    "owner": "orange",
-    "grade_pct": -27.61,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[96]",
-    "line": "W-edge",
-    "floor": 9.4445,
-    "owner": "orange",
-    "grade_pct": 11.34,
-    "clearance": 0.6008,
-    "ledge": 0.6008
-   },
-   {
-    "station": "orange[96]",
-    "line": "W-mid",
-    "floor": 9.0443,
-    "owner": "orange",
-    "grade_pct": 5.6,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[96]",
-    "line": "centre",
-    "floor": 8.6993,
-    "owner": "orange",
-    "grade_pct": -2.21,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[96]",
-    "line": "E-mid",
-    "floor": 8.466,
-    "owner": "orange",
-    "grade_pct": -11.68,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[96]",
-    "line": "E-edge",
-    "floor": 8.3488,
-    "owner": "orange",
-    "grade_pct": -21.74,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[97]",
-    "line": "W-edge",
-    "floor": 9.4666,
-    "owner": "orange",
-    "grade_pct": 4.7,
-    "clearance": 0.5336,
-    "ledge": 0.5336
-   },
-   {
-    "station": "orange[97]",
-    "line": "W-mid",
-    "floor": 9.051,
-    "owner": "orange",
-    "grade_pct": 1.47,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[97]",
-    "line": "centre",
-    "floor": 8.6861,
+    "floor": 8.7334,
     "owner": "orange",
     "grade_pct": -3.07,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[97]",
-    "line": "E-mid",
-    "floor": 8.4303,
-    "owner": "orange",
-    "grade_pct": -8.81,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[97]",
-    "line": "E-edge",
-    "floor": 8.2914,
-    "owner": "orange",
-    "grade_pct": -15.08,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[98]",
-    "line": "W-edge",
-    "floor": 9.4641,
-    "owner": "orange",
-    "grade_pct": -0.53,
-    "clearance": 0.5092,
-    "ledge": 0.5092
-   },
-   {
-    "station": "orange[98]",
-    "line": "W-mid",
-    "floor": 9.0421,
-    "owner": "orange",
-    "grade_pct": -1.96,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[98]",
+    "station": "orange[89]",
     "line": "centre",
-    "floor": 8.6688,
+    "floor": 8.8079,
     "owner": "orange",
-    "grade_pct": -4.03,
+    "grade_pct": -5.18,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[98]",
+    "station": "orange[89]",
     "line": "E-mid",
-    "floor": 8.4032,
+    "floor": 9.0038,
     "owner": "orange",
-    "grade_pct": -6.7,
+    "grade_pct": -7.16,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[98]",
+    "station": "orange[89]",
     "line": "E-edge",
-    "floor": 8.2548,
+    "floor": 9.2793,
     "owner": "orange",
-    "grade_pct": -9.64,
+    "grade_pct": -8.83,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[99]",
+    "station": "orange[90]",
     "line": "W-edge",
-    "floor": 9.4475,
+    "floor": 8.764,
     "owner": "orange",
-    "grade_pct": -3.55,
-    "clearance": 0.5039,
-    "ledge": 0.5039
+    "grade_pct": -1.04,
+    "clearance": null,
+    "ledge": null
    },
    {
-    "station": "orange[99]",
+    "station": "orange[90]",
     "line": "W-mid",
-    "floor": 9.0241,
+    "floor": 8.7207,
     "owner": "orange",
-    "grade_pct": -3.97,
+    "grade_pct": -3.03,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[99]",
+    "station": "orange[90]",
     "line": "centre",
-    "floor": 8.6489,
+    "floor": 8.7862,
     "owner": "orange",
-    "grade_pct": -4.62,
+    "grade_pct": -5.16,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[99]",
+    "station": "orange[90]",
     "line": "E-mid",
-    "floor": 8.3808,
+    "floor": 8.9734,
     "owner": "orange",
-    "grade_pct": -5.51,
+    "grade_pct": -7.19,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[99]",
+    "station": "orange[90]",
     "line": "E-edge",
-    "floor": 8.2302,
+    "floor": 9.2416,
     "owner": "orange",
-    "grade_pct": -6.46,
+    "grade_pct": -8.91,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[100]",
+    "station": "orange[91]",
     "line": "W-edge",
-    "floor": 9.4195,
+    "floor": 8.7598,
     "owner": "orange",
-    "grade_pct": -5.97,
-    "clearance": 0.5127,
-    "ledge": 0.5127
+    "grade_pct": -1.0,
+    "clearance": null,
+    "ledge": null
    },
    {
-    "station": "orange[100]",
+    "station": "orange[91]",
     "line": "W-mid",
-    "floor": 8.9991,
+    "floor": 8.7081,
     "owner": "orange",
-    "grade_pct": -5.54,
+    "grade_pct": -2.98,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[100]",
+    "station": "orange[91]",
     "line": "centre",
-    "floor": 8.627,
+    "floor": 8.7645,
     "owner": "orange",
-    "grade_pct": -5.08,
+    "grade_pct": -5.14,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[100]",
+    "station": "orange[91]",
     "line": "E-mid",
-    "floor": 8.362,
+    "floor": 8.9431,
     "owner": "orange",
-    "grade_pct": -4.63,
+    "grade_pct": -7.22,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[100]",
+    "station": "orange[91]",
     "line": "E-edge",
-    "floor": 8.2149,
+    "floor": 9.2038,
     "owner": "orange",
-    "grade_pct": -4.03,
+    "grade_pct": -9.02,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[101]",
+    "station": "orange[92]",
     "line": "W-edge",
-    "floor": 9.3693,
+    "floor": 8.7557,
     "owner": "orange",
-    "grade_pct": -10.69,
-    "clearance": 0.551,
-    "ledge": 0.551
+    "grade_pct": -0.96,
+    "clearance": null,
+    "ledge": null
    },
    {
-    "station": "orange[101]",
+    "station": "orange[92]",
     "line": "W-mid",
-    "floor": 8.9603,
+    "floor": 8.6956,
     "owner": "orange",
-    "grade_pct": -8.58,
+    "grade_pct": -2.94,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[101]",
+    "station": "orange[92]",
     "line": "centre",
-    "floor": 8.6015,
+    "floor": 8.743,
     "owner": "orange",
-    "grade_pct": -5.92,
+    "grade_pct": -5.12,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[101]",
+    "station": "orange[92]",
     "line": "E-mid",
-    "floor": 8.3504,
+    "floor": 8.9128,
     "owner": "orange",
-    "grade_pct": -2.86,
+    "grade_pct": -7.26,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[101]",
+    "station": "orange[92]",
     "line": "E-edge",
-    "floor": 8.2176,
+    "floor": 9.166,
     "owner": "orange",
-    "grade_pct": 0.73,
+    "grade_pct": -9.13,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[102]",
+    "station": "orange[93]",
     "line": "W-edge",
-    "floor": 9.2734,
+    "floor": 8.7517,
     "owner": "orange",
-    "grade_pct": -20.6,
-    "clearance": 0.6575,
-    "ledge": 0.6575
+    "grade_pct": -0.92,
+    "clearance": null,
+    "ledge": null
    },
    {
-    "station": "orange[102]",
+    "station": "orange[93]",
     "line": "W-mid",
-    "floor": 8.8933,
+    "floor": 8.6832,
     "owner": "orange",
-    "grade_pct": -14.93,
+    "grade_pct": -2.9,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[102]",
+    "station": "orange[93]",
     "line": "centre",
-    "floor": 8.5693,
+    "floor": 8.7215,
     "owner": "orange",
-    "grade_pct": -7.52,
+    "grade_pct": -5.11,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[102]",
+    "station": "orange[93]",
     "line": "E-mid",
-    "floor": 8.3554,
+    "floor": 8.8825,
     "owner": "orange",
-    "grade_pct": 1.23,
+    "grade_pct": -7.32,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[102]",
+    "station": "orange[93]",
     "line": "E-edge",
-    "floor": 8.2601,
+    "floor": 9.1281,
     "owner": "orange",
-    "grade_pct": 10.98,
+    "grade_pct": -9.28,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[103]",
+    "station": "orange[94]",
     "line": "W-edge",
-    "floor": 9.1074,
+    "floor": 8.748,
     "owner": "orange",
-    "grade_pct": -36.38,
-    "clearance": 0.8874,
-    "ledge": 0.8874
+    "grade_pct": -0.84,
+    "clearance": null,
+    "ledge": null
    },
    {
-    "station": "orange[103]",
+    "station": "orange[94]",
     "line": "W-mid",
-    "floor": 8.7849,
+    "floor": 8.671,
     "owner": "orange",
-    "grade_pct": -24.53,
+    "grade_pct": -2.83,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[103]",
+    "station": "orange[94]",
     "line": "centre",
-    "floor": 8.5302,
+    "floor": 8.7,
     "owner": "orange",
-    "grade_pct": -9.11,
+    "grade_pct": -5.11,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[103]",
+    "station": "orange[94]",
     "line": "E-mid",
-    "floor": 8.3908,
+    "floor": 8.852,
     "owner": "orange",
-    "grade_pct": 8.53,
+    "grade_pct": -7.42,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[103]",
+    "station": "orange[94]",
     "line": "E-edge",
-    "floor": 8.3676,
+    "floor": 9.0899,
     "owner": "orange",
-    "grade_pct": 26.92,
+    "grade_pct": -9.5,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[104]",
+    "station": "orange[95]",
     "line": "W-edge",
-    "floor": 8.8694,
+    "floor": 8.7446,
     "owner": "orange",
-    "grade_pct": -54.45,
+    "grade_pct": -0.76,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[104]",
+    "station": "orange[95]",
     "line": "W-mid",
-    "floor": 8.639,
+    "floor": 8.659,
     "owner": "orange",
-    "grade_pct": -33.84,
+    "grade_pct": -2.76,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[104]",
+    "station": "orange[95]",
     "line": "centre",
-    "floor": 8.493,
+    "floor": 8.6785,
     "owner": "orange",
-    "grade_pct": -8.7,
+    "grade_pct": -5.11,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[104]",
+    "station": "orange[95]",
     "line": "E-mid",
-    "floor": 8.4672,
+    "floor": 8.8214,
     "owner": "orange",
-    "grade_pct": 18.03,
+    "grade_pct": -7.56,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[104]",
+    "station": "orange[95]",
     "line": "E-edge",
-    "floor": 8.5503,
+    "floor": 9.0513,
     "owner": "orange",
-    "grade_pct": 43.92,
+    "grade_pct": -9.84,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[105]",
+    "station": "orange[96]",
     "line": "W-edge",
-    "floor": 8.6066,
+    "floor": 8.7412,
     "owner": "orange",
-    "grade_pct": -63.33,
+    "grade_pct": -0.73,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[105]",
+    "station": "orange[96]",
     "line": "W-mid",
-    "floor": 8.488,
-    "owner": "orange",
-    "grade_pct": -35.77,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[105]",
-    "line": "centre",
-    "floor": 8.4694,
-    "owner": "orange",
-    "grade_pct": -5.5,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[105]",
-    "line": "E-mid",
-    "floor": 8.5722,
-    "owner": "orange",
-    "grade_pct": 24.34,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[105]",
-    "line": "E-edge",
-    "floor": 8.7706,
-    "owner": "orange",
-    "grade_pct": 51.12,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[106]",
-    "line": "W-edge",
-    "floor": 8.3977,
-    "owner": "orange",
-    "grade_pct": -52.64,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[106]",
-    "line": "W-mid",
-    "floor": 8.3734,
-    "owner": "orange",
-    "grade_pct": -27.74,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[106]",
-    "line": "centre",
-    "floor": 8.4588,
-    "owner": "orange",
-    "grade_pct": -2.48,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[106]",
-    "line": "E-mid",
-    "floor": 8.6637,
-    "owner": "orange",
-    "grade_pct": 20.8,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[106]",
-    "line": "E-edge",
-    "floor": 8.9492,
-    "owner": "orange",
-    "grade_pct": 39.6,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[107]",
-    "line": "W-edge",
-    "floor": 8.2972,
-    "owner": "orange",
-    "grade_pct": -26.45,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[107]",
-    "line": "W-mid",
-    "floor": 8.3152,
-    "owner": "orange",
-    "grade_pct": -14.44,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[107]",
-    "line": "centre",
-    "floor": 8.4465,
-    "owner": "orange",
-    "grade_pct": -2.88,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[107]",
-    "line": "E-mid",
-    "floor": 8.6966,
-    "owner": "orange",
-    "grade_pct": 7.33,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[107]",
-    "line": "E-edge",
-    "floor": 9.018,
-    "owner": "orange",
-    "grade_pct": 14.72,
-    "clearance": 0.9644,
-    "ledge": 0.9644
-   },
-   {
-    "station": "orange[108]",
-    "line": "W-edge",
-    "floor": 8.3002,
-    "owner": "orange",
-    "grade_pct": 0.77,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[108]",
-    "line": "W-mid",
-    "floor": 8.3056,
-    "owner": "orange",
-    "grade_pct": -2.37,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[108]",
-    "line": "centre",
-    "floor": 8.4238,
-    "owner": "orange",
-    "grade_pct": -5.34,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[108]",
-    "line": "E-mid",
-    "floor": 8.6623,
-    "owner": "orange",
-    "grade_pct": -7.7,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[108]",
-    "line": "E-edge",
-    "floor": 8.9725,
-    "owner": "orange",
-    "grade_pct": -9.87,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[109]",
-    "line": "W-edge",
-    "floor": 8.3672,
-    "owner": "orange",
-    "grade_pct": 16.28,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[109]",
-    "line": "W-mid",
-    "floor": 8.3266,
-    "owner": "orange",
-    "grade_pct": 5.02,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[109]",
-    "line": "centre",
-    "floor": 8.3955,
-    "owner": "orange",
-    "grade_pct": -6.68,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[109]",
-    "line": "E-mid",
-    "floor": 8.5871,
-    "owner": "orange",
-    "grade_pct": -17.52,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[109]",
-    "line": "E-edge",
-    "floor": 8.8575,
-    "owner": "orange",
-    "grade_pct": -26.45,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[110]",
-    "line": "W-edge",
-    "floor": 8.4414,
-    "owner": "orange",
-    "grade_pct": 17.54,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[110]",
-    "line": "W-mid",
-    "floor": 8.3528,
-    "owner": "orange",
-    "grade_pct": 6.19,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[110]",
-    "line": "centre",
-    "floor": 8.3694,
-    "owner": "orange",
-    "grade_pct": -6.19,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[110]",
-    "line": "E-mid",
-    "floor": 8.5099,
-    "owner": "orange",
-    "grade_pct": -18.32,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[110]",
-    "line": "E-edge",
-    "floor": 8.7369,
-    "owner": "orange",
-    "grade_pct": -28.62,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[111]",
-    "line": "W-edge",
-    "floor": 8.4878,
-    "owner": "orange",
-    "grade_pct": 10.99,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[111]",
-    "line": "W-mid",
-    "floor": 8.3663,
-    "owner": "orange",
-    "grade_pct": 3.2,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[111]",
-    "line": "centre",
-    "floor": 8.3465,
-    "owner": "orange",
-    "grade_pct": -5.42,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[111]",
-    "line": "E-mid",
-    "floor": 8.451,
-    "owner": "orange",
-    "grade_pct": -13.99,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[111]",
-    "line": "E-edge",
     "floor": 8.647,
     "owner": "orange",
-    "grade_pct": -21.34,
-    "clearance": 0.688,
-    "ledge": 0.688
+    "grade_pct": -2.72,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[96]",
+    "line": "centre",
+    "floor": 8.6571,
+    "owner": "orange",
+    "grade_pct": -5.1,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[96]",
+    "line": "E-mid",
+    "floor": 8.7907,
+    "owner": "orange",
+    "grade_pct": -7.68,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[96]",
+    "line": "E-edge",
+    "floor": 9.0126,
+    "owner": "orange",
+    "grade_pct": -10.15,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[97]",
+    "line": "W-edge",
+    "floor": 8.7379,
+    "owner": "orange",
+    "grade_pct": -0.71,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[97]",
+    "line": "W-mid",
+    "floor": 8.635,
+    "owner": "orange",
+    "grade_pct": -2.68,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[97]",
+    "line": "centre",
+    "floor": 8.6357,
+    "owner": "orange",
+    "grade_pct": -5.1,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[97]",
+    "line": "E-mid",
+    "floor": 8.7601,
+    "owner": "orange",
+    "grade_pct": -7.8,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[97]",
+    "line": "E-edge",
+    "floor": 8.9738,
+    "owner": "orange",
+    "grade_pct": -10.47,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[98]",
+    "line": "W-edge",
+    "floor": 8.7345,
+    "owner": "orange",
+    "grade_pct": -0.71,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[98]",
+    "line": "W-mid",
+    "floor": 8.6231,
+    "owner": "orange",
+    "grade_pct": -2.66,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[98]",
+    "line": "centre",
+    "floor": 8.6143,
+    "owner": "orange",
+    "grade_pct": -5.09,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[98]",
+    "line": "E-mid",
+    "floor": 8.7294,
+    "owner": "orange",
+    "grade_pct": -7.83,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[98]",
+    "line": "E-edge",
+    "floor": 8.9351,
+    "owner": "orange",
+    "grade_pct": -10.55,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[99]",
+    "line": "W-edge",
+    "floor": 8.7312,
+    "owner": "orange",
+    "grade_pct": -0.7,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[99]",
+    "line": "W-mid",
+    "floor": 8.6112,
+    "owner": "orange",
+    "grade_pct": -2.65,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[99]",
+    "line": "centre",
+    "floor": 8.5931,
+    "owner": "orange",
+    "grade_pct": -5.07,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[99]",
+    "line": "E-mid",
+    "floor": 8.6988,
+    "owner": "orange",
+    "grade_pct": -7.79,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[99]",
+    "line": "E-edge",
+    "floor": 8.8963,
+    "owner": "orange",
+    "grade_pct": -10.51,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[100]",
+    "line": "W-edge",
+    "floor": 8.7279,
+    "owner": "orange",
+    "grade_pct": -0.69,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[100]",
+    "line": "W-mid",
+    "floor": 8.5995,
+    "owner": "orange",
+    "grade_pct": -2.62,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[100]",
+    "line": "centre",
+    "floor": 8.5719,
+    "owner": "orange",
+    "grade_pct": -5.04,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[100]",
+    "line": "E-mid",
+    "floor": 8.6683,
+    "owner": "orange",
+    "grade_pct": -7.77,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[100]",
+    "line": "E-edge",
+    "floor": 8.8576,
+    "owner": "orange",
+    "grade_pct": -10.52,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[101]",
+    "line": "W-edge",
+    "floor": 8.7247,
+    "owner": "orange",
+    "grade_pct": -0.69,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[101]",
+    "line": "W-mid",
+    "floor": 8.5878,
+    "owner": "orange",
+    "grade_pct": -2.6,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[101]",
+    "line": "centre",
+    "floor": 8.5509,
+    "owner": "orange",
+    "grade_pct": -5.0,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[101]",
+    "line": "E-mid",
+    "floor": 8.6381,
+    "owner": "orange",
+    "grade_pct": -7.72,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[101]",
+    "line": "E-edge",
+    "floor": 8.8192,
+    "owner": "orange",
+    "grade_pct": -10.46,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[102]",
+    "line": "W-edge",
+    "floor": 8.7215,
+    "owner": "orange",
+    "grade_pct": -0.68,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[102]",
+    "line": "W-mid",
+    "floor": 8.5763,
+    "owner": "orange",
+    "grade_pct": -2.57,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[102]",
+    "line": "centre",
+    "floor": 8.53,
+    "owner": "orange",
+    "grade_pct": -4.95,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[102]",
+    "line": "E-mid",
+    "floor": 8.608,
+    "owner": "orange",
+    "grade_pct": -7.62,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[102]",
+    "line": "E-edge",
+    "floor": 8.781,
+    "owner": "orange",
+    "grade_pct": -10.31,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[103]",
+    "line": "W-edge",
+    "floor": 8.7183,
+    "owner": "orange",
+    "grade_pct": -0.68,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[103]",
+    "line": "W-mid",
+    "floor": 8.5649,
+    "owner": "orange",
+    "grade_pct": -2.56,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[103]",
+    "line": "centre",
+    "floor": 8.5094,
+    "owner": "orange",
+    "grade_pct": -4.89,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[103]",
+    "line": "E-mid",
+    "floor": 8.5783,
+    "owner": "orange",
+    "grade_pct": -7.46,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[103]",
+    "line": "E-edge",
+    "floor": 8.7432,
+    "owner": "orange",
+    "grade_pct": -9.99,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[104]",
+    "line": "W-edge",
+    "floor": 8.7133,
+    "owner": "orange",
+    "grade_pct": -1.11,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[104]",
+    "line": "W-mid",
+    "floor": 8.5527,
+    "owner": "orange",
+    "grade_pct": -2.79,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[104]",
+    "line": "centre",
+    "floor": 8.4891,
+    "owner": "orange",
+    "grade_pct": -4.83,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[104]",
+    "line": "E-mid",
+    "floor": 8.5492,
+    "owner": "orange",
+    "grade_pct": -7.15,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[104]",
+    "line": "E-edge",
+    "floor": 8.7069,
+    "owner": "orange",
+    "grade_pct": -9.17,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[105]",
+    "line": "W-edge",
+    "floor": 8.6754,
+    "owner": "orange",
+    "grade_pct": -8.92,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[105]",
+    "line": "W-mid",
+    "floor": 8.5232,
+    "owner": "orange",
+    "grade_pct": -6.98,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[105]",
+    "line": "centre",
+    "floor": 8.4688,
+    "owner": "orange",
+    "grade_pct": -4.81,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[105]",
+    "line": "E-mid",
+    "floor": 8.5381,
+    "owner": "orange",
+    "grade_pct": -2.63,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[105]",
+    "line": "E-edge",
+    "floor": 8.7042,
+    "owner": "orange",
+    "grade_pct": -0.66,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[106]",
+    "line": "W-edge",
+    "floor": 8.6374,
+    "owner": "orange",
+    "grade_pct": -9.49,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[106]",
+    "line": "W-mid",
+    "floor": 8.4936,
+    "owner": "orange",
+    "grade_pct": -7.2,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[106]",
+    "line": "centre",
+    "floor": 8.4486,
+    "owner": "orange",
+    "grade_pct": -4.79,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[106]",
+    "line": "E-mid",
+    "floor": 8.5272,
+    "owner": "orange",
+    "grade_pct": -2.52,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[106]",
+    "line": "E-edge",
+    "floor": 8.7016,
+    "owner": "orange",
+    "grade_pct": -0.59,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[107]",
+    "line": "W-edge",
+    "floor": 8.5992,
+    "owner": "orange",
+    "grade_pct": -10.08,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[107]",
+    "line": "W-mid",
+    "floor": 8.4639,
+    "owner": "orange",
+    "grade_pct": -7.44,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[107]",
+    "line": "centre",
+    "floor": 8.4284,
+    "owner": "orange",
+    "grade_pct": -4.79,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[107]",
+    "line": "E-mid",
+    "floor": 8.5164,
+    "owner": "orange",
+    "grade_pct": -2.43,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[107]",
+    "line": "E-edge",
+    "floor": 8.6991,
+    "owner": "orange",
+    "grade_pct": -0.53,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[108]",
+    "line": "W-edge",
+    "floor": 8.5609,
+    "owner": "orange",
+    "grade_pct": -10.09,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[108]",
+    "line": "W-mid",
+    "floor": 8.4341,
+    "owner": "orange",
+    "grade_pct": -7.46,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[108]",
+    "line": "centre",
+    "floor": 8.4081,
+    "owner": "orange",
+    "grade_pct": -4.81,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[108]",
+    "line": "E-mid",
+    "floor": 8.5056,
+    "owner": "orange",
+    "grade_pct": -2.43,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[108]",
+    "line": "E-edge",
+    "floor": 8.6966,
+    "owner": "orange",
+    "grade_pct": -0.53,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[109]",
+    "line": "W-edge",
+    "floor": 8.5222,
+    "owner": "orange",
+    "grade_pct": -9.6,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[109]",
+    "line": "W-mid",
+    "floor": 8.4041,
+    "owner": "orange",
+    "grade_pct": -7.28,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[109]",
+    "line": "centre",
+    "floor": 8.3878,
+    "owner": "orange",
+    "grade_pct": -4.8,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[109]",
+    "line": "E-mid",
+    "floor": 8.495,
+    "owner": "orange",
+    "grade_pct": -2.47,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[109]",
+    "line": "E-edge",
+    "floor": 8.6944,
+    "owner": "orange",
+    "grade_pct": -0.51,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[110]",
+    "line": "W-edge",
+    "floor": 8.4852,
+    "owner": "orange",
+    "grade_pct": -8.89,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[110]",
+    "line": "W-mid",
+    "floor": 8.3751,
+    "owner": "orange",
+    "grade_pct": -6.95,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[110]",
+    "line": "centre",
+    "floor": 8.3677,
+    "owner": "orange",
+    "grade_pct": -4.78,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[110]",
+    "line": "E-mid",
+    "floor": 8.4841,
+    "owner": "orange",
+    "grade_pct": -2.56,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[110]",
+    "line": "E-edge",
+    "floor": 8.691,
+    "owner": "orange",
+    "grade_pct": -0.79,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[111]",
+    "line": "W-edge",
+    "floor": 8.482,
+    "owner": "orange",
+    "grade_pct": -0.78,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[111]",
+    "line": "W-mid",
+    "floor": 8.3633,
+    "owner": "orange",
+    "grade_pct": -2.79,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[111]",
+    "line": "centre",
+    "floor": 8.3466,
+    "owner": "orange",
+    "grade_pct": -5.0,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[111]",
+    "line": "E-mid",
+    "floor": 8.4538,
+    "owner": "orange",
+    "grade_pct": -7.17,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[111]",
+    "line": "E-edge",
+    "floor": 9.116,
+    "owner": "merge",
+    "grade_pct": 100.24,
+    "clearance": null,
+    "ledge": null
    },
    {
     "station": "orange[112]",
     "line": "W-edge",
-    "floor": 8.5047,
+    "floor": 8.479,
     "owner": "orange",
-    "grade_pct": 4.02,
+    "grade_pct": -0.72,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[112]",
     "line": "W-mid",
-    "floor": 8.3652,
+    "floor": 8.3518,
     "owner": "orange",
-    "grade_pct": -0.27,
+    "grade_pct": -2.74,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[112]",
     "line": "centre",
-    "floor": 8.3252,
+    "floor": 8.3256,
     "owner": "orange",
-    "grade_pct": -5.05,
+    "grade_pct": -4.98,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[112]",
     "line": "E-mid",
-    "floor": 8.4095,
+    "floor": 8.4234,
     "owner": "orange",
-    "grade_pct": -9.83,
+    "grade_pct": -7.18,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[112]",
     "line": "E-edge",
-    "floor": 8.588,
+    "floor": 8.614,
     "owner": "orange",
-    "grade_pct": -13.97,
-    "clearance": 0.7669,
-    "ledge": 0.7669
+    "grade_pct": -118.61,
+    "clearance": 0.5783,
+    "ledge": 0.5783
    },
    {
     "station": "orange[113]",
     "line": "W-edge",
-    "floor": 8.5053,
+    "floor": 8.4762,
     "owner": "orange",
-    "grade_pct": 0.15,
+    "grade_pct": -0.66,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[113]",
     "line": "W-mid",
-    "floor": 8.3557,
+    "floor": 8.3404,
     "owner": "orange",
-    "grade_pct": -2.25,
+    "grade_pct": -2.7,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[113]",
     "line": "centre",
-    "floor": 8.3044,
+    "floor": 8.3047,
+    "owner": "orange",
+    "grade_pct": -4.96,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[113]",
+    "line": "E-mid",
+    "floor": 8.3931,
+    "owner": "orange",
+    "grade_pct": -7.2,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[113]",
+    "line": "E-edge",
+    "floor": 8.5753,
+    "owner": "orange",
+    "grade_pct": -9.17,
+    "clearance": 0.6152,
+    "ledge": 0.6152
+   },
+   {
+    "station": "orange[114]",
+    "line": "W-edge",
+    "floor": 8.4737,
+    "owner": "orange",
+    "grade_pct": -0.59,
+    "clearance": 1.4169,
+    "ledge": null
+   },
+   {
+    "station": "orange[114]",
+    "line": "W-mid",
+    "floor": 8.3293,
+    "owner": "orange",
+    "grade_pct": -2.65,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "orange[114]",
+    "line": "centre",
+    "floor": 8.2839,
     "owner": "orange",
     "grade_pct": -4.94,
     "clearance": null,
     "ledge": null
    },
    {
-    "station": "orange[113]",
-    "line": "E-mid",
-    "floor": 8.3773,
-    "owner": "orange",
-    "grade_pct": -7.64,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[113]",
-    "line": "E-edge",
-    "floor": 8.5458,
-    "owner": "orange",
-    "grade_pct": -9.99,
-    "clearance": 0.7596,
-    "ledge": 0.7596
-   },
-   {
-    "station": "orange[114]",
-    "line": "W-edge",
-    "floor": 8.4975,
-    "owner": "orange",
-    "grade_pct": -1.86,
-    "clearance": 1.448,
-    "ledge": null
-   },
-   {
-    "station": "orange[114]",
-    "line": "W-mid",
-    "floor": 8.3418,
-    "owner": "orange",
-    "grade_pct": -3.29,
-    "clearance": null,
-    "ledge": null
-   },
-   {
-    "station": "orange[114]",
-    "line": "centre",
-    "floor": 8.2838,
-    "owner": "orange",
-    "grade_pct": -4.91,
-    "clearance": null,
-    "ledge": null
-   },
-   {
     "station": "orange[114]",
     "line": "E-mid",
-    "floor": 8.3497,
+    "floor": 8.3626,
     "owner": "orange",
-    "grade_pct": -6.54,
-    "clearance": 1.2951,
+    "grade_pct": -7.22,
+    "clearance": 1.0404,
     "ledge": null
    },
    {
     "station": "orange[114]",
     "line": "E-edge",
-    "floor": 8.5122,
+    "floor": 8.5363,
     "owner": "orange",
-    "grade_pct": -7.95,
-    "clearance": 0.6608,
-    "ledge": 0.6608
+    "grade_pct": -9.23,
+    "clearance": 0.634,
+    "ledge": 0.634
    },
    {
     "station": "orange[115]",
     "line": "W-edge",
-    "floor": 8.4833,
+    "floor": 8.4713,
     "owner": "orange",
-    "grade_pct": -3.38,
-    "clearance": 1.4017,
+    "grade_pct": -0.58,
+    "clearance": 1.4132,
     "ledge": null
    },
    {
     "station": "orange[115]",
     "line": "W-mid",
-    "floor": 8.3246,
+    "floor": 8.3182,
     "owner": "orange",
-    "grade_pct": -4.09,
-    "clearance": 1.3968,
+    "grade_pct": -2.62,
+    "clearance": 1.4024,
     "ledge": null
    },
    {
     "station": "orange[115]",
     "line": "centre",
-    "floor": 8.2631,
+    "floor": 8.2632,
     "owner": "orange",
-    "grade_pct": -4.9,
+    "grade_pct": -4.92,
     "clearance": null,
     "ledge": null
    },
    {
     "station": "orange[115]",
     "line": "E-mid",
-    "floor": 8.3256,
+    "floor": 8.3322,
     "owner": "orange",
-    "grade_pct": -5.72,
-    "clearance": 1.1582,
+    "grade_pct": -7.23,
+    "clearance": 1.0522,
     "ledge": null
    },
    {
     "station": "orange[115]",
     "line": "E-edge",
-    "floor": 8.4851,
+    "floor": 8.4973,
     "owner": "orange",
-    "grade_pct": -6.43,
-    "clearance": 0.6851,
-    "ledge": 0.6851
+    "grade_pct": -9.26,
+    "clearance": 0.6724,
+    "ledge": 0.6724
    },
    {
     "station": "orange[116]",
     "line": "W-edge",
     "floor": 8.4639,
     "owner": "orange",
-    "grade_pct": -4.59,
+    "grade_pct": -1.75,
     "clearance": 1.4684,
     "ledge": null
    },
@@ -6552,7 +5967,7 @@
     "line": "W-mid",
     "floor": 8.3046,
     "owner": "orange",
-    "grade_pct": -4.73,
+    "grade_pct": -3.22,
     "clearance": 1.4739,
     "ledge": null
    },
@@ -6561,7 +5976,7 @@
     "line": "centre",
     "floor": 8.2425,
     "owner": "orange",
-    "grade_pct": -4.89,
+    "grade_pct": -4.9,
     "clearance": 1.3096,
     "ledge": null
    },
@@ -6570,7 +5985,7 @@
     "line": "E-mid",
     "floor": 8.3043,
     "owner": "orange",
-    "grade_pct": -5.06,
+    "grade_pct": -6.64,
     "clearance": 1.0708,
     "ledge": null
    },
@@ -6579,7 +5994,7 @@
     "line": "E-edge",
     "floor": 8.4632,
     "owner": "orange",
-    "grade_pct": -5.21,
+    "grade_pct": -8.13,
     "clearance": 0.7176,
     "ledge": 0.7176
    },
@@ -6985,8 +6400,8 @@
     "floor": 7.7695,
     "owner": "final",
     "grade_pct": -151.63,
-    "clearance": 0.5021,
-    "ledge": 0.5021
+    "clearance": 0.5034,
+    "ledge": 0.5034
    },
    {
     "station": "final[8]",
@@ -7030,8 +6445,8 @@
     "floor": 7.6897,
     "owner": "final",
     "grade_pct": -25.33,
-    "clearance": 0.6264,
-    "ledge": 0.6264
+    "clearance": 0.6318,
+    "ledge": 0.6318
    },
    {
     "station": "final[9]",
@@ -7066,7 +6481,7 @@
     "floor": 7.4292,
     "owner": "final",
     "grade_pct": -24.92,
-    "clearance": 1.0661,
+    "clearance": 1.0711,
     "ledge": null
    },
    {
@@ -7075,8 +6490,8 @@
     "floor": 7.6099,
     "owner": "final",
     "grade_pct": -25.35,
-    "clearance": 0.7625,
-    "ledge": 0.7625
+    "clearance": 0.7739,
+    "ledge": 0.7739
    },
    {
     "station": "final[10]",
@@ -7111,7 +6526,7 @@
     "floor": 7.3505,
     "owner": "final",
     "grade_pct": -24.96,
-    "clearance": 1.4909,
+    "clearance": 1.5203,
     "ledge": null
    },
    {
@@ -7120,8 +6535,8 @@
     "floor": 7.53,
     "owner": "final",
     "grade_pct": -25.42,
-    "clearance": 0.9136,
-    "ledge": 0.9136
+    "clearance": 0.9331,
+    "ledge": 0.9331
    },
    {
     "station": "final[11]",
@@ -7165,7 +6580,7 @@
     "floor": 7.4497,
     "owner": "final",
     "grade_pct": -25.56,
-    "clearance": 1.0905,
+    "clearance": 1.1177,
     "ledge": null
    },
    {
@@ -7210,7 +6625,7 @@
     "floor": 7.3692,
     "owner": "final",
     "grade_pct": -25.62,
-    "clearance": 1.3406,
+    "clearance": 1.3816,
     "ledge": null
    },
    {
@@ -7219,7 +6634,7 @@
     "floor": 7.3474,
     "owner": "final",
     "grade_pct": -23.39,
-    "clearance": 1.6681,
+    "clearance": 1.6664,
     "ledge": null
    },
    {
@@ -7255,7 +6670,7 @@
     "floor": 7.2893,
     "owner": "final",
     "grade_pct": -25.49,
-    "clearance": 1.7388,
+    "clearance": 1.7367,
     "ledge": null
    },
    {
@@ -7264,7 +6679,7 @@
     "floor": 7.271,
     "owner": "final",
     "grade_pct": -23.9,
-    "clearance": 1.6673,
+    "clearance": 1.6664,
     "ledge": null
    },
    {
@@ -7300,7 +6715,7 @@
     "floor": 7.211,
     "owner": "final",
     "grade_pct": -24.95,
-    "clearance": 1.7433,
+    "clearance": 1.7388,
     "ledge": null
    },
    {
@@ -7309,7 +6724,7 @@
     "floor": 7.1922,
     "owner": "final",
     "grade_pct": -24.69,
-    "clearance": 1.6692,
+    "clearance": 1.6689,
     "ledge": null
    },
    {
@@ -7345,7 +6760,7 @@
     "floor": 7.1352,
     "owner": "final",
     "grade_pct": -24.13,
-    "clearance": 1.7436,
+    "clearance": 1.7422,
     "ledge": null
    },
    {

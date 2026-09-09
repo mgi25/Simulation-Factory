@@ -1,0 +1,211 @@
+{
+ "rows": [
+  {
+   "label": "crest 0.05",
+   "crest": 0.05
+  },
+  {
+   "label": "crest 0.09",
+   "crest": 0.09
+  },
+  {
+   "label": "crest 0.12",
+   "crest": 0.12
+  },
+  {
+   "label": "crest 0.15",
+   "crest": 0.15
+  },
+  {
+   "label": "crest 0.19",
+   "crest": 0.19
+  }
+ ],
+ "reports": [
+  {
+   "label": "crest 0.05",
+   "racers": 192,
+   "finish": 0.5521,
+   "all_eight": 0.0,
+   "escape": 0.3333,
+   "stuck": 0.1146,
+   "routes": {
+    "blue": {
+     "share": 0.1875,
+     "completion": 0.3611,
+     "entries": 36
+    },
+    "orange": {
+     "share": 0.8073,
+     "completion": 0.6,
+     "entries": 155
+    },
+    "unrouted": {
+     "share": 0.0052,
+     "completion": 0.0,
+     "entries": 1
+    }
+   },
+   "loss_sites": {
+    "final[10]": 17,
+    "orange_lead[17]": 6,
+    "leg3[92]": 6,
+    "final[8]": 4,
+    "orange_lead[16]": 4,
+    "orange_lead[11]": 4,
+    "leg3[89]": 3,
+    "orange[23]": 3,
+    "leg3[88]": 3,
+    "leg3[95]": 3
+   }
+  },
+  {
+   "label": "crest 0.09",
+   "racers": 192,
+   "finish": 0.3646,
+   "all_eight": 0.0,
+   "escape": 0.5,
+   "stuck": 0.1354,
+   "routes": {
+    "blue": {
+     "share": 0.2865,
+     "completion": 0.3091,
+     "entries": 55
+    },
+    "orange": {
+     "share": 0.7083,
+     "completion": 0.3897,
+     "entries": 136
+    },
+    "unrouted": {
+     "share": 0.0052,
+     "completion": 0.0,
+     "entries": 1
+    }
+   },
+   "loss_sites": {
+    "final[10]": 17,
+    "orange_lead[8]": 8,
+    "orange_lead[12]": 7,
+    "final[8]": 7,
+    "orange_lead[11]": 6,
+    "orange_lead[17]": 6,
+    "orange_lead[10]": 5,
+    "leg3[92]": 5,
+    "orange_lead[15]": 4,
+    "leg3[101]": 4
+   }
+  },
+  {
+   "label": "crest 0.12",
+   "racers": 192,
+   "finish": 0.3594,
+   "all_eight": 0.0,
+   "escape": 0.5833,
+   "stuck": 0.0573,
+   "routes": {
+    "blue": {
+     "share": 0.5156,
+     "completion": 0.3434,
+     "entries": 99
+    },
+    "orange": {
+     "share": 0.4792,
+     "completion": 0.3804,
+     "entries": 92
+    },
+    "unrouted": {
+     "share": 0.0052,
+     "completion": 0.0,
+     "entries": 1
+    }
+   },
+   "loss_sites": {
+    "leg3[92]": 10,
+    "final[10]": 10,
+    "leg3[93]": 8,
+    "orange_lead[9]": 8,
+    "orange_lead[8]": 7,
+    "orange_lead[10]": 7,
+    "leg3[91]": 6,
+    "orange_lead[11]": 5,
+    "leg3[102]": 4,
+    "leg3[89]": 4
+   }
+  },
+  {
+   "label": "crest 0.15",
+   "racers": 192,
+   "finish": 0.4167,
+   "all_eight": 0.0,
+   "escape": 0.5729,
+   "stuck": 0.0104,
+   "routes": {
+    "blue": {
+     "share": 0.7656,
+     "completion": 0.483,
+     "entries": 147
+    },
+    "orange": {
+     "share": 0.2292,
+     "completion": 0.2045,
+     "entries": 44
+    },
+    "unrouted": {
+     "share": 0.0052,
+     "completion": 0.0,
+     "entries": 1
+    }
+   },
+   "loss_sites": {
+    "leg3[92]": 16,
+    "orange_lead[10]": 8,
+    "leg3[95]": 8,
+    "orange_lead[8]": 7,
+    "leg3[96]": 7,
+    "leg3[100]": 6,
+    "leg3[91]": 6,
+    "leg3[99]": 5,
+    "leg3[93]": 5,
+    "orange_lead[17]": 4
+   }
+  },
+  {
+   "label": "crest 0.19",
+   "racers": 192,
+   "finish": 0.7292,
+   "all_eight": 0.0417,
+   "escape": 0.2708,
+   "stuck": 0.0,
+   "routes": {
+    "blue": {
+     "share": 0.9219,
+     "completion": 0.7853,
+     "entries": 177
+    },
+    "orange": {
+     "share": 0.0729,
+     "completion": 0.0714,
+     "entries": 14
+    },
+    "unrouted": {
+     "share": 0.0052,
+     "completion": 0.0,
+     "entries": 1
+    }
+   },
+   "loss_sites": {
+    "leg3[91]": 6,
+    "leg3[101]": 5,
+    "leg3[92]": 4,
+    "leg3[95]": 4,
+    "orange_lead[10]": 4,
+    "orange_lead[17]": 3,
+    "leg3[103]": 3,
+    "orange_lead[15]": 2,
+    "leg3[96]": 2,
+    "leg3[88]": 2
+   }
+  }
+ ]
+}
