@@ -143,6 +143,24 @@ ROUTE_CHOICES = ("blue", "both")
 # span the whole of it.
 MERGE_GUARD_WINDOW = (0.0, -1, 0, 9, 14)
 
+# How much of leg3's east guard stands through the fork window, as a fraction
+# of its full height - the sixth entry of `TrackRun.open_side`.
+#
+# **This is the fork's sorting crest, and it exists because the entry trim made
+# a crest possible.** Before `sloped.joins.fork_trim`, orange's west half hung
+# over leg3's channel with less than a marble of clearance, so nothing crossed
+# on purpose and 36% of the field arrived on orange by being shoved there. With
+# the overhang gone the two channels share one edge and the crossing is free -
+# 74% of the field took it, which is more traffic than the merge apron was
+# built for and blue's own completion fell from 91% to 38%.
+#
+# So the crossing needs a threshold, and the only surface between the two
+# routes is leg3's own east guard standing on the shared edge. At 5% - the bare
+# `OPEN_FLOOR` that exists so a scaled-away wall has no coincident vertices -
+# it is 0.05 simulation units and a marble does not notice it. Scanned against
+# whole races, `docs/validation/sloped_race_v1/v110/fork_lab_crest_height.json`.
+FORK_CREST = 0.05
+
 # --- the start correction -------------------------------------------------
 #
 # V1 put its one stud row on leg1 at the recorded `mix` node and called it the
@@ -405,7 +423,11 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
             # leg3's east guard, with a window in it rather than a ramp; see
             # `sloped.joins.FORK_GUARD_WINDOW` for why it is where it is.
             open_side=(
-                (1.0, *(joins.FORK_SAMPLE + n for n in joins.FORK_GUARD_WINDOW))
+                (
+                    1.0,
+                    *(joins.FORK_SAMPLE + n for n in joins.FORK_GUARD_WINDOW),
+                    FORK_CREST,
+                )
                 if (name == "leg3" and forked)
                 else None
             ),
@@ -463,6 +485,13 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
                 layout.BRANCH_SCALE,
             ),
         )
+
+    # Orange's lead stops overhanging leg3's channel. Solved from the two built
+    # runs and installed after both exist, because the answer is where one
+    # crosses the other; `sloped.joins.fork_trim` has the measurement and the
+    # eight racers a sample it was costing.
+    if forked:
+        runs["orange_lead"].set_entry_trim(joins.fork_trim(runs["leg3"], runs["orange_lead"]))
 
     start = start_module(START_KIND, runs["launch"])
     # Declaration order is the build order and therefore the body numbering, so

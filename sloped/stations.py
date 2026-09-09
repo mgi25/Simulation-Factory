@@ -1148,6 +1148,14 @@ class ForkRidge(MarbleModule):
     MAX_FLANK = 1.8            # crest height per unit of foot; 61 degrees
     HAIRLINE = 0.06            # of a marble diameter, where the channels overlap
     FLANK_POINTS = 5           # per side, plus the crest
+    # A floor under the crest, as a fraction of the run's containment, reached
+    # by the end of the window. Zero by default, so the crest is the gap's own
+    # 1.8:1 flank and nothing else - a crest raised above what its foot can
+    # carry is the spike this class's docstring records as the first failure.
+    # The knob exists because the handover from the entry trim to the ridge is
+    # a place where the gap is real but small; `tools/sloped_fork_lab.py`
+    # scans it.
+    CREST_FLOOR = 0.0
 
     def __init__(
         self,
@@ -1192,7 +1200,8 @@ class ForkRidge(MarbleModule):
                 # across the middle of the channel. Marbles stopped dead on it
                 # at leg3 sample 81, one sample before the fork.
                 continue
-            height = min(containment, self.MAX_FLANK * 0.5 * gap)
+            floor = self.CREST_FLOOR * containment * min(1.0, step / max(self.window, 1))
+            height = min(containment, max(self.MAX_FLANK * 0.5 * gap, floor))
             out.append((west, east, up, height))
         return out
 

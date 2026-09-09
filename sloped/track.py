@@ -83,6 +83,7 @@ __all__ = [
     "TrackRun",
 ]
 
+
 # Points per cradle half, as `v2_track.channel_section` walks it.
 CRADLE_POINTS = 5
 
@@ -112,6 +113,23 @@ def channel_profile(scale: float = 1.0) -> list[tuple[float, float]]:
 
     section = [(-across, up) for across, up in reversed(right[1:])] + right
     return [(across * scale, up * scale) for across, up in section]
+
+
+def _interpolate_rise(section: Sequence[tuple[float, float]], across: float) -> float:
+    """The section's height at one across, by linear interpolation.
+
+    The profile's `across` is non-decreasing from the west guard to the east
+    one - two pairs of points share a value at the guards - so a walk is enough
+    and no sort is needed.
+    """
+    if across <= section[0][0]:
+        return section[0][1]
+    for (a0, u0), (a1, u1) in zip(section, section[1:]):
+        if a0 <= across <= a1:
+            if a1 - a0 < 1e-12:
+                return u1
+            return u0 + (u1 - u0) * (across - a0) / (a1 - a0)
+    return section[-1][1]
 
 
 def frames_for(path, banks, tangents):
@@ -191,8 +209,12 @@ class TrackRun(MarbleModule):
         taper: tuple[float, float] | None = None,
         width_profile: tuple[float, int, int] | None = None,
         guard_boost: tuple[float, int, int, int, int] | None = None,
+        entry_trim: Sequence[float | None] | None = None,
     ) -> None:
         super().__init__(name)
+        # Per-sample section trim in profile units, or None. Usually installed
+        # after construction by `set_entry_trim`; see there.
+        self.entry_trim = None if entry_trim is None else list(entry_trim)
         # (extra, a, b, c, d): the guard rail is authored height before sample
         # `a`, eases up to `authored + extra` by `b`, holds it to `c`, and eases
         # back by `d`. A *window*, the same shape `open_side` uses, because a
@@ -321,24 +343,34 @@ class TrackRun(MarbleModule):
     def wall_factor(self, index: int) -> float:
         """How much of one wall stands at one sample, as a fraction of full.
 
-        One at both ends of the window and `OPEN_FLOOR` through the middle. Not
-        zero, because scaling a wall to nothing puts the guard's two
+        One at both ends of the window and the window's own open fraction
+        through the middle - `OPEN_FLOOR` unless the window carries a sixth
+        entry. Not zero, because scaling a wall to nothing puts the guard's two
         coincident-across points at the same height as well, and a pair of
         coincident vertices is a degenerate triangle the solver takes a
         meaningless normal from. A 5% guard is a 0.04 layout unit lip.
+
+        **The sixth entry is the fork's sorting crest.** With
+        `sloped.joins.fork_trim` in place the two channels share an edge at
+        leg3's east cradle edge, so what stands on that edge is the only thing
+        between the two routes: at 5% it is a threshold a marble does not
+        notice and three quarters of the field crosses, and raising it raises
+        the speed a marble needs to get over. It is the one number the route
+        split is set by, and `sloped.course.FORK_CREST` carries the scan.
         """
         if self.open_side is None:
             return 1.0
-        _side, a, b, c, d = self.open_side
+        _side, a, b, c, d = self.open_side[:5]
+        floor = self.open_side[5] if len(self.open_side) > 5 else self.OPEN_FLOOR
         if index <= a or index >= d:
             return 1.0
         if b <= index <= c:
-            return self.OPEN_FLOOR
+            return floor
         if index < b:
             t = (index - a) / max(b - a, 1)
-            return 1.0 + (self.OPEN_FLOOR - 1.0) * (t * t * (3.0 - 2.0 * t))
+            return 1.0 + (floor - 1.0) * (t * t * (3.0 - 2.0 * t))
         t = (index - c) / max(d - c, 1)
-        return self.OPEN_FLOOR + (1.0 - self.OPEN_FLOOR) * (t * t * (3.0 - 2.0 * t))
+        return floor + (1.0 - floor) * (t * t * (3.0 - 2.0 * t))
 
     def guard_extra(self, index: int) -> float:
         """How much taller the rail is at this sample, in layout units.
@@ -369,13 +401,42 @@ class TrackRun(MarbleModule):
         """
         return self.containment + to_sim(self.guard_extra(index))
 
+    # How far the trimmed-away half is folded down, in layout units, and why
+    # it is folded rather than deleted.
+    #
+    # A section with points removed has fewer points than its neighbours and
+    # `sweep_rings` refuses unequal rings - correctly, because that invariant is
+    # what stops a strip spanning from one end of a piece to the other. So the
+    # trimmed points are all placed *at* the trim and walked down the section's
+    # own `-up`, which at a 26-degree bank points down and **east**, away from
+    # the channel the trim exists to stop overhanging. The result is a short
+    # skirt hanging under the seam: a downward-facing wall a marble cannot rest
+    # on, in the void the fork ridge grows into.
+    TRIM_SKIRT = 0.30
+
+    def entry_trim_at(self, index: int) -> float | None:
+        """Where this sample's section is cut off, in profile units, or None."""
+        if self.entry_trim is None or index >= len(self.entry_trim):
+            return None
+        return self.entry_trim[index]
+
+    def set_entry_trim(self, table: Sequence[float | None] | None) -> None:
+        """Install a per-sample section trim and drop the cached collider.
+
+        Set after construction rather than passed in, because the trim is
+        solved *against another run's* geometry - see `sloped.joins.fork_trim` -
+        and that run has to exist before the answer does.
+        """
+        self.entry_trim = None if table is None else list(table)
+        self._mesh = None
+
     def section_at(self, index: int) -> list[tuple[float, float]]:
-        """The cross-section at one sample, with any opened wall and any local
-        guard boost applied.
+        """The cross-section at one sample, with any opened wall, any local
+        guard boost and any entry trim applied.
 
         Opening a wall scales its points' height toward the cradle's own edge
         rather than deleting them, so the section keeps its point count and the
-        strip builder keeps its invariant.
+        strip builder keeps its invariant. The trim keeps it the same way.
         """
         extra = self.guard_extra(index)
         if extra > 0.0:
@@ -390,10 +451,10 @@ class TrackRun(MarbleModule):
         else:
             section = self.section
         if self.open_side is None:
-            return section
+            return self._trimmed(section, index)
         factor = self.wall_factor(index)
         if factor >= 1.0:
-            return section
+            return self._trimmed(section, index)
         side = self.open_side[0]
         half = layout.CHANNEL_HALF * self.scale
         edge = layout.floor_y_at(layout.CHANNEL_HALF) * self.scale
@@ -415,7 +476,34 @@ class TrackRun(MarbleModule):
                 out.append((across, edge + (up - edge) * factor))
             else:
                 out.append((across, up))
-        return out
+        return self._trimmed(out, index)
+
+    def _trimmed(
+        self, section: list[tuple[float, float]], index: int
+    ) -> list[tuple[float, float]]:
+        """`section` with everything west of this sample's trim folded away.
+
+        The point count is preserved; see `TRIM_SKIRT`.
+        """
+        trim = self.entry_trim_at(index)
+        if trim is None:
+            return section
+        cut = trim * self.scale
+        count = sum(1 for across, _up in section if across < cut)
+        if not 0 < count < len(section):
+            return section
+        seam = _interpolate_rise(section, cut)
+        skirt = self.TRIM_SKIRT * self.scale
+        # `count - step` rather than `count - 1 - step`: the shallowest folded
+        # point stays one step *below* the seam rather than on it. At a trim of
+        # exactly zero - which is the mouth, where orange's cradle bottom sits
+        # on leg3's east cradle edge - a point on the seam is the section's own
+        # centreline point twice over, and `check_mesh` reports the zero-area
+        # triangle between them rather than the solver quietly taking a
+        # meaningless normal from it.
+        return [
+            (cut, seam - skirt * (count - step) / count) for step in range(count)
+        ] + section[count:]
 
     def local_colliders(self) -> list[TriMesh]:
         if self._mesh is None:

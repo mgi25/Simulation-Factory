@@ -141,6 +141,8 @@ __all__ = [
     "FORK_GUARD_WINDOW",
     "LEAD_MOUTH_FLARE",
     "FORK_WINDOW_ORANGE",
+    "FORK_TRIM_WINDOW",
+    "fork_trim",
     "blue_controls",
     "LEAD_TENSION",
     "MU_TRACK",
@@ -265,6 +267,91 @@ ORANGE_MOUTH_ACROSS = 0.94
 # `sloped.course.check` asserts the built geometry still parts inside the hold,
 # so a change to the path law cannot leave this behind.
 ORANGE_LEAD_HOLD = 0.40
+
+
+# How many of orange's own samples the entry trim is solved over. Past this the
+# two channels have long parted and the trim has released of its own accord;
+# the bound only stops the solve walking the whole lead.
+FORK_TRIM_WINDOW = 24
+
+
+def _horizontal_side(forward) -> tuple[float, float, float]:
+    """A run's side axis with the roll taken out, so `across` is horizontal."""
+    side = (forward[2], 0.0, -forward[0])
+    length = math.hypot(side[0], side[2])
+    return (side[0] / length, 0.0, side[2] / length) if length > 1e-9 else (1.0, 0.0, 0.0)
+
+
+def fork_trim(leg3, orange_lead) -> list[float | None]:
+    """Where orange's section has to be cut off so it stops overhanging leg3.
+
+    ## The defect this exists for, measured
+
+    Orange's mouth puts its **cradle bottom** on leg3's east cradle edge, and a
+    channel is 1.65 simulation units wide either side of its cradle bottom. So
+    orange's whole west half - a marble and a half of cradle, and its opened
+    west lip - stood over the east half of leg3's channel. In a vertical section
+    through the assembled colliders, with the roll taken out so it is the shape
+    gravity sees:
+
+        step past fork   orange's west edge   clearance over leg3's floor
+                     1              -0.250                         0.894
+                     2              -0.175                         0.917
+                     4              +0.125                         0.868
+                     6              +0.625                         0.682
+                     8              +1.425                         0.245
+
+    A marble is **1.000** across. Every one of those clearances is under it, so
+    the west edge was not a ledge a marble could pass under, and not a wall it
+    could climb: it was a free edge hanging at the height of a marble's own
+    equator, across the half of leg3's channel the hairpin throws the field
+    into. Over 12 seeds `leg3[84]` lost 8 racers of 96 - reach +1.31 to +1.40
+    east with the vertical speed negative in every one - and `orange_lead[3..13]`
+    lost 30 more the other way, thrown back west at 7 to 11 units per second off
+    a flank with no wall on it, because the ridge does not begin until the two
+    cradle edges part at step 8.
+
+    ## What the trim is
+
+    Per orange sample, the profile coordinate at which orange's own surface
+    crosses **leg3's east cradle edge**. Everything west of it - the part that
+    was overhanging - is folded away by `TrackRun._trimmed`, and leg3's own east
+    bank is the surface there instead. The two runs then share one edge and the
+    combined section is continuous from leg3's west guard to orange's east
+    guard, with no free edge anywhere between them.
+
+    Solved from the built runs rather than tabulated, so a change to the path
+    law, the bank law or the mouth moves it. And it releases itself: once
+    orange's own west cradle edge is east of leg3's, nothing overhangs, the
+    entry is None from there on, and that is the same sample `ForkRidge` starts
+    filling the gap at.
+    """
+    table: list[float | None] = []
+    half = layout.CHANNEL_HALF
+    for step in range(min(FORK_TRIM_WINDOW, len(orange_lead.sim_path))):
+        here = min(FORK_SAMPLE + step, len(leg3.sim_path) - 1)
+        centre = leg3.sim_path[here]
+        side = _horizontal_side(leg3.tangents[here])
+
+        def across_of(point, centre=centre, side=side) -> float:
+            return sum((point[axis] - centre[axis]) * side[axis] for axis in range(3))
+
+        edge = across_of(leg3.surface_point(here, half))
+        if across_of(orange_lead.surface_point(step, -half)) >= edge:
+            table.append(None)
+            continue
+        if across_of(orange_lead.surface_point(step, 0.0)) < edge:
+            table.append(0.0)
+            continue
+        low, high = -half, 0.0
+        for _ in range(40):
+            middle = 0.5 * (low + high)
+            if across_of(orange_lead.surface_point(step, middle)) < edge:
+                low = middle
+            else:
+                high = middle
+        table.append(0.5 * (low + high))
+    return table
 
 
 def min_radius_layout(speed: float, bank_deg: float, mu: float = MU_TRACK) -> float:
