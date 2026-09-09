@@ -55,7 +55,15 @@ from marble3d.units import MARBLE_DIAMETER, MARBLE_RADIUS
 
 from sloped import layout
 from sloped.scale import LAYOUT_TO_SIM, to_sim, to_sim_point
-from sloped.solids import box_shell, height_field, merge_meshes, plate, tube, wall_strip
+from sloped.solids import (
+    box_shell,
+    flank_field,
+    height_field,
+    merge_meshes,
+    plate,
+    tube,
+    wall_strip,
+)
 from sloped.track import TrackRun
 
 __all__ = [
@@ -1287,98 +1295,160 @@ def _unit(v) -> tuple[float, float, float]:
 
 
 class MergeCatch(MarbleModule):
-    """A roofed funnel apron at the head of the sprint, and the wall in its back.
+    """The shoulder around the junction channel, and the wall in its back.
+
+    ## What this is, and what it stopped being
 
     The two branches arrive 147 degrees apart with the sprint leaving between
     them, and `docs/sloped_race_v1_junction_finding.md` records the arithmetic
-    that says no channel joins them. So the merge is not a channel. It is a
-    place where two streams arrive, lose the part of their momentum that is not
-    along the sprint, and leave down it.
+    that says no channel joins them. That is still true of **orange**. It was
+    never true of blue: blue arrives 7.5 degrees off the sprint's own heading,
+    0.26 simulation units off its centreline and 1.9 behind its entry, and
+    `sloped.joins.merge_lead_path` joins those two poses with a channel.
 
-    Read in the sprint's own frame at its entry - `along` down the sprint,
-    `across` to its side, both in simulation units - the three things that meet
-    here are:
+    So this is no longer a pan that carries blue across the junction. It is the
+    **shoulder** outside whatever channel is beneath it - blue's tail, then the
+    merge lead, then the sprint - plus a roof, two outer walls and the back
+    wall that turns orange.
 
-        blue's mouth    at (-2.01, -0.25)   travelling (+0.99, +0.13)
-        orange's mouth  at (+1.49, +1.37)   travelling (-0.76, -0.65)
-        the sprint      from ( 0.00,  0.00) travelling (+1.00,  0.00)
+    ## Why a shoulder and not a height field, measured
 
-    Blue is the sprint's own upstream continuation, near enough: two units
-    behind the start, a quarter of a unit off the centreline, pointing down it.
-    Its marbles cross the apron and leave. Orange arrives *ahead* of the
-    sprint's start, off to one side, travelling back up it at 40 wu/s, and
-    nothing gentle will turn it: on the sprint's own 13.6-degree gradient it
-    would run 19.5 units upstream before gravity stopped it, and the whole
-    station is seven units long. It has to meet a wall.
+    The apron used to be a `height_field` over a rectangle spanning the whole
+    station, with the cradle formula laid across it, and it therefore owned the
+    floor wherever its own surface came out higher than the channel's. Along
+    blue's **west running edge** - which no audit had walked, because every
+    audit walked the centreline - it did:
 
-    ## Where the wall can be, and where it cannot
+        station     floor owner   grade along the line
+        blue[112]   blue                     -4.8%
+        blue[113]   merge apron             +26.0%    a 0.132 step up
+        blue[114]   merge apron              -4.9%
 
-    The first version put a plain wall across the apron's back at -4.04. That
-    is 2.03 units *upstream* of blue's mouth, and blue's channel runs through
-    it - so the wall caught blue instead of orange, and 23 of 48 marbles came
-    to a stop against it at blue samples 100 to 119.
+    Three things put it there, and the two chord corrections that preceded this
+    rebuild addressed none of them:
 
-    The wall has to be at an `along` where orange's own line has already
-    carried it clear of blue's channel. Orange crosses `along` at 0.76 units
-    per unit of path and drifts across at 0.65, so at the back wall's `along`
-    of -2.60 it is at across -2.13, while blue's channel there spans -1.80 to
-    +1.14. So the wall stands from the apron's edge in to -1.80, and again from
-    +1.14 out - a back wall with blue's channel cut out of it - and the margin
-    is 0.33 units, a third of a marble diameter.
+    * the apron's cradle was centred on the **sprint's** centreline while
+      blue's is 0.26 to 0.52 units off it and yawed 7.5 degrees, so the two
+      valleys did not line up;
+    * its cradle-to-shoulder changeover was at `CHANNEL_HALF * scale`, 1.649
+      units, while the sprint's own cradle edge is at 1.880 - because
+      `widths[0]` flares it to 1.140, and the apron did not read `widths` at
+      all. The shoulder's quadratic rise therefore began 0.23 units **inside**
+      the running surface;
+    * past blue's mouth it extrapolated blue's gradient as a straight line
+      while blue's channel was still turning.
 
-    That margin is thin and it is honest: an orange marble arriving wide will
-    pass through blue's opening instead, run up blue's channel and come back
-    down. It costs that marble time and it costs it no height, and how often it
-    happens is in `docs/sloped_race_v1.md` with everything else.
+    `flank_field` removes the whole class: the shoulder's inner edge **is** the
+    channel's own clear edge, read off the run through `widths`, so the two are
+    flush by construction and no part of the station stands over a running
+    surface.
+
+    ## Why the front is closed, and what was coming through it
+
+    The apron's floor used to span `across` +/-4.035 out to its front edge and
+    then simply **stop**, with side walls but no front wall and no floor
+    beyond. So every marble riding the shoulder outside the sprint's channel
+    ran off the lip. In apron-frame terms the lip was at `along` +2.982, which
+    is the sprint's sample 9.15 - and `final[9..11]` is the site V1.10 found
+    losing 14 of 128 in **six of seven** fork configurations, immovable by
+    every fork knob it scanned, because it is not a fork defect.
+
+    Two changes close it. The outer rim now eases in to the channel's own edge
+    between `TAPER_FROM` and `FRONT`, so the shoulder converges into the
+    channel instead of ending in mid-air; and `FRONT` is placed where the
+    sprint's own rails are back to full height rather than five samples before
+    it. `sloped.course.MERGE_GUARD_WINDOW` closes at `final[14]`, whose `along`
+    is 4.563 simulation units, so `FRONT` is 2.60 layout units and the handover
+    from the apron's wall to the sprint's rail happens at one station.
+
+    ## The back wall, and the one margin the geometry has
+
+    Orange arrives *ahead* of the sprint's start, off to one side, travelling
+    back up it at 40 wu/s: on the sprint's own 13.7-degree gradient it would
+    run 19.5 units upstream before gravity stopped it, and the whole station is
+    seven long. It has to meet a wall.
+
+    Orange crosses `along` at 0.749 per unit of path and drifts `across` at
+    0.662, so its line is `across = 1.381 + 0.884 * (along - 1.531)`. That line
+    passes through `(0, +0.028)` - **the sprint's entry point, on its
+    centreline** - so there is no station at which orange is outside the
+    sprint's channel and still upstream of it. A transverse wall with a
+    channel-shaped opening in it cannot sort the two streams anywhere in front
+    of the entry, and that is a property of the two pinned centrelines rather
+    than of any wall.
+
+    What makes the wall possible at all is that **blue's channel is narrower
+    than the sprint's**: 1.474 against 1.880. Upstream of blue's mouth the
+    opening only has to be blue's width, and orange's line has drifted further
+    across. At `WALL_AT` = -1.48 layout - -2.596 simulation units, 0.70 behind
+    blue's mouth - orange is at across -2.13 while blue's channel there spans
+    -1.80 to +1.14. So the wall stands from the apron's rim in to -1.80, and
+    again from +1.14 out, and the margin is **0.33 units, a third of a marble
+    diameter**. That is the whole clearance available, it is measured rather
+    than chosen, and an orange marble arriving wide passes through blue's
+    opening instead, runs up the channel and comes back down. It costs that
+    marble time and no height.
+
+    The opening is derived from whichever channel is at the wall's own station,
+    through `_channel_at`, so it is blue's while `WALL_AT` is behind blue's
+    mouth and would become the merge lead's if it moved.
 
     ## What the wall does to orange
 
     Its normal is the sprint's own direction, so it takes out the component of
     orange's velocity that is fighting the sprint and leaves the across
-    component: 40 wu/s in becomes about 27 across the apron, and the far side
-    wall takes that out in turn and leaves about 10 down the sprint. Two
+    component: 40 wu/s in becomes about 27 across the shoulder, and the far
+    side wall takes that out in turn and leaves about 10 down the sprint. Two
     contacts at 0.25 restitution, which is the track figure, and no marble is
     pushed by anything but geometry.
 
-    ## The apron and the roof
+    ## The roof
 
-    Across the channel the apron *is* the channel: inside the sprint's clear
-    half width the surface is the sprint's own cradle arc, so the two are one
-    surface rather than a pan with a gutter standing out of it, and outside it
-    keeps rising as a shallow quadratic to the apron's edge.
+    A marble at 40 wu/s carries 3.4 units of climb, so an open wall would have
+    to be taller than the station's whole recorded clearance to hold it and a
+    marble would ride up and over instead. A roof one and two-thirds diameters
+    above the floor holds it in with geometry rather than with height.
 
-    Along the sprint it adds **nothing**, and getting that wrong is what cost
-    the second attempt. The apron is laid out in the sprint's own frame, whose
-    forward axis already descends at 13.7 degrees, so a floor function that
-    also subtracts the gradient applies it twice: measured, the apron came out
-    0.74 simulation units - three quarters of a marble diameter - *above* blue's
-    channel floor two units back, and every marble on the blue route stopped
-    dead against that step. Twenty-three of forty-eight, at blue samples 100 to
-    119, in a run where the apron was otherwise correct.
-
-    Behind the sprint's entry it interpolates, in the frame, between the
-    sprint's own contact point at zero and blue's exit contact point at its own
-    `along` - so the apron is flush with the sprint at one end and flush with
-    blue at the other by construction rather than by a gradient that has to be
-    the right one. Beyond blue's mouth it continues on the same line.
-
-    The roof is what makes the wall safe. A marble at 40 wu/s carries 3.4 units
-    of climb, so an open wall would have to be taller than the station's whole
-    recorded clearance to hold it and a marble would ride up and over instead.
-    A roof one diameter above the apron holds it in with geometry rather than
-    with height.
+    The roof is also why every rail under the station is opened - blue's last
+    samples, the merge lead's, and the sprint's over
+    `sloped.course.MERGE_GUARD_WINDOW`. A rail standing inside a roofed apron
+    leaves a ledge along its own top: measured, an orange marble stopped on the
+    sprint's east rail at apron-frame across +2.337, its centre 0.43 units
+    above the floor beneath it and 0.74 below the roof, at 0.52 wu/s. V1 lost
+    319 of its 747 marbles there, every one booked to `blue[100]`.
     """
 
     BACK = -2.30               # layout units along, behind the sprint's entry
     WALL_AT = -1.48            # where the back wall stands, in layout units
-    FRONT = 1.70
+    # `final[14]`'s own station, where `MERGE_GUARD_WINDOW` puts the sprint's
+    # rails back at full height. The apron used to end at 1.70, five samples
+    # short of it, which left a stretch with neither an apron wall nor a rail.
+    FRONT = 2.60
+    # Where the outer rim starts easing in to the channel's edge, so the
+    # shoulder converges into the channel rather than ending in a free lip.
+    TAPER_FROM = 1.20
     ACROSS = 2.30
-    ROOF = 0.95                # above the sprint's centreline
-    FUNNEL = 0.16              # lateral V depth at the apron's edge
+    ROOF = 0.95                # above the local channel's own contact point
+    FUNNEL = 0.16              # how far the rim stands above the channel's edge
+    # The rim never quite reaches the channel's edge, and that is a mesh
+    # requirement rather than a physical one: a row whose inner and outer
+    # coincide is a ring of identical points, and `check_mesh` reports the
+    # zero-area triangles between it and its neighbour rather than letting the
+    # solver take a meaningless normal from them. A quarter of a diameter
+    # leaves a sliver that no marble can enter - a marble is four times as
+    # wide - and by `FRONT` the sprint's own rail is at full height inside it.
+    RIM_MIN = 0.5 * MARBLE_RADIUS
 
-    def __init__(self, module_id: str, sprint: TrackRun, blue: TrackRun | None = None) -> None:
+    def __init__(
+        self,
+        module_id: str,
+        sprint: TrackRun,
+        lead: TrackRun | None = None,
+        blue: TrackRun | None = None,
+    ) -> None:
         super().__init__(module_id)
         self.sprint = sprint
+        self.lead = lead
         self.blue = blue
         self.lateral, self.up, self.forward = sprint.frames[0]
         self.origin = sprint.surface_point(0, 0.0)
@@ -1389,150 +1459,228 @@ class MergeCatch(MarbleModule):
                 (sprint.sim_path[0][0], 0.0, sprint.sim_path[0][2]),
             ),
         )
+        self._stations = self._build_stations()
         self._mesh: TriMesh | None = None
 
-    # --- blue's opening in the back wall --------------------------------
+    # --- the channel under the station ----------------------------------
 
-    def _local(self, point) -> tuple[float, float]:
+    def _local(self, point) -> tuple[float, float, float]:
+        """A world point as (along, across, rise) in the sprint's entry frame."""
         offset = [point[axis] - self.origin[axis] for axis in range(3)]
         return (
             sum(offset[axis] * self.forward[axis] for axis in range(3)),
             sum(offset[axis] * self.lateral[axis] for axis in range(3)),
+            sum(offset[axis] * self.up[axis] for axis in range(3)),
         )
 
-    def blue_opening(self) -> tuple[float, float]:
-        """The across span the back wall leaves open for blue's channel.
+    def _build_stations(self) -> list[tuple[float, float, float, float, float]]:
+        """The junction channel as `(along, across, rise, half, edge)` rows.
 
-        Derived from blue's own exit pose and width rather than typed, so a
-        change to blue's lobe moves the opening with it. Falls back to a
-        symmetric gap if the merge is built without blue, which is what the
-        station tests do.
+        One row per sample of blue's tail, the merge lead and the sprint's head,
+        in flow order, taken from each run's own `surface_point` so the width
+        factor and the profile scale are the ones the collider was swept with.
+        `half` is the clear half width at that sample and `edge` is how far the
+        cradle rises over its own contact point at that half width - the two
+        numbers the shoulder's inner edge is made of.
+
+        Built once, in the constructor, because `local_colliders`,
+        `local_probes` and `describe` all read it and a re-solve per query would
+        be the same answer three times.
+
+        Falls back to the sprint alone when the station is built without the
+        upstream runs, which is what the station tests do.
         """
-        wall = to_sim(self.WALL_AT)
-        if self.blue is None:
-            return (-1.8, 1.14)
-        last = len(self.blue.sim_path) - 1
-        along, across = self._local(self.blue.surface_point(last, 0.0))
-        nose_along, nose_across = self._local(self.blue.surface_point(last - 4, 0.0))
-        run = along - nose_along
-        drift = (across - nose_across) / run if abs(run) > 1e-6 else 0.0
-        centre = across + drift * (wall - along)
-        half = 0.5 * self.blue.clear_width * self.blue.widths[last]
-        return (centre - half, centre + half)
+        rows: list[tuple[float, float, float, float, float]] = []
+        back, front = to_sim(self.BACK), to_sim(self.FRONT)
+        reach = back - 2.0 * MARBLE_DIAMETER
+        for run in (self.blue, self.lead, self.sprint):
+            if run is None:
+                continue
+            for index in range(len(run.sim_path)):
+                along, across, rise = self._local(run.surface_point(index, 0.0))
+                if along < reach or along > front + 2.0 * MARBLE_DIAMETER:
+                    continue
+                half = 0.5 * run.clear_width * run.widths[index]
+                edge = to_sim(
+                    (layout.floor_y_at(layout.CHANNEL_HALF) - layout.FLOOR_Y) * run.scale
+                )
+                rows.append((along, across, rise, half, edge))
+        rows.sort(key=lambda row: row[0])
+        # Two runs share a station at every seam - blue's last sample and the
+        # lead's first are the same `along` - and an interpolation over a
+        # zero-width span is a division by nothing. The downstream row wins,
+        # which is the wider channel at both seams and therefore the safe one.
+        out: list[tuple[float, float, float, float, float]] = []
+        for row in rows:
+            if out and row[0] - out[-1][0] < 1e-6:
+                out[-1] = row
+            else:
+                out.append(row)
+        return out
 
-    def _blue_frame_pose(self) -> tuple[float, float]:
-        """Blue's exit contact point as (along, rise) in the apron's frame."""
-        if self.blue is None:
-            return (-2.009, 0.0)
-        last = len(self.blue.sim_path) - 1
-        point = self.blue.surface_point(last, 0.0)
-        offset = [point[axis] - self.origin[axis] for axis in range(3)]
-        along = sum(offset[axis] * self.forward[axis] for axis in range(3))
-        rise = sum(offset[axis] * self.up[axis] for axis in range(3))
-        return (along, rise)
+    def _channel_at(self, along: float) -> tuple[float, float, float, float]:
+        """`(across, rise, half, edge)` of the channel at one station.
 
-    def _blue_frame_slope(self, span: int = 4) -> float:
-        """Blue's own fall per unit of `along`, at its exit, in the apron frame.
-
-        Measured off blue's last samples rather than taken from the chord to
-        the sprint, and measured over `span` of them rather than one, because a
-        single sample of a 118-point run is half a marble diameter and the rise
-        across it is within the rounding of the control points. Falls back to
-        the chord if the merge is built without blue, which is what the station
-        tests do.
+        Linear between the samples either side, clamped at both ends. The
+        clamp is why `_build_stations` reaches two diameters past each end of
+        the apron: a shoulder generated over a station with no channel under it
+        would take the nearest one's width, and at the back edge that is blue's
+        tail rather than nothing.
         """
-        if self.blue is None:
-            return 0.1594
-        last = len(self.blue.sim_path) - 1
-        near_along, near_rise = self._blue_frame_pose()
-        back = self.blue.surface_point(max(0, last - span), 0.0)
-        offset = [back[axis] - self.origin[axis] for axis in range(3)]
-        far_along = sum(offset[axis] * self.forward[axis] for axis in range(3))
-        far_rise = sum(offset[axis] * self.up[axis] for axis in range(3))
-        run = near_along - far_along
-        if abs(run) < 1e-6:
-            return 0.1594
-        return (near_rise - far_rise) / run
+        rows = self._stations
+        if not rows:
+            half = 0.5 * self.sprint.clear_width * self.sprint.widths[0]
+            edge = to_sim(
+                (layout.floor_y_at(layout.CHANNEL_HALF) - layout.FLOOR_Y) * self.sprint.scale
+            )
+            return (0.0, 0.0, half, edge)
+        if along <= rows[0][0]:
+            _a, across, rise, half, edge = rows[0]
+            return (across, rise, half, edge)
+        if along >= rows[-1][0]:
+            _a, across, rise, half, edge = rows[-1]
+            return (across, rise, half, edge)
+        for lower, upper in zip(rows, rows[1:]):
+            if lower[0] <= along <= upper[0]:
+                t = (along - lower[0]) / (upper[0] - lower[0])
+                return tuple(
+                    lower[axis] + (upper[axis] - lower[axis]) * t for axis in range(1, 5)
+                )  # type: ignore[return-value]
+        _a, across, rise, half, edge = rows[-1]
+        return (across, rise, half, edge)
+
+    # --- the shoulder ---------------------------------------------------
+
+    def rim(self, along: float) -> float:
+        """How far out the shoulder reaches at one station, in simulation units.
+
+        `ACROSS` until `TAPER_FROM`, then eased in to the channel's own edge by
+        `FRONT` with the same smoothstep the guard windows use. A shoulder that
+        keeps its full reach to the front edge is the open lip `final[9..11]`
+        was; one that converges into the channel hands its marbles over.
+        """
+        _across, _rise, half, _edge = self._channel_at(along)
+        wide = to_sim(self.ACROSS)
+        start, stop = to_sim(self.TAPER_FROM), to_sim(self.FRONT)
+        if along <= start:
+            return max(wide, half)
+        if along >= stop:
+            return half + self.RIM_MIN
+        t = (along - start) / max(stop - start, 1e-6)
+        ease = t * t * (3.0 - 2.0 * t)
+        shut = half + self.RIM_MIN
+        return max(wide, shut) + (shut - max(wide, shut)) * ease
+
+    def _bounds(self, side: float):
+        """`bounds(along)` for one side of the shoulder, for `flank_field`."""
+
+        def at(along: float) -> tuple[float, float]:
+            across, _rise, half, _edge = self._channel_at(along)
+            return (across + side * half, across + side * self.rim(along))
+
+        return at
 
     def _floor(self, along: float, across: float) -> float:
-        # Nothing along the sprint: the frame's forward axis carries the
-        # gradient already. Upstream, the line that joins the sprint's contact
-        # point to blue's.
-        if along >= 0.0:
-            fall = 0.0
-        else:
-            blue_along, blue_rise = self._blue_frame_pose()
-            chord = blue_rise / blue_along if abs(blue_along) > 1e-6 else 0.0
-            if along >= blue_along:
-                fall = along * chord
-            else:
-                # **Past blue's mouth the apron follows blue, not the chord.**
-                #
-                # It used to continue on the same line, and that line is the
-                # one joining the sprint's contact point to blue's - a chord,
-                # falling at 0.159 per unit of `along`, while blue's own
-                # channel there falls at 0.200. Extended 2.1 units upstream to
-                # the apron's back edge the two part company, and the apron -
-                # a height field spanning the full width - becomes a shelf
-                # across blue's channel:
-                #
-                #     blue sample | apron - blue floor
-                #             117 |  +0.009   (blue's mouth)
-                #             115 |  +0.060
-                #             113 |  +0.114   (the apron's back edge)
-                #
-                # A marble needs 7.5 wu/s to climb 0.114, so the fast ones
-                # never noticed and the slow ones stopped dead against it.
-                # That is `blue[100..119]`: 285 of V1.1's 384 losses, six of
-                # them coming to rest at the same point to two decimals -
-                # deterministic, because a step is deterministic.
-                #
-                # Following blue's own gradient instead keeps the apron flush
-                # with the channel everywhere the two overlap, which is what
-                # the chord already does between blue's mouth and the sprint.
-                fall = blue_rise + (along - blue_along) * self._blue_frame_slope()
-        half = layout.CHANNEL_HALF * self.sprint.scale
-        edge = self.ACROSS
-        across_layout = abs(across) / LAYOUT_TO_SIM
-        if across_layout <= half:
-            rise = layout.floor_y_at(across_layout / self.sprint.scale) * self.sprint.scale
-            rise -= layout.FLOOR_Y * self.sprint.scale
-        else:
-            lip = layout.floor_y_at(half / self.sprint.scale) * self.sprint.scale
-            lip -= layout.FLOOR_Y * self.sprint.scale
-            span = (across_layout - half) / max(edge - half, 1e-6)
-            rise = lip + self.FUNNEL * span * span
-        return fall + to_sim(rise)
+        """The station's surface at one point, as a rise in the apron's frame.
+
+        Inside the channel it **is** the channel's surface, so a caller that
+        generates the shoulder from `_bounds` never evaluates it there and the
+        two can never disagree. Outside, the channel's own cradle edge plus a
+        quadratic to the rim, so the shoulder leans a marble back toward the
+        channel rather than away from it.
+        """
+        centre, rise, half, edge = self._channel_at(along)
+        offset = abs(across - centre)
+        if offset <= half:
+            # The channel's own arc, read in *profile* coordinates so the width
+            # factor stretches it exactly as `ring_points` does. Reading it in
+            # physical units instead is what put the shoulder's rise 0.083
+            # units above the sprint's floor at a lateral fraction of 0.85.
+            scale = half / max(to_sim(layout.CHANNEL_HALF), 1e-9)
+            profile = (offset / max(scale, 1e-9)) / LAYOUT_TO_SIM
+            return rise + to_sim(layout.floor_y_at(profile) - layout.FLOOR_Y)
+        span = max(self.rim(along) - half, 1e-6)
+        over = min(1.0, (offset - half) / span)
+        return rise + edge + to_sim(self.FUNNEL) * over * over
+
+    def blue_opening(self) -> tuple[float, float]:
+        """The across span the back wall leaves open for the channel under it.
+
+        Derived from whichever run `_channel_at` finds at `WALL_AT` - blue's
+        tail, while the wall stands behind blue's mouth - so a change to blue's
+        lobe or to the wall's station moves the opening with it.
+
+        **Sized to the channel's clear width and not to a marble past it**, and
+        that is the trade rather than an oversight: widening it by a radius
+        either side would let orange's line through, because the whole margin
+        the geometry has is 0.33 units. A blue marble riding its own west edge
+        passes within 0.02 of the wall's end, so the ends are chamfered rather
+        than square - see `_wall_top`.
+        """
+        wall = to_sim(self.WALL_AT)
+        across, _rise, half, _edge = self._channel_at(wall)
+        return (across - half, across + half)
+
+    # --- geometry -------------------------------------------------------
 
     def local_colliders(self) -> list[TriMesh]:
         if self._mesh is not None:
             return [self._mesh]
         back, front = to_sim(self.BACK), to_sim(self.FRONT)
-        edge = to_sim(self.ACROSS)
         roof = to_sim(self.ROOF)
         wall = to_sim(self.WALL_AT)
         low, high = self.blue_opening()
         pieces = [
-            height_field(
-                self.origin, self.forward, self.lateral,
-                (back, front), (-edge, edge), self.up, self._floor,
-                steps=(10, 10), name=f"{self.id}_apron",
+            flank_field(
+                self.origin, self.forward, self.lateral, (back, front),
+                self._bounds(-1.0), self.up, self._floor,
+                steps=(14, 6), name=f"{self.id}_west_flank",
             ),
-            height_field(
-                self.origin, self.forward, self.lateral,
-                (back, front), (-edge, edge), self.up,
+            flank_field(
+                self.origin, self.forward, self.lateral, (back, front),
+                self._bounds(+1.0), self.up, self._floor,
+                steps=(14, 6), name=f"{self.id}_east_flank",
+            ),
+            # The roof spans the channel as well as the shoulders, because what
+            # it holds down is a marble crossing the channel at 40 wu/s.
+            flank_field(
+                self.origin, self.forward, self.lateral, (back, front),
+                lambda a: (
+                    self._channel_at(a)[0] - self.rim(a),
+                    self._channel_at(a)[0] + self.rim(a),
+                ),
+                self.up,
                 lambda a, c: self._floor(a, c) + roof,
-                steps=(8, 8), name=f"{self.id}_roof",
+                steps=(12, 10), name=f"{self.id}_roof",
             ),
         ]
+        rim_back, rim_front = self.rim(back), self.rim(front)
+        centre_back = self._channel_at(back)[0]
+        centre_front = self._channel_at(front)[0]
         walls = [
-            ("back_left", [(wall, -edge), (wall, max(-edge, low))]),
-            ("back_right", [(wall, min(edge, high)), (wall, edge)]),
-            ("left", [(back, edge), (front, edge)]),
-            ("right", [(back, -edge), (front, -edge)]),
+            ("back_left", [(wall, centre_back - rim_back), (wall, low)]),
+            ("back_right", [(wall, high), (wall, centre_back + rim_back)]),
+            (
+                "left",
+                [
+                    (back, centre_back + rim_back),
+                    (to_sim(self.TAPER_FROM), self._channel_at(to_sim(self.TAPER_FROM))[0]
+                     + self.rim(to_sim(self.TAPER_FROM))),
+                    (front, centre_front + rim_front),
+                ],
+            ),
+            (
+                "right",
+                [
+                    (back, centre_back - rim_back),
+                    (to_sim(self.TAPER_FROM), self._channel_at(to_sim(self.TAPER_FROM))[0]
+                     - self.rim(to_sim(self.TAPER_FROM))),
+                    (front, centre_front - rim_front),
+                ],
+            ),
         ]
         for label, stations in walls:
-            if abs(stations[0][1] - stations[1][1]) < 1e-6:
+            if max(abs(a[1] - b[1]) for a, b in zip(stations, stations[1:])) < 1e-6:
                 continue
             pieces.append(
                 wall_strip(
@@ -1555,14 +1703,23 @@ class MergeCatch(MarbleModule):
         )
 
     def local_probes(self) -> list[Probe]:
+        """Rays at the shoulder, fired where the shoulder actually is.
+
+        Outside the channel by construction: a probe aimed inside it would be
+        answered by the run's own collider, which is the correct surface there
+        and would read as the apron being missing.
+        """
         probes: list[Probe] = []
         reach = 3.0 * MARBLE_RADIUS
         back, front = to_sim(self.BACK), to_sim(self.FRONT)
-        edge = to_sim(self.ACROSS)
         for step in range(5):
             along = back + (front - back) * step / 4
-            for fraction in (-0.7, 0.0, 0.7):
-                across = fraction * edge
+            centre, _rise, half, _edge = self._channel_at(along)
+            rim = self.rim(along)
+            if rim - half < 0.25 * MARBLE_DIAMETER:
+                continue
+            for side in (-1.0, 1.0):
+                across = centre + side * (half + 0.5 * (rim - half))
                 rise = self._floor(along, across)
                 surface = tuple(
                     self.origin[axis]
@@ -1578,27 +1735,30 @@ class MergeCatch(MarbleModule):
                         expect_hit=True,
                         expected_point=surface,
                         tolerance=0.04,
-                        label=f"{self.id}.apron[{step}]@{fraction:+.1f}",
+                        label=f"{self.id}.flank[{step}]@{side:+.0f}",
                     )
                 )
         return probes
 
     def describe(self) -> dict[str, Any]:
         low, high = self.blue_opening()
+        wall = to_sim(self.WALL_AT)
         return {
             "kind": "MergeCatch",
             "on": self.sprint.id,
+            "lead": None if self.lead is None else self.lead.id,
+            "upstream": None if self.blue is None else self.blue.id,
             "along": [round(to_sim(self.BACK), 6), round(to_sim(self.FRONT), 6)],
+            "taper_from": round(to_sim(self.TAPER_FROM), 6),
             "across": round(to_sim(self.ACROSS), 6),
             "roof": round(to_sim(self.ROOF), 6),
-            "wall_at": round(to_sim(self.WALL_AT), 6),
+            "wall_at": round(wall, 6),
             "blue_opening": [round(low, 4), round(high, 4)],
-            "blue_frame_pose": [round(v, 4) for v in self._blue_frame_pose()],
+            "wall_channel": [round(v, 4) for v in self._channel_at(wall)],
+            "rim_at_front": round(self.rim(to_sim(self.FRONT)), 4),
+            "stations": len(self._stations),
             "entry_slope_deg": round(math.degrees(self.slope), 4),
         }
-
-
-# --- FINISH ---------------------------------------------------------------
 
 
 class FinishDeck(MarbleModule):

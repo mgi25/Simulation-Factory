@@ -30,13 +30,39 @@ of the same shape - see `docs/sloped_race_v112_merge.md`.
 
 * **floor** - the highest surface at or below the nominal running point, and
   its owner. `None` is a hole: nothing under a marble that is nominally on the
-  course.
+  course - **and a hole is only a hole if a marble fits in it.** Where three
+  meshes meet, a single ray can pass between them: at `merge_lead[11]`'s east
+  edge the lead's last ring, the sprint's first and the apron's shoulder all
+  arrive within 0.002 units, one ray missed, and every neighbour 0.1 out had
+  floor within 0.06 of the nominal height. A marble is 1.0 across, so a crack
+  0.2 wide is a tessellation seam and not a loss site. A miss is therefore
+  re-probed on a ring of `HOLE_REACH` and only reported when the whole
+  neighbourhood is empty.
+
+  **Probed a whisker downstream of the station, not on it.** A swept run's
+  first and last rings are the boundary of its mesh, so a vertical ray at the
+  exact (x, z) of a ring point meets that mesh in a single vertex - a
+  measure-zero hit a barycentric test may take or leave. Walked on the stations
+  themselves, `merge_lead[0]` and `final[0]` both reported holes on two lines
+  each, at seams whose colliders in fact overlap. `NUDGE` is a fraction of the
+  local sample spacing along the run's own tangent, which puts every ray inside
+  a strip.
 * **grade** - rise over run along the line, in percent, against the *previous*
   station of the same line. Positive is a climb. Measured against horizontal
   distance travelled rather than per sample, because the stations of two
   different runs are not the same distance apart and a per-sample step reads a
   1.9-unit gap between two runs' ends as a cliff. That mistake was made once
   here and it reported a 19% drop as a 0.19-unit step.
+
+  **And only when the step is downstream.** Two runs that share a seam do not
+  share a *contact* point exactly: their grades differ at the seam, so their
+  cradle bottoms are offset by `up`-difference times the cradle depth - 0.010
+  simulation units at the merge lead's exit, where the two grades are 22.0% and
+  24.5%. The lead's last station is therefore 0.010 further **down** the slope
+  than the sprint's first, and a walk that stepped between them backwards
+  reported the 0.009 of height it had already descended as a +24.7% climb. The
+  step is projected on the direction of travel and a backward step gets no
+  grade.
 * **clearance** - floor to the next surface above it. A roof is intentional at
   the merge; a surface a marble's diameter above the floor is a ledge.
 * **ledge** - a surface between the floor and one diameter above it, which is
@@ -233,6 +259,14 @@ FLOOR_BAND = MARBLE_RADIUS
 # shallowest authored grade is 10%, so anything positive is against the flow;
 # half a percent is the threshold that keeps facet rounding out of the list.
 CLIMB_PCT = 0.5
+# How far downstream of its own station each ray is fired, as a fraction of the
+# local sample spacing. Small enough that the reading is the station's, large
+# enough that a ray at a run's first or last ring lands inside a triangle
+# rather than on the vertex that bounds it. See the module docstring.
+NUDGE = 0.05
+# How far out a missed ray is re-probed before the miss is called a hole, in
+# simulation units. Half a marble radius: a marble bridges anything narrower.
+HOLE_REACH = 0.5 * MARBLE_RADIUS
 
 
 def walk_line(
@@ -253,12 +287,29 @@ def walk_line(
     for run_name, sample in stations:
         run = runs[run_name]
         label = f"{run_name}[{sample}]"
+        _lateral, _up, forward = run.frames[min(sample, len(run.frames) - 1)]
+        spacing = run.sim_arc[-1] / max(len(run.sim_path) - 1, 1)
         for fraction, line in fractions:
-            nominal = run.surface_point(sample, fraction * layout.CHANNEL_HALF)
+            seat = run.surface_point(sample, fraction * layout.CHANNEL_HALF)
+            nominal = tuple(
+                seat[axis] + forward[axis] * NUDGE * spacing for axis in range(3)
+            )
             column = index.column(nominal[0], nominal[2])
             floor = next(((y, o) for y, o in column if y <= nominal[1] + FLOOR_BAND), None)
             if floor is None:
-                readings.append(Reading(label, line, None, None, None, None, None))
+                bridged = _bridged(index, nominal)
+                if bridged is None:
+                    readings.append(Reading(label, line, None, None, None, None, None))
+                    previous.pop(line, None)
+                    continue
+                # A bridged floor is a neighbour's height, not this station's,
+                # so it is reported and then **dropped from the grade chain**.
+                # Feeding it in read the 0.048 offset to the neighbour as a
+                # +30.4% climb at `merge_lead[11]`, which is the same class of
+                # error as measuring a grade across a 1.9-unit gap.
+                readings.append(
+                    Reading(label, line, bridged[0], bridged[1], None, None, None)
+                )
                 previous.pop(line, None)
                 continue
             above = [(y, o) for y, o in column if y > floor[0] + 0.06]
@@ -267,8 +318,10 @@ def walk_line(
             grade = None
             last = previous.get(line)
             if last is not None:
-                run_h = math.dist((last[0], last[2]), (nominal[0], nominal[2]))
-                if run_h > 1e-6:
+                step = (nominal[0] - last[0], nominal[2] - last[2])
+                run_h = math.hypot(*step)
+                downstream = step[0] * forward[0] + step[1] * forward[2]
+                if run_h > 1e-6 and downstream > 0.0:
                     grade = 100.0 * (floor[0] - last[1]) / run_h
             readings.append(Reading(label, line, floor[0], floor[1], grade, clearance, ledge))
             previous[line] = (nominal[0], floor[0], nominal[2])
@@ -282,6 +335,23 @@ def walk_line(
             if r.clearance is not None and r.clearance < MARBLE_DIAMETER * 1.05
         ],
     )
+
+
+def _bridged(index: SurfaceIndex, nominal) -> tuple[float, str] | None:
+    """The floor a marble would bridge to, when the ray itself missed.
+
+    Four rays at `HOLE_REACH` on the compass. The highest floor any of them
+    finds is returned, because that is the surface a marble spanning the crack
+    would rest on. `None` only when the neighbourhood really is empty.
+    """
+    best: tuple[float, str] | None = None
+    for dx, dz in ((HOLE_REACH, 0.0), (-HOLE_REACH, 0.0), (0.0, HOLE_REACH), (0.0, -HOLE_REACH)):
+        for height, owner in index.column(nominal[0] + dx, nominal[2] + dz):
+            if height <= nominal[1] + FLOOR_BAND:
+                if best is None or height > best[0]:
+                    best = (height, owner)
+                break
+    return best
 
 
 def climb_survey(

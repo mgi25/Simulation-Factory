@@ -1,0 +1,4139 @@
+{
+ "routes": "blue",
+ "basins": {
+  "launch": {
+   "run": "launch",
+   "from": 0,
+   "to": 118,
+   "lines": {
+    "+0.00": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.40": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.40": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.55": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.55": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.70": {
+     "climb": 0.0202,
+     "from_sample": 4,
+     "to_sample": 5,
+     "escape_speed": 2.662
+    },
+    "+0.70": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.85": {
+     "climb": 0.0605,
+     "from_sample": 3,
+     "to_sample": 6,
+     "escape_speed": 4.602
+    },
+    "+0.85": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.95": {
+     "climb": 0.0941,
+     "from_sample": 3,
+     "to_sample": 6,
+     "escape_speed": 5.741
+    },
+    "+0.95": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    }
+   },
+   "worst": {
+    "climb": 0.0941,
+    "fraction": -0.95,
+    "at_sample": 6,
+    "escape_speed": 5.741
+   }
+  },
+  "leg1": {
+   "run": "leg1",
+   "from": 0,
+   "to": 118,
+   "lines": {
+    "+0.00": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.40": {
+     "climb": 0.1955,
+     "from_sample": 111,
+     "to_sample": 116,
+     "escape_speed": 8.277
+    },
+    "+0.40": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.55": {
+     "climb": 0.2953,
+     "from_sample": 111,
+     "to_sample": 116,
+     "escape_speed": 10.171
+    },
+    "+0.55": {
+     "climb": 0.0012,
+     "from_sample": 108,
+     "to_sample": 109,
+     "escape_speed": 0.661
+    },
+    "-0.70": {
+     "climb": 0.3963,
+     "from_sample": 111,
+     "to_sample": 116,
+     "escape_speed": 11.783
+    },
+    "+0.70": {
+     "climb": 0.0098,
+     "from_sample": 108,
+     "to_sample": 109,
+     "escape_speed": 1.852
+    },
+    "-0.85": {
+     "climb": 0.4997,
+     "from_sample": 110,
+     "to_sample": 116,
+     "escape_speed": 13.231
+    },
+    "+0.85": {
+     "climb": 0.0205,
+     "from_sample": 107,
+     "to_sample": 109,
+     "escape_speed": 2.682
+    },
+    "-0.95": {
+     "climb": 0.5719,
+     "from_sample": 110,
+     "to_sample": 116,
+     "escape_speed": 14.155
+    },
+    "+0.95": {
+     "climb": 0.0309,
+     "from_sample": 107,
+     "to_sample": 110,
+     "escape_speed": 3.288
+    }
+   },
+   "worst": {
+    "climb": 0.5719,
+    "fraction": -0.95,
+    "at_sample": 116,
+    "escape_speed": 14.155
+   }
+  },
+  "leg2": {
+   "run": "leg2",
+   "from": 0,
+   "to": 118,
+   "lines": {
+    "+0.00": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.40": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.40": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.55": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.55": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.70": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.70": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.85": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.85": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.95": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.95": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    }
+   },
+   "worst": {
+    "climb": 0.0,
+    "fraction": null,
+    "at_sample": null,
+    "escape_speed": 0.0
+   }
+  },
+  "leg3": {
+   "run": "leg3",
+   "from": 0,
+   "to": 118,
+   "lines": {
+    "+0.00": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.40": {
+     "climb": 0.0106,
+     "from_sample": 114,
+     "to_sample": 116,
+     "escape_speed": 1.927
+    },
+    "+0.40": {
+     "climb": 0.0001,
+     "from_sample": 111,
+     "to_sample": 112,
+     "escape_speed": 0.154
+    },
+    "-0.55": {
+     "climb": 0.0502,
+     "from_sample": 106,
+     "to_sample": 110,
+     "escape_speed": 4.196
+    },
+    "+0.55": {
+     "climb": 0.0146,
+     "from_sample": 111,
+     "to_sample": 112,
+     "escape_speed": 2.26
+    },
+    "-0.70": {
+     "climb": 0.1224,
+     "from_sample": 105,
+     "to_sample": 110,
+     "escape_speed": 6.55
+    },
+    "+0.70": {
+     "climb": 0.0393,
+     "from_sample": 111,
+     "to_sample": 113,
+     "escape_speed": 3.709
+    },
+    "-0.85": {
+     "climb": 0.2037,
+     "from_sample": 105,
+     "to_sample": 110,
+     "escape_speed": 8.448
+    },
+    "+0.85": {
+     "climb": 0.0643,
+     "from_sample": 111,
+     "to_sample": 113,
+     "escape_speed": 4.747
+    },
+    "-0.95": {
+     "climb": 0.2586,
+     "from_sample": 105,
+     "to_sample": 110,
+     "escape_speed": 9.519
+    },
+    "+0.95": {
+     "climb": 0.0809,
+     "from_sample": 111,
+     "to_sample": 113,
+     "escape_speed": 5.324
+    }
+   },
+   "worst": {
+    "climb": 0.2586,
+    "fraction": -0.95,
+    "at_sample": 110,
+    "escape_speed": 9.519
+   }
+  },
+  "blue_lead": {
+   "run": "blue_lead",
+   "from": 0,
+   "to": 27,
+   "lines": {
+    "+0.00": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.40": {
+     "climb": 0.0661,
+     "from_sample": 1,
+     "to_sample": 4,
+     "escape_speed": 4.812
+    },
+    "+0.40": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.55": {
+     "climb": 0.144,
+     "from_sample": 1,
+     "to_sample": 4,
+     "escape_speed": 7.102
+    },
+    "+0.55": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.70": {
+     "climb": 0.2331,
+     "from_sample": 1,
+     "to_sample": 5,
+     "escape_speed": 9.036
+    },
+    "+0.70": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.85": {
+     "climb": 0.3223,
+     "from_sample": 1,
+     "to_sample": 5,
+     "escape_speed": 10.626
+    },
+    "+0.85": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.95": {
+     "climb": 0.3834,
+     "from_sample": 0,
+     "to_sample": 5,
+     "escape_speed": 11.59
+    },
+    "+0.95": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    }
+   },
+   "worst": {
+    "climb": 0.3834,
+    "fraction": -0.95,
+    "at_sample": 5,
+    "escape_speed": 11.59
+   }
+  },
+  "blue": {
+   "run": "blue",
+   "from": 0,
+   "to": 118,
+   "lines": {
+    "+0.00": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.40": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.40": {
+     "climb": 0.0442,
+     "from_sample": 92,
+     "to_sample": 97,
+     "escape_speed": 3.937
+    },
+    "-0.55": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.55": {
+     "climb": 0.1181,
+     "from_sample": 91,
+     "to_sample": 98,
+     "escape_speed": 6.432
+    },
+    "-0.70": {
+     "climb": 0.0091,
+     "from_sample": 85,
+     "to_sample": 87,
+     "escape_speed": 1.783
+    },
+    "+0.70": {
+     "climb": 0.2083,
+     "from_sample": 90,
+     "to_sample": 98,
+     "escape_speed": 8.542
+    },
+    "-0.85": {
+     "climb": 0.0302,
+     "from_sample": 85,
+     "to_sample": 88,
+     "escape_speed": 3.251
+    },
+    "+0.85": {
+     "climb": 0.3013,
+     "from_sample": 90,
+     "to_sample": 98,
+     "escape_speed": 10.275
+    },
+    "-0.95": {
+     "climb": 0.0472,
+     "from_sample": 85,
+     "to_sample": 88,
+     "escape_speed": 4.066
+    },
+    "+0.95": {
+     "climb": 0.3635,
+     "from_sample": 90,
+     "to_sample": 98,
+     "escape_speed": 11.286
+    }
+   },
+   "worst": {
+    "climb": 0.3635,
+    "fraction": 0.95,
+    "at_sample": 98,
+    "escape_speed": 11.286
+   }
+  },
+  "merge_lead": {
+   "run": "merge_lead",
+   "from": 0,
+   "to": 12,
+   "lines": {
+    "+0.00": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.40": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.40": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.55": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.55": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.70": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.70": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.85": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.85": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.95": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.95": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    }
+   },
+   "worst": {
+    "climb": 0.0,
+    "fraction": null,
+    "at_sample": null,
+    "escape_speed": 0.0
+   }
+  },
+  "final": {
+   "run": "final",
+   "from": 0,
+   "to": 118,
+   "lines": {
+    "+0.00": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.40": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.40": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.55": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.55": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.70": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.70": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "-0.85": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.85": {
+     "climb": 0.0032,
+     "from_sample": 113,
+     "to_sample": 114,
+     "escape_speed": 1.052
+    },
+    "-0.95": {
+     "climb": 0.0,
+     "from_sample": 0,
+     "to_sample": null,
+     "escape_speed": 0.0
+    },
+    "+0.95": {
+     "climb": 0.0068,
+     "from_sample": 112,
+     "to_sample": 114,
+     "escape_speed": 1.539
+    }
+   },
+   "worst": {
+    "climb": 0.0068,
+    "fraction": 0.95,
+    "at_sample": 114,
+    "escape_speed": 1.539
+   }
+  }
+ },
+ "frames": {
+  "blue[117]": {
+   "run": "blue",
+   "sample": 117,
+   "contact": [
+    -1.9451,
+    8.2228,
+    63.2408
+   ],
+   "centre": [
+    -1.9298,
+    8.5965,
+    63.2456
+   ],
+   "tangent": [
+    0.95335,
+    -0.04279,
+    0.29881
+   ],
+   "up": [
+    0.04083,
+    0.99908,
+    0.0128
+   ],
+   "lateral": [
+    0.29908,
+    0.0,
+    -0.95423
+   ],
+   "heading_deg": 72.598,
+   "bank_deg": -0.0,
+   "grade_pct": 4.283,
+   "half_width": 1.474,
+   "containment": 1.1509,
+   "scale": 0.82,
+   "edges": {
+    "west_running": [
+     -2.3735,
+     8.526,
+     64.6512
+    ],
+    "east_running": [
+     -1.4919,
+     8.526,
+     61.8382
+    ],
+    "west_guard": [
+     -2.3833,
+     8.9989,
+     64.7501
+    ],
+    "east_guard": [
+     -1.4435,
+     8.9989,
+     61.7515
+    ]
+   },
+   "in_reference": {
+    "contact": [
+     -1.899,
+     -0.2573,
+     -0.3027
+    ],
+    "tangent": [
+     0.97238,
+     0.13018,
+     0.19375
+    ],
+    "edges": {
+     "west_running": [
+      -1.7719,
+      -1.717,
+      0.0405
+     ],
+     "east_running": [
+      -2.1451,
+      1.2058,
+      -0.0507
+     ],
+     "west_guard": [
+      -1.8525,
+      -1.8108,
+      0.5077
+     ],
+     "east_guard": [
+      -2.2502,
+      1.3049,
+      0.4104
+     ]
+    }
+   }
+  },
+  "merge_lead[0]": {
+   "run": "merge_lead",
+   "sample": 0,
+   "contact": [
+    -1.9424,
+    8.2227,
+    63.2419
+   ],
+   "centre": [
+    -1.9265,
+    8.6785,
+    63.2467
+   ],
+   "tangent": [
+    0.95646,
+    -0.03636,
+    0.28959
+   ],
+   "up": [
+    0.0348,
+    0.99934,
+    0.01054
+   ],
+   "lateral": [
+    0.28978,
+    0.0,
+    -0.95709
+   ],
+   "heading_deg": 73.155,
+   "bank_deg": 0.0,
+   "grade_pct": 3.638,
+   "half_width": 1.6491,
+   "containment": 1.4035,
+   "scale": 1.0,
+   "edges": {
+    "west_running": [
+     -2.4074,
+     8.5925,
+     64.8241
+    ],
+    "east_running": [
+     -1.4516,
+     8.5925,
+     61.6674
+    ],
+    "west_guard": [
+     -2.4188,
+     9.1694,
+     64.9343
+    ],
+    "east_guard": [
+     -1.4,
+     9.1694,
+     61.5694
+    ]
+   },
+   "in_reference": {
+    "contact": [
+     -1.8961,
+     -0.2571,
+     -0.3021
+    ],
+    "tangent": [
+     0.96982,
+     0.13985,
+     0.19974
+    ],
+    "edges": {
+     "west_running": [
+      -1.7469,
+      -1.8881,
+      0.1151
+     ],
+     "east_running": [
+      -2.1952,
+      1.3777,
+      0.0055
+     ],
+     "west_guard": [
+      -1.8489,
+      -1.9928,
+      0.6841
+     ],
+     "east_guard": [
+      -2.3269,
+      1.4884,
+      0.5672
+     ]
+    }
+   }
+  },
+  "merge_lead[11]": {
+   "run": "merge_lead",
+   "sample": 11,
+   "contact": [
+    -0.0899,
+    8.0633,
+    63.8203
+   ],
+   "centre": [
+    0.0,
+    8.5088,
+    63.8596
+   ],
+   "tangent": [
+    0.8945,
+    -0.21525,
+    0.39183
+   ],
+   "up": [
+    0.19717,
+    0.97656,
+    0.08637
+   ],
+   "lateral": [
+    0.40123,
+    0.0,
+    -0.91598
+   ],
+   "heading_deg": 66.345,
+   "bank_deg": 0.0,
+   "grade_pct": 22.042,
+   "half_width": 1.88,
+   "containment": 1.4035,
+   "scale": 1.0,
+   "edges": {
+    "west_running": [
+     -0.7713,
+     8.4247,
+     65.5742
+    ],
+    "east_running": [
+     0.7373,
+     8.4247,
+     62.1302
+    ],
+    "west_guard": [
+     -0.7072,
+     8.9885,
+     65.7377
+    ],
+    "east_guard": [
+     0.9009,
+     8.9885,
+     62.0665
+    ]
+   },
+   "in_reference": {
+    "contact": [
+     0.0105,
+     -0.0021,
+     0.0001
+    ],
+    "tangent": [
+     0.99952,
+     0.02103,
+     0.02284
+    ],
+    "edges": {
+     "west_running": [
+      0.0413,
+      -1.88,
+      0.3797
+     ],
+     "east_running": [
+      -0.0374,
+      1.8792,
+      0.3605
+     ],
+     "west_guard": [
+      0.0307,
+      -2.0013,
+      0.9575
+     ],
+     "east_guard": [
+      -0.0532,
+      2.0058,
+      0.937
+     ]
+    }
+   }
+  },
+  "final[0]": {
+   "run": "final",
+   "sample": 0,
+   "contact": [
+    -0.0983,
+    8.0657,
+    63.814
+   ],
+   "centre": [
+    0.0,
+    8.5088,
+    63.8596
+   ],
+   "tangent": [
+    0.88116,
+    -0.23755,
+    0.40882
+   ],
+   "up": [
+    0.21549,
+    0.97137,
+    0.09998
+   ],
+   "lateral": [
+    0.42087,
+    0.0,
+    -0.90712
+   ],
+   "heading_deg": 65.111,
+   "bank_deg": 0.0,
+   "grade_pct": 24.455,
+   "half_width": 1.88,
+   "containment": 1.4035,
+   "scale": 1.0,
+   "edges": {
+    "west_running": [
+     -0.8098,
+     8.4251,
+     65.5564
+    ],
+    "east_running": [
+     0.7727,
+     8.4251,
+     62.1457
+    ],
+    "west_guard": [
+     -0.7376,
+     8.9859,
+     65.7266
+    ],
+    "east_guard": [
+     0.9493,
+     8.9859,
+     62.0909
+    ]
+   },
+   "in_reference": {
+    "contact": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "tangent": [
+     1.0,
+     0.0,
+     -0.0
+    ],
+    "edges": {
+     "west_running": [
+      0.0,
+      -1.88,
+      0.3701
+     ],
+     "east_running": [
+      0.0,
+      1.88,
+      0.3701
+     ],
+     "west_guard": [
+      -0.0,
+      -2.004,
+      0.9474
+     ],
+     "east_guard": [
+      0.0,
+      2.004,
+      0.9474
+     ]
+    }
+   }
+  }
+ },
+ "blue_walk": {
+  "stations": 66,
+  "clean": false,
+  "holes": [],
+  "climbs": [
+   {
+    "station": "blue[87]",
+    "line": "W-edge",
+    "floor": 9.6005,
+    "owner": "blue",
+    "grade_pct": 3.44,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[91]",
+    "line": "E-edge",
+    "floor": 8.8987,
+    "owner": "blue",
+    "grade_pct": 3.56,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[92]",
+    "line": "E-edge",
+    "floor": 8.9294,
+    "owner": "blue",
+    "grade_pct": 6.23,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[93]",
+    "line": "E-mid",
+    "floor": 8.871,
+    "owner": "blue",
+    "grade_pct": 1.12,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[93]",
+    "line": "E-edge",
+    "floor": 8.9681,
+    "owner": "blue",
+    "grade_pct": 7.79,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[94]",
+    "line": "E-mid",
+    "floor": 8.8823,
+    "owner": "blue",
+    "grade_pct": 2.22,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[94]",
+    "line": "E-edge",
+    "floor": 9.0146,
+    "owner": "blue",
+    "grade_pct": 9.26,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[95]",
+    "line": "E-mid",
+    "floor": 8.8988,
+    "owner": "blue",
+    "grade_pct": 3.25,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[95]",
+    "line": "E-edge",
+    "floor": 9.0685,
+    "owner": "blue",
+    "grade_pct": 10.59,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[96]",
+    "line": "E-mid",
+    "floor": 8.9177,
+    "owner": "blue",
+    "grade_pct": 3.69,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[96]",
+    "line": "E-edge",
+    "floor": 9.1244,
+    "owner": "blue",
+    "grade_pct": 10.82,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[97]",
+    "line": "E-mid",
+    "floor": 8.9312,
+    "owner": "blue",
+    "grade_pct": 2.61,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[97]",
+    "line": "E-edge",
+    "floor": 9.1685,
+    "owner": "blue",
+    "grade_pct": 8.42,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[98]",
+    "line": "E-edge",
+    "floor": 9.1823,
+    "owner": "blue",
+    "grade_pct": 2.58,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[101]",
+    "line": "W-edge",
+    "floor": 8.7438,
+    "owner": "blue",
+    "grade_pct": 1.47,
+    "clearance": null,
+    "ledge": null
+   }
+  ],
+  "ledges": [
+   {
+    "station": "blue[89]",
+    "line": "W-edge",
+    "floor": 9.5672,
+    "owner": "blue",
+    "grade_pct": -6.13,
+    "clearance": 0.9586,
+    "ledge": 0.9586
+   }
+  ],
+  "tight": [
+   {
+    "station": "blue[89]",
+    "line": "W-edge",
+    "floor": 9.5672,
+    "owner": "blue",
+    "grade_pct": -6.13,
+    "clearance": 0.9586,
+    "ledge": 0.9586
+   }
+  ],
+  "readings": [
+   {
+    "station": "blue[86]",
+    "line": "W-edge",
+    "floor": 9.582,
+    "owner": "blue",
+    "grade_pct": null,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[86]",
+    "line": "W-mid",
+    "floor": 9.3165,
+    "owner": "blue",
+    "grade_pct": null,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[86]",
+    "line": "centre",
+    "floor": 9.1331,
+    "owner": "blue",
+    "grade_pct": null,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[86]",
+    "line": "E-mid",
+    "floor": 9.0719,
+    "owner": "blue",
+    "grade_pct": null,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[86]",
+    "line": "E-edge",
+    "floor": 9.1179,
+    "owner": "blue",
+    "grade_pct": null,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[87]",
+    "line": "W-edge",
+    "floor": 9.6005,
+    "owner": "blue",
+    "grade_pct": 3.44,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[87]",
+    "line": "W-mid",
+    "floor": 9.3079,
+    "owner": "blue",
+    "grade_pct": -1.65,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[87]",
+    "line": "centre",
+    "floor": 9.0924,
+    "owner": "blue",
+    "grade_pct": -7.97,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[87]",
+    "line": "E-mid",
+    "floor": 8.9976,
+    "owner": "blue",
+    "grade_pct": -15.03,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[87]",
+    "line": "E-edge",
+    "floor": 9.0125,
+    "owner": "blue",
+    "grade_pct": -22.01,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[88]",
+    "line": "W-edge",
+    "floor": 9.6007,
+    "owner": "blue",
+    "grade_pct": 0.03,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[88]",
+    "line": "W-mid",
+    "floor": 9.2906,
+    "owner": "blue",
+    "grade_pct": -3.23,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[88]",
+    "line": "centre",
+    "floor": 9.0542,
+    "owner": "blue",
+    "grade_pct": -7.43,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[88]",
+    "line": "E-mid",
+    "floor": 8.9368,
+    "owner": "blue",
+    "grade_pct": -12.38,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[88]",
+    "line": "E-edge",
+    "floor": 8.9312,
+    "owner": "blue",
+    "grade_pct": -17.35,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[89]",
+    "line": "W-edge",
+    "floor": 9.5672,
+    "owner": "blue",
+    "grade_pct": -6.13,
+    "clearance": 0.9586,
+    "ledge": 0.9586
+   },
+   {
+    "station": "blue[89]",
+    "line": "W-mid",
+    "floor": 9.2554,
+    "owner": "blue",
+    "grade_pct": -6.62,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[89]",
+    "line": "centre",
+    "floor": 9.0166,
+    "owner": "blue",
+    "grade_pct": -7.33,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[89]",
+    "line": "E-mid",
+    "floor": 8.896,
+    "owner": "blue",
+    "grade_pct": -8.27,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[89]",
+    "line": "E-edge",
+    "floor": 8.888,
+    "owner": "blue",
+    "grade_pct": -9.11,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[90]",
+    "line": "W-edge",
+    "floor": 9.5014,
+    "owner": "blue",
+    "grade_pct": -12.22,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[90]",
+    "line": "W-mid",
+    "floor": 9.2026,
+    "owner": "blue",
+    "grade_pct": -10.03,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[90]",
+    "line": "centre",
+    "floor": 8.979,
+    "owner": "blue",
+    "grade_pct": -7.34,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[90]",
+    "line": "E-mid",
+    "floor": 8.8741,
+    "owner": "blue",
+    "grade_pct": -4.4,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[90]",
+    "line": "E-edge",
+    "floor": 8.8814,
+    "owner": "blue",
+    "grade_pct": -1.37,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[91]",
+    "line": "W-edge",
+    "floor": 9.4168,
+    "owner": "blue",
+    "grade_pct": -15.89,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[91]",
+    "line": "W-mid",
+    "floor": 9.1403,
+    "owner": "blue",
+    "grade_pct": -11.91,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[91]",
+    "line": "centre",
+    "floor": 8.9429,
+    "owner": "blue",
+    "grade_pct": -7.04,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[91]",
+    "line": "E-mid",
+    "floor": 8.8656,
+    "owner": "blue",
+    "grade_pct": -1.72,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[91]",
+    "line": "E-edge",
+    "floor": 8.8987,
+    "owner": "blue",
+    "grade_pct": 3.56,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[92]",
+    "line": "W-edge",
+    "floor": 9.3244,
+    "owner": "blue",
+    "grade_pct": -17.55,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[92]",
+    "line": "W-mid",
+    "floor": 9.0751,
+    "owner": "blue",
+    "grade_pct": -12.54,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[92]",
+    "line": "centre",
+    "floor": 8.9097,
+    "owner": "blue",
+    "grade_pct": -6.51,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[92]",
+    "line": "E-mid",
+    "floor": 8.8654,
+    "owner": "blue",
+    "grade_pct": -0.03,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[92]",
+    "line": "E-edge",
+    "floor": 8.9294,
+    "owner": "blue",
+    "grade_pct": 6.23,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[93]",
+    "line": "W-edge",
+    "floor": 9.2289,
+    "owner": "blue",
+    "grade_pct": -18.34,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[93]",
+    "line": "W-mid",
+    "floor": 9.0098,
+    "owner": "blue",
+    "grade_pct": -12.65,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[93]",
+    "line": "centre",
+    "floor": 8.8794,
+    "owner": "blue",
+    "grade_pct": -5.94,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[93]",
+    "line": "E-mid",
+    "floor": 8.871,
+    "owner": "blue",
+    "grade_pct": 1.12,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[93]",
+    "line": "E-edge",
+    "floor": 8.9681,
+    "owner": "blue",
+    "grade_pct": 7.79,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[94]",
+    "line": "W-edge",
+    "floor": 9.1296,
+    "owner": "blue",
+    "grade_pct": -19.3,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[94]",
+    "line": "W-mid",
+    "floor": 8.944,
+    "owner": "blue",
+    "grade_pct": -12.85,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[94]",
+    "line": "centre",
+    "floor": 8.8518,
+    "owner": "blue",
+    "grade_pct": -5.41,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[94]",
+    "line": "E-mid",
+    "floor": 8.8823,
+    "owner": "blue",
+    "grade_pct": 2.22,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[94]",
+    "line": "E-edge",
+    "floor": 9.0146,
+    "owner": "blue",
+    "grade_pct": 9.26,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[95]",
+    "line": "W-edge",
+    "floor": 9.026,
+    "owner": "blue",
+    "grade_pct": -20.42,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[95]",
+    "line": "W-mid",
+    "floor": 8.8773,
+    "owner": "blue",
+    "grade_pct": -13.13,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[95]",
+    "line": "centre",
+    "floor": 8.8267,
+    "owner": "blue",
+    "grade_pct": -4.94,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[95]",
+    "line": "E-mid",
+    "floor": 8.8988,
+    "owner": "blue",
+    "grade_pct": 3.25,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[95]",
+    "line": "E-edge",
+    "floor": 9.0685,
+    "owner": "blue",
+    "grade_pct": 10.59,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[96]",
+    "line": "W-edge",
+    "floor": 8.9227,
+    "owner": "blue",
+    "grade_pct": -20.68,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[96]",
+    "line": "W-mid",
+    "floor": 8.812,
+    "owner": "blue",
+    "grade_pct": -12.97,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[96]",
+    "line": "centre",
+    "floor": 8.8036,
+    "owner": "blue",
+    "grade_pct": -4.54,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[96]",
+    "line": "E-mid",
+    "floor": 8.9177,
+    "owner": "blue",
+    "grade_pct": 3.69,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[96]",
+    "line": "E-edge",
+    "floor": 9.1244,
+    "owner": "blue",
+    "grade_pct": 10.82,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[97]",
+    "line": "W-edge",
+    "floor": 8.8315,
+    "owner": "blue",
+    "grade_pct": -18.56,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[97]",
+    "line": "W-mid",
+    "floor": 8.7535,
+    "owner": "blue",
+    "grade_pct": -11.69,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[97]",
+    "line": "centre",
+    "floor": 8.7813,
+    "owner": "blue",
+    "grade_pct": -4.38,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[97]",
+    "line": "E-mid",
+    "floor": 8.9312,
+    "owner": "blue",
+    "grade_pct": 2.61,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[97]",
+    "line": "E-edge",
+    "floor": 9.1685,
+    "owner": "blue",
+    "grade_pct": 8.42,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[98]",
+    "line": "W-edge",
+    "floor": 8.768,
+    "owner": "blue",
+    "grade_pct": -13.18,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[98]",
+    "line": "W-mid",
+    "floor": 8.7089,
+    "owner": "blue",
+    "grade_pct": -9.03,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[98]",
+    "line": "centre",
+    "floor": 8.7574,
+    "owner": "blue",
+    "grade_pct": -4.71,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[98]",
+    "line": "E-mid",
+    "floor": 8.9279,
+    "owner": "blue",
+    "grade_pct": -0.64,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[98]",
+    "line": "E-edge",
+    "floor": 9.1823,
+    "owner": "blue",
+    "grade_pct": 2.58,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[99]",
+    "line": "W-edge",
+    "floor": 8.7387,
+    "owner": "blue",
+    "grade_pct": -6.16,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[99]",
+    "line": "W-mid",
+    "floor": 8.6801,
+    "owner": "blue",
+    "grade_pct": -5.87,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[99]",
+    "line": "centre",
+    "floor": 8.7293,
+    "owner": "blue",
+    "grade_pct": -5.53,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[99]",
+    "line": "E-mid",
+    "floor": 8.9009,
+    "owner": "blue",
+    "grade_pct": -5.16,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[99]",
+    "line": "E-edge",
+    "floor": 9.1555,
+    "owner": "blue",
+    "grade_pct": -4.96,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[100]",
+    "line": "W-edge",
+    "floor": 8.7364,
+    "owner": "blue",
+    "grade_pct": -0.46,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[100]",
+    "line": "W-mid",
+    "floor": 8.6635,
+    "owner": "blue",
+    "grade_pct": -3.35,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[100]",
+    "line": "centre",
+    "floor": 8.697,
+    "owner": "blue",
+    "grade_pct": -6.36,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[100]",
+    "line": "E-mid",
+    "floor": 8.8536,
+    "owner": "blue",
+    "grade_pct": -9.12,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[100]",
+    "line": "E-edge",
+    "floor": 9.095,
+    "owner": "blue",
+    "grade_pct": -11.45,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[101]",
+    "line": "W-edge",
+    "floor": 8.7438,
+    "owner": "blue",
+    "grade_pct": 1.47,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[101]",
+    "line": "W-mid",
+    "floor": 8.6514,
+    "owner": "blue",
+    "grade_pct": -2.4,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[101]",
+    "line": "centre",
+    "floor": 8.6637,
+    "owner": "blue",
+    "grade_pct": -6.57,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[101]",
+    "line": "E-mid",
+    "floor": 8.7995,
+    "owner": "blue",
+    "grade_pct": -10.56,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[101]",
+    "line": "E-edge",
+    "floor": 9.023,
+    "owner": "blue",
+    "grade_pct": -13.94,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[102]",
+    "line": "W-edge",
+    "floor": 8.7456,
+    "owner": "blue",
+    "grade_pct": 0.35,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[102]",
+    "line": "W-mid",
+    "floor": 8.6366,
+    "owner": "blue",
+    "grade_pct": -2.95,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[102]",
+    "line": "centre",
+    "floor": 8.6305,
+    "owner": "blue",
+    "grade_pct": -6.54,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[102]",
+    "line": "E-mid",
+    "floor": 8.7481,
+    "owner": "blue",
+    "grade_pct": -10.04,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[102]",
+    "line": "E-edge",
+    "floor": 8.956,
+    "owner": "blue",
+    "grade_pct": -13.01,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[103]",
+    "line": "W-edge",
+    "floor": 8.7364,
+    "owner": "blue",
+    "grade_pct": -1.82,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[103]",
+    "line": "W-mid",
+    "floor": 8.6162,
+    "owner": "blue",
+    "grade_pct": -4.05,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[103]",
+    "line": "centre",
+    "floor": 8.5976,
+    "owner": "blue",
+    "grade_pct": -6.48,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[103]",
+    "line": "E-mid",
+    "floor": 8.7028,
+    "owner": "blue",
+    "grade_pct": -8.86,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[103]",
+    "line": "E-edge",
+    "floor": 8.9,
+    "owner": "blue",
+    "grade_pct": -10.91,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[104]",
+    "line": "W-edge",
+    "floor": 8.7215,
+    "owner": "blue",
+    "grade_pct": -2.99,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[104]",
+    "line": "W-mid",
+    "floor": 8.5927,
+    "owner": "blue",
+    "grade_pct": -4.64,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[104]",
+    "line": "centre",
+    "floor": 8.5648,
+    "owner": "blue",
+    "grade_pct": -6.46,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[104]",
+    "line": "E-mid",
+    "floor": 8.6608,
+    "owner": "blue",
+    "grade_pct": -8.23,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[104]",
+    "line": "E-edge",
+    "floor": 8.8498,
+    "owner": "blue",
+    "grade_pct": -9.77,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[105]",
+    "line": "W-edge",
+    "floor": 8.7057,
+    "owner": "blue",
+    "grade_pct": -3.12,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[105]",
+    "line": "W-mid",
+    "floor": 8.569,
+    "owner": "blue",
+    "grade_pct": -4.69,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[105]",
+    "line": "centre",
+    "floor": 8.5322,
+    "owner": "blue",
+    "grade_pct": -6.42,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[105]",
+    "line": "E-mid",
+    "floor": 8.6194,
+    "owner": "blue",
+    "grade_pct": -8.12,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[105]",
+    "line": "E-edge",
+    "floor": 8.8006,
+    "owner": "blue",
+    "grade_pct": -9.6,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[106]",
+    "line": "W-edge",
+    "floor": 8.6907,
+    "owner": "blue",
+    "grade_pct": -2.97,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[106]",
+    "line": "W-mid",
+    "floor": 8.5459,
+    "owner": "blue",
+    "grade_pct": -4.57,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[106]",
+    "line": "centre",
+    "floor": 8.5,
+    "owner": "blue",
+    "grade_pct": -6.34,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[106]",
+    "line": "E-mid",
+    "floor": 8.5781,
+    "owner": "blue",
+    "grade_pct": -8.1,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[106]",
+    "line": "E-edge",
+    "floor": 8.7514,
+    "owner": "blue",
+    "grade_pct": -9.65,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[107]",
+    "line": "W-edge",
+    "floor": 8.6732,
+    "owner": "blue",
+    "grade_pct": -3.45,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[107]",
+    "line": "W-mid",
+    "floor": 8.5218,
+    "owner": "blue",
+    "grade_pct": -4.75,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[107]",
+    "line": "centre",
+    "floor": 8.4684,
+    "owner": "blue",
+    "grade_pct": -6.21,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[107]",
+    "line": "E-mid",
+    "floor": 8.5391,
+    "owner": "blue",
+    "grade_pct": -7.68,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[107]",
+    "line": "E-edge",
+    "floor": 8.7058,
+    "owner": "blue",
+    "grade_pct": -8.97,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[108]",
+    "line": "W-edge",
+    "floor": 8.6487,
+    "owner": "blue",
+    "grade_pct": -4.82,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[108]",
+    "line": "W-mid",
+    "floor": 8.4945,
+    "owner": "blue",
+    "grade_pct": -5.38,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[108]",
+    "line": "centre",
+    "floor": 8.4379,
+    "owner": "blue",
+    "grade_pct": -6.02,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[108]",
+    "line": "E-mid",
+    "floor": 8.5051,
+    "owner": "blue",
+    "grade_pct": -6.69,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[108]",
+    "line": "E-edge",
+    "floor": 8.669,
+    "owner": "blue",
+    "grade_pct": -7.25,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[109]",
+    "line": "W-edge",
+    "floor": 8.6162,
+    "owner": "blue",
+    "grade_pct": -6.38,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[109]",
+    "line": "W-mid",
+    "floor": 8.4635,
+    "owner": "blue",
+    "grade_pct": -6.08,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[109]",
+    "line": "centre",
+    "floor": 8.4086,
+    "owner": "blue",
+    "grade_pct": -5.75,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[109]",
+    "line": "E-mid",
+    "floor": 8.4775,
+    "owner": "blue",
+    "grade_pct": -5.44,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[109]",
+    "line": "E-edge",
+    "floor": 8.6429,
+    "owner": "blue",
+    "grade_pct": -5.15,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[110]",
+    "line": "W-edge",
+    "floor": 8.5794,
+    "owner": "blue",
+    "grade_pct": -7.26,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[110]",
+    "line": "W-mid",
+    "floor": 8.4311,
+    "owner": "blue",
+    "grade_pct": -6.38,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[110]",
+    "line": "centre",
+    "floor": 8.3811,
+    "owner": "blue",
+    "grade_pct": -5.41,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[110]",
+    "line": "E-mid",
+    "floor": 8.4549,
+    "owner": "blue",
+    "grade_pct": -4.44,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[110]",
+    "line": "E-edge",
+    "floor": 8.6247,
+    "owner": "blue",
+    "grade_pct": -3.58,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[111]",
+    "line": "W-edge",
+    "floor": 8.546,
+    "owner": "blue",
+    "grade_pct": -6.64,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[111]",
+    "line": "W-mid",
+    "floor": 8.4013,
+    "owner": "blue",
+    "grade_pct": -5.88,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[111]",
+    "line": "centre",
+    "floor": 8.3555,
+    "owner": "blue",
+    "grade_pct": -5.03,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[111]",
+    "line": "E-mid",
+    "floor": 8.4335,
+    "owner": "blue",
+    "grade_pct": -4.17,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[111]",
+    "line": "E-edge",
+    "floor": 8.607,
+    "owner": "blue",
+    "grade_pct": -3.45,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[112]",
+    "line": "W-edge",
+    "floor": 8.5226,
+    "owner": "blue",
+    "grade_pct": -4.64,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[112]",
+    "line": "W-mid",
+    "floor": 8.3775,
+    "owner": "blue",
+    "grade_pct": -4.7,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[112]",
+    "line": "centre",
+    "floor": 8.3313,
+    "owner": "blue",
+    "grade_pct": -4.75,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[112]",
+    "line": "E-mid",
+    "floor": 8.4091,
+    "owner": "blue",
+    "grade_pct": -4.78,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[112]",
+    "line": "E-edge",
+    "floor": 8.5822,
+    "owner": "blue",
+    "grade_pct": -4.83,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[113]",
+    "line": "W-edge",
+    "floor": 8.5094,
+    "owner": "blue",
+    "grade_pct": -2.63,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[113]",
+    "line": "W-mid",
+    "floor": 8.3596,
+    "owner": "blue",
+    "grade_pct": -3.53,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[113]",
+    "line": "centre",
+    "floor": 8.3082,
+    "owner": "blue",
+    "grade_pct": -4.54,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[113]",
+    "line": "E-mid",
+    "floor": 8.3809,
+    "owner": "blue",
+    "grade_pct": -5.53,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[113]",
+    "line": "E-edge",
+    "floor": 8.5494,
+    "owner": "blue",
+    "grade_pct": -6.41,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "blue[114]",
+    "line": "W-edge",
+    "floor": 8.4982,
+    "owner": "blue",
+    "grade_pct": -2.2,
+    "clearance": 1.6147,
+    "ledge": null
+   },
+   {
+    "station": "blue[114]",
+    "line": "W-mid",
+    "floor": 8.3433,
+    "owner": "blue",
+    "grade_pct": -3.21,
+    "clearance": 1.6583,
+    "ledge": null
+   },
+   {
+    "station": "blue[114]",
+    "line": "centre",
+    "floor": 8.2861,
+    "owner": "blue",
+    "grade_pct": -4.35,
+    "clearance": 1.6436,
+    "ledge": null
+   },
+   {
+    "station": "blue[114]",
+    "line": "E-mid",
+    "floor": 8.3529,
+    "owner": "blue",
+    "grade_pct": -5.5,
+    "clearance": 1.6718,
+    "ledge": null
+   },
+   {
+    "station": "blue[114]",
+    "line": "E-edge",
+    "floor": 8.5163,
+    "owner": "blue",
+    "grade_pct": -6.5,
+    "clearance": 1.6362,
+    "ledge": null
+   },
+   {
+    "station": "blue[115]",
+    "line": "W-edge",
+    "floor": 8.4836,
+    "owner": "blue",
+    "grade_pct": -2.9,
+    "clearance": 1.6085,
+    "ledge": null
+   },
+   {
+    "station": "blue[115]",
+    "line": "W-mid",
+    "floor": 8.3254,
+    "owner": "blue",
+    "grade_pct": -3.52,
+    "clearance": 1.6537,
+    "ledge": null
+   },
+   {
+    "station": "blue[115]",
+    "line": "centre",
+    "floor": 8.2646,
+    "owner": "blue",
+    "grade_pct": -4.22,
+    "clearance": 1.6427,
+    "ledge": null
+   },
+   {
+    "station": "blue[115]",
+    "line": "E-mid",
+    "floor": 8.3278,
+    "owner": "blue",
+    "grade_pct": -4.93,
+    "clearance": 1.6736,
+    "ledge": null
+   },
+   {
+    "station": "blue[115]",
+    "line": "E-edge",
+    "floor": 8.488,
+    "owner": "blue",
+    "grade_pct": -5.55,
+    "clearance": 1.6441,
+    "ledge": null
+   },
+   {
+    "station": "blue[116]",
+    "line": "W-edge",
+    "floor": 8.4645,
+    "owner": "blue",
+    "grade_pct": -3.75,
+    "clearance": 1.6071,
+    "ledge": null
+   },
+   {
+    "station": "blue[116]",
+    "line": "W-mid",
+    "floor": 8.3054,
+    "owner": "blue",
+    "grade_pct": -3.94,
+    "clearance": 1.6515,
+    "ledge": null
+   },
+   {
+    "station": "blue[116]",
+    "line": "centre",
+    "floor": 8.2435,
+    "owner": "blue",
+    "grade_pct": -4.17,
+    "clearance": 1.6426,
+    "ledge": null
+   },
+   {
+    "station": "blue[116]",
+    "line": "E-mid",
+    "floor": 8.3055,
+    "owner": "blue",
+    "grade_pct": -4.4,
+    "clearance": 1.6739,
+    "ledge": null
+   },
+   {
+    "station": "blue[116]",
+    "line": "E-edge",
+    "floor": 8.4647,
+    "owner": "blue",
+    "grade_pct": -4.59,
+    "clearance": 1.6476,
+    "ledge": null
+   },
+   {
+    "station": "blue[117]",
+    "line": "W-edge",
+    "floor": 8.4321,
+    "owner": "merge_lead",
+    "grade_pct": -6.36,
+    "clearance": 1.6405,
+    "ledge": null
+   },
+   {
+    "station": "blue[117]",
+    "line": "W-mid",
+    "floor": 8.2849,
+    "owner": "merge_lead",
+    "grade_pct": -4.03,
+    "clearance": 1.6373,
+    "ledge": null
+   },
+   {
+    "station": "blue[117]",
+    "line": "centre",
+    "floor": 8.2219,
+    "owner": "merge_lead",
+    "grade_pct": -4.25,
+    "clearance": 1.6427,
+    "ledge": null
+   },
+   {
+    "station": "blue[117]",
+    "line": "E-mid",
+    "floor": 8.2844,
+    "owner": "merge_lead",
+    "grade_pct": -4.16,
+    "clearance": 1.6682,
+    "ledge": null
+   },
+   {
+    "station": "blue[117]",
+    "line": "E-edge",
+    "floor": 8.4308,
+    "owner": "merge_lead",
+    "grade_pct": -6.69,
+    "clearance": 1.6588,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[0]",
+    "line": "W-edge",
+    "floor": 8.4922,
+    "owner": "merge_lead",
+    "grade_pct": null,
+    "clearance": 1.6256,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[0]",
+    "line": "W-mid",
+    "floor": 8.298,
+    "owner": "merge_lead",
+    "grade_pct": null,
+    "clearance": 1.6346,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[0]",
+    "line": "centre",
+    "floor": 8.2223,
+    "owner": "merge_lead",
+    "grade_pct": null,
+    "clearance": 1.6428,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[0]",
+    "line": "E-mid",
+    "floor": 8.298,
+    "owner": "merge_lead",
+    "grade_pct": null,
+    "clearance": 1.6653,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[0]",
+    "line": "E-edge",
+    "floor": 8.4994,
+    "owner": "blue",
+    "grade_pct": null,
+    "clearance": 1.6297,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[1]",
+    "line": "W-edge",
+    "floor": 8.4855,
+    "owner": "merge_lead",
+    "grade_pct": -3.46,
+    "clearance": 1.6205,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[1]",
+    "line": "W-mid",
+    "floor": 8.2913,
+    "owner": "merge_lead",
+    "grade_pct": -3.5,
+    "clearance": 1.6269,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[1]",
+    "line": "centre",
+    "floor": 8.2156,
+    "owner": "merge_lead",
+    "grade_pct": -3.59,
+    "clearance": 1.6419,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[1]",
+    "line": "E-mid",
+    "floor": 8.2913,
+    "owner": "merge_lead",
+    "grade_pct": -3.73,
+    "clearance": 1.6588,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[1]",
+    "line": "E-edge",
+    "floor": 8.4854,
+    "owner": "merge_lead",
+    "grade_pct": -8.02,
+    "clearance": 1.6454,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[2]",
+    "line": "W-edge",
+    "floor": 8.4808,
+    "owner": "merge_lead",
+    "grade_pct": -2.28,
+    "clearance": 1.6201,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[2]",
+    "line": "W-mid",
+    "floor": 8.2861,
+    "owner": "merge_lead",
+    "grade_pct": -2.61,
+    "clearance": 1.6245,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[2]",
+    "line": "centre",
+    "floor": 8.2104,
+    "owner": "merge_lead",
+    "grade_pct": -2.8,
+    "clearance": 1.6391,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[2]",
+    "line": "E-mid",
+    "floor": 8.2861,
+    "owner": "merge_lead",
+    "grade_pct": -2.9,
+    "clearance": 1.6533,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[2]",
+    "line": "E-edge",
+    "floor": 8.4807,
+    "owner": "merge_lead",
+    "grade_pct": -2.76,
+    "clearance": 1.6591,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[3]",
+    "line": "W-edge",
+    "floor": 8.4758,
+    "owner": "merge_lead",
+    "grade_pct": -2.61,
+    "clearance": 1.6143,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[3]",
+    "line": "W-mid",
+    "floor": 8.2813,
+    "owner": "merge_lead",
+    "grade_pct": -2.57,
+    "clearance": 1.6228,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[3]",
+    "line": "centre",
+    "floor": 8.2056,
+    "owner": "merge_lead",
+    "grade_pct": -2.6,
+    "clearance": 1.6373,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[3]",
+    "line": "E-mid",
+    "floor": 8.2813,
+    "owner": "merge_lead",
+    "grade_pct": -2.68,
+    "clearance": 1.6451,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[3]",
+    "line": "E-edge",
+    "floor": 8.4757,
+    "owner": "merge_lead",
+    "grade_pct": -2.82,
+    "clearance": 1.6649,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[4]",
+    "line": "W-edge",
+    "floor": 8.4698,
+    "owner": "merge_lead",
+    "grade_pct": -3.21,
+    "clearance": 1.6129,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[4]",
+    "line": "W-mid",
+    "floor": 8.2757,
+    "owner": "merge_lead",
+    "grade_pct": -3.04,
+    "clearance": 1.6226,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[4]",
+    "line": "centre",
+    "floor": 8.2001,
+    "owner": "merge_lead",
+    "grade_pct": -3.0,
+    "clearance": 1.6375,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[4]",
+    "line": "E-mid",
+    "floor": 8.2758,
+    "owner": "merge_lead",
+    "grade_pct": -3.01,
+    "clearance": 1.645,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[4]",
+    "line": "E-edge",
+    "floor": 8.47,
+    "owner": "merge_lead",
+    "grade_pct": -3.13,
+    "clearance": 1.6729,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[5]",
+    "line": "W-edge",
+    "floor": 8.4621,
+    "owner": "merge_lead",
+    "grade_pct": -4.47,
+    "clearance": 1.6183,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[5]",
+    "line": "W-mid",
+    "floor": 8.2684,
+    "owner": "merge_lead",
+    "grade_pct": -4.15,
+    "clearance": 1.6251,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[5]",
+    "line": "centre",
+    "floor": 8.193,
+    "owner": "merge_lead",
+    "grade_pct": -3.99,
+    "clearance": 1.6394,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[5]",
+    "line": "E-mid",
+    "floor": 8.2686,
+    "owner": "merge_lead",
+    "grade_pct": -3.91,
+    "clearance": 1.6491,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[5]",
+    "line": "E-edge",
+    "floor": 8.4625,
+    "owner": "merge_lead",
+    "grade_pct": -3.94,
+    "clearance": 1.6791,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[6]",
+    "line": "W-edge",
+    "floor": 8.4514,
+    "owner": "merge_lead",
+    "grade_pct": -6.41,
+    "clearance": 1.6166,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[6]",
+    "line": "W-mid",
+    "floor": 8.2584,
+    "owner": "merge_lead",
+    "grade_pct": -5.93,
+    "clearance": 1.6281,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[6]",
+    "line": "centre",
+    "floor": 8.1832,
+    "owner": "merge_lead",
+    "grade_pct": -5.57,
+    "clearance": 1.644,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[6]",
+    "line": "E-mid",
+    "floor": 8.2586,
+    "owner": "merge_lead",
+    "grade_pct": -5.3,
+    "clearance": 1.6584,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[6]",
+    "line": "E-edge",
+    "floor": 8.4522,
+    "owner": "merge_lead",
+    "grade_pct": -5.13,
+    "clearance": 1.6933,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[7]",
+    "line": "W-edge",
+    "floor": 8.4369,
+    "owner": "merge_lead",
+    "grade_pct": -9.08,
+    "clearance": 1.6196,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[7]",
+    "line": "W-mid",
+    "floor": 8.2447,
+    "owner": "merge_lead",
+    "grade_pct": -8.43,
+    "clearance": 1.6288,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[7]",
+    "line": "centre",
+    "floor": 8.1697,
+    "owner": "merge_lead",
+    "grade_pct": -7.76,
+    "clearance": 1.6469,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[7]",
+    "line": "E-mid",
+    "floor": 8.2451,
+    "owner": "merge_lead",
+    "grade_pct": -7.13,
+    "clearance": 1.6732,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[7]",
+    "line": "E-edge",
+    "floor": 8.4382,
+    "owner": "merge_lead",
+    "grade_pct": -6.64,
+    "clearance": 1.7154,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[8]",
+    "line": "W-edge",
+    "floor": 8.418,
+    "owner": "merge_lead",
+    "grade_pct": -12.47,
+    "clearance": 1.6337,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[8]",
+    "line": "W-mid",
+    "floor": 8.2264,
+    "owner": "merge_lead",
+    "grade_pct": -11.72,
+    "clearance": 1.6357,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[8]",
+    "line": "centre",
+    "floor": 8.1517,
+    "owner": "merge_lead",
+    "grade_pct": -10.55,
+    "clearance": 1.6521,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[8]",
+    "line": "E-mid",
+    "floor": 8.2269,
+    "owner": "merge_lead",
+    "grade_pct": -9.35,
+    "clearance": 1.6819,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[8]",
+    "line": "E-edge",
+    "floor": 8.4197,
+    "owner": "merge_lead",
+    "grade_pct": -8.38,
+    "clearance": 1.7326,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[9]",
+    "line": "W-edge",
+    "floor": 8.3942,
+    "owner": "merge_lead",
+    "grade_pct": -17.12,
+    "clearance": 1.6541,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[9]",
+    "line": "W-mid",
+    "floor": 8.2029,
+    "owner": "merge_lead",
+    "grade_pct": -16.0,
+    "clearance": 1.6488,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[9]",
+    "line": "centre",
+    "floor": 8.1285,
+    "owner": "merge_lead",
+    "grade_pct": -13.92,
+    "clearance": 1.6624,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[9]",
+    "line": "E-mid",
+    "floor": 8.2035,
+    "owner": "merge_lead",
+    "grade_pct": -11.95,
+    "clearance": 1.693,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[9]",
+    "line": "E-edge",
+    "floor": 8.3957,
+    "owner": "merge_lead",
+    "grade_pct": -10.46,
+    "clearance": 1.7222,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[10]",
+    "line": "W-edge",
+    "floor": 8.3638,
+    "owner": "merge_lead",
+    "grade_pct": -25.69,
+    "clearance": 1.6722,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[10]",
+    "line": "W-mid",
+    "floor": 8.1733,
+    "owner": "merge_lead",
+    "grade_pct": -21.6,
+    "clearance": 1.6672,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[10]",
+    "line": "centre",
+    "floor": 8.0992,
+    "owner": "merge_lead",
+    "grade_pct": -17.86,
+    "clearance": 1.6784,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[10]",
+    "line": "E-mid",
+    "floor": 8.1737,
+    "owner": "merge_lead",
+    "grade_pct": -15.12,
+    "clearance": 1.7013,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[10]",
+    "line": "E-edge",
+    "floor": 8.3646,
+    "owner": "merge_lead",
+    "grade_pct": -13.42,
+    "clearance": 1.7144,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[11]",
+    "line": "W-edge",
+    "floor": 8.3183,
+    "owner": "final",
+    "grade_pct": -31.22,
+    "clearance": 1.6952,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[11]",
+    "line": "W-mid",
+    "floor": 8.131,
+    "owner": "final",
+    "grade_pct": -27.04,
+    "clearance": 1.6878,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[11]",
+    "line": "centre",
+    "floor": 8.0611,
+    "owner": "final",
+    "grade_pct": -22.25,
+    "clearance": 1.6929,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[11]",
+    "line": "E-mid",
+    "floor": 8.2029,
+    "owner": "merge_lead",
+    "grade_pct": null,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "merge_lead[11]",
+    "line": "E-edge",
+    "floor": 8.4277,
+    "owner": "merge_lead",
+    "grade_pct": null,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[0]",
+    "line": "W-edge",
+    "floor": 8.3333,
+    "owner": "merge_lead",
+    "grade_pct": null,
+    "clearance": 1.6868,
+    "ledge": null
+   },
+   {
+    "station": "final[0]",
+    "line": "W-mid",
+    "floor": 8.1397,
+    "owner": "merge_lead",
+    "grade_pct": null,
+    "clearance": 1.6827,
+    "ledge": null
+   },
+   {
+    "station": "final[0]",
+    "line": "centre",
+    "floor": 8.0618,
+    "owner": "final",
+    "grade_pct": null,
+    "clearance": 1.6931,
+    "ledge": null
+   },
+   {
+    "station": "final[0]",
+    "line": "E-mid",
+    "floor": 8.1356,
+    "owner": "final",
+    "grade_pct": null,
+    "clearance": 1.7035,
+    "ledge": null
+   },
+   {
+    "station": "final[0]",
+    "line": "E-edge",
+    "floor": 8.325,
+    "owner": "final",
+    "grade_pct": null,
+    "clearance": 1.7097,
+    "ledge": null
+   },
+   {
+    "station": "final[1]",
+    "line": "W-edge",
+    "floor": 8.2467,
+    "owner": "final",
+    "grade_pct": -27.4,
+    "clearance": 1.7003,
+    "ledge": null
+   },
+   {
+    "station": "final[1]",
+    "line": "W-mid",
+    "floor": 8.0578,
+    "owner": "final",
+    "grade_pct": -25.94,
+    "clearance": 1.699,
+    "ledge": null
+   },
+   {
+    "station": "final[1]",
+    "line": "centre",
+    "floor": 7.9844,
+    "owner": "final",
+    "grade_pct": -24.46,
+    "clearance": 1.7044,
+    "ledge": null
+   },
+   {
+    "station": "final[1]",
+    "line": "E-mid",
+    "floor": 8.0587,
+    "owner": "final",
+    "grade_pct": -24.23,
+    "clearance": 1.7064,
+    "ledge": null
+   },
+   {
+    "station": "final[1]",
+    "line": "E-edge",
+    "floor": 8.2484,
+    "owner": "final",
+    "grade_pct": -24.0,
+    "clearance": 1.7067,
+    "ledge": null
+   },
+   {
+    "station": "final[2]",
+    "line": "W-edge",
+    "floor": 8.1681,
+    "owner": "final",
+    "grade_pct": -24.93,
+    "clearance": 1.7073,
+    "ledge": null
+   },
+   {
+    "station": "final[2]",
+    "line": "W-mid",
+    "floor": 7.9797,
+    "owner": "final",
+    "grade_pct": -24.72,
+    "clearance": 1.7118,
+    "ledge": null
+   },
+   {
+    "station": "final[2]",
+    "line": "centre",
+    "floor": 7.907,
+    "owner": "final",
+    "grade_pct": -24.46,
+    "clearance": 1.7158,
+    "ledge": null
+   },
+   {
+    "station": "final[2]",
+    "line": "E-mid",
+    "floor": 7.9818,
+    "owner": "final",
+    "grade_pct": -24.16,
+    "clearance": 1.7091,
+    "ledge": null
+   },
+   {
+    "station": "final[2]",
+    "line": "E-edge",
+    "floor": 8.1721,
+    "owner": "final",
+    "grade_pct": -23.88,
+    "clearance": 1.7017,
+    "ledge": null
+   },
+   {
+    "station": "final[3]",
+    "line": "W-edge",
+    "floor": 8.0913,
+    "owner": "final",
+    "grade_pct": -24.23,
+    "clearance": 1.7101,
+    "ledge": null
+   },
+   {
+    "station": "final[3]",
+    "line": "W-mid",
+    "floor": 7.9026,
+    "owner": "final",
+    "grade_pct": -24.36,
+    "clearance": 1.711,
+    "ledge": null
+   },
+   {
+    "station": "final[3]",
+    "line": "centre",
+    "floor": 7.8295,
+    "owner": "final",
+    "grade_pct": -24.47,
+    "clearance": 1.7159,
+    "ledge": null
+   },
+   {
+    "station": "final[3]",
+    "line": "E-mid",
+    "floor": 7.9041,
+    "owner": "final",
+    "grade_pct": -24.54,
+    "clearance": 1.7083,
+    "ledge": null
+   },
+   {
+    "station": "final[3]",
+    "line": "E-edge",
+    "floor": 8.094,
+    "owner": "final",
+    "grade_pct": -24.6,
+    "clearance": 1.7038,
+    "ledge": null
+   },
+   {
+    "station": "final[4]",
+    "line": "W-edge",
+    "floor": 8.0172,
+    "owner": "final",
+    "grade_pct": -23.29,
+    "clearance": 1.7101,
+    "ledge": null
+   },
+   {
+    "station": "final[4]",
+    "line": "W-mid",
+    "floor": 7.8269,
+    "owner": "final",
+    "grade_pct": -23.85,
+    "clearance": 1.7099,
+    "ledge": null
+   },
+   {
+    "station": "final[4]",
+    "line": "centre",
+    "floor": 7.7521,
+    "owner": "final",
+    "grade_pct": -24.47,
+    "clearance": 1.716,
+    "ledge": null
+   },
+   {
+    "station": "final[4]",
+    "line": "E-mid",
+    "floor": 7.8248,
+    "owner": "final",
+    "grade_pct": -25.05,
+    "clearance": 1.7109,
+    "ledge": null
+   },
+   {
+    "station": "final[4]",
+    "line": "E-edge",
+    "floor": 8.0132,
+    "owner": "final",
+    "grade_pct": -25.57,
+    "clearance": 1.7105,
+    "ledge": null
+   },
+   {
+    "station": "final[5]",
+    "line": "W-edge",
+    "floor": 7.9444,
+    "owner": "final",
+    "grade_pct": -22.85,
+    "clearance": 1.7065,
+    "ledge": null
+   },
+   {
+    "station": "final[5]",
+    "line": "W-mid",
+    "floor": 7.7519,
+    "owner": "final",
+    "grade_pct": -23.61,
+    "clearance": 1.7083,
+    "ledge": null
+   },
+   {
+    "station": "final[5]",
+    "line": "centre",
+    "floor": 7.6746,
+    "owner": "final",
+    "grade_pct": -24.46,
+    "clearance": 1.7161,
+    "ledge": null
+   },
+   {
+    "station": "final[5]",
+    "line": "E-mid",
+    "floor": 7.7449,
+    "owner": "final",
+    "grade_pct": -25.31,
+    "clearance": 1.7145,
+    "ledge": null
+   },
+   {
+    "station": "final[5]",
+    "line": "E-edge",
+    "floor": 7.931,
+    "owner": "final",
+    "grade_pct": -26.05,
+    "clearance": 1.7167,
+    "ledge": null
+   },
+   {
+    "station": "final[6]",
+    "line": "W-edge",
+    "floor": 7.8708,
+    "owner": "final",
+    "grade_pct": -23.08,
+    "clearance": 1.7053,
+    "ledge": null
+   },
+   {
+    "station": "final[6]",
+    "line": "W-mid",
+    "floor": 7.6766,
+    "owner": "final",
+    "grade_pct": -23.73,
+    "clearance": 1.707,
+    "ledge": null
+   },
+   {
+    "station": "final[6]",
+    "line": "centre",
+    "floor": 7.5972,
+    "owner": "final",
+    "grade_pct": -24.46,
+    "clearance": 1.716,
+    "ledge": null
+   },
+   {
+    "station": "final[6]",
+    "line": "E-mid",
+    "floor": 7.6654,
+    "owner": "final",
+    "grade_pct": -25.19,
+    "clearance": 1.7179,
+    "ledge": null
+   },
+   {
+    "station": "final[6]",
+    "line": "E-edge",
+    "floor": 7.8496,
+    "owner": "final",
+    "grade_pct": -25.83,
+    "clearance": 1.7244,
+    "ledge": null
+   },
+   {
+    "station": "final[7]",
+    "line": "W-edge",
+    "floor": 7.796,
+    "owner": "final",
+    "grade_pct": -23.5,
+    "clearance": 1.7015,
+    "ledge": null
+   },
+   {
+    "station": "final[7]",
+    "line": "W-mid",
+    "floor": 7.6005,
+    "owner": "final",
+    "grade_pct": -23.95,
+    "clearance": 1.7057,
+    "ledge": null
+   },
+   {
+    "station": "final[7]",
+    "line": "centre",
+    "floor": 7.5197,
+    "owner": "final",
+    "grade_pct": -24.46,
+    "clearance": 1.716,
+    "ledge": null
+   },
+   {
+    "station": "final[7]",
+    "line": "E-mid",
+    "floor": 7.5866,
+    "owner": "final",
+    "grade_pct": -24.96,
+    "clearance": 1.7199,
+    "ledge": null
+   },
+   {
+    "station": "final[7]",
+    "line": "E-edge",
+    "floor": 7.7695,
+    "owner": "final",
+    "grade_pct": -25.4,
+    "clearance": 1.7285,
+    "ledge": null
+   },
+   {
+    "station": "final[8]",
+    "line": "W-edge",
+    "floor": 7.7209,
+    "owner": "final",
+    "grade_pct": -23.57,
+    "clearance": 1.6993,
+    "ledge": null
+   },
+   {
+    "station": "final[8]",
+    "line": "W-mid",
+    "floor": 7.5243,
+    "owner": "final",
+    "grade_pct": -23.99,
+    "clearance": 1.7042,
+    "ledge": null
+   },
+   {
+    "station": "final[8]",
+    "line": "centre",
+    "floor": 7.4423,
+    "owner": "final",
+    "grade_pct": -24.45,
+    "clearance": 1.7159,
+    "ledge": null
+   },
+   {
+    "station": "final[8]",
+    "line": "E-mid",
+    "floor": 7.5079,
+    "owner": "final",
+    "grade_pct": -24.92,
+    "clearance": 1.7215,
+    "ledge": null
+   },
+   {
+    "station": "final[8]",
+    "line": "E-edge",
+    "floor": 7.6897,
+    "owner": "final",
+    "grade_pct": -25.33,
+    "clearance": 1.7324,
+    "ledge": null
+   },
+   {
+    "station": "final[9]",
+    "line": "W-edge",
+    "floor": 7.6458,
+    "owner": "final",
+    "grade_pct": -23.55,
+    "clearance": 1.6923,
+    "ledge": null
+   },
+   {
+    "station": "final[9]",
+    "line": "W-mid",
+    "floor": 7.4482,
+    "owner": "final",
+    "grade_pct": -23.97,
+    "clearance": 1.7006,
+    "ledge": null
+   },
+   {
+    "station": "final[9]",
+    "line": "centre",
+    "floor": 7.3649,
+    "owner": "final",
+    "grade_pct": -24.45,
+    "clearance": 1.7158,
+    "ledge": null
+   },
+   {
+    "station": "final[9]",
+    "line": "E-mid",
+    "floor": 7.4292,
+    "owner": "final",
+    "grade_pct": -24.92,
+    "clearance": 1.7213,
+    "ledge": null
+   },
+   {
+    "station": "final[9]",
+    "line": "E-edge",
+    "floor": 7.6099,
+    "owner": "final",
+    "grade_pct": -25.35,
+    "clearance": 1.7375,
+    "ledge": null
+   },
+   {
+    "station": "final[10]",
+    "line": "W-edge",
+    "floor": 7.571,
+    "owner": "final",
+    "grade_pct": -23.47,
+    "clearance": 1.6786,
+    "ledge": null
+   },
+   {
+    "station": "final[10]",
+    "line": "W-mid",
+    "floor": 7.3721,
+    "owner": "final",
+    "grade_pct": -23.93,
+    "clearance": 1.7031,
+    "ledge": null
+   },
+   {
+    "station": "final[10]",
+    "line": "centre",
+    "floor": 7.2875,
+    "owner": "final",
+    "grade_pct": -24.44,
+    "clearance": 1.7158,
+    "ledge": null
+   },
+   {
+    "station": "final[10]",
+    "line": "E-mid",
+    "floor": 7.3505,
+    "owner": "final",
+    "grade_pct": -24.96,
+    "clearance": 1.7298,
+    "ledge": null
+   },
+   {
+    "station": "final[10]",
+    "line": "E-edge",
+    "floor": 7.53,
+    "owner": "final",
+    "grade_pct": -25.42,
+    "clearance": 1.7213,
+    "ledge": null
+   },
+   {
+    "station": "final[11]",
+    "line": "W-edge",
+    "floor": 7.4965,
+    "owner": "final",
+    "grade_pct": -23.33,
+    "clearance": 1.6655,
+    "ledge": null
+   },
+   {
+    "station": "final[11]",
+    "line": "W-mid",
+    "floor": 7.2963,
+    "owner": "final",
+    "grade_pct": -23.85,
+    "clearance": 1.7034,
+    "ledge": null
+   },
+   {
+    "station": "final[11]",
+    "line": "centre",
+    "floor": 7.2102,
+    "owner": "final",
+    "grade_pct": -24.43,
+    "clearance": 1.7157,
+    "ledge": null
+   },
+   {
+    "station": "final[11]",
+    "line": "E-mid",
+    "floor": 7.2716,
+    "owner": "final",
+    "grade_pct": -25.02,
+    "clearance": 1.7342,
+    "ledge": null
+   },
+   {
+    "station": "final[11]",
+    "line": "E-edge",
+    "floor": 7.4497,
+    "owner": "final",
+    "grade_pct": -25.56,
+    "clearance": 1.7169,
+    "ledge": null
+   },
+   {
+    "station": "final[12]",
+    "line": "W-edge",
+    "floor": 7.4222,
+    "owner": "final",
+    "grade_pct": -23.26,
+    "clearance": 1.6684,
+    "ledge": null
+   },
+   {
+    "station": "final[12]",
+    "line": "W-mid",
+    "floor": 7.2206,
+    "owner": "final",
+    "grade_pct": -23.81,
+    "clearance": 1.6993,
+    "ledge": null
+   },
+   {
+    "station": "final[12]",
+    "line": "centre",
+    "floor": 7.1328,
+    "owner": "final",
+    "grade_pct": -24.43,
+    "clearance": 1.7157,
+    "ledge": null
+   },
+   {
+    "station": "final[12]",
+    "line": "E-mid",
+    "floor": 7.1926,
+    "owner": "final",
+    "grade_pct": -25.05,
+    "clearance": 1.7448,
+    "ledge": null
+   },
+   {
+    "station": "final[12]",
+    "line": "E-edge",
+    "floor": 7.3692,
+    "owner": "final",
+    "grade_pct": -25.62,
+    "clearance": 1.7149,
+    "ledge": null
+   },
+   {
+    "station": "final[13]",
+    "line": "W-edge",
+    "floor": 7.3474,
+    "owner": "final",
+    "grade_pct": -23.39,
+    "clearance": 1.6708,
+    "ledge": null
+   },
+   {
+    "station": "final[13]",
+    "line": "W-mid",
+    "floor": 7.1446,
+    "owner": "final",
+    "grade_pct": -23.87,
+    "clearance": 1.7005,
+    "ledge": null
+   },
+   {
+    "station": "final[13]",
+    "line": "centre",
+    "floor": 7.0555,
+    "owner": "final",
+    "grade_pct": -24.42,
+    "clearance": 1.7157,
+    "ledge": null
+   },
+   {
+    "station": "final[13]",
+    "line": "E-mid",
+    "floor": 7.1139,
+    "owner": "final",
+    "grade_pct": -24.98,
+    "clearance": 1.737,
+    "ledge": null
+   },
+   {
+    "station": "final[13]",
+    "line": "E-edge",
+    "floor": 7.2893,
+    "owner": "final",
+    "grade_pct": -25.49,
+    "clearance": 1.7404,
+    "ledge": null
+   },
+   {
+    "station": "final[14]",
+    "line": "W-edge",
+    "floor": 7.271,
+    "owner": "final",
+    "grade_pct": -23.9,
+    "clearance": 1.6714,
+    "ledge": null
+   },
+   {
+    "station": "final[14]",
+    "line": "W-mid",
+    "floor": 7.0678,
+    "owner": "final",
+    "grade_pct": -24.14,
+    "clearance": 1.6963,
+    "ledge": null
+   },
+   {
+    "station": "final[14]",
+    "line": "centre",
+    "floor": 6.9782,
+    "owner": "final",
+    "grade_pct": -24.41,
+    "clearance": 1.7157,
+    "ledge": null
+   },
+   {
+    "station": "final[14]",
+    "line": "E-mid",
+    "floor": 7.0361,
+    "owner": "final",
+    "grade_pct": -24.7,
+    "clearance": 1.7384,
+    "ledge": null
+   },
+   {
+    "station": "final[14]",
+    "line": "E-edge",
+    "floor": 7.211,
+    "owner": "final",
+    "grade_pct": -24.95,
+    "clearance": 1.737,
+    "ledge": null
+   },
+   {
+    "station": "final[15]",
+    "line": "W-edge",
+    "floor": 7.1922,
+    "owner": "final",
+    "grade_pct": -24.69,
+    "clearance": 1.6745,
+    "ledge": null
+   },
+   {
+    "station": "final[15]",
+    "line": "W-mid",
+    "floor": 6.9897,
+    "owner": "final",
+    "grade_pct": -24.56,
+    "clearance": 1.6934,
+    "ledge": null
+   },
+   {
+    "station": "final[15]",
+    "line": "centre",
+    "floor": 6.9009,
+    "owner": "final",
+    "grade_pct": -24.41,
+    "clearance": 1.7158,
+    "ledge": null
+   },
+   {
+    "station": "final[15]",
+    "line": "E-mid",
+    "floor": 6.9596,
+    "owner": "final",
+    "grade_pct": -24.27,
+    "clearance": 1.7325,
+    "ledge": null
+   },
+   {
+    "station": "final[15]",
+    "line": "E-edge",
+    "floor": 7.1352,
+    "owner": "final",
+    "grade_pct": -24.13,
+    "clearance": 1.7447,
+    "ledge": null
+   },
+   {
+    "station": "final[16]",
+    "line": "W-edge",
+    "floor": 7.1111,
+    "owner": "final",
+    "grade_pct": -25.47,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[16]",
+    "line": "W-mid",
+    "floor": 6.9105,
+    "owner": "final",
+    "grade_pct": -24.97,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[16]",
+    "line": "centre",
+    "floor": 6.8237,
+    "owner": "final",
+    "grade_pct": -24.42,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[16]",
+    "line": "E-mid",
+    "floor": 6.8843,
+    "owner": "final",
+    "grade_pct": -23.86,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[16]",
+    "line": "E-edge",
+    "floor": 7.0617,
+    "owner": "final",
+    "grade_pct": -23.36,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[17]",
+    "line": "W-edge",
+    "floor": 7.029,
+    "owner": "final",
+    "grade_pct": -25.91,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[17]",
+    "line": "W-mid",
+    "floor": 6.8305,
+    "owner": "final",
+    "grade_pct": -25.27,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[17]",
+    "line": "centre",
+    "floor": 6.7461,
+    "owner": "final",
+    "grade_pct": -24.55,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[17]",
+    "line": "E-mid",
+    "floor": 6.8091,
+    "owner": "final",
+    "grade_pct": -23.81,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[17]",
+    "line": "E-edge",
+    "floor": 6.9886,
+    "owner": "final",
+    "grade_pct": -23.17,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[18]",
+    "line": "W-edge",
+    "floor": 6.9474,
+    "owner": "final",
+    "grade_pct": -25.8,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[18]",
+    "line": "W-mid",
+    "floor": 6.7506,
+    "owner": "final",
+    "grade_pct": -25.29,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[18]",
+    "line": "centre",
+    "floor": 6.6681,
+    "owner": "final",
+    "grade_pct": -24.72,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[18]",
+    "line": "E-mid",
+    "floor": 6.7329,
+    "owner": "final",
+    "grade_pct": -24.13,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[18]",
+    "line": "E-edge",
+    "floor": 6.914,
+    "owner": "final",
+    "grade_pct": -23.62,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[19]",
+    "line": "W-edge",
+    "floor": 6.867,
+    "owner": "final",
+    "grade_pct": -25.38,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[19]",
+    "line": "W-mid",
+    "floor": 6.6711,
+    "owner": "final",
+    "grade_pct": -25.14,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[19]",
+    "line": "centre",
+    "floor": 6.5896,
+    "owner": "final",
+    "grade_pct": -24.86,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[19]",
+    "line": "E-mid",
+    "floor": 6.6554,
+    "owner": "final",
+    "grade_pct": -24.58,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[19]",
+    "line": "E-edge",
+    "floor": 6.8372,
+    "owner": "final",
+    "grade_pct": -24.33,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[20]",
+    "line": "W-edge",
+    "floor": 6.7877,
+    "owner": "final",
+    "grade_pct": -25.01,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[20]",
+    "line": "W-mid",
+    "floor": 6.592,
+    "owner": "final",
+    "grade_pct": -24.98,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[20]",
+    "line": "centre",
+    "floor": 6.5108,
+    "owner": "final",
+    "grade_pct": -24.95,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[20]",
+    "line": "E-mid",
+    "floor": 6.5768,
+    "owner": "final",
+    "grade_pct": -24.91,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[20]",
+    "line": "E-edge",
+    "floor": 6.7588,
+    "owner": "final",
+    "grade_pct": -24.89,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[21]",
+    "line": "W-edge",
+    "floor": 6.7089,
+    "owner": "final",
+    "grade_pct": -24.82,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[21]",
+    "line": "W-mid",
+    "floor": 6.5131,
+    "owner": "final",
+    "grade_pct": -24.92,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[21]",
+    "line": "centre",
+    "floor": 6.4317,
+    "owner": "final",
+    "grade_pct": -25.01,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[21]",
+    "line": "E-mid",
+    "floor": 6.4977,
+    "owner": "final",
+    "grade_pct": -25.09,
+    "clearance": null,
+    "ledge": null
+   },
+   {
+    "station": "final[21]",
+    "line": "E-edge",
+    "floor": 6.6796,
+    "owner": "final",
+    "grade_pct": -25.16,
+    "clearance": null,
+    "ledge": null
+   }
+  ]
+ }
+}

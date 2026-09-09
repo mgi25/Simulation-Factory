@@ -534,6 +534,28 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
             ),
         )
 
+    # Blue's tail hands onto a **channel** into the sprint rather than onto the
+    # merge apron's height field. `sloped.joins.merge_lead_path` has the three
+    # measured reasons; the short one is that an apron laid over a channel is
+    # only flush where its own cradle happens to line up with the channel's, and
+    # blue's is 0.26 to 0.52 units off the sprint's and yawed 7.5 degrees.
+    #
+    # Solved from the two built runs and installed after both exist, because its
+    # endpoints are their poses. `MERGE_LEAD_WIDTH` opens at blue's own width
+    # and eases to `final[0]`'s flare, which is measured rather than chosen.
+    runs["merge_lead"] = TrackRun(
+        "merge_lead",
+        spec=joins.JOIN_SPECS["merge_lead"],
+        path=joins.merge_lead_path(runs["blue"], runs["final"]),
+        samples=joins.MERGE_LEAD_SAMPLES,
+        taper=joins.MERGE_LEAD_WIDTH,
+        # The apron stands around the lead as well as around the sprint, so the
+        # lead's rails are opened over the whole of it for the same reason the
+        # sprint's are - see `MERGE_GUARD_WINDOW`. A rail inside an apron leaves
+        # a ledge along its own top with the roof over it.
+        open_side=(0.0, -1, 0, joins.MERGE_LEAD_SAMPLES, joins.MERGE_LEAD_SAMPLES),
+    )
+
     # Orange's lead stops overhanging leg3's channel. Solved from the two built
     # runs and installed after both exist, because the answer is where one
     # crosses the other; `sloped.joins.fork_trim` has the measurement and the
@@ -575,7 +597,10 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
     branch = ("blue_lead", "blue", "orange_lead", "orange") if forked else ("blue_lead", "blue")
     for name in branch:
         machine.add(runs[name], Transform())
-    machine.add(MergeCatch("merge", runs["final"], runs["blue"]), Transform())
+    machine.add(runs["merge_lead"], Transform())
+    machine.add(
+        MergeCatch("merge", runs["final"], runs["merge_lead"], runs["blue"]), Transform()
+    )
     machine.add(runs["final"], Transform())
     machine.add(FinishDeck("finish", runs["final"]), Transform())
 
@@ -595,6 +620,11 @@ SEAMS = (
     ("leg3", "exit", "blue_lead", "entry"),
     ("blue_lead", "exit", "blue", "entry"),
     ("orange_lead", "exit", "orange", "entry"),
+    # The merge lead closes the junction in position, heading and roll on both
+    # sides, which is the whole point of it being a channel; before it, blue
+    # handed onto a height field and there was no seam to check.
+    ("blue", "exit", "merge_lead", "entry"),
+    ("merge_lead", "exit", "final", "entry"),
 )
 
 
@@ -667,13 +697,21 @@ def check(machine: Machine | None = None, config: CoreConfig | None = None) -> l
         speed = float(spec["design_speed"])
         allowed = joins.min_radius_layout(speed, float(spec["bank_max"]))
         worst, at = _worst_radius(run.path)
-        if worst < allowed:
+        # **The radius is reported against the drift it actually costs.** A
+        # steady-state radius budget fails six of the seven authored runs,
+        # including leg2 at less than half its own limit, and those runs ship;
+        # what separates a tight sample from a defect is whether the marble
+        # ends up somewhere else. `joins.TURN_DRIFT_BUDGET` carries both tables.
+        drift = joins.turn_drift(run.path, speed, float(spec["bank_max"]))
+        half = 0.5 * run.clear_width * max(run.widths) / to_sim(1.0)
+        if worst < allowed and drift > joins.TURN_DRIFT_BUDGET * half:
             report(
                 "turn-radius",
                 name,
                 f"sample {at} turns at {worst:.3f} layout units against the "
                 f"{allowed:.3f} a marble at {speed:.0f} wu/s holds on a "
-                f"{spec['bank_max']:.0f}-degree bank",
+                f"{spec['bank_max']:.0f}-degree bank, and walks it {drift:.4f} "
+                f"off the centreline against a {half:.3f} half width",
             )
 
     # The fork is where leg3 crosses south, and nothing may move it silently.

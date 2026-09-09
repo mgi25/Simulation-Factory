@@ -51,10 +51,23 @@ from sloped.junction import (  # noqa: E402
 # The junction, as stations. Wide enough to carry the whole roll reversal on
 # each branch tail, and far enough down the sprint to clear the apron's front
 # edge and the guard window that closes at `final[14]`.
-BLUE_WALK = [("blue", i) for i in range(86, 118)] + [("final", i) for i in range(0, 22)]
+BLUE_WALK = (
+    [("blue", i) for i in range(86, 118)]
+    + [("merge_lead", i) for i in range(0, 12)]
+    + [("final", i) for i in range(0, 22)]
+)
 ORANGE_WALK = [("orange", i) for i in range(86, 118)] + [("final", i) for i in range(0, 22)]
 
-OWNERS = ("blue", "blue_lead", "orange", "orange_lead", "merge", "final", "finish")
+OWNERS = (
+    "blue",
+    "blue_lead",
+    "orange",
+    "orange_lead",
+    "merge_lead",
+    "merge",
+    "final",
+    "finish",
+)
 
 
 def _print_walk(title: str, walk) -> None:
@@ -111,7 +124,10 @@ def main(argv: list[str] | None = None) -> int:
     fractions = (0.0, 0.4, 0.55, 0.7, 0.85, 0.95)
     print(f"{'run':<13}" + "".join(f"{f:>9.2f}" for f in fractions) + "    worst  needs  @sample")
     basins = {}
-    for name in ("launch", "leg1", "leg2", "leg3", "blue_lead", "blue", "orange_lead", "orange", "final"):
+    for name in (
+        "launch", "leg1", "leg2", "leg3", "blue_lead", "blue",
+        "orange_lead", "orange", "merge_lead", "final",
+    ):
         if name not in runs:
             continue
         survey = climb_survey(runs[name], fractions=fractions)
@@ -140,12 +156,17 @@ def main(argv: list[str] | None = None) -> int:
         print("--- endpoint frames, in the sprint's own frame at its entry " + "-" * 17)
         print("(along down the sprint, across to its side, rise above its contact point)")
         frames = {}
-        wanted = [("blue", len(runs["blue"].sim_path) - 1), ("final", 0)]
+        wanted = [
+            ("blue", len(runs["blue"].sim_path) - 1),
+            ("merge_lead", 0),
+            ("merge_lead", len(runs["merge_lead"].sim_path) - 1),
+            ("final", 0),
+        ]
         if "orange" in runs:
             wanted.insert(1, ("orange", len(runs["orange"].sim_path) - 1))
         for name, sample in wanted:
             frame = branch_frame(runs[name], sample, reference=sprint)
-            frames[name] = frame
+            frames[f"{name}[{sample}]"] = frame
             local = frame["in_reference"]
             print(
                 f"  {name+'['+str(sample)+']':<14} contact {local['contact']}"
@@ -159,10 +180,12 @@ def main(argv: list[str] | None = None) -> int:
             for edge in ("west_running", "east_running", "west_guard", "east_guard"):
                 print(f"  {'':<14}   {edge:<14} {local['edges'][edge]}")
         report["frames"] = frames
-        turn = frames["final"]["heading_deg"] - frames["blue"]["heading_deg"]
+        blue_last = len(runs["blue"].sim_path) - 1
+        turn = frames["final[0]"]["heading_deg"] - frames[f"blue[{blue_last}]"]["heading_deg"]
         print(f"  blue -> sprint: {turn:+.2f} degrees of heading change")
-        if "orange" in frames:
-            turn = frames["final"]["heading_deg"] - frames["orange"]["heading_deg"]
+        orange_key = f"orange[{len(runs['orange'].sim_path) - 1}]" if "orange" in runs else None
+        if orange_key in frames:
+            turn = frames["final[0]"]["heading_deg"] - frames[orange_key]["heading_deg"]
             print(f"  orange -> sprint: {turn:+.2f} degrees ({abs(turn) - 360:+.2f} the other way)")
 
         blue = walk_line(index, runs, BLUE_WALK)

@@ -25,7 +25,15 @@ from typing import Callable, Sequence
 
 from marble3d.mesh import TriMesh
 
-__all__ = ["tube", "plate", "box_shell", "height_field", "wall_strip", "merge_meshes"]
+__all__ = [
+    "tube",
+    "plate",
+    "box_shell",
+    "height_field",
+    "flank_field",
+    "wall_strip",
+    "merge_meshes",
+]
 
 Vec3 = tuple[float, float, float]
 
@@ -198,6 +206,61 @@ def height_field(
         ring: list[Vec3] = []
         for column in range(columns + 1):
             c = c0 + (c1 - c0) * column / columns
+            rise = height(a, c)
+            ring.append(
+                tuple(
+                    origin[axis] + along[axis] * a + across[axis] * c + up[axis] * rise
+                    for axis in range(3)
+                )
+            )
+        rings.append(ring)
+    return _rings_to_mesh(rings, name, closed=False)
+
+
+def flank_field(
+    origin,
+    along,
+    across,
+    along_range: tuple[float, float],
+    bounds: Callable[[float], tuple[float, float]],
+    up,
+    height: Callable[[float, float], float],
+    steps: tuple[int, int] = (10, 6),
+    name: str = "flank",
+) -> TriMesh:
+    """A surface whose across-span follows a channel instead of a rectangle.
+
+    `height_field` spans a rectangle, which is what made the merge apron a
+    height field *laid over* two swept channels: the apron owned the floor
+    wherever its own tessellation happened to sit higher than the channel's,
+    and along blue's west running edge it did, by 0.132 simulation units. See
+    `sloped.stations.MergeCatch`.
+
+    So the shoulder is generated between two curves instead. `bounds(a)`
+    returns the `(inner, outer)` across coordinates at station `a` - normally
+    the channel's own clear edge and the apron's outer rim - and the rows are
+    laid between them. Every row keeps the same point count, so the strip
+    invariant `_rings_to_mesh` enforces still holds, and a row whose inner and
+    outer coincide collapses to a degenerate line rather than an inverted
+    surface: that is what closes the apron's front lip, and it is why the
+    caller may taper `outer` all the way to `inner`.
+
+    A collapsed row is a real triangle-quality problem rather than a
+    convenience, so it is answered rather than allowed: rows are laid at the
+    *midpoints* of the collapsed span, which leaves the last strip a sliver
+    with no zero-area triangle in it. `marble3d.validation.check_mesh` is the
+    judge and it is run on the result.
+    """
+    a0, a1 = along_range
+    rows, columns = steps
+    rings: list[list[Vec3]] = []
+    for row in range(rows + 1):
+        a = a0 + (a1 - a0) * row / rows
+        inner, outer = bounds(a)
+        ring: list[Vec3] = []
+        for column in range(columns + 1):
+            t = column / columns
+            c = inner + (outer - inner) * t
             rise = height(a, c)
             ring.append(
                 tuple(

@@ -83,9 +83,14 @@ __all__ = [
 
 # The runs each route is made of, in flow order. The shared prefix is listed on
 # both, so a marble's progress is comparable from the first tick.
+# `merge_lead` is on **both**, because it is shared: blue runs down it, and an
+# orange marble that passes through the back wall's opening runs *up* it and
+# comes back. A run a marble can be on and the locator cannot search is a
+# marble booked to whichever neighbour is nearest, which is the mistake
+# `_runs_open_to` records for the orange lobe.
 ROUTE_RUNS = {
-    "blue": ("launch", "leg1", "leg2", "leg3", "blue_lead", "blue", "final"),
-    "orange": ("launch", "leg1", "leg2", "leg3", "orange_lead", "orange", "final"),
+    "blue": ("launch", "leg1", "leg2", "leg3", "blue_lead", "blue", "merge_lead", "final"),
+    "orange": ("launch", "leg1", "leg2", "leg3", "orange_lead", "orange", "merge_lead", "final"),
 }
 
 # Where a rank is taken, as a fraction of the route. Section 27 asks for the

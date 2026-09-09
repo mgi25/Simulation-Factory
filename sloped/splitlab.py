@@ -183,7 +183,10 @@ def split_machine(
         yaw_deg,
     )
     machine.add(injector, Transform())
-    for name in ("leg3", "fork", "blue_lead", "blue", "orange_lead", "orange", "merge", "final"):
+    for name in (
+        "leg3", "fork", "blue_lead", "blue", "orange_lead", "orange",
+        "merge_lead", "merge", "final",
+    ):
         machine.add(full.modules[name], Transform())
     machine.add(full.modules["finish"], Transform())
     machine.runs = runs                                   # type: ignore[attr-defined]
@@ -219,7 +222,7 @@ def merge_machine(
     machine = Machine("sloped_b_merge_entry")
     injector = Injector("inject", runs["blue"], entry_at, offsets, speed, yaw_deg)
     machine.add(injector, Transform())
-    for name in ("blue", "merge", "final"):
+    for name in ("blue", "merge_lead", "merge", "final"):
         machine.add(full.modules[name], Transform())
     machine.add(full.modules["finish"], Transform())
     machine.runs = runs                                   # type: ignore[attr-defined]
@@ -272,8 +275,11 @@ class EntryOutcome:
 
 # The runs each route is made of downstream of the injector, so a marble's
 # furthest point along its own branch can be named.
-_BLUE_CHAIN = ("leg3", "blue_lead", "blue", "final")
-_ORANGE_CHAIN = ("leg3", "orange_lead", "orange", "final")
+# `merge_lead` is on both, because it is shared: blue runs down it and an
+# orange marble through the back wall's opening runs up it. Same rule and same
+# reason as `sloped.race.ROUTE_RUNS`.
+_BLUE_CHAIN = ("leg3", "blue_lead", "blue", "merge_lead", "final")
+_ORANGE_CHAIN = ("leg3", "orange_lead", "orange", "merge_lead", "final")
 
 
 class SplitEntry:
@@ -337,7 +343,7 @@ class SplitEntry:
             return _ORANGE_CHAIN
         if route == "blue":
             return _BLUE_CHAIN
-        return ("leg3", "blue_lead", "blue", "orange_lead", "orange")
+        return ("leg3", "blue_lead", "blue", "orange_lead", "orange", "merge_lead")
 
     def _locate(self, marble_id: int, position, touched: set[str]) -> None:
         previous = self._where.get(marble_id)
@@ -380,7 +386,7 @@ class SplitEntry:
             outcome.reached_lobe = True
             if index >= len(self.runs[name].sim_path) - 6:
                 outcome.reached_merge = True
-        if name == "final":
+        if name in ("merge_lead", "final"):
             outcome.reached_merge = True
 
     def _outside(self, run_name: str, index: int, position) -> float:

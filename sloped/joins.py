@@ -147,7 +147,12 @@ __all__ = [
     "LEAD_TENSION",
     "MU_TRACK",
     "MERGE_DESIGN_SPEED",
+    "MERGE_LEAD_WIDTH",
+    "MERGE_LEAD_SAMPLES",
+    "merge_lead_path",
     "min_radius_layout",
+    "turn_drift",
+    "TURN_DRIFT_BUDGET",
     "hermite",
     "pose_of",
     "grade_of",
@@ -359,6 +364,81 @@ def min_radius_layout(speed: float, bank_deg: float, mu: float = MU_TRACK) -> fl
     tangent = math.tan(math.radians(bank_deg))
     ratio = (tangent + mu) / max(1.0 - mu * tangent, 1e-6)
     return speed * speed / (ratio * GRAVITY) / LAYOUT_TO_SIM
+
+
+# How much lateral drift a join may cost a marble before a short turn radius is
+# a finding, as a fraction of the run's own clear half width.
+#
+# **Why the radius alone is the wrong test, measured.** `min_radius_layout` is a
+# steady-state balance: it says what a marble holds on a turn it is *in* for
+# long enough to reach equilibrium. On a 1.16-unit join it says nothing useful,
+# because the tightest sample is 0.10 layout units long and a marble crosses it
+# in four milliseconds. `turn_drift` asks the question that matters instead -
+# how far the marble ends up from where the channel wanted it - and the two
+# answers are not close:
+#
+#     run           bank_max   worst r   required   drift   drift / half width
+#     merge_lead         0.0     2.686      7.814  0.0131                0.012
+#     blue_lead         30.0     4.383      2.837  0.0000                0.000
+#     orange_lead       30.0    13.089      2.837  0.0000                0.000
+#
+# And the *authored* runs, at 43 wu/s against their own bank extremes, are the
+# scale this threshold is set by. Every one of them contains turns tighter than
+# its own banked limit, and they ship:
+#
+#     launch  worst r 2.918 / required 4.363   drift 0.204   ratio 0.190
+#     leg1            2.977 / 3.058            drift 0.026   ratio 0.024
+#     leg2            1.767 / 3.793            drift 3.167   ratio 2.955
+#     leg3            2.568 / 3.290            drift 0.998   ratio 0.931
+#     blue            1.618 / 3.534            drift 5.837   ratio 6.643
+#     orange          1.558 / 2.627            drift 2.596   ratio 2.954
+#     final          40.598 / 5.020            drift 0.000   ratio 0.000
+#
+# leg2's worst radius is less than half what its bank holds and it carries
+# 99.5% of the field. So a bare radius comparison would fail six of the seven
+# runs the contract *pins*, and it is only ever applied to the joins because
+# the joins are the geometry this package chose. A quarter of a half width is
+# 20 times the merge lead's drift and a thirtieth of leg2's: tight enough to
+# catch a join that actually walks a marble toward the wall, loose enough not
+# to fail one whose tight sample is four milliseconds long.
+TURN_DRIFT_BUDGET = 0.25
+
+
+def turn_drift(path, speed: float, bank_deg: float, mu: float = MU_TRACK) -> float:
+    """How far a turn walks a marble off the centreline, in layout units.
+
+    Per sample, the channel asks for a heading change and the marble can be
+    given at most `ds / min_radius_layout(speed, bank)` of one. The shortfall
+    accumulates as a heading error - signed, so a turn the other way pays it
+    back - and the error integrated along the path is the lateral offset. The
+    worst offset reached anywhere on the run is the answer.
+
+    An upper bound rather than a simulation: nothing here models the wall
+    pushing the marble back, so a run whose drift is under a fraction of its
+    half width cannot have walked a marble into the wall at all.
+    """
+    limit = min_radius_layout(speed, bank_deg, mu)
+    if limit <= 0.0:
+        return 0.0
+    error = 0.0
+    offset = 0.0
+    worst = 0.0
+    for index in range(1, len(path) - 1):
+        a, b, c = path[index - 1], path[index], path[index + 1]
+        v0 = (b[0] - a[0], b[2] - a[2])
+        v1 = (c[0] - b[0], c[2] - b[2])
+        l0 = math.hypot(*v0)
+        l1 = math.hypot(*v1)
+        if l0 < 1e-9 or l1 < 1e-9:
+            continue
+        cross = v0[0] * v1[1] - v0[1] * v1[0]
+        turn = math.asin(max(-1.0, min(1.0, cross / (l0 * l1))))
+        step = 0.5 * (l0 + l1)
+        cap = step / limit
+        error += turn - max(-cap, min(cap, turn))
+        offset += error * step
+        worst = max(worst, abs(offset))
+    return worst
 
 
 def _norm2(x: float, z: float) -> tuple[float, float]:
@@ -724,7 +804,151 @@ JOIN_SPECS: dict[str, dict] = {
         "entry_bank_deg": fork_bank_deg(),
         "bank_ease_ends": 40,
     },
+    "merge_lead": {
+        "name": "merge_lead",
+        "role": "join",
+        "scale": layout.HERO_SCALE,
+        # **Dead level, and that is a budget rather than a preference.** The
+        # join's worst turn radius is 8.4 layout units, which a flat channel
+        # holds 42.6 wu/s on against the 41 the lobes arrive at, so no bank is
+        # *needed*. And none is affordable: rolling to six degrees and back
+        # over the join's 1.106 layout units costs `2 * sin(6) * 0.94` = 0.197
+        # of drop, and the join only has 0.104 to spend. A roll that costs more
+        # drop than the run has is the leg2 defect by construction - see
+        # `sloped.track._slewed_bank` - so the merge lead is built without one.
+        "bank_gain": 0.0,
+        "bank_max": 0.0,
+        # No flare at either end. The flare shape in `width_curve` is a
+        # *fraction* of the run, so on a 1.1-unit join the 0.16 entry flare
+        # collapses 12% of a half width inside two samples - a throat, where
+        # the authored runs get five layout units to do the same thing.
+        "entry_flare": 0.0,
+        "exit_flare": 0.0,
+        "design_speed": MERGE_DESIGN_SPEED,
+    },
 }
+
+# The merge lead's width, as a factor on the sprint's own clear width, and why
+# it is the sprint's entry flare rather than blue's exit width.
+#
+# It has to match `final[0]` exactly at one end, and `final[0]` carries the
+# sprint's 0.14 entry flare - a factor of 1.140. At the other end it meets
+# blue, whose half width is 1.474 simulation units against the lead's 1.880.
+#
+# **Wider at the seam is the safe direction and narrower is not, and the
+# smallest width that is wide enough is the one to take.** What matters is the
+# lead's surface height at blue's own cradle *edge* - layout across 0.840,
+# where blue's surface stands 0.1729 above its contact point. A scale-1.0
+# cradle is deeper than a scale-0.82 one, so a narrow lead puts its steeper arc
+# above blue's edge, and that is an uphill lip at the running edge - the defect
+# this rebuild exists to remove:
+#
+#     factor   lead's height at blue's edge   against blue's 0.1729
+#      0.95                        0.18542    +0.0125 layout  an uphill lip
+#      1.00                        0.16666    -0.0062 layout  0.011 sim below
+#      1.140                       0.12702    -0.0459 layout  0.081 sim below
+#
+# All three of the last two are safe in *height*. What decides between them is
+# **width**: the lead is 1.649 units of half width at 1.00 and 1.880 at 1.140,
+# against blue's 1.474, and whatever the difference is has no floor under it on
+# the upstream side of the seam - the apron's shoulder is there instead, at the
+# shoulder's own height. At 1.140 that unsupported strip is 0.406 wide either
+# side and the walk reads a 0.06 bump on the east edge at `merge_lead[1..2]`;
+# at 1.00 it is 0.175 and the bump goes.
+#
+# So the lead opens at 1.00 and eases to `final[0]`'s own 1.140 by its exit,
+# which is the flare the sprint carries and has to be matched exactly.
+MERGE_LEAD_WIDTH = (1.00, 1.140)
+
+# How many samples the lead is carried at. Its span is 1.106 layout units and
+# the authored runs sample at 0.289, which would give four - too few for
+# `flat_tangents` to read a heading off and too few for the collider's facets.
+# Twelve is 0.092 layout units a sample, three times the authored density,
+# which errs in the direction that matters: a finer facet is a smaller sagitta,
+# and with `bank_gain` at zero the density cannot feed `auto_bank`.
+MERGE_LEAD_SAMPLES = 12
+
+
+def _up_at(heading_deg: float, grade: float) -> tuple[float, float, float]:
+    """`banked_basis`' own up vector at zero roll, from a heading and a grade.
+
+    Closed form rather than read off a built run, because the run whose frame
+    is wanted is the one being solved for. With a horizontal side axis and
+    `forward = (sin h, g, cos h) / k`, the cross product comes out
+    `(-g sin h, 1, -g cos h) / k` with `k = sqrt(1 + g*g)`, already unit
+    length. Verified against the sprint's own built frame to seven decimals.
+    """
+    k = math.sqrt(1.0 + grade * grade)
+    radians = math.radians(heading_deg)
+    return (-grade * math.sin(radians) / k, 1.0 / k, -grade * math.cos(radians) / k)
+
+
+def merge_lead_path(blue, sprint, samples: int = MERGE_LEAD_SAMPLES):
+    """Blue's exit to the sprint's entry, as a channel rather than as a pan.
+
+    ## What this replaces
+
+    `sloped.stations.MergeCatch` used to carry blue across the merge on a
+    height field: a full-width apron whose floor was the chord from blue's exit
+    contact point to the sprint's, with the cradle formula laid across it. Two
+    corrections were made to that chord and a third defect survived both.
+    Measured on the assembled colliders along blue's **west running edge** -
+    which no audit had walked, because every audit walked the centreline:
+
+        station     floor owner   grade along the line
+        blue[112]   blue                     -4.8%
+        blue[113]   merge apron             +26.0%   <- a 0.132 step up
+        blue[114]   merge apron              -4.9%
+
+    Three things put it there and none of them is the chord:
+
+    * the apron's cradle is centred on the **sprint's** centreline, and blue's
+      is 0.26 to 0.52 simulation units off it and yawed 7.5 degrees, so the two
+      valleys do not line up;
+    * the apron's cradle-to-shoulder changeover is at `CHANNEL_HALF * scale`,
+      1.649 units, while the sprint's own cradle edge is at 1.880 because
+      `widths[0]` flares it to 1.140 - so the shoulder's quadratic rise begins
+      0.23 units *inside* the running surface;
+    * past blue's mouth the apron extrapolates blue's gradient as a straight
+      line while blue's channel is still turning.
+
+    A channel has none of those failure modes available to it, because it is
+    the same swept moulding as the runs either side of it and its cradle is
+    centred on its own centreline by construction.
+
+    ## How the endpoints are derived
+
+    `blue`'s exit and `sprint`'s entry, off the **built** runs rather than off
+    the layout table, so a change to the path law or to `blue_controls` moves
+    the lead with them.
+
+    The one thing that has to be solved rather than copied is the height. The
+    two runs have different profile scales - 0.82 and 1.0 - so their
+    centrelines sit at different heights above their own cradle bottoms, and
+    what has to be continuous is the **contact point**, not the centreline. A
+    contact point is `centre + up * (FLOOR_Y * scale)`, so the lead's
+    centreline starts `FLOOR_Y * (blue.scale - sprint.scale)` = 0.0468 layout
+    units up blue's own frame from blue's centreline. Both runs are level at
+    the seam, so that frame is `_up_at(heading, grade)` and needs no iteration.
+    """
+    last = len(blue.path) - 1
+    start_point, start_heading = pose_of(blue.path, blue.tangents, last)
+    start_grade = grade_of(blue.path, last - 4)
+    end_point, end_heading = pose_of(sprint.path, sprint.tangents, 0)
+    end_grade = grade_of(sprint.path, 0)
+    up = _up_at(start_heading, start_grade)
+    lift = layout.FLOOR_Y * (blue.scale - sprint.scale)
+    start = tuple(start_point[axis] + up[axis] * lift for axis in range(3))
+    return hermite(
+        start,
+        start_heading,
+        end_point,
+        end_heading,
+        samples=samples,
+        tension=LEAD_TENSION,
+        start_grade=start_grade,
+        end_grade=end_grade,
+    )
 
 
 def join_paths() -> dict[str, list[tuple[float, float, float]]]:
