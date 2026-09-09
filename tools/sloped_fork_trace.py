@@ -39,6 +39,7 @@ from marble3d.config import DEFAULT_CONFIG
 from sloped import joins
 from sloped.course import sloped_course
 from sloped.race import SlopedRace
+from tools.sloped_fork_sweep import SUPPORTED, frame_of, probe
 
 # How far either side of the fork sample a racer counts as "at the fork".
 WATCH_BACK = 12
@@ -63,6 +64,26 @@ class ForkTrace(SlopedRace):
         self.trace: dict[int, list[dict[str, Any]]] = defaultdict(list)
         self.touch_order: dict[int, list[str]] = defaultdict(list)
         self.entry: dict[int, dict[str, Any]] = {}
+        # The last frame at which each racer touched **static geometry**, with
+        # the owner of what it touched and its pose in the frame of the run it
+        # was nearest. This is the reading `sloped.race._last_touch` cannot
+        # give: that one records the *run* the marble was nearest whenever it
+        # touched anything, so a marble that climbs onto the fork ridge and
+        # rides it to its downstream end is booked at the leg3 sample it was
+        # nearest, and the geometry that actually lost it - the ridge - is
+        # never named.
+        #
+        # **By contact rather than by a ray, and that is a correction.** A
+        # first version fired one ray straight down and called the marble
+        # supported while the surface under its centre was within 0.62. On a
+        # surface inclined at `t` the centre stands `r / cos t` above the
+        # point below it, so 0.62 is a 36-degree ceiling: it read a marble
+        # climbing leg3's lip, which reaches 70 degrees, as already falling,
+        # and booked 20 of 58 losses to `leg3[69..80]` where the marbles were
+        # still running. The rays are kept for the drop and the clearance at
+        # the release frame, which is what they are good for.
+        self.release: dict[int, dict[str, Any]] = {}
+        self._probe_at: dict[int, tuple[str, int]] = {}
 
     def _frame_of(self, position):
         """(across, rise, sample) in leg3's gravity-aligned frame."""
@@ -82,10 +103,45 @@ class ForkTrace(SlopedRace):
         across = sum(offset[axis] * side[axis] for axis in range(3))
         return across, position[1] - bottom, index
 
+    def _static_owners(self, marble_id: int) -> set[str]:
+        """Which static colliders this marble is touching this tick."""
+        out: set[str] = set()
+        for contact in getattr(self, "_contacts", ()):
+            for body, other in (
+                (contact.body_a, contact.body_b),
+                (contact.body_b, contact.body_a),
+            ):
+                if self.world.marble_of(body) != marble_id:
+                    continue
+                if self.world.marble_of(other) is not None:
+                    continue
+                out.add(self.world.owner_of(other))
+        return out
+
     def step(self) -> None:
         super().step()
         for marble_id, marble in self.marbles.items():
+            if marble.state not in ("running", "queued"):
+                continue
             position, _orientation, velocity, _spin = marble.pose
+            statics = self._static_owners(marble_id)
+            if statics and self.ticks % 2 == 0:
+                located = frame_of(self.runs, position, self._probe_at.get(marble_id))
+                if located is not None:
+                    name, index, across, rise = located
+                    self._probe_at[marble_id] = (name, index)
+                    drop, _owner, pinch = probe(self.world, position)
+                    self.release[marble_id] = {
+                        "run": name,
+                        "sample": index,
+                        "across": round(across, 4),
+                        "rise": round(rise, 4),
+                        "speed": round(math.dist(velocity, (0.0, 0.0, 0.0)), 3),
+                        "drop": None if drop is None else round(drop, 4),
+                        "floor": "+".join(sorted(statics)),
+                        "pinch": None if pinch is None else round(pinch, 4),
+                        "t": round(self.elapsed, 4),
+                    }
             if math.dist(position, self.fork_point) > 26.0:
                 continue
             across, rise, index = self._frame_of(position)
@@ -135,7 +191,24 @@ class ForkTrace(SlopedRace):
             )
 
 
-def trace_seed(seed: int, marbles: int = 8, duration: float = 40.0) -> dict[str, Any]:
+def trace_seed(
+    seed: int,
+    marbles: int = 8,
+    duration: float = 40.0,
+    crest: float | None = None,
+    knobs: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    # Every fork constant `sloped.course` reads at build time, set before the
+    # machine is built. `tools/sloped_fork_lab.py` owns the table and the
+    # reason it writes every knob on every job; this borrows both, so a
+    # configuration that looks good in the whole-race scan can be traced with
+    # the same JSON row.
+    from tools.sloped_fork_lab import _apply
+
+    row = dict(knobs or {})
+    if crest is not None:
+        row["crest"] = crest
+    _apply({"label": "trace", **row})
     machine = sloped_course(routes="both")
     race = ForkTrace(machine, DEFAULT_CONFIG, seed, marbles)
     max_ticks = int(round(duration * DEFAULT_CONFIG.physics.physics_hz))
@@ -160,6 +233,7 @@ def trace_seed(seed: int, marbles: int = 8, duration: float = 40.0) -> dict[str,
                     "lost_at": list(result.lost_at) if result.lost_at else None,
                     "last_touch": [touch[0], touch[1]] if touch else None,
                     "entry": race.entry.get(marble_id),
+                    "release": race.release.get(marble_id),
                     "touch_order": race.touch_order.get(marble_id, []),
                     "fork_trace": race.trace.get(marble_id, []),
                 }
@@ -170,8 +244,8 @@ def trace_seed(seed: int, marbles: int = 8, duration: float = 40.0) -> dict[str,
 
 
 def _one(job):
-    seed, marbles, duration = job
-    return trace_seed(seed, marbles, duration)
+    seed, marbles, duration, crest, knobs = job
+    return trace_seed(seed, marbles, duration, crest, knobs)
 
 
 def summarise(seeds: Sequence[dict[str, Any]]) -> dict[str, Any]:
@@ -179,6 +253,8 @@ def summarise(seeds: Sequence[dict[str, Any]]) -> dict[str, Any]:
     by_route: Counter = Counter()
     by_outcome: Counter = Counter()
     sites: Counter = Counter()
+    releases: Counter = Counter()
+    release_floor: Counter = Counter()
     entry_by_fate: dict[str, list[float]] = defaultdict(list)
     peak_by_fate: dict[str, list[float]] = defaultdict(list)
     for row in racers:
@@ -188,6 +264,13 @@ def summarise(seeds: Sequence[dict[str, Any]]) -> dict[str, Any]:
         by_outcome[fate] += 1
         if row["state"] != "finished" and row["last_touch"]:
             sites[f"{row['last_touch'][0]}[{row['last_touch'][1]}]"] += 1
+        if row["state"] != "finished":
+            release = row.get("release")
+            if release is None:
+                releases["-"] += 1
+            else:
+                releases[f"{release['run']}[{release['sample']}]"] += 1
+                release_floor[str(release["floor"])] += 1
         if row["entry"]:
             entry_by_fate[fate].append(row["entry"]["across"])
         if row["fork_trace"]:
@@ -208,6 +291,8 @@ def summarise(seeds: Sequence[dict[str, Any]]) -> dict[str, Any]:
         "by_route": dict(by_route),
         "by_outcome": dict(by_outcome),
         "loss_sites": dict(sites.most_common(20)),
+        "release_sites": dict(releases.most_common(20)),
+        "release_floor": dict(release_floor.most_common(10)),
         "entry_across_by_fate": {k: spread(v) for k, v in sorted(entry_by_fate.items())},
         "peak_across_by_fate": {k: spread(v) for k, v in sorted(peak_by_fate.items())},
     }
@@ -220,21 +305,35 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--marbles", type=int, default=8)
     parser.add_argument("--duration", type=float, default=40.0)
     parser.add_argument("--examples", type=int, default=8)
+    parser.add_argument("--crest", type=float, default=None)
+    parser.add_argument("--knobs", default="", help="JSON object of sloped_fork_lab knobs")
+    parser.add_argument("--frames", type=int, default=6)
+    parser.add_argument("--site", default="", help="only show failures whose last touch starts with this")
     parser.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     parser.add_argument("--out", default="")
     args = parser.parse_args(argv)
 
     wanted = list(range(args.first_seed, args.first_seed + args.seeds))
+    knobs = json.loads(args.knobs) if args.knobs else {}
     if args.workers <= 1:
-        seeds = [trace_seed(seed, args.marbles, args.duration) for seed in wanted]
+        seeds = [
+            trace_seed(seed, args.marbles, args.duration, args.crest, knobs) for seed in wanted
+        ]
     else:
         with ProcessPoolExecutor(max_workers=args.workers) as pool:
-            seeds = list(pool.map(_one, [(s, args.marbles, args.duration) for s in wanted]))
+            seeds = list(
+                pool.map(
+                    _one,
+                    [(s, args.marbles, args.duration, args.crest, knobs) for s in wanted],
+                )
+            )
     report = summarise(seeds)
     print(f"{report['racers']} racers over {args.seeds} seeds")
     print(f"  by route   {report['by_route']}")
     print(f"  by outcome {report['by_outcome']}")
-    print(f"  loss sites {report['loss_sites']}")
+    print(f"  loss sites    {report['loss_sites']}")
+    print(f"  release sites {report['release_sites']}")
+    print(f"  release floor {report['release_floor']}")
     for title, key in (
         ("entry across", "entry_across_by_fate"),
         ("peak across", "peak_across_by_fate"),
@@ -253,6 +352,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         for row in seed["racers"]:
             if row["state"] == "finished" or shown >= args.examples:
                 continue
+            if args.site:
+                touch = row["last_touch"]
+                if not touch or not f"{touch[0]}[{touch[1]}]".startswith(args.site):
+                    continue
             shown += 1
             entry = row["entry"] or {}
             print(
@@ -264,7 +367,15 @@ def main(argv: Sequence[str] | None = None) -> int:
                 f"speed {entry.get('speed')} lateral {entry.get('lateral_speed')}"
             )
             print(f"    touched: {' -> '.join(row['touch_order'])}")
-            for frame in row["fork_trace"][-6:]:
+            release = row.get("release")
+            if release:
+                print(
+                    f"    released on {release['run']}[{release['sample']}] "
+                    f"across {release['across']:+.3f} rise {release['rise']:+.3f} "
+                    f"v {release['speed']:.1f} floor {release['floor']} "
+                    f"drop {release['drop']} pinch {release['pinch']}"
+                )
+            for frame in row["fork_trace"][-args.frames:]:
                 print(
                     f"      t={frame['t']:>8} step {frame['step']:>+4} "
                     f"across {frame['across']:>+6.3f} rise {frame['rise']:>+6.3f} "

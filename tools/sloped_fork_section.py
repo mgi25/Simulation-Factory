@@ -69,7 +69,13 @@ def section_at(world: MarbleWorld, run, index: int, lo: float, hi: float, step: 
     """One vertical section, as a list of samples across it."""
     side = _side_axis(run, index)
     centre = run.sim_path[index]
-    floor = centre[1] - run.floor_offset
+    # The cradle bottom, which is the centreline walked down the frame's own
+    # up by `floor_offset` - a **negative** number. `centre[1] - floor_offset`
+    # is 0.456 simulation units the wrong way and was the reference both this
+    # and `sloped_fork_corridor` used, so every `rise` either printed was 0.912
+    # too low. `sloped_fork_trace` has always had it right; the three agree now.
+    _lateral, up, _forward = run.frames[index]
+    floor = centre[1] + up[1] * run.floor_offset
     offsets = [lo + step * n for n in range(int(round((hi - lo) / step)) + 1)]
     starts, ends = [], []
     for across in offsets:

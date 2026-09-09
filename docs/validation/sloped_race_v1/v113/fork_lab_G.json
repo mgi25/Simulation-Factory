@@ -1,0 +1,307 @@
+{
+ "rows": [
+  {
+   "label": "G0 = F0",
+   "crest": 0.12,
+   "guard_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "lead_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "mouth_across": 0.65
+  },
+  {
+   "label": "G1 ridge to 30",
+   "crest": 0.12,
+   "guard_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "lead_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "mouth_across": 0.65,
+   "ridge_window": 30
+  },
+  {
+   "label": "G2 ridge to 40",
+   "crest": 0.12,
+   "guard_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "lead_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "mouth_across": 0.65,
+   "ridge_window": 40
+  },
+  {
+   "label": "G3 ridge 40 + slew",
+   "crest": 0.12,
+   "guard_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "lead_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "mouth_across": 0.65,
+   "ridge_window": 40,
+   "ridge_slew": 1.0
+  },
+  {
+   "label": "G4 ridge 40 + crest 0.16",
+   "crest": 0.16,
+   "guard_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "lead_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "mouth_across": 0.65,
+   "ridge_window": 40
+  },
+  {
+   "label": "G5 ridge 40 + trim_skirt 1.2",
+   "crest": 0.12,
+   "guard_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "lead_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "mouth_across": 0.65,
+   "ridge_window": 40,
+   "trim_skirt": 1.2
+  }
+ ],
+ "reports": [
+  {
+   "label": "G0 = F0",
+   "racers": 64,
+   "finish": 0.5,
+   "all_eight": 0.0,
+   "escape": 0.4219,
+   "stuck": 0.0781,
+   "routes": {
+    "blue": {
+     "share": 0.6562,
+     "completion": 0.381,
+     "entries": 42
+    },
+    "orange": {
+     "share": 0.3438,
+     "completion": 0.7273,
+     "entries": 22
+    }
+   },
+   "loss_sites": {
+    "leg3[90]": 11,
+    "leg3[97]": 5,
+    "final[10]": 4,
+    "leg3[95]": 3,
+    "orange_lead[10]": 2,
+    "leg3[89]": 2,
+    "leg3[99]": 1,
+    "leg3[104]": 1,
+    "final[8]": 1,
+    "leg3[98]": 1
+   }
+  },
+  {
+   "label": "G1 ridge to 30",
+   "racers": 64,
+   "finish": 0.5,
+   "all_eight": 0.0,
+   "escape": 0.4219,
+   "stuck": 0.0781,
+   "routes": {
+    "blue": {
+     "share": 0.6562,
+     "completion": 0.381,
+     "entries": 42
+    },
+    "orange": {
+     "share": 0.3438,
+     "completion": 0.7273,
+     "entries": 22
+    }
+   },
+   "loss_sites": {
+    "final[10]": 4,
+    "leg3[90]": 4,
+    "leg3[103]": 4,
+    "leg3[97]": 2,
+    "leg3[99]": 2,
+    "leg3[96]": 2,
+    "leg3[104]": 2,
+    "leg3[108]": 2,
+    "orange_lead[10]": 2,
+    "leg3[107]": 1
+   }
+  },
+  {
+   "label": "G2 ridge to 40",
+   "racers": 64,
+   "finish": 0.5,
+   "all_eight": 0.0,
+   "escape": 0.4219,
+   "stuck": 0.0781,
+   "routes": {
+    "blue": {
+     "share": 0.6562,
+     "completion": 0.381,
+     "entries": 42
+    },
+    "orange": {
+     "share": 0.3438,
+     "completion": 0.7273,
+     "entries": 22
+    }
+   },
+   "loss_sites": {
+    "final[10]": 4,
+    "leg3[99]": 4,
+    "leg3[90]": 3,
+    "leg3[103]": 3,
+    "leg3[97]": 2,
+    "leg3[113]": 2,
+    "leg3[112]": 2,
+    "leg3[104]": 2,
+    "leg3[95]": 1,
+    "final[8]": 1
+   }
+  },
+  {
+   "label": "G3 ridge 40 + slew",
+   "racers": 64,
+   "finish": 0.5,
+   "all_eight": 0.0,
+   "escape": 0.4219,
+   "stuck": 0.0781,
+   "routes": {
+    "blue": {
+     "share": 0.6562,
+     "completion": 0.381,
+     "entries": 42
+    },
+    "orange": {
+     "share": 0.3438,
+     "completion": 0.7273,
+     "entries": 22
+    }
+   },
+   "loss_sites": {
+    "final[10]": 4,
+    "leg3[99]": 4,
+    "leg3[90]": 3,
+    "leg3[103]": 3,
+    "leg3[97]": 2,
+    "leg3[113]": 2,
+    "leg3[112]": 2,
+    "leg3[104]": 2,
+    "leg3[95]": 1,
+    "final[8]": 1
+   }
+  },
+  {
+   "label": "G4 ridge 40 + crest 0.16",
+   "racers": 64,
+   "finish": 0.5781,
+   "all_eight": 0.125,
+   "escape": 0.4062,
+   "stuck": 0.0156,
+   "routes": {
+    "blue": {
+     "share": 0.9219,
+     "completion": 0.6102,
+     "entries": 59
+    },
+    "orange": {
+     "share": 0.0781,
+     "completion": 0.2,
+     "entries": 5
+    }
+   },
+   "loss_sites": {
+    "leg3[113]": 6,
+    "leg3[90]": 5,
+    "leg3[99]": 3,
+    "leg3[102]": 2,
+    "leg3[109]": 2,
+    "orange_lead[10]": 1,
+    "final[10]": 1,
+    "leg3[96]": 1,
+    "orange_lead[27]": 1,
+    "leg3[104]": 1
+   }
+  },
+  {
+   "label": "G5 ridge 40 + trim_skirt 1.2",
+   "racers": 64,
+   "finish": 0.4062,
+   "all_eight": 0.0,
+   "escape": 0.4219,
+   "stuck": 0.1719,
+   "routes": {
+    "blue": {
+     "share": 0.6562,
+     "completion": 0.4048,
+     "entries": 42
+    },
+    "orange": {
+     "share": 0.3438,
+     "completion": 0.4091,
+     "entries": 22
+    }
+   },
+   "loss_sites": {
+    "final[10]": 5,
+    "leg3[99]": 4,
+    "final[8]": 4,
+    "leg3[90]": 3,
+    "leg3[103]": 3,
+    "leg3[97]": 2,
+    "leg3[113]": 2,
+    "leg3[112]": 2,
+    "leg3[104]": 2,
+    "leg3[95]": 1
+   }
+  }
+ ]
+}

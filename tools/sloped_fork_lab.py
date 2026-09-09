@@ -35,6 +35,7 @@ from marble3d.config import DEFAULT_CONFIG
 # before the machine is built is the whole of the override.
 KNOBS = {
     "guard_window": ("sloped.joins", "FORK_GUARD_WINDOW"),
+    "lead_window": ("sloped.joins", "FORK_LEAD_WINDOW"),
     "orange_window": ("sloped.joins", "FORK_WINDOW_ORANGE"),
     "ridge_window": ("sloped.joins", "FORK_WINDOW_BLUE"),
     "mouth_across": ("sloped.joins", "ORANGE_MOUTH_ACROSS"),
@@ -43,6 +44,7 @@ KNOBS = {
     "trim_skirt": ("sloped.track", "TrackRun.TRIM_SKIRT"),
     "max_flank": ("sloped.stations", "ForkRidge.MAX_FLANK"),
     "ridge_floor": ("sloped.stations", "ForkRidge.CREST_FLOOR"),
+    "ridge_slew": ("sloped.stations", "ForkRidge.RISE_SLEW"),
     "nose_back": ("sloped.stations", "ForkRidge.NOSE_BACK"),
     "crest": ("sloped.course", "FORK_CREST"),
     # Two entries of a spec dict rather than module constants; `_target`

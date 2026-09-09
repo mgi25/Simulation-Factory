@@ -610,7 +610,7 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
             # And orange's lead has its west lip opened out over the same
             # window, for the same reason from the other side.
             open_side=(
-                (-1.0, -1, 0, 4, joins.FORK_WINDOW_ORANGE)
+                (-1.0, *joins.FORK_LEAD_WINDOW)
                 if name == "orange_lead"
                 else None
             ),

@@ -550,3 +550,138 @@ def test_the_apron_holds_a_marble_on_its_shoulder_and_not_beyond_it():
     assert not merge.holds(point(along, centre - merge.rim(along, -1.0) - 2.0, floor))
     assert not merge.holds(point(along, on_shoulder, floor + to_sim(merge.ROOF) + 1.0))
     assert not merge.holds(point(to_sim(merge.BACK) - 3.0, on_shoulder, floor))
+
+
+# --- V1.13: the fork ridge, and the knob that could not move ---------------
+
+
+def _ridge_stations(machine):
+    """(step, leg3 sample, gap, crest height) for every ridge station."""
+    ridge = machine.modules["fork"]
+    leg3, lead = ridge.run, ridge.other
+    out = []
+    for step in range(ridge.window + 1):
+        here = min(ridge.index + step, len(leg3.sim_path) - 1)
+        there = min(step, len(lead.sim_path) - 1)
+        west = leg3.surface_point(here, layout.CHANNEL_HALF)
+        east = lead.surface_point(there, -layout.CHANNEL_HALF)
+        lateral = leg3.frames[here][0]
+        gap = sum((east[axis] - west[axis]) * lateral[axis] for axis in range(3))
+        if gap <= ridge.HAIRLINE * MARBLE_DIAMETER:
+            continue
+        out.append((step, here, gap, min(leg3.containment, ridge.MAX_FLANK * 0.5 * gap)))
+    return out
+
+
+def test_the_fork_mouth_reads_its_constant_at_call_time():
+    """`ORANGE_MOUTH_ACROSS` used to be bound as a default argument.
+
+    Python evaluates a default once, when the `def` runs, so setting the module
+    attribute afterwards moved nothing - and `tools/sloped_fork_lab.py`'s
+    `mouth_across` knob, listed since V1.10, had never changed a row it
+    appeared in. This is the regression test for that, and it is written
+    against `fork_mouth` rather than against the knob because the knob is a
+    scan harness and the bug was in the geometry.
+    """
+    shipped, _heading, _grade = joins.fork_mouth()
+    explicit, _h, _g = joins.fork_mouth(joins.ORANGE_MOUTH_ACROSS)
+    assert shipped == explicit
+
+    before = joins.ORANGE_MOUTH_ACROSS
+    try:
+        joins.ORANGE_MOUTH_ACROSS = 0.65
+        moved, _h, _g = joins.fork_mouth()
+    finally:
+        joins.ORANGE_MOUTH_ACROSS = before
+    # 0.29 of a profile unit down a 26-degree bank is a real distance; anything
+    # under a tenth of a marble diameter means the constant is being ignored.
+    assert math.dist(shipped, moved) > 0.1 * MARBLE_DIAMETER
+
+
+def test_both_fork_guards_shut_where_the_two_cradles_part():
+    """The opening ends where the shared floor does, not seven samples later.
+
+    Running either window on to the ridge's own last station is the obvious
+    repair and it is falsified - 0.396 finish to 0.188 over 12 seeds - because
+    the guards are not walling off a corridor, they are keeping the field out
+    of one. What the scan settles is that both should shut at the **parting**:
+    the last sample at which leg3's east cradle edge and orange's west cradle
+    edge still overlap. See `docs/sloped_race_v113_fork.md`.
+    """
+    machine = sloped_course(routes="both")
+    stations = _ridge_stations(machine)
+    assert stations, "the two channels never part; there would be no fork"
+    parting = stations[0][0]
+
+    for name, window in (
+        ("leg3's east guard", joins.FORK_GUARD_WINDOW),
+        ("orange's west guard", joins.FORK_LEAD_WINDOW),
+    ):
+        _open_from, _full_open, last_open, full_again = window
+        assert last_open <= parting, (
+            f"{name} is still open at step {last_open}, past the parting at {parting}"
+        )
+        assert full_again <= parting + 2, (
+            f"{name} takes until step {full_again} to close, {full_again - parting} "
+            "past the parting - a long partial opening measured 0.156 finish"
+        )
+
+
+def test_the_ridge_is_a_conveyor_and_its_downstream_end_is_open():
+    """The mechanism this session found, pinned so it cannot be mislaid.
+
+    The ridge spans the gap between the two cradle edges and stops at its own
+    last station, and past that station there is no floor between the two
+    channels at all. That is why touching it is fatal: over 24 seeds at crest
+    0.12, 35 racers touched it and 6 finished.
+
+    The test does not assert that the ridge is *wrong* - it is the only thing
+    holding the gap up. It asserts the two facts a repair has to face: that its
+    last station is inside the fork window rather than somewhere the marble is
+    already contained, and that the gap it is spanning there is more than a
+    marble wide, so the end is a hole and not a seam.
+    """
+    machine = sloped_course(routes="both")
+    stations = _ridge_stations(machine)
+    step, sample, gap, _height = stations[-1]
+    assert gap > MARBLE_DIAMETER, (
+        f"the ridge ends at leg3[{sample}] over a gap of {gap:.3f}, which is "
+        "under a diameter - if this ever passes the end has become a seam and "
+        "the conveyor finding needs remeasuring"
+    )
+    leg3 = machine.runs["leg3"]
+    lead = machine.runs["orange_lead"]
+    assert leg3.wall_factor(sample) >= 0.99
+    assert lead.wall_factor(min(step, len(lead.sim_path) - 1)) >= 0.99
+
+
+def test_the_ridge_rise_limit_is_off_and_still_works():
+    """`ForkRidge.RISE_SLEW` is uninstalled, and the class still carries it.
+
+    Same rule as `sloped.joins.merge_trim`: a mechanism that is measured and
+    falsified stays in the tree with its measurement, because the next session
+    should not have to rediscover that it does nothing. Off, the crest climbs
+    0.179 to 0.218 of world height a sample through `leg3[91..94]`; on, it is
+    flat to two thousandths. Neither moves a marble.
+    """
+    from sloped.stations import ForkRidge
+
+    assert ForkRidge.RISE_SLEW is None
+
+    def crest_heights(slew):
+        before = ForkRidge.RISE_SLEW
+        try:
+            ForkRidge.RISE_SLEW = slew
+            ridge = sloped_course(routes="both").modules["fork"]
+            return [
+                0.5 * (west[1] + east[1]) + up[1] * height
+                for west, east, up, height in ridge._stations()
+            ]
+        finally:
+            ForkRidge.RISE_SLEW = before
+
+    loose = crest_heights(None)
+    tight = crest_heights(1.0)
+    rise = lambda series: max(b - a for a, b in zip(series, series[1:]))
+    assert rise(loose) > 0.15, "the ramp this exists for has gone; remeasure it"
+    assert rise(tight) < 0.02, "the limit no longer flattens the crest"

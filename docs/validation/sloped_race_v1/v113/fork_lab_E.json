@@ -1,0 +1,290 @@
+{
+ "rows": [
+  {
+   "label": "E0 = D5",
+   "crest": 0.12,
+   "guard_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "lead_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "mouth_across": 0.65
+  },
+  {
+   "label": "E1 taper to 14",
+   "crest": 0.12,
+   "guard_window": [
+    -1,
+    0,
+    8,
+    14
+   ],
+   "lead_window": [
+    -1,
+    0,
+    8,
+    14
+   ],
+   "mouth_across": 0.65
+  },
+  {
+   "label": "E2 taper to 18",
+   "crest": 0.12,
+   "guard_window": [
+    -1,
+    0,
+    8,
+    18
+   ],
+   "lead_window": [
+    -1,
+    0,
+    8,
+    18
+   ],
+   "mouth_across": 0.65
+  },
+  {
+   "label": "E3 E0 + crest 0.16",
+   "crest": 0.16,
+   "guard_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "lead_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "mouth_across": 0.65
+  },
+  {
+   "label": "E4 E0 + crest 0.20",
+   "crest": 0.2,
+   "guard_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "lead_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "mouth_across": 0.65
+  },
+  {
+   "label": "E5 open ends at 6",
+   "crest": 0.12,
+   "guard_window": [
+    -1,
+    0,
+    6,
+    10
+   ],
+   "lead_window": [
+    -1,
+    0,
+    6,
+    10
+   ],
+   "mouth_across": 0.65
+  }
+ ],
+ "reports": [
+  {
+   "label": "E0 = D5",
+   "racers": 64,
+   "finish": 0.5,
+   "all_eight": 0.0,
+   "escape": 0.4219,
+   "stuck": 0.0781,
+   "routes": {
+    "blue": {
+     "share": 0.6562,
+     "completion": 0.381,
+     "entries": 42
+    },
+    "orange": {
+     "share": 0.3438,
+     "completion": 0.7273,
+     "entries": 22
+    }
+   },
+   "loss_sites": {
+    "leg3[90]": 11,
+    "leg3[97]": 5,
+    "final[10]": 4,
+    "leg3[95]": 3,
+    "orange_lead[10]": 2,
+    "leg3[89]": 2,
+    "leg3[99]": 1,
+    "leg3[104]": 1,
+    "final[8]": 1,
+    "leg3[98]": 1
+   }
+  },
+  {
+   "label": "E1 taper to 14",
+   "racers": 64,
+   "finish": 0.2188,
+   "all_eight": 0.0,
+   "escape": 0.75,
+   "stuck": 0.0312,
+   "routes": {
+    "blue": {
+     "share": 0.7969,
+     "completion": 0.1569,
+     "entries": 51
+    },
+    "orange": {
+     "share": 0.2031,
+     "completion": 0.4615,
+     "entries": 13
+    }
+   },
+   "loss_sites": {
+    "leg3[94]": 5,
+    "leg3[95]": 5,
+    "leg3[96]": 5,
+    "leg3[98]": 4,
+    "leg3[100]": 3,
+    "leg3[91]": 3,
+    "leg3[92]": 3,
+    "leg3[97]": 3,
+    "leg3[87]": 3,
+    "leg3[90]": 3
+   }
+  },
+  {
+   "label": "E2 taper to 18",
+   "racers": 64,
+   "finish": 0.1562,
+   "all_eight": 0.0,
+   "escape": 0.8281,
+   "stuck": 0.0156,
+   "routes": {
+    "blue": {
+     "share": 0.8594,
+     "completion": 0.1273,
+     "entries": 55
+    },
+    "orange": {
+     "share": 0.1406,
+     "completion": 0.3333,
+     "entries": 9
+    }
+   },
+   "loss_sites": {
+    "leg3[95]": 8,
+    "leg3[94]": 7,
+    "leg3[96]": 5,
+    "leg3[98]": 4,
+    "leg3[99]": 4,
+    "leg3[93]": 4,
+    "leg3[87]": 4,
+    "leg3[88]": 3,
+    "orange_lead[15]": 2,
+    "leg3[97]": 2
+   }
+  },
+  {
+   "label": "E3 E0 + crest 0.16",
+   "racers": 64,
+   "finish": 0.5781,
+   "all_eight": 0.125,
+   "escape": 0.4062,
+   "stuck": 0.0156,
+   "routes": {
+    "blue": {
+     "share": 0.9219,
+     "completion": 0.6102,
+     "entries": 59
+    },
+    "orange": {
+     "share": 0.0781,
+     "completion": 0.2,
+     "entries": 5
+    }
+   },
+   "loss_sites": {
+    "leg3[90]": 9,
+    "leg3[97]": 3,
+    "leg3[99]": 3,
+    "orange_lead[10]": 2,
+    "leg3[96]": 2,
+    "leg3[89]": 2,
+    "final[10]": 1,
+    "leg3[95]": 1,
+    "orange_lead[18]": 1,
+    "leg3[101]": 1
+   }
+  },
+  {
+   "label": "E4 E0 + crest 0.20",
+   "racers": 64,
+   "finish": 0.875,
+   "all_eight": 0.375,
+   "escape": 0.1094,
+   "stuck": 0.0156,
+   "routes": {
+    "blue": {
+     "share": 1.0,
+     "completion": 0.875,
+     "entries": 64
+    }
+   },
+   "loss_sites": {
+    "leg3[90]": 4,
+    "leg3[89]": 1,
+    "leg3[98]": 1,
+    "leg3[99]": 1,
+    "final[63]": 1
+   }
+  },
+  {
+   "label": "E5 open ends at 6",
+   "racers": 64,
+   "finish": 0.3594,
+   "all_eight": 0.0,
+   "escape": 0.6094,
+   "stuck": 0.0312,
+   "routes": {
+    "blue": {
+     "share": 0.8125,
+     "completion": 0.3462,
+     "entries": 52
+    },
+    "orange": {
+     "share": 0.1875,
+     "completion": 0.4167,
+     "entries": 12
+    }
+   },
+   "loss_sites": {
+    "leg3[89]": 10,
+    "leg3[90]": 5,
+    "leg3[97]": 4,
+    "leg3[91]": 3,
+    "leg3[99]": 3,
+    "leg3[98]": 2,
+    "leg3[94]": 2,
+    "orange_lead[16]": 2,
+    "leg3[95]": 2,
+    "final[8]": 1
+   }
+  }
+ ]
+}

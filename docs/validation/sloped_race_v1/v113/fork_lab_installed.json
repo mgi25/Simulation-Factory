@@ -1,0 +1,142 @@
+{
+ "rows": [
+  {
+   "label": "V1.12 windows 12-14 / 4-14",
+   "crest": 0.12,
+   "guard_window": [
+    -1,
+    0,
+    12,
+    14
+   ],
+   "lead_window": [
+    -1,
+    0,
+    4,
+    14
+   ]
+  },
+  {
+   "label": "V1.13 windows 8-10 / 8-10",
+   "crest": 0.12
+  },
+  {
+   "label": "V1.13 + mouth 0.65 (not installed)",
+   "crest": 0.12,
+   "mouth_across": 0.65
+  }
+ ],
+ "reports": [
+  {
+   "label": "V1.12 windows 12-14 / 4-14",
+   "racers": 192,
+   "finish": 0.3594,
+   "all_eight": 0.0,
+   "escape": 0.5833,
+   "stuck": 0.0573,
+   "routes": {
+    "blue": {
+     "share": 0.5156,
+     "completion": 0.3434,
+     "entries": 99
+    },
+    "orange": {
+     "share": 0.4792,
+     "completion": 0.3804,
+     "entries": 92
+    },
+    "unrouted": {
+     "share": 0.0052,
+     "completion": 0.0,
+     "entries": 1
+    }
+   },
+   "loss_sites": {
+    "leg3[92]": 10,
+    "final[10]": 10,
+    "leg3[93]": 8,
+    "orange_lead[9]": 8,
+    "orange_lead[8]": 7,
+    "orange_lead[10]": 7,
+    "leg3[91]": 6,
+    "orange_lead[11]": 5,
+    "leg3[102]": 4,
+    "leg3[89]": 4
+   }
+  },
+  {
+   "label": "V1.13 windows 8-10 / 8-10",
+   "racers": 192,
+   "finish": 0.4479,
+   "all_eight": 0.0,
+   "escape": 0.4792,
+   "stuck": 0.0729,
+   "routes": {
+    "blue": {
+     "share": 0.6354,
+     "completion": 0.418,
+     "entries": 122
+    },
+    "orange": {
+     "share": 0.3594,
+     "completion": 0.5072,
+     "entries": 69
+    },
+    "unrouted": {
+     "share": 0.0052,
+     "completion": 0.0,
+     "entries": 1
+    }
+   },
+   "loss_sites": {
+    "final[10]": 10,
+    "leg3[96]": 9,
+    "orange_lead[9]": 8,
+    "leg3[98]": 7,
+    "orange_lead[15]": 7,
+    "leg3[95]": 7,
+    "leg3[97]": 6,
+    "leg3[99]": 6,
+    "leg3[90]": 6,
+    "leg3[93]": 6
+   }
+  },
+  {
+   "label": "V1.13 + mouth 0.65 (not installed)",
+   "racers": 192,
+   "finish": 0.4948,
+   "all_eight": 0.0,
+   "escape": 0.3958,
+   "stuck": 0.1094,
+   "routes": {
+    "blue": {
+     "share": 0.6094,
+     "completion": 0.4444,
+     "entries": 117
+    },
+    "orange": {
+     "share": 0.3854,
+     "completion": 0.5811,
+     "entries": 74
+    },
+    "unrouted": {
+     "share": 0.0052,
+     "completion": 0.0,
+     "entries": 1
+    }
+   },
+   "loss_sites": {
+    "final[10]": 16,
+    "leg3[90]": 16,
+    "leg3[96]": 15,
+    "leg3[97]": 7,
+    "leg3[98]": 7,
+    "final[8]": 5,
+    "orange_lead[10]": 3,
+    "leg3[99]": 3,
+    "leg3[89]": 3,
+    "leg3[95]": 3
+   }
+  }
+ ]
+}

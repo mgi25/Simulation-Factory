@@ -1,0 +1,302 @@
+{
+ "rows": [
+  {
+   "label": "F0 = E0 (8/10)",
+   "crest": 0.12,
+   "guard_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "lead_window": [
+    -1,
+    0,
+    8,
+    10
+   ],
+   "mouth_across": 0.65
+  },
+  {
+   "label": "F1 close at parting 10/12",
+   "crest": 0.12,
+   "guard_window": [
+    -1,
+    0,
+    10,
+    12
+   ],
+   "lead_window": [
+    -1,
+    0,
+    10,
+    12
+   ],
+   "mouth_across": 0.65
+  },
+  {
+   "label": "F2 9/11",
+   "crest": 0.12,
+   "guard_window": [
+    -1,
+    0,
+    9,
+    11
+   ],
+   "lead_window": [
+    -1,
+    0,
+    9,
+    11
+   ],
+   "mouth_across": 0.65
+  },
+  {
+   "label": "F3 mouth .55, 11/13",
+   "crest": 0.12,
+   "guard_window": [
+    -1,
+    0,
+    11,
+    13
+   ],
+   "lead_window": [
+    -1,
+    0,
+    11,
+    13
+   ],
+   "mouth_across": 0.55
+  },
+  {
+   "label": "F4 F1 + lead_hold .55",
+   "crest": 0.12,
+   "guard_window": [
+    -1,
+    0,
+    10,
+    12
+   ],
+   "lead_window": [
+    -1,
+    0,
+    10,
+    12
+   ],
+   "mouth_across": 0.65,
+   "lead_hold": 0.55
+  },
+  {
+   "label": "F5 F1 + max_flank .9",
+   "crest": 0.12,
+   "guard_window": [
+    -1,
+    0,
+    10,
+    12
+   ],
+   "lead_window": [
+    -1,
+    0,
+    10,
+    12
+   ],
+   "mouth_across": 0.65,
+   "max_flank": 0.9
+  }
+ ],
+ "reports": [
+  {
+   "label": "F0 = E0 (8/10)",
+   "racers": 64,
+   "finish": 0.5,
+   "all_eight": 0.0,
+   "escape": 0.4219,
+   "stuck": 0.0781,
+   "routes": {
+    "blue": {
+     "share": 0.6562,
+     "completion": 0.381,
+     "entries": 42
+    },
+    "orange": {
+     "share": 0.3438,
+     "completion": 0.7273,
+     "entries": 22
+    }
+   },
+   "loss_sites": {
+    "leg3[90]": 11,
+    "leg3[97]": 5,
+    "final[10]": 4,
+    "leg3[95]": 3,
+    "orange_lead[10]": 2,
+    "leg3[89]": 2,
+    "leg3[99]": 1,
+    "leg3[104]": 1,
+    "final[8]": 1,
+    "leg3[98]": 1
+   }
+  },
+  {
+   "label": "F1 close at parting 10/12",
+   "racers": 64,
+   "finish": 0.2656,
+   "all_eight": 0.0,
+   "escape": 0.7188,
+   "stuck": 0.0156,
+   "routes": {
+    "blue": {
+     "share": 0.7344,
+     "completion": 0.1915,
+     "entries": 47
+    },
+    "orange": {
+     "share": 0.2656,
+     "completion": 0.4706,
+     "entries": 17
+    }
+   },
+   "loss_sites": {
+    "leg3[96]": 8,
+    "leg3[92]": 8,
+    "leg3[97]": 5,
+    "leg3[98]": 4,
+    "leg3[91]": 4,
+    "leg3[93]": 3,
+    "orange_lead[17]": 2,
+    "leg3[94]": 2,
+    "leg3[99]": 2,
+    "orange_lead[14]": 2
+   }
+  },
+  {
+   "label": "F2 9/11",
+   "racers": 64,
+   "finish": 0.375,
+   "all_eight": 0.0,
+   "escape": 0.5469,
+   "stuck": 0.0781,
+   "routes": {
+    "blue": {
+     "share": 0.6719,
+     "completion": 0.3721,
+     "entries": 43
+    },
+    "orange": {
+     "share": 0.3281,
+     "completion": 0.381,
+     "entries": 21
+    }
+   },
+   "loss_sites": {
+    "leg3[91]": 8,
+    "leg3[97]": 5,
+    "final[10]": 4,
+    "leg3[96]": 4,
+    "orange_lead[10]": 3,
+    "orange_lead[14]": 2,
+    "leg3[99]": 2,
+    "leg3[87]": 2,
+    "leg3[88]": 2,
+    "orange[26]": 1
+   }
+  },
+  {
+   "label": "F3 mouth .55, 11/13",
+   "racers": 64,
+   "finish": 0.1875,
+   "all_eight": 0.0,
+   "escape": 0.75,
+   "stuck": 0.0625,
+   "routes": {
+    "blue": {
+     "share": 0.7656,
+     "completion": 0.1633,
+     "entries": 49
+    },
+    "orange": {
+     "share": 0.2344,
+     "completion": 0.2667,
+     "entries": 15
+    }
+   },
+   "loss_sites": {
+    "leg3[93]": 8,
+    "leg3[97]": 6,
+    "leg3[92]": 5,
+    "final[10]": 4,
+    "leg3[95]": 4,
+    "leg3[96]": 4,
+    "leg3[98]": 3,
+    "leg3[91]": 3,
+    "orange_lead[12]": 3,
+    "leg3[102]": 2
+   }
+  },
+  {
+   "label": "F4 F1 + lead_hold .55",
+   "racers": 64,
+   "finish": 0.2188,
+   "all_eight": 0.0,
+   "escape": 0.7031,
+   "stuck": 0.0781,
+   "routes": {
+    "blue": {
+     "share": 0.75,
+     "completion": 0.1875,
+     "entries": 48
+    },
+    "orange": {
+     "share": 0.25,
+     "completion": 0.3125,
+     "entries": 16
+    }
+   },
+   "loss_sites": {
+    "leg3[92]": 7,
+    "leg3[97]": 7,
+    "leg3[96]": 6,
+    "leg3[91]": 5,
+    "final[10]": 4,
+    "leg3[98]": 3,
+    "leg3[95]": 3,
+    "orange_lead[11]": 3,
+    "leg3[93]": 2,
+    "orange_lead[16]": 2
+   }
+  },
+  {
+   "label": "F5 F1 + max_flank .9",
+   "racers": 64,
+   "finish": 0.2656,
+   "all_eight": 0.0,
+   "escape": 0.7188,
+   "stuck": 0.0156,
+   "routes": {
+    "blue": {
+     "share": 0.7344,
+     "completion": 0.1915,
+     "entries": 47
+    },
+    "orange": {
+     "share": 0.2656,
+     "completion": 0.4706,
+     "entries": 17
+    }
+   },
+   "loss_sites": {
+    "leg3[92]": 6,
+    "leg3[91]": 5,
+    "leg3[95]": 5,
+    "leg3[93]": 4,
+    "leg3[97]": 3,
+    "leg3[98]": 2,
+    "orange_lead[18]": 2,
+    "orange_lead[14]": 2,
+    "leg3[90]": 2,
+    "leg3[96]": 2
+   }
+  }
+ ]
+}

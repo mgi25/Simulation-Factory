@@ -139,6 +139,7 @@ __all__ = [
     "FORK_SAMPLE",
     "FORK_WINDOW_BLUE",
     "FORK_GUARD_WINDOW",
+    "FORK_LEAD_WINDOW",
     "LEAD_MOUTH_FLARE",
     "FORK_WINDOW_ORANGE",
     "FORK_TRIM_WINDOW",
@@ -215,8 +216,92 @@ FORK_SAMPLE = 82
 # **orange's west wall.** Open from its first sample, because leg3's floor is
 # west of it there and a wall in the middle of leg3's floor is a step a marble
 # climbs; full by +14, where the two channels have parted.
-FORK_GUARD_WINDOW = (-1, 0, 12, 14)
+#
+# ## V1.13: both windows shut seven samples too early, and that built a trough
+#
+# "By +14 the two channels have parted and each needs its own again" is true of
+# the *channels* and false of the **ridge**, and the ridge is what a marble in
+# between is standing on. `sloped.stations.ForkRidge` emits a station wherever
+# leg3's east cradle edge and orange's west cradle edge are more than a
+# hairline apart, and measured on the built runs that is leg3 samples **91 to
+# 102** - not the 12 to 16 the table above estimates, because
+# `ORANGE_MOUTH_ACROSS` later moved the mouth a channel half-width east.
+#
+# So over leg3[96..102] the ridge was a floor 2.2 to 4.2 simulation units wide
+# with leg3's east guard at full height on one side of it, orange's west guard
+# at full height on the other, **and its own downstream end in mid-air over the
+# gorge**. A marble that crossed onto it could not get back into either channel
+# and could not stop:
+#
+#     of 58 non-finishers over 12 seeds at crest 0.12, the last static
+#     collider **41** of them touched was the ridge - and of 38 finishers,
+#     only 4 ever touched it at all. Touching the ridge was 91% fatal.
+#
+# **Running both windows to the ridge's last station is falsified.** It is the
+# obvious repair and it is the wrong one: over 12 seeds it took the forked
+# course from 0.396 finish to **0.188**, because the guards were not walling a
+# corridor off - they were keeping the field out of a trap. What the scan
+# settles instead is that both windows should shut where the two **cradles**
+# stop overlapping, which is two samples earlier than the shipped value, not
+# seven later:
+#
+#     windows        mouth   finish   blue fin   orange fin      8 seeds
+#       12/14, 4/14   0.94    0.344      0.314        0.379   as shipped
+#       20/22        0.94    0.188      0.207        0.438
+#        8/10         0.94    0.422      0.372        0.524
+#        8/10         0.65    0.500      0.381        0.727   best measured
+#        9/11         0.65    0.375      0.372        0.381
+#       10/12         0.65    0.266      0.192        0.471
+#        8/14         0.65    0.219      0.157        0.462   long taper
+#        8/18         0.65    0.156      0.127        0.333
+#
+# So each is a full four-tuple, the two can be scanned apart, and both are set
+# to the parting. Read `docs/sloped_race_v113_fork.md` before moving either:
+# the family is exhausted and the residual is not a guard defect.
+FORK_GUARD_WINDOW = (-1, 0, 8, 10)
 
+# Orange's west guard, in orange_lead's own samples, same shape and same
+# argument. It used to be spelled `(-1, 0, 4, FORK_WINDOW_ORANGE)` inline in
+# `sloped.course`, which tied the opening to a constant that also sets the
+# lead's mouth gradient span and both route-attribution windows - so the one
+# knob the brief calls the highest-value lever could not be moved without
+# moving three unrelated things. It is its own constant now.
+FORK_LEAD_WINDOW = (-1, 0, 8, 10)
+
+# ## V1.13: the mouth is lower, and the knob that moves it used to be inert
+#
+# `ORANGE_MOUTH_ACROSS` sets how far up leg3's east bank orange's mouth sits,
+# and therefore two things that decide whether the crossing is survivable: how
+# far a marble has to **climb** to reach orange's floor, and how long the two
+# cradles **overlap** before the gorge opens between them.
+#
+#     mouth   climb to orange's floor   cradles part at   finish   orange fin
+#      0.94            0.975 sim            step 9         0.344      0.379
+#      0.75            0.722                step 10        0.203      0.273
+#      0.65            0.601                step 10        0.344      0.636
+#      0.55            0.488                step 11        0.312      0.636
+#      0.45            0.382                step 11        0.328      0.591
+#
+# and with the guard windows moved to the parting as well, 0.65 is the best
+# result this session measured on whole races: 0.500 finish and **0.727**
+# orange completion against the shipped 0.344 and 0.379.
+#
+# **It is not installed, because it breaks three pinned invariants and one of
+# them is a real defect.** At 0.65 the mouth is no longer on leg3's lip, its
+# west half overhangs leg3's channel again, and
+# `test_the_orange_seam_has_no_cliff_through_the_crossing_window` measures the
+# seam dropping **0.641** against a threshold of 0.35 - so the whole-race gain
+# is bought with a two-thirds-of-a-diameter step in the surface the crossing
+# runs over, at eight seeds. Six tests fail on it. Recorded as the strongest
+# lead this session found and left uninstalled, for the reason `merge_trim` is.
+#
+# The docstring below says `sloped.splitlab` scans this. It does not, and until
+# this session **nothing could**: `fork_mouth` and `_leg3_lip` spelled the
+# constant as a *default argument*, which Python binds once at definition, so
+# `tools/sloped_fork_lab.py`'s `mouth_across` knob - listed since V1.10 - had
+# never moved the built mouth by a millimetre. Every row that set it measured
+# 0.94. See `fork_mouth`.
+#
 # Orange's mouth is at hero width, and the 1.28 flare it used to carry is gone.
 #
 # The flare existed to put orange's east guard outside leg3's from the nose,
@@ -818,18 +903,19 @@ def _leg3_fork_pose():
     return point, heading, grade_of(path, FORK_SAMPLE, span=FORK_WINDOW_ORANGE)
 
 
-def _leg3_lip(leg3, sample: int, across: float = ORANGE_MOUTH_ACROSS):
+def _leg3_lip(leg3, sample: int, across: float | None = None):
     """A point on leg3's east lip, in **layout** units.
 
     `surface_point` applies the profile scale and the per-sample width factor
     in the same order `ring_points` does, so this is a point the collider has a
     vertex at rather than one near it.
     """
+    across = ORANGE_MOUTH_ACROSS if across is None else across
     point = leg3.surface_point(sample, across)
     return tuple(value / LAYOUT_TO_SIM for value in point)
 
 
-def fork_mouth(across: float = ORANGE_MOUTH_ACROSS):
+def fork_mouth(across: float | None = None):
     """Orange's mouth, and the gradient of the lip it has to stay level with.
 
     Two corrections over V1.2, and the second is the one that was missing.
@@ -856,7 +942,16 @@ def fork_mouth(across: float = ORANGE_MOUTH_ACROSS):
     """
     from sloped.track import TrackRun
 
+    # **Read at call time, not bound as a default.** Both of these used to
+    # spell `across: float = ORANGE_MOUTH_ACROSS`, and Python evaluates a
+    # default once, when the `def` runs. So the module attribute could be set
+    # to anything afterwards and the built mouth never moved:
+    # `tools/sloped_fork_lab.py`'s `mouth_across` knob - listed since V1.10 -
+    # had never changed a single row it appeared in, and every scan that used
+    # it measured the shipped 0.94. Nothing else reads the constant, so this is
+    # the whole of the fix.
     leg3 = TrackRun("leg3")
+    across = ORANGE_MOUTH_ACROSS if across is None else across
     lip = _leg3_lip(leg3, FORK_SAMPLE, across)
     # Lift by the floor offset, along the channel's own up axis, so it is the
     # lead's *floor* that lands on the lip rather than its centreline.

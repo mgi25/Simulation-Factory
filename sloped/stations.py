@@ -1165,6 +1165,59 @@ class ForkRidge(MarbleModule):
     # scans it.
     CREST_FLOOR = 0.0
 
+    # How fast the crest may rise **along the run**, as a multiple of how far
+    # its own feet descend between two stations. `None` disables the limit.
+    #
+    # ## The defect this exists for, measured
+    #
+    # The crest is `MAX_FLANK * 0.5 * gap` capped at the containment, and the
+    # gap between two channels diverging at 56 degrees grows fast: on the built
+    # runs it is 0.282 at leg3[91] and 1.752 at leg3[95], so the crest goes
+    # 0.254 to 1.4035 in four samples - **1.15 simulation units of rise over
+    # 1.94 of travel**. The feet descend 0.13 a sample over the same stretch, so
+    # in world height the surface east of leg3's channel *climbs*:
+    #
+    #     centre-envelope world height at leg3-frame across +2.5
+    #       leg3[90] 21.286   [91] 21.290   [92] 21.674   [93] 22.084
+    #       [94] 22.263   [95] 22.016   [96] 21.674
+    #
+    #     the ramp that makes, per sample, at across +1.9 / +2.5 / +3.2
+    #       [92]  +26.9  +38.4  +17.0 degrees
+    #       [93]  +24.5  +40.2  +42.2 degrees
+    #
+    # A marble thrown east by leg3's own hairpin - which is what the fork is
+    # *for* - meets that at 30 to 38 wu/s and is launched off it. Over 12 seeds
+    # at crest 0.12 the last static collider **41 of 58 non-finishers** touched
+    # was this ridge, while only 4 of 38 finishers ever touched it at all:
+    # touching it was 91% fatal.
+    #
+    # So the crest is rate-limited by the same argument `TrackRun._slewed_bank`
+    # uses for a run's roll, and to the same invariant: **no surface a marble
+    # runs on may rise along the run.** One is the ceiling on how much the two
+    # feet fell, so the crest can grow as fast as the ridge descends and no
+    # faster. It reaches full height at step 18 instead of step 13, which is
+    # still four stations before the ridge ends.
+    #
+    # ## And it is off, because it does not move a single marble
+    #
+    # Flattening the ramp is a correct invariant and an ineffective repair. Over
+    # 8 seeds at crest 0.12 it took the forked course from 0.344 finish to
+    # 0.328 - noise - and with the guard windows shut at the parting it is
+    # *inert*: those two configurations came back byte-identical, because with
+    # the windows right no marble reaches the slewed stations at all.
+    #
+    # What that settles is worth more than the knob. The ridge does not lose
+    # marbles by launching them off a ramp; it loses them because it is a
+    # **conveyor**, and lengthening it only moves the cliff. `ridge_window` 20,
+    # 30 and 40 all give exactly 0.500 finish and 0.727 orange completion, with
+    # the loss sites marching downstream - `leg3[90]` from 11 to 3, and new
+    # ones appearing at `leg3[103..113]`. Same marbles, later drop.
+    #
+    # Kept in the tree with its measurement and uninstalled, the way
+    # `sloped.joins.merge_trim` is. `tools/sloped_fork_lab.py` scans it as
+    # `ridge_slew`.
+    RISE_SLEW = None
+
     def __init__(
         self,
         module_id: str,
@@ -1211,6 +1264,28 @@ class ForkRidge(MarbleModule):
             floor = self.CREST_FLOOR * containment * min(1.0, step / max(self.window, 1))
             height = min(containment, max(self.MAX_FLANK * 0.5 * gap, floor))
             out.append((west, east, up, height))
+        return self._slewed(out)
+
+    def _slewed(self, stations):
+        """`stations` with the crest's rise limited to its own feet's descent.
+
+        Applied after the heights are solved rather than inside the loop,
+        because the limit is against how far the *previous* station's feet
+        fell and the first station has none. A station whose feet rise - which
+        the built runs never do here, and which a future path law could - is
+        allowed no growth at all rather than a negative allowance.
+
+        See `RISE_SLEW` for the measurement.
+        """
+        if self.RISE_SLEW is None or len(stations) < 2:
+            return stations
+        out = [stations[0]]
+        for index in range(1, len(stations)):
+            west, east, up, height = stations[index]
+            before = stations[index - 1]
+            fell = 0.5 * ((before[0][1] - west[1]) + (before[1][1] - east[1]))
+            allowed = out[-1][3] + self.RISE_SLEW * max(fell, 0.0)
+            out.append((west, east, up, min(height, allowed)))
         return out
 
     def local_colliders(self) -> list[TriMesh]:
