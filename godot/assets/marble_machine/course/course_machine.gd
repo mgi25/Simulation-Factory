@@ -67,9 +67,16 @@ const GUARD_BOOSTS := {
 ## east edge climbs 0.3013 where its centre descends throughout. That climb tops
 ## out at sample 98 and `blue[100]` is the loss site - 8 of V1.11's 24 remaining
 ## non-finishers, and where V1 lost 319 of its 747 marbles.
+## Orange's covers the **whole** run rather than a window, and that is what
+## makes it work: over its tail alone the authored roll costs 3.96 times the
+## drop it has, so a rate cap started there lags and never catches up, while
+## over the whole run the ratio is 0.82. Its basins are the deepest on the
+## course - 0.9223 at the channel edge against leg2's 0.0685 - and the bank
+## extreme is still preserved exactly, at 32 degrees.
 const BANK_SLEWS := {
 	"leg2": [98, 112, 1.0],
 	"blue": [84, 117, 1.0],
+	"orange": [0, 117, 1.0],
 }
 # Fewer piers, each carrying more. At 5.6 a viaduct over the gorge came
 # out as a picket fence of thin frames; at 7.4 each one is a structure.

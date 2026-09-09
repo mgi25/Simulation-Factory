@@ -432,6 +432,17 @@ class SlopedRace(MarbleSimulation):
             return index <= joins.FORK_WINDOW_ORANGE
         return False
 
+    def _on_apron(self, position: Sequence[float]) -> bool:
+        """Is the marble standing on the merge station rather than off course?
+
+        The merge's shoulder is floor and orange is *designed* to cross it, so
+        a marble out there is not outside the course - see
+        `sloped.stations.MergeCatch.holds`, which owns the geometry and the
+        measurement. Same argument as `_shared` at the fork, one station along.
+        """
+        merge = self.machine.modules.get("merge")
+        return merge is not None and merge.holds(position)
+
     def _containment(self, marble_id: int, position: Sequence[float]) -> None:
         """Note the run and sample where a marble was last inside its channel.
 
@@ -464,9 +475,11 @@ class SlopedRace(MarbleSimulation):
         floor = run.floor_offset - FLOOR_SLACK
         how = (
             "outside"
-            if abs(across) > half + LATERAL_SLACK and not self._shared(name, index, across)
+            if abs(across) > half + LATERAL_SLACK
+            and not self._shared(name, index, across)
+            and not self._on_apron(position)
             else "over"
-            if height > ceiling + VERTICAL_SLACK
+            if height > ceiling + VERTICAL_SLACK and not self._on_apron(position)
             else "through"
             if height < floor
             else None

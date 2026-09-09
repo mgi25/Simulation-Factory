@@ -1710,8 +1710,21 @@ class MergeCatch(MarbleModule):
             # for both put it 0.0666 above blue's cradle edge.
             profile = layout.CHANNEL_HALF * offset / max(half, 1e-9)
             return rise + to_sim((layout.floor_y_at(profile) - layout.FLOOR_Y) * scale)
-        side = 1.0 if across >= centre else -1.0
-        span = max(self.rim(along, side) - half, 1e-6)
+        # **Normalised by the shoulder's widest span, not by the local rim.**
+        # The rim tapers in toward the front, so dividing by `rim - half` makes
+        # `over` grow downstream at a fixed `across` and the whole shoulder
+        # *rises* as it narrows. Measured on the shoulder's own surface along
+        # `across` = -2.19, from `along` -1.00 to +4.76:
+        #
+        #     local rim   0.2655 -> 0.6512, a closed basin 0.3857 deep
+        #     fixed span  no climb anywhere
+        #
+        # That basin was the leading orange loss at 30 to 36 wu/s and it came
+        # in with the front taper: six of six marbles came to rest at the same
+        # point to two decimals, `along` +3.27, `across` -2.19, which is a
+        # shape and not a scatter. A taper has to *remove* shoulder, not lift
+        # it, and dividing by a constant is what makes it do that.
+        span = max(to_sim(self.ACROSS) - half, 1e-6)
         over = min(1.0, (offset - half) / span)
         return rise + edge + to_sim(self.FUNNEL) * over * over
 
@@ -1805,6 +1818,39 @@ class MergeCatch(MarbleModule):
             )
         self._mesh = merge_meshes(pieces, f"{self.id}_catch")
         return [self._mesh]
+
+    def holds(self, point) -> bool:
+        """Is this point standing on the station rather than off the course?
+
+        **A lateral containment test asks the wrong question at the merge**, in
+        the same way `sloped.race._shared` records it asking the wrong question
+        at the fork: the test is "is the marble outside *this run's* channel",
+        and on the apron the answer is yes and it does not matter, because the
+        shoulder is floor. Orange is *designed* to cross it - the back wall
+        takes out the component fighting the sprint and the far shoulder takes
+        out the rest - so an orange marble at 0.50 units above the shoulder,
+        2.4 to 3.7 across, at 5 to 15 wu/s, is doing exactly what the station
+        is for.
+
+        Measured: of 28 marbles launched on orange's tail, eleven were booked
+        as having left the course in precisely that state, touching `merge` and
+        nothing else. Every forked measurement this project has taken has that
+        in it, V1.10's escape rates included.
+
+        So the run-relative test is excused where this returns True: inside the
+        apron's own `along` span, inside its rim, and between half a diameter
+        below its floor and its roof. Derived from the station's own geometry,
+        so it cannot drift from the collider it describes.
+        """
+        along, across, rise = self._local(point)
+        if not to_sim(self.BACK) - MARBLE_RADIUS <= along <= to_sim(self.FRONT) + MARBLE_RADIUS:
+            return False
+        centre = self._channel_at(along)[0]
+        side = 1.0 if across >= centre else -1.0
+        if abs(across - centre) > self.rim(along, side) + MARBLE_RADIUS:
+            return False
+        floor = self._floor(along, across)
+        return floor - MARBLE_DIAMETER <= rise <= floor + to_sim(self.ROOF)
 
     def local_sockets(self) -> dict[str, Socket]:
         return {}

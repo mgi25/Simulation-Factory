@@ -143,6 +143,8 @@ __all__ = [
     "FORK_WINDOW_ORANGE",
     "FORK_TRIM_WINDOW",
     "fork_trim",
+    "merge_trim",
+    "MERGE_TRIM_WINDOW",
     "blue_controls",
     "LEAD_TENSION",
     "MU_TRACK",
@@ -649,6 +651,130 @@ def orange_controls() -> tuple[tuple[float, float, float], ...]:
 
 # Measured; see the module docstring's tension table.
 LEAD_TENSION = 1.00
+
+
+# How many of orange's own samples the merge trim is solved over, counted back
+# from its mouth. Orange's east running edge crosses the sprint's clear edge
+# about four samples out and its whole section is clear about twelve out, so
+# twenty is comfortably past the answer without walking the lobe.
+MERGE_TRIM_WINDOW = 20
+
+
+def merge_trim(orange, sprint, lead=None) -> list[float | None]:
+    """Where orange's section has to be cut off so it stops overhanging the sprint.
+
+    ## The defect, measured on the assembled colliders
+
+    Orange arrives at the junction 1.53 simulation units *downstream* of the
+    sprint's entry, 1.38 across it, and 0.536 above its contact point - so its
+    mouth is not beside the sprint's channel, it is **inside** it and above it.
+    Its own half width is 1.474 against the sprint's 1.880, and its centre is
+    only 1.38 from the sprint's centreline, so no narrowing of orange can lift
+    its edge clear: the overlap is a property of where the two centrelines are.
+
+    Walked along the sprint's own east running line:
+
+        station     floor owner   grade along the line
+        final[5]    orange               +68.9%    onto orange's mouth
+        final[6]    orange                +5.4%
+        final[7]    final               -151.6%    off the end of it
+
+    A shelf a blue marble climbs and a cliff an orange marble drops off, in
+    three samples. Over the eight-marble tail sweep at `orange[100]` it was
+    three of the eleven losses, the only concentrated site left.
+
+    ## What the trim is
+
+    Per orange sample, the profile coordinate at which orange's own surface
+    crosses the **local channel's east clear edge** - the sprint's, or the
+    merge lead's where the station is behind the sprint's entry. Everything
+    above it is folded away by `TrackRun._trimmed_high`, and the channel's own
+    floor is the surface there instead. Orange's marbles then leave its
+    trimmed edge and drop onto the sprint rather than running out along a
+    shelf, which is a fall of a third of a diameter in the direction they are
+    already going.
+
+    Solved against the built runs rather than tabulated, and bisected on the
+    profile coordinate rather than assumed monotonic in a straight line,
+    because orange's section is an arc and its projection into the sprint's
+    frame is not linear in the profile coordinate.
+
+    ## And it is FALSIFIED. Do not install it.
+
+    `sloped.course` builds orange without it and says so. Measured, over the
+    eight-marble tail sweep:
+
+        configuration                    orange[88] field   launched alone
+        untrimmed mouth                       22 of 28           17 of 28
+        mouth trimmed by this solve           19 of 28            2 of 28
+
+    **The mechanism does not transfer from the fork, and the reason is what is
+    underneath.** `fork_trim` folds away the part of orange that overhangs
+    leg3, and leg3's own east bank is there instead at very nearly the same
+    height - the two runs share an edge, which is the whole point of the trim.
+    At the merge the sprint's floor is 0.34 to 0.9 simulation units *below*
+    orange's, so folding orange's section away does not hand a marble over to
+    another surface: it drops it. The walk after the trim reads -258.0% at
+    `orange[113]`'s east edge where it read -151.6% at `final[7]` before, and
+    the losses move from a shelf at `final[5..7]` to a fall spread over
+    `final[3..10]` - `final[7] x5, final[6] x5, final[5] x3, final[4] x3` for
+    marbles launched alone.
+
+    Kept rather than deleted, for the reason `sloped.basin` and `sloped.radial`
+    are kept: it is the geometry the mechanism was measured in, and the next
+    person to see a 0.50-unit shelf at `final[5]` will reach for exactly this.
+    """
+    lateral, up, forward = sprint.frames[0]
+    origin = sprint.surface_point(0, 0.0)
+
+    def across_of(point) -> float:
+        offset = [point[axis] - origin[axis] for axis in range(3)]
+        return sum(offset[axis] * lateral[axis] for axis in range(3))
+
+    def along_of(point) -> float:
+        offset = [point[axis] - origin[axis] for axis in range(3)]
+        return sum(offset[axis] * forward[axis] for axis in range(3))
+
+    def channel_edge(along: float) -> float:
+        """The east clear edge of whichever run is under this station."""
+        best = None
+        for run in (lead, sprint):
+            if run is None:
+                continue
+            for index in range(len(run.sim_path)):
+                centre = run.surface_point(index, 0.0)
+                gap = abs(along_of(centre) - along)
+                if best is None or gap < best[0]:
+                    half = 0.5 * run.clear_width * run.widths[index]
+                    best = (gap, across_of(centre) + half)
+        return 0.0 if best is None else best[1]
+
+    half = layout.CHANNEL_HALF
+    table: list[float | None] = [None] * len(orange.sim_path)
+    last = len(orange.sim_path) - 1
+    for index in range(max(0, last - MERGE_TRIM_WINDOW), last + 1):
+        edge = channel_edge(along_of(orange.surface_point(index, 0.0)))
+        # Orange's high profile side is the one at low `across` in the
+        # sprint's frame, because orange travels against it. If even the top
+        # of the section is clear of the channel there is nothing to cut.
+        if across_of(orange.surface_point(index, half)) >= edge:
+            continue
+        low, high = -half, half
+        if across_of(orange.surface_point(index, low)) < edge:
+            # The whole section is over the channel; clamp at the centreline
+            # rather than folding everything, for the same reason `fork_trim`
+            # clamps at the mouth - a section folded to one point is a ring of
+            # coincident vertices.
+            table[index] = 0.0
+            continue
+        for _step in range(40):
+            middle = 0.5 * (low + high)
+            if across_of(orange.surface_point(index, middle)) >= edge:
+                low = middle
+            else:
+                high = middle
+        table[index] = 0.5 * (low + high)
+    return table
 
 
 def blue_controls() -> tuple[tuple[float, float, float], ...]:

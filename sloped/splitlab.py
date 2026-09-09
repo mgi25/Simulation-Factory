@@ -57,7 +57,7 @@ from marble3d.units import MARBLE_RADIUS
 
 from sloped import joins, layout
 from sloped.course import sloped_course
-from sloped.race import LATERAL_SLACK, VERTICAL_SLACK
+from sloped.race import FLOOR_SLACK, LATERAL_SLACK, VERTICAL_SLACK
 
 __all__ = [
     "Injector",
@@ -480,6 +480,21 @@ class SplitEntry:
 
         Zero or negative means inside. Lateral and vertical excess are taken
         as a max rather than summed, because either alone is enough.
+
+        **Three tests, not two, and the merge excused from the first two.**
+        This had the pair of bugs `sloped.race` was fixed for in V1.10 and one
+        of its own, and both were live while it was reporting orange:
+
+        * a marble that falls through a gap goes *down*, so its `across` stays
+          inside the half width and its height never rises. Eleven of 28
+          marbles on an orange tail sweep came to rest **9.3 units below** the
+          apron with no verdict at all - `verdict()` said "running" - because
+          neither test could fire. `FLOOR_SLACK` is the third.
+        * and the merge's shoulder is floor. Another eleven of the same 28 were
+          booked as having left the course while standing on it, 0.50 above it
+          and 2.4 to 3.7 across, in contact with `merge` and nothing else -
+          which is the station doing its job. `MergeCatch.holds` answers that,
+          and the same exemption is now in `sloped.race`.
         """
         run = self.runs[run_name]
         index = min(max(index, 0), len(run.sim_path) - 1)
@@ -489,9 +504,14 @@ class SplitEntry:
         across = sum(offset[axis] * lateral[axis] for axis in range(3))
         height = sum(offset[axis] * up[axis] for axis in range(3))
         half = 0.5 * run.clear_width * run.widths[index]
+        below = (run.floor_offset - FLOOR_SLACK) - height
+        merge = self.machine.modules.get("merge")
+        if merge is not None and merge.holds(position):
+            return below
         return max(
             abs(across) - (half + LATERAL_SLACK),
-            height - (run.containment + VERTICAL_SLACK),
+            height - (run.containment_at(index) + VERTICAL_SLACK),
+            below,
         )
 
     def _containment(self, marble_id: int, position) -> None:

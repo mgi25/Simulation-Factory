@@ -339,12 +339,19 @@ class TrackRun(MarbleModule):
         width_profile: tuple[float, int, int] | None = None,
         guard_boost: tuple[float, int, int, int, int] | None = None,
         entry_trim: Sequence[float | None] | None = None,
+        exit_trim: Sequence[float | None] | None = None,
         bank_slew: tuple[int, int, float] | None = None,
     ) -> None:
         super().__init__(name)
         # Per-sample section trim in profile units, or None. Usually installed
         # after construction by `set_entry_trim`; see there.
         self.entry_trim = None if entry_trim is None else list(entry_trim)
+        # The same thing on the other side of the section: everything *above*
+        # this profile coordinate is folded away. Two trims rather than one
+        # signed table, because a run can need both - orange overhangs leg3 on
+        # its low side at the fork and the sprint on its high side at the
+        # merge - and a single table cannot express two cuts.
+        self.exit_trim = None if exit_trim is None else list(exit_trim)
         # (first, last, margin): between these samples the roll may only
         # unwind as fast as `margin` of the local drop pays for, so neither edge
         # of the channel ever rises along the run. See `_slewed_bank` for the
@@ -570,6 +577,22 @@ class TrackRun(MarbleModule):
         self.entry_trim = None if table is None else list(table)
         self._mesh = None
 
+    def exit_trim_at(self, index: int) -> float | None:
+        """Where this sample's section is cut off above, in profile units."""
+        if self.exit_trim is None or index >= len(self.exit_trim):
+            return None
+        return self.exit_trim[index]
+
+    def set_exit_trim(self, table: Sequence[float | None] | None) -> None:
+        """Install a high-side section trim and drop the cached collider.
+
+        `sloped.joins.merge_trim` solves it, against the sprint rather than
+        against leg3. Same reason as `set_entry_trim`: the answer is where one
+        run crosses another and both have to exist first.
+        """
+        self.exit_trim = None if table is None else list(table)
+        self._mesh = None
+
     def section_at(self, index: int) -> list[tuple[float, float]]:
         """The cross-section at one sample, with any opened wall, any local
         guard boost and any entry trim applied.
@@ -625,6 +648,7 @@ class TrackRun(MarbleModule):
 
         The point count is preserved; see `TRIM_SKIRT`.
         """
+        section = self._trimmed_high(section, index)
         trim = self.entry_trim_at(index)
         if trim is None:
             return section
@@ -644,6 +668,44 @@ class TrackRun(MarbleModule):
         return [
             (cut, seam - skirt * (count - step) / count) for step in range(count)
         ] + section[count:]
+
+    def _trimmed_high(
+        self, section: list[tuple[float, float]], index: int
+    ) -> list[tuple[float, float]]:
+        """`section` with everything **above** this sample's exit trim folded away.
+
+        The mirror of `_trimmed`, and it exists because orange overhangs two
+        different runs on two different sides. At the fork its *low* profile
+        side hangs over leg3's channel; at the merge its *high* side hangs over
+        the sprint's, because orange arrives travelling against the sprint and
+        its lateral axis is therefore reversed in the sprint's frame.
+
+        Measured before it was written: orange's mouth stands 0.30 to 0.50
+        simulation units over the sprint's east running edge at `final[5..7]`
+        and then stops, so the walk reads +68.9% of climb onto it at
+        `final[5]`, +5.4% at `final[6]`, and -151.6% off the end of it at
+        `final[7]`. That is a shelf a blue marble climbs and a cliff an orange
+        marble drops off, in the same three samples.
+
+        Folded to the cut and walked down the section's own `-up`, exactly as
+        `_trimmed` does and for the same reason: `sweep_rings` refuses unequal
+        rings, and the skirt that results is a downward-facing wall a marble
+        cannot rest on. The deepest folded point is the one furthest from the
+        seam, which is the mirror of the entry trim's ordering.
+        """
+        trim = self.exit_trim_at(index)
+        if trim is None:
+            return section
+        cut = trim * self.scale
+        count = sum(1 for across, _up in section if across > cut)
+        if not 0 < count < len(section):
+            return section
+        seam = _interpolate_rise(section, cut)
+        skirt = self.TRIM_SKIRT * self.scale
+        keep = len(section) - count
+        return section[:keep] + [
+            (cut, seam - skirt * (step + 1) / count) for step in range(count)
+        ]
 
     def local_colliders(self) -> list[TriMesh]:
         if self._mesh is None:

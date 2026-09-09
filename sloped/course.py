@@ -143,6 +143,14 @@ ROUTE_CHOICES = ("blue", "both")
 # span the whole of it.
 MERGE_GUARD_WINDOW = (0.0, -1, 0, 9, 14)
 
+# The same thing on blue's own last samples, which are inside the apron too.
+# `(side, full-before, open-from, open-to, full-after)` with a side of zero
+# meaning both rails. Blue's mouth is at the merge lead's seam and the apron
+# reaches 4.035 simulation units behind the sprint's entry, which falls between
+# blue's samples 112 and 113; the window opens at 112 and runs to the end of
+# the run, so `open-to` and `full-after` are both past its last sample.
+BLUE_MERGE_WINDOW = (0.0, 111, 113, 118, 119)
+
 # How much of leg3's east guard stands through the fork window, as a fraction
 # of its full height - the sixth entry of `TrackRun.open_side`.
 #
@@ -393,6 +401,41 @@ BANK_SLEWS: dict[str, tuple[int, int, float]] = {
     # is deliberate slack; opening it at 86 leaves 0.0152 at the edge. It
     # rejoins the authored curve inside its own window with a residual of 0.00.
     "blue": (84, 117, 1.0),
+    # **Orange's is the whole run, and that is what makes it possible.** Its
+    # tail carries three roll reversals, not one: the roll runs +18.1 degrees
+    # at sample 84 to -31.9 at 99 to +18.0 at 107, and the basins are the
+    # deepest on the course by a factor of thirteen -
+    #
+    #     fraction   0.00     0.40     0.55     0.70     0.85     0.95
+    #     authored 0.0000   0.2910   0.4602   0.6308   0.8035   0.9223
+    #     limited  0.0000   0.0000   0.0000   0.0000   0.0000   0.0002
+    #
+    # - and the marbles ride out there: `sloped_continuity_check` puts the ride
+    # height at 0.31 to 0.42 of a 0.54 containment through samples 103 to 110.
+    #
+    # **A window over the tail alone cannot do it and the whole run can**,
+    # which is the opposite of the leg2 result and is worth stating plainly.
+    # Over samples 84 to 118 the authored roll costs 1.5310 layout units of
+    # drop and has 0.3871 - a ratio of 3.96 - so a rate cap started at 84 lags
+    # and never catches up: it leaves 0.1864 at the edge. Over the *whole* run
+    # the ratio is 0.82, because orange descends 3.30 units in total. Started
+    # at sample 0 the cap never lets the roll wind on faster than the drop
+    # pays for either, so it never reaches the excursions it would then have
+    # to pay back, and the total variation it has to fund is its own and not
+    # the authored one. Scanned: a window from 20, 40, 50, 60 or 70 all give
+    # 0.0274; from 0 it gives 0.0002.
+    #
+    # The bank extreme is preserved exactly at 32.0000 - the roll holds +32 for
+    # 24 samples, so the cap reaches it - and `ride_height` is 0.2050 layout
+    # units before and after at 41 wu/s and 0.3608 at 50, with `runs_out` zero
+    # in every case. What it buys is the *rate*: 47.44 degrees per layout unit
+    # and 27 samples over the continuity audit's 12.0 threshold become 16.11
+    # and far fewer. Nine samples end up banked the wrong way for their corner
+    # and that is measured to cost nothing, the same as blue's.
+    #
+    # Measured on eight-marble traffic through orange's tail and the merge:
+    # 13 of 28 finish authored, 22 of 28 limited.
+    "orange": (0, 117, 1.0),
 }
 
 # Which start the course is built with.
@@ -527,7 +570,18 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
     # `sloped.joins`.
     blue_spec = dict(layout.run("blue"))
     blue_spec["controls"] = joins.blue_controls()
-    runs["blue"] = TrackRun("blue", spec=blue_spec, bank_slew=BANK_SLEWS.get("blue"))
+    runs["blue"] = TrackRun(
+        "blue",
+        spec=blue_spec,
+        bank_slew=BANK_SLEWS.get("blue"),
+        # Blue's last samples stand inside the roofed apron, so its rails are
+        # opened there for the same reason the sprint's and the merge lead's
+        # are: a rail inside a roofed apron leaves a ledge along its own top,
+        # and V1 lost 319 of 747 marbles resting on one. Blue's mouth is 1.899
+        # units behind the sprint's entry and the apron reaches 4.035 behind
+        # it, which is blue's sample 112.
+        open_side=BLUE_MERGE_WINDOW,
+    )
     # Orange's lobe entered at its second authored control; see `sloped.joins`.
     if forked:
         orange_spec = dict(layout.run("orange"))
@@ -601,6 +655,15 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
     # eight racers a sample it was costing.
     if forked:
         runs["orange_lead"].set_entry_trim(joins.fork_trim(runs["leg3"], runs["orange_lead"]))
+        # **Orange's mouth is NOT trimmed, and that is a measurement.** It
+        # overhangs the sprint's east running edge by 0.30 to 0.50 units at
+        # `final[5..7]`, which is a shelf, and `sloped.joins.merge_trim` solves
+        # the fold that would remove it. Installed, it made orange worse:
+        # 78.6% of an eight-marble tail sweep to 67.9%, and 60.7% to 7.1% for
+        # marbles launched alone. See `merge_trim` for why the mechanism does
+        # not transfer from the fork - there the folded-away part had leg3's
+        # floor under it at the same height, and here the sprint's floor is
+        # 0.34 to 0.9 below, so the fold turns a shelf into a waterfall.
 
     start = start_module(START_KIND, runs["launch"])
     # Declaration order is the build order and therefore the body numbering, so
