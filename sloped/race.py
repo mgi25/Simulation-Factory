@@ -101,6 +101,24 @@ CHECKPOINTS = (("descent", 0.09), ("mixed", 0.20), ("quarter", 0.25), ("half", 0
 LATERAL_SLACK = 0.5 * 2.0 * MARBLE_RADIUS
 VERTICAL_SLACK = 2.0 * MARBLE_RADIUS
 
+# And how far *below* its own cradle floor a marble has to be before it counts
+# as having dropped out of the bottom of the course.
+#
+# **The verdict had two tests and needed three.** A marble that falls through a
+# gap between two modules goes down, not sideways: its `across` stays inside the
+# half width all the way to the ground and its `height` never rises, so neither
+# the lateral nor the vertical test ever fires. Measured on the forked course
+# over 24 seeds, 27 racers escaped and `tools/sloped_race_escapes.py` located
+# **none of them** - the whole of orange's loss was invisible to the one
+# instrument built to explain it, and the tool reported "0 left the course" on
+# a run in which a quarter of the field did.
+#
+# Two and a half diameters below the cradle, so that the drop off blue's exit
+# onto the merge apron - a real place a marble is legitimately below the run it
+# is located on - stays inside it. `tests/test_sloped_race.py` pins that no
+# finisher ever trips it.
+FLOOR_SLACK = 2.5 * 2.0 * MARBLE_RADIUS
+
 
 @dataclass
 class RacerResult:
@@ -115,6 +133,7 @@ class RacerResult:
     ranks: dict[str, int] = field(default_factory=dict)
     lost_at: tuple[str, int] | None = None
     lost_time: float | None = None
+    lost_how: str | None = None
     last_touch: tuple[str, int] | None = None
 
     def to_json(self) -> dict[str, Any]:
@@ -129,6 +148,7 @@ class RacerResult:
             "top_speed": round(self.top_speed, 4),
             "ranks": dict(self.ranks),
             "lost_at": list(self.lost_at) if self.lost_at else None,
+            "lost_how": self.lost_how,
             "last_touch": list(self.last_touch) if self.last_touch else None,
             "lost_time": None if self.lost_time is None else round(self.lost_time, 6),
         }
@@ -148,7 +168,10 @@ class RaceOutcome:
     overtakes: int = 0
     top_speed: float = 0.0
     max_travel_per_tick: float = 0.0
+    max_travel_falling: float = 0.0
     worst_penetration: float = 0.0
+    worst_actuator_overlap: float = 0.0
+    worst_marble_overlap: float = 0.0
     route_counts: dict[str, int] = field(default_factory=dict)
     route_times: dict[str, list[float]] = field(default_factory=dict)
     winner_lock_time: float | None = None
@@ -196,7 +219,10 @@ class RaceOutcome:
             "overtakes": self.overtakes,
             "top_speed": round(self.top_speed, 4),
             "max_travel_per_tick": round(self.max_travel_per_tick, 5),
+            "max_travel_falling": round(self.max_travel_falling, 5),
             "worst_penetration": round(self.worst_penetration, 5),
+            "worst_actuator_overlap": round(self.worst_actuator_overlap, 5),
+            "worst_marble_overlap": round(self.worst_marble_overlap, 5),
             "route_counts": dict(self.route_counts),
             "route_times": {k: [round(v, 4) for v in vs] for k, vs in self.route_times.items()},
             "winner_lock_time": None
@@ -374,8 +400,46 @@ class SlopedRace(MarbleSimulation):
             # backwards there would report the apron as an overtake.
             result.progress = max(result.progress, progress)
 
+    def _shared(self, name: str, index: int, across: float) -> bool:
+        """Is this side of this sample the fork's own shared floor?
+
+        A lateral containment test asks "is the marble outside *this* channel",
+        and through the fork window that is the wrong question on one side of
+        each of two runs, because the other route's floor is there. Measured on
+        the forked course over 12 seeds: 72 of 84 recorded escapes were on leg3
+        at samples 86 to 91, every one of them east, every one of them with an
+        eastward across-speed of 6 to 11 units per second - which is not a
+        marble leaving the course, it is a marble taking the other one.
+
+        East of leg3 through the guard window and west of orange's lead through
+        its own, therefore, the marble is on a floor. Everywhere else, and on
+        the unforked course, this is False and the test is unchanged.
+        """
+        if "orange_lead" not in self.runs:
+            return False
+        if name == "leg3" and across > 0.0:
+            return (
+                joins.FORK_SAMPLE - 1
+                <= index
+                <= joins.FORK_SAMPLE + joins.FORK_GUARD_WINDOW[3]
+            )
+        if name == "orange_lead" and across < 0.0:
+            return index <= joins.FORK_WINDOW_ORANGE
+        return False
+
     def _containment(self, marble_id: int, position: Sequence[float]) -> None:
-        """Note the run and sample where a marble was last inside its channel."""
+        """Note the run and sample where a marble was last inside its channel.
+
+        **A finisher is not asked.** The sprint's exit hands onto the finish
+        deck, which is wider than the channel, so a marble that has crossed the
+        line and is rolling out on the deck reads as 1.3 half widths outside
+        `final[117]` - and booked as an escape. Over 12 forked races that was
+        43 of 90 recorded escapes, all of them racers who had already won or
+        placed. It never reached the benchmark, which counts states rather than
+        verdicts, but it was most of what the escape instrument had to say.
+        """
+        if marble_id in self._crossed:
+            return
         place = self._where.get(marble_id)
         if place is None:
             return
@@ -392,10 +456,21 @@ class SlopedRace(MarbleSimulation):
         # local guard boost and a check that read the scalar while the collider
         # carried the boost would book a contained marble as an escape.
         ceiling = run.containment_at(index)
-        if abs(across) > half + LATERAL_SLACK or height > ceiling + VERTICAL_SLACK:
+        floor = run.floor_offset - FLOOR_SLACK
+        how = (
+            "outside"
+            if abs(across) > half + LATERAL_SLACK and not self._shared(name, index, across)
+            else "over"
+            if height > ceiling + VERTICAL_SLACK
+            else "through"
+            if height < floor
+            else None
+        )
+        if how is not None:
             if result.lost_at is None:
                 result.lost_at = (name, index)
                 result.lost_time = self.elapsed
+                result.lost_how = how
                 self.events.append(
                     Event(
                         self.elapsed,
@@ -406,6 +481,7 @@ class SlopedRace(MarbleSimulation):
                             "sample": index,
                             "across": round(across, 4),
                             "height": round(height, 4),
+                            "how": how,
                         },
                     )
                 )
@@ -570,7 +646,10 @@ def run_race(
         outcome.collisions = race.stats.collisions
         outcome.top_speed = race.stats.top_speed
         outcome.max_travel_per_tick = race.stats.max_travel_per_tick
+        outcome.max_travel_falling = race.stats.max_travel_falling
         outcome.worst_penetration = race.stats.worst_penetration
+        outcome.worst_actuator_overlap = race.stats.worst_actuator_overlap
+        outcome.worst_marble_overlap = race.stats.worst_marble_overlap
         outcome.lead_changes = race.lead_changes
         outcome.overtakes = race.overtakes
         outcome.leader_series = list(race.leader_series)

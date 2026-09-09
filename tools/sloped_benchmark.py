@@ -195,7 +195,10 @@ def summarise(races: Sequence[dict[str, Any]], slots: int = 8) -> dict[str, Any]
     winner_worst: list[int] = []
     top_speeds: list[float] = []
     travel: list[float] = []
+    falling: list[float] = []
     penetration: list[float] = []
+    actuator: list[float] = []
+    pairs: list[float] = []
     collisions: list[int] = []
     lost_sites: Counter = Counter()
     slot_rank_pairs: dict[str, list[tuple[float, float]]] = defaultdict(list)
@@ -208,7 +211,10 @@ def summarise(races: Sequence[dict[str, Any]], slots: int = 8) -> dict[str, Any]
         overtakes.append(race["overtakes"])
         top_speeds.append(race["top_speed"])
         travel.append(race["max_travel_per_tick"])
+        falling.append(race["max_travel_falling"])
         penetration.append(race["worst_penetration"])
+        actuator.append(race["worst_actuator_overlap"])
+        pairs.append(race["worst_marble_overlap"])
         collisions.append(race["collisions"])
         finishers_per_race[race["finished"]] += 1
         if race["finished"] == len(race["racers"]):
@@ -387,8 +393,14 @@ def summarise(races: Sequence[dict[str, Any]], slots: int = 8) -> dict[str, Any]
                 sum(r["stuck"] for r in races) / max(sum(len(r["racers"]) for r in races), 1), 4
             ),
             "loss_sites": dict(lost_sites.most_common(12)),
+            # Three penetration numbers and two travel numbers, because the
+            # single worst case of each was being set by something the budget
+            # is not about: `marble3d.simulation.RunStats` has the measurement.
             "worst_penetration": round(min(penetration), 5) if penetration else None,
+            "worst_actuator_overlap": round(min(actuator), 5) if actuator else None,
+            "worst_marble_overlap": round(min(pairs), 5) if pairs else None,
             "max_travel_per_tick": round(max(travel), 5) if travel else None,
+            "max_travel_falling": round(max(falling), 5) if falling else None,
             "travel_budget": DEFAULT_CONFIG.marble.travel_budget
             * DEFAULT_CONFIG.marble.diameter,
         },
@@ -588,6 +600,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             f"median {data['median_time']}"
         )
     print(f"  loss sites: {reliability['loss_sites']}")
+    print(
+        f"  validation: travel {reliability['max_travel_per_tick']} in the machine, "
+        f"{reliability['max_travel_falling']} falling out of it; penetration "
+        f"track {reliability['worst_penetration']}, actuator "
+        f"{reliability['worst_actuator_overlap']}, marble-on-marble "
+        f"{reliability['worst_marble_overlap']}"
+    )
     print(f"  eligible seeds {report['selection']['eligible']}")
     for entry in report["selection"]["shortlist"][:5]:
         print(

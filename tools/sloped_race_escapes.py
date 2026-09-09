@@ -65,7 +65,9 @@ class EscapeRace(SlopedRace):
         # `RacerResult.finish_order`, so those are the two facts read here.
         place = self._where.get(marble_id)
         already = marble_id in self.escapes
+        before = self.results[marble_id].lost_at
         super()._containment(marble_id, position)
+        fired = before is None and self.results[marble_id].lost_at is not None
         if place is None:
             return
         name, index = place
@@ -85,9 +87,7 @@ class EscapeRace(SlopedRace):
         self.peak_reach[marble_id] = max(
             self.peak_reach.get(marble_id, 0.0), abs(across) / max(half, 1e-9)
         )
-        if already:
-            return
-        if self.marbles[marble_id].state != STATE_ESCAPED:
+        if already or not fired:
             return
         velocity = self.marbles[marble_id].pose[2]
         across_v = sum(velocity[axis] * lateral[axis] for axis in range(3))
@@ -99,6 +99,7 @@ class EscapeRace(SlopedRace):
             "slot": self.results[marble_id].start_slot,
             "route": self.results[marble_id].route,
             "state": self.marbles[marble_id].state,
+            "at": [round(value, 4) for value in position],
             "reach": round(across / max(half, 1e-9), 4),
             "height": round(height * SIM_TO_LAYOUT, 4),
             "ceiling": round(ceiling * SIM_TO_LAYOUT, 4),
@@ -107,9 +108,7 @@ class EscapeRace(SlopedRace):
             "across_speed": round(across_v * SIM_TO_LAYOUT, 3),
             "up_speed": round(up_v * SIM_TO_LAYOUT, 3),
             "bank_deg": round(math.degrees(run.banks[index]), 2),
-            "which_test": (
-                "lateral" if abs(across) > half + LATERAL_SLACK else "vertical"
-            ),
+            "which_test": self.results[marble_id].lost_how,
             "above_rail": bool(height > ceiling),
         }
 

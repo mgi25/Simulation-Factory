@@ -125,7 +125,41 @@ class _Marble:
 
 @dataclass
 class RunStats:
-    """Everything a batch run wants to sort on, without reading the frames."""
+    """Everything a batch run wants to sort on, without reading the frames.
+
+    ## Two of these numbers were one number each and had to be split
+
+    Both were reported over 600 sloped races as single worst cases with no site,
+    both exceeded the threshold the config sets for itself, and **neither was
+    measuring what the threshold is about.**
+
+    **Travel per tick.** `max_travel_per_tick` is `top_speed * dt`, and
+    `top_speed` is the largest instantaneous speed any marble reached at any
+    tick. A marble that leaves the channel keeps accelerating under gravity all
+    the way down to the bottom of the machine's bounding box, which on the
+    sloped course is another thirty units, and it is retired at the box rather
+    than at the track. So the record was routinely set by a marble in free
+    flight with nothing anywhere near it. The budget exists to keep the machine
+    out of the regime where discrete contact detection misses a *wall*; a marble
+    that has no wall cannot miss one. Measured over 48 blue races, the fastest
+    reading in 47 of them was a marble on leg1's plunge at 63 to 67 wu/s -
+    0.288 of a diameter against the 0.5 budget - and the 48th was a marble
+    already outside the machine at 69. So `max_travel_per_tick` is now taken
+    over marbles **inside the machine's own bounds** and `max_travel_falling`
+    carries the rest, rather than the two being one number that the higher of
+    them always won.
+
+    **Penetration.** `worst_penetration` was the most negative contact distance
+    over *every* pair, and the start's rotor and floor slats are kinematic
+    bodies that `move_kinematic` teleports with `resetBasePositionAndOrientation`
+    once a tick. A teleported panel that lands across a marble is reported at
+    whatever depth it landed at and pushed out on the next solve; over 48 races
+    the deepest contact was a marble against a moving part of the start in
+    **all 48**, at 1.8 to 2.6 seconds - inside the mixing phase - with relative
+    normal speeds of hundredths of a unit. That is actuator contact, and it says
+    nothing about whether a marble is sinking into the track. Split three ways
+    by what the marble was touching, so the track's own number can be read.
+    """
 
     ticks: int = 0
     sim_seconds: float = 0.0
@@ -136,8 +170,11 @@ class RunStats:
     collisions: int = 0
     top_speed: float = 0.0
     max_travel_per_tick: float = 0.0
+    max_travel_falling: float = 0.0
     travel_budget: float = 0.0
     worst_penetration: float = 0.0
+    worst_actuator_overlap: float = 0.0
+    worst_marble_overlap: float = 0.0
     energy_start: float = 0.0
     energy_end: float = 0.0
     max_energy_rise: float = 0.0
@@ -266,11 +303,21 @@ class MarbleSimulation:
     def _read_contacts(self) -> None:
         touching: set[tuple[int, int]] = set()
         worst = self.stats.worst_penetration
+        worst_actuator = self.stats.worst_actuator_overlap
+        worst_pair = self.stats.worst_marble_overlap
         for contact in self.world.contacts():
             first = self.world.marble_of(contact.body_a)
             second = self.world.marble_of(contact.body_b)
-            if contact.distance < worst:
-                worst = contact.distance
+            if first is not None and second is not None:
+                worst_pair = min(worst_pair, contact.distance)
+            elif any(
+                self.world.bodies[body].kind == "kinematic"
+                for body in (contact.body_a, contact.body_b)
+                if body in self.world.bodies
+            ):
+                worst_actuator = min(worst_actuator, contact.distance)
+            else:
+                worst = min(worst, contact.distance)
             if first is None or second is None:
                 continue
             pair = (min(first, second), max(first, second))
@@ -301,8 +348,14 @@ class MarbleSimulation:
             )
         self._touching = touching
         self.stats.worst_penetration = worst
+        self.stats.worst_actuator_overlap = worst_actuator
+        self.stats.worst_marble_overlap = worst_pair
 
     def _read_marbles(self) -> None:
+        # Hoisted: the containment test below wants it per marble and the
+        # travel split wants it per marble too, and it does not change inside
+        # a tick.
+        bounds = self.machine.bounds()
         for marble_id in list(self.world.marbles):
             marble = self.marbles[marble_id]
             position, orientation, velocity, spin = self.world.marble_state(marble_id)
@@ -322,6 +375,14 @@ class MarbleSimulation:
                 marble.top_speed = speed
             if speed > self.stats.top_speed:
                 self.stats.top_speed = speed
+            # The travel budget is about missing a wall, so it is measured on
+            # marbles that still have one; see `RunStats`.
+            inside = bounds.contains(position, slack=MARBLE_RADIUS)
+            travel = speed * self.dt
+            if inside:
+                self.stats.max_travel_per_tick = max(self.stats.max_travel_per_tick, travel)
+            else:
+                self.stats.max_travel_falling = max(self.stats.max_travel_falling, travel)
 
             where = self.machine.module_at(position, marble.module) or AIRBORNE
             if where != marble.module:
@@ -341,14 +402,13 @@ class MarbleSimulation:
 
             if self._past_finish(position):
                 self._retire(marble_id, STATE_FINISHED, "finish")
-            elif not self.machine.bounds().contains(position, slack=MARBLE_RADIUS):
+            elif not inside:
                 self.stats.failure = self.stats.failure or (
                     f"marble {marble_id} left the machine at "
                     f"{tuple(round(value, 2) for value in position)}"
                 )
                 self._retire(marble_id, STATE_ESCAPED, "escaped")
 
-        self.stats.max_travel_per_tick = self.stats.top_speed * self.dt
 
     def _past_finish(self, position: Sequence[float]) -> bool:
         """Has the marble gone out through the machine's last exit socket?
