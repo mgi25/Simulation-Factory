@@ -1,0 +1,22 @@
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+5 configurations x 16 seeds in 389s
+configuration                 finish   all8    esc    stk |  blue%  blue fin |  orng%  orng fin
+-----------------------------------------------------------------------------------------------
+crest 0.05 (open)              0.500   0.00  0.445  0.055 |  0.250     0.375 |  0.742     0.547
+crest 0.25                     0.961   0.81  0.016  0.023 |  0.992     0.969 |  0.000     0.000
+crest 0.40                     0.977   0.81  0.016  0.008 |  0.992     0.984 |  0.000     0.000
+crest 0.55                     0.992   0.94  0.000  0.008 |  0.992     1.000 |  0.000     0.000
+crest 0.70                     0.992   0.94  0.000  0.008 |  0.992     1.000 |  0.000     0.000
+
+  crest 0.05 (open): {'final[10]': 8, 'leg3[92]': 4, 'orange_lead[11]': 4, 'orange_lead[9]': 3, 'orange_lead[17]': 3, 'orange[108]': 3, 'leg3[88]': 3, 'final[11]': 3, 'leg3[94]': 3, 'final[9]': 3}
+  crest 0.25: {'blue[117]': 2, 'leg3[92]': 1, 'leg2[99]': 1, 'leg3[95]': 1}
+  crest 0.40: {'leg2[99]': 1, 'final[9]': 1, 'final[12]': 1}
+  crest 0.55: {'leg2[99]': 1}
+  crest 0.70: {'leg2[99]': 1}
+wrote docs/validation/sloped_race_v1/v110/fork_lab_crest_height.json

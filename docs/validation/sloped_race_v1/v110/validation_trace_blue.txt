@@ -1,0 +1,41 @@
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+48 races [routes=blue] in 764s; travel budget 0.5
+  worst travel per tick 0.28812; 0 of 48 races exceed the budget
+  of the 48 per-race records, 1 were already outside the machine's own bounds and 48 were touching nothing at all
+  module of the fastest reading: leg1 x47, airborne x1
+
+    travel   speed  seed  m module       located           in? touching
+   0.28812   69.15    40  3 airborne     final[32]          no -
+   0.27774   66.66    27  0 leg1         leg1[78]          yes -
+   0.27769   66.65    47  3 leg1         leg1[73]          yes -
+   0.27688   66.45    10  4 leg1         leg1[74]          yes -
+   0.27553   66.13    11  0 leg1         leg1[71]          yes -
+   0.27511   66.03    17  1 leg1         leg1[77]          yes -
+   0.27444   65.87     8  0 leg1         leg1[74]          yes -
+   0.27334   65.60    26  1 leg1         leg1[74]          yes -
+   0.27255   65.41    29  1 leg1         leg1[70]          yes -
+   0.27210   65.30    16  6 leg1         leg1[77]          yes -
+
+  worst penetration -1.03957
+  by pair kind: marble-static x48
+  by owners: marble / start x48
+
+      depth  seed    tick kind           owners                         impulse moving
+   -1.03957    25     626 marble-static  start / marble                704.4661 start
+   -1.00689    34     617 marble-static  start / marble                932.7373 start
+   -0.90852    47     480 marble-static  start / marble                 65.5107 start
+   -0.87734     7     789 marble-static  start / marble                754.3809 start
+   -0.76664    16     644 marble-static  start / marble                150.5919 start
+   -0.76613    18     788 marble-static  start / marble               1210.8697 start
+   -0.76545    37     409 marble-static  start / marble                 38.9816 start
+   -0.76395    41     464 marble-static  start / marble                572.2137 start
+   -0.76355     5     498 marble-static  start / marble               1228.4711 start
+   -0.76087    39     450 marble-static  start / marble               2864.2588 start
+wrote docs/validation/sloped_race_v1/v110/validation_trace_blue.json

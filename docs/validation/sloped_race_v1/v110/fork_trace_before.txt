@@ -1,0 +1,111 @@
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+192 racers over 24 seeds
+  by route   {'blue': 123, 'orange': 67, 'unrouted': 2}
+  by outcome {'blue/escaped': 11, 'blue/finished': 112, 'orange/finished': 33, 'orange/escaped': 27, 'unrouted/stuck': 2, 'orange/stuck': 7}
+  loss sites {'orange_lead[19]': 13, 'orange_lead[20]': 6, 'leg3[102]': 4, 'orange[101]': 4, 'leg2[99]': 2, 'orange_lead[15]': 2, 'leg3[96]': 2, 'leg3[100]': 2, 'orange[98]': 2, 'final[13]': 1, 'orange_lead[14]': 1, 'orange[21]': 1, 'leg3[94]': 1, 'final[0]': 1, 'orange_lead[16]': 1, 'orange[23]': 1, 'orange[100]': 1, 'leg3[95]': 1, 'final[10]': 1}
+  entry across (horizontal, sim units) by fate:
+    blue/escaped       n=11   mean +0.451  median +0.465  range +0.280 .. +0.583
+    blue/finished      n=112  mean +0.283  median +0.306  range -0.085 .. +0.719
+    orange/escaped     n=27   mean +0.386  median +0.376  range +0.149 .. +0.653
+    orange/finished    n=33   mean +0.391  median +0.383  range +0.136 .. +0.633
+    orange/stuck       n=7    mean +0.296  median +0.316  range +0.114 .. +0.458
+  peak across (horizontal, sim units) by fate:
+    blue/escaped       n=11   mean +6.777  median +3.744  range +1.187 .. +14.388
+    blue/finished      n=112  mean +0.848  median +0.796  range +0.352 .. +1.998
+    orange/escaped     n=27   mean +13.199  median +12.133  range +2.528 .. +21.978
+    orange/finished    n=33   mean +21.568  median +21.584  range +21.135 .. +21.989
+    orange/stuck       n=7    mean +21.463  median +21.372  range +21.224 .. +21.822
+
+representative failures:
+  seed   1 marble 0 slot 7 route blue escaped last touch ['final', 13]
+    entry: across 0.4646 rise 0.8254 speed 34.009 lateral 3.731
+    touched: leg3
+      t= 17.2833 step  +27 across -0.380 rise +0.495 v  18.87 touch ['leg3'] n [-0.018, 0.997, 0.072]
+      t=    17.3 step  +28 across -0.342 rise +0.513 v  19.54 touch ['leg3'] n [-0.024, 0.993, 0.117]
+      t= 17.3167 step  +28 across -0.308 rise +0.500 v  19.20 touch ['leg3'] n [-0.054, 0.981, 0.186]
+      t= 17.3333 step  +29 across -0.278 rise +0.508 v  19.64 touch ['leg3'] n [-0.035, 0.97, 0.241]
+      t=   17.35 step  +29 across -0.252 rise +0.474 v  20.01 touch ['leg3'] n [-0.123, 0.992, 0.021]
+      t= 17.3667 step  +30 across -0.229 rise +0.499 v  18.98 touch ['leg3'] n [-0.008, 0.998, -0.061]
+  seed   1 marble 5 slot 1 route orange escaped last touch ['orange_lead', 14]
+    entry: across 0.5041 rise 0.8163 speed 37.559 lateral 8.237
+    touched: leg3 -> orange_lead -> fork
+      t= 16.6667 step  +25 across +1.945 rise -1.693 v  50.06 touch [] n None
+      t= 16.6833 step  +26 across +1.945 rise -2.409 v  53.63 touch [] n None
+      t=    16.7 step  +27 across +1.952 rise -3.199 v  57.28 touch [] n None
+      t= 16.7167 step  +28 across +1.964 rise -4.060 v  60.98 touch [] n None
+      t= 16.7333 step  +29 across +1.982 rise -4.991 v  64.73 touch [] n None
+      t=   16.75 step  +30 across +1.995 rise -5.989 v  68.52 touch [] n None
+  seed   2 marble 3 slot 1 route None stuck last touch ['leg2', 99]
+    entry: across None rise None speed None lateral None
+    touched: 
+  seed   2 marble 7 slot 6 route orange escaped last touch ['orange', 21]
+    entry: across 0.391 rise 0.7557 speed 35.077 lateral 2.084
+    touched: leg3 -> orange_lead -> orange
+      t= 16.8333 step  +13 across +16.962 rise -4.753 v  51.28 touch ['orange_lead'] n [0.437, 0.899, 0.035]
+      t=   16.85 step  +13 across +17.774 rise -4.868 v  50.47 touch [] n None
+      t= 16.8667 step  +13 across +18.586 rise -5.051 v  51.31 touch [] n None
+      t= 16.8833 step  +13 across +19.402 rise -5.253 v  51.80 touch [] n None
+      t=    16.9 step  +13 across +20.219 rise -5.512 v  52.97 touch [] n None
+      t= 16.9167 step  +12 across +21.088 rise -5.901 v  52.81 touch ['orange'] n [0.137, 0.951, 0.278]
+  seed   3 marble 0 slot 7 route orange escaped last touch ['orange_lead', 20]
+    entry: across 0.4057 rise 0.743 speed 37.991 lateral 2.017
+    touched: leg3 -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead
+      t= 16.9167 step  +16 across +10.939 rise -10.596 v  77.39 touch [] n None
+      t= 16.9333 step  +16 across +11.203 rise -11.901 v  81.39 touch [] n None
+      t=   16.95 step  +16 across +11.468 rise -13.274 v  85.40 touch [] n None
+      t= 16.9667 step  +16 across +11.733 rise -14.715 v  89.42 touch [] n None
+      t= 16.9833 step  +17 across +11.947 rise -16.137 v  93.45 touch [] n None
+      t=    17.0 step  +17 across +12.212 rise -17.714 v  97.48 touch [] n None
+  seed   4 marble 0 slot 3 route orange escaped last touch ['orange_lead', 19]
+    entry: across 0.5109 rise 0.8201 speed 36.588 lateral 5.109
+    touched: leg3 -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead
+      t= 17.9667 step  +16 across +10.595 rise -9.748 v  74.48 touch [] n None
+      t= 17.9833 step  +16 across +10.846 rise -11.005 v  78.48 touch [] n None
+      t=    18.0 step  +17 across +11.059 rise -12.243 v  82.49 touch [] n None
+      t= 18.0167 step  +17 across +11.312 rise -13.636 v  86.51 touch [] n None
+      t= 18.0333 step  +17 across +11.564 rise -15.098 v  90.54 touch [] n None
+      t=   18.05 step  +18 across +11.774 rise -16.546 v  94.57 touch [] n None
+  seed   4 marble 1 slot 1 route orange escaped last touch ['orange_lead', 15]
+    entry: across 0.4732 rise 0.7596 speed 38.759 lateral 5.33
+    touched: leg3 -> orange_lead -> fork
+      t=    15.8 step  +18 across +12.034 rise -7.701 v  74.93 touch [] n None
+      t= 15.8167 step  +18 across +12.497 rise -8.897 v  78.72 touch [] n None
+      t= 15.8333 step  +19 across +12.928 rise -10.086 v  82.54 touch [] n None
+      t=   15.85 step  +19 across +13.393 rise -11.418 v  86.38 touch [] n None
+      t= 15.8667 step  +19 across +13.858 rise -12.819 v  90.24 touch [] n None
+      t= 15.8833 step  +20 across +14.237 rise -14.217 v  94.13 touch [] n None
+  seed   5 marble 6 slot 4 route orange escaped last touch ['orange_lead', 19]
+    entry: across 0.6222 rise 0.8914 speed 36.385 lateral 5.98
+    touched: leg3 -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork -> orange_lead -> fork
+      t= 19.6333 step  +16 across +10.726 rise -9.749 v  74.74 touch [] n None
+      t=   19.65 step  +16 across +10.990 rise -11.008 v  78.73 touch [] n None
+      t= 19.6667 step  +16 across +11.254 rise -12.336 v  82.74 touch [] n None
+      t= 19.6833 step  +17 across +11.475 rise -13.644 v  86.76 touch [] n None
+      t=    19.7 step  +17 across +11.739 rise -15.108 v  90.78 touch [] n None
+      t= 19.7167 step  +17 across +12.004 rise -16.640 v  94.80 touch [] n None
+  seed   5 marble 7 slot 1 route blue escaped last touch ['leg3', 102]
+    entry: across 0.5055 rise 0.8093 speed 38.897 lateral 5.568
+    touched: leg3 -> orange_lead -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork
+      t= 19.8167 step  +26 across +2.583 rise -4.334 v  58.10 touch [] n None
+      t= 19.8333 step  +27 across +2.655 rise -5.252 v  62.00 touch [] n None
+      t=   19.85 step  +28 across +2.731 rise -6.241 v  65.91 touch [] n None
+      t= 19.8667 step  +28 across +2.808 rise -7.339 v  69.84 touch [] n None
+      t= 19.8833 step  +29 across +2.889 rise -8.466 v  73.80 touch [] n None
+      t=    19.9 step  +30 across +2.968 rise -9.661 v  77.76 touch [] n None
+  seed   6 marble 1 slot 3 route blue escaped last touch ['leg3', 102]
+    entry: across 0.3399 rise 0.7181 speed 38.761 lateral 6.532
+    touched: leg3 -> orange_lead -> fork -> marble -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork -> leg3 -> fork
+      t= 17.8167 step  +26 across +2.742 rise -5.928 v  63.38 touch [] n None
+      t= 17.8333 step  +27 across +2.815 rise -6.951 v  67.35 touch [] n None
+      t=   17.85 step  +28 across +2.891 rise -8.047 v  71.33 touch [] n None
+      t= 17.8667 step  +28 across +2.970 rise -9.250 v  75.33 touch [] n None
+      t= 17.8833 step  +29 across +3.054 rise -10.482 v  79.33 touch [] n None
+      t=    17.9 step  +30 across +3.137 rise -11.782 v  83.34 touch [] n None
+wrote docs/validation/sloped_race_v1/v110/fork_trace_before.json

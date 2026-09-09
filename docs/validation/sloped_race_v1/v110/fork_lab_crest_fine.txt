@@ -1,0 +1,20 @@
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+pybullet build time: Sep  6 2026 01:40:34
+4 configurations x 24 seeds in 440s
+configuration                 finish   all8    esc    stk |  blue%  blue fin |  orng%  orng fin
+-----------------------------------------------------------------------------------------------
+crest 0.09                     0.344   0.00  0.609  0.047 |  0.318     0.311 |  0.672     0.364
+crest 0.13                     0.349   0.00  0.620  0.031 |  0.641     0.406 |  0.349     0.254
+crest 0.17                     0.641   0.08  0.339  0.021 |  0.891     0.702 |  0.099     0.158
+crest 0.21                     0.885   0.25  0.099  0.016 |  0.984     0.894 |  0.005     1.000
+
+  crest 0.09: {'orange_lead[12]': 8, 'leg3[89]': 8, 'leg3[92]': 7, 'orange_lead[9]': 7, 'orange_lead[16]': 6, 'orange_lead[10]': 6, 'orange_lead[13]': 6, 'orange_lead[18]': 6, 'orange_lead[17]': 5, 'leg3[95]': 5}
+  crest 0.13: {'leg3[92]': 12, 'orange_lead[10]': 12, 'leg3[89]': 9, 'leg3[95]': 8, 'orange_lead[8]': 7, 'orange_lead[17]': 6, 'leg3[93]': 5, 'orange_lead[9]': 5, 'leg3[97]': 4, 'leg3[100]': 4}
+  crest 0.17: {'leg3[89]': 11, 'leg3[92]': 7, 'leg3[95]': 6, 'leg3[94]': 4, 'leg3[91]': 4, 'orange_lead[16]': 3, 'leg3[99]': 3, 'leg3[102]': 3, 'leg3[93]': 3, 'final[10]': 2}
+  crest 0.21: {'leg3[90]': 3, 'leg3[94]': 2, 'leg3[92]': 2, 'leg2[99]': 2, 'leg3[101]': 2, 'leg3[102]': 2, 'leg3[100]': 2, 'leg3[93]': 1, 'leg3[96]': 1, 'leg3[98]': 1}
+wrote docs/validation/sloped_race_v1/v110/fork_lab_crest_fine.json

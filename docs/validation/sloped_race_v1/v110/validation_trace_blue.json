@@ -1,0 +1,3130 @@
+{
+ "routes": "blue",
+ "seeds": [
+  1,
+  49
+ ],
+ "travel_budget": 0.5,
+ "races": [
+  {
+   "seed": 1,
+   "fastest": {
+    "seed": 1,
+    "tick": 2308,
+    "time": 9.6167,
+    "marble": 6,
+    "slot": 3,
+    "speed": 61.096779445046344,
+    "travel": 0.25456991435435977,
+    "at": [
+     28.9489,
+     46.0809,
+     -38.2722
+    ],
+    "velocity": [
+     49.6466,
+     -21.303,
+     28.5344
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     70
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 1,
+    "tick": 450,
+    "time": 1.875,
+    "distance": -0.7581737007785412,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     2
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -29.8913,
+     73.304,
+     -61.3804
+    ],
+    "normal": [
+     -0.7362,
+     0.0,
+     0.6767
+    ],
+    "normal_speed": [
+     null,
+     -1.2844
+    ],
+    "impulse": 2938.779648
+   },
+   "stats_travel": 0.25456991435435977,
+   "stats_penetration": -0.7581737007785412
+  },
+  {
+   "seed": 2,
+   "fastest": {
+    "seed": 2,
+    "tick": 2231,
+    "time": 9.2958,
+    "marble": 0,
+    "slot": 7,
+    "speed": 64.88903108499585,
+    "travel": 0.27037096285414935,
+    "at": [
+     30.8969,
+     45.1827,
+     -36.2537
+    ],
+    "velocity": [
+     44.6765,
+     -27.8957,
+     37.9003
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     75
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 2,
+    "tick": 409,
+    "time": 1.7042,
+    "distance": -0.7599228681000884,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     5
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -36.6749,
+     73.2992,
+     -64.8291
+    ],
+    "normal": [
+     -0.0931,
+     -0.0,
+     -0.9957
+    ],
+    "normal_speed": [
+     null,
+     -0.1521
+    ],
+    "impulse": 5.562923
+   },
+   "stats_travel": 0.27037096285414935,
+   "stats_penetration": -0.7599228681000884
+  },
+  {
+   "seed": 3,
+   "fastest": {
+    "seed": 3,
+    "tick": 2400,
+    "time": 10.0,
+    "marble": 3,
+    "slot": 2,
+    "speed": 63.65268896683913,
+    "travel": 0.2652195373618297,
+    "at": [
+     31.4159,
+     44.8216,
+     -35.4239
+    ],
+    "velocity": [
+     48.2389,
+     -20.3458,
+     36.2039
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     76
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 3,
+    "tick": 439,
+    "time": 1.8292,
+    "distance": -0.7426906265513917,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     3
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -36.6724,
+     73.2987,
+     -64.5805
+    ],
+    "normal": [
+     -0.1469,
+     0.0,
+     -0.9891
+    ],
+    "normal_speed": [
+     null,
+     -0.0356
+    ],
+    "impulse": 19.53906
+   },
+   "stats_travel": 0.2652195373618297,
+   "stats_penetration": -0.7426906265513917
+  },
+  {
+   "seed": 4,
+   "fastest": {
+    "seed": 4,
+    "tick": 2283,
+    "time": 9.5125,
+    "marble": 0,
+    "slot": 3,
+    "speed": 64.69458424682568,
+    "travel": 0.269560767695107,
+    "at": [
+     31.3792,
+     44.9305,
+     -35.6495
+    ],
+    "velocity": [
+     42.8357,
+     -28.7306,
+     39.0518
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     76
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 4,
+    "tick": 441,
+    "time": 1.8375,
+    "distance": -0.7226834132192366,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     3
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -36.6192,
+     73.2989,
+     -64.1027
+    ],
+    "normal": [
+     -0.253,
+     0.0,
+     -0.9675
+    ],
+    "normal_speed": [
+     null,
+     -0.0791
+    ],
+    "impulse": 13.285732
+   },
+   "stats_travel": 0.269560767695107,
+   "stats_penetration": -0.7226834132192366
+  },
+  {
+   "seed": 5,
+   "fastest": {
+    "seed": 5,
+    "tick": 2369,
+    "time": 9.8708,
+    "marble": 5,
+    "slot": 3,
+    "speed": 64.07400360097296,
+    "travel": 0.26697501500405396,
+    "at": [
+     32.1842,
+     44.7571,
+     -34.9327
+    ],
+    "velocity": [
+     49.1444,
+     -17.9833,
+     36.9717
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     79
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 5,
+    "tick": 498,
+    "time": 2.075,
+    "distance": -0.7635529107355413,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     5
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -32.0088,
+     73.2998,
+     -60.5513
+    ],
+    "normal": [
+     -0.9797,
+     0.0,
+     0.2003
+    ],
+    "normal_speed": [
+     null,
+     -0.5594
+    ],
+    "impulse": 1228.47106
+   },
+   "stats_travel": 0.26697501500405396,
+   "stats_penetration": -0.7635529107355413
+  },
+  {
+   "seed": 6,
+   "fastest": {
+    "seed": 6,
+    "tick": 2211,
+    "time": 9.2125,
+    "marble": 4,
+    "slot": 2,
+    "speed": 65.11147938986979,
+    "travel": 0.27129783079112413,
+    "at": [
+     32.7142,
+     44.7441,
+     -34.4624
+    ],
+    "velocity": [
+     43.0217,
+     -22.7759,
+     43.2423
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     79
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 6,
+    "tick": 783,
+    "time": 3.2625,
+    "distance": -0.7596972816826485,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     3
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -31.685,
+     73.2988,
+     -68.9919
+    ],
+    "normal": [
+     0.9976,
+     -0.0,
+     0.0687
+    ],
+    "normal_speed": [
+     null,
+     -0.3556
+    ],
+    "impulse": 764.794491
+   },
+   "stats_travel": 0.27129783079112413,
+   "stats_penetration": -0.7596972816826485
+  },
+  {
+   "seed": 7,
+   "fastest": {
+    "seed": 7,
+    "tick": 2202,
+    "time": 9.175,
+    "marble": 2,
+    "slot": 6,
+    "speed": 63.99239006674524,
+    "travel": 0.2666349586114385,
+    "at": [
+     30.1968,
+     45.079,
+     -36.2274
+    ],
+    "velocity": [
+     47.2029,
+     -24.219,
+     35.7821
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     75
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 7,
+    "tick": 789,
+    "time": 3.2875,
+    "distance": -0.8773415114991947,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     4
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -36.6654,
+     73.3026,
+     -64.2447
+    ],
+    "normal": [
+     -0.2007,
+     -0.0,
+     -0.9797
+    ],
+    "normal_speed": [
+     null,
+     0.0888
+    ],
+    "impulse": 754.38087
+   },
+   "stats_travel": 0.2666349586114385,
+   "stats_penetration": -0.8773415114991947
+  },
+  {
+   "seed": 8,
+   "fastest": {
+    "seed": 8,
+    "tick": 2275,
+    "time": 9.4792,
+    "marble": 0,
+    "slot": 3,
+    "speed": 65.86599758634694,
+    "travel": 0.2744416566097789,
+    "at": [
+     30.4383,
+     45.2537,
+     -36.5854
+    ],
+    "velocity": [
+     49.1619,
+     -26.2797,
+     35.083
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     74
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 8,
+    "tick": 465,
+    "time": 1.9375,
+    "distance": -0.7161343473349514,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     0
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -32.8821,
+     73.2999,
+     -60.5924
+    ],
+    "normal": [
+     -0.9999,
+     -0.0,
+     -0.015
+    ],
+    "normal_speed": [
+     null,
+     -0.3093
+    ],
+    "impulse": 789.305984
+   },
+   "stats_travel": 0.2744416566097789,
+   "stats_penetration": -0.7161343473349514
+  },
+  {
+   "seed": 9,
+   "fastest": {
+    "seed": 9,
+    "tick": 2163,
+    "time": 9.0125,
+    "marble": 5,
+    "slot": 2,
+    "speed": 64.60142706991915,
+    "travel": 0.2691726127913298,
+    "at": [
+     32.485,
+     44.4187,
+     -34.1912
+    ],
+    "velocity": [
+     42.4715,
+     -20.1238,
+     44.3232
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     79
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 9,
+    "tick": 423,
+    "time": 1.7625,
+    "distance": -0.7343573274516815,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     1
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -29.5646,
+     73.305,
+     -61.7245
+    ],
+    "normal": [
+     -0.6588,
+     0.0,
+     0.7523
+    ],
+    "normal_speed": [
+     null,
+     -1.5519
+    ],
+    "impulse": 3795.414151
+   },
+   "stats_travel": 0.2691726127913298,
+   "stats_penetration": -0.7343573274516815
+  },
+  {
+   "seed": 10,
+   "fastest": {
+    "seed": 10,
+    "tick": 2206,
+    "time": 9.1917,
+    "marble": 4,
+    "slot": 7,
+    "speed": 66.45110504231987,
+    "travel": 0.27687960434299946,
+    "at": [
+     30.0106,
+     45.4588,
+     -36.9737
+    ],
+    "velocity": [
+     46.6449,
+     -37.6038,
+     28.7394
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     74
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 10,
+    "tick": 441,
+    "time": 1.8375,
+    "distance": -0.7510910059557876,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     2
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -31.7816,
+     73.3002,
+     -60.6227
+    ],
+    "normal": [
+     -0.9675,
+     0.0,
+     0.253
+    ],
+    "normal_speed": [
+     null,
+     -0.3787
+    ],
+    "impulse": 927.070642
+   },
+   "stats_travel": 0.27687960434299946,
+   "stats_penetration": -0.7510910059557876
+  },
+  {
+   "seed": 11,
+   "fastest": {
+    "seed": 11,
+    "tick": 2147,
+    "time": 8.9458,
+    "marble": 0,
+    "slot": 7,
+    "speed": 66.12772512668826,
+    "travel": 0.2755321880278678,
+    "at": [
+     29.465,
+     46.0926,
+     -38.1434
+    ],
+    "velocity": [
+     51.2461,
+     -21.8681,
+     35.616
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     71
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 11,
+    "tick": 1119,
+    "time": 4.6625,
+    "distance": -0.6731243464583212,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     5
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -29.8183,
+     73.2998,
+     -66.7717
+    ],
+    "normal": [
+     0.7096,
+     -0.0,
+     0.7046
+    ],
+    "normal_speed": [
+     null,
+     -0.2864
+    ],
+    "impulse": 786.551142
+   },
+   "stats_travel": 0.2755321880278678,
+   "stats_penetration": -0.6731243464583212
+  },
+  {
+   "seed": 12,
+   "fastest": {
+    "seed": 12,
+    "tick": 2057,
+    "time": 8.5708,
+    "marble": 4,
+    "slot": 1,
+    "speed": 63.698611661397926,
+    "travel": 0.26541088192249135,
+    "at": [
+     29.843,
+     45.3106,
+     -36.7162
+    ],
+    "velocity": [
+     50.0963,
+     -18.9829,
+     34.4604
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     74
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 12,
+    "tick": 392,
+    "time": 1.6333,
+    "distance": -0.7351077496023415,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     3
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -30.164,
+     73.3,
+     -61.6777
+    ],
+    "normal": [
+     -0.7363,
+     0.0,
+     0.6767
+    ],
+    "normal_speed": [
+     null,
+     -0.0803
+    ],
+    "impulse": 0.0
+   },
+   "stats_travel": 0.26541088192249135,
+   "stats_penetration": -0.7351077496023415
+  },
+  {
+   "seed": 13,
+   "fastest": {
+    "seed": 13,
+    "tick": 2139,
+    "time": 8.9125,
+    "marble": 0,
+    "slot": 1,
+    "speed": 61.96642951774852,
+    "travel": 0.2581934563239522,
+    "at": [
+     29.4874,
+     45.7024,
+     -37.5395
+    ],
+    "velocity": [
+     51.176,
+     -22.6461,
+     26.6083
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     72
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 13,
+    "tick": 610,
+    "time": 2.5417,
+    "distance": -0.7028969452864359,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     7
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -28.1916,
+     73.2982,
+     -64.3334
+    ],
+    "normal": [
+     -0.0148,
+     -0.0,
+     0.9999
+    ],
+    "normal_speed": [
+     null,
+     -0.1475
+    ],
+    "impulse": 115.325933
+   },
+   "stats_travel": 0.2581934563239522,
+   "stats_penetration": -0.7028969452864359
+  },
+  {
+   "seed": 14,
+   "fastest": {
+    "seed": 14,
+    "tick": 2225,
+    "time": 9.2708,
+    "marble": 3,
+    "slot": 5,
+    "speed": 63.45551229561371,
+    "travel": 0.26439796789839043,
+    "at": [
+     32.2423,
+     44.3044,
+     -34.1375
+    ],
+    "velocity": [
+     43.3599,
+     -16.1188,
+     43.4362
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     80
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 14,
+    "tick": 903,
+    "time": 3.7625,
+    "distance": -0.6985789920233884,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     0
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -35.7663,
+     73.2996,
+     -64.7187
+    ],
+    "normal": [
+     -0.1475,
+     0.0,
+     -0.9891
+    ],
+    "normal_speed": [
+     null,
+     -0.2228
+    ],
+    "impulse": 676.943662
+   },
+   "stats_travel": 0.26439796789839043,
+   "stats_penetration": -0.6985789920233884
+  },
+  {
+   "seed": 15,
+   "fastest": {
+    "seed": 15,
+    "tick": 2261,
+    "time": 9.4208,
+    "marble": 0,
+    "slot": 2,
+    "speed": 64.23314957689128,
+    "travel": 0.267638123237047,
+    "at": [
+     27.5375,
+     46.2056,
+     -38.5938
+    ],
+    "velocity": [
+     51.2687,
+     -22.8113,
+     31.2579
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     69
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 15,
+    "tick": 436,
+    "time": 1.8167,
+    "distance": -0.7346785742438784,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     1
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -32.8994,
+     73.2998,
+     -60.557
+    ],
+    "normal": [
+     -0.9999,
+     0.0,
+     -0.015
+    ],
+    "normal_speed": [
+     null,
+     -0.2817
+    ],
+    "impulse": 577.563604
+   },
+   "stats_travel": 0.267638123237047,
+   "stats_penetration": -0.7346785742438784
+  },
+  {
+   "seed": 16,
+   "fastest": {
+    "seed": 16,
+    "tick": 2211,
+    "time": 9.2125,
+    "marble": 6,
+    "slot": 7,
+    "speed": 65.30408990152121,
+    "travel": 0.2721003745896717,
+    "at": [
+     31.6391,
+     44.9879,
+     -35.6068
+    ],
+    "velocity": [
+     50.0882,
+     -23.1284,
+     34.941
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     77
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 16,
+    "tick": 644,
+    "time": 2.6833,
+    "distance": -0.7666418005750423,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     0
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -36.6056,
+     73.2979,
+     -64.1521
+    ],
+    "normal": [
+     -0.2533,
+     -0.0,
+     -0.9674
+    ],
+    "normal_speed": [
+     null,
+     0.0032
+    ],
+    "impulse": 150.591929
+   },
+   "stats_travel": 0.2721003745896717,
+   "stats_penetration": -0.7666418005750423
+  },
+  {
+   "seed": 17,
+   "fastest": {
+    "seed": 17,
+    "tick": 2102,
+    "time": 8.7583,
+    "marble": 1,
+    "slot": 1,
+    "speed": 66.02746512089686,
+    "travel": 0.2751144380037369,
+    "at": [
+     31.2747,
+     44.7829,
+     -35.4055
+    ],
+    "velocity": [
+     46.7851,
+     -27.2844,
+     37.7669
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     77
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 17,
+    "tick": 1115,
+    "time": 4.6458,
+    "distance": -0.6927670816724191,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     0
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -28.7094,
+     73.2978,
+     -66.8544
+    ],
+    "normal": [
+     0.569,
+     0.0,
+     0.8223
+    ],
+    "normal_speed": [
+     null,
+     -0.0656
+    ],
+    "impulse": 102.277347
+   },
+   "stats_travel": 0.2751144380037369,
+   "stats_penetration": -0.6927670816724191
+  },
+  {
+   "seed": 18,
+   "fastest": {
+    "seed": 18,
+    "tick": 2136,
+    "time": 8.9,
+    "marble": 5,
+    "slot": 0,
+    "speed": 63.54588854774244,
+    "travel": 0.2647745356155935,
+    "at": [
+     30.6372,
+     45.2355,
+     -36.4436
+    ],
+    "velocity": [
+     47.4467,
+     -26.0752,
+     33.2712
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     74
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 18,
+    "tick": 788,
+    "time": 3.2833,
+    "distance": -0.7661338507179593,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     0
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -32.0116,
+     73.2997,
+     -60.5579
+    ],
+    "normal": [
+     -0.9797,
+     0.0,
+     0.2007
+    ],
+    "normal_speed": [
+     null,
+     -0.5475
+    ],
+    "impulse": 1210.869743
+   },
+   "stats_travel": 0.2647745356155935,
+   "stats_penetration": -0.7661338507179593
+  },
+  {
+   "seed": 19,
+   "fastest": {
+    "seed": 19,
+    "tick": 2102,
+    "time": 8.7583,
+    "marble": 1,
+    "slot": 2,
+    "speed": 64.03301740584772,
+    "travel": 0.26680423919103213,
+    "at": [
+     30.8531,
+     45.0168,
+     -36.0388
+    ],
+    "velocity": [
+     42.1709,
+     -30.4445,
+     37.3494
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     76
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 19,
+    "tick": 418,
+    "time": 1.7417,
+    "distance": -0.7434554270418399,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     6
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -28.6431,
+     73.3013,
+     -66.7494
+    ],
+    "normal": [
+     0.5487,
+     0.0,
+     0.836
+    ],
+    "normal_speed": [
+     null,
+     -0.6538
+    ],
+    "impulse": 1209.515688
+   },
+   "stats_travel": 0.26680423919103213,
+   "stats_penetration": -0.7434554270418399
+  },
+  {
+   "seed": 20,
+   "fastest": {
+    "seed": 20,
+    "tick": 2128,
+    "time": 8.8667,
+    "marble": 4,
+    "slot": 0,
+    "speed": 63.15450592908588,
+    "travel": 0.2631437747045245,
+    "at": [
+     29.5405,
+     45.6551,
+     -37.4552
+    ],
+    "velocity": [
+     42.5727,
+     -30.1678,
+     35.5803
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     72
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 20,
+    "tick": 437,
+    "time": 1.8208,
+    "distance": -0.7334328124067685,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     6
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -32.6725,
+     73.2999,
+     -60.5778
+    ],
+    "normal": [
+     -0.9992,
+     0.0,
+     0.0391
+    ],
+    "normal_speed": [
+     null,
+     -0.3046
+    ],
+    "impulse": 762.451215
+   },
+   "stats_travel": 0.2631437747045245,
+   "stats_penetration": -0.7334328124067685
+  },
+  {
+   "seed": 21,
+   "fastest": {
+    "seed": 21,
+    "tick": 2104,
+    "time": 8.7667,
+    "marble": 0,
+    "slot": 1,
+    "speed": 64.3979295008511,
+    "travel": 0.26832470625354626,
+    "at": [
+     31.673,
+     44.1427,
+     -34.1557
+    ],
+    "velocity": [
+     37.6851,
+     -31.4313,
+     41.7014
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     78
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 21,
+    "tick": 469,
+    "time": 1.9542,
+    "distance": -0.699447217985794,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     2
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -36.6438,
+     73.2986,
+     -64.3087
+    ],
+    "normal": [
+     -0.2003,
+     0.0,
+     -0.9797
+    ],
+    "normal_speed": [
+     null,
+     0.0
+    ],
+    "impulse": 22.600754
+   },
+   "stats_travel": 0.26832470625354626,
+   "stats_penetration": -0.699447217985794
+  },
+  {
+   "seed": 22,
+   "fastest": {
+    "seed": 22,
+    "tick": 2238,
+    "time": 9.325,
+    "marble": 7,
+    "slot": 1,
+    "speed": 62.44796224306286,
+    "travel": 0.2601998426794286,
+    "at": [
+     32.5926,
+     44.3022,
+     -33.9501
+    ],
+    "velocity": [
+     43.0387,
+     -17.6538,
+     41.6625
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     80
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 22,
+    "tick": 1120,
+    "time": 4.6667,
+    "distance": -0.7206565604898258,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     2
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -29.2413,
+     73.299,
+     -67.6067
+    ],
+    "normal": [
+     0.7399,
+     0.0,
+     0.6727
+    ],
+    "normal_speed": [
+     null,
+     -0.085
+    ],
+    "impulse": 81.808978
+   },
+   "stats_travel": 0.2601998426794286,
+   "stats_penetration": -0.7206565604898258
+  },
+  {
+   "seed": 23,
+   "fastest": {
+    "seed": 23,
+    "tick": 2285,
+    "time": 9.5208,
+    "marble": 1,
+    "slot": 1,
+    "speed": 62.634203000369325,
+    "travel": 0.2609758458348722,
+    "at": [
+     30.4695,
+     44.8022,
+     -35.6319
+    ],
+    "velocity": [
+     45.0761,
+     -24.4714,
+     35.9491
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     76
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 23,
+    "tick": 452,
+    "time": 1.8833,
+    "distance": -0.7446224227514822,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     6
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -29.5902,
+     73.3051,
+     -61.7317
+    ],
+    "normal": [
+     -0.6588,
+     0.0,
+     0.7524
+    ],
+    "normal_speed": [
+     null,
+     -1.5661
+    ],
+    "impulse": 3757.629589
+   },
+   "stats_travel": 0.2609758458348722,
+   "stats_penetration": -0.7446224227514822
+  },
+  {
+   "seed": 24,
+   "fastest": {
+    "seed": 24,
+    "tick": 2213,
+    "time": 9.2208,
+    "marble": 3,
+    "slot": 0,
+    "speed": 63.19910579322998,
+    "travel": 0.26332960747179157,
+    "at": [
+     29.7657,
+     45.3695,
+     -36.8216
+    ],
+    "velocity": [
+     47.6434,
+     -25.1134,
+     33.0689
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     74
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 24,
+    "tick": 441,
+    "time": 1.8375,
+    "distance": -0.7569629834963036,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     7
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -31.7712,
+     73.2997,
+     -60.5709
+    ],
+    "normal": [
+     -0.9675,
+     0.0,
+     0.253
+    ],
+    "normal_speed": [
+     null,
+     -0.2663
+    ],
+    "impulse": 281.27772
+   },
+   "stats_travel": 0.26332960747179157,
+   "stats_penetration": -0.7569629834963036
+  },
+  {
+   "seed": 25,
+   "fastest": {
+    "seed": 25,
+    "tick": 2172,
+    "time": 9.05,
+    "marble": 7,
+    "slot": 3,
+    "speed": 64.66012476383722,
+    "travel": 0.2694171865159884,
+    "at": [
+     31.6826,
+     44.8687,
+     -35.4252
+    ],
+    "velocity": [
+     45.6566,
+     -25.3846,
+     38.1055
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     76
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 25,
+    "tick": 626,
+    "time": 2.6083,
+    "distance": -1.039565426417547,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     5
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -29.068,
+     73.2977,
+     -67.5218
+    ],
+    "normal": [
+     0.7157,
+     0.0,
+     0.6984
+    ],
+    "normal_speed": [
+     null,
+     0.2536
+    ],
+    "impulse": 704.466145
+   },
+   "stats_travel": 0.2694171865159884,
+   "stats_penetration": -1.039565426417547
+  },
+  {
+   "seed": 26,
+   "fastest": {
+    "seed": 26,
+    "tick": 2243,
+    "time": 9.3458,
+    "marble": 1,
+    "slot": 1,
+    "speed": 65.60074040996777,
+    "travel": 0.2733364183748657,
+    "at": [
+     30.5764,
+     45.2209,
+     -36.4669
+    ],
+    "velocity": [
+     46.7826,
+     -27.194,
+     37.0855
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     74
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 26,
+    "tick": 510,
+    "time": 2.125,
+    "distance": -0.755556427135962,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     7
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -29.5225,
+     73.3038,
+     -61.6646
+    ],
+    "normal": [
+     -0.6587,
+     -0.0,
+     0.7524
+    ],
+    "normal_speed": [
+     null,
+     -1.2451
+    ],
+    "impulse": 2612.320483
+   },
+   "stats_travel": 0.2733364183748657,
+   "stats_penetration": -0.755556427135962
+  },
+  {
+   "seed": 27,
+   "fastest": {
+    "seed": 27,
+    "tick": 2364,
+    "time": 9.85,
+    "marble": 0,
+    "slot": 7,
+    "speed": 66.65691808902427,
+    "travel": 0.2777371587042678,
+    "at": [
+     32.0644,
+     44.5675,
+     -34.6817
+    ],
+    "velocity": [
+     46.0196,
+     -29.9916,
+     37.7604
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     78
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 27,
+    "tick": 440,
+    "time": 1.8333,
+    "distance": -0.7302704180769074,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     6
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -31.9831,
+     73.3003,
+     -60.5823
+    ],
+    "normal": [
+     -0.9797,
+     0.0,
+     0.2003
+    ],
+    "normal_speed": [
+     null,
+     -0.3991
+    ],
+    "impulse": 970.464757
+   },
+   "stats_travel": 0.2777371587042678,
+   "stats_penetration": -0.7302704180769074
+  },
+  {
+   "seed": 28,
+   "fastest": {
+    "seed": 28,
+    "tick": 2072,
+    "time": 8.6333,
+    "marble": 1,
+    "slot": 3,
+    "speed": 63.56854353003173,
+    "travel": 0.26486893137513223,
+    "at": [
+     32.8738,
+     44.5579,
+     -34.0435
+    ],
+    "velocity": [
+     42.9564,
+     -24.5681,
+     39.9013
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     79
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 28,
+    "tick": 499,
+    "time": 2.0792,
+    "distance": -0.7307978531020927,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     0
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -36.6218,
+     73.2989,
+     -64.1101
+    ],
+    "normal": [
+     -0.2531,
+     0.0,
+     -0.9674
+    ],
+    "normal_speed": [
+     null,
+     -0.0605
+    ],
+    "impulse": 22.694608
+   },
+   "stats_travel": 0.26486893137513223,
+   "stats_penetration": -0.7307978531020927
+  },
+  {
+   "seed": 29,
+   "fastest": {
+    "seed": 29,
+    "tick": 2139,
+    "time": 8.9125,
+    "marble": 1,
+    "slot": 1,
+    "speed": 65.41317072629755,
+    "travel": 0.2725548780262398,
+    "at": [
+     28.4061,
+     45.8957,
+     -37.9584
+    ],
+    "velocity": [
+     49.988,
+     -28.522,
+     31.0898
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     70
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 29,
+    "tick": 596,
+    "time": 2.4833,
+    "distance": -0.7117830771953713,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     0
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -29.6749,
+     73.3014,
+     -66.9697
+    ],
+    "normal": [
+     0.7157,
+     0.0,
+     0.6984
+    ],
+    "normal_speed": [
+     null,
+     -0.6828
+    ],
+    "impulse": 1638.093409
+   },
+   "stats_travel": 0.2725548780262398,
+   "stats_penetration": -0.7117830771953713
+  },
+  {
+   "seed": 30,
+   "fastest": {
+    "seed": 30,
+    "tick": 2366,
+    "time": 9.8583,
+    "marble": 3,
+    "slot": 5,
+    "speed": 63.966953591374086,
+    "travel": 0.266528973297392,
+    "at": [
+     31.9843,
+     44.8797,
+     -35.2011
+    ],
+    "velocity": [
+     43.6329,
+     -18.3867,
+     43.0101
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     78
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 30,
+    "tick": 496,
+    "time": 2.0667,
+    "distance": -0.7337140196360745,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     0
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -32.4378,
+     73.2994,
+     -60.5252
+    ],
+    "normal": [
+     -0.9956,
+     0.0,
+     0.0932
+    ],
+    "normal_speed": [
+     null,
+     -0.1923
+    ],
+    "impulse": 46.289185
+   },
+   "stats_travel": 0.266528973297392,
+   "stats_penetration": -0.7337140196360745
+  },
+  {
+   "seed": 31,
+   "fastest": {
+    "seed": 31,
+    "tick": 2241,
+    "time": 9.3375,
+    "marble": 4,
+    "slot": 4,
+    "speed": 64.26145159753611,
+    "travel": 0.2677560483230671,
+    "at": [
+     32.12,
+     44.585,
+     -34.6924
+    ],
+    "velocity": [
+     43.9282,
+     -23.204,
+     40.7606
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     79
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 31,
+    "tick": 409,
+    "time": 1.7042,
+    "distance": -0.7371317537545814,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     5
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -36.6746,
+     73.2992,
+     -64.8061
+    ],
+    "normal": [
+     -0.0931,
+     0.0,
+     -0.9957
+    ],
+    "normal_speed": [
+     null,
+     -0.1352
+    ],
+    "impulse": 1.396307
+   },
+   "stats_travel": 0.2677560483230671,
+   "stats_penetration": -0.7371317537545814
+  },
+  {
+   "seed": 32,
+   "fastest": {
+    "seed": 32,
+    "tick": 2178,
+    "time": 9.075,
+    "marble": 3,
+    "slot": 1,
+    "speed": 64.90313463290629,
+    "travel": 0.27042972763710954,
+    "at": [
+     32.0502,
+     44.347,
+     -34.376
+    ],
+    "velocity": [
+     45.5459,
+     -20.1864,
+     41.5993
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     79
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 32,
+    "tick": 412,
+    "time": 1.7167,
+    "distance": -0.7102656745052431,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     1
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -36.6157,
+     73.2988,
+     -64.091
+    ],
+    "normal": [
+     -0.253,
+     0.0,
+     -0.9675
+    ],
+    "normal_speed": [
+     null,
+     -0.0504
+    ],
+    "impulse": 24.523372
+   },
+   "stats_travel": 0.27042972763710954,
+   "stats_penetration": -0.7102656745052431
+  },
+  {
+   "seed": 33,
+   "fastest": {
+    "seed": 33,
+    "tick": 2294,
+    "time": 9.5583,
+    "marble": 3,
+    "slot": 2,
+    "speed": 63.47313233325651,
+    "travel": 0.2644713847219021,
+    "at": [
+     28.4542,
+     45.9246,
+     -38.1106
+    ],
+    "velocity": [
+     46.5255,
+     -28.8481,
+     32.1247
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     70
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 33,
+    "tick": 422,
+    "time": 1.7583,
+    "distance": -0.7582184689151089,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     1
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -29.7199,
+     73.3033,
+     -61.5299
+    ],
+    "normal": [
+     -0.6985,
+     -0.0,
+     0.7156
+    ],
+    "normal_speed": [
+     null,
+     -1.1306
+    ],
+    "impulse": 2605.328053
+   },
+   "stats_travel": 0.2644713847219021,
+   "stats_penetration": -0.7582184689151089
+  },
+  {
+   "seed": 34,
+   "fastest": {
+    "seed": 34,
+    "tick": 2282,
+    "time": 9.5083,
+    "marble": 4,
+    "slot": 2,
+    "speed": 64.27688179747443,
+    "travel": 0.26782034082281014,
+    "at": [
+     30.1703,
+     45.3038,
+     -36.6676
+    ],
+    "velocity": [
+     45.2573,
+     -28.8073,
+     35.4038
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     74
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 34,
+    "tick": 617,
+    "time": 2.5708,
+    "distance": -1.0068891783012186,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     4
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -36.6215,
+     73.3061,
+     -63.9129
+    ],
+    "normal": [
+     -0.3052,
+     0.0,
+     -0.9523
+    ],
+    "normal_speed": [
+     null,
+     -0.0007
+    ],
+    "impulse": 932.737276
+   },
+   "stats_travel": 0.26782034082281014,
+   "stats_penetration": -1.0068891783012186
+  },
+  {
+   "seed": 35,
+   "fastest": {
+    "seed": 35,
+    "tick": 2361,
+    "time": 9.8375,
+    "marble": 4,
+    "slot": 6,
+    "speed": 63.10992505799673,
+    "travel": 0.2629580210749864,
+    "at": [
+     26.5711,
+     46.5894,
+     -39.4954
+    ],
+    "velocity": [
+     49.7453,
+     -29.142,
+     25.6712
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     67
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 35,
+    "tick": 1114,
+    "time": 4.6417,
+    "distance": -0.7319510782506637,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     0
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -28.5896,
+     73.2992,
+     -66.6485
+    ],
+    "normal": [
+     0.5291,
+     -0.0,
+     0.8485
+    ],
+    "normal_speed": [
+     null,
+     -0.1389
+    ],
+    "impulse": 96.546965
+   },
+   "stats_travel": 0.2629580210749864,
+   "stats_penetration": -0.7319510782506637
+  },
+  {
+   "seed": 36,
+   "fastest": {
+    "seed": 36,
+    "tick": 2107,
+    "time": 8.7792,
+    "marble": 6,
+    "slot": 0,
+    "speed": 64.20624598502289,
+    "travel": 0.26752602493759536,
+    "at": [
+     28.7477,
+     45.8423,
+     -37.8781
+    ],
+    "velocity": [
+     49.3318,
+     -30.0521,
+     28.0301
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     71
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 36,
+    "tick": 1079,
+    "time": 4.4958,
+    "distance": -0.66935726049015,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     5
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -36.5994,
+     73.299,
+     -64.0496
+    ],
+    "normal": [
+     -0.2538,
+     0.0,
+     -0.9673
+    ],
+    "normal_speed": [
+     null,
+     -0.1122
+    ],
+    "impulse": 83.14098
+   },
+   "stats_travel": 0.26752602493759536,
+   "stats_penetration": -0.66935726049015
+  },
+  {
+   "seed": 37,
+   "fastest": {
+    "seed": 37,
+    "tick": 2380,
+    "time": 9.9167,
+    "marble": 0,
+    "slot": 7,
+    "speed": 64.55431320726326,
+    "travel": 0.2689763050302636,
+    "at": [
+     28.9097,
+     45.7407,
+     -37.6748
+    ],
+    "velocity": [
+     51.8186,
+     -21.1177,
+     32.189
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     70
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 37,
+    "tick": 409,
+    "time": 1.7042,
+    "distance": -0.7654510838324872,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     2
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -36.6777,
+     73.2993,
+     -64.8342
+    ],
+    "normal": [
+     -0.0931,
+     0.0,
+     -0.9957
+    ],
+    "normal_speed": [
+     null,
+     -0.17
+    ],
+    "impulse": 38.981587
+   },
+   "stats_travel": 0.2689763050302636,
+   "stats_penetration": -0.7654510838324872
+  },
+  {
+   "seed": 38,
+   "fastest": {
+    "seed": 38,
+    "tick": 2298,
+    "time": 9.575,
+    "marble": 5,
+    "slot": 3,
+    "speed": 62.80092513034644,
+    "travel": 0.26167052137644353,
+    "at": [
+     30.6086,
+     45.4161,
+     -36.719
+    ],
+    "velocity": [
+     47.7385,
+     -25.7801,
+     31.6288
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     74
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 38,
+    "tick": 801,
+    "time": 3.3375,
+    "distance": -0.7549857438242915,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     4
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -35.5175,
+     73.2987,
+     -67.764
+    ],
+    "normal": [
+     0.6167,
+     0.0,
+     -0.7872
+    ],
+    "normal_speed": [
+     null,
+     -0.0571
+    ],
+    "impulse": 396.684661
+   },
+   "stats_travel": 0.26167052137644353,
+   "stats_penetration": -0.7549857438242915
+  },
+  {
+   "seed": 39,
+   "fastest": {
+    "seed": 39,
+    "tick": 2306,
+    "time": 9.6083,
+    "marble": 6,
+    "slot": 3,
+    "speed": 64.80478399013901,
+    "travel": 0.2700199332922459,
+    "at": [
+     31.4804,
+     45.0505,
+     -35.8021
+    ],
+    "velocity": [
+     45.4329,
+     -29.4994,
+     35.5711
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     77
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 39,
+    "tick": 450,
+    "time": 1.875,
+    "distance": -0.7608732525395332,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     2
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -29.8867,
+     73.3039,
+     -61.372
+    ],
+    "normal": [
+     -0.7362,
+     0.0,
+     0.6767
+    ],
+    "normal_speed": [
+     null,
+     -1.2687
+    ],
+    "impulse": 2864.258791
+   },
+   "stats_travel": 0.2700199332922459,
+   "stats_penetration": -0.7608732525395332
+  },
+  {
+   "seed": 40,
+   "fastest": {
+    "seed": 40,
+    "tick": 4525,
+    "time": 18.8542,
+    "marble": 3,
+    "slot": 1,
+    "speed": 69.149221217806,
+    "travel": 0.2881217550741917,
+    "at": [
+     9.0602,
+     -0.5803,
+     64.6023
+    ],
+    "velocity": [
+     21.6784,
+     -65.3795,
+     6.0975
+    ],
+    "module": "airborne",
+    "located": [
+     "final",
+     32
+    ],
+    "touching": [],
+    "inside_machine": false,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 40,
+    "tick": 418,
+    "time": 1.7417,
+    "distance": -0.7398443690998829,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     5
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -28.6452,
+     73.3016,
+     -66.7523
+    ],
+    "normal": [
+     0.5487,
+     0.0,
+     0.836
+    ],
+    "normal_speed": [
+     null,
+     -0.7122
+    ],
+    "impulse": 1332.911974
+   },
+   "stats_travel": 0.2881217550741917,
+   "stats_penetration": -0.7398443690998829
+  },
+  {
+   "seed": 41,
+   "fastest": {
+    "seed": 41,
+    "tick": 2182,
+    "time": 9.0917,
+    "marble": 6,
+    "slot": 3,
+    "speed": 63.47303462305913,
+    "travel": 0.2644709775960797,
+    "at": [
+     27.3045,
+     46.2921,
+     -38.7718
+    ],
+    "velocity": [
+     49.3183,
+     -27.731,
+     28.7668
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     68
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 41,
+    "tick": 464,
+    "time": 1.9333,
+    "distance": -0.763954832135902,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     6
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -33.1564,
+     73.299,
+     -60.5881
+    ],
+    "normal": [
+     -0.9976,
+     0.0,
+     -0.0691
+    ],
+    "normal_speed": [
+     null,
+     -0.3778
+    ],
+    "impulse": 572.213732
+   },
+   "stats_travel": 0.2644709775960797,
+   "stats_penetration": -0.763954832135902
+  },
+  {
+   "seed": 42,
+   "fastest": {
+    "seed": 42,
+    "tick": 2249,
+    "time": 9.3708,
+    "marble": 5,
+    "slot": 3,
+    "speed": 63.567161755634764,
+    "travel": 0.26486317398181153,
+    "at": [
+     30.0377,
+     45.4126,
+     -36.8892
+    ],
+    "velocity": [
+     51.3872,
+     -19.884,
+     31.698
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     74
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 42,
+    "tick": 436,
+    "time": 1.8167,
+    "distance": -0.7128752714171134,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     1
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -36.2106,
+     73.2987,
+     -65.2589
+    ],
+    "normal": [
+     0.015,
+     0.0,
+     -0.9999
+    ],
+    "normal_speed": [
+     null,
+     -0.0223
+    ],
+    "impulse": 0.0
+   },
+   "stats_travel": 0.26486317398181153,
+   "stats_penetration": -0.7128752714171134
+  },
+  {
+   "seed": 43,
+   "fastest": {
+    "seed": 43,
+    "tick": 2064,
+    "time": 8.6,
+    "marble": 7,
+    "slot": 4,
+    "speed": 64.27354661958776,
+    "travel": 0.2678064442482823,
+    "at": [
+     23.1483,
+     47.7028,
+     -41.6144
+    ],
+    "velocity": [
+     57.23,
+     -20.3523,
+     21.0143
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     59
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 43,
+    "tick": 409,
+    "time": 1.7042,
+    "distance": -0.7121900864040244,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     0
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -36.6713,
+     73.2991,
+     -64.7814
+    ],
+    "normal": [
+     -0.0931,
+     0.0,
+     -0.9957
+    ],
+    "normal_speed": [
+     null,
+     -0.1167
+    ],
+    "impulse": 0.0
+   },
+   "stats_travel": 0.2678064442482823,
+   "stats_penetration": -0.7121900864040244
+  },
+  {
+   "seed": 44,
+   "fastest": {
+    "seed": 44,
+    "tick": 2107,
+    "time": 8.7792,
+    "marble": 6,
+    "slot": 0,
+    "speed": 64.34831739521452,
+    "travel": 0.2681179891467272,
+    "at": [
+     32.9487,
+     44.757,
+     -34.2136
+    ],
+    "velocity": [
+     41.9325,
+     -25.8239,
+     41.4186
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     79
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 44,
+    "tick": 1112,
+    "time": 4.6333,
+    "distance": -0.7412334451928844,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     5
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -30.9397,
+     73.299,
+     -60.7939
+    ],
+    "normal": [
+     -0.8962,
+     0.0,
+     0.4437
+    ],
+    "normal_speed": [
+     null,
+     -0.1053
+    ],
+    "impulse": 116.212612
+   },
+   "stats_travel": 0.2681179891467272,
+   "stats_penetration": -0.7412334451928844
+  },
+  {
+   "seed": 45,
+   "fastest": {
+    "seed": 45,
+    "tick": 2153,
+    "time": 8.9708,
+    "marble": 5,
+    "slot": 2,
+    "speed": 63.51231767121492,
+    "travel": 0.2646346569633955,
+    "at": [
+     29.1467,
+     45.9,
+     -37.9295
+    ],
+    "velocity": [
+     49.197,
+     -27.2615,
+     29.5004
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     72
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 45,
+    "tick": 496,
+    "time": 2.0667,
+    "distance": -0.7463165231970115,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     2
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -32.463,
+     73.2996,
+     -60.6092
+    ],
+    "normal": [
+     -0.9956,
+     0.0,
+     0.0932
+    ],
+    "normal_speed": [
+     null,
+     -0.2413
+    ],
+    "impulse": 583.786638
+   },
+   "stats_travel": 0.2646346569633955,
+   "stats_penetration": -0.7463165231970115
+  },
+  {
+   "seed": 46,
+   "fastest": {
+    "seed": 46,
+    "tick": 2312,
+    "time": 9.6333,
+    "marble": 6,
+    "slot": 1,
+    "speed": 64.0672750730924,
+    "travel": 0.26694697947121837,
+    "at": [
+     29.357,
+     45.5146,
+     -37.1688
+    ],
+    "velocity": [
+     48.1705,
+     -25.5701,
+     33.6213
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     72
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 46,
+    "tick": 389,
+    "time": 1.6208,
+    "distance": -0.7227787898427531,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     1
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -29.0146,
+     73.2988,
+     -66.5009
+    ],
+    "normal": [
+     0.5486,
+     -0.0,
+     0.8361
+    ],
+    "normal_speed": [
+     null,
+     0.0
+    ],
+    "impulse": 0.0
+   },
+   "stats_travel": 0.26694697947121837,
+   "stats_penetration": -0.7227787898427531
+  },
+  {
+   "seed": 47,
+   "fastest": {
+    "seed": 47,
+    "tick": 2132,
+    "time": 8.8833,
+    "marble": 3,
+    "slot": 4,
+    "speed": 66.646562032656,
+    "travel": 0.2776940084694,
+    "at": [
+     30.3398,
+     45.4619,
+     -36.8754
+    ],
+    "velocity": [
+     50.648,
+     -20.761,
+     38.0201
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     73
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 47,
+    "tick": 480,
+    "time": 2.0,
+    "distance": -0.9085214837255271,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     2
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -29.0155,
+     73.3095,
+     -67.4299
+    ],
+    "normal": [
+     0.6767,
+     0.0,
+     0.7362
+    ],
+    "normal_speed": [
+     null,
+     0.1918
+    ],
+    "impulse": 65.51073
+   },
+   "stats_travel": 0.2776940084694,
+   "stats_penetration": -0.9085214837255271
+  },
+  {
+   "seed": 48,
+   "fastest": {
+    "seed": 48,
+    "tick": 2124,
+    "time": 8.85,
+    "marble": 4,
+    "slot": 1,
+    "speed": 65.2629281213443,
+    "travel": 0.27192886717226794,
+    "at": [
+     31.7916,
+     44.8534,
+     -35.365
+    ],
+    "velocity": [
+     45.171,
+     -33.1643,
+     33.4509
+    ],
+    "module": "leg1",
+    "located": [
+     "leg1",
+     77
+    ],
+    "touching": [],
+    "inside_machine": true,
+    "state": "running"
+   },
+   "deepest": {
+    "seed": 48,
+    "tick": 412,
+    "time": 1.7167,
+    "distance": -0.7456312454948361,
+    "owners": [
+     "start",
+     "marble"
+    ],
+    "marbles": [
+     null,
+     5
+    ],
+    "kind": "marble-static",
+    "moving_part": [
+     "start"
+    ],
+    "at": [
+     -31.8014,
+     73.299,
+     -60.7024
+    ],
+    "normal": [
+     -0.9675,
+     -0.0,
+     0.253
+    ],
+    "normal_speed": [
+     null,
+     -0.1019
+    ],
+    "impulse": 160.312425
+   },
+   "stats_travel": 0.27192886717226794,
+   "stats_penetration": -0.7456312454948361
+  }
+ ]
+}

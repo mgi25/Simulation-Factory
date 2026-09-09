@@ -1,0 +1,21 @@
+7 configurations x 16 seeds in 907s
+configuration                 finish   all8    esc    stk |  blue%  blue fin |  orng%  orng fin
+-----------------------------------------------------------------------------------------------
+trim only (as built)           0.500   0.00  0.445  0.055 |  0.250     0.375 |  0.742     0.547
+guards close at 8/11           0.508   0.00  0.438  0.055 |  0.258     0.333 |  0.734     0.575
+orange wall full by 10         0.555   0.00  0.328  0.117 |  0.148     0.684 |  0.844     0.537
+both, 8/11 + orange 10         0.570   0.00  0.320  0.109 |  0.172     0.727 |  0.820     0.543
+ridge floor 0.6                0.500   0.00  0.445  0.055 |  0.250     0.375 |  0.742     0.547
+ridge runs to 30               0.500   0.00  0.445  0.055 |  0.250     0.375 |  0.742     0.547
+ridge to 30 + floor 0.6        0.500   0.00  0.445  0.055 |  0.250     0.375 |  0.742     0.547
+
+  trim only (as built): {'final[10]': 8, 'leg3[92]': 4, 'orange_lead[11]': 4, 'orange_lead[9]': 3, 'orange_lead[17]': 3, 'orange[108]': 3, 'leg3[88]': 3, 'final[11]': 3, 'leg3[94]': 3, 'final[9]': 3}
+  guards close at 8/11: {'final[10]': 7, 'leg3[92]': 4, 'orange_lead[11]': 4, 'orange_lead[9]': 3, 'orange_lead[17]': 3, 'orange[108]': 3, 'leg3[94]': 3, 'final[9]': 3, 'leg3[97]': 2, 'leg3[89]': 2}
+  orange wall full by 10: {'final[10]': 9, 'orange_lead[18]': 5, 'orange[101]': 4, 'final[0]': 3, 'orange[98]': 3, 'orange[108]': 3, 'leg3[101]': 3, 'orange_lead[16]': 2, 'orange_lead[19]': 2, 'final[9]': 2}
+  both, 8/11 + orange 10: {'final[10]': 9, 'orange_lead[18]': 5, 'leg3[101]': 4, 'orange[101]': 4, 'final[0]': 3, 'orange[98]': 3, 'orange[108]': 3, 'orange_lead[19]': 2, 'final[9]': 2, 'orange_lead[16]': 1}
+  ridge floor 0.6: {'final[10]': 8, 'leg3[92]': 4, 'orange_lead[11]': 4, 'orange_lead[9]': 3, 'orange_lead[17]': 3, 'orange[108]': 3, 'leg3[88]': 3, 'final[11]': 3, 'leg3[94]': 3, 'final[9]': 3}
+  ridge runs to 30: {'final[10]': 8, 'orange_lead[17]': 3, 'orange[108]': 3, 'final[11]': 3, 'orange_lead[11]': 3, 'final[9]': 3, 'orange_lead[9]': 2, 'orange_lead[21]': 2, 'leg3[99]': 2, 'leg3[92]': 2}
+  ridge to 30 + floor 0.6: {'final[10]': 8, 'orange_lead[17]': 3, 'orange[108]': 3, 'final[11]': 3, 'orange_lead[11]': 3, 'final[9]': 3, 'orange_lead[9]': 2, 'orange_lead[21]': 2, 'leg3[99]': 2, 'leg3[92]': 2}
+wrote docs/validation/sloped_race_v1/v110/fork_lab_guards.json
+
+[exited with code 0]
