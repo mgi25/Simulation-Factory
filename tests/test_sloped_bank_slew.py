@@ -223,6 +223,7 @@ def test_the_track_builder_limits_the_roll_before_it_publishes_it():
 
 
 def test_the_gdscript_uses_the_same_signed_sine_rule():
+    """A cheap guard that runs without Godot. The real check is below."""
     source = TRACK.read_text(encoding="utf-8")
     body = source[
         source.index("static func slewed_bank") : source.index("static func guard_rise")
@@ -231,3 +232,70 @@ def test_the_gdscript_uses_the_same_signed_sine_rule():
     assert "sin(float(banks[index + 1]))" in body, "no longer reads the authored roll"
     assert "max(here - cap, min(here + cap, want))" in body, "the clamp changed"
     assert "CHANNEL_HALF * profile_scale" in body, "the half width changed"
+
+
+# The cases `godot/scripts/sloped_slew_check.gd` prints, and the roll it prints
+# them for - leg2's own shape, including the sign flip a magnitude limit gets
+# wrong. Kept here rather than parsed out of the GDScript so that a change to
+# either file has to be made in both.
+PARITY_DEGREES = (
+    -20.68, -19.64, -16.69, -11.72, -5.70, -0.59, 1.89, 1.47,
+    -0.31, -1.44, -0.91, 0.74, 2.29, 2.95, 2.68, 1.81,
+)
+PARITY_DROP = 0.0674
+PARITY_CASES = ((1, 13, 1.0), (1, 13, 0.5), (0, 3, 1.0))
+
+
+def test_the_two_implementations_agree_as_numbers():
+    """The parity that matters: run both and compare the rolls.
+
+    The source-text test above passes whenever the two files share a few
+    substrings, which is not the same as computing the same curve - and the
+    first numeric run of this found a real 0.99-degree gap, in the harness
+    rather than the code, because one side had been given a half width of 1.0
+    and the other `CHANNEL_HALF`. Skipped rather than failed without Godot, the
+    way the rest of the render-facing suite is.
+    """
+    import json
+    import subprocess
+    import sys
+
+    sys.path.insert(0, str(ROOT))
+    try:
+        from tools.render_replay import find_godot
+    except ImportError:  # pragma: no cover - the tool moved
+        pytest.skip("tools.render_replay is not importable")
+    try:
+        godot = find_godot(None)
+    except Exception:
+        pytest.skip("Godot 4 is not available; set $GODOT_BIN to run this")
+
+    done = subprocess.run(
+        [godot, "--headless", "--script", "scripts/sloped_slew_check.gd"],
+        cwd=str(ROOT / "godot"),
+        capture_output=True,
+        text=True,
+        timeout=300,
+    )
+    drawn: dict[str, list[float]] = {}
+    for line in done.stdout.splitlines():
+        key, sep, values = line.partition("|")
+        if sep and key.startswith("["):
+            drawn[key] = [float(v) for v in values.split(",")]
+    assert drawn, f"the check script printed nothing:\n{done.stdout}\n{done.stderr}"
+
+    banks = [math.radians(value) for value in PARITY_DEGREES]
+    path = [(0.0, -PARITY_DROP * index, 0.0) for index in range(len(PARITY_DEGREES))]
+    half = layout.CHANNEL_HALF  # the script passes a profile scale of 1.0
+    for first, last, margin in PARITY_CASES:
+        key = json.dumps([first, last, margin]).replace('"', "")
+        assert key in drawn, f"{key} missing from {sorted(drawn)}"
+        mine = [
+            math.degrees(v)
+            for v in _slewed_bank(banks, path, first, last, margin, half)
+        ]
+        for index, (ours, theirs) in enumerate(zip(mine, drawn[key])):
+            # The GDScript prints six decimals, so that is the floor.
+            assert ours == pytest.approx(theirs, abs=1e-5), (
+                f"{key} sample {index}: python {ours:.6f}, gdscript {theirs:.6f}"
+            )
