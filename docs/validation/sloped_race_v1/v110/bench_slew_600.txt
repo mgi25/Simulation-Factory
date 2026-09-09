@@ -1,0 +1,93 @@
+mesh cache warm: 16 collider chunks
+  8/600
+  16/600
+  24/600
+  32/600
+  40/600
+  48/600
+  56/600
+  64/600
+  72/600
+  80/600
+  88/600
+  96/600
+  104/600
+  112/600
+  120/600
+  128/600
+  136/600
+  144/600
+  152/600
+  160/600
+  168/600
+  176/600
+  184/600
+  192/600
+  200/600
+  208/600
+  216/600
+  224/600
+  232/600
+  240/600
+  248/600
+  256/600
+  264/600
+  272/600
+  280/600
+  288/600
+  296/600
+  304/600
+  312/600
+  320/600
+  328/600
+  336/600
+  344/600
+  352/600
+  360/600
+  368/600
+  376/600
+  384/600
+  392/600
+  400/600
+  408/600
+  416/600
+  424/600
+  432/600
+  440/600
+  448/600
+  456/600
+  464/600
+  472/600
+  480/600
+  488/600
+  496/600
+  504/600
+  512/600
+  520/600
+  528/600
+  536/600
+  544/600
+  552/600
+  560/600
+  568/600
+  576/600
+  584/600
+  592/600
+  600/600
+wrote docs/validation/sloped_race_v1/v110/bench_slew_600.json
+wrote docs/validation/sloped_race_v1/v110/races_slew
+600 races, 4800 racers in 5589.5 s (0.11 seeds/s, 0.40 sim s / wall s)
+  finish 0.995  escape 0.004  stuck 0.002  all-eight races 0.960
+  slot win rates: 0:0.168 1:0.177 2:0.027 3:0.128 4:0.125 5:0.063 6:0.137 7:0.175
+  strongest 1 weakest 2 ratio 6.618  spearman(finish) -0.0145
+  route blue      entries  4799 share 1.000 finish 0.995 win 0.125 median 21.8
+  loss sites: {'blue[100]': 8, 'final[0]': 7, 'blue[0]': 3, 'blue[20]': 1, 'blue_lead[20]': 1, 'launch[60]': 1, 'launch[20]': 1, 'leg1[40]': 1}
+  validation: travel 0.744 in the machine, 0.74823 falling out of it; penetration track -0.38005, actuator -1.15252, marble-on-marble -0.23359
+  eligible seeds 576
+    seed   2283 score 3.795 lock 0.4971 margin 0.0667 leads 9 routes {'blue': 8}
+    seed   2074 score 3.767 lock 0.48 margin 0.0667 leads 13 routes {'blue': 8}
+    seed   2320 score 3.656 lock 0.4933 margin 0.3333 leads 6 routes {'blue': 8}
+    seed   2451 score 3.582 lock 0.4842 margin 0.1167 leads 5 routes {'blue': 8}
+    seed   2299 score 3.383 lock 0.485 margin 0.05 leads 10 routes {'blue': 8}
+
+[exited with code 0]
