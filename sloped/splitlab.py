@@ -246,9 +246,10 @@ def tail_machine(
     Section 5 of the V1.12 brief asks for orange tail -> merge -> final to be
     tested at a single marble, at small packs and at eight-marble traffic. None
     of the existing harnesses can do that. `split_machine` injects into
-    **leg3** and measures the *fork*: with `FORK_CREST` at its open 0.05 it
-    still sorted only 2 of 28 marbles onto orange, so every orange number it
-    produced was a sample of two and said nothing about the merge.
+    **leg3** and measures the *fork*: with `FORK_CREST` at the 0.05 that was
+    the default then - V1.14 ships 0.12 - it still sorted only 2 of 28 marbles
+    onto orange, so every orange number it produced was a sample of two and
+    said nothing about the merge.
     `merge_machine` injects on blue and cannot be pointed at orange, because
     orange arrives at the junction 139 degrees from the sprint and its `_route`
     attribution goes through a different chain.

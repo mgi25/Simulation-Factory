@@ -555,6 +555,24 @@ def test_the_apron_holds_a_marble_on_its_shoulder_and_not_beyond_it():
 # --- V1.13: the fork ridge, and the knob that could not move ---------------
 
 
+def _ridge_course():
+    """The course with `ForkRidge` at the fork, whatever ships.
+
+    V1.14 replaced the ridge with `sloped.stations.ForkPan` and left the ridge
+    in the tree with its measurements, the way `sloped.joins.merge_trim` is
+    kept. So the tests below - all of which are *about the ridge* - have to ask
+    for it rather than take the built default.
+    """
+    import sloped.course as course
+
+    before = course.FORK_STATION
+    try:
+        course.FORK_STATION = "ridge"
+        return sloped_course(routes="both")
+    finally:
+        course.FORK_STATION = before
+
+
 def _ridge_stations(machine):
     """(step, leg3 sample, gap, crest height) for every ridge station."""
     ridge = machine.modules["fork"]
@@ -608,7 +626,7 @@ def test_both_fork_guards_shut_where_the_two_cradles_part():
     the last sample at which leg3's east cradle edge and orange's west cradle
     edge still overlap. See `docs/sloped_race_v113_fork.md`.
     """
-    machine = sloped_course(routes="both")
+    machine = _ridge_course()
     stations = _ridge_stations(machine)
     assert stations, "the two channels never part; there would be no fork"
     parting = stations[0][0]
@@ -641,7 +659,7 @@ def test_the_ridge_is_a_conveyor_and_its_downstream_end_is_open():
     already contained, and that the gap it is spanning there is more than a
     marble wide, so the end is a hole and not a seam.
     """
-    machine = sloped_course(routes="both")
+    machine = _ridge_course()
     stations = _ridge_stations(machine)
     step, sample, gap, _height = stations[-1]
     assert gap > MARBLE_DIAMETER, (
@@ -672,7 +690,7 @@ def test_the_ridge_rise_limit_is_off_and_still_works():
         before = ForkRidge.RISE_SLEW
         try:
             ForkRidge.RISE_SLEW = slew
-            ridge = sloped_course(routes="both").modules["fork"]
+            ridge = _ridge_course().modules["fork"]
             return [
                 0.5 * (west[1] + east[1]) + up[1] * height
                 for west, east, up, height in ridge._stations()
@@ -685,3 +703,243 @@ def test_the_ridge_rise_limit_is_off_and_still_works():
     rise = lambda series: max(b - a for a, b in zip(series, series[1:]))
     assert rise(loose) > 0.15, "the ramp this exists for has gone; remeasure it"
     assert rise(tight) < 0.02, "the limit no longer flattens the crest"
+
+
+# --- V1.14: the fork pan ---------------------------------------------------
+
+
+def _pan(**knobs):
+    """The built pan, with `sloped.course`'s constants set and restored."""
+    import sloped.course as course
+    from sloped.stations import ForkPan, ForkPanEnd
+
+    before = {
+        "station": course.FORK_STATION,
+        "crest": course.FORK_CREST,
+        "window": joins.FORK_WINDOW_PAN,
+        "cap": ForkPan.SEPARATOR_CAP,
+        "at": ForkPan.SEPARATOR_AT,
+        "slew": ForkPan.RISE_SLEW,
+        "height": ForkPanEnd.HEIGHT,
+    }
+    try:
+        course.FORK_STATION = "pan"
+        course.FORK_CREST = knobs.get("crest", course.FORK_CREST)
+        joins.FORK_WINDOW_PAN = knobs.get("window", joins.FORK_WINDOW_PAN)
+        ForkPan.SEPARATOR_CAP = knobs.get("cap", ForkPan.SEPARATOR_CAP)
+        ForkPan.SEPARATOR_AT = knobs.get("at", ForkPan.SEPARATOR_AT)
+        ForkPan.RISE_SLEW = knobs.get("slew", ForkPan.RISE_SLEW)
+        ForkPanEnd.HEIGHT = knobs.get("height", ForkPanEnd.HEIGHT)
+        machine = sloped_course(routes="both")
+        return machine, machine.modules["fork"], machine.modules["fork_end"]
+    finally:
+        course.FORK_STATION = before["station"]
+        course.FORK_CREST = before["crest"]
+        joins.FORK_WINDOW_PAN = before["window"]
+        ForkPan.SEPARATOR_CAP = before["cap"]
+        ForkPan.SEPARATOR_AT = before["at"]
+        ForkPan.RISE_SLEW = before["slew"]
+        ForkPanEnd.HEIGHT = before["height"]
+
+
+def test_the_fork_pan_ends_behind_a_wall():
+    """The defect the whole of V1.14 exists for, as an assertion.
+
+    `ForkRidge` ended over the gorge: `tools/sloped_fork_pan_audit.py` fires a
+    downstream ray from a marble centre over every point of every station and
+    counted **89 of 143** leaving the ridge without meeting anything. At the
+    same thirteen stations the pan's count is 1, and the one is the east end of
+    its own last ring, where the wall stops because orange's cradle starts; at
+    the ten-sample window that ships it is 0 of 33.
+
+    So this pins the two things that make that true: that a wall module exists,
+    and that it stands on the pan's last ring rather than near it. A wall an
+    epsilon downstream of the ring is a slot a marble fits through.
+    """
+    _machine, pan, end = _pan()
+    ring = pan.rings()[-1]
+    wall = end.local_colliders()[0]
+    corners = [tuple(vertex) for vertex in wall.vertices]
+    for point in ring:
+        assert min(math.dist(point, corner) for corner in corners) < 1e-9, (
+            "the end wall does not stand on the pan's last ring"
+        )
+    described = end.describe()
+    assert described["height"] > MARBLE_DIAMETER, (
+        f"the end wall is {described['height']:.3f} tall, under a marble - a "
+        "marble arriving at 30 wu/s rides over that"
+    )
+    # `describe` rounds to six places, so the tolerance is the rounding
+    # rather than an epsilon.
+    assert described["span"] >= math.dist(ring[0], ring[-1]) - 1e-6
+
+
+def test_the_fork_pan_stands_on_both_cradle_edges():
+    """Every station's feet are the two runs' own edges, to the last decimal.
+
+    Not a tolerance: the feet come from `TrackRun.surface_point`, which is the
+    expression the collider's own vertices come from, so the seam is exact or
+    the pan is standing somewhere else. A pan that does not reach its foot is a
+    floor gap at the one place the crossing happens; one that overshoots is a
+    hanging lip.
+    """
+    machine, pan, _end = _pan()
+    leg3 = machine.runs["leg3"]
+    lead = machine.runs["orange_lead"]
+    built = [
+        step for step, row in enumerate(pan._feet())
+        if row[3] > pan.HAIRLINE * MARBLE_DIAMETER
+    ]
+    assert built, "the pan emits nothing"
+    # `rings()[0]` is the nose, which sits `NOSE_BACK` upstream of the first
+    # station and therefore has no cradle edge of its own to stand on.
+    for ring, step in zip(pan.rings()[1:], built):
+        here = min(pan.index + step, len(leg3.sim_path) - 1)
+        there = min(step, len(lead.sim_path) - 1)
+        assert math.dist(ring[0], leg3.surface_point(here, layout.CHANNEL_HALF)) < 1e-9
+        assert math.dist(ring[-1], lead.surface_point(there, -layout.CHANNEL_HALF)) < 1e-9
+
+
+def test_the_fork_pan_crest_never_rises_along_the_run():
+    """`ForkPan.RISE_SLEW` is installed, unlike the ridge's.
+
+    The invariant is `TrackRun._slewed_bank`'s: no surface a marble runs on may
+    rise as it travels. The ridge broke it by tying the crest to a gap that
+    grows 0.28 to 4.21 over eleven samples, which made the surface east of
+    leg3's channel climb 26 to 42 degrees a sample - a launch, at 30 to 38
+    wu/s. The pan's cap alone does not fix that; it only makes the ramp
+    shorter. The slew is what flattens it.
+    """
+    from sloped.stations import ForkPan
+
+    assert ForkPan.RISE_SLEW is not None, (
+        "the slew is what keeps the approach to the cap from being a ramp"
+    )
+
+    def crest_world_heights(slew):
+        _machine, pan, _end = _pan(slew=slew)
+        return [
+            0.5 * (west[1] + east[1]) + up[1] * height
+            for west, east, up, height in pan._stations()
+        ]
+
+    tight = crest_world_heights(ForkPan.RISE_SLEW)
+    assert max(b - a for a, b in zip(tight, tight[1:])) <= 0.0 + 1e-9, (
+        "the pan's crest rises along the run"
+    )
+
+
+def test_the_fork_pan_crest_is_a_threshold_and_not_a_wall():
+    """Capped below a marble, and its steepest flank under 45 degrees.
+
+    `ForkRidge` reached the run's own containment - 1.4035, a marble and a
+    half - by its fifth built station, so the thing between the two routes was
+    a second wall on a surface whose whole job is to be crossed. And its
+    documented "61 degrees" was the average from foot to crest rather than the
+    face a marble meets, which is `atan(0.9*pi)` = 70.5 degrees.
+
+    This asserts the two numbers rather than the shape: no station's crest
+    reaches a marble diameter, and the west flank's steepest face - the
+    quarter cosine's inflection, `atan(pi*h/(2*a))` - stays under the ridge's
+    own 70.5.
+
+    `a` is the **effective** offset, `crest_u * span`, not the nominal
+    `SEPARATOR_AT`. A first version used the nominal one and reported 40.8
+    degrees; at the two stations that ship the offset is clamped to a third of
+    the chord and the real faces are 56.4 and 50.1. The bound here is 60
+    rather than 45 because 50 to 56 is what the whole of V1.14's scan was
+    measured on - `ForkPan.MAX_FLANK_DEG` is the knob that would tighten it,
+    and it is off and unscanned.
+    """
+    from sloped.stations import ForkPan
+
+    _machine, pan, _end = _pan()
+    stations = pan._stations()
+    assert stations, "the pan emits nothing"
+    crests = [height for _west, _east, _up, height in stations]
+    assert max(crests) < MARBLE_DIAMETER, (
+        f"the crest reaches {max(crests):.3f}, a marble or more"
+    )
+    worst = 0.0
+    for west, east, _up, height in stations:
+        span = math.dist(west, east)
+        offset = min(ForkPan.SEPARATOR_AT / span, 1.0 / 3.0) * span
+        worst = max(worst, math.degrees(math.atan(math.pi * height / (2.0 * offset))))
+    assert worst < 60.0, (
+        f"the crest's steepest face is {worst:.1f} degrees, past the ridge's "
+        "own 70.5 territory"
+    )
+
+
+def test_the_fork_pan_crest_does_not_migrate_across_the_corridor():
+    """The crest is pinned to the west foot, not to the middle of the gap.
+
+    `ForkRidge` puts its crest at `u = 0.5`, so as the gap opens from 0.28 to
+    4.21 the crest walks from leg3-frame across +2.5 to +3.9 - across the
+    corridor, in the direction leg3's own hairpin is throwing the field at
+    1.24 g. The pan's crest stays within `SEPARATOR_AT` of its west foot at
+    every station, so it reinforces leg3's rail instead of sweeping away from
+    it.
+    """
+    from sloped.stations import ForkPan
+
+    _machine, pan, _end = _pan()
+    for west, east, _up, _height in pan._stations():
+        span = math.dist(west, east)
+        crest_u = min(ForkPan.SEPARATOR_AT / span, 1.0 / 3.0)
+        assert crest_u * span <= ForkPan.SEPARATOR_AT + 1e-9, (
+            f"the crest stands {crest_u * span:.3f} from its west foot, past "
+            f"the pinned {ForkPan.SEPARATOR_AT}"
+        )
+
+
+def test_opening_oranges_west_guard_over_the_pan_is_falsified():
+    """`FORK_LEAD_WINDOW` stays at the parting, and this is why.
+
+    The pan drains east, so opening orange's west guard over its length is the
+    obvious completion of it - the drain would deliver into orange instead of
+    into the guard's outer face. Measured over 8 seeds at crest 0.12 it is much
+    worse, and the mechanism is the one V1.13 found from the other side: that
+    guard is not walling a corridor off, it is the only thing holding orange's
+    own field on a mouth banked 25 degrees toward it.
+
+        lead window   finish   blue%  blue fin   orng%  orng fin
+             8/10      0.453   0.688     0.409   0.312     0.550
+            14/16      0.266   0.953     0.262   0.047     0.333
+            18/20      0.297   0.969     0.306   0.031     0.000
+
+    Orange's share collapses from 0.312 to 0.031: with its west guard open,
+    orange empties onto the pan rather than the pan filling orange.
+    """
+    _open_from, _full_open, last_open, full_again = joins.FORK_LEAD_WINDOW
+    _machine, pan, _end = _pan()
+    parting = next(
+        step for step, row in enumerate(pan._feet())
+        if row[3] > pan.HAIRLINE * MARBLE_DIAMETER
+    )
+    assert last_open <= parting, (
+        f"orange's west guard is still open at step {last_open}, past the "
+        f"parting at {parting} - opening it to 18 measured 0.031 orange share"
+    )
+    assert full_again <= parting + 2
+
+
+def test_neither_fork_station_reaches_the_blue_only_course():
+    """`routes="blue"` builds no fork at all, which is why blue is unmoved.
+
+    The regression this session reports - 99.58% per-racer, 96.67% all-eight -
+    is only meaningful if none of the pan's constants can reach it. They
+    cannot, because the whole `forked` block is skipped.
+    """
+    import sloped.course as course
+
+    for station in course.FORK_STATIONS:
+        before = course.FORK_STATION
+        try:
+            course.FORK_STATION = station
+            machine = sloped_course(routes="blue")
+        finally:
+            course.FORK_STATION = before
+        assert "fork" not in machine.modules
+        assert "fork_end" not in machine.modules
+        assert "orange_lead" not in machine.modules

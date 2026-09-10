@@ -83,6 +83,7 @@ GLYPH = {
     "orange_lead": "O",
     "orange": "o",
     "fork": "^",
+    "fork_end": "W",
     "blue_lead": "B",
     "blue": "b",
     "merge": "m",
@@ -317,6 +318,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--step", type=float, default=0.05)
     parser.add_argument("--routes", default="both")
     parser.add_argument("--crest", type=float, default=None)
+    parser.add_argument("--station", default=None, help="pan or ridge")
     parser.add_argument(
         "--about",
         type=float,
@@ -327,10 +329,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--out", default="")
     args = parser.parse_args(argv)
 
-    if args.crest is not None:
+    if args.crest is not None or args.station is not None:
         import sloped.course as _course
 
-        _course.FORK_CREST = args.crest
+        if args.crest is not None:
+            _course.FORK_CREST = args.crest
+        if args.station is not None:
+            _course.FORK_STATION = args.station
 
     machine = sloped_course(routes=args.routes)
     world = MarbleWorld(DEFAULT_CONFIG)

@@ -1,0 +1,86 @@
+{
+ "station": "pan",
+ "crest": 0.12,
+ "support_reach": 0.7871,
+ "cells": 96,
+ "loose_cells": 3,
+ "gorge_rays": 33,
+ "open_downstream": 0,
+ "rings": [
+  {
+   "ring": 0,
+   "step": null,
+   "sample": null,
+   "span": 0.7937,
+   "points": 48,
+   "unsupported_points": [
+    {
+     "kind": "outboard_west",
+     "distance": 0.25,
+     "drop": 1.1463
+    },
+    {
+     "kind": "outboard_west",
+     "distance": 0.6,
+     "drop": 1.3934
+    },
+    {
+     "kind": "outboard_west",
+     "distance": 1.0,
+     "drop": 1.6422
+    }
+   ],
+   "loose_interior": 0,
+   "worst_drop": 0.5248,
+   "owners": [
+    "fork",
+    "leg3",
+    "orange_lead"
+   ],
+   "open_downstream": 0
+  },
+  {
+   "ring": 1,
+   "step": 9,
+   "sample": 91,
+   "span": 0.7937,
+   "points": 48,
+   "unsupported_points": [],
+   "loose_interior": 0,
+   "worst_drop": 0.5036,
+   "owners": [
+    "fork",
+    "leg3",
+    "orange_lead"
+   ],
+   "open_downstream": 0,
+   "west_seam": 0.0,
+   "east_seam": 0.0,
+   "leg3_wall": 0.56,
+   "lead_wall": 0.525
+  },
+  {
+   "ring": 2,
+   "step": 10,
+   "sample": 92,
+   "span": 1.2992,
+   "points": 0,
+   "unsupported_points": [],
+   "loose_interior": 0,
+   "worst_drop": null,
+   "owners": [],
+   "open_downstream": 0,
+   "west_seam": 0.0,
+   "east_seam": 0.0,
+   "leg3_wall": 1.0,
+   "lead_wall": 1.0
+  }
+ ],
+ "wall": {
+  "module": "fork_end",
+  "height": 1.403509,
+  "span": 1.299235,
+  "covers": true
+ },
+ "findings": []
+}

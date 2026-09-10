@@ -38,6 +38,7 @@ KNOBS = {
     "lead_window": ("sloped.joins", "FORK_LEAD_WINDOW"),
     "orange_window": ("sloped.joins", "FORK_WINDOW_ORANGE"),
     "ridge_window": ("sloped.joins", "FORK_WINDOW_BLUE"),
+    "pan_window": ("sloped.joins", "FORK_WINDOW_PAN"),
     "mouth_across": ("sloped.joins", "ORANGE_MOUTH_ACROSS"),
     "lead_hold": ("sloped.joins", "ORANGE_LEAD_HOLD"),
     "trim_window": ("sloped.joins", "FORK_TRIM_WINDOW"),
@@ -46,6 +47,16 @@ KNOBS = {
     "ridge_floor": ("sloped.stations", "ForkRidge.CREST_FLOOR"),
     "ridge_slew": ("sloped.stations", "ForkRidge.RISE_SLEW"),
     "nose_back": ("sloped.stations", "ForkRidge.NOSE_BACK"),
+    # Which divider stands at the fork - "pan" or "ridge". `ForkPan`'s
+    # docstring has the three measurements that falsify the ridge; this is here
+    # so every row of every previous scan can still be reproduced.
+    "fork_station": ("sloped.course", "FORK_STATION"),
+    "pan_cap": ("sloped.stations", "ForkPan.SEPARATOR_CAP"),
+    "pan_at": ("sloped.stations", "ForkPan.SEPARATOR_AT"),
+    "pan_flank": ("sloped.stations", "ForkPan.MAX_FLANK"),
+    "pan_flank_deg": ("sloped.stations", "ForkPan.MAX_FLANK_DEG"),
+    "pan_slew": ("sloped.stations", "ForkPan.RISE_SLEW"),
+    "wall_height": ("sloped.stations", "ForkPanEnd.HEIGHT"),
     "crest": ("sloped.course", "FORK_CREST"),
     # Two entries of a spec dict rather than module constants; `_target`
     # handles the `[key]` form so the lead's roll law can be scanned too.

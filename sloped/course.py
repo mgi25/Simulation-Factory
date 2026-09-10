@@ -82,13 +82,24 @@ from sloped.radial import RadialStart
 from sloped.shuffle import ShuffleChamber
 from sloped.trapdoor import ShuffleFloor
 from sloped.widelaunch import WideLaunch
-from sloped.stations import FinishDeck, ForkRidge, MergeCatch, Mixer, Spinners, StartGrid
+from sloped.stations import (
+    FinishDeck,
+    ForkPan,
+    ForkPanEnd,
+    ForkRidge,
+    MergeCatch,
+    Mixer,
+    Spinners,
+    StartGrid,
+)
 from sloped.track import TrackRun
 
 __all__ = [
     "CHAIN",
     "BRANCH_MODULES",
     "OBSTRUCTIONS",
+    "FORK_STATION",
+    "FORK_STATIONS",
     "START_KIND",
     "START_KINDS",
     "START_CLASSES",
@@ -105,7 +116,7 @@ __all__ = [
 # a hit owned by one of these answers the probe rather than failing it - which
 # is the honest reading: the surface a marble meets there really is the pin.
 # Anything else that intercepts a probe is a finding.
-OBSTRUCTIONS = ("start", "mixer", "shuffle", "obstacle", "fork", "merge")
+OBSTRUCTIONS = ("start", "mixer", "shuffle", "obstacle", "fork", "fork_end", "merge")
 
 # The runs a marble meets in order, before the fork.
 CHAIN = ("launch", "leg1", "leg2", "leg3")
@@ -167,7 +178,39 @@ BLUE_MERGE_WINDOW = (0.0, 111, 113, 118, 119)
 # `OPEN_FLOOR` that exists so a scaled-away wall has no coincident vertices -
 # it is 0.05 simulation units and a marble does not notice it. Scanned against
 # whole races, `docs/validation/sloped_race_v1/v110/fork_lab_crest_height.json`.
-FORK_CREST = 0.05
+#
+# ## V1.14: 0.12, because the fork now has a floor under it
+#
+# V1.10 through V1.13 left this at 0.05 and said so in as many words: the
+# forked course did not work, `routes="blue"` is the default and does not build
+# the fork, so the constant reached nothing that shipped and 0.05 was the value
+# the scans were indexed on. With `sloped.stations.ForkPan` in place the forked
+# course does work, so the crest is set from the measurement instead. Twenty
+# four seeds, 192 racers a row, pan window 10:
+#
+#     crest   finish   all8    esc | blue%  blue fin | orng%  orng fin
+#      0.05    0.771   0.12  0.036 | 0.328     0.905 | 0.667     0.711
+#      0.12    0.885   0.33  0.005 | 0.693     0.985 | 0.302     0.672
+#
+# 0.05 buys a more even route share - 0.33/0.67 against 0.69/0.30 - and pays
+# 0.114 of finish for it. Section 7's rule decides: route share need not be
+# even and survival comes first, so 0.12 ships. Both routes are still
+# genuinely used and neither is scripted; the crest is a threshold a marble
+# crosses on its own momentum against leg3's own bank.
+FORK_CREST = 0.12
+
+# Which divider stands at the fork: `"pan"` or `"ridge"`.
+#
+# `"ridge"` is `sloped.stations.ForkRidge` exactly as V1.12 and V1.13 shipped
+# it, kept so every number in `docs/sloped_race_v113_fork.md` can be
+# reproduced rather than taken on trust. It is not a fallback - it is the
+# falsified configuration, and `ForkPan`'s docstring has the three measurements
+# that falsify it.
+#
+# `"pan"` builds `ForkPan` plus its end wall. Both are only built at all when
+# `routes="both"`, so neither reaches the blue-only course that ships.
+FORK_STATION = "pan"
+FORK_STATIONS = ("pan", "ridge")
 
 # --- the start correction -------------------------------------------------
 #
@@ -686,16 +729,34 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
         )
     machine.add(Spinners("obstacle", runs["leg2"]), Transform())
     if forked:
-        machine.add(
-            ForkRidge(
+        if FORK_STATION not in FORK_STATIONS:
+            raise ValueError(
+                f"FORK_STATION {FORK_STATION!r} is not one of {FORK_STATIONS}"
+            )
+        if FORK_STATION == "ridge":
+            machine.add(
+                ForkRidge(
+                    "fork",
+                    runs["leg3"],
+                    joins.FORK_SAMPLE,
+                    runs["orange_lead"],
+                    joins.FORK_WINDOW_BLUE,
+                ),
+                Transform(),
+            )
+        else:
+            # The id stays `fork` so the loss ledgers of every previous session
+            # compare directly against this one. The end wall is its own
+            # module, for the reason `ForkPanEnd`'s docstring gives.
+            pan = ForkPan(
                 "fork",
                 runs["leg3"],
                 joins.FORK_SAMPLE,
                 runs["orange_lead"],
-                joins.FORK_WINDOW_BLUE,
-            ),
-            Transform(),
-        )
+                joins.FORK_WINDOW_PAN,
+            )
+            machine.add(pan, Transform())
+            machine.add(ForkPanEnd("fork_end", pan), Transform())
     branch = ("blue_lead", "blue", "orange_lead", "orange") if forked else ("blue_lead", "blue")
     for name in branch:
         machine.add(runs[name], Transform())

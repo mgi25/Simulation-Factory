@@ -138,6 +138,7 @@ from sloped.scale import LAYOUT_TO_SIM
 __all__ = [
     "FORK_SAMPLE",
     "FORK_WINDOW_BLUE",
+    "FORK_WINDOW_PAN",
     "FORK_GUARD_WINDOW",
     "FORK_LEAD_WINDOW",
     "LEAD_MOUTH_FLARE",
@@ -323,6 +324,60 @@ FORK_LEAD_WINDOW = (-1, 0, 8, 10)
 LEAD_MOUTH_FLARE = 1.0
 FORK_WINDOW_ORANGE = 14
 FORK_WINDOW_BLUE = 20          # how far the ridge runs
+
+# How far `sloped.stations.ForkPan` runs, in leg3 samples past the fork, and
+# why it is half the ridge's.
+#
+# The ridge ran to 20 because it was trying to *floor the wedge*, and the wedge
+# never stops widening - so its last station stood over a 4.21-unit gap in mid
+# air. The pan is not trying to floor the wedge. It bridges the **parting** and
+# then stops behind a wall, because past the parting there is nothing a marble
+# can be doing that is survivable:
+#
+#   * the wedge cannot drain into orange. Opening orange's west guard over the
+#     pan's length is the obvious completion of a pan that drains east, and
+#     measured it is much worse - orange's share collapses from 0.312 to 0.031,
+#     because that guard is the only thing holding orange's own field on a
+#     mouth banked 25 degrees toward it. See `FORK_LEAD_WINDOW`.
+#   * and it cannot drain back into blue. leg3's tail throws its field east at
+#     1.24 g, so a surface east of leg3's channel would have to be banked
+#     steeper than `atan(1.24)` = 51 degrees to return a marble west, and that
+#     is a wall rather than a floor.
+#
+# So the requirement is not "floor the wedge" but **"nothing may be in the
+# wedge"**, and that is a containment job: both guards reach full height at
+# step 10, so the pan ends there and its own end wall closes the mouth of the
+# fan. Eight seeds a row, everything else held. The two crests are tabulated
+# apart because they are separate scans:
+#
+#     crest 0.05   finish    esc    stk | blue fin | orng fin
+#         w10       0.812  0.031  0.156 |    0.880 |    0.769
+#         w11       0.703  0.156  0.141 |    0.750 |    0.675
+#         w12       0.609  0.219  0.172 |    0.609 |    0.625
+#         w14       0.625  0.172  0.203 |    0.565 |    0.658
+#
+#     crest 0.12   finish    esc    stk | blue fin | orng fin
+#         w12       0.562  0.297  0.141 |    0.600 |    0.571
+#         w14       0.438  0.438  0.125 |    0.409 |    0.500
+#         w20       0.453  0.062  0.484 |    0.409 |    0.550
+#
+# The trend is one mechanism read twice. A **longer** pan is a bigger dead end,
+# and `w20` at crest 0.12 is the clearest row: the escapes are nearly gone -
+# 0.062 against the ridge's 0.516 on the same eight seeds - and **every one of
+# them has become a stuck**, 0.484 against 0.062. The pan holds the marble up
+# and then has nowhere to put it, so the failure changes character without
+# changing size. A **shorter** pan is a smaller dead end, and at 10 there is
+# none left to be in: the pan is two stations wide, it ends where both channels
+# are walled, and the loss ledger stops being about the fork.
+#
+# Window 9 is refused by the geometry rather than by taste.
+# `tools/sloped_fork_pan_audit.py` finds 9 of its 11 downstream rays leaving
+# the station unobstructed, because both guards are still only at 0.53 there.
+#
+# Its own constant rather than `FORK_WINDOW_BLUE`, because that one's docstring
+# is about the ridge and `tests/test_sloped_fork_trim.py` asserts the ridge
+# spans the gap once it passes a marble diameter. Both stay true of the ridge.
+FORK_WINDOW_PAN = 10
 
 # Where orange's mouth sits across leg3's channel, in profile units, and why it
 # is not on the centreline.

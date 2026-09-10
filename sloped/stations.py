@@ -71,6 +71,8 @@ __all__ = [
     "Mixer",
     "Spinners",
     "ForkRidge",
+    "ForkPan",
+    "ForkPanEnd",
     "MergeCatch",
     "FinishDeck",
     "Spinner",
@@ -1356,6 +1358,421 @@ class ForkRidge(MarbleModule):
             "crest": round(max(row[2] for row in rows), 6),
             "gap": round(max(row[1] for row in rows), 6),
             "profile": rows,
+        }
+
+
+class ForkPan(MarbleModule):
+    """The fork as a continuously supported station, and the drain in it.
+
+    ## What `ForkRidge` got wrong, measured rather than argued
+
+    `ForkRidge` spans the same two feet this does - leg3's east cradle edge and
+    orange's west cradle edge, which are the only two things that bound the
+    wedge - and raises a `sin**2` crest between them whose height tracks the
+    gap. Read as a surface that is defensible. Read as the **energy landscape a
+    marble centre rides**, which is what `tools/sloped_fork_corridor.py`
+    reports, it is three separate defects.
+
+        leg3[87], centre height above leg3's cradle bottom, per across
+          leg3's floor   -1.00   0.086
+          climbing east  +0.75   0.954
+          the saddle     +1.50   1.553      <- 1.467 of climb
+          orange         +2.00   1.409      <- a pocket 0.144 deep
+          east of it     +3.25   1.914
+
+    **Orange's mouth is not a pocket. It is a shelf 0.144 deep behind a
+    1.467-unit saddle.** Nothing is captured there: a marble with enough
+    lateral speed to clear the saddle crosses the dimple and climbs the far
+    side, and comes back. So the crossing does not end in orange - it ends
+    *oscillating in the seam*, and then the channels part underneath it.
+
+        leg3[92], the same reading once the ridge exists
+          leg3's floor   -1.00   0.114
+          leg3's guard   +1.50   1.924
+          the plateau    +2.00   2.080     <- 1.97 above leg3, walled off from it
+          orange's lip   +3.00   2.250     <- only 0.17 above the plateau
+          orange's floor +6.00   0.710     <- and 1.54 below it
+
+    So from the plateau **blue is impossible and orange is nearly free**, and
+    the ridge does neither: it holds the marble on the plateau until its own
+    sheet ends. That is the conveyor `docs/sloped_race_v113_fork.md` names, and
+    the reason no parameter on the ridge repairs it - the ridge's failure is
+    that the plateau has no exit, not that it is the wrong height.
+
+    ## The third defect: the wedge is a fan, not a corridor
+
+    The two runs part at leg3[90..91] and are already **46 degrees apart** when
+    they do, because the 56-degree divergence happens inside the window where
+    the cradles still overlap. Past the parting the gap grows the way a pair of
+    scissors opens, and in leg3's own frame the far foot runs *backwards*:
+
+        step   gap across leg3   the same foot, along leg3's tangent
+          10             0.619                                -0.975
+          14             2.185                                -2.631
+          20             4.210                                -5.832
+
+    A sheet spanning that is not a cross-section of anything. Its east edge
+    sweeps west across leg3's frame as orange leaves leg3's section plane, and
+    then it stops over the gorge. Nothing spanning the fan can be made safe,
+    which is why this station is **short** and ends behind a wall rather than
+    running to the ridge's twenty samples.
+
+    ## So: a plateau that drains east, and a wall across its end
+
+    Three things, each derived from one of the readings above.
+
+    * The crest is **capped** (`SEPARATOR_CAP`) and **rate limited along the
+      run** (`RISE_SLEW`), so no surface a marble runs on rises as it travels -
+      the invariant `TrackRun._slewed_bank` holds for a run's roll. A crest
+      tied to a gap that grows 0.28 to 4.21 is a ramp, and 30 to 38 wu/s onto a
+      ramp is a launch.
+    * The crest sits at a **fixed distance from the west foot**
+      (`SEPARATOR_AT`) instead of at the middle of the gap, so the divider
+      stops migrating east across the corridor as the gap opens.
+    * East of the crest the surface is a **straight drain to the east foot**,
+      so the plateau tilts into orange rather than standing level. Orange's
+      floor falls 1.54 units past its own west lip, so a plateau that drains is
+      a plateau with an exit.
+
+    The drain only has somewhere to drain **if orange's west guard is open over
+    the pan's length** - `sloped.joins.FORK_LEAD_WINDOW`. That is not the
+    falsified `20/22` row of V1.13's scan: that row opened *leg3's* east guard
+    to step 20 as well, which let blue's own field out into the fan and took
+    the course from 0.396 to 0.188. leg3's east guard stays at the parting.
+
+    `ForkPanEnd` is the wall across the last station and is a separate module
+    so the loss ledger can say whether the backstop is where marbles die. If it
+    is, the drain is too weak, not the wall too near.
+    """
+
+    # A nose upstream of the first station, so the pan begins as an edge in the
+    # floor rather than as a step. `ForkRidge.NOSE_BACK`'s argument exactly.
+    NOSE_BACK = 0.30
+
+    # The crest's height ceiling, in simulation units, and where it comes from.
+    #
+    # The plateau at leg3[92] stands 1.97 above leg3's floor and 0.17 below
+    # orange's entry lip. A crest that reaches the run's own containment -
+    # which is what `MAX_FLANK * 0.5 * gap` does by step 13 - is a second wall
+    # on a surface whose whole job is to be crossed. Capped at a third of a
+    # marble: enough to bias a marble that is rolling, not enough to hold one.
+    SEPARATOR_CAP = 0.33
+
+    # Where the crest stands, in simulation units east of the west foot.
+    #
+    # `ForkRidge` puts it at half the gap, so it walks from +2.5 to +3.9 in
+    # leg3's frame as the gap opens - across the corridor, in the direction the
+    # hairpin is throwing the field. Pinned here instead, just outside leg3's
+    # own rail (the guard's inner face is 1.002 profile units out, and one
+    # profile unit is 1.754 simulation units), so it reinforces that rail
+    # rather than sweeping away from it.
+    SEPARATOR_AT = 0.60
+
+    # Crest height per unit of foot, as `ForkRidge.MAX_FLANK` - kept so a
+    # narrow gap gets a proportionally narrow crest rather than the cap.
+    #
+    # `ForkRidge` documents 1.8 as "61 degrees" and that is its own average
+    # from foot to crest; the steepest flank of `h*sin(pi*u)**2` with
+    # `h = 0.9*gap` is `atan(0.9*pi)` = 70.5 degrees, which is a wall.
+    #
+    # ## The pan's own flank, measured rather than derived
+    #
+    # The west flank is a quarter cosine over the crest's offset, so its
+    # steepest face is `atan(pi*h/(2*a))`. A first version of this docstring
+    # put that at 40.8 degrees by using the **nominal** `SEPARATOR_AT` of 0.60
+    # - and at the two stations that actually ship, the offset is clamped to a
+    # third of the chord instead, because the chord there is 0.79 and 1.30:
+    #
+    #      span   offset   crest   west flank   drain east
+    #     0.794    0.265  0.2538       56.4        25.6      step 9
+    #     1.299    0.433  0.3300       50.1        20.9      step 10
+    #     1.844    0.600  0.3300       40.8        14.9      step 11, unshipped
+    #     7.669    0.600  0.3300       40.8         2.7      step 20, unshipped
+    #
+    # So the installed flank is **50 to 56 degrees**, not 41. That is still
+    # well under the ridge's 70.5 and it is a face rather than a wall, but it
+    # is steeper than a marble runs on, and the number to quote is this one.
+    # `MAX_FLANK_DEG` caps it if a scan ever wants to.
+    MAX_FLANK = 1.8
+
+    # A ceiling on the west flank's steepest face, in degrees, or `None` for
+    # none. `None` is what the whole of V1.14's window and crest scan was
+    # measured on, so it is the installed value; the knob exists because the
+    # measured flank is 50 to 56 degrees and nothing has yet asked whether a
+    # gentler one is better. `tools/sloped_fork_lab.py` scans it as
+    # `pan_flank_deg`.
+    MAX_FLANK_DEG = None
+
+    # Of a marble diameter, the gap below which the two cradles are treated as
+    # still overlapping and nothing is emitted. `ForkRidge.HAIRLINE`'s
+    # argument: the feet are the two cradle *edges*, which stand above the
+    # cradle bottom, so a "hairline" there is a ledge a marble stops on.
+    HAIRLINE = 0.06
+
+    # Points across the ring, as `2 * FLANK_POINTS + 1` sampled **uniformly in
+    # `u`** - and that is a recorded approximation rather than the intent.
+    #
+    # The crest sits at `crest_u`, which is a third of the chord at both
+    # stations that ship. Eleven uniform points put vertices at 0.0, 0.1 ...
+    # 1.0, so none of them lands on 0.3333: the built polyline peaks at
+    # `u = 0.3` with `sin(0.5*pi*0.9)**2` = 0.976 of the nominal crest, and the
+    # crest is blunted by 2.4% and sits a fortieth of the chord west of where
+    # the formula puts it.
+    #
+    # Left as it is because every number in `docs/sloped_race_v114_fork_pan.md`
+    # was measured on this sampling, and a ring that puts `FLANK_POINTS` on the
+    # flank and `FLANK_POINTS` on the drain - which is what it should do - is a
+    # geometry change that has not been run. It is the first item in that
+    # report's "what the next session needs".
+    FLANK_POINTS = 5
+
+    # How fast the crest may rise along the run, as a multiple of how far its
+    # own feet descend between two stations. Installed here, unlike
+    # `ForkRidge.RISE_SLEW`, because with the crest capped low the slew is what
+    # keeps the *approach* to the cap from being a ramp.
+    RISE_SLEW = 1.0
+
+    def __init__(
+        self,
+        module_id: str,
+        run: TrackRun,
+        index: int,
+        other: TrackRun,
+        window: int,
+    ) -> None:
+        super().__init__(module_id)
+        self.run = run
+        self.index = index
+        self.other = other
+        self.window = window
+        self._mesh: TriMesh | None = None
+
+    # --- geometry --------------------------------------------------------
+
+    def _feet(self):
+        """(west foot, east foot, up, gap) per step, in simulation units.
+
+        The feet are the two runs' own cradle edges, so the pan cannot be
+        anywhere but between them. `gap` is measured on **this station's**
+        lateral axis rather than as the distance between the feet, because most
+        of that distance is along the flow once the two runs have diverged -
+        see the class docstring's table.
+        """
+        out = []
+        for step in range(self.window + 1):
+            a_index = min(self.index + step, len(self.run.sim_path) - 1)
+            b_index = min(step, len(self.other.sim_path) - 1)
+            west = self.run.surface_point(a_index, layout.CHANNEL_HALF)
+            east = self.other.surface_point(b_index, -layout.CHANNEL_HALF)
+            _la, ua, _fa = self.run.frames[a_index]
+            _lb, ub, _fb = self.other.frames[b_index]
+            up = _unit(tuple(0.5 * (ua[i] + ub[i]) for i in range(3)))
+            lateral = self.run.frames[a_index][0]
+            gap = sum((east[i] - west[i]) * lateral[i] for i in range(3))
+            out.append((west, east, up, gap))
+        return out
+
+    def _stations(self):
+        """(west, east, up, crest height) for the steps that have a gap."""
+        kept = [
+            row for row in self._feet()
+            if row[3] > self.HAIRLINE * MARBLE_DIAMETER
+        ]
+        out = []
+        for west, east, up, gap in kept:
+            height = min(self.SEPARATOR_CAP, self.MAX_FLANK * 0.5 * gap)
+            out.append((west, east, up, height))
+        return self._slewed(out)
+
+    def _slewed(self, stations):
+        """`stations` with the crest's rise limited to its own feet's descent.
+
+        Applied after the heights are solved rather than inside the loop,
+        because the limit is against how far the *previous* station's feet fell
+        and the first station has none. `ForkRidge.RISE_SLEW` carries the
+        argument and the measurement it was written from.
+        """
+        if self.RISE_SLEW is None or len(stations) < 2:
+            return stations
+        out = [stations[0]]
+        for index in range(1, len(stations)):
+            west, east, up, height = stations[index]
+            before = stations[index - 1]
+            fell = 0.5 * ((before[0][1] - west[1]) + (before[1][1] - east[1]))
+            allowed = out[-1][3] + self.RISE_SLEW * max(fell, 0.0)
+            out.append((west, east, up, min(height, allowed)))
+        return out
+
+    def _profile(self, west, east, up, height):
+        """One ring: the crest's west flank, then a straight drain east.
+
+        `u` runs along the chord from the west foot. The crest is at
+        `SEPARATOR_AT` simulation units along it, or at a third of the chord
+        where the chord is shorter than that - a crest past the middle of a
+        narrow gap would be the east cradle's own edge.
+        """
+        span = math.dist(west, east)
+        if span < 1e-9:
+            return [tuple(float(value) for value in west)]
+        crest_u = min(self.SEPARATOR_AT / span, 1.0 / 3.0)
+        if self.MAX_FLANK_DEG is not None:
+            # The quarter cosine's steepest face is `atan(pi*h/(2*a))`, so
+            # bounding it bounds `h` against the **effective** offset rather
+            # than against the nominal `SEPARATOR_AT` - which is the arithmetic
+            # this class's own docstring got wrong once.
+            offset = crest_u * span
+            height = min(
+                height,
+                2.0 * offset * math.tan(math.radians(self.MAX_FLANK_DEG)) / math.pi,
+            )
+        ring: list[tuple[float, float, float]] = []
+        points = 2 * self.FLANK_POINTS
+        for step in range(points + 1):
+            u = step / points
+            if u <= crest_u:
+                # A quarter cosine: flush with the west cradle at the foot,
+                # tangent to the horizontal at the crest.
+                rise = height * math.sin(0.5 * math.pi * u / max(crest_u, 1e-9)) ** 2
+            else:
+                # And a straight fall to the east foot, which is the drain. Not
+                # a raised cosine: that one is tangent to the horizontal at
+                # *both* ends, so its last third is the level shelf this
+                # station exists to remove.
+                rise = height * (1.0 - (u - crest_u) / max(1.0 - crest_u, 1e-9))
+            base = tuple(west[i] + (east[i] - west[i]) * u for i in range(3))
+            ring.append(tuple(base[i] + up[i] * rise for i in range(3)))
+        return ring
+
+    def rings(self) -> list[list[tuple[float, float, float]]]:
+        """The pan's rings, nose first. `ForkPanEnd` reads the last one."""
+        stations = self._stations()
+        if not stations:
+            raise ValueError(
+                f"{self.id}: the two channels never part within {self.window} "
+                "samples; there is nothing for a pan to stand in"
+            )
+        # One station is enough, unlike `ForkRidge`, whose guard this was
+        # copied from: the nose ring is inserted below, so a single station
+        # still makes a two-ring strip. Refusing one was a real defect - a
+        # window of 9 emits exactly one station on the built runs, and the
+        # window scan `sloped.joins.FORK_WINDOW_PAN` records died on that row
+        # rather than measuring it.
+        west, east, up, _height = stations[0]
+        _la, _ua, forward = self.run.frames[self.index]
+        back = to_sim(self.NOSE_BACK)
+        stations.insert(
+            0,
+            (
+                tuple(west[i] - forward[i] * back for i in range(3)),
+                tuple(east[i] - forward[i] * back for i in range(3)),
+                up,
+                0.0,
+            ),
+        )
+        return [self._profile(*station) for station in stations]
+
+    def local_colliders(self) -> list[TriMesh]:
+        if self._mesh is not None:
+            return [self._mesh]
+        self._mesh = _strip(self.rings(), f"{self.id}_pan")
+        return [self._mesh]
+
+    def local_sockets(self) -> dict[str, Socket]:
+        return {}
+
+    def local_bounds(self) -> Aabb:
+        bounds = self.local_colliders()[0].aabb()
+        return Aabb(
+            tuple(value - 0.2 * MARBLE_DIAMETER for value in bounds.lower),
+            tuple(value + 0.2 * MARBLE_DIAMETER for value in bounds.upper),
+        )
+
+    def describe(self) -> dict[str, Any]:
+        rows = []
+        for step, (west, east, _up, gap) in enumerate(self._feet()):
+            a_index = min(self.index + step, len(self.run.sim_path) - 1)
+            height = min(self.SEPARATOR_CAP, self.MAX_FLANK * 0.5 * gap)
+            rows.append(
+                [
+                    step,
+                    a_index,
+                    round(gap, 4),
+                    round(max(height, 0.0), 4),
+                    gap > self.HAIRLINE * MARBLE_DIAMETER,
+                ]
+            )
+        built = [row for row in rows if row[4]]
+        return {
+            "kind": "ForkPan",
+            "on": self.run.id,
+            "sample": self.index,
+            "against": self.other.id,
+            "window": self.window,
+            # The step the pan actually starts and ends at, which
+            # `ForkRidge.describe` could not report: it measured every gap on
+            # `frames[self.index]` - the lateral axis at the *fork* rather than
+            # at the station - and then re-labelled the surviving stations by
+            # `enumerate`, so it said the ridge began at step 0 with a gap of
+            # 0.630 when it began at step 9 with a gap of 0.282. V1.13's report
+            # named that and left it; fixed here.
+            "first_step": built[0][0] if built else None,
+            "last_step": built[-1][0] if built else None,
+            "crest": round(max((row[3] for row in built), default=0.0), 6),
+            "gap": round(max((row[2] for row in built), default=0.0), 6),
+            "profile": rows,
+        }
+
+
+class ForkPanEnd(MarbleModule):
+    """The wall across the pan's downstream end.
+
+    Its own module rather than a second mesh on `ForkPan`, because
+    `MarbleWorld.owner_of` answers with the module id and the fork's loss
+    ledger is read by owner. If marbles come to rest against this, the drain is
+    too weak or the pan too short - which is a different repair from the pan's
+    floor being wrong, and the ledger should be able to say which.
+
+    It spans the pan's last ring exactly, so there is no seam between the two,
+    and it stands `HEIGHT` of the run's containment. It cannot obstruct either
+    channel: its west end is leg3's east cradle edge, with leg3's channel west
+    of that, and its east end is orange's west cradle edge, with orange's
+    channel east of that.
+    """
+
+    HEIGHT = 1.0               # of the run's containment
+
+    def __init__(self, module_id: str, pan: ForkPan) -> None:
+        super().__init__(module_id)
+        self.pan = pan
+        self._mesh: TriMesh | None = None
+
+    def local_colliders(self) -> list[TriMesh]:
+        if self._mesh is not None:
+            return [self._mesh]
+        ring = self.pan.rings()[-1]
+        up = self.pan._stations()[-1][2]
+        rise = self.HEIGHT * self.pan.run.containment
+        top = [tuple(point[i] + up[i] * rise for i in range(3)) for point in ring]
+        self._mesh = _strip([ring, top], f"{self.id}_wall")
+        return [self._mesh]
+
+    def local_sockets(self) -> dict[str, Socket]:
+        return {}
+
+    def local_bounds(self) -> Aabb:
+        bounds = self.local_colliders()[0].aabb()
+        return Aabb(
+            tuple(value - 0.2 * MARBLE_DIAMETER for value in bounds.lower),
+            tuple(value + 0.2 * MARBLE_DIAMETER for value in bounds.upper),
+        )
+
+    def describe(self) -> dict[str, Any]:
+        ring = self.pan.rings()[-1]
+        return {
+            "kind": "ForkPanEnd",
+            "on": self.pan.run.id,
+            "height": round(self.HEIGHT * self.pan.run.containment, 6),
+            "span": round(math.dist(ring[0], ring[-1]), 6),
         }
 
 
