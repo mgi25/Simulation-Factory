@@ -20,6 +20,7 @@ extends Node
 ##     --replay=PATH        the marble3d replay JSON
 ##     --cameras=PATH       the camera track JSON
 ##     --stills=a,b,c       one frame per named cut, at the cut's midpoint
+##     --at=1.5,2.0,...     one frame per **output** second named, for a sheet
 ##     --clip=1             every frame from 0 to the replay's own duration
 ##     --fps=60             output rate; 60 matches the replay's sampling
 ##     --width= --height=   default 1080x1920
@@ -39,6 +40,7 @@ var _viewport: SubViewport
 var _scene: Node3D
 var _out_dir := ""
 var _stills: Array = []
+var _at: Array = []
 var _clip := false
 var _fps := DEFAULT_FPS
 var _width := DEFAULT_WIDTH
@@ -60,12 +62,17 @@ func _ready() -> void:
 		var name := part.strip_edges()
 		if not name.is_empty():
 			_stills.append(name)
+	for part in str(options.get("at", "")).split(",", false):
+		var when := part.strip_edges()
+		if not when.is_empty():
+			_at.append(when.to_float())
 
 	if _out_dir.is_empty():
 		_fail("--out-dir is required")
 		return
-	if _stills.is_empty() and not _clip and str(options.get("dump-terrain", "")) == "":
-		_fail("give either --stills=NAME,... or --clip=1")
+	if _stills.is_empty() and _at.is_empty() and not _clip \
+			and str(options.get("dump-terrain", "")) == "":
+		_fail("give one of --stills=NAME,... --at=SECONDS,... or --clip=1")
 		return
 	if DirAccess.make_dir_recursive_absolute(_out_dir) != OK \
 			and not DirAccess.dir_exists_absolute(_out_dir):
@@ -83,6 +90,8 @@ func _ready() -> void:
 		return
 	if _clip:
 		await _render_clip()
+	elif not _at.is_empty():
+		await _render_at()
 	else:
 		await _render_stills()
 
@@ -138,6 +147,42 @@ func _render_stills() -> void:
 		print("  still %s at %.2fs -> %s" % [name, when, path])
 
 	_report(started, _stills.size())
+	get_tree().quit(0)
+
+
+func _render_at() -> void:
+	## One frame per named **output** second, from one build.
+	##
+	## Its own mode rather than a clip with a narrow window, because a contact
+	## sheet wants eleven moments spread over three and a half seconds and a
+	## clip would render the two hundred frames between them to get there. The
+	## clock is the same one `_render_clip` walks, so a frame taken here is the
+	## frame the video will have at that second and not a picture near it.
+	var started := Time.get_ticks_usec()
+	_scene.set_time(_at[0])
+	for _i in WARMUP_DRAWS:
+		await RenderingServer.frame_post_draw
+
+	for when in _at:
+		var seconds: float = when
+		_scene.set_time(seconds)
+		# Two draws, for the same reason `_render_stills` takes two: screen
+		# space reflection and ambient occlusion carry history across a cut.
+		await RenderingServer.frame_post_draw
+		await RenderingServer.frame_post_draw
+
+		var image := _viewport.get_texture().get_image()
+		if image == null:
+			_fail("frame at %.3f: the render target produced no image" % seconds)
+			return
+		var path := _out_dir.path_join("at_%07.3f.png" % seconds)
+		if image.save_png(path) != OK:
+			_fail("frame at %.3f: could not write %s" % [seconds, path])
+			return
+		print("  out %.3f s -> replay %.3f s -> %s" % [
+			seconds, _scene.replay_at(seconds), path])
+
+	_report(started, _at.size())
 	get_tree().quit(0)
 
 

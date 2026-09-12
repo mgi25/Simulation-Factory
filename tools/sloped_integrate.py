@@ -48,6 +48,7 @@ sys.path.insert(0, os.getcwd())
 from marble3d.config import DEFAULT_CONFIG
 from marble3d.replay import read_replay, write_replay
 from sloped import cameras as cameras_module
+from sloped import sightlines, terrain
 from sloped.contact import check_replay
 from sloped.course import check as check_course, sloped_course
 from sloped.race import run_race
@@ -205,6 +206,25 @@ def stage_cameras(
             f"{track['replay_duration']:.2f} s, omitting {track['omitted']:.2f} s"
         )
     problems = cameras_module.check_track(track, replay)
+    # **And whether the finish lens is standing in the course.** `check_track`
+    # knows where the mountain is and `frame_report` counts racers inside the
+    # frustum; neither can see the track itself, which is how V18 shipped a
+    # finish camera 0.15 layout units off `orange`'s channel with the body of it
+    # across the frame from 16.9 s to the end. See `sloped.sightlines`.
+    config = terrain.terrain_config(machine.runs)
+    bundle = sightlines.Bundle(
+        sightlines.course_solids(machine, lambda x, z: terrain.height(x, z, config))
+    )
+    seen = sightlines.shot_report(track, replay, machine, bundle)
+    if seen:
+        print(
+            f"  finish lens: clearance "
+            f"{min(row['clearance'] for row in seen):.2f}-"
+            f"{max(row['clearance'] for row in seen):.2f} layout units, centre "
+            f"blocked in {sum(1 for row in seen if row['centre'] is not None)} of "
+            f"{len(seen)} sampled frames"
+        )
+    problems = list(problems) + sightlines.check_shot(track, replay, machine, bundle)
     cameras_module.write_track(track, out)
     print(f"cameras: {len(track['cuts'])} cuts over {track['duration']:.2f} s -> {out}")
     rows = {row["cut"]: row for row in cameras_module.frame_report(track, replay)}

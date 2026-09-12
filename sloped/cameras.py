@@ -115,6 +115,25 @@ class Cut:
     target: str = "pack"
     band: float = 60.0            # route units behind the leader, for `pack`
     node: str = ""                # for `target = "node"`
+    # Which side of the track the bearing swings toward. Zero asks the terrain,
+    # per frame, which is what every cut before V19 did and what all of them
+    # keep doing; +1 and -1 fix it to one perpendicular for the whole shot.
+    #
+    # **A per-frame answer is a per-frame decision, and a decision can change
+    # its mind mid-shot.** `terrain.lower_side` probes nine units either side of
+    # the aim and takes the lower ground, and where the two are within a metre
+    # of each other that verdict flips. On the run-out it does: measured along
+    # `final`, the side is (-0.35, +0.94) for a hundred samples and (+0.36,
+    # -0.94) from sample 105 on, because the sprint arrives at the finish mesa
+    # and the deck's own ground comes up on one side of it. V18's finish crossed
+    # that boundary at replay 21.367 s and the camera moved **7.385 layout units
+    # in a single frame** - a cut in the middle of a shot - and it landed the
+    # lens inside `orange`'s channel, where it stayed to the end.
+    #
+    # Nothing here detects a flip and smooths it. A shot that needs smoothing is
+    # a shot standing where the ground cannot decide, and the fix is to say
+    # which side the camera is on.
+    side: int = 0
     orbit: tuple[float, float] = (0.0, 0.0)     # degrees of azimuth drift
     dolly: tuple[float, float] = (0.0, 0.0)     # fraction of distance
     hold: float = 0.0             # extra seconds after the station is reached
@@ -132,6 +151,7 @@ class Cut:
             "target": self.target,
             "band": self.band,
             "node": self.node,
+            "side": self.side,
         }
 
 
@@ -417,7 +437,96 @@ EDIT_V18: tuple[tuple, ...] = (
     }),
 )
 
-EDITS = {"v18": EDIT_V18}
+# V19 is V18's edit with one shot re-lensed. **Every window is byte-identical**
+# - the same eleven entries, the same replay bounds, the same two cuts, so the
+# output clock is unchanged to the frame and nothing before 15.75 s can differ.
+# Only the finish's lens is new.
+#
+# ## What was wrong with V18's finish, measured
+#
+# It was placed twenty layout units behind the leading pair at twelve degrees,
+# and *twenty units behind this finish line is not open air*. The course doubles
+# back: the sprint runs out to the line at (19.80, 1.02, 44.40) while `orange`
+# comes down the other way just above and behind it, ending at (1.10, 4.90,
+# 36.05) beside the sprint's own start. Sampled against the drawn course by
+# `sloped.sightlines`, the V18 finish camera stood
+#
+#     output  lens to nearest surface   sight line to its own aim
+#      16.50           3.15 (blue)      clear
+#      16.75           2.39 (merge)     clear
+#      17.00           0.47 (merge)     BLOCKED by orange 2.43 units out
+#      17.50           0.15 (orange)    BLOCKED by orange 2.09 units out
+#      19.15           0.37 (orange)    BLOCKED by orange 0.54 units out
+#
+# which is the review's "at approximately 16.9 s onward the camera becomes
+# occluded", found by arithmetic rather than by eye. **0.15 layout units is a
+# quarter of a marble's diameter**: the lens was inside the channel's skin.
+#
+# The trigger is `terrain.lower_side`, which was asked per frame which side of
+# the track to stand on and changed its answer at `final[105]` where the sprint
+# reaches the finish mesa. The camera moved **7.385 layout units in one frame**
+# at replay 21.367 - output 16.92 - and landed on the side `orange` occupies.
+# `Cut.side` exists so this shot never asks.
+#
+# ## The new lens, and the three numbers that fix it
+#
+# An outside, elevated three-quarter from **downstream**, looking back up the
+# sprint at the field coming on, with the deck and its gantry between the lens
+# and the mountain rather than a channel between the lens and the racers.
+#
+# **The aim is the line, not the pair.** `target = "pair"` ranks by progress
+# along the route, and a marble that has crossed is rolling out across a deck
+# that is not on the route - so on this seed the finish cut's subject came out
+# marbles 2 and 7, which are *second and third*. The winner had already crossed
+# at the cut's midpoint and was no longer, by that measure, in front. A finish
+# does not need following: the racers come to the line, so the line is the aim.
+# See `nodes["finish_line"]`.
+#
+# **Elevation 43, and 40 is a floor the geometry sets.** The FINISH gantry
+# carries a 5.4-unit sign whose bottom edge stands 3.26 above the deck, four
+# units up-course of the deck's centre - directly between a downstream lens and
+# a racer still short of the line. At the winner's crossing the second-placed
+# marble is 5.22 units back, and swept across every bearing from 20 to 35 on
+# both sides, the sign is across it at **every elevation below 40 degrees**. At
+# 43 there is three degrees of margin under the sign and three under this file's
+# own 46-degree ceiling, rather than a shot sitting on either limit.
+#
+# **Side -1, bearing 25.** Of the bearings that clear the gantry, 20-28 on the
+# far side is the band that never empties: a racer is in frame in **all 205
+# frames** of the shot. The lens stands 14.2 to 17.6 layout units off the
+# nearest surface throughout against V18's 0.15, and moves at most 0.06 units a
+# frame against V18's 7.385.
+#
+# **Extent 16, and the contact sheet is what set it.** Every one of 14, 16, 17,
+# 18 and 20 passes `sightlines.check_shot` with no findings, so the arithmetic
+# had nothing left to say and the frames were rendered and looked at. At 14 the
+# FINISH sign - which stands *at* the aim, 3.8 units of gantry on a 14-unit
+# frame - takes a third of the picture and the racers are crowded onto the
+# bottom edge; at 20 the arena reads but the marbles are barely larger than
+# V17's. 16 is where the sprint still arrives from the top of the frame, the
+# gantry is a band across the middle rather than the subject, and the deck and
+# its catch lanes hold the bottom third. Measured on the delivered frame at the
+# winner's crossing the leading marble is **58 x 64 px** against V17's 46
+# predicted, and the second is up the channel a clear frame-quarter behind it.
+#
+# The push is a slow tighten rather than a push-in: the drama here is *early* -
+# the winner crosses 0.65 s into a 3.4 s shot - so a lens that starts wide would
+# be widest exactly when the 0.283 s gap has to read. It opens at the framing it
+# needs and closes 12% over the run-out.
+EDIT_V19: tuple[tuple, ...] = EDIT_V18[:-1] + (
+    ("finish", 20.20, 23.60, {
+        "extent": 16.0,
+        "elevation": 43.0,
+        "bearing": 25.0,
+        "side": -1,
+        "target": "node",
+        "node": "finish_line",
+        "orbit": (-2.0, 2.0),
+        "dolly": (0.03, -0.12),
+    }),
+)
+
+EDITS = {"v18": EDIT_V18, "v19": EDIT_V19}
 
 
 SMOOTH_PASSES = 14
@@ -798,6 +907,22 @@ def build_track(
             + layout.MARBLE_RADIUS,
             sum(point[2] for point in mouths) / len(mouths) * SIM_TO_LAYOUT,
         )
+    # **The line itself, for a camera that should not be following anybody.**
+    # `target = "pair"` is the midpoint of the leading two *by progress*, and a
+    # marble that has crossed and is rolling out across the deck has left the
+    # route the progress is measured along - so its projection slides back down
+    # `final` and it drops out of the leading pair it just won. On the selected
+    # seed the finish cut's own subject came out marbles 2 and 7, which are
+    # second and third: the winner had already crossed at the midpoint and was
+    # no longer, by that measure, in front.
+    #
+    # A finish does not need to be followed. The racers come to the line, so the
+    # line is the aim, taken from the built run's last sample and raised a
+    # radius to where a marble's centre crosses it.
+    final_run = runs.get("final")
+    if final_run is not None:
+        end = final_run.path[-1]
+        nodes["finish_line"] = (end[0], end[1] + layout.MARBLE_RADIUS, end[2])
     metrics_aim = (1.0, 18.0, 6.0)          # layout B's own hero aim
     cfg = terrain.terrain_config(machine.runs)
 
@@ -889,8 +1014,16 @@ def build_track(
             flat = (flat[0] / length, 0.0, flat[2] / length)
 
             # The bearing swings toward whichever side stands over lower
-            # ground, so a side-on shot is never inside the hill.
-            side = terrain.lower_side(aim, flat, cfg)
+            # ground, so a side-on shot is never inside the hill - unless the
+            # cut names its own side, in which case it is that perpendicular
+            # for the whole shot and the ground is not asked. See `Cut.side`.
+            if cut.side:
+                base = (flat[2], 0.0, -flat[0])
+                base_length = math.hypot(base[0], base[2]) or 1.0
+                sign = 1.0 if cut.side > 0 else -1.0
+                side = (base[0] / base_length * sign, 0.0, base[2] / base_length * sign)
+            else:
+                side = terrain.lower_side(aim, flat, cfg)
             angle = math.radians(cut.bearing + orbit)
             spun = (
                 flat[0] * math.cos(angle) + side[0] * math.sin(angle),

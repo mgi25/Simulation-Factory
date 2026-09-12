@@ -482,6 +482,36 @@ func cut_names() -> PackedStringArray:
 
 
 func cut_midpoint(name: String) -> float:
+	## The middle of one cut, **in output seconds**, which is what `set_time`
+	## takes.
+	##
+	## A cut's `from` and `to` are replay seconds. Without an edit those are the
+	## same number and this was right for five versions; with one they are not,
+	## and passing a replay second to `set_time` sends it through the edit map a
+	## second time. V18's finish runs replay 20.20-23.60 at output 15.75-19.15,
+	## so its midpoint of 21.90 was read as an output second, clamped past the
+	## end of the last window and photographed at replay 23.60 - the last frame
+	## of the film rather than the middle of the shot. No video was ever wrong;
+	## the validation stills were.
+	##
+	## So when there is an edit the answer comes from the edit map, which is the
+	## only thing that knows both clocks. A lens used twice - V18's `start` is -
+	## gets the middle of its **longest** window, because that is the one a
+	## still of it should be taken from.
+	if not _edit.is_empty():
+		var best_span := -1.0
+		var best_mid := 0.0
+		for entry in _edit:
+			var segment: Dictionary = entry
+			if str(segment["cut"]) != name:
+				continue
+			var out_span: Array = segment["out"]
+			var span := float(out_span[1]) - float(out_span[0])
+			if span > best_span:
+				best_span = span
+				best_mid = 0.5 * (float(out_span[0]) + float(out_span[1]))
+		if best_span >= 0.0:
+			return best_mid
 	for cut in _camera_track.get("cuts", []):
 		var record: Dictionary = cut
 		if str(record["name"]) == name:
