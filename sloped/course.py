@@ -368,7 +368,7 @@ SHUFFLE_RATE = 9.0
 # clump stacks in the chute and *none* of 768 racers ever reached a run, which
 # is V1.7's own measured floor of about 15 degrees confirmed at the higher
 # arrival speed.
-GUARD_BOOSTS: dict[str, tuple[float, int, int, int, int]] = {
+GUARD_BOOSTS: dict[str, tuple[float, int, int, int, int] | None] = {
     "launch": (0.50, 12, 24, 70, 84),
     "leg1": (0.50, 46, 58, 100, 110),
     # **leg2's was speculative and it is under test.** It was added on the
@@ -409,6 +409,11 @@ GUARD_BOOSTS: dict[str, tuple[float, int, int, int, int]] = {
     # takes the speed is another marble, and what keeps it is a pocket the
     # unwinding roll digs on the outside of the inflection.
     "leg2": (0.50, 60, 72, 106, 116),
+    # **V1.15: orange's hairpin, and it is the same defect the other three are.**
+    # Placeholder until the scan below fills it; `None` means the run builds
+    # exactly as V1.14 shipped it, so `tools/sloped_fork_lab.py` can price the
+    # window against a row that is the file on disk.
+    "orange": None,
 }
 
 # Where a run's roll is not allowed to unwind faster than the drop pays for,
@@ -653,7 +658,17 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
     }
     # The sprint's two guard rails are opened where the merge apron is built
     # around them; see `MERGE_GUARD_WINDOW`.
-    runs["final"] = TrackRun("final", open_side=MERGE_GUARD_WINDOW)
+    #
+    # **`guard_boost` is passed here, and to blue and orange below, because it
+    # was not.** The dict comprehension above reads `GUARD_BOOSTS` for the four
+    # `CHAIN` runs only, and the sprint and the two lobes are all built
+    # separately - so an entry in the table for any of them reached nothing.
+    # V1.15 found that by scanning four boost heights on orange and getting
+    # four byte-identical rows, which is `instrument-bugs-hide-geometry-findings`
+    # in its usual shape.
+    runs["final"] = TrackRun(
+        "final", open_side=MERGE_GUARD_WINDOW, guard_boost=GUARD_BOOSTS.get("final")
+    )
     # Both lobes entered one control in, so a lead can exist at all; see
     # `sloped.joins`.
     blue_spec = dict(layout.run("blue"))
@@ -662,6 +677,7 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
         "blue",
         spec=blue_spec,
         bank_slew=BANK_SLEWS.get("blue"),
+        guard_boost=GUARD_BOOSTS.get("blue"),
         # Blue's last samples stand inside the roofed apron, so its rails are
         # opened there for the same reason the sprint's and the merge lead's
         # are: a rail inside a roofed apron leaves a ledge along its own top,
@@ -675,7 +691,10 @@ def sloped_course(config: CoreConfig | None = None, routes: str = "blue") -> Mac
         orange_spec = dict(layout.run("orange"))
         orange_spec["controls"] = joins.orange_controls()
         runs["orange"] = TrackRun(
-            "orange", spec=orange_spec, bank_slew=BANK_SLEWS.get("orange")
+            "orange",
+            spec=orange_spec,
+            bank_slew=BANK_SLEWS.get("orange"),
+            guard_boost=GUARD_BOOSTS.get("orange"),
         )
 
     paths = joins.join_paths()

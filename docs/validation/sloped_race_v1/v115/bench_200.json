@@ -1,0 +1,902 @@
+{
+ "checkpoints": {
+  "descent": 0.09,
+  "half": 0.5,
+  "mixed": 0.2,
+  "quarter": 0.25,
+  "three_quarter": 0.75
+ },
+ "config": {
+  "collider": {
+   "max_chunk_indices": 24000,
+   "max_chunk_vertices": 6000,
+   "max_triangle_edge": 4.0,
+   "mesh_margin": 0.001,
+   "min_triangle_area": 1e-06,
+   "sagitta_budget": 0.04
+  },
+  "duration_limit": 45.0,
+  "gravity": 245.25,
+  "marble": {
+   "angular_damping": 0.0,
+   "ccd_swept_radius": 0.2,
+   "friction": 0.15,
+   "linear_damping": 0.0,
+   "mass": 1.0,
+   "radius": 0.5,
+   "restitution": 0.6,
+   "rolling_friction": 0.0,
+   "spinning_friction": 0.0,
+   "surface_friction": 0.5,
+   "surface_restitution": 0.25,
+   "travel_budget": 0.5
+  },
+  "physics": {
+   "allowed_ccd_penetration": 0.02,
+   "contact_breaking_threshold": 0.02,
+   "deterministic_overlapping_pairs": true,
+   "physics_hz": 240,
+   "solver_iterations": 40,
+   "split_impulse": true,
+   "substeps": 1
+  }
+ },
+ "course": {
+  "bounds": [
+   [
+    -41.879,
+    -0.067,
+    -75.847
+   ],
+   [
+    55.224,
+    76.164,
+    95.326
+   ]
+  ],
+  "fork": {
+   "blue_heading_deg": -37.86,
+   "built": true,
+   "orange_heading_deg": 8.288,
+   "sample": 82,
+   "stem_heading_deg": -1.054
+  },
+  "join_radius_layout": {
+   "blue_lead": {
+    "allowed": 2.8374,
+    "drift": 0.0,
+    "drift_budget": 0.2679,
+    "worst": 4.3826
+   },
+   "merge_lead": {
+    "allowed": 7.8138,
+    "drift": 0.0131,
+    "drift_budget": 0.2679,
+    "worst": 2.6856
+   },
+   "orange_lead": {
+    "allowed": 2.8374,
+    "drift": 0.0,
+    "drift_budget": 0.235,
+    "worst": 13.0889
+   }
+  },
+  "modules": 18,
+  "route_length_layout": {
+   "blue": 197.1222,
+   "orange": 185.734
+  },
+  "route_length_sim": {
+   "blue": 345.8283,
+   "difference": -19.9792,
+   "difference_pct": -5.777,
+   "orange": 325.8492
+  },
+  "routes": "both",
+  "runs": {
+   "blue": {
+    "bank_max_deg": 24.0,
+    "clear_width": 2.704561,
+    "containment": 1.150877,
+    "drop": 7.719298,
+    "entry_heading_deg": -71.6374,
+    "exit_heading_deg": 72.5976,
+    "floor_offset": -0.374035,
+    "guard_boost": null,
+    "kind": "TrackRun",
+    "layout_length": 33.902985,
+    "length": 59.478922,
+    "open_side": [
+     0.0,
+     111,
+     113,
+     118,
+     119
+    ],
+    "profile_scale": 0.82,
+    "role": "branch",
+    "samples": 118,
+    "taper": null
+   },
+   "blue_lead": {
+    "bank_max_deg": 26.3506,
+    "clear_width": 3.298246,
+    "containment": 1.403509,
+    "drop": 2.280702,
+    "entry_heading_deg": -82.284,
+    "exit_heading_deg": -70.0183,
+    "floor_offset": -0.45614,
+    "guard_boost": null,
+    "kind": "TrackRun",
+    "layout_length": 7.878414,
+    "length": 13.821778,
+    "open_side": null,
+    "profile_scale": 1.0,
+    "role": "join",
+    "samples": 27,
+    "taper": [
+     1.0,
+     0.82
+    ]
+   },
+   "final": {
+    "bank_max_deg": 2.8686,
+    "clear_width": 3.298246,
+    "containment": 1.403509,
+    "drop": 6.719298,
+    "entry_heading_deg": 65.1106,
+    "exit_heading_deg": 70.6903,
+    "floor_offset": -0.45614,
+    "guard_boost": null,
+    "kind": "TrackRun",
+    "layout_length": 21.734665,
+    "length": 38.130991,
+    "open_side": [
+     0.0,
+     -1,
+     0,
+     12,
+     14
+    ],
+    "profile_scale": 1.0,
+    "role": "sprint",
+    "samples": 118,
+    "taper": null
+   },
+   "launch": {
+    "bank_max_deg": 18.0,
+    "clear_width": 3.298246,
+    "containment": 1.403509,
+    "drop": 11.052632,
+    "entry_heading_deg": 29.9711,
+    "exit_heading_deg": 79.4096,
+    "floor_offset": -0.45614,
+    "guard_boost": [
+     0.5,
+     12,
+     24,
+     70,
+     84
+    ],
+    "kind": "TrackRun",
+    "layout_length": 13.70176,
+    "length": 24.038176,
+    "open_side": null,
+    "profile_scale": 1.0,
+    "role": "descent",
+    "samples": 118,
+    "taper": null
+   },
+   "leg1": {
+    "bank_max_deg": 28.0,
+    "clear_width": 3.298246,
+    "containment": 1.403509,
+    "drop": 14.824561,
+    "entry_heading_deg": 81.7186,
+    "exit_heading_deg": -88.224,
+    "floor_offset": -0.45614,
+    "guard_boost": [
+     0.5,
+     46,
+     58,
+     100,
+     110
+    ],
+    "kind": "TrackRun",
+    "layout_length": 40.871328,
+    "length": 71.704084,
+    "open_side": null,
+    "profile_scale": 1.0,
+    "role": "long",
+    "samples": 118,
+    "taper": null
+   },
+   "leg2": {
+    "bank_max_deg": 22.0,
+    "clear_width": 3.298246,
+    "containment": 1.403509,
+    "drop": 10.964912,
+    "entry_heading_deg": -82.5328,
+    "exit_heading_deg": 82.4101,
+    "floor_offset": -0.45614,
+    "guard_boost": [
+     0.5,
+     60,
+     72,
+     106,
+     116
+    ],
+    "kind": "TrackRun",
+    "layout_length": 44.925113,
+    "length": 78.815987,
+    "open_side": null,
+    "profile_scale": 1.0,
+    "role": "long",
+    "samples": 118,
+    "taper": null
+   },
+   "leg3": {
+    "bank_max_deg": 26.0,
+    "clear_width": 3.298246,
+    "containment": 1.403509,
+    "drop": 11.052632,
+    "entry_heading_deg": 79.5604,
+    "exit_heading_deg": -84.3987,
+    "floor_offset": -0.45614,
+    "guard_boost": null,
+    "kind": "TrackRun",
+    "layout_length": 34.107893,
+    "length": 59.838408,
+    "open_side": [
+     1.0,
+     81,
+     82,
+     90,
+     92,
+     0.12
+    ],
+    "profile_scale": 1.0,
+    "role": "long",
+    "samples": 118,
+    "taper": null
+   },
+   "merge_lead": {
+    "bank_max_deg": 0.0,
+    "clear_width": 3.298246,
+    "containment": 1.403509,
+    "drop": 0.16975,
+    "entry_heading_deg": 73.1551,
+    "exit_heading_deg": 66.3447,
+    "floor_offset": -0.45614,
+    "guard_boost": null,
+    "kind": "TrackRun",
+    "layout_length": 1.159917,
+    "length": 2.034942,
+    "open_side": [
+     0.0,
+     -1,
+     0,
+     12,
+     12
+    ],
+    "profile_scale": 1.0,
+    "role": "join",
+    "samples": 12,
+    "taper": [
+     1.0,
+     1.14
+    ]
+   },
+   "orange": {
+    "bank_max_deg": 32.0,
+    "clear_width": 2.704561,
+    "containment": 1.150877,
+    "drop": 5.789474,
+    "entry_heading_deg": 40.5787,
+    "exit_heading_deg": -74.2329,
+    "floor_offset": -0.374035,
+    "guard_boost": null,
+    "kind": "TrackRun",
+    "layout_length": 28.132402,
+    "length": 49.355091,
+    "open_side": null,
+    "profile_scale": 0.82,
+    "role": "branch",
+    "samples": 118,
+    "taper": null
+   },
+   "orange_lead": {
+    "bank_max_deg": 26.0,
+    "clear_width": 3.298246,
+    "containment": 1.403509,
+    "drop": 8.215824,
+    "entry_heading_deg": -0.3613,
+    "exit_heading_deg": 39.9623,
+    "floor_offset": -0.45614,
+    "guard_boost": null,
+    "kind": "TrackRun",
+    "layout_length": 12.463456,
+    "length": 21.865712,
+    "open_side": [
+     -1.0,
+     -1,
+     0,
+     8,
+     10
+    ],
+    "profile_scale": 1.0,
+    "role": "join",
+    "samples": 43,
+    "taper": [
+     1.0,
+     0.82
+    ]
+   }
+  },
+  "triangles": 40268,
+  "vertices": 21842
+ },
+ "duration": {
+  "max": 40.0,
+  "mean": 40.0,
+  "median": 40.0,
+  "min": 40.0
+ },
+ "fairness": {
+  "best_slot": 7,
+  "centre_rank_correlation": -0.8039,
+  "expected_win_rate": 0.125,
+  "slot_mean_rank_sd": 0.2182,
+  "slot_mean_rank_span": 0.583,
+  "slot_rank_correlation": -0.1605,
+  "slot_rank_spearman": {
+   "descent": -0.0155,
+   "finish": -0.0155,
+   "half": -0.0155,
+   "mixed": -0.0155,
+   "quarter": -0.0155,
+   "three_quarter": -0.0155
+  },
+  "slots": {
+   "0": {
+    "escape_rate": 0.01,
+    "finish_rank_variance": 5.125,
+    "finish_rate": 0.985,
+    "mean_finish_rank": 4.279,
+    "mean_rank": {
+     "descent": 4.3,
+     "half": 4.2,
+     "mixed": 4.3,
+     "quarter": 4.32,
+     "three_quarter": 4.255
+    },
+    "podium_rate": 0.405,
+    "routes": {
+     "blue": 151,
+     "orange": 48,
+     "unrouted": 1
+    },
+    "starts": 200,
+    "stuck_rate": 0.005,
+    "win_rate": 0.14
+   },
+   "1": {
+    "escape_rate": 0.02,
+    "finish_rank_variance": 5.096,
+    "finish_rate": 0.975,
+    "mean_finish_rank": 4.241,
+    "mean_rank": {
+     "descent": 3.785,
+     "half": 4.16,
+     "mixed": 3.8,
+     "quarter": 3.81,
+     "three_quarter": 4.375
+    },
+    "podium_rate": 0.415,
+    "routes": {
+     "blue": 158,
+     "orange": 42
+    },
+    "starts": 200,
+    "stuck_rate": 0.005,
+    "win_rate": 0.135
+   },
+   "2": {
+    "escape_rate": 0.015,
+    "finish_rank_variance": 4.874,
+    "finish_rate": 0.985,
+    "mean_finish_rank": 4.736,
+    "mean_rank": {
+     "descent": 5.255,
+     "half": 4.715,
+     "mixed": 5.23,
+     "quarter": 5.23,
+     "three_quarter": 4.685
+    },
+    "podium_rate": 0.32,
+    "routes": {
+     "blue": 154,
+     "orange": 46
+    },
+    "starts": 200,
+    "stuck_rate": 0.0,
+    "win_rate": 0.1
+   },
+   "3": {
+    "escape_rate": 0.01,
+    "finish_rank_variance": 5.333,
+    "finish_rate": 0.985,
+    "mean_finish_rank": 4.711,
+    "mean_rank": {
+     "descent": 4.805,
+     "half": 4.73,
+     "mixed": 4.815,
+     "quarter": 4.8,
+     "three_quarter": 4.705
+    },
+    "podium_rate": 0.32,
+    "routes": {
+     "blue": 155,
+     "orange": 44,
+     "unrouted": 1
+    },
+    "starts": 200,
+    "stuck_rate": 0.005,
+    "win_rate": 0.135
+   },
+   "4": {
+    "escape_rate": 0.01,
+    "finish_rank_variance": 5.488,
+    "finish_rate": 0.985,
+    "mean_finish_rank": 4.477,
+    "mean_rank": {
+     "descent": 4.26,
+     "half": 4.44,
+     "mixed": 4.24,
+     "quarter": 4.25,
+     "three_quarter": 4.475
+    },
+    "podium_rate": 0.37,
+    "routes": {
+     "blue": 157,
+     "orange": 42,
+     "unrouted": 1
+    },
+    "starts": 200,
+    "stuck_rate": 0.005,
+    "win_rate": 0.125
+   },
+   "5": {
+    "escape_rate": 0.015,
+    "finish_rank_variance": 4.545,
+    "finish_rate": 0.985,
+    "mean_finish_rank": 4.64,
+    "mean_rank": {
+     "descent": 5.32,
+     "half": 4.96,
+     "mixed": 5.3,
+     "quarter": 5.315,
+     "three_quarter": 4.81
+    },
+    "podium_rate": 0.315,
+    "routes": {
+     "blue": 144,
+     "orange": 55,
+     "unrouted": 1
+    },
+    "starts": 200,
+    "stuck_rate": 0.0,
+    "win_rate": 0.095
+   },
+   "6": {
+    "escape_rate": 0.02,
+    "finish_rank_variance": 5.123,
+    "finish_rate": 0.98,
+    "mean_finish_rank": 4.265,
+    "mean_rank": {
+     "descent": 4.245,
+     "half": 4.565,
+     "mixed": 4.2,
+     "quarter": 4.19,
+     "three_quarter": 4.475
+    },
+    "podium_rate": 0.4,
+    "routes": {
+     "blue": 130,
+     "orange": 70
+    },
+    "starts": 200,
+    "stuck_rate": 0.0,
+    "win_rate": 0.15
+   },
+   "7": {
+    "escape_rate": 0.02,
+    "finish_rank_variance": 5.038,
+    "finish_rate": 0.98,
+    "mean_finish_rank": 4.153,
+    "mean_rank": {
+     "descent": 4.03,
+     "half": 4.23,
+     "mixed": 4.115,
+     "quarter": 4.085,
+     "three_quarter": 4.22
+    },
+    "podium_rate": 0.455,
+    "routes": {
+     "blue": 150,
+     "orange": 50
+    },
+    "starts": 200,
+    "stuck_rate": 0.0,
+    "win_rate": 0.12
+   }
+  },
+  "slots_ranked": 8,
+  "strongest_slot": "6",
+  "strongest_win_rate": 0.15,
+  "weakest_slot": "5",
+  "weakest_win_rate": 0.095,
+  "win_rate_ratio": 1.5789,
+  "win_rate_spread_points": 5.5,
+  "worst_slot": 2
+ },
+ "fork_sample": 82,
+ "performance": {
+  "collider_chunks": 18,
+  "mean_sim_seconds": 40.0,
+  "mean_wall_seconds": 136.8908,
+  "seeds_per_second": 0.0782,
+  "seeds_per_wall_second": 0.0073,
+  "sim_per_wall": 0.292,
+  "wall_seconds_total": 2557.996,
+  "workers": 11
+ },
+ "quality": {
+  "mean_collisions": 105.5,
+  "mean_final_margin": 0.6739,
+  "mean_lead_changes": 4.81,
+  "mean_overtakes": 42.39,
+  "mean_top_speed": 69.461,
+  "mean_winner_lock_fraction": 0.2924,
+  "mean_winner_worst_rank": 2.855,
+  "median_final_margin": 0.5333,
+  "median_winner_lock_fraction": 0.2933
+ },
+ "racers": 1600,
+ "races": 200,
+ "reliability": {
+  "all_finished_races": 173,
+  "all_finished_rate": 0.865,
+  "escape_rate": 0.015,
+  "finish_rate": 0.9825,
+  "finishers_histogram": {
+   "6": 1,
+   "7": 26,
+   "8": 173
+  },
+  "loss_sites": {
+   "final[0]": 4,
+   "launch[20]": 2,
+   "launch[40]": 1,
+   "leg3[100]": 1,
+   "leg3[80]": 3,
+   "orange[20]": 10,
+   "orange_lead[0]": 6
+  },
+  "max_travel_falling": 0.74894,
+  "max_travel_per_tick": 0.74472,
+  "stuck_rate": 0.0025,
+  "travel_budget": 0.5,
+  "worst_actuator_overlap": -1.15231,
+  "worst_marble_overlap": -0.24588,
+  "worst_penetration": -0.35865
+ },
+ "routes": {
+  "blue": {
+   "entries": 1199,
+   "entry_share": 0.7513,
+   "escape_rate": 0.0033,
+   "finish_rate": 0.995,
+   "mean_finish_rank": 4.764,
+   "mean_rank_change_from_half": -0.229,
+   "mean_time": 23.1322,
+   "median_time": 23.05,
+   "stuck_rate": 0.0017,
+   "win_rate": 0.0834
+  },
+  "orange": {
+   "entries": 397,
+   "entry_share": 0.2487,
+   "escape_rate": 0.0403,
+   "finish_rate": 0.9547,
+   "mean_finish_rank": 3.414,
+   "mean_rank_change_from_half": 0.942,
+   "mean_time": 22.2566,
+   "median_time": 22.05,
+   "stuck_rate": 0.005,
+   "win_rate": 0.2519
+  }
+ },
+ "routes_built": "both",
+ "selection": {
+  "eligible": 173,
+  "shortlist": [
+   {
+    "final_margin": 0.05,
+    "lead_changes": 7,
+    "overtakes": 34,
+    "routes": {
+     "blue": 5,
+     "orange": 3
+    },
+    "score": 4.5708,
+    "seconds": 40.0,
+    "seed": 4060,
+    "terms": {
+     "comeback": 1.0,
+     "lock": 0.8458,
+     "margin": 0.975,
+     "split": 0.75,
+     "turnover": 1.0
+    },
+    "winner_lock_fraction": 0.5075,
+    "winner_route": "orange",
+    "winner_slot": 0,
+    "winner_worst_rank": 7
+   },
+   {
+    "final_margin": 0.3167,
+    "lead_changes": 13,
+    "overtakes": 50,
+    "routes": {
+     "blue": 4,
+     "orange": 4
+    },
+    "score": 4.5445,
+    "seconds": 40.0,
+    "seed": 4120,
+    "terms": {
+     "comeback": 1.0,
+     "lock": 0.7028,
+     "margin": 0.8417,
+     "split": 1.0,
+     "turnover": 1.0
+    },
+    "winner_lock_fraction": 0.4217,
+    "winner_route": "orange",
+    "winner_slot": 5,
+    "winner_worst_rank": 6
+   },
+   {
+    "final_margin": 0.45,
+    "lead_changes": 10,
+    "overtakes": 45,
+    "routes": {
+     "blue": 5,
+     "orange": 3
+    },
+    "score": 4.3528,
+    "seconds": 40.0,
+    "seed": 4002,
+    "terms": {
+     "comeback": 1.0,
+     "lock": 0.8278,
+     "margin": 0.775,
+     "split": 0.75,
+     "turnover": 1.0
+    },
+    "winner_lock_fraction": 0.4967,
+    "winner_route": "orange",
+    "winner_slot": 4,
+    "winner_worst_rank": 6
+   },
+   {
+    "final_margin": 0.1,
+    "lead_changes": 6,
+    "overtakes": 54,
+    "routes": {
+     "blue": 5,
+     "orange": 3
+    },
+    "score": 4.3285,
+    "seconds": 40.0,
+    "seed": 4139,
+    "terms": {
+     "comeback": 0.8,
+     "lock": 0.8285,
+     "margin": 0.95,
+     "split": 0.75,
+     "turnover": 1.0
+    },
+    "winner_lock_fraction": 0.4971,
+    "winner_route": "orange",
+    "winner_slot": 6,
+    "winner_worst_rank": 5
+   },
+   {
+    "final_margin": 0.0833,
+    "lead_changes": 9,
+    "overtakes": 39,
+    "routes": {
+     "blue": 6,
+     "orange": 2
+    },
+    "score": 4.3112,
+    "seconds": 40.0,
+    "seed": 4031,
+    "terms": {
+     "comeback": 1.0,
+     "lock": 0.8528,
+     "margin": 0.9584,
+     "split": 0.5,
+     "turnover": 1.0
+    },
+    "winner_lock_fraction": 0.5117,
+    "winner_route": "orange",
+    "winner_slot": 2,
+    "winner_worst_rank": 7
+   },
+   {
+    "final_margin": 0.2167,
+    "lead_changes": 6,
+    "overtakes": 47,
+    "routes": {
+     "blue": 6,
+     "orange": 2
+    },
+    "score": 4.2327,
+    "seconds": 40.0,
+    "seed": 4111,
+    "terms": {
+     "comeback": 1.0,
+     "lock": 0.841,
+     "margin": 0.8917,
+     "split": 0.5,
+     "turnover": 1.0
+    },
+    "winner_lock_fraction": 0.5046,
+    "winner_route": "orange",
+    "winner_slot": 5,
+    "winner_worst_rank": 8
+   },
+   {
+    "final_margin": 0.6667,
+    "lead_changes": 10,
+    "overtakes": 48,
+    "routes": {
+     "blue": 5,
+     "orange": 3
+    },
+    "score": 4.1971,
+    "seconds": 40.0,
+    "seed": 4078,
+    "terms": {
+     "comeback": 1.0,
+     "lock": 0.7805,
+     "margin": 0.6666,
+     "split": 0.75,
+     "turnover": 1.0
+    },
+    "winner_lock_fraction": 0.4683,
+    "winner_route": "blue",
+    "winner_slot": 1,
+    "winner_worst_rank": 6
+   },
+   {
+    "final_margin": 0.0833,
+    "lead_changes": 10,
+    "overtakes": 43,
+    "routes": {
+     "blue": 6,
+     "orange": 2
+    },
+    "score": 4.1584,
+    "seconds": 40.0,
+    "seed": 4096,
+    "terms": {
+     "comeback": 1.0,
+     "lock": 0.7,
+     "margin": 0.9584,
+     "split": 0.5,
+     "turnover": 1.0
+    },
+    "winner_lock_fraction": 0.42,
+    "winner_route": "orange",
+    "winner_slot": 6,
+    "winner_worst_rank": 6
+   },
+   {
+    "final_margin": 0.1,
+    "lead_changes": 6,
+    "overtakes": 46,
+    "routes": {
+     "blue": 5,
+     "orange": 3
+    },
+    "score": 4.1312,
+    "seconds": 40.0,
+    "seed": 4134,
+    "terms": {
+     "comeback": 0.6,
+     "lock": 0.8312,
+     "margin": 0.95,
+     "split": 0.75,
+     "turnover": 1.0
+    },
+    "winner_lock_fraction": 0.4987,
+    "winner_route": "orange",
+    "winner_slot": 6,
+    "winner_worst_rank": 4
+   },
+   {
+    "final_margin": 0.3833,
+    "lead_changes": 5,
+    "overtakes": 36,
+    "routes": {
+     "blue": 5,
+     "orange": 3
+    },
+    "score": 4.082,
+    "seconds": 40.0,
+    "seed": 4146,
+    "terms": {
+     "comeback": 1.0,
+     "lock": 0.6903,
+     "margin": 0.8084,
+     "split": 0.75,
+     "turnover": 0.8333
+    },
+    "winner_lock_fraction": 0.4142,
+    "winner_route": "orange",
+    "winner_slot": 5,
+    "winner_worst_rank": 7
+   },
+   {
+    "final_margin": 0.0667,
+    "lead_changes": 15,
+    "overtakes": 46,
+    "routes": {
+     "blue": 7,
+     "orange": 1
+    },
+    "score": 4.073,
+    "seconds": 40.0,
+    "seed": 4185,
+    "terms": {
+     "comeback": 1.0,
+     "lock": 0.8563,
+     "margin": 0.9667,
+     "split": 0.25,
+     "turnover": 1.0
+    },
+    "winner_lock_fraction": 0.5138,
+    "winner_route": "orange",
+    "winner_slot": 5,
+    "winner_worst_rank": 7
+   },
+   {
+    "final_margin": 0.15,
+    "lead_changes": 8,
+    "overtakes": 46,
+    "routes": {
+     "blue": 6,
+     "orange": 2
+    },
+    "score": 3.9298,
+    "seconds": 40.0,
+    "seed": 4107,
+    "terms": {
+     "comeback": 1.0,
+     "lock": 0.5048,
+     "margin": 0.925,
+     "split": 0.5,
+     "turnover": 1.0
+    },
+    "winner_lock_fraction": 0.3029,
+    "winner_route": "orange",
+    "winner_slot": 3,
+    "winner_worst_rank": 6
+   }
+  ]
+ }
+}

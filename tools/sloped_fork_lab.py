@@ -63,6 +63,9 @@ KNOBS = {
     # `taper_from` and `taper_to` are where the apron's rim eases in to the
     # channel edge. All three decide whether the west shoulder dead-ends.
     "merge_window": ("sloped.course", "MERGE_GUARD_WINDOW"),
+    # orange's own rail, which is the course's smallest - 0.82 of the hero
+    # profile - on the course's tightest corner.
+    "orange_boost": ("sloped.course", "GUARD_BOOSTS[orange]"),
     "taper_from": ("sloped.stations", "MergeCatch.TAPER_FROM"),
     "taper_to": ("sloped.stations", "MergeCatch.TAPER_TO"),
     # Two entries of a spec dict rather than module constants; `_target`

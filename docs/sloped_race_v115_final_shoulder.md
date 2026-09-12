@@ -175,3 +175,65 @@ at 0.0571 and left, it holds a marble launched into it at rest or at 6 wu/s, and
 in whole races it costs one racer in four hundred. It is recorded here rather
 than fixed, because it is a different mechanism in a different place and section
 8 of the brief asks for the smallest fix to the defect under investigation.
+
+## The 200-seed gate: passed on fairness, short on reliability, and it names why
+
+Seeds 4001-4200, 1600 racers, the shipped configuration.
+
+    finish 0.983   all-eight 0.865   escape 0.015   stuck 0.003
+    blue   share 0.751   completion 0.995   median 23.05 s
+    orange share 0.249   completion 0.955   median 22.05 s
+
+    loss sites  orange[20] 10   orange_lead[0] 6   final[0] 4
+                leg3[80] 3   launch[20] 2   launch[40] 1   leg3[100] 1
+
+Against section 12's targets: blue and orange completion are both met (0.995
+and 0.955 against 0.95), per-racer finish is 0.983 against 0.99 and all-eight
+0.865 against 0.90. **`final[10]` is gone** - `final[0]` is a bin of the
+sprint's first twenty samples and holds four.
+
+**Fairness is the best this course has recorded**, by a wide margin, and every
+measure agrees rather than one carrying the verdict:
+
+    metric                V1.11    V1.15     target
+    win-rate ratio        6.618    1.579     <= 2.0-2.5   met
+    podium ratio          1.957    1.444                  met
+    slot mean-rank SD    0.2997   0.2182
+    slot mean-rank span   0.854    0.583
+    slot/rank Spearman  -0.0721  -0.0155
+    early spread (9%)     2.078    1.535   diluting to 0.583 at the line
+
+Entertainment over the same 200: 4.81 lead changes, 42.4 overtakes, winner lock
+0.292, winner's worst rank 2.855, final margin 0.674 mean and 0.533 median.
+
+### The new leading site is orange's own lobe, and it is not the merge
+
+Sixteen of the twenty seven losses are `orange[20]` and `orange_lead[0]`, and
+the failure is an **escape** rather than a jam - 0.015 against 0.003.
+`tools/sloped_orange_trace.py` reports, per sample and over the whole field
+rather than only over the losers, how high a marble rides as a fraction of the
+run's own containment:
+
+    orange[]    16    18    20    21    22    23    24    26    28    30    34
+    highest   0.91  ....  1.22  1.23  1.91  1.95  1.89  1.54  1.23  1.09  1.00
+
+**The field rides over the top of orange's rail for sixteen consecutive
+samples.** Two facts explain it and both are geometry rather than traffic:
+
+* orange's lobe is the **tightest corner on the course** - the turn radius
+  falls to 2.74 simulation units at `orange[18]` against leg2's 1.77 at hero
+  scale but under half the bank - and at 32 degrees of bank that corner is
+  balanced at **20.5 wu/s**. The escapers' own speeds at their highest point
+  are 19.3 to 21.7.
+* orange carries the course's **smallest rail**. It is a branch, so its whole
+  profile is at `layout.BRANCH_SCALE` 0.82 and its containment is 1.1509
+  against the hero channel's 1.4035.
+
+So the smallest rail on the course sits on its hardest corner. That is the
+same shape as the three windows `GUARD_BOOSTS` already carries on the launch,
+leg1 and leg2 - "marbles at 16 to 31 layout units per second going over the top
+of the 0.26 rail" - and it is the same repair.
+
+**This is not a regression of the shoulder fix.** V1.14's held-out fifty booked
+four of 400 to the orange lobe, which is 1.0%; this run books sixteen of 1600,
+which is 1.0%. It is unchanged and was simply behind a larger defect.
