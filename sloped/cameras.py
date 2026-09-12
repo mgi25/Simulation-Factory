@@ -262,7 +262,25 @@ SECTIONS: tuple[Cut, ...] = (
     # racer crossing the band edge moved the aim 0.80 units - 1.4 diameters -
     # in a single frame, which `check_track` reports as an aim that snaps. At
     # 56 the whole field is inside it and there is no membership to change.
-    Cut("split", "promontory", fov=34.0, extent=16.0, elevation=26.0, bearing=8.0,
+    # **V1.15 widened the last three pack cuts, because the field is now on two
+    # lobes and they are about thirty layout units apart.** Every extent in this
+    # list was set against a blue-only race, where the pack is one line in one
+    # channel; with orange live, `frame_report` on the selected seed held 4, 2
+    # and 3 racers of eight here. Measured across five candidate replays, the
+    # widest the pack itself spans during each cut is:
+    #
+    #     cut       5432   5558   5585   5488   5007   old extent
+    #     split     31.8   26.5   28.7   26.4   25.7         16.0
+    #     branch    30.6   34.6   35.7   24.3   18.6         19.0
+    #     merge     33.0   35.8   34.6   21.3   25.1         15.0
+    #
+    # so each is framed at roughly half the width its own subject occupies.
+    # The new extents are the **median** of those five rather than the largest,
+    # so they are sized to the two-lobe field rather than fitted to the seed
+    # that ships. The same argument as `hairpin`'s, which is already in this
+    # file: "a hairpin is a shape that has to be read whole, so the extent is
+    # the turn's own width".
+    Cut("split", "promontory", fov=34.0, extent=28.0, elevation=26.0, bearing=8.0,
         target="pack", band=56.0, orbit=(5.0, -5.0), min_seconds=1.2),
     # Higher, for the same reason as `descent`: at 15 degrees the sprint's own
     # guard rail stood between the camera and the five racers the frustum
@@ -271,9 +289,9 @@ SECTIONS: tuple[Cut, ...] = (
     # at an extent of 14 the field, which is spread over most of a 48-unit band
     # by the last sprint, went from five racers in frame to one. Elevation was
     # the whole of the fix and extent was none of it.
-    Cut("branch", "branch_out", fov=36.0, extent=19.0, elevation=22.0, bearing=152.0,
+    Cut("branch", "branch_out", fov=36.0, extent=31.0, elevation=22.0, bearing=152.0,
         target="pack", band=48.0, dolly=(0.05, -0.05), min_seconds=1.4),
-    Cut("merge", "sprint", fov=34.0, extent=15.0, elevation=24.0, bearing=6.0,
+    Cut("merge", "sprint", fov=34.0, extent=32.0, elevation=24.0, bearing=6.0,
         target="pack", band=44.0, dolly=(0.05, -0.05), min_seconds=1.2),
     Cut("finish", "line", fov=36.0, extent=15.0, elevation=20.0, bearing=155.0,
         target="pair", orbit=(-4.0, 3.0), dolly=(0.14, -0.10), hold=1.7,
@@ -480,6 +498,43 @@ def _on_course(machine, offsets, route: str, progress: float):
     )
 
 
+def _pack_aim(machine, offsets, track, chosen, index) -> tuple[float, float, float]:
+    """Where to look when the pack is on more than one route.
+
+    The aim used to be `_on_course(leader's route, mean progress of everyone)`,
+    and on a two-route course that is wrong twice over: the mean is contaminated
+    by racers whose progress is measured along a *different* run, and the point
+    it produces is on the leader's lobe with the other lobe's racers nowhere
+    near the frame. Measured on the selected seed's `branch` cut, the pack is
+    two orange and one blue and the shot held **two racers of eight**; and when
+    the lead changes across the fork the aim steps from one lobe to the other,
+    which `check_track` reported as an aim moving 1.067 layout units in a frame
+    against a fastest racer's 0.530.
+
+    So each route present in the pack is projected onto its **own** run at its
+    **own** members' mean progress, and the aim is those points averaged by
+    member count. Between two lobes that is a point between them, which is what
+    a camera watching a split has to look at; on one route it is exactly the
+    old expression, which is what keeps every blue-only track reproducing.
+    """
+    by_route: dict[str, list[int]] = {}
+    for marble in chosen:
+        by_route.setdefault(track["routes"][marble] or "blue", []).append(marble)
+    points: list[tuple[float, float, float]] = []
+    weights: list[float] = []
+    for route, members in by_route.items():
+        if route not in offsets:
+            route = next(iter(offsets))
+        mean = sum(track["progress"][marble][index] for marble in members) / len(members)
+        points.append(_on_course(machine, offsets, route, mean))
+        weights.append(float(len(members)))
+    total = sum(weights)
+    return tuple(
+        sum(point[axis] * weight for point, weight in zip(points, weights)) / total
+        for axis in range(3)
+    )
+
+
 def _place(aim, spun, elevation_deg: float, reach: float) -> tuple[float, float, float]:
     """A camera position from an aim, a horizontal bearing and an elevation."""
     elevation = math.radians(elevation_deg)
@@ -606,14 +661,12 @@ def build_track(
                 lead = ranked[0]
                 headings.append(_heading_at(machine, track["places"][lead][index]))
                 continue
-            # The pack's mean progress, put back on the course. See
-            # `_on_course`: the centroid of the positions themselves is not a
-            # point on the course at a turn.
-            mean = sum(track["progress"][marble][index] for marble in chosen) / len(chosen)
-            centre = list(
-                _on_course(machine, offsets, track["routes"][chosen[0]], mean)
-            )
-            aims.append(tuple(centre))
+            # The pack's mean progress, put back on the course - **per route,
+            # and then averaged between them**. See `_on_course` for why the
+            # centroid of the positions themselves is not a point on the
+            # course at a turn, and `_pack_aim` for why one route is not
+            # enough once the field is on two.
+            aims.append(_pack_aim(machine, offsets, track, chosen, index))
             # The heading is the *course's* heading at the pack, taken from the
             # leader's own place, which is what the bearing is measured from.
             headings.append(_heading_at(machine, track["places"][chosen[0]][index]))

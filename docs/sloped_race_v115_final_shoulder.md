@@ -303,3 +303,81 @@ a two-and-a-half sigma swing on the rarest statistic in the report while the
 four measures built from every racer in every race did not move at all. Section
 14 says not to judge the start on it alone, and nothing else agrees with it.
 The 600-seed run is what settles it.
+
+## The 600-seed production benchmark
+
+Seeds 5001-5600, 4800 racers, none of them tuned on. Every reliability target
+in section 12 is met.
+
+### Reliability
+
+    per-racer finish   0.993     >= 0.99   met
+    all-eight races    0.947     >= 0.90   met
+    escape             0.004     near 0    met
+    stuck              0.003     near 0    met
+
+    loss sites, 31 of 4800:
+      orange_lead[0] 10   final[0] 10   leg3[80] 6
+      launch[40] 1   leg1[80] 1   leg1[100] 1   merge_lead[0] 1   orange_lead[20] 1
+
+The two leading sites are ten each - the merge lead's first twenty samples and
+the sprint's first twenty - which is 0.2% of the field apiece, and `leg3[80]`
+is the fork window at 0.125%. Nothing is concentrated.
+
+    travel per tick 0.74588 in the machine (budget 0.5), 0.75009 falling
+    penetration: track -0.37981, actuator -1.22536, marble-on-marble -0.2255
+
+Travel per tick is 49% over its 0.5 budget, which is the same figure V1.11
+recorded and left unexplained; it is carried forward rather than newly
+introduced. Actuator overlap is -1.22536 against V1.11's -1.15252.
+
+### Routes
+
+    route    share   completion   win rate   mean rank   median time
+    blue     0.739        0.997      0.096       4.729       22.92 s
+    orange   0.261        0.987      0.208       3.753       22.29 s
+
+Both completions clear 0.95 with room, and **orange is the faster route** - half
+a second quicker at the median, nearly a place better on mean finish rank, and
+it *gains* 0.84 places on average between halfway and the line where blue loses
+0.265. Twenty six per cent of the field takes it and it takes forty three per
+cent of the wins.
+
+That is a route advantage and it is worth stating plainly, but it is **not a
+start advantage**: the share of each bay's racers that end up on orange runs
+from 0.237 to 0.292 across the eight slots, so which route a marble takes is
+not decided by where it started. It is decided at the fork, on the marble's own
+momentum against leg3's bank, which is what `FORK_CREST` is for.
+
+### Fairness
+
+    metric                  V1.11    V1.15 (600)   target
+    win-rate ratio          6.618         2.674    2.0-2.5
+    podium ratio            1.957         1.442    met
+    slot mean-rank SD      0.2997        0.2629
+    slot mean-rank span     0.854         0.706
+    slot/rank Spearman    -0.0721       -0.0161
+    early spread (9%)       2.078         1.934    diluting to 0.706
+
+Section 14's combined picture: five of the six measures are comfortably inside
+target and the sixth, the win ratio, is marginally outside at 2.674. It is
+driven by slots 2 and 5, which win 0.062 and 0.070 against slot 1's 0.165 - and
+those are **the same two slots that arrive worst at the 9% mark**, 5.497 and
+5.495 against 3.563. So the win tail is the residual of a start disadvantage
+the course dilutes from 1.934 places to 0.706 by the line, not a separate
+finding. Spearman is -0.016 at every checkpoint, which is no relationship at
+all, and every bay finishes between 0.990 and 0.997 of the time.
+
+**The starting bay does not practically determine the outcome**, and section
+14's instruction not to reopen the start architecture on the win ratio alone
+applies: nothing else agrees with it.
+
+### Entertainment
+
+    lead changes           5.327
+    overtakes             44.237
+    winner lock fraction   0.3051 mean, 0.2977 median
+    winner worst rank      2.862
+    final margin           0.6717 mean, 0.5416 median
+    competitive pack       104.65 marble-on-marble contacts a race
+    top speed             65.958
