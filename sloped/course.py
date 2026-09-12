@@ -152,7 +152,48 @@ ROUTE_CHOICES = ("blue", "both")
 # V1 lost 319 of its 747 marbles there, every one booked to `blue[100]`.
 # Containment over the window is the apron's own outer walls and roof, which
 # span the whole of it.
-MERGE_GUARD_WINDOW = (0.0, -1, 0, 9, 14)
+#
+# ## V1.15: the window closes at 12, not at 9, and that is `final[10]`
+#
+# V1.12 through V1.14 shipped `(0.0, -1, 0, 9, 14)` and it put **two closures
+# on the same five samples**: the apron's rim eases in to the channel's own
+# edge between `MergeCatch.TAPER_FROM` and `FRONT`, which is `final[6.5]` to
+# `final[14]`, and this window eased the rails back up from `final[9]` to
+# `final[14]`. The clear shoulder between the sprint's rail foot and that rim
+# is therefore closing while the rail beside it is climbing:
+#
+#     final[]      8      9     10     11     12     13     14
+#     shoulder  1.976  1.639  1.219  0.778  0.381  0.090 -0.029
+#     rail      0.422  0.422  0.524  0.767  1.058  1.301  1.404
+#
+# A marble is 1.0 across, so from `final[11]` the shoulder is narrower than the
+# marble standing on it - and by then the lip has climbed 0.40 out of the
+# channel edge. The rim wall sweeps across the marble's path, the lip stops it
+# going the other way, and it wedges between them. The pose is one pose:
+# `final[10.34]` at across **-2.208**, rise 0.889, in contact with `merge` and
+# `final` at once. `tools/sloped_final_trace.py` found **all 32** of the 50
+# held-out seeds' non-finishers there, 29 of them orange; V1.12's own rebuild
+# notes record six of six marbles resting at "along +3.27, across -2.19", which
+# is the same corner measured before the shoulder was named.
+#
+# The rule that removes it is not a sample number: **wherever the shoulder is
+# still wide enough to hold a marble, the rail beside it must still be open**,
+# so a marble the rim is squeezing has somewhere to go. The shoulder is under a
+# diameter from `final[11]`, so the rails may start rising at 12 and no earlier,
+# and they must be full by 14 because that is where the apron's own wall ends -
+# which is the property `test_the_front_is_closed_and_the_rails_take_over`
+# already pins. 12 and 14 is the only pair that satisfies both.
+#
+# Measured on the same 24 seeds, 192 racers a row, everything else held:
+#
+#     configuration    finish   all8    esc    stk | blue fin | orng fin
+#     9/14 (V1.14)      0.885   0.33  0.005  0.109 |    0.985 |    0.672
+#     12/14             0.990   0.92  0.005  0.005 |    1.000 |    0.983
+#
+# The route share is **identical** at 0.693/0.302, so this buys survival
+# without moving the split, and `final[10]`, `final[8]`, `final[7]` and
+# `merge_lead[11]` all leave the loss ledger entirely.
+MERGE_GUARD_WINDOW = (0.0, -1, 0, 12, 14)
 
 # The same thing on blue's own last samples, which are inside the apron too.
 # `(side, full-before, open-from, open-to, full-after)` with a side of zero

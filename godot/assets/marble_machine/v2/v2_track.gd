@@ -275,6 +275,86 @@ static func _smooth(t: float) -> float:
 	return u * u * (3.0 - 2.0 * u)
 
 
+const OPEN_FLOOR := 0.05
+
+
+static func wall_factor(count: int, open_side: Array) -> Array:
+	## How much of one wall stands at each sample, as a fraction of full.
+	##
+	## `sloped.track.TrackRun.wall_factor`, sample for sample. The physics
+	## course opens a rail wherever a marble is meant to pass through it - the
+	## fork window in leg3's east guard, orange's lead on its west lip, and
+	## every run standing inside the merge apron - and until this existed the
+	## render drew a full-height acrylic rail across every one of them. A wall
+	## the physics does not have is a wall a viewer watches a marble go
+	## straight through, which is the same defect as `guard_rise` in the
+	## opposite direction.
+	##
+	## `[side, a, b, c, d]` with an optional sixth entry: full height at or
+	## before `a`, eased down to the floor fraction by `b`, held to `c`, eased
+	## back to full by `d`. The sixth entry is the floor, `OPEN_FLOOR` unless
+	## given - the fork's sorting crest passes 0.12 there, and the render has
+	## to draw the crest a marble is being sorted by.
+	var out: Array = []
+	if open_side.size() < 5:
+		for _index in count:
+			out.append(1.0)
+		return out
+	var a := float(open_side[1])
+	var b := float(open_side[2])
+	var c := float(open_side[3])
+	var d := float(open_side[4])
+	var floor_fraction: float = OPEN_FLOOR
+	if open_side.size() > 5:
+		floor_fraction = float(open_side[5])
+	for index in count:
+		var i := float(index)
+		var value := 1.0
+		if i <= a or i >= d:
+			value = 1.0
+		elif i >= b and i <= c:
+			value = floor_fraction
+		elif i < b:
+			value = 1.0 + (floor_fraction - 1.0) * _smooth((i - a) / maxf(b - a, 1.0))
+		else:
+			value = floor_fraction + (1.0 - floor_fraction) * _smooth(
+				(i - c) / maxf(d - c, 1.0))
+		out.append(value)
+	return out
+
+
+static func _open_section(section: Array, side: float, factor: float,
+		scale: float, profile_scale := 1.0) -> Array:
+	## One section with the named wall scaled toward the cradle's own edge.
+	##
+	## The rule is `sloped.track.TrackRun.section_at`'s, point for point: a
+	## point moves when it is outside 98% of the clear half width **and** above
+	## the height the cradle reaches there, and it moves to
+	## `edge + (up - edge) * factor`. Scaling toward the edge rather than
+	## deleting the points keeps the ring's point count, which is what both the
+	## collider strip and this sweep need.
+	##
+	## A `side` of zero opens **both** walls; the sprint, blue's tail and the
+	## merge lead all need that, because the apron stands around all three.
+	if factor >= 1.0:
+		return section
+	# `scale` here is the profile scale times this sample's width factor, so
+	# the half width is widened; the *rise* is not, because `scaled_sections`
+	# scales `x` only and a widened channel keeps its own floor depth.
+	var half := CHANNEL_HALF * scale
+	var edge := _floor_y_at(CHANNEL_HALF) * profile_scale
+	var out: Array = []
+	for point in section:
+		var value: Vector2 = point
+		var outside := absf(value.x) > half * 0.98
+		var named: bool = side == 0.0 or value.x * side > half * 0.98
+		if outside and named and value.y > edge:
+			out.append(Vector2(value.x, edge + (value.y - edge) * factor))
+		else:
+			out.append(value)
+	return out
+
+
 static func _raise_rail(section: Array, extra: float) -> Array:
 	## One guard section with its top points lifted.
 	##
@@ -382,9 +462,20 @@ static func build(palette, controls: Array, node_name: String,
 	var guard_key := str(options.get("guard", "acrylic_guard"))
 	var scale: float = float(options.get("scale", 1.0))
 
+	# open_side: the physics course opens a rail wherever a marble is meant to
+	# pass through it, and until this was plumbed through the render drew a
+	# full-height one there. `[side, a, b, c, d]` plus an optional floor
+	# fraction, the same tuple `sloped.course` hands `TrackRun`; empty means
+	# every wall stands, which is what every earlier build gets.
+	var open_side: Array = options.get("open_side", [])
+	var opening: Array = wall_factor(path.size(), open_side)
+	var open_at: float = 0.0 if open_side.is_empty() else float(open_side[0])
+
 	var body := _sized(channel_section(), scale)
 	var body_set: Array = V2Forms.scaled_sections(
 		body, V2Forms.section_normals(body), path.size(), widths)
+	if not open_side.is_empty():
+		body_set = _opened_set(body_set, open_at, opening, scale, widths)
 	root.add_child(Forms.mesh_node(
 		V2Forms.banked_sweep(path, body_set[0], body_set[1], banks),
 		palette.get_material(shell_key), "Shell"))
@@ -424,6 +515,8 @@ static func build(palette, controls: Array, node_name: String,
 			for index in path.size():
 				raised.append(_raise_rail(guard_set[0][index], rise[index] * scale))
 			guard_set[0] = raised
+		if not open_side.is_empty():
+			guard_set = _opened_set(guard_set, open_at, opening, scale, widths)
 		root.add_child(Forms.mesh_node(
 			V2Forms.banked_sweep(path, guard_set[0], guard_set[1], banks),
 			palette.get_material(guard_key),
@@ -436,6 +529,29 @@ static func build(palette, controls: Array, node_name: String,
 		_ribs(root, palette, path, banks, widths, scale)
 	root.set_meta("scale", scale)
 	return root
+
+
+static func _opened_set(section_set: Array, side: float, opening: Array,
+		scale: float, widths: Array) -> Array:
+	## `[sections, normals]` with the named wall opened per sample.
+	##
+	## The normals are recomputed from the moved section rather than carried
+	## over, because a folded lip faces a different way from a standing one and
+	## a sweep lit by the old normals reads as a wall that is still there.
+	var sections: Array = []
+	var normals: Array = []
+	for index in section_set[0].size():
+		# The sections have already been widened laterally, so the half width
+		# the rule compares against is widened too - which is the same test
+		# `sloped.track.TrackRun.section_at` makes before `ring_points` widens
+		# anything, scaled on both sides.
+		var width: float = float(widths[mini(index, widths.size() - 1)])
+		var opened: Array = _open_section(
+			section_set[0][index], side, float(opening[index]), scale * width,
+			scale)
+		sections.append(opened)
+		normals.append(V2Forms.section_normals(opened))
+	return [sections, normals]
 
 
 static func _sized(points: Array, scale: float) -> Array:

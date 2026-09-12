@@ -1919,6 +1919,26 @@ class MergeCatch(MarbleModule):
     # Where the outer rim starts easing in to the channel's edge, so the
     # shoulder converges into the channel rather than ending in a free lip.
     TAPER_FROM = 1.20
+    # Where it has finished easing in. `None` means `FRONT`, which is what
+    # V1.12 through V1.14 shipped and what every number in
+    # `docs/sloped_race_v112_merge.md` is measured on.
+    #
+    # **It must not be `FRONT`, and that is `final[10]`.** The rim's taper and
+    # `sloped.course.MERGE_GUARD_WINDOW`'s closing ramp both run from the
+    # sprint's sample 9 to its sample 14, so the shoulder narrows below a
+    # marble diameter at `final[11]` at the same stations the sprint's own lip
+    # is climbing back out of the channel edge - 0.17 units of it by
+    # `final[10.6]`, 0.38 by `final[12]`. A marble running down the west
+    # shoulder is driven into the corner between the two and wedges there.
+    # `tools/sloped_final_lab.py` reproduces it from 69 of 90 launches at one
+    # pose, `final[10.34]` at across -2.208, which is the pose 26 of the 38
+    # held-out non-finishers were found in.
+    #
+    # So the taper has to finish **before** the guard window starts closing:
+    # 1.673 layout units is the sprint's sample 9, `MERGE_GUARD_WINDOW`'s
+    # `open-to`. `TAPER_FROM` moves back with it so the wall is no steeper in
+    # plan than it was - see `rim`.
+    TAPER_TO: float | None = None
     ACROSS = 2.30
     ROOF = 0.95                # above the local channel's own contact point
     FUNNEL = 0.16              # how far the rim stands above the channel's edge
@@ -2134,7 +2154,8 @@ class MergeCatch(MarbleModule):
         """
         _across, _rise, half, _edge, _guard, _scale = self._channel_at(along)
         wide = to_sim(self.ACROSS)
-        start, stop = to_sim(self.TAPER_FROM), to_sim(self.FRONT)
+        start = to_sim(self.TAPER_FROM)
+        stop = to_sim(self.FRONT if self.TAPER_TO is None else self.TAPER_TO)
         shut = half + self.RIM_MIN
         if along <= start:
             reach = max(wide, shut)
@@ -2412,6 +2433,9 @@ class MergeCatch(MarbleModule):
             "upstream": None if self.blue is None else self.blue.id,
             "along": [round(to_sim(self.BACK), 6), round(to_sim(self.FRONT), 6)],
             "taper_from": round(to_sim(self.TAPER_FROM), 6),
+            "taper_to": round(
+                to_sim(self.FRONT if self.TAPER_TO is None else self.TAPER_TO), 6
+            ),
             "across": round(to_sim(self.ACROSS), 6),
             "roof": round(to_sim(self.ROOF), 6),
             "wall_at": round(wall, 6),

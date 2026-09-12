@@ -78,6 +78,36 @@ const BANK_SLEWS := {
 	"blue": [84, 117, 1.0],
 	"orange": [0, 117, 1.0],
 }
+
+## Where a rail is **opened**, and how far. **The same table as the windows
+## `sloped.course` hands `TrackRun`, and it has to stay the same table**: the
+## collider has a gap at every one of these, so a render without them draws a
+## full-height acrylic wall exactly where a marble crosses.
+##
+## `[side, a, b, c, d]` plus an optional floor fraction - full height at or
+## before `a`, eased down by `b`, held to `c`, eased back to full by `d`. A
+## side of `1.0` is the east rail, `-1.0` the west, `0.0` both.
+##
+## * **leg3** is the fork. Its east guard stands at `sloped.course.FORK_CREST`
+##   of full height over `sloped.joins.FORK_GUARD_WINDOW`, which is the
+##   *sorting crest* rather than a hole: a marble crosses into orange on its
+##   own momentum against leg3's bank, and at 0.12 the crest is the threshold
+##   that decides. Drawing it full height is the mismatch section 19 of the
+##   V1.15 brief names.
+## * **blue's tail and the sprint** stand inside the merge apron's roof, and a
+##   rail inside a roofed apron leaves a ledge along its own top - V1 lost 319
+##   of its 747 marbles resting on one. The sprint's window closes at sample 14
+##   rather than 9 because the apron's shoulder is still wide enough to hold a
+##   marble at sample 11; see `sloped.course.MERGE_GUARD_WINDOW`.
+##
+## The two leads and the merge lead carry windows too, and they are absent here
+## for the reason every join is: this layout table has the seven authored runs
+## and no join geometry at all.
+const OPEN_SIDES := {
+	"leg3": [1.0, 81, 82, 90, 92, 0.12],
+	"blue": [0.0, 111, 113, 118, 119],
+	"final": [0.0, -1, 0, 12, 14],
+}
 # Fewer piers, each carrying more. At 5.6 a viaduct over the gorge came
 # out as a picket fence of thin frames; at 7.4 each one is a structure.
 const SUPPORT_SPACING := 7.4
@@ -149,6 +179,11 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 			"samples": int(options.get("samples", 118)),
 			"guard_boost": GUARD_BOOSTS.get(name, []),
 			"bank_slew": BANK_SLEWS.get(name, []),
+			# leg3's window is the fork, which only exists on the two-route
+			# course; `routes` is "blue" for a render of the through route
+			# alone, exactly as `sloped.course.sloped_course` reads it.
+			"open_side": ([] if (name == "leg3" and str(options.get("routes",
+				"both")) == "blue") else OPEN_SIDES.get(name, [])),
 			"ribs": detail != "block",
 		})
 		runs.add_child(run)

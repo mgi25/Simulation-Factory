@@ -58,6 +58,13 @@ KNOBS = {
     "pan_slew": ("sloped.stations", "ForkPan.RISE_SLEW"),
     "wall_height": ("sloped.stations", "ForkPanEnd.HEIGHT"),
     "crest": ("sloped.course", "FORK_CREST"),
+    # The merge, because V1.15's defect is downstream of the fork and the same
+    # harness has to price it: `merge_window` is the sprint's own guard window,
+    # `taper_from` and `taper_to` are where the apron's rim eases in to the
+    # channel edge. All three decide whether the west shoulder dead-ends.
+    "merge_window": ("sloped.course", "MERGE_GUARD_WINDOW"),
+    "taper_from": ("sloped.stations", "MergeCatch.TAPER_FROM"),
+    "taper_to": ("sloped.stations", "MergeCatch.TAPER_TO"),
     # Two entries of a spec dict rather than module constants; `_target`
     # handles the `[key]` form so the lead's roll law can be scanned too.
     "lead_ease": ("sloped.joins", "JOIN_SPECS[orange_lead][bank_ease_ends]"),

@@ -858,6 +858,13 @@ class TrackRun(MarbleModule):
             "guard_boost": (
                 None if self.guard_boost is None else list(self.guard_boost)
             ),
+            # The opened wall, so the render can draw the same gap the collider
+            # has. Every earlier build of this course drew a full-height rail
+            # wherever the physics had a window, which is a wall a viewer
+            # watches a marble pass through; see `wall_factor`.
+            "open_side": (
+                None if self.open_side is None else list(self.open_side)
+            ),
             "clear_width": round(self.clear_width, 6),
             "floor_offset": round(self.floor_offset, 6),
             "containment": round(self.containment, 6),

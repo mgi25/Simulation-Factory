@@ -1,0 +1,153 @@
+{
+ "rows": [
+  {
+   "label": "as built (9/14)"
+  },
+  {
+   "label": "window 12/14",
+   "merge_window": [
+    0.0,
+    -1,
+    0,
+    12,
+    14
+   ]
+  },
+  {
+   "label": "window 12/15",
+   "merge_window": [
+    0.0,
+    -1,
+    0,
+    12,
+    15
+   ]
+  },
+  {
+   "label": "taper_from 0.0",
+   "taper_from": 0.0
+  }
+ ],
+ "reports": [
+  {
+   "label": "as built (9/14)",
+   "racers": 192,
+   "finish": 0.8854,
+   "all_eight": 0.3333,
+   "escape": 0.0052,
+   "stuck": 0.1094,
+   "routes": {
+    "blue": {
+     "share": 0.6927,
+     "completion": 0.985,
+     "entries": 133
+    },
+    "orange": {
+     "share": 0.3021,
+     "completion": 0.6724,
+     "entries": 58
+    },
+    "unrouted": {
+     "share": 0.0052,
+     "completion": 0.0,
+     "entries": 1
+    }
+   },
+   "loss_sites": {
+    "final[10]": 15,
+    "final[8]": 3,
+    "final[7]": 1,
+    "merge_lead[11]": 1,
+    "launch[29]": 1,
+    "merge_lead[0]": 1
+   }
+  },
+  {
+   "label": "window 12/14",
+   "racers": 192,
+   "finish": 0.9896,
+   "all_eight": 0.9167,
+   "escape": 0.0052,
+   "stuck": 0.0052,
+   "routes": {
+    "blue": {
+     "share": 0.6927,
+     "completion": 1.0,
+     "entries": 133
+    },
+    "orange": {
+     "share": 0.3021,
+     "completion": 0.9828,
+     "entries": 58
+    },
+    "unrouted": {
+     "share": 0.0052,
+     "completion": 0.0,
+     "entries": 1
+    }
+   },
+   "loss_sites": {
+    "launch[29]": 1,
+    "merge_lead[0]": 1
+   }
+  },
+  {
+   "label": "window 12/15",
+   "racers": 192,
+   "finish": 0.9896,
+   "all_eight": 0.9167,
+   "escape": 0.0052,
+   "stuck": 0.0052,
+   "routes": {
+    "blue": {
+     "share": 0.6927,
+     "completion": 1.0,
+     "entries": 133
+    },
+    "orange": {
+     "share": 0.3021,
+     "completion": 0.9828,
+     "entries": 58
+    },
+    "unrouted": {
+     "share": 0.0052,
+     "completion": 0.0,
+     "entries": 1
+    }
+   },
+   "loss_sites": {
+    "launch[29]": 1,
+    "merge_lead[0]": 1
+   }
+  },
+  {
+   "label": "taper_from 0.0",
+   "racers": 192,
+   "finish": 0.9896,
+   "all_eight": 0.9167,
+   "escape": 0.0052,
+   "stuck": 0.0052,
+   "routes": {
+    "blue": {
+     "share": 0.6927,
+     "completion": 1.0,
+     "entries": 133
+    },
+    "orange": {
+     "share": 0.3021,
+     "completion": 0.9828,
+     "entries": 58
+    },
+    "unrouted": {
+     "share": 0.0052,
+     "completion": 0.0,
+     "entries": 1
+    }
+   },
+   "loss_sites": {
+    "launch[29]": 1,
+    "merge_lead[0]": 1
+   }
+  }
+ ]
+}
