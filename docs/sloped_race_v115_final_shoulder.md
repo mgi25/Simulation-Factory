@@ -381,3 +381,169 @@ applies: nothing else agrees with it.
     final margin           0.6717 mean, 0.5416 median
     competitive pack       104.65 marble-on-marble contacts a race
     top speed             65.958
+
+## The selected seed
+
+Five candidates from the 600-seed shortlist were raced and contact-validated
+**before** the pick, which is section 17's ordering:
+
+    seed   routes  leads  overtakes  margin  findings      penetration  resting gap
+    5432      4/4      8         64   0.283  none              -0.0697       0.0217
+    5558      4/4     11         50   0.133  10 floating       -0.1304       0.9812
+    5585      5/3     15         52   0.083  1 floating        -0.0592       0.3709
+    5488      5/3      6         60   0.050  3 floating        -0.1085       0.1206
+    5007      4/4      5         56   0.200  2 floating        -0.1370       0.1076
+
+**Seed 5432** ships. It is the only one with no contact findings at all and it
+is also the highest scorer, so contact cleanliness and the score agree for once
+rather than having to be traded. Its resting gap of 0.0217 is the best of the
+five by a factor of five.
+
+    1  marble 5  slot 0  orange  20.850 s
+    2  marble 2  slot 4  blue    21.133 s
+    3  marble 7  slot 7  orange  21.717 s
+    4  marble 4  slot 6  orange  22.633 s
+    5  marble 1  slot 5  blue    22.650 s
+    6  marble 6  slot 1  orange  23.500 s
+    7  marble 3  slot 2  blue    24.317 s
+    8  marble 0  slot 3  blue    24.417 s
+
+Eight of eight home, four on each route, the winner from sixth place on orange,
+a 0.283 s margin at the front and 0.017 s between fourth and fifth.
+
+## Determinism
+
+    seed 5432, both routes, 45 s
+    in process      20 runs, identical
+    fresh process   20 runs, identical
+    one against the other, identical
+
+    state     aafb0d3d872e6c5f6db3a6f52d567ae073f1888fbac4ea4970867c130cf17de6
+    events    20967c389c3cb55416cfbdffbfdc40e6faf2bc81c58e1aea6a151c1449029d6d
+    actuators c0ea40c29dc3345d87a2ac67b900838c3edc9e31c7e8696138c5d93156b27b5d
+    order     [5, 2, 7, 4, 1, 6, 3, 0]
+
+The state and event digests are the ones the exported replay carries, so the
+file that is rendered is the run that was measured. **Cross-machine determinism
+remains untested and is not claimed** - there is one machine here, and what the
+report carries instead is the environment metadata.
+
+## The video
+
+    output/sloped_race_v1/real_race_v16.mp4
+    1080x1920, 60 fps, no audio, 1568 frames = 26.13 s, 35.3 MiB
+
+PyBullet is authoritative at 240 Hz and Godot resimulates nothing: the scene
+reads transforms out of `race_5432.json` and sets them. The clip ends 5.3 s
+after the last crossing rather than at the end of the 45 s record, which is the
+camera omitting a settled tail and not a change to the timing.
+
+## The visual review, and the one thing it found that this session did not fix
+
+Twenty four frames were pulled from the rendered clip across every cut and
+reviewed under five independent lenses - start readability and sense of
+descent, pack visibility, branch-choice readability, merge and finish payoff,
+and physics-versus-render disagreement - with every finding then re-checked
+against the frames by a separate reader whose instruction was to refute it.
+
+### The start is drawn in the wrong place, and it has been since V1.8
+
+**The eight racers hang in mid-air for the first four seconds of the video.**
+This is the most visible defect in the deliverable and it is not a camera
+problem, an art problem or a physics problem: it is the render drawing a
+*different start module* from the one the physics runs.
+
+    physics   sloped.trapdoor.ShuffleFloor   bays 8   bay pitch 1.1053
+              lift 3.9292   yaw 23.96   marbles rest at y = 42.659 layout
+    render    course_modules.start()         bays 8   BAY_PITCH 0.63
+              DECK_TOP 0.0    drawn on NODES["start"] at y = 38.55 layout
+
+So the drawn grid sits **4.11 layout units below** the field and its lanes are
+**1.75 times too close together**. Measured off `start_a_t02.00.png`: sampling
+straight down from four marbles finds smooth background gradient for about 315
+pixels - three marble diameters - before any geometry appears.
+
+V1.8 replaced the start with a rotor chamber and a louvre trapdoor floor and
+the render was never updated; `course_modules.start()` still builds V1's fan
+pod. **Every video this project has shipped since V1.9 has the same defect**,
+so it is not a regression of V1.15's work - but it is the first thing a viewer
+sees, and it should be the next session's first render job. Fixing it means
+building `ShuffleFloor`'s chamber, rotor and louvre floor in GDScript, which is
+a new art module rather than the targeted camera correction section 21 allows,
+so it is reported here rather than attempted at the end of this chain.
+
+### Two camera corrections were made, and both are measured
+
+* **The finish lens was 15 and is now 24.** The aim is the midpoint of the
+  leading two, which on this seed run 5.3 layout units apart, and the delivery
+  frame is portrait: at `fov` 36 *vertical* on 1080x1920 the horizontal field
+  is 20.7 degrees, so an extent of 15 is 15 units tall and **8.4 wide**. The
+  pair plus the line does not fit in 8.4, and the rendered frame at the winning
+  moment had the leader mid-frame with the deck at the corner. 24 gives 13.5
+  units across.
+* **`split` holds 0.3 s longer.** The cut ended at leg3 0.72 and the fork's own
+  window is leg3 0.69 to 0.78, so the crossing fell into the next cut's opening
+  frames and all three `split` frames show one undivided channel. Swept against
+  `frame_report` over three replays, 0.3 is the largest hold that costs nothing
+  - past it the cut runs into the divergence itself and the two-lobe aim drops
+  racers out of both lobes:
+
+      hold   0.0   0.3   0.5   0.7   0.9
+      total  215   215   214   210   203      racers in frame, all cuts
+
+### What the review found and what was not changed
+
+Held, and reported rather than acted on:
+
+* **Branch choice is still not fully readable.** No frame shows a marble
+  arriving at the divider and taking a side. The two lobes are legible - the
+  `branch` and `merge` frames show the cyan and amber channels clearly, which
+  is what section 21 asked for - but the moment of choosing is not. The fork is
+  a two-unit divergence inside a field strung over thirty, and `split`'s own
+  history in `sloped.cameras` records that a fixed aim on the fork node gave "a
+  picture of two empty gantries with one marble in it at 42 pixels".
+* **The mid-race cuts hold three to five racers of eight rather than all
+  eight**, because the field is genuinely strung out over more than the band by
+  then. That is the race, not the camera.
+* **No penetration, no floating and no odd jumps anywhere on the running
+  course** - the contact validation's zero findings and the reviewers' reading
+  of the frames agree. The only floating is the start, above.
+
+## Tests
+
+`tests/test_sloped_open_side.py` is new and carries eight:
+
+* that every run standing inside the roofed apron has its rails opened and
+  nothing else does;
+* **`final[10]` as a property rather than as a sample number** - it walks the
+  apron's own `rim` and the run's own `wall_factor` and fails with the
+  offending sample named, so it fails again if either the taper or the window
+  moves without the other;
+* that the window reaches a renderer at all, through `describe`;
+* that `v2_track.gd` has a `wall_factor`, an `_open_section`, and actually
+  calls them on both the shell and the guard;
+* that the two implementations **agree as numbers** on the four window shapes
+  the course ships, to 1e-6, run headless through Godot;
+* that the two tables are equal, parsed as numbers rather than string-matched
+  because GDScript and Python spell the same float differently;
+* that the **built mesh** carries the fork crest at `edge + (CONTAINMENT_TOP -
+  edge) * FORK_CREST` with its neighbours untouched;
+* and that the parity harness discriminates.
+
+`tests/test_sloped_guards.py` gains orange as the fourth boosted run.
+
+Full suite: **1607 passed, 1 skipped**, with Godot present so the render-facing
+parity tests run rather than skip.
+
+## What the next session should look at, in order
+
+1. **The start render.** Four seconds of floating marbles is the first thing a
+   viewer sees and it is a bigger visual defect than anything this session
+   fixed. `ShuffleFloor`'s chamber, rotor and louvre floor need building in
+   `course_modules.gd` at bay pitch 1.1053 and lift 3.9292.
+2. **`orange_lead[0]`**, ten of the 600-seed benchmark's thirty one losses and
+   its largest single site. The lead is a join and joins take neither a guard
+   boost nor a bank slew, so it needs a look at whether they should.
+3. **Travel per tick, 0.74588 against a 0.5 budget.** V1.11 recorded 0.744 and
+   left it unexplained; it is unchanged, so it is inherited rather than new,
+   but it has now survived two production benchmarks without being traced.

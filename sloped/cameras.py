@@ -280,8 +280,29 @@ SECTIONS: tuple[Cut, ...] = (
     # that ships. The same argument as `hairpin`'s, which is already in this
     # file: "a hairpin is a shape that has to be read whole, so the extent is
     # the turn's own width".
+    # **`hold` is V1.15's, and it is where the fork actually happens.** The cut
+    # ends at `promontory`, leg3 at 0.72, and the fork's own window is leg3
+    # samples 81 to 92 of 118 - 0.69 to 0.78 - so the leader crosses the
+    # divider within a tenth of a second of the boundary and the crossing
+    # landed in the *next* cut's opening frames. Reviewed against the rendered
+    # frames, `split_a`, `split_b` and `split_c` all show one undivided channel
+    # with the fork gantry at the frame edge: a viewer sees the approach to a
+    # choice and never the choice.
+    #
+    # **0.3 is the most hold that costs nothing, and that is measured rather
+    # than chosen.** Swept against `frame_report` over three replays, total
+    # racers in frame across every cut:
+    #
+    #     hold   0.0   0.3   0.5   0.7   0.9
+    #     total  215   215   214   210   203
+    #
+    # Past 0.3 the cut runs into the divergence itself, where the pack aim sits
+    # between two lobes and drops racers out of both - at 0.9 `split` holds
+    # three of eight instead of seven. So this buys a third of a second more of
+    # the divider at no cost and **does not fully solve branch-choice
+    # readability**; the crossing itself is still mostly the `branch` cut's.
     Cut("split", "promontory", fov=34.0, extent=28.0, elevation=26.0, bearing=8.0,
-        target="pack", band=56.0, orbit=(5.0, -5.0), min_seconds=1.2),
+        target="pack", band=56.0, orbit=(5.0, -5.0), hold=0.3, min_seconds=1.2),
     # Higher, for the same reason as `descent`: at 15 degrees the sprint's own
     # guard rail stood between the camera and the five racers the frustum
     # arithmetic said were in frame, and the still came out empty. Closing in as
@@ -293,7 +314,16 @@ SECTIONS: tuple[Cut, ...] = (
         target="pack", band=48.0, dolly=(0.05, -0.05), min_seconds=1.4),
     Cut("merge", "sprint", fov=34.0, extent=32.0, elevation=24.0, bearing=6.0,
         target="pack", band=44.0, dolly=(0.05, -0.05), min_seconds=1.2),
-    Cut("finish", "line", fov=36.0, extent=15.0, elevation=20.0, bearing=155.0,
+    # **Widened from 15 in V1.15, because the win was at the frame edge.** The
+    # aim is the midpoint of the leading two and on the selected seed they run
+    # 5.3 layout units apart, so each sits 2.65 off the aim - and the delivery
+    # frame is portrait. At `fov` 36 *vertical* and 1080x1920 the horizontal
+    # field is only 2*atan(tan(18 deg) * 1080/1920) = 20.7 degrees, so an
+    # extent of 15 is 15 units tall and **8.4 wide**. The pair plus the line
+    # does not fit in 8.4, and the rendered frame at the winning moment has the
+    # leader mid-frame with the finish deck at the corner. At 24 the horizontal
+    # field is 13.5 units, which holds the pair and the line they are crossing.
+    Cut("finish", "line", fov=36.0, extent=24.0, elevation=20.0, bearing=155.0,
         target="pair", orbit=(-4.0, 3.0), dolly=(0.14, -0.10), hold=1.7,
         min_seconds=1.6),
 )
