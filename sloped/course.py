@@ -166,6 +166,10 @@ ROUTE_CHOICES = ("blue", "both")
 #     shoulder  1.976  1.639  1.219  0.778  0.381  0.090 -0.029
 #     rail      0.422  0.422  0.524  0.767  1.058  1.301  1.404
 #
+# `rail` is the top of the opened guard over the sprint's own cradle bottom;
+# the cradle's clear edge is at 0.370, so the 0.05 floor is a 0.05 lip and the
+# full rail is 1.03 of wall.
+#
 # A marble is 1.0 across, so from `final[11]` the shoulder is narrower than the
 # marble standing on it - and by then the lip has climbed 0.40 out of the
 # channel edge. The rim wall sweeps across the marble's path, the lip stops it

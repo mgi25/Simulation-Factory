@@ -52,7 +52,7 @@ in simulation units:
 
     final[]                      8      9     10     11     12     13     14
     clear shoulder (rim-rail) 1.976  1.639  1.219  0.778  0.381  0.090 -0.029
-    rail top above the edge   0.422  0.422  0.524  0.767  1.058  1.301  1.404
+    rail top over the cradle  0.422  0.422  0.524  0.767  1.058  1.301  1.404
 
 A marble is 1.0 across. From `final[11]` the shoulder is **narrower than the
 marble standing on it**, and by then the lip has climbed 0.40 out of the channel
@@ -123,8 +123,8 @@ to the corner.
 
 ## The instruments, and the one of mine that was wrong
 
-Two new ones, both aimed at the merge the way `tools/sloped_fork_trace.py` is
-aimed at the fork, and both reporting in the sprint's gravity-aligned frame
+Three new ones, all aimed at the merge the way `tools/sloped_fork_trace.py` is
+aimed at the fork, and all reporting in the sprint's gravity-aligned frame
 rather than in any run's banked profile units.
 
 * **`tools/sloped_final_shoulder.py`** walks every surface under a grid of
@@ -139,7 +139,10 @@ rather than in any run's banked profile units.
 * **`tools/sloped_final_lab.py`** launches single marbles onto the shoulder and
   asks only whether they passed `final[20]` or stopped. It reproduces the defect
   in seconds: **69 of 90 launches stopped at `final[10.34]`, across -2.208** -
-  the pose from the races - and after the fix the same set clears 368 of 384.
+  the pose from the races. On the wider set that ships as the regression - six
+  stations, eight lateral offsets, four speeds and two approach angles, 384
+  launches - the shipped window clears 368 against the old window's 208, and
+  the 16 it does not clear are the older upstream basin below.
 
 **The lab's first sweep was worthless and said so by being too good.** It probed
 for the floor with one downward ray, and inside a roofed apron the first thing a

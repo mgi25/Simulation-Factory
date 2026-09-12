@@ -187,6 +187,8 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 			"ribs": detail != "block",
 		})
 		runs.add_child(run)
+		# The node's own name is display text; this is the key.
+		run.set_meta("run_name", name)
 		var path: Array = run.get_meta("path")
 		total_length += V2Forms.path_length(path)
 		root.set_meta("%s_path" % name, path)
@@ -203,9 +205,16 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 	var ground := Terrain.build(palette, terrain_cfg)
 	root.add_child(ground)
 
+	# **By the run's own recorded name, not by its node name.** `Track.build` is
+	# handed `name.capitalize()`, and GDScript's `capitalize()` puts a space
+	# before a digit - so "leg1" comes back as "Leg 1" and `to_lower()` gives
+	# "leg 1", which matches no run. `_spec_for` then pushed an error and fell
+	# back to `table["runs"][0]`, so every run whose name ends in a digit got
+	# the **launch's** profile scale and label for its supports. Layout B has
+	# three of them.
 	for entry in runs.get_children():
 		var run: Node3D = entry
-		var spec: Dictionary = _spec_for(table, run.name.to_lower())
+		var spec: Dictionary = _spec_for(table, str(run.get_meta("run_name", "")))
 		clearances.append_array(_supports(root, palette, run, terrain_cfg,
 			float(spec["scale"]), str(spec["name"])))
 

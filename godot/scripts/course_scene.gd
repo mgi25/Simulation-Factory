@@ -47,6 +47,14 @@ static var SHOTS := {
 		"elevation": 17.0, "bearing": 24.0},
 	"merge": {"at": ["node", "merge"], "extent": 14.0, "fov": 34.0,
 		"elevation": 15.0, "bearing": 32.0},
+	# Section 19 of the V1.15 brief: close enough on leg3's own east guard to
+	# see whether the wall the physics opens is drawn open. Aimed at the fork
+	# window's middle - leg3 samples 81 to 92 of 118 - and framed at five
+	# units, which is three channel widths, so the crest and the full-height
+	# rails either side of it are in one frame. A validation lens, not a
+	# storytelling one: it is never in `SEQUENCE`.
+	"fork_wall": {"at": ["path", "leg3", 0.74], "extent": 5.2, "fov": 30.0,
+		"elevation": 24.0, "bearing": 74.0},
 	"final_run": {"at": ["path", "final", 0.46], "extent": 24.0, "fov": 36.0,
 		"elevation": 13.0, "bearing": 40.0},
 	"finish": {"at": ["node", "finish"], "extent": 24.0, "fov": 34.0,
@@ -121,8 +129,13 @@ func _ready() -> void:
 	World.build_lights(self)
 	add_child(World.build(_palette))
 
+	# `routes` reaches `course_machine.OPEN_SIDES`: "both" opens leg3's east
+	# guard over the fork window, which is what the physics course that ships
+	# does, and "blue" leaves it standing - which is the control frame for
+	# section 19's before-and-after.
 	_course = Machine.build(_palette, _layout, {
 		"detail": str(options.get("detail", "block")),
+		"routes": str(options.get("routes", "both")),
 	})
 	add_child(_course)
 	_practicals()

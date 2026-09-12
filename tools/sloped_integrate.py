@@ -127,8 +127,10 @@ def paths_for(seed: int) -> dict[str, str]:
 # --- stages ---------------------------------------------------------------
 
 
-def stage_race(seed: int, marbles: int, duration: float, out: str) -> dict[str, Any]:
-    machine = sloped_course()
+def stage_race(
+    seed: int, marbles: int, duration: float, out: str, routes: str = "blue"
+) -> dict[str, Any]:
+    machine = sloped_course(routes=routes)
     findings = check_course(machine)
     if findings:
         raise IntegrationError(
@@ -160,10 +162,10 @@ def stage_race(seed: int, marbles: int, duration: float, out: str) -> dict[str, 
     return {"outcome": outcome.to_json(), "replay": out}
 
 
-def stage_cameras(replay_path: str, out: str) -> dict[str, Any]:
+def stage_cameras(replay_path: str, out: str, routes: str = "blue") -> dict[str, Any]:
     with open(replay_path, "r", encoding="utf-8") as handle:
         replay = json.load(handle)
-    machine = sloped_course()
+    machine = sloped_course(routes=routes)
     track = cameras_module.build_track(replay, machine, fps=FPS)
     problems = cameras_module.check_track(track, replay)
     cameras_module.write_track(track, out)
@@ -185,10 +187,12 @@ def stage_cameras(replay_path: str, out: str) -> dict[str, Any]:
     return {"cameras": out, "problems": problems}
 
 
-def stage_check(replay_path: str, out: str, stride: int) -> dict[str, Any]:
+def stage_check(
+    replay_path: str, out: str, stride: int, routes: str = "blue"
+) -> dict[str, Any]:
     with open(replay_path, "r", encoding="utf-8") as handle:
         replay = json.load(handle)
-    machine = sloped_course()
+    machine = sloped_course(routes=routes)
     report = check_replay(replay, machine, stride=stride)
     os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
     with open(out, "w", encoding="utf-8", newline="\n") as handle:
@@ -376,6 +380,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--video", default="",
         help="where to write the clip; defaults to VIDEO_PATH",
     )
+    # **The race, the cameras and the contact check must all build the same
+    # course**, and until V1.15 all three built `routes="blue"` regardless -
+    # which was right while the through route was the only one that worked and
+    # is wrong now that orange ships. A replay of a two-route race validated
+    # against a blue-only machine reports every orange marble as off the
+    # course, and a camera solved on one cannot find the branch at all.
+    parser.add_argument(
+        "--routes", default="both", choices=("blue", "both"),
+        help="which routes the course offers; \"both\" builds the fork",
+    )
     args = parser.parse_args(argv)
 
     paths = paths_for(args.seed)
@@ -394,11 +408,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     for stage in stages:
         print(f"--- {stage} ---")
         if stage == "race":
-            stage_race(args.seed, args.marbles, args.duration, paths["replay"])
+            stage_race(
+                args.seed, args.marbles, args.duration, paths["replay"], args.routes
+            )
         elif stage == "cameras":
-            stage_cameras(paths["replay"], paths["cameras"])
+            stage_cameras(paths["replay"], paths["cameras"], args.routes)
         elif stage == "check":
-            stage_check(paths["replay"], paths["contact"], args.stride)
+            stage_check(paths["replay"], paths["contact"], args.stride, args.routes)
         elif stage == "stills":
             stage_stills(godot, paths["replay"], paths["cameras"])
         elif stage == "clip":
