@@ -236,3 +236,63 @@ def _gd_table(body: str, name: str) -> dict[str, list[float]]:
     for key, values in re.findall(r'"([a-z0-9_]+)"\s*:\s*\[([^\]]*)\]', block):
         out[key] = [float(part) for part in values.split(",") if part.strip()]
     return out
+
+
+def test_the_drawn_fork_wall_is_the_height_the_physics_leaves():
+    """Section 19's proof, as numbers off the **built mesh**.
+
+    `godot/scripts/sloped_fork_gap_check.gd` sweeps leg3's east rail twice -
+    with the fork's window and without - reads the vertices of the resulting
+    `ArrayMesh`, and reports the tallest one per sample in the run's own banked
+    frame. Three things have to be true and each is a separate assertion: the
+    wall is open where the collider is open, its neighbours are at full height,
+    and the open height is the height the collider actually leaves rather than
+    merely "lower".
+
+    Measured in the run's banked frame and not in world height, which is a
+    correction: leg3 rolls 26 degrees at the fork, so a rail that has collapsed
+    to nothing still stands 0.44 above the centreline in world y from its
+    lateral offset alone - and the first run of this check reported exactly
+    that and read as a wall still standing.
+    """
+    try:
+        from tools.render_replay import find_godot
+    except ImportError:  # pragma: no cover - the tool moved
+        pytest.skip("tools.render_replay is not importable")
+    try:
+        godot = find_godot(None)
+    except Exception:
+        pytest.skip("Godot 4 is not available; set $GODOT_BIN to run this")
+
+    done = subprocess.run(
+        [godot, "--headless", "--script", "scripts/sloped_fork_gap_check.gd"],
+        cwd=str(ROOT / "godot"),
+        capture_output=True,
+        text=True,
+        timeout=600,
+    )
+    rows: dict[int, tuple[float, float]] = {}
+    for line in done.stdout.splitlines():
+        parts = line.strip().split(",")
+        if len(parts) == 3 and parts[0].isdigit():
+            rows[int(parts[0])] = (float(parts[1]), float(parts[2]))
+    assert rows, f"the check script printed nothing:\n{done.stdout}\n{done.stderr}"
+
+    machine = sloped_course(routes="both")
+    leg3 = machine.runs["leg3"]                           # type: ignore[attr-defined]
+    edge = layout.floor_y_at(layout.CHANNEL_HALF)
+    for index, (opened, closed) in sorted(rows.items()):
+        factor = leg3.wall_factor(index)
+        wanted = edge + (layout.CONTAINMENT_TOP - edge) * factor
+        assert opened == pytest.approx(wanted, abs=2e-4), (index, opened, wanted)
+        assert closed == pytest.approx(layout.CONTAINMENT_TOP, abs=2e-4), index
+        if factor >= 1.0:
+            assert opened == pytest.approx(closed, abs=2e-4), (
+                f"leg3[{index}] is outside the window and must be untouched"
+            )
+
+    crest = [row for index, row in rows.items() if leg3.wall_factor(index) < 0.2]
+    assert crest, "no sample in the window reached the crest"
+    assert max(value for value, _closed in crest) < 0.5 * layout.CONTAINMENT_TOP, (
+        "the drawn crest is still more than half a wall"
+    )
