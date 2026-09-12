@@ -121,6 +121,10 @@ def paths_for(seed: int) -> dict[str, str]:
         "replay": os.path.join(OUT_DIR, f"race_{seed}.json"),
         "cameras": os.path.join(OUT_DIR, f"cameras_{seed}.json"),
         "contact": os.path.join(OUT_DIR, f"contact_{seed}.json"),
+        # The start module's own geometry, so the renderer draws the start the
+        # physics runs rather than the one the layout table draws. See
+        # `tools/sloped_start_contract.py`.
+        "start": os.path.join(OUT_DIR, f"start_contract_{seed}.json"),
     }
 
 
@@ -160,6 +164,28 @@ def stage_race(
         )
     print(f"  wrote {out}")
     return {"outcome": outcome.to_json(), "replay": out}
+
+
+def stage_start_contract(out: str, routes: str = "both") -> dict[str, Any]:
+    """The start module's geometry, read off the built module and written out.
+
+    Its own stage rather than a line inside `race`, because the render stages
+    need it and a camera tweak should not have to re-simulate to get it.
+    """
+    from tools.sloped_start_contract import contract as build_contract
+
+    data = build_contract(routes)
+    os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
+    with open(out, "w", encoding="utf-8", newline="\n") as handle:
+        json.dump(data, handle, indent=1, sort_keys=True)
+        handle.write("\n")
+    print(
+        f"start: {data['kind']} lift {data['lift']} above {data['node']}, "
+        f"{data['bays']} bays at {data['bay_pitch']} layout, "
+        f"{len(data['parts'])} kinematic parts"
+    )
+    print(f"  wrote {out}")
+    return data
 
 
 def stage_cameras(replay_path: str, out: str, routes: str = "blue") -> dict[str, Any]:
@@ -251,6 +277,21 @@ def run_godot(godot: str, extra: Sequence[str], label: str) -> float:
     return elapsed
 
 
+def start_flag(seed: int | None = None) -> list[str]:
+    """`--start-contract=` when the file exists, and nothing when it does not.
+
+    Absent, `course_machine` builds the V1 fan pod on the authored node, which
+    is what every earlier lab frame has and what keeps them reproducing.
+    """
+    path = _START_CONTRACT[0]
+    if not path or not os.path.isfile(path):
+        return []
+    return [f"--start-contract={os.path.abspath(path)}"]
+
+
+_START_CONTRACT = [""]
+
+
 def stage_stills(godot: str, replay_path: str, cameras_path: str) -> dict[str, Any]:
     with open(cameras_path, "r", encoding="utf-8") as handle:
         track = json.load(handle)
@@ -264,6 +305,7 @@ def stage_stills(godot: str, replay_path: str, cameras_path: str) -> dict[str, A
             f"--replay={os.path.abspath(replay_path)}",
             f"--cameras={os.path.abspath(cameras_path)}",
             f"--stills={','.join(names)}",
+            *start_flag(),
             f"--width={WIDTH}",
             f"--height={HEIGHT}",
             "--layout=b",
@@ -312,6 +354,7 @@ def stage_clip(godot: str, replay_path: str, cameras_path: str, fps: int,
         godot,
         [
             f"--out-dir={os.path.abspath(FRAMES_DIR)}",
+            *start_flag(),
             f"--replay={os.path.abspath(replay_path)}",
             f"--cameras={os.path.abspath(cameras_path)}",
             "--clip=1",
@@ -371,7 +414,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         "--stage",
         default="all",
-        choices=("race", "cameras", "check", "stills", "clip", "all", "render"),
+        choices=("race", "start", "cameras", "check", "stills", "clip", "all",
+                 "render"),
     )
     parser.add_argument("--fps", type=int, default=FPS)
     parser.add_argument("--stride", type=int, default=1)
@@ -394,9 +438,9 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     paths = paths_for(args.seed)
     stages = (
-        ("race", "cameras", "check", "stills", "clip")
+        ("race", "start", "cameras", "check", "stills", "clip")
         if args.stage == "all"
-        else ("stills", "clip")
+        else ("start", "stills", "clip")
         if args.stage == "render"
         else (args.stage,)
     )
@@ -405,9 +449,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         godot = find_godot(args.godot or None)
         print(f"godot: {godot}")
 
+    _START_CONTRACT[0] = paths["start"]
     for stage in stages:
         print(f"--- {stage} ---")
-        if stage == "race":
+        if stage == "start":
+            stage_start_contract(paths["start"], args.routes)
+        elif stage == "race":
             stage_race(
                 args.seed, args.marbles, args.duration, paths["replay"], args.routes
             )

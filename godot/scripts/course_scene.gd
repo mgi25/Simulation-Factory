@@ -136,6 +136,7 @@ func _ready() -> void:
 	_course = Machine.build(_palette, _layout, {
 		"detail": str(options.get("detail", "block")),
 		"routes": str(options.get("routes", "both")),
+		"start_contract": _start_contract,
 	})
 	add_child(_course)
 	_practicals()
@@ -146,6 +147,27 @@ func _ready() -> void:
 	set_time(0.0)
 	if str(options.get("dump-physics", "")) != "":
 		_dump_physics(str(options["dump-physics"]))
+
+
+## The physics start module geometry, when a caller supplies it. Empty means
+## the layout proof s V1 fan pod, which is what every earlier lab frame has.
+var _start_contract: Dictionary = {}
+
+
+func load_start_contract(path: String) -> void:
+	var text := FileAccess.get_file_as_string(path)
+	if text.is_empty():
+		push_error("course_scene: cannot read start contract %s" % path)
+		return
+	var parsed = JSON.parse_string(text)
+	if typeof(parsed) != TYPE_DICTIONARY:
+		push_error("course_scene: %s is not a start contract" % path)
+		return
+	_start_contract = parsed
+
+
+func start_contract() -> Dictionary:
+	return _start_contract
 
 
 func _options() -> Dictionary:

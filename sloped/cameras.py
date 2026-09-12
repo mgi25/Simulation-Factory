@@ -67,7 +67,7 @@ import math
 from dataclasses import dataclass, field
 from typing import Any, Sequence
 
-from sloped import layout, terrain
+from sloped import joins, layout, terrain
 from sloped.race import ROUTE_RUNS
 from sloped.scale import SIM_TO_LAYOUT
 
@@ -194,7 +194,12 @@ SECTIONS: tuple[Cut, ...] = (
         # station, which the leader does not reach until 1.9 s because the fan
         # takes a second and a half to deliver the field to the launch.
         max_seconds=0.95),
-    Cut("start", "launched", fov=34.0, extent=9.5, elevation=16.0, bearing=28.0,
+    # **Extent 14 rather than 9.5, because the start is a machine now.** The
+    # V1 fan pod this lens was framed on was a shelf; the module the physics
+    # runs is a mixing drum with a 2.7 wall on a 2.9 catch cone, over a pan
+    # that reaches 4.6 back - about 14 layout units end to end. At 9.5 the
+    # camera stands inside it.
+    Cut("start", "launched", fov=34.0, extent=14.0, elevation=16.0, bearing=28.0,
         target="node", node="start", orbit=(-6.0, 4.0), dolly=(0.10, -0.06),
         min_seconds=1.4),
     # Wider and higher than a low side follow would be, because at an extent of
@@ -301,8 +306,32 @@ SECTIONS: tuple[Cut, ...] = (
     # three of eight instead of seven. So this buys a third of a second more of
     # the divider at no cost and **does not fully solve branch-choice
     # readability**; the crossing itself is still mostly the `branch` cut's.
-    Cut("split", "promontory", fov=34.0, extent=28.0, elevation=26.0, bearing=8.0,
-        target="pack", band=56.0, orbit=(5.0, -5.0), hold=0.3, min_seconds=1.2),
+    # **V1.17 aims this at the fork and holds it over the whole decision.**
+    #
+    # A pack aim could not show the choice. The pack is the centroid of the
+    # racers within the band, and at the fork the field is at its most strung
+    # out, so the aim is always somewhere between marbles and never on the
+    # divider; and when the leader crosses to orange, the aim steps to the
+    # other lobe. Held longer it got worse rather than better - swept against
+    # `frame_report`, racers in frame across every cut went 215, 215, 214, 210,
+    # 203 at holds of 0.0 to 0.9 - because the shot was following a point
+    # between two diverging lines.
+    #
+    # A **fixed aim on the fork itself** has none of that. It cannot drift, it
+    # cannot step between lobes, and the subject is the one thing that has to
+    # be legible here: leg3 arriving, the divider, and both mouths leaving it.
+    # The earlier note against a fixed aim - "a picture of two empty gantries
+    # with one marble in it at 42 pixels" - was written when the aim was the
+    # *authored* `split` node, which is 10.9 units past the divider with
+    # orange's lead already gone, and when the course was blue-only so there
+    # was never a second stream to see.
+    #
+    # The hold carries the cut to the point where both routes are in use. On
+    # the selected seed the first racer takes orange at 16.07 s and the first
+    # takes blue at 17.17 s, so a cut that ends at the station leaves the
+    # second half of the decision to the next shot.
+    Cut("split", "promontory", fov=34.0, extent=30.0, elevation=38.0, bearing=0.0,
+        target="node", node="fork", orbit=(6.0, -6.0), hold=1.6, min_seconds=1.4),
     # Higher, for the same reason as `descent`: at 15 degrees the sprint's own
     # guard rail stood between the camera and the five racers the frustum
     # arithmetic said were in frame, and the still came out empty. Closing in as
@@ -643,7 +672,41 @@ def build_track(
     bounds = [span for _cut, span in kept]
 
     offsets, _totals = _route_offsets(machine.runs)
+    # **The start node is the authored one and the start module is not on it.**
+    # `sloped.trapdoor.ShuffleFloor` derives its own lift and stands 3.93 layout
+    # units above `layout.NODES["start"]`, so a camera aimed at the node aims
+    # at the empty air under the machine - which is what the V1.15 start cut
+    # did. Taken from the module rather than from a constant, so a start that
+    # derives a different lift moves the camera with it.
     nodes = dict(layout.NODES)
+    start = machine.modules.get("start")
+    if start is not None and hasattr(start, "origin"):
+        nodes["start"] = tuple(float(value) for value in start.origin)
+    # **`layout.NODES["split"]` is not the fork.** It sits at (6.0, 10.5, 18.0),
+    # which is where *blue's lead* begins - 10.9 layout units downstream of the
+    # divider, with orange's lead already gone. A camera aimed at it frames the
+    # aftermath of a choice and never the choice, which is what the V1.15
+    # review found in all three `split` frames. The fork is leg3's own fork
+    # sample, taken from the built run so it moves if the junction does.
+    runs = machine.runs if hasattr(machine, "runs") else {}
+    leg3 = runs.get("leg3")
+    if leg3 is not None:
+        at = min(joins.FORK_SAMPLE, len(leg3.sim_path) - 1)
+        mouths = [leg3.sim_path[at]]
+        # **The midpoint of the two mouths, not the divider.** Aimed at the
+        # divider alone the shot holds the divider and one lobe; aimed between
+        # the two lead entries it holds the divider, both mouths and the leg
+        # arriving at them, which is the whole of the decision.
+        for name in ("blue_lead", "orange_lead"):
+            branch = runs.get(name)
+            if branch is not None:
+                mouths.append(branch.sim_path[0])
+        nodes["fork"] = (
+            sum(point[0] for point in mouths) / len(mouths) * SIM_TO_LAYOUT,
+            sum(point[1] for point in mouths) / len(mouths) * SIM_TO_LAYOUT
+            + layout.MARBLE_RADIUS,
+            sum(point[2] for point in mouths) / len(mouths) * SIM_TO_LAYOUT,
+        )
     metrics_aim = (1.0, 18.0, 6.0)          # layout B's own hero aim
     cfg = terrain.terrain_config(machine.runs)
 

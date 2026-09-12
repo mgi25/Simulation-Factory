@@ -224,7 +224,7 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 			float(spec["scale"]), str(spec["name"])))
 
 	_markers(root, palette, table, detail)
-	_modules(root, palette, table, detail)
+	_modules(root, palette, table, detail, options.get("start_contract", {}))
 	_field(root, palette, table)
 	# Two scatters at two scales. The large one reads at a hundred units and
 	# the small one at ten, and a section shot is framed at ten - one pass at
@@ -433,7 +433,7 @@ static func _markers(root: Node3D, palette, table: Dictionary,
 
 
 static func _modules(root: Node3D, palette, table: Dictionary,
-		detail: String) -> void:
+		detail: String, contract: Dictionary = {}) -> void:
 	## The six authored race moments, each placed on its anchor and yawed to
 	## the direction of travel there.
 	##
@@ -454,10 +454,23 @@ static func _modules(root: Node3D, palette, table: Dictionary,
 	var blue: Array = root.get_meta("blue_path")
 	var orange: Array = root.get_meta("orange_path")
 
-	var start_at: Vector3 = nodes["start"]
-	var start_yaw := _yaw_to(start_at, launch[0])
-	group.add_child(_placed(Modules.start(palette,
-		_to_local(start_at, start_yaw, launch[0])), start_at, start_yaw))
+	# **The start comes from the physics contract when one is supplied.**
+	# `sloped.trapdoor.ShuffleFloor` stands `lift` = 3.93 layout units above the
+	# authored node and is a mixing drum rather than a fan pod, so a render that
+	# puts the pod on the node draws the field hanging in mid-air - which is
+	# what every video shipped since V1.9 did. Without a contract this still
+	# builds the V1 pod on the node, which is what keeps the layout proof's own
+	# committed frames reproducing.
+	if contract.is_empty():
+		var start_at: Vector3 = nodes["start"]
+		var start_yaw := _yaw_to(start_at, launch[0])
+		group.add_child(_placed(Modules.start(palette,
+			_to_local(start_at, start_yaw, launch[0])), start_at, start_yaw))
+	else:
+		var origin: Array = contract["origin"]
+		var at := Vector3(float(origin[0]), float(origin[1]), float(origin[2]))
+		var yaw := deg_to_rad(float(contract["yaw_deg"]))
+		group.add_child(_placed(Modules.shuffle_start(palette, contract), at, yaw))
 
 	# The mixer and the shuffle wheel stand on the *launch* run's own samples,
 	# not on the recorded `mix` node, because that is where the physics has

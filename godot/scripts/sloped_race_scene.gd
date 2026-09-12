@@ -1,5 +1,7 @@
 extends "res://scripts/course_scene.gd"
 
+const Modules := preload("res://assets/marble_machine/course/course_modules.gd")
+
 ## THE REAL RACE, on the approved sloped course.
 ##
 ## Extends the layout proof's scene rather than replacing it, so the course in
@@ -50,6 +52,7 @@ extends "res://scripts/course_scene.gd"
 
 var _replay: Dictionary = {}
 var _camera_track: Dictionary = {}
+var _start_parts: Dictionary = {}
 var _marble_root: Node3D
 var _marbles: Array[Node3D] = []
 var _wheels: Array = []
@@ -61,6 +64,12 @@ var _use_track := false
 
 
 func _ready() -> void:
+	# **Before `super()`, because the course is built inside it.** The start
+	# module the physics runs is not the one the layout table draws, and the
+	# parent has to have the contract in hand when it calls `Machine.build`.
+	var early := _options()
+	if str(early.get("start-contract", "")) != "":
+		load_start_contract(str(early["start-contract"]))
 	super()
 	_strip_display_field()
 	var options := _options()
@@ -69,6 +78,7 @@ func _ready() -> void:
 	if str(options.get("cameras", "")) != "":
 		_load_cameras(str(options["cameras"]))
 	_collect_wheels()
+	_build_start_parts()
 	set_time(0.0)
 
 
@@ -213,6 +223,44 @@ func _collect_wheels() -> void:
 				})
 
 
+func _build_start_parts() -> void:
+	## One box per kinematic part of the start, driven from the replay.
+	##
+	## The eight gate paddles, four rotor blades and eighteen trapdoor slats are
+	## `marble3d` actuators, and the replay already records a transform for each
+	## of them every frame - thirty for the start. So the scene draws a box at
+	## the size the solver was given and sets its pose from the file, the same
+	## way it does for a marble and for the obstacle wheels. There is therefore
+	## no release law, no mixing law and no trapdoor law in this renderer that
+	## a later physics change could leave behind.
+	_start_parts.clear()
+	var contract := start_contract()
+	if contract.is_empty() or _marble_root == null:
+		return
+	var built: Dictionary = Modules.shuffle_start_parts(_palette, contract,
+		_render_scale)
+	for key in built:
+		var node: Node3D = built[key]
+		_marble_root.add_child(node)
+		_start_parts[key] = node
+	print("start: %d kinematic parts driven from the replay" % _start_parts.size())
+
+
+func _move_start_parts(low: Dictionary, high: Dictionary, blend: float) -> void:
+	if _start_parts.is_empty():
+		return
+	var actuators: Dictionary = low.get("actuators", {})
+	var next_actuators: Dictionary = high.get("actuators", {})
+	for key in _start_parts:
+		if not actuators.has(key):
+			continue
+		var a: Dictionary = actuators[key]
+		var b: Dictionary = next_actuators.get(key, a)
+		var node: Node3D = _start_parts[key]
+		node.position = _vec(a["p"]).lerp(_vec(b["p"]), blend)
+		node.quaternion = _quat(a["q"]).slerp(_quat(b["q"]), blend)
+
+
 # --- playback -------------------------------------------------------------
 
 
@@ -262,6 +310,7 @@ func set_time(seconds: float) -> void:
 		node.quaternion = _quat(a["q"]).slerp(_quat(b["q"]), blend)
 
 	_turn_wheels(low, high, blend)
+	_move_start_parts(low, high, blend)
 
 	if _use_track:
 		_place_from_track(seconds)

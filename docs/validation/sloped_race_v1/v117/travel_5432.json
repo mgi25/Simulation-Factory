@@ -1,0 +1,42 @@
+{
+ "after": [
+  30.7467,
+  45.1835,
+  -36.3044
+ ],
+ "airborne": true,
+ "before": [
+  30.5342,
+  45.258,
+  -36.438
+ ],
+ "budget": null,
+ "clearance": {
+  "ahead": 2.3727,
+  "ahead_owner": "leg1",
+  "nearest": 0.5828,
+  "nearest_owner": "leg1"
+ },
+ "marble": 0,
+ "place": [
+  "leg1",
+  76
+ ],
+ "speed": 62.8476,
+ "spin": 124.72,
+ "stats_falling": 0.0,
+ "stats_top_speed": 62.8476,
+ "stats_travel": 0.26186,
+ "t": 9.21667,
+ "tick": 2212,
+ "touching_actuator": [],
+ "touching_static": [],
+ "travel": 0.26186499363398263,
+ "travel_diameters": 0.2619,
+ "velocity": [
+  50.997,
+  -17.88,
+  32.085
+ ],
+ "worst_depth": 0.0
+}

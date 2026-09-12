@@ -221,6 +221,314 @@ static func _start_gate(root: Node3D, palette) -> void:
 		root.add_child(drum)
 
 
+# --- SHUFFLE START (V1.17) -------------------------------------------------
+#
+# The start the physics actually runs, drawn from the physics' own numbers.
+#
+# `sloped.trapdoor.ShuffleFloor` replaced the V1 fan pod in V1.8 - eight bays on
+# a sloping apron, a round mixing chamber with a four-blade rotor, a louvre
+# trapdoor floor, a catch cone and an exit chute - and `start()` above was never
+# updated, so the render drew the old pod at `layout.NODES["start"]` while the
+# field stood `lift` = 3.93 layout units above it. The eight racers hung in
+# mid-air for the first four seconds of every video shipped since V1.9.
+#
+# **Nothing here is authored.** Every dimension comes from the contract
+# `tools/sloped_start_contract.py` reads off the built module, and the eight
+# gate paddles, four rotor blades and eighteen floor slats are not built as
+# mechanisms at all: they are boxes at the sizes the solver was given, driven
+# frame by frame from the transforms `marble3d.replay` already records for them.
+# So there is no release law, no mixing law and no trapdoor law in the renderer
+# for a future physics change to leave behind.
+#
+# The one number that is NOT a defect: the bay pitch. `describe()` reports
+# `bay_pitch` 1.105263 because it converts that one field to simulation units
+# while reporting every other field in layout; 0.63 layout and 1.105263
+# simulation are `layout.BAY_PITCH` twice over.
+
+
+static func shuffle_start(palette, contract: Dictionary) -> Node3D:
+	var root := Node3D.new()
+	root.name = "Start"
+	_shuffle_pan(root, palette, contract)
+	_shuffle_chamber(root, palette, contract)
+	_shuffle_cone(root, palette, contract)
+	_shuffle_chute(root, palette, contract)
+	_shuffle_frame(root, palette, contract)
+	var pan: Dictionary = contract["pan"]
+	sign_panel(root, palette, "START", 4.6,
+		Vector3(0.0, float(pan["floor"]) + 2.26, float(pan["back"]) - 0.52),
+		"sign_face", "lit_white")
+	return root
+
+
+static func _apron_y(contract: Dictionary, z: float) -> float:
+	## The pan and apron are ONE ramp, and this is its height at a station.
+	##
+	## Measured off the built collider rather than assumed: a downward ray at
+	## the module's own x = 0 descends from -0.155 at z = -4.60 to -0.704 at
+	## z = -2.40 at a constant 14 degrees, which is `apron_grade_deg`, and
+	## passes through `pan.floor` = -0.32 at z = -3.94 - which is exactly where
+	## the replay's eight marbles sit for the first four tenths of a second. So
+	## `pan.floor` is the ramp's height at the bays rather than a flat deck.
+	var pan: Dictionary = contract["pan"]
+	var chamber: Dictionary = contract["chamber"]
+	var rim: float = float(chamber["centre_z"]) - float(chamber["wall_radius"])
+	var top: float = float(chamber["rim_floor"]) + float(pan["inlet_step"])
+	var grade := tan(deg_to_rad(float(pan["apron_grade_deg"])))
+	return top + (rim - z) * grade
+
+
+static func _shuffle_pan(root: Node3D, palette, contract: Dictionary) -> void:
+	## The eight bays: a tray on the apron's own slope, with seven fins.
+	var pan: Dictionary = contract["pan"]
+	var chamber: Dictionary = contract["chamber"]
+	var bays: Array = contract["bay_x"]
+	var half := float(pan["half"])
+	var back := float(pan["back"])
+	var front: float = float(chamber["centre_z"]) - float(chamber["wall_radius"]) + 0.02
+	var samples := 24
+
+	var path: Array = []
+	var sections: Array = []
+	var normals: Array = []
+	var banks: Array = []
+	for index in samples:
+		var t := float(index) / float(samples - 1)
+		var z := lerpf(back, front, t)
+		path.append(Vector3(0.0, _apron_y(contract, z), z))
+		var built := trough_section(half)
+		sections.append(built[0])
+		normals.append(built[1])
+		banks.append(0.0)
+	root.add_child(Forms.mesh_node(
+		V2Forms.banked_sweep(path, sections, normals, banks),
+		palette.get_material("pearl_shell"), "Pan"))
+
+	var inner: Array = []
+	var inner_normals: Array = []
+	for index in samples:
+		var built := floor_section(half - 0.05)
+		inner.append(built[0])
+		inner_normals.append(built[1])
+	root.add_child(Forms.mesh_node(
+		V2Forms.banked_sweep(path, inner, inner_normals, banks),
+		palette.get_material("running_polished"), "PanFloor", false))
+
+	for index in bays.size() - 1:
+		var x: float = (float(bays[index]) + float(bays[index + 1])) * 0.5
+		var lane: Array = []
+		for step in samples:
+			var centre: Vector3 = path[step]
+			lane.append(Vector3(x, centre.y + 0.09, centre.z))
+		root.add_child(Forms.mesh_node(Geometry.tube(lane, 0.055, 8),
+			palette.get_material("pearl_lip_v2"), "Fin%d" % index, false))
+
+	for side in [1.0, -1.0]:
+		var suffix := "R" if side > 0.0 else "L"
+		var rail: Array = []
+		var line: Array = []
+		for step in samples:
+			var centre: Vector3 = path[step]
+			rail.append(Vector3(side * (half + 0.16), centre.y + 0.36, centre.z))
+			line.append(Vector3(side * (half + 0.21), centre.y + 0.04, centre.z))
+		root.add_child(Forms.mesh_node(Geometry.tube(rail, 0.075, 10),
+			palette.get_material("chrome"), "PanRail%s" % suffix, false))
+		root.add_child(Forms.mesh_node(Geometry.tube(line, 0.05, 8),
+			palette.get_material("lit_cyan_line_hero"), "PanLine%s" % suffix, false))
+
+
+static func _shuffle_chamber(root: Node3D, palette, contract: Dictionary) -> void:
+	## The mixing drum: an acrylic wall on a pearl kerb, open where the pan feeds.
+	var chamber: Dictionary = contract["chamber"]
+	var rotor: Dictionary = contract["rotor"]
+	var radius := float(chamber["wall_radius"])
+	var floor_y := float(chamber["rim_floor"])
+	var rise := float(chamber["wall_rise"])
+	var centre := Vector3(0.0, 0.0, float(chamber["centre_z"]))
+
+	var gap := deg_to_rad(float(chamber["inlet_half_deg"]))
+	var mouth := -PI * 0.5
+	var wall := Node3D.new()
+	wall.name = "ChamberWall"
+	wall.position = centre + Vector3(0.0, floor_y, 0.0)
+	root.add_child(wall)
+	# Five rings rather than a solid cylinder: the drum has to be **seen into**
+	# or the eight racers waiting in it are behind frosted acrylic, and the
+	# first render of this put a wall between the camera and the whole field.
+	for ring in 5:
+		var y: float = rise * (float(ring) + 0.5) / 5.0
+		var hoop := Forms.mesh_node(
+			Forms.arc_hoop(radius, 0.05, mouth + gap, mouth + TAU - gap, 48, 8),
+			palette.get_material("acrylic_guard"), "Hoop%d" % ring, false)
+		hoop.position = Vector3(0.0, y, 0.0)
+		wall.add_child(hoop)
+	var kerb := Forms.mesh_node(
+		Forms.arc_hoop(radius, 0.10, mouth + gap, mouth + TAU - gap, 48, 10),
+		palette.get_material("pearl_lip_v2"), "Kerb", false)
+	kerb.position = Vector3(0.0, 0.02, 0.0)
+	wall.add_child(kerb)
+	var crown := Forms.mesh_node(
+		Forms.arc_hoop(radius, 0.07, mouth + gap, mouth + TAU - gap, 48, 10),
+		palette.get_material("chrome"), "Crown", false)
+	crown.position = Vector3(0.0, rise, 0.0)
+	wall.add_child(crown)
+
+	# **No hub and no post at marble height.** `ShuffleFloor.rest_radius` is
+	# zero - the field rests anywhere on the disc, the chamber axis included -
+	# so a drawn hub is a wall the physics has not got, and the first render of
+	# this put a 1.01-radius graphite disc straight through four of the eight
+	# waiting racers. The spindle therefore starts a marble's height clear of
+	# the floor and hangs from the gantry above.
+	var clear: float = float(rotor["height"]) + 0.12
+	var post := Forms.mesh_node(
+		Geometry.tube([centre + Vector3(0.0, floor_y + clear, 0.0),
+			centre + Vector3(0.0, floor_y + rise + 1.05, 0.0)], 0.075, 12),
+		palette.get_material("chrome"), "RotorPost", false)
+	root.add_child(post)
+	var collar := Forms.mesh_node(
+		Geometry.rounded_disc(0.30, 0.14, 0.05, 24, 3),
+		palette.get_material("graphite"), "RotorCollar", false)
+	collar.position = centre + Vector3(0.0, floor_y + clear, 0.0)
+	root.add_child(collar)
+	var gantry := Forms.mesh_node(
+		Forms.hoop(radius * 0.72, 0.06, 32, 8),
+		palette.get_material("graphite"), "RotorGantry", false)
+	gantry.position = centre + Vector3(0.0, floor_y + rise + 1.05, 0.0)
+	root.add_child(gantry)
+	for index in 3:
+		var angle := TAU * float(index) / 3.0
+		root.add_child(Forms.mesh_node(
+			Geometry.tube([centre + Vector3(0.0, floor_y + rise + 1.05, 0.0),
+				centre + Vector3(cos(angle) * radius * 0.72,
+					floor_y + rise + 1.05, sin(angle) * radius * 0.72)],
+				0.05, 8),
+			palette.get_material("graphite"), "Spoke%d" % index, false))
+
+
+static func _shuffle_cone(root: Node3D, palette, contract: Dictionary) -> void:
+	## The catch cone under the trapdoor, and the guard round its rim.
+	var cone: Dictionary = contract["cone"]
+	var chamber: Dictionary = contract["chamber"]
+	var rim := float(cone["rim"])
+	var lip := float(cone["lip"])
+	var outer := float(cone["half"])
+	var throat := float(cone["throat"])
+	var points: Array = [
+		Vector2(throat, lip),
+		Vector2(outer, rim),
+		Vector2(outer + 0.14, rim + float(cone["rim_rise"])),
+		Vector2(outer + 0.26, rim + float(cone["rim_rise"])),
+		Vector2(outer + 0.26, rim - 0.34),
+		Vector2(throat + 0.10, lip - 0.30),
+	]
+	var normals: Array = Geometry.profile_normals(points, true)
+	var dish := Forms.mesh_node(Geometry.lathe(points, normals, 48),
+		palette.get_material("pearl_shell"), "CatchCone")
+	dish.position = Vector3(0.0, 0.0, float(chamber["centre_z"]))
+	root.add_child(dish)
+
+	var ring := Forms.mesh_node(
+		Forms.hoop(outer + 0.26, 0.06, 48, 8),
+		palette.get_material("lit_cyan_line_hero"), "ConeLine", false)
+	ring.position = Vector3(0.0, rim + float(cone["rim_rise"]),
+		float(chamber["centre_z"]))
+	root.add_child(ring)
+
+
+static func _shuffle_chute(root: Node3D, palette, contract: Dictionary) -> void:
+	## The run-out to the first track run, at the physics' own grade.
+	var chute: Dictionary = contract["chute"]
+	var exit_local: Array = contract["exit_local"]
+	var mouth := Vector3(0.0, float(chute["lip"]), float(chute["mouth_z"]))
+	var landing := Vector3(float(exit_local[0]), float(exit_local[1]),
+		float(exit_local[2]))
+	var samples := 16
+	var path: Array = []
+	var sections: Array = []
+	var normals: Array = []
+	var banks: Array = []
+	for index in samples:
+		var t := float(index) / float(samples - 1)
+		path.append(mouth.lerp(landing, t))
+		var built := trough_section(float(chute["half"]))
+		sections.append(built[0])
+		normals.append(built[1])
+		banks.append(0.0)
+	root.add_child(Forms.mesh_node(
+		V2Forms.banked_sweep(path, sections, normals, banks),
+		palette.get_material("pearl_shell"), "Chute"))
+	var inner: Array = []
+	var inner_normals: Array = []
+	for index in samples:
+		var built := floor_section(float(chute["half"]) - 0.05)
+		inner.append(built[0])
+		inner_normals.append(built[1])
+	root.add_child(Forms.mesh_node(
+		V2Forms.banked_sweep(path, inner, inner_normals, banks),
+		palette.get_material("running_polished"), "ChuteFloor", false))
+	for side in [1.0, -1.0]:
+		var line: Array = []
+		for step in samples:
+			var centre: Vector3 = path[step]
+			line.append(Vector3(side * (float(chute["half"]) + 0.14),
+				centre.y + 0.06, centre.z))
+		root.add_child(Forms.mesh_node(Geometry.tube(line, 0.045, 8),
+			palette.get_material("lit_cyan_line_hero"),
+			"ChuteLine%s" % ("R" if side > 0.0 else "L"), false))
+
+
+static func _shuffle_frame(root: Node3D, palette, contract: Dictionary) -> void:
+	## What the drum stands on: four graphite legs and a collar.
+	var chamber: Dictionary = contract["chamber"]
+	var cone: Dictionary = contract["cone"]
+	var centre_z := float(chamber["centre_z"])
+	var radius: float = float(cone["half"]) + 0.20
+	var top: float = float(cone["rim"]) - 0.30
+	var foot: float = float(cone["lip"]) - 2.30
+	for index in 4:
+		var angle := TAU * (float(index) + 0.5) / 4.0
+		var at := Vector3(cos(angle) * radius, 0.0, centre_z + sin(angle) * radius)
+		var base := Vector3(at.x * 1.16, foot, centre_z + (at.z - centre_z) * 1.16)
+		root.add_child(Forms.mesh_node(
+			Geometry.tube([at + Vector3(0.0, top, 0.0), base], 0.105, 10),
+			palette.get_material("graphite"), "Leg%d" % index, false))
+	var collar := Forms.mesh_node(Forms.hoop(radius, 0.075, 40, 8),
+		palette.get_material("chrome"), "Collar", false)
+	collar.position = Vector3(0.0, top, centre_z)
+	root.add_child(collar)
+
+
+static func shuffle_start_parts(palette, contract: Dictionary,
+		scale: float) -> Dictionary:
+	## One box per kinematic part, keyed by its replay actuator name.
+	##
+	## Built at **simulation** size, because the caller parents them to the same
+	## `render_scale` node the replay marbles hang from - one conversion in the
+	## pipeline, on one node, exactly as `sloped_race_scene.gd` documents.
+	var out: Dictionary = {}
+	var parts: Dictionary = contract["parts"]
+	var factor: float = 1.0 / maxf(scale, 1.0e-6)
+	for name in parts:
+		var entry: Dictionary = parts[name]
+		var size: Array = entry["size"]
+		var box := Vector3(float(size[0]), float(size[1]), float(size[2])) * factor
+		var key := str(name)
+		# The slats are the surface eight racers stand on for five of the six
+		# seconds before the gun, so they are drawn in the polished metal the
+		# channel uses rather than in acrylic - which read as a pale blur
+		# against the catch cone below and made the floor look like no floor.
+		var material := "graphite"
+		if key.begins_with("panel"):
+			material = "running_polished"
+		elif key.begins_with("rotor"):
+			material = "orange_machine"
+		var node := Forms.mesh_node(
+			Geometry.rounded_box(box, minf(box.y, box.x) * 0.22, 3),
+			palette.get_material(material), "Part_%s" % key, false)
+		out["start.%s" % key] = node
+	return out
+
+
 static func trough_section(half: float) -> Array:
 	## An open tapering trough: a cradle floor, two low walls, real thickness.
 	##
