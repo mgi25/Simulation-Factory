@@ -53,6 +53,10 @@ const Modules := preload("res://assets/marble_machine/course/course_modules.gd")
 var _replay: Dictionary = {}
 var _camera_track: Dictionary = {}
 var _start_parts: Dictionary = {}
+## The edit map: output seconds to replay seconds, one entry per kept window.
+## Empty means the track tiles the replay and output time IS replay time.
+var _edit: Array = []
+var _out_duration := 0.0
 var _marble_root: Node3D
 var _marbles: Array[Node3D] = []
 var _wheels: Array = []
@@ -186,6 +190,12 @@ func _load_cameras(path: String) -> void:
 		return
 	_camera_track = parsed
 	_use_track = true
+	_edit = _camera_track.get("edit", [])
+	_out_duration = float(_camera_track.get("duration", 0.0))
+	if bool(_camera_track.get("edited", false)):
+		print("edit: %.2f s of output from %.2f s of replay, %.2f s omitted" % [
+			_out_duration, float(_camera_track.get("replay_duration", 0.0)),
+			float(_camera_track.get("omitted", 0.0))])
 	var cuts: Array = _camera_track.get("cuts", [])
 	var names: PackedStringArray = PackedStringArray()
 	for cut in cuts:
@@ -287,11 +297,33 @@ func _frame_pair(seconds: float) -> Array:
 	return [low, high, blend]
 
 
-func set_time(seconds: float) -> void:
+func replay_at(out_seconds: float) -> float:
+	## Output time to replay time. **Slope one inside every window.**
+	##
+	## The edit omits replay time; it never stretches or compresses it, so a
+	## marble in the finished film moves at exactly the speed PyBullet gave it.
+	## Between two windows the map steps - that is the cut - and outside the
+	## last one it holds at the end rather than running off the replay.
+	if _edit.is_empty():
+		return out_seconds
+	for entry in _edit:
+		var segment: Dictionary = entry
+		var out_span: Array = segment["out"]
+		var replay_span: Array = segment["replay"]
+		var low := float(out_span[0])
+		var high := float(out_span[1])
+		if out_seconds <= high or segment == _edit[_edit.size() - 1]:
+			return float(replay_span[0]) + clampf(out_seconds - low, 0.0,
+				float(replay_span[1]) - float(replay_span[0]))
+	return out_seconds
+
+
+func set_time(out_seconds: float) -> void:
 	if _replay.is_empty():
-		super(seconds)
+		super(out_seconds)
 		return
 
+	var seconds := replay_at(out_seconds)
 	var frames: Array = _replay["frames"]
 	var pair := _frame_pair(seconds)
 	var low: Dictionary = frames[int(pair[0])]
@@ -433,6 +465,12 @@ func dump_terrain(path: String, step: float = 7.0) -> void:
 
 
 func replay_duration() -> float:
+	## What the renderer walks: the **output** length when an edit is loaded.
+	##
+	## The name is the renderer's and predates the edit; what it has always
+	## meant is "how many seconds of film are there".
+	if _out_duration > 0.0 and not _edit.is_empty():
+		return _out_duration
 	return _duration
 
 

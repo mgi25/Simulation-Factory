@@ -64,6 +64,7 @@ from __future__ import annotations
 
 import json
 import math
+import dataclasses
 from dataclasses import dataclass, field
 from typing import Any, Sequence
 
@@ -357,6 +358,68 @@ SECTIONS: tuple[Cut, ...] = (
         min_seconds=1.6),
 )
 
+# --- the edit ---------------------------------------------------------------
+#
+# **A cut list is not an edit.** `SECTIONS` tiles the whole replay: every second
+# the physics ran is a second of video, and the only editorial decision left is
+# which lens is on. That is the right thing for a proof and the wrong thing for
+# a film - the selected race spends three and a half seconds mixing eight
+# marbles in a drum, which is a mechanism worth one look and not worth a fifth
+# of the running time.
+#
+# An edit is a list of `(lens, replay from, replay to)`, optionally with lens
+# overrides, and the windows need not touch. Output time runs at **slope one**
+# through every one of them, so a jump between two windows omits replay time
+# without altering any marble's speed: nothing here can make the physics look
+# faster or slower than it was, only shorter.
+#
+# The same lens may appear twice. V18's opening does exactly that - the start
+# lens holds the eight racers on the line, the edit cuts three and three
+# quarter seconds of mixing, and the same lens picks the drum up again as the
+# trapdoor goes.
+EDIT_V18: tuple[tuple, ...] = (
+    # **No establishing shot.** It was 0.95 s of a course 205 units away with
+    # the field 14 pixels across, which is a title card rather than a race.
+    # Open on the eight racers instead.
+    ("start", 0.20, 2.30, {}),
+    # The cut. `ShuffleFloor` mixes from 1.6 s to 4.6 s and settles to 5.8;
+    # this drops 3.55 s of it and returns just before the floor opens at 6.10.
+    ("start", 5.70, 7.62, {}),
+    ("descent", 7.62, 8.62, {}),
+    ("long", 8.62, 9.80, {}),
+    ("hairpin", 9.80, 10.80, {}),
+    ("straight", 10.80, 12.00, {}),
+    # The spinner corridor ran 3.37 s and is the busiest thing on the course;
+    # 2.30 is enough to read it.
+    ("obstacle", 12.00, 14.50, {}),
+    # V17's fork shot, unchanged: a fixed aim on the divider held over both of
+    # this seed's decisions - orange at 16.07 s and blue at 17.17 s.
+    ("split", 15.35, 17.67, {}),
+    ("branch", 17.67, 19.07, {}),
+    ("merge", 19.07, 20.20, {}),
+    # **The finish, rebuilt.** V17 framed the leading pair at an extent of 24
+    # because the pair straddles 5.3 layout units and a portrait frame is
+    # narrow - correct, and it made the marbles small and the line distant. The
+    # answer is not a wider lens but a lower, closer one almost directly
+    # behind: at a bearing of 170 the sprint recedes up the frame, which is the
+    # one direction a 1080x1920 frame has to spare, so the pair and the line
+    # they are running at both fit across 13 units instead of 24.
+    #
+    # It starts before the leader arrives and ends 0.75 s after the fifth
+    # racer, so the 0.283 s between first and second and the 0.017 s between
+    # fourth and fifth are both in the shot.
+    ("finish", 20.20, 23.60, {
+        "extent": 13.0,
+        "elevation": 12.0,
+        "bearing": 170.0,
+        "orbit": (-2.0, 2.0),
+        "dolly": (0.06, -0.05),
+    }),
+)
+
+EDITS = {"v18": EDIT_V18}
+
+
 SMOOTH_PASSES = 14
 
 # How far the sight line has to clear the ground, in layout units, and how far
@@ -616,8 +679,16 @@ def build_track(
     machine,
     sections: Sequence[Cut] = SECTIONS,
     fps: int = 60,
+    edit: Sequence[tuple] | None = None,
 ) -> dict[str, Any]:
-    """A position, an aim and a field of view per frame, in layout units."""
+    """A position, an aim and a field of view per frame, in layout units.
+
+    `edit` replaces the station clock with an explicit list of
+    `(lens, replay from, replay to[, overrides])` windows. The windows need not
+    be contiguous, so the track then carries an **edit map** from output time to
+    replay time - slope one throughout, so replay time is omitted rather than
+    compressed and no marble's speed changes.
+    """
     track = progress_track(replay, machine)
     times = track["times"]
     frames = replay["frames"]
@@ -661,13 +732,33 @@ def build_track(
         min(horizon, max(bounds[-1][1], last_crossing + sections[-1].hold)),
     )
 
-    # A cut the replay left no room for is dropped rather than emitted empty,
-    # so `check_track` never has to reason about a zero-length shot.
-    kept = [
-        (cut, span) for cut, span in zip(sections, bounds) if span[1] - span[0] > 1e-6
-    ]
-    if not kept:
-        kept = [(sections[0], (0.0, horizon))]
+    if edit:
+        # The editor's own windows, clamped to the replay and in its order.
+        lenses = {cut.name: cut for cut in sections}
+        kept = []
+        for entry in edit:
+            name, low, high = entry[0], float(entry[1]), float(entry[2])
+            overrides = dict(entry[3]) if len(entry) > 3 else {}
+            lens = lenses.get(name)
+            if lens is None:
+                raise KeyError(f"the edit names a lens the cut list has not: {name!r}")
+            low = max(0.0, min(low, horizon))
+            high = max(low, min(high, horizon))
+            if high - low <= 1e-6:
+                continue
+            kept.append((dataclasses.replace(lens, **overrides), (low, high)))
+        if not kept:
+            raise ValueError("the edit kept nothing")
+    else:
+        # A cut the replay left no room for is dropped rather than emitted
+        # empty, so `check_track` never has to reason about a zero-length shot.
+        kept = [
+            (cut, span)
+            for cut, span in zip(sections, bounds)
+            if span[1] - span[0] > 1e-6
+        ]
+        if not kept:
+            kept = [(sections[0], (0.0, horizon))]
     sections = tuple(cut for cut, _span in kept)
     bounds = [span for _cut, span in kept]
 
@@ -847,13 +938,34 @@ def build_track(
             }
         )
 
+    # The edit map: output time to replay time, one entry per kept window and
+    # **slope one** in every one of them. Without an edit it is the identity,
+    # so a track built the old way maps output onto replay unchanged.
+    segments: list[dict[str, Any]] = []
+    cursor = 0.0
+    for cut, (low, high) in zip(sections, bounds):
+        span = high - low
+        segments.append(
+            {
+                "cut": cut.name,
+                "out": [round(cursor, 6), round(cursor + span, 6)],
+                "replay": [round(low, 6), round(high, 6)],
+            }
+        )
+        cursor += span
+    edited = bool(edit)
     return {
         "units": "layout",
         "fps": fps,
         "seed": replay["seed"],
-        "duration": round(bounds[-1][1], 6),
+        "edited": edited,
+        # What the renderer walks. Equal to the replay duration when there is
+        # no edit, and the sum of the kept windows when there is.
+        "duration": round(cursor if edited else bounds[-1][1], 6),
         "replay_duration": times[-1],
+        "omitted": round(max(0.0, (bounds[-1][1] - bounds[0][0]) - cursor), 6),
         "last_crossing": round(last_crossing, 6),
+        "edit": segments,
         "cuts": cuts_out,
     }
 
@@ -1004,7 +1116,17 @@ def check_track(track: dict[str, Any], replay: dict[str, Any] | None = None) -> 
         span = cut["to"] - cut["from"]
         if span < 0.34:
             problems.append(f"{cut['name']}: {span:.3f} s is too short to read as a shot")
-        if previous_end is not None and abs(cut["from"] - previous_end) > 1e-6:
+        # **A gap between two cuts is an edit, not a fault.** `SECTIONS` tiles
+        # the replay, so on an unedited track a cut that does not start where
+        # the last one ended is a bug; on an edited one it is the whole point -
+        # V18 omits 3.55 s of mixing and 1.05 s of spinner corridor with two
+        # intentional jumps. Output time still runs at slope one through every
+        # window, which is what the edit map carries and what the rate test pins.
+        if (
+            not track.get("edited")
+            and previous_end is not None
+            and abs(cut["from"] - previous_end) > 1e-6
+        ):
             problems.append(
                 f"{cut['name']}: starts at {cut['from']:.3f} against the previous "
                 f"cut's end at {previous_end:.3f}"

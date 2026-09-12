@@ -188,11 +188,22 @@ def stage_start_contract(out: str, routes: str = "both") -> dict[str, Any]:
     return data
 
 
-def stage_cameras(replay_path: str, out: str, routes: str = "blue") -> dict[str, Any]:
+def stage_cameras(
+    replay_path: str, out: str, routes: str = "blue", edit: str = ""
+) -> dict[str, Any]:
     with open(replay_path, "r", encoding="utf-8") as handle:
         replay = json.load(handle)
     machine = sloped_course(routes=routes)
-    track = cameras_module.build_track(replay, machine, fps=FPS)
+    # An edit replaces the station clock with an explicit window list, so the
+    # film can omit replay time without altering any marble speed. Absent, the
+    # track tiles the whole replay exactly as every earlier version did.
+    plan = cameras_module.EDITS[edit] if edit else None
+    track = cameras_module.build_track(replay, machine, fps=FPS, edit=plan)
+    if plan is not None:
+        print(
+            f"cameras: edit {edit!r} keeps {track['duration']:.2f} s of "
+            f"{track['replay_duration']:.2f} s, omitting {track['omitted']:.2f} s"
+        )
     problems = cameras_module.check_track(track, replay)
     cameras_module.write_track(track, out)
     print(f"cameras: {len(track['cuts'])} cuts over {track['duration']:.2f} s -> {out}")
@@ -431,6 +442,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     # against a blue-only machine reports every orange marble as off the
     # course, and a camera solved on one cannot find the branch at all.
     parser.add_argument(
+        "--edit", default="",
+        help="name of a cut plan in sloped.cameras.EDITS; empty tiles the replay",
+    )
+    parser.add_argument(
         "--routes", default="both", choices=("blue", "both"),
         help="which routes the course offers; \"both\" builds the fork",
     )
@@ -459,7 +474,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 args.seed, args.marbles, args.duration, paths["replay"], args.routes
             )
         elif stage == "cameras":
-            stage_cameras(paths["replay"], paths["cameras"], args.routes)
+            stage_cameras(paths["replay"], paths["cameras"], args.routes, args.edit)
         elif stage == "check":
             stage_check(paths["replay"], paths["contact"], args.stride, args.routes)
         elif stage == "stills":
