@@ -264,3 +264,42 @@ bug was in the course rather than in the tool: `sloped_course` reads
 the sprint, blue's lobe and orange's lobe are each constructed separately
 afterwards. An entry in the table for any of those three **reached nothing at
 all**. All three now pass it through, and the scan discriminates.
+
+## The gate, re-run with the rail
+
+Seeds 4001-4200 again, 1600 racers, the only change being orange's boost.
+
+    metric              no boost   with boost   target
+    per-racer finish       0.983        0.989   >= 0.99
+    all-eight races        0.865        0.910   >= 0.90   met
+    escape                 0.015        0.009   near 0
+    stuck                  0.003        0.002   near 0    met
+    blue completion        0.995        0.996   >= 0.95   met
+    orange completion      0.955        0.977   >= 0.95   met
+    blue / orange share  0.751/0.249  0.751/0.249         both used
+
+    loss sites   orange_lead[0] 6  final[0] 3  leg3[80] 3  launch[20] 2
+                 launch[40] 1  orange[20] 1  leg3[100] 1      (17 of 1600)
+
+`orange[20]` falls from ten to one. **Per-racer finish is 0.989 against a 0.99
+target, which is one racer in 1600**, and every other reliability target is met.
+The ledger has no concentrated site left: the largest is `orange_lead[0]` with
+six, which is the merge lead's first twenty samples and 35% of a ledger of
+seventeen. That is the condition section 12 gates the 600 on, so the 600 runs.
+
+**Fairness, with section 14's warning applied.** Every rank measure is unchanged
+or better and the win ratio is worse:
+
+    metric              no boost   with boost
+    slot mean-rank SD     0.2182       0.2182
+    slot mean-rank span    0.583        0.531
+    podium ratio          1.4444       1.4677
+    slot/rank Spearman   -0.0155       0.0003
+    win-rate ratio         1.579       2.6667
+
+The win ratio moved because slot 5 won 12 races of 200 rather than 19. On 200
+races the expected count per slot is 25 and its Poisson spread is 5, so that is
+a two-and-a-half sigma swing on the rarest statistic in the report while the
+four measures built from every racer in every race did not move at all. Section
+14 says not to judge the start on it alone, and nothing else agrees with it.
+The 600-seed run is what settles it.
