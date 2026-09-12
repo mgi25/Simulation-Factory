@@ -15,6 +15,11 @@ frames/
 videos/
 *.mp4
 
+# Delivered cuts kept outside output/ so they survive a worktree being
+# removed. The films are already covered by *.mp4; this keeps whatever
+# else lands beside them (contact sheets, notes) out of the branch too.
+exports/
+
 # Iteration frames from the art labs: kept out of the branch on purpose,
 # because they are the working set and change every render.
 docs/validation/**/_preview/
