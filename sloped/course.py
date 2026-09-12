@@ -410,10 +410,46 @@ GUARD_BOOSTS: dict[str, tuple[float, int, int, int, int] | None] = {
     # unwinding roll digs on the outside of the inflection.
     "leg2": (0.50, 60, 72, 106, 116),
     # **V1.15: orange's hairpin, and it is the same defect the other three are.**
-    # Placeholder until the scan below fills it; `None` means the run builds
-    # exactly as V1.14 shipped it, so `tools/sloped_fork_lab.py` can price the
-    # window against a row that is the file on disk.
-    "orange": None,
+    #
+    # The 200-seed gate put sixteen of twenty seven losses on orange's lobe,
+    # and they are **escapes** rather than jams. `tools/sloped_orange_trace.py`
+    # reports the whole field rather than only the losers, as the highest a
+    # marble rides as a fraction of the run's own containment:
+    #
+    #     orange[]    16    20    21    22    23    24    26    28    30    34
+    #     highest   0.91  1.22  1.23  1.91  1.95  1.89  1.54  1.23  1.09  1.00
+    #
+    # Sixteen consecutive samples over the top of the rail. Two measured
+    # reasons, both geometry rather than traffic:
+    #
+    # * orange's lobe is the **tightest corner on the course**. Its turn radius
+    #   falls to 2.74 simulation units at `orange[18]`, and at 32 degrees of
+    #   bank - which `sloped.contract` pins as an extreme and a slew cannot
+    #   raise - that corner is balanced at **20.5 wu/s**. The escapers are
+    #   doing 19.3 to 21.7 at their own highest point.
+    # * orange is a branch, so its whole profile is at `layout.BRANCH_SCALE`
+    #   0.82 and its containment is **1.1509** against the hero channel's
+    #   1.4035. The smallest rail on the course is on its hardest corner.
+    #
+    # Scanned against whole races, 32 seeds and 256 racers a row:
+    #
+    #     boost                 finish   all8    esc | blue fin | orng fin
+    #     none                   0.981   0.84  0.019 |    1.000 |    0.942
+    #     +0.30 (4,12,38,46)     0.981   0.84  0.016 |    1.000 |    0.942
+    #     +0.50 (4,12,38,46)     0.988   0.91  0.012 |    1.000 |    0.971
+    #     +0.75 (4,12,38,46)     0.988   0.91  0.012 |    1.000 |    0.971
+    #     +0.50 (14,18,36,42)    0.981   0.84  0.016 |    0.995 |    0.957
+    #
+    # 0.50 and 0.75 are indistinguishable, so the smaller ships - and it is the
+    # same height as the other three windows, which is a consistency rather
+    # than a coincidence: it is what a marble a diameter over the rail needs.
+    # The **window has to start early**: closed up to 14 it recovers a third of
+    # what the wide one does and costs blue a racer, because the field is
+    # already over containment by `orange[16]` and the lead hands over at 0.
+    #
+    # Route share is 0.270 in every row, so this buys survival without moving
+    # the split, exactly as `MERGE_GUARD_WINDOW` did.
+    "orange": (0.50, 4, 12, 38, 46),
 }
 
 # Where a run's roll is not allowed to unwind faster than the drop pays for,

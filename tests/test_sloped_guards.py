@@ -143,10 +143,18 @@ def test_the_asset_applies_the_boost_to_its_guard_sweep():
 
 
 def test_every_boosted_run_is_one_the_escape_trace_named():
-    """Three sites, each measured before it was given a rail."""
-    assert set(GUARD_BOOSTS) == {"launch", "leg1", "leg2"}
+    """Four sites, each measured before it was given a rail.
+
+    orange's is V1.15's and it was measured the same way the first three were,
+    by `tools/sloped_orange_trace.py` rather than by `sloped_escape_trace.py`:
+    the start lab carries the launch and leg1 only, so a lobe's own losses need
+    whole races. The reading is the same one - how high the field rides as a
+    fraction of the run's own containment - and orange's answer is over 1.0 for
+    sixteen consecutive samples.
+    """
+    assert set(GUARD_BOOSTS) == {"launch", "leg1", "leg2", "orange"}
     for name, (extra, a, b, c, d) in GUARD_BOOSTS.items():
-        run = TrackRun(name)
+        run = TrackRun(name, spec=None if name != "orange" else dict(layout.run("orange")))
         assert 0 <= a < b < c < d <= len(run.path) - 1, name
         # Tall enough to matter against a 0.26 authored rail, and not so tall
         # that the channel becomes a tube.

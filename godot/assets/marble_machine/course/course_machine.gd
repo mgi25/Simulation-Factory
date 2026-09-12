@@ -48,6 +48,11 @@ const GUARD_BOOSTS := {
 	"launch": [0.50, 12, 24, 70, 84],
 	"leg1": [0.50, 46, 58, 100, 110],
 	"leg2": [0.50, 60, 72, 106, 116],
+	# orange's hairpin: the smallest rail on the course - a branch is at
+	# BRANCH_SCALE 0.82 throughout - on its tightest corner, radius 2.74 at
+	# `orange[18]` and balanced at 20.5 wu/s under 32 degrees of bank. The
+	# field rode over the top of it for sixteen consecutive samples.
+	"orange": [0.50, 4, 12, 38, 46],
 }
 
 ## Where a run's roll may not unwind faster than the drop pays for. **The same

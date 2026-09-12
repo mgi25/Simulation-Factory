@@ -237,3 +237,30 @@ of the 0.26 rail" - and it is the same repair.
 **This is not a regression of the shoulder fix.** V1.14's held-out fifty booked
 four of 400 to the orange lobe, which is 1.0%; this run books sixteen of 1600,
 which is 1.0%. It is unchanged and was simply behind a larger defect.
+
+## orange's rail, and the plumbing bug the scan found first
+
+`GUARD_BOOSTS` gains a fourth entry, `orange: (0.50, 4, 12, 38, 46)`, measured
+over whole races at 32 seeds and 256 racers a row:
+
+    boost                 finish   all8    esc | blue fin | orng fin
+    none                   0.981   0.84  0.019 |    1.000 |    0.942
+    +0.30 (4,12,38,46)     0.981   0.84  0.016 |    1.000 |    0.942
+    +0.50 (4,12,38,46)     0.988   0.91  0.012 |    1.000 |    0.971
+    +0.75 (4,12,38,46)     0.988   0.91  0.012 |    1.000 |    0.971
+    +0.50 (14,18,36,42)    0.981   0.84  0.016 |    0.995 |    0.957
+
+0.50 and 0.75 are indistinguishable, so the smaller ships, and it is the same
+height as the other three windows - which is what a marble a diameter over the
+rail needs rather than a coincidence. The **window has to start early**: closed
+up to sample 14 it recovers a third of what the wide one does and costs blue a
+racer, because the field is already over containment by `orange[16]` and the
+lead hands over at 0. Route share is 0.270 in every row.
+
+**The first version of this scan returned four byte-identical rows**, which is
+`instrument-bugs-hide-geometry-findings` in its usual shape and this time the
+bug was in the course rather than in the tool: `sloped_course` reads
+`GUARD_BOOSTS` in the dict comprehension that builds the four `CHAIN` runs, and
+the sprint, blue's lobe and orange's lobe are each constructed separately
+afterwards. An entry in the table for any of those three **reached nothing at
+all**. All three now pass it through, and the scan discriminates.
