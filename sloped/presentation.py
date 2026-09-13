@@ -52,6 +52,7 @@ __all__ = [
     "GRAVITY",
     "impacts",
     "load",
+    "omit_frames",
     "project",
     "rolling",
     "screen_track",
@@ -160,6 +161,123 @@ def load(
     if master_frames is None:
         master_frames = int(round(float(track["duration"]) * fps)) + 1
     return replay, track, Clock(segments, fps=fps, master_frames=master_frames)
+
+
+# --- taking more time out of a master that is already rendered --------------
+
+
+def _window_of(clock: Clock, output: float) -> int | None:
+    """Which edit window an output second falls in, by the renderer's own rule."""
+    for index, (out_from, out_to, _replay_from, _replay_to) in enumerate(clock.segments):
+        if out_from - 1e-9 <= output <= out_to + 1e-9:
+            return index
+    return None
+
+
+def omit_frames(
+    clock: Clock, drop: Sequence[tuple[int, int]]
+) -> tuple[Clock, tuple[tuple[int, int], ...]]:
+    """The same master with whole frames taken out of it, and what to keep.
+
+    An edit omits replay time by never rendering it. A master that is **already
+    rendered** can omit more of it exactly one other honest way: drop whole
+    frames and close the gap. Nothing is resampled, nothing is reordered, no
+    frame is shown twice and no frame is shown for longer than 1/fps - every
+    surviving frame keeps the replay instant it always had, and everything after
+    a cut simply happens earlier by however many frames went.
+
+    `drop` is inclusive master-frame ranges. What comes back is the new clock -
+    the old map with the two touched window edges rewritten and every later
+    window shifted - and the frame ranges to keep, which is what an encoder
+    needs. Frame 0 may never go, because the hold clones it.
+    """
+    fps = clock.fps
+    total = clock.master_frames
+    ranges = tuple(sorted((int(first), int(last)) for first, last in drop))
+    if not ranges:
+        return clock, ((0, total - 1),)
+
+    end = -1
+    for first, last in ranges:
+        if not 0 < first <= last < total - 1:
+            raise ValueError(
+                f"the cut {(first, last)} is not inside master frames 1..{total - 2}"
+            )
+        if first <= end:
+            raise ValueError(f"the cut {(first, last)} overlaps the one before it")
+        end = last
+    gone = set()
+    for first, last in ranges:
+        gone.update(range(first, last + 1))
+
+    # What each master frame is showing, read off the map the way the renderer
+    # read it: first window whose output span contains the frame's own second.
+    replay_of: list[float] = []
+    window_of: list[int] = []
+    for frame in range(total):
+        output = frame / fps
+        index = _window_of(clock, output)
+        if index is None:
+            raise ValueError(f"master frame {frame} is not on the edit map")
+        out_from, _out_to, replay_from, _replay_to = clock.segments[index]
+        replay_of.append(replay_from + (output - out_from))
+        window_of.append(index)
+
+    # **A cut must step forwards in the replay.** Anything else is a repeated
+    # frame or a rewind, and both are lies about what the physics did.
+    for first, last in ranges:
+        if replay_of[last + 1] <= replay_of[first - 1] + 0.5 / fps:
+            raise ValueError(
+                f"the cut {(first, last)} does not step forwards in the replay"
+            )
+
+    kept = [frame for frame in range(total) if frame not in gone]
+    before = [0] * (total + 1)
+    running = 0
+    for frame in range(total):
+        before[frame] = running
+        if frame in gone:
+            running += 1
+    before[total] = running
+
+    segments: list[tuple[float, float, float, float]] = []
+    for index, (out_from, out_to, replay_from, replay_to) in enumerate(clock.segments):
+        mine = [frame for frame in kept if window_of[frame] == index]
+        if not mine:
+            continue
+        first, last = mine[0], mine[-1]
+        cut_head = any(window_of[frame] == index and frame < first for frame in gone)
+        cut_tail = any(window_of[frame] == index and frame > last for frame in gone)
+        # An untouched edge keeps the window's own figure, moved by the frames
+        # that went before it; a trimmed edge becomes the frame that survived.
+        new_from = (first - before[first]) / fps if cut_head else out_from - before[first] / fps
+        new_replay_from = replay_of[first] if cut_head else replay_from
+        new_to = (last - before[last]) / fps if cut_tail else out_to - before[last] / fps
+        new_replay_to = replay_of[last] if cut_tail else replay_to
+        # **The replay edges are rounded and the output edges are not**, and the
+        # asymmetry is not a slip. `at()` is asked about replay instants that
+        # come out of the replay file, where every `t` is written to six
+        # decimals, so an edge carrying a sixteen-digit 5.833333333... would
+        # exclude the very frame it names. `replay_at()` is asked about output
+        # seconds that are exact `frame / fps` divisions, so an edge rounded
+        # *up* past one would exclude that frame instead. Each edge is written
+        # in the units it is compared against; the slope stays one to under a
+        # microsecond, which is a thousandth of a frame.
+        segments.append((new_from, new_to, round(new_replay_from, 6), round(new_replay_to, 6)))
+
+    keep: list[tuple[int, int]] = []
+    run_from = previous = kept[0]
+    for frame in kept[1:]:
+        if frame != previous + 1:
+            keep.append((run_from, previous))
+            run_from = frame
+        previous = frame
+    keep.append((run_from, previous))
+
+    return (
+        Clock(tuple(segments), hold=clock.hold, fps=fps, master_frames=len(kept)),
+        tuple(keep),
+    )
 
 
 # --- what happened ----------------------------------------------------------

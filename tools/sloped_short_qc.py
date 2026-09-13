@@ -1,9 +1,17 @@
 """Section 14 of the brief, as measurements on the file that came out.
 
-Everything here reads `real_race_v20.mp4` itself rather than the plan that made
+Everything here reads the delivered mp4 itself rather than the plan that made
 it, because the question a reviewer asks is about the file. Where a check can be
 answered from the pixels or the samples it is; where it cannot - "does the time
 skip feel intentional" - the closest measurable proxy is stated as what it is.
+
+    python tools/sloped_short_qc.py            # V21.1
+    python tools/sloped_short_qc.py v20        # the earlier cut
+
+**The frame count is derived, not typed.** V21.1 is V20 with 85 master frames
+omitted, so a hard-coded 1192 would have had to be edited in two places and
+would then only be asserting that somebody edited it. `sloped_short.load_all`
+builds the edition's clock and this asks it how long the film should be.
 """
 
 from __future__ import annotations
@@ -19,11 +27,8 @@ from typing import Any
 sys.path.insert(0, os.getcwd())
 
 OUT_DIR = os.path.join("output", "sloped_race_v1")
-VIDEO = os.path.join(OUT_DIR, "real_race_v20.mp4")
-VISUAL = os.path.join(OUT_DIR, "real_race_v20_visual.mp4")
 
 WIDTH, HEIGHT, FPS = 1080, 1920, 60
-EXPECTED_FRAMES = 1192           # 1150 of master plus 42 held
 TRUE_PEAK_CEILING_DBTP = -1.0
 BLACK_LUMA = 6.0                 # mean luma under this is a black frame
 
@@ -136,9 +141,22 @@ def _hold_is_static(path: str, hold_frames: int) -> tuple[bool, str]:
     )
 
 
-def report(seed: int = 5432) -> bool:
+def report(seed: int = 5432, edition: str = "v21") -> bool:
     from sloped import presentation
+    from tools.sloped_short import EDITIONS, load_all
     import numpy as np
+
+    if edition not in EDITIONS:
+        print(f"  [FAIL] no such edition: {edition!r}")
+        return False
+    VIDEO = EDITIONS[edition]["video"]
+    VISUAL = EDITIONS[edition]["visual"]
+    low, high = EDITIONS[edition]["runtime"]
+
+    # The clock the film actually runs on, cuts and all, so every figure below
+    # is the edition's own rather than a number carried over from the last one.
+    replay, track, clock = load_all(seed, edition)[:3]
+    EXPECTED_FRAMES = clock.frames
 
     ok = True
 
@@ -162,7 +180,8 @@ def report(seed: int = 5432) -> bool:
     frames = int(video["nb_frames"])
     check(frames == EXPECTED_FRAMES,
           f"{frames} frames = {frames / FPS:.4f} s (want {EXPECTED_FRAMES})")
-    check(19.8 <= frames / FPS <= 20.2, f"runtime {frames / FPS:.3f} s inside 19.8-20.2")
+    check(low <= frames / FPS <= high,
+          f"runtime {frames / FPS:.3f} s inside {low}-{high}")
     check(len(audios) == 1, f"{len(audios)} audio stream(s)")
     visual = _probe(VISUAL)
     check(not [s for s in visual["streams"] if s["codec_type"] == "audio"],
@@ -182,11 +201,6 @@ def report(seed: int = 5432) -> bool:
         check(False, "could not measure loudness")
 
     # The designed hierarchy, measured on the mix this build produces.
-    replay, track, clock = presentation.load(
-        os.path.join(OUT_DIR, f"race_{seed}.json"),
-        os.path.join(OUT_DIR, f"cameras_{seed}.json"),
-        EXPECTED_FRAMES - int(round(presentation.HOLD_SECONDS * FPS)),
-    )
     from audio import marble
     from audio.synthesis import SAMPLE_RATE
     mix = marble.build_race_audio(replay, track, clock)
@@ -218,7 +232,11 @@ def report(seed: int = 5432) -> bool:
           f"the loudest moment in the film is {top:.2f} s, the winner crosses at {winner_at:.2f} s")
     check(not mix.limited, "the safety limiter stayed idle, so the hierarchy is as designed")
 
-    ordinary = float(np.median(envelope[int(4 * 100):int(11 * 100)]))
+    # A typical mid-race moment: after the start and before the finish, on
+    # whichever clock this edition runs, so the reference is the same footage.
+    mid_from = clock.at(8.62) or 4.0
+    mid_to = clock.at(15.35) or (clock.duration - 8.8)
+    ordinary = float(np.median(envelope[int(mid_from * 100):int(mid_to * 100)]))
     check(db(10 ** (winner / 20)) - db(ordinary) > 6.0,
           f"the winner is {winner - db(ordinary):.1f} dB over a typical mid-race moment")
 
@@ -264,8 +282,22 @@ def report(seed: int = 5432) -> bool:
     gate = presentation.actuator_move(replay, clock, "start.paddle")
     check(gate is not None and gate > 0.80,
           f"the hook is gone by 0.80 s; the gates first move at {gate:.3f} s")
+
+    # **The retention claim, measured rather than asserted.** The floor drops
+    # when `start.panel` first moves, and after it the field never stops going
+    # downhill - so this is the second the race proper starts for a viewer.
+    trapdoor = presentation.actuator_move(replay, clock, "start.panel")
+    print(f"         the floor opens at {trapdoor:.3f} s "
+          f"({trapdoor - gate:.3f} s after the gates)")
+    if edition == "v21":
+        check(trapdoor is not None and trapdoor <= 2.0,
+              f"the release is inside the first two seconds ({trapdoor:.3f} s)")
+
+    # Omitted time is cued, and the cue is the only thing standing in for it.
+    for at, dropped in presentation.omissions(clock):
+        print(f"         {dropped:.3f} s of replay omitted at {at:.3f} s")
     return ok
 
 
 if __name__ == "__main__":
-    raise SystemExit(0 if report() else 1)
+    raise SystemExit(0 if report(edition=(sys.argv[1] if len(sys.argv) > 1 else "v21")) else 1)
