@@ -309,8 +309,32 @@ func get_material(key: String) -> StandardMaterial3D:
 	var material := _build(key)
 	if contrast == CONTRAST_V21 and V21_RETUNE.has(key):
 		_retune(material, V21_RETUNE[key])
+	# The environment profile has the last word, and only over the surfaces it
+	# actually names. See `environment_builder.apply_palette`.
+	if _environment.has(key):
+		_retune(material, _environment[key])
 	_cache[key] = material
 	return material
+
+
+## Surface overrides from the selected `EnvironmentProfile`, keyed by material
+## name. Empty for every caller that does not select one, which is what keeps
+## the labs' committed frames reproducing.
+var _environment: Dictionary = {}
+
+
+func apply_environment(overrides: Dictionary) -> void:
+	## Install a profile's surface table.
+	##
+	## The cache is dropped rather than patched: a material built before the
+	## overrides arrived is already in somebody else's mesh, and rebuilding is
+	## the only way the two agree. Called once, before anything is built.
+	_environment = overrides.duplicate(true)
+	_cache.clear()
+
+
+func environment_overrides() -> Dictionary:
+	return _environment
 
 
 func _retune(material: StandardMaterial3D, spec: Dictionary) -> void:

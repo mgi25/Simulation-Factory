@@ -26,6 +26,8 @@ from pathlib import Path
 
 import pytest
 
+from sloped import environment as env
+
 GODOT = Path(__file__).resolve().parents[1] / "godot"
 PALETTE_GD = GODOT / "assets" / "marble_machine" / "lab_palette.gd"
 WORLD_GD = GODOT / "assets" / "marble_machine" / "course" / "course_world.gd"
@@ -127,12 +129,18 @@ def _arm_number(key: str, position: int) -> float | None:
 # --- the pass is gated -----------------------------------------------------
 
 def test_the_labs_default_to_the_v20_look():
-    """An ungated retune would silently re-grade every committed lab frame."""
-    assert 'var _contrast := ""' in COURSE_SCENE_GD.read_text(encoding="utf-8")
+    """An ungated retune would silently re-grade every committed lab frame.
+
+    The V23 environment system moved the world's numbers into
+    `environment/profiles/alpine_neon.json` and added a resolved profile to
+    both calls. The gate did not move: `_contrast` still starts empty, and it
+    is still what selects the pass.
+    """
     text = COURSE_SCENE_GD.read_text(encoding="utf-8")
+    assert 'var _contrast := ""' in text
     assert 'Palette.new("tower", _contrast)' in text
-    assert "World.build_environment(_no_glow, _contrast)" in text
-    assert "World.build_lights(self, _contrast)" in text
+    assert "World.build_environment(_no_glow, _contrast," in text
+    assert "World.build_lights(self, _contrast," in text
 
 
 def test_only_the_race_scene_turns_the_pass_on():
@@ -146,20 +154,50 @@ def test_only_the_race_scene_turns_the_pass_on():
 
 
 def test_every_environment_change_is_behind_the_flag():
-    """`build_environment` and `build_lights` must do nothing new by default."""
+    """`build_environment` and `build_lights` must do nothing new by default.
+
+    This used to be read out of `course_world.gd`, where each energy the pass
+    moves was written as `2.7 if v21 else 3.2` so the V20 value stayed in the
+    file. V23 moved those numbers into the root environment profile and the
+    pass into its `contrast.v21` overlay, so the same guarantee is now a
+    property of the data: the profile resolved with no contrast pass is the
+    V20 rig, field for field.
+    """
     assert 'const CONTRAST_V21 := "v21"' in WORLD
-    assert "static func build_environment(no_glow: bool, contrast := \"\")" in WORLD
-    assert 'static func build_lights(parent: Node3D, contrast := "")' in WORLD
-    assert "var v21 := contrast == CONTRAST_V21" in WORLD
-    # Every energy the pass moves is written as a conditional, so the V20
-    # value is still in the file and still what an unflagged build gets.
-    for light, v20 in (("key.light_energy", "3.2"),
-                       ("world_key.light_energy", "2.9"),
-                       ("world_fill.light_energy", "0.95"),
-                       ("rim.light_energy", "2.3"),
-                       ("bounce.light_energy", "1.15")):
-        assert re.search(rf"{re.escape(light)} = [\d.]+ if v21 else {v20}",
-                         WORLD), f"{light} lost its V20 value"
+    assert 'static func build_environment(no_glow: bool, contrast := ""' in WORLD
+    assert 'static func build_lights(parent: Node3D, contrast := ""' in WORLD
+    v20 = env.resolve("alpine_neon")
+    for light, energy in (("Key", 3.2), ("WorldKey", 2.9),
+                          ("WorldFill", 0.95), ("Rim", 2.3),
+                          ("ValleyBounce", 1.15)):
+        assert v20["lights"][light]["energy"] == energy, \
+            f"{light} lost its V20 value"
+    assert v20["grade"]["ambient_energy"] == 0.42
+    assert v20["glow"]["hdr_threshold"] == 1.16
+    assert v20["ssao"]["radius"] == 0.9
+
+
+def test_the_v21_pass_still_moves_exactly_what_it_moved():
+    """The overlay is the whole of the pass, and it is a short list.
+
+    V21 was argued light by light. If a later theme edit widened the overlay
+    the argument would no longer describe what ships, so the overlay's own
+    reach is pinned here rather than left to a render comparison.
+    """
+    v20 = env.resolve("alpine_neon")
+    v21 = env.resolve("alpine_neon", "v21")
+    moved = {path for path, _, _ in env.diff(v20, v21)}
+    assert moved == {
+        "contrast_pass",
+        "grade.ambient_energy", "grade.contrast", "grade.saturation",
+        "fog.density", "fog.aerial_perspective",
+        "ssao.radius", "ssao.intensity", "ssao.light_affect",
+        "glow.intensity", "glow.bloom", "glow.hdr_threshold",
+        "lights.Key.energy", "lights.WorldKey.energy",
+        "lights.WorldFill.energy",
+        "lights.Rim.energy", "lights.Rim.specular",
+        "lights.ValleyBounce.energy",
+    }
 
 
 def test_the_palette_only_retunes_when_asked():

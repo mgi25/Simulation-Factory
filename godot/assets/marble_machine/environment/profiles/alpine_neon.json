@@ -1,0 +1,420 @@
+{
+  "id": "alpine_neon",
+  "title": "Alpine Neon Valley",
+  "family": "alpine",
+  "summary": "The shipped V20/V21 direction: a cold dusk mountainside, a warm horizon behind it, service lighting along the course and lit industry in the gorge below. The root profile - every field the schema has is set here, and every other profile is a delta over it.",
+  "extends": null,
+  "sky": {
+    "top": "#040A16",
+    "horizon": "#6A5C63",
+    "curve": 0.16,
+    "sky_energy": 1.0,
+    "ground_bottom": "#080F19",
+    "ground_horizon": "#4A4048",
+    "ground_curve": 0.28,
+    "sun_angle_max": 46.0,
+    "energy": 1.0
+  },
+  "grade": {
+    "background_energy": 0.78,
+    "ambient_energy": 0.42,
+    "ambient_sky_contribution": 1.0,
+    "tonemap": "aces",
+    "exposure": 0.82,
+    "white": 14.0,
+    "contrast": 1.06,
+    "saturation": 1.2,
+    "brightness": 1.0
+  },
+  "fog": {
+    "enabled": true,
+    "colour": "#5E5A6E",
+    "energy": 0.85,
+    "sun_scatter": 0.52,
+    "density": 0.0016,
+    "sky_affect": 0.3,
+    "aerial_perspective": 0.72,
+    "height": -14.0,
+    "height_density": 0.022
+  },
+  "ssao": {
+    "enabled": true,
+    "radius": 0.9,
+    "intensity": 2.1,
+    "power": 1.5,
+    "light_affect": 0.12
+  },
+  "ssr": {
+    "enabled": true,
+    "max_steps": 44,
+    "fade_in": 0.2,
+    "fade_out": 2.0
+  },
+  "glow": {
+    "enabled": true,
+    "intensity": 1.1,
+    "bloom": 0.26,
+    "hdr_threshold": 1.16,
+    "hdr_scale": 2.2,
+    "blend": "softlight",
+    "levels": [0.0, 0.3, 0.65, 0.85, 0.45, 0.0, 0.0]
+  },
+  "lights": {
+    "Key": {
+      "cull_mask": 1,
+      "colour": "#FFF2E2",
+      "energy": 3.2,
+      "specular": 1.0,
+      "rotation": [-44.0, -34.0, 0.0],
+      "shadow": {
+        "enabled": true,
+        "max_distance": 110.0,
+        "splits": [0.05, 0.16, 0.44],
+        "blend_splits": true,
+        "bias": 0.035,
+        "normal_bias": 1.2
+      }
+    },
+    "WorldKey": {
+      "cull_mask": 2,
+      "colour": "#DFEBFF",
+      "energy": 2.9,
+      "specular": 0.2,
+      "rotation": [-26.0, -78.0, 0.0],
+      "shadow": {
+        "enabled": true,
+        "max_distance": 300.0,
+        "splits": [0.07, 0.22, 0.52],
+        "blend_splits": true,
+        "bias": 0.045,
+        "normal_bias": 1.1
+      }
+    },
+    "WorldFill": {
+      "cull_mask": 2,
+      "colour": "#6E9AC4",
+      "energy": 0.95,
+      "specular": 0.0,
+      "rotation": [-14.0, 26.0, 0.0],
+      "shadow": {
+        "enabled": false
+      }
+    },
+    "WorldWarm": {
+      "cull_mask": 2,
+      "colour": "#FF9C46",
+      "energy": 2.3,
+      "specular": 0.1,
+      "rotation": [-8.0, 52.0, 0.0],
+      "shadow": {
+        "enabled": false
+      }
+    },
+    "Rim": {
+      "cull_mask": 4294967295,
+      "colour": "#8ED6FF",
+      "energy": 2.3,
+      "specular": 1.5,
+      "rotation": [-9.0, 162.0, 0.0],
+      "shadow": {
+        "enabled": false
+      }
+    },
+    "ValleyBounce": {
+      "cull_mask": 4294967295,
+      "colour": "#FFB06A",
+      "energy": 1.15,
+      "specular": 0.25,
+      "rotation": [36.0, 54.0, 0.0],
+      "shadow": {
+        "enabled": false
+      }
+    }
+  },
+  "backdrop": {
+    "near_range": {
+      "base_y": -78.0,
+      "facets": 30,
+      "tiers": 15,
+      "taper": 0.34,
+      "materials": ["rock_soft_near", "rock_soft_mid"],
+      "masses": [
+        [168.0, 214.0, 118.0, 46.0, 3],
+        [188.0, 206.0, 126.0, 48.0, 11],
+        [208.0, 210.0, 124.0, 48.0, 19],
+        [228.0, 218.0, 120.0, 46.0, 27],
+        [248.0, 232.0, 112.0, 44.0, 35],
+        [140.0, 246.0, 110.0, 46.0, 43],
+        [272.0, 250.0, 108.0, 44.0, 51],
+        [112.0, 272.0, 104.0, 44.0, 59],
+        [300.0, 276.0, 106.0, 44.0, 67],
+        [84.0, 300.0, 100.0, 42.0, 75],
+        [330.0, 304.0, 100.0, 42.0, 83],
+        [20.0, 330.0, 96.0, 42.0, 91]
+      ]
+    },
+    "mid_range": {
+      "base_y": -132.0,
+      "facets": 26,
+      "tiers": 13,
+      "taper": 0.38,
+      "materials": ["rock_soft_mid", "rock_soft_far"],
+      "masses": [
+        [160.0, 372.0, 144.0, 74.0, 5],
+        [182.0, 358.0, 154.0, 78.0, 13],
+        [202.0, 350.0, 158.0, 80.0, 21],
+        [222.0, 362.0, 152.0, 78.0, 29],
+        [242.0, 380.0, 142.0, 74.0, 37],
+        [130.0, 404.0, 136.0, 72.0, 45],
+        [268.0, 408.0, 134.0, 72.0, 53],
+        [100.0, 436.0, 130.0, 70.0, 61],
+        [298.0, 440.0, 130.0, 70.0, 69],
+        [40.0, 470.0, 124.0, 68.0, 77],
+        [336.0, 474.0, 124.0, 68.0, 85]
+      ]
+    },
+    "far_range": {
+      "base_y": -186.0,
+      "facets": 22,
+      "tiers": 11,
+      "taper": 0.42,
+      "materials": ["rock_soft_far", "rock_soft_haze"],
+      "masses": [
+        [176.0, 596.0, 188.0, 116.0, 7],
+        [200.0, 580.0, 198.0, 120.0, 15],
+        [224.0, 600.0, 186.0, 116.0, 23],
+        [150.0, 634.0, 174.0, 112.0, 31],
+        [252.0, 640.0, 174.0, 112.0, 39],
+        [120.0, 686.0, 166.0, 108.0, 47],
+        [282.0, 690.0, 166.0, 108.0, 55],
+        [60.0, 740.0, 158.0, 104.0, 63],
+        [320.0, 744.0, 158.0, 104.0, 71]
+      ]
+    },
+    "structures": {
+      "shell": "far_structure",
+      "lit": "lit_far_window_hero",
+      "bands": 4,
+      "band_from": 0.28,
+      "band_step": 0.17,
+      "sites": [
+        [196.0, 316.0, -46.0, 40.0, 5.0, 2],
+        [204.0, 336.0, -50.0, 44.0, 5.4, 6],
+        [212.0, 322.0, -47.0, 38.0, 4.8, 14],
+        [190.0, 348.0, -52.0, 42.0, 5.2, 22],
+        [219.0, 352.0, -53.0, 41.0, 5.0, 26],
+        [178.0, 330.0, -48.0, 36.0, 4.6, 34]
+      ]
+    },
+    "dusk_band": {
+      "material": "lit_dusk_band",
+      "count": 9,
+      "bearing_from": 160.0,
+      "bearing_step": 10.0,
+      "radius": 880.0,
+      "base_y": -78.0,
+      "size": [150.0, 30.0, 8.0],
+      "round": 8.0
+    },
+    "clouds": {
+      "material": "cloud_bank",
+      "count": 14,
+      "bearing_from": 96.0,
+      "bearing_step": 17.0,
+      "radius": 430.0,
+      "radius_step": 120.0,
+      "radius_cycle": 3,
+      "base_y": -96.0,
+      "drop_step": 14.0,
+      "drop_cycle": 4,
+      "size": [190.0, 13.0, 26.0],
+      "round": 12.0
+    }
+  },
+  "terrain": {
+    "surfaces": {
+      "shelf": "slope_earth",
+      "flank": "slope_rock",
+      "cliff": "slope_cliff",
+      "high": "slope_cap"
+    },
+    "scatter": [
+      {
+        "count": 64,
+        "clearance": 5.4,
+        "gauge": 1.0,
+        "materials": ["slope_cliff", "slope_boulder"],
+        "accent_every": 3
+      },
+      {
+        "count": 110,
+        "clearance": 3.1,
+        "gauge": 0.34,
+        "materials": ["slope_cliff", "slope_boulder"],
+        "accent_every": 3
+      }
+    ]
+  },
+  "dressing": {
+    "enabled": true,
+    "lamps": {
+      "enabled": true,
+      "spacing": 11.0,
+      "offset": 2.35,
+      "samples": 240,
+      "column": "graphite",
+      "foot": "graphite_deep",
+      "arm": "graphite",
+      "head": "graphite_soft",
+      "lenses": ["lit_cyan_soft", "lit_window"],
+      "accent_every": 3
+    },
+    "scrub": {
+      "enabled": true,
+      "target": 74,
+      "attempts": 900,
+      "span_x": 58.0,
+      "span_z": 62.0,
+      "max_slope": 0.86,
+      "clearance": 4.2,
+      "clump_min": 3,
+      "clump_spread": 4,
+      "materials": ["scrub_dark", "scrub_dry"]
+    },
+    "pylons": {
+      "enabled": true,
+      "beacon": "lit_cyan_line_hero",
+      "leg": "graphite",
+      "tie": "graphite_deep",
+      "sites": [
+        [-44.0, -54.0, 15.0],
+        [-20.0, -62.0, 17.5],
+        [8.0, -58.0, 14.0],
+        [34.0, -48.0, 16.0],
+        [-58.0, -30.0, 13.0],
+        [52.0, -22.0, 12.0]
+      ]
+    },
+    "valley": {
+      "enabled": true,
+      "count": 7,
+      "deck": "far_structure",
+      "glow": "lit_valley_hero",
+      "block": "far_structure",
+      "bearing_from": -40.0,
+      "bearing_step": 22.0,
+      "reach": 46.0,
+      "reach_step": 11.0,
+      "reach_cycle": 3,
+      "offset": [34.0, 6.0],
+      "size": 5.0,
+      "size_step": 2.6
+    },
+    "practicals": {
+      "enabled": true,
+      "samples": 11,
+      "spill": {
+        "colour": "#9FD6F0",
+        "energy": 1.5,
+        "range": 13.0,
+        "attenuation": 1.6,
+        "lift": 2.4
+      },
+      "under": {
+        "colour": "#FFA658",
+        "energy": 2.1,
+        "range": 15.0,
+        "attenuation": 1.4,
+        "lift": -3.4
+      }
+    }
+  },
+  "zones": {
+    "start": {
+      "colour": "#6BE9FF",
+      "energy": 2.6,
+      "range": 9.0,
+      "lift": 2.2
+    },
+    "mix": {
+      "colour": "#A379FF",
+      "energy": 2.6,
+      "range": 8.0,
+      "lift": 1.8
+    },
+    "obstacle": {
+      "colour": "#FF9A48",
+      "energy": 3.0,
+      "range": 9.5,
+      "lift": 2.4
+    },
+    "split": {
+      "colour": "#EAF7FF",
+      "energy": 2.4,
+      "range": 9.0,
+      "lift": 2.6
+    },
+    "merge": {
+      "colour": "#FFC168",
+      "energy": 2.8,
+      "range": 9.0,
+      "lift": 2.0
+    },
+    "finish": {
+      "colour": "#FFC46A",
+      "energy": 3.4,
+      "range": 14.0,
+      "lift": 2.6
+    }
+  },
+  "ravine": {
+    "water": {
+      "enabled": false
+    }
+  },
+  "accent": {
+    "intensity": 1.0
+  },
+  "palette": {},
+  "contrast": {
+    "v21": {
+      "grade": {
+        "ambient_energy": 0.35,
+        "contrast": 1.0,
+        "saturation": 1.26
+      },
+      "fog": {
+        "density": 0.0019,
+        "aerial_perspective": 0.8
+      },
+      "ssao": {
+        "radius": 0.7,
+        "intensity": 2.7,
+        "light_affect": 0.22
+      },
+      "glow": {
+        "intensity": 0.95,
+        "bloom": 0.19,
+        "hdr_threshold": 1.34
+      },
+      "lights": {
+        "Key": {
+          "energy": 2.7
+        },
+        "WorldKey": {
+          "energy": 2.45
+        },
+        "WorldFill": {
+          "energy": 0.68
+        },
+        "Rim": {
+          "energy": 1.75,
+          "specular": 2.1
+        },
+        "ValleyBounce": {
+          "energy": 0.85
+        }
+      }
+    }
+  }
+}

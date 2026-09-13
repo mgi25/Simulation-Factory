@@ -30,6 +30,8 @@ const Layout := preload("res://assets/marble_machine/course/course_layout.gd")
 const Modules := preload("res://assets/marble_machine/course/course_modules.gd")
 const FinishArena := preload("res://assets/marble_machine/course/course_finish.gd")
 const Dressing := preload("res://assets/marble_machine/course/course_dressing.gd")
+const EnvBuilder := preload(
+	"res://assets/marble_machine/environment/environment_builder.gd")
 
 const KEEL_DROP := 0.98         # v2_track's keel bottom, in profile units
 
@@ -138,6 +140,18 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 	var table := Layout.table(key)
 	var terrain_cfg: Dictionary = table["terrain"]
 	var detail := str(options.get("detail", "block"))
+	# The resolved `EnvironmentProfile`, or nothing. Its ground fields are
+	# folded into the layout's terrain table here rather than read at each
+	# use, so `Terrain.build` keeps taking one config dictionary and has no
+	# idea a profile exists. What is folded in is material keys and scatter
+	# densities: the landform stays the layout table's, and
+	# `environment_profile.validate` is what stops a theme reaching it.
+	var environment: Dictionary = options.get("environment", {})
+	var ground_theme: Dictionary = EnvBuilder.terrain(environment)
+	var scatter_passes: Array = ground_theme.get("scatter", [])
+	ground_theme.erase("scatter")
+	for field in ground_theme:
+		terrain_cfg[field] = ground_theme[field]
 
 	var root := Node3D.new()
 	root.name = "Course"
@@ -230,13 +244,23 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 	# the small one at ten, and a section shot is framed at ten - one pass at
 	# a single size leaves the near ground smooth in exactly the frames where
 	# the ground is a third of the picture.
-	Terrain.scatter(ground, palette, terrain_cfg,
-		int(options.get("rocks", 64)), centreline, 5.4)
-	Terrain.scatter(ground, palette, terrain_cfg,
-		int(options.get("pebbles", 110)), centreline, 3.1, 0.34)
+	if scatter_passes.is_empty():
+		Terrain.scatter(ground, palette, terrain_cfg,
+			int(options.get("rocks", 64)), centreline, 5.4)
+		Terrain.scatter(ground, palette, terrain_cfg,
+			int(options.get("pebbles", 110)), centreline, 3.1, 0.34)
+	else:
+		for entry in scatter_passes:
+			var pass_cfg: Dictionary = entry
+			Terrain.scatter(ground, palette, terrain_cfg,
+				int(pass_cfg.get("count", 0)), centreline,
+				float(pass_cfg.get("clearance", 5.4)),
+				float(pass_cfg.get("gauge", 1.0)),
+				pass_cfg.get("materials", []),
+				int(pass_cfg.get("accent_every", 3)))
 	if detail != "block":
 		Dressing.build(root, palette, terrain_cfg, centreline,
-			table["nodes"])
+			table["nodes"], EnvBuilder.dressing(environment))
 
 	root.set_meta("metrics", _metrics(table, total_length, clearances,
 		centreline))

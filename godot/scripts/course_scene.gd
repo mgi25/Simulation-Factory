@@ -23,6 +23,10 @@ const Layout := preload("res://assets/marble_machine/course/course_layout.gd")
 const Track := preload("res://assets/marble_machine/v2/v2_track.gd")
 const V2Forms := preload("res://assets/marble_machine/v2/v2_forms.gd")
 const Terrain := preload("res://assets/marble_machine/course/course_terrain.gd")
+const EnvProfile := preload(
+	"res://assets/marble_machine/environment/environment_profile.gd")
+const EnvBuilder := preload(
+	"res://assets/marble_machine/environment/environment_builder.gd")
 
 # at: ["node", name] or ["path", run, t]. `bearing` is measured from the
 # track's own forward direction at the aim point - 0 looks up the course from
@@ -95,6 +99,15 @@ var _palette
 ## line overrides either way, which is how the before-and-after frames of the
 ## V21 pass were taken from one build of one scene.
 var _contrast := ""
+## Which `EnvironmentProfile` the world is built from.
+##
+## Empty selects the registry default, `alpine_neon`, which is the shipped
+## look transcribed field for field - so every scene that does not ask for a
+## theme renders what it rendered before the profiles existed. `--environment=`
+## picks another, and it is the one switch that changes the sky, the haze, the
+## light rig, the mountain, the dressing and the zone practicals together.
+var _environment_id := ""
+var _environment: Dictionary = {}
 var _camera: Camera3D
 var _shot := DEFAULT_SHOT
 var _layout := "a"
@@ -129,16 +142,33 @@ func _ready() -> void:
 
 	if options.has("contrast"):
 		_contrast = str(options["contrast"])
+	if options.has("environment"):
+		_environment_id = str(options["environment"])
+		if not EnvProfile.has(_environment_id):
+			push_error("course_scene: unknown environment '%s' (have %s)"
+				% [_environment_id, ", ".join(EnvProfile.ids())])
+			_environment_id = ""
+	# Resolved once, here, and passed down. Resolving per call would let the
+	# sky and the light rig disagree if a profile were ever edited mid-run,
+	# and it is the seam a future race map hands its own profile through.
+	_environment = EnvProfile.resolve(_environment_id, _contrast)
+	var complaints: Array = EnvProfile.validate(_environment)
+	for complaint in complaints:
+		push_error("environment '%s': %s" % [environment_id(), complaint])
+
 	_palette = Palette.new("tower", _contrast)
+	# Before anything is built, because the palette caches what it hands out.
+	EnvBuilder.apply_palette(_palette, _environment)
 	_table = Layout.table(_layout)
 
 	var world_env := WorldEnvironment.new()
 	world_env.name = "WorldEnvironment"
-	world_env.environment = World.build_environment(_no_glow, _contrast)
+	world_env.environment = World.build_environment(_no_glow, _contrast,
+		_environment)
 	add_child(world_env)
 
-	World.build_lights(self, _contrast)
-	add_child(World.build(_palette))
+	World.build_lights(self, _contrast, _environment)
+	add_child(World.build(_palette, _environment))
 
 	# `routes` reaches `course_machine.OPEN_SIDES`: "both" opens leg3's east
 	# guard over the fork window, which is what the physics course that ships
@@ -148,6 +178,7 @@ func _ready() -> void:
 		"detail": str(options.get("detail", "block")),
 		"routes": str(options.get("routes", "both")),
 		"start_contract": _start_contract,
+		"environment": _environment,
 	})
 	add_child(_course)
 	_practicals()
@@ -155,6 +186,7 @@ func _ready() -> void:
 	_report()
 
 	_build_camera()
+	_isolate_layers(str(options.get("layers", "")))
 	set_time(0.0)
 	if str(options.get("dump-physics", "")) != "":
 		_dump_physics(str(options["dump-physics"]))
@@ -193,8 +225,20 @@ func _options() -> Dictionary:
 	return options
 
 
+## The profile actually in force, named. Empty `_environment_id` means the
+## registry default was taken, and a report that printed "" there would be
+## the kind of instrument bug that hides a geometry finding.
+func environment_id() -> String:
+	return str(_environment.get("id", EnvProfile.default_id()))
+
+
+func environment_profile() -> Dictionary:
+	return _environment
+
+
 func _report() -> void:
 	var metrics: Dictionary = _course.get_meta("metrics")
+	print("environment %s" % EnvProfile.describe(_environment))
 	print("layout %s: %s" % [_layout, str(_table["title"])])
 	print("  length %.1f  drop %.1f  span x %.1f z %.1f  grade %.1f deg" % [
 		metrics["length"], metrics["drop"], metrics["span_x"],
@@ -206,15 +250,13 @@ func _report() -> void:
 
 func _practicals() -> void:
 	## One warm or cool omni at each race moment, following the colour story.
+	##
+	## Which moments get one, and in what colour, is the profile's `zones`
+	## table - the framework's zone integration hook. A zone named here that
+	## the layout has no node for is skipped, so a profile written against one
+	## course does not have to be edited to run on another.
 	var nodes: Dictionary = _table["nodes"]
-	var lamps := [
-		["start", "#6BE9FF", 2.6, 9.0, 2.2],
-		["mix", "#A379FF", 2.6, 8.0, 1.8],
-		["obstacle", "#FF9A48", 3.0, 9.5, 2.4],
-		["split", "#EAF7FF", 2.4, 9.0, 2.6],
-		["merge", "#FFC168", 2.8, 9.0, 2.0],
-		["finish", "#FFC46A", 3.4, 14.0, 2.6],
-	]
+	var lamps: Array = EnvBuilder.zone_lamps(_environment)
 	for entry in lamps:
 		var name := str(entry[0])
 		if not nodes.has(name):
@@ -456,6 +498,60 @@ func _hero_fit() -> Dictionary:
 		% [float(hero["fov"]), float(hero["elevation"]),
 			float(hero["azimuth"]), distance])
 	return _fitted
+
+
+## Photograph one half of the picture: `machine` keeps visual layer 1, `world`
+## keeps layer 2, `sky` keeps neither, anything else keeps both.
+##
+## The split already exists and the whole light rig depends on it - the product
+## key is on mask 1 and the three world lights are on mask 2 - so exposing it
+## to the camera costs three lines and buys an exact measurement. "Dark
+## background, bright machine" is a claim about two populations of pixels, and
+## until they could be photographed apart it could only be argued from a
+## thumbnail. `tools/sloped_environment.py measure` renders both and reports
+## the gap.
+func _isolate_layers(which: String) -> void:
+	if _camera == null or which.is_empty():
+		return
+	# **Lights are VisualInstance3D too, and a camera culls them by the same
+	# mask.** Every light in the rig is left on the default layer 1, so a
+	# camera set to layer 2 dropped the whole rig along with the course and
+	# photographed an unlit mountain - which measured as a world thirty times
+	# darker than it is. So before the mask is narrowed, every light is put on
+	# every layer. This runs only when `--layers` is passed, so no shipped
+	# render can reach it.
+	_light_everywhere(self)
+	_light_everywhere(_course)
+	match which:
+		"machine":
+			_camera.cull_mask = 1
+		"world":
+			_camera.cull_mask = WORLD_ONLY_MASK
+		"sky":
+			_camera.cull_mask = EMPTY_MASK
+		"all":
+			pass
+		_:
+			push_error("course_scene: unknown --layers '%s'" % which)
+
+
+static func _light_everywhere(node: Node) -> void:
+	if node == null:
+		return
+	if node is Light3D:
+		(node as Light3D).layers = 0xFFFFF
+	for child in node.get_children():
+		_light_everywhere(child)
+
+
+const WORLD_ONLY_MASK := 2
+
+## A render layer nothing in this project is ever put on, so a camera set to
+## it photographs the sky, the haze and the grade alone. That frame is the
+## reference the other two are masked against: a pixel that matches it is
+## background, and a measurement that skipped this step would count the sky as
+## part of whichever half happened to be in front of it.
+const EMPTY_MASK := 1 << 19
 
 
 func _build_camera() -> void:
