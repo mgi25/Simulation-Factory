@@ -103,6 +103,12 @@ MASTER_V21 = os.path.join(OUT_DIR, "real_race_v21_master.mp4")
 # `tools/sloped_v22.py` and `sloped/v22.py`.
 MASTER_V22 = os.path.join(OUT_DIR, "v22", "race_master.mp4")
 PREVIEW_V22 = os.path.join(OUT_DIR, "v22", "preview_master.mp4")
+# V22.1 renders the same two pieces to its own edit: the race through
+# `sloped.v221.edit()` with the finish rewritten by `v221_finish`, and a preview
+# of 210 frames rather than 120. Both come out of
+# `tools/sloped_v22.py --edition v221`.
+MASTER_V221 = os.path.join(OUT_DIR, "v221", "race_master.mp4")
+PREVIEW_V221 = os.path.join(OUT_DIR, "v221", "preview_master.mp4")
 
 # Kept for the callers and the tests that name the locked V19 master directly.
 MASTER = MASTER_V19
@@ -161,6 +167,28 @@ EDITIONS: dict[str, dict[str, Any]] = {
         "silent": os.path.join(OUT_DIR, "real_race_v22_master.mp4"),
         "track": os.path.join(OUT_DIR, "cameras_v22_{seed}.json"),
         "runtime": (22.8, 23.3),
+    },
+    # **V22.1 is V22 with three joins rebuilt and one sound removed.** The
+    # picture is a different render - a longer preview, a start that omits 116
+    # frames instead of 235, and a finish that is the end of the chase - and all
+    # of that arrives here as two file paths and a track, because everything
+    # that places a cue derives it from the track's own edit map.
+    #
+    # `cues` is the one genuinely new field. See `audio.marble.Cues`: V22.1's
+    # omission is phase-locked and invisible, so marking it with a whoosh would
+    # announce an edit the viewer could not otherwise see, and the mixer it now
+    # holds on screen for five and a half seconds gets its own machinery
+    # instead. Every other edition keeps `default` and rebuilds unchanged.
+    "v221": {
+        "master": MASTER_V221,
+        "preview": PREVIEW_V221,
+        "cuts": (),
+        "cues": "v221",
+        "video": os.path.join(OUT_DIR, "real_race_v221.mp4"),
+        "visual": os.path.join(OUT_DIR, "real_race_v221_visual.mp4"),
+        "silent": os.path.join(OUT_DIR, "real_race_v221_master.mp4"),
+        "track": os.path.join(OUT_DIR, "cameras_v221_{seed}.json"),
+        "runtime": (26.0, 27.0),
     },
 }
 DEFAULT_EDITION = "v21"
@@ -275,9 +303,14 @@ def _select(cuts: Sequence[tuple[int, int]]) -> str:
 # --- stages -----------------------------------------------------------------
 
 
+def cue_policy(edition: str) -> marble.Cues:
+    """Which non-diegetic cues this edition uses. `default` unless it says."""
+    return marble.CUES[EDITIONS[edition].get("cues", "default")]
+
+
 def stage_audio(seed: int, edition: str = DEFAULT_EDITION) -> str:
     replay, track, clock, _keep = load_all(seed, edition)
-    mix = marble.build_race_audio(replay, track, clock)
+    mix = marble.build_race_audio(replay, track, clock, cues=cue_policy(edition))
     os.makedirs(WORK_DIR, exist_ok=True)
     path = os.path.join(WORK_DIR, f"race_{seed}_{edition}.wav")
     write_wav(path, mix.left, mix.right, sample_rate=mix.sample_rate)
@@ -489,7 +522,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     parser.add_argument(
         "--edition", default=DEFAULT_EDITION, choices=tuple(EDITIONS),
-        help="v21 is the start/retention cut; v20 rebuilds the earlier one",
+        help="v21 is the start/retention cut; v221 the continuity pass; "
+             "v20 and v211 rebuild the earlier ones",
     )
     args = parser.parse_args(argv)
 

@@ -54,7 +54,10 @@ from sloped import cameras, chase_camera, course_preview, presentation, terrain
 __all__ = [
     "EDIT",
     "FPS",
+    "HANDOFF_COLUMNS",
+    "HANDOFF_TOLERANCE",
     "PREVIEW",
+    "assert_handoff",
     "build_preview_track",
     "build_race_track",
     "film_clock",
@@ -84,6 +87,57 @@ EDIT = "v22"
 #
 # `lead`, `lift`, `aim_lift`, `sway`, `fov` and the two overruns are untouched.
 PREVIEW = course_preview.Preview(ease=0.45, end_blend=0.72, name="v22")
+
+
+# The camera record's columns after the timestamp, in the order a track row
+# writes them. **The eighth is the field of view and V22 does not check it**:
+# see `assert_handoff`.
+HANDOFF_COLUMNS = ("px", "py", "pz", "ax", "ay", "az", "fov")
+
+# How far apart the two frames may be, per column. The end blend sets the pose
+# exactly, so this is a rounding tolerance rather than a budget.
+HANDOFF_TOLERANCE = 5e-4
+
+
+def handoff_deltas(
+    race: dict[str, Any], preview: dict[str, Any], columns: int = len(HANDOFF_COLUMNS),
+) -> dict[str, float]:
+    """Per-column distance between the preview's last frame and the race's first."""
+    last = preview["cuts"][-1]["frames"][-1]
+    first = race["cuts"][0]["frames"][0]
+    return {
+        name: abs(float(last[index]) - float(first[index]))
+        for index, name in enumerate(HANDOFF_COLUMNS[:columns], start=1)
+    }
+
+
+def assert_handoff(
+    race: dict[str, Any],
+    preview: dict[str, Any],
+    columns: int = 6,
+    tolerance: float = HANDOFF_TOLERANCE,
+) -> dict[str, float]:
+    """The preview's last frame and the race's first must be the same camera.
+
+    This is the whole claim of the opening - that there is no cut between the
+    preview and the race - so it is checked rather than assumed.
+
+    **`columns` defaults to six, which is position and aim, and that default is
+    a statement about V22 rather than about what a handoff is.** V22's preview
+    ends at a 48-degree field of view and its race begins at 34, so a
+    seven-column check would fail the delivered film; the zoom snap is real and
+    it is what V22.1 fixes. Editions that ease the eighth column - see
+    `v221_preview._fov_land` - pass `columns=7` and get the stricter reading.
+    """
+    deltas = handoff_deltas(race, preview, columns)
+    worst = max(deltas.values())
+    if worst > tolerance:
+        column = max(deltas, key=deltas.__getitem__)
+        raise ValueError(
+            f"the preview does not arrive on the race camera: {column} is "
+            f"{worst:.6f} apart at the handoff"
+        )
+    return deltas
 
 
 def handoff_pose(track: dict[str, Any]) -> tuple[tuple[float, float, float],

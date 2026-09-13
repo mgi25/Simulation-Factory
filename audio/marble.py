@@ -63,14 +63,53 @@ from audio.synthesis import (
 
 __all__ = [
     "BODY_HZ",
+    "CUES",
+    "Cues",
     "RaceMix",
     "build_race_audio",
     "impact_cue",
+    "lift_cue",
+    "mechanism_bed",
     "release_cue",
     "whoosh_cue",
     "split_cue",
     "crossing_cue",
 ]
+
+
+@dataclass(frozen=True)
+class Cues:
+    """Which of the non-diegetic cues an edition uses.
+
+    **This exists because V22.1 had to stop making one sound, and hard-muting a
+    timestamp would have broken every older edition's rebuild.** The two flags
+    are policies rather than switches for one film:
+
+    `omission` marks time the edit skipped, with `whoosh_cue`. V19 through V22
+    want it: their omission is placed across the rotor's spin-down, so the
+    picture changes in a way that needs explaining and a cue says "that was
+    deliberate". V22.1 does not: its omission is four whole rotor revolutions
+    inside the constant-rate spin, and the blades, the hub and the field are all
+    continuous across it to a hundredth of a degree. The whole claim is that the
+    viewer does not notice, and a whoosh over an invisible join does not explain
+    an edit - it announces one that was not otherwise there.
+
+    `mechanism` is the mixer's own machinery: a drone that follows the recorded
+    rotor rate, so the spin-down is *heard* as the rotor slowing, and a cue on
+    the blades lifting out of the drum. Only V22.1 keeps enough of that on
+    screen to be worth sounding - see `sloped.v221.START` - and an edition that
+    shows 0.267 s of it would be scoring a shot it does not have.
+    """
+
+    omission: bool = True
+    mechanism: bool = False
+
+
+# The default is every edition before V22.1, unchanged.
+CUES: dict[str, Cues] = {
+    "default": Cues(),
+    "v221": Cues(omission=False, mechanism=True),
+}
 
 
 # --- levels ----------------------------------------------------------------
@@ -103,6 +142,21 @@ LEVEL_CROSS_OTHER = HEADROOM - 6.5
 LEVEL_TRAPDOOR = HEADROOM - 4.0
 LEVEL_GATE = HEADROOM - 7.0
 LEVEL_WHOOSH = HEADROOM - 10.0
+# The mixer's machinery.
+#
+# **-26 rather than the -19 this started at, and the seven decibels are the
+# finish.** The drone is a *continuous* voice, and the one stretch it is loudest
+# over - the rotor at full rate, replay 1.6 to 4.6 - is also where the field is
+# pouring down the apron and throwing its hardest contacts. Summed, the two put
+# the loudest moment of the whole film at output 5.76 s, which is the mixer:
+# `tools/sloped_short_qc.py` checks that the winner's crossing is the loudest
+# moment and it correctly failed. At -26 the crossing is the peak again and the
+# mechanism is still plainly the subject where it should be - measured against
+# the same mix with `mechanism=False`, it adds 8.5 dB under the mix, 2.3 dB
+# through the spin-down, and 0.0 dB once the rotor has stopped, which is the
+# shape the machine actually has.
+LEVEL_MECHANISM = HEADROOM - 26.0
+LEVEL_LIFT = HEADROOM - 9.0
 LEVEL_SPLIT = HEADROOM - 11.0
 LEVEL_IMPACT_LOUD = HEADROOM - 12.0
 LEVEL_IMPACT_QUIET = HEADROOM - 28.0
@@ -126,6 +180,13 @@ ROLL_RESPONSE = 0.85
 # race; everything between maps onto the level range above.
 IMPACT_SOFT = 6.0
 IMPACT_HARD = 42.0
+
+# The mixer's own two numbers. `ShuffleFloor` carries four paddles on one hub,
+# so the chop a viewer hears is four a revolution; `MOTOR_HZ` is where the drive
+# sits at full rate, low enough to read as a machine under load and high enough
+# to survive a phone speaker's roll-off.
+BLADES = 4
+MOTOR_HZ = 112.0
 
 # How far a sound may be pushed off centre by where it is on screen. Restrained
 # on purpose: a phone speaker is mono and a wide mix collapses to nothing.
@@ -635,12 +696,130 @@ def tension_cue(
     return out
 
 
+def mechanism_bed(
+    motion: Sequence[tuple[float, float, float]],
+    length: int,
+    seed: int,
+    *,
+    sample_rate: int = SAMPLE_RATE,
+) -> array:
+    """The mixer, heard. Level and pitch follow the **recorded** rotor rate.
+
+    `motion` is `presentation.actuator_motion`'s series - output second, radians
+    a second, units risen - so nothing here decides when the machine slows down.
+    The rotor holds 13.0 rad/s from replay 1.600 to 4.600 and is at 0.036 by
+    5.000, and a bed keyed to that is a spin-down a viewer hears without anyone
+    placing one.
+
+    Two voices, both of them things a drum mixer actually makes:
+
+    * the motor, a pair of detuned tones whose frequency rises with the rate, so
+      slowing is a pitch fall as well as a level fall. Half-speed is a fifth
+      down, which is what a motor under load does;
+    * the blades in the air, low-passed noise gated by the same envelope, with
+      the cutoff opening as the rate rises.
+
+    Over it both are amplitude-modulated at the **blade-pass frequency** - four
+    paddles at 13.0 rad/s is 8.28 Hz - which is the chop you hear standing next
+    to one and is why this reads as a mixer rather than as a synthesiser pad.
+    """
+    out = silence(length)
+    if not motion:
+        return out
+    peak_rate = max(row[1] for row in motion)
+    if peak_rate <= 1e-6:
+        return out
+
+    # The envelope, one value a sample, read off the series by interpolation.
+    # Rate over its own peak, so the bed is normalised to this machine.
+    rows = sorted(motion)
+    times = [row[0] for row in rows]
+    gain = silence(length)
+    cursor = 0
+    for index in range(length):
+        when = index / sample_rate
+        while cursor + 1 < len(times) and times[cursor + 1] <= when:
+            cursor += 1
+        low = rows[cursor]
+        high = rows[min(cursor + 1, len(rows) - 1)]
+        span = max(1e-6, high[0] - low[0])
+        blend = min(1.0, max(0.0, (when - low[0]) / span))
+        gain[index] = (low[1] + (high[1] - low[1]) * blend) / peak_rate
+
+    noise = Noise(seed).fill(length)
+    low_pass(noise, 1400.0, sample_rate=sample_rate, stages=2)
+    high_pass(noise, 120.0, sample_rate=sample_rate, stages=1)
+
+    # The motor and the chop, integrated rather than evaluated, so a changing
+    # rate does not step the phase. `MOTOR_HZ` at full rate; the blade pass is
+    # the rate itself times the paddle count over 2*pi.
+    motor_phase = 0.0
+    chop_phase = 0.0
+    for index in range(length):
+        level = gain[index]
+        if level <= 1e-4:
+            out[index] = 0.0
+            continue
+        motor = MOTOR_HZ * (0.45 + 0.55 * level)
+        motor_phase += 2.0 * math.pi * motor / sample_rate
+        chop_phase += 2.0 * math.pi * (BLADES * peak_rate * level / (2.0 * math.pi)) / sample_rate
+        body = (math.sin(motor_phase)
+                + 0.62 * math.sin(motor_phase * 1.502 + 0.7)
+                + 0.28 * math.sin(motor_phase * 2.0))
+        chop = 0.62 + 0.38 * math.sin(chop_phase)
+        out[index] = (body * 0.55 + noise[index] * 0.9) * chop * level * level
+    largest = peak(out)
+    if largest > 0.0:
+        scale(out, 1.0 / largest)
+    return out
+
+
+def lift_cue(
+    seconds: float,
+    seed: int,
+    *,
+    sample_rate: int = SAMPLE_RATE,
+) -> array:
+    """The paddle assembly withdrawing from the drum, over its recorded travel.
+
+    A screw actuator lifting a heavy thing: a low tone that climbs a minor third
+    as it takes the load, band-limited noise for the thread, and a settle at the
+    top. `seconds` is the replay's own 5.200-5.900, so this is as long as the
+    move is and stops when the blades stop.
+    """
+    length = seconds_to_samples(max(seconds, 0.05), sample_rate)
+    out = silence(length)
+    phase = 0.0
+    for index in range(length):
+        position = index / max(1, length - 1)
+        freq = 96.0 * (1.0 + 0.19 * position)
+        phase += 2.0 * math.pi * freq / sample_rate
+        out[index] = math.sin(phase) + 0.4 * math.sin(phase * 2.0)
+    grind = Noise(seed).fill(length)
+    band_pass = grind
+    high_pass(band_pass, 900.0, sample_rate=sample_rate, stages=1)
+    low_pass(band_pass, 3400.0, sample_rate=sample_rate, stages=2)
+    add_into(out, band_pass, 0, 0.5)
+    # In quickly, out over the last fifth: the move ends by arriving, not by
+    # fading. The tail is the mechanism settling onto its stops.
+    for index in range(length):
+        position = index / max(1, length - 1)
+        shape = min(1.0, position / 0.08) * (1.0 if position < 0.80 else
+                                             max(0.0, (1.0 - position) / 0.20))
+        out[index] *= shape
+    largest = peak(out)
+    if largest > 0.0:
+        scale(out, 1.0 / largest)
+    return out
+
+
 def build_race_audio(
     replay: dict[str, Any],
     track: dict[str, Any],
     clock,
     *,
     music: bool = True,
+    cues: Cues = CUES["default"],
     sample_rate: int = SAMPLE_RATE,
 ) -> RaceMix:
     """The whole soundtrack, placed on the finished film's clock.
@@ -719,6 +898,45 @@ def build_race_audio(
                trapdoor, LEVEL_TRAPDOOR, 0.0, sample_rate)
         bump("trapdoor")
 
+    # --- the mixer, for editions that keep it on screen ---------------------
+    #
+    # **There are effectively no contact events during the settled period, and
+    # this does not invent any.** The field stops being hit at replay 2.012 and
+    # the floor does not open until 6.100 - `join_report`'s
+    # `last_collision_to_gate` is 4.09 s - so what fills those four seconds is
+    # the machine, or nothing. Both voices below are the recorded rotor
+    # transforms read back: the drone is its rate, the lift is its height.
+    if cues.mechanism:
+        motion = pres.actuator_motion(replay, clock, "start.rotor")
+        if motion:
+            # Only as long as the machinery is doing something, plus a second of
+            # room. Synthesising a silent bed over the whole film is a minute of
+            # arithmetic to add zero.
+            active = [row[0] for row in motion if row[1] > 0.2 or row[2] > 1e-3]
+            span = min(length, seconds_to_samples(
+                (max(active) if active else 0.0) + 1.0, sample_rate))
+            bed = mechanism_bed(
+                motion, span, stable_seed("mechanism", seed_base),
+                sample_rate=sample_rate,
+            )
+            _to_rms(bed, LEVEL_MECHANISM)
+            add_into(left, bed, 0, 1.0)
+            add_into(right, bed, 0, 0.96)
+            bump("mechanism")
+
+            rising = [row for row in motion if row[2] > 1e-3]
+            if rising:
+                settled = [row[0] for row in rising
+                           if row[2] >= rising[-1][2] - 1e-3]
+                start_at = rising[0][0]
+                _place(
+                    left, right,
+                    lift_cue(max(0.15, min(settled) - start_at),
+                             stable_seed("lift", seed_base)),
+                    start_at, LEVEL_LIFT, 0.0, sample_rate,
+                )
+                bump("lift")
+
     # --- the edit's own omissions -------------------------------------------
     #
     # A whoosh marks *omitted time*, not a change of lens. This film omits time
@@ -726,7 +944,7 @@ def build_race_audio(
     # one the brief asks to make legible, because the lens is the same on both
     # sides of it and without a cue it reads as a glitch. Ordinary camera cuts
     # get nothing: there is nothing to explain.
-    for at, omitted in pres.omissions(clock):
+    for at, omitted in pres.omissions(clock) if cues.omission else ():
         weight = min(1.0, omitted / 3.4)
         _place(
             left,

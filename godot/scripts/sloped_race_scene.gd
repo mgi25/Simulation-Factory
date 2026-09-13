@@ -43,6 +43,7 @@ const Modules := preload("res://assets/marble_machine/course/course_modules.gd")
 ##     --cameras=PATH       the camera track JSON     (required for a clip)
 ##     --layout=b --detail=hero
 ##     --shot=NAME          override with a still lens from SHOTS
+##     --finish-sign=double copy the FINISH board onto its own back face
 
 # `Palette`, `World`, `Machine`, `Layout`, `Track`, `V2Forms` and `Terrain` all
 # come from the parent class, and re-declaring one is a parse error rather than
@@ -54,6 +55,24 @@ const Modules := preload("res://assets/marble_machine/course/course_modules.gd")
 ## `lab_palette.V21_RETUNE` for what it is and why it is a named pass rather
 ## than an edit to the shared surfaces.
 const DEFAULT_CONTRAST := "v21"
+
+## Whether the FINISH board carries its face on one side or on both.
+##
+## **Single is correct for every camera language before V22.1 and wrong for
+## V22.1's.** `course_modules.sign_panel` puts the lit face and the letters on
+## the +Z side of the board, down-course, because - in that file's own words -
+## "every camera on this course stands downhill of what it is looking at, so a
+## sign that faces uphill is a dark rectangle in every frame it appears in".
+## That was true until the finish stopped being a shot down the course and
+## became the end of a chase: V22.1 parks at bearing 180, directly up-course,
+## and spends the last three seconds of the film looking at the back of a board
+## it cannot read - a blank graphite slab across the middle of the payoff.
+##
+## `double` copies the face and the letters onto the -Z side. It is drawn
+## geometry and nothing else: no collider moves, the finish line does not move,
+## and no crossing changes time by a frame. Default is `single` so that V20,
+## V21 and V22 re-render exactly what they shipped.
+const DEFAULT_FINISH_SIGN := "single"
 
 var _replay: Dictionary = {}
 var _camera_track: Dictionary = {}
@@ -92,7 +111,43 @@ func _ready() -> void:
 		_load_cameras(str(options["cameras"]))
 	_collect_wheels()
 	_build_start_parts()
+	if str(options.get("finish-sign", DEFAULT_FINISH_SIGN)) == "double":
+		_face_finish_sign_both_ways()
 	set_time(0.0)
+
+
+func _face_finish_sign_both_ways() -> void:
+	## Copy the FINISH board's face and letters onto its back, after the build.
+	##
+	## **A patch on the built scene rather than a parameter through the asset
+	## modules, and that is deliberate.** The board is made by
+	## `course_modules.sign_panel`, four call levels below `Machine.build`, and
+	## every one of those levels is shared with the hero, neon, toy and layout
+	## scenes. Threading a flag down to it would put a V22.1 decision inside
+	## geometry five other films are photographed from. Reaching into the
+	## finished tree instead keeps the change where the decision is.
+	##
+	## The mirrored letters are turned about Y rather than scaled by -1: a
+	## negative scale on a `TextMesh` flips the glyphs, which is a sign reading
+	## HSINIF. The face is a rounded box and symmetric, so it is only moved.
+	var pivot := _course.find_child("SignFinish", true, false)
+	if pivot == null:
+		push_warning("no FINISH sign to make double-sided")
+		return
+	var copied := 0
+	for name in ["Face", "Letters"]:
+		var front: MeshInstance3D = pivot.find_child(name, false, false)
+		if front == null:
+			continue
+		var back: MeshInstance3D = front.duplicate()
+		back.name = "%sBack" % name
+		back.position = Vector3(front.position.x, front.position.y,
+			-front.position.z)
+		back.rotation = Vector3(front.rotation.x, front.rotation.y + PI,
+			front.rotation.z)
+		pivot.add_child(back)
+		copied += 1
+	print("scene: FINISH sign is double-sided (%d faces copied)" % copied)
 
 
 func _strip_display_field() -> void:

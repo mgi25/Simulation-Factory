@@ -285,6 +285,7 @@ __all__ = [
     "chase_report",
     "check_chase",
     "course_at",
+    "edit_plan",
     "pack_anchor",
     "route_offsets",
 ]
@@ -772,11 +773,28 @@ def _crossings(replay: dict[str, Any]) -> dict[int, float]:
 START_BEARING = 230.0
 
 
+def edit_plan(edit: "str | Sequence[tuple]") -> tuple[tuple, ...]:
+    """An edit map, given either its name in `cameras.EDITS` or the plan itself.
+
+    **A named plan is a plan that lives in `sloped.cameras`, and not every plan
+    does.** V22.1's start windows are solved by `v221_shuffle.plan_windows` from
+    a `StartPlan` - the legs are computed by `constant_rate_legs` rather than
+    typed - so the plan exists only once something has built it, and putting a
+    placeholder for it in `cameras.EDITS` would make the module that owns the
+    lenses import the module that owns the prototypes. Accepting the plan
+    directly costs one `isinstance` and keeps every existing caller, which
+    passes a name, reading exactly as it did.
+    """
+    if isinstance(edit, str):
+        return cameras.EDITS[edit]
+    return tuple(tuple(entry) for entry in edit)
+
+
 def _bookends(
     replay: dict[str, Any],
     machine,
     fps: int,
-    edit: str = "v212",
+    edit: "str | Sequence[tuple]" = "v212",
     start_bearing: float = START_BEARING,
 ) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
     """V21's start and finish, solved by `sloped.cameras` itself.
@@ -786,7 +804,7 @@ def _bookends(
     either in production reaches this prototype without an edit here, and means
     the opening of a V22 proof is frame-for-frame the opening of the V21 film.
     """
-    plan = cameras.EDITS[edit]
+    plan = edit_plan(edit)
     lenses = {cut.name: cut for cut in cameras.SECTIONS}
     # **A window the replay does not reach is dropped, not solved.** The edit's
     # times are the production seed's, and a shorter replay - a twelve-second
@@ -835,7 +853,7 @@ def build_chase(
     fps: int = 60,
     rule: str = "adaptive",
     bookends: bool = True,
-    edit: str = "v212",
+    edit: "str | Sequence[tuple]" = "v212",
     start_bearing: float = START_BEARING,
 ) -> dict[str, Any]:
     """A camera track in `sloped.cameras`' own schema, solved as one chase.

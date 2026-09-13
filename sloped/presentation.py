@@ -50,6 +50,7 @@ __all__ = [
     "Event",
     "HOLD_SECONDS",
     "GRAVITY",
+    "actuator_motion",
     "impacts",
     "load",
     "omit_frames",
@@ -543,6 +544,64 @@ def actuator_move(
                 return clock.at(float(frame["t"]))
         previous = current
     return None
+
+
+def actuator_motion(
+    replay: dict[str, Any],
+    clock: Clock,
+    prefix: str,
+) -> list[tuple[float, float, float]]:
+    """Per kept frame: `(output second, radians a second, layout units risen)`.
+
+    `actuator_move` answers "when did this group first move", which is the right
+    question for a gate and the wrong one for a mixer: the rotor turns for three
+    seconds, slows over three tenths and then lifts, and a soundtrack that wants
+    to follow it needs the whole series rather than one instant.
+
+    Both channels come out of the recorded transforms and neither is modelled.
+    The turn rate is the quaternion angle between consecutive frames over the
+    frame time - the group's mean, so a four-blade assembly reports the hub's
+    rate rather than four times it - and the rise is the group's mean height
+    above its own first recorded height. At 13.0 rad/s a frame turns 12.4
+    degrees, so there is no wrap to resolve and no unwinding to do.
+
+    **Frames the edit omitted are not in the list.** `clock.at` returns None for
+    replay the film never shows, and those frames are skipped, so a cue derived
+    from this series cannot sound over footage nobody sees.
+    """
+    out: list[tuple[float, float, float]] = []
+    previous: dict[str, Any] | None = None
+    previous_t = 0.0
+    datum: float | None = None
+    for frame in replay["frames"]:
+        actuators = frame.get("actuators") or {}
+        current = {
+            name: value for name, value in actuators.items() if name.startswith(prefix)
+        }
+        if not current:
+            return out
+        when = float(frame["t"])
+        height = sum(value["p"][1] for value in current.values()) / len(current)
+        if datum is None:
+            datum = height
+        if previous is not None:
+            span = max(when - previous_t, 1e-9)
+            total = 0.0
+            counted = 0
+            for name, value in current.items():
+                before = previous.get(name)
+                if before is None:
+                    continue
+                dot = abs(sum(a * b for a, b in zip(before["q"], value["q"])))
+                total += 2.0 * math.acos(min(1.0, dot))
+                counted += 1
+            rate = (total / counted / span) if counted else 0.0
+            output = clock.at(when)
+            if output is not None:
+                out.append((output, rate, height - datum))
+        previous = current
+        previous_t = when
+    return out
 
 
 def omissions(clock: Clock) -> list[tuple[float, float]]:

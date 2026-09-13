@@ -1,0 +1,429 @@
+{
+  "body": {
+    "branches": {
+      "v22": {
+        "ahead_share": 0.25,
+        "ahead_units": 34.5,
+        "camera_step": 0.631,
+        "hidden_share": 0.017,
+        "in_frame": 7.04,
+        "px_median": 34.0,
+        "seconds": 1.683,
+        "visible": 7.0
+      },
+      "v221": {
+        "ahead_share": 0.25,
+        "ahead_units": 34.5,
+        "camera_step": 0.631,
+        "hidden_share": 0.017,
+        "in_frame": 7.04,
+        "px_median": 34.0,
+        "seconds": 1.683,
+        "visible": 7.0
+      }
+    },
+    "first descent": {
+      "v22": {
+        "ahead_share": 0.375,
+        "ahead_units": 17.2,
+        "camera_step": 0.558,
+        "hidden_share": 0.113,
+        "in_frame": 7.58,
+        "px_median": 48.0,
+        "seconds": 2.047,
+        "visible": 6.76
+      },
+      "v221": {
+        "ahead_share": 0.396,
+        "ahead_units": 22.0,
+        "camera_step": 0.558,
+        "hidden_share": 0.207,
+        "in_frame": 7.71,
+        "px_median": 48.5,
+        "seconds": 2.967,
+        "visible": 6.13
+      }
+    },
+    "fork": {
+      "v22": {
+        "ahead_share": 0.417,
+        "ahead_units": 21.1,
+        "camera_step": 0.463,
+        "hidden_share": 0.059,
+        "in_frame": 8.0,
+        "px_median": 47.8,
+        "seconds": 1.633,
+        "visible": 7.53
+      },
+      "v221": {
+        "ahead_share": 0.417,
+        "ahead_units": 21.1,
+        "camera_step": 0.463,
+        "hidden_share": 0.059,
+        "in_frame": 8.0,
+        "px_median": 47.8,
+        "seconds": 1.633,
+        "visible": 7.53
+      }
+    },
+    "merge": {
+      "v22": {
+        "ahead_share": 0.208,
+        "ahead_units": 10.5,
+        "camera_step": 0.832,
+        "hidden_share": 0.191,
+        "in_frame": 6.13,
+        "px_median": 28.4,
+        "seconds": 1.783,
+        "visible": 4.94
+      },
+      "v221": {
+        "ahead_share": 0.333,
+        "ahead_units": 21.1,
+        "camera_step": 0.832,
+        "hidden_share": 0.029,
+        "in_frame": 6.8,
+        "px_median": 28.4,
+        "seconds": 0.483,
+        "visible": 6.6
+      }
+    },
+    "obstacle": {
+      "v22": {
+        "ahead_share": 0.458,
+        "ahead_units": 36.4,
+        "camera_step": 0.669,
+        "hidden_share": 0.124,
+        "in_frame": 7.3,
+        "px_median": 69.2,
+        "seconds": 5.433,
+        "visible": 6.4
+      },
+      "v221": {
+        "ahead_share": 0.458,
+        "ahead_units": 36.4,
+        "camera_step": 0.669,
+        "hidden_share": 0.124,
+        "in_frame": 7.3,
+        "px_median": 69.2,
+        "seconds": 5.433,
+        "visible": 6.4
+      }
+    },
+    "opening / start": {
+      "v22": {
+        "ahead_share": 0.448,
+        "ahead_units": 39.2,
+        "camera_step": 0.87,
+        "hidden_share": 0.166,
+        "in_frame": 7.38,
+        "px_median": 75.1,
+        "seconds": 3.487,
+        "visible": 6.3
+      },
+      "v221": {
+        "ahead_share": 0.531,
+        "ahead_units": 46.0,
+        "camera_step": 0.057,
+        "hidden_share": 0.096,
+        "in_frame": 8.0,
+        "px_median": 76.2,
+        "seconds": 4.55,
+        "visible": 7.23
+      }
+    }
+  },
+  "continuity": {
+    "v22": {
+      "boundaries": 7,
+      "hard_cuts": 1,
+      "max_jump": 0.443,
+      "measured": 7
+    },
+    "v221": {
+      "boundaries": 7,
+      "hard_cuts": 0,
+      "max_jump": 0.058,
+      "measured": 7
+    }
+  },
+  "film": {
+    "delta": {
+      "frames": 209,
+      "preview_seconds": 1.5,
+      "race_frames": 119,
+      "runtime": 3.483333
+    },
+    "v22": {
+      "cuts": 8,
+      "frames": 1383,
+      "hold_frames": 42,
+      "omissions": [
+        {
+          "at": 4.4,
+          "dropped": 3.933333
+        }
+      ],
+      "omitted": 3.933333,
+      "preview_frames": 120,
+      "preview_seconds": 2.0,
+      "race_frames": 1221,
+      "replay_covered": 20.333667,
+      "runtime": 23.05
+    },
+    "v221": {
+      "cuts": 8,
+      "frames": 1592,
+      "hold_frames": 42,
+      "omissions": [
+        {
+          "at": 6.05,
+          "dropped": 1.95
+        }
+      ],
+      "omitted": 1.95,
+      "preview_frames": 210,
+      "preview_seconds": 3.5,
+      "race_frames": 1340,
+      "replay_covered": 22.317,
+      "runtime": 26.533333
+    }
+  },
+  "findings": {
+    "v221": [],
+    "v221_chase_checker": [
+      "final: the aim is 12.9 layout units from the nearest racer at 20.10s, past the 0.6 its look-ahead allows"
+    ]
+  },
+  "finish": {
+    "all_eight": {
+      "clear": 8,
+      "crossed": 8,
+      "in_frame": 8,
+      "readable": 8
+    },
+    "discontinuities": 0,
+    "findings": [],
+    "joins": {
+      "boundaries": 7,
+      "hard_cuts": 0,
+      "max_jump": 0.058
+    },
+    "lead": {
+      "blocked_by": {},
+      "frames": 42,
+      "from": 19.4667,
+      "seconds": 1.3833,
+      "winner_crosses": 20.85
+    },
+    "motion": {
+      "frames": 335,
+      "max_step": 0.824,
+      "max_step_at": 18.9167,
+      "max_turn": 0.8803,
+      "max_turn_at": 20.7333,
+      "mean_step": 0.2355,
+      "over_step": 0,
+      "over_turn": 0
+    },
+    "screen": {
+      "max_at": 21.1167,
+      "max_marble": 7,
+      "max_px": 43.05,
+      "max_share": 0.0195,
+      "mean_px": 21.41
+    },
+    "shape": {
+      "aim_entry_speed": 0.2954,
+      "aim_ratio": 0.834,
+      "aim_reach": 25.514,
+      "aim_settle": 1.2,
+      "aim_steps": 72,
+      "entry_speed": 0.8309,
+      "parked_at": 21.5834,
+      "ratio": 2.0,
+      "reach": 66.888,
+      "settle": 2.6834,
+      "steps": 161
+    },
+    "split": 18.9,
+    "strategy": "a_chase",
+    "v22": {
+      "joins": {
+        "boundaries": 7,
+        "hard_cuts": 1,
+        "max_jump": 0.443
+      },
+      "lead": {
+        "blocked_by": {},
+        "frames": 20,
+        "from": 20.2167,
+        "seconds": 0.6333,
+        "winner_crosses": 20.85
+      }
+    },
+    "window_after": {
+      "blockers": {},
+      "hidden_share": 0.0,
+      "in_frame_mean": 1.22,
+      "in_frame_min": 0,
+      "lost_share": 0.822,
+      "px_median": 64.4,
+      "px_min": 53.4,
+      "sampled": 73,
+      "seen_share": 0.306,
+      "under_min_px": 0,
+      "visible_mean": 1.22,
+      "visible_min": 0
+    },
+    "winner": {
+      "crosses": 20.85,
+      "marble": 5,
+      "off_frame": 20,
+      "px_at_crossing": 54.9,
+      "px_median": 54.9,
+      "px_min": 26.9,
+      "sampled": 31
+    }
+  },
+  "preview": {
+    "breath_ratio": 37.45,
+    "centre_seconds": {
+      "branches": 1.156,
+      "finish": 0.0,
+      "fork": 1.444,
+      "merge": 0.852,
+      "mixer": 2.782,
+      "obstacle": 2.042,
+      "start": 3.483,
+      "turns": 2.389
+    },
+    "duration": 3.4833,
+    "flat_units_per_frame": 0.9818,
+    "frames": 210,
+    "handoff": {
+      "aim_delta": 0.0,
+      "fov_delta": 0.0,
+      "last_fov": 34.0,
+      "last_step": 0.05736,
+      "last_turn": 0.12685,
+      "max_fov_step": 0.6621,
+      "max_tail_step": 0.05743,
+      "max_tail_turn": 0.12693,
+      "mean_tail_step": 0.05429,
+      "pose_delta": 0.0,
+      "race_first_step": 0.05733,
+      "race_first_turn": 0.12685,
+      "race_fov": 34.0,
+      "tail_dip": 0.02688,
+      "tail_frames": 12,
+      "turn_residual": -0.0,
+      "velocity_residual": 3e-05
+    },
+    "handoff_columns": {
+      "ax": 0.0,
+      "ay": 0.0,
+      "az": 0.0,
+      "fov": 0.0,
+      "px": 0.0,
+      "py": 0.0,
+      "pz": 0.0
+    },
+    "landmarks_seen": 8,
+    "max_aim_step": 1.1085,
+    "max_pitch": 0.4264,
+    "max_step": 1.0065,
+    "max_turn": 0.5409,
+    "max_yaw": 0.4589,
+    "mean_step": 0.4827,
+    "mean_visible_fraction": 0.4396,
+    "min_sight_clearance": 2.982,
+    "prefix": 3.5,
+    "problems": [],
+    "subject_seconds": {
+      "branches": 0.3,
+      "finish": 0.517,
+      "fork": 0.45,
+      "merge": 0.483,
+      "mixer": 0.367,
+      "obstacle": 0.483,
+      "start": 0.517,
+      "turns": 0.383
+    },
+    "v22_peak_step": 1.074
+  },
+  "seed": 5432,
+  "start": {
+    "beats": {
+      "gate": 6.1,
+      "lift_at": 5.199999999999999,
+      "rate": 13.0,
+      "release": 0.3,
+      "rotor_start": 1.6,
+      "rotor_stop": 4.6,
+      "settled": 4.8999999999999995,
+      "spin_down": 0.3,
+      "turns": 6.207042780583917
+    },
+    "v22": {
+      "aim_step_join": 0.0,
+      "anticipation": {
+        "blade_lift": 0.2667,
+        "mixing": 0.3,
+        "pour": 1.3,
+        "spin_down": 0.0,
+        "still": 0.2667,
+        "to_gate": 0.2667
+      },
+      "camera_reach_change": 3.6634,
+      "camera_step_inside": 0.8704,
+      "camera_step_join": 5.3741,
+      "last_collision_to_gate": 4.0875,
+      "live": 3.486667,
+      "marbles": {
+        "max_diameters": 1.907,
+        "max_px": 158.4,
+        "max_sim": 2.3223,
+        "mean_sim": 1.0502
+      },
+      "omitted": 3.933333,
+      "omitted_frames": 235,
+      "plan": "v22",
+      "rotor": {
+        "inside_constant_rate": false,
+        "lift_change": 1.193,
+        "phase_error_deg": -49.6055
+      }
+    },
+    "v221": {
+      "aim_step_join": 0.0,
+      "anticipation": {
+        "blade_lift": 0.9,
+        "mixing": 1.05,
+        "pour": 1.3,
+        "spin_down": 0.3,
+        "still": 1.2,
+        "to_gate": 1.5
+      },
+      "camera_reach_change": 0.0,
+      "camera_step_inside": 0.0574,
+      "camera_step_join": 0.0,
+      "last_collision_to_gate": 4.0875,
+      "live": 4.55,
+      "marbles": {
+        "max_diameters": 1.116,
+        "max_px": 83.8,
+        "max_sim": 1.123,
+        "mean_sim": 0.4593
+      },
+      "omitted": 1.95,
+      "omitted_frames": 116,
+      "plan": "b116_v221",
+      "rotor": {
+        "inside_constant_rate": true,
+        "lift_change": 0.0,
+        "phase_error_deg": 0.0339
+      }
+    }
+  }
+}

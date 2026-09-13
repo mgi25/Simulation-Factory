@@ -104,53 +104,83 @@ def _mpdecimate_frames(path: str) -> int | None:
 def _hold_is_static(path: str, hold_frames: int, offset: int = 0) -> tuple[bool, str]:
     """Is the held opening one picture, judged below the text?
 
-    Compares frame 2 with frame `hold_frames - 2` over the rows under y 560,
-    which is below PICK ONE and its shadow and above nothing else that moves.
-    Whole frames cannot be compared because the hook fades in and out over the
-    hold, which is the point of it.
+    Every frame of the hold is compared with the one before it, over the rows
+    under y 560 - below PICK ONE and its shadow, and above nothing else that
+    moves. Whole frames cannot be compared because the hook fades in and out
+    over the hold, which is the point of it.
 
     `offset` is where the held frames start, which is no longer frame zero:
-    V22 puts a 120-frame course preview in front of the hold, and that preview
-    is moving footage by design. Measured against frames 2 and 40 of the V22
-    file - which are preview frames - this check reported a mean difference of
-    66.3 and 99.9% of pixels moved, which is a correct reading of the wrong two
-    frames.
+    V22 puts a 120-frame course preview in front of the hold and V22.1 a
+    210-frame one, and a preview is moving footage by design. Measured against
+    frames 2 and 40 of the V22 file - which are preview frames - an earlier
+    version of this check reported a mean difference of 66.3 with 99.9% of
+    pixels moved, which is a correct reading of the wrong two frames.
+
+    ## Why the **median** adjacent step and not the two ends
+
+    This compared frame 2 with frame `hold_frames - 2` until V22.1, and on V22.1
+    it failed: mean 0.79 with 20.4% of pixels moved. Nothing had drifted. x264's
+    default key interval is 250 frames, V22.1's hold runs 210 to 251, and **an
+    IDR lands on frame 250, inside it**. An I-frame is quantised from scratch
+    rather than predicted, so it differs from the P-frames before it - by up to
+    48 on a hard edge here, because the V22.1 held frame is the elevation-30
+    start with the whole drum rim in it and far more fine detail than V21's.
+    Broken down, frames 212-240 agree to a mean of 0.03 and the entire
+    difference is the single step at the IDR; side by side the two pictures are
+    the same picture.
+
+    So the two-ended reading was measuring the encoder. The median of the 41
+    adjacent steps measures the *picture*: it is immune to the one or two frames
+    an IDR lands on, it still reports 2.4 per frame if the wrong footage is
+    being examined, and it is what "one still picture" actually means. The
+    largest step is reported beside it rather than judged, because on a static
+    run its cause is the bitstream and not the edit.
     """
     import numpy as np
     from PIL import Image
 
     scratch = os.path.join(OUT_DIR, "short", "qc")
+    if os.path.isdir(scratch):
+        shutil.rmtree(scratch)
     os.makedirs(scratch, exist_ok=True)
-    grabbed = []
-    for index in (offset + 2, offset + max(3, hold_frames - 2)):
-        out = os.path.join(scratch, f"hold_{index:04d}.png")
-        subprocess.run(
-            [shutil.which("ffmpeg"), "-v", "error", "-y", "-i", path,
-             "-vf", f"select='eq(n\\,{index})'", "-vsync", "0", "-frames:v", "1", out],
-            capture_output=True, text=True,
-        )
-        if not os.path.isfile(out):
-            return False, "could not extract the held frames"
-        grabbed.append(np.asarray(Image.open(out).convert("RGB"), dtype=np.int16)[560:])
-    difference = np.abs(grabbed[0] - grabbed[1])
-    mean = float(difference.mean())
-    pixels = difference.shape[0] * difference.shape[1]
-    moved = float((difference.max(axis=2) > 2).sum()) / pixels
-    # **Not bit-equality, because h.264 is lossy and these frames are encoded
-    # differently even when the source is the same picture.** Measured on this
-    # file the two held frames differ by a mean of 0.014 with 0.08% of pixels
-    # off by more than two - noise spread evenly over the frame, not structure.
-    # A hold that had actually drifted would move a region, not a scatter.
+    last = offset + max(3, hold_frames - 2)
+    subprocess.run(
+        [shutil.which("ffmpeg"), "-v", "error", "-y", "-i", path,
+         "-vf", f"select='between(n\\,{offset + 2}\\,{last})'",
+         "-vsync", "0", os.path.join(scratch, "hold_%04d.png")],
+        capture_output=True, text=True,
+    )
+    names = sorted(f for f in os.listdir(scratch) if f.endswith(".png"))
+    if len(names) < 3:
+        return False, "could not extract the held frames"
+    frames = [
+        np.asarray(Image.open(os.path.join(scratch, name)).convert("RGB"),
+                   dtype=np.int16)[560:]
+        for name in names
+    ]
+    pixels = frames[0].shape[0] * frames[0].shape[1]
+    steps = []
+    for before, after in zip(frames, frames[1:]):
+        difference = np.abs(before - after)
+        steps.append((float(difference.mean()),
+                      float((difference.max(axis=2) > 2).sum()) / pixels))
+    mean = float(np.median([step[0] for step in steps]))
+    moved = float(np.median([step[1] for step in steps]))
+    worst = max(steps)
+    # **Not bit-equality, because h.264 is lossy and two encodings of one
+    # picture differ.** On a hold that had actually drifted these medians move
+    # together and by orders of magnitude, which is what the bar is set for.
     return (
         mean < 0.10 and moved < 0.005,
-        f"the held opening is one still picture below the hook "
-        f"(mean difference {mean:.4f}, {moved * 100:.3f}% of pixels moved by more than 2)",
+        f"the held opening is one still picture below the hook, over "
+        f"{len(steps)} adjacent frames (median step {mean:.4f}, {moved * 100:.3f}% "
+        f"of pixels; largest step {worst[0]:.4f}, {worst[1] * 100:.3f}%)",
     )
 
 
 def report(seed: int = 5432, edition: str = "v21") -> bool:
     from sloped import presentation
-    from tools.sloped_short import EDITIONS, load_all
+    from tools.sloped_short import EDITIONS, cue_policy, load_all
     import numpy as np
 
     if edition not in EDITIONS:
@@ -210,7 +240,7 @@ def report(seed: int = 5432, edition: str = "v21") -> bool:
     # The designed hierarchy, measured on the mix this build produces.
     from audio import marble
     from audio.synthesis import SAMPLE_RATE
-    mix = marble.build_race_audio(replay, track, clock)
+    mix = marble.build_race_audio(replay, track, clock, cues=cue_policy(edition))
     mono = 0.5 * (np.array(mix.left) + np.array(mix.right))
     hop = SAMPLE_RATE // 100
     envelope = np.array([float(np.abs(mono[i * hop:(i + 1) * hop]).max())
@@ -305,9 +335,15 @@ def report(seed: int = 5432, edition: str = "v21") -> bool:
         check(trapdoor is not None and trapdoor <= 2.0,
               f"the release is inside the first two seconds ({trapdoor:.3f} s)")
 
-    # Omitted time is cued, and the cue is the only thing standing in for it.
+    # Omitted time, and whether this edition marks it. **An uncued omission is
+    # a claim, not an oversight**: V22.1 cuts four whole rotor revolutions out
+    # of a constant-rate spin, so the picture is continuous across the join and
+    # a whoosh would announce an edit nobody could otherwise see. See
+    # `audio.marble.Cues`.
+    cues = cue_policy(edition)
     for at, dropped in presentation.omissions(clock):
-        print(f"         {dropped:.3f} s of replay omitted at {at:.3f} s")
+        marked = "cued" if cues.omission else "deliberately uncued"
+        print(f"         {dropped:.3f} s of replay omitted at {at:.3f} s ({marked})")
     return ok
 
 
