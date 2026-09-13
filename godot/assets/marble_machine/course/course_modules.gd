@@ -359,7 +359,7 @@ static func _shuffle_chamber(root: Node3D, palette, contract: Dictionary) -> voi
 		var y: float = rise * (float(ring) + 0.5) / 5.0
 		var hoop := Forms.mesh_node(
 			Forms.arc_hoop(radius, 0.05, mouth + gap, mouth + TAU - gap, 48, 8),
-			palette.get_material("acrylic_guard"), "Hoop%d" % ring, false)
+			palette.get_material("acrylic_drum"), "Hoop%d" % ring, false)
 		hoop.position = Vector3(0.0, y, 0.0)
 		wall.add_child(hoop)
 	var kerb := Forms.mesh_node(
@@ -521,7 +521,7 @@ static func shuffle_start_parts(palette, contract: Dictionary,
 		if key.begins_with("panel"):
 			material = "running_polished"
 		elif key.begins_with("rotor"):
-			material = "orange_machine"
+			material = "rotor_machine"
 		var node := Forms.mesh_node(
 			Geometry.rounded_box(box, minf(box.y, box.x) * 0.22, 3),
 			palette.get_material(material), "Part_%s" % key, false)
@@ -592,7 +592,7 @@ static func mixer(palette) -> Node3D:
 
 	var window := Forms.mesh_node(
 		Geometry.rounded_box(Vector3(2.40, 0.92, 0.14), 0.06, 3),
-		palette.get_material("acrylic_guard"), "Window", false)
+		palette.get_material("acrylic_drum"), "Window", false)
 	window.position = Vector3(0.0, -0.16, 1.14)
 	root.add_child(window)
 
@@ -683,7 +683,7 @@ static func obstacle(palette) -> Node3D:
 		for index in 7:
 			var chevron := Forms.mesh_node(
 				Geometry.rounded_box(Vector3(0.07, 0.34, 0.26), 0.02, 2),
-				palette.get_material("orange_machine" if index % 2 == 0
+				palette.get_material("hazard_machine" if index % 2 == 0
 					else "graphite_deep"), "Chevron%s%d" % [suffix, index],
 				false)
 			chevron.position = Vector3(float(sx) * 1.50, -0.16,
@@ -731,7 +731,7 @@ static func obstacle(palette) -> Node3D:
 			wheel.add_child(pivot)
 			var arm := Forms.mesh_node(
 				Geometry.rounded_box(Vector3(0.15, 0.78, 1.34), 0.06, 3),
-				palette.get_material("orange_machine"), "Blade%d" % blade)
+				palette.get_material("hazard_machine"), "Blade%d" % blade)
 			arm.position = Vector3(0.0, -0.20, 0.72)
 			pivot.add_child(arm)
 			var tip := Forms.mesh_node(
@@ -743,7 +743,7 @@ static func obstacle(palette) -> Node3D:
 	# The drive: a machinery block on one side, where the shafts are geared.
 	var drive := Forms.mesh_node(
 		Geometry.rounded_box(Vector3(0.44, 0.52, reach * 1.4), 0.14, 3),
-		palette.get_material("orange_machine"), "Drive")
+		palette.get_material("hazard_machine"), "Drive")
 	drive.position = Vector3(half + 0.30, 1.88, 0.0)
 	root.add_child(drive)
 	for index in 3:

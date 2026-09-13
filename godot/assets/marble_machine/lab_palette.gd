@@ -172,6 +172,13 @@ const V21_RETUNE := {
 		"clearcoat": 0.78},
 	"orange_machine": {"albedo": "#DE762F", "roughness": 0.31,
 		"clearcoat": 0.74},
+	# The two aliases carry `orange_machine`'s own V21 row, so a course built
+	# under "v21" and no machine pass is the course V22.1 shipped.
+	"rotor_machine": {"albedo": "#DE762F", "roughness": 0.31,
+		"clearcoat": 0.74},
+	"hazard_machine": {"albedo": "#DE762F", "roughness": 0.31,
+		"clearcoat": 0.74},
+	"acrylic_drum": {"rim": 0.18, "rim_tint": 0.55},
 	# Metal hardware. Rougher, and specular down: at 0.14/0.75 a chrome bead
 	# is a pinpoint mirror, and there is one every half metre of track.
 	"chrome": {"roughness": 0.27, "specular": 0.52},
@@ -202,15 +209,224 @@ const V21_RETUNE := {
 	"lit_dusk_band": {"energy": 1.7},
 }
 
+# --- V23: the machine colour passes ----------------------------------------
+#
+# A second override layer, applied *after* the V21 retune and gated on its own
+# flag, so a pass is a machine colour language rather than a re-grade. Nothing
+# here touches the environment, the lights, the grade, the camera or a racer's
+# skin: the keys below are the moulded body of the machine, its structure, its
+# hardware, its guards and its edge lights, and nothing else.
+#
+# ## What a pass is for
+#
+# The shipped machine already has a zone story - cyan off the line, violet on
+# the approach to the choice, the two route identities at the choice, gold from
+# the merge to the flag - and `course_machine.EDGE_LIGHTS` is where it is
+# written. What it does not have is a zone story a viewer can *see at phone
+# size*, because four of the five zones are told only by a 6 cm emissive strip
+# along a track whose body is the same warm cream in every one of them.
+#
+# Two things follow, and all three passes below do both:
+#
+# **The neutrals go cool.** The machine is warm-neutral cream and its sky is
+# warm orange, so the largest object in frame shares a temperature with its own
+# background. Cooling the pearl family to silver puts the machine on the other
+# side of the wheel from the environment it is photographed against, which is
+# the cheapest separation available and costs no brightness - the swaps below
+# hold relative luminance to within about one per cent.
+#
+# **Each zone gets a body, not just a line.** The mixer's rotor goes violet,
+# the split's wedge line goes amber, the obstacle's sweep drops half a step
+# below the split's orange so the choice is the brightest warm thing in the
+# film, and the finale's gold comes up. Orange stops meaning both "moving part"
+# and "route", which is what `rotor_machine` and `hazard_machine` exist for.
+#
+# ## The three
+#
+# `v23a` is the temperature correction and the two hue corrections, and nothing
+# else: the same machine, photographed cooler. `v23b` is the designed system -
+# every zone carries a body colour, the structure deepens so the machine reads
+# brighter against it, and the finish is the only place glow is *raised*.
+# `v23c` is `v23b` with the value range and the edge-light energy pushed past
+# where the V21 pass left them, so the comparison has an upper bound rather
+# than an open end.
+#
+# ## The one rule these passes keep
+#
+# **A machine pass says what colour a surface is. It does not say how that
+# surface answers a light.** `roughness`, `clearcoat` and `clearcoat_roughness`
+# are V21's decisions and are left alone; what a pass sets is `albedo`,
+# `emission`, `metallic`/`specular` and emissive `energy`.
+#
+# That is not tidiness, it is a measured correction. The first build of `v23b`
+# also tightened the track lip - roughness 0.29 to 0.27, clearcoat 0.58 to 0.64
+# - which is a rim highlight sharpened along every metre of a 237-unit course,
+# and it put clipping back on frames V21 had cleaned. A colour pass that also
+# re-narrows specular lobes is a second readability pass wearing a palette's
+# name, and it will undo the first one somewhere nobody is looking.
+#
+# The exceptions are the two keys that are being *repainted* rather than
+# recoloured: `rotor_machine` goes from a saturated orange to a light lilac,
+# and a surface changing that far may state its own gloss.
+const MACHINE_SUBTLE := "v23a"
+const MACHINE_SIGNATURE := "v23b"
+const MACHINE_SHOWCASE := "v23c"
+const MACHINE_PASSES := {
+	# --- A: subtle premium --------------------------------------------------
+	"v23a": {
+		# The pearl family, flipped cool at constant luminance. Roughness and
+		# clearcoat are left exactly where V21 put them: this pass changes the
+		# temperature of the machine and not how it answers a light.
+		"pearl_shell": {"albedo": "#C4C8CC"},
+		"pearl_lip_v2": {"albedo": "#D6DADE"},
+		"pearl_soft": {"albedo": "#C8CCD0"},
+		"pearl_shade": {"albedo": "#B5B9BE"},
+		# The mixer reads violet. One surface, and it is the right one: the
+		# rotor blades are the largest moving thing in the first six seconds
+		# and they sit in the middle of the frame for all of them.
+		#
+		# **Light lilac rather than a saturated violet, and that is a racer
+		# constraint rather than a taste.** The field's purple is #8E3FD4; a
+		# rotor painted anywhere near it puts a marble against a blade of its
+		# own hue *and* its own value, which is exactly the collision the first
+		# render of this pass produced. A blade well above every racer in value
+		# keeps all eight silhouettes and still says violet; the zone's energy
+		# comes from the crown line and the drum tint, which no marble touches.
+		"rotor_machine": {"albedo": "#B098E2", "roughness": 0.30,
+			"clearcoat": 0.78},
+		# The split's own line, which is white in the shipped machine and is
+		# the one lit surface at the choice that belongs to neither route.
+		"lit_white": {"emission": "#F6B36A", "albedo": "#6E5030",
+			"energy": 1.9},
+		# The payoff, a hair stronger. Nothing else in the finale moves.
+		"gold": {"specular": 0.74},
+		"lit_gold_line": {"energy": 4.8},
+	},
+
+	# --- B: balanced signature ---------------------------------------------
+	"v23b": {
+		# Body. Half a step below A, so the machine stops being the brightest
+		# object in its own frame and an eight-pixel racer has somewhere to be
+		# bright. The lip caps stay up: a silver shell with a lit rim is the
+		# product read, and dropping both together loses the track's line.
+		"pearl_shell": {"albedo": "#B9BEC4"},
+		"pearl_lip_v2": {"albedo": "#D2D7DC"},
+		"pearl_soft": {"albedo": "#BEC3C9"},
+		"pearl_shade": {"albedo": "#A7ACB2"},
+		# Running surface: darker and more metal, so it reflects the zone it is
+		# in instead of painting every zone the same pale grey.
+		"running_polished": {"albedo": "#8B99A8", "metallic": 0.62},
+		# Structure, deeper and cooler. The brief's "dark environment, bright
+		# machine" is not available to a machine pass - the sky is the
+		# environment's - but the armature the machine stands on is, and this
+		# is the whole of that move.
+		"graphite": {"albedo": "#23272E"},
+		"graphite_soft": {"albedo": "#333943"},
+		"graphite_deep": {"albedo": "#14171C"},
+		"chrome": {"albedo": "#C1C9D1"},
+		# Mixer zone: violet rotor in a violet-tinted room.
+		"rotor_machine": {"albedo": "#B69FEA", "roughness": 0.30,
+			"clearcoat": 0.80},
+		"acrylic_drum": {"albedo": "#B78FF2", "backlight": "#332654",
+			"rim": 0.20, "rim_tint": 0.60},
+		"neon_violet_hero": {"energy": 6.8},
+		# Descent: the longest zone and therefore the quietest line.
+		"lit_cyan_line_hero": {"energy": 5.6},
+		# Choice zone: the wedge line goes amber, and both portals gain a
+		# little chroma without either changing hue.
+		#
+		# **Both are saturated downwards, and that is the merge frame's
+		# lesson.** Clipping is measured per channel, so a body that gains
+		# chroma by *raising* its dominant channel clips more even as its
+		# luminance falls: #2A83C6 to #2380CC is a darker blue and it put
+		# 0.29 of a point of extra clipping on the merge frame all by itself,
+		# more than any other row in this table. The same chroma bought by
+		# pulling the other two channels down costs nothing, because the
+		# channel the test looks at never moved.
+		#
+		# The wedge line sits at V21's own energy for the same reason once its
+		# emission is amber rather than cool white: at 1.9 it was the second
+		# largest contributor to that frame, two cuts downstream of itself.
+		"lit_white": {"emission": "#F6A957", "albedo": "#6E4B27",
+			"energy": 1.6},
+		"orange_machine": {"albedo": "#DE7126"},
+		"blue_machine": {"albedo": "#1E7CC6"},
+		# Obstacle: half a step under the choice, so the split is the brightest
+		# warm thing in the film and the sweep is its warning shot.
+		"hazard_machine": {"albedo": "#C2702F"},
+		"orange_deep": {"albedo": "#A54B10"},
+		# Finish. **The payoff is bought from the body and not from the glow,
+		# and that is a measured decision rather than a preference.** The first
+		# build of this pass took `lit_gold_line` to 5.2 and the wash to 1.30,
+		# which is what a gold payoff sounds like it should want; it put 2.8
+		# more points of the merge frame at or above 250 in a channel than the
+		# machine that ships, and 1.9 more on the preview's opening flight over
+		# the finish. Both lines are back at V21's energies here. What carries
+		# the finale instead is gold that answers a light harder, warm hardware
+		# a step brighter, a shell half a step deeper, and a checker whose light
+		# tile comes down - contrast in the moulding rather than light added to
+		# the frame. The one emissive that moves moves *down*: the wash is a
+		# large area, and a large area is where clipping is cheapest to buy.
+		"pearl_warm": {"albedo": "#DCD0B6"},
+		"pearl_warm_shade": {"albedo": "#C0B49B"},
+		"running_warm": {"albedo": "#948468"},
+		"gold": {"specular": 0.80},
+		"gold_dark": {"albedo": "#B4861F"},
+		"lit_gold_wash": {"energy": 0.98},
+		"checker_light": {"albedo": "#C6C0B0"},
+	},
+
+	# --- C: bold showcase ---------------------------------------------------
+	"v23c": {
+		# The same system, pushed. Body down a full step from the shipped
+		# machine, structure near black, every zone line 12-18% hotter than
+		# V21 left it. This is the upper bound the comparison needs, not a
+		# recommendation: it is the variant that can over-glow.
+		"pearl_shell": {"albedo": "#ADB4BC"},
+		"pearl_lip_v2": {"albedo": "#D8DDE2"},
+		"pearl_soft": {"albedo": "#B2B9C1"},
+		"pearl_shade": {"albedo": "#9AA1A9"},
+		"running_polished": {"albedo": "#7F8E9E", "metallic": 0.66},
+		"graphite": {"albedo": "#1B1F26"},
+		"graphite_soft": {"albedo": "#2A2F38"},
+		"graphite_deep": {"albedo": "#0E1116"},
+		"chrome": {"albedo": "#D2D9E1"},
+		"rotor_machine": {"albedo": "#C2A9F7", "roughness": 0.28,
+			"clearcoat": 0.85},
+		"acrylic_drum": {"albedo": "#ADA2F6", "backlight": "#2E2750",
+			"rim": 0.24, "rim_tint": 0.62},
+		"neon_violet_hero": {"energy": 7.4},
+		"lit_cyan_line_hero": {"energy": 6.2},
+		"lit_white": {"emission": "#FFAE52", "albedo": "#7A5226",
+			"energy": 3.0},
+		"orange_machine": {"albedo": "#F0761F"},
+		"blue_machine": {"albedo": "#1C7BD0"},
+		"lit_orange_line": {"energy": 5.9},
+		"neon_blue": {"energy": 6.1},
+		"hazard_machine": {"albedo": "#B8641F"},
+		"orange_deep": {"albedo": "#93400B"},
+		"pearl_warm": {"albedo": "#E0D2B2"},
+		"pearl_warm_shade": {"albedo": "#C4B693"},
+		"running_warm": {"albedo": "#9C8A66"},
+		"gold": {"specular": 0.86},
+		"gold_dark": {"albedo": "#BA8A1C"},
+		"lit_gold_line": {"energy": 6.0},
+		"lit_gold_wash": {"energy": 1.55},
+		"checker_light": {"albedo": "#D2CBBA"},
+	},
+}
+
 var _cache: Dictionary = {}
 var variant: String = VARIANT_TOWER
 var contrast: String = ""
+var machine: String = ""
 
 
 func _init(art_variant: String = VARIANT_TOWER,
-		contrast_pass: String = "") -> void:
+		contrast_pass: String = "", machine_pass: String = "") -> void:
 	variant = art_variant if art_variant in VARIANTS else VARIANT_TOWER
 	contrast = contrast_pass
+	machine = machine_pass
 
 
 # --- builders -------------------------------------------------------------
@@ -309,6 +525,14 @@ func get_material(key: String) -> StandardMaterial3D:
 	var material := _build(key)
 	if contrast == CONTRAST_V21 and V21_RETUNE.has(key):
 		_retune(material, V21_RETUNE[key])
+	# **After the contrast pass, never instead of it.** A machine pass is a
+	# colour language laid over a readability pass, and the two answer
+	# different questions; a pass that replaced V21 would have to restate
+	# every roughness and every energy it agreed with.
+	if MACHINE_PASSES.has(machine):
+		var table: Dictionary = MACHINE_PASSES[machine]
+		if table.has(key):
+			_retune(material, table[key])
 	_cache[key] = material
 	return material
 
@@ -340,6 +564,14 @@ func _retune(material: StandardMaterial3D, spec: Dictionary) -> void:
 		material.rim = float(spec["rim"])
 	if spec.has("rim_tint"):
 		material.rim_tint = float(spec["rim_tint"])
+	# An emissive surface carries its hue in `emission`, and the `albedo`
+	# field above only moves the unlit body the builder darkened out of it.
+	# A row that recolours a lit strip therefore sets both, and one that set
+	# only `albedo` on an emissive would change nothing a viewer can see.
+	if spec.has("emission"):
+		material.emission = Color(str(spec["emission"]))
+	if spec.has("backlight"):
+		material.backlight = Color(str(spec["backlight"]))
 
 
 func _build(key: String) -> StandardMaterial3D:
@@ -377,6 +609,18 @@ func _build(key: String) -> StandardMaterial3D:
 			return _metal(GOLD_LIGHT, 0.16, 0.8)
 		"orange_machine":
 			return _moulded(ORANGE, 0.28, 0.9, 0.05)
+		# Two aliases of `orange_machine`, built from the same three numbers and
+		# therefore the same material until a machine pass names one of them.
+		#
+		# `orange_machine` is asked for by three different things - the orange
+		# route's body, the start rotor's blades and the obstacle's sweep - and a
+		# zone language cannot separate them while they share a key. These exist
+		# so a pass can move the rotor without moving the route. With no pass on,
+		# every one of the three renders exactly as it did.
+		"rotor_machine":
+			return _moulded(ORANGE, 0.28, 0.9, 0.05)
+		"hazard_machine":
+			return _moulded(ORANGE, 0.28, 0.9, 0.05)
 
 		# Transparent.
 		"acrylic_aqua":
@@ -390,6 +634,13 @@ func _build(key: String) -> StandardMaterial3D:
 		# small canopy, milk on a bowl. These two drop the rim and lean on
 		# thickness and backlight for the cast-plastic read instead.
 		"acrylic_guard":
+			return _acrylic_soft(ACRYLIC_AQUA, 0.115, 0.30)
+		# An alias of `acrylic_guard`, for the two enclosures a marble is mixed
+		# inside: the start chamber's hoops and the mixer module's window. Every
+		# other guard in the course is a wall beside a moving racer and keeps the
+		# course's own aqua; these two are rooms, and a zone language wants to
+		# tint a room. Identical until a pass names it.
+		"acrylic_drum":
 			return _acrylic_soft(ACRYLIC_AQUA, 0.115, 0.30)
 		"acrylic_bowl":
 			return _acrylic_soft(ACRYLIC_AQUA, 0.175, 0.38)

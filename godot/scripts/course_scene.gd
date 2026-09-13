@@ -95,6 +95,14 @@ var _palette
 ## line overrides either way, which is how the before-and-after frames of the
 ## V21 pass were taken from one build of one scene.
 var _contrast := ""
+## Which machine colour pass the *machine* is painted under.
+##
+## Empty is the shipped machine, and it is what every entry point gets
+## unless `--machine=` names a pass. Orthogonal to `_contrast`: a pass is a
+## colour language over the body, the structure and the zone lines, and it
+## reaches neither the environment nor the light rig nor the grade. See
+## `lab_palette.MACHINE_PASSES`.
+var _machine := ""
 var _camera: Camera3D
 var _shot := DEFAULT_SHOT
 var _layout := "a"
@@ -129,7 +137,9 @@ func _ready() -> void:
 
 	if options.has("contrast"):
 		_contrast = str(options["contrast"])
-	_palette = Palette.new("tower", _contrast)
+	if options.has("machine"):
+		_machine = str(options["machine"])
+	_palette = Palette.new("tower", _contrast, _machine)
 	_table = Layout.table(_layout)
 
 	var world_env := WorldEnvironment.new()

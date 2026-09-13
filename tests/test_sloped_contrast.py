@@ -130,7 +130,10 @@ def test_the_labs_default_to_the_v20_look():
     """An ungated retune would silently re-grade every committed lab frame."""
     assert 'var _contrast := ""' in COURSE_SCENE_GD.read_text(encoding="utf-8")
     text = COURSE_SCENE_GD.read_text(encoding="utf-8")
-    assert 'Palette.new("tower", _contrast)' in text
+    # V23 added a third argument, the machine colour pass. What this test is
+    # about is the second one: the palette is built from `_contrast`, which is
+    # empty everywhere but the race scene.
+    assert 'Palette.new("tower", _contrast' in text
     assert "World.build_environment(_no_glow, _contrast)" in text
     assert "World.build_lights(self, _contrast)" in text
 
