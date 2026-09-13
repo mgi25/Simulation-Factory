@@ -83,12 +83,134 @@ const MARBLE_COLOURS := [
 	"#F0559B",  # pink
 ]
 
+# --- V21: the readability retune -------------------------------------------
+#
+# The sloped race's V20 frames measure 9.2% of every pixel at or above 250 in
+# a channel, and 18.9% in the obstacle shot. That is not a bright picture, it
+# is a *clipped* one: the pearl shell renders as flat paper, the moulding's
+# own curvature is gone, and the eight racers - which are 8 to 14 pixels wide
+# at phone size - are asked to compete with it. The 99th percentile of frame
+# lightness is L* 99.8 across all eleven section frames, which is to say the
+# top one per cent of the picture is paper white.
+#
+# Nothing here changes what the machine is made of. Pearl is still pearl, the
+# guards are still cast aqua, the structure is still graphite and warm
+# hardware, the finish is still gold over a checker. What changes is where
+# those surfaces sit on the curve, and how hard they fight the racers:
+#
+#   * the pearl family comes down about a third of a stop and gains
+#     roughness, so the moulding shades instead of clipping;
+#   * the polished running surfaces broaden their specular lobe, trading one
+#     blown flare for a sheen that shows the channel's curvature;
+#   * the edge lights - the brightest thing in frame, and continuous along
+#     every metre of track - drop about 40% of their energy, which is the
+#     single largest source of competition with a racer;
+#   * chrome and gold hardware roughen, so the bead line stops sparkling;
+#   * a racer's fresnel rim widens, which is a *response* change and not a
+#     skin change: the hue, the saturation and the body value are untouched,
+#     and what the wider rim buys is a coloured edge that survives being
+#     drawn at ten pixels over a light track.
+#
+# Applied only when the palette is constructed with `contrast = "v21"`, which
+# `sloped_race_scene.gd` does and no other scene does. Every earlier lab's
+# committed frames therefore keep reproducing from this branch, which is the
+# rule the `_v2` and `_hero` keys above were added under.
+const CONTRAST_V21 := "v21"
+
+const V21_RETUNE := {
+	# Moulded body. Value down, roughness up, clearcoat narrowed: the three
+	# together are what turn a blown plane back into a curved one.
+	"pearl_lip": {"albedo": "#E1DCD1", "roughness": 0.24, "clearcoat": 0.72,
+		"clearcoat_roughness": 0.07},
+	"pearl_track": {"albedo": "#D8D5CC", "roughness": 0.27, "clearcoat": 0.70,
+		"clearcoat_roughness": 0.08},
+	"pearl_shell": {"albedo": "#CCC8BF", "roughness": 0.34, "clearcoat": 0.52,
+		"clearcoat_roughness": 0.13},
+	"pearl_shade": {"albedo": "#BCB9B2", "roughness": 0.40, "clearcoat": 0.40},
+	"pearl_lip_v2": {"albedo": "#DDD8CB", "roughness": 0.29, "clearcoat": 0.58,
+		"clearcoat_roughness": 0.10},
+	"pearl_soft": {"albedo": "#CFCCC5", "roughness": 0.36},
+	# The finale's shell and its warm shade. Same move, same warmth.
+	"pearl_warm": {"albedo": "#D8D0BE", "roughness": 0.30, "clearcoat": 0.62,
+		"clearcoat_roughness": 0.09},
+	"pearl_warm_shade": {"albedo": "#C4BAA5", "roughness": 0.40,
+		"clearcoat": 0.42},
+	# Running surfaces. The metallic stays - it is what makes a racer pop off
+	# them - but the lobe broadens, so the surface reads as polished rather
+	# than as one white flare with a track somewhere under it.
+	"running_polished": {"albedo": "#95A2B0", "roughness": 0.25,
+		"clearcoat": 0.80, "clearcoat_roughness": 0.07},
+	"running_warm": {"albedo": "#8D8069", "roughness": 0.26, "clearcoat": 0.80,
+		"clearcoat_roughness": 0.07},
+	"running_blue": {"albedo": "#8DB8D6", "roughness": 0.25, "clearcoat": 0.80,
+		"clearcoat_roughness": 0.07},
+	"running_orange": {"albedo": "#C7A288", "roughness": 0.25,
+		"clearcoat": 0.80, "clearcoat_roughness": 0.07},
+	"track_floor_v2": {"albedo": "#A0AAB5", "roughness": 0.31},
+	"dish_polished": {"albedo": "#74808E", "roughness": 0.26},
+	"pan_polished": {"albedo": "#828E9B", "roughness": 0.26},
+	"dish_floor": {"albedo": "#A3ACB7", "roughness": 0.48},
+	# The finish floor. The checker's contrast is the motif, so the dark tile
+	# is left alone and only the light one comes off the ceiling.
+	"checker_light": {"albedo": "#CEC7B7", "roughness": 0.30,
+		"clearcoat": 0.60, "clearcoat_roughness": 0.09},
+	# Cast guards. `rim_tint` blends the fresnel term between white and the
+	# surface's own colour, so at 0.15 a large acrylic wall seen face on
+	# answers with a *white* wash - the "frosted milk" `_acrylic_soft` was
+	# written to avoid, still arriving on the widest walls in the course: the
+	# fork canopy, the obstacle window and the mixing drum. Narrower, and what
+	# is left of it is aqua rather than white, which is what cast acrylic
+	# actually does. Only the four keys the sloped course builds with.
+	"acrylic_guard": {"rim": 0.18, "rim_tint": 0.55},
+	"acrylic_blue": {"rim": 0.20, "rim_tint": 0.55},
+	"acrylic_amber": {"rim": 0.20, "rim_tint": 0.55},
+	"acrylic_gold": {"rim": 0.20, "rim_tint": 0.55},
+	# Route identity. A half step deeper each: enough to stop a pale wash
+	# competing with a saturated racer, nowhere near enough to make either
+	# branch a different colour.
+	"blue_machine": {"albedo": "#2A83C6", "roughness": 0.28,
+		"clearcoat": 0.78},
+	"orange_machine": {"albedo": "#DE762F", "roughness": 0.31,
+		"clearcoat": 0.74},
+	# Metal hardware. Rougher, and specular down: at 0.14/0.75 a chrome bead
+	# is a pinpoint mirror, and there is one every half metre of track.
+	"chrome": {"roughness": 0.27, "specular": 0.52},
+	"gold": {"roughness": 0.25, "specular": 0.70},
+	"gold_bright": {"roughness": 0.24, "specular": 0.66},
+	"gold_dark": {"roughness": 0.31, "specular": 0.66},
+	# Structure. Only the lacquer: a graphite plate with a 0.45 clearcoat on
+	# it returns the key as a hard white streak, and those streaks are most of
+	# what makes the support bays read as busy rather than as structure.
+	"graphite_soft": {"clearcoat": 0.28, "clearcoat_roughness": 0.20},
+	"graphite": {"clearcoat": 0.26, "clearcoat_roughness": 0.22},
+	# Edge lights. The zone story is unchanged - cyan, violet, blue, orange,
+	# gold, in that order down the course - and each is about 40% quieter.
+	"lit_cyan_line_hero": {"energy": 6.0},
+	"neon_violet_hero": {"energy": 6.0},
+	"lit_violet_ring_hero": {"energy": 5.8},
+	"neon_blue": {"energy": 5.3},
+	"lit_orange_line": {"energy": 4.9},
+	"lit_gold_line": {"energy": 4.4},
+	"lit_gold_wash": {"energy": 1.10},
+	"lit_cyan_line": {"energy": 5.4},
+	"lit_white": {"energy": 1.6},
+	"sign_face": {"energy": 0.50},
+	# Environment. The valley practical is the frame's warm anchor and stays
+	# warm; it stops being a second key.
+	"lit_valley_hero": {"energy": 5.0},
+	"lit_far_window_hero": {"energy": 1.6},
+	"lit_dusk_band": {"energy": 1.7},
+}
+
 var _cache: Dictionary = {}
 var variant: String = VARIANT_TOWER
+var contrast: String = ""
 
 
-func _init(art_variant: String = VARIANT_TOWER) -> void:
+func _init(art_variant: String = VARIANT_TOWER,
+		contrast_pass: String = "") -> void:
 	variant = art_variant if art_variant in VARIANTS else VARIANT_TOWER
+	contrast = contrast_pass
 
 
 # --- builders -------------------------------------------------------------
@@ -185,8 +307,39 @@ func get_material(key: String) -> StandardMaterial3D:
 	if _cache.has(key):
 		return _cache[key]
 	var material := _build(key)
+	if contrast == CONTRAST_V21 and V21_RETUNE.has(key):
+		_retune(material, V21_RETUNE[key])
 	_cache[key] = material
 	return material
+
+
+func _retune(material: StandardMaterial3D, spec: Dictionary) -> void:
+	## Apply one V21 override table to an already-built surface.
+	##
+	## Field by field rather than by rebuilding, because the builders above
+	## carry decisions this pass has no opinion about - `_acrylic`'s backlight,
+	## the running surfaces' metallic - and a rebuild would silently drop them.
+	## The alpha of a transparent albedo is preserved for the same reason.
+	if spec.has("albedo"):
+		var tinted := Color(str(spec["albedo"]))
+		tinted.a = material.albedo_color.a
+		material.albedo_color = tinted
+	if spec.has("roughness"):
+		material.roughness = float(spec["roughness"])
+	if spec.has("metallic"):
+		material.metallic = float(spec["metallic"])
+	if spec.has("specular"):
+		material.metallic_specular = float(spec["specular"])
+	if spec.has("clearcoat"):
+		material.clearcoat = float(spec["clearcoat"])
+	if spec.has("clearcoat_roughness"):
+		material.clearcoat_roughness = float(spec["clearcoat_roughness"])
+	if spec.has("energy"):
+		material.emission_energy_multiplier = float(spec["energy"])
+	if spec.has("rim"):
+		material.rim = float(spec["rim"])
+	if spec.has("rim_tint"):
+		material.rim_tint = float(spec["rim_tint"])
 
 
 func _build(key: String) -> StandardMaterial3D:
@@ -518,5 +671,16 @@ func marble(index: int) -> StandardMaterial3D:
 	material.rim_enabled = true
 	material.rim = 0.22
 	material.rim_tint = 0.85
+	if contrast == CONTRAST_V21:
+		# The one change to a racer, and it is a response change rather than a
+		# skin change: body hue, saturation and value are exactly as shipped.
+		# A wider, more tinted fresnel puts a ring of the marble's own colour
+		# around its silhouette, which is what lets a ten-pixel ball keep an
+		# edge against a light track; the broader clearcoat lobe stops the
+		# ball answering the key with a single blown white dot that, at that
+		# size, is a third of its area.
+		material.rim = 0.42
+		material.rim_tint = 0.95
+		material.clearcoat_roughness = 0.05
 	_cache[key] = material
 	return material
