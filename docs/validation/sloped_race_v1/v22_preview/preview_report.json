@@ -1,0 +1,179 @@
+{
+  "centre_blocked_first": null,
+  "centre_blocked_frames": 0,
+  "corridor_length": 101.695,
+  "course_length": 185.282,
+  "duration": 1.9833,
+  "end_aim": [
+    -18.6,
+    41.05,
+    -37.2
+  ],
+  "end_elevation": 38.81,
+  "end_position": [
+    -32.088,
+    57.291,
+    -52.223
+  ],
+  "end_reach": 25.911,
+  "fov": 48.0,
+  "fps": 60,
+  "frames": 120,
+  "landmarks": {
+    "branches": {
+      "best_height": 0.141,
+      "from": 0.7,
+      "nearest": 47.79,
+      "nearest_at": 0.7,
+      "seconds": 0.933,
+      "seen": true,
+      "to": 1.617
+    },
+    "finish": {
+      "best_height": 0.1735,
+      "from": 0.0,
+      "nearest": 38.83,
+      "nearest_at": 0.0,
+      "seconds": 2.0,
+      "seen": true,
+      "to": 1.983
+    },
+    "fork": {
+      "best_height": 0.2143,
+      "from": 0.533,
+      "nearest": 31.44,
+      "nearest_at": 0.533,
+      "seconds": 1.467,
+      "seen": true,
+      "to": 1.983
+    },
+    "merge": {
+      "best_height": 0.1177,
+      "from": 0.717,
+      "nearest": 57.23,
+      "nearest_at": 0.717,
+      "seconds": 0.783,
+      "seen": true,
+      "to": 1.483
+    },
+    "mixer": {
+      "best_height": 0.197,
+      "from": 1.283,
+      "nearest": 34.21,
+      "nearest_at": 1.283,
+      "seconds": 0.717,
+      "seen": true,
+      "to": 1.983
+    },
+    "obstacle": {
+      "best_height": 0.1433,
+      "from": 1.017,
+      "nearest": 47.03,
+      "nearest_at": 1.017,
+      "seconds": 0.7,
+      "seen": true,
+      "to": 1.7
+    },
+    "start": {
+      "best_height": 0.2459,
+      "from": 1.517,
+      "nearest": 27.4,
+      "nearest_at": 1.933,
+      "seconds": 0.483,
+      "seen": true,
+      "to": 1.983
+    },
+    "turns": {
+      "best_height": 0.0978,
+      "from": 1.7,
+      "nearest": 68.9,
+      "nearest_at": 1.7,
+      "seconds": 0.3,
+      "seen": true,
+      "to": 1.983
+    }
+  },
+  "landmarks_seen": 8,
+  "max_across_step": 0.3026,
+  "max_aim_step": 1.3161,
+  "max_corridor_stray": 10.791,
+  "max_pitch": 0.5062,
+  "max_rise_step": 0.592,
+  "max_step": 1.2669,
+  "max_turn": 0.5412,
+  "max_yaw": 0.7636,
+  "mean_corridor_stray": 4.573,
+  "mean_step": 0.8467,
+  "mean_turn": 0.3247,
+  "mean_visible_fraction": 0.4467,
+  "min_gaze_to_vertical": 41.18,
+  "min_lens_clearance": 13.553,
+  "min_sight_clearance": 5.254,
+  "min_visible_fraction": 0.0625,
+  "name": "preview",
+  "nearest_solid": "leg3",
+  "problems": [],
+  "segments": [
+    {
+      "cut": "finish",
+      "frames": 19,
+      "from": 0.0,
+      "to": 0.3
+    },
+    {
+      "cut": "merge",
+      "frames": 24,
+      "from": 0.3,
+      "to": 0.683333
+    },
+    {
+      "cut": "branches",
+      "frames": 8,
+      "from": 0.683333,
+      "to": 0.8
+    },
+    {
+      "cut": "fork",
+      "frames": 12,
+      "from": 0.8,
+      "to": 0.983333
+    },
+    {
+      "cut": "obstacle",
+      "frames": 13,
+      "from": 0.983333,
+      "to": 1.183333
+    },
+    {
+      "cut": "turns",
+      "frames": 14,
+      "from": 1.183333,
+      "to": 1.4
+    },
+    {
+      "cut": "mixer",
+      "frames": 20,
+      "from": 1.4,
+      "to": 1.716667
+    },
+    {
+      "cut": "start",
+      "frames": 17,
+      "from": 1.716667,
+      "to": 1.983333
+    }
+  ],
+  "start_aim": [
+    20.905,
+    5.712,
+    41.54
+  ],
+  "start_position": [
+    8.902,
+    25.095,
+    20.15
+  ],
+  "total_pitch": 20.528,
+  "total_turn": 38.64,
+  "total_yaw": 41.826
+}
