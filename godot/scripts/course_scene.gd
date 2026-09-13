@@ -108,6 +108,16 @@ var _contrast := ""
 ## light rig, the mountain, the dressing and the zone practicals together.
 var _environment_id := ""
 var _environment: Dictionary = {}
+## Which machine colour pass the *machine* is painted under.
+##
+## Empty is the shipped machine, and it is what every entry point gets
+## unless `--machine=` names a pass. Orthogonal to both `_contrast` and
+## `_environment_id`: a pass is a colour language over the body, the structure
+## and the zone lines, and it reaches neither the sky nor the light rig nor
+## the grade. The world switch and the machine switch are independent by
+## construction -- `--environment=aurora_valley --machine=v23b` is one world
+## and one machine, not one theme. See `lab_palette.MACHINE_PASSES`.
+var _machine := ""
 var _camera: Camera3D
 var _shot := DEFAULT_SHOT
 var _layout := "a"
@@ -148,6 +158,8 @@ func _ready() -> void:
 			push_error("course_scene: unknown environment '%s' (have %s)"
 				% [_environment_id, ", ".join(EnvProfile.ids())])
 			_environment_id = ""
+	if options.has("machine"):
+		_machine = str(options["machine"])
 	# Resolved once, here, and passed down. Resolving per call would let the
 	# sky and the light rig disagree if a profile were ever edited mid-run,
 	# and it is the seam a future race map hands its own profile through.
@@ -156,7 +168,10 @@ func _ready() -> void:
 	for complaint in complaints:
 		push_error("environment '%s': %s" % [environment_id(), complaint])
 
-	_palette = Palette.new("tower", _contrast)
+	# The machine pass is a constructor argument and the environment profile
+	# is an override table applied over the built material, so the two reach
+	# the palette by different doors and cannot shadow each other by accident.
+	_palette = Palette.new("tower", _contrast, _machine)
 	# Before anything is built, because the palette caches what it hands out.
 	EnvBuilder.apply_palette(_palette, _environment)
 	_table = Layout.table(_layout)

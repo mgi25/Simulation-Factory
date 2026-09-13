@@ -138,9 +138,16 @@ def test_the_labs_default_to_the_v20_look():
     """
     text = COURSE_SCENE_GD.read_text(encoding="utf-8")
     assert 'var _contrast := ""' in text
-    assert 'Palette.new("tower", _contrast)' in text
+    # V23 added a third argument, the machine colour pass, and the environment
+    # system added a resolved profile to the world calls. What this test is
+    # about is unchanged: the palette, the sky and the lights are all built
+    # from `_contrast`, which is empty everywhere but the race scene.
+    assert 'Palette.new("tower", _contrast' in text
     assert "World.build_environment(_no_glow, _contrast," in text
     assert "World.build_lights(self, _contrast," in text
+    # ...and the two V23 switches are gated the same way, each off by default.
+    assert 'var _machine := ""' in text
+    assert 'var _environment_id := ""' in text
 
 
 def test_only_the_race_scene_turns_the_pass_on():

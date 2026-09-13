@@ -1,0 +1,1134 @@
+{
+ "moments": {
+  "control": {
+   "branch": {
+    "achromatic": 2.333657177568873,
+    "clipped": 2.10546875,
+    "machine_clipped": 6.181206792121808,
+    "machine_mean_L": 53.62436288121426,
+    "machine_p99_L": 96.41547468600584,
+    "marble_dE": 74.57732106894431,
+    "marble_dL": 9.276388108140836,
+    "marble_dL_p10": 4.103758672497766,
+    "marbles": 7.0,
+    "mean_L": 32.933337362706276,
+    "p99_L": 93.83576774270271,
+    "reach": 27.707754629629626,
+    "warm": 35.57807677469136
+   },
+   "descent": {
+    "achromatic": 4.108575697930946,
+    "clipped": 6.427565586419753,
+    "machine_clipped": 4.368100923631449,
+    "machine_mean_L": 67.64902080049657,
+    "machine_p99_L": 95.66737779650967,
+    "marble_dE": 63.38922301648216,
+    "marble_dL": 9.837888897506474,
+    "marble_dL_p10": 2.9692160314494154,
+    "marbles": 8.0,
+    "mean_L": 44.78641636852963,
+    "p99_L": 98.33527148761245,
+    "reach": 17.125771604938272,
+    "warm": 36.87027391975309
+   },
+   "final": {
+    "achromatic": 3.3621465286088013,
+    "clipped": 3.0421971450617287,
+    "machine_clipped": 6.72406643745939,
+    "machine_mean_L": 49.6145085880884,
+    "machine_p99_L": 98.255952929179,
+    "marble_dE": 81.29595184780486,
+    "marble_dL": 9.462720556483116,
+    "marble_dL_p10": 6.007593517968714,
+    "marbles": 2.0,
+    "mean_L": 38.187534278099164,
+    "p99_L": 97.90961727817638,
+    "reach": 44.31032986111111,
+    "warm": 48.56520061728395
+   },
+   "merge": {
+    "achromatic": 5.268658453136226,
+    "clipped": 2.662519290123457,
+    "machine_clipped": 8.17840166439976,
+    "machine_mean_L": 53.72160295999981,
+    "machine_p99_L": 96.82259933923498,
+    "marble_dE": 61.293791673693846,
+    "marble_dL": 4.690279819619946,
+    "marble_dL_p10": 1.645039567198193,
+    "marbles": 6.0,
+    "mean_L": 24.659661150275117,
+    "p99_L": 96.7021612867828,
+    "reach": 20.351755401234566,
+    "warm": 5.8148630401234565
+   },
+   "mixer_release": {
+    "achromatic": 10.885222749629529,
+    "clipped": 3.959780092592593,
+    "machine_clipped": 3.9041934856988063,
+    "machine_mean_L": 62.53693320075628,
+    "machine_p99_L": 95.54305420499337,
+    "marble_dE": 30.204769254598972,
+    "marble_dL": 14.135101009001357,
+    "marble_dL_p10": 4.39876765483871,
+    "marbles": 8.0,
+    "mean_L": 43.91121618280426,
+    "p99_L": 98.68551030580939,
+    "reach": 32.75675154320988,
+    "warm": 17.779369212962962
+   },
+   "mixer_spin": {
+    "achromatic": 8.485092387409516,
+    "clipped": 7.514226466049383,
+    "machine_clipped": 3.6364582988209793,
+    "machine_mean_L": 59.80967003032902,
+    "machine_p99_L": 95.2863132610218,
+    "marble_dE": 45.783190854858674,
+    "marble_dL": 9.620840298127465,
+    "marble_dL_p10": 5.155385295472239,
+    "marbles": 8.0,
+    "mean_L": 46.67140602199202,
+    "p99_L": 98.44910148242131,
+    "reach": 30.56669560185185,
+    "warm": 27.70360725308642
+   },
+   "obstacle": {
+    "achromatic": 5.7004404248804725,
+    "clipped": 4.563319830246913,
+    "machine_clipped": 5.417911503601507,
+    "machine_mean_L": 57.88829425573929,
+    "machine_p99_L": 95.56179661204884,
+    "marble_dE": 56.21906773124766,
+    "marble_dL": 14.585259922631824,
+    "marble_dL_p10": 9.012257060387977,
+    "marbles": 8.0,
+    "mean_L": 46.94217737794645,
+    "p99_L": 98.05854516266592,
+    "reach": 49.76509452160494,
+    "warm": 19.648533950617285
+   },
+   "preview_finish": {
+    "achromatic": 1.9028723746315857,
+    "clipped": 6.569010416666667,
+    "machine_clipped": 5.817880899839654,
+    "machine_mean_L": 48.51684418259065,
+    "machine_p99_L": 97.5692152236301,
+    "marble_dE": NaN,
+    "marble_dL": NaN,
+    "marble_dL_p10": NaN,
+    "marbles": 0.0,
+    "mean_L": 39.90693869066245,
+    "p99_L": 93.57786075645959,
+    "reach": 24.30131172839506,
+    "warm": 54.007474922839506
+   },
+   "preview_fork": {
+    "achromatic": 2.2592665086303763,
+    "clipped": 1.4985532407407407,
+    "machine_clipped": 6.051455912253539,
+    "machine_mean_L": 52.59207347447059,
+    "machine_p99_L": 96.28998517224879,
+    "marble_dE": NaN,
+    "marble_dL": NaN,
+    "marble_dL_p10": NaN,
+    "marbles": 0.0,
+    "mean_L": 26.981317188515806,
+    "p99_L": 93.68332614023048,
+    "reach": 20.682484567901234,
+    "warm": 18.613136574074073
+   },
+   "preview_start": {
+    "achromatic": 3.2880846097130503,
+    "clipped": 13.42824074074074,
+    "machine_clipped": 2.0487301847321397,
+    "machine_mean_L": 56.37644482681529,
+    "machine_p99_L": 94.12534181289531,
+    "marble_dE": 50.244895312160494,
+    "marble_dL": 7.16439691700192,
+    "marble_dL_p10": 2.423254807014513,
+    "marbles": 8.0,
+    "mean_L": 48.66606049159459,
+    "p99_L": 94.06503600058494,
+    "reach": 17.95799575617284,
+    "warm": 39.56105324074074
+   },
+   "split": {
+    "achromatic": 2.5838749645064456,
+    "clipped": 5.080970293209877,
+    "machine_clipped": 10.779733652252993,
+    "machine_mean_L": 53.48834733537809,
+    "machine_p99_L": 95.11464539270182,
+    "marble_dE": 60.1982307260821,
+    "marble_dL": 9.839953349578536,
+    "marble_dL_p10": 2.7791082555817654,
+    "marbles": 8.0,
+    "mean_L": 39.48884006208904,
+    "p99_L": 93.64827387819676,
+    "reach": 19.35546875,
+    "warm": 50.7139274691358
+   },
+   "start_gate": {
+    "achromatic": 4.4726058178481445,
+    "clipped": 19.445698302469136,
+    "machine_clipped": 1.4125606445008234,
+    "machine_mean_L": 59.69903491883882,
+    "machine_p99_L": 94.74644993672253,
+    "marble_dE": 61.93300179118356,
+    "marble_dL": 16.13767796354504,
+    "marble_dL_p10": 6.5494274422786365,
+    "marbles": 8.0,
+    "mean_L": 53.28007775310983,
+    "p99_L": 95.81663243703466,
+    "reach": 27.08695023148148,
+    "warm": 40.58752893518518
+   },
+   "winner": {
+    "achromatic": 2.5549275759419308,
+    "clipped": 8.94434799382716,
+    "machine_clipped": 6.831966303444502,
+    "machine_mean_L": 49.325291216046296,
+    "machine_p99_L": 98.55038163454981,
+    "marble_dE": 36.68259087738153,
+    "marble_dL": 9.739272083103891,
+    "marble_dL_p10": 3.7958610631661927,
+    "marbles": 5.0,
+    "mean_L": 43.196503474009376,
+    "p99_L": 97.9157808117411,
+    "reach": 37.37056327160494,
+    "warm": 54.85725308641975
+   }
+  },
+  "v23a": {
+   "branch": {
+    "achromatic": 1.912234037291004,
+    "clipped": 2.390721450617284,
+    "machine_clipped": 7.210189575109477,
+    "machine_mean_L": 53.55550038632317,
+    "machine_p99_L": 95.09628243265337,
+    "marble_dE": 74.91908003413874,
+    "marble_dL": 9.277355273164723,
+    "marble_dL_p10": 4.105885085324212,
+    "marbles": 7.0,
+    "mean_L": 32.91523832901446,
+    "p99_L": 93.15206818089652,
+    "reach": 27.707754629629626,
+    "warm": 35.8377700617284
+   },
+   "descent": {
+    "achromatic": 4.4532945904004295,
+    "clipped": 6.321807484567901,
+    "machine_clipped": 3.7623901779680105,
+    "machine_mean_L": 67.6812514923336,
+    "machine_p99_L": 95.64235810645955,
+    "marble_dE": 63.34820664291753,
+    "marble_dL": 9.848444706592261,
+    "marble_dL_p10": 2.9710557249781937,
+    "marbles": 8.0,
+    "mean_L": 44.79657719130955,
+    "p99_L": 98.33527148761245,
+    "reach": 17.125771604938272,
+    "warm": 36.35407021604939
+   },
+   "final": {
+    "achromatic": 3.573039635565013,
+    "clipped": 3.1235532407407405,
+    "machine_clipped": 6.903644787493511,
+    "machine_mean_L": 49.94735064356732,
+    "machine_p99_L": 98.55038163454981,
+    "marble_dE": 80.96010862311253,
+    "marble_dL": 9.399946491637365,
+    "marble_dL_p10": 6.030045426193658,
+    "marbles": 2.0,
+    "mean_L": 38.34762686128562,
+    "p99_L": 98.22776021289414,
+    "reach": 44.31032986111111,
+    "warm": 47.839747299382715
+   },
+   "merge": {
+    "achromatic": 4.554912060636793,
+    "clipped": 2.8978105709876543,
+    "machine_clipped": 9.326941760225964,
+    "machine_mean_L": 53.657467944155286,
+    "machine_p99_L": 95.57095637015517,
+    "marble_dE": 61.39886256697504,
+    "marble_dL": 4.70074212900758,
+    "marble_dL_p10": 1.6511244129304643,
+    "marbles": 6.0,
+    "mean_L": 24.647066593437273,
+    "p99_L": 96.1346333446781,
+    "reach": 20.351755401234566,
+    "warm": 6.073881172839506
+   },
+   "mixer_release": {
+    "achromatic": 11.22123177016887,
+    "clipped": 3.02319637345679,
+    "machine_clipped": 1.051904764709,
+    "machine_mean_L": 62.93001494514955,
+    "machine_p99_L": 95.51783690595295,
+    "marble_dE": 27.230354416890236,
+    "marble_dL": 14.31281770085064,
+    "marble_dL_p10": 4.394674394197642,
+    "marbles": 8.0,
+    "mean_L": 44.04115034095023,
+    "p99_L": 98.68551030580939,
+    "reach": 32.75675154320988,
+    "warm": 15.550733024691358
+   },
+   "mixer_spin": {
+    "achromatic": 8.338265556992223,
+    "clipped": 6.673900462962963,
+    "machine_clipped": 0.8765743549936813,
+    "machine_mean_L": 60.2610507027209,
+    "machine_p99_L": 95.27267014503953,
+    "marble_dE": 50.63639813692765,
+    "marble_dL": 9.214732497428798,
+    "marble_dL_p10": 4.7032273364667825,
+    "marbles": 8.0,
+    "mean_L": 46.810802917864926,
+    "p99_L": 98.44910148242131,
+    "reach": 30.56669560185185,
+    "warm": 25.46489197530864
+   },
+   "obstacle": {
+    "achromatic": 4.78004288370225,
+    "clipped": 4.935715663580247,
+    "machine_clipped": 6.151586010277839,
+    "machine_mean_L": 57.82150558276511,
+    "machine_p99_L": 94.92135440606567,
+    "marble_dE": 56.27190285018824,
+    "marble_dL": 14.578822747111772,
+    "marble_dL_p10": 9.008406510225644,
+    "marbles": 8.0,
+    "mean_L": 46.91071596706507,
+    "p99_L": 98.05854516266592,
+    "reach": 49.76509452160494,
+    "warm": 19.76538387345679
+   },
+   "preview_finish": {
+    "achromatic": 1.9785197109024197,
+    "clipped": 6.599729938271605,
+    "machine_clipped": 5.942902729047929,
+    "machine_mean_L": 48.69994519857908,
+    "machine_p99_L": 97.90961727817638,
+    "marble_dE": NaN,
+    "marble_dL": NaN,
+    "marble_dL_p10": NaN,
+    "marbles": 0.0,
+    "mean_L": 39.95546517378296,
+    "p99_L": 93.63582289989239,
+    "reach": 24.30131172839506,
+    "warm": 53.90051118827161
+   },
+   "preview_fork": {
+    "achromatic": 1.9159559711560155,
+    "clipped": 1.668547453703704,
+    "machine_clipped": 6.869182413400734,
+    "machine_mean_L": 52.53501442795663,
+    "machine_p99_L": 95.40945687310493,
+    "marble_dE": NaN,
+    "marble_dL": NaN,
+    "marble_dL_p10": NaN,
+    "marbles": 0.0,
+    "mean_L": 26.970358055987436,
+    "p99_L": 93.19228987218068,
+    "reach": 20.682484567901234,
+    "warm": 18.767650462962962
+   },
+   "preview_start": {
+    "achromatic": 3.288079595842777,
+    "clipped": 13.377893518518519,
+    "machine_clipped": 1.751182269581634,
+    "machine_mean_L": 56.547125747194634,
+    "machine_p99_L": 93.87627109718052,
+    "marble_dE": 49.79588605443634,
+    "marble_dL": 7.666703995780811,
+    "marble_dL_p10": 2.9752817792186574,
+    "marbles": 8.0,
+    "mean_L": 48.69896953812802,
+    "p99_L": 94.04502093239965,
+    "reach": 17.95799575617284,
+    "warm": 39.14916087962963
+   },
+   "split": {
+    "achromatic": 2.8637586539475275,
+    "clipped": 5.083188657407407,
+    "machine_clipped": 10.777740404380163,
+    "machine_mean_L": 53.49047666915839,
+    "machine_p99_L": 95.11464539270182,
+    "marble_dE": 60.08915101765503,
+    "marble_dL": 9.864147837565486,
+    "marble_dL_p10": 2.7829099994098656,
+    "marbles": 8.0,
+    "mean_L": 39.48953859001479,
+    "p99_L": 93.59848431347166,
+    "reach": 19.35546875,
+    "warm": 50.48543595679013
+   },
+   "start_gate": {
+    "achromatic": 5.047804579700131,
+    "clipped": 19.178530092592595,
+    "machine_clipped": 0.4253349356834468,
+    "machine_mean_L": 59.95965928242797,
+    "machine_p99_L": 94.69704243239775,
+    "marble_dE": 61.295817708003476,
+    "marble_dL": 16.375153080325184,
+    "marble_dL_p10": 7.332301664198846,
+    "marbles": 8.0,
+    "mean_L": 53.352100126002014,
+    "p99_L": 95.78403735901585,
+    "reach": 27.08695023148148,
+    "warm": 39.158805941358025
+   },
+   "winner": {
+    "achromatic": 2.6923970953854144,
+    "clipped": 9.073157793209877,
+    "machine_clipped": 7.147355326254716,
+    "machine_mean_L": 49.63643794842105,
+    "machine_p99_L": 98.57387231184443,
+    "marble_dE": 36.75823243485889,
+    "marble_dL": 9.826464800053792,
+    "marble_dL_p10": 3.7944996098618846,
+    "marbles": 5.0,
+    "mean_L": 43.32684574336203,
+    "p99_L": 98.22776021289414,
+    "reach": 37.37056327160494,
+    "warm": 54.45978009259259
+   }
+  },
+  "v23b": {
+   "branch": {
+    "achromatic": 1.4067123407852866,
+    "clipped": 2.467930169753086,
+    "machine_clipped": 7.4893655534437515,
+    "machine_mean_L": 51.00004866887213,
+    "machine_p99_L": 95.05085487098584,
+    "marble_dE": 77.06804261648833,
+    "marble_dL": 9.00379638303994,
+    "marble_dL_p10": 2.257287958457758,
+    "marbles": 7.0,
+    "mean_L": 32.19819430379163,
+    "p99_L": 93.67249097150724,
+    "reach": 27.707754629629626,
+    "warm": 36.00342399691358
+   },
+   "descent": {
+    "achromatic": 3.956999569835317,
+    "clipped": 6.309895833333333,
+    "machine_clipped": 3.7652061275061954,
+    "machine_mean_L": 63.99551395143997,
+    "machine_p99_L": 96.09459922009238,
+    "marble_dE": 64.6678859529552,
+    "marble_dL": 13.484435368734097,
+    "marble_dL_p10": 4.416703298136023,
+    "marbles": 8.0,
+    "mean_L": 44.133585567479464,
+    "p99_L": 98.19842119168938,
+    "reach": 17.125771604938272,
+    "warm": 36.4477237654321
+   },
+   "final": {
+    "achromatic": 3.0826969620474265,
+    "clipped": 2.1635802469135803,
+    "machine_clipped": 4.738038721445681,
+    "machine_mean_L": 49.625061236581885,
+    "machine_p99_L": 98.255952929179,
+    "marble_dE": 80.85743965412436,
+    "marble_dL": 8.45499990536425,
+    "marble_dL_p10": 5.345417908200324,
+    "marbles": 2.0,
+    "mean_L": 38.17355114041257,
+    "p99_L": 97.90961727817638,
+    "reach": 44.31032986111111,
+    "warm": 50.24320023148148
+   },
+   "merge": {
+    "achromatic": 4.076745322941545,
+    "clipped": 3.1205150462962963,
+    "machine_clipped": 10.405578961835388,
+    "machine_mean_L": 51.46368024351887,
+    "machine_p99_L": 95.50430268355561,
+    "marble_dE": 62.14695406826857,
+    "marble_dL": 7.449184145938524,
+    "marble_dL_p10": 1.8284825953906179,
+    "marbles": 6.0,
+    "mean_L": 24.19594265041923,
+    "p99_L": 96.05826441504291,
+    "reach": 20.351755401234566,
+    "warm": 6.132378472222221
+   },
+   "mixer_release": {
+    "achromatic": 8.754826199759506,
+    "clipped": 2.9895351080246915,
+    "machine_clipped": 0.9704907220380304,
+    "machine_mean_L": 58.922938043828985,
+    "machine_p99_L": 95.24748893543821,
+    "marble_dE": 26.785560325186193,
+    "marble_dL": 16.295206088190973,
+    "marble_dL_p10": 5.778789033907136,
+    "marbles": 8.0,
+    "mean_L": 42.71228154763903,
+    "p99_L": 98.6148669180781,
+    "reach": 32.75675154320988,
+    "warm": 15.561390817901236
+   },
+   "mixer_spin": {
+    "achromatic": 7.00901307076872,
+    "clipped": 6.673755787037037,
+    "machine_clipped": 0.9002399693293639,
+    "machine_mean_L": 56.20234266589267,
+    "machine_p99_L": 94.79624952279991,
+    "marble_dE": 49.224076823257505,
+    "marble_dL": 9.126754200085621,
+    "marble_dL_p10": 5.046872978591761,
+    "marbles": 8.0,
+    "mean_L": 45.553062457119815,
+    "p99_L": 98.24709788551073,
+    "reach": 30.56669560185185,
+    "warm": 25.495225694444446
+   },
+   "obstacle": {
+    "achromatic": 3.7876009351924083,
+    "clipped": 4.978587962962963,
+    "machine_clipped": 6.268842139333229,
+    "machine_mean_L": 54.71764488251382,
+    "machine_p99_L": 94.81031690981868,
+    "marble_dE": 56.487331535265696,
+    "marble_dL": 14.076727944245441,
+    "marble_dL_p10": 6.344550213960164,
+    "marbles": 8.0,
+    "mean_L": 45.32838496574418,
+    "p99_L": 97.96360350618713,
+    "reach": 49.76509452160494,
+    "warm": 19.635416666666668
+   },
+   "preview_finish": {
+    "achromatic": 1.6971627824314568,
+    "clipped": 6.530189043209876,
+    "machine_clipped": 5.652971153693502,
+    "machine_mean_L": 48.030528198521914,
+    "machine_p99_L": 97.5630185832852,
+    "marble_dE": NaN,
+    "marble_dL": NaN,
+    "marble_dL_p10": NaN,
+    "marbles": 0.0,
+    "mean_L": 39.77390707451369,
+    "p99_L": 93.48264647979187,
+    "reach": 24.30131172839506,
+    "warm": 54.61082175925925
+   },
+   "preview_fork": {
+    "achromatic": 1.5194337599928591,
+    "clipped": 1.7275752314814814,
+    "machine_clipped": 7.151317875729822,
+    "machine_mean_L": 50.315742267540365,
+    "machine_p99_L": 95.20841139410139,
+    "marble_dE": NaN,
+    "marble_dL": NaN,
+    "marble_dL_p10": NaN,
+    "marbles": 0.0,
+    "mean_L": 26.503037362371106,
+    "p99_L": 93.66050008406535,
+    "reach": 20.682484567901234,
+    "warm": 18.915895061728392
+   },
+   "preview_start": {
+    "achromatic": 3.0526632158237317,
+    "clipped": 13.394434799382715,
+    "machine_clipped": 1.8631655553377358,
+    "machine_mean_L": 52.76348230852834,
+    "machine_p99_L": 93.49770343835341,
+    "marble_dE": 50.200016562349646,
+    "marble_dL": 7.243993439138752,
+    "marble_dL_p10": 2.4573220367805693,
+    "marbles": 8.0,
+    "mean_L": 47.99688998435432,
+    "p99_L": 94.04502093239965,
+    "reach": 17.95799575617284,
+    "warm": 39.20515046296296
+   },
+   "split": {
+    "achromatic": 1.9427408591896673,
+    "clipped": 4.869454089506172,
+    "machine_clipped": 9.672484458895491,
+    "machine_mean_L": 50.20293633072033,
+    "machine_p99_L": 95.09628243265337,
+    "marble_dE": 59.105269483188096,
+    "marble_dL": 9.5562783333758,
+    "marble_dL_p10": 3.6072766784664294,
+    "marbles": 8.0,
+    "mean_L": 38.84230901842625,
+    "p99_L": 93.67249097150724,
+    "reach": 19.35546875,
+    "warm": 50.26475694444444
+   },
+   "start_gate": {
+    "achromatic": 4.488928372495215,
+    "clipped": 19.173900462962962,
+    "machine_clipped": 0.4331686473494458,
+    "machine_mean_L": 56.03171807987806,
+    "machine_p99_L": 94.09732773591827,
+    "marble_dE": 58.89359722731673,
+    "marble_dL": 13.519719037812315,
+    "marble_dL_p10": 6.388146750299111,
+    "marbles": 8.0,
+    "mean_L": 52.262125903084474,
+    "p99_L": 95.54982067695998,
+    "reach": 27.08695023148148,
+    "warm": 39.476224922839506
+   },
+   "winner": {
+    "achromatic": 2.3210864525606865,
+    "clipped": 8.421103395061728,
+    "machine_clipped": 5.392326394086585,
+    "machine_mean_L": 49.258456056523585,
+    "machine_p99_L": 98.55038163454981,
+    "marble_dE": 36.53977425907739,
+    "marble_dL": 10.994240607899911,
+    "marble_dL_p10": 5.209516455604854,
+    "marbles": 5.0,
+    "mean_L": 43.14692500278537,
+    "p99_L": 97.9157808117411,
+    "reach": 37.37056327160494,
+    "warm": 56.344907407407405
+   }
+  },
+  "v23c": {
+   "branch": {
+    "achromatic": 1.2120770255184319,
+    "clipped": 2.970582561728395,
+    "machine_clipped": 9.305401811510961,
+    "machine_mean_L": 49.36296406198026,
+    "machine_p99_L": 96.32075671363243,
+    "marble_dE": 79.71916808957398,
+    "marble_dL": 9.337984049230407,
+    "marble_dL_p10": 6.768264336750429,
+    "marbles": 7.0,
+    "mean_L": 31.775147543107806,
+    "p99_L": 94.7217868104219,
+    "reach": 27.707754629629626,
+    "warm": 36.08005401234568
+   },
+   "descent": {
+    "achromatic": 3.8270603130755068,
+    "clipped": 6.315441743827161,
+    "machine_clipped": 3.75,
+    "machine_mean_L": 61.21265337255805,
+    "machine_p99_L": 96.58274251620827,
+    "marble_dE": 64.74329802999236,
+    "marble_dL": 16.843783389633813,
+    "marble_dL_p10": 8.132467672960319,
+    "marbles": 8.0,
+    "mean_L": 43.71300651485488,
+    "p99_L": 98.40472253574946,
+    "reach": 17.125771604938272,
+    "warm": 36.474006558641975
+   },
+   "final": {
+    "achromatic": 3.2576998434011446,
+    "clipped": 3.4836998456790123,
+    "machine_clipped": 7.695204387371179,
+    "machine_mean_L": 51.311759354399484,
+    "machine_p99_L": 98.89249964929841,
+    "marble_dE": 78.6248827815826,
+    "marble_dL": 6.782402682837038,
+    "marble_dL_p10": 4.444669601868775,
+    "marbles": 2.0,
+    "mean_L": 39.00392912062536,
+    "p99_L": 98.86875112895164,
+    "reach": 44.31032986111111,
+    "warm": 50.42988040123457
+   },
+   "merge": {
+    "achromatic": 3.7524784801970243,
+    "clipped": 3.5236304012345676,
+    "machine_clipped": 12.290824475017416,
+    "machine_mean_L": 49.87607912366323,
+    "machine_p99_L": 96.80357658981687,
+    "marble_dE": 63.1664299544559,
+    "marble_dL": 10.669605160379774,
+    "marble_dL_p10": 1.757683528047231,
+    "marbles": 6.0,
+    "mean_L": 23.895105823235106,
+    "p99_L": 96.80357658981687,
+    "reach": 20.351755401234566,
+    "warm": 6.22583912037037
+   },
+   "mixer_release": {
+    "achromatic": 8.315040767202355,
+    "clipped": 2.9822530864197527,
+    "machine_clipped": 0.896143359381901,
+    "machine_mean_L": 56.84633828927013,
+    "machine_p99_L": 95.46848075090763,
+    "marble_dE": 29.186859192165798,
+    "marble_dL": 19.7657654370949,
+    "marble_dL_p10": 5.092458522742567,
+    "marbles": 8.0,
+    "mean_L": 42.0530080857144,
+    "p99_L": 98.93537644208575,
+    "reach": 32.75675154320988,
+    "warm": 15.575327932098764
+   },
+   "mixer_spin": {
+    "achromatic": 6.012809721940269,
+    "clipped": 6.690923996913581,
+    "machine_clipped": 0.9046575506720245,
+    "machine_mean_L": 53.784109149858764,
+    "machine_p99_L": 95.04591270826347,
+    "marble_dE": 49.247754301203855,
+    "marble_dL": 9.55055069272213,
+    "marble_dL_p10": 5.571025238716427,
+    "marbles": 8.0,
+    "mean_L": 44.82556838964691,
+    "p99_L": 98.44910148242131,
+    "reach": 30.56669560185185,
+    "warm": 25.49725115740741
+   },
+   "obstacle": {
+    "achromatic": 3.7991319725850423,
+    "clipped": 5.706838348765432,
+    "machine_clipped": 7.692389689600739,
+    "machine_mean_L": 52.452412824594525,
+    "machine_p99_L": 96.14625345673646,
+    "marble_dE": 57.89523856023003,
+    "marble_dL": 13.435821825647047,
+    "marble_dL_p10": 4.388385583239078,
+    "marbles": 8.0,
+    "mean_L": 44.26175924506617,
+    "p99_L": 98.19842119168938,
+    "reach": 49.76509452160494,
+    "warm": 19.914207175925927
+   },
+   "preview_finish": {
+    "achromatic": 1.5615860815494953,
+    "clipped": 7.164158950617285,
+    "machine_clipped": 8.250646938354315,
+    "machine_mean_L": 49.41826883880339,
+    "machine_p99_L": 98.59748310166171,
+    "marble_dE": NaN,
+    "marble_dL": NaN,
+    "marble_dL_p10": NaN,
+    "marbles": 0.0,
+    "mean_L": 40.17935154593748,
+    "p99_L": 94.79791406552806,
+    "reach": 24.30131172839506,
+    "warm": 54.76996527777778
+   },
+   "preview_fork": {
+    "achromatic": 1.3708406761423215,
+    "clipped": 2.1086516203703702,
+    "machine_clipped": 8.966544796582664,
+    "machine_mean_L": 48.91312075983493,
+    "machine_p99_L": 96.2218557729982,
+    "marble_dE": NaN,
+    "marble_dL": NaN,
+    "marble_dL_p10": NaN,
+    "marbles": 0.0,
+    "mean_L": 26.237299296235424,
+    "p99_L": 94.61619168360055,
+    "reach": 20.682484567901234,
+    "warm": 18.960358796296294
+   },
+   "preview_start": {
+    "achromatic": 2.962722253654948,
+    "clipped": 13.50511188271605,
+    "machine_clipped": 2.448593763846854,
+    "machine_mean_L": 50.12322568688161,
+    "machine_p99_L": 94.32197271424772,
+    "marble_dE": 51.48376981113379,
+    "marble_dL": 8.62476551650878,
+    "marble_dL_p10": 3.110066480526778,
+    "marbles": 8.0,
+    "mean_L": 47.53546207440614,
+    "p99_L": 94.12219663801521,
+    "reach": 17.95799575617284,
+    "warm": 39.22608024691358
+   },
+   "split": {
+    "achromatic": 1.6487885194215597,
+    "clipped": 4.85228587962963,
+    "machine_clipped": 9.5952461038233,
+    "machine_mean_L": 46.91477353325716,
+    "machine_p99_L": 96.03260704867098,
+    "marble_dE": 58.23238175933376,
+    "marble_dL": 10.53572159969914,
+    "marble_dL_p10": 2.823994725204613,
+    "marbles": 8.0,
+    "mean_L": 38.21912733015039,
+    "p99_L": 94.00035813938882,
+    "reach": 19.35546875,
+    "warm": 50.22579089506173
+   },
+   "start_gate": {
+    "achromatic": 4.419352719675025,
+    "clipped": 19.19184027777778,
+    "machine_clipped": 0.4760760226109405,
+    "machine_mean_L": 53.34532901822141,
+    "machine_p99_L": 94.1970580655268,
+    "marble_dE": 59.81780413738878,
+    "marble_dL": 12.144276659306152,
+    "marble_dL_p10": 4.527718418396432,
+    "marbles": 8.0,
+    "mean_L": 51.54881789965985,
+    "p99_L": 95.7480713001264,
+    "reach": 27.08695023148148,
+    "warm": 39.616464120370374
+   },
+   "winner": {
+    "achromatic": 2.7196046001093257,
+    "clipped": 9.661072530864198,
+    "machine_clipped": 8.680166624511559,
+    "machine_mean_L": 50.800250447053834,
+    "machine_p99_L": 98.91636798526211,
+    "marble_dE": 34.69895232379126,
+    "marble_dL": 10.511089462369306,
+    "marble_dL_p10": 7.20392217521327,
+    "marbles": 5.0,
+    "mean_L": 43.81822620433991,
+    "p99_L": 98.86875112895164,
+    "reach": 37.37056327160494,
+    "warm": 56.61188271604938
+   }
+  }
+ },
+ "variants": {
+  "control": {
+   "accent_pairs": {
+    "descent|split": 81.0,
+    "descent|winner": 57.8,
+    "mixer_spin|descent": 44.4,
+    "mixer_spin|split": 37.8,
+    "mixer_spin|winner": 13.4,
+    "split|winner": 25.4,
+    "start_gate|descent": 21.5,
+    "start_gate|mixer_spin": 25.7,
+    "start_gate|split": 63.6,
+    "start_gate|winner": 38.8
+   },
+   "accent_spread": 40.9,
+   "accents": {
+    "descent": [
+     8.0,
+     -19.6
+    ],
+    "mixer_spin": [
+     9.8,
+     24.8
+    ],
+    "split": [
+     24.2,
+     59.8
+    ],
+    "start_gate": [
+     0.8,
+     0.7
+    ],
+    "winner": [
+     11.0,
+     38.1
+    ]
+   },
+   "achromatic": 4.4004173284950685,
+   "clipped": 6.557069088319088,
+   "label": "V22.1 as shipped",
+   "machine_clipped": 5.488666669442873,
+   "machine_mean_L": 55.75710989775102,
+   "machine_p99_L": 96.14989138474938,
+   "marble_dE": 56.52927583222165,
+   "marble_dL": 10.408161720430945,
+   "marble_dL_p10": 4.439969942532193,
+   "mean_L": 40.73934510787184,
+   "p99_L": 96.20637575157065,
+   "reach": 28.41068672839506,
+   "warm": 34.63848453822412,
+   "zone_pairs": {
+    "descent|split": 11.2,
+    "descent|winner": 18.5,
+    "mixer_spin|descent": 5.9,
+    "mixer_spin|split": 8.9,
+    "mixer_spin|winner": 12.9,
+    "split|winner": 11.4,
+    "start_gate|descent": 2.7,
+    "start_gate|mixer_spin": 4.1,
+    "start_gate|split": 11.5,
+    "start_gate|winner": 17.0
+   },
+   "zone_spread": 10.406640326962444,
+   "zones": {
+    "descent": [
+     -1.3,
+     -8.8
+    ],
+    "mixer_spin": [
+     -1.8,
+     -2.9
+    ],
+    "split": [
+     6.9,
+     -1.1
+    ],
+    "start_gate": [
+     -3.1,
+     -6.8
+    ],
+    "winner": [
+     2.3,
+     9.3
+    ]
+   }
+  },
+  "v23a": {
+   "accent_pairs": {
+    "descent|split": 86.9,
+    "descent|winner": 63.5,
+    "mixer_spin|descent": 4.5,
+    "mixer_spin|split": 88.3,
+    "mixer_spin|winner": 64.3,
+    "split|winner": 25.4,
+    "start_gate|descent": 8.0,
+    "start_gate|mixer_spin": 3.5,
+    "start_gate|split": 88.7,
+    "start_gate|winner": 64.4
+   },
+   "accent_spread": 49.8,
+   "accents": {
+    "descent": [
+     6.7,
+     -25.4
+    ],
+    "mixer_spin": [
+     2.2,
+     -25.8
+    ],
+    "split": [
+     24.1,
+     59.7
+    ],
+    "start_gate": [
+     -1.3,
+     -25.3
+    ],
+    "winner": [
+     11.1,
+     37.9
+    ]
+   },
+   "achromatic": 4.355348933976221,
+   "clipped": 6.488288669278253,
+   "label": "A - subtle premium",
+   "machine_clipped": 5.245917654548162,
+   "machine_mean_L": 55.90175392082714,
+   "machine_p99_L": 95.85790349125247,
+   "marble_dE": 56.609454589645786,
+   "marble_dL": 10.46048465995622,
+   "marble_dL_p10": 4.522673813000532,
+   "mean_L": 40.78941964832341,
+   "p99_L": 96.11740813591017,
+   "reach": 28.41068672839506,
+   "warm": 34.06214016500475,
+   "zone_pairs": {
+    "descent|split": 12.1,
+    "descent|winner": 20.0,
+    "mixer_spin|descent": 0.9,
+    "mixer_spin|split": 11.9,
+    "mixer_spin|winner": 19.4,
+    "split|winner": 11.8,
+    "start_gate|descent": 1.6,
+    "start_gate|mixer_spin": 1.7,
+    "start_gate|split": 13.6,
+    "start_gate|winner": 21.0
+   },
+   "zone_spread": 11.393545835746341,
+   "zones": {
+    "descent": [
+     -1.4,
+     -10.3
+    ],
+    "mixer_spin": [
+     -1.9,
+     -9.5
+    ],
+    "split": [
+     6.9,
+     -1.5
+    ],
+    "start_gate": [
+     -2.9,
+     -10.9
+    ],
+    "winner": [
+     2.3,
+     9.4
+    ]
+   }
+  },
+  "v23b": {
+   "accent_pairs": {
+    "descent|split": 89.4,
+    "descent|winner": 69.6,
+    "mixer_spin|descent": 4.7,
+    "mixer_spin|split": 92.2,
+    "mixer_spin|winner": 73.0,
+    "split|winner": 23.6,
+    "start_gate|descent": 4.9,
+    "start_gate|mixer_spin": 9.2,
+    "start_gate|split": 89.3,
+    "start_gate|winner": 68.7
+   },
+   "accent_spread": 52.5,
+   "accents": {
+    "descent": [
+     12.1,
+     -29.8
+    ],
+    "mixer_spin": [
+     15.5,
+     -33.0
+    ],
+    "split": [
+     25.0,
+     58.7
+    ],
+    "start_gate": [
+     7.3,
+     -28.8
+    ],
+    "winner": [
+     10.8,
+     39.8
+    ]
+   },
+   "achromatic": 3.622816141832602,
+   "clipped": 6.370804398148148,
+   "label": "B - balanced signature",
+   "machine_clipped": 4.977168944617248,
+   "machine_mean_L": 53.27154561033546,
+   "machine_p99_L": 95.67483771467163,
+   "marble_dE": 56.54326804613434,
+   "marble_dL": 10.83684867762051,
+   "marble_dL_p10": 4.425487809799523,
+   "mean_L": 40.06309207524162,
+   "p99_L": 96.07620170174286,
+   "reach": 28.41068672839506,
+   "warm": 34.48742432336182,
+   "zone_pairs": {
+    "descent|split": 11.8,
+    "descent|winner": 22.8,
+    "mixer_spin|descent": 1.1,
+    "mixer_spin|split": 11.0,
+    "mixer_spin|winner": 22.6,
+    "split|winner": 14.6,
+    "start_gate|descent": 0.9,
+    "start_gate|mixer_spin": 1.7,
+    "start_gate|split": 12.6,
+    "start_gate|winner": 23.7
+   },
+   "zone_spread": 12.27821858794086,
+   "zones": {
+    "descent": [
+     -0.5,
+     -11.8
+    ],
+    "mixer_spin": [
+     0.6,
+     -11.7
+    ],
+    "split": [
+     7.3,
+     -3.0
+    ],
+    "start_gate": [
+     -0.8,
+     -12.7
+    ],
+    "winner": [
+     2.4,
+     10.8
+    ]
+   }
+  },
+  "v23c": {
+   "accent_pairs": {
+    "descent|split": 95.3,
+    "descent|winner": 71.3,
+    "mixer_spin|descent": 2.5,
+    "mixer_spin|split": 95.1,
+    "mixer_spin|winner": 70.6,
+    "split|winner": 27.9,
+    "start_gate|descent": 10.1,
+    "start_gate|mixer_spin": 7.7,
+    "start_gate|split": 92.6,
+    "start_gate|winner": 67.1
+   },
+   "accent_spread": 54.0,
+   "accents": {
+    "descent": [
+     13.4,
+     -31.7
+    ],
+    "mixer_spin": [
+     11.0,
+     -31.0
+    ],
+    "split": [
+     29.7,
+     62.2
+    ],
+    "start_gate": [
+     4.5,
+     -26.9
+    ],
+    "winner": [
+     13.3,
+     39.6
+    ]
+   },
+   "achromatic": 3.4507071518824963,
+   "clipped": 6.781268548195632,
+   "label": "C - bold showcase",
+   "machine_clipped": 6.2270688864064505,
+   "machine_mean_L": 51.87394495849052,
+   "machine_p99_L": 96.42673592871007,
+   "marble_dE": 56.98332172189564,
+   "marble_dL": 11.654706043220774,
+   "marble_dL_p10": 4.89278693487872,
+   "mean_L": 39.774293005613835,
+   "p99_L": 96.65655531821129,
+   "reach": 28.41068672839506,
+   "warm": 34.585162185422604,
+   "zone_pairs": {
+    "descent|split": 12.7,
+    "descent|winner": 25.7,
+    "mixer_spin|descent": 0.9,
+    "mixer_spin|split": 11.8,
+    "mixer_spin|winner": 25.1,
+    "split|winner": 17.6,
+    "start_gate|descent": 0.3,
+    "start_gate|mixer_spin": 1.3,
+    "start_gate|split": 13.0,
+    "start_gate|winner": 25.8
+   },
+   "zone_spread": 13.441698555544846,
+   "zones": {
+    "descent": [
+     -0.8,
+     -12.5
+    ],
+    "mixer_spin": [
+     -0.0,
+     -12.0
+    ],
+    "split": [
+     8.2,
+     -3.5
+    ],
+    "start_gate": [
+     -1.1,
+     -12.6
+    ],
+    "winner": [
+     2.0,
+     13.0
+    ]
+   }
+  }
+ }
+}
