@@ -1,0 +1,143 @@
+{
+  "id": "mono_readability",
+  "title": "Mono Readability",
+  "family": "diagnostic",
+  "summary": "Not a look - an instrument. Every environment surface goes to one neutral value, every environment accent goes out, and the machine is left exactly as it is. Whatever still reads in this frame is the course itself, so it answers track readability and silhouette questions that a lit, coloured, dressed world can hide.",
+  "extends": "alpine_neon",
+  "sky": {
+    "top": "#0B0D10",
+    "horizon": "#2A2E34",
+    "curve": 0.3,
+    "ground_bottom": "#090B0E",
+    "ground_horizon": "#1E2126"
+  },
+  "grade": {
+    "background_energy": 0.6,
+    "ambient_energy": 0.3,
+    "contrast": 1.0,
+    "saturation": 0.55
+  },
+  "fog": {
+    "colour": "#3A3E46",
+    "density": 0.0012,
+    "sun_scatter": 0.0,
+    "aerial_perspective": 0.6
+  },
+  "lights": {
+    "WorldKey": {
+      "colour": "#FFFFFF",
+      "energy": 2.0
+    },
+    "WorldFill": {
+      "colour": "#9AA4B0",
+      "energy": 0.6
+    },
+    "WorldWarm": {
+      "colour": "#FFFFFF",
+      "energy": 0.0
+    },
+    "ValleyBounce": {
+      "colour": "#FFFFFF",
+      "energy": 0.4
+    }
+  },
+  "backdrop": {
+    "structures": {
+      "sites": []
+    },
+    "dusk_band": {
+      "count": 0
+    },
+    "clouds": {
+      "count": 6
+    }
+  },
+  "dressing": {
+    "pylons": {
+      "enabled": false
+    },
+    "valley": {
+      "enabled": false
+    },
+    "scrub": {
+      "enabled": false
+    },
+    "lamps": {
+      "lenses": ["lit_window", "lit_window"]
+    },
+    "practicals": {
+      "spill": {
+        "colour": "#FFFFFF",
+        "energy": 0.8
+      },
+      "under": {
+        "colour": "#FFFFFF",
+        "energy": 0.8
+      }
+    }
+  },
+  "zones": {
+    "start": {
+      "colour": "#FFFFFF",
+      "energy": 1.6
+    },
+    "mix": {
+      "colour": "#FFFFFF",
+      "energy": 1.6
+    },
+    "obstacle": {
+      "colour": "#FFFFFF",
+      "energy": 1.6
+    },
+    "split": {
+      "colour": "#FFFFFF",
+      "energy": 1.6
+    },
+    "merge": {
+      "colour": "#FFFFFF",
+      "energy": 1.6
+    },
+    "finish": {
+      "colour": "#FFFFFF",
+      "energy": 1.8
+    }
+  },
+  "accent": {
+    "intensity": 0.35
+  },
+  "palette": {
+    "slope_cliff": {
+      "albedo": "#1E2126"
+    },
+    "slope_rock": {
+      "albedo": "#23262B"
+    },
+    "slope_earth": {
+      "albedo": "#2A2D33"
+    },
+    "slope_cap": {
+      "albedo": "#25282E"
+    },
+    "slope_boulder": {
+      "albedo": "#1A1D21"
+    },
+    "rock_soft_near": {
+      "albedo": "#181B20"
+    },
+    "rock_soft_mid": {
+      "albedo": "#24282E"
+    },
+    "rock_soft_far": {
+      "albedo": "#343941"
+    },
+    "rock_soft_haze": {
+      "albedo": "#454B54"
+    },
+    "far_structure": {
+      "albedo": "#2A2E34"
+    },
+    "cloud_bank": {
+      "albedo": "#2C3138"
+    }
+  }
+}

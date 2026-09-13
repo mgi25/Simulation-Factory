@@ -1,0 +1,242 @@
+{
+  "id": "canyon_dusk",
+  "title": "Canyon Dusk",
+  "family": "canyon",
+  "summary": "A red-rock canyon an hour before dark. The mountainside becomes sandstone, the cold fill goes, the haze turns to dust, and the backdrop is generated mesas rather than authored alpine masses - so the file is a delta, not a second world.",
+  "extends": "alpine_neon",
+  "sky": {
+    "top": "#1A0E16",
+    "horizon": "#8C4A26",
+    "curve": 0.22,
+    "ground_bottom": "#160D10",
+    "ground_horizon": "#4A2618",
+    "sun_angle_max": 62.0
+  },
+  "grade": {
+    "background_energy": 0.6,
+    "ambient_energy": 0.26,
+    "saturation": 1.22
+  },
+  "fog": {
+    "colour": "#8A5B44",
+    "energy": 0.52,
+    "sun_scatter": 0.4,
+    "density": 0.0017,
+    "aerial_perspective": 0.78,
+    "height": -20.0,
+    "height_density": 0.03
+  },
+  "lights": {
+    "Key": {
+      "colour": "#FFE6C8",
+      "rotation": [-38.0, -28.0, 0.0]
+    },
+    "WorldKey": {
+      "colour": "#FFD2A0",
+      "energy": 2.0,
+      "rotation": [-16.0, -72.0, 0.0]
+    },
+    "WorldFill": {
+      "colour": "#4E5C86",
+      "energy": 0.5
+    },
+    "WorldWarm": {
+      "colour": "#FF7A2E",
+      "energy": 1.5,
+      "rotation": [-6.0, 48.0, 0.0]
+    },
+    "Rim": {
+      "colour": "#FFB36B",
+      "energy": 1.6
+    },
+    "ValleyBounce": {
+      "colour": "#C96A3A",
+      "energy": 0.85
+    }
+  },
+  "backdrop": {
+    "near_range": {
+      "masses": null,
+      "ring": {
+        "count": 14,
+        "bearing_from": 118.0,
+        "bearing_step": 17.0,
+        "radius": 262.0,
+        "radius_step": 26.0,
+        "radius_cycle": 3,
+        "height": 112.0,
+        "height_step": -7.0,
+        "height_cycle": 4,
+        "base": 52.0,
+        "base_step": 4.0,
+        "base_cycle": 3,
+        "seed_from": 3,
+        "seed_step": 8
+      },
+      "facets": 14,
+      "tiers": 5,
+      "taper": 0.22
+    },
+    "mid_range": {
+      "masses": null,
+      "ring": {
+        "count": 11,
+        "bearing_from": 132.0,
+        "bearing_step": 20.0,
+        "radius": 400.0,
+        "radius_step": 34.0,
+        "radius_cycle": 3,
+        "height": 138.0,
+        "height_step": -9.0,
+        "height_cycle": 4,
+        "base": 86.0,
+        "base_step": 5.0,
+        "base_cycle": 3,
+        "seed_from": 5,
+        "seed_step": 8
+      },
+      "facets": 13,
+      "tiers": 5,
+      "taper": 0.26
+    },
+    "far_range": {
+      "taper": 0.34,
+      "tiers": 6
+    },
+    "structures": {
+      "sites": []
+    },
+    "dusk_band": {
+      "count": 13,
+      "bearing_from": 130.0,
+      "bearing_step": 11.0,
+      "base_y": -70.0,
+      "size": [170.0, 44.0, 8.0]
+    },
+    "clouds": {
+      "count": 9,
+      "base_y": -128.0,
+      "size": [220.0, 9.0, 30.0]
+    }
+  },
+  "terrain": {
+    "scatter": [
+      {
+        "count": 84,
+        "clearance": 5.4,
+        "gauge": 1.15,
+        "materials": ["slope_cliff", "slope_earth"],
+        "accent_every": 4
+      },
+      {
+        "count": 130,
+        "clearance": 3.1,
+        "gauge": 0.34,
+        "materials": ["slope_cliff", "slope_boulder"],
+        "accent_every": 3
+      }
+    ]
+  },
+  "dressing": {
+    "scrub": {
+      "target": 34,
+      "max_slope": 0.9,
+      "materials": ["scrub_dry", "scrub_dry"]
+    },
+    "pylons": {
+      "enabled": false
+    },
+    "valley": {
+      "count": 4,
+      "glow": "lit_dusk_band"
+    },
+    "lamps": {
+      "lenses": ["lit_window", "lit_window"]
+    },
+    "practicals": {
+      "spill": {
+        "colour": "#FFD2A8",
+        "energy": 1.2
+      },
+      "under": {
+        "colour": "#FF8A3C",
+        "energy": 2.4
+      }
+    }
+  },
+  "zones": {
+    "start": {
+      "colour": "#7FD8FF"
+    },
+    "mix": {
+      "colour": "#C089FF"
+    },
+    "obstacle": {
+      "colour": "#FF8A2E"
+    },
+    "split": {
+      "colour": "#FFE8D0"
+    },
+    "merge": {
+      "colour": "#FFAD4C"
+    },
+    "finish": {
+      "colour": "#FFB347"
+    }
+  },
+  "accent": {
+    "intensity": 1.1
+  },
+  "palette": {
+    "slope_cliff": {
+      "albedo": "#301A13",
+      "roughness": 0.96
+    },
+    "slope_rock": {
+      "albedo": "#3E2318",
+      "roughness": 0.95
+    },
+    "slope_earth": {
+      "albedo": "#57341F",
+      "roughness": 0.93
+    },
+    "slope_cap": {
+      "albedo": "#46281A",
+      "roughness": 0.94
+    },
+    "slope_boulder": {
+      "albedo": "#321C15",
+      "roughness": 0.95
+    },
+    "scrub_dry": {
+      "albedo": "#3A3320",
+      "roughness": 0.96
+    },
+    "scrub_dark": {
+      "albedo": "#2A2A18",
+      "roughness": 0.96
+    },
+    "rock_soft_near": {
+      "albedo": "#2E1A18"
+    },
+    "rock_soft_mid": {
+      "albedo": "#472619"
+    },
+    "rock_soft_far": {
+      "albedo": "#6E4230"
+    },
+    "rock_soft_haze": {
+      "albedo": "#845440"
+    },
+    "far_structure": {
+      "albedo": "#5C3A2C"
+    },
+    "cloud_bank": {
+      "albedo": "#5A3B34"
+    },
+    "lit_dusk_band": {
+      "albedo": "#FF9A4E",
+      "energy": 1.6
+    }
+  }
+}

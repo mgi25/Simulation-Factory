@@ -321,7 +321,8 @@ static func build(palette, cfg: Dictionary) -> Node3D:
 
 
 static func scatter(root: Node3D, palette, cfg: Dictionary, count: int,
-		avoid: Array, clearance: float, gauge := 1.0) -> void:
+		avoid: Array, clearance: float, gauge := 1.0,
+		materials: Array = [], accent_every := 3) -> void:
 	## Boulders on the flank, kept clear of the racing line.
 	##
 	## Deterministic siting, rejected wherever the sample falls within
@@ -358,7 +359,13 @@ static func scatter(root: Node3D, palette, cfg: Dictionary, count: int,
 		# Two values, both darker than the ground they sit on. A boulder
 		# lighter than the hillside reads as a sheet of paper lying on it,
 		# which is what the lighter scree value gave at this size.
-		var shade := "slope_boulder" if placed % 3 == 0 else "slope_cliff"
+		# Which two values, and how often the second one lands, is the
+		# environment profile's - `terrain.scatter[].materials` and
+		# `accent_every`. The defaults are the alpine ones, so a caller that
+		# passes neither gets the frame it always got.
+		var shades: Array = materials if materials.size() >= 2 			else ["slope_cliff", "slope_boulder"]
+		var every := maxi(accent_every, 1)
+		var shade: String = str(shades[1] if placed % every == 0 else shades[0])
 		var salt: int = attempt * 7 + 3 + int(gauge * 1000.0)
 		# The same smooth mass the distant ranges use, at a fiftieth of the
 		# size. A rounded box on a hillside reads as a crate: it has four

@@ -1,0 +1,239 @@
+{
+  "id": "glow_valley",
+  "title": "Futuristic Glow Valley",
+  "family": "futuristic",
+  "summary": "Night, a near-black valley floor, and everything that is lit is lit hard. The ground loses almost all of its own value so the machine and the installation lighting carry the frame - the strongest statement of dark background, bright machine the schema can make without touching the machine.",
+  "extends": "alpine_neon",
+  "sky": {
+    "top": "#01030A",
+    "horizon": "#123044",
+    "curve": 0.1,
+    "ground_bottom": "#010206",
+    "ground_horizon": "#0C1E2C",
+    "sun_angle_max": 30.0,
+    "energy": 0.8
+  },
+  "grade": {
+    "background_energy": 0.5,
+    "ambient_energy": 0.22,
+    "exposure": 0.86,
+    "contrast": 1.0,
+    "saturation": 1.34
+  },
+  "fog": {
+    "colour": "#1E4A66",
+    "energy": 0.45,
+    "sun_scatter": 0.3,
+    "density": 0.0021,
+    "sky_affect": 0.18,
+    "aerial_perspective": 0.9,
+    "height": -26.0,
+    "height_density": 0.045
+  },
+  "glow": {
+    "intensity": 1.25,
+    "bloom": 0.3,
+    "hdr_threshold": 1.28,
+    "levels": [0.0, 0.35, 0.7, 0.95, 0.6, 0.2, 0.0]
+  },
+  "lights": {
+    "Key": {
+      "colour": "#E8F2FF",
+      "energy": 2.4
+    },
+    "WorldKey": {
+      "colour": "#8FB6FF",
+      "energy": 1.35,
+      "rotation": [-22.0, -84.0, 0.0]
+    },
+    "WorldFill": {
+      "colour": "#2A4E86",
+      "energy": 0.42
+    },
+    "WorldWarm": {
+      "colour": "#A855FF",
+      "energy": 1.5,
+      "rotation": [-10.0, 58.0, 0.0]
+    },
+    "Rim": {
+      "colour": "#54E6F7",
+      "energy": 2.1,
+      "specular": 2.4
+    },
+    "ValleyBounce": {
+      "colour": "#3FA8D8",
+      "energy": 0.7
+    }
+  },
+  "backdrop": {
+    "near_range": {
+      "materials": ["rock_soft_near", "rock_soft_near"]
+    },
+    "structures": {
+      "bands": 6,
+      "band_from": 0.2,
+      "band_step": 0.13,
+      "sites": [
+        [196.0, 316.0, -46.0, 62.0, 5.0, 2],
+        [204.0, 336.0, -50.0, 70.0, 5.4, 6],
+        [212.0, 322.0, -47.0, 58.0, 4.8, 14],
+        [190.0, 348.0, -52.0, 66.0, 5.2, 22],
+        [219.0, 352.0, -53.0, 64.0, 5.0, 26],
+        [178.0, 330.0, -48.0, 54.0, 4.6, 34],
+        [168.0, 300.0, -44.0, 48.0, 4.4, 42],
+        [232.0, 308.0, -45.0, 52.0, 4.6, 50],
+        [152.0, 364.0, -54.0, 60.0, 5.0, 58],
+        [246.0, 372.0, -55.0, 58.0, 5.2, 66]
+      ]
+    },
+    "dusk_band": {
+      "count": 7,
+      "bearing_from": 168.0,
+      "bearing_step": 12.0,
+      "base_y": -92.0,
+      "size": [140.0, 18.0, 8.0]
+    },
+    "clouds": {
+      "count": 18,
+      "base_y": -84.0,
+      "drop_step": 18.0,
+      "size": [190.0, 11.0, 26.0]
+    }
+  },
+  "terrain": {
+    "scatter": [
+      {
+        "count": 52,
+        "clearance": 5.4,
+        "gauge": 1.0,
+        "materials": ["slope_cliff", "slope_boulder"],
+        "accent_every": 3
+      },
+      {
+        "count": 90,
+        "clearance": 3.1,
+        "gauge": 0.34,
+        "materials": ["slope_cliff", "slope_boulder"],
+        "accent_every": 3
+      }
+    ]
+  },
+  "dressing": {
+    "lamps": {
+      "spacing": 8.5,
+      "lenses": ["lit_cyan_soft", "lit_cyan_soft"]
+    },
+    "scrub": {
+      "target": 44,
+      "materials": ["scrub_dark", "scrub_dark"]
+    },
+    "pylons": {
+      "beacon": "neon_violet_hero"
+    },
+    "valley": {
+      "count": 11,
+      "reach": 40.0,
+      "glow": "lit_cyan_line_hero"
+    },
+    "practicals": {
+      "spill": {
+        "colour": "#7FE6FF",
+        "energy": 2.0
+      },
+      "under": {
+        "colour": "#9B6BFF",
+        "energy": 1.6
+      }
+    }
+  },
+  "zones": {
+    "start": {
+      "colour": "#54E6F7",
+      "energy": 3.4
+    },
+    "mix": {
+      "colour": "#9B6BFF",
+      "energy": 3.4
+    },
+    "obstacle": {
+      "colour": "#FF6BD6",
+      "energy": 3.6
+    },
+    "split": {
+      "colour": "#FFFFFF",
+      "energy": 3.0
+    },
+    "merge": {
+      "colour": "#54E6F7",
+      "energy": 3.4
+    },
+    "finish": {
+      "colour": "#B7FF5A",
+      "energy": 4.2,
+      "range": 16.0
+    }
+  },
+  "accent": {
+    "intensity": 1.45
+  },
+  "palette": {
+    "slope_cliff": {
+      "albedo": "#0A0E14",
+      "roughness": 0.94
+    },
+    "slope_rock": {
+      "albedo": "#0D1219",
+      "roughness": 0.93
+    },
+    "slope_earth": {
+      "albedo": "#121A24",
+      "roughness": 0.92
+    },
+    "slope_cap": {
+      "albedo": "#0F151D",
+      "roughness": 0.93
+    },
+    "slope_boulder": {
+      "albedo": "#080B10",
+      "roughness": 0.93
+    },
+    "scrub_dark": {
+      "albedo": "#0C1A16",
+      "roughness": 0.96
+    },
+    "scrub_dry": {
+      "albedo": "#101A20",
+      "roughness": 0.96
+    },
+    "rock_soft_near": {
+      "albedo": "#080D16"
+    },
+    "rock_soft_mid": {
+      "albedo": "#101E30"
+    },
+    "rock_soft_far": {
+      "albedo": "#1B3148"
+    },
+    "rock_soft_haze": {
+      "albedo": "#27455E"
+    },
+    "far_structure": {
+      "albedo": "#16222E"
+    },
+    "cloud_bank": {
+      "albedo": "#12283A"
+    },
+    "lit_dusk_band": {
+      "albedo": "#3E7FB8",
+      "energy": 1.4
+    },
+    "lit_valley_hero": {
+      "albedo": "#54E6F7",
+      "energy": 7.0
+    },
+    "lit_far_window_hero": {
+      "albedo": "#BFE9FF",
+      "energy": 2.4
+    }
+  }
+}
