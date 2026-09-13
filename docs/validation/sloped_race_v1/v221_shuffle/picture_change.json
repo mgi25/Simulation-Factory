@@ -1,0 +1,58 @@
+{
+ "a25": {
+  "join_change": 57.788,
+  "largest_change": 57.788,
+  "median_change": 3.068,
+  "of_changes": 245,
+  "rank_of_join": 1,
+  "ratio": 18.83
+ },
+ "b116": {
+  "join_change": 3.578,
+  "largest_change": 4.977,
+  "median_change": 2.288,
+  "of_changes": 328,
+  "rank_of_join": 10,
+  "ratio": 1.56
+ },
+ "b116_jumpcam": {
+  "join_change": 50.708,
+  "largest_change": 50.708,
+  "median_change": 2.011,
+  "of_changes": 328,
+  "rank_of_join": 1,
+  "ratio": 25.21
+ },
+ "b145": {
+  "join_change": 3.963,
+  "largest_change": 5.085,
+  "median_change": 2.433,
+  "of_changes": 299,
+  "rank_of_join": 9,
+  "ratio": 1.63
+ },
+ "b87": {
+  "join_change": 3.688,
+  "largest_change": 4.826,
+  "median_change": 2.177,
+  "of_changes": 357,
+  "rank_of_join": 9,
+  "ratio": 1.69
+ },
+ "c": {
+  "join_change": 2.116,
+  "largest_change": 4.685,
+  "median_change": 2.116,
+  "of_changes": 445,
+  "rank_of_join": null,
+  "ratio": 1.0
+ },
+ "v22": {
+  "join_change": 57.895,
+  "largest_change": 57.895,
+  "median_change": 3.542,
+  "of_changes": 209,
+  "rank_of_join": 1,
+  "ratio": 16.35
+ }
+}
