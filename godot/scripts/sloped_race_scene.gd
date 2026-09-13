@@ -50,6 +50,11 @@ const Modules := preload("res://assets/marble_machine/course/course_modules.gd")
 # `_palette`, `_camera`, `_course`, `_table` and `_travellers`, all of which are
 # used below and none of which is declared here.
 
+## The readability pass this scene is photographed under. See
+## `lab_palette.V21_RETUNE` for what it is and why it is a named pass rather
+## than an edit to the shared surfaces.
+const DEFAULT_CONTRAST := "v21"
+
 var _replay: Dictionary = {}
 var _camera_track: Dictionary = {}
 var _start_parts: Dictionary = {}
@@ -65,8 +70,6 @@ var _replay_fps := 60.0
 var _render_scale := 0.57
 var _duration := 0.0
 var _use_track := false
-
-
 func _ready() -> void:
 	# **Before `super()`, because the course is built inside it.** The start
 	# module the physics runs is not the one the layout table draws, and the
@@ -74,6 +77,12 @@ func _ready() -> void:
 	var early := _options()
 	if str(early.get("start-contract", "")) != "":
 		load_start_contract(str(early["start-contract"]))
+	# **Also before `super()`**, and for the same reason: the palette, the
+	# environment and the light rig are all built inside it. The race is the
+	# only scene that ships the V21 readability pass - the labs above it stay
+	# on the V20 look so their committed frames keep reproducing - and
+	# `--contrast=` still wins, which is how the before frames were taken.
+	_contrast = str(early.get("contrast", DEFAULT_CONTRAST))
 	super()
 	_strip_display_field()
 	var options := _options()

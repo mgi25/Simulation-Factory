@@ -66,7 +66,10 @@ static func _polar(bearing: float, radius: float, y: float) -> Vector3:
 	return Vector3(sin(angle) * radius, y, cos(angle) * radius)
 
 
-static func build_environment(no_glow: bool) -> Environment:
+const CONTRAST_V21 := "v21"
+
+
+static func build_environment(no_glow: bool, contrast := "") -> Environment:
 	## Dusk, tuned for a scene four times the tower's depth.
 	##
 	## The tower's fog density was set so a cliff at two hundred units lost half
@@ -105,6 +108,14 @@ static func build_environment(no_glow: bool) -> Environment:
 	env.tonemap_exposure = 0.82
 	env.tonemap_white = 14.0
 
+	# V21. Sky ambient reaches every upward-facing plane in the picture, and
+	# the widest upward-facing planes here are the track floor and the terrain
+	# - so it is the term that was adding the last of the pearl's clip and
+	# most of the mountainside's wash. Down a sixth, with the sky's own
+	# contribution to the background left alone so the dusk does not change.
+	if contrast == CONTRAST_V21:
+		env.ambient_light_energy = 0.35
+
 	env.fog_enabled = true
 	env.fog_mode = Environment.FOG_MODE_DEPTH
 	env.fog_light_color = Color("#5E5A6E")
@@ -121,6 +132,16 @@ static func build_environment(no_glow: bool) -> Environment:
 	env.ssao_intensity = 2.1
 	env.ssao_power = 1.5
 	env.ssao_light_affect = 0.12
+	if contrast == CONTRAST_V21:
+		# Local form, which is the half of "the track is flat" that lowering
+		# its value does not fix. A tighter radius reads the rib spacing, the
+		# guard root and the gap under a marble rather than the whole channel
+		# as one cavity, and `light_affect` is what lets the occlusion survive
+		# on a surface the key is pointed straight at - at 0.12 the lit face
+		# of the track, which is most of it, had no occlusion at all.
+		env.ssao_radius = 0.70
+		env.ssao_intensity = 2.7
+		env.ssao_light_affect = 0.22
 
 	env.ssr_enabled = true
 	env.ssr_max_steps = 44
@@ -133,6 +154,16 @@ static func build_environment(no_glow: bool) -> Environment:
 		env.glow_bloom = 0.26
 		env.glow_hdr_threshold = 1.16
 		env.glow_hdr_scale = 2.2
+		# V21. At 1.16 the threshold sits *below* what a lit pearl surface
+		# renders at, so the track itself was being bloomed - which is what
+		# turned the running channel into a light source with a course
+		# somewhere inside it, and it is why the white ribbon has no edge. The
+		# practicals and the edge lights are all well above 1.34 and keep
+		# their halo; the moulding stops having one.
+		if contrast == CONTRAST_V21:
+			env.glow_intensity = 0.95
+			env.glow_bloom = 0.19
+			env.glow_hdr_threshold = 1.34
 		env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
 		for level in 7:
 			env.set_glow_level(level, 0.0)
@@ -145,16 +176,39 @@ static func build_environment(no_glow: bool) -> Environment:
 	env.adjustment_contrast = 1.06
 	env.adjustment_saturation = 1.20
 	env.adjustment_brightness = 1.0
+	if contrast == CONTRAST_V21:
+		# A grade contrast above 1 is a gain around mid grey, so it pushes the
+		# top of the range further into the clip it is supposed to be shaping.
+		# Flat, with the separation bought back as saturation - which costs
+		# the pearl nothing, because pearl has almost no chroma to amplify,
+		# and pays the racers directly.
+		env.adjustment_contrast = 1.0
+		env.adjustment_saturation = 1.26
+		# Depth. Half the work the mountainside was doing to read as distance
+		# was being done by value alone, and the value range just came down;
+		# a little more aerial perspective puts it back where a lens would.
+		env.fog_density = 0.0019
+		env.fog_aerial_perspective = 0.80
 	return env
 
 
-static func build_lights(parent: Node3D) -> void:
+static func build_lights(parent: Node3D, contrast := "") -> void:
 	## Product key on the course, raking key on the world, rim, warm bounce.
+	##
+	## V21 moves four energies and nothing else: no light is added, removed,
+	## recoloured or re-aimed, so every shadow in the picture falls exactly
+	## where it fell in V20. What changes is the ratio between the subject key
+	## and the two lights that were washing the hill out from under it.
+	var v21 := contrast == CONTRAST_V21
 	var key := DirectionalLight3D.new()
 	key.name = "Key"
 	key.light_cull_mask = 1
 	key.light_color = Color("#FFF2E2")
-	key.light_energy = 3.2
+	# The course key at 3.2 over a 0.89-linear pearl is three and a half times
+	# what the curve can hold. Down to 2.7, which is where the moulding's own
+	# form comes back; the racers lose the same fraction and were never near
+	# the clip, so the gap between a marble and the track it sits on widens.
+	key.light_energy = 2.7 if v21 else 3.2
 	key.light_specular = 1.0
 	key.shadow_enabled = true
 	key.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
@@ -172,7 +226,10 @@ static func build_lights(parent: Node3D) -> void:
 	world_key.name = "WorldKey"
 	world_key.light_cull_mask = WORLD_LAYER
 	world_key.light_color = Color("#DFEBFF")
-	world_key.light_energy = 2.9
+	# The terrain fills a third of a section frame. Its key comes down by the
+	# same fraction as the course's, so the two keep their V20 relationship
+	# and the hill does not brighten relative to the track it carries.
+	world_key.light_energy = 2.45 if v21 else 2.9
 	world_key.light_specular = 0.2
 	world_key.shadow_enabled = true
 	world_key.directional_shadow_mode = \
@@ -196,7 +253,11 @@ static func build_lights(parent: Node3D) -> void:
 	world_fill.name = "WorldFill"
 	world_fill.light_cull_mask = WORLD_LAYER
 	world_fill.light_color = Color("#6E9AC4")
-	world_fill.light_energy = 0.95
+	# The one light that only ever *reduces* contrast. Two thirds of it is
+	# enough to keep the shadowed flank readable, and the third that goes is
+	# most of what made the near ground read as a pale lavender wash under a
+	# white track.
+	world_fill.light_energy = 0.68 if v21 else 0.95
 	world_fill.light_specular = 0.0
 	world_fill.shadow_enabled = false
 	world_fill.rotation_degrees = Vector3(-14.0, 26.0, 0.0)
@@ -223,8 +284,17 @@ static func build_lights(parent: Node3D) -> void:
 	var rim := DirectionalLight3D.new()
 	rim.name = "Rim"
 	rim.light_color = Color("#8ED6FF")
-	rim.light_energy = 2.3
-	rim.light_specular = 1.5
+	# The rim is on no cull mask, so it reaches the racers and the course
+	# alike - and it was reaching them in the wrong proportion. On a pearl
+	# drum at roughness 0.34 almost all of it arrives as diffuse, which is a
+	# second key on the frame's largest pale surfaces; on a marble at
+	# roughness 0.08 under a full clearcoat almost all of it arrives as
+	# specular, which is the cool edge that lifts a candy sphere off whatever
+	# is behind it. So V21 trades the one for the other: less light, more of
+	# it specular. The marbles keep their backlight and the shells stop being
+	# lit twice.
+	rim.light_energy = 1.75 if v21 else 2.3
+	rim.light_specular = 2.1 if v21 else 1.5
 	rim.shadow_enabled = false
 	rim.rotation_degrees = Vector3(-9.0, 162.0, 0.0)
 	parent.add_child(rim)
@@ -232,7 +302,10 @@ static func build_lights(parent: Node3D) -> void:
 	var bounce := DirectionalLight3D.new()
 	bounce.name = "ValleyBounce"
 	bounce.light_color = Color("#FFB06A")
-	bounce.light_energy = 1.15
+	# The warm bounce off the valley, which is almost pure diffuse fill on the
+	# course and so lands hardest on exactly the wide pale surfaces this pass
+	# is trying to get back under the clip.
+	bounce.light_energy = 0.85 if v21 else 1.15
 	bounce.light_specular = 0.25
 	bounce.rotation_degrees = Vector3(36.0, 54.0, 0.0)
 	bounce.shadow_enabled = false

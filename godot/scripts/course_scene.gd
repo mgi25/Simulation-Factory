@@ -86,6 +86,15 @@ const SEQUENCE := [
 const DEFAULT_SHOT := "hero"
 
 var _palette
+## Which readability pass the palette and the world are built under.
+##
+## Empty is the V20 look, and it is what every lab entry point gets, so the
+## committed frames of the visual lab, the track lab, the hero build and this
+## file's own layout proof keep reproducing from this branch. `sloped_race_scene`
+## sets it to `v21` before it calls `super()`; `--contrast=` on the command
+## line overrides either way, which is how the before-and-after frames of the
+## V21 pass were taken from one build of one scene.
+var _contrast := ""
 var _camera: Camera3D
 var _shot := DEFAULT_SHOT
 var _layout := "a"
@@ -118,15 +127,17 @@ func _ready() -> void:
 	RenderingServer.directional_soft_shadow_filter_set_quality(
 		RenderingServer.SHADOW_QUALITY_SOFT_HIGH)
 
-	_palette = Palette.new("tower")
+	if options.has("contrast"):
+		_contrast = str(options["contrast"])
+	_palette = Palette.new("tower", _contrast)
 	_table = Layout.table(_layout)
 
 	var world_env := WorldEnvironment.new()
 	world_env.name = "WorldEnvironment"
-	world_env.environment = World.build_environment(_no_glow)
+	world_env.environment = World.build_environment(_no_glow, _contrast)
 	add_child(world_env)
 
-	World.build_lights(self)
+	World.build_lights(self, _contrast)
 	add_child(World.build(_palette))
 
 	# `routes` reaches `course_machine.OPEN_SIDES`: "both" opens leg3's east
