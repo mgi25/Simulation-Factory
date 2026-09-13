@@ -1,0 +1,1250 @@
+{
+ "a22": {
+  "aim_step_join": 0.0,
+  "beats": {
+   "gate": 6.1,
+   "lift_at": 5.199999999999999,
+   "rate": 13.0,
+   "release": 0.3,
+   "rotor_start": 1.6,
+   "rotor_stop": 4.6,
+   "settled": 4.8999999999999995,
+   "spin_down": 0.3,
+   "turns": 6.207042780583917
+  },
+  "camera_reach_change": 3.6634,
+  "camera_step_inside": 0.8704,
+  "camera_step_join": 5.3741,
+  "coverage": {
+   "mean": 0.2258,
+   "per_marble": {
+    "0": 0.9178,
+    "1": 0.0,
+    "2": 0.0,
+    "3": 0.8889,
+    "4": 0.0,
+    "5": 0.0,
+    "6": 0.0,
+    "7": 0.0
+   },
+   "worst_mover": 0.0
+  },
+  "duration": 3.786667,
+  "last_collision_to_gate": 4.0875,
+  "live": 3.786667,
+  "live_anticipation": {
+   "blade_lift": 0.2667,
+   "mixing": 0.6,
+   "pour": 1.3,
+   "spin_down": 0.0,
+   "still": 0.2667,
+   "to_gate": 0.2667
+  },
+  "marbles": {
+   "max_diameters": 1.687,
+   "max_px": 140.3,
+   "max_sim": 2.1148,
+   "mean_px": 82.2,
+   "mean_sim": 1.0403,
+   "per_marble": {
+    "0": {
+     "diameters": 0.789,
+     "px": 69.3,
+     "sim": 0.4463
+    },
+    "1": {
+     "diameters": 0.963,
+     "px": 73.1,
+     "sim": 1.1133
+    },
+    "2": {
+     "diameters": 1.302,
+     "px": 103.2,
+     "sim": 1.0562
+    },
+    "3": {
+     "diameters": 0.902,
+     "px": 80.8,
+     "sim": 0.4369
+    },
+    "4": {
+     "diameters": 0.294,
+     "px": 23.9,
+     "sim": 0.6404
+    },
+    "5": {
+     "diameters": 1.687,
+     "px": 140.3,
+     "sim": 2.1148
+    },
+    "6": {
+     "diameters": 1.341,
+     "px": 108.4,
+     "sim": 1.1143
+    },
+    "7": {
+     "diameters": 0.727,
+     "px": 58.4,
+     "sim": 1.4003
+    }
+   }
+  },
+  "note": "A - 2.000 s live before the omission",
+  "omissions": 1,
+  "omitted": 3.633333,
+  "omitted_frames": 217,
+  "output_frames": 229,
+  "plan": "a22",
+  "problems": [],
+  "rotor": {
+   "inside_constant_rate": false,
+   "lift_change": 1.193,
+   "phase_error_deg": 86.941
+  },
+  "visible": [
+   {
+    "in_frame": 8,
+    "nearest_px": 81.1,
+    "of": 8
+   },
+   {
+    "in_frame": 8,
+    "nearest_px": 71.9,
+    "of": 8
+   }
+  ],
+  "windows": [
+   {
+    "frames": 121,
+    "replay": [
+     0.2,
+     2.2
+    ]
+   },
+   {
+    "frames": 108,
+    "replay": [
+     5.833333,
+     7.62
+    ]
+   }
+  ]
+ },
+ "a25": {
+  "aim_step_join": 0.0,
+  "beats": {
+   "gate": 6.1,
+   "lift_at": 5.199999999999999,
+   "rate": 13.0,
+   "release": 0.3,
+   "rotor_start": 1.6,
+   "rotor_stop": 4.6,
+   "settled": 4.8999999999999995,
+   "spin_down": 0.3,
+   "turns": 6.207042780583917
+  },
+  "camera_reach_change": 3.6634,
+  "camera_step_inside": 0.8704,
+  "camera_step_join": 5.3741,
+  "coverage": {
+   "mean": 0.0201,
+   "per_marble": {
+    "0": 0.0,
+    "1": 0.0123,
+    "2": 0.0,
+    "3": 0.0,
+    "4": 0.0,
+    "5": 0.1481,
+    "6": 0.0,
+    "7": 0.0
+   },
+   "worst_mover": 0.1481
+  },
+  "duration": 4.086667,
+  "last_collision_to_gate": 4.0875,
+  "live": 4.086667,
+  "live_anticipation": {
+   "blade_lift": 0.2667,
+   "mixing": 0.9,
+   "pour": 1.3,
+   "spin_down": 0.0,
+   "still": 0.2667,
+   "to_gate": 0.2667
+  },
+  "marbles": {
+   "max_diameters": 1.755,
+   "max_px": 147.4,
+   "max_sim": 2.2993,
+   "mean_px": 79.5,
+   "mean_sim": 1.0243,
+   "per_marble": {
+    "0": {
+     "diameters": 0.749,
+     "px": 65.7,
+     "sim": 0.3381
+    },
+    "1": {
+     "diameters": 0.974,
+     "px": 73.8,
+     "sim": 1.159
+    },
+    "2": {
+     "diameters": 1.048,
+     "px": 82.9,
+     "sim": 0.7891
+    },
+    "3": {
+     "diameters": 0.81,
+     "px": 72.3,
+     "sim": 0.3061
+    },
+    "4": {
+     "diameters": 0.243,
+     "px": 19.7,
+     "sim": 0.6111
+    },
+    "5": {
+     "diameters": 1.755,
+     "px": 147.4,
+     "sim": 2.2993
+    },
+    "6": {
+     "diameters": 1.241,
+     "px": 99.9,
+     "sim": 0.9799
+    },
+    "7": {
+     "diameters": 0.934,
+     "px": 74.6,
+     "sim": 1.7118
+    }
+   }
+  },
+  "note": "A - 2.300 s live before the omission",
+  "omissions": 1,
+  "omitted": 3.333333,
+  "omitted_frames": 199,
+  "output_frames": 247,
+  "plan": "a25",
+  "problems": [],
+  "rotor": {
+   "inside_constant_rate": false,
+   "lift_change": 1.193,
+   "phase_error_deg": -136.5125
+  },
+  "visible": [
+   {
+    "in_frame": 8,
+    "nearest_px": 79.6,
+    "of": 8
+   },
+   {
+    "in_frame": 8,
+    "nearest_px": 71.9,
+    "of": 8
+   }
+  ],
+  "windows": [
+   {
+    "frames": 139,
+    "replay": [
+     0.2,
+     2.5
+    ]
+   },
+   {
+    "frames": 108,
+    "replay": [
+     5.833333,
+     7.62
+    ]
+   }
+  ]
+ },
+ "a28": {
+  "aim_step_join": 0.0,
+  "beats": {
+   "gate": 6.1,
+   "lift_at": 5.199999999999999,
+   "rate": 13.0,
+   "release": 0.3,
+   "rotor_start": 1.6,
+   "rotor_stop": 4.6,
+   "settled": 4.8999999999999995,
+   "spin_down": 0.3,
+   "turns": 6.207042780583917
+  },
+  "camera_reach_change": 3.6634,
+  "camera_step_inside": 0.8704,
+  "camera_step_join": 5.3741,
+  "coverage": {
+   "mean": 0.2236,
+   "per_marble": {
+    "0": 0.9863,
+    "1": 0.0,
+    "2": 0.0,
+    "3": 0.7901,
+    "4": 0.0,
+    "5": 0.0,
+    "6": 0.0123,
+    "7": 0.0
+   },
+   "worst_mover": 0.0
+  },
+  "duration": 4.386667,
+  "last_collision_to_gate": 4.0875,
+  "live": 4.386667,
+  "live_anticipation": {
+   "blade_lift": 0.2667,
+   "mixing": 1.2,
+   "pour": 1.3,
+   "spin_down": 0.0,
+   "still": 0.2667,
+   "to_gate": 0.2667
+  },
+  "marbles": {
+   "max_diameters": 1.579,
+   "max_px": 132.6,
+   "max_sim": 2.1341,
+   "mean_px": 76.2,
+   "mean_sim": 1.0022,
+   "per_marble": {
+    "0": {
+     "diameters": 0.78,
+     "px": 68.4,
+     "sim": 0.4206
+    },
+    "1": {
+     "diameters": 0.965,
+     "px": 73.2,
+     "sim": 1.1167
+    },
+    "2": {
+     "diameters": 1.081,
+     "px": 85.4,
+     "sim": 0.8066
+    },
+    "3": {
+     "diameters": 0.775,
+     "px": 69.0,
+     "sim": 0.3054
+    },
+    "4": {
+     "diameters": 0.212,
+     "px": 17.2,
+     "sim": 0.5496
+    },
+    "5": {
+     "diameters": 1.579,
+     "px": 132.6,
+     "sim": 2.1341
+    },
+    "6": {
+     "diameters": 1.16,
+     "px": 93.0,
+     "sim": 0.8788
+    },
+    "7": {
+     "diameters": 0.888,
+     "px": 70.7,
+     "sim": 1.8057
+    }
+   }
+  },
+  "note": "A - 2.600 s live before the omission",
+  "omissions": 1,
+  "omitted": 3.033333,
+  "omitted_frames": 181,
+  "output_frames": 265,
+  "plan": "a28",
+  "problems": [],
+  "rotor": {
+   "inside_constant_rate": false,
+   "lift_change": 1.193,
+   "phase_error_deg": 0.0339
+  },
+  "visible": [
+   {
+    "in_frame": 8,
+    "nearest_px": 79.5,
+    "of": 8
+   },
+   {
+    "in_frame": 8,
+    "nearest_px": 71.9,
+    "of": 8
+   }
+  ],
+  "windows": [
+   {
+    "frames": 157,
+    "replay": [
+     0.2,
+     2.8
+    ]
+   },
+   {
+    "frames": 108,
+    "replay": [
+     5.833333,
+     7.62
+    ]
+   }
+  ]
+ },
+ "b116": {
+  "aim_step_join": 0.0,
+  "beats": {
+   "gate": 6.1,
+   "lift_at": 5.199999999999999,
+   "rate": 13.0,
+   "release": 0.3,
+   "rotor_start": 1.6,
+   "rotor_stop": 4.6,
+   "settled": 4.8999999999999995,
+   "spin_down": 0.3,
+   "turns": 6.207042780583917
+  },
+  "camera_reach_change": 0.0,
+  "camera_step_inside": 0.0477,
+  "camera_step_join": 0.0,
+  "coverage": {
+   "mean": 0.1045,
+   "per_marble": {
+    "0": 0.8219,
+    "1": 0.0,
+    "2": 0.0,
+    "3": 0.0,
+    "4": 0.0,
+    "5": 0.0,
+    "6": 0.0137,
+    "7": 0.0
+   },
+   "worst_mover": 0.0
+  },
+  "duration": 5.47,
+  "last_collision_to_gate": 4.0875,
+  "live": 5.47,
+  "live_anticipation": {
+   "blade_lift": 0.9,
+   "mixing": 1.05,
+   "pour": 1.3,
+   "spin_down": 0.3,
+   "still": 1.2,
+   "to_gate": 1.5
+  },
+  "marbles": {
+   "max_diameters": 1.11,
+   "max_px": 82.4,
+   "max_sim": 1.123,
+   "mean_px": 31.4,
+   "mean_sim": 0.4593,
+   "per_marble": {
+    "0": {
+     "diameters": 0.101,
+     "px": 7.7,
+     "sim": 0.1273
+    },
+    "1": {
+     "diameters": 0.011,
+     "px": 0.8,
+     "sim": 0.0114
+    },
+    "2": {
+     "diameters": 0.733,
+     "px": 52.0,
+     "sim": 0.7342
+    },
+    "3": {
+     "diameters": 0.02,
+     "px": 1.5,
+     "sim": 0.0308
+    },
+    "4": {
+     "diameters": 0.152,
+     "px": 11.0,
+     "sim": 0.2916
+    },
+    "5": {
+     "diameters": 1.11,
+     "px": 82.4,
+     "sim": 1.123
+    },
+    "6": {
+     "diameters": 0.652,
+     "px": 46.8,
+     "sim": 0.6694
+    },
+    "7": {
+     "diameters": 0.666,
+     "px": 48.6,
+     "sim": 0.6869
+    }
+   }
+  },
+  "note": "B - 4 rotor revolutions omitted (1.933 s), lens continuous",
+  "omissions": 1,
+  "omitted": 1.95,
+  "omitted_frames": 116,
+  "output_frames": 330,
+  "plan": "b116",
+  "problems": [],
+  "rotor": {
+   "inside_constant_rate": true,
+   "lift_change": 0.0,
+   "phase_error_deg": 0.0339
+  },
+  "visible": [
+   {
+    "in_frame": 8,
+    "nearest_px": 77.5,
+    "of": 8
+   },
+   {
+    "in_frame": 8,
+    "nearest_px": 82.6,
+    "of": 8
+   }
+  ],
+  "windows": [
+   {
+    "frames": 112,
+    "replay": [
+     0.2,
+     2.05
+    ]
+   },
+   {
+    "frames": 218,
+    "replay": [
+     4.0,
+     7.62
+    ]
+   }
+  ]
+ },
+ "b116_jumpcam": {
+  "aim_step_join": 0.0,
+  "beats": {
+   "gate": 6.1,
+   "lift_at": 5.199999999999999,
+   "rate": 13.0,
+   "release": 0.3,
+   "rotor_start": 1.6,
+   "rotor_stop": 4.6,
+   "settled": 4.8999999999999995,
+   "spin_down": 0.3,
+   "turns": 6.207042780583917
+  },
+  "camera_reach_change": 3.6634,
+  "camera_step_inside": 0.141,
+  "camera_step_join": 5.0767,
+  "coverage": {
+   "mean": 0.0034,
+   "per_marble": {
+    "0": 0.0137,
+    "1": 0.0,
+    "2": 0.0,
+    "3": 0.0,
+    "4": 0.0,
+    "5": 0.0,
+    "6": 0.0137,
+    "7": 0.0
+   },
+   "worst_mover": 0.0
+  },
+  "duration": 5.47,
+  "last_collision_to_gate": 4.0875,
+  "live": 5.47,
+  "live_anticipation": {
+   "blade_lift": 0.9,
+   "mixing": 1.05,
+   "pour": 1.3,
+   "spin_down": 0.3,
+   "still": 1.2,
+   "to_gate": 1.5
+  },
+  "marbles": {
+   "max_diameters": 1.051,
+   "max_px": 83.9,
+   "max_sim": 1.123,
+   "mean_px": 56.0,
+   "mean_sim": 0.4593,
+   "per_marble": {
+    "0": {
+     "diameters": 0.495,
+     "px": 43.2,
+     "sim": 0.1273
+    },
+    "1": {
+     "diameters": 0.346,
+     "px": 26.3,
+     "sim": 0.0114
+    },
+    "2": {
+     "diameters": 1.051,
+     "px": 83.4,
+     "sim": 0.7342
+    },
+    "3": {
+     "diameters": 0.679,
+     "px": 60.6,
+     "sim": 0.0308
+    },
+    "4": {
+     "diameters": 0.247,
+     "px": 20.0,
+     "sim": 0.2916
+    },
+    "5": {
+     "diameters": 1.013,
+     "px": 83.9,
+     "sim": 1.123
+    },
+    "6": {
+     "diameters": 0.954,
+     "px": 77.2,
+     "sim": 0.6694
+    },
+    "7": {
+     "diameters": 0.665,
+     "px": 53.6,
+     "sim": 0.6869
+    }
+   }
+  },
+  "note": "ablation - B's join with V22's camera legs",
+  "omissions": 1,
+  "omitted": 1.95,
+  "omitted_frames": 116,
+  "output_frames": 330,
+  "plan": "b116_jumpcam",
+  "problems": [],
+  "rotor": {
+   "inside_constant_rate": true,
+   "lift_change": 0.0,
+   "phase_error_deg": 0.0339
+  },
+  "visible": [
+   {
+    "in_frame": 8,
+    "nearest_px": 81.4,
+    "of": 8
+   },
+   {
+    "in_frame": 8,
+    "nearest_px": 80.9,
+    "of": 8
+   }
+  ],
+  "windows": [
+   {
+    "frames": 112,
+    "replay": [
+     0.2,
+     2.05
+    ]
+   },
+   {
+    "frames": 218,
+    "replay": [
+     4.0,
+     7.62
+    ]
+   }
+  ]
+ },
+ "b145": {
+  "aim_step_join": 0.0,
+  "beats": {
+   "gate": 6.1,
+   "lift_at": 5.199999999999999,
+   "rate": 13.0,
+   "release": 0.3,
+   "rotor_start": 1.6,
+   "rotor_stop": 4.6,
+   "settled": 4.8999999999999995,
+   "spin_down": 0.3,
+   "turns": 6.207042780583917
+  },
+  "camera_reach_change": 0.0,
+  "camera_step_inside": 0.0523,
+  "camera_step_join": 0.0,
+  "coverage": {
+   "mean": 0.0086,
+   "per_marble": {
+    "0": 0.0,
+    "1": 0.0,
+    "2": 0.0,
+    "3": 0.0,
+    "4": 0.0,
+    "5": 0.0685,
+    "6": 0.0,
+    "7": 0.0
+   },
+   "worst_mover": 0.0685
+  },
+  "duration": 4.986667,
+  "last_collision_to_gate": 4.0875,
+  "live": 4.986667,
+  "live_anticipation": {
+   "blade_lift": 0.9,
+   "mixing": 0.5667,
+   "pour": 1.3,
+   "spin_down": 0.3,
+   "still": 1.2,
+   "to_gate": 1.5
+  },
+  "marbles": {
+   "max_diameters": 1.328,
+   "max_px": 98.9,
+   "max_sim": 1.383,
+   "mean_px": 36.6,
+   "mean_sim": 0.5579,
+   "per_marble": {
+    "0": {
+     "diameters": 0.138,
+     "px": 10.6,
+     "sim": 0.2051
+    },
+    "1": {
+     "diameters": 0.029,
+     "px": 2.1,
+     "sim": 0.0325
+    },
+    "2": {
+     "diameters": 0.871,
+     "px": 62.1,
+     "sim": 0.8738
+    },
+    "3": {
+     "diameters": 0.02,
+     "px": 1.6,
+     "sim": 0.0336
+    },
+    "4": {
+     "diameters": 0.19,
+     "px": 13.9,
+     "sim": 0.3568
+    },
+    "5": {
+     "diameters": 1.328,
+     "px": 98.9,
+     "sim": 1.383
+    },
+    "6": {
+     "diameters": 0.776,
+     "px": 56.0,
+     "sim": 0.7853
+    },
+    "7": {
+     "diameters": 0.651,
+     "px": 47.7,
+     "sim": 0.7931
+    }
+   }
+  },
+  "note": "B - 5 rotor revolutions omitted (2.417 s), lens continuous",
+  "omissions": 1,
+  "omitted": 2.433333,
+  "omitted_frames": 145,
+  "output_frames": 301,
+  "plan": "b145",
+  "problems": [],
+  "rotor": {
+   "inside_constant_rate": true,
+   "lift_change": 0.0,
+   "phase_error_deg": 0.0424
+  },
+  "visible": [
+   {
+    "in_frame": 8,
+    "nearest_px": 78.0,
+    "of": 8
+   },
+   {
+    "in_frame": 8,
+    "nearest_px": 82.8,
+    "of": 8
+   }
+  ],
+  "windows": [
+   {
+    "frames": 110,
+    "replay": [
+     0.2,
+     2.016667
+    ]
+   },
+   {
+    "frames": 191,
+    "replay": [
+     4.45,
+     7.62
+    ]
+   }
+  ]
+ },
+ "b58": {
+  "aim_step_join": 0.0,
+  "beats": {
+   "gate": 6.1,
+   "lift_at": 5.199999999999999,
+   "rate": 13.0,
+   "release": 0.3,
+   "rotor_start": 1.6,
+   "rotor_stop": 4.6,
+   "settled": 4.8999999999999995,
+   "spin_down": 0.3,
+   "turns": 6.207042780583917
+  },
+  "camera_reach_change": 0.0,
+  "camera_step_inside": 0.0406,
+  "camera_step_join": 0.0,
+  "coverage": {
+   "mean": 0.0849,
+   "per_marble": {
+    "0": 0.0,
+    "1": 0.679,
+    "2": 0.0,
+    "3": 0.0,
+    "4": 0.0,
+    "5": 0.0,
+    "6": 0.0,
+    "7": 0.0
+   },
+   "worst_mover": 0.0
+  },
+  "duration": 6.436666,
+  "last_collision_to_gate": 4.0875,
+  "live": 6.436666,
+  "live_anticipation": {
+   "blade_lift": 0.9,
+   "mixing": 2.0167,
+   "pour": 1.3,
+   "spin_down": 0.3,
+   "still": 1.2,
+   "to_gate": 1.5
+  },
+  "marbles": {
+   "max_diameters": 0.641,
+   "max_px": 47.9,
+   "max_sim": 0.6446,
+   "mean_px": 20.8,
+   "mean_sim": 0.3051,
+   "per_marble": {
+    "0": {
+     "diameters": 0.049,
+     "px": 3.7,
+     "sim": 0.0497
+    },
+    "1": {
+     "diameters": 0.149,
+     "px": 10.5,
+     "sim": 0.1634
+    },
+    "2": {
+     "diameters": 0.303,
+     "px": 21.5,
+     "sim": 0.304
+    },
+    "3": {
+     "diameters": 0.04,
+     "px": 3.1,
+     "sim": 0.0484
+    },
+    "4": {
+     "diameters": 0.106,
+     "px": 7.7,
+     "sim": 0.2009
+    },
+    "5": {
+     "diameters": 0.641,
+     "px": 47.9,
+     "sim": 0.6446
+    },
+    "6": {
+     "diameters": 0.361,
+     "px": 25.8,
+     "sim": 0.389
+    },
+    "7": {
+     "diameters": 0.634,
+     "px": 45.9,
+     "sim": 0.6412
+    }
+   }
+  },
+  "note": "B - 2 rotor revolutions omitted (0.967 s), lens continuous",
+  "omissions": 1,
+  "omitted": 0.983334,
+  "omitted_frames": 58,
+  "output_frames": 388,
+  "plan": "b58",
+  "problems": [],
+  "rotor": {
+   "inside_constant_rate": true,
+   "lift_change": 0.0,
+   "phase_error_deg": 0.017
+  },
+  "visible": [
+   {
+    "in_frame": 8,
+    "nearest_px": 75.8,
+    "of": 8
+   },
+   {
+    "in_frame": 8,
+    "nearest_px": 82.4,
+    "of": 8
+   }
+  ],
+  "windows": [
+   {
+    "frames": 129,
+    "replay": [
+     0.2,
+     2.333333
+    ]
+   },
+   {
+    "frames": 259,
+    "replay": [
+     3.316667,
+     7.62
+    ]
+   }
+  ]
+ },
+ "b87": {
+  "aim_step_join": 0.0,
+  "beats": {
+   "gate": 6.1,
+   "lift_at": 5.199999999999999,
+   "rate": 13.0,
+   "release": 0.3,
+   "rotor_start": 1.6,
+   "rotor_stop": 4.6,
+   "settled": 4.8999999999999995,
+   "spin_down": 0.3,
+   "turns": 6.207042780583917
+  },
+  "camera_reach_change": 0.0,
+  "camera_step_inside": 0.0439,
+  "camera_step_join": 0.0,
+  "coverage": {
+   "mean": 0.2232,
+   "per_marble": {
+    "0": 1.0,
+    "1": 0.0822,
+    "2": 0.0,
+    "3": 0.7037,
+    "4": 0.0,
+    "5": 0.0,
+    "6": 0.0,
+    "7": 0.0
+   },
+   "worst_mover": 0.0
+  },
+  "duration": 5.953333,
+  "last_collision_to_gate": 4.0875,
+  "live": 5.953333,
+  "live_anticipation": {
+   "blade_lift": 0.9,
+   "mixing": 1.5333,
+   "pour": 1.3,
+   "spin_down": 0.3,
+   "still": 1.2,
+   "to_gate": 1.5
+  },
+  "marbles": {
+   "max_diameters": 0.873,
+   "max_px": 65.0,
+   "max_sim": 0.8831,
+   "mean_px": 26.2,
+   "mean_sim": 0.3836,
+   "per_marble": {
+    "0": {
+     "diameters": 0.051,
+     "px": 3.9,
+     "sim": 0.0592
+    },
+    "1": {
+     "diameters": 0.01,
+     "px": 0.7,
+     "sim": 0.0211
+    },
+    "2": {
+     "diameters": 0.519,
+     "px": 36.9,
+     "sim": 0.5195
+    },
+    "3": {
+     "diameters": 0.063,
+     "px": 4.9,
+     "sim": 0.0757
+    },
+    "4": {
+     "diameters": 0.142,
+     "px": 10.3,
+     "sim": 0.2751
+    },
+    "5": {
+     "diameters": 0.873,
+     "px": 65.0,
+     "sim": 0.8831
+    },
+    "6": {
+     "diameters": 0.539,
+     "px": 38.6,
+     "sim": 0.555
+    },
+    "7": {
+     "diameters": 0.678,
+     "px": 49.3,
+     "sim": 0.6799
+    }
+   }
+  },
+  "note": "B - 3 rotor revolutions omitted (1.450 s), lens continuous",
+  "omissions": 1,
+  "omitted": 1.466667,
+  "omitted_frames": 87,
+  "output_frames": 359,
+  "plan": "b87",
+  "problems": [],
+  "rotor": {
+   "inside_constant_rate": true,
+   "lift_change": 0.0,
+   "phase_error_deg": 0.0255
+  },
+  "visible": [
+   {
+    "in_frame": 8,
+    "nearest_px": 76.6,
+    "of": 8
+   },
+   {
+    "in_frame": 8,
+    "nearest_px": 82.5,
+    "of": 8
+   }
+  ],
+  "windows": [
+   {
+    "frames": 121,
+    "replay": [
+     0.2,
+     2.2
+    ]
+   },
+   {
+    "frames": 238,
+    "replay": [
+     3.666667,
+     7.62
+    ]
+   }
+  ]
+ },
+ "c": {
+  "aim_step_join": 0.0,
+  "beats": {
+   "gate": 6.1,
+   "lift_at": 5.199999999999999,
+   "rate": 13.0,
+   "release": 0.3,
+   "rotor_start": 1.6,
+   "rotor_stop": 4.6,
+   "settled": 4.8999999999999995,
+   "spin_down": 0.3,
+   "turns": 6.207042780583917
+  },
+  "camera_reach_change": 0.0,
+  "camera_step_inside": 0.0352,
+  "camera_step_join": 0.0,
+  "coverage": {
+   "mean": 0.0,
+   "per_marble": {},
+   "worst_mover": 0.0
+  },
+  "duration": 7.42,
+  "last_collision_to_gate": 4.0875,
+  "live": 7.42,
+  "live_anticipation": {
+   "blade_lift": 0.9,
+   "mixing": 3.0,
+   "pour": 1.3,
+   "spin_down": 0.3,
+   "still": 1.2,
+   "to_gate": 1.5
+  },
+  "marbles": {
+   "max_diameters": 0.0,
+   "max_px": 0.0,
+   "max_sim": 0.0,
+   "mean_px": 0.0,
+   "mean_sim": 0.0,
+   "per_marble": {}
+  },
+  "note": "C - no omission, replay 0.200-7.620 entire",
+  "omissions": 0,
+  "omitted": 0.0,
+  "omitted_frames": 0,
+  "output_frames": 446,
+  "plan": "c",
+  "problems": [],
+  "rotor": {
+   "inside_constant_rate": true,
+   "lift_change": 0.0,
+   "phase_error_deg": 0.0
+  },
+  "visible": [
+   {
+    "in_frame": 8,
+    "nearest_px": 79.8,
+    "of": 8
+   }
+  ],
+  "windows": [
+   {
+    "frames": 446,
+    "replay": [
+     0.2,
+     7.62
+    ]
+   }
+  ]
+ },
+ "v22": {
+  "aim_step_join": 0.0,
+  "beats": {
+   "gate": 6.1,
+   "lift_at": 5.199999999999999,
+   "rate": 13.0,
+   "release": 0.3,
+   "rotor_start": 1.6,
+   "rotor_stop": 4.6,
+   "settled": 4.8999999999999995,
+   "spin_down": 0.3,
+   "turns": 6.207042780583917
+  },
+  "camera_reach_change": 3.6634,
+  "camera_step_inside": 0.8704,
+  "camera_step_join": 5.3741,
+  "coverage": {
+   "mean": 0.0309,
+   "per_marble": {
+    "0": 0.0,
+    "1": 0.0,
+    "2": 0.0,
+    "3": 0.0,
+    "4": 0.0,
+    "5": 0.1852,
+    "6": 0.0617,
+    "7": 0.0
+   },
+   "worst_mover": 0.1852
+  },
+  "duration": 3.486667,
+  "last_collision_to_gate": 4.0875,
+  "live": 3.486667,
+  "live_anticipation": {
+   "blade_lift": 0.2667,
+   "mixing": 0.3,
+   "pour": 1.3,
+   "spin_down": 0.0,
+   "still": 0.2667,
+   "to_gate": 0.2667
+  },
+  "marbles": {
+   "max_diameters": 1.907,
+   "max_px": 158.4,
+   "max_sim": 2.3223,
+   "mean_px": 81.4,
+   "mean_sim": 1.0502,
+   "per_marble": {
+    "0": {
+     "diameters": 0.514,
+     "px": 44.6,
+     "sim": 0.1842
+    },
+    "1": {
+     "diameters": 0.974,
+     "px": 73.9,
+     "sim": 1.1556
+    },
+    "2": {
+     "diameters": 1.548,
+     "px": 122.8,
+     "sim": 1.3063
+    },
+    "3": {
+     "diameters": 0.813,
+     "px": 72.6,
+     "sim": 0.2841
+    },
+    "4": {
+     "diameters": 0.332,
+     "px": 26.8,
+     "sim": 0.8605
+    },
+    "5": {
+     "diameters": 1.907,
+     "px": 158.4,
+     "sim": 2.3223
+    },
+    "6": {
+     "diameters": 1.382,
+     "px": 112.0,
+     "sim": 1.1976
+    },
+    "7": {
+     "diameters": 0.5,
+     "px": 40.4,
+     "sim": 1.0908
+    }
+   }
+  },
+  "note": "control - V22 as delivered, 3.933 s omitted across a stopped rotor",
+  "omissions": 1,
+  "omitted": 3.933333,
+  "omitted_frames": 235,
+  "output_frames": 211,
+  "plan": "v22",
+  "problems": [],
+  "rotor": {
+   "inside_constant_rate": false,
+   "lift_change": 1.193,
+   "phase_error_deg": -49.6055
+  },
+  "visible": [
+   {
+    "in_frame": 8,
+    "nearest_px": 84.0,
+    "of": 8
+   },
+   {
+    "in_frame": 8,
+    "nearest_px": 71.9,
+    "of": 8
+   }
+  ],
+  "windows": [
+   {
+    "frames": 103,
+    "replay": [
+     0.2,
+     1.9
+    ]
+   },
+   {
+    "frames": 108,
+    "replay": [
+     5.833333,
+     7.62
+    ]
+   }
+  ]
+ }
+}
