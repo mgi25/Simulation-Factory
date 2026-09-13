@@ -1,0 +1,1200 @@
+{
+ "seed": 5432,
+ "since": 18.9,
+ "candidates": {
+  "a_chase": {
+   "candidate": "a_chase",
+   "note": "continuous rear chase: parks behind the line, never cuts",
+   "split": 18.9,
+   "shape": {
+    "settle": 2.6834,
+    "steps": 161,
+    "parked_at": 21.5834,
+    "entry_speed": 0.8309,
+    "reach": 66.888,
+    "ratio": 2.0,
+    "aim_settle": 1.2,
+    "aim_steps": 72,
+    "aim_entry_speed": 0.2954,
+    "aim_reach": 25.514,
+    "aim_ratio": 0.834
+   },
+   "park": {
+    "bearing": 180.0,
+    "radius": 26.0,
+    "height": 18.0,
+    "aim_ahead": 0.0,
+    "aim_lift": 1.0,
+    "fov": 36.0
+   },
+   "orbit": null,
+   "motion": {
+    "frames": 335,
+    "max_step": 0.824,
+    "max_step_at": 18.9167,
+    "mean_step": 0.2355,
+    "max_turn": 0.8803,
+    "max_turn_at": 20.7333,
+    "over_step": 0,
+    "over_turn": 0
+   },
+   "screen": {
+    "max_px": 43.05,
+    "max_share": 0.0195,
+    "max_at": 21.1167,
+    "max_marble": 7,
+    "mean_px": 21.41
+   },
+   "finish_lead": {
+    "seconds": 1.3667,
+    "from": 19.4833,
+    "winner_crosses": 20.85,
+    "frames": 42,
+    "blocked_by": {}
+   },
+   "window": {
+    "sampled": 112,
+    "seen_share": 0.327,
+    "in_frame_mean": 1.76,
+    "in_frame_min": 0,
+    "visible_mean": 1.63,
+    "visible_min": 0,
+    "hidden_share": 0.071,
+    "px_median": 59.5,
+    "px_min": 22.6,
+    "under_min_px": 23,
+    "lost_share": 0.795,
+    "blockers": {
+     "merge": 11,
+     "orange": 3
+    }
+   },
+   "window_after": {
+    "sampled": 73,
+    "seen_share": 0.306,
+    "in_frame_mean": 1.22,
+    "in_frame_min": 0,
+    "visible_mean": 1.22,
+    "visible_min": 0,
+    "hidden_share": 0.0,
+    "px_median": 64.4,
+    "px_min": 53.4,
+    "under_min_px": 0,
+    "lost_share": 0.822,
+    "blockers": {}
+   },
+   "winner": {
+    "marble": 5,
+    "crosses": 20.85,
+    "sampled": 31,
+    "px_at_crossing": 54.9,
+    "px_median": 54.9,
+    "px_min": 26.9,
+    "off_frame": 20
+   },
+   "crossings": [
+    {
+     "place": 1,
+     "marble": 5,
+     "t": 20.85,
+     "in_frame": true,
+     "px": 54.9,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 43.9,
+     "at": [
+      500,
+      1043
+     ]
+    },
+    {
+     "place": 2,
+     "marble": 2,
+     "t": 21.1333,
+     "in_frame": true,
+     "px": 54.4,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 14.1,
+     "at": [
+      526,
+      1037
+     ]
+    },
+    {
+     "place": 3,
+     "marble": 7,
+     "t": 21.7167,
+     "in_frame": true,
+     "px": 53.0,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 55.8,
+     "at": [
+      595,
+      1048
+     ]
+    },
+    {
+     "place": 4,
+     "marble": 4,
+     "t": 22.6333,
+     "in_frame": true,
+     "px": 52.6,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 25.6,
+     "at": [
+      565,
+      1042
+     ]
+    },
+    {
+     "place": 5,
+     "marble": 1,
+     "t": 22.65,
+     "in_frame": true,
+     "px": 53.0,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 46.6,
+     "at": [
+      586,
+      1047
+     ]
+    },
+    {
+     "place": 6,
+     "marble": 6,
+     "t": 23.5,
+     "in_frame": true,
+     "px": 52.8,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 23.0,
+     "at": [
+      519,
+      1048
+     ]
+    },
+    {
+     "place": 7,
+     "marble": 3,
+     "t": 24.3167,
+     "in_frame": true,
+     "px": 53.0,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 39.0,
+     "at": [
+      504,
+      1053
+     ]
+    },
+    {
+     "place": 8,
+     "marble": 0,
+     "t": 24.4167,
+     "in_frame": true,
+     "px": 52.8,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 34.0,
+     "at": [
+      573,
+      1048
+     ]
+    }
+   ],
+   "all_eight": {
+    "crossed": 8,
+    "in_frame": 8,
+    "clear": 8,
+    "readable": 8
+   },
+   "joins": {
+    "boundaries": 7,
+    "max_jump": 0.243,
+    "hard_cuts": 0,
+    "joins": [
+     {
+      "from": "start",
+      "to": "start",
+      "jump": 0.009,
+      "drift": 0.072,
+      "swing": 9.7,
+      "travel": 5.37,
+      "shared": 8,
+      "turn": -0.687
+     },
+     {
+      "from": "start",
+      "to": "descent",
+      "jump": 0.243,
+      "drift": 0.243,
+      "swing": 18.2,
+      "travel": 11.2,
+      "shared": 1,
+      "turn": 0.813
+     },
+     {
+      "from": "descent",
+      "to": "obstacle",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 6,
+      "turn": 1.0
+     },
+     {
+      "from": "obstacle",
+      "to": "fork",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 8,
+      "turn": 1.0
+     },
+     {
+      "from": "fork",
+      "to": "branches",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 8,
+      "turn": 1.0
+     },
+     {
+      "from": "branches",
+      "to": "merge",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 7,
+      "turn": 1.0
+     },
+     {
+      "from": "merge",
+      "to": "final",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 8,
+      "turn": 1.0
+     }
+    ]
+   },
+   "terrain": {
+    "min_ground": 24.935,
+    "min_sight": 2.784,
+    "ground_ok": true,
+    "sight_ok": true
+   },
+   "discontinuities": 0,
+   "findings": []
+  },
+  "b_orbit": {
+   "candidate": "b_orbit",
+   "note": "rear chase through the winner, then an orbit onto V19's finish lens",
+   "split": 18.9,
+   "shape": {
+    "settle": 2.6834,
+    "steps": 161,
+    "parked_at": 21.5834,
+    "entry_speed": 0.8309,
+    "reach": 66.888,
+    "ratio": 2.0,
+    "aim_settle": 1.2,
+    "aim_steps": 72,
+    "aim_entry_speed": 0.2954,
+    "aim_reach": 25.514,
+    "aim_ratio": 0.834
+   },
+   "park": {
+    "bearing": 180.0,
+    "radius": 26.0,
+    "height": 18.0,
+    "aim_ahead": 0.0,
+    "aim_lift": 1.0,
+    "fov": 36.0
+   },
+   "orbit": {
+    "at": 20.9,
+    "seconds": 5.4,
+    "to": {
+     "bearing": 26.864061909318135,
+     "radius": 18.54727206060234,
+     "height": 17.2956,
+     "aim_ahead": 7.708988343253428e-15,
+     "aim_lift": 0.0,
+     "fov": 36.0
+    }
+   },
+   "motion": {
+    "frames": 335,
+    "max_step": 0.824,
+    "max_step_at": 18.9167,
+    "mean_step": 0.3811,
+    "max_turn": 0.8803,
+    "max_turn_at": 20.7333,
+    "over_step": 0,
+    "over_turn": 0
+   },
+   "screen": {
+    "max_px": 43.09,
+    "max_share": 0.0196,
+    "max_at": 21.1167,
+    "max_marble": 7,
+    "mean_px": 22.97
+   },
+   "finish_lead": {
+    "seconds": 1.3667,
+    "from": 19.4833,
+    "winner_crosses": 20.85,
+    "frames": 42,
+    "blocked_by": {}
+   },
+   "window": {
+    "sampled": 112,
+    "seen_share": 0.285,
+    "in_frame_mean": 1.54,
+    "in_frame_min": 0,
+    "visible_mean": 1.38,
+    "visible_min": 0,
+    "hidden_share": 0.105,
+    "px_median": 59.5,
+    "px_min": 22.6,
+    "under_min_px": 23,
+    "lost_share": 0.857,
+    "blockers": {
+     "merge": 11,
+     "orange": 3,
+     "final": 3,
+     "finish:gantry": 1
+    }
+   },
+   "window_after": {
+    "sampled": 73,
+    "seen_share": 0.22,
+    "in_frame_mean": 0.88,
+    "in_frame_min": 0,
+    "visible_mean": 0.82,
+    "visible_min": 0,
+    "hidden_share": 0.062,
+    "px_median": 61.8,
+    "px_min": 53.7,
+    "under_min_px": 0,
+    "lost_share": 0.918,
+    "blockers": {
+     "final": 3,
+     "finish:gantry": 1
+    }
+   },
+   "winner": {
+    "marble": 5,
+    "crosses": 20.85,
+    "sampled": 31,
+    "px_at_crossing": 54.9,
+    "px_median": 54.9,
+    "px_min": 26.9,
+    "off_frame": 20
+   },
+   "crossings": [
+    {
+     "place": 1,
+     "marble": 5,
+     "t": 20.85,
+     "in_frame": true,
+     "px": 54.9,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 43.9,
+     "at": [
+      500,
+      1043
+     ]
+    },
+    {
+     "place": 2,
+     "marble": 2,
+     "t": 21.1333,
+     "in_frame": true,
+     "px": 54.4,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 14.1,
+     "at": [
+      526,
+      1037
+     ]
+    },
+    {
+     "place": 3,
+     "marble": 7,
+     "t": 21.7167,
+     "in_frame": true,
+     "px": 53.2,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 56.5,
+     "at": [
+      595,
+      1049
+     ]
+    },
+    {
+     "place": 4,
+     "marble": 4,
+     "t": 22.6333,
+     "in_frame": true,
+     "px": 54.8,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 40.4,
+     "at": [
+      579,
+      1037
+     ]
+    },
+    {
+     "place": 5,
+     "marble": 1,
+     "t": 22.65,
+     "in_frame": true,
+     "px": 55.4,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 52.2,
+     "at": [
+      587,
+      1048
+     ]
+    },
+    {
+     "place": 6,
+     "marble": 6,
+     "t": 23.5,
+     "in_frame": true,
+     "px": 58.1,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 8.9,
+     "at": [
+      548,
+      1007
+     ]
+    },
+    {
+     "place": 7,
+     "marble": 3,
+     "t": 24.3167,
+     "in_frame": true,
+     "px": 61.6,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 21.7,
+     "at": [
+      561,
+      976
+     ]
+    },
+    {
+     "place": 8,
+     "marble": 0,
+     "t": 24.4167,
+     "in_frame": true,
+     "px": 63.3,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 48.7,
+     "at": [
+      538,
+      1028
+     ]
+    }
+   ],
+   "all_eight": {
+    "crossed": 8,
+    "in_frame": 8,
+    "clear": 8,
+    "readable": 8
+   },
+   "joins": {
+    "boundaries": 7,
+    "max_jump": 0.243,
+    "hard_cuts": 0,
+    "joins": [
+     {
+      "from": "start",
+      "to": "start",
+      "jump": 0.009,
+      "drift": 0.072,
+      "swing": 9.7,
+      "travel": 5.37,
+      "shared": 8,
+      "turn": -0.687
+     },
+     {
+      "from": "start",
+      "to": "descent",
+      "jump": 0.243,
+      "drift": 0.243,
+      "swing": 18.2,
+      "travel": 11.2,
+      "shared": 1,
+      "turn": 0.813
+     },
+     {
+      "from": "descent",
+      "to": "obstacle",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 6,
+      "turn": 1.0
+     },
+     {
+      "from": "obstacle",
+      "to": "fork",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 8,
+      "turn": 1.0
+     },
+     {
+      "from": "fork",
+      "to": "branches",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 8,
+      "turn": 1.0
+     },
+     {
+      "from": "branches",
+      "to": "merge",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 7,
+      "turn": 1.0
+     },
+     {
+      "from": "merge",
+      "to": "final",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 8,
+      "turn": 1.0
+     }
+    ]
+   },
+   "terrain": {
+    "min_ground": 25.207,
+    "min_sight": 2.784,
+    "ground_ok": true,
+    "sight_ok": true
+   },
+   "discontinuities": 0,
+   "findings": []
+  },
+  "c_v22": {
+   "candidate": "c_v22",
+   "note": "V22 as integrated: chase to replay 20.200, hard cut to V19's finish lens",
+   "split": null,
+   "shape": null,
+   "park": null,
+   "orbit": null,
+   "motion": {
+    "frames": 335,
+    "max_step": 51.1227,
+    "max_step_at": 20.2,
+    "mean_step": 0.2999,
+    "max_turn": 55.9862,
+    "max_turn_at": 20.2,
+    "over_step": 1,
+    "over_turn": 1
+   },
+   "screen": {
+    "max_px": 973.61,
+    "max_share": 0.442,
+    "max_at": 20.2,
+    "max_marble": 5,
+    "mean_px": 19.76
+   },
+   "finish_lead": {
+    "seconds": 0.6333,
+    "from": 20.2167,
+    "winner_crosses": 20.85,
+    "frames": 20,
+    "blocked_by": {}
+   },
+   "window": {
+    "sampled": 112,
+    "seen_share": 0.458,
+    "in_frame_mean": 2.46,
+    "in_frame_min": 0,
+    "visible_mean": 1.92,
+    "visible_min": 0,
+    "hidden_share": 0.221,
+    "px_median": 57.8,
+    "px_min": 22.6,
+    "under_min_px": 26,
+    "lost_share": 0.75,
+    "blockers": {
+     "merge": 40,
+     "finish:gantry": 21
+    }
+   },
+   "window_after": {
+    "sampled": 73,
+    "seen_share": 0.333,
+    "in_frame_mean": 1.33,
+    "in_frame_min": 0,
+    "visible_mean": 1.08,
+    "visible_min": 0,
+    "hidden_share": 0.186,
+    "px_median": 60.9,
+    "px_min": 52.0,
+    "under_min_px": 0,
+    "lost_share": 0.822,
+    "blockers": {
+     "finish:gantry": 18
+    }
+   },
+   "winner": {
+    "marble": 5,
+    "crosses": 20.85,
+    "sampled": 31,
+    "px_at_crossing": 67.3,
+    "px_median": 32.7,
+    "px_min": 24.7,
+    "off_frame": 0
+   },
+   "crossings": [
+    {
+     "place": 1,
+     "marble": 5,
+     "t": 20.85,
+     "in_frame": true,
+     "px": 67.3,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 47.8,
+     "at": [
+      587,
+      966
+     ]
+    },
+    {
+     "place": 2,
+     "marble": 2,
+     "t": 21.1333,
+     "in_frame": true,
+     "px": 68.5,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 50.2,
+     "at": [
+      567,
+      1002
+     ]
+    },
+    {
+     "place": 3,
+     "marble": 7,
+     "t": 21.7167,
+     "in_frame": true,
+     "px": 70.3,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 75.3,
+     "at": [
+      477,
+      1001
+     ]
+    },
+    {
+     "place": 4,
+     "marble": 4,
+     "t": 22.6333,
+     "in_frame": true,
+     "px": 72.8,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 63.6,
+     "at": [
+      526,
+      1022
+     ]
+    },
+    {
+     "place": 5,
+     "marble": 1,
+     "t": 22.65,
+     "in_frame": true,
+     "px": 72.8,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 67.6,
+     "at": [
+      489,
+      1004
+     ]
+    },
+    {
+     "place": 6,
+     "marble": 6,
+     "t": 23.5,
+     "in_frame": true,
+     "px": 74.4,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 44.8,
+     "at": [
+      575,
+      987
+     ]
+    },
+    {
+     "place": 7,
+     "marble": 3,
+     "t": 24.3167,
+     "in_frame": true,
+     "px": 76.4,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 49.9,
+     "at": [
+      589,
+      969
+     ]
+    },
+    {
+     "place": 8,
+     "marble": 0,
+     "t": 24.4167,
+     "in_frame": true,
+     "px": 77.8,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 62.1,
+     "at": [
+      508,
+      1013
+     ]
+    }
+   ],
+   "all_eight": {
+    "crossed": 8,
+    "in_frame": 8,
+    "clear": 8,
+    "readable": 8
+   },
+   "joins": {
+    "boundaries": 7,
+    "max_jump": 0.443,
+    "hard_cuts": 1,
+    "joins": [
+     {
+      "from": "start",
+      "to": "start",
+      "jump": 0.009,
+      "drift": 0.072,
+      "swing": 9.7,
+      "travel": 5.37,
+      "shared": 8,
+      "turn": -0.687
+     },
+     {
+      "from": "start",
+      "to": "descent",
+      "jump": 0.243,
+      "drift": 0.243,
+      "swing": 18.2,
+      "travel": 11.2,
+      "shared": 1,
+      "turn": 0.813
+     },
+     {
+      "from": "descent",
+      "to": "obstacle",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 6,
+      "turn": 1.0
+     },
+     {
+      "from": "obstacle",
+      "to": "fork",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 8,
+      "turn": 1.0
+     },
+     {
+      "from": "fork",
+      "to": "branches",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 8,
+      "turn": 1.0
+     },
+     {
+      "from": "branches",
+      "to": "merge",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 7,
+      "turn": 1.0
+     },
+     {
+      "from": "merge",
+      "to": "finish",
+      "jump": 0.443,
+      "drift": 0.443,
+      "swing": 56.1,
+      "travel": 51.17,
+      "shared": 1,
+      "turn": 0.162
+     }
+    ]
+   },
+   "terrain": {
+    "min_ground": 18.71,
+    "min_sight": 2.577,
+    "ground_ok": true,
+    "sight_ok": true
+   },
+   "discontinuities": 3,
+   "findings": []
+  },
+  "d_pull": {
+   "candidate": "d_pull",
+   "note": "rear chase, then a straight pull-back instead of an orbit (falsified)",
+   "split": 18.9,
+   "shape": {
+    "settle": 2.6834,
+    "steps": 161,
+    "parked_at": 21.5834,
+    "entry_speed": 0.8309,
+    "reach": 66.888,
+    "ratio": 2.0,
+    "aim_settle": 1.2,
+    "aim_steps": 72,
+    "aim_entry_speed": 0.2954,
+    "aim_reach": 25.514,
+    "aim_ratio": 0.834
+   },
+   "park": {
+    "bearing": 180.0,
+    "radius": 26.0,
+    "height": 18.0,
+    "aim_ahead": 0.0,
+    "aim_lift": 1.0,
+    "fov": 36.0
+   },
+   "orbit": {
+    "at": 20.9,
+    "seconds": 5.4,
+    "to": {
+     "bearing": 180.0,
+     "radius": 38.0,
+     "height": 26.0,
+     "aim_ahead": 0.0,
+     "aim_lift": 1.0,
+     "fov": 36.0
+    }
+   },
+   "motion": {
+    "frames": 335,
+    "max_step": 0.824,
+    "max_step_at": 18.9167,
+    "mean_step": 0.2692,
+    "max_turn": 0.8803,
+    "max_turn_at": 20.7333,
+    "over_step": 0,
+    "over_turn": 0
+   },
+   "screen": {
+    "max_px": 43.06,
+    "max_share": 0.0195,
+    "max_at": 21.1167,
+    "max_marble": 7,
+    "mean_px": 20.49
+   },
+   "finish_lead": {
+    "seconds": 1.3667,
+    "from": 19.4833,
+    "winner_crosses": 20.85,
+    "frames": 42,
+    "blocked_by": {}
+   },
+   "window": {
+    "sampled": 112,
+    "seen_share": 0.345,
+    "in_frame_mean": 1.86,
+    "in_frame_min": 0,
+    "visible_mean": 1.73,
+    "visible_min": 0,
+    "hidden_share": 0.067,
+    "px_median": 55.5,
+    "px_min": 22.6,
+    "under_min_px": 35,
+    "lost_share": 0.759,
+    "blockers": {
+     "merge": 11,
+     "orange": 3
+    }
+   },
+   "window_after": {
+    "sampled": 73,
+    "seen_share": 0.344,
+    "in_frame_mean": 1.37,
+    "in_frame_min": 0,
+    "visible_mean": 1.37,
+    "visible_min": 0,
+    "hidden_share": 0.0,
+    "px_median": 59.1,
+    "px_min": 39.5,
+    "under_min_px": 12,
+    "lost_share": 0.767,
+    "blockers": {}
+   },
+   "winner": {
+    "marble": 5,
+    "crosses": 20.85,
+    "sampled": 31,
+    "px_at_crossing": 54.9,
+    "px_median": 54.9,
+    "px_min": 26.9,
+    "off_frame": 20
+   },
+   "crossings": [
+    {
+     "place": 1,
+     "marble": 5,
+     "t": 20.85,
+     "in_frame": true,
+     "px": 54.9,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 43.9,
+     "at": [
+      500,
+      1043
+     ]
+    },
+    {
+     "place": 2,
+     "marble": 2,
+     "t": 21.1333,
+     "in_frame": true,
+     "px": 54.4,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 14.1,
+     "at": [
+      526,
+      1037
+     ]
+    },
+    {
+     "place": 3,
+     "marble": 7,
+     "t": 21.7167,
+     "in_frame": true,
+     "px": 52.6,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 55.4,
+     "at": [
+      594,
+      1048
+     ]
+    },
+    {
+     "place": 4,
+     "marble": 4,
+     "t": 22.6333,
+     "in_frame": true,
+     "px": 48.5,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 23.7,
+     "at": [
+      563,
+      1035
+     ]
+    },
+    {
+     "place": 5,
+     "marble": 1,
+     "t": 22.65,
+     "in_frame": true,
+     "px": 48.8,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 42.9,
+     "at": [
+      582,
+      1040
+     ]
+    },
+    {
+     "place": 6,
+     "marble": 6,
+     "t": 23.5,
+     "in_frame": true,
+     "px": 43.6,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 19.0,
+     "at": [
+      523,
+      1033
+     ]
+    },
+    {
+     "place": 7,
+     "marble": 3,
+     "t": 24.3167,
+     "in_frame": true,
+     "px": 39.7,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 29.2,
+     "at": [
+      513,
+      1029
+     ]
+    },
+    {
+     "place": 8,
+     "marble": 0,
+     "t": 24.4167,
+     "in_frame": true,
+     "px": 39.2,
+     "clear": true,
+     "blocker": null,
+     "gap_px": 25.2,
+     "at": [
+      564,
+      1025
+     ]
+    }
+   ],
+   "all_eight": {
+    "crossed": 8,
+    "in_frame": 8,
+    "clear": 8,
+    "readable": 5
+   },
+   "joins": {
+    "boundaries": 7,
+    "max_jump": 0.243,
+    "hard_cuts": 0,
+    "joins": [
+     {
+      "from": "start",
+      "to": "start",
+      "jump": 0.009,
+      "drift": 0.072,
+      "swing": 9.7,
+      "travel": 5.37,
+      "shared": 8,
+      "turn": -0.687
+     },
+     {
+      "from": "start",
+      "to": "descent",
+      "jump": 0.243,
+      "drift": 0.243,
+      "swing": 18.2,
+      "travel": 11.2,
+      "shared": 1,
+      "turn": 0.813
+     },
+     {
+      "from": "descent",
+      "to": "obstacle",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 6,
+      "turn": 1.0
+     },
+     {
+      "from": "obstacle",
+      "to": "fork",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 8,
+      "turn": 1.0
+     },
+     {
+      "from": "fork",
+      "to": "branches",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 8,
+      "turn": 1.0
+     },
+     {
+      "from": "branches",
+      "to": "merge",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 7,
+      "turn": 1.0
+     },
+     {
+      "from": "merge",
+      "to": "final",
+      "jump": 0.0,
+      "drift": 0.0,
+      "swing": 0.0,
+      "travel": 0.0,
+      "shared": 8,
+      "turn": 1.0
+     }
+    ]
+   },
+   "terrain": {
+    "min_ground": 24.982,
+    "min_sight": 2.784,
+    "ground_ok": true,
+    "sight_ok": true
+   },
+   "discontinuities": 0,
+   "findings": []
+  }
+ }
+}
