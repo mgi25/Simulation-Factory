@@ -289,7 +289,7 @@ def report(seed: int = 5432, edition: str = "v21") -> bool:
     trapdoor = presentation.actuator_move(replay, clock, "start.panel")
     print(f"         the floor opens at {trapdoor:.3f} s "
           f"({trapdoor - gate:.3f} s after the gates)")
-    if edition == "v21":
+    if EDITIONS[edition]["cuts"]:
         check(trapdoor is not None and trapdoor <= 2.0,
               f"the release is inside the first two seconds ({trapdoor:.3f} s)")
 

@@ -1,0 +1,265 @@
+{
+ "v19": [
+  {
+   "cut": "start",
+   "sampled": 22,
+   "in_frame_mean": 8.0,
+   "visible_mean": 7.45,
+   "hidden_share": 0.068,
+   "both_routes": 1.0,
+   "blockers": {
+    "start": 12
+   }
+  },
+  {
+   "cut": "start",
+   "sampled": 20,
+   "in_frame_mean": 6.3,
+   "visible_mean": 4.75,
+   "hidden_share": 0.246,
+   "both_routes": 0.8,
+   "blockers": {
+    "start": 31
+   }
+  },
+  {
+   "cut": "descent",
+   "sampled": 10,
+   "in_frame_mean": 7.0,
+   "visible_mean": 2.7,
+   "hidden_share": 0.614,
+   "both_routes": 0.5,
+   "blockers": {
+    "launch": 42,
+    "leg1": 1
+   }
+  },
+  {
+   "cut": "long",
+   "sampled": 12,
+   "in_frame_mean": 5.75,
+   "visible_mean": 4.5,
+   "hidden_share": 0.217,
+   "both_routes": 0.833,
+   "blockers": {
+    "leg1": 15
+   }
+  },
+  {
+   "cut": "hairpin",
+   "sampled": 11,
+   "in_frame_mean": 6.73,
+   "visible_mean": 6.36,
+   "hidden_share": 0.054,
+   "both_routes": 0.909,
+   "blockers": {
+    "leg2": 3,
+    "leg1": 1
+   }
+  },
+  {
+   "cut": "straight",
+   "sampled": 13,
+   "in_frame_mean": 6.08,
+   "visible_mean": 2.15,
+   "hidden_share": 0.646,
+   "both_routes": 0.692,
+   "blockers": {
+    "leg2": 48,
+    "obstacle": 3
+   }
+  },
+  {
+   "cut": "obstacle",
+   "sampled": 26,
+   "in_frame_mean": 7.85,
+   "visible_mean": 1.35,
+   "hidden_share": 0.828,
+   "both_routes": 0.308,
+   "blockers": {
+    "leg2": 164,
+    "obstacle": 4,
+    "leg3": 1
+   }
+  },
+  {
+   "cut": "split",
+   "sampled": 24,
+   "in_frame_mean": 5.29,
+   "visible_mean": 4.96,
+   "hidden_share": 0.063,
+   "both_routes": 1.0,
+   "blockers": {
+    "obstacle": 3,
+    "leg2": 3,
+    "orange_lead": 2
+   }
+  },
+  {
+   "cut": "branch",
+   "sampled": 14,
+   "in_frame_mean": 3.0,
+   "visible_mean": 2.36,
+   "hidden_share": 0.214,
+   "both_routes": 0.786,
+   "blockers": {
+    "orange": 6,
+    "blue": 3
+   }
+  },
+  {
+   "cut": "merge",
+   "sampled": 12,
+   "in_frame_mean": 5.08,
+   "visible_mean": 2.08,
+   "hidden_share": 0.59,
+   "both_routes": 0.417,
+   "blockers": {
+    "merge": 18,
+    "orange": 8,
+    "blue": 6,
+    "orange_lead": 2
+   }
+  },
+  {
+   "cut": "finish",
+   "sampled": 35,
+   "in_frame_mean": 1.34,
+   "visible_mean": 1.14,
+   "hidden_share": 0.149,
+   "both_routes": 0.343,
+   "blockers": {
+    "finish:gantry": 7
+   }
+  }
+ ],
+ "v212": [
+  {
+   "cut": "start",
+   "sampled": 22,
+   "in_frame_mean": 8.0,
+   "visible_mean": 7.45,
+   "hidden_share": 0.068,
+   "both_routes": 1.0,
+   "blockers": {
+    "start": 12
+   }
+  },
+  {
+   "cut": "start",
+   "sampled": 20,
+   "in_frame_mean": 6.4,
+   "visible_mean": 4.85,
+   "hidden_share": 0.242,
+   "both_routes": 0.85,
+   "blockers": {
+    "start": 31
+   }
+  },
+  {
+   "cut": "descent",
+   "sampled": 10,
+   "in_frame_mean": 7.4,
+   "visible_mean": 7.3,
+   "hidden_share": 0.014,
+   "both_routes": 1.0,
+   "blockers": {
+    "shuffle": 1
+   }
+  },
+  {
+   "cut": "long",
+   "sampled": 12,
+   "in_frame_mean": 6.17,
+   "visible_mean": 6.17,
+   "hidden_share": 0.0,
+   "both_routes": 1.0,
+   "blockers": {}
+  },
+  {
+   "cut": "hairpin",
+   "sampled": 11,
+   "in_frame_mean": 6.55,
+   "visible_mean": 5.73,
+   "hidden_share": 0.125,
+   "both_routes": 1.0,
+   "blockers": {
+    "leg2": 5,
+    "leg1": 4
+   }
+  },
+  {
+   "cut": "straight",
+   "sampled": 13,
+   "in_frame_mean": 6.31,
+   "visible_mean": 6.15,
+   "hidden_share": 0.024,
+   "both_routes": 1.0,
+   "blockers": {
+    "leg2": 1,
+    "obstacle": 1
+   }
+  },
+  {
+   "cut": "obstacle",
+   "sampled": 26,
+   "in_frame_mean": 8.0,
+   "visible_mean": 7.65,
+   "hidden_share": 0.043,
+   "both_routes": 1.0,
+   "blockers": {
+    "obstacle": 9
+   }
+  },
+  {
+   "cut": "split",
+   "sampled": 24,
+   "in_frame_mean": 7.38,
+   "visible_mean": 6.75,
+   "hidden_share": 0.085,
+   "both_routes": 1.0,
+   "blockers": {
+    "leg3": 9,
+    "orange_lead": 4,
+    "leg2": 1,
+    "obstacle": 1
+   }
+  },
+  {
+   "cut": "branch",
+   "sampled": 14,
+   "in_frame_mean": 2.86,
+   "visible_mean": 2.57,
+   "hidden_share": 0.1,
+   "both_routes": 1.0,
+   "blockers": {
+    "orange": 4
+   }
+  },
+  {
+   "cut": "merge",
+   "sampled": 12,
+   "in_frame_mean": 4.75,
+   "visible_mean": 2.75,
+   "hidden_share": 0.421,
+   "both_routes": 0.75,
+   "blockers": {
+    "merge": 20,
+    "blue_lead": 2,
+    "orange": 1,
+    "blue": 1
+   }
+  },
+  {
+   "cut": "finish",
+   "sampled": 35,
+   "in_frame_mean": 1.34,
+   "visible_mean": 1.14,
+   "hidden_share": 0.149,
+   "both_routes": 0.343,
+   "blockers": {
+    "finish:gantry": 7
+   }
+  }
+ ]
+}

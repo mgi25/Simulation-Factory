@@ -1,12 +1,17 @@
-"""V19 plus a hook, a soundtrack and three marks: the deliverable Short.
+"""A silent master plus a hook, a soundtrack and three marks: the Short.
 
     python tools/sloped_short.py --seed 5432
 
-**The master is an input, not something this rebuilds.** V19 is locked: its
-physics, replay, edit map and camera poses are all fixed, and nothing here opens
-Godot. The film is made by holding V19's first frame for 42 frames, laying three
-overlays on top and muxing a soundtrack synthesised from the same replay the
-pictures came from.
+**The master is an input, not something this rebuilds.** The physics, the seed,
+the replay and the edit map are locked, and nothing here opens Godot. The film
+is made by holding the master's first frame for 42 frames, cutting 85 frames out
+of the middle of the start, laying three overlays on top and muxing a soundtrack
+synthesised from the same replay the pictures came from.
+
+Which master is an edition's own choice. `v20` and `v211` are cut from
+`real_race_v19.mp4`; `v21`, the deliverable, is cut from
+`real_race_v21_master.mp4` - the same replay and the same edit map rendered
+through the V21.2 camera track and the V21 contrast pass. See MASTER_V21.
 
 Two files come out, because overlays and sound are separable decisions:
 
@@ -34,7 +39,8 @@ V20's two start windows become one:
 Nothing is sped up or slowed down, nothing is interpolated, no frame repeats and
 no frame runs backwards - `presentation.omit_frames` refuses a cut that does not
 step forwards, and `tests/test_sloped_retention.py` pins the rest.
-`--edition v20` still builds V20 from the same master.
+`--edition v20` still builds V20, and `--edition v211` the retention pass's
+own proof, from V19's master.
 
 Stages:
 
@@ -73,24 +79,59 @@ from sloped import overlays, presentation
 
 OUT_DIR = os.path.join("output", "sloped_race_v1")
 WORK_DIR = os.path.join(OUT_DIR, "short")
-MASTER = os.path.join(OUT_DIR, "real_race_v19.mp4")
+
+# --- the masters ------------------------------------------------------------
+#
+# Two silent masters, both of the same locked replay of seed 5432 and both cut
+# to the same edit map, so they are frame for frame the same instants of the
+# same race. They differ only in the lens and the light:
+#
+#   V19     the shipped camera track, the V20 grade. What V20 and V21.1 are
+#           cut from, and it is kept so both of them still rebuild.
+#   V21     the V21.2 camera track (`cameras.EDITS["v212"]`) under the V21
+#           contrast pass (`lab_palette.new("tower", "v21")`, which is the race
+#           scene's own default). What the delivered V21 is cut from.
+#
+# The integrated master is a *render*, not a re-encode of anything: it comes out
+# of `tools/sloped_integrate.py --stage clip` against `cameras_5432.json` solved
+# with `--edit v212`. Combining two finished films in ffmpeg would have given a
+# picture neither pass ever measured.
+MASTER_V19 = os.path.join(OUT_DIR, "real_race_v19.mp4")
+MASTER_V21 = os.path.join(OUT_DIR, "real_race_v21_master.mp4")
+
+# Kept for the callers and the tests that name the locked V19 master directly.
+MASTER = MASTER_V19
 
 # --- the editions -----------------------------------------------------------
 #
-# One machine, one locked master, two cuts of it. V20 keeps every frame; V21.1
-# drops master frames 49 to 133 inclusive - the tail of the drum in the first
-# start window and the head of the second - so the join is master frame 48
-# (replay 1.000) to master frame 134 (replay 5.833333) on the same lens, and
-# everything after it lands 85 frames earlier.
+# One machine, two masters, two cuts. V20 keeps every frame of V19's master;
+# the retention cut drops master frames 49 to 133 inclusive - the tail of the
+# drum in the first start window and the head of the second - so the join is
+# master frame 48 (replay 1.000) to master frame 134 (replay 5.833333) on the
+# same lens, and everything after it lands 85 frames earlier.
+#
+# `v211` applies that cut to V19's master, which is exactly the film the
+# retention pass delivered and is kept so its result still reproduces. `v21`
+# applies the same cut to the integrated master, and is the deliverable: the
+# same edit over the V21.2 lenses and the V21 grade.
 
 EDITIONS: dict[str, dict[str, Any]] = {
     "v20": {
+        "master": MASTER_V19,
         "cuts": (),
         "video": os.path.join(OUT_DIR, "real_race_v20.mp4"),
         "visual": os.path.join(OUT_DIR, "real_race_v20_visual.mp4"),
         "runtime": (19.8, 20.2),
     },
+    "v211": {
+        "master": MASTER_V19,
+        "cuts": ((49, 133),),
+        "video": os.path.join(OUT_DIR, "real_race_v211.mp4"),
+        "visual": os.path.join(OUT_DIR, "real_race_v211_visual.mp4"),
+        "runtime": (18.2, 18.7),
+    },
     "v21": {
+        "master": MASTER_V21,
         "cuts": ((49, 133),),
         "video": os.path.join(OUT_DIR, "real_race_v21.mp4"),
         "visual": os.path.join(OUT_DIR, "real_race_v21_visual.mp4"),
@@ -169,11 +210,12 @@ def load_all(seed: int, edition: str = DEFAULT_EDITION):
         raise ShortError(f"no such edition: {edition!r}; try {sorted(EDITIONS)}")
     replay_path = os.path.join(OUT_DIR, f"race_{seed}.json")
     track_path = os.path.join(OUT_DIR, f"cameras_{seed}.json")
-    for path in (replay_path, track_path, MASTER):
+    master = EDITIONS[edition]["master"]
+    for path in (replay_path, track_path, master):
         if not os.path.isfile(path):
             raise ShortError(f"missing input: {path}")
     replay, track, clock = presentation.load(
-        replay_path, track_path, master_frames(MASTER)
+        replay_path, track_path, master_frames(master)
     )
     clock, keep = presentation.omit_frames(clock, EDITIONS[edition]["cuts"])
     return replay, track, clock, keep
@@ -218,16 +260,25 @@ def stage_overlays(seed: int, edition: str = DEFAULT_EDITION) -> dict[str, Any]:
     replay, track, clock, keep = load_all(seed, edition)
     os.makedirs(WORK_DIR, exist_ok=True)
 
+    winner, crossed = _winner_of(replay)
+
     hook = os.path.join(WORK_DIR, "pick_one.png")
     overlays.pick_one().save(hook)
-    fact = os.path.join(WORK_DIR, "end_fact.png")
-    overlays.end_fact().save(fact)
+    # The end card carries the winning marble's own hue, read out of the replay
+    # rather than typed, so a different seed would carry a different ball.
+    fact = os.path.join(WORK_DIR, f"end_fact_{winner}.png")
+    overlays.end_fact(accent=overlays.MARBLE_HUES[winner]).save(fact)
 
-    winner, crossed = _winner_of(replay)
     start = clock.at(crossed)
     if start is None:
         raise ShortError("the winner's crossing is not in the film")
-    start += WINNER_DELAY
+    # **Snapped to a frame, so the mark opens on the frame it is placed on.**
+    # `ring_from` becomes an ffmpeg `setpts` offset in the ring stream's own
+    # 1/60 timebase; an offset that is not a whole number of ticks lands the
+    # sequence between two frames and the first one is never composited. That
+    # is the frame the flash exists for, and measured on the file it was the
+    # frame that went missing.
+    start = round((start + WINNER_DELAY) * FPS) / FPS
     ring_dir = os.path.join(WORK_DIR, f"ring_{edition}")
     if os.path.isdir(ring_dir):
         shutil.rmtree(ring_dir)
@@ -266,6 +317,7 @@ def stage_overlays(seed: int, edition: str = DEFAULT_EDITION) -> dict[str, Any]:
         "hold": clock.hold,
         "frames": clock.frames,
         "edition": edition,
+        "master": EDITIONS[edition]["master"],
         "cuts": EDITIONS[edition]["cuts"],
         "keep": keep,
         "video": EDITIONS[edition]["video"],
@@ -302,7 +354,7 @@ def stage_mux(seed: int, plan: dict[str, Any], audio_path: str) -> dict[str, str
 
     common = [
         _ffmpeg(), "-y",
-        "-i", MASTER,
+        "-i", plan["master"],
         "-loop", "1", "-framerate", str(FPS), "-i", plan["hook"],
         "-framerate", str(FPS), "-start_number", "0",
         "-i", os.path.join(plan["ring_dir"], "ring_%04d.png"),

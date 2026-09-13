@@ -1,0 +1,462 @@
+{
+ "edit": "v212",
+ "cuts": [
+  {
+   "cut": "start",
+   "from": 0.2,
+   "to": 2.3,
+   "seconds": 2.1,
+   "extent": 14.0,
+   "frames": 127,
+   "in_frame_mean": 8.0,
+   "in_frame_min": 8,
+   "coverage": 1.0,
+   "of": 8,
+   "in_play": 8.0,
+   "lost_seconds": 0.0,
+   "px_median": 73.5,
+   "px_tail": 63.6,
+   "px_max": 87.6,
+   "occupancy": 0.0201,
+   "off_centre": 0.116,
+   "camera_step": 0.0444
+  },
+  {
+   "cut": "start",
+   "from": 5.7,
+   "to": 7.62,
+   "seconds": 1.92,
+   "extent": 14.0,
+   "frames": 116,
+   "in_frame_mean": 6.36,
+   "in_frame_min": 1,
+   "coverage": 0.795,
+   "of": 8,
+   "in_play": 8.0,
+   "lost_seconds": 0.55,
+   "px_median": 76.0,
+   "px_tail": 70.0,
+   "px_max": 91.9,
+   "occupancy": 0.0402,
+   "off_centre": 0.473,
+   "camera_step": 0.0486
+  },
+  {
+   "cut": "descent",
+   "from": 7.62,
+   "to": 8.62,
+   "seconds": 1.0,
+   "extent": 15.0,
+   "frames": 60,
+   "in_frame_mean": 7.4,
+   "in_frame_min": 7,
+   "coverage": 0.925,
+   "of": 8,
+   "in_play": 8.0,
+   "lost_seconds": 0.0,
+   "px_median": 69.7,
+   "px_tail": 59.2,
+   "px_max": 100.6,
+   "occupancy": 0.5369,
+   "off_centre": 0.033,
+   "camera_step": 0.4181
+  },
+  {
+   "cut": "long",
+   "from": 8.62,
+   "to": 9.8,
+   "seconds": 1.18,
+   "extent": 20.0,
+   "frames": 71,
+   "in_frame_mean": 6.18,
+   "in_frame_min": 5,
+   "coverage": 0.773,
+   "of": 8,
+   "in_play": 8.0,
+   "lost_seconds": 0.3,
+   "px_median": 56.0,
+   "px_tail": 44.5,
+   "px_max": 71.2,
+   "occupancy": 0.1796,
+   "off_centre": 0.104,
+   "camera_step": 0.5039
+  },
+  {
+   "cut": "hairpin",
+   "from": 9.8,
+   "to": 10.8,
+   "seconds": 1.0,
+   "extent": 18.0,
+   "frames": 61,
+   "in_frame_mean": 6.54,
+   "in_frame_min": 6,
+   "coverage": 0.818,
+   "of": 8,
+   "in_play": 8.0,
+   "lost_seconds": 0.0,
+   "px_median": 58.5,
+   "px_tail": 50.9,
+   "px_max": 84.6,
+   "occupancy": 0.409,
+   "off_centre": 0.101,
+   "camera_step": 0.4206
+  },
+  {
+   "cut": "straight",
+   "from": 10.8,
+   "to": 12.0,
+   "seconds": 1.2,
+   "extent": 16.0,
+   "frames": 73,
+   "in_frame_mean": 6.22,
+   "in_frame_min": 4,
+   "coverage": 0.777,
+   "of": 8,
+   "in_play": 8.0,
+   "lost_seconds": 0.417,
+   "px_median": 71.2,
+   "px_tail": 58.7,
+   "px_max": 79.9,
+   "occupancy": 0.0958,
+   "off_centre": 0.136,
+   "camera_step": 0.4538
+  },
+  {
+   "cut": "obstacle",
+   "from": 12.0,
+   "to": 14.5,
+   "seconds": 2.5,
+   "extent": 8.0,
+   "frames": 151,
+   "in_frame_mean": 8.0,
+   "in_frame_min": 8,
+   "coverage": 1.0,
+   "of": 8,
+   "in_play": 8.0,
+   "lost_seconds": 0.0,
+   "px_median": 135.0,
+   "px_tail": 123.0,
+   "px_max": 161.7,
+   "occupancy": 0.1079,
+   "off_centre": 0.038,
+   "camera_step": 0.0555
+  },
+  {
+   "cut": "split",
+   "from": 15.35,
+   "to": 17.67,
+   "seconds": 2.32,
+   "extent": 23.0,
+   "frames": 140,
+   "in_frame_mean": 7.4,
+   "in_frame_min": 5,
+   "coverage": 0.925,
+   "of": 8,
+   "in_play": 8.0,
+   "lost_seconds": 0.033,
+   "px_median": 35.9,
+   "px_tail": 30.9,
+   "px_max": 66.4,
+   "occupancy": 0.2082,
+   "off_centre": 0.546,
+   "camera_step": 0.0757
+  },
+  {
+   "cut": "branch",
+   "from": 17.67,
+   "to": 19.07,
+   "seconds": 1.4,
+   "extent": 19.0,
+   "frames": 84,
+   "in_frame_mean": 2.85,
+   "in_frame_min": 2,
+   "coverage": 0.356,
+   "of": 8,
+   "in_play": 8.0,
+   "lost_seconds": 1.4,
+   "px_median": 49.5,
+   "px_tail": 34.1,
+   "px_max": 83.8,
+   "occupancy": 0.264,
+   "off_centre": 0.154,
+   "camera_step": 0.4956
+  },
+  {
+   "cut": "merge",
+   "from": 19.07,
+   "to": 20.2,
+   "seconds": 1.13,
+   "extent": 26.0,
+   "frames": 68,
+   "in_frame_mean": 4.68,
+   "in_frame_min": 4,
+   "coverage": 0.585,
+   "of": 8,
+   "in_play": 8.0,
+   "lost_seconds": 0.883,
+   "px_median": 39.8,
+   "px_tail": 34.2,
+   "px_max": 58.3,
+   "occupancy": 0.2276,
+   "off_centre": 0.229,
+   "camera_step": 0.295
+  },
+  {
+   "cut": "finish",
+   "from": 20.2,
+   "to": 23.6,
+   "seconds": 3.4,
+   "extent": 16.0,
+   "frames": 205,
+   "in_frame_mean": 1.34,
+   "in_frame_min": 0,
+   "coverage": 0.265,
+   "of": 8,
+   "in_play": 5.3,
+   "lost_seconds": 3.417,
+   "px_median": 60.4,
+   "px_tail": 53.6,
+   "px_max": 76.3,
+   "occupancy": 0.0,
+   "off_centre": 0.635,
+   "camera_step": 0.0591
+  }
+ ],
+ "continuity": [
+  {
+   "from": "start",
+   "to": "start",
+   "jump": 0.01,
+   "drift": 0.05,
+   "turn": 0.727,
+   "shared": 8,
+   "swing": 9.6,
+   "travel": 5.35,
+   "left": [
+    494,
+    1063
+   ],
+   "landed": [
+    507,
+    1046
+   ],
+   "in_frame": [
+    8,
+    8
+   ]
+  },
+  {
+   "from": "start",
+   "to": "descent",
+   "jump": null,
+   "drift": null,
+   "turn": 0.819,
+   "shared": 0,
+   "swing": 40.0,
+   "travel": 11.44,
+   "left": [
+    500,
+    1482
+   ],
+   "landed": [
+    564,
+    940
+   ],
+   "in_frame": [
+    1,
+    7
+   ]
+  },
+  {
+   "from": "descent",
+   "to": "long",
+   "jump": 0.096,
+   "drift": 0.459,
+   "turn": -0.157,
+   "shared": 6,
+   "swing": 97.1,
+   "travel": 39.68,
+   "left": [
+    570,
+    892
+   ],
+   "landed": [
+    642,
+    1031
+   ],
+   "in_frame": [
+    7,
+    7
+   ]
+  },
+  {
+   "from": "long",
+   "to": "hairpin",
+   "jump": 0.072,
+   "drift": 0.415,
+   "turn": -0.148,
+   "shared": 6,
+   "swing": 68.8,
+   "travel": 33.71,
+   "left": [
+    493,
+    963
+   ],
+   "landed": [
+    579,
+    802
+   ],
+   "in_frame": [
+    6,
+    7
+   ]
+  },
+  {
+   "from": "hairpin",
+   "to": "straight",
+   "jump": 0.097,
+   "drift": 0.38,
+   "turn": -0.282,
+   "shared": 5,
+   "swing": 96.5,
+   "travel": 44.47,
+   "left": [
+    655,
+    1097
+   ],
+   "landed": [
+    673,
+    1064
+   ],
+   "in_frame": [
+    7,
+    5
+   ]
+  },
+  {
+   "from": "straight",
+   "to": "obstacle",
+   "jump": 0.003,
+   "drift": 0.161,
+   "turn": 0.923,
+   "shared": 8,
+   "swing": 12.3,
+   "travel": 8.91,
+   "left": [
+    552,
+    980
+   ],
+   "landed": [
+    553,
+    973
+   ],
+   "in_frame": [
+    8,
+    8
+   ]
+  },
+  {
+   "from": "obstacle",
+   "to": "split",
+   "jump": 0.345,
+   "drift": 0.539,
+   "turn": 0.963,
+   "shared": 8,
+   "swing": 12.4,
+   "travel": 49.34,
+   "left": [
+    528,
+    1021
+   ],
+   "landed": [
+    491,
+    261
+   ],
+   "in_frame": [
+    8,
+    8
+   ]
+  },
+  {
+   "from": "split",
+   "to": "branch",
+   "jump": null,
+   "drift": null,
+   "turn": 0.969,
+   "shared": 0,
+   "swing": 22.4,
+   "travel": 10.39,
+   "left": [
+    793,
+    525
+   ],
+   "landed": [
+    580,
+    909
+   ],
+   "in_frame": [
+    5,
+    3
+   ]
+  },
+  {
+   "from": "branch",
+   "to": "merge",
+   "jump": 0.254,
+   "drift": 0.329,
+   "turn": 0.986,
+   "shared": 3,
+   "swing": 14.5,
+   "travel": 31.74,
+   "left": [
+    531,
+    1031
+   ],
+   "landed": [
+    427,
+    480
+   ],
+   "in_frame": [
+    3,
+    4
+   ]
+  },
+  {
+   "from": "merge",
+   "to": "finish",
+   "jump": 0.605,
+   "drift": 0.605,
+   "turn": 0.959,
+   "shared": 1,
+   "swing": 20.8,
+   "travel": 18.63,
+   "left": [
+    497,
+    1188
+   ],
+   "landed": [
+    113,
+    207
+   ],
+   "in_frame": [
+    5,
+    1
+   ]
+  }
+ ],
+ "problems": [
+  "start: under 75% of the field is in frame for 0.55 s at a stretch",
+  "split: the median racer is 36 px across, under the 48 a phone frame needs",
+  "split: a tenth of the racers in shot are under 31 px, which reads as scenery",
+  "branch: 2.9 of the 8.0 racers still in the race are in frame on average, so most viewers' marbles are outside it",
+  "branch: under 75% of the field is in frame for 1.40 s at a stretch",
+  "merge: the median racer is 40 px across, under the 48 a phone frame needs",
+  "merge: 4.7 of the 8.0 racers still in the race are in frame on average, so most viewers' marbles are outside it",
+  "merge: under 75% of the field is in frame for 0.88 s at a stretch",
+  "obstacle -> split: the pack moves 0.34 of the frame diagonal across the cut, from (528, 1021) to (491, 261)",
+  "merge -> finish: the pack moves 0.60 of the frame diagonal across the cut, from (497, 1188) to (113, 207)",
+  "merge: the aim is 6.1 layout units from the nearest racer, so it is not following the field",
+  "obstacle: the centre of the frame is blocked in 3 of 16 sampled frames, first at 12.83s by obstacle 13.84 units from the lens",
+  "branch: the centre of the frame is blocked in 2 of 9 sampled frames, first at 18.85s by merge 25.69 units from the lens"
+ ]
+}
