@@ -75,6 +75,7 @@ from sloped.scale import SIM_TO_LAYOUT
 __all__ = [
     "Cut",
     "SECTIONS",
+    "EDITS",
     "STATIONS",
     "progress_track",
     "build_track",
@@ -134,6 +135,45 @@ class Cut:
     # a shot standing where the ground cannot decide, and the fix is to say
     # which side the camera is on.
     side: int = 0
+    # Whether the bearing's *forward* is taken once or per frame. `side` fixes
+    # the perpendicular; this fixes the direction it is perpendicular to, and
+    # for the same reason.
+    #
+    # **The heading is the course's own tangent at the pack, and on this course
+    # it reverses.** The run-out doubles back: a marble leaving `orange` joins
+    # `merge`, which points the other way, so the tangent at the leader's place
+    # swings through about 180 degrees in the frames around the junction. The
+    # bearing is measured off that tangent, so the camera swings with it - and
+    # it swings around a 52-unit reach. Measured on V19's `merge`, which has
+    # `bearing = 6` and therefore points almost straight along the heading, the
+    # lens moved **29.7 layout units in one frame** at replay 19.32; `split`
+    # moved 2.9 a frame for 58 consecutive frames as the leader crossed the
+    # divider onto a lead whose tangent is not leg3's.
+    #
+    # Nothing before V21 could see this. `check_track` limits how fast the
+    # *aim* moves and says nothing about the lens, and the aim on both of those
+    # shots is either a fixed node or a smoothed centroid - perfectly steady
+    # while the camera flies around it.
+    #
+    # True takes the heading at the cut's own midpoint and holds it, so the
+    # bearing means one thing for the whole shot and the lens moves only as the
+    # aim, the orbit and the dolly move it.
+    fixed_heading: bool = False
+    # Which run's direction the bearing is measured from, when the leader's own
+    # is the wrong one. Empty asks the leader, which is right for a shot that
+    # follows the field and wrong for one aimed at a place.
+    #
+    # **At a junction the leader's direction is one arm of two, and the shot
+    # wants the axis both arms share.** `merge` follows the pack, and the pack
+    # there is half on blue and half on orange running thirty units apart; a
+    # bearing measured off whichever arm the leader is on puts the lens beside
+    # that route looking across the other, which is how V19's merge came to
+    # show 1.86 racers of the 4.86 it had in frame. Measured off `blue`, the
+    # bearing means the same thing for the whole shot however the lead changes.
+    #
+    # The tangent is taken at the run's sample nearest the aim and held, so it
+    # is the course's own direction there rather than a number typed in.
+    heading_run: str = ""
     orbit: tuple[float, float] = (0.0, 0.0)     # degrees of azimuth drift
     dolly: tuple[float, float] = (0.0, 0.0)     # fraction of distance
     hold: float = 0.0             # extra seconds after the station is reached
@@ -152,6 +192,8 @@ class Cut:
             "band": self.band,
             "node": self.node,
             "side": self.side,
+            "fixed_heading": self.fixed_heading,
+            "heading_run": self.heading_run,
         }
 
 
@@ -207,9 +249,19 @@ class Cut:
 # on the argument that leg 1's apex is where the course's own zig-zag is
 # legible and that wants the turn seen from outside it; the terrain check
 # settled it - see the note on that cut.
+# **Every cut here holds its heading.** `Cut.fixed_heading` defaults to False
+# so that a cut written before V21 keeps its behaviour, and every cut in *this*
+# list turns it on, because the fault it exists for is not particular to the
+# edit: on a twelve-second proof race the blocking list moved the lens 21.3
+# layout units in a frame on `start`, 20.4 on `long` and 20.2 on `straight`,
+# which `check_track` now reports.
+#
+# V18's and V19's windows each override it back to False. They are delivered
+# films and the tests reproduce them frame for frame, so they keep the
+# per-frame heading, defect and all - see `EDIT_V18`.
 SECTIONS: tuple[Cut, ...] = (
     Cut("establish", "grid", fov=30.0, extent=110.0, elevation=30.0, bearing=200.0,
-        target="node", node="hero", orbit=(-2.0, 2.0), min_seconds=0.75,
+        target="node", fixed_heading=True, node="hero", orbit=(-2.0, 2.0), min_seconds=0.75,
         # Section 39 allows half a second to a second of establishing view and
         # then wants the camera on the racers. Capped rather than left to the
         # station, which the leader does not reach until 1.9 s because the fan
@@ -221,7 +273,7 @@ SECTIONS: tuple[Cut, ...] = (
     # that reaches 4.6 back - about 14 layout units end to end. At 9.5 the
     # camera stands inside it.
     Cut("start", "launched", fov=34.0, extent=14.0, elevation=16.0, bearing=28.0,
-        target="node", node="start", orbit=(-6.0, 4.0), dolly=(0.10, -0.06),
+        target="node", fixed_heading=True, node="start", orbit=(-6.0, 4.0), dolly=(0.10, -0.06),
         min_seconds=1.4),
     # Wider and higher than a low side follow would be, because at an extent of
     # 9 and 9 degrees this shot looks straight through the mixer's housing - the
@@ -233,7 +285,7 @@ SECTIONS: tuple[Cut, ...] = (
     # them. Looking down the descent rather than across it puts the track on a
     # diagonal and the field on its floor.
     Cut("descent", "mixed", fov=36.0, extent=20.0, elevation=24.0, bearing=160.0,
-        target="pack", band=26.0, orbit=(4.0, -4.0), min_seconds=1.0),
+        target="pack", fixed_heading=True, band=26.0, orbit=(4.0, -4.0), min_seconds=1.0),
     # The last exception to the rule above, and the terrain took it away. Leg
     # 1's apex is on the inside of the zig and therefore uphill, and 62 degrees
     # cleared the flank by 1.5 units with no lift - on one particular field. On
@@ -249,14 +301,14 @@ SECTIONS: tuple[Cut, ...] = (
     # and the extent is 20 rather than 13 because it is the widest-spread the
     # field ever is: at 13 it held one racer of eight.
     Cut("long", "leg1_apex", fov=36.0, extent=20.0, elevation=18.0, bearing=22.0,
-        target="pack", band=44.0, dolly=(0.04, -0.04), min_seconds=1.2),
+        target="pack", fixed_heading=True, band=44.0, dolly=(0.04, -0.04), min_seconds=1.2),
     # An extent of 13 held two of the eight racers in frame - measured, not
     # judged, by `frame_report`. The field is spread over most of a 44-unit band
     # by the second turn and a hairpin is a shape that has to be read whole, so
     # the extent is the turn's own width and the elevation is enough to see both
     # legs of it at once.
     Cut("hairpin", "leg2_start", fov=34.0, extent=24.0, elevation=34.0, bearing=20.0,
-        target="pack", band=44.0, orbit=(-7.0, 5.0), min_seconds=1.0),
+        target="pack", fixed_heading=True, band=44.0, orbit=(-7.0, 5.0), min_seconds=1.0),
     # The last of the side-on bearings to go, and the one that showed what the
     # rule above is really about. At 118 degrees this shot needed 24 degrees of
     # lift to clear the flank it was looking across, which stood it 35 degrees
@@ -272,9 +324,9 @@ SECTIONS: tuple[Cut, ...] = (
     # the lens with the cradle open to it. Eight racers in frame and seven
     # legible. `merge` at 6 degrees works for exactly this reason.
     Cut("straight", "obstacle", fov=36.0, extent=14.0, elevation=16.0, bearing=30.0,
-        target="pack", band=52.0, dolly=(0.06, -0.05), min_seconds=1.2),
+        target="pack", fixed_heading=True, band=52.0, dolly=(0.06, -0.05), min_seconds=1.2),
     Cut("obstacle", "sweep", fov=32.0, extent=8.0, elevation=15.0, bearing=44.0,
-        target="pack", band=24.0, orbit=(-8.0, 5.0), hold=0.25, min_seconds=1.0),
+        target="pack", fixed_heading=True, band=24.0, orbit=(-8.0, 5.0), hold=0.25, min_seconds=1.0),
     # This was aimed at the authored split node, on the argument that the
     # subject of the frame is the fork itself. The frame disagreed: a fixed aim
     # on a moving field put the nearest racer 10.5 units off the aim point, and
@@ -352,7 +404,7 @@ SECTIONS: tuple[Cut, ...] = (
     # takes blue at 17.17 s, so a cut that ends at the station leaves the
     # second half of the decision to the next shot.
     Cut("split", "promontory", fov=34.0, extent=30.0, elevation=38.0, bearing=0.0,
-        target="node", node="fork", orbit=(6.0, -6.0), hold=1.6, min_seconds=1.4),
+        target="node", fixed_heading=True, node="fork", orbit=(6.0, -6.0), hold=1.6, min_seconds=1.4),
     # Higher, for the same reason as `descent`: at 15 degrees the sprint's own
     # guard rail stood between the camera and the five racers the frustum
     # arithmetic said were in frame, and the still came out empty. Closing in as
@@ -361,9 +413,9 @@ SECTIONS: tuple[Cut, ...] = (
     # by the last sprint, went from five racers in frame to one. Elevation was
     # the whole of the fix and extent was none of it.
     Cut("branch", "branch_out", fov=36.0, extent=31.0, elevation=22.0, bearing=152.0,
-        target="pack", band=48.0, dolly=(0.05, -0.05), min_seconds=1.4),
+        target="pack", fixed_heading=True, band=48.0, dolly=(0.05, -0.05), min_seconds=1.4),
     Cut("merge", "sprint", fov=34.0, extent=32.0, elevation=24.0, bearing=6.0,
-        target="pack", band=44.0, dolly=(0.05, -0.05), min_seconds=1.2),
+        target="pack", fixed_heading=True, band=44.0, dolly=(0.05, -0.05), min_seconds=1.2),
     # **Widened from 15 in V1.15, because the win was at the frame edge.** The
     # aim is the midpoint of the leading two and on the selected seed they run
     # 5.3 layout units apart, so each sits 2.65 off the aim - and the delivery
@@ -374,7 +426,7 @@ SECTIONS: tuple[Cut, ...] = (
     # leader mid-frame with the finish deck at the corner. At 24 the horizontal
     # field is 13.5 units, which holds the pair and the line they are crossing.
     Cut("finish", "line", fov=36.0, extent=24.0, elevation=20.0, bearing=155.0,
-        target="pair", orbit=(-4.0, 3.0), dolly=(0.14, -0.10), hold=1.7,
+        target="pair", fixed_heading=True, orbit=(-4.0, 3.0), dolly=(0.14, -0.10), hold=1.7,
         min_seconds=1.6),
 )
 
@@ -397,26 +449,31 @@ SECTIONS: tuple[Cut, ...] = (
 # lens holds the eight racers on the line, the edit cuts three and three
 # quarter seconds of mixing, and the same lens picks the drum up again as the
 # trapdoor goes.
+# **`"fixed_heading": False` on every window is a freeze, not a preference.**
+# `SECTIONS` turns a steady heading on for every cut; these two edits are films
+# that have been delivered and whose tracks the tests compare frame for frame,
+# so they hold the behaviour they were rendered with. V21 is where the fix
+# ships.
 EDIT_V18: tuple[tuple, ...] = (
     # **No establishing shot.** It was 0.95 s of a course 205 units away with
     # the field 14 pixels across, which is a title card rather than a race.
     # Open on the eight racers instead.
-    ("start", 0.20, 2.30, {}),
+    ("start", 0.20, 2.30, {"fixed_heading": False}),
     # The cut. `ShuffleFloor` mixes from 1.6 s to 4.6 s and settles to 5.8;
     # this drops 3.55 s of it and returns just before the floor opens at 6.10.
-    ("start", 5.70, 7.62, {}),
-    ("descent", 7.62, 8.62, {}),
-    ("long", 8.62, 9.80, {}),
-    ("hairpin", 9.80, 10.80, {}),
-    ("straight", 10.80, 12.00, {}),
+    ("start", 5.70, 7.62, {"fixed_heading": False}),
+    ("descent", 7.62, 8.62, {"fixed_heading": False}),
+    ("long", 8.62, 9.80, {"fixed_heading": False}),
+    ("hairpin", 9.80, 10.80, {"fixed_heading": False}),
+    ("straight", 10.80, 12.00, {"fixed_heading": False}),
     # The spinner corridor ran 3.37 s and is the busiest thing on the course;
     # 2.30 is enough to read it.
-    ("obstacle", 12.00, 14.50, {}),
+    ("obstacle", 12.00, 14.50, {"fixed_heading": False}),
     # V17's fork shot, unchanged: a fixed aim on the divider held over both of
     # this seed's decisions - orange at 16.07 s and blue at 17.17 s.
-    ("split", 15.35, 17.67, {}),
-    ("branch", 17.67, 19.07, {}),
-    ("merge", 19.07, 20.20, {}),
+    ("split", 15.35, 17.67, {"fixed_heading": False}),
+    ("branch", 17.67, 19.07, {"fixed_heading": False}),
+    ("merge", 19.07, 20.20, {"fixed_heading": False}),
     # **The finish, rebuilt.** V17 framed the leading pair at an extent of 24
     # because the pair straddles 5.3 layout units and a portrait frame is
     # narrow - correct, and it made the marbles small and the line distant. The
@@ -429,6 +486,7 @@ EDIT_V18: tuple[tuple, ...] = (
     # racer, so the 0.283 s between first and second and the 0.017 s between
     # fourth and fifth are both in the shot.
     ("finish", 20.20, 23.60, {
+        "fixed_heading": False,
         "extent": 13.0,
         "elevation": 12.0,
         "bearing": 170.0,
@@ -515,6 +573,7 @@ EDIT_V18: tuple[tuple, ...] = (
 # needs and closes 12% over the run-out.
 EDIT_V19: tuple[tuple, ...] = EDIT_V18[:-1] + (
     ("finish", 20.20, 23.60, {
+        "fixed_heading": False,
         "extent": 16.0,
         "elevation": 43.0,
         "bearing": 25.0,
@@ -526,7 +585,225 @@ EDIT_V19: tuple[tuple, ...] = EDIT_V18[:-1] + (
     }),
 )
 
-EDITS = {"v18": EDIT_V18, "v19": EDIT_V19}
+# V21.2 is V19's edit with every **lens** rebuilt and not one window touched.
+#
+# Same eleven entries, same replay bounds, same two omissions, same 19.15 s and
+# the same 1150 frames - so the edit map, the Clock, the soundtrack V20 built on
+# it and all three overlay windows are unchanged to the frame. Only where the
+# camera stands is new. `test_v212_keeps_v19s_edit_map` pins that.
+#
+# ## What was wrong, measured
+#
+# The review said a viewer loses their marble between about five and sixteen
+# seconds. `sloped.readability` says why, over every frame of every cut rather
+# than at a midpoint:
+#
+#     cut        px med   in frame   visible   what is in the way
+#     descent      56.9    7.0/8       2.50    launch's own shell
+#     long         54.6    5.8/8       4.75    leg1
+#     hairpin      44.6    6.6/8       6.14    -
+#     straight     84.0    6.1/8       2.25    leg2
+#     obstacle    135.9    7.9/8       1.44    leg2, in 101 of 123 samples
+#     split        33.5    5.2/8       4.93    -
+#     branch       38.7    3.0/8       2.44    orange
+#     merge        33.1    5.1/8       1.86    merge, orange, blue
+#
+# Three separate faults, none of which any check in this file could see.
+#
+# **The racers were behind the course.** A marble sits in a cradle 1.4
+# diameters below its guard rail, and six of these eleven shots were low enough
+# or side-on enough for that rail to be between the lens and the field. The
+# spinner corridor is the extreme: 7.9 racers of 8 inside the frustum and
+# **1.44 of them actually on screen**, which is exactly the review's "the
+# obstacle area is visually busy" - it is busy because the busiest thing in it
+# is the wall in front of the racers. Elevation is the fix and it is cheap:
+# `obstacle` at 38 degrees instead of 15 shows 7.62.
+#
+# **The lens was jumping mid-shot.** V19's `merge` moved 29.7 layout units in a
+# single frame, `hairpin` 23.4, its second `start` window 21.1 and `long` 20.1,
+# because the bearing is measured off the leader's own course tangent and that
+# tangent reverses at the junction and swings through the turns. Every one of
+# those is a cut nobody edited, in the middle of the weakest section of the
+# film. `Cut.fixed_heading` closes all five.
+#
+# **The late shots were framed for a spread that is mostly depth.** V1.15 set
+# `split`, `branch` and `merge` to extents of 30, 31 and 32 because "the widest
+# the pack itself spans during each cut" is about thirty layout units. It is -
+# but measured per route, the two lobes' own centroids are only **10 to 14
+# units apart**; the other twenty are the field strung out *along* the routes,
+# which a camera absorbs in depth and does not have to pay for in extent. A
+# racer is 1094/extent pixels across at the aim plane, so those three numbers
+# were spending two thirds of the frame on length.
+#
+# ## The rule the sweep found
+#
+# Bearings near 0 and near 180 - along the channel, from ahead or from behind -
+# are the ones where the cradle is open to the lens, which this file already
+# argued from two rendered frames. The V21 sweep measured it: at the spinner
+# corridor, bearing 20 shows 7.62 racers of 8 and bearing 110 shows 2.08, at
+# the same extent and the same elevation. Side-on is not a style choice on this
+# course, it is a wall.
+#
+# ## And the constraint that set four of these bearings: the line
+#
+# Every cut in this edit joins two shots of the **same instant**, so the pack's
+# direction in the world is identical either side of it - `readability` measures
+# +1.00 at all ten. Any turn the screen shows is therefore the camera having
+# crossed the line, and two of them were reversals: a first pass at V21 had the
+# field descending the frame through `descent` and climbing it through `long`
+# (cosine -0.99), and turning right out of `hairpin` and left into `straight`
+# (-0.73). A viewer tracks motion, so that is the one discontinuity a cut cannot
+# afford - and neither `jump` nor `swing` sees it, because the pack lands in the
+# same part of the frame either way.
+#
+# `side` is what fixes it, and it costs visibility, so the four middle cuts were
+# solved as a chain rather than one at a time: every (bearing, side) candidate
+# measured once for its own visibility and for the screen direction at each of
+# its ends, then the combination with the most visible racers among those whose
+# five seams all stay above -0.35. The answer is `descent` and `hairpin` on the
+# far side and `long` swung round to 70 degrees, and it spends **2.6 racers of
+# visibility across four shots** to buy it. That is the one trade in this pass
+# that goes against "racers first", and it is made because a marble you cannot
+# follow through a cut is not a marble you are following.
+EDIT_V212: tuple[tuple, ...] = (
+    # The start is the one shot V19 already framed well - 8 racers of 8 in
+    # frame at 73 px - so it keeps its lens and gains only a steady heading.
+    # Without one the second window's camera moved 21.085 units in a frame as
+    # the trapdoor opened and the leader's place jumped off the launch.
+    ("start", 0.20, 2.30, {"fixed_heading": True}),
+    ("start", 5.70, 7.62, {"fixed_heading": True}),
+    # **From ahead rather than from behind, and closer.** At bearing 160 the
+    # field is on the far side of `launch`'s own shell: 2.50 racers visible of
+    # the 7.0 in frame. Swung to 20 - looking back up the descent at the field
+    # coming on - all eight are visible in every sampled frame, and the extent
+    # comes in from 20 to 15 because the shot no longer has to hold the machine
+    # the field has just left.
+    ("descent", 7.62, 8.62, {
+        "extent": 15.0, "elevation": 24.0, "bearing": 20.0, "side": 1,
+        "fixed_heading": True, "orbit": (3.0, -3.0),
+    }),
+    # Leg 1's apex, from outside the zig and high enough to see both legs of
+    # it - which is what this cut was always meant to be and what the terrain
+    # took away in V1.15, because asking the ground per frame put the camera on
+    # whichever side was lower and then changed its mind. `side` says it once.
+    # At 40 degrees the sight line clears by 2.93 units with no lift at all.
+    ("long", 8.62, 9.80, {
+        "extent": 20.0, "elevation": 44.0, "bearing": 70.0, "side": -1,
+        "fixed_heading": True, "dolly": (0.04, -0.04),
+    }),
+    # The hairpin read better than anything else in the middle and was still
+    # 45 px. Pulled in from an extent of 24 to 18 it is 58 px with nobody lost
+    # for a single frame.
+    #
+    # **It is also the one shot in this pass that gives something up.** Its
+    # best framing shows 7.18 racers of 8; this one shows 5.73, against V19's
+    # 6.36. The difference is the side: on the near side the pack leaves the
+    # frame travelling the opposite way to how it arrives in `straight`, and
+    # the cut reverses the racers on screen at cosine -0.73. Six tenths of a
+    # racer of visibility is what that costs to fix, against 14 px of scale and
+    # a camera that no longer moves 23.4 units in a frame.
+    ("hairpin", 9.80, 10.80, {
+        "extent": 18.0, "elevation": 28.0, "bearing": 20.0, "side": 1,
+        "fixed_heading": True, "orbit": (-4.0, 3.0),
+    }),
+    # Straight on down the corridor, and 20 degrees higher. The bearing of 30
+    # was across enough of leg2 for the guard to hide 62 per cent of the field:
+    # 2.25 racers visible of the 6.0 in frame, against 6.15 here.
+    #
+    # The extent goes 14 to 16 against the grain of this whole pass, and the
+    # reason is the only one that outranks scale: at 14 the shot held 5.9 of
+    # the 8 racers and dipped under three quarters of the field for 0.47 s,
+    # which is a viewer losing their marble. 16 with a small opening dolly puts
+    # 6.15 in shot at 71 px - still half as big again as anything V19 had here
+    # in the fork half of the film.
+    ("straight", 10.80, 12.00, {
+        "extent": 16.0, "elevation": 36.0, "bearing": 0.0,
+        "fixed_heading": True, "dolly": (0.18, -0.10),
+    }),
+    # **The obstacle, which was the worst shot in the film, and the extent was
+    # never the problem.** At 8 units the racers are already 135 px across -
+    # the biggest in the film by a factor of two - and 7.9 of 8 were inside the
+    # frustum. They were behind `leg2`'s outer guard in **101 of 123 sampled
+    # frames**, which is what "the obstacle area is visually busy" turns out to
+    # mean: the busiest thing in the picture was the wall in front of the
+    # racers. Raised from 15 degrees to 38 and swung from 44 to 20, 7.65 of 8
+    # are visible and the extent does not move.
+    #
+    # Widening it was tried and is not in this list. At 7.5, 8, 9 and 10 the
+    # visible count is 7.65, 7.65, 7.62 and 7.65 - identical - so a wider frame
+    # buys nothing here and costs 27 px a racer, and the brief asked for closer.
+    ("obstacle", 12.00, 14.50, {
+        "elevation": 38.0, "bearing": 20.0,
+        "fixed_heading": True, "orbit": (-5.0, 4.0),
+    }),
+    # **The fork, as a beat rather than a wide.** The aim is still V17's fixed
+    # point on the divider - a pack aim cannot show a choice, and that argument
+    # is unchanged and still in `SECTIONS`. What is new is where the camera
+    # stands: swept over the whole azimuth at a fixed heading, 330 degrees is
+    # the one that holds the arriving leg *and* both mouths, and it holds 6.9
+    # racers of 8 against V19's 4.9 while nobody drops out of shot for a single
+    # frame - V19 lost a quarter of the field for 0.90 s.
+    #
+    # The extent is 23 rather than 30, and the dolly spends a little of it: the
+    # shot opens at an effective 25 on the pack coming down leg3 and closes at
+    # 20 on the divergence.
+    #
+    # **The dolly was twice that, and the frame edge is what stopped it.** At
+    # (0.12, -0.30) the median racer reaches 38 px, and the price is the blue
+    # mouth: projected, it slides from x=130 to x=23 over the shot and is gone
+    # by the end, so the last second of the fork shot holds one arm of two.
+    # That is the exact fault V20 recorded - "the blue lead-in leaving the
+    # frame entirely" - and no amount of racer scale is worth a fork with one
+    # road. At (0.10, -0.12) the blue mouth stays at x=103 to 131 all the way
+    # through, the racers are 36 px, and a marble on **each** route is in frame
+    # and unobstructed in every sampled frame of the shot.
+    ("split", 15.35, 17.67, {
+        "extent": 23.0, "elevation": 26.0, "bearing": 330.0,
+        "fixed_heading": True, "dolly": (0.10, -0.12), "orbit": (5.0, -5.0),
+    }),
+    # **Both routes in every frame, which is what this shot is for.** Measured
+    # by `readability.visibility_report`, a racer on each route is in frame and
+    # unobstructed in **all** sampled frames at bearing 180 and 36 degrees, and
+    # the median racer goes 38.7 px to 53.7 because the extent stops paying for
+    # the 31 units the field is strung out along the two lobes and pays only
+    # for the 10 to 14 they are apart.
+    #
+    # The dolly opens the shot 45 per cent wider than it ends it, which is the
+    # split handing over: the two streams are still close together at 17.67 and
+    # thirty units apart by 19.07.
+    ("branch", 17.67, 19.07, {
+        "extent": 19.0, "elevation": 36.0, "bearing": 180.0,
+        "fixed_heading": True, "dolly": (0.45, -0.20),
+    }),
+    # **The junction, from downstream, looking back up both arms.** The bearing
+    # is measured off `blue`'s own direction rather than the leader's, because
+    # the leader at a merge is on one arm or the other and a bearing taken off
+    # it stands the lens beside one route looking across the other - which is
+    # how V19 came to show 1.86 racers of the 4.86 it had in frame, 62 per cent
+    # of them behind a channel wall.
+    #
+    # 44 degrees is high, and it is the geometry's price: the `MergeCatch` the
+    # two arms empty into is a basin whose rim stands 1.1 units above a
+    # marble's centre, so a lens that is not looking down into it is looking at
+    # its wall. At 44 a racer on each route is in frame and clear in three
+    # quarters of the sampled frames against V19's third, and the median racer
+    # is 41 px rather than 33. The three that converge here - m5 and m7 on
+    # orange and m2 on blue, within 0.03 s of each other at replay 19.38 - are
+    # the merge this shot is about.
+    ("merge", 19.07, 20.20, {
+        "extent": 26.0, "elevation": 44.0, "bearing": 0.0,
+        "heading_run": "blue", "dolly": (0.08, -0.16),
+    }),
+    # **The finish is V19's, unchanged.** It is the strongest shot in the film
+    # and the brief says not to replace it without measured evidence of an
+    # improvement. There is none: over its own 205 frames it runs at a median
+    # 60 px with the winner 68 px at the crossing, no racer is behind anything
+    # for more than 0.12 s, and the lens moves 0.059 units a frame. Every other
+    # cut in this list was rebuilt to reach that standard, not away from it.
+    EDIT_V19[-1],
+)
+
+EDITS = {"v18": EDIT_V18, "v19": EDIT_V19, "v212": EDIT_V212}
 
 
 SMOOTH_PASSES = 14
@@ -992,6 +1269,27 @@ def build_track(
                     math.sqrt(sum(float(v) ** 2 for v in sample["v"])) * SIM_TO_LAYOUT,
                 )
 
+        # **One heading for the whole shot, where the cut asks for it.** Taken
+        # at the same midpoint the subject is chosen at, so the bearing is
+        # measured off the course direction at the moment the shot is about,
+        # and held - see `Cut.fixed_heading` for the 180-degree tangent
+        # reversal at the junction that this exists to survive.
+        if cut.heading_run and cut.heading_run in machine.runs and headings:
+            run = machine.runs[cut.heading_run]
+            anchor = aims[len(aims) // 2]
+            at = min(
+                range(len(run.sim_path)),
+                key=lambda k: math.dist(
+                    [value * SIM_TO_LAYOUT for value in run.sim_path[k]], anchor
+                ),
+            )
+            headings = [_heading_at(machine, (cut.heading_run, at))] * len(headings)
+        elif cut.fixed_heading and headings:
+            middle_step = min(
+                range(len(indices)), key=lambda step: abs(indices[step] - middle_index)
+            )
+            headings = [headings[middle_step]] * len(headings)
+
         aims = _smooth(aims, SMOOTH_PASSES)
         headings = _smooth(headings, SMOOTH_PASSES + 3)
 
@@ -1127,6 +1425,22 @@ MIN_RACERS_IN_FRAME = 2
 MIN_RACER_PIXELS = 24.0
 MAX_AIM_DRIFT = 6.0             # layout units: ten diameters off the field
 
+# How far the **lens** may move between two frames, in layout units.
+#
+# The aim limit above is not this limit. A camera stands a reach away from its
+# aim, so a bearing that turns one degree moves a lens standing fifty units out
+# by nearly a unit while the aim has not moved at all - and every fault V21
+# found was of exactly that shape: a steady aim with the camera flying around
+# it. V19's `merge` moved **29.7 units in one frame**, its `hairpin` 23.4, its
+# `long` 20.1 and its second `start` window 21.1, none of which any check in
+# this file could see.
+#
+# 1.2 is two marble diameters, or 72 layout units a second, which is faster
+# than any racer on the course and slow enough to read as a camera move. The
+# shots that were already right sit two orders of magnitude under it: V19's
+# `finish` runs at 0.059 and its `obstacle` at 0.081.
+MAX_CAMERA_STEP = 1.2
+
 
 def frame_report(
     track: dict[str, Any],
@@ -1238,6 +1552,7 @@ def check_track(track: dict[str, Any], replay: dict[str, Any] | None = None) -> 
       quantity, because a field descending at 24 layout units a second covers
       most of a diameter per frame legitimately;
     * a gap or an overlap between consecutive cuts;
+    * a lens that jumps within a shot, which is a cut nobody edited;
     * a sight line the mountain still crosses after the lift ran out of
       elevation, which is section 37's check and the one that needed the
       terrain ported to make.
@@ -1281,6 +1596,17 @@ def check_track(track: dict[str, Any], replay: dict[str, Any] | None = None) -> 
                     f"not above its aim at y={entry[5]:.2f}"
                 )
                 break
+        lens_step = 0.0
+        lens_at = 0.0
+        for a, b in zip(cut["frames"], cut["frames"][1:]):
+            moved = math.dist(a[1:4], b[1:4])
+            if moved > lens_step:
+                lens_step, lens_at = moved, b[0]
+        if lens_step > MAX_CAMERA_STEP:
+            problems.append(
+                f"{cut['name']}: the lens moves {lens_step:.3f} layout units in one "
+                f"frame at {lens_at:.2f}s, which is a cut in the middle of a shot"
+            )
         worst = 0.0
         for a, b in zip(cut["frames"], cut["frames"][1:]):
             worst = max(worst, math.dist(a[4:7], b[4:7]))
