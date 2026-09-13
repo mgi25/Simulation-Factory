@@ -405,12 +405,41 @@ func _place_from_track(seconds: float) -> void:
 	var cuts: Array = _camera_track.get("cuts", [])
 	if cuts.is_empty():
 		return
-	var chosen: Dictionary = cuts[cuts.size() - 1]
-	for cut in cuts:
-		var record: Dictionary = cut
+	var fps := float(_camera_track.get("fps", 60))
+	var half := 0.5 / maxf(fps, 1.0)
+	var index: int = cuts.size() - 1
+	for i in range(cuts.size()):
+		var record: Dictionary = cuts[i]
 		if seconds <= float(record["to"]):
-			chosen = record
+			index = i
 			break
+	# **A cut boundary can select the cut after the one the frame belongs to.**
+	# `to` is written to six decimal places and this scene's clock is
+	# `frame / fps` at full precision, so at a boundary the test above can fall
+	# through by a fraction of a microsecond. The lookup below then indexes the
+	# *next* cut from its own first row and clamps to row zero - drawing the
+	# frame after the wanted one. On a track whose cuts are cut by frame index
+	# that duplicates a frame and doubles the camera step across the join;
+	# measured on the 120-frame course preview it duplicated frames 17/18,
+	# 47/48 and 83/84, reproducibly, across independent renders.
+	#
+	# Stepping back when the wanted second is before this cut's first row undoes
+	# exactly that. The half-frame tolerance is the other half of the fix and is
+	# not slack: the row times are rounded to six places too, so a first row can
+	# be rounded *up* past the frame that belongs to it, and a step-back with no
+	# tolerance then over-corrects in the other direction. Half a frame is
+	# 8.3 ms against a rounding error of at most 0.5 us.
+	#
+	# It cannot disturb a track whose cuts are bounded by station times, because
+	# there no frame lands on a boundary: over all 1150 frames of the V21
+	# production track this changes the chosen cut **zero** times, which is what
+	# `tests/test_sloped_v22_integration.py` pins.
+	while index > 0:
+		var previous: Array = (cuts[index] as Dictionary)["frames"]
+		if previous.is_empty() or seconds >= float((previous[0] as Array)[0]) - half:
+			break
+		index -= 1
+	var chosen: Dictionary = cuts[index]
 	var rows: Array = chosen["frames"]
 	if rows.is_empty():
 		return
@@ -418,7 +447,7 @@ func _place_from_track(seconds: float) -> void:
 	# sampled at the replay rate, so at 60 fps this lands on a row exactly.
 	var first := float((rows[0] as Array)[0])
 	var at: float = (clampf(seconds, first, float((rows[rows.size() - 1] as Array)[0]))
-		- first) * float(_camera_track.get("fps", 60))
+		- first) * fps
 	var low: int = clampi(int(floor(at)), 0, rows.size() - 1)
 	var high: int = clampi(low + 1, 0, rows.size() - 1)
 	var a: Array = rows[low]

@@ -352,8 +352,8 @@ def mixing(replay: dict[str, Any], clock: Clock, gates: float | None = None) -> 
         "drum": first[3] - first[2],
         "live": max(0.0, first[3] - opened),
         "gates_replay": opened,
-        "output_from": clock.hold + first[0],
-        "output_to": clock.hold + first[1],
+        "output_from": clock.origin + first[0],
+        "output_to": clock.origin + first[1],
     }
 
 
@@ -411,7 +411,7 @@ def cut_jump(replay: dict[str, Any], clock: Clock) -> list[tuple[float, float, f
         gaps = [math.dist(near[key], far[key]) for key in near if key in far]
         if not gaps:
             continue
-        out.append((clock.hold + after[0], sum(gaps) / len(gaps), max(gaps)))
+        out.append((clock.origin + after[0], sum(gaps) / len(gaps), max(gaps)))
     return out
 
 
@@ -520,7 +520,7 @@ def _omission_pairs(clock: Clock) -> list[tuple[float, float]]:
     for before, after in zip(clock.segments, clock.segments[1:]):
         dropped = after[2] - before[3]
         if dropped > 1e-6:
-            out.append((clock.hold + after[0], dropped))
+            out.append((clock.origin + after[0], dropped))
     return out
 
 
@@ -562,7 +562,7 @@ def verify(
     #    the same instant.
     previous: float | None = None
     for frame in range(clock.master_frames):
-        shown = clock.replay_at(clock.hold + frame / fps)
+        shown = clock.replay_at(clock.origin + frame / fps)
         if shown is None:
             findings.append(f"film frame {frame} is not on the map")
             break
@@ -582,8 +582,8 @@ def verify(
             f"has {len(kept)}"
         )
     for index, master in enumerate(kept):
-        was = base.replay_at(base.hold + master / fps)
-        now = clock.replay_at(clock.hold + index / fps)
+        was = base.replay_at(base.origin + master / fps)
+        now = clock.replay_at(clock.origin + index / fps)
         if was is None or now is None or abs(was - now) > 1e-6:
             findings.append(
                 f"master frame {master} showed {was} and now shows {now}"

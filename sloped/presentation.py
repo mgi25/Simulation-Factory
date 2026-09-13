@@ -82,6 +82,31 @@ class Clock:
     no window covers is **not in the film** and has no output time at all -
     `at()` returns None for it, which is how three and a half seconds of mixing
     make no sound.
+
+    ## The two prefixes, which are not the same thing
+
+    V22 puts a course preview in front of the film, so the output clock has two
+    stretches before the master:
+
+        [0, prefix)                 the course preview
+        [prefix, prefix + hold)     the held opening frame, under PICK ONE
+        [prefix + hold, duration)   the master, through `segments`
+
+    `hold` clones the master's first frame, so the picture during it **is** a
+    replay instant and `replay_at` says which one. `prefix` is *different
+    footage* - a reverse flight over the course under its own camera track,
+    against a frozen replay - so no race instant is on screen during it,
+    `replay_at` returns None there, and `at()` never maps a replay second into
+    it. That asymmetry is the whole reason these are two fields and not one.
+
+    **`prefix` is frames, expressed in seconds.** The preview is 120 rendered
+    frames, and what it costs the output clock is 120/60 = 2.000 s exactly -
+    not the 1.9833 s its own report calls its duration, which is the span from
+    the first frame's centre to the last's. Taking the report's figure would
+    put every cue in the film 1/60 s early.
+
+    With `prefix = 0.0` every number this class returns is the one it returned
+    before V22, which is what the V21 editions still rebuild on.
     """
 
     segments: tuple[tuple[float, float, float, float], ...]
@@ -94,15 +119,32 @@ class Clock:
     # soundtrack a frame shorter than the picture, which is exactly the kind of
     # drift that shows up as a click at the end of an export.
     master_frames: int = 1150
+    # Output seconds of preview in front of everything, V22's course flight.
+    # Zero for every edition before it.
+    prefix: float = 0.0
 
     @property
     def hold_frames(self) -> int:
         return int(round(self.hold * self.fps))
 
     @property
+    def prefix_frames(self) -> int:
+        """Frames of preview in front of the held frame."""
+        return int(round(self.prefix * self.fps))
+
+    @property
+    def origin(self) -> float:
+        """Output second the master's first frame lands on.
+
+        Everything the film says about the race is measured from here, and it
+        is the one number that moves when a preview is put in front.
+        """
+        return self.prefix + self.hold
+
+    @property
     def frames(self) -> int:
-        """Frames in the finished film, held opening included."""
-        return self.hold_frames + self.master_frames
+        """Frames in the finished film, preview and held opening included."""
+        return self.prefix_frames + self.hold_frames + self.master_frames
 
     @property
     def duration(self) -> float:
@@ -113,12 +155,19 @@ class Clock:
         """Output seconds for a replay instant, or None if it was cut."""
         for out_from, out_to, replay_from, replay_to in self.segments:
             if replay_from - 1e-9 <= replay <= replay_to + 1e-9:
-                return self.hold + out_from + (replay - replay_from)
+                return self.origin + out_from + (replay - replay_from)
         return None
 
     def replay_at(self, output: float) -> float | None:
-        """The inverse: what the frame at this output second is showing."""
-        inside = output - self.hold
+        """The inverse: what the frame at this output second is showing.
+
+        None during the preview, because the preview is not showing the race:
+        it is a different camera over a frozen field, and the honest answer to
+        "which replay instant is this" there is that there is not one.
+        """
+        if output < self.prefix - 1e-9:
+            return None
+        inside = output - self.origin
         if inside < 0.0:
             # The hold shows the master's first frame, over and over.
             return self.segments[0][2]
@@ -127,22 +176,30 @@ class Clock:
                 return replay_from + (inside - out_from)
         return None
 
+    def in_preview(self, output: float) -> bool:
+        """Whether this output second is inside the course preview."""
+        return self.prefix > 0.0 and output < self.prefix - 1e-9
+
     def window(self, name_index: int) -> tuple[float, float]:
-        """One window's output span, hold included."""
+        """One window's output span, preview and hold included."""
         segment = self.segments[name_index]
-        return (self.hold + segment[0], self.hold + segment[1])
+        return (self.origin + segment[0], self.origin + segment[1])
 
 
 def load(
     replay_path: str,
     track_path: str,
     master_frames: int | None = None,
+    prefix: float = 0.0,
 ) -> tuple[dict[str, Any], dict[str, Any], Clock]:
     """The replay, the camera track and the clock that joins them.
 
     `master_frames` is the rendered master's own frame count; without it the
     renderer's rule is reproduced - frames 0 to `round(duration * fps)`
     inclusive - which is what V19 has.
+
+    `prefix` is output seconds of course preview in front of the master, which
+    is V22's and zero everywhere else. See `Clock`.
     """
     with open(replay_path, "r", encoding="utf-8") as handle:
         replay = json.load(handle)
@@ -160,7 +217,9 @@ def load(
     fps = int(track.get("fps", 60))
     if master_frames is None:
         master_frames = int(round(float(track["duration"]) * fps)) + 1
-    return replay, track, Clock(segments, fps=fps, master_frames=master_frames)
+    return replay, track, Clock(
+        segments, fps=fps, master_frames=master_frames, prefix=prefix
+    )
 
 
 # --- taking more time out of a master that is already rendered --------------
@@ -275,7 +334,8 @@ def omit_frames(
     keep.append((run_from, previous))
 
     return (
-        Clock(tuple(segments), hold=clock.hold, fps=fps, master_frames=len(kept)),
+        Clock(tuple(segments), hold=clock.hold, fps=fps,
+              master_frames=len(kept), prefix=clock.prefix),
         tuple(keep),
     )
 
@@ -495,7 +555,7 @@ def omissions(clock: Clock) -> list[tuple[float, float]]:
     for before, after in zip(clock.segments, clock.segments[1:]):
         dropped = after[2] - before[3]
         if dropped > 1e-6:
-            out.append((clock.hold + after[0], dropped))
+            out.append((clock.origin + after[0], dropped))
     return out
 
 

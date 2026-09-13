@@ -1,0 +1,398 @@
+{
+  "against": "v212",
+  "continuity": {
+    "v21": {
+      "boundaries": 10,
+      "hard_cuts": 3,
+      "joins": [
+        {
+          "from": "start",
+          "jump": 0.01,
+          "to": "start"
+        },
+        {
+          "from": "start",
+          "jump": null,
+          "to": "descent"
+        },
+        {
+          "from": "descent",
+          "jump": 0.096,
+          "to": "long"
+        },
+        {
+          "from": "long",
+          "jump": 0.072,
+          "to": "hairpin"
+        },
+        {
+          "from": "hairpin",
+          "jump": 0.097,
+          "to": "straight"
+        },
+        {
+          "from": "straight",
+          "jump": 0.003,
+          "to": "obstacle"
+        },
+        {
+          "from": "obstacle",
+          "jump": 0.345,
+          "to": "split"
+        },
+        {
+          "from": "split",
+          "jump": null,
+          "to": "branch"
+        },
+        {
+          "from": "branch",
+          "jump": 0.254,
+          "to": "merge"
+        },
+        {
+          "from": "merge",
+          "jump": 0.605,
+          "to": "finish"
+        }
+      ],
+      "max_jump": 0.605,
+      "mean_jump": 0.1852,
+      "measured": 8
+    },
+    "v22": {
+      "boundaries": 7,
+      "hard_cuts": 1,
+      "joins": [
+        {
+          "from": "start",
+          "jump": 0.009,
+          "to": "start"
+        },
+        {
+          "from": "start",
+          "jump": 0.243,
+          "to": "descent"
+        },
+        {
+          "from": "descent",
+          "jump": 0.0,
+          "to": "obstacle"
+        },
+        {
+          "from": "obstacle",
+          "jump": 0.0,
+          "to": "fork"
+        },
+        {
+          "from": "fork",
+          "jump": 0.0,
+          "to": "branches"
+        },
+        {
+          "from": "branches",
+          "jump": 0.0,
+          "to": "merge"
+        },
+        {
+          "from": "merge",
+          "jump": 0.443,
+          "to": "finish"
+        }
+      ],
+      "max_jump": 0.443,
+      "mean_jump": 0.0993,
+      "measured": 7
+    }
+  },
+  "film": {
+    "frames": 1383,
+    "hold_frames": 42,
+    "omissions": [
+      {
+        "at": 4.4,
+        "dropped": 3.933333
+      }
+    ],
+    "omitted": 3.933333,
+    "phases": 8,
+    "preview_frames": 120,
+    "preview_seconds": 2.0,
+    "race_frames": 1221,
+    "replay_covered": 20.333667,
+    "runtime": 23.05,
+    "v21_frames": 1107,
+    "v21_runtime": 18.45
+  },
+  "findings": [],
+  "phases": {
+    "branches": {
+      "v21": {
+        "ahead_share": 0.167,
+        "ahead_units": 9.6,
+        "both_routes": 1.0,
+        "camera_step": 0.496,
+        "hidden_share": 0.1,
+        "in_frame": 2.83,
+        "px_median": 49.3,
+        "seconds": 1.4,
+        "visible": 2.57
+      },
+      "v21_cuts": [
+        "branch"
+      ],
+      "v22": {
+        "ahead_share": 0.25,
+        "ahead_units": 34.5,
+        "both_routes": 1.0,
+        "camera_step": 0.631,
+        "hidden_share": 0.017,
+        "in_frame": 7.04,
+        "px_median": 34.0,
+        "seconds": 1.683,
+        "visible": 7.0
+      },
+      "v22_cuts": [
+        "branches"
+      ]
+    },
+    "finish": {
+      "v21": {
+        "ahead_share": 0.208,
+        "ahead_units": 13.4,
+        "both_routes": 0.343,
+        "camera_step": 0.059,
+        "hidden_share": 0.149,
+        "in_frame": 1.35,
+        "px_median": 60.4,
+        "seconds": 3.4,
+        "visible": 1.14
+      },
+      "v21_cuts": [
+        "finish"
+      ],
+      "v22": {
+        "ahead_share": 0.208,
+        "ahead_units": 11.5,
+        "both_routes": 0.302,
+        "camera_step": 0.06,
+        "hidden_share": 0.161,
+        "in_frame": 1.41,
+        "px_median": 60.2,
+        "seconds": 4.267,
+        "visible": 1.21
+      },
+      "v22_cuts": [
+        "finish"
+      ]
+    },
+    "first descent": {
+      "v21": {
+        "ahead_share": 0.014,
+        "ahead_units": 0.7,
+        "both_routes": 1.0,
+        "camera_step": 0.504,
+        "hidden_share": 0.046,
+        "in_frame": 6.67,
+        "px_median": 61.1,
+        "seconds": 3.18,
+        "visible": 6.37
+      },
+      "v21_cuts": [
+        "descent",
+        "long",
+        "hairpin"
+      ],
+      "v22": {
+        "ahead_share": 0.375,
+        "ahead_units": 17.2,
+        "both_routes": 1.0,
+        "camera_step": 0.558,
+        "hidden_share": 0.113,
+        "in_frame": 7.58,
+        "px_median": 48.0,
+        "seconds": 2.047,
+        "visible": 6.76
+      },
+      "v22_cuts": [
+        "descent"
+      ]
+    },
+    "fork": {
+      "v21": {
+        "ahead_share": 0.083,
+        "ahead_units": 3.8,
+        "both_routes": 1.0,
+        "camera_step": 0.076,
+        "hidden_share": 0.085,
+        "in_frame": 7.41,
+        "px_median": 35.9,
+        "seconds": 2.32,
+        "visible": 6.75
+      },
+      "v21_cuts": [
+        "split"
+      ],
+      "v22": {
+        "ahead_share": 0.417,
+        "ahead_units": 21.1,
+        "both_routes": 1.0,
+        "camera_step": 0.463,
+        "hidden_share": 0.059,
+        "in_frame": 8.0,
+        "px_median": 47.8,
+        "seconds": 1.633,
+        "visible": 7.53
+      },
+      "v22_cuts": [
+        "fork"
+      ]
+    },
+    "merge": {
+      "v21": {
+        "ahead_share": 0.333,
+        "ahead_units": 15.3,
+        "both_routes": 0.75,
+        "camera_step": 0.295,
+        "hidden_share": 0.421,
+        "in_frame": 4.68,
+        "px_median": 39.7,
+        "seconds": 1.13,
+        "visible": 2.75
+      },
+      "v21_cuts": [
+        "merge"
+      ],
+      "v22": {
+        "ahead_share": 0.208,
+        "ahead_units": 10.5,
+        "both_routes": 0.667,
+        "camera_step": 0.832,
+        "hidden_share": 0.191,
+        "in_frame": 6.13,
+        "px_median": 28.4,
+        "seconds": 1.783,
+        "visible": 4.94
+      },
+      "v22_cuts": [
+        "merge"
+      ]
+    },
+    "obstacle": {
+      "v21": {
+        "ahead_share": 0.062,
+        "ahead_units": 2.8,
+        "both_routes": 1.0,
+        "camera_step": 0.454,
+        "hidden_share": 0.037,
+        "in_frame": 7.42,
+        "px_median": 114.0,
+        "seconds": 3.7,
+        "visible": 7.15
+      },
+      "v21_cuts": [
+        "straight",
+        "obstacle"
+      ],
+      "v22": {
+        "ahead_share": 0.458,
+        "ahead_units": 36.4,
+        "both_routes": 1.0,
+        "camera_step": 0.669,
+        "hidden_share": 0.124,
+        "in_frame": 7.3,
+        "px_median": 69.2,
+        "seconds": 5.433,
+        "visible": 6.4
+      },
+      "v22_cuts": [
+        "obstacle"
+      ]
+    },
+    "opening / start": {
+      "v21": {
+        "ahead_share": 0.0,
+        "ahead_units": 0.0,
+        "both_routes": 0.929,
+        "camera_step": 0.049,
+        "hidden_share": 0.151,
+        "in_frame": 7.24,
+        "px_median": 74.6,
+        "seconds": 4.02,
+        "visible": 6.21
+      },
+      "v21_cuts": [
+        "start"
+      ],
+      "v22": {
+        "ahead_share": 0.448,
+        "ahead_units": 39.2,
+        "both_routes": 0.972,
+        "camera_step": 0.87,
+        "hidden_share": 0.166,
+        "in_frame": 7.38,
+        "px_median": 75.1,
+        "seconds": 3.487,
+        "visible": 6.3
+      },
+      "v22_cuts": [
+        "start"
+      ]
+    }
+  },
+  "preview": {
+    "duration": 1.9833,
+    "end_elevation": 16.0,
+    "end_reach": 25.186,
+    "frames": 120,
+    "landmarks": {
+      "branches": {
+        "seconds": 0.7,
+        "seen": true
+      },
+      "finish": {
+        "seconds": 2.0,
+        "seen": true
+      },
+      "fork": {
+        "seconds": 1.533,
+        "seen": true
+      },
+      "merge": {
+        "seconds": 0.617,
+        "seen": true
+      },
+      "mixer": {
+        "seconds": 0.817,
+        "seen": true
+      },
+      "obstacle": {
+        "seconds": 0.467,
+        "seen": true
+      },
+      "start": {
+        "seconds": 0.7,
+        "seen": true
+      },
+      "turns": {
+        "seconds": 0.567,
+        "seen": true
+      }
+    },
+    "landmarks_seen": 8,
+    "max_across_step": 0.3895,
+    "max_aim_step": 1.7898,
+    "max_pitch": 0.8002,
+    "max_rise_step": 0.8763,
+    "max_step": 1.588,
+    "max_turn": 1.0436,
+    "max_yaw": 0.8956,
+    "mean_step": 0.8386,
+    "mean_turn": 0.4318,
+    "mean_visible_fraction": 0.4538,
+    "min_sight_clearance": 3.675,
+    "min_visible_fraction": 0.0625,
+    "problems": []
+  },
+  "seed": 5432
+}

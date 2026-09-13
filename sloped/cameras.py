@@ -803,7 +803,86 @@ EDIT_V212: tuple[tuple, ...] = (
     EDIT_V19[-1],
 )
 
-EDITS = {"v18": EDIT_V18, "v19": EDIT_V19, "v212": EDIT_V212}
+# V22 is V21.2's eleven lenses with **four window edges moved and nothing else
+# touched**, which is what `tools/sloped_v22_pacing.py` recommended. Deriving it
+# from `EDIT_V212` rather than retyping it is the point: every lens, bearing,
+# side, dolly and orbit in the film is still the one V21.2 measured, and this
+# list is only about how much replay time each shot is given.
+#
+#     start    2.300 -> 1.900     the mixing dial, at the frame churn falls
+#                                 through the floor. 1.583 s of live mixing
+#                                 instead of V21's 0.683, and 13 of the drum's
+#                                 15 hits instead of 7
+#     start    5.700 -> 5.833333  the same trim V21.1 made as a frame cut, made
+#                                 here as a window edge instead, so the V22
+#                                 master is rendered with it rather than cut
+#                                 after the fact. One omission, one whoosh
+#     obstacle 14.500 -> 15.350   RESTORED. The single highest-churn stretch
+#                                 the film omitted: 5.03 rising to 9.28, and
+#                                 the leader's own escape into leg3 at 14.9958
+#     finish   23.600 -> 24.467   RESTORED. 7th and 8th cross at 24.3167 and
+#                                 24.4167; V21 stopped while two were running
+#
+# The middle nine windows are V21.2's to the microsecond. Note that the chase
+# track does not consume the middle of this list at all - `chase_camera.
+# _bookends` takes only the `start` and `finish` entries - so what this plan is
+# *for* is the two bookends, plus a spectator-camera V22 to measure against.
+# **The first start window opens swung round from where it closes, and that is
+# the course preview's handoff, not a framing change.** The chase stands at
+# `chase_camera.START_BEARING` = 230, round behind the machine; the preview's
+# reverse dolly arrives down the corridor's own axis, and the two are 32 degrees
+# apart in azimuth about a subject 25 layout units away. Something has to spend
+# that angle. Spent inside the preview's tail it is a 1.9 degrees-a-frame pan -
+# nearly twice what `course_preview` allows - because the preview has 120 frames
+# and is decelerating into the join. Spent by the live start shot instead it is
+# 40 degrees over 1.7 s, which is **0.39 degrees a frame**, and it happens under
+# the gates opening rather than under a still frame.
+#
+# It is close to free, and that was measured rather than assumed: swept from -6
+# to -42, the start shot holds **8 racers of 8 at 72 px at every setting**, its
+# own worst lens step *falls* slightly (0.870 to 0.844 layout units a frame),
+# and `chase_camera.check_chase` returns no findings at any of them. What moves
+# is the preview, which goes from one failing check to clean and from 32% of the
+# course ribbon in frame to 45%.
+#
+# Only the *first* window takes it. The second start window is the trapdoor, it
+# is on the far side of the omission, and it keeps the lens V21.2 proved.
+V22_START_ORBIT = (-36.0, 4.0)
+
+_V22_WINDOWS = {
+    ("start", 0.20): 1.900,
+    ("start", 5.70): (5.833333, 7.620),
+    ("obstacle", 12.00): 15.350,
+    ("finish", 20.20): 24.467,
+}
+
+
+def _v22_edit(plan: tuple[tuple, ...]) -> tuple[tuple, ...]:
+    """V21.2's plan with the four V22 edges moved, everything else identical.
+
+    Plus the opening orbit on the first start window - see `V22_START_ORBIT`.
+    """
+    out: list[tuple] = []
+    starts = 0
+    for entry in plan:
+        name, low, high = entry[0], float(entry[1]), float(entry[2])
+        moved = _V22_WINDOWS.get((name, round(low, 2)))
+        if isinstance(moved, tuple):
+            low, high = moved
+        elif moved is not None:
+            high = float(moved)
+        overrides = dict(entry[3]) if len(entry) > 3 else {}
+        if name == "start":
+            starts += 1
+            if starts == 1:
+                overrides["orbit"] = V22_START_ORBIT
+        out.append((name, low, high, overrides))
+    return tuple(out)
+
+
+EDIT_V22: tuple[tuple, ...] = _v22_edit(EDIT_V212)
+
+EDITS = {"v18": EDIT_V18, "v19": EDIT_V19, "v212": EDIT_V212, "v22": EDIT_V22}
 
 
 SMOOTH_PASSES = 14

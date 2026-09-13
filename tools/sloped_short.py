@@ -98,6 +98,11 @@ WORK_DIR = os.path.join(OUT_DIR, "short")
 # picture neither pass ever measured.
 MASTER_V19 = os.path.join(OUT_DIR, "real_race_v19.mp4")
 MASTER_V21 = os.path.join(OUT_DIR, "real_race_v21_master.mp4")
+# V22 renders two silent pieces rather than one: the race, to the V22 edit map,
+# and the course preview, which is its own footage over a frozen field. See
+# `tools/sloped_v22.py` and `sloped/v22.py`.
+MASTER_V22 = os.path.join(OUT_DIR, "v22", "race_master.mp4")
+PREVIEW_V22 = os.path.join(OUT_DIR, "v22", "preview_master.mp4")
 
 # Kept for the callers and the tests that name the locked V19 master directly.
 MASTER = MASTER_V19
@@ -136,6 +141,26 @@ EDITIONS: dict[str, dict[str, Any]] = {
         "video": os.path.join(OUT_DIR, "real_race_v21.mp4"),
         "visual": os.path.join(OUT_DIR, "real_race_v21_visual.mp4"),
         "runtime": (18.2, 18.7),
+    },
+    # **V22 has no cuts, because its master is rendered to the edit it wants.**
+    # V21.1 took 85 frames out of a finished file because the mixing it wanted
+    # back was already rendered and the obstacle it wanted back was not. V22
+    # re-renders, so Candidate A's start, the restored obstacle and the extended
+    # finish are all window bounds in `cameras.EDITS["v22"]` - and a master cut
+    # after the fact would only be able to take time away again.
+    #
+    # What is new is the preview: 120 frames of different footage in front of
+    # everything, joined by `concat` rather than by an overlay, and carried in
+    # the clock as `prefix`. See `sloped.presentation.Clock`.
+    "v22": {
+        "master": MASTER_V22,
+        "preview": PREVIEW_V22,
+        "cuts": (),
+        "video": os.path.join(OUT_DIR, "real_race_v22.mp4"),
+        "visual": os.path.join(OUT_DIR, "real_race_v22_visual.mp4"),
+        "silent": os.path.join(OUT_DIR, "real_race_v22_master.mp4"),
+        "track": os.path.join(OUT_DIR, "cameras_v22_{seed}.json"),
+        "runtime": (22.8, 23.3),
     },
 }
 DEFAULT_EDITION = "v21"
@@ -209,13 +234,25 @@ def load_all(seed: int, edition: str = DEFAULT_EDITION):
     if edition not in EDITIONS:
         raise ShortError(f"no such edition: {edition!r}; try {sorted(EDITIONS)}")
     replay_path = os.path.join(OUT_DIR, f"race_{seed}.json")
-    track_path = os.path.join(OUT_DIR, f"cameras_{seed}.json")
+    track_path = EDITIONS[edition].get(
+        "track", os.path.join(OUT_DIR, "cameras_{seed}.json")
+    ).format(seed=seed)
     master = EDITIONS[edition]["master"]
+    preview = EDITIONS[edition].get("preview")
     for path in (replay_path, track_path, master):
         if not os.path.isfile(path):
             raise ShortError(f"missing input: {path}")
+    # **The preview's cost to the clock is its frame count over the rate.** Not
+    # the 1.9833 s its own report calls its duration, which is the span of its
+    # frame centres; 120 frames hold the screen for 2.000 s and everything in
+    # the film after them is placed from that. See `sloped.v22`.
+    prefix = 0.0
+    if preview:
+        if not os.path.isfile(preview):
+            raise ShortError(f"missing input: {preview}")
+        prefix = master_frames(preview) / float(FPS)
     replay, track, clock = presentation.load(
-        replay_path, track_path, master_frames(master)
+        replay_path, track_path, master_frames(master), prefix=prefix
     )
     clock, keep = presentation.omit_frames(clock, EDITIONS[edition]["cuts"])
     return replay, track, clock, keep
@@ -315,6 +352,9 @@ def stage_overlays(seed: int, edition: str = DEFAULT_EDITION) -> dict[str, Any]:
         "winner": winner,
         "duration": clock.duration,
         "hold": clock.hold,
+        "prefix": clock.prefix,
+        "preview": EDITIONS[edition].get("preview"),
+        "silent": EDITIONS[edition].get("silent"),
         "frames": clock.frames,
         "edition": edition,
         "master": EDITIONS[edition]["master"],
@@ -334,18 +374,49 @@ def _winner_of(replay: dict[str, Any]) -> tuple[int, float]:
 
 def stage_mux(seed: int, plan: dict[str, Any], audio_path: str) -> dict[str, str]:
     hold = plan["hold"]
+    prefix = plan.get("prefix", 0.0)
+    preview = plan.get("preview")
     ring_from = plan["ring_from"]
     ring_seconds = plan["ring_frames"] / FPS
     fact_from = plan["duration"] - END_FACT_SECONDS
 
+    # **The hook's times are offsets into the held frame, not into the file.**
+    # They were written when the held frame was the first thing in the film, and
+    # for every edition before V22 it still is - `prefix` is zero and these are
+    # the numbers they have always been. With a course preview in front, PICK
+    # ONE belongs over the *start*, so it moves with the hold rather than
+    # staying at second zero, and the preview plays clean.
+    hook_in = prefix + PICK_ONE_IN
+    hook_out_from = prefix + PICK_ONE_OUT_FROM
+    hook_out_to = prefix + PICK_ONE_OUT_TO
+
     video = plan["video"]
     visual = plan["visual"]
-    graph = (
+    silent = plan.get("silent")
+
+    # The base picture: the master, cut if this edition cuts, held at its first
+    # frame, and with the preview joined on the front if this edition has one.
+    # `concat` rather than an overlay because the preview is *different footage*
+    # occupying its own frames, and rather than a second encode because a join
+    # made in the filter graph never re-compresses what it joins.
+    base = (
         f"[0:v]{_select(plan['cuts'])}"
-        f"tpad=start_duration={hold}:start_mode=clone,setpts=PTS-STARTPTS[base];"
-        f"[1:v]format=rgba,fade=t=in:st={PICK_ONE_IN}:d=0.18:alpha=1,"
-        f"fade=t=out:st={PICK_ONE_OUT_FROM}:d={PICK_ONE_OUT_TO - PICK_ONE_OUT_FROM}:alpha=1[hook];"
-        f"[base][hook]overlay=0:0:enable='between(t,0,{PICK_ONE_OUT_TO})'[v1];"
+        f"tpad=start_duration={hold}:start_mode=clone,setpts=PTS-STARTPTS"
+    )
+    if preview:
+        base += (
+            ",format=yuv420p,setsar=1[race];"
+            f"[{_PREVIEW_INPUT}:v]format=yuv420p,setsar=1,setpts=PTS-STARTPTS[pre];"
+            "[pre][race]concat=n=2:v=1:a=0[base];"
+        )
+    else:
+        base += "[base];"
+
+    graph = (
+        base
+        + f"[1:v]format=rgba,fade=t=in:st={hook_in}:d=0.18:alpha=1,"
+        f"fade=t=out:st={hook_out_from}:d={PICK_ONE_OUT_TO - PICK_ONE_OUT_FROM}:alpha=1[hook];"
+        f"[base][hook]overlay=0:0:enable='between(t,{prefix},{hook_out_to})'[v1];"
         f"[2:v]format=rgba,setpts=PTS-STARTPTS+{ring_from}/TB[ring];"
         f"[v1][ring]overlay=0:0:enable='between(t,{ring_from},{ring_from + ring_seconds})'[v2];"
         f"[3:v]format=rgba,fade=t=in:st=0:d=0.20:alpha=1[fact];"
@@ -360,6 +431,8 @@ def stage_mux(seed: int, plan: dict[str, Any], audio_path: str) -> dict[str, str
         "-i", os.path.join(plan["ring_dir"], "ring_%04d.png"),
         "-loop", "1", "-framerate", str(FPS), "-i", plan["fact"],
     ]
+    if preview:
+        common += ["-i", preview]
     encode = [
         "-c:v", "libx264", "-preset", VIDEO_PRESET, "-crf", str(VIDEO_CRF),
         "-pix_fmt", "yuv420p", "-movflags", "+faststart",
@@ -367,18 +440,45 @@ def stage_mux(seed: int, plan: dict[str, Any], audio_path: str) -> dict[str, str
     ]
 
     os.makedirs(os.path.dirname(os.path.abspath(visual)), exist_ok=True)
+    written = []
+    if silent:
+        # The integrated presentation master: the whole picture, joined and
+        # held, with no mark on it and no sound. What a reviewer watches to see
+        # the camera work without anything drawn over it.
+        #
+        # **Its own graph, because a filter output may be used once.** `[base]`
+        # is consumed by the hook overlay, so mapping it as well as the overlay
+        # chain's end is "Output with label 'base' does not exist in any defined
+        # filter graph, or was already used elsewhere". Splitting it instead
+        # would leave an unused branch on the two passes that do overlay, which
+        # ffmpeg rejects for the same reason from the other side. The inputs are
+        # the same list so every index in `base` still means what it says.
+        _run(common + ["-filter_complex", base, "-map", "[base]", "-an", *encode, silent],
+             "encode the silent integrated master")
+        written.append(silent)
     _run(common + ["-filter_complex", graph, "-map", "[vout]", "-an", *encode, visual],
          "encode the silent visual cut")
+    written.append(visual)
     _run(
         common + ["-i", audio_path, "-filter_complex", graph, "-map", "[vout]",
-                  "-map", "4:a", *encode,
+                  "-map", f"{_audio_input(plan)}:a", *encode,
                   "-c:a", "aac", "-b:a", AUDIO_BITRATE, "-ar", str(SAMPLE_RATE),
                   "-shortest", video],
         "encode the Short",
     )
-    for path in (visual, video):
+    written.append(video)
+    for path in written:
         print(f"video: {path}  {os.path.getsize(path) / (1024 * 1024):.1f} MiB")
-    return {"video": video, "visual": visual}
+    return {"video": video, "visual": visual, "silent": silent or ""}
+
+
+# The four picture inputs are fixed; the preview, when there is one, is the
+# fifth, and the soundtrack lands after whatever is there.
+_PREVIEW_INPUT = 4
+
+
+def _audio_input(plan: dict[str, Any]) -> int:
+    return 5 if plan.get("preview") else 4
 
 
 def main(argv: Sequence[str] | None = None) -> int:

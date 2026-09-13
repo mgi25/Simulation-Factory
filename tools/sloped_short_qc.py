@@ -101,13 +101,20 @@ def _mpdecimate_frames(path: str) -> int | None:
     return kept
 
 
-def _hold_is_static(path: str, hold_frames: int) -> tuple[bool, str]:
+def _hold_is_static(path: str, hold_frames: int, offset: int = 0) -> tuple[bool, str]:
     """Is the held opening one picture, judged below the text?
 
     Compares frame 2 with frame `hold_frames - 2` over the rows under y 560,
     which is below PICK ONE and its shadow and above nothing else that moves.
     Whole frames cannot be compared because the hook fades in and out over the
     hold, which is the point of it.
+
+    `offset` is where the held frames start, which is no longer frame zero:
+    V22 puts a 120-frame course preview in front of the hold, and that preview
+    is moving footage by design. Measured against frames 2 and 40 of the V22
+    file - which are preview frames - this check reported a mean difference of
+    66.3 and 99.9% of pixels moved, which is a correct reading of the wrong two
+    frames.
     """
     import numpy as np
     from PIL import Image
@@ -115,7 +122,7 @@ def _hold_is_static(path: str, hold_frames: int) -> tuple[bool, str]:
     scratch = os.path.join(OUT_DIR, "short", "qc")
     os.makedirs(scratch, exist_ok=True)
     grabbed = []
-    for index in (2, max(3, hold_frames - 2)):
+    for index in (offset + 2, offset + max(3, hold_frames - 2)):
         out = os.path.join(scratch, f"hold_{index:04d}.png")
         subprocess.run(
             [shutil.which("ffmpeg"), "-v", "error", "-y", "-i", path,
@@ -267,7 +274,7 @@ def report(seed: int = 5432, edition: str = "v21") -> bool:
     # The hold itself, checked where the text is not: PICK ONE occupies y 247 to
     # 436, so below y 560 the held frames must be pixel-identical to each other
     # and to the master's own first frame.
-    same, detail = _hold_is_static(VIDEO, hold_frames)
+    same, detail = _hold_is_static(VIDEO, hold_frames, clock.prefix_frames)
     check(same, detail)
 
     print("overlays, against measured marble positions")
@@ -279,9 +286,14 @@ def report(seed: int = 5432, edition: str = "v21") -> bool:
           f"{min(photo):.2f} s dead heat")
     check(ring_from > clock.at(crossings[0][0]),
           "the winner's mark starts only after the winner has crossed")
+    # **The hook's deadline moves with the hold, not with the file.** PICK ONE
+    # is on screen over the held frame, wherever that now sits: on V22 it fades
+    # out at the preview's end plus 0.80 s, and comparing the gates against a
+    # bare 0.80 would be comparing them against a moment inside the preview.
+    hook_gone = clock.prefix + 0.80
     gate = presentation.actuator_move(replay, clock, "start.paddle")
-    check(gate is not None and gate > 0.80,
-          f"the hook is gone by 0.80 s; the gates first move at {gate:.3f} s")
+    check(gate is not None and gate > hook_gone,
+          f"the hook is gone by {hook_gone:.2f} s; the gates first move at {gate:.3f} s")
 
     # **The retention claim, measured rather than asserted.** The floor drops
     # when `start.panel` first moves, and after it the field never stops going

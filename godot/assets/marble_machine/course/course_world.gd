@@ -394,7 +394,22 @@ static func _dusk_band(root: Node3D, palette) -> void:
 			Geometry.rounded_box(Vector3(150.0, 30.0, 8.0), 8.0, 2),
 			palette.get_material("lit_dusk_band"), "Band%d" % index, false)
 		slab.position = _polar(bearing, 880.0, -78.0)
-		slab.look_at(Vector3(0.0, -78.0, 0.0), Vector3.UP)
+		# **Turned to face the origin by a yaw, not by `look_at`.**
+		#
+		# `look_at` reads the node's *global* transform, and every node here is
+		# still detached: `build` makes `root` with `Node3D.new()` and returns
+		# it, so nothing in this file is in the tree when it is posed. Godot
+		# printed an error for each of these nine slabs and left them all at
+		# the identity - facing bearing 0 - which is why the warm horizon band
+		# has been edge-on over most of its arc since before V21.
+		#
+		# The yaw is exact rather than an approximation of what `look_at` meant.
+		# `_polar(b, r, y)` puts the slab at `(sin b * r, y, cos b * r)` and the
+		# target is `(0, y, 0)`, so the aim is horizontal and `look_at` would
+		# have pointed -Z at `(-sin b, 0, -cos b)`. A yaw of `b` about Y sends
+		# +Z to `(sin b, 0, cos b)`, which is the same orientation, and it needs
+		# no tree. `_clouds` below has posed its slabs this way all along.
+		slab.rotation.y = deg_to_rad(bearing)
 		group.add_child(slab)
 
 
