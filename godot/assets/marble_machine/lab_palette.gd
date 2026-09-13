@@ -601,6 +601,16 @@ func _retune(material: StandardMaterial3D, spec: Dictionary) -> void:
 		material.emission = Color(str(spec["emission"]))
 	if spec.has("backlight"):
 		material.backlight = Color(str(spec["backlight"]))
+	# **Alpha is opt-in, and it is the one field that also changes the blend.**
+	# The note above says a transparent albedo keeps its alpha, and that is
+	# still true of every row that does not name one: this is for a surface
+	# whose whole job is to be thin, and setting a fraction there without
+	# putting the material on the alpha path would silently do nothing.
+	if spec.has("alpha"):
+		var faded := material.albedo_color
+		faded.a = float(spec["alpha"])
+		material.albedo_color = faded
+		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 
 
 func _build(key: String) -> StandardMaterial3D:
@@ -932,6 +942,37 @@ func _build(key: String) -> StandardMaterial3D:
 			return _matte("#2A2A20", 0.95)
 		"slope_boulder":
 			return _matte("#212A36", 0.94)
+
+		# --- V23 WORLD -----------------------------------------------------
+		#
+		# Two surfaces the shipped profiles do not name, added for the V23
+		# environment and inert until one does.
+		#
+		# **`haze_vapour` exists because `cloud_bank` cannot be lifted.**
+		# `cloud_bank` is `_matte`, which is right for a slab under the horizon
+		# that only ever contributes a dark value, and wrong the moment the
+		# slab is raised into the sky - up there the raking world key and the
+		# warm alpenglow both reach it and turn it into a bright painted blob
+		# with a hard rounded edge. The environment lab hit exactly that on its
+		# first lift, in every direction, in the top left of the start frame.
+		# So a raised bank is unshaded, so no light reaches it; alpha, so the
+		# range behind shows through; and depth-write off, so two overlapping
+		# banks accumulate rather than clip each other. The alpha is meant to
+		# be small and the stack is meant to do the work - a bank strong enough
+		# to read on its own reads as a lozenge, not as air.
+		"haze_vapour":
+			var vapour := StandardMaterial3D.new()
+			vapour.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			vapour.albedo_color = Color("#8FAEC8")
+			vapour.albedo_color.a = 0.07
+			vapour.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			vapour.cull_mode = BaseMaterial3D.CULL_DISABLED
+			vapour.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+			return vapour
+		# A thin lit edge on a far crest. Low albedo and a modest energy: it
+		# has to survive three hundred units of haze and do nothing at thirty.
+		"lit_crest_line":
+			return _emissive("#5FE4FF", 2.4, 0.55)
 	push_error("lab_palette: unknown material key '%s'" % key)
 	return _moulded("#FF00FF", 0.5, 0.0)
 

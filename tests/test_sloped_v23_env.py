@@ -85,14 +85,23 @@ def read(path: str) -> str:
 
 
 def test_the_lab_changed_no_production_file():
-    """Every path this branch touches against origin/main is a lab file.
+    """Every path the environment-direction lab commit touched is a lab file.
 
-    The brief asks for additive prototype work and says that any change to a
-    production render file has to be isolated and documented. The strongest
+    The brief asked for additive prototype work and said that any change to a
+    production render file had to be isolated and documented. The strongest
     form of that is no change at all, and this is where that is checked rather
     than asserted - including the four files it would have been most natural to
     edit: `course_world.gd`, `course_terrain.gd`, `course_dressing.gd` and
     `course_scene.gd`.
+
+    Scoped to the lab's own commit rather than to the whole branch. On the
+    lab branch the two were the same thing; on `v23-integration` they are not,
+    because the environment *system* deliberately rewrites `course_world.gd`
+    and `course_scene.gd`. Widening this to the branch would either fail on a
+    legitimate integration or have to whitelist those files, and both of those
+    stop it from saying anything about the lab. So it asks the narrower
+    question that is still true and still worth asking: the art lab that
+    answered the direction question paid for itself in lab files only.
     """
     def git(*args: str) -> str | None:
         try:
@@ -102,19 +111,17 @@ def test_the_lab_changed_no_production_file():
             return None
         return done.stdout if done.returncode == 0 else None
 
-    # The committed half and the working-tree half, so this test says the same
-    # thing before the branch is committed and after it is pushed. `--porcelain`
-    # lines are "XY path"; a rename carries "old -> new" and both sides count.
-    committed = git("diff", "--name-only", "origin/main...HEAD")
-    if committed is None:  # pragma: no cover
-        pytest.skip("git is unavailable or origin/main is not fetched")
-    working = git("status", "--porcelain", "--untracked-files=all") or ""
-    changed = {line.strip() for line in committed.splitlines() if line.strip()}
-    for line in working.splitlines():
-        if len(line) > 3:
-            for part in line[3:].strip().strip('"').split(" -> "):
-                changed.add(part.strip().strip('"'))
-    assert changed, "expected this branch to differ from origin/main"
+    # The commit that introduced the lab's own entry point, wherever it sits in
+    # history - the cherry-pick onto the integration branch rewrote its sha.
+    found = git("log", "--diff-filter=A", "--format=%H", "-1", "--",
+                "tools/sloped_v23_env.py")
+    if not found or not found.strip():  # pragma: no cover
+        pytest.skip("git is unavailable, or the lab commit is not in history")
+    listing = git("show", "--name-only", "--format=", found.strip())
+    if listing is None:  # pragma: no cover
+        pytest.skip("git is unavailable")
+    changed = {line.strip() for line in listing.splitlines() if line.strip()}
+    assert changed, "expected the lab commit to touch files"
     code = {one for one in changed if not one.startswith(LAB_ARTEFACTS)}
     assert code <= LAB_FILES, (
         "the V23 lab must be additive; these are not lab files: "

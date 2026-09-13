@@ -248,7 +248,7 @@ static func validate(profile: Dictionary) -> Array:
 static func describe(profile: Dictionary) -> String:
 	var backdrop: Dictionary = profile.get("backdrop", {})
 	var counted := 0
-	for layer in ["near_range", "mid_range", "far_range"]:
+	for layer in ["near_range", "ridge_range", "mid_range", "far_range"]:
 		counted += masses_of(backdrop.get(layer, {})).size()
 	var scatter: Array = (profile.get("terrain", {}) as Dictionary) \
 		.get("scatter", [])

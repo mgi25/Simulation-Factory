@@ -1,0 +1,584 @@
+{
+  "id": "aurora_valley",
+  "title": "Aurora Valley",
+  "family": "valley",
+  "summary": "cold alpine dusk over a dark cool valley; one gold pocket at the finish and the only warm light on the course at the fork",
+  "extends": "alpine_neon",
+  "sky": {
+    "top": "#050A1E",
+    "horizon": "#1E4C6E",
+    "curve": 0.1,
+    "ground_bottom": "#1B2C40",
+    "ground_horizon": "#2B4763",
+    "ground_curve": 0.22,
+    "sun_angle_max": 3.0,
+    "sun_curve": 0.12
+  },
+  "grade": {
+    "background_energy": 0.52,
+    "ambient_energy": 0.75,
+    "exposure": 0.81,
+    "white": 12.0,
+    "contrast": 1.04,
+    "saturation": 1.3,
+    "brightness": 1.0,
+    "ambient_sky_contribution": 0.45,
+    "ambient_colour": "#3A5C80"
+  },
+  "fog": {
+    "colour": "#1D3D5C",
+    "energy": 0.6,
+    "sun_scatter": 0.04,
+    "density": 0.0034,
+    "sky_affect": 0.38,
+    "aerial_perspective": 0.92,
+    "height": -26.0,
+    "height_density": 0.055
+  },
+  "glow": {
+    "intensity": 0.85,
+    "bloom": 0.16,
+    "hdr_threshold": 1.4
+  },
+  "lights": {
+    "Key": {
+      "colour": "#FFF0DC",
+      "energy": 2.85
+    },
+    "WorldKey": {
+      "colour": "#BFE0FF",
+      "energy": 2.0
+    },
+    "WorldFill": {
+      "colour": "#4478B4",
+      "energy": 0.78
+    },
+    "WorldWarm": {
+      "colour": "#FFAE62",
+      "energy": 0.9,
+      "rotation": [
+        -14.0,
+        52.0,
+        0.0
+      ]
+    },
+    "Rim": {
+      "colour": "#6FE7FF",
+      "energy": 1.65,
+      "specular": 2.55
+    },
+    "ValleyBounce": {
+      "colour": "#3D86B8",
+      "energy": 0.55
+    }
+  },
+  "backdrop": {
+    "near_range": {
+      "base_y": -62.0,
+      "masses": [
+        [
+          168.0,
+          214.0,
+          118.0,
+          59.8,
+          3
+        ],
+        [
+          188.0,
+          206.0,
+          126.0,
+          62.4,
+          11
+        ],
+        [
+          208.0,
+          210.0,
+          124.0,
+          62.4,
+          19
+        ],
+        [
+          228.0,
+          218.0,
+          120.0,
+          59.8,
+          27
+        ],
+        [
+          248.0,
+          232.0,
+          112.0,
+          57.2,
+          35
+        ],
+        [
+          140.0,
+          246.0,
+          110.0,
+          59.8,
+          43
+        ],
+        [
+          272.0,
+          250.0,
+          108.0,
+          57.2,
+          51
+        ],
+        [
+          112.0,
+          272.0,
+          104.0,
+          57.2,
+          59
+        ],
+        [
+          300.0,
+          276.0,
+          106.0,
+          57.2,
+          67
+        ],
+        [
+          84.0,
+          300.0,
+          100.0,
+          54.6,
+          75
+        ],
+        [
+          330.0,
+          304.0,
+          100.0,
+          54.6,
+          83
+        ],
+        [
+          20.0,
+          330.0,
+          96.0,
+          54.6,
+          91
+        ]
+      ]
+    },
+    "ridge_range": {
+      "base_y": -88.0,
+      "facets": 28,
+      "tiers": 14,
+      "taper": 0.32,
+      "materials": [
+        "rock_soft_near",
+        "rock_soft_mid"
+      ],
+      "masses": [
+        [
+          150.0,
+          126.0,
+          52.0,
+          30.0,
+          101
+        ],
+        [
+          176.0,
+          118.0,
+          60.0,
+          34.0,
+          109
+        ],
+        [
+          200.0,
+          132.0,
+          56.0,
+          32.0,
+          117
+        ],
+        [
+          224.0,
+          122.0,
+          62.0,
+          35.0,
+          125
+        ],
+        [
+          248.0,
+          140.0,
+          50.0,
+          29.0,
+          133
+        ],
+        [
+          128.0,
+          152.0,
+          46.0,
+          27.0,
+          141
+        ],
+        [
+          272.0,
+          158.0,
+          44.0,
+          26.0,
+          149
+        ]
+      ]
+    },
+    "mid_range": {
+      "base_y": -106.0,
+      "masses": [
+        [
+          160.0,
+          372.0,
+          158.4,
+          114.7,
+          5
+        ],
+        [
+          182.0,
+          358.0,
+          169.4,
+          120.9,
+          13
+        ],
+        [
+          202.0,
+          350.0,
+          173.8,
+          124.0,
+          21
+        ],
+        [
+          222.0,
+          362.0,
+          167.2,
+          120.9,
+          29
+        ],
+        [
+          242.0,
+          380.0,
+          156.2,
+          114.7,
+          37
+        ],
+        [
+          130.0,
+          404.0,
+          149.6,
+          111.6,
+          45
+        ],
+        [
+          268.0,
+          408.0,
+          147.4,
+          111.6,
+          53
+        ],
+        [
+          100.0,
+          436.0,
+          143.0,
+          108.5,
+          61
+        ],
+        [
+          298.0,
+          440.0,
+          143.0,
+          108.5,
+          69
+        ],
+        [
+          40.0,
+          470.0,
+          136.4,
+          105.4,
+          77
+        ],
+        [
+          336.0,
+          474.0,
+          136.4,
+          105.4,
+          85
+        ]
+      ]
+    },
+    "far_range": {
+      "base_y": -150.0,
+      "masses": [
+        [
+          176.0,
+          596.0,
+          221.8,
+          197.2,
+          7
+        ],
+        [
+          200.0,
+          580.0,
+          233.6,
+          204.0,
+          15
+        ],
+        [
+          224.0,
+          600.0,
+          219.5,
+          197.2,
+          23
+        ],
+        [
+          150.0,
+          634.0,
+          205.3,
+          190.4,
+          31
+        ],
+        [
+          252.0,
+          640.0,
+          205.3,
+          190.4,
+          39
+        ],
+        [
+          120.0,
+          686.0,
+          195.9,
+          183.6,
+          47
+        ],
+        [
+          282.0,
+          690.0,
+          195.9,
+          183.6,
+          55
+        ],
+        [
+          60.0,
+          740.0,
+          186.4,
+          176.8,
+          63
+        ],
+        [
+          320.0,
+          744.0,
+          186.4,
+          176.8,
+          71
+        ]
+      ]
+    },
+    "dusk_band": {
+      "base_y": 18.0,
+      "radius": 560.0,
+      "bearing_from": 150.0,
+      "bearing_step": 11.0,
+      "size": [
+        150.0,
+        20.0,
+        8.0
+      ],
+      "count": 9
+    },
+    "clouds": {
+      "material": "haze_vapour",
+      "count": 0,
+      "bearing_from": 120.0,
+      "bearing_step": 13.0,
+      "radius": 380.0,
+      "radius_step": 70.0,
+      "radius_cycle": 3,
+      "base_y": 34.0,
+      "drop_step": 14.0,
+      "drop_cycle": 4,
+      "size": [
+        300.0,
+        10.0,
+        50.0
+      ],
+      "round": 3.0
+    },
+    "crest_lines": {
+      "material": "lit_crest_line",
+      "count": 9,
+      "bearing_from": 150.0,
+      "bearing_step": 16.0,
+      "radius": 420.0,
+      "radius_step": 70.0,
+      "radius_cycle": 3,
+      "base_y": 26.0,
+      "lift_step": 11.0,
+      "lift_cycle": 4,
+      "size": [
+        300.0,
+        8.0,
+        4.0
+      ],
+      "round": 1.6,
+      "tilt": 0.06
+    },
+    "aurora": {
+      "bearing_from": 140.0,
+      "bearing_step": 25.0,
+      "tier_bearing": 13.0,
+      "radius": 520.0,
+      "radius_step": 50.0,
+      "rise": 24.0,
+      "size": [
+        50.0,
+        170.0,
+        6.0
+      ],
+      "round": 14.0,
+      "lean": 0.09,
+      "tiers": [
+        {
+          "colour": "#4FE3FF",
+          "base_y": 92.0,
+          "energy": 0.34,
+          "alpha": 0.3,
+          "count": 5
+        },
+        {
+          "colour": "#8C7CFF",
+          "base_y": 124.0,
+          "energy": 0.24,
+          "alpha": 0.3,
+          "count": 4
+        }
+      ]
+    },
+    "mist": {
+      "colour": "#A8C6DE",
+      "alpha": 0.075,
+      "decks": 6,
+      "top": -44.0,
+      "step": 12.0,
+      "offset": 30.0,
+      "reach": 26.0,
+      "at_x": 15.0,
+      "at_z": 6.0
+    }
+  },
+  "palette": {
+    "slope_cliff": {
+      "albedo": "#202B3D"
+    },
+    "slope_rock": {
+      "albedo": "#253346"
+    },
+    "slope_earth": {
+      "albedo": "#2F415F"
+    },
+    "slope_scree": {
+      "albedo": "#2A3C59"
+    },
+    "slope_cap": {
+      "albedo": "#29384F"
+    },
+    "slope_boulder": {
+      "albedo": "#202B3C"
+    },
+    "slope_moss": {
+      "albedo": "#1B3028"
+    },
+    "scrub_dark": {
+      "albedo": "#1A2923"
+    },
+    "scrub_dry": {
+      "albedo": "#212D2D"
+    },
+    "rock_soft_near": {
+      "albedo": "#141F32"
+    },
+    "rock_soft_mid": {
+      "albedo": "#1A2C42"
+    },
+    "rock_soft_far": {
+      "albedo": "#1F3852"
+    },
+    "rock_soft_haze": {
+      "albedo": "#244460"
+    },
+    "cloud_bank": {
+      "albedo": "#2E5A80"
+    },
+    "haze_vapour": {
+      "albedo": "#7FA8C8",
+      "alpha": 0.04
+    },
+    "far_structure": {
+      "albedo": "#4C6B8C"
+    },
+    "lit_crest_line": {
+      "albedo": "#123542",
+      "emission": "#5FE4FF",
+      "energy": 2.4
+    },
+    "lit_dusk_band": {
+      "albedo": "#1B3444",
+      "emission": "#5FA8D8",
+      "energy": 1.2
+    },
+    "lit_valley": {
+      "albedo": "#3A2313",
+      "emission": "#FFA451",
+      "energy": 4.2
+    },
+    "lit_far_window_hero": {
+      "albedo": "#20323E",
+      "emission": "#BFE6FF",
+      "energy": 1.9
+    }
+  },
+  "zones": {
+    "start": {
+      "colour": "#6BE9FF",
+      "energy": 3.0,
+      "range": 10.0
+    },
+    "mix": {
+      "colour": "#9E7BFF",
+      "energy": 3.0,
+      "range": 9.0
+    },
+    "obstacle": {
+      "colour": "#FF8A38",
+      "energy": 3.4,
+      "range": 10.5
+    },
+    "split": {
+      "colour": "#FF9A4E",
+      "energy": 3.2,
+      "range": 10.5
+    },
+    "merge": {
+      "colour": "#FFC168",
+      "energy": 3.0,
+      "range": 9.5
+    },
+    "finish": {
+      "colour": "#FFC46A",
+      "energy": 4.2,
+      "range": 18.0
+    }
+  },
+  "contrast": {
+    "v21": {
+      "grade": null,
+      "fog": null,
+      "glow": null,
+      "lights": null,
+      "ssao": {
+        "radius": 0.7,
+        "intensity": 2.7,
+        "light_affect": 0.22
+      }
+    }
+  }
+}

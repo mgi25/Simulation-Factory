@@ -1,4 +1,10 @@
 {
   "default": "alpine_neon",
-  "profiles": ["alpine_neon", "canyon_dusk", "glow_valley", "mono_readability"]
+  "profiles": [
+    "alpine_neon",
+    "canyon_dusk",
+    "glow_valley",
+    "mono_readability",
+    "aurora_valley"
+  ]
 }

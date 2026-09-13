@@ -228,7 +228,7 @@ def describe(profile: dict[str, Any]) -> str:
     backdrop = profile.get("backdrop", {})
     masses = sum(
         len(masses_of(backdrop.get(layer, {})))
-        for layer in ("near_range", "mid_range", "far_range")
+        for layer in ("near_range", "ridge_range", "mid_range", "far_range")
     )
     rocks = sum(
         int(entry.get("count", 0))

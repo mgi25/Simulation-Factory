@@ -50,6 +50,15 @@ RETUNE_FIELDS = {"albedo", "roughness", "metallic", "specular", "clearcoat",
                  "clearcoat_roughness", "energy", "rim", "rim_tint",
                  "emission", "backlight"}
 
+#: Fields `_retune` applies for a caller that is *not* a machine pass. The
+#: applier is shared by three: the V21 contrast retune, the machine passes, and
+#: an `EnvironmentProfile`'s surface table. `alpha` belongs to the third - V23's
+#: raised haze banks have to be thin, and a fraction there would do nothing
+#: without also putting the material on the alpha blend path. No machine pass
+#: may set it, which `test_every_field_a_pass_sets_is_a_field_the_applier_knows`
+#: already enforces by checking a pass against `RETUNE_FIELDS` alone.
+OTHER_CALLER_FIELDS = {"alpha"}
+
 #: How a surface answers a light, as opposed to what colour it is. V21 set
 #: these and a machine pass does not get to move them.
 RESPONSE_FIELDS = {"roughness", "clearcoat", "clearcoat_roughness"}
@@ -269,10 +278,10 @@ def test_every_field_a_pass_sets_is_a_field_the_applier_knows(name, key, spec):
 
 
 def test_the_applier_handles_every_field_the_passes_use():
-    """The other direction: a field the tables never use is dead applier."""
+    """The other direction: a field no caller ever uses is dead applier."""
     body = PALETTE.split("func _retune(")[1].split("\nfunc ")[0]
     handled = set(re.findall(r'spec\.has\("([a-z_]+)"\)', body))
-    assert handled == RETUNE_FIELDS
+    assert handled == RETUNE_FIELDS | OTHER_CALLER_FIELDS
     used = {field for _n, _k, spec in ALL_ROWS for field in spec}
     assert used <= handled
 
@@ -322,9 +331,20 @@ def test_no_pass_reaches_the_environment(name, key, spec):
 
 
 def test_no_pass_reaches_the_light_rig_or_the_grade():
-    """`build_lights` and `build_environment` take the *contrast* pass only."""
-    assert "World.build_environment(_no_glow, _contrast)" in COURSE_SCENE
-    assert "World.build_lights(self, _contrast)" in COURSE_SCENE
+    """`build_lights` and `build_environment` never take the *machine* pass.
+
+    V23 integration gave both calls a second passenger, the resolved
+    `EnvironmentProfile` -- that one is *supposed* to reach the sky and the
+    light rig, it is what an environment profile is for. The claim this test
+    makes is the machine half: a machine colour pass paints the machine and
+    stops there, so `_machine` appears in neither call.
+    """
+    for call in ("World.build_environment(", "World.build_lights("):
+        start = COURSE_SCENE.index(call)
+        args = COURSE_SCENE[start:COURSE_SCENE.index(")", start)]
+        assert "_contrast" in args, "%s lost the contrast pass" % call
+        assert "_machine" not in args, (
+            "%s takes the machine pass; a pass must not reach the world" % call)
 
 
 # --- each pass's own claims ------------------------------------------------

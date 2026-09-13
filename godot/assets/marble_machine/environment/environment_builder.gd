@@ -68,6 +68,15 @@ static func environment(profile: Dictionary, no_glow := false) -> Environment:
 		str(sky_cfg.get("ground_horizon", "#444444")))
 	sky_material.ground_curve = float(sky_cfg.get("ground_curve", 0.28))
 	sky_material.sun_angle_max = float(sky_cfg.get("sun_angle_max", 46.0))
+	# **The halo's falloff, and the property is left alone unless asked for.**
+	# Assigning the engine's documented default here instead was not neutral -
+	# it moved two of three V22.1 probe frames - so the only safe form is not to
+	# touch it at all for a profile that does not name it. `aurora_valley` is
+	# the first to: six directional lights mean six halos, and at a wide
+	# `sun_angle_max` they merge into a pale mass across the top of every wide
+	# frame.
+	if sky_cfg.has("sun_curve"):
+		sky_material.sun_curve = float(sky_cfg["sun_curve"])
 	sky_material.energy_multiplier = float(sky_cfg.get("energy", 1.0))
 
 	var sky := Sky.new()
@@ -82,6 +91,21 @@ static func environment(profile: Dictionary, no_glow := false) -> Environment:
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
 	env.ambient_light_sky_contribution = float(
 		grade.get("ambient_sky_contribution", 1.0))
+	# **The ambient floor a dark sky cannot supply.** Ambient is sampled from
+	# the sky, and `ambient_sky_contribution` says how much of it is. At the
+	# shipped 1.0 that is the whole of it, which is fine for a profile whose
+	# sky is bright - and it silently fails for one whose sky is not. Under a
+	# near-black dusk the sample is near-black too, so every surface the key
+	# does not reach renders at zero however high `ambient_energy` goes: a
+	# multiple of nothing. The V23 integration found this as a massif that was
+	# a flat black hole in front of a lit mountain range, and found it the hard
+	# way, by raising ambient fourfold and measuring no change at all.
+	#
+	# Left untouched unless a profile names it, for the same reason as
+	# `sun_curve` above: writing a default that is believed to be the engine's
+	# is a guess, and not writing it at all is not.
+	if grade.has("ambient_colour"):
+		env.ambient_light_color = Color(str(grade["ambient_colour"]))
 	env.ambient_light_energy = float(grade.get("ambient_energy", 0.4))
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
 	env.tonemap_mode = TONEMAP.get(str(grade.get("tonemap", "aces")),
@@ -193,11 +217,23 @@ static func backdrop(palette, profile: Dictionary) -> Node3D:
 	root.name = "World"
 	var cfg: Dictionary = profile.get("backdrop", {})
 	_range(root, palette, cfg.get("near_range", {}), "NearRange")
+	# **A fourth range, in the gap the world file leaves empty.** The near
+	# terrain fades to the valley floor by a radius of 94 units and the nearest
+	# distant mass stands at 210. Between them is eighty units of nothing, and
+	# it is the band a viewer reads "how big is this" from - the one place a
+	# silhouette can sit and be unambiguously *between* the machine and the
+	# mountains. Empty for every profile that does not author masses for it, so
+	# it is the same `_range` the other three are and it draws nothing by
+	# default.
+	_range(root, palette, cfg.get("ridge_range", {}), "RidgeRange")
 	_range(root, palette, cfg.get("mid_range", {}), "MidRange")
 	_range(root, palette, cfg.get("far_range", {}), "FarRange")
 	_landmarks(root, palette, cfg.get("structures", {}))
 	_band(root, palette, cfg.get("dusk_band", {}))
 	_clouds(root, palette, cfg.get("clouds", {}))
+	_crests(root, palette, cfg.get("crest_lines", {}))
+	_curtains(root, cfg.get("aurora", {}))
+	_mist(root, cfg.get("mist", {}))
 	assign_layer(root)
 	return root
 
@@ -323,6 +359,175 @@ static func _clouds(root: Node3D, palette, cfg: Dictionary) -> void:
 				- float(cfg.get("drop_step", 14.0)) * float(index % drop_cycle))
 		slab.rotation.y = deg_to_rad(-bearing)
 		group.add_child(slab)
+
+
+static func _curtains(root: Node3D, cfg: Dictionary) -> void:
+	## Cold light in the upper sky, behind the ranges and above them.
+	##
+	## Sited by a rule the brief states: cyan and violet belong to the *upper*
+	## areas of the frame. High above the far range and behind it means the
+	## only shots that see them are the ones whose camera is tilted up - the
+	## course preview's opening and the wide descents - which are exactly the
+	## frames that had nothing but flat sky in their top third. It stays out of
+	## the racing shots, which is the point: an aurora that appeared behind the
+	## marbles would be a bright stripe competing with them.
+	##
+	## **Curtains, not bands.** The environment lab built this first as fifteen
+	## horizontal slabs 210 wide and 62 tall. Each was faint; together they
+	## tiled the upper sky into a solid pale ceiling with a scalloped edge where
+	## the rounded boxes met, and it was the worst artefact in the lab. An
+	## aurora is a set of tall narrow ribbons with gaps between them, so these
+	## are turned ninety degrees and spread wide enough that no two overlap from
+	## any camera on the course. A ribbon that is mostly gap cannot become a
+	## ceiling however many of them there are.
+	##
+	## **`emission` survives an albedo alpha of zero.** In the unshaded path the
+	## emission term is added after the alpha the blend uses, so an "invisible
+	## albedo, faint emission" curtain is in fact a fully opaque glow. The alpha
+	## here is real and the energy is low.
+	var tiers: Array = cfg.get("tiers", [])
+	if tiers.is_empty():
+		return
+	var group := Node3D.new()
+	group.name = "Aurora"
+	root.add_child(group)
+	var size: Array = cfg.get("size", [26.0, 150.0, 5.0])
+	for tier in tiers.size():
+		var entry: Dictionary = tiers[tier]
+		var hue := Color(str(entry.get("colour", "#4FE3FF")))
+		var glow := StandardMaterial3D.new()
+		glow.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		glow.albedo_color = Color(hue.r, hue.g, hue.b,
+			float(entry.get("alpha", 0.30)))
+		glow.metallic = 0.0
+		glow.roughness = 1.0
+		glow.cull_mode = BaseMaterial3D.CULL_DISABLED
+		glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		glow.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+		glow.emission_enabled = true
+		glow.emission = hue
+		glow.emission_energy_multiplier = float(entry.get("energy", 0.3))
+		for index in int(entry.get("count", 5)):
+			var bearing: float = float(cfg.get("bearing_from", 148.0)) 				+ float(cfg.get("bearing_step", 27.0)) * float(index) 				+ float(cfg.get("tier_bearing", 13.0)) * float(tier)
+			var curtain := Forms.mesh_node(
+				Geometry.rounded_box(Vector3(float(size[0]), float(size[1]),
+					float(size[2])), float(cfg.get("round", 11.0)), 2),
+				glow, "Curtain%d_%d" % [tier, index], false)
+			curtain.position = _polar(bearing,
+				float(cfg.get("radius", 780.0))
+					+ float(cfg.get("radius_step", 50.0)) * float(tier),
+				float(entry.get("base_y", 150.0))
+					+ float(cfg.get("rise", 26.0)) * float(index % 3))
+			curtain.rotation.y = deg_to_rad(bearing)
+			curtain.rotation.z = (float(index) - 2.0) * float(cfg.get("lean", 0.09))
+			group.add_child(curtain)
+
+
+static func _mist(root: Node3D, cfg: Dictionary) -> void:
+	## Mist pooling in the gorge, so the drop beside the track has a depth.
+	##
+	## The midground layer the depth brief asks for, and the one that is *below*
+	## the course rather than beyond it. A camera on a section shot sees it past
+	## the guard rail, which puts a soft, receding field behind the near
+	## structure instead of a dark void.
+	##
+	## **Three numbers keep it out from under the track**, and all three are in
+	## the profile so a direction tunes them rather than this file. A slab wide
+	## enough to span the gorge presents almost its whole area to a lens looking
+	## down at it, and the lab's first build put six of them from y = -6
+	## downward at up to 225 units across: it came out as a pale sheet lying
+	## over the lower half of the frame with the course sitting on it. `top` and
+	## `step` keep the highest deck well below the racing line; `offset` pushes
+	## every deck out past the gorge lip so the near edge of the stack is beyond
+	## the course rather than under it; `alpha` is per-deck and small, because
+	## the stack is meant to accumulate and any single deck that reads on its
+	## own is too strong.
+	var decks := int(cfg.get("decks", 0))
+	if decks <= 0:
+		return
+	var group := Node3D.new()
+	group.name = "GorgeMist"
+	root.add_child(group)
+	var tint := Color(str(cfg.get("colour", "#9EBCD6")))
+	var mist := StandardMaterial3D.new()
+	mist.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mist.albedo_color = Color(tint.r, tint.g, tint.b,
+		float(cfg.get("alpha", 0.055)))
+	mist.metallic = 0.0
+	mist.roughness = 1.0
+	mist.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mist.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	# A deck that wrote depth would clip the boulders and the supports behind
+	# it into hard silhouettes; unsorted alpha over an unshaded plane is the
+	# trick.
+	mist.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+	# **Read from the profile, never written to it.** These two are the gorge's
+	# own coordinates and they are landform, not theme - `EnvironmentProfile`
+	# rejects a profile that sets either. A mist deck is placed *against* the
+	# shape the course already has.
+	var gorge_at := float(cfg.get("at_x", 15.0))
+	var centre_z := float(cfg.get("at_z", 6.0))
+	var top := float(cfg.get("top", -26.0))
+	var step := float(cfg.get("step", 11.0))
+	var offset := float(cfg.get("offset", 40.0))
+	var reach := float(cfg.get("reach", 30.0))
+	for index in decks:
+		var y: float = top - step * float(index)
+		var span: float = reach + 9.0 * float(index)
+		var slab := Forms.mesh_node(
+			Geometry.rounded_box(Vector3(span * 1.7, 0.5, span * 2.1),
+				span * 0.38, 2),
+			mist, "Shelf%d" % index, false)
+		slab.position = Vector3(gorge_at + offset + 7.0 * float(index), y,
+			centre_z + 6.0 * float(index % 3))
+		group.add_child(slab)
+
+
+static func _crests(root: Node3D, palette, cfg: Dictionary) -> void:
+	## A thin lit edge along the mid crests: distance you can see the shape of.
+	##
+	## The one idea carried over from the environment lab's Graphite Grid, which
+	## was otherwise rejected. Graphite bought silhouette by making the world
+	## near-black, and paid for it with five backdrops out of eleven that were a
+	## featureless wall. The crest lines were the part of it that worked without
+	## that cost: they draw the *top edge* of a far mass, so a range reads as a
+	## mountain rather than as a darker patch of sky, and they do it at a
+	## distance where nothing else in the frame is competing.
+	##
+	## Restrained on purpose. A dark world will take any amount of neon before
+	## it looks full, and that is the trap - the brief asks for readable
+	## mountain depth, not a cyber-grid landscape. One bar per crest, at an
+	## energy chosen to survive three hundred units of haze and to do nothing at
+	## thirty, keeps the accent in the background where it belongs.
+	##
+	## `count` defaults to zero, so this draws nothing for every profile that
+	## does not ask for it.
+	var count := int(cfg.get("count", 0))
+	if count <= 0:
+		return
+	var group := Node3D.new()
+	group.name = "CrestLines"
+	root.add_child(group)
+	var size: Array = cfg.get("size", [78.0, 1.6, 2.0])
+	var shade = palette.get_material(str(cfg.get("material", "lit_crest_line")))
+	var radius_cycle := maxi(int(cfg.get("radius_cycle", 3)), 1)
+	var lift_cycle := maxi(int(cfg.get("lift_cycle", 4)), 1)
+	for index in count:
+		var bearing: float = float(cfg.get("bearing_from", 140.0)) 			+ float(cfg.get("bearing_step", 19.0)) * float(index)
+		var radius: float = float(cfg.get("radius", 300.0)) 			+ float(cfg.get("radius_step", 70.0)) * float(index % radius_cycle)
+		var bar := Forms.mesh_node(
+			Geometry.rounded_box(Vector3(float(size[0]), float(size[1]),
+				float(size[2])), float(cfg.get("round", 0.7)), 2),
+			shade, "Crest%d" % index, false)
+		bar.position = _polar(bearing, radius,
+			float(cfg.get("base_y", -14.0))
+				+ float(cfg.get("lift_step", 16.0)) * float(index % lift_cycle))
+		bar.rotation.y = deg_to_rad(bearing)
+		# A crest is not level. The tilt is what stops nine bars reading as nine
+		# identical dashes at the same angle, which is what made the lab's
+		# version look like a grid rather than like terrain.
+		bar.rotation.z = (float(index % 3) - 1.0) * float(cfg.get("tilt", 0.06))
+		group.add_child(bar)
 
 
 # --- what the rest of the course asks for ---------------------------------

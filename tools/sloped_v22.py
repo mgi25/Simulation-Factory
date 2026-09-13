@@ -39,7 +39,8 @@ from typing import Any, Sequence
 
 sys.path.insert(0, os.getcwd())
 
-from sloped import cameras, chase_camera, course_preview, v22, v221, v221_finish
+from sloped import (cameras, chase_camera, course_preview, v22, v221,
+                    v221_finish, v23)
 from sloped.course import sloped_course
 
 PROJECT_ROOT = os.getcwd()
@@ -78,6 +79,23 @@ EDITIONS: dict[str, dict[str, Any]] = {
         # and every other edition renders with the flag absent. See
         # `sloped_race_scene._face_finish_sign_both_ways`.
         "scene": ("--finish-sign=double",),
+        "race_track": os.path.join(OUT_DIR, "cameras_v221_{seed}.json"),
+        "preview_track": os.path.join(OUT_DIR, "preview_v221_{seed}.json"),
+        "check": v221_finish.check_finish,
+    },
+    # **V23 is V22.1's film in a different world.** It shares V22.1's module,
+    # its checker and - deliberately - its two *solved track files*, not copies
+    # of them. A repaint that re-solved its cameras would be asserting that the
+    # solve is deterministic rather than relying on the same numbers; pointing
+    # both editions at `cameras_v221_{seed}.json` makes the camera track
+    # identical by construction, and there is no drift left for a test to have
+    # to catch. `--stage solve` is therefore not part of a V23 build.
+    #
+    # What differs is three render flags, and they are in `sloped/v23.py`.
+    "v23": {
+        "module": v221,
+        "work": "v23",
+        "scene": v23.SCENE_FLAGS,
         "race_track": os.path.join(OUT_DIR, "cameras_v221_{seed}.json"),
         "preview_track": os.path.join(OUT_DIR, "preview_v221_{seed}.json"),
         "check": v221_finish.check_finish,

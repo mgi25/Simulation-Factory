@@ -109,6 +109,10 @@ PREVIEW_V22 = os.path.join(OUT_DIR, "v22", "preview_master.mp4")
 # `tools/sloped_v22.py --edition v221`.
 MASTER_V221 = os.path.join(OUT_DIR, "v221", "race_master.mp4")
 PREVIEW_V221 = os.path.join(OUT_DIR, "v221", "preview_master.mp4")
+# V23 renders the same two pieces again, from V22.1's own solved tracks, with
+# the world and the machine repainted. `tools/sloped_v22.py --edition v23`.
+MASTER_V23 = os.path.join(OUT_DIR, "v23", "race_master.mp4")
+PREVIEW_V23 = os.path.join(OUT_DIR, "v23", "preview_master.mp4")
 
 # Kept for the callers and the tests that name the locked V19 master directly.
 MASTER = MASTER_V19
@@ -187,6 +191,28 @@ EDITIONS: dict[str, dict[str, Any]] = {
         "video": os.path.join(OUT_DIR, "real_race_v221.mp4"),
         "visual": os.path.join(OUT_DIR, "real_race_v221_visual.mp4"),
         "silent": os.path.join(OUT_DIR, "real_race_v221_master.mp4"),
+        "track": os.path.join(OUT_DIR, "cameras_v221_{seed}.json"),
+        "runtime": (26.0, 27.0),
+    },
+    # **V23 is V22.1's edit over V23's pixels.** Same master length, same
+    # preview, no cuts, the same cue policy, the same runtime band - because
+    # the two masters are the same instants of the same replay through the same
+    # camera track, and the only thing that differs is what the frames look
+    # like. See `sloped/v23.py` for what "look like" means here, and
+    # `tools/sloped_v22.py --edition v23` for the render that produces them.
+    #
+    # It is a *separate* edition rather than a flag on `v221` so that V22.1
+    # stays reproducible: nothing here makes `aurora_valley` or `v23b` a
+    # default, and `--edition v221` rebuilds byte for byte what it built before
+    # this entry existed.
+    "v23": {
+        "master": MASTER_V23,
+        "preview": PREVIEW_V23,
+        "cuts": (),
+        "cues": "v221",
+        "video": os.path.join(OUT_DIR, "real_race_v23.mp4"),
+        "visual": os.path.join(OUT_DIR, "real_race_v23_visual.mp4"),
+        "silent": os.path.join(OUT_DIR, "real_race_v23_master.mp4"),
         "track": os.path.join(OUT_DIR, "cameras_v221_{seed}.json"),
         "runtime": (26.0, 27.0),
     },
