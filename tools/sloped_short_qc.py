@@ -178,6 +178,146 @@ def _hold_is_static(path: str, hold_frames: int, offset: int = 0) -> tuple[bool,
     )
 
 
+def _opening_moves(path: str, frames: int = 15) -> tuple[bool, str]:
+    """Is the film's opening alive, judged below the mark?
+
+    `_hold_is_static`'s measurement, its window and its bars, asking the
+    opposite question. The same rows are compared - everything under y 560, so
+    the mark fading over the top is not what is being read - and the same median
+    adjacent step is taken, for the same reason: an IDR lands where it lands and
+    the median is immune to it.
+
+    The bar is `_hold_is_static`'s own, read the other way. A run it would call
+    still is a median step under 0.10 with under 0.5 per cent of pixels moved;
+    an opening passes here by being outside that. There is no third setting, so
+    a film cannot satisfy both and cannot slip between them.
+    """
+    import numpy as np
+    from PIL import Image
+
+    scratch = os.path.join(OUT_DIR, "short", "qc_open")
+    if os.path.isdir(scratch):
+        shutil.rmtree(scratch)
+    os.makedirs(scratch, exist_ok=True)
+    subprocess.run(
+        [shutil.which("ffmpeg"), "-v", "error", "-y", "-i", path,
+         "-vf", r"select='lt(n\,%d)'" % frames,
+         "-vsync", "0", os.path.join(scratch, "open_%04d.png")],
+        capture_output=True, text=True,
+    )
+    names = sorted(f for f in os.listdir(scratch) if f.endswith(".png"))
+    if len(names) < 3:
+        return False, "could not extract the opening frames"
+    pictures = [
+        np.asarray(Image.open(os.path.join(scratch, name)).convert("RGB"),
+                   dtype=np.int16)[560:]
+        for name in names
+    ]
+    pixels = pictures[0].shape[0] * pictures[0].shape[1]
+    steps = []
+    for before, after in zip(pictures, pictures[1:]):
+        difference = np.abs(before - after)
+        steps.append((float(difference.mean()),
+                      float((difference.max(axis=2) > 2).sum()) / pixels))
+    mean = float(np.median([step[0] for step in steps]))
+    moved = float(np.median([step[1] for step in steps]))
+    return (
+        mean >= 0.10 and moved >= 0.005,
+        f"the opening is live, not held: over {len(steps)} adjacent frames the "
+        f"median step is {mean:.4f} with {moved * 100:.3f}% of pixels moved "
+        f"(a held frame is under 0.10 and 0.500%)",
+    )
+
+
+def _dark_band(path: str, when: float, until: float,
+               x_from: int = 90, x_to: int = 990, ceiling: float = 130.0):
+    """The tallest band of rows a card could sit on, over a stretch of film.
+
+    The payoff lab's own measurement, re-run on this edition's tail: every
+    second frame from `when` to `until`, the **maximum** luma of each row across
+    the text corridor, and then the tallest run of rows whose maximum never
+    exceeds `ceiling` on any of them.
+
+    **It must be measured on footage with no overlay on it**, which is what the
+    silent integrated master is for. Reading the finished film instead measures
+    the card's own warm white and answers a different question: the first
+    version of this check did that and reported 111 of 1713 bright rows, which
+    is a correct count of a finish frame's sky, deck and racers.
+
+    Returns `(low, high, the worst luma inside it)`, or None.
+    """
+    import numpy as np
+    from PIL import Image
+
+    scratch = os.path.join(OUT_DIR, "short", "qc_band")
+    if os.path.isdir(scratch):
+        shutil.rmtree(scratch)
+    os.makedirs(scratch, exist_ok=True)
+    every_second = "select=not(mod(n" + chr(92) + ",2))"
+    subprocess.run(
+        [shutil.which("ffmpeg"), "-v", "error", "-y", "-ss", f"{when:.4f}",
+         "-i", path, "-t", f"{max(0.05, until - when):.4f}",
+         "-vf", every_second, "-vsync", "0",
+         os.path.join(scratch, "t_%04d.png")],
+        capture_output=True, text=True,
+    )
+    names = sorted(f for f in os.listdir(scratch) if f.endswith(".png"))
+    if not names:
+        return None
+    worst = None
+    for name in names:
+        pixels = np.asarray(
+            Image.open(os.path.join(scratch, name)).convert("RGB"), dtype=float
+        )
+        luma = (0.2126 * pixels[..., 0] + 0.7152 * pixels[..., 1]
+                + 0.0722 * pixels[..., 2])
+        row = luma[:, x_from:x_to].max(axis=1)
+        worst = row if worst is None else np.maximum(worst, row)
+    best = (0, -1)
+    run = None
+    for y, value in enumerate(worst):
+        if value <= ceiling:
+            run = y if run is None else run
+        elif run is not None:
+            if y - 1 - run > best[1] - best[0]:
+                best = (run, y - 1)
+            run = None
+    if run is not None and len(worst) - 1 - run > best[1] - best[0]:
+        best = (run, len(worst) - 1)
+    if best[1] < best[0]:
+        return None
+    return best[0], best[1], float(worst[best[0]:best[1] + 1].max())
+
+
+def _ink_rows(path: str, when: float, x_from: int = 90, x_to: int = 990):
+    """The rows one still frame has solid warm ink in, over the text corridor.
+
+    Used for one question: is the mark actually drawn on frame zero. That is a
+    presence test on a frame whose background behind the mark is known to be
+    dark - `v24_hook.background_report` puts the massif in shade there - and it
+    is not the right instrument for the payoff, which is `_dark_band`.
+    """
+    import numpy as np
+    from PIL import Image
+
+    scratch = os.path.join(OUT_DIR, "short", "qc_ink")
+    os.makedirs(scratch, exist_ok=True)
+    grab = os.path.join(scratch, f"at_{int(round(when * 1000)):06d}.png")
+    subprocess.run(
+        [shutil.which("ffmpeg"), "-v", "error", "-y", "-ss", f"{when:.4f}",
+         "-i", path, "-frames:v", "1", grab],
+        capture_output=True, text=True,
+    )
+    if not os.path.isfile(grab):
+        return None
+    pixels = np.asarray(Image.open(grab).convert("RGB"), dtype=float)
+    luma = (0.2126 * pixels[..., 0] + 0.7152 * pixels[..., 1]
+            + 0.0722 * pixels[..., 2])
+    corridor = luma[:, x_from:x_to]
+    rows = np.where((corridor > 200.0).sum(axis=1) > 4)[0]
+    return rows, corridor
+
+
 def report(seed: int = 5432, edition: str = "v21") -> bool:
     from sloped import presentation
     from tools.sloped_short import EDITIONS, cue_policy, load_all
@@ -292,38 +432,78 @@ def report(seed: int = 5432, edition: str = "v21") -> bool:
     # pairs differ in 778 930 and 726 555 pixels respectively. `mpdecimate` is
     # the tool that actually compares frames, so it is the one that is asked.
     survived = _mpdecimate_frames(VIDEO)
-    hold_frames = int(round(presentation.HOLD_SECONDS * FPS))
+    # **The hold is the clock's, not `presentation.HOLD_SECONDS`.** Every
+    # edition up to V22.1 holds 0.70 s and this read the constant; V24 holds
+    # nothing, and a constant here would let it through a check for a static
+    # opening it does not have - and then fail it on the frame count.
+    hold_frames = clock.hold_frames
     # The held opening is genuinely one picture repeated, so mpdecimate is
     # expected to drop it down to a handful of frames - the text fading over it
-    # is the only thing moving. Everything after it must survive intact.
+    # is the only thing moving. Everything after it must survive intact. With no
+    # hold at all the allowance is zero and every frame has to be its own.
     expected_min = EXPECTED_FRAMES - hold_frames - 1
     check(survived is not None and survived >= expected_min,
           f"mpdecimate keeps {survived} of {EXPECTED_FRAMES} frames "
           f"(at least {expected_min} once the held opening is allowed to collapse)")
 
-    # The hold itself, checked where the text is not: PICK ONE occupies y 247 to
-    # 436, so below y 560 the held frames must be pixel-identical to each other
-    # and to the master's own first frame.
-    same, detail = _hold_is_static(VIDEO, hold_frames, clock.prefix_frames)
-    check(same, detail)
+    if hold_frames:
+        # The hold itself, checked where the text is not: PICK ONE occupies
+        # y 247 to 436, so below y 560 the held frames must be pixel-identical
+        # to each other and to the master's own first frame.
+        same, detail = _hold_is_static(VIDEO, hold_frames, clock.prefix_frames)
+        check(same, detail)
+    else:
+        # **The same check, inverted, because the claim is inverted.** V24's
+        # whole premise is that the opening is alive: it holds nothing, so the
+        # first two frames must *differ*, and by more than encoder noise. This
+        # is not a weaker bar than the hold check - it is the same measurement
+        # asked to prove the opposite thing, and a film that accidentally
+        # shipped a frozen first frame would fail here rather than pass quietly.
+        moving, detail = _opening_moves(VIDEO)
+        check(moving, detail)
 
     print("overlays, against measured marble positions")
-    ring_from = clock.at(crossings[0][0]) + 0.20
-    ring_to = ring_from + 0.70
+    # The ring's own window, as this edition places it. V24 opens it **on** the
+    # crossing and runs 0.300 s, because the payoff lab measured that the winner
+    # is on screen for 0.217 s and the shipped 0.200+0.700 puts one frame of the
+    # mark on a visible marble. Every other edition keeps 0.200 and 0.700.
+    from sloped import v24_payoff
+    if EDITIONS[edition].get("payoff"):
+        ring_delay, ring_span = v24_payoff.RING_DELAY, v24_payoff.RING_SECONDS
+    else:
+        ring_delay, ring_span = 0.20, 0.70
+    ring_from = clock.at(crossings[0][0]) + ring_delay
+    ring_to = ring_from + ring_span
     photo = [clock.at(when) for when, order in crossings if order in (4, 5)]
     check(all(ring_to < at for at in photo),
           f"the winner's mark ends at {ring_to:.2f} s, before the "
           f"{min(photo):.2f} s dead heat")
-    check(ring_from > clock.at(crossings[0][0]),
-          "the winner's mark starts only after the winner has crossed")
-    # **The hook's deadline moves with the hold, not with the file.** PICK ONE
-    # is on screen over the held frame, wherever that now sits: on V22 it fades
-    # out at the preview's end plus 0.80 s, and comparing the gates against a
-    # bare 0.80 would be comparing them against a moment inside the preview.
-    hook_gone = clock.prefix + 0.80
+    check(ring_from >= clock.at(crossings[0][0]) - 1e-9,
+          "the winner's mark starts no earlier than the winner's crossing")
+    # **The mark and the machine, and which of the two is supposed to be first.**
+    #
+    # For every edition up to V22.1 the mark is a title over a frozen frame and
+    # the rule is that it is gone before anything moves: PICK ONE fades out at
+    # the hold's end plus 0.80 s and the gates open after that.
+    #
+    # V24 inverts the rule on purpose. The mark sits over **live** footage, so
+    # the bar is that the machine is already moving while it is up - a mark over
+    # a still picture is the thing the retention numbers punished. Both are
+    # checked; neither is relaxed.
     gate = presentation.actuator_move(replay, clock, "start.paddle")
-    check(gate is not None and gate > hook_gone,
-          f"the hook is gone by {hook_gone:.2f} s; the gates first move at {gate:.3f} s")
+    if EDITIONS[edition].get("mark") == "v24":
+        from sloped import v24 as v24_module
+        check(gate is not None and gate < v24_module.MARK_OUT_FROM,
+              f"the gates move at {gate:.3f} s, while PICK A COLOR is still up "
+              f"(it starts to leave at {v24_module.MARK_OUT_FROM:.2f} s)")
+        check(gate is not None and gate <= 0.25,
+              f"the first mechanism motion is at {gate:.3f} s, inside the first "
+              f"quarter second")
+    else:
+        hook_gone = clock.prefix + 0.80
+        check(gate is not None and gate > hook_gone,
+              f"the hook is gone by {hook_gone:.2f} s; the gates first move at "
+              f"{gate:.3f} s")
 
     # **The retention claim, measured rather than asserted.** The floor drops
     # when `start.panel` first moves, and after it the field never stops going
@@ -334,6 +514,75 @@ def report(seed: int = 5432, edition: str = "v21") -> bool:
     if EDITIONS[edition]["cuts"]:
         check(trapdoor is not None and trapdoor <= 2.0,
               f"the release is inside the first two seconds ({trapdoor:.3f} s)")
+
+    if EDITIONS[edition].get("mark") == "v24" or EDITIONS[edition].get("payoff"):
+        print("V24: the hook frame, the joins and the payoff")
+        from sloped import v24 as v24_module
+        from sloped import v24_payoff
+        from tools.sloped_short import _winner_of
+        from tools.sloped_v24_audit import EXPOSURE_BAR, join_audit
+
+        winner_id = _winner_of(replay)[0]
+
+        # **The mark is on frame zero.** Not faded in over it, not arriving a
+        # beat later: the premise has to be readable before a thumb has decided
+        # anything, so the ink is looked for on the first frame of the file.
+        found = _ink_rows(VIDEO, 0.0)
+        if found is None:
+            check(False, "could not read frame zero")
+        else:
+            rows, _corridor = found
+            band = (v24_module.MARK_BASELINE - 120, v24_module.MARK_BASELINE + 40)
+            on_mark = [row for row in rows if band[0] <= row <= band[1]]
+            check(bool(on_mark),
+                  f"PICK A COLOR is on frame 0: {len(on_mark)} rows of solid ink "
+                  f"between y {band[0]} and y {band[1]}")
+
+        # Every omission in the film, against the spread of the shot it is in.
+        # The bar is the film's own accepted joins - see `sloped_v24_audit`.
+        for row in join_audit(replay, track, clock):
+            check(row["exposure"] <= EXPOSURE_BAR or not row["same_camera"],
+                  f"the {row['name']} join is {row['exposure']:.2f}x its shot's "
+                  f"per-frame spread "
+                  f"({'same camera' if row['same_camera'] else 'at a camera cut'})")
+            if row["name"] == "spin":
+                check(row["rotor_phase_error_deg"] <= 1.0,
+                      f"the mixer join's rotor phase error is "
+                      f"{row['rotor_phase_error_deg']:.2f} deg")
+
+        # The payoff, measured on the finished file rather than on the card.
+        # The band the plate has to survive is re-measured here, because the
+        # payoff lab's y 297-548 was taken on a tail that ended at replay
+        # 24.467 and V24's ends at 23.450.
+        card_from, card_to = v24_payoff.schedule(
+            crossing=clock.at(crossings[0][0]), beat=v24_module.BEAT,
+            seconds=v24_payoff.PAYOFF_SECONDS, fps=FPS,
+        )["card"]
+        check(card_to <= clock.duration + 1e-6,
+              f"the payoff card ends at {card_to:.3f} s, inside the "
+              f"{clock.duration:.3f} s film")
+        check(card_from > clock.at(crossings[0][0]),
+              f"the card comes up {card_from - clock.at(crossings[0][0]):.2f} s "
+              f"after the crossing")
+        # **The band, re-measured on this film's own tail.** The payoff lab
+        # measured y 297-548 over a tail that ran to replay 24.467; V24's stops
+        # at 23.450 and this is the same parked stand shooting less of it, so
+        # the band is re-read rather than inherited. On the *silent* master,
+        # which is this picture with nothing drawn on it.
+        silent = EDITIONS[edition].get("silent")
+        band = _dark_band(silent, card_from, clock.duration) if silent else None
+        if band is None:
+            check(False, "could not measure the payoff band")
+        else:
+            low, high, worst = band
+            card = v24_payoff.build(style=EDITIONS[edition]["payoff"],
+                                    winner=winner_id,
+                                    from_place=v24_payoff.WINNER_FROM)
+            check(low <= card.box[1] and card.box[3] <= high,
+                  f"the card's ink (y {card.box[1]}-{card.box[3]}) is inside the "
+                  f"tail's own dark band (y {low}-{high}, worst luma {worst:.1f})")
+            check(card.text_contrast >= 4.5,
+                  f"the card's text is {card.text_contrast:.2f}:1 on its own plate")
 
     # Omitted time, and whether this edition marks it. **An uncued omission is
     # a claim, not an oversight**: V22.1 cuts four whole rotor revolutions out

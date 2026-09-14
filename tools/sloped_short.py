@@ -75,7 +75,7 @@ sys.path.insert(0, os.getcwd())
 from audio import marble
 from audio.synthesis import SAMPLE_RATE
 from audio.wav_io import write_wav
-from sloped import overlays, presentation
+from sloped import overlays, presentation, v24, v24_hook, v24_payoff
 
 OUT_DIR = os.path.join("output", "sloped_race_v1")
 WORK_DIR = os.path.join(OUT_DIR, "short")
@@ -113,6 +113,10 @@ PREVIEW_V221 = os.path.join(OUT_DIR, "v221", "preview_master.mp4")
 # the world and the machine repainted. `tools/sloped_v22.py --edition v23`.
 MASTER_V23 = os.path.join(OUT_DIR, "v23", "race_master.mp4")
 PREVIEW_V23 = os.path.join(OUT_DIR, "v23", "preview_master.mp4")
+# V24 renders **one** piece of footage and no preview at all. The film's second
+# zero is this master's own first frame: no flight in front of it and no frozen
+# hold on it. See `sloped.v24`.
+MASTER_V24 = os.path.join(OUT_DIR, "v24", "race_master.mp4")
 
 # Kept for the callers and the tests that name the locked V19 master directly.
 MASTER = MASTER_V19
@@ -216,6 +220,38 @@ EDITIONS: dict[str, dict[str, Any]] = {
         "track": os.path.join(OUT_DIR, "cameras_v221_{seed}.json"),
         "runtime": (26.0, 27.0),
     },
+    # **V24 is the hook experiment, and three of its fields are new because
+    # three things about the opening and the ending are new.**
+    #
+    # `hold` 0.0. Every edition before this one freezes the master's first frame
+    # for 0.7 s and puts the mark on the still. V24's first frame is already the
+    # hook - eight racers at 146 px under PICK A COLOR, with the release paddles
+    # moving 0.117 s later - so there is nothing a freeze would buy and 0.7 s it
+    # would cost. `presentation.Clock` takes the hold as a field, so this is a
+    # number rather than a branch, and `prefix` is 0.0 because there is no
+    # preview either.
+    #
+    # `mark` chooses the opening overlay. `pick_one` is 150 pt at baseline 395,
+    # measured against V20's held frame; V24's twelve glyphs are 96 pt at
+    # baseline 269, measured by `v24_hook.text_plate` against the frame this
+    # opening actually renders. See `sloped.v24.MARK_BASELINE`.
+    #
+    # `payoff` replaces the end fact with the payoff lab's plate: PURPLE WINS
+    # over the winner's own #8E3FD4, warm white on it at 5.26:1, with the ring
+    # moved on to the crossing where the winner is actually visible.
+    "v24": {
+        "master": MASTER_V24,
+        "cuts": (),
+        "cues": "v221",
+        "hold": 0.0,
+        "mark": "v24",
+        "payoff": v24_payoff.RECOMMENDED,
+        "video": os.path.join(OUT_DIR, "real_race_v24.mp4"),
+        "visual": os.path.join(OUT_DIR, "real_race_v24_visual.mp4"),
+        "silent": os.path.join(OUT_DIR, "real_race_v24_master.mp4"),
+        "track": os.path.join(OUT_DIR, "cameras_v24_{seed}.json"),
+        "runtime": (19.8, 20.4),
+    },
 }
 DEFAULT_EDITION = "v21"
 
@@ -308,6 +344,17 @@ def load_all(seed: int, edition: str = DEFAULT_EDITION):
     replay, track, clock = presentation.load(
         replay_path, track_path, master_frames(master), prefix=prefix
     )
+    # **The hold is an edition's choice, not a constant.** It has been 0.70 s
+    # since V20 because every edition before V24 opens on a still; V24 opens on
+    # a moving hook and holds nothing, so it asks for 0.0 and every time in the
+    # film after second zero is a master frame. `Clock` carries it as a field,
+    # so `at`, `replay_at`, `frames` and `duration` all already know.
+    hold = EDITIONS[edition].get("hold", presentation.HOLD_SECONDS)
+    if hold != clock.hold:
+        clock = presentation.Clock(
+            clock.segments, hold=hold, fps=clock.fps,
+            master_frames=clock.master_frames, prefix=clock.prefix,
+        )
     clock, keep = presentation.omit_frames(clock, EDITIONS[edition]["cuts"])
     return replay, track, clock, keep
 
@@ -358,12 +405,30 @@ def stage_overlays(seed: int, edition: str = DEFAULT_EDITION) -> dict[str, Any]:
 
     winner, crossed = _winner_of(replay)
 
-    hook = os.path.join(WORK_DIR, "pick_one.png")
-    overlays.pick_one().save(hook)
-    # The end card carries the winning marble's own hue, read out of the replay
-    # rather than typed, so a different seed would carry a different ball.
-    fact = os.path.join(WORK_DIR, f"end_fact_{winner}.png")
-    overlays.end_fact(accent=overlays.MARBLE_HUES[winner]).save(fact)
+    # **The opening mark, and which drawing of it this edition uses.** Both
+    # are the same face, the same warm white and the same soft shadow through
+    # `overlays._shadowed`; what differs is the words and where they sit, and
+    # both of those were measured against the frame the mark is actually on.
+    if EDITIONS[edition].get("mark") == "v24":
+        hook = os.path.join(WORK_DIR, "pick_a_color.png")
+        v24_hook.pick_a_color(baseline=v24.MARK_BASELINE).save(hook)
+    else:
+        hook = os.path.join(WORK_DIR, "pick_one.png")
+        overlays.pick_one().save(hook)
+
+    # The end card. `end_fact` carries the winning marble's own hue as a dot,
+    # read out of the replay rather than typed; V24's plate carries it as an
+    # *area* with the colour's name reversed out of it, because the payoff lab
+    # measured that the dot is 27 px wide and the film never says a colour.
+    style = EDITIONS[edition].get("payoff")
+    if style:
+        card = v24_payoff.build(style=style, winner=winner,
+                                from_place=v24_payoff.WINNER_FROM)
+        fact = os.path.join(WORK_DIR, f"payoff_{style}_{winner}.png")
+        card.image.save(fact)
+    else:
+        fact = os.path.join(WORK_DIR, f"end_fact_{winner}.png")
+        overlays.end_fact(accent=overlays.MARBLE_HUES[winner]).save(fact)
 
     start = clock.at(crossed)
     if start is None:
@@ -374,7 +439,16 @@ def stage_overlays(seed: int, edition: str = DEFAULT_EDITION) -> dict[str, Any]:
     # sequence between two frames and the first one is never composited. That
     # is the frame the flash exists for, and measured on the file it was the
     # frame that went missing.
-    start = round((start + WINNER_DELAY) * FPS) / FPS
+    # **The winner's ring opens where the winner is.** V22.1 opens it 0.200 s
+    # after the crossing and runs 0.700, which the payoff lab measured puts
+    # *one frame* of it on a visible marble and the other 0.683 s on the gantry
+    # rail. The winner is on screen for 0.217 s, so V24 opens the ring **on**
+    # the crossing and runs 0.300.
+    delay = (v24_payoff.RING_DELAY if EDITIONS[edition].get("payoff")
+             else WINNER_DELAY)
+    ring_seconds = (v24_payoff.RING_SECONDS if EDITIONS[edition].get("payoff")
+                    else WINNER_SECONDS)
+    start = round((start + delay) * FPS) / FPS
     ring_dir = os.path.join(WORK_DIR, f"ring_{edition}")
     if os.path.isdir(ring_dir):
         shutil.rmtree(ring_dir)
@@ -383,11 +457,11 @@ def stage_overlays(seed: int, edition: str = DEFAULT_EDITION) -> dict[str, Any]:
     where = dict(
         (round(row[0], 6), row[1:])
         for row in presentation.screen_track(
-            replay, track, clock, winner, (start - 0.05, start + WINNER_SECONDS + 0.05)
+            replay, track, clock, winner, (start - 0.05, start + ring_seconds + 0.05)
         )
     )
     times = sorted(where)
-    count = int(round(WINNER_SECONDS * FPS))
+    count = int(round(ring_seconds * FPS))
     written = 0
     for index in range(count):
         when = start + index / FPS
@@ -402,9 +476,30 @@ def stage_overlays(seed: int, edition: str = DEFAULT_EDITION) -> dict[str, Any]:
     print(f"overlays: hook {hook}")
     print(f"          fact {fact}")
     print(f"          ring {written} frames from {start:.3f} s on marble {winner}")
+    # When the mark is up, and when the card is. Both are edition choices and
+    # both are computed here rather than in the filter graph, so the report and
+    # the QC read the same numbers ffmpeg is given.
+    if EDITIONS[edition].get("mark") == "v24":
+        mark = (v24.MARK_IN, v24.MARK_OUT_FROM, v24.MARK_OUT_TO)
+    else:
+        mark = (clock.prefix + PICK_ONE_IN, clock.prefix + PICK_ONE_OUT_FROM,
+                clock.prefix + PICK_ONE_OUT_TO)
+    if EDITIONS[edition].get("payoff"):
+        plan_card = v24_payoff.schedule(
+            crossing=start - delay, beat=v24.BEAT,
+            seconds=v24_payoff.PAYOFF_SECONDS, fps=FPS,
+        )["card"]
+    else:
+        plan_card = (clock.duration - END_FACT_SECONDS, clock.duration)
+
+    print(f"          mark {mark[0]:.3f}-{mark[2]:.3f}  "
+          f"card {plan_card[0]:.3f}-{plan_card[1]:.3f}  "
+          f"crossing {start - delay:.3f}  film {clock.duration:.4f} s")
     return {
         "hook": hook,
         "fact": fact,
+        "mark": mark,
+        "card": plan_card,
         "ring_dir": ring_dir,
         "ring_from": start,
         "ring_frames": written,
@@ -431,37 +526,23 @@ def _winner_of(replay: dict[str, Any]) -> tuple[int, float]:
     raise ShortError("the replay records no winner")
 
 
-def stage_mux(seed: int, plan: dict[str, Any], audio_path: str) -> dict[str, str]:
+def _base_for(plan: dict[str, Any]) -> str:
+    """The base picture: the master, cut, held and joined to its preview.
+
+    Split out of `stage_mux` because it is used twice - once on its own for the
+    silent integrated master, once as the head of the overlay chain - and
+    because it is the half of the graph a test can read without an encoder.
+    """
     hold = plan["hold"]
-    prefix = plan.get("prefix", 0.0)
     preview = plan.get("preview")
-    ring_from = plan["ring_from"]
-    ring_seconds = plan["ring_frames"] / FPS
-    fact_from = plan["duration"] - END_FACT_SECONDS
-
-    # **The hook's times are offsets into the held frame, not into the file.**
-    # They were written when the held frame was the first thing in the film, and
-    # for every edition before V22 it still is - `prefix` is zero and these are
-    # the numbers they have always been. With a course preview in front, PICK
-    # ONE belongs over the *start*, so it moves with the hold rather than
-    # staying at second zero, and the preview plays clean.
-    hook_in = prefix + PICK_ONE_IN
-    hook_out_from = prefix + PICK_ONE_OUT_FROM
-    hook_out_to = prefix + PICK_ONE_OUT_TO
-
-    video = plan["video"]
-    visual = plan["visual"]
-    silent = plan.get("silent")
-
-    # The base picture: the master, cut if this edition cuts, held at its first
-    # frame, and with the preview joined on the front if this edition has one.
-    # `concat` rather than an overlay because the preview is *different footage*
-    # occupying its own frames, and rather than a second encode because a join
-    # made in the filter graph never re-compresses what it joins.
-    base = (
-        f"[0:v]{_select(plan['cuts'])}"
-        f"tpad=start_duration={hold}:start_mode=clone,setpts=PTS-STARTPTS"
-    )
+    # **`tpad` is omitted entirely when there is no hold, not given zero.**
+    # `start_duration=0` is legal and is a no-op, but it also makes the graph
+    # claim a hold the film does not have; leaving the filter out says what V24
+    # is, and `setpts` still normalises the timestamps.
+    base = f"[0:v]{_select(plan['cuts'])}"
+    if hold > 0.0:
+        base += f"tpad=start_duration={hold}:start_mode=clone,"
+    base += "setpts=PTS-STARTPTS"
     if preview:
         base += (
             ",format=yuv420p,setsar=1[race];"
@@ -470,17 +551,64 @@ def stage_mux(seed: int, plan: dict[str, Any], audio_path: str) -> dict[str, str
         )
     else:
         base += "[base];"
+    return base
 
-    graph = (
-        base
-        + f"[1:v]format=rgba,fade=t=in:st={hook_in}:d=0.18:alpha=1,"
-        f"fade=t=out:st={hook_out_from}:d={PICK_ONE_OUT_TO - PICK_ONE_OUT_FROM}:alpha=1[hook];"
+
+def _graph_for(plan: dict[str, Any]) -> str:
+    """The whole filter graph: the base, the mark, the ring and the end card.
+
+    **The mark does not fade in when it opens on frame zero.** A `fade=t=in`
+    starting at 0 makes the first frame transparent, and the first frame is the
+    one the whole pass exists for: PICK A COLOR has to be readable before the
+    viewer has decided anything. Every edition that opens its mark over a held
+    frame still fades, because there it is a title coming up on a still.
+    """
+    prefix = plan.get("prefix", 0.0)
+    ring_from = plan["ring_from"]
+    ring_seconds = plan["ring_frames"] / FPS
+    fact_from, fact_to = plan["card"]
+    hook_in, hook_out_from, hook_out_to = plan["mark"]
+    fade_in = (f"fade=t=in:st={hook_in}:d=0.18:alpha=1,"
+               if hook_in > 0.0 else "")
+    return (
+        _base_for(plan)
+        + f"[1:v]format=rgba,{fade_in}"
+        f"fade=t=out:st={hook_out_from}:d={hook_out_to - hook_out_from}:alpha=1[hook];"
         f"[base][hook]overlay=0:0:enable='between(t,{prefix},{hook_out_to})'[v1];"
         f"[2:v]format=rgba,setpts=PTS-STARTPTS+{ring_from}/TB[ring];"
         f"[v1][ring]overlay=0:0:enable='between(t,{ring_from},{ring_from + ring_seconds})'[v2];"
         f"[3:v]format=rgba,fade=t=in:st=0:d=0.20:alpha=1[fact];"
-        f"[v2][fact]overlay=0:0:enable='between(t,{fact_from},{plan['duration']})'[vout]"
+        f"[v2][fact]overlay=0:0:enable='between(t,{fact_from},{fact_to})'[vout]"
     )
+
+
+def stage_mux(seed: int, plan: dict[str, Any], audio_path: str) -> dict[str, str]:
+    hold = plan["hold"]
+    prefix = plan.get("prefix", 0.0)
+    preview = plan.get("preview")
+    ring_from = plan["ring_from"]
+    ring_seconds = plan["ring_frames"] / FPS
+    fact_from, fact_to = plan["card"]
+
+    # **The mark's times, as `stage_overlays` computed them.** For every edition
+    # before V24 they are offsets into the held frame, which is where they have
+    # always been: `prefix` is zero before V22, and with a course preview in
+    # front PICK ONE moves with the hold so the preview plays clean. V24 has
+    # neither a preview nor a hold, so its mark opens at second zero over live
+    # footage - which is the whole experiment and is why these come in rather
+    # than being recomputed here.
+    hook_in, hook_out_from, hook_out_to = plan["mark"]
+
+    video = plan["video"]
+    visual = plan["visual"]
+    silent = plan.get("silent")
+
+    # The base picture and the overlay chain. `concat` joins the preview rather
+    # than an overlay because the preview is *different footage* occupying its
+    # own frames, and rather than a second encode because a join made in the
+    # filter graph never re-compresses what it joins.
+    base = _base_for(plan)
+    graph = _graph_for(plan)
 
     common = [
         _ffmpeg(), "-y",
@@ -548,8 +676,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     parser.add_argument(
         "--edition", default=DEFAULT_EDITION, choices=tuple(EDITIONS),
-        help="v21 is the start/retention cut; v221 the continuity pass; "
-             "v20 and v211 rebuild the earlier ones",
+        help="v24 is the hook experiment; v21 is the start/retention cut; "
+             "v221 the continuity pass; v20 and v211 rebuild the earlier ones",
     )
     args = parser.parse_args(argv)
 
