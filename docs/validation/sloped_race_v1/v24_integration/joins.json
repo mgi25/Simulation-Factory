@@ -1,0 +1,287 @@
+[
+ {
+  "name": "spin",
+  "replay_before": 2.05,
+  "replay_after": 4.483333,
+  "omitted_seconds": 2.416666,
+  "output_at": 1.85,
+  "camera_before": [
+   -36.5435,
+   54.2706,
+   -46.9542
+  ],
+  "camera_after": [
+   -36.5627,
+   54.2618,
+   -46.8867
+  ],
+  "camera_step": 0.0707,
+  "fov_before": 34.0,
+  "fov_after": 34.0,
+  "same_camera": true,
+  "cut_before": "start",
+  "cut_after": "start",
+  "turn_deg_median": 119.159,
+  "turn_deg_max": 168.095,
+  "turn_deg_one_frame": 1.772,
+  "screen_px_median": 32.8,
+  "screen_px_max": 101.2,
+  "visible_change_median": 0.26,
+  "visible_change_max": 0.3262,
+  "shot_p95": 0.2197,
+  "exposure": 1.18,
+  "rotor_step_deg": 12.457,
+  "rotor_one_frame_deg": 12.414,
+  "rotor_phase_error_deg": 0.043,
+  "machine_before": {
+   "rotor_rate": 12.9998,
+   "rotor_height": 73.2898,
+   "panel_rate": 0.0,
+   "panel_height": 72.7109,
+   "paddle_rate": 0.0,
+   "paddle_height": 75.2687
+  },
+  "machine_after": {
+   "rotor_rate": 13.0003,
+   "rotor_height": 73.2898,
+   "panel_rate": 0.0,
+   "panel_height": 72.7109,
+   "paddle_rate": 0.0,
+   "paddle_height": 75.2687
+  },
+  "phases": [
+   {
+    "family": "start.rotor",
+    "step_deg": 12.457,
+    "one_frame_deg": 12.414,
+    "symmetry_deg": 90.0,
+    "phase_error_deg": 0.043,
+    "on_screen": true
+   },
+   {
+    "family": "shuffle.wheel0_blade",
+    "step_deg": 174.778,
+    "one_frame_deg": 8.594,
+    "symmetry_deg": 90.0,
+    "phase_error_deg": 13.817,
+    "on_screen": false
+   },
+   {
+    "family": "obstacle.wheel0_blade",
+    "step_deg": 141.911,
+    "one_frame_deg": 3.441,
+    "symmetry_deg": 90.0,
+    "phase_error_deg": 41.53,
+    "on_screen": false
+   },
+   {
+    "family": "obstacle.wheel1_blade",
+    "step_deg": 141.911,
+    "one_frame_deg": 3.438,
+    "symmetry_deg": 90.0,
+    "phase_error_deg": 41.527,
+    "on_screen": false
+   },
+   {
+    "family": "obstacle.wheel2_blade",
+    "step_deg": 141.911,
+    "one_frame_deg": 3.439,
+    "symmetry_deg": 90.0,
+    "phase_error_deg": 41.528,
+    "on_screen": false
+   }
+  ],
+  "phase_error_on_screen_deg": 0.043,
+  "verdict": "same camera, 1.2x its shot's per-frame spread: the marbles turn 119 degrees across it and 1.8 in an ordinary frame, so the marking is already churning and the cut is inside the churn"
+ },
+ {
+  "name": "fall",
+  "replay_before": 6.416667,
+  "replay_after": 6.716667,
+  "omitted_seconds": 0.283333,
+  "output_at": 3.8,
+  "camera_before": [
+   -37.1357,
+   53.2403,
+   -39.1576
+  ],
+  "camera_after": [
+   -28.6408,
+   62.3973,
+   -53.9102
+  ],
+  "camera_step": 19.3301,
+  "fov_before": 34.0,
+  "fov_after": 36.0,
+  "same_camera": false,
+  "cut_before": "start",
+  "cut_after": "descent",
+  "turn_deg_median": 103.563,
+  "turn_deg_max": 156.114,
+  "turn_deg_one_frame": 11.446,
+  "screen_px_median": 179.6,
+  "screen_px_max": 261.9,
+  "visible_change_median": 0.2373,
+  "visible_change_max": 0.3361,
+  "shot_p95": 0.189,
+  "exposure": 1.26,
+  "rotor_step_deg": 0.068,
+  "rotor_one_frame_deg": 0.068,
+  "rotor_phase_error_deg": 0.0,
+  "machine_before": {
+   "rotor_rate": 0.0357,
+   "rotor_height": 74.4828,
+   "panel_rate": 0.0,
+   "panel_height": 71.9214,
+   "paddle_rate": 0.0,
+   "paddle_height": 75.2687
+  },
+  "machine_after": {
+   "rotor_rate": 0.0357,
+   "rotor_height": 74.4828,
+   "panel_rate": 0.0,
+   "panel_height": 71.9214,
+   "paddle_rate": 0.0,
+   "paddle_height": 75.2687
+  },
+  "phases": [
+   {
+    "family": "start.rotor",
+    "step_deg": 0.068,
+    "one_frame_deg": 0.068,
+    "symmetry_deg": 90.0,
+    "phase_error_deg": 0.0,
+    "on_screen": true
+   },
+   {
+    "family": "shuffle.wheel0_blade",
+    "step_deg": 154.699,
+    "one_frame_deg": 8.595,
+    "symmetry_deg": 90.0,
+    "phase_error_deg": 33.896,
+    "on_screen": false
+   },
+   {
+    "family": "obstacle.wheel0_blade",
+    "step_deg": 61.879,
+    "one_frame_deg": 3.439,
+    "symmetry_deg": 90.0,
+    "phase_error_deg": 31.56,
+    "on_screen": false
+   },
+   {
+    "family": "obstacle.wheel1_blade",
+    "step_deg": 61.88,
+    "one_frame_deg": 3.438,
+    "symmetry_deg": 90.0,
+    "phase_error_deg": 31.559,
+    "on_screen": false
+   },
+   {
+    "family": "obstacle.wheel2_blade",
+    "step_deg": 61.88,
+    "one_frame_deg": 3.439,
+    "symmetry_deg": 90.0,
+    "phase_error_deg": 31.559,
+    "on_screen": false
+   }
+  ],
+  "phase_error_on_screen_deg": 0.0,
+  "verdict": "camera cut (start -> descent, lens steps 19.3 units): the spatial discontinuity is the edit, and the marking's 0.237 is 1.3x the shot's own spread - inside it"
+ },
+ {
+  "name": "trap",
+  "replay_before": 13.583333,
+  "replay_after": 14.033333,
+  "omitted_seconds": 0.433333,
+  "output_at": 10.683333,
+  "camera_before": [
+   -28.5548,
+   29.6286,
+   0.5725
+  ],
+  "camera_after": [
+   -28.0979,
+   29.4222,
+   1.0504
+  ],
+  "camera_step": 0.6926,
+  "fov_before": 36.0,
+  "fov_after": 36.0,
+  "same_camera": true,
+  "cut_before": "obstacle",
+  "cut_after": "obstacle",
+  "turn_deg_median": 147.247,
+  "turn_deg_max": 176.385,
+  "turn_deg_one_frame": 6.303,
+  "screen_px_median": 60.1,
+  "screen_px_max": 151.5,
+  "visible_change_median": 0.2494,
+  "visible_change_max": 0.3734,
+  "shot_p95": 0.1834,
+  "exposure": 1.36,
+  "rotor_step_deg": 0.068,
+  "rotor_one_frame_deg": 0.068,
+  "rotor_phase_error_deg": 0.0,
+  "machine_before": {
+   "rotor_rate": 0.0357,
+   "rotor_height": 74.4828,
+   "panel_rate": 0.0,
+   "panel_height": 71.9214,
+   "paddle_rate": 0.0,
+   "paddle_height": 75.2687
+  },
+  "machine_after": {
+   "rotor_rate": 0.0357,
+   "rotor_height": 74.4828,
+   "panel_rate": 0.0,
+   "panel_height": 71.9214,
+   "paddle_rate": 0.0,
+   "paddle_height": 75.2687
+  },
+  "phases": [
+   {
+    "family": "start.rotor",
+    "step_deg": 0.068,
+    "one_frame_deg": 0.068,
+    "symmetry_deg": 90.0,
+    "phase_error_deg": 0.0,
+    "on_screen": false
+   },
+   {
+    "family": "shuffle.wheel0_blade",
+    "step_deg": 127.952,
+    "one_frame_deg": 8.595,
+    "symmetry_deg": 90.0,
+    "phase_error_deg": 29.357,
+    "on_screen": false
+   },
+   {
+    "family": "obstacle.wheel0_blade",
+    "step_deg": 92.819,
+    "one_frame_deg": 3.439,
+    "symmetry_deg": 90.0,
+    "phase_error_deg": 0.619,
+    "on_screen": true
+   },
+   {
+    "family": "obstacle.wheel1_blade",
+    "step_deg": 92.819,
+    "one_frame_deg": 3.436,
+    "symmetry_deg": 90.0,
+    "phase_error_deg": 0.617,
+    "on_screen": true
+   },
+   {
+    "family": "obstacle.wheel2_blade",
+    "step_deg": 92.819,
+    "one_frame_deg": 3.438,
+    "symmetry_deg": 90.0,
+    "phase_error_deg": 0.619,
+    "on_screen": true
+   }
+  ],
+  "phase_error_on_screen_deg": 0.619,
+  "verdict": "same camera, 1.4x its shot's per-frame spread: the marbles turn 147 degrees across it and 6.3 in an ordinary frame, so the marking is already churning and the cut is inside the churn"
+ }
+]

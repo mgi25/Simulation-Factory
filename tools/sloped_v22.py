@@ -39,7 +39,7 @@ from typing import Any, Sequence
 
 sys.path.insert(0, os.getcwd())
 
-from sloped import cameras, chase_camera, course_preview, v22, v221, v221_finish
+from sloped import cameras, chase_camera, course_preview, v22, v221, v221_finish, v24
 from sloped.course import sloped_course
 
 PROJECT_ROOT = os.getcwd()
@@ -82,6 +82,28 @@ EDITIONS: dict[str, dict[str, Any]] = {
         "preview_track": os.path.join(OUT_DIR, "preview_v221_{seed}.json"),
         "check": v221_finish.check_finish,
     },
+    # **V24 has no preview, and that is the experiment.** Every other edition
+    # here renders two pieces of footage; this one renders the race and only the
+    # race, because the retention numbers say the aerial flight over an empty
+    # hillside is what four viewers in five leave during. `preview_track` is
+    # absent rather than empty, and `stage_solve`, `stage_freeze` and
+    # `stage_preview` all read it as "this edition has none".
+    #
+    # `--racers=meridian` is the other new flag and it draws no new object: it
+    # paints a greyscale marker into the racer material's albedo map, which
+    # lives in the mesh's own UV space and is therefore carried by the transform
+    # the replay already sets. The physics, the replay, the quaternion and the
+    # racer's colour off the marker are all untouched - see
+    # `godot/assets/marble_machine/racers/racer_visual.gd`. Every other edition
+    # renders with the flag absent and gets `solid`, the shipped sphere.
+    "v24": {
+        "module": v24,
+        "work": "v24",
+        "scene": ("--finish-sign=double", f"--racers={v24.RACERS}"),
+        "race_track": os.path.join(OUT_DIR, "cameras_v24_{seed}.json"),
+        "preview_track": None,
+        "check": v221_finish.check_finish,
+    },
 }
 DEFAULT_EDITION = "v22"
 
@@ -94,7 +116,14 @@ def race_track_path(edition: str, seed: int) -> str:
     return EDITIONS[edition]["race_track"].format(seed=seed)
 
 
+def has_preview(edition: str) -> bool:
+    """Whether this edition renders a course preview in front of the race."""
+    return EDITIONS[edition].get("preview_track") is not None
+
+
 def preview_track_path(edition: str, seed: int) -> str:
+    if not has_preview(edition):
+        raise V22Error(f"the {edition!r} edition has no course preview")
     return EDITIONS[edition]["preview_track"].format(seed=seed)
 
 
@@ -158,6 +187,12 @@ def stage_solve(seed: int, edition: str = DEFAULT_EDITION) -> dict[str, Any]:
               f"  replay {segment['replay'][0]:9.4f}-{segment['replay'][1]:9.4f}"
               f"  racers {row.get('in_frame', '-')}/{row.get('of', '-')}"
               f"  nearest {row.get('nearest_px', 0.0):.0f} px")
+
+    if not has_preview(edition):
+        # Nothing else to solve. The film's second zero is this track's own
+        # first frame, so there is no handoff to assert and no preview to pace.
+        print("preview: none - this edition opens on the race")
+        return {"race": race, "preview": None, "report": None}
 
     track, report = module.build_preview_track(race, machine, seed)
     course_preview.write_track(track, preview_track_path(edition, seed))
@@ -336,6 +371,9 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     stages = (("solve", "freeze", "race", "preview", "check")
               if args.stage == "all" else (args.stage,))
+    if not has_preview(args.edition):
+        stages = tuple(stage for stage in stages
+                       if stage not in ("freeze", "preview"))
     godot = None
     for stage in stages:
         print(f"--- {stage} ({args.edition}) ---")

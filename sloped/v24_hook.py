@@ -421,16 +421,26 @@ def build_hook_track(
     hook: Hook,
     plan=None,
     fps: int = FPS,
+    start_track: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """The hook's own frames as a `cameras`-schema track, nothing else in it.
 
     Solved against the *shifted* start plan, because the whole point of the move
     is where it ends: the last row is the shipped start shot's own first row, so
     the two can be concatenated with no join at all. See `build_opening_track`.
+
+    **`start_track` is the shot the hook has to arrive on, when that is not a
+    `StartPlan`.** `start_plan_for` can only express the two windows a
+    `StartPlan` has, and V24's start has more than two - the timeline pass omits
+    inside it - so integration solves that shot itself and hands it in here. The
+    hook reads exactly two things from it, the opening pose and the opening rate,
+    and neither depends on how many windows follow; passing None keeps the
+    prototype's own behaviour and every number in `docs/sloped_race_v24_hook.md`.
     """
     reference = start_reference(replay, machine)
-    shifted = start_plan_for(hook, plan, fps)
-    start_track = v221_shuffle.build_start_track(replay, machine, shifted, fps=fps)
+    if start_track is None:
+        shifted = start_plan_for(hook, plan, fps)
+        start_track = v221_shuffle.build_start_track(replay, machine, shifted, fps=fps)
     land, rate = _landing(start_track, reference, fps)
 
     centre = field_centroid(replay, hook.opens_at)
