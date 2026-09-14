@@ -1,0 +1,314 @@
+{
+  "seed": 5432,
+  "replay_digest_frames": 2701,
+  "phases": [
+    {
+      "phase": "mixer",
+      "replay_from": 1.0,
+      "replay_to": 5.5,
+      "spin_rad_s": {
+        "median": 2.1236,
+        "p95": 16.98,
+        "max": 26.4919
+      },
+      "step_deg_per_frame": {
+        "median": 2.0286,
+        "p95": 16.107,
+        "max": 25.2981
+      },
+      "turns_per_second_median": 0.338
+    },
+    {
+      "phase": "spin-down",
+      "replay_from": 5.5,
+      "replay_to": 6.0,
+      "spin_rad_s": {
+        "median": 1.0763,
+        "p95": 3.6428,
+        "max": 3.6428
+      },
+      "step_deg_per_frame": {
+        "median": 1.0258,
+        "p95": 3.4779,
+        "max": 3.4818
+      },
+      "turns_per_second_median": 0.1713
+    },
+    {
+      "phase": "release",
+      "replay_from": 6.0,
+      "replay_to": 7.0,
+      "spin_rad_s": {
+        "median": 15.5131,
+        "p95": 41.1093,
+        "max": 49.9446
+      },
+      "step_deg_per_frame": {
+        "median": 14.9606,
+        "p95": 39.325,
+        "max": 60.9883
+      },
+      "turns_per_second_median": 2.469
+    },
+    {
+      "phase": "descent",
+      "replay_from": 7.0,
+      "replay_to": 12.0,
+      "spin_rad_s": {
+        "median": 87.2848,
+        "p95": 118.9001,
+        "max": 154.254
+      },
+      "step_deg_per_frame": {
+        "median": 83.351,
+        "p95": 113.5262,
+        "max": 145.8683
+      },
+      "turns_per_second_median": 13.8918
+    },
+    {
+      "phase": "obstacle",
+      "replay_from": 13.8,
+      "replay_to": 15.1,
+      "spin_rad_s": {
+        "median": 7.8443,
+        "p95": 26.6484,
+        "max": 42.3583
+      },
+      "step_deg_per_frame": {
+        "median": 7.6553,
+        "p95": 26.1587,
+        "max": 40.962
+      },
+      "turns_per_second_median": 1.2485
+    },
+    {
+      "phase": "fork",
+      "replay_from": 15.1,
+      "replay_to": 16.73,
+      "spin_rad_s": {
+        "median": 18.0469,
+        "p95": 88.6397,
+        "max": 104.9942
+      },
+      "step_deg_per_frame": {
+        "median": 17.6123,
+        "p95": 87.2645,
+        "max": 100.2621
+      },
+      "turns_per_second_median": 2.8723
+    },
+    {
+      "phase": "rolling",
+      "replay_from": 17.0,
+      "replay_to": 19.0,
+      "spin_rad_s": {
+        "median": 53.572,
+        "p95": 90.9708,
+        "max": 105.9163
+      },
+      "step_deg_per_frame": {
+        "median": 51.2391,
+        "p95": 86.8707,
+        "max": 101.1427
+      },
+      "turns_per_second_median": 8.5262
+    },
+    {
+      "phase": "final",
+      "replay_from": 19.0,
+      "replay_to": 21.0,
+      "spin_rad_s": {
+        "median": 51.4449,
+        "p95": 93.3467,
+        "max": 109.2342
+      },
+      "step_deg_per_frame": {
+        "median": 49.1235,
+        "p95": 86.8547,
+        "max": 102.8089
+      },
+      "turns_per_second_median": 8.1877
+    }
+  ],
+  "sampling": {
+    "samples": 21600,
+    "max_deg_per_frame": 145.8682662698828,
+    "at_replay_second": 9.5167,
+    "over_180_deg": 0,
+    "aliased": false
+  },
+  "readability": {
+    "mixer_spin_up": [
+      {
+        "appearance": "solid",
+        "samples": 576,
+        "median": 0.0,
+        "p95": 0.0,
+        "max": 0.0,
+        "quiet_share": 1.0
+      },
+      {
+        "appearance": "ribbon",
+        "samples": 576,
+        "median": 0.08785,
+        "p95": 0.200403,
+        "max": 0.22041,
+        "quiet_share": 0.0
+      },
+      {
+        "appearance": "crescent",
+        "samples": 576,
+        "median": 0.007965,
+        "p95": 0.124873,
+        "max": 0.18619,
+        "quiet_share": 0.401042
+      },
+      {
+        "appearance": "meridian",
+        "samples": 576,
+        "median": 0.151176,
+        "p95": 0.291655,
+        "max": 0.400423,
+        "quiet_share": 0.0
+      }
+    ],
+    "mixer_full": [
+      {
+        "appearance": "solid",
+        "samples": 576,
+        "median": 0.0,
+        "p95": 0.0,
+        "max": 0.0,
+        "quiet_share": 1.0
+      },
+      {
+        "appearance": "ribbon",
+        "samples": 576,
+        "median": 0.01487,
+        "p95": 0.031801,
+        "max": 0.051786,
+        "quiet_share": 0.006944
+      },
+      {
+        "appearance": "crescent",
+        "samples": 576,
+        "median": 0.002879,
+        "p95": 0.016809,
+        "max": 0.03203,
+        "quiet_share": 0.446181
+      },
+      {
+        "appearance": "meridian",
+        "samples": 576,
+        "median": 0.024658,
+        "p95": 0.052399,
+        "max": 0.072027,
+        "quiet_share": 0.006944
+      }
+    ],
+    "trapdoor": [
+      {
+        "appearance": "solid",
+        "samples": 528,
+        "median": 0.0,
+        "p95": 0.0,
+        "max": 0.0,
+        "quiet_share": 1.0
+      },
+      {
+        "appearance": "ribbon",
+        "samples": 528,
+        "median": 0.099646,
+        "p95": 0.207519,
+        "max": 0.227121,
+        "quiet_share": 0.005682
+      },
+      {
+        "appearance": "crescent",
+        "samples": 528,
+        "median": 0.013613,
+        "p95": 0.152253,
+        "max": 0.267384,
+        "quiet_share": 0.329545
+      },
+      {
+        "appearance": "meridian",
+        "samples": 528,
+        "median": 0.153312,
+        "p95": 0.320538,
+        "max": 0.405454,
+        "quiet_share": 0.0
+      }
+    ],
+    "descent": [
+      {
+        "appearance": "solid",
+        "samples": 576,
+        "median": 0.0,
+        "p95": 0.0,
+        "max": 0.0,
+        "quiet_share": 1.0
+      },
+      {
+        "appearance": "ribbon",
+        "samples": 576,
+        "median": 0.17939,
+        "p95": 0.2124,
+        "max": 0.223992,
+        "quiet_share": 0.0
+      },
+      {
+        "appearance": "crescent",
+        "samples": 576,
+        "median": 0.064796,
+        "p95": 0.175063,
+        "max": 0.226318,
+        "quiet_share": 0.060764
+      },
+      {
+        "appearance": "meridian",
+        "samples": 576,
+        "median": 0.259519,
+        "p95": 0.338254,
+        "max": 0.369883,
+        "quiet_share": 0.0
+      }
+    ],
+    "obstacle": [
+      {
+        "appearance": "solid",
+        "samples": 576,
+        "median": 0.0,
+        "p95": 0.0,
+        "max": 0.0,
+        "quiet_share": 1.0
+      },
+      {
+        "appearance": "ribbon",
+        "samples": 576,
+        "median": 0.056366,
+        "p95": 0.173463,
+        "max": 0.223115,
+        "quiet_share": 0.001736
+      },
+      {
+        "appearance": "crescent",
+        "samples": 576,
+        "median": 0.012523,
+        "p95": 0.078548,
+        "max": 0.17971,
+        "quiet_share": 0.263889
+      },
+      {
+        "appearance": "meridian",
+        "samples": 576,
+        "median": 0.084376,
+        "p95": 0.237538,
+        "max": 0.402652,
+        "quiet_share": 0.001736
+      }
+    ]
+  },
+  "marker_tint": 0.52
+}

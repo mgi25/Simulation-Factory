@@ -1,0 +1,48 @@
+{
+  "renders": [
+    {
+      "appearance": "solid",
+      "frames": 73,
+      "seconds": 35.173,
+      "ms_per_frame": 481.8,
+      "mesh_instances": 1561,
+      "triangles": 556728,
+      "vs_solid_pct": 0.0,
+      "extra_mesh_instances": 0,
+      "extra_triangles": 0
+    },
+    {
+      "appearance": "ribbon",
+      "frames": 73,
+      "seconds": 35.887,
+      "ms_per_frame": 491.6,
+      "mesh_instances": 1561,
+      "triangles": 556728,
+      "vs_solid_pct": 2.03,
+      "extra_mesh_instances": 0,
+      "extra_triangles": 0
+    },
+    {
+      "appearance": "crescent",
+      "frames": 73,
+      "seconds": 35.268,
+      "ms_per_frame": 483.1,
+      "mesh_instances": 1561,
+      "triangles": 556728,
+      "vs_solid_pct": 0.27,
+      "extra_mesh_instances": 0,
+      "extra_triangles": 0
+    },
+    {
+      "appearance": "meridian",
+      "frames": 73,
+      "seconds": 35.936,
+      "ms_per_frame": 492.3,
+      "mesh_instances": 1561,
+      "triangles": 556728,
+      "vs_solid_pct": 2.18,
+      "extra_mesh_instances": 0,
+      "extra_triangles": 0
+    }
+  ]
+}

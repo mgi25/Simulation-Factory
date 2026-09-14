@@ -1,6 +1,7 @@
 extends "res://scripts/course_scene.gd"
 
 const Modules := preload("res://assets/marble_machine/course/course_modules.gd")
+const RacerVisual := preload("res://assets/marble_machine/racers/racer_visual.gd")
 
 ## THE REAL RACE, on the approved sloped course.
 ##
@@ -44,6 +45,7 @@ const Modules := preload("res://assets/marble_machine/course/course_modules.gd")
 ##     --layout=b --detail=hero
 ##     --shot=NAME          override with a still lens from SHOTS
 ##     --finish-sign=double copy the FINISH board onto its own back face
+##     --racers=NAME        racer surface: solid, ribbon, crescent, meridian
 
 # `Palette`, `World`, `Machine`, `Layout`, `Track`, `V2Forms` and `Terrain` all
 # come from the parent class, and re-declaring one is a parse error rather than
@@ -74,6 +76,16 @@ const DEFAULT_CONTRAST := "v21"
 ## V21 and V22 re-render exactly what they shipped.
 const DEFAULT_FINISH_SIGN := "single"
 
+## The racer surface. `solid` is the uniformly coloured sphere every film up
+## to and including V22.1 shipped, and is the default so that all of them
+## re-render exactly what they shipped.
+##
+## The others put a marker on the body so that the rotation the replay
+## already carries becomes visible. None of them touches the physics, the
+## replay, the transform the marble is drawn at, or the colour of any racer
+## off the marker - see `racers/racer_visual.gd`.
+const DEFAULT_RACERS := "solid"
+
 var _replay: Dictionary = {}
 var _camera_track: Dictionary = {}
 var _start_parts: Dictionary = {}
@@ -89,6 +101,7 @@ var _replay_fps := 60.0
 var _render_scale := 0.57
 var _duration := 0.0
 var _use_track := false
+var _racers := DEFAULT_RACERS
 func _ready() -> void:
 	# **Before `super()`, because the course is built inside it.** The start
 	# module the physics runs is not the one the layout table draws, and the
@@ -102,6 +115,10 @@ func _ready() -> void:
 	# on the V20 look so their committed frames keep reproducing - and
 	# `--contrast=` still wins, which is how the before frames were taken.
 	_contrast = str(early.get("contrast", DEFAULT_CONTRAST))
+	_racers = str(early.get("racers", DEFAULT_RACERS))
+	if not RacerVisual.APPEARANCES.has(_racers):
+		push_error("sloped_race_scene: unknown --racers=%s" % _racers)
+		_racers = DEFAULT_RACERS
 	super()
 	_strip_display_field()
 	var options := _options()
@@ -225,19 +242,17 @@ func _load_replay(path: String) -> void:
 	for index in info.size():
 		var record: Dictionary = info[index]
 		var radius := float(record.get("radius", 0.5))
-		var sphere := SphereMesh.new()
-		sphere.radius = radius
-		sphere.height = radius * 2.0
-		sphere.radial_segments = 32
-		sphere.rings = 16
-		var node := MeshInstance3D.new()
-		node.name = "Racer%d" % int(record.get("id", index))
-		node.mesh = sphere
-		node.material_override = _palette.marble(int(record.get("id", index)))
-		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+		var marble_id := int(record.get("id", index))
+		# One mesh, one material, no children: the marker is in the material's
+		# albedo map, which is in the mesh's own UV space and therefore rides
+		# the node transform set from the replay below. At `solid` this builds
+		# the identical sphere and the palette's own material object.
+		var node := RacerVisual.build(_palette.marble(marble_id), radius,
+			"Racer%d" % marble_id, _racers)
 		_marble_root.add_child(node)
 		_marbles.append(node)
 
+	print("racers: %s" % _racers)
 	print("replay: seed %d, %d marbles, %d frames, %.2f s, render scale %.4f" % [
 		int(_replay.get("seed", -1)), _marbles.size(), frames.size(), _duration,
 		_render_scale])
