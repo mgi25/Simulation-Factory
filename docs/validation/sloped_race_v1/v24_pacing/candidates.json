@@ -1,0 +1,1983 @@
+{
+  "a": {
+    "key": "a",
+    "title": "A - the compact start",
+    "note": "every frame of the start's slack, a 0.600 s hold, and the deepest trap cut - the floor this master has",
+    "runtime": 19.6,
+    "frames": 1176,
+    "hold": 0.6,
+    "master_frames": 1140,
+    "coverage": {
+      "shown": 19.0,
+      "replay_from": 0.2,
+      "replay_to": 22.9,
+      "spanned": 22.7,
+      "coverage": 0.8370044052863437,
+      "of_whole_replay": 0.4222222222222222
+    },
+    "omissions": [
+      {
+        "kind": "cut",
+        "replay_from": 2.05,
+        "replay_to": 4.483333,
+        "seconds": 2.433333,
+        "frames": 28,
+        "master_frames": [
+          112,
+          139
+        ]
+      },
+      {
+        "kind": "cut",
+        "replay_from": 4.916667,
+        "replay_to": 5.2,
+        "seconds": 0.28333299999999983,
+        "frames": 16,
+        "master_frames": [
+          167,
+          182
+        ]
+      },
+      {
+        "kind": "cut",
+        "replay_from": 5.666667,
+        "replay_to": 5.866667,
+        "seconds": 0.1999999999999993,
+        "frames": 11,
+        "master_frames": [
+          212,
+          222
+        ]
+      },
+      {
+        "kind": "cut",
+        "replay_from": 6.35,
+        "replay_to": 6.716667,
+        "seconds": 0.3666670000000005,
+        "frames": 21,
+        "master_frames": [
+          253,
+          273
+        ]
+      },
+      {
+        "kind": "cut",
+        "replay_from": 13.583333,
+        "replay_to": 14.1,
+        "seconds": 0.516667,
+        "frames": 30,
+        "master_frames": [
+          687,
+          716
+        ]
+      },
+      {
+        "kind": "tail",
+        "replay_from": 22.9,
+        "replay_to": 24.466667,
+        "seconds": 1.5666670000000025,
+        "frames": 94,
+        "master_frames": [
+          1246,
+          1339
+        ]
+      }
+    ],
+    "join_count": 5,
+    "sections": [
+      {
+        "name": "hold (PICK ONE)",
+        "frames": 36,
+        "seconds": 0.6,
+        "output_from": 0.0,
+        "output_to": 0.6
+      },
+      {
+        "name": "start",
+        "frames": 112,
+        "seconds": 1.8666666666666667,
+        "output_from": 0.6,
+        "output_to": 2.466666666666667
+      },
+      {
+        "name": "start",
+        "frames": 86,
+        "seconds": 1.4333333333333333,
+        "output_from": 2.466666666666667,
+        "output_to": 3.9
+      },
+      {
+        "name": "descent",
+        "frames": 178,
+        "seconds": 2.966666666666667,
+        "output_from": 3.9,
+        "output_to": 6.866666666666666
+      },
+      {
+        "name": "obstacle",
+        "frames": 296,
+        "seconds": 4.933333333333334,
+        "output_from": 6.866666666666666,
+        "output_to": 11.8
+      },
+      {
+        "name": "fork",
+        "frames": 97,
+        "seconds": 1.6166666666666667,
+        "output_from": 11.8,
+        "output_to": 13.416666666666666
+      },
+      {
+        "name": "branches",
+        "frames": 102,
+        "seconds": 1.7,
+        "output_from": 13.416666666666666,
+        "output_to": 15.116666666666667
+      },
+      {
+        "name": "merge",
+        "frames": 29,
+        "seconds": 0.48333333333333334,
+        "output_from": 15.116666666666667,
+        "output_to": 15.6
+      },
+      {
+        "name": "final",
+        "frames": 240,
+        "seconds": 4.0,
+        "output_from": 15.6,
+        "output_to": 19.6
+      }
+    ],
+    "segments": [
+      {
+        "name": "start",
+        "detail": "eight in eight bays, the gates at 0.317, fifteen contacts to 2.013",
+        "approach": 0.6,
+        "interaction": 0.7166669999999999,
+        "exit": 2.4499999999999997,
+        "replay": [
+          0.2,
+          0.316667,
+          2.05
+        ],
+        "whole": true,
+        "run_up": 0.11666699999999997,
+        "pay_off": 1.7333329999999998
+      },
+      {
+        "name": "shuffle",
+        "detail": "the rotor takes hold at 1.617, runs at 13.0 rad/s, winds down over 4.617-4.917 and lifts its blades clear over 5.217-5.650",
+        "approach": 2.016667,
+        "interaction": 2.6000006666666664,
+        "exit": 3.366666666666667,
+        "replay": [
+          1.616667,
+          4.616667,
+          5.65
+        ],
+        "whole": true,
+        "run_up": 0.5833336666666664,
+        "pay_off": 0.7666660000000007
+      },
+      {
+        "name": "release",
+        "detail": "stillness, then the trapdoor's panels swing over 6.117-6.317",
+        "approach": 3.366666666666667,
+        "interaction": 3.65,
+        "exit": 3.85,
+        "replay": [
+          5.65,
+          6.116667,
+          6.316667
+        ],
+        "whole": true,
+        "run_up": 0.28333333333333277,
+        "pay_off": 0.20000000000000018
+      },
+      {
+        "name": "descent",
+        "detail": "the launch chute at 6.9-7.4, then leg1 with the field strung out past 48 wu/s",
+        "approach": 3.9000003333333333,
+        "interaction": 4.883333333333333,
+        "exit": 6.850000333333334,
+        "replay": [
+          6.716667,
+          7.7,
+          9.666667
+        ],
+        "whole": true,
+        "run_up": 0.9833329999999996,
+        "pay_off": 1.966667000000001
+      },
+      {
+        "name": "obstacle",
+        "detail": "the approach at 44 wu/s, 39 contacts over 11.4-12.65, then the trap",
+        "approach": 6.866666333333332,
+        "interaction": 8.583333333333332,
+        "exit": 11.783333333333333,
+        "replay": [
+          9.683333,
+          11.4,
+          15.1
+        ],
+        "whole": true,
+        "run_up": 1.7166670000000002,
+        "pay_off": 3.200000000000001
+      },
+      {
+        "name": "escape",
+        "detail": "the field accelerating out of the blades, the leader into leg3 at 14.996",
+        "approach": 11.083333333333334,
+        "interaction": 11.679166333333333,
+        "exit": 12.983333333333334,
+        "replay": [
+          14.4,
+          14.995833,
+          16.3
+        ],
+        "whole": true,
+        "run_up": 0.595832999999999,
+        "pay_off": 1.3041670000000014
+      },
+      {
+        "name": "fork",
+        "detail": "eight route decisions, marble 7 first at 16.300, blue against orange",
+        "approach": 11.800000333333333,
+        "interaction": 12.983333333333334,
+        "exit": 16.03333333333334,
+        "replay": [
+          15.116667,
+          16.3,
+          19.35
+        ],
+        "whole": true,
+        "run_up": 1.183333000000001,
+        "pay_off": 3.0500000000000043
+      },
+      {
+        "name": "branches",
+        "detail": "the two routes run side by side",
+        "approach": 13.416666333333332,
+        "interaction": 14.533333333333337,
+        "exit": 15.100000333333336,
+        "replay": [
+          16.733333,
+          17.85,
+          18.416667
+        ],
+        "whole": true,
+        "run_up": 1.116667000000005,
+        "pay_off": 0.5666669999999989
+      },
+      {
+        "name": "merge",
+        "detail": "the routes converge on the final channel",
+        "approach": 15.100000333333336,
+        "interaction": 15.583333333333334,
+        "exit": 16.050000333333337,
+        "replay": [
+          18.416667,
+          18.9,
+          19.366667
+        ],
+        "whole": true,
+        "run_up": 0.48333299999999824,
+        "pay_off": 0.46666700000000283
+      },
+      {
+        "name": "finish",
+        "detail": "the chase parks behind the line; the winner at 20.850 and the podium settled by 21.717",
+        "approach": 15.600000333333336,
+        "interaction": 17.53333333333334,
+        "exit": 18.400000333333338,
+        "replay": [
+          18.916667,
+          20.85,
+          21.716667
+        ],
+        "whole": true,
+        "run_up": 1.9333330000000029,
+        "pay_off": 0.8666669999999996
+      }
+    ],
+    "start": {
+      "gates": 0.7166669999999999,
+      "to_release": 3.65,
+      "to_downhill": 3.9000003333333333,
+      "drum": 2.4499999999999997,
+      "first_race_action": 4.070833333333333
+    },
+    "crossings": [
+      {
+        "order": 1,
+        "marble": 5,
+        "route": "orange",
+        "replay": 20.85,
+        "output": 17.53333333333334
+      },
+      {
+        "order": 2,
+        "marble": 2,
+        "route": "blue",
+        "replay": 21.133333,
+        "output": 17.816666333333337
+      },
+      {
+        "order": 3,
+        "marble": 7,
+        "route": "orange",
+        "replay": 21.716667,
+        "output": 18.400000333333338
+      },
+      {
+        "order": 4,
+        "marble": 4,
+        "route": "orange",
+        "replay": 22.633333,
+        "output": 19.316666333333337
+      },
+      {
+        "order": 5,
+        "marble": 1,
+        "route": "blue",
+        "replay": 22.65,
+        "output": 19.333333333333336
+      },
+      {
+        "order": 6,
+        "marble": 6,
+        "route": "orange",
+        "replay": 23.5,
+        "output": null
+      },
+      {
+        "order": 7,
+        "marble": 3,
+        "route": "blue",
+        "replay": 24.316667,
+        "output": null
+      },
+      {
+        "order": 8,
+        "marble": 0,
+        "route": "blue",
+        "replay": 24.416667,
+        "output": null
+      }
+    ],
+    "crossings_shown": 5,
+    "winner_output": 17.53333333333334,
+    "post_winner": 2.066666666666663,
+    "problems": [],
+    "keep": [
+      [
+        0,
+        111
+      ],
+      [
+        140,
+        166
+      ],
+      [
+        183,
+        211
+      ],
+      [
+        223,
+        252
+      ],
+      [
+        274,
+        686
+      ],
+      [
+        717,
+        1245
+      ]
+    ],
+    "joins": [
+      {
+        "output": 2.466666666666667,
+        "before_frame": 111,
+        "after_frame": 140,
+        "replay": [
+          2.05,
+          4.483333
+        ],
+        "omitted_frames": 28,
+        "seconds": 2.433333,
+        "world_mean": 0.5551556757070366,
+        "world_max": 1.3948693804371015,
+        "px_mean": 39.23868526623732,
+        "px_max": 101.44163226502627,
+        "widths_mean": 0.5267032838729674,
+        "widths_max": 1.3446872384972093,
+        "camera_step": 1.5583900859540893,
+        "aim_step": 0.0,
+        "fov_step": 0.0,
+        "churn_before": 1.9651321771677166,
+        "phase_error_deg": 0.037538340468927345,
+        "window": [
+          "start",
+          "start"
+        ],
+        "problems": []
+      },
+      {
+        "output": 2.916666666666667,
+        "before_frame": 166,
+        "after_frame": 183,
+        "replay": [
+          4.916667,
+          5.2
+        ],
+        "omitted_frames": 16,
+        "seconds": 0.28333299999999983,
+        "world_mean": 0.14027051008470307,
+        "world_max": 0.2834761061553487,
+        "px_mean": 7.883685517425636,
+        "px_max": 19.07576263413775,
+        "widths_mean": 0.09984660799697248,
+        "widths_max": 0.23164463181171224,
+        "camera_step": 0.889751206798845,
+        "aim_step": 0.0,
+        "fov_step": 0.0,
+        "churn_before": 0.8040376312958502,
+        "phase_error_deg": 0.0,
+        "window": [
+          "start",
+          "start"
+        ],
+        "problems": []
+      },
+      {
+        "output": 3.4,
+        "before_frame": 211,
+        "after_frame": 223,
+        "replay": [
+          5.666667,
+          5.866667
+        ],
+        "omitted_frames": 11,
+        "seconds": 0.1999999999999993,
+        "world_mean": 0.0859759554763637,
+        "world_max": 0.18967708214225515,
+        "px_mean": 5.699368631641796,
+        "px_max": 14.344339533303677,
+        "widths_mean": 0.0700306956919798,
+        "widths_max": 0.16843842284756402,
+        "camera_step": 0.6134932925468708,
+        "aim_step": 0.0,
+        "fov_step": 0.0,
+        "churn_before": 0.4304393146513402,
+        "phase_error_deg": 0.0,
+        "window": [
+          "start",
+          "start"
+        ],
+        "problems": []
+      },
+      {
+        "output": 3.9,
+        "before_frame": 252,
+        "after_frame": 274,
+        "replay": [
+          6.35,
+          6.716667
+        ],
+        "omitted_frames": 21,
+        "seconds": 0.3666670000000005,
+        "world_mean": 3.4190403440394164,
+        "world_max": 5.207198804980369,
+        "px_mean": 158.44911704473193,
+        "px_max": 264.00577990055234,
+        "widths_mean": 2.3844390215105125,
+        "widths_max": 4.018958196629578,
+        "camera_step": 18.536676920634942,
+        "aim_step": 14.042487167877347,
+        "fov_step": 2.0,
+        "churn_before": 19.68810011912127,
+        "phase_error_deg": 0.0,
+        "window": [
+          "start",
+          "descent"
+        ],
+        "problems": []
+      },
+      {
+        "output": 10.783333333333333,
+        "before_frame": 686,
+        "after_frame": 717,
+        "replay": [
+          13.583333,
+          14.1
+        ],
+        "omitted_frames": 30,
+        "seconds": 0.516667,
+        "world_mean": 1.6150882801670536,
+        "world_max": 2.446269441315489,
+        "px_mean": 84.23517098777438,
+        "px_max": 149.63360103511266,
+        "widths_mean": 1.1067396759811974,
+        "widths_max": 1.9670106150362623,
+        "camera_step": 0.7493729311898044,
+        "aim_step": 0.7577441322768524,
+        "fov_step": 0.0,
+        "churn_before": 3.8500370205682137,
+        "phase_error_deg": 0.0,
+        "window": [
+          "obstacle",
+          "obstacle"
+        ],
+        "problems": []
+      }
+    ]
+  },
+  "b": {
+    "key": "b",
+    "title": "B - the balanced start",
+    "note": "the full 0.700 s hold, 0.250 s of anticipation kept in front of the release, and 0.100 s of the fall before the chase takes over",
+    "runtime": 19.866666666666667,
+    "frames": 1192,
+    "hold": 0.7,
+    "master_frames": 1150,
+    "coverage": {
+      "shown": 19.166666666666668,
+      "replay_from": 0.2,
+      "replay_to": 23.0,
+      "spanned": 22.8,
+      "coverage": 0.8406432748538012,
+      "of_whole_replay": 0.42592592592592593
+    },
+    "omissions": [
+      {
+        "kind": "cut",
+        "replay_from": 2.05,
+        "replay_to": 4.483333,
+        "seconds": 2.433333,
+        "frames": 28,
+        "master_frames": [
+          112,
+          139
+        ]
+      },
+      {
+        "kind": "cut",
+        "replay_from": 4.916667,
+        "replay_to": 5.2,
+        "seconds": 0.28333299999999983,
+        "frames": 16,
+        "master_frames": [
+          167,
+          182
+        ]
+      },
+      {
+        "kind": "cut",
+        "replay_from": 5.666667,
+        "replay_to": 5.866667,
+        "seconds": 0.1999999999999993,
+        "frames": 11,
+        "master_frames": [
+          212,
+          222
+        ]
+      },
+      {
+        "kind": "cut",
+        "replay_from": 6.416667,
+        "replay_to": 6.716667,
+        "seconds": 0.2999999999999998,
+        "frames": 17,
+        "master_frames": [
+          257,
+          273
+        ]
+      },
+      {
+        "kind": "cut",
+        "replay_from": 13.583333,
+        "replay_to": 14.1,
+        "seconds": 0.516667,
+        "frames": 30,
+        "master_frames": [
+          687,
+          716
+        ]
+      },
+      {
+        "kind": "tail",
+        "replay_from": 23.0,
+        "replay_to": 24.466667,
+        "seconds": 1.466667000000001,
+        "frames": 88,
+        "master_frames": [
+          1252,
+          1339
+        ]
+      }
+    ],
+    "join_count": 5,
+    "sections": [
+      {
+        "name": "hold (PICK ONE)",
+        "frames": 42,
+        "seconds": 0.7,
+        "output_from": 0.0,
+        "output_to": 0.7
+      },
+      {
+        "name": "start",
+        "frames": 112,
+        "seconds": 1.8666666666666667,
+        "output_from": 0.7,
+        "output_to": 2.566666666666667
+      },
+      {
+        "name": "start",
+        "frames": 90,
+        "seconds": 1.5,
+        "output_from": 2.566666666666667,
+        "output_to": 4.066666666666666
+      },
+      {
+        "name": "descent",
+        "frames": 178,
+        "seconds": 2.966666666666667,
+        "output_from": 4.066666666666666,
+        "output_to": 7.033333333333333
+      },
+      {
+        "name": "obstacle",
+        "frames": 296,
+        "seconds": 4.933333333333334,
+        "output_from": 7.033333333333333,
+        "output_to": 11.966666666666667
+      },
+      {
+        "name": "fork",
+        "frames": 97,
+        "seconds": 1.6166666666666667,
+        "output_from": 11.966666666666667,
+        "output_to": 13.583333333333334
+      },
+      {
+        "name": "branches",
+        "frames": 102,
+        "seconds": 1.7,
+        "output_from": 13.583333333333334,
+        "output_to": 15.283333333333333
+      },
+      {
+        "name": "merge",
+        "frames": 29,
+        "seconds": 0.48333333333333334,
+        "output_from": 15.283333333333333,
+        "output_to": 15.766666666666667
+      },
+      {
+        "name": "final",
+        "frames": 246,
+        "seconds": 4.1,
+        "output_from": 15.766666666666667,
+        "output_to": 19.866666666666667
+      }
+    ],
+    "segments": [
+      {
+        "name": "start",
+        "detail": "eight in eight bays, the gates at 0.317, fifteen contacts to 2.013",
+        "approach": 0.7,
+        "interaction": 0.8166669999999999,
+        "exit": 2.55,
+        "replay": [
+          0.2,
+          0.316667,
+          2.05
+        ],
+        "whole": true,
+        "run_up": 0.11666699999999997,
+        "pay_off": 1.733333
+      },
+      {
+        "name": "shuffle",
+        "detail": "the rotor takes hold at 1.617, runs at 13.0 rad/s, winds down over 4.617-4.917 and lifts its blades clear over 5.217-5.650",
+        "approach": 2.116667,
+        "interaction": 2.700000666666666,
+        "exit": 3.466666666666667,
+        "replay": [
+          1.616667,
+          4.616667,
+          5.65
+        ],
+        "whole": true,
+        "run_up": 0.583333666666666,
+        "pay_off": 0.7666660000000007
+      },
+      {
+        "name": "release",
+        "detail": "stillness, then the trapdoor's panels swing over 6.117-6.317",
+        "approach": 3.466666666666667,
+        "interaction": 3.75,
+        "exit": 3.95,
+        "replay": [
+          5.65,
+          6.116667,
+          6.316667
+        ],
+        "whole": true,
+        "run_up": 0.2833333333333332,
+        "pay_off": 0.20000000000000018
+      },
+      {
+        "name": "descent",
+        "detail": "the launch chute at 6.9-7.4, then leg1 with the field strung out past 48 wu/s",
+        "approach": 4.066667,
+        "interaction": 5.05,
+        "exit": 7.016667,
+        "replay": [
+          6.716667,
+          7.7,
+          9.666667
+        ],
+        "whole": true,
+        "run_up": 0.983333,
+        "pay_off": 1.9666670000000002
+      },
+      {
+        "name": "obstacle",
+        "detail": "the approach at 44 wu/s, 39 contacts over 11.4-12.65, then the trap",
+        "approach": 7.033332999999999,
+        "interaction": 8.75,
+        "exit": 11.95,
+        "replay": [
+          9.683333,
+          11.4,
+          15.1
+        ],
+        "whole": true,
+        "run_up": 1.716667000000001,
+        "pay_off": 3.1999999999999993
+      },
+      {
+        "name": "escape",
+        "detail": "the field accelerating out of the blades, the leader into leg3 at 14.996",
+        "approach": 11.25,
+        "interaction": 11.845832999999999,
+        "exit": 13.15,
+        "replay": [
+          14.4,
+          14.995833,
+          16.3
+        ],
+        "whole": true,
+        "run_up": 0.595832999999999,
+        "pay_off": 1.3041670000000014
+      },
+      {
+        "name": "fork",
+        "detail": "eight route decisions, marble 7 first at 16.300, blue against orange",
+        "approach": 11.966667,
+        "interaction": 13.15,
+        "exit": 16.200000000000003,
+        "replay": [
+          15.116667,
+          16.3,
+          19.35
+        ],
+        "whole": true,
+        "run_up": 1.183333000000001,
+        "pay_off": 3.0500000000000025
+      },
+      {
+        "name": "branches",
+        "detail": "the two routes run side by side",
+        "approach": 13.583332999999998,
+        "interaction": 14.700000000000003,
+        "exit": 15.266667000000002,
+        "replay": [
+          16.733333,
+          17.85,
+          18.416667
+        ],
+        "whole": true,
+        "run_up": 1.116667000000005,
+        "pay_off": 0.5666669999999989
+      },
+      {
+        "name": "merge",
+        "detail": "the routes converge on the final channel",
+        "approach": 15.266667000000002,
+        "interaction": 15.75,
+        "exit": 16.216667,
+        "replay": [
+          18.416667,
+          18.9,
+          19.366667
+        ],
+        "whole": true,
+        "run_up": 0.48333299999999824,
+        "pay_off": 0.46666700000000105
+      },
+      {
+        "name": "finish",
+        "detail": "the chase parks behind the line; the winner at 20.850 and the podium settled by 21.717",
+        "approach": 15.766667000000002,
+        "interaction": 17.700000000000003,
+        "exit": 18.566667000000002,
+        "replay": [
+          18.916667,
+          20.85,
+          21.716667
+        ],
+        "whole": true,
+        "run_up": 1.933333000000001,
+        "pay_off": 0.8666669999999996
+      }
+    ],
+    "start": {
+      "gates": 0.8166669999999999,
+      "to_release": 3.75,
+      "to_downhill": 4.066667,
+      "drum": 2.55,
+      "first_race_action": 4.2375
+    },
+    "crossings": [
+      {
+        "order": 1,
+        "marble": 5,
+        "route": "orange",
+        "replay": 20.85,
+        "output": 17.700000000000003
+      },
+      {
+        "order": 2,
+        "marble": 2,
+        "route": "blue",
+        "replay": 21.133333,
+        "output": 17.983333000000002
+      },
+      {
+        "order": 3,
+        "marble": 7,
+        "route": "orange",
+        "replay": 21.716667,
+        "output": 18.566667000000002
+      },
+      {
+        "order": 4,
+        "marble": 4,
+        "route": "orange",
+        "replay": 22.633333,
+        "output": 19.483333000000002
+      },
+      {
+        "order": 5,
+        "marble": 1,
+        "route": "blue",
+        "replay": 22.65,
+        "output": 19.5
+      },
+      {
+        "order": 6,
+        "marble": 6,
+        "route": "orange",
+        "replay": 23.5,
+        "output": null
+      },
+      {
+        "order": 7,
+        "marble": 3,
+        "route": "blue",
+        "replay": 24.316667,
+        "output": null
+      },
+      {
+        "order": 8,
+        "marble": 0,
+        "route": "blue",
+        "replay": 24.416667,
+        "output": null
+      }
+    ],
+    "crossings_shown": 5,
+    "winner_output": 17.700000000000003,
+    "post_winner": 2.1666666666666643,
+    "problems": [],
+    "keep": [
+      [
+        0,
+        111
+      ],
+      [
+        140,
+        166
+      ],
+      [
+        183,
+        211
+      ],
+      [
+        223,
+        256
+      ],
+      [
+        274,
+        686
+      ],
+      [
+        717,
+        1251
+      ]
+    ],
+    "joins": [
+      {
+        "output": 2.5666666666666664,
+        "before_frame": 111,
+        "after_frame": 140,
+        "replay": [
+          2.05,
+          4.483333
+        ],
+        "omitted_frames": 28,
+        "seconds": 2.433333,
+        "world_mean": 0.5551556757070366,
+        "world_max": 1.3948693804371015,
+        "px_mean": 39.23868526623732,
+        "px_max": 101.44163226502627,
+        "widths_mean": 0.5267032838729674,
+        "widths_max": 1.3446872384972093,
+        "camera_step": 1.5583900859540893,
+        "aim_step": 0.0,
+        "fov_step": 0.0,
+        "churn_before": 1.9651321771677166,
+        "phase_error_deg": 0.037538340468927345,
+        "window": [
+          "start",
+          "start"
+        ],
+        "problems": []
+      },
+      {
+        "output": 3.0166666666666666,
+        "before_frame": 166,
+        "after_frame": 183,
+        "replay": [
+          4.916667,
+          5.2
+        ],
+        "omitted_frames": 16,
+        "seconds": 0.28333299999999983,
+        "world_mean": 0.14027051008470307,
+        "world_max": 0.2834761061553487,
+        "px_mean": 7.883685517425636,
+        "px_max": 19.07576263413775,
+        "widths_mean": 0.09984660799697248,
+        "widths_max": 0.23164463181171224,
+        "camera_step": 0.889751206798845,
+        "aim_step": 0.0,
+        "fov_step": 0.0,
+        "churn_before": 0.8040376312958502,
+        "phase_error_deg": 0.0,
+        "window": [
+          "start",
+          "start"
+        ],
+        "problems": []
+      },
+      {
+        "output": 3.5,
+        "before_frame": 211,
+        "after_frame": 223,
+        "replay": [
+          5.666667,
+          5.866667
+        ],
+        "omitted_frames": 11,
+        "seconds": 0.1999999999999993,
+        "world_mean": 0.0859759554763637,
+        "world_max": 0.18967708214225515,
+        "px_mean": 5.699368631641796,
+        "px_max": 14.344339533303677,
+        "widths_mean": 0.0700306956919798,
+        "widths_max": 0.16843842284756402,
+        "camera_step": 0.6134932925468708,
+        "aim_step": 0.0,
+        "fov_step": 0.0,
+        "churn_before": 0.4304393146513402,
+        "phase_error_deg": 0.0,
+        "window": [
+          "start",
+          "start"
+        ],
+        "problems": []
+      },
+      {
+        "output": 4.066666666666666,
+        "before_frame": 256,
+        "after_frame": 274,
+        "replay": [
+          6.416667,
+          6.716667
+        ],
+        "omitted_frames": 17,
+        "seconds": 0.2999999999999998,
+        "world_mean": 2.7367921728571813,
+        "world_max": 3.7905701056631314,
+        "px_mean": 162.23142776767043,
+        "px_max": 265.87478044390497,
+        "widths_mean": 2.4587140747120637,
+        "widths_max": 4.0514173926563934,
+        "camera_step": 18.689026310913043,
+        "aim_step": 14.042487167877347,
+        "fov_step": 2.0,
+        "churn_before": 17.680460151621578,
+        "phase_error_deg": 0.0,
+        "window": [
+          "start",
+          "descent"
+        ],
+        "problems": []
+      },
+      {
+        "output": 10.95,
+        "before_frame": 686,
+        "after_frame": 717,
+        "replay": [
+          13.583333,
+          14.1
+        ],
+        "omitted_frames": 30,
+        "seconds": 0.516667,
+        "world_mean": 1.6150882801670536,
+        "world_max": 2.446269441315489,
+        "px_mean": 84.23517098777438,
+        "px_max": 149.63360103511266,
+        "widths_mean": 1.1067396759811974,
+        "widths_max": 1.9670106150362623,
+        "camera_step": 0.7493729311898044,
+        "aim_step": 0.7577441322768524,
+        "fov_step": 0.0,
+        "churn_before": 3.8500370205682137,
+        "phase_error_deg": 0.0,
+        "window": [
+          "obstacle",
+          "obstacle"
+        ],
+        "problems": []
+      }
+    ]
+  },
+  "c": {
+    "key": "c",
+    "title": "C - the richer start",
+    "note": "the machine's ceremony left whole - the full 0.467 s of anticipation and the whole fall - paid for at the finish",
+    "runtime": 20.233333333333334,
+    "frames": 1214,
+    "hold": 0.7,
+    "master_frames": 1172,
+    "coverage": {
+      "shown": 19.533333333333335,
+      "replay_from": 0.2,
+      "replay_to": 22.9,
+      "spanned": 22.7,
+      "coverage": 0.8604992657856095,
+      "of_whole_replay": 0.4340740740740741
+    },
+    "omissions": [
+      {
+        "kind": "cut",
+        "replay_from": 2.05,
+        "replay_to": 4.483333,
+        "seconds": 2.433333,
+        "frames": 28,
+        "master_frames": [
+          112,
+          139
+        ]
+      },
+      {
+        "kind": "cut",
+        "replay_from": 4.916667,
+        "replay_to": 5.2,
+        "seconds": 0.28333299999999983,
+        "frames": 16,
+        "master_frames": [
+          167,
+          182
+        ]
+      },
+      {
+        "kind": "cut",
+        "replay_from": 13.583333,
+        "replay_to": 14.1,
+        "seconds": 0.516667,
+        "frames": 30,
+        "master_frames": [
+          687,
+          716
+        ]
+      },
+      {
+        "kind": "tail",
+        "replay_from": 22.9,
+        "replay_to": 24.466667,
+        "seconds": 1.5666670000000025,
+        "frames": 94,
+        "master_frames": [
+          1246,
+          1339
+        ]
+      }
+    ],
+    "join_count": 3,
+    "sections": [
+      {
+        "name": "hold (PICK ONE)",
+        "frames": 42,
+        "seconds": 0.7,
+        "output_from": 0.0,
+        "output_to": 0.7
+      },
+      {
+        "name": "start",
+        "frames": 112,
+        "seconds": 1.8666666666666667,
+        "output_from": 0.7,
+        "output_to": 2.566666666666667
+      },
+      {
+        "name": "start",
+        "frames": 118,
+        "seconds": 1.9666666666666666,
+        "output_from": 2.566666666666667,
+        "output_to": 4.533333333333333
+      },
+      {
+        "name": "descent",
+        "frames": 178,
+        "seconds": 2.966666666666667,
+        "output_from": 4.533333333333333,
+        "output_to": 7.5
+      },
+      {
+        "name": "obstacle",
+        "frames": 296,
+        "seconds": 4.933333333333334,
+        "output_from": 7.5,
+        "output_to": 12.433333333333334
+      },
+      {
+        "name": "fork",
+        "frames": 97,
+        "seconds": 1.6166666666666667,
+        "output_from": 12.433333333333334,
+        "output_to": 14.05
+      },
+      {
+        "name": "branches",
+        "frames": 102,
+        "seconds": 1.7,
+        "output_from": 14.05,
+        "output_to": 15.75
+      },
+      {
+        "name": "merge",
+        "frames": 29,
+        "seconds": 0.48333333333333334,
+        "output_from": 15.75,
+        "output_to": 16.233333333333334
+      },
+      {
+        "name": "final",
+        "frames": 240,
+        "seconds": 4.0,
+        "output_from": 16.233333333333334,
+        "output_to": 20.233333333333334
+      }
+    ],
+    "segments": [
+      {
+        "name": "start",
+        "detail": "eight in eight bays, the gates at 0.317, fifteen contacts to 2.013",
+        "approach": 0.7,
+        "interaction": 0.8166669999999999,
+        "exit": 2.55,
+        "replay": [
+          0.2,
+          0.316667,
+          2.05
+        ],
+        "whole": true,
+        "run_up": 0.11666699999999997,
+        "pay_off": 1.733333
+      },
+      {
+        "name": "shuffle",
+        "detail": "the rotor takes hold at 1.617, runs at 13.0 rad/s, winds down over 4.617-4.917 and lifts its blades clear over 5.217-5.650",
+        "approach": 2.116667,
+        "interaction": 2.700000666666666,
+        "exit": 3.466666666666667,
+        "replay": [
+          1.616667,
+          4.616667,
+          5.65
+        ],
+        "whole": true,
+        "run_up": 0.583333666666666,
+        "pay_off": 0.7666660000000007
+      },
+      {
+        "name": "release",
+        "detail": "stillness, then the trapdoor's panels swing over 6.117-6.317",
+        "approach": 3.466666666666667,
+        "interaction": 3.933333666666666,
+        "exit": 4.133333666666666,
+        "replay": [
+          5.65,
+          6.116667,
+          6.316667
+        ],
+        "whole": true,
+        "run_up": 0.4666669999999993,
+        "pay_off": 0.20000000000000018
+      },
+      {
+        "name": "descent",
+        "detail": "the launch chute at 6.9-7.4, then leg1 with the field strung out past 48 wu/s",
+        "approach": 4.533333666666667,
+        "interaction": 5.516666666666667,
+        "exit": 7.483333666666667,
+        "replay": [
+          6.716667,
+          7.7,
+          9.666667
+        ],
+        "whole": true,
+        "run_up": 0.983333,
+        "pay_off": 1.9666670000000002
+      },
+      {
+        "name": "obstacle",
+        "detail": "the approach at 44 wu/s, 39 contacts over 11.4-12.65, then the trap",
+        "approach": 7.499999666666666,
+        "interaction": 9.216666666666667,
+        "exit": 12.416666666666666,
+        "replay": [
+          9.683333,
+          11.4,
+          15.1
+        ],
+        "whole": true,
+        "run_up": 1.716667000000001,
+        "pay_off": 3.1999999999999993
+      },
+      {
+        "name": "escape",
+        "detail": "the field accelerating out of the blades, the leader into leg3 at 14.996",
+        "approach": 11.716666666666667,
+        "interaction": 12.312499666666666,
+        "exit": 13.616666666666665,
+        "replay": [
+          14.4,
+          14.995833,
+          16.3
+        ],
+        "whole": true,
+        "run_up": 0.595832999999999,
+        "pay_off": 1.3041669999999996
+      },
+      {
+        "name": "fork",
+        "detail": "eight route decisions, marble 7 first at 16.300, blue against orange",
+        "approach": 12.433333666666664,
+        "interaction": 13.616666666666665,
+        "exit": 16.666666666666668,
+        "replay": [
+          15.116667,
+          16.3,
+          19.35
+        ],
+        "whole": true,
+        "run_up": 1.183333000000001,
+        "pay_off": 3.0500000000000025
+      },
+      {
+        "name": "branches",
+        "detail": "the two routes run side by side",
+        "approach": 14.049999666666663,
+        "interaction": 15.166666666666668,
+        "exit": 15.733333666666667,
+        "replay": [
+          16.733333,
+          17.85,
+          18.416667
+        ],
+        "whole": true,
+        "run_up": 1.116667000000005,
+        "pay_off": 0.5666669999999989
+      },
+      {
+        "name": "merge",
+        "detail": "the routes converge on the final channel",
+        "approach": 15.733333666666667,
+        "interaction": 16.216666666666665,
+        "exit": 16.683333666666666,
+        "replay": [
+          18.416667,
+          18.9,
+          19.366667
+        ],
+        "whole": true,
+        "run_up": 0.48333299999999824,
+        "pay_off": 0.46666700000000105
+      },
+      {
+        "name": "finish",
+        "detail": "the chase parks behind the line; the winner at 20.850 and the podium settled by 21.717",
+        "approach": 16.233333666666667,
+        "interaction": 18.166666666666668,
+        "exit": 19.033333666666667,
+        "replay": [
+          18.916667,
+          20.85,
+          21.716667
+        ],
+        "whole": true,
+        "run_up": 1.933333000000001,
+        "pay_off": 0.8666669999999996
+      }
+    ],
+    "start": {
+      "gates": 0.8166669999999999,
+      "to_release": 3.933333666666666,
+      "to_downhill": 4.533333666666667,
+      "drum": 2.55,
+      "first_race_action": 4.704166666666667
+    },
+    "crossings": [
+      {
+        "order": 1,
+        "marble": 5,
+        "route": "orange",
+        "replay": 20.85,
+        "output": 18.166666666666668
+      },
+      {
+        "order": 2,
+        "marble": 2,
+        "route": "blue",
+        "replay": 21.133333,
+        "output": 18.449999666666667
+      },
+      {
+        "order": 3,
+        "marble": 7,
+        "route": "orange",
+        "replay": 21.716667,
+        "output": 19.033333666666667
+      },
+      {
+        "order": 4,
+        "marble": 4,
+        "route": "orange",
+        "replay": 22.633333,
+        "output": 19.949999666666667
+      },
+      {
+        "order": 5,
+        "marble": 1,
+        "route": "blue",
+        "replay": 22.65,
+        "output": 19.966666666666665
+      },
+      {
+        "order": 6,
+        "marble": 6,
+        "route": "orange",
+        "replay": 23.5,
+        "output": null
+      },
+      {
+        "order": 7,
+        "marble": 3,
+        "route": "blue",
+        "replay": 24.316667,
+        "output": null
+      },
+      {
+        "order": 8,
+        "marble": 0,
+        "route": "blue",
+        "replay": 24.416667,
+        "output": null
+      }
+    ],
+    "crossings_shown": 5,
+    "winner_output": 18.166666666666668,
+    "post_winner": 2.0666666666666664,
+    "problems": [],
+    "keep": [
+      [
+        0,
+        111
+      ],
+      [
+        140,
+        166
+      ],
+      [
+        183,
+        686
+      ],
+      [
+        717,
+        1245
+      ]
+    ],
+    "joins": [
+      {
+        "output": 2.5666666666666664,
+        "before_frame": 111,
+        "after_frame": 140,
+        "replay": [
+          2.05,
+          4.483333
+        ],
+        "omitted_frames": 28,
+        "seconds": 2.433333,
+        "world_mean": 0.5551556757070366,
+        "world_max": 1.3948693804371015,
+        "px_mean": 39.23868526623732,
+        "px_max": 101.44163226502627,
+        "widths_mean": 0.5267032838729674,
+        "widths_max": 1.3446872384972093,
+        "camera_step": 1.5583900859540893,
+        "aim_step": 0.0,
+        "fov_step": 0.0,
+        "churn_before": 1.9651321771677166,
+        "phase_error_deg": 0.037538340468927345,
+        "window": [
+          "start",
+          "start"
+        ],
+        "problems": []
+      },
+      {
+        "output": 3.0166666666666666,
+        "before_frame": 166,
+        "after_frame": 183,
+        "replay": [
+          4.916667,
+          5.2
+        ],
+        "omitted_frames": 16,
+        "seconds": 0.28333299999999983,
+        "world_mean": 0.14027051008470307,
+        "world_max": 0.2834761061553487,
+        "px_mean": 7.883685517425636,
+        "px_max": 19.07576263413775,
+        "widths_mean": 0.09984660799697248,
+        "widths_max": 0.23164463181171224,
+        "camera_step": 0.889751206798845,
+        "aim_step": 0.0,
+        "fov_step": 0.0,
+        "churn_before": 0.8040376312958502,
+        "phase_error_deg": 0.0,
+        "window": [
+          "start",
+          "start"
+        ],
+        "problems": []
+      },
+      {
+        "output": 11.416666666666666,
+        "before_frame": 686,
+        "after_frame": 717,
+        "replay": [
+          13.583333,
+          14.1
+        ],
+        "omitted_frames": 30,
+        "seconds": 0.516667,
+        "world_mean": 1.6150882801670536,
+        "world_max": 2.446269441315489,
+        "px_mean": 84.23517098777438,
+        "px_max": 149.63360103511266,
+        "widths_mean": 1.1067396759811974,
+        "widths_max": 1.9670106150362623,
+        "camera_step": 0.7493729311898044,
+        "aim_step": 0.7577441322768524,
+        "fov_step": 0.0,
+        "churn_before": 3.8500370205682137,
+        "phase_error_deg": 0.0,
+        "window": [
+          "obstacle",
+          "obstacle"
+        ],
+        "problems": []
+      }
+    ]
+  },
+  "d_rejected": {
+    "key": "d_rejected",
+    "title": "D - REJECTED: the brief's start target, and its cost",
+    "note": "the field on the downhill at 2.733 s, which is the brief's own band - and a rotor that stops in a single frame to get there",
+    "runtime": 18.533333333333335,
+    "frames": 1112,
+    "hold": 0.6,
+    "master_frames": 1076,
+    "coverage": {
+      "shown": 17.933333333333334,
+      "replay_from": 0.2,
+      "replay_to": 23.0,
+      "spanned": 22.8,
+      "coverage": 0.7865497076023392,
+      "of_whole_replay": 0.39851851851851855
+    },
+    "omissions": [
+      {
+        "kind": "cut",
+        "replay_from": 2.05,
+        "replay_to": 6.1,
+        "seconds": 4.05,
+        "frames": 125,
+        "master_frames": [
+          112,
+          236
+        ]
+      },
+      {
+        "kind": "cut",
+        "replay_from": 6.35,
+        "replay_to": 6.716667,
+        "seconds": 0.3666670000000005,
+        "frames": 21,
+        "master_frames": [
+          253,
+          273
+        ]
+      },
+      {
+        "kind": "cut",
+        "replay_from": 13.583333,
+        "replay_to": 14.1,
+        "seconds": 0.516667,
+        "frames": 30,
+        "master_frames": [
+          687,
+          716
+        ]
+      },
+      {
+        "kind": "tail",
+        "replay_from": 23.0,
+        "replay_to": 24.466667,
+        "seconds": 1.466667000000001,
+        "frames": 88,
+        "master_frames": [
+          1252,
+          1339
+        ]
+      }
+    ],
+    "join_count": 3,
+    "sections": [
+      {
+        "name": "hold (PICK ONE)",
+        "frames": 36,
+        "seconds": 0.6,
+        "output_from": 0.0,
+        "output_to": 0.6
+      },
+      {
+        "name": "start",
+        "frames": 112,
+        "seconds": 1.8666666666666667,
+        "output_from": 0.6,
+        "output_to": 2.466666666666667
+      },
+      {
+        "name": "start",
+        "frames": 16,
+        "seconds": 0.26666666666666666,
+        "output_from": 2.466666666666667,
+        "output_to": 2.7333333333333334
+      },
+      {
+        "name": "descent",
+        "frames": 178,
+        "seconds": 2.966666666666667,
+        "output_from": 2.7333333333333334,
+        "output_to": 5.7
+      },
+      {
+        "name": "obstacle",
+        "frames": 296,
+        "seconds": 4.933333333333334,
+        "output_from": 5.7,
+        "output_to": 10.633333333333333
+      },
+      {
+        "name": "fork",
+        "frames": 97,
+        "seconds": 1.6166666666666667,
+        "output_from": 10.633333333333333,
+        "output_to": 12.25
+      },
+      {
+        "name": "branches",
+        "frames": 102,
+        "seconds": 1.7,
+        "output_from": 12.25,
+        "output_to": 13.95
+      },
+      {
+        "name": "merge",
+        "frames": 29,
+        "seconds": 0.48333333333333334,
+        "output_from": 13.95,
+        "output_to": 14.433333333333334
+      },
+      {
+        "name": "final",
+        "frames": 246,
+        "seconds": 4.1,
+        "output_from": 14.433333333333334,
+        "output_to": 18.533333333333335
+      }
+    ],
+    "segments": [
+      {
+        "name": "start",
+        "detail": "eight in eight bays, the gates at 0.317, fifteen contacts to 2.013",
+        "approach": 0.6,
+        "interaction": 0.7166669999999999,
+        "exit": 2.4499999999999997,
+        "replay": [
+          0.2,
+          0.316667,
+          2.05
+        ],
+        "whole": true,
+        "run_up": 0.11666699999999997,
+        "pay_off": 1.7333329999999998
+      },
+      {
+        "name": "shuffle",
+        "detail": "the rotor takes hold at 1.617, runs at 13.0 rad/s, winds down over 4.617-4.917 and lifts its blades clear over 5.217-5.650",
+        "approach": 2.016667,
+        "interaction": null,
+        "exit": null,
+        "replay": [
+          1.616667,
+          4.616667,
+          5.65
+        ],
+        "whole": false,
+        "run_up": null,
+        "pay_off": null
+      },
+      {
+        "name": "release",
+        "detail": "stillness, then the trapdoor's panels swing over 6.117-6.317",
+        "approach": null,
+        "interaction": 2.4833336666666668,
+        "exit": 2.683333666666667,
+        "replay": [
+          5.65,
+          6.116667,
+          6.316667
+        ],
+        "whole": false,
+        "run_up": null,
+        "pay_off": 0.20000000000000018
+      },
+      {
+        "name": "descent",
+        "detail": "the launch chute at 6.9-7.4, then leg1 with the field strung out past 48 wu/s",
+        "approach": 2.7333336666666668,
+        "interaction": 3.716666666666667,
+        "exit": 5.683333666666667,
+        "replay": [
+          6.716667,
+          7.7,
+          9.666667
+        ],
+        "whole": true,
+        "run_up": 0.983333,
+        "pay_off": 1.9666670000000002
+      },
+      {
+        "name": "obstacle",
+        "detail": "the approach at 44 wu/s, 39 contacts over 11.4-12.65, then the trap",
+        "approach": 5.699999666666665,
+        "interaction": 7.416666666666666,
+        "exit": 10.616666666666667,
+        "replay": [
+          9.683333,
+          11.4,
+          15.1
+        ],
+        "whole": true,
+        "run_up": 1.716667000000001,
+        "pay_off": 3.200000000000001
+      },
+      {
+        "name": "escape",
+        "detail": "the field accelerating out of the blades, the leader into leg3 at 14.996",
+        "approach": 9.916666666666668,
+        "interaction": 10.512499666666667,
+        "exit": 11.816666666666666,
+        "replay": [
+          14.4,
+          14.995833,
+          16.3
+        ],
+        "whole": true,
+        "run_up": 0.595832999999999,
+        "pay_off": 1.3041669999999996
+      },
+      {
+        "name": "fork",
+        "detail": "eight route decisions, marble 7 first at 16.300, blue against orange",
+        "approach": 10.633333666666665,
+        "interaction": 11.816666666666666,
+        "exit": 14.866666666666669,
+        "replay": [
+          15.116667,
+          16.3,
+          19.35
+        ],
+        "whole": true,
+        "run_up": 1.183333000000001,
+        "pay_off": 3.0500000000000025
+      },
+      {
+        "name": "branches",
+        "detail": "the two routes run side by side",
+        "approach": 12.249999666666664,
+        "interaction": 13.366666666666669,
+        "exit": 13.933333666666668,
+        "replay": [
+          16.733333,
+          17.85,
+          18.416667
+        ],
+        "whole": true,
+        "run_up": 1.116667000000005,
+        "pay_off": 0.5666669999999989
+      },
+      {
+        "name": "merge",
+        "detail": "the routes converge on the final channel",
+        "approach": 13.933333666666668,
+        "interaction": 14.416666666666666,
+        "exit": 14.883333666666667,
+        "replay": [
+          18.416667,
+          18.9,
+          19.366667
+        ],
+        "whole": true,
+        "run_up": 0.48333299999999824,
+        "pay_off": 0.46666700000000105
+      },
+      {
+        "name": "finish",
+        "detail": "the chase parks behind the line; the winner at 20.850 and the podium settled by 21.717",
+        "approach": 14.433333666666668,
+        "interaction": 16.366666666666667,
+        "exit": 17.233333666666667,
+        "replay": [
+          18.916667,
+          20.85,
+          21.716667
+        ],
+        "whole": true,
+        "run_up": 1.9333329999999993,
+        "pay_off": 0.8666669999999996
+      }
+    ],
+    "start": {
+      "gates": 0.7166669999999999,
+      "to_release": 2.4833336666666668,
+      "to_downhill": 2.7333336666666668,
+      "drum": 2.4499999999999997,
+      "first_race_action": 2.904166666666667
+    },
+    "crossings": [
+      {
+        "order": 1,
+        "marble": 5,
+        "route": "orange",
+        "replay": 20.85,
+        "output": 16.366666666666667
+      },
+      {
+        "order": 2,
+        "marble": 2,
+        "route": "blue",
+        "replay": 21.133333,
+        "output": 16.649999666666666
+      },
+      {
+        "order": 3,
+        "marble": 7,
+        "route": "orange",
+        "replay": 21.716667,
+        "output": 17.233333666666667
+      },
+      {
+        "order": 4,
+        "marble": 4,
+        "route": "orange",
+        "replay": 22.633333,
+        "output": 18.149999666666666
+      },
+      {
+        "order": 5,
+        "marble": 1,
+        "route": "blue",
+        "replay": 22.65,
+        "output": 18.166666666666664
+      },
+      {
+        "order": 6,
+        "marble": 6,
+        "route": "orange",
+        "replay": 23.5,
+        "output": null
+      },
+      {
+        "order": 7,
+        "marble": 3,
+        "route": "blue",
+        "replay": 24.316667,
+        "output": null
+      },
+      {
+        "order": 8,
+        "marble": 0,
+        "route": "blue",
+        "replay": 24.416667,
+        "output": null
+      }
+    ],
+    "crossings_shown": 5,
+    "winner_output": 16.366666666666667,
+    "post_winner": 2.166666666666668,
+    "problems": [
+      "at output 2.467: the rotor turns at 13.00 rad/s before the join and 0.04 after it",
+      "at output 2.467: the blades stand 1.193 layout units apart across the join",
+      "at output 2.467: the blades land +23.57 degrees off the lock (90 degree symmetry, 12.41 degrees a frame)",
+      "the join at output 2.467 resumes 0.017 s before the trapdoor releasing"
+    ],
+    "keep": [
+      [
+        0,
+        111
+      ],
+      [
+        237,
+        252
+      ],
+      [
+        274,
+        686
+      ],
+      [
+        717,
+        1251
+      ]
+    ],
+    "joins": [
+      {
+        "output": 2.466666666666667,
+        "before_frame": 111,
+        "after_frame": 237,
+        "replay": [
+          2.05,
+          6.1
+        ],
+        "omitted_frames": 125,
+        "seconds": 4.05,
+        "world_mean": 1.0623105763026321,
+        "world_max": 2.2045417189103014,
+        "px_mean": 69.82058688362427,
+        "px_max": 149.07950754548767,
+        "widths_mean": 0.8964692425965634,
+        "widths_max": 1.9331548422347522,
+        "camera_step": 6.566007893690046,
+        "aim_step": 0.0,
+        "fov_step": 0.0,
+        "churn_before": 1.9651321771677166,
+        "phase_error_deg": 23.570818749894897,
+        "window": [
+          "start",
+          "start"
+        ],
+        "problems": [
+          "the rotor turns at 13.00 rad/s before the join and 0.04 after it",
+          "the blades stand 1.193 layout units apart across the join",
+          "the blades land +23.57 degrees off the lock (90 degree symmetry, 12.41 degrees a frame)"
+        ]
+      },
+      {
+        "output": 2.7333333333333334,
+        "before_frame": 252,
+        "after_frame": 274,
+        "replay": [
+          6.35,
+          6.716667
+        ],
+        "omitted_frames": 21,
+        "seconds": 0.3666670000000005,
+        "world_mean": 3.4190403440394164,
+        "world_max": 5.207198804980369,
+        "px_mean": 158.44911704473193,
+        "px_max": 264.00577990055234,
+        "widths_mean": 2.3844390215105125,
+        "widths_max": 4.018958196629578,
+        "camera_step": 18.536676920634942,
+        "aim_step": 14.042487167877347,
+        "fov_step": 2.0,
+        "churn_before": 19.68810011912127,
+        "phase_error_deg": 0.0,
+        "window": [
+          "start",
+          "descent"
+        ],
+        "problems": []
+      },
+      {
+        "output": 9.616666666666667,
+        "before_frame": 686,
+        "after_frame": 717,
+        "replay": [
+          13.583333,
+          14.1
+        ],
+        "omitted_frames": 30,
+        "seconds": 0.516667,
+        "world_mean": 1.6150882801670536,
+        "world_max": 2.446269441315489,
+        "px_mean": 84.23517098777438,
+        "px_max": 149.63360103511266,
+        "widths_mean": 1.1067396759811974,
+        "widths_max": 1.9670106150362623,
+        "camera_step": 0.7493729311898044,
+        "aim_step": 0.7577441322768524,
+        "fov_step": 0.0,
+        "churn_before": 3.8500370205682137,
+        "phase_error_deg": 0.0,
+        "window": [
+          "obstacle",
+          "obstacle"
+        ],
+        "problems": []
+      }
+    ]
+  }
+}
