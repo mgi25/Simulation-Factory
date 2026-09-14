@@ -1,0 +1,189 @@
+{
+  "id": "aurora_valley_v25b",
+  "title": "V25 B - Balanced premium",
+  "summary": "A, plus foreground rock, support foundations, sparse conifers, one landmark at each race location, three distant practicals and rock banks in the ravine",
+  "extends": "aurora_valley_v25a",
+  "world": {
+    "boulders": {
+      "count": 72,
+      "near": 7.0,
+      "far": 32.0,
+      "scale": 2.4,
+      "scale_spread": 3.8,
+      "taper": 0.44,
+      "facets": 15,
+      "tiers": 9,
+      "sink": 0.5,
+      "min_normal": 0.6,
+      "materials": [
+        "world_rock",
+        "world_scarp"
+      ]
+    },
+    "anchors": {
+      "every": 15.0,
+      "min_drop": 2.4,
+      "max_drop": 17.0,
+      "limit": 26,
+      "pad": 4.6,
+      "lip": 0.95,
+      "blocks": 4,
+      "wall": 1.7,
+      "sweep": 1.12,
+      "block_width": 0.52,
+      "deck": "world_deck",
+      "kerb": "world_deck_dark",
+      "stone": "world_scarp"
+    },
+    "trees": {
+      "clusters": 40,
+      "per_cluster": 4,
+      "cluster_spread": 3,
+      "spread": 3.6,
+      "height": 3.2,
+      "height_spread": 2.8,
+      "width": 0.6,
+      "taper": 0.93,
+      "facets": 8,
+      "tiers": 5,
+      "clearance": 7.0,
+      "reach": 40.0,
+      "min_normal": 0.72,
+      "shrub_every": 3,
+      "materials": [
+        "conifer_deep",
+        "conifer_dark"
+      ],
+      "shrubs": [
+        "world_shrub"
+      ]
+    },
+    "landmarks": {
+      "clearance": 12.0,
+      "keepout": 16.0,
+      "sites": {
+        "start": {
+          "kind": "butte",
+          "offset": [
+            -30.0,
+            16.0
+          ],
+          "height": 30.0,
+          "base": 15.0,
+          "sink": 4.0,
+          "taper": 0.24,
+          "seed": 1301,
+          "material": "world_cliff_face"
+        },
+        "obstacle": {
+          "kind": "spires",
+          "offset": [
+            -40.0,
+            -20.0
+          ],
+          "count": 3,
+          "height": 26.0,
+          "base": 9.0,
+          "spread": 6.0,
+          "sink": 3.0,
+          "seed": 1409,
+          "material": "world_scarp"
+        },
+        "split": {
+          "kind": "gate",
+          "offset": [
+            3.0,
+            10.0
+          ],
+          "bearing": 88.0,
+          "gap": 78.0,
+          "height": 26.0,
+          "base": 10.0,
+          "ratio": 0.58,
+          "sink": 3.5,
+          "seed": 1511,
+          "material": "world_cliff_face"
+        },
+        "merge": {
+          "kind": "spires",
+          "offset": [
+            -24.0,
+            10.0
+          ],
+          "count": 3,
+          "height": 18.0,
+          "base": 7.0,
+          "spread": 5.0,
+          "sink": 3.0,
+          "seed": 1607,
+          "material": "world_scarp"
+        },
+        "finish": {
+          "kind": "butte",
+          "offset": [
+            10.0,
+            34.0
+          ],
+          "height": 30.0,
+          "base": 16.0,
+          "sink": 3.0,
+          "taper": 0.26,
+          "seed": 1709,
+          "material": "world_cliff_face"
+        }
+      }
+    },
+    "lamps": {
+      "sites": [
+        [
+          "obstacle",
+          -22.0,
+          -9.0,
+          -6.0,
+          "#FFB469",
+          0.9,
+          26.0,
+          1.6
+        ],
+        [
+          "split",
+          26.0,
+          -16.0,
+          8.0,
+          "#7FD8FF",
+          0.7,
+          30.0,
+          1.7
+        ],
+        [
+          "finish",
+          24.0,
+          -5.0,
+          20.0,
+          "#FFC98A",
+          1.1,
+          28.0,
+          1.5
+        ]
+      ]
+    },
+    "ravine": {
+      "water": true,
+      "level": -70.0,
+      "size": [
+        84.0,
+        154.0
+      ],
+      "round": 18.0,
+      "at_x": 55.0,
+      "at_z": 6.0,
+      "material": "world_water",
+      "banks": 7,
+      "bank_material": "world_wet",
+      "bank_offset": 38.0,
+      "bank_span": 120.0,
+      "bank_height": 27.0,
+      "bank_base": 15.0
+    }
+  }
+}

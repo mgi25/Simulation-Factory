@@ -57,7 +57,15 @@ RETUNE_FIELDS = {"albedo", "roughness", "metallic", "specular", "clearcoat",
 #: without also putting the material on the alpha blend path. No machine pass
 #: may set it, which `test_every_field_a_pass_sets_is_a_field_the_applier_knows`
 #: already enforces by checking a pass against `RETUNE_FIELDS` alone.
-OTHER_CALLER_FIELDS = {"alpha"}
+#:
+#: `unshaded` and `no_fog` are V25's, and they belong to the third caller in a
+#: narrower sense still: only a *diagnostic* profile names them. A marker
+#: profile exists so a render can be segmented by what a surface is, and a lit,
+#: hazed marker cannot do that — the world rig swings a painted hue by more than
+#: the gap between two marker colours. They are here rather than in
+#: `RETUNE_FIELDS` because a machine pass that flattened a surface would be
+#: deleting the shading the whole machine lab is about.
+OTHER_CALLER_FIELDS = {"alpha", "unshaded", "no_fog"}
 
 #: How a surface answers a light, as opposed to what colour it is. V21 set
 #: these and a machine pass does not get to move them.

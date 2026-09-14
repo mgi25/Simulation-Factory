@@ -1,0 +1,1315 @@
+{
+  "aurora_valley": {
+    "branch_cross": {
+      "bands": {
+        "foreground": {
+          "cover": 0.0021219135802469135,
+          "order": 1.0
+        },
+        "ranges": {
+          "cover": 0.008294753086419753,
+          "order": 4.0
+        },
+        "ridges": {
+          "cover": 0.0,
+          "order": 2.0
+        },
+        "terrain": {
+          "cover": 38.48818479938272,
+          "dx": 8.0,
+          "dy": 65.0,
+          "order": 0.0,
+          "patches": 4,
+          "score": 0.9181603305390221,
+          "shift": 65.49045732013177,
+          "spread": 52.160809042805305
+        },
+        "vegetation": {
+          "cover": 0.0009162808641975308,
+          "order": 1.0
+        },
+        "walls": {
+          "cover": 0.0,
+          "order": 3.0
+        },
+        "water": {
+          "cover": 0.00048225308641975306,
+          "order": 1.0
+        }
+      },
+      "monotone": false,
+      "seconds": [
+        15.3,
+        15.55
+      ],
+      "separation": {
+        "bands": 0.0,
+        "fastest": 0.0,
+        "slowest": 0.0,
+        "spread": 0.0
+      },
+      "series": "fewer than two bands were tracked",
+      "track": "race",
+      "verdict": "0 world band tracked - no spread to measure"
+    },
+    "final_dive": {
+      "bands": {
+        "foreground": {
+          "cover": 0.0,
+          "order": 1.0
+        },
+        "ranges": {
+          "cover": 8.458381558641975,
+          "order": 4.0,
+          "patches": 0
+        },
+        "ridges": {
+          "cover": 0.0,
+          "order": 2.0
+        },
+        "terrain": {
+          "cover": 26.668547453703706,
+          "dx": 0.0,
+          "dy": 0.0,
+          "order": 0.0,
+          "patches": 3,
+          "score": 0.9973071607527424,
+          "shift": 0.0,
+          "spread": 0.0
+        },
+        "vegetation": {
+          "cover": 0.0009162808641975308,
+          "order": 1.0
+        },
+        "walls": {
+          "cover": 0.0,
+          "order": 3.0
+        },
+        "water": {
+          "cover": 0.0,
+          "order": 1.0
+        }
+      },
+      "monotone": false,
+      "seconds": [
+        19.4,
+        19.65
+      ],
+      "separation": {
+        "bands": 0.0,
+        "fastest": 0.0,
+        "slowest": 0.0,
+        "spread": 0.0
+      },
+      "series": "fewer than two bands were tracked",
+      "track": "race",
+      "verdict": "0 world band tracked - no spread to measure"
+    },
+    "fork_swing": {
+      "bands": {
+        "foreground": {
+          "cover": 0.00048225308641975306,
+          "order": 1.0
+        },
+        "ranges": {
+          "cover": 25.407118055555557,
+          "order": 4.0,
+          "patches": 0
+        },
+        "ridges": {
+          "cover": 0.0,
+          "order": 2.0
+        },
+        "terrain": {
+          "cover": 35.29933449074074,
+          "dx": 14.0,
+          "dy": -8.0,
+          "order": 0.0,
+          "patches": 7,
+          "score": 0.9884442195813373,
+          "shift": 16.1245154965971,
+          "spread": 63.556820151381885
+        },
+        "vegetation": {
+          "cover": 0.0024112654320987653,
+          "order": 1.0
+        },
+        "walls": {
+          "cover": 0.0,
+          "order": 3.0
+        },
+        "water": {
+          "cover": 0.001398533950617284,
+          "order": 1.0
+        }
+      },
+      "monotone": false,
+      "seconds": [
+        13.3,
+        13.55
+      ],
+      "separation": {
+        "bands": 0.0,
+        "fastest": 0.0,
+        "slowest": 0.0,
+        "spread": 0.0
+      },
+      "series": "fewer than two bands were tracked",
+      "track": "race",
+      "verdict": "0 world band tracked - no spread to measure"
+    },
+    "obstacle_pan": {
+      "bands": {
+        "foreground": {
+          "cover": 0.00308641975308642,
+          "order": 1.0
+        },
+        "ranges": {
+          "cover": 32.575520833333336,
+          "dx": 63.0,
+          "dy": 25.0,
+          "order": 4.0,
+          "patches": 4,
+          "score": 0.998397594334703,
+          "shift": 67.77905281132217,
+          "spread": 2.0
+        },
+        "ridges": {
+          "cover": 0.0,
+          "order": 2.0
+        },
+        "terrain": {
+          "cover": 34.93045910493827,
+          "dx": 8.0,
+          "dy": 17.0,
+          "order": 0.0,
+          "patches": 1,
+          "score": 0.9990353484617912,
+          "shift": 18.788294228055936,
+          "spread": 0.0
+        },
+        "vegetation": {
+          "cover": 0.003279320987654321,
+          "order": 1.0
+        },
+        "walls": {
+          "cover": 0.0,
+          "order": 3.0
+        },
+        "water": {
+          "cover": 0.0008198302469135802,
+          "order": 1.0
+        }
+      },
+      "monotone": false,
+      "seconds": [
+        11.4,
+        11.65
+      ],
+      "separation": {
+        "bands": 1.0,
+        "fastest": 67.77905281132217,
+        "slowest": 67.77905281132217,
+        "spread": 1.0
+      },
+      "series": "fewer than two bands were tracked",
+      "track": "race",
+      "verdict": "1 world band tracked - no spread to measure"
+    },
+    "preview_dolly": {
+      "bands": {
+        "foreground": {
+          "cover": 0.001398533950617284,
+          "order": 1.0
+        },
+        "ranges": {
+          "cover": 0.0814525462962963,
+          "order": 4.0
+        },
+        "ridges": {
+          "cover": 0.0,
+          "order": 2.0
+        },
+        "terrain": {
+          "cover": 43.996141975308646,
+          "dx": 52.0,
+          "dy": 15.0,
+          "order": 0.0,
+          "patches": 5,
+          "score": 0.9431718047253378,
+          "shift": 54.120236510939236,
+          "spread": 69.85585158023629
+        },
+        "vegetation": {
+          "cover": 0.0027488425925925927,
+          "order": 1.0
+        },
+        "walls": {
+          "cover": 0.0,
+          "order": 3.0
+        },
+        "water": {
+          "cover": 0.00028935185185185184,
+          "order": 1.0
+        }
+      },
+      "monotone": false,
+      "seconds": [
+        1.4,
+        1.65
+      ],
+      "separation": {
+        "bands": 0.0,
+        "fastest": 0.0,
+        "slowest": 0.0,
+        "spread": 0.0
+      },
+      "series": "fewer than two bands were tracked",
+      "track": "preview",
+      "verdict": "0 world band tracked - no spread to measure"
+    }
+  },
+  "aurora_valley_v25a": {
+    "branch_cross": {
+      "bands": {
+        "foreground": {
+          "cover": 2.6672935956790123,
+          "dx": -19.0,
+          "dy": -30.0,
+          "order": 1.0,
+          "patches": 7,
+          "score": 0.7068291408061017,
+          "shift": 35.510561809129406,
+          "spread": 61.72618932819029
+        },
+        "ranges": {
+          "cover": 0.00535300925925926,
+          "order": 4.0
+        },
+        "ridges": {
+          "cover": 35.65784143518518,
+          "dx": 59.0,
+          "dy": 43.0,
+          "order": 2.0,
+          "patches": 3,
+          "score": 0.5626762017761033,
+          "shift": 73.00684899377592,
+          "spread": 49.27924963353688
+        },
+        "terrain": {
+          "cover": 36.98398919753087,
+          "dx": -49.0,
+          "dy": -43.0,
+          "order": 0.0,
+          "patches": 5,
+          "score": 0.9421575427139157,
+          "shift": 65.19202405202648,
+          "spread": 67.6354936405435
+        },
+        "vegetation": {
+          "cover": 0.007282021604938271,
+          "order": 1.0
+        },
+        "walls": {
+          "cover": 0.00048225308641975306,
+          "order": 3.0
+        },
+        "water": {
+          "cover": 0.25472608024691357,
+          "order": 1.0
+        }
+      },
+      "monotone": false,
+      "seconds": [
+        15.3,
+        15.55
+      ],
+      "separation": {
+        "bands": 2.0,
+        "fastest": 73.00684899377592,
+        "slowest": 35.510561809129406,
+        "spread": 2.0559192892016314
+      },
+      "series": "not monotone: 35.5 > 73.0  (0.5x)",
+      "track": "race",
+      "verdict": "2 bands, 36-73 px, 2.1x spread"
+    },
+    "final_dive": {
+      "bands": {
+        "foreground": {
+          "cover": 3.6644000771604937,
+          "dx": 0.0,
+          "dy": 12.0,
+          "order": 1.0,
+          "patches": 2,
+          "score": 0.997909952239052,
+          "shift": 12.0,
+          "spread": 34.44198019858905
+        },
+        "ranges": {
+          "cover": 0.1310763888888889,
+          "order": 4.0
+        },
+        "ridges": {
+          "cover": 29.292341820987655,
+          "dx": 1.0,
+          "dy": 2.0,
+          "order": 2.0,
+          "patches": 3,
+          "score": 0.9918901485967992,
+          "shift": 2.23606797749979,
+          "spread": 11.661903789690601
+        },
+        "terrain": {
+          "cover": 26.51914544753086,
+          "dx": 0.0,
+          "dy": 0.0,
+          "order": 0.0,
+          "patches": 3,
+          "score": 0.9978194742390285,
+          "shift": 0.0,
+          "spread": 0.0
+        },
+        "vegetation": {
+          "cover": 0.001109182098765432,
+          "order": 1.0
+        },
+        "walls": {
+          "cover": 1.6141010802469138,
+          "order": 3.0,
+          "patches": 0
+        },
+        "water": {
+          "cover": 0.0,
+          "order": 1.0
+        }
+      },
+      "monotone": true,
+      "seconds": [
+        19.4,
+        19.65
+      ],
+      "separation": {
+        "bands": 2.0,
+        "fastest": 12.0,
+        "slowest": 2.23606797749979,
+        "spread": 5.366563145999495
+      },
+      "series": "12.0 > 2.2  (5.4x)",
+      "track": "race",
+      "verdict": "2 bands, 2-12 px, 5.4x spread"
+    },
+    "fork_swing": {
+      "bands": {
+        "foreground": {
+          "cover": 0.00028935185185185184,
+          "order": 1.0
+        },
+        "ranges": {
+          "cover": 9.196855709876543,
+          "dx": 10.0,
+          "dy": -18.0,
+          "order": 4.0,
+          "patches": 6,
+          "score": 0.8215731804121902,
+          "shift": 20.591260281974,
+          "spread": 45.99879225467652
+        },
+        "ridges": {
+          "cover": 26.494695216049386,
+          "dx": -65.0,
+          "dy": 60.0,
+          "order": 2.0,
+          "patches": 2,
+          "score": 0.7613634127329685,
+          "shift": 88.45903006477066,
+          "spread": 7.0710678118654755
+        },
+        "terrain": {
+          "cover": 35.279899691358025,
+          "dx": 14.0,
+          "dy": -8.0,
+          "order": 0.0,
+          "patches": 7,
+          "score": 0.9874388870084797,
+          "shift": 16.1245154965971,
+          "spread": 63.637686177616615
+        },
+        "vegetation": {
+          "cover": 0.007089120370370371,
+          "order": 1.0
+        },
+        "walls": {
+          "cover": 6.492862654320988,
+          "dx": 17.0,
+          "dy": -30.0,
+          "order": 3.0,
+          "patches": 5,
+          "score": 0.7529347431284068,
+          "shift": 34.48187929913333,
+          "spread": 46.92547282660026
+        },
+        "water": {
+          "cover": 4.822530864197531e-05,
+          "order": 1.0
+        }
+      },
+      "monotone": true,
+      "seconds": [
+        13.3,
+        13.55
+      ],
+      "separation": {
+        "bands": 3.0,
+        "fastest": 88.45903006477066,
+        "slowest": 20.591260281974,
+        "spread": 4.295950264987396
+      },
+      "series": "88.5 > 34.5 > 20.6  (4.3x)",
+      "track": "race",
+      "verdict": "3 bands, 21-88 px, 4.3x spread"
+    },
+    "obstacle_pan": {
+      "bands": {
+        "foreground": {
+          "cover": 0.00019290123456790125,
+          "order": 1.0
+        },
+        "ranges": {
+          "cover": 14.28959297839506,
+          "dx": 61.0,
+          "dy": 25.0,
+          "order": 4.0,
+          "patches": 8,
+          "score": 0.9983601237680284,
+          "shift": 65.92419889539804,
+          "spread": 1.79843682124227
+        },
+        "ridges": {
+          "cover": 15.988570601851851,
+          "dx": 57.0,
+          "dy": 25.0,
+          "order": 2.0,
+          "patches": 2,
+          "score": 0.996168772883941,
+          "shift": 62.24146527838174,
+          "spread": 1.118033988749895
+        },
+        "terrain": {
+          "cover": 34.91218171296296,
+          "dx": 7.0,
+          "dy": 16.0,
+          "order": 0.0,
+          "patches": 1,
+          "score": 0.9985496919040632,
+          "shift": 17.46424919657298,
+          "spread": 0.0
+        },
+        "vegetation": {
+          "cover": 0.010368441358024692,
+          "order": 1.0
+        },
+        "walls": {
+          "cover": 7.940248842592593,
+          "dx": 62.0,
+          "dy": 25.0,
+          "order": 3.0,
+          "patches": 3,
+          "score": 0.9982629221582221,
+          "shift": 66.85057965343307,
+          "spread": 4.189935029992178
+        },
+        "water": {
+          "cover": 0.00048225308641975306,
+          "order": 1.0
+        }
+      },
+      "monotone": false,
+      "seconds": [
+        11.4,
+        11.65
+      ],
+      "separation": {
+        "bands": 3.0,
+        "fastest": 66.85057965343307,
+        "slowest": 62.24146527838174,
+        "spread": 1.0740521508360474
+      },
+      "series": "not monotone: 62.2 > 66.9 > 65.9  (0.9x)",
+      "track": "race",
+      "verdict": "3 bands, 62-67 px, 1.1x spread"
+    },
+    "preview_dolly": {
+      "bands": {
+        "foreground": {
+          "cover": 1.847800925925926,
+          "dx": -22.0,
+          "dy": 69.0,
+          "order": 1.0,
+          "patches": 2,
+          "score": 0.748213886027361,
+          "shift": 72.42237223399962,
+          "spread": 32.44225639501667
+        },
+        "ranges": {
+          "cover": 0.08169367283950617,
+          "order": 4.0
+        },
+        "ridges": {
+          "cover": 27.3461612654321,
+          "order": 2.0,
+          "patches": 0
+        },
+        "terrain": {
+          "cover": 42.67549189814815,
+          "dx": 12.0,
+          "dy": 27.0,
+          "order": 0.0,
+          "patches": 4,
+          "score": 0.8944326007523996,
+          "shift": 29.546573405388315,
+          "spread": 55.13959557341711
+        },
+        "vegetation": {
+          "cover": 0.006944444444444444,
+          "order": 1.0
+        },
+        "walls": {
+          "cover": 0.08902391975308642,
+          "order": 3.0
+        },
+        "water": {
+          "cover": 0.0,
+          "order": 1.0
+        }
+      },
+      "monotone": false,
+      "seconds": [
+        1.4,
+        1.65
+      ],
+      "separation": {
+        "bands": 1.0,
+        "fastest": 72.42237223399962,
+        "slowest": 72.42237223399962,
+        "spread": 1.0
+      },
+      "series": "fewer than two bands were tracked",
+      "track": "preview",
+      "verdict": "1 world band tracked - no spread to measure"
+    }
+  },
+  "aurora_valley_v25b": {
+    "branch_cross": {
+      "bands": {
+        "foreground": {
+          "cover": 19.423369984567902,
+          "dx": -39.0,
+          "dy": -12.0,
+          "order": 1.0,
+          "patches": 5,
+          "score": 0.7105699692293189,
+          "shift": 40.80441152620633,
+          "spread": 54.614283845895116
+        },
+        "ranges": {
+          "cover": 0.0036651234567901233,
+          "order": 4.0
+        },
+        "ridges": {
+          "cover": 34.312789351851855,
+          "dx": 15.0,
+          "dy": 17.0,
+          "order": 2.0,
+          "patches": 3,
+          "score": 0.8636160763514813,
+          "shift": 22.67156809750927,
+          "spread": 62.6028043390319
+        },
+        "terrain": {
+          "cover": 23.24561149691358,
+          "dx": -11.0,
+          "dy": 18.0,
+          "order": 0.0,
+          "patches": 2,
+          "score": 0.7982965394243974,
+          "shift": 21.095023109728988,
+          "spread": 35.11765937530575
+        },
+        "vegetation": {
+          "cover": 0.6410590277777778,
+          "order": 1.0,
+          "patches": 0
+        },
+        "walls": {
+          "cover": 0.00043402777777777775,
+          "order": 3.0
+        },
+        "water": {
+          "cover": 0.15726273148148148,
+          "order": 1.0
+        }
+      },
+      "monotone": true,
+      "seconds": [
+        15.3,
+        15.55
+      ],
+      "separation": {
+        "bands": 2.0,
+        "fastest": 40.80441152620633,
+        "slowest": 22.67156809750927,
+        "spread": 1.799805436955601
+      },
+      "series": "40.8 > 22.7  (1.8x)",
+      "track": "race",
+      "verdict": "2 bands, 23-41 px, 1.8x spread"
+    },
+    "final_dive": {
+      "bands": {
+        "foreground": {
+          "cover": 5.848186728395062,
+          "order": 1.0,
+          "patches": 0
+        },
+        "ranges": {
+          "cover": 0.1310763888888889,
+          "order": 4.0
+        },
+        "ridges": {
+          "cover": 27.257040895061728,
+          "dx": 2.0,
+          "dy": 2.0,
+          "order": 2.0,
+          "patches": 2,
+          "score": 0.9970090396814122,
+          "shift": 2.8284271247461903,
+          "spread": 1.5811388300841898
+        },
+        "terrain": {
+          "cover": 25.09905478395062,
+          "dx": 0.0,
+          "dy": 0.0,
+          "order": 0.0,
+          "patches": 2,
+          "score": 0.99945500390784,
+          "shift": 0.0,
+          "spread": 0.0
+        },
+        "vegetation": {
+          "cover": 1.9481577932098766,
+          "dx": 0.0,
+          "dy": 5.0,
+          "order": 1.0,
+          "patches": 1,
+          "score": 0.9972638578168841,
+          "shift": 5.0,
+          "spread": 0.0
+        },
+        "walls": {
+          "cover": 1.6141010802469138,
+          "order": 3.0,
+          "patches": 0
+        },
+        "water": {
+          "cover": 0.0,
+          "order": 1.0
+        }
+      },
+      "monotone": false,
+      "seconds": [
+        19.4,
+        19.65
+      ],
+      "separation": {
+        "bands": 1.0,
+        "fastest": 2.8284271247461903,
+        "slowest": 2.8284271247461903,
+        "spread": 1.0
+      },
+      "series": "fewer than two bands were tracked",
+      "track": "race",
+      "verdict": "1 world band tracked - no spread to measure"
+    },
+    "fork_swing": {
+      "bands": {
+        "foreground": {
+          "cover": 9.41970486111111,
+          "dx": -32.0,
+          "dy": -1.0,
+          "order": 1.0,
+          "patches": 7,
+          "score": 0.97647969350038,
+          "shift": 32.01562118716424,
+          "spread": 48.015728715511884
+        },
+        "ranges": {
+          "cover": 9.196469907407408,
+          "dx": 10.0,
+          "dy": -18.0,
+          "order": 4.0,
+          "patches": 6,
+          "score": 0.8215731804121902,
+          "shift": 20.591260281974,
+          "spread": 45.99879225467652
+        },
+        "ridges": {
+          "cover": 25.818817515432098,
+          "dx": -65.0,
+          "dy": 60.0,
+          "order": 2.0,
+          "patches": 2,
+          "score": 0.7613558269885752,
+          "shift": 88.45903006477066,
+          "spread": 7.0710678118654755
+        },
+        "terrain": {
+          "cover": 27.245756172839506,
+          "dx": -66.0,
+          "dy": -29.0,
+          "order": 0.0,
+          "patches": 3,
+          "score": 0.9934887978956805,
+          "shift": 72.09022125087424,
+          "spread": 59.27712693592511
+        },
+        "vegetation": {
+          "cover": 0.5732060185185186,
+          "order": 1.0,
+          "patches": 0
+        },
+        "walls": {
+          "cover": 6.492862654320988,
+          "dx": 17.0,
+          "dy": -30.0,
+          "order": 3.0,
+          "patches": 5,
+          "score": 0.7529347431284068,
+          "shift": 34.48187929913333,
+          "spread": 46.92547282660026
+        },
+        "water": {
+          "cover": 0.0005787037037037037,
+          "order": 1.0
+        }
+      },
+      "monotone": false,
+      "seconds": [
+        13.3,
+        13.55
+      ],
+      "separation": {
+        "bands": 4.0,
+        "fastest": 88.45903006477066,
+        "slowest": 20.591260281974,
+        "spread": 4.295950264987396
+      },
+      "series": "not monotone: 32.0 > 88.5 > 34.5 > 20.6  (1.6x)",
+      "track": "race",
+      "verdict": "4 bands, 21-88 px, 4.3x spread"
+    },
+    "obstacle_pan": {
+      "bands": {
+        "foreground": {
+          "cover": 12.332513503086421,
+          "dx": -17.0,
+          "dy": 19.0,
+          "order": 1.0,
+          "patches": 5,
+          "score": 0.954835123583157,
+          "shift": 25.495097567963924,
+          "spread": 44.14340267808996
+        },
+        "ranges": {
+          "cover": 14.288146219135802,
+          "dx": 61.0,
+          "dy": 25.0,
+          "order": 4.0,
+          "patches": 8,
+          "score": 0.9983601237680284,
+          "shift": 65.92419889539804,
+          "spread": 1.79843682124227
+        },
+        "ridges": {
+          "cover": 14.770736882716049,
+          "dx": 57.0,
+          "dy": 23.0,
+          "order": 2.0,
+          "patches": 3,
+          "score": 0.9930785769524142,
+          "shift": 61.465437442517235,
+          "spread": 2.211083193570267
+        },
+        "terrain": {
+          "cover": 24.829716435185183,
+          "order": 0.0,
+          "patches": 0
+        },
+        "vegetation": {
+          "cover": 0.896267361111111,
+          "dx": 5.0,
+          "dy": 7.0,
+          "order": 1.0,
+          "patches": 1,
+          "score": 0.9990065042454519,
+          "shift": 8.602325267042627,
+          "spread": 0.0
+        },
+        "walls": {
+          "cover": 7.940248842592593,
+          "dx": 62.0,
+          "dy": 25.0,
+          "order": 3.0,
+          "patches": 3,
+          "score": 0.9982629221582221,
+          "shift": 66.85057965343307,
+          "spread": 4.189935029992178
+        },
+        "water": {
+          "cover": 0.00028935185185185184,
+          "order": 1.0
+        }
+      },
+      "monotone": false,
+      "seconds": [
+        11.4,
+        11.65
+      ],
+      "separation": {
+        "bands": 4.0,
+        "fastest": 66.85057965343307,
+        "slowest": 25.495097567963924,
+        "spread": 2.6220954626757234
+      },
+      "series": "not monotone: 25.5 > 61.5 > 66.9 > 65.9  (0.4x)",
+      "track": "race",
+      "verdict": "4 bands, 25-67 px, 2.6x spread"
+    },
+    "preview_dolly": {
+      "bands": {
+        "foreground": {
+          "cover": 17.88382523148148,
+          "dx": 32.0,
+          "dy": -9.0,
+          "order": 1.0,
+          "patches": 8,
+          "score": 0.6164334226935765,
+          "shift": 33.24154027718932,
+          "spread": 73.28358871534608
+        },
+        "ranges": {
+          "cover": 0.07132523148148148,
+          "order": 4.0
+        },
+        "ridges": {
+          "cover": 27.293065200617285,
+          "order": 2.0,
+          "patches": 0
+        },
+        "terrain": {
+          "cover": 28.425925925925927,
+          "dx": -12.0,
+          "dy": -35.0,
+          "order": 0.0,
+          "patches": 4,
+          "score": 0.7242343275349425,
+          "shift": 37.0,
+          "spread": 69.66661682613847
+        },
+        "vegetation": {
+          "cover": 0.5622106481481481,
+          "dx": 41.0,
+          "dy": -54.0,
+          "order": 1.0,
+          "patches": 1,
+          "score": 0.781712580777842,
+          "shift": 67.80117993073571,
+          "spread": 0.0
+        },
+        "walls": {
+          "cover": 0.08902391975308642,
+          "order": 3.0
+        },
+        "water": {
+          "cover": 0.0036651234567901233,
+          "order": 1.0
+        }
+      },
+      "monotone": false,
+      "seconds": [
+        1.4,
+        1.65
+      ],
+      "separation": {
+        "bands": 1.0,
+        "fastest": 33.24154027718932,
+        "slowest": 33.24154027718932,
+        "spread": 1.0
+      },
+      "series": "fewer than two bands were tracked",
+      "track": "preview",
+      "verdict": "1 world band tracked - no spread to measure"
+    }
+  },
+  "aurora_valley_v25c": {
+    "branch_cross": {
+      "bands": {
+        "foreground": {
+          "cover": 22.214940200617285,
+          "dx": -36.0,
+          "dy": -24.0,
+          "order": 1.0,
+          "patches": 4,
+          "score": 0.7089673701250487,
+          "shift": 43.266615305567875,
+          "spread": 43.629118716746966
+        },
+        "ranges": {
+          "cover": 0.005256558641975309,
+          "order": 4.0
+        },
+        "ridges": {
+          "cover": 33.24532214506173,
+          "dx": 28.0,
+          "dy": 5.0,
+          "order": 2.0,
+          "patches": 2,
+          "score": 0.8399764666737193,
+          "shift": 28.442925306655784,
+          "spread": 35.106979363083916
+        },
+        "terrain": {
+          "cover": 20.22829861111111,
+          "dx": 50.0,
+          "dy": 42.0,
+          "order": 0.0,
+          "patches": 2,
+          "score": 0.9133033815655786,
+          "shift": 65.29931086925804,
+          "spread": 21.224985276791124
+        },
+        "vegetation": {
+          "cover": 0.7163387345679012,
+          "dx": -19.0,
+          "dy": 17.0,
+          "order": 1.0,
+          "patches": 1,
+          "score": 0.3852295185099042,
+          "shift": 25.495097567963924,
+          "spread": 0.0
+        },
+        "walls": {
+          "cover": 0.00043402777777777775,
+          "order": 3.0
+        },
+        "water": {
+          "cover": 0.14356674382716048,
+          "order": 1.0
+        }
+      },
+      "monotone": true,
+      "seconds": [
+        15.3,
+        15.55
+      ],
+      "separation": {
+        "bands": 2.0,
+        "fastest": 43.266615305567875,
+        "slowest": 28.442925306655784,
+        "spread": 1.521173185918513
+      },
+      "series": "43.3 > 28.4  (1.5x)",
+      "track": "race",
+      "verdict": "2 bands, 28-43 px, 1.5x spread"
+    },
+    "final_dive": {
+      "bands": {
+        "foreground": {
+          "cover": 21.835792824074073,
+          "dx": 2.0,
+          "dy": 1.0,
+          "order": 1.0,
+          "patches": 2,
+          "score": 0.9693405458219568,
+          "shift": 2.23606797749979,
+          "spread": 1.118033988749895
+        },
+        "ranges": {
+          "cover": 0.02662037037037037,
+          "order": 4.0
+        },
+        "ridges": {
+          "cover": 28.57378472222222,
+          "order": 2.0,
+          "patches": 0
+        },
+        "terrain": {
+          "cover": 9.11574074074074,
+          "dx": 0.0,
+          "dy": 0.0,
+          "order": 0.0,
+          "patches": 2,
+          "score": 0.9983431517777529,
+          "shift": 0.0,
+          "spread": 0.0
+        },
+        "vegetation": {
+          "cover": 2.0834297839506175,
+          "dx": 1.0,
+          "dy": 2.0,
+          "order": 1.0,
+          "patches": 2,
+          "score": 0.9737744092697758,
+          "shift": 2.23606797749979,
+          "spread": 0.0
+        },
+        "walls": {
+          "cover": 0.3326581790123457,
+          "order": 3.0
+        },
+        "water": {
+          "cover": 9.645061728395063e-05,
+          "order": 1.0
+        }
+      },
+      "monotone": false,
+      "seconds": [
+        19.4,
+        19.65
+      ],
+      "separation": {
+        "bands": 2.0,
+        "fastest": 2.23606797749979,
+        "slowest": 2.23606797749979,
+        "spread": 1.0
+      },
+      "series": "fewer than two bands were tracked",
+      "track": "race",
+      "verdict": "2 bands, 2-2 px, 1.0x spread"
+    },
+    "fork_swing": {
+      "bands": {
+        "foreground": {
+          "cover": 17.536265432098766,
+          "dx": -51.0,
+          "dy": -9.0,
+          "order": 1.0,
+          "patches": 7,
+          "score": 0.9786780481664317,
+          "shift": 51.78802950489621,
+          "spread": 20.244424780513707
+        },
+        "ranges": {
+          "cover": 7.460358796296296,
+          "dx": 17.0,
+          "dy": -27.0,
+          "order": 4.0,
+          "patches": 4,
+          "score": 0.9461587294744715,
+          "shift": 31.906112267087632,
+          "spread": 50.9693535371992
+        },
+        "ridges": {
+          "cover": 28.03414351851852,
+          "dx": 60.0,
+          "dy": 56.0,
+          "order": 2.0,
+          "patches": 4,
+          "score": 0.8083186317029513,
+          "shift": 82.07313811473277,
+          "spread": 74.36228882975564
+        },
+        "terrain": {
+          "cover": 19.452449845679013,
+          "dx": -48.0,
+          "dy": -12.0,
+          "order": 0.0,
+          "patches": 3,
+          "score": 0.9892712666721996,
+          "shift": 49.47726750741192,
+          "spread": 43.56859215331869
+        },
+        "vegetation": {
+          "cover": 0.5727237654320988,
+          "order": 1.0,
+          "patches": 0
+        },
+        "walls": {
+          "cover": 6.471836419753087,
+          "dx": -13.0,
+          "dy": -73.0,
+          "order": 3.0,
+          "patches": 4,
+          "score": 0.9733599163269451,
+          "shift": 74.14849964766651,
+          "spread": 69.57325276282546
+        },
+        "water": {
+          "cover": 0.004436728395061728,
+          "order": 1.0
+        }
+      },
+      "monotone": false,
+      "seconds": [
+        13.3,
+        13.55
+      ],
+      "separation": {
+        "bands": 4.0,
+        "fastest": 82.07313811473277,
+        "slowest": 31.906112267087632,
+        "spread": 2.5723327689595807
+      },
+      "series": "not monotone: 51.8 > 82.1 > 74.1 > 31.9  (1.6x)",
+      "track": "race",
+      "verdict": "4 bands, 32-82 px, 2.6x spread"
+    },
+    "obstacle_pan": {
+      "bands": {
+        "foreground": {
+          "cover": 15.500626929012345,
+          "dx": -2.0,
+          "dy": 18.0,
+          "order": 1.0,
+          "patches": 5,
+          "score": 0.9818432640381993,
+          "shift": 18.110770276274835,
+          "spread": 22.407141718657467
+        },
+        "ranges": {
+          "cover": 14.264467592592592,
+          "dx": 63.0,
+          "dy": 24.0,
+          "order": 4.0,
+          "patches": 4,
+          "score": 0.9991816697618516,
+          "shift": 67.4166151627327,
+          "spread": 1.6393596310755
+        },
+        "ridges": {
+          "cover": 14.043740354938272,
+          "dx": 57.0,
+          "dy": 25.0,
+          "order": 2.0,
+          "patches": 5,
+          "score": 0.998229237374874,
+          "shift": 62.24146527838174,
+          "spread": 2.6832815729997477
+        },
+        "terrain": {
+          "cover": 21.612027391975307,
+          "dx": -12.0,
+          "dy": 20.0,
+          "order": 0.0,
+          "patches": 1,
+          "score": 0.9701497023914036,
+          "shift": 23.323807579381203,
+          "spread": 0.0
+        },
+        "vegetation": {
+          "cover": 0.8974247685185186,
+          "dx": 5.0,
+          "dy": 7.0,
+          "order": 1.0,
+          "patches": 1,
+          "score": 0.9990204164549937,
+          "shift": 8.602325267042627,
+          "spread": 0.0
+        },
+        "walls": {
+          "cover": 9.400270061728396,
+          "dx": 62.0,
+          "dy": 26.0,
+          "order": 3.0,
+          "patches": 5,
+          "score": 0.9990317039740021,
+          "shift": 67.23094525588644,
+          "spread": 5.592852581643824
+        },
+        "water": {
+          "cover": 0.0013503086419753088,
+          "order": 1.0
+        }
+      },
+      "monotone": false,
+      "seconds": [
+        11.4,
+        11.65
+      ],
+      "separation": {
+        "bands": 4.0,
+        "fastest": 67.4166151627327,
+        "slowest": 18.110770276274835,
+        "spread": 3.722459847610605
+      },
+      "series": "not monotone: 18.1 > 62.2 > 67.2 > 67.4  (0.3x)",
+      "track": "race",
+      "verdict": "4 bands, 18-67 px, 3.7x spread"
+    },
+    "preview_dolly": {
+      "bands": {
+        "foreground": {
+          "cover": 21.78954475308642,
+          "dx": -42.0,
+          "dy": -39.0,
+          "order": 1.0,
+          "patches": 5,
+          "score": 0.7461632804150762,
+          "shift": 57.3149195236284,
+          "spread": 59.54091030543621
+        },
+        "ranges": {
+          "cover": 0.007908950617283951,
+          "order": 4.0
+        },
+        "ridges": {
+          "cover": 26.340711805555557,
+          "dx": 51.0,
+          "dy": 10.0,
+          "order": 2.0,
+          "patches": 1,
+          "score": 0.9891933939371006,
+          "shift": 51.97114584074513,
+          "spread": 0.0
+        },
+        "terrain": {
+          "cover": 24.26200810185185,
+          "dx": -16.0,
+          "dy": -19.0,
+          "order": 0.0,
+          "patches": 3,
+          "score": 0.7222920529315631,
+          "shift": 24.839484696748443,
+          "spread": 54.29344138823563
+        },
+        "vegetation": {
+          "cover": 0.9329185956790123,
+          "order": 1.0,
+          "patches": 0
+        },
+        "walls": {
+          "cover": 0.015576774691358023,
+          "order": 3.0
+        },
+        "water": {
+          "cover": 0.0019290123456790122,
+          "order": 1.0
+        }
+      },
+      "monotone": false,
+      "seconds": [
+        1.4,
+        1.65
+      ],
+      "separation": {
+        "bands": 1.0,
+        "fastest": 57.3149195236284,
+        "slowest": 57.3149195236284,
+        "spread": 1.0
+      },
+      "series": "fewer than two bands were tracked",
+      "track": "preview",
+      "verdict": "1 world band tracked - no spread to measure"
+    }
+  }
+}

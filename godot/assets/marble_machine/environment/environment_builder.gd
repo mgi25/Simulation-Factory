@@ -15,6 +15,7 @@ extends RefCounted
 ##     apply_palette() every environment surface override, in one call
 ##     terrain()       ground material keys and scatter passes, as cfg fields
 ##     zone_lamps()    the practical at each race moment
+##     world()         the near world, handed to `environment_world.gd`
 ##
 ## `course_world.gd`, `course_terrain.gd`, `course_dressing.gd` and
 ## `course_scene.gd` call these and hold no environment values of their own.
@@ -566,6 +567,15 @@ static func terrain(profile: Dictionary) -> Dictionary:
 
 static func dressing(profile: Dictionary) -> Dictionary:
 	return (profile.get("dressing", {}) as Dictionary).duplicate(true)
+
+
+static func world(profile: Dictionary) -> Dictionary:
+	## The near-world section, for `environment_world.build`.
+	##
+	## Empty for every profile that does not author one, and empty means no
+	## node is added at all - which is what keeps the four profiles shipped
+	## before V25 rendering the frames they were committed with.
+	return (profile.get("world", {}) as Dictionary).duplicate(true)
 
 
 static func zone_lamps(profile: Dictionary) -> Array:

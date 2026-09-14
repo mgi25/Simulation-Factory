@@ -1,0 +1,53 @@
+Per-depth-band image displacement, in pixels, across 0.25 s (15
+frames) of each camera move. A band under 0.4% of the frame is not
+measured - a correlation peak on a few hundred pixels means nothing -
+and its cover is printed in brackets instead, so the gap is visible.
+Each cell is the median of N tracked 41x41 patches, printed as px/Np;
+a band tracked by fewer than two patches is not reported either.
+
+'world bands' is the verdict: how many world depth bands were
+trackable at all, the slowest and fastest of them, and the ratio.
+That ratio is the parallax - a painted backdrop gives one rate and a
+world gives a spread. 'near-to-far' is the same numbers in depth
+order, and it is NOT expected to fall: every race camera here is
+tracking the pack, which pins a point at the pack's own distance and
+makes image motion grow in BOTH directions from it. See
+sloped/v25_world.separation. The near ground and the ravine floor are
+measured but not ranked - neither is at a single depth.
+
+B - Balanced premium
+move           terrain   foreground  vegetation  ridges    walls    ranges   water    depth order                                        
+-------------  --------  ----------  ----------  --------  -------  -------  -------  ---------------------------------------------------
+branch_cross   21px/2p   41px/5p     (0.64%)     23px/3p   (0.00%)  (0.00%)  (0.16%)  40.8 > 22.7  (1.8x)                                
+final_dive     0px/2p    (5.85%)     (1.95%)     3px/2p    (1.61%)  (0.13%)  (0.00%)  NOT fewer than two bands were tracked              
+fork_swing     72px/3p   32px/7p     (0.57%)     88px/2p   34px/5p  21px/6p  (0.00%)  NOT not monotone: 32.0 > 88.5 > 34.5 > 20.6  (1.6x)
+obstacle_pan   (24.83%)  25px/5p     (0.90%)     61px/3p   67px/3p  66px/8p  (0.00%)  NOT not monotone: 25.5 > 61.5 > 66.9 > 65.9  (0.4x)
+preview_dolly  37px/4p   33px/8p     (0.56%)     (27.29%)  (0.09%)  (0.07%)  (0.00%)  NOT fewer than two bands were tracked              
+
+C - Rich showcase
+move           terrain   foreground  vegetation  ridges    walls    ranges   water    depth order                                        
+-------------  --------  ----------  ----------  --------  -------  -------  -------  ---------------------------------------------------
+branch_cross   65px/2p   43px/4p     (0.72%)     28px/2p   (0.00%)  (0.01%)  (0.14%)  43.3 > 28.4  (1.5x)                                
+final_dive     0px/2p    2px/2p      2px/2p      (28.57%)  (0.33%)  (0.03%)  (0.00%)  NOT fewer than two bands were tracked              
+fork_swing     49px/3p   52px/7p     (0.57%)     82px/4p   74px/4p  32px/4p  (0.00%)  NOT not monotone: 51.8 > 82.1 > 74.1 > 31.9  (1.6x)
+obstacle_pan   (21.61%)  18px/5p     (0.90%)     62px/5p   67px/5p  67px/4p  (0.00%)  NOT not monotone: 18.1 > 62.2 > 67.2 > 67.4  (0.3x)
+preview_dolly  25px/3p   57px/5p     (0.93%)     (26.34%)  (0.02%)  (0.01%)  (0.00%)  NOT fewer than two bands were tracked              
+
+V23 baseline
+move           terrain   foreground  vegetation  ridges   walls    ranges    water    depth order                          
+-------------  --------  ----------  ----------  -------  -------  --------  -------  -------------------------------------
+obstacle_pan   (34.93%)  (0.00%)     (0.00%)     (0.00%)  (0.00%)  68px/4p   (0.00%)  NOT fewer than two bands were tracked
+fork_swing     16px/7p   (0.00%)     (0.00%)     (0.00%)  (0.00%)  (25.41%)  (0.00%)  NOT fewer than two bands were tracked
+branch_cross   65px/4p   (0.00%)     (0.00%)     (0.00%)  (0.00%)  (0.01%)   (0.00%)  NOT fewer than two bands were tracked
+final_dive     0px/3p    (0.00%)     (0.00%)     (0.00%)  (0.00%)  (8.46%)   (0.00%)  NOT fewer than two bands were tracked
+preview_dolly  54px/5p   (0.00%)     (0.00%)     (0.00%)  (0.00%)  (0.08%)   (0.00%)  NOT fewer than two bands were tracked
+
+A - Restrained
+move           terrain   foreground  vegetation  ridges    walls    ranges   water    depth order                                 
+-------------  --------  ----------  ----------  --------  -------  -------  -------  --------------------------------------------
+obstacle_pan   (34.91%)  (0.00%)     (0.01%)     62px/2p   67px/3p  66px/8p  (0.00%)  NOT not monotone: 62.2 > 66.9 > 65.9  (0.9x)
+fork_swing     16px/7p   (0.00%)     (0.01%)     88px/2p   34px/5p  21px/6p  (0.00%)  88.5 > 34.5 > 20.6  (4.3x)                  
+branch_cross   65px/5p   36px/7p     (0.01%)     73px/3p   (0.00%)  (0.01%)  (0.25%)  NOT not monotone: 35.5 > 73.0  (0.5x)       
+final_dive     0px/3p    12px/2p     (0.00%)     2px/3p    (1.61%)  (0.13%)  (0.00%)  12.0 > 2.2  (5.4x)                          
+preview_dolly  30px/4p   72px/2p     (0.01%)     (27.35%)  (0.09%)  (0.08%)  (0.00%)  NOT fewer than two bands were tracked       
+

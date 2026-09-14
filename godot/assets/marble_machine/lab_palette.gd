@@ -601,6 +601,23 @@ func _retune(material: StandardMaterial3D, spec: Dictionary) -> void:
 		material.emission = Color(str(spec["emission"]))
 	if spec.has("backlight"):
 		material.backlight = Color(str(spec["backlight"]))
+	# **Flat paint, for a diagnostic profile and nothing else.**
+	#
+	# A marker profile exists so a render can be segmented by what a surface
+	# *is*, and a lit marker cannot do that: the world rig is a cool key, a
+	# warm fill and a cyan rim, and between them they swing a painted hue by
+	# more than the gap between two marker colours. The V25 lab found this the
+	# way these things are always found - by measuring the V23 baseline, which
+	# has no foreground rock in it at all, as twenty-two per cent foreground
+	# rock. It was the near ground, drifting one band over.
+	#
+	# Unshaded output plus fog disabled makes a marked surface render its own
+	# albedo exactly, at any distance, under any light. Both are opt-in and no
+	# shipped profile names either.
+	if spec.has("unshaded") and bool(spec["unshaded"]):
+		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	if spec.has("no_fog") and bool(spec["no_fog"]):
+		material.disable_fog = true
 	# **Alpha is opt-in, and it is the one field that also changes the blend.**
 	# The note above says a transparent albedo keeps its alpha, and that is
 	# still true of every row that does not name one: this is for a surface
@@ -973,6 +990,86 @@ func _build(key: String) -> StandardMaterial3D:
 		# has to survive three hundred units of haze and do nothing at thirty.
 		"lit_crest_line":
 			return _emissive("#5FE4FF", 2.4, 0.55)
+
+		# --- V25 NEAR WORLD ------------------------------------------------
+		#
+		# The surfaces `environment_world.gd` builds from. Named by no profile
+		# before V25 and therefore inert until one is selected, exactly like
+		# the two V23 surfaces above.
+		#
+		# **Four rock values, and the spacing between them is the point.**
+		# V23's finding on the distant ranges was that aerial perspective
+		# converges everything on the sky, so four ranges within 4 L* of each
+		# other read as one wash. The near world has the same failure mode for
+		# a different reason: it is *inside* the haze rather than behind it,
+		# so nothing converges it and four values that are close together stay
+		# close together - one large extruded mass. These step about six L*
+		# apart and carry a hue turn as well, cool in the shadowed faces and a
+		# touch warmer on the ledges the key rakes.
+		# One pair per depth band, and the separation is why there are six
+		# rock keys rather than two. A single "rock" material over forms at
+		# 20, 120 and 240 units puts the whole world on one value, and the
+		# haze then has to carry the entire recession - which is the failure
+		# V23 measured on the distant ranges, reproduced one band closer in.
+		# Each pair is a face value and a ledge value about five L* above it,
+		# so a form has internal relief as well as a place in the stack.
+		"world_wall_face":
+			return _matte("#1B2436", 0.97)
+		"world_wall_ledge":
+			return _matte("#28344A", 0.96)
+		"world_cliff_face":
+			return _matte("#18202E", 0.96)
+		"world_cliff_ledge":
+			return _matte("#28323F", 0.95)
+		"world_scarp":
+			return _matte("#202836", 0.95)
+		"world_rock":
+			return _matte("#1A212C", 0.95)
+		"world_soil":
+			return _matte("#2E3242", 0.94)
+		# Wet rock at the bottom of a ravine. The only near-world surface with
+		# any gloss on it, and it is small and far below the racing line: a
+		# specular lobe down there is a highlight on a wet wall, and the same
+		# lobe anywhere the camera passes close to would be plastic.
+		"world_wet":
+			var wet := _matte("#141A24", 0.62)
+			wet.metallic = 0.12
+			wet.metallic_specular = 0.5
+			return wet
+		# And the water itself. Dark, smooth and barely metallic, for the
+		# reason `environment_world._ravine` gives: reflections are sampled
+		# from a near-black dusk sky, so a mirror returns nothing and what
+		# reads is a smooth plane against broken rock.
+		"world_water":
+			var water := _matte("#0B131E", 0.13)
+			water.metallic = 0.35
+			water.metallic_specular = 0.7
+			return water
+		# Engineering concrete, where the machine meets the hill. Lighter than
+		# any rock value and darker than any machine value, which is what a
+		# foundation should be: it belongs to the installation, not to the
+		# product, and a viewer should read it as built without reading it as
+		# part of the track.
+		"world_deck":
+			return _matte("#3A4150", 0.88)
+		"world_deck_dark":
+			return _matte("#252B36", 0.92)
+		# Vegetation. Both far darker and far less saturated than a racer, and
+		# that is a readability constraint rather than a taste: eight hundred
+		# small shapes at a marble's own chroma would be eight hundred things
+		# that look like marbles at 270 pixels wide.
+		"conifer_deep":
+			return _matte("#14261F", 0.97)
+		"conifer_dark":
+			return _matte("#1A2E2A", 0.97)
+		"world_shrub":
+			return _matte("#1D2A26", 0.96)
+		# A small warm practical out in the valley, and a cool one. Low energy
+		# on purpose - see `environment_world._lamps`.
+		"lit_world_warm":
+			return _emissive("#FFB469", 2.2, 0.5)
+		"lit_world_cool":
+			return _emissive("#7FD8FF", 1.8, 0.5)
 	push_error("lab_palette: unknown material key '%s'" % key)
 	return _moulded("#FF00FF", 0.5, 0.0)
 

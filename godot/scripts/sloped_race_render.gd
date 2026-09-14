@@ -162,6 +162,11 @@ func _render_at() -> void:
 	_scene.set_time(_at[0])
 	for _i in WARMUP_DRAWS:
 		await RenderingServer.frame_post_draw
+	# **Also on the still path, not only on the clip path.** A world-density
+	# variant is compared on sheets before it is ever rendered as a clip, and
+	# what it costs is part of the comparison. Counting meshes changes no
+	# pixel.
+	_report_triangles()
 
 	for when in _at:
 		var seconds: float = when

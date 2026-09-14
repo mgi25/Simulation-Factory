@@ -30,6 +30,8 @@ const Layout := preload("res://assets/marble_machine/course/course_layout.gd")
 const Modules := preload("res://assets/marble_machine/course/course_modules.gd")
 const FinishArena := preload("res://assets/marble_machine/course/course_finish.gd")
 const Dressing := preload("res://assets/marble_machine/course/course_dressing.gd")
+const EnvWorld := preload(
+	"res://assets/marble_machine/environment/environment_world.gd")
 const EnvBuilder := preload(
 	"res://assets/marble_machine/environment/environment_builder.gd")
 
@@ -261,6 +263,22 @@ static func build(palette, key: String, options: Dictionary = {}) -> Node3D:
 	if detail != "block":
 		Dressing.build(root, palette, terrain_cfg, centreline,
 			table["nodes"], EnvBuilder.dressing(environment))
+	# **The near world, after the ground and before the metrics.** V25's
+	# terrain-anchored forms need the finished terrain config - the bench index
+	# is written into it above, and a form sited before that would stand on the
+	# uncut hill - and they need the whole centreline, which is what every one
+	# of them rejects candidates against. Absent from every profile before V25,
+	# and absent builds nothing at all.
+	#
+	# Independent of `detail`, unlike the dressing. A block render is a
+	# geometry check and has no lamps in it; the world is the thing under
+	# review here, and a proof that dropped it at one detail level would be a
+	# proof of a different picture.
+	var world_cfg: Dictionary = EnvBuilder.world(environment)
+	if not world_cfg.is_empty():
+		var census := EnvWorld.build(root, palette, terrain_cfg, centreline,
+			table["nodes"], world_cfg)
+		root.set_meta("world_census", census)
 
 	root.set_meta("metrics", _metrics(table, total_length, clearances,
 		centreline))

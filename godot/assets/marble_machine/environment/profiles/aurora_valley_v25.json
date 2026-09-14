@@ -1,0 +1,411 @@
+{
+  "id": "aurora_valley_v25",
+  "title": "Aurora Valley V25",
+  "family": "valley",
+  "summary": "Aurora Valley's air and materials, retuned for a world with geometry in it: five rock recession steps, valley-floor haze and a cool rim that reaches the world layer only",
+  "extends": "aurora_valley",
+  "fog": {
+    "colour": "#15293F",
+    "energy": 0.55,
+    "sun_scatter": 0.04,
+    "density": 0.0038,
+    "sky_affect": 0.38,
+    "aerial_perspective": 0.94,
+    "height": -40.0,
+    "height_density": 0.03
+  },
+  "lights": {
+    "WorldKey": {
+      "energy": 1.65
+    },
+    "WorldFill": {
+      "energy": 0.66
+    },
+    "WorldRim": {
+      "cull_mask": 2,
+      "colour": "#63BEE8",
+      "energy": 0.55,
+      "specular": 0.05,
+      "rotation": [
+        -7.0,
+        96.0,
+        0.0
+      ],
+      "shadow": {
+        "enabled": false
+      }
+    }
+  },
+  "world": {
+    "keepout": [
+      [
+        -33.7,
+        -52.9
+      ],
+      [
+        -35.7,
+        -49.4
+      ],
+      [
+        -36.9,
+        -45.5
+      ],
+      [
+        -37.3,
+        -41.5
+      ],
+      [
+        -28.6,
+        -53.9
+      ],
+      [
+        -29.1,
+        -49.7
+      ],
+      [
+        -29.8,
+        -45.8
+      ],
+      [
+        -31.2,
+        -42.0
+      ],
+      [
+        -32.6,
+        -38.2
+      ],
+      [
+        -31.7,
+        -34.3
+      ],
+      [
+        -28.1,
+        -32.4
+      ],
+      [
+        -23.8,
+        -33.1
+      ],
+      [
+        -19.7,
+        -34.5
+      ],
+      [
+        -15.6,
+        -36.0
+      ],
+      [
+        -11.4,
+        -37.2
+      ],
+      [
+        -7.0,
+        -37.8
+      ],
+      [
+        -2.9,
+        -37.6
+      ],
+      [
+        -0.4,
+        -34.4
+      ],
+      [
+        0.1,
+        -30.4
+      ],
+      [
+        -3.5,
+        -28.2
+      ],
+      [
+        -7.1,
+        -25.8
+      ],
+      [
+        -10.0,
+        -22.5
+      ],
+      [
+        -12.0,
+        -18.8
+      ],
+      [
+        -14.4,
+        -15.5
+      ],
+      [
+        -18.2,
+        -14.2
+      ],
+      [
+        -21.7,
+        -11.9
+      ],
+      [
+        -24.7,
+        -9.2
+      ],
+      [
+        -26.9,
+        -5.6
+      ],
+      [
+        -28.3,
+        -1.6
+      ],
+      [
+        -23.4,
+        -3.7
+      ],
+      [
+        -20.6,
+        -6.7
+      ],
+      [
+        -18.0,
+        -9.8
+      ],
+      [
+        -9.0,
+        -16.0
+      ],
+      [
+        -5.1,
+        -17.6
+      ],
+      [
+        -1.2,
+        -19.3
+      ],
+      [
+        2.5,
+        -20.9
+      ],
+      [
+        6.8,
+        -21.5
+      ],
+      [
+        10.9,
+        -20.4
+      ],
+      [
+        14.5,
+        -18.4
+      ],
+      [
+        18.1,
+        -15.2
+      ],
+      [
+        21.1,
+        -11.6
+      ],
+      [
+        23.5,
+        -8.2
+      ],
+      [
+        25.5,
+        -4.3
+      ],
+      [
+        26.8,
+        -0.0
+      ],
+      [
+        27.3,
+        4.0
+      ],
+      [
+        26.9,
+        8.2
+      ],
+      [
+        25.7,
+        12.2
+      ],
+      [
+        23.8,
+        15.8
+      ],
+      [
+        21.2,
+        19.2
+      ],
+      [
+        18.3,
+        22.3
+      ],
+      [
+        15.1,
+        25.0
+      ],
+      [
+        11.6,
+        27.5
+      ],
+      [
+        8.2,
+        29.7
+      ],
+      [
+        4.6,
+        31.7
+      ],
+      [
+        1.0,
+        33.4
+      ],
+      [
+        -2.8,
+        35.1
+      ],
+      [
+        10.5,
+        23.5
+      ],
+      [
+        9.4,
+        19.5
+      ],
+      [
+        8.3,
+        15.6
+      ],
+      [
+        7.0,
+        11.7
+      ],
+      [
+        5.7,
+        7.7
+      ],
+      [
+        4.4,
+        3.6
+      ],
+      [
+        3.3,
+        -0.4
+      ],
+      [
+        2.1,
+        -4.3
+      ],
+      [
+        0.7,
+        -8.1
+      ],
+      [
+        -1.0,
+        -11.9
+      ],
+      [
+        -10.8,
+        -28.6
+      ],
+      [
+        -13.6,
+        -32.3
+      ],
+      [
+        -18.9,
+        -38.6
+      ],
+      [
+        -21.9,
+        -41.8
+      ],
+      [
+        -25.0,
+        -44.9
+      ]
+    ]
+  },
+  "palette": {
+    "slope_cliff": {
+      "albedo": "#1B212B"
+    },
+    "slope_rock": {
+      "albedo": "#202733"
+    },
+    "slope_earth": {
+      "albedo": "#2B3444"
+    },
+    "slope_scree": {
+      "albedo": "#262F3F"
+    },
+    "slope_cap": {
+      "albedo": "#242B38"
+    },
+    "slope_boulder": {
+      "albedo": "#1A202A"
+    },
+    "slope_moss": {
+      "albedo": "#1D2A25"
+    },
+    "scrub_dark": {
+      "albedo": "#1A2420"
+    },
+    "scrub_dry": {
+      "albedo": "#202828"
+    },
+    "world_rock": {
+      "albedo": "#0C1119"
+    },
+    "world_scarp": {
+      "albedo": "#0F141D"
+    },
+    "world_cliff_face": {
+      "albedo": "#111826"
+    },
+    "world_cliff_ledge": {
+      "albedo": "#19222F"
+    },
+    "world_wall_face": {
+      "albedo": "#151E2E"
+    },
+    "world_wall_ledge": {
+      "albedo": "#1E2A3C"
+    },
+    "world_soil": {
+      "albedo": "#1B2231"
+    },
+    "world_deck": {
+      "albedo": "#2A3140"
+    },
+    "world_deck_dark": {
+      "albedo": "#171C25"
+    },
+    "world_wet": {
+      "albedo": "#101724",
+      "roughness": 0.55
+    },
+    "world_water": {
+      "albedo": "#091220",
+      "roughness": 0.11,
+      "metallic": 0.4
+    },
+    "conifer_deep": {
+      "albedo": "#0F241E"
+    },
+    "conifer_dark": {
+      "albedo": "#16302A"
+    },
+    "world_shrub": {
+      "albedo": "#1A2B26"
+    },
+    "lit_world_warm": {
+      "albedo": "#3A2616",
+      "emission": "#FFB469",
+      "energy": 2.0
+    },
+    "lit_world_cool": {
+      "albedo": "#17303C",
+      "emission": "#7FD8FF",
+      "energy": 1.6
+    }
+  }
+}

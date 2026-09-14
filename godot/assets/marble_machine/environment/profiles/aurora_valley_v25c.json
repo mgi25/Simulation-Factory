@@ -1,0 +1,175 @@
+{
+  "id": "aurora_valley_v25c",
+  "title": "V25 C - Rich showcase",
+  "summary": "B with every count raised, a second ridge band, denser vegetation, more foreground rock and a thicker valley haze",
+  "extends": "aurora_valley_v25b",
+  "fog": {
+    "density": 0.0044,
+    "height_density": 0.042
+  },
+  "backdrop": {
+    "mist": {
+      "decks": 8,
+      "alpha": 0.085
+    }
+  },
+  "world": {
+    "walls": {
+      "count": 15,
+      "bearing_from": 296.0,
+      "bearing_step": 22.0,
+      "bearing_jitter": 7.0,
+      "radius": 300.0,
+      "radius_step": 46.0,
+      "radius_cycle": 3,
+      "height": 138.0,
+      "height_step": -15.0,
+      "height_cycle": 4,
+      "base": 72.0,
+      "base_step": 15.0,
+      "base_cycle": 3,
+      "taper": 0.3,
+      "facets": 22,
+      "tiers": 12,
+      "sink": 18.0,
+      "crest": 5,
+      "crest_scale": 0.15,
+      "crest_from": 0.6,
+      "crest_span": 0.28,
+      "seed_from": 601,
+      "seed_step": 17,
+      "materials": [
+        "world_wall_face",
+        "world_wall_ledge"
+      ]
+    },
+    "ridges": {
+      "taper": 0.33,
+      "facets": 26,
+      "tiers": 13,
+      "crest": 4,
+      "crest_scale": 0.19,
+      "crest_from": 0.58,
+      "crest_span": 0.3,
+      "seed_from": 811,
+      "seed_step": 19,
+      "materials": [
+        "world_cliff_face",
+        "world_cliff_ledge"
+      ],
+      "bands": [
+        {
+          "count": 13,
+          "bearing_from": 34.0,
+          "bearing_step": 10.0,
+          "bearing_jitter": 6.0,
+          "radius": 100.0,
+          "radius_step": 16.0,
+          "radius_cycle": 2,
+          "height": 42.0,
+          "height_step": -7.0,
+          "height_cycle": 3,
+          "base": 21.0,
+          "base_step": 4.0,
+          "base_cycle": 2,
+          "sink": 6.0,
+          "seed_from": 907,
+          "seed_step": 23
+        },
+        {
+          "count": 23,
+          "bearing_from": 288.0,
+          "bearing_step": 15.0,
+          "bearing_jitter": 8.0,
+          "radius": 188.0,
+          "radius_step": 26.0,
+          "radius_cycle": 3,
+          "height": 90.0,
+          "height_step": -11.0,
+          "height_cycle": 4,
+          "base": 33.0,
+          "base_step": 7.0,
+          "base_cycle": 3,
+          "sink": 10.0
+        }
+      ]
+    },
+    "spires": {
+      "count": 58,
+      "zone": [
+        -70.0,
+        48.0,
+        -78.0,
+        30.0
+      ],
+      "clearance": 10.0,
+      "height": 7.0,
+      "height_spread": 9.5,
+      "base": 2.0,
+      "taper": 0.66,
+      "facets": 12,
+      "tiers": 8,
+      "sink": 1.2,
+      "lean": 0.12,
+      "min_normal": 0.58,
+      "materials": [
+        "world_rock",
+        "world_scarp"
+      ]
+    },
+    "boulders": {
+      "count": 118,
+      "near": 7.0,
+      "far": 36.0,
+      "scale": 2.4,
+      "scale_spread": 3.8,
+      "taper": 0.44,
+      "facets": 15,
+      "tiers": 9,
+      "sink": 0.5,
+      "min_normal": 0.6,
+      "materials": [
+        "world_rock",
+        "world_scarp"
+      ]
+    },
+    "trees": {
+      "clusters": 66,
+      "per_cluster": 5,
+      "cluster_spread": 3,
+      "spread": 3.6,
+      "height": 3.2,
+      "height_spread": 2.8,
+      "width": 0.6,
+      "taper": 0.93,
+      "facets": 8,
+      "tiers": 5,
+      "clearance": 7.0,
+      "reach": 48.0,
+      "min_normal": 0.72,
+      "shrub_every": 3,
+      "materials": [
+        "conifer_deep",
+        "conifer_dark"
+      ],
+      "shrubs": [
+        "world_shrub"
+      ]
+    },
+    "anchors": {
+      "every": 11.0,
+      "min_drop": 2.4,
+      "max_drop": 17.0,
+      "limit": 34,
+      "pad": 4.6,
+      "lip": 0.95,
+      "blocks": 4,
+      "wall": 1.7,
+      "sweep": 1.12,
+      "block_width": 0.52,
+      "deck": "world_deck",
+      "kerb": "world_deck_dark",
+      "stone": "world_scarp"
+    }
+  }
+}

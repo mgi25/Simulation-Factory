@@ -261,6 +261,15 @@ func _report() -> void:
 	print("  start->finish %.1f  clearance %.2f..%.2f  buried piers %d" % [
 		metrics["start_to_finish"], metrics["min_clearance"],
 		metrics["max_clearance"], metrics["buried_piers"]])
+	# The near world's census, when a profile asked for one. Printed rather
+	# than trusted: a feature that built nothing because a count was zero is
+	# indistinguishable in a still from one that built something subtle.
+	var census = _course.get_meta("world_census", null)
+	if census is Dictionary and not (census as Dictionary).is_empty():
+		var parts: Array = []
+		for key in census:
+			parts.append("%s %d" % [str(key), int(census[key])])
+		print("  world: %s" % ", ".join(parts))
 
 
 func _practicals() -> void:

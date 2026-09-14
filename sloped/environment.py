@@ -70,6 +70,11 @@ SECTIONS = (
     "id", "title", "family", "summary", "extends",
     "sky", "grade", "fog", "ssao", "ssr", "glow", "lights", "backdrop",
     "terrain", "dressing", "zones", "ravine", "accent", "palette", "contrast",
+    # V25. The near world - what a race camera can actually see that is not
+    # the machine, the sky or a distant range. Built by
+    # ``environment_world.gd``; absent from every profile shipped before V25,
+    # and absent means nothing is built.
+    "world",
 )
 
 TERRAIN_SECTIONS = ("surfaces", "scatter")
