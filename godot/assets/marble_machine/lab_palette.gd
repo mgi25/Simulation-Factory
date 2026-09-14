@@ -1054,6 +1054,66 @@ func _build(key: String) -> StandardMaterial3D:
 			return _matte("#3A4150", 0.88)
 		"world_deck_dark":
 			return _matte("#252B36", 0.92)
+		# **Concrete, and lighter than the ground it stands in.** V25 built its
+		# retaining blocks out of `world_deck_dark`, which is darker than the
+		# hillside - and a small dark shape on a lighter ground reads as a
+		# hole, which is why fifteen foundations came out of the motion proof
+		# as a field of scattered boxes. A poured wall is the one thing in a
+		# dark valley that is genuinely pale, and making it pale is what turns
+		# it from a hole into a structure.
+		# **And only just lighter.** The first value here was #464D5C, three
+		# stops above the hillside, and the render said what that is: sixty
+		# pale boxes scattered across the near ground, brighter than any rock
+		# in the frame and second only to the machine. A foundation is read by
+		# its *shape and its shadow*, not by its value - so this sits about
+		# four L* above `slope_earth` under the V25 profile, which is enough
+		# to say "poured" and not enough to say "look here".
+		"world_concrete":
+			return _matte("#343B49", 0.9)
+		# --- V25.1: stylised material zones on the near ground ---
+		#
+		# Laid over the heightfield by `environment_world._patches`, and
+		# deliberately **close in value to the ground and separated by hue and
+		# roughness**. A zone that is much lighter than the hillside is a
+		# painted patch; a zone half a stop away with a different sheen is a
+		# change of material, which is what the brief asks for. Each of these
+		# is within four L* of `slope_earth` under the V25 profile.
+		"world_gravel":
+			return _matte("#2F3949", 0.99)
+		"world_bench":
+			return _matte("#2A3038", 0.93)
+		# Damp rock below a ledge and along the gorge lip. The only zone with
+		# any specular at all, and it is small: a sheen is how a viewer reads
+		# wet, and it is also the fastest way to make a whole hillside plastic.
+		"world_damp":
+			var damp := _matte("#1D2531", 0.58)
+			damp.metallic = 0.08
+			damp.metallic_specular = 0.45
+			return damp
+		# The ground inside the finish basin, and the one zone allowed to
+		# separate from the hillside by value as well as by hue.
+		#
+		# **Warm here means "not blue".** In a frame where every other surface
+		# carries a cyan cast, a neutral reads as warm without a single orange
+		# pixel being spent - which is how this pass buys the brief's finish
+		# warmth without competing with the gold chute or the FINISH board.
+		#
+		# It was #332F33 first, four L* above `slope_earth` like every other
+		# zone, and in the finish frame - the one frame it exists for, where
+		# the mesa is the whole lower half of the picture - it was invisible.
+		# A zone rule that is right for nine sites can be wrong for the tenth:
+		# this one is read at forty units at a grazing angle through fog, and
+		# all three of those flatten a four-L* step to nothing.
+		"world_ember":
+			return _matte("#3E3739", 0.93)
+		"world_warm_rock":
+			return _matte("#242130", 0.94)
+		# A small amber practical out in the world: the lens, not the light.
+		# Dimmer than the valley's own warm practical, because the two it
+		# stands nearest are the FINISH board and the gold chute, and a lamp
+		# that competes with the payoff is a lamp in the wrong place.
+		"lit_world_amber":
+			return _emissive("#FFC98A", 1.6, 0.5)
 		# Vegetation. Both far darker and far less saturated than a racer, and
 		# that is a readability constraint rather than a taste: eight hundred
 		# small shapes at a marble's own chroma would be eight hundred things

@@ -1,0 +1,16 @@
+Analytic parallax: median image displacement per depth band over
+0.25 s, computed by projecting the world's own form positions through
+the solved camera at both instants. Shading-blind, so it measures the
+bands a block matcher discards on flat-shaded rock. Pixels at
+1080 x 1920. N is how many forms of that band are on screen at both
+instants.
+
+move            foreground        vegetation        ridges            walls             ranges            
+----------------------------------------------------------------------------------------------------------
+obstacle_pan    37px/4n           31px/3n           52px/3n           66px/1n           -                 
+fork_swing      55px/4n           41px/3n           137px/4n          147px/1n          -                 
+branch_cross    328px/9n          303px/7n          460px/2n          -                 -                 
+final_dive      1px/2n            1px/2n            2px/3n            -                 -                 
+preview_dolly   128px/10n         130px/8n          55px/1n           -                 -                 
+
+counts: foreground 36, vegetation 24, ridges 26, walls 13, ranges 72

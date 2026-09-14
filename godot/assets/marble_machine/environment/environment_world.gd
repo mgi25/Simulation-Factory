@@ -57,6 +57,8 @@ const Geometry := preload("res://scripts/toy_geometry.gd")
 const Forms := preload("res://assets/marble_machine/lab_forms.gd")
 const HeroWorld := preload("res://assets/marble_machine/hero/hero_world.gd")
 const Terrain := preload("res://assets/marble_machine/course/course_terrain.gd")
+const Rock := preload("res://assets/marble_machine/environment/world_rock.gd")
+const Flora := preload("res://assets/marble_machine/environment/world_flora.gd")
 
 const WORLD_LAYER := 2
 
@@ -68,8 +70,8 @@ const TRACK_CELL := 10.0
 ## from the profile's key order so that two profiles with the same sections
 ## build the same tree - a `Dictionary` iterates in insertion order, and a JSON
 ## file's insertion order is whatever its author happened to type.
-const BUILD_ORDER := ["walls", "ridges", "scarps", "spires", "boulders",
-	"anchors", "trees", "landmarks", "ravine", "lamps"]
+const BUILD_ORDER := ["patches", "walls", "ridges", "scarps", "spires",
+	"boulders", "anchors", "trees", "landmarks", "ravine", "lamps"]
 
 
 # --- the entry point --------------------------------------------------------
@@ -129,6 +131,7 @@ static func build(root: Node3D, palette, cfg: Dictionary, centreline: Array,
 			continue
 		var made := 0
 		match key:
+			"patches": made = _patches(group, palette, cfg, guides, spec)
 			"walls": made = _walls(group, palette, cfg, guides, spec)
 			"ridges": made = _ridges(group, palette, cfg, guides, spec)
 			"scarps": made = _scarps(group, palette, cfg, guides, spec)
@@ -258,6 +261,29 @@ static func _mass(height: float, base: float, salt: int, facets: int,
 	return HeroWorld.smooth_mass(height, base, salt, facets, tiers, taper)
 
 
+## **The one switch that turns V25's rock into V25.1's.**
+##
+## A spec with no `kit` field builds `smooth_mass` exactly as V25 did, with
+## V25's own facet, tier and taper numbers - which is what keeps every profile
+## shipped before this pass reproducing. A spec that names a kit entry builds
+## `world_rock.form` instead, and `shape` is passed through as per-site
+## overrides on that entry.
+##
+## Written as one helper rather than as a branch at each of the seven call
+## sites because the property that matters is that *every* rock in the world
+## goes one way or the other together: a world with faceted ridges and smooth
+## boulders would read worse than either, since the eye reads the mismatch
+## before it reads the forms.
+static func _rock(spec: Dictionary, height: float, base: float, salt: int,
+		facets: int, tiers: int, taper: float) -> ArrayMesh:
+	var kit := str(spec.get("kit", ""))
+	if kit == "" or not Rock.known(kit):
+		if kit != "":
+			push_error("environment_world: unknown rock kit '%s'" % kit)
+		return _mass(height, base, salt, facets, tiers, taper)
+	return Rock.form(kit, height, base, salt, spec.get("shape", {}))
+
+
 static func _bands(spec: Dictionary) -> Array:
 	## One mass ring, or several sharing a set of defaults.
 	##
@@ -329,7 +355,7 @@ static func _ring(node: Node3D, palette, cfg: Dictionary,
 		if not _sited(guides, at.x, at.y, 0.0, lens):
 			continue
 		var mass := Forms.mesh_node(
-			_mass(height * (0.88 + 0.24 * _rand(salt, 5, 37)),
+			_rock(spec, height * (0.88 + 0.24 * _rand(salt, 5, 37)),
 				base * (0.88 + 0.26 * _rand(salt, 7, 41)),
 				salt, facets, tiers, taper),
 			_material(palette, materials, index, fallback),
@@ -375,7 +401,9 @@ static func _crest(mass: Node3D, palette, spec: Dictionary, salt: int,
 		var tall: float = height * gauge * (0.55 + 0.9
 			* _rand(seed_value, 11, 1471))
 		var tooth := Forms.mesh_node(
-			_mass(tall, tall * (0.34 + 0.3 * _rand(seed_value, 13, 1481)),
+			_rock({"kit": str(spec.get("crest_kit", "")),
+					"shape": spec.get("crest_shape", {})},
+				tall, tall * (0.34 + 0.3 * _rand(seed_value, 13, 1481)),
 				seed_value, 11, 7, 0.58),
 			_material(palette, materials, which + 1, fallback),
 			"Crag%d" % which, false)
@@ -385,6 +413,120 @@ static func _crest(mass: Node3D, palette, spec: Dictionary, salt: int,
 		tooth.rotation.z = (_rand(seed_value, 19, 1493) - 0.5) * 0.3
 		mass.add_child(tooth)
 	return count
+
+
+# --- 0: material zones on the near ground -----------------------------------
+
+
+static func _patches(group: Node3D, palette, cfg: Dictionary,
+		guides: Dictionary, spec: Dictionary) -> int:
+	## Large stylised material zones laid over the heightfield.
+	##
+	## **The problem.** `course_terrain` paints the near ground from one
+	## function of position and deliberately refuses band boundaries, because a
+	## per-quad material edge on a heightfield is a staircase at cell
+	## resolution. That decision is right and its cost is that the hillside is
+	## one smooth painted surface from every camera - V25's own weakness 2, and
+	## the thing that most makes the near world look like a model base.
+	##
+	## **Why not a texture.** The brief's rule, and this course's own style
+	## lock: variation at *large* spatial scale, nothing high-frequency, no
+	## photographic noise. A tiling rock texture on this ground would read as
+	## dirt on a toy at exactly the moment the machine has to read as moulded.
+	##
+	## **So: geometry that is a material.** A patch is a mesh that follows
+	## `Terrain.height` across tens of units, lifted by a couple of
+	## centimetres, painted a different value and roughness - a gravel shelf, a
+	## damp apron below a ledge, a soil bench. It is the same surface the
+	## terrain has, so it cannot be seen as an object; what is seen is that the
+	## ground changes material there.
+	##
+	## Two details make it read rather than z-fight:
+	##
+	##   * the rim drops **below** the terrain rather than ending in mid-air,
+	##     so no edge is ever a floating lip at a grazing angle
+	##   * the plan is an irregular polygon, so a boundary is a coastline
+	##     rather than a disc
+	##
+	## Render-only, like everything here. Nothing samples it, nothing lands on
+	## it, and `Terrain.height` is unchanged and unconsulted by anything but
+	## this file.
+	var sites: Array = spec.get("sites", [])
+	if sites.is_empty():
+		return 0
+	var node := Node3D.new()
+	node.name = "Patches"
+	group.add_child(node)
+	var centre_x := float(cfg.get("centre_x", 0.0))
+	var centre_z := float(cfg.get("centre_z", 0.0))
+	var rings := maxi(int(spec.get("rings", 3)), 1)
+	var facets := maxi(int(spec.get("facets", 11)), 5)
+	var lift := float(spec.get("lift", 0.06))
+	var skirt := float(spec.get("skirt", 0.9))
+	var rough := float(spec.get("rough", 0.34))
+	var made := 0
+	for which in sites.size():
+		# `[dx, dz, radius, material]`, terrain-relative like the scarps.
+		var site: Array = sites[which]
+		var x := centre_x + float(site[0])
+		var z := centre_z + float(site[1])
+		var reach := float(site[2])
+		var key: String = str(site[3]) if site.size() > 3 else "world_soil"
+		var plan := PackedFloat32Array()
+		plan.resize(facets)
+		for facet in facets:
+			var angle: float = TAU * float(facet) / float(facets)
+			plan[facet] = 1.0 				+ rough * sin(angle * 2.0 + float(which)) 				+ rough * 0.55 * sin(angle * 3.0 - float(which) * 1.7)
+		var surface := SurfaceTool.new()
+		surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+		var loops: Array = []
+		for ring in rings + 1:
+			# **The skirt is vertical, not a ramp.** The first build spread
+			# the outermost ring one whole step past the second-outermost and
+			# dropped it, which is a shallow apron a few units wide cutting
+			# down through a bumpy heightfield - and where the ground is
+			# convex the intersection came back as a torn, flame-shaped edge.
+			# The last ring stands at the *same radius* as the one inside it
+			# and simply drops, so the boundary is the polygon's own edge and
+			# what is below it is buried.
+			var share: float = 1.0 if ring >= rings - 1 				else float(ring) / float(rings - 1)
+			var loop: Array = []
+			for facet in facets:
+				var angle: float = TAU * float(facet) / float(facets)
+				var radius: float = reach * plan[facet] * share
+				var px: float = x + cos(angle) * radius
+				var pz: float = z + sin(angle) * radius
+				var py: float = Terrain.height(px, pz, cfg) + lift
+				if ring == rings:
+					py -= skirt
+				loop.append(Vector3(px - x, py, pz - z))
+			loops.append(loop)
+		var hub := Vector3(0.0, Terrain.height(x, z, cfg) + lift, 0.0)
+		for facet in facets:
+			var next := (facet + 1) % facets
+			Geometry.quad_auto(surface, hub, loops[0][facet],
+				loops[0][next], hub, Vector3.UP)
+		for ring in rings:
+			for facet in facets:
+				var next := (facet + 1) % facets
+				var a: Vector3 = loops[ring][facet]
+				var b: Vector3 = loops[ring + 1][facet]
+				var c: Vector3 = loops[ring + 1][next]
+				var d: Vector3 = loops[ring][next]
+				var normal := (c - a).cross(b - d)
+				if normal.y < 0.0:
+					normal = -normal
+				if normal.length_squared() < 1.0e-12:
+					normal = Vector3.UP
+				Geometry.quad_auto(surface, a, b, c, d, normal.normalized())
+		var mesh := ArrayMesh.new()
+		surface.commit(mesh)
+		var patch := Forms.mesh_node(mesh, palette.get_material(key),
+			"Zone%d" % which, false)
+		patch.position = Vector3(x, 0.0, z)
+		node.add_child(patch)
+		made += 1
+	return made
 
 
 # --- A: the valley walls ----------------------------------------------------
@@ -482,6 +624,7 @@ static func _scarps(group: Node3D, palette, cfg: Dictionary,
 	var sink := float(spec.get("sink", 1.4))
 	var clearance := float(spec.get("clearance", 6.0))
 	var lens := float(spec.get("keepout", 24.0))
+	var kit := str(spec.get("kit", ""))
 	var made := 0
 	for which in sites.size():
 		var site: Array = sites[which]
@@ -498,6 +641,43 @@ static func _scarps(group: Node3D, palette, cfg: Dictionary,
 		stack.position = Vector3(x, Terrain.height(x, z, cfg) - sink, z)
 		stack.rotation.y = deg_to_rad(bearing)
 		node.add_child(stack)
+		# **A stack of rounded boxes on a smooth hill is a stack of boxes.**
+		#
+		# That is the V25 finding this branch exists to fix, and it is visible
+		# in every wide frame of the motion proof: twelve five-slab stacks
+		# across the flank read as sixty dark crates dropped on a blue field,
+		# not as strata. The idea was right - put the bedding back as geometry
+		# - and the primitive was wrong, because a rounded box has no
+		# silhouette of its own and sixty of them have one silhouette between
+		# them.
+		#
+		# The kit's `ledge` form is the same idea built properly: one mass,
+		# wide and low, with a partial shelf cut round part of it, set into
+		# the slope. Two or three of those stepping back up the hill are a
+		# scarp; five boxes are a pallet.
+		if kit != "":
+			var steps := maxi(int(spec.get("steps", 3)), 1)
+			for tier in steps:
+				var salt := which * 131 + tier * 17 + 3
+				var back: float = inset * gauge * float(tier) * 2.2
+				var lift: float = rise * gauge * float(tier) * 1.35
+				var wide: float = float(size[0]) * gauge * 0.5 					* pow(shrink, float(tier))
+				var block := Forms.mesh_node(
+					_rock({"kit": kit, "shape": spec.get("shape", {})},
+						float(size[1]) * gauge
+							* float(spec.get("thickness", 3.2))
+							* (0.8 + 0.45 * _rand(salt, 3, 97)),
+						wide, salt, 10, 2, 0.2),
+					_material(palette, materials, tier, "world_cliff_ledge"),
+					"Step%d" % tier, false)
+				block.position = Vector3(
+					(_rand(salt, 5, 101) - 0.5) * float(size[0]) * gauge * 0.5,
+					lift, -back)
+				block.rotation.y = (_rand(salt, 7, 103) - 0.5) * 0.9
+				block.rotation.z = (_rand(salt, 11, 107) - 0.5) * 0.12
+				stack.add_child(block)
+				made += 1
+			continue
 		for tier in tiers:
 			var shrunk: float = pow(shrink, float(tier))
 			var salt := which * 31 + tier
@@ -579,7 +759,7 @@ static func _spires(group: Node3D, palette, cfg: Dictionary,
 		var salt := attempt * 13 + 5
 		var tall: float = height + spread * _rand(salt, 3, 1021)
 		var spire := Forms.mesh_node(
-			_mass(tall, base * (0.7 + 0.7 * _rand(salt, 7, 1031)), salt,
+			_rock(spec, tall, base * (0.7 + 0.7 * _rand(salt, 7, 1031)), salt,
 				facets, tiers, taper),
 			_material(palette, materials, made, "world_scarp"),
 			"Spire%d" % made, false)
@@ -650,8 +830,19 @@ static func _boulders(group: Node3D, palette, cfg: Dictionary,
 		made += 1
 		var salt := attempt * 19 + 7
 		var size: float = scale + spread * _rand(salt, 3, 1061)
+		# Two kinds alternating rather than one: a boulder field where every
+		# form came out of one preset is the repetition the brief bans, and
+		# `slab` against `boulder` is the cheapest possible variation - a
+		# leaning plate beside a chunk.
+		var shape: Dictionary = {
+			"kit": str(spec.get("kit", "")),
+			"shape": spec.get("shape", {}),
+		}
+		var alternate: Array = spec.get("kits", [])
+		if not alternate.is_empty():
+			shape["kit"] = str(alternate[made % alternate.size()])
 		var rock := Forms.mesh_node(
-			_mass(size * (0.7 + 0.6 * _rand(salt, 5, 1063)), size, salt,
+			_rock(shape, size * (0.7 + 0.6 * _rand(salt, 5, 1063)), size, salt,
 				facets, tiers, taper),
 			_material(palette, materials, made, "world_scarp"),
 			"Rock%d" % made, false)
@@ -726,6 +917,9 @@ static func _anchors(group: Node3D, palette, cfg: Dictionary,
 		site.position = Vector3(here.x, ground, here.z)
 		site.rotation.y = atan2(forward.x, forward.z)
 		node.add_child(site)
+		if str(spec.get("form", "")) == "bench":
+			_bench(site, palette, cfg, spec, here, ground, made)
+			continue
 		# The cut platform: a shallow disc of rock sunk almost flush, so its
 		# rim is a thin bright line on the hillside rather than a plinth.
 		var slab := Forms.mesh_node(
@@ -758,6 +952,75 @@ static func _anchors(group: Node3D, palette, cfg: Dictionary,
 		sill.position.y = 0.22
 		site.add_child(sill)
 	return made
+
+
+static func _bench(site: Node3D, palette, cfg: Dictionary, spec: Dictionary,
+		here: Vector3, ground: float, index: int) -> void:
+	## A cut bench where the machine meets the hill: **one wall, not a ring of
+	## blocks.**
+	##
+	## V25's anchor was a sunken disc, four kerb blocks on a half arc and a
+	## graphite sill. Its own notes record the correction that got it from
+	## seven blocks to four, and the motion proof says the correction did not
+	## go far enough: at every wide framing the anchors read as **a field of
+	## scattered dark cubes** under the track. Three separate causes, and each
+	## is fixed here:
+	##
+	##   1. **The pad was invisible.** A disc sunk almost flush in `world_
+	##      scarp`, which is darker than the hillside it sits in, shows a rim
+	##      of nothing. So the only thing an anchor contributed to the picture
+	##      was its blocks - and a block with no platform under it is a box on
+	##      a hill.
+	##   2. **The blocks were darker than the ground.** `world_deck_dark` is
+	##      #252B36 against a near ground around #2B3444. A small dark shape on
+	##      a lighter ground reads as a *hole*, and a row of holes reads as
+	##      debris. Engineering concrete should be the one thing out here that
+	##      is **lighter** than the rock, because that is what concrete is.
+	##   3. **Four separate arcs are four shapes.** Whatever the gaps were
+	##      meant to say about masonry, at forty units they are four objects.
+	##
+	## A bench is instead: a **level shelf** cut into the slope, wide enough to
+	## read; **one continuous retaining wall** along its downhill lip, with the
+	## seams cut into its own top edge as notches rather than as gaps between
+	## bodies; and a small graphite sill under the pier. Five meshes per site
+	## against V25's six, and one silhouette instead of five.
+	var pad := float(spec.get("pad", 3.6))
+	var wall := float(spec.get("wall", 1.35))
+	var deck: String = str(spec.get("deck", "world_deck"))
+	var kerb: String = str(spec.get("kerb", "world_concrete"))
+	var stone: String = str(spec.get("stone", "world_soil"))
+	# The shelf. A wide flat plate at ground level, a hand's width proud, so
+	# its lit top face is a horizontal in a frame that is otherwise all slope.
+	var shelf := Forms.mesh_node(
+		Geometry.rounded_box(Vector3(pad * 1.5, 0.44, pad * 1.0), 0.16, 2),
+		palette.get_material(stone), "Shelf", false)
+	shelf.position.y = -0.12
+	site.add_child(shelf)
+	# The retaining wall: one body across the downhill lip, with two shallow
+	# notches cut in its top by a pair of narrow blocks set proud of it. The
+	# seams are therefore *in* the wall rather than *between* walls.
+	var run := pad * 1.45
+	var face := Forms.mesh_node(
+		Geometry.rounded_box(Vector3(run, wall, pad * 0.34), 0.12, 2),
+		palette.get_material(kerb), "Wall", false)
+	face.position = Vector3(0.0, wall * 0.38, pad * 0.62)
+	site.add_child(face)
+	for which in 2:
+		var pier := Forms.mesh_node(
+			Geometry.rounded_box(Vector3(run * 0.13, wall * 1.32,
+				pad * 0.42), 0.1, 2),
+			palette.get_material(kerb), "Pier%d" % which, false)
+		pier.position = Vector3(run * (0.3 if which == 0 else -0.3),
+			wall * 0.5, pad * 0.62)
+		site.add_child(pier)
+	# The sill the machine's own foot lands on: graphite, so the join between
+	# the installation and the ground is a change of material rather than a
+	# change of size.
+	var sill := Forms.mesh_node(
+		Geometry.rounded_box(Vector3(pad * 0.62, 0.5, pad * 0.62), 0.12, 2),
+		palette.get_material(deck), "Sill", false)
+	sill.position.y = 0.26
+	site.add_child(sill)
 
 
 # --- G: vegetation ----------------------------------------------------------
@@ -823,15 +1086,46 @@ static func _trees(group: Node3D, palette, cfg: Dictionary,
 		clump.position = Vector3(x, Terrain.height(x, z, cfg), z)
 		node.add_child(clump)
 		var count: int = per + int(_rand(attempt, 19, 1097) * float(vary))
+		var kit := bool(spec.get("kit", false))
 		for which in count:
 			var salt := attempt * 29 + which * 7 + 3
 			var angle: float = TAU * _rand(salt, 3, 1103)
+			# **A cluster is composed, not scattered.**
+			#
+			# V25 put `per_cluster` identical cones on a disc at a uniform
+			# radius, and the motion proof shows what that is: rows of matched
+			# dark triangles on every crest. The forms are the vegetation
+			# kit's job; the *arrangement* is this one, and the rule is the
+			# same as for a rock formation - one dominant, a group behind it.
+			#
+			# So the first plant of a cluster sits near its centre and is the
+			# kit's `hero`; the rest fall on a ring whose radius grows with
+			# index, which puts the small ones out at the edges where a stand
+			# of trees actually thins.
 			var out: float = radius * (0.25 + 0.9 * _rand(salt, 5, 1109))
+			if kit:
+				out = radius * (0.08 + 0.95 * float(which)
+					/ float(maxi(count - 1, 1))) 					* (0.7 + 0.6 * _rand(salt, 5, 1109))
 			var tx: float = x + cos(angle) * out
 			var tz: float = z + sin(angle) * out
 			if not _sited(guides, tx, tz, clearance, lens):
 				continue
 			var top: float = height + tall * _rand(salt, 7, 1117)
+			if kit:
+				var role := str(Flora.CLUSTER[which % Flora.CLUSTER.size()])
+				# The hero is taller than anything behind it by construction,
+				# and the ground forms are a third of the height. A stand
+				# whose members are all one height is a hedge.
+				var gauge: float = 1.32 if which == 0 					else (0.42 if role == "shrub" or role == "tuft" else 0.9)
+				var plant := Flora.plant(role, top * gauge, salt, palette,
+					spec.get("shape", {}))
+				plant.position = Vector3(cos(angle) * out,
+					Terrain.height(tx, tz, cfg) - clump.position.y,
+					sin(angle) * out)
+				plant.rotation.y = _rand(salt, 13, 1129) * TAU
+				clump.add_child(plant)
+				made += 1
+				continue
 			var mesh: ArrayMesh
 			var key: String
 			if which % shrub_every == shrub_every - 1 and not shrubs.is_empty():
@@ -894,10 +1188,15 @@ static func _landmarks(group: Node3D, palette, cfg: Dictionary,
 	var lens := float(spec.get("keepout", 26.0))
 	var made := 0
 	for name in sites:
-		if not nodes.has(name):
-			continue
 		var site: Dictionary = sites[name]
-		var anchor: Vector3 = nodes[name]
+		# **A site may name the node it stands at**, so two forms can share
+		# one race location. The finish needs exactly that: a high rim beyond
+		# the mesa and a low rim down in the gorge are one composition and two
+		# arcs, and keying the table by node name alone allowed only one.
+		var node_name := str(site.get("node", name))
+		if not nodes.has(node_name):
+			continue
+		var anchor: Vector3 = nodes[node_name]
 		var offset: Array = site.get("offset", [0.0, 0.0])
 		var x: float = anchor.x + float(offset[0])
 		var z: float = anchor.z + float(offset[1])
@@ -919,7 +1218,8 @@ static func _landmarks(group: Node3D, palette, cfg: Dictionary,
 						+ "camera path") % [name, clearance, lens])
 					continue
 				var mass := Forms.mesh_node(
-					_mass(height, base, salt, int(site.get("facets", 20)),
+					_rock(site, height, base, salt,
+						int(site.get("facets", 20)),
 						int(site.get("tiers", 12)),
 						float(site.get("taper", 0.22))),
 					palette.get_material(material), "Butte", false)
@@ -946,7 +1246,7 @@ static func _landmarks(group: Node3D, palette, cfg: Dictionary,
 					var tall: float = height * (0.62 + 0.55
 						* _rand(seed_value, 3, 1151))
 					var spire := Forms.mesh_node(
-						_mass(tall, base * (0.24 + 0.2
+						_rock(site, tall, base * (0.24 + 0.2
 							* _rand(seed_value, 5, 1153)), seed_value,
 							int(site.get("facets", 13)),
 							int(site.get("tiers", 9)),
@@ -975,8 +1275,22 @@ static func _landmarks(group: Node3D, palette, cfg: Dictionary,
 						continue
 					var tall: float = height * (1.0 if side > 0.0
 						else float(site.get("ratio", 0.68)))
+					# **The two posts are different kinds, not one kind at
+					# two heights.** V25's gate already used a height ratio and
+					# the review's verdict was that the fork reads as two rocks
+					# rather than as two *ways*. A broad stepped mesa on one
+					# side and a vertical wall on the other is a geological
+					# split: the eye reads two different kinds of country and
+					# infers two different routes before it is told.
+					var post: Dictionary = site.duplicate()
+					var pair: Array = site.get("kits", [])
+					if pair.size() >= 2:
+						post["kit"] = str(pair[0 if side > 0.0 else 1])
 					var pillar := Forms.mesh_node(
-						_mass(tall, base, seed_value,
+						_rock(post, tall, base
+								* (1.0 if side > 0.0
+									else float(site.get("width_ratio", 1.0))),
+							seed_value,
 							int(site.get("facets", 17)),
 							int(site.get("tiers", 11)),
 							float(site.get("taper", 0.38))),
@@ -987,6 +1301,128 @@ static func _landmarks(group: Node3D, palette, cfg: Dictionary,
 							- mount.position.y - sink, at.z)
 					pillar.rotation.y = float(seed_value) * 0.43
 					mount.add_child(pillar)
+					made += 1
+			"pair":
+				# **Two forms, deliberately unequal.** The obstacle's V25 mark
+				# was three spires on an even ring, and three of anything
+				# evenly spaced is the shape a viewer reads as generated. Two
+				# needles at a strong height ratio, offset along one bearing,
+				# is a composition: a dominant and a second, which is the
+				# brief's own rule for a formation stated at landmark scale.
+				var bearing: float = deg_to_rad(float(site.get("bearing", 0.0)))
+				var apart := float(site.get("gap", 14.0))
+				var ratio := float(site.get("ratio", 0.55))
+				var pair_kits: Array = site.get("kits", [])
+				for which in 2:
+					var seed_value := salt + which * 47
+					var at := Vector3(sin(bearing) * apart * (0.5 - float(which)),
+						0.0, cos(bearing) * apart * (0.5 - float(which)))
+					if not _sited(guides, x + at.x, z + at.z, clearance, lens):
+						push_warning(("environment_world: landmark '%s' form "
+							+ "%d is inside %.1f of the racing line or %.1f of "
+							+ "the camera path")
+							% [name, which, clearance, lens])
+						continue
+					var shape: Dictionary = site.duplicate()
+					if pair_kits.size() >= 2:
+						shape["kit"] = str(pair_kits[which])
+					var tall: float = height * (1.0 if which == 0 else ratio)
+					var form := Forms.mesh_node(
+						_rock(shape, tall, base * (1.0 if which == 0
+								else float(site.get("width_ratio", 0.72))),
+							seed_value, int(site.get("facets", 11)),
+							int(site.get("tiers", 9)),
+							float(site.get("taper", 0.62))),
+						palette.get_material(material), "Form%d" % which, false)
+					form.position = Vector3(at.x,
+						Terrain.height(x + at.x, z + at.z, cfg)
+							- mount.position.y - sink, at.z)
+					form.rotation.y = _rand(seed_value, 7, 1163) * TAU
+					form.rotation.z = (float(which) - 0.5) 						* float(site.get("lean", 0.0))
+					mount.add_child(form)
+					made += 1
+			"basin":
+				# **An arc of rock around a place, opening toward the camera.**
+				#
+				# This is the finish's form, and it is the one landmark kind
+				# that is about *enclosure* rather than about a silhouette.
+				# V25's finish was a butte beyond the mesa: a thing to look at
+				# past the payoff. What the brief asks for - "we arrived
+				# somewhere" - is not an object but a room, and a room is a
+				# wall that wraps. So: `count` masses on an arc from `from` to
+				# `to` degrees at `radius`, each standing on the ground where
+				# it lands, tallest in the middle of the arc and falling away
+				# at both ends.
+				#
+				# The arc is **open on the approach bearing** by construction,
+				# because a wall between the camera and the finish is a wall
+				# in front of the payoff - which is the failure V25's first
+				# ridge band produced and the reason this whole file measures
+				# radii against the camera envelope rather than the terrain.
+				var count := int(site.get("count", 5))
+				var radius := float(site.get("radius", 30.0))
+				var from_bearing := float(site.get("from", 200.0))
+				var to_bearing := float(site.get("to", 340.0))
+				var fall := float(site.get("fall", 0.45))
+				var arc_kits: Array = site.get("kits", [])
+				for which in count:
+					var seed_value := salt + which * 59
+					var share: float = 0.0 if count <= 1 						else float(which) / float(count - 1)
+					var bearing: float = deg_to_rad(lerpf(from_bearing,
+						to_bearing, share))
+					var out: float = radius * (0.86 + 0.28
+						* _rand(seed_value, 3, 1291))
+					var at := Vector3(sin(bearing) * out, 0.0,
+						cos(bearing) * out)
+					if not _sited(guides, x + at.x, z + at.z, clearance, lens):
+						push_warning(("environment_world: landmark '%s' arc "
+							+ "%d is inside %.1f of the racing line or %.1f of "
+							+ "the camera path")
+							% [name, which, clearance, lens])
+						continue
+					# Tallest at the back of the arc, lowest at its horns. A
+					# wall of one height is a fence; a wall that rises to a
+					# shoulder and falls away is a place.
+					var crest_shape: float = 1.0 - fall \
+						* pow(absf(share - 0.5) * 2.0, 1.4)
+					var ground := Terrain.height(x + at.x, z + at.z, cfg)
+					var tall: float = height * crest_shape \
+						* (0.84 + 0.3 * _rand(seed_value, 5, 1297))
+					# **A wall on falling ground is specified by its crest,
+					# not by its own height**, and on this course that is not
+					# a refinement - it is the difference between a basin and
+					# nothing at all.
+					#
+					# The finish stands on a promontory: the ground is -2 at
+					# the mesa and falls to -82 within forty units in every
+					# direction the finish camera looks. An arc of five
+					# seventy-unit masses round it therefore tops out at -31,
+					# thirty units *below* the deck, and is invisible from a
+					# camera that is looking down at the deck. `crown` names
+					# the absolute y the arc's back should reach; each mass
+					# then grows from wherever the ground actually is to get
+					# there, so the far wall is a hundred units tall and the
+					# near horn is twenty, and the two read as one rim.
+					if site.has("crown"):
+						var want: float = float(site["crown"]) - float(
+							site.get("fall_y", 12.0)) * pow(
+								absf(share - 0.5) * 2.0, 1.4)
+						tall = maxf(want - ground + sink,
+							base * float(site.get("min_aspect", 1.1)))
+					var shape: Dictionary = site.duplicate()
+					if not arc_kits.is_empty():
+						shape["kit"] = str(arc_kits[which % arc_kits.size()])
+					var wall := Forms.mesh_node(
+						_rock(shape, tall,
+							base * (0.8 + 0.4 * _rand(seed_value, 7, 1301)),
+							seed_value, int(site.get("facets", 13)),
+							int(site.get("tiers", 11)),
+							float(site.get("taper", 0.32))),
+						palette.get_material(material), "Arc%d" % which, false)
+					wall.position = Vector3(at.x,
+						ground - mount.position.y - sink, at.z)
+					wall.rotation.y = _rand(seed_value, 11, 1303) * TAU
+					mount.add_child(wall)
 					made += 1
 			_:
 				push_error("environment_world: unknown landmark kind '%s'"
@@ -1044,7 +1480,7 @@ static func _ravine(group: Node3D, palette, cfg: Dictionary,
 		var tall: float = float(spec.get("bank_height", 26.0)) \
 			* (0.6 + 0.8 * _rand(salt, 7, 1193))
 		var slab := Forms.mesh_node(
-			_mass(tall, float(spec.get("bank_base", 15.0))
+			_rock(spec, tall, float(spec.get("bank_base", 15.0))
 				* (0.7 + 0.6 * _rand(salt, 11, 1201)), salt, 15, 9, 0.30),
 			palette.get_material(bank_material), "Bank%d" % which, false)
 		slab.position = Vector3(at_x + out, level - tall * 0.22, at_z + along)

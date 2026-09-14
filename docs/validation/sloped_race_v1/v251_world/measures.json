@@ -1,0 +1,1415 @@
+{
+  "moments": {
+    "branch": {
+      "aurora_valley_v251": {
+        "backdrop": 13.542940431839849,
+        "dE": 88.88172274724893,
+        "flat_white": 0.10706018518518519,
+        "headroom": 77.52452803398876,
+        "layer_cover": {
+          "foreground": 11.05637538580247,
+          "ranges": 0.003423996913580247,
+          "ridges": 26.35884452160494,
+          "terrain": 23.222849151234566,
+          "vegetation": 0.165991512345679,
+          "walls": 0.0009645061728395061,
+          "water": 15.345630787037038
+        },
+        "layer_value": {
+          "foreground": 15.899765939271953,
+          "ridges": 9.717095507896694,
+          "terrain": 12.28627784572275,
+          "vegetation": 17.119702878454188,
+          "water": 4.1886007636899985
+        },
+        "mean": 21.813894788249485,
+        "near_clip": 2.326774691358025,
+        "noise": 6.912067198378168,
+        "planes": 6,
+        "racers": 7,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": 0.12,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -2.69,
+            "to": "midground ridges"
+          }
+        ],
+        "spread": 15.418650615552986,
+        "subject": 91.06746846582861,
+        "warmth": -20.259902772387846,
+        "world_cover": 52.931
+      },
+      "aurora_valley_v25b": {
+        "backdrop": 13.484349189971374,
+        "dE": 88.8653671993837,
+        "flat_white": 0.10498649691358024,
+        "headroom": 78.2520223712742,
+        "layer_cover": {
+          "foreground": 19.86082175925926,
+          "ranges": 0.0033275462962962963,
+          "ridges": 28.0390625,
+          "terrain": 25.406925154320987,
+          "vegetation": 0.6582754629629629,
+          "walls": 0.0010609567901234567,
+          "water": 0.2653838734567901
+        },
+        "layer_value": {
+          "foreground": 9.116488734152416,
+          "ridges": 8.651489299053246,
+          "terrain": 11.91609693272202,
+          "vegetation": 20.05725797169006,
+          "water": 10.057862181085936
+        },
+        "mean": 21.899994036422797,
+        "near_clip": 2.342062114197531,
+        "noise": 6.9687172823751515,
+        "planes": 5,
+        "racers": 7,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": 1.16,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -4.43,
+            "to": "midground ridges"
+          }
+        ],
+        "spread": 16.323485691186054,
+        "subject": 91.73637156124556,
+        "warmth": -18.26383955480948,
+        "world_cover": 48.828
+      }
+    },
+    "descent": {
+      "aurora_valley_v251": {
+        "backdrop": 10.494239401150063,
+        "dE": 48.60315789761809,
+        "flat_white": 0.3041087962962963,
+        "headroom": 86.8071073693483,
+        "layer_cover": {
+          "foreground": 3.6749614197530867,
+          "ranges": 1.7643229166666667,
+          "ridges": 21.320167824074073,
+          "terrain": 42.809076003086425,
+          "vegetation": 0.00626929012345679,
+          "walls": 1.113377700617284,
+          "water": 0.5003858024691358
+        },
+        "layer_value": {
+          "foreground": 10.528271965878089,
+          "ranges": 10.82855897707287,
+          "ridges": 12.171648062490927,
+          "terrain": 16.127608455049998,
+          "walls": 10.355103360676067,
+          "water": 3.417300377835461
+        },
+        "mean": 29.221849374903737,
+        "near_clip": 4.445842978395062,
+        "noise": 7.4955489815331,
+        "planes": 15,
+        "racers": 8,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": -9.15,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": 5.2,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": -1.82,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": 0.47,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 6.967850309894108,
+        "subject": 97.30134677049837,
+        "warmth": -20.84076413472548,
+        "world_cover": 28.379
+      },
+      "aurora_valley_v25b": {
+        "backdrop": 8.593706029406585,
+        "dE": 48.84356661847717,
+        "flat_white": 0.30401234567901236,
+        "headroom": 88.70764074109178,
+        "layer_cover": {
+          "foreground": 9.055073302469136,
+          "ranges": 0.1398533950617284,
+          "ridges": 24.5048225308642,
+          "terrain": 35.88777970679013,
+          "vegetation": 0.0078125,
+          "walls": 1.285349151234568,
+          "water": 0.0025559413580246914
+        },
+        "layer_value": {
+          "foreground": 7.845282301021851,
+          "ranges": 13.02219309215122,
+          "ridges": 9.213236629097992,
+          "terrain": 11.75891980393007,
+          "walls": 13.329688454216445
+        },
+        "mean": 26.281956282649585,
+        "near_clip": 4.457561728395062,
+        "noise": 7.5686876233615346,
+        "planes": 17,
+        "racers": 8,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": -3.91,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": 1.37,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": 4.12,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": -0.31,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 6.068253285361559,
+        "subject": 97.30134677049837,
+        "warmth": -20.560487680311773,
+        "world_cover": 34.995
+      }
+    },
+    "final_approach": {
+      "aurora_valley_v251": {
+        "backdrop": 15.30882801817701,
+        "dE": 101.83547988998575,
+        "flat_white": 0.015866126543209878,
+        "headroom": 79.47825701762422,
+        "layer_cover": {
+          "foreground": 7.384645061728396,
+          "ranges": 0.23423032407407407,
+          "ridges": 15.774980709876543,
+          "terrain": 33.42081404320988,
+          "vegetation": 0.7043306327160495,
+          "walls": 0.005979938271604939,
+          "water": 0.0
+        },
+        "layer_value": {
+          "foreground": 4.536958595252114,
+          "ranges": 52.801380188497944,
+          "ridges": 10.903279372121535,
+          "terrain": 15.622036681488071,
+          "vegetation": 15.466482717156989
+        },
+        "mean": 28.808444447408977,
+        "near_clip": 2.364920910493827,
+        "noise": 6.506788961556143,
+        "planes": 6,
+        "racers": 2,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": -5.62,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": 0.9,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": 41.9,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 19.28659210872766,
+        "subject": 94.78708503580123,
+        "warmth": -17.14316901657544,
+        "world_cover": 24.104
+      },
+      "aurora_valley_v25b": {
+        "backdrop": 12.811772337815318,
+        "dE": 101.81132319410122,
+        "flat_white": 0.015866126543209878,
+        "headroom": 81.99837100391483,
+        "layer_cover": {
+          "foreground": 3.7451774691358026,
+          "ranges": 0.4734278549382716,
+          "ridges": 8.675347222222223,
+          "terrain": 31.44492669753086,
+          "vegetation": 2.4153645833333335,
+          "walls": 0.0,
+          "water": 0.0
+        },
+        "layer_value": {
+          "foreground": 6.312893423212495,
+          "ranges": 50.78963527072878,
+          "ridges": 9.503185378607933,
+          "terrain": 15.176732605104672,
+          "vegetation": 14.750123219094156
+        },
+        "mean": 29.755538952378014,
+        "near_clip": 2.5620177469135803,
+        "noise": 7.005132582794364,
+        "planes": 4,
+        "racers": 2,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": -4.65,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -1.03,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": 41.29,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 19.727310249344516,
+        "subject": 94.81014334173014,
+        "warmth": -12.504549876948383,
+        "world_cover": 15.309
+      }
+    },
+    "finish": {
+      "aurora_valley_v251": {
+        "backdrop": 12.50520247596838,
+        "dE": 34.59111422787772,
+        "flat_white": 0.06394675925925926,
+        "headroom": 84.09881480879956,
+        "layer_cover": {
+          "foreground": 11.83420138888889,
+          "ranges": 0.02469135802469136,
+          "ridges": 24.373697916666668,
+          "terrain": 26.516493055555557,
+          "vegetation": 1.4911265432098764,
+          "walls": 0.1584201388888889,
+          "water": 0.0
+        },
+        "layer_value": {
+          "foreground": 5.141130640536274,
+          "ranges": 58.47594684308534,
+          "ridges": 13.159887142319437,
+          "terrain": 16.162706809822566,
+          "vegetation": 13.27863653303767,
+          "walls": 17.501531982411457
+        },
+        "mean": 26.68225703055593,
+        "near_clip": 2.6021412037037037,
+        "noise": 6.415233210552965,
+        "planes": 10,
+        "racers": 6,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": -6.95,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": 3.95,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": 4.34,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": 40.97,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 7.906062952453009,
+        "subject": 96.60401728476793,
+        "warmth": -22.43648278742734,
+        "world_cover": 37.882
+      },
+      "aurora_valley_v25b": {
+        "backdrop": 11.579614071926791,
+        "dE": 34.58728615486976,
+        "flat_white": 0.06399498456790124,
+        "headroom": 85.04738126261293,
+        "layer_cover": {
+          "foreground": 5.848331404320987,
+          "ranges": 0.1398533950617284,
+          "ridges": 27.231385030864196,
+          "terrain": 25.07503858024691,
+          "vegetation": 1.937451774691358,
+          "walls": 1.6618441358024691,
+          "water": 0.0
+        },
+        "layer_value": {
+          "foreground": 4.651889804017568,
+          "ranges": 19.114084732591955,
+          "ridges": 11.465287711227534,
+          "terrain": 16.872280140960203,
+          "vegetation": 16.81586928691038,
+          "walls": 15.226274361814529
+        },
+        "mean": 27.646520414229897,
+        "near_clip": 2.6923707561728394,
+        "noise": 6.7210567261486736,
+        "planes": 16,
+        "racers": 6,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": -6.14,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": 0.73,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": 3.76,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": 3.89,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 7.356661484337449,
+        "subject": 96.62699533453973,
+        "warmth": -20.595318929046584,
+        "world_cover": 36.819
+      }
+    },
+    "fork_approach": {
+      "aurora_valley_v251": {
+        "backdrop": 10.049693167971578,
+        "dE": 43.47976090816043,
+        "flat_white": 0.05613425925925926,
+        "headroom": 84.12573780213235,
+        "layer_cover": {
+          "foreground": 2.0420524691358026,
+          "ranges": 14.611207561728396,
+          "ridges": 23.447193287037038,
+          "terrain": 27.44169560185185,
+          "vegetation": 0.31915509259259256,
+          "walls": 0.65991512345679,
+          "water": 4.651765046296296
+        },
+        "layer_value": {
+          "foreground": 29.203361749281452,
+          "ranges": 15.393771659061466,
+          "ridges": 5.491009311738929,
+          "terrain": 15.177513937358784,
+          "vegetation": 11.418970109169626,
+          "walls": 20.730836534705006,
+          "water": 4.516526682468192
+        },
+        "mean": 22.948501578491264,
+        "near_clip": 4.374807098765432,
+        "noise": 5.837761490007977,
+        "planes": 11,
+        "racers": 8,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": -0.13,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -9.56,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": 15.24,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": -5.34,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 9.718816286015143,
+        "subject": 94.17543097010393,
+        "warmth": -23.197493602651463,
+        "world_cover": 45.731
+      },
+      "aurora_valley_v25b": {
+        "backdrop": 10.50425252880274,
+        "dE": 43.48274687502206,
+        "flat_white": 0.05618248456790123,
+        "headroom": 83.67114748317857,
+        "layer_cover": {
+          "foreground": 10.468701774691358,
+          "ranges": 14.934606481481483,
+          "ridges": 15.788242669753085,
+          "terrain": 24.114342206790123,
+          "vegetation": 0.8743248456790124,
+          "walls": 7.690248842592593,
+          "water": 0.00043402777777777775
+        },
+        "layer_value": {
+          "foreground": 12.778687541271513,
+          "ranges": 10.864336878426982,
+          "ridges": 7.373390254556012,
+          "terrain": 15.440085327929628,
+          "vegetation": 17.25463901811683,
+          "walls": 15.359215279773414
+        },
+        "mean": 23.096859547724097,
+        "near_clip": 4.375337577160494,
+        "noise": 5.909252145923802,
+        "planes": 11,
+        "racers": 8,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": -0.42,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -7.64,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": 7.99,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": -4.49,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 8.663170975408358,
+        "subject": 94.17540001198131,
+        "warmth": -24.607954469546577,
+        "world_cover": 49.757
+      }
+    },
+    "merge": {
+      "aurora_valley_v251": {
+        "backdrop": 9.481846699859762,
+        "dE": 72.09953584774136,
+        "flat_white": 0.6007426697530864,
+        "headroom": 85.25685529259587,
+        "layer_cover": {
+          "foreground": 4.214072145061729,
+          "ranges": 0.008342978395061729,
+          "ridges": 28.680314429012345,
+          "terrain": 26.023630401234566,
+          "vegetation": 1.5647665895061729,
+          "walls": 1.8836805555555554,
+          "water": 12.779031635802468
+        },
+        "layer_value": {
+          "foreground": 18.226683635036814,
+          "ridges": 11.623843755996413,
+          "terrain": 12.080546347706706,
+          "vegetation": 21.432180781681385,
+          "walls": 4.180046040725612,
+          "water": 3.1923966088410585
+        },
+        "mean": 21.16713303054588,
+        "near_clip": 3.0891685956790127,
+        "noise": 7.18177918495072,
+        "planes": 17,
+        "racers": 6,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": 2.2,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -2.66,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": -7.44,
+            "to": "valley walls"
+          }
+        ],
+        "spread": 5.417895703047463,
+        "subject": 94.73870199245563,
+        "warmth": -19.11026494084161,
+        "world_cover": 49.13
+      },
+      "aurora_valley_v25b": {
+        "backdrop": 7.779073549225841,
+        "dE": 78.51551597318698,
+        "flat_white": 0.5710358796296297,
+        "headroom": 86.93756003727715,
+        "layer_cover": {
+          "foreground": 15.98847415123457,
+          "ranges": 0.007282021604938271,
+          "ridges": 23.861738040123456,
+          "terrain": 30.36969521604938,
+          "vegetation": 1.6350308641975306,
+          "walls": 0.1095679012345679,
+          "water": 0.0019290123456790122
+        },
+        "layer_value": {
+          "foreground": 10.43374748321642,
+          "ridges": 8.153970646147922,
+          "terrain": 10.901015327264236,
+          "vegetation": 21.843853390913978,
+          "walls": 6.104986807257876
+        },
+        "mean": 20.617518219374677,
+        "near_clip": 3.119164737654321,
+        "noise": 7.675625883758972,
+        "planes": 11,
+        "racers": 6,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": 5.24,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -7.98,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": -2.05,
+            "to": "valley walls"
+          }
+        ],
+        "spread": 3.24136519283973,
+        "subject": 94.716633586503,
+        "warmth": -18.595717897555428,
+        "world_cover": 41.604
+      }
+    },
+    "mixer": {
+      "aurora_valley_v251": {
+        "backdrop": 12.533605872866824,
+        "dE": 55.76945826794628,
+        "flat_white": 0.3308738425925926,
+        "headroom": 84.03727978287324,
+        "layer_cover": {
+          "foreground": 2.3307773919753085,
+          "ranges": 11.310522762345679,
+          "ridges": 12.207995756172838,
+          "terrain": 38.83680555555556,
+          "vegetation": 0.0010609567901234567,
+          "walls": 1.7038483796296295,
+          "water": 0.01089891975308642
+        },
+        "layer_value": {
+          "foreground": 10.079011436114092,
+          "ranges": 12.250430938008217,
+          "ridges": 16.76255202160288,
+          "terrain": 15.928531465937766,
+          "walls": 21.31358314560412
+        },
+        "mean": 29.591839131878825,
+        "near_clip": 2.590760030864198,
+        "noise": 8.62212144488506,
+        "planes": 12,
+        "racers": 8,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": -5.85,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": 6.68,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": 4.55,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": -9.06,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 7.013641201041762,
+        "subject": 96.57088565574007,
+        "warmth": -25.10035076040037,
+        "world_cover": 27.565
+      },
+      "aurora_valley_v25b": {
+        "backdrop": 10.86805637126813,
+        "dE": 55.76442415213849,
+        "flat_white": 0.33077739197530864,
+        "headroom": 85.76808769125908,
+        "layer_cover": {
+          "foreground": 2.2724729938271606,
+          "ranges": 6.098524305555555,
+          "ridges": 11.882571373456791,
+          "terrain": 37.925684799382715,
+          "vegetation": 0.010320216049382717,
+          "walls": 8.236593364197532,
+          "water": 0.0
+        },
+        "layer_value": {
+          "foreground": 15.850315584961034,
+          "ranges": 11.046901136961724,
+          "ridges": 10.527142158528957,
+          "terrain": 14.92038250388951,
+          "walls": 16.706350242368128
+        },
+        "mean": 28.464950721596445,
+        "near_clip": 2.6007908950617282,
+        "noise": 8.490815895816668,
+        "planes": 15,
+        "racers": 8,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": 0.93,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -5.32,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": 6.18,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": -5.66,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 6.834400135529716,
+        "subject": 96.63614406252721,
+        "warmth": -23.069711176674666,
+        "world_cover": 28.5
+      }
+    },
+    "obstacle": {
+      "aurora_valley_v251": {
+        "backdrop": 34.28627180071277,
+        "dE": 57.87774687904668,
+        "flat_white": 0.06028163580246913,
+        "headroom": 61.48851199588981,
+        "layer_cover": {
+          "foreground": 6.485387731481482,
+          "ranges": 0.01070601851851852,
+          "ridges": 1.7969232253086418,
+          "terrain": 31.499131944444443,
+          "vegetation": 0.015625,
+          "walls": 0.9821084104938272,
+          "water": 3.2327835648148144
+        },
+        "layer_value": {
+          "foreground": 18.230600528065228,
+          "ridges": 11.994406539445727,
+          "terrain": 16.514168234267107,
+          "walls": 8.511271885578605,
+          "water": 3.3390317861497083
+        },
+        "mean": 38.41008605550954,
+        "near_clip": 4.926118827160494,
+        "noise": 6.473663956832047,
+        "planes": 14,
+        "racers": 8,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": -5.73,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": 1.21,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": -3.48,
+            "to": "valley walls"
+          }
+        ],
+        "spread": 30.28621362551325,
+        "subject": 95.77478379660258,
+        "warmth": -4.811064651025902,
+        "world_cover": 12.524
+      },
+      "aurora_valley_v25b": {
+        "backdrop": 35.62697117883454,
+        "dE": 57.86353222408419,
+        "flat_white": 0.06008873456790124,
+        "headroom": 60.16545627793468,
+        "layer_cover": {
+          "foreground": 18.546875,
+          "ranges": 0.022376543209876545,
+          "ridges": 5.459828317901234,
+          "terrain": 22.185281635802472,
+          "vegetation": 0.27083333333333337,
+          "walls": 0.00019290123456790125,
+          "water": 0.0011574074074074073
+        },
+        "layer_value": {
+          "foreground": 17.674528068251753,
+          "ranges": 57.35406919034863,
+          "ridges": 13.132591297189267,
+          "terrain": 15.86472540750146,
+          "vegetation": 23.43513153076814
+        },
+        "mean": 38.88978746638854,
+        "near_clip": 4.939911265432099,
+        "noise": 6.524219245109198,
+        "planes": 15,
+        "racers": 8,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": 4.69,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -7.42,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": 44.22,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 30.244558153067324,
+        "subject": 95.79242745676922,
+        "warmth": -4.5306555812417,
+        "world_cover": 24.301
+      }
+    },
+    "preview_arena": {
+      "aurora_valley_v251": {
+        "backdrop": 11.226567032630792,
+        "dE": 0.0,
+        "flat_white": 0.000626929012345679,
+        "headroom": 80.19202335293889,
+        "layer_cover": {
+          "foreground": 13.770013503086421,
+          "ranges": 4.207706404320987,
+          "ridges": 24.536265432098766,
+          "terrain": 20.55439814814815,
+          "vegetation": 0.3973283179012346,
+          "walls": 4.410349151234568,
+          "water": 2.197579089506173
+        },
+        "layer_value": {
+          "foreground": 12.478465180748152,
+          "ranges": 19.03053492868681,
+          "ridges": 10.400604276539411,
+          "terrain": 14.42341761255979,
+          "vegetation": 16.387294310513433,
+          "walls": 9.861809751230126,
+          "water": 4.384151304138953
+        },
+        "mean": 21.709016101814964,
+        "near_clip": 1.3225308641975309,
+        "noise": 6.788859225646834,
+        "planes": 16,
+        "racers": 0,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": -3.34,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -0.68,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": -0.54,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": 9.17,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 6.1991489062002065,
+        "subject": 91.41859038556969,
+        "warmth": -23.29687714413988,
+        "world_cover": 49.519
+      },
+      "aurora_valley_v25b": {
+        "backdrop": 13.679698952620075,
+        "dE": 0.0,
+        "flat_white": 0.001109182098765432,
+        "headroom": 78.9863296329303,
+        "layer_cover": {
+          "foreground": 14.278018904320987,
+          "ranges": 0.92602237654321,
+          "ridges": 37.66840277777778,
+          "terrain": 16.548466435185187,
+          "vegetation": 1.4877507716049383,
+          "walls": 0.470727237654321,
+          "water": 4.822530864197531e-05
+        },
+        "layer_value": {
+          "foreground": 6.937798800764443,
+          "ranges": 23.188848480345374,
+          "ridges": 12.215959166973933,
+          "terrain": 15.529241942552105,
+          "vegetation": 19.639024278350007,
+          "walls": 8.814270431559532
+        },
+        "mean": 23.36427534158568,
+        "near_clip": 1.3984375,
+        "noise": 7.743740607996657,
+        "planes": 18,
+        "racers": 0,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": -2.24,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -1.07,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": -3.4,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": 14.37,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 5.551719169300903,
+        "subject": 92.66602858555038,
+        "warmth": -22.01819368379841,
+        "world_cover": 54.831
+      }
+    },
+    "preview_mid": {
+      "aurora_valley_v251": {
+        "backdrop": 8.597952774340746,
+        "dE": 0.0,
+        "flat_white": 0.08193479938271606,
+        "headroom": 82.32947207528717,
+        "layer_cover": {
+          "foreground": 8.098765432098766,
+          "ranges": 0.030912422839506175,
+          "ridges": 20.40996334876543,
+          "terrain": 30.95481288580247,
+          "vegetation": 0.19675925925925924,
+          "walls": 3.343846450617284,
+          "water": 11.691261574074074
+        },
+        "layer_value": {
+          "foreground": 15.95381513254248,
+          "ranges": 52.456547412628936,
+          "ridges": 9.100078974751046,
+          "terrain": 11.865187913574003,
+          "vegetation": 17.493221240429442,
+          "walls": 7.632182046622397,
+          "water": 3.879237504868421
+        },
+        "mean": 19.21170803542267,
+        "near_clip": 1.7064043209876545,
+        "noise": 7.252853377590768,
+        "planes": 18,
+        "racers": 0,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": 0.58,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -3.34,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": -1.47,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": 44.82,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 6.500615256856636,
+        "subject": 90.92742484962791,
+        "warmth": -19.661679327101,
+        "world_cover": 43.772
+      },
+      "aurora_valley_v25b": {
+        "backdrop": 10.836730328093731,
+        "dE": 0.0,
+        "flat_white": 0.06548996913580246,
+        "headroom": 80.370652086676,
+        "layer_cover": {
+          "foreground": 15.701292438271604,
+          "ranges": 0.06356095679012345,
+          "ridges": 27.117042824074073,
+          "terrain": 33.73085455246914,
+          "vegetation": 0.5047743055555556,
+          "walls": 0.1103877314814815,
+          "water": 0.002941743827160494
+        },
+        "layer_value": {
+          "foreground": 9.154700480141615,
+          "ranges": 52.953581692216375,
+          "ridges": 10.177356786177356,
+          "terrain": 11.63593679324124,
+          "vegetation": 20.767635443833957,
+          "walls": 8.742981052862815
+        },
+        "mean": 20.188215244071507,
+        "near_clip": 1.7090084876543212,
+        "noise": 7.520130920909205,
+        "planes": 16,
+        "racers": 0,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": 3.33,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -4.78,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": -1.43,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": 44.21,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 6.025732259103317,
+        "subject": 91.20738241476974,
+        "warmth": -20.27030796893609,
+        "world_cover": 43.5
+      }
+    },
+    "preview_start": {
+      "aurora_valley_v251": {
+        "backdrop": 19.386230716922288,
+        "dE": 98.73401631089246,
+        "flat_white": 0.07310956790123457,
+        "headroom": 68.50296173275949,
+        "layer_cover": {
+          "foreground": 1.6684510030864197,
+          "ranges": 7.306905864197531,
+          "ridges": 17.082899305555554,
+          "terrain": 42.09852430555556,
+          "vegetation": 1.3873939043209877,
+          "walls": 12.9389949845679,
+          "water": 0.14848572530864196
+        },
+        "layer_value": {
+          "foreground": 17.576722974330938,
+          "ranges": 28.53127150290409,
+          "ridges": 13.42198438759906,
+          "terrain": 15.794932030759739,
+          "vegetation": 20.969729060539965,
+          "walls": 14.837979088954532,
+          "water": 18.29636437207168
+        },
+        "mean": 22.940331215216595,
+        "near_clip": 0.8097993827160495,
+        "noise": 6.527754264766582,
+        "planes": 18,
+        "racers": 8,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": 3.15,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -5.53,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": 1.42,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": 13.69,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 8.412372786730918,
+        "subject": 87.88919244968177,
+        "warmth": -30.61283060568214,
+        "world_cover": 40.533
+      },
+      "aurora_valley_v25b": {
+        "backdrop": 15.293450638575532,
+        "dE": 98.73359874706578,
+        "flat_white": 0.07195216049382716,
+        "headroom": 72.88188283628348,
+        "layer_cover": {
+          "foreground": 1.5223765432098766,
+          "ranges": 0.6467978395061729,
+          "ridges": 19.368537808641975,
+          "terrain": 42.32233796296296,
+          "vegetation": 0.23509837962962962,
+          "walls": 18.362364969135804,
+          "water": 0.00043402777777777775
+        },
+        "layer_value": {
+          "foreground": 15.51658483391423,
+          "ranges": 32.74685606039921,
+          "ridges": 14.780875503102818,
+          "terrain": 15.403823841772011,
+          "vegetation": 18.864435578282464,
+          "walls": 14.282836174625036
+        },
+        "mean": 22.056258452750686,
+        "near_clip": 0.8448591820987654,
+        "noise": 6.401885981358852,
+        "planes": 17,
+        "racers": 8,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": 1.79,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -2.41,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": -0.5,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": 18.46,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 7.348595490486873,
+        "subject": 88.17533347485902,
+        "warmth": -25.581208392126253,
+        "world_cover": 40.136
+      }
+    },
+    "split": {
+      "aurora_valley_v251": {
+        "backdrop": 9.725949668745919,
+        "dE": 49.92273457844698,
+        "flat_white": 0.06553819444444445,
+        "headroom": 80.56988135311428,
+        "layer_cover": {
+          "foreground": 1.7488425925925926,
+          "ranges": 5.871961805555555,
+          "ridges": 32.71961805555556,
+          "terrain": 27.881510416666664,
+          "vegetation": 0.2673611111111111,
+          "walls": 4.471595293209877,
+          "water": 9.546006944444445
+        },
+        "layer_value": {
+          "foreground": 21.328792841587152,
+          "ranges": 13.203647163977324,
+          "ridges": 7.161354240893106,
+          "terrain": 13.491031914402543,
+          "vegetation": 11.573442668102672,
+          "walls": 20.648089589152733,
+          "water": 4.298203707794712
+        },
+        "mean": 18.094748701971255,
+        "near_clip": 2.361689814814815,
+        "noise": 5.245312888768548,
+        "planes": 12,
+        "racers": 8,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": -1.09,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -5.24,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": 13.49,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": -7.44,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 7.969154665584287,
+        "subject": 90.29583102186021,
+        "warmth": -20.174394536145382,
+        "world_cover": 54.625
+      },
+      "aurora_valley_v25b": {
+        "backdrop": 10.406168675642306,
+        "dE": 49.92182103414183,
+        "flat_white": 0.06553819444444445,
+        "headroom": 79.88965362926453,
+        "layer_cover": {
+          "foreground": 8.68701774691358,
+          "ranges": 5.151765046296297,
+          "ridges": 31.8368537808642,
+          "terrain": 30.465229552469136,
+          "vegetation": 0.6121720679012346,
+          "walls": 5.868827160493828,
+          "water": 0.001736111111111111
+        },
+        "layer_value": {
+          "foreground": 8.20976617202277,
+          "ranges": 10.795883583041128,
+          "ridges": 9.133317980705963,
+          "terrain": 13.013851388918555,
+          "vegetation": 17.262703738197807,
+          "walls": 16.390756901423714
+        },
+        "mean": 18.600729420206264,
+        "near_clip": 2.361496913580247,
+        "noise": 5.140194658228394,
+        "planes": 18,
+        "racers": 8,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": -0.28,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -3.6,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": 7.26,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": -5.59,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 6.692536047450068,
+        "subject": 90.29582230490684,
+        "warmth": -22.73777620783319,
+        "world_cover": 52.158
+      }
+    },
+    "start": {
+      "aurora_valley_v251": {
+        "backdrop": 15.189209670108426,
+        "dE": 13.27444329318114,
+        "flat_white": 0.12581983024691357,
+        "headroom": 78.2639883742882,
+        "layer_cover": {
+          "foreground": 0.7690489969135803,
+          "ranges": 1.923707561728395,
+          "ridges": 24.227961033950617,
+          "terrain": 34.530092592592595,
+          "vegetation": 0.8063271604938271,
+          "walls": 8.859809027777779,
+          "water": 0.13715277777777776
+        },
+        "layer_value": {
+          "foreground": 26.23519591892292,
+          "ranges": 25.623081563940534,
+          "ridges": 12.711971211227251,
+          "terrain": 17.604906996808502,
+          "vegetation": 16.19266697554976,
+          "walls": 15.43876420075643,
+          "water": 32.076811014623786
+        },
+        "mean": 27.18744011692254,
+        "near_clip": 0.8018904320987655,
+        "noise": 7.532427461336923,
+        "planes": 18,
+        "racers": 8,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": 7.23,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": -12.12,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": 2.73,
+            "to": "valley walls"
+          },
+          {
+            "from": "valley walls",
+            "step": 10.18,
+            "to": "distant ranges"
+          }
+        ],
+        "spread": 7.024519065276877,
+        "subject": 93.45319804439663,
+        "warmth": -24.648526881884763,
+        "world_cover": 36.724
+      },
+      "aurora_valley_v25b": {
+        "backdrop": 14.349563757653696,
+        "dE": 13.27568706060353,
+        "flat_white": 0.1259645061728395,
+        "headroom": 79.15163410143819,
+        "layer_cover": {
+          "foreground": 1.2647569444444444,
+          "ranges": 0.005883487654320988,
+          "ridges": 20.528404706790123,
+          "terrain": 34.04957561728395,
+          "vegetation": 0.2865547839506173,
+          "walls": 15.495225694444445,
+          "water": 0.00014467592592592592
+        },
+        "layer_value": {
+          "foreground": 17.611433645192243,
+          "ridges": 16.522049198810205,
+          "terrain": 15.91445533712001,
+          "vegetation": 13.993737099622704,
+          "walls": 11.944414246774073
+        },
+        "mean": 26.606641692937252,
+        "near_clip": 0.8175154320987653,
+        "noise": 7.356984054641228,
+        "planes": 18,
+        "racers": 8,
+        "recession": [
+          {
+            "from": "near ground",
+            "step": -0.11,
+            "to": "foreground rock + ravine floor + vegetation"
+          },
+          {
+            "from": "foreground rock + ravine floor + vegetation",
+            "step": 0.72,
+            "to": "midground ridges"
+          },
+          {
+            "from": "midground ridges",
+            "step": -4.58,
+            "to": "valley walls"
+          }
+        ],
+        "spread": 7.082283620773759,
+        "subject": 93.50119785909189,
+        "warmth": -22.6597544472682,
+        "world_cover": 37.581
+      }
+    }
+  },
+  "variants": {
+    "aurora_valley_v251": {
+      "census": {
+        "anchors": 11,
+        "boulders": 46,
+        "lamps": 6,
+        "landmarks": 16,
+        "patches": 11,
+        "ravine": 8,
+        "ridges": 26,
+        "scarps": 36,
+        "spires": 26,
+        "trees": 117,
+        "walls": 13
+      },
+      "cost": {
+        "meshes": 2307,
+        "ms_per_frame": 294.0,
+        "triangles": 643302
+      }
+    },
+    "aurora_valley_v25b": {
+      "census": {
+        "anchors": 15,
+        "boulders": 72,
+        "lamps": 3,
+        "landmarks": 10,
+        "ravine": 8,
+        "ridges": 130,
+        "scarps": 60,
+        "spires": 38,
+        "trees": 188,
+        "walls": 78
+      },
+      "cost": {
+        "meshes": 2252,
+        "ms_per_frame": 359.0,
+        "triangles": 693060
+      }
+    }
+  }
+}

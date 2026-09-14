@@ -1,0 +1,673 @@
+{
+  "id": "aurora_valley_v251",
+  "title": "Aurora Valley V25.1 - world art",
+  "family": "valley",
+  "summary": "V25 B's layout and density, rebuilt from a faceted rock kit and a tiered vegetation kit: stylised material zones on the near ground, cut benches instead of scattered blocks, five distinct landmarks, a finish basin and one warm world fill",
+  "extends": "aurora_valley_v25",
+  "lights": {
+    "WorldWarm": {
+      "cull_mask": 2,
+      "colour": "#FFAE62",
+      "energy": 1.05,
+      "specular": 0.0,
+      "rotation": [
+        -11.0,
+        58.0,
+        0.0
+      ],
+      "shadow": {
+        "enabled": false
+      }
+    },
+    "WorldBounce": {
+      "cull_mask": 2,
+      "colour": "#35618F",
+      "energy": 0.55,
+      "specular": 0.0,
+      "rotation": [
+        -6.0,
+        208.0,
+        0.0
+      ],
+      "shadow": {
+        "enabled": false
+      }
+    },
+    "WorldRim": {
+      "energy": 0.66
+    },
+    "WorldKey": {
+      "energy": 1.58
+    }
+  },
+  "world": {
+    "enabled": true,
+    "patches": {
+      "rings": 7,
+      "facets": 13,
+      "lift": 0.1,
+      "skirt": 1.1,
+      "rough": 0.3,
+      "sites": [
+        [
+          -21.0,
+          -44.0,
+          15.0,
+          "world_bench"
+        ],
+        [
+          3.0,
+          -24.0,
+          17.0,
+          "world_gravel"
+        ],
+        [
+          -13.0,
+          -40.0,
+          14.0,
+          "world_gravel"
+        ],
+        [
+          -10.0,
+          -4.0,
+          16.0,
+          "world_gravel"
+        ],
+        [
+          10.0,
+          3.16,
+          22.0,
+          "world_damp"
+        ],
+        [
+          -9.0,
+          10.0,
+          22.0,
+          "world_bench"
+        ],
+        [
+          31.0,
+          18.0,
+          24.0,
+          "world_damp"
+        ],
+        [
+          -13.0,
+          34.1,
+          24.0,
+          "world_bench"
+        ],
+        [
+          7.2,
+          46.2,
+          26.0,
+          "world_gravel"
+        ],
+        [
+          29.2,
+          56.2,
+          22.0,
+          "world_ember"
+        ],
+        [
+          19.0,
+          39.0,
+          17.0,
+          "world_ember"
+        ]
+      ]
+    },
+    "walls": {
+      "count": 13,
+      "bearing_from": 296.0,
+      "bearing_step": 25.0,
+      "bearing_jitter": 7.0,
+      "radius": 300.0,
+      "radius_step": 46.0,
+      "radius_cycle": 3,
+      "height": 138.0,
+      "height_step": -15.0,
+      "height_cycle": 4,
+      "base": 72.0,
+      "base_step": 15.0,
+      "base_cycle": 3,
+      "taper": 0.3,
+      "facets": 22,
+      "tiers": 12,
+      "sink": 18.0,
+      "crest": 0,
+      "crest_scale": 0.15,
+      "crest_from": 0.6,
+      "crest_span": 0.28,
+      "seed_from": 601,
+      "seed_step": 17,
+      "materials": [
+        "world_wall_face",
+        "world_wall_ledge"
+      ],
+      "kit": "mountain",
+      "shape": {
+        "ridge": 0.34,
+        "buttress": 2,
+        "lobe": 0.42
+      }
+    },
+    "ridges": {
+      "taper": 0.33,
+      "facets": 26,
+      "tiers": 13,
+      "crest": 0,
+      "crest_scale": 0.19,
+      "crest_from": 0.58,
+      "crest_span": 0.3,
+      "seed_from": 811,
+      "seed_step": 19,
+      "materials": [
+        "world_cliff_face",
+        "world_cliff_ledge"
+      ],
+      "bands": [
+        {
+          "count": 9,
+          "bearing_from": 34.0,
+          "bearing_step": 15.0,
+          "bearing_jitter": 6.0,
+          "radius": 100.0,
+          "radius_step": 16.0,
+          "radius_cycle": 2,
+          "height": 42.0,
+          "height_step": -7.0,
+          "height_cycle": 3,
+          "base": 21.0,
+          "base_step": 4.0,
+          "base_cycle": 2,
+          "sink": 6.0,
+          "seed_from": 907,
+          "seed_step": 23,
+          "kit": "cliff",
+          "shape": {
+            "ledges": 2,
+            "lobe": 0.34,
+            "buttress": 2,
+            "taper": 0.46,
+            "batter": 0.58
+          }
+        },
+        {
+          "count": 17,
+          "bearing_from": 288.0,
+          "bearing_step": 21.0,
+          "bearing_jitter": 8.0,
+          "radius": 188.0,
+          "radius_step": 26.0,
+          "radius_cycle": 3,
+          "height": 90.0,
+          "height_step": -11.0,
+          "height_cycle": 4,
+          "base": 33.0,
+          "base_step": 7.0,
+          "base_cycle": 3,
+          "sink": 10.0,
+          "kit": "mountain",
+          "shape": {
+            "ledges": 2,
+            "buttress": 2,
+            "lobe": 0.38,
+            "ridge": 0.2,
+            "taper": 0.54,
+            "batter": 0.6
+          }
+        }
+      ]
+    },
+    "scarps": {
+      "tiers": 5,
+      "size": [
+        14.0,
+        1.5,
+        5.2
+      ],
+      "rise": 1.75,
+      "inset": 1.2,
+      "shrink": 0.86,
+      "sink": 1.5,
+      "clearance": 7.0,
+      "keepout": 14.0,
+      "materials": [
+        "world_scarp",
+        "world_soil"
+      ],
+      "sites": [
+        [
+          -58.0,
+          -50.0,
+          90.0,
+          1.15
+        ],
+        [
+          -43.0,
+          -24.0,
+          90.0,
+          1.0
+        ],
+        [
+          -40.0,
+          2.0,
+          90.0,
+          1.35
+        ],
+        [
+          -36.0,
+          28.0,
+          90.0,
+          1.1
+        ],
+        [
+          -48.0,
+          -72.0,
+          60.0,
+          0.9
+        ],
+        [
+          -14.0,
+          -78.0,
+          0.0,
+          1.2
+        ],
+        [
+          12.0,
+          -72.0,
+          0.0,
+          1.0
+        ],
+        [
+          35.0,
+          -28.0,
+          90.0,
+          1.1
+        ],
+        [
+          40.0,
+          6.0,
+          90.0,
+          1.3
+        ],
+        [
+          31.0,
+          34.0,
+          90.0,
+          1.0
+        ],
+        [
+          36.0,
+          60.0,
+          90.0,
+          1.15
+        ],
+        [
+          -12.0,
+          70.0,
+          20.0,
+          1.05
+        ]
+      ],
+      "kit": "ledge",
+      "steps": 3,
+      "thickness": 3.4,
+      "shape": {
+        "ledges": 1,
+        "flats": 2,
+        "lobe": 0.5,
+        "buttress": 1
+      }
+    },
+    "spires": {
+      "count": 26,
+      "zone": [
+        -70.0,
+        48.0,
+        -78.0,
+        30.0
+      ],
+      "clearance": 10.0,
+      "height": 8.0,
+      "height_spread": 11.0,
+      "base": 2.4,
+      "taper": 0.66,
+      "facets": 12,
+      "tiers": 8,
+      "sink": 1.2,
+      "lean": 0.12,
+      "min_normal": 0.58,
+      "materials": [
+        "world_rock",
+        "world_scarp"
+      ],
+      "kit": "needle",
+      "shape": {
+        "buttress": 1,
+        "lobe": 0.3
+      }
+    },
+    "boulders": {
+      "count": 46,
+      "near": 7.0,
+      "far": 32.0,
+      "scale": 2.8,
+      "scale_spread": 4.4,
+      "taper": 0.44,
+      "facets": 15,
+      "tiers": 9,
+      "sink": 0.5,
+      "min_normal": 0.6,
+      "materials": [
+        "world_rock",
+        "world_scarp"
+      ],
+      "kits": [
+        "boulder",
+        "slab",
+        "boulder",
+        "block"
+      ],
+      "shape": {
+        "lobe": 0.42
+      }
+    },
+    "anchors": {
+      "every": 20.0,
+      "min_drop": 2.8,
+      "max_drop": 17.0,
+      "limit": 12,
+      "pad": 3.6,
+      "lip": 0.95,
+      "blocks": 4,
+      "wall": 1.35,
+      "sweep": 1.12,
+      "block_width": 0.52,
+      "deck": "world_deck",
+      "kerb": "world_concrete",
+      "stone": "world_bench",
+      "form": "bench"
+    },
+    "trees": {
+      "clusters": 26,
+      "per_cluster": 4,
+      "cluster_spread": 3,
+      "spread": 4.6,
+      "height": 3.0,
+      "height_spread": 2.6,
+      "width": 0.6,
+      "taper": 0.93,
+      "facets": 8,
+      "tiers": 5,
+      "clearance": 7.5,
+      "reach": 40.0,
+      "min_normal": 0.8,
+      "shrub_every": 3,
+      "materials": [
+        "conifer_deep",
+        "conifer_dark"
+      ],
+      "shrubs": [
+        "world_shrub"
+      ],
+      "kit": true
+    },
+    "landmarks": {
+      "clearance": 12.0,
+      "keepout": 16.0,
+      "sites": {
+        "east_wall": {
+          "node": "obstacle",
+          "kind": "butte",
+          "offset": [
+            55.0,
+            -1.2
+          ],
+          "height": 44.0,
+          "base": 22.0,
+          "sink": 5.0,
+          "seed": 1301,
+          "kit": "ledge",
+          "material": "world_cliff_face",
+          "shape": {
+            "cap": 0.78,
+            "ledges": 2,
+            "buttress": 2,
+            "lobe": 0.52
+          }
+        },
+        "gorge_teeth": {
+          "node": "mix",
+          "kind": "pair",
+          "offset": [
+            53.6,
+            8.4
+          ],
+          "bearing": 24.0,
+          "gap": 15.0,
+          "height": 27.0,
+          "base": 6.0,
+          "ratio": 0.54,
+          "width_ratio": 0.6,
+          "sink": 3.0,
+          "seed": 1409,
+          "lean": 0.12,
+          "kits": [
+            "needle",
+            "needle"
+          ],
+          "material": "world_scarp",
+          "shape": {
+            "buttress": 1,
+            "lobe": 0.32
+          }
+        },
+        "split": {
+          "kind": "gate",
+          "offset": [
+            3.0,
+            10.0
+          ],
+          "bearing": 88.0,
+          "gap": 78.0,
+          "height": 28.0,
+          "base": 11.0,
+          "ratio": 0.56,
+          "width_ratio": 1.55,
+          "sink": 3.5,
+          "seed": 1511,
+          "kits": [
+            "needle",
+            "ledge"
+          ],
+          "material": "world_cliff_face",
+          "shape": {
+            "buttress": 2,
+            "lobe": 0.4
+          }
+        },
+        "merge_narrows": {
+          "node": "merge",
+          "kind": "pair",
+          "offset": [
+            -17.0,
+            17.9
+          ],
+          "bearing": 0.0,
+          "gap": 18.0,
+          "height": 28.0,
+          "base": 9.0,
+          "ratio": 0.78,
+          "width_ratio": 0.88,
+          "sink": 3.0,
+          "seed": 1607,
+          "lean": 0.17,
+          "kits": [
+            "wall",
+            "wall"
+          ],
+          "material": "world_cliff_face",
+          "shape": {
+            "ledges": 2,
+            "buttress": 1,
+            "lobe": 0.28
+          }
+        },
+        "finish": {
+          "kind": "basin",
+          "offset": [
+            4.0,
+            8.0
+          ],
+          "count": 5,
+          "radius": 30.0,
+          "from": 26.0,
+          "to": 158.0,
+          "fall": 0.42,
+          "crown": 14.0,
+          "fall_y": 26.0,
+          "min_aspect": 1.6,
+          "height": 46.0,
+          "base": 17.0,
+          "sink": 5.0,
+          "seed": 1709,
+          "kits": [
+            "cliff",
+            "wall",
+            "cliff",
+            "block",
+            "ledge"
+          ],
+          "material": "world_warm_rock",
+          "shape": {
+            "ledges": 2,
+            "buttress": 2,
+            "lobe": 0.42
+          }
+        },
+        "finish_floor": {
+          "node": "finish",
+          "kind": "basin",
+          "offset": [
+            4.0,
+            8.0
+          ],
+          "count": 4,
+          "radius": 21.0,
+          "from": 40.0,
+          "to": 150.0,
+          "fall": 0.4,
+          "crown": -12.0,
+          "fall_y": 22.0,
+          "min_aspect": 1.4,
+          "height": 30.0,
+          "base": 13.0,
+          "sink": 4.0,
+          "seed": 1801,
+          "kits": [
+            "wall",
+            "cliff",
+            "wall",
+            "block"
+          ],
+          "material": "world_damp",
+          "shape": {
+            "ledges": 2,
+            "buttress": 1,
+            "lobe": 0.36
+          }
+        }
+      }
+    },
+    "ravine": {
+      "water": true,
+      "level": -70.0,
+      "size": [
+        84.0,
+        154.0
+      ],
+      "round": 18.0,
+      "at_x": 55.0,
+      "at_z": 6.0,
+      "material": "world_water",
+      "banks": 7,
+      "bank_material": "world_damp",
+      "bank_offset": 38.0,
+      "bank_span": 120.0,
+      "bank_height": 27.0,
+      "bank_base": 15.0,
+      "kit": "wall",
+      "shape": {
+        "ledges": 2,
+        "lobe": 0.3,
+        "buttress": 1
+      }
+    },
+    "lamps": {
+      "sites": [
+        [
+          "obstacle",
+          -22.0,
+          -9.0,
+          -6.0,
+          "#FFB469",
+          0.9,
+          26.0,
+          1.6
+        ],
+        [
+          "split",
+          26.0,
+          -16.0,
+          8.0,
+          "#7FD8FF",
+          0.7,
+          30.0,
+          1.7
+        ],
+        [
+          "merge",
+          -20.0,
+          -7.0,
+          4.0,
+          "#8FD0F0",
+          0.6,
+          24.0,
+          1.7
+        ],
+        [
+          "finish",
+          22.0,
+          -4.0,
+          18.0,
+          "#FFC98A",
+          1.1,
+          28.0,
+          1.5
+        ],
+        [
+          "finish",
+          -14.0,
+          -6.0,
+          22.0,
+          "#FFB469",
+          0.8,
+          24.0,
+          1.6
+        ],
+        [
+          "finish",
+          4.0,
+          -14.0,
+          34.0,
+          "#FFD3A0",
+          0.7,
+          30.0,
+          1.5
+        ]
+      ]
+    }
+  }
+}

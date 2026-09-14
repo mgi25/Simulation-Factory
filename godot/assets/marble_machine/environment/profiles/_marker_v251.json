@@ -1,0 +1,184 @@
+{
+  "id": "_marker_v251",
+  "title": "Marker over aurora_valley_v251 (diagnostic)",
+  "family": "diagnostic",
+  "summary": "aurora_valley_v251 with every world surface painted the flat hue of its depth band, so a render of it can be segmented by depth",
+  "extends": "aurora_valley_v251",
+  "palette": {
+    "slope_cliff": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "slope_rock": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "slope_earth": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "slope_scree": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "slope_cap": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "slope_boulder": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "slope_moss": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "scrub_dark": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "scrub_dry": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_gravel": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_bench": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_ember": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_rock": {
+      "albedo": "#FF00C8",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_scarp": {
+      "albedo": "#FF00C8",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_soil": {
+      "albedo": "#FF00C8",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_deck": {
+      "albedo": "#FF00C8",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_deck_dark": {
+      "albedo": "#FF00C8",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_concrete": {
+      "albedo": "#FF00C8",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "lit_world_amber": {
+      "albedo": "#FF00C8",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "conifer_deep": {
+      "albedo": "#FF7800",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "conifer_dark": {
+      "albedo": "#FF7800",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_shrub": {
+      "albedo": "#FF7800",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_cliff_face": {
+      "albedo": "#AAFF00",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_cliff_ledge": {
+      "albedo": "#AAFF00",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_warm_rock": {
+      "albedo": "#AAFF00",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_wall_face": {
+      "albedo": "#00E6A0",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_wall_ledge": {
+      "albedo": "#00E6A0",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "rock_soft_near": {
+      "albedo": "#00DCFF",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "rock_soft_mid": {
+      "albedo": "#00DCFF",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "rock_soft_far": {
+      "albedo": "#00DCFF",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "rock_soft_haze": {
+      "albedo": "#00DCFF",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "far_structure": {
+      "albedo": "#00DCFF",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_water": {
+      "albedo": "#8C00FF",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_wet": {
+      "albedo": "#8C00FF",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "world_damp": {
+      "albedo": "#8C00FF",
+      "unshaded": true,
+      "no_fog": true
+    }
+  }
+}
