@@ -1,0 +1,52 @@
+{
+  "clips": [
+    {
+      "appearance": "solid",
+      "frames": 73,
+      "seconds": 41.489,
+      "ms_per_frame": 568.3,
+      "mesh_instances": 1561,
+      "triangles": 556728,
+      "dir": "output\\sloped_race_v1\\v24\\spin\\frames\\descent_solid",
+      "moment": "descent",
+      "video": "output\\sloped_race_v1\\v24\\spin\\clips\\descent_solid.mp4",
+      "phone": "output\\sloped_race_v1\\v24\\spin\\clips\\descent_solid_phone.mp4"
+    },
+    {
+      "appearance": "ribbon",
+      "frames": 73,
+      "seconds": 40.62,
+      "ms_per_frame": 556.4,
+      "mesh_instances": 1561,
+      "triangles": 556728,
+      "dir": "output\\sloped_race_v1\\v24\\spin\\frames\\descent_ribbon",
+      "moment": "descent",
+      "video": "output\\sloped_race_v1\\v24\\spin\\clips\\descent_ribbon.mp4",
+      "phone": "output\\sloped_race_v1\\v24\\spin\\clips\\descent_ribbon_phone.mp4"
+    },
+    {
+      "appearance": "crescent",
+      "frames": 73,
+      "seconds": 41.065,
+      "ms_per_frame": 562.5,
+      "mesh_instances": 1561,
+      "triangles": 556728,
+      "dir": "output\\sloped_race_v1\\v24\\spin\\frames\\descent_crescent",
+      "moment": "descent",
+      "video": "output\\sloped_race_v1\\v24\\spin\\clips\\descent_crescent.mp4",
+      "phone": "output\\sloped_race_v1\\v24\\spin\\clips\\descent_crescent_phone.mp4"
+    },
+    {
+      "appearance": "meridian",
+      "frames": 73,
+      "seconds": 40.58,
+      "ms_per_frame": 555.9,
+      "mesh_instances": 1561,
+      "triangles": 556728,
+      "dir": "output\\sloped_race_v1\\v24\\spin\\frames\\descent_meridian",
+      "moment": "descent",
+      "video": "output\\sloped_race_v1\\v24\\spin\\clips\\descent_meridian.mp4",
+      "phone": "output\\sloped_race_v1\\v24\\spin\\clips\\descent_meridian_phone.mp4"
+    }
+  ]
+}
