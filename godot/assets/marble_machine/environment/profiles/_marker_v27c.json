@@ -1,0 +1,84 @@
+{
+  "id": "_marker_v27c",
+  "title": "Marker over industrial_chamber (diagnostic)",
+  "family": "diagnostic",
+  "summary": "industrial_chamber with every stage surface painted the flat hue of its depth band, so a render of it can be segmented by depth",
+  "extends": "industrial_chamber",
+  "palette": {
+    "slope_cliff": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "slope_rock": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "slope_earth": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "slope_scree": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "slope_cap": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "slope_boulder": {
+      "albedo": "#FF3C78",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "hall_rib": {
+      "albedo": "#FF00C8",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "hall_grate": {
+      "albedo": "#FF00C8",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "hall_beam": {
+      "albedo": "#FF00C8",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "hall_deck": {
+      "albedo": "#FF7800",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "hall_deck_dark": {
+      "albedo": "#FF7800",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "hall_panel": {
+      "albedo": "#00E6A0",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "hall_panel_dark": {
+      "albedo": "#00E6A0",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "hall_glass": {
+      "albedo": "#00E6A0",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "hall_trim": {
+      "albedo": "#00E6A0",
+      "unshaded": true,
+      "no_fog": true
+    }
+  }
+}

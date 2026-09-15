@@ -59,6 +59,12 @@ const HeroWorld := preload("res://assets/marble_machine/hero/hero_world.gd")
 const Terrain := preload("res://assets/marble_machine/course/course_terrain.gd")
 const Rock := preload("res://assets/marble_machine/environment/world_rock.gd")
 const Flora := preload("res://assets/marble_machine/environment/world_flora.gd")
+## V27. The contained stage: architecture where this file builds landscape.
+## Five more builders inside this one build order, reached only by a profile
+## that names one of `environment_stage.STAGE_ORDER`. No profile shipped before
+## V27 names any of them, so every earlier edition builds what it built.
+const Stage := preload(
+	"res://assets/marble_machine/environment/environment_stage.gd")
 
 const WORLD_LAYER := 2
 
@@ -70,8 +76,15 @@ const TRACK_CELL := 10.0
 ## from the profile's key order so that two profiles with the same sections
 ## build the same tree - a `Dictionary` iterates in insertion order, and a JSON
 ## file's insertion order is whatever its author happened to type.
-const BUILD_ORDER := ["patches", "walls", "ridges", "scarps", "spires",
-	"boulders", "anchors", "trees", "landmarks", "ravine", "lamps"]
+## V27's five are interleaved rather than appended: the stage's floor has to
+## be laid before the material patches that skin the heightfield are read
+## against it, its wall before the structure that stands in front of one, and
+## its bays after the landmarks so that a profile carrying both gets the
+## authored architecture in front of the authored rock. The eleven that were
+## here keep their relative order exactly.
+const BUILD_ORDER := ["deck", "shell", "pylons", "canopy",
+	"patches", "walls", "ridges", "scarps", "spires",
+	"boulders", "anchors", "trees", "landmarks", "bays", "ravine", "lamps"]
 
 
 # --- the entry point --------------------------------------------------------
@@ -122,6 +135,16 @@ static func build(root: Node3D, palette, cfg: Dictionary, centreline: Array,
 		"track": _index_points(centreline),
 		"lens": _index_points(world.get("keepout", [])),
 	}
+	# The two guides, bound once as callables, for the builders that live in
+	# `environment_stage.gd`. Passing the test rather than the index is what
+	# keeps a second file from growing its own copy of the bucket query and
+	# then disagreeing with this one about what "clear" means.
+	var tools := {
+		"sited": func(x: float, z: float, clearance: float, lens: float) -> bool:
+			return _sited(guides, x, z, clearance, lens),
+		"why": func(x: float, z: float, clearance: float, lens: float) -> String:
+			return _why(guides, x, z, clearance, lens),
+	}
 	var census := {}
 	for key in BUILD_ORDER:
 		var spec = world.get(key, null)
@@ -130,6 +153,10 @@ static func build(root: Node3D, palette, cfg: Dictionary, centreline: Array,
 		if not bool((spec as Dictionary).get("enabled", true)):
 			continue
 		var made := 0
+		if Stage.builds(key):
+			census[key] = Stage.build(key, group, palette, cfg, nodes, tools,
+				spec)
+			continue
 		match key:
 			"patches": made = _patches(group, palette, cfg, guides, spec)
 			"walls": made = _walls(group, palette, cfg, guides, spec)

@@ -1,0 +1,462 @@
+{
+  "id": "contained_hall",
+  "title": "A - Premium machine hall",
+  "family": "contained",
+  "summary": "A round graphite hall in three courses: a 32-segment drum at radius 122 with a string course at +26 and a clerestory above it, a darker lower wall at 92 carrying the obstacle's three bays, a taller near wall behind the start, two deck bands and sixteen braced columns; no overhead structure, which is a measured result rather than a stylistic choice",
+  "extends": "contained_base",
+  "palette": {
+    "hall_panel": {
+      "albedo": "#242830",
+      "roughness": 0.6,
+      "soft_light": "#2A3441",
+      "floor_lift": "#161C26"
+    },
+    "hall_panel_dark": {
+      "albedo": "#151920",
+      "roughness": 0.88,
+      "soft_light": "#1E2632",
+      "floor_lift": "#11161E"
+    },
+    "hall_rib": {
+      "albedo": "#2E343E",
+      "roughness": 0.42,
+      "soft_light": "#232C3A",
+      "floor_lift": "#141A23"
+    },
+    "hall_trim": {
+      "albedo": "#525A65",
+      "roughness": 0.38,
+      "soft_light": "#2E3745",
+      "floor_lift": "#181E2A"
+    },
+    "hall_deck": {
+      "albedo": "#2E333C",
+      "roughness": 0.9,
+      "soft_light": "#26303C",
+      "floor_lift": "#13181F"
+    },
+    "hall_deck_dark": {
+      "albedo": "#171B22",
+      "roughness": 0.93,
+      "floor_lift": "#0F131A"
+    },
+    "hall_beam": {
+      "albedo": "#1C2028",
+      "roughness": 0.86,
+      "soft_light": "#1E2632",
+      "floor_lift": "#11161E"
+    },
+    "hall_glass": {
+      "albedo": "#0E1219",
+      "roughness": 0.1,
+      "soft_light": "#1A2230",
+      "floor_lift": "#0C1018"
+    },
+    "lit_hall_warm": {
+      "emission": "#FFC489",
+      "energy": 1.55
+    },
+    "lit_hall_cool": {
+      "emission": "#9FD4FF",
+      "energy": 1.05
+    }
+  },
+  "world": {
+    "deck": {
+      "rings": [
+        {
+          "inner": 88.0,
+          "outer": 124.0,
+          "y": -80.0,
+          "thickness": 4.0,
+          "facets": 28,
+          "material": "hall_deck",
+          "fillet": 0.5
+        },
+        {
+          "inner": 122.0,
+          "outer": 154.0,
+          "y": -74.0,
+          "thickness": 5.0,
+          "facets": 32,
+          "material": "hall_deck_dark",
+          "fillet": 0.5
+        }
+      ],
+      "pads": [
+        {
+          "at": [
+            23.0,
+            41.0
+          ],
+          "size": [
+            40.0,
+            1.6,
+            34.0
+          ],
+          "sink": 1.1,
+          "bearing": 28.0,
+          "material": "hall_deck",
+          "clearance": 0.0,
+          "keepout": 0.0
+        }
+      ],
+      "clearance": 0.0,
+      "keepout": 0.0
+    },
+    "shell": {
+      "bands": [
+        {
+          "count": 32,
+          "bearing_from": 0.0,
+          "bearing_step": 11.25,
+          "radius": 122.0,
+          "height": 126.0,
+          "foot": -100.0,
+          "thickness": 6.0,
+          "fill": 0.995,
+          "batter": 2.0,
+          "fillet": 0.7,
+          "keepout": 40.0,
+          "pattern": [
+            "panel",
+            "rib",
+            "glass",
+            "bay",
+            "panel",
+            "rib",
+            "panel",
+            "slot"
+          ],
+          "material": "hall_panel",
+          "bay_depth": 7.0,
+          "glass": {
+            "margin": 3.5,
+            "span": 0.3,
+            "at": 0.72,
+            "material": "hall_glass"
+          },
+          "rib": {
+            "count": 1,
+            "width": 3.4,
+            "depth": 2.6,
+            "material": "hall_rib"
+          },
+          "bay": {
+            "jamb": 4.5,
+            "head": 5.0,
+            "sill": 34.0,
+            "opening": 0.4,
+            "lift": 0.34,
+            "material": "hall_panel",
+            "strip": {
+              "width": 0.66,
+              "height": 1.6,
+              "depth": 0.7,
+              "at": 0.95,
+              "material": "lit_hall_warm"
+            }
+          },
+          "slot": {
+            "at": 0.74,
+            "width": 0.66,
+            "height": 1.8,
+            "depth": 0.8,
+            "material": "lit_hall_cool"
+          },
+          "plinth": {
+            "height": 3.2,
+            "depth": 1.6,
+            "at": 0.0,
+            "material": "hall_trim"
+          }
+        },
+        {
+          "count": 32,
+          "bearing_from": 0.0,
+          "bearing_step": 11.25,
+          "radius": 122.0,
+          "height": 30.0,
+          "foot": 26.0,
+          "thickness": 6.0,
+          "fill": 0.995,
+          "fillet": 0.7,
+          "keepout": 40.0,
+          "pattern": [
+            "panel",
+            "slot"
+          ],
+          "material": "hall_panel",
+          "slot": {
+            "at": 0.46,
+            "width": 0.62,
+            "height": 2.2,
+            "depth": 0.8,
+            "material": "lit_hall_cool"
+          },
+          "plinth": {
+            "height": 4.2,
+            "depth": 2.6,
+            "at": 0.0,
+            "material": "hall_trim"
+          },
+          "cornice": {
+            "height": 4.0,
+            "depth": 2.4,
+            "at": 1.0,
+            "material": "hall_trim"
+          }
+        },
+        {
+          "count": 24,
+          "bearing_from": 7.5,
+          "bearing_step": 15.0,
+          "radius": 92.0,
+          "height": 100.0,
+          "foot": -96.0,
+          "thickness": 5.0,
+          "fill": 0.99,
+          "fillet": 0.6,
+          "keepout": 18.0,
+          "bay_depth": 6.0,
+          "pattern": [
+            "rib",
+            "bay",
+            "bay",
+            "bay",
+            "rib",
+            "panel",
+            "slot",
+            "panel",
+            "rib",
+            "panel",
+            "panel",
+            "slot",
+            "rib",
+            "panel",
+            "panel",
+            "panel",
+            "rib",
+            "panel",
+            "slot",
+            "panel",
+            "rib",
+            "panel",
+            "panel",
+            "panel"
+          ],
+          "material": "hall_panel_dark",
+          "rib": {
+            "count": 1,
+            "width": 3.0,
+            "depth": 2.2,
+            "material": "hall_rib"
+          },
+          "bay": {
+            "jamb": 4.0,
+            "head": 4.0,
+            "sill": 26.0,
+            "opening": 0.3,
+            "lift": 0.62,
+            "material": "hall_panel_dark",
+            "strip": {
+              "width": 0.6,
+              "height": 1.4,
+              "depth": 0.7,
+              "at": 0.92,
+              "material": "lit_hall_warm"
+            }
+          },
+          "slot": {
+            "at": 0.86,
+            "width": 0.6,
+            "height": 1.4,
+            "depth": 0.7,
+            "material": "lit_hall_cool"
+          },
+          "cornice": {
+            "height": 3.0,
+            "depth": 1.6,
+            "at": 1.0,
+            "material": "hall_trim"
+          }
+        },
+        {
+          "count": 6,
+          "bearing_from": 150.0,
+          "bearing_step": 12.0,
+          "radius": 90.0,
+          "height": 134.0,
+          "foot": -96.0,
+          "thickness": 6.0,
+          "fill": 1.0,
+          "fillet": 0.7,
+          "keepout": 20.0,
+          "pattern": [
+            "rib",
+            "panel",
+            "bay",
+            "panel",
+            "rib",
+            "panel"
+          ],
+          "material": "hall_panel",
+          "bay_depth": 7.0,
+          "rib": {
+            "count": 1,
+            "width": 3.6,
+            "depth": 2.8,
+            "material": "hall_rib"
+          },
+          "bay": {
+            "jamb": 5.0,
+            "head": 5.0,
+            "sill": 86.0,
+            "opening": 0.24,
+            "lift": 0.66,
+            "material": "hall_panel",
+            "strip": {
+              "width": 0.66,
+              "height": 1.8,
+              "depth": 0.8,
+              "at": 0.94,
+              "material": "lit_hall_warm"
+            }
+          },
+          "cornice": {
+            "height": 4.0,
+            "depth": 2.4,
+            "at": 1.0,
+            "material": "hall_trim"
+          }
+        }
+      ]
+    },
+    "pylons": {
+      "bands": [
+        {
+          "count": 16,
+          "bearing_from": 8.0,
+          "bearing_step": 22.5,
+          "radius": 80.0,
+          "height": 82.0,
+          "width": 3.6,
+          "depth": 3.6,
+          "sink": 2.5,
+          "clearance": 16.0,
+          "keepout": 26.0,
+          "fillet": 0.4,
+          "material": "hall_rib",
+          "cap": {
+            "spread": 1.8,
+            "height": 1.8,
+            "material": "hall_rib"
+          },
+          "brace": {
+            "stock": 0.8,
+            "at": 0.86,
+            "max_span": 42.0,
+            "material": "hall_beam"
+          }
+        },
+        {
+          "count": 12,
+          "bearing_from": 20.0,
+          "bearing_step": 30.0,
+          "radius": 64.0,
+          "height": 54.0,
+          "width": 3.0,
+          "depth": 3.0,
+          "sink": 2.0,
+          "clearance": 18.0,
+          "keepout": 24.0,
+          "fillet": 0.4,
+          "material": "hall_rib",
+          "cap": {
+            "spread": 1.7,
+            "height": 1.4,
+            "material": "hall_rib"
+          }
+        }
+      ]
+    },
+    "bays": {
+      "clearance": 9.0,
+      "keepout": 14.0,
+      "sites": {
+        "split": {
+          "node": "split",
+          "offset": [
+            36.0,
+            6.0
+          ],
+          "bearing": 80.0,
+          "kind": "portal",
+          "width": 34.0,
+          "height": 58.0,
+          "thickness": 3.4,
+          "sink": 2.0,
+          "jamb": 5.0,
+          "head": 5.0,
+          "fillet": 0.6,
+          "material": "hall_panel",
+          "trim": "hall_trim",
+          "wing": {
+            "width": 20.0,
+            "spread": 34.0,
+            "span": 0.72,
+            "reach": 0.92,
+            "material": "hall_panel_dark"
+          }
+        },
+        "merge": {
+          "node": "merge",
+          "offset": [
+            8.0,
+            38.0
+          ],
+          "bearing": 12.0,
+          "kind": "backing",
+          "width": 46.0,
+          "height": 46.0,
+          "thickness": 3.4,
+          "sink": 2.0,
+          "fillet": 0.6,
+          "material": "hall_panel_dark",
+          "trim": "hall_trim",
+          "strip": {
+            "width": 0.62,
+            "height": 1.4,
+            "at": 0.9,
+            "material": "lit_hall_cool"
+          }
+        },
+        "finish": {
+          "node": "finish",
+          "offset": [
+            32.0,
+            20.0
+          ],
+          "bearing": 58.0,
+          "kind": "frame",
+          "width": 40.0,
+          "height": 84.0,
+          "thickness": 3.4,
+          "sink": 2.0,
+          "jamb": 5.0,
+          "head": 5.0,
+          "sill": 3.0,
+          "fillet": 0.6,
+          "material": "hall_panel",
+          "trim": "hall_trim",
+          "strip": {
+            "width": 0.7,
+            "height": 1.6,
+            "at": 0.9,
+            "material": "lit_hall_warm"
+          }
+        }
+      }
+    }
+  }
+}

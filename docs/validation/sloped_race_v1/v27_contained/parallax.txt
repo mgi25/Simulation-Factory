@@ -1,0 +1,72 @@
+PARALLAX
+
+PART 1 - what the camera makes available.
+Screen travel in pixels of a STATIC point on the view axis, by its
+distance from the lens, over each move. A property of the camera
+track: identical in all four worlds.
+
+  move                     20u         40u         80u        160u        320u
+  ----------------------------------------------------------------------------
+  descent_run            102.9        52.2       110.5       141.0       156.2
+  obstacle_pan            20.0        85.7       136.5       161.9       174.7
+  fork_swing              85.8        22.6        19.9        35.8        44.4
+  branch_cross           222.7        21.3        85.3       138.6       165.5
+  final_dive             172.2       104.1        98.8       103.7       107.7
+
+PART 2 - what each world does with it.
+`moved` is the fraction of a band's screen area that is no longer the
+same area a tenth of a second later - one minus the intersection over
+union of its two masks. Higher is faster. Depth reads when the three
+fall near-to-far.
+
+A displacement in pixels is added where the block matcher found four
+or more trackable patches. It usually does not: both worlds here are
+flat-shaded by design, and a 41-pixel window of V26's own stylised
+rock has an L* standard deviation of 0.1 to 0.5. That is a finding
+about the project's look rather than about any of these three walls.
+
+V26 control - outdoor canyon  (aurora_valley_v26)
+  move                 stage structure          deck bands      enclosure wall
+  ----------------------------------------------------------------------------
+  descent_run           0.312/48% 78px      0.509/13% 81px            0.729/2%
+  obstacle_pan          0.385/31% 12px       0.706/6% 40px                   -
+  fork_swing                 0.139/47%           0.237/20%      0.115/13% 44px
+  branch_cross          0.484/44% 31px           0.526/33%                   -
+  final_dive            0.566/31% 72px           0.563/22%           0.665/14%
+  ordered near-to-far in 0 of the 5 moves where two or more bands were measurable (5 moves in all)
+
+A - Premium machine hall  (contained_hall)
+  move                 stage structure          deck bands      enclosure wall
+  ----------------------------------------------------------------------------
+  descent_run                 0.733/7%                   -           0.451/18%
+  obstacle_pan                       -            0.890/5%            0.751/5%
+  fork_swing                 0.374/11%                   -           0.167/33%
+  branch_cross                       -            0.652/8%           0.334/33%
+  final_dive                         -           0.487/29%           0.288/18%
+  ordered near-to-far in 5 of the 5 moves where two or more bands were measurable (5 moves in all)
+
+B - Toy diorama chamber  (diorama_chamber)
+  move                 stage structure          deck bands      enclosure wall
+  ----------------------------------------------------------------------------
+  descent_run            0.593/6% 79px                   -           0.330/20%
+  obstacle_pan                       -            0.846/5%            0.676/6%
+  fork_swing                  0.108/3%                   -           0.034/41%
+  branch_cross                0.837/6%           0.418/15%      0.507/25% 82px
+  final_dive                         -           0.442/33%           0.219/18%
+  ordered near-to-far in 4 of the 5 moves where two or more bands were measurable (5 moves in all)
+
+C - Enclosed industrial canyon  (industrial_chamber)
+  move                 stage structure          deck bands      enclosure wall
+  ----------------------------------------------------------------------------
+  descent_run            0.809/6% 67px                   -           0.513/20%
+  obstacle_pan                0.897/4%                   -            0.661/6%
+  fork_swing                  0.456/7%                   -           0.121/38%
+  branch_cross                0.724/9%                   -      0.311/35% 28px
+  final_dive                 0.488/25%                   -           0.185/21%
+  ordered near-to-far in 5 of the 5 moves where two or more bands were measurable (5 moves in all)
+
+Each cell is `moved / cover`, plus a matched displacement where one was
+available. A band is absent where it covered under two per cent of the
+frame: below that a sliver the machine eats and uncovers changes nearly
+all of its own area without going anywhere, which is how the control
+first measured 0.99 on a wall it barely showed.

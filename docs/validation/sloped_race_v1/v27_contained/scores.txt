@@ -1,0 +1,15 @@
+criterion                                             v26  a   b   c 
+----------------------------------------------------  ---  --  --  --
+do the eight marbles stay the first thing read        3    5   5   4 
+does the machine stay the second                      5    4   4   3 
+frame 0: racers, PICK A COLOR, START, no tangency     4    4   4   4 
+foreground, midground and background all present      4    5   3   4 
+three separable speeds during a camera move           2    5   4   5 
+does it look expensive                                3    5   4   4 
+is the background quiet behind the track              2    4   5   4 
+would it host a different course                      1    5   4   3 
+would it host country flags and other racer palettes  2    5   4   4 
+would it host a different machine footprint           1    5   4   3 
+is the payoff a place                                 3    4   4   2 
+meshes, triangles and milliseconds against V26        3    4   5   5 
+TOTAL (60)                                            33   55  50  45

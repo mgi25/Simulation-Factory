@@ -1,0 +1,31 @@
+V27 MEASURES - mean over the twelve moments unless said otherwise
+
+                                           v26           a           b           c
+----------------------------------------------------------------------------------
+racers legible / 12 moments              4.833       4.833       4.833       4.667
+racers in frame                          5.917       5.917       5.917       5.917
+least racer dE (legible only)           39.392      38.525      38.525       37.45
+machine - background luma              109.193      93.079      91.615      82.228
+mean luma                               68.597      68.313      69.853      60.342
+clipped white %                          1.044       1.054       1.048       0.939
+clipped black %                          2.906        3.23       2.605       4.579
+environment cover                        0.685        0.74       0.741       0.715
+background edge px (fine) %              4.555        5.55       4.782       4.432
+background edge px (coarse) %           16.277      21.301      20.881      16.983
+detail that survives a squint            3.699         3.9       4.459       3.936
+background value spread                 24.115      45.675      45.254      40.817
+phone edge px (fine) %                  14.876      17.337       16.85      14.469
+phone value spread                      24.172      45.199      44.809      40.153
+
+HOOK worst column (shipped)               8.64        8.45         8.4        8.42
+HOOK mean contrast                       15.21       15.41       15.41       15.39
+HOOK plate luma                           30.4        30.3        30.3        30.4
+HOOK racers legible / 8                      8           8           8           8
+
+mesh instances                            2284        1513        1319        1324
+triangles                               650556      540440      498800      498212
+ms / frame                               330.0       352.0       356.0       353.0
+
+WCAG large text wants 3.0:1. `worst column` is the weakest twelfth of
+PICK A COLOR at the shipped baseline of 269, measured on the picture
+the card will sit on, unaided by its own drop shadow.
