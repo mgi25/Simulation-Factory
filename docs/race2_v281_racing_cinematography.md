@@ -497,11 +497,17 @@ Answering the brief's review questions directly, against the rendered films.
    course ahead wherever that does not cost the racers their place in frame.
 3. **Does the camera travel with the race?** This is the whole architectural
    change: the lens rides an arc length rather than being placed near a station.
-4. **Do mechanisms appear naturally ahead?** Yes, and without a shot of their
-   own - A covers four beats in one take. V28 gave each an anticipation cut, and
-   those shots spend 41-52% of their samples with the pack out of frame.
-5. **Do I see consequences after impacts?** Yes - the take continues through
-   them rather than ending on them.
+4. **Do mechanisms appear naturally ahead?** **No - and this is the one question
+   V28 answers better.** See section 14a: V28 puts each mechanism on screen
+   about a second before the contact; the candidates put it there at the
+   contact. They cover four beats in one take without a shot of their own, which
+   is what the brief asked for, and they do not give the viewer the warning the
+   brief also asked for.
+5. **Do I see consequences after impacts?** Yes, and by a wide margin. Uncut
+   film after each of the four mechanism contacts: V28 holds **0.85 s** at every
+   one; A holds **2.74 to 6.79 s**, B 2.74 to 6.47, C 2.35 to 6.47. The cut
+   lands *on* the contact and the incoming take then runs for seconds, so the
+   impact is the motivated cut and the consequence is the shot.
 6. **Do cuts preserve spatial orientation?** Yes: zero reversals against five.
 7. **Does the race feel fast?** Better: racers are 33-50% larger and the lens
    moves with them rather than waiting for them.
@@ -510,6 +516,45 @@ Answering the brief's review questions directly, against the rendered films.
 10. **Does any camera movement call attention to itself?** The opening's quarter
     turn is the only move a viewer will notice, and it is motivated by the
     release. Peak lens speed is 40.6 u/s against V28's 72.
+
+## 14a. Anticipation: the one thing V28 does better
+
+Measured as the first frame in which a mechanism's centre is inside the frustum
+and not behind geometry, relative to the leading group's contact with it:
+
+| | drum | sweep | pair | last |
+|---|---|---|---|---|
+| **V28** | **-0.98 s** | **-1.11 s** | **-0.92 s** | **-0.95 s** |
+| A | +0.15 s | +0.02 s | +0.41 s | +0.20 s |
+| B | +0.15 s | +0.07 s | +0.40 s | +0.20 s |
+| C | +0.22 s | +0.00 s | +0.41 s | +0.22 s |
+
+Over the two seconds before each contact, the mechanism is in frame for 39-42%
+of V28's samples and **0%** of every candidate's. The candidates reveal each
+mechanism as the racers reach it, not before.
+
+**It was not fixed, and the attempt to fix it is the informative part.** The
+obvious suspect was `FRAME_HOLD_X` clamping the look-ahead blend, so the hold
+was loosened to 0.82 and 0.90 and the lead distance taken to 1.8x. The
+anticipation moved from +0.15 s to +0.10 s - essentially nothing - while the
+worst pack jump at a cut went from 0.274 to 0.427. The blend was never the
+constraint.
+
+The constraint is the lens. A 34-degree portrait frame at the 18-to-22-unit
+depth these shots use is about seven layout units wide at the pack, and the next
+mechanism is fifteen to twenty units further down the course. **It is not in the
+frustum at any aim.** V28 buys its second of warning by cutting to a camera
+standing *past* the mechanism looking back, which is precisely the shot this
+branch removed - and those shots are the ones that spend 46.7-58.5% of their
+samples with the racers out of frame.
+
+So anticipation and continuity are in direct conflict on this course, and this
+branch chose continuity. That is defensible under the brief's own priority order
+- anticipation is fifth, below the four the candidates win - but it is a real
+cost and it is not recovered by tuning. Recovering it would need either a wider
+lens on the approach, a longer trail so the mechanism and the pack are both in
+frame, or the one thing the brief rules out, a cut to the mechanism. The first
+two are cheap experiments and neither was run.
 
 ## 15. The winner: **camera A, continuous chase**
 
@@ -521,7 +566,7 @@ Against the brief's stated priority order:
 | 2. following a chosen colour | A = B | worst pack jump 0.285 for both |
 | 3. spatial orientation | A = B = C | zero reversals for all three |
 | 4. final sprint | A = B = C | identical 6.47 s take |
-| 5. anticipation | A = B | B's side pursuit reveals the pair better; A's long take reveals the sweep better |
+| 5. anticipation | **V28** | the candidates are tied at essentially zero warning; see 14a |
 | 6. racer size | C | 79-108 px, but see below |
 | 7. cinematography quality | B | the only candidate with real rig variety |
 | 8. visual excitement | C | lowest and closest |
@@ -550,27 +595,31 @@ is the measurement of where that ceiling is.
 
 ## 16. Remaining weaknesses
 
-1. **The frame is half empty, and this branch did not fix it.** The V26
+1. **No anticipation.** Section 14a: the mechanisms appear at the contact rather
+   than a second before it, V28 does this better, and it is not a tuning
+   problem. This is the largest single regression against V28 and the first
+   thing to attack after the environment.
+2. **The frame is half empty, and this branch did not fix it.** The V26
    environment is a dark valley and a portrait frame of a compact course leaves a
    lot of unlit rock. The brief rules it out of scope and the other session owns
    it. It is the single biggest difference between these frames and a finished
    film, and it is the reason the rendered stills read sparser than the metrics
    suggest.
-2. **A loses the pack around 8.0 s**, between the sweep and the pair, where B's
+3. **A loses the pack around 8.0 s**, between the sweep and the pair, where B's
    side pursuit holds them. It is the clearest single argument for B and the
    first thing to fix in A - most likely by giving the long take a rig that leans
    further out across that stretch rather than by cutting.
-3. **C's `pan2_side` is occluded on 34% of its samples** - the only shot in any
+4. **C's `pan2_side` is occluded on 34% of its samples** - the only shot in any
    candidate that is worse than the V28 average on that measure. A side rig at a
    1.6-unit negative lift on the second hairpin is standing too low to see over
    the pan it is beside. It is C's problem and it is part of why C loses.
-4. **Up to 23% of active-pack samples are outside the frame width** on the worst
+5. **Up to 23% of active-pack samples are outside the frame width** on the worst
    shot of each candidate (A 19.6%, B 19.9%, C 23.2%), against V28's 46.7-58.5%
    on its anticipation shots. Not zero, and the honest cost of `PACK_MAX` = 4
    framed at a readable size.
-5. **The flow score is a regression detector, not a judgement.** It ranks these
+6. **The flow score is a regression detector, not a judgement.** It ranks these
    four correctly and it should not be quoted as a quality number.
-6. **Only one seed is filmed, and only one course exists.** The schedules are
+7. **Only one seed is filmed, and only one course exists.** The schedules are
    authored against race markers rather than times, so they should transfer, but
    nothing here proves it on a second seed. And every Race #2 course shares one
    centreline, so the reusability of the spine and rail is argued from their

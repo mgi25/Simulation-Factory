@@ -549,6 +549,48 @@ REACQUIRE_ZERO = 0.66      # the pack landing two thirds of a half-frame away
 SCALE_ZERO = 0.67          # the racers changing size by two thirds
 
 
+def anticipation(track, spine, stations: dict, hits: dict) -> dict[str, Any]:
+    """When each mechanism first reaches the frame, relative to its contact.
+
+    Negative is warning; positive means the mechanism arrived with the racers or
+    after them. **This is the measure V28 wins on** - it leads every contact by
+    about a second, where a trailing chase reveals the mechanism as the pack
+    reaches it - and it is reported here rather than left to the prose so the
+    trade is a number.
+
+    Also returns the uncut film held after each contact, which is the measure the
+    chase wins on by three to eight times. A cut landing exactly *on* a contact
+    is not counted as ending the consequence: it is the motivated cut, and the
+    take it opens is where the consequence is seen.
+    """
+    rows = [row for cut in track.get("cuts", []) for row in cut.get("frames", [])]
+    ends = sorted(float(cut["to"]) for cut in track.get("cuts", []))
+    duration = float(track.get("duration", ends[-1] if ends else 0.0))
+    lead: dict[str, float | None] = {}
+    held: dict[str, float] = {}
+    for module, when in hits.items():
+        point = stations.get(module)
+        first = None
+        if point is not None:
+            for row in rows:
+                if float(row[0]) > when + 1.5:
+                    break
+                position = (float(row[1]), float(row[2]), float(row[3]))
+                aim = (float(row[4]), float(row[5]), float(row[6]))
+                forward, right, up = _basis(position, aim)
+                projected, _depth = _project(point, position, forward, right, up,
+                                             float(row[7]))
+                if (projected and -1.0 <= projected[0] <= 1.0
+                        and -1.0 <= projected[1] <= 1.0
+                        and not spine.blocked(position, point)):
+                    first = float(row[0])
+                    break
+        lead[module] = None if first is None else round(first - when, 3)
+        later = [e for e in ends if e > when + 0.05]
+        held[module] = round((later[0] if later else duration) - when, 3)
+    return {"lead_seconds": lead, "consequence_seconds": held}
+
+
 def _flow_score(report: dict[str, Any]) -> float:
     """A blunt composite, on 0 to 100, and explicitly not a quality judgement.
 

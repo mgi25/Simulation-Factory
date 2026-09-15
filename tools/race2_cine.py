@@ -33,7 +33,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from race2 import cinematography, courses
 from race2.events import extract
-from race2.flow import measure, summary
+from race2.flow import anticipation, measure, summary
 from race2.race import run_race
 from race2.rig import PackTrack, build_track, write_track
 from race2.spine import Spine, camera_rail
@@ -89,6 +89,19 @@ def main() -> int:
 
     pack = PackTrack(raw, spine, outcome)
     marks = cinematography.markers(course, outcome, timeline)
+    # Station centres, for the anticipation measure.
+    from sloped.scale import SIM_TO_LAYOUT
+    stations = {}
+    for module_id in course.stations:
+        module = course.machine.modules.get(module_id)
+        if module is None:
+            continue
+        bounds = module.bounds()
+        stations[module_id] = tuple(
+            0.5 * (bounds.lower[axis] + bounds.upper[axis]) * SIM_TO_LAYOUT
+            for axis in range(3)
+        )
+    powered_hits = {k: v for k, v in marks["first"].items() if k != "studs"}
     os.makedirs(args.out, exist_ok=True)
     os.makedirs(args.docs, exist_ok=True)
 
@@ -118,6 +131,9 @@ def main() -> int:
         control_track = json.loads(open(control, encoding="utf-8").read())
         control_track.setdefault("camera", "V28")
         reports["V28"] = measure(control_track, pack, spine, outcome, marks)
+        reports["V28"]["anticipation"] = anticipation(
+            control_track, spine, stations, powered_hits
+        )
         folder = stage("V28")
         shutil.copyfile(control, os.path.join(folder, os.path.basename(control)))
         reports["V28"]["path"] = os.path.join(folder, os.path.basename(control))
@@ -129,6 +145,7 @@ def main() -> int:
         stem = f"race2_{args.course}_{args.seed}.cameras.json"
         path = write_track(track, os.path.join(stage(key), stem))
         report = measure(track, pack, spine, outcome, marks)
+        report["anticipation"] = anticipation(track, spine, stations, powered_hits)
         report["path"] = path
         report["note"] = plan.note
         reports[key] = report
@@ -178,6 +195,20 @@ def main() -> int:
                   f"{report['worst_scale_jump']:7.2f}"
                   f"{report['racer_pixels'][0]:5.0f}-{report['racer_pixels'][1]:<3.0f}"
                   f"{report['phone_pixels'][0]:7.1f}{report['flow_score']:7.1f}")
+        print()
+        header = f"{'camera':<8}{'mechanism in frame vs contact, seconds':<44}{'consequence held':>18}"
+        print(header)
+        print("-" * len(header))
+        for key in ("V28", "A", "B", "C"):
+            report = reports.get(key)
+            if not report or "anticipation" not in report:
+                continue
+            lead = report["anticipation"]["lead_seconds"]
+            held = report["anticipation"]["consequence_seconds"]
+            shown = "  ".join(
+                f"{name} {'never' if v is None else f'{v:+.2f}'}" for name, v in lead.items()
+            )
+            print(f"{key:<8}{shown:<44}{min(held.values()):>13.2f} s min")
         print()
         print(f"pack  {json.dumps(pack.describe())}")
     return 0

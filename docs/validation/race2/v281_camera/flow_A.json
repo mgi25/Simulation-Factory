@@ -187,6 +187,20 @@
   "visible_before_crossing": 2.917,
   "crossing_at": 15.817
  },
+ "anticipation": {
+  "lead_seconds": {
+   "drum": 0.15,
+   "sweep": 0.017,
+   "pair": 0.417,
+   "last": 0.2
+  },
+  "consequence_seconds": {
+   "drum": 6.783,
+   "sweep": 2.733,
+   "pair": 3.667,
+   "last": 6.467
+  }
+ },
  "path": "output/race2/v281_camera\\A\\race2_switchyard_8.cameras.json",
  "note": "the most conservative answer: change the editing and nothing else"
 }

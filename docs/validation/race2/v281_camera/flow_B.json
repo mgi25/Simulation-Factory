@@ -226,6 +226,20 @@
   "visible_before_crossing": 2.917,
   "crossing_at": 15.817
  },
+ "anticipation": {
+  "lead_seconds": {
+   "drum": 0.15,
+   "sweep": 0.067,
+   "pair": 0.4,
+   "last": 0.2
+  },
+  "consequence_seconds": {
+   "drum": 4.05,
+   "sweep": 2.733,
+   "pair": 3.667,
+   "last": 6.467
+  }
+ },
  "path": "output/race2/v281_camera\\B\\race2_switchyard_8.cameras.json",
  "note": "variety bought from rig changes at motivated cuts, not from cutting more"
 }

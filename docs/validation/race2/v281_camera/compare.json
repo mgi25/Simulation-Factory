@@ -100,6 +100,20 @@
     "visible_before_crossing": 0.45,
     "crossing_at": 15.817
    },
+   "anticipation": {
+    "lead_seconds": {
+     "drum": -0.983,
+     "sweep": -1.117,
+     "pair": -0.917,
+     "last": -0.95
+    },
+    "consequence_seconds": {
+     "drum": 0.85,
+     "sweep": 0.85,
+     "pair": 0.85,
+     "last": 0.85
+    }
+   },
    "path": "output/race2/v281_camera\\V28\\race2_switchyard_8.cameras.json"
   },
   "A": {
@@ -148,6 +162,20 @@
     "winner_pixels_min": 58.4,
     "visible_before_crossing": 2.917,
     "crossing_at": 15.817
+   },
+   "anticipation": {
+    "lead_seconds": {
+     "drum": 0.15,
+     "sweep": 0.017,
+     "pair": 0.417,
+     "last": 0.2
+    },
+    "consequence_seconds": {
+     "drum": 6.783,
+     "sweep": 2.733,
+     "pair": 3.667,
+     "last": 6.467
+    }
    },
    "path": "output/race2/v281_camera\\A\\race2_switchyard_8.cameras.json",
    "note": "the most conservative answer: change the editing and nothing else"
@@ -199,6 +227,20 @@
     "visible_before_crossing": 2.917,
     "crossing_at": 15.817
    },
+   "anticipation": {
+    "lead_seconds": {
+     "drum": 0.15,
+     "sweep": 0.067,
+     "pair": 0.4,
+     "last": 0.2
+    },
+    "consequence_seconds": {
+     "drum": 4.05,
+     "sweep": 2.733,
+     "pair": 3.667,
+     "last": 6.467
+    }
+   },
    "path": "output/race2/v281_camera\\B\\race2_switchyard_8.cameras.json",
    "note": "variety bought from rig changes at motivated cuts, not from cutting more"
   },
@@ -248,6 +290,20 @@
     "winner_pixels_min": 59.3,
     "visible_before_crossing": 2.783,
     "crossing_at": 15.817
+   },
+   "anticipation": {
+    "lead_seconds": {
+     "drum": 0.217,
+     "sweep": -0.0,
+     "pair": 0.417,
+     "last": 0.217
+    },
+    "consequence_seconds": {
+     "drum": 2.35,
+     "sweep": 2.733,
+     "pair": 3.667,
+     "last": 6.467
+    }
    },
    "path": "output/race2/v281_camera\\C\\race2_switchyard_8.cameras.json",
    "note": "stronger racing energy: lower, closer, larger racers, six shots"
