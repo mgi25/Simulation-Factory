@@ -22,6 +22,8 @@ Stages, and each one can be run on its own:
     sheet      the merge boards and the 270x480 phone board
     clip       branch -> merge -> post-merge, in motion, in each world
     compare    the three clips stacked into one comparison file
+    film       the whole 20.117 s in one world, for watching rather than
+               measuring (not part of --stage all)
     ring       why no WINNER-mark number is invented on a merge clip
     timing     four renders per world, for an honest frame time
     cost       mesh, triangle and frame-time comparison
@@ -1931,6 +1933,22 @@ def _ffmpeg() -> str:
     return found
 
 
+def _write_listing(path: str, names: Sequence[str]) -> str:
+    """ffmpeg's concat demuxer input: one `file '...'` line per frame.
+
+    The single quotes are ffmpeg's own escaping, not the shell's, and a name
+    containing one has to close, escape and reopen the quoting - which is what
+    the replacement below does.
+    """
+    quote = chr(39)
+    escaped = quote + chr(92) + quote + quote
+    with open(path, "w", encoding="utf-8", newline=chr(10)) as handle:
+        for name in names:
+            handle.write("file %s%s%s%s" % (quote, name.replace(quote, escaped),
+                                            quote, chr(10)))
+    return path
+
+
 def stage_clip(godot: str) -> list[str]:
     """Branch to post-merge, in motion, in each world - and at phone size.
 
@@ -1968,6 +1986,63 @@ def stage_clip(godot: str) -> list[str]:
                     (done.stderr or "").splitlines()[-12:]))
             written.append(video)
             print("wrote " + video)
+    return written
+
+
+def stage_film(godot: str, worlds: Sequence[str] = ()) -> list[str]:
+    """The whole 20.117 s film in a chosen world, for watching rather than
+    measuring.
+
+    Every other clip in this lab is 2.65 s of the merge, because that is what
+    the pass had to prove. This one exists for the different question a
+    reviewer actually asks - *what is it like to sit through* - and it renders
+    the film end to end on V24's own edit, at delivery size and at phone size.
+
+    No overlays and no audio: the renderer draws neither, the Short composites
+    them in Python, and adding them here would make this a second edition
+    rather than a look at a world. `tools/sloped_short.py` is what cuts a
+    deliverable.
+
+    Rendered as an explicit `--at` list of all 1207 frames rather than through
+    `--clip`, so this comes out of the same code path as every still in the
+    pass and a frame here is the frame the sheets show.
+    """
+    track = _load(TRACK)
+    duration = float(track["duration"])
+    count = int(round(duration * v272.FPS))
+    seconds = [round(index / float(v272.FPS), 6) for index in range(count)]
+    chosen = [one for one in _worlds()
+              if not worlds or one[0] in worlds or one[1] in worlds]
+    written: list[str] = []
+    for environment, tag, _title in chosen:
+        out = os.path.join(LAB_DIR, "frames", tag, "film")
+        print(f"--- film {tag}: {count} frames, {duration:.3f} s ---")
+        started = time.perf_counter()
+        _render_at(godot, environment, "", seconds, out, f"film {tag}")
+        print(f"  {count} frames in {time.perf_counter() - started:.1f} s")
+        names = sorted(one for one in os.listdir(out) if one.endswith(".png"))
+        listing = os.path.join(out, "frames.txt")
+        _write_listing(listing, names)
+        for size, suffix in ((None, ""), (PHONE, "_phone")):
+            video = os.path.join(LAB_DIR, "clips", f"film_{tag}{suffix}.mp4")
+            os.makedirs(os.path.dirname(video), exist_ok=True)
+            command = [_ffmpeg(), "-y", "-r", str(v272.FPS), "-f", "concat",
+                       "-safe", "0", "-i", os.path.abspath(listing)]
+            if size:
+                command += ["-vf", "scale=%d:%d:flags=lanczos" % size]
+            command += ["-c:v", "libx264", "-pix_fmt", "yuv420p",
+                        "-crf", str(lab.VIDEO_CRF), "-preset", lab.VIDEO_PRESET,
+                        os.path.abspath(video)]
+            done = subprocess.run(command, cwd=PROJECT_ROOT,
+                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                  text=True, encoding="utf-8", errors="replace")
+            if done.returncode != 0:
+                raise LabError("ffmpeg failed: " + NEWLINE.join(
+                    (done.stderr or "").splitlines()[-12:]))
+            written.append(video)
+            print("wrote " + video)
+        # the frames are 1207 PNGs at 1080x1920; the mp4 is the deliverable
+        shutil.rmtree(out, ignore_errors=True)
     return written
 
 
@@ -2203,8 +2278,8 @@ def stage_export() -> list[str]:
 STAGES = ("survey", "render", "listcheck", "isolate", "mechanism", "surfaces",
           "measure", "coverage",
           "delta", "regress", "winner", "payoff", "hook", "country", "proof",
-          "sheet", "clip", "compare", "ring", "timing", "cost", "clean",
-          "export", "all")
+          "sheet", "clip", "compare", "film", "ring", "timing", "cost",
+          "clean", "export", "all")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -2259,6 +2334,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         stage_clip(godot())
     if stage in ("compare", "all"):
         stage_side_by_side()
+    if stage == "film":
+        stage_film(godot(), only)
     if stage in ("ring", "all"):
         stage_ring()
     if stage in ("timing", "all"):
