@@ -203,7 +203,7 @@
  "race": {
   "seed": 8,
   "seconds": 40.0,
-  "wall_seconds": 10.918,
+  "wall_seconds": 10.535,
   "finished": 8,
   "escaped": 0,
   "stuck": 0,
@@ -1137,7 +1137,7 @@
     "note": "low and alongside, so the closing gap is the whole picture",
     "side": -1.0,
     "from": 13.533333,
-    "to": 15.816667
+    "to": 15.366667
    },
    {
     "name": "payoff",
@@ -1145,7 +1145,7 @@
     "subject": "",
     "note": "the winner across the line, held until the whole field is home",
     "side": 1.0,
-    "from": 15.816667,
+    "from": 15.366667,
     "to": 19.15
    }
   ]

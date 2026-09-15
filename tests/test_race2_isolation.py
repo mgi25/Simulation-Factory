@@ -49,7 +49,7 @@ def test_race_one_course_still_checks_out():
 def test_race_one_channel_profile_is_not_capped():
     """The wall cap belongs to `race2.track` and must not leak into `sloped`.
 
-    `race2.track.capped_profile` flattens everything above 0.62 layout units.
+    `race2.track.capped_profile` flattens everything above `WALL_CAP`.
     Race #1's own profile reaches `CONTAINMENT_TOP` and its committed frames
     were photographed with that rail.
     """

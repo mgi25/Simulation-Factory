@@ -11,15 +11,15 @@ same marble, which is what a branch should be.
 
 Race #2 runs at scale 2.0 so that eight racers can spread across a pan, and the
 marble is still 0.285. So the width doubled and **the wall doubled with it**:
-1.08 layout units of containment above the cradle, against Race #1's 0.54.
-That is 3.8 marble radii of rail around a marble that is 1.0 radius tall.
+**1.60** layout units of containment above the cradle, against Race #1's
+0.54. That is 5.6 marble radii of rail around a marble that is 1.0 radius tall.
 
 The cost is not containment. It is the camera. Seeing a marble in a channel
 over its own near rail needs a depression angle of at least
 `atan(containment / half width)`, measured in the channel's banked frame - and
-at 1.08 of containment in a 1.5 half-width corridor that is **36 degrees**. The
+at 1.60 of containment in a 1.33 half-width corridor that is **50 degrees**. The
 brief asks for a low or moderate three-quarter view and rules out the map view;
-36 degrees of look-down over every corridor is the map view. Seed 140's
+50 degrees of look-down over every corridor is the map view. Seed 140's
 `last_impact` was the measurement: four racers dead centre of frame by
 projection, none of them visible in the render, every sightline crossing
 `corr4`'s own guard at 94% of the way to the marble.
@@ -34,26 +34,36 @@ positions and lose only the part of their height that was buying nothing.
 
 ## What the cap costs, and how it is paid for
 
-A cap alone is not free, and `tools/race2_wall.py` measured the bill over 40
-seeds each:
+A cap alone is not free:
 
-    cap    finish   all-8   escape   look-down
-    0.62    77.7%     13%    21.9%      20 deg
-    0.85    97.2%     78%     2.5%      18 deg
-    1.60    99.9%     99%     0.0%      50 deg   (uncapped, scale 2.0)
+    cap                seeds  finish   all-8   escape   look-down
+    0.62                  60   77.7%     13%    21.9%      20 deg
+    0.85                  40   97.2%     78%     2.5%      18 deg
+    0.70 + pan boost      60   91.7%     47%     8.1%   26/36 deg
+    1.10 + pan boost      60   99.6%     97%     0.00%   21-40 deg
+    1.60 (uncapped)      200   99.9%     99%     0.00%      50 deg
 
 The tall wall was doing real work: a marble carrying 20 layout units a second
-into a 4.8-radius hairpin rides most of the way up the outside, and at 0.62 it
-rides over.
+into a 4.8-radius hairpin rides most of the way up the outside. And the escapes
+were not spread evenly - over 24 seeds, thirteen of them, every one "outside",
+five in `corr1` and four in the sprint. That is **the corridors, in their first
+half, where the field arrives out of a bank**.
 
-But the *whole run* does not need that wall - only the banked part of it does.
-So the cap is 0.70 everywhere and the pans carry a **guard boost** over the
-stretch where the bank is, which is the mechanism `sloped.track` already has
-for exactly this and describes as "a containment repair belongs to a stretch
-and not to a whole run". A pan ends up with 1.65 of rail through its turn and
-a corridor with 0.70, and because a pan is also twice as wide the look-down
-each demands comes out the same: 25 degrees over a pan, 28 over a corridor.
-Both are the three-quarter view the brief asks for, and neither is the map.
+So `WALL_CAP` is 1.10 and two other things carry the rest:
+
+- the pans take a **guard boost** over their banked stretch, to 1.66. That is
+  the mechanism `sloped.track` already has, and its own description of it - "a
+  containment repair belongs to a stretch and not to a whole run" - is the
+  argument for using it here.
+- the funnel from a pan into a corridor is eased over **half** the run rather
+  than a third (`race2.concepts._skeleton_runs`), because a 2.31 half width
+  squeezing to 1.45 in five units is a wall closing on a marble that still has
+  lateral speed from the hairpin.
+
+Zero escapes over 200 seeds, and a look-down of 21 degrees over the head band,
+36 over a pan, 37 over a corridor and 40 over the sprint. More than was hoped
+for, and still the moderate three-quarter the brief asks for rather than the map
+view it rules out - Race #1's own `split` cut is authored at 38.
 """
 
 from __future__ import annotations

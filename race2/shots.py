@@ -89,10 +89,14 @@ PRESETS = {
                    target_width=0.42, group=4),
     "route_choice": dict(fov=36.0, elevation=26.0, bearing=34.0, look_ahead=0.42,
                          target_width=0.40, group=5),
-    # Two, not three: the final sprint's subject is the contest for the line,
-    # and framing a third racer that is four units back pushes the two that
-    # matter apart. `race2.framing.report` records how many were in frame.
-    "final_sprint": dict(fov=34.0, elevation=18.0, bearing=64.0, look_ahead=0.16,
+    # **No look-ahead at all on the sprint, and that is a measured correction.**
+    # Every other mode blends its aim toward the next event; on the sprint the
+    # next event is the line itself, and as the leaders reach it the aim is
+    # already past them. On seed 8 that emptied the last half-second of the shot
+    # completely - two consecutive rendered frames came back byte-identical,
+    # because nothing in frame was moving. There is nothing to anticipate on a
+    # sprint: the racers *are* the subject, so the aim is the racers.
+    "final_sprint": dict(fov=34.0, elevation=18.0, bearing=64.0, look_ahead=0.0,
                          target_width=0.38, group=3),
     "winner_payoff": dict(fov=32.0, elevation=18.0, bearing=40.0, look_ahead=0.0,
                           target_width=0.30, group=1),
@@ -105,6 +109,8 @@ MIN_SHOT = 0.80
 HOOK_MAX = 1.60
 # How much of the end is given to the final sprint, when there is that much.
 SPRINT_MIN = 1.70
+# How long before the winner crosses the sprint hands over to the payoff.
+CROSSING_HANDOVER = 0.45
 
 
 def phase_windows(course: Course, outcome: RaceOutcome) -> list[tuple[str, float, float]]:
@@ -309,13 +315,21 @@ def plan_for(
                   note="the consequence of the last wheel, tracking into the sprint")
         )
         last = sprint_from
-    if winner_at - last >= MIN_SHOT:
+    # **The sprint hands over before the line, not at it.** Its last frames had
+    # the leaders inside the frustum and invisible: at the end of the channel
+    # the run-out deck stands between a shot solved along the sprint and the
+    # racers on it, and two rendered frames came back byte-identical because
+    # nothing in frame was moving. The crossing is the payoff shot's job
+    # anyway - it frames the winner from outside the channel - so the sprint
+    # ends CROSSING_HANDOVER before the line and the payoff takes it.
+    handover = max(last, winner_at - CROSSING_HANDOVER)
+    if handover - last >= MIN_SHOT:
         plan.shots.append(
-            _shot("sprint", "final_sprint", last, winner_at,
+            _shot("sprint", "final_sprint", last, handover,
                   note="low and alongside, so the closing gap is the whole picture")
         )
     else:
-        plan.shots[-1] = _replace(plan.shots[-1], end=winner_at)
+        plan.shots[-1] = _replace(plan.shots[-1], end=handover)
 
     # The payoff runs to whichever is later: a beat past the winner, or a beat
     # past the *last* finisher. A film that cuts at the winner has eight racers

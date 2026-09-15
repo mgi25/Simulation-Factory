@@ -201,9 +201,17 @@ func _render_clip() -> void:
 		await RenderingServer.frame_post_draw
 	_report_triangles()
 
+	# The output frame each cut begins on, so the frame after a camera jump can
+	# be given the second draw the post-effects need. See `race2_scene.cut_starts`.
+	var cut_frames := {}
+	for when in _scene.cut_starts():
+		cut_frames[int(round(float(when) * _fps))] = true
+
 	for index in range(first, last + 1):
 		_scene.set_time(float(index) / _fps)
 		await RenderingServer.frame_post_draw
+		if cut_frames.has(index):
+			await RenderingServer.frame_post_draw
 
 		var image := _viewport.get_texture().get_image()
 		if image == null:

@@ -190,36 +190,38 @@
   "mode": "final_sprint",
   "subject": "",
   "from": 13.533,
-  "to": 15.817,
-  "group_width": 0.4397,
+  "to": 15.367,
+  "group_width": 0.4945,
   "group_width_range": [
-   0.0237,
-   0.9295
+   0.1797,
+   0.8267
   ],
-  "racer_pixels": 70.1,
-  "phone_pixels": 17.5,
+  "racer_pixels": 75.2,
+  "phone_pixels": 18.8,
   "racers_in_frame": 4,
-  "min_racers_in_frame": 2,
+  "min_racers_in_frame": 3,
   "subject_visible": 0.0,
   "lead_seconds": null,
   "racers_enter": 0.0,
-  "notes": []
+  "notes": [
+   "leading group 49% of width, over the 45% reference"
+  ]
  },
  {
   "name": "payoff",
   "mode": "winner_payoff",
   "subject": "",
-  "from": 15.817,
+  "from": 15.367,
   "to": 19.15,
-  "group_width": 0.3541,
+  "group_width": 0.3434,
   "group_width_range": [
    0.0578,
-   0.5398
+   0.963
   ],
-  "racer_pixels": 80.5,
-  "phone_pixels": 20.1,
+  "racer_pixels": 79.7,
+  "phone_pixels": 19.9,
   "racers_in_frame": 4,
-  "min_racers_in_frame": 3,
+  "min_racers_in_frame": 2,
   "subject_visible": 0.0,
   "lead_seconds": null,
   "racers_enter": 0.0,

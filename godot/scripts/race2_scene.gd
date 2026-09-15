@@ -352,6 +352,23 @@ func cut_names() -> PackedStringArray:
 	return out
 
 
+func cut_starts() -> PackedFloat32Array:
+	## When each cut begins, in seconds. Used by the clip renderer.
+	##
+	## **A hard cut needs two draws, not one.** Screen-space reflection and
+	## ambient occlusion carry history, and the first draw after the camera
+	## jumps resolves them against the previous frame's depth - which on the
+	## `sprint` to `payoff` boundary of seed 8 produced a frame byte-identical
+	## to the one before it, out of 1150. The stills path already takes two
+	## draws for exactly this reason; the clip path takes one, because taking
+	## two everywhere would double a five-minute render to remove a defect that
+	## exists on eleven frames.
+	var out := PackedFloat32Array()
+	for cut in _camera_track.get("cuts", []):
+		out.append(float((cut as Dictionary)["from"]))
+	return out
+
+
 func cut_midpoint(name: String) -> float:
 	for cut in _camera_track.get("cuts", []):
 		var record: Dictionary = cut
