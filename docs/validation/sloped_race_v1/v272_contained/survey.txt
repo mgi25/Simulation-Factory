@@ -1,0 +1,21 @@
+THE MERGE SECTOR
+which pieces of the hall the three merge cameras see, and what else
+sees them. Projected with the film's own lens onto the solved track,
+over all fourteen moments.
+
+part           pieces   at merge merge only never seen
+--------------------------------------------------------
+shell 0            32          6          2         15
+shell 1            32          0          0         31
+shell 2            24          5          2         11
+shell 3             6          0          0          4
+deck 0             28          5          1         16
+deck 1             32          6          2         16
+
+Pieces private to the merge: 7.
+
+`merge only` is a piece the three merge cameras see and no other
+camera does. A repaint there would be invisible everywhere else; a
+repaint of a shared piece is a change to the whole film, and has to
+be defended at every moment rather than at three. --stage delta is
+where that is done.

@@ -1,0 +1,13 @@
+FRAME ZERO
+the hook, which no part of a merge correction may reach.
+
+world  title                    racers worst col      mean    plate  least dE
+------------------------------------------------------------------------------
+v26    V26 outdoor                8/8      8.64     15.21     30.4      65.9
+v271   V27.1 contained            8/8      8.45     15.41     30.3      71.7
+v272   V27.2 corrected            8/8      8.45     15.41     30.3      71.7
+
+contained_hall_v272 against contained_hall_v271 at frame 0: byte-identical.
+
+WCAG large text wants 3.0 of the worst column. `least dE` is the
+nearest any racer's colour comes to the picture under it.

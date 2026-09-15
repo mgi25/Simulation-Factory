@@ -1,0 +1,19 @@
+THE REGRESSION GUARDS
+every moment the merge correction is not allowed to cost anything.
+
+moment                v26     v271     v272  v272-v271  guard
+------------------------------------------------------------------------------------------------
+frame0              119.5    117.0    117.0      +0.00  hook - byte-identical, or the pass has reached the opening
+mixer               107.1    114.0    114.7      +0.69  hook - the rotor, still inside the start
+release             120.3    124.7    124.7      +0.05  hook - the trapdoor
+descent             135.0    131.0    132.6      +1.57  the first open shot
+obstacle            106.2    108.8    110.9      +2.10  obstacle guard
+fork_approach       103.2     97.1     98.7      +1.63  fork guard - the gate coming up
+split               111.6    103.5    105.4      +1.92  fork guard - the choice itself
+branch              116.3    109.6    113.4      +3.79  fork guard - two routes over open air
+final_approach      128.4    121.2    127.8      +6.60  finish guard - V27.1's own correction
+winner               90.9     99.0    101.3      +2.30  finish guard - the crossing
+payoff               85.3    101.3    103.7      +2.32  finish guard - the card
+
+Frame 0 against V27.1: byte-identical.
+Worst step at any guarded moment: +0.00 luma.

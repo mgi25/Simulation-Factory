@@ -1,0 +1,58 @@
+WHICH OBJECT IS THE BRIGHT ONE
+one probe per candidate, each re-materialling exactly that object to
+hall_grate - the one hall key contained_hall builds nothing from - and
+the object found by DIFFERENCING the two probes rather than by hue.
+The first version of this stage classified by hue and reported 0.00%
+for every object; see _isolate_mask for why, and why it is a
+difference now.
+
+cover is the share of the whole frame. luma is read off the LIT frame
+of contained_hall_v271 over exactly that mask. lever is the object's
+share of the background: the luma of separation that one luma of
+darkening it would buy.
+
+object                             merge_approach                   merge              post_merge
+                            cover    luma   lever   cover    luma   lever   cover    luma   lever
+-------------------------------------------------------------------------------------------------
+deck ring 0, radius 88-1    0.00%       -   0.000   0.00%       -   0.000   0.00%       -   0.000
+deck ring 1, radius 122-    0.00%       -   0.000   0.00%       -   0.000   0.00%       -   0.000
+the finish landing pad     10.78%    28.2   0.152   7.68%    29.1   0.101   7.85%    31.7   0.099
+the merge bay's backing    14.93%    47.2   0.216  15.53%    46.0   0.210  11.27%    45.0   0.156
+the lower wall, radius 9    1.47%    42.4   0.021   5.68%    52.6   0.077  11.21%    52.4   0.155
+the main drum, radius 12    0.00%       -   0.000   0.00%       -   0.000   0.00%       -   0.000
+the near wall behind the    0.00%       -   0.000   0.00%       -   0.000   0.00%       -   0.000
+the fork portal's wings     0.00%       -   0.000   0.00%       -   0.000   0.00%       -   0.000
+
+the machine, for scale     30.61%   136.6       -  25.53%   134.1       -  27.43%   140.8       -
+the whole background       68.93%    34.1   1.000  73.97%    35.7   1.000  72.09%    31.7   1.000
+
+Machine leak, worst of every object at every moment: 0.7839% of frame.
+  A re-materialled world object may not change a machine pixel - no
+  profile palette names a machine key and the geometry does not move -
+  so this is the check that a difference mask is the object and only
+  the object. Anything but ~0 would mean a probe moved something it
+  was not asked to.
+
+RANKED BY WHAT DARKENING EACH OBJECT WOULD BUY AT THE MERGE
+
+  `headroom` is how far the object sits above the background it is
+  part of. `gain` is lever x headroom: the separation this pass would
+  win by taking this one object down to the background's own average -
+  the first-order size of the prize, before any particular new value
+  is chosen. Averaged over the three merge moments.
+
+object                      cover     luma     lever  headroom     gain
+------------------------------------------------------------------------
+the merge bay's backing    13.91%     46.1     0.194     +12.2     2.35
+the lower wall, radius 9    6.12%     49.1     0.084     +15.3     1.56
+deck ring 0, radius 88-1    0.00%        -     0.000         -     0.00
+deck ring 1, radius 122-    0.00%        -     0.000         -     0.00
+the main drum, radius 12    0.00%        -     0.000         -     0.00
+the near wall behind the    0.00%        -     0.000         -     0.00
+the fork portal's wings     0.00%        -     0.000         -     0.00
+the finish landing pad      8.77%     29.7     0.117      -4.2    -0.52
+
+The eight candidates are 39.6% of the merge background between them.
+What is left is the course's own landform, which is not a hall surface
+and may not be repainted: GEOMETRY IS NOT THEME binds the
+heightfield's materials as well as its shape.

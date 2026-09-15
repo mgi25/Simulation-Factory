@@ -1,0 +1,18 @@
+FRAME TIME
+4 runs of the twelve-moment list per world, median of the engine's
+own per-frame figure. One run is not a measurement here: the
+run-to-run spread is about 3 per cent, which is larger than anything
+a material value can do.
+
+world  environment              ms/frame                      median
+----------------------------------------------------------------------
+v26    aurora_valley_v26        338 337 349 328                337.5
+v271   contained_hall_v271      356 363 343 356                356.0
+v272   contained_hall_v272      350 351 351 362                351.0
+
+V27.2 against V27.1: -1.40%.
+Mesh instances 1513 against 1513, triangles 540440 against 540440: identical.
+
+The delta is one reflectance field on one material. It adds no
+draw call, no shader variant and no vertex, so the honest
+expectation is zero and anything here is spread.

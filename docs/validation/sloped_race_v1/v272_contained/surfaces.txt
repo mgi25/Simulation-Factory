@@ -1,0 +1,55 @@
+WHAT IS BEHIND THE MERGE, BY MATERIAL
+the hall's own materials, each rendered its own flat hue and read off
+the lit frame of contained_hall_v271. The machine is masked out first.
+
+  merge_approach
+    surface              cover    V27.1    V27.2
+    --------------------------------------------
+    hall_deck_dark      10.36%     26.2     26.2
+    hall_panel_dark     16.34%     46.5     14.0
+    hall_rib             1.14%     45.5     45.2
+    ground               6.24%     24.0     24.0
+
+  merge
+    surface              cover    V27.1    V27.2
+    --------------------------------------------
+    hall_deck_dark       7.39%     26.8     26.8
+    hall_panel_dark     21.04%     47.7     14.7
+    hall_rib             4.92%     58.5     58.3
+    ground               7.76%     24.0     24.0
+
+  post_merge
+    surface              cover    V27.1    V27.2
+    --------------------------------------------
+    hall_deck_dark       7.04%     27.2     27.1
+    hall_panel_dark     22.41%     48.7     15.1
+    hall_rib             4.12%     52.9     52.6
+    ground               8.35%     26.7     26.7
+
+  final_approach
+    surface              cover    V27.1    V27.2
+    --------------------------------------------
+    hall_deck_dark      27.98%     25.2     25.2
+    hall_panel_dark     15.49%     44.9     13.9
+    hall_rib             2.59%     47.1     47.1
+    ground               3.32%     37.8     37.8
+
+  winner
+    surface              cover    V27.1    V27.2
+    --------------------------------------------
+    hall_deck_dark       6.38%     23.3     23.3
+    hall_panel_dark     14.55%     16.2      7.8
+    hall_rib             2.01%     39.7     39.7
+    ground               2.87%     43.5     43.5
+
+  payoff
+    surface              cover    V27.1    V27.2
+    --------------------------------------------
+    hall_deck_dark       3.37%     24.0     24.0
+    hall_panel_dark     32.42%     11.2      7.0
+    ground               2.82%     37.6     37.6
+
+  A material is not an object: `hall_panel_dark` is the lower wall,
+  the merge bay's backing and the fork's wings at once, and
+  `hall_deck_dark` is the outer ring and the finish pad. --stage
+  isolate is where those are told apart.

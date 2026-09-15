@@ -1,0 +1,39 @@
+CONTRAST, OR COVERAGE
+the merge gap split into the part that is the picture and the part
+that is the two worlds not showing the same machine.
+
+moment                dSep  dMachine  dBackgnd dMach_same dBackg_same
+----------------------------------------------------------------------
+merge_approach      -18.78     -9.25      9.53       0.10       10.01
+merge               -21.96    -14.86      7.10      -0.76        7.75
+post_merge          -18.16    -12.67      5.49      -0.02        5.98
+final_approach       -7.22     -3.19      4.03      -0.32        4.44
+winner                8.10     -0.03     -8.13      -0.14       -9.50
+payoff               16.05     -1.72    -17.76      -0.06      -17.49
+
+  read on V27.1 against V26, before the correction.
+
+  dMach_same is ~0 at every moment: measured on the pixels both
+  worlds show, the hall does not darken the machine. The large
+  negative dMachine beside it is V26's foreground rock hiding the
+  machine's own dark lower edge, which lifts V26's visible-machine
+  mean and is not a contrast difference at all.
+
+  dBackg_same is the real defect, and it is the one the correction
+  acts on.
+
+SEPARATION ON THE PIXELS BOTH WORLDS SHOW
+
+moment                 v26      v271      v272
+------------------------------------------------
+merge_approach       122.7     112.8     120.5
+merge                122.2     113.8     123.2
+post_merge           128.7     122.7     133.1
+final_approach       129.0     124.3     130.8
+winner                89.6      99.0     101.3
+payoff                85.7     103.1     105.5
+
+  This is the brief's number asked as a like-for-like question: one
+  machine mask, one background mask, both worlds measured over them.
+  It is the pairing V27.1 built `collar_pair` for, applied to the
+  whole frame rather than to the silhouette.

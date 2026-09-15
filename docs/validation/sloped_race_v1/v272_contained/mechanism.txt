@@ -1,0 +1,44 @@
+WHY THE SURFACE IS BRIGHT, AND WHY THE VALUE IS 0.06
+hall_panel_dark, one field at a time. Every row is contained_hall's
+own palette entry with a single field moved, rendered over
+contained_hall_v271 and read on the merge bay's backing slab.
+
+variant        merge_a    back   merge    back post_me    back  note
+----------------------------------------------------------------------------------------------------
+v271 base        102.5    47.2    98.3    46.0   109.2    45.0  contained_hall_v271, unchanged
+no_albedo        104.7    37.9   101.1    36.7   112.2    35.6  albedo black, everything else the parent's
+no_emission      103.6    42.4    99.7    41.1   110.6    40.1  floor_lift black: the emissive floor off
+no_backlight     102.5    47.1    98.3    45.9   109.2    44.9  soft_light erased: the backlight off
+nothing          105.9    32.6   102.6    31.2   113.8    30.2  black, un-emissive, un-backlit - and still not dark
+no_fog           105.9    32.6   102.6    31.3   113.8    30.3  the same, with fog disabled: the floor is not fog
+spec_00          110.3    13.8   108.0    13.6   119.9    13.2  specular 0.00
+spec_06          110.2    14.5   107.7    14.4   119.6    14.0  specular 0.06  <- the delta
+spec_12          109.8    16.1   107.3    15.9   119.1    15.6  specular 0.12
+spec_20          108.9    20.1   106.2    19.6   118.0    18.9  specular 0.20
+spec_30          107.3    26.8   104.2    26.3   115.7    25.9  specular 0.30
+v26              121.2       -   120.3       -   127.3       -  the outdoor control
+
+THE DECOMPOSITION, at the merge
+
+  the surface as authored                      46.0 luma
+  with its albedo taken to black               36.7
+  with its emissive floor off                  41.1
+  black, un-emissive and un-backlit            31.2
+  the same with fog disabled                   31.3
+  as authored, with specular 0.06              14.4
+
+  A black, un-emissive, un-backlit, un-fogged surface still reads
+  31.2. That is a specular lobe: lab_palette._matte never sets
+  metallic_specular, so the material runs at StandardMaterial3D's
+  default 0.5, and at roughness 0.88 the lobe is broad enough to
+  take an even sheen from all five directional lights at once.
+
+  It is a LIFT AND NOT A HIGHLIGHT. The slab's own 5th-to-95th
+  percentile spread is 2.6 luma as authored and 0.9 at 0.06, so
+  nothing that describes the form is being removed.
+
+  For contrast, hall_rib on the same frame: 4.92% of the picture
+  at 58.5 luma, spread 27.4. That lobe IS a highlight - it is the
+  vertical band a viewer reads the wall's height off, which
+  environment_stage._shell_rib exists for - so hall_rib keeps its
+  specular and this pass does not touch it.

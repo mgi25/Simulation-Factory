@@ -1,0 +1,27 @@
+THE TWO --at LISTS, COMPARED ON THE FRAMES THEY SHARE
+the same output second, rendered once inside the twelve V27 moments
+and once inside the brief's six. V27 found that a still is only
+comparable with one asked for in the same list; this is how much.
+
+moment           world   identical  changed px   max dLuma dSeparation
+------------------------------------------------------------------------
+merge            v26            NO     0.0089%         5.5       +0.01
+final_approach   v26            NO     0.0484%        26.6       +0.01
+winner           v26           yes     0.0000%         0.0       +0.00
+payoff           v26           yes     0.0000%         0.0       +0.00
+merge            v271           NO     0.0091%         5.3       +0.00
+final_approach   v271           NO     0.0446%        26.3       +0.00
+winner           v271          yes     0.0000%         0.0       +0.00
+payoff           v271          yes     0.0000%         0.0       +0.00
+merge            v272           NO     0.0093%         5.3       +0.01
+final_approach   v272           NO     0.0446%        26.3       +0.00
+winner           v272          yes     0.0000%         0.0       +0.00
+payoff           v272          yes     0.0000%         0.0       +0.00
+
+Worst separation difference between the two lists: 0.01 luma.
+
+That figure is the error bar on any number in this report that is
+quoted from one list beside a number from another. Inside this pass
+every comparison is list against itself; the only cross-list
+quotations are against V27.1's published table, which was taken on
+list A, and this pass's own list-A numbers are what stand beside it.

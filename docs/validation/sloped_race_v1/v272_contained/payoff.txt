@@ -1,0 +1,14 @@
+THE PAYOFF CARD
+V24's own card, unchanged, measured with v24_payoff.measured_contrast
+on each world's payoff frame - ink against the composited picture.
+
+world  title                      worst    median  band max
+--------------------------------------------------------------
+v26    V26 outdoor                 7.79     16.25      78.1
+v271   V27.1 contained            14.18     19.25      40.0
+v272   V27.2 corrected            18.96     19.47      19.0
+
+`band max` is the brightest pixel of v24_payoff.PAYOFF_BAND inside
+the text corridor: the worst thing the card could have to sit on.
+WCAG large text wants 3.0. V27.1 published 7.79 for V26 and 14.18 for
+the contained bay.

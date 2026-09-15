@@ -1,0 +1,12 @@
+{
+  "id": "contained_hall_v272",
+  "title": "A'' - Premium machine hall, merge corrected",
+  "family": "contained",
+  "summary": "contained_hall_v271 with one leaf added: hall_panel_dark's specular, which no profile had ever named, taken from StandardMaterial3D's default 0.5 to 0.06. That material is the merge bay's backing slab and the lower wall at radius 92 - 28.5% of the merge background at luma 47.7 - and 31 of those 47 luma are a specular lobe so broad at roughness 0.88 that it lays an even sheen over the whole surface. It carries no form: the wall's own luma spread is 0.8 either way. No geometry, no new material key, no value change, no light, no grade, no camera, and the depth-band marker renders byte-identically because an unshaded marker surface has no specular response to change",
+  "extends": "contained_hall_v271",
+  "palette": {
+    "hall_panel_dark": {
+      "specular": 0.06
+    }
+  }
+}

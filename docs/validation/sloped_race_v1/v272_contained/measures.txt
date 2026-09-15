@@ -1,0 +1,149 @@
+THE MERGE CORRECTION
+machine-to-background separation in luma.
+
+  THE INSTRUMENT. `machine` is where hiding the machine changes the
+  marker render by more than 24/255 on any channel - an occlusion
+  test, V27.1's, not a hue classification. `background` is every
+  pixel the four depth bands claim and the machine mask does not.
+  Nothing is excluded from either; what belongs to neither is the
+  sky, which the marker does not paint. Both marker passes are
+  unshaded and un-fogged, so a world pixel is a constant colour
+  between them and the only thing that can differ is which object it
+  is. See sloped/v271_finish.machine_mask.
+
+1  List A: the twelve V27 moments
+
+moment                v26    v271    v272   vs V26
+------------------------------------------------------
+frame0             119.5   117.0   117.0      -2.4
+mixer              107.1   114.0   114.7      +7.6
+release            120.3   124.7   124.7      +4.4
+descent            135.0   131.0   132.6      -2.4
+obstacle           106.2   108.8   110.9      +4.7
+fork_approach      103.2    97.1    98.7      -4.5
+split              111.6   103.5   105.4      -6.2
+branch             116.3   109.6   113.4      -2.9
+merge              120.3    98.3   107.7     -12.5
+final_approach     128.4   121.2   127.8      -0.6
+winner              90.9    99.0   101.3     +10.4
+payoff              85.3   101.3   103.7     +18.4
+
+  at the silhouette, on the machine both worlds show
+moment                v26     v271     v272
+--------------------------------------------
+frame0               71.1     75.1     75.1
+mixer                48.4     56.5     58.6
+release              74.3     86.2     86.2
+descent             115.8    120.8    124.9
+obstacle             56.6     58.4     58.9
+fork_approach        88.7     92.9     93.4
+split               110.4    112.0    112.5
+branch              112.0    111.8    112.7
+merge                78.7     85.6     86.6
+final_approach       96.7    102.4    102.7
+winner               78.7     88.9     89.1
+payoff               64.1     90.5     91.6
+
+  exposure and clipping
+moment           world       mean  clip wht  clip blk
+------------------------------------------------------
+frame0           v26         96.6     1.55%     2.05%
+frame0           v271        97.2     1.55%     4.39%
+frame0           v272        97.2     1.55%     4.39%
+mixer            v26         71.5     1.21%     1.12%
+mixer            v271        66.2     1.22%     4.32%
+mixer            v272        65.7     1.22%     4.59%
+release          v26         74.0     1.79%     0.98%
+release          v271        69.8     1.79%     2.56%
+release          v272        69.8     1.79%     2.66%
+descent          v26         71.0     1.32%     1.17%
+descent          v271        67.1     1.32%     3.52%
+descent          v272        66.0     1.32%     4.27%
+obstacle         v26         95.1     1.20%     3.11%
+obstacle         v271        94.1     1.23%     3.77%
+obstacle         v272        93.2     1.23%     3.82%
+fork_approach    v26         52.2     0.37%     2.15%
+fork_approach    v271        51.8     0.37%     2.52%
+fork_approach    v272        50.5     0.37%     5.58%
+split            v26         45.4     0.26%     2.06%
+split            v271        43.8     0.26%     2.58%
+split            v272        42.2     0.26%     9.85%
+branch           v26         53.1     0.15%     5.26%
+branch           v271        50.0     0.17%     3.03%
+branch           v272        47.1     0.17%    10.12%
+merge            v26         54.7     0.88%     3.26%
+merge            v271        60.7     0.87%     3.55%
+merge            v272        53.7     0.87%     3.55%
+final_approach   v26         60.4     0.88%     6.30%
+final_approach   v271        65.5     0.87%     1.69%
+final_approach   v272        60.7     0.87%     1.69%
+winner           v26         75.8     1.42%     3.38%
+winner           v271        75.3     1.49%     2.00%
+winner           v272        74.1     1.49%     2.02%
+payoff           v26         73.4     1.48%     4.04%
+payoff           v271        64.5     1.51%     5.03%
+payoff           v272        63.1     1.51%     5.14%
+
+2  List B: the brief's six proof frames
+
+moment                v26    v271    v272   vs V26
+------------------------------------------------------
+merge_approach     121.2   102.5   110.2     -11.0
+merge              120.3    98.3   107.7     -12.5
+post_merge         127.3   109.2   119.6      -7.7
+final_approach     128.4   121.2   127.8      -0.6
+winner              90.9    99.0   101.3     +10.4
+payoff              85.3   101.3   103.7     +18.4
+
+  at the silhouette, on the machine both worlds show
+moment                v26     v271     v272
+--------------------------------------------
+merge_approach       80.4     84.2     85.1
+merge                78.7     85.6     86.6
+post_merge           74.0     83.2     83.2
+final_approach       96.7    102.5    102.7
+winner               78.7     88.9     89.1
+payoff               64.1     90.5     91.6
+
+  exposure and clipping
+moment           world       mean  clip wht  clip blk
+------------------------------------------------------
+merge_approach   v26         57.8     0.56%     4.82%
+merge_approach   v271        65.4     0.56%     4.04%
+merge_approach   v272        60.0     0.56%     4.06%
+merge            v26         54.7     0.88%     3.26%
+merge            v271        60.7     0.87%     3.55%
+merge            v272        53.7     0.87%     3.55%
+post_merge       v26         56.9     1.36%     5.82%
+post_merge       v271        61.5     1.39%     6.93%
+post_merge       v272        54.0     1.39%     6.94%
+final_approach   v26         60.4     0.88%     6.30%
+final_approach   v271        65.5     0.87%     1.69%
+final_approach   v272        60.7     0.87%     1.69%
+winner           v26         75.8     1.42%     3.38%
+winner           v271        75.3     1.49%     2.00%
+winner           v272        74.1     1.49%     2.02%
+payoff           v26         73.4     1.48%     4.04%
+payoff           v271        64.5     1.51%     5.03%
+payoff           v272        63.1     1.51%     5.14%
+
+3  Against V27.1's published table (list A, same instrument)
+
+moment            V26 pub  V26 now v271 pub v271 now v272 now
+--------------------------------------------------------------
+frame0              119.5    119.5    117.0    117.0    117.0
+mixer               107.1    107.1    114.0    114.0    114.7
+release             120.3    120.3    124.7    124.7    124.7
+descent             135.0    135.0    131.0    131.0    132.6
+obstacle            106.2    106.2    108.8    108.8    110.9
+fork_approach       103.2    103.2     97.1     97.1     98.7
+split               111.6    111.6    103.5    103.5    105.4
+branch              116.3    116.3    109.6    109.6    113.4
+merge               120.3    120.3     98.3     98.3    107.7
+final_approach      128.4    128.4    121.2    121.2    127.8
+winner               90.9     90.9     99.0     99.0    101.3
+payoff               85.3     85.3    101.3    101.3    103.7
+
+  `pub` is V27.1's own table, reproduced here from the same
+  profiles and the same list of seconds. A `now` that matches it
+  is the check that this pass's instrument is that pass's.

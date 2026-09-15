@@ -1,0 +1,28 @@
+THE WINNER, THROUGH THE MERGE AND THE FINISH
+marble 5, PURPLE. Projected from the replay, not read off a sheet.
+
+moment           world  on screen      px   occl dE surround  surround
+--------------------------------------------------------------------------
+merge            v26          yes      22   0.00       149.1     119.8
+merge            v271         yes      22   0.00       136.0     119.5
+merge            v272         yes      22   0.00       136.0     119.5
+
+final_approach   v26           NO       -      -           -         -
+final_approach   v271          NO       -      -           -         -
+final_approach   v272          NO       -      -           -         -
+
+winner           v26          yes      55   0.00       144.5     139.4
+winner           v271         yes      55   0.00       132.0     140.1
+winner           v272         yes      55   0.00       132.0     140.1
+
+payoff           v26          yes      46   0.00       125.8     117.8
+payoff           v271         yes      46   0.00       125.4     117.7
+payoff           v272         yes      46   0.00       125.4     117.7
+
+`occl` is the share of the marble's own patch the world stands in
+front of: 0.00 is a clear marble. `dE surround` is the marble's mean
+RGB distance from the ring of picture just outside it.
+
+Measured on list B, so the merge row and the finish rows are the same
+render. V27.1 published 132.0 at the winner and 125.4 at the payoff,
+on list A; --stage listcheck is the bridge between the two.

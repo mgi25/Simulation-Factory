@@ -1,0 +1,10 @@
+THE WINNER RING
+the mark opens on the crossing at 17.517 s and runs 0.300 s.
+This pass's clip is 13.450 to 16.100 - the merge - so the mark's own
+frames are not in it, and no number for it is invented here.
+
+What is checked instead: the winner and the payoff are both in the
+regression table, V24's ring schedule is untouched, and --stage delta
+shows what the correction does to the frames the mark is drawn on.
+V27.1 measured 12 of 18 frames reading purple at a median dE of 50.1,
+identical to V26's 12 of 18 at 48.0.

@@ -1,0 +1,17 @@
+COST
+read off the engine's own per-frame figure during --stage render.
+
+world  environment                 meshes    triangles    ms/frame
+--------------------------------------------------------------------
+v26/a  aurora_valley_v26             2284       650556         343
+v26/b  aurora_valley_v26             2284       650556         389
+v271/a contained_hall_v271           1513       540440         368
+v271/b contained_hall_v271           1513       540440         354
+v272/a contained_hall_v272           1513       540440         355
+v272/b contained_hall_v272           1513       540440         359
+
+V27.2 against V27.1: -3.53% frame time, geometry identical.
+
+A material value costs a shader nothing; a difference here that is
+not zero is run-to-run spread, which is about +-3% on this
+machine.
