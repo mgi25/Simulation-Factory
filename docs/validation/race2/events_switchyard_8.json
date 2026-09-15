@@ -1,0 +1,1153 @@
+{
+ "course": {
+  "title": "SWITCHYARD",
+  "concept": "switchyard",
+  "length": 176.5159,
+  "layout_length": 176.516,
+  "drop": 36.6,
+  "footprint": [
+   26.6,
+   48.0
+  ],
+  "stages": [
+   {
+    "name": "head",
+    "runs": [
+     "head"
+    ],
+    "span": 14.6164,
+    "role": "release",
+    "parallel": false,
+    "lengths": {
+     "head": 14.616
+    }
+   },
+   {
+    "name": "pan1",
+    "runs": [
+     "pan1"
+    ],
+    "span": 15.2354,
+    "role": "compress",
+    "parallel": false,
+    "lengths": {
+     "pan1": 15.235
+    }
+   },
+   {
+    "name": "corr1",
+    "runs": [
+     "corr1"
+    ],
+    "span": 17.5111,
+    "role": "disrupt",
+    "parallel": false,
+    "lengths": {
+     "corr1": 17.511
+    }
+   },
+   {
+    "name": "pan2",
+    "runs": [
+     "pan2"
+    ],
+    "span": 15.2354,
+    "role": "recompress",
+    "parallel": false,
+    "lengths": {
+     "pan2": 15.235
+    }
+   },
+   {
+    "name": "corr2",
+    "runs": [
+     "corr2"
+    ],
+    "span": 16.4924,
+    "role": "gate",
+    "parallel": false,
+    "lengths": {
+     "corr2": 16.492
+    }
+   },
+   {
+    "name": "pan3",
+    "runs": [
+     "pan3"
+    ],
+    "span": 15.2354,
+    "role": "recompress",
+    "parallel": false,
+    "lengths": {
+     "pan3": 15.235
+    }
+   },
+   {
+    "name": "corr3",
+    "runs": [
+     "corr3"
+    ],
+    "span": 16.4924,
+    "role": "disrupt",
+    "parallel": false,
+    "lengths": {
+     "corr3": 16.492
+    }
+   },
+   {
+    "name": "pan4",
+    "runs": [
+     "pan4"
+    ],
+    "span": 15.2354,
+    "role": "recompress",
+    "parallel": false,
+    "lengths": {
+     "pan4": 15.235
+    }
+   },
+   {
+    "name": "corr4",
+    "runs": [
+     "corr4"
+    ],
+    "span": 15.4738,
+    "role": "disrupt",
+    "parallel": false,
+    "lengths": {
+     "corr4": 15.474
+    }
+   },
+   {
+    "name": "pan5",
+    "runs": [
+     "pan5"
+    ],
+    "span": 15.2354,
+    "role": "last compression",
+    "parallel": false,
+    "lengths": {
+     "pan5": 15.235
+    }
+   },
+   {
+    "name": "sprint",
+    "runs": [
+     "sprint"
+    ],
+    "span": 19.7525,
+    "role": "sprint",
+    "parallel": false,
+    "lengths": {
+     "sprint": 19.752
+    }
+   }
+  ],
+  "phases": [
+   {
+    "name": "start_scramble",
+    "stages": [
+     "head"
+    ],
+    "purpose": "release eight racers in one tick and destroy the bay order before the course narrows for the first time"
+   },
+   {
+    "name": "first_mechanism",
+    "stages": [
+     "pan1",
+     "corr1"
+    ],
+    "purpose": "four wheels at 6.2 rad/s in a 2.8-unit corridor - the biggest single reordering, and the earliest"
+   },
+   {
+    "name": "recompression",
+    "stages": [
+     "pan2"
+    ],
+    "purpose": "a banked pan that erases the drum's gaps, so the next question is asked of a field that is level again"
+   },
+   {
+    "name": "gate",
+    "stages": [
+     "corr2",
+     "pan3"
+    ],
+    "purpose": "the one wheel that sweeps the whole channel; it is shut for about a third of every turn and a leader can be the one it catches"
+   },
+   {
+    "name": "second_mechanism",
+    "stages": [
+     "corr3",
+     "pan4",
+     "corr4"
+    ],
+    "purpose": "two counter-turning wheels, then a slower pair - the deflection cancels and only the delay is left, which is what reorders"
+   },
+   {
+    "name": "final_sprint",
+    "stages": [
+     "pan5",
+     "sprint"
+    ],
+    "purpose": "one more bank to compress what the last wheels separated, then a straight fall with nothing on it"
+   }
+  ],
+  "stations": [
+   "studs",
+   "drum",
+   "sweep",
+   "pair",
+   "last"
+  ]
+ },
+ "race": {
+  "seed": 8,
+  "seconds": 40.0,
+  "wall_seconds": 10.918,
+  "finished": 8,
+  "escaped": 0,
+  "stuck": 0,
+  "collisions": 116,
+  "lead_changes": 9,
+  "overtakes": 65,
+  "top_speed": 65.3889,
+  "worst_penetration": -0.142073,
+  "branch_counts": {},
+  "finish_span": 2.9333,
+  "podium_gap": 0.0667,
+  "failure": null,
+  "racers": [
+   {
+    "marble": 0,
+    "slot": 3,
+    "route": "-",
+    "branches": [],
+    "order": 6,
+    "time": 17.716667,
+    "state": "finished",
+    "progress": 176.5159,
+    "top_speed": 48.6142,
+    "ranks": {
+     "release": 1,
+     "first_event": 1,
+     "quarter": 8,
+     "half": 8,
+     "three_quarter": 8
+    },
+    "stage_times": {
+     "head": 0.0167,
+     "pan1": 1.2,
+     "corr1": 2.15,
+     "pan2": 7.5,
+     "corr2": 8.5167,
+     "pan3": 9.9833,
+     "corr3": 10.9667,
+     "pan4": 13.7667,
+     "corr4": 14.8,
+     "pan5": 15.9167,
+     "sprint": 16.8833
+    },
+    "lost_at": null,
+    "lost_how": null,
+    "lost_time": null
+   },
+   {
+    "marble": 1,
+    "slot": 1,
+    "route": "-",
+    "branches": [],
+    "order": 3,
+    "time": 16.133333,
+    "state": "finished",
+    "progress": 176.5159,
+    "top_speed": 64.7635,
+    "ranks": {
+     "release": 3,
+     "first_event": 4,
+     "quarter": 1,
+     "half": 2,
+     "three_quarter": 1
+    },
+    "stage_times": {
+     "head": 0.0167,
+     "pan1": 1.4333,
+     "corr1": 2.3167,
+     "pan2": 4.8833,
+     "corr2": 5.9333,
+     "pan3": 8.0667,
+     "corr3": 8.9667,
+     "pan4": 11.4333,
+     "corr4": 12.45,
+     "pan5": 14.3167,
+     "sprint": 15.3167
+    },
+    "lost_at": null,
+    "lost_how": null,
+    "lost_time": null
+   },
+   {
+    "marble": 2,
+    "slot": 5,
+    "route": "-",
+    "branches": [],
+    "order": 2,
+    "time": 15.883333,
+    "state": "finished",
+    "progress": 176.5159,
+    "top_speed": 53.8195,
+    "ranks": {
+     "release": 5,
+     "first_event": 3,
+     "quarter": 2,
+     "half": 1,
+     "three_quarter": 3
+    },
+    "stage_times": {
+     "head": 0.0167,
+     "pan1": 1.4333,
+     "corr1": 2.2667,
+     "pan2": 5.2,
+     "corr2": 6.1667,
+     "pan3": 7.85,
+     "corr3": 8.85,
+     "pan4": 12.0833,
+     "corr4": 13.1667,
+     "pan5": 14.0667,
+     "sprint": 15.0333
+    },
+    "lost_at": null,
+    "lost_how": null,
+    "lost_time": null
+   },
+   {
+    "marble": 3,
+    "slot": 6,
+    "route": "-",
+    "branches": [],
+    "order": 5,
+    "time": 17.2,
+    "state": "finished",
+    "progress": 176.5159,
+    "top_speed": 48.232,
+    "ranks": {
+     "release": 6,
+     "first_event": 6,
+     "quarter": 7,
+     "half": 7,
+     "three_quarter": 7
+    },
+    "stage_times": {
+     "head": 0.0167,
+     "pan1": 1.35,
+     "corr1": 2.6667,
+     "pan2": 6.1833,
+     "corr2": 7.2167,
+     "pan3": 9.3,
+     "corr3": 10.3167,
+     "pan4": 13.4667,
+     "corr4": 14.4667,
+     "pan5": 15.2667,
+     "sprint": 16.2
+    },
+    "lost_at": null,
+    "lost_how": null,
+    "lost_time": null
+   },
+   {
+    "marble": 4,
+    "slot": 2,
+    "route": "-",
+    "branches": [],
+    "order": 8,
+    "time": 18.75,
+    "state": "finished",
+    "progress": 176.5159,
+    "top_speed": 47.6275,
+    "ranks": {
+     "release": 8,
+     "first_event": 8,
+     "quarter": 3,
+     "half": 5,
+     "three_quarter": 6
+    },
+    "stage_times": {
+     "head": 0.0167,
+     "pan1": 1.5667,
+     "corr1": 2.5833,
+     "pan2": 5.6333,
+     "corr2": 6.75,
+     "pan3": 8.7333,
+     "corr3": 9.6833,
+     "pan4": 13.3,
+     "corr4": 14.35,
+     "pan5": 16.6667,
+     "sprint": 17.7333
+    },
+    "lost_at": null,
+    "lost_how": null,
+    "lost_time": null
+   },
+   {
+    "marble": 5,
+    "slot": 7,
+    "route": "-",
+    "branches": [],
+    "order": 4,
+    "time": 16.583333,
+    "state": "finished",
+    "progress": 176.5159,
+    "top_speed": 48.4281,
+    "ranks": {
+     "release": 7,
+     "first_event": 7,
+     "quarter": 5,
+     "half": 4,
+     "three_quarter": 4
+    },
+    "stage_times": {
+     "head": 0.0167,
+     "pan1": 1.3333,
+     "corr1": 2.3333,
+     "pan2": 5.9167,
+     "corr2": 6.9833,
+     "pan3": 8.6833,
+     "corr3": 9.6667,
+     "pan4": 12.4,
+     "corr4": 13.45,
+     "pan5": 14.6,
+     "sprint": 15.6
+    },
+    "lost_at": null,
+    "lost_how": null,
+    "lost_time": null
+   },
+   {
+    "marble": 6,
+    "slot": 4,
+    "route": "-",
+    "branches": [],
+    "order": 7,
+    "time": 17.816667,
+    "state": "finished",
+    "progress": 176.5159,
+    "top_speed": 48.4072,
+    "ranks": {
+     "release": 2,
+     "first_event": 2,
+     "quarter": 6,
+     "half": 6,
+     "three_quarter": 5
+    },
+    "stage_times": {
+     "head": 0.0167,
+     "pan1": 1.2667,
+     "corr1": 2.3,
+     "pan2": 5.6833,
+     "corr2": 6.7333,
+     "pan3": 8.9667,
+     "corr3": 9.85,
+     "pan4": 12.7333,
+     "corr4": 13.8,
+     "pan5": 15.75,
+     "sprint": 16.7667
+    },
+    "lost_at": null,
+    "lost_how": null,
+    "lost_time": null
+   },
+   {
+    "marble": 7,
+    "slot": 0,
+    "route": "-",
+    "branches": [],
+    "order": 1,
+    "time": 15.816667,
+    "state": "finished",
+    "progress": 176.5159,
+    "top_speed": 59.5931,
+    "ranks": {
+     "release": 4,
+     "first_event": 5,
+     "quarter": 4,
+     "half": 3,
+     "three_quarter": 2
+    },
+    "stage_times": {
+     "head": 0.0167,
+     "pan1": 1.3667,
+     "corr1": 2.3333,
+     "pan2": 5.45,
+     "corr2": 6.4667,
+     "pan3": 8.6333,
+     "corr3": 9.55,
+     "pan4": 11.7333,
+     "corr4": 12.75,
+     "pan5": 14.0333,
+     "sprint": 15.05
+    },
+    "lost_at": null,
+    "lost_how": null,
+    "lost_time": null
+   }
+  ]
+ },
+ "timeline": {
+  "seed": 8,
+  "start": 0.017,
+  "end": 18.75,
+  "duration": 18.733,
+  "count": 67,
+  "density": 3.577,
+  "longest_gap": 1.05,
+  "longest_gap_at": 14.517,
+  "dead_zones": [],
+  "counts": {
+   "leader_change": 9,
+   "top3_change": 8,
+   "overtake_cluster": 19,
+   "route_split": 0,
+   "route_merge": 0,
+   "compression": 3,
+   "separation": 3,
+   "mechanism_hit": 15,
+   "line_choice": 2,
+   "finish": 8
+  },
+  "events": [
+   {
+    "t": 0.417,
+    "kind": "overtake_cluster",
+    "detail": "2 place(s) gained in the leading 4",
+    "ids": [
+     0,
+     6
+    ]
+   },
+   {
+    "t": 0.417,
+    "kind": "top3_change",
+    "detail": "m0 into the top three",
+    "ids": [
+     0
+    ]
+   },
+   {
+    "t": 0.517,
+    "kind": "leader_change",
+    "detail": "m1 takes the lead from m7",
+    "ids": [
+     1,
+     7
+    ]
+   },
+   {
+    "t": 0.667,
+    "kind": "leader_change",
+    "detail": "m0 takes the lead from m1",
+    "ids": [
+     0,
+     1
+    ]
+   },
+   {
+    "t": 0.933,
+    "kind": "mechanism_hit",
+    "detail": "m6 into studs (rank 2)",
+    "ids": [
+     6
+    ]
+   },
+   {
+    "t": 1.217,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 1.383,
+    "kind": "top3_change",
+    "detail": "m7 into the top three",
+    "ids": [
+     7
+    ]
+   },
+   {
+    "t": 1.433,
+    "kind": "top3_change",
+    "detail": "m1 into the top three",
+    "ids": [
+     1
+    ]
+   },
+   {
+    "t": 1.55,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 1.55,
+    "kind": "top3_change",
+    "detail": "m2 into the top three",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 2.233,
+    "kind": "mechanism_hit",
+    "detail": "m0 into drum (rank 1)",
+    "ids": [
+     0
+    ]
+   },
+   {
+    "t": 2.267,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 2.583,
+    "kind": "leader_change",
+    "detail": "m2 takes the lead from m0",
+    "ids": [
+     2,
+     0
+    ]
+   },
+   {
+    "t": 2.583,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 2.683,
+    "kind": "top3_change",
+    "detail": "m7 into the top three",
+    "ids": [
+     7
+    ]
+   },
+   {
+    "t": 2.767,
+    "kind": "mechanism_hit",
+    "detail": "m2 into drum (rank 1)",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 2.783,
+    "kind": "top3_change",
+    "detail": "m1 into the top three",
+    "ids": [
+     1
+    ]
+   },
+   {
+    "t": 2.933,
+    "kind": "leader_change",
+    "detail": "m1 takes the lead from m2",
+    "ids": [
+     1,
+     2
+    ]
+   },
+   {
+    "t": 2.933,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     1
+    ]
+   },
+   {
+    "t": 2.95,
+    "kind": "top3_change",
+    "detail": "m4 into the top three",
+    "ids": [
+     4
+    ]
+   },
+   {
+    "t": 3.367,
+    "kind": "mechanism_hit",
+    "detail": "m2 into drum (rank 3)",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 3.583,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     7
+    ]
+   },
+   {
+    "t": 3.967,
+    "kind": "mechanism_hit",
+    "detail": "m2 into drum (rank 3)",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 4.35,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 4.583,
+    "kind": "mechanism_hit",
+    "detail": "m2 into drum (rank 2)",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 4.683,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     7
+    ]
+   },
+   {
+    "t": 4.683,
+    "kind": "top3_change",
+    "detail": "m7 into the top three",
+    "ids": [
+     7
+    ]
+   },
+   {
+    "t": 5.317,
+    "kind": "separation",
+    "detail": "leading five spread to 9.9 units",
+    "ids": []
+   },
+   {
+    "t": 5.4,
+    "kind": "line_choice",
+    "detail": "leaders split high and low through pan2 (spread 0.558)",
+    "ids": []
+   },
+   {
+    "t": 6.283,
+    "kind": "mechanism_hit",
+    "detail": "m1 into sweep (rank 1)",
+    "ids": [
+     1
+    ]
+   },
+   {
+    "t": 6.783,
+    "kind": "mechanism_hit",
+    "detail": "m2 into sweep (rank 2)",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 6.85,
+    "kind": "compression",
+    "detail": "leading five inside 5.2 units",
+    "ids": []
+   },
+   {
+    "t": 7.15,
+    "kind": "leader_change",
+    "detail": "m2 takes the lead from m1",
+    "ids": [
+     2,
+     1
+    ]
+   },
+   {
+    "t": 7.15,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 7.6,
+    "kind": "mechanism_hit",
+    "detail": "m7 into sweep (rank 3)",
+    "ids": [
+     7
+    ]
+   },
+   {
+    "t": 7.9,
+    "kind": "separation",
+    "detail": "leading five spread to 9.7 units",
+    "ids": []
+   },
+   {
+    "t": 8.3,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     5
+    ]
+   },
+   {
+    "t": 9.017,
+    "kind": "mechanism_hit",
+    "detail": "m2 into pair (rank 1)",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 9.583,
+    "kind": "leader_change",
+    "detail": "m1 takes the lead from m2",
+    "ids": [
+     1,
+     2
+    ]
+   },
+   {
+    "t": 9.583,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     1
+    ]
+   },
+   {
+    "t": 9.617,
+    "kind": "mechanism_hit",
+    "detail": "m2 into pair (rank 2)",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 9.783,
+    "kind": "compression",
+    "detail": "leading five inside 5.2 units",
+    "ids": []
+   },
+   {
+    "t": 10.283,
+    "kind": "mechanism_hit",
+    "detail": "m2 into pair (rank 2)",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 10.333,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     4
+    ]
+   },
+   {
+    "t": 10.85,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     7
+    ]
+   },
+   {
+    "t": 10.95,
+    "kind": "mechanism_hit",
+    "detail": "m2 into pair (rank 3)",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 11.517,
+    "kind": "separation",
+    "detail": "leading five spread to 9.7 units",
+    "ids": []
+   },
+   {
+    "t": 11.7,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     5
+    ]
+   },
+   {
+    "t": 12.683,
+    "kind": "mechanism_hit",
+    "detail": "m1 into last (rank 1)",
+    "ids": [
+     1
+    ]
+   },
+   {
+    "t": 13.117,
+    "kind": "leader_change",
+    "detail": "m7 takes the lead from m1",
+    "ids": [
+     7,
+     1
+    ]
+   },
+   {
+    "t": 13.117,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     7
+    ]
+   },
+   {
+    "t": 13.467,
+    "kind": "mechanism_hit",
+    "detail": "m1 into last (rank 2)",
+    "ids": [
+     1
+    ]
+   },
+   {
+    "t": 13.7,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 14.383,
+    "kind": "leader_change",
+    "detail": "m2 takes the lead from m7",
+    "ids": [
+     2,
+     7
+    ]
+   },
+   {
+    "t": 14.383,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 14.517,
+    "kind": "line_choice",
+    "detail": "leaders split high and low through pan5 (spread 0.6192)",
+    "ids": []
+   },
+   {
+    "t": 15.567,
+    "kind": "leader_change",
+    "detail": "m7 takes the lead from m2",
+    "ids": [
+     7,
+     2
+    ]
+   },
+   {
+    "t": 15.567,
+    "kind": "overtake_cluster",
+    "detail": "1 place(s) gained in the leading 4",
+    "ids": [
+     7
+    ]
+   },
+   {
+    "t": 15.817,
+    "kind": "finish",
+    "detail": "m7 finishes 1",
+    "ids": [
+     7
+    ]
+   },
+   {
+    "t": 15.883,
+    "kind": "finish",
+    "detail": "m2 finishes 2",
+    "ids": [
+     2
+    ]
+   },
+   {
+    "t": 16.133,
+    "kind": "finish",
+    "detail": "m1 finishes 3",
+    "ids": [
+     1
+    ]
+   },
+   {
+    "t": 16.583,
+    "kind": "finish",
+    "detail": "m5 finishes 4",
+    "ids": [
+     5
+    ]
+   },
+   {
+    "t": 16.983,
+    "kind": "compression",
+    "detail": "leading five inside 5.2 units",
+    "ids": []
+   },
+   {
+    "t": 17.2,
+    "kind": "finish",
+    "detail": "m3 finishes 5",
+    "ids": [
+     3
+    ]
+   },
+   {
+    "t": 17.717,
+    "kind": "finish",
+    "detail": "m0 finishes 6",
+    "ids": [
+     0
+    ]
+   },
+   {
+    "t": 17.817,
+    "kind": "finish",
+    "detail": "m6 finishes 7",
+    "ids": [
+     6
+    ]
+   },
+   {
+    "t": 18.75,
+    "kind": "finish",
+    "detail": "m4 finishes 8",
+    "ids": [
+     4
+    ]
+   }
+  ]
+ },
+ "camera": {
+  "duration": 19.15,
+  "cuts": [
+   {
+    "name": "hook",
+    "mode": "hook_close",
+    "subject": "",
+    "note": "eight racers at rest, then the floor goes - the premise, legible inside half a second",
+    "side": 1.0,
+    "from": 0.016667,
+    "to": 1.183333
+   },
+   {
+    "name": "drum_anticipate",
+    "mode": "obstacle_anticipation",
+    "subject": "drum",
+    "note": "the drum in the foreground, the field arriving into it",
+    "side": -1.0,
+    "from": 1.183333,
+    "to": 2.153333
+   },
+   {
+    "name": "drum_impact",
+    "mode": "action",
+    "subject": "drum",
+    "note": "the contact, held long enough to read who came out in front",
+    "side": 1.0,
+    "from": 2.153333,
+    "to": 3.083333
+   },
+   {
+    "name": "sweep_anticipate",
+    "mode": "obstacle_anticipation",
+    "subject": "sweep",
+    "note": "the sweep in the foreground, the field arriving into it",
+    "side": 1.0,
+    "from": 3.083333,
+    "to": 6.203333
+   },
+   {
+    "name": "sweep_impact",
+    "mode": "action",
+    "subject": "sweep",
+    "note": "the contact, held long enough to read who came out in front",
+    "side": -1.0,
+    "from": 6.203333,
+    "to": 7.133333
+   },
+   {
+    "name": "pair_anticipate",
+    "mode": "obstacle_anticipation",
+    "subject": "pair",
+    "note": "the pair in the foreground, the field arriving into it",
+    "side": -1.0,
+    "from": 7.133333,
+    "to": 8.936667
+   },
+   {
+    "name": "pair_impact",
+    "mode": "action",
+    "subject": "pair",
+    "note": "the contact, held long enough to read who came out in front",
+    "side": 1.0,
+    "from": 8.936667,
+    "to": 9.866667
+   },
+   {
+    "name": "last_anticipate",
+    "mode": "obstacle_anticipation",
+    "subject": "last",
+    "note": "the last in the foreground, the field arriving into it",
+    "side": 1.0,
+    "from": 9.866667,
+    "to": 12.603333
+   },
+   {
+    "name": "last_impact",
+    "mode": "action",
+    "subject": "last",
+    "note": "the contact, held long enough to read who came out in front",
+    "side": -1.0,
+    "from": 12.603333,
+    "to": 13.533333
+   },
+   {
+    "name": "sprint",
+    "mode": "final_sprint",
+    "subject": "",
+    "note": "low and alongside, so the closing gap is the whole picture",
+    "side": -1.0,
+    "from": 13.533333,
+    "to": 15.816667
+   },
+   {
+    "name": "payoff",
+    "mode": "winner_payoff",
+    "subject": "",
+    "note": "the winner across the line, held until the whole field is home",
+    "side": 1.0,
+    "from": 15.816667,
+    "to": 19.15
+   }
+  ]
+ }
+}

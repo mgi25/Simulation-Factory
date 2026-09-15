@@ -1,0 +1,238 @@
+[
+ {
+  "name": "hook",
+  "mode": "hook_close",
+  "subject": "",
+  "from": 0.017,
+  "to": 1.133,
+  "group_width": 0.3457,
+  "group_width_range": [
+   0.2558,
+   0.4099
+  ],
+  "racer_pixels": 73.6,
+  "phone_pixels": 18.4,
+  "racers_in_frame": 8,
+  "min_racers_in_frame": 8,
+  "subject_visible": 0.0,
+  "lead_seconds": null,
+  "notes": []
+ },
+ {
+  "name": "drum_anticipate",
+  "mode": "obstacle_anticipation",
+  "subject": "drum",
+  "from": 1.133,
+  "to": 2.103,
+  "group_width": 0.2472,
+  "group_width_range": [
+   0.164,
+   0.3795
+  ],
+  "racer_pixels": 34.5,
+  "phone_pixels": 8.6,
+  "racers_in_frame": 8,
+  "min_racers_in_frame": 6,
+  "subject_visible": 1.0,
+  "lead_seconds": 1.05,
+  "notes": [
+   "leading group 25% of width, under the 25% reference"
+  ]
+ },
+ {
+  "name": "drum_impact",
+  "mode": "action",
+  "subject": "drum",
+  "from": 2.103,
+  "to": 3.033,
+  "group_width": 0.3251,
+  "group_width_range": [
+   0.1971,
+   0.4566
+  ],
+  "racer_pixels": 57.1,
+  "phone_pixels": 14.3,
+  "racers_in_frame": 8,
+  "min_racers_in_frame": 8,
+  "subject_visible": 1.0,
+  "lead_seconds": 0.083,
+  "notes": []
+ },
+ {
+  "name": "sweep_anticipate",
+  "mode": "obstacle_anticipation",
+  "subject": "sweep",
+  "from": 3.033,
+  "to": 6.77,
+  "group_width": 0.2612,
+  "group_width_range": [
+   0.0533,
+   0.7324
+  ],
+  "racer_pixels": 29.7,
+  "phone_pixels": 7.4,
+  "racers_in_frame": 8,
+  "min_racers_in_frame": 6,
+  "subject_visible": 1.0,
+  "lead_seconds": 3.817,
+  "notes": []
+ },
+ {
+  "name": "sweep_impact",
+  "mode": "action",
+  "subject": "sweep",
+  "from": 6.77,
+  "to": 7.7,
+  "group_width": 0.3645,
+  "group_width_range": [
+   0.0901,
+   0.5579
+  ],
+  "racer_pixels": 55.0,
+  "phone_pixels": 13.8,
+  "racers_in_frame": 7,
+  "min_racers_in_frame": 6,
+  "subject_visible": 1.0,
+  "lead_seconds": 0.083,
+  "notes": []
+ },
+ {
+  "name": "pair_anticipate",
+  "mode": "obstacle_anticipation",
+  "subject": "pair",
+  "from": 7.7,
+  "to": 9.82,
+  "group_width": 0.2631,
+  "group_width_range": [
+   0.0708,
+   0.5155
+  ],
+  "racer_pixels": 31.3,
+  "phone_pixels": 7.8,
+  "racers_in_frame": 8,
+  "min_racers_in_frame": 4,
+  "subject_visible": 1.0,
+  "lead_seconds": 2.2,
+  "notes": []
+ },
+ {
+  "name": "pair_impact",
+  "mode": "action",
+  "subject": "pair",
+  "from": 9.82,
+  "to": 10.75,
+  "group_width": 0.5852,
+  "group_width_range": [
+   0.5008,
+   0.6795
+  ],
+  "racer_pixels": 31.3,
+  "phone_pixels": 7.8,
+  "racers_in_frame": 7,
+  "min_racers_in_frame": 6,
+  "subject_visible": 1.0,
+  "lead_seconds": 0.083,
+  "notes": [
+   "leading group 59% of width, over the 45% reference"
+  ]
+ },
+ {
+  "name": "last_anticipate",
+  "mode": "obstacle_anticipation",
+  "subject": "last",
+  "from": 10.75,
+  "to": 12.987,
+  "group_width": 0.3046,
+  "group_width_range": [
+   0.2081,
+   0.5084
+  ],
+  "racer_pixels": 27.1,
+  "phone_pixels": 6.8,
+  "racers_in_frame": 8,
+  "min_racers_in_frame": 6,
+  "subject_visible": 1.0,
+  "lead_seconds": 2.317,
+  "notes": []
+ },
+ {
+  "name": "last_impact",
+  "mode": "action",
+  "subject": "last",
+  "from": 12.987,
+  "to": 13.917,
+  "group_width": 0.7015,
+  "group_width_range": [
+   0.5844,
+   0.7427
+  ],
+  "racer_pixels": 31.5,
+  "phone_pixels": 7.9,
+  "racers_in_frame": 8,
+  "min_racers_in_frame": 8,
+  "subject_visible": 1.0,
+  "lead_seconds": 0.083,
+  "notes": [
+   "leading group 70% of width, over the 45% reference"
+  ]
+ },
+ {
+  "name": "carry",
+  "mode": "action",
+  "subject": "",
+  "from": 13.917,
+  "to": 15.5,
+  "group_width": 0.5665,
+  "group_width_range": [
+   0.432,
+   0.6897
+  ],
+  "racer_pixels": 33.2,
+  "phone_pixels": 8.3,
+  "racers_in_frame": 8,
+  "min_racers_in_frame": 7,
+  "subject_visible": 0.0,
+  "lead_seconds": null,
+  "notes": [
+   "leading group 57% of width, over the 45% reference"
+  ]
+ },
+ {
+  "name": "sprint",
+  "mode": "final_sprint",
+  "subject": "",
+  "from": 15.5,
+  "to": 17.2,
+  "group_width": 0.4377,
+  "group_width_range": [
+   0.0508,
+   0.9183
+  ],
+  "racer_pixels": 38.9,
+  "phone_pixels": 9.7,
+  "racers_in_frame": 5,
+  "min_racers_in_frame": 3,
+  "subject_visible": 0.0,
+  "lead_seconds": null,
+  "notes": []
+ },
+ {
+  "name": "payoff",
+  "mode": "winner_payoff",
+  "subject": "",
+  "from": 17.2,
+  "to": 19.0,
+  "group_width": 0.3594,
+  "group_width_range": [
+   0.1905,
+   0.5362
+  ],
+  "racer_pixels": 74.3,
+  "phone_pixels": 18.6,
+  "racers_in_frame": 3,
+  "min_racers_in_frame": 2,
+  "subject_visible": 0.0,
+  "lead_seconds": null,
+  "notes": []
+ }
+]

@@ -1,0 +1,2093 @@
+{
+ "seeds": 24,
+ "first_seed": 1,
+ "concepts": {
+  "cascade": {
+   "geometry": {
+    "title": "A  CASCADE GAUNTLET",
+    "runs": 11,
+    "stages": 11,
+    "splits": 0,
+    "layout_length": 176.52,
+    "drop": 36.6,
+    "footprint": [
+     26.6,
+     48.0
+    ],
+    "plan_area": 1276.6,
+    "mean_slope_deg": 11.97,
+    "clear_width_by_stage": [
+     [
+      "head",
+      5.86
+     ],
+     [
+      "pan1",
+      4.62
+     ],
+     [
+      "corr1",
+      2.84
+     ],
+     [
+      "pan2",
+      4.62
+     ],
+     [
+      "corr2",
+      2.84
+     ],
+     [
+      "pan3",
+      4.62
+     ],
+     [
+      "corr3",
+      2.84
+     ],
+     [
+      "pan4",
+      4.62
+     ],
+     [
+      "corr4",
+      2.84
+     ],
+     [
+      "pan5",
+      4.62
+     ],
+     [
+      "sprint",
+      2.2
+     ]
+    ],
+    "wheels": [
+     {
+      "id": "blades",
+      "half_width": 1.549,
+      "side_gap": 0.775,
+      "blades": 4,
+      "rate": 4.2,
+      "gate": false
+     },
+     {
+      "id": "chicane",
+      "half_width": 1.464,
+      "side_gap": 0.732,
+      "blades": 3,
+      "rate": 2.6,
+      "gate": false
+     }
+    ]
+   },
+   "benchmark": {
+    "course": "cascade",
+    "races": 24,
+    "racers": 192,
+    "finish_rate": 0.9948,
+    "all_finished_rate": 0.9583,
+    "stuck_rate": 0.0,
+    "escape_rate": 0.0052,
+    "slot_correlation": -0.1005,
+    "winner_by_slot": {
+     "0": 3,
+     "1": 2,
+     "2": 2,
+     "3": 4,
+     "4": 5,
+     "5": 7,
+     "7": 1
+    },
+    "route_advantage": {},
+    "mean_lead_changes": 18.583,
+    "mean_overtakes": 144.125,
+    "mean_events": 87.542,
+    "mean_density": 5.682,
+    "mean_longest_gap": 2.036,
+    "worst_longest_gap": 3.233,
+    "mean_dead_zones": 0.833,
+    "mean_first_finish": 12.109,
+    "mean_last_finish": 15.444,
+    "mean_podium_gap": 0.6611,
+    "mean_wall": 46.014,
+    "seeds": [
+     {
+      "seed": 1,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 28,
+      "overtakes": 137,
+      "first_finish": 11.35,
+      "last_finish": 15.083,
+      "podium_gap": 0.983,
+      "winner": 1,
+      "winner_slot": 5,
+      "events": 105,
+      "density": 6.969,
+      "longest_gap": 1.467,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 45.86,
+      "failures": []
+     },
+     {
+      "seed": 2,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 23,
+      "overtakes": 127,
+      "first_finish": 13.05,
+      "last_finish": 15.917,
+      "podium_gap": 0.333,
+      "winner": 2,
+      "winner_slot": 3,
+      "events": 89,
+      "density": 5.597,
+      "longest_gap": 2.517,
+      "dead_zones": 2,
+      "branches": {},
+      "wall": 43.69,
+      "failures": []
+     },
+     {
+      "seed": 3,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 10,
+      "overtakes": 148,
+      "first_finish": 11.833,
+      "last_finish": 15.05,
+      "podium_gap": 0.7,
+      "winner": 1,
+      "winner_slot": 1,
+      "events": 94,
+      "density": 6.253,
+      "longest_gap": 3.233,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 43.36,
+      "failures": []
+     },
+     {
+      "seed": 4,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 23,
+      "overtakes": 116,
+      "first_finish": 12.017,
+      "last_finish": 15.167,
+      "podium_gap": 0.583,
+      "winner": 6,
+      "winner_slot": 0,
+      "events": 94,
+      "density": 6.205,
+      "longest_gap": 1.583,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 16.11,
+      "failures": []
+     },
+     {
+      "seed": 5,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 22,
+      "overtakes": 153,
+      "first_finish": 12.233,
+      "last_finish": 14.833,
+      "podium_gap": 0.35,
+      "winner": 2,
+      "winner_slot": 2,
+      "events": 84,
+      "density": 5.669,
+      "longest_gap": 1.783,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 43.37,
+      "failures": []
+     },
+     {
+      "seed": 6,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 8,
+      "overtakes": 147,
+      "first_finish": 12.1,
+      "last_finish": 15.117,
+      "podium_gap": 0.5,
+      "winner": 0,
+      "winner_slot": 4,
+      "events": 62,
+      "density": 4.106,
+      "longest_gap": 2.05,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 46.02,
+      "failures": []
+     },
+     {
+      "seed": 7,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 17,
+      "overtakes": 104,
+      "first_finish": 11.8,
+      "last_finish": 15.617,
+      "podium_gap": 1.017,
+      "winner": 0,
+      "winner_slot": 3,
+      "events": 79,
+      "density": 5.064,
+      "longest_gap": 2.55,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 45.91,
+      "failures": []
+     },
+     {
+      "seed": 8,
+      "finished": 7,
+      "escaped": 1,
+      "stuck": 0,
+      "lead_changes": 18,
+      "overtakes": 166,
+      "first_finish": 12.65,
+      "last_finish": 15.267,
+      "podium_gap": 0.233,
+      "winner": 0,
+      "winner_slot": 3,
+      "events": 99,
+      "density": 6.492,
+      "longest_gap": 1.833,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 43.06,
+      "failures": [
+       "1 escaped, 0 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 9,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 25,
+      "overtakes": 177,
+      "first_finish": 12.25,
+      "last_finish": 15.933,
+      "podium_gap": 0.85,
+      "winner": 5,
+      "winner_slot": 2,
+      "events": 116,
+      "density": 7.288,
+      "longest_gap": 1.45,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 48.15,
+      "failures": []
+     },
+     {
+      "seed": 10,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 18,
+      "overtakes": 138,
+      "first_finish": 12.05,
+      "last_finish": 15.85,
+      "podium_gap": 1.483,
+      "winner": 3,
+      "winner_slot": 5,
+      "events": 89,
+      "density": 5.621,
+      "longest_gap": 1.55,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 44.02,
+      "failures": []
+     },
+     {
+      "seed": 11,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 10,
+      "overtakes": 167,
+      "first_finish": 11.867,
+      "last_finish": 15.117,
+      "podium_gap": 0.533,
+      "winner": 0,
+      "winner_slot": 7,
+      "events": 85,
+      "density": 5.629,
+      "longest_gap": 1.717,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 45.75,
+      "failures": []
+     },
+     {
+      "seed": 12,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 13,
+      "overtakes": 176,
+      "first_finish": 12.517,
+      "last_finish": 15.2,
+      "podium_gap": 0.1,
+      "winner": 6,
+      "winner_slot": 3,
+      "events": 110,
+      "density": 7.245,
+      "longest_gap": 2.533,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 55.89,
+      "failures": []
+     },
+     {
+      "seed": 13,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 18,
+      "overtakes": 190,
+      "first_finish": 11.783,
+      "last_finish": 15.05,
+      "podium_gap": 1.017,
+      "winner": 6,
+      "winner_slot": 4,
+      "events": 91,
+      "density": 6.053,
+      "longest_gap": 2.117,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 55.0,
+      "failures": []
+     },
+     {
+      "seed": 14,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 23,
+      "overtakes": 133,
+      "first_finish": 11.583,
+      "last_finish": 17.017,
+      "podium_gap": 2.0,
+      "winner": 3,
+      "winner_slot": 5,
+      "events": 88,
+      "density": 5.176,
+      "longest_gap": 2.433,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 26.44,
+      "failures": []
+     },
+     {
+      "seed": 15,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 18,
+      "overtakes": 130,
+      "first_finish": 12.45,
+      "last_finish": 15.983,
+      "podium_gap": 0.267,
+      "winner": 2,
+      "winner_slot": 4,
+      "events": 92,
+      "density": 5.762,
+      "longest_gap": 3.05,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 53.48,
+      "failures": []
+     },
+     {
+      "seed": 16,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 36,
+      "overtakes": 181,
+      "first_finish": 12.367,
+      "last_finish": 15.0,
+      "podium_gap": 0.117,
+      "winner": 7,
+      "winner_slot": 0,
+      "events": 106,
+      "density": 7.075,
+      "longest_gap": 0.95,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 56.0,
+      "failures": []
+     },
+     {
+      "seed": 17,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 18,
+      "overtakes": 155,
+      "first_finish": 12.3,
+      "last_finish": 15.15,
+      "podium_gap": 0.367,
+      "winner": 0,
+      "winner_slot": 5,
+      "events": 94,
+      "density": 6.211,
+      "longest_gap": 1.75,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 50.49,
+      "failures": []
+     },
+     {
+      "seed": 18,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 17,
+      "overtakes": 118,
+      "first_finish": 12.017,
+      "last_finish": 15.883,
+      "podium_gap": 0.367,
+      "winner": 2,
+      "winner_slot": 5,
+      "events": 63,
+      "density": 3.971,
+      "longest_gap": 2.15,
+      "dead_zones": 2,
+      "branches": {},
+      "wall": 53.72,
+      "failures": []
+     },
+     {
+      "seed": 19,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 16,
+      "overtakes": 118,
+      "first_finish": 11.2,
+      "last_finish": 15.117,
+      "podium_gap": 1.333,
+      "winner": 5,
+      "winner_slot": 4,
+      "events": 63,
+      "density": 4.172,
+      "longest_gap": 2.083,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 53.65,
+      "failures": []
+     },
+     {
+      "seed": 20,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 14,
+      "overtakes": 144,
+      "first_finish": 13.0,
+      "last_finish": 15.167,
+      "podium_gap": 0.133,
+      "winner": 3,
+      "winner_slot": 5,
+      "events": 84,
+      "density": 5.545,
+      "longest_gap": 2.1,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 50.65,
+      "failures": []
+     },
+     {
+      "seed": 21,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 18,
+      "overtakes": 128,
+      "first_finish": 12.6,
+      "last_finish": 15.983,
+      "podium_gap": 0.05,
+      "winner": 1,
+      "winner_slot": 4,
+      "events": 80,
+      "density": 5.01,
+      "longest_gap": 2.317,
+      "dead_zones": 2,
+      "branches": {},
+      "wall": 53.73,
+      "failures": []
+     },
+     {
+      "seed": 22,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 22,
+      "overtakes": 107,
+      "first_finish": 12.783,
+      "last_finish": 15.217,
+      "podium_gap": 0.483,
+      "winner": 7,
+      "winner_slot": 1,
+      "events": 86,
+      "density": 5.658,
+      "longest_gap": 1.55,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 51.65,
+      "failures": []
+     },
+     {
+      "seed": 23,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 15,
+      "overtakes": 150,
+      "first_finish": 11.3,
+      "last_finish": 15.05,
+      "podium_gap": 1.117,
+      "winner": 4,
+      "winner_slot": 0,
+      "events": 78,
+      "density": 5.188,
+      "longest_gap": 1.333,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 39.71,
+      "failures": []
+     },
+     {
+      "seed": 24,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 16,
+      "overtakes": 149,
+      "first_finish": 11.517,
+      "last_finish": 15.883,
+      "podium_gap": 0.95,
+      "winner": 5,
+      "winner_slot": 5,
+      "events": 70,
+      "density": 4.412,
+      "longest_gap": 2.767,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 38.62,
+      "failures": []
+     }
+    ]
+   }
+  },
+  "braid": {
+   "geometry": {
+    "title": "B  BRAID",
+    "runs": 13,
+    "stages": 11,
+    "splits": 2,
+    "layout_length": 176.52,
+    "drop": 36.6,
+    "footprint": [
+     26.6,
+     48.0
+    ],
+    "plan_area": 1276.6,
+    "mean_slope_deg": 11.97,
+    "clear_width_by_stage": [
+     [
+      "head",
+      5.86
+     ],
+     [
+      "pan1",
+      5.05
+     ],
+     [
+      "split1",
+      1.95
+     ],
+     [
+      "pan2",
+      5.05
+     ],
+     [
+      "corr2",
+      2.84
+     ],
+     [
+      "pan3",
+      5.05
+     ],
+     [
+      "split2",
+      1.95
+     ],
+     [
+      "pan4",
+      5.05
+     ],
+     [
+      "corr4",
+      2.84
+     ],
+     [
+      "pan5",
+      4.62
+     ],
+     [
+      "sprint",
+      2.2
+     ]
+    ],
+    "wheels": [
+     {
+      "id": "gate1",
+      "half_width": 0.978,
+      "side_gap": 0.47,
+      "blades": 3,
+      "rate": 5.0,
+      "gate": true
+     },
+     {
+      "id": "gate2",
+      "half_width": 0.979,
+      "side_gap": 0.47,
+      "blades": 3,
+      "rate": 4.4,
+      "gate": true
+     }
+    ]
+   },
+   "benchmark": {
+    "course": "braid",
+    "races": 24,
+    "racers": 192,
+    "finish_rate": 0.4688,
+    "all_finished_rate": 0.0,
+    "stuck_rate": 0.5312,
+    "escape_rate": 0.0,
+    "slot_correlation": -0.0443,
+    "winner_by_slot": {
+     "0": 1,
+     "1": 3,
+     "2": 3,
+     "3": 5,
+     "4": 4,
+     "5": 3,
+     "6": 3,
+     "7": 1
+    },
+    "route_advantage": {
+     "split1": {
+      "s1_left": {
+       "took": 92,
+       "mean_rank": 5.533
+      },
+      "s1_right": {
+       "took": 51,
+       "mean_rank": 4.118
+      },
+      "spread": 1.415,
+      "share": 0.643
+     },
+     "split2": {
+      "s2_left": {
+       "took": 69,
+       "mean_rank": 3.014
+      },
+      "s2_right": {
+       "took": 27,
+       "mean_rank": 3.259
+      },
+      "spread": 0.245,
+      "share": 0.719
+     }
+    },
+    "mean_lead_changes": 16.625,
+    "mean_overtakes": 107.792,
+    "mean_events": 71.5,
+    "mean_density": 4.9,
+    "mean_longest_gap": 2.835,
+    "worst_longest_gap": 4.9,
+    "mean_dead_zones": 1.708,
+    "mean_first_finish": 11.71,
+    "mean_last_finish": 14.192,
+    "mean_podium_gap": 1.1508,
+    "mean_wall": 38.821,
+    "seeds": [
+     {
+      "seed": 1,
+      "finished": 6,
+      "escaped": 0,
+      "stuck": 2,
+      "lead_changes": 9,
+      "overtakes": 112,
+      "first_finish": 10.3,
+      "last_finish": 14.3,
+      "podium_gap": 0.317,
+      "winner": 6,
+      "winner_slot": 3,
+      "events": 61,
+      "density": 4.271,
+      "longest_gap": 2.55,
+      "dead_zones": 3,
+      "branches": {
+       "split1": {
+        "s1_left": 4,
+        "s1_right": 2
+       },
+       "split2": {
+        "s2_left": 6,
+        "s2_right": 0
+       }
+      },
+      "wall": 42.56,
+      "failures": [
+       "0 escaped, 2 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 2,
+      "finished": 7,
+      "escaped": 0,
+      "stuck": 1,
+      "lead_changes": 35,
+      "overtakes": 147,
+      "first_finish": 11.233,
+      "last_finish": 14.9,
+      "podium_gap": 0.317,
+      "winner": 5,
+      "winner_slot": 2,
+      "events": 99,
+      "density": 6.652,
+      "longest_gap": 2.017,
+      "dead_zones": 1,
+      "branches": {
+       "split1": {
+        "s1_left": 6,
+        "s1_right": 2
+       },
+       "split2": {
+        "s2_left": 6,
+        "s2_right": 1
+       }
+      },
+      "wall": 34.8,
+      "failures": [
+       "0 escaped, 1 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 3,
+      "finished": 2,
+      "escaped": 0,
+      "stuck": 6,
+      "lead_changes": 10,
+      "overtakes": 102,
+      "first_finish": 12.05,
+      "last_finish": 12.317,
+      "podium_gap": 0.267,
+      "winner": 3,
+      "winner_slot": 2,
+      "events": 76,
+      "density": 6.179,
+      "longest_gap": 3.983,
+      "dead_zones": 2,
+      "branches": {
+       "split1": {
+        "s1_left": 4,
+        "s1_right": 2
+       },
+       "split2": {
+        "s2_left": 2,
+        "s2_right": 2
+       }
+      },
+      "wall": 53.45,
+      "failures": [
+       "0 escaped, 6 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 4,
+      "finished": 2,
+      "escaped": 0,
+      "stuck": 6,
+      "lead_changes": 12,
+      "overtakes": 75,
+      "first_finish": 10.883,
+      "last_finish": 18.067,
+      "podium_gap": 7.183,
+      "winner": 0,
+      "winner_slot": 3,
+      "events": 67,
+      "density": 3.712,
+      "longest_gap": 4.9,
+      "dead_zones": 3,
+      "branches": {
+       "split1": {
+        "s1_left": 3,
+        "s1_right": 1
+       },
+       "split2": {
+        "s2_left": 2,
+        "s2_right": 1
+       }
+      },
+      "wall": 49.01,
+      "failures": [
+       "0 escaped, 6 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 5,
+      "finished": 4,
+      "escaped": 0,
+      "stuck": 4,
+      "lead_changes": 19,
+      "overtakes": 128,
+      "first_finish": 10.7,
+      "last_finish": 13.583,
+      "podium_gap": 2.167,
+      "winner": 6,
+      "winner_slot": 4,
+      "events": 72,
+      "density": 5.307,
+      "longest_gap": 1.717,
+      "dead_zones": 2,
+      "branches": {
+       "split1": {
+        "s1_left": 3,
+        "s1_right": 4
+       },
+       "split2": {
+        "s2_left": 2,
+        "s2_right": 2
+       }
+      },
+      "wall": 48.04,
+      "failures": [
+       "0 escaped, 4 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 6,
+      "finished": 5,
+      "escaped": 0,
+      "stuck": 3,
+      "lead_changes": 9,
+      "overtakes": 102,
+      "first_finish": 11.2,
+      "last_finish": 12.9,
+      "podium_gap": 0.867,
+      "winner": 0,
+      "winner_slot": 4,
+      "events": 69,
+      "density": 5.356,
+      "longest_gap": 2.4,
+      "dead_zones": 2,
+      "branches": {
+       "split1": {
+        "s1_left": 4,
+        "s1_right": 3
+       },
+       "split2": {
+        "s2_left": 4,
+        "s2_right": 1
+       }
+      },
+      "wall": 42.47,
+      "failures": [
+       "0 escaped, 3 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 7,
+      "finished": 4,
+      "escaped": 0,
+      "stuck": 4,
+      "lead_changes": 29,
+      "overtakes": 120,
+      "first_finish": 10.85,
+      "last_finish": 15.933,
+      "podium_gap": 0.633,
+      "winner": 1,
+      "winner_slot": 1,
+      "events": 87,
+      "density": 5.466,
+      "longest_gap": 4.133,
+      "dead_zones": 1,
+      "branches": {
+       "split1": {
+        "s1_left": 4,
+        "s1_right": 2
+       },
+       "split2": {
+        "s2_left": 4,
+        "s2_right": 1
+       }
+      },
+      "wall": 47.82,
+      "failures": [
+       "0 escaped, 4 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 8,
+      "finished": 4,
+      "escaped": 0,
+      "stuck": 4,
+      "lead_changes": 16,
+      "overtakes": 115,
+      "first_finish": 12.467,
+      "last_finish": 14.333,
+      "podium_gap": 0.383,
+      "winner": 0,
+      "winner_slot": 3,
+      "events": 62,
+      "density": 4.331,
+      "longest_gap": 3.233,
+      "dead_zones": 2,
+      "branches": {
+       "split1": {
+        "s1_left": 4,
+        "s1_right": 2
+       },
+       "split2": {
+        "s2_left": 2,
+        "s2_right": 2
+       }
+      },
+      "wall": 50.75,
+      "failures": [
+       "0 escaped, 4 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 9,
+      "finished": 3,
+      "escaped": 0,
+      "stuck": 5,
+      "lead_changes": 15,
+      "overtakes": 127,
+      "first_finish": 13.017,
+      "last_finish": 15.25,
+      "podium_gap": 0.983,
+      "winner": 4,
+      "winner_slot": 5,
+      "events": 80,
+      "density": 5.252,
+      "longest_gap": 2.4,
+      "dead_zones": 2,
+      "branches": {
+       "split1": {
+        "s1_left": 5,
+        "s1_right": 1
+       },
+       "split2": {
+        "s2_left": 1,
+        "s2_right": 2
+       }
+      },
+      "wall": 46.32,
+      "failures": [
+       "0 escaped, 5 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 10,
+      "finished": 2,
+      "escaped": 0,
+      "stuck": 6,
+      "lead_changes": 16,
+      "overtakes": 88,
+      "first_finish": 14.183,
+      "last_finish": 15.467,
+      "podium_gap": 1.283,
+      "winner": 5,
+      "winner_slot": 2,
+      "events": 58,
+      "density": 3.754,
+      "longest_gap": 3.317,
+      "dead_zones": 1,
+      "branches": {
+       "split1": {
+        "s1_left": 4,
+        "s1_right": 2
+       },
+       "split2": {
+        "s2_left": 1,
+        "s2_right": 1
+       }
+      },
+      "wall": 51.18,
+      "failures": [
+       "0 escaped, 6 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 11,
+      "finished": 4,
+      "escaped": 0,
+      "stuck": 4,
+      "lead_changes": 13,
+      "overtakes": 114,
+      "first_finish": 10.7,
+      "last_finish": 14.683,
+      "podium_gap": 1.65,
+      "winner": 3,
+      "winner_slot": 3,
+      "events": 71,
+      "density": 4.841,
+      "longest_gap": 2.267,
+      "dead_zones": 3,
+      "branches": {
+       "split1": {
+        "s1_left": 4,
+        "s1_right": 3
+       },
+       "split2": {
+        "s2_left": 3,
+        "s2_right": 1
+       }
+      },
+      "wall": 45.41,
+      "failures": [
+       "0 escaped, 4 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 12,
+      "finished": 5,
+      "escaped": 0,
+      "stuck": 3,
+      "lead_changes": 12,
+      "overtakes": 112,
+      "first_finish": 12.233,
+      "last_finish": 14.05,
+      "podium_gap": 0.75,
+      "winner": 1,
+      "winner_slot": 6,
+      "events": 83,
+      "density": 5.914,
+      "longest_gap": 2.917,
+      "dead_zones": 2,
+      "branches": {
+       "split1": {
+        "s1_left": 5,
+        "s1_right": 1
+       },
+       "split2": {
+        "s2_left": 4,
+        "s2_right": 1
+       }
+      },
+      "wall": 43.05,
+      "failures": [
+       "0 escaped, 3 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 13,
+      "finished": 3,
+      "escaped": 0,
+      "stuck": 5,
+      "lead_changes": 22,
+      "overtakes": 133,
+      "first_finish": 11.833,
+      "last_finish": 13.733,
+      "podium_gap": 1.2,
+      "winner": 3,
+      "winner_slot": 3,
+      "events": 83,
+      "density": 6.051,
+      "longest_gap": 2.833,
+      "dead_zones": 1,
+      "branches": {
+       "split1": {
+        "s1_left": 3,
+        "s1_right": 3
+       },
+       "split2": {
+        "s2_left": 2,
+        "s2_right": 1
+       }
+      },
+      "wall": 39.72,
+      "failures": [
+       "0 escaped, 5 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 14,
+      "finished": 5,
+      "escaped": 0,
+      "stuck": 3,
+      "lead_changes": 22,
+      "overtakes": 118,
+      "first_finish": 11.983,
+      "last_finish": 14.533,
+      "podium_gap": 1.317,
+      "winner": 5,
+      "winner_slot": 7,
+      "events": 71,
+      "density": 4.891,
+      "longest_gap": 2.367,
+      "dead_zones": 2,
+      "branches": {
+       "split1": {
+        "s1_left": 3,
+        "s1_right": 4
+       },
+       "split2": {
+        "s2_left": 2,
+        "s2_right": 3
+       }
+      },
+      "wall": 37.59,
+      "failures": [
+       "0 escaped, 3 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 15,
+      "finished": 4,
+      "escaped": 0,
+      "stuck": 4,
+      "lead_changes": 14,
+      "overtakes": 89,
+      "first_finish": 11.9,
+      "last_finish": 13.383,
+      "podium_gap": 1.3,
+      "winner": 6,
+      "winner_slot": 5,
+      "events": 74,
+      "density": 5.536,
+      "longest_gap": 2.517,
+      "dead_zones": 2,
+      "branches": {
+       "split1": {
+        "s1_left": 4,
+        "s1_right": 1
+       },
+       "split2": {
+        "s2_left": 4,
+        "s2_right": 0
+       }
+      },
+      "wall": 36.85,
+      "failures": [
+       "0 escaped, 4 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 16,
+      "finished": 4,
+      "escaped": 0,
+      "stuck": 4,
+      "lead_changes": 16,
+      "overtakes": 112,
+      "first_finish": 10.817,
+      "last_finish": 14.667,
+      "podium_gap": 1.05,
+      "winner": 5,
+      "winner_slot": 1,
+      "events": 47,
+      "density": 3.208,
+      "longest_gap": 2.483,
+      "dead_zones": 3,
+      "branches": {
+       "split1": {
+        "s1_left": 4,
+        "s1_right": 2
+       },
+       "split2": {
+        "s2_left": 3,
+        "s2_right": 1
+       }
+      },
+      "wall": 35.35,
+      "failures": [
+       "0 escaped, 4 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 17,
+      "finished": 4,
+      "escaped": 0,
+      "stuck": 4,
+      "lead_changes": 17,
+      "overtakes": 115,
+      "first_finish": 12.383,
+      "last_finish": 14.85,
+      "podium_gap": 1.133,
+      "winner": 0,
+      "winner_slot": 5,
+      "events": 83,
+      "density": 5.596,
+      "longest_gap": 2.883,
+      "dead_zones": 2,
+      "branches": {
+       "split1": {
+        "s1_left": 6,
+        "s1_right": 2
+       },
+       "split2": {
+        "s2_left": 2,
+        "s2_right": 2
+       }
+      },
+      "wall": 35.93,
+      "failures": [
+       "0 escaped, 4 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 18,
+      "finished": 0,
+      "escaped": 0,
+      "stuck": 8,
+      "lead_changes": 14,
+      "overtakes": 72,
+      "first_finish": null,
+      "last_finish": null,
+      "podium_gap": null,
+      "winner": null,
+      "winner_slot": null,
+      "events": 94,
+      "density": 2.351,
+      "longest_gap": 3.633,
+      "dead_zones": 1,
+      "branches": {
+       "split1": {
+        "s1_left": 3,
+        "s1_right": 1
+       },
+       "split2": {
+        "s2_left": 0,
+        "s2_right": 0
+       }
+      },
+      "wall": 36.26,
+      "failures": [
+       "0 escaped, 8 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 19,
+      "finished": 1,
+      "escaped": 0,
+      "stuck": 7,
+      "lead_changes": 16,
+      "overtakes": 100,
+      "first_finish": 14.2,
+      "last_finish": 14.2,
+      "podium_gap": null,
+      "winner": 5,
+      "winner_slot": 4,
+      "events": 61,
+      "density": 4.301,
+      "longest_gap": 2.867,
+      "dead_zones": 1,
+      "branches": {
+       "split1": {
+        "s1_left": 1,
+        "s1_right": 2
+       },
+       "split2": {
+        "s2_left": 1,
+        "s2_right": 1
+       }
+      },
+      "wall": 35.18,
+      "failures": [
+       "0 escaped, 7 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 20,
+      "finished": 5,
+      "escaped": 0,
+      "stuck": 3,
+      "lead_changes": 17,
+      "overtakes": 120,
+      "first_finish": 10.267,
+      "last_finish": 12.117,
+      "podium_gap": 0.283,
+      "winner": 5,
+      "winner_slot": 6,
+      "events": 72,
+      "density": 5.95,
+      "longest_gap": 2.517,
+      "dead_zones": 1,
+      "branches": {
+       "split1": {
+        "s1_left": 3,
+        "s1_right": 3
+       },
+       "split2": {
+        "s2_left": 5,
+        "s2_right": 0
+       }
+      },
+      "wall": 31.62,
+      "failures": [
+       "0 escaped, 3 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 21,
+      "finished": 4,
+      "escaped": 0,
+      "stuck": 4,
+      "lead_changes": 12,
+      "overtakes": 86,
+      "first_finish": 10.65,
+      "last_finish": 14.05,
+      "podium_gap": 1.3,
+      "winner": 5,
+      "winner_slot": 0,
+      "events": 53,
+      "density": 3.777,
+      "longest_gap": 2.033,
+      "dead_zones": 1,
+      "branches": {
+       "split1": {
+        "s1_left": 2,
+        "s1_right": 3
+       },
+       "split2": {
+        "s2_left": 1,
+        "s2_right": 3
+       }
+      },
+      "wall": 31.92,
+      "failures": [
+       "0 escaped, 4 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 22,
+      "finished": 5,
+      "escaped": 0,
+      "stuck": 3,
+      "lead_changes": 27,
+      "overtakes": 106,
+      "first_finish": 10.483,
+      "last_finish": 12.45,
+      "podium_gap": 0.033,
+      "winner": 5,
+      "winner_slot": 4,
+      "events": 75,
+      "density": 6.032,
+      "longest_gap": 1.5,
+      "dead_zones": 0,
+      "branches": {
+       "split1": {
+        "s1_left": 3,
+        "s1_right": 3
+       },
+       "split2": {
+        "s2_left": 5,
+        "s2_right": 0
+       }
+      },
+      "wall": 30.4,
+      "failures": [
+       "0 escaped, 3 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 23,
+      "finished": 4,
+      "escaped": 0,
+      "stuck": 4,
+      "lead_changes": 17,
+      "overtakes": 104,
+      "first_finish": 12.35,
+      "last_finish": 13.3,
+      "podium_gap": 0.717,
+      "winner": 0,
+      "winner_slot": 6,
+      "events": 69,
+      "density": 5.194,
+      "longest_gap": 2.967,
+      "dead_zones": 1,
+      "branches": {
+       "split1": {
+        "s1_left": 4,
+        "s1_right": 1
+       },
+       "split2": {
+        "s2_left": 3,
+        "s2_right": 1
+       }
+      },
+      "wall": 12.4,
+      "failures": [
+       "0 escaped, 4 still in the machine after 40.0 s"
+      ]
+     },
+     {
+      "seed": 24,
+      "finished": 3,
+      "escaped": 0,
+      "stuck": 5,
+      "lead_changes": 10,
+      "overtakes": 90,
+      "first_finish": 12.65,
+      "last_finish": 13.35,
+      "podium_gap": 0.183,
+      "winner": 2,
+      "winner_slot": 1,
+      "events": 49,
+      "density": 3.675,
+      "longest_gap": 3.6,
+      "dead_zones": 2,
+      "branches": {
+       "split1": {
+        "s1_left": 6,
+        "s1_right": 1
+       },
+       "split2": {
+        "s2_left": 4,
+        "s2_right": 0
+       }
+      },
+      "wall": 13.63,
+      "failures": [
+       "0 escaped, 5 still in the machine after 40.0 s"
+      ]
+     }
+    ]
+   }
+  },
+  "mechanism": {
+   "geometry": {
+    "title": "C  MECHANISM LINE",
+    "runs": 11,
+    "stages": 11,
+    "splits": 0,
+    "layout_length": 176.52,
+    "drop": 36.6,
+    "footprint": [
+     26.6,
+     48.0
+    ],
+    "plan_area": 1276.6,
+    "mean_slope_deg": 11.97,
+    "clear_width_by_stage": [
+     [
+      "head",
+      5.86
+     ],
+     [
+      "pan1",
+      4.62
+     ],
+     [
+      "corr1",
+      2.84
+     ],
+     [
+      "pan2",
+      4.62
+     ],
+     [
+      "corr2",
+      2.84
+     ],
+     [
+      "pan3",
+      4.62
+     ],
+     [
+      "corr3",
+      2.84
+     ],
+     [
+      "pan4",
+      4.62
+     ],
+     [
+      "corr4",
+      2.84
+     ],
+     [
+      "pan5",
+      4.62
+     ],
+     [
+      "sprint",
+      2.2
+     ]
+    ],
+    "wheels": [
+     {
+      "id": "drum",
+      "half_width": 1.798,
+      "side_gap": 0.899,
+      "blades": 4,
+      "rate": 6.2,
+      "gate": false
+     },
+     {
+      "id": "sweep",
+      "half_width": 1.423,
+      "side_gap": 0.071,
+      "blades": 4,
+      "rate": 2.2,
+      "gate": true
+     },
+     {
+      "id": "pair",
+      "half_width": 1.441,
+      "side_gap": 0.72,
+      "blades": 4,
+      "rate": 4.8,
+      "gate": false
+     },
+     {
+      "id": "last",
+      "half_width": 1.431,
+      "side_gap": 0.716,
+      "blades": 4,
+      "rate": 3.4,
+      "gate": false
+     }
+    ]
+   },
+   "benchmark": {
+    "course": "mechanism",
+    "races": 24,
+    "racers": 192,
+    "finish_rate": 1.0,
+    "all_finished_rate": 1.0,
+    "stuck_rate": 0.0,
+    "escape_rate": 0.0,
+    "slot_correlation": 0.0179,
+    "winner_by_slot": {
+     "1": 2,
+     "2": 3,
+     "3": 7,
+     "4": 3,
+     "5": 3,
+     "6": 4,
+     "7": 2
+    },
+    "route_advantage": {},
+    "mean_lead_changes": 20.042,
+    "mean_overtakes": 163.75,
+    "mean_events": 114.0,
+    "mean_density": 5.952,
+    "mean_longest_gap": 1.593,
+    "worst_longest_gap": 2.0,
+    "mean_dead_zones": 0.458,
+    "mean_first_finish": 15.925,
+    "mean_last_finish": 19.22,
+    "mean_podium_gap": 0.6236,
+    "mean_wall": 49.382,
+    "seeds": [
+     {
+      "seed": 1,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 32,
+      "overtakes": 203,
+      "first_finish": 17.2,
+      "last_finish": 19.917,
+      "podium_gap": 0.217,
+      "winner": 1,
+      "winner_slot": 5,
+      "events": 140,
+      "density": 7.035,
+      "longest_gap": 1.9,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 40.43,
+      "failures": []
+     },
+     {
+      "seed": 2,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 34,
+      "overtakes": 158,
+      "first_finish": 15.483,
+      "last_finish": 18.817,
+      "podium_gap": 0.5,
+      "winner": 2,
+      "winner_slot": 3,
+      "events": 121,
+      "density": 6.436,
+      "longest_gap": 1.167,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 39.8,
+      "failures": []
+     },
+     {
+      "seed": 3,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 17,
+      "overtakes": 139,
+      "first_finish": 15.4,
+      "last_finish": 18.017,
+      "podium_gap": 0.383,
+      "winner": 6,
+      "winner_slot": 6,
+      "events": 125,
+      "density": 6.944,
+      "longest_gap": 1.65,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 40.2,
+      "failures": []
+     },
+     {
+      "seed": 4,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 25,
+      "overtakes": 170,
+      "first_finish": 16.383,
+      "last_finish": 18.833,
+      "podium_gap": 0.4,
+      "winner": 3,
+      "winner_slot": 2,
+      "events": 141,
+      "density": 7.493,
+      "longest_gap": 1.517,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 40.23,
+      "failures": []
+     },
+     {
+      "seed": 5,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 28,
+      "overtakes": 157,
+      "first_finish": 15.933,
+      "last_finish": 19.283,
+      "podium_gap": 0.683,
+      "winner": 5,
+      "winner_slot": 3,
+      "events": 99,
+      "density": 5.138,
+      "longest_gap": 1.383,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 39.88,
+      "failures": []
+     },
+     {
+      "seed": 6,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 17,
+      "overtakes": 163,
+      "first_finish": 15.367,
+      "last_finish": 19.7,
+      "podium_gap": 0.617,
+      "winner": 5,
+      "winner_slot": 5,
+      "events": 101,
+      "density": 5.131,
+      "longest_gap": 1.483,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 39.88,
+      "failures": []
+     },
+     {
+      "seed": 7,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 19,
+      "overtakes": 164,
+      "first_finish": 15.5,
+      "last_finish": 19.767,
+      "podium_gap": 1.017,
+      "winner": 0,
+      "winner_slot": 3,
+      "events": 118,
+      "density": 5.975,
+      "longest_gap": 1.517,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 40.75,
+      "failures": []
+     },
+     {
+      "seed": 8,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 28,
+      "overtakes": 184,
+      "first_finish": 15.533,
+      "last_finish": 18.683,
+      "podium_gap": 0.683,
+      "winner": 1,
+      "winner_slot": 1,
+      "events": 100,
+      "density": 5.357,
+      "longest_gap": 2.0,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 39.82,
+      "failures": []
+     },
+     {
+      "seed": 9,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 16,
+      "overtakes": 169,
+      "first_finish": 15.95,
+      "last_finish": 19.2,
+      "podium_gap": 0.933,
+      "winner": 0,
+      "winner_slot": 3,
+      "events": 115,
+      "density": 5.995,
+      "longest_gap": 1.283,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 39.93,
+      "failures": []
+     },
+     {
+      "seed": 10,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 14,
+      "overtakes": 159,
+      "first_finish": 16.133,
+      "last_finish": 19.7,
+      "podium_gap": 0.833,
+      "winner": 2,
+      "winner_slot": 3,
+      "events": 113,
+      "density": 5.741,
+      "longest_gap": 1.867,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 40.37,
+      "failures": []
+     },
+     {
+      "seed": 11,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 14,
+      "overtakes": 162,
+      "first_finish": 15.333,
+      "last_finish": 19.417,
+      "podium_gap": 1.633,
+      "winner": 5,
+      "winner_slot": 6,
+      "events": 124,
+      "density": 6.392,
+      "longest_gap": 1.633,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 39.71,
+      "failures": []
+     },
+     {
+      "seed": 12,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 12,
+      "overtakes": 178,
+      "first_finish": 16.333,
+      "last_finish": 18.683,
+      "podium_gap": 0.483,
+      "winner": 7,
+      "winner_slot": 5,
+      "events": 121,
+      "density": 6.482,
+      "longest_gap": 1.683,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 62.51,
+      "failures": []
+     },
+     {
+      "seed": 13,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 28,
+      "overtakes": 241,
+      "first_finish": 16.533,
+      "last_finish": 17.867,
+      "podium_gap": 0.15,
+      "winner": 1,
+      "winner_slot": 7,
+      "events": 156,
+      "density": 8.739,
+      "longest_gap": 1.633,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 64.8,
+      "failures": []
+     },
+     {
+      "seed": 14,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 25,
+      "overtakes": 172,
+      "first_finish": 16.183,
+      "last_finish": 18.85,
+      "podium_gap": 0.683,
+      "winner": 7,
+      "winner_slot": 2,
+      "events": 111,
+      "density": 5.894,
+      "longest_gap": 1.483,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 64.86,
+      "failures": []
+     },
+     {
+      "seed": 15,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 15,
+      "overtakes": 126,
+      "first_finish": 15.633,
+      "last_finish": 19.267,
+      "podium_gap": 0.55,
+      "winner": 4,
+      "winner_slot": 6,
+      "events": 109,
+      "density": 5.662,
+      "longest_gap": 1.55,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 64.97,
+      "failures": []
+     },
+     {
+      "seed": 16,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 14,
+      "overtakes": 153,
+      "first_finish": 17.45,
+      "last_finish": 19.683,
+      "podium_gap": 0.117,
+      "winner": 1,
+      "winner_slot": 3,
+      "events": 102,
+      "density": 5.186,
+      "longest_gap": 1.25,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 64.51,
+      "failures": []
+     },
+     {
+      "seed": 17,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 18,
+      "overtakes": 154,
+      "first_finish": 15.067,
+      "last_finish": 19.033,
+      "podium_gap": 1.533,
+      "winner": 4,
+      "winner_slot": 4,
+      "events": 98,
+      "density": 5.153,
+      "longest_gap": 1.533,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 63.91,
+      "failures": []
+     },
+     {
+      "seed": 18,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 14,
+      "overtakes": 173,
+      "first_finish": 14.567,
+      "last_finish": 19.317,
+      "podium_gap": 1.567,
+      "winner": 1,
+      "winner_slot": 4,
+      "events": 93,
+      "density": 4.819,
+      "longest_gap": 1.567,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 64.0,
+      "failures": []
+     },
+     {
+      "seed": 19,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 24,
+      "overtakes": 147,
+      "first_finish": 15.9,
+      "last_finish": 20.467,
+      "podium_gap": 0.367,
+      "winner": 0,
+      "winner_slot": 7,
+      "events": 105,
+      "density": 5.134,
+      "longest_gap": 1.7,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 64.57,
+      "failures": []
+     },
+     {
+      "seed": 20,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 16,
+      "overtakes": 174,
+      "first_finish": 15.833,
+      "last_finish": 19.75,
+      "podium_gap": 0.55,
+      "winner": 5,
+      "winner_slot": 6,
+      "events": 122,
+      "density": 6.182,
+      "longest_gap": 1.883,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 65.62,
+      "failures": []
+     },
+     {
+      "seed": 21,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 14,
+      "overtakes": 116,
+      "first_finish": 16.2,
+      "last_finish": 19.283,
+      "podium_gap": 0.183,
+      "winner": 6,
+      "winner_slot": 3,
+      "events": 88,
+      "density": 4.567,
+      "longest_gap": 1.917,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 22.15,
+      "failures": []
+     },
+     {
+      "seed": 22,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 21,
+      "overtakes": 141,
+      "first_finish": 15.917,
+      "last_finish": 19.8,
+      "podium_gap": 0.55,
+      "winner": 5,
+      "winner_slot": 4,
+      "events": 119,
+      "density": 6.015,
+      "longest_gap": 1.55,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 66.44,
+      "failures": []
+     },
+     {
+      "seed": 23,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 22,
+      "overtakes": 168,
+      "first_finish": 16.6,
+      "last_finish": 18.683,
+      "podium_gap": 0.267,
+      "winner": 1,
+      "winner_slot": 1,
+      "events": 122,
+      "density": 6.536,
+      "longest_gap": 1.767,
+      "dead_zones": 1,
+      "branches": {},
+      "wall": 55.12,
+      "failures": []
+     },
+     {
+      "seed": 24,
+      "finished": 8,
+      "escaped": 0,
+      "stuck": 0,
+      "lead_changes": 14,
+      "overtakes": 159,
+      "first_finish": 15.767,
+      "last_finish": 19.267,
+      "podium_gap": 0.067,
+      "winner": 6,
+      "winner_slot": 2,
+      "events": 93,
+      "density": 4.831,
+      "longest_gap": 1.317,
+      "dead_zones": 0,
+      "branches": {},
+      "wall": 20.7,
+      "failures": []
+     }
+    ]
+   }
+  }
+ }
+}
