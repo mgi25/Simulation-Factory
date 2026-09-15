@@ -1,0 +1,192 @@
+{
+ "camera": "A",
+ "duration": 19.133,
+ "shots": 4,
+ "hard_cuts": 3,
+ "mean_shot": 4.783,
+ "shortest_shot": 2.217,
+ "longest_shot": 6.783,
+ "two_longest_share": 0.6925,
+ "continuous_share": 0.8841,
+ "direction_flips": 0,
+ "worst_reacquire": 0.2855,
+ "mean_reacquire": 0.1894,
+ "worst_scale_jump": 1.185,
+ "worst_angle_change": 10.3,
+ "racer_pixels": [
+  77.4,
+  95.4
+ ],
+ "phone_pixels": [
+  19.3,
+  23.8
+ ],
+ "min_lens_clearance": 5.645,
+ "max_speed": 45.63,
+ "max_accel": 352.2,
+ "max_turn": 110.7,
+ "max_turn_accel": 598.5,
+ "shot_rows": [
+  {
+   "name": "release",
+   "rig": "hook_release",
+   "from": 0.017,
+   "to": 2.233,
+   "duration": 2.217,
+   "cut_on": "release",
+   "racer_pixels": 93.4,
+   "racer_pixels_min": 78.6,
+   "phone_pixels": 23.3,
+   "group_width": 0.3141,
+   "pack_visible": 0.88,
+   "pack_on_screen": 0.959,
+   "min_on_screen": 2,
+   "lens_clearance": 6.578,
+   "max_speed": 45.63,
+   "max_accel": 221.2,
+   "max_turn": 110.7,
+   "max_turn_accel": 598.5,
+   "notes": []
+  },
+  {
+   "name": "upper",
+   "rig": "chase_rear_3q",
+   "from": 2.233,
+   "to": 9.017,
+   "duration": 6.783,
+   "cut_on": "drum first contact",
+   "racer_pixels": 95.4,
+   "racer_pixels_min": 72.4,
+   "phone_pixels": 23.8,
+   "group_width": 0.2974,
+   "pack_visible": 0.634,
+   "pack_on_screen": 0.8,
+   "min_on_screen": 0,
+   "lens_clearance": 6.032,
+   "max_speed": 19.91,
+   "max_accel": 306.9,
+   "max_turn": 104.4,
+   "max_turn_accel": 392.4,
+   "notes": [
+    "only 0 of the pack visible at the worst moment"
+   ]
+  },
+  {
+   "name": "middle",
+   "rig": "chase_rear_3q",
+   "from": 9.017,
+   "to": 12.683,
+   "duration": 3.667,
+   "cut_on": "pair first contact",
+   "racer_pixels": 91.9,
+   "racer_pixels_min": 73.6,
+   "phone_pixels": 23.0,
+   "group_width": 0.3168,
+   "pack_visible": 0.577,
+   "pack_on_screen": 0.742,
+   "min_on_screen": 0,
+   "lens_clearance": 5.645,
+   "max_speed": 17.77,
+   "max_accel": 278.3,
+   "max_turn": 107.8,
+   "max_turn_accel": 357.9,
+   "notes": [
+    "only 0 of the pack visible at the worst moment"
+   ]
+  },
+  {
+   "name": "run_in",
+   "rig": "finish_chase",
+   "from": 12.683,
+   "to": 19.15,
+   "duration": 6.467,
+   "cut_on": "last first contact",
+   "racer_pixels": 77.4,
+   "racer_pixels_min": 60.9,
+   "phone_pixels": 19.3,
+   "group_width": 0.366,
+   "pack_visible": 0.554,
+   "pack_on_screen": 0.849,
+   "min_on_screen": 0,
+   "lens_clearance": 7.791,
+   "max_speed": 36.46,
+   "max_accel": 352.2,
+   "max_turn": 90.0,
+   "max_turn_accel": 518.4,
+   "notes": [
+    "only 0 of the pack visible at the worst moment"
+   ]
+  }
+ ],
+ "cut_rows": [
+  {
+   "at": 2.233,
+   "from": "release",
+   "to": "upper",
+   "cut_on": "drum first contact",
+   "reacquire": 0.2855,
+   "scale_ratio": 1.016,
+   "pack_before": 4,
+   "pack_after": 4,
+   "direction_flip": false,
+   "screen_drift": [
+    -6.447,
+    -2.743
+   ],
+   "angle_change": 10.3
+  },
+  {
+   "at": 9.017,
+   "from": "upper",
+   "to": "middle",
+   "cut_on": "pair first contact",
+   "reacquire": 0.128,
+   "scale_ratio": 0.887,
+   "pack_before": 3,
+   "pack_after": 3,
+   "direction_flip": false,
+   "screen_drift": [
+    -3.831,
+    -1.759
+   ],
+   "angle_change": 5.4
+  },
+  {
+   "at": 12.683,
+   "from": "middle",
+   "to": "run_in",
+   "cut_on": "last first contact",
+   "reacquire": 0.1547,
+   "scale_ratio": 0.844,
+   "pack_before": 3,
+   "pack_after": 3,
+   "direction_flip": false,
+   "screen_drift": [
+    4.331,
+    3.557
+   ],
+   "angle_change": 5.6
+  }
+ ],
+ "flow_terms": {
+  "continuity": 0.923,
+  "budget": 1.0,
+  "reacquire": 0.567,
+  "direction": 1.0,
+  "scale": 0.724
+ },
+ "flow_score": 85.5,
+ "final_sprint": {
+  "shot": "run_in",
+  "duration": 6.467,
+  "hard_cuts": 0,
+  "top3_visible": 0.8265,
+  "winner_visible": 0.9665,
+  "winner_pixels": 73.2,
+  "winner_pixels_min": 58.4,
+  "visible_before_crossing": 2.917,
+  "crossing_at": 15.817
+ },
+ "path": "output/race2/v281_camera\\A\\race2_switchyard_8.cameras.json",
+ "note": "the most conservative answer: change the editing and nothing else"
+}

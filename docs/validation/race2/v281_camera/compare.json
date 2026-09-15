@@ -1,0 +1,256 @@
+{
+ "seed": 8,
+ "course": "switchyard",
+ "pack": {
+  "frames": 2401,
+  "mean_pack": 3.759,
+  "pack_range": [
+   3,
+   4
+  ],
+  "floor_bound_frames": 460,
+  "cap_bound_frames": 1761,
+  "mean_extent": 8.963,
+  "max_extent": 11.981
+ },
+ "spine": {
+  "length": 184.81,
+  "samples": 595,
+  "runs": [
+   "head",
+   "pan1",
+   "corr1",
+   "pan2",
+   "corr2",
+   "pan3",
+   "corr3",
+   "pan4",
+   "corr4",
+   "pan5",
+   "sprint",
+   "runout"
+  ],
+  "racing_length": 176.516,
+  "descent_per_z": -0.6486,
+  "downhill_azimuth": 93.1,
+  "blockers": 157
+ },
+ "markers": {
+  "release": 0.016666666666666666,
+  "first": {
+   "drum": 2.2333333333333334,
+   "sweep": 6.283333333333333,
+   "pair": 9.016666666666666,
+   "last": 12.683333333333334
+  },
+  "last": {
+   "drum": 4.583333333333333,
+   "sweep": 7.6,
+   "pair": 10.95,
+   "last": 13.466666666666667
+  },
+  "winner": 15.816666666666666,
+  "end": 19.15
+ },
+ "candidates": {
+  "V28": {
+   "camera": "V28",
+   "duration": 19.133,
+   "shots": 11,
+   "hard_cuts": 10,
+   "mean_shot": 1.739,
+   "shortest_shot": 0.93,
+   "longest_shot": 3.783,
+   "two_longest_share": 0.3608,
+   "continuous_share": 0.3608,
+   "direction_flips": 5,
+   "worst_reacquire": 1.7837,
+   "mean_reacquire": 0.8382,
+   "worst_scale_jump": 1.328,
+   "worst_angle_change": 123.7,
+   "racer_pixels": [
+    57.5,
+    85.2
+   ],
+   "phone_pixels": [
+    14.4,
+    21.3
+   ],
+   "min_lens_clearance": -6.601,
+   "max_speed": 72.0,
+   "max_accel": 3095.3,
+   "max_turn": 188.7,
+   "max_turn_accel": 6666.8,
+   "flow_terms": {
+    "continuity": 0.481,
+    "budget": 0.0,
+    "reacquire": 0.0,
+    "direction": 0.0,
+    "scale": 0.51
+   },
+   "flow_score": 24.3,
+   "final_sprint": {
+    "shot": "payoff",
+    "duration": 3.783,
+    "hard_cuts": 0,
+    "top3_visible": 0.746,
+    "winner_visible": 1.0,
+    "winner_pixels": 77.0,
+    "winner_pixels_min": 76.4,
+    "visible_before_crossing": 0.45,
+    "crossing_at": 15.817
+   },
+   "path": "output/race2/v281_camera\\V28\\race2_switchyard_8.cameras.json"
+  },
+  "A": {
+   "camera": "A",
+   "duration": 19.133,
+   "shots": 4,
+   "hard_cuts": 3,
+   "mean_shot": 4.783,
+   "shortest_shot": 2.217,
+   "longest_shot": 6.783,
+   "two_longest_share": 0.6925,
+   "continuous_share": 0.8841,
+   "direction_flips": 0,
+   "worst_reacquire": 0.2855,
+   "mean_reacquire": 0.1894,
+   "worst_scale_jump": 1.185,
+   "worst_angle_change": 10.3,
+   "racer_pixels": [
+    77.4,
+    95.4
+   ],
+   "phone_pixels": [
+    19.3,
+    23.8
+   ],
+   "min_lens_clearance": 5.645,
+   "max_speed": 45.63,
+   "max_accel": 352.2,
+   "max_turn": 110.7,
+   "max_turn_accel": 598.5,
+   "flow_terms": {
+    "continuity": 0.923,
+    "budget": 1.0,
+    "reacquire": 0.567,
+    "direction": 1.0,
+    "scale": 0.724
+   },
+   "flow_score": 85.5,
+   "final_sprint": {
+    "shot": "run_in",
+    "duration": 6.467,
+    "hard_cuts": 0,
+    "top3_visible": 0.8265,
+    "winner_visible": 0.9665,
+    "winner_pixels": 73.2,
+    "winner_pixels_min": 58.4,
+    "visible_before_crossing": 2.917,
+    "crossing_at": 15.817
+   },
+   "path": "output/race2/v281_camera\\A\\race2_switchyard_8.cameras.json",
+   "note": "the most conservative answer: change the editing and nothing else"
+  },
+  "B": {
+   "camera": "B",
+   "duration": 19.133,
+   "shots": 5,
+   "hard_cuts": 4,
+   "mean_shot": 3.827,
+   "shortest_shot": 2.217,
+   "longest_shot": 6.467,
+   "two_longest_share": 0.5497,
+   "continuous_share": 0.7413,
+   "direction_flips": 0,
+   "worst_reacquire": 0.2855,
+   "mean_reacquire": 0.1445,
+   "worst_scale_jump": 1.184,
+   "worst_angle_change": 19.5,
+   "racer_pixels": [
+    77.4,
+    99.8
+   ],
+   "phone_pixels": [
+    19.3,
+    25.0
+   ],
+   "min_lens_clearance": 5.197,
+   "max_speed": 45.63,
+   "max_accel": 352.2,
+   "max_turn": 110.7,
+   "max_turn_accel": 598.5,
+   "flow_terms": {
+    "continuity": 0.733,
+    "budget": 1.0,
+    "reacquire": 0.567,
+    "direction": 1.0,
+    "scale": 0.725
+   },
+   "flow_score": 77.9,
+   "final_sprint": {
+    "shot": "run_in",
+    "duration": 6.467,
+    "hard_cuts": 0,
+    "top3_visible": 0.8265,
+    "winner_visible": 0.9665,
+    "winner_pixels": 73.2,
+    "winner_pixels_min": 58.4,
+    "visible_before_crossing": 2.917,
+    "crossing_at": 15.817
+   },
+   "path": "output/race2/v281_camera\\B\\race2_switchyard_8.cameras.json",
+   "note": "variety bought from rig changes at motivated cuts, not from cutting more"
+  },
+  "C": {
+   "camera": "C",
+   "duration": 19.133,
+   "shots": 6,
+   "hard_cuts": 5,
+   "mean_shot": 3.189,
+   "shortest_shot": 1.7,
+   "longest_shot": 6.467,
+   "two_longest_share": 0.5296,
+   "continuous_share": 0.5296,
+   "direction_flips": 0,
+   "worst_reacquire": 0.3092,
+   "mean_reacquire": 0.1256,
+   "worst_scale_jump": 1.332,
+   "worst_angle_change": 26.9,
+   "racer_pixels": [
+    79.0,
+    108.5
+   ],
+   "phone_pixels": [
+    19.7,
+    27.1
+   ],
+   "min_lens_clearance": 4.153,
+   "max_speed": 40.02,
+   "max_accel": 436.7,
+   "max_turn": 129.2,
+   "max_turn_accel": 610.6,
+   "flow_terms": {
+    "continuity": 0.706,
+    "budget": 0.75,
+    "reacquire": 0.532,
+    "direction": 1.0,
+    "scale": 0.504
+   },
+   "flow_score": 70.2,
+   "final_sprint": {
+    "shot": "run_in",
+    "duration": 6.467,
+    "hard_cuts": 0,
+    "top3_visible": 0.8015,
+    "winner_visible": 0.9459,
+    "winner_pixels": 74.5,
+    "winner_pixels_min": 59.3,
+    "visible_before_crossing": 2.783,
+    "crossing_at": 15.817
+   },
+   "path": "output/race2/v281_camera\\C\\race2_switchyard_8.cameras.json",
+   "note": "stronger racing energy: lower, closer, larger racers, six shots"
+  }
+ }
+}
