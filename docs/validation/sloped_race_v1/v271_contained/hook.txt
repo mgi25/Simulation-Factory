@@ -1,0 +1,13 @@
+FRAME ZERO
+the hook, which no part of a finish correction may reach.
+
+world  title                    racers worst col      mean    plate  least dE
+------------------------------------------------------------------------------
+v26    V26 outdoor                8/8      8.64     15.21     30.4      65.9
+v27    V27 contained_hall         8/8      8.45     15.41     30.3      71.7
+v271   V27.1 corrected            8/8      8.45     15.41     30.3      71.7
+
+V27.1 against contained_hall at frame 0: byte-identical.
+
+WCAG large text wants 3.0 of the worst column. `least dE` is the
+nearest any racer's colour comes to the picture under it.

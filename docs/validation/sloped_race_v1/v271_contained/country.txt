@@ -1,0 +1,27 @@
+THE COUNTRY-SKIN PROBE
+India on marble 5, `meridian` on the other seven. Render-only: the skin
+is one appearance in `racer_visual.gd` behind `--flag-racer=`, there is
+no country system, and no shipped render reaches it.
+
+moment           world        px dE around bands seen    spread
+------------------------------------------------------------------
+frame0           v271        167     167.5       2/3       241
+frame0           v26         167     167.7       2/3       239
+
+mixer            v271         78      64.0       2/3       179
+mixer            v26          78      65.9       2/3       180
+
+obstacle         v271         69      79.5       3/3       184
+obstacle         v26          69      83.1       3/3       178
+
+fork_approach    v271         69      71.0       3/3       248
+fork_approach    v26          69      72.3       3/3       248
+
+winner           v271         55      83.8       2/3       126
+winner           v26          55      82.4       2/3       113
+
+`bands seen` is how many of the flag's three colours are present in
+the marble's own patch at that size - the test of whether a tricolour
+is still a tricolour on screen rather than one average. `spread` is
+the patch's own luma range, which is what a flag has and a solid
+marble does not.

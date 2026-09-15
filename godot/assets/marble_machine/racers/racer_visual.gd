@@ -35,7 +35,85 @@ extends RefCounted
 ## flag inherits the replay quaternion for free because the flag is the
 ## surface. That is why the marker is a texture rather than child geometry.
 
-const APPEARANCES := ["solid", "ribbon", "crescent", "meridian"]
+const APPEARANCES := ["solid", "ribbon", "crescent", "meridian", "flag_in"]
+
+## The country skins, and there is deliberately one of them.
+##
+## **This is a probe, not a feature.** V27.1's Part E asks whether a neutral
+## contained stage would host a flag racer, and the honest way to answer that
+## is to render one rather than to argue it from palette values. So exactly one
+## flag exists, it reaches exactly one marble through `--flag-racer=`, and with
+## that option unset nothing in this file behaves differently from the way it
+## behaved before the appearance was added. There is no country system here: no
+## table of nations, no per-racer assignment, no selection logic.
+##
+## India, because it asks the two hard questions at once. A graphite hall has
+## very little white in it and a cream chute has a great deal, so a flag with a
+## **white** band tests separation from the background and from the machine in
+## the same frame; and the wheel is the smallest mark any skin in this family
+## would ever have to hold at 270 px wide.
+const FLAGS := {
+	"flag_in": {
+		"title": "India",
+		"bands": ["#FF9933", "#FFFFFF", "#138808"],
+		"emblem": "#000080",
+	},
+}
+
+## The band axis, and the emblem's, in the marble's own frame.
+##
+## Neither is axis-aligned, for the reason the marker normals below give: a
+## marble is dropped with an identity orientation, so bands about local +Y
+## would start as a level tricolour on every racer on the line and read as a
+## sticker applied to the picture rather than as a body with a top and a bottom
+## of its own.
+##
+## The two are **orthogonal**, and that is the one relation that matters:
+## `FLAG_BAND_AXIS.dot(FLAG_EMBLEM_AXIS)` is 0 to three places, which is what
+## puts the wheel in the middle of the white band rather than over a stripe
+## boundary. It also means no single rotation holds both the bands and the
+## wheel still.
+const FLAG_BAND_AXIS := Vector3(-0.52, 0.30, 0.80)
+const FLAG_EMBLEM_AXIS := Vector3(0.6465, 0.7508, 0.1356)
+
+## Where the three zones meet, as `dot(point, axis)`.
+##
+## A spherical zone's area is proportional to its height, so thirds of the axis
+## are thirds of the *surface*. Equal-area stripes are what still reads as a
+## tricolour when the ball is seen edge on, which is most of the time.
+const FLAG_BAND_EDGE := 1.0 / 3.0
+
+## The wheel, in radians from `FLAG_EMBLEM_AXIS`.
+##
+## The white band reaches about 19.5 degrees either side of its own great
+## circle, so a wheel 15 degrees across leaves the rim a margin rather than
+## bleeding into the saffron. Twenty-four spokes because that is what the flag
+## has; whether twenty-four spokes survive to the screen is the question the
+## probe is taken to answer, and the report's §7 is the answer.
+const FLAG_HUB := 0.045
+const FLAG_SPOKE_IN := 0.055
+const FLAG_SPOKE_OUT := 0.232
+const FLAG_RIM_IN := 0.232
+const FLAG_RIM_OUT := 0.262
+const FLAG_SPOKES := 24
+const FLAG_SPOKE_HALF := 0.052
+
+## A flag carries its own colour, so its map is read at twice the marker's
+## resolution on each axis. The marker is one soft-edged band and 512x256 is
+## generous for it; a 24-spoke wheel fifteen degrees across is not the same
+## kind of object, and a probe whose answer is set by its own texture budget
+## has answered a question about the texture.
+const FLAG_TEXTURE_WIDTH := 1024
+const FLAG_TEXTURE_HEIGHT := 512
+
+## What a racer that is *not* wearing the flag falls back to, so a flag probe
+## is the shipped picture with one marble changed rather than a different film.
+const FLAG_FALLBACK := "meridian"
+
+## The body colour a flag is drawn over. White, so the map is the colour: Godot
+## multiplies `albedo_color` by `albedo_texture`, and any other value would
+## tint the tricolour into the racer's own hue.
+const FLAG_BASE := "#FFFFFF"
 
 ## Where the marker sits on the body, in the marble's own frame.
 ##
@@ -137,8 +215,94 @@ static func coverage(appearance: String, point: Vector3) -> float:
 	return 0.0
 
 
+static func is_flag(appearance: String) -> bool:
+	return FLAGS.has(appearance)
+
+
+static func appearance_for(appearance: String, marble_id: int,
+		flag_on: int) -> String:
+	## Which surface *this* racer wears.
+	##
+	## The one place the probe's "one marble, not eight" rule lives. A flag
+	## appearance reaches the chosen marble and every other racer falls back to
+	## `meridian`, so a flag sheet is the shipped picture with one body changed
+	## and the other seven are the control standing beside it in the same frame.
+	if not is_flag(appearance):
+		return appearance
+	return appearance if marble_id == flag_on else FLAG_FALLBACK
+
+
+static func flag_colour(appearance: String, point: Vector3) -> Color:
+	## The flag at this point of the body, as a colour rather than an amount.
+	##
+	## One pure function of a direction in the marble's own frame - exactly the
+	## contract `coverage` keeps, and for exactly the same reason. Nothing here
+	## reads time, the frame index or any part of the replay, so the flag turns
+	## because the node turns and by no other route.
+	var flag: Dictionary = FLAGS[appearance]
+	var bands: Array = flag["bands"]
+	var along := point.dot(FLAG_BAND_AXIS.normalized())
+	var body: Color
+	if along > FLAG_BAND_EDGE:
+		body = Color(str(bands[0]))
+	elif along < -FLAG_BAND_EDGE:
+		body = Color(str(bands[2]))
+	else:
+		body = Color(str(bands[1]))
+	# The wheel, drawn only where the white band is. `smoothstep` on every
+	# boundary for the reason EDGE_SOFT exists: a hard edge on a thirty-pixel
+	# ball lands on a different pixel each frame and the eye reads the crawl
+	# rather than the turn.
+	var axis := FLAG_EMBLEM_AXIS.normalized()
+	var theta := acos(clampf(point.dot(axis), -1.0, 1.0))
+	if theta > FLAG_RIM_OUT:
+		return body
+	var ink := Color(str(flag["emblem"]))
+	var soft := 0.008
+	var amount := 0.0
+	# Hub.
+	amount = maxf(amount, 1.0 - smoothstep(FLAG_HUB - soft, FLAG_HUB + soft,
+		theta))
+	# Rim.
+	amount = maxf(amount, smoothstep(FLAG_RIM_IN - soft, FLAG_RIM_IN + soft,
+		theta) * (1.0 - smoothstep(FLAG_RIM_OUT - soft, FLAG_RIM_OUT + soft,
+		theta)))
+	# Spokes: lines of constant azimuth about the emblem axis. The azimuth is
+	# measured against a reference that is fixed in the *body*, so the wheel
+	# does not counter-rotate against the stripes.
+	if theta > FLAG_SPOKE_IN and theta < FLAG_SPOKE_OUT:
+		var reference := FLAG_BAND_AXIS.normalized()
+		var right := axis.cross(reference).normalized()
+		var up := right.cross(axis).normalized()
+		var phi := atan2(point.dot(right), point.dot(up))
+		var step := TAU / float(FLAG_SPOKES)
+		var offset := fposmod(phi + step * 0.5, step) - step * 0.5
+		amount = maxf(amount, 1.0 - smoothstep(FLAG_SPOKE_HALF - soft,
+			FLAG_SPOKE_HALF + soft, absf(offset)))
+	return body.lerp(ink, amount)
+
+
+static func flag_image(appearance: String) -> Image:
+	## The flag's own albedo map. **Colour, not a multiplier.**
+	##
+	## `material` pairs it with `albedo_color` white, so what the viewer sees is
+	## this image and not this image times a racer hue - which is the whole
+	## difference between a skin and a tint, and is what
+	## `racer_visual`'s own header predicted a country skin would need.
+	var image := Image.create(FLAG_TEXTURE_WIDTH, FLAG_TEXTURE_HEIGHT, true,
+		Image.FORMAT_RGB8)
+	for y in FLAG_TEXTURE_HEIGHT:
+		var v: float = (float(y) + 0.5) / float(FLAG_TEXTURE_HEIGHT)
+		for x in FLAG_TEXTURE_WIDTH:
+			var u: float = (float(x) + 0.5) / float(FLAG_TEXTURE_WIDTH)
+			image.set_pixel(x, y, flag_colour(appearance, direction(u, v)))
+	return image
+
+
 static func skin_image(appearance: String) -> Image:
 	## The multiplier map: white off the marker, MARKER_TINT on it.
+	if is_flag(appearance):
+		return flag_image(appearance)
 	var image := Image.create(TEXTURE_WIDTH, TEXTURE_HEIGHT, true,
 		Image.FORMAT_RGB8)
 	for y in TEXTURE_HEIGHT:
@@ -177,6 +341,21 @@ static func material(base: StandardMaterial3D,
 		return base
 	var skinned: StandardMaterial3D = base.duplicate()
 	skinned.albedo_texture = skin(appearance)
+	# **A flag replaces the body colour; a marker modulates it.** Godot
+	# multiplies `albedo_color` by `albedo_texture`, so leaving the racer's own
+	# hue in place would tint the tricolour and there would be no white band
+	# and no navy wheel - just a purple flag. Alpha is carried over rather than
+	# set, for the reason `lab_palette._apply` gives about transparent albedos.
+	if is_flag(appearance):
+		# `Color("#FFFFFF")` rather than `Color(1.0, 1.0, 1.0)`: a float Color
+		# in GDScript is not the sRGB value the hex string is, and
+		# `tests/test_marble3d_integration.py` bans the float form outright
+		# because it once turned the whole machine grey. White is the one
+		# value where the two agree, which is exactly why the rule has to be
+		# the form and not the outcome.
+		var white := Color(FLAG_BASE)
+		white.a = skinned.albedo_color.a
+		skinned.albedo_color = white
 	# Anisotropic, because a rolling marble presents most of its band at a
 	# grazing angle and trilinear alone turns the far side of it into mush.
 	skinned.texture_filter = \

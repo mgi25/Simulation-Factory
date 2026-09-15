@@ -1,0 +1,14 @@
+THE WINNER RING
+the mark opens on the crossing at 17.517 s and runs 0.300 s (18 frames).
+For each of them: is the winner in frame, and is the picture under the
+mark the winner's own colour rather than another racer's.
+
+world  title                    in frame reads purple   median dE
+------------------------------------------------------------------
+v26    V26 outdoor                18/18        12/18         48.0
+v27    V27 contained_hall         18/18        12/18         50.1
+v271   V27.1 corrected            18/18        12/18         50.1
+
+`median dE` is the distance from the picture under the mark to the
+winner's own hue - small is the winner, and the column beside it is
+how often that hue is the *nearest* of the eight.

@@ -1,0 +1,87 @@
+{
+  "id": "_probe_v271",
+  "title": "Probe over contained_hall (diagnostic)",
+  "family": "diagnostic",
+  "summary": "contained_hall with every hall material painted its own flat hue rather than its depth band's, so a bright area in a finish frame can be named instead of attributed",
+  "extends": "contained_hall",
+  "palette": {
+    "hall_deck": {
+      "albedo": "#FF2000",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "hall_deck_dark": {
+      "albedo": "#FF9000",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "hall_panel": {
+      "albedo": "#00FF40",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "hall_panel_dark": {
+      "albedo": "#0060FF",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "hall_trim": {
+      "albedo": "#00FFFF",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "hall_rib": {
+      "albedo": "#FF00FF",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "hall_beam": {
+      "albedo": "#FFFF00",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "hall_glass": {
+      "albedo": "#8000FF",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "lit_hall_warm": {
+      "emission": "#FF0080",
+      "energy": 1.0
+    },
+    "lit_hall_cool": {
+      "emission": "#80FF00",
+      "energy": 1.0
+    },
+    "slope_cliff": {
+      "albedo": "#303030",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "slope_rock": {
+      "albedo": "#303030",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "slope_earth": {
+      "albedo": "#303030",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "slope_scree": {
+      "albedo": "#303030",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "slope_cap": {
+      "albedo": "#303030",
+      "unshaded": true,
+      "no_fog": true
+    },
+    "slope_boulder": {
+      "albedo": "#303030",
+      "unshaded": true,
+      "no_fog": true
+    }
+  }
+}

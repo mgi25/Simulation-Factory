@@ -1,0 +1,27 @@
+THE WINNER, THROUGH THE FINISH
+marble 5, PURPLE. Projected from the replay, not read off a sheet.
+
+moment           world  on screen       px    occl dE surround  surround
+--------------------------------------------------------------------------
+final_approach   v26          NO        -       -         -         -
+final_approach   v27          NO        -       -         -         -
+final_approach   v271         NO        -       -         -         -
+
+winner           v26         yes       55    0.00     144.5     139.4
+winner           v27         yes       55    0.00     132.0     140.1
+winner           v271        yes       55    0.00     132.0     140.1
+
+payoff           v26         yes       46    0.00     125.8     117.8
+payoff           v27         yes       46    0.00     125.4     117.7
+payoff           v271        yes       46    0.00     125.4     117.7
+
+`occl` is the share of the marble's own patch that the world stands in
+front of: 0.00 is a clear marble. `dE surround` is the marble's mean
+RGB distance from the ring of picture just outside it - the thing an
+eye reads when it decides a ball is not part of what it is on.
+
+The ring: V24 opens the WINNER mark on the crossing and it runs 0.300 s
+(v24_payoff.RING_SECONDS), which `v24_payoff` measured against the
+marble's own 0.217 s of visibility. That schedule is V24's and this
+pass does not touch it; what is checked here is that the marble the
+ring is drawn around is on screen and clear when the ring opens.

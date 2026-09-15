@@ -1,0 +1,31 @@
+WHAT IS BEHIND THE FINISH, BY SURFACE
+the hall's own materials, each rendered its own flat hue and read off
+the lit frame. The machine is masked out first - see SURFACES.
+
+  final_approach
+    surface            cover      V27    V27.1 clip wht
+    ----------------------------------------------------
+    hall_panel_dark   15.49%     44.9     44.9    0.00%
+    hall_rib           2.60%     47.3     47.1    0.00%
+    FINISH PAD        27.82%     50.7     25.0    0.00%
+    ground             3.01%     38.6     38.6    0.00%
+
+  winner
+    surface            cover      V27    V27.1 clip wht
+    ----------------------------------------------------
+    hall_panel_dark   14.55%     16.2     16.2    0.00%
+    hall_rib           2.02%     39.7     39.7    0.00%
+    FINISH PAD         6.39%     44.6     23.2    0.00%
+    ground             2.82%     43.7     43.7    0.00%
+
+  payoff
+    surface            cover      V27    V27.1 clip wht
+    ----------------------------------------------------
+    hall_panel_dark   32.42%     11.2     11.2    0.00%
+    FINISH PAD         3.37%     46.9     24.0    0.00%
+    ground             2.75%     37.9     37.9    0.00%
+
+  `hall_glass` is the finish landing pad: `_probe_v271_pad` re-materials
+  it so it can be told apart from the deck ring it shares `hall_deck`
+  with. It is the whole of the bright background at all three moments.
+  Nothing the hall builds clips white at any of them.

@@ -1,0 +1,20 @@
+THE FINISH SECTOR
+which pieces of the hall the three finish cameras see, and what else
+sees them. Projected with the film's own lens onto the solved track.
+
+part           pieces  at finish finish only never seen
+--------------------------------------------------------
+shell 0            32          7          0         16
+shell 1            32          0          0         31
+shell 2            24          6          0         12
+shell 3             6          0          0          4
+deck 0             28          6          0         16
+deck 1             32          7          0         17
+
+Not one piece of wall or deck is private to the finish. Every segment
+and every facet the three finish cameras see is also in the obstacle,
+the branch or the merge, so there is no 'wall behind the finish' to
+take down a value: the brief's fixes 1, 3 and 6 have no surface to
+act on that is not shared. What *is* local to the finish is the bay's
+own furniture, sited at the finish node and built nowhere else - and
+the fix is one field of it.

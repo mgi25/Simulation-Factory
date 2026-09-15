@@ -26,6 +26,10 @@
     "_marker_v27a",
     "_marker_v27b",
     "_marker_v27c",
-    "_marker_v27_control"
+    "_marker_v27_control",
+    "contained_hall_v271",
+    "_marker_v271",
+    "_probe_v271",
+    "_probe_v271_pad"
   ]
 }

@@ -45,7 +45,13 @@ const RacerVisual := preload("res://assets/marble_machine/racers/racer_visual.gd
 ##     --layout=b --detail=hero
 ##     --shot=NAME          override with a still lens from SHOTS
 ##     --finish-sign=double copy the FINISH board onto its own back face
-##     --racers=NAME        racer surface: solid, ribbon, crescent, meridian
+##     --racers=NAME        racer surface: solid, ribbon, crescent, meridian,
+##                          flag_in
+##     --flag-racer=N       which marble wears a flag appearance; every other
+##                          racer falls back to `meridian`. Render-only - it is
+##                          V27.1's country-skin probe and there is no country
+##                          system behind it. Default -1, meaning none, at
+##                          which a flag appearance reaches no racer at all.
 
 # `Palette`, `World`, `Machine`, `Layout`, `Track`, `V2Forms` and `Terrain` all
 # come from the parent class, and re-declaring one is a parse error rather than
@@ -102,6 +108,7 @@ var _render_scale := 0.57
 var _duration := 0.0
 var _use_track := false
 var _racers := DEFAULT_RACERS
+var _flag_racer := -1
 func _ready() -> void:
 	# **Before `super()`, because the course is built inside it.** The start
 	# module the physics runs is not the one the layout table draws, and the
@@ -119,6 +126,13 @@ func _ready() -> void:
 	if not RacerVisual.APPEARANCES.has(_racers):
 		push_error("sloped_race_scene: unknown --racers=%s" % _racers)
 		_racers = DEFAULT_RACERS
+	_flag_racer = int(early.get("flag-racer", -1))
+	# A flag appearance with nobody to wear it would silently render the whole
+	# field as `meridian`, which is a sheet that looks like a control and is
+	# labelled like a probe. Refuse it out loud instead.
+	if RacerVisual.is_flag(_racers) and _flag_racer < 0:
+		push_error("sloped_race_scene: --racers=%s needs --flag-racer=N"
+			% _racers)
 	super()
 	_strip_display_field()
 	var options := _options()
@@ -248,11 +262,16 @@ func _load_replay(path: String) -> void:
 		# the node transform set from the replay below. At `solid` this builds
 		# the identical sphere and the palette's own material object.
 		var node := RacerVisual.build(_palette.marble(marble_id), radius,
-			"Racer%d" % marble_id, _racers)
+			"Racer%d" % marble_id,
+			RacerVisual.appearance_for(_racers, marble_id, _flag_racer))
 		_marble_root.add_child(node)
 		_marbles.append(node)
 
-	print("racers: %s" % _racers)
+	if RacerVisual.is_flag(_racers):
+		print("racers: %s on marble %d, %s elsewhere"
+			% [_racers, _flag_racer, RacerVisual.FLAG_FALLBACK])
+	else:
+		print("racers: %s" % _racers)
 	print("replay: seed %d, %d marbles, %d frames, %.2f s, render scale %.4f" % [
 		int(_replay.get("seed", -1)), _marbles.size(), frames.size(), _duration,
 		_render_scale])
