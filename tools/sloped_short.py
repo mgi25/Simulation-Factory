@@ -75,7 +75,7 @@ sys.path.insert(0, os.getcwd())
 from audio import marble
 from audio.synthesis import SAMPLE_RATE
 from audio.wav_io import write_wav
-from sloped import overlays, presentation, v24, v24_hook, v24_payoff
+from sloped import overlays, presentation, v24, v24_hook, v24_payoff, v26
 
 OUT_DIR = os.path.join("output", "sloped_race_v1")
 WORK_DIR = os.path.join(OUT_DIR, "short")
@@ -117,6 +117,10 @@ PREVIEW_V23 = os.path.join(OUT_DIR, "v23", "preview_master.mp4")
 # zero is this master's own first frame: no flight in front of it and no frozen
 # hold on it. See `sloped.v24`.
 MASTER_V24 = os.path.join(OUT_DIR, "v24", "race_master.mp4")
+# V26 renders that same one piece again - same replay, same instants, same
+# solved camera track - in V25.2's world and V23B's machine colours. One
+# master, no preview. `tools/sloped_v22.py --edition v26`.
+MASTER_V26 = os.path.join(OUT_DIR, "v26", "race_master.mp4")
 
 # Kept for the callers and the tests that name the locked V19 master directly.
 MASTER = MASTER_V19
@@ -249,6 +253,38 @@ EDITIONS: dict[str, dict[str, Any]] = {
         "video": os.path.join(OUT_DIR, "real_race_v24.mp4"),
         "visual": os.path.join(OUT_DIR, "real_race_v24_visual.mp4"),
         "silent": os.path.join(OUT_DIR, "real_race_v24_master.mp4"),
+        "track": os.path.join(OUT_DIR, "cameras_v24_{seed}.json"),
+        "runtime": (19.8, 20.4),
+    },
+    # **V26 is V24's edit over V26's pixels**, which is the same sentence V23's
+    # entry makes about V22.1 and is true here for the same reason: the two
+    # masters are the same instants of the same replay through the same solved
+    # camera track, and the only thing that differs is what the frames look
+    # like. So every field below that describes *the film* is V24's - no cuts,
+    # V22.1's cue policy, no hold, V24's mark, V24's payoff plate and V24's
+    # runtime band - and the fields that differ are the four paths naming the
+    # footage plus the master it is cut from.
+    #
+    # `track` is `cameras_v24_{seed}.json`, not a V26 copy of it. The Short
+    # reads the track to find the winner's crossing and to schedule the ring;
+    # reading V24's own file is what makes "the ring opens on the crossing"
+    # mean the same instant in both editions rather than two instants that
+    # happen to agree.
+    #
+    # It is a *separate* edition rather than a flag on `v24` so that V24 stays
+    # reproducible: nothing here makes `aurora_valley_v252`, `v23b` or the V26
+    # paths a default, and `--edition v24` rebuilds byte for byte what it built
+    # before this entry existed. See `sloped/v26.py` for the four strings.
+    "v26": {
+        "master": MASTER_V26,
+        "cuts": (),
+        "cues": "v221",
+        "hold": 0.0,
+        "mark": "v24",
+        "payoff": v26.PAYOFF,
+        "video": os.path.join(OUT_DIR, "real_race_v26.mp4"),
+        "visual": os.path.join(OUT_DIR, "real_race_v26_visual.mp4"),
+        "silent": os.path.join(OUT_DIR, "real_race_v26_master.mp4"),
         "track": os.path.join(OUT_DIR, "cameras_v24_{seed}.json"),
         "runtime": (19.8, 20.4),
     },

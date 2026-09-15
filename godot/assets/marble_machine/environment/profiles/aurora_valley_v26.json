@@ -1,0 +1,79 @@
+{
+  "id": "aurora_valley_v26",
+  "title": "Aurora Valley V26 - V25.2 with the finish sightline cleared",
+  "family": "valley",
+  "summary": "V25.2's final lookdev world, unchanged in every respect but one: the ninth scarp is moved three units further from the course, out of the line between V24's finish camera and the winner's crossing",
+  "extends": "aurora_valley_v252",
+  "world": {
+    "scarps": {
+      "sites": [
+        [
+          -58.0,
+          -50.0,
+          90.0,
+          1.15
+        ],
+        [
+          -43.0,
+          -24.0,
+          90.0,
+          1.0
+        ],
+        [
+          -40.0,
+          2.0,
+          90.0,
+          1.35
+        ],
+        [
+          -36.0,
+          28.0,
+          90.0,
+          1.1
+        ],
+        [
+          -14.0,
+          -78.0,
+          0.0,
+          1.2
+        ],
+        [
+          12.0,
+          -72.0,
+          0.0,
+          1.0
+        ],
+        [
+          35.0,
+          -28.0,
+          90.0,
+          1.1
+        ],
+        [
+          40.0,
+          6.0,
+          90.0,
+          1.3
+        ],
+        [
+          34.0,
+          34.0,
+          90.0,
+          1.0
+        ],
+        [
+          36.0,
+          60.0,
+          90.0,
+          1.15
+        ],
+        [
+          -12.0,
+          70.0,
+          20.0,
+          1.05
+        ]
+      ]
+    }
+  }
+}

@@ -40,7 +40,7 @@ from typing import Any, Sequence
 sys.path.insert(0, os.getcwd())
 
 from sloped import (cameras, chase_camera, course_preview, v22, v221,
-                    v221_finish, v23, v24)
+                    v221_finish, v23, v24, v26)
 from sloped.course import sloped_course
 
 PROJECT_ROOT = os.getcwd()
@@ -122,6 +122,28 @@ EDITIONS: dict[str, dict[str, Any]] = {
         "preview_track": None,
         "check": v221_finish.check_finish,
     },
+    # **V26 is V24's film in V25.2's world, and it re-solves nothing.** It
+    # shares V24's module, its checker and - deliberately - V24's own *solved
+    # track file* rather than a copy of it, for the reason V23 shares V22.1's:
+    # a repaint that re-solved its cameras would be asserting the solve is
+    # deterministic instead of relying on the same numbers. Pointing both
+    # editions at `cameras_v24_{seed}.json` makes the camera schedule identical
+    # by construction, so "V26 keeps V24's camera timing" is not a test result,
+    # it is a property of the file list. `--stage solve` is not part of a V26
+    # build, and `preview_track` is None because V24's format has no preview.
+    #
+    # What differs from V24 is four render flags, and they are in
+    # `sloped/v26.py` - one line each for the world, the machine, the racers
+    # and the finish board, reaching the scene through four independent options.
+    "v26": {
+        "module": v24,
+        "work": "v26",
+        "scene": v26.SCENE_FLAGS,
+        "race_track": os.path.join(OUT_DIR, "cameras_v24_{seed}.json"),
+        "borrows_track": "v24",
+        "preview_track": None,
+        "check": v221_finish.check_finish,
+    },
 }
 DEFAULT_EDITION = "v22"
 
@@ -137,6 +159,30 @@ def race_track_path(edition: str, seed: int) -> str:
 def has_preview(edition: str) -> bool:
     """Whether this edition renders a course preview in front of the race."""
     return EDITIONS[edition].get("preview_track") is not None
+
+
+def borrows_track(edition: str) -> str | None:
+    """The edition whose solved camera track this one renders through, if any.
+
+    **A borrowed track is a shared *file*, which is the whole point and also the
+    hazard.** V26 renders V24's camera schedule by pointing `race_track` at
+    `cameras_v24_{seed}.json` rather than at a copy, so the two editions cannot
+    drift apart - there is nothing to drift. But `stage_solve` writes to
+    `race_track_path`, so a V26 solve would overwrite the file V24 ships, and
+    the failure would be silent: V24 would keep rendering, from a track it did
+    not produce.
+
+    So an edition that declares `borrows_track` refuses to solve, and `--stage
+    all` skips the stage rather than failing on it. The owner solves; everyone
+    borrowing renders.
+
+    V23 borrows V22.1's track by the same arrangement and, at the time of
+    writing, by convention only - its docstring says `--stage solve` is not part
+    of a V23 build. It is deliberately left as it is here: making it declare the
+    field would change what `--stage all --edition v23` does, and V23 is a
+    shipped edition this pass is not entitled to alter.
+    """
+    return EDITIONS[edition].get("borrows_track")
 
 
 def preview_track_path(edition: str, seed: int) -> str:
@@ -189,6 +235,13 @@ def _load_replay(seed: int) -> dict[str, Any]:
 
 
 def stage_solve(seed: int, edition: str = DEFAULT_EDITION) -> dict[str, Any]:
+    owner = borrows_track(edition)
+    if owner is not None:
+        raise V22Error(
+            f"the {edition!r} edition renders {owner!r}'s solved track "
+            f"({race_track_path(edition, seed)}) and must not re-solve it; "
+            f"run --stage solve --edition {owner} instead"
+        )
     module = EDITIONS[edition]["module"]
     track_path = race_track_path(edition, seed)
     replay = _load_replay(seed)
@@ -392,6 +445,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not has_preview(args.edition):
         stages = tuple(stage for stage in stages
                        if stage not in ("freeze", "preview"))
+    if borrows_track(args.edition) is not None and args.stage == "all":
+        # Not an error here, only in `stage_solve`: asking for the whole build
+        # of a borrowing edition is a reasonable thing to do, and the answer is
+        # that its camera track is already solved. Asking for the solve *by
+        # name* is the mistake, and that still raises.
+        stages = tuple(stage for stage in stages if stage != "solve")
     godot = None
     for stage in stages:
         print(f"--- {stage} ({args.edition}) ---")

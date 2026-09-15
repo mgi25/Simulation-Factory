@@ -224,14 +224,27 @@ def test_the_render_edition_carries_the_flags():
     assert tool.DEFAULT_EDITION == "v22", "V23 must not become the default"
 
 
+#: The editions entitled to `--environment=` and `--machine=`. V23 is the pass
+#: that introduced both dials; V26 is the integration that inherited them, and
+#: it names its own world and V23's own `v23b` machine.
+#:
+#: The list exists because this test's claim is "no edition **older** than V23
+#: gained a V23 flag", and while V23 was the newest edition "not v23" was the
+#: same set. It stopped being the same set when a later edition was added, and
+#: widening the exemption keeps the assertion the one the name makes rather
+#: than a proxy for it. `v22` and `v221` - the two editions that predate V23 -
+#: are still checked, which is the whole point.
+ZONE_DIAL_EDITIONS = ("v23", "v26")
+
+
 def test_no_older_edition_gained_a_v23_flag():
     tool = _tool("sloped_v22")
-    for name, entry in tool.EDITIONS.items():
-        if name == "v23":
-            continue
-        for flag in entry.get("scene", ()):
-            assert "--environment=" not in flag
-            assert "--machine=" not in flag
+    older = [name for name in tool.EDITIONS if name not in ZONE_DIAL_EDITIONS]
+    assert "v22" in older and "v221" in older, older
+    for name in older:
+        for flag in tool.EDITIONS[name].get("scene", ()):
+            assert "--environment=" not in flag, name
+            assert "--machine=" not in flag, name
 
 
 def test_the_defaults_are_untouched():
