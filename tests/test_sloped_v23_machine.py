@@ -65,7 +65,22 @@ RETUNE_FIELDS = {"albedo", "roughness", "metallic", "specular", "clearcoat",
 #: the gap between two marker colours. They are here rather than in
 #: `RETUNE_FIELDS` because a machine pass that flattened a surface would be
 #: deleting the shading the whole machine lab is about.
-OTHER_CALLER_FIELDS = {"alpha", "unshaded", "no_fog"}
+#: `soft_light`, `edge_light`, `edge_tint`, `floor_lift`, `floor_energy` and
+#: `vertex_tint` are V25.2's, and they belong to the third caller for the
+#: strongest reason on this list: each of them *enables* a material feature
+#: rather than setting a value on one the builder already turned on. `rim`,
+#: `backlight` and `emission` above deliberately do not, because V21's retune
+#: and the machine passes both name them and enabling a flag from those rows
+#: would change shipped pictures. A machine pass that switched on a backlight
+#: or a vertex tint would be doing exactly that, so these stay out of
+#: `RETUNE_FIELDS` and a pass naming one still fails.
+#: `edge_tint` and `floor_energy` are deliberately absent: they are modifiers
+#: read with `spec.get` beside `edge_light` and `floor_lift`, never tested for
+#: on their own, and this set is compared against what the applier asks
+#: `spec.has` about.
+OTHER_CALLER_FIELDS = {"alpha", "unshaded", "no_fog",
+                       "soft_light", "edge_light", "floor_lift",
+                       "vertex_tint"}
 
 #: How a surface answers a light, as opposed to what colour it is. V21 set
 #: these and a machine pass does not get to move them.

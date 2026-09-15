@@ -229,6 +229,21 @@ static func _sited(guides: Dictionary, x: float, z: float, clearance: float,
 	return lens <= 0.0 or _clear(guides["lens"], x, z, lens)
 
 
+static func _why(guides: Dictionary, x: float, z: float, clearance: float,
+		lens: float) -> String:
+	## Why `_sited` said no, with both distances in it.
+	##
+	## **A rejection that does not say by how much costs a render.** The V25.2
+	## pass moved one landmark seven units and got back "inside 12.0 of the
+	## racing line or 16.0 of the camera path" - which does not say which of
+	## the two, or whether the fix is one unit or ten. Two numbers turn a
+	## bisection over fifteen-second renders into one edit.
+	var to_track := _track_gap(guides["track"], x, z, clearance * 4.0)
+	var to_lens := _track_gap(guides["lens"], x, z, maxf(lens, 0.001) * 4.0)
+	return ("%.1f from the racing line (needs %.1f), %.1f from the camera "
+		+ "path (needs %.1f)") % [to_track, clearance, to_lens, lens]
+
+
 # --- shared helpers ---------------------------------------------------------
 
 
@@ -464,6 +479,7 @@ static func _patches(group: Node3D, palette, cfg: Dictionary,
 	var lift := float(spec.get("lift", 0.06))
 	var skirt := float(spec.get("skirt", 0.9))
 	var rough := float(spec.get("rough", 0.34))
+	var smooth := bool(spec.get("smooth", false))
 	var made := 0
 	for which in sites.size():
 		# `[dx, dz, radius, material]`, terrain-relative like the scarps.
@@ -504,8 +520,17 @@ static func _patches(group: Node3D, palette, cfg: Dictionary,
 		var hub := Vector3(0.0, Terrain.height(x, z, cfg) + lift, 0.0)
 		for facet in facets:
 			var next := (facet + 1) % facets
-			Geometry.quad_auto(surface, hub, loops[0][facet],
-				loops[0][next], hub, Vector3.UP)
+			if not smooth:
+				Geometry.quad_auto(surface, hub, loops[0][facet],
+					loops[0][next], hub, Vector3.UP)
+				continue
+			var a: Vector3 = loops[0][facet]
+			var b: Vector3 = loops[0][next]
+			Geometry.quad_smooth_auto(surface, [hub, a, b, hub], [
+				Terrain.normal(x, z, cfg),
+				Terrain.normal(x + a.x, z + a.z, cfg),
+				Terrain.normal(x + b.x, z + b.z, cfg),
+				Terrain.normal(x, z, cfg)])
 		for ring in rings:
 			for facet in facets:
 				var next := (facet + 1) % facets
@@ -518,7 +543,32 @@ static func _patches(group: Node3D, palette, cfg: Dictionary,
 					normal = -normal
 				if normal.length_squared() < 1.0e-12:
 					normal = Vector3.UP
-				Geometry.quad_auto(surface, a, b, c, d, normal.normalized())
+				if not smooth or ring >= rings - 1:
+					Geometry.quad_auto(surface, a, b, c, d, normal.normalized())
+					continue
+				# **V25.2: a material zone shades like the ground it is on.**
+				#
+				# The quads above follow `Terrain.height` across tens of units
+				# of a bumpy heightfield and each takes its own face normal -
+				# so a patch is a flat-shaded mosaic lying on a *smooth-shaded*
+				# terrain (`course_terrain` emits `quad_smooth_auto`). At the
+				# finish that is 40% of the frame and it is the literal form of
+				# the review's complaint: the zones read as painted polygons
+				# because they are the only polygons on the hillside that shade
+				# like polygons.
+				#
+				# The corner normals are the terrain's own, sampled at each
+				# corner, so the zone is indistinguishable from the ground in
+				# every respect but albedo and roughness - which is the whole
+				# definition of a material zone. The outermost ring keeps its
+				# flat normals: it is the vertical skirt, and a skirt that
+				# shaded like the ground it is cutting into would have no edge
+				# at all.
+				Geometry.quad_smooth_auto(surface, [a, b, c, d], [
+					Terrain.normal(x + a.x, z + a.z, cfg),
+					Terrain.normal(x + b.x, z + b.z, cfg),
+					Terrain.normal(x + c.x, z + c.z, cfg),
+					Terrain.normal(x + d.x, z + d.z, cfg)])
 		var mesh := ArrayMesh.new()
 		surface.commit(mesh)
 		var patch := Forms.mesh_node(mesh, palette.get_material(key),
@@ -1112,7 +1162,14 @@ static func _trees(group: Node3D, palette, cfg: Dictionary,
 				continue
 			var top: float = height + tall * _rand(salt, 7, 1117)
 			if kit:
-				var role := str(Flora.CLUSTER[which % Flora.CLUSTER.size()])
+				# **The composition is data.** V25.1's cluster order is a
+				# `const` in the kit, which made "put a snag in every third
+				# stand" a code change to a shared file. A profile may name
+				# its own order in `trees.roles`; absent, the kit's.
+				var order: Array = spec.get("roles", [])
+				if order.is_empty():
+					order = Flora.CLUSTER
+				var role := str(order[which % order.size()])
 				# The hero is taller than anything behind it by construction,
 				# and the ground forms are a third of the height. A stand
 				# whose members are all one height is a hedge.
@@ -1213,9 +1270,8 @@ static func _landmarks(group: Node3D, palette, cfg: Dictionary,
 		match kind:
 			"butte":
 				if not _sited(guides, x, z, clearance, lens):
-					push_warning(("environment_world: landmark '%s' is "
-						+ "inside %.1f of the racing line or %.1f of the "
-						+ "camera path") % [name, clearance, lens])
+					push_warning("environment_world: landmark '%s' is %s"
+						% [name, _why(guides, x, z, clearance, lens)])
 					continue
 				var mass := Forms.mesh_node(
 					_rock(site, height, base, salt,
@@ -1239,9 +1295,9 @@ static func _landmarks(group: Node3D, palette, cfg: Dictionary,
 					# mesh RID, and Godot reports exactly that at exit.
 					if not _sited(guides, x + at.x, z + at.z, clearance, lens):
 						push_warning(("environment_world: landmark '%s' spire "
-							+ "%d is inside %.1f of the racing line or %.1f of "
-							+ "the camera path")
-							% [name, which, clearance, lens])
+							+ "%d is %s") % [name, which,
+							_why(guides, x + at.x, z + at.z, clearance,
+								lens)])
 						continue
 					var tall: float = height * (0.62 + 0.55
 						* _rand(seed_value, 3, 1151))
@@ -1269,9 +1325,9 @@ static func _landmarks(group: Node3D, palette, cfg: Dictionary,
 						cos(bearing) * half * side)
 					if not _sited(guides, x + at.x, z + at.z, clearance, lens):
 						push_warning(("environment_world: landmark '%s' post "
-							+ "%d is inside %.1f of the racing line or %.1f of "
-							+ "the camera path")
-							% [name, int(side), clearance, lens])
+							+ "%d is %s") % [name, int(side),
+							_why(guides, x + at.x, z + at.z, clearance,
+								lens)])
 						continue
 					var tall: float = height * (1.0 if side > 0.0
 						else float(site.get("ratio", 0.68)))
@@ -1319,9 +1375,9 @@ static func _landmarks(group: Node3D, palette, cfg: Dictionary,
 						0.0, cos(bearing) * apart * (0.5 - float(which)))
 					if not _sited(guides, x + at.x, z + at.z, clearance, lens):
 						push_warning(("environment_world: landmark '%s' form "
-							+ "%d is inside %.1f of the racing line or %.1f of "
-							+ "the camera path")
-							% [name, which, clearance, lens])
+							+ "%d is %s") % [name, which,
+							_why(guides, x + at.x, z + at.z, clearance,
+								lens)])
 						continue
 					var shape: Dictionary = site.duplicate()
 					if pair_kits.size() >= 2:
@@ -1376,9 +1432,9 @@ static func _landmarks(group: Node3D, palette, cfg: Dictionary,
 						cos(bearing) * out)
 					if not _sited(guides, x + at.x, z + at.z, clearance, lens):
 						push_warning(("environment_world: landmark '%s' arc "
-							+ "%d is inside %.1f of the racing line or %.1f of "
-							+ "the camera path")
-							% [name, which, clearance, lens])
+							+ "%d is %s") % [name, which,
+							_why(guides, x + at.x, z + at.z, clearance,
+								lens)])
 						continue
 					# Tallest at the back of the arc, lowest at its horns. A
 					# wall of one height is a fence; a wall that rises to a

@@ -618,6 +618,57 @@ func _retune(material: StandardMaterial3D, spec: Dictionary) -> void:
 		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	if spec.has("no_fog") and bool(spec["no_fog"]):
 		material.disable_fog = true
+	# --- V25.2: four fields that also have to turn their feature *on* -------
+	#
+	# `rim`, `backlight` and `emission` above set a value on a feature the
+	# builder already enabled - a rim on an acrylic, an emission on a lit
+	# strip - and they are deliberately left that way: enabling the flag from
+	# those rows would change every V21 and machine-pass render that names
+	# one, and those are shipped pictures.
+	#
+	# The world lookdev needs the opposite: to put a soft term on a `_matte`
+	# rock that has none. So it is four new, distinctly named fields, and no
+	# table written before V25.2 uses any of them.
+	#
+	# **`soft_light` is the midground fix that is not a light.** Godot's
+	# backlight adds a term proportional to `1 - N.L` per light, which lands
+	# exactly and only on the faces turned away from the key - the ones a flat
+	# facet renders as one near-black value. A fifth directional light would
+	# have raised the whole world and given the faces pointing at *it* a
+	# second key; this raises the shadow floor and nothing else, and it cannot
+	# reach the machine because the machine's materials are not in the table.
+	if spec.has("soft_light"):
+		material.backlight_enabled = true
+		material.backlight = Color(str(spec["soft_light"]))
+	# A face-on brightening, for the few surfaces where the silhouette edge
+	# has to separate from what is behind it.
+	if spec.has("edge_light"):
+		material.rim_enabled = true
+		material.rim = float(spec["edge_light"])
+		material.rim_tint = float(spec.get("edge_tint", 0.2))
+	# A constant floor under a surface. Small: this is a lifted black point,
+	# not a glow, and past about 0.06 it starts flattening the form it is
+	# meant to keep readable.
+	#
+	# **Named `floor_lift` rather than `lift`, and the test found that.** A
+	# profile already uses `lift` for a geometric field - `alpine_neon` has
+	# four of them and `world.patches` has one, all of them "raise this mesh by
+	# so many units". A palette row and a builder row are read by different
+	# code and could not actually collide, which is exactly why one name for
+	# two meanings would have survived until somebody read a diff and drew the
+	# wrong conclusion.
+	if spec.has("floor_lift"):
+		material.emission_enabled = true
+		material.emission = Color(str(spec["floor_lift"]))
+		material.emission_energy_multiplier = float(
+			spec.get("floor_energy", 1.0))
+	# **The switch the rock kit's vertex gradient needs.** A mesh with no
+	# colour array renders as if every vertex were white, so this is inert on
+	# every surface that does not carry one - which is what lets one material
+	# serve a tinted hero form and an untinted boulder.
+	if spec.has("vertex_tint") and bool(spec["vertex_tint"]):
+		material.vertex_color_use_as_albedo = true
+		material.vertex_color_is_srgb = false
 	# **Alpha is opt-in, and it is the one field that also changes the blend.**
 	# The note above says a transparent albedo keeps its alpha, and that is
 	# still true of every row that does not name one: this is for a surface
@@ -1108,6 +1159,36 @@ func _build(key: String) -> StandardMaterial3D:
 			return _matte("#3E3739", 0.93)
 		"world_warm_rock":
 			return _matte("#242130", 0.94)
+		# --- V25.2: the obstacle's own stone ---
+		#
+		# The one section of the course with no local identity, and the brief's
+		# own list of ways to give it one begins with "a distinct rock
+		# material". A slate: the same *value* as the cliff pair beside it and
+		# a hue turn off them, toward green rather than toward warm - warm is
+		# spent at the finish and may not be spent twice.
+		#
+		# **Value, not brightness, is what makes this read.** A lighter rock at
+		# the obstacle would have made the uphill wall compete with the machine
+		# in the one frame where the machine is smallest in the picture. Two
+		# surfaces at one value and two hues read as two materials and neither
+		# of them reads as a light.
+		"world_pocket":
+			return _matte("#1B2830", 0.9)
+		# And the ground of the same place, as its **own two keys** rather
+		# than as the rock's.
+		#
+		# **One material may not belong to two depth bands.** The first build
+		# painted the obstacle's two ground zones with the rock keys, and
+		# `sloped/v252_world.MARKED` puts those keys in `ridges` because the
+		# east wall is midground rock - so two large near-ground zones were
+		# segmented as midground and the measured world cover at the obstacle
+		# went from 12.5% to 39.3% without a single object being added. A zone
+		# is a skin on the heightfield and counts as terrain; the rock standing
+		# on it counts as rock; and the only way both can be true is two keys.
+		"world_pocket_floor":
+			return _matte("#2B3138", 0.93)
+		"world_pocket_grit":
+			return _matte("#31363C", 0.97)
 		# A small amber practical out in the world: the lens, not the light.
 		# Dimmer than the valley's own warm practical, because the two it
 		# stands nearest are the FINISH board and the gold chute, and a lamp

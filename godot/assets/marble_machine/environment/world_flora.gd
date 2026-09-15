@@ -39,6 +39,34 @@ extends RefCounted
 ## 8 x 5 x 2 + 8 = **88**. Cheaper, again, and for the same reason as the rock
 ## kit: the quality was in where the edges are.
 
+## ## V25.2: why three tiers were still a triangle
+##
+## V25.1 was right that the fix is variety in the silhouette rather than
+## detail, and the finish frame says it did not go far enough. Every tier is a
+## **cone on a circular-ish plan with its apex on the axis**, so a stack of
+## them is a taller cone: the outline is still two straight lines meeting at a
+## point, which is the one silhouette the review keeps calling a spike. At
+## finish distance the three tiers are three shallow notches on an otherwise
+## perfect triangle.
+##
+## Three options fix that, and like the rock kit's they all default to off, so
+## a profile that does not name them grows V25.1's plant exactly:
+##
+##     bough     the apex comes off the axis, so a tier leans one way
+##               rather than closing over its own centre. Two boughs in
+##               different directions up one tree is the end of bilateral
+##               symmetry.
+##     ragged    the skirt height varies per facet, so the lower edge of a
+##               tier is a broken line of drooping tips rather than a rim.
+##     aspect    a per-plant width-to-height jitter, so two conifers from one
+##               generator are not the same tree at two scales.
+##
+## And one new kind. `snag` is a dead standing stem with two stub tiers near
+## the top: the cheapest thing in the kit at about 30 triangles and the most
+## distinct silhouette in it, because it is the only plant here that is mostly
+## vertical line. It is in the kit but in no cluster unless a profile names it
+## in `trees.roles` - a composition is data, not a constant.
+
 const Geometry := preload("res://scripts/toy_geometry.gd")
 const Forms := preload("res://assets/marble_machine/lab_forms.gd")
 
@@ -87,6 +115,16 @@ const KINDS := {
 		"trunk": 0.0, "lean": 0.18, "shrink": 1.0, "overlap": 0.0,
 		"squash": 0.3, "material": "world_shrub",
 	},
+	# **The third silhouette, and the one that is not a triangle.** A dead
+	# standing stem: two thirds bare trunk, two small stub tiers at the top,
+	# a strong lean. A stand of conifers with one snag in it reads as a place
+	# with a history; a stand of conifers with one more conifer in it reads as
+	# a stand of conifers.
+	"snag": {
+		"tiers": 2, "facets": 6, "spread": 0.15, "drop": 0.36,
+		"trunk": 0.66, "lean": 0.16, "shrink": 0.62, "overlap": 0.18,
+		"stem_width": 0.42, "material": "conifer_dark",
+	},
 }
 
 
@@ -127,14 +165,24 @@ static func plant(kind: String, height: float, seed_value: int, palette,
 	var key := str(spec.get("material", "conifer_deep"))
 	var material = palette.get_material(key)
 
+	# **The per-plant aspect jitter.** Two plants of one kind differed only in
+	# height and in the per-tier radius noise, which at phone size is two
+	# copies of the same tree. This puts a real width-to-height spread on the
+	# kind itself: `aspect` 0.3 means a plant is between 15% narrower and 15%
+	# wider for its height than the kind's nominal.
+	var aspect := float(spec.get("aspect", 0.0))
+	if aspect > 0.0:
+		spread *= 1.0 + aspect * (_h(seed_value, 41) - 0.5)
+
 	var base := height * trunk
 	if trunk > 0.01:
 		# A stem. Four-sided and untapered: at this size it is two or three
 		# pixels wide and its only job is to hold the crown off the ground,
 		# which is the cue that separates a tree from a bush.
+		var girth := spread * float(spec.get("stem_width", 0.15))
 		var stem := Forms.mesh_node(
-			Geometry.rounded_box(Vector3(spread * 0.15, base * 1.06,
-				spread * 0.15), spread * 0.04, 1),
+			Geometry.rounded_box(Vector3(girth, base * 1.06, girth),
+				spread * 0.04, 1),
 			palette.get_material(str(spec.get("stem", key))), "Stem", false)
 		stem.position.y = base * 0.53
 		node.add_child(stem)
@@ -155,7 +203,16 @@ static func plant(kind: String, height: float, seed_value: int, palette,
 			seed_value * 7 + tier, 13)) * squash
 		var foot: float = base + step * float(tier) * (1.0 - overlap * 0.0)
 		var slide: float = lean * height * (float(tier) / float(maxi(tiers, 1)))
-		var mesh := _tier(radius, tall, facets, seed_value * 11 + tier * 3)
+		# **The lean grows with height, and that is what stops the tip being a
+		# spike.** A uniform `bough` leans every tier the same amount, which
+		# is a leaning cone - still one straight outline. Scaling it up the
+		# plant puts the largest offset on the topmost tier, whose apex is the
+		# only point on a conifer a viewer reads as *the* point.
+		var reach: float = float(spec.get("bough", 0.0))
+		if reach > 0.0 and tiers > 1:
+			reach *= 0.55 + 0.9 * float(tier) / float(tiers - 1)
+		var mesh := _tier(radius, tall, facets, seed_value * 11 + tier * 3,
+			reach, float(spec.get("ragged", 0.0)))
 		var cone := Forms.mesh_node(mesh, material, "Tier%d" % tier, false)
 		cone.position = Vector3(
 			cos(lean_dir) * slide + cos(lean_dir) * spread * offset
@@ -169,7 +226,7 @@ static func plant(kind: String, height: float, seed_value: int, palette,
 
 
 static func _tier(radius: float, height: float, facets: int,
-		seed_value: int) -> ArrayMesh:
+		seed_value: int, bough := 0.0, ragged := 0.0) -> ArrayMesh:
 	## One crown tier: a flat-shaded cone on an irregular plan.
 	##
 	## The plan is jittered per facet by up to a quarter of the radius, which
@@ -182,22 +239,42 @@ static func _tier(radius: float, height: float, facets: int,
 	var plan: Array = []
 	for facet in facets:
 		plan.append(radius * (0.76 + 0.34 * _h(seed_value + facet * 31, 23)))
-	var peak := Vector3(0.0, height, 0.0)
-	var skirt: float = -height * 0.1
+	# **The apex comes off the axis.** A cone with its point over its centre
+	# is bilaterally symmetric from every direction, and a stack of them is a
+	# triangle. Leaning the apex by up to `bough` radii turns the tier into a
+	# bough: one flank is long and shallow, the other short and steep, and
+	# because the lean direction is hashed per tier the tiers of one tree lean
+	# different ways.
+	#
+	# **Named `bough` rather than `tilt` for the reason `floor_lift` is not
+	# `lift`:** `alpine_neon` already uses `tilt` for an aurora curtain angle.
+	# The two are read by different builders out of different sections and
+	# could not collide, and one name for two meanings is still a trap.
+	var slew := TAU * _h(seed_value, 37)
+	var peak := Vector3(cos(slew) * radius * bough, height,
+		sin(slew) * radius * bough)
+	var base: float = -height * 0.1
+	var hub := Vector3(0.0, base, 0.0)
+	var skirts := PackedFloat32Array()
+	skirts.resize(facets)
+	for facet in facets:
+		# `ragged` drops alternating facets of the rim. A tier whose lower
+		# edge is a broken line of tips reads as branches; a tier whose lower
+		# edge is a clean rim reads as a lampshade.
+		skirts[facet] = base - height * ragged 			* _h(seed_value + facet * 43, 47)
 	for facet in facets:
 		var next := (facet + 1) % facets
 		var a := Vector3(cos(TAU * float(facet) / float(facets)) * plan[facet],
-			skirt, sin(TAU * float(facet) / float(facets)) * plan[facet])
+			skirts[facet], sin(TAU * float(facet) / float(facets)) * plan[facet])
 		var b := Vector3(cos(TAU * float(next) / float(facets)) * plan[next],
-			skirt, sin(TAU * float(next) / float(facets)) * plan[next])
+			skirts[next], sin(TAU * float(next) / float(facets)) * plan[next])
 		var normal := (b - peak).cross(a - peak)
 		if normal.dot(a + b) < 0.0:
 			normal = -normal
 		Geometry.quad_auto(surface, a, b, peak, peak, normal.normalized())
 		# The underside, so a tier seen from below or in silhouette against
 		# the sky is not an open shell.
-		Geometry.quad_auto(surface, a, b, Vector3(0.0, skirt, 0.0),
-			Vector3(0.0, skirt, 0.0), Vector3.DOWN)
+		Geometry.quad_auto(surface, a, b, hub, hub, Vector3.DOWN)
 	var mesh := ArrayMesh.new()
 	surface.commit(mesh)
 	return mesh

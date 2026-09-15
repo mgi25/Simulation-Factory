@@ -1,0 +1,26 @@
+Analytic parallax, both worlds: median image displacement per depth
+band over 0.25 s, from the world's own form positions projected
+through the solved camera at both instants. Shading-blind, so it is
+the measure that survives both the flat facets V25.1 broke the block
+matcher with and the tempered surfaces V25.2 breaks it with.
+Pixels at 1080 x 1920; N is how many forms of that band are on
+screen at both instants.
+
+V25.1 - world art
+move            foreground      vegetation      ridges          walls           ranges          
+------------------------------------------------------------------------------------------------
+obstacle_pan    37px/4n         31px/3n         52px/3n         66px/1n         -                 spread 2.2x
+fork_swing      55px/4n         41px/3n         137px/4n        147px/1n        -                 spread 3.6x
+branch_cross    328px/9n        303px/7n        460px/2n        -               -                 spread 1.5x
+final_dive      1px/2n          1px/2n          2px/3n          -               -                 spread 2.4x
+preview_dolly   128px/10n       130px/8n        55px/1n         -               -                 spread 2.3x
+
+V25.2 - final lookdev
+move            foreground      vegetation      ridges          walls           ranges          
+------------------------------------------------------------------------------------------------
+obstacle_pan    37px/4n         31px/3n         52px/3n         66px/1n         -                 spread 2.2x
+fork_swing      55px/4n         41px/3n         137px/4n        147px/1n        -                 spread 3.6x
+branch_cross    328px/9n        303px/7n        460px/2n        -               -                 spread 1.5x
+final_dive      1px/2n          1px/2n          2px/3n          -               -                 spread 2.4x
+preview_dolly   128px/10n       130px/8n        55px/1n         -               -                 spread 2.3x
+

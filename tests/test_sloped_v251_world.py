@@ -276,8 +276,20 @@ def test_the_rock_kit_has_the_eight_named_forms():
 
 
 def test_the_flora_kit_has_the_five_named_plants():
-    listed = re.findall(r'^\t"([a-z]+)": \{', FLORA, re.MULTILINE)
-    assert set(listed) == {"conifer", "spruce", "hero", "shrub", "tuft"}
+    """V25.1's five, and V25.1's clusters still made of only those five.
+
+    A later pass may add a form - V25.2 adds `snag` - and this test's job is
+    not to forbid that. Its job is that **V25.1 still grows V25.1's world**:
+    the five entries it authored are all still there, and the cluster
+    composition it ships still names none but those five, so a plant added
+    for a later profile cannot appear in a V25.1 render.
+    """
+    listed = set(re.findall(r'^	"([a-z]+)": \{', FLORA, re.MULTILINE))
+    five = {"conifer", "spruce", "hero", "shrub", "tuft"}
+    assert five <= listed
+    composition = FLORA[FLORA.index("const CLUSTER := ["):]
+    composition = composition[:composition.index("]")]
+    assert set(re.findall(r'"(\w+)"', composition)) <= five
 
 
 def test_a_cluster_is_composed_rather_than_filled():

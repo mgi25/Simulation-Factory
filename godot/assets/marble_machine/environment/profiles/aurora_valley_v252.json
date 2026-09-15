@@ -1,0 +1,646 @@
+{
+  "id": "aurora_valley_v252",
+  "title": "Aurora Valley V25.2 - final world lookdev",
+  "family": "valley",
+  "summary": "V25.1's world at V25.1's density, with the midground shading response rebuilt: crease-limited normal softening, a baked albedo gradient and a material shadow floor on every rock, restrained warmth in the brief's hierarchy, broken silhouettes on the five hero formations, leaning and ragged vegetation, a slate pocket at the obstacle and a warm two-tier basin at the finish",
+  "extends": "aurora_valley_v251",
+  "lights": {
+    "WorldKey": {
+      "energy": 1.52
+    },
+    "WorldWarm": {
+      "energy": 1.2
+    },
+    "WorldBounce": {
+      "energy": 0.7
+    },
+    "WorldRim": {
+      "energy": 0.5
+    }
+  },
+  "palette": {
+    "world_cliff_face": {
+      "albedo": "#19202F",
+      "roughness": 0.93,
+      "soft_light": "#0C1520",
+      "vertex_tint": true
+    },
+    "world_cliff_ledge": {
+      "albedo": "#222C3B",
+      "roughness": 0.92,
+      "soft_light": "#0C1520",
+      "vertex_tint": true
+    },
+    "world_wall_face": {
+      "albedo": "#1B2739",
+      "roughness": 0.95,
+      "soft_light": "#0A1220",
+      "vertex_tint": true
+    },
+    "world_wall_ledge": {
+      "albedo": "#24344C",
+      "roughness": 0.94,
+      "soft_light": "#0A1220",
+      "vertex_tint": true
+    },
+    "world_scarp": {
+      "albedo": "#1D2229",
+      "roughness": 0.92,
+      "soft_light": "#0C1420",
+      "vertex_tint": true
+    },
+    "world_rock": {
+      "albedo": "#191E25",
+      "roughness": 0.92,
+      "soft_light": "#0C1420",
+      "vertex_tint": true
+    },
+    "world_soil": {
+      "albedo": "#262B34",
+      "roughness": 0.92,
+      "soft_light": "#0C1420",
+      "vertex_tint": true
+    },
+    "world_damp": {
+      "soft_light": "#0A1220",
+      "vertex_tint": true
+    },
+    "world_wet": {
+      "soft_light": "#0A1220"
+    },
+    "world_warm_rock": {
+      "albedo": "#3B3029",
+      "roughness": 0.93,
+      "soft_light": "#2A1D14",
+      "vertex_tint": true
+    },
+    "world_ember": {
+      "albedo": "#453C39",
+      "roughness": 0.92,
+      "soft_light": "#2A1D14"
+    },
+    "world_concrete": {
+      "albedo": "#3A3F49",
+      "soft_light": "#221E1A"
+    },
+    "world_deck": {
+      "albedo": "#333A48",
+      "soft_light": "#0C1520"
+    },
+    "world_deck_dark": {
+      "albedo": "#1E242E",
+      "soft_light": "#0C1520"
+    },
+    "world_pocket": {
+      "albedo": "#1D2630",
+      "roughness": 0.9,
+      "soft_light": "#131C1E",
+      "vertex_tint": true
+    },
+    "world_pocket_floor": {
+      "albedo": "#2C333B",
+      "roughness": 0.93
+    },
+    "world_pocket_grit": {
+      "albedo": "#333940",
+      "roughness": 0.98
+    },
+    "slope_earth": {
+      "albedo": "#2F3846",
+      "roughness": 0.95
+    },
+    "slope_rock": {
+      "albedo": "#242B36",
+      "roughness": 0.94
+    },
+    "slope_cliff": {
+      "albedo": "#1F2530",
+      "roughness": 0.94,
+      "soft_light": "#0C1520"
+    },
+    "slope_scree": {
+      "albedo": "#2A323F",
+      "roughness": 0.97
+    },
+    "slope_cap": {
+      "albedo": "#282E3A",
+      "roughness": 0.93
+    },
+    "slope_boulder": {
+      "albedo": "#1E242E",
+      "soft_light": "#0C1520"
+    },
+    "world_gravel": {
+      "albedo": "#333B49",
+      "roughness": 0.99
+    },
+    "world_bench": {
+      "albedo": "#2F343C",
+      "roughness": 0.9
+    },
+    "conifer_deep": {
+      "albedo": "#15281C",
+      "soft_light": "#0C1A12"
+    },
+    "conifer_dark": {
+      "albedo": "#1D3325",
+      "soft_light": "#0C1A12"
+    },
+    "world_shrub": {
+      "albedo": "#21301F",
+      "soft_light": "#0C1A12"
+    },
+    "lit_world_amber": {
+      "emission": "#FFC48C",
+      "energy": 2.3
+    }
+  },
+  "world": {
+    "patches": {
+      "smooth": true,
+      "facets": 24,
+      "rings": 8,
+      "rough": 0.34,
+      "sites": [
+        [
+          -21.0,
+          -44.0,
+          15.0,
+          "world_bench"
+        ],
+        [
+          3.0,
+          -24.0,
+          17.0,
+          "world_gravel"
+        ],
+        [
+          -13.0,
+          -40.0,
+          14.0,
+          "world_gravel"
+        ],
+        [
+          -10.0,
+          -4.0,
+          19.0,
+          "world_pocket_floor"
+        ],
+        [
+          10.0,
+          3.16,
+          22.0,
+          "world_damp"
+        ],
+        [
+          -9.0,
+          10.0,
+          22.0,
+          "world_pocket_grit"
+        ],
+        [
+          31.0,
+          18.0,
+          24.0,
+          "world_damp"
+        ],
+        [
+          -13.0,
+          34.1,
+          24.0,
+          "world_bench"
+        ],
+        [
+          7.2,
+          46.2,
+          26.0,
+          "world_gravel"
+        ],
+        [
+          29.2,
+          56.2,
+          22.0,
+          "world_ember"
+        ],
+        [
+          19.0,
+          39.0,
+          17.0,
+          "world_ember"
+        ]
+      ]
+    },
+    "walls": {
+      "shape": {
+        "ridge": 0.34,
+        "buttress": 2,
+        "lobe": 0.42,
+        "temper": 0.7,
+        "crease": 42.0,
+        "shade": 0.5,
+        "shade_crown": 0.32,
+        "shade_foot": 0.3,
+        "shade_bearing": 58.0,
+        "shade_cool": 0.05
+      }
+    },
+    "ridges": {
+      "bands": [
+        {
+          "count": 9,
+          "bearing_from": 34.0,
+          "bearing_step": 15.0,
+          "bearing_jitter": 6.0,
+          "radius": 100.0,
+          "radius_step": 16.0,
+          "radius_cycle": 2,
+          "height": 42.0,
+          "height_step": -7.0,
+          "height_cycle": 3,
+          "base": 21.0,
+          "base_step": 4.0,
+          "base_cycle": 2,
+          "sink": 6.0,
+          "seed_from": 907,
+          "seed_step": 23,
+          "kit": "cliff",
+          "shape": {
+            "ledges": 2,
+            "lobe": 0.34,
+            "buttress": 2,
+            "taper": 0.46,
+            "batter": 0.58,
+            "temper": 0.62,
+            "crease": 42.0,
+            "shade": 1.0,
+            "shade_crown": 0.32,
+            "shade_foot": 0.3,
+            "shade_bearing": 58.0,
+            "jag": 0.11,
+            "shoulder": 1,
+            "shade_warm": 0.07,
+            "shade_cool": 0.05
+          }
+        },
+        {
+          "count": 17,
+          "bearing_from": 288.0,
+          "bearing_step": 21.0,
+          "bearing_jitter": 8.0,
+          "radius": 188.0,
+          "radius_step": 26.0,
+          "radius_cycle": 3,
+          "height": 90.0,
+          "height_step": -11.0,
+          "height_cycle": 4,
+          "base": 33.0,
+          "base_step": 7.0,
+          "base_cycle": 3,
+          "sink": 10.0,
+          "kit": "mountain",
+          "shape": {
+            "ledges": 2,
+            "buttress": 2,
+            "lobe": 0.38,
+            "ridge": 0.2,
+            "taper": 0.54,
+            "batter": 0.6,
+            "temper": 0.66,
+            "crease": 42.0,
+            "shade": 0.7,
+            "shade_crown": 0.32,
+            "shade_foot": 0.3,
+            "shade_bearing": 58.0,
+            "jag": 0.06,
+            "shade_cool": 0.06
+          }
+        }
+      ]
+    },
+    "scarps": {
+      "sites": [
+        [
+          -58.0,
+          -50.0,
+          90.0,
+          1.15
+        ],
+        [
+          -43.0,
+          -24.0,
+          90.0,
+          1.0
+        ],
+        [
+          -40.0,
+          2.0,
+          90.0,
+          1.35
+        ],
+        [
+          -36.0,
+          28.0,
+          90.0,
+          1.1
+        ],
+        [
+          -14.0,
+          -78.0,
+          0.0,
+          1.2
+        ],
+        [
+          12.0,
+          -72.0,
+          0.0,
+          1.0
+        ],
+        [
+          35.0,
+          -28.0,
+          90.0,
+          1.1
+        ],
+        [
+          40.0,
+          6.0,
+          90.0,
+          1.3
+        ],
+        [
+          31.0,
+          34.0,
+          90.0,
+          1.0
+        ],
+        [
+          36.0,
+          60.0,
+          90.0,
+          1.15
+        ],
+        [
+          -12.0,
+          70.0,
+          20.0,
+          1.05
+        ]
+      ],
+      "shape": {
+        "ledges": 1,
+        "flats": 2,
+        "lobe": 0.5,
+        "buttress": 1,
+        "temper": 0.46,
+        "crease": 42.0,
+        "shade": 0.9,
+        "shade_crown": 0.32,
+        "shade_foot": 0.3,
+        "shade_bearing": 58.0,
+        "jag": 0.05,
+        "shade_warm": 0.05
+      }
+    },
+    "spires": {
+      "count": 22,
+      "shape": {
+        "buttress": 1,
+        "lobe": 0.3,
+        "temper": 0.3,
+        "crease": 42.0,
+        "shade": 0.8,
+        "shade_crown": 0.32,
+        "shade_foot": 0.3,
+        "shade_bearing": 58.0,
+        "shade_cool": 0.04
+      }
+    },
+    "boulders": {
+      "count": 42,
+      "shape": {
+        "lobe": 0.42,
+        "temper": 0.44,
+        "crease": 42.0,
+        "shade": 0.95,
+        "shade_crown": 0.32,
+        "shade_foot": 0.3,
+        "shade_bearing": 58.0,
+        "jag": 0.16,
+        "shoulder": 1,
+        "shade_warm": 0.06,
+        "shade_cool": 0.05
+      }
+    },
+    "ravine": {
+      "shape": {
+        "ledges": 2,
+        "lobe": 0.3,
+        "buttress": 1,
+        "temper": 0.52,
+        "crease": 42.0,
+        "shade": 0.6,
+        "shade_crown": 0.32,
+        "shade_foot": 0.3,
+        "shade_bearing": 58.0,
+        "shade_cool": 0.08
+      }
+    },
+    "trees": {
+      "shape": {
+        "bough": 0.34,
+        "ragged": 0.24,
+        "aspect": 0.34
+      },
+      "roles": [
+        "hero",
+        "conifer",
+        "spruce",
+        "snag",
+        "conifer",
+        "shrub",
+        "spruce",
+        "tuft",
+        "conifer"
+      ]
+    },
+    "landmarks": {
+      "sites": {
+        "east_wall": {
+          "offset": [
+            54.0,
+            -2.0
+          ],
+          "height": 54.0,
+          "base": 21.0,
+          "kit": "cliff",
+          "facets": 13,
+          "material": "world_pocket",
+          "shape": {
+            "temper": 0.5,
+            "crease": 42.0,
+            "shade": 1.0,
+            "shade_crown": 0.32,
+            "shade_foot": 0.3,
+            "shade_bearing": 58.0,
+            "cap": 0.52,
+            "lobe": 0.54,
+            "step": 0.115,
+            "overhang": 1,
+            "overhang_step": 0.15,
+            "shoulder": 1,
+            "jag": 0.13,
+            "batter": 0.5,
+            "shade_warm": 0.12,
+            "shade_cool": 0.06
+          }
+        },
+        "gorge_teeth": {
+          "shape": {
+            "temper": 0.34,
+            "crease": 42.0,
+            "shade": 0.9,
+            "shade_crown": 0.32,
+            "shade_foot": 0.3,
+            "shade_bearing": 58.0,
+            "jag": 0.09,
+            "shade_cool": 0.07
+          }
+        },
+        "split": {
+          "shape": {
+            "temper": 0.48,
+            "crease": 42.0,
+            "shade": 1.0,
+            "shade_crown": 0.32,
+            "shade_foot": 0.3,
+            "shade_bearing": 58.0,
+            "jag": 0.14,
+            "shoulder": 1,
+            "shade_warm": 0.06,
+            "shade_cool": 0.06
+          }
+        },
+        "merge_narrows": {
+          "shape": {
+            "temper": 0.54,
+            "crease": 42.0,
+            "shade": 0.9,
+            "shade_crown": 0.32,
+            "shade_foot": 0.3,
+            "shade_bearing": 58.0,
+            "jag": 0.08,
+            "overhang": 1,
+            "shade_cool": 0.06
+          }
+        },
+        "finish": {
+          "from": 60.0,
+          "to": 120.0,
+          "radius": 22.0,
+          "crown": 2.0,
+          "fall_y": 16.0,
+          "base": 12.0,
+          "shape": {
+            "temper": 0.58,
+            "crease": 42.0,
+            "shade": 1.0,
+            "shade_crown": 0.36,
+            "shade_foot": 0.3,
+            "shade_bearing": 58.0,
+            "jag": 0.26,
+            "shoulder": 1,
+            "overhang": 1,
+            "overhang_step": 0.12,
+            "shade_warm": 0.4,
+            "shade_cool": 0.07,
+            "taper": 0.46,
+            "batter": 0.56,
+            "cap": 0.22,
+            "lobe": 0.46
+          }
+        },
+        "finish_floor": {
+          "from": 64.0,
+          "to": 124.0,
+          "radius": 15.0,
+          "crown": -22.0,
+          "fall_y": 14.0,
+          "base": 9.0,
+          "shape": {
+            "temper": 0.56,
+            "crease": 42.0,
+            "shade": 0.8,
+            "shade_crown": 0.24,
+            "shade_foot": 0.4,
+            "shade_bearing": 58.0,
+            "shade_cool": 0.09
+          }
+        }
+      }
+    },
+    "lamps": {
+      "sites": [
+        [
+          "obstacle",
+          -13.0,
+          4.0,
+          -8.0,
+          "#FFB877",
+          1.6,
+          30.0,
+          1.6
+        ],
+        [
+          "split",
+          26.0,
+          -16.0,
+          8.0,
+          "#7FD8FF",
+          0.7,
+          30.0,
+          1.7
+        ],
+        [
+          "merge",
+          -20.0,
+          -7.0,
+          4.0,
+          "#8FD0F0",
+          0.6,
+          24.0,
+          1.7
+        ],
+        [
+          "finish",
+          22.0,
+          -4.0,
+          18.0,
+          "#FFC98A",
+          1.45,
+          30.0,
+          1.5
+        ],
+        [
+          "finish",
+          -14.0,
+          -6.0,
+          22.0,
+          "#FFB469",
+          1.05,
+          26.0,
+          1.6
+        ],
+        [
+          "finish",
+          14.0,
+          -3.0,
+          12.0,
+          "#FFB878",
+          4.2,
+          40.0,
+          1.3
+        ]
+      ]
+    }
+  }
+}

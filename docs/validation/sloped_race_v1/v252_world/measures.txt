@@ -1,0 +1,18 @@
+headroom (machine L* minus backdrop L*), marble dE, world cover % and flat-white %
+(world cover is every depth band except the near ground, off the marker render)
+
+moment                      V25.1 hr  V25.1 dE  V25.1 wc  V25.1 clip  V25.2 hr  V25.2 dE  V25.2 wc  V25.2 clip
+--------------------------  --------  --------  --------  ----------  --------  --------  --------  ----------
+1  Start                    78.3      13        36.7      0.126       75.8      13        36.7      0.126     
+2  Mixer                    84.0      56        27.6      0.331       83.7      56        27.6      0.331     
+3  Descent                  86.8      49        28.4      0.304       84.5      49        29.5      0.304     
+4  Obstacle                 61.5      58        12.5      0.060       61.4      58        13.0      0.060     
+5  Fork approach            84.1      43        45.7      0.056       81.8      43        54.1      0.056     
+6  Split                    80.6      50        54.6      0.066       77.3      50        59.6      0.066     
+7  Branch                   77.5      89        52.9      0.107       73.5      89        55.7      0.106     
+8  Merge                    85.3      72        49.1      0.601       83.3      72        50.4      0.601     
+9  Final approach           79.5      102       24.1      0.016       78.9      102       23.8      0.006     
+10  Finish                  84.1      35        37.9      0.064       80.6      34        37.3      0.063     
+P1  Preview - finish arena  80.2      0         49.5      0.001       74.6      0         50.7      0.001     
+P2  Preview - mid course    82.3      0         43.8      0.082       80.1      0         46.2      0.082     
+P3  Preview - the start     68.5      99        40.5      0.073       65.5      99        40.6      0.073     

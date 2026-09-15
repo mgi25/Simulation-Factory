@@ -1,0 +1,32 @@
+{
+  "aurora_valley_v251": {
+    "finish_rim_shift": -64.0,
+    "finish_rim_warm": 0.000981375627457149,
+    "finish_shift": -43.0,
+    "finish_warm": 0.008242659337861417,
+    "hero_spread": 28.562999999999995,
+    "midground_dark": {
+      "ridges": 0.2235366130834215,
+      "walls": 0.034652743342181255
+    },
+    "midground_spread": {
+      "ridges": 4.0092,
+      "walls": 3.115500000000001
+    }
+  },
+  "aurora_valley_v252": {
+    "finish_rim_shift": -46.0,
+    "finish_rim_warm": 0.25574225153444397,
+    "finish_shift": -35.0,
+    "finish_warm": 0.08475755970414886,
+    "hero_spread": 26.345200000000002,
+    "midground_dark": {
+      "ridges": 0.0274831145937951,
+      "walls": 0.010118611247902634
+    },
+    "midground_spread": {
+      "ridges": 4.081400000000002,
+      "walls": 2.3619000000000003
+    }
+  }
+}

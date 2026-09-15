@@ -59,6 +59,35 @@ extends RefCounted
 ##
 ## A mesh. No collider, no height field, no physics. See
 ## `environment_world.gd`'s header for why that separation is load-bearing.
+##
+## ## V25.2: the lookdev options, and why they are options
+##
+## V25.1 shipped this kit and its own doc recorded the cost of it honestly:
+## the midground ridge band went from 22.6% of its pixels under grey 12 to
+## **42.2%**, because a flat facet has one value and some of those values are
+## low. The review saw the same thing without a number - cliffs that read as
+## twelve unrelated dark polygons rather than as one sculpted mass.
+##
+## Four options below answer that, and **every one of them defaults to off**,
+## so a profile that does not name them builds the mesh V25.1 built, vertex
+## for vertex and triangle for triangle. That is not politeness: V25.1 and
+## V25 B are the controls this pass is measured against, and a control that
+## silently moved would make the comparison meaningless.
+##
+##     temper     crease-limited normal softening. The silhouette, the
+##                vertices and the triangle count are untouched; only the
+##                shading normals move, and only across edges shallower than
+##                `crease`. A ledge step still catches the key as a hard line;
+##                the 33-degree steps around the plan stop being cliffs of
+##                value. This is the midground fix.
+##     shade      a large-scale albedo gradient baked to vertex colour: lift
+##                toward the crown, fall into the foot, and a restrained warm
+##                or cool turn by aspect. Needs `vertex_tint` on the material.
+##     jag        a broken crown contour on the flat-topped kinds.
+##     overhang   a ledge that steps *outward*, which is the one silhouette
+##                event a taper cannot produce.
+##     shoulder   a high secondary mass that breaks the top contour, where
+##                `buttress` is a low one that broadens the foot.
 
 const Geometry := preload("res://scripts/toy_geometry.gd")
 
@@ -187,6 +216,29 @@ static func form(kind: String, height: float, base_radius: float,
 			base_radius * (0.40 + 0.26 * _h(salt, 83)), salt,
 			Vector3(cos(angle) * out, -height * 0.02, sin(angle) * out))
 
+	# **The high secondary mass.** A buttress broadens the foot; what breaks a
+	# *top* contour has to be up near the crown, and the brief's hero-rock
+	# rule asks for both. A shoulder is a shell at 62-88% of the height,
+	# pushed out about half a radius, so it interpenetrates the parent's upper
+	# third and its own crown lands beside the parent's - two summits at
+	# different heights instead of one plate.
+	var shoulders := int(spec.get("shoulder", 0))
+	for which in shoulders:
+		var salt := seed_value * 53 + which * 907 + 17
+		var angle: float = TAU * _h(salt, 89)
+		var out: float = base_radius * (0.34 + 0.3 * _h(salt, 97))
+		var share: float = 0.62 + 0.26 * _h(salt, 101)
+		var high: Dictionary = spec.duplicate()
+		high["ledges"] = maxi(int(spec.get("ledges", 2)) - 1, 0)
+		high["buttress"] = 0
+		high["shoulder"] = 0
+		high["overhang"] = 0
+		high["cap"] = float(spec.get("cap", 0.4)) * 0.72
+		high["lean"] = float(spec.get("lean", 0.1)) * 1.6
+		_shell(surface, high, height * share,
+			base_radius * (0.30 + 0.2 * _h(salt, 103)), salt,
+			Vector3(cos(angle) * out, -height * 0.01, sin(angle) * out))
+
 	var mesh := ArrayMesh.new()
 	surface.commit(mesh)
 	return mesh
@@ -232,9 +284,41 @@ static func _shell(surface: SurfaceTool, spec: Dictionary, height: float,
 				sin(angle) * radius) + offset)
 		loops.append(loop)
 
+	# **The vertex tint.** A large-scale albedo gradient, baked per vertex and
+	# multiplied into the material by `vertex_tint`. Off unless a profile asks
+	# for it, and when it is on it is on for *every* vertex of the surface -
+	# `SurfaceTool` rejects a surface where some vertices carry a colour and
+	# others do not.
+	var shade := float(spec.get("shade", 0.0))
+	var tints: Array = []
+	if shade > 0.0:
+		for index in loops.size():
+			var ring: Array = loops[index]
+			var row: Array = []
+			for facet in facets:
+				row.append(_tint(spec, shade, ring[facet], origin, height))
+			tints.append(row)
+
+	# **The shading normals, and the one rule that keeps this from flattening
+	# the kit.**
+	#
+	# `temper` blends each corner of a quad from its own face normal toward
+	# the average of the faces meeting at that corner - but only over edges
+	# shallower than `crease`. So the 33-degree steps around a plan, which are
+	# what turn a cliff into a mosaic of unrelated values, get a gradient
+	# across them; a ledge step, a notch and a chorded flat's corner are all
+	# past the crease angle and stay exactly as hard as they were. The
+	# vertices do not move, the silhouette does not move and the triangle
+	# count does not move: this is a shading change and nothing else.
+	var temper := clampf(float(spec.get("temper", 0.0)), 0.0, 1.0)
+	var crease := cos(deg_to_rad(clampf(float(spec.get("crease", 42.0)),
+		1.0, 179.0)))
+	var faces: Array = []
 	for tier in loops.size() - 1:
 		var lower: Array = loops[tier]
 		var upper: Array = loops[tier + 1]
+		var row := PackedVector3Array()
+		row.resize(facets)
 		for facet in facets:
 			var next := (facet + 1) % facets
 			var a: Vector3 = lower[facet]
@@ -254,7 +338,35 @@ static func _shell(surface: SurfaceTool, spec: Dictionary, height: float,
 				normal = -normal
 			if normal.length_squared() < 1.0e-12:
 				normal = outward
-			Geometry.quad_auto(surface, a, b, c, d, normal.normalized())
+			row[facet] = normal.normalized()
+		faces.append(row)
+
+	for tier in loops.size() - 1:
+		var lower: Array = loops[tier]
+		var upper: Array = loops[tier + 1]
+		for facet in facets:
+			var next := (facet + 1) % facets
+			var a: Vector3 = lower[facet]
+			var b: Vector3 = upper[facet]
+			var c: Vector3 = upper[next]
+			var d: Vector3 = lower[next]
+			var flat: Vector3 = faces[tier][facet]
+			if temper <= 0.0 and shade <= 0.0:
+				Geometry.quad_auto(surface, a, b, c, d, flat)
+				continue
+			var normals := [flat, flat, flat, flat]
+			if temper > 0.0:
+				normals = [
+					_soft(faces, facets, tier, facet, flat, temper, crease),
+					_soft(faces, facets, tier + 1, facet, flat, temper, crease),
+					_soft(faces, facets, tier + 1, next, flat, temper, crease),
+					_soft(faces, facets, tier, next, flat, temper, crease),
+				]
+			var colours := []
+			if shade > 0.0:
+				colours = [tints[tier][facet], tints[tier + 1][facet],
+					tints[tier + 1][next], tints[tier][next]]
+			_face(surface, [a, b, c, d], normals, colours, flat)
 
 	# **The foot is a buried skirt, not a flat cap, and the reason is the one
 	# lighting fact that flat shading makes unforgiving.**
@@ -293,18 +405,37 @@ static func _shell(surface: SurfaceTool, spec: Dictionary, height: float,
 			b.z + c.z - 2.0 * origin.z)
 		if outward.length_squared() < 1.0e-9:
 			outward = Vector3.RIGHT
-		Geometry.quad_auto(surface, a, b, c, d, outward.normalized())
+		if shade <= 0.0:
+			Geometry.quad_auto(surface, a, b, c, d, outward.normalized())
+			continue
+		var face := outward.normalized()
+		# The skirt is below the ground on level terrain and is a vertical
+		# wall where the ground falls away, so it takes the foot's own tint
+		# rather than a darker one: what is visible of it is the bottom of
+		# the mass, not a separate object.
+		var low: Color = tints[0][index]
+		var low_next: Color = tints[0][next]
+		_face(surface, [a, b, c, d], [face, face, face, face],
+			[low, low, low_next, low_next], face)
 	var base_centre := origin - Vector3(0.0, skirt, 0.0)
 	for index in buried.size():
 		var next := (index + 1) % buried.size()
-		Geometry.quad_auto(surface, buried[index], buried[next], base_centre,
-			base_centre, Vector3.DOWN)
+		if shade <= 0.0:
+			Geometry.quad_auto(surface, buried[index], buried[next],
+				base_centre, base_centre, Vector3.DOWN)
+			continue
+		var under: Color = tints[0][index]
+		_face(surface, [buried[index], buried[next], base_centre, base_centre],
+			[Vector3.DOWN, Vector3.DOWN, Vector3.DOWN, Vector3.DOWN],
+			[under, under, under, under], Vector3.DOWN)
 
-	_crown(surface, loops[loops.size() - 1], height, ridge, seed_value)
+	_crown(surface, loops[loops.size() - 1], height, ridge, seed_value,
+		spec, shade, origin)
 
 
 static func _crown(surface: SurfaceTool, top: Array, height: float,
-		ridge: float, seed_value: int) -> void:
+		ridge: float, seed_value: int, spec := {}, shade := 0.0,
+		origin := Vector3.ZERO) -> void:
 	## The top. A flat plate on every kind but the mountains, which get a
 	## broken ridge line instead.
 	##
@@ -324,13 +455,26 @@ static func _crown(surface: SurfaceTool, top: Array, height: float,
 		var tilt := Vector3(
 			(_h(seed_value, 307) - 0.5) * 0.22, 0.0,
 			(_h(seed_value, 311) - 0.5) * 0.22)
+		# **The broken crown.** A flat top is the right decision - the
+		# reference's rock is mesas and buttes, and a mass that closes to a
+		# point is a cone. But a flat top whose rim is a single clean polygon
+		# draws a straight line across the sky, and a straight line across the
+		# sky is the strongest "generated" cue a silhouette has. `jag` gives
+		# each rim vertex its own height, so the top reads as a weathered
+		# crown with notches in it and still reads as a *top*.
+		var jag := maxf(float(spec.get("jag", 0.0)), 0.0)
 		var lifted: Array = []
-		for point in top:
-			var raised: Vector3 = point
-			raised.y += tilt.x * point.x + tilt.z * point.z
+		for index in top.size():
+			var raised: Vector3 = top[index]
+			raised.y += tilt.x * raised.x + tilt.z * raised.z
+			if jag > 0.0:
+				raised.y += height * jag * (_h(seed_value * 17 + index, 503)
+					- 0.42)
 			lifted.append(raised)
 		var apex := centre
 		apex.y += height * 0.02
+		if jag > 0.0:
+			apex.y += height * jag * 0.22
 		for index in lifted.size():
 			var next := (index + 1) % lifted.size()
 			var a: Vector3 = lifted[index]
@@ -338,7 +482,16 @@ static func _crown(surface: SurfaceTool, top: Array, height: float,
 			var normal := (b - apex).cross(a - apex)
 			if normal.y < 0.0:
 				normal = -normal
-			Geometry.quad_auto(surface, a, b, apex, apex, normal.normalized())
+			if shade <= 0.0:
+				Geometry.quad_auto(surface, a, b, apex, apex,
+					normal.normalized())
+				continue
+			var face := normal.normalized()
+			var top_a := _tint(spec, shade, a, origin, height)
+			var top_b := _tint(spec, shade, b, origin, height)
+			var top_c := _tint(spec, shade, apex, origin, height)
+			_face(surface, [a, b, apex, apex], [face, face, face, face],
+				[top_a, top_b, top_c, top_c], face)
 		return
 	# A ridge line: each crown vertex gets its own height, so the top is a row
 	# of summits and saddles rather than a plate. This is what makes a distant
@@ -360,7 +513,113 @@ static func _crown(surface: SurfaceTool, top: Array, height: float,
 		var normal := (b - spine).cross(a - spine)
 		if normal.y < 0.0:
 			normal = -normal
-		Geometry.quad_auto(surface, a, b, spine, spine, normal.normalized())
+		if shade <= 0.0:
+			Geometry.quad_auto(surface, a, b, spine, spine,
+				normal.normalized())
+			continue
+		var face := normal.normalized()
+		_face(surface, [a, b, spine, spine], [face, face, face, face],
+			[_tint(spec, shade, a, origin, height),
+				_tint(spec, shade, b, origin, height),
+				_tint(spec, shade, spine, origin, height),
+				_tint(spec, shade, spine, origin, height)], face)
+
+
+# --- V25.2: shading response, not geometry ----------------------------------
+
+
+static func _soft(faces: Array, facets: int, tier: int, facet: int,
+		flat: Vector3, temper: float, crease: float) -> Vector3:
+	## One corner's shading normal: its own face, blended toward the average
+	## of the faces meeting there over shallow edges only.
+	##
+	## Vertex `(tier, facet)` belongs to the four quads `(tier-1, facet-1)`,
+	## `(tier-1, facet)`, `(tier, facet-1)` and `(tier, facet)`, minus whichever
+	## of those are off the ends of the form. A neighbour joins the average
+	## only if its normal is within `crease` of the face being emitted, so a
+	## ledge step, a notch wall and the corner of a chorded flat are all left
+	## alone - they are the edges that carry the kit's whole argument.
+	var sum := flat
+	var previous := (facet + facets - 1) % facets
+	for row in [tier - 1, tier]:
+		if row < 0 or row >= faces.size():
+			continue
+		var band: PackedVector3Array = faces[row]
+		for column in [previous, facet]:
+			if row == tier and column == facet:
+				continue
+			var other: Vector3 = band[column]
+			if other.dot(flat) >= crease:
+				sum += other
+	if sum.length_squared() < 1.0e-12:
+		return flat
+	return flat.lerp(sum.normalized(), temper).normalized()
+
+
+static func _tint(spec: Dictionary, shade: float, point: Vector3,
+		origin: Vector3, height: float) -> Color:
+	## The large-scale albedo gradient at one vertex, as a multiplier.
+	##
+	## Two terms, both of them at the scale of the whole form, because the
+	## brief's rule and this course's style lock both ban high-frequency
+	## surface noise:
+	##
+	##   * **height.** Lift toward the crown and fall into the foot, which is
+	##     what a mass standing in its own dust and its own shadow does, and
+	##     which gives a cliff an internal value change that survives being
+	##     flat-shaded. A facet is still one value; the *form* is no longer
+	##     one value.
+	##   * **aspect.** A restrained warm turn on the side the world's warm
+	##     fill comes from and a cool turn away from it. This is the brief's
+	##     "warm bounce on selected rock faces" bought at zero light cost and
+	##     with no risk of reaching the machine, which is on another layer and
+	##     another material set entirely.
+	##
+	## Returned as a multiplier around 1.0 in **linear** space, which is what
+	## `vertex_color_use_as_albedo` wants with `vertex_color_is_srgb` off.
+	var v: float = clampf(point.y / maxf(height, 0.001), 0.0, 1.0)
+	var lift: float = 1.0 		+ shade * float(spec.get("shade_crown", 0.34)) * pow(v, 0.8) 		- shade * float(spec.get("shade_foot", 0.30)) * pow(1.0 - v, 2.0)
+	var warm := shade * float(spec.get("shade_warm", 0.0))
+	var cool := shade * float(spec.get("shade_cool", 0.0))
+	var tint := Color(lift, lift, lift, 1.0)
+	if warm > 0.0 or cool > 0.0:
+		var bearing := deg_to_rad(float(spec.get("shade_bearing", 58.0)))
+		var out := Vector3(point.x - origin.x, 0.0, point.z - origin.z)
+		var aspect := 0.0
+		if out.length_squared() > 1.0e-9:
+			out = out.normalized()
+			aspect = out.x * sin(bearing) + out.z * cos(bearing)
+		var lit: float = maxf(aspect, 0.0)
+		var away: float = maxf(-aspect, 0.0)
+		tint.r += warm * lit * 1.00 - cool * away * 0.30
+		tint.g += warm * lit * 0.52 - cool * away * 0.05
+		tint.b += -warm * lit * 0.22 + cool * away * 0.55
+	tint.r = maxf(tint.r, 0.05)
+	tint.g = maxf(tint.g, 0.05)
+	tint.b = maxf(tint.b, 0.05)
+	return tint
+
+
+static func _face(surface: SurfaceTool, points: Array, normals: Array,
+		colours: Array, mean: Vector3) -> void:
+	## One quad with a normal - and optionally a colour - per corner.
+	##
+	## `Geometry.quad_auto` is still the path when no lookdev option is on,
+	## and a byte-identical mesh is the reason: this exists because
+	## `SurfaceTool` needs the colour set before each `add_vertex` and the
+	## shared helper has no colour argument. Winding is decided against
+	## `mean`, the untempered face normal, so a tempered quad winds exactly
+	## the way the same quad wound in V25.1.
+	var order := [0, 1, 2, 3]
+	if (points[1] - points[0]).cross(points[2] - points[0]).dot(mean) > 0.0:
+		order = [0, 3, 2, 1]
+	var tinted := not colours.is_empty()
+	for index in [0, 1, 2, 0, 2, 3]:
+		var at: int = order[index]
+		if tinted:
+			surface.set_color(colours[at])
+		surface.set_normal(normals[at])
+		surface.add_vertex(points[at])
 
 
 # --- the plan: what the form looks like from above --------------------------
@@ -480,6 +739,28 @@ static func _profile(spec: Dictionary, seed_value: int, facets: int) -> Array:
 			"span": mini(span, facets - 1),
 			"step": step * (0.7 + 0.6 * _h(seed_value, 67 + which * 3)),
 		})
+	# **The overhang: the one silhouette event a taper cannot produce.**
+	#
+	# Every mark above steps the radius *in*, because that is what a taper and
+	# a shelf do. A cliff that has been undercut steps *out* - the mass above
+	# hangs past the mass below, and the face under it goes into a shadow no
+	# amount of fill reaches. That is worth exactly one per hero form: two
+	# overhangs is a mushroom.
+	#
+	# Implemented as a mark with a negative step, high up the form and over a
+	# short arc, so the lip is a corner of the silhouette rather than a brim.
+	for which in maxi(int(spec.get("overhang", 0)), 0):
+		var at: float = clampf(0.52 + 0.24 * _h(seed_value, 71 + which * 3),
+			0.3, 0.86)
+		var span := maxi(int(round(float(facets)
+			* (0.2 + 0.22 * _h(seed_value, 73 + which * 3)))), 2)
+		marks.append({
+			"v": at,
+			"start": int(_h(seed_value, 79 + which * 3) * float(facets)),
+			"span": mini(span, facets - 1),
+			"step": -maxf(float(spec.get("overhang_step", 0.13)), 0.0)
+				* (0.7 + 0.6 * _h(seed_value, 83 + which * 3)),
+		})
 	marks.sort_custom(func(a, b): return float(a["v"]) < float(b["v"]))
 
 	var stops: Array = []
@@ -526,10 +807,15 @@ static func _profile(spec: Dictionary, seed_value: int, facets: int) -> Array:
 
 static func _scaled(natural: float, shed: PackedFloat32Array,
 		floor_scale: float) -> PackedFloat32Array:
+	## Clamped **above** as well as below, and the upper clamp is what keeps
+	## `form()`'s promise that `base_radius` is the widest point: an overhang
+	## is a negative shed, and without the clamp a low-taper kind with one on
+	## it would grow past its own foot and out through a keep-out that was
+	## sized against the foot.
 	var out := PackedFloat32Array()
 	out.resize(shed.size())
 	for facet in shed.size():
-		out[facet] = maxf(natural - shed[facet], floor_scale * 0.45)
+		out[facet] = clampf(natural - shed[facet], floor_scale * 0.45, 1.0)
 	return out
 
 
