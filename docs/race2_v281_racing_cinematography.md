@@ -32,7 +32,9 @@ instrument, on its own rendered track:
 | share of the film inside its two longest takes | **36%** |
 | screen-direction reversals across cuts | **5** |
 | worst pack jump at a cut, in half-frames | **1.784** |
-| racers, delivery frame | 58-85 px |
+| worst lens-angle change across a cut | **123.7 deg** |
+| minimum lens clearance | **-6.60 units** |
+| racers, delivery frame | 57.5-85.2 px |
 
 The last two are the ones that matter. **1.784 half-frames is the pack landing
 most of a frame-width away from where it just was** - the eye has to hunt for
@@ -42,12 +44,33 @@ to a fixed bearing about a *station*, and the switchyard reverses direction five
 times, so consecutive stations are filmed from opposite sides of the racing
 axis.
 
+A negative clearance is the third row worth stopping on: **V28's lens spends
+part of the film 6.6 layout units inside the course's own envelope.** That is
+not a rendering fault - the shots it produces are the ones the doc describes -
+but it is the measurement of a camera placed by bearing and reach from a station
+rather than by a solve against the geometry, and it is why V28 needed a per-frame
+lift loop at all.
+
 A second, quieter failure shows up in the same instrument. V28's anticipation
 shots stand past a mechanism looking back up the course, and measured
-frame-by-frame they spend **41-52% of their samples with the active pack outside
-the frame**, and its `sprint` cut has 53.7% of its samples with the racers
-behind geometry. The shots are correct compositions of mechanisms. They are not
-shots of a race.
+frame-by-frame they spend **46.7 to 58.5% of their samples with the active pack
+outside the frame width**. Its `hook` has 31.4% of its samples with the racers
+behind geometry, and its `sprint` has 56.2%. The shots are correct compositions
+of mechanisms. They are not shots of a race.
+
+| V28 shot | active pack outside the frame | behind geometry |
+|---|---|---|
+| `hook` | 0.0% | 31.4% |
+| `drum_anticipate` | 50.0% | 37.9% |
+| `sweep_anticipate` | **58.5%** | 10.9% |
+| `pair_anticipate` | 53.4% | 13.8% |
+| `last_anticipate` | 46.7% | 16.5% |
+| `sprint` | 0.0% | **56.2%** |
+| `payoff` | 31.7% | 0.0% |
+
+The four `*_impact` shots are the good ones - 0 to 15% out of frame and nothing
+occluded - and they are 0.9 to 1.6 s each. **V28 films the collisions well and
+spends the rest of the film elsewhere.**
 
 ---
 
@@ -159,7 +182,17 @@ the downhill side of any leg is *above* the next leg, and the uphill side is
 *below* the previous one. A lens 9 units upcourse of `corr2` sits inside
 `corr1`'s guard envelope; the same lens downcourse sits eleven units clear above
 `corr3`. A course that folded the other way would get the other answer from the
-same three lines.
+same three lines, and `test_the_downhill_direction_is_derived_from_the_geometry`
+checks exactly that by mirroring a synthetic plane and by tilting one toward -X.
+
+**That test is also the honest limit of the reusability claim.** Every course in
+`race2` - the switchyard and all three concepts - is built on *one centreline
+skeleton*, which is deliberate (V28 compared its concepts on one skeleton so the
+comparison was about topology) and which means solving a rail for `cascade` and
+for `switchyard` returns the same numbers and proves nothing. The architecture
+is course-independent by construction - `camera_rail` takes a `Spine` and a rig
+is seven numbers - but **nothing here demonstrates it on a genuinely different
+plan**, and that is the first thing to do with a second course.
 
 ### 4.3 `race2.rig` - seven primitives
 
@@ -228,15 +261,15 @@ So the pack's own velocity is passed to the springs and they aim that far ahead.
 The lag against a steady ramp cancels; the damping still does its work on
 everything that is not steady.
 
-**What it bought, on the same three candidates with nothing else changed:**
+**What it bought, on the same build with nothing else changed:**
 
 | | before | after |
 |---|---|---|
 | worst pack jump at a cut | 1.635 | **0.285** |
 | worst scale jump | 1.33 | **1.19** |
-| final sprint, top 3 visible | 62% | **75%** |
-| final sprint, winner visible | 65% | **81%** |
-| finish visible before the crossing | 1.12 s | **2.22 s** |
+| final sprint, top 3 visible | 75% | **82.7%** |
+| final sprint, winner visible | 81% | **96.7%** |
+| finish visible before the crossing | 2.22 s | **2.92 s** |
 
 This is the single largest improvement in the session and it is four lines of
 code.
@@ -309,12 +342,12 @@ direction to reverse.
 Four shots, three hard cuts, one rig family between the hook and the run-in. Its
 job is to isolate one variable: how much of V28's problem was the cutting.
 
-| from | to | s | rig | cut on |
-|---|---|---|---|---|
-| 0.02 | 2.23 | 2.22 | `hook_release` | release |
-| 2.23 | 9.02 | 6.78 | `chase_rear_3q` | drum first contact |
-| 9.02 | 12.68 | 3.67 | `chase_rear_3q` | pair first contact |
-| 12.68 | 19.15 | 6.47 | `finish_chase` | last first contact |
+| from | to | s | rig | racers | pack on screen | cut on |
+|---|---|---|---|---|---|---|
+| 0.02 | 2.23 | 2.22 | `hook_release` | 93 px | 96% | release |
+| 2.23 | 9.02 | 6.78 | `chase_rear_3q` | 95 px | 80% | drum first contact |
+| 9.02 | 12.68 | 3.67 | `chase_rear_3q` | 92 px | 74% | pair first contact |
+| 12.68 | 19.15 | 6.47 | `finish_chase` | 77 px | 85% | last first contact |
 
 The second shot carries the drum, the second hairpin, the sweep and the approach
 to the pair in one take - four of the course's beats, none of them cut to.
@@ -324,13 +357,13 @@ to the pair in one take - four of the course's beats, none of them cut to.
 Five shots, four hard cuts, four different rigs. Variety bought from rig changes
 at motivated cuts rather than from cutting more often.
 
-| from | to | s | rig | cut on |
-|---|---|---|---|---|
-| 0.02 | 2.23 | 2.22 | `hook_release` | release |
-| 2.23 | 6.28 | 4.05 | `chase_rear_3q` | drum first contact |
-| 6.28 | 9.02 | 2.73 | `chase_side` | sweep first contact |
-| 9.02 | 12.68 | 3.67 | `bend_orbit` | pair first contact |
-| 12.68 | 19.15 | 6.47 | `finish_chase` | last first contact |
+| from | to | s | rig | racers | pack on screen | cut on |
+|---|---|---|---|---|---|---|
+| 0.02 | 2.23 | 2.22 | `hook_release` | 93 px | 96% | release |
+| 2.23 | 6.28 | 4.05 | `chase_rear_3q` | 100 px | 87% | drum first contact |
+| 6.28 | 9.02 | 2.73 | `chase_side` | 90 px | 65% | sweep first contact |
+| 9.02 | 12.68 | 3.67 | `bend_orbit` | 89 px | 68% | pair first contact |
+| 12.68 | 19.15 | 6.47 | `finish_chase` | 77 px | 85% | last first contact |
 
 ## 9. Camera C - low pursuit
 
@@ -338,14 +371,18 @@ Six shots, five hard cuts, the lift pulled 1.6 units under the rail throughout
 and the reach at its floor. Larger racers, stronger foreground, less of what is
 coming.
 
-| from | to | s | rig | cut on |
-|---|---|---|---|---|
-| 0.02 | 2.23 | 2.22 | `hook_release` | release |
-| 2.23 | 4.58 | 2.35 | `chase_pack` | drum first contact |
-| 4.58 | 6.28 | 1.70 | `chase_side` | drum last contact |
-| 6.28 | 9.02 | 2.73 | `compression_follow` | sweep first contact |
-| 9.02 | 12.68 | 3.67 | `chase_pack` | pair first contact |
-| 12.68 | 19.15 | 6.47 | `finish_chase` | last first contact |
+| from | to | s | rig | racers | pack on screen | cut on |
+|---|---|---|---|---|---|---|
+| 0.02 | 2.23 | 2.22 | `hook_release` | 93 px | 99% | release |
+| 2.23 | 4.58 | 2.35 | `chase_pack` | **108 px** | **100%** | drum first contact |
+| 4.58 | 6.28 | 1.70 | `chase_side` | 98 px | **52%** | drum last contact |
+| 6.28 | 9.02 | 2.73 | `compression_follow` | 100 px | 68% | sweep first contact |
+| 9.02 | 12.68 | 3.67 | `chase_pack` | 96 px | 68% | pair first contact |
+| 12.68 | 19.15 | 6.47 | `finish_chase` | 79 px | 82% | last first contact |
+
+C's `drum_low` is the best single shot in the session by these numbers - 108 px
+with the whole active pack on screen for every frame of it - and its
+`pan2_side`, two shots later, is the worst at 52%. That spread is C.
 
 ---
 
@@ -364,10 +401,11 @@ instrument over the same replay.
 | share in the two longest takes | 36% | **69%** | 55% | 53% |
 | share in takes of 3 s or more | n/a | **88%** | 74% | 53% |
 | screen-direction reversals | **5** | 0 | 0 | 0 |
-| racers, 1080 frame | 58-85 px | 77-95 | 77-100 | **79-108** |
-| racers, 270 frame | 14.4-21 px | 19.3-23.8 | 19.3-24.7 | **19.7-26.3** |
-| peak lens speed | 72.0 u/s | 40.6 | 40.6 | 34.7 |
-| minimum lens clearance | n/a | 4.10 u | 4.10 u | 3.12 u |
+| racers, 1080 frame | 57.5-85.2 px | 77.4-95.4 | 77.4-99.8 | **79.0-108.5** |
+| racers, 270 frame | 14.4-21.3 px | 19.3-23.8 | 19.3-25.0 | **19.7-27.1** |
+| peak lens speed | 72.0 u/s | 45.6 | 45.6 | **40.0** |
+| peak lens turn rate | 189 deg/s | 111 | 111 | 129 |
+| minimum lens clearance | **-6.60 u** | **5.64 u** | 5.20 u | 4.15 u |
 | **FLOW** | **24.3** | **85.5** | 77.9 | 70.2 |
 
 FLOW is a weighted sum of five of the brief's own criteria - continuity 40,
@@ -386,7 +424,20 @@ space, where 1.0 is half the frame width, and how much its apparent size changes
 |---|---|---|---|---|
 | worst pack jump | **1.784** | 0.285 | 0.285 | 0.309 |
 | worst scale change | 1.33x | 1.19x | **1.18x** | 1.33x |
-| worst lens-angle change | n/a | 28.8 deg | 32.7 deg | 40.5 deg |
+| worst lens-angle change | 123.7 deg | **10.3 deg** | 19.5 deg | 26.9 deg |
+
+Per shot, the fraction of active-pack samples outside the frame width and behind
+geometry - the two measures V28's anticipation shots fail on:
+
+| | worst shot, out of frame | worst shot, occluded |
+|---|---|---|
+| V28 | 58.5% (`sweep_anticipate`) | 56.2% (`sprint`) |
+| **A** | **19.6%** (`middle`) | **6.6%** (`upper`) |
+| B | 19.9% (`sweep_out`) | 12.4% (`pair_bend`) |
+| C | 23.2% (`sweep_low`) | 34.0% (`pan2_side`) |
+
+Both candidates' openings are measured at **0.0% out of frame** - the shot that
+was the worst in the build before the feed-forward is now the best.
 
 Every candidate's worst cut is inside the 0.33 reference - the width of the pack
 itself at these shot sizes - so the racers overlap their own outgoing position
@@ -416,13 +467,20 @@ powered mechanism to the end of the film.
 
 | | |
 |---|---|
-| duration | **6.47 s** (12.68 to 19.15) |
-| hard cuts | **0** |
-| top three visible | 75% of frames |
-| winner visible | 81% of frames |
-| winner size | 74 px mean in the delivery frame |
-| finish visible before the crossing | 2.22 s |
-| identical frame pairs | 0 |
+| | A and B | C | V28's last shot |
+|---|---|---|---|
+| duration | **6.47 s** (12.68 to 19.15) | 6.47 s | 3.78 s |
+| hard cuts inside it | **0** | 0 | 0 |
+| top three visible | **82.7%** of frames | 80.2% | 74.6% |
+| winner visible | **96.7%** of frames | 94.6% | 100% |
+| winner size | 73.2 px mean, 58.4 px worst | 74.5 / 59.3 | 77.0 / 76.4 |
+| visible before the crossing | **2.92 s** | 2.78 s | **0.45 s** |
+| identical frame pairs | 0 | 0 | 0 |
+
+V28's own last shot scores well on the columns it is measured on and is
+disqualified by the one that matters: it is the `payoff`, it starts 0.45 s
+before the line, and the comeback that decides the race happens in the two
+shots before it.
 
 It contains the last wheel, m7 taking the lead at 13.12, m2 taking it back at
 14.38, m7 taking it again at 15.57, the 0.067 s crossing at 15.82 and all eight
@@ -482,7 +540,7 @@ craft**, and the recommendation in section 17 follows from that rather than
 pretending the gap is larger than it is.
 
 **C is falsified as a direction, usefully.** Its lower lift costs clearance
-(3.12 units against 4.10), it is the only candidate whose worst scale jump
+(4.15 units against A's 5.64), it is the only candidate whose worst scale jump
 reaches V28's, and its six shots put it back within one cut of the failure being
 repaired - for 13 px of marble. The switchyard's own geometry is why: the legs
 are 9.6 layout units apart, so a lens closer than about nine units laterally
@@ -502,19 +560,21 @@ is the measurement of where that ceiling is.
    side pursuit holds them. It is the clearest single argument for B and the
    first thing to fix in A - most likely by giving the long take a rig that leans
    further out across that stretch rather than by cutting.
-3. **The opening is the worst-framed shot in every candidate**: 36-44% of active
-   pack samples outside the frame width, because the field explodes from a
-   stationary 8.2-unit bay row to thirty units of strung-out course in two
-   seconds, and one reach cannot hold both. The grid itself is good; the second
-   half of the shot is where it goes.
-4. **17-25% of active-pack samples are outside the frame** across the film. That
-   is a large improvement on V28's 41-52% on its anticipation shots but it is not
-   zero, and it is the honest cost of `PACK_MAX` = 4 framed at a readable size.
+3. **C's `pan2_side` is occluded on 34% of its samples** - the only shot in any
+   candidate that is worse than the V28 average on that measure. A side rig at a
+   1.6-unit negative lift on the second hairpin is standing too low to see over
+   the pan it is beside. It is C's problem and it is part of why C loses.
+4. **Up to 23% of active-pack samples are outside the frame width** on the worst
+   shot of each candidate (A 19.6%, B 19.9%, C 23.2%), against V28's 46.7-58.5%
+   on its anticipation shots. Not zero, and the honest cost of `PACK_MAX` = 4
+   framed at a readable size.
 5. **The flow score is a regression detector, not a judgement.** It ranks these
    four correctly and it should not be quoted as a quality number.
-6. **Only one seed is filmed.** The schedules are authored against race markers
-   rather than times, so they should transfer, but nothing here proves it on a
-   second seed.
+6. **Only one seed is filmed, and only one course exists.** The schedules are
+   authored against race markers rather than times, so they should transfer, but
+   nothing here proves it on a second seed. And every Race #2 course shares one
+   centreline, so the reusability of the spine and rail is argued from their
+   construction rather than demonstrated (section 4.2).
 
 ## 17. Recommendation
 
@@ -532,8 +592,10 @@ Then, in order:
    deliverable, and the camera is environment-independent by construction -
    `tests/test_race2_cinematography.py` asserts that nothing in `race2.spine`,
    `race2.rig`, `race2.cinematography` or `race2.flow` reads an environment.
-2. **Prove the schedules on a second seed.** They are authored on markers, so
-   this should be a flag; it has not been done.
+2. **Prove the schedules on a second seed**, and the rail on a second *plan*.
+   The first is a flag. The second needs a course that is not built on the
+   switchyard skeleton, and until one exists the reusability claim stays an
+   argument rather than a measurement.
 3. **Only then tune the opening** (weakness 3).
 
 ---

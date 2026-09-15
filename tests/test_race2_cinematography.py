@@ -214,6 +214,30 @@ def test_the_downhill_azimuth_is_derived_and_points_downcourse(spine):
     assert spine.downhill_azimuth == pytest.approx(90.0, abs=8.0)
 
 
+def test_the_downhill_direction_is_derived_from_the_geometry():
+    """The rail's preferred side is a fit, not a constant.
+
+    **This is the only direct evidence for the reusability claim.** Every course
+    in `race2` - the switchyard and all three concepts - is built on one
+    centreline skeleton, so solving a rail for `cascade` and for `switchyard`
+    produces the same answer and proves nothing about a second course. What can
+    be tested is the step that would have to transfer: that the downhill
+    direction comes out of a plane fit and changes when the plane does.
+    """
+    from race2.spine import _fit_plane
+
+    def azimuth(points):
+        _a, gradient_x, gradient_z = _fit_plane(points)
+        return math.degrees(math.atan2(-gradient_z, -gradient_x)) % 360.0
+
+    # Falling toward +Z, which is the switchyard.
+    assert azimuth([(x, -0.6 * z, z) for x in (-5, 0, 5) for z in range(-20, 21, 5)])         == pytest.approx(90.0, abs=1.0)
+    # The same course mirrored: the answer must follow it.
+    assert azimuth([(x, +0.6 * z, z) for x in (-5, 0, 5) for z in range(-20, 21, 5)])         == pytest.approx(270.0, abs=1.0)
+    # Falling toward -X instead.
+    assert azimuth([(x, 0.6 * x, z) for x in range(-20, 21, 5) for z in (-5, 0, 5)])         == pytest.approx(180.0, abs=1.0)
+
+
 def test_the_rail_clears_the_course_everywhere(rail):
     assert min(rail.clearance) >= 2.3, rail.describe()
     assert min(rail.height) >= 2.0
