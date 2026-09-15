@@ -639,4 +639,11 @@ damped and its half-life is a half-life, that all three candidates cover the sam
 window, the identical-frame detector, and that the staged V28 control is byte
 for byte the file V28 produced.
 
-**27 passed.** The 44 existing Race #2 tests pass unchanged.
+The camera-speed bound is anchored to **V28's own measured peak** (72.0 u/s,
+189 deg/s) rather than to an invented number, because the brief asks for
+kinematics as a diagnostic and "no faster than the camera being replaced" is the
+one threshold that is not made up. The candidates peak at 45.6 u/s and 129
+deg/s, both during the opening swing.
+
+**28 passed, and 72 Race #2 tests pass together** - the 44 that existed before
+this branch, unchanged.
