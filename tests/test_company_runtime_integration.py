@@ -140,7 +140,17 @@ def test_context_references_are_deduplicated_and_ceiling_is_enforced() -> None:
         _config(),
     )
     assert plan.context_manifest is not None
-    assert plan.context_manifest.keys() == (duplicate.key,)
+    assert plan.context_plan is not None
+    assert plan.context_manifest.keys().count(duplicate.key) == 1
+    assert plan.context_plan.explicit_refs == (duplicate.key,)
+    assert plan.context_plan.duplicate_count == 1
+    assert set(plan.context_plan.selected_capsule_ids) == {
+        "ai-platform",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-runtime",
+        "company-validation",
+    }
 
     too_many = tuple(
         ContextRef(ContextKind.FILE, f"company/runtime/ref_{index}.py", f"ref {index}")

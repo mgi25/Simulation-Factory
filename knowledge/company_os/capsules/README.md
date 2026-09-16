@@ -113,6 +113,12 @@ stays a pure function and why `observed_digests` is an argument. **The shipped
 seeds carry no `source_digests` yet**, so the source-changed condition cannot
 fire on them until a caller supplies them.
 
+`digest_source_file`, `digest_source_files`, and `digest_capsule_sources`
+provide the missing observation mechanism. They calculate SHA-256 over raw
+bytes for caller-supplied repository-relative file paths. They never expand a
+directory or glob, scan the repository, or invoke Git. Seed digests remain a
+separate maintenance pass so adding the mechanism does not rewrite every seed.
+
 Flagging a `permanent` capsule raises, for the reason it raises for a record:
 if an invariant needs revalidation, the class was wrong.
 

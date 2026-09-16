@@ -88,7 +88,12 @@ def finalise_attempt(
     store: ResourceUsageStore,
 ) -> AttemptResult:
     """Create, persist, and link one attempt's canonical usage record."""
-    if not plan.ready or plan.selected_employee is None or plan.context_manifest is None:
+    if (
+        not plan.ready
+        or plan.selected_employee is None
+        or plan.context_manifest is None
+        or plan.context_plan is None
+    ):
         raise LifecycleError(
             f"task {plan.specification.task_id} is {plan.state.value}, not execution_prepared"
         )
@@ -110,6 +115,9 @@ def finalise_attempt(
         context_sources=manifest.keys(),
         context_refs_used=report.context_refs_used,
         context_fingerprint=manifest.fingerprint(),
+        explicit_context_sources=plan.context_plan.explicit_refs,
+        automatic_context_sources=plan.context_plan.capsule_refs_accepted,
+        context_cache_key=plan.context_plan.cache_identity,
         passes=report.passes,
         retries=report.retries,
         cache_hits=report.cache_hits,

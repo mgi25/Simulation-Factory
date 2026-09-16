@@ -55,6 +55,11 @@ from knowledge.company_os.capsules.index import (
     normalise_path,
     path_related,
 )
+from knowledge.company_os.capsules.digests import (
+    digest_capsule_sources,
+    digest_source_file,
+    digest_source_files,
+)
 from knowledge.company_os.capsules.select import (
     CapsuleMatch,
     CapsuleSelection,
@@ -90,6 +95,9 @@ __all__ = [
     "assert_pointer",
     "assert_tag",
     "budget_problems",
+    "digest_capsule_sources",
+    "digest_source_file",
+    "digest_source_files",
     "flag_capsule_for_revalidation",
     "normalise_path",
     "path_related",
