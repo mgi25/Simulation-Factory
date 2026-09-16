@@ -1,0 +1,54 @@
+V30 SURFACE COVERAGE: every authored material family, by screen area
+==============================================================================
+  V29 measured six of its own surfaces at 0.000%. A family with no
+  pixels in any sampled frame is UNSEEN and must be removed or
+  justified.
+
+A  (contained_bay_v30)
+  family             coverage   frames       peak  peak at
+  hall_deck          43.4722%    10/10    77.793%  winner
+  hall_deck_mid      13.6384%    10/10    21.298%  final_frame
+  hall_grate         12.1450%     9/10    45.014%  switchback
+  hall_panel         11.1855%     7/10    42.547%  hook
+  hall_panel_dark     5.1989%     5/10    18.675%  central_chase
+  hall_trim           3.4629%     7/10    11.104%  hook
+  hall_rib            2.6573%     7/10     9.049%  early_chase
+  lit_hall_warm       0.6122%    10/10     2.168%  winner
+  lit_hall_cool       0.1652%     2/10     1.256%  sprint_early
+  hall_deck_dark      0.0906%    10/10     0.304%  final_frame
+  authored families seen: 10 of 10
+  AUTHORED BUT UNSEEN: 0  -
+  not authored by this concept: hall_glass, hall_beam
+
+B  (horseshoe_arena_v30)
+  family             coverage   frames       peak  peak at
+  hall_deck_mid      40.9695%    10/10    80.205%  winner
+  hall_deck          19.9988%    10/10    29.502%  late_mechanism
+  hall_panel         10.2438%     7/10    27.871%  first_mechanism
+  hall_grate          6.5287%    10/10    31.071%  switchback
+  hall_panel_dark     5.6331%     5/10    19.241%  central_chase
+  hall_trim           3.8062%     7/10    12.291%  first_mechanism
+  hall_rib            3.5212%     6/10    16.187%  first_mechanism
+  lit_hall_warm       0.2114%     6/10     1.112%  early_chase
+  lit_hall_cool       0.1795%     2/10     1.366%  sprint_early
+  hall_deck_dark      0.0989%     8/10     0.814%  hook
+  authored families seen: 10 of 10
+  AUTHORED BUT UNSEEN: 0  -
+  not authored by this concept: hall_glass, hall_beam
+
+C  (stepped_chamber_v30)
+  family             coverage   frames       peak  peak at
+  hall_deck          26.6247%     9/10    58.843%  sprint_mid
+  hall_deck_dark     17.2957%    10/10    31.260%  final_frame
+  hall_grate         12.1404%     8/10    45.033%  switchback
+  hall_deck_mid      10.8287%     8/10    26.024%  winner
+  hall_panel          8.1835%     7/10    20.398%  first_mechanism
+  hall_panel_dark     4.0631%     5/10    15.968%  central_chase
+  hall_rib            3.9241%     6/10    10.677%  first_mechanism
+  hall_trim           2.0032%     7/10     6.016%  early_chase
+  lit_hall_warm       0.3224%     8/10     1.475%  winner
+  lit_hall_cool       0.1832%     7/10     1.329%  sprint_early
+  authored families seen: 10 of 10
+  AUTHORED BUT UNSEEN: 0  -
+  not authored by this concept: hall_glass, hall_beam
+

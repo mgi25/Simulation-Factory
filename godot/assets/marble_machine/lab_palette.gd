@@ -1262,6 +1262,22 @@ func _build(key: String) -> StandardMaterial3D:
 		"hall_deck_dark":
 			# The service level and the pit: where the floor stops being a floor.
 			return _matte("#171B21", 0.93)
+		"hall_deck_mid":
+			# **The twelfth key, and V30 is why there had to be one.** V27's
+			# floor is two values, and two is enough for a floor that is a
+			# surround: `hall_deck` for the plate and `hall_deck_dark` for the
+			# pit under it. V30's floor is the *picture* - 79% of camera A's
+			# frame across the film and 99.6% of its final sprint - and at that
+			# size a two-value floor is one value and a hole. This is the third:
+			# close enough to `hall_deck` that a panel laid in it reads as the
+			# same material, far enough that the joint between two of them is
+			# visible at 270 pixels wide, which is where the brief's Part R asks
+			# the question.
+			#
+			# Not `hall_grate`, which is already spoken for: a grate is the
+			# machine's own kerb and has to stay separable from the floor it
+			# stands on.
+			return _matte("#22262C", 0.92)
 		"hall_glass":
 			# Dark glass, as an opaque gloss rather than as transparency. A real
 			# alpha pane here would buy one thing - seeing through it - that there

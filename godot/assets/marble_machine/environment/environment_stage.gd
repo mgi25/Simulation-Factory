@@ -302,6 +302,123 @@ static func _deck(group: Node3D, palette, cfg: Dictionary, tools: Dictionary,
 			float(pad.get("fillet", 0.5)),
 			bool(pad.get("shadows", true)))
 		made += 1
+
+	made += _plates(node, palette, cfg, spec)
+	return made
+
+
+static func _plates(node: Node3D, palette, cfg: Dictionary,
+		spec: Dictionary) -> int:
+	## The third deck kind, and the one V30 exists because of: a *continuous*
+	## floor, laid as a field of panels rather than as a band around a hole.
+	##
+	## **Why a ring could not do this.** A ring is an annulus by construction -
+	## `_deck` above refuses one whose inner radius is not inside its outer -
+	## and that is correct for Race #1, where the plate is a surround for a
+	## heightfield and the ravine under the branches cut must stay open. Race
+	## #2 stands on nothing. V29 pointed camera A at V27.2's hall and measured
+	## the consequence: the centre ray passed inside the deck's 88-unit inner
+	## radius on 100% of frames, the final sprint came out 90.8% black, and the
+	## film overall was 64.89% nothing-drawn. The hall supplied a perimeter
+	## where the picture needed a floor.
+	##
+	## **Why a field of panels and not one large slab.** Three reasons, and the
+	## second is the one that matters:
+	##
+	##   1. A single plate 140 units across has one normal, one highlight and
+	##      no edge inside the frame, so it reads as fog rather than as floor.
+	##   2. A *seam* is free detail, and a seam every fifteen units is what
+	##      gives the camera something to measure its own speed against. Camera
+	##      A moves at a median 12.0 units a second and the nearest ground it
+	##      ever sees is 14.3 away, which puts a panel edge across the frame
+	##      about once a second - the brief's Part G, bought with geometry
+	##      rather than with a texture.
+	##   3. Panels can differ. `materials` cycles them, `terrace` steps them
+	##      down in bands and `radius` clips the field to a disc, so the same
+	##      builder makes a flat hall floor, a stepped basin and a round
+	##      platform without a second code path.
+	##
+	## The channels between panels are not modelled. `under` lays one dark slab
+	## beneath the whole field, so a gap reads as an inset channel rather than
+	## as a hole onto the same black V29 was full of - one extra mesh for the
+	## entire floor, which is the cheapest way to buy the brief's Part K "dark
+	## inset channels" that exists.
+	##
+	## Not clearance-tested, for the same reason a ring is not: a floor is
+	## meant to be under the racing line, and a test that refused it would be
+	## refusing the feature.
+	var centre_x := float(cfg.get("centre_x", 0.0))
+	var centre_z := float(cfg.get("centre_z", 0.0))
+	var made := 0
+
+	for field_index in (spec.get("plates", []) as Array).size():
+		var field: Dictionary = spec["plates"][field_index]
+		var cells: Array = field.get("cells", [8, 8])
+		var nx := maxi(int(cells[0]), 1)
+		var nz := maxi(int(cells[1]), 1)
+		var cell: Array = field.get("cell", [18.0, 2.4, 18.0])
+		var size_x := float(cell[0])
+		var size_z := float(cell[2]) if cell.size() > 2 else float(cell[0])
+		var thickness := float(field.get("thickness",
+			float(cell[1]) if cell.size() > 2 else 2.4))
+		var gap := float(field.get("gap", 1.0))
+		var at: Array = field.get("at", [0.0, 0.0])
+		var origin_x := centre_x + float(at[0])
+		var origin_z := centre_z + float(at[1])
+		var y := float(field.get("y", -3.0))
+		var pitch_x := size_x + gap
+		var pitch_z := size_z + gap
+		var span_x := pitch_x * float(nx)
+		var span_z := pitch_z * float(nz)
+		var clip := float(field.get("radius", 0.0))
+		var materials: Array = field.get("materials", [])
+		var fallback := str(field.get("material", "hall_deck"))
+		var fillet := float(field.get("fillet", 0.35))
+		var shadows := bool(field.get("shadows", false))
+
+		# One slab under the whole field, a little larger than it and a little
+		# lower, so every gap between panels shows dark lining rather than the
+		# clear colour. Built first so it is behind everything it lines.
+		var under: Dictionary = field.get("under", {})
+		if not under.is_empty():
+			var margin := float(under.get("margin", 4.0))
+			var drop := float(under.get("drop", 1.2))
+			var under_thick := float(under.get("thickness", 2.0))
+			_slab(node, palette, "DeckUnder%d" % field_index,
+				Vector3(span_x + margin * 2.0, under_thick,
+					span_z + margin * 2.0),
+				Vector3(origin_x, y - drop, origin_z),
+				0.0, str(under.get("material", "hall_deck_dark")),
+				float(under.get("fillet", 0.6)), false)
+			made += 1
+
+		# A band-wise step down away from the middle. `from` is the plan radius
+		# the first step happens at and `band` how wide each tread is, so a
+		# floor terraces outward without any of it being authored cell by cell.
+		var terrace: Dictionary = field.get("terrace", {})
+		var step_from := float(terrace.get("from", 1.0e9))
+		var step_band := maxf(float(terrace.get("band", 16.0)), 0.001)
+		var step_drop := float(terrace.get("step", 0.0))
+
+		for iz in nz:
+			for ix in nx:
+				var x := origin_x + (float(ix) - float(nx - 1) * 0.5) * pitch_x
+				var z := origin_z + (float(iz) - float(nz - 1) * 0.5) * pitch_z
+				var reach := sqrt((x - origin_x) * (x - origin_x)
+					+ (z - origin_z) * (z - origin_z))
+				if clip > 0.0 and reach > clip:
+					continue
+				var level := y
+				if reach > step_from and step_drop != 0.0:
+					level += step_drop * floor(
+						(reach - step_from) / step_band + 1.0)
+				_slab(node, palette, "DeckPlate%d_%d_%d"
+					% [field_index, ix, iz],
+					Vector3(size_x, thickness, size_z),
+					Vector3(x, level, z), 0.0,
+					_pick(materials, ix + iz * nx, fallback),
+					fillet, shadows)
+				made += 1
 	return made
 
 

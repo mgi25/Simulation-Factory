@@ -1,0 +1,977 @@
+{
+ "id": "contained_bay_v30",
+ "title": "Contained bay, V30",
+ "family": "contained",
+ "summary": "A continuous machine floor under the whole course, with a layered perimeter on the 165 degrees of arc camera A actually looks at.",
+ "extends": "contained_base",
+ "palette": {
+  "hall_deck": {
+   "albedo": "#443A2C",
+   "roughness": 0.9,
+   "soft_light": "#3A3832"
+  },
+  "hall_deck_mid": {
+   "albedo": "#3E3527",
+   "roughness": 0.91,
+   "soft_light": "#35332E"
+  },
+  "hall_deck_dark": {
+   "albedo": "#322C22",
+   "roughness": 0.94
+  },
+  "hall_panel": {
+   "albedo": "#302C27",
+   "roughness": 0.63,
+   "specular": 0.3,
+   "soft_light": "#34363A",
+   "floor_lift": "#1B1C1F"
+  },
+  "hall_panel_dark": {
+   "albedo": "#1D1A16",
+   "roughness": 0.88,
+   "specular": 0.06,
+   "soft_light": "#212327",
+   "floor_lift": "#131416"
+  },
+  "hall_rib": {
+   "albedo": "#3B3730",
+   "roughness": 0.43,
+   "soft_light": "#2A2D33",
+   "floor_lift": "#191B1E"
+  },
+  "hall_trim": {
+   "albedo": "#615C52",
+   "roughness": 0.39,
+   "soft_light": "#3C3E42",
+   "floor_lift": "#1E2022"
+  },
+  "hall_beam": {
+   "albedo": "#242019",
+   "roughness": 0.87
+  },
+  "hall_grate": {
+   "albedo": "#3D362B",
+   "roughness": 0.97
+  },
+  "hall_glass": {
+   "albedo": "#101113",
+   "roughness": 0.1,
+   "specular": 1.0
+  },
+  "lit_hall_warm": {
+   "albedo": "#C98E52",
+   "emission": "#FF9A47",
+   "energy": 0.62
+  },
+  "lit_hall_cool": {
+   "albedo": "#7E97AB",
+   "emission": "#8FB6D2",
+   "energy": 0.44
+  }
+ },
+ "world": {
+  "keepout": [
+   [
+    -24.89,
+    -25.05
+   ],
+   [
+    -24.68,
+    -21.97
+   ],
+   [
+    -23.9,
+    -18.99
+   ],
+   [
+    -22.45,
+    -16.2
+   ],
+   [
+    -20.06,
+    -13.57
+   ],
+   [
+    -16.98,
+    -11.48
+   ],
+   [
+    -13.56,
+    -10.13
+   ],
+   [
+    -10.15,
+    -9.57
+   ],
+   [
+    -6.99,
+    -9.68
+   ],
+   [
+    -3.82,
+    -10.38
+   ],
+   [
+    -0.78,
+    -11.04
+   ],
+   [
+    2.05,
+    -10.0
+   ],
+   [
+    3.93,
+    -7.4
+   ],
+   [
+    5.35,
+    -4.49
+   ],
+   [
+    6.74,
+    -1.72
+   ],
+   [
+    9.63,
+    -2.98
+   ],
+   [
+    12.22,
+    -1.21
+   ],
+   [
+    9.18,
+    -0.96
+   ],
+   [
+    6.35,
+    -2.02
+   ],
+   [
+    3.75,
+    -0.33
+   ],
+   [
+    0.92,
+    1.09
+   ],
+   [
+    -1.95,
+    2.3
+   ],
+   [
+    -4.89,
+    2.95
+   ],
+   [
+    -7.94,
+    3.39
+   ],
+   [
+    -11.01,
+    3.92
+   ],
+   [
+    -13.5,
+    5.97
+   ],
+   [
+    -14.27,
+    9.08
+   ],
+   [
+    -13.08,
+    11.89
+   ],
+   [
+    -10.17,
+    11.04
+   ],
+   [
+    -8.18,
+    8.61
+   ],
+   [
+    -5.24,
+    9.61
+   ],
+   [
+    -2.39,
+    11.03
+   ],
+   [
+    0.4,
+    12.4
+   ],
+   [
+    3.52,
+    12.96
+   ],
+   [
+    6.74,
+    13.15
+   ],
+   [
+    9.54,
+    14.63
+   ],
+   [
+    11.18,
+    17.25
+   ],
+   [
+    10.87,
+    20.33
+   ],
+   [
+    8.49,
+    18.44
+   ],
+   [
+    5.87,
+    16.91
+   ],
+   [
+    3.34,
+    18.88
+   ],
+   [
+    0.64,
+    20.4
+   ],
+   [
+    -2.25,
+    21.6
+   ],
+   [
+    -5.26,
+    22.45
+   ],
+   [
+    -8.29,
+    22.79
+   ],
+   [
+    -11.29,
+    24.01
+   ],
+   [
+    -13.65,
+    26.03
+   ],
+   [
+    -14.28,
+    29.1
+   ],
+   [
+    -12.86,
+    31.92
+   ],
+   [
+    -10.01,
+    33.24
+   ],
+   [
+    -6.94,
+    32.39
+   ],
+   [
+    -3.92,
+    31.48
+   ],
+   [
+    -0.87,
+    31.59
+   ],
+   [
+    2.15,
+    32.2
+   ],
+   [
+    5.24,
+    32.59
+   ],
+   [
+    8.2,
+    33.74
+   ],
+   [
+    9.77,
+    36.61
+   ],
+   [
+    9.05,
+    39.84
+   ],
+   [
+    6.66,
+    41.95
+   ],
+   [
+    3.47,
+    42.56
+   ],
+   [
+    0.31,
+    42.54
+   ],
+   [
+    -2.77,
+    42.5
+   ],
+   [
+    -5.8,
+    42.48
+   ],
+   [
+    -8.87,
+    42.43
+   ],
+   [
+    -12.06,
+    41.83
+   ],
+   [
+    -14.9,
+    40.48
+   ]
+  ],
+  "deck": {
+   "clearance": 0.0,
+   "keepout": 0.0,
+   "plates": [
+    {
+     "at": [
+      0.0,
+      0.0
+     ],
+     "cells": [
+      3,
+      66
+     ],
+     "cell": [
+      52.0,
+      0.6,
+      2.2
+     ],
+     "gap": 0.18,
+     "y": -0.3,
+     "thickness": 0.6,
+     "fillet": 0.3,
+     "shadows": false,
+     "material": "hall_deck",
+     "materials": [
+      "hall_deck",
+      "hall_deck",
+      "hall_deck",
+      "hall_deck",
+      "hall_deck",
+      "hall_deck",
+      "hall_deck",
+      "hall_deck",
+      "hall_deck",
+      "hall_deck_mid",
+      "hall_deck_mid",
+      "hall_deck_mid"
+     ],
+     "under": {
+      "margin": 6.0,
+      "drop": 1.45,
+      "thickness": 2.4,
+      "material": "hall_deck_dark",
+      "fillet": 0.8
+     }
+    }
+   ],
+   "pads": [
+    {
+     "at": [
+      2.0,
+      -22.0
+     ],
+     "size": [
+      16.0,
+      1.6,
+      9.0
+     ],
+     "y": 0.5,
+     "bearing": 0.0,
+     "material": "hall_grate",
+     "clearance": 0.0,
+     "keepout": 0.0,
+     "fillet": 0.5
+    },
+    {
+     "at": [
+      0.7,
+      -14.4
+     ],
+     "size": [
+      13.0,
+      1.6,
+      9.0
+     ],
+     "y": 0.5,
+     "bearing": 0.0,
+     "material": "hall_grate",
+     "clearance": 0.0,
+     "keepout": 0.0,
+     "fillet": 0.5
+    },
+    {
+     "at": [
+      -0.5,
+      0.0
+     ],
+     "size": [
+      13.0,
+      1.6,
+      12.0
+     ],
+     "y": 0.5,
+     "bearing": 0.0,
+     "material": "hall_grate",
+     "clearance": 0.0,
+     "keepout": 0.0,
+     "fillet": 0.5
+    },
+    {
+     "at": [
+      -1.2,
+      14.4
+     ],
+     "size": [
+      12.0,
+      1.6,
+      9.0
+     ],
+     "y": 0.5,
+     "bearing": 0.0,
+     "material": "hall_grate",
+     "clearance": 0.0,
+     "keepout": 0.0,
+     "fillet": 0.5
+    },
+    {
+     "at": [
+      17.999999999999996,
+      -31.176914536239792
+     ],
+     "size": [
+      17.0,
+      0.5,
+      0.55
+     ],
+     "y": -0.15,
+     "bearing": 240.0,
+     "material": "lit_hall_warm",
+     "clearance": 13.0,
+     "keepout": 6.0,
+     "fillet": 0.2,
+     "shadows": false
+    },
+    {
+     "at": [
+      24.999999999999996,
+      -43.30127018922194
+     ],
+     "size": [
+      17.0,
+      0.5,
+      0.55
+     ],
+     "y": -0.15,
+     "bearing": 240.0,
+     "material": "lit_hall_warm",
+     "clearance": 13.0,
+     "keepout": 6.0,
+     "fillet": 0.2,
+     "shadows": false
+    },
+    {
+     "at": [
+      3.1376067389156947,
+      -35.86300913130284
+     ],
+     "size": [
+      17.0,
+      0.5,
+      0.55
+     ],
+     "y": -0.15,
+     "bearing": 265.0,
+     "material": "lit_hall_warm",
+     "clearance": 13.0,
+     "keepout": 6.0,
+     "fillet": 0.2,
+     "shadows": false
+    },
+    {
+     "at": [
+      4.35778713738291,
+      -49.80973490458728
+     ],
+     "size": [
+      17.0,
+      0.5,
+      0.55
+     ],
+     "y": -0.15,
+     "bearing": 265.0,
+     "material": "lit_hall_warm",
+     "clearance": 13.0,
+     "keepout": 6.0,
+     "fillet": 0.2,
+     "shadows": false
+    },
+    {
+     "at": [
+      -12.31272515972407,
+      -33.828934348292705
+     ],
+     "size": [
+      17.0,
+      0.5,
+      0.55
+     ],
+     "y": -0.15,
+     "bearing": 290.0,
+     "material": "lit_hall_warm",
+     "clearance": 13.0,
+     "keepout": 6.0,
+     "fillet": 0.2,
+     "shadows": false
+    },
+    {
+     "at": [
+      -17.101007166283434,
+      -46.98463103929542
+     ],
+     "size": [
+      17.0,
+      0.5,
+      0.55
+     ],
+     "y": -0.15,
+     "bearing": 290.0,
+     "material": "lit_hall_warm",
+     "clearance": 13.0,
+     "keepout": 6.0,
+     "fillet": 0.2,
+     "shadows": false
+    },
+    {
+     "at": [
+      -18.0,
+      33.0
+     ],
+     "size": [
+      18.0,
+      0.5,
+      0.6
+     ],
+     "y": -0.15,
+     "bearing": 90.0,
+     "material": "lit_hall_warm",
+     "clearance": 6.0,
+     "keepout": 6.0,
+     "fillet": 0.2,
+     "shadows": false
+    },
+    {
+     "at": [
+      -20.0,
+      21.0
+     ],
+     "size": [
+      16.0,
+      0.5,
+      0.6
+     ],
+     "y": -0.15,
+     "bearing": 0.0,
+     "material": "lit_hall_warm",
+     "clearance": 6.0,
+     "keepout": 6.0,
+     "fillet": 0.2,
+     "shadows": false
+    },
+    {
+     "at": [
+      -4.0,
+      35.0
+     ],
+     "size": [
+      14.0,
+      0.5,
+      0.6
+     ],
+     "y": -0.15,
+     "bearing": 90.0,
+     "material": "lit_hall_warm",
+     "clearance": 6.0,
+     "keepout": 6.0,
+     "fillet": 0.2,
+     "shadows": false
+    }
+   ]
+  },
+  "shell": {
+   "bands": [
+    {
+     "count": 5,
+     "bearing_from": 90.0,
+     "bearing_step": 15.0,
+     "radius": 56.0,
+     "height": 15.0,
+     "foot": 0.0,
+     "thickness": 4.0,
+     "fill": 0.99,
+     "batter": 1.0,
+     "fillet": 0.6,
+     "keepout": 16.0,
+     "pattern": [
+      "rib",
+      "slot",
+      "bay",
+      "slot",
+      "rib"
+     ],
+     "material": "hall_panel",
+     "shadows": true,
+     "plinth": {
+      "height": 2.6,
+      "depth": 1.3,
+      "at": 0.0,
+      "material": "hall_trim"
+     },
+     "cornice": {
+      "height": 1.6,
+      "depth": 1.1,
+      "at": 1.0,
+      "material": "hall_trim"
+     },
+     "bay_depth": 5.0,
+     "rib": {
+      "count": 1,
+      "width": 3.0,
+      "depth": 2.2,
+      "material": "hall_rib"
+     },
+     "bay": {
+      "jamb": 3.6,
+      "head": 3.2,
+      "sill": 0.0,
+      "opening": 0.46,
+      "lift": 0.1,
+      "material": "hall_panel_dark",
+      "strip": {
+       "width": 0.6,
+       "height": 1.8,
+       "depth": 0.8,
+       "at": 0.16,
+       "material": "lit_hall_warm"
+      }
+     },
+     "slot": {
+      "at": 0.13,
+      "width": 0.5,
+      "height": 2.2,
+      "depth": 0.9,
+      "material": "lit_hall_warm"
+     }
+    },
+    {
+     "count": 5,
+     "bearing_from": 150.0,
+     "bearing_step": 15.0,
+     "radius": 70.0,
+     "height": 26.0,
+     "foot": 0.0,
+     "thickness": 5.0,
+     "fill": 0.99,
+     "batter": 2.5,
+     "fillet": 0.6,
+     "keepout": 18.0,
+     "pattern": [
+      "panel",
+      "bay",
+      "slot",
+      "bay",
+      "panel"
+     ],
+     "material": "hall_panel",
+     "shadows": true,
+     "plinth": {
+      "height": 2.6,
+      "depth": 1.3,
+      "at": 0.0,
+      "material": "hall_trim"
+     },
+     "cornice": {
+      "height": 1.6,
+      "depth": 1.1,
+      "at": 1.0,
+      "material": "hall_trim"
+     },
+     "bay_depth": 7.0,
+     "bay": {
+      "jamb": 3.6,
+      "head": 3.2,
+      "sill": 0.0,
+      "opening": 0.46,
+      "lift": 0.1,
+      "material": "hall_panel_dark",
+      "strip": {
+       "width": 0.6,
+       "height": 1.8,
+       "depth": 0.8,
+       "at": 0.16,
+       "material": "lit_hall_warm"
+      }
+     },
+     "slot": {
+      "at": 0.13,
+      "width": 0.5,
+      "height": 2.2,
+      "depth": 0.9,
+      "material": "lit_hall_warm"
+     },
+     "rib": {
+      "count": 1,
+      "width": 3.0,
+      "depth": 2.2,
+      "material": "hall_rib"
+     }
+    },
+    {
+     "count": 4,
+     "bearing_from": 210.0,
+     "bearing_step": 15.0,
+     "radius": 60.0,
+     "height": 19.0,
+     "foot": 0.0,
+     "thickness": 4.0,
+     "fill": 0.99,
+     "batter": 1.5,
+     "fillet": 0.6,
+     "keepout": 16.0,
+     "pattern": [
+      "rib",
+      "slot",
+      "panel",
+      "rib"
+     ],
+     "material": "hall_panel",
+     "shadows": true,
+     "plinth": {
+      "height": 2.6,
+      "depth": 1.3,
+      "at": 0.0,
+      "material": "hall_trim"
+     },
+     "cornice": {
+      "height": 1.6,
+      "depth": 1.1,
+      "at": 1.0,
+      "material": "hall_trim"
+     },
+     "rib": {
+      "count": 1,
+      "width": 3.0,
+      "depth": 2.2,
+      "material": "hall_rib"
+     },
+     "slot": {
+      "at": 0.13,
+      "width": 0.5,
+      "height": 2.2,
+      "depth": 0.9,
+      "material": "lit_hall_warm"
+     }
+    },
+    {
+     "count": 12,
+     "bearing_from": 75.0,
+     "bearing_step": 15.0,
+     "radius": 70.0,
+     "height": 21.0,
+     "foot": 13.0,
+     "thickness": 5.0,
+     "fill": 0.99,
+     "batter": 2.5,
+     "fillet": 0.6,
+     "keepout": 18.0,
+     "pattern": [
+      "panel",
+      "panel",
+      "rib",
+      "panel",
+      "rib",
+      "panel",
+      "panel",
+      "rib",
+      "panel",
+      "panel",
+      "rib"
+     ],
+     "material": "hall_panel",
+     "shadows": true,
+     "radius_step": 2.0,
+     "radius_cycle": 3,
+     "rib": {
+      "count": 1,
+      "width": 3.0,
+      "depth": 2.2,
+      "material": "hall_rib"
+     }
+    }
+   ]
+  },
+  "pylons": {
+   "bands": [
+    {
+     "count": 8,
+     "bearing_from": 97.0,
+     "bearing_step": 18.0,
+     "radius": 48.0,
+     "height": 15.0,
+     "width": 2.4,
+     "depth": 2.4,
+     "sink": 1.2,
+     "clearance": 18.0,
+     "keepout": 13.0,
+     "fillet": 0.4,
+     "material": "hall_rib",
+     "cap": {
+      "spread": 1.6,
+      "height": 1.2,
+      "material": "hall_trim"
+     }
+    }
+   ]
+  },
+  "bays": {
+   "clearance": 11.0,
+   "keepout": 14.0,
+   "sites": {
+    "drum": {
+     "node": "drum",
+     "offset": [
+      26.0,
+      -14.0
+     ],
+     "bearing": 118.0,
+     "kind": "backing",
+     "width": 26.0,
+     "height": 17.0,
+     "thickness": 3.0,
+     "sink": 1.6,
+     "fillet": 0.6,
+     "material": "hall_panel_dark",
+     "trim": "hall_trim",
+     "strip": {
+      "width": 0.55,
+      "height": 1.3,
+      "at": 0.12,
+      "material": "lit_hall_cool"
+     }
+    },
+    "sweep": {
+     "node": "sweep",
+     "offset": [
+      -30.0,
+      -22.0
+     ],
+     "bearing": 229.0,
+     "kind": "portal",
+     "width": 22.0,
+     "height": 17.0,
+     "thickness": 3.2,
+     "sink": 1.6,
+     "jamb": 3.6,
+     "head": 3.2,
+     "fillet": 0.6,
+     "material": "hall_panel",
+     "trim": "hall_trim",
+     "wing": {
+      "width": 11.0,
+      "spread": 18.0,
+      "span": 0.66,
+      "reach": 0.9,
+      "material": "hall_panel_dark"
+     }
+    }
+   }
+  }
+ },
+ "sky": {
+  "top": "#0C0B0A",
+  "horizon": "#15130F",
+  "ground_bottom": "#0B0A09",
+  "ground_horizon": "#131210",
+  "curve": 0.1,
+  "sky_energy": 0.55,
+  "ground_curve": 0.22,
+  "sun_angle_max": 3.0,
+  "energy": 1.0,
+  "sun_curve": 0.12
+ },
+ "grade": {
+  "ambient_colour": "#403E38",
+  "ambient_energy": 0.68,
+  "ambient_sky_contribution": 0.0,
+  "exposure": 0.82,
+  "white": 12.0,
+  "contrast": 1.02,
+  "saturation": 1.06
+ },
+ "fog": {
+  "enabled": true,
+  "colour": "#22201D",
+  "energy": 0.55,
+  "sun_scatter": 0.02,
+  "density": 0.0016,
+  "sky_affect": 0.06,
+  "aerial_perspective": 0.3,
+  "height": -30.0,
+  "height_density": 0.004
+ },
+ "lights": {
+  "WorldKey": {
+   "colour": "#EFEAE1",
+   "energy": 0.78,
+   "specular": 0.14,
+   "rotation": [
+    -46.0,
+    -58.0,
+    0.0
+   ]
+  },
+  "WorldFill": {
+   "colour": "#8A8781",
+   "energy": 0.3,
+   "specular": 0.0,
+   "rotation": [
+    -26.0,
+    116.0,
+    0.0
+   ]
+  },
+  "WorldWarm": {
+   "colour": "#FFC694",
+   "energy": 0.3,
+   "specular": 0.0,
+   "rotation": [
+    -14.0,
+    28.0,
+    0.0
+   ]
+  },
+  "WorldRim": {
+   "colour": "#B9B3A9",
+   "energy": 0.16,
+   "specular": 0.0
+  }
+ }
+}

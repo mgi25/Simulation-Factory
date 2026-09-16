@@ -1,0 +1,350 @@
+{
+ "A": {
+  "environment": "contained_bay_v30",
+  "pixels": 20736000,
+  "authored": {
+   "hall_deck": true,
+   "hall_deck_mid": true,
+   "hall_deck_dark": true,
+   "hall_panel": true,
+   "hall_panel_dark": true,
+   "hall_rib": true,
+   "hall_trim": true,
+   "hall_glass": false,
+   "hall_beam": false,
+   "hall_grate": true,
+   "lit_hall_warm": true,
+   "lit_hall_cool": true
+  },
+  "families": {
+   "hall_deck": {
+    "coverage": 0.43472236689814814,
+    "frames_visible": 10,
+    "frames": 10,
+    "max_coverage": 0.7779282407407407,
+    "max_at": "winner",
+    "authored": true
+   },
+   "hall_deck_mid": {
+    "coverage": 0.13638411458333333,
+    "frames_visible": 10,
+    "frames": 10,
+    "max_coverage": 0.21297791280864198,
+    "max_at": "final_frame",
+    "authored": true
+   },
+   "hall_deck_dark": {
+    "coverage": 0.0009064911265432099,
+    "frames_visible": 10,
+    "frames": 10,
+    "max_coverage": 0.0030386766975308644,
+    "max_at": "final_frame",
+    "authored": true
+   },
+   "hall_panel": {
+    "coverage": 0.11185532407407407,
+    "frames_visible": 7,
+    "frames": 10,
+    "max_coverage": 0.4254740547839506,
+    "max_at": "hook",
+    "authored": true
+   },
+   "hall_panel_dark": {
+    "coverage": 0.05198895640432099,
+    "frames_visible": 5,
+    "frames": 10,
+    "max_coverage": 0.18675250771604937,
+    "max_at": "central_chase",
+    "authored": true
+   },
+   "hall_rib": {
+    "coverage": 0.026573109567901234,
+    "frames_visible": 7,
+    "frames": 10,
+    "max_coverage": 0.09048562885802469,
+    "max_at": "early_chase",
+    "authored": true
+   },
+   "hall_trim": {
+    "coverage": 0.03462909915123457,
+    "frames_visible": 7,
+    "frames": 10,
+    "max_coverage": 0.11104311342592593,
+    "max_at": "hook",
+    "authored": true
+   },
+   "hall_glass": {
+    "coverage": 0.0,
+    "frames_visible": 0,
+    "frames": 10,
+    "max_coverage": 0.0,
+    "max_at": "",
+    "authored": false
+   },
+   "hall_beam": {
+    "coverage": 8.584104938271605e-06,
+    "frames_visible": 5,
+    "frames": 10,
+    "max_coverage": 2.4112654320987653e-05,
+    "max_at": "hook",
+    "authored": false
+   },
+   "hall_grate": {
+    "coverage": 0.12144984567901235,
+    "frames_visible": 9,
+    "frames": 10,
+    "max_coverage": 0.45013985339506174,
+    "max_at": "switchback",
+    "authored": true
+   },
+   "lit_hall_warm": {
+    "coverage": 0.0061219135802469135,
+    "frames_visible": 10,
+    "frames": 10,
+    "max_coverage": 0.021676793981481483,
+    "max_at": "winner",
+    "authored": true
+   },
+   "lit_hall_cool": {
+    "coverage": 0.0016515239197530864,
+    "frames_visible": 2,
+    "frames": 10,
+    "max_coverage": 0.012561728395061728,
+    "max_at": "sprint_early",
+    "authored": true
+   }
+  }
+ },
+ "B": {
+  "environment": "horseshoe_arena_v30",
+  "pixels": 20736000,
+  "authored": {
+   "hall_deck": true,
+   "hall_deck_mid": true,
+   "hall_deck_dark": true,
+   "hall_panel": true,
+   "hall_panel_dark": true,
+   "hall_rib": true,
+   "hall_trim": true,
+   "hall_glass": false,
+   "hall_beam": false,
+   "hall_grate": true,
+   "lit_hall_warm": true,
+   "lit_hall_cool": true
+  },
+  "families": {
+   "hall_deck": {
+    "coverage": 0.19998789544753087,
+    "frames_visible": 10,
+    "frames": 10,
+    "max_coverage": 0.295024112654321,
+    "max_at": "late_mechanism",
+    "authored": true
+   },
+   "hall_deck_mid": {
+    "coverage": 0.4096952642746914,
+    "frames_visible": 10,
+    "frames": 10,
+    "max_coverage": 0.8020452353395062,
+    "max_at": "winner",
+    "authored": true
+   },
+   "hall_deck_dark": {
+    "coverage": 0.0009891493055555556,
+    "frames_visible": 8,
+    "frames": 10,
+    "max_coverage": 0.00814477237654321,
+    "max_at": "hook",
+    "authored": true
+   },
+   "hall_panel": {
+    "coverage": 0.10243788580246914,
+    "frames_visible": 7,
+    "frames": 10,
+    "max_coverage": 0.2787133487654321,
+    "max_at": "first_mechanism",
+    "authored": true
+   },
+   "hall_panel_dark": {
+    "coverage": 0.05633072916666667,
+    "frames_visible": 5,
+    "frames": 10,
+    "max_coverage": 0.19240933641975308,
+    "max_at": "central_chase",
+    "authored": true
+   },
+   "hall_rib": {
+    "coverage": 0.03521195023148148,
+    "frames_visible": 6,
+    "frames": 10,
+    "max_coverage": 0.16187451774691358,
+    "max_at": "first_mechanism",
+    "authored": true
+   },
+   "hall_trim": {
+    "coverage": 0.038061873070987656,
+    "frames_visible": 7,
+    "frames": 10,
+    "max_coverage": 0.1229128086419753,
+    "max_at": "first_mechanism",
+    "authored": true
+   },
+   "hall_glass": {
+    "coverage": 1.4467592592592592e-07,
+    "frames_visible": 1,
+    "frames": 10,
+    "max_coverage": 1.4467592592592592e-06,
+    "max_at": "hook",
+    "authored": false
+   },
+   "hall_beam": {
+    "coverage": 5.160108024691358e-06,
+    "frames_visible": 4,
+    "frames": 10,
+    "max_coverage": 2.652391975308642e-05,
+    "max_at": "early_chase",
+    "authored": false
+   },
+   "hall_grate": {
+    "coverage": 0.06528732638888889,
+    "frames_visible": 10,
+    "frames": 10,
+    "max_coverage": 0.31071277006172837,
+    "max_at": "switchback",
+    "authored": true
+   },
+   "lit_hall_warm": {
+    "coverage": 0.0021142939814814813,
+    "frames_visible": 6,
+    "frames": 10,
+    "max_coverage": 0.011121238425925927,
+    "max_at": "early_chase",
+    "authored": true
+   },
+   "lit_hall_cool": {
+    "coverage": 0.0017953317901234567,
+    "frames_visible": 2,
+    "frames": 10,
+    "max_coverage": 0.013664641203703703,
+    "max_at": "sprint_early",
+    "authored": true
+   }
+  }
+ },
+ "C": {
+  "environment": "stepped_chamber_v30",
+  "pixels": 20736000,
+  "authored": {
+   "hall_deck": true,
+   "hall_deck_mid": true,
+   "hall_deck_dark": true,
+   "hall_panel": true,
+   "hall_panel_dark": true,
+   "hall_rib": true,
+   "hall_trim": true,
+   "hall_glass": false,
+   "hall_beam": false,
+   "hall_grate": true,
+   "lit_hall_warm": true,
+   "lit_hall_cool": true
+  },
+  "families": {
+   "hall_deck": {
+    "coverage": 0.26624720293209875,
+    "frames_visible": 9,
+    "frames": 10,
+    "max_coverage": 0.5884297839506173,
+    "max_at": "sprint_mid",
+    "authored": true
+   },
+   "hall_deck_mid": {
+    "coverage": 0.10828689236111111,
+    "frames_visible": 8,
+    "frames": 10,
+    "max_coverage": 0.26024450231481483,
+    "max_at": "winner",
+    "authored": true
+   },
+   "hall_deck_dark": {
+    "coverage": 0.17295703125,
+    "frames_visible": 10,
+    "frames": 10,
+    "max_coverage": 0.3125959683641975,
+    "max_at": "final_frame",
+    "authored": true
+   },
+   "hall_panel": {
+    "coverage": 0.08183506944444445,
+    "frames_visible": 7,
+    "frames": 10,
+    "max_coverage": 0.20397521219135803,
+    "max_at": "first_mechanism",
+    "authored": true
+   },
+   "hall_panel_dark": {
+    "coverage": 0.04063054591049383,
+    "frames_visible": 5,
+    "frames": 10,
+    "max_coverage": 0.15968074845679012,
+    "max_at": "central_chase",
+    "authored": true
+   },
+   "hall_rib": {
+    "coverage": 0.039240547839506174,
+    "frames_visible": 6,
+    "frames": 10,
+    "max_coverage": 0.10677324459876543,
+    "max_at": "first_mechanism",
+    "authored": true
+   },
+   "hall_trim": {
+    "coverage": 0.02003153935185185,
+    "frames_visible": 7,
+    "frames": 10,
+    "max_coverage": 0.06015528549382716,
+    "max_at": "early_chase",
+    "authored": true
+   },
+   "hall_glass": {
+    "coverage": 1.7505787037037036e-05,
+    "frames_visible": 5,
+    "frames": 10,
+    "max_coverage": 6.896219135802469e-05,
+    "max_at": "sprint_early",
+    "authored": false
+   },
+   "hall_beam": {
+    "coverage": 4.8225308641975306e-08,
+    "frames_visible": 1,
+    "frames": 10,
+    "max_coverage": 4.822530864197531e-07,
+    "max_at": "final_frame",
+    "authored": false
+   },
+   "hall_grate": {
+    "coverage": 0.1214035011574074,
+    "frames_visible": 8,
+    "frames": 10,
+    "max_coverage": 0.45033323688271604,
+    "max_at": "switchback",
+    "authored": true
+   },
+   "lit_hall_warm": {
+    "coverage": 0.003224247685185185,
+    "frames_visible": 8,
+    "frames": 10,
+    "max_coverage": 0.01474729938271605,
+    "max_at": "winner",
+    "authored": true
+   },
+   "lit_hall_cool": {
+    "coverage": 0.001832175925925926,
+    "frames_visible": 7,
+    "frames": 10,
+    "max_coverage": 0.013287037037037036,
+    "max_at": "sprint_early",
+    "authored": true
+   }
+  }
+ }
+}

@@ -1,0 +1,32 @@
+{
+ "outdoor": {
+  "environment": "aurora_valley_v26",
+  "meshes": 66,
+  "triangles": 34124,
+  "ms_per_frame": 96.0
+ },
+ "v29_hall": {
+  "environment": "contained_hall_v272",
+  "meshes": 66,
+  "triangles": 34124,
+  "ms_per_frame": 98.0
+ },
+ "A": {
+  "environment": "contained_bay_v30",
+  "meshes": 66,
+  "triangles": 34124,
+  "ms_per_frame": 95.0
+ },
+ "B": {
+  "environment": "horseshoe_arena_v30",
+  "meshes": 66,
+  "triangles": 34124,
+  "ms_per_frame": 97.0
+ },
+ "C": {
+  "environment": "stepped_chamber_v30",
+  "meshes": 66,
+  "triangles": 34124,
+  "ms_per_frame": 94.0
+ }
+}

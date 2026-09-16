@@ -204,13 +204,26 @@ func _options() -> Dictionary:
 #    a redesign of the hall and is not done here: that the room comes out too
 #    large for this course is a result this branch reports, not one it fixes.
 #
-# 4. **The lens keep-out is dropped rather than inherited.** The 78 points a
-#    contained profile carries are decimated Race #1 camera paths, and applying
-#    them here would cull hall segments at positions no Race #2 lens ever
-#    visits - a room with holes in it for reasons belonging to another film.
-#    An empty lens guide builds the room as authored, which is the thing this
-#    branch exists to photograph. Whether the architecture occludes the racers
-#    is then a question answered from the frames.
+# 4. **The lens keep-out is the profile's, when the profile carries one for
+#    this course.** V29 dropped it, and was right to for what it was doing: the
+#    78 points a V27 contained profile carries are decimated *Race #1* camera
+#    paths, and applying them here would cull segments at positions no Race #2
+#    lens ever visits - a room with holes in it for reasons belonging to
+#    another film. But an empty guide is not a fix either, it is a missing
+#    constraint, and V30 puts architecture close enough to the lens for that to
+#    matter. So a V30 profile carries Race #2's own decimated camera A path,
+#    written by `tools/race2_v30_stage.py keepout`, and this scene passes it
+#    through unchanged.
+#
+#    It stays **profile data rather than the loaded track**, which is the rule
+#    `environment_world.build` states and gives its reason for: a world that
+#    avoided whichever camera happened to be loaded would be a different world
+#    in the delivery and in the matte, and the subtraction between them is the
+#    measurement. A profile with no keep-out gets an empty guide, exactly as
+#    before, so every pre-V30 profile builds what it built.
+#
+#    The list is plan positions and the stage lift is purely vertical, so the
+#    points are valid in both frames and no transform is applied to them.
 
 
 ## The stage keys, from `environment_stage.STAGE_ORDER`. Named here rather than
@@ -234,6 +247,10 @@ func _build_stage(profile: Dictionary) -> void:
 			world_cfg[key] = authored[key]
 	if world_cfg.is_empty():
 		return
+	# Not a build key - `environment_world.BUILD_ORDER` has no entry for it -
+	# so this adds a guide rather than a feature. See note 4 in the header.
+	if authored.get("keepout", null) is Array:
+		world_cfg["keepout"] = authored["keepout"]
 
 	var centreline := _centreline()
 	if centreline.is_empty():
@@ -307,15 +324,29 @@ func _build_stage(profile: Dictionary) -> void:
 func _stage_datum(world_cfg: Dictionary) -> float:
 	## The height of the room's floor, in the profile's own frame.
 	##
-	## The top of the highest deck ring: the surface the architecture stands on
-	## and the one the ring test measures against. A stage with no deck falls
-	## back to the highest wall foot, the only other absolute a shell carries.
+	## The top of the highest deck surface: what the architecture stands on and
+	## what the ring test measures against. A stage with no deck falls back to
+	## the highest wall foot, the only other absolute a shell carries.
+	##
+	## **Plates count, and the highest plate wins.** A V30 floor is a plate
+	## field rather than a ring, and a datum that only knew about rings would
+	## put a plate-floored stage at the shell's foot instead - which is
+	## typically twenty units lower, so the room would sink and the course
+	## would hang in the air above its own floor. `terrace` only ever steps a
+	## plate *down* from `y`, so `y` plus half the thickness is the top of the
+	## field whatever the terracing does.
 	var deck: Dictionary = world_cfg.get("deck", {})
 	var datum := -INF
 	for entry in (deck.get("rings", []) as Array):
 		var ring: Dictionary = entry
 		datum = maxf(datum, float(ring.get("y", -20.0))
 			+ float(ring.get("thickness", 3.0)) * 0.5)
+	for entry in (deck.get("plates", []) as Array):
+		var field: Dictionary = entry
+		var cell: Array = field.get("cell", [18.0, 2.4, 18.0])
+		var thickness := float(field.get("thickness",
+			float(cell[1]) if cell.size() > 2 else 2.4))
+		datum = maxf(datum, float(field.get("y", -3.0)) + thickness * 0.5)
 	if datum > -INF:
 		return datum
 	var shell: Dictionary = world_cfg.get("shell", {})

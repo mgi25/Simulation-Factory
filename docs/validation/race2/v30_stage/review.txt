@@ -1,0 +1,42 @@
+V30 CONTAINED STAGE: camera A, ten moments, five worlds
+==============================================================================
+
+OVER THE FILM
+world        void%  sprint%   lower3%    roomL racerSep    warm%     B/R
+outdoor      4.23%    3.81%     5.72%     14.4    116.3   0.000%  887.98
+v29_hall    67.04%   94.02%    96.04%      5.0     66.4   0.000%    1.95
+A            0.21%    0.04%     0.23%     46.3     87.9   0.565%    1.18
+B            1.49%    0.07%     0.21%     44.4     89.7   0.202%    1.23
+C            7.29%    0.07%     0.24%     42.4     91.7   0.278%    1.31
+
+  void      nothing drawn.   V29 measured 64.89% over its film
+  sprint    void in the final sprint.   V29: 90.8%
+  racerSep  racer luma minus room luma; positive is readable
+  warm      warm practical pixels.   V29: 0.000%
+  B/R       room blue channel over red; >1.35 reads as blue
+
+PER MOMENT, void %
+  moment            outdoor v29_hall        A        B        C
+  hook                 1.68%   30.23%    1.10%   13.80%   30.53%
+  early_chase          5.63%   39.31%    0.06%    0.03%   13.42%
+  first_mechanism      3.63%   29.38%    0.03%    0.02%   26.51%
+  central_chase        5.72%   54.60%    0.60%    0.69%    2.03%
+  switchback           5.56%   87.74%    0.10%    0.00%    0.10%
+  late_mechanism       4.80%   53.09%    0.04%    0.03%    0.00%
+  sprint_early         1.55%   87.04%    0.02%    0.06%    0.09%
+  sprint_mid           4.42%   95.01%    0.01%    0.04%    0.02%
+  winner               5.27%   97.86%    0.04%    0.11%    0.06%
+  final_frame          3.98%   96.18%    0.08%    0.09%    0.10%
+
+PER MOMENT, room mean luma
+  moment            outdoor v29_hall        A        B        C
+  hook                  13.2     14.0     32.4     30.3     24.1
+  early_chase           11.5      9.7     35.5     33.8     28.6
+  first_mechanism       12.4     10.8     32.0     31.4     22.2
+  central_chase         10.8      7.7     47.3     47.1     47.6
+  switchback            11.4      1.1     43.1     43.2     42.3
+  late_mechanism        14.6      5.3     41.5     38.5     40.1
+  sprint_early          32.4      1.1     57.4     56.4     56.9
+  sprint_mid            11.7      0.2     46.4     45.8     46.4
+  winner                11.5      0.0     64.9     57.5     59.0
+  final_frame           14.6      0.0     62.7     60.3     56.7
