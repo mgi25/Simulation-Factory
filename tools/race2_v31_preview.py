@@ -218,13 +218,27 @@ def _ordinal(value: int) -> str:
 
 
 def build_preview(args) -> None:
-    """Composite the three marks over the winner's delivered frames."""
+    """Composite the three marks over the winner's delivered frames.
+
+    **Five optional fields, all defaulting to V31's own paths.** V31.1 changes
+    the channel's material and nothing about these marks, so it reuses this
+    function rather than restating the measured title placement and the
+    occlusion refusal. Given none of them this behaves exactly as it did, and
+    `tests/test_race2_v311_track.py::test_preview_defaults_are_v31` holds that.
+    """
     from PIL import Image
     from sloped import overlays
 
+    frames_root = str(getattr(args, "frames_root", "") or FRAMES)
+    clip_tag = str(getattr(args, "clip_tag", "") or f"clip_{args.camera}")
+    export = str(getattr(args, "export", "") or EXPORT)
+    docs = str(getattr(args, "docs", "") or DOCS)
+    name = str(getattr(args, "name", "")
+               or f"race2_v31_production_preview_{args.camera}")
+
     marks = placement(args)
-    os.makedirs(DOCS, exist_ok=True)
-    with open(os.path.join(DOCS, "preview_placement.json"), "w",
+    os.makedirs(docs, exist_ok=True)
+    with open(os.path.join(docs, "preview_placement.json"), "w",
               encoding="utf-8") as handle:
         json.dump(marks, handle, indent=1)
     title = marks["title"]
@@ -249,13 +263,13 @@ def build_preview(args) -> None:
     if args.place_only:
         return
 
-    source = os.path.join(FRAMES, f"clip_{args.camera}",
+    source = os.path.join(frames_root, clip_tag,
                           f"clip_{args.course}_{args.seed}")
     found = sorted(glob.glob(os.path.join(source, "frame_*.png")))
     if not found:
         raise SystemExit(f"no frames in {source}; run "
                          f"`python tools/race2_v31_review.py clips` first")
-    out = os.path.join(FRAMES, f"preview_{args.camera}")
+    out = os.path.join(frames_root, f"preview_{args.camera}")
     os.makedirs(out, exist_ok=True)
 
     plate = overlays.pick_one(title["text"], size=args.title_size)
@@ -300,7 +314,7 @@ def build_preview(args) -> None:
 
     from tools.race2_v30_review import encode
 
-    target = os.path.join(EXPORT, f"race2_v31_production_preview_{args.camera}.mp4")
+    target = os.path.join(export, f"{name}.mp4")
     encode(out, target)
     print(f"  {len(found)} frames, {written} carrying a mark")
     print(f"  wrote {target}")

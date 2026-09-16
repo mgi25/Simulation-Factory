@@ -116,7 +116,7 @@ def inputs_for(out: str, course: str, seed: int) -> tuple[str, str, str]:
 
 def base_command(godot: str, out_dir: str, course: str, seed: int, out: str,
                  size: tuple[int, int], environment: str, racers: str,
-                 show: str) -> list[str]:
+                 show: str, track: str = "", track_probe: str = "") -> list[str]:
     geometry, replay, cameras = inputs_for(out, course, seed)
     command = [
         godot, "--path", GODOT_PROJECT, RENDER_SCENE, "--",
@@ -129,6 +129,13 @@ def base_command(godot: str, out_dir: str, course: str, seed: int, out: str,
     ]
     if environment:
         command.append(f"--environment={environment}")
+    # Both absent by default, and both absent is the V31 render. A flag that is
+    # only appended when it is asked for is a flag that cannot change a command
+    # line somebody already reproduced.
+    if track:
+        command.append(f"--track={track}")
+    if track_probe:
+        command.append(f"--track-probe={track_probe}")
     return command
 
 
@@ -152,6 +159,10 @@ def main() -> int:
     parser.add_argument("--environment", default="")
     parser.add_argument("--racers", default="meridian")
     parser.add_argument("--show", default="all")
+    parser.add_argument("--track", default="",
+                        help="channel surface: v31 (default), A, B, C, mask")
+    parser.add_argument("--track-probe", dest="track_probe", default="",
+                        help="one material field at a time, e.g. roughness=0.5")
     parser.add_argument("--fps", type=int, default=60)
     parser.add_argument("--start", type=float, default=0.0)
     parser.add_argument("--end", type=float, default=-1.0)
@@ -168,7 +179,8 @@ def main() -> int:
         os.makedirs(out_dir, exist_ok=True)
         names = cut_names(args.out, args.course, args.seed)
         command = base_command(godot, out_dir, args.course, args.seed, args.out,
-                               size, args.environment, args.racers, args.show)
+                               size, args.environment, args.racers, args.show,
+                               args.track, args.track_probe)
         command.append(f"--stills={','.join(names)}")
         run_godot(command, f"{args.mode} {tag}")
         print(f"  {len(names)} frames in {out_dir}")
@@ -180,7 +192,8 @@ def main() -> int:
         out_dir = os.path.join(args.frames, f"still_{tag}")
         os.makedirs(out_dir, exist_ok=True)
         command = base_command(godot, out_dir, args.course, args.seed, args.out,
-                               size, args.environment, args.racers, args.show)
+                               size, args.environment, args.racers, args.show,
+                               args.track, args.track_probe)
         command.append(f"--at={args.at}")
         run_godot(command, f"still {tag}")
         return 0
@@ -190,7 +203,8 @@ def main() -> int:
     for stale in glob.glob(os.path.join(out_dir, "frame_*.png")):
         os.remove(stale)
     command = base_command(godot, out_dir, args.course, args.seed, args.out,
-                           size, args.environment, args.racers, args.show)
+                           size, args.environment, args.racers, args.show,
+                           args.track, args.track_probe)
     command += ["--clip=1", f"--fps={args.fps}", f"--start={args.start}"]
     if args.end > 0:
         command.append(f"--end={args.end}")

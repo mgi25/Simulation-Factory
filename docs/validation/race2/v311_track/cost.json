@@ -1,0 +1,38 @@
+{
+ "v31": {
+  "mesh_instances": 326,
+  "triangles": 93404,
+  "course_triangles": 25420,
+  "runs": 11,
+  "ms_per_frame": 190,
+  "wall_seconds": 7.0,
+  "course_materials": 3
+ },
+ "A": {
+  "mesh_instances": 326,
+  "triangles": 93404,
+  "course_triangles": 25420,
+  "runs": 11,
+  "ms_per_frame": 188,
+  "wall_seconds": 5.07,
+  "course_materials": 3
+ },
+ "B": {
+  "mesh_instances": 326,
+  "triangles": 93404,
+  "course_triangles": 25420,
+  "runs": 11,
+  "ms_per_frame": 190,
+  "wall_seconds": 4.98,
+  "course_materials": 3
+ },
+ "C": {
+  "mesh_instances": 326,
+  "triangles": 93404,
+  "course_triangles": 25420,
+  "runs": 11,
+  "ms_per_frame": 189,
+  "wall_seconds": 5.06,
+  "course_materials": 3
+ }
+}

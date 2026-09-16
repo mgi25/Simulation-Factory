@@ -42,8 +42,17 @@ extends Node3D
 ##                          `course` hides the world and keeps its sky, for a
 ##                          geometry proof; `matte` hides the sky as well, for
 ##                          a coverage measurement
+##     --track=v31|A|B|C|mask
+##                          the channel's surface treatment. Absent or `v31` is
+##                          the delivered V31 material, unchanged; `mask` is the
+##                          segmentation diagnostic, not a picture
+##     --track-probe=roughness=0.5,...
+##                          one material field at a time, over whichever
+##                          `--track=` is selected. A scan, not a variant
 
 const Palette := preload("res://assets/marble_machine/lab_palette.gd")
+const TrackSurface := preload(
+	"res://assets/marble_machine/course/race2_track_surface.gd")
 const World := preload("res://assets/marble_machine/course/course_world.gd")
 const EnvProfile := preload(
 	"res://assets/marble_machine/environment/environment_profile.gd")
@@ -77,12 +86,19 @@ var _render_scale := 0.57
 var _geometry: Dictionary = {}
 var _contrast := DEFAULT_CONTRAST
 var _racers := DEFAULT_RACERS
+var _track := ""
+var _track_probe := ""
 
 
 func _ready() -> void:
 	var options := _options()
 	_contrast = str(options.get("contrast", DEFAULT_CONTRAST))
 	_racers = str(options.get("racers", DEFAULT_RACERS))
+	_track = str(options.get("track", ""))
+	_track_probe = str(options.get("track-probe", ""))
+	if not TrackSurface.known(_track):
+		push_error("race2_scene: unknown --track=%s" % _track)
+		_track = ""
 	if not RacerVisual.APPEARANCES.has(_racers):
 		push_error("race2_scene: unknown --racers=%s" % _racers)
 		_racers = DEFAULT_RACERS
@@ -134,10 +150,35 @@ func _ready() -> void:
 	if show == "matte":
 		world_env.environment.background_mode = Environment.BG_COLOR
 		world_env.environment.background_color = Color(0.0, 0.0, 0.0)
+	# **The mask is a measurement, so the picture-making is switched off.**
+	# Every class is already unshaded and unfogged, but tonemapping and the
+	# grade's exposure, contrast and saturation still run over the frame
+	# buffer, and a saturation of 1.06 over a cube corner is a cube corner
+	# moved. Linear tonemapping at unit exposure with the adjustment off is
+	# what makes "this pixel is the deck" a fact rather than a nearest guess.
+	if TrackSurface.is_mask(_track):
+		world_env.environment.background_mode = Environment.BG_COLOR
+		world_env.environment.background_color = Color(0.0, 0.0, 0.0)
+		world_env.environment.tonemap_mode = Environment.TONE_MAPPER_LINEAR
+		world_env.environment.tonemap_exposure = 1.0
+		world_env.environment.tonemap_white = 1.0
+		world_env.environment.adjustment_enabled = false
+		world_env.environment.fog_enabled = false
+		world_env.environment.volumetric_fog_enabled = false
+		world_env.environment.glow_enabled = false
+		world_env.environment.ssao_enabled = false
+		world_env.environment.ssil_enabled = false
+		# The class boundaries are the measurement. A 4x resolve would put a
+		# blend of two classes on every one of them, and on a channel two
+		# hundred pixels wide the deck/rail boundary is most of the signal.
+		get_viewport().msaa_3d = Viewport.MSAA_DISABLED
 	add_child(world_env)
 	World.build_lights(self, _contrast, profile)
 	if show == "all":
-		add_child(World.build(_palette, profile))
+		var backdrop := World.build(_palette, profile)
+		if TrackSurface.is_mask(_track):
+			_paint(backdrop, TrackSurface.flat(TrackSurface.MASK_BACKGROUND))
+		add_child(backdrop)
 
 	_build_course(str(options.get("geometry", "")))
 	# **After the course, not before it.** The stage is sited against the
@@ -299,6 +340,8 @@ func _build_stage(profile: Dictionary) -> void:
 	var census: Dictionary = EnvWorld.build(stage, _palette, cfg, local, nodes,
 		world_cfg)
 	World.assign_layer(stage)
+	if TrackSurface.is_mask(_track):
+		_paint(stage, TrackSurface.flat(TrackSurface.MASK_BACKGROUND))
 	stage.set_meta("stage_census", census)
 	stage.set_meta("stage_lift", lift)
 
@@ -473,9 +516,23 @@ func _build_course(path: String) -> void:
 	_course_root.scale = Vector3(_render_scale, _render_scale, _render_scale)
 	add_child(_course_root)
 
-	var channel: StandardMaterial3D = _palette.get_material("track_silver")
+	# **The one seam V31.1 adds, and it is one call wide.** With no `--track=`
+	# this is `_palette.get_material("track_silver")` and nothing else has
+	# changed, which is what keeps the V31 control reproducible from this
+	# branch.
+	var channel: StandardMaterial3D = TrackSurface.channel(
+		_palette, _track, _track_probe)
 	var structure: StandardMaterial3D = _palette.get_material("graphite")
 	var hazard: StandardMaterial3D = _palette.get_material("hazard_machine")
+	# `bands` reuses two of the scene mask's corners for two of its own, so it
+	# paints everything that is not channel out rather than classifying it. A
+	# diagnostic whose classes overlap is not a diagnostic.
+	if TrackSurface.is_mask(_track):
+		var scene_mask := _track == "mask"   # `bands` and `racers` paint out
+		structure = TrackSurface.flat(TrackSurface.MASK_STRUCTURE if scene_mask
+			else TrackSurface.MASK_BACKGROUND)
+		hazard = TrackSurface.flat(TrackSurface.MASK_STATION if scene_mask
+			else TrackSurface.MASK_BACKGROUND)
 
 	var runs: Array = _geometry.get("runs", [])
 	var triangles := 0
@@ -521,6 +578,10 @@ func _build_course(path: String) -> void:
 		# structure. Both are actuators, and colouring every actuator as a
 		# hazard put an orange slab across the whole of the first shot.
 		node.material_override = hazard if _is_station(str(record["module"])) else structure
+		if TrackSurface.is_mask(_track):
+			node.material_override = TrackSurface.flat(
+				TrackSurface.MASK_ACTUATOR if _track == "mask"
+				else TrackSurface.MASK_BACKGROUND)
 		node.layers = COURSE_LAYER
 		moving.add_child(node)
 		_actuators[str(record["key"])] = node
@@ -529,6 +590,23 @@ func _build_course(path: String) -> void:
 	print("race2: %d runs, %d modules, %d actuators, %d triangles" % [
 		runs.size(), (_geometry.get("modules", []) as Array).size(),
 		_actuators.size(), triangles])
+
+
+func _paint(root: Node, material: StandardMaterial3D) -> void:
+	## Every `MeshInstance3D` under `root`, overridden to one segmentation class.
+	##
+	## A walk rather than a build-time argument because the backdrop, the stage
+	## and a racer are built by three packages that this scene does not own, and
+	## a diagnostic that needed a `mask` parameter threaded through all three
+	## would be a diagnostic with three places to disagree with the picture it
+	## is measuring. `material_override` sits above whatever each of them
+	## authored and leaves every one of those files alone.
+	if root is MeshInstance3D:
+		(root as MeshInstance3D).material_override = material
+		(root as MeshInstance3D).cast_shadow = \
+			GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	for child in root.get_children():
+		_paint(child, material)
 
 
 func _is_station(module_id: String) -> bool:
@@ -622,6 +700,12 @@ func _load_replay(path: String) -> void:
 		var node := RacerVisual.build(_palette.marble(int(info["id"])), radius,
 			"Racer%d" % int(info["id"]), _racers)
 		node.layers = COURSE_LAYER
+		if _track == "mask":
+			_paint(node, TrackSurface.flat(TrackSurface.MASK_RACER))
+		elif _track == "racers":
+			_paint(node, TrackSurface.racer_class(index, marbles.size()))
+		elif TrackSurface.is_mask(_track):
+			_paint(node, TrackSurface.flat(TrackSurface.MASK_BACKGROUND))
 		_course_root.add_child(node)
 		_marbles.append(node)
 	print("race2: %d frames, %.2f s, %d racers" % [
