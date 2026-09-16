@@ -598,6 +598,10 @@ the file with its comments stripped. A second new test asserts the property that
 comment-stripping depends on, which is that the scene has no `#` inside a string
 literal.
 
+The suites that cover this change - everything matching `race2`,
+`environment`, `v23`, `v26` or `v27` - are **590 passed, 16 skipped, 0
+failed**, re-run after the fix described two paragraphs down.
+
 The whole repository suite runs **2710 passed, 336 skipped, 10 failed**. Every
 one of the ten is accounted for.
 
