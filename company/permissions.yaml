@@ -1,0 +1,50 @@
+version: 1
+mode: bootstrap
+
+autonomy_levels:
+  0:
+    name: observe
+    allows: [read]
+  1:
+    name: recommend
+    allows: [read, propose]
+  2:
+    name: experiment
+    allows: [read, propose, sandbox_write]
+  3:
+    name: modify
+    allows: [read, propose, approved_code_write]
+  4:
+    name: operate
+    allows: [approved_operational_actions]
+  5:
+    name: corporate
+    allows: [approved_org_or_architecture_change]
+
+bootstrap_defaults:
+  new_employee_level: 1
+  candidate_level: 0
+  shadow_level: 1
+  probation_max_level: 2
+  production_write_requires: [evaluation_pass, explicit_permission, tests]
+  no_subagents: true
+
+ceo_reserved:
+  - publish_public_video
+  - large_or_recurring_paid_api_spend
+  - delete_important_production_or_company_data
+  - merge_major_architecture_rewrite
+  - change_primary_engine
+  - hire_or_remove_executive_role
+  - drop_entire_content_format
+  - change_company_mission
+  - amend_constitution
+  - change_no_subagents_policy
+
+mandatory_review_triggers:
+  unusually_large_diff: architecture_review
+  new_dependency: architecture_and_security_review
+  physics_result_change: simulation_regression_review
+  above_budget_ai_usage: efficiency_review
+  production_publish_request: release_and_ceo_gate
+  new_employee_write_request: hr_and_evaluation_gate
