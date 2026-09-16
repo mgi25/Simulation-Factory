@@ -11,6 +11,15 @@ from .context_assembly import (
     assemble_context,
 )
 from .attempts import AttemptReport, AttemptResult, finalise_attempt
+from .context_expansion import (
+    ContextExpansionDecision,
+    ContextExpansionLedger,
+    ContextExpansionRequest,
+    ContextRefRejection,
+    ExpansionOutcome,
+    effective_context_fingerprint,
+)
+from .context_expansion_policy import decide_context_expansion
 from .errors import LifecycleError
 from .execution_store import (
     AttemptRecord,
@@ -42,6 +51,7 @@ from .receipts import (
 )
 from .routing import EmployeeMatch, RoutingResult, match_capabilities
 from .session_adapter import (
+    ExpandedSession,
     IngestedSession,
     ManualExternalSessionAdapter,
     PreparedSession,
@@ -60,7 +70,11 @@ __all__ = [
     "CapsuleSelectionReason",
     "ContextAssembly",
     "ContextAssemblyPolicy",
+    "ContextExpansionDecision",
+    "ContextExpansionLedger",
+    "ContextExpansionRequest",
     "ContextPlan",
+    "ContextRefRejection",
     "ContextRequirements",
     "EmployeeMatch",
     "Escalation",
@@ -68,6 +82,8 @@ __all__ = [
     "ExecutionRecordPointer",
     "ExecutionStore",
     "ExecutionStoreError",
+    "ExpandedSession",
+    "ExpansionOutcome",
     "ExecutorHint",
     "HandoffArtifact",
     "IngestedSession",
@@ -94,6 +110,8 @@ __all__ = [
     "assemble_context",
     "build_session_packet",
     "contract_from_registry",
+    "decide_context_expansion",
+    "effective_context_fingerprint",
     "finalise_attempt",
     "load_company_config",
     "load_validated_company_config",
