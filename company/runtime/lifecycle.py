@@ -185,7 +185,7 @@ def plan_task(
     contract = (
         employee_contract
         if employee_contract is not None
-        else _contract_from_registry(selected, company_config)
+        else contract_from_registry(selected, company_config)
     )
     validate_agent_contract(contract, company_config)
     if contract.get("employee_id") != selected:
@@ -228,7 +228,13 @@ def plan_task(
     )
 
 
-def _contract_from_registry(employee_id: str, config: CompanyConfig) -> dict[str, Any]:
+def contract_from_registry(employee_id: str, config: CompanyConfig) -> dict[str, Any]:
+    """The canonical contract for one employee: the schema template, filled in.
+
+    Public because the execution boundary re-reads it. A packet checks its own
+    path scope against `may_write`/`may_not_modify`, and it must check the same
+    contract the lifecycle validated rather than a second copy of it.
+    """
     contract = deepcopy(config.agent_contract_schema["template"])
     employee = config.org_registry["employees"][employee_id]
     contract.update(
