@@ -7,14 +7,13 @@
   "created": "2026-09-16",
   "decisions": [],
   "dependencies": [
-    "ai-platform",
     "company-bootstrap-policy",
     "company-knowledge-capsules",
-    "company-knowledge-store",
     "company-research-intelligence",
     "company-research-operations",
     "company-runtime",
-    "company-validation"
+    "company-validation",
+    "company-workforce-employment"
   ],
   "experiment_learnings": [],
   "facts": [

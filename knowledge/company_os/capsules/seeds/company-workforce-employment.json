@@ -1,0 +1,81 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "employee_evaluation",
+    "shadow_mode",
+    "employment_lifecycle",
+    "role_necessity"
+  ],
+  "created": "2026-09-16",
+  "decisions": [],
+  "dependencies": [
+    "company-workforce-hiring",
+    "ai-platform"
+  ],
+  "experiment_learnings": [],
+  "facts": [
+    "bootstrap-forbids-nested-agents"
+  ],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-workforce-employment",
+  "inputs": [
+    "An EmploymentRecord, a target state, and the evidence that edge requires",
+    "PerformanceObservations scoped to one employee and one capability"
+  ],
+  "invariants": [
+    "candidate to active is not an edge; more evidence cannot reach it, only walking shadow and probation can.",
+    "A shadow holds no write scope and production_write is False; both are refused at construction.",
+    "Archived returns only to dormant, and only with a recorded reactivation decision.",
+    "permission_compliance and no_subagent_compliance cases are mandatory in every evaluation.",
+    "A pass needs observed evidence and a missing outcome is a fail, not a skip.",
+    "Performance is keyed by employee and capability; there is no global employee score and a test enforces its absence.",
+    "Usage records are linked by reference; counts have one home in ai_platform.usage.",
+    "A necessity review never archives: requires_human_decision is True and a sole provider cannot be archived."
+  ],
+  "last_reviewed": "2026-09-16",
+  "may_read": [
+    "company/permissions.yaml",
+    "ai_platform/usage.py",
+    "company/workforce/*.py"
+  ],
+  "may_write": [
+    "company/workforce/employment.py",
+    "company/workforce/evaluation.py"
+  ],
+  "must_not_modify": [
+    "company/org_registry.yaml",
+    "company/permissions.yaml",
+    "ai_platform/usage.py"
+  ],
+  "outputs": [
+    "EmploymentRecord with appended signed transitions; CandidateEvaluation pass or fail",
+    "CapabilityPerformance, RoleNecessityReview, and a sorted list of integrity issues"
+  ],
+  "owner": "workstream-workforce",
+  "owns_paths": [
+    "company/workforce/employment.py",
+    "company/workforce/evaluation.py",
+    "company/workforce/shadow.py",
+    "company/workforce/performance.py",
+    "company/workforce/necessity.py",
+    "company/workforce/debt.py",
+    "company/workforce/integrity.py",
+    "company/workforce/store.py"
+  ],
+  "purpose": "The gated path from candidate to active, the evidence each edge costs, capability-scoped performance, role-necessity findings, and the integrity pass.",
+  "recheck_on": "2027-09-16",
+  "revalidation_reason": "",
+  "risks": [
+    "Authority caps are read from permissions.yaml and fail closed at 0; a renamed key silently tightens rather than loosens.",
+    "session_packet_ref is a slot for the external session boundary and is deliberately unwired."
+  ],
+  "source": "company-os-v1-workforce-foundation",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_workforce.py"
+  ],
+  "title": "Evaluation, shadow, probation and performance",
+  "type": "module"
+}
