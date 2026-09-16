@@ -12,6 +12,16 @@ the contracts prove stable first, and automated discovery is built against a
 schema that already works. The ingestion boundary below is the shape any future
 connector has to produce; today a researcher produces it by hand.
 
+## Knowledge capsule ownership
+
+`company-research-intelligence` is authoritative for the core research
+contracts: `ResearchSource`, `ReferenceCase`, `OpportunityDossier`,
+`VideoIntelligenceDossier`, scoring, and their core invariants.
+`company-research-operations` is authoritative for ingestion, discovery,
+public snapshots, screening, research batches, resource accounting,
+saturation, and stop rules. The operations capsule hands screened evidence to
+the core contracts; it does not redefine them.
+
 ## Where records live
 
 ```

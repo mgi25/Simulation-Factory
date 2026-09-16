@@ -1,8 +1,6 @@
 {
   "benchmarks": [],
   "capabilities": [
-    "capability_research_discovery",
-    "capability_research_batching",
     "capability_reference_analysis",
     "capability_opportunity_scoring"
   ],
@@ -18,20 +16,17 @@
   "freshness": "slow_changing",
   "id": "company-research-intelligence",
   "inputs": [
-    "A URL and public metadata captured outside this package, as an IngestionEnvelope",
-    "A batch objective, a BatchBudget and the stop conditions agreed before collecting",
-    "A researcher's screening signals, confidence and rights judgement",
+    "A screened ResearchSource with Evidence, rights and ResearchConfidence",
+    "A researcher's ReferenceCase, OpportunityDossier or VideoIntelligenceDossier",
     "A ScoringRubric and an OpportunityScorecard"
   ],
   "invariants": [
-    "No network, scraper, downloader, browser or model in either direction: metadata arrives captured, nothing here imports production, and no production module imports this.",
+    "The company-research-operations capsule is authoritative for the no-network ingestion boundary and batch ceiling escalation; core contracts accept its reviewed handoffs.",
     "Every number about the outside world is a Measurement with mandatory Evidence, and a rate whose denominator was never observed is absent rather than zero.",
-    "Private channel analytics - retention, revenue, RPM, traffic sources - are refused by name on any payload key.",
-    "A URL is canonicalized or rejected, never guessed; identity is platform + external id, never a title.",
-    "A local copy requires a named authoriser; the ingestion path can produce neither.",
-    "Only a screened-in candidate promotes to a ResearchSource, and a person signs every screening decision.",
-    "A batch declares its budget and stop conditions before collecting; a breached ceiling stops it or is escalated by a named authoriser, never silently continued.",
-    "Research confidence may never be permanent, and every finding names what would overturn it."
+    "A local copy requires a named authoriser; non-copy rights statuses refuse one.",
+    "Research confidence may never be permanent, and every finding names what would overturn it.",
+    "ResearchSource lifecycle gates require their linked core artefact; rejection is terminal.",
+    "Scoring applies explicit rubric weights to researcher judgements and carries coverage and caveats; public metrics never decide an opportunity."
   ],
   "last_reviewed": "2026-09-16",
   "may_read": [
@@ -48,27 +43,25 @@
     "tools/**"
   ],
   "outputs": [
-    "DiscoveryCandidate, deduplicated on platform + external id, with every query that found it",
-    "SnapshotSeries: dated public readings, appended, plus derived rates the inputs support",
-    "ResearchBatch: an append-only round log, budget consumption and the stop conditions triggered",
-    "BatchReport: duplication, creator concentration, tag coverage, saturation components, funnel counts and cost per useful outcome",
-    "ResearchSource, ReferenceCase, OpportunityDossier, VideoIntelligenceDossier",
-    "ScoreResult carrying weight coverage and a caveat it cannot travel without"
+    "ResearchSource with evidence, rights, confidence and lifecycle",
+    "ReferenceCase with analysis and originality boundary",
+    "OpportunityDossier with evidence, limitations and format class",
+    "VideoIntelligenceDossier with experiment, kill conditions and superiority targets",
+    "ScoringRubric, OpportunityScorecard and a qualified ScoreResult"
   ],
   "owner": "workstream-claude",
   "owns_paths": [
     "intelligence/research"
   ],
-  "purpose": "Stores and evaluates external research: a discovery queue that deduplicates public video metadata cheaply, a batch layer that budgets and measures a search, and the six record types a reviewed opportunity is built from.",
+  "purpose": "Defines the bounded core research contracts and invariants used to turn reviewed evidence into reference analysis, opportunity dossiers, video experiments and qualified scores. Discovery, ingestion and batch execution belong to company-research-operations.",
   "recheck_on": "2027-09-16",
   "revalidation_reason": "",
   "risks": [
-    "Public metrics are a moving surface: a snapshot is an observation of a day, never a property of a video.",
-    "Deduplication is only as strong as the platform id; a platform without one falls back to the canonical URL.",
-    "The funnel describes tiers 3-5 but executes none of them - stopping early is a person's decision, not a default.",
-    "Saturation is measured over rounds a researcher recorded; a round nobody logged is invisible to every rate."
+    "Evidence can age while its record remains structurally valid; confidence and would-change conditions must travel with every finding.",
+    "A plausible weighted score can outlive its rubric or conceal incomplete coverage unless its qualification travels with it.",
+    "A format opportunity can collapse into a one-off idea unless its reusable loop and variation space are explicit."
   ],
-  "source": "company-os-v1-research-batches",
+  "source": "company-os-v1-dogfood-research-capsule",
   "source_digests": [],
   "status": "active",
   "tests": [
