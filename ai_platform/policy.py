@@ -7,14 +7,16 @@ until it is forgotten. This module makes it a construction error.
 
 ## The lock
 
-`ExecutionPolicy` defaults to the bootstrap position - `no_subagents=True`,
-`nested_agent_spawning=False`, one session at a time - and in bootstrap mode
-those are not defaults, they are the only permitted values. There is no flag,
-no environment variable and no config key that relaxes them while `mode` stays
-`"bootstrap"`. Leaving bootstrap mode is the first key; naming the CEO approval
-in `ceo_amendment` is the second. Neither key alone opens anything, and both
-of them are recorded in the policy object that the run is executed under, so
-the amendment appears in the artefact rather than in someone's memory.
+`ExecutionPolicy` defaults to the bootstrap position: nested sessions are
+forbidden, while unrelated top-level tasks with isolated ownership may run at
+the same time. Those are different axes. A global concurrency integer blurred
+them, so the policy names them separately.
+
+There is no flag, environment variable or config key that relaxes the nested
+session rule while `mode` stays `"bootstrap"`. Leaving bootstrap mode is the
+first key; naming the CEO approval in `ceo_amendment` is the second. Neither key
+alone opens anything, and both are recorded in the policy object used for the
+run.
 
 ## Why `from_mapping` is strict
 
@@ -25,11 +27,10 @@ policy from a mapping rejects unknown keys outright. A config that says
 
 ## Multi-perspective work
 
-Class F exists because rare major decisions deserve independent reviewers, and
-that is exactly the shape of task someone would reach for parallel agents to
-serve. `assert_sequential` is the reminder in executable form: reviewers are
-separate sessions invoked one after another, passing the compact handoff of
-`company/task_handoff.schema.yaml` between them.
+Class F exists because rare major decisions deserve independent reviewers.
+Those reviewers work on the same decision, so
+`assert_same_task_review_concurrency` keeps them sequential. This does not
+limit unrelated top-level tasks owned by independent sessions.
 """
 
 from __future__ import annotations
@@ -58,29 +59,49 @@ class ExecutionPolicy:
     no_subagents: bool = True
     nested_agent_spawning: bool = False
     always_on_agents: bool = False
-    max_concurrent_sessions: int = 1
+
+    # Independent tasks are not nested work. Same-task reviewers are.
+    independent_top_level_parallelism: bool = True
+    same_task_multi_perspective_review_is_sequential: bool = True
 
     # The efficiency block, mirroring `agent_contract.schema.yaml: token_policy`.
     deterministic_first: bool = True
     retrieval_before_reasoning: bool = True
     minimum_relevant_context: bool = True
     prefer_single_pass: bool = True
-    multi_perspective_is_sequential: bool = True
-
     # The second key. Empty in bootstrap mode, always.
     ceo_amendment: str = ""
 
     def __post_init__(self) -> None:
-        if self.max_concurrent_sessions < 1:
-            raise PolicyConfigError("max_concurrent_sessions must be at least 1")
+        if not isinstance(self.mode, str):
+            raise PolicyConfigError("mode must be a string")
+        if not isinstance(self.ceo_amendment, str):
+            raise PolicyConfigError("ceo_amendment must be a string")
+        for name in (
+            "no_subagents",
+            "nested_agent_spawning",
+            "always_on_agents",
+            "independent_top_level_parallelism",
+            "same_task_multi_perspective_review_is_sequential",
+            "deterministic_first",
+            "retrieval_before_reasoning",
+            "minimum_relevant_context",
+            "prefer_single_pass",
+        ):
+            if not isinstance(getattr(self, name), bool):
+                raise PolicyConfigError(f"{name} must be a boolean")
         if self.mode == BOOTSTRAP_MODE:
             self._assert_bootstrap_lock()
-        elif self.nested_agent_spawning or not self.no_subagents:
+        elif (
+            self.nested_agent_spawning
+            or not self.no_subagents
+            or not self.same_task_multi_perspective_review_is_sequential
+        ):
             if not self.ceo_amendment.strip():
                 raise SubagentPolicyViolation(
-                    "enabling nested agents outside bootstrap mode still requires "
-                    "ceo_amendment naming the approval "
-                    "(permissions.yaml: ceo_reserved.change_no_subagents_policy)"
+                    "relaxing nested-agent or same-task review policy outside "
+                    "bootstrap mode still requires ceo_amendment naming the recorded "
+                    "CEO approval"
                 )
 
     def _assert_bootstrap_lock(self) -> None:
@@ -88,7 +109,11 @@ class ExecutionPolicy:
             ("no_subagents", self.no_subagents, True),
             ("nested_agent_spawning", self.nested_agent_spawning, False),
             ("always_on_agents", self.always_on_agents, False),
-            ("max_concurrent_sessions", self.max_concurrent_sessions, 1),
+            (
+                "same_task_multi_perspective_review_is_sequential",
+                self.same_task_multi_perspective_review_is_sequential,
+                True,
+            ),
             ("ceo_amendment", self.ceo_amendment, ""),
         )
         for name, actual, required in locked:
@@ -116,14 +141,22 @@ class ExecutionPolicy:
                 "which forbids them"
             )
 
-    def assert_sequential(self, reviewers: int) -> None:
-        """Raise if more than one reviewer would run at once."""
-        if reviewers > 1 and self.multi_perspective_is_sequential:
-            if self.max_concurrent_sessions > 1:
-                raise SubagentPolicyViolation(
-                    f"{reviewers} reviewers must be invoked sequentially, but "
-                    f"max_concurrent_sessions={self.max_concurrent_sessions}"
-                )
+    def assert_same_task_review_concurrency(self, concurrent_reviewers: int) -> None:
+        """Reject parallel reviewers of one decision; unrelated tasks are unaffected."""
+        if isinstance(concurrent_reviewers, bool) or not isinstance(
+            concurrent_reviewers, int
+        ):
+            raise PolicyConfigError("concurrent_reviewers must be an integer")
+        if concurrent_reviewers < 1:
+            raise PolicyConfigError("concurrent_reviewers must be at least 1")
+        if (
+            concurrent_reviewers > 1
+            and self.same_task_multi_perspective_review_is_sequential
+        ):
+            raise SubagentPolicyViolation(
+                f"{concurrent_reviewers} reviewers of the same task must be invoked "
+                "sequentially under this execution policy"
+            )
 
     def amended(self, mode: str, ceo_amendment: str, **changes: Any) -> ExecutionPolicy:
         """The only supported way out of the locked block, and it is explicit."""

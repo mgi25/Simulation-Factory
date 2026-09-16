@@ -35,9 +35,8 @@ def _valid_handoff() -> dict[str, object]:
         "tests": ["pytest tests/test_company_runtime.py"],
         "risks": [],
         "resource_usage": {
-            "reasoning_class": "small",
-            "retries": 0,
-            "context_sources": ["company contracts"],
+            "record_ref": "resource_usage/core-runtime/000001.json",
+            "fingerprint": "0123456789abcdef",
         },
         "next_owner": "studio_coo",
         "escalation": {"required": False, "reason": ""},
@@ -160,6 +159,7 @@ def test_valid_handoff_builds_typed_artifact() -> None:
 
     assert artifact.task_id == "core-runtime"
     assert artifact.status.value == "completed"
+    assert artifact.resource_usage.fingerprint == "0123456789abcdef"
 
 
 @pytest.mark.parametrize(

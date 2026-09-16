@@ -383,7 +383,8 @@ def test_the_default_policy_is_the_bootstrap_position():
     assert policy.no_subagents is True
     assert policy.nested_agent_spawning is False
     assert policy.always_on_agents is False
-    assert policy.max_concurrent_sessions == 1
+    assert policy.independent_top_level_parallelism is True
+    assert policy.same_task_multi_perspective_review_is_sequential is True
     assert policy.allows_nested_agents is False
     assert BOOTSTRAP_POLICY == policy
 
@@ -394,7 +395,7 @@ def test_the_default_policy_is_the_bootstrap_position():
         {"no_subagents": False},
         {"nested_agent_spawning": True},
         {"always_on_agents": True},
-        {"max_concurrent_sessions": 4},
+        {"same_task_multi_perspective_review_is_sequential": False},
         {"ceo_amendment": "approved in a chat message"},
     ],
 )
@@ -426,6 +427,11 @@ def test_an_unknown_config_key_is_refused_rather_than_ignored():
         ExecutionPolicy.from_mapping({"mode": "bootstrap", "allow_subagents": True})
 
 
+def test_ambiguous_global_session_cap_was_removed():
+    with pytest.raises(PolicyConfigError, match="max_concurrent_sessions"):
+        ExecutionPolicy.from_mapping({"max_concurrent_sessions": 4})
+
+
 def test_a_config_mapping_round_trips_the_bootstrap_position():
     policy = ExecutionPolicy.from_mapping(
         {"mode": "bootstrap", "no_subagents": True, "nested_agent_spawning": False}
@@ -454,7 +460,23 @@ def test_no_resource_class_permits_subagents():
 
 
 def test_reviewers_must_be_invoked_sequentially():
-    BOOTSTRAP_POLICY.assert_sequential(3)  # one at a time is fine
-    parallel = ExecutionPolicy(mode="amended", max_concurrent_sessions=3, ceo_amendment="x")
     with pytest.raises(SubagentPolicyViolation, match="sequentially"):
-        parallel.assert_sequential(3)
+        BOOTSTRAP_POLICY.assert_same_task_review_concurrency(3)
+
+    BOOTSTRAP_POLICY.assert_same_task_review_concurrency(1)
+
+
+def test_same_task_parallel_review_requires_a_recorded_amendment():
+    amended = ExecutionPolicy(
+        mode="amended",
+        same_task_multi_perspective_review_is_sequential=False,
+        ceo_amendment="CEO approval recorded in decision/review-parallelism-v2",
+    )
+    amended.assert_same_task_review_concurrency(3)
+
+
+def test_independent_top_level_work_is_not_a_same_task_review():
+    assert BOOTSTRAP_POLICY.independent_top_level_parallelism is True
+    # The policy has no global session cap: unrelated jobs are outside the
+    # same-task review concurrency guard.
+    BOOTSTRAP_POLICY.assert_same_task_review_concurrency(1)

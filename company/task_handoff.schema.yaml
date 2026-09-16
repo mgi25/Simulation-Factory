@@ -29,9 +29,8 @@ template:
   tests: []
   risks: []
   resource_usage:
-    reasoning_class: ""
-    retries: 0
-    context_sources: []
+    record_ref: ""
+    fingerprint: ""
   next_owner: ""
   escalation:
     required: false
