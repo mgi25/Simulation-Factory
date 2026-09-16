@@ -8,9 +8,10 @@
   "created": "2026-09-16",
   "decisions": [],
   "dependencies": [
+    "company-analytics-experiments",
+    "company-finance",
     "company-workforce-capabilities",
-    "company-workforce-hiring",
-    "company-finance"
+    "company-workforce-hiring"
   ],
   "experiment_learnings": [],
   "facts": [
@@ -21,7 +22,8 @@
   "id": "company-organizational-intelligence",
   "inputs": [
     "Workforce records: CoverageReport, CapabilityGap, CapabilityPerformance, RoleNecessityReview, OrganizationalDebt",
-    "ResourceUsageRecord or ResourceSummary, a research BatchReport shape, and org_registry.yaml manager edges"
+    "ResourceUsageRecord or ResourceSummary, a research BatchReport shape, and org_registry.yaml manager edges",
+    "ExperimentResult and AnalyticsLearning, read as evidence that work is producing learning rather than only output"
   ],
   "invariants": [
     "Advisory only: no module writes org_registry.yaml, permissions.yaml, constitution.md or the agent contract schema.",
@@ -39,7 +41,8 @@
     "company/permissions.yaml",
     "company/workforce/*.py",
     "ai_platform/usage.py",
-    "company/finance/*.py"
+    "company/finance/*.py",
+    "company/analytics/*.py"
   ],
   "may_write": [
     "company/org_intelligence/*.py"
