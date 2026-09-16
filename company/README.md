@@ -11,6 +11,7 @@ Production systems MUST NOT depend on `company/`.
 - No subagents, child agents, worker swarms, or nested agent spawning.
 - One invoked session performs its assigned task directly.
 - Specialists may be invoked sequentially by a top-level workflow using compact handoff artifacts.
+- Independent top-level tasks with isolated ownership may run concurrently.
 - Prefer deterministic software over LLM reasoning.
 - Retrieve known facts instead of rediscovering them.
 - Supply minimum relevant context.

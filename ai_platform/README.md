@@ -10,6 +10,10 @@ A Codex, Claude Code, ChatGPT, or other agent session must execute its own bound
 
 When multiple perspectives are required, the orchestrating workflow invokes separate sessions sequentially and passes compact artifacts between them.
 
+This same-task sequencing rule is not a global concurrency cap. Unrelated
+top-level tasks with isolated ownership may run concurrently; child sessions
+and parallel reviewers of the same decision may not.
+
 ## Decision order
 
 1. Can deterministic software do it?

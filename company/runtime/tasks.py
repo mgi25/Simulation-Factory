@@ -5,8 +5,10 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import Enum
+import re
 from typing import Any
 
+from ai_platform.references import assert_reference
 from company.validation.errors import ValidationError
 from company.validation.no_subagents import collect_no_subagent_violations
 
@@ -85,6 +87,48 @@ class TaskAssignment:
 
 
 @dataclass(frozen=True)
+class UsageRecordPointer:
+    """Compact handoff link to the one canonical detailed usage record."""
+
+    record_ref: str
+    fingerprint: str
+
+    def __post_init__(self) -> None:
+        assert_reference(self.record_ref, "resource_usage.record_ref")
+        if not re.fullmatch(r"[0-9a-f]{16}", self.fingerprint):
+            raise ValueError(
+                "resource_usage.fingerprint must be a 16-character lowercase hex digest"
+            )
+
+    def to_dict(self) -> dict[str, str]:
+        return {
+            "record_ref": self.record_ref,
+            "fingerprint": self.fingerprint,
+        }
+
+    @classmethod
+    def from_mapping(
+        cls, data: Mapping[str, Any], issues: list[str]
+    ) -> "UsageRecordPointer | None":
+        record_ref = _required_string(data, "record_ref", "handoff.resource_usage", issues)
+        fingerprint = _required_string(
+            data, "fingerprint", "handoff.resource_usage", issues
+        )
+        unknown = sorted(set(data) - {"record_ref", "fingerprint"})
+        if unknown:
+            issues.append(
+                "handoff.resource_usage has unknown field(s): " + ", ".join(unknown)
+            )
+        if not record_ref or not fingerprint:
+            return None
+        try:
+            return cls(record_ref=record_ref, fingerprint=fingerprint)
+        except ValueError as exc:
+            issues.append(str(exc))
+            return None
+
+
+@dataclass(frozen=True)
 class HandoffArtifact:
     task_id: str
     owner: str
@@ -97,7 +141,7 @@ class HandoffArtifact:
     unchanged: tuple[str, ...]
     tests: tuple[str, ...]
     risks: tuple[str, ...]
-    resource_usage: Mapping[str, Any]
+    resource_usage: UsageRecordPointer
     next_owner: str
     escalation_required: bool
     escalation_reason: str
@@ -144,17 +188,7 @@ class HandoffArtifact:
         if not isinstance(resource_usage, Mapping):
             issues.append("handoff.resource_usage must be a mapping")
             resource_usage = {}
-        reasoning_class = resource_usage.get("reasoning_class")
-        if not isinstance(reasoning_class, str):
-            issues.append("handoff.resource_usage.reasoning_class must be a string")
-        retries = resource_usage.get("retries")
-        if not isinstance(retries, int) or isinstance(retries, bool) or retries < 0:
-            issues.append("handoff.resource_usage.retries must be a non-negative integer")
-        _string_list(
-            resource_usage.get("context_sources"),
-            "handoff.resource_usage.context_sources",
-            issues,
-        )
+        usage_pointer = UsageRecordPointer.from_mapping(resource_usage, issues)
 
         escalation = data.get("escalation")
         if not isinstance(escalation, Mapping):
@@ -180,6 +214,7 @@ class HandoffArtifact:
                 )
         if issues:
             raise ValidationError(issues)
+        assert usage_pointer is not None
         return cls(
             task_id=task_id,
             owner=owner,
@@ -192,7 +227,7 @@ class HandoffArtifact:
             unchanged=tuple(list_values["unchanged"]),
             tests=tuple(list_values["tests"]),
             risks=tuple(list_values["risks"]),
-            resource_usage=dict(resource_usage),
+            resource_usage=usage_pointer,
             next_owner=next_owner,
             escalation_required=escalation_required,
             escalation_reason=escalation_reason,
