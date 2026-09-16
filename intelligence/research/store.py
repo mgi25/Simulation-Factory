@@ -68,6 +68,29 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from ai_platform.serde import read_json, write_json
+from intelligence.research.batch import (
+    BatchStatus,
+    DiscoveryRound,
+    ResearchBatch,
+)
+from intelligence.research.batch_control import (
+    BatchProgress,
+    StopSignal,
+    advance_batch,
+    escalate_batch,
+    evaluate_stop_conditions,
+    exceeded_limits,
+    record_round,
+    stop_batch,
+)
+from intelligence.research.batch_metrics import (
+    CandidateOutcome,
+    batch_progress,
+    outcome_of,
+    round_progress,
+    saturation_signals,
+)
+from intelligence.research.batch_report import BatchReport, build_batch_report
 from intelligence.research.discovery import (
     CandidateState,
     DiscoveryCandidate,
@@ -79,7 +102,13 @@ from intelligence.research.errors import ResearchError
 from intelligence.research.opportunity import OpportunityDossier
 from intelligence.research.promotion import PromotionResult, promote_candidate
 from intelligence.research.reference_case import ReferenceCase
+from intelligence.research.resources import ResearchResourceRecord
 from intelligence.research.scoring import OpportunityScorecard, ScoringRubric
+from intelligence.research.screening_queue import (
+    QueueEntry,
+    ScreeningAssessment,
+    screening_queue,
+)
 from intelligence.research.snapshots import PublicSnapshot, SnapshotSeries, series_id
 from intelligence.research.sources import ResearchSource
 from intelligence.research.urls import ContentIdentity
@@ -98,6 +127,9 @@ RECORD_TYPES: dict[str, type] = {
     VideoIntelligenceDossier.kind: VideoIntelligenceDossier,
     ScoringRubric.kind: ScoringRubric,
     OpportunityScorecard.kind: OpportunityScorecard,
+    ResearchBatch.kind: ResearchBatch,
+    ScreeningAssessment.kind: ScreeningAssessment,
+    ResearchResourceRecord.kind: ResearchResourceRecord,
 }
 
 DIRECTORIES: dict[str, str] = {
@@ -110,6 +142,9 @@ DIRECTORIES: dict[str, str] = {
     VideoIntelligenceDossier.kind: "video_dossiers",
     ScoringRubric.kind: "rubrics",
     OpportunityScorecard.kind: "scorecards",
+    ResearchBatch.kind: "research_batches",
+    ScreeningAssessment.kind: "screening_assessments",
+    ResearchResourceRecord.kind: "research_resources",
 }
 
 
@@ -284,6 +319,148 @@ class ResearchStore:
             self.add(result.series, overwrite=True)
         return result
 
+    # -- batches ----------------------------------------------------------
+
+    def batches(self, status: BatchStatus | None = None) -> tuple[ResearchBatch, ...]:
+        records = self.load_all(ResearchBatch.kind)
+        if status is None:
+            return records
+        return tuple(b for b in records if b.status is status)
+
+    def batch_outcomes(self, batch: ResearchBatch) -> tuple[CandidateOutcome, ...]:
+        """Join each of the batch's candidates with the source it became.
+
+        The one place the join happens. A candidate id the store does not hold is
+        skipped rather than faked - `integrity()` reports it as dangling, and the
+        batch report counts it in `unmatched_candidates` so every metric drawn
+        from the candidate records carries its own coverage.
+        """
+        out: list[CandidateOutcome] = []
+        for candidate_id in batch.candidate_ids:
+            if not self.exists(DiscoveryCandidate.kind, candidate_id):
+                continue
+            candidate = self.get(DiscoveryCandidate.kind, candidate_id)
+            source = None
+            if candidate.promoted_source_id and self.exists(
+                ResearchSource.kind, candidate.promoted_source_id
+            ):
+                source = self.get(ResearchSource.kind, candidate.promoted_source_id)
+            out.append(outcome_of(candidate, source))
+        return tuple(out)
+
+    def batch_assessments(self, batch_id: str) -> tuple[ScreeningAssessment, ...]:
+        return tuple(
+            a
+            for a in self.load_all(ScreeningAssessment.kind)
+            if a.batch_id == batch_id
+        )
+
+    def batch_resources(self, batch_id: str) -> tuple[ResearchResourceRecord, ...]:
+        return tuple(
+            r
+            for r in self.load_all(ResearchResourceRecord.kind)
+            if r.batch_id == batch_id
+        )
+
+    def batch_progress(self, batch_id: str) -> BatchProgress:
+        batch = self.get(ResearchBatch.kind, batch_id)
+        return batch_progress(batch, self.batch_outcomes(batch))
+
+    def batch_stop_signals(
+        self, batch_id: str, *, on: dt.date | None = None
+    ) -> tuple[StopSignal, ...]:
+        """Evaluate the batch's declared conditions. Reports; changes nothing."""
+        batch = self.get(ResearchBatch.kind, batch_id)
+        outcomes = self.batch_outcomes(batch)
+        signals = saturation_signals(batch, round_progress(batch, outcomes))
+        return evaluate_stop_conditions(
+            batch,
+            batch_progress(batch, outcomes),
+            on=on or dt.date.today(),
+            saturation=signals,
+        )
+
+    def batch_queue(self, batch_id: str) -> tuple[QueueEntry, ...]:
+        batch = self.get(ResearchBatch.kind, batch_id)
+        outcomes = self.batch_outcomes(batch)
+        return screening_queue(
+            tuple((o.candidate_id, o.state) for o in outcomes),
+            self.batch_assessments(batch_id),
+        )
+
+    def batch_report(self, batch_id: str, as_of: dt.date | None = None) -> BatchReport:
+        """Assemble the whole report from the store. Reads; writes nothing."""
+        batch = self.get(ResearchBatch.kind, batch_id)
+        return build_batch_report(
+            batch,
+            self.batch_outcomes(batch),
+            self.batch_assessments(batch_id),
+            self.batch_resources(batch_id),
+            as_of=as_of or dt.date.today(),
+        )
+
+    def record_round(
+        self, batch_id: str, round: DiscoveryRound, *, by: str, detail: str = ""
+    ) -> ResearchBatch:
+        """Append a round and write the batch back. Supplies the saturation signals.
+
+        `overwrite=True` is deliberate and is the same call `ingest` makes: this
+        is an edit to a record the method has just read, and it shows up in git
+        as the lines that moved. What the store still refuses is the accidental
+        overwrite - a second batch claiming an id that already exists.
+        """
+        batch = self.get(ResearchBatch.kind, batch_id)
+        outcomes = self.batch_outcomes(batch)
+        updated = record_round(
+            batch,
+            round,
+            by=by,
+            detail=detail,
+            saturation=saturation_signals(batch, round_progress(batch, outcomes)),
+        )
+        self.add(updated, overwrite=True)
+        return updated
+
+    def advance_batch(
+        self, batch_id: str, to: BatchStatus, *, on: dt.date, by: str, reason: str
+    ) -> ResearchBatch:
+        """Move a batch, supplying the evidence its next status requires."""
+        batch = self.get(ResearchBatch.kind, batch_id)
+        outcomes = self.batch_outcomes(batch)
+        progress = batch_progress(batch, outcomes)
+        signals = evaluate_stop_conditions(
+            batch,
+            progress,
+            on=on,
+            saturation=saturation_signals(batch, round_progress(batch, outcomes)),
+        )
+        updated = advance_batch(
+            batch, to, on=on, by=by, reason=reason, progress=progress, signals=signals
+        )
+        self.add(updated, overwrite=True)
+        return updated
+
+    def stop_batch(
+        self, batch_id: str, *, on: dt.date, by: str, reason: str
+    ) -> ResearchBatch:
+        """Stop a batch, recording which declared condition fired first."""
+        batch = self.get(ResearchBatch.kind, batch_id)
+        updated = stop_batch(
+            batch,
+            on=on,
+            by=by,
+            reason=reason,
+            signals=self.batch_stop_signals(batch_id, on=on),
+        )
+        self.add(updated, overwrite=True)
+        return updated
+
+    def escalate_batch(self, batch_id: str, **kwargs: Any) -> ResearchBatch:
+        """Authorise continuing. See `batch.escalate_batch` for the refusals."""
+        updated = escalate_batch(self.get(ResearchBatch.kind, batch_id), **kwargs)
+        self.add(updated, overwrite=True)
+        return updated
+
     def stale(self, today: dt.date | None = None, kind: str | None = None) -> tuple[Any, ...]:
         """Records whose confidence is past its recheck date, soonest due first.
 
@@ -407,7 +584,140 @@ class ResearchStore:
                     )
                 )
 
+        issues.extend(self._batch_issues(query_ids, candidate_ids))
         return tuple(sorted(issues, key=lambda i: (i.kind, i.record_id, i.problem)))
+
+    def _batch_issues(
+        self, query_ids: frozenset[str], candidate_ids: frozenset[str]
+    ) -> tuple[IntegrityIssue, ...]:
+        """What a batch, an assessment and a resource record cannot notice alone.
+
+        The one worth having is the provenance cross-check. A batch's round log
+        and a candidate's own provenance are two records of the same event
+        written by two different calls, and nothing inside either notices when
+        they disagree - a candidate charged to a batch whose query never found it
+        makes that query look productive and hides which one actually paid.
+        """
+        issues: list[IntegrityIssue] = []
+        batches = self.load_all(ResearchBatch.kind)
+        batch_ids = {batch.id for batch in batches}
+
+        sources = self.load_all(ResearchSource.kind)
+        promoted_from: dict[str, str] = {
+            source.origin.candidate_id: source.id
+            for source in sources
+            if source.origin is not None
+        }
+
+        for batch in batches:
+            for query_id in batch.query_ids:
+                if query_id not in query_ids:
+                    issues.append(
+                        IntegrityIssue(
+                            batch.kind,
+                            batch.id,
+                            f"declares unknown discovery query {query_id!r}",
+                        )
+                    )
+            for entry in batch.rounds:
+                for candidate_id in entry.observed:
+                    if candidate_id not in candidate_ids:
+                        issues.append(
+                            IntegrityIssue(
+                                batch.kind,
+                                batch.id,
+                                f"a {entry.ran_on} round observed unknown candidate "
+                                f"{candidate_id!r}",
+                            )
+                        )
+                        continue
+                    candidate = self.get(DiscoveryCandidate.kind, candidate_id)
+                    if entry.query_id not in candidate.query_ids:
+                        issues.append(
+                            IntegrityIssue(
+                                batch.kind,
+                                batch.id,
+                                f"charges candidate {candidate_id!r} to query "
+                                f"{entry.query_id!r}, which is not in that candidate's "
+                                "provenance",
+                            )
+                        )
+
+            outcomes = self.batch_outcomes(batch)
+            claimed = sum(1 for outcome in outcomes if outcome.is_promoted)
+            held = sum(
+                1
+                for candidate_id in batch.candidate_ids
+                if candidate_id in promoted_from
+            )
+            if claimed != held:
+                issues.append(
+                    IntegrityIssue(
+                        batch.kind,
+                        batch.id,
+                        f"{claimed} candidate(s) say they were promoted, but {held} "
+                        "source(s) in the store name a candidate of this batch as their "
+                        "origin",
+                    )
+                )
+
+            over = exceeded_limits(batch.budget, batch_progress(batch, outcomes))
+            if (
+                over
+                and batch.status not in (BatchStatus.STOPPED, BatchStatus.ARCHIVED)
+                and not batch.escalated_since_stop
+            ):
+                issues.append(
+                    IntegrityIssue(
+                        batch.kind,
+                        batch.id,
+                        f"is {batch.status.value!r} having spent past "
+                        f"{', '.join(over)}; a breached ceiling stops the batch or is "
+                        "escalated by a named authoriser",
+                    )
+                )
+
+        for assessment in self.load_all(ScreeningAssessment.kind):
+            if assessment.batch_id not in batch_ids:
+                issues.append(
+                    IntegrityIssue(
+                        assessment.kind,
+                        assessment.id,
+                        f"names unknown research batch {assessment.batch_id!r}",
+                    )
+                )
+            elif assessment.candidate_id not in set(
+                self.get(ResearchBatch.kind, assessment.batch_id).candidate_ids
+            ):
+                issues.append(
+                    IntegrityIssue(
+                        assessment.kind,
+                        assessment.id,
+                        f"screens candidate {assessment.candidate_id!r}, which batch "
+                        f"{assessment.batch_id!r} never observed",
+                    )
+                )
+            if assessment.candidate_id not in candidate_ids:
+                issues.append(
+                    IntegrityIssue(
+                        assessment.kind,
+                        assessment.id,
+                        f"names unknown discovery candidate "
+                        f"{assessment.candidate_id!r}",
+                    )
+                )
+
+        for record in self.load_all(ResearchResourceRecord.kind):
+            if record.batch_id not in batch_ids:
+                issues.append(
+                    IntegrityIssue(
+                        record.kind,
+                        record.id,
+                        f"charges {record.batch_id!r}, which is not a research batch",
+                    )
+                )
+
+        return tuple(issues)
 
     def thread(self, source_id: str) -> dict[str, tuple[Any, ...]]:
         """One source and everything downstream of it, for a reviewer.

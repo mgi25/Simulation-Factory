@@ -1,9 +1,9 @@
 # Company OS research & intelligence
 
-Nine record types, a discovery queue, one seven-stage workflow, and a directory
-of JSON files. No
-database, no embeddings, no network. Everything here is `dataclasses` and
-`json`, same as the knowledge store it sits beside.
+Twelve record types, a discovery queue, a budgeted batch in front of it, one
+seven-stage workflow, and a directory of JSON files. No database, no
+embeddings, no network. Everything here is `dataclasses` and `json`, same as
+the knowledge store it sits beside.
 
 This layer stores and evaluates research. It does not go and get it: there is
 no scraper, no API client, no browser driver, no downloader and no model. That
@@ -19,6 +19,9 @@ intelligence/research/records/
     discovery_queries/<id>.json
     discovery_candidates/<id>.json
     public_snapshots/<id>.json
+    research_batches/<id>.json
+    screening_assessments/<id>.json
+    research_resources/<id>.json
     sources/<id>.json
     references/<id>.json
     opportunities/<id>.json
@@ -32,7 +35,7 @@ written with sorted keys, so two sessions writing different records never
 conflict and a research change shows up in `git diff` as the sentence that
 changed.
 
-## The nine types
+## The twelve types
 
 | Type | Answers | Required beyond the common fields |
 |---|---|---|
@@ -45,6 +48,9 @@ changed.
 | `DiscoveryQuery` | What did we go looking for? | `terms` (≥1), `objective`, a known `platform` |
 | `DiscoveryCandidate` | What turned up, and has anyone judged it? | `provenance` (≥1), `evidence`, `capture_method` |
 | `SnapshotSeries` | What did the public page show, and when? | a derived `id`, snapshots oldest first |
+| `ResearchBatch` | How much are we allowed to spend on this search? | `budget`, `stop_conditions` (>=1), `query_ids` (>=1) |
+| `ScreeningAssessment` | What did a screener think, and on what? | `reason`, `evidence` (>=1), a reviewer and a date |
+| `ResearchResourceRecord` | What did this cost, and at which tier? | a `CostTier` and at least one measurement |
 
 Common to most: `id`, `created`, an author, and a `ResearchConfidence`. The
 three discovery types carry no confidence: a candidate is a URL and some public
@@ -134,6 +140,94 @@ a state that already exists - `CandidateState` or `ResearchStage` - so it
 cannot drift from the record it describes. `next_tier` returns a description;
 nothing in this package calls it in a loop, because the gap between two tiers
 is where a person decides whether the next one is worth paying for.
+
+## Batches: how much of this are we allowed to buy?
+
+A query can return four results or four hundred, and the cost of four hundred is
+not in holding them - it is in the afternoon each one can ask for. A
+`ResearchBatch` is one search with a ceiling on that.
+
+```
+plan (budget + stop conditions) -> collecting -> screening -> analysis_ready
+                                        \-> stopped -> escalated -> collecting
+```
+
+**The conditions are written before the collecting.** A batch requires at least
+one `StopCondition` at construction. A stop rule chosen after the numbers are in
+is not a rule, it is a description of where somebody happened to stop, and it
+cannot fail. Six reasons - unique candidates, observations, queries, budget,
+saturation, deadline - and each carries exactly the parameter it needs and
+refuses the others.
+
+**A round is refused whole, never trimmed.** `record_round` checks the three
+collection ceilings and rejects a round that would cross one, naming the limit
+and both remedies. Truncating the round to fit would lose evidence silently, and
+would make the duplicate rate wrong in a direction nobody could see.
+
+**A fired condition stops collecting; an exceeded ceiling stops everything.**
+Those are different rules on purpose. Reaching `max_unique_candidates` is the
+ceiling *working* - the next thing the batch should do is screen what it found -
+so a fired condition blocks the way back into `COLLECTING` and blocks
+`record_round`, and nothing else. *Exceeding* any ceiling is spend nobody
+authorised, and it blocks every forward move until `escalate_batch` raises it
+with an authoriser's name in the history.
+
+`batch.py` is what a batch is; `batch_control.py` is the four functions that
+change one, each refused against a measurement; `batch_metrics.py` is the pure
+arithmetic over the round log and the candidate records.
+
+**The round log is the measurement.** `rounds` is append-only and chronological;
+`candidate_ids` is a derived property, so there is no second list to disagree
+with it. Saturation, duplication and query contribution are all replays of that
+log, which is why "new" means new *at that point*.
+
+### What the numbers refuse to say
+
+| Question | Answer when nobody measured it |
+|---|---|
+| new-candidate rate for a round that observed nothing | `None` - "the round observed nothing", not 0.0 |
+| new-creator rate where no observation named a creator | `None`, and the saturation verdict becomes `INSUFFICIENT_EVIDENCE` |
+| top-creator share with no creator recorded | `None`; the share otherwise divides by the *known* creators and prints the unknown count |
+| mechanics observed | only explicit `tags`. No tokenizer, no title parsing |
+| saturation over fewer rounds than the rule wants | `INSUFFICIENT_EVIDENCE` - a third answer, never "not yet" |
+| cost per promoted source when nothing was promoted | a sentence, not an infinity |
+| any cost total where one record left the field blank | `None`, and `missing` says how many were short |
+
+`SaturationRule` is `N` rounds under rate `X`, both configuration, both
+required. There is no saturation score: one number would hide which of the three
+metrics flattened and how many rounds it took, and those are the two things a
+research lead acts on.
+
+### The screening queue
+
+A researcher scores a candidate on five named signals - relevance, novelty
+potential, format-family potential, channel fit, evidence completeness - each
+with a reason, each as a `DimensionScore`. The queue sorts what they supplied
+and invents nothing; it reads no public metric at all, the same refusal
+`score_opportunity` makes.
+
+Ordering is `(status, -mean, candidate_id)`. The mean rather than the total,
+because a total rewards whoever filled in more boxes; and a partially scored
+candidate never sorts above a fully scored one, whatever its mean. An unscored
+candidate keeps its place at the bottom rather than being dropped, because
+`ScreeningCoverage` over the whole batch is the number that says whether the
+ordering means anything yet.
+
+**An assessment is not a decision.** `ScreeningRecommendation` is what a
+reviewer thinks; `screen_candidate` is what the queue does, and it still takes
+its own person, date and reason.
+
+### Cost
+
+`ResearchResourceRecord` charges spend to a batch and a `CostTier`. Manual
+minutes, reasoning units, tool calls and search calls are each optional and each
+stay missing when absent - `ai_platform/usage.py` makes the same call for the
+same reason, and a system whose only budget needs provider telemetry stops
+budgeting the day the provider changes. Reasoning units without a `UsageUnit`
+are refused, and two quantisations in one batch do not add up.
+
+`BatchReport` is the whole thing as twenty numbers and one list of absences.
+`missing_measurements` is deliberately the longest section on a young batch.
 
 ## The flow
 
@@ -278,10 +372,17 @@ python -m intelligence.research candidates --state queued
 python -m intelligence.research screen <id> --to screened_in --by X --reason "..."
 python -m intelligence.research promote <id> --spec promotion.json
 python -m intelligence.research funnel
+
+python -m intelligence.research batch show rb-marble-race-2026q3
+python -m intelligence.research batch report rb-marble-race-2026q3 --today 2026-09-17
+python -m intelligence.research batch queue rb-marble-race-2026q3
 ```
 
 `docs/research_ingestion_example/` holds a worked `captured.json` and
-`promotion.json`. `promote` has no flags for confidence or rights: a
+`promotion.json`; `docs/research_batch_example/` holds the batch plan those
+candidates are collected under. `batch report` exits non-zero when a declared
+stop condition has fired or a ceiling is over, so it can become a review gate
+later without changing shape. `promote` has no flags for confidence or rights: a
 `ResearchConfidence` is a level, a basis and what would overturn it, and a
 command line that let a researcher skip those would manufacture them.
 
