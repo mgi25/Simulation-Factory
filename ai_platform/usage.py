@@ -94,6 +94,16 @@ class ResourceUsageRecord:
     explicit_context_sources: tuple[str, ...] = ()
     automatic_context_sources: tuple[str, ...] = ()
     context_cache_key: str = ""
+    initial_context_sources: tuple[str, ...] = ()
+    expanded_context_sources: tuple[str, ...] = ()
+    rejected_expansion_sources: tuple[str, ...] = ()
+    initial_context_fingerprint: str = ""
+    effective_context_fingerprint: str = ""
+    expansion_ledger_fingerprint: str = ""
+    context_usage_reported: bool = False
+    expansion_count: int = 0
+    required_expansion_count: int = 0
+    expansion_chars: int = 0
 
     # What we observe ourselves. Always present.
     passes: int = 1
@@ -129,17 +139,44 @@ class ResourceUsageRecord:
             "context_refs_used",
             "explicit_context_sources",
             "automatic_context_sources",
+            "initial_context_sources",
+            "expanded_context_sources",
+            "rejected_expansion_sources",
         ):
             if not isinstance(getattr(self, name), tuple):
                 raise UsageRecordError(f"{self.task_id}: {name} must be a tuple")
         for name in (
             "context_fingerprint",
             "context_cache_key",
+            "initial_context_fingerprint",
+            "effective_context_fingerprint",
+            "expansion_ledger_fingerprint",
             "rejection_reason",
             "notes",
         ):
             if not isinstance(getattr(self, name), str):
                 raise UsageRecordError(f"{self.task_id}: {name} must be a string")
+        if not isinstance(self.context_usage_reported, bool):
+            raise UsageRecordError(
+                f"{self.task_id}: context_usage_reported must be a boolean"
+            )
+        if self.context_refs_used and not self.context_usage_reported:
+            object.__setattr__(self, "context_usage_reported", True)
+        for name in (
+            "context_fingerprint",
+            "initial_context_fingerprint",
+            "effective_context_fingerprint",
+            "expansion_ledger_fingerprint",
+        ):
+            value = getattr(self, name)
+            if value and (
+                len(value) != 16
+                or any(char not in "0123456789abcdef" for char in value)
+            ):
+                raise UsageRecordError(
+                    f"{self.task_id}: {name} must be empty or a 16-character "
+                    "lowercase hex digest"
+                )
 
         if self.outcome is Outcome.REJECTED and not self.rejection_reason.strip():
             raise UsageRecordError(
@@ -157,6 +194,9 @@ class ResourceUsageRecord:
             ("cache_hits", self.cache_hits),
             ("retrieval_hits", self.retrieval_hits),
             ("subagents_used", self.subagents_used),
+            ("expansion_count", self.expansion_count),
+            ("required_expansion_count", self.required_expansion_count),
+            ("expansion_chars", self.expansion_chars),
         )
         for name, value in counters:
             if isinstance(value, bool) or not isinstance(value, int):
@@ -200,6 +240,9 @@ class ResourceUsageRecord:
             ("context_refs_used", self.context_refs_used),
             ("explicit_context_sources", self.explicit_context_sources),
             ("automatic_context_sources", self.automatic_context_sources),
+            ("initial_context_sources", self.initial_context_sources),
+            ("expanded_context_sources", self.expanded_context_sources),
+            ("rejected_expansion_sources", self.rejected_expansion_sources),
         ):
             if any(not isinstance(value, str) or not value for value in values):
                 raise UsageRecordError(
@@ -229,11 +272,44 @@ class ResourceUsageRecord:
                 + ", ".join(sorted(overlap))
             )
         if (explicit or automatic) and explicit | automatic != set(
-            self.context_sources
+            self.initial_context_sources or self.context_sources
         ):
             raise UsageRecordError(
                 f"{self.task_id}: explicit and automatic context must account for "
-                "every supplied context source"
+                "every initial context source"
+            )
+
+        initial = set(self.initial_context_sources)
+        expanded = set(self.expanded_context_sources)
+        if initial & expanded:
+            raise UsageRecordError(
+                f"{self.task_id}: context cannot be both initial and expanded: "
+                + ", ".join(sorted(initial & expanded))
+            )
+        if initial or expanded:
+            expected_sources = (
+                self.initial_context_sources + self.expanded_context_sources
+            )
+            if expected_sources != self.context_sources:
+                raise UsageRecordError(
+                    f"{self.task_id}: initial and expanded context must account for "
+                    "every supplied context source in order"
+                )
+        if expanded and self.expansion_count < 1:
+            raise UsageRecordError(
+                f"{self.task_id}: expanded context requires a positive expansion_count"
+            )
+        if self.expansion_count and not expanded:
+            raise UsageRecordError(
+                f"{self.task_id}: expansion_count is set without expanded context"
+            )
+        if self.required_expansion_count > self.expansion_count:
+            raise UsageRecordError(
+                f"{self.task_id}: required_expansion_count cannot exceed expansion_count"
+            )
+        if expanded and not self.expansion_ledger_fingerprint:
+            raise UsageRecordError(
+                f"{self.task_id}: expanded context requires an expansion ledger fingerprint"
             )
 
         if self.subagents_used:
@@ -258,6 +334,71 @@ class ResourceUsageRecord:
     def unused_context(self) -> tuple[str, ...]:
         used = set(self.context_refs_used)
         return tuple(key for key in self.context_sources if key not in used)
+
+    @property
+    def initial_context_sufficient(self) -> bool:
+        return self.required_expansion_count == 0
+
+    @property
+    def initial_ref_count(self) -> int:
+        return len(self.initial_context_sources or self.context_sources)
+
+    @property
+    def expanded_ref_count(self) -> int:
+        return len(self.expanded_context_sources)
+
+    @property
+    def rejected_expansion_ref_count(self) -> int:
+        return len(self.rejected_expansion_sources)
+
+    @property
+    def used_initial_ref_count(self) -> int | None:
+        if not self.context_usage_reported:
+            return None
+        initial = set(self.initial_context_sources or self.context_sources)
+        return len(initial & set(self.context_refs_used))
+
+    @property
+    def used_expansion_ref_count(self) -> int | None:
+        if not self.context_usage_reported:
+            return None
+        return len(set(self.expanded_context_sources) & set(self.context_refs_used))
+
+    @property
+    def unused_initial_ref_count(self) -> int | None:
+        used = self.used_initial_ref_count
+        return None if used is None else self.initial_ref_count - used
+
+    @property
+    def unused_initial_refs(self) -> tuple[str, ...] | None:
+        if not self.context_usage_reported:
+            return None
+        used = set(self.context_refs_used)
+        return tuple(
+            key
+            for key in (self.initial_context_sources or self.context_sources)
+            if key not in used
+        )
+
+    @property
+    def unused_expansion_refs(self) -> tuple[str, ...] | None:
+        if not self.context_usage_reported:
+            return None
+        used = set(self.context_refs_used)
+        return tuple(key for key in self.expanded_context_sources if key not in used)
+
+    @property
+    def unused_expansion_ref_count(self) -> int | None:
+        unused = self.unused_expansion_refs
+        return None if unused is None else len(unused)
+
+    @property
+    def context_precision(self) -> float | None:
+        if not self.context_usage_reported:
+            return None
+        if not self.context_sources:
+            return 1.0
+        return len(set(self.context_refs_used)) / len(self.context_sources)
 
     def check_policy(self, policy: ExecutionPolicy = BOOTSTRAP_POLICY) -> None:
         policy.assert_no_subagents(self.subagents_used)
@@ -296,6 +437,9 @@ class ResourceUsageRecord:
                 "context_refs_used",
                 "explicit_context_sources",
                 "automatic_context_sources",
+                "initial_context_sources",
+                "expanded_context_sources",
+                "rejected_expansion_sources",
             )
         }
         integer_fields = {
@@ -306,6 +450,9 @@ class ResourceUsageRecord:
                 ("cache_hits", 0),
                 ("retrieval_hits", 0),
                 ("subagents_used", 0),
+                ("expansion_count", 0),
+                ("required_expansion_count", 0),
+                ("expansion_chars", 0),
             )
         }
         optional_integer_fields = {
@@ -323,6 +470,9 @@ class ResourceUsageRecord:
             for name in (
                 "context_fingerprint",
                 "context_cache_key",
+                "initial_context_fingerprint",
+                "effective_context_fingerprint",
+                "expansion_ledger_fingerprint",
                 "rejection_reason",
                 "notes",
             )
@@ -337,6 +487,10 @@ class ResourceUsageRecord:
             **integer_fields,
             **optional_integer_fields,
             **string_fields,
+            context_usage_reported=_boolean(
+                data.get("context_usage_reported", bool(data.get("context_refs_used"))),
+                "context_usage_reported",
+            ),
         )
 
 
@@ -486,6 +640,12 @@ def _optional_integer(value: Any, field_name: str) -> int | None:
     if value is None:
         return None
     return _integer(value, field_name)
+
+
+def _boolean(value: Any, field_name: str) -> bool:
+    if not isinstance(value, bool):
+        raise UsageRecordError(f"{field_name} must be a boolean")
+    return value
 
 
 def _enum_value(enum_type: type[Enum], value: Any, field_name: str) -> Any:

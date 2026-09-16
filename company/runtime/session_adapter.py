@@ -37,12 +37,19 @@ from pathlib import Path
 from typing import Any
 
 from ai_platform.usage import Outcome
+from knowledge.company_os.capsules import CapsuleIndex
 
 from .attempts import AttemptReport, AttemptResult, finalise_attempt
+from .context_expansion import (
+    ContextExpansionDecision,
+    ContextExpansionLedger,
+    ContextExpansionRequest,
+)
+from .context_expansion_policy import decide_context_expansion
 from .errors import LifecycleError
 from .execution_store import ExecutionRecordPointer, ExecutionStore
 from .git_evidence import repository_findings
-from .lifecycle import TaskPlan
+from .lifecycle import TaskPlan, contract_from_registry
 from .packets import ExecutorHint, SessionPacket, build_session_packet
 from .path_scope import PathScope
 from .receipts import ReceiptValidation, SessionReceipt, validate_receipt
@@ -69,6 +76,17 @@ class IngestedSession:
     @property
     def accepted(self) -> bool:
         return self.attempt.usage_record.outcome is Outcome.ACCEPTED
+
+
+@dataclass(frozen=True)
+class ExpandedSession:
+    """One persisted request, its persisted decision, and the resulting ledger."""
+
+    request: ContextExpansionRequest
+    request_pointer: ExecutionRecordPointer
+    decision: ContextExpansionDecision
+    decision_pointer: ExecutionRecordPointer
+    ledger: ContextExpansionLedger
 
 
 class ManualExternalSessionAdapter:
@@ -108,6 +126,7 @@ class ManualExternalSessionAdapter:
         usage_store: ResourceUsageStore,
         *,
         repo_dir: str | Path | None = None,
+        expansion_ledger: ContextExpansionLedger | None = None,
     ) -> IngestedSession:
         """Validate one receipt and record the attempt it describes.
 
@@ -122,12 +141,22 @@ class ManualExternalSessionAdapter:
         pointer = self.store.append_receipt(receipt)
         plan.policy.assert_no_subagents(receipt.subagents_used)
 
+        ledger = (
+            expansion_ledger
+            if expansion_ledger is not None
+            else self.store.context_expansion_ledger(packet)
+        )
         validation = _widen(
-            validate_receipt(packet, receipt),
+            validate_receipt(packet, receipt, expansion_ledger=ledger),
             _owner_failures(plan, receipt) + _repository_failures(receipt, repo_dir),
         )
-        report = _attempt_report(plan, packet, receipt, validation, pointer)
-        attempt = finalise_attempt(plan, report, usage_store)
+        usable_ledger = _ledger_for_recording(packet, ledger)
+        report = _attempt_report(
+            plan, packet, receipt, validation, pointer, usable_ledger
+        )
+        attempt = finalise_attempt(
+            plan, report, usage_store, expansion_ledger=usable_ledger
+        )
         return IngestedSession(
             receipt=receipt,
             receipt_pointer=pointer,
@@ -135,8 +164,46 @@ class ManualExternalSessionAdapter:
             attempt=attempt,
         )
 
+    def expand_context(
+        self,
+        plan: TaskPlan,
+        packet: SessionPacket,
+        request: ContextExpansionRequest,
+        *,
+        employee_contract: Mapping[str, Any] | None = None,
+        capsule_index: CapsuleIndex | None = None,
+        repo_root: str | Path | None = None,
+    ) -> ExpandedSession:
+        """Persist, decide, and persist one request without changing the packet."""
+        _assert_plan_matches_packet(plan, packet)
+        request_pointer = self.store.append_context_expansion_request(request)
+        ledger = self.store.context_expansion_ledger(packet)
+        contract = (
+            employee_contract
+            if employee_contract is not None
+            else contract_from_registry(plan.selected_employee, plan.config)
+        )
+        decision = decide_context_expansion(
+            packet,
+            request,
+            contract,
+            ledger=ledger,
+            capsule_index=capsule_index,
+            repo_root=repo_root,
+        )
+        decision_pointer = self.store.append_context_expansion_decision(decision)
+        return ExpandedSession(
+            request=request,
+            request_pointer=request_pointer,
+            decision=decision,
+            decision_pointer=decision_pointer,
+            ledger=ledger.with_decision(decision),
+        )
 
-def _widen(validation: ReceiptValidation, failures: tuple[str, ...]) -> ReceiptValidation:
+
+def _widen(
+    validation: ReceiptValidation, failures: tuple[str, ...]
+) -> ReceiptValidation:
     if not failures:
         return validation
     return replace(validation, failures=validation.failures + failures)
@@ -211,14 +278,13 @@ def _attempt_report(
     receipt: SessionReceipt,
     validation: ReceiptValidation,
     pointer: ExecutionRecordPointer,
+    expansion_ledger: ContextExpansionLedger | None,
 ) -> AttemptReport:
     outcome = receipt.outcome if validation.ok else Outcome.REJECTED
     rejection_reason = ""
     if outcome is Outcome.REJECTED:
         rejection_reason = (
-            receipt.rejection_reason.strip()
-            if validation.ok
-            else validation.reason()
+            receipt.rejection_reason.strip() if validation.ok else validation.reason()
         ) or "the returned receipt did not satisfy the packet"
 
     evidence = list(receipt.evidence)
@@ -235,6 +301,8 @@ def _attempt_report(
     # rejected attempt must still be recordable, so the report carries only the
     # refs the packet actually contained. Validation reports the rest.
     supplied = set(packet.context_keys())
+    if expansion_ledger is not None:
+        supplied.update(ref.key for ref in expansion_ledger.approved_refs)
     refs_used = tuple(ref for ref in receipt.context_refs_used if ref in supplied)
 
     escalation_reason = ""
@@ -261,6 +329,9 @@ def _attempt_report(
         tests=receipt.test_commands,
         risks=tuple(receipt.unresolved_risks),
         context_refs_used=refs_used,
+        context_usage_reported=(
+            receipt.context_usage_reported or bool(receipt.context_refs_used)
+        ),
         next_owner=(
             receipt.next_owner if receipt.next_owner in _known_owners(plan) else ""
         ),
@@ -280,7 +351,19 @@ def _attempt_report(
     )
 
 
+def _ledger_for_recording(
+    packet: SessionPacket, ledger: ContextExpansionLedger
+) -> ContextExpansionLedger | None:
+    """Invalid foreign history rejects a receipt but must not abort its audit record."""
+    try:
+        ledger.assert_for_packet(packet)
+    except LifecycleError:
+        return None
+    return ledger
+
+
 __all__ = [
+    "ExpandedSession",
     "IngestedSession",
     "ManualExternalSessionAdapter",
     "PreparedSession",

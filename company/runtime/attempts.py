@@ -6,6 +6,7 @@ from dataclasses import dataclass, replace
 
 from ai_platform.usage import Outcome, ResourceUsageRecord, UsageUnit
 
+from .context_expansion import ContextExpansionLedger
 from .errors import LifecycleError
 from .lifecycle import LifecycleState, TaskPlan
 from .tasks import HandoffArtifact, UsageRecordPointer
@@ -23,6 +24,7 @@ class AttemptReport:
     tests: tuple[str, ...] = ()
     risks: tuple[str, ...] = ()
     context_refs_used: tuple[str, ...] = ()
+    context_usage_reported: bool = False
     next_owner: str = ""
     escalation_reason: str = ""
     passes: int = 1
@@ -68,6 +70,8 @@ class AttemptReport:
         ):
             if not isinstance(getattr(self, name), str):
                 raise LifecycleError(f"attempt {name} must be a string")
+        if not isinstance(self.context_usage_reported, bool):
+            raise LifecycleError("attempt context_usage_reported must be a boolean")
 
 
 @dataclass(frozen=True)
@@ -86,6 +90,8 @@ def finalise_attempt(
     plan: TaskPlan,
     report: AttemptReport,
     store: ResourceUsageStore,
+    *,
+    expansion_ledger: ContextExpansionLedger | None = None,
 ) -> AttemptResult:
     """Create, persist, and link one attempt's canonical usage record."""
     if (
@@ -108,16 +114,51 @@ def finalise_attempt(
             f"task {plan.specification.task_id}: accepted result requires evidence"
         )
     manifest = plan.context_manifest
+    initial_sources = manifest.keys()
+    expanded_sources: tuple[str, ...] = ()
+    rejected_expansion_sources: tuple[str, ...] = ()
+    effective_fingerprint = manifest.fingerprint()
+    expansion_ledger_fingerprint = ""
+    expansion_count = 0
+    required_expansion_count = 0
+    expansion_chars = 0
+    if expansion_ledger is not None:
+        if expansion_ledger.task_id != plan.specification.task_id:
+            raise LifecycleError("context expansion ledger belongs to another task")
+        if expansion_ledger.initial_context_fingerprint != manifest.fingerprint():
+            raise LifecycleError(
+                "context expansion ledger does not begin at the plan's initial context"
+            )
+        expanded_sources = tuple(ref.key for ref in expansion_ledger.approved_refs)
+        rejected_expansion_sources = expansion_ledger.rejected_ref_keys
+        effective_fingerprint = expansion_ledger.effective_context_fingerprint
+        if expansion_ledger.decisions:
+            expansion_ledger_fingerprint = expansion_ledger.fingerprint()
+        expansion_count = expansion_ledger.expansion_count
+        required_expansion_count = expansion_ledger.required_expansion_count
+        expansion_chars = expansion_ledger.expansion_chars
     usage = ResourceUsageRecord(
         task_id=plan.specification.task_id,
         reasoning_class=plan.classification.code,
         outcome=report.outcome,
-        context_sources=manifest.keys(),
+        context_sources=initial_sources + expanded_sources,
         context_refs_used=report.context_refs_used,
-        context_fingerprint=manifest.fingerprint(),
+        context_fingerprint=effective_fingerprint,
         explicit_context_sources=plan.context_plan.explicit_refs,
         automatic_context_sources=plan.context_plan.capsule_refs_accepted,
         context_cache_key=plan.context_plan.cache_identity,
+        initial_context_sources=initial_sources,
+        expanded_context_sources=expanded_sources,
+        rejected_expansion_sources=rejected_expansion_sources,
+        initial_context_fingerprint=manifest.fingerprint(),
+        effective_context_fingerprint=effective_fingerprint,
+        expansion_ledger_fingerprint=expansion_ledger_fingerprint,
+        context_usage_reported=(
+            report.context_usage_reported or bool(report.context_refs_used)
+        ),
+        expansion_count=expansion_count,
+        required_expansion_count=required_expansion_count,
+        expansion_chars=expansion_chars,
         passes=report.passes,
         retries=report.retries,
         cache_hits=report.cache_hits,

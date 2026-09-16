@@ -51,7 +51,6 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from enum import Enum
 import re
 from typing import Any
 
@@ -62,6 +61,8 @@ from ai_platform.usage import Outcome, UsageUnit
 from company.validation.errors import ValidationError
 from company.validation.no_subagents import collect_no_subagent_violations
 
+from .context_expansion import ContextExpansionLedger
+from .errors import LifecycleError
 from .git_evidence import is_git_sha
 from .packets import ExecutorHint, SessionPacket
 from .path_scope import PathScopeVerdict, normalise_path
@@ -130,7 +131,9 @@ class ReceiptUsage:
             if isinstance(self.duration_s, bool) or not isinstance(
                 self.duration_s, (int, float)
             ):
-                raise ValidationError("receipt.usage.duration_s must be a number or null")
+                raise ValidationError(
+                    "receipt.usage.duration_s must be a number or null"
+                )
             object.__setattr__(self, "duration_s", float(self.duration_s))
 
     @classmethod
@@ -179,6 +182,9 @@ class SessionReceipt:
     evidence: tuple[str, ...] = ()
     artifacts: tuple[str, ...] = ()
     context_refs_used: tuple[str, ...] = ()
+    context_usage_reported: bool = False
+    expansion_ledger_fingerprint: str = ""
+    effective_context_fingerprint: str = ""
     next_owner: str = ""
     rejection_reason: str = ""
     notes: str = ""
@@ -209,6 +215,8 @@ class SessionReceipt:
             "next_owner",
             "rejection_reason",
             "notes",
+            "expansion_ledger_fingerprint",
+            "effective_context_fingerprint",
         ):
             if not isinstance(getattr(self, name), str):
                 issues.append(f"receipt.{name} must be a string")
@@ -219,6 +227,14 @@ class SessionReceipt:
             self.working_tree_clean, bool
         ):
             issues.append("receipt.working_tree_clean must be a boolean or null")
+        if not isinstance(self.context_usage_reported, bool):
+            issues.append("receipt.context_usage_reported must be a boolean")
+        for name in ("expansion_ledger_fingerprint", "effective_context_fingerprint"):
+            value = getattr(self, name)
+            if value and not _FINGERPRINT.fullmatch(value):
+                issues.append(
+                    f"receipt.{name} must be empty or a 16-character lowercase hex digest"
+                )
         for name in (
             "files_changed",
             "dependencies_added",
@@ -304,7 +320,9 @@ class SessionReceipt:
             parsed_executor = ExecutorHint(executor)
         except ValueError as exc:
             allowed = ", ".join(str(item.value) for item in ExecutorHint)
-            raise ValidationError(f"receipt.executor must be one of: {allowed}") from exc
+            raise ValidationError(
+                f"receipt.executor must be one of: {allowed}"
+            ) from exc
 
         tests = data.get("tests", [])
         if not isinstance(tests, (list, tuple)):
@@ -354,6 +372,15 @@ class SessionReceipt:
             context_refs_used=_string_tuple(
                 data.get("context_refs_used"), "context_refs_used"
             ),
+            context_usage_reported=_boolean(
+                data, "context_usage_reported", bool(data.get("context_refs_used"))
+            ),
+            expansion_ledger_fingerprint=_optional_string(
+                data, "expansion_ledger_fingerprint"
+            ),
+            effective_context_fingerprint=_optional_string(
+                data, "effective_context_fingerprint"
+            ),
             next_owner=_optional_string(data, "next_owner"),
             rejection_reason=_optional_string(data, "rejection_reason"),
             notes=_optional_string(data, "notes"),
@@ -381,7 +408,12 @@ class ReceiptValidation:
         return "; ".join(self.failures)
 
 
-def validate_receipt(packet: SessionPacket, receipt: SessionReceipt) -> ReceiptValidation:
+def validate_receipt(
+    packet: SessionPacket,
+    receipt: SessionReceipt,
+    *,
+    expansion_ledger: ContextExpansionLedger | None = None,
+) -> ReceiptValidation:
     """Check one receipt against the packet it claims to answer.
 
     Deterministic and offline: it compares two records and reads nothing else.
@@ -438,10 +470,49 @@ def validate_receipt(packet: SessionPacket, receipt: SessionReceipt) -> ReceiptV
         if value and not is_git_sha(value):
             failures.append(f"receipt {name} {value!r} is not a Git object name")
 
-    unknown_refs = sorted(set(receipt.context_refs_used) - set(packet.context_keys()))
+    supplied_refs = set(packet.context_keys())
+    ledger_valid = True
+    if expansion_ledger is not None:
+        try:
+            expansion_ledger.assert_for_packet(packet)
+        except LifecycleError as exc:
+            failures.append(str(exc))
+            ledger_valid = False
+        if ledger_valid:
+            supplied_refs.update(ref.key for ref in expansion_ledger.approved_refs)
+            expected_ledger = expansion_ledger.fingerprint()
+            expected_context = expansion_ledger.effective_context_fingerprint
+            if receipt.expansion_ledger_fingerprint:
+                if receipt.expansion_ledger_fingerprint != expected_ledger:
+                    failures.append(
+                        "receipt expansion ledger fingerprint does not match the "
+                        "approved history for this packet"
+                    )
+            elif expansion_ledger.approved_refs:
+                failures.append(
+                    "receipt used an expanded context but does not reference its ledger"
+                )
+            if receipt.effective_context_fingerprint:
+                if receipt.effective_context_fingerprint != expected_context:
+                    failures.append(
+                        "receipt effective context fingerprint does not match the "
+                        "approved expansion history"
+                    )
+            elif expansion_ledger.approved_refs:
+                failures.append(
+                    "receipt used an expanded context but does not name its effective "
+                    "context fingerprint"
+                )
+    elif receipt.expansion_ledger_fingerprint or receipt.effective_context_fingerprint:
+        failures.append(
+            "receipt references context expansion history that was not supplied for validation"
+        )
+
+    unknown_refs = sorted(set(receipt.context_refs_used) - supplied_refs)
     if unknown_refs:
         failures.append(
-            "receipt reports context the packet did not supply: " + ", ".join(unknown_refs)
+            "receipt reports context neither the packet nor an approved expansion supplied: "
+            + ", ".join(unknown_refs)
         )
 
     verdict = packet.path_scope.verdict(receipt.files_changed)
@@ -449,7 +520,9 @@ def validate_receipt(packet: SessionPacket, receipt: SessionReceipt) -> ReceiptV
 
     if receipt.outcome is Outcome.ACCEPTED:
         failures.extend(_accepted_failures(packet, receipt))
-        if receipt.working_tree_clean is None and not _could_have_written(packet, receipt):
+        if receipt.working_tree_clean is None and not _could_have_written(
+            packet, receipt
+        ):
             warnings.append(
                 "the receipt does not report working tree status; the packet is "
                 "read-only and the receipt reports no change, so the gap is recorded "
@@ -515,7 +588,9 @@ def _accepted_failures(packet: SessionPacket, receipt: SessionReceipt) -> list[s
         )
 
     missing_tests = tuple(
-        command for command in packet.required_tests if command not in receipt.test_commands
+        command
+        for command in packet.required_tests
+        if command not in receipt.test_commands
     )
     if missing_tests:
         failures.append("required test(s) not reported: " + ", ".join(missing_tests))
@@ -523,9 +598,7 @@ def _accepted_failures(packet: SessionPacket, receipt: SessionReceipt) -> list[s
     if failing:
         failures.append("reported failing test(s): " + ", ".join(failing))
     if packet.evidence_required and not receipt.evidence:
-        failures.append(
-            "this task requires evidence and the receipt supplies none"
-        )
+        failures.append("this task requires evidence and the receipt supplies none")
     return failures
 
 
@@ -553,7 +626,9 @@ def _string_tuple(value: Any, field_name: str) -> tuple[str, ...]:
     if isinstance(value, (str, bytes)) or not isinstance(value, (list, tuple)):
         raise ValidationError(f"receipt.{field_name} must be a list of strings")
     if any(not isinstance(item, str) or not item.strip() for item in value):
-        raise ValidationError(f"receipt.{field_name} must be a list of non-empty strings")
+        raise ValidationError(
+            f"receipt.{field_name} must be a list of non-empty strings"
+        )
     return tuple(item.strip() for item in value)
 
 
