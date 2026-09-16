@@ -59,6 +59,7 @@ class ContextExpansionRequest:
     requesting_executor: ExecutorHint
     sequence: int
     required_to_continue: bool
+    packet_attempt: int = 1
     no_subagents: bool = True
 
     def __post_init__(self) -> None:
@@ -90,6 +91,9 @@ class ContextExpansionRequest:
                 "context_expansion.requesting_executor must be an ExecutorHint value"
             )
         _assert_positive_integer(self.sequence, "context_expansion.sequence")
+        _assert_positive_integer(
+            self.packet_attempt, "context_expansion.packet_attempt"
+        )
         if not isinstance(self.required_to_continue, bool):
             raise LifecycleError(
                 "context_expansion.required_to_continue must be a boolean"
@@ -131,6 +135,7 @@ class ContextExpansionRequest:
             required_to_continue=_boolean(
                 data.get("required_to_continue"), "required_to_continue"
             ),
+            packet_attempt=_integer(data.get("packet_attempt", 1), "packet_attempt"),
             no_subagents=_boolean(data.get("no_subagents", True), "no_subagents"),
         )
 
@@ -175,6 +180,8 @@ class ContextExpansionDecision:
     already_present_refs: tuple[str, ...]
     previous_context_fingerprint: str
     resulting_context_fingerprint: str
+    packet_attempt: int = 1
+    authority_fingerprint: str = ""
     no_subagents: bool = True
 
     def __post_init__(self) -> None:
@@ -190,6 +197,14 @@ class ContextExpansionDecision:
                 getattr(self, name), f"context_expansion_decision.{name}"
             )
         _assert_positive_integer(self.sequence, "context_expansion_decision.sequence")
+        _assert_positive_integer(
+            self.packet_attempt, "context_expansion_decision.packet_attempt"
+        )
+        if self.authority_fingerprint:
+            _assert_fingerprint(
+                self.authority_fingerprint,
+                "context_expansion_decision.authority_fingerprint",
+            )
         if not isinstance(self.required_to_continue, bool):
             raise LifecycleError(
                 "context_expansion_decision.required_to_continue must be a boolean"
@@ -276,6 +291,8 @@ class ContextExpansionDecision:
             resulting_context_fingerprint=_required_string(
                 data, "resulting_context_fingerprint"
             ),
+            packet_attempt=_integer(data.get("packet_attempt", 1), "packet_attempt"),
+            authority_fingerprint=_optional_string(data, "authority_fingerprint"),
             no_subagents=_boolean(data.get("no_subagents", True), "no_subagents"),
         )
 
@@ -288,6 +305,7 @@ class ContextExpansionLedger:
     packet_fingerprint: str
     initial_context_fingerprint: str
     decisions: tuple[ContextExpansionDecision, ...] = ()
+    packet_attempt: int = 1
     no_subagents: bool = True
 
     def __post_init__(self) -> None:
@@ -298,6 +316,9 @@ class ContextExpansionLedger:
         _assert_fingerprint(
             self.initial_context_fingerprint,
             "context_expansion_ledger.initial_context_fingerprint",
+        )
+        _assert_positive_integer(
+            self.packet_attempt, "context_expansion_ledger.packet_attempt"
         )
         if not isinstance(self.decisions, tuple) or any(
             not isinstance(item, ContextExpansionDecision) for item in self.decisions
@@ -317,9 +338,10 @@ class ContextExpansionLedger:
             if (
                 decision.task_id != self.task_id
                 or decision.packet_fingerprint != self.packet_fingerprint
+                or decision.packet_attempt != self.packet_attempt
             ):
                 raise LifecycleError(
-                    "context expansion decision belongs to another task or packet"
+                    "context expansion decision belongs to another task, packet, or attempt"
                 )
             if decision.sequence != expected_sequence:
                 raise LifecycleError(
@@ -350,12 +372,15 @@ class ContextExpansionLedger:
         cls,
         packet: SessionPacket,
         decisions: tuple[ContextExpansionDecision, ...] = (),
+        *,
+        packet_attempt: int = 1,
     ) -> "ContextExpansionLedger":
         return cls(
             task_id=packet.task_id,
             packet_fingerprint=packet.fingerprint(),
             initial_context_fingerprint=packet.context_fingerprint,
             decisions=decisions,
+            packet_attempt=packet_attempt,
         )
 
     @property
@@ -412,15 +437,22 @@ class ContextExpansionLedger:
             packet_fingerprint=self.packet_fingerprint,
             initial_context_fingerprint=self.initial_context_fingerprint,
             decisions=self.decisions + (decision,),
+            packet_attempt=self.packet_attempt,
         )
 
-    def assert_for_packet(self, packet: SessionPacket) -> None:
+    def assert_for_packet(
+        self, packet: SessionPacket, *, packet_attempt: int | None = None
+    ) -> None:
         if (
             self.task_id != packet.task_id
             or self.packet_fingerprint != packet.fingerprint()
         ):
             raise LifecycleError(
                 "context expansion ledger belongs to another task or packet"
+            )
+        if packet_attempt is not None and self.packet_attempt != packet_attempt:
+            raise LifecycleError(
+                "context expansion ledger belongs to another packet attempt"
             )
         if self.initial_context_fingerprint != packet.context_fingerprint:
             raise LifecycleError(
@@ -432,6 +464,7 @@ class ContextExpansionLedger:
             {
                 "task_id": self.task_id,
                 "packet_fingerprint": self.packet_fingerprint,
+                "packet_attempt": self.packet_attempt,
                 "initial_context_fingerprint": self.initial_context_fingerprint,
                 "decision_fingerprints": tuple(
                     item.fingerprint() for item in self.decisions
@@ -538,6 +571,13 @@ def _required_string(data: Mapping[str, Any], field: str) -> str:
     value = data.get(field)
     if not isinstance(value, str) or not value.strip():
         raise LifecycleError(f"context expansion {field} must be a non-empty string")
+    return value
+
+
+def _optional_string(data: Mapping[str, Any], field: str) -> str:
+    value = data.get(field, "")
+    if not isinstance(value, str):
+        raise LifecycleError(f"context expansion {field} must be a string")
     return value
 
 

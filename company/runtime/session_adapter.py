@@ -40,6 +40,7 @@ from ai_platform.usage import Outcome
 from knowledge.company_os.capsules import CapsuleIndex
 
 from .attempts import AttemptReport, AttemptResult, finalise_attempt
+from .authority import AuthoritySource, ExecutionAuthoritySnapshot
 from .context_expansion import (
     ContextExpansionDecision,
     ContextExpansionLedger,
@@ -47,7 +48,7 @@ from .context_expansion import (
 )
 from .context_expansion_policy import decide_context_expansion
 from .errors import LifecycleError
-from .execution_store import ExecutionRecordPointer, ExecutionStore
+from .execution_store import ExecutionRecordPointer, ExecutionStore, PacketRecord
 from .git_evidence import repository_findings
 from .lifecycle import TaskPlan, contract_from_registry
 from .packets import ExecutorHint, SessionPacket, build_session_packet
@@ -62,6 +63,8 @@ class PreparedSession:
 
     packet: SessionPacket
     pointer: ExecutionRecordPointer
+    authority: ExecutionAuthoritySnapshot
+    authority_pointer: ExecutionRecordPointer
 
 
 @dataclass(frozen=True)
@@ -116,7 +119,31 @@ class ManualExternalSessionAdapter:
             executor=executor,
             employee_contract=employee_contract,
         )
-        return PreparedSession(packet=packet, pointer=self.store.append_packet(packet))
+        effective_contract = (
+            employee_contract
+            if employee_contract is not None
+            else contract_from_registry(plan.selected_employee, plan.config)
+        )
+        pointer = self.store.append_packet(packet)
+        authority = ExecutionAuthoritySnapshot.from_contract(
+            task_id=packet.task_id,
+            employee=packet.employee,
+            packet_fingerprint=packet.fingerprint(),
+            packet_attempt=pointer.attempt,
+            contract=effective_contract,
+            source=(
+                AuthoritySource.TEMPORARY_TASK_OVERRIDE
+                if employee_contract is not None
+                else AuthoritySource.CANONICAL_CONTRACT
+            ),
+        )
+        authority_pointer = self.store.append_authority(authority)
+        return PreparedSession(
+            packet=packet,
+            pointer=pointer,
+            authority=authority,
+            authority_pointer=authority_pointer,
+        )
 
     def ingest(
         self,
@@ -137,17 +164,31 @@ class ManualExternalSessionAdapter:
         a machine that has never seen the repository.
         """
         _assert_plan_matches_packet(plan, packet)
-
+        packet_record = self._resolve_packet_record(packet, receipt.packet_attempt)
+        authority = self.store.authority(
+            packet.task_id, packet.fingerprint(), packet_record.attempt
+        )
+        ledger = expansion_ledger or self.store.context_expansion_ledger(
+            packet, packet_attempt=packet_record.attempt
+        )
+        receipt = _associate_receipt(
+            receipt,
+            packet_attempt=packet_record.attempt,
+            authority=authority,
+            ledger=ledger,
+        )
         pointer = self.store.append_receipt(receipt)
         plan.policy.assert_no_subagents(receipt.subagents_used)
-
-        ledger = (
-            expansion_ledger
-            if expansion_ledger is not None
-            else self.store.context_expansion_ledger(packet)
-        )
         validation = _widen(
-            validate_receipt(packet, receipt, expansion_ledger=ledger),
+            validate_receipt(
+                packet,
+                receipt,
+                expansion_ledger=ledger,
+                packet_attempt=packet_record.attempt,
+                authority_fingerprint=(
+                    authority.fingerprint() if authority is not None else ""
+                ),
+            ),
             _owner_failures(plan, receipt) + _repository_failures(receipt, repo_dir),
         )
         usable_ledger = _ledger_for_recording(packet, ledger)
@@ -166,39 +207,114 @@ class ManualExternalSessionAdapter:
 
     def expand_context(
         self,
-        plan: TaskPlan,
         packet: SessionPacket,
         request: ContextExpansionRequest,
         *,
-        employee_contract: Mapping[str, Any] | None = None,
         capsule_index: CapsuleIndex | None = None,
         repo_root: str | Path | None = None,
     ) -> ExpandedSession:
-        """Persist, decide, and persist one request without changing the packet."""
-        _assert_plan_matches_packet(plan, packet)
+        """Persist and decide one request using only preparation-time authority."""
         request_pointer = self.store.append_context_expansion_request(request)
-        ledger = self.store.context_expansion_ledger(packet)
-        contract = (
-            employee_contract
-            if employee_contract is not None
-            else contract_from_registry(plan.selected_employee, plan.config)
+        return self.decide_context(
+            packet,
+            request,
+            request_pointer=request_pointer,
+            capsule_index=capsule_index,
+            repo_root=repo_root,
+        )
+
+    def decide_context(
+        self,
+        packet: SessionPacket,
+        request: ContextExpansionRequest,
+        *,
+        request_pointer: ExecutionRecordPointer | None = None,
+        capsule_index: CapsuleIndex | None = None,
+        repo_root: str | Path | None = None,
+    ) -> ExpandedSession:
+        """Decide a persisted request from its immutable authority snapshot."""
+        stored = self.store.find_context_expansion_request(
+            request.task_id, request.request_id
+        )
+        if stored is None or stored != request:
+            raise LifecycleError(
+                "context expansion request must be persisted unchanged before decision"
+            )
+        if any(
+            decision.request_id == request.request_id
+            for decision in self.store.context_expansion_decisions(request.task_id)
+        ):
+            raise LifecycleError(
+                f"context expansion request {request.request_id!r} already has a decision"
+            )
+        record = self.store.find_packet_record(
+            request.task_id,
+            request.packet_fingerprint,
+            attempt=request.packet_attempt,
+        )
+        if record is None or record.packet != packet:
+            raise LifecycleError(
+                "context expansion request does not match a persisted packet attempt"
+            )
+        authority = self.store.authority(
+            request.task_id, request.packet_fingerprint, request.packet_attempt
+        )
+        if authority is None:
+            raise LifecycleError(
+                "context expansion is denied: the packet attempt has no immutable "
+                "execution authority snapshot"
+            )
+        ledger = self.store.context_expansion_ledger(
+            packet, packet_attempt=request.packet_attempt
         )
         decision = decide_context_expansion(
             packet,
             request,
-            contract,
+            authority.as_contract(),
             ledger=ledger,
             capsule_index=capsule_index,
             repo_root=repo_root,
+            authority_fingerprint=authority.fingerprint(),
         )
         decision_pointer = self.store.append_context_expansion_decision(decision)
+        pointer = request_pointer or _request_pointer(self.store, request)
         return ExpandedSession(
             request=request,
-            request_pointer=request_pointer,
+            request_pointer=pointer,
             decision=decision,
             decision_pointer=decision_pointer,
             ledger=ledger.with_decision(decision),
         )
+
+    def _resolve_packet_record(
+        self, packet: SessionPacket, requested_attempt: int
+    ) -> PacketRecord:
+        if requested_attempt:
+            record = self.store.find_packet_record(
+                packet.task_id, packet.fingerprint(), attempt=requested_attempt
+            )
+            if record is None:
+                raise LifecycleError(
+                    f"no persisted packet attempt {requested_attempt} matches receipt"
+                )
+            return record
+        records = tuple(
+            record
+            for record in self.store.packet_records(packet.task_id)
+            if record.packet.fingerprint() == packet.fingerprint()
+        )
+        if not records:
+            pointer = self.store.append_packet(packet)
+            return PacketRecord(pointer.attempt, pointer, packet)
+        completed = {
+            item.receipt.packet_attempt
+            for item in self.store.attempts(packet.task_id)
+            if item.receipt.packet_attempt
+        }
+        incomplete = tuple(
+            record for record in records if record.attempt not in completed
+        )
+        return (incomplete or records)[-1]
 
 
 def _widen(
@@ -207,6 +323,42 @@ def _widen(
     if not failures:
         return validation
     return replace(validation, failures=validation.failures + failures)
+
+
+def _associate_receipt(
+    receipt: SessionReceipt,
+    *,
+    packet_attempt: int,
+    authority: ExecutionAuthoritySnapshot | None,
+    ledger: ContextExpansionLedger,
+) -> SessionReceipt:
+    """Attach stored evidence when omitted; preserve supplied values for validation."""
+    changes: dict[str, Any] = {}
+    if receipt.packet_attempt == 0:
+        changes["packet_attempt"] = packet_attempt
+    if authority is not None and not receipt.authority_fingerprint:
+        changes["authority_fingerprint"] = authority.fingerprint()
+    if ledger.decisions:
+        if not receipt.expansion_ledger_fingerprint:
+            changes["expansion_ledger_fingerprint"] = ledger.fingerprint()
+        if not receipt.effective_context_fingerprint:
+            changes["effective_context_fingerprint"] = (
+                ledger.effective_context_fingerprint
+            )
+    return replace(receipt, **changes) if changes else receipt
+
+
+def _request_pointer(
+    store: ExecutionStore, request: ContextExpansionRequest
+) -> ExecutionRecordPointer:
+    pointer = store.context_expansion_request_pointer(
+        request.task_id, request.request_id
+    )
+    if pointer is None:
+        raise LifecycleError(
+            f"context expansion request {request.request_id!r} is not persisted"
+        )
+    return pointer
 
 
 def _known_owners(plan: TaskPlan) -> set[str]:
