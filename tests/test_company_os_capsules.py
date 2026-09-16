@@ -307,8 +307,18 @@ def test_path_matching_is_segment_aware_in_both_directions():
 
 def test_the_dependency_closure_terminates_on_the_real_runtime_validation_cycle(seeds):
     """company/runtime and company/validation import each other; the walk must not."""
-    assert seeds.dependency_closure("company-runtime") == ("company-validation",)
-    assert seeds.dependency_closure("company-validation") == ("company-runtime",)
+    assert seeds.dependency_closure("company-runtime") == (
+        "ai-platform",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-validation",
+    )
+    assert seeds.dependency_closure("company-validation") == (
+        "ai-platform",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-runtime",
+    )
     assert seeds.dependency_closure("company-os-control-plane") == tuple(
         sorted(set(seeds.ids()) - {"company-os-control-plane"})
     )
@@ -356,8 +366,17 @@ def test_a_query_with_no_matching_signal_selects_nothing(seeds):
 
 def test_dependencies_are_pulled_in_but_rank_below_direct_matches(seeds):
     selection = select_capsules(seeds, TaskQuery(paths=("company/runtime/routing.py",)))
-    assert selection.ids() == ("company-runtime", "company-validation")
-    assert selection.matches[1].reasons == ("dependency of company-runtime",)
+    assert selection.ids() == (
+        "company-runtime",
+        "ai-platform",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-validation",
+    )
+    assert all(
+        match.reasons == ("dependency of company-runtime",)
+        for match in selection.matches[1:]
+    )
 
 
 def test_an_explicit_id_outranks_an_incidental_tag_match(seeds):
@@ -413,7 +432,13 @@ def test_selection_is_reproducible(seeds):
 
 def test_refs_are_pointers_and_carry_no_capsule_text(seeds):
     refs = refs_for_task(seeds, paths=("company/runtime/",))
-    assert [r.ref for r in refs] == ["capsule:company-runtime", "capsule:company-validation"]
+    assert [r.ref for r in refs] == [
+        "capsule:company-runtime",
+        "capsule:ai-platform",
+        "capsule:company-knowledge-capsules",
+        "capsule:company-knowledge-store",
+        "capsule:company-validation",
+    ]
     assert all(r.kind is ContextKind.MODULE_CONTRACT for r in refs)
     assert all(len(r.ref) <= 64 for r in refs)
 
@@ -658,9 +683,11 @@ _ALLOWED_IMPORTS = frozenset(
         "__future__",
         "ai_platform",
         "argparse",
+        "collections",
         "dataclasses",
         "datetime",
         "enum",
+        "hashlib",
         "json",
         "knowledge",
         "pathlib",

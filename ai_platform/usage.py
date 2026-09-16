@@ -47,7 +47,11 @@ from enum import Enum
 import math
 from typing import Any
 
-from ai_platform.policy import BOOTSTRAP_POLICY, ExecutionPolicy, SubagentPolicyViolation
+from ai_platform.policy import (
+    BOOTSTRAP_POLICY,
+    ExecutionPolicy,
+    SubagentPolicyViolation,
+)
 from ai_platform.references import assert_reference
 from ai_platform.resource_classes import ReasoningClass
 from ai_platform.serde import fingerprint as _fingerprint
@@ -57,7 +61,9 @@ from ai_platform.serde import to_jsonable
 class Outcome(Enum):
     ACCEPTED = "accepted"
     REJECTED = "rejected"
-    ABANDONED = "abandoned"  # stopped before a result existed: escalated, superseded, cancelled
+    ABANDONED = (
+        "abandoned"  # stopped before a result existed: escalated, superseded, cancelled
+    )
 
 
 class UsageUnit(Enum):
@@ -85,6 +91,9 @@ class ResourceUsageRecord:
     context_sources: tuple[str, ...] = ()
     context_refs_used: tuple[str, ...] = ()
     context_fingerprint: str = ""
+    explicit_context_sources: tuple[str, ...] = ()
+    automatic_context_sources: tuple[str, ...] = ()
+    context_cache_key: str = ""
 
     # What we observe ourselves. Always present.
     passes: int = 1
@@ -112,11 +121,23 @@ class ResourceUsageRecord:
         if not isinstance(self.outcome, Outcome):
             raise UsageRecordError(f"{self.task_id}: outcome must be an Outcome value")
         if not isinstance(self.usage_unit, UsageUnit):
-            raise UsageRecordError(f"{self.task_id}: usage_unit must be a UsageUnit value")
-        for name in ("context_sources", "context_refs_used"):
+            raise UsageRecordError(
+                f"{self.task_id}: usage_unit must be a UsageUnit value"
+            )
+        for name in (
+            "context_sources",
+            "context_refs_used",
+            "explicit_context_sources",
+            "automatic_context_sources",
+        ):
             if not isinstance(getattr(self, name), tuple):
                 raise UsageRecordError(f"{self.task_id}: {name} must be a tuple")
-        for name in ("context_fingerprint", "rejection_reason", "notes"):
+        for name in (
+            "context_fingerprint",
+            "context_cache_key",
+            "rejection_reason",
+            "notes",
+        ):
             if not isinstance(getattr(self, name), str):
                 raise UsageRecordError(f"{self.task_id}: {name} must be a string")
 
@@ -143,7 +164,9 @@ class ResourceUsageRecord:
             if value < 0:
                 raise UsageRecordError(f"{self.task_id}: {name} must not be negative")
         if self.passes < 1:
-            raise UsageRecordError(f"{self.task_id}: a record describes at least one pass")
+            raise UsageRecordError(
+                f"{self.task_id}: a record describes at least one pass"
+            )
 
         optional = (
             ("tool_calls", self.tool_calls),
@@ -175,6 +198,8 @@ class ResourceUsageRecord:
         for name, values in (
             ("context_sources", self.context_sources),
             ("context_refs_used", self.context_refs_used),
+            ("explicit_context_sources", self.explicit_context_sources),
+            ("automatic_context_sources", self.automatic_context_sources),
         ):
             if any(not isinstance(value, str) or not value for value in values):
                 raise UsageRecordError(
@@ -193,6 +218,22 @@ class ResourceUsageRecord:
             raise UsageRecordError(
                 f"{self.task_id}: used context not present in the manifest: "
                 + ", ".join(sorted(unknown))
+            )
+
+        explicit = set(self.explicit_context_sources)
+        automatic = set(self.automatic_context_sources)
+        overlap = explicit & automatic
+        if overlap:
+            raise UsageRecordError(
+                f"{self.task_id}: context cannot be both explicit and automatic: "
+                + ", ".join(sorted(overlap))
+            )
+        if (explicit or automatic) and explicit | automatic != set(
+            self.context_sources
+        ):
+            raise UsageRecordError(
+                f"{self.task_id}: explicit and automatic context must account for "
+                "every supplied context source"
             )
 
         if self.subagents_used:
@@ -250,7 +291,12 @@ class ResourceUsageRecord:
 
         tuple_fields = {
             name: _string_tuple(data.get(name, ()), name)
-            for name in ("context_sources", "context_refs_used")
+            for name in (
+                "context_sources",
+                "context_refs_used",
+                "explicit_context_sources",
+                "automatic_context_sources",
+            )
         }
         integer_fields = {
             name: _integer(data.get(name, default), name)
@@ -276,6 +322,7 @@ class ResourceUsageRecord:
             name: _string(data.get(name, ""), name)
             for name in (
                 "context_fingerprint",
+                "context_cache_key",
                 "rejection_reason",
                 "notes",
             )
@@ -354,7 +401,11 @@ class UsageLedger:
 
         # Units are only summable when every record reports the same unit.
         units_seen = {r.usage_unit for r in records if r.has_unit_accounting}
-        if len(units_seen) == 1 and all(r.has_unit_accounting for r in records) and records:
+        if (
+            len(units_seen) == 1
+            and all(r.has_unit_accounting for r in records)
+            and records
+        ):
             unit = units_seen.pop()
             units: int | None = sum(r.total_units or 0 for r in records)
         else:
@@ -396,7 +447,9 @@ class UsageLedger:
             # Every pass in the scope is charged to the accepted deliverables,
             # rejections included - that is the cost of getting to acceptance.
             passes_per_accepted=(passes / n_accepted) if n_accepted else None,
-            units_per_accepted=(units / n_accepted) if (units is not None and n_accepted) else None,
+            units_per_accepted=(
+                (units / n_accepted) if (units is not None and n_accepted) else None
+            ),
             first_pass_success_rate=first_pass,
             rejected_passes=sum(r.passes for r in rejected),
         )

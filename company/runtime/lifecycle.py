@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from copy import deepcopy
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
-from ai_platform.context_manifest import ContextKind, ContextManifest, ContextRef
+from ai_platform.context_manifest import ContextManifest
 from ai_platform.policy import BOOTSTRAP_POLICY, ExecutionPolicy
 from ai_platform.resource_classes import (
     Classification,
@@ -19,8 +19,15 @@ from ai_platform.resource_classes import (
 from ai_platform.serde import to_jsonable
 from company.validation.bootstrap import validate_agent_contract, validate_bootstrap
 from company.validation.no_subagents import enforce_no_subagents
+from knowledge.company_os.capsules import CapsuleIndex
+from knowledge.company_os.ledger import KnowledgeStore
 
 from .config import CompanyConfig, load_company_config
+from .context_assembly import (
+    ContextAssemblyPolicy,
+    ContextPlan,
+    assemble_context,
+)
 from .errors import LifecycleError
 from .routing import RoutingResult, match_capabilities
 from .specification import TaskSpecification
@@ -52,6 +59,7 @@ class ExecutionPreparation:
     owner: str
     reasoning_class: ReasoningClass
     context_fingerprint: str
+    context_cache_key: str
     evidence_required: bool
     no_subagents: bool
     independent_top_level_parallelism: bool
@@ -67,6 +75,7 @@ class TaskPlan:
     selected_employee: str | None
     missing_capabilities: tuple[str, ...]
     context_manifest: ContextManifest | None
+    context_plan: ContextPlan | None
     preparation: ExecutionPreparation | None
     escalation: Escalation
     states: tuple[LifecycleState, ...]
@@ -97,6 +106,9 @@ class TaskPlan:
             "context_manifest": (
                 to_jsonable(self.context_manifest) if self.context_manifest else None
             ),
+            "context_plan": (
+                to_jsonable(self.context_plan) if self.context_plan else None
+            ),
             "preparation": to_jsonable(self.preparation) if self.preparation else None,
             "escalation": to_jsonable(self.escalation),
         }
@@ -109,6 +121,10 @@ def plan_task(
     context_manifest: ContextManifest | None = None,
     employee_contract: Mapping[str, Any] | None = None,
     policy: ExecutionPolicy = BOOTSTRAP_POLICY,
+    capsule_index: CapsuleIndex | None = None,
+    context_policy: ContextAssemblyPolicy | None = None,
+    knowledge_store: KnowledgeStore | None = None,
+    observed_source_digests: Mapping[str, str] | None = None,
 ) -> TaskPlan:
     """Validate, classify, route, select, bound context, and prepare one task."""
     company_config = config or load_company_config()
@@ -131,7 +147,9 @@ def plan_task(
     eligible = routing.eligible_employee_ids
     if not eligible:
         best = routing.matches[0] if routing.matches else None
-        missing = best.missing_capabilities if best else specification.required_capabilities
+        missing = (
+            best.missing_capabilities if best else specification.required_capabilities
+        )
         reason = "no eligible employee has every required capability"
         if missing:
             reason += "; closest match is missing: " + ", ".join(missing)
@@ -143,6 +161,7 @@ def plan_task(
             selected_employee=None,
             missing_capabilities=missing,
             context_manifest=None,
+            context_plan=None,
             preparation=None,
             escalation=Escalation(True, reason),
             states=tuple(states + [LifecycleState.ESCALATED]),
@@ -151,7 +170,16 @@ def plan_task(
 
     selected = eligible[0]
     states.append(LifecycleState.EMPLOYEE_SELECTED)
-    manifest = _prepare_manifest(specification, classification, context_manifest)
+    context = assemble_context(
+        specification,
+        classification,
+        supplied_manifest=context_manifest,
+        capsule_index=capsule_index,
+        policy=context_policy,
+        knowledge_store=knowledge_store,
+        observed_source_digests=observed_source_digests,
+    )
+    manifest = context.manifest
     states.append(LifecycleState.CONTEXT_VALIDATED)
 
     contract = (
@@ -172,6 +200,7 @@ def plan_task(
         owner=selected,
         reasoning_class=classification.code,
         context_fingerprint=manifest.fingerprint(),
+        context_cache_key=context.plan.cache_identity,
         evidence_required=(
             specification.evidence_required
             or classification.resource_class.requires_evidence
@@ -191,91 +220,12 @@ def plan_task(
         selected_employee=selected,
         missing_capabilities=(),
         context_manifest=manifest,
+        context_plan=context.plan,
         preparation=preparation,
         escalation=Escalation(),
         states=tuple(states),
         policy=policy,
     )
-
-
-def _prepare_manifest(
-    specification: TaskSpecification,
-    classification: Classification,
-    supplied: ContextManifest | None,
-) -> ContextManifest:
-    if supplied is None:
-        refs = _deduplicate_refs(specification.context.refs)
-        groups: dict[str, list[ContextRef]] = {
-            "module_contracts": [],
-            "files": [],
-            "facts": [],
-            "tests": [],
-            "decisions": [],
-            "experiments": [],
-        }
-        destinations = {
-            ContextKind.MODULE_CONTRACT: "module_contracts",
-            ContextKind.FILE: "files",
-            ContextKind.FACT: "facts",
-            ContextKind.TEST: "tests",
-            ContextKind.BENCHMARK: "tests",
-            ContextKind.DECISION: "decisions",
-            ContextKind.EXPERIMENT: "experiments",
-        }
-        for ref in refs:
-            groups[destinations[ref.kind]].append(ref)
-        manifest = ContextManifest(
-            task_id=specification.task_id,
-            objective=specification.objective,
-            reasoning_class=classification.code,
-            constraints=specification.context.constraints,
-            acceptance_criteria=specification.context.acceptance_criteria,
-            **{name: tuple(values) for name, values in groups.items()},
-        )
-    else:
-        manifest = _deduplicate_manifest(supplied)
-        if manifest.task_id != specification.task_id:
-            raise LifecycleError("context manifest task_id does not match the task")
-        if manifest.objective != specification.objective:
-            raise LifecycleError("context manifest objective does not match the task")
-        if manifest.reasoning_class is not classification.code:
-            raise LifecycleError(
-                "context manifest reasoning_class does not match the classified resource class"
-            )
-    try:
-        return manifest.assert_valid()
-    except ValueError as exc:
-        raise LifecycleError(str(exc)) from exc
-
-
-def _deduplicate_manifest(manifest: ContextManifest) -> ContextManifest:
-    seen: set[str] = set()
-    changes: dict[str, tuple[ContextRef, ...]] = {}
-    for group in (
-        "module_contracts",
-        "files",
-        "facts",
-        "tests",
-        "decisions",
-        "experiments",
-    ):
-        kept: list[ContextRef] = []
-        for ref in getattr(manifest, group):
-            if ref.key not in seen:
-                kept.append(ref)
-                seen.add(ref.key)
-        changes[group] = tuple(kept)
-    return replace(manifest, **changes)
-
-
-def _deduplicate_refs(refs: tuple[ContextRef, ...]) -> tuple[ContextRef, ...]:
-    seen: set[str] = set()
-    result: list[ContextRef] = []
-    for ref in refs:
-        if ref.key not in seen:
-            result.append(ref)
-            seen.add(ref.key)
-    return tuple(result)
 
 
 def _contract_from_registry(employee_id: str, config: CompanyConfig) -> dict[str, Any]:

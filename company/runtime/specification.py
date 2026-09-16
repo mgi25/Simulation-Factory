@@ -46,7 +46,9 @@ class ContextRequirements:
         refs = tuple(_context_ref(item, index) for index, item in enumerate(raw_refs))
         return cls(
             refs=refs,
-            constraints=_string_tuple(data.get("constraints", []), "context.constraints"),
+            constraints=_string_tuple(
+                data.get("constraints", []), "context.constraints"
+            ),
             acceptance_criteria=_string_tuple(
                 data.get("acceptance_criteria", []), "context.acceptance_criteria"
             ),
@@ -72,6 +74,8 @@ class TaskSpecification:
     novel: bool = False
     ceo_reserved: bool = False
     multi_perspective_requested: bool = False
+    capsule_ids: tuple[str, ...] = ()
+    capsule_owner: str = ""
     execution: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -94,7 +98,9 @@ class TaskSpecification:
         if not isinstance(self.risk, Risk):
             raise LifecycleError("risk must be a Risk value")
         if not isinstance(self.reasoning_class_ceiling, ReasoningClass):
-            raise LifecycleError("reasoning_class_ceiling must be a ReasoningClass value")
+            raise LifecycleError(
+                "reasoning_class_ceiling must be a ReasoningClass value"
+            )
         if not isinstance(self.context, ContextRequirements):
             raise LifecycleError("context must be a ContextRequirements value")
         for field_name in (
@@ -111,6 +117,25 @@ class TaskSpecification:
                 raise LifecycleError(f"{field_name} must be a boolean")
         if not isinstance(self.specialist_domain, str):
             raise LifecycleError("specialist_domain must be a string")
+        if not isinstance(self.capsule_ids, tuple):
+            raise LifecycleError("capsule_ids must be a tuple")
+        capsule_ids = tuple(
+            sorted(
+                {
+                    item.strip()
+                    for item in self.capsule_ids
+                    if isinstance(item, str) and item.strip()
+                }
+            )
+        )
+        if len(capsule_ids) != len(self.capsule_ids):
+            raise LifecycleError(
+                "capsule_ids must be a collection of unique non-empty strings"
+            )
+        object.__setattr__(self, "capsule_ids", capsule_ids)
+        if not isinstance(self.capsule_owner, str):
+            raise LifecycleError("capsule_owner must be a string")
+        object.__setattr__(self, "capsule_owner", self.capsule_owner.strip())
         if not isinstance(self.execution, Mapping):
             raise LifecycleError("execution must be a mapping")
         object.__setattr__(self, "execution", dict(self.execution))
@@ -133,6 +158,8 @@ class TaskSpecification:
             "novel",
             "ceo_reserved",
             "multi_perspective_requested",
+            "capsule_ids",
+            "capsule_owner",
             "execution",
         }
         unknown = sorted(set(data) - known)
@@ -172,6 +199,8 @@ class TaskSpecification:
             multi_perspective_requested=_boolean(
                 data, "multi_perspective_requested", False
             ),
+            capsule_ids=_string_tuple(data.get("capsule_ids", []), "task.capsule_ids"),
+            capsule_owner=_optional_string(data, "capsule_owner", "task"),
             execution=dict(execution),
         )
 

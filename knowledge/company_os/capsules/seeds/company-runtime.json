@@ -3,12 +3,14 @@
   "capabilities": [
     "capability_routing",
     "capability_config_loading",
-    "capability_task_handoff"
+    "capability_task_handoff",
+    "capability_context_assembly"
   ],
   "created": "2026-09-16",
   "decisions": [],
   "dependencies": [
-    "company-validation"
+    "company-validation",
+    "company-knowledge-capsules"
   ],
   "experiment_learnings": [],
   "facts": [],
@@ -30,7 +32,8 @@
   "may_read": [
     "company/*.yaml",
     "company/validation/**",
-    "company/*.schema.yaml"
+    "company/*.schema.yaml",
+    "knowledge/company_os/capsules/**"
   ],
   "may_write": [
     "company/runtime/**"
@@ -43,13 +46,14 @@
   "outputs": [
     "CompanyConfig holding the four parsed contracts",
     "RoutingResult with one EmployeeMatch per employee, eligible or not",
-    "TaskAssignment and HandoffArtifact, or ValidationError listing every issue"
+    "TaskAssignment and HandoffArtifact, or ValidationError listing every issue",
+    "A reference-only ContextManifest and inspectable ContextPlan"
   ],
   "owner": "workstream-codex",
   "owns_paths": [
     "company/runtime"
   ],
-  "purpose": "Loads and validates the four bootstrap YAML contracts, ranks employees against required capabilities with no LLM call, and carries task assignments and compact handoff artifacts between sessions.",
+  "purpose": "Loads bootstrap contracts, routes tasks, assembles bounded capsule-backed context with no LLM call, and carries compact handoff artifacts between sessions.",
   "recheck_on": "2027-09-16",
   "revalidation_reason": "",
   "risks": [
@@ -60,7 +64,8 @@
   "source_digests": [],
   "status": "active",
   "tests": [
-    "tests/test_company_runtime.py"
+    "tests/test_company_runtime.py",
+    "tests/test_company_context_assembly.py"
   ],
   "title": "Company runtime",
   "type": "module"
