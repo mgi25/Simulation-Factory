@@ -15,6 +15,12 @@ and the discovery queue in front of them:
     python -m intelligence.research promote <id> --spec promotion.json
     python -m intelligence.research funnel
 
+and the batch layer that decides how many of them are worth paying for:
+
+    python -m intelligence.research batch show <id>
+    python -m intelligence.research batch report <id> --today 2026-09-16
+    python -m intelligence.research batch queue <id>
+
 `check` runs the integrity sweep and the staleness sweep and exits non-zero if
 either finds something, so it can become a pre-merge step later without
 changing shape. `rank` prints the weighted totals with their coverage and the
@@ -43,6 +49,8 @@ from intelligence.research.funnel import describe_funnel
 from intelligence.research.ingestion import ingest_envelope, load_envelopes
 from intelligence.research.scoring import CAVEAT, OpportunityScorecard, ScoringRubric, rank, score_opportunity
 from intelligence.research.sources import RightsStatus, SourceType
+from intelligence.research.batch import ResearchBatch
+from intelligence.research.screening_queue import QUEUE_CAVEAT
 from intelligence.research.store import DEFAULT_ROOT, RECORD_TYPES, ResearchStore
 
 
@@ -89,6 +97,16 @@ def build_parser() -> argparse.ArgumentParser:
     promote.add_argument("--spec", default="", help="JSON: source_id, confidence, rights")
 
     sub.add_parser("funnel", help="the cost tiers, cheapest first")
+
+    batch = sub.add_parser("batch", help="a research batch: its cost, coverage and stops")
+    batch_sub = batch.add_subparsers(dest="batch_command", required=True)
+    batch_show = batch_sub.add_parser("show", help="the plan, the log and the history")
+    batch_show.add_argument("id")
+    batch_report = batch_sub.add_parser("report", help="the whole batch as numbers")
+    batch_report.add_argument("id")
+    batch_report.add_argument("--today", default="", help="ISO date the report is as of")
+    batch_queue = batch_sub.add_parser("queue", help="the screening queue, best first")
+    batch_queue.add_argument("id")
     return parser
 
 
@@ -209,6 +227,71 @@ def _cmd_rank(store: ResearchStore, rubric_id: str) -> int:
     return 0
 
 
+def _cmd_batch_show(store: ResearchStore, batch_id: str) -> int:
+    """The plan and the log. Deliberately not the report - this is what was
+    agreed and what happened, with no derived numbers to argue with."""
+    batch = store.get(ResearchBatch.kind, batch_id)
+    print(f"{batch.id}  {batch.status.value}")
+    print(f"  objective   {batch.objective}")
+    print(f"  owner       {batch.owner}   planned {batch.created}")
+    if batch.target is not None:
+        print(f"  target      {batch.target.minimum}-{batch.target.maximum} candidates")
+    print(f"  queries     {', '.join(batch.query_ids)}")
+    if batch.unrun_query_ids:
+        print(f"  never run   {', '.join(batch.unrun_query_ids)}")
+    print("  budget")
+    for name, limit in batch.budget.limits:
+        print(f"    {name:<28} {limit}")
+    if batch.budget.deadline is not None:
+        print(f"    {'deadline':<28} {batch.budget.deadline}")
+    print("  stop conditions")
+    for condition in batch.stop_conditions:
+        detail = condition.threshold or condition.deadline or ""
+        if condition.saturation is not None:
+            rule = condition.saturation
+            detail = f"{rule.rounds} rounds under {rule.new_rate_below} {rule.metric.value}"
+        print(f"    {condition.reason.value:<28} [{condition.action.value}] {detail}")
+    print(f"  rounds      {len(batch.rounds)}, {batch.observations} observation(s), "
+          f"{len(batch.candidate_ids)} unique")
+    for index, entry in enumerate(batch.rounds):
+        print(f"    {index:>3}  {entry.ran_on}  {entry.query_id:<28} "
+              f"{entry.observations} observation(s)")
+    print("  history")
+    for event in batch.history:
+        print(f"    {event.on}  {event.kind.value:<16} {event.by:<24} {event.detail}")
+    return 0
+
+
+def _cmd_batch_report(store: ResearchStore, batch_id: str, today: dt.date) -> int:
+    """Non-zero when a declared stop condition has fired or a ceiling is over."""
+    report = store.batch_report(batch_id, as_of=today)
+    for line in report.lines():
+        print(line)
+    return 1 if (report.halting or report.exceeded) else 0
+
+
+def _cmd_batch_queue(store: ResearchStore, batch_id: str) -> int:
+    entries = store.batch_queue(batch_id)
+    if not entries:
+        print("(no candidate is awaiting a screening decision)")
+        return 0
+    width = max(len(entry.candidate_id) for entry in entries)
+    for entry in entries:
+        mean = "  n/a" if entry.signal_mean is None else f"{entry.signal_mean:5.2f}"
+        missing = (
+            f"  missing: {', '.join(entry.missing_signals)}"
+            if entry.missing_signals
+            else ""
+        )
+        print(
+            f"{mean}  {entry.status.value:<17} {entry.candidate_id:<{width}}  "
+            f"{entry.state.value:<12} {entry.recommendation.value}{missing}"
+        )
+    print()
+    print(QUEUE_CAVEAT)
+    return 0
+
+
 def _cmd_check(store: ResearchStore, today: dt.date) -> int:
     issues = store.integrity()
     stale = store.stale(today)
@@ -254,6 +337,13 @@ def main(argv: list[str] | None = None) -> int:
             for line in describe_funnel():
                 print(line)
             return 0
+        if args.command == "batch":
+            if args.batch_command == "show":
+                return _cmd_batch_show(store, args.id)
+            if args.batch_command == "report":
+                return _cmd_batch_report(store, args.id, _today(args.today))
+            if args.batch_command == "queue":
+                return _cmd_batch_queue(store, args.id)
     except ResearchError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2

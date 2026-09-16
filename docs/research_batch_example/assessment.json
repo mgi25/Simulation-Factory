@@ -1,0 +1,44 @@
+{
+  "batch_id": "rb-marble-race-2026q3",
+  "candidate_id": "cand-youtube-REPLACE-WITH-THE-ID-INGEST-PRINTED",
+  "evidence": [
+    {
+      "kind": "observation",
+      "note": "first ninety seconds, watched twice",
+      "ref": "docs/validation/discovery/2026-09-16-marble-race.md"
+    }
+  ],
+  "id": "sa-marble-mountain",
+  "reason": "The loop renews at every junction and the machine never explains itself.",
+  "recommendation": "screen_in",
+  "reviewer": "research_opportunity_lead",
+  "reviewed_on": "2026-09-16",
+  "scale_max": 5,
+  "scores": [
+    {
+      "dimension": "relevance",
+      "reason": "Same family as the format we already run.",
+      "score": 5
+    },
+    {
+      "dimension": "novelty_potential",
+      "reason": "The junction geometry is one we have not tried.",
+      "score": 4
+    },
+    {
+      "dimension": "format_family_potential",
+      "reason": "The variation space is the track, which is cheap for us to change.",
+      "score": 4
+    },
+    {
+      "dimension": "channel_fit",
+      "reason": "No narration, which is the constraint our pipeline is built around.",
+      "score": 5
+    },
+    {
+      "dimension": "evidence_completeness",
+      "reason": "One public reading only; no second date yet.",
+      "score": 2
+    }
+  ]
+}

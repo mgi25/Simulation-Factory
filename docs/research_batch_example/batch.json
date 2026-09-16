@@ -1,0 +1,47 @@
+{
+  "budget": {
+    "max_candidate_observations": 120,
+    "max_human_review_minutes": 240,
+    "max_promoted_candidates": 6,
+    "max_queries": 4,
+    "max_reference_cases": 4,
+    "max_unique_candidates": 60,
+    "note": "Two afternoons of screening and four reference cases is the whole spend."
+  },
+  "created": "2026-09-16",
+  "id": "rb-marble-race-2026q3",
+  "notes": "First batch run under the batch layer. Queries two and three are held back until round three, so saturation has something to measure.",
+  "objective": "Find marble-race formats whose viewer question renews without narration.",
+  "owner": "research_opportunity_lead",
+  "query_ids": [
+    "dq-marble-race-2026q3"
+  ],
+  "status": "planned",
+  "stop_conditions": [
+    {
+      "action": "stop",
+      "note": "Sixty is two afternoons of screening; past that the queue is theatre.",
+      "reason": "max_unique_candidates",
+      "threshold": 60
+    },
+    {
+      "action": "review",
+      "note": "Three flat rounds means the next query is buying re-reads.",
+      "reason": "saturation",
+      "saturation": {
+        "metric": "new_unique_candidates",
+        "new_rate_below": 0.2,
+        "rounds": 3
+      }
+    },
+    {
+      "action": "stop",
+      "deadline": "2026-10-15",
+      "reason": "deadline"
+    }
+  ],
+  "target": {
+    "maximum": 60,
+    "minimum": 25
+  }
+}
