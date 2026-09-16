@@ -1,0 +1,68 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "capability_governance",
+    "capability_permissions",
+    "capability_no_subagent_policy"
+  ],
+  "created": "2026-09-16",
+  "decisions": [],
+  "dependencies": [],
+  "experiment_learnings": [],
+  "facts": [
+    "bootstrap-forbids-nested-agents"
+  ],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-bootstrap-policy",
+  "inputs": [
+    "A proposed change to org, permissions, employee contract or handoff shape"
+  ],
+  "invariants": [
+    "No session spawns subagents, child agents, worker swarms or nested delegations; multiple perspectives are separate sequential sessions (rule 2).",
+    "Production systems must not depend on company/; Company OS must be removable (rule 12).",
+    "A session is given the minimum relevant context, never the whole repository (rule 5).",
+    "Every change to code, org, prompts, employees or workflows must be reversible (rule 10).",
+    "Facts, hypotheses and decisions stay structurally distinct (rule 16).",
+    "A canonical fact is stored once and retrieved, not restated (rule 15).",
+    "Amending the no-subagent rule, the production permission model, the mission or a CEO-reserved decision requires explicit CEO approval."
+  ],
+  "last_reviewed": "2026-09-16",
+  "may_read": [
+    "company/**",
+    "docs/company_os_v1_bootstrap.md"
+  ],
+  "may_write": [],
+  "must_not_modify": [
+    "company/constitution.md",
+    "company/permissions.yaml",
+    "company/org_registry.yaml"
+  ],
+  "outputs": [
+    "An allow/deny answer, and the CEO-reserved decisions that need approval"
+  ],
+  "owner": "ceo",
+  "owns_paths": [
+    "company/constitution.md",
+    "company/README.md",
+    "company/WORKSTREAMS.md",
+    "company/org_registry.yaml",
+    "company/permissions.yaml",
+    "company/agent_contract.schema.yaml",
+    "company/task_handoff.schema.yaml"
+  ],
+  "purpose": "The non-negotiable rules every Company OS session runs under, and the contracts that encode them. The files are the source of truth; this capsule is the pointer that stops a session re-reading all seven to find the four rules that bind it.",
+  "recheck_on": "2027-09-16",
+  "revalidation_reason": "",
+  "risks": [
+    "An agent could restate a constitutional rule inside a capsule and drift from company/constitution.md; the file is the source, the capsule is a pointer."
+  ],
+  "source": "company-os-v1-knowledge-capsules",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_runtime.py"
+  ],
+  "title": "Bootstrap operating policy",
+  "type": "policy"
+}

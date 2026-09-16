@@ -1,0 +1,66 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "capability_no_subagent_enforcement",
+    "capability_org_validation",
+    "capability_yaml_subset"
+  ],
+  "created": "2026-09-16",
+  "decisions": [],
+  "dependencies": [
+    "company-runtime"
+  ],
+  "experiment_learnings": [],
+  "facts": [
+    "bootstrap-forbids-nested-agents"
+  ],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-validation",
+  "inputs": [
+    "A CompanyConfig, or any nested config/contract mapping to scan",
+    "A YAML file written in the supported subset"
+  ],
+  "invariants": [
+    "no_subagents must be exactly true and the nested-spawn keys exactly false; anything else, including a truthy string, is a violation (rule 2).",
+    "Validation collects every issue and raises once, so one run reports the whole problem rather than the first line of it.",
+    "The YAML reader is a deliberate subset, not PyYAML: no third-party dependency enters the control plane.",
+    "Restricted employment states (candidate, shadow, probation) may not hold production authority (rule 11)."
+  ],
+  "last_reviewed": "2026-09-16",
+  "may_read": [
+    "company/*.yaml",
+    "company/runtime/config.py"
+  ],
+  "may_write": [
+    "company/validation/**"
+  ],
+  "must_not_modify": [
+    "company/constitution.md",
+    "ai_platform/**",
+    "knowledge/**"
+  ],
+  "outputs": [
+    "None on success; ValidationError or YamlSubsetError carrying every issue found",
+    "A list of no-subagent violations, each naming the offending config path"
+  ],
+  "owner": "workstream-codex",
+  "owns_paths": [
+    "company/validation"
+  ],
+  "purpose": "Parses the YAML subset the bootstrap contracts are written in, validates the org, permissions and contract shapes, and enforces the no-subagent rule over any nested config mapping.",
+  "recheck_on": "2027-09-16",
+  "revalidation_reason": "",
+  "risks": [
+    "Imports company.runtime.config for CompanyConfig, which imports back into validation.yaml_subset; the cycle is load-bearing and easy to worsen.",
+    "Owned by the Codex workstream: another session may be editing it concurrently."
+  ],
+  "source": "company-os-v1-knowledge-capsules",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_runtime.py"
+  ],
+  "title": "Company validation and no-subagent enforcement",
+  "type": "module"
+}
