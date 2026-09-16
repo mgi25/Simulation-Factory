@@ -8,6 +8,12 @@ employee contract, `company/permissions.yaml` and the task specification
 already allow, which is why building one re-reads the contract instead of
 trusting the plan that produced it.
 
+That re-reading is fail-closed in both directions. An employee contract with
+no `may_write` paths - which is what `contract_from_registry` produces in
+Bootstrap Mode - is read-only, not unrestricted, so it can only carry a packet
+that declares no writable path at all. Write authority arrives by being
+configured on a contract, never by being declared on a packet.
+
 ## Reference-only, for the same reason a manifest is
 
 Every pointer in a packet passes `ai_platform.references.assert_reference` by
@@ -293,7 +299,8 @@ def build_session_packet(
       un-reserve it;
     - an allowed path outside the employee contract's `may_write`, or inside
       its `may_not_modify`, is refused: a packet cannot grant what the contract
-      withholds.
+      withholds. A contract whose `may_write` is empty withholds every path, so
+      the only packet it can carry is a read-only one.
     """
     from .lifecycle import contract_from_registry  # local import: avoids a cycle
 
@@ -346,26 +353,54 @@ def build_session_packet(
     )
 
 
+def _covers(rule: str, path: str) -> bool:
+    """Whole-segment prefix matching - the same rule `PathScope` applies.
+
+    `company/runtime` covers `company/runtime/packets.py` and does not cover
+    `company/runtime_extra.py`. Stated once here so the two directions of the
+    contract check cannot drift apart on what "inside" means.
+    """
+    return path == rule or path.startswith(rule + "/")
+
+
 def _assert_scope_within_contract(
     scope: PathScope, contract: Mapping[str, Any], employee: str
 ) -> None:
+    """Refuse any packet scope the employee contract does not already grant.
+
+    Permissions are read fail-closed, which for this check means two things:
+
+    - **Every allowed path must sit inside a `may_write` rule.** An empty
+      `may_write` grants nothing rather than everything, so the only packet a
+      contract without a writable path can carry is a read-only one. That is
+      the reading `PathScope` gives an empty allow-list and the one
+      `permissions.yaml` gives silence: authority exists where it is named.
+      Treating empty as unrestricted was the defect this replaces - it let
+      transport hand out write scope the contract never held, which is the one
+      thing a transport boundary may not do.
+    - **`may_not_modify` outranks `may_write`, and overlap either way is
+      enough.** A packet allowing `company/` where the contract protects
+      `company/permissions.yaml` is refused: the broad allow reaches the
+      protected file rather than being rescued by it.
+    """
     may_write = _contract_paths(contract, "may_write")
     may_not_modify = _contract_paths(contract, "may_not_modify")
     issues: list[str] = []
     for path in scope.allowed:
         blocked = [
-            rule
-            for rule in may_not_modify
-            if path == rule or path.startswith(rule + "/") or rule.startswith(path + "/")
+            rule for rule in may_not_modify if _covers(rule, path) or _covers(path, rule)
         ]
         if blocked:
             issues.append(
                 f"{path} reaches {employee}'s may_not_modify ({', '.join(sorted(blocked))})"
             )
-        if may_write and not any(
-            path == rule or path.startswith(rule + "/") for rule in may_write
-        ):
-            issues.append(f"{path} is outside {employee}'s may_write")
+        if not any(_covers(rule, path) for rule in may_write):
+            issues.append(
+                f"{path} is outside {employee}'s may_write"
+                if may_write
+                else f"{path} is outside {employee}'s may_write, which is empty: the "
+                "contract grants no writable path, so only a read-only packet is valid"
+            )
     if issues:
         raise LifecycleError(
             "packet path scope exceeds the employee contract: " + "; ".join(sorted(issues))

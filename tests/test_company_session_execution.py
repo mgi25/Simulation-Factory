@@ -90,15 +90,41 @@ def _plan(**changes: object):
     return plan_task(_spec(**changes), _config())
 
 
+def _writable_contract(*allowed: str) -> dict[str, object]:
+    """An explicitly restricted test contract.
+
+    `contract_from_registry` grants no writable path, and that is deliberate:
+    Bootstrap Mode is fail-closed and real write authority is configured on
+    purpose, later. A test that needs to package work therefore states its own
+    narrow grant here, rather than the suite quietly widening a production
+    contract to keep itself green.
+    """
+    contract = contract_from_registry("chief_architect", _config())
+    contract["may_write"] = list(allowed or SCOPE.allowed)
+    return contract
+
+
 def _packet(**changes: object) -> SessionPacket:
     plan = changes.pop("plan", None) or _plan()
     kwargs: dict[str, object] = {
         "expected_branch": BRANCH,
         "path_scope": SCOPE,
         "required_tests": ("pytest tests/test_company_session_execution.py",),
+        "employee_contract": _writable_contract(),
     }
     kwargs.update(changes)
     return build_session_packet(plan, **kwargs)
+
+
+def _prepare(adapter: ManualExternalSessionAdapter, plan, **changes: object):
+    """`adapter.prepare` with the writable test contract the scope requires."""
+    kwargs: dict[str, object] = {
+        "expected_branch": BRANCH,
+        "path_scope": SCOPE,
+        "employee_contract": _writable_contract(),
+    }
+    kwargs.update(changes)
+    return adapter.prepare(plan, **kwargs)
 
 
 def _receipt(packet: SessionPacket, **changes: object) -> SessionReceipt:
@@ -243,6 +269,111 @@ def test_packet_scope_cannot_exceed_the_employee_contract() -> None:
         )
 
 
+def test_an_explicit_narrow_grant_packages_work_only_inside_its_boundary() -> None:
+    """A contract may receive one writable path, and it bounds the packet exactly."""
+    contract = _writable_contract("company/runtime/")
+    plan = _plan()
+
+    inside = build_session_packet(
+        plan,
+        expected_branch=BRANCH,
+        path_scope=PathScope(allowed=("company/runtime/packets.py",)),
+        employee_contract=contract,
+    )
+    assert inside.path_scope.allowed == ("company/runtime/packets.py",)
+
+    # A sibling that merely shares a prefix is outside: matching is by segment.
+    for outside in ("company/runtime_extra.py", "company/", "tests/", "sloped/"):
+        with pytest.raises(LifecycleError, match="outside chief_architect's may_write"):
+            build_session_packet(
+                plan,
+                expected_branch=BRANCH,
+                path_scope=PathScope(allowed=(outside,)),
+                employee_contract=contract,
+            )
+
+
+def test_a_broad_grant_cannot_reach_a_path_the_contract_protects() -> None:
+    """Forbidden outranks allowed, and overlap in either direction is enough."""
+    contract = _writable_contract("company/")
+    contract["may_not_modify"] = ["company/permissions.yaml"]
+    plan = _plan()
+
+    # The protected file itself, and a rule broad enough to contain it.
+    for reaching in ("company/permissions.yaml", "company/"):
+        with pytest.raises(LifecycleError, match="may_not_modify"):
+            build_session_packet(
+                plan,
+                expected_branch=BRANCH,
+                path_scope=PathScope(allowed=(reaching,)),
+                employee_contract=contract,
+            )
+
+    beside = build_session_packet(
+        plan,
+        expected_branch=BRANCH,
+        path_scope=PathScope(allowed=("company/runtime/",)),
+        employee_contract=contract,
+    )
+    assert beside.path_scope.allowed == ("company/runtime",)
+
+
+def test_the_default_bootstrap_contract_grants_no_write_authority() -> None:
+    """The real contract, unfilled: empty `may_write` means read-only, not unrestricted.
+
+    This is the regression the fail-closed rule exists for. It uses the
+    canonical config and `contract_from_registry` exactly as
+    `build_session_packet` does when no contract is supplied, so it fails if
+    bootstrap ever starts handing out a writable path by default *or* if the
+    check ever starts reading an empty list as a wildcard again.
+    """
+    config = _config()
+    contract = contract_from_registry("chief_architect", config)
+    assert contract["may_write"] == []
+    assert contract["may_not_modify"] == []
+
+    plan = _plan()
+    for writable in ("company/runtime/", "company/", "tests/", "intelligence/"):
+        with pytest.raises(LifecycleError, match="grants no writable path"):
+            build_session_packet(
+                plan,
+                expected_branch=BRANCH,
+                path_scope=PathScope(allowed=(writable,)),
+                employee_contract=contract,
+            )
+
+    # The same refusal when the contract is read from the registry rather than
+    # passed in - the default path a caller takes without thinking about it.
+    with pytest.raises(LifecycleError, match="grants no writable path"):
+        build_session_packet(
+            plan, expected_branch=BRANCH, path_scope=PathScope(allowed=("company/runtime/",))
+        )
+
+
+def test_the_default_bootstrap_contract_still_packages_read_only_work() -> None:
+    """Fail-closed is not fail-useless: a read-only packet is still valid."""
+    plan = _plan()
+    packet = build_session_packet(
+        plan,
+        expected_branch=BRANCH,
+        path_scope=PathScope(forbidden=("race2/", "sloped/")),
+        employee_contract=contract_from_registry("chief_architect", _config()),
+    )
+    assert packet.path_scope.read_only
+    assert packet.path_scope.allowed == ()
+
+    # And so is a packet that names no scope at all.
+    assert build_session_packet(plan, expected_branch=BRANCH).path_scope.read_only
+
+    # It permits no change, which is what read-only has to mean downstream.
+    verdict = validate_receipt(
+        packet,
+        _receipt(packet, files_changed=("company/runtime/packets.py",)),
+    )
+    assert not verdict.ok
+    assert any("outside every allowed path" in failure for failure in verdict.failures)
+
+
 def test_branch_and_sha_shapes_are_checked_at_construction() -> None:
     assert assert_branch_name(BRANCH, "branch") == BRANCH
     assert is_git_sha(SHA) and not is_git_sha("A" * 40) and not is_git_sha("abc")
@@ -330,9 +461,56 @@ def test_wrong_branch_merge_and_dirty_tree_fail() -> None:
     dirty = validate_receipt(packet, _receipt(packet, working_tree_clean=False))
     assert any("working tree is reported dirty" in failure for failure in dirty.failures)
 
-    unreported = validate_receipt(packet, _receipt(packet, working_tree_clean=None))
-    assert unreported.ok
-    assert any("working tree status" in warning for warning in unreported.warnings)
+
+def test_a_write_producing_accepted_result_must_prove_a_clean_tree() -> None:
+    """The protocol ends in a clean tree, so silence about it is not completion."""
+    packet = _packet()
+
+    clean = validate_receipt(packet, _receipt(packet, working_tree_clean=True))
+    assert clean.ok
+
+    dirty = validate_receipt(packet, _receipt(packet, working_tree_clean=False))
+    assert not dirty.ok
+    assert any("working tree is reported dirty" in failure for failure in dirty.failures)
+
+    unknown = validate_receipt(packet, _receipt(packet, working_tree_clean=None))
+    assert not unknown.ok
+    assert any("working tree status is unknown" in failure for failure in unknown.failures)
+
+    # Still fatal when the packet is writable and the receipt names no file:
+    # the grant alone is enough to have left something behind.
+    no_files = validate_receipt(
+        packet, _receipt(packet, working_tree_clean=None, files_changed=())
+    )
+    assert not no_files.ok
+    assert any("working tree status is unknown" in failure for failure in no_files.failures)
+
+
+def test_an_unknown_tree_is_only_a_warning_for_a_genuinely_read_only_result() -> None:
+    """Nothing could be left dirty by a read-only packet that changed nothing."""
+    read_only = build_session_packet(
+        _plan(),
+        expected_branch=BRANCH,
+        path_scope=PathScope(forbidden=("race2/",)),
+        required_tests=("pytest tests/test_company_session_execution.py",),
+    )
+    assert read_only.path_scope.read_only
+
+    result = validate_receipt(
+        read_only, _receipt(read_only, working_tree_clean=None, files_changed=())
+    )
+    assert result.ok
+    assert any("does not report working tree status" in w for w in result.warnings)
+
+    # A change reported under a read-only packet is write-producing anyway, so
+    # the tree must be proven - on top of the scope failure the change earns.
+    contradicted = validate_receipt(
+        read_only,
+        _receipt(read_only, working_tree_clean=None, files_changed=("company/runtime/x.py",)),
+    )
+    assert not contradicted.ok
+    assert any("working tree status is unknown" in f for f in contradicted.failures)
+    assert contradicted.warnings == ()
 
 
 def test_required_tests_and_evidence_are_enforced_for_an_accepted_result() -> None:
@@ -421,10 +599,9 @@ def test_ingestion_produces_one_usage_record_and_a_compact_handoff(tmp_path: Pat
     usage_store = ResourceUsageStore(tmp_path)
     adapter = ManualExternalSessionAdapter(store)
 
-    prepared = adapter.prepare(
+    prepared = _prepare(
+        adapter,
         plan,
-        expected_branch=BRANCH,
-        path_scope=SCOPE,
         required_tests=("pytest tests/test_company_session_execution.py",),
         executor=ExecutorHint.CLAUDE_CODE,
     )
@@ -470,7 +647,7 @@ def test_a_failed_receipt_is_recorded_as_a_rejected_attempt(tmp_path: Path) -> N
     store = ExecutionStore(tmp_path)
     usage_store = ResourceUsageStore(tmp_path)
     adapter = ManualExternalSessionAdapter(store)
-    prepared = adapter.prepare(plan, expected_branch=BRANCH, path_scope=SCOPE)
+    prepared = _prepare(adapter, plan)
 
     ingested = adapter.ingest(
         plan,
@@ -490,7 +667,7 @@ def test_retries_are_separate_attempts_and_the_rejected_one_is_retained(tmp_path
     store = ExecutionStore(tmp_path)
     usage_store = ResourceUsageStore(tmp_path)
     adapter = ManualExternalSessionAdapter(store)
-    prepared = adapter.prepare(plan, expected_branch=BRANCH, path_scope=SCOPE)
+    prepared = _prepare(adapter, plan)
     packet = prepared.packet
 
     first = adapter.ingest(
@@ -518,12 +695,12 @@ def test_the_history_never_silently_overwrites_a_record(tmp_path: Path) -> None:
     store = ExecutionStore(tmp_path)
     usage_store = ResourceUsageStore(tmp_path)
     adapter = ManualExternalSessionAdapter(store)
-    prepared = adapter.prepare(plan, expected_branch=BRANCH, path_scope=SCOPE)
+    prepared = _prepare(adapter, plan)
 
     first_path = tmp_path / prepared.pointer.record_ref
     original = first_path.read_bytes()
 
-    again = adapter.prepare(plan, expected_branch=BRANCH, path_scope=SCOPE)
+    again = _prepare(adapter, plan)
     adapter.ingest(plan, prepared.packet, _receipt(prepared.packet), usage_store)
     adapter.ingest(plan, prepared.packet, _receipt(prepared.packet), usage_store)
 
@@ -549,7 +726,7 @@ def test_a_receipt_answering_another_packet_is_rejected(tmp_path: Path) -> None:
     plan = _plan()
     store = ExecutionStore(tmp_path)
     adapter = ManualExternalSessionAdapter(store)
-    prepared = adapter.prepare(plan, expected_branch=BRANCH, path_scope=SCOPE)
+    prepared = _prepare(adapter, plan)
     other = _packet(expected_branch="main")
 
     ingested = adapter.ingest(
@@ -563,7 +740,7 @@ def test_a_declared_dependency_raises_the_permissions_review_trigger(tmp_path: P
     plan = _plan()
     store = ExecutionStore(tmp_path)
     adapter = ManualExternalSessionAdapter(store)
-    prepared = adapter.prepare(plan, expected_branch=BRANCH, path_scope=SCOPE)
+    prepared = _prepare(adapter, plan)
 
     ingested = adapter.ingest(
         plan,
@@ -580,7 +757,7 @@ def test_an_invented_next_owner_is_rejected_rather_than_raised(tmp_path: Path) -
     plan = _plan()
     store = ExecutionStore(tmp_path)
     adapter = ManualExternalSessionAdapter(store)
-    prepared = adapter.prepare(plan, expected_branch=BRANCH, path_scope=SCOPE)
+    prepared = _prepare(adapter, plan)
 
     ingested = adapter.ingest(
         plan,
@@ -606,7 +783,7 @@ def test_a_local_clone_can_contradict_a_remote_claim(tmp_path: Path) -> None:
     plan = _plan()
     state = tmp_path / "state"
     adapter = ManualExternalSessionAdapter(ExecutionStore(state))
-    prepared = adapter.prepare(plan, expected_branch=BRANCH, path_scope=SCOPE)
+    prepared = _prepare(adapter, plan)
     usage_store = ResourceUsageStore(state)
 
     without_repo = adapter.ingest(plan, prepared.packet, _receipt(prepared.packet), usage_store)
@@ -750,6 +927,8 @@ def test_packet_receipt_and_execution_cli(
     )
     state = tmp_path / "state"
 
+    # The CLI reads the registry contract, which in Bootstrap Mode grants no
+    # writable path - so asking it for one is refused rather than served.
     assert (
         runtime_main(
             [
@@ -759,6 +938,23 @@ def test_packet_receipt_and_execution_cli(
                 BRANCH,
                 "--allow",
                 "company/runtime/",
+                "--state-dir",
+                str(state),
+            ]
+        )
+        == 2
+    )
+    refused = capsys.readouterr()
+    assert "grants no writable path" in refused.err
+    assert refused.out == ""
+
+    assert (
+        runtime_main(
+            [
+                "packet",
+                str(task_file),
+                "--branch",
+                BRANCH,
                 "--forbid",
                 "sloped/",
                 "--test",
@@ -774,6 +970,7 @@ def test_packet_receipt_and_execution_cli(
     built = json.loads(capsys.readouterr().out)
     assert built["packet"]["expected_branch"] == BRANCH
     assert built["packet"]["executor"] == "codex"
+    assert built["packet"]["path_scope"]["allowed"] == []
     assert built["persisted"]["attempt"] == 1
 
     receipt_file = tmp_path / "receipt.json"
@@ -789,7 +986,7 @@ def test_packet_receipt_and_execution_cli(
                 "remote_branch_sha": SHA,
                 "remote_verified": True,
                 "working_tree_clean": True,
-                "files_changed": ["company/runtime/packets.py"],
+                "files_changed": [],
                 "tests": [
                     {
                         "command": "pytest tests/test_company_session_execution.py",
@@ -819,7 +1016,12 @@ def test_the_cli_reports_a_rejected_attempt_with_a_non_zero_status(
     plan = _plan(task_id="cli-rejected")
     state = tmp_path / "state"
     store = ExecutionStore(state)
-    packet = build_session_packet(plan, expected_branch=BRANCH, path_scope=SCOPE)
+    packet = build_session_packet(
+        plan,
+        expected_branch=BRANCH,
+        path_scope=SCOPE,
+        employee_contract=_writable_contract(),
+    )
     store.append_packet(packet)
 
     task_file = tmp_path / "task.json"
@@ -861,7 +1063,7 @@ def test_the_cli_reports_a_rejected_attempt_with_a_non_zero_status(
 def test_runtime_state_is_never_written_into_the_repository(tmp_path: Path) -> None:
     plan = _plan()
     adapter = ManualExternalSessionAdapter(ExecutionStore(tmp_path))
-    prepared = adapter.prepare(plan, expected_branch=BRANCH, path_scope=SCOPE)
+    prepared = _prepare(adapter, plan)
 
     written = tmp_path / prepared.pointer.record_ref
     assert written.is_file()

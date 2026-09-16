@@ -34,6 +34,17 @@ Shape is checked here and always: a commit SHA looks like a Git object name,
 the branch equals the packet's, `remote_verified` is asserted rather than
 assumed, and `merge_performed` is fatal in any outcome. Substance - whether the
 remote really is at that SHA - needs a clone, and lives in `git_evidence.py`.
+
+## Completion, for a result that could have written
+
+The protocol ends with a clean working tree, so an accepted receipt that could
+have written - the packet granted a writable path, or the receipt names a
+changed file - must say `working_tree_clean: true`. False fails, and so does
+silence: an unreported tree is not evidence of a clean one, and accepting it
+would let the last step of the protocol be the one nobody performed. A
+genuinely read-only result that reports no change is the single case where
+unknown is recorded as a warning instead, because there was nothing there to
+leave dirty.
 """
 
 from __future__ import annotations
@@ -438,8 +449,12 @@ def validate_receipt(packet: SessionPacket, receipt: SessionReceipt) -> ReceiptV
 
     if receipt.outcome is Outcome.ACCEPTED:
         failures.extend(_accepted_failures(packet, receipt))
-        if receipt.working_tree_clean is None:
-            warnings.append("the receipt does not report working tree status")
+        if receipt.working_tree_clean is None and not _could_have_written(packet, receipt):
+            warnings.append(
+                "the receipt does not report working tree status; the packet is "
+                "read-only and the receipt reports no change, so the gap is recorded "
+                "rather than fatal"
+            )
     elif receipt.outcome is Outcome.REJECTED and not receipt.rejection_reason.strip():
         failures.append(
             "a rejected result must carry a rejection_reason; an unexplained "
@@ -456,6 +471,18 @@ def validate_receipt(packet: SessionPacket, receipt: SessionReceipt) -> ReceiptV
     return ReceiptValidation(
         failures=tuple(failures), warnings=tuple(warnings), path_verdict=verdict
     )
+
+
+def _could_have_written(packet: SessionPacket, receipt: SessionReceipt) -> bool:
+    """Whether this attempt could have left a dirty tree behind.
+
+    True if the packet granted any writable path, or the receipt reports a
+    changed file - the second because a receipt claiming changes under a
+    read-only packet is still a write-producing result, whatever the packet
+    said. Only when both are empty is "I did not check the tree" a gap worth
+    recording rather than a failed completion.
+    """
+    return bool(packet.path_scope.allowed) or bool(receipt.files_changed)
 
 
 def _accepted_failures(packet: SessionPacket, receipt: SessionReceipt) -> list[str]:
@@ -480,6 +507,12 @@ def _accepted_failures(packet: SessionPacket, receipt: SessionReceipt) -> list[s
         )
     if receipt.working_tree_clean is False:
         failures.append("the working tree is reported dirty for an accepted result")
+    elif receipt.working_tree_clean is None and _could_have_written(packet, receipt):
+        failures.append(
+            "working tree status is unknown for an accepted result that could have "
+            "written; the completion protocol ends in a clean tree, and an unreported "
+            "tree is not evidence of one"
+        )
 
     missing_tests = tuple(
         command for command in packet.required_tests if command not in receipt.test_commands

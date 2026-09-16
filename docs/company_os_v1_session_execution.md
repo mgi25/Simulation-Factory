@@ -66,6 +66,15 @@ escalates to the CEO rather than being transported to a worker.
 path outside `may_write`, or inside `may_not_modify`, fails at construction.
 The transport layer cannot grant what the contract withholds.
 
+The check is fail-closed on an empty contract, which is the case that matters
+in Bootstrap Mode: `contract_from_registry` fills the schema template, and that
+template's `may_write` is `[]`. An empty `may_write` therefore means *read-only*
+- no writable path - rather than *unrestricted*. Every allowed path a packet
+declares must sit inside at least one `may_write` rule, so the only packet a
+default bootstrap contract can carry is one that declares no writable path at
+all. Write authority is configured onto a contract, deliberately; it is never
+acquired by a packet asking for it.
+
 **The two treatments of the no-subagent rule are different on purpose.**
 `no_subagents=false` is a *claim* that constitution rule 2 does not apply, and
 construction refuses it — there is no such packet and no such receipt.
@@ -148,15 +157,19 @@ python -m company.runtime execution --state-dir D --task <id>
 
 ## Tests
 
-`tests/test_company_session_execution.py` — 38 focused tests covering
+`tests/test_company_session_execution.py` — 44 focused tests covering
 deterministic and reference-only packet generation, fingerprint stability,
 preserved context fingerprints, the no-subagent rule at every link, branch
 preservation, allowed/forbidden paths, malformed SHAs, remote mismatch,
 attempted authority escalation, separate retained attempts, the canonical usage
 record and the compact handoff that references it, no silent overwrite, the
-provider hint changing nothing, and production independence.
+provider hint changing nothing, and production independence — and, since the
+fail-closed correction, the canonical default contract granting no write
+authority, an explicit narrow grant bounding a packet exactly, `may_not_modify`
+outranking `may_write`, and a write-producing accepted result having to prove a
+clean working tree.
 
-Combined Company OS suites: 293 passed.
+Combined Company OS suites: 301 passed.
 
 ## Invariants preserved
 
@@ -169,12 +182,20 @@ Combined Company OS suites: 293 passed.
 
 ## Unresolved risks
 
-1. **`working_tree_clean=None` is a warning, not a failure.** A session that
-   simply omits the field passes. Making it fatal would reject honest receipts
-   from tools that cannot report it; the warning is the compromise.
+1. **A read-only result may still omit `working_tree_clean`.** For an accepted
+   result that could have written — the packet granted a writable path, or the
+   receipt names a changed file — an unreported tree is now a failure, because
+   the protocol ends in a clean tree and silence is not evidence of one. The
+   remaining gap is the genuinely read-only result that changed nothing: there
+   `None` is recorded as a warning, since there was nothing that could have
+   been left dirty. A tool that writes but reports neither its files nor its
+   tree would slip through, and only the scope guard would catch it.
 2. **Substance verification is opt-in.** Without `repo_dir`, `remote_verified`
-   is a claim the runtime believes. That is inherent to a transport boundary —
-   the alternative is a network call from the control plane.
+   is a claim the runtime believes, as is the reported `remote_branch_sha` it
+   is checked against. That is inherent to a transport boundary — the
+   alternative is a network call from the control plane, and the boundary must
+   keep working when the worker checkout is not reachable from here. The
+   stronger local check stays available and stays optional.
 3. **`invariants_preserved` lands in usage `notes`.** The canonical copy is the
    receipt file, which the handoff references; the note is a convenience and
    could drift if someone edits one and not the other.
