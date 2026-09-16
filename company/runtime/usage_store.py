@@ -2,20 +2,22 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
-import os
 from pathlib import Path
-import re
 
 from ai_platform.serde import dumps
 from ai_platform.usage import ResourceSummary, ResourceUsageRecord, UsageLedger
-from company.validation.errors import CompanyOSError
 
+from .state_paths import (
+    StateStoreError,
+    append_json_bytes,
+    sorted_records,
+    task_directory_name,
+)
 from .tasks import UsageRecordPointer
 
 
-class UsageStoreError(CompanyOSError):
+class UsageStoreError(StateStoreError):
     """A usage history is missing, malformed, or fails its integrity check."""
 
 
@@ -29,7 +31,6 @@ class ResourceUsageStore:
     """
 
     _STORE_DIRECTORY = "resource_usage"
-    _RECORD_NAME = re.compile(r"(?P<sequence>[0-9]{6,})\.json")
 
     def __init__(self, state_dir: str | Path) -> None:
         if isinstance(state_dir, str) and not state_dir.strip():
@@ -40,45 +41,19 @@ class ResourceUsageStore:
     def append(self, record: ResourceUsageRecord) -> UsageRecordPointer:
         """Persist one record without ever opening an existing record for write."""
         record.check_policy()
-        task_directory = self.root / _task_directory_name(record.task_id)
-        task_directory.mkdir(parents=True, exist_ok=True)
-        payload = dumps(record).encode("utf-8")
-
-        sequence = self._next_sequence(task_directory)
-        while True:
-            path = task_directory / f"{sequence:06d}.json"
-            try:
-                descriptor = os.open(
-                    path,
-                    os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0),
-                )
-            except FileExistsError:
-                sequence += 1
-                continue
-            try:
-                offset = 0
-                while offset < len(payload):
-                    written = os.write(descriptor, payload[offset:])
-                    if written <= 0:
-                        raise UsageStoreError(
-                            f"short write while appending resource usage record {path}"
-                        )
-                    offset += written
-                os.fsync(descriptor)
-            finally:
-                os.close(descriptor)
-            break
-
-        relative = path.relative_to(self.state_dir).as_posix()
+        path = append_json_bytes(
+            self.root / task_directory_name(record.task_id),
+            dumps(record).encode("utf-8"),
+        )
         return UsageRecordPointer(
-            record_ref=relative,
+            record_ref=path.relative_to(self.state_dir).as_posix(),
             fingerprint=record.fingerprint(),
         )
 
     def records(self, task_id: str | None = None) -> tuple[ResourceUsageRecord, ...]:
         """Load all records in a scope, preserving deterministic file order."""
         if task_id is not None:
-            directories = (self.root / _task_directory_name(task_id),)
+            directories = (self.root / task_directory_name(task_id),)
         elif self.root.exists():
             directories = tuple(path for path in sorted(self.root.iterdir()) if path.is_dir())
         else:
@@ -86,9 +61,7 @@ class ResourceUsageStore:
 
         records: list[ResourceUsageRecord] = []
         for directory in directories:
-            if not directory.exists():
-                continue
-            for path in sorted(directory.glob("*.json"), key=_record_sort_key):
+            for path in sorted_records(directory):
                 record = self._read(path)
                 if task_id is not None and record.task_id != task_id:
                     raise UsageStoreError(
@@ -120,15 +93,6 @@ class ResourceUsageStore:
         return record
 
     @staticmethod
-    def _next_sequence(directory: Path) -> int:
-        sequences = [
-            int(match.group("sequence"))
-            for path in directory.glob("*.json")
-            if (match := ResourceUsageStore._RECORD_NAME.fullmatch(path.name))
-        ]
-        return max(sequences, default=0) + 1
-
-    @staticmethod
     def _read(path: Path) -> ResourceUsageRecord:
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
@@ -140,14 +104,3 @@ class ResourceUsageStore:
             return ResourceUsageRecord.from_mapping(data)
         except (TypeError, ValueError) as exc:
             raise UsageStoreError(f"{path}: invalid resource usage record: {exc}") from exc
-
-
-def _task_directory_name(task_id: str) -> str:
-    slug = re.sub(r"[^a-zA-Z0-9._-]+", "-", task_id).strip("-.")[:48] or "task"
-    digest = hashlib.sha256(task_id.encode("utf-8")).hexdigest()[:12]
-    return f"{slug}-{digest}"
-
-
-def _record_sort_key(path: Path) -> tuple[int, str]:
-    match = ResourceUsageStore._RECORD_NAME.fullmatch(path.name)
-    return (int(match.group("sequence")) if match else 2**63, path.name)

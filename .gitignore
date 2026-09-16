@@ -38,3 +38,8 @@ godot/export_presets.cfg
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Company OS runtime state: session packets, receipts and usage records. The
+# state directory is always supplied by the caller, and none of it belongs in
+# the branch.
+state/
