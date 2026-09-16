@@ -2,6 +2,7 @@
 
 ```
 <state_dir>/execution/packets/<task>/000001.json
+<state_dir>/execution/authorities/<task>/000001.json
 <state_dir>/execution/context_expansions/requests/<task>/000001.json
 <state_dir>/execution/context_expansions/decisions/<task>/000001.json
 <state_dir>/execution/receipts/<task>/000001.json
@@ -13,10 +14,10 @@ Three properties, and the directory layout is most of the implementation:
 - **Append-only.** There is no update and no delete. A file is created with
   `O_EXCL` (see `state_paths.append_json_bytes`), so a second write never
   replaces a first.
-- **Attempt-numbered.** The receipt sequence *is* the attempt number. A task
-  whose first attempt was rejected and whose second was accepted keeps both,
-  in order, which is exactly what the resources-per-accepted-deliverable metric
-  needs: the rejected attempt is the cost of reaching the accepted one.
+- **Attempt-numbered.** Packet and authority records share a packet-attempt
+  identity. Receipts retain their own append sequence and explicitly name the
+  packet attempt they answer, so retries and repeated identical packets cannot
+  cross their authority or context-expansion histories.
 - **Caller-supplied.** The state directory is always passed in and is never
   inside the package, so runtime state is not committed to the repository by
   default. `.gitignore` carries `state/` for the conventional choice.
@@ -36,6 +37,7 @@ from ai_platform.serde import dumps
 from ai_platform.usage import Outcome
 from company.validation.errors import ValidationError
 
+from .authority import ExecutionAuthoritySnapshot
 from .context_expansion import (
     ContextExpansionDecision,
     ContextExpansionLedger,
@@ -47,6 +49,7 @@ from .receipts import SessionReceipt
 from .state_paths import (
     StateStoreError,
     append_json_bytes,
+    create_json_bytes_at_sequence,
     sequence_of,
     sorted_records,
     task_directory_name,
@@ -101,11 +104,30 @@ class AttemptRecord:
         return self.receipt.outcome
 
 
+@dataclass(frozen=True)
+class PacketRecord:
+    """One prepared packet at its immutable per-task attempt number."""
+
+    attempt: int
+    pointer: ExecutionRecordPointer
+    packet: SessionPacket
+
+
+@dataclass(frozen=True)
+class AuthorityRecord:
+    """The authority evidence paired with exactly one packet attempt."""
+
+    attempt: int
+    pointer: ExecutionRecordPointer
+    snapshot: ExecutionAuthoritySnapshot
+
+
 class ExecutionStore:
     """Packets out, receipts in - both immutable once written."""
 
     _ROOT = "execution"
     _PACKETS = "packets"
+    _AUTHORITIES = "authorities"
     _CONTEXT_EXPANSIONS = "context_expansions"
     _EXPANSION_REQUESTS = "requests"
     _EXPANSION_DECISIONS = "decisions"
@@ -126,14 +148,83 @@ class ExecutionStore:
 
     def append_receipt(self, receipt: SessionReceipt) -> ExecutionRecordPointer:
         """Persist a receipt - valid or not. A refused attempt is still history."""
+        if receipt.packet_attempt < 1:
+            raise ExecutionStoreError(
+                "a persisted receipt must be associated with a packet attempt"
+            )
         return self._append(
             self._RECEIPTS, receipt.task_id, dumps(receipt), receipt.fingerprint()
+        )
+
+    def append_authority(
+        self, snapshot: ExecutionAuthoritySnapshot
+    ) -> ExecutionRecordPointer:
+        """Persist authority at the exact packet attempt it supports."""
+        packet = self.packet(snapshot.task_id, snapshot.packet_attempt)
+        if packet is None or packet.fingerprint() != snapshot.packet_fingerprint:
+            raise ExecutionStoreError(
+                "execution authority does not match the persisted packet at attempt "
+                f"{snapshot.packet_attempt}"
+            )
+        path = create_json_bytes_at_sequence(
+            self._directory(self._AUTHORITIES, snapshot.task_id),
+            dumps(snapshot).encode("utf-8"),
+            snapshot.packet_attempt,
+        )
+        return ExecutionRecordPointer(
+            record_ref=path.relative_to(self.state_dir).as_posix(),
+            fingerprint=snapshot.fingerprint(),
+            attempt=snapshot.packet_attempt,
         )
 
     def append_context_expansion_request(
         self, request: ContextExpansionRequest
     ) -> ExecutionRecordPointer:
         """Persist the request before deciding it; rejected requests stay history."""
+        if (
+            self.find_packet_record(
+                request.task_id,
+                request.packet_fingerprint,
+                attempt=request.packet_attempt,
+            )
+            is None
+        ):
+            raise ExecutionStoreError(
+                "context expansion request does not match a persisted packet attempt"
+            )
+        if self.find_context_expansion_request(request.task_id, request.request_id):
+            raise ExecutionStoreError(
+                f"context expansion request ID {request.request_id!r} already exists"
+            )
+        if (
+            self.authority(
+                request.task_id, request.packet_fingerprint, request.packet_attempt
+            )
+            is None
+        ):
+            raise ExecutionStoreError(
+                "context expansion request has no matching authority snapshot"
+            )
+        decisions = tuple(
+            item
+            for item in self.context_expansion_decisions(request.task_id)
+            if item.packet_fingerprint == request.packet_fingerprint
+            and item.packet_attempt == request.packet_attempt
+        )
+        requests = tuple(
+            item
+            for item in self.context_expansion_requests(request.task_id)
+            if item.packet_fingerprint == request.packet_fingerprint
+            and item.packet_attempt == request.packet_attempt
+        )
+        if len(requests) != len(decisions):
+            raise ExecutionStoreError(
+                "the packet attempt already has an undecided context request"
+            )
+        if request.sequence != len(decisions) + 1:
+            raise ExecutionStoreError(
+                "context expansion request sequence is not next for its packet attempt"
+            )
         return self._append_expansion(
             self._EXPANSION_REQUESTS,
             request.task_id,
@@ -144,6 +235,40 @@ class ExecutionStore:
     def append_context_expansion_decision(
         self, decision: ContextExpansionDecision
     ) -> ExecutionRecordPointer:
+        authority = self.authority(
+            decision.task_id,
+            decision.packet_fingerprint,
+            decision.packet_attempt,
+        )
+        if authority is None:
+            raise ExecutionStoreError(
+                "context expansion decision has no matching authority snapshot"
+            )
+        if decision.authority_fingerprint != authority.fingerprint():
+            raise ExecutionStoreError(
+                "context expansion decision authority fingerprint does not match the "
+                "stored snapshot"
+            )
+        request = self.find_context_expansion_request(
+            decision.task_id, decision.request_id
+        )
+        if (
+            request is None
+            or request.fingerprint() != decision.request_fingerprint
+            or request.packet_fingerprint != decision.packet_fingerprint
+            or request.packet_attempt != decision.packet_attempt
+            or request.sequence != decision.sequence
+        ):
+            raise ExecutionStoreError(
+                "context expansion decision does not match its persisted request"
+            )
+        if any(
+            item.request_id == decision.request_id
+            for item in self.context_expansion_decisions(decision.task_id)
+        ):
+            raise ExecutionStoreError(
+                f"context expansion request {decision.request_id!r} already has a decision"
+            )
         return self._append_expansion(
             self._EXPANSION_DECISIONS,
             decision.task_id,
@@ -154,9 +279,81 @@ class ExecutionStore:
     # --- reading -----------------------------------------------------------
 
     def packets(self, task_id: str) -> tuple[SessionPacket, ...]:
-        return tuple(
-            self._read_packet(path)
-            for path in sorted_records(self._directory(self._PACKETS, task_id))
+        return tuple(record.packet for record in self.packet_records(task_id))
+
+    def packet_records(self, task_id: str) -> tuple[PacketRecord, ...]:
+        records = []
+        for path in sorted_records(self._directory(self._PACKETS, task_id)):
+            packet = self._read_packet(path)
+            attempt = sequence_of(path)
+            records.append(
+                PacketRecord(
+                    attempt=attempt,
+                    pointer=ExecutionRecordPointer(
+                        record_ref=path.relative_to(self.state_dir).as_posix(),
+                        fingerprint=packet.fingerprint(),
+                        attempt=attempt,
+                    ),
+                    packet=packet,
+                )
+            )
+        return tuple(records)
+
+    def packet(self, task_id: str, attempt: int) -> SessionPacket | None:
+        return next(
+            (
+                record.packet
+                for record in self.packet_records(task_id)
+                if record.attempt == attempt
+            ),
+            None,
+        )
+
+    def authorities(self, task_id: str) -> tuple[ExecutionAuthoritySnapshot, ...]:
+        return tuple(record.snapshot for record in self.authority_records(task_id))
+
+    def authority_records(self, task_id: str) -> tuple[AuthorityRecord, ...]:
+        records = []
+        for path in sorted_records(self._directory(self._AUTHORITIES, task_id)):
+            snapshot = self._read_authority(path)
+            attempt = sequence_of(path)
+            if snapshot.packet_attempt != attempt:
+                raise ExecutionStoreError(
+                    f"{path}: authority packet_attempt does not match record sequence"
+                )
+            packet = self.packet(task_id, attempt)
+            if (
+                packet is None
+                or packet.fingerprint() != snapshot.packet_fingerprint
+                or packet.employee != snapshot.employee
+            ):
+                raise ExecutionStoreError(
+                    f"{path}: authority does not match its packet attempt"
+                )
+            records.append(
+                AuthorityRecord(
+                    attempt=attempt,
+                    pointer=ExecutionRecordPointer(
+                        record_ref=path.relative_to(self.state_dir).as_posix(),
+                        fingerprint=snapshot.fingerprint(),
+                        attempt=attempt,
+                    ),
+                    snapshot=snapshot,
+                )
+            )
+        return tuple(records)
+
+    def authority(
+        self, task_id: str, packet_fingerprint: str, packet_attempt: int
+    ) -> ExecutionAuthoritySnapshot | None:
+        return next(
+            (
+                record.snapshot
+                for record in self.authority_records(task_id)
+                if record.attempt == packet_attempt
+                and record.snapshot.packet_fingerprint == packet_fingerprint
+            ),
+            None,
         )
 
     def receipts(self, task_id: str) -> tuple[SessionReceipt, ...]:
@@ -201,15 +398,30 @@ class ExecutionStore:
             )
         )
 
-    def context_expansion_ledger(self, packet: SessionPacket) -> ContextExpansionLedger:
+    def context_expansion_ledger(
+        self, packet: SessionPacket, *, packet_attempt: int = 1
+    ) -> ContextExpansionLedger:
         """The decisions for this exact packet; other attempts remain isolated."""
         packet_fingerprint = packet.fingerprint()
         decisions = tuple(
             decision
             for decision in self.context_expansion_decisions(packet.task_id)
             if decision.packet_fingerprint == packet_fingerprint
+            and decision.packet_attempt == packet_attempt
         )
-        return ContextExpansionLedger.for_packet(packet, decisions)
+        authority = self.authority(packet.task_id, packet_fingerprint, packet_attempt)
+        for decision in decisions:
+            if (
+                authority is None
+                or decision.authority_fingerprint != authority.fingerprint()
+            ):
+                raise ExecutionStoreError(
+                    "context expansion decision is not bound to the stored authority "
+                    f"for packet attempt {packet_attempt}"
+                )
+        return ContextExpansionLedger.for_packet(
+            packet, decisions, packet_attempt=packet_attempt
+        )
 
     def find_packet(self, task_id: str, fingerprint: str) -> SessionPacket | None:
         """The packet a receipt claims to answer, or None if this history lacks it."""
@@ -218,28 +430,93 @@ class ExecutionStore:
                 return packet
         return None
 
+    def find_packet_record(
+        self, task_id: str, fingerprint: str, *, attempt: int | None = None
+    ) -> PacketRecord | None:
+        matches = tuple(
+            record
+            for record in self.packet_records(task_id)
+            if record.pointer.fingerprint == fingerprint
+            and (attempt is None or record.attempt == attempt)
+        )
+        return matches[-1] if matches else None
+
+    def find_context_expansion_request(
+        self, task_id: str, request_id: str
+    ) -> ContextExpansionRequest | None:
+        matches = tuple(
+            request
+            for request in self.context_expansion_requests(task_id)
+            if request.request_id == request_id
+        )
+        if len(matches) > 1:
+            raise ExecutionStoreError(
+                f"context expansion request ID {request_id!r} is not unique"
+            )
+        return matches[0] if matches else None
+
+    def context_expansion_request_pointer(
+        self, task_id: str, request_id: str
+    ) -> ExecutionRecordPointer | None:
+        matches = []
+        for path in sorted_records(
+            self._expansion_directory(self._EXPANSION_REQUESTS, task_id)
+        ):
+            request = self._read_expansion_request(path)
+            if request.request_id == request_id:
+                sequence = sequence_of(path)
+                matches.append(
+                    ExecutionRecordPointer(
+                        record_ref=path.relative_to(self.state_dir).as_posix(),
+                        fingerprint=request.fingerprint(),
+                        attempt=sequence,
+                    )
+                )
+        if len(matches) > 1:
+            raise ExecutionStoreError(
+                f"context expansion request ID {request_id!r} is not unique"
+            )
+        return matches[0] if matches else None
+
     def history(self, task_id: str) -> dict[str, object]:
         """A compact, JSON-ready answer to 'what happened to this task?'."""
         attempts = self.attempts(task_id)
+        packet_records = self.packet_records(task_id)
+        authority_records = self.authority_records(task_id)
         requests = self.context_expansion_requests(task_id)
         decisions = self.context_expansion_decisions(task_id)
         return {
             "task_id": task_id,
             "packets": [
                 {
+                    "attempt": record.attempt,
                     "fingerprint": packet.fingerprint(),
                     "employee": packet.employee,
                     "expected_branch": packet.expected_branch,
                     "executor": packet.executor.value,
                     "size_chars": packet.size_chars(),
                 }
-                for packet in self.packets(task_id)
+                for record in packet_records
+                for packet in (record.packet,)
+            ],
+            "authorities": [
+                {
+                    "attempt": record.attempt,
+                    "packet_fingerprint": record.snapshot.packet_fingerprint,
+                    "fingerprint": record.pointer.fingerprint,
+                    "record_ref": record.pointer.record_ref,
+                    "source": record.snapshot.source.value,
+                    "no_subagents": record.snapshot.no_subagents,
+                }
+                for record in authority_records
             ],
             "attempts": [
                 {
                     "attempt": record.attempt,
                     "outcome": record.outcome.value,
                     "packet_fingerprint": record.receipt.packet_fingerprint,
+                    "packet_attempt": record.receipt.packet_attempt,
+                    "authority_fingerprint": record.receipt.authority_fingerprint,
                     "commit_sha": record.receipt.commit_sha,
                     "remote_verified": record.receipt.remote_verified,
                     "subagents_used": record.receipt.subagents_used,
@@ -252,6 +529,7 @@ class ExecutionStore:
                     {
                         "request_id": request.request_id,
                         "packet_fingerprint": request.packet_fingerprint,
+                        "packet_attempt": request.packet_attempt,
                         "sequence": request.sequence,
                         "requested_refs": [ref.key for ref in request.requested_refs],
                         "required_to_continue": request.required_to_continue,
@@ -262,6 +540,8 @@ class ExecutionStore:
                     {
                         "request_id": decision.request_id,
                         "packet_fingerprint": decision.packet_fingerprint,
+                        "packet_attempt": decision.packet_attempt,
+                        "authority_fingerprint": decision.authority_fingerprint,
                         "sequence": decision.sequence,
                         "required_to_continue": decision.required_to_continue,
                         "outcome": decision.outcome.value,
@@ -276,6 +556,16 @@ class ExecutionStore:
                     for decision in decisions
                 ],
             },
+            "effective_contexts": [
+                {
+                    "attempt": record.attempt,
+                    "packet_fingerprint": record.packet.fingerprint(),
+                    "fingerprint": self.context_expansion_ledger(
+                        record.packet, packet_attempt=record.attempt
+                    ).effective_context_fingerprint,
+                }
+                for record in packet_records
+            ],
         }
 
     # --- internals ---------------------------------------------------------
@@ -326,6 +616,14 @@ class ExecutionStore:
                 f"{path}: invalid session receipt: {exc}"
             ) from exc
 
+    def _read_authority(self, path: Path) -> ExecutionAuthoritySnapshot:
+        try:
+            return ExecutionAuthoritySnapshot.from_mapping(self._load(path))
+        except (LifecycleError, ValueError) as exc:
+            raise ExecutionStoreError(
+                f"{path}: invalid execution authority snapshot: {exc}"
+            ) from exc
+
     def _read_expansion_request(self, path: Path) -> ContextExpansionRequest:
         try:
             return ContextExpansionRequest.from_mapping(self._load(path))
@@ -356,8 +654,10 @@ class ExecutionStore:
 
 
 __all__ = [
+    "AuthorityRecord",
     "AttemptRecord",
     "ExecutionRecordPointer",
     "ExecutionStore",
     "ExecutionStoreError",
+    "PacketRecord",
 ]

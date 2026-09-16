@@ -11,6 +11,12 @@ from .context_assembly import (
     assemble_context,
 )
 from .attempts import AttemptReport, AttemptResult, finalise_attempt
+from .authority import (
+    AUTHORITY_SNAPSHOT_VERSION,
+    AuthoritySource,
+    ExecutionAuthoritySnapshot,
+    authority_projection,
+)
 from .context_expansion import (
     ContextExpansionDecision,
     ContextExpansionLedger,
@@ -23,9 +29,11 @@ from .context_expansion_policy import decide_context_expansion
 from .errors import LifecycleError
 from .execution_store import (
     AttemptRecord,
+    AuthorityRecord,
     ExecutionRecordPointer,
     ExecutionStore,
     ExecutionStoreError,
+    PacketRecord,
 )
 from .lifecycle import (
     Escalation,
@@ -59,12 +67,16 @@ from .session_adapter import (
 from .specification import ContextRequirements, TaskSpecification
 from .tasks import HandoffArtifact, TaskAssignment, TaskStatus, UsageRecordPointer
 from .usage_store import ResourceUsageStore, UsageStoreError
+from .transport import EXPANSION_INSTRUCTIONS, SessionTransportBundle
 
 __all__ = [
     "COMPLETION_PROTOCOL",
+    "AUTHORITY_SNAPSHOT_VERSION",
     "AttemptRecord",
     "AttemptReport",
     "AttemptResult",
+    "AuthorityRecord",
+    "AuthoritySource",
     "CompanyConfig",
     "CapsuleRefRejection",
     "CapsuleSelectionReason",
@@ -79,6 +91,7 @@ __all__ = [
     "EmployeeMatch",
     "Escalation",
     "ExecutionPreparation",
+    "ExecutionAuthoritySnapshot",
     "ExecutionRecordPointer",
     "ExecutionStore",
     "ExecutionStoreError",
@@ -90,6 +103,7 @@ __all__ = [
     "LifecycleError",
     "LifecycleState",
     "ManualExternalSessionAdapter",
+    "PacketRecord",
     "PathScope",
     "PathScopeVerdict",
     "PreparedSession",
@@ -100,6 +114,7 @@ __all__ = [
     "RoutingResult",
     "SessionPacket",
     "SessionReceipt",
+    "SessionTransportBundle",
     "TaskAssignment",
     "TaskPlan",
     "TaskSpecification",
@@ -107,7 +122,9 @@ __all__ = [
     "StaleCapsulePolicy",
     "UsageRecordPointer",
     "UsageStoreError",
+    "EXPANSION_INSTRUCTIONS",
     "assemble_context",
+    "authority_projection",
     "build_session_packet",
     "contract_from_registry",
     "decide_context_expansion",

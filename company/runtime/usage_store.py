@@ -55,7 +55,9 @@ class ResourceUsageStore:
         if task_id is not None:
             directories = (self.root / task_directory_name(task_id),)
         elif self.root.exists():
-            directories = tuple(path for path in sorted(self.root.iterdir()) if path.is_dir())
+            directories = tuple(
+                path for path in sorted(self.root.iterdir()) if path.is_dir()
+            )
         else:
             directories = ()
 
@@ -73,6 +75,20 @@ class ResourceUsageStore:
 
     def summarise(self, task_id: str | None = None) -> ResourceSummary:
         return UsageLedger(list(self.records(task_id))).summarise()
+
+    def pointers(self, task_id: str) -> tuple[UsageRecordPointer, ...]:
+        """Compact references to each immutable usage record for execution views."""
+        directory = self.root / task_directory_name(task_id)
+        pointers = []
+        for path in sorted_records(directory):
+            record = self._read(path)
+            pointers.append(
+                UsageRecordPointer(
+                    record_ref=path.relative_to(self.state_dir).as_posix(),
+                    fingerprint=record.fingerprint(),
+                )
+            )
+        return tuple(pointers)
 
     def load(self, pointer: UsageRecordPointer) -> ResourceUsageRecord:
         """Resolve a compact handoff pointer and verify the detailed record."""
@@ -97,10 +113,16 @@ class ResourceUsageStore:
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
-            raise UsageStoreError(f"cannot read resource usage record {path}: {exc}") from exc
+            raise UsageStoreError(
+                f"cannot read resource usage record {path}: {exc}"
+            ) from exc
         if not isinstance(data, dict):
-            raise UsageStoreError(f"{path}: resource usage record must be a JSON object")
+            raise UsageStoreError(
+                f"{path}: resource usage record must be a JSON object"
+            )
         try:
             return ResourceUsageRecord.from_mapping(data)
         except (TypeError, ValueError) as exc:
-            raise UsageStoreError(f"{path}: invalid resource usage record: {exc}") from exc
+            raise UsageStoreError(
+                f"{path}: invalid resource usage record: {exc}"
+            ) from exc

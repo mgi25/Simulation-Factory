@@ -41,11 +41,14 @@ def decide_context_expansion(
     ledger: ContextExpansionLedger | None = None,
     capsule_index: CapsuleIndex | None = None,
     repo_root: str | Path | None = None,
+    authority_fingerprint: str = "",
 ) -> ContextExpansionDecision:
     """Approve only explicit, readable refs that fit the packet's original ceiling."""
 
-    current = ledger or ContextExpansionLedger.for_packet(packet)
-    current.assert_for_packet(packet)
+    current = ledger or ContextExpansionLedger.for_packet(
+        packet, packet_attempt=request.packet_attempt
+    )
+    current.assert_for_packet(packet, packet_attempt=request.packet_attempt)
     index = capsule_index if capsule_index is not None else CapsuleIndex.load()
     may_read = _contract_paths(employee_contract, "may_read")
     may_not_read = _contract_paths(employee_contract, "may_not_read")
@@ -125,6 +128,8 @@ def decide_context_expansion(
         already_present_refs=tuple(already),
         previous_context_fingerprint=previous,
         resulting_context_fingerprint=resulting,
+        packet_attempt=request.packet_attempt,
+        authority_fingerprint=authority_fingerprint,
     )
 
 

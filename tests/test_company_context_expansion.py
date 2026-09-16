@@ -146,6 +146,19 @@ def _receipt(
     return SessionReceipt(**values)
 
 
+def _prepare_for_expansion(
+    adapter: ManualExternalSessionAdapter,
+    plan,
+    contract: dict[str, object],
+):
+    return adapter.prepare(
+        plan,
+        expected_branch=BRANCH,
+        path_scope=PathScope(),
+        employee_contract=contract,
+    )
+
+
 def test_request_and_decision_are_deterministic_and_reference_only() -> None:
     packet = _packet()
     request = _request(packet)
@@ -332,25 +345,29 @@ def test_broad_path_prefers_a_capsule_but_narrow_file_remains_exact() -> None:
 
 def test_requests_and_all_decisions_are_append_only_history(tmp_path: Path) -> None:
     plan = _plan()
-    packet = _packet(plan=plan)
     store = ExecutionStore(tmp_path)
     adapter = ManualExternalSessionAdapter(store)
+    prepared = _prepare_for_expansion(
+        adapter, plan, _read_contract(plan, INDEX_REF.ref)
+    )
+    packet = prepared.packet
     original_fingerprint = packet.fingerprint()
 
-    denied_contract = _read_contract(plan)
-    denied_contract["may_read"] = []
     denied = adapter.expand_context(
-        plan,
         packet,
-        _request(packet),
-        employee_contract=denied_contract,
+        _request(
+            packet,
+            ContextRef(
+                ContextKind.FILE,
+                "race2/track.py",
+                "inspect an explicitly out-of-scope production file",
+            ),
+        ),
         repo_root=ROOT,
     )
     approved = adapter.expand_context(
-        plan,
         packet,
         _request(packet, request_id="expansion-002", sequence=2),
-        employee_contract=_read_contract(plan),
         repo_root=ROOT,
     )
 
@@ -388,17 +405,15 @@ def test_dogfood_missing_index_case_is_approved_linked_and_measured(
     tmp_path: Path,
 ) -> None:
     plan = _plan()
-    packet = _packet(plan=plan)
-    packet_fingerprint = packet.fingerprint()
-    assert INDEX_REF.key not in packet.context_keys()
-
     store = ExecutionStore(tmp_path)
     adapter = ManualExternalSessionAdapter(store)
+    prepared = _prepare_for_expansion(adapter, plan, _read_contract(plan))
+    packet = prepared.packet
+    packet_fingerprint = packet.fingerprint()
+    assert INDEX_REF.key not in packet.context_keys()
     expanded = adapter.expand_context(
-        plan,
         packet,
         _request(packet),
-        employee_contract=_read_contract(plan),
         repo_root=ROOT,
     )
     assert expanded.decision.outcome is ExpansionOutcome.APPROVED
@@ -442,16 +457,14 @@ def test_rejected_expansions_flow_into_usage_without_becoming_context(
     tmp_path: Path,
 ) -> None:
     plan = _plan()
-    packet = _packet(plan=plan)
     store = ExecutionStore(tmp_path)
     adapter = ManualExternalSessionAdapter(store)
     denied_contract = _read_contract(plan)
     denied_contract["may_read"] = []
+    packet = _prepare_for_expansion(adapter, plan, denied_contract).packet
     expanded = adapter.expand_context(
-        plan,
         packet,
         _request(packet),
-        employee_contract=denied_contract,
         repo_root=ROOT,
     )
     receipt = _receipt(packet, ledger=expanded.ledger, used=())
@@ -468,13 +481,11 @@ def test_helpful_approved_context_does_not_claim_initial_context_was_insufficien
     tmp_path: Path,
 ) -> None:
     plan = _plan()
-    packet = _packet(plan=plan)
     adapter = ManualExternalSessionAdapter(ExecutionStore(tmp_path))
+    packet = _prepare_for_expansion(adapter, plan, _read_contract(plan)).packet
     expanded = adapter.expand_context(
-        plan,
         packet,
         _request(packet, required_to_continue=False),
-        employee_contract=_read_contract(plan),
         repo_root=ROOT,
     )
     ingested = adapter.ingest(
@@ -506,17 +517,24 @@ def test_context_precision_is_absent_when_executor_does_not_report_usage(
 
 
 def test_request_decision_and_usage_round_trip_through_json(tmp_path: Path) -> None:
-    packet = _packet()
+    plan = _plan()
+    store = ExecutionStore(tmp_path)
+    adapter = ManualExternalSessionAdapter(store)
+    prepared = _prepare_for_expansion(adapter, plan, _read_contract(plan))
+    packet = prepared.packet
     request = _request(packet)
     decision = decide_context_expansion(
-        packet, request, _read_contract(), repo_root=ROOT
+        packet,
+        request,
+        prepared.authority.as_contract(),
+        repo_root=ROOT,
+        authority_fingerprint=prepared.authority.fingerprint(),
     )
     assert ContextExpansionRequest.from_mapping(json.loads(dumps(request))) == request
     assert (
         ContextExpansionDecision.from_mapping(json.loads(dumps(decision))) == decision
     )
 
-    store = ExecutionStore(tmp_path)
     store.append_context_expansion_request(request)
     store.append_context_expansion_decision(decision)
     assert store.context_expansion_requests(packet.task_id) == (request,)

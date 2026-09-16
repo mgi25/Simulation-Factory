@@ -87,6 +87,38 @@ def append_json_bytes(directory: Path, payload: bytes) -> Path:
         return path
 
 
+def create_json_bytes_at_sequence(
+    directory: Path, payload: bytes, sequence: int
+) -> Path:
+    """Create one exact sequenced record, refusing an existing slot.
+
+    Paired append-only histories use this to give two records the same attempt
+    identity without ever opening either record for overwrite.
+    """
+    if isinstance(sequence, bool) or not isinstance(sequence, int) or sequence < 1:
+        raise StateStoreError("record sequence must be a positive integer")
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / f"{sequence:06d}.json"
+    try:
+        descriptor = os.open(
+            path,
+            os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0),
+        )
+    except FileExistsError as exc:
+        raise StateStoreError(f"append-only record already exists: {path}") from exc
+    try:
+        offset = 0
+        while offset < len(payload):
+            written = os.write(descriptor, payload[offset:])
+            if written <= 0:
+                raise StateStoreError(f"short write while appending {path}")
+            offset += written
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+    return path
+
+
 def sequence_of(path: Path) -> int:
     match = RECORD_NAME.fullmatch(path.name)
     if match is None:

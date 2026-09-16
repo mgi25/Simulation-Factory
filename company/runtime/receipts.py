@@ -166,6 +166,8 @@ class SessionReceipt:
     task_id: str
     packet_fingerprint: str
     outcome: Outcome
+    packet_attempt: int = 0
+    authority_fingerprint: str = ""
     summary: str = ""
     branch: str = ""
     base_commit: str = ""
@@ -217,6 +219,7 @@ class SessionReceipt:
             "notes",
             "expansion_ledger_fingerprint",
             "effective_context_fingerprint",
+            "authority_fingerprint",
         ):
             if not isinstance(getattr(self, name), str):
                 issues.append(f"receipt.{name} must be a string")
@@ -229,7 +232,11 @@ class SessionReceipt:
             issues.append("receipt.working_tree_clean must be a boolean or null")
         if not isinstance(self.context_usage_reported, bool):
             issues.append("receipt.context_usage_reported must be a boolean")
-        for name in ("expansion_ledger_fingerprint", "effective_context_fingerprint"):
+        for name in (
+            "authority_fingerprint",
+            "expansion_ledger_fingerprint",
+            "effective_context_fingerprint",
+        ):
             value = getattr(self, name)
             if value and not _FINGERPRINT.fullmatch(value):
                 issues.append(
@@ -257,6 +264,12 @@ class SessionReceipt:
             issues.append("receipt.usage must be a ReceiptUsage value")
         if not isinstance(self.executor, ExecutorHint):
             issues.append("receipt.executor must be an ExecutorHint value")
+        if (
+            isinstance(self.packet_attempt, bool)
+            or not isinstance(self.packet_attempt, int)
+            or self.packet_attempt < 0
+        ):
+            issues.append("receipt.packet_attempt must be a non-negative integer")
         if (
             isinstance(self.subagents_used, bool)
             or not isinstance(self.subagents_used, int)
@@ -348,6 +361,8 @@ class SessionReceipt:
             task_id=_string(data, "task_id"),
             packet_fingerprint=_string(data, "packet_fingerprint"),
             outcome=parsed_outcome,
+            packet_attempt=_integer(data.get("packet_attempt", 0), "packet_attempt"),
+            authority_fingerprint=_optional_string(data, "authority_fingerprint"),
             summary=_optional_string(data, "summary"),
             branch=_optional_string(data, "branch"),
             base_commit=_optional_string(data, "base_commit"),
@@ -413,6 +428,8 @@ def validate_receipt(
     receipt: SessionReceipt,
     *,
     expansion_ledger: ContextExpansionLedger | None = None,
+    packet_attempt: int | None = None,
+    authority_fingerprint: str = "",
 ) -> ReceiptValidation:
     """Check one receipt against the packet it claims to answer.
 
@@ -432,6 +449,21 @@ def validate_receipt(
     if receipt.packet_fingerprint != expected_fingerprint:
         failures.append(
             f"receipt answers packet {receipt.packet_fingerprint}, not {expected_fingerprint}"
+        )
+    if packet_attempt is not None and receipt.packet_attempt != packet_attempt:
+        failures.append(
+            f"receipt packet attempt {receipt.packet_attempt} does not match attempt "
+            f"{packet_attempt}"
+        )
+    if authority_fingerprint:
+        if receipt.authority_fingerprint != authority_fingerprint:
+            failures.append(
+                "receipt authority fingerprint does not match the immutable authority "
+                "snapshot for this packet attempt"
+            )
+    elif receipt.authority_fingerprint:
+        failures.append(
+            "receipt references authority evidence that was not supplied for validation"
         )
 
     if receipt.subagents_used:
