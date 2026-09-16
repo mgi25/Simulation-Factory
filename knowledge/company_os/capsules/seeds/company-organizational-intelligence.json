@@ -9,7 +9,8 @@
   "decisions": [],
   "dependencies": [
     "company-workforce-capabilities",
-    "company-workforce-hiring"
+    "company-workforce-hiring",
+    "company-finance"
   ],
   "experiment_learnings": [],
   "facts": [
@@ -37,7 +38,8 @@
     "company/org_registry.yaml",
     "company/permissions.yaml",
     "company/workforce/*.py",
-    "ai_platform/usage.py"
+    "ai_platform/usage.py",
+    "company/finance/*.py"
   ],
   "may_write": [
     "company/org_intelligence/*.py"

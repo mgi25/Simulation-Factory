@@ -1,0 +1,81 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "cost_accounting",
+    "unit_economics",
+    "budget_governance",
+    "spend_proposal"
+  ],
+  "created": "2026-09-16",
+  "decisions": [],
+  "dependencies": [
+    "ai-platform",
+    "company-knowledge-store"
+  ],
+  "experiment_learnings": [],
+  "facts": [
+    "bootstrap-forbids-nested-agents"
+  ],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-finance",
+  "inputs": [
+    "CostRecord, RevenueRecord, CostRate, LabourRate, BudgetLine, ReusableInvestment, SpendProposal",
+    "ResourceUsageRecord and ResearchResourceRecord, read duck-typed for their measured quantities"
+  ],
+  "invariants": [
+    "Money is Decimal and carries its currency; a float is refused at construction and no code converts between currencies.",
+    "Every monetary record needs evidence: cost, revenue, rate, labour rate, budget and investment all refuse construction without it.",
+    "Revenue is never inferred; public, estimated and competitor evidence kinds are refused and SubjectKind has no competitor member.",
+    "Unknown stays unknown: an unpriced quantity, an unasserted cost set and a missing count all yield None plus a named gap, never zero.",
+    "Margin and net contribution are suppressed whenever any required input is missing (section 8).",
+    "Records are append-only; the store refuses a second write of one id with different bytes, and corrections supersede.",
+    "Finance never pays, subscribes or approves; recurring paid spend stays CEO-reserved per permissions.yaml and a human decides.",
+    "No profit, format, employee or company score exists; a test scans every dataclass for one."
+  ],
+  "last_reviewed": "2026-09-16",
+  "may_read": [
+    "company/permissions.yaml",
+    "ai_platform/usage.py",
+    "ai_platform/serde.py",
+    "knowledge/company_os/records.py"
+  ],
+  "may_write": [
+    "company/finance/*.py"
+  ],
+  "must_not_modify": [
+    "company/permissions.yaml",
+    "company/constitution.md",
+    "company/org_intelligence/*.py",
+    "company/workforce/*.py",
+    "company/runtime/*.py",
+    "intelligence/**",
+    "sloped/**",
+    "race2/**"
+  ],
+  "outputs": [
+    "DeliverableEconomics, FormatEconomics, ProfitabilitySummary, BudgetConsumption",
+    "BreakEvenResult labelled MEASURED or HYPOTHETICAL, SpendProposal, FinancialRecommendation"
+  ],
+  "owner": "workstream-finance",
+  "owns_paths": [
+    "company/finance"
+  ],
+  "purpose": "The deterministic financial evidence layer: what a video, format, experiment or reusable tool cost, what it earned, and which measurement is missing. It records and computes over recorded money. It does not forecast, does not estimate, and does not spend.",
+  "recheck_on": "2027-09-16",
+  "revalidation_reason": "",
+  "risks": [
+    "Costs, revenue and outcome counts are all supplied; a summary is only as complete as whoever asserted costs_are_complete.",
+    "Revenue credited to a competitor's video is caught only when the caller supplies external reference ids to check_integrity.",
+    "Reserved-action mapping reads permissions.yaml ceo_reserved; unreserved_action reports a rename, it cannot prevent one.",
+    "Both measuring subsystems are read duck-typed, so an upstream rename raises rather than silently yielding no mapping."
+  ],
+  "source": "company-os-v1-finance-foundation",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_finance.py"
+  ],
+  "title": "Financial evidence, unit economics and spend governance",
+  "type": "module"
+}
