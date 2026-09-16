@@ -81,6 +81,7 @@ from typing import Any, Sequence
 
 from sloped.scale import SIM_TO_LAYOUT
 
+from race2.readability import interest_group, interest_weights
 from race2.spine import Rail, Spine, camera_rail
 
 __all__ = [
@@ -95,6 +96,7 @@ __all__ = [
     "PACK_GAP",
     "PACK_MIN",
     "PACK_MAX",
+    "FRAME_HOLD_X",
 ]
 
 # --- the active pack ---------------------------------------------------------
@@ -121,6 +123,12 @@ FRAME_HEIGHT = 1920
 
 # The marble, in layout units, for the framing solve.
 MARBLE_RADIUS = 0.285
+
+# The steepest a shot may look down, in degrees. Past it a three-quarter view
+# has become the plan view the brief rules out, and V28 stopped at 44 for the
+# same reason. It binds where the rail has had to climb over a hairpin and the
+# framing solve has come in close at the same time.
+MAX_DEPRESSION = 45.0
 
 
 def horizontal_half_angle(fov_deg: float) -> float:
@@ -242,6 +250,80 @@ class Rig:
     follow: float = 0.24
     aim_follow: float = 0.20
     reach_follow: float = 0.50
+
+    # --- V31: race readability ----------------------------------------------
+    # Everything below defaults to the V28.1 behaviour exactly, so a rig that
+    # sets none of it builds the track it always built. `tests/test_race2_v31
+    # _readability.py` proves that byte for byte against the delivered camera A.
+    #
+    # How far off centre a member of the **race-interest group** may sit before
+    # the reach solve stands further back to hold it, as a fraction of the
+    # half-frame. Zero is off, and off is what camera A does: its solve frames
+    # the four-racer active pack and anything outside that is simply not the
+    # solve's problem. On the hero replay five to eight racers are inside the
+    # contest gap on 73% of frames, so "not the solve's problem" is most of the
+    # field most of the time.
+    #
+    # It is a **second stage** rather than a wider `target_width` on purpose:
+    # widening the target shrinks the racers on every frame, including the ones
+    # where the group is already together. This costs nothing until a real
+    # contender is about to leave the frame, and then it costs exactly as much
+    # reach as that racer needs.
+    contain: float = 0.0
+    # Where the framed group should sit vertically, as a fraction of the
+    # half-frame. Zero is off; negative puts the group below centre and
+    # positive above it.
+    #
+    # **This is the portrait frame's only cheap axis**: at these lenses the
+    # delivery frame is 19 to 21 degrees wide and 34 to 38 tall, so a fraction
+    # of the tall axis given up by the pack is 1.78 times as much new room for
+    # the course as the same fraction of the width.
+    #
+    # **And the sign is the course's, not the convention's.** A racing frame
+    # conventionally sits the subject low and gives the upper frame to the road
+    # ahead, which assumes the road runs away toward a horizon. The switchyard
+    # falls at 0.65 units of descent per unit of plan, and the track-visibility
+    # overlay says what that means: from a lens above and behind, **the course
+    # ahead is below the pack in frame, not above it.** The first build of this
+    # branch biased the group downward on that convention and pushed the coming
+    # path off the bottom edge - at the drum it cut the visible forward course
+    # from 7 units to 4. Positive is the sign this course wants.
+    frame_bias: float = 0.0
+    # How far a framed racer may be pushed by the bias, below and above. The
+    # guard that stops "group low" becoming "group in the bottom edge", and
+    # "group high" becoming the same thing at the top.
+    frame_floor: float = -0.74
+    frame_ceiling: float = 0.74
+    # Look-ahead arc added per degree-per-unit of local curvature. The course's
+    # own turn rate, so a hairpin reaches further ahead than a straight without
+    # a fixed number having to be right for both - the brief's "do not blindly
+    # use one fixed number everywhere".
+    lead_curve: float = 0.0
+    # And the ceiling on it, in layout units, so a hairpin cannot ask the lens
+    # to look at the far side of the course.
+    lead_max: float = 26.0
+    # How far off centre a framed racer may be pushed by the look-ahead blend.
+    # `FRAME_HOLD_X` unless a rig says otherwise; a path-aware shot may spend
+    # more of the frame on the course and accept the racers sitting wider.
+    look_hold: float = 0.0
+    # Extra reach and lift on a bend, per degree-per-unit of curvature, so the
+    # lens stands back and up a little where the course turns and nowhere else.
+    curve_reach: float = 0.0
+    curve_lift: float = 0.0
+    # Over how much arc ahead the curvature these three read is measured.
+    curve_window: float = 9.0
+    # The band the shot's depression angle is clamped into, in degrees. The
+    # default is V28.1's: no floor, and the global `MAX_DEPRESSION` ceiling.
+    #
+    # **This exists because reach and height are the same dial and nothing said
+    # so.** `_riser` encodes the rail's answer as a *ratio* - height over the
+    # rig's nominal reach - so shortening the nominal reach to bring the lens
+    # closer silently steepens the shot: every trial in this branch that
+    # reduced `reach` to hold racer size at a wider lens arrived at the 45
+    # degree cap, which is the plan view the brief rules out, and the group
+    # visibility fell from 79% to 35% on the way. Naming the angle lets a rig
+    # ask for a three-quarter view and get one at any reach.
+    depression_span: tuple[float, float] = (0.0, MAX_DEPRESSION)
     note: str = ""
 
     def with_(self, **changes) -> "Rig":
@@ -368,7 +450,17 @@ class PackTrack:
     below are computed here and nowhere else.
     """
 
-    def __init__(self, replay: dict[str, Any], spine: Spine, outcome) -> None:
+    def __init__(self, replay: dict[str, Any], spine: Spine, outcome,
+                 group: str = "pack") -> None:
+        # Which rule decides who the camera is attached to. `"pack"` is V28.1's
+        # `active_pack` and is the default, so a `PackTrack` built the way the
+        # V28.1 tool builds one is the same object it always was. `"interest"`
+        # is the race-interest group of `race2.readability`, and it changes
+        # three things and nothing else: who `framed()` returns, where the
+        # anchor is, and how the anchor is weighted.
+        if group not in ("pack", "interest"):
+            raise ValueError(f"unknown group rule: {group}")
+        self.group_rule = group
         self.spine = spine
         self.fps = float(replay.get("replay_fps", 60))
         frames = replay["frames"]
@@ -402,8 +494,13 @@ class PackTrack:
                 hints[marble] = value
             self.arcs.append(here)
 
-        # And the derived per-frame answers.
+        # And the derived per-frame answers. `groups` is always the
+        # race-interest group - it is what the readability instrument reports
+        # and what a rig's `contain` stage holds on screen - while `packs` is
+        # whichever rule this track was built with, because that is the set the
+        # framing solve and the trail are computed from.
         self.packs: list[list[int]] = []
+        self.groups: list[list[int]] = []
         self.anchors: list[tuple[float, float, float]] = []
         self.pack_arcs: list[float] = []
         self.extents: list[float] = []
@@ -413,17 +510,33 @@ class PackTrack:
             order = self.order_at(self.times[index])
             ranked = [m for m in order if m in arcs]
             within = [m for m in ranked if (arcs[ranked[0]] - arcs[m]) <= PACK_GAP] if ranked else []
-            pack = active_pack(order, arcs)
+            interest = interest_group(order, arcs)
+            self.groups.append(interest)
+            pack = interest if group == "interest" else active_pack(order, arcs)
             if len(within) < PACK_MIN:
                 self.floor_bound += 1
             if len(within) > PACK_MAX:
                 self.cap_bound += 1
             self.packs.append(pack)
             points = [row[m] for m in pack] or list(row.values())[:1]
-            self.anchors.append(tuple(
-                sum(p[axis] for p in points) / len(points) for axis in range(3)
-            ))
-            self.pack_arcs.append(sum(arcs[m] for m in pack) / max(len(pack), 1))
+            if group == "interest" and pack:
+                # The weighted centroid: a lone leader still pulls the frame,
+                # and the tail of a long group pulls it less than the head.
+                # See `race2.readability.interest_weights`.
+                weights = interest_weights(pack, arcs)
+                total = sum(weights.get(m, 1.0) for m in pack) or 1.0
+                self.anchors.append(tuple(
+                    sum(row[m][axis] * weights.get(m, 1.0) for m in pack) / total
+                    for axis in range(3)
+                ))
+                self.pack_arcs.append(
+                    sum(arcs[m] * weights.get(m, 1.0) for m in pack) / total
+                )
+            else:
+                self.anchors.append(tuple(
+                    sum(p[axis] for p in points) / len(points) for axis in range(3)
+                ))
+                self.pack_arcs.append(sum(arcs[m] for m in pack) / max(len(pack), 1))
             self.extents.append(
                 max((math.dist(a, b) for i, a in enumerate(points) for b in points[i + 1:]),
                     default=2.0 * MARBLE_RADIUS)
@@ -489,6 +602,17 @@ class PackTrack:
         row = self.places[index]
         return [row[m] for m in self.framed_ids(index, count)]
 
+    def contest(self, index: int) -> list[tuple[float, float, float]]:
+        """The race-interest group's world positions at a frame.
+
+        What a rig's `contain` stage holds on screen. Always the interest
+        group, whichever rule this track frames with, so a candidate that
+        frames the four-racer pack can still be charged for losing a fifth
+        racer who is genuinely in the contest.
+        """
+        row = self.places[index]
+        return [row[m] for m in self.groups[index] if m in row]
+
     def order_at(self, seconds: float) -> tuple[int, ...]:
         if not self._rank_times:
             return tuple(sorted(self.places[self.frame_at(seconds)]))
@@ -497,7 +621,11 @@ class PackTrack:
 
     def describe(self) -> dict[str, Any]:
         sizes = [len(p) for p in self.packs]
+        contest = [len(g) for g in self.groups]
         return {
+            "rule": self.group_rule,
+            "mean_interest": round(sum(contest) / len(contest), 3),
+            "interest_range": [min(contest), max(contest)],
             "frames": len(self.times),
             "mean_pack": round(sum(sizes) / len(sizes), 3),
             "pack_range": [min(sizes), max(sizes)],
@@ -606,12 +734,6 @@ FRAME_HOLD_Y = 0.80
 # racer is in front of the camera rather than beside it.
 TRAIL_MARGIN = 3.0
 
-# The steepest a shot may look down, in degrees. Past it a three-quarter view
-# has become the plan view the brief rules out, and V28 stopped at 44 for the
-# same reason. It binds where the rail has had to climb over a hairpin and the
-# framing solve has come in close at the same time.
-MAX_DEPRESSION = 45.0
-
 
 def _unit(v: Sequence[float]) -> tuple[float, float, float]:
     span = math.sqrt(sum(float(c) * float(c) for c in v)) or 1.0
@@ -711,7 +833,136 @@ def _solve_reach(spine, s_cam, azimuth, height_for, anchor, points, fov,
     return high
 
 
-def _hold_aim(anchor, ahead, look_ahead, position, points, fov):
+def _outside(screen, limit: float) -> float:
+    """The furthest any projected point is outside `limit`, both axes at once.
+
+    Unlike `_worst` this does not rescale the vertical against
+    `FRAME_HOLD_X/FRAME_HOLD_Y`: containment asks whether a racer is *in the
+    picture*, and the picture is as tall as it is.
+    """
+    if not screen:
+        return 0.0
+    return max(max(abs(x), abs(y)) for x, y in screen) - limit
+
+
+def _contain_reach(spine, s_cam, azimuth, height_for, anchor, contest, fov,
+                   limit: float, start: float, hi: float) -> float:
+    """The least reach at or past `start` that keeps `contest` inside `limit`.
+
+    The second stage of the framing solve, and the one that answers the brief's
+    Part A. Stage one sizes the reach so the *core* group spans the rig's
+    `target_width`; this one asks whether anybody else in the race-interest
+    group has been left outside the frame by that answer, and if so stands far
+    enough back to hold them.
+
+    It only ever moves the lens **outward** and it is capped by the rig's own
+    `reach_span`, so it cannot make a shot tighter than stage one chose and it
+    cannot make one wider than the rig allows. On a frame where the contest is
+    already inside `limit` it returns `start` unchanged and costs one
+    projection.
+    """
+    if limit <= 0.0 or not contest:
+        return start
+
+    def outside_at(reach: float) -> float:
+        position = spine.offset(s_cam, azimuth, height_for(reach), reach)
+        return _outside(_screen(contest, position, anchor, fov), limit)
+
+    if outside_at(start) <= 0.0:
+        return start
+    if outside_at(hi) > 0.0:
+        return hi
+    low, high = start, hi
+    for _ in range(7):
+        mid = 0.5 * (low + high)
+        if outside_at(mid) > 0.0:
+            low = mid
+        else:
+            high = mid
+    return high
+
+
+def _bias_aim(aim, position, points, fov, bias: float, floor: float,
+              ceiling: float = 0.74):
+    """Slide the aim along the lens's own up-axis to place the group in frame.
+
+    The brief's Part F. Moving the *aim point* rather than the lens is what
+    keeps this a composition change and not a camera move: the lens does not go
+    anywhere, and the shot is the same shot from the same place with the
+    subject sitting somewhere else in the frame.
+
+    Two guards. The shift is sized from the group's own mean depth, so it is
+    the same number of frame-heights whether the lens is nine units out or
+    eighteen; and it is bisected back if it would carry a framed racer past
+    `floor` or `ceiling`, which is what stops a composition bias becoming a
+    racer in the edge of the picture.
+    """
+    if bias == 0.0 or not points:
+        return aim
+    forward, _right, up = _basis(position, aim)
+    half_up = math.tan(math.radians(fov) * 0.5)
+    depths = [
+        max(sum((point[axis] - position[axis]) * forward[axis] for axis in range(3)), 1e-3)
+        for point in points
+    ]
+    depth = sum(depths) / len(depths)
+    screen = _screen(points, position, aim, fov)
+    here = [y for _x, y in screen if abs(y) < 8.0]
+    if not here:
+        return aim
+    centre = sum(here) / len(here)
+    # A positive shift raises the aim point, which moves the subject **down**
+    # the frame; a negative one does the reverse. One formula covers both.
+    shift = (centre - bias) * depth * half_up
+    if abs(shift) <= 1e-6:
+        return aim
+
+    def aim_at(factor: float):
+        return tuple(aim[axis] + up[axis] * shift * factor for axis in range(3))
+
+    def held(factor: float) -> bool:
+        ys = [y for _x, y in _screen(points, position, aim_at(factor), fov)
+              if abs(y) < 8.0]
+        return bool(ys) and min(ys) >= floor and max(ys) <= ceiling
+
+    if held(1.0):
+        return aim_at(1.0)
+    low, high = 0.0, 1.0
+    for _ in range(5):
+        mid = 0.5 * (low + high)
+        if held(mid):
+            low = mid
+        else:
+            high = mid
+    return aim_at(low)
+
+
+def _lead_for(rig: "Rig", spine, s_pack: float) -> float:
+    """How far ahead the look-ahead point sits, given what the course is doing.
+
+    The rig's authored `lead` on a straight, reaching further as the course
+    turns. A fixed number cannot serve both: twelve units is most of a
+    switchyard straight and barely into a hairpin, and the brief is explicit
+    that the look-ahead distance should vary with curvature rather than be one
+    value everywhere.
+    """
+    if rig.lead_curve <= 0.0:
+        return rig.lead
+    turn = spine.curvature_at(min(s_pack + rig.curve_window, spine.length),
+                              window=rig.curve_window)
+    return min(rig.lead + rig.lead_curve * turn, rig.lead_max)
+
+
+def _curve_at(rig: "Rig", spine, s_pack: float) -> float:
+    """Local turn rate in degrees per layout unit, as the bend terms read it."""
+    if rig.curve_reach <= 0.0 and rig.curve_lift <= 0.0:
+        return 0.0
+    return spine.curvature_at(min(s_pack + rig.curve_window, spine.length),
+                              window=rig.curve_window)
+
+
+def _hold_aim(anchor, ahead, look_ahead, position, points, fov,
+              hold: float = FRAME_HOLD_X):
     """Blend the aim toward the course ahead, but never out of the racers.
 
     The brief's rule is that camera *position* follows the racers while camera
@@ -739,12 +990,12 @@ def _hold_aim(anchor, ahead, look_ahead, position, points, fov):
             anchor[axis] * (1.0 - blend) + ahead[axis] * blend for axis in range(3)
         )
 
-    if _worst(_screen(points, position, aim_at(look_ahead), fov)) <= FRAME_HOLD_X:
+    if _worst(_screen(points, position, aim_at(look_ahead), fov)) <= hold:
         return aim_at(look_ahead)
     low, high = 0.0, look_ahead
     for _ in range(6):
         mid = 0.5 * (low + high)
-        if _worst(_screen(points, position, aim_at(mid), fov)) <= FRAME_HOLD_X:
+        if _worst(_screen(points, position, aim_at(mid), fov)) <= hold:
             low = mid
         else:
             high = mid
@@ -794,11 +1045,18 @@ def build_track(
         # so a shot opens exactly where it was authored and settles from there.
         index = pack.frame_at(times[0])
         s_seed = max(pack.pack_arcs[index] - _trail(rig, pack, index), 0.0)
+        bend = _curve_at(rig, spine, pack.pack_arcs[index])
         azimuth, height = _pose(rail, spine, rig, s_seed, times[0], shot.start,
-                                pack.pack_arcs[index])
+                                pack.pack_arcs[index], bend)
+        seed_rise = _riser(height, rig.reach, rig.depression_span)
         seed_reach = _solve_reach(
-            spine, s_seed, azimuth, _riser(height, rig.reach), pack.anchors[index],
-            pack.framed(index, rig.frame_count), rig.fov, rig.target_width, lo, hi,
+            spine, s_seed, azimuth, seed_rise, pack.anchors[index],
+            pack.framed(index, rig.frame_count), rig.fov, rig.target_width,
+            lo, min(hi, _bend_ceiling(rig, bend, hi)),
+        )
+        seed_reach = _contain_reach(
+            spine, s_seed, azimuth, seed_rise, pack.anchors[index],
+            pack.contest(index), rig.fov, rig.contain, seed_reach, hi,
         )
         arc_spring = Spring(s_seed, rig.follow)
         reach_spring = Spring(seed_reach, rig.reach_follow)
@@ -815,14 +1073,23 @@ def build_track(
         # anchor makes the first frame of every shot look somewhere the rest of
         # the shot never looks, which the cut metric reads - correctly - as the
         # pack jumping most of a frame width at the cut.
+        seed_position = spine.offset(s_seed, azimuth, height, reach_spring.value)
+        seed_framed = pack.framed(index, rig.frame_count)
         aim_spring = VectorSpring(
-            _hold_aim(
-                pack.anchors[index],
-                spine.point_at(min(pack.pack_arcs[index] + rig.lead, spine.length)),
-                rig.look_ahead,
-                spine.offset(s_seed, azimuth, height, reach_spring.value),
-                pack.framed(index, rig.frame_count),
-                rig.fov,
+            _bias_aim(
+                _hold_aim(
+                    pack.anchors[index],
+                    spine.point_at(min(
+                        pack.pack_arcs[index] + _lead_for(rig, spine, pack.pack_arcs[index]),
+                        spine.length)),
+                    rig.look_ahead,
+                    seed_position,
+                    seed_framed,
+                    rig.fov,
+                    rig.look_hold or FRAME_HOLD_X,
+                ),
+                seed_position, seed_framed, rig.fov, rig.frame_bias,
+                rig.frame_floor, rig.frame_ceiling,
             ),
             rig.aim_follow,
         )
@@ -838,11 +1105,17 @@ def build_track(
             s_cam = arc_spring.step(
                 max(s_pack - _trail(rig, pack, index), 0.0), dt, arc_rate
             )
-            azimuth, height = _pose(rail, spine, rig, s_cam, when, shot.start, s_pack)
+            bend = _curve_at(rig, spine, s_pack)
+            azimuth, height = _pose(rail, spine, rig, s_cam, when, shot.start,
+                                    s_pack, bend)
             height = height_spring.step(height, dt)
-            rise = _riser(height, rig.reach)
+            rise = _riser(height, rig.reach, rig.depression_span)
             solved = _solve_reach(spine, s_cam, azimuth, rise, anchor, framed,
-                                  rig.fov, rig.target_width, lo, hi)
+                                  rig.fov, rig.target_width, lo,
+                                  min(hi, _bend_ceiling(rig, bend, hi)))
+            solved = _contain_reach(spine, s_cam, azimuth, rise, anchor,
+                                    pack.contest(index), rig.fov, rig.contain,
+                                    solved, hi)
             if rig.reach_hold and rig.azimuth_hold is not None:
                 solved = _mix(seed_reach, solved, _blend(rig, when, shot.start))
             reach = reach_spring.step(solved, dt)
@@ -855,8 +1128,12 @@ def build_track(
             ) - rig.target_width) / max(rig.target_width, 0.05)))
             fov = fov_spring.step(rig.fov + rig.breath * spread, dt)
 
-            ahead = spine.point_at(min(s_pack + rig.lead, spine.length))
-            target = _hold_aim(anchor, ahead, rig.look_ahead, position, framed, fov)
+            ahead = spine.point_at(
+                min(s_pack + _lead_for(rig, spine, s_pack), spine.length))
+            target = _hold_aim(anchor, ahead, rig.look_ahead, position, framed,
+                               fov, rig.look_hold or FRAME_HOLD_X)
+            target = _bias_aim(target, position, framed, fov, rig.frame_bias,
+                               rig.frame_floor, rig.frame_ceiling)
             aim = aim_spring.step(target, dt, anchor_rate)
 
             rows.append([
@@ -888,16 +1165,20 @@ def build_track(
     }
 
 
-def _riser(height: float, nominal: float):
+def _riser(height: float, nominal: float,
+           span: tuple[float, float] = (0.0, MAX_DEPRESSION)):
     """The height a lens stands at, as a function of how far out it is.
 
     The rail solves a height at its own nominal reach; what that pair really
     encodes is an **angle**, and the flown reach is often twice the nominal
     because the framing solve has pulled back to hold the group. So the height
     travels with it, and the depression the rail chose is the depression the
-    shot gets.
+    shot gets - clamped into `span`, which is how a rig holds a three-quarter
+    view while its reach changes underneath it.
     """
-    scale = min(height / max(nominal, 1e-6), math.tan(math.radians(MAX_DEPRESSION)))
+    low = math.tan(math.radians(max(span[0], 0.0)))
+    high = math.tan(math.radians(min(span[1], MAX_DEPRESSION)))
+    scale = min(max(height / max(nominal, 1e-6), low), high)
 
     def at(reach: float) -> float:
         return scale * reach
@@ -925,8 +1206,23 @@ def _trail(rig: Rig, pack: PackTrack, index: int) -> float:
     return max(rig.trail, pack.rear(index, rig.frame_count) + TRAIL_MARGIN)
 
 
+def _bend_ceiling(rig: Rig, bend: float, hi: float) -> float:
+    """The reach ceiling, raised a little where the course turns.
+
+    The brief's Part D: tighter where the pack is together and the path is
+    simple, a modest step back where the geometry ahead matters. Expressed as a
+    ceiling rather than as a target so it can never pull the lens *out* on a
+    frame the framing solve was happy with - it only widens the range the solve
+    is allowed to use.
+    """
+    if rig.curve_reach <= 0.0:
+        return hi
+    return hi + rig.curve_reach * bend * rig.reach
+
+
 def _pose(rail: Rail, spine: Spine, rig: Rig, s_cam: float, when: float,
-          started: float, s_pack: float = 0.0) -> tuple[float, float]:
+          started: float, s_pack: float = 0.0,
+          bend: float = 0.0) -> tuple[float, float]:
     """The lens's world azimuth and height above the channel at one instant.
 
     The rail's, unless the rig holds its own azimuth for the opening of its
@@ -943,7 +1239,7 @@ def _pose(rail: Rail, spine: Spine, rig: Rig, s_cam: float, when: float,
         while azimuth - base < -180.0:
             azimuth += 360.0
         azimuth = _mix(base, azimuth, blend)
-    lift = rig.lift
+    lift = rig.lift + rig.curve_lift * bend
     if rig.lift_after_line > 0.0:
         # How far past the line the pack is, as a fraction of the rise. The
         # spine's tail is 8 units and the rise is quoted in seconds, so it is

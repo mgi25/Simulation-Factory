@@ -1,0 +1,256 @@
+{
+ "camera": "RA",
+ "frames": 575,
+ "stride": 2,
+ "seconds": 19.133,
+ "size": [
+  1080,
+  1920
+ ],
+ "group": {
+  "mean_size": 4.677,
+  "size_range": [
+   3,
+   6
+  ],
+  "visible_pct": 84.91,
+  "all_visible_pct": 56.35,
+  "screen_width_mean": 0.4494,
+  "screen_width_max": 1.0436,
+  "screen_y_mean": -0.0107,
+  "screen_y_range": [
+   -0.417,
+   0.365
+  ],
+  "worst_visibility": [
+   {
+    "from": 14.05,
+    "to": 14.617,
+    "value": 0.412
+   },
+   {
+    "from": 5.1,
+    "to": 5.667,
+    "value": 0.439
+   },
+   {
+    "from": 7.867,
+    "to": 8.433,
+    "value": 0.537
+   }
+  ]
+ },
+ "racers": {
+  "0": {
+   "racing_s": 17.9,
+   "visible_pct": 25.51,
+   "on_screen_pct": 26.82,
+   "longest_gap_s": 7.867,
+   "gaps_over_0s5": 3,
+   "in_contest_s": 4.7,
+   "contest_visible_pct": 95.04,
+   "worst_contest_gap_s": 0.1
+  },
+  "1": {
+   "racing_s": 16.333,
+   "visible_pct": 91.63,
+   "on_screen_pct": 95.92,
+   "longest_gap_s": 0.267,
+   "gaps_over_0s5": 0,
+   "in_contest_s": 16.1,
+   "contest_visible_pct": 91.51,
+   "worst_contest_gap_s": 0.267
+  },
+  "2": {
+   "racing_s": 16.067,
+   "visible_pct": 89.42,
+   "on_screen_pct": 91.91,
+   "longest_gap_s": 0.667,
+   "gaps_over_0s5": 2,
+   "in_contest_s": 15.067,
+   "contest_visible_pct": 89.16,
+   "worst_contest_gap_s": 0.567
+  },
+  "3": {
+   "racing_s": 17.367,
+   "visible_pct": 23.22,
+   "on_screen_pct": 24.57,
+   "longest_gap_s": 6.683,
+   "gaps_over_0s5": 2,
+   "in_contest_s": 3.1,
+   "contest_visible_pct": 79.57,
+   "worst_contest_gap_s": 0.2
+  },
+  "4": {
+   "racing_s": 18.933,
+   "visible_pct": 38.38,
+   "on_screen_pct": 39.26,
+   "longest_gap_s": 7.566,
+   "gaps_over_0s5": 5,
+   "in_contest_s": 7.5,
+   "contest_visible_pct": 81.78,
+   "worst_contest_gap_s": 0.367
+  },
+  "5": {
+   "racing_s": 16.767,
+   "visible_pct": 48.91,
+   "on_screen_pct": 48.91,
+   "longest_gap_s": 2.5,
+   "gaps_over_0s5": 5,
+   "in_contest_s": 5.533,
+   "contest_visible_pct": 76.51,
+   "worst_contest_gap_s": 0.534
+  },
+  "6": {
+   "racing_s": 18.0,
+   "visible_pct": 45.0,
+   "on_screen_pct": 46.67,
+   "longest_gap_s": 6.3,
+   "gaps_over_0s5": 4,
+   "in_contest_s": 7.9,
+   "contest_visible_pct": 77.64,
+   "worst_contest_gap_s": 0.3
+  },
+  "7": {
+   "racing_s": 16.0,
+   "visible_pct": 86.88,
+   "on_screen_pct": 89.38,
+   "longest_gap_s": 0.733,
+   "gaps_over_0s5": 1,
+   "in_contest_s": 15.167,
+   "contest_visible_pct": 87.03,
+   "worst_contest_gap_s": 0.733
+  }
+ },
+ "racer_visible_pct_min": 23.22,
+ "racer_longest_gap_s": 7.867,
+ "track": {
+  "forward_arc_mean": 4.739,
+  "forward_arc_p10": 2.0,
+  "forward_arc_min": 0.0,
+  "forward_s_mean": 0.579,
+  "forward_s_p10": 0.138,
+  "seen_arc_mean": 5.84,
+  "depression_mean": 38.65,
+  "depression_range": [
+   27.14,
+   59.47
+  ],
+  "short_path_pct": 77.04,
+  "short_path_intervals": [
+   [
+    0.017,
+    0.383
+   ],
+   [
+    0.55,
+    2.333
+   ],
+   [
+    4.733,
+    6.267
+   ],
+   [
+    7.7,
+    9.883
+   ],
+   [
+    10.85,
+    12.75
+   ],
+   [
+    12.85,
+    13.45
+   ],
+   [
+    13.583,
+    19.117
+   ]
+  ],
+  "worst_forward": [
+   {
+    "from": 18.417,
+    "to": 18.983,
+    "value": 0.0
+   },
+   {
+    "from": 0.85,
+    "to": 1.417,
+    "value": 0.186
+   },
+   {
+    "from": 17.583,
+    "to": 18.15,
+    "value": 0.192
+   }
+  ]
+ },
+ "turns": {
+  "turning_frames": 450,
+  "turn_read_mean": 0.178,
+  "turn_run_mean": 0.175,
+  "blind_turn_pct": 84.67,
+  "blind_intervals": [
+   [
+    0.017,
+    1.417
+   ],
+   [
+    1.983,
+    5.433
+   ],
+   [
+    5.733,
+    8.2
+   ],
+   [
+    8.733,
+    11.817
+   ],
+   [
+    12.317,
+    14.417
+   ]
+  ]
+ },
+ "mechanism": {
+  "span_mean": 0.4865,
+  "span_max": 2.0365,
+  "dominant_pct": 45.57,
+  "dominant_intervals": []
+ },
+ "per_shot": {
+  "release": {
+   "seconds": 2.233,
+   "group_visible_pct": 95.77,
+   "forward_s_mean": 0.442,
+   "screen_width_mean": 0.3856,
+   "screen_y_mean": 0.0081,
+   "short_path_pct": 92.54
+  },
+  "upper": {
+   "seconds": 6.8,
+   "group_visible_pct": 82.98,
+   "forward_s_mean": 0.783,
+   "screen_width_mean": 0.4177,
+   "screen_y_mean": -0.0299,
+   "short_path_pct": 56.86
+  },
+  "middle": {
+   "seconds": 3.667,
+   "group_visible_pct": 79.45,
+   "forward_s_mean": 0.657,
+   "screen_width_mean": 0.4973,
+   "screen_y_mean": -0.0119,
+   "short_path_pct": 75.45
+  },
+  "run_in": {
+   "seconds": 6.467,
+   "group_visible_pct": 86.28,
+   "forward_s_mean": 0.367,
+   "screen_width_mean": 0.4451,
+   "screen_y_mean": 0.0036,
+   "short_path_pct": 93.81
+  }
+ }
+}

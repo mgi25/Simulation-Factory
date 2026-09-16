@@ -291,3 +291,195 @@ def plan_c(marks: dict[str, Any], fps: int = 60) -> Plan:
 
 
 CANDIDATES = {"A": plan_a, "B": plan_b, "C": plan_c}
+
+
+# --- V31: the readability variants -------------------------------------------
+
+"""Three framing variants over camera A's own schedule.
+
+They are not new cameras. Each is camera A's four shots, on camera A's four
+markers, with the same rig on each - `hook_release`, `chase_rear_3q` twice,
+`finish_chase` - and a dict of parameter changes. `race2.rig` builds all four
+from the same code path, so what separates them is a table of numbers that can
+be read in one screen.
+
+## What the measurements said before any of this was authored
+
+On the hero replay, camera A delivers **3.9 layout units of visible course
+ahead of the pack** - a third of a second at racing speed - and **15% of the
+coming turn on screen** where the course is turning. Both were measured by
+`race2.readability` against the delivered track, and the cause is not what the
+brief assumed:
+
+- The forward centreline is **never occluded**. Over the whole film the course
+  never stands between the lens and the path ahead. A track-contrast change
+  could not have helped, and none is made.
+- It leaves **sideways**, at screen x of 1.07 to 1.12, within four to eight
+  units. The delivery frame is portrait: at camera A's 34-degree lens it is
+  **19.5 degrees wide** and 34 tall.
+- And the switchyard is a **hairpin every 32 units**, turning 180 degrees over
+  a 16-unit pan at 7 to 12 degrees per unit, with no straight longer than 16
+  units anywhere on the course. Measured at 7.0 s: the coming hairpin projects
+  at screen x **+1.7 to +3.0** - one and a half to three half-frames outside
+  the picture - while the frame spends its width on the leg already run.
+
+So the lever is the **horizontal field**, and the three variants differ mostly
+in how much of it they buy and what they spend it on. Every other change that
+was tried made the picture worse and the numbers say so:
+
+    a longer trail          align 0.23 -> 0.45, but group visibility 79% -> 35%
+    a shorter nominal reach depression to the 45-degree cap: the plan view
+    a lower reach floor     forward path 6.1 -> 4.8 u and clearance 5.5 -> 3.2
+    a vertical pack bias    falsified in **both** directions - see below
+    a relaxed look-ahead    +0.10 u of course for +0.10 of reacquisition and
+    hold                    six points of "all of the group on screen"
+
+## The vertical bias, falsified both ways
+
+The brief's Part F asks for the pack to sit below centre so that more upcoming
+track is visible above it. That is the right principle and the wrong sign here,
+and then the right sign does not pay either.
+
+The switchyard descends at 0.65 units per unit of plan. From a lens above and
+behind, **the course ahead is below the pack in frame, not above it** - the
+track-visibility overlay in `docs/validation/race2/v31_readability` shows the
+forward centreline running down and out of the bottom of the picture. Biasing
+the group downward pushes the coming path off that edge: at the drum it took
+the visible forward course from 7 units to 4.
+
+Biasing it *upward* does what the geometry says it should - the visible course
+ahead goes from 4.88 to 4.98 units and the total from 6.05 to 6.47 - and costs
+more than it is worth, because the bottom of the frame is also where the
+racers off the back of the group are. At a bias of +0.12 the longest any racer
+spends off screen goes from **7.97 s to 13.35 s**: on a descending course the
+coming path and the trailing racers are competing for the same edge of the
+picture, and the racers win. Every variant here therefore ships at zero.
+"""
+
+# The depression band every readability variant holds. The rail's own answer is
+# a ratio against the *nominal* reach, so any rig that changes its reach moves
+# its depression without saying so; naming the band is what lets these shots
+# widen the lens and keep the racing three-quarter view the brief locks.
+V31_DEPRESSION = (31.0, 38.0)
+
+# The opening, shared by all three variants so the comparison is about the
+# chase and not about the hook.
+#
+# **It is a cut-continuity fix and the instrument named it.** Moving to the
+# race-interest group costs reacquisition at exactly one join - `release` into
+# `upper`, where the field is still one bunch and the interest group is at its
+# widest six - and the measured cause is a lens-angle step of 11 degrees, which
+# is the look-ahead blend changing across the cut. Matching the opening's
+# look-ahead to the chase's and tightening its target to 0.73 of frame width
+# takes the worst pack jump from **0.459 back to 0.284**, against camera A's
+# 0.285, for seven pixels of racer in the opening take. The eight racers are
+# still 86 pixels on the delivery frame and 21 on the phone.
+V31_HOOK = {"look_ahead": 0.42, "lead": 10.0, "target_width": 0.73}
+
+
+def _v31(name: str, marks: dict[str, Any], hook: dict, chase: dict, run_in: dict,
+         note: str, fps: int = 60) -> Plan:
+    """Camera A's schedule, with one parameter dict per rig family."""
+    return _assemble(
+        name,
+        marks,
+        [
+            ("release", "hook_release", dict(hook),
+             "eight racers large and the floor going, the lens already travelling",
+             ("drum", "first")),
+            ("upper", "chase_rear_3q", dict(chase),
+             "one take from the drum to the pair: two mechanisms and two hairpins "
+             "revealed by the camera turning rather than by cutting to them",
+             ("pair", "first")),
+            ("middle", "chase_rear_3q", dict(chase, trail=9.5, lead=13.0),
+             "the pair's consequence and the fourth hairpin, still travelling",
+             ("last", "first")),
+            ("run_in", "finish_chase", dict(run_in),
+             "the last wheel, the comeback and the line, uncut",
+             None),
+        ],
+        note=note,
+        fps=fps,
+    )
+
+
+def plan_ra(marks: dict[str, Any], fps: int = 60) -> Plan:
+    """A - pack priority. The battle framed wider; the path left to itself.
+
+    The race-interest group and the `contain` stage, four degrees of lens, and
+    nothing aimed at the course at all: the look-ahead is camera A's own 0.30
+    on camera A's own 0.70 hold. Its job is to separate the brief's Part A from
+    its Part B, so that whatever B and C gain on the course is charged against
+    this rather than against camera A.
+    """
+    chase = {
+        "fov": 38.0, "depression_span": V31_DEPRESSION,
+        "contain": 0.88, "target_width": 0.42,
+    }
+    return _v31(
+        "RA", marks,
+        hook=dict(V31_HOOK),
+        chase=chase,
+        run_in={},
+        note="pack priority: the race-interest group, held in frame, and little else",
+        fps=fps,
+    )
+
+
+def plan_rb(marks: dict[str, Any], fps: int = 60) -> Plan:
+    """B - pack and path. The interest group, plus a lens that can see the bend.
+
+    Everything A does, at 42 degrees - 24 wide against camera A's 19.5 - with
+    the look-ahead blend raised to 0.42 and its **distance scaled by the
+    course's own curvature**, so a hairpin reaches further ahead than a
+    straight. The hold stays at camera A's 0.70: see the note on C for what
+    relaxing it costs and buys.
+    """
+    chase = {
+        "fov": 42.0, "depression_span": V31_DEPRESSION,
+        "contain": 0.88, "target_width": 0.42,
+        "look_ahead": 0.42, "lead": 12.0, "lead_curve": 0.9, "lead_max": 22.0,
+    }
+    return _v31(
+        "RB", marks,
+        hook=dict(V31_HOOK),
+        chase=chase,
+        run_in={},
+        note="pack and path: the interest group plus the horizontal field to see the bend",
+        fps=fps,
+    )
+
+
+def plan_rc(marks: dict[str, Any], fps: int = 60) -> Plan:
+    """C - path-aware chase. As much future course as the racers will allow.
+
+    B's shape with every path term pushed past where the measurements stop
+    paying: 48 degrees, a look-ahead that may carry a racer to 0.86 of the
+    half-frame, and the two bend terms - a little more reach and a little more
+    height where the course turns, and nowhere else.
+
+    It is the variant that finds the edge, and it does: the picture gains
+    another third of a unit of visible course and loses nine pixels of racer,
+    seven points of "every member of the group on screen", and a third of the
+    lens clearance the rail proved. Reported rather than tuned away, because a
+    candidate that shows where the trade turns over is worth more than a third
+    good one.
+    """
+    chase = {
+        "fov": 48.0, "depression_span": V31_DEPRESSION,
+        "contain": 0.90, "target_width": 0.44,
+        "look_ahead": 0.55, "look_hold": 0.86,
+        "lead": 13.0, "lead_curve": 1.2, "lead_max": 24.0,
+        "curve_reach": 0.05, "curve_lift": 0.09,
+    }
+    return _v31(
+        "RC", marks,
+        hook=dict(V31_HOOK),
+        chase=chase,
+        run_in={},
+        note="path-aware chase: the most future course the racers will pay for",
+        fps=fps,
+    )
+
+
+READABILITY = {"RA": plan_ra, "RB": plan_rb, "RC": plan_rc}

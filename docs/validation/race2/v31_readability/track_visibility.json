@@ -1,0 +1,142 @@
+[
+ {
+  "camera": "A",
+  "moment": "drum",
+  "t": 3.2,
+  "forward_units_visible": 7,
+  "group": 6
+ },
+ {
+  "camera": "A",
+  "moment": "chase",
+  "t": 6.8,
+  "forward_units_visible": 8,
+  "group": 5
+ },
+ {
+  "camera": "A",
+  "moment": "switchback",
+  "t": 8.4,
+  "forward_units_visible": 9,
+  "group": 3
+ },
+ {
+  "camera": "A",
+  "moment": "sparse",
+  "t": 10.6,
+  "forward_units_visible": 7,
+  "group": 6
+ },
+ {
+  "camera": "A",
+  "moment": "comeback",
+  "t": 15.4,
+  "forward_units_visible": 8,
+  "group": 3
+ },
+ {
+  "camera": "RA",
+  "moment": "drum",
+  "t": 3.2,
+  "forward_units_visible": 7,
+  "group": 6
+ },
+ {
+  "camera": "RA",
+  "moment": "chase",
+  "t": 6.8,
+  "forward_units_visible": 9,
+  "group": 5
+ },
+ {
+  "camera": "RA",
+  "moment": "switchback",
+  "t": 8.4,
+  "forward_units_visible": 10,
+  "group": 3
+ },
+ {
+  "camera": "RA",
+  "moment": "sparse",
+  "t": 10.6,
+  "forward_units_visible": 5,
+  "group": 6
+ },
+ {
+  "camera": "RA",
+  "moment": "comeback",
+  "t": 15.4,
+  "forward_units_visible": 8,
+  "group": 3
+ },
+ {
+  "camera": "RB",
+  "moment": "drum",
+  "t": 3.2,
+  "forward_units_visible": 4,
+  "group": 6
+ },
+ {
+  "camera": "RB",
+  "moment": "chase",
+  "t": 6.8,
+  "forward_units_visible": 10,
+  "group": 5
+ },
+ {
+  "camera": "RB",
+  "moment": "switchback",
+  "t": 8.4,
+  "forward_units_visible": 11,
+  "group": 3
+ },
+ {
+  "camera": "RB",
+  "moment": "sparse",
+  "t": 10.6,
+  "forward_units_visible": 5,
+  "group": 6
+ },
+ {
+  "camera": "RB",
+  "moment": "comeback",
+  "t": 15.4,
+  "forward_units_visible": 8,
+  "group": 3
+ },
+ {
+  "camera": "RC",
+  "moment": "drum",
+  "t": 3.2,
+  "forward_units_visible": 4,
+  "group": 6
+ },
+ {
+  "camera": "RC",
+  "moment": "chase",
+  "t": 6.8,
+  "forward_units_visible": 14,
+  "group": 5
+ },
+ {
+  "camera": "RC",
+  "moment": "switchback",
+  "t": 8.4,
+  "forward_units_visible": 12,
+  "group": 3
+ },
+ {
+  "camera": "RC",
+  "moment": "sparse",
+  "t": 10.6,
+  "forward_units_visible": 8,
+  "group": 6
+ },
+ {
+  "camera": "RC",
+  "moment": "comeback",
+  "t": 15.4,
+  "forward_units_visible": 8,
+  "group": 3
+ }
+]

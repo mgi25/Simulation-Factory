@@ -1,0 +1,226 @@
+{
+ "camera": "RB",
+ "duration": 19.133,
+ "shots": 4,
+ "hard_cuts": 3,
+ "mean_shot": 4.783,
+ "shortest_shot": 2.217,
+ "longest_shot": 6.783,
+ "two_longest_share": 0.6925,
+ "continuous_share": 0.8841,
+ "direction_flips": 0,
+ "worst_reacquire": 0.2839,
+ "mean_reacquire": 0.1614,
+ "worst_scale_jump": 1.13,
+ "worst_angle_change": 10.8,
+ "racer_pixels": [
+  74.4,
+  86.4
+ ],
+ "phone_pixels": [
+  18.6,
+  21.6
+ ],
+ "min_lens_clearance": 5.266,
+ "max_speed": 48.92,
+ "max_accel": 789.4,
+ "max_turn": 126.0,
+ "max_turn_accel": 1527.4,
+ "shot_rows": [
+  {
+   "name": "release",
+   "rig": "hook_release",
+   "from": 0.017,
+   "to": 2.233,
+   "duration": 2.217,
+   "cut_on": "release",
+   "racer_pixels": 86.4,
+   "racer_pixels_min": 70.9,
+   "phone_pixels": 21.6,
+   "group_width": 0.3812,
+   "pack_visible": 0.85,
+   "pack_on_screen": 0.956,
+   "min_on_screen": 3,
+   "lens_clearance": 7.591,
+   "max_speed": 48.92,
+   "max_accel": 247.6,
+   "max_turn": 97.7,
+   "max_turn_accel": 437.8,
+   "notes": []
+  },
+  {
+   "name": "upper",
+   "rig": "chase_rear_3q",
+   "from": 2.233,
+   "to": 9.017,
+   "duration": 6.783,
+   "cut_on": "drum first contact",
+   "racer_pixels": 80.6,
+   "racer_pixels_min": 59.4,
+   "phone_pixels": 20.1,
+   "group_width": 0.377,
+   "pack_visible": 0.548,
+   "pack_on_screen": 0.821,
+   "min_on_screen": 0,
+   "lens_clearance": 5.266,
+   "max_speed": 39.26,
+   "max_accel": 559.5,
+   "max_turn": 121.8,
+   "max_turn_accel": 765.7,
+   "notes": [
+    "only 0 of the pack visible at the worst moment"
+   ]
+  },
+  {
+   "name": "middle",
+   "rig": "chase_rear_3q",
+   "from": 9.017,
+   "to": 12.683,
+   "duration": 3.667,
+   "cut_on": "pair first contact",
+   "racer_pixels": 74.4,
+   "racer_pixels_min": 59.3,
+   "phone_pixels": 18.6,
+   "group_width": 0.4202,
+   "pack_visible": 0.286,
+   "pack_on_screen": 0.771,
+   "min_on_screen": 1,
+   "lens_clearance": 5.747,
+   "max_speed": 27.18,
+   "max_accel": 431.2,
+   "max_turn": 126.0,
+   "max_turn_accel": 1527.4,
+   "notes": [
+    "only 1 of the pack visible at the worst moment"
+   ]
+  },
+  {
+   "name": "run_in",
+   "rig": "finish_chase",
+   "from": 12.683,
+   "to": 19.15,
+   "duration": 6.467,
+   "cut_on": "last first contact",
+   "racer_pixels": 77.5,
+   "racer_pixels_min": 60.5,
+   "phone_pixels": 19.4,
+   "group_width": 0.4055,
+   "pack_visible": 0.492,
+   "pack_on_screen": 0.851,
+   "min_on_screen": 0,
+   "lens_clearance": 7.498,
+   "max_speed": 32.0,
+   "max_accel": 789.4,
+   "max_turn": 87.5,
+   "max_turn_accel": 973.1,
+   "notes": [
+    "only 0 of the pack visible at the worst moment"
+   ]
+  }
+ ],
+ "cut_rows": [
+  {
+   "at": 2.233,
+   "from": "release",
+   "to": "upper",
+   "cut_on": "drum first contact",
+   "reacquire": 0.2839,
+   "scale_ratio": 1.014,
+   "pack_before": 6,
+   "pack_after": 6,
+   "direction_flip": false,
+   "screen_drift": [
+    -5.968,
+    -2.862
+   ],
+   "angle_change": 10.8
+  },
+  {
+   "at": 9.017,
+   "from": "upper",
+   "to": "middle",
+   "cut_on": "pair first contact",
+   "reacquire": 0.0697,
+   "scale_ratio": 0.885,
+   "pack_before": 3,
+   "pack_after": 3,
+   "direction_flip": false,
+   "screen_drift": [
+    -4.223,
+    -1.481
+   ],
+   "angle_change": 3.9
+  },
+  {
+   "at": 12.683,
+   "from": "middle",
+   "to": "run_in",
+   "cut_on": "last first contact",
+   "reacquire": 0.1307,
+   "scale_ratio": 1.052,
+   "pack_before": 3,
+   "pack_after": 3,
+   "direction_flip": false,
+   "screen_drift": [
+    4.757,
+    2.758
+   ],
+   "angle_change": 4.8
+  }
+ ],
+ "flow_terms": {
+  "continuity": 0.923,
+  "budget": 1.0,
+  "reacquire": 0.57,
+  "direction": 1.0,
+  "scale": 0.806
+ },
+ "flow_score": 86.4,
+ "final_sprint": {
+  "shot": "run_in",
+  "duration": 6.467,
+  "hard_cuts": 0,
+  "top3_visible": 0.8325,
+  "winner_visible": 0.9665,
+  "winner_pixels": 73.1,
+  "winner_pixels_min": 58.5,
+  "visible_before_crossing": 2.917,
+  "crossing_at": 15.817
+ },
+ "anticipation": {
+  "lead_seconds": {
+   "drum": 0.067,
+   "sweep": -0.183,
+   "pair": 0.067,
+   "last": 0.017
+  },
+  "consequence_seconds": {
+   "drum": 6.783,
+   "sweep": 2.733,
+   "pair": 3.667,
+   "last": 6.467
+  }
+ },
+ "path": "output/race2/v31_readability\\RB\\race2_switchyard_8.cameras.json",
+ "note": "pack and path: the interest group plus the horizontal field to see the bend",
+ "rule": "interest",
+ "pack": {
+  "rule": "interest",
+  "mean_interest": 5.367,
+  "interest_range": [
+   3,
+   6
+  ],
+  "frames": 2401,
+  "mean_pack": 5.367,
+  "pack_range": [
+   3,
+   6
+  ],
+  "floor_bound_frames": 460,
+  "cap_bound_frames": 1761,
+  "mean_extent": 9.338,
+  "max_extent": 12.892
+ },
+ "sha256": "1fcae581f88a45ae"
+}
