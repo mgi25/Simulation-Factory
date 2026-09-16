@@ -1,6 +1,7 @@
 # Company OS research & intelligence
 
-Six record types, one seven-stage workflow, one directory of JSON files. No
+Nine record types, a discovery queue, one seven-stage workflow, and a directory
+of JSON files. No
 database, no embeddings, no network. Everything here is `dataclasses` and
 `json`, same as the knowledge store it sits beside.
 
@@ -8,12 +9,16 @@ This layer stores and evaluates research. It does not go and get it: there is
 no scraper, no API client, no browser driver, no downloader and no model. That
 is deliberate and it is the sequencing in `docs/company_os_v1_bootstrap.md` —
 the contracts prove stable first, and automated discovery is built against a
-schema that already works.
+schema that already works. The ingestion boundary below is the shape any future
+connector has to produce; today a researcher produces it by hand.
 
 ## Where records live
 
 ```
 intelligence/research/records/
+    discovery_queries/<id>.json
+    discovery_candidates/<id>.json
+    public_snapshots/<id>.json
     sources/<id>.json
     references/<id>.json
     opportunities/<id>.json
@@ -27,7 +32,7 @@ written with sorted keys, so two sessions writing different records never
 conflict and a research change shows up in `git diff` as the sentence that
 changed.
 
-## The six types
+## The nine types
 
 | Type | Answers | Required beyond the common fields |
 |---|---|---|
@@ -37,8 +42,98 @@ changed.
 | `VideoIntelligenceDossier` | What is this video testing? | `experiment`, `kill_conditions` (≥1), `superiority_targets` (≥1) |
 | `ScoringRubric` | What are we weighing, and how heavily? | `dimensions` (≥1), explicit weights |
 | `OpportunityScorecard` | What did a researcher judge, and why? | `scores` (≥1), each with a `reason` |
+| `DiscoveryQuery` | What did we go looking for? | `terms` (≥1), `objective`, a known `platform` |
+| `DiscoveryCandidate` | What turned up, and has anyone judged it? | `provenance` (≥1), `evidence`, `capture_method` |
+| `SnapshotSeries` | What did the public page show, and when? | a derived `id`, snapshots oldest first |
 
-Common to most: `id`, `created`, an author, and a `ResearchConfidence`.
+Common to most: `id`, `created`, an author, and a `ResearchConfidence`. The
+three discovery types carry no confidence: a candidate is a URL and some public
+counts, and asking a screener to rate their belief in forty of those would cost
+more than reading them.
+
+## The discovery queue, before any of that
+
+A `ReferenceCase` costs an analyst an afternoon; a `DiscoveryCandidate` costs a
+URL. The queue in front of the workflow exists so that most candidates never
+reach the afternoon.
+
+```
+DiscoveryQuery -> IngestionEnvelope -> DiscoveryCandidate -> screening -> ResearchSource
+```
+
+as states on the candidate:
+
+```
+DISCOVERED -> QUEUED -> SCREENED_IN -> PROMOTED_TO_SOURCE
+           \-> SCREENED_OUT                \-> ARCHIVED
+```
+
+**One video is one candidate.** Every URL is reduced to a `ContentIdentity` -
+`platform` plus external id - so `youtu.be/ID`, `/watch?v=ID&t=42`,
+`/shorts/ID`, `/embed/ID` and `/live/ID` are one row, not five. Identity never
+falls back to the title, because two different videos share one every week.
+Deduplication is a file lookup: `public_snapshots/<id>.json` is named after the
+identity, so "have we got this?" opens one file.
+
+**A second sighting adds, it never replaces.** Re-discovery unions the
+provenance, so a video found by three queries keeps all three - that several
+found it is a signal no single query can see. It fills fields that were blank,
+leaves fields that were not, reports the disagreement through
+`candidate_conflicts`, and does not touch the screening state. A scheduled
+query cannot resurrect a rejected candidate.
+
+**A person screens.** There is no `auto_screen`, and `screen_candidate` takes a
+reviewer, a reason and a date. `excluded_by` and `within_freshness` report facts
+about the researcher's own query and change no state.
+
+**Only a screened-in candidate promotes.** `promote_candidate` is the single
+path to a `ResearchSource`, and it refuses a screened-out one outright. The
+source keeps the canonical URL as its reference and a `DiscoveryOrigin` holding
+the string the researcher actually clicked, the capture method, and every query
+that found it. It arrives at `SCREENED` rather than `DISCOVERED`, because the
+screener already made that judgement once.
+
+## Ingestion: one door, no network
+
+An `IngestionEnvelope` is platform, URL, capture date, capture method, evidence
+pointer and payload. The payload is checked against a per-platform schema:
+
+- an unknown key is **refused**, not dropped - a silently dropped field is a
+  metric somebody believes they recorded;
+- a private channel analytic is **refused by name**: retention, average
+  percentage viewed, revenue, RPM, CPM, impressions, traffic sources,
+  subscriber conversion. No public page shows them for somebody else's video;
+- a count that arrived as `"1.2M"` fails at the boundary rather than becoming a
+  float three modules later.
+
+There is no payload key naming a file, a download or a local copy, so the
+ingestion path cannot satisfy `RightsStatus`'s copy requirements at all.
+
+The one shipped adapter reads a JSON file a researcher wrote by hand. That is
+the cheap path, it works today, and every future connector - browser extension,
+API export, partner feed - produces the same envelope.
+
+## Snapshots: an observation is not an update
+
+A view count is a property of a video *on a day*. Writing a new number over the
+old one destroys the only thing two readings are good for. So `SnapshotSeries`
+appends, a reading already recorded is refused rather than merged, and
+`growth_between` names every rate it could not compute and why: no views/day
+across two readings on the same day, no likes gained when one reading did not
+show likes.
+
+## The cost tiers
+
+```
+T0 identity  T1 public metadata  T2 screening
+T3 reference analysis  T4 opportunity dossier  T5 prototype recommendation
+```
+
+`funnel.py` describes them and executes none of them. A tier is *derived* from
+a state that already exists - `CandidateState` or `ResearchStage` - so it
+cannot drift from the record it describes. `next_tier` returns a description;
+nothing in this package calls it in a loop, because the gap between two tiers
+is where a person decides whether the next one is worth paying for.
 
 ## The flow
 
@@ -177,7 +272,18 @@ python -m intelligence.research show opportunity op-elimination-race
 python -m intelligence.research thread yt-competitor-marble-run
 python -m intelligence.research rank --rubric opportunity-v1
 python -m intelligence.research check --today 2026-09-16
+
+python -m intelligence.research ingest captured.json --by research_lead
+python -m intelligence.research candidates --state queued
+python -m intelligence.research screen <id> --to screened_in --by X --reason "..."
+python -m intelligence.research promote <id> --spec promotion.json
+python -m intelligence.research funnel
 ```
+
+`docs/research_ingestion_example/` holds a worked `captured.json` and
+`promotion.json`. `promote` has no flags for confidence or rights: a
+`ResearchConfidence` is a level, a basis and what would overturn it, and a
+command line that let a researcher skip those would manufacture them.
 
 `check` runs the integrity and staleness sweeps and exits non-zero when either
 finds something, so it can become a pre-merge step later without changing
@@ -187,7 +293,10 @@ shape. `rank` always prints the caveat under the table.
 
 `store.integrity()` reports what a record cannot notice about itself: dangling
 links in both directions, a reference case whose source is gone, a scorecard
-against a rubric that does not define its dimensions. It does not look for
+against a rubric that does not define its dimensions, a candidate whose
+discovery query is gone, and - the one worth having - two candidates holding one
+video, which is the deduplication failing and is invisible from inside either
+record. It does not look for
 contradictions between two English sentences — that is a reasoning task, and
 `KnowledgeStore.contradictions` draws the same line for the same reason.
 
@@ -195,6 +304,17 @@ contradictions between two English sentences — that is a reasoning task, and
 
 YouTube scraper, downloader, API client, browser automation, trend scheduler,
 autonomous researcher, LLM content analyst, embeddings, vector DB, publishing
-integration. Those come after these contracts prove stable. Nothing here
-imports production, nothing in production imports this, and the package depends
-on `ai_platform`, `knowledge.company_os` and the standard library only.
+integration. Those come after these contracts prove stable.
+
+What changed in this phase is only that there is now a **shape** for them to
+produce. `IngestionEnvelope` is the boundary a connector sits outside of; the
+connector is still nobody's code. `CaptureMethod.PLATFORM_API` exists as a
+value because a researcher may legitimately export rows from an API console by
+hand, and the evidence pointer is what makes that claim checkable - no request
+is made anywhere in this package.
+
+Nothing here imports production, nothing in production imports this, and the
+package depends on `ai_platform`, `knowledge.company_os` and the standard
+library only. URL parsing is hand-written rather than `urllib.parse`, because
+the package forbids the `urllib` root outright and a scheme/host/path split is
+twenty lines.
