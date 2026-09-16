@@ -1,0 +1,67 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "capability_routing",
+    "capability_config_loading",
+    "capability_task_handoff"
+  ],
+  "created": "2026-09-16",
+  "decisions": [],
+  "dependencies": [
+    "company-validation"
+  ],
+  "experiment_learnings": [],
+  "facts": [],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-runtime",
+  "inputs": [
+    "company/org_registry.yaml, permissions.yaml and the two schema files",
+    "A non-empty list of required capability names",
+    "A task assignment or handoff mapping to validate"
+  ],
+  "invariants": [
+    "Capability matching is exact and deterministic: active before dormant, then fewest unrelated capabilities, then employee id.",
+    "match_capabilities explains every employee's result, not only the winners.",
+    "No LLM call, no network, no third-party dependency - standard library only.",
+    "A handoff or contract with no_subagents not exactly true is rejected (rule 2)."
+  ],
+  "last_reviewed": "2026-09-16",
+  "may_read": [
+    "company/*.yaml",
+    "company/validation/**",
+    "company/*.schema.yaml"
+  ],
+  "may_write": [
+    "company/runtime/**"
+  ],
+  "must_not_modify": [
+    "company/constitution.md",
+    "ai_platform/**",
+    "knowledge/**"
+  ],
+  "outputs": [
+    "CompanyConfig holding the four parsed contracts",
+    "RoutingResult with one EmployeeMatch per employee, eligible or not",
+    "TaskAssignment and HandoffArtifact, or ValidationError listing every issue"
+  ],
+  "owner": "workstream-codex",
+  "owns_paths": [
+    "company/runtime"
+  ],
+  "purpose": "Loads and validates the four bootstrap YAML contracts, ranks employees against required capabilities with no LLM call, and carries task assignments and compact handoff artifacts between sessions.",
+  "recheck_on": "2027-09-16",
+  "revalidation_reason": "",
+  "risks": [
+    "company/runtime and company/validation import each other (runtime.config uses validation.yaml_subset; validation.bootstrap uses runtime.config). Do not deepen it.",
+    "Owned by the Codex workstream: another session may be editing it concurrently."
+  ],
+  "source": "company-os-v1-knowledge-capsules",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_runtime.py"
+  ],
+  "title": "Company runtime",
+  "type": "module"
+}

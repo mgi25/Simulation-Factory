@@ -1,0 +1,73 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "capability_knowledge_records",
+    "capability_freshness",
+    "capability_decision_ledger"
+  ],
+  "created": "2026-09-16",
+  "decisions": [
+    "knowledge-store-is-files"
+  ],
+  "dependencies": [
+    "ai-platform"
+  ],
+  "experiment_learnings": [],
+  "facts": [],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-knowledge-store",
+  "inputs": [
+    "A Fact, Hypothesis, Decision, ExperimentLearning or FailureLearning",
+    "A date, for every staleness question",
+    "A decision id and a reason, for a ledger transition"
+  ],
+  "invariants": [
+    "A Fact with no evidence raises and names Hypothesis; promote() is the only crossing and requires SUPPORTED status plus evidence (rule 16).",
+    "Ledger transitions change status and add a reason; they never rewrite why, evidence, alternatives, risks, reconsider_if or rollback.",
+    "store.add refuses to overwrite silently; the normal way to change a claim is a new record that supersedes the old one.",
+    "Flagging a permanent record raises - if an invariant needs revalidation, the freshness class was wrong.",
+    "Writes are sorted-key JSON, so two sessions produce byte-identical files and the store merges without conflict."
+  ],
+  "last_reviewed": "2026-09-16",
+  "may_read": [
+    "knowledge/**",
+    "ai_platform/**"
+  ],
+  "may_write": [
+    "knowledge/company_os/*.py",
+    "knowledge/company_os/records/**"
+  ],
+  "must_not_modify": [
+    "company/**",
+    "ai_platform/README.md"
+  ],
+  "outputs": [
+    "Canonical JSON at knowledge/company_os/records/<kind>/<id>.json",
+    "Stale and needing-revalidation work lists, ordered by due date then kind then id",
+    "Decision transitions: reconsidered, rolled back, superseded"
+  ],
+  "owner": "workstream-claude",
+  "owns_paths": [
+    "knowledge/company_os/records.py",
+    "knowledge/company_os/freshness.py",
+    "knowledge/company_os/ledger.py",
+    "knowledge/company_os/records",
+    "knowledge/company_os/README.md"
+  ],
+  "purpose": "Five sibling record types with no inheritance, four decay classes, and one directory of JSON files. A guess cannot be stored in the shape of a fact, and a claim that has gone stale can be found.",
+  "recheck_on": "2027-09-16",
+  "revalidation_reason": "",
+  "risks": [
+    "No index and no semantic retrieval: every non-keyed question is a full sweep, which stops being free somewhere in the thousands of records.",
+    "contradictions() surfaces declared contradictions only; nothing detects two records that disagree in prose."
+  ],
+  "source": "company-os-v1-knowledge-capsules",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_os_knowledge.py"
+  ],
+  "title": "Company knowledge store",
+  "type": "module"
+}
