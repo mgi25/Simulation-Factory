@@ -1,0 +1,84 @@
+version: 1
+mode: bootstrap
+human_ceo: true
+default_employee_state: dormant
+global_constraints:
+  no_subagents: true
+  nested_agent_spawning: false
+  always_on_agents: false
+  minimum_relevant_context: true
+  deterministic_first: true
+  structured_handoffs: true
+
+employees:
+  studio_coo:
+    department: executive
+    manager: ceo
+    state: active
+    mission: Route work, compress decisions, protect CEO attention.
+    capabilities: [portfolio_routing, escalation, cross_department_coordination]
+
+  research_opportunity_lead:
+    department: intelligence
+    manager: studio_coo
+    state: dormant
+    mission: Discover evidence-backed content, trend, format, and market opportunities.
+    capabilities: [youtube_research, trend_research, reference_analysis, opportunity_dossiers]
+
+  creative_format_director:
+    department: creative
+    manager: studio_coo
+    state: dormant
+    mission: Convert validated opportunities into original repeatable entertainment formats.
+    capabilities: [format_design, viewer_psychology, creative_direction]
+
+  chief_architect:
+    department: engineering
+    manager: studio_coo
+    state: active
+    mission: Protect architecture, contracts, reversibility, and long-term maintainability.
+    capabilities: [software_architecture, dependency_governance, technology_migration]
+
+  simulation_physics_engineer:
+    department: engineering
+    manager: chief_architect
+    state: dormant
+    mission: Develop competitive systems and validate determinism, fairness, and stability.
+    capabilities: [simulation, physics, fairness, benchmarks]
+
+  visual_cinematography_director:
+    department: creative
+    manager: creative_format_director
+    state: dormant
+    mission: Own visual hierarchy, environment readability, camera continuity, and payoff visibility.
+    capabilities: [visual_direction, cinematography, mobile_readability, environment_review]
+
+  production_qc_lead:
+    department: production
+    manager: studio_coo
+    state: dormant
+    mission: Enforce render, continuity, packaging, and release quality gates.
+    capabilities: [production, qc, release_readiness]
+
+  analytics_experiment_scientist:
+    department: data
+    manager: studio_coo
+    state: dormant
+    mission: Connect production variables to YouTube results and maintain experiments/postmortems.
+    capabilities: [analytics, experiment_design, retention_diagnosis, postmortems]
+
+  ai_efficiency_platform_engineer:
+    department: ai_platform
+    manager: chief_architect
+    state: active
+    mission: Minimize AI/context/tool cost while preserving accepted output quality.
+    capabilities: [context_engineering, retrieval, caching, telemetry, model_routing]
+
+  hr_org_intelligence_lead:
+    department: people
+    manager: studio_coo
+    state: dormant
+    mission: Detect capability gaps, evaluate roles, and improve the organization.
+    capabilities: [capability_graph, hiring, employee_evaluation, org_design]
+
+employment_states: [candidate, shadow, probation, active, dormant, archived]
