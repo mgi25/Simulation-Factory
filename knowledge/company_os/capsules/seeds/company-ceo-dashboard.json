@@ -1,0 +1,84 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "company_state_snapshot",
+    "executive_brief",
+    "ceo_decision_queue"
+  ],
+  "created": "2026-09-17",
+  "decisions": [],
+  "dependencies": [
+    "company-analytics-experiments",
+    "company-finance",
+    "company-organizational-intelligence",
+    "company-research-operations",
+    "company-runtime",
+    "company-workforce-capabilities",
+    "company-workforce-employment"
+  ],
+  "experiment_learnings": [],
+  "facts": [
+    "bootstrap-forbids-nested-agents"
+  ],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-ceo-dashboard",
+  "inputs": [
+    "Canonical records from Company OS subsystem stores under a caller-supplied state directory",
+    "Canonical bootstrap permissions, organization registry and capsule graph"
+  ],
+  "invariants": [
+    "The dashboard is a read model: it changes no canonical record and exposes no approval, spend, hire, publish or merge action.",
+    "Unknown and stale evidence remain explicit; an empty subsystem is never reported as zero or healthy.",
+    "Every executive item retains compact source references and fingerprints, never a copied canonical record body.",
+    "No global company, format or project verdict is computed; independent dimensions stay independent.",
+    "Decision ordering is blocked, deadline, reserved action, risk, created date and id - never an opaque priority value.",
+    "Snapshot IDs, canonical JSON, briefs and structured diffs are deterministic for the same inputs and as-of date."
+  ],
+  "last_reviewed": "2026-09-17",
+  "may_read": [
+    "company/runtime/**",
+    "company/finance/**",
+    "company/analytics/**",
+    "company/org_intelligence/**",
+    "company/workforce/**",
+    "intelligence/research/**",
+    "knowledge/company_os/capsules/**"
+  ],
+  "may_write": [
+    "company/dashboard/**"
+  ],
+  "must_not_modify": [
+    "production/**",
+    "sloped/**",
+    "race2/**",
+    "engine/**",
+    "modes/**",
+    "powers/**",
+    "godot/**"
+  ],
+  "outputs": [
+    "Canonical JSON CompanyStateSnapshot with source, freshness, missing-data and integrity references",
+    "Compact CEOBrief, deterministic decision queue, attention items and structured snapshot diff"
+  ],
+  "owner": "company-os",
+  "owns_paths": [
+    "company/dashboard"
+  ],
+  "purpose": "Compresses canonical Company OS state into a deterministic, read-only executive snapshot and brief without approving, ranking or operating the company.",
+  "recheck_on": "2027-09-17",
+  "revalidation_reason": "",
+  "risks": [
+    "A source subsystem may be absent or incomplete; the view reports that gap and does not infer health.",
+    "Derived totals are summaries of supplied records, not a replacement for subsystem-owned calculations."
+  ],
+  "source": "company-os-v1-ceo-dashboard",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_dashboard.py",
+    "tests/test_company_os_capsules.py"
+  ],
+  "title": "CEO company-state dashboard",
+  "type": "system"
+}
