@@ -1,0 +1,28 @@
+{
+  "author": "research_opportunity_lead",
+  "created": "2026-09-16",
+  "exclusions": [
+    "compilation",
+    "reaction"
+  ],
+  "format_tags": [
+    "short_form",
+    "long_form"
+  ],
+  "freshness_days": 180,
+  "id": "dq-marble-race-2026q3",
+  "language": "en",
+  "max_candidates": 40,
+  "mechanic_tags": [
+    "race",
+    "elimination"
+  ],
+  "notes": "Looking for the loop, not the machine. Geometry is their expression.",
+  "objective": "Find marble-race formats whose viewer question renews without narration.",
+  "platform": "youtube",
+  "terms": [
+    "marble race",
+    "country marble race",
+    "marble elimination"
+  ]
+}

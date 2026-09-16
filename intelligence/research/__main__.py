@@ -7,11 +7,24 @@
     python -m intelligence.research rank --rubric opportunity-v1
     python -m intelligence.research check --today 2026-09-16
 
+and the discovery queue in front of them:
+
+    python -m intelligence.research ingest captured.json --by research_lead
+    python -m intelligence.research candidates --state queued
+    python -m intelligence.research screen <id> --to screened_in --by X --reason "..."
+    python -m intelligence.research promote <id> --spec promotion.json
+    python -m intelligence.research funnel
+
 `check` runs the integrity sweep and the staleness sweep and exits non-zero if
 either finds something, so it can become a pre-merge step later without
 changing shape. `rank` prints the weighted totals with their coverage and the
 caveat, because a ranking printed without the caveat is the failure mode the
 scoring module exists to prevent.
+
+`promote` takes a `--spec` file and has no flags for confidence or rights. That
+is not terseness: a `ResearchConfidence` is a level, a basis and the observation
+that would overturn it, and a command line that let a researcher skip those
+would be a command line that manufactures them.
 """
 
 from __future__ import annotations
@@ -20,9 +33,16 @@ import argparse
 import datetime as dt
 import sys
 
-from ai_platform.serde import dumps
+from pathlib import Path
+
+from ai_platform.serde import dumps, read_json
+from intelligence.research.common import ResearchConfidence
+from intelligence.research.discovery import CandidateState, DiscoveryCandidate, screen_candidate
 from intelligence.research.errors import ResearchError
+from intelligence.research.funnel import describe_funnel
+from intelligence.research.ingestion import ingest_envelope, load_envelopes
 from intelligence.research.scoring import CAVEAT, OpportunityScorecard, ScoringRubric, rank, score_opportunity
+from intelligence.research.sources import RightsStatus, SourceType
 from intelligence.research.store import DEFAULT_ROOT, RECORD_TYPES, ResearchStore
 
 
@@ -46,11 +66,42 @@ def build_parser() -> argparse.ArgumentParser:
 
     check = sub.add_parser("check", help="integrity and staleness; non-zero if anything is wrong")
     check.add_argument("--today", default="", help="ISO date for the staleness sweep")
+
+    ingest = sub.add_parser("ingest", help="load captured metadata from a JSON file")
+    ingest.add_argument("path", help="a JSON envelope, or a list of them")
+    ingest.add_argument("--by", required=True, help="who captured this metadata")
+    ingest.add_argument("--query", default="", help="discovery query id, if not in the file")
+
+    candidates = sub.add_parser("candidates", help="the discovery queue")
+    candidates.add_argument(
+        "--state", choices=[s.value for s in CandidateState], default=None
+    )
+
+    screen = sub.add_parser("screen", help="record a screening decision")
+    screen.add_argument("candidate_id")
+    screen.add_argument("--to", required=True, choices=[s.value for s in CandidateState])
+    screen.add_argument("--by", required=True, help="who is deciding")
+    screen.add_argument("--reason", required=True, help="why")
+    screen.add_argument("--on", default="", help="ISO date; defaults to today")
+
+    promote = sub.add_parser("promote", help="turn a screened-in candidate into a source")
+    promote.add_argument("candidate_id")
+    promote.add_argument("--spec", default="", help="JSON: source_id, confidence, rights")
+
+    sub.add_parser("funnel", help="the cost tiers, cheapest first")
     return parser
 
 
 def _today(value: str) -> dt.date:
     return dt.date.fromisoformat(value) if value else dt.date.today()
+
+
+def _label(record) -> str:
+    for field in ("title", "purpose", "objective", "canonical_url"):
+        value = getattr(record, field, "")
+        if value:
+            return value
+    return ""
 
 
 def _cmd_list(store: ResearchStore, kind: str | None) -> int:
@@ -59,10 +110,77 @@ def _cmd_list(store: ResearchStore, kind: str | None) -> int:
         print("(no records)")
         return 0
     for record in records:
-        title = getattr(record, "title", "") or getattr(record, "purpose", "")
-        stage = getattr(record, "stage", None)
-        suffix = f"  [{stage.value}]" if stage is not None else ""
-        print(f"{record.kind:<15} {record.id:<40} {title}{suffix}")
+        position = getattr(record, "stage", None) or getattr(record, "state", None)
+        suffix = f"  [{position.value}]" if position is not None else ""
+        print(f"{record.kind:<20} {record.id:<40} {_label(record)}{suffix}")
+    return 0
+
+
+def _cmd_ingest(store: ResearchStore, path: str, by: str, query: str) -> int:
+    """The manual adapter, end to end: a JSON file becomes queued candidates."""
+    for envelope in load_envelopes(path):
+        ingested = ingest_envelope(envelope, discovered_by=by, query_id=query)
+        outcome = store.ingest(ingested.candidate, ingested.snapshot)
+        reading = "reading recorded" if outcome.snapshot_added else "no new reading"
+        print(f"{outcome.action:<7} {outcome.candidate.id}  {reading}")
+        for conflict in outcome.conflicts:
+            print(f"        conflict kept unresolved: {conflict}")
+    return 0
+
+
+def _cmd_candidates(store: ResearchStore, state: str | None) -> int:
+    wanted = CandidateState(state) if state else None
+    records = store.candidates(wanted)
+    if not records:
+        print("(no candidates)")
+        return 0
+    for candidate in records:
+        unknown = (
+            f"  unknown: {', '.join(candidate.unknown_fields)}"
+            if candidate.unknown_fields
+            else ""
+        )
+        print(
+            f"{candidate.state.value:<20} {candidate.id:<44} "
+            f"{candidate.title or candidate.canonical_url}{unknown}"
+        )
+    return 0
+
+
+def _cmd_screen(
+    store: ResearchStore, candidate_id: str, to: str, by: str, reason: str, on: str
+) -> int:
+    candidate = store.get(DiscoveryCandidate.kind, candidate_id)
+    updated = screen_candidate(
+        candidate, CandidateState(to), on=_today(on), by=by, reason=reason
+    )
+    store.add(updated, overwrite=True)
+    print(f"{candidate.state.value} -> {updated.state.value}  {updated.id}")
+    return 0
+
+
+def _cmd_promote(store: ResearchStore, candidate_id: str, spec_path: str) -> int:
+    if not spec_path:
+        raise ResearchError(
+            "promote needs --spec: a JSON file with source_id, source_type, rights, "
+            "reason, promoted_by and a confidence block. A source carries a research "
+            "confidence - a level, a basis, and what would overturn it - and those are "
+            "judgements, not flags a command line should default for you."
+        )
+    spec = read_json(Path(spec_path))
+    result = store.promote(
+        candidate_id,
+        source_id=spec["source_id"],
+        source_type=SourceType(spec["source_type"]),
+        rights=RightsStatus(spec.get("rights", "link_only")),
+        confidence=ResearchConfidence.from_dict(spec["confidence"]),
+        promoted_by=spec["promoted_by"],
+        on=_today(spec.get("on", "")),
+        reason=spec["reason"],
+        title=spec.get("title", ""),
+        notes=spec.get("notes", ""),
+    )
+    print(f"promoted {result.candidate.id} -> source/{result.source.id}")
     return 0
 
 
@@ -122,6 +240,20 @@ def main(argv: list[str] | None = None) -> int:
             return _cmd_rank(store, args.rubric)
         if args.command == "check":
             return _cmd_check(store, _today(args.today))
+        if args.command == "ingest":
+            return _cmd_ingest(store, args.path, args.by, args.query)
+        if args.command == "candidates":
+            return _cmd_candidates(store, args.state)
+        if args.command == "screen":
+            return _cmd_screen(
+                store, args.candidate_id, args.to, args.by, args.reason, args.on
+            )
+        if args.command == "promote":
+            return _cmd_promote(store, args.candidate_id, args.spec)
+        if args.command == "funnel":
+            for line in describe_funnel():
+                print(line)
+            return 0
     except ResearchError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2

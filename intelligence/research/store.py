@@ -8,6 +8,9 @@ changed in a pull request.
 
 ```
 intelligence/research/records/
+    discovery_queries/<id>.json
+    discovery_candidates/<id>.json
+    public_snapshots/<id>.json
     sources/<id>.json
     references/<id>.json
     opportunities/<id>.json
@@ -19,6 +22,14 @@ intelligence/research/records/
 The brief's sketch is `sources/ references/ opportunities/`; the `records/`
 level is inserted so code and data do not share a directory, matching the
 knowledge store.
+
+## Deduplication is a file lookup, not a scan
+
+`public_snapshots/<id>.json` holds a `SnapshotSeries`, and its id is derived
+from the content identity. So "have we already got this video?" is opening one
+file by name. `ingest()` is built on that: an identity already present merges
+into the candidate we hold, an identity absent writes a new one, and two
+sessions ingesting the same video in either order finish with one candidate.
 
 ## No silent overwrite
 
@@ -57,17 +68,30 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from ai_platform.serde import read_json, write_json
+from intelligence.research.discovery import (
+    CandidateState,
+    DiscoveryCandidate,
+    DiscoveryQuery,
+    candidate_conflicts,
+    merge_candidates,
+)
 from intelligence.research.errors import ResearchError
 from intelligence.research.opportunity import OpportunityDossier
+from intelligence.research.promotion import PromotionResult, promote_candidate
 from intelligence.research.reference_case import ReferenceCase
 from intelligence.research.scoring import OpportunityScorecard, ScoringRubric
+from intelligence.research.snapshots import PublicSnapshot, SnapshotSeries, series_id
 from intelligence.research.sources import ResearchSource
+from intelligence.research.urls import ContentIdentity
 from intelligence.research.video_dossier import VideoIntelligenceDossier
 from knowledge.company_os.freshness import is_stale
 
 DEFAULT_ROOT = Path(__file__).resolve().parent / "records"
 
 RECORD_TYPES: dict[str, type] = {
+    DiscoveryQuery.kind: DiscoveryQuery,
+    DiscoveryCandidate.kind: DiscoveryCandidate,
+    SnapshotSeries.kind: SnapshotSeries,
     ResearchSource.kind: ResearchSource,
     ReferenceCase.kind: ReferenceCase,
     OpportunityDossier.kind: OpportunityDossier,
@@ -77,6 +101,9 @@ RECORD_TYPES: dict[str, type] = {
 }
 
 DIRECTORIES: dict[str, str] = {
+    DiscoveryQuery.kind: "discovery_queries",
+    DiscoveryCandidate.kind: "discovery_candidates",
+    SnapshotSeries.kind: "public_snapshots",
     ResearchSource.kind: "sources",
     ReferenceCase.kind: "references",
     OpportunityDossier.kind: "opportunities",
@@ -96,6 +123,27 @@ class IntegrityIssue:
 
     def __str__(self) -> str:
         return f"{self.kind}/{self.record_id}: {self.problem}"
+
+
+@dataclass(frozen=True)
+class IngestionOutcome:
+    """What one ingestion did, said plainly enough for a CLI to print it.
+
+    `merged` is the number the funnel cares about. A high merge rate means the
+    queries overlap, which is information about the queries; it also means the
+    dedupe is earning its place, because every merge is an analysis not bought
+    twice.
+    """
+
+    candidate: DiscoveryCandidate
+    series: SnapshotSeries
+    merged: bool
+    snapshot_added: bool
+    conflicts: tuple[str, ...] = ()
+
+    @property
+    def action(self) -> str:
+        return "merged" if self.merged else "added"
 
 
 class ResearchStore:
@@ -153,6 +201,89 @@ class ResearchStore:
             return frozenset()
         return frozenset(p.stem for p in directory.glob("*.json"))
 
+    # -- discovery --------------------------------------------------------
+
+    def series_for(self, identity: ContentIdentity) -> SnapshotSeries | None:
+        """The series for one piece of content, or None. One file lookup."""
+        record_id = series_id(identity)
+        if not self.exists(SnapshotSeries.kind, record_id):
+            return None
+        return self.get(SnapshotSeries.kind, record_id)
+
+    def candidate_for(self, identity: ContentIdentity) -> DiscoveryCandidate | None:
+        """The candidate already holding this content, or None.
+
+        Resolved through the series rather than by scanning titles: a title is
+        not an identity, and two videos share one every week.
+        """
+        series = self.series_for(identity)
+        if series is None:
+            return None
+        for candidate_id in series.candidate_ids:
+            if self.exists(DiscoveryCandidate.kind, candidate_id):
+                return self.get(DiscoveryCandidate.kind, candidate_id)
+        return None
+
+    def ingest(
+        self,
+        candidate: DiscoveryCandidate,
+        snapshot: PublicSnapshot | None = None,
+    ) -> IngestionOutcome:
+        """Add a candidate, or fold it into the one we already hold.
+
+        The deduplication rule, in one place: identity first, canonical URL as
+        the fallback identity, and never the title. A second sighting adds its
+        discovery provenance and its reading; it does not reset screening, and
+        it does not overwrite a field the first sighting already filled.
+        """
+        identity = candidate.identity
+        existing = self.candidate_for(identity)
+        merged = existing is not None
+        conflicts: tuple[str, ...] = ()
+        if existing is not None:
+            conflicts = candidate_conflicts(existing, candidate)
+            candidate = merge_candidates(existing, candidate)
+
+        series = self.series_for(identity) or SnapshotSeries.for_identity(identity)
+        series = series.watching(candidate_id=candidate.id)
+        snapshot_added = False
+        if snapshot is not None and not any(s.key == snapshot.key for s in series.snapshots):
+            series = series.add(snapshot)
+            snapshot_added = True
+
+        # overwrite=True is deliberate on both: a merge is an edit to a record
+        # this method just read, and it shows up in git as the lines that moved.
+        self.add(candidate, overwrite=True)
+        self.add(series, overwrite=True)
+        return IngestionOutcome(
+            candidate=candidate,
+            series=series,
+            merged=merged,
+            snapshot_added=snapshot_added,
+            conflicts=conflicts,
+        )
+
+    def candidates(self, state: CandidateState | None = None) -> tuple[DiscoveryCandidate, ...]:
+        records = self.load_all(DiscoveryCandidate.kind)
+        if state is None:
+            return records
+        return tuple(c for c in records if c.state is state)
+
+    def promote(self, candidate_id: str, **kwargs: Any) -> PromotionResult:
+        """Promote a screened-in candidate, writing all three records it touches.
+
+        The judgement arguments - confidence, rights, source type - are the
+        caller's and have no defaults here worth having. See
+        `promotion.promote_candidate` for the refusals.
+        """
+        candidate = self.get(DiscoveryCandidate.kind, candidate_id)
+        result = promote_candidate(candidate, series=self.series_for(candidate.identity), **kwargs)
+        self.add(result.source)
+        self.add(result.candidate, overwrite=True)
+        if result.series is not None:
+            self.add(result.series, overwrite=True)
+        return result
+
     def stale(self, today: dt.date | None = None, kind: str | None = None) -> tuple[Any, ...]:
         """Records whose confidence is past its recheck date, soonest due first.
 
@@ -168,6 +299,9 @@ class ResearchStore:
         source_ids = self.ids(ResearchSource.kind)
         reference_ids = self.ids(ReferenceCase.kind)
         opportunity_ids = self.ids(OpportunityDossier.kind)
+        query_ids = self.ids(DiscoveryQuery.kind)
+        candidate_ids = self.ids(DiscoveryCandidate.kind)
+        series_ids = self.ids(SnapshotSeries.kind)
         rubrics = {r.id: r for r in self.load_all(ScoringRubric.kind)}
 
         def check(record: Any, field: str, known: frozenset[str], target: str) -> None:
@@ -177,9 +311,59 @@ class ResearchStore:
                         IntegrityIssue(record.kind, record.id, f"{field} names unknown {target} {value!r}")
                     )
 
+        # One identity, one candidate. A second candidate for content we already
+        # hold is the deduplication failing, and it is invisible from inside
+        # either record - which is exactly what this sweep is for.
+        by_identity: dict[str, list[str]] = {}
+        for candidate in self.load_all(DiscoveryCandidate.kind):
+            by_identity.setdefault(candidate.identity.key, []).append(candidate.id)
+            check(candidate, "query_ids", query_ids, "discovery query")
+            if candidate.series_id not in series_ids:
+                issues.append(
+                    IntegrityIssue(
+                        candidate.kind,
+                        candidate.id,
+                        f"has no snapshot series {candidate.series_id!r}, so it is "
+                        "absent from the deduplication index",
+                    )
+                )
+            if candidate.promoted_source_id and candidate.promoted_source_id not in source_ids:
+                issues.append(
+                    IntegrityIssue(
+                        candidate.kind,
+                        candidate.id,
+                        f"promoted_source_id names unknown source "
+                        f"{candidate.promoted_source_id!r}",
+                    )
+                )
+        for key, ids in by_identity.items():
+            if len(ids) > 1:
+                for duplicate in ids:
+                    issues.append(
+                        IntegrityIssue(
+                            DiscoveryCandidate.kind,
+                            duplicate,
+                            f"shares content {key!r} with {len(ids) - 1} other "
+                            "candidate(s); one identity is one candidate",
+                        )
+                    )
+
+        for series in self.load_all(SnapshotSeries.kind):
+            check(series, "candidate_ids", candidate_ids, "discovery candidate")
+            check(series, "source_ids", source_ids, "source")
+
         for source in self.load_all(ResearchSource.kind):
             check(source, "reference_case_ids", reference_ids, "reference case")
             check(source, "opportunity_ids", opportunity_ids, "opportunity")
+            if source.origin is not None and source.origin.candidate_id not in candidate_ids:
+                issues.append(
+                    IntegrityIssue(
+                        source.kind,
+                        source.id,
+                        f"origin names unknown discovery candidate "
+                        f"{source.origin.candidate_id!r}",
+                    )
+                )
 
         for case in self.load_all(ReferenceCase.kind):
             if case.source_id not in source_ids:
@@ -248,8 +432,26 @@ class ResearchStore:
             for c in self.load_all(OpportunityScorecard.kind)
             if c.opportunity_id in opportunity_ids
         )
+        # The discovery half of the thread, when the source came through the
+        # queue: which query found it, and every public reading since.
+        candidates: tuple[Any, ...] = ()
+        series: tuple[Any, ...] = ()
+        if source.origin is not None:
+            if self.exists(DiscoveryCandidate.kind, source.origin.candidate_id):
+                candidates = (self.get(DiscoveryCandidate.kind, source.origin.candidate_id),)
+            found = self.series_for(
+                ContentIdentity(
+                    platform=source.origin.platform,
+                    external_id=source.origin.external_id,
+                    canonical_url=source.origin.canonical_url,
+                )
+            )
+            if found is not None:
+                series = (found,)
         return {
             "source": (source,),
+            "candidates": candidates,
+            "snapshot_series": series,
             "reference_cases": cases,
             "opportunities": opportunities,
             "scorecards": cards,

@@ -45,6 +45,14 @@ is `None` and is *named* in `unavailable`, with the input that was missing. It
 is a pure function of the snapshot plus the publication date. There is no
 `views_per_day` when the publication date is unknown, no engagement ratio when
 views are zero, and no retention at any time.
+
+## Where a source came from
+
+`origin` is an optional `DiscoveryOrigin`: the candidate this source was
+promoted from, the URL the researcher actually clicked, and every discovery
+query that found it. Optional because a source can still be written by hand,
+and checked when present - a source whose reference disagrees with the
+canonical URL its candidate produced is refused, so the two cannot drift.
 """
 
 from __future__ import annotations
@@ -65,6 +73,7 @@ from intelligence.research.common import (
 )
 from intelligence.research.errors import ResearchError
 from intelligence.research.lifecycle import ResearchStage, StageTransition
+from intelligence.research.provenance import DiscoveryOrigin
 from knowledge.company_os.records import Evidence
 
 NEVER_KNOWABLE: tuple[str, ...] = (
@@ -302,6 +311,7 @@ class ResearchSource:
     history: tuple[StageTransition, ...] = ()
     reference_case_ids: tuple[str, ...] = ()
     opportunity_ids: tuple[str, ...] = ()
+    origin: DiscoveryOrigin | None = None
 
     def __post_init__(self) -> None:
         assert_research_id(self.id, "source")
@@ -371,6 +381,21 @@ class ResearchSource:
                 "lifecycle.advance_source so every stage change records who and why."
             )
 
+        if self.origin is not None:
+            if not isinstance(self.origin, DiscoveryOrigin):
+                raise ResearchError(f"source {self.id!r}: origin must be a DiscoveryOrigin")
+            if self.origin.platform != self.platform:
+                raise ResearchError(
+                    f"source {self.id!r}: origin platform {self.origin.platform!r} does "
+                    f"not match the source's {self.platform!r}"
+                )
+            if self.origin.canonical_url != self.reference:
+                raise ResearchError(
+                    f"source {self.id!r}: the reference is {self.reference!r} but the "
+                    f"candidate it came from canonicalized to "
+                    f"{self.origin.canonical_url!r}"
+                )
+
     @property
     def private_analytics_unavailable(self) -> tuple[str, ...]:
         """What we do not and will not know about this source.
@@ -418,6 +443,11 @@ class ResearchSource:
             history=tuple(StageTransition.from_dict(h) for h in data.get("history", ())),
             reference_case_ids=as_tuple(data.get("reference_case_ids")),
             opportunity_ids=as_tuple(data.get("opportunity_ids")),
+            origin=(
+                None
+                if data.get("origin") is None
+                else DiscoveryOrigin.from_dict(data["origin"])
+            ),
         )
 
 

@@ -641,13 +641,14 @@ def test_the_four_staleness_conditions_accumulate_on_one_capsule():
 
 
 def test_the_company_os_seed_capsules_load(seeds):
-    assert len(seeds) == 7
+    assert len(seeds) == 8
     assert seeds.ids() == (
         "ai-platform",
         "company-bootstrap-policy",
         "company-knowledge-capsules",
         "company-knowledge-store",
         "company-os-control-plane",
+        "company-research-intelligence",
         "company-runtime",
         "company-validation",
     )
@@ -662,7 +663,8 @@ def test_every_seed_names_a_test_file_that_exists(seeds):
 def test_the_seeds_cover_the_control_plane_and_nothing_in_production(seeds):
     owned = [path for capsule in seeds.all() for path in capsule.owns_paths]
     assert all(
-        path.startswith(("company/", "ai_platform", "knowledge/")) for path in owned
+        path.startswith(("company/", "ai_platform", "knowledge/", "intelligence/"))
+        for path in owned
     ), owned
 
 

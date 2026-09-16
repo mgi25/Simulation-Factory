@@ -1,0 +1,48 @@
+[
+  {
+    "capture_method": "manual_browser",
+    "captured_at": "2026-09-16",
+    "captured_by": "research_opportunity_lead",
+    "evidence_ref": "docs/validation/discovery/2026-09-16-marble-race.md",
+    "payload": {
+      "channel_subscribers": 1250000,
+      "comments": 3110,
+      "creator": "Some Channel",
+      "duration_seconds": 184,
+      "language": "en",
+      "likes": 48200,
+      "published_on": "2026-08-01",
+      "signals": [
+        "The field halves at every gate, and the gates are visible early."
+      ],
+      "tags": [
+        "race",
+        "elimination"
+      ],
+      "title": "A marble race down a mountain",
+      "views": 1204300
+    },
+    "platform": "youtube",
+    "query_id": "dq-marble-race-2026q3",
+    "rank": 3,
+    "url": "https://youtu.be/EXAMPLE1234?si=share-sheet-junk"
+  },
+  {
+    "capture_method": "manual_browser",
+    "captured_at": "2026-09-16",
+    "captured_by": "research_opportunity_lead",
+    "evidence_ref": "docs/validation/discovery/2026-09-16-marble-race.md",
+    "payload": {
+      "creator": "Another Channel",
+      "duration_seconds": 41,
+      "likes": 62000,
+      "published_on": "2026-09-02",
+      "title": "Which colour wins?",
+      "views": 880500
+    },
+    "platform": "youtube",
+    "query_id": "dq-marble-race-2026q3",
+    "rank": 7,
+    "url": "https://www.youtube.com/shorts/EXAMPLE5678"
+  }
+]
