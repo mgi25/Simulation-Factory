@@ -1,0 +1,38 @@
+version: 1
+purpose: Compact artifact passed between independently invoked sessions without replaying prior conversations.
+
+required_fields:
+  - task_id
+  - owner
+  - objective
+  - status
+  - result
+  - evidence
+  - changed
+  - unchanged
+  - tests
+  - risks
+  - resource_usage
+  - next_owner
+  - escalation
+
+template:
+  task_id: ""
+  owner: ""
+  objective: ""
+  status: pending
+  result: ""
+  evidence: []
+  artifacts: []
+  changed: []
+  unchanged: []
+  tests: []
+  risks: []
+  resource_usage:
+    reasoning_class: ""
+    retries: 0
+    context_sources: []
+  next_owner: ""
+  escalation:
+    required: false
+    reason: ""
