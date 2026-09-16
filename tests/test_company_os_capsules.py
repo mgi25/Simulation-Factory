@@ -549,8 +549,14 @@ def test_nothing_shipped_is_already_stale(seeds):
 
 
 def test_an_expired_review_becomes_a_reason(seeds):
-    a_year_and_a_day = TODAY + dt.timedelta(days=366)
-    stale = seeds.staleness(a_year_and_a_day)
+    """A day past the last recheck date, every capsule is overdue.
+
+    Computed from the seeds rather than from TODAY, because capsules are added
+    on the day they are written and a fixed offset would only ever be a year
+    past whichever cohort happened to be reviewed first.
+    """
+    latest = max(capsule.recheck_on for capsule in seeds.all())
+    stale = seeds.staleness(latest + dt.timedelta(days=1))
     assert {s.capsule_id for s in stale} == set(seeds.ids())
     assert all("review overdue" in s.reasons[0] for s in stale)
 
@@ -641,9 +647,10 @@ def test_the_four_staleness_conditions_accumulate_on_one_capsule():
 
 
 def test_the_company_os_seed_capsules_load(seeds):
-    assert len(seeds) == 14
+    assert len(seeds) == 15
     assert seeds.ids() == (
         "ai-platform",
+        "company-analytics-experiments",
         "company-bootstrap-policy",
         "company-finance",
         "company-knowledge-capsules",
