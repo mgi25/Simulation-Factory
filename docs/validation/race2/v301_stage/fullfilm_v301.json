@@ -1,0 +1,49 @@
+{
+ "world": "v301",
+ "environment": "contained_bay_v301",
+ "frames": 1150,
+ "near_black_mean": 0.0064188124832259795,
+ "near_black_p99": 0.06903218557098766,
+ "near_black_max": 0.10767312885802469,
+ "frames_over_2pct": 132,
+ "frames_over_10pct": 1,
+ "frames_over_25pct": 0,
+ "stripe_mean": 9.24111304347826,
+ "stripe_p99": 17.72,
+ "stripe_max": 22.39,
+ "mean_luma": 49.96138951508895,
+ "per_shot": {
+  "run_in": {
+   "frames": 391,
+   "near_mean": 0.0012868263750749895,
+   "near_max": 0.0690354938271605,
+   "stripe_mean": 7.362890025575449,
+   "stripe_max": 13.99,
+   "luma_mean": 49.07904794210059
+  },
+  "release": {
+   "frames": 132,
+   "near_mean": 0.019630068041526377,
+   "near_max": 0.10767312885802469,
+   "stripe_mean": 12.635757575757575,
+   "stripe_max": 18.66,
+   "luma_mean": 49.19086771300345
+  },
+  "upper": {
+   "frames": 408,
+   "near_mean": 0.010351191354242315,
+   "near_max": 0.04322868441358025,
+   "stripe_mean": 11.279068627450982,
+   "stripe_max": 22.39,
+   "luma_mean": 51.18380973853317
+  },
+  "middle": {
+   "frames": 219,
+   "near_mean": 0.00029237529243474823,
+   "near_max": 0.0019092399691358025,
+   "stripe_mean": 6.751643835616438,
+   "stripe_max": 12.13,
+   "luma_mean": 49.72375016234237
+  }
+ }
+}

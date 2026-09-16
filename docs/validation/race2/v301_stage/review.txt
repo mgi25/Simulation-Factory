@@ -1,0 +1,61 @@
+V30.1 PREMIUM STAGE: camera A, ten moments
+==============================================================================
+
+OVER THE FILM
+world       void%  sprint%   roomL racerSep    warm%     B/R   brB/R   brChr
+v30         0.21%    0.04%    46.3     87.9   0.565%    1.18    1.42   0.371
+v301        0.30%    0.07%    42.0     91.8   1.187%    1.09    0.99   0.202
+floor_a     0.28%    0.06%    42.7     91.1   1.187%    1.09    0.99   0.201
+floor_b     0.30%    0.07%    42.2     91.6   1.187%    1.08    0.99   0.202
+floor_c     0.29%    0.07%    42.6     91.2   1.187%    1.08    0.99   0.199
+
+  B/R      V30's measure: blue over red on every lit room px
+  brB/R    the same on the room's brightest quartile
+  brChr    chroma there. V30's sprint floor measures 0.49
+
+BACKGROUND FREQUENCY  (room only, middle 60% of the frame)
+world       pitch   seams/s     edge% vert-edge%   lines/k     ampl
+v30          2.38      5.06     5.80%      5.08%      9.19     2.62
+v301         13.0      0.93     1.72%      1.19%      6.41     2.70
+floor_a      26.5      0.45     1.47%      1.01%      6.31     2.69
+floor_b      13.0      0.93     1.73%      1.21%      6.60     2.69
+floor_c      18.1      0.67     1.69%      1.20%      6.50     2.70
+
+  lines/k  dark lines crossing the room per 1000 image
+           rows. This is the grate, counted.
+  ampl     RMS of that detrended residual, in luma. A floor
+           can repeat perfectly at an invisible amplitude.
+
+THE FINAL SPRINT ALONE
+world       void%    roomL racerSep    warm%    edge%  lines/k    ampl
+v30         0.04%     57.9     80.4   0.706%    5.44%   7.460    2.80
+v301        0.07%     44.7     92.7   0.937%    1.26%   3.265    2.45
+floor_a     0.06%     46.5     91.0   0.937%    1.05%   3.265    2.45
+floor_b     0.07%     45.3     92.2   0.937%    1.30%   3.730    2.43
+floor_c     0.07%     45.6     91.7   0.937%    1.26%   3.498    2.43
+
+PER MOMENT, void %
+  moment                 v30      v301   floor_a   floor_b   floor_c
+  hook                  1.10%     1.40%     1.31%     1.40%     1.33%
+  early_chase           0.06%     0.04%     0.04%     0.04%     0.05%
+  first_mechanism       0.03%     0.15%     0.14%     0.15%     0.14%
+  central_chase         0.60%     1.10%     1.06%     1.10%     1.06%
+  switchback            0.10%     0.00%     0.00%     0.00%     0.00%
+  late_mechanism        0.04%     0.04%     0.04%     0.04%     0.04%
+  sprint_early          0.02%     0.11%     0.05%     0.11%     0.10%
+  sprint_mid            0.01%     0.00%     0.00%     0.00%     0.00%
+  winner                0.04%     0.07%     0.07%     0.07%     0.08%
+  final_frame           0.08%     0.11%     0.11%     0.11%     0.11%
+
+PER MOMENT, dark lines crossing the room per 1000 rows
+  moment                 v30      v301   floor_a   floor_b   floor_c
+  hook                  12.27     12.27     12.27     12.27     12.27
+  early_chase           20.14     14.10     13.09     14.10     13.09
+  first_mechanism       10.40     12.47     12.47     12.47     12.47
+  central_chase          9.33     10.26      9.33     10.26      9.33
+  switchback             2.80      0.93      1.87      0.93      1.87
+  late_mechanism         7.09      1.01      1.01      1.01      2.02
+  sprint_early           7.46      4.66      3.73      4.66      2.80
+  sprint_mid             4.66      2.80      2.80      2.80      2.80
+  winner                11.19      2.80      3.73      3.73      4.66
+  final_frame            6.53      2.80      2.80      3.73      3.73

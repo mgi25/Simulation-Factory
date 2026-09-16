@@ -1,0 +1,34 @@
+AUTHORED ELEMENTS, against the scene's own two guards
+--------------------------------------------------------------------------
+  stage centre [0.0, 0.0]   line samples 595   lens points 66
+
+  kind  material                        at    line (need)    lens (need) ok
+  pad   grate                   2.0, -22.0        2.0 (0)       11.3 (0) 
+  pad   grate                   0.7, -14.4        0.1 (0)        3.7 (0) 
+  pad   grate                    -0.5, 0.0        4.8 (0)        1.8 (0) 
+  pad   grate                   -1.2, 14.4        0.1 (0)        2.6 (0) 
+  pad   grate                   -2.0, 26.0        2.0 (0)        4.4 (0) 
+  pad   deck_mid               -19.5, 26.0        7.3 (0)        5.8 (0) 
+  pad   deck_mid                -9.0, 33.0        9.0 (0)        1.0 (0) 
+  pad   deck_mid               -24.0, 30.0       13.0 (0)        9.8 (0) 
+  pad   deck_dark              18.0, -31.2       10.5 (0)       26.5 (0) 
+  pad   warm                   18.0, -31.2       10.5 (0)       26.5 (0) 
+  pad   deck_dark              25.0, -43.3       24.4 (0)       40.4 (0) 
+  pad   warm                   25.0, -43.3       24.4 (0)       40.4 (0) 
+  pad   deck_dark               3.1, -35.9       11.9 (0)       25.1 (0) 
+  pad   warm                    3.1, -35.9       11.9 (0)       25.1 (0) 
+  pad   deck_dark               4.4, -49.8       25.8 (0)       38.3 (0) 
+  pad   warm                    4.4, -49.8       25.8 (0)       38.3 (0) 
+  pad   deck_dark             -12.3, -33.8       12.0 (0)       15.3 (0) 
+  pad   warm                  -12.3, -33.8       12.0 (0)       15.3 (0) 
+  pad   deck_dark             -17.1, -47.0       25.7 (0)       23.3 (0) 
+  pad   warm                  -17.1, -47.0       25.7 (0)       23.3 (0) 
+  pad   deck_dark              -18.0, 25.0        5.6 (0)        4.5 (0) 
+  pad   warm                   -18.0, 25.0        5.6 (0)        4.5 (0) 
+  pad   deck_dark               -19.5, 6.0        6.8 (0)        6.0 (0) 
+  pad   warm                    -19.5, 6.0        6.8 (0)        6.0 (0) 
+  bay   panel                  26.7, -28.4      15.6 (11)      30.6 (14) 
+  bay   panel                 -24.0, -56.0      37.0 (11)      31.0 (14) 
+
+  refused: 0 of 26
+  buried under another floor element: 0

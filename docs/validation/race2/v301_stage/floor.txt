@@ -1,0 +1,53 @@
+V30.1 FLOOR ENVELOPE: where camera A's picture meets the floor
+==========================================================================
+
+FRAME WIDTH AT THE FLOOR, per shot
+  shot       frames    narrow    median    widest     range
+  release        45     18.75     26.92     35.47     84.07
+  upper         136     15.18     24.86     28.85     69.25
+  middle         74     11.87     18.26     18.86     52.42
+  run_in        130      7.05     10.21     16.50     27.00
+
+MODULE PITCH: the two numbers that disagree
+  pitch       seams/s  across narrow across sprint
+  2.38           5.06           2.96          4.29
+  6.00           2.01           1.18          1.70
+  9.00           1.34           0.78          1.13
+  13.00          0.93           0.54          0.79
+  18.10          0.67           0.39          0.56
+  22.00          0.55           0.32          0.46
+  26.50          0.45           0.27          0.39
+  30.55          0.39           0.23          0.33
+
+  V30 shipped 2.38 (a 2.2 plate on a 0.18 gap).
+  The target band is about 0.4 to 2.0 seams a second.
+
+FLOOR FIELD EACH SHOT SHOWS
+  shot       cells                  x                  z         centroid
+  release      150            2 .. 58        -106 .. -18          26, -56
+  upper        402          -82 .. 82         -138 .. -2          -7, -45
+  middle       178          -70 .. 10          -82 .. 14         -17, -17
+  run_in       169          -34 .. 38          -34 .. 34           -5, 16
+
+THE TWENTY CELLS THAT CARRY THE MOST PICTURE  (4-unit cells)
+  at                   share     range shots
+  -14, 30             2.418%      18.0 run_in 100%
+  -14, 26             1.620%      20.9 run_in 100%
+  -18, 30             1.231%      17.5 run_in 100%
+  -14, 34             1.170%      17.0 run_in 100%
+  -14, 22             1.097%      24.2 run_in 100%
+  -18, 26             0.860%      21.1 run_in 100%
+  -10, 30             0.841%      19.9 run_in 100%
+  -14, 18             0.793%      27.8 run_in 100%
+  -10, 26             0.781%      22.6 run_in 100%
+  -10, 22             0.610%      25.5 run_in 100%
+  -18, 22             0.595%      24.1 run_in 100%
+  -10, 18             0.587%      28.8 run_in 100%
+  -6, 14              0.521%      33.6 run_in 94%, middle 6%
+  -14, 14             0.514%      31.6 run_in 96%
+  -10, 14             0.498%      32.3 run_in 94%, middle 6%
+  -10, 10             0.487%      34.1 run_in 81%, middle 19%
+  -14, -2             0.485%      38.1 middle 96%
+  -10, -2             0.481%      38.4 middle 92%, run_in 8%
+  -6, -6              0.458%      40.4 middle 93%, run_in 5%
+  -14, 10             0.452%      34.0 run_in 77%, middle 23%

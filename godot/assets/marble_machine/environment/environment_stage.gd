@@ -334,9 +334,11 @@ static func _plates(node: Node3D, palette, cfg: Dictionary,
 	##      about once a second - the brief's Part G, bought with geometry
 	##      rather than with a texture.
 	##   3. Panels can differ. `materials` cycles them, `terrace` steps them
-	##      down in bands and `radius` clips the field to a disc, so the same
-	##      builder makes a flat hall floor, a stepped basin and a round
-	##      platform without a second code path.
+	##      down in bands, `radius` clips the field to a disc and `skip_x` /
+	##      `skip_z` omit a whole row or column so the `under` slab reads as a
+	##      recessed service channel - so the same builder makes a flat hall
+	##      floor, a stepped basin, a round platform and a channelled deck
+	##      without a second code path.
 	##
 	## The channels between panels are not modelled. `under` lays one dark slab
 	## beneath the whole field, so a gap reads as an inset channel rather than
@@ -392,6 +394,27 @@ static func _plates(node: Node3D, palette, cfg: Dictionary,
 				float(under.get("fillet", 0.6)), false)
 			made += 1
 
+		# **A row or column left out, so `under` shows through as a recessed
+		# channel.** V30.1's, and it is the one shape a plate field could not
+		# express. A gap between two panels is `gap`, which is a *seam* - a
+		# line the eye reads as a joint - and no value of it makes a channel,
+		# because widening it widens every seam in the field at once. So a
+		# channel is an omitted module, which is also what it is in a real
+		# floor.
+		#
+		# Indices into the field's own grid, so they read as "the fourth bay
+		# across" rather than as a coordinate, and deliberately the same shape
+		# as `_deck`'s ring `skip` above. The `under` slab is what is seen at
+		# the bottom of the channel, which is why a field that skips without
+		# one is warned about: skipping a module with nothing under it cuts a
+		# hole to whatever lies beyond, and a hole in the floor is the V29
+		# failure this whole line of work exists to keep closed.
+		var skip_x: Array = field.get("skip_x", [])
+		var skip_z: Array = field.get("skip_z", [])
+		if under.is_empty() and not (skip_x.is_empty() and skip_z.is_empty()):
+			push_warning(("environment_stage: plate field %d omits modules "
+				+ "with no `under` slab to line the channel") % field_index)
+
 		# A band-wise step down away from the middle. `from` is the plan radius
 		# the first step happens at and `band` how wide each tread is, so a
 		# floor terraces outward without any of it being authored cell by cell.
@@ -402,6 +425,8 @@ static func _plates(node: Node3D, palette, cfg: Dictionary,
 
 		for iz in nz:
 			for ix in nx:
+				if ix in skip_x or iz in skip_z:
+					continue
 				var x := origin_x + (float(ix) - float(nx - 1) * 0.5) * pitch_x
 				var z := origin_z + (float(iz) - float(nz - 1) * 0.5) * pitch_z
 				var reach := sqrt((x - origin_x) * (x - origin_x)

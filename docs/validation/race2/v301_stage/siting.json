@@ -1,0 +1,376 @@
+{
+ "centre": [
+  0.0,
+  0.0
+ ],
+ "line_samples": 595,
+ "lens_points": 66,
+ "elements": [
+  {
+   "kind": "pad",
+   "index": 0,
+   "material": "hall_grate",
+   "at": [
+    2.0,
+    -22.0
+   ],
+   "to_line": 2.0,
+   "needs_line": 0.0,
+   "to_lens": 11.31,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 1,
+   "material": "hall_grate",
+   "at": [
+    0.7,
+    -14.4
+   ],
+   "to_line": 0.11,
+   "needs_line": 0.0,
+   "to_lens": 3.67,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 2,
+   "material": "hall_grate",
+   "at": [
+    -0.5,
+    0.0
+   ],
+   "to_line": 4.8,
+   "needs_line": 0.0,
+   "to_lens": 1.79,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 3,
+   "material": "hall_grate",
+   "at": [
+    -1.2,
+    14.4
+   ],
+   "to_line": 0.05,
+   "needs_line": 0.0,
+   "to_lens": 2.56,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 4,
+   "material": "hall_grate",
+   "at": [
+    -2.0,
+    26.0
+   ],
+   "to_line": 2.0,
+   "needs_line": 0.0,
+   "to_lens": 4.41,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 5,
+   "material": "hall_deck_mid",
+   "at": [
+    -19.5,
+    26.0
+   ],
+   "to_line": 7.28,
+   "needs_line": 0.0,
+   "to_lens": 5.85,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 6,
+   "material": "hall_deck_mid",
+   "at": [
+    -9.0,
+    33.0
+   ],
+   "to_line": 9.0,
+   "needs_line": 0.0,
+   "to_lens": 1.04,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 7,
+   "material": "hall_deck_mid",
+   "at": [
+    -24.0,
+    30.0
+   ],
+   "to_line": 12.97,
+   "needs_line": 0.0,
+   "to_lens": 9.76,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 8,
+   "material": "hall_deck_dark",
+   "at": [
+    18.0,
+    -31.18
+   ],
+   "to_line": 10.49,
+   "needs_line": 0.0,
+   "to_lens": 26.51,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 9,
+   "material": "lit_hall_warm",
+   "at": [
+    18.0,
+    -31.18
+   ],
+   "to_line": 10.49,
+   "needs_line": 0.0,
+   "to_lens": 26.51,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 10,
+   "material": "hall_deck_dark",
+   "at": [
+    25.0,
+    -43.3
+   ],
+   "to_line": 24.41,
+   "needs_line": 0.0,
+   "to_lens": 40.44,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 11,
+   "material": "lit_hall_warm",
+   "at": [
+    25.0,
+    -43.3
+   ],
+   "to_line": 24.41,
+   "needs_line": 0.0,
+   "to_lens": 40.44,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 12,
+   "material": "hall_deck_dark",
+   "at": [
+    3.14,
+    -35.86
+   ],
+   "to_line": 11.86,
+   "needs_line": 0.0,
+   "to_lens": 25.13,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 13,
+   "material": "lit_hall_warm",
+   "at": [
+    3.14,
+    -35.86
+   ],
+   "to_line": 11.86,
+   "needs_line": 0.0,
+   "to_lens": 25.13,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 14,
+   "material": "hall_deck_dark",
+   "at": [
+    4.36,
+    -49.81
+   ],
+   "to_line": 25.81,
+   "needs_line": 0.0,
+   "to_lens": 38.32,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 15,
+   "material": "lit_hall_warm",
+   "at": [
+    4.36,
+    -49.81
+   ],
+   "to_line": 25.81,
+   "needs_line": 0.0,
+   "to_lens": 38.32,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 16,
+   "material": "hall_deck_dark",
+   "at": [
+    -12.31,
+    -33.83
+   ],
+   "to_line": 11.96,
+   "needs_line": 0.0,
+   "to_lens": 15.34,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 17,
+   "material": "lit_hall_warm",
+   "at": [
+    -12.31,
+    -33.83
+   ],
+   "to_line": 11.96,
+   "needs_line": 0.0,
+   "to_lens": 15.34,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 18,
+   "material": "hall_deck_dark",
+   "at": [
+    -17.1,
+    -46.98
+   ],
+   "to_line": 25.74,
+   "needs_line": 0.0,
+   "to_lens": 23.27,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 19,
+   "material": "lit_hall_warm",
+   "at": [
+    -17.1,
+    -46.98
+   ],
+   "to_line": 25.74,
+   "needs_line": 0.0,
+   "to_lens": 23.27,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 20,
+   "material": "hall_deck_dark",
+   "at": [
+    -18.0,
+    25.0
+   ],
+   "to_line": 5.59,
+   "needs_line": 0.0,
+   "to_lens": 4.47,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 21,
+   "material": "lit_hall_warm",
+   "at": [
+    -18.0,
+    25.0
+   ],
+   "to_line": 5.59,
+   "needs_line": 0.0,
+   "to_lens": 4.47,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 22,
+   "material": "hall_deck_dark",
+   "at": [
+    -19.5,
+    6.0
+   ],
+   "to_line": 6.78,
+   "needs_line": 0.0,
+   "to_lens": 6.0,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "pad",
+   "index": 23,
+   "material": "lit_hall_warm",
+   "at": [
+    -19.5,
+    6.0
+   ],
+   "to_line": 6.78,
+   "needs_line": 0.0,
+   "to_lens": 6.0,
+   "needs_lens": 0.0,
+   "accepted": true
+  },
+  {
+   "kind": "bay",
+   "index": "drum",
+   "material": "hall_panel",
+   "at": [
+    26.74,
+    -28.4
+   ],
+   "to_line": 15.63,
+   "needs_line": 11.0,
+   "to_lens": 30.64,
+   "needs_lens": 14.0,
+   "accepted": true
+  },
+  {
+   "kind": "bay",
+   "index": "sweep",
+   "material": "hall_panel",
+   "at": [
+    -24.02,
+    -56.0
+   ],
+   "to_line": 36.97,
+   "needs_line": 11.0,
+   "to_lens": 30.96,
+   "needs_lens": 14.0,
+   "accepted": true
+  }
+ ],
+ "refused": [],
+ "buried": []
+}

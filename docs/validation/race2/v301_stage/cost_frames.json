@@ -1,0 +1,32 @@
+{
+ "v30": {
+  "environment": "contained_bay_v30",
+  "meshes": 367,
+  "triangles": 102752,
+  "ms_per_frame": 196.0
+ },
+ "v301": {
+  "environment": "contained_bay_v301",
+  "meshes": 326,
+  "triangles": 93404,
+  "ms_per_frame": 190.0
+ },
+ "floor_a": {
+  "environment": "contained_bay_v301a",
+  "meshes": 215,
+  "triangles": 68096,
+  "ms_per_frame": 177.0
+ },
+ "floor_b": {
+  "environment": "contained_bay_v301b",
+  "meshes": 323,
+  "triangles": 92720,
+  "ms_per_frame": 187.0
+ },
+ "floor_c": {
+  "environment": "contained_bay_v301c",
+  "meshes": 260,
+  "triangles": 78356,
+  "ms_per_frame": 184.0
+ }
+}

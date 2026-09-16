@@ -1,0 +1,38 @@
+V30.1 SURFACE COVERAGE: every authored material family, by screen area
+==============================================================================
+  V29 measured six of its own surfaces at 0.000%. A family with no
+  pixels in any sampled frame is UNSEEN and must be removed or
+  justified.
+
+v30  (contained_bay_v30)
+  family             coverage   frames       peak  peak at
+  hall_deck          43.4722%    10/10    77.793%  winner
+  hall_deck_mid      13.6384%    10/10    21.298%  final_frame
+  hall_grate         12.1450%     9/10    45.014%  switchback
+  hall_panel         11.1855%     7/10    42.547%  hook
+  hall_panel_dark     5.1989%     5/10    18.675%  central_chase
+  hall_trim           3.4629%     7/10    11.104%  hook
+  hall_rib            2.6573%     7/10     9.049%  early_chase
+  lit_hall_warm       0.6122%    10/10     2.168%  winner
+  lit_hall_cool       0.1652%     2/10     1.256%  sprint_early
+  hall_deck_dark      0.0906%    10/10     0.304%  final_frame
+  authored families seen: 10 of 10
+  AUTHORED BUT UNSEEN: 0  -
+  not authored by this concept: hall_glass, hall_beam
+
+v301  (contained_bay_v301)
+  family             coverage   frames       peak  peak at
+  hall_deck          32.7966%    10/10    49.974%  sprint_early
+  hall_deck_mid      15.9415%     9/10    47.070%  winner
+  hall_panel         15.7832%     8/10    53.853%  hook
+  hall_grate         15.7465%     9/10    47.602%  sprint_mid
+  hall_trim           5.4439%     8/10    15.465%  hook
+  hall_deck_dark      4.1073%    10/10     8.751%  winner
+  hall_rib            1.4417%     8/10     4.140%  early_chase
+  lit_hall_warm       0.8566%     8/10     2.586%  winner
+  hall_panel_dark     0.3152%     3/10     1.146%  late_mechanism
+  lit_hall_cool       0.1940%     5/10     1.218%  sprint_early
+  authored families seen: 10 of 10
+  AUTHORED BUT UNSEEN: 0  -
+  not authored by this concept: hall_glass, hall_beam
+

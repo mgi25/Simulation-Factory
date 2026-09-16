@@ -83,9 +83,19 @@ def run_godot(command: list[str], label: str) -> str:
     for line in (result.stderr or "").splitlines():
         if "SCRIPT ERROR" in line or "Parse Error" in line:
             raise RenderError(f"{label}: {line.strip()}")
+    # **`stage:` is here because its absence hid a shipped defect.**
+    # `race2_scene._build_stage` prints a per-section census of what the stage
+    # actually built, and `environment_stage` prints a line for every pad, bay
+    # or wall segment its clearance guards *refused*. Neither was surfaced, so
+    # a profile could author twelve floor inlays and two bays, have eight
+    # inlays and one bay silently rejected, and render with no sign of it -
+    # which is exactly what the V30 profile does, and what V30.1 found only by
+    # reimplementing the guards in Python. One census line per render is a
+    # cheap way for the next pass not to need that.
     for line in (result.stdout or "").splitlines():
         stripped = line.strip()
-        if stripped.startswith(("race2:", "cameras:", "scene:", "rendered", "adapter:")):
+        if stripped.startswith(("race2:", "cameras:", "scene:", "rendered",
+                                "adapter:", "stage:", "environment_stage:")):
             print(f"    {stripped}")
     print(f"  {label}: {elapsed:.1f}s")
     return result.stdout or ""
