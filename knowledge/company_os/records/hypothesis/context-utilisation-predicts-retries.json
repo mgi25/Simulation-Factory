@@ -1,0 +1,17 @@
+{
+  "confidence": 0.4,
+  "contradicts": [],
+  "created": "2026-09-16",
+  "evidence": [],
+  "id": "context-utilisation-predicts-retries",
+  "outcome_note": "",
+  "predicted_observation": "Across at least 30 recorded tasks, ResourceUsageRecord.unused_context as a fraction of context_sources correlates with retries more strongly than len(context_sources) does.",
+  "rationale": "A manifest with many unused refs is evidence the assembler did not know what the task needed. If that is true, the unused fraction is a leading indicator that can be computed before the pass runs, whereas retries are only known after.",
+  "related_commits": [],
+  "related_experiments": [],
+  "related_tasks": [],
+  "source": "company-os-v1-ai-efficiency",
+  "statement": "Low context utilisation - a large fraction of manifest refs never touched - predicts retries better than manifest size does.",
+  "status": "open",
+  "test_plan": "Accumulate usage records over normal Company OS work until 30 tasks exist across at least three reasoning classes, then compare the two correlations. No new instrumentation is required: both quantities are already fields."
+}
