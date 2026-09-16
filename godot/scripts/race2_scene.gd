@@ -38,12 +38,19 @@ extends Node3D
 ##     --environment=ID     an environment profile; default is the shipped one
 ##     --contrast=v21       the readability pass; default on
 ##     --racers=meridian    racer appearance
-##     --show=course|all    `course` hides the world, for a geometry proof
+##     --show=course|matte|all
+##                          `course` hides the world and keeps its sky, for a
+##                          geometry proof; `matte` hides the sky as well, for
+##                          a coverage measurement
 
 const Palette := preload("res://assets/marble_machine/lab_palette.gd")
 const World := preload("res://assets/marble_machine/course/course_world.gd")
 const EnvProfile := preload(
 	"res://assets/marble_machine/environment/environment_profile.gd")
+const EnvBuilder := preload(
+	"res://assets/marble_machine/environment/environment_builder.gd")
+const EnvWorld := preload(
+	"res://assets/marble_machine/environment/environment_world.gd")
 const RacerVisual := preload("res://assets/marble_machine/racers/racer_visual.gd")
 
 const DEFAULT_CONTRAST := "v21"
@@ -93,17 +100,53 @@ func _ready() -> void:
 		environment_id = ""
 	var profile: Dictionary = EnvProfile.resolve(environment_id, _contrast)
 	_palette = Palette.new("tower", _contrast, str(options.get("machine", "")))
+	# **The profile's surface overrides, which Race #2 had never applied.**
+	# `course_scene.gd:176` has always done this and this scene never did,
+	# which did not show while Race #2 only ever drew the backdrop: the
+	# overrides name world surfaces, and Race #2 built none of them. It
+	# shows the moment a stage is built, because a contained profile paints
+	# the room through exactly this table - and V27.2 in particular *is* one
+	# leaf of it, `hall_panel_dark.specular`, so without this call the merge
+	# correction that names the edition is not in the picture at all.
+	#
+	# Before anything is built, because the palette caches what it hands
+	# out. The outdoor control is unaffected and measurably so: the V26
+	# chain resolves to no palette overrides, and the control frame is byte
+	# for byte the one it rendered before this line existed.
+	EnvBuilder.apply_palette(_palette, profile)
 
 	var show := str(options.get("show", "all"))
 	var world_env := WorldEnvironment.new()
 	world_env.name = "WorldEnvironment"
 	world_env.environment = World.build_environment(false, _contrast, profile)
+	# **`matte` is `course` with the sky taken away too.**
+	#
+	# `--show=course` hides the world's geometry and leaves its background, which
+	# is the right answer for a geometry proof and the wrong one for a coverage
+	# measurement: against a drawn sky every pixel of the frame is drawn, so
+	# "how much of this frame is the machine" comes back as 100% in both worlds.
+	# Clearing the background to black makes the same render a silhouette, and a
+	# pixel that is lit in the silhouette is a pixel of machine or racer - which
+	# is a fact about the frame rather than an inference from its colour.
+	#
+	# Lighting, grade and fog are left exactly as the profile sets them, so the
+	# silhouette is the machine as this world lights it and not a flat matte.
+	if show == "matte":
+		world_env.environment.background_mode = Environment.BG_COLOR
+		world_env.environment.background_color = Color(0.0, 0.0, 0.0)
 	add_child(world_env)
 	World.build_lights(self, _contrast, profile)
-	if show != "course":
+	if show == "all":
 		add_child(World.build(_palette, profile))
 
 	_build_course(str(options.get("geometry", "")))
+	# **After the course, not before it.** The stage is sited against the
+	# racing line and the stations, and both are read out of the geometry
+	# `_build_course` has just parsed. Race #1 orders it the same way for
+	# the same reason: `course_machine.gd` builds its world after its
+	# ground, because the terrain config is not finished until then.
+	if show == "all":
+		_build_stage(profile)
 	if str(options.get("replay", "")) != "":
 		_load_replay(str(options["replay"]))
 	if str(options.get("cameras", "")) != "":
@@ -124,6 +167,249 @@ func _options() -> Dictionary:
 			out[body] = "1"
 		else:
 			out[body.substr(0, split)] = body.substr(split + 1)
+	return out
+
+
+# --- the contained stage ----------------------------------------------------
+#
+# **Race #2 had no near world at all before this.** `course_world.build` is the
+# backdrop and only the backdrop - sky masses, cloud band, aurora - while the
+# architecture a contained profile authors lives in that profile's `world`
+# section, which until now only Race #1 ever built, from `course_machine.gd`.
+# So `--environment=contained_hall_v272` on this scene used to deliver the
+# hall's sky, fog, grade and lights over nothing at all: a contained profile
+# erases the outdoor backdrop, and there was no code path to replace it.
+#
+# This is the seam the header at the top of this file promised, and only it.
+# Four limits, each a decision rather than an omission:
+#
+# 1. **Only the stage keys are built** - `deck`, `shell`, `pylons`, `canopy`,
+#    `bays`. The eleven terrain-anchored features (`patches`, `ridges`,
+#    `scarps`, `boulders`, `ravine`...) are skipped, because every one of them
+#    is sited against a heightfield and Race #2's course does not stand on one.
+#    The consequence that matters for a comparison is the useful one: a profile
+#    that authors no stage - `aurora_valley_v26`, the outdoor control - reaches
+#    `world_cfg.is_empty()` and adds nothing, so the control renders exactly
+#    the frames it rendered before this edit.
+#
+# 2. **Nothing in the profile is rewritten.** The hall's radii, courses,
+#    heights, patterns, materials and lit strips are V27.2's, to the leaf.
+#
+# 3. **The room is placed, because the profile cannot place it.** The hall
+#    carries absolute heights - a deck at y = -80, a wall footed at -100 -
+#    which are the terrace and the basin under Race #1's finish, and Race #2's
+#    course does not descend a mountainside. So the stage is translated by one
+#    rigid lift, derived below from the two courses' own numbers, and every
+#    authored dimension keeps the value it was measured at. A *scale* would be
+#    a redesign of the hall and is not done here: that the room comes out too
+#    large for this course is a result this branch reports, not one it fixes.
+#
+# 4. **The lens keep-out is dropped rather than inherited.** The 78 points a
+#    contained profile carries are decimated Race #1 camera paths, and applying
+#    them here would cull hall segments at positions no Race #2 lens ever
+#    visits - a room with holes in it for reasons belonging to another film.
+#    An empty lens guide builds the room as authored, which is the thing this
+#    branch exists to photograph. Whether the architecture occludes the racers
+#    is then a question answered from the frames.
+
+
+## The stage keys, from `environment_stage.STAGE_ORDER`. Named here rather than
+## read from there so that this scene builds architecture and nothing else even
+## if a later edition teaches `environment_stage.gd` a sixth feature.
+const STAGE_KEYS := ["deck", "shell", "pylons", "canopy", "bays"]
+
+## How far under the lowest point of the racing line the room's floor is laid.
+## Small on purpose: the floor is the datum the architecture stands on, and the
+## gap between it and the course is a void nothing in the profile fills.
+const STAGE_FLOOR_CLEARANCE := 2.0
+
+
+func _build_stage(profile: Dictionary) -> void:
+	if _geometry.is_empty():
+		return
+	var authored: Dictionary = EnvBuilder.world(profile)
+	var world_cfg := {}
+	for key in STAGE_KEYS:
+		if authored.get(key, null) is Dictionary:
+			world_cfg[key] = authored[key]
+	if world_cfg.is_empty():
+		return
+
+	var centreline := _centreline()
+	if centreline.is_empty():
+		push_warning("race2_scene: no centreline; stage not built")
+		return
+	var floor_y := INF
+	var low := Vector2(INF, INF)
+	var high := Vector2(-INF, -INF)
+	for entry in centreline:
+		var point: Vector3 = entry
+		floor_y = minf(floor_y, point.y)
+		low = Vector2(minf(low.x, point.x), minf(low.y, point.z))
+		high = Vector2(maxf(high.x, point.x), maxf(high.y, point.z))
+	var centre := (low + high) * 0.5
+
+	# **The datum is the highest deck surface, not the lowest.** A deck ring
+	# refuses to build if its top would stand above the ground it is meant to
+	# lie under - `environment_stage._deck` tests exactly that, and it is right
+	# to, because a plate floating over a hillside is the artefact the test
+	# exists to catch. On a flat floor that test becomes a constraint on where
+	# the floor goes: put the ground at the top of the tallest ring and every
+	# ring passes; put it one unit lower and the upper terrace silently
+	# disappears.
+	var datum := _stage_datum(world_cfg)
+	var lift := (floor_y - STAGE_FLOOR_CLEARANCE) - datum
+
+	var stage := Node3D.new()
+	stage.name = "Stage"
+	stage.position = Vector3(0.0, lift, 0.0)
+	add_child(stage)
+
+	# Sited in the stage's own frame: the racing line and the station anchors
+	# come down by exactly the lift the node goes up by, so a form kept clear
+	# of the course is kept clear of the course.
+	var local: Array = []
+	for entry in centreline:
+		var point: Vector3 = entry
+		local.append(Vector3(point.x, point.y - lift, point.z))
+	var anchors := _station_nodes()
+	var nodes := {}
+	for key in anchors:
+		var anchor: Vector3 = anchors[key]
+		nodes[key] = Vector3(anchor.x, anchor.y - lift, anchor.z)
+
+	var cfg := _flat_ground(centre, datum)
+	var census: Dictionary = EnvWorld.build(stage, _palette, cfg, local, nodes,
+		world_cfg)
+	World.assign_layer(stage)
+	stage.set_meta("stage_census", census)
+	stage.set_meta("stage_lift", lift)
+
+	# Printed, because a feature that built nothing is indistinguishable from a
+	# subtle one in a still - `environment_world.build` says exactly that - and
+	# on this course one of them does build nothing.
+	var parts := PackedStringArray()
+	for key in census:
+		parts.append("%s %d" % [key, int(census[key])])
+	print("stage: %s lift %.2f floor %.2f datum %.2f centre (%.2f, %.2f)"
+		% [str(profile.get("id", "?")), lift, floor_y, datum, centre.x,
+			centre.y])
+	print("stage: census %s" % ", ".join(parts))
+	var bays: Dictionary = world_cfg.get("bays", {})
+	for key in (bays.get("sites", {}) as Dictionary):
+		var site: Dictionary = (bays["sites"] as Dictionary)[key]
+		var wanted := str(site.get("node", key))
+		if not nodes.has(wanted):
+			print("stage: bay '%s' wants node '%s', which this course has not"
+				% [str(key), wanted])
+
+
+func _stage_datum(world_cfg: Dictionary) -> float:
+	## The height of the room's floor, in the profile's own frame.
+	##
+	## The top of the highest deck ring: the surface the architecture stands on
+	## and the one the ring test measures against. A stage with no deck falls
+	## back to the highest wall foot, the only other absolute a shell carries.
+	var deck: Dictionary = world_cfg.get("deck", {})
+	var datum := -INF
+	for entry in (deck.get("rings", []) as Array):
+		var ring: Dictionary = entry
+		datum = maxf(datum, float(ring.get("y", -20.0))
+			+ float(ring.get("thickness", 3.0)) * 0.5)
+	if datum > -INF:
+		return datum
+	var shell: Dictionary = world_cfg.get("shell", {})
+	for entry in (shell.get("bands", []) as Array):
+		var band: Dictionary = entry
+		datum = maxf(datum, float(band.get("foot", -40.0)))
+	return datum if datum > -INF else 0.0
+
+
+func _flat_ground(centre: Vector2, level: float) -> Dictionary:
+	## A terrain config whose `height()` is one number everywhere.
+	##
+	## `environment_stage.gd` asks `course_terrain.height()` where the ground is
+	## under a pad, a pylon and a bay. Race #1 answers with its mountainside;
+	## Race #2 has no ground at all, so the answer is the floor of the room.
+	## Every term of that surface is switched off explicitly rather than left at
+	## a default, because a default here is a slope nobody authored.
+	return {
+		"centre_x": centre.x,
+		"centre_z": centre.y,
+		"z_top": 0.0,
+		"top_y": level,
+		"grade": 0.0,
+		"crest_rise": 0.0,
+		"crest_scale": 1.0,
+		"steps": [],
+		"left_at": 0.0,
+		"left_span": 1.0,
+		"left_rise": 0.0,
+		"gorge_at": 0.0,
+		"gorge_span": 1.0,
+		"gorge_depth": 0.0,
+		"noise": 0.0,
+		# The edge fade lerps toward `edge_y` past `edge_from`. With the two
+		# heights equal it is an identity wherever it fires, so the floor stays
+		# flat out to whatever radius the shell is authored at.
+		"edge_from": 1.0e9,
+		"edge_to": 1.0e9 + 1.0,
+		"edge_y": level,
+		"pads": [],
+	}
+
+
+func _centreline() -> Array:
+	## Every run's path, concatenated, in layout units.
+	##
+	## The same samples `race2.spine` measures its arc length along, and the
+	## same concatenation Race #1 hands its world builder. In layout units
+	## because the profile is: the geometry is written in simulation units, and
+	## `_render_scale` is the factor between the two.
+	var out: Array = []
+	for entry in _geometry.get("runs", []):
+		var run: Dictionary = entry
+		for sample in (run.get("path", []) as Array):
+			var point: Array = sample
+			out.append(Vector3(float(point[0]), float(point[1]),
+				float(point[2])) * _render_scale)
+	return out
+
+
+func _station_nodes() -> Dictionary:
+	## Each module's centre, by id, in layout units.
+	##
+	## The anchors a profile's `bays` sites name. Race #1's are `start`,
+	## `split`, `obstacle`, `merge` and `finish`; Race #2's are its stations -
+	## `studs`, `drum`, `sweep`, `pair`, `last` - plus `start` and `runout`. The
+	## two sets share exactly one name, and a site naming any of the others is
+	## skipped by `environment_stage._bays` rather than guessed at.
+	var out := {}
+	for entry in _geometry.get("modules", []):
+		var module: Dictionary = entry
+		var lowest := Vector3(INF, INF, INF)
+		var highest := Vector3(-INF, -INF, -INF)
+		var seen := false
+		for mesh_entry in (module.get("meshes", []) as Array):
+			var mesh: Dictionary = mesh_entry
+			# `v` is flat - x, y, z, x, y, z - exactly as `_indexed_mesh`
+			# reads it a few functions down. Strided rather than reshaped:
+			# two readers of one array that disagree about its shape is the
+			# bug this comment exists to stop coming back.
+			var flat: Array = mesh.get("v", [])
+			var index := 0
+			while index + 2 < flat.size():
+				var point := Vector3(float(flat[index]), float(flat[index + 1]),
+					float(flat[index + 2]))
+				lowest = Vector3(minf(lowest.x, point.x),
+					minf(lowest.y, point.y), minf(lowest.z, point.z))
+				highest = Vector3(maxf(highest.x, point.x),
+					maxf(highest.y, point.y), maxf(highest.z, point.z))
+				seen = true
+				index += 3
+		if seen:
+			out[str(module.get("id", ""))] = (lowest + highest) * 0.5 \
+				* _render_scale
 	return out
 
 

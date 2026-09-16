@@ -1211,6 +1211,81 @@ func _build(key: String) -> StandardMaterial3D:
 			return _emissive("#FFB469", 2.2, 0.5)
 		"lit_world_cool":
 			return _emissive("#7FD8FF", 1.8, 0.5)
+
+		# --- V27: the contained stage -------------------------------------
+		#
+		# Eleven keys for three rooms, and the count is the point. The brief's
+		# Part F asks for a compact material family and its Part P asks whether
+		# the stage would still be right under different racers, a different
+		# machine and a different course; a family that grew a surface per theme
+		# would answer no to the second by failing the first.
+		#
+		# **Nothing here is reachable from a machine pass.** These are named only
+		# by `world.deck`, `world.shell`, `world.pylons`, `world.canopy` and
+		# `world.bays`, which no profile before V27 carries, and
+		# `tests/test_sloped_v23_integration.py`'s disjointness rule holds
+		# because a machine pass names none of them.
+		#
+		# The values are neutral on purpose and it is a hard requirement rather
+		# than a preference: a stage meant to outlive this racer palette, this
+		# machine colour language and this course may not carry a hue of its own
+		# strong enough to argue with the next one. Graphite, charcoal, cool
+		# grey. The only saturated surfaces in the family are the two lit strips,
+		# and both are dimmer than the machine's own practicals.
+		"hall_panel":
+			# The wall. A shade warmer and a shade lighter than `world_cliff_face`
+			# so a panel does not read as rock, and matte-with-a-trace-of-lacquer
+			# rather than matte, because a large flat architectural surface with no
+			# specular lobe at all has no gradient across it and goes dead.
+			return _moulded("#23272E", 0.62, 0.22, 0.30)
+		"hall_panel_dark":
+			# What a recess is lined with, and what a wall is divided by. Four L*
+			# under the panel: enough to read as a division at 270 pixels, not
+			# enough to read as a hole.
+			return _matte("#14181E", 0.88)
+		"hall_rib":
+			# Painted structural metal. The clearcoat is doing the work: a rib is
+			# read as a *vertical* by the highlight band running down it, and that
+			# band is the only thing in the room that tells a viewer how tall the
+			# wall behind it is.
+			return _moulded("#2C323B", 0.44, 0.38, 0.16)
+		"hall_trim":
+			# Cornice, plinth, cap: the one light-value surface in the family.
+			# Bright enough to describe an edge against a dark wall, dark enough
+			# that a frame full of it still sits under the machine.
+			return _moulded("#4E5660", 0.38, 0.42, 0.12)
+		"hall_deck":
+			# The floor. Ceramic-neutral rather than concrete-grey: this surface
+			# is the largest single area in several frames and a true grey at this
+			# size pulls the whole picture's white balance with it.
+			return _matte("#2D323A", 0.90)
+		"hall_deck_dark":
+			# The service level and the pit: where the floor stops being a floor.
+			return _matte("#171B21", 0.93)
+		"hall_glass":
+			# Dark glass, as an opaque gloss rather than as transparency. A real
+			# alpha pane here would buy one thing - seeing through it - that there
+			# is nothing behind to see, and would cost sorting against every
+			# transparent guard on the machine.
+			return _moulded("#0E1219", 0.10, 1.0, 0.02)
+		"hall_beam":
+			# Overhead structure. Darker than the wall it crosses, because a
+			# ceiling member's whole job in a nine-by-sixteen frame is to be a
+			# silhouette.
+			return _matte("#1B1F26", 0.86)
+		"hall_grate":
+			# Utility decking and catwalk plate: the roughest surface here, so a
+			# walkway does not catch the same sheen as the wall behind it.
+			return _matte("#242932", 0.97)
+		"lit_hall_warm":
+			# A wall practical. Dimmer than `lit_world_warm` and much dimmer than
+			# the zone lamps, for the reason `environment_world._lamps` states: a
+			# dark room takes any amount of light before it looks full, and the
+			# frame where it looks full is the frame where the machine stopped
+			# being the brightest thing in it.
+			return _emissive("#FFC489", 1.7, 0.55)
+		"lit_hall_cool":
+			return _emissive("#9FD4FF", 1.35, 0.55)
 	push_error("lab_palette: unknown material key '%s'" % key)
 	return _moulded("#FF00FF", 0.5, 0.0)
 

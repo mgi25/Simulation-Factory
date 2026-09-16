@@ -114,21 +114,74 @@ def test_race2_does_not_edit_the_shared_primitives():
             assert "setattr(sloped" not in stripped, f"{path.name}: {stripped}"
 
 
-def test_the_renderer_does_not_touch_the_contained_stage():
-    """Race #2's scene builds no environment of its own and edits none.
+def _scene_code() -> str:
+    """`race2_scene.gd` with its comments removed.
 
-    The other session owns `environment_stage.gd` and the V27 profiles. This
-    asserts the Race #2 scene only *calls* the shared seam.
+    The assertions below are about what the scene *does*, and V29 gave it a
+    long comment block naming the very modules and profiles those assertions
+    forbid. Testing the raw text would then fail on prose, which is how a
+    correct test gets deleted for being wrong. The file has no `#` inside a
+    string literal - there is a test for that immediately below - so cutting
+    at the first `#` on each line leaves exactly the code.
     """
     import pathlib
 
     scene = pathlib.Path(REPO) / "godot" / "scripts" / "race2_scene.gd"
-    text = scene.read_text(encoding="utf-8")
-    assert "environment_stage" not in text
-    assert "contained_hall" not in text
+    lines = []
+    for line in scene.read_text(encoding="utf-8").splitlines():
+        cut = line.find("#")
+        lines.append(line if cut < 0 else line[:cut])
+    return '\n'.join(lines)
+
+
+def test_the_scene_has_no_hash_inside_a_string_literal():
+    """What `_scene_code` depends on, asserted rather than assumed."""
+    import pathlib
+    import re
+
+    scene = pathlib.Path(REPO) / "godot" / "scripts" / "race2_scene.gd"
+    for number, line in enumerate(
+            scene.read_text(encoding="utf-8").splitlines(), start=1):
+        for literal in re.findall(r'"[^"]*"', line):
+            assert "#" not in literal, f"line {number}: {literal}"
+
+
+def test_the_renderer_does_not_touch_the_contained_stage():
+    """Race #2's scene builds no environment of its own and edits none.
+
+    **V29 changed what this test can say and not what it is for.** Race #2 now
+    builds a stage - that is the whole of the V29 integration - so the old form
+    of this test, which asserted the string `environment_stage` was absent, is
+    asserting the opposite of the shipped behaviour. What it was *for* is that
+    the scene owns none of the environment: it calls the shared seam and does
+    not reimplement, edit or special-case any part of it. That survives V29
+    intact and is what is asserted here.
+    """
+    code = _scene_code()
+
+    # It reaches the stage through `environment_world.build`, the one entry
+    # point Race #1 uses, rather than preloading the stage module and calling
+    # its builders itself.
+    assert "environment_world.gd" in code
+    assert "EnvWorld.build(" in code
+    assert "environment_stage.gd" not in code
+    assert "Stage.build(" not in code
+
+    # It defines none of the stage's own builders.
+    for builder in ("func _shell", "func _pylons", "func _canopy",
+                    "func _bays", "func _deck("):
+        assert builder not in code, builder
+
+    # It special-cases no profile. The hall is reached by `--environment=`,
+    # like every other world, and the default is still the one camera A was
+    # developed against.
+    assert "contained_hall" not in code
+    assert "contained_base" not in code
+    assert 'DEFAULT_ENVIRONMENT := "aurora_valley_v26"' in code
+
     # It resolves a profile and asks `course_world` to build one; it never
     # constructs a light, a sky or a backdrop itself.
-    assert "World.build_environment" in text
-    assert "World.build_lights" in text
-    assert "DirectionalLight3D.new" not in text
-    assert "ProceduralSkyMaterial" not in text
+    assert "World.build_environment" in code
+    assert "World.build_lights" in code
+    assert "DirectionalLight3D.new" not in code
+    assert "ProceduralSkyMaterial" not in code

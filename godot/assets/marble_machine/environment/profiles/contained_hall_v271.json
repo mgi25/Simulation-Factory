@@ -1,0 +1,29 @@
+{
+  "id": "contained_hall_v271",
+  "title": "A' - Premium machine hall, finish corrected",
+  "family": "contained",
+  "summary": "contained_hall with the finish bay's landing pad dropped from hall_deck to hall_deck_dark. The pad is the one bright surface behind the finish machine - 27.8% of the final-approach frame at luma 51 against V26's 20-luma ravine floor - and it is the whole of the delta: no geometry is added, no material key is new, and the hall's architecture, radius, rhythm and lighting are V27's unchanged",
+  "extends": "contained_hall",
+  "world": {
+    "deck": {
+      "pads": [
+        {
+          "at": [
+            23.0,
+            41.0
+          ],
+          "size": [
+            40.0,
+            1.6,
+            34.0
+          ],
+          "sink": 1.1,
+          "bearing": 28.0,
+          "material": "hall_deck_dark",
+          "clearance": 0.0,
+          "keepout": 0.0
+        }
+      ]
+    }
+  }
+}

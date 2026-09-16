@@ -1,0 +1,54 @@
+V29: the review measures
+
+
+HOW THE ROOM AND THE LENS FIT  (layout units, degrees)
+  course plan reach from the axis      27.06
+  deck inner radius (the hole)         88.00   = 3.25x the course
+  nearest standing element             64.00   = 2.37x
+  stage lift applied                   68.90
+  hall floor, world y                  -2.60
+  frame top edge, whole film          -41.98 to -9.23 deg
+
+shot         eye y   eye r  aim elev  frame top  floor hit r  in hole %
+release       44.9    15.7     -35.4      -19.5         69.8        100
+upper         34.1    10.4     -33.2      -15.9         51.8        100
+middle        25.6    21.0     -36.2      -18.9         22.2        100
+run_in        15.8    39.2     -39.7      -21.4         22.1        100
+
+WHERE THE BLACKNESS IS  (% of each third, mean per shot)
+shot             outdoor top       outdoor mid       outdoor bot     contained top     contained mid     contained bot
+release                 0.09              1.04              0.00              7.69             17.12             83.89
+upper                   0.06              0.02              0.00             12.48             36.79             94.36
+middle                  0.00              0.00              0.00             32.09             75.48             98.36
+run_in                  0.11              0.00              0.00             80.55             92.71             99.20
+
+WHAT A TITLE PLATE WOULD SIT ON  (V24's band, first 1.05 s)
+world          luma      sd  worst sd   >128 %
+outdoor       22.10   12.48     32.34    0.058
+contained     17.00   11.60     17.87    0.000
+
+THE RACERS, AS THE DELIVERED FILM SHOWS THEM
+shot         outdoor luma contained luma   outdoor sat contained sat
+release            101.03         106.46        0.7518        0.7161
+upper              125.71         126.29        0.8441        0.8102
+middle             112.69          63.27        0.8529        0.9089
+run_in             128.32          21.01        0.7821        0.9494
+
+ENVIRONMENT MOTION ENERGY  (mean |dluma| per 0.1 s, background only)
+shot            outdoor    contained    ratio
+release         10.5252       9.7188    0.923
+upper            8.5370       6.6083    0.774
+middle           8.7432       2.9551    0.338
+run_in           8.2058       1.2241    0.149
+film             8.6922       4.4457    0.511
+
+HALL GEOMETRY IN FRONT OF THE MACHINE  (% of its silhouette)
+shot            mean       max
+?             0.1268    0.1268
+release       0.0694    0.1704
+upper         0.2627    3.7249
+middle        0.0138    0.1064
+run_in        0.0034    0.0227
+film          0.1054    3.7249
+
+  wrote docs/validation/race2/v29_contained\review.json

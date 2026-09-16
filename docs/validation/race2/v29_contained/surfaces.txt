@@ -1,0 +1,21 @@
+V29: which hall surfaces camera A looks at
+flat-marker segmentation over the same 1150 frames
+
+
+SHARE OF FRAME, PER SURFACE, MEAN OVER EACH SHOT (%)
+surface             release     upper    middle    run_in      film
+-------------------------------------------------------------------
+hall_panel           32.526    24.544    10.186     2.002    15.007
+hall_panel_dark       9.927     7.230    10.588     2.961     6.931
+hall_rib             12.955    11.467     2.368     0.662     6.280
+hall_trim             0.000     0.000     0.000     0.000     0.000
+hall_deck             0.326     0.898     1.950     0.393     0.861
+hall_deck_dark        0.000     0.000     0.000     0.000     0.000
+hall_glass            0.000     0.000     0.000     0.000     0.000
+hall_beam             0.000     0.000     0.000     0.000     0.000
+hall_grate            0.000     0.000     0.000     0.000     0.000
+lit_hall_warm         0.000     0.000     0.000     0.000     0.000
+lit_hall_cool         0.000     0.000     0.000     0.000     0.000
+hall                 55.734    44.140    25.091     6.018    29.079
+machine               7.856     7.804     6.195     3.189     5.941
+void                 36.411    48.056    68.714    90.793    64.980
