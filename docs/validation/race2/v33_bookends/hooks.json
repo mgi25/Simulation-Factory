@@ -1,0 +1,98 @@
+{
+ "compositions": [
+  {
+   "aim": [
+    -4.7085,
+    36.8626,
+    -24.0
+   ],
+   "azimuth": 44.0,
+   "blocked_by": [],
+   "clip": "output/race2/v33_bookends\\hooks\\A\\clip_switchyard_8",
+   "distance": 29.3352,
+   "elevation": 22.0,
+   "fov": 20.0,
+   "frames": 91,
+   "in_frame": 8,
+   "key": "A",
+   "max_diameter_1080": 112.24,
+   "median_diameter_1080": 105.21,
+   "median_diameter_270": 26.3,
+   "min_centre_gap_px": 104.69,
+   "min_diameter_1080": 99.0,
+   "min_gap_in_diameters": 0.995,
+   "near_far_ratio": 1.134,
+   "note": "the largest racer the row will hold at full separation, and the bay layout read straight off",
+   "position": [
+    14.8569,
+    47.8517,
+    -5.1059
+   ],
+   "racer_area_share": 0.03371,
+   "title": "front three-quarter grid"
+  },
+  {
+   "aim": [
+    -4.6085,
+    36.9226,
+    -24.0
+   ],
+   "azimuth": 78.0,
+   "blocked_by": [],
+   "clip": "output/race2/v33_bookends\\hooks\\B\\clip_switchyard_8",
+   "distance": 12.8863,
+   "elevation": 14.0,
+   "fov": 26.0,
+   "frames": 91,
+   "in_frame": 8,
+   "key": "B",
+   "max_diameter_1080": 231.41,
+   "median_diameter_1080": 182.95,
+   "median_diameter_270": 45.74,
+   "min_centre_gap_px": 63.09,
+   "min_diameter_1080": 151.05,
+   "min_gap_in_diameters": 0.345,
+   "near_far_ratio": 1.532,
+   "note": "down the row rather than across it: the biggest racers in the set, bought with most of the separation",
+   "position": [
+    -2.0089,
+    40.04,
+    -11.7697
+   ],
+   "racer_area_share": 0.10732,
+   "title": "low three-quarter, along the row"
+  },
+  {
+   "aim": [
+    -4.5485,
+    36.7426,
+    -24.0
+   ],
+   "azimuth": 58.0,
+   "blocked_by": [],
+   "clip": "output/race2/v33_bookends\\hooks\\C\\clip_switchyard_8",
+   "distance": 28.0057,
+   "elevation": 42.0,
+   "fov": 18.0,
+   "frames": 91,
+   "in_frame": 8,
+   "key": "C",
+   "max_diameter_1080": 131.5,
+   "median_diameter_1080": 123.04,
+   "median_diameter_270": 30.76,
+   "min_centre_gap_px": 123.65,
+   "min_diameter_1080": 115.58,
+   "min_gap_in_diameters": 1.005,
+   "near_far_ratio": 1.138,
+   "note": "high enough to slant the row across the portrait frame, which is where the extra size comes from, and to show the gate and the band the field falls onto",
+   "position": [
+    6.4803,
+    55.482,
+    -6.3502
+   ],
+   "racer_area_share": 0.04611,
+   "title": "elevated three-quarter"
+  }
+ ],
+ "seconds": 1.5
+}

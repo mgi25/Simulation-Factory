@@ -1,0 +1,185 @@
+{
+ "channel": {
+  "entry": [
+   -19.0,
+   5.4,
+   0.0
+  ],
+  "fall": 0.28421
+ },
+ "course": "switchyard",
+ "deck": {
+  "across": [
+   -8.2,
+   -0.0
+  ],
+  "along": [
+   -5.5,
+   5.5
+  ],
+  "covers_the_line": false,
+  "fall_per_across": 0.02443,
+  "fitted_stations": 6,
+  "stations": 13,
+  "top_at_across_0": -0.5201
+ },
+ "envelope": {
+  "across": [
+   -7.9365,
+   0.7742
+  ],
+  "along": [
+   -4.3264,
+   5.2666
+  ],
+  "up": [
+   -1.7882,
+   -0.0339
+  ]
+ },
+ "finding": {
+  "note": "race2.parts.RunOut reads TrackRun.heading_deg (atan2(x, z)) through Frame.yaw's inverse (atan2(-z, x)); the deck is laid across the travel direction. Physics is locked, so this is measured, not fixed.",
+  "racers_frozen_off_the_deck": [
+   1,
+   7
+  ],
+  "runout_yaw_error_deg": 90.0
+ },
+ "frames": 1150,
+ "racers": 8,
+ "rest": [
+  {
+   "across": -3.1716,
+   "along": 3.5758,
+   "crossed_at": 17.7333,
+   "id": 0,
+   "speed": 11.2344,
+   "state": "running",
+   "up": -0.3128
+  },
+  {
+   "across": -0.1059,
+   "along": 3.1598,
+   "crossed_at": 16.1333,
+   "id": 1,
+   "speed": 0.0,
+   "state": "escaped",
+   "up": -1.7882
+  },
+  {
+   "across": -7.915,
+   "along": -4.3264,
+   "crossed_at": 15.8833,
+   "id": 2,
+   "speed": 4.7248,
+   "state": "running",
+   "up": -0.4284
+  },
+  {
+   "across": -5.8813,
+   "along": 0.273,
+   "crossed_at": 17.2,
+   "id": 3,
+   "speed": 9.5096,
+   "state": "running",
+   "up": -0.3787
+  },
+  {
+   "across": 0.7742,
+   "along": 4.5109,
+   "crossed_at": 18.75,
+   "id": 4,
+   "speed": 31.102,
+   "state": "running",
+   "up": -1.2328
+  },
+  {
+   "across": -7.7953,
+   "along": -1.4387,
+   "crossed_at": 16.5833,
+   "id": 5,
+   "speed": 4.2598,
+   "state": "running",
+   "up": -0.4256
+  },
+  {
+   "across": -7.8144,
+   "along": 4.2809,
+   "crossed_at": 17.8167,
+   "id": 6,
+   "speed": 3.5818,
+   "state": "running",
+   "up": -0.4259
+  },
+  {
+   "across": 0.7302,
+   "along": 2.8634,
+   "crossed_at": 15.8333,
+   "id": 7,
+   "speed": 0.0,
+   "state": "escaped",
+   "up": -1.7517
+  }
+ ],
+ "seed": 8,
+ "sight": {
+  "across": [
+   -1.8838,
+   -0.1197
+  ],
+  "along": [
+   0.9736,
+   4.7967
+  ],
+  "rays": 377
+ },
+ "site": {
+  "across": [
+   0.0,
+   0.0,
+   -1.0
+  ],
+  "along": [
+   -1.0,
+   0.0,
+   0.0
+  ],
+  "half_width": 1.4754,
+  "origin": [
+   -12.5,
+   -0.6,
+   24.0
+  ],
+  "up": [
+   0.0,
+   1.0,
+   0.0
+  ]
+ },
+ "unsupported_frames": [
+  {
+   "across": -0.094,
+   "along": 5.077,
+   "id": 4,
+   "t": 19.0,
+   "up": -0.146
+  }
+ ],
+ "well": {
+  "across": [
+   -0.1197,
+   1.3592
+  ],
+  "along": [
+   0.7296,
+   5.2024
+  ],
+  "floor": -2.1132,
+  "frames": 380,
+  "racers": [
+   1,
+   4,
+   7
+  ]
+ }
+}

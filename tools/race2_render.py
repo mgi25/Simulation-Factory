@@ -95,7 +95,8 @@ def run_godot(command: list[str], label: str) -> str:
     for line in (result.stdout or "").splitlines():
         stripped = line.strip()
         if stripped.startswith(("race2:", "cameras:", "scene:", "rendered",
-                                "adapter:", "stage:", "environment_stage:")):
+                                "adapter:", "stage:", "environment_stage:",
+                                  "bookends:")):
             print(f"    {stripped}")
     print(f"  {label}: {elapsed:.1f}s")
     return result.stdout or ""
@@ -117,7 +118,7 @@ def inputs_for(out: str, course: str, seed: int) -> tuple[str, str, str]:
 def base_command(godot: str, out_dir: str, course: str, seed: int, out: str,
                  size: tuple[int, int], environment: str, racers: str,
                  show: str, track: str = "", track_probe: str = "",
-                 faces: str = "") -> list[str]:
+                 faces: str = "", bookends: str = "") -> list[str]:
     geometry, replay, cameras = inputs_for(out, course, seed)
     command = [
         godot, "--path", GODOT_PROJECT, RENDER_SCENE, "--",
@@ -142,6 +143,11 @@ def base_command(godot: str, out_dir: str, course: str, seed: int, out: str,
     # `race2_track_surface.faces` for the measurement behind it.
     if faces:
         command.append(f"--faces={faces}")
+    # V33. Absent by default, and absent is every render up to V32.2: the
+    # scene builds no bookend without one, so a command line that does not
+    # carry this flag is the command line that made the shipped film.
+    if bookends:
+        command.append(f"--bookends={os.path.abspath(bookends)}")
     return command
 
 
@@ -171,6 +177,8 @@ def main() -> int:
                         help="one material field at a time, e.g. roughness=0.5")
     parser.add_argument("--faces", default="",
                         help="channel strip: front (V32) or both (V32.1)")
+    parser.add_argument("--bookends", default="",
+                        help="a race2.bookends spec: the V33 start/finish stands")
     parser.add_argument("--fps", type=int, default=60)
     parser.add_argument("--start", type=float, default=0.0)
     parser.add_argument("--end", type=float, default=-1.0)
@@ -188,7 +196,8 @@ def main() -> int:
         names = cut_names(args.out, args.course, args.seed)
         command = base_command(godot, out_dir, args.course, args.seed, args.out,
                                size, args.environment, args.racers, args.show,
-                               args.track, args.track_probe, args.faces)
+                               args.track, args.track_probe, args.faces,
+                               args.bookends)
         command.append(f"--stills={','.join(names)}")
         run_godot(command, f"{args.mode} {tag}")
         print(f"  {len(names)} frames in {out_dir}")
@@ -201,7 +210,8 @@ def main() -> int:
         os.makedirs(out_dir, exist_ok=True)
         command = base_command(godot, out_dir, args.course, args.seed, args.out,
                                size, args.environment, args.racers, args.show,
-                               args.track, args.track_probe, args.faces)
+                               args.track, args.track_probe, args.faces,
+                               args.bookends)
         command.append(f"--at={args.at}")
         run_godot(command, f"still {tag}")
         return 0
@@ -212,7 +222,8 @@ def main() -> int:
         os.remove(stale)
     command = base_command(godot, out_dir, args.course, args.seed, args.out,
                            size, args.environment, args.racers, args.show,
-                           args.track, args.track_probe, args.faces)
+                           args.track, args.track_probe, args.faces,
+                               args.bookends)
     command += ["--clip=1", f"--fps={args.fps}", f"--start={args.start}"]
     if args.end > 0:
         command.append(f"--end={args.end}")

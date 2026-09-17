@@ -1,0 +1,238 @@
+{
+ "checks": [
+  {
+   "check": "the start stand has eight bays",
+   "detail": 8,
+   "pass": true
+  },
+  {
+   "check": "the gate is a moving group",
+   "detail": "slide",
+   "pass": true
+  },
+  {
+   "check": "the gate starts on the physical release",
+   "detail": 0.1,
+   "pass": true
+  },
+  {
+   "check": "the finish line exists",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "the run-out exists",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "the catch pocket exists",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "the pocket catches the racers the deck drops",
+   "detail": [
+    1,
+    4,
+    7
+   ],
+   "pass": true
+  },
+  {
+   "check": "the replay is the production one",
+   "detail": "7510313489368087",
+   "pass": true
+  },
+  {
+   "check": "camera A: the three later cuts are the shipped ones",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "camera B: the three later cuts are the shipped ones",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "camera C: the three later cuts are the shipped ones",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "a: 1150 frames",
+   "detail": 1150,
+   "pass": true
+  },
+  {
+   "check": "a: 1080x1920",
+   "detail": [
+    1080,
+    1920
+   ],
+   "pass": true
+  },
+  {
+   "check": "a: carries a soundtrack",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "a: the soundtrack is the delivered AAC stream",
+   "detail": "aac",
+   "pass": true
+  },
+  {
+   "check": "a: runtime 19.1667 s",
+   "detail": 19.1667,
+   "pass": true
+  },
+  {
+   "check": "a: the winner is still PINK",
+   "detail": "PINK",
+   "pass": true
+  },
+  {
+   "check": "a: the winner is still m7",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "a: the finish order is the shipped one",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "a: the mark clears the racers",
+   "detail": 48.0,
+   "pass": true
+  },
+  {
+   "check": "a: the mark's band is measured on THIS film's racers",
+   "detail": [
+    523.2,
+    [
+     96,
+     453
+    ]
+   ],
+   "pass": true
+  },
+  {
+   "check": "a: the payoff still says 5TH",
+   "detail": 5,
+   "pass": true
+  },
+  {
+   "check": "a: the hook reads PICK A COLOR",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "your: 1150 frames",
+   "detail": 1150,
+   "pass": true
+  },
+  {
+   "check": "your: 1080x1920",
+   "detail": [
+    1080,
+    1920
+   ],
+   "pass": true
+  },
+  {
+   "check": "your: carries a soundtrack",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "your: the soundtrack is the delivered AAC stream",
+   "detail": "aac",
+   "pass": true
+  },
+  {
+   "check": "your: runtime 19.1667 s",
+   "detail": 19.1667,
+   "pass": true
+  },
+  {
+   "check": "your: the winner is still PINK",
+   "detail": "PINK",
+   "pass": true
+  },
+  {
+   "check": "your: the winner is still m7",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "your: the finish order is the shipped one",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "your: the mark clears the racers",
+   "detail": 128.1,
+   "pass": true
+  },
+  {
+   "check": "your: the mark's band is measured on THIS film's racers",
+   "detail": [
+    523.2,
+    [
+     96,
+     453
+    ]
+   ],
+   "pass": true
+  },
+  {
+   "check": "your: the payoff still says 5TH",
+   "detail": 5,
+   "pass": true
+  },
+  {
+   "check": "your: the hook reads PICK YOUR COLOR",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "a: the soundtrack matches V32.2 stream for stream",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "your: the soundtrack matches V32.2 stream for stream",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "the middle report exists",
+   "detail": 0.754,
+   "pass": true
+  },
+  {
+   "check": "the finish becomes visible before the crossing",
+   "detail": 3.05,
+   "pass": true
+  },
+  {
+   "check": "the racers are meaningfully larger at frame 0",
+   "detail": 2.002,
+   "pass": true
+  },
+  {
+   "check": "all eight racers are visible on frame 0",
+   "detail": "",
+   "pass": true
+  },
+  {
+   "check": "with no bookends this branch renders the base commit",
+   "detail": "8/8",
+   "pass": true
+  }
+ ],
+ "passed": 42,
+ "total": 42
+}

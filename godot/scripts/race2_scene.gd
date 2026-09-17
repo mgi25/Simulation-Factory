@@ -62,6 +62,12 @@ const EnvBuilder := preload(
 const EnvWorld := preload(
 	"res://assets/marble_machine/environment/environment_world.gd")
 const RacerVisual := preload("res://assets/marble_machine/racers/racer_visual.gd")
+## V33. Absent unless `--bookends=` names a spec, so every edition up to and
+## including V32.2 renders the frames it rendered before this line existed -
+## which is what `tools/race2_v33_bookends.py neutrality` proves rather than
+## claims.
+const Bookends := preload(
+	"res://assets/marble_machine/course/race2_bookends.gd")
 
 const DEFAULT_CONTRAST := "v21"
 ## The world Race #2 is developed against: V26's shipped production
@@ -90,6 +96,7 @@ var _racers := DEFAULT_RACERS
 var _track := ""
 var _track_probe := ""
 var _faces := "front"
+var _bookends: Node3D = null
 
 
 func _ready() -> void:
@@ -194,6 +201,11 @@ func _ready() -> void:
 	# ground, because the terrain config is not finished until then.
 	if show == "all":
 		_build_stage(profile)
+	# **After the stage and before the replay.** After the stage because a
+	# bookend stands on the room's floor and wants to be drawn over it rather
+	# than under it; before the replay because `set_time` poses the gate and
+	# the gate has to exist by then.
+	_build_bookends(str(options.get("bookends", "")), show)
 	if str(options.get("replay", "")) != "":
 		_load_replay(str(options["replay"]))
 	if str(options.get("cameras", "")) != "":
@@ -368,6 +380,42 @@ func _build_stage(profile: Dictionary) -> void:
 		if not nodes.has(wanted):
 			print("stage: bay '%s' wants node '%s', which this course has not"
 				% [str(key), wanted])
+
+
+func _build_bookends(path: String, show: String) -> void:
+	## The V33 start and finish stands, if a spec was named.
+	##
+	## Parented at the scene root, **not** under `Course`: the spec is in
+	## layout units and `Course` carries the simulation-to-layout scale, so a
+	## stand added there would come out at 0.57 of its authored size. The
+	## contained stage is parented the same way for the same reason.
+	if path.is_empty():
+		return
+	if show != "all" and not TrackSurface.is_mask(_track):
+		return
+	var text := FileAccess.get_file_as_string(path)
+	if text.is_empty():
+		push_error("race2_scene: cannot read bookends %s" % path)
+		return
+	var parsed = JSON.parse_string(text)
+	if typeof(parsed) != TYPE_DICTIONARY:
+		push_error("race2_scene: %s is not a bookend spec" % path)
+		return
+	var spec: Dictionary = parsed
+	if str(spec.get("units", "")) != "layout":
+		push_error("race2_scene: bookend spec is in '%s', not layout units"
+			% str(spec.get("units", "?")))
+		return
+	_bookends = Bookends.build(_palette, spec)
+	add_child(_bookends)
+	if TrackSurface.is_mask(_track):
+		# A bookend is machine, so it paints out as structure in the scene
+		# mask and as background in the band masks - the same classification
+		# `_build_course` gives a module shell.
+		_paint(_bookends, TrackSurface.flat(
+			TrackSurface.MASK_STRUCTURE if _track == "mask"
+			else TrackSurface.MASK_BACKGROUND))
+	Bookends.set_time(_bookends, 0.0)
 
 
 func _stage_datum(world_cfg: Dictionary) -> float:
@@ -805,6 +853,7 @@ func set_time(seconds: float) -> void:
 		node.quaternion = _quat(a["q"]).slerp(_quat(b["q"]), blend)
 
 	_place_actuators(low, high, blend)
+	Bookends.set_time(_bookends, seconds)
 	if _use_track:
 		_place_from_track(seconds)
 
