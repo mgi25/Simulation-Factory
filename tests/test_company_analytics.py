@@ -21,6 +21,7 @@ across modules. The sections are:
 
 from __future__ import annotations
 
+import ast
 import dataclasses
 import datetime as dt
 import json
@@ -1665,19 +1666,28 @@ def test_no_production_module_imports_analytics():
 
 
 def test_analytics_uses_only_the_standard_library_and_company_os():
-    """No new dependency. Everything imported is stdlib or already in the tree."""
+    """No new dependency. Everything imported is stdlib or already in the tree.
+
+    The four roots the Studio import added - csv, decimal, hashlib, io - are all
+    standard library. Read from the syntax tree rather than matched line by
+    line, because a docstring sentence beginning "from opposite sides" is not an
+    import, and a pattern that cannot tell the difference fails on prose.
+    """
     allowed_roots = {
-        "__future__", "ai_platform", "collections", "company", "dataclasses",
-        "datetime", "enum", "json", "knowledge", "pathlib", "re", "statistics",
-        "typing", "argparse", "sys", "abc", "math", "itertools", "functools",
+        "__future__", "ai_platform", "collections", "company", "csv", "dataclasses",
+        "datetime", "decimal", "enum", "hashlib", "io", "json", "knowledge",
+        "pathlib", "re", "statistics", "typing", "argparse", "sys", "abc", "math",
+        "itertools", "functools",
     }
-    pattern = re.compile(r"^\s*(?:from|import)\s+([A-Za-z_][\w.]*)", re.MULTILINE)
     for path in sorted(PACKAGE.glob("*.py")):
-        for match in pattern.finditer(path.read_text(encoding="utf-8")):
-            root = match.group(1).split(".")[0]
-            if root.startswith("_") or match.group(1).startswith("."):
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if isinstance(node, ast.Import):
+                roots = {alias.name.split(".")[0] for alias in node.names}
+            elif isinstance(node, ast.ImportFrom) and not node.level and node.module:
+                roots = {node.module.split(".")[0]}
+            else:
                 continue
-            assert root in allowed_roots, f"{path.name} imports {match.group(1)}"
+            assert roots <= allowed_roots, f"{path.name} imports {sorted(roots)}"
 
 
 def test_the_only_company_os_imports_are_the_two_shared_utilities():
@@ -1715,7 +1725,10 @@ def test_the_analytics_capsule_is_within_budget(seeds):
     capsule = seeds.get("company-analytics-experiments")
     assert capsule.size_chars() <= DEFAULT_BUDGET.max_capsule_chars
     assert capsule.owns_paths == ("company/analytics",)
-    assert capsule.tests == ("tests/test_company_analytics.py",)
+    assert capsule.tests == (
+        "tests/test_company_analytics.py",
+        "tests/test_company_youtube_studio_ingestion.py",
+    )
 
 
 def test_the_capsule_is_cheaper_than_the_package_it_describes(seeds):

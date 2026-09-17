@@ -61,6 +61,7 @@ from .metrics import DEFAULT_REGISTRY, MetricDefinition, MetricRegistry
 from .observations import MetricObservation
 from .postmortem import DeliverablePostmortem
 from .results import ExperimentResult
+from .studio_source import StudioExportSource
 
 T = TypeVar("T")
 
@@ -82,6 +83,10 @@ _KINDS: dict[str, tuple[str, str, Callable[..., Any]]] = {
     "learning": ("learnings", "learning_id", AnalyticsLearning.from_dict),
     "hypothesis": ("hypotheses", "hypothesis_id", AnalyticsHypothesis.from_dict),
     "baseline": ("baselines", "baseline_id", FormatBaseline.from_dict),
+    # The export an import came off: which file, which bytes, what it was
+    # declared to cover. A document about readings rather than a reading, so it
+    # is stored beside them and stays out of the event ledger.
+    "studio_source": ("studio_sources", "source_id", StudioExportSource.from_dict),
 }
 
 _KIND_BY_TYPE: dict[type, str] = {
@@ -94,6 +99,7 @@ _KIND_BY_TYPE: dict[type, str] = {
     AnalyticsLearning: "learning",
     AnalyticsHypothesis: "hypothesis",
     FormatBaseline: "baseline",
+    StudioExportSource: "studio_source",
 }
 
 # Kinds mirrored into the event ledger. Just the one: an observation is the

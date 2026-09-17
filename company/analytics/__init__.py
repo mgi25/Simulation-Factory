@@ -33,14 +33,25 @@ something.
    objective is long-term profitable audience growth, which is not one number,
    and a single number here would be optimised in its place.
 
-## What it deliberately does not have
+## The one data bridge, and what it still is not
 
-No YouTube connector, no OAuth, no scraper, no scheduler, no prediction model,
-no embeddings, no LLM analysis. Constitution rule 17 - prove need before
-building. This phase defines the contracts the data will have to satisfy; a
-session that later fetches the data has something to put it in.
+`studio_*.py` reads a YouTube Studio CSV export of our own channel into
+observations. It is a file ingester and nothing more: the caller has already
+downloaded the file, asserted that the channel is ours, and written down which
+video is which deliverable. There is still no YouTube connector, no OAuth, no
+scraper, no downloader, no scheduler, no live polling, no prediction model, no
+embeddings and no LLM analysis. Constitution rule 17 - prove need before
+building.
 
-No title inference either, in this phase or a later one. Feature tags are
+What the bridge adds is provenance rather than convenience. A row becomes an
+observation only when the file, its bytes, the row, the column, the video, the
+deliverable and what the reading covers are recorded with it. Everything else
+becomes a diagnostic saying why it did not, because an imported number is not
+true merely because it arrived in a CSV.
+
+No title inference, in this phase or a later one. A Studio row is resolved to a
+deliverable by an explicit mapping from the platform's own video id, never from
+the title sitting next to it. Feature tags are
 recorded by whoever made the thing (`genome.py`), because a feature read off a
 title is a guess about how a video was made carrying the authority of a record.
 
@@ -74,6 +85,8 @@ from .errors import (
     LedgerViolation,
     OverclaimRefused,
     ProvenanceViolation,
+    StudioExportRejected,
+    StudioValueError,
 )
 from .experiments import (
     ComparisonBasis,
@@ -130,6 +143,46 @@ from .results import (
     evaluate_experiment,
 )
 from .store import AnalyticsStore, AnalyticsStoreError
+from .studio_ingest import (
+    CommitOutcome,
+    ExportDescription,
+    IngestionIssue,
+    IngestionIssueKind,
+    IssueSeverity,
+    StudioIngestionResult,
+    UnresolvedVideo,
+    commit_ingestion,
+    describe_export,
+    ingest_studio_export,
+)
+from .studio_mapping import VideoIdentityMapping, load_video_mapping
+from .studio_schema import (
+    STANDARD_STUDIO_SCHEMAS,
+    STUDIO_VIDEO_DAILY_V1,
+    STUDIO_VIDEO_TOTALS_V1,
+    ColumnMapping,
+    StudioExportSchema,
+    TemporalSemantics,
+    recognise_schema,
+)
+from .studio_source import (
+    STUDIO_PARSER_VERSION,
+    ExportRow,
+    StudioExportFile,
+    StudioExportSource,
+    digest_bytes,
+    read_export,
+)
+from .studio_values import (
+    COMMA_DECIMAL,
+    DOT_DECIMAL,
+    EN_US_GROUPED,
+    EURO_GROUPED,
+    STANDARD_NUMBER_FORMATS,
+    NumberFormat,
+    ValueFormat,
+    number_format,
+)
 from .windows import (
     FIRST_7D,
     FIRST_24H,
@@ -145,15 +198,6 @@ from .windows import (
 __all__ = [
     "ALL_DIMENSIONS",
     "ASSOCIATION_NOTE",
-    "CONSTRUCTION_ENFORCED",
-    "DEFAULT_REGISTRY",
-    "FIRST_7D",
-    "FIRST_24H",
-    "FIRST_30D",
-    "FIRST_HOUR",
-    "LIFETIME",
-    "STANDARD_AGE_WINDOWS",
-    "STANDARD_METRICS",
     "AgeWindow",
     "AnalyticsError",
     "AnalyticsHypothesis",
@@ -163,10 +207,16 @@ __all__ = [
     "AnalyticsStore",
     "AnalyticsStoreError",
     "AnalyzedDeliverable",
+    "COMMA_DECIMAL",
+    "CONSTRUCTION_ENFORCED",
     "CausalAssessment",
-    "CompetitorPublicReference",
+    "ColumnMapping",
+    "CommitOutcome",
     "ComparisonBasis",
+    "CompetitorPublicReference",
     "ContentFeatures",
+    "DEFAULT_REGISTRY",
+    "DOT_DECIMAL",
     "DataScope",
     "DataSource",
     "DateRange",
@@ -175,6 +225,8 @@ __all__ = [
     "DeliverableOutcome",
     "DeliverablePostmortem",
     "Direction",
+    "EN_US_GROUPED",
+    "EURO_GROUPED",
     "EvidenceRequired",
     "EvidenceStrength",
     "ExecutionRecordKind",
@@ -183,6 +235,12 @@ __all__ = [
     "ExperimentResult",
     "ExperimentSpecification",
     "ExperimentStatus",
+    "ExportDescription",
+    "ExportRow",
+    "FIRST_24H",
+    "FIRST_30D",
+    "FIRST_7D",
+    "FIRST_HOUR",
     "FeatureDimension",
     "FinanceRecordKind",
     "FinanceReference",
@@ -191,7 +249,11 @@ __all__ = [
     "GroupedPerformance",
     "GuardrailOutcome",
     "HypothesisState",
+    "IngestionIssue",
+    "IngestionIssueKind",
+    "IssueSeverity",
     "KillCondition",
+    "LIFETIME",
     "LearningScope",
     "LedgerViolation",
     "MeasurementCoverage",
@@ -202,6 +264,7 @@ __all__ = [
     "MetricOutcome",
     "MetricRegistry",
     "MetricSummary",
+    "NumberFormat",
     "ObservationSeries",
     "OutlierMethod",
     "OutlierRule",
@@ -211,18 +274,43 @@ __all__ = [
     "ProvenanceViolation",
     "ResearchRecordKind",
     "ResearchReference",
+    "STANDARD_AGE_WINDOWS",
+    "STANDARD_METRICS",
+    "STANDARD_NUMBER_FORMATS",
+    "STANDARD_STUDIO_SCHEMAS",
+    "STUDIO_PARSER_VERSION",
+    "STUDIO_VIDEO_DAILY_V1",
+    "STUDIO_VIDEO_TOTALS_V1",
+    "StudioExportFile",
+    "StudioExportRejected",
+    "StudioExportSchema",
+    "StudioExportSource",
+    "StudioIngestionResult",
+    "StudioValueError",
+    "TemporalSemantics",
+    "UnresolvedVideo",
+    "ValueFormat",
     "Variable",
     "Verdict",
+    "VideoIdentityMapping",
     "assert_integrity",
     "build_baseline",
     "build_report",
     "check_integrity",
+    "commit_ingestion",
     "compare_deliverables",
+    "describe_export",
+    "digest_bytes",
     "evaluate_experiment",
     "group_performance",
     "group_value",
+    "ingest_studio_export",
+    "load_video_mapping",
+    "number_format",
     "observe",
     "promote",
+    "read_export",
+    "recognise_schema",
     "standard_age_window",
     "summarise_metric",
 ]

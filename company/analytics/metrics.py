@@ -223,6 +223,16 @@ _PLATFORM_METRICS: tuple[MetricDefinition, ...] = (
         private=True,
     ),
     _m(
+        "watch_time_hours",
+        MetricKind.DURATION,
+        "hours",
+        "Total hours watched over the observation window, in the hours the export "
+        "reports rather than converted to seconds. Named for its unit because it "
+        "sits beside average_view_duration_seconds, and a total in one unit next "
+        "to a mean in another is how a watch time gets divided by sixty.",
+        private=True,
+    ),
+    _m(
         "retention_at_3s",
         MetricKind.RATE,
         "fraction of views, 0.0-1.0",
