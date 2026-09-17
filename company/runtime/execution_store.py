@@ -6,6 +6,8 @@
 <state_dir>/execution/context_expansions/requests/<task>/000001.json
 <state_dir>/execution/context_expansions/decisions/<task>/000001.json
 <state_dir>/execution/receipts/<task>/000001.json
+<state_dir>/execution/efficiency/<task>/000001.json
+<state_dir>/execution/tool_outputs/<task>/000001.json
                                      000002.json
 ```
 
@@ -132,6 +134,9 @@ class ExecutionStore:
     _EXPANSION_REQUESTS = "requests"
     _EXPANSION_DECISIONS = "decisions"
     _RECEIPTS = "receipts"
+    _EFFICIENCY = "efficiency"
+    _TOOL_OUTPUTS = "tool_outputs"
+    _EXTENSIONS = frozenset({_EFFICIENCY, _TOOL_OUTPUTS})
 
     def __init__(self, state_dir: str | Path) -> None:
         if isinstance(state_dir, str) and not state_dir.strip():
@@ -276,6 +281,19 @@ class ExecutionStore:
             decision.fingerprint(),
         )
 
+    def append_extension(
+        self, kind: str, task_id: str, payload: object, record_fingerprint: str
+    ) -> ExecutionRecordPointer:
+        """Append an approved typed extension beside core execution records.
+
+        Runtime deliberately does not import the extension packages: callers
+        validate and decode their own records, while this method supplies the
+        same append-only path and exclusive-create semantics as packets.
+        """
+        if kind not in self._EXTENSIONS:
+            raise ExecutionStoreError(f"unsupported execution extension {kind!r}")
+        return self._append(kind, task_id, dumps(payload), record_fingerprint)
+
     # --- reading -----------------------------------------------------------
 
     def packets(self, task_id: str) -> tuple[SessionPacket, ...]:
@@ -396,6 +414,15 @@ class ExecutionStore:
             for path in sorted_records(
                 self._expansion_directory(self._EXPANSION_DECISIONS, task_id)
             )
+        )
+
+    def extension_records(self, kind: str, task_id: str) -> tuple[dict[str, object], ...]:
+        """Return canonical mappings; the owning extension validates its schema."""
+        if kind not in self._EXTENSIONS:
+            raise ExecutionStoreError(f"unsupported execution extension {kind!r}")
+        return tuple(
+            self._load(path)
+            for path in sorted_records(self._directory(kind, task_id))
         )
 
     def context_expansion_ledger(

@@ -4,7 +4,9 @@
     "capability_routing",
     "capability_config_loading",
     "capability_task_handoff",
-    "capability_context_assembly"
+    "capability_context_assembly",
+    "capability_efficiency_telemetry",
+    "capability_efficiency_benchmark"
   ],
   "created": "2026-09-16",
   "decisions": [],
@@ -37,6 +39,7 @@
     "knowledge/company_os/capsules/**"
   ],
   "may_write": [
+    "company/efficiency/**",
     "company/runtime/**"
   ],
   "must_not_modify": [
@@ -48,13 +51,15 @@
     "CompanyConfig holding the four parsed contracts",
     "RoutingResult with one EmployeeMatch per employee, eligible or not",
     "TaskAssignment and HandoffArtifact, or ValidationError listing every issue",
-    "A reference-only ContextManifest and inspectable ContextPlan"
+    "A reference-only ContextManifest and inspectable ContextPlan",
+    "Append-only efficiency records and deterministic benchmark comparisons"
   ],
   "owner": "workstream-codex",
   "owns_paths": [
+    "company/efficiency",
     "company/runtime"
   ],
-  "purpose": "Loads bootstrap contracts, routes tasks, assembles bounded capsule-backed context with no LLM call, and carries compact handoff artifacts between sessions.",
+  "purpose": "Loads bootstrap contracts, routes tasks, assembles bounded capsule-backed context with no LLM call, carries compact handoffs, and measures execution context efficiency without fabricating provider data.",
   "recheck_on": "2027-09-16",
   "revalidation_reason": "",
   "risks": [
@@ -66,7 +71,8 @@
   "status": "active",
   "tests": [
     "tests/test_company_runtime.py",
-    "tests/test_company_context_assembly.py"
+    "tests/test_company_context_assembly.py",
+    "tests/test_company_efficiency.py"
   ],
   "title": "Company runtime",
   "type": "module"
