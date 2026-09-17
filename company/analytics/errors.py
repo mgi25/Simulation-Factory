@@ -62,5 +62,35 @@ class LedgerViolation(AnalyticsError):
     """
 
 
+class StudioExportRejected(AnalyticsError):
+    """A Studio export file may not be ingested at all.
+
+    Whole-file refusals rather than row ones: an export whose provenance does
+    not assert our own channel, a header no schema recognises, a declaration of
+    what the file covers that the file contradicts. A row-level defect becomes a
+    diagnostic on the ingestion result instead; this is the class of problem
+    where reading on would produce records nobody could trace to a real reading.
+    """
+
+
+class StudioValueError(AnalyticsError):
+    """One cell could not honestly become a number.
+
+    Raised per cell and normally caught: `studio_ingest.py` turns it into a row
+    diagnostic naming the file, the row, the column and the reason, and produces
+    no observation for that cell. Empty, malformed and locale-ambiguous cells
+    all arrive here, and none of them leaves as a zero.
+
+    `ambiguous` separates the cell nobody can read from the cell that reads two
+    ways. They need different fixes - a correction against a declared number
+    format - so the ingester reports them as different kinds of problem rather
+    than as one bucket of bad cells.
+    """
+
+    def __init__(self, message: str, *, ambiguous: bool = False) -> None:
+        super().__init__(message)
+        self.ambiguous = ambiguous
+
+
 class AnalyticsIntegrityError(ValidationError):
     """One or more cross-record analytics invariants are broken, reported together."""
