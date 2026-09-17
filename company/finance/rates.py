@@ -31,8 +31,10 @@ it and `integrity.py` fails on it.
 from __future__ import annotations
 
 import datetime as dt
+import json
 from dataclasses import dataclass, replace
 from enum import Enum
+from pathlib import Path
 from typing import Any, ClassVar, Iterable
 
 from knowledge.company_os.records import Evidence
@@ -327,3 +329,41 @@ class RateCard:
 
     def currencies(self) -> tuple[str, ...]:
         return tuple(sorted({rate.currency for rate in self._rates}))
+
+
+def load_rate_card(path: str | Path) -> RateCard:
+    """Read a rate card from a JSON file somebody wrote by hand.
+
+    The file is a list of rate objects, or an object with a `rates` key holding
+    one. Every field `CostRate` requires is required here too - id, provider,
+    category, unit, amount, currency, effective dates, source and evidence -
+    because a loader that filled in a default would be a price this package
+    invented.
+
+    There is no fetch, no URL and no provider client, and there is not going to
+    be: a price that arrives over the network is a price nobody reviewed, and
+    section 5 of the brief exists to keep pricing something a human recorded.
+    """
+    source = Path(path)
+    try:
+        data = json.loads(source.read_text(encoding="utf-8"))
+    except OSError as exc:
+        raise FinanceError(f"cannot read rate card {source}: {exc}") from exc
+    except json.JSONDecodeError as exc:
+        raise FinanceError(f"{source}: rate card is not valid JSON: {exc}") from exc
+    if isinstance(data, dict):
+        data = data.get("rates", data)
+    if not isinstance(data, list):
+        raise FinanceError(
+            f"{source}: a rate card is a list of rate objects, or an object with a "
+            "'rates' key holding one"
+        )
+    rates: list[CostRate] = []
+    for index, item in enumerate(data):
+        if not isinstance(item, dict):
+            raise FinanceError(f"{source}: rate {index} is not an object")
+        try:
+            rates.append(CostRate.from_dict(item))
+        except (KeyError, TypeError, ValueError) as exc:
+            raise FinanceError(f"{source}: rate {index} does not decode: {exc}") from exc
+    return RateCard(rates)
