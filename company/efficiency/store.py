@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from company.runtime.execution_store import (
@@ -9,6 +10,7 @@ from company.runtime.execution_store import (
     ExecutionStore,
     ExecutionStoreError,
 )
+from company.runtime.state_paths import sorted_records, task_directory_name
 
 from .providers import ToolOutputArtifact
 from .telemetry import EfficiencyRecord
@@ -31,6 +33,28 @@ class EfficiencyStore:
             "efficiency", record.task_id, record, record.fingerprint()
         )
 
+    def append_idempotent(self, record: EfficiencyRecord) -> ExecutionRecordPointer:
+        """Return an identical finalized run, but never overwrite or fork it."""
+        for index, existing in enumerate(self.records(record.task_id), start=1):
+            if existing.run_id != record.run_id:
+                continue
+            if existing.fingerprint() != record.fingerprint():
+                raise ExecutionStoreError(
+                    f"efficiency run {record.run_id!r} already exists with different telemetry"
+                )
+            path = (
+                self.execution.root
+                / "efficiency"
+                / task_directory_name(record.task_id)
+                / f"{index:06d}.json"
+            )
+            return ExecutionRecordPointer(
+                path.relative_to(self.execution.state_dir).as_posix(),
+                existing.fingerprint(),
+                index,
+            )
+        return self.append(record)
+
     def records(self, task_id: str) -> tuple[EfficiencyRecord, ...]:
         try:
             return tuple(
@@ -46,6 +70,36 @@ class EfficiencyStore:
         return self.execution.append_extension(
             "tool_outputs", artifact.task_id, artifact, artifact.fingerprint()
         )
+
+    def append_tool_output_idempotent(
+        self, artifact: ToolOutputArtifact
+    ) -> ExecutionRecordPointer:
+        for index, existing in enumerate(self.tool_outputs(artifact.task_id), start=1):
+            if existing.fingerprint() != artifact.fingerprint():
+                continue
+            path = (
+                self.execution.root
+                / "tool_outputs"
+                / task_directory_name(artifact.task_id)
+                / f"{index:06d}.json"
+            )
+            return ExecutionRecordPointer(
+                path.relative_to(self.execution.state_dir).as_posix(),
+                existing.fingerprint(),
+                index,
+            )
+        return self.append_tool_output(artifact)
+
+    def all_records(self) -> tuple[EfficiencyRecord, ...]:
+        root = self.execution.root / "efficiency"
+        if not root.exists():
+            return ()
+        records: list[EfficiencyRecord] = []
+        for directory in sorted(path for path in root.iterdir() if path.is_dir()):
+            for path in sorted_records(directory):
+                value = json.loads(path.read_text(encoding="utf-8"))
+                records.append(EfficiencyRecord.from_mapping(value))
+        return tuple(records)
 
     def tool_outputs(self, task_id: str) -> tuple[ToolOutputArtifact, ...]:
         try:

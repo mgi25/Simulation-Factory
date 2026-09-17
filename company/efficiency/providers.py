@@ -5,12 +5,110 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Mapping, Protocol
 
 from ai_platform.serde import fingerprint
 from knowledge.company_os.capsules.index import normalise_path
 
-from .telemetry import IntegrationStatus
+from .telemetry import (
+    CostMeasurement,
+    IntegrationStatus,
+    MeasurementSource,
+    TokenMeasurement,
+)
+
+
+@dataclass(frozen=True)
+class ProviderUsage:
+    """Provider-neutral usage copied from an external provider response.
+
+    The runtime's current executor is an external-session transport, not a
+    provider client.  Consequently this adapter accepts the usage mapping that
+    the executor observed and never treats absence as zero.
+    """
+
+    provider: str | None
+    model: str | None
+    tokens: TokenMeasurement
+    latency_ms: int | None
+    cost: CostMeasurement
+
+
+def normalise_provider_usage(
+    payload: Mapping[str, Any] | None,
+    *,
+    provider: str | None = None,
+    model: str | None = None,
+) -> ProviderUsage:
+    """Normalize common provider usage shapes without inventing usage.
+
+    Supported token names are OpenAI-style ``prompt_tokens`` /
+    ``completion_tokens`` and provider-neutral/Anthropic-style
+    ``input_tokens`` / ``output_tokens``.  Either may be nested under
+    ``usage``.  A conflicting reported total is ignored in favour of the two
+    provider-reported components; it is never allowed to corrupt finalization.
+    """
+
+    data: Mapping[str, Any] = payload or {}
+    nested = data.get("usage")
+    usage = nested if isinstance(nested, Mapping) else data
+    input_tokens = _optional_provider_count(
+        usage.get("input_tokens", usage.get("prompt_tokens"))
+    )
+    output_tokens = _optional_provider_count(
+        usage.get("output_tokens", usage.get("completion_tokens"))
+    )
+    total_tokens = _optional_provider_count(usage.get("total_tokens"))
+    if (
+        total_tokens is not None
+        and input_tokens is not None
+        and output_tokens is not None
+        and total_tokens != input_tokens + output_tokens
+    ):
+        total_tokens = None
+    if any(value is not None for value in (input_tokens, output_tokens, total_tokens)):
+        tokens = TokenMeasurement.provider_reported(
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            total_tokens=total_tokens,
+            method="normalized external provider usage",
+        )
+    else:
+        tokens = TokenMeasurement.unavailable("provider omitted token usage")
+
+    latency_ms = _optional_provider_count(data.get("latency_ms"))
+    cost = _reported_cost(data)
+    resolved_provider = provider or _optional_text(data.get("provider"))
+    resolved_model = model or _optional_text(data.get("model"))
+    return ProviderUsage(resolved_provider, resolved_model, tokens, latency_ms, cost)
+
+
+def _reported_cost(data: Mapping[str, Any]) -> CostMeasurement:
+    raw = data.get("cost")
+    currency = _optional_text(data.get("currency")) or ""
+    if isinstance(raw, Mapping):
+        amount = raw.get("amount")
+        currency = _optional_text(raw.get("currency")) or currency
+    else:
+        amount = raw
+    if amount is None or not currency:
+        return CostMeasurement.unavailable("provider omitted monetary cost")
+    try:
+        return CostMeasurement(
+            MeasurementSource.PROVIDER_REPORTED,
+            amount=str(amount),
+            currency=currency,
+        )
+    except ValueError:
+        return CostMeasurement.unavailable("provider returned invalid monetary cost")
+
+
+def _optional_provider_count(value: Any) -> int | None:
+    return value if isinstance(value, int) and not isinstance(value, bool) and value >= 0 else None
+
+
+def _optional_text(value: Any) -> str | None:
+    return value.strip() if isinstance(value, str) and value.strip() else None
 
 
 class CodeQueryKind(str, Enum):

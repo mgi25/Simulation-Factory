@@ -33,6 +33,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, replace
+from importlib import import_module
 from pathlib import Path
 from typing import Any
 
@@ -75,6 +76,8 @@ class IngestedSession:
     receipt_pointer: ExecutionRecordPointer
     validation: ReceiptValidation
     attempt: AttemptResult
+    efficiency_pointer: ExecutionRecordPointer | None = None
+    telemetry_error: str = ""
 
     @property
     def accepted(self) -> bool:
@@ -154,6 +157,7 @@ class ManualExternalSessionAdapter:
         *,
         repo_dir: str | Path | None = None,
         expansion_ledger: ContextExpansionLedger | None = None,
+        tool_outputs: tuple[Any, ...] = (),
     ) -> IngestedSession:
         """Validate one receipt and record the attempt it describes.
 
@@ -198,11 +202,38 @@ class ManualExternalSessionAdapter:
         attempt = finalise_attempt(
             plan, report, usage_store, expansion_ledger=usable_ledger
         )
+        efficiency_pointer = None
+        telemetry_error = ""
+        try:
+            # Imported only at finalization so the core runtime remains usable
+            # without importing optional reporting code during preparation.
+            # Efficiency is an execution-store extension. Resolve it only
+            # after canonical finalization so runtime keeps a one-way static
+            # dependency graph and remains usable without the extension.
+            emitter = import_module(
+                "company.efficiency.emission"
+            ).emit_execution_efficiency
+            emission = emitter(
+                plan=plan,
+                packet=packet,
+                packet_attempt=packet_record.attempt,
+                receipt=receipt,
+                receipt_pointer=pointer,
+                outcome=attempt.usage_record.outcome,
+                state_dir=self.store.state_dir,
+                expansion_ledger=usable_ledger,
+                tool_outputs=tool_outputs,
+            )
+            efficiency_pointer = emission.pointer
+        except Exception as exc:  # observational telemetry cannot replace the result
+            telemetry_error = f"{type(exc).__name__}: {exc}"
         return IngestedSession(
             receipt=receipt,
             receipt_pointer=pointer,
             validation=validation,
             attempt=attempt,
+            efficiency_pointer=efficiency_pointer,
+            telemetry_error=telemetry_error,
         )
 
     def expand_context(

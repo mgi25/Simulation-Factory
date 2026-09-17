@@ -51,6 +51,8 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
+from datetime import datetime
+from decimal import Decimal, InvalidOperation
 import re
 from typing import Any
 
@@ -101,12 +103,18 @@ class ReceiptUsage:
     passes: int = 1
     retries: int = 0
     cache_hits: int = 0
+    cache_misses: int | None = None
     retrieval_hits: int = 0
     tool_calls: int | None = None
     input_units: int | None = None
     output_units: int | None = None
     usage_unit: UsageUnit = UsageUnit.UNKNOWN
     duration_s: float | None = None
+    provider: str = ""
+    model: str = ""
+    provider_latency_ms: int | None = None
+    provider_cost: str | None = None
+    provider_cost_currency: str = ""
 
     def __post_init__(self) -> None:
         for name in ("passes", "retries", "cache_hits", "retrieval_hits"):
@@ -117,7 +125,10 @@ class ReceiptUsage:
                 )
         if self.passes < 1:
             raise ValidationError("receipt.usage.passes describes at least one pass")
-        for name in ("tool_calls", "input_units", "output_units"):
+        for name in (
+            "cache_misses", "tool_calls", "input_units", "output_units",
+            "provider_latency_ms",
+        ):
             value = getattr(self, name)
             if value is None:
                 continue
@@ -135,6 +146,31 @@ class ReceiptUsage:
                     "receipt.usage.duration_s must be a number or null"
                 )
             object.__setattr__(self, "duration_s", float(self.duration_s))
+        for name in ("provider", "model", "provider_cost_currency"):
+            value = getattr(self, name)
+            if not isinstance(value, str):
+                raise ValidationError(f"receipt.usage.{name} must be a string")
+        if self.provider_cost is not None:
+            if not isinstance(self.provider_cost, str):
+                raise ValidationError("receipt.usage.provider_cost must be a decimal string or null")
+            try:
+                amount = Decimal(self.provider_cost)
+            except InvalidOperation as exc:
+                raise ValidationError(
+                    "receipt.usage.provider_cost must be a decimal string or null"
+                ) from exc
+            if (
+                not amount.is_finite()
+                or amount < 0
+                or not self.provider_cost_currency.strip()
+            ):
+                raise ValidationError(
+                    "receipt.usage.provider_cost requires a non-negative amount and currency"
+                )
+        elif self.provider_cost_currency:
+            raise ValidationError(
+                "receipt.usage.provider_cost_currency requires provider_cost"
+            )
 
     @classmethod
     def from_mapping(cls, data: Mapping[str, Any]) -> "ReceiptUsage":
@@ -190,6 +226,7 @@ class SessionReceipt:
     next_owner: str = ""
     rejection_reason: str = ""
     notes: str = ""
+    completed_at: str = ""
     usage: ReceiptUsage = field(default_factory=ReceiptUsage)
     executor: ExecutorHint = ExecutorHint.UNSPECIFIED
     subagents_used: int = 0
@@ -217,12 +254,18 @@ class SessionReceipt:
             "next_owner",
             "rejection_reason",
             "notes",
+            "completed_at",
             "expansion_ledger_fingerprint",
             "effective_context_fingerprint",
             "authority_fingerprint",
         ):
             if not isinstance(getattr(self, name), str):
                 issues.append(f"receipt.{name} must be a string")
+        if self.completed_at:
+            try:
+                datetime.fromisoformat(self.completed_at.replace("Z", "+00:00"))
+            except ValueError:
+                issues.append("receipt.completed_at must be an ISO-8601 timestamp")
         for name in ("remote_verified", "merge_performed"):
             if not isinstance(getattr(self, name), bool):
                 issues.append(f"receipt.{name} must be a boolean")
@@ -399,6 +442,7 @@ class SessionReceipt:
             next_owner=_optional_string(data, "next_owner"),
             rejection_reason=_optional_string(data, "rejection_reason"),
             notes=_optional_string(data, "notes"),
+            completed_at=_optional_string(data, "completed_at"),
             usage=ReceiptUsage.from_mapping(data.get("usage", {})),
             executor=parsed_executor,
             subagents_used=_integer(data.get("subagents_used", 0), "subagents_used"),

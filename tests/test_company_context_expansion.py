@@ -39,6 +39,7 @@ from company.runtime import (
     plan_task,
     validate_receipt,
 )
+from company.efficiency import EfficiencyStore
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -384,6 +385,23 @@ def test_requests_and_all_decisions_are_append_only_history(tmp_path: Path) -> N
         "rejected",
         "approved",
     ]
+    ingested = adapter.ingest(
+        plan,
+        packet,
+        _receipt(
+            packet,
+            ledger=approved.ledger,
+            used=(packet.context_keys()[0], INDEX_REF.key),
+        ),
+        ResourceUsageStore(tmp_path),
+    )
+    assert ingested.accepted
+    telemetry = EfficiencyStore(tmp_path).records(packet.task_id)[0]
+    assert (
+        telemetry.context_expansion_requests,
+        telemetry.context_expansion_approvals,
+        telemetry.context_expansion_denials,
+    ) == (2, 1, 1)
 
 
 def test_receipt_refuses_unapproved_context_and_a_foreign_ledger() -> None:

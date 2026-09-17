@@ -412,6 +412,11 @@ def _receipt(args: argparse.Namespace) -> int:
                 "warnings": list(ingested.validation.warnings),
                 "receipt_ref": ingested.receipt_pointer.record_ref,
                 "usage_record": ingested.attempt.usage_pointer.to_dict(),
+                "efficiency_record": (
+                    ingested.efficiency_pointer.to_dict()
+                    if ingested.efficiency_pointer is not None else None
+                ),
+                "telemetry_error": ingested.telemetry_error or None,
                 "handoff": to_jsonable(ingested.attempt.handoff),
             },
             indent=2,

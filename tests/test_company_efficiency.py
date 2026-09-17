@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import replace
+import json
 from pathlib import Path
+import sys
 
 import pytest
 
@@ -23,9 +25,11 @@ from company.efficiency import (
     check_reuse,
     compare_efficiency,
     estimate_tokens,
+    normalise_provider_usage,
     summarise_efficiency,
 )
 from company.efficiency.benchmark import BenchmarkRunner, default_scenarios
+from company.efficiency.__main__ import main as efficiency_main
 from company.runtime import ExecutionStoreError
 from knowledge.company_os.capsules import (
     DEFAULT_BUDGET,
@@ -132,6 +136,40 @@ def test_token_provenance_never_turns_unavailable_into_zero() -> None:
     assert reported.total_tokens == 7
     with pytest.raises(EfficiencyError, match="cannot carry counts"):
         TokenMeasurement(MeasurementSource.UNAVAILABLE, input_tokens=0, reason="missing")
+
+
+def test_provider_usage_adapter_preserves_reported_values_and_safe_totals() -> None:
+    openai = normalise_provider_usage(
+        {
+            "provider": "openai",
+            "model": "example-model",
+            "usage": {
+                "prompt_tokens": 11,
+                "completion_tokens": 7,
+                "total_tokens": 18,
+            },
+            "latency_ms": 250,
+            "cost": {"amount": "0.012", "currency": "USD"},
+        }
+    )
+    assert openai.tokens.source is MeasurementSource.PROVIDER_REPORTED
+    assert (
+        openai.tokens.input_tokens,
+        openai.tokens.output_tokens,
+        openai.tokens.total_tokens,
+    ) == (11, 7, 18)
+    assert openai.provider == "openai" and openai.model == "example-model"
+    assert openai.cost.source is MeasurementSource.PROVIDER_REPORTED
+
+    anthropic = normalise_provider_usage(
+        {"usage": {"input_tokens": 5, "output_tokens": 3, "total_tokens": 999}}
+    )
+    assert anthropic.tokens.total_tokens == 8  # invalid total cannot poison the record
+
+    missing = normalise_provider_usage(None)
+    assert missing.tokens.source is MeasurementSource.UNAVAILABLE
+    assert missing.tokens.total_tokens is None
+    assert missing.cost.source is MeasurementSource.UNAVAILABLE
 
 
 def test_comparison_handles_real_values_unavailable_values_and_zero() -> None:
@@ -248,6 +286,42 @@ def test_efficiency_store_rejects_a_false_execution_link(tmp_path) -> None:
         store.append(linked)
 
 
+def test_finalized_efficiency_append_is_idempotent_and_conflicts_are_refused(
+    tmp_path,
+) -> None:
+    store = EfficiencyStore(tmp_path)
+    record = _record(run_id="execution:stable")
+    first = store.append_idempotent(record)
+    second = store.append_idempotent(record)
+    assert first == second
+    assert len(store.records(record.task_id)) == 1
+    with pytest.raises(ExecutionStoreError, match="different telemetry"):
+        store.append_idempotent(replace(record, context_bytes=121))
+    assert len(store.records(record.task_id)) == 1
+
+
+def test_real_efficiency_cli_filters_and_summarises_json(
+    tmp_path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    EfficiencyStore(tmp_path).append(_record(mode=BenchmarkMode.REAL))
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "python -m company.efficiency",
+            "real",
+            "--state-dir",
+            str(tmp_path),
+            "--capability",
+            "capability_context_assembly",
+        ],
+    )
+    assert efficiency_main() == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["summary"]["total_runs"] == 1
+    assert payload["records"][0]["mode"] == "real"
+
+
 def test_summary_is_dashboard_ready_without_fabricating_cost() -> None:
     summary = summarise_efficiency((
         _record(run_id="base", mode=BenchmarkMode.BASELINE, context_chars=200),
@@ -266,6 +340,13 @@ def test_summary_is_dashboard_ready_without_fabricating_cost() -> None:
     ))
     assert mixed.average_input_tokens is None
     assert mixed.token_source is None
+    assert mixed.average_provider_input_tokens == 10
+    assert mixed.average_estimated_input_tokens == 2
+
+    failed = summarise_efficiency((
+        _record(run_id="failed", outcome="rejected"),
+    ))
+    assert failed.failures_with_measurable_spend == 1
 
 
 def test_minimalism_check_requires_every_cheaper_reuse_tier() -> None:

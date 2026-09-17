@@ -48,6 +48,13 @@ from company.runtime.git_evidence import (
 )
 from company.runtime.packets import COMPLETION_PROTOCOL
 from company.validation.errors import ValidationError
+from company.efficiency import (
+    BenchmarkMode,
+    EfficiencyStore,
+    MeasurementSource,
+    capture_tool_output,
+    emit_execution_efficiency,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -640,6 +647,195 @@ def test_ingestion_produces_one_usage_record_and_a_compact_handoff(tmp_path: Pat
     assert ingested.receipt_pointer.record_ref in handoff.artifacts
     assert set(handoff.resource_usage.to_dict()) == {"record_ref", "fingerprint"}
     assert f"commit:{SHA}" in handoff.evidence
+
+
+def test_ingestion_emits_observational_efficiency_with_provider_and_tool_facts(
+    tmp_path: Path,
+) -> None:
+    plan = _plan(
+        context=ContextRequirements(
+            refs=(
+                ContextRef(
+                    ContextKind.FILE,
+                    "company/runtime/session_adapter.py",
+                    "the actual finalization boundary",
+                ),
+                ContextRef(
+                    ContextKind.FILE,
+                    "company/runtime/receipts.py",
+                    "the selected provider-neutral receipt contract",
+                ),
+            ),
+            acceptance_criteria=("Telemetry is observational.",),
+        )
+    )
+    store = ExecutionStore(tmp_path)
+    usage_store = ResourceUsageStore(tmp_path)
+    adapter = ManualExternalSessionAdapter(store)
+    prepared = _prepare(adapter, plan)
+    used = next(
+        ref.key
+        for ref in prepared.packet.context_refs
+        if ref.ref == "company/runtime/session_adapter.py"
+    )
+    tool_output = capture_tool_output(
+        task_id=prepared.packet.task_id,
+        command="pytest",
+        exit_status=1,
+        raw_output="one passed\none failed\n",
+    )
+    ingested = adapter.ingest(
+        plan,
+        prepared.packet,
+        _receipt(
+            prepared.packet,
+            context_refs_used=(used,),
+            completed_at="2026-09-17T12:00:00+05:30",
+            usage=ReceiptUsage(
+                cache_hits=2,
+                cache_misses=1,
+                tool_calls=3,
+                input_units=101,
+                output_units=17,
+                usage_unit=UsageUnit.TOKEN,
+                provider="example-provider",
+                model="example-model",
+                provider_latency_ms=425,
+                provider_cost="0.014",
+                provider_cost_currency="USD",
+            ),
+        ),
+        usage_store,
+        tool_outputs=(tool_output,),
+    )
+
+    assert ingested.accepted and not ingested.telemetry_error
+    assert ingested.efficiency_pointer is not None
+    record = EfficiencyStore(tmp_path).records(prepared.packet.task_id)[0]
+    assert record.mode is BenchmarkMode.REAL
+    assert record.tokens.source is MeasurementSource.PROVIDER_REPORTED
+    assert (record.tokens.input_tokens, record.tokens.output_tokens) == (101, 17)
+    assert record.estimated_tokens is not None
+    assert record.estimated_tokens.source is MeasurementSource.ESTIMATED
+    assert record.provider == "example-provider" and record.model == "example-model"
+    assert record.repository_references_selected == (
+        "company/runtime/session_adapter.py",
+        "company/runtime/receipts.py",
+    )
+    assert record.repository_files_read == ("company/runtime/session_adapter.py",)
+    assert (record.cache_hits, record.cache_misses) == (2, 1)
+    assert record.cache_identity == prepared.packet.context_cache_key
+    assert record.context_bytes is None  # external ref resolution is not observable
+    assert record.context_manifest_bytes is not None
+    assert record.tool_output_bytes == record.tool_context_bytes
+    assert record.tool_activity[0].name == "pytest"
+    assert record.tool_activity[0].failure_count == 1
+    assert record.outcome == "accepted"
+    assert record.timestamp == "2026-09-17T12:00:00+05:30"
+    retried = emit_execution_efficiency(
+        plan=plan,
+        packet=prepared.packet,
+        packet_attempt=prepared.pointer.attempt,
+        receipt=ingested.receipt,
+        receipt_pointer=ingested.receipt_pointer,
+        outcome=ingested.attempt.usage_record.outcome,
+        state_dir=tmp_path,
+        expansion_ledger=None,
+        tool_outputs=(tool_output,),
+    )
+    assert retried.pointer == ingested.efficiency_pointer
+    assert len(EfficiencyStore(tmp_path).records(prepared.packet.task_id)) == 1
+
+
+def test_rejected_execution_still_emits_efficiency_and_missing_usage_stays_unavailable(
+    tmp_path: Path,
+) -> None:
+    plan = _plan()
+    store = ExecutionStore(tmp_path)
+    adapter = ManualExternalSessionAdapter(store)
+    prepared = _prepare(adapter, plan)
+    ingested = adapter.ingest(
+        plan,
+        prepared.packet,
+        _receipt(prepared.packet, files_changed=("sloped/cameras.py",)),
+        ResourceUsageStore(tmp_path),
+    )
+    record = EfficiencyStore(tmp_path).records(prepared.packet.task_id)[0]
+    assert not ingested.accepted
+    assert record.outcome == "rejected"
+    assert record.tokens.source is MeasurementSource.UNAVAILABLE
+    assert record.estimated_tokens is not None
+
+
+def test_provider_failure_retains_any_reported_usage(tmp_path: Path) -> None:
+    plan = _plan()
+    store = ExecutionStore(tmp_path)
+    adapter = ManualExternalSessionAdapter(store)
+    prepared = _prepare(adapter, plan)
+    ingested = adapter.ingest(
+        plan,
+        prepared.packet,
+        _receipt(
+            prepared.packet,
+            outcome=Outcome.ABANDONED,
+            summary="Provider failed before a deliverable was returned.",
+            rejection_reason="provider transport failed",
+            usage=ReceiptUsage(
+                input_units=37,
+                output_units=0,
+                usage_unit=UsageUnit.TOKEN,
+                provider="example-provider",
+            ),
+        ),
+        ResourceUsageStore(tmp_path),
+    )
+    record = EfficiencyStore(tmp_path).records(prepared.packet.task_id)[0]
+    assert not ingested.accepted
+    assert record.outcome == "abandoned"
+    assert record.tokens.source is MeasurementSource.PROVIDER_REPORTED
+    assert record.tokens.total_tokens == 37
+
+
+def test_telemetry_storage_failure_never_changes_execution_result(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from company.efficiency import emission
+
+    plan = _plan()
+    store = ExecutionStore(tmp_path)
+    prepared = _prepare(ManualExternalSessionAdapter(store), plan)
+
+    def fail_telemetry(*args: object, **kwargs: object) -> object:
+        raise OSError("telemetry disk unavailable")
+
+    monkeypatch.setattr(emission, "emit_execution_efficiency", fail_telemetry)
+    ingested = ManualExternalSessionAdapter(store).ingest(
+        plan,
+        prepared.packet,
+        _receipt(prepared.packet),
+        ResourceUsageStore(tmp_path),
+    )
+    assert ingested.accepted
+    assert ingested.attempt.usage_record.outcome is Outcome.ACCEPTED
+    assert "telemetry disk unavailable" in ingested.telemetry_error
+    assert ingested.efficiency_pointer is None
+
+    failed_state = tmp_path / "failed"
+    failed_plan = _plan(task_id="failed-telemetry")
+    failed_store = ExecutionStore(failed_state)
+    failed_prepared = _prepare(ManualExternalSessionAdapter(failed_store), failed_plan)
+    failed = ManualExternalSessionAdapter(failed_store).ingest(
+        failed_plan,
+        failed_prepared.packet,
+        _receipt(
+            failed_prepared.packet,
+            files_changed=("sloped/cameras.py",),
+        ),
+        ResourceUsageStore(failed_state),
+    )
+    assert not failed.accepted
+    assert failed.attempt.usage_record.outcome is Outcome.REJECTED
+    assert "telemetry disk unavailable" in failed.telemetry_error
 
 
 def test_a_failed_receipt_is_recorded_as_a_rejected_attempt(tmp_path: Path) -> None:

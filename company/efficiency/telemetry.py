@@ -31,6 +31,7 @@ class MeasurementSource(str, Enum):
 
 
 class BenchmarkMode(str, Enum):
+    REAL = "real"
     BASELINE = "baseline"
     CAPSULE_OPTIMIZED = "capsule_optimized"
     FULL_RAW_CONTEXT = "full_raw_context"
@@ -145,7 +146,7 @@ class CostMeasurement:
             value = Decimal(self.amount)
         except InvalidOperation as exc:
             raise EfficiencyError("cost amount must be a decimal string") from exc
-        if value < 0 or not self.currency.strip():
+        if not value.is_finite() or value < 0 or not self.currency.strip():
             raise EfficiencyError("cost must be non-negative and name a currency")
         if self.source is MeasurementSource.ESTIMATED and not self.rate_ref.strip():
             raise EfficiencyError("estimated cost requires an evidence-backed rate_ref")
@@ -206,9 +207,9 @@ class EfficiencyRecord:
     capabilities_selected: tuple[str, ...]
     capsules_selected: tuple[str, ...]
     capsule_count: int
-    capsule_chars: int
-    context_chars: int
-    context_bytes: int
+    capsule_chars: int | None
+    context_chars: int | None
+    context_bytes: int | None
     context_manifest_fingerprint: str
     execution_packet_chars: int
     execution_packet_bytes: int
@@ -232,6 +233,14 @@ class EfficiencyRecord:
     packet_attempt: int | None = None
     minimalism: MinimalismCheck | None = None
     integrations: tuple[IntegrationStatus, ...] = ()
+    estimated_tokens: TokenMeasurement | None = None
+    provider: str | None = None
+    outcome: str = ""
+    timestamp: str | None = None
+    cache_identity: str = ""
+    tool_activity: tuple["ToolActivity", ...] = ()
+    context_manifest_chars: int | None = None
+    context_manifest_bytes: int | None = None
     schema_version: int = SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -242,8 +251,7 @@ class EfficiencyRecord:
         if self.capsule_count != len(self.capsules_selected):
             raise EfficiencyError("capsule_count must match capsules_selected")
         for name in (
-            "capsule_count", "capsule_chars", "context_chars", "context_bytes",
-            "execution_packet_chars", "execution_packet_bytes",
+            "capsule_count", "execution_packet_chars", "execution_packet_bytes",
             "context_expansion_requests", "context_expansion_approvals",
             "context_expansion_denials",
         ):
@@ -251,7 +259,9 @@ class EfficiencyRecord:
         for name in (
             "tool_calls", "tool_output_chars", "tool_output_bytes",
             "tool_context_chars", "tool_context_bytes", "cache_hits",
-            "cache_misses", "latency_ms", "packet_attempt",
+            "cache_misses", "latency_ms", "packet_attempt", "capsule_chars",
+            "context_chars", "context_bytes", "context_manifest_chars",
+            "context_manifest_bytes",
         ):
             _optional_count(getattr(self, name), name)
         if self.context_expansion_approvals + self.context_expansion_denials > self.context_expansion_requests:
@@ -265,6 +275,23 @@ class EfficiencyRecord:
             raise EfficiencyError("tokens must be a TokenMeasurement")
         if not isinstance(self.cost, CostMeasurement):
             raise EfficiencyError("cost must be a CostMeasurement")
+        if self.estimated_tokens is not None:
+            if not isinstance(self.estimated_tokens, TokenMeasurement):
+                raise EfficiencyError("estimated_tokens must be a TokenMeasurement")
+            if self.estimated_tokens.source is not MeasurementSource.ESTIMATED:
+                raise EfficiencyError("estimated_tokens must carry estimated provenance")
+        if self.provider is not None and not self.provider.strip():
+            raise EfficiencyError("provider must be non-empty when supplied")
+        if self.model is not None and not self.model.strip():
+            raise EfficiencyError("model must be non-empty when supplied")
+        if self.outcome and self.outcome not in {"accepted", "rejected", "abandoned"}:
+            raise EfficiencyError("outcome must be accepted, rejected, or abandoned")
+        if self.timestamp is not None and not self.timestamp.strip():
+            raise EfficiencyError("timestamp must be non-empty when supplied")
+        if self.cache_identity:
+            _fingerprint_value(self.cache_identity, "cache identity")
+        if any(not isinstance(item, ToolActivity) for item in self.tool_activity):
+            raise EfficiencyError("tool_activity must contain ToolActivity values")
         names = [item.name for item in self.integrations]
         if len(names) != len(set(names)):
             raise EfficiencyError("integration status names must be unique")
@@ -280,15 +307,22 @@ class EfficiencyRecord:
         tokens = data.get("tokens", {})
         cost = data.get("cost", {})
         minimalism = data.get("minimalism")
+        estimated = data.get("estimated_tokens")
         return cls(
             run_id=str(data["run_id"]), task_id=str(data["task_id"]),
             mode=BenchmarkMode(data["mode"]),
             capabilities_selected=tuple(data.get("capabilities_selected", ())),
             capsules_selected=tuple(data.get("capsules_selected", ())),
             capsule_count=int(data["capsule_count"]),
-            capsule_chars=int(data["capsule_chars"]),
-            context_chars=int(data["context_chars"]),
-            context_bytes=int(data["context_bytes"]),
+            capsule_chars=(
+                int(data["capsule_chars"]) if data.get("capsule_chars") is not None else None
+            ),
+            context_chars=(
+                int(data["context_chars"]) if data.get("context_chars") is not None else None
+            ),
+            context_bytes=(
+                int(data["context_bytes"]) if data.get("context_bytes") is not None else None
+            ),
             context_manifest_fingerprint=str(data["context_manifest_fingerprint"]),
             execution_packet_chars=int(data["execution_packet_chars"]),
             execution_packet_bytes=int(data["execution_packet_bytes"]),
@@ -325,7 +359,55 @@ class EfficiencyRecord:
                 IntegrationStatus(item["name"], item["available"], item["enabled"], item.get("reason", ""))
                 for item in data.get("integrations", ())
             ),
+            estimated_tokens=(
+                TokenMeasurement(
+                    MeasurementSource(estimated["source"]),
+                    estimated.get("input_tokens"), estimated.get("output_tokens"),
+                    estimated.get("total_tokens"), estimated.get("method", ""),
+                    estimated.get("reason", ""),
+                ) if isinstance(estimated, Mapping) else None
+            ),
+            provider=data.get("provider"),
+            outcome=str(data.get("outcome", "")),
+            timestamp=data.get("timestamp"),
+            cache_identity=str(data.get("cache_identity", "")),
+            tool_activity=tuple(
+                ToolActivity.from_mapping(item) for item in data.get("tool_activity", ())
+            ),
+            context_manifest_chars=data.get("context_manifest_chars"),
+            context_manifest_bytes=data.get("context_manifest_bytes"),
             schema_version=int(data.get("schema_version", SCHEMA_VERSION)),
+        )
+
+
+@dataclass(frozen=True)
+class ToolActivity:
+    name: str
+    call_count: int
+    failure_count: int
+    raw_chars: int | None = None
+    raw_bytes: int | None = None
+    context_chars: int | None = None
+    context_bytes: int | None = None
+
+    def __post_init__(self) -> None:
+        if not self.name.strip():
+            raise EfficiencyError("tool activity requires a name")
+        for field in ("call_count", "failure_count"):
+            _count(getattr(self, field), f"tool_activity.{field}")
+        if self.failure_count > self.call_count:
+            raise EfficiencyError("tool failures cannot exceed calls")
+        for field in ("raw_chars", "raw_bytes", "context_chars", "context_bytes"):
+            _optional_count(getattr(self, field), f"tool_activity.{field}")
+
+    @classmethod
+    def from_mapping(cls, data: Mapping[str, Any]) -> "ToolActivity":
+        return cls(
+            name=str(data["name"]), call_count=int(data["call_count"]),
+            failure_count=int(data["failure_count"]),
+            raw_chars=data.get("raw_chars"), raw_bytes=data.get("raw_bytes"),
+            context_chars=data.get("context_chars"),
+            context_bytes=data.get("context_bytes"),
         )
 
 
@@ -358,6 +440,13 @@ class EfficiencySummary:
     context_expansion_rate: float | None
     average_repository_files_read: float | None
     tool_output_reduction_pct: float | None
+    average_provider_input_tokens: float | None
+    average_provider_output_tokens: float | None
+    average_estimated_input_tokens: float | None
+    average_estimated_output_tokens: float | None
+    provider_cost_amount: str | None
+    estimated_cost_amount: str | None
+    failures_with_measurable_spend: int
 
 
 def compare_efficiency(baseline: EfficiencyRecord, optimized: EfficiencyRecord) -> EfficiencyComparison:
@@ -416,6 +505,25 @@ def summarise_efficiency(records: tuple[EfficiencyRecord, ...]) -> EfficiencySum
         and len(cost_sources) == 1
         else None
     )
+    provider_tokens = [
+        r.tokens for r in records
+        if r.tokens.source is MeasurementSource.PROVIDER_REPORTED
+    ]
+    estimates = [
+        measurement
+        for r in records
+        for measurement in (
+            r.estimated_tokens
+            or (r.tokens if r.tokens.source is MeasurementSource.ESTIMATED else None),
+        )
+        if measurement is not None
+    ]
+    provider_costs = [
+        item for item in priced if item.source is MeasurementSource.PROVIDER_REPORTED
+    ]
+    estimated_costs = [
+        item for item in priced if item.source is MeasurementSource.ESTIMATED
+    ]
     return EfficiencySummary(
         total_runs=len(records),
         average_input_tokens=_average(input_tokens) if one_token_source else None,
@@ -430,7 +538,9 @@ def summarise_efficiency(records: tuple[EfficiencyRecord, ...]) -> EfficiencySum
         unavailable_token_runs=sum(
             1 for r in records if r.tokens.source is MeasurementSource.UNAVAILABLE
         ),
-        average_context_bytes=_average([r.context_bytes for r in records]),
+        average_context_bytes=_average([
+            r.context_bytes for r in records if r.context_bytes is not None
+        ]),
         average_context_reduction_pct=_average(reductions),
         cost_amount=cost_amount,
         cost_currency=next(iter(currencies)) if cost_amount is not None else None,
@@ -441,7 +551,36 @@ def summarise_efficiency(records: tuple[EfficiencyRecord, ...]) -> EfficiencySum
             [len(r.repository_files_read) for r in records]
         ),
         tool_output_reduction_pct=_reduction(raw, context),
+        average_provider_input_tokens=_average([
+            item.input_tokens for item in provider_tokens if item.input_tokens is not None
+        ]),
+        average_provider_output_tokens=_average([
+            item.output_tokens for item in provider_tokens if item.output_tokens is not None
+        ]),
+        average_estimated_input_tokens=_average([
+            item.input_tokens for item in estimates if item.input_tokens is not None
+        ]),
+        average_estimated_output_tokens=_average([
+            item.output_tokens for item in estimates if item.output_tokens is not None
+        ]),
+        provider_cost_amount=_sum_cost(provider_costs),
+        estimated_cost_amount=_sum_cost(estimated_costs),
+        failures_with_measurable_spend=sum(
+            1 for r in records
+            if r.outcome in {"rejected", "abandoned"}
+            and (
+                r.tokens.source is not MeasurementSource.UNAVAILABLE
+                or r.cost.source is not MeasurementSource.UNAVAILABLE
+            )
+        ),
     )
+
+
+def _sum_cost(values: list[CostMeasurement]) -> str | None:
+    currencies = {item.currency for item in values}
+    if not values or len(currencies) != 1:
+        return None
+    return str(sum((Decimal(item.amount or "0") for item in values), Decimal("0")))
 
 
 def _reduction(baseline: int | None, optimized: int | None) -> float | None:
