@@ -1,0 +1,120 @@
+RACE #2 (SWITCHYARD) - V32.2 AUDIO PASS
+MUSIC LICENSING AND PROVENANCE RECORD
+=====================================
+
+Date of record ....... 2026-09-17
+Branch ............... v322-asmr-audio-final
+Applies to ........... exports/race2_v322_audio/*.mp4
+                       output/race2/v322_audio/work/race2_switchyard_8_{A,B}.wav
+
+
+1. STATUS
+---------
+
+    NO THIRD-PARTY MUSIC IS USED IN THIS PRODUCTION.
+
+The music bed in Mix A and Mix B is ORIGINAL, PROCEDURALLY GENERATED WORK
+CREATED INSIDE THIS REPOSITORY and owned outright by this project. There is no
+external asset, no licensed track, no library cue, no sample pack, no loop, no
+stem, no soundfont, no AI music service output and no YouTube Audio Library
+material anywhere in the chain.
+
+This satisfies option 1 of the brief's copyright rule - "original/procedurally
+created music owned by this project" - and no attribution is owed to anyone.
+
+
+2. WHERE THE MUSIC COMES FROM
+-----------------------------
+
+Every sample of the bed is computed at render time by:
+
+    audio/asmr.py          music_score()      the arrangement
+                           music_plan()       the tempo and section map
+                           music_tempo()      BPM derived from the race
+                           _pluck()           one plucked note
+                           CHORDS             the progression, as frequencies
+                           _LAYER_OFFSETS     the per-part timing offsets
+
+    audio/synthesis.py     tone()             one enveloped sine
+                           noise_burst()      enveloped, band-limited noise
+                           Noise              a seeded linear-congruential PRNG
+                           envelope(), low_pass(), high_pass(), add_into()
+
+`audio/synthesis.py` predates this pass and is itself original project code: it
+contains oscillators, envelopes, one-pole filters and a seeded PRNG, and nothing
+else. It reads no files. There is no audio data on disk anywhere in `audio/`.
+
+The bed can therefore be regenerated from source at any time, and its provenance
+is the git history of this repository.
+
+
+3. WHAT THE MUSIC IS
+
+    Key .................. A natural minor
+    Progression .......... i - VI - III - VII (Am - F - C - G), four bars
+    Roots ................ 220.00, 174.61, 261.63, 196.00 Hz
+    Tempo ................ 136.565 BPM
+    Metre ................ 4/4
+    Length ............... 19.1667 s (10.9 bars)
+    Parts ................ pulse (filtered noise), bass (sine + octave + sub),
+                           figure (three-partial pluck), counter (pluck),
+                           resolution (five-partial chord on the crossing)
+
+The tempo is NOT a chosen number. It is computed from the race:
+
+    music_tempo(crossing) = 9 bars * 4 beats * 60 / 15.81667 s = 136.565 BPM
+
+so that the winner's crossing lands exactly on the downbeat of bar 9. Every
+other section boundary follows from that. The arrangement is a function of the
+replay, which is itself a deterministic product of seed 8.
+
+
+4. ORIGINALITY
+
+The progression i-VI-III-VII is a chord sequence. Chord progressions are not
+copyrightable subject matter in any jurisdiction this project publishes in;
+what is protected is a particular expression of one, and the expression here is
+1400 lines of arithmetic in this repository with no reference to any existing
+recording or score. The melodic figure is the root, fifth and octave of the
+current chord played as three eighth notes - an arpeggio of the chord itself.
+
+No melody, bassline, rhythm, arrangement or production element has been
+transcribed, sampled, interpolated or modelled from any third-party work.
+
+
+5. DETERMINISM AND REPRODUCIBILITY
+
+The bed is a pure function of (replay seed, profile). It is seeded through
+`audio.synthesis.stable_seed("v322-music", 8)`, uses no wall clock and no
+unseeded randomness, and is covered by:
+
+    tests/test_race2_v322_audio.py::test_the_same_profile_builds_the_same_audio_twice
+    tests/test_race2_v322_audio.py::test_the_tempo_is_the_races_own
+
+Rebuilding from this commit reproduces the delivered WAVs sample for sample.
+
+
+6. THE REST OF THE SOUNDTRACK
+
+The same applies to every non-musical sound in the mix. The rolling layer, the
+rail ticks, the marble-to-marble clicks, the track contacts, the five mechanism
+voices, the points ticks, the arrival cues and the room tone are all synthesised
+by `audio/asmr.py` from `audio/synthesis.py` primitives. There is no field
+recording and no sample library in the production.
+
+The CONTROL mix carried in this comparison is `audio/marble.py`, which is the
+same situation and was delivered with V19 through V32.1.
+
+
+7. CLEARANCE
+
+    Music .................... original, owned by this project
+    Sound effects ............ original, owned by this project
+    Room tone ................ original, owned by this project
+    Third-party rights ....... none
+    Attribution required ..... none
+    Content ID risk .......... none from this project's own material
+    Territory ................ worldwide, perpetual, all media
+
+The rendered video may be published, monetised, re-cut and re-used without
+reference to any third party.

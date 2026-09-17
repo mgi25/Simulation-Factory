@@ -1,0 +1,37 @@
+{
+ "video": {
+  "SOURCE (V32.1)": {
+   "path": "output/race2/v322_audio\\work\\locked_visual.mp4",
+   "video_stream_md5": "49515b72fc1799ca611ce8d55490736e",
+   "decoded_frames_sha256": "d7c3c48d1292dfa1a16766f3f90e53540119d5c44d661ce7e0c64e45331e2db0",
+   "frames": 1150
+  },
+  "CONTROL": {
+   "path": "exports/race2_v322_audio\\race2_switchyard_control.mp4",
+   "video_stream_md5": "49515b72fc1799ca611ce8d55490736e",
+   "decoded_frames_sha256": "d7c3c48d1292dfa1a16766f3f90e53540119d5c44d661ce7e0c64e45331e2db0",
+   "frames": 1150
+  },
+  "A": {
+   "path": "exports/race2_v322_audio\\race2_switchyard_a.mp4",
+   "video_stream_md5": "49515b72fc1799ca611ce8d55490736e",
+   "decoded_frames_sha256": "d7c3c48d1292dfa1a16766f3f90e53540119d5c44d661ce7e0c64e45331e2db0",
+   "frames": 1150
+  },
+  "B": {
+   "path": "exports/race2_v322_audio\\race2_switchyard_b.mp4",
+   "video_stream_md5": "49515b72fc1799ca611ce8d55490736e",
+   "decoded_frames_sha256": "d7c3c48d1292dfa1a16766f3f90e53540119d5c44d661ce7e0c64e45331e2db0",
+   "frames": 1150
+  }
+ },
+ "video_identical": true,
+ "frames": 1150,
+ "audio_sha256": {
+  "CONTROL": "8ceb9b24100440d926a0e267d0eae0ef835001eba45d90e79562d33e75542adc",
+  "A": "cb2eab05711a79be25eca43d5235dfd34247e30b3b2bf0807d0f55f59c921b24",
+  "B": "1dfa74277c54865f96b24367140471fdc8a20a73f66b52c215bfcb1c077e5f75"
+ },
+ "audio_all_distinct": true,
+ "method": "mux is `ffmpeg -c:v copy`, so no decoder or encoder touches the picture. Both the copied elementary stream's MD5 and a SHA-256 over framemd5 of all decoded frames are compared against the V32.1 film."
+}

@@ -1,0 +1,287 @@
+{
+ "checks": [
+  {
+   "check": "video streams identical to V32.1",
+   "pass": true,
+   "detail": "49515b72fc1799ca611ce8d55490736e"
+  },
+  {
+   "check": "1150 decoded frames in every film",
+   "pass": true,
+   "detail": "1150"
+  },
+  {
+   "check": "the three audio masters differ",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "CONTROL: one video and one audio stream",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "CONTROL: 1080x1920 at 60 fps",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "CONTROL: audio at 48 kHz stereo",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "CONTROL: runtime 19.1667 s matches 1150/60",
+   "pass": true,
+   "detail": "19.1667"
+  },
+  {
+   "check": "A: one video and one audio stream",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "A: 1080x1920 at 60 fps",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "A: audio at 48 kHz stereo",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "A: runtime 19.1667 s matches 1150/60",
+   "pass": true,
+   "detail": "19.1667"
+  },
+  {
+   "check": "B: one video and one audio stream",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "B: 1080x1920 at 60 fps",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "B: audio at 48 kHz stereo",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "B: runtime 19.1667 s matches 1150/60",
+   "pass": true,
+   "detail": "19.1667"
+  },
+  {
+   "check": "CONTROL: duration is exactly 1150 frames",
+   "pass": true,
+   "detail": "920000"
+  },
+  {
+   "check": "CONTROL: no clipping",
+   "pass": true,
+   "detail": "-2.06 dBFS"
+  },
+  {
+   "check": "CONTROL: true peak at or under -1.0 dBTP",
+   "pass": true,
+   "detail": "-1.93 dBTP"
+  },
+  {
+   "check": "CONTROL: within 1.0 LU of -14.0 LUFS",
+   "pass": true,
+   "detail": "-14.18 LUFS"
+  },
+  {
+   "check": "CONTROL: audio is present throughout",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "CONTROL: mono fold-down loses under 1 dB",
+   "pass": true,
+   "detail": "-0.01 dB"
+  },
+  {
+   "check": "A: duration is exactly 1150 frames",
+   "pass": true,
+   "detail": "920000"
+  },
+  {
+   "check": "A: no clipping",
+   "pass": true,
+   "detail": "-1.30 dBFS"
+  },
+  {
+   "check": "A: true peak at or under -1.0 dBTP",
+   "pass": true,
+   "detail": "-1.17 dBTP"
+  },
+  {
+   "check": "A: within 1.0 LU of -14.0 LUFS",
+   "pass": true,
+   "detail": "-14.73 LUFS"
+  },
+  {
+   "check": "A: audio is present throughout",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "A: mono fold-down loses under 1 dB",
+   "pass": true,
+   "detail": "-0.03 dB"
+  },
+  {
+   "check": "B: duration is exactly 1150 frames",
+   "pass": true,
+   "detail": "920000"
+  },
+  {
+   "check": "B: no clipping",
+   "pass": true,
+   "detail": "-1.30 dBFS"
+  },
+  {
+   "check": "B: true peak at or under -1.0 dBTP",
+   "pass": true,
+   "detail": "-1.27 dBTP"
+  },
+  {
+   "check": "B: within 1.0 LU of -14.0 LUFS",
+   "pass": true,
+   "detail": "-14.58 LUFS"
+  },
+  {
+   "check": "B: audio is present throughout",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "B: mono fold-down loses under 1 dB",
+   "pass": true,
+   "detail": "-0.03 dB"
+  },
+  {
+   "check": "A: 2000-5000 Hz is no longer a continuous bed",
+   "pass": true,
+   "detail": "within 6 dB of median 47.4% (CONTROL 98.7%)"
+  },
+  {
+   "check": "A: 2000-5000 Hz travels further than CONTROL",
+   "pass": true,
+   "detail": "27.6 dB vs 7.4 dB"
+  },
+  {
+   "check": "A: 2000-5000 Hz has quiet stretches",
+   "pass": true,
+   "detail": "36.8% of windows 12 dB down"
+  },
+  {
+   "check": "A: 5000-10000 Hz is no longer a continuous bed",
+   "pass": true,
+   "detail": "within 6 dB of median 46.1% (CONTROL 100.0%)"
+  },
+  {
+   "check": "A: 5000-10000 Hz travels further than CONTROL",
+   "pass": true,
+   "detail": "28.4 dB vs 4.2 dB"
+  },
+  {
+   "check": "A: 5000-10000 Hz has quiet stretches",
+   "pass": true,
+   "detail": "46.1% of windows 12 dB down"
+  },
+  {
+   "check": "B: 2000-5000 Hz is no longer a continuous bed",
+   "pass": true,
+   "detail": "within 6 dB of median 56.6% (CONTROL 98.7%)"
+  },
+  {
+   "check": "B: 2000-5000 Hz travels further than CONTROL",
+   "pass": true,
+   "detail": "22.7 dB vs 7.4 dB"
+  },
+  {
+   "check": "B: 2000-5000 Hz has quiet stretches",
+   "pass": true,
+   "detail": "30.3% of windows 12 dB down"
+  },
+  {
+   "check": "B: 5000-10000 Hz is no longer a continuous bed",
+   "pass": true,
+   "detail": "within 6 dB of median 57.9% (CONTROL 100.0%)"
+  },
+  {
+   "check": "B: 5000-10000 Hz travels further than CONTROL",
+   "pass": true,
+   "detail": "25.5 dB vs 4.2 dB"
+  },
+  {
+   "check": "B: 5000-10000 Hz has quiet stretches",
+   "pass": true,
+   "detail": "46.1% of windows 12 dB down"
+  },
+  {
+   "check": "every mechanism cue sits on a recorded hit",
+   "pass": true,
+   "detail": "21 cues from 32 hits"
+  },
+  {
+   "check": "all five machines are voiced",
+   "pass": true,
+   "detail": "['drum', 'last', 'pair', 'studs', 'sweep']"
+  },
+  {
+   "check": "the finish cue is on the winner's crossing frame",
+   "pass": true,
+   "detail": "15.8167 s"
+  },
+  {
+   "check": "A: the loudest moment is the winner crossing",
+   "pass": true,
+   "detail": "15.85 s vs 15.817 s"
+  },
+  {
+   "check": "A: no finish is buried by the music",
+   "pass": true,
+   "detail": "min 12.57 dB over the bed"
+  },
+  {
+   "check": "A: the master bus is not compressed",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "A: the limiter is a safety, not a level control",
+   "pass": true,
+   "detail": "worst -2.754 dB, mean -0.0408 dB"
+  },
+  {
+   "check": "B: the loudest moment is the winner crossing",
+   "pass": true,
+   "detail": "15.85 s vs 15.817 s"
+  },
+  {
+   "check": "B: no finish is buried by the music",
+   "pass": true,
+   "detail": "min 9.36 dB over the bed"
+  },
+  {
+   "check": "B: the master bus is not compressed",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "B: the limiter is a safety, not a level control",
+   "pass": true,
+   "detail": "worst -2.871 dB, mean -0.0183 dB"
+  }
+ ],
+ "passed": 56,
+ "failed": 0,
+ "total": 56
+}
