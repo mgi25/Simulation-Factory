@@ -31,6 +31,7 @@
   "last_reviewed": "2026-09-16",
   "may_read": [
     "company/*.yaml",
+    "company/config_types.py",
     "company/validation/**",
     "company/*.schema.yaml",
     "knowledge/company_os/capsules/**"
@@ -57,7 +58,7 @@
   "recheck_on": "2027-09-16",
   "revalidation_reason": "",
   "risks": [
-    "company/runtime and company/validation import each other (runtime.config uses validation.yaml_subset; validation.bootstrap uses runtime.config). Do not deepen it.",
+    "Runtime intentionally invokes validation; validation must remain independent of runtime implementation modules.",
     "Owned by the Codex workstream: another session may be editing it concurrently."
   ],
   "source": "company-os-v1-knowledge-capsules",

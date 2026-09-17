@@ -7,9 +7,7 @@
   ],
   "created": "2026-09-16",
   "decisions": [],
-  "dependencies": [
-    "company-runtime"
-  ],
+  "dependencies": [],
   "experiment_learnings": [],
   "facts": [
     "bootstrap-forbids-nested-agents"
@@ -30,9 +28,10 @@
   "last_reviewed": "2026-09-16",
   "may_read": [
     "company/*.yaml",
-    "company/runtime/config.py"
+    "company/config_types.py"
   ],
   "may_write": [
+    "company/config_types.py",
     "company/validation/**"
   ],
   "must_not_modify": [
@@ -46,13 +45,14 @@
   ],
   "owner": "workstream-codex",
   "owns_paths": [
+    "company/config_types.py",
     "company/validation"
   ],
   "purpose": "Parses the YAML subset the bootstrap contracts are written in, validates the org, permissions and contract shapes, and enforces the no-subagent rule over any nested config mapping.",
   "recheck_on": "2027-09-16",
   "revalidation_reason": "",
   "risks": [
-    "Imports company.runtime.config for CompanyConfig, which imports back into validation.yaml_subset; the cycle is load-bearing and easy to worsen.",
+    "Validation must not import runtime implementation modules; shared bootstrap data contracts live in company/config_types.py.",
     "Owned by the Codex workstream: another session may be editing it concurrently."
   ],
   "source": "company-os-v1-knowledge-capsules",

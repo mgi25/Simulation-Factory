@@ -305,20 +305,15 @@ def test_path_matching_is_segment_aware_in_both_directions():
     assert normalise_path("tests/test_x.py::test_y") == "tests/test_x.py"
 
 
-def test_the_dependency_closure_terminates_on_the_real_runtime_validation_cycle(seeds):
-    """company/runtime and company/validation import each other; the walk must not."""
+def test_runtime_and_validation_dependency_graph_is_acyclic(seeds):
     assert seeds.dependency_closure("company-runtime") == (
         "ai-platform",
         "company-knowledge-capsules",
         "company-knowledge-store",
         "company-validation",
     )
-    assert seeds.dependency_closure("company-validation") == (
-        "ai-platform",
-        "company-knowledge-capsules",
-        "company-knowledge-store",
-        "company-runtime",
-    )
+    assert seeds.dependency_closure("company-validation") == ()
+    assert "company-runtime" not in seeds.dependency_closure("company-validation")
     assert seeds.dependency_closure("company-os-control-plane") == tuple(
         sorted(set(seeds.ids()) - {"company-os-control-plane"})
     )

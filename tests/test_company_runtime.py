@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import ast
+import subprocess
+import sys
 from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
+from company.config_types import CompanyConfig as ContractCompanyConfig
 from company.runtime.config import CompanyConfig, load_company_config
 from company.runtime.routing import match_capabilities
 from company.runtime.tasks import HandoffArtifact, TaskAssignment
@@ -15,6 +18,77 @@ from company.validation.errors import ValidationError
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_company_config_has_one_neutral_definition() -> None:
+    assert CompanyConfig is ContractCompanyConfig
+
+
+def test_validation_does_not_import_runtime_implementation_modules() -> None:
+    violations: list[str] = []
+    for source in sorted((ROOT / "company/validation").rglob("*.py")):
+        tree = ast.parse(source.read_text(encoding="utf-8"), filename=str(source))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                imports_runtime = any(
+                    alias.name == "company.runtime"
+                    or alias.name.startswith("company.runtime.")
+                    for alias in node.names
+                )
+            elif isinstance(node, ast.ImportFrom):
+                module = node.module or ""
+                imports_runtime = (
+                    module == "company.runtime"
+                    or module.startswith("company.runtime.")
+                    or (
+                        module == "company"
+                        and any(
+                            alias.name == "runtime"
+                            or alias.name.startswith("runtime.")
+                            for alias in node.names
+                        )
+                    )
+                    or (
+                        node.level >= 2
+                        and (
+                            module == "runtime" or module.startswith("runtime.")
+                        )
+                    )
+                )
+            else:
+                continue
+            if imports_runtime:
+                violations.append(f"{source.relative_to(ROOT)}:{node.lineno}")
+
+    assert violations == []
+
+
+@pytest.mark.parametrize(
+    "first,second",
+    [
+        ("company.runtime", "company.validation"),
+        ("company.validation", "company.runtime"),
+    ],
+)
+def test_runtime_and_validation_import_order_is_independent(
+    first: str, second: str
+) -> None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            (
+                "import importlib; "
+                f"importlib.import_module({first!r}); "
+                f"importlib.import_module({second!r})"
+            ),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
 
 
 def _config_with(config: CompanyConfig, **changes: object) -> CompanyConfig:

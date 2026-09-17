@@ -2,23 +2,12 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from company.config_types import CompanyConfig
 from company.validation.errors import YamlSubsetError
 from company.validation.yaml_subset import load_yaml_subset
-
-
-@dataclass(frozen=True)
-class CompanyConfig:
-    """In-memory bootstrap contracts with their source directory."""
-
-    config_dir: Path
-    org_registry: dict[str, Any]
-    permissions: dict[str, Any]
-    agent_contract_schema: dict[str, Any]
-    task_handoff_schema: dict[str, Any]
 
 
 def default_config_dir() -> Path:
