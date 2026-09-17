@@ -729,6 +729,9 @@ frames that are not the ones it names.
 
 ```
 exports/race2_v33_bookends/
+  hook_A.mp4  hook_B.mp4  hook_C.mp4          the three compositions, 1.5 s each
+  hook_A_phone_270x480.mp4  (and B, C)
+  hook_chosen_C.mp4                           the winner
   race2_switchyard_v33_your.mp4               the Test #4 candidate
   race2_switchyard_v33_your_phone_270x480.mp4
   race2_switchyard_v33_a.mp4                  the wording comparison
