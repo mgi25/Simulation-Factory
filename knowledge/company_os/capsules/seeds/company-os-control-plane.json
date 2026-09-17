@@ -56,7 +56,7 @@
   "revalidation_reason": "",
   "risks": [
     "The integration gate has not passed; treating any of this as production-wired is premature.",
-    "company/runtime and company/validation import each other, so the control plane has one real cycle inside it."
+    "Runtime may invoke validation, but validation must remain independent of runtime implementation modules."
   ],
   "source": "company-os-v1-knowledge-capsules",
   "source_digests": [],

@@ -4,11 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 import re
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
-if TYPE_CHECKING:
-    from company.runtime.config import CompanyConfig
-
+from company.config_types import CompanyConfig
 from .errors import ValidationError
 from .no_subagents import collect_no_subagent_violations
 

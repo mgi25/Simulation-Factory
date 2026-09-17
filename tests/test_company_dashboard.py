@@ -342,14 +342,14 @@ def test_capsule_is_bounded_and_control_plane_stays_at_eight_with_full_closure()
     assert "company-research-intelligence" not in control.dependencies
     assert "company-research-intelligence" in index.dependency_closure("company-os-control-plane")
     assert index.dependency_closure("company-os-control-plane") == tuple(sorted(set(index.ids()) - {"company-os-control-plane"}))
-    assert all("company-ceo-dashboard" not in cycle for cycle in _dependency_cycles(index))
+    assert _dependency_cycles(index) == ()
     assert index.integrity(repo_root=ROOT) == ()
 
 
-def test_system_view_surfaces_the_preexisting_runtime_validation_cycle(tmp_path):
+def test_system_view_has_no_runtime_validation_cycle(tmp_path):
     system = _snapshot(tmp_path).section("system")
-    assert any("company-runtime -> company-validation -> company-runtime" in issue
-               for issue in system.integrity_issues)
+    assert not any("company-runtime" in issue and "company-validation" in issue
+                   and "cycle" in issue for issue in system.integrity_issues)
 
 
 def test_cli_model_uses_only_standard_library_and_internal_dependencies():
