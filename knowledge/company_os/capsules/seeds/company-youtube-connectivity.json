@@ -23,8 +23,8 @@
   ],
   "invariants": [
     "This package performs no network access and holds no credential: the authenticated fetch runs outside Company OS and leaves a file, which is the only input.",
-    "Every reading it commits carries measurement=interval, so a windowed API value can never collide with a cumulative Studio or Data API reading of the same metric.",
-    "An unavailable metric stays unavailable with a stated reason and is never normalized to zero.",
+    "Every reading it commits carries measurement=interval, so a windowed API value cannot collide with a cumulative Studio reading; a channel-wide row set becomes no reading and no invented deliverable id.",
+    "No reading is silently adjusted: an unavailable metric keeps its reason rather than becoming zero, and average_percentage_viewed past 1.0 is carried, not clamped.",
     "An observation id is derived from what was measured - api, channel, video, deliverable, metric, window, measurement - never from fetch time, file path or the value.",
     "A replayed pull is a no-op; a revised value for an existing identity is refused as a conflict and nothing is written, not even the source record.",
     "Incomplete retrieval becomes DataScope(complete=False, excludes=...) naming the video ids that did not come back, never a silently shorter list.",
@@ -68,7 +68,8 @@
   "source_digests": [],
   "status": "active",
   "tests": [
-    "tests/test_company_youtube_connectivity.py"
+    "tests/test_company_youtube_connectivity.py",
+    "tests/test_company_youtube_live_findings.py"
   ],
   "title": "Network-free YouTube artifact ingestion",
   "type": "module"

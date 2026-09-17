@@ -36,6 +36,31 @@ it refuses private metric *names* on a public snapshot. The two checks are
 deliberately independent rather than shared: analytics must not import research,
 and a boundary guarded from both sides survives one side being rewritten.
 
+## A ceiling is a claim about the metric, and one of ours was wrong
+
+A rate is capped at 1.0 because a share of a population cannot exceed the
+population - `retention_at_3s` above 1.0 would mean more views still playing
+than there were views. That reasoning is right for every rate here except one,
+and `average_percentage_viewed` was carrying the cap anyway, as prose in its
+unit string: "fraction of video length, 0.0-1.0".
+
+It is not bounded by 1.0. Its denominator is the length of the video, not a
+population, and a viewer who replays or loops a Short accumulates watch time
+past the end of it. The first real pull of our own channel returned 118.41% for
+a Short, which the fetcher correctly carried through as 1.1841 - a number the
+documented contract called impossible. Clamping it to 1.0 would have destroyed
+the only interesting thing the reading said, which is that the video is watched
+more than once per view.
+
+So the ceiling is now declared rather than described. `unbounded_above` lifts it
+for the metrics where the numerator can lap the denominator, `maximum` derives
+it, and `MetricObservation` checks a value against it at construction. The
+assumption that was wrong is now a field somebody has to change on purpose,
+rather than a sentence a later reader could restore by agreeing with it.
+
+The floor stays at zero for everything except money, where a refund or a
+downward revision is a real negative amount.
+
 ## What is not here
 
 No metric is derived from another. `average_percentage_viewed` is not computed
@@ -72,6 +97,17 @@ class MetricKind(Enum):
     MONEY = "money"
 
 
+# The kinds whose 1.0 means "all of the denominator", and which therefore have a
+# full scale a reading could in principle pass. A count or a duration has no such
+# point, which is why `unbounded_above` is refused on one.
+_FULL_SCALE_KINDS = frozenset({MetricKind.RATE, MetricKind.FRACTION})
+
+# The kinds whose sign carries information. Money is the only one: a refund, a
+# chargeback or a downward revision is a real negative amount, and a floor of
+# zero here would turn the correction into a refusal.
+_SIGNED_KINDS = frozenset({MetricKind.MONEY})
+
+
 @dataclass(frozen=True)
 class MetricDefinition:
     """One metric, defined once, with its unit and its denominator."""
@@ -82,6 +118,7 @@ class MetricDefinition:
     definition: str
     denominator: str = ""
     private: bool = False
+    unbounded_above: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "name", assert_tag(self.name, "metric name"))
@@ -96,6 +133,18 @@ class MetricDefinition:
         if not isinstance(self.private, bool):
             raise AnalyticsError(
                 f"metric {self.name!r}: private must be a bool, got {self.private!r}"
+            )
+        if not isinstance(self.unbounded_above, bool):
+            raise AnalyticsError(
+                f"metric {self.name!r}: unbounded_above must be a bool, got "
+                f"{self.unbounded_above!r}"
+            )
+        if self.unbounded_above and self.kind not in _FULL_SCALE_KINDS:
+            raise AnalyticsError(
+                f"metric {self.name!r}: unbounded_above says a value may pass full "
+                f"scale, and a {self.kind.value} has no full scale to pass. Only a "
+                "rate or a fraction, whose 1.0 means 'all of the denominator', can "
+                "declare it"
             )
         if self.kind is MetricKind.RATE:
             if not self.denominator:
@@ -115,6 +164,48 @@ class MetricDefinition:
     @property
     def requires_first_party(self) -> bool:
         return self.private
+
+    @property
+    def minimum(self) -> float | None:
+        """The floor a reading may not go below, or None where a sign is a fact."""
+        return None if self.kind in _SIGNED_KINDS else 0.0
+
+    @property
+    def maximum(self) -> float | None:
+        """The ceiling a reading may not pass, or None where there is no ceiling.
+
+        A rate or a fraction is capped at 1.0 by default, because its 1.0 is
+        "all of the denominator" and a share of a population cannot exceed the
+        population. `unbounded_above` lifts that cap for the metrics where the
+        numerator can lap the denominator instead - see
+        `average_percentage_viewed`, where a viewer who replays a Short
+        accumulates watch time past the end of it.
+        """
+        if self.kind not in _FULL_SCALE_KINDS or self.unbounded_above:
+            return None
+        return 1.0
+
+    def assert_value_in_range(self, value: float, field_name: str) -> None:
+        """Refuse a reading outside what this metric can mean.
+
+        Both messages name the metric rather than the bound alone, because the
+        useful question on a failure is which definition is wrong: the reading,
+        or the ceiling somebody assumed it had.
+        """
+        if self.minimum is not None and value < self.minimum:
+            raise AnalyticsError(
+                f"{field_name}: {value} is below {self.minimum} and {self.name!r} is "
+                f"a {self.kind.value} that cannot be negative. A negative here is an "
+                "arithmetic slip or a sign convention this record does not declare"
+            )
+        if self.maximum is not None and value > self.maximum:
+            raise AnalyticsError(
+                f"{field_name}: {value} is above {self.maximum} and {self.name!r} is "
+                f"a share of {self.denominator or 'its population'}, which cannot "
+                "exceed it. If this platform reading genuinely can pass full scale - "
+                "as average_percentage_viewed does when a view loops - the metric "
+                "declares unbounded_above rather than the value being clamped"
+            )
 
     def assert_source_can_produce(self, source: DataSource, field_name: str) -> None:
         """Refuse a private metric attributed to a source that cannot see it.
@@ -140,6 +231,7 @@ class MetricDefinition:
             "definition": self.definition,
             "denominator": self.denominator,
             "private": self.private,
+            "unbounded_above": self.unbounded_above,
         }
 
     @classmethod
@@ -154,6 +246,7 @@ class MetricDefinition:
                 definition=data["definition"],
                 denominator=data.get("denominator", ""),
                 private=bool(data.get("private", False)),
+                unbounded_above=bool(data.get("unbounded_above", False)),
             )
         except KeyError as exc:
             raise AnalyticsError(f"{field_name}: missing {exc.args[0]!r}") from None
@@ -168,8 +261,11 @@ def _m(
     definition: str,
     denominator: str = "",
     private: bool = False,
+    unbounded_above: bool = False,
 ) -> MetricDefinition:
-    return MetricDefinition(name, kind, unit, definition, denominator, private)
+    return MetricDefinition(
+        name, kind, unit, definition, denominator, private, unbounded_above
+    )
 
 
 # -- the registry ----------------------------------------------------------
@@ -215,11 +311,16 @@ _PLATFORM_METRICS: tuple[MetricDefinition, ...] = (
     _m(
         "average_percentage_viewed",
         MetricKind.RATE,
-        "fraction of video length, 0.0-1.0",
+        "fraction of video length; 1.0 is 100% and is not the ceiling",
         "Mean share of the video watched per view, as the platform reports it. "
+        "1.0 means the average view lasted exactly one length of the video. "
+        "Values above 1.0 are valid and are not a defect: a looping or replayed "
+        "view accumulates watch time past the end, so the mean watch duration "
+        "can exceed the duration of the video. A Shorts pull returned 118.41%. "
         "Distinct from average_view_duration_seconds divided by video length, "
         "which the platform does not compute the same way.",
         denominator="video_length_seconds",
+        unbounded_above=True,
         private=True,
     ),
     _m(

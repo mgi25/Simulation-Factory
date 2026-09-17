@@ -191,7 +191,7 @@ reading of the same quantity land on the same `MetricDefinition`.
 | `views` | `views` | views | `views` | identity |
 | `estimated_minutes_watched` | `estimatedMinutesWatched` | minutes | `watch_time_hours` | `/ 60.0` |
 | `average_view_duration_seconds` | `averageViewDuration` | seconds | `average_view_duration_seconds` | identity |
-| `average_view_percentage` | `averageViewPercentage` | fraction | `average_percentage_viewed` | `* 0.01`, in the fetcher |
+| `average_view_percentage` | `averageViewPercentage` | fraction | `average_percentage_viewed` | `* 0.01`, in the fetcher; **may exceed 1.0** |
 | `subscribers_gained` | `subscribersGained` | subscribers | `subscribers_gained` | identity |
 | `subscribers_lost` | `subscribersLost` | subscribers | `subscribers_lost` | identity |
 | `likes` | `likes` | likes | `likes` | identity |
@@ -199,6 +199,81 @@ reading of the same quantity land on the same `MetricDefinition`.
 | `shares` | `shares` | shares | `shares` | identity |
 
 No monetary metric exists in either half.
+
+#### `average_percentage_viewed` has no ceiling, and that is a correction
+
+The first live pull of the Physics Loop channel returned
+`averageViewPercentage = 118.41` for a Short. The fetcher normalized it to
+`1.1841`, correctly, and the metric registry described itself as
+
+> fraction of video length, 0.0-1.0
+
+which made the one interesting reading in the pull the one the contract called
+impossible. Nothing clamped it — the clamp had never been written — so the
+defect was latent rather than harmless: the next person to reconcile the two
+had a sentence in the registry telling them to clamp, and clamping would have
+turned "this Short is watched more than once per view" into "this Short is
+watched exactly once through".
+
+A percentage viewed is watch duration over video length. Its denominator is not
+a population, so the numerator can lap it: a viewer who lets a Short loop keeps
+accumulating watch time past the end. **Values above 1.0 are valid.** The
+corrected contract is
+
+> average fraction of video viewed; 1.0 = 100%; values above 1.0 are valid when
+> repeat viewing or looping makes the average watch duration exceed the video's
+> duration
+
+and it is now enforced rather than described. `MetricDefinition` carries
+`unbounded_above`, derives `minimum`/`maximum` from it, and `MetricObservation`
+checks the value at construction:
+
+| metric | floor | ceiling | why |
+|---|---|---|---|
+| `average_percentage_viewed` | 0.0 | none | a view can lap the video |
+| `retention_at_3s`, `retention_at_50pct`, `click_through_rate`, `traffic_source_share` | 0.0 | 1.0 | a share of a population cannot exceed the population |
+| `views`, `likes`, durations, … | 0.0 | none | a count has no full scale |
+| `estimated_revenue` | none | none | a refund is a real negative amount |
+
+Restoring the old assumption now means flipping a declared field, and
+`tests/test_company_youtube_live_findings.py` fails when somebody does.
+
+### Channel-level evidence is not a `MetricObservation`
+
+A pull asks `reports.query` for the channel as well as for each video, so a real
+artifact carries one row set with no `video_id`. It is a genuine measurement —
+"the channel averaged 71.94% viewed this week" is something the company wants —
+and it is **not** an observation, because an observation is recorded against a
+deliverable and the channel is not one.
+
+The tempting fix is the failure. A `deliverable_id` of `"channel"` would put a
+total into the same population as the videos it totals, and every later average,
+baseline and experiment over deliverables would count that week twice. So the
+two levels are separated instead of one being discarded:
+
+```
+artifact
+├── channel evidence
+│   └── the channel-wide row set  →  retained in the artifact, in the evidence
+│                                    envelope, and named in
+│                                    ApiIngestionResult.channel_reports
+└── video evidence
+    └── the per-video row sets    →  MetricObservation, once a mapping says
+                                     which deliverable the video is
+```
+
+`ApiIngestionResult.to_dict()` reports both under `evidence_levels`
+(`{"channel": n, "deliverable": m}`) and lists the channel row sets under
+`channel_evidence`, so a consumer can tell them apart without knowing this
+module's field names. The diagnostic is an `AGGREGATE_ROW` **note** — the same
+kind and severity the Studio importer gives a `Total` row, which is the same
+thing seen through the other door — rather than the error it used to be. An
+expected, correct, every-pull outcome that sets an error flag only teaches an
+operator to ignore the error flag.
+
+The channel's actual numbers live in the artifact and in the envelope
+`YouTubeEvidenceStore` appends; the result object prints no reading, by the same
+rule `inspect` follows.
 
 ## Observation identity: what makes two numbers the same reading
 
@@ -337,23 +412,75 @@ The Company OS half, which touches no network and needs no credential:
 
 ```powershell
 python -m company.youtube inspect artifact.json
+python -m company.youtube assignments artifact.json --out assignments.json
 python -m company.youtube ingest artifact.json --assignments assignments.json
 python -m company.youtube ingest artifact.json --assignments assignments.json --state-dir C:\path\to\company-state --commit --keep-evidence
 ```
 
+### Mapping videos to deliverables
+
 `assignments.json` is the operator's declaration of what each video *is*, which
-is the one thing the platform cannot tell us:
+is the one thing the platform cannot tell us. The schema is a JSON object keyed
+by YouTube video id:
 
 ```json
 {
-  "dQw4w9WgXcQ": {"deliverable_id": "race-02", "kind": "short", "format_id": "marble_race"}
+  "VIDEO_ID": {
+    "deliverable_id": "race-001",
+    "kind": "short",
+    "format_id": "marble_race",
+    "version": ""
+  }
 }
 ```
 
-`kind` (`video` against `short`) and `format_id` are supplied, never inferred
-from a duration or a title: a family guessed off a title would carry the
-authority of a record and silently mis-group every comparison downstream. A
-video with no entry is reported as unassigned and produces no observation.
+| field | required | rule |
+|---|---|---|
+| *key* | yes | the YouTube video id, case-sensitive, exactly as the platform spells it |
+| `deliverable_id` | yes | lowercase `[a-z0-9._-]`, starting alphanumeric — so it is **never** the video id |
+| `kind` | yes | one of `video`, `short`, `prototype`, `experiment_render`, `format_version` |
+| `format_id` | yes | the format family tag, e.g. `marble_race` |
+| `version` | no | the iteration within that format |
+
+`docs/youtube_assignments_template.json` holds that example with placeholder
+keys, and `tests/test_company_youtube_live_findings.py` loads it through the
+real `load_assignments`, so the documented shape cannot drift from the shape the
+code accepts.
+
+`kind` and `format_id` are supplied, never inferred from a duration or a title:
+a family guessed off a title would carry the authority of a record and silently
+mis-group every comparison downstream. A video with no entry is reported as
+unassigned and produces no observation.
+
+The operator workflow, which invents nothing:
+
+```powershell
+# 1. what needs classifying, and a template keyed by the real video ids
+python -m company.youtube assignments artifact.json --out assignments.json
+
+# 2. a person edits assignments.json, replacing every REPLACE_WITH_... value
+#    with what that video actually is
+
+# 3. dry run: read it back and see exactly what would be recorded
+python -m company.youtube ingest artifact.json --assignments assignments.json
+
+# 4. commit
+python -m company.youtube ingest artifact.json --assignments assignments.json --state-dir C:\path\to\company-state --commit --keep-evidence
+```
+
+Step 1 prints each unassigned video's id, publication instant, duration and
+title — enough for a person to recognise it — and writes a file in exactly the
+schema above with every value set to `REPLACE_WITH_…`. The title is printed to
+help a human decide and is never read back as a classification. The command
+exits 1 while anything is unassigned, so a scripted run cannot read "nothing
+committed" as "done".
+
+`load_assignments` **refuses** any field still holding a `REPLACE_WITH_`
+placeholder, including a half-filled file whose `kind` is valid but whose
+`deliverable_id` is not. Without that refusal the template would be the most
+dangerous file in the system: `REPLACE_WITH_DELIVERABLE_ID` is a perfectly legal
+tag, so validation alone would accept it and attach a week of real readings to a
+deliverable nobody ever made.
 
 `inspect` writes nothing. `ingest` is a **dry run by default** — it parses,
 validates and reports everything it would record, and needs `--commit` before it
@@ -376,6 +503,12 @@ of these:
    still absent from the observation identity?
 6. Does a failed or incomplete fetch still write no artifact, and does a
    conflicting commit still write nothing at all?
+7. Does `average_percentage_viewed` still declare `unbounded_above`, and is
+   there still no clamp anywhere between the API response and the store?
+8. Is a channel-wide row set still retained as evidence, still reported as a
+   note rather than an error, and still absent from every `MetricObservation`
+   under any deliverable id?
+9. Does an unedited or half-filled assignments template still fail to load?
 
 Any "no" is a design change rather than a fix, and belongs in the gate report
 before it belongs in this file.

@@ -409,6 +409,36 @@ def test_a_percentage_column_becomes_the_fraction_the_metric_is_defined_over(exp
     assert "0.0-1.0" in ctr.metric.unit
 
 
+def test_a_percentage_viewed_above_one_hundred_survives_the_studio_door_too(tmp_path):
+    """The looping-Short reading, arriving as a CSV cell instead of as JSON.
+
+    `average_percentage_viewed` is reached from two directions - a Studio export
+    and the Analytics API - and a ceiling restored on one side would be a defect
+    the other side's tests could not see. The live pull that exposed this came
+    through the API; this is the same number through the export.
+    """
+    row = TOTALS_ROW_14.replace(",0:18,60.5,", ",0:18,118.41,")
+    result = ingest(totals_csv(tmp_path, row))
+    assert value_of(result, "average_percentage_viewed") == pytest.approx(1.1841)
+    assert parse_cell("118.41%", ValueFormat.PERCENTAGE, DOT_DECIMAL) == pytest.approx(1.1841)
+    assert parse_cell("200", ValueFormat.PERCENTAGE, DOT_DECIMAL) == 2.0
+
+
+def test_a_share_of_a_population_above_one_hundred_is_still_refused(tmp_path):
+    """Lifting the cap for one metric did not lift it for click-through rate.
+
+    More clicks than impressions is an export defect or a column read into the
+    wrong metric, and either way it is not a reading.
+    """
+    row = TOTALS_ROW_14.replace(",900000,5.8,", ",900000,140.0,")
+    result = ingest(totals_csv(tmp_path, row))
+    assert "click_through_rate" not in {o.metric.name for o in result.observations}
+    refused = [
+        i for i in result.issues if i.kind is IngestionIssueKind.OBSERVATION_REFUSED
+    ]
+    assert refused and "unbounded_above" in refused[0].reason
+
+
 def test_a_trailing_percent_sign_is_accepted_and_a_misplaced_one_is_not():
     assert parse_cell("12.4%", ValueFormat.PERCENTAGE, DOT_DECIMAL) == 0.124
     with pytest.raises(StudioValueError, match="other than the end"):

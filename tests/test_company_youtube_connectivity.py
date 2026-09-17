@@ -57,6 +57,7 @@ from company.youtube import (
     parse_artifact,
     read_artifact,
 )
+from company.analytics.studio_ingest import IngestionIssueKind, IssueSeverity
 from company.youtube.store import CANONICAL_FIELDS
 from knowledge.company_os.records import Evidence
 
@@ -539,13 +540,32 @@ def test_an_unknown_metric_name_is_reported_rather_than_guessed_at():
 
 
 def test_a_channel_wide_row_set_and_an_unassigned_video_are_reported(tmp_path):
+    """Two refusals that look alike and are not.
+
+    Neither produces an observation, and that is where the resemblance ends. An
+    unassigned video is a gap somebody has to close: a mapping is missing, and
+    until it arrives real readings have nowhere to go. A channel-wide row set is
+    not a gap at all - it is a correct measurement at a level this ledger does
+    not record, it arrives on every single pull, and no assignment will ever
+    make it into a deliverable. So one is an error and the other is a note, and
+    the channel's numbers are retained as evidence rather than dropped.
+
+    `tests/test_company_youtube_live_findings.py` has the rest of it; this is
+    the part that belongs beside the other ingestion refusals.
+    """
     result = ingest(artifact_mapping(video_id=None))
     assert result.observations == ()
-    assert result.errors and "channel-wide" in result.errors[0].reason
+    assert result.errors == ()
+    assert len(result.channel_reports) == 1
+    assert result.channel_reports[0].subject_ref.startswith("youtube:channel:")
+    note = result.issues_of(IngestionIssueKind.AGGREGATE_ROW)[0]
+    assert note.severity is IssueSeverity.NOTE
+    assert "channel-wide" in note.reason
 
     unassigned = ingest_artifact(parse_artifact(artifact_mapping()), assignments={})
     assert unassigned.observations == ()
     assert unassigned.unassigned_videos == ("abcDEF_1",)
+    assert unassigned.errors and "no assignment" in unassigned.errors[0].reason
 
 
 # -- requirement 13: the evidence envelope carries one digest ---------------

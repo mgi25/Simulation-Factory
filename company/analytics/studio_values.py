@@ -33,9 +33,13 @@ each column's conversion is visible in the schema rather than buried in a branch
 here.
 
 The one conversion this module performs is percent to fraction, because the
-canonical rate metrics are defined over `0.0-1.0` and the column header says
-`(%)`. Everything else is read in the unit the column already carries: a watch
-time in hours stays hours, and it is the metric definition's job to say so.
+canonical rate metrics are expressed with `1.0` meaning 100% and the column
+header says `(%)`. It divides by one hundred and nothing else: `118.41%` becomes
+`1.1841`, not `1.0`. Whether a metric may sit above full scale is declared on
+the metric (`unbounded_above`) and checked when the observation is built, and
+clamping here would destroy the reading before anything got the chance to.
+Everything else is read in the unit the column already carries: a watch time in
+hours stays hours, and it is the metric definition's job to say so.
 """
 
 from __future__ import annotations

@@ -127,6 +127,9 @@ class MetricObservation:
         if self.note:
             object.__setattr__(self, "note", assert_prose(self.note, "note"))
 
+        self.metric.assert_value_in_range(
+            self.value, f"observation {self.observation_id} value"
+        )
         self.metric.assert_source_can_produce(
             self.provenance.effective_source,
             f"observation {self.observation_id}",

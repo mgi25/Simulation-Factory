@@ -1,0 +1,267 @@
+{
+  "analytics": [
+    {
+      "channel_id": "UCtestCHANNELtestCHANNEL",
+      "complete": true,
+      "end_date": "2026-09-16",
+      "excludes": [],
+      "metrics": [
+        {
+          "available": true,
+          "name": "views",
+          "source_metric": "views",
+          "unavailable_reason": "",
+          "unit": "views",
+          "value": 4000
+        },
+        {
+          "available": true,
+          "name": "average_view_percentage",
+          "source_metric": "averageViewPercentage",
+          "unavailable_reason": "",
+          "unit": "fraction",
+          "value": 0.7194
+        },
+        {
+          "available": true,
+          "name": "average_view_duration_seconds",
+          "source_metric": "averageViewDuration",
+          "unavailable_reason": "",
+          "unit": "seconds",
+          "value": 12
+        }
+      ],
+      "source": "youtube_analytics_api_v2.reports.query",
+      "start_date": "2026-09-10",
+      "temporal_semantics": "interval",
+      "video_id": null
+    },
+    {
+      "channel_id": "UCtestCHANNELtestCHANNEL",
+      "complete": true,
+      "end_date": "2026-09-16",
+      "excludes": [],
+      "metrics": [
+        {
+          "available": true,
+          "name": "views",
+          "source_metric": "views",
+          "unavailable_reason": "",
+          "unit": "views",
+          "value": 1000
+        },
+        {
+          "available": true,
+          "name": "average_view_percentage",
+          "source_metric": "averageViewPercentage",
+          "unavailable_reason": "",
+          "unit": "fraction",
+          "value": 0.456
+        },
+        {
+          "available": true,
+          "name": "average_view_duration_seconds",
+          "source_metric": "averageViewDuration",
+          "unavailable_reason": "",
+          "unit": "seconds",
+          "value": 12
+        }
+      ],
+      "source": "youtube_analytics_api_v2.reports.query",
+      "start_date": "2026-09-10",
+      "temporal_semantics": "interval",
+      "video_id": "apvUnderOne"
+    },
+    {
+      "channel_id": "UCtestCHANNELtestCHANNEL",
+      "complete": true,
+      "end_date": "2026-09-16",
+      "excludes": [],
+      "metrics": [
+        {
+          "available": true,
+          "name": "views",
+          "source_metric": "views",
+          "unavailable_reason": "",
+          "unit": "views",
+          "value": 1000
+        },
+        {
+          "available": true,
+          "name": "average_view_percentage",
+          "source_metric": "averageViewPercentage",
+          "unavailable_reason": "",
+          "unit": "fraction",
+          "value": 1.0
+        },
+        {
+          "available": true,
+          "name": "average_view_duration_seconds",
+          "source_metric": "averageViewDuration",
+          "unavailable_reason": "",
+          "unit": "seconds",
+          "value": 12
+        }
+      ],
+      "source": "youtube_analytics_api_v2.reports.query",
+      "start_date": "2026-09-10",
+      "temporal_semantics": "interval",
+      "video_id": "apvExactlyOne"
+    },
+    {
+      "channel_id": "UCtestCHANNELtestCHANNEL",
+      "complete": true,
+      "end_date": "2026-09-16",
+      "excludes": [],
+      "metrics": [
+        {
+          "available": true,
+          "name": "views",
+          "source_metric": "views",
+          "unavailable_reason": "",
+          "unit": "views",
+          "value": 1000
+        },
+        {
+          "available": true,
+          "name": "average_view_percentage",
+          "source_metric": "averageViewPercentage",
+          "unavailable_reason": "",
+          "unit": "fraction",
+          "value": 1.1841
+        },
+        {
+          "available": true,
+          "name": "average_view_duration_seconds",
+          "source_metric": "averageViewDuration",
+          "unavailable_reason": "",
+          "unit": "seconds",
+          "value": 12
+        }
+      ],
+      "source": "youtube_analytics_api_v2.reports.query",
+      "start_date": "2026-09-10",
+      "temporal_semantics": "interval",
+      "video_id": "apvLooped1184"
+    },
+    {
+      "channel_id": "UCtestCHANNELtestCHANNEL",
+      "complete": true,
+      "end_date": "2026-09-16",
+      "excludes": [],
+      "metrics": [
+        {
+          "available": true,
+          "name": "views",
+          "source_metric": "views",
+          "unavailable_reason": "",
+          "unit": "views",
+          "value": 1000
+        },
+        {
+          "available": true,
+          "name": "average_view_percentage",
+          "source_metric": "averageViewPercentage",
+          "unavailable_reason": "",
+          "unit": "fraction",
+          "value": 2.0
+        },
+        {
+          "available": true,
+          "name": "average_view_duration_seconds",
+          "source_metric": "averageViewDuration",
+          "unavailable_reason": "",
+          "unit": "seconds",
+          "value": 12
+        }
+      ],
+      "source": "youtube_analytics_api_v2.reports.query",
+      "start_date": "2026-09-10",
+      "temporal_semantics": "interval",
+      "video_id": "apvDoubled200"
+    }
+  ],
+  "api_calls": [
+    {
+      "endpoint": "https://youtubeanalytics.googleapis.com/v2/reports",
+      "error_kind": "",
+      "latency_ms": 100,
+      "method": "GET",
+      "response_bytes": 512,
+      "status": 200,
+      "succeeded": true
+    }
+  ],
+  "artifact_version": 1,
+  "channel": {
+    "channel_id": "UCtestCHANNELtestCHANNEL",
+    "channel_title": "Fixture Channel",
+    "source": "youtube_data_api_v3.channels.list",
+    "subscriber_count": 100,
+    "subscriber_count_unavailable_reason": "",
+    "uploads_playlist_id": "UUtestCHANNELtestCHANNEL",
+    "video_count": 4,
+    "view_count": 10000
+  },
+  "fetched_at": "2026-09-17T00:00:00+00:00",
+  "granted_scopes": [
+    "https://www.googleapis.com/auth/youtube.readonly",
+    "https://www.googleapis.com/auth/yt-analytics.readonly"
+  ],
+  "producer": "tools.youtube_fetch",
+  "producer_version": "1.0",
+  "video_retrieval": {
+    "complete": true,
+    "missing_video_ids": [],
+    "notes": [],
+    "pages_followed": 1,
+    "requested": 4,
+    "returned": 4
+  },
+  "videos": [
+    {
+      "channel_id": "UCtestCHANNELtestCHANNEL",
+      "duration": "PT24S",
+      "duration_seconds": 24,
+      "privacy_status": "public",
+      "published_at": "2026-09-01T00:00:00+00:00",
+      "source": "youtube_data_api_v3.videos.list",
+      "title": "A Short most people leave early",
+      "upload_status": "processed",
+      "video_id": "apvUnderOne"
+    },
+    {
+      "channel_id": "UCtestCHANNELtestCHANNEL",
+      "duration": "PT20S",
+      "duration_seconds": 20,
+      "privacy_status": "public",
+      "published_at": "2026-09-01T00:00:00+00:00",
+      "source": "youtube_data_api_v3.videos.list",
+      "title": "A Short watched exactly once through",
+      "upload_status": "processed",
+      "video_id": "apvExactlyOne"
+    },
+    {
+      "channel_id": "UCtestCHANNELtestCHANNEL",
+      "duration": "PT21S",
+      "duration_seconds": 21,
+      "privacy_status": "public",
+      "published_at": "2026-09-01T00:00:00+00:00",
+      "source": "youtube_data_api_v3.videos.list",
+      "title": "A Short that loops, as the live pull found",
+      "upload_status": "processed",
+      "video_id": "apvLooped1184"
+    },
+    {
+      "channel_id": "UCtestCHANNELtestCHANNEL",
+      "duration": "PT17S",
+      "duration_seconds": 17,
+      "privacy_status": "public",
+      "published_at": "2026-09-01T00:00:00+00:00",
+      "source": "youtube_data_api_v3.videos.list",
+      "title": "A Short watched twice through on average",
+      "upload_status": "processed",
+      "video_id": "apvDoubled200"
+    }
+  ]
+}

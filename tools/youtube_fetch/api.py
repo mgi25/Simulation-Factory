@@ -77,6 +77,12 @@ MAX_PAGE_SIZE = 50
 # The factor exists so the artifact carries a value in the unit it names:
 # averageViewPercentage arrives as 45.6 meaning 45.6%, and a "fraction" that
 # reads 45.6 is a number waiting to be multiplied twice.
+#
+# The factor is the whole conversion. It is not a range check, and there is no
+# ceiling applied after it: a real pull of this channel returned 118.41 for a
+# Short, because a looping view accumulates watch time past the end of the
+# video, and it is carried through as 1.1841. Capping it at 1.0 here would lose
+# the only thing that reading says.
 METRIC_TABLE: tuple[tuple[str, str, str, float], ...] = (
     ("views", "views", "views", 1.0),
     ("estimated_minutes_watched", "estimatedMinutesWatched", "minutes", 1.0),

@@ -225,7 +225,10 @@ class ColumnMapping:
 
 # Which metric kinds each column shape may supply. A count has to arrive as a
 # whole number, a clock duration has to land on a duration, and a percentage has
-# to land on something defined over 0.0-1.0.
+# to land on a metric whose 1.0 means 100%. That is a statement about the unit,
+# not about a ceiling: a percentage column may carry a figure above 100, and
+# whether the metric it lands on permits one is the metric definition's call
+# (`unbounded_above`), checked when the observation is built.
 _COMPATIBLE: dict[ValueFormat, frozenset[MetricKind]] = {
     ValueFormat.INTEGER: frozenset({MetricKind.COUNT, MetricKind.DURATION}),
     ValueFormat.DECIMAL: frozenset(

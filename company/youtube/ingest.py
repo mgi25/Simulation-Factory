@@ -19,9 +19,31 @@ committing is doing the review the whole layer exists to make possible.
 
 The result reports readings read and readings accepted, and then reports every
 reason the difference exists: each unavailable metric with the API's own reason,
-each metric name the vocabulary does not recognise, each video with no
-assignment, each channel-wide row set that has no deliverable to attach to.
-"Import successful" is not a sentence this layer can say.
+each metric name the vocabulary does not recognise, and each video with no
+assignment. "Import successful" is not a sentence this layer can say.
+
+## A channel total is evidence, and is not an observation
+
+A pull asks `reports.query` for the channel as well as for each video, so a real
+artifact arrives with one row set that names no video. It is not a defect and it
+is not a loss: it is a measurement of the channel, at the level the channel is
+the subject.
+
+It cannot be a `MetricObservation`, because an observation is recorded against a
+deliverable and the channel is not one. The tempting fix - a deliverable id of
+`"channel"` - is the failure, not the workaround: it would put a total into the
+same population as the videos it totals, and every later average, baseline and
+experiment over deliverables would count that week twice.
+
+So the two levels are separated rather than one of them discarded. The channel
+row set is named in `channel_reports`, its numbers stay in the artifact and in
+the envelope `YouTubeEvidenceStore` appends, and `to_dict()` reports both levels
+under `evidence_levels` so a consumer can tell them apart without reading this
+module. The diagnostic it raises is an `AGGREGATE_ROW` note - the same kind and
+the same severity the Studio importer gives a "Total" row, which is the same
+thing seen through the other door - rather than the error it used to be. An
+expected, correct outcome that sets an error flag teaches an operator to ignore
+the error flag.
 
 An unavailable metric is a note rather than an error, because it is the expected
 case rather than a defect: the Analytics API returns no row for a metric it has
@@ -81,6 +103,24 @@ from .models import YouTubeArtifact
 # prints four hundred lines is a summary nobody reads.
 MAX_LISTED_ISSUES = 20
 
+# What a retained channel-wide row set is, in one word, wherever this result is
+# serialized. The two levels are deliberately named rather than implied by which
+# list a thing landed in, so a consumer of `to_dict()` can tell a channel total
+# from a per-deliverable reading without knowing this module's field names.
+CHANNEL_EVIDENCE_LEVEL = "channel"
+VIDEO_EVIDENCE_LEVEL = "deliverable"
+
+# What an unfilled field in a generated assignments file looks like, and the
+# reason there is a sentinel at all. `assignment_template` writes a file keyed by
+# the real video ids so nobody transcribes eleven-character ids by hand, and the
+# risk it creates is that the file gets passed to `ingest` before it is filled
+# in. A `deliverable_id` of "REPLACE_WITH_DELIVERABLE_ID" is a perfectly legal
+# tag, so validation alone would accept it and attach a week of real readings to
+# a deliverable nobody ever made. `load_assignments` therefore refuses this
+# prefix outright: the template is unusable until a person has edited it, which
+# is the only state in which it is honest.
+ASSIGNMENT_PLACEHOLDER_PREFIX = "REPLACE_WITH_"
+
 
 @dataclass(frozen=True)
 class DeliverableAssignment:
@@ -132,6 +172,52 @@ class UnavailableReading:
 
 
 @dataclass(frozen=True)
+class ChannelReport:
+    """One channel-wide row set, classified as evidence rather than dropped.
+
+    A `reports.query` without a video dimension measures the channel. It is a
+    real, useful reading - "the channel averaged 71.94% viewed this week" is
+    something the company wants - and it is not a `MetricObservation`, because
+    an observation is recorded against a deliverable and the channel is not one.
+    Inventing a deliverable id of `channel` to make it fit would put a total
+    beside the videos it is a total *of*, and every later average over
+    deliverables would double-count it.
+
+    So it is named here instead. The numbers themselves stay in the artifact and
+    in the evidence envelope `YouTubeEvidenceStore` appends; this record carries
+    identity, window and metric names so a reader can see what was retained
+    without a reading being printed. Deliberately no value, for the reason
+    `ArtifactDescription` gives.
+    """
+
+    subject_ref: str
+    channel_id: str
+    start_date: str
+    end_date: str
+    metric_names: tuple[str, ...]
+    unavailable_metrics: tuple[str, ...] = ()
+
+    @property
+    def reading_count(self) -> int:
+        return len(self.metric_names)
+
+    @property
+    def window(self) -> str:
+        return f"{self.start_date}..{self.end_date}"
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "subject_ref": self.subject_ref,
+            "channel_id": self.channel_id,
+            "start_date": self.start_date,
+            "end_date": self.end_date,
+            "metric_names": list(self.metric_names),
+            "unavailable_metrics": list(self.unavailable_metrics),
+            "evidence_level": CHANNEL_EVIDENCE_LEVEL,
+        }
+
+
+@dataclass(frozen=True)
 class ApiIngestionResult:
     """Everything one artifact produced, and everything it did not."""
 
@@ -144,10 +230,16 @@ class ApiIngestionResult:
     unavailable: tuple[UnavailableReading, ...] = ()
     unknown_metrics: tuple[str, ...] = ()
     unassigned_videos: tuple[str, ...] = ()
+    channel_reports: tuple[ChannelReport, ...] = ()
 
     @property
     def readings_rejected(self) -> int:
         return self.readings_read - self.readings_accepted
+
+    @property
+    def channel_readings(self) -> int:
+        """Readings retained as channel evidence rather than offered to the ledger."""
+        return sum(report.reading_count for report in self.channel_reports)
 
     @property
     def errors(self) -> tuple[IngestionIssue, ...]:
@@ -181,6 +273,17 @@ class ApiIngestionResult:
             f"  observations {len(self.observations)} for "
             f"{len(self.deliverable_ids)} deliverable(s)",
         ]
+        if self.channel_reports:
+            lines.append(
+                f"  channel evidence {self.channel_readings} reading(s) in "
+                f"{len(self.channel_reports)} channel-wide report(s), retained in the "
+                "artifact and not written as observations"
+            )
+            for report in self.channel_reports[:MAX_LISTED_ISSUES]:
+                lines.append(
+                    f"    {report.subject_ref} {report.window} "
+                    f"{report.reading_count} metric(s)"
+                )
         if not self.source.complete:
             lines.append("  incomplete pull:")
             for text in self.source.excludes:
@@ -221,6 +324,11 @@ class ApiIngestionResult:
             "unavailable": [u.to_dict() for u in self.unavailable],
             "unknown_metrics": list(self.unknown_metrics),
             "unassigned_videos": list(self.unassigned_videos),
+            "channel_evidence": [r.to_dict() for r in self.channel_reports],
+            "evidence_levels": {
+                CHANNEL_EVIDENCE_LEVEL: self.channel_readings,
+                VIDEO_EVIDENCE_LEVEL: self.readings_accepted,
+            },
         }
 
 
@@ -393,6 +501,7 @@ def ingest_artifact(
     unavailable: list[UnavailableReading] = []
     unknown_metrics: list[str] = []
     unassigned: list[str] = []
+    channel_reports: list[ChannelReport] = []
     deliverables: dict[str, AnalyzedDeliverable] = {}
     observations: list[MetricObservation] = []
     readings_read = 0
@@ -401,12 +510,24 @@ def ingest_artifact(
     for report in artifact.analytics:
         readings_read += len(report.metrics)
         if report.video_id is None:
+            channel_reports.append(
+                ChannelReport(
+                    subject_ref=report.subject_ref,
+                    channel_id=report.channel_id,
+                    start_date=report.start_date.isoformat(),
+                    end_date=report.end_date.isoformat(),
+                    metric_names=tuple(m.name for m in report.metrics if m.available),
+                    unavailable_metrics=tuple(m.name for m in report.unavailable),
+                )
+            )
             issues.append(
                 IngestionIssue(
-                    IngestionIssueKind.MISSING_VIDEO_ID,
-                    "a channel-wide row set names no video, and an observation is "
-                    "recorded against a deliverable. A channel total is a reading "
-                    "about the channel, which this ledger has no subject for",
+                    IngestionIssueKind.AGGREGATE_ROW,
+                    "a channel-wide row set: a measurement of the channel, not of any "
+                    "one video. Retained as channel evidence in the artifact and in "
+                    "the evidence envelope, and deliberately not written as an "
+                    "observation, which is recorded against a deliverable. There is "
+                    "no deliverable here and none is invented",
                     video_id="",
                 )
             )
@@ -515,6 +636,7 @@ def ingest_artifact(
         unavailable=tuple(unavailable),
         unknown_metrics=tuple(unknown_metrics),
         unassigned_videos=tuple(unassigned),
+        channel_reports=tuple(channel_reports),
     )
 
 
@@ -601,6 +723,75 @@ def commit_ingestion(
     )
 
 
+@dataclass(frozen=True)
+class UnassignedVideo:
+    """One video an operator has to classify, with what the platform knows of it.
+
+    Title and duration are here because an operator cannot recognise a video
+    from an eleven-character id, and they are the platform's own strings rather
+    than anything this layer inferred. They are printed to help a person decide;
+    nothing reads them back.
+    """
+
+    video_id: str
+    title: str
+    published_at: str
+    duration: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "video_id": self.video_id,
+            "title": self.title,
+            "published_at": self.published_at,
+            "duration": self.duration,
+        }
+
+
+def unassigned_videos(
+    artifact: YouTubeArtifact,
+    assignments: Mapping[str, DeliverableAssignment] | None = None,
+) -> tuple[UnassignedVideo, ...]:
+    """Every video in the artifact that no assignment classifies, in pull order."""
+    known = set(assignments or ())
+    return tuple(
+        UnassignedVideo(
+            video_id=video.video_id,
+            title=video.title,
+            published_at=video.published_at.isoformat(),
+            duration=video.duration or "",
+        )
+        for video in artifact.videos
+        if video.video_id not in known
+    )
+
+
+def assignment_template(
+    artifact: YouTubeArtifact,
+    assignments: Mapping[str, DeliverableAssignment] | None = None,
+) -> dict[str, dict[str, str]]:
+    """An `assignments.json` keyed by the real video ids, with nothing filled in.
+
+    Exactly the shape `load_assignments` reads, so the operator edits this file
+    and passes it straight to `ingest --assignments`. Every value is a
+    placeholder, and `load_assignments` refuses a placeholder, so the generated
+    file cannot be used until a person has said what each video is.
+
+    Nothing is guessed. A title says "PICK A COLOR - Who Wins?" and this module
+    could pattern-match its way to a `format_id` from that, which is precisely
+    the inference the whole layer exists to refuse: a format read off a title is
+    a guess wearing the authority of a record.
+    """
+    prefix = ASSIGNMENT_PLACEHOLDER_PREFIX
+    return {
+        video.video_id: {
+            "deliverable_id": f"{prefix}DELIVERABLE_ID",
+            "kind": f"{prefix}KIND",
+            "format_id": f"{prefix}FORMAT_ID",
+        }
+        for video in unassigned_videos(artifact, assignments)
+    }
+
+
 def load_assignments(data: Any) -> dict[str, DeliverableAssignment]:
     """Read the operator's video-to-deliverable declarations from a mapping.
 
@@ -626,6 +817,21 @@ def load_assignments(data: Any) -> dict[str, DeliverableAssignment]:
         if missing:
             raise ArtifactRejected(
                 f"assignments[{video_id!r}]: missing " + ", ".join(missing)
+            )
+        unfilled = sorted(
+            key
+            for key in ("deliverable_id", "kind", "format_id", "version")
+            if isinstance(item.get(key), str)
+            and item[key].startswith(ASSIGNMENT_PLACEHOLDER_PREFIX)
+        )
+        if unfilled:
+            raise ArtifactRejected(
+                f"assignments[{video_id!r}]: " + ", ".join(unfilled)
+                + (" still hold " if len(unfilled) > 1 else " still holds ")
+                + f"the {ASSIGNMENT_PLACEHOLDER_PREFIX}... placeholder this template was "
+                "generated with. Fill in what this video actually is before importing "
+                "it; a placeholder that validated would attach real readings to a "
+                "deliverable that does not exist"
             )
         try:
             kind = DeliverableKind(item["kind"])
@@ -727,14 +933,21 @@ def _record_source(source: ApiArtifactSource, store: AnalyticsStore) -> bool:
 
 
 __all__ = [
+    "CHANNEL_EVIDENCE_LEVEL",
     "MAX_LISTED_ISSUES",
+    "VIDEO_EVIDENCE_LEVEL",
     "ApiCommitOutcome",
     "ApiIngestionResult",
     "ArtifactDescription",
+    "ASSIGNMENT_PLACEHOLDER_PREFIX",
+    "ChannelReport",
     "DeliverableAssignment",
+    "UnassignedVideo",
     "UnavailableReading",
+    "assignment_template",
     "commit_ingestion",
     "describe_artifact",
     "ingest_artifact",
     "load_assignments",
+    "unassigned_videos",
 ]
