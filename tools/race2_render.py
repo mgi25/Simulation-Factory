@@ -116,7 +116,8 @@ def inputs_for(out: str, course: str, seed: int) -> tuple[str, str, str]:
 
 def base_command(godot: str, out_dir: str, course: str, seed: int, out: str,
                  size: tuple[int, int], environment: str, racers: str,
-                 show: str, track: str = "", track_probe: str = "") -> list[str]:
+                 show: str, track: str = "", track_probe: str = "",
+                 faces: str = "") -> list[str]:
     geometry, replay, cameras = inputs_for(out, course, seed)
     command = [
         godot, "--path", GODOT_PROJECT, RENDER_SCENE, "--",
@@ -136,6 +137,11 @@ def base_command(godot: str, out_dir: str, course: str, seed: int, out: str,
         command.append(f"--track={track}")
     if track_probe:
         command.append(f"--track-probe={track_probe}")
+    # Absent by default, and absent is V32's render. `--faces=both` draws the
+    # channel strip double-sided, which is V32.1's whole geometric fix; see
+    # `race2_track_surface.faces` for the measurement behind it.
+    if faces:
+        command.append(f"--faces={faces}")
     return command
 
 
@@ -163,6 +169,8 @@ def main() -> int:
                         help="channel surface: v31 (default), A, B, C, mask")
     parser.add_argument("--track-probe", dest="track_probe", default="",
                         help="one material field at a time, e.g. roughness=0.5")
+    parser.add_argument("--faces", default="",
+                        help="channel strip: front (V32) or both (V32.1)")
     parser.add_argument("--fps", type=int, default=60)
     parser.add_argument("--start", type=float, default=0.0)
     parser.add_argument("--end", type=float, default=-1.0)
@@ -180,7 +188,7 @@ def main() -> int:
         names = cut_names(args.out, args.course, args.seed)
         command = base_command(godot, out_dir, args.course, args.seed, args.out,
                                size, args.environment, args.racers, args.show,
-                               args.track, args.track_probe)
+                               args.track, args.track_probe, args.faces)
         command.append(f"--stills={','.join(names)}")
         run_godot(command, f"{args.mode} {tag}")
         print(f"  {len(names)} frames in {out_dir}")
@@ -193,7 +201,7 @@ def main() -> int:
         os.makedirs(out_dir, exist_ok=True)
         command = base_command(godot, out_dir, args.course, args.seed, args.out,
                                size, args.environment, args.racers, args.show,
-                               args.track, args.track_probe)
+                               args.track, args.track_probe, args.faces)
         command.append(f"--at={args.at}")
         run_godot(command, f"still {tag}")
         return 0
@@ -204,7 +212,7 @@ def main() -> int:
         os.remove(stale)
     command = base_command(godot, out_dir, args.course, args.seed, args.out,
                            size, args.environment, args.racers, args.show,
-                           args.track, args.track_probe)
+                           args.track, args.track_probe, args.faces)
     command += ["--clip=1", f"--fps={args.fps}", f"--start={args.start}"]
     if args.end > 0:
         command.append(f"--end={args.end}")

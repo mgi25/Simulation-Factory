@@ -46,11 +46,71 @@ from marble3d.mesh import TriMesh
 from sloped.scale import SIM_TO_LAYOUT, to_sim_point
 from sloped.track import ring_points
 
+from race2 import v321_section
 from race2.course import Course
 
-__all__ = ["course_geometry", "write_geometry"]
+__all__ = ["RENDER_SECTION", "RENDER_WELD", "course_geometry",
+           "render_section", "render_weld", "write_geometry"]
 
 PLACES = 4
+
+# **The one place the picture may differ from the collider.**
+#
+# `_run_rings` below and `TrackRun.local_colliders` build the same rings from
+# the same `section_at`, and this module's own docstring is the argument for
+# that: a second hand-built copy would be a second chance to be wrong. V31.1
+# then measured what it costs - the cradle covers 0.000% of the frame on eight
+# of thirteen sampled moments, because the near guard stands 0.678 above it in
+# 0.124 of lateral run and the RB camera looks along the channel rather than
+# down into it.
+#
+# So V32.1 adds a **render-only** map over the cross-section, named by
+# `$RACE2_RENDER_SECTION` and applied here and nowhere else. `local_colliders`
+# cannot see it: it does not call this module. Empty or `CONTROL` is the
+# identity and reproduces the shipped geometry file byte for byte, which is
+# what `tools/race2_v321_geometry.py build` asserts before it renders anything.
+#
+# An environment variable rather than an argument for the reason
+# `race2.track.WALL_CAP` gives for its own: every tool in this branch that
+# writes a geometry file goes through `write_geometry(course, path)`, and a
+# parameter threaded through all of them would be a parameter that four call
+# sites could disagree about.
+RENDER_SECTION = "RACE2_RENDER_SECTION"
+
+# **The seam the fix uncovered, and the render-only weld that closes it.**
+#
+# Consecutive runs do not meet. Measured on the delivered course, the last ring
+# of each run stands **0.051 to 0.077** simulation-scaled layout units from the
+# first ring of the next at the centreline, and **0.11 to 0.23** at the section
+# edges, because the bank and the width are still changing across the join. The
+# collider has that gap too and always did - a marble crosses it in under a
+# frame and never notices - and so did the picture, invisibly, because with the
+# deck backfacing there was no surface for a hole to be a hole in.
+#
+# With the deck drawn, the join is a **black slash across the road**: 6.5 to
+# 48.8 delivery pixels wide, on screen at 16 of the 21 sampled moments.
+#
+# `RACE2_RENDER_WELD=1` replaces each run's last ring with the next run's first
+# ring, so the two strips share an edge instead of facing each other across a
+# gap. It is longitudinal rather than lateral - no cross-section changes - and
+# it is render-only for the same reason the sections are: `local_colliders`
+# does not come through this module. The bridging quad it creates is 0.77 to
+# 1.25 times the run's own sample step, so nothing is stretched and nothing
+# folds; `tests/test_race2_v321_geometry.py` holds both bounds.
+RENDER_WELD = "RACE2_RENDER_WELD"
+
+
+def render_weld() -> bool:
+    """Whether consecutive runs are welded in the render mesh."""
+    return os.environ.get(RENDER_WELD, "").strip() not in ("", "0", "off", "false")
+
+
+def render_section() -> str:
+    """The render-only section variant in force, or `""` for the collider's own."""
+    name = os.environ.get(RENDER_SECTION, "").strip()
+    if not v321_section.known(name):
+        raise ValueError(f"${RENDER_SECTION} names no variant: {name!r}")
+    return "" if name == "CONTROL" else name
 
 
 def _round(value: float) -> float:
@@ -73,6 +133,7 @@ def _run_rings(run) -> list[list[float]]:
     builder ever changes the winding.
     """
     rings: list[list[float]] = []
+    variant = render_section()
     for index in range(len(run.path)):
         # The same call `TrackRun.local_colliders` makes: the ring is built in
         # *layout* units - the path, the frames and the section are all layout -
@@ -80,11 +141,37 @@ def _run_rings(run) -> list[list[float]]:
         # with a layout section would put a 1.88-unit channel on a 3.3-unit
         # centreline, which is a course that looks right in plan and is a third
         # too narrow.
+        section = run.section_at(index)
+        if variant:
+            section = v321_section.transform(variant, section)
         points = ring_points(
-            run.path[index], run.frames[index], run.section_at(index), run.widths[index]
+            run.path[index], run.frames[index], section, run.widths[index]
         )
         rings.append([_round(v) for point in points for v in to_sim_point(point)])
     return rings
+
+
+def _weld(runs: list[dict[str, Any]]) -> None:
+    """Each run's last ring, replaced by the next run's first ring.
+
+    In place, over the runs in the order they are emitted - which is the order
+    the stages put them in, and therefore the order a marble meets them. The
+    join is only welded when the two rings are actually neighbours: the guard is
+    that the next run's *first* ring is nearer to this run's last than its own
+    last ring is, and that the two are within a quarter of a layout unit. A
+    course whose stages were not a chain would fail both and be left alone.
+    """
+    for near, far in zip(runs, runs[1:]):
+        a = near["rings"][-1]
+        first, last = far["rings"][0], far["rings"][-1]
+        middle = len(a) // 6 * 3
+        def gap(other: list[float]) -> float:
+            return sum((a[middle + k] - other[middle + k]) ** 2 for k in range(3)) ** 0.5
+        if gap(first) > gap(last):
+            continue
+        if gap(first) > 0.25 / SIM_TO_LAYOUT:
+            continue
+        near["rings"][-1] = list(first)
 
 
 def course_geometry(course: Course) -> dict[str, Any]:
@@ -110,6 +197,9 @@ def course_geometry(course: Course) -> dict[str, Any]:
                     "clear_width": _round(run.clear_width),
                 }
             )
+
+    if render_weld():
+        _weld(runs)
 
     modules: list[dict[str, Any]] = []
     actuators: list[dict[str, Any]] = []

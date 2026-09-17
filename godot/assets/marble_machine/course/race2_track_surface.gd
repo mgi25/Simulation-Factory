@@ -88,6 +88,10 @@ const RACER_FLAG := "FF00"
 ## Every treatment this branch can render, control first.
 const VARIANTS := ["v31", "A", "B", "C", "mask", "bands", "racers"]
 
+## How much of the strip is drawn. `front` is V32; `both` is V32.1's fix. See
+## `faces` for the measurement that says why this field exists at all.
+const FACE_MODES := ["front", "both", "inside"]
+
 ## **Variant B's gain profile, and why it is shaped the way it is.**
 ##
 ## The band measurement in `docs/race2_v311_track_visibility.md` section 2 is
@@ -144,7 +148,46 @@ static func racer_class(index: int, count: int) -> StandardMaterial3D:
 	return flat("#%02X%s" % [level, RACER_FLAG])
 
 
-static func channel(palette, variant: String, probe: String) -> StandardMaterial3D:
+static func faces(material: StandardMaterial3D, mode: String) -> StandardMaterial3D:
+	## **The pass's root cause, as one field.**
+	##
+	## The channel is an open strip of single-sided triangles, and
+	## `race2_scene._strip_mesh` winds it so that the side Godot draws is the
+	## **outside of the shell**: the underside of the cradle and the outer face
+	## of each guard. So the running surface is not hidden behind the near rail,
+	## as V31.1 and the V32.1 brief both assumed - it is *backfacing to every
+	## camera above the track*, and no amount of lowering a guard can reveal a
+	## polygon the rasteriser discards before depth is ever considered.
+	##
+	## Measured, `--track=bands` on the shipped picture against the same frame
+	## with this set to `both`:
+	##
+	##     t       deck, front only     deck, both
+	##     3.20          0.000%           2.070%
+	##     8.40          0.001%          44.542%
+	##     15.40         0.000%          10.851%
+	##
+	## `CULL_DISABLED` is the whole fix. It moves no vertex, so the collider is
+	## untouched by construction; it changes no colour, roughness, clearcoat or
+	## texture, so V31.1's Variant B material is field-for-field what it was;
+	## and Godot's own shader flips `NORMAL` on a back-facing fragment when a
+	## material is double-sided, so the running surface is lit as the surface it
+	## is rather than as the underside of one.
+	##
+	## `front` is the default and is V32's render exactly.
+	if mode == "both":
+		material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	elif mode == "inside":
+		# The cut-away: only the channel's inner surface, with the shell's
+		# outside discarded. It reveals the same deck `both` does and, because
+		# the underside of the strip is never drawn, it leaves the upper frame
+		# the dark room it was - which is where V32's payoff card lives.
+		material.cull_mode = BaseMaterial3D.CULL_FRONT
+	return material
+
+
+static func channel(palette, variant: String, probe: String,
+		face_mode: String = "front") -> StandardMaterial3D:
 	## The material the runs render with.
 	##
 	## `palette.get_material("track_silver")` is cached and shared, so every
@@ -152,9 +195,9 @@ static func channel(palette, variant: String, probe: String) -> StandardMaterial
 	## repaint the collector tray and the S-curve channel in Race #1 too.
 	var base: StandardMaterial3D = palette.get_material("track_silver")
 	if variant.is_empty() or variant == "v31":
-		if probe.is_empty():
+		if probe.is_empty() and face_mode != "both":
 			return base
-		return _probed(base.duplicate(), probe)
+		return faces(_probed(base.duplicate(), probe), face_mode)
 	# **`racers` paints the channel out, and that is a bug fix.** The first
 	# build let it fall through to the deck/rail mask, whose rail is pure green
 	# - which is also racer 0's class colour, because racer 0 is painted
@@ -162,9 +205,16 @@ static func channel(palette, variant: String, probe: String) -> StandardMaterial
 	# weakest-separation guard came back as a flat 0.00 dE for all four
 	# candidates: a guard that could not fail.
 	if variant == "racers":
-		return flat(MASK_BACKGROUND)
+		return faces(flat(MASK_BACKGROUND), face_mode)
 	if is_mask(variant):
-		return _mask_channel(variant == "bands")
+		# The probe reaches the segmentation too, which the first build did not
+		# allow. It has to: the only probe that matters to a *coverage* measure
+		# is `cull`, and asking "is the deck behind something or facing away?"
+		# is a question about the mask, not about the picture.
+		var masked := _mask_channel(variant == "bands")
+		if not probe.is_empty():
+			_probed(masked, probe)
+		return faces(masked, face_mode)
 	var material: StandardMaterial3D = base.duplicate()
 	match variant:
 		"A":
@@ -179,7 +229,7 @@ static func channel(palette, variant: String, probe: String) -> StandardMaterial
 			_solid(material)
 	if not probe.is_empty():
 		_probed(material, probe)
-	return material
+	return faces(material, face_mode)
 
 
 # --- the three variants -----------------------------------------------------

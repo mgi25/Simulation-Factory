@@ -39,6 +39,7 @@ extends Node3D
 ##     --contrast=v21       the readability pass; default on
 ##     --racers=meridian    racer appearance
 ##     --show=course|matte|all
+##     --faces=front|both   how much of the channel strip is drawn
 ##                          `course` hides the world and keeps its sky, for a
 ##                          geometry proof; `matte` hides the sky as well, for
 ##                          a coverage measurement
@@ -88,6 +89,7 @@ var _contrast := DEFAULT_CONTRAST
 var _racers := DEFAULT_RACERS
 var _track := ""
 var _track_probe := ""
+var _faces := "front"
 
 
 func _ready() -> void:
@@ -96,6 +98,10 @@ func _ready() -> void:
 	_racers = str(options.get("racers", DEFAULT_RACERS))
 	_track = str(options.get("track", ""))
 	_track_probe = str(options.get("track-probe", ""))
+	_faces = str(options.get("faces", "front"))
+	if not TrackSurface.FACE_MODES.has(_faces):
+		push_error("race2_scene: unknown --faces=%s" % _faces)
+		_faces = "front"
 	if not TrackSurface.known(_track):
 		push_error("race2_scene: unknown --track=%s" % _track)
 		_track = ""
@@ -521,7 +527,7 @@ func _build_course(path: String) -> void:
 	# changed, which is what keeps the V31 control reproducible from this
 	# branch.
 	var channel: StandardMaterial3D = TrackSurface.channel(
-		_palette, _track, _track_probe)
+		_palette, _track, _track_probe, _faces)
 	var structure: StandardMaterial3D = _palette.get_material("graphite")
 	var hazard: StandardMaterial3D = _palette.get_material("hazard_machine")
 	# `bands` reuses two of the scene mask's corners for two of its own, so it

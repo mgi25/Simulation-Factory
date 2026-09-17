@@ -1,0 +1,797 @@
+{
+  "moments": [
+    {
+      "moment": "grid",
+      "t": 0.35,
+      "variants": {
+        "A": {
+          "deck_L": 94.19603957264225,
+          "mechanism_L": 10.17806782299446,
+          "mechanism_pct": 6.847366898148148,
+          "vs_deck": 84.05185127797799
+        },
+        "B": {
+          "deck_L": 95.15077232519118,
+          "mechanism_L": 10.072944760111547,
+          "mechanism_pct": 6.835069444444445,
+          "vs_deck": 85.11503139093317
+        },
+        "C": {
+          "deck_L": 95.11587906838292,
+          "mechanism_L": 10.074669239237092,
+          "mechanism_pct": 6.835069444444445,
+          "vs_deck": 85.078857997976
+        },
+        "CONTROL": {
+          "deck_L": 26.583787152045822,
+          "mechanism_L": 10.108035800236845,
+          "mechanism_pct": 6.848765432098765,
+          "vs_deck": 16.89144645441935
+        },
+        "S": {
+          "deck_L": 94.12322417685665,
+          "mechanism_L": 10.065032225898431,
+          "mechanism_pct": 6.835551697530865,
+          "vs_deck": 84.09427768788852
+        }
+      }
+    },
+    {
+      "moment": "hook",
+      "t": 1.2,
+      "variants": {
+        "A": {
+          "deck_L": 94.42820523872695,
+          "mechanism_L": 68.96610594455743,
+          "mechanism_pct": 0.050395447530864196,
+          "vs_deck": 57.15429110659879
+        },
+        "B": {
+          "deck_L": 94.4272497404815,
+          "mechanism_L": 69.0587802923844,
+          "mechanism_pct": 0.050395447530864196,
+          "vs_deck": 57.21012756641006
+        },
+        "C": {
+          "deck_L": 94.61847308951853,
+          "mechanism_L": 69.20611340959725,
+          "mechanism_pct": 0.050395447530864196,
+          "vs_deck": 57.042128066914444
+        },
+        "CONTROL": {
+          "deck_L": 52.87028905545985,
+          "mechanism_L": 68.98668979500636,
+          "mechanism_pct": 0.050395447530864196,
+          "vs_deck": 48.72626551435656
+        },
+        "S": {
+          "deck_L": 94.40165154872344,
+          "mechanism_L": 68.98624252842262,
+          "mechanism_pct": 0.050395447530864196,
+          "vs_deck": 56.9757623908375
+        }
+      }
+    },
+    {
+      "moment": "drop",
+      "t": 2.4,
+      "variants": {
+        "A": {
+          "deck_L": 88.83698281019728,
+          "mechanism_L": 56.649765941453765,
+          "mechanism_pct": 4.939621913580247,
+          "vs_deck": 61.393268108087256
+        },
+        "B": {
+          "deck_L": 89.45083448376815,
+          "mechanism_L": 56.7689032827934,
+          "mechanism_pct": 4.945794753086419,
+          "vs_deck": 61.61464863717896
+        },
+        "C": {
+          "deck_L": 89.53911631495495,
+          "mechanism_L": 56.71845507658834,
+          "mechanism_pct": 4.945794753086419,
+          "vs_deck": 61.54872749886261
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": 55.24055429031252,
+          "mechanism_pct": 4.899257330246914,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": 88.2117095310884,
+          "mechanism_L": 56.764555822441466,
+          "mechanism_pct": 4.899257330246914,
+          "vs_deck": 61.1895248621824
+        }
+      }
+    },
+    {
+      "moment": "drum",
+      "t": 3.2,
+      "variants": {
+        "A": {
+          "deck_L": 80.36985161533764,
+          "mechanism_L": 58.92553405618082,
+          "mechanism_pct": 6.915702160493827,
+          "vs_deck": 58.325292760081865
+        },
+        "B": {
+          "deck_L": 83.83569164755437,
+          "mechanism_L": 59.001405927166715,
+          "mechanism_pct": 7.166329089506172,
+          "vs_deck": 60.077644239949976
+        },
+        "C": {
+          "deck_L": 83.67664564529821,
+          "mechanism_L": 58.97329316057848,
+          "mechanism_pct": 7.120804398148148,
+          "vs_deck": 59.833500549210264
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": 58.53941292839539,
+          "mechanism_pct": 6.498263888888889,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": 80.21361410014859,
+          "mechanism_L": 59.36447519555098,
+          "mechanism_pct": 6.498263888888889,
+          "vs_deck": 57.29097236437523
+        }
+      }
+    },
+    {
+      "moment": "post_drum",
+      "t": 4.2,
+      "variants": {
+        "A": {
+          "deck_L": 88.56037400147196,
+          "mechanism_L": 58.00522291253239,
+          "mechanism_pct": 5.318190586419753,
+          "vs_deck": 60.61103200330352
+        },
+        "B": {
+          "deck_L": 88.77884731459717,
+          "mechanism_L": 57.808166985507114,
+          "mechanism_pct": 5.617573302469136,
+          "vs_deck": 61.268021150176246
+        },
+        "C": {
+          "deck_L": 88.63259184566843,
+          "mechanism_L": 57.83366450643949,
+          "mechanism_pct": 5.547984182098766,
+          "vs_deck": 60.974283051144056
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": 58.188366818037466,
+          "mechanism_pct": 4.928626543209877,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": 90.06260366765162,
+          "mechanism_L": 58.98141225624555,
+          "mechanism_pct": 4.928626543209877,
+          "vs_deck": 60.55296156165242
+        }
+      }
+    },
+    {
+      "moment": "sweep",
+      "t": 5.2,
+      "variants": {
+        "A": {
+          "deck_L": 93.52024004240972,
+          "mechanism_L": 68.03289822224092,
+          "mechanism_pct": 0.2066454475308642,
+          "vs_deck": 67.21605427696255
+        },
+        "B": {
+          "deck_L": 93.58701232523337,
+          "mechanism_L": 66.8573499549424,
+          "mechanism_pct": 0.24932484567901236,
+          "vs_deck": 68.49165766060545
+        },
+        "C": {
+          "deck_L": 93.57874999871768,
+          "mechanism_L": 67.43279456474706,
+          "mechanism_pct": 0.23823302469135801,
+          "vs_deck": 67.98172372054228
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": 67.82129681449337,
+          "mechanism_pct": 0.1550925925925926,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": 93.31204261450823,
+          "mechanism_L": 69.86638710852299,
+          "mechanism_pct": 0.1550925925925926,
+          "vs_deck": 64.8236985232415
+        }
+      }
+    },
+    {
+      "moment": "chase",
+      "t": 6.8,
+      "variants": {
+        "A": {
+          "deck_L": 93.7518551527593,
+          "mechanism_L": 76.76764959149874,
+          "mechanism_pct": 2.170235339506173,
+          "vs_deck": 59.05895643055528
+        },
+        "B": {
+          "deck_L": 93.77898236364878,
+          "mechanism_L": 76.15568540210774,
+          "mechanism_pct": 2.3548900462962963,
+          "vs_deck": 60.47807509237195
+        },
+        "C": {
+          "deck_L": 94.16364965520681,
+          "mechanism_L": 76.81548374976191,
+          "mechanism_pct": 2.239920910493827,
+          "vs_deck": 59.43870149165675
+        },
+        "CONTROL": {
+          "deck_L": 30.001915953086737,
+          "mechanism_L": 76.96937665392183,
+          "mechanism_pct": 1.8701774691358024,
+          "vs_deck": 95.421578191718
+        },
+        "S": {
+          "deck_L": 93.57271726053402,
+          "mechanism_L": 78.01133282564315,
+          "mechanism_pct": 1.8701774691358024,
+          "vs_deck": 56.76793115539268
+        }
+      }
+    },
+    {
+      "moment": "bend",
+      "t": 7.6,
+      "variants": {
+        "A": {
+          "deck_L": 94.34203504805224,
+          "mechanism_L": 78.45947333851949,
+          "mechanism_pct": 1.2651427469135803,
+          "vs_deck": 60.579014823288745
+        },
+        "B": {
+          "deck_L": 94.11059130645087,
+          "mechanism_L": 78.57066969610271,
+          "mechanism_pct": 1.331886574074074,
+          "vs_deck": 60.73290183534978
+        },
+        "C": {
+          "deck_L": 94.35211885757789,
+          "mechanism_L": 78.58768312669314,
+          "mechanism_pct": 1.3297646604938271,
+          "vs_deck": 60.57450973618543
+        },
+        "CONTROL": {
+          "deck_L": 20.97760393380402,
+          "mechanism_L": 77.69969081523035,
+          "mechanism_pct": 1.1743827160493827,
+          "vs_deck": 87.614675162854
+        },
+        "S": {
+          "deck_L": 94.46681272955661,
+          "mechanism_L": 78.43287098959074,
+          "mechanism_pct": 1.1743827160493827,
+          "vs_deck": 60.45238159544461
+        }
+      }
+    },
+    {
+      "moment": "weak_in",
+      "t": 8.0,
+      "variants": {
+        "A": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "B": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "C": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        }
+      }
+    },
+    {
+      "moment": "switchback",
+      "t": 8.4,
+      "variants": {
+        "A": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "B": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "C": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        }
+      }
+    },
+    {
+      "moment": "weak_out",
+      "t": 8.5,
+      "variants": {
+        "A": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "B": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "C": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        }
+      }
+    },
+    {
+      "moment": "gorge",
+      "t": 9.6,
+      "variants": {
+        "A": {
+          "deck_L": 92.75417974275682,
+          "mechanism_L": 63.6037984922681,
+          "mechanism_pct": 1.101466049382716,
+          "vs_deck": 62.72005856011346
+        },
+        "B": {
+          "deck_L": 92.92675814770278,
+          "mechanism_L": 63.715989698782295,
+          "mechanism_pct": 1.101466049382716,
+          "vs_deck": 62.53429231331968
+        },
+        "C": {
+          "deck_L": 92.98285502513757,
+          "mechanism_L": 63.63097187704261,
+          "mechanism_pct": 1.101466049382716,
+          "vs_deck": 62.55751590880534
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": 61.141534035229824,
+          "mechanism_pct": 1.101466049382716,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": 92.47186986497358,
+          "mechanism_L": 63.54233164190673,
+          "mechanism_pct": 1.101466049382716,
+          "vs_deck": 62.81826302790723
+        }
+      }
+    },
+    {
+      "moment": "sparse",
+      "t": 10.6,
+      "variants": {
+        "A": {
+          "deck_L": 92.02504410245467,
+          "mechanism_L": 62.17988765400062,
+          "mechanism_pct": 2.7894965277777777,
+          "vs_deck": 64.18509719831457
+        },
+        "B": {
+          "deck_L": 92.16088808595646,
+          "mechanism_L": 62.46193932645855,
+          "mechanism_pct": 2.851900077160494,
+          "vs_deck": 64.20707266463988
+        },
+        "C": {
+          "deck_L": 92.1486971084938,
+          "mechanism_L": 62.38736569977554,
+          "mechanism_pct": 2.849199459876543,
+          "vs_deck": 64.23187038648898
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": 61.076324611236146,
+          "mechanism_pct": 2.6860050154320985,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": 92.58660433235235,
+          "mechanism_L": 62.26456283552379,
+          "mechanism_pct": 2.6860050154320985,
+          "vs_deck": 64.02091259690204
+        }
+      }
+    },
+    {
+      "moment": "mid_bend",
+      "t": 11.4,
+      "variants": {
+        "A": {
+          "deck_L": 94.18468370323411,
+          "mechanism_L": 58.708250723727076,
+          "mechanism_pct": 1.2580536265432098,
+          "vs_deck": 59.604570043531
+        },
+        "B": {
+          "deck_L": 94.14116945255711,
+          "mechanism_L": 57.64847940152957,
+          "mechanism_pct": 1.371045524691358,
+          "vs_deck": 59.645388765809614
+        },
+        "C": {
+          "deck_L": 94.32778836900839,
+          "mechanism_L": 57.734319658800786,
+          "mechanism_pct": 1.33984375,
+          "vs_deck": 59.71791382512402
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": 59.79787022989369,
+          "mechanism_pct": 1.1399498456790125,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": 94.17477307412197,
+          "mechanism_L": 60.75133658232876,
+          "mechanism_pct": 1.1399498456790125,
+          "vs_deck": 59.34292951578641
+        }
+      }
+    },
+    {
+      "moment": "late_mech",
+      "t": 12.2,
+      "variants": {
+        "A": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "B": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "C": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        }
+      }
+    },
+    {
+      "moment": "sprint_in",
+      "t": 13.6,
+      "variants": {
+        "A": {
+          "deck_L": 93.73573539783956,
+          "mechanism_L": 74.25723606580583,
+          "mechanism_pct": 2.2974054783950617,
+          "vs_deck": 60.52225030686614
+        },
+        "B": {
+          "deck_L": 93.85187619093998,
+          "mechanism_L": 74.4860358045795,
+          "mechanism_pct": 2.3466435185185186,
+          "vs_deck": 60.51956525324313
+        },
+        "C": {
+          "deck_L": 93.82487076188865,
+          "mechanism_L": 74.49352369874131,
+          "mechanism_pct": 2.335985725308642,
+          "vs_deck": 60.347114360472
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": 72.88843660074308,
+          "mechanism_pct": 2.1494502314814814,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": 93.81665302294228,
+          "mechanism_L": 74.25735465394357,
+          "mechanism_pct": 2.1494502314814814,
+          "vs_deck": 60.32818296022073
+        }
+      }
+    },
+    {
+      "moment": "sprint_mid",
+      "t": 14.6,
+      "variants": {
+        "A": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "B": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "C": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        }
+      }
+    },
+    {
+      "moment": "comeback",
+      "t": 15.4,
+      "variants": {
+        "A": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "B": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "C": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        }
+      }
+    },
+    {
+      "moment": "line",
+      "t": 16.2,
+      "variants": {
+        "A": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "B": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "C": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        }
+      }
+    },
+    {
+      "moment": "after",
+      "t": 17.0,
+      "variants": {
+        "A": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "B": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "C": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        }
+      }
+    },
+    {
+      "moment": "runout",
+      "t": 18.0,
+      "variants": {
+        "A": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "B": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "C": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "CONTROL": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        },
+        "S": {
+          "deck_L": null,
+          "mechanism_L": null,
+          "mechanism_pct": 0.0,
+          "vs_deck": null
+        }
+      }
+    }
+  ],
+  "summary": {
+    "A": {
+      "mechanism_L": 61.22782423048164,
+      "mechanism_pct": 2.9299768518518516,
+      "moments": 12,
+      "vs_deck": 62.95181140797342,
+      "worst_vs_deck": 57.15429110659879
+    },
+    "B": {
+      "mechanism_L": 61.05052921103882,
+      "mechanism_pct": 3.018526556069959,
+      "moments": 12,
+      "vs_deck": 63.49120221416567,
+      "worst_vs_deck": 57.21012756641006
+    },
+    "C": {
+      "mechanism_L": 61.157361480666914,
+      "mechanism_pct": 2.994538483796296,
+      "moments": 12,
+      "vs_deck": 63.277237216115175,
+      "worst_vs_deck": 57.042128066914444
+    },
+    "CONTROL": {
+      "mechanism_L": 60.704799116061395,
+      "mechanism_pct": 2.7918193801440334,
+      "moments": 12,
+      "vs_deck": 62.163491330836976,
+      "worst_vs_deck": 16.89144645441935
+    },
+    "S": {
+      "mechanism_L": 61.773991222168235,
+      "mechanism_pct": 2.790718235596708,
+      "moments": 12,
+      "vs_deck": 62.38814985348594,
+      "worst_vs_deck": 56.76793115539268
+    }
+  }
+}

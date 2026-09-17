@@ -1,0 +1,271 @@
+{
+ "ok": true,
+ "checks": [
+  {
+   "pass": true,
+   "line": "1080x1920 (want 1080x1920)"
+  },
+  {
+   "pass": true,
+   "line": "60/1 fps"
+  },
+  {
+   "pass": true,
+   "line": "1150 frames (want 1150)"
+  },
+  {
+   "pass": true,
+   "line": "runtime 19.1667 s (want 19.1667)"
+  },
+  {
+   "pass": true,
+   "line": "1 audio stream(s)"
+  },
+  {
+   "pass": true,
+   "line": "audio at 48000 Hz"
+  },
+  {
+   "pass": true,
+   "line": "the visual cut carries no audio"
+  },
+  {
+   "pass": true,
+   "line": "the visual cut has the same frame count"
+  },
+  {
+   "pass": true,
+   "line": "the master has the same frame count"
+  },
+  {
+   "pass": true,
+   "line": "phone review 270x480"
+  },
+  {
+   "pass": true,
+   "line": "the master's frames are contiguous"
+  },
+  {
+   "pass": true,
+   "line": "0 temporal omissions"
+  },
+  {
+   "pass": true,
+   "line": "1150 frames decoded (want 1150)"
+  },
+  {
+   "pass": true,
+   "line": "0 duplicate/frozen frame pairs"
+  },
+  {
+   "pass": true,
+   "line": "0 black frames"
+  },
+  {
+   "pass": true,
+   "line": "true peak -1.93 dBTP (ceiling -1.0)"
+  },
+  {
+   "pass": true,
+   "line": "PICK A COLOR is up on frame 0"
+  },
+  {
+   "pass": true,
+   "line": "the mark is gone at 1.30 s, before the first cut at 2.23 s"
+  },
+  {
+   "pass": true,
+   "line": "the mark clears the racers by 200 px"
+  },
+  {
+   "pass": true,
+   "line": "the ring is on m7, the winner"
+  },
+  {
+   "pass": true,
+   "line": "the ring opens on the crossing (15.8167 vs 15.8167)"
+  },
+  {
+   "pass": true,
+   "line": "0 of 42 ring frames blocked"
+  },
+  {
+   "pass": true,
+   "line": "the card comes up 1.00 s after the result"
+  },
+  {
+   "pass": true,
+   "line": "the card's ink is inside its measured band [1588, 1813]"
+  },
+  {
+   "pass": true,
+   "line": "the card says 5TH and the evidence says 5TH"
+  },
+  {
+   "pass": true,
+   "line": "both rank instruments agree on the comeback"
+  },
+  {
+   "pass": true,
+   "line": "frame 0: the hook is up (delta 39.615 in its own box)"
+  },
+  {
+   "pass": true,
+   "line": "0.50 s: the hook is still up (delta 40.849 in its own box)"
+  },
+  {
+   "pass": true,
+   "line": "1.05 s: the hook starts to fade (delta 40.248 in its own box)"
+  },
+  {
+   "pass": true,
+   "line": "1.50 s: the hook is gone (whole-frame delta 0.416)"
+  },
+  {
+   "pass": true,
+   "line": "5.00 s: nothing is drawn (whole-frame delta 0.0)"
+  },
+  {
+   "pass": true,
+   "line": "10.00 s: nothing is drawn (whole-frame delta 0.0)"
+  },
+  {
+   "pass": true,
+   "line": "15.00 s: nothing is drawn (whole-frame delta 0.0)"
+  },
+  {
+   "pass": true,
+   "line": "the crossing: the ring opens (delta 8.797 in its own box)"
+  },
+  {
+   "pass": true,
+   "line": "+0.35 s: the ring is up (delta 11.308 in its own box)"
+  },
+  {
+   "pass": true,
+   "line": "+0.75 s: the ring is gone (whole-frame delta 0.329)"
+  },
+  {
+   "pass": true,
+   "line": "the card is up (delta 57.682 in its own box)"
+  },
+  {
+   "pass": true,
+   "line": "the last frame: the card holds (delta 55.667 in its own box)"
+  }
+ ],
+ "loudness": {
+  "input_i": -14.18,
+  "input_tp": -1.93,
+  "input_lra": 3.3,
+  "input_thresh": -24.18
+ },
+ "frames": 1150,
+ "runtime_seconds": 19.166666666666668,
+ "duplicate_frames": [],
+ "black_frames": [],
+ "mark_presence": [
+  {
+   "label": "frame 0: the hook is up",
+   "frame": 0,
+   "mark": "hook",
+   "expect_mark": true,
+   "whole_frame_delta": 8.934,
+   "in_box_delta": 39.615
+  },
+  {
+   "label": "0.50 s: the hook is still up",
+   "frame": 30,
+   "mark": "hook",
+   "expect_mark": true,
+   "whole_frame_delta": 9.302,
+   "in_box_delta": 40.849
+  },
+  {
+   "label": "1.05 s: the hook starts to fade",
+   "frame": 63,
+   "mark": "hook",
+   "expect_mark": true,
+   "whole_frame_delta": 9.231,
+   "in_box_delta": 40.248
+  },
+  {
+   "label": "1.50 s: the hook is gone",
+   "frame": 90,
+   "mark": null,
+   "expect_mark": false,
+   "whole_frame_delta": 0.416,
+   "in_box_delta": null
+  },
+  {
+   "label": "5.00 s: nothing is drawn",
+   "frame": 300,
+   "mark": null,
+   "expect_mark": false,
+   "whole_frame_delta": 0.0,
+   "in_box_delta": null
+  },
+  {
+   "label": "10.00 s: nothing is drawn",
+   "frame": 600,
+   "mark": null,
+   "expect_mark": false,
+   "whole_frame_delta": 0.0,
+   "in_box_delta": null
+  },
+  {
+   "label": "15.00 s: nothing is drawn",
+   "frame": 900,
+   "mark": null,
+   "expect_mark": false,
+   "whole_frame_delta": 0.0,
+   "in_box_delta": null
+  },
+  {
+   "label": "the crossing: the ring opens",
+   "frame": 949,
+   "mark": "ring",
+   "expect_mark": true,
+   "whole_frame_delta": 0.618,
+   "in_box_delta": 8.797
+  },
+  {
+   "label": "+0.35 s: the ring is up",
+   "frame": 970,
+   "mark": "ring",
+   "expect_mark": true,
+   "whole_frame_delta": 0.935,
+   "in_box_delta": 11.308
+  },
+  {
+   "label": "+0.75 s: the ring is gone",
+   "frame": 993,
+   "mark": null,
+   "expect_mark": false,
+   "whole_frame_delta": 0.329,
+   "in_box_delta": null
+  },
+  {
+   "label": "the card is up",
+   "frame": 1027,
+   "mark": "card",
+   "expect_mark": true,
+   "whole_frame_delta": 7.505,
+   "in_box_delta": 57.682
+  },
+  {
+   "label": "the last frame: the card holds",
+   "frame": 1149,
+   "mark": "card",
+   "expect_mark": true,
+   "whole_frame_delta": 7.292,
+   "in_box_delta": 55.667
+  }
+ ],
+ "files": {
+  "master": "exports/race2_v321_track_geometry\\A\\race2_switchyard_master.mp4",
+  "visual": "exports/race2_v321_track_geometry\\A\\race2_switchyard_final_visual.mp4",
+  "final": "exports/race2_v321_track_geometry\\A\\race2_switchyard_final.mp4",
+  "phone": "exports/race2_v321_track_geometry\\A\\race2_switchyard_final_phone_270x480.mp4"
+ }
+}

@@ -1,0 +1,308 @@
+{
+ "course": "switchyard",
+ "seed": 8,
+ "camera": "RB (V31 readability)",
+ "environment": "contained_bay_v301",
+ "track_variant": "B",
+ "film": {
+  "frames": 1150,
+  "first_frame": 0,
+  "last_frame": 1149,
+  "contiguous": true,
+  "fps": 60,
+  "runtime_seconds": 19.166667,
+  "camera_track_duration": 19.15,
+  "temporal_omissions": 0,
+  "segments": [
+   [
+    0.0,
+    19.15,
+    0.0,
+    19.15
+   ]
+  ]
+ },
+ "winner": {
+  "marble": 7,
+  "crossing": 15.816667,
+  "label": "PINK",
+  "hue": [
+   240,
+   85,
+   155
+  ],
+  "finish_order": [
+   {
+    "marble": 7,
+    "order": 1,
+    "t": 15.816667
+   },
+   {
+    "marble": 2,
+    "order": 2,
+    "t": 15.883333
+   },
+   {
+    "marble": 1,
+    "order": 3,
+    "t": 16.133333
+   },
+   {
+    "marble": 5,
+    "order": 4,
+    "t": 16.583333
+   },
+   {
+    "marble": 3,
+    "order": 5,
+    "t": 17.2
+   },
+   {
+    "marble": 0,
+    "order": 6,
+    "t": 17.716667
+   },
+   {
+    "marble": 6,
+    "order": 7,
+    "t": 17.816667
+   },
+   {
+    "marble": 4,
+    "order": 8,
+    "t": 18.75
+   }
+  ],
+  "margin_to_second": 0.066666
+ },
+ "comeback": {
+  "rank": 5,
+  "floor_seconds": 0.5,
+  "seconds_at_rank": 1.6167,
+  "longest_run_at_rank": 0.9333,
+  "deepest_instant_rank": 6,
+  "rejected": [
+   {
+    "rank": 6,
+    "seconds_total": 0.2167,
+    "longest_run": 0.2167,
+    "frames_longest": 13
+   }
+  ],
+  "checkpoints": {
+   "release": 4,
+   "first_event": 5,
+   "quarter": 4,
+   "half": 3,
+   "three_quarter": 2
+  },
+  "checkpoint_worst": 5,
+  "instruments_agree": true,
+  "held_seconds": {
+   "1": 5.3667,
+   "2": 3.45,
+   "3": 6.3167,
+   "4": 2.1833,
+   "5": 1.6167,
+   "6": 0.2167
+  }
+ },
+ "rank_runs": [
+  {
+   "from": 0.0167,
+   "to": 0.5,
+   "seconds": 0.5,
+   "rank": 1
+  },
+  {
+   "from": 0.5167,
+   "to": 1.2,
+   "seconds": 0.7,
+   "rank": 4
+  },
+  {
+   "from": 1.2167,
+   "to": 1.3667,
+   "seconds": 0.1667,
+   "rank": 5
+  },
+  {
+   "from": 1.3833,
+   "to": 1.4167,
+   "seconds": 0.05,
+   "rank": 3
+  },
+  {
+   "from": 1.4333,
+   "to": 2.35,
+   "seconds": 0.9333,
+   "rank": 5
+  },
+  {
+   "from": 2.3667,
+   "to": 2.6667,
+   "seconds": 0.3167,
+   "rank": 4
+  },
+  {
+   "from": 2.6833,
+   "to": 2.7667,
+   "seconds": 0.1,
+   "rank": 3
+  },
+  {
+   "from": 2.7833,
+   "to": 2.8333,
+   "seconds": 0.0667,
+   "rank": 4
+  },
+  {
+   "from": 2.85,
+   "to": 3.1167,
+   "seconds": 0.2833,
+   "rank": 5
+  },
+  {
+   "from": 3.1333,
+   "to": 3.3333,
+   "seconds": 0.2167,
+   "rank": 6
+  },
+  {
+   "from": 3.35,
+   "to": 3.5667,
+   "seconds": 0.2333,
+   "rank": 5
+  },
+  {
+   "from": 3.5833,
+   "to": 4.6667,
+   "seconds": 1.1,
+   "rank": 4
+  },
+  {
+   "from": 4.6833,
+   "to": 10.8333,
+   "seconds": 6.1667,
+   "rank": 3
+  },
+  {
+   "from": 10.85,
+   "to": 13.1,
+   "seconds": 2.2667,
+   "rank": 2
+  },
+  {
+   "from": 13.1167,
+   "to": 14.3667,
+   "seconds": 1.2667,
+   "rank": 1
+  },
+  {
+   "from": 14.3833,
+   "to": 15.55,
+   "seconds": 1.1833,
+   "rank": 2
+  },
+  {
+   "from": 15.5667,
+   "to": 19.15,
+   "seconds": 3.6,
+   "rank": 1
+  }
+ ],
+ "hook": {
+  "text": "PICK A COLOR",
+  "lines": [
+   "PICK A",
+   "COLOR"
+  ],
+  "size": 201,
+  "lead": 1.15,
+  "top_baseline": 375,
+  "cap_px": 148,
+  "cap_px_at_270": 37.0,
+  "line_ink_px": [
+   758,
+   786
+  ],
+  "gutter_px": 146,
+  "block_px": 379,
+  "racers_top": 806.5,
+  "racers_bottom": 1079.3,
+  "clearance": 200.3,
+  "band": [
+   96,
+   736
+  ],
+  "in": 0.0,
+  "out_from": 1.05,
+  "out_to": 1.3
+ },
+ "ring": {
+  "marble": 7,
+  "crossing": 15.8167,
+  "from": 15.8167,
+  "to": 16.5,
+  "from_frame": 949,
+  "to_frame": 990,
+  "seconds": 0.7,
+  "frames": 42,
+  "frames_blocked": 0,
+  "radius_px": [
+   29.5,
+   30.7
+  ]
+ },
+ "card": {
+  "style": "plate",
+  "label": "PINK",
+  "winner": 7,
+  "from_place": 5,
+  "hue": [
+   240,
+   85,
+   155
+  ],
+  "shift": 1290.0,
+  "band": [
+   1588,
+   1813
+  ],
+  "ink_box": [
+   112,
+   1588,
+   966,
+   1813
+  ],
+  "inside_band": true,
+  "text_contrast": 3.09,
+  "colour_pixels": 54268,
+  "from": 16.816666666666666,
+  "from_frame": 1009,
+  "to": 19.166667,
+  "beat": 1.0,
+  "band_measure": {
+   "band": [
+    1588,
+    1813
+   ],
+   "height": 225,
+   "max_luma": 184.0,
+   "max_luma_under_ink": 67.6,
+   "frames_measured": 71,
+   "from": 16.8167,
+   "fallback": true,
+   "tallest_band": [
+    97,
+    201
+   ],
+   "racing_rows": [
+    [
+     372,
+     763
+    ]
+   ]
+  }
+ }
+}

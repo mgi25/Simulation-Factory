@@ -1,0 +1,2181 @@
+{
+  "moments": [
+    {
+      "cut": "release",
+      "fov": 31.99700002,
+      "moment": "grid",
+      "racer_row": 472.6850147957778,
+      "run": "head",
+      "sample": 3,
+      "t": 0.35,
+      "variants": {
+        "A": {
+          "channel_pct": 20.551118827160494,
+          "deck_pct": 17.45871913580247,
+          "deck_share": 0.8495264555975858,
+          "hidden_pct": 1.1633873456790125,
+          "lane_px": 382.0,
+          "lane_ratio": 0.9646464646464646,
+          "over": {
+            "crown": 100,
+            "lip": 121,
+            "none": 0,
+            "racer": 4942,
+            "wall": 868
+          },
+          "over_top": "racer 82%",
+          "row": 473.0,
+          "track_px": 396.0
+        },
+        "B": {
+          "channel_pct": 24.12692901234568,
+          "deck_pct": 17.37133487654321,
+          "deck_share": 0.7199977613252955,
+          "hidden_pct": 1.2507716049382716,
+          "lane_px": 382.0,
+          "lane_ratio": 0.7670682730923695,
+          "over": {
+            "crown": 54,
+            "lip": 157,
+            "none": 0,
+            "racer": 4942,
+            "wall": 1331
+          },
+          "over_top": "racer 76%",
+          "row": 473.0,
+          "track_px": 498.0
+        },
+        "C": {
+          "channel_pct": 25.711226851851855,
+          "deck_pct": 17.37615740740741,
+          "deck_share": 0.6758198473969704,
+          "hidden_pct": 1.2459490740740742,
+          "lane_px": 382.0,
+          "lane_ratio": 0.7180451127819549,
+          "over": {
+            "crown": 14,
+            "lip": 1441,
+            "none": 0,
+            "racer": 4942,
+            "wall": 62
+          },
+          "over_top": "racer 77%",
+          "row": 473.0,
+          "track_px": 532.0
+        },
+        "CONTROL": {
+          "channel_pct": 0.7762345679012346,
+          "deck_pct": 0.4118441358024691,
+          "deck_share": 0.5305666003976143,
+          "hidden_pct": 18.14158950617284,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 174,
+            "lip": 173,
+            "none": 87295,
+            "racer": 4942,
+            "wall": 1462
+          },
+          "over_top": "none 93%",
+          "row": 473.0,
+          "track_px": 2.0
+        },
+        "S": {
+          "channel_pct": 21.392746913580247,
+          "deck_pct": 17.30941358024691,
+          "deck_share": 0.8091253381424707,
+          "hidden_pct": 1.3126929012345678,
+          "lane_px": 382.0,
+          "lane_ratio": 0.9052132701421801,
+          "over": {
+            "crown": 173,
+            "lip": 200,
+            "none": 0,
+            "racer": 4942,
+            "wall": 1490
+          },
+          "over_top": "racer 73%",
+          "row": 473.0,
+          "track_px": 422.0
+        }
+      }
+    },
+    {
+      "cut": "release",
+      "fov": 31.693000020000003,
+      "moment": "hook",
+      "racer_row": 474.98435975879846,
+      "run": "head",
+      "sample": 39,
+      "t": 1.2,
+      "variants": {
+        "A": {
+          "channel_pct": 36.17476851851852,
+          "deck_pct": 28.628279320987655,
+          "deck_share": 0.7913880445795339,
+          "hidden_pct": 4.888310185185185,
+          "lane_px": 284.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 1544,
+            "lip": 1690,
+            "none": 0,
+            "racer": 7618,
+            "wall": 14489
+          },
+          "over_top": "wall 57%",
+          "row": 475.0,
+          "track_px": 284.0
+        },
+        "B": {
+          "channel_pct": 41.32465277777778,
+          "deck_pct": 31.6977237654321,
+          "deck_share": 0.7670415027050745,
+          "hidden_pct": 1.8188657407407407,
+          "lane_px": 284.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 17,
+            "lip": 330,
+            "none": 0,
+            "racer": 7618,
+            "wall": 1464
+          },
+          "over_top": "racer 81%",
+          "row": 475.0,
+          "track_px": 284.0
+        },
+        "C": {
+          "channel_pct": 46.76543209876543,
+          "deck_pct": 31.604938271604937,
+          "deck_share": 0.675818373812038,
+          "hidden_pct": 1.911651234567901,
+          "lane_px": 284.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 179,
+            "lip": 646,
+            "none": 0,
+            "racer": 7618,
+            "wall": 1467
+          },
+          "over_top": "racer 77%",
+          "row": 475.0,
+          "track_px": 284.0
+        },
+        "CONTROL": {
+          "channel_pct": 5.68287037037037,
+          "deck_pct": 0.21354166666666666,
+          "deck_share": 0.037576374745417515,
+          "hidden_pct": 32.870756172839506,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 2415,
+            "lip": 2811,
+            "none": 134669,
+            "racer": 7389,
+            "wall": 23118
+          },
+          "over_top": "none 79%",
+          "row": 475.0,
+          "track_px": 0.0
+        },
+        "S": {
+          "channel_pct": 37.53510802469136,
+          "deck_pct": 26.592206790123456,
+          "deck_share": 0.7084622421395607,
+          "hidden_pct": 6.924382716049382,
+          "lane_px": 284.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 2397,
+            "lip": 2817,
+            "none": 0,
+            "racer": 7618,
+            "wall": 23064
+          },
+          "over_top": "wall 64%",
+          "row": 475.0,
+          "track_px": 284.0
+        }
+      }
+    },
+    {
+      "cut": "upper",
+      "fov": 41.9749999,
+      "moment": "drop",
+      "racer_row": 508.28132286691573,
+      "run": "corr1",
+      "sample": 9,
+      "t": 2.4,
+      "variants": {
+        "A": {
+          "channel_pct": 22.245949074074073,
+          "deck_pct": 16.729166666666668,
+          "deck_share": 0.7520095731120419,
+          "hidden_pct": 3.379243827160494,
+          "lane_px": 648.0,
+          "lane_ratio": 0.8780487804878049,
+          "over": {
+            "crown": 1158,
+            "lip": 1253,
+            "none": 0,
+            "racer": 4636,
+            "wall": 10471
+          },
+          "over_top": "wall 60%",
+          "row": 508.0,
+          "track_px": 738.0
+        },
+        "B": {
+          "channel_pct": 25.272569444444443,
+          "deck_pct": 19.172260802469136,
+          "deck_share": 0.7586193736499431,
+          "hidden_pct": 0.9361496913580246,
+          "lane_px": 738.0,
+          "lane_ratio": 0.9761904761904762,
+          "over": {
+            "crown": 66,
+            "lip": 0,
+            "none": 0,
+            "racer": 4636,
+            "wall": 151
+          },
+          "over_top": "racer 96%",
+          "row": 508.0,
+          "track_px": 756.0
+        },
+        "C": {
+          "channel_pct": 29.591435185185183,
+          "deck_pct": 19.041087962962962,
+          "deck_share": 0.643466186881527,
+          "hidden_pct": 1.0673225308641974,
+          "lane_px": 738.0,
+          "lane_ratio": 0.8891566265060241,
+          "over": {
+            "crown": 523,
+            "lip": 0,
+            "none": 0,
+            "racer": 4636,
+            "wall": 374
+          },
+          "over_top": "racer 84%",
+          "row": 508.0,
+          "track_px": 830.0
+        },
+        "CONTROL": {
+          "channel_pct": 3.7986111111111107,
+          "deck_pct": 0.0,
+          "deck_share": 0.0,
+          "hidden_pct": 19.99363425925926,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 1564,
+            "lip": 2104,
+            "none": 79644,
+            "racer": 4636,
+            "wall": 15699
+          },
+          "over_top": "none 77%",
+          "row": 508.0,
+          "track_px": 150.0
+        },
+        "S": {
+          "channel_pct": 23.388503086419753,
+          "deck_pct": 15.26176697530864,
+          "deck_share": 0.6525328670636557,
+          "hidden_pct": 4.846643518518518,
+          "lane_px": 598.0,
+          "lane_ratio": 0.8102981029810298,
+          "over": {
+            "crown": 1683,
+            "lip": 2195,
+            "none": 0,
+            "racer": 4636,
+            "wall": 16611
+          },
+          "over_top": "wall 66%",
+          "row": 508.0,
+          "track_px": 738.0
+        }
+      }
+    },
+    {
+      "cut": "upper",
+      "fov": 41.59399994,
+      "moment": "drum",
+      "racer_row": 501.559080669355,
+      "run": "corr1",
+      "sample": 20,
+      "t": 3.2,
+      "variants": {
+        "A": {
+          "channel_pct": 15.223958333333334,
+          "deck_pct": 9.322530864197532,
+          "deck_share": 0.6123591946376756,
+          "hidden_pct": 3.8551311728395063,
+          "lane_px": 402.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 1207,
+            "lip": 1449,
+            "none": 0,
+            "racer": 5783,
+            "wall": 11546
+          },
+          "over_top": "wall 58%",
+          "row": 502.0,
+          "track_px": 402.0
+        },
+        "B": {
+          "channel_pct": 16.483603395061728,
+          "deck_pct": 11.48070987654321,
+          "deck_share": 0.6964927268259002,
+          "hidden_pct": 1.6969521604938271,
+          "lane_px": 402.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 256,
+            "lip": 254,
+            "none": 0,
+            "racer": 6074,
+            "wall": 2213
+          },
+          "over_top": "racer 69%",
+          "row": 502.0,
+          "track_px": 402.0
+        },
+        "C": {
+          "channel_pct": 19.949074074074076,
+          "deck_pct": 11.164737654320987,
+          "deck_share": 0.5596619478610659,
+          "hidden_pct": 2.0129243827160495,
+          "lane_px": 402.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 1005,
+            "lip": 0,
+            "none": 0,
+            "racer": 6074,
+            "wall": 3356
+          },
+          "over_top": "racer 58%",
+          "row": 502.0,
+          "track_px": 402.0
+        },
+        "CONTROL": {
+          "channel_pct": 4.228395061728396,
+          "deck_pct": 0.0,
+          "deck_share": 0.0,
+          "hidden_pct": 13.17746913580247,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 1803,
+            "lip": 2298,
+            "none": 41573,
+            "racer": 4819,
+            "wall": 17819
+          },
+          "over_top": "none 61%",
+          "row": 502.0,
+          "track_px": 294.0
+        },
+        "S": {
+          "channel_pct": 16.67168209876543,
+          "deck_pct": 8.019675925925926,
+          "deck_share": 0.4810357994122139,
+          "hidden_pct": 5.157986111111111,
+          "lane_px": 402.0,
+          "lane_ratio": 0.5726495726495726,
+          "over": {
+            "crown": 1803,
+            "lip": 2298,
+            "none": 0,
+            "racer": 4819,
+            "wall": 17819
+          },
+          "over_top": "wall 67%",
+          "row": 502.0,
+          "track_px": 702.0
+        }
+      }
+    },
+    {
+      "cut": "upper",
+      "fov": 41.38,
+      "moment": "post_drum",
+      "racer_row": 483.13698644841185,
+      "run": "corr1",
+      "sample": 31,
+      "t": 4.2,
+      "variants": {
+        "A": {
+          "channel_pct": 15.085841049382717,
+          "deck_pct": 8.704668209876543,
+          "deck_share": 0.5770091426379388,
+          "hidden_pct": 4.145833333333333,
+          "lane_px": 184.0,
+          "lane_ratio": 0.5443786982248521,
+          "over": {
+            "crown": 1327,
+            "lip": 1678,
+            "none": 0,
+            "racer": 5501,
+            "wall": 12986
+          },
+          "over_top": "wall 60%",
+          "row": 483.0,
+          "track_px": 338.0
+        },
+        "B": {
+          "channel_pct": 16.285300925925924,
+          "deck_pct": 10.595679012345679,
+          "deck_share": 0.6506283832604859,
+          "hidden_pct": 2.2548225308641974,
+          "lane_px": 222.0,
+          "lane_ratio": 0.6894409937888198,
+          "over": {
+            "crown": 562,
+            "lip": 535,
+            "none": 0,
+            "racer": 5848,
+            "wall": 4744
+          },
+          "over_top": "racer 50%",
+          "row": 483.0,
+          "track_px": 322.0
+        },
+        "C": {
+          "channel_pct": 19.42978395061728,
+          "deck_pct": 9.988425925925926,
+          "deck_share": 0.5140780747388904,
+          "hidden_pct": 2.8620756172839505,
+          "lane_px": 184.0,
+          "lane_ratio": 0.416289592760181,
+          "over": {
+            "crown": 1766,
+            "lip": 0,
+            "none": 0,
+            "racer": 5834,
+            "wall": 7237
+          },
+          "over_top": "wall 49%",
+          "row": 483.0,
+          "track_px": 442.0
+        },
+        "CONTROL": {
+          "channel_pct": 4.676118827160494,
+          "deck_pct": 0.0,
+          "deck_share": 0.0,
+          "hidden_pct": 12.794945987654321,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 1949,
+            "lip": 2586,
+            "none": 37563,
+            "racer": 4550,
+            "wall": 19681
+          },
+          "over_top": "none 57%",
+          "row": 483.0,
+          "track_px": 416.0
+        },
+        "S": {
+          "channel_pct": 16.574074074074076,
+          "deck_pct": 7.296682098765432,
+          "deck_share": 0.44024674115456236,
+          "hidden_pct": 5.553819444444445,
+          "lane_px": 178.0,
+          "lane_ratio": 0.30067567567567566,
+          "over": {
+            "crown": 1957,
+            "lip": 2586,
+            "none": 0,
+            "racer": 4550,
+            "wall": 19698
+          },
+          "over_top": "wall 68%",
+          "row": 483.0,
+          "track_px": 592.0
+        }
+      }
+    },
+    {
+      "cut": "upper",
+      "fov": 41.67100036,
+      "moment": "sweep",
+      "racer_row": 489.08497869052616,
+      "run": "corr1",
+      "sample": 41,
+      "t": 5.2,
+      "variants": {
+        "A": {
+          "channel_pct": 17.766396604938272,
+          "deck_pct": 12.054591049382717,
+          "deck_share": 0.6785051193798113,
+          "hidden_pct": 2.648533950617284,
+          "lane_px": 1002.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 956,
+            "lip": 1124,
+            "none": 0,
+            "racer": 2557,
+            "wall": 9093
+          },
+          "over_top": "wall 66%",
+          "row": 489.0,
+          "track_px": 1002.0
+        },
+        "B": {
+          "channel_pct": 21.721257716049383,
+          "deck_pct": 13.298032407407407,
+          "deck_share": 0.612212818486186,
+          "hidden_pct": 1.4050925925925928,
+          "lane_px": 1002.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 438,
+            "lip": 407,
+            "none": 0,
+            "racer": 2671,
+            "wall": 3768
+          },
+          "over_top": "wall 52%",
+          "row": 489.0,
+          "track_px": 1002.0
+        },
+        "C": {
+          "channel_pct": 24.90354938271605,
+          "deck_pct": 12.85841049382716,
+          "deck_share": 0.5163284275755229,
+          "hidden_pct": 1.8447145061728394,
+          "lane_px": 1002.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 1132,
+            "lip": 0,
+            "none": 0,
+            "racer": 2671,
+            "wall": 5760
+          },
+          "over_top": "wall 60%",
+          "row": 489.0,
+          "track_px": 1002.0
+        },
+        "CONTROL": {
+          "channel_pct": 3.340277777777778,
+          "deck_pct": 0.0013503086419753088,
+          "deck_share": 0.00040425040425040424,
+          "hidden_pct": 14.625,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 1440,
+            "lip": 1787,
+            "none": 56449,
+            "racer": 2091,
+            "wall": 14049
+          },
+          "over_top": "none 74%",
+          "row": 489.0,
+          "track_px": 798.0
+        },
+        "S": {
+          "channel_pct": 19.122878086419753,
+          "deck_pct": 10.96508487654321,
+          "deck_share": 0.5734013900517486,
+          "hidden_pct": 3.73804012345679,
+          "lane_px": 308.0,
+          "lane_ratio": 0.2851851851851852,
+          "over": {
+            "crown": 1434,
+            "lip": 1785,
+            "none": 0,
+            "racer": 2091,
+            "wall": 14068
+          },
+          "over_top": "wall 73%",
+          "row": 489.0,
+          "track_px": 1080.0
+        }
+      }
+    },
+    {
+      "cut": "upper",
+      "fov": 43.34400014,
+      "moment": "chase",
+      "racer_row": 467.77620559019397,
+      "run": "corr2",
+      "sample": 20,
+      "t": 6.8,
+      "variants": {
+        "A": {
+          "channel_pct": 15.61033950617284,
+          "deck_pct": 10.206018518518519,
+          "deck_share": 0.6537986258711878,
+          "hidden_pct": 2.9309413580246915,
+          "lane_px": 642.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 1087,
+            "lip": 1426,
+            "none": 0,
+            "racer": 1818,
+            "wall": 10863
+          },
+          "over_top": "wall 71%",
+          "row": 468.0,
+          "track_px": 642.0
+        },
+        "B": {
+          "channel_pct": 17.19945987654321,
+          "deck_pct": 11.898341049382715,
+          "deck_share": 0.6917857383190148,
+          "hidden_pct": 1.2386188271604937,
+          "lane_px": 642.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 347,
+            "lip": 450,
+            "none": 0,
+            "racer": 2186,
+            "wall": 3438
+          },
+          "over_top": "wall 54%",
+          "row": 468.0,
+          "track_px": 642.0
+        },
+        "C": {
+          "channel_pct": 20.087962962962962,
+          "deck_pct": 11.510223765432098,
+          "deck_share": 0.572991088576477,
+          "hidden_pct": 1.6267361111111112,
+          "lane_px": 642.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 894,
+            "lip": 0,
+            "none": 0,
+            "racer": 2093,
+            "wall": 5446
+          },
+          "over_top": "wall 65%",
+          "row": 468.0,
+          "track_px": 642.0
+        },
+        "CONTROL": {
+          "channel_pct": 3.8670910493827164,
+          "deck_pct": 0.06635802469135803,
+          "deck_share": 0.017159674764303887,
+          "hidden_pct": 13.02681327160494,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 1502,
+            "lip": 2199,
+            "none": 47020,
+            "racer": 980,
+            "wall": 15830
+          },
+          "over_top": "none 70%",
+          "row": 468.0,
+          "track_px": 276.0
+        },
+        "S": {
+          "channel_pct": 16.79050925925926,
+          "deck_pct": 9.056520061728394,
+          "deck_share": 0.5393832862296363,
+          "hidden_pct": 4.080439814814815,
+          "lane_px": 642.0,
+          "lane_ratio": 0.823076923076923,
+          "over": {
+            "crown": 1557,
+            "lip": 2242,
+            "none": 0,
+            "racer": 980,
+            "wall": 16374
+          },
+          "over_top": "wall 77%",
+          "row": 468.0,
+          "track_px": 780.0
+        }
+      }
+    },
+    {
+      "cut": "upper",
+      "fov": 42.849999700000005,
+      "moment": "bend",
+      "racer_row": 510.85261983826433,
+      "run": "corr2",
+      "sample": 25,
+      "t": 7.6,
+      "variants": {
+        "A": {
+          "channel_pct": 13.186535493827162,
+          "deck_pct": 8.02932098765432,
+          "deck_share": 0.6089029974107286,
+          "hidden_pct": 2.9675925925925926,
+          "lane_px": 34.0,
+          "lane_ratio": 0.14912280701754385,
+          "over": {
+            "crown": 1075,
+            "lip": 1376,
+            "none": 0,
+            "racer": 2309,
+            "wall": 10624
+          },
+          "over_top": "wall 69%",
+          "row": 511.0,
+          "track_px": 228.0
+        },
+        "B": {
+          "channel_pct": 14.273726851851851,
+          "deck_pct": 9.22337962962963,
+          "deck_share": 0.6461787958645855,
+          "hidden_pct": 1.7735339506172838,
+          "lane_px": 130.0,
+          "lane_ratio": 0.5701754385964912,
+          "over": {
+            "crown": 554,
+            "lip": 555,
+            "none": 0,
+            "racer": 3203,
+            "wall": 4882
+          },
+          "over_top": "wall 53%",
+          "row": 511.0,
+          "track_px": 228.0
+        },
+        "C": {
+          "channel_pct": 16.706983024691358,
+          "deck_pct": 8.662808641975309,
+          "deck_share": 0.5185142421688277,
+          "hidden_pct": 2.334104938271605,
+          "lane_px": 92.0,
+          "lane_ratio": 0.27218934911242604,
+          "over": {
+            "crown": 1453,
+            "lip": 138,
+            "none": 0,
+            "racer": 3116,
+            "wall": 7393
+          },
+          "over_top": "wall 61%",
+          "row": 511.0,
+          "track_px": 338.0
+        },
+        "CONTROL": {
+          "channel_pct": 3.8348765432098766,
+          "deck_pct": 0.027584876543209874,
+          "deck_share": 0.007193158953722334,
+          "hidden_pct": 10.92650462962963,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 1579,
+            "lip": 2096,
+            "none": 35552,
+            "racer": 1378,
+            "wall": 16038
+          },
+          "over_top": "none 63%",
+          "row": 511.0,
+          "track_px": 298.0
+        },
+        "S": {
+          "channel_pct": 14.372106481481481,
+          "deck_pct": 6.921296296296296,
+          "deck_share": 0.4815784175558687,
+          "hidden_pct": 4.075617283950617,
+          "lane_px": 34.0,
+          "lane_ratio": 0.1069182389937107,
+          "over": {
+            "crown": 1581,
+            "lip": 2101,
+            "none": 0,
+            "racer": 1378,
+            "wall": 16068
+          },
+          "over_top": "wall 76%",
+          "row": 511.0,
+          "track_px": 318.0
+        }
+      }
+    },
+    {
+      "cut": "upper",
+      "fov": 42.68400004,
+      "moment": "weak_in",
+      "racer_row": 504.8590926907689,
+      "run": "corr2",
+      "sample": 28,
+      "t": 8.0,
+      "variants": {
+        "A": {
+          "channel_pct": 16.324845679012345,
+          "deck_pct": 10.822916666666666,
+          "deck_share": 0.6629720659828898,
+          "hidden_pct": 2.346064814814815,
+          "lane_px": 224.0,
+          "lane_ratio": 0.3835616438356164,
+          "over": {
+            "crown": 947,
+            "lip": 1160,
+            "none": 0,
+            "racer": 863,
+            "wall": 9192
+          },
+          "over_top": "wall 76%",
+          "row": 505.0,
+          "track_px": 584.0
+        },
+        "B": {
+          "channel_pct": 19.669753086419753,
+          "deck_pct": 11.998842592592593,
+          "deck_share": 0.6100149066373765,
+          "hidden_pct": 1.170138888888889,
+          "lane_px": 422.0,
+          "lane_ratio": 0.7226027397260274,
+          "over": {
+            "crown": 476,
+            "lip": 478,
+            "none": 0,
+            "racer": 863,
+            "wall": 4249
+          },
+          "over_top": "wall 70%",
+          "row": 505.0,
+          "track_px": 584.0
+        },
+        "C": {
+          "channel_pct": 22.551118827160494,
+          "deck_pct": 11.523341049382715,
+          "deck_share": 0.510987553996835,
+          "hidden_pct": 1.6456404320987654,
+          "lane_px": 330.0,
+          "lane_ratio": 0.3055555555555556,
+          "over": {
+            "crown": 1155,
+            "lip": 30,
+            "none": 0,
+            "racer": 863,
+            "wall": 6483
+          },
+          "over_top": "wall 76%",
+          "row": 505.0,
+          "track_px": 1080.0
+        },
+        "CONTROL": {
+          "channel_pct": 3.343942901234568,
+          "deck_pct": 0.010609567901234568,
+          "deck_share": 0.0031727718488606866,
+          "hidden_pct": 13.098572530864198,
+          "lane_px": 6.0,
+          "lane_ratio": 0.010273972602739725,
+          "over": {
+            "crown": 1414,
+            "lip": 1808,
+            "none": 49796,
+            "racer": 863,
+            "wall": 14022
+          },
+          "over_top": "none 73%",
+          "row": 505.0,
+          "track_px": 584.0
+        },
+        "S": {
+          "channel_pct": 17.50366512345679,
+          "deck_pct": 9.671875,
+          "deck_share": 0.5525628450831506,
+          "hidden_pct": 3.4971064814814814,
+          "lane_px": 194.0,
+          "lane_ratio": 0.3321917808219178,
+          "over": {
+            "crown": 1410,
+            "lip": 1808,
+            "none": 0,
+            "racer": 863,
+            "wall": 14048
+          },
+          "over_top": "wall 77%",
+          "row": 505.0,
+          "track_px": 584.0
+        }
+      }
+    },
+    {
+      "cut": "upper",
+      "fov": 42.867000219999994,
+      "moment": "switchback",
+      "racer_row": 493.1613017070466,
+      "run": "corr2",
+      "sample": 39,
+      "t": 8.4,
+      "variants": {
+        "A": {
+          "channel_pct": 50.210455246913575,
+          "deck_pct": 45.30092592592593,
+          "deck_share": 0.9022209757540599,
+          "hidden_pct": 0.6257716049382716,
+          "lane_px": 924.0,
+          "lane_ratio": 0.9314516129032258,
+          "over": {
+            "crown": 308,
+            "lip": 115,
+            "none": 0,
+            "racer": 1060,
+            "wall": 1761
+          },
+          "over_top": "wall 54%",
+          "row": 493.0,
+          "track_px": 992.0
+        },
+        "B": {
+          "channel_pct": 58.30902777777778,
+          "deck_pct": 45.72222222222222,
+          "deck_share": 0.7841362472458763,
+          "hidden_pct": 0.20447530864197533,
+          "lane_px": 964.0,
+          "lane_ratio": 0.8925925925925926,
+          "over": {
+            "crown": 0,
+            "lip": 0,
+            "none": 0,
+            "racer": 1060,
+            "wall": 0
+          },
+          "over_top": "racer 100%",
+          "row": 493.0,
+          "track_px": 1080.0
+        },
+        "C": {
+          "channel_pct": 60.55632716049383,
+          "deck_pct": 45.72222222222222,
+          "deck_share": 0.7550362508122985,
+          "hidden_pct": 0.20447530864197533,
+          "lane_px": 964.0,
+          "lane_ratio": 0.8925925925925926,
+          "over": {
+            "crown": 0,
+            "lip": 0,
+            "none": 0,
+            "racer": 1060,
+            "wall": 0
+          },
+          "over_top": "racer 100%",
+          "row": 493.0,
+          "track_px": 1080.0
+        },
+        "CONTROL": {
+          "channel_pct": 1.0117669753086418,
+          "deck_pct": 0.0005787037037037037,
+          "deck_share": 0.0005719733079122975,
+          "hidden_pct": 45.917824074074076,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 608,
+            "lip": 378,
+            "none": 231815,
+            "racer": 1060,
+            "wall": 4177
+          },
+          "over_top": "none 97%",
+          "row": 493.0,
+          "track_px": 120.0
+        },
+        "S": {
+          "channel_pct": 51.2590663580247,
+          "deck_pct": 44.72627314814815,
+          "deck_share": 0.8725534100787651,
+          "hidden_pct": 1.2004243827160495,
+          "lane_px": 872.0,
+          "lane_ratio": 0.8772635814889336,
+          "over": {
+            "crown": 608,
+            "lip": 378,
+            "none": 0,
+            "racer": 1060,
+            "wall": 4177
+          },
+          "over_top": "wall 67%",
+          "row": 493.0,
+          "track_px": 994.0
+        }
+      }
+    },
+    {
+      "cut": "upper",
+      "fov": 42.93800024,
+      "moment": "weak_out",
+      "racer_row": 468.30753143343986,
+      "run": "corr2",
+      "sample": 43,
+      "t": 8.5,
+      "variants": {
+        "A": {
+          "channel_pct": 51.05516975308642,
+          "deck_pct": 46.65952932098765,
+          "deck_share": 0.9139041070011713,
+          "hidden_pct": 0.706983024691358,
+          "lane_px": 790.0,
+          "lane_ratio": 0.9681372549019608,
+          "over": {
+            "crown": 360,
+            "lip": 135,
+            "none": 0,
+            "racer": 1184,
+            "wall": 1986
+          },
+          "over_top": "wall 54%",
+          "row": 468.0,
+          "track_px": 816.0
+        },
+        "B": {
+          "channel_pct": 60.48456790123456,
+          "deck_pct": 47.13811728395061,
+          "deck_share": 0.7793412256978108,
+          "hidden_pct": 0.22839506172839508,
+          "lane_px": 794.0,
+          "lane_ratio": 0.7892644135188867,
+          "over": {
+            "crown": 0,
+            "lip": 0,
+            "none": 0,
+            "racer": 1184,
+            "wall": 0
+          },
+          "over_top": "racer 100%",
+          "row": 468.0,
+          "track_px": 1006.0
+        },
+        "C": {
+          "channel_pct": 63.59741512345679,
+          "deck_pct": 47.13811728395061,
+          "deck_share": 0.7411954902953996,
+          "hidden_pct": 0.22839506172839508,
+          "lane_px": 794.0,
+          "lane_ratio": 0.7693798449612403,
+          "over": {
+            "crown": 0,
+            "lip": 0,
+            "none": 0,
+            "racer": 1184,
+            "wall": 0
+          },
+          "over_top": "racer 100%",
+          "row": 468.0,
+          "track_px": 1032.0
+        },
+        "CONTROL": {
+          "channel_pct": 1.1134259259259258,
+          "deck_pct": 0.0,
+          "deck_share": 0.0,
+          "hidden_pct": 47.28433641975309,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 653,
+            "lip": 427,
+            "none": 238270,
+            "racer": 1184,
+            "wall": 4588
+          },
+          "over_top": "none 97%",
+          "row": 468.0,
+          "track_px": 16.0
+        },
+        "S": {
+          "channel_pct": 51.90027006172839,
+          "deck_pct": 46.0462962962963,
+          "deck_share": 0.8872072581034822,
+          "hidden_pct": 1.320216049382716,
+          "lane_px": 778.0,
+          "lane_ratio": 0.958128078817734,
+          "over": {
+            "crown": 645,
+            "lip": 427,
+            "none": 0,
+            "racer": 1184,
+            "wall": 4588
+          },
+          "over_top": "wall 67%",
+          "row": 468.0,
+          "track_px": 812.0
+        }
+      }
+    },
+    {
+      "cut": "middle",
+      "fov": 42.40699968,
+      "moment": "gorge",
+      "racer_row": 486.03797533223826,
+      "run": "pan3",
+      "sample": 43,
+      "t": 9.6,
+      "variants": {
+        "A": {
+          "channel_pct": 24.65335648148148,
+          "deck_pct": 19.716435185185187,
+          "deck_share": 0.7997464848242999,
+          "hidden_pct": 2.670138888888889,
+          "lane_px": 1038.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 1063,
+            "lip": 1096,
+            "none": 0,
+            "racer": 2238,
+            "wall": 9445
+          },
+          "over_top": "wall 68%",
+          "row": 486.0,
+          "track_px": 1038.0
+        },
+        "B": {
+          "channel_pct": 28.334104938271604,
+          "deck_pct": 21.510609567901234,
+          "deck_share": 0.7591773099861114,
+          "hidden_pct": 0.8759645061728395,
+          "lane_px": 1038.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 240,
+            "lip": 205,
+            "none": 0,
+            "racer": 2238,
+            "wall": 1858
+          },
+          "over_top": "racer 49%",
+          "row": 486.0,
+          "track_px": 1038.0
+        },
+        "C": {
+          "channel_pct": 31.783757716049383,
+          "deck_pct": 21.23148148148148,
+          "deck_share": 0.6679978393731755,
+          "hidden_pct": 1.1550925925925926,
+          "lane_px": 1038.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 871,
+            "lip": 0,
+            "none": 0,
+            "racer": 2238,
+            "wall": 2879
+          },
+          "over_top": "wall 48%",
+          "row": 486.0,
+          "track_px": 1038.0
+        },
+        "CONTROL": {
+          "channel_pct": 3.5277777777777777,
+          "deck_pct": 0.0,
+          "deck_share": 0.0,
+          "hidden_pct": 22.279899691358025,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 1531,
+            "lip": 1905,
+            "none": 95118,
+            "racer": 2238,
+            "wall": 14707
+          },
+          "over_top": "none 82%",
+          "row": 486.0,
+          "track_px": 10.0
+        },
+        "S": {
+          "channel_pct": 25.58738425925926,
+          "deck_pct": 18.370177469135804,
+          "deck_share": 0.7179388593614535,
+          "hidden_pct": 4.016396604938271,
+          "lane_px": 1038.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 1566,
+            "lip": 1943,
+            "none": 0,
+            "racer": 2238,
+            "wall": 15074
+          },
+          "over_top": "wall 72%",
+          "row": 486.0,
+          "track_px": 1038.0
+        }
+      }
+    },
+    {
+      "cut": "middle",
+      "fov": 42.36600022,
+      "moment": "sparse",
+      "racer_row": 491.6698189801787,
+      "run": "corr3",
+      "sample": 24,
+      "t": 10.6,
+      "variants": {
+        "A": {
+          "channel_pct": 13.709104938271604,
+          "deck_pct": 8.418595679012347,
+          "deck_share": 0.6140879157989532,
+          "hidden_pct": 3.149884259259259,
+          "lane_px": 302.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 1087,
+            "lip": 1340,
+            "none": 0,
+            "racer": 3381,
+            "wall": 10521
+          },
+          "over_top": "wall 64%",
+          "row": 492.0,
+          "track_px": 302.0
+        },
+        "B": {
+          "channel_pct": 14.874035493827162,
+          "deck_pct": 10.19579475308642,
+          "deck_share": 0.6854760268198736,
+          "hidden_pct": 1.3726851851851851,
+          "lane_px": 302.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 326,
+            "lip": 329,
+            "none": 0,
+            "racer": 3620,
+            "wall": 2841
+          },
+          "over_top": "racer 51%",
+          "row": 492.0,
+          "track_px": 302.0
+        },
+        "C": {
+          "channel_pct": 17.750578703703702,
+          "deck_pct": 9.8125,
+          "deck_share": 0.5527988784924852,
+          "hidden_pct": 1.755979938271605,
+          "lane_px": 302.0,
+          "lane_ratio": 0.9207317073170732,
+          "over": {
+            "crown": 1180,
+            "lip": 0,
+            "none": 0,
+            "racer": 3620,
+            "wall": 4303
+          },
+          "over_top": "wall 47%",
+          "row": 492.0,
+          "track_px": 328.0
+        },
+        "CONTROL": {
+          "channel_pct": 3.8128858024691357,
+          "deck_pct": 0.0,
+          "deck_share": 0.0,
+          "hidden_pct": 11.528549382716049,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 1592,
+            "lip": 2100,
+            "none": 37604,
+            "racer": 2412,
+            "wall": 16056
+          },
+          "over_top": "none 63%",
+          "row": 492.0,
+          "track_px": 282.0
+        },
+        "S": {
+          "channel_pct": 14.977623456790123,
+          "deck_pct": 7.2903163580246915,
+          "deck_share": 0.48674720519293185,
+          "hidden_pct": 4.278163580246914,
+          "lane_px": 302.0,
+          "lane_ratio": 0.5571955719557196,
+          "over": {
+            "crown": 1596,
+            "lip": 2100,
+            "none": 0,
+            "racer": 2412,
+            "wall": 16070
+          },
+          "over_top": "wall 72%",
+          "row": 492.0,
+          "track_px": 542.0
+        }
+      }
+    },
+    {
+      "cut": "middle",
+      "fov": 41.95699996,
+      "moment": "mid_bend",
+      "racer_row": 510.0436224024336,
+      "run": "corr3",
+      "sample": 28,
+      "t": 11.4,
+      "variants": {
+        "A": {
+          "channel_pct": 14.293209876543209,
+          "deck_pct": 8.667438271604938,
+          "deck_share": 0.6064025048585618,
+          "hidden_pct": 3.241898148148148,
+          "lane_px": 124.0,
+          "lane_ratio": 0.2743362831858407,
+          "over": {
+            "crown": 1155,
+            "lip": 1483,
+            "none": 0,
+            "racer": 2605,
+            "wall": 11563
+          },
+          "over_top": "wall 69%",
+          "row": 510.0,
+          "track_px": 452.0
+        },
+        "B": {
+          "channel_pct": 15.564814814814815,
+          "deck_pct": 10.133487654320987,
+          "deck_share": 0.6510509617291295,
+          "hidden_pct": 1.7758487654320987,
+          "lane_px": 312.0,
+          "lane_ratio": 0.6902654867256637,
+          "over": {
+            "crown": 561,
+            "lip": 602,
+            "none": 0,
+            "racer": 2794,
+            "wall": 5249
+          },
+          "over_top": "wall 57%",
+          "row": 510.0,
+          "track_px": 452.0
+        },
+        "C": {
+          "channel_pct": 18.05902777777778,
+          "deck_pct": 9.544174382716049,
+          "deck_share": 0.5284987929671644,
+          "hidden_pct": 2.365162037037037,
+          "lane_px": 240.0,
+          "lane_ratio": 0.39215686274509803,
+          "over": {
+            "crown": 1542,
+            "lip": 77,
+            "none": 0,
+            "racer": 2794,
+            "wall": 7848
+          },
+          "over_top": "wall 64%",
+          "row": 510.0,
+          "track_px": 612.0
+        },
+        "CONTROL": {
+          "channel_pct": 4.137152777777778,
+          "deck_pct": 0.016203703703703703,
+          "deck_share": 0.0039166316967408025,
+          "hidden_pct": 11.832175925925927,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 1690,
+            "lip": 2276,
+            "none": 38412,
+            "racer": 1594,
+            "wall": 17366
+          },
+          "over_top": "none 63%",
+          "row": 510.0,
+          "track_px": 504.0
+        },
+        "S": {
+          "channel_pct": 15.590856481481483,
+          "deck_pct": 7.476851851851851,
+          "deck_share": 0.4795664600423147,
+          "hidden_pct": 4.432484567901235,
+          "lane_px": 86.0,
+          "lane_ratio": 0.14726027397260275,
+          "over": {
+            "crown": 1696,
+            "lip": 2281,
+            "none": 0,
+            "racer": 1615,
+            "wall": 17386
+          },
+          "over_top": "wall 76%",
+          "row": 510.0,
+          "track_px": 584.0
+        }
+      }
+    },
+    {
+      "cut": "middle",
+      "fov": 42.637999619999995,
+      "moment": "late_mech",
+      "racer_row": 374.05884499246037,
+      "run": "corr3",
+      "sample": 27,
+      "t": 12.2,
+      "variants": {
+        "A": {
+          "channel_pct": 52.152391975308646,
+          "deck_pct": 47.71238425925926,
+          "deck_share": 0.9148647349070492,
+          "hidden_pct": 1.0515046296296298,
+          "lane_px": 834.0,
+          "lane_ratio": 0.972027972027972,
+          "over": {
+            "crown": 526,
+            "lip": 263,
+            "none": 0,
+            "racer": 1257,
+            "wall": 3405
+          },
+          "over_top": "wall 62%",
+          "row": 374.0,
+          "track_px": 858.0
+        },
+        "B": {
+          "channel_pct": 61.43441358024692,
+          "deck_pct": 48.52141203703704,
+          "deck_share": 0.7898083372059433,
+          "hidden_pct": 0.24247685185185183,
+          "lane_px": 838.0,
+          "lane_ratio": 0.8858350951374208,
+          "over": {
+            "crown": 0,
+            "lip": 0,
+            "none": 0,
+            "racer": 1257,
+            "wall": 0
+          },
+          "over_top": "racer 100%",
+          "row": 374.0,
+          "track_px": 946.0
+        },
+        "C": {
+          "channel_pct": 64.87480709876543,
+          "deck_pct": 48.52141203703704,
+          "deck_share": 0.7479237967238657,
+          "hidden_pct": 0.24247685185185183,
+          "lane_px": 838.0,
+          "lane_ratio": 0.8674948240165632,
+          "over": {
+            "crown": 0,
+            "lip": 0,
+            "none": 0,
+            "racer": 1257,
+            "wall": 0
+          },
+          "over_top": "racer 100%",
+          "row": 374.0,
+          "track_px": 966.0
+        },
+        "CONTROL": {
+          "channel_pct": 1.7017746913580247,
+          "deck_pct": 0.0,
+          "deck_share": 0.0,
+          "hidden_pct": 48.6460262345679,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 934,
+            "lip": 694,
+            "none": 242182,
+            "racer": 1257,
+            "wall": 7114
+          },
+          "over_top": "none 96%",
+          "row": 374.0,
+          "track_px": 32.0
+        },
+        "S": {
+          "channel_pct": 52.94000771604939,
+          "deck_pct": 46.83777006172839,
+          "deck_share": 0.8847329662841922,
+          "hidden_pct": 1.9261188271604939,
+          "lane_px": 828.0,
+          "lane_ratio": 0.9672897196261683,
+          "over": {
+            "crown": 933,
+            "lip": 694,
+            "none": 0,
+            "racer": 1257,
+            "wall": 7101
+          },
+          "over_top": "wall 71%",
+          "row": 374.0,
+          "track_px": 856.0
+        }
+      }
+    },
+    {
+      "cut": "run_in",
+      "fov": 35.4840005,
+      "moment": "sprint_in",
+      "racer_row": 473.8557281262,
+      "run": "corr4",
+      "sample": 31,
+      "t": 13.6,
+      "variants": {
+        "A": {
+          "channel_pct": 12.66917438271605,
+          "deck_pct": 7.960841049382717,
+          "deck_share": 0.6283630494693728,
+          "hidden_pct": 2.3057484567901234,
+          "lane_px": 1044.0,
+          "lane_ratio": 0.9666666666666667,
+          "over": {
+            "crown": 870,
+            "lip": 1100,
+            "none": 0,
+            "racer": 1454,
+            "wall": 8529
+          },
+          "over_top": "wall 71%",
+          "row": 474.0,
+          "track_px": 1080.0
+        },
+        "B": {
+          "channel_pct": 14.222415123456791,
+          "deck_pct": 9.309220679012347,
+          "deck_share": 0.6545457011488017,
+          "hidden_pct": 0.9573688271604939,
+          "lane_px": 1080.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 294,
+            "lip": 285,
+            "none": 0,
+            "racer": 1860,
+            "wall": 2524
+          },
+          "over_top": "wall 51%",
+          "row": 474.0,
+          "track_px": 1080.0
+        },
+        "C": {
+          "channel_pct": 16.816743827160494,
+          "deck_pct": 8.981867283950617,
+          "deck_share": 0.5341026405744569,
+          "hidden_pct": 1.284722222222222,
+          "lane_px": 1080.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 1025,
+            "lip": 0,
+            "none": 0,
+            "racer": 1790,
+            "wall": 3845
+          },
+          "over_top": "wall 58%",
+          "row": 474.0,
+          "track_px": 1080.0
+        },
+        "CONTROL": {
+          "channel_pct": 3.0773533950617287,
+          "deck_pct": 0.0,
+          "deck_share": 0.0,
+          "hidden_pct": 10.219907407407407,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 1280,
+            "lip": 1711,
+            "none": 36314,
+            "racer": 729,
+            "wall": 12946
+          },
+          "over_top": "none 69%",
+          "row": 474.0,
+          "track_px": 440.0
+        },
+        "S": {
+          "channel_pct": 13.83005401234568,
+          "deck_pct": 7.047453703703704,
+          "deck_share": 0.5095752841899714,
+          "hidden_pct": 3.2191358024691357,
+          "lane_px": 884.0,
+          "lane_ratio": 0.8185185185185185,
+          "over": {
+            "crown": 1285,
+            "lip": 1712,
+            "none": 0,
+            "racer": 729,
+            "wall": 12962
+          },
+          "over_top": "wall 78%",
+          "row": 474.0,
+          "track_px": 1080.0
+        }
+      }
+    },
+    {
+      "cut": "run_in",
+      "fov": 36.24700046,
+      "moment": "sprint_mid",
+      "racer_row": 382.90142704352445,
+      "run": "corr4",
+      "sample": 25,
+      "t": 14.6,
+      "variants": {
+        "A": {
+          "channel_pct": 61.92226080246913,
+          "deck_pct": 55.24131944444445,
+          "deck_share": 0.8921075995701001,
+          "hidden_pct": 1.9398148148148147,
+          "lane_px": 942.0,
+          "lane_ratio": 0.9553752535496958,
+          "over": {
+            "crown": 804,
+            "lip": 591,
+            "none": 0,
+            "racer": 2613,
+            "wall": 6048
+          },
+          "over_top": "wall 60%",
+          "row": 383.0,
+          "track_px": 986.0
+        },
+        "B": {
+          "channel_pct": 70.02739197530865,
+          "deck_pct": 56.677083333333336,
+          "deck_share": 0.8093559068045463,
+          "hidden_pct": 0.5040509259259259,
+          "lane_px": 942.0,
+          "lane_ratio": 0.8722222222222222,
+          "over": {
+            "crown": 0,
+            "lip": 0,
+            "none": 0,
+            "racer": 2613,
+            "wall": 0
+          },
+          "over_top": "racer 100%",
+          "row": 383.0,
+          "track_px": 1080.0
+        },
+        "C": {
+          "channel_pct": 73.39737654320987,
+          "deck_pct": 56.677083333333336,
+          "deck_share": 0.7721949475941675,
+          "hidden_pct": 0.5040509259259259,
+          "lane_px": 942.0,
+          "lane_ratio": 0.8722222222222222,
+          "over": {
+            "crown": 0,
+            "lip": 0,
+            "none": 0,
+            "racer": 2613,
+            "wall": 0
+          },
+          "over_top": "racer 100%",
+          "row": 383.0,
+          "track_px": 1080.0
+        },
+        "CONTROL": {
+          "channel_pct": 2.654513888888889,
+          "deck_pct": 0.0,
+          "deck_share": 0.0,
+          "hidden_pct": 57.17110339506173,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 1449,
+            "lip": 1163,
+            "none": 280078,
+            "racer": 2613,
+            "wall": 11072
+          },
+          "over_top": "none 95%",
+          "row": 383.0,
+          "track_px": 0.0
+        },
+        "S": {
+          "channel_pct": 63.23148148148148,
+          "deck_pct": 54.03742283950618,
+          "deck_share": 0.8545968174940206,
+          "hidden_pct": 3.143711419753086,
+          "lane_px": 942.0,
+          "lane_ratio": 0.9534412955465587,
+          "over": {
+            "crown": 1449,
+            "lip": 1163,
+            "none": 0,
+            "racer": 2613,
+            "wall": 11072
+          },
+          "over_top": "wall 68%",
+          "row": 383.0,
+          "track_px": 988.0
+        }
+      }
+    },
+    {
+      "cut": "run_in",
+      "fov": 36.91800034,
+      "moment": "comeback",
+      "racer_row": 263.3601027859943,
+      "run": "sprint",
+      "sample": 27,
+      "t": 15.4,
+      "variants": {
+        "A": {
+          "channel_pct": 16.114583333333332,
+          "deck_pct": 12.002314814814815,
+          "deck_share": 0.7448107448107448,
+          "hidden_pct": 1.839891975308642,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 752,
+            "lip": 791,
+            "none": 0,
+            "racer": 1313,
+            "wall": 6682
+          },
+          "over_top": "wall 70%",
+          "row": 263.0,
+          "track_px": 0.0
+        },
+        "B": {
+          "channel_pct": 18.168788580246915,
+          "deck_pct": 13.483603395061728,
+          "deck_share": 0.7421300179430282,
+          "hidden_pct": 0.3586033950617284,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 57,
+            "lip": 44,
+            "none": 0,
+            "racer": 1313,
+            "wall": 445
+          },
+          "over_top": "racer 71%",
+          "row": 263.0,
+          "track_px": 0.0
+        },
+        "C": {
+          "channel_pct": 20.817901234567902,
+          "deck_pct": 13.399112654320987,
+          "deck_share": 0.6436341734618236,
+          "hidden_pct": 0.44309413580246915,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 296,
+            "lip": 0,
+            "none": 0,
+            "racer": 1313,
+            "wall": 688
+          },
+          "over_top": "racer 57%",
+          "row": 263.0,
+          "track_px": 0.0
+        },
+        "CONTROL": {
+          "channel_pct": 2.5455246913580245,
+          "deck_pct": 0.0,
+          "deck_share": 0.0,
+          "hidden_pct": 13.842206790123457,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 1123,
+            "lip": 1344,
+            "none": 57265,
+            "racer": 1297,
+            "wall": 10729
+          },
+          "over_top": "none 80%",
+          "row": 263.0,
+          "track_px": 0.0
+        },
+        "S": {
+          "channel_pct": 17.06886574074074,
+          "deck_pct": 11.046489197530866,
+          "deck_share": 0.6471718370345256,
+          "hidden_pct": 2.7957175925925926,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 1123,
+            "lip": 1344,
+            "none": 0,
+            "racer": 1297,
+            "wall": 10729
+          },
+          "over_top": "wall 74%",
+          "row": 263.0,
+          "track_px": 0.0
+        }
+      }
+    },
+    {
+      "cut": "run_in",
+      "fov": 37.7270003,
+      "moment": "line",
+      "racer_row": 463.9471367149205,
+      "run": "pan5",
+      "sample": 19,
+      "t": 16.2,
+      "variants": {
+        "A": {
+          "channel_pct": 1.5931712962962963,
+          "deck_pct": 0.7060185185185185,
+          "deck_share": 0.44315292408281876,
+          "hidden_pct": 0.44290123456790126,
+          "lane_px": 120.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 156,
+            "lip": 297,
+            "none": 0,
+            "racer": 0,
+            "wall": 1843
+          },
+          "over_top": "wall 80%",
+          "row": 464.0,
+          "track_px": 120.0
+        },
+        "B": {
+          "channel_pct": 1.5698302469135803,
+          "deck_pct": 0.8784722222222221,
+          "deck_share": 0.5595969525681985,
+          "hidden_pct": 0.27044753086419754,
+          "lane_px": 120.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 110,
+            "lip": 163,
+            "none": 0,
+            "racer": 0,
+            "wall": 1129
+          },
+          "over_top": "wall 81%",
+          "row": 464.0,
+          "track_px": 120.0
+        },
+        "C": {
+          "channel_pct": 1.9747299382716048,
+          "deck_pct": 0.7837577160493827,
+          "deck_share": 0.3968936211780795,
+          "hidden_pct": 0.36516203703703703,
+          "lane_px": 120.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 225,
+            "lip": 0,
+            "none": 0,
+            "racer": 0,
+            "wall": 1668
+          },
+          "over_top": "wall 88%",
+          "row": 464.0,
+          "track_px": 120.0
+        },
+        "CONTROL": {
+          "channel_pct": 0.9228395061728395,
+          "deck_pct": 0.0,
+          "deck_share": 0.0,
+          "hidden_pct": 1.1489197530864197,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 209,
+            "lip": 441,
+            "none": 2758,
+            "racer": 0,
+            "wall": 2548
+          },
+          "over_top": "none 46%",
+          "row": 464.0,
+          "track_px": 0.0
+        },
+        "S": {
+          "channel_pct": 1.841820987654321,
+          "deck_pct": 0.5320216049382716,
+          "deck_share": 0.28885630498533726,
+          "hidden_pct": 0.6168981481481481,
+          "lane_px": 120.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 209,
+            "lip": 441,
+            "none": 0,
+            "racer": 0,
+            "wall": 2548
+          },
+          "over_top": "wall 80%",
+          "row": 464.0,
+          "track_px": 120.0
+        }
+      }
+    },
+    {
+      "cut": "run_in",
+      "fov": 37.57199936,
+      "moment": "after",
+      "racer_row": 356.08331944678775,
+      "run": "sprint",
+      "sample": 16,
+      "t": 17.0,
+      "variants": {
+        "A": {
+          "channel_pct": 0.546875,
+          "deck_pct": 0.3306327160493827,
+          "deck_share": 0.6045855379188713,
+          "hidden_pct": 0.0320216049382716,
+          "lane_px": 34.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 16,
+            "lip": 14,
+            "none": 0,
+            "racer": 0,
+            "wall": 136
+          },
+          "over_top": "wall 82%",
+          "row": 356.0,
+          "track_px": 34.0
+        },
+        "B": {
+          "channel_pct": 0.6226851851851851,
+          "deck_pct": 0.35416666666666663,
+          "deck_share": 0.5687732342007435,
+          "hidden_pct": 0.008487654320987654,
+          "lane_px": 34.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 5,
+            "lip": 4,
+            "none": 0,
+            "racer": 0,
+            "wall": 35
+          },
+          "over_top": "wall 80%",
+          "row": 356.0,
+          "track_px": 34.0
+        },
+        "C": {
+          "channel_pct": 0.7137345679012346,
+          "deck_pct": 0.3485725308641975,
+          "deck_share": 0.4883783783783784,
+          "hidden_pct": 0.01408179012345679,
+          "lane_px": 34.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 17,
+            "lip": 0,
+            "none": 0,
+            "racer": 0,
+            "wall": 56
+          },
+          "over_top": "wall 77%",
+          "row": 356.0,
+          "track_px": 34.0
+        },
+        "CONTROL": {
+          "channel_pct": 0.06847993827160494,
+          "deck_pct": 0.0,
+          "deck_share": 0.0,
+          "hidden_pct": 0.3626543209876543,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 32,
+            "lip": 21,
+            "none": 1590,
+            "racer": 0,
+            "wall": 237
+          },
+          "over_top": "none 85%",
+          "row": 356.0,
+          "track_px": 0.0
+        },
+        "S": {
+          "channel_pct": 0.6327160493827161,
+          "deck_pct": 0.30671296296296297,
+          "deck_share": 0.4847560975609756,
+          "hidden_pct": 0.05594135802469136,
+          "lane_px": 34.0,
+          "lane_ratio": 1.0,
+          "over": {
+            "crown": 32,
+            "lip": 21,
+            "none": 0,
+            "racer": 0,
+            "wall": 237
+          },
+          "over_top": "wall 82%",
+          "row": 356.0,
+          "track_px": 34.0
+        }
+      }
+    },
+    {
+      "cut": "run_in",
+      "fov": 36.550000139999995,
+      "moment": "runout",
+      "racer_row": 411.763737506294,
+      "run": "sprint",
+      "sample": 18,
+      "t": 18.0,
+      "variants": {
+        "A": {
+          "channel_pct": 3.7636959876543212,
+          "deck_pct": 2.3620756172839505,
+          "deck_share": 0.6275946901747732,
+          "hidden_pct": 0.4957561728395061,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 215,
+            "lip": 263,
+            "none": 0,
+            "racer": 0,
+            "wall": 2092
+          },
+          "over_top": "wall 81%",
+          "row": 412.0,
+          "track_px": 0.0
+        },
+        "B": {
+          "channel_pct": 4.133294753086419,
+          "deck_pct": 2.68653549382716,
+          "deck_share": 0.649974331450973,
+          "hidden_pct": 0.1712962962962963,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 86,
+            "lip": 81,
+            "none": 0,
+            "racer": 0,
+            "wall": 721
+          },
+          "over_top": "wall 81%",
+          "row": 412.0,
+          "track_px": 0.0
+        },
+        "C": {
+          "channel_pct": 4.77662037037037,
+          "deck_pct": 2.596257716049383,
+          "deck_share": 0.543534447944431,
+          "hidden_pct": 0.26157407407407407,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 272,
+            "lip": 0,
+            "none": 0,
+            "racer": 0,
+            "wall": 1084
+          },
+          "over_top": "wall 80%",
+          "row": 412.0,
+          "track_px": 0.0
+        },
+        "CONTROL": {
+          "channel_pct": 0.7621527777777778,
+          "deck_pct": 0.0,
+          "deck_share": 0.0,
+          "hidden_pct": 2.857831790123457,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 329,
+            "lip": 412,
+            "none": 10864,
+            "racer": 0,
+            "wall": 3210
+          },
+          "over_top": "none 73%",
+          "row": 412.0,
+          "track_px": 0.0
+        },
+        "S": {
+          "channel_pct": 4.127893518518518,
+          "deck_pct": 2.0956790123456788,
+          "deck_share": 0.5076872751063134,
+          "hidden_pct": 0.7621527777777778,
+          "lane_px": 0.0,
+          "lane_ratio": 0.0,
+          "over": {
+            "crown": 329,
+            "lip": 412,
+            "none": 0,
+            "racer": 0,
+            "wall": 3210
+          },
+          "over_top": "wall 81%",
+          "row": 412.0,
+          "track_px": 0.0
+        }
+      }
+    }
+  ],
+  "size": [
+    540,
+    960
+  ],
+  "summary": {
+    "A": {
+      "deck_pct": 17.954034391534393,
+      "deck_share_of_channel": 0.7084910708752462,
+      "hidden_deck_pct": 2.2298739711934155,
+      "lane_px": 474.0,
+      "lane_px_median": 382.0,
+      "lane_ratio": 0.7613215922594117,
+      "moments": 21,
+      "moments_with_lane": 17
+    },
+    "B": {
+      "deck_pct": 19.20700139623751,
+      "deck_share_of_channel": 0.6945875361845191,
+      "hidden_deck_pct": 0.9769069664902997,
+      "lane_px": 507.04761904761904,
+      "lane_px_median": 402.0,
+      "lane_ratio": 0.8026503681709988,
+      "moments": 21,
+      "moments_with_lane": 18
+    },
+    "C": {
+      "deck_pct": 18.975556657848323,
+      "deck_share_of_channel": 0.5980883333716134,
+      "hidden_deck_pct": 1.2083517048794825,
+      "lane_px": 495.6190476190476,
+      "lane_px_median": 382.0,
+      "lane_ratio": 0.7293244900271871,
+      "moments": 21,
+      "moments_with_lane": 18
+    },
+    "CONTROL": {
+      "deck_pct": 0.03562242798353909,
+      "deck_share_of_channel": 0.028598163624705818,
+      "hidden_deck_pct": 20.083177175191064,
+      "lane_px": 0.2857142857142857,
+      "lane_px_median": 0.0,
+      "lane_ratio": 0.0004892367906066536,
+      "moments": 21,
+      "moments_with_lane": 0
+    },
+    "S": {
+      "deck_pct": 16.995618386243386,
+      "deck_share_of_channel": 0.6123675572508167,
+      "hidden_deck_pct": 3.1882899764844215,
+      "lane_px": 424.0952380952381,
+      "lane_px_median": 308.0,
+      "lane_ratio": 0.6388240852120205,
+      "moments": 21,
+      "moments_with_lane": 17
+    }
+  }
+}

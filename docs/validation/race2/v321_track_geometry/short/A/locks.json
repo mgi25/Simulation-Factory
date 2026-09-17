@@ -1,0 +1,200 @@
+{
+ "base_commit": "fa39d7a794444ee761b499a3f855f452517b4369",
+ "layers": {
+  "physics": {
+   "files": [
+    {
+     "path": "race2/race.py",
+     "sha256": "4a5251ff0dfdf514208a75421bc4a55a7f6a67ce7a10c4399dc72fd0efa194f8",
+     "base_sha256": "81751a7f74b9698c69decb30ab5ffefab2067d405adb7c31eabe1ec9d47f482a",
+     "tracked_at_base": true,
+     "unchanged": true,
+     "note": null
+    },
+    {
+     "path": "race2/course.py",
+     "sha256": "cadf18d747850097cb44e3c2b1b978ddbcd114ad621d0d088a1290c775edd101",
+     "base_sha256": "7a46a17d1cedb1cc2fe14a266142877417712eb76f3eeba12b8afacb9ccf32c2",
+     "tracked_at_base": true,
+     "unchanged": true,
+     "note": null
+    },
+    {
+     "path": "race2/courses.py",
+     "sha256": "28a37b2cebb4f23af224f16b724ededbcf6a99afb0a8f459dde288dd9e8b8cd6",
+     "base_sha256": "e63c7bb8bfc2f9f17dec336ac417c04c46d4226077aa10a7f06a6b01fca8bbf4",
+     "tracked_at_base": true,
+     "unchanged": true,
+     "note": null
+    },
+    {
+     "path": "race2/parts.py",
+     "sha256": "bd0ba529cc34c367b9799727beb3df83782767abe7c2ad1371d4f63cb178b7bc",
+     "base_sha256": "8f2c8bdc8f1758cd0993a19b924ad17321f34a78e8dd0c2071ea493ac73549c3",
+     "tracked_at_base": true,
+     "unchanged": true,
+     "note": null
+    },
+    {
+     "path": "race2/kit.py",
+     "sha256": "367162f27b43a87b186a99f479930c0f69bb11c1fc534afde3a207b839abff0f",
+     "base_sha256": "da6d7f77019898d8164723f6bb49415b4a74ce4b54b94f582ef7e6ea562c24c6",
+     "tracked_at_base": true,
+     "unchanged": true,
+     "note": null
+    },
+    {
+     "path": "race2/start.py",
+     "sha256": "943850ae13c22537e78afdcff72378ae0f08fa1c5b748dde390ba32e056d983d",
+     "base_sha256": "88218f97fe17e276c31ba77516db805d8440adef8b30993375ffd973292f794c",
+     "tracked_at_base": true,
+     "unchanged": true,
+     "note": null
+    },
+    {
+     "path": "race2/track.py",
+     "sha256": "23d57b1fcaab6bde057681532cec3ed2f3254dd12c09328d7994aec1268ed418",
+     "base_sha256": "8e3765bdd01a09684a3c164a02507b39f68a89008ce05bdcd7dafa242c39b017",
+     "tracked_at_base": true,
+     "unchanged": true,
+     "note": null
+    }
+   ],
+   "replay_digest": "751031348936808792ad2fac667bfdfb6e726dca7520ffdaf19429c6a2f7f539",
+   "replay_event_digest": "51078e8d31e56f53993c6ee9aa61b482a6757942a422fb43f533336983016502",
+   "seed": 8
+  },
+  "camera": {
+   "files": [
+    {
+     "path": "race2/rig.py",
+     "sha256": "414379b15203bb8d46120eb2b6ee198d18c9532d4e285aa67eeef22cd6ac4d23",
+     "base_sha256": "3ed35382b9baba3be430faebd3492c4a35e390c4e55969e2d4a0285b772350f9",
+     "tracked_at_base": true,
+     "unchanged": true,
+     "note": null
+    },
+    {
+     "path": "race2/cinematography.py",
+     "sha256": "e0026de39e8336d02e4952f03422ff3cb79d7360102e98fd86be6acd55eb030c",
+     "base_sha256": "2e90cea252406ea2a6cd3def9a55b56e42427a5c29d8a1dd54e7fd91979de093",
+     "tracked_at_base": true,
+     "unchanged": true,
+     "note": null
+    },
+    {
+     "path": "race2/shots.py",
+     "sha256": "dd8f6f3c2cb5d7cffe51d65dd15bd14e50f4518edcb0eed9871a80581ca1e68b",
+     "base_sha256": "26b8c3857104b56f76c1d3e2a848cb5f4fcd6b288dbc1eacf043a170392bab7f",
+     "tracked_at_base": true,
+     "unchanged": true,
+     "note": null
+    },
+    {
+     "path": "race2/spine.py",
+     "sha256": "ed3946ef4b43eb28eba0a8da2658ebce690f79da34046b3f73a415c8b2a06d2d",
+     "base_sha256": "095effbf1e6d840e417e7d4c22a57ea4e4161912a8c4e46b1c2dedc596452b88",
+     "tracked_at_base": true,
+     "unchanged": true,
+     "note": null
+    },
+    {
+     "path": "race2/flow.py",
+     "sha256": "0e3c2d4fd101650812636e16cce8d8cff14582f0bdee62bef0e9b1330ca0ebcb",
+     "base_sha256": "b1330301fe09bc4b94471efdb374250fabbd84a2c448bc58e55fd228ffc6bbae",
+     "tracked_at_base": true,
+     "unchanged": true,
+     "note": null
+    },
+    {
+     "path": "output/race2/v31_readability/RB/race2_switchyard_8.cameras.json",
+     "sha256": "1fcae581f88a45ae38879ec749f44d11919f274021f5ebc986912c21a6f673e5",
+     "base_sha256": null,
+     "tracked_at_base": false,
+     "unchanged": null,
+     "note": "not in the base commit; built by this run"
+    }
+   ],
+   "track_duration": 19.15,
+   "cuts": [
+    {
+     "name": "release",
+     "mode": "hook_release",
+     "from": 0.016667,
+     "to": 2.233333
+    },
+    {
+     "name": "upper",
+     "mode": "chase_rear_3q",
+     "from": 2.233333,
+     "to": 9.016667
+    },
+    {
+     "name": "middle",
+     "mode": "chase_rear_3q",
+     "from": 9.016667,
+     "to": 12.683333
+    },
+    {
+     "name": "run_in",
+     "mode": "finish_chase",
+     "from": 12.683333,
+     "to": 19.15
+    }
+   ]
+  },
+  "environment": {
+   "files": [
+    {
+     "path": "godot/assets/marble_machine/environment/profiles/contained_bay_v301.json",
+     "sha256": "3b93ea1fca7cc1f7ecd88f533a64d764f563761bc8b1667ec7d9901afcafb8e1",
+     "base_sha256": "88b1cff83b03580fca58d38b2ade9b416be2803bcbd440bdddd65c702f026812",
+     "tracked_at_base": true,
+     "unchanged": true,
+     "note": null
+    },
+    {
+     "path": "godot/scripts/race2_scene.gd",
+     "sha256": "36c4cb63c493a4038fed3acf405a9b7273a7fde5a52fb9926b2a8e7ac3b9a4a2",
+     "base_sha256": "fefdbd3d35f65495b9c72992afbb49b6c761baa90bfc86bdd4a35b074e918e24",
+     "tracked_at_base": true,
+     "unchanged": false,
+     "note": null
+    }
+   ]
+  },
+  "track": {
+   "files": [
+    {
+     "path": "godot/assets/marble_machine/course/race2_track_surface.gd",
+     "sha256": "46f68b0dbf68091d9376995eb7c973324dab0f8ce25ca03331b7f103963495c0",
+     "base_sha256": "4c238834b5ad3b81ec815c42ff315c28db61afad629f7c233e8867302f8b6d49",
+     "tracked_at_base": true,
+     "unchanged": false,
+     "note": null
+    }
+   ]
+  }
+ },
+ "reproduced": {
+  "physics": {
+   "report": "docs/validation/race2/events_switchyard_8.json",
+   "fields_compared": 697,
+   "fields_differing": [],
+   "identical": true
+  },
+  "camera": {
+   "report": "docs/validation/race2/v31_readability/read_RB.json",
+   "fields_compared": 167,
+   "fields_differing": [],
+   "identical": true
+  },
+  "track": {
+   "report": "docs/validation/race2/v311_track/track_measure.json",
+   "fields_compared": 6866,
+   "fields_differing": [],
+   "identical": true
+  }
+ },
+ "ok": false
+}

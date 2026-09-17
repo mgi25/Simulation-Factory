@@ -73,6 +73,7 @@ __all__ = [
     "RING_DELAY",
     "RING_SECONDS",
     "card_band",
+    "card_height",
     "card_plate",
     "comeback_rank",
     "film_clock",
@@ -552,6 +553,7 @@ def card_band(
                 racing[low:high] = True
 
     brightest = None
+    brightest_px = None
     counted = 0
     for index in range(int(round(start * clock.fps)), clock.master_frames, 2):
         path = os.path.join(frames_dir, f"frame_{index:06d}.png")
@@ -565,11 +567,24 @@ def card_band(
         )
         row_max = light[:, CARD_CORRIDOR[0]:CARD_CORRIDOR[1]].max(1)
         brightest = row_max if brightest is None else np.maximum(brightest, row_max)
+        # The per-pixel worst as well as the per-row one: the fallback below
+        # needs to ask what is under the card's glyphs, and a row maximum has
+        # already thrown that away.
+        brightest_px = light if brightest_px is None else np.maximum(brightest_px, light)
         counted += 1
     if brightest is None:
         raise ValueError(f"no frames under {frames_dir} for the card's window")
 
     usable = (brightest <= luma) & (~racing)
+    # **The frame's own gutter, at the bottom as well as the top.** `HOOK_TOP`
+    # is already "the frame's own gutter, applied vertically" for the hook, and
+    # the card never needed it while its band was at the top of the picture. The
+    # first film whose darkest band was the *floor* put the fact line flush
+    # against the frame's last row, which is a margin failure a top-aligned band
+    # can never produce and therefore never caught.
+    usable[:HOOK_TOP] = False
+    usable[DELIVERY[1] - HOOK_TOP:] = False
+
     best = (0, 0)
     run_start = None
     for index in range(DELIVERY[1] + 1):
@@ -580,16 +595,106 @@ def card_band(
             if index - run_start > best[1] - best[0]:
                 best = (run_start, index)
             run_start = None
-    if best[1] - best[0] < 40:
+
+    # **Which card, not a card.** `v24_payoff` fits its type to the frame's
+    # gutter, so a five-letter winner gets bigger type than a six-letter one and
+    # the ink is 225 rows tall for PINK against 201 for PURPLE. Taking the
+    # default card's height here put the band 24 rows short of the card that was
+    # actually going to be drawn, which `card_plate` then reported as outside
+    # its own band. The winner is in the replay this function was handed.
+    winner = _first_finisher(replay)
+    needed = card_height(winner=winner)
+    if best[1] - best[0] >= needed:
+        return {
+            "band": [int(best[0]), int(best[1])],
+            "height": int(best[1] - best[0]),
+            "max_luma": round(float(brightest[best[0]:best[1]].max()), 1),
+            "frames_measured": counted,
+            "from": round(start, 4),
+            "fallback": False,
+            "racing_rows": _row_runs(racing),
+        }
+
+    # **The fallback, and why a film can need one.**
+    #
+    # `brightest` is the worst pixel anywhere across an 888-pixel-wide corridor
+    # on any frame of the card's life. That is the right test when a band is
+    # being *chosen* out of a dark picture, and it is far stricter than the
+    # question it stands in for, which is whether the card's own glyphs land on
+    # something they can be read against. A single bright pixel at one end of a
+    # row, on one frame, disqualifies the row.
+    #
+    # V32.1 is the first film where that matters, and the reason is the whole
+    # point of the pass: with the running surface backfacing, the payoff shot's
+    # upper frame was empty room, and V32's card sat in 305 rows of it. With the
+    # surface drawn, the run-out sweeps through those rows and **no window of
+    # the card's height anywhere in the frame stays under the bar** - the best
+    # is 184 against a 130 limit.
+    #
+    # So when no band can hold the card, the rule becomes the question itself:
+    # slide a card-height window between the gutters, avoiding any row a still
+    # racing marble occupies, and take the one whose worst pixel **under the
+    # card's own ink** is lowest. That is measured against the mask the card
+    # actually draws, not against a corridor it mostly does not fill.
+    # `card_plate` lands the ink's bottom on `band[1]`, so a band of exactly the
+    # ink's height puts the glyphs on rows `[top, top + needed)` and the mask
+    # can be read straight off the card with no offset to get wrong.
+    mask = _card_ink_mask(winner=winner)
+    ink_rows = np.nonzero(mask.any(axis=1))[0]
+    glyphs = mask[ink_rows[0]:ink_rows[0] + needed]
+    pick, score = None, None
+    for top in range(HOOK_TOP, DELIVERY[1] - HOOK_TOP - needed + 1):
+        if racing[top:top + needed].any():
+            continue
+        worst = float(brightest_px[top:top + needed][glyphs].max())
+        if score is None or worst < score:
+            pick, score = top, worst
+    if pick is None:
         raise ValueError("no band on this film is dark enough and clear of the race")
     return {
-        "band": [int(best[0]), int(best[1])],
-        "height": int(best[1] - best[0]),
-        "max_luma": round(float(brightest[best[0]:best[1]].max()), 1),
+        "band": [int(pick), int(pick + needed)],
+        "height": int(needed),
+        "max_luma": round(float(brightest[pick:pick + needed].max()), 1),
+        "max_luma_under_ink": round(score, 1),
         "frames_measured": counted,
         "from": round(start, 4),
+        "fallback": True,
+        "tallest_band": [int(best[0]), int(best[1])],
         "racing_rows": _row_runs(racing),
     }
+
+
+def _first_finisher(replay: dict[str, Any]) -> int:
+    """The marble that crossed first, from the replay's own events."""
+    best = None
+    for event in replay.get("events", ()):
+        if event.get("kind") != "finish_line":
+            continue
+        if best is None or float(event["t"]) < best[0]:
+            best = (float(event["t"]), int(event["id"]))
+    if best is None:
+        raise ValueError("this replay has no finish_line event")
+    return best[1]
+
+
+def card_height(style: str = CARD_STYLE, winner: int | None = None) -> int:
+    """How many rows the card's ink actually occupies, measured from the card.
+
+    Not a constant: `v24_payoff` fits its type to the frame's gutter, so the
+    number belongs to the drawing rather than to this module.
+    """
+    payoff = v24_payoff.build(style=style, **({} if winner is None else {"winner": winner}))
+    box = _ink(payoff.image)
+    return int(box[3] - box[1])
+
+
+def _card_ink_mask(style: str = CARD_STYLE, winner: int | None = None):
+    """The card's own solid pixels, as a boolean mask over the delivery frame."""
+    import numpy as np
+
+    payoff = v24_payoff.build(style=style, **({} if winner is None else {"winner": winner}))
+    alpha = np.asarray(payoff.image.getchannel("A"))
+    return alpha >= 200
 
 
 def _row_runs(mask) -> list[tuple[int, int]]:

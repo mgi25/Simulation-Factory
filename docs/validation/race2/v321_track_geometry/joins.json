@@ -1,0 +1,54 @@
+{
+  "variants": {
+    "A": {
+      "joins": 10,
+      "moments": 21,
+      "moments_in_frame": 0,
+      "screen_px_max": 0.0,
+      "screen_px_median": 0.0,
+      "weld": true,
+      "world_gap_max": 0.0,
+      "world_gap_mean": 0.0
+    },
+    "B": {
+      "joins": 10,
+      "moments": 21,
+      "moments_in_frame": 0,
+      "screen_px_max": 0.0,
+      "screen_px_median": 0.0,
+      "weld": true,
+      "world_gap_max": 0.0,
+      "world_gap_mean": 0.0
+    },
+    "C": {
+      "joins": 10,
+      "moments": 21,
+      "moments_in_frame": 0,
+      "screen_px_max": 0.0,
+      "screen_px_median": 0.0,
+      "weld": true,
+      "world_gap_max": 0.0,
+      "world_gap_mean": 0.0
+    },
+    "CONTROL": {
+      "joins": 10,
+      "moments": 21,
+      "moments_in_frame": 16,
+      "screen_px_max": 48.84173805821709,
+      "screen_px_median": 21.377180845999675,
+      "weld": false,
+      "world_gap_max": 0.3565140447079201,
+      "world_gap_mean": 0.2466022917158504
+    },
+    "S": {
+      "joins": 10,
+      "moments": 21,
+      "moments_in_frame": 0,
+      "screen_px_max": 0.0,
+      "screen_px_median": 0.0,
+      "weld": true,
+      "world_gap_max": 0.0,
+      "world_gap_mean": 0.0
+    }
+  }
+}

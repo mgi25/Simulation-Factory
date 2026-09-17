@@ -1,0 +1,22 @@
+{
+  "A": {
+    "bytes": 13805095,
+    "frames": 1150,
+    "video": "exports/race2_v321_track_geometry\\race2_switchyard_v321_A.mp4"
+  },
+  "B": {
+    "bytes": 14142038,
+    "frames": 1150,
+    "video": "exports/race2_v321_track_geometry\\race2_switchyard_v321_B.mp4"
+  },
+  "C": {
+    "bytes": 13928236,
+    "frames": 1150,
+    "video": "exports/race2_v321_track_geometry\\race2_switchyard_v321_C.mp4"
+  },
+  "S": {
+    "bytes": 13534493,
+    "frames": 1150,
+    "video": "exports/race2_v321_track_geometry\\race2_switchyard_v321_S.mp4"
+  }
+}
