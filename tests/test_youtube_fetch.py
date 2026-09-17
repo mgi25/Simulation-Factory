@@ -517,6 +517,85 @@ def test_missing_scope_is_an_authorization_error(tmp_path: Path) -> None:
     assert issubclass(MissingScopeError, AuthorizationError)
 
 
+def test_a_refresh_that_returns_a_narrowed_grant_is_refused(tmp_path: Path) -> None:
+    """A permission withdrawn after consent narrows the refresh response.
+
+    The grant on disk was complete when it was written, so checking only at the
+    exchange would let the narrowed one be used for the rest of the run.
+    """
+    harness = make_harness(tmp_path, with_grant=True)
+    harness.fake.queue(TOKEN_KEY, 200, token_payload(scope=DATA_SCOPE))
+    with pytest.raises(MissingScopeError) as caught:
+        harness.oauth.access_token()
+    assert ANALYTICS_SCOPE in str(caught.value)
+    assert_no_sentinel(str(caught.value))
+
+
+def test_a_narrowed_refresh_does_not_overwrite_the_stored_grant(tmp_path: Path) -> None:
+    harness = make_harness(tmp_path, with_grant=True)
+    harness.fake.queue(
+        TOKEN_KEY, 200, token_payload(scope=DATA_SCOPE, refresh=ROTATED_REFRESH)
+    )
+    with pytest.raises(MissingScopeError):
+        harness.oauth.access_token()
+    stored = harness.store.load()
+    assert stored.refresh_token == REFRESH_TOKEN, (
+        "a rotation arriving alongside a narrowed grant must not be persisted"
+    )
+    assert stored.scopes == REQUIRED_SCOPES
+    assert harness.oauth.granted_scopes() == REQUIRED_SCOPES
+
+
+def test_a_refresh_that_keeps_both_scopes_still_works(tmp_path: Path) -> None:
+    """The refusal above must not have cost the ordinary path."""
+    harness = make_harness(tmp_path, with_grant=True)
+    harness.fake.queue(TOKEN_KEY, 200, token_payload(access=SECOND_ACCESS_TOKEN))
+    assert harness.oauth.access_token() == SECOND_ACCESS_TOKEN
+
+
+def test_redaction_leaves_fields_that_merely_end_in_code_alone() -> None:
+    """`code` is a credential on its own and a suffix everywhere else.
+
+    Redacting `status_code=404` costs the only number that says what went
+    wrong, and a redactor that eats diagnostics gets turned off.
+    """
+    redactor = SecretRedactor(CLIENT_SECRET)
+    text = "status_code=502 error_code=backendError retry_code: 3"
+    assert redactor.redact(text) == text
+
+
+def test_redaction_still_removes_every_credential_assignment() -> None:
+    """The boundary above narrowed `code`; it narrowed nothing else."""
+    redactor = SecretRedactor(CLIENT_SECRET)
+    for key in (
+        "code",
+        "authorization_code",
+        "code_verifier",
+        "access_token",
+        "refresh_token",
+        "new_refresh_token",
+        "client_secret",
+    ):
+        assert redactor.redact(f"{key}=4/0AX4XfWhVALUE") == f"{key}=[REDACTED]", key
+
+
+def test_an_endpoint_never_keeps_url_userinfo() -> None:
+    """Stripping the query is not enough: `user:pass@` sits before the host."""
+    endpoint = endpoint_of(
+        "https://fetcher:SENTINEL-in-url@www.googleapis.com/youtube/v3/videos?key=k"
+    )
+    assert endpoint == "https://www.googleapis.com/youtube/v3/videos"
+    assert "@" not in endpoint
+    assert "SENTINEL" not in endpoint
+
+
+def test_an_endpoint_keeps_the_port_it_needs() -> None:
+    assert (
+        endpoint_of("http://127.0.0.1:8731/oauth2/callback?code=c")
+        == "http://127.0.0.1:8731/oauth2/callback"
+    )
+
+
 # -- requirement 11: the callback server keeps serving ----------------------
 
 

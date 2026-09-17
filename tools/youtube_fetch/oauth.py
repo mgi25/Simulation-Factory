@@ -15,6 +15,14 @@ partial consent therefore leaves no trace on disk at all: the next run finds no
 grant, says so, and asks for authorization again, which is the correct and
 obvious repair.
 
+`access_token` runs the same check, for the same reason one step later. A grant
+can be narrowed after it was made - a permission withdrawn in the Google account
+page - and the refresh still succeeds, returning only the scopes that survived.
+Checking at the exchange alone would let that narrowed grant overwrite the
+stored one and then be used, which is the original defect with a different
+starting point, so `_require_scopes` is shared by both paths and neither can
+drift from the other.
+
 ## The callback server serves until it hears what it is waiting for
 
 `handle_request()` handles *one* request. A browser opening the consent page
@@ -366,17 +374,9 @@ class OAuthClient:
             extra_secrets=(code, code_verifier),
         )
         granted = scopes_of(payload.get("scope"))
-        missing = tuple(scope for scope in REQUIRED_SCOPES if scope not in granted)
-        if missing:
-            # Nothing has been written yet, and nothing will be: a partial grant
-            # leaves the machine exactly as it was before the flow started.
-            raise MissingScopeError(
-                "Google granted "
-                + (", ".join(granted) if granted else "no scopes")
-                + "; this fetcher cannot run without "
-                + ", ".join(missing)
-                + ". Authorize again and accept every requested permission."
-            )
+        # Nothing has been written yet, and nothing will be: a partial grant
+        # leaves the machine exactly as it was before the flow started.
+        _require_scopes(granted)
         refresh = payload.get("refresh_token")
         if not isinstance(refresh, str) or not refresh:
             raise AuthorizationError(
@@ -404,6 +404,15 @@ class OAuthClient:
             extra_secrets=(grant.refresh_token,),
         )
         scopes = scopes_of(payload.get("scope")) or grant.scopes
+        # A grant can be narrowed after it was made - a permission removed in
+        # the Google account page - and the refresh still succeeds, returning
+        # the scopes that survived. Checking only at `exchange_code` would let
+        # that narrowed grant be written over the stored one and then used, so
+        # the same refusal runs here, before the rotated token is persisted and
+        # before the access token is cached. Re-authorizing is the only remedy
+        # for a narrowed grant, so losing a rotation we refuse to store costs
+        # nothing.
+        _require_scopes(scopes)
         rotated = payload.get("refresh_token")
         if isinstance(rotated, str) and rotated and rotated != grant.refresh_token:
             self.token_store.save(StoredGrant(rotated, scopes))
@@ -494,6 +503,25 @@ class OAuthClient:
 def scopes_of(value: object) -> tuple[str, ...]:
     """Google returns the granted scopes as one space-separated string."""
     return tuple(str(value).split()) if isinstance(value, str) else ()
+
+
+def _require_scopes(granted: tuple[str, ...]) -> None:
+    """Refuse a grant that does not cover `REQUIRED_SCOPES`, naming the gap.
+
+    Shared by the exchange and the refresh so the two cannot drift: a grant
+    that is too narrow is refused the same way whether it arrived that way or
+    was narrowed afterwards.
+    """
+    missing = tuple(scope for scope in REQUIRED_SCOPES if scope not in granted)
+    if not missing:
+        return
+    raise MissingScopeError(
+        "Google granted "
+        + (", ".join(granted) if granted else "no scopes")
+        + "; this fetcher cannot run without "
+        + ", ".join(missing)
+        + ". Authorize again and accept every requested permission."
+    )
 
 
 __all__ = [

@@ -26,9 +26,11 @@ secret. A telemetry record built by copying the URL would put a credential in
 the artifact, in the log, and ultimately in the repository, where the evidence
 files are read by people who were never meant to hold the grant.
 
-`_endpoint` therefore keeps scheme, host and path and discards query, params and
-fragment. The endpoint in an artifact is `.../youtube/v3/videos`, never
-`.../videos?id=...&access_token=...`. The trace records `response_bytes`, not the
+`_endpoint` therefore keeps scheme, host and path and discards query, params,
+fragment and userinfo. The endpoint in an artifact is `.../youtube/v3/videos`,
+never `.../videos?id=...&access_token=...` and never `https://user:pass@...` -
+a credential ahead of the host would otherwise survive the query strip, because
+it is not in the query. The trace records `response_bytes`, not the
 response - a size is enough to see a truncated page, and the body may hold
 private analytics.
 
@@ -193,9 +195,25 @@ class InstrumentedTransport:
 
 
 def endpoint_of(url: str) -> str:
-    """Scheme, host and path. The query string is where the credentials are."""
+    """Scheme, host and path. The query string is where the credentials are.
+
+    Built from `hostname`, never `netloc`: a URL may carry `user:password@`
+    ahead of the host, and `netloc` includes it, so stripping the query alone
+    would have carried a credential straight into the artifact. `hostname`
+    drops the userinfo and lower-cases the host; the port is put back because
+    the loopback redirect needs one. A port too malformed to parse is dropped
+    rather than raised on - this runs while a trace is being recorded, often on
+    a failure, and an endpoint is evidence rather than an address to dial.
+    """
     parsed = urlsplit(url)
-    return f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
+    host = parsed.hostname or ""
+    try:
+        port = parsed.port
+    except ValueError:
+        port = None
+    if port is not None:
+        host = f"{host}:{port}"
+    return f"{parsed.scheme}://{host}{parsed.path}"
 
 
 __all__ = [

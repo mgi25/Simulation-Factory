@@ -64,8 +64,18 @@ from typing import Any, Protocol
 from .errors import TokenProtectionError
 
 
+# `code` is only a credential when it stands alone. It is also the tail of
+# `status_code`, `error_code` and a dozen other harmless field names, so the
+# bare spelling carries a left boundary; without one, `status_code=404` is
+# written to the log as `status_code=[REDACTED]` and the diagnostic is gone.
+# The longer names keep their permissive match, because a prefixed spelling of
+# one of those - a provider quoting back `new_refresh_token=...` - really is
+# the credential. Ordering matters: `authorization_code` and `code_verifier`
+# are tried before the bare `code`, so a compound key is matched whole rather
+# than from its tail.
 _SENSITIVE_ASSIGNMENT = re.compile(
-    r"(?i)(access_token|refresh_token|client_secret|authorization|code_verifier|code)"
+    r"(?i)(access_token|refresh_token|client_secret|authorization_code"
+    r"|authorization|code_verifier|(?<![A-Za-z0-9_])code)"
     r"(\s*[:=]\s*)([^\s,&}\]]+)"
 )
 _BEARER = re.compile(r"(?i)Bearer\s+[A-Za-z0-9._~+\-/=]+")

@@ -1201,6 +1201,44 @@ _PRODUCTION_DIRS = (
     "tools",
 )
 
+# `_PRODUCTION_DIRS` names roots, not owners: every race, fight and V30 module
+# lives under one of them, but a root may also hold a package that has nothing
+# to do with any of them. A path listed below is separately owned and purely
+# additive, so a *new* file under it changes no race/fight/V30 code. Modifying
+# or deleting anything under a production root - this path included - stays a
+# violation, and so does adding a file anywhere else under one.
+_ADDITIVE_PRODUCTION_PATHS = ("tools/youtube_fetch/",)
+
+
+def _production_changes(name_status):
+    """The (status, path) pairs of a --name-status diff that touch race, fight
+    or V30 code: anything modified or deleted under a production root, plus any
+    file added under one outside the additive paths above.
+
+    A rename reports two paths - the source went away, the destination is new -
+    and a copy leaves its source untouched.
+    """
+    roots = tuple(f"{d}/" for d in _PRODUCTION_DIRS)
+    offending = []
+    for line in name_status.splitlines():
+        if not line.strip():
+            continue
+        fields = line.split("\t")
+        code = fields[0][:1]
+        if code == "R" and len(fields) == 3:
+            changes = [("D", fields[1]), ("A", fields[2])]
+        elif code == "C" and len(fields) == 3:
+            changes = [("A", fields[2])]
+        else:
+            changes = [(code, fields[1])]
+        for status, path in changes:
+            if not path.startswith(roots):
+                continue
+            if status == "A" and path.startswith(_ADDITIVE_PRODUCTION_PATHS):
+                continue
+            offending.append((status, path))
+    return offending
+
 
 def test_the_research_package_imports_nothing_from_production_and_adds_no_dependency():
     for path in sorted(PACKAGE.rglob("*.py")):
@@ -1232,16 +1270,38 @@ def test_this_branch_changed_no_race_fight_or_v30_code():
     import subprocess
 
     diff = subprocess.run(
-        ["git", "diff", "--name-only", "origin/main...HEAD"],
+        ["git", "diff", "--name-status", "origin/main...HEAD"],
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,
     )
     if diff.returncode != 0:
         pytest.skip("no origin/main to compare against")
-    touched = [line for line in diff.stdout.splitlines() if line.strip()]
-    for path in touched:
-        assert not path.startswith(tuple(f"{d}/" for d in _PRODUCTION_DIRS)), path
+    assert _production_changes(diff.stdout) == []
+
+
+def test_the_branch_guard_still_refuses_race_fight_and_v30_changes():
+    """A new separately owned package under a production root is additive; the
+    guard still refuses every other change under one, including a rename away
+    and a path that merely starts like the additive one."""
+    tab = "\t"
+    for line in (
+        "M" + tab + "tools/race2_render.py",
+        "D" + tab + "tools/sloped_short.py",
+        "M" + tab + "sloped/cameras.py",
+        "A" + tab + "tools/race3_render.py",
+        "A" + tab + "sloped/newthing.py",
+        "A" + tab + "tools/youtube_fetch_evil.py",
+        "M" + tab + "tools/youtube_fetch/api.py",
+        "R100" + tab + "tools/race2_render.py" + tab + "tools/race2_moved.py",
+    ):
+        assert _production_changes(line), line
+    for line in (
+        "A" + tab + "tools/youtube_fetch/api.py",
+        "A" + tab + "company/youtube/ingest.py",
+        "M" + tab + ".gitignore",
+    ):
+        assert _production_changes(line) == [], line
 
 
 def test_the_no_subagent_rule_is_exactly_where_it_was():
