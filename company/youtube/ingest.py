@@ -69,7 +69,9 @@ contradictory row would quietly break every later average.
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Iterable, Mapping
 
 from company.analytics import (
@@ -120,6 +122,16 @@ VIDEO_EVIDENCE_LEVEL = "deliverable"
 # prefix outright: the template is unusable until a person has edited it, which
 # is the only state in which it is honest.
 ASSIGNMENT_PLACEHOLDER_PREFIX = "REPLACE_WITH_"
+
+# The shipped mapping from YouTube video id to the deliverable it is, tracked in
+# git beside this module. `company/workforce/store.py` draws the line this
+# follows: definitions live in the repository and are reviewed, state lives under
+# a directory the caller names. Which video is which deliverable is a definition
+# - it is decided once by whoever made the video, it is not a measurement, and it
+# is what every stored observation needs in order to still mean something. A copy
+# of it under a state directory would be a second editable truth, and the one
+# that got edited would be whichever the operator had open.
+DEFAULT_ASSIGNMENTS_PATH = Path(__file__).resolve().parent / "video_assignments.json"
 
 
 @dataclass(frozen=True)
@@ -792,6 +804,29 @@ def assignment_template(
     }
 
 
+def load_shipped_assignments(
+    path: Path | str | None = None,
+) -> dict[str, DeliverableAssignment]:
+    """The tracked mapping, read through the same loader an operator file uses.
+
+    There is one reader, so the shipped registry cannot drift into a dialect the
+    `--assignments` path would refuse. `path` exists for tests; production has
+    exactly one location and it is `DEFAULT_ASSIGNMENTS_PATH`.
+    """
+    source = Path(path) if path is not None else DEFAULT_ASSIGNMENTS_PATH
+    try:
+        raw = source.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise ArtifactRejected(
+            f"cannot read the shipped video assignments at {source}: {exc}"
+        ) from exc
+    try:
+        data = json.loads(raw)
+    except ValueError as exc:
+        raise ArtifactRejected(f"{source} is not valid JSON: {exc}") from exc
+    return load_assignments(data)
+
+
 def load_assignments(data: Any) -> dict[str, DeliverableAssignment]:
     """Read the operator's video-to-deliverable declarations from a mapping.
 
@@ -940,6 +975,7 @@ __all__ = [
     "ApiIngestionResult",
     "ArtifactDescription",
     "ASSIGNMENT_PLACEHOLDER_PREFIX",
+    "DEFAULT_ASSIGNMENTS_PATH",
     "ChannelReport",
     "DeliverableAssignment",
     "UnassignedVideo",
@@ -949,5 +985,6 @@ __all__ = [
     "describe_artifact",
     "ingest_artifact",
     "load_assignments",
+    "load_shipped_assignments",
     "unassigned_videos",
 ]

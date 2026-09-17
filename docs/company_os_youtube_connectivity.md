@@ -447,6 +447,16 @@ keys, and `tests/test_company_youtube_live_findings.py` loads it through the
 real `load_assignments`, so the documented shape cannot drift from the shape the
 code accepts.
 
+**The canonical mapping is tracked in git** at
+`company/youtube/video_assignments.json`, and `ingest` reads it when
+`--assignments` is omitted. Which video is which deliverable is durable company
+knowledge, not runtime analytics state: it is decided once by whoever made the
+video, nothing can re-derive it, and every stored observation needs it to remain
+attributable. `company/youtube/README.md` states the split; there is no copy of
+the mapping under any state directory, because two editable copies disagree
+eventually. `--assignments` remains for a mapping that is not yet company
+knowledge.
+
 `kind` and `format_id` are supplied, never inferred from a duration or a title:
 a family guessed off a title would carry the authority of a record and silently
 mis-group every comparison downstream. A video with no entry is reported as
@@ -509,6 +519,8 @@ of these:
    note rather than an error, and still absent from every `MetricObservation`
    under any deliverable id?
 9. Does an unedited or half-filled assignments template still fail to load?
+10. Is `company/youtube/video_assignments.json` still the only editable mapping,
+    still byte-identical to `dumps`, and still free of anything but identity?
 
 Any "no" is a design change rather than a fix, and belongs in the gate report
 before it belongs in this file.

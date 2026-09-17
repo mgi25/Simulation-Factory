@@ -75,13 +75,14 @@ from company.analytics import (
     observe,
 )
 from company.analytics.comparison import compare_deliverables
-from company.analytics.errors import AnalyticsError
+from company.analytics.errors import AnalyticsError, LedgerViolation
 from company.analytics.metrics import STANDARD_METRICS, MetricDefinition
 from company.analytics.studio_ingest import IngestionIssueKind, IssueSeverity
 from company.analytics.windows import FIRST_30D
 from knowledge.company_os.records import Evidence
 from company.youtube import (
     CHANNEL_EVIDENCE_LEVEL,
+    build_deliverable,
     VIDEO_EVIDENCE_LEVEL,
     ArtifactRejected,
     DeliverableAssignment,
@@ -90,10 +91,13 @@ from company.youtube import (
     ingest_artifact,
     read_artifact,
 )
+from ai_platform.serde import dumps
 from company.youtube.ingest import (
     ASSIGNMENT_PLACEHOLDER_PREFIX,
+    DEFAULT_ASSIGNMENTS_PATH,
     assignment_template,
     load_assignments,
+    load_shipped_assignments,
     unassigned_videos,
 )
 
@@ -433,6 +437,219 @@ def test_the_render_says_the_channel_report_was_kept(result):
     text = result.render()
     assert "channel evidence" in text
     assert "not written as observations" in text
+
+
+# -- the shipped registry: durable identity, not runtime state -------------
+#
+# Which video is which deliverable is the one thing in this path that no API can
+# answer and no measurement can re-derive. It is decided once by whoever made the
+# video, and every stored observation leans on it to still mean anything: lose
+# the mapping and eighteen readings become numbers about nothing.
+# `company/workforce/store.py` already drew this line - definitions live in git
+# and are reviewed, state lives under a directory the caller names - so the
+# mapping is tracked beside the module and no state directory holds a copy.
+
+
+CEO_CONFIRMED = {
+    "dX_0JSqnIUk": "race-test-1",
+    "uoNdArsIers": "race-test-2",
+    "j05EGwn7U5w": "race-test-3",
+}
+FIGHT_VIDEOS = ("SeIAF9EfQ6U", "dqguZKvREDk")
+
+
+def test_the_shipped_registry_is_tracked_and_canonically_serialized():
+    """It is in git, in the canonical form every other stored record uses.
+
+    Byte-equality with `dumps` is what makes a diff of this file mean something:
+    a reordered key or a changed indent would otherwise read as a change to the
+    mapping when the mapping did not move.
+    """
+    assert DEFAULT_ASSIGNMENTS_PATH.name == "video_assignments.json"
+    assert DEFAULT_ASSIGNMENTS_PATH.parent.name == "youtube"
+    text = DEFAULT_ASSIGNMENTS_PATH.read_text(encoding="utf-8")
+    assert dumps(json.loads(text)) == text
+
+
+def test_the_shipped_registry_holds_the_ceo_confirmed_mappings():
+    loaded = load_shipped_assignments()
+    assert {v: a.deliverable_id for v, a in loaded.items()} == CEO_CONFIRMED
+    for assignment in loaded.values():
+        assert assignment.kind is DeliverableKind.SHORT
+        assert assignment.format_id == "race_short"
+
+
+def test_the_fight_videos_are_absent_from_the_shipped_registry():
+    """Absent, not present-and-blank. An unconfirmed identity has no row."""
+    loaded = load_shipped_assignments()
+    raw = json.loads(DEFAULT_ASSIGNMENTS_PATH.read_text(encoding="utf-8"))
+    for video_id in FIGHT_VIDEOS:
+        assert video_id not in loaded
+        assert video_id not in raw
+
+
+def test_the_shipped_registry_goes_through_the_operator_loader():
+    """One reader, so the tracked file cannot drift into its own dialect."""
+    raw = json.loads(DEFAULT_ASSIGNMENTS_PATH.read_text(encoding="utf-8"))
+    assert {k: v.to_dict() for k, v in load_assignments(raw).items()} == {
+        k: v.to_dict() for k, v in load_shipped_assignments().items()
+    }
+
+
+def test_the_shipped_registry_carries_nothing_but_identity():
+    """Four identity fields and no fifth: no value, no path, no credential.
+
+    The check is on the shape rather than only on forbidden words, because a
+    field this file may not have is any field that is not one of these, and a
+    denylist catches only the secrets somebody thought of in advance.
+    """
+    raw = json.loads(DEFAULT_ASSIGNMENTS_PATH.read_text(encoding="utf-8"))
+    for entry in raw.values():
+        assert set(entry) <= {"deliverable_id", "kind", "format_id", "version"}
+        assert all(isinstance(value, str) for value in entry.values())
+    flat = DEFAULT_ASSIGNMENTS_PATH.read_text(encoding="utf-8").lower()
+    for forbidden in ("token", "secret", "client_id", "refresh", "password",
+                      "bearer", "http", "users/"):
+        assert forbidden not in flat, forbidden
+
+
+def test_a_duplicate_video_id_cannot_survive_the_canonical_form(tmp_path):
+    """A repeated key is not a conflict the loader sees - JSON collapses it.
+
+    So the guard is the canonical form, asserted on the shipped file above: a
+    duplicated key changes the text without changing the parse, and the
+    round-trip catches exactly that.
+    """
+    doubled = (
+        '{"dX_0JSqnIUk": {"deliverable_id": "race-test-1", "format_id": '
+        '"race_short", "kind": "short"}, "dX_0JSqnIUk": {"deliverable_id": '
+        '"race-test-9", "format_id": "race_short", "kind": "short"}}'
+    )
+    path = tmp_path / "doubled.json"
+    path.write_text(doubled, encoding="utf-8")
+    loaded = load_shipped_assignments(path)
+    assert len(loaded) == 1
+    assert loaded["dX_0JSqnIUk"].deliverable_id == "race-test-9"
+    assert dumps(json.loads(doubled)) != doubled
+
+
+def test_two_videos_on_one_deliverable_merge_and_the_second_identity_is_lost(
+    tmp_path,
+):
+    """The existing rule, pinned because it is a sharp edge of the mapping file.
+
+    Mapping two videos onto one deliverable is not refused anywhere. It is a
+    legitimate thing to want - a re-upload really is the same deliverable - so
+    `ingest_artifact` keeps the first deliverable record it builds
+    (`deliverables.setdefault`) and attaches *both* videos' readings to it.
+
+    Nothing is overwritten: `video_id` is part of the observation identity, so
+    six readings stay six distinct records. What is lost is attribution. The
+    stored deliverable names only the first video in `production_refs` and
+    carries only its title, while holding readings taken from a video it does
+    not mention - and no diagnostic says so.
+
+    This is why the mapping is reviewed in git rather than edited in a state
+    directory: a typo that points two videos at one deliverable produces a clean
+    import and a quietly wrong record, and the only place to catch it is a diff.
+    """
+    path = tmp_path / "collide.json"
+    path.write_text(dumps({
+        "apvUnderOne": {"deliverable_id": "race-dupe", "format_id": "race_short",
+                        "kind": "short"},
+        "apvLooped1184": {"deliverable_id": "race-dupe", "format_id": "race_short",
+                          "kind": "short"},
+    }), encoding="utf-8")
+    loaded = load_shipped_assignments(path)
+    assert len(loaded) == 2
+
+    result = ingest_artifact(read_artifact(FIXTURE), assignments=loaded)
+    assert [d.deliverable_id for d in result.deliverables] == ["race-dupe"]
+    assert result.deliverables[0].production_refs == ("youtube:video:apvUnderOne",)
+    assert {o.deliverable_id for o in result.observations} == {"race-dupe"}
+    assert len({o.observation_id for o in result.observations}) == len(
+        result.observations
+    )
+
+    store = AnalyticsStore(tmp_path / "state")
+    outcome = commit_ingestion(result, store)
+    assert outcome.conflicts == ()
+    assert len(outcome.written) == len(result.observations)
+    stored = store.get("deliverable", "race-dupe")
+    assert "apvLooped1184" not in " ".join(stored.production_refs)
+
+
+def test_the_shipped_registry_maps_each_deliverable_exactly_once():
+    """The guard that matters for the file we actually ship.
+
+    The merge above cannot be caught by the loader, so it is caught here for the
+    one mapping that is company knowledge: three videos, three deliverables, no
+    id used twice.
+    """
+    loaded = load_shipped_assignments()
+    ids = [a.deliverable_id for a in loaded.values()]
+    assert len(ids) == len(set(ids)) == len(CEO_CONFIRMED)
+
+
+@pytest.mark.parametrize(
+    "field,value,fragment",
+    [
+        ("deliverable_id", "Race Test #1", "lowercase"),
+        ("deliverable_id", "race test 1", "lowercase"),
+        ("format_id", "Race Shorts", "lowercase"),
+        ("format_id", "race-short", "lowercase"),
+        ("kind", "reel", "Known kinds"),
+    ],
+)
+def test_an_invalid_identity_is_refused(tmp_path, field, value, fragment):
+    """The same validators an operator file meets. The registry gets no exemption."""
+    entry = {"deliverable_id": "race-test-1", "format_id": "race_short",
+             "kind": "short"}
+    entry[field] = value
+    path = tmp_path / "bad.json"
+    path.write_text(dumps({"dX_0JSqnIUk": entry}), encoding="utf-8")
+    with pytest.raises((ArtifactRejected, AnalyticsError)) as error:
+        loaded = load_shipped_assignments(path)
+        assignment = loaded["dX_0JSqnIUk"]
+        build_deliverable(
+            read_artifact(FIXTURE).videos[0],
+            deliverable_id=assignment.deliverable_id,
+            kind=assignment.kind,
+            format_id=assignment.format_id,
+        )
+    assert fragment in str(error.value)
+
+
+def test_a_missing_registry_is_a_named_refusal_not_a_traceback(tmp_path):
+    with pytest.raises(ArtifactRejected) as error:
+        load_shipped_assignments(tmp_path / "absent.json")
+    assert "cannot read the shipped video assignments" in str(error.value)
+
+
+def test_unreadable_registry_json_is_a_named_refusal(tmp_path):
+    path = tmp_path / "broken.json"
+    path.write_text("{not json", encoding="utf-8")
+    with pytest.raises(ArtifactRejected) as error:
+        load_shipped_assignments(path)
+    assert "not valid JSON" in str(error.value)
+
+
+def test_a_state_directory_never_holds_a_mapping_of_its_own(tmp_path):
+    """The durability rule as a test: identity is tracked, state is not.
+
+    A second editable copy under a state directory is the failure this whole
+    arrangement exists to prevent - the two disagree, and the one that gets
+    edited is whichever the operator happened to have open.
+    """
+    from company.youtube.store import YouTubeEvidenceStore
+
+    evidence = YouTubeEvidenceStore(tmp_path / "state")
+    evidence.append(read_artifact(FIXTURE), ingested_from=str(FIXTURE))
+    result = ingest_artifact(read_artifact(FIXTURE), assignments=ASSIGNMENTS)
+    commit_ingestion(result, AnalyticsStore(tmp_path / "state"))
+    written = {p.name for p in (tmp_path / "state").rglob("*") if p.is_file()}
+    assert "assignments.json" not in written
+    assert "video_assignments.json" not in written
 
 
 # -- finding 3: the assignment workflow -----------------------------------

@@ -34,11 +34,13 @@ from company.analytics import AnalyticsError, AnalyticsStore
 from .artifact import read_artifact
 from .errors import ArtifactRejected
 from .ingest import (
+    DEFAULT_ASSIGNMENTS_PATH,
     assignment_template,
     commit_ingestion,
     describe_artifact,
     ingest_artifact,
     load_assignments,
+    load_shipped_assignments,
     unassigned_videos,
 )
 from .store import YouTubeEvidenceStore
@@ -53,6 +55,18 @@ def _inspect(args: argparse.Namespace) -> int:
     return 0
 
 
+def _assignments_for(path: str | None) -> dict:
+    """The mapping this run should use: an operator's file, or the shipped one.
+
+    Defaulting to the tracked registry is what keeps there being one truth. The
+    alternative - requiring the flag - is how a second assignments file ends up
+    in a state directory and then quietly disagrees with the one in git.
+    """
+    if path:
+        return load_assignments(_read_json(path))
+    return load_shipped_assignments()
+
+
 def _assignments(args: argparse.Namespace) -> int:
     """Print what needs classifying, and write the file to classify it in.
 
@@ -60,9 +74,7 @@ def _assignments(args: argparse.Namespace) -> int:
     that the import is not ready rather than reading a zero as "done".
     """
     artifact = read_artifact(args.artifact)
-    existing = (
-        load_assignments(_read_json(args.assignments)) if args.assignments else {}
-    )
+    existing = _assignments_for(args.assignments) if args.assignments else {}
     pending = unassigned_videos(artifact, existing)
     if not pending:
         print(
@@ -101,8 +113,9 @@ def _ingest(args: argparse.Namespace) -> int:
         return 2
     artifact = read_artifact(args.artifact)
     result = ingest_artifact(
-        artifact, assignments=load_assignments(_read_json(args.assignments))
+        artifact, assignments=_assignments_for(args.assignments)
     )
+    print(f"  mapping     {args.assignments or DEFAULT_ASSIGNMENTS_PATH}")
     print(result.render())
     if not args.commit:
         print(
@@ -172,8 +185,12 @@ def parser() -> argparse.ArgumentParser:
     ingest.add_argument("artifact", help="the artifact file written by the fetcher")
     ingest.add_argument(
         "--assignments",
-        required=True,
-        help="JSON: video id to {deliverable_id, kind, format_id}",
+        help=(
+            "JSON: video id to {deliverable_id, kind, format_id}. Defaults to the "
+            "tracked registry at company/youtube/video_assignments.json, which is "
+            "the canonical mapping; pass a path only to import with a mapping that "
+            "is not yet company knowledge."
+        ),
     )
     ingest.add_argument(
         "--state-dir", help="the analytics state directory to read and append to"
