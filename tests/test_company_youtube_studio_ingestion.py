@@ -1107,21 +1107,22 @@ def test_an_ingested_observation_is_a_plain_metric_observation(export):
     assert all(isinstance(o, MetricObservation) for o in ingest(export).observations)
 
 
-def test_a_snapshot_over_many_observations_of_one_deliverable_is_a_dashboard_defect(tmp_path):
-    """A pre-existing defect in company/dashboard, reproduced without any import.
+def test_a_snapshot_over_many_observations_of_one_deliverable_keeps_them_apart(tmp_path):
+    """Once a defect in company/dashboard, reproduced here without any import.
 
-    `builder._record_id` reads `deliverable_id` before `observation_id`, and a
-    `MetricObservation` carries both - so every observation is keyed by the
-    deliverable it is about, and a second reading of the same video collides.
-    Two hand-built observations are enough to raise it, so it is not something
-    the Studio import introduced; it is what the import will run into as soon as
-    a snapshot is built over real analytics state.
+    `builder._record_id` used to read `deliverable_id` before `observation_id`,
+    and a `MetricObservation` carries both - so every observation was keyed by
+    the deliverable it is about, and a second reading of the same video
+    collided. Two hand-built observations were enough to raise it, so it was
+    never something the Studio import introduced; it was what the import ran
+    into as soon as a snapshot was built over real analytics state.
 
-    Reported rather than fixed: the dashboard is another session's to change.
+    The dashboard now identifies a record by the field its store writes it
+    under, so the readings stay apart. Kept as the import's own guard on the
+    boundary it depends on.
     """
     from company.analytics import observe
-    from company.dashboard import CompanyStatePaths, build_snapshot
-    from company.dashboard.models import DashboardError
+    from company.dashboard import CompanyStatePaths, SourceSubsystem, build_snapshot
 
     paths = CompanyStatePaths.from_root(tmp_path / "company-state")
     store = AnalyticsStore(paths.analytics)
@@ -1133,8 +1134,10 @@ def test_a_snapshot_over_many_observations_of_one_deliverable_is_a_dashboard_def
             observe(f"obs-{name}", deliverable, metric, value, at,
                     a_provenance(), DataScope(population="all viewers"))
         )
-    with pytest.raises(DashboardError, match="duplicate source reference"):
-        build_snapshot(sources=paths, as_of=dt.date(2026, 9, 17), repo_root=REPO_ROOT)
+    snapshot = build_snapshot(sources=paths, as_of=dt.date(2026, 9, 17), repo_root=REPO_ROOT)
+    keys = {r.key for r in snapshot.source_refs
+            if r.subsystem is SourceSubsystem.ANALYTICS and r.kind == "observation"}
+    assert keys == {"analytics:observation:obs-a", "analytics:observation:obs-b"}
 
 
 # --------------------------------------------------------------------------
@@ -1263,3 +1266,59 @@ def test_the_control_plane_dependency_count_is_unchanged(seeds):
 
 def test_the_seed_index_is_still_consistent(seeds):
     assert seeds.integrity() == ()
+
+
+# --------------------------------------------------------------------------
+# Downstream: a real import has to survive the read model
+#
+# Two exports of one video are the ordinary case - a video is read at a day and
+# again three days later - and they produce two observations that share a
+# deliverable_id. The CEO dashboard keys its source references by record
+# identity, so this is the path that broke when it identified an observation by
+# the deliverable it names. Ingestion owns neither the key nor the fix; this
+# proves the pipeline end to end so the boundary cannot regress unnoticed.
+# --------------------------------------------------------------------------
+
+
+def test_two_studio_exports_of_one_video_reach_the_dashboard(tmp_path):
+    from company.analytics.store import AnalyticsStore
+    from company.dashboard import (Availability, CompanyStatePaths, SourceSubsystem,
+                                   build_snapshot)
+
+    paths = CompanyStatePaths.from_root(tmp_path / "company-state")
+    store = AnalyticsStore(paths.analytics)
+    store.put(a_deliverable())
+
+    day_two = totals_csv(tmp_path, TOTALS_TOTAL_ROW, TOTALS_ROW_14, name="day-two.csv")
+    day_five = totals_csv(
+        tmp_path,
+        "Total,,,,71000,590.5,1210000,5.9,0:18,61.4,1510,96,52,120,9,111,17.40",
+        f"{VIDEO_14},Marble race 14,2026-09-08,0:30,69000,580.0,1200000,6.0,0:18,"
+        "60.9,1490,92,50,115,8,107,17.05",
+        name="day-five.csv",
+    )
+    later = EXPORTED_AT + dt.timedelta(days=3)
+    first = ingest(day_two, source_id="ys-2026-09-10")
+    second = ingest(day_five, source_id="ys-2026-09-13", exported_at=later,
+                    imported_at=later + dt.timedelta(minutes=5))
+
+    commit_ingestion(first, store)
+    commit_ingestion(second, store)
+
+    stored = store.list("observation")
+    views = [o for o in stored if o.metric.name == "views"]
+    assert len(views) == 2, "two exports of one video are two readings"
+    assert {o.deliverable_id for o in views} == {"race-short-014"}
+    assert len({o.observation_id for o in views}) == 2
+    assert {o.value for o in views} == {50000.0, 69000.0}
+
+    snapshot = build_snapshot(sources=paths, as_of=dt.date(2026, 9, 17), repo_root=REPO_ROOT)
+
+    refs = [r for r in snapshot.source_refs
+            if r.subsystem is SourceSubsystem.ANALYTICS and r.kind == "observation"]
+    assert len(refs) == len(stored)
+    assert len({r.key for r in refs}) == len(refs), "no reading was collapsed onto another"
+    assert {r.record_id for r in refs} == {o.observation_id for o in stored}
+    assert all(r.record_id.startswith("ys-") for r in refs)
+    assert snapshot.section("analytics").availability is Availability.AVAILABLE
+    assert not snapshot.unresolved_integrity_issues
