@@ -591,11 +591,23 @@ Measured on the base commit and on this branch:
 | `test_race2_v32_final::test_no_locked_file_moved[godot/scripts/race2_scene.gd]` | passes | **fails** | reads `--faces` |
 | `test_race2_v32_final::test_no_locked_file_moved[.../race2_track_surface.gd]` | passes | **fails** | implements `--faces` |
 
-Three new failures, and all three name one of the two files this pass exists to
-change. Everything else in those two suites passes - 174 tests over the eight
-Race #2 files, plus this branch's own 31.
+The whole suite, on this branch: **2944 passed, 345 skipped, 13 failed**. Every
+one of the thirteen was then run again in a worktree checked out at `ab5d516`,
+and **ten of them already failed there**:
+
+| already failing at `ab5d516` | why |
+|---|---|
+| `test_neon_proof::test_a_missing_godot_is_reported_rather_than_raised` | wants `output/neon_v11/neon_7.json`, which is gitignored |
+| `test_race2_v30_stage::test_this_branch_changes_no_physics_camera_or_course_module` | V30's scope test, stale since V30.1 |
+| `test_race2_v301_stage::test_this_branch_changes_no_physics_camera_or_course_module` | V30.1's, stale since V31 |
+| `test_race2_v311_track::test_the_branch_changes_only_render_and_measurement` | V31.1's, stale since V32 |
+| `test_race2_v311_track::test_no_locked_package_moved[race2/]` | the same |
+| `test_sloped_v251_world` x4, `test_sloped_v252_world` x1 | `FileNotFoundError` in `tools/sloped_v251_sites.py:404` - gitignored Race #1 render output |
+
+**Three failures are new, and all three are V32's own assertions about the two
+files this pass exists to change.** Nothing else in the repository moved.
 `tests/test_race2_v321_geometry.py::test_the_branch_changes_only_render_and_measurement`
-is V32.1's version of the same assertion and it is the one that is current.
+is V32.1's version of the same assertion, and it is the one that is current.
 
 ---
 
