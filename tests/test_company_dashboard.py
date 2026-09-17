@@ -355,3 +355,105 @@ def test_system_view_has_no_runtime_validation_cycle(tmp_path):
 def test_cli_model_uses_only_standard_library_and_internal_dependencies():
     requirements = (ROOT / "requirements.txt").read_text(encoding="utf-8")
     assert "dashboard" not in requirements.lower()
+
+
+# --- Record identity -------------------------------------------------------
+#
+# A dashboard source reference is keyed by the record's OWN id. Several
+# canonical records also carry the id of the subject or container they hang
+# off - an observation names its deliverable, a result names its experiment -
+# and identifying a record by that borrowed id collapses every sibling onto one
+# key. Two readings of one video then become one reference, which is both a
+# silent data loss and a hard `duplicate source reference ID(s)` failure.
+
+def _analytics_store(tmp_path: Path):
+    from company.analytics.store import AnalyticsStore
+    return AnalyticsStore(_sources(tmp_path).analytics)
+
+
+def _video(deliverable_id: str = "video-1"):
+    from company.analytics import AnalyzedDeliverable, DeliverableKind
+    return AnalyzedDeliverable(deliverable_id=deliverable_id, kind=DeliverableKind.SHORT,
+                               format_id="race_short",
+                               published_at=dt.datetime(2026, 9, 8, 12, 0, tzinfo=dt.timezone.utc))
+
+
+def _reading(observation_id: str, deliverable, hours: int, value: float):
+    from company.analytics import DataScope, DataSource, Provenance, observe
+    provenance = Provenance(source=DataSource.OWN_STUDIO_EXPORT,
+                            retrieved_by="studio csv export 2026-09-10",
+                            evidence=(_evidence("document", "docs/exports/studio.csv"),))
+    return observe(observation_id, deliverable, "views", value,
+                   deliverable.published_at + dt.timedelta(hours=hours),
+                   provenance, DataScope(population="all viewers"))
+
+
+def test_two_observations_of_one_deliverable_keep_separate_identities(tmp_path):
+    """Two readings of the same video at two times are two sources, not one."""
+    deliverable = _video()
+    first = _reading("obs-video-1-24h", deliverable, 24, 50000.0)
+    second = _reading("obs-video-1-72h", deliverable, 72, 91000.0)
+    assert first.deliverable_id == second.deliverable_id == "video-1"
+    assert first.metric.name == second.metric.name
+    store = _analytics_store(tmp_path)
+    store.put(deliverable)
+    store.put_all((first, second))
+
+    snapshot = _snapshot(tmp_path)
+
+    observations = [ref for ref in snapshot.source_refs
+                    if ref.subsystem is SourceSubsystem.ANALYTICS and ref.kind == "observation"]
+    assert [ref.record_id for ref in observations] == ["obs-video-1-24h", "obs-video-1-72h"]
+    assert len({ref.key for ref in observations}) == 2
+    # The deliverable's own id stays the deliverable's, and is not borrowed.
+    assert "analytics:observation:video-1" not in {ref.key for ref in snapshot.source_refs}
+    assert "analytics:deliverable:video-1" in {ref.key for ref in snapshot.source_refs}
+    # Each reference points at the file the store actually wrote.
+    for ref in observations:
+        assert ref.record_ref.endswith(f"observations/{ref.record_id}.json")
+        assert (_sources(tmp_path).root / ref.record_ref).exists()
+    # Distinct readings keep distinct fingerprints: neither overwrote the other.
+    assert len({ref.fingerprint for ref in observations}) == 2
+    analytics = snapshot.section("analytics")
+    assert analytics.availability is Availability.AVAILABLE
+    assert not snapshot.unresolved_integrity_issues
+    # A reference is a pointer, not a copy of the canonical record.
+    for ref in observations:
+        assert not any(isinstance(value, (dict, list)) for value in ref.to_dict().values())
+        assert "50000" not in ref.to_dict()["fingerprint"]
+
+
+def test_record_identity_matches_every_store_declared_id_field():
+    """`_record_id` must agree with the id field each store writes files under.
+
+    The priority list is a heuristic over field names, so a record type added
+    later with a foreign key can silently take over another kind's identity.
+    This pins the whole ordering to the canonical stores rather than to the one
+    case that was reported.
+    """
+    from company.dashboard.builder import _IDENTITY_FIELDS
+    import company.analytics.store as analytics_store
+    import company.finance.store as finance_store
+    import company.workforce.store as workforce_store
+    import company.org_intelligence.store as org_store
+
+    read_kinds = {
+        analytics_store: ("deliverable", "observation", "experiment", "result", "postmortem",
+                          "learning", "hypothesis", "baseline"),
+        finance_store: ("period", "cost", "cost_adjustment", "revenue", "rate", "labour_rate",
+                        "resource_cost_mapping", "budget", "reusable_investment", "reuse_event",
+                        "spend_proposal", "spend_decision", "financial_recommendation"),
+        workforce_store: ("gap", "proposal", "role", "evaluation", "employment",
+                          "shadow_assignment", "shadow_comparison", "debt"),
+        org_store: ("review", "signal", "finding", "recommendation", "change_proposal",
+                    "experiment", "change_review"),
+    }
+    wrong = []
+    for module, kinds in read_kinds.items():
+        for kind in kinds:
+            _directory, id_field, from_dict = module._KINDS[kind]
+            names = {field.name for field in fields(from_dict.__self__)}
+            picked = next((name for name in _IDENTITY_FIELDS if name in names), None)
+            if picked != id_field:
+                wrong.append(f"{kind}: store writes {id_field}, dashboard picks {picked}")
+    assert wrong == []

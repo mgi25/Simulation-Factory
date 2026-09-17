@@ -681,12 +681,36 @@ def _project_views(results: tuple[_Result, ...]) -> tuple[ProjectView, ...]:
     return tuple(output)
 
 
+# Field names tried, in order, to find a canonical record's own identity.
+#
+# Many records carry the id of the subject or container they hang off as well
+# as their own: an observation names its deliverable, a result names its
+# experiment, a change review names the experiment it reviews. A record must be
+# identified by the field its store writes the file under, so every such
+# record-specific id is listed BEFORE the borrowed one it would otherwise lose
+# to. Reading an observation as its deliverable collapses every reading of one
+# video onto a single reference, which fails the snapshot outright.
+#
+# `test_record_identity_matches_every_store_declared_id_field` pins this order
+# against the `_KINDS` table of each canonical store; add a record type with a
+# foreign key and that test, not a dashboard user, is what notices.
+_IDENTITY_FIELDS = (
+    # finance: the adjustment, the reuse event and the decision each name what
+    # they adjust, reuse and decide on.
+    "period_id", "adjustment_id", "cost_id", "revenue_id", "rate_id", "mapping_id",
+    "budget_id", "event_id", "investment_id", "decision_id", "proposal_id", "recommendation_id",
+    # analytics: observations, results and postmortems all name their subject.
+    "observation_id", "name", "result_id", "postmortem_id", "deliverable_id",
+    "learning_id", "hypothesis_id", "baseline_id",
+    # workforce: the role names its gap, the comparison names its assignment.
+    "role_id", "gap_id", "evaluation_id", "employee_id", "comparison_id", "assignment_id", "debt_id",
+    # organization: the finding names its review, the change review its experiment.
+    "signal_id", "finding_id", "review_id", "experiment_id",
+)
+
+
 def _record_id(record: Any) -> str:
-    for name in ("period_id", "cost_id", "adjustment_id", "revenue_id", "rate_id", "mapping_id",
-                 "budget_id", "investment_id", "event_id", "proposal_id", "decision_id", "recommendation_id",
-                 "deliverable_id", "observation_id", "name", "experiment_id", "result_id", "postmortem_id",
-                 "learning_id", "hypothesis_id", "baseline_id", "gap_id", "role_id", "evaluation_id",
-                 "employee_id", "assignment_id", "comparison_id", "debt_id", "review_id", "signal_id", "finding_id"):
+    for name in _IDENTITY_FIELDS:
         value = getattr(record, name, None)
         if isinstance(value, str) and value:
             return value
