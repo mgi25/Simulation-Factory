@@ -130,6 +130,7 @@ from .rates import (
     RateCard,
     RateUnit,
     UnpricedReason,
+    load_rate_card,
     supersede,
 )
 from .recommendations import (
@@ -147,6 +148,30 @@ from .revenue import (
     basis_mix,
 )
 from .store import FinanceStore, FinanceStoreError
+from .usage_cost import (
+    DESCRIPTIVE_ONLY,
+    RETRY_SEMANTICS,
+    UNPRICED_IS_NOT_FREE,
+    AttributionCommit,
+    AttributionConflict,
+    AttributionScope,
+    ConflictKind,
+    CostableMeasure,
+    CostCompleteness,
+    CostPerAccepted,
+    DogfoodReport,
+    ExpansionCostView,
+    GroupCost,
+    Restatement,
+    UsageCostAttribution,
+    UsageCostAttributionRun,
+    UsageObservation,
+    attribute_usage_costs,
+    commit_attribution_costs,
+    cost_per_accepted_deliverable,
+    dogfood_report,
+    observe_usage,
+)
 
 __all__ = [
     # money and periods
@@ -198,6 +223,30 @@ __all__ = [
     "price_all",
     "mappings_from_usage",
     "mappings_from_research_resource",
+    "load_rate_card",
+    # usage cost attribution: the bridge from a measured attempt to a cost
+    "UsageObservation",
+    "observe_usage",
+    "UsageCostAttribution",
+    "UsageCostAttributionRun",
+    "AttributionConflict",
+    "ConflictKind",
+    "CostableMeasure",
+    "CostCompleteness",
+    "AttributionScope",
+    "GroupCost",
+    "ExpansionCostView",
+    "attribute_usage_costs",
+    "CostPerAccepted",
+    "cost_per_accepted_deliverable",
+    "AttributionCommit",
+    "Restatement",
+    "commit_attribution_costs",
+    "DogfoodReport",
+    "dogfood_report",
+    "DESCRIPTIVE_ONLY",
+    "RETRY_SEMANTICS",
+    "UNPRICED_IS_NOT_FREE",
     # budgets
     "BudgetLine",
     "BudgetConsumption",
