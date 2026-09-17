@@ -52,6 +52,7 @@ from company.runtime.state_paths import (
     sorted_records,
 )
 
+from .api_source import ApiArtifactSource
 from .baseline import FormatBaseline
 from .deliverable import AnalyzedDeliverable
 from .errors import AnalyticsError, LedgerViolation
@@ -87,6 +88,10 @@ _KINDS: dict[str, tuple[str, str, Callable[..., Any]]] = {
     # declared to cover. A document about readings rather than a reading, so it
     # is stored beside them and stays out of the event ledger.
     "studio_source": ("studio_sources", "source_id", StudioExportSource.from_dict),
+    # The API pull an import came off: which window, which digest of what was
+    # reported, under which grant. The same kind of document as a studio source
+    # and stored the same way - beside the readings, out of the event ledger.
+    "api_source": ("api_sources", "source_id", ApiArtifactSource.from_dict),
 }
 
 _KIND_BY_TYPE: dict[type, str] = {
@@ -100,6 +105,7 @@ _KIND_BY_TYPE: dict[type, str] = {
     AnalyticsHypothesis: "hypothesis",
     FormatBaseline: "baseline",
     StudioExportSource: "studio_source",
+    ApiArtifactSource: "api_source",
 }
 
 # Kinds mirrored into the event ledger. Just the one: an observation is the

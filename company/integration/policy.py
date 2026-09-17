@@ -40,7 +40,7 @@ from .errors import PolicyError
 from .model import GateCheck, GateStatus
 
 
-POLICY_VERSION = 2
+POLICY_VERSION = 1
 
 
 REQUIRED_CHECKS = frozenset(
@@ -82,7 +82,7 @@ REQUIRED_CHECKS = frozenset(
         "health.required_suites_pass",
         "health.sources_parse",
         "health.no_new_dependency",
-        "health.no_unreviewed_network_or_model_dependency",
+        "health.no_network_or_model_dependency",
         # Production boundary: nothing here can publish, mutate or delete.
         "production.no_publishing_capability",
         "production.no_automatic_production_mutation",

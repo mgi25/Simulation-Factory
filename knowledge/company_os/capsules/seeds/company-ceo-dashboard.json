@@ -8,12 +8,12 @@
   "created": "2026-09-17",
   "decisions": [],
   "dependencies": [
+    "company-analytics-experiments",
     "company-finance",
     "company-organizational-intelligence",
     "company-production-integration-gate",
     "company-research-operations",
     "company-runtime",
-    "company-workforce-capabilities",
     "company-workforce-employment",
     "company-youtube-connectivity"
   ],
@@ -41,7 +41,6 @@
     "company/runtime/**",
     "company/finance/**",
     "company/analytics/**",
-    "company/youtube/**",
     "company/org_intelligence/**",
     "company/workforce/**",
     "intelligence/research/**",

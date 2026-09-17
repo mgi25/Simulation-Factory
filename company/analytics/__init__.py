@@ -67,6 +67,13 @@ Nothing here imports production, and no production module imports this.
 Standard library only.
 """
 
+from .api_source import (
+    API_ARTIFACT_PARSER_VERSION,
+    EVIDENCE_NOTE,
+    ApiArtifactSource,
+    artifact_evidence,
+    source_id_for,
+)
 from .baseline import (
     FormatBaseline,
     MetricSummary,
@@ -197,6 +204,7 @@ from .windows import (
 
 __all__ = [
     "ALL_DIMENSIONS",
+    "API_ARTIFACT_PARSER_VERSION",
     "ASSOCIATION_NOTE",
     "AgeWindow",
     "AnalyticsError",
@@ -207,6 +215,7 @@ __all__ = [
     "AnalyticsStore",
     "AnalyticsStoreError",
     "AnalyzedDeliverable",
+    "ApiArtifactSource",
     "COMMA_DECIMAL",
     "CONSTRUCTION_ENFORCED",
     "CausalAssessment",
@@ -227,6 +236,7 @@ __all__ = [
     "Direction",
     "EN_US_GROUPED",
     "EURO_GROUPED",
+    "EVIDENCE_NOTE",
     "EvidenceRequired",
     "EvidenceStrength",
     "ExecutionRecordKind",
@@ -293,6 +303,7 @@ __all__ = [
     "Variable",
     "Verdict",
     "VideoIdentityMapping",
+    "artifact_evidence",
     "assert_integrity",
     "build_baseline",
     "build_report",
@@ -311,6 +322,7 @@ __all__ = [
     "promote",
     "read_export",
     "recognise_schema",
+    "source_id_for",
     "standard_age_window",
     "summarise_metric",
 ]
