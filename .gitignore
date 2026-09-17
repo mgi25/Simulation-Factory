@@ -43,3 +43,15 @@ desktop.ini
 # state directory is always supplied by the caller, and none of it belongs in
 # the branch.
 state/
+
+# Local credentials and OAuth state. Examples may be committed explicitly;
+# real client files, environment files, and grants may not.
+.env
+.env.*
+!.env.example
+.secrets/
+.company-os/
+client_secret*.json
+youtube-client*.json
+youtube-token*.json
+token.json

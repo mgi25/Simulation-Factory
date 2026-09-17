@@ -89,7 +89,7 @@ that into a pass takes a named reporter and a dated run.
 | `finance` | no autonomous spend approval; recurring paid API spend reserved; unknown is not zero | — |
 | `analytics` | causal overclaim refused; learning requires results; competitor private metrics unavailable | — |
 | `executive` | dashboard available; missing and stale evidence visible; dashboard cannot approve | decision queue preserves source refs |
-| `health` | required suites pass; sources parse; no new dependency; no network or model dependency | production failures separated |
+| `health` | required suites pass; sources parse; no new dependency; no model dependency; network confined to the reviewed read-only YouTube connector | production failures separated |
 | `production` | no publishing capability; no automatic production mutation; no production delete authority; integration remains disabled |  — |
 
 The rule for the split is written into `policy.py`: **required** if the
@@ -191,9 +191,10 @@ Three calibration decisions:
   blocker on a string method would make the whole gate ignorable.
 
 What this cannot see is a production path assembled at runtime from variables.
-Three other required conditions cover that case — no network, no process
-spawn, no delete — which together mean a Company OS module cannot publish,
-shell out or destroy regardless of what path it computes.
+Three other required conditions cover that case — network confined to the
+reviewed connector with no YouTube write scope or endpoint, no process spawn,
+and no delete — which together mean a Company OS module cannot publish, shell
+out or destroy regardless of what path it computes.
 
 ## Production roots
 

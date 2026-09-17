@@ -68,6 +68,7 @@ from .sources import (
     SourceModule,
     absent_production_roots,
     company_os_roots,
+    module_imports,
     parse_tree,
     production_files,
     production_roots,
@@ -1104,25 +1105,31 @@ def _new_dependency(inputs, scan, index, config) -> GateCheck:
 
 
 def _network_or_model(inputs, scan, index, config) -> GateCheck:
-    findings = forbidden_import_violations(
-        scan.company_modules,
-        NETWORK_MODULES | MODEL_MODULES,
-        "Company OS is deterministic and offline; a network or model client here is "
-        "an unbudgeted external call",
+    findings = tuple(
+        list(
+            forbidden_import_violations(
+                scan.company_modules,
+                MODEL_MODULES,
+                "Company OS may not embed a model client",
+            )
+        )
+        + list(_unapproved_network_imports(scan.company_modules))
+        + list(_youtube_write_capability(scan.company_modules))
     )
     return _from_findings(
-        "health.no_network_or_model_dependency",
+        "health.no_unreviewed_network_or_model_dependency",
         GateCategory.TEST_BUILD_HEALTH,
-        "No Company OS module imports a network client or a model SDK. The control "
-        "plane is deterministic code (constitution rule 4) and reaches nothing.",
+        "Company OS imports no model client and no network client outside the reviewed "
+        "read-only YouTube connector; that connector carries no YouTube write scope or "
+        "write endpoint.",
         findings,
         clean_detail=(
-            f"{len(scan.company_modules)} Company OS modules import none of "
-            f"{len(NETWORK_MODULES | MODEL_MODULES)} network or model roots"
+            f"{len(scan.company_modules)} Company OS modules keep networking confined "
+            "to company/youtube and expose no YouTube write capability"
         ),
         remediation=(
-            "Remove the client. Research ingestion takes supplied snapshots; it does "
-            "not fetch them."
+            "Remove the client or write capability. External reads belong only in the "
+            "reviewed company/youtube boundary; publishing remains elsewhere."
         ),
         as_of=inputs.as_of,
     )
@@ -1134,23 +1141,21 @@ def _network_or_model(inputs, scan, index, config) -> GateCheck:
 def _no_publishing(inputs, scan, index, config) -> GateCheck:
     findings = tuple(
         list(
-            forbidden_import_violations(
-                scan.company_modules,
-                NETWORK_MODULES,
-                "publishing needs a network, and no Company OS module may have one",
-            )
+            _unapproved_network_imports(scan.company_modules)
         )
         + list(process_spawn_violations(scan.company_modules))
+        + list(_youtube_write_capability(scan.company_modules))
     )
     return _from_findings(
         "production.no_publishing_capability",
         GateCategory.PRODUCTION_BOUNDARY,
-        "No Company OS module can publish: it opens no socket and spawns no process. "
-        "publish_public_video is CEO-reserved, and a shell would be a way around that.",
+        "No Company OS module can publish: the only network boundary is a reviewed "
+        "read-only YouTube connector, and no module spawns a process. "
+        "publish_public_video is CEO-reserved.",
         tuple(sorted(findings, key=lambda item: (item.path, item.line))),
         clean_detail=(
-            "no network import and no process spawn anywhere in "
-            f"{len(scan.company_modules)} Company OS modules"
+            "network imports are confined to the read-only YouTube connector, with no "
+            f"write capability or process spawn in {len(scan.company_modules)} modules"
         ),
         remediation=(
             "Remove the capability. A publish is a CEO decision carried out elsewhere, "
@@ -1159,6 +1164,58 @@ def _no_publishing(inputs, scan, index, config) -> GateCheck:
         evidence=("company/permissions.yaml",),
         as_of=inputs.as_of,
     )
+
+
+_YOUTUBE_CONNECTOR_PREFIX = "company/youtube/"
+_YOUTUBE_NETWORK_ROOTS = frozenset({"http", "urllib", "webbrowser"})
+_YOUTUBE_WRITE_MARKERS = frozenset(
+    {
+        "https://www.googleapis.com/auth/youtube.upload",
+        "https://www.googleapis.com/auth/youtube.force-ssl",
+        "videos.insert",
+        "videos.update",
+        "videos.delete",
+        "playlistItems.insert",
+        "playlistItems.update",
+        "playlistItems.delete",
+    }
+)
+
+
+def _unapproved_network_imports(modules):
+    """Allow only the stdlib roots used by the reviewed read-only connector."""
+    findings = []
+    for module in modules:
+        for ref in module_imports(module):
+            if ref.root not in NETWORK_MODULES:
+                continue
+            if module.path.startswith(_YOUTUBE_CONNECTOR_PREFIX) and ref.root in _YOUTUBE_NETWORK_ROOTS:
+                continue
+            findings.append(
+                Finding(
+                    module.path,
+                    ref.line,
+                    f"imports {ref.module!r}: network access is allowed only in the reviewed read-only YouTube connector",
+                )
+            )
+    return tuple(sorted(findings, key=lambda item: (item.path, item.line)))
+
+
+def _youtube_write_capability(modules):
+    """Reject scopes and endpoint names that would let the connector mutate YouTube."""
+    findings = []
+    for module in modules:
+        if not module.path.startswith(_YOUTUBE_CONNECTOR_PREFIX):
+            continue
+        for node in ast.walk(module.tree):
+            if not isinstance(node, ast.Constant) or not isinstance(node.value, str):
+                continue
+            marker = next((item for item in _YOUTUBE_WRITE_MARKERS if item in node.value), None)
+            if marker:
+                findings.append(
+                    Finding(module.path, node.lineno, f"contains YouTube write capability marker {marker!r}")
+                )
+    return tuple(sorted(findings, key=lambda item: (item.path, item.line)))
 
 
 def _no_production_mutation(inputs, scan, index, config) -> GateCheck:

@@ -1,0 +1,75 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "youtube_oauth_authorization",
+    "youtube_channel_evidence",
+    "youtube_video_evidence",
+    "youtube_analytics_evidence"
+  ],
+  "created": "2026-09-17",
+  "decisions": [],
+  "dependencies": [
+    "company-analytics-experiments",
+    "company-runtime"
+  ],
+  "experiment_learnings": [],
+  "facts": [],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-youtube-connectivity",
+  "inputs": [
+    "A local Google OAuth client configuration supplied by environment or an ignored credential file",
+    "A current-user refresh grant protected outside Git",
+    "An explicit inclusive date range and optional YouTube video id"
+  ],
+  "invariants": [
+    "The default scopes are youtube.readonly and yt-analytics.readonly; the monetary read scope is opt-in and no write scope exists.",
+    "Access tokens remain in memory and refresh tokens are protected locally; neither appears in logs, errors, evidence, or telemetry.",
+    "Provider responses and normalized evidence are distinct fields in an append-only caller-supplied Company OS state directory.",
+    "Unavailable metrics remain unavailable and are never normalized to zero.",
+    "Every API call records endpoint without query, result status, latency, response size, and failure kind without request headers or bodies.",
+    "Only explicit per-video evidence can cross into the analytics observation store, with operator-supplied deliverable kind and format."
+  ],
+  "last_reviewed": "2026-09-17",
+  "may_read": [
+    "company/analytics/**",
+    "company/efficiency/**",
+    "company/runtime/state_paths.py",
+    "knowledge/company_os/records.py"
+  ],
+  "may_write": [
+    "company/youtube/**"
+  ],
+  "must_not_modify": [
+    "production/**",
+    "sloped/**",
+    "race2/**",
+    "tools/**"
+  ],
+  "outputs": [
+    "ChannelEvidence and VideoEvidence from YouTube Data API v3",
+    "AnalyticsEvidence with explicit unavailable metrics from YouTube Analytics API v2",
+    "Append-only raw/normalized evidence envelopes and optional MetricObservation records",
+    "Secret-free API call telemetry"
+  ],
+  "owner": "company-os",
+  "owns_paths": [
+    "company/youtube"
+  ],
+  "purpose": "Obtains continued read-only access to the company's own YouTube channel, turns Data and Analytics API responses into traceable evidence, and bridges explicit per-video readings into the existing analytics ledger.",
+  "recheck_on": "2027-09-17",
+  "revalidation_reason": "",
+  "risks": [
+    "Google can revoke a refresh grant or change metric availability; both become explicit authorization or unavailable-evidence outcomes.",
+    "YouTube subscriber counts can be hidden or rounded and analytics data can be delayed or revised.",
+    "A local OAuth client secret remains the operator's responsibility and must stay outside Git."
+  ],
+  "source": "company-os-v1-youtube-connectivity",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_youtube_connectivity.py"
+  ],
+  "title": "Read-only YouTube connectivity",
+  "type": "module"
+}
