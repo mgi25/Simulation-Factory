@@ -126,13 +126,18 @@ def _round(v: Sequence[float], places: int = 5) -> list[float]:
 
 @dataclass(frozen=True)
 class Palette:
-    """Which `lab_palette` key each part of a bookend is painted with.
+    """Which renderer material key each part of a bookend is painted with.
 
     A dataclass rather than a dict so a caller that wants a different machine
     language names the surfaces it is changing and inherits the rest. Every
-    value must be a key `lab_palette.get_material` answers; the Godot side
-    fails loudly on one that is not, because a silently-defaulted material is
-    the sort of thing that only shows up in a delivered frame.
+    value must be a key the renderer's palette answers; the builder fails
+    loudly on one that is not, because a silently-defaulted material is the
+    sort of thing that only shows up in a delivered frame.
+
+    The keys are *strings that travel through JSON*, and that is the whole
+    isolation story: nothing in this package imports, reads or knows about the
+    palette itself, which `tests/test_race2_isolation.py` asserts over the
+    source of every module in `race2/`.
     """
 
     base: str = "graphite"          # the plinth and the foundations
