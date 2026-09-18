@@ -1252,6 +1252,28 @@ def test_a_job_cannot_carry_more_attempts_than_the_work_order_allows(tmp_path):
         replace(job, developer_attempts=order.max_developer_attempts + 1)
 
 
+def test_blocked_attempts_increments_on_blocked_transition_only(tmp_path):
+    order = _order(tmp_path)
+    job = EngineeringJob.open(order, on=DAY)
+    assert job.blocked_attempts == 0
+
+    # Advance through planning without hitting BLOCKED; counter stays at zero.
+    planning = job.advance(JobState.PLANNING, on=DAY, reason="planning started")
+    assert planning.blocked_attempts == 0
+
+    # Transition into BLOCKED increments by exactly one.
+    blocked = planning.advance(JobState.BLOCKED, on=DAY, reason="authority scope violation")
+    assert blocked.blocked_attempts == 1
+
+    # Leaving BLOCKED for planning does not increment again.
+    back = blocked.advance(JobState.PLANNING, on=DAY, reason="unblocked")
+    assert back.blocked_attempts == 1
+
+    # A second BLOCKED transition increments again.
+    blocked2 = back.advance(JobState.BLOCKED, on=DAY, reason="blocked again")
+    assert blocked2.blocked_attempts == 2
+
+
 def test_the_state_machine_has_no_unbounded_loop():
     """Every cycle in the machine passes through `developing`, which is bounded."""
     for state, targets in ALLOWED_TRANSITIONS.items():
