@@ -39,7 +39,7 @@ from typing import Any, Sequence
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, REPO)
 
-from race2 import bookends, courses, opening
+from race2 import bookends, courses, kit, opening
 
 COURSE = "switchyard"
 SEED = 8
@@ -134,17 +134,20 @@ def stage_field(args) -> dict[str, Any]:
     """Where the field is after the line, in the finish site's own frame.
 
     **This is a measurement and it is the reason the finish stand is shaped the
-    way it is.** `race2.parts.RunOut` converts a `TrackRun.heading_deg` - which
-    is `atan2(x, z)` - through `race2.kit.Frame.yaw`'s inverse, which is the
-    inverse of `atan2(-z, x)`. The two differ by 90 degrees, so Race #2's
-    run-out deck is laid *across* the direction of travel: its fall drains the
-    field sideways and its near edge is the racing line itself. The
-    consequences are in the report this stage writes, and the finish stand is
-    sited on the report rather than on the plan.
+    way it is.** The stand is sited on where the racers demonstrably end up
+    rather than on where the course plan says they should, and
+    `_runout_alignment` reports how far the run-out deck is turned away from
+    the direction of travel, so that a reader knows which of the two they are
+    looking at.
 
-    The physics is locked, so none of that is fixed here. It is measured, the
-    scenery is put where the racers actually are, and the defect is written
-    down for whoever opens Race #3.
+    When V33 ran this, the answer was ninety degrees: `race2.parts.RunOut`
+    converted a `TrackRun.heading_deg` - `atan2(x, z)` - through
+    `race2.kit.Frame.yaw`'s inverse - `atan2(-z, x)` - so the deck was laid
+    *across* the track, its fall drained the field sideways and its near edge
+    was the racing line itself. V33 measured that and shaped the stand around
+    it rather than fixing it, because its brief locked the physics. V33.1's
+    brief did not, and `docs/race2_v331_runout_fix.md` is the repair; on this
+    branch the same stage reports zero.
     """
     _geometry, replay_path, _cameras = _paths()
     course = courses.build(COURSE)
@@ -377,15 +380,7 @@ def stage_field(args) -> dict[str, Any]:
         "deck": deck_report,
         "well": well,
         "unsupported_frames": unsupported,
-        "finding": {
-            "runout_yaw_error_deg": 90.0,
-            "note": "race2.parts.RunOut reads TrackRun.heading_deg "
-                    "(atan2(x, z)) through Frame.yaw's inverse "
-                    "(atan2(-z, x)); the deck is laid across the travel "
-                    "direction. Physics is locked, so this is measured, "
-                    "not fixed.",
-            "racers_frozen_off_the_deck": [r["id"] for r in below],
-        },
+        "finding": _runout_alignment(course, below),
     }
     _write(FIELD, report)
     print(f"field: {len(crossing)}/{racers} crossings, envelope along "
@@ -431,6 +426,35 @@ def field_from_report(report: dict[str, Any]) -> bookends.Field:
         sight_along=tuple(sight["along"]) if sight else None,
         sight_across=tuple(sight["across"]) if sight else None,
     )
+
+
+def _runout_alignment(course, below) -> dict[str, Any]:
+    """How far the run-out deck is turned away from the direction of travel.
+
+    **Measured, not asserted.** This block used to carry a hard-coded 90.0 and
+    a note saying the deck was laid across the track, which was true when V33
+    measured it and false the moment V33.1 repaired it. A finding that cannot
+    come back clean is not a finding, so the angle is read off the built module
+    and the note follows from it - the same stage now reports the defect on a
+    branch that has it and reports zero on one that does not.
+    """
+    run = course.runs["sprint"]
+    deck = course.machine.modules["runout"]
+    tangent = kit.flat_forward(run.tangents[len(run.path) - 1])
+    dot = sum(tangent[axis] * deck.forward[axis] for axis in range(3))
+    cross_y = tangent[2] * deck.forward[0] - tangent[0] * deck.forward[2]
+    error = math.degrees(math.atan2(cross_y, dot))
+    aligned = abs(error) < 1.0e-6
+    return {
+        "runout_yaw_error_deg": round(error, 9),
+        "aligned": aligned,
+        "note": ("the run-out deck's forward axis is the sprint's own exit "
+                 "tangent" if aligned else
+                 "race2.parts.RunOut reads TrackRun.heading_deg (atan2(x, z)) "
+                 "through Frame.yaw's inverse (atan2(-z, x)); the deck is laid "
+                 "across the travel direction"),
+        "racers_frozen_off_the_deck": [r["id"] for r in below],
+    }
 
 
 def stage_spec(args) -> dict[str, Any]:

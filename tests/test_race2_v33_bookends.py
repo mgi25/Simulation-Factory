@@ -326,7 +326,14 @@ def test_the_finish_stand_exists(spec):
     assert {"leg_left", "leg_right", "gantry_header"} <= names, "a gantry"
     assert any(name.startswith("plaza_") for name in names), "a run-out"
     assert "plaza_end_front" in names, "something to stop against"
-    assert "well_floor" in names, "a pocket for the racers the deck drops"
+    # **The pocket is conditional, and its condition was a defect.** V33 built
+    # `well_*` to dress the hole its run-out dropped the field into. V33.1
+    # repaired the run-out, the same measurement returned `Field.well_* = None`
+    # because there is no longer a hole, and the five parts are not built. So
+    # this asks for a pocket only where there is one - a half-built pocket is
+    # still a bug - and for the receiving deck always.
+    if any(name.startswith("well_") for name in names):
+        assert "well_floor" in names, "a pocket with no floor in it"
     assert stand["meta"]["gantry_rise"] > 3.0
 
 
@@ -351,7 +358,22 @@ def test_no_bookend_part_stands_where_a_racer_goes(spec, points):
     at some frame. The finish line's inlay and the plaza's surfacing declare
     `touch` because a racer is supposed to be in contact with them, and those
     are the only exemptions.
+
+    **The spec and the replay have to be a matched pair.** The plaza is sited
+    on where the field is *measured* to end up, so a spec built for one replay
+    says nothing about another. Without V33's own built bookends on disk the
+    `spec` fixture falls back to a live `bookends.build(course)`, which carries
+    `Field`'s defaults rather than V33's measurement - and on a branch that has
+    moved the run-out, comparing that against V33's recorded trajectories puts
+    the new plaza where the old racers fell. The other tests on this fixture
+    ask questions about the stand's own shape and are fine with the fallback;
+    this one is not, so it says so instead of reporting a collision that
+    neither build has. V33.1's own suite makes the same check on its own pair.
     """
+    if not os.path.isfile(SPEC):
+        pytest.skip("V33's built bookends are not on disk, so the spec and the "
+                    "replay are not a matched pair; run "
+                    "`python tools/race2_v33_bookends.py spec` first")
     gaps = bookends.clearance(spec, points)
     for key, entry in gaps.items():
         assert entry["inside_a_racer"] == [], (key, entry["inside_a_racer"])
@@ -374,13 +396,21 @@ def test_the_well_is_where_the_racers_actually_fall():
         assert record["up"] - bookends.MARBLE_RADIUS >= well["floor"] - 0.06
 
 
-def test_the_run_out_deck_defect_is_recorded_not_fixed(course):
-    """`race2.parts.RunOut` is rotated 90 degrees, and must stay that way here.
+def test_the_run_out_deck_points_along_the_direction_of_travel(course):
+    """`race2.parts.RunOut` faces the way the sprint exits.
 
-    The physics is locked, so the defect is measured and the scenery is sited
-    around it. This test fails if somebody fixes the module - which would be
-    the right fix in a branch that is allowed to move the race, and is not this
-    one.
+    **This assertion used to be the other way round.** V33 wrote it as
+    `test_the_run_out_deck_defect_is_recorded_not_fixed` and asserted
+    `abs(dot) < 1e-6` - that the deck is *square* to the direction of travel -
+    because the module was rotated ninety degrees by a yaw-convention mix-up,
+    V33's brief locked the physics, and the finish stand was sited on the
+    measured wreckage rather than on the plan. Its docstring said so: "this
+    test fails if somebody fixes the module, which would be the right fix in a
+    branch that is allowed to move the race, and is not this one."
+
+    V33.1 was that branch. `docs/race2_v331_runout_fix.md` has the repair, and
+    the assertion is inverted rather than deleted so that the history of the
+    claim stays attached to it.
     """
     run = course.runs["sprint"]
     module = course.machine.modules["runout"]
@@ -389,9 +419,10 @@ def test_the_run_out_deck_defect_is_recorded_not_fixed(course):
     length = math.hypot(tangent[0], tangent[2]) or 1.0
     travel = (tangent[0] / length, 0.0, tangent[2] / length)
     dot = travel[0] * module.forward[0] + travel[2] * module.forward[2]
-    assert abs(dot) < 1.0e-6, (
-        "RunOut.forward is no longer square to the direction of travel; the "
-        "run-out has been re-sited and the V33 finish stand must be re-measured")
+    assert abs(dot - 1.0) < 1.0e-6, (
+        "RunOut.forward is not the sprint's own exit tangent; the deck is "
+        "turned away from the direction of travel by "
+        f"{math.degrees(math.acos(max(-1.0, min(1.0, dot)))):.3f} degrees")
 
 
 # --- the two projections agree ----------------------------------------------

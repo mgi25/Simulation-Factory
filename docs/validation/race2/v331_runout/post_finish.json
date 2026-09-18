@@ -1,0 +1,392 @@
+{
+ "by_build": {
+  "v33": {
+   "frozen": [
+    1,
+    7
+   ],
+   "frozen_frames": 367,
+   "racers": [
+    {
+     "crossing_frame": 1063,
+     "final_local": [
+      3.5758,
+      0.2072,
+      -3.1716
+     ],
+     "final_speed": 11.2344,
+     "forward_travel": 5.2103,
+     "frames_after_crossing": 87,
+     "frames_on_deck": 37,
+     "frames_outside_the_deck": 50,
+     "frames_supported": 12,
+     "frozen_frames": 0,
+     "frozen_from_frame": null,
+     "id": 0,
+     "still_moving_at_the_last_frame": true
+    },
+    {
+     "crossing_frame": 968,
+     "final_local": [
+      3.1598,
+      -1.2682,
+      -0.1059
+     ],
+     "final_speed": 0.0,
+     "forward_travel": 3.1598,
+     "frames_after_crossing": 182,
+     "frames_on_deck": 182,
+     "frames_outside_the_deck": 0,
+     "frames_supported": 0,
+     "frozen_frames": 174,
+     "frozen_from_frame": 975,
+     "id": 1,
+     "still_moving_at_the_last_frame": false
+    },
+    {
+     "crossing_frame": 953,
+     "final_local": [
+      -4.3264,
+      0.0916,
+      -7.915
+     ],
+     "final_speed": 4.7248,
+     "forward_travel": 5.1657,
+     "frames_after_crossing": 197,
+     "frames_on_deck": 51,
+     "frames_outside_the_deck": 146,
+     "frames_supported": 19,
+     "frozen_frames": 0,
+     "frozen_from_frame": null,
+     "id": 2,
+     "still_moving_at_the_last_frame": true
+    },
+    {
+     "crossing_frame": 1032,
+     "final_local": [
+      0.273,
+      0.1413,
+      -5.8813
+     ],
+     "final_speed": 9.5096,
+     "forward_travel": 5.2212,
+     "frames_after_crossing": 118,
+     "frames_on_deck": 88,
+     "frames_outside_the_deck": 30,
+     "frames_supported": 28,
+     "frozen_frames": 0,
+     "frozen_from_frame": null,
+     "id": 3,
+     "still_moving_at_the_last_frame": true
+    },
+    {
+     "crossing_frame": 1125,
+     "final_local": [
+      4.5109,
+      -0.7128,
+      0.7742
+     ],
+     "final_speed": 31.102,
+     "forward_travel": 5.2666,
+     "frames_after_crossing": 25,
+     "frames_on_deck": 9,
+     "frames_outside_the_deck": 16,
+     "frames_supported": 2,
+     "frozen_frames": 0,
+     "frozen_from_frame": null,
+     "id": 4,
+     "still_moving_at_the_last_frame": true
+    },
+    {
+     "crossing_frame": 995,
+     "final_local": [
+      -1.4387,
+      0.0944,
+      -7.7953
+     ],
+     "final_speed": 4.2598,
+     "forward_travel": 5.2154,
+     "frames_after_crossing": 155,
+     "frames_on_deck": 65,
+     "frames_outside_the_deck": 90,
+     "frames_supported": 25,
+     "frozen_frames": 0,
+     "frozen_from_frame": null,
+     "id": 5,
+     "still_moving_at_the_last_frame": true
+    },
+    {
+     "crossing_frame": 1069,
+     "final_local": [
+      4.2809,
+      0.0941,
+      -7.8144
+     ],
+     "final_speed": 3.5818,
+     "forward_travel": 5.2077,
+     "frames_after_crossing": 81,
+     "frames_on_deck": 11,
+     "frames_outside_the_deck": 70,
+     "frames_supported": 4,
+     "frozen_frames": 0,
+     "frozen_from_frame": null,
+     "id": 6,
+     "still_moving_at_the_last_frame": true
+    },
+    {
+     "crossing_frame": 949,
+     "final_local": [
+      2.8634,
+      -1.2317,
+      0.7302
+     ],
+     "final_speed": 0.0,
+     "forward_travel": 2.8634,
+     "frames_after_crossing": 201,
+     "frames_on_deck": 201,
+     "frames_outside_the_deck": 0,
+     "frames_supported": 0,
+     "frozen_frames": 193,
+     "frozen_from_frame": 956,
+     "id": 7,
+     "still_moving_at_the_last_frame": false
+    }
+   ],
+   "retired": [
+    {
+     "id": 7,
+     "kind": "escaped",
+     "t": 15.929167
+    },
+    {
+     "id": 1,
+     "kind": "escaped",
+     "t": 16.2375
+    },
+    {
+     "id": 4,
+     "kind": "escaped",
+     "t": 19.179167
+    }
+   ],
+   "unsupported_frames": 402
+  },
+  "v331": {
+   "frozen": [],
+   "frozen_frames": 0,
+   "racers": [
+    {
+     "crossing_frame": 1063,
+     "final_local": [
+      2.9071,
+      0.2127,
+      0.9317
+     ],
+     "final_speed": 8.7373,
+     "forward_travel": 3.0044,
+     "frames_after_crossing": 87,
+     "frames_on_deck": 87,
+     "frames_outside_the_deck": 0,
+     "frames_supported": 80,
+     "frozen_frames": 0,
+     "frozen_from_frame": null,
+     "id": 0,
+     "still_moving_at_the_last_frame": true
+    },
+    {
+     "crossing_frame": 968,
+     "final_local": [
+      2.9136,
+      0.2139,
+      -4.0507
+     ],
+     "final_speed": 0.1389,
+     "forward_travel": 2.92,
+     "frames_after_crossing": 182,
+     "frames_on_deck": 182,
+     "frames_outside_the_deck": 0,
+     "frames_supported": 164,
+     "frozen_frames": 0,
+     "frozen_from_frame": null,
+     "id": 1,
+     "still_moving_at_the_last_frame": true
+    },
+    {
+     "crossing_frame": 953,
+     "final_local": [
+      2.915,
+      0.2138,
+      -4.6299
+     ],
+     "final_speed": 1.3973,
+     "forward_travel": 2.935,
+     "frames_after_crossing": 197,
+     "frames_on_deck": 197,
+     "frames_outside_the_deck": 0,
+     "frames_supported": 187,
+     "frozen_frames": 0,
+     "frozen_from_frame": null,
+     "id": 2,
+     "still_moving_at_the_last_frame": true
+    },
+    {
+     "crossing_frame": 1032,
+     "final_local": [
+      2.0855,
+      0.2338,
+      -4.2322
+     ],
+     "final_speed": 7.2403,
+     "forward_travel": 2.902,
+     "frames_after_crossing": 118,
+     "frames_on_deck": 118,
+     "frames_outside_the_deck": 0,
+     "frames_supported": 107,
+     "frozen_frames": 0,
+     "frozen_from_frame": null,
+     "id": 3,
+     "still_moving_at_the_last_frame": true
+    },
+    {
+     "crossing_frame": 1125,
+     "final_local": [
+      2.5042,
+      0.2224,
+      -3.6391
+     ],
+     "final_speed": 3.2718,
+     "forward_travel": 2.9396,
+     "frames_after_crossing": 25,
+     "frames_on_deck": 25,
+     "frames_outside_the_deck": 0,
+     "frames_supported": 12,
+     "frozen_frames": 0,
+     "frozen_from_frame": null,
+     "id": 4,
+     "still_moving_at_the_last_frame": true
+    },
+    {
+     "crossing_frame": 995,
+     "final_local": [
+      2.0577,
+      0.2348,
+      -5.1315
+     ],
+     "final_speed": 0.9367,
+     "forward_travel": 2.949,
+     "frames_after_crossing": 155,
+     "frames_on_deck": 155,
+     "frames_outside_the_deck": 0,
+     "frames_supported": 144,
+     "frozen_frames": 0,
+     "frozen_from_frame": null,
+     "id": 5,
+     "still_moving_at_the_last_frame": true
+    },
+    {
+     "crossing_frame": 1069,
+     "final_local": [
+      2.8745,
+      0.2148,
+      4.1437
+     ],
+     "final_speed": 5.4007,
+     "forward_travel": 2.9119,
+     "frames_after_crossing": 81,
+     "frames_on_deck": 81,
+     "frames_outside_the_deck": 0,
+     "frames_supported": 71,
+     "frozen_frames": 0,
+     "frozen_from_frame": null,
+     "id": 6,
+     "still_moving_at_the_last_frame": true
+    },
+    {
+     "crossing_frame": 949,
+     "final_local": [
+      2.915,
+      0.2138,
+      -5.215
+     ],
+     "final_speed": 0.0,
+     "forward_travel": 2.917,
+     "frames_after_crossing": 201,
+     "frames_on_deck": 201,
+     "frames_outside_the_deck": 0,
+     "frames_supported": 184,
+     "frozen_frames": 0,
+     "frozen_from_frame": null,
+     "id": 7,
+     "still_moving_at_the_last_frame": true
+    }
+   ],
+   "retired": [],
+   "unsupported_frames": 0
+  }
+ },
+ "deck": {
+  "across": [
+   -0.0,
+   0.0,
+   -1.0
+  ],
+  "catch": 0.6,
+  "depth": 3.2,
+  "fall_deg": 1.4,
+  "floor_y": -0.26,
+  "forward": [
+   -1.0,
+   0.0,
+   0.0
+  ],
+  "origin": [
+   -12.5,
+   -1.12,
+   24.0
+  ],
+  "rim": 2.0,
+  "width": 11.0
+ },
+ "window": [
+  949,
+  1149
+ ],
+ "winner": {
+  "v33": {
+   "crossing_frame": 949,
+   "final_local": [
+    2.8634,
+    -1.2317,
+    0.7302
+   ],
+   "final_speed": 0.0,
+   "forward_travel": 2.8634,
+   "frames_after_crossing": 201,
+   "frames_on_deck": 201,
+   "frames_outside_the_deck": 0,
+   "frames_supported": 0,
+   "frozen_frames": 193,
+   "frozen_from_frame": 956,
+   "id": 7,
+   "still_moving_at_the_last_frame": false
+  },
+  "v331": {
+   "crossing_frame": 949,
+   "final_local": [
+    2.915,
+    0.2138,
+    -5.215
+   ],
+   "final_speed": 0.0,
+   "forward_travel": 2.917,
+   "frames_after_crossing": 201,
+   "frames_on_deck": 201,
+   "frames_outside_the_deck": 0,
+   "frames_supported": 184,
+   "frozen_frames": 0,
+   "frozen_from_frame": null,
+   "id": 7,
+   "still_moving_at_the_last_frame": true
+  }
+ }
+}

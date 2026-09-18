@@ -1,0 +1,1018 @@
+{
+ "clearance": {
+  "finish": {
+   "at": [
+    -15.3696,
+    -0.8999,
+    29.2199
+   ],
+   "inside_a_racer": [],
+   "min_gap": 0.32,
+   "part": "plaza_rim_far",
+   "parts": 51,
+   "per_part": [
+    {
+     "at": [
+      -15.3811,
+      -0.9053,
+      20.119
+     ],
+     "gap": 0.0917,
+     "name": "plaza_11_0",
+     "touch": true
+    },
+    {
+     "at": [
+      -15.3896,
+      -0.907,
+      20.2798
+     ],
+     "gap": 0.1115,
+     "name": "plaza_10_0",
+     "touch": true
+    },
+    {
+     "at": [
+      -15.2174,
+      -0.9024,
+      21.0511
+     ],
+     "gap": 0.1376,
+     "name": "plaza_9_0",
+     "touch": true
+    },
+    {
+     "at": [
+      -14.842,
+      -0.8922,
+      21.9366
+     ],
+     "gap": 0.1693,
+     "name": "plaza_8_0",
+     "touch": true
+    },
+    {
+     "at": [
+      -15.4121,
+      -0.9083,
+      23.1516
+     ],
+     "gap": 0.1746,
+     "name": "plaza_7_0",
+     "touch": true
+    },
+    {
+     "at": [
+      -14.8659,
+      -0.9415,
+      24.935
+     ],
+     "gap": 0.1844,
+     "name": "plaza_5_0",
+     "touch": true
+    },
+    {
+     "at": [
+      -15.4144,
+      -0.9066,
+      24.4311
+     ],
+     "gap": 0.1978,
+     "name": "plaza_6_0",
+     "touch": true
+    },
+    {
+     "at": [
+      -15.42,
+      -0.9063,
+      26.0123
+     ],
+     "gap": 0.2411,
+     "name": "plaza_4_0",
+     "touch": true
+    },
+    {
+     "at": [
+      -15.3628,
+      -0.9073,
+      27.1505
+     ],
+     "gap": 0.2615,
+     "name": "plaza_3_0",
+     "touch": true
+    },
+    {
+     "at": [
+      -15.4139,
+      -0.9091,
+      27.3427
+     ],
+     "gap": 0.2813,
+     "name": "plaza_2_0",
+     "touch": true
+    },
+    {
+     "at": [
+      -12.7021,
+      -0.8413,
+      24.0052
+     ],
+     "gap": 0.2986,
+     "name": "line_inlay",
+     "touch": true
+    },
+    {
+     "at": [
+      -15.3556,
+      -0.9083,
+      28.547
+     ],
+     "gap": 0.3035,
+     "name": "plaza_1_0",
+     "touch": true
+    },
+    {
+     "at": [
+      -15.3696,
+      -0.8999,
+      29.2199
+     ],
+     "gap": 0.32,
+     "name": "plaza_rim_far",
+     "touch": false
+    },
+    {
+     "at": [
+      -15.3745,
+      -0.9052,
+      19.8563
+     ],
+     "gap": 0.32,
+     "name": "plaza_rim_near",
+     "touch": false
+    },
+    {
+     "at": [
+      -15.417,
+      -0.9062,
+      29.2061
+     ],
+     "gap": 0.3271,
+     "name": "plaza_0_0",
+     "touch": true
+    },
+    {
+     "at": [
+      -15.4139,
+      -0.9091,
+      27.3427
+     ],
+     "gap": 0.513,
+     "name": "plaza_plinth",
+     "touch": false
+    },
+    {
+     "at": [
+      -12.2674,
+      -0.5606,
+      24.924
+     ],
+     "gap": 0.5518,
+     "name": "line_kerb_cap_left",
+     "touch": false
+    },
+    {
+     "at": [
+      -12.2674,
+      -0.5606,
+      24.924
+     ],
+     "gap": 0.5714,
+     "name": "line_kerb_left",
+     "touch": false
+    },
+    {
+     "at": [
+      -11.4526,
+      -0.3156,
+      24.8871
+     ],
+     "gap": 0.5755,
+     "name": "plaza_end_cap_back",
+     "touch": false
+    },
+    {
+     "at": [
+      -11.4526,
+      -0.3156,
+      24.8871
+     ],
+     "gap": 0.5883,
+     "name": "plaza_end_back",
+     "touch": false
+    },
+    {
+     "at": [
+      -13.5947,
+      -0.8617,
+      27.0918
+     ],
+     "gap": 0.7752,
+     "name": "leg_foot_left",
+     "touch": false
+    },
+    {
+     "at": [
+      -12.1961,
+      -0.5953,
+      23.3528
+     ],
+     "gap": 0.8318,
+     "name": "line_kerb_cap_right",
+     "touch": false
+    },
+    {
+     "at": [
+      -15.5044,
+      -0.8878,
+      24.7348
+     ],
+     "gap": 0.84,
+     "name": "plaza_end_front",
+     "touch": false
+    },
+    {
+     "at": [
+      -12.1961,
+      -0.5953,
+      23.3528
+     ],
+     "gap": 0.8514,
+     "name": "line_kerb_right",
+     "touch": false
+    },
+    {
+     "at": [
+      -15.4145,
+      -0.1681,
+      24.3603
+     ],
+     "gap": 0.9122,
+     "name": "plaza_lit",
+     "touch": false
+    },
+    {
+     "at": [
+      -13.6672,
+      -0.8635,
+      26.6056
+     ],
+     "gap": 0.9179,
+     "name": "line_post_left",
+     "touch": false
+    },
+    {
+     "at": [
+      -15.4145,
+      -0.1681,
+      24.3603
+     ],
+     "gap": 0.9815,
+     "name": "plaza_end_cap_front",
+     "touch": false
+    },
+    {
+     "at": [
+      4.0127,
+      4.3375,
+      25.9929
+     ],
+     "gap": 1.0728,
+     "name": "approach_3_line",
+     "touch": false
+    },
+    {
+     "at": [
+      4.0127,
+      4.3375,
+      25.9929
+     ],
+     "gap": 1.1771,
+     "name": "approach_3_beam",
+     "touch": false
+    },
+    {
+     "at": [
+      -13.6145,
+      -0.8622,
+      26.8333
+     ],
+     "gap": 1.1804,
+     "name": "leg_edge_left",
+     "touch": false
+    },
+    {
+     "at": [
+      -13.5948,
+      -0.8617,
+      27.0595
+     ],
+     "gap": 1.1848,
+     "name": "leg_left",
+     "touch": false
+    },
+    {
+     "at": [
+      -11.7212,
+      -0.4847,
+      23.2549
+     ],
+     "gap": 1.4361,
+     "name": "line_post_right",
+     "touch": false
+    },
+    {
+     "at": [
+      -11.7212,
+      -0.4847,
+      23.2549
+     ],
+     "gap": 1.5479,
+     "name": "leg_foot_right",
+     "touch": false
+    },
+    {
+     "at": [
+      0.1534,
+      3.0828,
+      25.4272
+     ],
+     "gap": 1.7208,
+     "name": "approach_2_line",
+     "touch": false
+    },
+    {
+     "at": [
+      0.1534,
+      3.0828,
+      25.4272
+     ],
+     "gap": 1.8252,
+     "name": "approach_2_beam",
+     "touch": false
+    },
+    {
+     "at": [
+      -11.7212,
+      -0.4847,
+      23.2549
+     ],
+     "gap": 1.859,
+     "name": "leg_edge_right",
+     "touch": false
+    },
+    {
+     "at": [
+      -11.7212,
+      -0.4847,
+      23.2549
+     ],
+     "gap": 1.9139,
+     "name": "leg_right",
+     "touch": false
+    },
+    {
+     "at": [
+      -3.675,
+      2.2525,
+      23.0075
+     ],
+     "gap": 1.973,
+     "name": "approach_1_line",
+     "touch": false
+    },
+    {
+     "at": [
+      -8.2099,
+      0.7208,
+      22.9311
+     ],
+     "gap": 2.0359,
+     "name": "approach_0_right",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.3222,
+      1.909,
+      22.9708
+     ],
+     "gap": 2.071,
+     "name": "approach_1_right",
+     "touch": false
+    },
+    {
+     "at": [
+      -3.675,
+      2.2525,
+      23.0075
+     ],
+     "gap": 2.0773,
+     "name": "approach_1_beam",
+     "touch": false
+    },
+    {
+     "at": [
+      -6.7744,
+      1.5234,
+      23.0032
+     ],
+     "gap": 2.5067,
+     "name": "approach_0_line",
+     "touch": false
+    },
+    {
+     "at": [
+      -1.7741,
+      2.3659,
+      23.2167
+     ],
+     "gap": 2.575,
+     "name": "approach_2_right",
+     "touch": false
+    },
+    {
+     "at": [
+      -6.7744,
+      1.5234,
+      23.0032
+     ],
+     "gap": 2.6042,
+     "name": "approach_0_beam",
+     "touch": false
+    },
+    {
+     "at": [
+      -11.4526,
+      -0.3156,
+      24.8871
+     ],
+     "gap": 2.6493,
+     "name": "brace_left",
+     "touch": false
+    },
+    {
+     "at": [
+      -11.2615,
+      -0.3077,
+      23.1846
+     ],
+     "gap": 2.7295,
+     "name": "brace_right",
+     "touch": false
+    },
+    {
+     "at": [
+      -11.4526,
+      -0.3156,
+      24.8871
+     ],
+     "gap": 2.7696,
+     "name": "gantry_accent",
+     "touch": false
+    },
+    {
+     "at": [
+      -11.4526,
+      -0.3156,
+      24.8871
+     ],
+     "gap": 2.8464,
+     "name": "gantry_lit",
+     "touch": false
+    },
+    {
+     "at": [
+      -10.8036,
+      -0.146,
+      23.1203
+     ],
+     "gap": 3.1879,
+     "name": "gantry_header",
+     "touch": false
+    },
+    {
+     "at": [
+      -10.3617,
+      0.0372,
+      23.07
+     ],
+     "gap": 3.773,
+     "name": "gantry_cap",
+     "touch": false
+    },
+    {
+     "at": [
+      5.2638,
+      4.2851,
+      24.9283
+     ],
+     "gap": 4.3395,
+     "name": "approach_3_right",
+     "touch": false
+    }
+   ],
+   "touching_by_design": [
+    "line_inlay",
+    "plaza_0_0",
+    "plaza_10_0",
+    "plaza_11_0",
+    "plaza_1_0",
+    "plaza_2_0",
+    "plaza_3_0",
+    "plaza_4_0",
+    "plaza_5_0",
+    "plaza_6_0",
+    "plaza_7_0",
+    "plaza_8_0",
+    "plaza_9_0"
+   ]
+  },
+  "start": {
+   "at": [
+    -4.958,
+    36.8676,
+    -21.9554
+   ],
+   "inside_a_racer": [],
+   "min_gap": 0.3446,
+   "part": "fin_6",
+   "parts": 39,
+   "per_part": [
+    {
+     "at": [
+      -4.958,
+      36.8676,
+      -21.9554
+     ],
+     "gap": 0.3446,
+     "name": "fin_6",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9621,
+      36.8676,
+      -23.5851
+     ],
+     "gap": 0.3451,
+     "name": "fin_5",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9606,
+      36.8676,
+      -26.8733
+     ],
+     "gap": 0.3467,
+     "name": "fin_0",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9556,
+      36.8676,
+      -24.4068
+     ],
+     "gap": 0.3468,
+     "name": "fin_4",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9631,
+      36.8676,
+      -26.0483
+     ],
+     "gap": 0.3483,
+     "name": "fin_2",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9583,
+      36.8676,
+      -25.2292
+     ],
+     "gap": 0.3492,
+     "name": "fin_3",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9538,
+      36.8676,
+      -21.1308
+     ],
+     "gap": 0.3492,
+     "name": "fin_7",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9538,
+      36.8676,
+      -21.1308
+     ],
+     "gap": 0.3508,
+     "name": "fin_8",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9631,
+      36.8676,
+      -26.0483
+     ],
+     "gap": 0.3517,
+     "name": "fin_1",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9606,
+      36.5202,
+      -26.8733
+     ],
+     "gap": 0.4967,
+     "name": "tower_cap_left",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9477,
+      36.5197,
+      -21.1308
+     ],
+     "gap": 0.5008,
+     "name": "tower_cap_right",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9606,
+      36.5202,
+      -26.8733
+     ],
+     "gap": 0.5467,
+     "name": "tower_left",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9477,
+      36.5197,
+      -21.1308
+     ],
+     "gap": 0.5508,
+     "name": "tower_right",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9634,
+      36.5203,
+      -22.7662
+     ],
+     "gap": 0.5751,
+     "name": "bay_back_5",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9631,
+      36.5203,
+      -26.0483
+     ],
+     "gap": 0.5754,
+     "name": "bay_back_1",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9621,
+      36.5203,
+      -23.5851
+     ],
+     "gap": 0.5764,
+     "name": "bay_back_4",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9606,
+      36.5202,
+      -26.8733
+     ],
+     "gap": 0.5779,
+     "name": "bay_back_0",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9583,
+      36.8676,
+      -25.2292
+     ],
+     "gap": 0.5802,
+     "name": "bay_back_2",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.958,
+      36.8676,
+      -21.9554
+     ],
+     "gap": 0.5805,
+     "name": "bay_back_6",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9556,
+      36.8676,
+      -24.4068
+     ],
+     "gap": 0.5829,
+     "name": "bay_back_3",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9538,
+      36.8676,
+      -21.1308
+     ],
+     "gap": 0.5847,
+     "name": "bay_back_7",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.254,
+      35.5329,
+      -25.8229
+     ],
+     "gap": 0.6976,
+     "name": "gate_rail",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9634,
+      36.5203,
+      -22.7662
+     ],
+     "gap": 0.8551,
+     "name": "skirt_cap",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9634,
+      35.6121,
+      -22.7662
+     ],
+     "gap": 0.9051,
+     "name": "skirt",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9634,
+      36.6503,
+      -22.7662
+     ],
+     "gap": 0.9651,
+     "name": "board",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9462,
+      36.1429,
+      -21.1308
+     ],
+     "gap": 1.0507,
+     "name": "gate_cap_right",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9477,
+      36.5197,
+      -21.1308
+     ],
+     "gap": 1.0509,
+     "name": "gate_guide_right",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9606,
+      36.7414,
+      -26.8733
+     ],
+     "gap": 1.0605,
+     "name": "gate_guide_left",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9606,
+      36.5202,
+      -26.8733
+     ],
+     "gap": 1.0622,
+     "name": "gate_cap_left",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9462,
+      36.1429,
+      -21.1308
+     ],
+     "gap": 1.4162,
+     "name": "tower_lit_right",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9606,
+      36.1437,
+      -26.8733
+     ],
+     "gap": 1.427,
+     "name": "tower_lit_left",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9634,
+      36.8676,
+      -22.7662
+     ],
+     "gap": 1.4986,
+     "name": "board_line",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9606,
+      36.6502,
+      -26.8733
+     ],
+     "gap": 1.5923,
+     "name": "post_left",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9538,
+      36.8676,
+      -21.1308
+     ],
+     "gap": 1.5996,
+     "name": "post_right",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9634,
+      36.8676,
+      -22.7662
+     ],
+     "gap": 1.6684,
+     "name": "board_cap",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9634,
+      36.8676,
+      -22.7662
+     ],
+     "gap": 2.1871,
+     "name": "header_line",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9634,
+      36.8676,
+      -22.7662
+     ],
+     "gap": 2.2496,
+     "name": "header",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9606,
+      36.8676,
+      -26.8733
+     ],
+     "gap": 2.7773,
+     "name": "post_cap_left",
+     "touch": false
+    },
+    {
+     "at": [
+      -4.9538,
+      36.8676,
+      -21.1308
+     ],
+     "gap": 2.7817,
+     "name": "post_cap_right",
+     "touch": false
+    }
+   ],
+   "touching_by_design": []
+  }
+ },
+ "sha256": "cf5851ddb4bca4915e9f5c112e064b9dcf72180df36d9db789f4cc3509341a5c",
+ "spec": "output\\race2\\v331_runout\\bookends.json",
+ "stands": {
+  "finish": {
+   "meta": {
+    "approach_clear": 1.62458,
+    "approach_count": 4,
+    "channel_half": 1.47542,
+    "field": {
+     "across": [
+      -5.2199,
+      4.1437
+     ],
+     "along": [
+      0.0195,
+      3.0044
+     ],
+     "channel_fall": 0.28421,
+     "rest_up": -0.3073,
+     "sight_across": null,
+     "sight_along": null,
+     "surface_fall": 0.0244,
+     "surface_up": -0.52,
+     "well_across": null,
+     "well_along": null,
+     "well_floor": null
+    },
+    "gantry_rise": 4.1,
+    "header_clear": 3.44,
+    "leg_clear": 1.16458,
+    "line_rise": 0.11,
+    "plaza_across": [
+     -5.8199,
+     4.7437
+    ],
+    "plaza_along": [
+     -1.1805,
+     4.2044
+    ],
+    "plaza_strips": 12,
+    "well_parts": 0
+   },
+   "motion": 0,
+   "static": 51
+  },
+  "start": {
+   "meta": {
+    "bay_across": [
+     -2.87,
+     -2.05,
+     -1.23,
+     -0.41,
+     0.41,
+     1.23,
+     2.05,
+     2.87
+    ],
+    "bay_pitch": 0.82,
+    "bays": 8,
+    "board_face": -1.62,
+    "board_rise": 1.74,
+    "fin_clear_of_marble": 0.065,
+    "gate_top_below_marble_top": 0.55,
+    "gate_travel": -0.62,
+    "half_across": 4.28,
+    "portal_rise": 2.66,
+    "tower_inner": 3.42
+   },
+   "motion": 3,
+   "static": 36
+  }
+ }
+}

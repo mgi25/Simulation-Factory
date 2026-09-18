@@ -1,0 +1,13 @@
+{
+ "your": {
+  "evidence": "docs\\validation\\race2\\v331_runout\\short\\your\\evidence.json",
+  "final": "exports\\race2_v331_runout\\race2_switchyard_v331_your.mp4",
+  "lines": [
+   "PICK YOUR",
+   "COLOR"
+  ],
+  "master": "exports\\race2_v331_runout\\your\\race2_switchyard_master.mp4",
+  "phone": "exports\\race2_v331_runout\\race2_switchyard_v331_your_phone_270x480.mp4",
+  "visual": "exports\\race2_v331_runout\\your\\race2_switchyard_final_visual.mp4"
+ }
+}

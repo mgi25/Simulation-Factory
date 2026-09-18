@@ -1,0 +1,149 @@
+{
+ "channel": {
+  "entry": [
+   -19.0,
+   5.4,
+   0.0
+  ],
+  "fall": 0.28421
+ },
+ "course": "switchyard",
+ "deck": {
+  "across": [
+   -5.5,
+   5.5
+  ],
+  "along": [
+   -0.0,
+   3.2
+  ],
+  "covers_the_line": true,
+  "fall_per_across": 0.0244,
+  "fitted_stations": 0,
+  "stations": 21,
+  "top_at_across_0": -0.52
+ },
+ "envelope": {
+  "across": [
+   -5.2199,
+   4.1437
+  ],
+  "along": [
+   0.0195,
+   3.0044
+  ],
+  "up": [
+   -0.3415,
+   0.4861
+  ]
+ },
+ "finding": {
+  "aligned": true,
+  "note": "the run-out deck's forward axis is the sprint's own exit tangent",
+  "racers_frozen_off_the_deck": [],
+  "runout_yaw_error_deg": 0.0
+ },
+ "frames": 1150,
+ "racers": 8,
+ "rest": [
+  {
+   "across": 0.9317,
+   "along": 2.9071,
+   "crossed_at": 17.7333,
+   "id": 0,
+   "speed": 8.7373,
+   "state": "running",
+   "up": -0.3073
+  },
+  {
+   "across": -4.0507,
+   "along": 2.9136,
+   "crossed_at": 16.1333,
+   "id": 1,
+   "speed": 0.1389,
+   "state": "running",
+   "up": -0.3061
+  },
+  {
+   "across": -4.6299,
+   "along": 2.915,
+   "crossed_at": 15.8833,
+   "id": 2,
+   "speed": 1.3973,
+   "state": "running",
+   "up": -0.3062
+  },
+  {
+   "across": -4.2322,
+   "along": 2.0855,
+   "crossed_at": 17.2,
+   "id": 3,
+   "speed": 7.2403,
+   "state": "running",
+   "up": -0.2862
+  },
+  {
+   "across": -3.6391,
+   "along": 2.5042,
+   "crossed_at": 18.75,
+   "id": 4,
+   "speed": 3.2718,
+   "state": "running",
+   "up": -0.2976
+  },
+  {
+   "across": -5.1315,
+   "along": 2.0577,
+   "crossed_at": 16.5833,
+   "id": 5,
+   "speed": 0.9367,
+   "state": "running",
+   "up": -0.2852
+  },
+  {
+   "across": 4.1437,
+   "along": 2.8745,
+   "crossed_at": 17.8167,
+   "id": 6,
+   "speed": 5.4007,
+   "state": "running",
+   "up": -0.3052
+  },
+  {
+   "across": -5.215,
+   "along": 2.915,
+   "crossed_at": 15.8333,
+   "id": 7,
+   "speed": 0.0,
+   "state": "running",
+   "up": -0.3062
+  }
+ ],
+ "seed": 8,
+ "sight": null,
+ "site": {
+  "across": [
+   0.0,
+   0.0,
+   -1.0
+  ],
+  "along": [
+   -1.0,
+   0.0,
+   0.0
+  ],
+  "half_width": 1.4754,
+  "origin": [
+   -12.5,
+   -0.6,
+   24.0
+  ],
+  "up": [
+   0.0,
+   1.0,
+   0.0
+  ]
+ },
+ "unsupported_frames": [],
+ "well": null
+}

@@ -37,9 +37,10 @@ the direction the field is travelling, `up` is world +Y and
 here because the two yaw conventions in this package do not agree: `Frame.yaw`
 is `atan2(-forward.z, forward.x)` and `TrackRun.heading_deg` is
 `atan2(forward.x, forward.z)`. `site_from_run` takes the *tangent*, never a
-heading, so there is nothing here to get the wrong way round. See
-`docs/race2_v33_mobile_bookends.md` section 10 for what happens when something
-does.
+heading, so there is nothing here to get the wrong way round. `race2.kit`'s
+convention note is where that rule is written down; see
+`docs/race2_v331_runout_fix.md` for what happened to the one module that did
+get it the wrong way round.
 
 ## Reusability
 
@@ -214,9 +215,10 @@ def site_from_run(path: Sequence[Sequence[float]], index: int,
     **The tangent, never a heading.** `TrackRun.heading_deg` answers
     `atan2(x, z)` and `race2.kit.Frame.yaw` answers `atan2(-z, x)`; a site
     built by converting one through the other's inverse is rotated by 90
-    degrees, which is a defect this package already ships (see
-    `race2.parts.RunOut` and the document's section 10). Differencing two path
-    samples cannot express that mistake.
+    degrees, which is a defect `race2.parts.RunOut` shipped from the commit
+    that wrote it to V33, and which `docs/race2_v331_runout_fix.md` repairs.
+    Differencing two path samples cannot express that mistake, and
+    `race2.kit`'s convention note is where the rule is written down.
     """
     points = [tuple(float(c) for c in p) for p in path]
     if len(points) < 2:
@@ -696,14 +698,17 @@ class Field:
     """Where the field actually ends up after the line, in the site's frame.
 
     Measured off the replay by `tools/race2_v33_bookends.py field`, never
-    guessed: Race #2's own run-out is laid across the direction of travel (the
-    document's section 10 has the arithmetic) and the field therefore drains
-    sideways, so an apron sized on the course's plan would be in the wrong
-    place by eight units. A structure sited on the *record* cannot be.
+    guessed, and the habit earned itself: when V33 measured this, Race #2's
+    run-out was laid across the direction of travel, the field drained sideways
+    and an apron sized on the course's *plan* would have been eight units from
+    where the racers actually were. A structure sited on the record was right
+    anyway. V33.1 repaired the deck - `docs/race2_v331_runout_fix.md` - and the
+    same measurement now puts the field in front of the line, which is why the
+    defaults below changed and why they are still only defaults.
     """
 
-    along: tuple[float, float] = (-5.5, 5.5)
-    across: tuple[float, float] = (-8.2, 0.0)
+    along: tuple[float, float] = (0.0, 8.0)
+    across: tuple[float, float] = (-5.25, 0.55)
     rest_up: float = -0.43
     surface_up: float = -0.52
     surface_fall: float = 0.0244      # d(up)/d(across) of the deck under it

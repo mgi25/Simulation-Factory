@@ -1,0 +1,218 @@
+{
+ "audio": {
+  "adts_sha256": {
+   "v322_shipped": "9db89f3a919446215cc9e0afd5122b1acc8d4f3351a5f5c7c2afb9e870f832dd",
+   "v331_your": "9db89f3a919446215cc9e0afd5122b1acc8d4f3351a5f5c7c2afb9e870f832dd"
+  },
+  "identical_to_v322": true,
+  "present": true,
+  "source": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-v331-runout\\..\\wt-v322-audio\\exports\\race2_v322_audio\\race2_switchyard_final_audio.mp4"
+ },
+ "camera": {
+  "identical": true,
+  "sha256": {
+   "baseline": "1fcae581f88a45ae38879ec749f44d11919f274021f5ebc986912c21a6f673e5",
+   "source": "1fcae581f88a45ae38879ec749f44d11919f274021f5ebc986912c21a6f673e5",
+   "v33": "1fcae581f88a45ae38879ec749f44d11919f274021f5ebc986912c21a6f673e5"
+  }
+ },
+ "delivered": {
+  "your": [
+   {
+    "codec_name": "h264",
+    "codec_type": "video",
+    "duration": "19.166667",
+    "nb_frames": "1150"
+   },
+   {
+    "channels": 2,
+    "codec_name": "aac",
+    "codec_type": "audio",
+    "duration": "19.166000",
+    "nb_frames": "900",
+    "sample_rate": "48000"
+   }
+  ]
+ },
+ "finish_order": [
+  7,
+  2,
+  1,
+  5,
+  3,
+  0,
+  6,
+  4
+ ],
+ "frames": {
+  "v33": 1150,
+  "v331": 1150
+ },
+ "physics": {
+  "crossings_identical": true,
+  "events_before_line": 316,
+  "events_before_line_identical": true,
+  "every_racer_locked_to_its_own_crossing": true,
+  "frame_count_unchanged": true,
+  "frames_identical_through": 949,
+  "order_unchanged": true,
+  "winner_unchanged": true,
+  "worst_drift_before_any_crossing_sim": 0.0
+ },
+ "picture": {
+  "by_cut": [
+   {
+    "box": null,
+    "frames": [
+     1,
+     134
+    ],
+    "frames_differing": 0,
+    "frames_total": 134,
+    "name": "release",
+    "seconds": [
+     0.0167,
+     2.2333
+    ],
+    "worst_changed": 0.0,
+    "worst_channel_delta": 0
+   },
+   {
+    "box": null,
+    "frames": [
+     134,
+     541
+    ],
+    "frames_differing": 0,
+    "frames_total": 408,
+    "name": "upper",
+    "seconds": [
+     2.2333,
+     9.0167
+    ],
+    "worst_changed": 0.0,
+    "worst_channel_delta": 0
+   },
+   {
+    "box": null,
+    "frames": [
+     541,
+     761
+    ],
+    "frames_differing": 0,
+    "frames_total": 221,
+    "name": "middle",
+    "seconds": [
+     9.0167,
+     12.6833
+    ],
+    "worst_changed": 0.0,
+    "worst_channel_delta": 0
+   },
+   {
+    "box": [
+     0,
+     107,
+     1079,
+     1919
+    ],
+    "frames": [
+     761,
+     1149
+    ],
+    "frames_differing": 228,
+    "frames_total": 389,
+    "name": "run_in",
+    "seconds": [
+     12.6833,
+     19.15
+    ],
+    "worst_changed": 0.680728,
+    "worst_channel_delta": 255
+   }
+  ],
+  "difference_is_scenery_not_racers": true,
+  "first_difference": 922,
+  "first_difference_seconds": 15.3667,
+  "frame_zero_identical": true,
+  "identical_seconds": 15.35,
+  "identical_through": 921,
+  "ramp": [
+   {
+    "box": [
+     0,
+     982,
+     5,
+     1033
+    ],
+    "changed": 5e-05,
+    "frame": 922,
+    "max_channel_delta": 19,
+    "t": 15.3667
+   },
+   {
+    "box": [
+     0,
+     650,
+     80,
+     1162
+    ],
+    "changed": 0.00415,
+    "frame": 925,
+    "max_channel_delta": 33,
+    "t": 15.4167
+   },
+   {
+    "box": [
+     0,
+     731,
+     206,
+     1396
+    ],
+    "changed": 0.01844,
+    "frame": 930,
+    "max_channel_delta": 224,
+    "t": 15.5
+   },
+   {
+    "box": [
+     0,
+     697,
+     509,
+     1919
+    ],
+    "changed": 0.123888,
+    "frame": 940,
+    "max_channel_delta": 234,
+    "t": 15.6667
+   },
+   {
+    "box": [
+     0,
+     664,
+     906,
+     1919
+    ],
+    "changed": 0.295716,
+    "frame": 949,
+    "max_channel_delta": 235,
+    "t": 15.8167
+   },
+   {
+    "box": [
+     0,
+     189,
+     1079,
+     1650
+    ],
+    "changed": 0.43591,
+    "frame": 1149,
+    "max_channel_delta": 255,
+    "t": 19.15
+   }
+  ],
+  "winner_crossing_frame": 949
+ },
+ "runtime_seconds": 19.166667,
+ "winner": 7
+}

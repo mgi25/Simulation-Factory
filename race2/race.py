@@ -221,7 +221,17 @@ class Race2(MarbleSimulation):
         self._where: dict[int, tuple[str, int]] = {}
         self._entered: dict[int, set[str]] = {}
         self._crossed: set[int] = set()
-        self._finish_count = 0
+        # **Not `_finish_count`.** `Race2` extends `MarbleSimulation`, which
+        # keeps an attribute of that name for the marbles it retires through
+        # the machine's own exit socket, and the two counters were the same
+        # integer. It never showed, because until V33.1 no Race #2 racer
+        # reached that socket alive - the run-out deck was laid across the
+        # track and they fell out of the machine instead - so the base class
+        # never incremented it. With the deck the right way round a racer runs
+        # out through the gate, and the placings from fourth onward were
+        # renumbered by one. A line crossing is a different event from leaving
+        # the machine and it gets its own counter.
+        self._line_count = 0
         self._leader: int | None = None
         self.lead_changes = 0
         self.overtakes = 0
@@ -409,8 +419,8 @@ class Race2(MarbleSimulation):
             result.top_speed = marble.top_speed
             if marble_id not in self._crossed and self._past_line(marble.pose[0]):
                 self._crossed.add(marble_id)
-                self._finish_count += 1
-                result.finish_order = self._finish_count
+                self._line_count += 1
+                result.finish_order = self._line_count
                 result.finish_time = self.elapsed
                 result.progress = self.course.length
                 self.events.append(

@@ -1,0 +1,127 @@
+{
+ "crossings": {
+  "0": 17.716667,
+  "1": 16.133333,
+  "2": 15.883333,
+  "3": 17.2,
+  "4": 18.75,
+  "5": 16.583333,
+  "6": 17.816667,
+  "7": 15.816667
+ },
+ "finish_order": [
+  7,
+  2,
+  1,
+  5,
+  3,
+  0,
+  6,
+  4
+ ],
+ "lock": {
+  "crossings_identical": true,
+  "events_before_line": 316,
+  "events_before_line_identical": true,
+  "every_racer_locked_to_its_own_crossing": true,
+  "frame_count_unchanged": true,
+  "frames_identical_through": 949,
+  "order_unchanged": true,
+  "winner_unchanged": true,
+  "worst_drift_before_any_crossing_sim": 0.0
+ },
+ "per_racer_lock": [
+  {
+   "crossing_frame": 1063,
+   "crossing_time": 17.716667,
+   "id": 0,
+   "identical_through": 1063,
+   "locked": true,
+   "worst_drift_before_crossing_sim": 0.0
+  },
+  {
+   "crossing_frame": 968,
+   "crossing_time": 16.133333,
+   "id": 1,
+   "identical_through": 969,
+   "locked": true,
+   "worst_drift_before_crossing_sim": 0.0
+  },
+  {
+   "crossing_frame": 953,
+   "crossing_time": 15.883333,
+   "id": 2,
+   "identical_through": 952,
+   "locked": true,
+   "worst_drift_before_crossing_sim": 0.0
+  },
+  {
+   "crossing_frame": 1032,
+   "crossing_time": 17.2,
+   "id": 3,
+   "identical_through": 1032,
+   "locked": true,
+   "worst_drift_before_crossing_sim": 0.0
+  },
+  {
+   "crossing_frame": 1125,
+   "crossing_time": 18.75,
+   "id": 4,
+   "identical_through": 1126,
+   "locked": true,
+   "worst_drift_before_crossing_sim": 0.0
+  },
+  {
+   "crossing_frame": 995,
+   "crossing_time": 16.583333,
+   "id": 5,
+   "identical_through": 995,
+   "locked": true,
+   "worst_drift_before_crossing_sim": 0.0
+  },
+  {
+   "crossing_frame": 1069,
+   "crossing_time": 17.816667,
+   "id": 6,
+   "identical_through": 1070,
+   "locked": true,
+   "worst_drift_before_crossing_sim": 0.0
+  },
+  {
+   "crossing_frame": 949,
+   "crossing_time": 15.816667,
+   "id": 7,
+   "identical_through": 949,
+   "locked": true,
+   "worst_drift_before_crossing_sim": 0.0
+  }
+ ],
+ "v33": {
+  "digest": "751031348936808792ad2fac667bfdfb6e726dca7520ffdaf19429c6a2f7f539",
+  "event_digest": "51078e8d31e56f53993c6ee9aa61b482a6757942a422fb43f533336983016502",
+  "retired": [
+   {
+    "id": 7,
+    "kind": "escaped",
+    "t": 15.929167
+   },
+   {
+    "id": 1,
+    "kind": "escaped",
+    "t": 16.2375
+   },
+   {
+    "id": 4,
+    "kind": "escaped",
+    "t": 19.179167
+   }
+  ]
+ },
+ "v331": {
+  "digest": "b592c76d5c8f8d96b8053143b9f77953dd19a6dca78bc750a71e2c26ac5ea572",
+  "event_digest": "230dd650367256c13fe6c35ad3fc141b603c5e79eef9920b24d29b255dc2d9ac",
+  "retired": []
+ },
+ "winner": 7,
+ "winner_label": "PINK"
+}

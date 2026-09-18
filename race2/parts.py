@@ -36,6 +36,11 @@ from marble3d.mesh import Aabb, TriMesh
 from marble3d.modules.base import GUIDED, MarbleModule, Probe
 from marble3d.units import MARBLE_DIAMETER, MARBLE_RADIUS
 
+# `marble3d.config`'s own bound on a collider's longest triangle edge.
+# Read from the constant rather than repeated, so the two cannot drift.
+COLLIDER_MAX_EDGE = 4.0 * MARBLE_DIAMETER
+
+from race2.kit import flat_forward
 from sloped import layout
 from sloped.scale import to_sim, to_sim_point
 from sloped.solids import merge_meshes, plate, tube, wall_strip
@@ -210,9 +215,58 @@ class RunOut(MarbleModule):
     """
 
     WIDTH = 11.0
-    DEPTH = 8.2
-    RIM = 0.80
+    # **Sized to the shot, and contained against a bounce that does not
+    # converge.**
+    #
+    # `DEPTH` was 8.2 and `RIM` was 0.80, and with the deck laid across the
+    # track neither number was ever tested: the field left sideways before it
+    # could reach the back of the deck. Turned the right way round, both are
+    # wrong, and for two different reasons.
+    #
+    # *Depth comes from the camera envelope, not from a score.* The finish shot
+    # pulls back through the payoff, and what it can still hold collapses
+    # quickly: measured against the locked track over the settled window, a
+    # racer resting at `along` 3.0 is in frame across the deck's whole width,
+    # at 3.4 only within +/-4.3 of the centreline, and at 4.0 and beyond there
+    # is no lateral position that stays in frame to the last frame. A racer
+    # comes to rest about a radius short of the back wall, so `DEPTH` 3.2 puts
+    # the field at 2.9 - inside the band where *every* part of the deck it can
+    # reach is on screen. That is why this number is robust: it does not depend
+    # on which way the pack happens to scatter. At 8.2 the winner was on screen
+    # for 95 of the 200 frames after it crossed, because it settled behind the
+    # picture.
+    #
+    # *Rim is sized to the worst rebound, because the rebound is chaotic.* A
+    # racer arrives at about 29 layout units a second and is stopped by a wall.
+    # How high it comes off that wall does not settle down as the deck is
+    # tuned - over `DEPTH` 3.0 to 3.6 the worst rise in the field runs 0.74,
+    # 1.11, 0.78, 0.86, 1.82, 1.21 with no trend, and it moved again when the
+    # wall's own triangulation changed (see `_wall_steps`). At `RIM` 0.80 that
+    # was a coin toss on whether the winner cleared the wall and was retired
+    # through the gate behind it - 4.8 and 5.6 lost it, 4.6 and 5.0 did not.
+    # So the rim is not tuned either: it is set above the worst centre height
+    # seen anywhere in that range, 2.10, with margin over the depth that
+    # ships: 2.00 leaves 0.94 - more than a marble diameter and a half - above
+    # the highest any racer gets at `DEPTH` 3.2. It is not raised further
+    # because `wall_strip` never subdivides vertically, so the rim's own height
+    # is a single triangle edge and `check_mesh` bounds that at four marble
+    # diameters: 2.28 would be the wall that cannot be built at all.
+    DEPTH = 3.2
+    RIM = 2.00
+    # Downhill, away from the line, and it has to be: the deck's front edge is
+    # the channel mouth and has no wall. An upslope was tried - it gathers the
+    # field beautifully and then rolls three to six racers back out of the
+    # machine through that mouth. See the document's section 4.
     FALL_DEG = 1.4
+    # How far past the back wall's inner face the machine's finish gate sits,
+    # in layout units. One marble diameter is 0.57, so a racer resting against
+    # the wall is clear of the gate by a margin rather than by a rounding.
+    CATCH = 0.60
+    # How much of `check_mesh`'s longest-edge budget a wall quad may spend.
+    # Not the whole of it: the bound is on the built mesh and `_wall_steps` is
+    # arithmetic on the nominal cell, and a wall that follows a sloping base is
+    # a little longer than its plan.
+    EDGE_TARGET = 0.95
 
     def __init__(self, module_id: str, sprint: TrackRun, width: float | None = None) -> None:
         super().__init__(module_id)
@@ -220,8 +274,14 @@ class RunOut(MarbleModule):
         self.width = self.WIDTH if width is None else float(width)
         exit_index = len(sprint.path) - 1
         point = sprint.path[exit_index]
-        yaw = math.radians(sprint.heading_deg(exit_index))
-        self.forward = (math.cos(yaw), 0.0, -math.sin(yaw))
+        # **The tangent, never a heading.** This line used to read
+        # `heading_deg` - `atan2(x, z)` - through `Frame.yaw`'s inverse -
+        # `atan2(-z, x)` - and the two are ninety degrees apart at every
+        # heading, so the deck was laid across the direction of travel from the
+        # commit that wrote it (8daff3a, with SWITCHYARD) to V33.
+        # `race2.kit`'s convention note has the arithmetic;
+        # `flat_forward` of the run's own tangent cannot express the mistake.
+        self.forward = flat_forward(sprint.tangents[exit_index])
         self.across = (-self.forward[2], 0.0, self.forward[0])
         # The deck top sits a cradle's depth below the exit centreline, so the
         # channel's running surface and the deck are the same height at the
@@ -232,6 +292,35 @@ class RunOut(MarbleModule):
             point[2],
         )
         self._mesh: TriMesh | None = None
+
+    def _wall_steps(self, span: float) -> int:
+        """Enough subdivisions that no wall quad's diagonal is a phantom span.
+
+        **A taller rim needs a finer wall.** `check_mesh` bounds the longest
+        triangle edge at four marble diameters, and a `wall_strip` cell is
+        `span/steps` wide by the rim's *full* height - the height is never
+        subdivided, so raising `RIM` tightens the bound on `steps`. That is
+        how V33.1 first broke this check: `RIM` 1.60 made the back wall's cell
+        3.216 by 2.807 simulation units and its diagonal 4.269, over the 4.000
+        limit, on a mesh that had been well formed at 0.80 for the same six
+        steps.
+
+        Derived rather than typed, so the next dimension change does not have
+        to remember, and it raises rather than silently fails if the rim alone
+        is over budget - a `wall_strip` never subdivides vertically, so a tall
+        enough rim is one edge that no number of steps can shorten. That is a
+        real ceiling: at `RIM` 2.28 the wall's own height reaches the limit.
+        """
+        limit = COLLIDER_MAX_EDGE * self.EDGE_TARGET
+        height = to_sim(self.RIM)
+        if height >= limit:
+            raise ValueError(
+                f"RIM {self.RIM} is {height:.3f} simulation units, at or over "
+                f"the {limit:.3f} this wall may spend on one edge. A "
+                "`wall_strip` never subdivides vertically, so no number of "
+                "steps can bring it back - the rim itself is the edge.")
+        room = math.sqrt(limit * limit - height * height)
+        return max(6, math.ceil(to_sim(span) / room))
 
     def _at(self, along: float, across: float) -> tuple[float, float, float]:
         drop = -math.tan(math.radians(self.FALL_DEG)) * max(along, 0.0)
@@ -268,7 +357,7 @@ class RunOut(MarbleModule):
                 base=lambda a, c: to_sim(-math.tan(math.radians(self.FALL_DEG)) * max(a, 0.0)),
                 top=lambda a, c: to_sim(self.RIM - math.tan(math.radians(self.FALL_DEG)) * max(a, 0.0)),
                 name=f"{self.id}_back",
-                steps=6,
+                steps=self._wall_steps(self.width),
             )
         )
         for sign in (-1.0, 1.0):
@@ -282,14 +371,24 @@ class RunOut(MarbleModule):
                     base=lambda a, c: to_sim(-math.tan(math.radians(self.FALL_DEG)) * max(a, 0.0)),
                     top=lambda a, c: to_sim(self.RIM - math.tan(math.radians(self.FALL_DEG)) * max(a, 0.0)),
                     name=f"{self.id}_side{int(sign)}",
-                    steps=6,
+                    steps=self._wall_steps(self.DEPTH),
                 )
             )
         self._mesh = merge_meshes(parts, name=f"{self.id}_deck")
         return [self._mesh]
 
     def local_sockets(self) -> dict[str, Socket]:
-        position = to_sim_point(self._at(self.DEPTH - 0.2, 0.0))
+        # **Past the back wall, not in front of it.** `MarbleSimulation` takes
+        # the last module's `exit` as the machine's finish gate and retires -
+        # freezes, and removes from the world - anything that reaches it. This
+        # socket used to stand at `DEPTH - 0.2`, while a marble resting against
+        # the back wall centres at `DEPTH - MARBLE_RADIUS`, which is 0.285:
+        # the gate was 0.085 layout units in *front* of the resting place, so
+        # the wall could never stop anybody. Everything that reached the back
+        # of the deck was captured just before it touched, and stood frozen
+        # there for the rest of the film. The wall is the thing that stops the
+        # field; the gate is for a marble that has left over it.
+        position = to_sim_point(self._at(self.DEPTH + self.CATCH, 0.0))
         return {
             "entry": Socket(
                 name="entry",

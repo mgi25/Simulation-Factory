@@ -1,0 +1,13 @@
+{
+ "final_sprint": "exports\\race2_v331_runout\\final_sprint_v331.mp4",
+ "finish_1080": "exports\\race2_v331_runout\\compare_finish_1080.mp4",
+ "finish_phone": "exports\\race2_v331_runout\\compare_finish_270x480.mp4",
+ "finish_v33": "output\\race2\\v331_runout\\compare\\v33_finish.mp4",
+ "finish_v331": "output\\race2\\v331_runout\\compare\\v331_finish.mp4",
+ "full_1080": "exports\\race2_v331_runout\\compare_full_1080.mp4",
+ "full_v33": "output\\race2\\v331_runout\\compare\\v33_full.mp4",
+ "full_v331": "output\\race2\\v331_runout\\compare\\v331_full.mp4",
+ "sprint_1080": "exports\\race2_v331_runout\\compare_sprint_1080.mp4",
+ "sprint_v33": "output\\race2\\v331_runout\\compare\\v33_sprint.mp4",
+ "sprint_v331": "output\\race2\\v331_runout\\compare\\v331_sprint.mp4"
+}

@@ -48,6 +48,11 @@ __all__ = [
     "run_spec",
     "Frame",
     "frame_towards",
+    "frame_along",
+    "flat_forward",
+    "forward_from_heading",
+    "heading_from_forward",
+    "build_yaw_from_forward",
     "lerp",
     "ease",
     "ramp_controls",
@@ -141,6 +146,108 @@ class Frame:
             position=self.sim(along, up, across),
             rotation=basis_from_forward_up(self.forward, self.up),
         )
+
+
+# --- the one angle convention ----------------------------------------------
+
+# **There are two yaw conventions in this package and they are ninety degrees
+# apart.** Both are correct for what they measure, neither is going away, and
+# the conversion between them is written once - here - so that nothing has to
+# derive it a second time.
+#
+#   compass heading   `sloped.track.TrackRun.heading_deg`, which is
+#                     `atan2(x, z)`: zero is +Z and +90 is +X. Its direction of
+#                     travel is `(sin h, 0, cos h)`, which is exactly the third
+#                     column of `sloped.stations._yaw_frame` - a Godot node
+#                     yawed by `h` - so this is the angle a *built* thing takes.
+#
+#   build yaw         `Frame.yaw` and `marble3d.geometry.Socket.heading`, which
+#                     are `atan2(-z, x)`: zero is +X and +90 is -Z, because
+#                     `marble3d.geometry.yaw_quaternion` turns +X toward -Z.
+#                     Its direction of travel is `(cos y, 0, -sin y)`.
+#
+# Reading one through the other's inverse rotates the result by ninety degrees
+# **for every input**, not by a little near some headings: the dot product of
+# `(sin h, 0, cos h)` and `(cos h, 0, -sin h)` is `sin h cos h - cos h sin h`,
+# which is identically zero, and the cross product's +Y term is
+# `cos^2 h + sin^2 h`, which is identically one. There is no heading at which
+# the mistake is small enough to be missed in a review frame, and no heading at
+# which it shows up as a bias rather than as a right angle.
+#
+# That is not hypothetical. `race2.parts.RunOut` shipped it: Race #2's run-out
+# deck was laid across the direction of travel from the commit that wrote it to
+# V33, which put the deck's near edge on the racing line and dropped three of
+# eight racers - the winner among them - out of the machine within half a
+# second of the finish. `docs/race2_v331_runout_fix.md` has the arithmetic and
+# the repair.
+#
+# **Prefer a direction to either angle.** A tangent differenced off a path
+# cannot express this mistake at all, which is why `frame_along` below,
+# `RunOut` and `race2.bookends.site_from_run` all take one. Reach for
+# `forward_from_heading` only where an angle is what you were handed.
+
+
+def flat_forward(direction: Sequence[float]) -> Vec3:
+    """A direction flattened onto the ground plane and normalised.
+
+    The horizontal part of a tangent is what orients a level structure; the
+    grade is dropped for the reason `frame_towards` drops it, and a direction
+    with no horizontal part is an error rather than a default, because the
+    default would be a deck pointing somewhere nobody chose.
+    """
+    dx, dz = float(direction[0]), float(direction[2])
+    span = math.hypot(dx, dz)
+    if span < 1e-9:
+        raise ValueError("a direction needs a horizontal component")
+    return (dx / span, 0.0, dz / span)
+
+
+def forward_from_heading(heading_deg: float) -> Vec3:
+    """A compass heading -> the direction of travel. The only conversion.
+
+    `TrackRun.heading_deg` measures `atan2(x, z)`, so its direction is
+    `(sin h, 0, cos h)`. Anything that turns one of those angles into a vector
+    calls this and nothing else.
+    """
+    angle = math.radians(float(heading_deg))
+    return (math.sin(angle), 0.0, math.cos(angle))
+
+
+def heading_from_forward(direction: Sequence[float]) -> float:
+    """The exact inverse of `forward_from_heading`, in degrees.
+
+    Round-trips `TrackRun.heading_deg` for every sample of every run: both are
+    `atan2(x, z)` over the same flattened tangent.
+    """
+    fx, _up, fz = flat_forward(direction)
+    return math.degrees(math.atan2(fx, fz))
+
+
+def build_yaw_from_forward(direction: Sequence[float]) -> float:
+    """The direction of travel -> the yaw `Frame.yaw`/`Socket.heading` report.
+
+    Degrees, so it reads beside `heading_from_forward`; `Frame.yaw` itself
+    returns radians and is left alone. The two answers differ by ninety
+    degrees and that difference is the whole of the convention problem, so
+    they are defined next to each other on purpose.
+    """
+    fx, _up, fz = flat_forward(direction)
+    return math.degrees(math.atan2(-fz, fx))
+
+
+def frame_along(origin: Sequence[float], forward: Sequence[float],
+                up: Vec3 = (0.0, 1.0, 0.0)) -> Frame:
+    """A level frame at `origin` facing along a direction.
+
+    `frame_towards`' sibling, for a caller holding a tangent rather than a
+    second point, and the form to reach for: no angle is constructed, so no
+    angle can be read back through the wrong convention. `across` is
+    `up x forward`, the same handedness `frame_towards` documents, so +across
+    is to the left of travel.
+    """
+    flat = flat_forward(forward)
+    across = (-flat[2], 0.0, flat[0])
+    return Frame(tuple(float(v) for v in origin), flat, across, tuple(float(v) for v in up))
 
 
 def frame_towards(origin: Sequence[float], target: Sequence[float]) -> Frame:
