@@ -82,6 +82,54 @@ class ResultTest:
 
 
 @dataclass(frozen=True)
+class ScopeUsage:
+    """Which authorized paths the work actually touched, and which it did not.
+
+    A changed file is "under" an authorized path when the file path equals the
+    authorized path or starts with it followed by a ``/``.  The matching uses
+    the same prefix semantics as ``PathScope``.
+    """
+
+    granted: int
+    used: int
+    touched_paths: tuple[str, ...]
+    untouched_paths: tuple[str, ...]
+    file_map: tuple[tuple[str, tuple[str, ...]], ...]
+
+    def files_under(self, authorized_path: str) -> tuple[str, ...]:
+        """The changed files that fell under *authorized_path*."""
+        for path, files in self.file_map:
+            if path == authorized_path:
+                return files
+        return ()
+
+    @classmethod
+    def from_result(
+        cls,
+        authorized_paths: tuple[str, ...],
+        changed_files: tuple[str, ...],
+    ) -> "ScopeUsage":
+        mapping: dict[str, list[str]] = {p: [] for p in authorized_paths}
+        for changed in changed_files:
+            for auth in authorized_paths:
+                if changed == auth or changed.startswith(auth + "/"):
+                    mapping[auth].append(changed)
+                    break
+        touched = tuple(p for p in authorized_paths if mapping[p])
+        untouched = tuple(p for p in authorized_paths if not mapping[p])
+        file_map = tuple(
+            (p, tuple(mapping[p])) for p in authorized_paths
+        )
+        return cls(
+            granted=len(authorized_paths),
+            used=len(touched),
+            touched_paths=touched,
+            untouched_paths=untouched,
+            file_map=file_map,
+        )
+
+
+@dataclass(frozen=True)
 class EngineeringResult:
     """The complete CEO-facing outcome of one engineering job."""
 
@@ -202,6 +250,10 @@ class EngineeringResult:
     @property
     def ready(self) -> bool:
         return self.status is JobState.READY_FOR_APPROVAL
+
+    def scope_usage(self) -> ScopeUsage:
+        """Which authorized paths the work actually touched."""
+        return ScopeUsage.from_result(self.authorized_paths, self.changed_files)
 
     def to_dict(self) -> dict[str, Any]:
         payload = to_jsonable(self)
@@ -338,6 +390,17 @@ class EngineeringResult:
         lines.append(f"  developer attempts: {self.developer_attempts}")
         lines.append(f"  changed files ({len(self.changed_files)}):")
         lines.extend(f"    {path}" for path in self.changed_files or ("none reported",))
+
+        lines.append("")
+        lines.append("SCOPE USAGE")
+        usage = self.scope_usage()
+        lines.append(f"  {usage.used}/{usage.granted} authorized paths touched")
+        for path in self.authorized_paths:
+            touched = usage.files_under(path)
+            if touched:
+                lines.append(f"    [USED]   {path}  ({len(touched)} file(s))")
+            else:
+                lines.append(f"    [UNUSED] {path}")
 
         lines.append("")
         lines.append("TESTS")
@@ -533,5 +596,6 @@ __all__ = [
     "RESULT_VERSION",
     "EngineeringResult",
     "ResultTest",
+    "ScopeUsage",
     "SuiteScope",
 ]

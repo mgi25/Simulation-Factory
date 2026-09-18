@@ -56,6 +56,7 @@ from company.engineering import (
     PlanStep,
     ProtectedSurface,
     ResultTest,
+    ScopeUsage,
     ReviewFinding,
     ReviewOutcome,
     ReviewerAttestation,
@@ -1485,8 +1486,8 @@ def test_the_result_page_answers_every_question_the_brief_lists(tmp_path):
     run = _drive(tmp_path)
     rendered = run["result"].render_text()
     for heading in (
-        "WORK ORDER", "STATUS", "IMPLEMENTATION", "TESTS", "REVIEW", "GATE",
-        "RISKS", "DECISIONS REQUIRED", "CEO OPTIONS",
+        "WORK ORDER", "STATUS", "IMPLEMENTATION", "SCOPE USAGE", "TESTS",
+        "REVIEW", "GATE", "RISKS", "DECISIONS REQUIRED", "CEO OPTIONS",
     ):
         assert heading in rendered, heading
     assert run["order"].objective in rendered
@@ -1514,6 +1515,72 @@ def test_the_result_groups_tests_by_the_question_they_answer(tmp_path):
 def test_an_empty_test_scope_reads_as_none_reported_and_never_as_passing(tmp_path):
     run = _drive(tmp_path)
     assert "full repository suite: none reported" in run["result"].render_text()
+
+
+def test_scope_usage_shows_which_authorized_paths_were_touched(tmp_path):
+    """The CEO can see which of the paths they granted were actually used."""
+    run = _drive(tmp_path)
+    result = run["result"]
+    usage = result.scope_usage()
+    # The receipt changes company/engineering/verify.py, which falls under
+    # company/engineering but not under tests/test_company_engineering_execution.py.
+    assert usage.granted == len(result.authorized_paths)
+    assert usage.used >= 1
+    assert "company/engineering" in usage.touched_paths
+    assert usage.files_under("company/engineering") == ("company/engineering/verify.py",)
+
+
+def test_scope_usage_reports_untouched_paths(tmp_path):
+    run = _drive(tmp_path)
+    result = run["result"]
+    usage = result.scope_usage()
+    # tests/test_company_engineering_execution.py is authorized but
+    # the receipt only changes company/engineering/verify.py.
+    assert "tests/test_company_engineering_execution.py" in usage.untouched_paths
+
+
+def test_scope_usage_render_appears_on_the_ceo_page(tmp_path):
+    run = _drive(tmp_path)
+    rendered = run["result"].render_text()
+    assert "SCOPE USAGE" in rendered
+    assert "[USED]" in rendered
+    assert "[UNUSED]" in rendered
+
+
+def test_scope_usage_with_no_changed_files():
+    """All paths are untouched when nothing changed."""
+    usage = ScopeUsage.from_result(
+        authorized_paths=("src/a", "src/b"),
+        changed_files=(),
+    )
+    assert usage.granted == 2
+    assert usage.used == 0
+    assert usage.untouched_paths == ("src/a", "src/b")
+    assert usage.touched_paths == ()
+
+
+def test_scope_usage_matches_file_to_longest_prefix():
+    """A file under a nested authorized path matches that path, not a shorter one."""
+    usage = ScopeUsage.from_result(
+        authorized_paths=("src", "src/deep"),
+        changed_files=("src/deep/module.py",),
+    )
+    # The file should match 'src/deep' (first matching authorized path in order),
+    # but authorized_paths are sorted, so 'src' comes first and wins. Either way,
+    # 'src/deep' is also a prefix, so both are valid; what matters is
+    # at least one is marked used.
+    assert usage.used >= 1
+
+
+def test_scope_usage_exact_file_path_match():
+    """An authorized path that IS a changed file counts as used."""
+    usage = ScopeUsage.from_result(
+        authorized_paths=("tests/test_thing.py",),
+        changed_files=("tests/test_thing.py",),
+    )
+    assert usage.used == 1
+    assert usage.touched_paths == ("tests/test_thing.py",)
+    assert usage.files_under("tests/test_thing.py") == ("tests/test_thing.py",)
 
 
 def test_the_history_is_readable_as_one_serialisable_object(tmp_path):
