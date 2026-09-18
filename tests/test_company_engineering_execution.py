@@ -281,6 +281,30 @@ def _stores(state: Path):
     return EngineeringStore(state), ExecutionStore(state), ResourceUsageStore(state)
 
 
+def _validation(run):
+    """The receipt validation `record_review` performs, with the same evidence.
+
+    A bare `validate_receipt(packet, receipt)` fails an honest receipt, because
+    the receipt references the authority snapshot the adapter attached and a
+    validation that was not given it reports the reference as unsupplied. That
+    was a real defect in `record_review` before it was fixed; a test that
+    re-validates has to supply the same evidence or it re-creates it.
+    """
+    packet, receipt = run["packet"], run["receipt"]
+    authority = run["execution"].authority(
+        packet.task_id, packet.fingerprint(), receipt.packet_attempt
+    )
+    return validate_receipt(
+        packet,
+        receipt,
+        expansion_ledger=run["execution"].context_expansion_ledger(
+            packet, packet_attempt=receipt.packet_attempt
+        ),
+        packet_attempt=receipt.packet_attempt or None,
+        authority_fingerprint=authority.fingerprint() if authority else "",
+    )
+
+
 def _through_review(tmp_path: Path, *, request_changes=None, receipt_changes=None,
                     attestation_changes=None, review_verdict=ReviewOutcome.PASS,
                     tamper=None):
@@ -681,7 +705,7 @@ def test_the_implementer_cannot_review_its_own_work(tmp_path):
     self_review = _attestation(order, packet, receipt, reviewer=run["employee"])
     with pytest.raises(SelfApproval, match="cannot review it"):
         adjudicate(
-            order, packet, receipt, validate_receipt(packet, receipt), self_review,
+            order, packet, receipt, _validation(run), self_review,
             repo_root=run["repo"], implementer=run["employee"],
             packet_attempt=receipt.packet_attempt,
         )
@@ -728,9 +752,54 @@ def test_an_unqualified_reviewer_blocks_the_review(tmp_path):
         tmp_path, attestation_changes={"reviewer": "production_qc_lead"}
     )
     assert run["review"].outcome is ReviewOutcome.BLOCKED
-    assert any(
-        item.finding_id == "reviewer-not-qualified" for item in run["review"].findings
+    finding = next(
+        item for item in run["review"].findings
+        if item.finding_id == "reviewer-not-qualified"
     )
+    assert "does not hold the work order" in finding.summary
+
+
+def test_a_reviewer_who_is_not_an_employee_blocks_the_review(tmp_path):
+    """Unknown and unqualified used to be the same empty tuple, so unknown passed."""
+    run = _through_review(
+        tmp_path, attestation_changes={"reviewer": "nobody-employs-this-name"}
+    )
+    assert run["review"].outcome is ReviewOutcome.BLOCKED
+    finding = next(
+        item for item in run["review"].findings
+        if item.finding_id == "reviewer-not-qualified"
+    )
+    assert "holds no capability in the org registry" in finding.summary
+    assert any("staffed" in item for item in run["review"].escalations)
+
+
+def test_the_qualification_check_is_skipped_only_when_nobody_looked(tmp_path):
+    run = _through_review(tmp_path)
+    order, packet, receipt = run["order"], run["packet"], run["receipt"]
+    attestation = _attestation(
+        order, packet, receipt, review_id="rev-002", reviewer="production_qc_lead"
+    )
+    unchecked = adjudicate(
+        order, packet, receipt, _validation(run), attestation,
+        repo_root=run["repo"], implementer=run["employee"],
+        packet_attempt=receipt.packet_attempt, reviewer_capabilities=None,
+    )
+    assert unchecked.outcome is ReviewOutcome.PASS
+    checked = adjudicate(
+        order, packet, receipt, _validation(run), attestation,
+        repo_root=run["repo"], implementer=run["employee"],
+        packet_attempt=receipt.packet_attempt, reviewer_capabilities=(),
+    )
+    assert checked.outcome is ReviewOutcome.BLOCKED
+
+
+def test_a_targeted_test_is_one_the_work_order_required(tmp_path):
+    """The scope heading comes from the work order, never from a suite name."""
+    run = _drive(tmp_path)
+    targeted = run["result"].tests_in(SuiteScope.TARGETED)
+    assert [item.command for item in targeted] == list(run["order"].required_tests)
+    for item in run["result"].tests_in(SuiteScope.COMPANY_OS):
+        assert item.command not in run["order"].required_tests
 
 
 # --- 6. review is distinct and cannot be talked into a pass -------------
@@ -1565,3 +1634,11 @@ def test_the_dashboard_projection_cannot_act_on_a_work_order():
     forbidden = ("approve", "reject", "merge", "decide", "advance", "close", "publish")
     for name in dir(dashboard):
         assert not any(name.lower().startswith(verb) for verb in forbidden), name
+
+
+def test_a_revalidation_without_the_authority_evidence_fails_an_honest_receipt(tmp_path):
+    """The defect the review stage had: less evidence is not a stricter check."""
+    run = _through_review(tmp_path)
+    bare = validate_receipt(run["packet"], run["receipt"])
+    assert any("authority evidence" in item for item in bare.failures)
+    assert _validation(run).ok

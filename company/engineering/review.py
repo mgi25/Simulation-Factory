@@ -580,9 +580,18 @@ def adjudicate(
     repo_root: Path | str,
     implementer: str,
     packet_attempt: int,
-    reviewer_capabilities: Sequence[str] = (),
+    reviewer_capabilities: Sequence[str] | None = None,
 ) -> EngineeringReview:
-    """Combine deterministic QA with one reviewer's judgment into one verdict."""
+    """Combine deterministic QA with one reviewer's judgment into one verdict.
+
+    `reviewer_capabilities` distinguishes three cases, because collapsing two
+    of them was a hole: `None` means nobody looked the reviewer up and the
+    check is skipped; `()` means the registry holds no capability for that
+    name, which includes an employee who does not exist; and a non-empty
+    sequence is checked for the work order's review capability. Before this,
+    an unknown reviewer produced `()`, and `()` skipped the check, so an
+    attestation could name anybody at all.
+    """
     if attestation.reviewer == implementer:
         raise SelfApproval(
             f"{implementer!r} implemented work order {order.work_order_id} and cannot "
@@ -608,20 +617,26 @@ def adjudicate(
             order, packet, receipt, validation, repo_root=repo_root, attestation=attestation
         )
     )
-    if reviewer_capabilities and order.review_capability not in {
-        str(item).casefold() for item in reviewer_capabilities
-    }:
-        findings.append(
-            ReviewFinding(
-                finding_id="reviewer-not-qualified",
-                severity=FindingSeverity.BLOCKING,
-                summary=(
+    if reviewer_capabilities is not None:
+        held = {str(item).casefold() for item in reviewer_capabilities}
+        if order.review_capability not in held:
+            summary = (
+                f"reviewer {attestation.reviewer!r} holds no capability in the org "
+                "registry; an attestation cannot name somebody who is not an employee"
+                if not held
+                else (
                     f"reviewer {attestation.reviewer!r} does not hold the work order's "
                     f"review capability {order.review_capability!r}"
-                ),
-                deterministic=True,
+                )
             )
-        )
+            findings.append(
+                ReviewFinding(
+                    finding_id="reviewer-not-qualified",
+                    severity=FindingSeverity.BLOCKING,
+                    summary=summary,
+                    deterministic=True,
+                )
+            )
     deterministic_outcome = _worst(
         ReviewOutcome.PASS, *(item.severity.as_outcome() for item in findings)
     )

@@ -621,6 +621,12 @@ def record_decision(
 
 
 def _capabilities_of(employee: str, config: CompanyConfig) -> tuple[str, ...]:
+    """What the registry says this employee can do; empty for a name it never heard of.
+
+    Empty is the honest answer for an unknown employee, and `adjudicate` reads
+    it as blocking rather than as "not checked" - the two used to be the same
+    value, which let an attestation name anybody.
+    """
     employees = config.org_registry.get("employees", {})
     record = employees.get(employee, {}) if isinstance(employees, Mapping) else {}
     values = record.get("capabilities", ()) if isinstance(record, Mapping) else ()

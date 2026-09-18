@@ -242,10 +242,13 @@ class EngineeringResult:
                     ResultTest(
                         command=reported.command,
                         passed=reported.passed,
+                        # Targeted means "a test this work order required".
+                        # The work order is the only thing that knows which
+                        # those are; a name match would be this package
+                        # guessing about somebody else's suite.
                         scope=(
                             SuiteScope.TARGETED
                             if reported.command in order.required_tests
-                            or "test_company_engineering" in reported.command
                             else SuiteScope.COMPANY_OS
                         ),
                         summary=reported.summary,
