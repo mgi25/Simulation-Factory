@@ -932,6 +932,7 @@ class EngineeringRunner:
             worktree=worktree,
             receipt=receipt,
             developer_report=developer_report,
+            strategy=strategy,
         )
         write_text(stage_dir / "instructions.md", instructions)
 

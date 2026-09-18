@@ -630,7 +630,12 @@ def assess_request(
     if derived and capsules:
         criteria = _derive_criteria(request, capsules, tests)
 
-    routing_preview = derive_routing(request)
+    # Computed once and read twice. Both are pure functions of what is already
+    # in hand, so a second call would agree - but a derivation that says one
+    # thing and a work order that carries another is the exact failure this
+    # milestone found in the briefing, and the way to not have it is to not
+    # have two answers.
+    routing = derive_routing(request)
     narrowing = _narrow_refs(selection, tests, authorized)
     derivation = ScopeDerivation(
         matched_tokens=tokens,
@@ -645,11 +650,11 @@ def assess_request(
         required_tests=tests,
         criteria_derived=derived,
         unscreened_reserved_actions=unscreened,
-        specialist_domain=routing_preview.specialist_domain,
-        specialist_reason=routing_preview.reason,
-        novel=routing_preview.novel,
-        escalation=routing_preview.escalation.value,
-        reasoning_class_ceiling=routing_preview.reasoning_class_ceiling.value,
+        specialist_domain=routing.specialist_domain,
+        specialist_reason=routing.reason,
+        novel=routing.novel,
+        escalation=routing.escalation.value,
+        reasoning_class_ceiling=routing.reasoning_class_ceiling.value,
         resource_profile=request.resource_profile,
         context_refs_considered=narrowing.considered,
         context_refs_kept=len(narrowing.kept),
@@ -665,7 +670,6 @@ def assess_request(
         )
 
     surface = ProtectedSurface.capture(repo_root, authorized_paths=authorized)
-    routing = derive_routing(request)
     order = EngineeringWorkOrder(
         work_order_id=work_order_id or f"wo-{request.request_id}",
         objective=request.objective,
@@ -677,7 +681,7 @@ def assess_request(
         authorized_on=authorized_on or request.requested_on,
         forbidden_paths=forbidden,
         constraints=request.constraints,
-        context_refs=_context_refs(selection, tests, authorized),
+        context_refs=narrowing.kept,
         required_tests=tests,
         protected=surface,
         base_commit=request.base_commit,
@@ -903,6 +907,7 @@ def _narrow_refs(
 def _context_refs(
     selection: Any, tests: Sequence[str], authorized: Sequence[str]
 ) -> tuple[ContextRef, ...]:
+    """The narrowed reference set alone, for a caller that wants only that."""
     return _narrow_refs(selection, tests, authorized).kept
 
 

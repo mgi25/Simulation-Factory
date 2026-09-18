@@ -76,6 +76,66 @@ REVIEW_REPORT_FIELDS: tuple[tuple[str, str], ...] = (
 )
 
 
+def _ceiling_lines(strategy: "ResourceStrategy | None", *, role: str) -> list[str]:
+    """What this session may spend, and which of those limits actually binds.
+
+    One wording for both roles. Telling a session an advisory number and an
+    enforced one in the same list, and saying which is which, is the whole
+    point: a session that treats the turn ceiling as a wall stops early for no
+    reason, and one that treats the wall clock as advice is terminated
+    mid-sentence.
+    """
+    if strategy is None:
+        return []
+    out = [
+        "",
+        "## How much of the company this job is worth",
+        "",
+        (
+            f"Company OS runs this under its {strategy.profile!r} resource profile "
+            f"and recommended the {strategy.model_tier} model tier "
+            f"({strategy.strategy_reason})."
+        ),
+        "",
+        "Which of these binds, and which does not:",
+        (
+            f"  - wall clock: {strategy.max_wall_seconds}s. **Enforced** - this "
+            "session's process is terminated at that point, mid-sentence if need be."
+        ),
+    ]
+    if strategy.max_session_cost:
+        out.append(
+            f"  - spend: {strategy.max_session_cost} {strategy.cost_currency}. "
+            "**Enforced by the provider** when the backend accepts a ceiling."
+        )
+    if strategy.max_turns_advisory:
+        out.append(
+            f"  - turns: about {strategy.max_turns_advisory}. **Not enforced** - "
+            "nothing stops you at it. It is the shape of a session that fits, and "
+            "going far past it means the task was larger than the work order "
+            "described."
+        )
+    out.append("")
+    if role == "developer":
+        out.append(
+            "Work to finish inside them rather than up to them. If the task turns "
+            "out not to fit, stop, commit what is complete and correct, and say so "
+            "in your report: a partial result somebody can continue is worth more "
+            "than a complete one that was cut off at the ceiling."
+        )
+    else:
+        out.append(
+            "If the diff is larger than these allow, say so in your notes and "
+            "report on what you did read. A review that ran out of budget and said "
+            "nothing is worse than a short one that says where it stopped."
+        )
+    out.append(
+        "Prefer reading the specific file you need over searching the whole "
+        "repository, and do not re-read a file you have already read."
+    )
+    return out
+
+
 def developer_instructions(
     envelope: AuthorityEnvelope,
     *,
@@ -177,45 +237,7 @@ def developer_instructions(
             "changed and cannot be widened."
         )
 
-    if strategy is not None:
-        add("")
-        add("## How much of the company this job is worth")
-        add("")
-        add(
-            f"Company OS runs this under its {strategy.profile!r} resource profile "
-            f"and recommended the {strategy.model_tier} model tier "
-            f"({strategy.strategy_reason})."
-        )
-        add("")
-        add("Two of these ceilings are held by the runner and one is not:")
-        add(
-            f"  - wall clock: {strategy.max_wall_seconds}s. **Enforced** - this "
-            "session's process is terminated at that point, mid-edit if need be."
-        )
-        if strategy.max_session_cost:
-            add(
-                f"  - spend: {strategy.max_session_cost} "
-                f"{strategy.cost_currency}. **Enforced by the provider** when the "
-                "backend accepts a ceiling."
-            )
-        if strategy.max_turns_advisory:
-            add(
-                f"  - turns: about {strategy.max_turns_advisory}. **Not enforced** - "
-                "nothing stops you at it. It is the shape of a session that fits, "
-                "and going far past it means the task was larger than the work "
-                "order described."
-            )
-        add("")
-        add(
-            "Work to finish inside them rather than up to them. If the task turns "
-            "out not to fit, stop, commit what is complete and correct, and say so "
-            "in your report: a partial result somebody can continue is worth more "
-            "than a complete one that was cut off at the ceiling."
-        )
-        add(
-            "Prefer reading the specific file you need over searching the whole "
-            "repository, and do not re-read a file you have already read."
-        )
+    lines.extend(_ceiling_lines(strategy, role="developer"))
 
     add("")
     add("## The packet Company OS issued, verbatim")
@@ -233,6 +255,7 @@ def review_instructions(
     worktree: Path,
     receipt: Mapping[str, Any],
     developer_report: Mapping[str, Any],
+    strategy: "ResourceStrategy | None" = None,
 ) -> str:
     lines: list[str] = []
     add = lines.append
@@ -304,6 +327,7 @@ def review_instructions(
         "the CEO, and approval is the CEO's and only the CEO's."
     )
     add("Do not start nested agents. Do not edit, write or run anything.")
+    lines.extend(_ceiling_lines(strategy, role="reviewer"))
     return "\n".join(lines) + "\n"
 
 

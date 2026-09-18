@@ -316,7 +316,17 @@ def ingest_developer_result(
             f"a developer receipt is ingested from developing, not from {job.state.value}"
         )
     contract = order.employee_contract(config, _implementer_of(order, config))
-    scoped = plan_task(order.task_specification(), config, employee_contract=contract)
+    # The same context policy the packet was built under. `ingest` re-plans and
+    # compares the resulting context fingerprint against the packet's, so a
+    # second plan assembled under different rules is a fingerprint mismatch and
+    # a refused receipt - which is what the dogfood run found: the brief stage
+    # narrowed context by the resource profile and this one did not.
+    scoped = plan_task(
+        order.task_specification(),
+        config,
+        employee_contract=contract,
+        context_policy=_context_policy(order),
+    )
     resolved = packet or _latest_packet(execution_store, order)
     ingested = ManualExternalSessionAdapter(execution_store).ingest(
         scoped, resolved, receipt, usage_store, repo_dir=repo_dir
@@ -680,8 +690,16 @@ def _capabilities_of(employee: str, config: CompanyConfig) -> tuple[str, ...]:
 
 
 def _implementer_of(order: EngineeringWorkOrder, config: CompanyConfig) -> str:
-    """Re-route the work order to learn which employee its packet was issued to."""
-    routed = plan_task(order.task_specification(), config)
+    """Re-route the work order to learn which employee its packet was issued to.
+
+    Routing does not depend on the context policy, but planning under a
+    different one assembles a different manifest, and an assembly that can fail
+    here for a reason routing does not care about is a needless second way for
+    this to break. It is given the same policy as every other call.
+    """
+    routed = plan_task(
+        order.task_specification(), config, context_policy=_context_policy(order)
+    )
     if routed.selected_employee is None:
         raise EngineeringError(
             f"work order {order.work_order_id}: no employee holds "

@@ -2172,3 +2172,77 @@ def test_an_irreversible_request_raises_its_own_ceiling():
     routed = derive_routing(_request(reversible=False))
     assert routed.reasoning_class_ceiling is ReasoningClass.E
     assert derive_routing(_request()).reasoning_class_ceiling is ReasoningClass.D
+
+
+def test_every_stage_plans_under_the_same_context_policy(tmp_path):
+    """The defect a live run found and no test had.
+
+    `ManualExternalSessionAdapter.ingest` re-plans the task and compares the
+    resulting context fingerprint with the packet's. The brief stage narrowed
+    context by the resource profile and the receipt stage did not, so the two
+    plans assembled different manifests and every real receipt was refused:
+    `context b2655e65 against packet 491e6522`. The work was done, committed
+    and pushed, and the lifecycle would not accept it.
+    """
+    repo = _fake_repo(tmp_path)
+    config = _config()
+    assessment = assess_request(
+        _routine_request(), config.permissions, repo_root=repo,
+        capsule_index=_index(), work_order_id="wo-req-001",
+    )
+    order = assessment.work_order
+    store, execution, usage = _stores(tmp_path / "state")
+    opened = open_job(store, assessment, on=DAY)
+    briefing = prepare_developer_session(store, execution, order, opened.job, config, on=DAY)
+
+    # The packet carries the narrowed context.
+    assert len(briefing.packet.context_refs) == len(order.context_refs)
+
+    # A plan built without the policy would assemble a wider manifest and a
+    # different fingerprint - which is exactly what made the receipt fail.
+    from company.engineering.orchestrator import _context_policy
+    from company.runtime.lifecycle import plan_task
+
+    contract = order.employee_contract(config, briefing.employee)
+    unpoliced = plan_task(order.task_specification(), config, employee_contract=contract)
+    assert unpoliced.preparation.context_fingerprint != briefing.packet.context_fingerprint
+    policed = plan_task(
+        order.task_specification(), config, employee_contract=contract,
+        context_policy=_context_policy(order),
+    )
+    assert policed.preparation.context_fingerprint == briefing.packet.context_fingerprint
+
+    # And the real ingestion path agrees, end to end.
+    developed = ingest_developer_result(
+        store, execution, usage, order, briefing.job, config,
+        _receipt(briefing.packet), on=DAY,
+    )
+    assert developed.job.state is JobState.TESTING
+
+
+def test_no_engineering_stage_plans_without_a_context_policy():
+    """A source guard, because the behavioural one only covers the paths it walks.
+
+    Every `plan_task` call in this subsystem must pass `context_policy`. One
+    that does not assembles context under different rules from the packet it
+    is being compared against, and the failure surfaces as a refused receipt
+    two stages later, after a session has already been paid for.
+    """
+    source = (ROOT / "company" / "engineering" / "orchestrator.py").read_text(
+        encoding="utf-8"
+    )
+    tree = ast.parse(source)
+    calls = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "plan_task"
+    ]
+    assert calls, "the guard is watching a function nobody calls"
+    for call in calls:
+        keywords = {keyword.arg for keyword in call.keywords}
+        assert "context_policy" in keywords, (
+            f"plan_task at line {call.lineno} plans without a context policy"
+        )
+
