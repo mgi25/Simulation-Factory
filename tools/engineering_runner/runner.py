@@ -748,7 +748,10 @@ class EngineeringRunner:
         )
         attestation_path = write_json(stage_dir / "attestation.json", attestation)
         reply = self._control.submit_review(
-            work_order_id, attestation_path, implementer=developer_envelope.employee
+            work_order_id,
+            attestation_path,
+            implementer=developer_envelope.employee,
+            repo_root=worktree,
         )
         write_json(
             stage_dir / "review-out.json", reply.payload or {"exit_code": reply.exit_code}
@@ -1027,10 +1030,20 @@ def _next_stage_dir(run_dir: Path, role: str) -> Path:
 
 
 def _latest_stage_dir(run_dir: Path, role: str) -> Path | None:
-    candidates = sorted(run_dir.glob(f"{role}-*"))
-    for path in reversed(candidates):
-        if (path / "briefing.json").is_file():
-            return path
+    """The most recent stage of this role, searching earlier runs if needed.
+
+    A review does not have to happen in the same *run* as the attempt it
+    reviews. A runner that died between the two - or was restarted, or hit a
+    bug and was fixed - resumes from `testing`, in a new run directory, and the
+    receipt it must review is in the previous one. Looking only at the current
+    run made a resumed review impossible for a reason that has nothing to do
+    with the work; the dogfood run found it.
+    """
+    runs = sorted(run_dir.parent.glob("run-*"), reverse=True)
+    for directory in ([run_dir] + [item for item in runs if item != run_dir]):
+        for path in sorted(directory.glob(f"{role}-*"), reverse=True):
+            if (path / "briefing.json").is_file():
+                return path
     return None
 
 

@@ -212,6 +212,10 @@ def review_briefing(base: str) -> dict[str, Any]:
     payload["read_only"] = True
     payload["review_instructions"] = ["change nothing: this packet grants no writable path"]
     payload["packet"]["path_scope"] = {"allowed": [], "forbidden": []}
+    # A review is its own task. `EngineeringWorkOrder.review_specification`
+    # builds `<work_order_id>-review`, because the two roles route to different
+    # employees by different capabilities.
+    payload["packet"]["task_id"] = f"{WORK_ORDER}-review"
     payload["packet_fingerprint"] = "beefbeefbeefbeef"
     payload["persisted"]["packet"]["fingerprint"] = "beefbeefbeefbeef"
     payload["persisted"]["packet"]["attempt"] = 1
@@ -298,6 +302,28 @@ def test_a_packet_for_another_work_order_is_refused():
     payload["packet"]["task_id"] = "wo-something-else"
     with pytest.raises(IntegrityFailure, match="will not act on the pair"):
         AuthorityEnvelope.parse(payload)
+
+
+def test_each_role_expects_its_own_task_id_and_refuses_the_others():
+    """A review is a different task, and the two ids are not interchangeable.
+
+    The first version of this check compared both roles' packets with the work
+    order id, which reads correctly and is wrong: it refused every real review
+    packet, and the dogfood run found it at the review stage rather than in a
+    test. Both directions are asserted now.
+    """
+    reviewer = review_briefing("a" * 40)
+    assert AuthorityEnvelope.parse(reviewer).task_id == f"{WORK_ORDER}-review"
+
+    reviewer_with_developer_task = review_briefing("a" * 40)
+    reviewer_with_developer_task["packet"]["task_id"] = WORK_ORDER
+    with pytest.raises(IntegrityFailure, match="will not act on the pair"):
+        AuthorityEnvelope.parse(reviewer_with_developer_task)
+
+    developer_with_review_task = developer_briefing("a" * 40)
+    developer_with_review_task["packet"]["task_id"] = f"{WORK_ORDER}-review"
+    with pytest.raises(IntegrityFailure, match="will not act on the pair"):
+        AuthorityEnvelope.parse(developer_with_review_task)
 
 
 def test_a_packet_fingerprint_that_disagrees_with_the_stored_record_is_refused():
@@ -660,6 +686,7 @@ class ScriptedControlPlane:
         self.calls: list[tuple[str, Any]] = []
         self.receipts: list[dict[str, Any]] = []
         self.attestations: list[dict[str, Any]] = []
+        self.review_repo_roots: list[Path] = []
         self.review_outcome = "pass"
         self.receipt_accepted = True
 
@@ -696,9 +723,12 @@ class ScriptedControlPlane:
         self._advance("reviewing")
         return _reply(review_briefing(self.base))
 
-    def submit_review(self, work_order_id: str, attestation_file: Path, *, implementer: str):
+    def submit_review(
+        self, work_order_id: str, attestation_file: Path, *, implementer: str, repo_root: Path
+    ):
         payload = json.loads(Path(attestation_file).read_text(encoding="utf-8"))
         self.attestations.append(payload)
+        self.review_repo_roots.append(Path(repo_root))
         self.calls.append(("review", payload["verdict"]))
         self._advance("gate")
         return _reply({"state": "gate", "review": {"outcome": self.review_outcome}})
@@ -937,6 +967,41 @@ def test_a_restart_does_not_repeat_completed_work(repository):
     assert len(backend.launched) == launched_first
 
 
+def test_a_review_resumes_in_a_new_run_from_the_attempt_in_the_previous_one(repository):
+    """The review stage does not require the developer stage to be in its own run.
+
+    A runner that dies - or is stopped, fixed and restarted - between the
+    attempt and the review resumes from `testing` in a fresh run directory,
+    and the receipt it must review is in the previous one.
+    """
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    backend = ScriptedBackend(edit=_in_scope_edit)
+
+    class StopsAfterTheReceipt(ScriptedControlPlane):
+        def review_brief(self, work_order_id: str, *, implementer: str, executor: str):
+            raise OSError("the runner died here")
+
+    first = StopsAfterTheReceipt(repository["base"], states=["planning"])
+    runner = _runner(repository, backend, first)
+    stopped = runner.run_one(WORK_ORDER)
+    assert stopped.outcome == RUN_FAILED
+    assert [item.stage for item in stopped.stages] == ["developer"]
+
+    # A second process, over the same directories, with the job at `testing`.
+    control.states[0] = "testing"
+    control.receipts.extend(first.receipts)
+    resumed = _runner(repository, backend, control).run_one(WORK_ORDER)
+    assert resumed.outcome == COMPLETED, resumed.reason
+    assert [item.stage for item in resumed.stages] == ["reviewer", "gate"]
+    assert resumed.final_state == "ready_for_approval"
+    assert control.attestations[0]["verdict"] == "pass"
+    # and no second developer attempt was launched
+    assert [request.role for request in backend.launched] == [
+        "developer",
+        "reviewer",
+    ]
+
+
 def test_a_failing_stage_is_recorded_and_does_not_leave_the_lease_held(repository):
     class Exploding(ScriptedControlPlane):
         def developer_brief(self, work_order_id: str, *, executor: str):
@@ -955,9 +1020,26 @@ def test_a_failing_stage_is_recorded_and_does_not_leave_the_lease_held(repositor
     assert store.outcomes(WORK_ORDER)[-1]["outcome"] == RUN_FAILED
 
 
+def test_the_review_is_adjudicated_against_the_tree_the_work_happened_in(repository):
+    """`--repo-root` decides where the protected surface is re-read.
+
+    Pointing it at the operator's checkout instead of the task worktree would
+    make the one check that can catch an unmentioned edit re-read files no
+    session could have touched, and it would pass every time.
+    """
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    runner = _runner(repository, backend, control)
+    runner.run_one(WORK_ORDER)
+
+    (used,) = control.review_repo_roots
+    assert used == runner._workspace.worktree_path(BRANCH)  # noqa: SLF001
+    assert used != repository["repo"]
+
+
 def test_a_review_that_routes_back_to_the_implementer_is_refused(repository):
     class SelfReviewing(ScriptedControlPlane):
-        def review_brief(self, work_order_id: str, *, implementer: str, executor: str):
+        def review_brief(self, work_order_id: str, *, implementer: str, executor: str):  # noqa: D102
             payload = review_briefing(self.base)
             payload["reviewer"] = EMPLOYEE
             self._advance("reviewing")

@@ -159,8 +159,22 @@ class ControlPlane:
         )
 
     def submit_review(
-        self, work_order_id: str, attestation_file: Path, *, implementer: str
+        self,
+        work_order_id: str,
+        attestation_file: Path,
+        *,
+        implementer: str,
+        repo_root: Path,
     ) -> StageReply:
+        """Adjudicate a review against the checkout the work actually happened in.
+
+        `--repo-root` is where `company.engineering.review` re-reads the
+        protected governance surface and compares it with the digests taken at
+        authorization - the one check that can catch a change no receipt
+        mentions. So it has to be the **task worktree**, not the operator's
+        checkout: pointing it at a tree the session never touched would make
+        that check re-read files nobody could have edited and pass every time.
+        """
         return self._engineering(
             [
                 "review",
@@ -171,7 +185,7 @@ class ControlPlane:
                 "--implementer",
                 implementer,
                 "--repo-root",
-                str(self._repo_root),
+                str(repo_root),
             ]
         )
 

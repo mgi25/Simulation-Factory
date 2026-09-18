@@ -63,7 +63,11 @@ from company.runtime.path_scope import normalise_path as company_normalise
 from company.runtime.receipts import SessionReceipt, validate_receipt
 from knowledge.company_os.capsules import CapsuleIndex
 
-from tools.engineering_runner.authorization import AuthorityEnvelope, PathRules
+from tools.engineering_runner.authorization import (
+    REVIEW_TASK_SUFFIX,
+    AuthorityEnvelope,
+    PathRules,
+)
 from tools.engineering_runner.authorization import normalise_path as runner_normalise
 from tools.engineering_runner.backends import SessionOutcome, executor_hint
 from tools.engineering_runner.evidence import (
@@ -158,6 +162,20 @@ def test_the_runner_acts_on_no_state_that_belongs_to_the_ceo():
     terminal = {state.value for state in TERMINAL_STATES}
     assert not (runner_module.ACTIONABLE & ceo)
     assert not (runner_module.ACTIONABLE & terminal)
+
+
+def test_the_review_task_id_the_runner_expects_is_the_one_the_work_order_builds(briefing):
+    """Pinned to `review_specification`, because the runner refuses any other id.
+
+    The suffix is the separation of duties made visible in an identifier, and
+    the runner restates it. A silent change to either side would make every
+    review packet unparseable - which is exactly how the dogfood run failed
+    before this pin existed.
+    """
+    order = briefing["order"]
+    assert order.review_specification().task_id == (
+        f"{order.work_order_id}{REVIEW_TASK_SUFFIX}"
+    )
 
 
 def test_the_runner_runs_exactly_the_suites_the_gate_requires():

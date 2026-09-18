@@ -63,6 +63,14 @@ _WINDOWS_DRIVE = re.compile(r"[A-Za-z]:")
 # architecture_and_security_review; the runner's job is to notice it happened.
 DEPENDENCY_FILES: tuple[str, ...] = ("requirements.txt", "pyproject.toml", "setup.cfg")
 
+# A review is a different task from the work it reviews, and Company OS says so
+# in the id: `EngineeringWorkOrder.review_specification` builds
+# `<work_order_id>-review`, because the two route to different employees by
+# different capabilities and that difference *is* the separation of duties. The
+# suffix is restated here and pinned to the original in
+# `tests/test_company_external_engineering_runner.py`.
+REVIEW_TASK_SUFFIX = "-review"
+
 
 def normalise_path(value: str, field_name: str = "path") -> str:
     """A repository-relative POSIX path, or a refusal.
@@ -239,10 +247,15 @@ class AuthorityEnvelope:
         if not work_order_id:
             raise IntegrityFailure("briefing names no work order")
         task_id = str(packet.get("task_id", ""))
-        if task_id != work_order_id:
+        expected_task = (
+            work_order_id
+            if role == "developer"
+            else f"{work_order_id}{REVIEW_TASK_SUFFIX}"
+        )
+        if task_id != expected_task:
             raise IntegrityFailure(
-                f"the packet is for task {task_id!r} and the work order is "
-                f"{work_order_id!r}; the runner will not act on the pair"
+                f"the {role} packet is for task {task_id!r} and this work order's "
+                f"{role} task is {expected_task!r}; the runner will not act on the pair"
             )
         branch = str(order.get("authorized_branch", ""))
         if str(packet.get("expected_branch", branch)) != branch:
@@ -460,6 +473,7 @@ def _strings(values: Any) -> tuple[str, ...]:
 
 __all__ = [
     "DEPENDENCY_FILES",
+    "REVIEW_TASK_SUFFIX",
     "AuthorityEnvelope",
     "AuthorityVerdict",
     "PathRules",
