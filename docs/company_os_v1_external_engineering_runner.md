@@ -571,3 +571,32 @@ establish that the code being shipped is the code that completed a request.
 | a failed job is recorded and the lease released | `test_a_failing_stage_is_recorded_and_does_not_leave_the_lease_held` |
 | secrets are redacted from persisted logs | four tests with recognisable sentinels |
 | Company OS still holds no process-spawn capability | `test_company_os_still_holds_no_process_spawning_capability`, and the gate check itself |
+
+---
+
+## 16. Regression, at `e930467`
+
+| | |
+|---|---|
+| targeted (`test_external_engineering_runner.py`, `test_company_external_engineering_runner.py`, `test_company_engineering_execution.py`) | 212 passed |
+| the 11 required Company OS suites | 780 passed, all green |
+| integration gate | **READY** — `integration-readiness-2026-09-18-7f11ceec8d31b26e`, 34/34 required checks pass, 0 blockers |
+| full repository suite | 6 failed, 4389 passed, 337 skipped |
+| new failures | **0** |
+| pre-existing failures | 6, unchanged: `test_neon_proof.py` and the two `test_sloped_v25*_world.py` modules, all race and visual-production |
+
+The base commit reported 4272 passing and the same 6 failures. This branch adds
+117 passing tests and breaks none.
+
+**Unchanged, byte for byte, against the base:** `company/runtime/`,
+`company/integration/`, `company/youtube/`, `company/analytics/`,
+`ai_platform/`, `knowledge/`, `intelligence/`, `tools/youtube_fetch/`,
+`company/permissions.yaml`, `company/constitution.md`,
+`company/org_registry.yaml`, and `company/youtube/video_assignments.json`. The
+only Company OS change on this branch is seven lines in
+`company/engineering/__main__.py`.
+
+`production.no_publishing_capability` is **pass**, still required, and its
+implementation — `PROCESS_MODULES == {multiprocessing, pty, subprocess}` — is
+asserted by value in a test, because an exemption would most plausibly arrive
+as a quiet edit to a frozenset rather than as a change to the policy.
