@@ -74,6 +74,7 @@ from .lifecycle import (
     EngineeringJob,
     JobState,
     JobTransition,
+    StageTiming,
 )
 from .orchestrator import (
     DeveloperBriefing,
@@ -189,6 +190,7 @@ __all__ = [
     "ReviewerAttestation",
     "ScopeDerivation",
     "SelfApproval",
+    "StageTiming",
     "SuiteScope",
     "accepted",
     "adjudicate",
