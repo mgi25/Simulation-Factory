@@ -18,6 +18,10 @@ work order knows and a packet does not:
 - **`protected_paths` —** the governance surface, named so the session knows it
   is measured. The digests are deliberately *not* included: a session that
   knows the digests learns nothing useful, and a briefing is a set of pointers.
+- **`efficiency` —** the execution strategy Company OS selected for this job,
+  including model tier, context budget, checkpoint rule, output reduction
+  directives and resource ceilings. The operator applies these with the
+  runner's existing flags; Company OS determines and records them.
 
 ## Still references, never bodies
 
@@ -33,6 +37,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from ai_platform.serde import to_jsonable
+from company.efficiency.strategy import select_strategy
 from company.runtime.transport import SessionTransportBundle
 
 from .work_order import EngineeringWorkOrder
@@ -86,6 +91,39 @@ def _work_order_terms(order: EngineeringWorkOrder) -> dict[str, Any]:
     }
 
 
+def _efficiency_directives(
+    order: EngineeringWorkOrder,
+    reasoning_class_value: str,
+    max_context_refs: int,
+    *,
+    is_review: bool = False,
+) -> dict[str, Any]:
+    """Compute execution strategy from work order properties and emit as directives.
+
+    The strategy is deterministic: the same work order always produces the same
+    directives.  The operator applies model tier and resource ceilings using
+    the runner's existing flags; Company OS determines and records them.
+    """
+    from ai_platform.resource_classes import ReasoningClass
+
+    strategy = select_strategy(
+        ReasoningClass(reasoning_class_value),
+        order.risk,
+        evidence_required=order.evidence_required,
+        max_context_refs=max_context_refs,
+        is_review=is_review,
+    )
+    directives = strategy.to_dict()
+    directives["operator_applied"] = True
+    directives["note"] = (
+        "Company OS selected this execution strategy. The operator applies "
+        "model_tier and resource_ceiling using the runner's --model and "
+        "--max-turns flags. These are not advisory; the session should stop "
+        "and escalate before exceeding the resource ceiling."
+    )
+    return directives
+
+
 def developer_briefing_payload(briefing: "DeveloperBriefing") -> dict[str, Any]:
     """Everything an external developer session needs, and nothing else."""
     packet = briefing.packet
@@ -110,6 +148,12 @@ def developer_briefing_payload(briefing: "DeveloperBriefing") -> dict[str, Any]:
             "authority": briefing.prepared.authority_pointer.to_dict(),
             "job": briefing.job_pointer.to_dict(),
         },
+        "efficiency": _efficiency_directives(
+            briefing.work_order,
+            packet.reasoning_class.value,
+            len(packet.context_refs),
+            is_review=False,
+        ),
     }
 
 
@@ -140,6 +184,12 @@ def review_briefing_payload(briefing: "ReviewBriefing") -> dict[str, Any]:
             "authority": briefing.prepared.authority_pointer.to_dict(),
             "job": briefing.job_pointer.to_dict(),
         },
+        "efficiency": _efficiency_directives(
+            briefing.work_order,
+            packet.reasoning_class.value,
+            len(packet.context_refs),
+            is_review=True,
+        ),
     }
 
 

@@ -1642,3 +1642,76 @@ def test_a_revalidation_without_the_authority_evidence_fails_an_honest_receipt(t
     bare = validate_receipt(run["packet"], run["receipt"])
     assert any("authority evidence" in item for item in bare.failures)
     assert _validation(run).ok
+
+
+# --- efficiency directives in briefings ------------------------------------
+
+from company.engineering.transport import developer_briefing_payload, review_briefing_payload
+
+
+def test_developer_briefing_carries_efficiency_directives(tmp_path):
+    """The briefing Company OS emits must include execution strategy."""
+    repo = _fake_repo(tmp_path)
+    state = tmp_path / "state"
+    config = _config()
+    assessment = assess_request(
+        _request(), config.permissions, repo_root=repo,
+        capsule_index=_index(), work_order_id="wo-req-001",
+    )
+    store, execution, usage = _stores(state)
+    opened = open_job(store, assessment, on=DAY)
+    briefing = prepare_developer_session(
+        store, execution, opened.work_order, opened.job, config, on=DAY,
+    )
+    payload = developer_briefing_payload(briefing)
+    assert "efficiency" in payload
+    eff = payload["efficiency"]
+    assert eff["model_tier"] in ("standard", "strongest")
+    assert isinstance(eff["context_budget_chars"], int)
+    assert eff["context_budget_chars"] > 0
+    assert isinstance(eff["checkpoint_threshold_chars"], int)
+    assert eff["checkpoint_rule"] in (
+        "continue_if_under_budget",
+        "checkpoint_when_context_exceeds_threshold",
+        "fresh_context_per_independent_criterion",
+    )
+    assert isinstance(eff["output_reduction"], dict)
+    assert isinstance(eff["resource_ceiling"], dict)
+    assert eff["resource_ceiling"]["max_turns"] > 0
+    assert eff["resource_ceiling"]["max_tool_calls"] > 0
+    assert eff["provider_count"] == 1
+    assert eff["operator_applied"] is True
+    assert eff["strategy_reason"]
+
+
+def test_review_briefing_carries_efficiency_directives_with_reduced_budget(tmp_path):
+    """The review briefing has efficiency directives with a tighter context budget."""
+    repo = _fake_repo(tmp_path)
+    state = tmp_path / "state"
+    config = _config()
+    assessment = assess_request(
+        _request(), config.permissions, repo_root=repo,
+        capsule_index=_index(), work_order_id="wo-req-001",
+    )
+    store, execution, usage = _stores(state)
+    opened = open_job(store, assessment, on=DAY)
+    dev_briefing = prepare_developer_session(
+        store, execution, opened.work_order, opened.job, config, on=DAY,
+    )
+    receipt = _receipt(dev_briefing.packet)
+    developed = ingest_developer_result(
+        store, execution, usage, opened.work_order, dev_briefing.job,
+        config, receipt, on=DAY,
+    )
+    rev_briefing = prepare_review_session(
+        store, execution, opened.work_order, developed.job, config,
+        implementer=dev_briefing.employee, on=DAY,
+    )
+    dev_payload = developer_briefing_payload(dev_briefing)
+    rev_payload = review_briefing_payload(rev_briefing)
+    assert "efficiency" in rev_payload
+    assert (
+        rev_payload["efficiency"]["context_budget_chars"]
+        <= dev_payload["efficiency"]["context_budget_chars"]
+    )
+    assert "review" in rev_payload["efficiency"]["strategy_reason"]

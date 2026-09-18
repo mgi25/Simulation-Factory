@@ -41,5 +41,23 @@ from .telemetry import (
 )
 from .store import EfficiencyStore
 from .emission import EfficiencyEmission, emit_execution_efficiency
+from .strategy import (
+    CheckpointRule,
+    ExecutionStrategy,
+    ModelTier,
+    OutputReductionDirective,
+    ResourceCeiling,
+    select_strategy,
+)
+from .budget import (
+    BudgetCheck,
+    check_budget,
+    should_checkpoint,
+)
+from .baseline import (
+    Baseline,
+    BaselineEntry,
+    extract_baseline,
+)
 
 __all__ = [name for name in globals() if not name.startswith("_")]

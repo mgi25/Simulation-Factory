@@ -355,3 +355,180 @@ def test_minimalism_check_requires_every_cheaper_reuse_tier() -> None:
     assert check.considered_tiers[-1] is ReuseTier.SMALL_IMPLEMENTATION
     with pytest.raises(EfficiencyError, match="every cheaper"):
         replace(check, considered_tiers=(ReuseTier.SMALL_IMPLEMENTATION,))
+
+
+# --- execution strategy selection ------------------------------------------
+
+from ai_platform.resource_classes import ReasoningClass, Risk
+from company.efficiency.strategy import (
+    CheckpointRule,
+    ExecutionStrategy,
+    ModelTier,
+    OutputReductionDirective,
+    ResourceCeiling,
+    select_strategy,
+)
+from company.efficiency.budget import BudgetCheck, check_budget, should_checkpoint
+from company.efficiency.baseline import Baseline, BaselineEntry, extract_baseline
+
+
+def test_strategy_selects_strongest_for_specialist_reasoning() -> None:
+    strategy = select_strategy(ReasoningClass.D, Risk.MEDIUM, evidence_required=True)
+    assert strategy.model_tier is ModelTier.STRONGEST
+    assert strategy.provider_count == 1
+    assert "specialist" in strategy.strategy_reason or "evidence" in strategy.strategy_reason
+
+
+def test_strategy_selects_standard_for_routine_c_class() -> None:
+    strategy = select_strategy(ReasoningClass.C, Risk.LOW)
+    assert strategy.model_tier is ModelTier.STANDARD
+    assert "routine" in strategy.strategy_reason
+
+
+def test_strategy_selects_strongest_for_high_risk() -> None:
+    strategy = select_strategy(ReasoningClass.C, Risk.HIGH)
+    assert strategy.model_tier is ModelTier.STRONGEST
+    assert "risk" in strategy.strategy_reason
+
+
+def test_strategy_review_has_reduced_context_budget() -> None:
+    dev = select_strategy(ReasoningClass.D, Risk.MEDIUM)
+    review = select_strategy(ReasoningClass.D, Risk.MEDIUM, is_review=True)
+    assert review.context_budget_chars < dev.context_budget_chars
+    assert "review" in review.strategy_reason
+
+
+def test_strategy_is_deterministic() -> None:
+    first = select_strategy(ReasoningClass.D, Risk.MEDIUM, max_context_refs=8)
+    second = select_strategy(ReasoningClass.D, Risk.MEDIUM, max_context_refs=8)
+    assert first == second
+
+
+def test_strategy_to_dict_is_complete() -> None:
+    strategy = select_strategy(ReasoningClass.D, Risk.MEDIUM)
+    payload = strategy.to_dict()
+    assert payload["model_tier"] == "strongest"
+    assert isinstance(payload["context_budget_chars"], int)
+    assert isinstance(payload["checkpoint_threshold_chars"], int)
+    assert payload["checkpoint_rule"] in {r.value for r in CheckpointRule}
+    assert isinstance(payload["output_reduction"], dict)
+    assert isinstance(payload["resource_ceiling"], dict)
+    assert payload["provider_count"] == 1
+    assert payload["strategy_reason"]
+
+
+def test_output_reduction_standard_omits_passing_tests() -> None:
+    standard = OutputReductionDirective.standard()
+    assert standard.omit_passing_test_detail is True
+    assert standard.omit_clean_git_detail is True
+    full = OutputReductionDirective.full()
+    assert full.omit_passing_test_detail is False
+
+
+def test_resource_ceiling_varies_by_tier() -> None:
+    standard = ResourceCeiling.for_tier(ModelTier.STANDARD, ReasoningClass.C)
+    strongest = ResourceCeiling.for_tier(ModelTier.STRONGEST, ReasoningClass.D)
+    assert strongest.max_turns >= standard.max_turns
+    assert strongest.max_tool_calls >= standard.max_tool_calls
+
+
+# --- budget enforcement ----------------------------------------------------
+
+
+def test_budget_check_detects_violations() -> None:
+    strategy = select_strategy(ReasoningClass.C, Risk.LOW)
+    ok = check_budget(strategy, context_chars=1000, turns=5, tool_calls=10)
+    assert ok.within_budget
+    assert not ok.exceeded
+    assert ok.violations == ()
+
+    over = check_budget(
+        strategy,
+        context_chars=strategy.context_budget_chars + 1,
+        turns=strategy.resource_ceiling.max_turns + 1,
+    )
+    assert over.exceeded
+    assert len(over.violations) == 2
+
+
+def test_budget_check_handles_none_values() -> None:
+    strategy = select_strategy(ReasoningClass.D, Risk.MEDIUM)
+    result = check_budget(strategy)
+    assert result.within_budget
+
+
+def test_checkpoint_respects_critical_section() -> None:
+    strategy = select_strategy(ReasoningClass.D, Risk.MEDIUM)
+    # Over threshold but in critical section: don't checkpoint
+    assert not should_checkpoint(
+        strategy,
+        context_chars=strategy.checkpoint_threshold_chars + 1000,
+        in_critical_section=True,
+        has_committed_progress=True,
+    )
+    # Over threshold, not critical, has progress: checkpoint
+    assert should_checkpoint(
+        strategy,
+        context_chars=strategy.checkpoint_threshold_chars + 1000,
+        in_critical_section=False,
+        has_committed_progress=True,
+    )
+    # Under threshold: don't checkpoint
+    assert not should_checkpoint(
+        strategy,
+        context_chars=100,
+        has_committed_progress=True,
+    )
+
+
+# --- baseline extraction ---------------------------------------------------
+
+
+def test_baseline_from_real_efficiency_records(tmp_path) -> None:
+    store = EfficiencyStore(tmp_path)
+    store.append(_record(
+        mode=BenchmarkMode.REAL,
+        model="claude-opus-4-6[1m]",
+        provider="anthropic",
+        outcome="accepted",
+        cost=CostMeasurement(
+            MeasurementSource.PROVIDER_REPORTED,
+            amount="1.50",
+            currency="USD",
+        ),
+    ))
+    baseline = extract_baseline(tmp_path)
+    assert len(baseline.entries) == 1
+    assert baseline.entries[0].task_id == "task-1"
+    assert baseline.entries[0].model == "claude-opus-4-6[1m]"
+    assert baseline.entries[0].cost_amount == "1.50"
+    assert baseline.total_cost_usd == "1.50"
+    assert baseline.all_used_strongest_model
+    assert len(baseline.state_dirs_read) == 1
+
+
+def test_baseline_excludes_benchmark_records(tmp_path) -> None:
+    store = EfficiencyStore(tmp_path)
+    store.append(_record(mode=BenchmarkMode.BASELINE))
+    store.append(_record(run_id="run-2", mode=BenchmarkMode.CAPSULE_OPTIMIZED))
+    baseline = extract_baseline(tmp_path)
+    assert len(baseline.entries) == 0
+
+
+def test_baseline_handles_missing_state_dir() -> None:
+    baseline = extract_baseline("/nonexistent/path")
+    assert len(baseline.entries) == 0
+    assert baseline.total_cost_usd is None
+
+
+def test_baseline_to_dict_is_serializable(tmp_path) -> None:
+    store = EfficiencyStore(tmp_path)
+    store.append(_record(
+        mode=BenchmarkMode.REAL,
+        outcome="accepted",
+    ))
+    baseline = extract_baseline(tmp_path)
+    payload = baseline.to_dict()
+    assert payload["entry_count"] == 1
+    serialized = json.dumps(payload)
+    assert "task-1" in serialized
