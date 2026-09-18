@@ -1678,7 +1678,7 @@ _PRODUCTION_DIRS = (
 # additive, so a *new* file under it changes no race/fight/V30 code. Modifying
 # or deleting anything under a production root - this path included - stays a
 # violation, and so does adding a file anywhere else under one.
-_ADDITIVE_PRODUCTION_PATHS = ("tools/youtube_fetch/",)
+_ADDITIVE_PRODUCTION_PATHS = ("tools/youtube_fetch/", "tools/engineering_runner/")
 
 
 def _production_changes(name_status):

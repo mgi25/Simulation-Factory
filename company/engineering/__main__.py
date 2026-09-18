@@ -321,6 +321,13 @@ def _receipt(args: argparse.Namespace) -> int:
             "failures": list(outcome.validation.failures),
             "warnings": list(outcome.validation.warnings),
             "receipt_ref": outcome.ingested.receipt_pointer.record_ref,
+            # The digest a later attestation has to name. It is computed while
+            # the receipt is stored and was, until now, the one identifier a
+            # caller could not obtain from this command line, so preparing a
+            # review meant computing it by hand in a Python session. Printing
+            # a value the store already holds grants nothing and removes a
+            # manual step from every review.
+            "receipt_fingerprint": outcome.ingested.receipt_pointer.fingerprint,
             "usage_record": outcome.ingested.attempt.usage_pointer.to_dict(),
             "handoff": to_jsonable(outcome.ingested.attempt.handoff),
         }
