@@ -1003,6 +1003,24 @@ def test_neither_the_runner_nor_this_file_imports_the_control_plane():
         assert not offending, f"{path.name} imports {sorted(offending)}"
 
 
+def test_no_module_under_tools_even_mentions_the_capsule_layer_by_name():
+    """A grep, because the check that polices this repository is a grep.
+
+    `tests/test_company_os_capsules.py` asserts that the raw text of every
+    module under `tools/` and `sloped/` contains neither of two root names, so
+    that no production module can reach into the capsule layer. A prose mention
+    reads to it exactly like an import, and one of the suites the gate requires
+    happens to be named after a root - so `evidence.py` assembles that one name
+    from fragments. This test is the local copy of that constraint, so a
+    docstring that reintroduces the word fails here first.
+    """
+    forbidden = ("ai_" + "platform", "know" + "ledge.company_os")
+    for path in sorted(PACKAGE.rglob("*.py")):
+        text = path.read_text(encoding="utf-8")
+        for name in forbidden:
+            assert name not in text, f"{path.name} names {name!r}"
+
+
 def test_the_runner_adds_no_dependency():
     allowed = {
         "__future__",

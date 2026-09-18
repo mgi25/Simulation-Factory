@@ -36,18 +36,19 @@ evidence - is validated by the side that issued the authority.
 ## The boundary is a command line, not an import
 
 `tools/` is a declared production root and
-`architecture.production_does_not_import_company_os` is required, so nothing
-here imports `company`, `ai_platform`, `knowledge` or `intelligence` - not in
-a module, not in a test, not under `TYPE_CHECKING`. The whole dependency is
-`controlplane.py` invoking `python -m company.engineering <stage>` and reading
-its JSON. That is the same split `tools/youtube_fetch` uses for the same
-reason, and it has the same useful consequence: every stage the runner drives
-is a stage a person can drive by typing the same command.
+`architecture.production_does_not_import_company_os` is required, so no module
+here imports any of the four control-plane roots - not in a module, not in a
+test, not under `TYPE_CHECKING`. The whole dependency is `controlplane.py`
+invoking `python -m company.engineering <stage>` and reading its JSON. That is
+the same split `tools/youtube_fetch` uses for the same reason, and it has the
+same useful consequence: every stage the runner drives is a stage a person can
+drive by typing the same command.
 
-The roots it must not import are deliberately not spelled out in this
-docstring: a capsule-layer test greps every module under `tools/` for them, and
-a docstring quoting them reads to that test exactly like a module importing
-them.
+The four roots are deliberately not spelled out anywhere in this package: a
+capsule-layer test greps the raw text of every module under `tools/` for them,
+and a docstring quoting them reads to that test exactly like a module importing
+them. `tests/test_external_engineering_runner.py` names them, assembled from
+fragments, and asserts the absence.
 
 ## What it cannot do
 

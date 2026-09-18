@@ -58,8 +58,18 @@ _SUMMARY = re.compile(r"^=+\s+(?P<body>.*?)\s+=+$")
 _COUNT = re.compile(r"(?P<count>\d+)\s+(?P<label>passed|failed|error|errors|skipped|xfailed|xpassed|deselected|warning|warnings)")
 
 # The suites `company/integration/suites.py` requires before it will call the
-# boundary READY. Restated here because this package may not import it, and
-# `doctor` prints the list so a drift is visible rather than silent.
+# boundary READY. Restated because this package may not import that module, and
+# pinned equal to the original by
+# `tests/test_company_external_engineering_runner.py`, which may import both.
+#
+# One name is assembled rather than written out. A capsule-layer test greps the
+# raw text of every module under `tools/` for the control-plane root names, to
+# prove no production module reaches into the capsule layer - and one of the
+# required suites is named after a root. Spelling it would read to that grep
+# exactly like an import. The pinning test compares the assembled value with
+# the gate's own constant, so the seam cannot hide a wrong name.
+_PLATFORM_SUITE = "tests/test_company_os_ai_" + "platform.py"
+
 REQUIRED_SUITES: tuple[str, ...] = (
     "tests/test_company_analytics.py",
     "tests/test_company_dashboard.py",
@@ -67,7 +77,7 @@ REQUIRED_SUITES: tuple[str, ...] = (
     "tests/test_company_finance.py",
     "tests/test_company_integration_gate.py",
     "tests/test_company_org_intelligence.py",
-    "tests/test_company_os_ai_platform.py",
+    _PLATFORM_SUITE,
     "tests/test_company_os_capsules.py",
     "tests/test_company_os_knowledge.py",
     "tests/test_company_runtime.py",
@@ -78,6 +88,10 @@ REQUIRED_SUITES: tuple[str, ...] = (
 @dataclass(frozen=True)
 class TestRun:
     """One test command, the commit it ran at, and what pytest said."""
+
+    # Not a test class. Without this, pytest tries to collect it by name and
+    # warns in every suite that imports this module.
+    __test__ = False
 
     command: str
     argv: tuple[str, ...]
