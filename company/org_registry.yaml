@@ -39,6 +39,13 @@ employees:
     mission: Protect architecture, contracts, reversibility, and long-term maintainability.
     capabilities: [software_architecture, dependency_governance, technology_migration]
 
+  software_implementation_engineer:
+    department: engineering
+    manager: chief_architect
+    state: dormant
+    mission: Implement authorized engineering work orders and the tests that prove them.
+    capabilities: [software_implementation, test_engineering]
+
   simulation_physics_engineer:
     department: engineering
     manager: chief_architect

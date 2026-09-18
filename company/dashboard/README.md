@@ -11,7 +11,7 @@ record bodies.
 
 ```
 <company-state>/
-  runtime/       # ExecutionStore and ResourceUsageStore root
+  runtime/       # ExecutionStore, ResourceUsageStore and EngineeringStore root
   research/      # ResearchStore root
   analytics/     # AnalyticsStore root
   finance/       # FinanceStore root
@@ -34,6 +34,18 @@ python -m company.dashboard show --output-dir state/dashboard --snapshot company
 Build writes a canonical JSON snapshot and compact text brief beneath the caller-supplied
 output directory. Files are created exclusively. Repeating identical output is a no-op;
 differing content under the same snapshot ID is refused.
+
+`engineering` defaults to the same root as `execution`, because an engineering
+job's packets, authority snapshots and receipts *are* execution records: a job
+that pointed at attempts in another directory would be a job the dashboard
+could not verify. A caller may still point it elsewhere explicitly.
+
+The engineering section carries one dimension per lifecycle state - requested,
+planning, developing, testing, reviewing, gate, ready_for_approval,
+decision_required, blocked, failed, closed - and puts every job waiting on the
+CEO into the decision queue, which is what surfaces it in the brief. It cannot
+approve one: `merges_authorized` is structurally zero and no engineering record
+carries merge authority.
 
 Snapshot identity includes the explicit `as_of` date. Source freshness is `current`,
 `stale`, or `unknown`; absent recheck metadata stays unknown. Snapshot diffing compares

@@ -374,6 +374,18 @@
       "status": "active"
     },
     {
+      "capability_id": "software_implementation",
+      "criticality": "important",
+      "description": "Implement an authorized engineering work order inside its granted paths.",
+      "domain": "engineering",
+      "name": "Software implementation",
+      "notes": "",
+      "required_by": [
+        "software_implementation_engineer"
+      ],
+      "status": "active"
+    },
+    {
       "capability_id": "source_analysis",
       "criticality": "supporting",
       "description": "Judge whether a discovered source is worth a reader's attention and record why.",
@@ -401,6 +413,18 @@
       "name": "Telemetry",
       "notes": "",
       "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "test_engineering",
+      "criticality": "important",
+      "description": "Write the tests that decide whether an implementation met its criteria.",
+      "domain": "engineering",
+      "name": "Test engineering",
+      "notes": "",
+      "required_by": [
+        "software_implementation_engineer"
+      ],
       "status": "active"
     },
     {
@@ -540,6 +564,18 @@
       "note": "",
       "source": "mobile_readability",
       "target": "qc"
+    },
+    {
+      "kind": "related_to",
+      "note": "",
+      "source": "software_architecture",
+      "target": "software_implementation"
+    },
+    {
+      "kind": "related_to",
+      "note": "",
+      "source": "software_implementation",
+      "target": "test_engineering"
     },
     {
       "kind": "related_to",

@@ -9,11 +9,11 @@
   "decisions": [],
   "dependencies": [
     "company-analytics-experiments",
+    "company-engineering-execution",
     "company-finance",
     "company-organizational-intelligence",
     "company-production-integration-gate",
     "company-research-operations",
-    "company-runtime",
     "company-workforce-employment",
     "company-youtube-connectivity"
   ],

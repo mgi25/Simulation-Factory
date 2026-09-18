@@ -13,6 +13,8 @@ from typing import Any, Callable, Iterable, Mapping
 from ai_platform.serde import fingerprint
 from ai_platform.usage import Outcome, ResourceUsageRecord
 from company.analytics.integrity import check_integrity as analytics_integrity
+from company.engineering.lifecycle import CEO_STATES, JobState
+from company.engineering.store import EngineeringStore
 from company.analytics.store import AnalyticsStore
 from company.finance.integrity import check_integrity as finance_integrity
 from company.finance.store import FinanceStore
@@ -58,18 +60,29 @@ class CompanyStatePaths:
     finance: Path
     workforce: Path
     organization: Path
+    engineering: Path | None = None
+
+    def __post_init__(self) -> None:
+        # Engineering state lives beside the execution history: an engineering
+        # job's packets, authorities and receipts are execution records, and
+        # splitting the two roots would let a job point at attempts the
+        # dashboard cannot see. Defaulted rather than required so every
+        # existing caller keeps working.
+        if self.engineering is None:
+            object.__setattr__(self, "engineering", self.execution)
 
     @classmethod
     def from_root(cls, root: str | Path) -> "CompanyStatePaths":
         base = Path(root).resolve()
         return cls(base, base / "runtime", base / "research", base / "analytics",
-                   base / "finance", base / "workforce", base / "organization")
+                   base / "finance", base / "workforce", base / "organization",
+                   base / "runtime")
 
     @classmethod
     def flat(cls, root: str | Path) -> "CompanyStatePaths":
         """Compatibility layout for a caller that deliberately shares one store root."""
         base = Path(root).resolve()
-        return cls(base, base, base, base, base, base, base)
+        return cls(base, base, base, base, base, base, base, base)
 
 
 @dataclass
@@ -229,6 +242,153 @@ class _Reader:
                                         f"{len(pending)} active attempt(s); {len(accepted)} accepted and {len(visible_rejections)} rejected attempt(s).",
                                         dims, tuple(r.key for r in refs), integrity_issues=tuple(issues)), refs,
                        attention=tuple(attention), records={k: tuple(r for r, _ in v) for k, v in decoded.items()})
+
+    def engineering(self) -> _Result:
+        """The engineering lifecycle, as the CEO's own read-only projection.
+
+        Every state the loop can be in is a dimension, so a CEO reading the
+        snapshot sees how many jobs are waiting on the company and how many are
+        waiting on them. A job in `ready_for_approval`, `decision_required` or
+        `blocked` becomes a `CEODecisionItem`, which is what puts it in the
+        existing CEO brief's "Needs my decision" section without the brief
+        knowing this subsystem exists.
+
+        Nothing here decides anything. `executive.dashboard_cannot_approve` is
+        a required gate check, and a projection that could approve a work order
+        would fail it.
+        """
+        store = EngineeringStore(self.paths.engineering)
+        work_order_ids = store.work_order_ids()
+        if not work_order_ids:
+            return self.missing("engineering", "engineering:no_work_orders")
+        refs: list[SourceReference] = []
+        decisions: list[CEODecisionItem] = []
+        attention: list[AttentionItem] = []
+        issues: list[str] = []
+        by_state: dict[str, int] = defaultdict(int)
+        orders: list[Any] = []
+        jobs: list[Any] = []
+        reviews: list[Any] = []
+        verdicts: list[Any] = []
+
+        for work_order_id in work_order_ids:
+            try:
+                order = store.work_order(work_order_id)
+                job = store.job(work_order_id)
+                review = store.review(work_order_id)
+                verdict = store.gate_verdict(work_order_id)
+                issues.extend(store.integrity(work_order_id))
+            except Exception as exc:  # corrupt state belongs on the dashboard
+                issues.append(f"{work_order_id}: {exc}")
+                continue
+            if order is None or job is None:
+                issues.append(f"{work_order_id}: a work order with no job record")
+                continue
+            orders.append(order)
+            jobs.append(job)
+            if review is not None:
+                reviews.append(review)
+            if verdict is not None:
+                verdicts.append(verdict)
+            by_state[job.state.value] += 1
+            path = self.paths.engineering / "engineering" / "work_orders"
+            ref = self.ref(SourceSubsystem.ENGINEERING, "work_order", work_order_id,
+                           path, order)
+            refs.append(ref)
+            if job.state in CEO_STATES:
+                decisions.append(
+                    CEODecisionItem(
+                        decision_id=f"engineering-{work_order_id}",
+                        type="engineering_work_order",
+                        source_subsystem=SourceSubsystem.ENGINEERING,
+                        subject=order.objective,
+                        why_ceo_attention=_engineering_reason(job, review, verdict),
+                        evidence_refs=(ref.key,),
+                        risk=order.risk.value,
+                        reversibility="reversible" if order.reversible else "irreversible",
+                        current_state=job.state.value,
+                        blocked=job.state is not JobState.READY_FOR_APPROVAL,
+                        created_on=order.authorized_on,
+                    )
+                )
+            if job.state is JobState.BLOCKED:
+                attention.append(
+                    AttentionItem(
+                        f"engineering-blocked-{work_order_id}", order.objective,
+                        job.transitions[-1].reason, (ref.key,), "engineering",
+                        AttentionLevel.BLOCKED,
+                        "A corrected attempt, a re-run gate, or a CEO decision resolves it.",
+                    )
+                )
+            elif job.state is JobState.FAILED:
+                attention.append(
+                    AttentionItem(
+                        f"engineering-failed-{work_order_id}", order.objective,
+                        job.transitions[-1].reason, (ref.key,), "engineering",
+                        AttentionLevel.ACTION_REQUIRED,
+                        "A further attempt needs a new work order, which is a CEO decision.",
+                    )
+                )
+        if issues and refs:
+            attention.append(
+                AttentionItem(
+                    "engineering-integrity", "engineering history",
+                    f"{len(issues)} engineering integrity issue(s) remain.",
+                    (refs[0].key,), "integrity", AttentionLevel.BLOCKED,
+                    "Repair canonical engineering state and re-read the history.",
+                )
+            )
+        states = tuple(
+            ExecutiveDimension(f"jobs_{state.value}", by_state.get(state.value, 0),
+                               source_refs=tuple(item.key for item in refs))
+            for state in JobState
+        )
+        dims = states + (
+            ExecutiveDimension("work_orders", len(orders),
+                               source_refs=tuple(item.key for item in refs)),
+            ExecutiveDimension("awaiting_ceo", sum(1 for job in jobs if job.awaits_ceo),
+                               source_refs=tuple(item.key for item in refs)),
+            ExecutiveDimension("developer_attempts",
+                               sum(job.developer_attempts for job in jobs),
+                               source_refs=tuple(item.key for item in refs)),
+            ExecutiveDimension("reviews_recorded", len(reviews),
+                               source_refs=tuple(item.key for item in refs)),
+            ExecutiveDimension(
+                "reviews_independent",
+                all(item.implementer != item.reviewer for item in reviews) if reviews else None,
+                known=bool(reviews), source_refs=tuple(item.key for item in refs),
+                note="Unknown until a review has been recorded.",
+            ),
+            ExecutiveDimension(
+                "gate_ready",
+                sum(1 for item in verdicts if item.readiness.permits_readiness)
+                if verdicts else None,
+                known=bool(verdicts), source_refs=tuple(item.key for item in refs),
+                note="Unknown until a gate report has been supplied.",
+            ),
+            ExecutiveDimension(
+                "merges_authorized", 0,
+                source_refs=tuple(item.key for item in refs),
+                note="Structurally zero: no engineering record carries merge authority.",
+            ),
+        )
+        ready = by_state.get(JobState.READY_FOR_APPROVAL.value, 0)
+        waiting = sum(1 for job in jobs if job.awaits_ceo)
+        summary = (
+            f"{len(orders)} work order(s); {ready} ready for CEO approval and "
+            f"{waiting} awaiting a CEO decision."
+        )
+        return _Result(
+            ExecutiveSection(
+                "engineering",
+                Availability.PARTIAL if issues else Availability.AVAILABLE,
+                summary, dims, tuple(item.key for item in refs),
+                integrity_issues=tuple(issues),
+            ),
+            tuple(refs), tuple(decisions), tuple(attention),
+            records={"work_order": tuple(orders), "job": tuple(jobs),
+                     "review": tuple(reviews), "gate_verdict": tuple(verdicts)},
+        )
 
     def research(self) -> _Result:
         store = ResearchStore(self.paths.research)
@@ -589,8 +749,9 @@ def build_snapshot(state_dir: str | Path | None = None, *, sources: CompanyState
     day = as_of or dt.date.today()
     repository = Path(repo_root).resolve() if repo_root else Path(__file__).resolve().parents[2]
     reader = _Reader(sources, day, repository)
-    results = (reader.execution(), reader.research(), reader.analytics(), reader.finance(),
-               reader.workforce(), reader.organization(), reader.system())
+    results = (reader.execution(), reader.engineering(), reader.research(),
+               reader.analytics(), reader.finance(), reader.workforce(),
+               reader.organization(), reader.system())
     results = _with_resource_finance(results)
     refs = tuple(ref for result in results for ref in result.refs)
     missing = tuple(item for result in results for item in result.section.missing)
@@ -729,6 +890,20 @@ def _date(value: Any) -> dt.date | None:
 
 def _keys(refs: Iterable[SourceReference], kind: str, ids: set[str] | None = None) -> tuple[str, ...]:
     return tuple(ref.key for ref in refs if ref.kind == kind and (ids is None or ref.record_id in ids))
+
+
+def _engineering_reason(job: Any, review: Any, verdict: Any) -> str:
+    """Why this work order is on the CEO's desk, in one line, from its records."""
+    if job.state is JobState.READY_FOR_APPROVAL:
+        gate = verdict.readiness.value if verdict is not None else "not recorded"
+        outcome = review.outcome.value if review is not None else "not recorded"
+        return (
+            f"review {outcome}, integration gate {gate}; approval, changes or "
+            "rejection is the CEO's decision and nothing is merged"
+        )
+    if job.pending_decisions:
+        return "; ".join(job.pending_decisions[:3])
+    return job.transitions[-1].reason
 
 
 def _dim(name: str, value: int, rows: Iterable[tuple[Any, SourceReference]]) -> ExecutiveDimension:

@@ -20,6 +20,7 @@ class DashboardError(ValueError):
 
 class SourceSubsystem(str, Enum):
     EXECUTION = "execution"
+    ENGINEERING = "engineering"
     RESEARCH = "research"
     ANALYTICS = "analytics"
     FINANCE = "finance"
