@@ -1516,6 +1516,35 @@ def test_an_empty_test_scope_reads_as_none_reported_and_never_as_passing(tmp_pat
     assert "full repository suite: none reported" in run["result"].render_text()
 
 
+def test_the_result_reports_attempts_spent_remaining_and_ceiling(tmp_path):
+    """The CEO page shows how many attempts are spent, how many remain, and the ceiling."""
+    run = _drive(tmp_path)
+    result = run["result"]
+    job = run["job"]
+    # The fields carry the same data the job tracks.
+    assert result.developer_attempts == job.developer_attempts
+    assert result.max_developer_attempts == job.max_developer_attempts
+    assert result.attempts_remaining == job.corrections_remaining
+    # The invariant: spent + remaining == ceiling.
+    assert result.developer_attempts + result.attempts_remaining == result.max_developer_attempts
+    # The CEO page renders all three in one line.
+    rendered = result.render_text()
+    assert f"{result.developer_attempts} spent" in rendered
+    assert f"{result.attempts_remaining} remaining" in rendered
+    assert f"ceiling {result.max_developer_attempts}" in rendered
+
+
+def test_attempts_remaining_decreases_with_a_higher_ceiling(tmp_path):
+    """With a ceiling of 3 and one attempt spent, two remain."""
+    run = _drive(tmp_path, request_changes={"max_developer_attempts": 3})
+    order = run["order"]
+    assert order.max_developer_attempts == 3
+    result = run["result"]
+    assert result.developer_attempts == 1
+    assert result.attempts_remaining == 2
+    assert result.max_developer_attempts == 3
+
+
 def test_the_history_is_readable_as_one_serialisable_object(tmp_path):
     run = _drive(tmp_path)
     history = run["store"].history(run["order"].work_order_id)
