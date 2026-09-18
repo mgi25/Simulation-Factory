@@ -348,12 +348,65 @@ in this milestone changes that finding.
 
 ## 10. Cheap validation, then the one matched job
 
-Deterministic tests pass first (§1-§6 test files, plus the existing suite -
-see the commit log for the exact run). The matched job - consumer profile,
-STANDARD tier, one Developer, one Reviewer, no automatic retry, the same
-`attempts-remaining`-shaped objective as the historical BEFORE and Consumer
-Mode V1 runs - is reported in the Final Report section below, appended after
-it ran. Stopped after that one job, per the brief.
+Deterministic tests pass first: every new test file in §1-§2 (22 cases) and
+the full suite at commit `30878b1` - **4,545 passed, 6 failed (the known
+gitignored-artifact failures named in the project's own suite fingerprint),
+337 skipped, zero new failures.** The three research branch-scope guards that
+watch `tools/` were re-run *after* committing (the failure mode they have is
+invisible before a commit) and all three pass: the new modules sit inside
+`tools/engineering_runner/`, already on the additive-paths allowlist.
+
+**The matched job.** Objective: "For one engineering work order, tell me how
+many reviewer passes have been completed so far, so a CEO page can show
+review activity alongside developer attempts" - same subsystem
+(`company/engineering`), same authorized-path shape (one module + its test
+file), same risk level (`medium`) and same `specialist_domain=""` as the
+historical `attempts-remaining` objective, so it classifies the same way
+(routine, standard tier). Not the identical objective: that feature is
+already implemented on this branch's own base. Smaller in one respect
+(surfacing an existing counter rather than a spent/remaining pair) and
+honestly reported as such rather than dressed up as identical.
+
+Run via `python -m company.engineering request` then
+`python -m tools.engineering_runner run-one`, consumer profile, one Developer
+attempt, one Reviewer pass, no automatic retry, on top of this milestone's
+own commit (`base_commit 30878b1`). Result: **developer accepted, reviewer
+verdict `pass` (attested pass, deterministic pass), gate 11/11 required
+suites green with zero blockers, final state `ready_for_approval`.**
+
+---
+
+## FINAL REPORT
+
+**baseline branch:** `company-os-v1-consumer-resource-mode` @ `4b6064d` (verified pushed and clean before starting)
+**new branch:** `company-os-v1-repository-exploration-efficiency`
+**commit:** `30878b1381040893fc474e89fe1a9e7d90a99342`
+
+**historical exploration findings:** §1. Cache-read units, cost, output tokens and (where the field exists) model turns are RELIABLE; files changed is RELIABLE; which files were read or searched is UNAVAILABLE for every one of the 21 stored sessions measured, by construction of the backend's `--output-format json` launch mode. Ten stored developer receipts predate the `model_turns` field and carry a legacy `tool_calls` key instead - PARTIAL, not blended into the reliable aggregate.
+
+**navigation mechanism:** `tools/engineering_runner/repo_map.py` - stdlib `ast` over `company/`, `tools/`, `tests/`, queried into a capped, ranked slice injected into each briefing.
+**repo-map size:** 413 modules, 554,922-character JSON (~542 KB), built in 1.74 s; never handed whole to a session.
+**retrieval behavior:** objective text → `query()` → 2-5 ranked (path, owner, matched symbols, covering tests) → injected under one new briefing section, plus the tests already covering each authorized-to-write file.
+
+**external tools tested:** the internal `ast`-based repo map (built and measured).
+**adopted:** the internal repo map.
+**rejected:** ast-grep, for V1 (not installed here, no new dependency justified against a 2.07 s / 0-error full-repo `ast` parse of 593 files).
+**deferred:** Serena, Graphify (a `CodeIntelligenceProvider` hook for this already exists in `company/efficiency/providers.py`, unwired, benchmark-only), RTK (shell-output verbosity not measured this round), context-compression approaches.
+
+**Consumer Mode V1 matched result** (developer attempt, `attempts-remaining`): 39 turns, 11,020 output units, 1,835,390 cache-read units, 71,558 cache-creation units, $1.640637, 2 files changed, 305.9 s.
+
+**Exploration Efficiency V1 result** (developer attempt, `reviews-completed`): 27 turns, 8,184 output units, **990,324 cache-read units**, 61,384 cache-creation units, $1.083562, 2 files changed, 209.6 s.
+
+**change (developer attempt, Consumer V1 → this milestone):** cache-read **-46.0%** (1,835,390 → 990,324), turns -30.8%, output tokens -25.7%, cost -34.0%, wall time -31.5%. Reviewer attempt moved the other way in this single run (7→9 turns, 78,605→158,520 cache-read, $0.296→$0.374) - small absolute numbers, and §1 already established that n=1 variance on this workload exceeds the effect size for any single dimension; the total job cost (developer + reviewer) still fell, $1.936→$1.457 (**-24.7%**).
+
+**quality:** developer report accepted; two invariant-preservation statements and two unresolved-risk notes recorded, neither blocking.
+**tests:** 116 passed (was 114; 2 added), 0 failed.
+**review:** verdict `pass` (attested pass, deterministic pass), 1 advisory finding, 0 blocking.
+**gate:** READY, 11/11 required suites green, 0 blockers.
+
+**consumer viability:** SUPPORTED. One provider, one session per stage, one developer attempt, one reviewer pass, no automatic retry, total job cost $1.457 - inside the consumer profile's own $3.00 session ceiling with room to spare, and $0.479 cheaper than the same-shaped Consumer Mode V1 job it is compared against. Not a claim that every task fits: §9's threshold and this result are both about a routine, bounded, two-file change, the same class of job Consumer Mode V1 was validated against.
+
+**verdict: REPOSITORY EXPLORATION EFFICIENCY V1: PASS.** Every §10 acceptance condition met: STANDARD tier resolved and used, tests PASS, review PASS, gate READY, no automatic retry occurred, telemetry trustworthy (`unreliable_metrics: []` on both sessions), and repository exploration - measured as the developer attempt's `cache_read_units`, the threshold declared in §9 before this job ran - came in 46.0% below Consumer Mode V1's matched figure against a 25% bar. **Do not merge.**
 
 ---
 
