@@ -100,6 +100,8 @@ class EngineeringResult:
     remote_verified: bool = False
     implementer: str = ""
     developer_attempts: int = 0
+    max_developer_attempts: int = 0
+    attempts_remaining: int = 0
     tests: tuple[ResultTest, ...] = ()
     review_outcome: ReviewOutcome | None = None
     reviewer: str = ""
@@ -170,10 +172,17 @@ class EngineeringResult:
         for name in ("remote_verified", "merge_performed"):
             if not isinstance(getattr(self, name), bool):
                 raise EngineeringError(f"result.{name} must be a boolean")
-        if isinstance(self.developer_attempts, bool) or not isinstance(
-            self.developer_attempts, int
-        ):
-            raise EngineeringError("result.developer_attempts must be an integer")
+        for counter in ("developer_attempts", "max_developer_attempts", "attempts_remaining"):
+            val = getattr(self, counter)
+            if isinstance(val, bool) or not isinstance(val, int):
+                raise EngineeringError(f"result.{counter} must be an integer")
+            if val < 0:
+                raise EngineeringError(f"result.{counter} must be non-negative")
+        if self.attempts_remaining != max(0, self.max_developer_attempts - self.developer_attempts):
+            raise EngineeringError(
+                "result.attempts_remaining must equal "
+                "max_developer_attempts - developer_attempts (clamped to 0)"
+            )
         if self.authorizes_merge is not False:
             raise EngineeringError(
                 "an engineering result never authorizes a merge. It reports; the CEO "
@@ -289,6 +298,8 @@ class EngineeringResult:
             remote_verified=bool(receipt.remote_verified) if receipt else False,
             implementer=(review.implementer if review else ""),
             developer_attempts=job.developer_attempts,
+            max_developer_attempts=job.max_developer_attempts,
+            attempts_remaining=job.corrections_remaining,
             tests=tuple(tests),
             review_outcome=(review.outcome if review else None),
             reviewer=(review.reviewer if review else ""),
@@ -335,7 +346,10 @@ class EngineeringResult:
         lines.append(f"  commit: {self.commit_sha or 'none reported'}")
         lines.append(f"  remote verified: {'yes' if self.remote_verified else 'no'}")
         lines.append(f"  implementer: {self.implementer or 'not recorded'}")
-        lines.append(f"  developer attempts: {self.developer_attempts}")
+        lines.append(
+            f"  developer attempts: {self.developer_attempts} of "
+            f"{self.max_developer_attempts} ({self.attempts_remaining} remaining)"
+        )
         lines.append(f"  changed files ({len(self.changed_files)}):")
         lines.extend(f"    {path}" for path in self.changed_files or ("none reported",))
 
@@ -457,6 +471,8 @@ class EngineeringResult:
             remote_verified=bool(data.get("remote_verified", False)),
             implementer=str(data.get("implementer", "")),
             developer_attempts=int(data.get("developer_attempts", 0)),
+            max_developer_attempts=int(data.get("max_developer_attempts", 0)),
+            attempts_remaining=int(data.get("attempts_remaining", 0)),
             tests=tuple(tests),
             review_outcome=_optional_enum(ReviewOutcome, data.get("review_outcome")),
             reviewer=str(data.get("reviewer", "")),
