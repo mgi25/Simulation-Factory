@@ -408,6 +408,8 @@ suites green with zero blockers, final state `ready_for_approval`.**
 
 **verdict: REPOSITORY EXPLORATION EFFICIENCY V1: PASS.** Every §10 acceptance condition met: STANDARD tier resolved and used, tests PASS, review PASS, gate READY, no automatic retry occurred, telemetry trustworthy (`unreliable_metrics: []` on both sessions), and repository exploration - measured as the developer attempt's `cache_read_units`, the threshold declared in §9 before this job ran - came in 46.0% below Consumer Mode V1's matched figure against a 25% bar. **Do not merge.**
 
+**This is the precondition, not the lifting of it.** `docs/company_os_consumer_resource_mode.md`'s own record states plainly that autonomous Company OS engineering is PAUSED, for one stated reason - live repository exploration dominating resource usage with nothing reaching inside a session - and names exactly one condition for resuming: "repository-exploration efficiency is improved *and* proven with a cheap matched run." This milestone is that improve-and-prove step, and it passed. Whether to resume issuing autonomous Company OS engineering requests is a CEO/operator decision this document does not make on its own behalf, the same way a READY gate is never itself authorization to merge.
+
 ---
 
 ## 11. Governance, unchanged
