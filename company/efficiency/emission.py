@@ -23,7 +23,10 @@ from .providers import (
     ToolOutputArtifact,
     normalise_provider_usage,
 )
+from .baseline import AfterComparison, Baseline, compare_against_baseline, extract_baseline
+from .budget import BudgetCheck, check_budget, should_checkpoint
 from .store import EfficiencyStore
+from .strategy import ExecutionStrategy, select_strategy
 from .telemetry import (
     BenchmarkMode,
     EfficiencyRecord,
@@ -36,6 +39,9 @@ from .telemetry import (
 class EfficiencyEmission:
     record: EfficiencyRecord
     pointer: ExecutionRecordPointer
+    budget_check: BudgetCheck | None = None
+    should_checkpoint: bool = False
+    after_comparison: AfterComparison | None = None
 
 
 def emit_execution_efficiency(
@@ -134,7 +140,52 @@ def emit_execution_efficiency(
         context_manifest_chars=len(manifest_text),
         context_manifest_bytes=len(manifest_text.encode("utf-8")),
     )
-    return EfficiencyEmission(record, store.append_idempotent(record))
+    pointer = store.append_idempotent(record)
+
+    # --- budget enforcement at finalization ---
+    budget_result = None
+    checkpoint_needed = False
+    after_cmp = None
+    try:
+        from ai_platform.resource_classes import ReasoningClass
+        strategy = select_strategy(
+            plan.specification.reasoning_class_ceiling
+            if hasattr(plan.specification, "reasoning_class_ceiling")
+            else ReasoningClass(plan.classification.reasoning_class.value),
+            plan.specification.risk,
+            max_context_refs=len(packet.context_refs),
+            is_review=packet.path_scope.read_only if hasattr(packet.path_scope, "read_only") else False,
+        )
+        budget_result = check_budget(
+            strategy,
+            turns=receipt.usage.passes + receipt.usage.retries if receipt.usage.passes is not None else None,
+            tool_calls=receipt.usage.tool_calls,
+            input_tokens=receipt.usage.input_units if receipt.usage.usage_unit and receipt.usage.usage_unit.value == "token" else None,
+        )
+        checkpoint_needed = should_checkpoint(
+            strategy,
+            context_chars=len(packet_text) + (record.tool_output_chars or 0),
+            in_critical_section=False,
+            has_committed_progress=bool(receipt.commit_sha),
+        )
+    except Exception:
+        pass  # budget check is observational; failure does not replace the result
+
+    # --- AFTER comparison against baseline ---
+    try:
+        baseline = extract_baseline(state_dir)
+        if baseline.entries:
+            after_cmp = compare_against_baseline(baseline, record)
+    except Exception:
+        pass
+
+    return EfficiencyEmission(
+        record=record,
+        pointer=pointer,
+        budget_check=budget_result,
+        should_checkpoint=checkpoint_needed,
+        after_comparison=after_cmp,
+    )
 
 
 def _provider_usage(receipt: SessionReceipt) -> ProviderUsage:

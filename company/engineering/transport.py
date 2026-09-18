@@ -37,7 +37,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from ai_platform.serde import to_jsonable
-from company.efficiency.strategy import select_strategy
+from company.efficiency.strategy import (
+    select_strategy,
+    scope_file_listing,
+)
 from company.runtime.transport import SessionTransportBundle
 
 from .work_order import EngineeringWorkOrder
@@ -103,6 +106,9 @@ def _efficiency_directives(
     The strategy is deterministic: the same work order always produces the same
     directives.  The operator applies model tier and resource ceilings using
     the runner's existing flags; Company OS determines and records them.
+
+    ``evidence_required`` is passed for review depth but does NOT affect model
+    tier selection — that depends on reasoning class and risk only.
     """
     from ai_platform.resource_classes import ReasoningClass
 
@@ -134,7 +140,13 @@ def developer_briefing_payload(briefing: "DeveloperBriefing") -> dict[str, Any]:
         briefing.prepared.authority_pointer,
         briefing.ledger,
     )
-    return {
+    directives = _efficiency_directives(
+        briefing.work_order,
+        packet.reasoning_class.value,
+        len(packet.context_refs),
+        is_review=False,
+    )
+    payload = {
         "role": "developer",
         "employee": briefing.employee,
         "state": briefing.job.state.value,
@@ -148,13 +160,15 @@ def developer_briefing_payload(briefing: "DeveloperBriefing") -> dict[str, Any]:
             "authority": briefing.prepared.authority_pointer.to_dict(),
             "job": briefing.job_pointer.to_dict(),
         },
-        "efficiency": _efficiency_directives(
-            briefing.work_order,
-            packet.reasoning_class.value,
-            len(packet.context_refs),
-            is_review=False,
-        ),
+        "efficiency": directives,
     }
+    # Apply deterministic output reduction: scope context_refs to authorized paths
+    if directives.get("output_reduction", {}).get("scope_file_listings"):
+        payload["context_refs_scoped"] = list(scope_file_listing(
+            tuple(ref.key for ref in packet.context_refs),
+            briefing.work_order.authorized_paths,
+        ))
+    return payload
 
 
 def review_briefing_payload(briefing: "ReviewBriefing") -> dict[str, Any]:
@@ -167,7 +181,13 @@ def review_briefing_payload(briefing: "ReviewBriefing") -> dict[str, Any]:
         briefing.prepared.authority_pointer,
         briefing.ledger,
     )
-    return {
+    directives = _efficiency_directives(
+        briefing.work_order,
+        packet.reasoning_class.value,
+        len(packet.context_refs),
+        is_review=True,
+    )
+    payload = {
         "role": "reviewer",
         "reviewer": briefing.reviewer,
         "implementer": briefing.implementer,
@@ -184,13 +204,15 @@ def review_briefing_payload(briefing: "ReviewBriefing") -> dict[str, Any]:
             "authority": briefing.prepared.authority_pointer.to_dict(),
             "job": briefing.job_pointer.to_dict(),
         },
-        "efficiency": _efficiency_directives(
-            briefing.work_order,
-            packet.reasoning_class.value,
-            len(packet.context_refs),
-            is_review=True,
-        ),
+        "efficiency": directives,
     }
+    # Apply deterministic output reduction: scope context_refs to authorized paths
+    if directives.get("output_reduction", {}).get("scope_file_listings"):
+        payload["context_refs_scoped"] = list(scope_file_listing(
+            tuple(ref.key for ref in packet.context_refs),
+            briefing.work_order.authorized_paths,
+        ))
+    return payload
 
 
 def payload_json(payload: dict[str, Any]) -> Any:

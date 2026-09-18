@@ -376,11 +376,18 @@ def test_strategy_selects_strongest_for_specialist_reasoning() -> None:
     strategy = select_strategy(ReasoningClass.D, Risk.MEDIUM, evidence_required=True)
     assert strategy.model_tier is ModelTier.STRONGEST
     assert strategy.provider_count == 1
-    assert "specialist" in strategy.strategy_reason or "evidence" in strategy.strategy_reason
+    assert "specialist" in strategy.strategy_reason
 
 
 def test_strategy_selects_standard_for_routine_c_class() -> None:
     strategy = select_strategy(ReasoningClass.C, Risk.LOW)
+    assert strategy.model_tier is ModelTier.STANDARD
+    assert "routine" in strategy.strategy_reason
+
+
+def test_strategy_standard_even_with_evidence_required() -> None:
+    """evidence_required does not force strongest — only reasoning class and risk do."""
+    strategy = select_strategy(ReasoningClass.C, Risk.LOW, evidence_required=True)
     assert strategy.model_tier is ModelTier.STANDARD
     assert "routine" in strategy.strategy_reason
 
@@ -532,3 +539,128 @@ def test_baseline_to_dict_is_serializable(tmp_path) -> None:
     assert payload["entry_count"] == 1
     serialized = json.dumps(payload)
     assert "task-1" in serialized
+
+
+def test_baseline_gpt4o_is_not_strongest(tmp_path) -> None:
+    """gpt-4o is a mid-tier model; it should not be classified as strongest."""
+    store = EfficiencyStore(tmp_path)
+    store.append(_record(
+        mode=BenchmarkMode.REAL,
+        model="gpt-4o",
+        provider="openai",
+        outcome="accepted",
+    ))
+    baseline = extract_baseline(tmp_path)
+    assert not baseline.all_used_strongest_model
+
+
+# --- output reduction (applied, not advisory) ---------------------------------
+
+from company.efficiency.strategy import (
+    reduce_test_output,
+    reduce_log_output,
+    reduce_git_output,
+    scope_file_listing,
+)
+
+
+def test_reduce_test_output_omits_passing_lines() -> None:
+    raw = "PASSED test_one\nPASSED test_two\nFAILED test_three\n=== 2 passed, 1 failed ==="
+    directive = OutputReductionDirective.standard()
+    reduced = reduce_test_output(raw, directive)
+    assert "PASSED test_one" not in reduced
+    assert "FAILED" in reduced or "failed" in reduced
+
+
+def test_reduce_test_output_preserves_all_when_full() -> None:
+    raw = "PASSED test_one\nFAILED test_two"
+    directive = OutputReductionDirective.full()
+    assert reduce_test_output(raw, directive) == raw
+
+
+def test_reduce_log_output_keeps_tail_and_errors() -> None:
+    lines = [f"line {i}" for i in range(200)]
+    lines[5] = "ERROR: something failed"
+    raw = "\n".join(lines)
+    directive = OutputReductionDirective.standard()
+    reduced = reduce_log_output(raw, directive)
+    assert "ERROR: something failed" in reduced
+    assert "line 199" in reduced
+    assert len(reduced.splitlines()) < len(lines)
+
+
+def test_reduce_git_output_clean_tree() -> None:
+    raw = "On branch main\nnothing to commit, working tree clean"
+    directive = OutputReductionDirective.standard()
+    assert reduce_git_output(raw, directive) == "working tree clean"
+
+
+def test_scope_file_listing_filters_to_allowed_paths() -> None:
+    paths = ("company/efficiency/strategy.py", "tools/runner.py", "company/engineering/transport.py")
+    allowed = ("company/efficiency", "company/engineering")
+    result = scope_file_listing(paths, allowed)
+    assert result == ("company/efficiency/strategy.py", "company/engineering/transport.py")
+
+
+def test_reduce_test_output_all_passing() -> None:
+    raw = "PASSED test_one\nPASSED test_two"
+    directive = OutputReductionDirective.standard()
+    reduced = reduce_test_output(raw, directive)
+    assert reduced == "all tests passed"
+
+
+# --- routine checkpoint rule --------------------------------------------------
+
+
+def test_routine_job_uses_continue_checkpoint_rule() -> None:
+    strategy = select_strategy(ReasoningClass.C, Risk.LOW)
+    assert strategy.checkpoint_rule is CheckpointRule.CONTINUE
+
+
+def test_strongest_job_uses_checkpoint_on_threshold() -> None:
+    strategy = select_strategy(ReasoningClass.D, Risk.MEDIUM)
+    assert strategy.checkpoint_rule is CheckpointRule.CHECKPOINT_ON_THRESHOLD
+
+
+# --- AFTER comparison ---------------------------------------------------------
+
+from company.efficiency.baseline import AfterComparison, compare_against_baseline
+
+
+def test_after_comparison_against_baseline(tmp_path) -> None:
+    store = EfficiencyStore(tmp_path)
+    store.append(_record(
+        mode=BenchmarkMode.REAL,
+        model="claude-opus-4-6[1m]",
+        provider="anthropic",
+        outcome="accepted",
+        cost=CostMeasurement(
+            MeasurementSource.PROVIDER_REPORTED,
+            amount="1.50",
+            currency="USD",
+        ),
+    ))
+    baseline = extract_baseline(tmp_path)
+    after_record = _record(
+        run_id="after-run-1",
+        mode=BenchmarkMode.REAL,
+        model="claude-sonnet-4-6",
+        outcome="accepted",
+    )
+    comparison = compare_against_baseline(baseline, after_record)
+    assert comparison.after_run_id == "after-run-1"
+    assert comparison.baseline_entry_count == 1
+    assert comparison.baseline_all_strongest
+    assert isinstance(comparison.to_dict(), dict)
+
+
+# --- budget enforcement wired into emission -----------------------------------
+
+from company.efficiency.emission import EfficiencyEmission
+
+
+def test_emission_includes_budget_check_and_comparison_fields() -> None:
+    """EfficiencyEmission carries budget_check and after_comparison fields."""
+    assert hasattr(EfficiencyEmission, "budget_check")
+    assert hasattr(EfficiencyEmission, "should_checkpoint")
+    assert hasattr(EfficiencyEmission, "after_comparison")

@@ -215,10 +215,12 @@ def select_strategy(
     - Standard model for C-class routine implementation at LOW/MEDIUM risk
     - Reviews always use one tier lower resource ceiling than implementation
     """
+    # Model tier depends on reasoning class and risk only.  evidence_required
+    # affects review thoroughness, not model strength, so a C-class routine job
+    # at LOW risk stays STANDARD even when evidence_required is True.
     needs_strongest = (
         reasoning_class in (ReasoningClass.D, ReasoningClass.E, ReasoningClass.F)
         or risk in (Risk.HIGH, Risk.CRITICAL)
-        or evidence_required
     )
     tier = ModelTier.STRONGEST if needs_strongest else ModelTier.STANDARD
 
@@ -227,14 +229,16 @@ def select_strategy(
     checkpoint_threshold = int(context_budget * 0.7)
 
     if is_review:
-        # Reviews read but don't write; tighter budget, always checkpoint
+        # Reviews read but don't write; tighter budget, always continue
         context_budget = int(context_budget * 0.6)
         checkpoint_threshold = int(context_budget * 0.7)
         checkpoint_rule = CheckpointRule.CONTINUE
     elif needs_strongest:
         checkpoint_rule = CheckpointRule.CHECKPOINT_ON_THRESHOLD
     else:
-        checkpoint_rule = CheckpointRule.CHECKPOINT_ON_THRESHOLD
+        # Routine jobs continue if under budget; checkpoint rule kicks in only
+        # when context approaches the threshold.
+        checkpoint_rule = CheckpointRule.CONTINUE
 
     output_reduction = (
         OutputReductionDirective.full()
@@ -271,11 +275,107 @@ def select_strategy(
     )
 
 
+import re as _re
+
+
+def reduce_test_output(raw: str, directive: OutputReductionDirective) -> str:
+    """Deterministically filter test output before it enters model context.
+
+    When ``omit_passing_test_detail`` is True, passing test lines are stripped
+    and only failures, errors and the summary line are kept.  The result is
+    always shorter or equal; it never adds content.
+    """
+    if not directive.omit_passing_test_detail:
+        return raw
+    lines = raw.splitlines()
+    kept: list[str] = []
+    for line in lines:
+        lower = line.lower()
+        is_important = (
+            "fail" in lower
+            or "error" in lower
+            or "warning" in lower
+            or lower.startswith("collected ")
+            or lower.lstrip().startswith("=")
+            or "passed" in lower and ("failed" in lower or "error" in lower)
+        )
+        if is_important:
+            kept.append(line)
+    if len(kept) > directive.max_test_failure_lines:
+        kept = kept[: directive.max_test_failure_lines]
+    if not kept:
+        return "all tests passed" if lines else raw
+    return "\n".join(kept)
+
+
+def reduce_log_output(raw: str, directive: OutputReductionDirective) -> str:
+    """Keep only the last N lines plus any line containing error/fail/warning."""
+    lines = raw.splitlines()
+    if len(lines) <= directive.max_log_lines:
+        return raw
+    important: list[str] = []
+    for line in lines[: -directive.max_log_lines]:
+        lower = line.lower()
+        if "error" in lower or "fail" in lower or "warning" in lower:
+            important.append(line)
+    tail = lines[-directive.max_log_lines :]
+    result = important + tail
+    return "\n".join(result)
+
+
+def reduce_git_output(raw: str, directive: OutputReductionDirective) -> str:
+    """Reduce git status/diff output when clean detail is not needed."""
+    if not directive.omit_clean_git_detail:
+        return raw
+    lines = raw.splitlines()
+    if not lines:
+        return raw
+    # A clean working tree: reduce to one line
+    for line in lines:
+        if "nothing to commit" in line.lower() or "working tree clean" in line.lower():
+            return "working tree clean"
+    # Keep only changed-file lines and conflict markers
+    kept: list[str] = []
+    for line in lines:
+        stripped = line.lstrip()
+        if (
+            stripped.startswith("M ")
+            or stripped.startswith("A ")
+            or stripped.startswith("D ")
+            or stripped.startswith("?? ")
+            or stripped.startswith("UU ")
+            or stripped.startswith("AA ")
+            or "conflict" in line.lower()
+            or stripped.startswith("renamed:")
+            or stripped.startswith("modified:")
+            or stripped.startswith("new file:")
+            or stripped.startswith("deleted:")
+        ):
+            kept.append(line)
+    return "\n".join(kept) if kept else raw
+
+
+def scope_file_listing(
+    paths: tuple[str, ...], allowed_paths: tuple[str, ...],
+) -> tuple[str, ...]:
+    """Keep only paths that fall inside the authorized scope."""
+    if not allowed_paths:
+        return paths
+    return tuple(
+        p for p in paths
+        if any(p == a or p.startswith(a + "/") for a in allowed_paths)
+    )
+
+
 __all__ = [
     "CheckpointRule",
     "ExecutionStrategy",
     "ModelTier",
     "OutputReductionDirective",
     "ResourceCeiling",
+    "reduce_git_output",
+    "reduce_log_output",
+    "reduce_test_output",
+    "scope_file_listing",
     "select_strategy",
 ]

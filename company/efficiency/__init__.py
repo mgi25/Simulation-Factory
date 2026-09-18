@@ -47,6 +47,10 @@ from .strategy import (
     ModelTier,
     OutputReductionDirective,
     ResourceCeiling,
+    reduce_git_output,
+    reduce_log_output,
+    reduce_test_output,
+    scope_file_listing,
     select_strategy,
 )
 from .budget import (
@@ -55,8 +59,10 @@ from .budget import (
     should_checkpoint,
 )
 from .baseline import (
+    AfterComparison,
     Baseline,
     BaselineEntry,
+    compare_against_baseline,
     extract_baseline,
 )
 

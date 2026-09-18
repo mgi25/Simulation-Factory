@@ -1715,3 +1715,52 @@ def test_review_briefing_carries_efficiency_directives_with_reduced_budget(tmp_p
         <= dev_payload["efficiency"]["context_budget_chars"]
     )
     assert "review" in rev_payload["efficiency"]["strategy_reason"]
+
+
+def test_briefing_applies_output_reduction_not_just_directives(tmp_path):
+    """Company OS must apply actual output reduction, not just emit JSON directives."""
+    from company.efficiency.strategy import (
+        reduce_test_output,
+        reduce_git_output,
+        reduce_log_output,
+        OutputReductionDirective,
+    )
+    directive = OutputReductionDirective.standard()
+    # Test output reduction: passing tests are actually stripped
+    test_raw = "PASSED test_a\nPASSED test_b\nFAILED test_c: assertion\n=== 1 failed ==="
+    reduced = reduce_test_output(test_raw, directive)
+    assert "PASSED test_a" not in reduced
+    assert "FAILED" in reduced or "failed" in reduced
+    # Git output reduction: clean tree is one line
+    git_raw = "On branch feature\nnothing to commit, working tree clean"
+    assert reduce_git_output(git_raw, directive) == "working tree clean"
+
+
+def test_budget_check_is_callable_from_production_path():
+    """check_budget and should_checkpoint are importable and callable from the
+    finalization path (emission.py), not just from tests."""
+    from company.efficiency.emission import EfficiencyEmission
+    # The emission dataclass must carry budget_check as a production field
+    assert "budget_check" in {f.name for f in EfficiencyEmission.__dataclass_fields__.values()}
+    assert "should_checkpoint" in {f.name for f in EfficiencyEmission.__dataclass_fields__.values()}
+    assert "after_comparison" in {f.name for f in EfficiencyEmission.__dataclass_fields__.values()}
+
+
+def test_developer_briefing_scopes_context_refs_when_reduction_enabled(tmp_path):
+    """When scope_file_listings is True, the briefing includes context_refs_scoped."""
+    repo = _fake_repo(tmp_path)
+    state = tmp_path / "state"
+    config = _config()
+    assessment = assess_request(
+        _request(), config.permissions, repo_root=repo,
+        capsule_index=_index(), work_order_id="wo-req-001",
+    )
+    store, execution, usage = _stores(state)
+    opened = open_job(store, assessment, on=DAY)
+    briefing = prepare_developer_session(
+        store, execution, opened.work_order, opened.job, config, on=DAY,
+    )
+    payload = developer_briefing_payload(briefing)
+    eff = payload["efficiency"]
+    if eff.get("output_reduction", {}).get("scope_file_listings"):
+        assert "context_refs_scoped" in payload

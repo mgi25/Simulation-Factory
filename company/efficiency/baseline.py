@@ -158,7 +158,7 @@ def extract_baseline(*state_dirs: str | Path) -> Baseline:
 
     # Check if all jobs used the strongest model
     models = {e.model for e in entries if e.model}
-    strongest_indicators = {"claude-opus-4-6[1m]", "claude-opus-4-6", "gpt-4o"}
+    strongest_indicators = {"claude-opus-4-6[1m]", "claude-opus-4-6"}
     all_strongest = bool(models) and models.issubset(strongest_indicators)
 
     return Baseline(
@@ -170,8 +170,104 @@ def extract_baseline(*state_dirs: str | Path) -> Baseline:
     )
 
 
+@dataclass(frozen=True)
+class AfterComparison:
+    """One AFTER run compared against the BEFORE baseline."""
+
+    after_run_id: str
+    after_task_id: str
+    after_model: str | None
+    baseline_entry_count: int
+    baseline_all_strongest: bool
+    baseline_total_cost_usd: str | None
+    after_input_tokens: int | None
+    after_output_tokens: int | None
+    after_tool_calls: int | None
+    after_cost_amount: str | None
+    after_outcome: str
+    baseline_avg_input_tokens: float | None
+    baseline_avg_output_tokens: float | None
+    baseline_avg_tool_calls: float | None
+    input_token_change_pct: float | None
+    output_token_change_pct: float | None
+    tool_call_change_pct: float | None
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "after_run_id": self.after_run_id,
+            "after_task_id": self.after_task_id,
+            "after_model": self.after_model,
+            "after_outcome": self.after_outcome,
+            "baseline_entry_count": self.baseline_entry_count,
+            "baseline_all_strongest": self.baseline_all_strongest,
+            "baseline_total_cost_usd": self.baseline_total_cost_usd,
+            "after_input_tokens": self.after_input_tokens,
+            "after_output_tokens": self.after_output_tokens,
+            "after_tool_calls": self.after_tool_calls,
+            "after_cost_amount": self.after_cost_amount,
+            "baseline_avg_input_tokens": self.baseline_avg_input_tokens,
+            "baseline_avg_output_tokens": self.baseline_avg_output_tokens,
+            "baseline_avg_tool_calls": self.baseline_avg_tool_calls,
+            "input_token_change_pct": self.input_token_change_pct,
+            "output_token_change_pct": self.output_token_change_pct,
+            "tool_call_change_pct": self.tool_call_change_pct,
+        }
+
+
+def _pct_change(baseline_avg: float | None, after: int | None) -> float | None:
+    if baseline_avg is None or after is None or baseline_avg == 0:
+        return None
+    return ((after - baseline_avg) / baseline_avg) * 100.0
+
+
+def compare_against_baseline(
+    baseline: Baseline, record: EfficiencyRecord,
+) -> AfterComparison:
+    """Compare one AFTER execution record against the BEFORE baseline."""
+    b_input = [
+        e.input_tokens for e in baseline.entries if e.input_tokens is not None
+    ]
+    b_output = [
+        e.output_tokens for e in baseline.entries if e.output_tokens is not None
+    ]
+    b_tools = [
+        e.tool_calls for e in baseline.entries if e.tool_calls is not None
+    ]
+    avg_in = (sum(b_input) / len(b_input)) if b_input else None
+    avg_out = (sum(b_output) / len(b_output)) if b_output else None
+    avg_tools = (sum(b_tools) / len(b_tools)) if b_tools else None
+
+    cost_amount = (
+        record.cost.amount
+        if record.cost.source is not MeasurementSource.UNAVAILABLE
+        else None
+    )
+
+    return AfterComparison(
+        after_run_id=record.run_id,
+        after_task_id=record.task_id,
+        after_model=record.model,
+        baseline_entry_count=len(baseline.entries),
+        baseline_all_strongest=baseline.all_used_strongest_model,
+        baseline_total_cost_usd=baseline.total_cost_usd,
+        after_input_tokens=record.tokens.input_tokens,
+        after_output_tokens=record.tokens.output_tokens,
+        after_tool_calls=record.tool_calls,
+        after_cost_amount=cost_amount,
+        after_outcome=record.outcome,
+        baseline_avg_input_tokens=avg_in,
+        baseline_avg_output_tokens=avg_out,
+        baseline_avg_tool_calls=avg_tools,
+        input_token_change_pct=_pct_change(avg_in, record.tokens.input_tokens),
+        output_token_change_pct=_pct_change(avg_out, record.tokens.output_tokens),
+        tool_call_change_pct=_pct_change(avg_tools, record.tool_calls),
+    )
+
+
 __all__ = [
+    "AfterComparison",
     "Baseline",
     "BaselineEntry",
+    "compare_against_baseline",
     "extract_baseline",
 ]
