@@ -121,12 +121,28 @@ SPECIALIST_TRIGGERS: Mapping[str, tuple[str, ...]] = {
         "re-architect",
         "rearchitect",
         "redesign",
-        "migrate",
-        "migration",
         "new subsystem",
         "breaking change",
         "schema change",
         "protocol change",
+        # Breaking migration/schema/storage-format/wire-protocol coverage.
+        # These name kinds of structural breakage, never a bare "migrate",
+        # "migration", "schema", "protocol", or "format" - a job that merely
+        # *mentions* one of those nouns ("show migration status on a
+        # dashboard", "document the current schema") must stay routine, so
+        # every phrase here pairs the noun with what makes it breaking.
+        "migrate the",
+        "database migration",
+        "schema migration",
+        "storage-format migration",
+        "storage format migration",
+        "serialization-format migration",
+        "serialization format migration",
+        "replace the serialization format",
+        "wire protocol",
+        "wire-protocol",
+        "backward-incompatible",
+        "breaks compatibility",
     ),
     "concurrency": (
         "concurren",

@@ -2265,6 +2265,152 @@ def test_an_irreversible_request_raises_its_own_ceiling():
     assert derive_routing(_request()).reasoning_class_ceiling is ReasoningClass.D
 
 
+# --- 13b. routine-eligibility guard: breaking migration/schema/storage-format/
+#          wire-protocol work is not routine, whatever else the objective says --
+
+
+@pytest.mark.parametrize(
+    "objective",
+    [
+        "Document the current schema.",
+        "Display protocol status on the CEO page.",
+        "Add tests for the existing serialization format.",
+        "Show migration status on a dashboard.",
+        "Add schema information to a report.",
+        "Rename a field in documentation.",
+    ],
+)
+def test_harmless_schema_protocol_format_mentions_stay_routine(objective):
+    """Naming schema/protocol/migration/format in passing is not breaking work.
+
+    Regression for the operational-readiness gap: the old table matched bare
+    "migrate"/"migration", so a dashboard that merely *displays* migration
+    status routed to the strongest tier. The fix pairs each noun with what
+    makes it breaking, so a routine mention stays routine.
+    """
+    routed = derive_routing(_request(objective=objective))
+    assert routed.specialist_domain == "", (objective, routed)
+    assert "routine implementation" in routed.reason, routed.reason
+
+
+def test_routine_objective_with_breaking_change_mentioned_only_in_notes_stays_routine():
+    """`notes` never influences routing - not even breaking-change wording.
+
+    Same guarantee `[[company-os-read-efficiency-v3a-stop-condition]]` pinned
+    for "governance", extended to the new breaking-change phrases: a note that
+    explains a *past* schema migration must not retrigger specialist routing.
+    """
+    routed = derive_routing(
+        _routine_request(
+            notes=(
+                "This follows up on the database migration that made a "
+                "backward-incompatible schema change last quarter."
+            )
+        )
+    )
+    assert routed.specialist_domain == "", routed
+    assert "routine implementation" in routed.reason, routed.reason
+
+
+@pytest.mark.parametrize(
+    "objective",
+    [
+        "Migrate the database schema to an incompatible layout.",
+        "Make a breaking schema change.",
+        "Change the wire protocol in a backward-incompatible way.",
+        "Migrate the persisted storage format.",
+        "Replace the serialization format used for stored records.",
+        "Introduce a backward-incompatible API contract.",
+    ],
+)
+def test_breaking_migration_schema_protocol_changes_route_to_architecture(objective):
+    routed = derive_routing(_request(objective=objective))
+    assert routed.specialist_domain == "architecture", (objective, routed)
+    assert "which is architecture work" in routed.reason, routed.reason
+
+
+@pytest.mark.parametrize(
+    "objective",
+    [
+        "Modify the approval boundary so a second reviewer is required.",
+        "Refactor the authentication flow.",
+        "Fix a race condition in the developer lock.",
+        "Rewrite the intake matching engine.",
+    ],
+)
+def test_other_specialist_domains_are_unaffected_by_the_breaking_change_table(objective):
+    """Security, governance, concurrency and the rest of architecture still route.
+
+    The breaking-change additions live inside the architecture trigger table
+    alongside the pre-existing terms, so this pins that none of the other
+    domains, or architecture's own older triggers, lost coverage.
+    """
+    routed = derive_routing(_request(objective=objective))
+    assert routed.specialist_domain != "", (objective, routed)
+
+
+def test_explicit_specialist_domain_still_wins_over_a_breaking_change_objective():
+    routed = derive_routing(
+        _request(
+            objective="Migrate the database schema to an incompatible layout.",
+            specialist_domain="governance",
+        )
+    )
+    assert routed.specialist_domain == "governance"
+    assert "named the specialist domain" in routed.reason
+
+
+def test_explicit_escalation_still_wins_over_a_routine_looking_objective():
+    routed = derive_routing(_routine_request(escalate_reasoning=True))
+    assert routed.specialist_domain == "explicit_escalation"
+
+
+@pytest.mark.parametrize("risk", [Risk.HIGH, Risk.CRITICAL])
+def test_high_or_critical_risk_routing_is_unaffected_by_the_breaking_change_table(risk):
+    routed = derive_routing(_routine_request(risk=risk))
+    assert routed.specialist_domain == "high_risk_change", routed
+
+
+def test_state_c_routine_eligibility_requires_no_breaking_change_trigger():
+    """State C (routine autonomous engineering) reads eligibility from one place.
+
+    A request that satisfies every other routine condition - LOW risk,
+    reversible, no reserved action, no credential, no explicit escalation or
+    domain - still lands on reasoning class D, not the routine floor C, the
+    moment its objective describes a breaking migration/schema/storage-format/
+    protocol change. This is `classify()` in `ai_platform.resource_classes`
+    acting on `derive_routing`'s own `specialist_domain` output: one engine,
+    not a second eligibility check bolted on beside it.
+    """
+    from ai_platform.resource_classes import TaskSignals, classify
+
+    routine = derive_routing(_routine_request())
+    routine_classification = classify(
+        TaskSignals(
+            requires_judgment=True,
+            specialist_domain=routine.specialist_domain,
+            risk=Risk.LOW,
+            reversible=True,
+        )
+    )
+    assert routine_classification.code is ReasoningClass.C
+    assert routine_classification.rule == "small_reasoning_floor"
+
+    breaking = derive_routing(
+        _request(objective="Migrate the persisted storage format.")
+    )
+    breaking_classification = classify(
+        TaskSignals(
+            requires_judgment=True,
+            specialist_domain=breaking.specialist_domain,
+            risk=Risk.LOW,
+            reversible=True,
+        )
+    )
+    assert breaking_classification.code is ReasoningClass.D
+    assert breaking_classification.rule == "specialist_reasoning"
+
+
 def test_every_stage_plans_under_the_same_context_policy(tmp_path):
     """The defect a live run found and no test had.
 
