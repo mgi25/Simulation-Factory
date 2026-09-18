@@ -36,6 +36,8 @@ from ai_platform.usage import Outcome
 from company.engineering import (
     DEFAULT_PROTECTED_PATHS,
     NOT_AN_APPROVAL,
+    AttemptLedger,
+    AttemptLedgerEntry,
     AuthorityEscalation,
     CEODecision,
     CEORequest,
@@ -63,6 +65,7 @@ from company.engineering import (
     SuiteScope,
     adjudicate,
     assess_request,
+    build_attempt_ledger,
     derive_plan,
     ingest_developer_result,
     open_job,
@@ -1642,3 +1645,114 @@ def test_a_revalidation_without_the_authority_evidence_fails_an_honest_receipt(t
     bare = validate_receipt(run["packet"], run["receipt"])
     assert any("authority evidence" in item for item in bare.failures)
     assert _validation(run).ok
+
+
+# --- 19. the attempt ledger -----------------------------------------------
+#
+# The CEO wants to see, for one job, every developer attempt and what it cost,
+# so convergence vs thrashing is visible without reading the full history.
+
+
+def test_the_attempt_ledger_shows_one_attempt_after_a_single_pass(tmp_path):
+    run = _drive(tmp_path)
+    ledger = build_attempt_ledger(
+        run["store"], run["execution"], run["usage"], run["order"].work_order_id
+    )
+    assert isinstance(ledger, AttemptLedger)
+    assert ledger.work_order_id == run["order"].work_order_id
+    assert ledger.objective == run["order"].objective
+    assert ledger.developer_attempts == 1
+    assert len(ledger.entries) == 1
+    entry = ledger.entries[0]
+    assert isinstance(entry, AttemptLedgerEntry)
+    assert entry.attempt == 1
+    assert entry.outcome == "accepted"
+    assert isinstance(entry.reasoning_class, str)
+    assert entry.reasoning_class != ""
+
+
+def test_the_attempt_ledger_is_json_serialisable(tmp_path):
+    run = _drive(tmp_path)
+    ledger = build_attempt_ledger(
+        run["store"], run["execution"], run["usage"], run["order"].work_order_id
+    )
+    data = ledger.to_dict()
+    json.dumps(data)
+    assert data["work_order_id"] == run["order"].work_order_id
+    assert len(data["entries"]) == 1
+
+
+def test_the_attempt_ledger_shows_multiple_attempts_in_a_correction_loop(tmp_path):
+    """Two failing attempts followed by exhaustion: both appear in the ledger."""
+    repo = _fake_repo(tmp_path)
+    state = tmp_path / "state"
+    config = _config()
+    assessment = assess_request(
+        _request(max_developer_attempts=2), config.permissions, repo_root=repo,
+        capsule_index=_index(), work_order_id="wo-req-001",
+    )
+    store, execution, usage = _stores(state)
+    opened = open_job(store, assessment, on=DAY)
+    order = opened.work_order
+    job = opened.job
+    failing = {
+        "tests": (
+            ReportedTest(
+                command="tests/test_company_engineering_execution.py",
+                passed=False, summary="1 failed",
+            ),
+        ),
+    }
+    for attempt in range(2):
+        briefing = prepare_developer_session(store, execution, order, job, config, on=DAY)
+        developed = ingest_developer_result(
+            store, execution, usage, order, briefing.job, config,
+            _receipt(briefing.packet, **failing), on=DAY,
+        )
+        review_briefing = prepare_review_session(
+            store, execution, order, developed.job, config,
+            implementer=briefing.employee, on=DAY,
+        )
+        reviewed = record_review(
+            store, execution, order, review_briefing.job, config,
+            _attestation(
+                order, briefing.packet, developed.receipt,
+                review_id=f"rev-{attempt:03d}", verdict=ReviewOutcome.CHANGES_REQUIRED,
+            ),
+            briefing.packet, developed.receipt,
+            implementer=briefing.employee, repo_root=repo, on=DAY,
+        )
+        job = reviewed.job
+
+    ledger = build_attempt_ledger(store, execution, usage, order.work_order_id)
+    assert ledger.developer_attempts == 2
+    assert ledger.max_developer_attempts == 2
+    assert ledger.corrections_remaining == 0
+    assert len(ledger.entries) == 2
+    assert ledger.entries[0].attempt == 1
+    assert ledger.entries[1].attempt == 2
+
+
+def test_the_attempt_ledger_refuses_an_unknown_work_order(tmp_path):
+    state = tmp_path / "state"
+    store, execution, usage = _stores(state)
+    with pytest.raises(EngineeringError, match="no work order"):
+        build_attempt_ledger(store, execution, usage, "wo-does-not-exist")
+
+
+def test_the_attempt_ledger_is_empty_before_any_developer_session(tmp_path):
+    repo = _fake_repo(tmp_path)
+    state = tmp_path / "state"
+    config = _config()
+    assessment = assess_request(
+        _request(), config.permissions, repo_root=repo,
+        capsule_index=_index(), work_order_id="wo-req-001",
+    )
+    store, execution, usage = _stores(state)
+    opened = open_job(store, assessment, on=DAY)
+    ledger = build_attempt_ledger(
+        store, execution, usage, opened.work_order.work_order_id
+    )
+    assert ledger.developer_attempts == 0
+    assert len(ledger.entries) == 0
+    assert ledger.total_units is None
