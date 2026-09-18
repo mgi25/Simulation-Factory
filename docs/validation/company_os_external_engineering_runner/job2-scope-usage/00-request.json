@@ -1,0 +1,11 @@
+{
+  "request_id": "ceo-2026-09-18-scope-usage",
+  "objective": "For one work order, show me which of the paths it was authorized to change the work actually touched, so I can see how much of the scope I granted was used.",
+  "requested_by": "MGI",
+  "requested_on": "2026-09-18",
+  "subsystem_hint": "company/engineering",
+  "authorized_branch": "eng-scope-usage",
+  "base_commit": "89915ce85eae30df3b3d12ad7f946413be97a3da",
+  "max_developer_attempts": 3,
+  "risk": "low"
+}

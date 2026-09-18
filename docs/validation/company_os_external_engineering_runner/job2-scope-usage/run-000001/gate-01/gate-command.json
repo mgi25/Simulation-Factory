@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "C:\\Users\\mgial\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "-m",
+    "company.integration",
+    "check",
+    "--repo-root",
+    "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-company-os-runner-tasks\\eng-scope-usage",
+    "--json",
+    "--suite-evidence",
+    "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-scope-usage-060a017cc09c\\run-000001\\gate-01\\suites.json",
+    "--state-dir",
+    "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-company-os-runner\\state\\external-runner"
+  ],
+  "cwd": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-company-os-runner-tasks\\eng-scope-usage",
+  "duration_s": 7.911,
+  "exit_code": 0,
+  "readiness": "",
+  "stderr": "",
+  "stdout_chars": 33323,
+  "timed_out": false
+}

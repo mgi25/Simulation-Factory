@@ -1342,6 +1342,118 @@ def test_a_review_that_routes_back_to_the_implementer_is_refused(repository):
     assert control.attestations == []
 
 
+# --- the backends ----------------------------------------------------------
+
+# A real `codex exec` session on a CLI older than the only model the account
+# has. Kept verbatim (minus the timestamps) because every property this test
+# asserts is a property of exactly this output: the prompt is echoed back, the
+# process exits 0, and the refusal is only in the body.
+CODEX_REFUSED_TRANSCRIPT = """
+OpenAI Codex v0.42.0 (research preview)
+--------
+workdir: C:/repo
+model: gpt-5.6-sol
+provider: openai
+approval: never
+sandbox: read-only
+--------
+User instructions:
+Add 19 and 23. Reply with the word OK immediately followed by the result, as one token, and nothing else.
+
+stream error: unexpected status 400 Bad Request: {"detail":"The 'gpt-5.6-sol' model requires a newer version of Codex. Please upgrade to the latest app or CLI and try again."}; retrying 1/5 in 197ms
+ERROR: unexpected status 400 Bad Request: {"detail":"The 'gpt-5.6-sol' model requires a newer version of Codex. Please upgrade to the latest app or CLI and try again."}
+"""
+
+
+class CannedRunner(CommandRunner):
+    """A command runner that answers with a fixed transcript and exit code."""
+
+    def __init__(self, stdout: str, exit_code: int = 0) -> None:
+        super().__init__()
+        self._stdout = stdout
+        self._exit_code = exit_code
+        self.calls: list[tuple[str, ...]] = []
+
+    def run(self, argv, *, cwd, timeout_s, env=None, stdin=None):
+        from tools.engineering_runner.process import CommandResult
+
+        self.calls.append(tuple(str(item) for item in argv))
+        return CommandResult(
+            argv=tuple(str(item) for item in argv),
+            cwd=str(cwd),
+            exit_code=self._exit_code,
+            stdout=self._stdout,
+            stderr="",
+            duration_s=0.01,
+        )
+
+
+def test_a_refused_codex_session_is_not_reported_as_an_available_backend():
+    """The false positive this test exists for was real, and shipped for an hour.
+
+    `codex exec` writes its own prompt back under `User instructions:` and
+    exits 0 even when every request in the session was refused. A probe that
+    asked for a word and looked for that word therefore found its own question
+    and reported the backend working - on a machine where it could not complete
+    a single call.
+    """
+    from tools.engineering_runner.backends import (
+        CODEX_PROBE_EXPECTED,
+        CODEX_PROBE_PROMPT,
+        CodexBackend,
+    )
+
+    # The transcript contains the prompt, and does not contain the answer.
+    assert CODEX_PROBE_PROMPT in CODEX_REFUSED_TRANSCRIPT
+    assert CODEX_PROBE_EXPECTED not in CODEX_REFUSED_TRANSCRIPT.replace(" ", "")
+
+    runner = CannedRunner(CODEX_REFUSED_TRANSCRIPT, exit_code=0)
+    backend = CodexBackend(runner, executable="python")
+    available, detail = backend.available()
+    assert available is False
+    assert "400" in detail or "newer version" in detail
+
+
+def test_a_codex_session_that_answers_the_probe_is_available():
+    from tools.engineering_runner.backends import CodexBackend
+
+    lines = ["User instructions:", "Add 19 and 23...", "", "codex", "OK42"]
+    runner = CannedRunner(chr(10).join(lines))
+    available, detail = backend_detail = CodexBackend(runner, executable="python").available()
+    assert available is True, detail
+    assert backend_detail[1]
+
+
+def test_a_refused_codex_session_raises_rather_than_returning_an_outcome():
+    from tools.engineering_runner.backends import CodexBackend
+    from tools.engineering_runner.errors import BackendFailure
+
+    runner = CannedRunner(CODEX_REFUSED_TRANSCRIPT, exit_code=0)
+    backend = CodexBackend(runner, executable="python")
+    with pytest.raises(BackendFailure, match="did not complete"):
+        backend.launch(
+            SessionRequest(
+                role="reviewer",
+                cwd=Path.cwd(),
+                instructions="review this",
+                timeout_s=60,
+                read_only=True,
+            )
+        )
+
+
+def test_the_runner_refuses_to_start_a_stage_on_an_unavailable_backend(repository):
+    class Unavailable(ScriptedBackend):
+        def available(self) -> tuple[bool, str]:
+            return False, "the CLI is older than the only model this account has"
+
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    report = _runner(repository, Unavailable(), control).run_one(WORK_ORDER)
+    assert report.outcome == RUN_FAILED
+    assert "older than the only model" in report.reason
+    assert control.receipts == []
+
+
 # --- what the package is, read off its own source -------------------------
 
 

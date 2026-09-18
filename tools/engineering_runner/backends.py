@@ -45,9 +45,17 @@ protocol is vendor-neutral, and because writing the second one is what
 discovers the assumptions the first one baked in. It is **not** claimed to
 work: on the machine this milestone was built on, `codex exec` reached the
 provider and was refused for every model offered - the installed CLI is older
-than the only model the account has. `available()` therefore probes rather
-than asserts, and `EngineeringRunner` refuses a backend that reports
-unavailable rather than discovering it half-way through a work order.
+than the only model the account has.
+
+That refusal is also why `available()` is shaped the way it is. `codex exec`
+writes its own prompt back to stdout and **exits 0 even when every request in
+the session failed**, so the obvious probe - ask for a word, look for that word
+- finds its own question and reports the backend working. It did, briefly, on a
+machine where Codex could not complete a single call. The probe now asks for
+something the prompt does not contain (a sum, not its answer) and checks the
+provider's failure signatures explicitly, because an exit code that is always 0
+says nothing. `launch` applies the same reading, and `EngineeringRunner` refuses
+an unavailable backend before a stage rather than half-way through a work order.
 """
 
 from __future__ import annotations
@@ -75,6 +83,22 @@ EXECUTOR_HINTS: Mapping[str, str] = {
 }
 
 _SESSION_ID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+
+# Codex writes its own prompt back to stdout under `User instructions:`, and it
+# exits 0 even when every request in the session failed. So a probe that asks
+# for a word and looks for that word in the output finds its own question and
+# reports success - which is how this package briefly claimed a backend worked
+# that could not complete a single call.
+#
+# The probe therefore asks for something the prompt does not contain: the sum
+# is in the prompt, the answer is not. And the known failure signatures are
+# checked explicitly, because an exit code that is always 0 says nothing.
+CODEX_PROBE_PROMPT = (
+    "Add 19 and 23. Reply with the word OK immediately followed by the result, "
+    "as one token, and nothing else."
+)
+CODEX_PROBE_EXPECTED = "OK42"
+_CODEX_FAILURE_MARKERS = ("stream error", "ERROR:", '"detail"')
 
 
 @dataclass(frozen=True)
@@ -305,12 +329,19 @@ class CodexBackend:
             cwd=Path.cwd(),
             timeout_s=180.0,
             env=child_environment(),
-            stdin="Reply with exactly: READY",
+            stdin=CODEX_PROBE_PROMPT,
         )
-        if not result.ok or "READY" not in result.stdout:
-            detail = _codex_refusal(result) or f"exit {result.exit_code}"
-            return False, detail
-        return True, "codex exec answered a probe"
+        failure = _codex_failure(result.stdout)
+        if failure:
+            return False, failure
+        if not result.ok:
+            return False, f"codex exec exited {result.exit_code}"
+        if CODEX_PROBE_EXPECTED not in result.stdout.replace(" ", ""):
+            return False, (
+                "codex exec produced no answer to the probe; the session ran and "
+                "returned nothing usable"
+            )
+        return True, "codex exec answered a probe that its own echo cannot satisfy"
 
     def launch(self, request: SessionRequest) -> SessionOutcome:
         argv = [
@@ -331,10 +362,10 @@ class CodexBackend:
             env=child_environment(),
             stdin=request.instructions,
         )
-        if not result.ok:
+        failure = _codex_failure(result.stdout)
+        if failure or not result.ok:
             raise BackendFailure(
-                f"codex exec exited {result.exit_code}: "
-                f"{_codex_refusal(result) or result.stderr.strip()[:400]}"
+                f"codex exec did not complete: {failure or result.stderr.strip()[:400]}"
             )
         return SessionOutcome(
             backend=self.name,
@@ -392,9 +423,14 @@ def _denials(value: object) -> tuple[str, ...]:
     return tuple(rendered[:32])
 
 
-def _codex_refusal(result: CommandResult) -> str:
-    for line in reversed(result.stdout.splitlines()):
-        if "detail" in line or "ERROR:" in line:
+def _codex_failure(output: str) -> str:
+    """The provider's own refusal, or an empty string.
+
+    Read from stdout rather than from the exit code, because `codex exec`
+    returns 0 after a session in which every request was refused.
+    """
+    for line in reversed(output.splitlines()):
+        if any(marker in line for marker in _CODEX_FAILURE_MARKERS):
             return line.strip()[:400]
     return ""
 
@@ -402,6 +438,8 @@ def _codex_refusal(result: CommandResult) -> str:
 __all__ = [
     "CLAUDE_CODE",
     "CODEX",
+    "CODEX_PROBE_EXPECTED",
+    "CODEX_PROBE_PROMPT",
     "ClaudeCodeBackend",
     "CodexBackend",
     "CodingBackend",

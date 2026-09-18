@@ -1,0 +1,17 @@
+{
+  "backend": "claude_code",
+  "cache_read_units": 89182,
+  "cost_usd": 0.2990935,
+  "duration_s": 54.601,
+  "exit_code": 0,
+  "input_units": 8,
+  "model": "claude-opus-4-6[1m]",
+  "ok": true,
+  "output_units": 2590,
+  "permission_denials": [],
+  "provider": "anthropic",
+  "result_chars": 3834,
+  "role": "reviewer",
+  "session_id": "5b33b7ea-49ff-497b-bd53-6a76d37ea003",
+  "turns": 13
+}

@@ -1,0 +1,50 @@
+{
+  "accepted": true,
+  "failures": [],
+  "handoff": {
+    "artifacts": [
+      "execution/receipts/wo-attempt-ledger-93c5b79f0e3b/000001.json"
+    ],
+    "changed": [
+      "company/engineering/__init__.py",
+      "company/engineering/attempt_ledger.py",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "escalation_reason": "",
+    "escalation_required": false,
+    "evidence": [
+      "company/engineering/attempt_ledger.py",
+      "company/engineering/__init__.py",
+      "tests/test_company_engineering_execution.py",
+      "commit:d681c5a1b970470bd98c54f352f4f969f97f5ab2"
+    ],
+    "next_owner": "",
+    "objective": "Show me, for one engineering job, every developer attempt that was made and what each one cost, so I can tell whether an automated run is converging or thrashing without reading the whole history.",
+    "owner": "software_implementation_engineer",
+    "resource_usage": {
+      "fingerprint": "a98b5b1f5430bada",
+      "record_ref": "resource_usage/wo-attempt-ledger-93c5b79f0e3b/000001.json"
+    },
+    "result": "Added company/engineering/attempt_ledger.py with AttemptLedger, AttemptLedgerEntry and build_attempt_ledger(), which joins the engineering, execution and usage stores to produce a per-attempt cost view for one job. Exported from __init__.py and covered by four new tests in the existing suite (100 total pass).",
+    "risks": [
+      "The usage-record-to-attempt correlation assumes records appear in sequence order (1-based index); a store with gaps or out-of-order records would mis-correlate",
+      "Cost fields (input_units, output_units, duration_s) may all be None when the provider did not expose them; the ledger propagates None honestly but the CEO surface must handle it"
+    ],
+    "status": "completed",
+    "task_id": "wo-attempt-ledger",
+    "tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "unchanged": []
+  },
+  "packet_attempt": 1,
+  "receipt_fingerprint": "08cd3fd92f1e7f99",
+  "receipt_ref": "execution/receipts/wo-attempt-ledger-93c5b79f0e3b/000001.json",
+  "state": "testing",
+  "usage_record": {
+    "fingerprint": "a98b5b1f5430bada",
+    "record_ref": "resource_usage/wo-attempt-ledger-93c5b79f0e3b/000001.json"
+  },
+  "warnings": [],
+  "work_order_id": "wo-attempt-ledger"
+}

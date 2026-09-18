@@ -1,0 +1,50 @@
+{
+  "final_state": "ready_for_approval",
+  "finished_at": "2026-09-18T09:38:57.694493+00:00",
+  "lease_note": "took a new lease",
+  "outcome": "completed",
+  "reason": "",
+  "run_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-scope-usage-060a017cc09c\\run-000001",
+  "stages": [
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-scope-usage-060a017cc09c\\run-000001\\developer-01\\receipt.json"
+      ],
+      "detail": "attempt 1 by software_implementation_engineer, commit be5255dfbacc, 3 path(s)",
+      "ok": true,
+      "session_ids": [
+        "d964d8c3-1775-4881-b529-6cd3a3ae5b1f"
+      ],
+      "stage": "developer",
+      "state_after": "testing",
+      "state_before": "planning"
+    },
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-scope-usage-060a017cc09c\\run-000001\\reviewer-01\\attestation.json"
+      ],
+      "detail": "chief_architect returned pass; Company OS adjudicated pass (attested pass, deterministic pass)",
+      "ok": true,
+      "session_ids": [
+        "fbf4cf22-71c7-4890-aeff-2b5914f2f3f9"
+      ],
+      "stage": "reviewer",
+      "state_after": "gate",
+      "state_before": "testing"
+    },
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-scope-usage-060a017cc09c\\run-000001\\gate-01\\gate-report.json",
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-scope-usage-060a017cc09c\\run-000001\\gate-01\\suites.json"
+      ],
+      "detail": "11/11 required suites green; gate says  at be5255dfbacc",
+      "ok": true,
+      "session_ids": [],
+      "stage": "gate",
+      "state_after": "ready_for_approval",
+      "state_before": "gate"
+    }
+  ],
+  "started_at": "2026-09-18T09:31:28.389195+00:00",
+  "work_order_id": "wo-scope-usage"
+}
