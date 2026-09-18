@@ -13,23 +13,60 @@ or died, and where the transcripts went. That lives here.
     <runner_dir>/runs/<work-order>/outcomes/000001.json append-only history
     <runner_dir>/runs/<work-order>/run-000001/...       one run's artifacts
 
-## The lease, and the three states it distinguishes
+## The lease is a directory, and owning it is one syscall
 
-A lease file is created with `O_EXCL`, so two processes racing for the same
-work order cannot both believe they won - the filesystem decides, not a
-check-then-write. Once it exists it is read rather than assumed:
+    <runner_dir>/runs/<work-order>/lease-000001/lease.json
 
+Ownership of a work order is ownership of generation N, and generation N is
+owned by whoever `os.mkdir`s `lease-<N>`. That call is atomic on every
+supported platform: it creates the directory or it raises `FileExistsError`,
+with nothing in between and no window for a second opinion. Exactly one
+contender can create one name.
+
+**This replaces an `O_EXCL` file, which was not enough.** `os.open(O_EXCL)`
+creates the lease *empty* and the metadata is written after, so a contender
+arriving in that gap read an unparseable file, concluded the holder was
+broken, and took the lease a winner already held. Measured, eight threads
+racing one never-before-seen work order produced four grants, not one. A
+directory has no such gap: it is complete the instant it exists, and the
+metadata inside it is a description of an ownership already held rather than
+the thing that establishes it.
+
+**Reclaiming is also a create, never an overwrite.** The old code decided a
+lease was stale or released and then wrote over it - a check-then-act that
+every contender passed at once, so a released lease had as many winners as
+readers. Now a reclaimer creates the *next* generation. Everyone reads
+generation G and everyone races to create G+1, and the filesystem picks one.
+
+## The states a contender distinguishes, before it races
+
+- **no lease at all** - generation 1 is free. Race for it.
 - **held and fresh** - another runner is on it. `ClaimUnavailable`, and the
-  watch loop moves to the next job.
+  watch loop moves to the next job. No race is entered.
 - **held and stale** - the heartbeat is older than the lease window, so the
-  holder crashed or was killed. The lease is reclaimed and the reclamation is
-  recorded, because "a run that never ended" and "a run that ended badly" are
-  different facts and the outcome log should not merge them.
-- **released** - the previous run finished. Reclaimed silently.
+  holder crashed or was killed. Race for G+1, and record the reclamation,
+  because "a run that never ended" and "a run that ended badly" are different
+  facts and the outcome log should not merge them.
+- **released** - the previous run finished. Race for G+1, silently.
+- **unreadable** - there is a directory and no usable metadata inside it.
+  This is *not* read as "therefore I won". A winner that has not yet written
+  its metadata looks exactly like a crashed one, so the directory's own mtime
+  decides: inside the lease window it is treated as **held** and the contender
+  leaves, and only a generation that has sat without metadata for longer than
+  a whole lease window is reclaimed. The safe answer is the one that refuses.
+
+Losing the race is not a failure to handle later: `FileExistsError` from the
+mkdir sends the contender back to re-read the state it raced on, where it now
+finds a fresh holder and leaves. It never falls through to a claim.
 
 Staleness is a heartbeat comparison rather than a liveness probe. Checking
 whether a pid is alive is wrong across machines and wrong after pid reuse, and
 a heartbeat that has stopped is the thing actually being asked about.
+
+A `lease.json` sitting directly in the job directory is a lease written by the
+runner that predates this layout. It is read as generation 0 - respected while
+fresh, superseded by generation 1 - so an in-flight job from an older runner
+is not claimed twice across the upgrade.
 
 ## Why the outcome log is append-only and the lease is not
 
@@ -64,13 +101,21 @@ import uuid
 
 
 LEASE_NAME = "lease.json"
+LEASE_DIR_PREFIX = "lease-"
 OUTCOMES_DIR = "outcomes"
 RUNS_DIR = "runs"
 
 HELD = "held"
 RELEASED = "released"
 
+# How many times a contender that lost the mkdir will re-read and try again.
+# Each loss means somebody else now holds the generation it wanted, so the
+# re-read almost always ends in `ClaimUnavailable`; the bound exists so a
+# pathological interleaving terminates rather than spinning.
+_MAX_CLAIM_ATTEMPTS = 8
+
 _RECORD_NAME = re.compile(r"(?P<sequence>[0-9]{6,})\.json")
+_LEASE_DIR_NAME = re.compile(r"lease-(?P<generation>[0-9]{6,})$")
 
 
 def task_directory_name(task_id: str) -> str:
@@ -134,6 +179,10 @@ class Lease:
     stage: str = ""
     run_sequence: int = 0
     reclaimed_from: str = ""
+    # Which `lease-<N>` directory this lease owns. The heartbeat and the
+    # release write inside it, so a runner that was superseded cannot write
+    # over the lease of the runner that superseded it.
+    generation: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -147,6 +196,7 @@ class Lease:
             "stage": self.stage,
             "run_sequence": self.run_sequence,
             "reclaimed_from": self.reclaimed_from,
+            "generation": self.generation,
         }
 
     @classmethod
@@ -162,6 +212,7 @@ class Lease:
             stage=str(data.get("stage", "")),
             run_sequence=int(data.get("run_sequence", 0) or 0),
             reclaimed_from=str(data.get("reclaimed_from", "")),
+            generation=int(data.get("generation", 0) or 0),
         )
 
     def age_s(self, now: dt.datetime | None = None) -> float:
@@ -194,76 +245,134 @@ class RunStore:
         return self._root / RUNS_DIR / task_directory_name(work_order_id)
 
     def lease_path(self, work_order_id: str) -> Path:
-        return self.job_dir(work_order_id) / LEASE_NAME
+        """Where the *current* generation's metadata is, held or not."""
+        directory = self.job_dir(work_order_id)
+        generation = _highest_generation(directory)
+        return _lease_file(directory, generation)
 
     def lease(self, work_order_id: str) -> Lease | None:
-        path = self.lease_path(work_order_id)
-        if not path.is_file():
+        """The current generation's lease, or None if there is none to read."""
+        directory = self.job_dir(work_order_id)
+        generation = _highest_generation(directory)
+        if generation == 0 and not _lease_file(directory, 0).is_file():
             return None
-        try:
-            return Lease.from_mapping(json.loads(path.read_text(encoding="utf-8")))
-        except (json.JSONDecodeError, ValueError, OSError):
-            return None
+        found = _read_lease(directory, generation)
+        return found[0]
 
     def acquire(
         self, work_order_id: str, *, lease_seconds: float, stage: str = ""
     ) -> tuple[Lease, str]:
-        """Take the lease, or raise. Returns the lease and how it was obtained."""
+        """Take the lease, or raise. Returns the lease and how it was obtained.
+
+        The claim is the `os.mkdir` and nothing else. Everything before it is
+        a decision about whether to enter the race, and everything after it is
+        a description of a race already won.
+        """
         from .errors import ClaimUnavailable  # local: keeps the error graph one-way
 
         directory = self.job_dir(work_order_id)
         directory.mkdir(parents=True, exist_ok=True)
-        path = directory / LEASE_NAME
-        now = utcnow()
-        fresh = Lease(
-            work_order_id=work_order_id,
-            runner_id=self._runner_id,
-            pid=os.getpid(),
-            host=self._host,
-            state=HELD,
-            acquired_at=now.isoformat(),
-            heartbeat_at=now.isoformat(),
-            stage=stage,
-            run_sequence=self.next_run_sequence(work_order_id),
-        )
-        try:
-            descriptor = os.open(
-                path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0)
+        for _ in range(_MAX_CLAIM_ATTEMPTS):
+            generation = _highest_generation(directory)
+            how = self._verdict(
+                directory, generation, lease_seconds=lease_seconds, refuse=ClaimUnavailable
             )
-        except FileExistsError:
-            existing = self.lease(work_order_id)
-            if existing is None:
-                how = "reclaimed an unreadable lease"
-            elif existing.state == HELD and existing.age_s(now) < lease_seconds:
-                raise ClaimUnavailable(
-                    f"{work_order_id} is held by runner {existing.runner_id} on "
+            claimed = directory / f"{LEASE_DIR_PREFIX}{generation + 1:06d}"
+            try:
+                claimed.mkdir()
+            except FileExistsError:
+                # Somebody else created the generation this contender was
+                # racing for. Re-read: they are now the fresh holder and the
+                # next pass leaves. Never fall through into a claim.
+                continue
+            now = utcnow()
+            reclaimed_from = ""
+            if "stale" in how:
+                existing = _read_lease(directory, generation)[0]
+                reclaimed_from = existing.runner_id if existing else ""
+            lease = Lease(
+                work_order_id=work_order_id,
+                runner_id=self._runner_id,
+                pid=os.getpid(),
+                host=self._host,
+                state=HELD,
+                acquired_at=now.isoformat(),
+                heartbeat_at=now.isoformat(),
+                stage=stage,
+                run_sequence=self.next_run_sequence(work_order_id),
+                reclaimed_from=reclaimed_from,
+                generation=generation + 1,
+            )
+            # Only now, and only by the owner: the directory already says who
+            # won, so this file cannot change the answer, only describe it.
+            write_json(claimed / LEASE_NAME, lease.to_dict())
+            return lease, how
+        raise ClaimUnavailable(
+            f"{work_order_id}: lost the claim race {_MAX_CLAIM_ATTEMPTS} times; "
+            "another runner is working this job"
+        )
+
+    def _verdict(
+        self,
+        directory: Path,
+        generation: int,
+        *,
+        lease_seconds: float,
+        refuse: type[Exception],
+    ) -> str:
+        """Whether the next generation may be raced for, and how to say so.
+
+        Raises `refuse` when it may not. This reads; it never writes, and it
+        never decides a winner - the mkdir that follows does that.
+        """
+        if generation == 0 and not _lease_file(directory, 0).is_file():
+            return "took a new lease"
+        existing, readable = _read_lease(directory, generation)
+        now = utcnow()
+        if not readable:
+            # A winner writing its metadata and a winner that died before
+            # writing it look identical from here, so age decides. Inside the
+            # window the safe answer is that somebody holds it.
+            age = _directory_age_s(directory, generation, now)
+            if age < lease_seconds:
+                raise refuse(
+                    f"lease generation {generation} exists with no readable metadata "
+                    f"({age:.0f}s old); another runner is claiming it"
+                )
+            return f"reclaimed an unreadable lease ({age:.0f}s without metadata)"
+        if existing is not None and existing.state == HELD:
+            age = existing.age_s(now)
+            if age < lease_seconds:
+                raise refuse(
+                    f"{existing.work_order_id} is held by runner {existing.runner_id} on "
                     f"{existing.host} (pid {existing.pid}), last heartbeat "
-                    f"{existing.age_s(now):.0f}s ago"
+                    f"{age:.0f}s ago"
                 )
-            elif existing.state == HELD:
-                how = (
-                    f"reclaimed a stale lease from {existing.runner_id} "
-                    f"({existing.age_s(now):.0f}s without a heartbeat)"
-                )
-                fresh = _with(fresh, reclaimed_from=existing.runner_id)
-            else:
-                how = "took a released lease"
-            write_json(path, fresh.to_dict())
-            return fresh, how
-        else:
-            os.close(descriptor)
-            write_json(path, fresh.to_dict())
-            return fresh, "took a new lease"
+            return (
+                f"reclaimed a stale lease from {existing.runner_id} "
+                f"({age:.0f}s without a heartbeat)"
+            )
+        return "took a released lease"
 
     def heartbeat(self, lease: Lease, *, stage: str = "") -> Lease:
         updated = _with(lease, heartbeat_at=utcnow().isoformat(), stage=stage or lease.stage)
-        write_json(self.lease_path(lease.work_order_id), updated.to_dict())
+        write_json(self._owned_path(updated), updated.to_dict())
         return updated
 
     def release(self, lease: Lease) -> Lease:
         released = _with(lease, state=RELEASED, heartbeat_at=utcnow().isoformat())
-        write_json(self.lease_path(lease.work_order_id), released.to_dict())
+        write_json(self._owned_path(released), released.to_dict())
         return released
+
+    def _owned_path(self, lease: Lease) -> Path:
+        """The lease file of the generation this lease owns, not the newest one.
+
+        A runner whose lease was reclaimed as stale keeps running until it
+        notices. Addressing its own generation means its heartbeats and its
+        release land in a directory nobody reads any more, instead of over the
+        metadata of the runner that superseded it.
+        """
+        return _lease_file(self.job_dir(lease.work_order_id), lease.generation)
 
     def next_run_sequence(self, work_order_id: str) -> int:
         directory = self.job_dir(work_order_id) / OUTCOMES_DIR
@@ -296,16 +405,73 @@ class RunStore:
             return ()
         found: set[str] = set()
         for child in directory.iterdir():
-            lease_file = child / LEASE_NAME
-            if not lease_file.is_file():
+            if not child.is_dir():
                 continue
-            try:
-                data = json.loads(lease_file.read_text(encoding="utf-8"))
-            except (json.JSONDecodeError, OSError):
-                continue
-            if isinstance(data, Mapping) and data.get("work_order_id"):
-                found.add(str(data["work_order_id"]))
+            lease, _ = _read_lease(child, _highest_generation(child))
+            if lease is not None and lease.work_order_id:
+                found.add(lease.work_order_id)
         return tuple(sorted(found))
+
+
+def _lease_file(directory: Path, generation: int) -> Path:
+    """Generation N's metadata file. Generation 0 is the pre-directory layout."""
+    if generation <= 0:
+        return directory / LEASE_NAME
+    return directory / f"{LEASE_DIR_PREFIX}{generation:06d}" / LEASE_NAME
+
+
+def _highest_generation(directory: Path) -> int:
+    """The newest generation anybody has created here, or 0 for none.
+
+    0 also covers the pre-directory layout, whose lease file sits directly in
+    the job directory - so a job left in flight by an older runner is read,
+    not ignored.
+    """
+    if not directory.is_dir():
+        return 0
+    generations = [
+        int(match.group("generation"))
+        for child in directory.iterdir()
+        if child.is_dir() and (match := _LEASE_DIR_NAME.fullmatch(child.name))
+    ]
+    return max(generations, default=0)
+
+
+def _read_lease(directory: Path, generation: int) -> tuple[Lease | None, bool]:
+    """Generation N's lease, and whether it could be read at all.
+
+    The second value is the one that matters at a claim: "no lease here" and
+    "a lease I cannot parse" are different facts, and collapsing them is how
+    an empty file came to mean "therefore I won".
+    """
+    path = _lease_file(directory, generation)
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, ValueError, OSError):
+        return None, False
+    if not isinstance(data, Mapping):
+        return None, False
+    lease = Lease.from_mapping(data)
+    if generation and not lease.generation:
+        lease = _with(lease, generation=generation)
+    return lease, True
+
+
+def _directory_age_s(directory: Path, generation: int, now: dt.datetime) -> float:
+    """How long generation N's directory has existed, by the filesystem's clock.
+
+    Its own mtime rather than a written timestamp, because the case this
+    answers is precisely the one where nothing was written.
+    """
+    if generation <= 0:
+        target = _lease_file(directory, generation)
+    else:
+        target = directory / f"{LEASE_DIR_PREFIX}{generation:06d}"
+    try:
+        modified = dt.datetime.fromtimestamp(target.stat().st_mtime, dt.timezone.utc)
+    except OSError:
+        return float("inf")
+    return (now - modified).total_seconds()
 
 
 def _with(lease: Lease, **changes: Any) -> Lease:
@@ -332,6 +498,7 @@ def _sequence_key(path: Path) -> tuple[int, str]:
 
 __all__ = [
     "HELD",
+    "LEASE_DIR_PREFIX",
     "LEASE_NAME",
     "OUTCOMES_DIR",
     "RELEASED",

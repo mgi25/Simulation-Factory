@@ -102,6 +102,17 @@ class Workspace:
         value = self.require_git(["rev-parse", "--path-format=absolute", "--git-common-dir"], cwd=cwd)
         return Path(value.strip()).resolve()
 
+    def file_at(self, commit: str, path: str, *, cwd: Path | None = None) -> str:
+        """One tracked file's contents at one commit, or "" if it was not there.
+
+        A file that does not exist at a commit and a file that is empty at it
+        are both "": the callers here compare *declarations*, and a manifest
+        that did not exist declared nothing. Distinguishing the two would mean
+        a second git call to answer a question nobody asks.
+        """
+        result = self.git(["show", f"{commit}:{path}"], cwd=cwd)
+        return result.stdout if result.ok else ""
+
     def status(self, cwd: Path) -> GitStatus:
         head = self.require_git(["rev-parse", "HEAD"], cwd=cwd)
         branch = self.require_git(["rev-parse", "--abbrev-ref", "HEAD"], cwd=cwd)

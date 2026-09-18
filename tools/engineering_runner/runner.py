@@ -90,12 +90,14 @@ from .errors import (
     RunnerError,
 )
 from .evidence import (
+    DEPENDENCY_MANIFESTS,
     REQUIRED_SUITES,
     GitObservation,
     TestRun,
     assert_reviewer_report,
     build_attestation,
     build_receipt,
+    manifest_changes,
     normalised_changes,
     parse_json_object,
     read_json_object,
@@ -104,7 +106,7 @@ from .evidence import (
 )
 from .process import CommandRunner
 from .queue import RunStore, utcnow, write_json, write_text
-from .redaction import Redactor
+from .redaction import Redactor, sanitize_json_file
 from .workspace import Workspace
 
 
@@ -599,6 +601,23 @@ class EngineeringRunner:
                 ),
             )
 
+        # What the attempt did to the project's dependency manifests, read from
+        # git rather than from the report. `dependencies_added` is a governed
+        # field - a non-empty one is a BLOCKING finding in the deterministic
+        # review - so it is measured from the two commits the attempt sits
+        # between, and the session is not asked.
+        dependencies = manifest_changes(
+            {
+                path: self._workspace.file_at(envelope.base_commit, path, cwd=worktree)
+                for path in DEPENDENCY_MANIFESTS
+            },
+            {
+                path: self._workspace.file_at(commit_sha, path, cwd=worktree)
+                for path in DEPENDENCY_MANIFESTS
+            },
+        )
+        write_json(stage_dir / "dependencies.json", dependencies)
+
         tests = run_tests(
             self._commands,
             python_executable=self.config.python_executable,
@@ -645,6 +664,7 @@ class EngineeringRunner:
                 if accepted
                 else _rejection(tests, observation, narrative, changed_nothing)
             ),
+            dependencies_added=dependencies["dependencies_added"],
         )
         receipt_path = write_json(stage_dir / "receipt.json", receipt)
         reply = self._control.submit_receipt(
@@ -948,6 +968,14 @@ class EngineeringRunner:
         problem = ""
         for index in range(self.config.max_stage_retries + 1):
             session = backend.launch(attempt)
+            # The report is the one channel the session writes straight to
+            # disk, and everything downstream - the receipt, the attestation,
+            # the Company OS record, the committed evidence - is built from it.
+            # Scrub it where it lands, before anything reads it, so there is no
+            # arrangement of later code that can persist a credential a session
+            # happened to quote back.
+            if report_path is not None:
+                sanitize_json_file(report_path, self._redactor)
             write_json(stage_dir / f"session-{index + 1}.json", session.to_dict())
             write_text(
                 stage_dir / f"session-{index + 1}.transcript.txt",

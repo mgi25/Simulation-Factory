@@ -243,6 +243,93 @@ class GitObservation:
         }
 
 
+# --- dependencies ----------------------------------------------------------
+#
+# `SessionReceipt.dependencies_added` is a governed field: a non-empty one is a
+# BLOCKING `dependency-added` finding in `company/engineering/review.py`,
+# because `mandatory_review_triggers.new_dependency` in permissions.yaml makes
+# a new dependency an architecture-and-security review rather than a diff to
+# skim. It was hardcoded to `[]`, which meant an attempt could add a production
+# dependency inside its authorized scope and the deterministic review would
+# have nothing to find.
+#
+# It is measured from the repository, never from the report. A session that is
+# trusted to describe its own dependency changes is a session whose forgetting
+# to mention one is indistinguishable from not making one.
+
+# The project's dependency source. One file, because the project has one: there
+# is no pyproject.toml and no lock file, and inventing support for manifests
+# this repository does not carry would be a second policy with no subject.
+# Company OS's own dependency rule is stricter and separate - it may import
+# nothing but stdlib, which `company/integration/checks.py` checks by reading
+# imports - and that rule is not restated here.
+DEPENDENCY_MANIFESTS: tuple[str, ...] = ("requirements.txt",)
+
+# `-r other.txt`, `--index-url ...`: pip options, not requirements.
+_REQUIREMENT_OPTION = re.compile(r"^-")
+# Everything that can follow a distribution name: extras, a version specifier,
+# a direct URL, or an environment marker.
+_REQUIREMENT_NAME = re.compile(r"^(?P<name>[A-Za-z0-9._-]+)")
+_NORMALISE = re.compile(r"[-_.]+")
+
+
+def declared_dependencies(text: str) -> tuple[str, ...]:
+    """The distribution names one requirements file declares, normalised.
+
+    Names only. A version specifier is deliberately dropped: raising a floor on
+    a dependency the project already has is not a new dependency, and treating
+    it as one would make every routine bump an architecture review. The
+    normalisation is PEP 503's, so `Pillow`, `pillow` and `PIL_LOW` never look
+    like three dependencies when two of them are one.
+    """
+    names: list[str] = []
+    for raw in text.splitlines():
+        line = raw.split("#", 1)[0].strip()
+        if not line or _REQUIREMENT_OPTION.match(line):
+            continue
+        # `name @ url` and `name ; marker` both put the name first.
+        head = line.split(";", 1)[0].split("@", 1)[0].strip()
+        match = _REQUIREMENT_NAME.match(head)
+        if not match:
+            continue
+        names.append(_NORMALISE.sub("-", match.group("name")).lower())
+    return tuple(sorted(set(names)))
+
+
+def dependencies_added(before: str, after: str) -> tuple[str, ...]:
+    """Names declared after and not before, in the order a reader would read.
+
+    Reordering a file changes no name, so it adds nothing. Bumping a version
+    changes no name either. Only a name that was not declared before is an
+    addition, which is what the governed field means.
+    """
+    was = set(declared_dependencies(before))
+    return tuple(name for name in declared_dependencies(after) if name not in was)
+
+
+def manifest_changes(
+    before: Mapping[str, str], after: Mapping[str, str]
+) -> dict[str, Any]:
+    """What the dependency manifests say about one attempt.
+
+    Two facts, kept apart because the policy keeps them apart: which manifest
+    *files* the attempt touched - a scope question, already answered by
+    `files_changed` and by the authority verdict - and which dependencies it
+    actually *added*, which is the governed one. A version bump appears in the
+    first and not the second, and that is the distinction.
+    """
+    changed = tuple(
+        sorted(path for path in {*before, *after} if before.get(path, "") != after.get(path, ""))
+    )
+    added: list[str] = []
+    for path in sorted({*before, *after}):
+        added.extend(dependencies_added(before.get(path, ""), after.get(path, "")))
+    return {
+        "manifests_changed": list(changed),
+        "dependencies_added": sorted(set(added)),
+    }
+
+
 def build_receipt(
     envelope: AuthorityEnvelope,
     *,
@@ -253,6 +340,7 @@ def build_receipt(
     completed_at: dt.datetime,
     accepted: bool,
     rejection_reason: str = "",
+    dependencies_added: Sequence[str] = (),
 ) -> dict[str, Any]:
     """One `SessionReceipt`, as the JSON its own `from_mapping` decodes.
 
@@ -280,7 +368,7 @@ def build_receipt(
         "working_tree_clean": observation.working_tree_clean,
         "files_changed": list(observation.files_changed),
         "tests": [run.reported() for run in tests],
-        "dependencies_added": [],
+        "dependencies_added": [str(name) for name in dependencies_added],
         "invariants_preserved": _strings(narrative.get("invariants_preserved"))[:32],
         "unresolved_risks": _strings(narrative.get("unresolved_risks"))[:32],
         "evidence": _evidence(narrative, observation),

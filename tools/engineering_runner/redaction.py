@@ -32,7 +32,9 @@ marker, which destroys the transcript to protect nothing.
 
 from __future__ import annotations
 
+import json
 import os
+from pathlib import Path
 import re
 from typing import Iterable, Mapping
 
@@ -145,20 +147,275 @@ class Redactor:
         return tuple(self.scrub(item) for item in values)
 
 
+def sanitize_json_file(path: Path, redactor: "Redactor") -> bool:
+    """Rewrite a file a session wrote so it holds no credential. Reports whether it did.
+
+    **Why this exists.** Every other thing a session produces reaches disk
+    through `CommandRunner.run`, which scrubs on the way in. The report does
+    not: the session writes it to a path the runner names, and the runner then
+    builds the receipt, the attestation and the committed evidence out of it.
+    That made it the one persisted developer channel where a credential quoted
+    back in a summary would travel all the way into a Company OS record. It is
+    scrubbed here, at the boundary, rather than at each of the places that read
+    it - there is no arrangement of later code that can reintroduce the leak.
+
+    **It uses the same `Redactor` as everything else**, deliberately. A second
+    pattern set would drift from the first, and the first is the one the
+    transcripts are checked against.
+
+    The scrub runs over the file's text, so it also covers a file that does not
+    parse. Every replacement substitutes a run of non-structural characters for
+    a shorter one, so JSON that was valid stays valid; if a pathological input
+    ever proved otherwise, the parsed-and-scrubbed form is written instead, and
+    an unparseable file is left scrubbed as text for the caller to fail on.
+    """
+    try:
+        original = path.read_text(encoding="utf-8")
+    except OSError:
+        return False
+    scrubbed = redactor.scrub(original)
+    if scrubbed != original:
+        try:
+            json.loads(original)
+        except ValueError:
+            pass
+        else:
+            try:
+                json.loads(scrubbed)
+            except ValueError:
+                scrubbed = json.dumps(
+                    _scrub_tree(json.loads(original), redactor), indent=2, sort_keys=True
+                )
+    if scrubbed == original:
+        return False
+    path.write_text(scrubbed, encoding="utf-8")
+    return True
+
+
+def _scrub_tree(value: object, redactor: "Redactor") -> object:
+    """Every string in a decoded document, scrubbed, structure untouched."""
+    if isinstance(value, str):
+        return redactor.scrub(value)
+    if isinstance(value, Mapping):
+        return {str(key): _scrub_tree(item, redactor) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_scrub_tree(item, redactor) for item in value]
+    return value
+
+
+# --- what a child process is given -----------------------------------------
+#
+# An allowlist, because the alternative was measured and it failed. Forwarding
+# `os.environ` and subtracting a few names handed every coding session this
+# machine's BINANCE_API_SECRET and CLAUDE_CODE_MESSAGING_TOKEN, neither of
+# which the session has any business holding: a denylist has to predict the
+# names, and the operator adds new ones faster than the runner can learn them.
+#
+# Three groups, and a variable is forwarded only if it is in one of them.
+
+# 1. The base safe environment: what a process needs to be a process. Paths,
+#    the interpreter's own configuration, locale, and the machine's identity.
+#    Nothing here carries an authorisation to do anything.
+_BASE_ENVIRONMENT: frozenset[str] = frozenset(
+    {
+        # process and filesystem
+        "PATH",
+        "PATHEXT",
+        "COMSPEC",
+        "SYSTEMROOT",
+        "SYSTEMDRIVE",
+        "WINDIR",
+        "DRIVERDATA",
+        "TEMP",
+        "TMP",
+        "TMPDIR",
+        # where a user's own configuration lives, which is where every backend
+        # keeps the credentials it manages itself
+        "HOME",
+        "HOMEDRIVE",
+        "HOMEPATH",
+        "USERPROFILE",
+        "APPDATA",
+        "LOCALAPPDATA",
+        "PROGRAMDATA",
+        "ALLUSERSPROFILE",
+        "PUBLIC",
+        # where installed software lives
+        "PROGRAMFILES",
+        "PROGRAMFILES(X86)",
+        "PROGRAMW6432",
+        "COMMONPROGRAMFILES",
+        "COMMONPROGRAMFILES(X86)",
+        "COMMONPROGRAMW6432",
+        # machine identity and shape
+        "OS",
+        "USERNAME",
+        "USERDOMAIN",
+        "COMPUTERNAME",
+        "NUMBER_OF_PROCESSORS",
+        "PROCESSOR_ARCHITECTURE",
+        "PROCESSOR_IDENTIFIER",
+        "PROCESSOR_LEVEL",
+        "PROCESSOR_REVISION",
+        # locale and terminal
+        "LANG",
+        "LANGUAGE",
+        "LC_ALL",
+        "LC_CTYPE",
+        "TERM",
+        "TZ",
+        # the Python the runner and its tests run under
+        "PYTHONPATH",
+        "PYTHONHOME",
+        "PYTHONUTF8",
+        "PYTHONDONTWRITEBYTECODE",
+        "PYTHONWARNINGS",
+        "PYTHONHASHSEED",
+        "VIRTUAL_ENV",
+        "CONDA_PREFIX",
+        "CONDA_DEFAULT_ENV",
+        # the Node a coding CLI runs under
+        "NODE_PATH",
+        "NODE_OPTIONS",
+        "NVM_DIR",
+        "NVM_BIN",
+        "NPM_CONFIG_PREFIX",
+        # git, which the runner drives for every stage
+        "GIT_EXEC_PATH",
+        "GIT_SSH",
+        "GIT_SSH_COMMAND",
+        "SSH_AUTH_SOCK",
+        "SSH_AGENT_PID",
+        # reaching the network at all, on a machine that goes through a proxy
+        "HTTP_PROXY",
+        "HTTPS_PROXY",
+        "NO_PROXY",
+        "ALL_PROXY",
+    }
+)
+
+# 2. The backend's own variables, named one at a time. A prefix rule was the
+#    obvious shortcut and it is wrong: CLAUDE_CODE_MESSAGING_TOKEN shares a
+#    prefix with every Claude Code setting and is exactly the credential the
+#    review found being handed out.
+_BACKEND_ENVIRONMENT: frozenset[str] = frozenset(
+    {
+        # Anthropic, for the `claude` backend
+        "ANTHROPIC_API_KEY",
+        "ANTHROPIC_AUTH_TOKEN",
+        "ANTHROPIC_BASE_URL",
+        "ANTHROPIC_CUSTOM_HEADERS",
+        "ANTHROPIC_MODEL",
+        "ANTHROPIC_SMALL_FAST_MODEL",
+        "ANTHROPIC_DEFAULT_OPUS_MODEL",
+        "ANTHROPIC_DEFAULT_SONNET_MODEL",
+        "ANTHROPIC_DEFAULT_HAIKU_MODEL",
+        "CLAUDE_CODE_OAUTH_TOKEN",
+        "CLAUDE_CONFIG_DIR",
+        "CLAUDE_CODE_USE_BEDROCK",
+        "CLAUDE_CODE_USE_VERTEX",
+        "CLAUDE_CODE_MAX_OUTPUT_TOKENS",
+        "MAX_THINKING_TOKENS",
+        # OpenAI, for the `codex` backend
+        "OPENAI_API_KEY",
+        "OPENAI_BASE_URL",
+        "CODEX_HOME",
+    }
+)
+
+# 3. Variables required only by a backend routed through a cloud provider, and
+#    forwarded only when the switch that routes it there is actually set. An
+#    AWS or GCP credential is a real credential; it travels when Claude Code is
+#    configured to need it, not because it happened to be in the shell.
+_BEDROCK_ENVIRONMENT: frozenset[str] = frozenset(
+    {
+        "AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY",
+        "AWS_SESSION_TOKEN",
+        "AWS_BEARER_TOKEN_BEDROCK",
+        "AWS_PROFILE",
+        "AWS_REGION",
+        "AWS_DEFAULT_REGION",
+        "AWS_CONTAINER_CREDENTIALS_FULL_URI",
+        "AWS_CONTAINER_AUTHORIZATION_TOKEN",
+    }
+)
+_VERTEX_ENVIRONMENT: frozenset[str] = frozenset(
+    {
+        "GOOGLE_APPLICATION_CREDENTIALS",
+        "GOOGLE_CLOUD_PROJECT",
+        "CLOUD_ML_REGION",
+    }
+)
+
+# Never forwarded, whatever else says so. These mark "you are already inside a
+# Claude Code session", and a child that sees them refuses to start because
+# nested sessions share runtime resources. Dropping them is what makes the
+# child an independent session rather than a nested one, which is exactly the
+# property the review stage needs. They are named rather than merely left off
+# the allowlist, so that adding one of them later is a visible contradiction.
+_NESTED_SESSION_MARKERS: frozenset[str] = frozenset(
+    {
+        "CLAUDECODE",
+        "CLAUDE_CODE_ENTRYPOINT",
+        "CLAUDE_CODE_SSE_PORT",
+    }
+)
+
+
+def _truthy(source: Mapping[str, str], name: str) -> bool:
+    for key, value in source.items():
+        if key.upper() == name:
+            return str(value).strip().lower() not in ("", "0", "false", "no")
+    return False
+
+
+def forwarded_names(environment: Mapping[str, str] | None = None) -> tuple[str, ...]:
+    """Which of `environment`'s names a child would be given, sorted.
+
+    Names, never values. This exists so that a test and a run record can both
+    say what crossed the boundary without either of them handling what crossed
+    it.
+    """
+    source = os.environ if environment is None else environment
+    allowed = set(_BASE_ENVIRONMENT | _BACKEND_ENVIRONMENT)
+    if _truthy(source, "CLAUDE_CODE_USE_BEDROCK"):
+        allowed |= _BEDROCK_ENVIRONMENT
+    if _truthy(source, "CLAUDE_CODE_USE_VERTEX"):
+        allowed |= _VERTEX_ENVIRONMENT
+    return tuple(
+        sorted(
+            name
+            for name in source
+            if name.upper() in allowed and name.upper() not in _NESTED_SESSION_MARKERS
+        )
+    )
+
+
 def child_environment(environment: Mapping[str, str] | None = None) -> dict[str, str]:
     """The environment every process this runner starts gets.
 
-    Two changes to the inherited one, and both are about the child rather than
-    about secrets - they live here because this module already owns the one
-    question "what environment does a child get", and two answers to that
-    question is how something ends up somewhere nobody looked.
+    An allowlist of three classes - a base safe environment, the backend's own
+    variables named one at a time, and a cloud provider's credentials only when
+    the switch routing the backend through it is set - plus one value the
+    runner sets itself.
 
-    **`CLAUDECODE` and its companions are dropped.** They mark "you are already
-    inside a Claude Code session". A runner started from an ordinary shell does
-    not have them; a runner started from inside one does, and the child then
-    refuses to launch because nested sessions share runtime resources. Dropping
-    them is what makes the child an independent session rather than a nested
-    one, which is exactly the property the review stage needs.
+    **Why an allowlist.** The runner's whole claim is that a coding session's
+    authority is bounded, and an inherited environment *is* authority: it is
+    where a process finds the keys to every service the operator uses, and none
+    of them is in the work order. Forwarding `os.environ` minus three names
+    handed each session credentials for services this repository has never
+    heard of. The list here is the smallest one under which the runner, git,
+    pytest, the Company OS CLI and a `claude` or `codex` session all still
+    work; a backend that needs a name it does not have fails at its own
+    `available()` probe, before a work order is claimed, which is the right way
+    to find out.
+
+    **What is deliberately not forwarded**, and is not missed: anything
+    credential-shaped that is not a named backend variable, every editor and
+    IDE integration variable, every session-marking variable, and everything
+    else. Absence is the default, and a new credential in the operator's shell
+    is not a change to this boundary.
 
     **`PYTHONIOENCODING` is set to UTF-8.** Output is captured as UTF-8, and on
     Windows a Python child writes its stdout in the console codepage unless
@@ -167,15 +424,16 @@ def child_environment(environment: Mapping[str, str] | None = None) -> dict[str,
     read back exactly is worse evidence.
     """
     source = dict(os.environ if environment is None else environment)
-    for name in ("CLAUDECODE", "CLAUDE_CODE_SSE_PORT", "CLAUDE_CODE_ENTRYPOINT"):
-        source.pop(name, None)
-    source["PYTHONIOENCODING"] = "utf-8"
-    return source
+    kept = {name: source[name] for name in forwarded_names(source)}
+    kept["PYTHONIOENCODING"] = "utf-8"
+    return kept
 
 
 __all__ = [
     "REDACTED",
     "Redactor",
     "child_environment",
+    "forwarded_names",
+    "sanitize_json_file",
     "secret_values",
 ]

@@ -121,6 +121,7 @@ from .errors import (
 )
 from .evidence import (
     MAX_REF_CHARS,
+    DEPENDENCY_MANIFESTS,
     REQUIRED_SUITES,
     GitObservation,
     TestRun,
@@ -128,13 +129,23 @@ from .evidence import (
     assert_tests_describe,
     build_attestation,
     build_receipt,
+    declared_dependencies,
+    dependencies_added,
+    manifest_changes,
     parse_json_object,
     run_tests,
     suite_evidence,
 )
 from .process import CommandResult, CommandRunner, resolve_executable
 from .queue import Lease, RunStore, task_directory_name
-from .redaction import REDACTED, Redactor, child_environment, secret_values
+from .redaction import (
+    REDACTED,
+    Redactor,
+    child_environment,
+    forwarded_names,
+    sanitize_json_file,
+    secret_values,
+)
 from .runner import ACTIONABLE, EngineeringRunner, RunReport, StageRecord
 from .workspace import GitStatus, Workspace
 
@@ -145,6 +156,7 @@ __all__ = [
     "CODEX",
     "MAX_REF_CHARS",
     "REDACTED",
+    "DEPENDENCY_MANIFESTS",
     "REQUIRED_SUITES",
     "AuthorityEnvelope",
     "AuthorityVerdict",
@@ -183,9 +195,13 @@ __all__ = [
     "build_backend",
     "build_receipt",
     "child_environment",
+    "declared_dependencies",
+    "dependencies_added",
     "developer_instructions",
     "digest_paths",
     "executor_hint",
+    "forwarded_names",
+    "manifest_changes",
     "normalise_path",
     "parse_json_object",
     "protected_drift",
@@ -193,6 +209,7 @@ __all__ = [
     "resolve_executable",
     "review_instructions",
     "run_tests",
+    "sanitize_json_file",
     "secret_values",
     "suite_evidence",
     "task_directory_name",

@@ -49,7 +49,7 @@ from company.engineering.intake import CEORequest, assess_request
 from company.engineering.lifecycle import CEO_STATES, TERMINAL_STATES, JobState
 from company.engineering.orchestrator import open_job, prepare_developer_session
 from company.engineering.protected import DEFAULT_PROTECTED_PATHS
-from company.engineering.review import ReviewerAttestation
+from company.engineering.review import ReviewerAttestation, deterministic_findings
 from company.engineering.store import EngineeringStore
 from company.engineering.transport import developer_briefing_payload
 from company.integration.boundary import NETWORK_MODULES, PROCESS_MODULES
@@ -86,6 +86,7 @@ from tools.engineering_runner.evidence import (
     TestRun,
     build_attestation,
     build_receipt,
+    dependencies_added,
 )
 from tools.engineering_runner import runner as runner_module
 
@@ -342,7 +343,7 @@ def _session() -> SessionOutcome:
     )
 
 
-def _runner_receipt(briefing) -> dict:
+def _runner_receipt(briefing, *, dependencies: tuple[str, ...] = ()) -> dict:
     envelope = AuthorityEnvelope.parse(briefing["payload"])
     changed = (f"{envelope.may_write[0]}/verify.py",)
     tests = tuple(
@@ -385,6 +386,7 @@ def _runner_receipt(briefing) -> dict:
         session=_session(),
         completed_at=dt.datetime(2026, 9, 18, tzinfo=dt.timezone.utc),
         accepted=True,
+        dependencies_added=dependencies,
     )
 
 
@@ -402,6 +404,61 @@ def test_a_receipt_the_runner_builds_is_one_company_os_accepts(briefing):
     assert receipt.no_subagents is True
     assert receipt.merge_performed is False
 
+
+
+def test_a_dependency_the_runner_measures_is_one_company_os_blocks_on(briefing):
+    """The field the runner now fills, read by the governance that was waiting for it.
+
+    `dependencies_added` was hardcoded to `[]`, so an attempt could add a
+    production dependency inside its authorized scope and this finding - which
+    has existed the whole time, because `mandatory_review_triggers.new_dependency`
+    in permissions.yaml makes a new dependency an architecture-and-security
+    review - had nothing to fire on. The runner supplies no new policy here; it
+    supplies the measurement the existing policy needed.
+    """
+    measured = dependencies_added("pymunk>=7.0\npytest>=8.0\n", "pymunk>=7.0\npytest>=8.0\nrequests>=2.31\n")
+    assert measured == ("requests",)
+
+    payload = _runner_receipt(briefing, dependencies=measured)
+    receipt = SessionReceipt.from_mapping(payload)
+    assert receipt.dependencies_added == ("requests",)
+    validation = validate_receipt(
+        briefing["packet"],
+        receipt,
+        packet_attempt=1,
+        authority_fingerprint=receipt.authority_fingerprint,
+    )
+    findings = deterministic_findings(
+        briefing["order"],
+        briefing["packet"],
+        receipt,
+        validation,
+        repo_root=briefing["repo"],
+    )
+    dependency = [item for item in findings if item.finding_id == "dependency-added"]
+    assert len(dependency) == 1
+    assert dependency[0].severity is FindingSeverity.BLOCKING
+    assert "requests" in dependency[0].summary
+    assert "architecture_and_security_review" in dependency[0].summary
+
+
+def test_an_attempt_that_adds_no_dependency_raises_no_such_finding(briefing):
+    payload = _runner_receipt(briefing)
+    receipt = SessionReceipt.from_mapping(payload)
+    validation = validate_receipt(
+        briefing["packet"],
+        receipt,
+        packet_attempt=1,
+        authority_fingerprint=receipt.authority_fingerprint,
+    )
+    findings = deterministic_findings(
+        briefing["order"],
+        briefing["packet"],
+        receipt,
+        validation,
+        repo_root=briefing["repo"],
+    )
+    assert [item for item in findings if item.finding_id == "dependency-added"] == []
 
 def test_the_receipt_command_now_reports_the_fingerprint_an_attestation_needs(
     briefing, tmp_path, monkeypatch

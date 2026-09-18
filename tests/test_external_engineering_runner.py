@@ -43,6 +43,9 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
+import threading
+import time
 from typing import Any, Mapping, Sequence
 
 import pytest
@@ -73,12 +76,21 @@ from tools.engineering_runner.evidence import (
     assert_tests_describe,
     build_attestation,
     build_receipt,
+    declared_dependencies,
+    dependencies_added,
+    manifest_changes,
     parse_json_object,
     suite_evidence,
 )
 from tools.engineering_runner.process import CommandRunner
-from tools.engineering_runner.queue import RunStore, utcnow
-from tools.engineering_runner.redaction import REDACTED, Redactor, child_environment
+from tools.engineering_runner.queue import LEASE_NAME, RunStore, utcnow
+from tools.engineering_runner.redaction import (
+    REDACTED,
+    Redactor,
+    child_environment,
+    forwarded_names,
+    sanitize_json_file,
+)
 from tools.engineering_runner.runner import (
     COMPLETED,
     RUN_BLOCKED,
@@ -137,6 +149,11 @@ def repository(tmp_path: Path) -> dict[str, Any]:
     (repo / ".gitignore").write_text("__pycache__/\n.pytest_cache/\n", encoding="utf-8")
     (repo / "company").mkdir()
     (repo / "company" / "permissions.yaml").write_text("reserved: [publish]\n", encoding="utf-8")
+    # The project's one dependency manifest. It is here rather than in the
+    # tests that need it because `dependencies_added` is measured against the
+    # authorized base commit, and a manifest that first appears in the attempt
+    # would make every name in it an addition.
+    (repo / "requirements.txt").write_text(BASE_REQUIREMENTS, encoding="utf-8")
     (repo / "subject").mkdir()
     (repo / "subject" / "module.py").write_text("VALUE = 1\n", encoding="utf-8")
     (repo / "tests").mkdir()
@@ -206,8 +223,8 @@ def developer_briefing(base: str, *, allowed: Sequence[str] = ("subject",)) -> d
     }
 
 
-def review_briefing(base: str) -> dict[str, Any]:
-    payload = developer_briefing(base)
+def review_briefing(base: str, *, allowed: Sequence[str] = ("subject",)) -> dict[str, Any]:
+    payload = developer_briefing(base, allowed=allowed)
     payload["role"] = "reviewer"
     payload["reviewer"] = REVIEWER
     payload["implementer"] = EMPLOYEE
@@ -847,9 +864,16 @@ def test_a_child_writes_utf8_that_survives_the_capture(tmp_path: Path):
 class ScriptedControlPlane:
     """A stand-in that answers like `company.engineering` and records what it was asked."""
 
-    def __init__(self, base: str, *, states: list[str]) -> None:
+    def __init__(
+        self,
+        base: str,
+        *,
+        states: list[str],
+        allowed: Sequence[str] = ("subject",),
+    ) -> None:
         self.base = base
         self.states = states
+        self.allowed = tuple(allowed)
         self.calls: list[tuple[str, Any]] = []
         self.receipts: list[dict[str, Any]] = []
         self.attestations: list[dict[str, Any]] = []
@@ -871,7 +895,7 @@ class ScriptedControlPlane:
     def developer_brief(self, work_order_id: str, *, executor: str):
         self.calls.append(("brief", executor))
         self._advance("developing")
-        return _reply(developer_briefing(self.base))
+        return _reply(developer_briefing(self.base, allowed=self.allowed))
 
     def submit_receipt(self, work_order_id: str, receipt_file: Path, *, repo_dir=None):
         payload = json.loads(Path(receipt_file).read_text(encoding="utf-8"))
@@ -891,7 +915,7 @@ class ScriptedControlPlane:
     def review_brief(self, work_order_id: str, *, implementer: str, executor: str):
         self.calls.append(("review-brief", implementer))
         self._advance("reviewing")
-        return _reply(review_briefing(self.base))
+        return _reply(review_briefing(self.base, allowed=self.allowed))
 
     def submit_review(
         self, work_order_id: str, attestation_file: Path, *, implementer: str, repo_root: Path
@@ -1062,6 +1086,20 @@ def _runner(repository: dict[str, Any], backend: ScriptedBackend, control: Scrip
 
 def _in_scope_edit(worktree: Path) -> None:
     (worktree / "subject" / "module.py").write_text("VALUE = 2\n", encoding="utf-8")
+
+
+def _adds_a_dependency(worktree: Path) -> None:
+    _in_scope_edit(worktree)
+    (worktree / "requirements.txt").write_text(
+        BASE_REQUIREMENTS + "requests>=2.31\n", encoding="utf-8"
+    )
+
+
+def _bumps_a_version(worktree: Path) -> None:
+    _in_scope_edit(worktree)
+    (worktree / "requirements.txt").write_text(
+        BASE_REQUIREMENTS.replace("pytest>=8.0", "pytest>=8.2"), encoding="utf-8"
+    )
 
 
 def _out_of_scope_edit(worktree: Path) -> None:
@@ -1676,3 +1714,551 @@ def test_no_shell_is_ever_used(tmp_path: Path):
         [os.sys.executable, "-c", "print('hello')"], cwd=tmp_path, timeout_s=60
     )
     assert result.ok and "hello" in result.stdout
+
+
+# --- the lease, under real contention --------------------------------------
+#
+# The claim used to be that `O_EXCL` made the lease exclusive. It did not, and
+# the way to find that out was never a sequential call - every sequential call
+# passed. These run real simultaneous contenders and count grants, because the
+# defect only exists in the window between two operations and a test that never
+# opens that window cannot see it.
+#
+# Measured on the code these replaced, 20 trials x 8 threads: 75 grants where
+# 20 were expected for a never-before-seen work order, 160 for a released one,
+# 160 for a stale one, and 157 for one whose metadata did not parse.
+
+RACE_TRIALS = 20
+RACE_CONTENDERS = 8
+
+
+def _contend(root: Path, *, lease_seconds: float = 3600.0, contenders: int = RACE_CONTENDERS):
+    """Let `contenders` threads reach `acquire` together. Returns the winners."""
+    barrier = threading.Barrier(contenders)
+    won: list[str] = []
+    lock = threading.Lock()
+
+    def claim(index: int) -> None:
+        store = RunStore(root, runner_id=f"contender-{index}")
+        barrier.wait()
+        try:
+            lease, _ = store.acquire(WORK_ORDER, lease_seconds=lease_seconds)
+        except ClaimUnavailable:
+            return
+        with lock:
+            won.append(lease.runner_id)
+
+    threads = [threading.Thread(target=claim, args=(i,)) for i in range(contenders)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    return won
+
+
+def _trials(tmp_path: Path, prepare, *, lease_seconds: float = 3600.0) -> list[int]:
+    """`RACE_TRIALS` independent races over a freshly prepared runner directory."""
+    counts = []
+    for trial in range(RACE_TRIALS):
+        root = tmp_path / f"trial-{trial:03d}"
+        root.mkdir()
+        prepare(root)
+        counts.append(len(_contend(root, lease_seconds=lease_seconds)))
+    return counts
+
+
+def _backdate(store: RunStore, hours: float = 3.0) -> None:
+    """Make the current holder's heartbeat old, without waiting for a clock.
+
+    Not `lease_seconds=0`: that makes the winner's own brand-new lease stale
+    too, so each contender supersedes the last and the count measures the
+    clock rather than the lock.
+    """
+    path = store.lease_path(WORK_ORDER)
+    data = json.loads(path.read_text(encoding="utf-8"))
+    data["heartbeat_at"] = (utcnow() - dt.timedelta(hours=hours)).isoformat()
+    path.write_text(json.dumps(data), encoding="utf-8")
+
+
+def test_many_contenders_for_a_new_work_order_produce_exactly_one_winner(tmp_path: Path):
+    counts = _trials(tmp_path, lambda root: None)
+    assert counts == [1] * RACE_TRIALS, counts
+    assert sum(counts) == RACE_TRIALS
+
+
+def test_a_fresh_lease_admits_no_additional_winner(tmp_path: Path):
+    def prepare(root: Path) -> None:
+        RunStore(root, runner_id="holder").acquire(WORK_ORDER, lease_seconds=3600)
+
+    counts = _trials(tmp_path, prepare)
+    assert counts == [0] * RACE_TRIALS, counts
+
+
+def test_a_released_lease_admits_exactly_one_new_winner(tmp_path: Path):
+    def prepare(root: Path) -> None:
+        store = RunStore(root, runner_id="holder")
+        lease, _ = store.acquire(WORK_ORDER, lease_seconds=3600)
+        store.release(lease)
+
+    counts = _trials(tmp_path, prepare)
+    assert counts == [1] * RACE_TRIALS, counts
+
+
+def test_a_stale_lease_admits_exactly_one_reclaimer(tmp_path: Path):
+    def prepare(root: Path) -> None:
+        store = RunStore(root, runner_id="holder")
+        store.acquire(WORK_ORDER, lease_seconds=3600)
+        _backdate(store)
+
+    counts = _trials(tmp_path, prepare)
+    assert counts == [1] * RACE_TRIALS, counts
+
+
+@pytest.mark.parametrize("body", ["", "{ not json", "[]", "null"])
+def test_a_lease_whose_metadata_cannot_be_read_is_held_rather_than_won(
+    tmp_path: Path, body: str
+):
+    """The crash case, and the one the old code got backwards.
+
+    An empty or unparseable lease is exactly what a winner looks like in the
+    instant before it writes its metadata. Reading that as "the holder is
+    broken, therefore I won" is what let eight threads all claim one work
+    order. Inside the lease window the answer is that somebody holds it.
+    """
+
+    def prepare(root: Path) -> None:
+        store = RunStore(root, runner_id="holder")
+        store.acquire(WORK_ORDER, lease_seconds=3600)
+        store.lease_path(WORK_ORDER).write_text(body, encoding="utf-8")
+
+    counts = _trials(tmp_path, prepare)
+    assert counts == [0] * RACE_TRIALS, counts
+
+
+def test_a_lease_that_has_sat_without_metadata_for_a_whole_window_is_reclaimed_once(
+    tmp_path: Path,
+):
+    """And the recovery rule is not "never": a crash must not wedge a job forever.
+
+    `lease_seconds` measured against the directory's own mtime, because the
+    case being answered is precisely the one where nothing was written.
+    """
+
+    def prepare(root: Path) -> None:
+        store = RunStore(root, runner_id="holder")
+        store.acquire(WORK_ORDER, lease_seconds=3600)
+        owned = store.lease_path(WORK_ORDER).parent
+        owned.joinpath(LEASE_NAME).unlink()
+        # Age the directory rather than shrinking the window: a window small
+        # enough to age this one ages the winner's own lease too, and the count
+        # would then measure the clock instead of the lock.
+        old = (utcnow() - dt.timedelta(hours=3)).timestamp()
+        os.utime(owned, (old, old))
+
+    counts = _trials(tmp_path, prepare)
+    assert counts == [1] * RACE_TRIALS, counts
+
+
+def test_ownership_is_the_directory_and_the_metadata_only_describes_it(tmp_path: Path):
+    """An empty ownership directory nobody wrote into still excludes everyone.
+
+    This is the property the fix rests on: the claim is one `mkdir`, so there
+    is no instant at which a work order is owned and the filesystem does not
+    say so.
+    """
+    store = RunStore(tmp_path, runner_id="runner-one")
+    lease, _ = store.acquire(WORK_ORDER, lease_seconds=3600)
+    owned = store.lease_path(WORK_ORDER).parent
+    assert owned.name == "lease-000001"
+    assert lease.generation == 1
+
+    (store.job_dir(WORK_ORDER) / "lease-000002").mkdir()
+    with pytest.raises(ClaimUnavailable, match="no readable metadata"):
+        RunStore(tmp_path, runner_id="runner-two").acquire(WORK_ORDER, lease_seconds=3600)
+
+
+def test_a_superseded_runner_cannot_write_over_the_lease_that_replaced_it(tmp_path: Path):
+    """A stale holder keeps running until it notices. It must not scribble.
+
+    Its heartbeat and its release address the generation it owns, which nobody
+    reads any more - not the generation of the runner that took the job.
+    """
+    first = RunStore(tmp_path, runner_id="runner-one")
+    lease, _ = first.acquire(WORK_ORDER, lease_seconds=3600)
+    _backdate(first)
+    second = RunStore(tmp_path, runner_id="runner-two")
+    taken, how = second.acquire(WORK_ORDER, lease_seconds=3600)
+    assert "stale" in how and taken.reclaimed_from == "runner-one"
+
+    first.heartbeat(lease, stage="still going")
+    first.release(lease)
+
+    current = second.lease(WORK_ORDER)
+    assert current is not None
+    assert current.runner_id == "runner-two"
+    assert current.state == "held"
+
+
+def test_a_lease_written_by_the_previous_layout_is_respected_then_superseded(
+    tmp_path: Path,
+):
+    """An upgrade must not claim a job an older runner is still working."""
+    store = RunStore(tmp_path, runner_id="runner-two")
+    job = store.job_dir(WORK_ORDER)
+    job.mkdir(parents=True)
+    legacy = {
+        "work_order_id": WORK_ORDER,
+        "runner_id": "runner-one",
+        "pid": 4321,
+        "host": "old-machine",
+        "state": "held",
+        "acquired_at": utcnow().isoformat(),
+        "heartbeat_at": utcnow().isoformat(),
+    }
+    (job / "lease.json").write_text(json.dumps(legacy), encoding="utf-8")
+
+    with pytest.raises(ClaimUnavailable, match="runner-one"):
+        store.acquire(WORK_ORDER, lease_seconds=3600)
+
+    legacy["heartbeat_at"] = (utcnow() - dt.timedelta(hours=3)).isoformat()
+    (job / "lease.json").write_text(json.dumps(legacy), encoding="utf-8")
+    taken, how = store.acquire(WORK_ORDER, lease_seconds=3600)
+    assert "stale" in how
+    assert taken.generation == 1
+
+
+def test_separate_processes_racing_one_runner_directory_produce_one_winner(tmp_path: Path):
+    """Threads prove the syscall is atomic; processes prove the claim it backs.
+
+    Each child blocks on a file that does not exist yet, so they reach
+    `acquire` together rather than in start-up order.
+    """
+    root = tmp_path / "runner"
+    root.mkdir()
+    go = tmp_path / "go"
+    script = tmp_path / "contend.py"
+    script.write_text(
+        "import sys, time\n"
+        f"sys.path.insert(0, {str(REPO_ROOT)!r})\n"
+        "from pathlib import Path\n"
+        "from tools.engineering_runner.queue import RunStore\n"
+        "from tools.engineering_runner.errors import ClaimUnavailable\n"
+        f"go = Path({str(go)!r})\n"
+        "deadline = time.monotonic() + 60\n"
+        "while not go.exists() and time.monotonic() < deadline:\n"
+        "    pass\n"
+        f"store = RunStore(Path({str(root)!r}), runner_id=sys.argv[1])\n"
+        "try:\n"
+        f"    store.acquire({WORK_ORDER!r}, lease_seconds=3600)\n"
+        "except ClaimUnavailable:\n"
+        "    print('LOST')\n"
+        "else:\n"
+        "    print('WON')\n",
+        encoding="utf-8",
+    )
+    children = [
+        subprocess.Popen(
+            [sys.executable, str(script), f"process-{index}"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        for index in range(6)
+    ]
+    time.sleep(1.5)
+    go.write_text("go", encoding="utf-8")
+    results = [child.communicate(timeout=120) for child in children]
+    for out, err in results:
+        assert "Traceback" not in err, err
+    assert [out.strip() for out, _ in results].count("WON") == 1
+
+
+def test_a_job_the_ceo_already_holds_runs_no_stage(repository):
+    """`ready_for_approval` is not actionable, so a completed job is not re-run."""
+    control = ScriptedControlPlane(repository["base"], states=["ready_for_approval"])
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    runner = _runner(repository, backend, control)
+
+    report = runner.run_one(WORK_ORDER)
+    assert report.stages == ()
+    assert backend.launched == []
+    assert report.final_state == "ready_for_approval"
+
+
+# --- what a child process is given -----------------------------------------
+
+
+CREDENTIAL_SHAPED = {
+    "BINANCE_API_KEY": "SYNTHETIC-binance-key-0123456789",
+    "BINANCE_API_SECRET": "SYNTHETIC-binance-secret-0123456789",
+    "CLAUDE_CODE_MESSAGING_TOKEN": "SYNTHETIC-messaging-token-0123456789",
+    "GITHUB_TOKEN": "SYNTHETIC-github-token-0123456789",
+    "STRIPE_SECRET_KEY": "SYNTHETIC-stripe-key-0123456789",
+}
+
+
+def test_an_unrelated_credential_is_not_given_to_a_coding_session():
+    """The finding, restated as a test. None of these is in any work order."""
+    env = child_environment({"PATH": "/x", **CREDENTIAL_SHAPED})
+    for name in CREDENTIAL_SHAPED:
+        assert name not in env
+    assert env["PATH"] == "/x"
+
+
+def test_a_claude_code_prefix_is_not_a_reason_to_forward_a_variable():
+    """Why the backend list is names and not a prefix.
+
+    `CLAUDE_CODE_MESSAGING_TOKEN` shares its prefix with every Claude Code
+    setting and is a credential; `CLAUDE_CODE_OAUTH_TOKEN` shares it and is the
+    backend's own. A prefix rule cannot tell them apart, so there is none.
+    """
+    env = child_environment(
+        {
+            "CLAUDE_CODE_MESSAGING_TOKEN": "SYNTHETIC-messaging-0123456789",
+            "CLAUDE_CODE_OAUTH_TOKEN": "SYNTHETIC-oauth-0123456789",
+        }
+    )
+    assert "CLAUDE_CODE_MESSAGING_TOKEN" not in env
+    assert "CLAUDE_CODE_OAUTH_TOKEN" in env
+
+
+def test_the_backends_own_authentication_still_reaches_it():
+    """Removing an auth variable the backend needs would break every session."""
+    source = {
+        "ANTHROPIC_API_KEY": "SYNTHETIC-anthropic-0123456789",
+        "ANTHROPIC_BASE_URL": "https://example.invalid",
+        "OPENAI_API_KEY": "SYNTHETIC-openai-0123456789",
+        "CLAUDE_CONFIG_DIR": "/config",
+    }
+    env = child_environment(source)
+    assert set(source) <= set(env)
+
+
+@pytest.mark.parametrize(
+    "switch, name",
+    [
+        ("CLAUDE_CODE_USE_BEDROCK", "AWS_SECRET_ACCESS_KEY"),
+        ("CLAUDE_CODE_USE_VERTEX", "GOOGLE_APPLICATION_CREDENTIALS"),
+    ],
+)
+def test_a_cloud_credential_travels_only_when_the_backend_is_routed_through_it(
+    switch: str, name: str
+):
+    """A real credential, forwarded because a configuration needs it - not because
+    it was in the shell."""
+    secret = {name: "SYNTHETIC-cloud-credential-0123456789"}
+    assert name not in child_environment(dict(secret))
+    assert name in child_environment({switch: "1", **secret})
+    assert name not in child_environment({switch: "0", **secret})
+
+
+def test_the_child_keeps_what_a_process_needs_to_be_a_process():
+    source = {
+        "PATH": "/x",
+        "SYSTEMROOT": r"C:\Windows",
+        "USERPROFILE": r"C:\Users\someone",
+        "APPDATA": r"C:\Users\someone\AppData\Roaming",
+        "HOME": "/home/someone",
+        "TEMP": "/tmp",
+        "COMSPEC": r"C:\Windows\system32\cmd.exe",
+        "PATHEXT": ".COM;.EXE;.CMD",
+        "VIRTUAL_ENV": "/venv",
+    }
+    assert set(source) <= set(child_environment(source))
+
+
+def test_forwarded_names_reports_names_and_never_values():
+    names = forwarded_names({"PATH": "/x", **CREDENTIAL_SHAPED})
+    assert names == ("PATH",)
+
+
+def test_a_real_child_process_cannot_see_an_unrelated_credential(
+    tmp_path: Path, monkeypatch
+):
+    """End to end, through the one function that spawns anything.
+
+    The child prints the *names* it was given, never a value, and the variable
+    is set on this process only for the duration of the test.
+    """
+    monkeypatch.setenv("SYNTHETIC_TRADING_API_KEY", "SYNTHETIC-value-0123456789")
+    monkeypatch.setenv("ANTHROPIC_BASE_URL", "https://example.invalid")
+    script = tmp_path / "names.py"
+    script.write_text(
+        "import os\nprint('\\n'.join(sorted(os.environ)))\n", encoding="utf-8"
+    )
+    result = CommandRunner().run(
+        [sys.executable, str(script)], cwd=tmp_path, timeout_s=120
+    )
+    seen = set(result.stdout.split())
+    assert "SYNTHETIC_TRADING_API_KEY" not in seen
+    assert "ANTHROPIC_BASE_URL" in seen
+    assert "PATH" in seen
+
+
+# --- dependencies, measured rather than reported ---------------------------
+
+
+BASE_REQUIREMENTS = "pymunk>=7.0\npygame>=2.6\npytest>=8.0\n"
+
+
+def test_no_dependency_change_adds_nothing():
+    assert dependencies_added(BASE_REQUIREMENTS, BASE_REQUIREMENTS) == ()
+
+
+def test_a_reordered_requirements_file_adds_nothing():
+    shuffled = "\n".join(reversed(BASE_REQUIREMENTS.strip().splitlines())) + "\n"
+    assert shuffled != BASE_REQUIREMENTS
+    assert dependencies_added(BASE_REQUIREMENTS, shuffled) == ()
+
+
+def test_raising_a_version_floor_is_not_a_new_dependency():
+    """Otherwise every routine bump becomes an architecture-and-security review."""
+    bumped = BASE_REQUIREMENTS.replace("pygame>=2.6", "pygame>=2.7")
+    assert dependencies_added(BASE_REQUIREMENTS, bumped) == ()
+
+
+@pytest.mark.parametrize(
+    "line, expected",
+    [
+        ("requests>=2.31\n", "requests"),
+        ("uvicorn[standard]>=0.30\n", "uvicorn"),
+        ('httpx>=0.27 ; python_version >= "3.11"\n', "httpx"),
+        ("  # a comment\nrich==13.7.0\n", "rich"),
+        ("mylib @ https://example.invalid/mylib.whl\n", "mylib"),
+    ],
+)
+def test_a_new_requirement_is_detected_however_it_is_written(line: str, expected: str):
+    assert dependencies_added(BASE_REQUIREMENTS, BASE_REQUIREMENTS + line) == (expected,)
+
+
+def test_a_pip_option_line_is_not_read_as_a_dependency():
+    added = dependencies_added(
+        BASE_REQUIREMENTS, BASE_REQUIREMENTS + "--index-url https://example.invalid\n-r dev.txt\n"
+    )
+    assert added == ()
+
+
+def test_the_two_facts_are_kept_apart():
+    """A manifest that changed and a dependency that was added are not the same
+    claim, and the policy treats them differently: scope answers the first and
+    `mandatory_review_triggers.new_dependency` answers the second."""
+    bumped = BASE_REQUIREMENTS.replace("pytest>=8.0", "pytest>=8.2")
+    changes = manifest_changes(
+        {"requirements.txt": BASE_REQUIREMENTS}, {"requirements.txt": bumped}
+    )
+    assert changes["manifests_changed"] == ["requirements.txt"]
+    assert changes["dependencies_added"] == []
+
+
+def test_a_new_dependency_reaches_the_receipt_the_runner_hands_over(repository):
+    """The whole path: a session edits the manifest inside its grant, and the
+    governed field is measured from git rather than taken from the report."""
+    control = ScriptedControlPlane(
+        repository["base"], states=["planning"], allowed=("subject", "requirements.txt")
+    )
+    backend = ScriptedBackend(edit=_adds_a_dependency)
+    runner = _runner(repository, backend, control)
+
+    runner.run_one(WORK_ORDER)
+
+    receipt = control.receipts[0]
+    assert receipt["dependencies_added"] == ["requests"]
+    assert "requirements.txt" in receipt["files_changed"]
+
+
+def test_an_authorized_manifest_change_that_adds_nothing_is_still_measured(repository):
+    """Measured, and the answer is honestly empty - not silently accepted."""
+    control = ScriptedControlPlane(
+        repository["base"], states=["planning"], allowed=("subject", "requirements.txt")
+    )
+    backend = ScriptedBackend(edit=_bumps_a_version)
+    runner = _runner(repository, backend, control)
+
+    runner.run_one(WORK_ORDER)
+
+    receipt = control.receipts[0]
+    assert receipt["dependencies_added"] == []
+    assert "requirements.txt" in receipt["files_changed"]
+    stage = next((runner.config.runner_dir).glob("runs/*/run-*/developer*/dependencies.json"))
+    assert json.loads(stage.read_text(encoding="utf-8")) == {
+        "manifests_changed": ["requirements.txt"],
+        "dependencies_added": [],
+    }
+
+
+def test_an_unauthorized_manifest_change_is_still_blocked_by_scope(repository):
+    """Measuring dependencies did not open a path around `may_write`.
+
+    The grant here does not include `requirements.txt`, so the attempt is
+    refused before anything is committed and nothing is measured at all.
+    """
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    backend = ScriptedBackend(edit=_adds_a_dependency)
+    runner = _runner(repository, backend, control)
+
+    report = runner.run_one(WORK_ORDER)
+
+    assert report.outcome == RUN_BLOCKED
+    receipt = control.receipts[0]
+    assert receipt["outcome"] == "rejected"
+    assert "requirements.txt" in receipt["rejection_reason"]
+    assert receipt["dependencies_added"] == []
+
+
+# --- the developer report is scrubbed where it lands ------------------------
+
+
+def test_a_credential_in_a_developer_report_never_reaches_the_receipt(repository):
+    """The one persisted developer channel that was not going through a redactor.
+
+    Everything else a session produces reaches disk through `CommandRunner`,
+    which scrubs on the way in. The report is written by the session to a path
+    the runner names, and the receipt, the attestation and the committed
+    evidence are all built out of it.
+    """
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    backend = ScriptedBackend(
+        edit=_in_scope_edit,
+        report={
+            "outcome": "accepted",
+            "summary": f"VALUE is two now; the key I found was {SENTINEL_TOKEN}",
+            "invariants_preserved": ["nothing else moved"],
+            "unresolved_risks": [f"an operator had ANTHROPIC_API_KEY={SENTINEL_TOKEN} set"],
+            "evidence": ["subject/module.py"],
+            "context_refs_used": ["module_contract:subject"],
+            "notes": "the diff is one line",
+        },
+    )
+    runner = _runner(repository, backend, control)
+
+    runner.run_one(WORK_ORDER)
+
+    persisted = next((runner.config.runner_dir).glob("runs/*/run-*/developer*/report.json"))
+    receipt = control.receipts[0]
+    for text in (persisted.read_text(encoding="utf-8"), json.dumps(receipt)):
+        assert SENTINEL_TOKEN not in text
+        assert REDACTED in text
+    # and the diagnostics that were never the problem are still readable
+    assert "VALUE is two now" in receipt["summary"]
+    assert receipt["notes"] == "the diff is one line"
+    assert receipt["invariants_preserved"] == ["nothing else moved"]
+
+
+def test_sanitizing_a_report_leaves_it_parseable(tmp_path: Path):
+    report = tmp_path / "report.json"
+    report.write_text(
+        json.dumps({"summary": f"used {SENTINEL_TOKEN}", "evidence": ["a.py"]}),
+        encoding="utf-8",
+    )
+    assert sanitize_json_file(report, Redactor(environment={})) is True
+    decoded = json.loads(report.read_text(encoding="utf-8"))
+    assert SENTINEL_TOKEN not in json.dumps(decoded)
+    assert decoded["evidence"] == ["a.py"]
+
+
+def test_a_report_with_nothing_to_remove_is_left_exactly_as_it_was(tmp_path: Path):
+    report = tmp_path / "report.json"
+    body = json.dumps({"summary": "raised VALUE to two", "evidence": ["subject/module.py"]})
+    report.write_text(body, encoding="utf-8")
+    assert sanitize_json_file(report, Redactor(environment={})) is False
+    assert report.read_text(encoding="utf-8") == body
