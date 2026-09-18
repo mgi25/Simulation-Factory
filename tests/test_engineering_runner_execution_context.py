@@ -11,8 +11,11 @@ from pathlib import Path
 
 from tools.engineering_runner.execution_context import (
     MAX_BUNDLE_CHARS,
+    MAX_TEST_ANCHOR_EXCERPTS,
+    MAX_TEST_ANCHORS,
     build_execution_context,
     rank_primary_files,
+    rank_test_anchors,
 )
 from tools.engineering_runner.repo_map import build_repo_map
 
@@ -59,6 +62,173 @@ def _sample_repo(root: Path) -> Path:
         "    assert issubclass(SpinError, Exception)\n",
     )
     return root
+
+
+def _pattern_repo(root: Path) -> Path:
+    """A tiny repo shaped like the V2 blocked_attempts scenario: a class with
+    two existing counter-like fields, a test file whose helper (`_config`)
+    sits before the sibling tests that actually exercise each counter, plus
+    one wholly unrelated test."""
+    _write(
+        root,
+        "company/widgets/counter.py",
+        '"""A widget counter with two existing fields."""\n\n'
+        "class Counter:\n"
+        "    def __init__(self) -> None:\n"
+        "        self.spin_count = 0\n"
+        "        self.stop_count = 0\n",
+    )
+    _write(
+        root,
+        "tests/test_widget_counter.py",
+        "def _config():\n"
+        "    return {}\n\n"
+        "def test_spin_count_increments_on_spin():\n"
+        "    counter = Counter()\n"
+        "    counter.spin_count += 1\n"
+        "    assert counter.spin_count == 1\n\n"
+        "def test_stop_count_increments_on_stop():\n"
+        "    counter = Counter()\n"
+        "    counter.stop_count += 1\n"
+        "    assert counter.stop_count == 1\n\n"
+        "def test_unrelated_widget_behaviour():\n"
+        "    assert True\n",
+    )
+    return root
+
+
+def test_rank_test_anchors_ranks_the_relevant_sibling_above_the_helper(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    anchors = rank_test_anchors(
+        repo_map,
+        objective="add a launch_count field",
+        acceptance_criteria=["follows the same pattern as spin_count"],
+        test_paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+    )
+    assert anchors
+    assert anchors[0].qualified_name == "test_spin_count_increments_on_spin"
+    # `_config` is a fixture, not a `test_`-prefixed symbol, so it is never a
+    # candidate at all - the irrelevant-helper de-prioritization is structural.
+    assert all(a.qualified_name != "_config" for a in anchors)
+
+
+def test_rank_test_anchors_ranks_a_second_named_pattern_correctly(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    anchors = rank_test_anchors(
+        repo_map,
+        objective="add a launch_count field",
+        acceptance_criteria=["follows the same pattern as stop_count"],
+        test_paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+    )
+    assert anchors
+    assert anchors[0].qualified_name == "test_stop_count_increments_on_stop"
+
+
+def test_rank_test_anchors_surfaces_two_bounded_anchors_for_two_patterns(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    anchors = rank_test_anchors(
+        repo_map,
+        objective="add a launch_count field",
+        acceptance_criteria=[
+            "follows the same pattern as spin_count and stop_count",
+        ],
+        test_paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+    )
+    names = {a.qualified_name for a in anchors}
+    assert names == {"test_spin_count_increments_on_spin", "test_stop_count_increments_on_stop"}
+    assert len(anchors) <= MAX_TEST_ANCHORS
+
+
+def test_rank_test_anchors_does_not_manufacture_a_match(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    anchors = rank_test_anchors(
+        repo_map,
+        objective="improve overall reliability",
+        acceptance_criteria=["the change should be well tested and documented"],
+        test_paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+    )
+    assert anchors == ()
+
+
+def test_rank_test_anchors_ignores_a_self_referential_filename_mention(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    anchors = rank_test_anchors(
+        repo_map,
+        objective="x",
+        acceptance_criteria=[
+            "a new test case in tests/test_widget_counter.py covers this",
+        ],
+        test_paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+    )
+    assert anchors == ()
+
+
+def test_rank_test_anchors_caps_excerpts_at_one(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    anchors = rank_test_anchors(
+        repo_map,
+        objective="add a launch_count field",
+        acceptance_criteria=["follows the same pattern as spin_count and stop_count"],
+        test_paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+    )
+    assert len(anchors) == 2
+    with_excerpt = [a for a in anchors if a.excerpt is not None]
+    assert len(with_excerpt) == MAX_TEST_ANCHOR_EXCERPTS
+
+
+def test_rank_test_anchors_is_deterministic(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    kwargs = dict(
+        objective="add a launch_count field",
+        acceptance_criteria=["follows the same pattern as spin_count and stop_count"],
+        test_paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+    )
+    first = rank_test_anchors(repo_map, **kwargs)
+    second = rank_test_anchors(repo_map, **kwargs)
+    assert first == second
+
+
+def test_rank_test_anchors_with_no_repo_map_is_empty() -> None:
+    assert rank_test_anchors(
+        None, objective="x", acceptance_criteria=["y"], test_paths=["tests/test_a.py"]
+    ) == ()
+
+
+def test_build_execution_context_renders_test_anchors_within_budget(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    anchors = rank_test_anchors(
+        repo_map,
+        objective="add a launch_count field",
+        acceptance_criteria=["follows the same pattern as spin_count and stop_count"],
+        test_paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+    )
+    bundle = build_execution_context(
+        repo_map,
+        primary=[("company/widgets/counter.py", "authorized")],
+        test_anchors=anchors,
+        repo_root=repo,
+    )
+    rendered = bundle.render()
+    assert "test_spin_count_increments_on_spin" in rendered
+    assert "test_stop_count_increments_on_stop" in rendered
+    assert len(rendered) <= MAX_BUNDLE_CHARS
+    assert bundle.truncated is False
 
 
 def test_rank_primary_files_puts_authorized_paths_first(tmp_path: Path) -> None:

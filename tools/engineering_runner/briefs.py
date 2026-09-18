@@ -35,7 +35,12 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from .authorization import AuthorityEnvelope
-from .execution_context import ExecutionContextBundle, build_execution_context, rank_primary_files
+from .execution_context import (
+    ExecutionContextBundle,
+    build_execution_context,
+    rank_primary_files,
+    rank_test_anchors,
+)
 from .repo_map import RepoMap
 from .resources import ResourceStrategy
 
@@ -171,10 +176,28 @@ def _developer_execution_context(
     primary = rank_primary_files(
         repo_map, objective=envelope.objective, focus_paths=envelope.may_write
     )
+    test_paths = tuple(
+        dict.fromkeys(
+            [
+                str(ref.get("ref", ""))
+                for ref in envelope.packet.get("context_refs", ())
+                if isinstance(ref, Mapping) and ref.get("kind") == "test"
+            ]
+            + [path for path in envelope.may_write if path.startswith("tests/")]
+        )
+    )
+    test_anchors = rank_test_anchors(
+        repo_map,
+        objective=envelope.objective,
+        acceptance_criteria=envelope.acceptance_criteria,
+        test_paths=test_paths,
+        repo_root=worktree,
+    )
     return build_execution_context(
         repo_map,
         primary=primary,
         context_refs=envelope.packet.get("context_refs", ()),
+        test_anchors=test_anchors,
         repo_root=worktree,
     )
 

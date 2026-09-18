@@ -39,6 +39,7 @@ of the milestone brief. Same renderer, same budget, different input.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -57,7 +58,40 @@ MAX_EXCERPT_CHARS = 600
 MAX_FILES_WITH_EXCERPTS = 1
 MAX_SYMBOLS_PER_EXCERPT = 2
 
+# Test-pattern anchors: acceptance criteria -> existing sibling test symbols.
+# See `rank_test_anchors`. Bounds fixed before the V3B matched run (milestone
+# section 4): at most 2 anchors, at most 1 of them carries an excerpt, and
+# that excerpt obeys the same MAX_EXCERPT_LINES/MAX_EXCERPT_CHARS as a file's
+# own excerpt - this is not a second, looser budget.
+MAX_TEST_ANCHORS = 2
+MAX_TEST_ANCHOR_EXCERPTS = 1
+
 TRUNCATION_MARKER = "\n... (execution context truncated at the size budget)\n"
+
+# Two identifier shapes count as an "exact identifier phrase": snake_case
+# (`developer_attempts`) and PascalCase (`EngineeringJob`) - both are how a
+# work order names an existing symbol in prose, and a criterion's own class
+# name is often the strongest disambiguator between two candidates that both
+# mention a generic method name (`to_dict`, `from_mapping`).
+_IDENTIFIER_PHRASE_RE = re.compile(
+    r"[A-Z][a-z0-9]+(?:[A-Z][a-z0-9]*)+|[a-zA-Z][a-zA-Z0-9]*(?:_[a-zA-Z0-9]+)+"
+)
+_WORD_RE = re.compile(r"[a-zA-Z0-9]+")
+
+# Tokens too generic to count as a meaningful match on their own - fixture and
+# control-flow vocabulary that appears in nearly every test regardless of
+# subject. Without this list, `_config`/`_fake_repo`/`_validation` style
+# helpers would tie with the actually-relevant sibling test on token overlap
+# alone, because every test in the file calls them.
+_STOP_TOKENS = frozenset(
+    {
+        "test", "def", "self", "assert", "return", "tmp", "path", "config",
+        "state", "job", "order", "on", "day", "repo", "true", "false", "none",
+        "import", "from", "for", "in", "with", "as", "not", "is", "and", "or",
+        "the", "a", "an", "this", "that", "it", "to", "of", "if", "else",
+        "store", "execution", "usage",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -96,6 +130,33 @@ class RelevantFile:
 
 
 @dataclass(frozen=True)
+class TestPatternAnchor:
+    """One existing test symbol the acceptance criteria's own words point to.
+
+    A pointer, like `ContextPointer` - never a licence to skip reading the
+    file. At most one anchor in a bundle carries `excerpt`
+    (`MAX_TEST_ANCHOR_EXCERPTS`); the rest are name-and-span pointers only.
+    """
+
+    path: str
+    qualified_name: str
+    start_line: int
+    end_line: int
+    reason: str
+    excerpt: str | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "path": self.path,
+            "qualified_name": self.qualified_name,
+            "start_line": self.start_line,
+            "end_line": self.end_line,
+            "reason": self.reason,
+            "excerpt": self.excerpt,
+        }
+
+
+@dataclass(frozen=True)
 class ContextPointer:
     """One packet-authorized context reference: never a body, always a pointer."""
 
@@ -114,11 +175,12 @@ class ExecutionContextBundle:
 
     files: tuple[RelevantFile, ...]
     context_refs: tuple[ContextPointer, ...] = ()
+    test_anchors: tuple[TestPatternAnchor, ...] = ()
     budget_chars: int = MAX_BUNDLE_CHARS
     truncated: bool = False
 
     def render(self) -> str:
-        if not self.files and not self.context_refs:
+        if not self.files and not self.context_refs and not self.test_anchors:
             return ""
         lines: list[str] = [
             "",
@@ -163,6 +225,22 @@ class ExecutionContextBundle:
                 span = f"#{ref.span[0]}-{ref.span[1]}" if ref.span else ""
                 lines.append(f"  - [{ref.kind}] {ref.ref}{span} - {ref.reason}")
             lines.append("")
+        if self.test_anchors:
+            lines.append(
+                "Existing test(s) matching this work order's acceptance criteria "
+                "(a pointer, not a substitute for reading the file - open it if you "
+                "need the surrounding code):"
+            )
+            for anchor in self.test_anchors:
+                lines.append(
+                    f"  - {anchor.path}::{anchor.qualified_name} "
+                    f"#{anchor.start_line}-{anchor.end_line} - {anchor.reason}"
+                )
+                if anchor.excerpt:
+                    lines.append("    ```")
+                    lines.extend(f"    {line}" for line in anchor.excerpt.splitlines())
+                    lines.append("    ```")
+            lines.append("")
         text = "\n".join(lines)
         if len(text) > self.budget_chars:
             cut = max(self.budget_chars - len(TRUNCATION_MARKER), 0)
@@ -173,6 +251,7 @@ class ExecutionContextBundle:
         return {
             "files": [f.to_dict() for f in self.files],
             "context_refs": [r.to_dict() for r in self.context_refs],
+            "test_anchors": [a.to_dict() for a in self.test_anchors],
             "budget_chars": self.budget_chars,
             "truncated": self.truncated,
             "rendered_chars": len(self.render()),
@@ -237,6 +316,7 @@ def build_execution_context(
     *,
     primary: Sequence[tuple[str, str]],
     context_refs: Sequence[Mapping[str, Any]] = (),
+    test_anchors: Sequence[TestPatternAnchor] = (),
     repo_root: Path | None = None,
     limit: int = 5,
     include_excerpts: bool = True,
@@ -293,12 +373,14 @@ def build_execution_context(
     bundle = ExecutionContextBundle(
         files=tuple(files),
         context_refs=_context_pointers(context_refs),
+        test_anchors=tuple(test_anchors),
         budget_chars=budget_chars,
     )
     truncated = len(bundle.render()) >= budget_chars
     return ExecutionContextBundle(
         files=bundle.files,
         context_refs=bundle.context_refs,
+        test_anchors=bundle.test_anchors,
         budget_chars=budget_chars,
         truncated=truncated,
     )
@@ -368,16 +450,140 @@ def rank_primary_files(
     return tuple(ranked)
 
 
+def _identifier_phrases(text: str) -> frozenset[str]:
+    return frozenset(m.lower() for m in _IDENTIFIER_PHRASE_RE.findall(text))
+
+
+def _meaningful_tokens(text: str) -> frozenset[str]:
+    return frozenset(
+        t.lower()
+        for t in _WORD_RE.findall(text)
+        if len(t) > 2 and t.lower() not in _STOP_TOKENS
+    )
+
+
+def _test_symbols(repo_map: RepoMap, path: str) -> tuple[SymbolSpan, ...]:
+    module = repo_map.by_path(path)
+    if module is None or not path.startswith("tests/"):
+        return ()
+    return tuple(s for s in module.symbols if s.kind == "function" and s.qualified_name.startswith("test_"))
+
+
+def rank_test_anchors(
+    repo_map: RepoMap | None,
+    *,
+    objective: str,
+    acceptance_criteria: Sequence[str],
+    test_paths: Sequence[str],
+    repo_root: Path | None = None,
+    limit: int = MAX_TEST_ANCHORS,
+    with_excerpt: bool = True,
+) -> tuple[TestPatternAnchor, ...]:
+    """Acceptance-criteria text -> the existing sibling test(s) it implies.
+
+    Deterministic, symbol/token matching only - no LLM, no embeddings (see
+    the milestone's section 3/6). Scoring favors an *exact identifier
+    phrase* the criteria already spell out (`developer_attempts`,
+    `reviews_completed`) appearing in a test's own body over generic token
+    overlap, which is what keeps a fixture like `_config` or `_fake_repo`
+    from outranking the actually-relevant sibling test just because every
+    test in the file happens to call it too (`_STOP_TOKENS` also guards
+    this). A criterion with no identifier phrase and no meaningful-token
+    overlap in any candidate produces no anchor at all - this is a pointer
+    to a match already found, never a manufactured one.
+    """
+    if repo_map is None or repo_root is None:
+        return ()
+    criteria_text = " ".join((objective, *acceptance_criteria))
+    phrase_targets = _identifier_phrases(criteria_text)
+    token_targets = _meaningful_tokens(criteria_text)
+    # A criterion naming the test file itself ("a new test case in
+    # tests/test_x.py exercises...") must not let every candidate in that
+    # file score a free match on its own filename - a self-referential path
+    # mention is not a signal about *which* test inside it matters.
+    self_references: set[str] = set()
+    for path in test_paths:
+        if not path:
+            continue
+        stem = Path(path).stem.lower()
+        self_references.add(stem)
+        self_references |= _meaningful_tokens(stem)
+    phrase_targets = phrase_targets - self_references
+    token_targets = token_targets - self_references
+    if not phrase_targets and not token_targets:
+        return ()
+
+    scored: list[tuple[int, int, str, SymbolSpan, tuple[str, ...]]] = []
+    seen_paths: set[str] = set()
+    for path in test_paths:
+        if path in seen_paths:
+            continue
+        seen_paths.add(path)
+        for symbol in _test_symbols(repo_map, path):
+            body = _read_excerpt_full(repo_root, path, symbol)
+            if body is None:
+                continue
+            body_phrases = _identifier_phrases(body)
+            phrase_hits = tuple(sorted(body_phrases & phrase_targets))
+            token_hits = len(_meaningful_tokens(body) & token_targets)
+            score = 5 * len(phrase_hits) + token_hits
+            if score <= 0:
+                continue
+            scored.append((score, -symbol.start_line, path, symbol, phrase_hits))
+
+    # Deterministic order: best score first, ties broken by path then line -
+    # never by discovery order, which would depend on `test_paths`' own order.
+    scored.sort(key=lambda item: (-item[0], item[2], item[3].start_line))
+
+    anchors: list[TestPatternAnchor] = []
+    for index, (score, _neg_line, path, symbol, phrase_hits) in enumerate(scored[:limit]):
+        if phrase_hits:
+            reason = "acceptance criteria names: " + ", ".join(phrase_hits)
+        else:
+            reason = "acceptance criteria's wording overlaps this test's body"
+        excerpt = None
+        if with_excerpt and index < MAX_TEST_ANCHOR_EXCERPTS:
+            excerpt = _read_excerpt(repo_root, path, symbol)
+        anchors.append(
+            TestPatternAnchor(
+                path=path,
+                qualified_name=symbol.qualified_name,
+                start_line=symbol.start_line,
+                end_line=symbol.end_line,
+                reason=reason,
+                excerpt=excerpt,
+            )
+        )
+    return tuple(anchors)
+
+
+def _read_excerpt_full(repo_root: Path, path: str, symbol: SymbolSpan) -> str | None:
+    """The whole symbol body, for scoring - unlike `_read_excerpt`, not capped
+    to `MAX_EXCERPT_LINES`/`MAX_EXCERPT_CHARS`, because a match late in a long
+    test function must still be found."""
+    try:
+        text = (repo_root / path).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    lines = text.splitlines()
+    end = min(symbol.end_line, len(lines))
+    return "\n".join(lines[symbol.start_line - 1 : end])
+
+
 __all__ = [
     "MAX_BUNDLE_CHARS",
     "MAX_EXCERPT_CHARS",
     "MAX_EXCERPT_LINES",
     "MAX_FILES_WITH_EXCERPTS",
     "MAX_SYMBOLS_PER_EXCERPT",
+    "MAX_TEST_ANCHORS",
+    "MAX_TEST_ANCHOR_EXCERPTS",
     "ContextPointer",
     "ExecutionContextBundle",
     "RelevantFile",
     "SourceExcerpt",
+    "TestPatternAnchor",
     "build_execution_context",
     "rank_primary_files",
+    "rank_test_anchors",
 ]
