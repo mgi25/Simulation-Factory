@@ -1,4 +1,8 @@
-"""Deterministic Company OS efficiency measurement and benchmark support."""
+"""Deterministic Company OS efficiency measurement and benchmark support.
+
+V2 adds: workflow audit, model routing policy, execution strategy selection,
+and structured tool evaluation — all deterministic, all measured.
+"""
 
 from .providers import (
     GRAPHIFY_STATUS,
@@ -41,5 +45,31 @@ from .telemetry import (
 )
 from .store import EfficiencyStore
 from .emission import EfficiencyEmission, emit_execution_efficiency
+from .audit import (
+    WasteCategory,
+    WasteFinding,
+    WasteSeverity,
+    WorkflowAudit,
+    audit_workflow,
+)
+from .routing import (
+    ModelRoutingPolicy,
+    ModelRoutingRule,
+    ModelTier,
+    default_routing_policy,
+)
+from .strategy import (
+    CostPerAcceptedResult,
+    ExecutionStrategy,
+    StrategyKind,
+    compute_cost_per_result,
+    select_strategy,
+)
+from .tool_evaluation import (
+    ToolEvaluation,
+    ToolEvaluationReport,
+    ToolVerdict,
+    evaluate_tools,
+)
 
 __all__ = [name for name in globals() if not name.startswith("_")]

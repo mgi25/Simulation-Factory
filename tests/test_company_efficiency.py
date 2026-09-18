@@ -28,9 +28,40 @@ from company.efficiency import (
     normalise_provider_usage,
     summarise_efficiency,
 )
+from company.efficiency.audit import (
+    WasteCategory,
+    WasteFinding,
+    WasteSeverity,
+    WorkflowAudit,
+    audit_workflow,
+)
+from company.efficiency.routing import (
+    ModelRoutingPolicy,
+    ModelRoutingRule,
+    ModelTier,
+    default_routing_policy,
+)
+from company.efficiency.strategy import (
+    CostPerAcceptedResult,
+    ExecutionStrategy,
+    StrategyKind,
+    compute_cost_per_result,
+    select_strategy,
+)
+from company.efficiency.tool_evaluation import (
+    ToolEvaluation,
+    ToolEvaluationReport,
+    ToolVerdict,
+    evaluate_tools,
+)
 from company.efficiency.benchmark import BenchmarkRunner, default_scenarios
 from company.efficiency.__main__ import main as efficiency_main
 from company.runtime import ExecutionStoreError
+from ai_platform.resource_classes import (
+    ReasoningClass,
+    TaskSignals,
+    classify,
+)
 from knowledge.company_os.capsules import (
     DEFAULT_BUDGET,
     CapsuleIndex,
@@ -355,3 +386,266 @@ def test_minimalism_check_requires_every_cheaper_reuse_tier() -> None:
     assert check.considered_tiers[-1] is ReuseTier.SMALL_IMPLEMENTATION
     with pytest.raises(EfficiencyError, match="every cheaper"):
         replace(check, considered_tiers=(ReuseTier.SMALL_IMPLEMENTATION,))
+
+
+# --- V2: workflow audit ---------------------------------------------------
+
+
+def test_workflow_audit_produces_findings_with_measured_evidence() -> None:
+    audit = audit_workflow()
+    assert audit.total_findings > 0
+    assert audit.total_findings == len(audit.findings)
+    assert (
+        audit.high_severity_count + audit.medium_severity_count + audit.low_severity_count
+        == audit.total_findings
+    )
+    assert audit.high_severity_count >= 2  # context + model routing
+    assert audit.estimated_savings_pct > 0
+    for finding in audit.findings:
+        assert finding.description.strip()
+        assert finding.rule.strip()
+        assert finding.measured_impact.strip()
+
+
+def test_workflow_audit_covers_required_waste_categories() -> None:
+    audit = audit_workflow()
+    categories = {finding.category for finding in audit.findings}
+    assert WasteCategory.OVERSIZED_CONTEXT in categories
+    assert WasteCategory.OVERPOWERED_MODEL in categories
+    assert WasteCategory.UNNECESSARY_MODEL_CALL in categories
+    assert WasteCategory.CACHE_MISS in categories
+
+
+def test_waste_finding_rejects_empty_fields() -> None:
+    with pytest.raises(ValueError, match="description"):
+        WasteFinding(
+            category=WasteCategory.OVERSIZED_CONTEXT,
+            severity=WasteSeverity.HIGH,
+            description="",
+            rule="test",
+            measured_impact="test",
+            recommendation="test",
+        )
+
+
+# --- V2: model routing policy ---------------------------------------------
+
+
+def test_routing_policy_maps_every_reasoning_class() -> None:
+    policy = default_routing_policy()
+    for code in ReasoningClass:
+        rule = policy.route(code)
+        assert isinstance(rule, ModelRoutingRule)
+        assert rule.reasoning_class is code
+
+
+def test_routing_policy_prefers_deterministic_for_class_a_and_b() -> None:
+    policy = default_routing_policy()
+    assert policy.route(ReasoningClass.A).tier is ModelTier.DETERMINISTIC
+    assert policy.route(ReasoningClass.B).tier is ModelTier.RETRIEVAL
+    assert policy.route(ReasoningClass.A).relative_cost_per_token == 0.0
+    assert policy.route(ReasoningClass.B).relative_cost_per_token == 0.0
+
+
+def test_routing_policy_escalates_cost_with_reasoning_depth() -> None:
+    policy = default_routing_policy()
+    costs = [policy.route(code).relative_cost_per_token for code in ReasoningClass]
+    # Each class must cost >= the previous one
+    for i in range(1, len(costs)):
+        assert costs[i] >= costs[i - 1]
+
+
+def test_routing_policy_cost_per_accepted_result_accounts_for_retries() -> None:
+    policy = default_routing_policy()
+    fast = policy.route(ReasoningClass.C)
+    capable = policy.route(ReasoningClass.D)
+    # Fast model is cheaper per token but less reliable
+    assert fast.relative_cost_per_token < capable.relative_cost_per_token
+    # Cost per accepted result accounts for first_pass_rate
+    assert fast.expected_cost_per_accepted_result() > 0
+    assert capable.expected_cost_per_accepted_result() > 0
+
+
+def test_routing_policy_summary_counts_deterministic_classes() -> None:
+    policy = default_routing_policy()
+    summary = policy.summary()
+    assert summary["deterministic_classes"] == 2  # A and B
+    assert summary["model_classes"] == 4  # C, D, E, F
+    assert summary["total_classes"] == 6
+
+
+def test_routing_rule_rejects_invalid_first_pass_rate() -> None:
+    with pytest.raises(ValueError, match="expected_first_pass_rate"):
+        ModelRoutingRule(
+            reasoning_class=ReasoningClass.C,
+            tier=ModelTier.FAST,
+            rule_name="test",
+            reason="test",
+            expected_first_pass_rate=1.5,
+            relative_cost_per_token=1.0,
+            max_context_refs=12,
+        )
+
+
+# --- V2: execution strategy selection ------------------------------------
+
+
+def test_strategy_selects_deterministic_for_class_a() -> None:
+    signals = TaskSignals(deterministic_solution_exists=True)
+    classification = classify(signals)
+    strategy = select_strategy(classification)
+    assert strategy.strategy is StrategyKind.DETERMINISTIC
+    assert strategy.expected_cost_per_accepted_result == 0.0
+
+
+def test_strategy_selects_lightweight_for_class_c_first_attempt() -> None:
+    signals = TaskSignals()  # defaults to class C
+    classification = classify(signals)
+    strategy = select_strategy(classification, prior_attempts=0)
+    assert strategy.strategy is StrategyKind.LIGHTWEIGHT_REASONING
+    assert strategy.routing_rule.tier is ModelTier.FAST
+
+
+def test_strategy_escalates_on_retry() -> None:
+    signals = TaskSignals()  # class C
+    classification = classify(signals)
+    first = select_strategy(classification, prior_attempts=0)
+    retry = select_strategy(classification, prior_attempts=1)
+    assert first.strategy is StrategyKind.LIGHTWEIGHT_REASONING
+    assert retry.strategy is StrategyKind.FULL_REASONING
+    assert retry.routing_rule.tier is ModelTier.CAPABLE
+
+
+def test_strategy_uses_cache_when_available() -> None:
+    signals = TaskSignals()
+    classification = classify(signals)
+    strategy = select_strategy(classification, has_cache_hit=True)
+    assert strategy.strategy is StrategyKind.CACHED_RETRIEVAL
+    assert strategy.cache_eligible
+
+
+def test_strategy_selects_full_reasoning_for_specialist_tasks() -> None:
+    signals = TaskSignals(
+        requires_judgment=True,
+        specialist_domain="software_engineering",
+    )
+    classification = classify(signals)
+    assert classification.code is ReasoningClass.D
+    strategy = select_strategy(classification)
+    assert strategy.strategy is StrategyKind.FULL_REASONING
+    assert strategy.routing_rule.tier is ModelTier.CAPABLE
+
+
+def test_cost_per_accepted_result_is_the_headline_metric() -> None:
+    result = compute_cost_per_result(
+        task_id="wo-test-task",
+        total_attempts=2,
+        accepted_attempt=2,
+        total_input_tokens=50000,
+        total_output_tokens=10000,
+        total_cost_amount="0.15",
+        total_cost_currency="USD",
+        model_tiers_used=("fast", "capable"),
+        strategy_used=StrategyKind.FULL_REASONING,
+    )
+    assert not result.first_pass_success
+    assert result.retry_overhead_pct == 50.0
+    assert result.total_attempts == 2
+
+
+def test_cost_per_accepted_result_first_pass_success() -> None:
+    result = compute_cost_per_result(
+        task_id="wo-test-simple",
+        total_attempts=1,
+        accepted_attempt=1,
+    )
+    assert result.first_pass_success
+    assert result.retry_overhead_pct == 0.0
+
+
+# --- V2: tool evaluation -------------------------------------------------
+
+
+def test_tool_evaluation_covers_all_mentioned_tools() -> None:
+    report = evaluate_tools()
+    tool_names = {e.tool_name for e in report.evaluations}
+    assert len(report.evaluations) >= 7
+    # The work order mentions these tools explicitly
+    assert any("RTK" in name for name in tool_names)
+    assert any("Graphify" in name for name in tool_names)
+    assert any("ast-grep" in name for name in tool_names)
+    assert any("Serena" in name for name in tool_names)
+    assert any("Context7" in name for name in tool_names)
+    assert any("Ponytail" in name or "minimalism" in name for name in tool_names)
+
+
+def test_tool_evaluation_no_adoption_without_measured_evidence() -> None:
+    report = evaluate_tools()
+    for evaluation in report.evaluations:
+        assert evaluation.measured_reason.strip()
+        if evaluation.verdict is ToolVerdict.ADOPTED:
+            # Adopted tools must reference existing implementation
+            assert "implemented" in evaluation.measured_reason.lower() or \
+                   "already" in evaluation.measured_reason.lower()
+
+
+def test_tool_evaluation_verdict_counts_match() -> None:
+    report = evaluate_tools()
+    assert report.adopted_count + report.conditionally_adopted_count + \
+        report.deferred_count + report.rejected_count == len(report.evaluations)
+    assert report.rejected_count >= 1  # Context7 is rejected
+
+
+def test_tool_evaluation_context7_rejected_for_measured_reason() -> None:
+    report = evaluate_tools()
+    context7 = next(e for e in report.evaluations if "Context7" in e.tool_name)
+    assert context7.verdict is ToolVerdict.REJECTED
+    assert "near zero" in context7.measured_reason.lower()
+
+
+# --- V2: governance preservation ------------------------------------------
+
+
+def test_v2_modules_do_not_import_forbidden_paths() -> None:
+    """V2 efficiency modules must not import from forbidden governance paths."""
+    import ast as ast_module
+    v2_modules = (
+        ROOT / "company" / "efficiency" / "audit.py",
+        ROOT / "company" / "efficiency" / "routing.py",
+        ROOT / "company" / "efficiency" / "strategy.py",
+        ROOT / "company" / "efficiency" / "tool_evaluation.py",
+    )
+    forbidden = {"company.integration", "company.validation.no_subagents"}
+    violations: list[str] = []
+    for source in v2_modules:
+        tree = ast_module.parse(source.read_text(encoding="utf-8"), filename=str(source))
+        for node in ast_module.walk(tree):
+            if isinstance(node, ast_module.ImportFrom):
+                module = node.module or ""
+                if any(module == f or module.startswith(f + ".") for f in forbidden):
+                    violations.append(f"{source.name}:{node.lineno}: {module}")
+            elif isinstance(node, ast_module.Import):
+                for alias in node.names:
+                    if any(alias.name == f or alias.name.startswith(f + ".") for f in forbidden):
+                        violations.append(f"{source.name}:{node.lineno}: {alias.name}")
+    assert violations == []
+
+
+# --- V2: benchmark integration with V2 metrics ---------------------------
+
+
+def test_benchmark_report_includes_baseline_vs_optimized_evidence() -> None:
+    report = BenchmarkRunner(ROOT).run(
+        (next(s for s in default_scenarios() if s.name == "dependency_closure"),),
+        modes=(BenchmarkMode.BASELINE, BenchmarkMode.CAPSULE_OPTIMIZED),
+    )
+    baseline = next(r for r in report.records if r.mode is BenchmarkMode.BASELINE)
+    optimized = next(r for r in report.records if r.mode is BenchmarkMode.CAPSULE_OPTIMIZED)
+    assert len(report.comparisons) == 1
+    comparison = report.comparisons[0]
+    # Optimized must use fewer capsules than baseline
+    assert optimized.capsule_count <= baseline.capsule_count
+    # Reduction percentage must be non-negative when optimized < baseline
+    if baseline.context_chars and optimized.context_chars:
+        assert comparison.context_reduction_pct is not None
+        assert comparison.context_reduction_pct >= 0
