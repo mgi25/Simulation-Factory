@@ -2172,3 +2172,86 @@ def test_an_irreversible_request_raises_its_own_ceiling():
     routed = derive_routing(_request(reversible=False))
     assert routed.reasoning_class_ceiling is ReasoningClass.E
     assert derive_routing(_request()).reasoning_class_ceiling is ReasoningClass.D
+
+
+# --- 14. developer attempts spent and remaining ---------------------------
+
+
+def test_result_reports_attempts_spent_and_remaining(tmp_path):
+    """The CEO page shows how many attempts have been spent and how many remain.
+
+    This is the primary acceptance criterion: for a work order the CEO owns,
+    the result must answer both "how many attempts have already gone?" and
+    "how many are left before I need to make a decision?"
+    """
+    run = _drive(tmp_path)
+    result = run["result"]
+    order = run["order"]
+    assert result.developer_attempts == 1
+    assert result.max_developer_attempts == order.max_developer_attempts
+    assert result.developer_attempts_remaining == order.max_developer_attempts - 1
+
+    rendered = result.render_text()
+    assert "1 spent" in rendered
+    assert "remaining" in rendered
+    assert f"ceiling: {order.max_developer_attempts}" in rendered
+
+
+def test_result_remaining_is_zero_when_all_attempts_used(tmp_path):
+    """When attempts are exhausted, remaining reads 0 — never negative."""
+    repo = _fake_repo(tmp_path)
+    config = _config()
+    assessment = assess_request(
+        _request(resource_profile="expanded", max_developer_attempts=2),
+        config.permissions, repo_root=repo,
+        capsule_index=_index(), work_order_id="wo-req-rem",
+    )
+    order = assessment.work_order
+    state = tmp_path / "state"
+    store, execution, usage = _stores(state)
+    opened = open_job(store, assessment, on=DAY)
+    job = opened.job
+
+    failing = {
+        "tests": (ReportedTest(command="tests/test_company_engineering_execution.py", passed=False, summary="fail"),),
+    }
+    for _ in range(2):
+        briefing = prepare_developer_session(store, execution, order, job, config, on=DAY)
+        developed = ingest_developer_result(
+            store, execution, usage, order, briefing.job, config,
+            _receipt(briefing.packet, **failing), on=DAY,
+        )
+        review_briefing = prepare_review_session(
+            store, execution, order, developed.job, config,
+            implementer=briefing.employee, on=DAY,
+        )
+        reviewed = record_review(
+            store, execution, order, review_briefing.job, config,
+            _attestation(
+                order, briefing.packet, developed.receipt,
+                review_id=f"rev-rem-{_}",
+                verdict=ReviewOutcome.CHANGES_REQUIRED,
+            ),
+            briefing.packet, developed.receipt,
+            implementer=briefing.employee, repo_root=repo, on=DAY,
+        )
+        job = reviewed.job
+        if job.exhausted:
+            break
+
+    result = EngineeringResult.build(order, job)
+    assert result.developer_attempts == 2
+    assert result.max_developer_attempts == 2
+    assert result.developer_attempts_remaining == 0
+
+
+def test_result_max_developer_attempts_roundtrips_through_mapping(tmp_path):
+    """max_developer_attempts survives serialisation and deserialisation."""
+    run = _drive(tmp_path)
+    original = run["result"]
+    data = original.to_dict()
+    assert "max_developer_attempts" in data
+    assert data["max_developer_attempts"] == original.max_developer_attempts
+    restored = EngineeringResult.from_mapping(data)
+    assert restored.max_developer_attempts == original.max_developer_attempts
+    assert restored.developer_attempts_remaining == original.developer_attempts_remaining

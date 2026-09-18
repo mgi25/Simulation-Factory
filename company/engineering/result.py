@@ -100,6 +100,7 @@ class EngineeringResult:
     remote_verified: bool = False
     implementer: str = ""
     developer_attempts: int = 0
+    max_developer_attempts: int = 1
     tests: tuple[ResultTest, ...] = ()
     review_outcome: ReviewOutcome | None = None
     reviewer: str = ""
@@ -174,6 +175,12 @@ class EngineeringResult:
             self.developer_attempts, int
         ):
             raise EngineeringError("result.developer_attempts must be an integer")
+        if isinstance(self.max_developer_attempts, bool) or not isinstance(
+            self.max_developer_attempts, int
+        ) or self.max_developer_attempts < 1:
+            raise EngineeringError(
+                "result.max_developer_attempts must be a positive integer"
+            )
         if self.authorizes_merge is not False:
             raise EngineeringError(
                 "an engineering result never authorizes a merge. It reports; the CEO "
@@ -198,6 +205,10 @@ class EngineeringResult:
     @property
     def failing_tests(self) -> tuple[str, ...]:
         return tuple(item.command for item in self.tests if not item.passed)
+
+    @property
+    def developer_attempts_remaining(self) -> int:
+        return max(0, self.max_developer_attempts - self.developer_attempts)
 
     @property
     def ready(self) -> bool:
@@ -289,6 +300,7 @@ class EngineeringResult:
             remote_verified=bool(receipt.remote_verified) if receipt else False,
             implementer=(review.implementer if review else ""),
             developer_attempts=job.developer_attempts,
+            max_developer_attempts=job.max_developer_attempts,
             tests=tuple(tests),
             review_outcome=(review.outcome if review else None),
             reviewer=(review.reviewer if review else ""),
@@ -335,7 +347,11 @@ class EngineeringResult:
         lines.append(f"  commit: {self.commit_sha or 'none reported'}")
         lines.append(f"  remote verified: {'yes' if self.remote_verified else 'no'}")
         lines.append(f"  implementer: {self.implementer or 'not recorded'}")
-        lines.append(f"  developer attempts: {self.developer_attempts}")
+        lines.append(
+            f"  developer attempts: {self.developer_attempts} spent, "
+            f"{self.developer_attempts_remaining} remaining "
+            f"(ceiling: {self.max_developer_attempts})"
+        )
         lines.append(f"  changed files ({len(self.changed_files)}):")
         lines.extend(f"    {path}" for path in self.changed_files or ("none reported",))
 
@@ -457,6 +473,7 @@ class EngineeringResult:
             remote_verified=bool(data.get("remote_verified", False)),
             implementer=str(data.get("implementer", "")),
             developer_attempts=int(data.get("developer_attempts", 0)),
+            max_developer_attempts=int(data.get("max_developer_attempts", 1)),
             tests=tuple(tests),
             review_outcome=_optional_enum(ReviewOutcome, data.get("review_outcome")),
             reviewer=str(data.get("reviewer", "")),
