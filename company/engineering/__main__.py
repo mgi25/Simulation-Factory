@@ -9,6 +9,7 @@
     python -m company.engineering result   --work-order WO --state-dir S
     python -m company.engineering decide   --work-order WO --decision-file d.json --state-dir S
     python -m company.engineering status   --work-order WO --state-dir S
+    python -m company.engineering verify   --work-order WO --state-dir S --repo-root .
 
 `--state-dir` is always explicit and never defaulted: engineering state is
 company state, and a command that picks its own directory writes history
@@ -19,12 +20,14 @@ parsing prose: 0 when the stage advanced, 1 when it stopped on evidence
 (decision required, review not passed, gate not ready), 2 on a malformed input
 or an illegal move. `result` exits 0 only when the job is `ready_for_approval`.
 
-## Two commands that write nothing
+## Three commands that write nothing
 
-`status` and `result` read. `result` appends the CEO page it renders, because
-the page the CEO was shown is itself evidence; `--no-store` prints it without
-recording. Nothing in this module merges, pushes, publishes or deploys, and
-`gate` cannot evaluate the gate — it reads a report `python -m
+`status`, `verify` and `result` read. `result` appends the CEO page it renders,
+because the page the CEO was shown is itself evidence; `--no-store` prints it
+without recording. `verify` never writes and never moves the job: a drift check
+is an observation, and an observation that could block a job would block work
+review has not looked at yet. Nothing in this module merges, pushes, publishes
+or deploys, and `gate` cannot evaluate the gate — it reads a report `python -m
 company.integration check --json` wrote.
 """
 
@@ -65,6 +68,7 @@ from .result import EngineeringResult
 from .review import ReviewOutcome, ReviewerAttestation
 from .store import EngineeringStore
 from .transport import developer_briefing_payload, review_briefing_payload
+from .verify import DriftStatus, verify_all, verify_work_order
 
 # Exit codes. Distinct from each other so a caller can branch on the stage's
 # answer rather than on its text.
@@ -170,6 +174,21 @@ def build_parser() -> argparse.ArgumentParser:
     status = commands.add_parser("status", help="show one job's state and history")
     _common(status)
 
+    verify = commands.add_parser(
+        "verify",
+        help="re-read a work order's protected governance surface; writes nothing",
+    )
+    verify.add_argument("--state-dir", type=Path, required=True)
+    verify.add_argument("--repo-root", type=Path, default=Path("."))
+    verify.add_argument("--as-of", type=dt.date.fromisoformat, default=None)
+    verify.add_argument(
+        "--work-order",
+        dest="work_order_id",
+        default="",
+        help="one work order; omitted checks every work order the store holds",
+    )
+    verify.add_argument("--json", action="store_true")
+
     listing = commands.add_parser("list", help="every work order this state directory holds")
     listing.add_argument("--state-dir", type=Path, required=True)
     return root
@@ -201,6 +220,7 @@ def _dispatch(args: argparse.Namespace) -> int:
         "result": _result,
         "decide": _decide,
         "status": _status,
+        "verify": _verify,
         "list": _list,
     }
     return handlers[args.command](args)
@@ -476,6 +496,32 @@ def _status(args: argparse.Namespace) -> int:
     if job is None:
         return _REFUSED
     return _ADVANCED if job.state is JobState.READY_FOR_APPROVAL else _STOPPED
+
+
+def _verify(args: argparse.Namespace) -> int:
+    """Answer the drift question without completing a review, and without writing."""
+    store = EngineeringStore(args.state_dir)
+    day = args.as_of or dt.date.today()
+    if args.work_order_id:
+        reports = (
+            verify_work_order(
+                store, args.work_order_id, repo_root=args.repo_root, on=day
+            ),
+        )
+    else:
+        reports = verify_all(store, repo_root=args.repo_root, on=day)
+    if args.json:
+        _emit({"reports": [item.to_dict() for item in reports]})
+    elif not reports:
+        print(f"no work order is stored under {args.state_dir}")
+    else:
+        for item in reports:
+            print(item.render_text(), end="")
+    if any(item.status is DriftStatus.DRIFTED for item in reports):
+        return _STOPPED
+    if not reports or any(item.status is DriftStatus.UNKNOWN for item in reports):
+        return _REFUSED
+    return _ADVANCED
 
 
 def _list(args: argparse.Namespace) -> int:

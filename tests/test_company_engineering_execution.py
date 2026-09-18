@@ -41,6 +41,7 @@ from company.engineering import (
     CEORequest,
     CEOVerdict,
     CriterionFinding,
+    DriftStatus,
     EngineeringError,
     EngineeringJob,
     EngineeringResult,
@@ -50,6 +51,7 @@ from company.engineering import (
     FindingSeverity,
     GateReadiness,
     GateVerdict,
+    GovernanceDriftReport,
     ImplementationPlan,
     IntakeOutcome,
     JobState,
@@ -73,6 +75,8 @@ from company.engineering import (
     record_decision,
     record_gate,
     record_review,
+    verify_all,
+    verify_work_order,
 )
 from company.engineering.lifecycle import ALLOWED_TRANSITIONS, MAIN_SEQUENCE
 from company.engineering.transport import ESCALATE_INSTEAD_OF
@@ -1470,3 +1474,153 @@ def test_every_record_round_trips_through_its_own_decoder(tmp_path):
     ):
         again = decoder(json.loads(dumps(record)))
         assert again.fingerprint() == record.fingerprint(), type(record).__name__
+
+
+# --- 16. the drift check: the governance question, asked without a review ---
+#
+# `ProtectedSurface.verify` was reachable only by completing a review, so the
+# answer existed and nobody could ask for it until Thursday. These tests hold
+# the standalone check to the same standard as the review that used to own it,
+# and to one extra: it must write nothing and move nothing.
+
+
+def test_an_unchanged_surface_reports_unchanged(tmp_path):
+    repo = _fake_repo(tmp_path)
+    store = EngineeringStore(tmp_path / "state")
+    order = _order(tmp_path)
+    store.put_work_order(order)
+    report = verify_work_order(
+        store, order.work_order_id, repo_root=repo, on=DAY
+    )
+    assert report.status is DriftStatus.UNCHANGED
+    assert report.ok
+    assert report.findings == ()
+    assert report.paths_checked == len(DEFAULT_PROTECTED_PATHS)
+    assert report.work_order_fingerprint == order.fingerprint()
+    assert "byte-identical" in report.render_text()
+
+
+def test_a_drifted_surface_names_what_moved(tmp_path):
+    repo = _fake_repo(tmp_path)
+    store = EngineeringStore(tmp_path / "state")
+    order = _order(tmp_path)
+    store.put_work_order(order)
+    (repo / "company" / "permissions.yaml").write_text(
+        "ceo_reserved: []\n", encoding="utf-8"
+    )
+    report = verify_work_order(store, order.work_order_id, repo_root=repo, on=DAY)
+    assert report.status is DriftStatus.DRIFTED
+    assert not report.ok
+    assert any("company/permissions.yaml was modified" in item for item in report.findings)
+    assert "DRIFTED" in report.render_text()
+
+
+def test_an_unknown_answer_is_never_reported_as_clean(tmp_path):
+    """A question that could not be asked is not a question that answered no."""
+    store = EngineeringStore(tmp_path / "state")
+    absent = verify_work_order(
+        store, "wo-nobody-stored", repo_root=_fake_repo(tmp_path), on=DAY
+    )
+    assert absent.status is DriftStatus.UNKNOWN
+    assert absent.ok is False
+    assert absent.status.is_evidence is False
+    assert any("no work order" in item for item in absent.missing_evidence)
+
+    order = _order(tmp_path)
+    store.put_work_order(order)
+    no_tree = verify_work_order(
+        store, order.work_order_id, repo_root=tmp_path / "not-a-checkout", on=DAY
+    )
+    assert no_tree.status is DriftStatus.UNKNOWN
+    assert any("not a directory" in item for item in no_tree.missing_evidence)
+
+
+def test_a_report_cannot_claim_a_status_its_findings_contradict(tmp_path):
+    for kwargs, message in (
+        ({"status": DriftStatus.DRIFTED}, "names what drifted"),
+        ({"status": DriftStatus.UNCHANGED, "findings": ("x moved",)}, "carries no finding"),
+        ({"status": DriftStatus.UNKNOWN}, "names what is missing"),
+        (
+            {"status": DriftStatus.UNCHANGED, "missing_evidence": ("y",)},
+            "has no missing evidence",
+        ),
+    ):
+        values = {
+            "work_order_id": "wo-x",
+            "work_order_fingerprint": "0" * 16,
+            "checked_on": DAY,
+            "repo_root": "repo",
+        }
+        values.update(kwargs)
+        with pytest.raises(EngineeringError, match=message):
+            GovernanceDriftReport(**values)
+
+
+def test_the_drift_check_writes_nothing_and_moves_nothing(tmp_path):
+    """An observation must not become a transition."""
+    repo = _fake_repo(tmp_path)
+    state = tmp_path / "state"
+    store = EngineeringStore(state)
+    order = _order(tmp_path)
+    store.put_work_order(order)
+    job = EngineeringJob.open(order, on=DAY)
+    store.append_job(job)
+    before = sorted(
+        (item.relative_to(state).as_posix(), item.stat().st_mtime_ns)
+        for item in state.rglob("*.json")
+    )
+    (repo / "company" / "constitution.md").write_text("weakened\n", encoding="utf-8")
+    report = verify_work_order(store, order.work_order_id, repo_root=repo, on=DAY)
+    assert report.status is DriftStatus.DRIFTED
+    after = sorted(
+        (item.relative_to(state).as_posix(), item.stat().st_mtime_ns)
+        for item in state.rglob("*.json")
+    )
+    assert before == after
+    assert store.job(order.work_order_id).state is job.state
+
+
+def test_every_stored_work_order_can_be_checked_at_once(tmp_path):
+    repo = _fake_repo(tmp_path)
+    store = EngineeringStore(tmp_path / "state")
+    first = _order(tmp_path)
+    second = replace(first, work_order_id="wo-req-002", request_id="req-002")
+    store.put_work_order(first)
+    store.put_work_order(second)
+    reports = verify_all(store, repo_root=repo, on=DAY)
+    assert [item.work_order_id for item in reports] == ["wo-req-001", "wo-req-002"]
+    assert all(item.status is DriftStatus.UNCHANGED for item in reports)
+    assert verify_all(EngineeringStore(tmp_path / "empty"), repo_root=repo, on=DAY) == ()
+
+
+def test_the_drift_report_round_trips_and_is_serialisable(tmp_path):
+    repo = _fake_repo(tmp_path)
+    store = EngineeringStore(tmp_path / "state")
+    order = _order(tmp_path)
+    store.put_work_order(order)
+    report = verify_work_order(store, order.work_order_id, repo_root=repo, on=DAY)
+    payload = json.loads(dumps(report))
+    assert payload["status"] == "unchanged"
+    assert payload["paths_checked"] == len(DEFAULT_PROTECTED_PATHS)
+    json.dumps(payload)
+
+
+def test_the_cli_exit_code_is_the_drift_answer(tmp_path):
+    """0 unchanged, 1 drifted, 2 unanswerable - branchable without parsing prose."""
+    from company.engineering.__main__ import main
+
+    repo = _fake_repo(tmp_path)
+    state = tmp_path / "state"
+    order = _order(tmp_path)
+    EngineeringStore(state).put_work_order(order)
+    common = [
+        "verify", "--state-dir", str(state), "--repo-root", str(repo),
+        "--as-of", DAY.isoformat(),
+    ]
+    assert main(common + ["--work-order", order.work_order_id]) == 0
+    assert main(common + ["--work-order", "wo-nobody-stored"]) == 2
+    (repo / "company" / "permissions.yaml").write_text(
+        "ceo_reserved: []\n", encoding="utf-8"
+    )
+    assert main(common + ["--work-order", order.work_order_id]) == 1
+    assert main(common + ["--json"]) == 1
