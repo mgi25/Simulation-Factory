@@ -54,6 +54,8 @@ from company.engineering.store import EngineeringStore
 from company.engineering.transport import developer_briefing_payload
 from company.integration.boundary import NETWORK_MODULES, PROCESS_MODULES
 from company.integration.policy import DEFAULT_POLICY
+from ai_platform.references import MAX_REF_CHARS as COMPANY_MAX_REF_CHARS
+from company.engineering.review import FindingSeverity, ReviewOutcome
 from company.integration.suites import REQUIRED_SUITES as GATE_REQUIRED_SUITES
 from company.runtime.config import load_company_config
 from company.runtime.execution_store import ExecutionStore
@@ -72,6 +74,12 @@ from tools.engineering_runner.authorization import normalise_path as runner_norm
 from tools.engineering_runner.backends import SessionOutcome, executor_hint
 from tools.engineering_runner.evidence import (
     REQUIRED_SUITES as RUNNER_REQUIRED_SUITES,
+)
+from tools.engineering_runner.evidence import (
+    FINDING_SEVERITIES,
+    MAX_REF_CHARS,
+    REVIEW_VERDICTS,
+    assert_reviewer_report,
 )
 from tools.engineering_runner.evidence import (
     GitObservation,
@@ -180,6 +188,55 @@ def test_the_review_task_id_the_runner_expects_is_the_one_the_work_order_builds(
 
 def test_the_runner_runs_exactly_the_suites_the_gate_requires():
     assert RUNNER_REQUIRED_SUITES == GATE_REQUIRED_SUITES
+
+
+def test_the_review_contract_the_runner_enforces_is_the_one_company_os_enforces():
+    """Three restatements, pinned. The first run lost a review to the first one."""
+    assert MAX_REF_CHARS == COMPANY_MAX_REF_CHARS
+    assert REVIEW_VERDICTS == {item.value for item in ReviewOutcome}
+    assert FINDING_SEVERITIES == {item.value for item in FindingSeverity}
+
+
+def test_a_review_the_runner_accepts_is_one_the_attestation_decodes(briefing):
+    """Whatever passes the runner's check must survive `ReviewerAttestation`.
+
+    The runner's check exists to spend a repair turn instead of a whole review
+    session, so it is only worth having if it is not weaker than the contract
+    it stands in for.
+    """
+    envelope = AuthorityEnvelope.parse(briefing["payload"])
+    reported = {
+        "verdict": "pass",
+        "criteria": [
+            {"criterion": item, "satisfied": True, "evidence_ref": "company/engineering"}
+            for item in envelope.acceptance_criteria
+        ],
+        "findings": [
+            {
+                "finding_id": "nit-01",
+                "severity": "advisory",
+                "summary": "a nit",
+                "evidence_ref": "company/engineering/attempt_ledger.py:1",
+            }
+        ],
+        "evidence": ["company/engineering"],
+        "changed_paths_reviewed": ["company/engineering/attempt_ledger.py"],
+        "notes": "",
+    }
+    assert_reviewer_report(reported)
+    decoded = ReviewerAttestation.from_mapping(
+        build_attestation(
+            envelope,
+            review_id="rev-contract-01",
+            reviewer="chief_architect",
+            reviewed_packet_fingerprint=envelope.packet_fingerprint,
+            receipt_fingerprint="1111222233334444",
+            reviewed_on=DAY,
+            reported=reported,
+        )
+    )
+    assert decoded.verdict is ReviewOutcome.PASS
+    assert len(decoded.criteria) == len(envelope.acceptance_criteria)
 
 
 def test_every_executor_hint_the_runner_reports_is_a_real_one():

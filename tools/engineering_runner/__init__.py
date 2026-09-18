@@ -120,9 +120,11 @@ from .errors import (
     RunnerError,
 )
 from .evidence import (
+    MAX_REF_CHARS,
     REQUIRED_SUITES,
     GitObservation,
     TestRun,
+    assert_reviewer_report,
     assert_tests_describe,
     build_attestation,
     build_receipt,
@@ -141,6 +143,7 @@ __all__ = [
     "ACTIONABLE",
     "CLAUDE_CODE",
     "CODEX",
+    "MAX_REF_CHARS",
     "REDACTED",
     "REQUIRED_SUITES",
     "AuthorityEnvelope",
@@ -174,6 +177,7 @@ __all__ = [
     "StageReply",
     "TestRun",
     "Workspace",
+    "assert_reviewer_report",
     "assert_tests_describe",
     "build_attestation",
     "build_backend",

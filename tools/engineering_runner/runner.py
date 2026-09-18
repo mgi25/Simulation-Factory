@@ -93,6 +93,7 @@ from .evidence import (
     REQUIRED_SUITES,
     GitObservation,
     TestRun,
+    assert_reviewer_report,
     build_attestation,
     build_receipt,
     normalised_changes,
@@ -717,6 +718,7 @@ class EngineeringRunner:
             stage_dir=stage_dir,
             report_path=None,
             what="the reviewer attestation",
+            validate=assert_reviewer_report,
         )
 
         developer_session = _session_id_of(developer_dir)
@@ -895,8 +897,15 @@ class EngineeringRunner:
         stage_dir: Path,
         report_path: Path | None,
         what: str,
+        validate: Callable[[Mapping[str, Any]], None] | None = None,
     ) -> tuple[SessionOutcome, dict[str, Any]]:
-        """Launch a session and read its structured answer, with one repair try."""
+        """Launch a session and read its structured answer, with one repair try.
+
+        `validate` runs against the decoded answer, so a reply that parses but
+        does not fit the contract Company OS will hold it to is repaired here -
+        by the session that made the judgment - instead of being refused a
+        stage later, when the judgment is already gone.
+        """
         backend = self.backend(backend_name)
         available, detail = backend.available()
         if not available:
@@ -913,8 +922,12 @@ class EngineeringRunner:
             write_json(stage_dir / "session.json", session.to_dict())
             try:
                 if report_path is not None and report_path.is_file():
-                    return session, read_json_object(report_path, what)
-                return session, parse_json_object(session.result_text, what)
+                    answer = read_json_object(report_path, what)
+                else:
+                    answer = parse_json_object(session.result_text, what)
+                if validate is not None:
+                    validate(answer)
+                return session, answer
             except IntegrityFailure as exc:
                 problem = str(exc)
                 if index >= self.config.max_stage_retries:

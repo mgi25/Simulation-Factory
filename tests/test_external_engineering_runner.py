@@ -58,6 +58,7 @@ from tools.engineering_runner.authorization import (
     verify_reviewer_left_no_trace,
 )
 from tools.engineering_runner.backends import SessionOutcome, SessionRequest
+from tools.engineering_runner.briefs import review_instructions
 from tools.engineering_runner.config import RunnerConfig
 from tools.engineering_runner.errors import (
     AuthorityViolation,
@@ -65,8 +66,10 @@ from tools.engineering_runner.errors import (
     IntegrityFailure,
 )
 from tools.engineering_runner.evidence import (
+    MAX_REF_CHARS,
     GitObservation,
     TestRun,
+    assert_reviewer_report,
     assert_tests_describe,
     build_attestation,
     build_receipt,
@@ -288,6 +291,33 @@ def test_dropping_the_packets_forbidden_list_is_also_refused():
     payload["packet"]["path_scope"]["forbidden"] = []
     with pytest.raises(IntegrityFailure, match="forbidden scope"):
         AuthorityEnvelope.parse(payload)
+
+
+def test_a_reviewer_sees_the_grant_and_still_holds_no_writable_path():
+    """Two different questions, and the reviewer needs both answers.
+
+    `may_write` is what *this session* may change, and for a reviewer it is
+    empty - that is what read-only means. `authorized_paths` is what the *work
+    order* granted, and a reviewer judging whether the work stayed in scope has
+    nothing to compare the diff against without it. The review brief used to
+    fall back to the receipt's own changed-file list, which is the diff
+    labelled as the grant and answers the question by assuming it.
+    """
+    envelope = AuthorityEnvelope.parse(review_briefing("a" * 40))
+    assert envelope.may_write == ()
+    assert envelope.read_only
+    assert envelope.authorized_paths == ("subject",)
+
+    instructions = review_instructions(
+        envelope,
+        diff_path=Path("diff.patch"),
+        worktree=Path("worktree"),
+        receipt={"files_changed": ["subject/module.py"], "commit_sha": "a" * 40},
+        developer_report={"summary": "x"},
+    )
+    grant = instructions.split("may change:")[1].split("must not change:")[0]
+    assert "- subject" in grant
+    assert "module.py" not in grant
 
 
 def test_a_reviewer_packet_that_grants_a_writable_path_is_refused():
@@ -578,6 +608,124 @@ def test_an_attestation_names_the_developers_packet_not_the_reviewers():
     assert reviewer_envelope.packet_fingerprint == "beefbeefbeefbeef"
     # A reviewer cannot claim a deterministic finding; Company OS computes those.
     assert attestation["findings"][0]["deterministic"] is False
+
+
+def _review_answer(**changes):
+    answer = {
+        "verdict": "pass",
+        "criteria": [
+            {"criterion": "VALUE is two", "satisfied": True, "evidence_ref": "subject/module.py"}
+        ],
+        "findings": [],
+        "evidence": ["subject/module.py"],
+        "changed_paths_reviewed": ["subject/module.py"],
+        "notes": "",
+    }
+    answer.update(changes)
+    return answer
+
+
+def test_a_well_formed_review_passes_the_contract_check():
+    assert_reviewer_report(_review_answer()) is None
+
+
+def test_a_reference_that_is_really_a_paragraph_is_refused():
+    """The failure the first real dogfood run hit, at the stage that can repair it.
+
+    Company OS refused a 424-character `evidence_ref` one stage later, which
+    was correct and cost the whole review session. The same budget is applied
+    the moment the session answers, so the session that made the judgment can
+    restate it.
+    """
+    answer = _review_answer(
+        criteria=[
+            {
+                "criterion": "VALUE is two",
+                "satisfied": True,
+                "evidence_ref": "because " + "x" * MAX_REF_CHARS,
+            }
+        ]
+    )
+    with pytest.raises(IntegrityFailure, match="reference budget"):
+        assert_reviewer_report(answer)
+
+
+def test_a_multi_line_reference_is_refused():
+    answer = _review_answer(
+        criteria=[
+            {"criterion": "c", "satisfied": True, "evidence_ref": "a.py" + chr(10) + "b.py"}
+        ]
+    )
+    with pytest.raises(IntegrityFailure, match="one line"):
+        assert_reviewer_report(answer)
+
+
+def test_a_satisfied_criterion_with_no_reference_is_refused():
+    answer = _review_answer(
+        criteria=[{"criterion": "c", "satisfied": True, "evidence_ref": ""}]
+    )
+    with pytest.raises(IntegrityFailure, match="names what satisfies it"):
+        assert_reviewer_report(answer)
+
+
+@pytest.mark.parametrize(
+    "changes,expected",
+    [
+        ({"verdict": "approved"}, "must be one of"),
+        ({"verdict": "pass", "criteria": []}, "non-empty list"),
+        (
+            {"findings": [{"severity": "critical", "summary": "x"}]},
+            "severity",
+        ),
+        ({"findings": [{"severity": "advisory", "summary": "  "}]}, "summary is empty"),
+        ({"evidence": ["x" * 400]}, "reference budget"),
+    ],
+)
+def test_the_review_contract_refuses_what_company_os_would_refuse(changes, expected):
+    with pytest.raises(IntegrityFailure, match=expected):
+        assert_reviewer_report(_review_answer(**changes))
+
+
+def test_a_reviewer_that_answers_badly_is_asked_again_in_the_same_session(repository):
+    """The bounded repair loop, on the failure it was extended to cover."""
+
+    class SloppyThenCorrect(ScriptedBackend):
+        def __init__(self) -> None:
+            super().__init__(edit=_in_scope_edit)
+            self.reviews = 0
+
+        def launch(self, request: SessionRequest) -> SessionOutcome:
+            if request.role != "reviewer":
+                return super().launch(request)
+            self.reviews += 1
+            self.launched.append(request)
+            self.session_ids.append(request.session_id)
+            body = _review_answer()
+            if self.reviews == 1:
+                body["criteria"][0]["evidence_ref"] = "b" * 400
+            return SessionOutcome(
+                backend=self.name,
+                role=request.role,
+                session_id=request.session_id,
+                model="scripted",
+                exit_code=0,
+                duration_s=0.01,
+                result_text=json.dumps(body),
+                transcript="",
+                ok=True,
+            )
+
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    backend = SloppyThenCorrect()
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    assert backend.reviews == 2
+    assert report.outcome == COMPLETED, report.reason
+    assert len(control.attestations) == 1
+    # The repair repeated the request and changed no term.
+    first, second = [r for r in backend.launched if r.role == "reviewer"]
+    assert second.instructions.startswith(first.instructions)
+    assert "could not be read" in second.instructions
 
 
 def test_suite_evidence_reports_a_failure_rather_than_hiding_it():

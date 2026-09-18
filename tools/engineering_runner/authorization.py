@@ -168,7 +168,14 @@ class AuthorityEnvelope:
     objective: str
     authorized_branch: str
     base_commit: str
+    # What *this session* may change. Empty for a reviewer, which is what
+    # read-only means.
     may_write: tuple[str, ...]
+    # What the *work order* authorized, whoever is reading. A reviewer needs
+    # this and must not be given `may_write` instead: judging whether the work
+    # stayed in scope means comparing the diff with the grant, and a reviewer
+    # shown its own empty scope has nothing to compare against.
+    authorized_paths: tuple[str, ...]
     may_not_modify: tuple[str, ...]
     protected_paths: tuple[str, ...]
     required_tests: tuple[str, ...]
@@ -202,6 +209,7 @@ class AuthorityEnvelope:
             "authorized_branch": self.authorized_branch,
             "base_commit": self.base_commit,
             "may_write": list(self.may_write),
+            "authorized_paths": list(self.authorized_paths),
             "may_not_modify": list(self.may_not_modify),
             "required_tests": list(self.required_tests),
             "read_only": self.read_only,
@@ -319,6 +327,7 @@ class AuthorityEnvelope:
             authorized_branch=branch,
             base_commit=base,
             may_write=tuple(sorted(authorized)) if role == "developer" else (),
+            authorized_paths=tuple(sorted(authorized)),
             may_not_modify=tuple(sorted(set(forbidden) | set(protected))),
             protected_paths=tuple(sorted(protected)),
             required_tests=_strings(order.get("required_tests", ())),

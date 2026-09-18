@@ -59,16 +59,18 @@ REVIEW_REPORT_FIELDS: tuple[tuple[str, str], ...] = (
     (
         "criteria",
         'list of {"criterion": <the exact criterion text>, "satisfied": true/false, '
-        '"evidence_ref": <a path, symbol or commit that shows it; required when satisfied>}',
+        '"evidence_ref": <a POINTER that shows it - one line, at most 200 characters, '
+        'such as a path, a path with a line span, a symbol name or a commit. Not the '
+        'reasoning. Required when satisfied is true.>}',
     ),
     (
         "findings",
         'list of {"finding_id": <lowercase id, 3-64 chars>, "severity": '
         '"advisory"|"changes_required"|"blocking", "summary": <one sentence>, '
-        '"evidence_ref": <where to look>}',
+        '"evidence_ref": <where to look; the same one-line 200-character pointer>}',
     ),
-    ("evidence", "list of references you read"),
-    ("changed_paths_reviewed", "the paths you actually reviewed"),
+    ("evidence", "list of references you read; pointers, at most 32, one line each"),
+    ("changed_paths_reviewed", "the paths you actually reviewed; at most 64"),
     ("notes", "anything the CEO should know that is not a finding"),
 )
 
@@ -208,7 +210,7 @@ def review_instructions(
     add("")
     add("## What the work order authorized")
     add("  may change:")
-    for path in envelope.rules.allowed or _implementer_scope(receipt):
+    for path in envelope.authorized_paths:
         add(f"    - {path}")
     add("  must not change:")
     for path in envelope.may_not_modify:
@@ -251,6 +253,11 @@ def review_instructions(
         "an unanswered criterion is refused by Company OS, not by me."
     )
     add(
+        "Every `evidence_ref` is a POINTER: one line, at most 200 characters. Put the "
+        "reasoning in `notes` or in a finding's `summary`, and put a place to look in "
+        "`evidence_ref`. A reference longer than that is refused as content."
+    )
+    add(
         "You cannot approve anything: `pass` means the work is ready to be read by "
         "the CEO, and approval is the CEO's and only the CEO's."
     )
@@ -272,11 +279,6 @@ def repair_instructions(previous: str, problem: str) -> str:
         f"{problem}\n\n"
         "Answer again, in exactly the format above, and change nothing else."
     )
-
-
-def _implementer_scope(receipt: Mapping[str, Any]) -> Sequence[str]:
-    changed = receipt.get("files_changed", ())
-    return [str(item) for item in changed] if isinstance(changed, (list, tuple)) else []
 
 
 def _receipt_digest(receipt: Mapping[str, Any]) -> dict[str, Any]:

@@ -30,6 +30,18 @@ evidence for the edit - which is the single easiest way for an automated loop
 to certify work nobody tested. The gate has the same rule one level up
 (`stale_against`), and this is its counterpart inside the attempt.
 
+## Why the returned judgment is validated here and not by Company OS alone
+
+Company OS validates an attestation and refuses a bad one - that is correct and
+must stay. But a refusal at that point costs the whole review session: the
+judgment was made, and it is thrown away because one field was a paragraph
+instead of a pointer. `assert_reviewer_report` applies the same budgets the
+moment the session answers, so the bounded repair loop can ask the *same*
+session to re-state its answer in the required shape rather than starting a new
+one. It adds no rule Company OS does not already enforce, and it must not: the
+first real run lost a review to a 424-character `evidence_ref`, which is
+exactly the failure this prevents and exactly the rule it copies.
+
 ## Suite evidence is reported, never asserted
 
 `suite_evidence` writes what pytest said, including a failure. The gate decides
@@ -356,6 +368,105 @@ def build_attestation(
     }
 
 
+# The control plane's reference budget, restated (its `references` module owns
+# the original; the root name is not spelled here, for the reason the package
+# docstring gives). A value over it is not a long path, it is content. Pinned
+# to the original by `tests/test_company_external_engineering_runner.py`.
+MAX_REF_CHARS = 200
+
+# `ReviewOutcome` and `FindingSeverity`, by value.
+REVIEW_VERDICTS: frozenset[str] = frozenset({"pass", "changes_required", "blocked"})
+FINDING_SEVERITIES: frozenset[str] = frozenset(
+    {"advisory", "changes_required", "blocking"}
+)
+
+
+def _reference_problem(value: object, field: str) -> str:
+    text = str(value or "")
+    if not text.strip():
+        return f"{field} is empty; a satisfied criterion names what satisfies it"
+    # chr(10)/chr(13) rather than the escapes, so this line and the next name a
+    # newline the same way.
+    if chr(10) in text or chr(13) in text:
+        return f"{field} is {text.count(chr(10)) + 1} lines; a reference is one line"
+    if len(text) > MAX_REF_CHARS:
+        return (
+            f"{field} is {len(text)} characters, over the {MAX_REF_CHARS}-character "
+            "reference budget; give a path, a symbol or a commit, not the reasoning"
+        )
+    return ""
+
+
+def assert_reviewer_report(reported: Mapping[str, Any]) -> None:
+    """Hold a returned review to the budgets Company OS will hold it to.
+
+    Every rule here exists in `company/engineering/review.py` already. Checking
+    them at the moment the session answers is what lets the runner ask that
+    session to restate its answer, instead of losing the judgment to a refusal
+    one stage later.
+    """
+    problems: list[str] = []
+    verdict = str(reported.get("verdict", "")).strip().lower()
+    if verdict not in REVIEW_VERDICTS:
+        problems.append(
+            f"verdict {verdict!r} must be one of: " + ", ".join(sorted(REVIEW_VERDICTS))
+        )
+    criteria = reported.get("criteria", ())
+    if not isinstance(criteria, (list, tuple)) or not criteria:
+        problems.append("criteria must be a non-empty list, one entry per criterion")
+    else:
+        for index, item in enumerate(criteria):
+            if not isinstance(item, Mapping):
+                problems.append(f"criteria[{index}] must be an object")
+                continue
+            if not str(item.get("criterion", "")).strip():
+                problems.append(f"criteria[{index}].criterion is empty")
+            if item.get("satisfied"):
+                problem = _reference_problem(
+                    item.get("evidence_ref"), f"criteria[{index}].evidence_ref"
+                )
+                if problem:
+                    problems.append(problem)
+    findings = reported.get("findings", ())
+    if not isinstance(findings, (list, tuple)):
+        problems.append("findings must be a list")
+    else:
+        for index, item in enumerate(findings):
+            if not isinstance(item, Mapping):
+                problems.append(f"findings[{index}] must be an object")
+                continue
+            severity = str(item.get("severity", "")).strip().lower()
+            if severity not in FINDING_SEVERITIES:
+                problems.append(
+                    f"findings[{index}].severity {severity!r} must be one of: "
+                    + ", ".join(sorted(FINDING_SEVERITIES))
+                )
+            if not str(item.get("summary", "")).strip():
+                problems.append(f"findings[{index}].summary is empty")
+            if item.get("evidence_ref"):
+                problem = _reference_problem(
+                    item.get("evidence_ref"), f"findings[{index}].evidence_ref"
+                )
+                if problem:
+                    problems.append(problem)
+    for name, limit in (("evidence", 32), ("changed_paths_reviewed", 64)):
+        values = reported.get(name, ())
+        if not isinstance(values, (list, tuple)):
+            problems.append(f"{name} must be a list")
+            continue
+        if len(values) > limit:
+            problems.append(f"{name} has {len(values)} items, over the {limit} allowed")
+        for index, value in enumerate(values):
+            problem = _reference_problem(value, f"{name}[{index}]")
+            if problem:
+                problems.append(problem)
+    if problems:
+        raise IntegrityFailure(
+            "the returned review does not fit the attestation contract: "
+            + "; ".join(problems[:8])
+        )
+
+
 def read_json_object(path: Path, what: str) -> dict[str, Any]:
     if not path.is_file():
         raise IntegrityFailure(f"{what}: {path} was never written")
@@ -471,9 +582,13 @@ def normalised_changes(paths: Iterable[str]) -> tuple[str, ...]:
 
 
 __all__ = [
+    "FINDING_SEVERITIES",
+    "MAX_REF_CHARS",
     "REQUIRED_SUITES",
+    "REVIEW_VERDICTS",
     "GitObservation",
     "TestRun",
+    "assert_reviewer_report",
     "assert_tests_describe",
     "build_attestation",
     "build_receipt",
