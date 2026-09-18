@@ -600,3 +600,20 @@ only Company OS change on this branch is seven lines in
 implementation — `PROCESS_MODULES == {multiprocessing, pty, subprocess}` — is
 asserted by value in a test, because an exemption would most plausibly arrive
 as a quiet edit to a frozenset rather than as a change to the policy.
+
+---
+
+## 17. After the acceptance review
+
+An independent review accepted this runner **with nonblocking risks** and named
+four defects. They are fixed on `company-os-v1-external-runner-hardening`, and
+`company_os_v1_external_runner_hardening.md` is the record: the lease was not
+actually exclusive and is now a `mkdir`-owned generation directory; the child
+environment was inherited and is now an allowlist; `dependencies_added` was
+hardcoded to `[]` and is now measured from git; and `report.json` was the one
+persisted developer channel with no redactor.
+
+Section 5 of that document restates what the hardening deliberately did **not**
+do. The V2 limitation in section 5 above — the backend has host-level access
+while it runs, and authority is enforced on the repository result rather than by
+an OS sandbox — is unchanged.
