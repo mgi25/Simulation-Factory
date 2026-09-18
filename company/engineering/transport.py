@@ -37,10 +37,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from ai_platform.serde import to_jsonable
-from company.efficiency.strategy import (
-    select_strategy,
-    scope_file_listing,
-)
+from company.efficiency.profile import resource_profile
+from company.efficiency.strategy import EscalationReason, select_strategy
 from company.runtime.transport import SessionTransportBundle
 
 from .work_order import EngineeringWorkOrder
@@ -90,43 +88,96 @@ def _work_order_terms(order: EngineeringWorkOrder) -> dict[str, Any]:
         "required_tests": list(order.required_tests),
         "context_refs": [ref.key for ref in order.context_refs],
         "max_developer_attempts": order.max_developer_attempts,
+        "resource_profile": order.resource_profile,
         "escalate_instead_of": list(ESCALATE_INSTEAD_OF),
     }
+
+
+# The version of the resource-strategy artifact. The runner refuses a version
+# it does not know, rather than reading a payload whose fields may have moved.
+RESOURCE_STRATEGY_VERSION = 1
 
 
 def _efficiency_directives(
     order: EngineeringWorkOrder,
     reasoning_class_value: str,
-    max_context_refs: int,
+    packet_ref_keys: tuple[str, ...],
     *,
     is_review: bool = False,
+    packet_attempt: int = 0,
 ) -> dict[str, Any]:
-    """Compute execution strategy from work order properties and emit as directives.
+    """The resource strategy for one session, as an artifact the runner reads.
 
-    The strategy is deterministic: the same work order always produces the same
-    directives.  The operator applies model tier and resource ceilings using
-    the runner's existing flags; Company OS determines and records them.
+    This is the whole Company-OS-to-runner protocol for execution economics,
+    and it is deliberately one JSON object inside a briefing the runner
+    already fetches, validates and acts on. No new command, no new file, no
+    new directory, and - the part that matters - **no new authority**. The
+    artifact can only ever make a session smaller: a tier, four ceilings and a
+    set of output filters. There is no field in it that can widen a path
+    scope, name a branch, or add a tool, and `AuthorityEnvelope` refuses a
+    briefing whose scope does not match the work order regardless of what this
+    block says.
 
-    ``evidence_required`` is passed for review depth but does NOT affect model
-    tier selection — that depends on reasoning class and risk only.
+    The tier is selected from the packet's **actual reasoning class**, not from
+    the work order's ceiling. Reading the ceiling is what made every job
+    specialist work.
+
+    A correction attempt escalates. If a standard-tier session was reviewed and
+    found wanting, the cheaper capable model has demonstrably failed on this
+    task, which is one of the four legitimate routes to the strongest tier.
     """
     from ai_platform.resource_classes import ReasoningClass
 
+    escalation = EscalationReason(order.escalation)
+    if escalation is EscalationReason.NONE and packet_attempt > 1:
+        escalation = EscalationReason.CHEAPER_MODEL_FAILED
+
+    profile = resource_profile(order.resource_profile)
     strategy = select_strategy(
         ReasoningClass(reasoning_class_value),
         order.risk,
         evidence_required=order.evidence_required,
-        max_context_refs=max_context_refs,
+        max_context_refs=len(packet_ref_keys),
         is_review=is_review,
+        profile=profile,
+        escalation=escalation,
     )
     directives = strategy.to_dict()
-    directives["operator_applied"] = True
-    directives["note"] = (
-        "Company OS selected this execution strategy. The operator applies "
-        "model_tier and resource_ceiling using the runner's --model and "
-        "--max-turns flags. These are not advisory; the session should stop "
-        "and escalate before exceeding the resource ceiling."
-    )
+    directives["artifact_version"] = RESOURCE_STRATEGY_VERSION
+    directives["reasoning_class"] = reasoning_class_value
+    directives["packet_attempt"] = packet_attempt
+    directives["profile_terms"] = profile.to_dict()
+    directives["context"] = {
+        "refs": list(packet_ref_keys),
+        "ref_count": len(packet_ref_keys),
+        "ref_ceiling": profile.context_ref_ceiling,
+        "work_order_refs": [ref.key for ref in order.context_refs],
+        "narrowed_at": "intake",
+        "note": (
+            "The work order's references were narrowed against the authorized "
+            "paths when it was authorized, and the profile's ceiling bounds how "
+            "many further capsules the assembler may add. `refs` is what the "
+            "packet actually carries - there is no wider set behind it and no "
+            "scoped list beside it."
+        ),
+    }
+    directives["enforcement"] = {
+        "company_enforces": [
+            "developer_attempts: the job state machine refuses a further attempt",
+            "context_refs: the packet is built from the narrowed set",
+        ],
+        "runner_enforces": [
+            "wall_seconds: the runner terminates the session process",
+            "session_cost: passed to the backend when the backend accepts one",
+        ],
+        "advisory_only": [
+            "max_turns: no backend this company drives accepts a turn ceiling",
+        ],
+        "note": (
+            "Company OS does not start a process and therefore enforces nothing "
+            "inside a session. What it can do is refuse to issue the next one."
+        ),
+    }
     return directives
 
 
@@ -143,8 +194,9 @@ def developer_briefing_payload(briefing: "DeveloperBriefing") -> dict[str, Any]:
     directives = _efficiency_directives(
         briefing.work_order,
         packet.reasoning_class.value,
-        len(packet.context_refs),
+        tuple(ref.key for ref in packet.context_refs),
         is_review=False,
+        packet_attempt=briefing.prepared.pointer.attempt,
     )
     payload = {
         "role": "developer",
@@ -162,12 +214,6 @@ def developer_briefing_payload(briefing: "DeveloperBriefing") -> dict[str, Any]:
         },
         "efficiency": directives,
     }
-    # Apply deterministic output reduction: scope context_refs to authorized paths
-    if directives.get("output_reduction", {}).get("scope_file_listings"):
-        payload["context_refs_scoped"] = list(scope_file_listing(
-            tuple(ref.key for ref in packet.context_refs),
-            briefing.work_order.authorized_paths,
-        ))
     return payload
 
 
@@ -184,8 +230,9 @@ def review_briefing_payload(briefing: "ReviewBriefing") -> dict[str, Any]:
     directives = _efficiency_directives(
         briefing.work_order,
         packet.reasoning_class.value,
-        len(packet.context_refs),
+        tuple(ref.key for ref in packet.context_refs),
         is_review=True,
+        packet_attempt=briefing.prepared.pointer.attempt,
     )
     payload = {
         "role": "reviewer",
@@ -206,12 +253,6 @@ def review_briefing_payload(briefing: "ReviewBriefing") -> dict[str, Any]:
         },
         "efficiency": directives,
     }
-    # Apply deterministic output reduction: scope context_refs to authorized paths
-    if directives.get("output_reduction", {}).get("scope_file_listings"):
-        payload["context_refs_scoped"] = list(scope_file_listing(
-            tuple(ref.key for ref in packet.context_refs),
-            briefing.work_order.authorized_paths,
-        ))
     return payload
 
 
@@ -221,6 +262,7 @@ def payload_json(payload: dict[str, Any]) -> Any:
 
 __all__ = [
     "ESCALATE_INSTEAD_OF",
+    "RESOURCE_STRATEGY_VERSION",
     "REVIEW_INSTRUCTIONS",
     "developer_briefing_payload",
     "payload_json",

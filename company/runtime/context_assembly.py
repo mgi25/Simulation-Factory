@@ -48,6 +48,17 @@ class ContextAssemblyPolicy:
     as_of: dt.date = field(default_factory=dt.date.today)
     stale_capsules: StaleCapsulePolicy = StaleCapsulePolicy.EXCLUDE
     include_dependencies: bool = True
+    # An extra cap on *automatically* selected references, below the reasoning
+    # class's own ceiling. Zero means the class ceiling stands.
+    #
+    # It exists because the class ceiling answers "how much context may a task
+    # of this depth carry", and the caller sometimes also has to answer "how
+    # much is this company willing to pay for". Those are different questions
+    # and the smaller answer wins. Explicit references are never affected: a
+    # reference the task asked for by name is authoritative, and silently
+    # dropping one to save money is how a session ends up rediscovering its own
+    # subject at greater expense.
+    automatic_ref_ceiling: int = 0
 
     def __post_init__(self) -> None:
         if isinstance(self.as_of, dt.datetime) or not isinstance(self.as_of, dt.date):
@@ -55,6 +66,14 @@ class ContextAssemblyPolicy:
         if not isinstance(self.stale_capsules, StaleCapsulePolicy):
             raise LifecycleError(
                 "context assembly stale_capsules must be a StaleCapsulePolicy value"
+            )
+        if (
+            isinstance(self.automatic_ref_ceiling, bool)
+            or not isinstance(self.automatic_ref_ceiling, int)
+            or self.automatic_ref_ceiling < 0
+        ):
+            raise LifecycleError(
+                "context assembly automatic_ref_ceiling must be a non-negative integer"
             )
         if not isinstance(self.include_dependencies, bool):
             raise LifecycleError(
@@ -183,6 +202,14 @@ def assemble_context(
         for item in selection.rejected
     ]
 
+    # The class ceiling bounds explicit references, which have already been
+    # checked against it above. Automatic ones are bounded by whichever of the
+    # two ceilings is smaller.
+    automatic_ceiling = (
+        min(ceiling, assembly_policy.automatic_ref_ceiling)
+        if assembly_policy.automatic_ref_ceiling
+        else ceiling
+    )
     final_refs = list(explicit_refs)
     final_keys = {ref.key for ref in final_refs}
     accepted_auto: list[str] = []
@@ -224,16 +251,21 @@ def assemble_context(
             duplicate_count += 1
             selected_ids.append(capsule_id)
             continue
-        if len(final_refs) >= ceiling:
+        if len(final_refs) >= automatic_ceiling:
+            named = (
+                f"class {classification.code.value} ceiling of {ceiling}"
+                if automatic_ceiling == ceiling
+                else (
+                    f"caller ceiling of {automatic_ceiling} (below the class "
+                    f"{classification.code.value} ceiling of {ceiling})"
+                )
+            )
             rejections.append(
                 CapsuleRefRejection(
                     capsule_id=capsule_id,
                     ref=selected_ref.key,
                     stage="resource_ceiling",
-                    reason=(
-                        f"automatic context rejected: class {classification.code.value} "
-                        f"ceiling of {ceiling} refs is already filled"
-                    ),
+                    reason=f"automatic context rejected: {named} refs is already filled",
                 )
             )
             continue

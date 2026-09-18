@@ -74,8 +74,19 @@ from company.engineering import (
     record_gate,
     record_review,
 )
+from ai_platform.resource_classes import Risk
+from company.efficiency.profile import CONSUMER, EXPANDED, resource_profile
+from company.efficiency.strategy import ModelTier, narrow_context_refs
+from company.engineering.intake import (
+    SPECIALIST_TRIGGERS,
+    RoutingDerivation,
+    derive_routing,
+)
 from company.engineering.lifecycle import ALLOWED_TRANSITIONS, MAIN_SEQUENCE
-from company.engineering.transport import ESCALATE_INSTEAD_OF
+from company.engineering.transport import (
+    ESCALATE_INSTEAD_OF,
+    RESOURCE_STRATEGY_VERSION,
+)
 from company.integration.model import (
     EvidenceKind,
     GateCategory,
@@ -141,6 +152,22 @@ def _fake_repo(tmp_path: Path) -> Path:
         "def test_seed():\n    assert True\n", encoding="utf-8"
     )
     return root
+
+
+# An objective that is plainly routine: it names no security, governance,
+# architecture or concurrency work, so intake derives no specialist domain and
+# the classifier floors it at C. Deliberately modelled on the real
+# `attempts-remaining` dogfood job, which is the historical BEFORE case.
+ROUTINE_OBJECTIVE = (
+    "Add a field to the engineering result record reporting how many developer "
+    "attempts remain, and show it on the page the CEO reads."
+)
+
+
+def _routine_request(**changes) -> CEORequest:
+    values = {"objective": ROUTINE_OBJECTIVE}
+    values.update(changes)
+    return _request(**values)
 
 
 def _request(**changes) -> CEORequest:
@@ -844,6 +871,13 @@ def test_a_reviewer_block_is_never_overridden_by_clean_code_checks(tmp_path):
 
 
 def test_review_failure_prevents_readiness(tmp_path):
+    """Changes required stops the job, and under consumer mode it stops it dead.
+
+    The consumer resource profile authorizes one developer attempt, so a
+    review that finds something has no second attempt to fall back on. The
+    job moves to `decision_required` - the explicit continuation state -
+    rather than spending another expensive session on its own initiative.
+    """
     run = _drive(
         tmp_path,
         review_verdict=ReviewOutcome.CHANGES_REQUIRED,
@@ -857,9 +891,72 @@ def test_review_failure_prevents_readiness(tmp_path):
             )
         },
     )
-    assert run["job"].state is JobState.PLANNING
+    assert run["job"].state is JobState.DECISION_REQUIRED
+    assert any(
+        "additional-attempt authorization" in item
+        for item in run["job"].pending_decisions
+    )
     assert run["gate"] is None
     assert run["result"].status is not JobState.READY_FOR_APPROVAL
+
+
+def test_consumer_mode_never_starts_a_second_developer_session_by_itself(tmp_path):
+    """One developer attempt, one review, then a person decides.
+
+    This is the retry burn stopped at its source. The measured failure mode was
+    a work order permitting three automatic developer sessions, each one a full
+    strongest-tier session, spent without anybody choosing to spend them.
+    """
+    repo = _fake_repo(tmp_path)
+    state = tmp_path / "state"
+    config = _config()
+    assessment = assess_request(
+        _request(), config.permissions, repo_root=repo,
+        capsule_index=_index(), work_order_id="wo-req-001",
+    )
+    order = assessment.work_order
+    assert order.resource_profile == "consumer"
+    assert order.max_developer_attempts == 1
+
+    store, execution, usage = _stores(state)
+    opened = open_job(store, assessment, on=DAY)
+    briefing = prepare_developer_session(
+        store, execution, order, opened.job, config, on=DAY
+    )
+    developed = ingest_developer_result(
+        store, execution, usage, order, briefing.job, config,
+        _receipt(briefing.packet), on=DAY,
+    )
+    review_briefing = prepare_review_session(
+        store, execution, order, developed.job, config,
+        implementer=briefing.employee, on=DAY,
+    )
+    reviewed = record_review(
+        store, execution, order, review_briefing.job, config,
+        _attestation(
+            order, briefing.packet, developed.receipt,
+            review_id="rev-000", verdict=ReviewOutcome.CHANGES_REQUIRED,
+        ),
+        briefing.packet, developed.receipt,
+        implementer=briefing.employee, repo_root=repo, on=DAY,
+    )
+    assert reviewed.job.state is JobState.DECISION_REQUIRED
+    assert reviewed.job.exhausted
+    # And the next developer session is not merely discouraged, it is refused.
+    with pytest.raises(EngineeringError, match="not an allowed transition"):
+        prepare_developer_session(
+            store, execution, order, reviewed.job, config, on=DAY
+        )
+
+
+def test_a_profile_is_the_ceiling_on_automatic_attempts(tmp_path):
+    """A request cannot buy itself more automatic attempts by naming a number."""
+    with pytest.raises(EngineeringError, match="consumer resource profile authorizes"):
+        _request(max_developer_attempts=3)
+    relaxed = _request(resource_profile="expanded", max_developer_attempts=3)
+    assert relaxed.max_developer_attempts == 3
+    with pytest.raises(EngineeringError, match="unknown resource profile"):
+        _request(resource_profile="unlimited")
 
 
 def test_an_unanswered_acceptance_criterion_prevents_readiness(tmp_path):
@@ -1076,8 +1173,12 @@ def test_the_correction_loop_is_bounded_by_the_work_order(tmp_path):
     repo = _fake_repo(tmp_path)
     state = tmp_path / "state"
     config = _config()
+    # The expanded profile is the one that authorizes an automatic correction
+    # loop at all. Under consumer mode there is nothing to bound: the first
+    # changes_required is already the last.
     assessment = assess_request(
-        _request(max_developer_attempts=2), config.permissions, repo_root=repo,
+        _request(resource_profile="expanded", max_developer_attempts=2),
+        config.permissions, repo_root=repo,
         capsule_index=_index(), work_order_id="wo-req-001",
     )
     store, execution, usage = _stores(state)
@@ -1649,8 +1750,13 @@ def test_a_revalidation_without_the_authority_evidence_fails_an_honest_receipt(t
 from company.engineering.transport import developer_briefing_payload, review_briefing_payload
 
 
-def test_developer_briefing_carries_efficiency_directives(tmp_path):
-    """The briefing Company OS emits must include execution strategy."""
+def test_developer_briefing_carries_a_resource_strategy_artifact(tmp_path):
+    """The briefing carries one validated artifact, and it can only narrow.
+
+    This is the whole Company-OS-to-runner protocol for execution economics.
+    It is checked for the fields the runner reads, and - the part that is
+    governance rather than efficiency - for the fields it must never contain.
+    """
     repo = _fake_repo(tmp_path)
     state = tmp_path / "state"
     config = _config()
@@ -1664,103 +1770,405 @@ def test_developer_briefing_carries_efficiency_directives(tmp_path):
         store, execution, opened.work_order, opened.job, config, on=DAY,
     )
     payload = developer_briefing_payload(briefing)
-    assert "efficiency" in payload
     eff = payload["efficiency"]
+
+    assert eff["artifact_version"] == RESOURCE_STRATEGY_VERSION
+    assert eff["profile"] == "consumer"
     assert eff["model_tier"] in ("standard", "strongest")
-    assert isinstance(eff["context_budget_chars"], int)
-    assert eff["context_budget_chars"] > 0
-    assert isinstance(eff["checkpoint_threshold_chars"], int)
-    assert eff["checkpoint_rule"] in (
-        "continue_if_under_budget",
-        "checkpoint_when_context_exceeds_threshold",
-        "fresh_context_per_independent_criterion",
-    )
-    assert isinstance(eff["output_reduction"], dict)
-    assert isinstance(eff["resource_ceiling"], dict)
-    assert eff["resource_ceiling"]["max_turns"] > 0
-    assert eff["resource_ceiling"]["max_tool_calls"] > 0
     assert eff["provider_count"] == 1
-    assert eff["operator_applied"] is True
+    assert eff["parallel_sessions"] == 1
+    assert eff["resource_ceiling"]["max_wall_seconds"] > 0
+    assert eff["resource_ceiling"]["max_session_cost"]
+    assert eff["context"]["narrowed_at"] == "intake"
+    assert eff["context"]["ref_count"] == len(briefing.packet.context_refs)
     assert eff["strategy_reason"]
 
+    # Governance: the artifact carries no authority of any kind. A resource
+    # strategy that could name a path would be a second place a scope is set.
+    forbidden = {
+        "authorized_paths", "may_write", "forbidden_paths", "path_scope",
+        "authorized_branch", "protected_paths", "allowed_tools",
+    }
+    assert not forbidden & set(eff)
 
-def test_review_briefing_carries_efficiency_directives_with_reduced_budget(tmp_path):
-    """The review briefing has efficiency directives with a tighter context budget."""
+    # And it says plainly which of its ceilings anybody actually holds.
+    assert eff["enforcement"]["advisory_only"]
+    assert any("max_turns" in line for line in eff["enforcement"]["advisory_only"])
+
+
+def test_a_routine_request_reaches_the_standard_tier(tmp_path):
+    """The whole cost lever, end to end, through real production intake.
+
+    Not a unit test of `select_strategy`: that always could return STANDARD.
+    This drives a real CEO request through `assess_request`,
+    `prepare_developer_session` and `developer_briefing_payload`, which is the
+    path that could not produce a standard-tier recommendation before.
+    """
     repo = _fake_repo(tmp_path)
     state = tmp_path / "state"
     config = _config()
     assessment = assess_request(
-        _request(), config.permissions, repo_root=repo,
+        _routine_request(), config.permissions, repo_root=repo,
         capsule_index=_index(), work_order_id="wo-req-001",
     )
+    assert assessment.outcome is IntakeOutcome.AUTHORIZED
+    assert assessment.work_order.specialist_domain == ""
+    assert "routine implementation" in assessment.derivation.specialist_reason
+
     store, execution, usage = _stores(state)
     opened = open_job(store, assessment, on=DAY)
-    dev_briefing = prepare_developer_session(
+
+    briefing = prepare_developer_session(
         store, execution, opened.work_order, opened.job, config, on=DAY,
     )
-    receipt = _receipt(dev_briefing.packet)
-    developed = ingest_developer_result(
-        store, execution, usage, opened.work_order, dev_briefing.job,
-        config, receipt, on=DAY,
-    )
-    rev_briefing = prepare_review_session(
-        store, execution, opened.work_order, developed.job, config,
-        implementer=dev_briefing.employee, on=DAY,
-    )
-    dev_payload = developer_briefing_payload(dev_briefing)
-    rev_payload = review_briefing_payload(rev_briefing)
-    assert "efficiency" in rev_payload
-    assert (
-        rev_payload["efficiency"]["context_budget_chars"]
-        <= dev_payload["efficiency"]["context_budget_chars"]
-    )
-    assert "review" in rev_payload["efficiency"]["strategy_reason"]
+    payload = developer_briefing_payload(briefing)
+    assert briefing.packet.reasoning_class is ReasoningClass.C
+    assert payload["efficiency"]["model_tier"] == "standard"
+    assert payload["efficiency"]["escalation"] == "none"
 
 
-def test_briefing_applies_output_reduction_not_just_directives(tmp_path):
-    """Company OS must apply actual output reduction, not just emit JSON directives."""
-    from company.efficiency.strategy import (
-        reduce_test_output,
-        reduce_git_output,
-        reduce_log_output,
-        OutputReductionDirective,
-    )
-    directive = OutputReductionDirective.standard()
-    # Test output reduction: passing tests are actually stripped
-    test_raw = "PASSED test_a\nPASSED test_b\nFAILED test_c: assertion\n=== 1 failed ==="
-    reduced = reduce_test_output(test_raw, directive)
-    assert "PASSED test_a" not in reduced
-    assert "FAILED" in reduced or "failed" in reduced
-    # Git output reduction: clean tree is one line
-    git_raw = "On branch feature\nnothing to commit, working tree clean"
-    assert reduce_git_output(git_raw, directive) == "working tree clean"
-
-
-def test_budget_check_is_callable_from_production_path():
-    """check_budget and should_checkpoint are importable and callable from the
-    finalization path (emission.py), not just from tests."""
-    from company.efficiency.emission import EfficiencyEmission
-    # The emission dataclass must carry budget_check as a production field
-    assert "budget_check" in {f.name for f in EfficiencyEmission.__dataclass_fields__.values()}
-    assert "should_checkpoint" in {f.name for f in EfficiencyEmission.__dataclass_fields__.values()}
-    assert "after_comparison" in {f.name for f in EfficiencyEmission.__dataclass_fields__.values()}
-
-
-def test_developer_briefing_scopes_context_refs_when_reduction_enabled(tmp_path):
-    """When scope_file_listings is True, the briefing includes context_refs_scoped."""
+def test_a_governance_request_reaches_the_strongest_tier(tmp_path):
+    """And the same path still routes real risk upward."""
     repo = _fake_repo(tmp_path)
     state = tmp_path / "state"
     config = _config()
     assessment = assess_request(
-        _request(), config.permissions, repo_root=repo,
-        capsule_index=_index(), work_order_id="wo-req-001",
+        _request(
+            objective=(
+                "Rewrite the governance approval boundary so a protected policy "
+                "file cannot be changed without a separate reviewer."
+            ),
+        ),
+        config.permissions, repo_root=repo,
+        capsule_index=_index(), work_order_id="wo-req-002",
     )
+    assert assessment.outcome is IntakeOutcome.AUTHORIZED
+    assert assessment.work_order.specialist_domain
     store, execution, usage = _stores(state)
     opened = open_job(store, assessment, on=DAY)
     briefing = prepare_developer_session(
         store, execution, opened.work_order, opened.job, config, on=DAY,
     )
     payload = developer_briefing_payload(briefing)
-    eff = payload["efficiency"]
-    if eff.get("output_reduction", {}).get("scope_file_listings"):
-        assert "context_refs_scoped" in payload
+    assert briefing.packet.reasoning_class is ReasoningClass.D
+    assert payload["efficiency"]["model_tier"] == "strongest"
+
+
+def test_a_high_risk_request_reaches_the_strongest_tier(tmp_path):
+    repo = _fake_repo(tmp_path)
+    config = _config()
+    assessment = assess_request(
+        _routine_request(risk=Risk.HIGH), config.permissions, repo_root=repo,
+        capsule_index=_index(), work_order_id="wo-req-003",
+    )
+    order = assessment.work_order
+    assert order.specialist_domain == "high_risk_change"
+    store, execution, usage = _stores(tmp_path / "state")
+    opened = open_job(store, assessment, on=DAY)
+    briefing = prepare_developer_session(store, execution, order, opened.job, config, on=DAY)
+    assert developer_briefing_payload(briefing)["efficiency"]["model_tier"] == "strongest"
+
+
+def test_an_explicit_escalation_reaches_the_strongest_tier(tmp_path):
+    repo = _fake_repo(tmp_path)
+    config = _config()
+    assessment = assess_request(
+        _routine_request(escalate_reasoning=True), config.permissions, repo_root=repo,
+        capsule_index=_index(), work_order_id="wo-req-004",
+    )
+    order = assessment.work_order
+    assert order.escalation == "explicit_escalation"
+    store, execution, usage = _stores(tmp_path / "state")
+    opened = open_job(store, assessment, on=DAY)
+    briefing = prepare_developer_session(store, execution, order, opened.job, config, on=DAY)
+    payload = developer_briefing_payload(briefing)
+    assert payload["efficiency"]["model_tier"] == "strongest"
+    assert payload["efficiency"]["escalation"] == "explicit_escalation"
+
+
+def test_a_correction_attempt_escalates_because_the_cheaper_model_failed(tmp_path):
+    """The fourth route to the strongest tier, and the only one that is earned.
+
+    A second attempt exists only because a standard-tier session was reviewed
+    and found wanting. That is evidence about this task, not a guess.
+    """
+    repo = _fake_repo(tmp_path)
+    config = _config()
+    assessment = assess_request(
+        _routine_request(resource_profile="expanded", max_developer_attempts=2),
+        config.permissions, repo_root=repo,
+        capsule_index=_index(), work_order_id="wo-req-005",
+    )
+    order = assessment.work_order
+    store, execution, usage = _stores(tmp_path / "state")
+    opened = open_job(store, assessment, on=DAY)
+
+    first = prepare_developer_session(store, execution, order, opened.job, config, on=DAY)
+    assert developer_briefing_payload(first)["efficiency"]["model_tier"] == "standard"
+
+    developed = ingest_developer_result(
+        store, execution, usage, order, first.job, config,
+        _receipt(first.packet), on=DAY,
+    )
+    review_briefing = prepare_review_session(
+        store, execution, order, developed.job, config,
+        implementer=first.employee, on=DAY,
+    )
+    reviewed = record_review(
+        store, execution, order, review_briefing.job, config,
+        _attestation(
+            order, first.packet, developed.receipt,
+            review_id="rev-000", verdict=ReviewOutcome.CHANGES_REQUIRED,
+        ),
+        first.packet, developed.receipt,
+        implementer=first.employee, repo_root=repo, on=DAY,
+    )
+    assert reviewed.job.state is JobState.PLANNING
+
+    second = prepare_developer_session(store, execution, order, reviewed.job, config, on=DAY)
+    payload = developer_briefing_payload(second)
+    assert payload["efficiency"]["packet_attempt"] == 2
+    assert payload["efficiency"]["model_tier"] == "strongest"
+    assert payload["efficiency"]["escalation"] == "cheaper_capable_model_failed"
+
+
+
+# --- 12. real context narrowing -----------------------------------------
+
+
+def test_context_refs_are_narrowed_against_the_real_repository_path(tmp_path):
+    """The reference/path bug, fixed where it can be seen.
+
+    `ContextRef.key` is `"<kind>:<ref>"`. Comparing that against an authorized
+    path never matches, so the old filter dropped everything and the briefing
+    reported a reduction it had not performed. Narrowing now resolves each
+    reference to the repository path it actually stands for.
+    """
+    inside = ContextRef(
+        kind=ContextKind.TEST,
+        ref="tests/test_company_engineering_execution.py",
+        reason="declared test of the owning capsule",
+    )
+    outside = ContextRef(
+        kind=ContextKind.TEST,
+        ref="tests/test_arena_layout.py",
+        reason="a test belonging to another subsystem entirely",
+    )
+    scope = ("company/engineering", "tests/test_company_engineering_execution.py")
+
+    result = narrow_context_refs((inside, outside), scope)
+    assert inside in result.kept
+    assert outside in result.dropped
+    assert result.dropped_reasons
+
+    # The exact failure being prevented: the key form matches nothing.
+    assert not any(
+        key.startswith(path)
+        for key in (inside.key, outside.key)
+        for path in scope
+    )
+
+
+def test_a_capsule_reference_is_narrowed_by_what_the_capsule_owns(tmp_path):
+    """A module contract names an id, not a path, and is resolved through it."""
+    relevant = ContextRef(
+        kind=ContextKind.MODULE_CONTRACT,
+        ref="capsule:company-engineering-execution",
+        reason="owns the subject of this objective",
+    )
+    irrelevant = ContextRef(
+        kind=ContextKind.MODULE_CONTRACT,
+        ref="capsule:company-finance",
+        reason="matched a token and owns nothing here",
+    )
+    owned = {
+        "company-engineering-execution": ("company/engineering",),
+        "company-finance": ("company/finance",),
+    }
+    result = narrow_context_refs(
+        (relevant, irrelevant), ("company/engineering",), capsule_paths=owned
+    )
+    assert result.kept == (relevant,)
+    assert result.dropped == (irrelevant,)
+
+    # A capsule the caller supplied no paths for survives: the company cannot
+    # prove a reference irrelevant with a map it does not have.
+    unknown = narrow_context_refs(
+        (relevant, irrelevant), ("company/engineering",), capsule_paths={}
+    )
+    assert len(unknown.kept) == 2
+
+
+def test_narrowing_never_empties_a_packet():
+    stray = ContextRef(
+        kind=ContextKind.FILE, ref="sloped/cameras.py", reason="unrelated"
+    )
+    result = narrow_context_refs((stray,), ("company/engineering",), floor=1)
+    assert result.kept == (stray,)
+    assert result.dropped == ()
+
+
+def test_the_packet_the_session_receives_is_the_narrowed_one(tmp_path):
+    """Not a calculated field beside a wider packet: the same set, everywhere.
+
+    The work order, the packet, the briefing and the strategy artifact all
+    report one reference list, because narrowing happens once, at intake.
+    """
+    repo = _fake_repo(tmp_path)
+    config = _config()
+    assessment = assess_request(
+        _request(), config.permissions, repo_root=repo,
+        capsule_index=_index(), work_order_id="wo-req-001",
+    )
+    order = assessment.work_order
+    store, execution, usage = _stores(tmp_path / "state")
+    opened = open_job(store, assessment, on=DAY)
+    briefing = prepare_developer_session(store, execution, order, opened.job, config, on=DAY)
+    payload = developer_briefing_payload(briefing)
+
+    order_keys = [ref.key for ref in order.context_refs]
+    packet_keys = [ref.key for ref in briefing.packet.context_refs]
+
+    # The work order's narrowed references are the packet's explicit ones.
+    # Order is the manifest's group order - contracts, then tests - not the
+    # order they were supplied in, so this is a subset check by identity.
+    assert set(order_keys) <= set(packet_keys)
+    assert payload["work_order"]["context_refs"] == order_keys
+    assert payload["efficiency"]["context"]["refs"] == packet_keys
+    assert payload["efficiency"]["context"]["work_order_refs"] == order_keys
+    assert len(packet_keys) <= CONSUMER.context_ref_ceiling
+
+    # And there is no second, wider set anywhere in the briefing.
+    assert "context_refs_scoped" not in payload
+
+    assert assessment.derivation.context_refs_kept == len(order_keys)
+    assert assessment.derivation.context_refs_considered >= len(order_keys)
+
+
+def test_the_profile_ceiling_bounds_automatic_context():
+    """Most of a routine packet is automatic capsules, not what the order asked for.
+
+    The work order supplied two references and the assembler returned seven:
+    five were capsules it selected itself, following the capsule graph's
+    dependencies until the reasoning class's ceiling was reached. That is
+    where a routine job's context actually comes from, and it is what the
+    profile ceiling now bounds - below the class ceiling, and only ever the
+    automatic half.
+    """
+    from company.runtime.context_assembly import ContextAssemblyPolicy, assemble_context
+    from ai_platform.resource_classes import TaskSignals, classify
+    from company.runtime.specification import ContextRequirements, TaskSpecification
+
+    explicit = ContextRef(
+        kind=ContextKind.MODULE_CONTRACT,
+        ref="capsule:company-engineering-execution",
+        reason="owns the subject",
+    )
+    spec = TaskSpecification(
+        task_id="wo-ceiling",
+        objective="Add a field to the engineering result record.",
+        required_capabilities=("software_implementation",),
+        requires_judgment=True,
+        context=ContextRequirements(
+            refs=(explicit,),
+            acceptance_criteria=("the field is present and rendered",),
+        ),
+    )
+    classification = classify(TaskSignals(requires_judgment=True))
+    assert classification.code is ReasoningClass.C
+    class_ceiling = classification.resource_class.max_context_refs
+
+    index = _index()
+    unbounded = assemble_context(spec, classification, capsule_index=index)
+    bounded = assemble_context(
+        spec,
+        classification,
+        capsule_index=index,
+        policy=ContextAssemblyPolicy(automatic_ref_ceiling=2),
+    )
+
+    assert len(bounded.manifest.refs()) == 2
+    assert len(bounded.manifest.refs()) < len(unbounded.manifest.refs())
+    assert bounded.plan.manifest_size_chars < unbounded.plan.manifest_size_chars
+    assert 2 < class_ceiling, "the cap must be the smaller of the two to prove anything"
+
+    rejected = bounded.plan.capsule_refs_rejected
+    assert any(item.stage == "resource_ceiling" for item in rejected)
+    assert any("caller ceiling" in item.reason for item in rejected)
+
+    # The explicit reference survives whatever the ceiling says. A reference
+    # the work order named is authoritative; dropping it to save money is how
+    # a session ends up rediscovering its own subject.
+    assert explicit.key in bounded.manifest.keys()
+
+
+def test_an_explicit_reference_is_never_dropped_by_a_profile_ceiling():
+    from company.runtime.context_assembly import ContextAssemblyPolicy, assemble_context
+    from ai_platform.resource_classes import TaskSignals, classify
+    from company.runtime.specification import ContextRequirements, TaskSpecification
+
+    refs = (
+        ContextRef(
+            kind=ContextKind.MODULE_CONTRACT,
+            ref="capsule:company-engineering-execution",
+            reason="owns the subject",
+        ),
+        ContextRef(
+            kind=ContextKind.TEST,
+            ref="tests/test_company_engineering_execution.py",
+            reason="declared test",
+        ),
+        ContextRef(
+            kind=ContextKind.FILE,
+            ref="company/engineering/result.py",
+            reason="the file being changed",
+        ),
+    )
+    spec = TaskSpecification(
+        task_id="wo-explicit",
+        objective="Add a field to the engineering result record.",
+        required_capabilities=("software_implementation",),
+        requires_judgment=True,
+        context=ContextRequirements(
+            refs=refs, acceptance_criteria=("the field is rendered",)
+        ),
+    )
+    classification = classify(TaskSignals(requires_judgment=True))
+    assembled = assemble_context(
+        spec,
+        classification,
+        capsule_index=_index(),
+        policy=ContextAssemblyPolicy(automatic_ref_ceiling=1),
+    )
+    for ref in refs:
+        assert ref.key in assembled.manifest.keys()
+
+
+# --- 13. the routing derivation is deterministic and readable -------------
+
+
+def test_routing_is_a_pure_function_of_the_request():
+    request = _request()
+    assert derive_routing(request) == derive_routing(request)
+
+
+def test_every_specialist_trigger_routes_to_its_own_domain():
+    for domain, terms in SPECIALIST_TRIGGERS.items():
+        for term in terms:
+            routed = derive_routing(
+                _request(objective=f"Please handle the {term} problem in the loop.")
+            )
+            assert routed.specialist_domain == domain, (term, routed)
+
+
+def test_an_irreversible_request_raises_its_own_ceiling():
+    """Deep reasoning needs a ceiling that permits it, or the job is refused.
+
+    `requires_judgment` is True for every engineering task, so an irreversible
+    one classifies E. A hard-coded D ceiling would make `plan_task` refuse the
+    work order rather than downgrade it - the right refusal, discovered at the
+    wrong moment.
+    """
+    routed = derive_routing(_request(reversible=False))
+    assert routed.reasoning_class_ceiling is ReasoningClass.E
+    assert derive_routing(_request()).reasoning_class_ceiling is ReasoningClass.D

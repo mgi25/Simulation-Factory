@@ -37,6 +37,7 @@ from pathlib import Path
 import sys
 
 from .errors import ConfigurationError
+from .resources import DEFAULT_TIER_MODELS, STANDARD, STRONGEST
 
 
 # The CLI a coding session is launched through, by name. Resolved to an
@@ -75,8 +76,22 @@ class RunnerConfig:
     operator: str = "MGI"
     backend: str = DEFAULT_BACKEND
     reviewer_backend: str = ""
+    # An explicit model pins the session to it and the recommended tier is
+    # recorded and not applied. Left empty - which is the normal case - the
+    # model comes from the tier Company OS recommended, so the operator does
+    # not restate a routing decision the company already made per job.
     developer_model: str = ""
     reviewer_model: str = ""
+    # Which vendor model each tier means. The company never names a model;
+    # this is the one place a tier becomes one, and aliases are used so the
+    # account's current model of each strength is what runs.
+    standard_model: str = DEFAULT_TIER_MODELS[STANDARD]
+    strongest_model: str = DEFAULT_TIER_MODELS[STRONGEST]
+    # Whether to apply the recommendation at all. False records it and runs
+    # the operator's own settings, which is a debugging seam and not a way to
+    # spend more: the ceilings still bind, because they come from the config's
+    # own timeouts as before.
+    apply_resource_strategy: bool = True
     python_executable: str = field(default_factory=lambda: sys.executable)
     remote: str = "origin"
     poll_interval_s: float = 20.0
@@ -98,6 +113,9 @@ class RunnerConfig:
     developer_tools: tuple[str, ...] = DEFAULT_DEVELOPER_TOOLS
     reviewer_tools: tuple[str, ...] = DEFAULT_REVIEWER_TOOLS
     disallowed_tools: tuple[str, ...] = DEFAULT_DISALLOWED_TOOLS
+
+    def tier_models(self) -> dict[str, str]:
+        return {STANDARD: self.standard_model, STRONGEST: self.strongest_model}
 
     def __post_init__(self) -> None:
         for name in ("repo_root", "state_dir", "runner_dir", "worktree_root"):
@@ -146,6 +164,9 @@ class RunnerConfig:
             "reviewer_backend": self.reviewer_backend_name,
             "developer_model": self.developer_model,
             "reviewer_model": self.reviewer_model,
+            "standard_model": self.standard_model,
+            "strongest_model": self.strongest_model,
+            "apply_resource_strategy": self.apply_resource_strategy,
             "remote": self.remote,
             "push": self.push,
             "poll_interval_s": self.poll_interval_s,

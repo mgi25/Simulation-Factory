@@ -73,6 +73,7 @@ from .authorization import (
     verify_reviewer_left_no_trace,
 )
 from .backends import CodingBackend, SessionOutcome, SessionRequest, build_backend, executor_hint
+from .resources import ResourceStrategy
 from .briefs import (
     DEVELOPER_REPORT_NAME,
     REVIEW_DIFF_NAME,
@@ -130,7 +131,18 @@ ACTIONABLE: frozenset[str] = frozenset({PLANNING, DEVELOPING, TESTING, REVIEWING
 # How many stages one run may perform before it stops and says so. A bounded
 # correction loop cannot exceed this, so reaching it means the lifecycle is
 # cycling and the runner should stop rather than keep paying for sessions.
+#
+# This is the outer bound. The active resource profile may name a smaller one -
+# consumer mode does - and the runner tightens to it the moment it reads its
+# first briefing. It never loosens: a strategy cannot buy a run more stages
+# than the runner was started willing to perform.
 MAX_STAGES_PER_RUN = 16
+
+# What a run writes when it stops at a ceiling instead of finishing. The point
+# is that the *next* session starts from this file and not from a transcript:
+# a checkpoint is what the next session needs, and a conversation is what the
+# last one happened to contain.
+CHECKPOINT_NAME = "checkpoint.json"
 
 # Run outcomes, as the outcome log records them.
 COMPLETED = "completed"
@@ -208,6 +220,7 @@ class EngineeringRunner:
         config.ensure_directories()
         self.config = config
         self._redactor = Redactor()
+        self._stage_limit = MAX_STAGES_PER_RUN
         self._commands = command_runner or CommandRunner(redactor=self._redactor)
         self._control = control_plane or ControlPlane(
             self._commands,
@@ -312,7 +325,17 @@ class EngineeringRunner:
             # *move* the job: that is a stall, not a correction, and repeating
             # it would spend sessions on the same state forever.
             previous = ""
-            for _ in range(MAX_STAGES_PER_RUN):
+            self._stage_limit = MAX_STAGES_PER_RUN
+            performed = 0
+            while True:
+                if performed >= self._stage_limit:
+                    outcome = RUN_FAILED
+                    reason = (
+                        f"this run performed {performed} stages, which is the "
+                        f"ceiling the active resource profile allows; stopping "
+                        "with a checkpoint rather than continuing to spend sessions"
+                    )
+                    break
                 if state not in ACTIONABLE:
                     break
                 if state == previous:
@@ -326,13 +349,8 @@ class EngineeringRunner:
                 lease = self._store.heartbeat(lease, stage=state)
                 record = self._stage(work_order_id, state, run_dir)
                 stages.append(record)
+                performed += 1
                 state = record.state_after or self._state(work_order_id)
-            else:
-                outcome = RUN_FAILED
-                reason = (
-                    f"the lifecycle did not settle in {MAX_STAGES_PER_RUN} stages; "
-                    "stopping rather than continuing to spend sessions"
-                )
         except AuthorityViolation as exc:
             outcome, reason = RUN_BLOCKED, str(exc)
         except (RunnerError, OSError) as exc:
@@ -359,6 +377,9 @@ class EngineeringRunner:
                 if stages
                 else f"the job is {state or 'unknown'} and the runner cannot move it"
             )
+
+        if outcome != COMPLETED:
+            self._write_checkpoint(work_order_id, run_dir, state=state, reason=reason)
 
         report = RunReport(
             work_order_id=work_order_id,
@@ -427,6 +448,158 @@ class EngineeringRunner:
             emit("idle", {"sleep_s": self.config.poll_interval_s, "pending": len(pending)})
             time.sleep(self.config.poll_interval_s)
 
+    # --- checkpoints ---------------------------------------------------------
+
+    def _write_checkpoint(
+        self, work_order_id: str, run_dir: Path, *, state: str, reason: str
+    ) -> Path | None:
+        """What the next fresh session needs, and deliberately nothing else.
+
+        A session that stops at a ceiling has to be continuable, or the ceiling
+        just throws the work away. The continuation is a *fresh* session: it
+        reads this file and the repository, and it does not inherit the last
+        session's conversation. That is the whole point - carrying the
+        conversation forward is what made a continuation cost more than the
+        attempt it continued, because the transcript is the expensive part and
+        almost none of it is load-bearing.
+
+        Six things go in, and they are the six the milestone brief names: the
+        work order, what is already done, where the code is, what is failing,
+        what the reviewer is still unhappy about, and which references matter.
+        No transcript, no tool output, no session id, no narrative.
+        """
+        developer = _latest_stage_dir(run_dir, "developer")
+        briefing = _read_json(developer / "briefing.json") if developer else {}
+        order = briefing.get("work_order", {}) if isinstance(briefing, Mapping) else {}
+        efficiency = briefing.get("efficiency", {}) if isinstance(briefing, Mapping) else {}
+        context = efficiency.get("context", {}) if isinstance(efficiency, Mapping) else {}
+        receipt = _read_json(developer / "receipt.json") if developer else {}
+        tests = _read_json(developer / "tests.json") if developer else {}
+        changes = _read_json(developer / "changes.json") if developer else {}
+
+        failing = [
+            {
+                "command": run.get("command"),
+                "summary": run.get("summary"),
+                "failure_detail": run.get("failure_detail", "")[:2000],
+            }
+            for run in (tests.get("runs", ()) if isinstance(tests, Mapping) else ())
+            if isinstance(run, Mapping) and run.get("exit_code") not in (0, None)
+        ]
+
+        checkpoint = {
+            "checkpoint_version": 1,
+            "work_order": {
+                "work_order_id": work_order_id,
+                "work_order_fingerprint": order.get("work_order_fingerprint", ""),
+                "objective": order.get("objective", ""),
+                "authorized_branch": order.get("authorized_branch", ""),
+                "authorized_paths": order.get("authorized_paths", []),
+                "acceptance_criteria": order.get("acceptance_criteria", []),
+                "required_tests": order.get("required_tests", []),
+            },
+            "stopped": {"state": state, "reason": self._redactor.scrub(reason or "")},
+            "completed_work": {
+                "summary": self._redactor.scrub(str(receipt.get("summary", "")))[:1200],
+                "files_changed": receipt.get("files_changed", []),
+                "invariants_preserved": receipt.get("invariants_preserved", []),
+            },
+            "git": {
+                "base_commit": order.get("base_commit", ""),
+                "commit_sha": receipt.get("commit_sha", ""),
+                "uncommitted": changes.get("uncommitted", [])
+                if isinstance(changes, Mapping)
+                else [],
+            },
+            "failing_tests": failing,
+            "unresolved_reviewer_findings": list(self._prior_findings(work_order_id)),
+            "context_refs": context.get("refs", []) if isinstance(context, Mapping) else [],
+            "next_session": (
+                "Start a fresh session from this file and the repository. Do not "
+                "carry the previous conversation: it is the expensive part and "
+                "almost none of it is load-bearing. Continuing needs the operator "
+                "or the CEO to authorize it; this file does not authorize anything."
+            ),
+        }
+        return write_json(run_dir / CHECKPOINT_NAME, checkpoint)
+
+    # --- the resource strategy ----------------------------------------------
+
+    def _resource_plan(
+        self, payload: Mapping[str, Any], *, role: str
+    ) -> tuple[ResourceStrategy, dict[str, Any]]:
+        """Read the briefing's resource strategy and decide what to apply.
+
+        The strategy is validated before anything else looks at it, so a
+        briefing that carries an unreadable one stops the stage rather than
+        being run at whatever the operator's defaults happen to be. The
+        returned mapping is the *applied* settings, written beside the stage so
+        a later reader can tell what was recommended from what was used.
+        """
+        strategy = ResourceStrategy.parse(payload)
+        configured = (
+            self.config.developer_model
+            if role == "developer"
+            else self.config.reviewer_model
+        )
+        default_timeout = (
+            self.config.developer_timeout_s
+            if role == "developer"
+            else self.config.reviewer_timeout_s
+        )
+
+        applied: dict[str, Any] = {
+            "role": role,
+            "recommended": strategy.summary(),
+            "applied_model": configured,
+            "model_source": "operator",
+            "applied_timeout_s": default_timeout,
+            "timeout_source": "runner_config",
+            "applied_cost_ceiling": 0.0,
+            "cost_ceiling_enforced": False,
+            "not_enforced": [
+                "max_turns: no backend this runner drives accepts a turn ceiling; "
+                "it is carried into the session's instructions as guidance only",
+            ],
+        }
+        if not self.config.apply_resource_strategy:
+            applied["model_source"] = "operator (strategy recorded, not applied)"
+            return strategy, applied
+
+        # The profile's stage ceiling tightens this run, and only tightens it.
+        stage_ceiling = _stage_ceiling_of(strategy)
+        if stage_ceiling and stage_ceiling < self._stage_limit:
+            self._stage_limit = stage_ceiling
+        applied["stage_limit"] = self._stage_limit
+
+        if not configured:
+            model = strategy.model_for(self.config.tier_models())
+            if model:
+                applied["applied_model"] = model
+                applied["model_source"] = f"tier:{strategy.model_tier}"
+
+        # The ceiling only ever tightens. A strategy may not buy a session more
+        # wall-clock than the operator started the runner with.
+        wall = float(strategy.max_wall_seconds)
+        if wall < default_timeout:
+            applied["applied_timeout_s"] = wall
+            applied["timeout_source"] = "resource_strategy"
+
+        ceiling = strategy.cost_ceiling()
+        if ceiling is not None and self._backend_accepts_cost_ceiling():
+            applied["applied_cost_ceiling"] = float(ceiling)
+            applied["cost_ceiling_enforced"] = True
+        elif ceiling is not None:
+            applied["not_enforced"].append(
+                f"session_cost: backend {self.config.backend!r} accepts no spend "
+                "flag, so the ceiling is recorded and measured after the fact"
+            )
+        return strategy, applied
+
+    def _backend_accepts_cost_ceiling(self) -> bool:
+        """Only the Claude Code adapter passes a spend ceiling to the provider."""
+        return self.config.backend == "claude_code"
+
     # --- stages ------------------------------------------------------------
 
     def _stage(self, work_order_id: str, state: str, run_dir: Path) -> StageRecord:
@@ -459,6 +632,8 @@ class EngineeringRunner:
             payload = reply.payload
         write_json(stage_dir / "briefing.json", payload)
         envelope = AuthorityEnvelope.parse(payload)
+        strategy, applied = self._resource_plan(payload, role="developer")
+        write_json(stage_dir / "resources.json", applied)
 
         worktree = self._workspace.ensure_worktree(
             envelope.authorized_branch, envelope.base_commit
@@ -482,6 +657,7 @@ class EngineeringRunner:
             worktree=worktree,
             attempt=envelope.packet_attempt,
             prior_findings=self._prior_findings(work_order_id),
+            strategy=strategy,
         )
         write_text(stage_dir / "instructions.md", instructions)
 
@@ -491,12 +667,13 @@ class EngineeringRunner:
                 role="developer",
                 cwd=worktree,
                 instructions=instructions,
-                timeout_s=self.config.developer_timeout_s,
+                timeout_s=applied["applied_timeout_s"],
                 allowed_tools=self.config.developer_tools,
                 disallowed_tools=self.config.disallowed_tools,
-                model=self.config.developer_model,
+                model=applied["applied_model"],
                 read_only=False,
                 extra_dirs=(stage_dir,),
+                max_cost=applied["applied_cost_ceiling"],
             ),
             stage_dir=stage_dir,
             report_path=report_path,
@@ -726,6 +903,8 @@ class EngineeringRunner:
             ).require().payload
         write_json(stage_dir / "briefing.json", payload)
         envelope = AuthorityEnvelope.parse(payload)
+        strategy, applied = self._resource_plan(payload, role="reviewer")
+        write_json(stage_dir / "resources.json", applied)
         reviewer = envelope.employee
         if reviewer == developer_envelope.employee:
             raise AuthorityViolation(
@@ -762,13 +941,14 @@ class EngineeringRunner:
                 role="reviewer",
                 cwd=worktree,
                 instructions=instructions,
-                timeout_s=self.config.reviewer_timeout_s,
+                timeout_s=applied["applied_timeout_s"],
                 allowed_tools=self.config.reviewer_tools,
                 disallowed_tools=self.config.disallowed_tools
                 + ("Write", "Edit", "NotebookEdit", "Bash"),
-                model=self.config.reviewer_model,
+                model=applied["applied_model"],
                 read_only=True,
                 extra_dirs=(stage_dir,),
+                max_cost=applied["applied_cost_ceiling"],
             ),
             stage_dir=stage_dir,
             report_path=None,
@@ -1112,6 +1292,32 @@ def _next_stage_dir(run_dir: Path, role: str) -> Path:
     return path
 
 
+
+def _stage_ceiling_of(strategy: "ResourceStrategy") -> int:
+    """The profile's stage ceiling, as the strategy carries it."""
+    terms = strategy.raw.get("profile_terms")
+    if not isinstance(terms, Mapping):
+        return 0
+    value = terms.get("stage_ceiling")
+    if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+        return 0
+    return value
+
+
+def _read_json(path: Path | None) -> dict[str, Any]:
+    """Whatever is there, or nothing. A checkpoint is best-effort by design.
+
+    It is written on the failure path, and a checkpoint that raised while
+    reporting a failure would replace the failure with its own.
+    """
+    if path is None or not path.is_file():
+        return {}
+    try:
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return loaded if isinstance(loaded, dict) else {}
+
 def _latest_stage_dir(run_dir: Path, role: str) -> Path | None:
     """The most recent stage of this role, searching earlier runs if needed.
 
@@ -1157,5 +1363,6 @@ __all__ = [
     "SKIPPED",
     "EngineeringRunner",
     "RunReport",
+    "CHECKPOINT_NAME",
     "StageRecord",
 ]

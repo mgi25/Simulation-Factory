@@ -60,7 +60,12 @@ from tools.engineering_runner.authorization import (
     verify_developer_changes,
     verify_reviewer_left_no_trace,
 )
-from tools.engineering_runner.backends import SessionOutcome, SessionRequest
+from tools.engineering_runner.backends import (
+    ClaudeCodeBackend,
+    SessionOutcome,
+    SessionRequest,
+    normalise_claude_usage,
+)
 from tools.engineering_runner.briefs import review_instructions
 from tools.engineering_runner.config import RunnerConfig
 from tools.engineering_runner.errors import (
@@ -82,7 +87,8 @@ from tools.engineering_runner.evidence import (
     parse_json_object,
     suite_evidence,
 )
-from tools.engineering_runner.process import CommandRunner
+from tools.engineering_runner.evidence import _usage
+from tools.engineering_runner.process import CommandResult, CommandRunner
 from tools.engineering_runner.queue import LEASE_NAME, RunStore, utcnow
 from tools.engineering_runner.redaction import (
     REDACTED,
@@ -91,8 +97,14 @@ from tools.engineering_runner.redaction import (
     forwarded_names,
     sanitize_json_file,
 )
+from tools.engineering_runner.resources import (
+    ResourceStrategy,
+    failure_detail,
+    summarise_command,
+)
 from tools.engineering_runner.runner import (
     COMPLETED,
+    MAX_STAGES_PER_RUN,
     RUN_BLOCKED,
     RUN_FAILED,
     SKIPPED,
@@ -220,7 +232,54 @@ def developer_briefing(base: str, *, allowed: Sequence[str] = ("subject",)) -> d
                 "attempt": 1,
             }
         },
+        "efficiency": efficiency_block(),
     }
+
+
+def efficiency_block(**changes: Any) -> dict[str, Any]:
+    """The resource-strategy artifact, in the shape `company.engineering` emits.
+
+    A real briefing always carries one, and the runner refuses a briefing that
+    does not - so the fixture carries one too. A fixture that omitted it would
+    be testing a payload production cannot produce.
+    """
+    block: dict[str, Any] = {
+        "artifact_version": 1,
+        "profile": "consumer",
+        "model_tier": "standard",
+        "escalation": "none",
+        "reasoning_class": "C",
+        "context_budget_chars": 32000,
+        "checkpoint_threshold_chars": 22400,
+        "checkpoint_rule": "continue_if_under_budget",
+        "output_reduction": {
+            "omit_passing_test_detail": True,
+            "max_test_failure_lines": 50,
+            "max_log_lines": 100,
+            "omit_clean_git_detail": True,
+            "scope_file_listings": True,
+        },
+        "resource_ceiling": {
+            "max_turns": 40,
+            "max_wall_seconds": 1800,
+            "max_session_cost": "3.00",
+            "cost_currency": "USD",
+            "escalation_message": "Stop and report progress.",
+        },
+        "provider_count": 1,
+        "parallel_sessions": 1,
+        "packet_attempt": 1,
+        "profile_terms": {
+            "name": "consumer",
+            "developer_attempts": 1,
+            "stage_ceiling": 4,
+            "context_ref_ceiling": 8,
+        },
+        "context": {"refs": ["module_contract:subject"], "ref_count": 1},
+        "strategy_reason": "reasoning class C at risk medium is routine implementation",
+    }
+    block.update(changes)
+    return block
 
 
 def review_briefing(base: str, *, allowed: Sequence[str] = ("subject",)) -> dict[str, Any]:
@@ -870,10 +929,14 @@ class ScriptedControlPlane:
         *,
         states: list[str],
         allowed: Sequence[str] = ("subject",),
+        efficiency: Mapping[str, Any] | None = None,
     ) -> None:
         self.base = base
         self.states = states
         self.allowed = tuple(allowed)
+        # What the real control plane varies per work order: the resource
+        # strategy. A stand-in with a fixed one could not exercise routing.
+        self.efficiency = dict(efficiency or {})
         self.calls: list[tuple[str, Any]] = []
         self.receipts: list[dict[str, Any]] = []
         self.attestations: list[dict[str, Any]] = []
@@ -895,7 +958,7 @@ class ScriptedControlPlane:
     def developer_brief(self, work_order_id: str, *, executor: str):
         self.calls.append(("brief", executor))
         self._advance("developing")
-        return _reply(developer_briefing(self.base, allowed=self.allowed))
+        return _reply(self._brief(developer_briefing(self.base, allowed=self.allowed)))
 
     def submit_receipt(self, work_order_id: str, receipt_file: Path, *, repo_dir=None):
         payload = json.loads(Path(receipt_file).read_text(encoding="utf-8"))
@@ -915,7 +978,7 @@ class ScriptedControlPlane:
     def review_brief(self, work_order_id: str, *, implementer: str, executor: str):
         self.calls.append(("review-brief", implementer))
         self._advance("reviewing")
-        return _reply(review_briefing(self.base, allowed=self.allowed))
+        return _reply(self._brief(review_briefing(self.base, allowed=self.allowed)))
 
     def submit_review(
         self, work_order_id: str, attestation_file: Path, *, implementer: str, repo_root: Path
@@ -965,6 +1028,14 @@ class ScriptedControlPlane:
 
     def result_text(self, work_order_id: str):
         return _command()
+
+    def _brief(self, payload: dict[str, Any]) -> dict[str, Any]:
+        for key, value in self.efficiency.items():
+            if isinstance(value, Mapping) and isinstance(payload["efficiency"].get(key), dict):
+                payload["efficiency"][key].update(value)
+            else:
+                payload["efficiency"][key] = value
+        return payload
 
     def _advance(self, state: str) -> None:
         self.states[0] = state
@@ -1049,7 +1120,12 @@ class ScriptedBackend:
         )
 
 
-def _runner(repository: dict[str, Any], backend: ScriptedBackend, control: ScriptedControlPlane):
+def _runner(
+    repository: dict[str, Any],
+    backend: ScriptedBackend,
+    control: ScriptedControlPlane,
+    **settings: Any,
+):
     tmp = repository["tmp"]
     config = RunnerConfig(
         repo_root=repository["repo"],
@@ -1057,6 +1133,7 @@ def _runner(repository: dict[str, Any], backend: ScriptedBackend, control: Scrip
         runner_dir=tmp / "runner",
         worktree_root=tmp / "worktrees",
         push=True,
+        **settings,
         poll_interval_s=0.01,
         test_timeout_s=300.0,
         # The fixture repository holds one suite, not the eleven the real gate
@@ -1190,7 +1267,24 @@ def test_a_review_that_requires_changes_spends_another_authorized_attempt(reposi
             "VALUE = " + str(value) + chr(10), encoding="utf-8"
         )
 
-    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    # A work order with three authorized attempts is not a consumer-mode work
+    # order: consumer mode authorizes one, and the first changes_required is
+    # already the last. The loop under test is the expanded profile's, so the
+    # briefing carries the expanded profile's terms - including a stage ceiling
+    # that has room for it.
+    control = ScriptedControlPlane(
+        repository["base"],
+        states=["planning"],
+        efficiency={
+            "profile": "expanded",
+            "profile_terms": {
+                "name": "expanded",
+                "developer_attempts": 3,
+                "stage_ceiling": 12,
+                "context_ref_ceiling": 20,
+            },
+        },
+    )
     control.max_attempts = 3
     backend = ScriptedBackend(edit=fix_on_the_second_try)
     report = _runner(repository, backend, control).run_one(WORK_ORDER)
@@ -1569,6 +1663,9 @@ def test_the_runner_adds_no_dependency():
         "collections",
         "dataclasses",
         "datetime",
+        # stdlib, and the right type for money: a session cost ceiling
+        # compared as a float would round a cent into a breach.
+        "decimal",
         "hashlib",
         "json",
         "os",
@@ -2262,3 +2359,454 @@ def test_a_report_with_nothing_to_remove_is_left_exactly_as_it_was(tmp_path: Pat
     report.write_text(body, encoding="utf-8")
     assert sanitize_json_file(report, Redactor(environment={})) is False
     assert report.read_text(encoding="utf-8") == body
+
+
+# --- consumer resource mode: telemetry ------------------------------------
+#
+# The two envelope shapes, in the exact form the provider writes them, copied
+# from real stored sessions including the numbers.
+
+
+def _envelope(*, num_turns, usage, model_usage=None, cost=None):
+    payload = {
+        "type": "result",
+        "subtype": "success",
+        "is_error": False,
+        "num_turns": num_turns,
+        "result": "done",
+        "session_id": "03dff822-7d61-4865-b0b5-2efe8a35ab40",
+        "usage": usage,
+    }
+    if cost is not None:
+        payload["total_cost_usd"] = cost
+    if model_usage is not None:
+        payload["modelUsage"] = model_usage
+    return payload
+
+
+AGREEING_ENVELOPE = _envelope(
+    num_turns=39,
+    cost=1.740796,
+    usage={
+        "input_tokens": 40,
+        "cache_creation_input_tokens": 75106,
+        "cache_read_input_tokens": 2083217,
+        "output_tokens": 9183,
+    },
+    model_usage={
+        "claude-opus-4-6[1m]": {
+            "inputTokens": 40,
+            "outputTokens": 9183,
+            "cacheReadInputTokens": 2083217,
+            "cacheCreationInputTokens": 75106,
+            "costUSD": 1.740796,
+        }
+    },
+)
+
+# The real one that broke the old reader. `usage` describes the final segment
+# of a 1032-second session of 48 billed requests; `modelUsage` describes the
+# whole thing; `total_cost_usd` agrees with `modelUsage`.
+SEGMENT_ENVELOPE = _envelope(
+    num_turns=1,
+    cost=3.78449925,
+    usage={
+        "input_tokens": 3,
+        "cache_creation_input_tokens": 33224,
+        "cache_read_input_tokens": 121579,
+        "output_tokens": 66,
+    },
+    model_usage={
+        "claude-opus-4-6[1m]": {
+            "inputTokens": 53,
+            "outputTokens": 27132,
+            "cacheReadInputTokens": 4276831,
+            "cacheCreationInputTokens": 154803,
+            "costUSD": 3.78449925,
+        }
+    },
+)
+
+
+def test_usage_is_read_from_session_totals_not_a_final_segment():
+    """The measured defect, and the shape that produced it.
+
+    One envelope, three accounts of the same session. Reading cost from the
+    session-total field and tokens from the final-segment one agreed for
+    nineteen sessions and then understated the twentieth by four hundred times.
+    """
+    usage = normalise_claude_usage(SEGMENT_ENVELOPE)
+    assert usage.output_units == 27132, "the segment said 66"
+    assert usage.cache_read_units == 4276831, "the segment said 121,579"
+    assert usage.cache_creation_units == 154803
+    assert usage.cost_usd == pytest.approx(3.78449925)
+    assert usage.source == "model_usage_totals:segment_mismatch"
+
+
+def test_a_turn_count_that_describes_one_segment_is_not_reported():
+    """Not silently corrected, and not silently used: marked and withheld.
+
+    The session's real turn count is not anywhere in this envelope. The old
+    reader reported 1 for a session of 48 billed requests. Reporting nothing
+    and saying why is the only honest answer available.
+    """
+    usage = normalise_claude_usage(SEGMENT_ENVELOPE)
+    assert usage.turns is None
+    assert "model_turns" in usage.unreliable
+
+
+def test_an_agreeing_envelope_reports_its_turn_count():
+    usage = normalise_claude_usage(AGREEING_ENVELOPE)
+    assert usage.turns == 39
+    assert usage.unreliable == ()
+    assert usage.source == "model_usage_totals"
+    assert usage.output_units == 9183
+
+
+def test_cache_creation_is_captured():
+    """It is billed separately from cache reads and was never recorded."""
+    for envelope in (AGREEING_ENVELOPE, SEGMENT_ENVELOPE):
+        assert normalise_claude_usage(envelope).cache_creation_units
+
+
+def test_the_smaller_value_is_never_silently_preferred():
+    """Two session totals that disagree mark the metric; they do not pick one.
+
+    Preferring the smaller would turn a measurement error into a reported
+    saving, which is the failure this whole milestone exists to avoid.
+    """
+    envelope = dict(SEGMENT_ENVELOPE)
+    envelope["total_cost_usd"] = 0.01
+    usage = normalise_claude_usage(envelope)
+    assert "session_cost" in usage.unreliable
+    assert usage.cost_usd == pytest.approx(3.78449925)
+
+
+def test_an_envelope_without_model_usage_is_labelled_as_such():
+    envelope = _envelope(num_turns=4, usage={"input_tokens": 1, "output_tokens": 2})
+    usage = normalise_claude_usage(envelope)
+    assert usage.source == "envelope_usage"
+    assert usage.output_units == 2
+
+
+def test_turns_are_never_recorded_as_tool_calls():
+    """Two different quantities, and conflating them invented a measurement."""
+    outcome = SessionOutcome(
+        backend="claude_code", role="developer", session_id="s", model="m",
+        exit_code=0, duration_s=1.0, result_text="", transcript="", ok=True,
+        turns=39, input_units=40, output_units=9183, cache_creation_units=75106,
+    )
+    usage = _usage(outcome)
+    assert "tool_calls" not in usage
+    assert usage["model_turns"] == 39
+    assert usage["cache_creation_units"] == 75106
+
+
+# --- consumer resource mode: the resource strategy artifact ---------------
+
+
+def test_the_runner_refuses_a_briefing_with_no_resource_strategy(repository):
+    payload = developer_briefing(repository["base"])
+    payload.pop("efficiency")
+    with pytest.raises(IntegrityFailure, match="no resource strategy"):
+        ResourceStrategy.parse(payload)
+
+
+def test_the_runner_refuses_an_artifact_version_it_cannot_read(repository):
+    payload = developer_briefing(repository["base"])
+    payload["efficiency"]["artifact_version"] = 99
+    with pytest.raises(IntegrityFailure, match="artifact version 99"):
+        ResourceStrategy.parse(payload)
+
+
+def test_the_runner_refuses_a_tier_it_does_not_know(repository):
+    payload = developer_briefing(repository["base"])
+    payload["efficiency"]["model_tier"] = "cheapest"
+    with pytest.raises(IntegrityFailure, match="model tier"):
+        ResourceStrategy.parse(payload)
+
+
+def test_a_resource_strategy_may_not_carry_authority(repository):
+    """The governance property: this artifact can only make a session smaller.
+
+    Refused rather than ignored. A field nobody validates is how a scope gets
+    widened by a payload that was never meant to carry one, and ignoring it
+    leaves the widening sitting in a file somebody later decides to read.
+    """
+    for key in ("authorized_paths", "may_write", "allowed_tools", "authorized_branch"):
+        payload = developer_briefing(repository["base"])
+        payload["efficiency"][key] = ["anything"]
+        with pytest.raises(IntegrityFailure, match="authority-shaped"):
+            ResourceStrategy.parse(payload)
+
+
+def test_the_operator_does_not_restate_the_model_for_every_job(repository):
+    """The tier becomes a model in the runner, and only in the runner."""
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    runner = _runner(repository, backend, control)
+    report = runner.run_one(WORK_ORDER)
+    assert report.outcome == COMPLETED, report.reason
+
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    assert developer.model == "sonnet", "the standard tier, resolved by the runner"
+    assert developer.timeout_s == 1800.0, "the strategy's wall ceiling, not the config's"
+    assert developer.max_cost == pytest.approx(3.00)
+
+    applied = json.loads(
+        (Path(report.run_dir) / "developer-01" / "resources.json").read_text("utf-8")
+    )
+    assert applied["model_source"] == "tier:standard"
+    assert applied["timeout_source"] == "resource_strategy"
+    assert applied["cost_ceiling_enforced"] is True
+    assert any("max_turns" in line for line in applied["not_enforced"])
+
+
+def test_the_strongest_tier_resolves_to_the_stronger_model(repository):
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    control = ScriptedControlPlane(
+        repository["base"], states=["planning"], efficiency={"model_tier": "strongest"}
+    )
+    runner = _runner(repository, backend, control)
+    runner.run_one(WORK_ORDER)
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    assert developer.model == "opus"
+
+
+def test_an_explicit_operator_model_still_wins(repository):
+    """A recommendation is a recommendation. The operator can pin one."""
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    runner = _runner(repository, backend, control, developer_model="haiku")
+    runner.run_one(WORK_ORDER)
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    assert developer.model == "haiku"
+
+
+def test_a_strategy_cannot_buy_a_session_more_time_than_the_runner_allows(repository):
+    """The ceiling only ever tightens.
+
+    A briefing that asked for a longer session than the operator started the
+    runner with would be a Company OS record widening a runner setting, which
+    is the direction authority must never travel.
+    """
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    control = ScriptedControlPlane(
+        repository["base"],
+        states=["planning"],
+        efficiency={"resource_ceiling": {"max_wall_seconds": 999999}},
+    )
+    runner = _runner(repository, backend, control)
+    runner.run_one(WORK_ORDER)
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    assert developer.timeout_s == 3600.0, "the runner config's own ceiling"
+
+
+class _Recorder:
+    def __init__(self):
+        self.calls: list[list[str]] = []
+
+    def run(self, argv, **kwargs):
+        self.calls.append(list(argv))
+        return CommandResult(
+            argv=tuple(argv),
+            cwd=".",
+            exit_code=0,
+            stdout=json.dumps(
+                {"session_id": "03dff822-7d61-4865-b0b5-2efe8a35ab40", "result": "ok"}
+            ),
+            stderr="",
+            duration_s=0.1,
+        )
+
+
+def test_a_spend_ceiling_reaches_the_command_line():
+    """The one live spend limit either CLI offers, actually passed."""
+    recorder = _Recorder()
+    backend = ClaudeCodeBackend(recorder, executable=sys.executable)
+    backend._resolved = sys.executable
+    outcome = backend.launch(
+        SessionRequest(
+            role="developer", cwd=Path("."), instructions="x",
+            timeout_s=60.0, max_cost=1.5,
+        )
+    )
+    argv = recorder.calls[0]
+    assert "--max-budget-usd" in argv
+    assert argv[argv.index("--max-budget-usd") + 1] == "1.5000"
+    assert outcome.cost_ceiling_enforced is True
+
+
+def test_no_spend_ceiling_means_no_flag_and_no_claim_of_one():
+    recorder = _Recorder()
+    backend = ClaudeCodeBackend(recorder, executable=sys.executable)
+    backend._resolved = sys.executable
+    outcome = backend.launch(
+        SessionRequest(role="developer", cwd=Path("."), instructions="x", timeout_s=60.0)
+    )
+    assert "--max-budget-usd" not in recorder.calls[0]
+    assert outcome.cost_ceiling_enforced is False
+
+
+# --- consumer resource mode: checkpoints ----------------------------------
+
+
+def test_a_run_that_stops_short_leaves_a_checkpoint_and_not_a_transcript(repository):
+    """What the next fresh session needs, and nothing that makes it expensive.
+
+    The continuation must be a *fresh* session. Carrying the previous
+    conversation is what made a correction attempt cost more than the attempt
+    it corrected: the transcript is the expensive part and almost none of it
+    is load-bearing.
+    """
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    control.review_outcome = "changes_required"
+    control.max_attempts = 1  # what the consumer profile authorizes
+    runner = _runner(repository, backend, control)
+    report = runner.run_one(WORK_ORDER)
+    assert report.outcome == RUN_BLOCKED, report.reason
+    assert report.final_state == "decision_required"
+
+    checkpoint_path = Path(report.run_dir) / "checkpoint.json"
+    assert checkpoint_path.is_file()
+    checkpoint = json.loads(checkpoint_path.read_text("utf-8"))
+
+    assert checkpoint["work_order"]["work_order_id"] == WORK_ORDER
+    assert checkpoint["work_order"]["acceptance_criteria"]
+    assert checkpoint["work_order"]["authorized_paths"]
+    assert checkpoint["completed_work"]["files_changed"]
+    assert checkpoint["git"]["commit_sha"]
+    assert "failing_tests" in checkpoint
+    assert "unresolved_reviewer_findings" in checkpoint
+    assert checkpoint["context_refs"]
+    assert "fresh session" in checkpoint["next_session"]
+
+    # And none of the expensive parts.
+    text = json.dumps(checkpoint)
+    assert "scripted transcript" not in text
+    assert "transcript" not in checkpoint
+    assert len(text) < 8000, "a checkpoint that is not compact is a transcript"
+
+
+def test_one_developer_attempt_is_not_followed_by_a_second(repository):
+    """The retry burn, stopped where the money is actually spent.
+
+    Company OS refuses the transition, so the runner has no actionable state
+    to act on and stops. Neither half is trusted to do it alone.
+    """
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    control.review_outcome = "changes_required"
+    control.max_attempts = 1
+    runner = _runner(repository, backend, control)
+    runner.run_one(WORK_ORDER)
+    developer_sessions = [item for item in backend.launched if item.role == "developer"]
+    assert len(developer_sessions) == 1
+
+
+def test_the_profile_stage_ceiling_tightens_the_run(repository):
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    runner = _runner(repository, backend, control)
+    report = runner.run_one(WORK_ORDER)
+    applied = json.loads(
+        (Path(report.run_dir) / "developer-01" / "resources.json").read_text("utf-8")
+    )
+    assert applied["stage_limit"] == 4, "the consumer profile's stage ceiling"
+    assert applied["stage_limit"] < MAX_STAGES_PER_RUN
+
+
+# --- consumer resource mode: output reduction -----------------------------
+
+
+def test_a_successful_command_is_one_line_and_a_failing_one_is_its_failure():
+    """The honest half of output reduction: what the runner itself captures.
+
+    Company OS cannot compress the tool output inside a coding session - that
+    happens in the external CLI's own process, in a conversation nothing here
+    observes. What the runner captures and puts back in front of a model is a
+    different thing, and it is the only thing these reduce.
+    """
+    green = "\n".join(f"tests/test_{index}.py ...." for index in range(200))
+    green += "\n==== 812 passed in 44.10s ===="
+    summary = summarise_command("pytest", exit_code=0, stdout=green)
+    assert "\n" not in summary
+    assert "812 passed" in summary
+    assert len(summary) * 50 < len(green)
+
+    red = green + "\nFAILED tests/test_7.py::test_value - assert 1 == 2"
+    detail = summarise_command("pytest", exit_code=1, stdout=red)
+    assert "FAILED tests/test_7.py::test_value" in detail
+    assert "tests/test_0.py ...." not in detail
+
+
+def test_failure_detail_is_bounded_and_order_preserving():
+    stdout = "\n".join(f"FAILED case {index}" for index in range(200))
+    detail = failure_detail(stdout, max_lines=10)
+    lines = detail.splitlines()
+    assert len(lines) == 11
+    assert lines[0] == "FAILED case 0"
+    assert "truncated" in lines[-1]
+
+
+def test_a_passing_test_run_carries_no_failure_detail(repository):
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    runner = _runner(repository, backend, control)
+    report = runner.run_one(WORK_ORDER)
+    runs = json.loads(
+        (Path(report.run_dir) / "developer-01" / "tests.json").read_text("utf-8")
+    )["runs"]
+    assert runs
+    assert all(run["failure_detail"] == "" for run in runs)
+
+
+def test_a_session_stopped_at_its_spend_ceiling_is_not_a_successful_session():
+    """Measured, not assumed: the provider reports `is_error: false` for this.
+
+    Probed against the real CLI at `--max-budget-usd 0.0001`, the envelope came
+    back `{"subtype": "error_max_budget_usd", "is_error": false}` and exit code
+    0. Reading only `is_error` would record a session cut off part-way as a
+    clean one, and the runner would hand a half-finished attempt to a reviewer
+    as though the developer had said it was done.
+    """
+    recorder = _Recorder()
+    recorder.run = lambda argv, **kwargs: CommandResult(
+        argv=tuple(argv),
+        cwd=".",
+        exit_code=0,
+        stdout=json.dumps(
+            {
+                "type": "result",
+                "subtype": "error_max_budget_usd",
+                "is_error": False,
+                "num_turns": 1,
+                "session_id": "d5555fc0-e7de-42da-9dd4-6a5fd48c7d40",
+                "total_cost_usd": 0.042285,
+                "usage": {"input_tokens": 0, "output_tokens": 0},
+                "modelUsage": {
+                    "claude-sonnet-4-6": {
+                        "inputTokens": 2,
+                        "outputTokens": 4,
+                        "cacheCreationInputTokens": 6748,
+                        "costUSD": 0.042285,
+                    }
+                },
+            }
+        ),
+        stderr="",
+        duration_s=2.5,
+    )
+    backend = ClaudeCodeBackend(recorder, executable=sys.executable)
+    backend._resolved = sys.executable
+    outcome = backend.launch(
+        SessionRequest(
+            role="developer", cwd=Path("."), instructions="x",
+            timeout_s=60.0, max_cost=0.0001,
+        )
+    )
+    assert outcome.ok is False
+    assert outcome.stopped_reason == "error_max_budget_usd"
+    assert outcome.cost_usd == pytest.approx(0.042285)
+

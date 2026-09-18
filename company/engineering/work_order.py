@@ -60,6 +60,8 @@ from ai_platform.serde import to_jsonable
 from company.runtime.git_evidence import assert_branch_name, assert_git_sha
 from company.runtime.lifecycle import contract_from_registry
 from company.runtime.path_scope import PathScope, normalise_path
+from company.efficiency.strategy import EscalationReason
+from company.efficiency.profile import resource_profile
 from company.runtime.specification import ContextRequirements, TaskSpecification
 
 from .common import (
@@ -88,8 +90,22 @@ FORBIDDEN_BRANCHES = frozenset({"main", "master", "HEAD", "trunk"})
 ALLOWED_CEILINGS = (ReasoningClass.C, ReasoningClass.D, ReasoningClass.E)
 
 # The domain that routes an implementation task to specialist reasoning.
+#
+# This constant used to be written into *every* work order's task
+# specification. The classifier's `specialist_reasoning` rule fires on a
+# non-empty specialist domain, so every engineering job the company could
+# issue classified D, and D and above is what selects the strongest model.
+# Class C - the bounded single pass over a known contract, which is what most
+# engineering work actually is - was unreachable in production.
+#
+# It is now the value a work order carries only when the work genuinely needs
+# domain judgment, and `company.engineering.intake` decides that from the
+# request rather than asserting it for everyone.
 SPECIALIST_DOMAIN = "software_engineering"
 
+# Three automatic developer attempts was the old default, chosen when nobody
+# was counting what an attempt cost. The resource profile sets this now; the
+# constant remains the ceiling for a work order that names no profile.
 DEFAULT_MAX_DEVELOPER_ATTEMPTS = 3
 
 
@@ -120,6 +136,18 @@ class EngineeringWorkOrder:
     risk: Risk = Risk.MEDIUM
     reversible: bool = True
     evidence_required: bool = True
+    # The signals the classifier reads, carried on the work order instead of
+    # asserted by `task_specification`. Empty and False are the routine case,
+    # which is the whole point: routine work must be able to look routine.
+    specialist_domain: str = ""
+    novel: bool = False
+    # Why the strongest tier was chosen despite a routine classification. A
+    # value here is an authorization, so it lives in the work order and travels
+    # into its fingerprint rather than being decided at briefing time.
+    escalation: str = "none"
+    # Which resource profile this job runs under. Names a profile in
+    # `company.efficiency.profile`; an unknown name is refused at construction.
+    resource_profile: str = "consumer"
     version: int = WORK_ORDER_VERSION
 
     def __post_init__(self) -> None:
@@ -242,6 +270,30 @@ class EngineeringWorkOrder:
                 f"reasoning_class_ceiling {self.reasoning_class_ceiling.value!r} is not "
                 f"an engineering class; allowed: {allowed}"
             )
+        if not isinstance(self.specialist_domain, str):
+            raise EngineeringError("specialist_domain must be a string")
+        object.__setattr__(self, "specialist_domain", self.specialist_domain.strip())
+        if not isinstance(self.novel, bool):
+            raise EngineeringError("novel must be a boolean")
+        try:
+            escalation = EscalationReason(str(self.escalation or "").strip() or "none")
+        except ValueError as exc:
+            allowed = ", ".join(item.value for item in EscalationReason)
+            raise EngineeringError(f"escalation must be one of: {allowed}") from exc
+        object.__setattr__(self, "escalation", escalation.value)
+        # Refused, never defaulted: a work order naming a profile the company
+        # does not have was authorized against a policy nobody wrote.
+        try:
+            profile = resource_profile(self.resource_profile)
+        except ValueError as exc:
+            raise EngineeringError(str(exc)) from exc
+        object.__setattr__(self, "resource_profile", profile.name.value)
+        if self.max_developer_attempts > profile.developer_attempts:
+            raise EngineeringError(
+                f"max_developer_attempts {self.max_developer_attempts} exceeds the "
+                f"{profile.developer_attempts} the {profile.name.value} resource "
+                "profile authorizes; raise the profile or lower the attempts"
+            )
         if not isinstance(self.risk, Risk):
             raise EngineeringError("risk must be a Risk value")
         for name in ("reversible", "evidence_required"):
@@ -280,7 +332,8 @@ class EngineeringWorkOrder:
             reversible=self.reversible,
             evidence_required=self.evidence_required,
             requires_judgment=True,
-            specialist_domain=SPECIALIST_DOMAIN,
+            specialist_domain=self.specialist_domain,
+            novel=self.novel,
             context=ContextRequirements(
                 refs=self.context_refs,
                 constraints=self.constraints,
@@ -288,6 +341,7 @@ class EngineeringWorkOrder:
             ),
             reasoning_class_ceiling=self.reasoning_class_ceiling,
             ceo_reserved=False,
+            execution={"resource_profile": self.resource_profile},
         )
 
     def review_specification(self, reviewer_objective: str = "") -> TaskSpecification:
@@ -309,7 +363,8 @@ class EngineeringWorkOrder:
             reversible=self.reversible,
             evidence_required=True,
             requires_judgment=True,
-            specialist_domain=SPECIALIST_DOMAIN,
+            specialist_domain=self.specialist_domain,
+            novel=self.novel,
             context=ContextRequirements(
                 refs=self.context_refs,
                 constraints=self.constraints,
@@ -317,6 +372,7 @@ class EngineeringWorkOrder:
             ),
             reasoning_class_ceiling=self.reasoning_class_ceiling,
             ceo_reserved=False,
+            execution={"resource_profile": self.resource_profile},
         )
 
     def employee_contract(self, config: Any, employee: str) -> dict[str, Any]:
@@ -407,6 +463,10 @@ class EngineeringWorkOrder:
             reasoning_class_ceiling=_reasoning_class(
                 data.get("reasoning_class_ceiling", ReasoningClass.D.value)
             ),
+            specialist_domain=str(data.get("specialist_domain", "")),
+            novel=_bool(data.get("novel", False), "novel"),
+            escalation=str(data.get("escalation", "none") or "none"),
+            resource_profile=str(data.get("resource_profile", "consumer") or "consumer"),
             risk=_risk(data.get("risk", Risk.MEDIUM.value)),
             reversible=_bool(data.get("reversible", True), "reversible"),
             evidence_required=_bool(data.get("evidence_required", True), "evidence_required"),

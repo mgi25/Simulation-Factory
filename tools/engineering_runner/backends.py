@@ -119,6 +119,10 @@ class SessionRequest:
     # an untracked file inside the task worktree - which would show up in
     # `git status` and be swept into the commit the authority check reads.
     extra_dirs: tuple[Path, ...] = ()
+    # A per-session spend ceiling, in the provider's billing currency. Zero
+    # means none was set. A backend that cannot pass it to the provider leaves
+    # `cost_ceiling_enforced` False on the outcome rather than pretending.
+    max_cost: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -138,7 +142,22 @@ class SessionOutcome:
     input_units: int | None = None
     output_units: int | None = None
     cache_read_units: int | None = None
+    # Cache *creation* is billed separately from cache reads and was never
+    # captured, so every record understated what setting a session up cost.
+    cache_creation_units: int | None = None
+    # The provider's own turn count, under the provider's own name. It is not
+    # a tool-call count and must never be recorded as one.
     turns: int | None = None
+    # Which part of the envelope the token counts came from, and which metrics
+    # this session could not vouch for.
+    usage_source: str = ""
+    unreliable: tuple[str, ...] = ()
+    cost_ceiling_enforced: bool = False
+    # Non-empty when the provider stopped the session at a ceiling rather than
+    # the session finishing. Carried separately from `ok` so a reader can tell
+    # "ran out of budget" from "failed", which are different problems with
+    # different answers.
+    stopped_reason: str = ""
     permission_denials: tuple[str, ...] = ()
     provider: str = ""
 
@@ -156,7 +175,12 @@ class SessionOutcome:
             "input_units": self.input_units,
             "output_units": self.output_units,
             "cache_read_units": self.cache_read_units,
+            "cache_creation_units": self.cache_creation_units,
             "turns": self.turns,
+            "usage_source": self.usage_source,
+            "unreliable": list(self.unreliable),
+            "cost_ceiling_enforced": self.cost_ceiling_enforced,
+            "stopped_reason": self.stopped_reason,
             "permission_denials": list(self.permission_denials),
             "result_chars": len(self.result_text),
         }
@@ -232,6 +256,10 @@ class ClaudeCodeBackend:
         # print mode an unanswered permission prompt is a denial and the run
         # would stall instead of failing.
         argv += ["--permission-mode", "default" if request.read_only else "acceptEdits"]
+        # A real ceiling, applied by the provider rather than agreed to by the
+        # session. It is the only live spend limit either CLI offers.
+        if request.max_cost > 0:
+            argv += ["--max-budget-usd", f"{request.max_cost:.4f}"]
 
         result = self._runner.run(
             argv,
@@ -251,36 +279,191 @@ class ClaudeCodeBackend:
                 payload = loaded if isinstance(loaded, Mapping) else {}
             except json.JSONDecodeError:
                 payload = {}
-        usage = payload.get("usage") if isinstance(payload.get("usage"), Mapping) else {}
-        model_usage = (
-            payload.get("modelUsage")
-            if isinstance(payload.get("modelUsage"), Mapping)
-            else {}
-        )
         session_id = str(payload.get("session_id", "")) or request.session_id
         if not _SESSION_ID.fullmatch(session_id):
             raise BackendFailure(
                 f"the {self.name} session returned no usable session id; the run "
                 "cannot be attributed and is not recorded as an attempt"
             )
+        usage = normalise_claude_usage(payload)
+        # A session the provider stopped at a ceiling reports `is_error: false`
+        # and an `error_*` subtype, which is measured behaviour: probed at
+        # `--max-budget-usd 0.0001`, the envelope came back
+        # `{"subtype": "error_max_budget_usd", "is_error": false}` with an exit
+        # code of 0. Reading only `is_error` would record a session cut off
+        # part-way as a clean one, and the runner would then hand a half-done
+        # attempt to a reviewer as though the developer had finished.
+        stopped_at_ceiling = str(payload.get("subtype", "")).startswith("error")
         return SessionOutcome(
             backend=self.name,
             role=request.role,
             session_id=session_id,
-            model=request.model or (sorted(model_usage)[0] if model_usage else ""),
+            model=request.model or usage.model,
             provider="anthropic",
             exit_code=result.exit_code,
             duration_s=result.duration_s,
             result_text=self._redactor.scrub(payload.get("result", "")),
             transcript=result.stdout,
-            ok=result.ok and not bool(payload.get("is_error")),
-            cost_usd=_number(payload.get("total_cost_usd")),
+            ok=result.ok and not bool(payload.get("is_error")) and not stopped_at_ceiling,
+            stopped_reason=str(payload.get("subtype", "")) if stopped_at_ceiling else "",
+            cost_usd=usage.cost_usd,
+            input_units=usage.input_units,
+            output_units=usage.output_units,
+            cache_read_units=usage.cache_read_units,
+            cache_creation_units=usage.cache_creation_units,
+            turns=usage.turns,
+            usage_source=usage.source,
+            unreliable=usage.unreliable,
+            cost_ceiling_enforced=request.max_cost > 0,
+            permission_denials=_denials(payload.get("permission_denials")),
+        )
+
+
+@dataclass(frozen=True)
+class NormalisedUsage:
+    """One session's resource usage, read from the whole session's totals."""
+
+    cost_usd: float | None
+    input_units: int | None
+    output_units: int | None
+    cache_read_units: int | None
+    cache_creation_units: int | None
+    turns: int | None
+    model: str
+    source: str
+    unreliable: tuple[str, ...]
+
+
+def normalise_claude_usage(payload: Mapping[str, Any]) -> NormalisedUsage:
+    """Read session totals from a Claude Code result envelope, not a segment.
+
+    ## The defect this replaces
+
+    The envelope carries three accounts of one session and they are not the
+    same account:
+
+    - `total_cost_usd` - the **whole session**;
+    - `modelUsage[model]` - the **whole session**, per model;
+    - `usage` - the **final segment**, and `num_turns` with it.
+
+    Usually the session has one segment and the three agree, which is why the
+    old code read cost from the first and tokens from the third for nineteen
+    sessions without anybody noticing. In the twentieth they did not agree:
+    `usage` said 66 output tokens and 121,579 cache reads over 1 turn, while
+    `modelUsage` in the same envelope said 27,132 and 4,276,831 - a session of
+    48 billed requests over 1032 seconds recorded as one turn. Turns were
+    understated about sixty times and output about four hundred, silently, and
+    the cost stayed right so the record looked plausible.
+
+    ## The rule
+
+    `modelUsage`, summed across models, is the session total and is what is
+    recorded. The top-level `usage` is then compared against it: agreement
+    means the session had one segment and every figure describes it; a
+    disagreement means `usage` is a final segment, so `num_turns` describes
+    that segment too and **turns is marked unreliable rather than reported**.
+
+    The smaller value is never silently preferred. Where only `usage` exists -
+    an envelope with no `modelUsage` at all - it is used and its source is
+    recorded as `envelope_usage`, so a later reader can tell the two apart
+    without reopening the transcript.
+    """
+    usage = payload.get("usage") if isinstance(payload.get("usage"), Mapping) else {}
+    model_usage = (
+        payload.get("modelUsage")
+        if isinstance(payload.get("modelUsage"), Mapping)
+        else {}
+    )
+    cost = _number(payload.get("total_cost_usd"))
+    turns = _integer(payload.get("num_turns"))
+    model = sorted(model_usage)[0] if model_usage else ""
+
+    if not model_usage:
+        # Nothing to cross-check against. The figures are taken as given and
+        # labelled as what they are.
+        return NormalisedUsage(
+            cost_usd=cost,
             input_units=_integer(usage.get("input_tokens")),
             output_units=_integer(usage.get("output_tokens")),
             cache_read_units=_integer(usage.get("cache_read_input_tokens")),
-            turns=_integer(payload.get("num_turns")),
-            permission_denials=_denials(payload.get("permission_denials")),
+            cache_creation_units=_integer(usage.get("cache_creation_input_tokens")),
+            turns=turns,
+            model=model,
+            source="envelope_usage",
+            unreliable=("model_turns",) if turns is None else (),
         )
+
+    totals = _sum_model_usage(model_usage)
+    segment_output = _integer(usage.get("output_tokens"))
+    segment_cache_read = _integer(usage.get("cache_read_input_tokens"))
+    agrees = (
+        segment_output is not None
+        and segment_cache_read is not None
+        and segment_output == totals["output"]
+        and segment_cache_read == totals["cache_read"]
+    )
+
+    unreliable: list[str] = []
+    if not agrees:
+        # `usage` describes a final segment, so `num_turns` does too. The
+        # session's real turn count is not in this envelope at all.
+        unreliable.append("model_turns")
+        turns = None
+
+    model_cost = totals["cost"]
+    if cost is not None and model_cost is not None and not _close(cost, model_cost):
+        # Two session-total cost figures that disagree. Neither is preferred;
+        # the metric is marked and the larger is carried so an under-report
+        # cannot pass as a saving.
+        unreliable.append("session_cost")
+        cost = max(cost, model_cost)
+    elif cost is None:
+        cost = model_cost
+
+    return NormalisedUsage(
+        cost_usd=cost,
+        input_units=totals["input"],
+        output_units=totals["output"],
+        cache_read_units=totals["cache_read"],
+        cache_creation_units=totals["cache_creation"],
+        turns=turns,
+        model=model,
+        source="model_usage_totals" if agrees else "model_usage_totals:segment_mismatch",
+        unreliable=tuple(sorted(set(unreliable))),
+    )
+
+
+def _sum_model_usage(model_usage: Mapping[str, Any]) -> dict[str, Any]:
+    """Sum every model's block. A session may legitimately use more than one."""
+    fields = {
+        "input": "inputTokens",
+        "output": "outputTokens",
+        "cache_read": "cacheReadInputTokens",
+        "cache_creation": "cacheCreationInputTokens",
+    }
+    totals: dict[str, Any] = {name: 0 for name in fields}
+    totals["cost"] = None
+    seen = {name: False for name in fields}
+    for block in model_usage.values():
+        if not isinstance(block, Mapping):
+            continue
+        for name, key in fields.items():
+            value = _integer(block.get(key))
+            if value is not None:
+                totals[name] += value
+                seen[name] = True
+        cost = _number(block.get("costUSD"))
+        if cost is not None:
+            totals["cost"] = (totals["cost"] or 0.0) + cost
+    for name in fields:
+        if not seen[name]:
+            totals[name] = None
+    return totals
+
+
+def _close(left: float, right: float) -> bool:
+    """Equal to the cent, which is the resolution anybody acts on."""
+    return abs(left - right) <= max(0.01, abs(right) * 0.001)
 
 
 class CodexBackend:

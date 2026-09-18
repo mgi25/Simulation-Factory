@@ -61,6 +61,8 @@ from typing import Any
 from ai_platform.context_manifest import ContextKind, ContextRef
 from ai_platform.resource_classes import ReasoningClass, Risk
 from ai_platform.serde import to_jsonable
+from company.efficiency.profile import resource_profile
+from company.efficiency.strategy import EscalationReason, narrow_context_refs
 from company.runtime.path_scope import normalise_path
 from knowledge.company_os.capsules import CapsuleIndex, TaskQuery, select_capsules
 
@@ -80,6 +82,70 @@ from .work_order import (
     EngineeringWorkOrder,
 )
 
+
+# Terms in an objective that mean the work needs specialist domain judgment
+# rather than a bounded pass over a known contract. A hit sets the work order's
+# `specialist_domain`, which is what routes the job to reasoning class D and
+# therefore to the strongest model tier.
+#
+# The table is deliberately small and deliberately about *kinds of work*, not
+# about subsystems. "Refactor the authentication flow" is security work
+# wherever it lives; "add a field to a dataclass in company/security" is not.
+# A list of sensitive directories would have classified the second as the
+# first, which is how the previous behaviour - every job is specialist -
+# would come back under a new name.
+SPECIALIST_TRIGGERS: Mapping[str, tuple[str, ...]] = {
+    "security": (
+        "authentication",
+        "authorisation",
+        "authorization",
+        "cryptograph",
+        "encrypt",
+        "sandbox escape",
+        "privilege",
+        "vulnerabilit",
+        "exploit",
+    ),
+    "governance": (
+        "governance",
+        "permissions policy",
+        "protected policy",
+        "constitution",
+        "approval boundary",
+        "separation of duties",
+    ),
+    "architecture": (
+        "rewrite",
+        "re-architect",
+        "rearchitect",
+        "redesign",
+        "migrate",
+        "migration",
+        "new subsystem",
+        "breaking change",
+        "schema change",
+        "protocol change",
+    ),
+    "concurrency": (
+        "concurren",
+        "race condition",
+        "deadlock",
+        "locking",
+        "atomicit",
+        "thread saf",
+    ),
+}
+
+# Terms that mean the work has no precedent to follow. `novel` combined with
+# HIGH risk is what the classifier reads as deep reasoning.
+NOVEL_TRIGGERS: tuple[str, ...] = (
+    "from scratch",
+    "greenfield",
+    "no precedent",
+    "first of its kind",
+    "prototype a new",
+    "invent",
+)
 
 # Trigger terms for the CEO-reserved decisions in company/permissions.yaml.
 # The keys must be action names that appear in `permissions.yaml: ceo_reserved`;
@@ -205,9 +271,19 @@ class CEORequest:
     constraints: tuple[str, ...] = ()
     authorized_branch: str = ""
     base_commit: str = ""
-    max_developer_attempts: int = DEFAULT_MAX_DEVELOPER_ATTEMPTS
+    max_developer_attempts: int = 0  # 0 means "whatever the resource profile allows"
     risk: Risk = Risk.MEDIUM
     reversible: bool = True
+    # The CEO may name a specialist domain outright. Left empty, intake derives
+    # one from the objective, and most objectives derive nothing - which is the
+    # routine case and the one that reaches the cheaper model tier.
+    specialist_domain: str = ""
+    novel: bool = False
+    # An explicit request for the strongest tier, recorded as an authorization.
+    # This is the escape hatch: a CEO who knows a job is harder than it reads
+    # says so here, and the routing does not have to guess.
+    escalate_reasoning: bool = False
+    resource_profile: str = ""
     notes: str = ""
 
     def __post_init__(self) -> None:
@@ -247,15 +323,36 @@ class CEORequest:
         object.__setattr__(
             self, "constraints", text_tuple(self.constraints, "constraints", limit=24)
         )
+        try:
+            profile = resource_profile(self.resource_profile or None)
+        except ValueError as exc:
+            raise EngineeringError(str(exc)) from exc
+        object.__setattr__(self, "resource_profile", profile.name.value)
+        # An unset attempt count takes the profile's. A set one is still
+        # checked against the profile, so a request cannot buy itself more
+        # automatic attempts than the profile authorizes by naming a number.
+        attempts = self.max_developer_attempts or profile.developer_attempts
         object.__setattr__(
             self,
             "max_developer_attempts",
-            positive_int(self.max_developer_attempts, "max_developer_attempts", maximum=8),
+            positive_int(attempts, "max_developer_attempts", maximum=8),
         )
+        if self.max_developer_attempts > profile.developer_attempts:
+            raise EngineeringError(
+                f"max_developer_attempts {self.max_developer_attempts} exceeds the "
+                f"{profile.developer_attempts} the {profile.name.value} resource "
+                "profile authorizes"
+            )
         if not isinstance(self.risk, Risk):
             raise EngineeringError("risk must be a Risk value")
         if not isinstance(self.reversible, bool):
             raise EngineeringError("reversible must be a boolean")
+        if not isinstance(self.specialist_domain, str):
+            raise EngineeringError("specialist_domain must be a string")
+        object.__setattr__(self, "specialist_domain", self.specialist_domain.strip())
+        for name in ("novel", "escalate_reasoning"):
+            if not isinstance(getattr(self, name), bool):
+                raise EngineeringError(f"{name} must be a boolean")
 
     def tokens(self) -> tuple[str, ...]:
         """The objective and hints as deterministic, de-noised match tokens."""
@@ -301,11 +398,13 @@ class CEORequest:
             constraints=_strings(data.get("constraints"), "constraints"),
             authorized_branch=str(data.get("authorized_branch", "")),
             base_commit=str(data.get("base_commit", "")),
-            max_developer_attempts=int(
-                data.get("max_developer_attempts", DEFAULT_MAX_DEVELOPER_ATTEMPTS)
-            ),
+            max_developer_attempts=int(data.get("max_developer_attempts", 0)),
             risk=parsed_risk,
             reversible=bool(data.get("reversible", True)),
+            specialist_domain=str(data.get("specialist_domain", "")),
+            novel=bool(data.get("novel", False)),
+            escalate_reasoning=bool(data.get("escalate_reasoning", False)),
+            resource_profile=str(data.get("resource_profile", "")),
             notes=str(data.get("notes", "")),
         )
 
@@ -324,6 +423,15 @@ class ScopeDerivation:
     required_tests: tuple[str, ...] = ()
     criteria_derived: bool = False
     unscreened_reserved_actions: tuple[str, ...] = ()
+    specialist_domain: str = ""
+    specialist_reason: str = ""
+    novel: bool = False
+    escalation: str = "none"
+    reasoning_class_ceiling: str = ""
+    resource_profile: str = ""
+    context_refs_considered: int = 0
+    context_refs_kept: int = 0
+    context_refs_dropped: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return to_jsonable(self)
@@ -522,6 +630,8 @@ def assess_request(
     if derived and capsules:
         criteria = _derive_criteria(request, capsules, tests)
 
+    routing_preview = derive_routing(request)
+    narrowing = _narrow_refs(selection, tests, authorized)
     derivation = ScopeDerivation(
         matched_tokens=tokens,
         selected_capsule_ids=selection.ids(),
@@ -535,6 +645,15 @@ def assess_request(
         required_tests=tests,
         criteria_derived=derived,
         unscreened_reserved_actions=unscreened,
+        specialist_domain=routing_preview.specialist_domain,
+        specialist_reason=routing_preview.reason,
+        novel=routing_preview.novel,
+        escalation=routing_preview.escalation.value,
+        reasoning_class_ceiling=routing_preview.reasoning_class_ceiling.value,
+        resource_profile=request.resource_profile,
+        context_refs_considered=narrowing.considered,
+        context_refs_kept=len(narrowing.kept),
+        context_refs_dropped=narrowing.dropped_reasons,
     )
 
     if blocking:
@@ -546,6 +665,7 @@ def assess_request(
         )
 
     surface = ProtectedSurface.capture(repo_root, authorized_paths=authorized)
+    routing = derive_routing(request)
     order = EngineeringWorkOrder(
         work_order_id=work_order_id or f"wo-{request.request_id}",
         objective=request.objective,
@@ -557,14 +677,18 @@ def assess_request(
         authorized_on=authorized_on or request.requested_on,
         forbidden_paths=forbidden,
         constraints=request.constraints,
-        context_refs=_context_refs(selection, tests),
+        context_refs=_context_refs(selection, tests, authorized),
         required_tests=tests,
         protected=surface,
         base_commit=request.base_commit,
         max_developer_attempts=request.max_developer_attempts,
-        reasoning_class_ceiling=ReasoningClass.D,
+        reasoning_class_ceiling=routing.reasoning_class_ceiling,
         risk=request.risk,
         reversible=request.reversible,
+        specialist_domain=routing.specialist_domain,
+        novel=routing.novel,
+        escalation=routing.escalation.value,
+        resource_profile=request.resource_profile,
     )
     return IntakeAssessment(
         request=request,
@@ -639,7 +763,108 @@ def _derive_criteria(
     return tuple(criteria[:24])
 
 
-def _context_refs(selection: Any, tests: Sequence[str]) -> tuple[ContextRef, ...]:
+@dataclass(frozen=True)
+class RoutingDerivation:
+    """What the request routes to, and the sentence that says why.
+
+    Derived, recorded, and visible on the CEO page - the same discipline the
+    acceptance criteria follow. A routing decision nobody can read is a
+    routing decision nobody can correct.
+    """
+
+    specialist_domain: str
+    novel: bool
+    escalation: EscalationReason
+    reasoning_class_ceiling: ReasoningClass
+    reason: str
+
+
+def derive_routing(request: CEORequest) -> RoutingDerivation:
+    """Decide the classifier signals for one request, deterministically.
+
+    The rule, in order:
+
+    1. A specialist domain the CEO named is the specialist domain.
+    2. Otherwise the objective is matched against `SPECIALIST_TRIGGERS`, which
+       names kinds of work - security, governance, architecture, concurrency -
+       that need domain judgment whatever subsystem they touch.
+    3. HIGH or CRITICAL risk needs specialist depth on its own; the classifier
+       already routes it to D or E and this only records the reason.
+    4. Everything else has no specialist domain, classifies C, and runs at the
+       profile's routine tier.
+
+    Nothing here consults a model, a clock or the filesystem: the same request
+    routes the same way in this session and the next, which is what makes the
+    decision auditable after the fact.
+    """
+    text = " ".join((request.objective, request.notes)).lower()
+    novel = request.novel or any(term in text for term in NOVEL_TRIGGERS)
+
+    domain = request.specialist_domain
+    reason = ""
+    if domain:
+        reason = f"the request named the specialist domain {domain!r}"
+    else:
+        for name, terms in SPECIALIST_TRIGGERS.items():
+            hit = next((term for term in terms if term in text), "")
+            if hit:
+                domain = name
+                reason = f"the objective names {hit!r}, which is {name} work"
+                break
+    if not domain and request.risk in (Risk.HIGH, Risk.CRITICAL):
+        domain = "high_risk_change"
+        reason = f"risk {request.risk.value} needs specialist depth whatever the subject"
+    if not domain:
+        reason = (
+            "the objective names no security, governance, architecture or "
+            "concurrency work and the risk is not high, so this is routine "
+            "implementation"
+        )
+
+    escalation = (
+        EscalationReason.EXPLICIT if request.escalate_reasoning else EscalationReason.NONE
+    )
+    if request.escalate_reasoning and not domain:
+        domain = "explicit_escalation"
+        reason = "the request explicitly escalated this job to the strongest tier"
+
+    # The ceiling is the highest class the work order authorizes, not the class
+    # it will be. It has to sit above whatever the classifier will produce, or
+    # `plan_task` refuses the job rather than downgrading it - which is the
+    # right refusal and the wrong moment to discover it.
+    ceiling = ReasoningClass.D
+    if request.risk is Risk.CRITICAL or (request.risk is Risk.HIGH and novel):
+        ceiling = ReasoningClass.E
+    elif not request.reversible:
+        # `requires_judgment` is True for every engineering task, so an
+        # irreversible one classifies E by the deep_reasoning rule.
+        ceiling = ReasoningClass.E
+
+    return RoutingDerivation(
+        specialist_domain=domain,
+        novel=novel,
+        escalation=escalation,
+        reasoning_class_ceiling=ceiling,
+        reason=reason,
+    )
+
+
+def _capsule_paths(selection: Any) -> dict[str, tuple[str, ...]]:
+    """Every selected capsule's owned paths, for reference narrowing.
+
+    Read from the capsules already in hand. Nothing is loaded, so narrowing
+    costs no I/O and cannot disagree with the selection it narrows.
+    """
+    owned: dict[str, tuple[str, ...]] = {}
+    for match in getattr(selection, "matches", ()):  # pragma: no branch
+        capsule = match.capsule
+        owned[capsule.id] = tuple(
+            _strip_glob(path) for path in capsule.owns_paths
+        ) + tuple(_strip_glob(path) for path in capsule.tests)
+    return owned
+
+
+def _all_refs(selection: Any, tests: Sequence[str]) -> tuple[ContextRef, ...]:
     """The capsules as module contracts, and the declared tests as test refs."""
     refs = list(selection.refs())
     seen = {ref.key for ref in refs}
@@ -655,6 +880,32 @@ def _context_refs(selection: Any, tests: Sequence[str]) -> tuple[ContextRef, ...
     return tuple(refs[:12])
 
 
+def _narrow_refs(
+    selection: Any, tests: Sequence[str], authorized: Sequence[str]
+):
+    """Narrow the candidate references to the ones the scope actually bears on.
+
+    This is where the narrowing *happens*, rather than where it is reported.
+    The previous implementation computed a scoped list in the briefing and
+    sent the packet the unnarrowed one, so the record claimed a reduction the
+    session never received. Narrowing here means the work order, the packet,
+    the briefing and the receipt all carry the same references, because there
+    is only one set.
+    """
+    return narrow_context_refs(
+        _all_refs(selection, tests),
+        tuple(authorized),
+        capsule_paths=_capsule_paths(selection),
+        floor=1,
+    )
+
+
+def _context_refs(
+    selection: Any, tests: Sequence[str], authorized: Sequence[str]
+) -> tuple[ContextRef, ...]:
+    return _narrow_refs(selection, tests, authorized).kept
+
+
 def _strings(value: Any, field_name: str) -> tuple[str, ...]:
     if value is None:
         return ()
@@ -665,7 +916,11 @@ def _strings(value: Any, field_name: str) -> tuple[str, ...]:
 
 __all__ = [
     "CREDENTIAL_TRIGGERS",
+    "NOVEL_TRIGGERS",
     "RESERVED_TRIGGERS",
+    "SPECIALIST_TRIGGERS",
+    "RoutingDerivation",
+    "derive_routing",
     "CEORequest",
     "DecisionRequired",
     "IntakeAssessment",

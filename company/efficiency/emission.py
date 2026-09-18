@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ai_platform.context_manifest import ContextKind
+from ai_platform.resource_classes import ReasoningClass
 from ai_platform.serde import dumps
 from ai_platform.usage import UsageUnit
 from ai_platform.usage import Outcome
@@ -25,6 +26,7 @@ from .providers import (
 )
 from .baseline import AfterComparison, Baseline, compare_against_baseline, extract_baseline
 from .budget import BudgetCheck, check_budget, should_checkpoint
+from .profile import resource_profile
 from .store import EfficiencyStore
 from .strategy import ExecutionStrategy, select_strategy
 from .telemetry import (
@@ -150,25 +152,36 @@ def emit_execution_efficiency(
     )
     pointer = store.append_idempotent(record)
 
-    # --- budget enforcement at finalization ---
+    # --- budget scoring at finalization ---
+    #
+    # The strategy is re-selected from the plan's **classification**, not from
+    # the work order's reasoning-class ceiling. They are different things: the
+    # ceiling is the highest class the CEO authorized, the classification is
+    # the class the task actually is, and reading the ceiling made every job
+    # look like specialist work and therefore recommended the strongest model
+    # to every one of them.
     budget_result = None
     checkpoint_needed = False
     after_cmp = None
     try:
-        from ai_platform.resource_classes import ReasoningClass
         strategy = select_strategy(
-            plan.specification.reasoning_class_ceiling
-            if hasattr(plan.specification, "reasoning_class_ceiling")
-            else ReasoningClass(plan.classification.reasoning_class.value),
+            ReasoningClass(plan.classification.resource_class.code.value),
             plan.specification.risk,
+            evidence_required=plan.specification.evidence_required,
             max_context_refs=len(packet.context_refs),
-            is_review=packet.path_scope.read_only if hasattr(packet.path_scope, "read_only") else False,
+            is_review=getattr(packet.path_scope, "read_only", False),
+            profile=resource_profile(_profile_name(plan)),
         )
         budget_result = check_budget(
             strategy,
-            turns=receipt.usage.passes + receipt.usage.retries if receipt.usage.passes is not None else None,
-            tool_calls=receipt.usage.tool_calls,
-            input_tokens=receipt.usage.input_units if receipt.usage.usage_unit and receipt.usage.usage_unit.value == "token" else None,
+            wall_seconds=receipt.usage.duration_s,
+            session_cost=receipt.usage.provider_cost,
+            cost_ceiling_enforced=receipt.usage.cost_ceiling_enforced,
+            context_chars=len(packet_text) + (record.tool_output_chars or 0),
+            input_tokens=receipt.usage.input_units,
+            output_tokens=receipt.usage.output_units,
+            cache_read_units=receipt.usage.cache_hits or None,
+            unreliable=receipt.usage.unreliable_metrics,
         )
         checkpoint_needed = should_checkpoint(
             strategy,
@@ -177,7 +190,7 @@ def emit_execution_efficiency(
             has_committed_progress=bool(receipt.commit_sha),
         )
     except Exception:
-        pass  # budget check is observational; failure does not replace the result
+        pass  # budget scoring is observational; failure does not replace the result
 
     # --- AFTER comparison against pre-extracted baseline ---
     if pre_baseline is not None and pre_baseline.entries:
@@ -193,6 +206,21 @@ def emit_execution_efficiency(
         should_checkpoint=checkpoint_needed,
         after_comparison=after_cmp,
     )
+
+
+def _profile_name(plan: TaskPlan) -> str:
+    """The resource profile this task was planned under, or the default.
+
+    Carried in `TaskSpecification.execution`, which is the existing free-form
+    slot for execution metadata; a missing key means the default profile,
+    because a plan written before profiles existed was executed under whatever
+    the company's default then was.
+    """
+    execution = getattr(plan.specification, "execution", None) or {}
+    try:
+        return str(execution.get("resource_profile", "") or "")
+    except AttributeError:
+        return ""
 
 
 def _provider_usage(receipt: SessionReceipt) -> ProviderUsage:

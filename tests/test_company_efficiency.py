@@ -359,16 +359,39 @@ def test_minimalism_check_requires_every_cheaper_reuse_tier() -> None:
 
 # --- execution strategy selection ------------------------------------------
 
+from decimal import Decimal
+
+from ai_platform.context_manifest import ContextKind, ContextRef
 from ai_platform.resource_classes import ReasoningClass, Risk
+from company.efficiency.profile import (
+    CONSUMER,
+    EXPANDED,
+    PROFILES,
+    ResourceProfile,
+    ResourceProfileName,
+    resource_profile,
+)
 from company.efficiency.strategy import (
     CheckpointRule,
+    ContextNarrowing,
+    EscalationReason,
     ExecutionStrategy,
     ModelTier,
     OutputReductionDirective,
     ResourceCeiling,
+    narrow_context_refs,
+    reference_repository_path,
+    scope_file_listing,
     select_strategy,
 )
-from company.efficiency.budget import BudgetCheck, check_budget, should_checkpoint
+from company.efficiency.budget import (
+    DIMENSIONS,
+    BudgetCheck,
+    Enforceability,
+    check_budget,
+    dimension,
+    should_checkpoint,
+)
 from company.efficiency.baseline import Baseline, BaselineEntry, extract_baseline
 
 
@@ -432,36 +455,120 @@ def test_output_reduction_standard_omits_passing_tests() -> None:
     assert full.omit_passing_test_detail is False
 
 
-def test_resource_ceiling_varies_by_tier() -> None:
-    standard = ResourceCeiling.for_tier(ModelTier.STANDARD, ReasoningClass.C)
-    strongest = ResourceCeiling.for_tier(ModelTier.STRONGEST, ReasoningClass.D)
-    assert strongest.max_turns >= standard.max_turns
-    assert strongest.max_tool_calls >= standard.max_tool_calls
+def test_resource_ceiling_comes_from_the_profile_not_the_tier() -> None:
+    """A ceiling is what the company will spend, not what the model deserves.
+
+    The old table gave the strongest tier a *larger* budget than the standard
+    one, which is backwards: an expensive model reaching a ceiling is the case
+    the ceiling exists for. Ceilings now come from the resource profile and
+    are the same whatever tier the job routes to.
+    """
+    consumer = ResourceCeiling.from_profile(CONSUMER)
+    expanded = ResourceCeiling.from_profile(EXPANDED)
+    assert expanded.max_wall_seconds > consumer.max_wall_seconds
+    assert expanded.max_turns > consumer.max_turns
+
+    routine = select_strategy(ReasoningClass.C, Risk.LOW, profile=CONSUMER)
+    specialist = select_strategy(ReasoningClass.D, Risk.LOW, profile=CONSUMER)
+    assert routine.model_tier is ModelTier.STANDARD
+    assert specialist.model_tier is ModelTier.STRONGEST
+    assert routine.resource_ceiling == specialist.resource_ceiling
+
+
+def test_a_review_gets_a_tighter_ceiling_than_the_work_it_judges() -> None:
+    implementation = ResourceCeiling.from_profile(CONSUMER)
+    review = ResourceCeiling.from_profile(CONSUMER, is_review=True)
+    assert review.max_wall_seconds < implementation.max_wall_seconds
+    assert Decimal(review.max_session_cost) < Decimal(implementation.max_session_cost)
 
 
 # --- budget enforcement ----------------------------------------------------
 
 
-def test_budget_check_detects_violations() -> None:
-    strategy = select_strategy(ReasoningClass.C, Risk.LOW)
-    ok = check_budget(strategy, context_chars=1000, turns=5, tool_calls=10)
-    assert ok.within_budget
-    assert not ok.exceeded
-    assert ok.violations == ()
+def test_budget_check_separates_a_broken_limit_from_a_passed_estimate() -> None:
+    """Only a live-enforceable breach counts as being over budget.
 
-    over = check_budget(
+    Wall time is held by the runner terminating a process, so exceeding it is
+    a failure. Context characters are only observable after the fact, so
+    exceeding them is a measurement. Reporting both as violations is how the
+    real breach becomes easy to ignore.
+    """
+    strategy = select_strategy(ReasoningClass.C, Risk.LOW, profile=CONSUMER)
+
+    ok = check_budget(strategy, wall_seconds=120.0, context_chars=1_000)
+    assert ok.within_budget
+    assert ok.enforced_violations == ()
+
+    observed = check_budget(
         strategy,
+        wall_seconds=120.0,
         context_chars=strategy.context_budget_chars + 1,
-        turns=strategy.resource_ceiling.max_turns + 1,
     )
-    assert over.exceeded
-    assert len(over.violations) == 2
+    assert observed.within_budget, "an estimate passed is not a limit broken"
+    assert len(observed.observed_violations) == 1
+
+    broken = check_budget(
+        strategy,
+        wall_seconds=strategy.resource_ceiling.max_wall_seconds + 1,
+    )
+    assert broken.exceeded
+    assert len(broken.enforced_violations) == 1
+
+
+def test_every_budget_dimension_declares_what_can_be_done_about_it() -> None:
+    names = {item.name for item in DIMENSIONS}
+    assert "model_turns" in names
+    assert dimension("model_turns").enforceability is Enforceability.UNAVAILABLE
+    assert dimension("wall_seconds").enforceability is Enforceability.LIVE_ENFORCEABLE
+    assert (
+        dimension("input_tokens").enforceability
+        is Enforceability.POST_SESSION_OBSERVABLE
+    )
+    # Every dimension is classified. A dimension with no class would be one the
+    # company could describe as enforced without ever saying who enforces it.
+    assert all(isinstance(item.enforceability, Enforceability) for item in DIMENSIONS)
+    assert all(item.note.strip() for item in DIMENSIONS)
+
+
+def test_an_unreliable_metric_is_left_unscored_rather_than_passed() -> None:
+    """A check against a number known to be wrong is worse than no check."""
+    strategy = select_strategy(ReasoningClass.C, Risk.LOW, profile=CONSUMER)
+    result = check_budget(
+        strategy,
+        wall_seconds=10.0,
+        context_chars=10,
+        unreliable=("context_chars",),
+    )
+    assert "context_chars" in result.unscored
+    scored = {item.name: item for item in result.results}
+    assert not scored["context_chars"].scored
+    assert "unreliable" in scored["context_chars"].detail
+
+
+def test_a_cost_ceiling_nobody_passed_to_the_provider_is_not_enforcement() -> None:
+    strategy = select_strategy(ReasoningClass.C, Risk.LOW, profile=CONSUMER)
+    unenforced = check_budget(strategy, session_cost="99.00", cost_ceiling_enforced=False)
+    assert unenforced.within_budget
+    assert unenforced.observed_violations
+
+    enforced = check_budget(strategy, session_cost="99.00", cost_ceiling_enforced=True)
+    assert enforced.exceeded
+    assert enforced.enforced_violations
+
+
+def test_model_turns_are_never_scored() -> None:
+    """The one number the provider was measured lying about stays unscored."""
+    strategy = select_strategy(ReasoningClass.C, Risk.LOW, profile=CONSUMER)
+    result = check_budget(strategy, wall_seconds=1.0)
+    assert "model_turns" in result.unscored
 
 
 def test_budget_check_handles_none_values() -> None:
     strategy = select_strategy(ReasoningClass.D, Risk.MEDIUM)
     result = check_budget(strategy)
     assert result.within_budget
+    # And says so honestly: nothing was supplied, so nothing was scored.
+    assert len(result.unscored) == len(result.results)
 
 
 def test_checkpoint_respects_critical_section() -> None:
@@ -777,3 +884,148 @@ def test_baseline_extraction_excludes_current_record_in_emission(tmp_path) -> No
     # But a fresh extraction would include both
     fresh_baseline = extract_baseline(tmp_path)
     assert len(fresh_baseline.entries) == 2
+
+
+# --- the consumer resource profile ----------------------------------------
+
+
+def test_the_consumer_profile_is_the_default() -> None:
+    assert resource_profile() is CONSUMER
+    assert resource_profile("consumer") is CONSUMER
+    assert resource_profile("expanded") is EXPANDED
+
+
+def test_an_unknown_profile_is_refused_rather_than_defaulted() -> None:
+    """Defaulting a typo would pick a policy nobody asked for and record it."""
+    with pytest.raises(ValueError, match="unknown resource profile"):
+        resource_profile("unlimited")
+
+
+def test_the_consumer_profile_says_what_consumer_mode_means() -> None:
+    assert CONSUMER.provider_count == 1
+    assert CONSUMER.parallel_sessions == 1
+    assert CONSUMER.developer_attempts == 1
+    assert CONSUMER.reviewer_passes == 1
+    assert CONSUMER.auto_continue_after_changes_required is False
+    assert CONSUMER.routine_tier is ModelTier.STANDARD
+    assert CONSUMER.strongest_requires_escalation is True
+    assert CONSUMER.include_capsule_dependencies is False
+    assert CONSUMER.context_ref_ceiling < EXPANDED.context_ref_ceiling
+    assert CONSUMER.session_wall_seconds < EXPANDED.session_wall_seconds
+
+
+def test_no_profile_field_is_a_provider_quota() -> None:
+    """Provider quotas change without notice and belong to the vendor.
+
+    A weak test by construction - it cannot prove a number's provenance - but
+    it pins the shape: every ceiling is a Company quantity in Company units,
+    and nothing names a plan, a vendor or a model.
+    """
+    for profile in PROFILES.values():
+        terms = profile.to_dict()
+        text = " ".join(str(value).lower() for value in terms.values())
+        for vendor_word in ("claude", "anthropic", "openai", "gpt", "sonnet", "opus"):
+            assert vendor_word not in text
+        assert set(terms) >= {
+            "developer_attempts",
+            "session_wall_seconds",
+            "stage_ceiling",
+            "context_ref_ceiling",
+        }
+
+
+def test_the_profile_is_what_makes_the_standard_tier_reachable() -> None:
+    routine = select_strategy(ReasoningClass.C, Risk.LOW, profile=CONSUMER)
+    assert routine.model_tier is ModelTier.STANDARD
+    assert routine.profile_name == "consumer"
+    assert routine.provider_count == 1
+    assert routine.parallel_sessions == 1
+
+
+def test_the_four_routes_to_the_strongest_tier() -> None:
+    """Specialist depth, real risk, an explicit ask, and a cheaper model failing."""
+    assert (
+        select_strategy(ReasoningClass.D, Risk.LOW, profile=CONSUMER).model_tier
+        is ModelTier.STRONGEST
+    )
+    assert (
+        select_strategy(ReasoningClass.C, Risk.HIGH, profile=CONSUMER).model_tier
+        is ModelTier.STRONGEST
+    )
+    explicit = select_strategy(
+        ReasoningClass.C, Risk.LOW, profile=CONSUMER,
+        escalation=EscalationReason.EXPLICIT,
+    )
+    assert explicit.model_tier is ModelTier.STRONGEST
+    assert "explicitly escalated" in explicit.strategy_reason
+    failed = select_strategy(
+        ReasoningClass.C, Risk.LOW, profile=CONSUMER,
+        escalation=EscalationReason.CHEAPER_MODEL_FAILED,
+    )
+    assert failed.model_tier is ModelTier.STRONGEST
+    assert "did not satisfy review" in failed.strategy_reason
+
+
+def test_evidence_required_does_not_buy_a_stronger_model() -> None:
+    """It changes how thoroughly the work is reviewed, not who does it."""
+    plain = select_strategy(ReasoningClass.C, Risk.LOW, profile=CONSUMER)
+    evidenced = select_strategy(
+        ReasoningClass.C, Risk.LOW, evidence_required=True, profile=CONSUMER
+    )
+    assert plain.model_tier is evidenced.model_tier is ModelTier.STANDARD
+
+
+def test_the_profile_ceiling_bounds_a_greedy_context_request() -> None:
+    strategy = select_strategy(
+        ReasoningClass.C, Risk.LOW, max_context_refs=500, profile=CONSUMER
+    )
+    assert (
+        strategy.context_budget_chars
+        == CONSUMER.context_ref_ceiling * CONSUMER.chars_per_ref
+    )
+
+
+# --- the reference/path bug ------------------------------------------------
+
+
+def test_a_reference_key_is_not_a_repository_path() -> None:
+    """The defect in one assertion.
+
+    `scope_file_listing` was handed keys and compared them with paths. A key
+    carries a `<kind>:` prefix, so nothing ever matched and the filter reported
+    a total reduction that had removed nothing.
+    """
+    ref = ContextRef(
+        kind=ContextKind.TEST, ref="tests/test_company_efficiency.py", reason="declared"
+    )
+    assert ref.key == "test:tests/test_company_efficiency.py"
+    assert scope_file_listing((ref.key,), ("tests",)) == ()
+    assert reference_repository_path(ref) == "tests/test_company_efficiency.py"
+    assert scope_file_listing((reference_repository_path(ref),), ("tests",))
+
+
+def test_a_knowledge_reference_has_no_repository_path() -> None:
+    """And must not be scored as though it had one."""
+    for kind in (ContextKind.FACT, ContextKind.DECISION, ContextKind.EXPERIMENT):
+        ref = ContextRef(kind=kind, ref="decision/classifier-order", reason="why")
+        assert reference_repository_path(ref) is None
+    kept = narrow_context_refs(
+        (ContextRef(kind=ContextKind.FACT, ref="fact/x", reason="why"),),
+        ("company/efficiency",),
+    )
+    assert len(kept.kept) == 1
+
+
+def test_narrowing_keeps_a_containing_directory_reference() -> None:
+    """Both containment directions count.
+
+    A scope of `company/efficiency/profile.py` is bounded by a contract that
+    covers `company/efficiency`; dropping the directory-level reference would
+    discard the most useful pointer in the packet.
+    """
+    ref = ContextRef(
+        kind=ContextKind.FILE, ref="company/efficiency", reason="the module"
+    )
+    result = narrow_context_refs((ref,), ("company/efficiency/profile.py",))
+    assert result.kept == (ref,)
+

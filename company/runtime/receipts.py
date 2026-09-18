@@ -115,6 +115,24 @@ class ReceiptUsage:
     provider_latency_ms: int | None = None
     provider_cost: str | None = None
     provider_cost_currency: str = ""
+    # Cache *creation* is billed separately from cache reads and was never
+    # captured, so every record under-reported what a session actually cost to
+    # set up. None still means "the provider did not say".
+    cache_creation_units: int | None = None
+    # The provider's own count of model turns, under its own name. It is not
+    # `tool_calls`: the two were conflated, and a receipt that renames one as
+    # the other makes a number that was never measured look measured.
+    model_turns: int | None = None
+    # Which part of the provider envelope the token counts were read from, so
+    # a later reader can tell a session total from a final-segment figure
+    # without re-opening the transcript.
+    usage_source: str = ""
+    # Metrics this session's telemetry could not vouch for, by budget-dimension
+    # name. `company.efficiency.budget.check_budget` refuses to score them.
+    unreliable_metrics: tuple[str, ...] = ()
+    # Whether the backend was actually given a spend ceiling. Without this the
+    # cost dimension is an observation, not a limit.
+    cost_ceiling_enforced: bool = False
 
     def __post_init__(self) -> None:
         for name in ("passes", "retries", "cache_hits", "retrieval_hits"):
@@ -127,7 +145,7 @@ class ReceiptUsage:
             raise ValidationError("receipt.usage.passes describes at least one pass")
         for name in (
             "cache_misses", "tool_calls", "input_units", "output_units",
-            "provider_latency_ms",
+            "provider_latency_ms", "cache_creation_units", "model_turns",
         ):
             value = getattr(self, name)
             if value is None:
@@ -146,10 +164,22 @@ class ReceiptUsage:
                     "receipt.usage.duration_s must be a number or null"
                 )
             object.__setattr__(self, "duration_s", float(self.duration_s))
-        for name in ("provider", "model", "provider_cost_currency"):
+        for name in ("provider", "model", "provider_cost_currency", "usage_source"):
             value = getattr(self, name)
             if not isinstance(value, str):
                 raise ValidationError(f"receipt.usage.{name} must be a string")
+        if not isinstance(self.cost_ceiling_enforced, bool):
+            raise ValidationError("receipt.usage.cost_ceiling_enforced must be a boolean")
+        metrics = self.unreliable_metrics
+        if isinstance(metrics, (str, bytes)) or not isinstance(metrics, (list, tuple)):
+            raise ValidationError(
+                "receipt.usage.unreliable_metrics must be a list of metric names"
+            )
+        object.__setattr__(
+            self,
+            "unreliable_metrics",
+            tuple(sorted({str(item).strip() for item in metrics if str(item).strip()})),
+        )
         if self.provider_cost is not None:
             if not isinstance(self.provider_cost, str):
                 raise ValidationError("receipt.usage.provider_cost must be a decimal string or null")

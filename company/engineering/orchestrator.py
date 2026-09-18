@@ -52,6 +52,8 @@ from pathlib import Path
 
 from ai_platform.usage import Outcome
 from company.config_types import CompanyConfig
+from company.efficiency.profile import resource_profile
+from company.runtime.context_assembly import ContextAssemblyPolicy
 from company.runtime.context_expansion import ContextExpansionLedger
 from company.runtime.execution_store import ExecutionStore
 from company.runtime.lifecycle import TaskPlan, plan_task
@@ -199,6 +201,29 @@ def open_job(
 # --- stage 2: the developer session --------------------------------------
 
 
+def _context_policy(order: EngineeringWorkOrder) -> ContextAssemblyPolicy:
+    """The context policy this work order's resource profile asks for.
+
+    The reasoning class already caps how many references a task may carry -
+    twelve for a bounded change, twenty for specialist work. The profile caps
+    it again, lower, and the smaller number wins. Without this the packet
+    filled itself to the class ceiling with automatically selected capsules
+    whatever the profile said, which is where most of the context in a routine
+    job was actually coming from: not from what the work order asked for, but
+    from the capsule graph's transitive dependencies filling the space left.
+    """
+    profile = resource_profile(order.resource_profile)
+    # Specialist work gets the capsule graph even under a profile that would
+    # otherwise withhold it. The graph is the point of specialist work, and a
+    # job routed to the strongest model because it needs domain judgment is not
+    # the job to economise on background.
+    specialist = bool(order.specialist_domain) or order.escalation != "none"
+    return ContextAssemblyPolicy(
+        automatic_ref_ceiling=profile.context_ref_ceiling,
+        include_dependencies=profile.include_capsule_dependencies or specialist,
+    )
+
+
 def prepare_developer_session(
     store: EngineeringStore,
     execution_store: ExecutionStore,
@@ -217,7 +242,8 @@ def prepare_developer_session(
     refusal = job.refusal(JobState.DEVELOPING)
     if refusal:
         raise EngineeringError(refusal)
-    routed = plan_task(order.task_specification(), config)
+    policy = _context_policy(order)
+    routed = plan_task(order.task_specification(), config, context_policy=policy)
     if not routed.ready or routed.selected_employee is None:
         reason = routed.escalation.reason or "the work order could not be prepared"
         raise EngineeringError(
@@ -225,7 +251,12 @@ def prepare_developer_session(
         )
     employee = routed.selected_employee
     contract = order.employee_contract(config, employee)
-    scoped = plan_task(order.task_specification(), config, employee_contract=contract)
+    scoped = plan_task(
+        order.task_specification(),
+        config,
+        employee_contract=contract,
+        context_policy=policy,
+    )
     prepared = ManualExternalSessionAdapter(execution_store).prepare(
         scoped,
         expected_branch=order.authorized_branch,
@@ -326,7 +357,8 @@ def prepare_review_session(
     refusal = job.refusal(JobState.REVIEWING)
     if refusal:
         raise EngineeringError(refusal)
-    routed = plan_task(order.review_specification(), config)
+    policy = _context_policy(order)
+    routed = plan_task(order.review_specification(), config, context_policy=policy)
     if not routed.ready or routed.selected_employee is None:
         reason = routed.escalation.reason or "no reviewer could be routed"
         raise EngineeringError(
@@ -340,7 +372,12 @@ def prepare_review_session(
             "employee; staff the review capability separately."
         )
     contract = order.reviewer_contract(config, reviewer)
-    scoped = plan_task(order.review_specification(), config, employee_contract=contract)
+    scoped = plan_task(
+        order.review_specification(),
+        config,
+        employee_contract=contract,
+        context_policy=policy,
+    )
     prepared = ManualExternalSessionAdapter(execution_store).prepare(
         scoped,
         expected_branch=order.authorized_branch,
@@ -467,11 +504,18 @@ def record_review(
             evidence_refs=evidence,
         )
     elif review.outcome is ReviewOutcome.CHANGES_REQUIRED:
+        # The explicit continuation state. Under a resource profile that
+        # authorizes one developer attempt - which is what consumer mode is -
+        # this is the ordinary end of a job whose review found something, and
+        # it is reached *instead of* automatically spending another session.
+        # Nothing here decides whether the work should continue; it records
+        # that continuing needs an authorization the company does not hold.
         moved = job.requiring_decision(
             (
                 f"the work order's {job.max_developer_attempts} authorized developer "
-                "attempt(s) are spent and the review still requires changes; a further "
-                "attempt needs a new work order",
+                "attempt(s) are spent and the review still requires changes; "
+                "continuing needs either additional-attempt authorization on this "
+                "work order or a new one",
             ),
             on=day,
             actor=review.reviewer,

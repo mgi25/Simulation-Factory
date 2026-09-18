@@ -62,6 +62,7 @@ from .authorization import AuthorityEnvelope, normalise_path
 from .backends import SessionOutcome
 from .errors import IntegrityFailure
 from .process import CommandRunner
+from .resources import failure_detail
 
 
 # pytest's own last line. Both shapes appear: with a duration and, under
@@ -116,6 +117,10 @@ class TestRun:
     summary: str
     duration_s: float
     timed_out: bool
+    # The failure lines, and only when there was a failure. A passing run's
+    # output tells a reader nothing the counts do not, and a green 900-line
+    # pytest log is 900 lines of context bought for one bit of information.
+    failure_detail: str = ""
 
     @property
     def green(self) -> bool:
@@ -134,6 +139,7 @@ class TestRun:
             "summary": self.summary,
             "duration_s": round(self.duration_s, 3),
             "timed_out": self.timed_out,
+            "failure_detail": self.failure_detail,
             "green": self.green,
         }
 
@@ -177,6 +183,11 @@ def run_tests(
                 or (f"timed out after {timeout_s:.0f}s" if result.timed_out else "no summary line"),
                 duration_s=result.duration_s,
                 timed_out=result.timed_out,
+                failure_detail=(
+                    ""
+                    if result.exit_code == 0 and not result.timed_out
+                    else failure_detail(result.stdout)
+                ),
             )
         )
     return tuple(runs)
@@ -604,6 +615,27 @@ def _evidence(narrative: Mapping[str, Any], observation: GitObservation) -> list
 
 
 def _usage(session: SessionOutcome) -> dict[str, Any]:
+    """The session's resource usage, each number under its own name.
+
+    Two things this deliberately does not do:
+
+    **It does not record turns as tool calls.** `num_turns` is the provider's
+    count of model turns and `tool_calls` is a count of tool invocations. They
+    are different quantities, they were measured differing, and writing one
+    into the other made a number nobody had measured look measured. `tool_calls`
+    is now left absent unless a provider actually reports one, and the turn
+    count travels as `model_turns`.
+
+    **It does not report a metric the normaliser could not vouch for.** A
+    session whose envelope carried a final-segment `usage` block has no
+    trustworthy turn count anywhere in it; `unreliable_metrics` says so and the
+    company's budget check refuses to score it, rather than scoring a number
+    known to be wrong.
+
+    `passes` and `retries` stay 1 and 0 because that is the truth of one
+    session: it is one pass, and the runner does not retry a session inside a
+    stage. They are not a turn count and were never one.
+    """
     usage: dict[str, Any] = {
         "passes": 1,
         "retries": 0,
@@ -611,6 +643,9 @@ def _usage(session: SessionOutcome) -> dict[str, Any]:
         "provider": session.provider,
         "model": session.model,
         "duration_s": round(session.duration_s, 3),
+        "usage_source": session.usage_source,
+        "unreliable_metrics": list(session.unreliable),
+        "cost_ceiling_enforced": session.cost_ceiling_enforced,
     }
     if session.input_units is not None:
         usage["input_units"] = session.input_units
@@ -618,8 +653,10 @@ def _usage(session: SessionOutcome) -> dict[str, Any]:
         usage["output_units"] = session.output_units
     if session.cache_read_units is not None:
         usage["cache_hits"] = session.cache_read_units
+    if session.cache_creation_units is not None:
+        usage["cache_creation_units"] = session.cache_creation_units
     if session.turns is not None:
-        usage["tool_calls"] = session.turns
+        usage["model_turns"] = session.turns
     if session.cost_usd is not None:
         usage["provider_cost"] = f"{session.cost_usd:.6f}"
         usage["provider_cost_currency"] = "USD"
