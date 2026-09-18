@@ -131,6 +131,21 @@ class ResourceProfile:
     session_turn_ceiling: int
     session_cost_ceiling: Decimal | None
     cost_currency: str
+    # A repository-exploration proxy, not a turn or a cost figure. Company OS
+    # cannot see a file read or a grep - `tools/engineering_runner`'s backend
+    # runs the CLI with `--output-format json`, which returns one final
+    # envelope and no per-tool-call log, for every session this company has
+    # ever recorded. What it *can* see is `cache_read_units`: context re-sent
+    # on every turn, which grows with exactly what a session reads. Measured
+    # on this company's own dogfood work order under Consumer Mode V1 - two
+    # files changed, one developer attempt - the developer session alone read
+    # 1,835,390 cache units. This ceiling is set below that measured number on
+    # purpose, so a session that explores the way that one did is flagged
+    # rather than accepted silently. It is POST_SESSION_OBSERVABLE, the same
+    # class as the cost and token counts beside it: nothing stops the read
+    # while it happens, and exceeding this is a fact about a session already
+    # paid for, never an enforced limit.
+    session_cache_read_ceiling: int
 
     # --- one job's lifetime -----------------------------------------------
     # How many runner stages one work order may consume before the runner
@@ -153,6 +168,7 @@ class ResourceProfile:
             "chars_per_ref",
             "session_wall_seconds",
             "session_turn_ceiling",
+            "session_cache_read_ceiling",
             "stage_ceiling",
         ):
             value = getattr(self, field_name)
@@ -198,6 +214,7 @@ class ResourceProfile:
             "include_capsule_dependencies": self.include_capsule_dependencies,
             "session_wall_seconds": self.session_wall_seconds,
             "session_turn_ceiling": self.session_turn_ceiling,
+            "session_cache_read_ceiling": self.session_cache_read_ceiling,
             "session_cost_ceiling": (
                 str(self.session_cost_ceiling)
                 if self.session_cost_ceiling is not None
@@ -232,6 +249,7 @@ CONSUMER = ResourceProfile(
     include_capsule_dependencies=False,
     session_wall_seconds=1_800,
     session_turn_ceiling=40,
+    session_cache_read_ceiling=1_000_000,
     session_cost_ceiling=Decimal("3.00"),
     cost_currency="USD",
     stage_ceiling=4,
@@ -257,6 +275,7 @@ EXPANDED = ResourceProfile(
     include_capsule_dependencies=True,
     session_wall_seconds=3_600,
     session_turn_ceiling=120,
+    session_cache_read_ceiling=3_000_000,
     session_cost_ceiling=Decimal("12.00"),
     cost_currency="USD",
     stage_ceiling=12,

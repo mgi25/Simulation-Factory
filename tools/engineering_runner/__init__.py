@@ -81,6 +81,7 @@ what keeps `health.no_new_dependency` green.
 | `queue` | leases, run directories and the append-only outcome log |
 | `runner` | the loop |
 | `redaction` | what never reaches a persisted transcript |
+| `repo_map` | a cheap `ast`-built map of the worktree, queried into a briefing |
 """
 
 from __future__ import annotations
@@ -138,6 +139,15 @@ from .evidence import (
 )
 from .process import CommandResult, CommandRunner, resolve_executable
 from .queue import Lease, RunStore, task_directory_name
+from .repo_map import (
+    ModuleMap,
+    QueryHit,
+    RepoMap,
+    build_and_cache,
+    build_repo_map,
+    load_or_build,
+)
+from .repo_map import query as query_repo_map
 from .redaction import (
     REDACTED,
     Redactor,
@@ -177,8 +187,11 @@ __all__ = [
     "GitStatus",
     "IntegrityFailure",
     "Lease",
+    "ModuleMap",
     "PathRules",
+    "QueryHit",
     "Redactor",
+    "RepoMap",
     "RunReport",
     "RunStore",
     "RunnerConfig",
@@ -191,9 +204,11 @@ __all__ = [
     "Workspace",
     "assert_reviewer_report",
     "assert_tests_describe",
+    "build_and_cache",
     "build_attestation",
     "build_backend",
     "build_receipt",
+    "build_repo_map",
     "child_environment",
     "declared_dependencies",
     "dependencies_added",
@@ -201,10 +216,12 @@ __all__ = [
     "digest_paths",
     "executor_hint",
     "forwarded_names",
+    "load_or_build",
     "manifest_changes",
     "normalise_path",
     "parse_json_object",
     "protected_drift",
+    "query_repo_map",
     "repair_instructions",
     "resolve_executable",
     "review_instructions",

@@ -32,10 +32,14 @@ Every budget dimension is now declared as exactly one of:
     exceeding one is a fact about a session that has already been paid for.
 
 `UNAVAILABLE`
-    The company has no trustworthy value at all. Model turns are here today:
-    no CLI this company drives accepts a turn ceiling, and the one number the
-    provider reports for it - `num_turns` - was measured understating a real
-    session by roughly sixty times.
+    The company has no trustworthy value at all, for any session, by
+    construction. `repo_file_reads` and `repo_searches` are here: every
+    backend this company drives (`tools/engineering_runner/backends.py`,
+    `ClaudeCodeBackend.launch`) runs the CLI with `--output-format json`,
+    which returns one final result envelope and never a per-tool-call log.
+    There is no record, in any stored session, of which files a developer or
+    reviewer read or what it searched for - not a defect to fix, a fact about
+    the artifact the provider emits in this mode.
 
 ## What check_budget is for, now
 
@@ -130,16 +134,43 @@ DIMENSIONS: tuple[BudgetDimension, ...] = (
     BudgetDimension(
         name="cache_read_units",
         enforceability=Enforceability.POST_SESSION_OBSERVABLE,
-        note="reported by the provider when the session ends",
+        note=(
+            "reported by the provider when the session ends; the profile now "
+            "states a real ceiling for it (session_cache_read_ceiling) because "
+            "this is the dimension a routine job's repository exploration "
+            "actually shows up in - a bounded change reading far more cache "
+            "than the packet it was given, turn over turn"
+        ),
     ),
     BudgetDimension(
         name="model_turns",
+        enforceability=Enforceability.POST_SESSION_OBSERVABLE,
+        note=(
+            "no backend this company drives accepts a turn ceiling, so this "
+            "can never be an enforced_violation; but the provider's count is "
+            "now cross-checked at read time (modelUsage against the envelope's "
+            "top-level usage) and marked in receipt.usage.unreliable_metrics "
+            "when the two disagree, so a session not so marked has a "
+            "trustworthy value worth comparing against the strategy's "
+            "advisory ceiling"
+        ),
+    ),
+    BudgetDimension(
+        name="repo_file_reads",
         enforceability=Enforceability.UNAVAILABLE,
         note=(
-            "no backend this company drives accepts a turn ceiling, and the "
-            "provider's own turn count was measured understating a session by "
-            "about sixty times; the strategy states one as guidance to the "
-            "session and the company scores nothing against it"
+            "no stored session, of any age, carries a per-tool-call log; "
+            "see the UNAVAILABLE class note above. Declared so a reader of "
+            "this table sees the gap named rather than the dimension simply "
+            "missing"
+        ),
+    ),
+    BudgetDimension(
+        name="repo_searches",
+        enforceability=Enforceability.UNAVAILABLE,
+        note=(
+            "same as repo_file_reads: a grep or glob issued inside a coding "
+            "session leaves no trace this company can read"
         ),
     ),
 )
@@ -252,6 +283,7 @@ def check_budget(
     input_tokens: int | None = None,
     output_tokens: int | None = None,
     cache_read_units: int | None = None,
+    model_turns: int | None = None,
     unreliable: frozenset[str] | set[str] | tuple[str, ...] = (),
 ) -> BudgetCheck:
     """Score one finished session against the strategy it was issued.
@@ -266,6 +298,12 @@ def check_budget(
     says whether the backend was actually given the spend flag. Without it the
     cost ceiling is downgraded to an observation, because a limit nobody
     passed to the provider did not bind anything.
+
+    `model_turns` is `receipt.usage.model_turns` - already captured, already
+    named, already excluded from `unreliable_metrics` when the provider's two
+    turn counts disagreed. Pass it through and it is scored like any other
+    POST_SESSION_OBSERVABLE dimension; leave it `None` (the caller did not
+    have it, or marked it unreliable) and it stays unscored, same as before.
     """
     ceiling = strategy.resource_ceiling
     untrusted = frozenset(unreliable)
@@ -360,8 +398,44 @@ def check_budget(
     )
     score("input_tokens", "observation only", input_tokens, False)
     score("output_tokens", "observation only", output_tokens, False)
-    score("cache_read_units", "observation only", cache_read_units, False)
-    score("model_turns", ceiling.max_turns, None, False)
+
+    over_cache = (
+        cache_read_units is not None
+        and cache_read_units > ceiling.max_cache_read_units
+    )
+    score(
+        "cache_read_units",
+        ceiling.max_cache_read_units,
+        cache_read_units,
+        over_cache,
+        detail=(
+            f"the session read {cache_read_units} cache units against a "
+            f"{ceiling.max_cache_read_units} ceiling - repository exploration, "
+            "not the packet, is almost certainly why"
+            if over_cache
+            else ""
+        ),
+    )
+
+    over_turns = model_turns is not None and model_turns > ceiling.max_turns
+    score(
+        "model_turns",
+        ceiling.max_turns,
+        model_turns,
+        over_turns,
+        detail=(
+            f"the session ran {model_turns} turns against a {ceiling.max_turns} "
+            "advisory ceiling; nothing stopped it, because no backend this "
+            "company drives accepts a turn ceiling"
+            if over_turns
+            else ""
+        ),
+    )
+
+    # Declared, never scorable: see Enforceability.UNAVAILABLE above. Recorded
+    # so a reader of one BudgetCheck sees the gap stated, not just absent.
+    score("repo_file_reads", "not observable", None, False)
+    score("repo_searches", "not observable", None, False)
 
     return BudgetCheck(results=tuple(results))
 

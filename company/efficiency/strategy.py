@@ -134,6 +134,7 @@ class ResourceCeiling:
     max_wall_seconds: int
     max_session_cost: str  # decimal string, or "" when the profile sets none
     cost_currency: str
+    max_cache_read_units: int
     escalation_message: str
 
     @classmethod
@@ -154,6 +155,9 @@ class ResourceCeiling:
             max_wall_seconds=max(60, profile.session_wall_seconds // divisor),
             max_session_cost=str(cost / divisor) if cost is not None else "",
             cost_currency=profile.cost_currency if cost is not None else "",
+            max_cache_read_units=max(
+                1, profile.session_cache_read_ceiling // divisor
+            ),
             escalation_message=(
                 "Stop and report progress rather than exceeding these ceilings. "
                 "An honest partial result with a checkpoint is cheaper than a "
@@ -206,6 +210,7 @@ class ExecutionStrategy:
                 "max_wall_seconds": self.resource_ceiling.max_wall_seconds,
                 "max_session_cost": self.resource_ceiling.max_session_cost,
                 "cost_currency": self.resource_ceiling.cost_currency,
+                "max_cache_read_units": self.resource_ceiling.max_cache_read_units,
                 "escalation_message": self.resource_ceiling.escalation_message,
             },
             "provider_count": self.provider_count,

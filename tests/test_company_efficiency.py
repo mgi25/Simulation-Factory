@@ -518,7 +518,12 @@ def test_budget_check_separates_a_broken_limit_from_a_passed_estimate() -> None:
 def test_every_budget_dimension_declares_what_can_be_done_about_it() -> None:
     names = {item.name for item in DIMENSIONS}
     assert "model_turns" in names
-    assert dimension("model_turns").enforceability is Enforceability.UNAVAILABLE
+    assert (
+        dimension("model_turns").enforceability
+        is Enforceability.POST_SESSION_OBSERVABLE
+    )
+    assert dimension("repo_file_reads").enforceability is Enforceability.UNAVAILABLE
+    assert dimension("repo_searches").enforceability is Enforceability.UNAVAILABLE
     assert dimension("wall_seconds").enforceability is Enforceability.LIVE_ENFORCEABLE
     assert (
         dimension("input_tokens").enforceability
@@ -557,10 +562,68 @@ def test_a_cost_ceiling_nobody_passed_to_the_provider_is_not_enforcement() -> No
 
 
 def test_model_turns_are_never_scored() -> None:
-    """The one number the provider was measured lying about stays unscored."""
+    """Nothing supplied stays unscored, the same as every other dimension."""
     strategy = select_strategy(ReasoningClass.C, Risk.LOW, profile=CONSUMER)
     result = check_budget(strategy, wall_seconds=1.0)
     assert "model_turns" in result.unscored
+
+
+def test_model_turns_is_scored_when_the_telemetry_trusts_it() -> None:
+    """Once a value is supplied and not marked unreliable, it is compared.
+
+    It can still never be an enforced_violation: no backend this company
+    drives accepts a turn ceiling, so exceeding it is an observation about a
+    session already paid for, exactly like cost and cache reads.
+    """
+    strategy = select_strategy(ReasoningClass.C, Risk.LOW, profile=CONSUMER)
+
+    over = check_budget(
+        strategy, wall_seconds=1.0, model_turns=strategy.resource_ceiling.max_turns + 1
+    )
+    assert "model_turns" not in over.unscored
+    assert over.within_budget, "a turn overshoot is observed, never enforced"
+    assert any("model_turns" in v or "turns" in v for v in over.observed_violations)
+
+    marked_unreliable = check_budget(
+        strategy,
+        wall_seconds=1.0,
+        model_turns=strategy.resource_ceiling.max_turns + 1,
+        unreliable=("model_turns",),
+    )
+    assert "model_turns" in marked_unreliable.unscored
+
+
+def test_cache_read_units_has_a_real_ceiling_now() -> None:
+    """The dimension this milestone exists for: exploration cost, observed.
+
+    Consumer Mode V1's own matched job read 1,835,390 cache units for a
+    two-file change; the consumer profile's ceiling sits below that on
+    purpose, so a session that explores the way that one did is flagged.
+    """
+    strategy = select_strategy(ReasoningClass.C, Risk.LOW, profile=CONSUMER)
+    ceiling = strategy.resource_ceiling.max_cache_read_units
+    assert ceiling < 1_835_390
+
+    within = check_budget(strategy, wall_seconds=1.0, cache_read_units=ceiling - 1)
+    assert within.observed_violations == ()
+
+    over = check_budget(strategy, wall_seconds=1.0, cache_read_units=ceiling + 1)
+    assert over.within_budget, "still only an observation - nothing enforces it live"
+    assert over.observed_violations
+    assert "repository exploration" in over.observed_violations[0]
+
+
+def test_repo_exploration_dimensions_are_declared_and_never_scorable() -> None:
+    """The gap this milestone measured is named, not silently absent.
+
+    No backend this company drives logs a file read or a search, for any
+    session, ever - so these two dimensions can never receive a value and
+    are declared UNAVAILABLE rather than omitted.
+    """
+    strategy = select_strategy(ReasoningClass.C, Risk.LOW, profile=CONSUMER)
+    result = check_budget(strategy, wall_seconds=1.0)
+    assert "repo_file_reads" in result.unscored
+    assert "repo_searches" in result.unscored
 
 
 def test_budget_check_handles_none_values() -> None:

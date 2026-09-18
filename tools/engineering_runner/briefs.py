@@ -35,6 +35,7 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from .authorization import AuthorityEnvelope
+from .repo_map import RepoMap, query as query_repo_map
 from .resources import ResourceStrategy
 
 
@@ -136,6 +137,78 @@ def _ceiling_lines(strategy: "ResourceStrategy | None", *, role: str) -> list[st
     return out
 
 
+# Fixed and non-negotiable in the sense that every field here already exists:
+# this is not a quality exhortation, it is the same ordering the runner itself
+# applies before adding anything under `tools/` - reuse first, extend the
+# smallest surface, reach for the standard library before a new dependency,
+# keep the diff small, and do not build for a case the objective did not ask
+# for. Stated once, plainly, rather than left to be inferred from the size of
+# the packet.
+_MINIMALISM_LINES: tuple[str, ...] = (
+    "## Preference order for how you get there",
+    "",
+    "  1. Reuse existing code before writing new code.",
+    "  2. Modify the smallest existing surface that satisfies the objective.",
+    "  3. Reach for the standard library or an already-declared dependency "
+    "before adding a new one.",
+    "  4. Prefer the smallest coherent diff over a larger, tidier-looking one.",
+    "  5. Do not build an abstraction, a config flag or a fallback path for a "
+    "case the objective did not ask for.",
+    "",
+    "This is an ordering, not a ban: a genuinely new capability still gets "
+    "written. It is a tie-breaker for the many points where more than one "
+    "correct-looking change exists.",
+    "",
+)
+
+
+def _repo_map_lines(
+    repo_map: "RepoMap | None",
+    *,
+    objective: str,
+    focus_paths: Sequence[str],
+    limit: int = 5,
+) -> list[str]:
+    """The deterministic map's answer to "which files matter here", not the map.
+
+    Two questions, each cheap and each avoiding a grep-and-read loop for the
+    session: which modules this objective's own words point at, and which
+    modules already depend on the files you are authorized to change - so a
+    change to one does not surprise a caller you never read.
+    """
+    if repo_map is None or not repo_map.modules:
+        return []
+    lines: list[str] = [
+        "",
+        "## What a deterministic repository search already found",
+        "",
+        "Company OS parsed this repository's own Python modules with the "
+        "standard library `ast` module before this session started. This is "
+        "that search's answer, not a substitute for reading the files it "
+        "names - read them; do not re-derive this list with your own grep.",
+        "",
+    ]
+    hits = query_repo_map(repo_map, objective, limit=limit)
+    if hits:
+        lines.append(f"Likely relevant to the objective (\"{objective[:80]}\"):")
+        for hit in hits:
+            symbols = ", ".join(hit.matched_symbols[:5])
+            detail = f" - {symbols}" if symbols else ""
+            lines.append(f"  - {hit.path} (owner: {hit.owner}){detail}")
+        lines.append("")
+    for path in focus_paths:
+        module = repo_map.by_path(path)
+        if module is None:
+            continue
+        tests = repo_map.tests_by_module.get(path, ())
+        if tests:
+            lines.append(f"Tests already covering {path}:")
+            for test in tests[:5]:
+                lines.append(f"  - {test}")
+            lines.append("")
+    return lines
+
+
 def developer_instructions(
     envelope: AuthorityEnvelope,
     *,
@@ -144,6 +217,7 @@ def developer_instructions(
     attempt: int,
     prior_findings: Sequence[str] = (),
     strategy: "ResourceStrategy | None" = None,
+    repo_map: "RepoMap | None" = None,
 ) -> str:
     lines: list[str] = []
     add = lines.append
@@ -188,6 +262,12 @@ def developer_instructions(
         for item in envelope.constraints:
             add(f"  - {item}")
         add("")
+    lines.extend(_MINIMALISM_LINES)
+    lines.extend(
+        _repo_map_lines(
+            repo_map, objective=envelope.objective, focus_paths=envelope.may_write
+        )
+    )
     if envelope.required_tests:
         add("## Tests the work order requires")
         for item in envelope.required_tests:
@@ -256,6 +336,7 @@ def review_instructions(
     receipt: Mapping[str, Any],
     developer_report: Mapping[str, Any],
     strategy: "ResourceStrategy | None" = None,
+    repo_map: "RepoMap | None" = None,
 ) -> str:
     lines: list[str] = []
     add = lines.append
@@ -285,6 +366,11 @@ def review_instructions(
     for item in envelope.acceptance_criteria:
         add(f"  - {item}")
     add("")
+    lines.extend(
+        _repo_map_lines(
+            repo_map, objective=envelope.objective, focus_paths=envelope.authorized_paths
+        )
+    )
     if envelope.review_instructions:
         add("## What a review is, per the work order")
         for item in envelope.review_instructions:

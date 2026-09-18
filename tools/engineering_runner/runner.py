@@ -81,6 +81,7 @@ from .briefs import (
     repair_instructions,
     review_instructions,
 )
+from .repo_map import RepoMap, build_repo_map
 from .config import RunnerConfig
 from .controlplane import ControlPlane
 from .errors import (
@@ -658,6 +659,7 @@ class EngineeringRunner:
             attempt=envelope.packet_attempt,
             prior_findings=self._prior_findings(work_order_id),
             strategy=strategy,
+            repo_map=self._repo_map(worktree),
         )
         write_text(stage_dir / "instructions.md", instructions)
 
@@ -933,6 +935,7 @@ class EngineeringRunner:
             receipt=receipt,
             developer_report=developer_report,
             strategy=strategy,
+            repo_map=self._repo_map(worktree),
         )
         write_text(stage_dir / "instructions.md", instructions)
 
@@ -1229,6 +1232,22 @@ class EngineeringRunner:
                 if isinstance(item, Mapping)
             ]
         return tuple(rendered[-6:])
+
+    def _repo_map(self, worktree: Path) -> RepoMap | None:
+        """The deterministic map of the worktree the session is about to read.
+
+        Built fresh per stage rather than cached across work orders: each
+        work order's worktree can sit at a different commit, a stale map
+        naming a file that moved is worse than no map, and a full `ast` parse
+        of `company/` + `tools/` + `tests/` measures at about two seconds -
+        negligible beside a session that runs for minutes. Best-effort: a map
+        that failed to build is a missing convenience, never a reason to stop
+        an authorized session.
+        """
+        try:
+            return build_repo_map(worktree)
+        except OSError:
+            return None
 
     def _state(self, work_order_id: str) -> str:
         reply = self._control.status(work_order_id)

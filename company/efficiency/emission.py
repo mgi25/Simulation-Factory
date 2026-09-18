@@ -181,6 +181,7 @@ def emit_execution_efficiency(
             input_tokens=receipt.usage.input_units,
             output_tokens=receipt.usage.output_units,
             cache_read_units=receipt.usage.cache_hits or None,
+            model_turns=receipt.usage.model_turns,
             unreliable=receipt.usage.unreliable_metrics,
         )
         checkpoint_needed = should_checkpoint(
