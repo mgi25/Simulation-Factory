@@ -48,6 +48,18 @@ from .process import CommandResult, CommandRunner
 ENGINEERING_MODULE = "company.engineering"
 INTEGRATION_MODULE = "company.integration"
 
+# `company.integration.__main__._EXIT`, inverted. The gate CLI's exit code *is*
+# its verdict, and it is the only place the verdict appears as one word: the
+# report carries the checks, not a summary field. Reading it is what lets the
+# runner pass `--reported-readiness`, which makes `GateVerdict` compare what
+# the gate said with what the report's own required checks say and refuse the
+# pair if they differ. Without it that cross-check silently does not run.
+GATE_READINESS_BY_EXIT: Mapping[int, str] = {
+    0: "ready",
+    1: "blocked",
+    2: "insufficient_evidence",
+}
+
 # `company.engineering` exit codes, as its own CLI documents them.
 ADVANCED = 0
 STOPPED = 1
@@ -242,8 +254,12 @@ class ControlPlane:
         gate_repo_root: Path,
         suite_evidence: Path,
         timeout_s: float,
-    ) -> tuple[CommandResult, dict[str, Any]]:
-        """Run the gate over a checkout and return its own report, unaltered.
+    ) -> tuple[CommandResult, dict[str, Any], str]:
+        """Run the gate over a checkout and return its report and its verdict.
+
+        The verdict comes from the exit code, not from the report: the report
+        holds the checks and names no summary field, so a caller that looked
+        for one would find nothing and would quietly stop cross-checking.
 
         The report is the gate's output and the runner is its courier. Nothing
         here reads a check, weighs a status or computes a readiness: that is
@@ -272,7 +288,14 @@ class ControlPlane:
             raise ControlPlaneRefusal(
                 "company.integration check", result.exit_code, result.stderr.strip()
             )
-        return result, _parse_json(result.stdout, "company.integration check")
+        readiness = GATE_READINESS_BY_EXIT.get(result.exit_code, "")
+        if not readiness:
+            raise ControlPlaneRefusal(
+                "company.integration check",
+                result.exit_code,
+                "the gate exited with a code that is not one of its three verdicts",
+            )
+        return result, _parse_json(result.stdout, "company.integration check"), readiness
 
     # --- internals ---------------------------------------------------------
 
@@ -316,6 +339,7 @@ def _parse_json(text: str, command: str) -> dict[str, Any]:
 
 __all__ = [
     "ADVANCED",
+    "GATE_READINESS_BY_EXIT",
     "ENGINEERING_MODULE",
     "INTEGRATION_MODULE",
     "REFUSED",

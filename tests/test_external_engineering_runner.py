@@ -838,6 +838,7 @@ class ScriptedControlPlane:
         self.review_outcome = "pass"
         self.corrections = 0
         self.max_attempts = 3
+        self.gate_readiness = "ready"
         self.receipt_accepted = True
 
     # the surface `EngineeringRunner` uses
@@ -906,12 +907,15 @@ class ScriptedControlPlane:
 
     def gate_check(self, *, gate_repo_root: Path, suite_evidence: Path, timeout_s: float):
         self.calls.append(("gate-check", str(gate_repo_root)))
-        return _command(), {"readiness": "ready", "report_id": "r-1"}
+        # Report, then verdict - and the verdict is not a field of the report.
+        # `company.integration check` says it with its exit code only.
+        return _command(), {"report_id": "r-1", "required_check_ids": ["x"]}, self.gate_readiness
 
     def submit_gate(self, work_order_id, gate_report, *, reported_readiness, implementation_commit):
         self.calls.append(("gate", reported_readiness))
-        self._advance("ready_for_approval")
-        return _reply({"state": "ready_for_approval"})
+        state = "ready_for_approval" if reported_readiness == "ready" else "blocked"
+        self._advance(state)
+        return _reply({"state": state})
 
     def result(self, work_order_id: str, *, risks=()):
         return _reply({"status": self.states[0]})
@@ -1168,6 +1172,59 @@ def test_a_stage_that_does_not_move_the_job_stops_the_run(repository):
     assert report.outcome == RUN_FAILED
     assert "did not move it" in report.reason
     assert len(report.stages) == 1
+
+
+def test_the_gate_verdict_is_read_from_the_exit_code_and_passed_for_cross_checking(repository):
+    """`--reported-readiness` is what makes the gate's own report argue with itself.
+
+    `GateVerdict.from_report_mapping` compares the verdict the caller reports
+    with the one the report's required checks derive, and refuses the pair if
+    they differ. The runner used to look for a `readiness` field the report
+    does not have, pass an empty string, and silently skip that comparison.
+    The verdict lives in the exit code.
+    """
+    from tools.engineering_runner.controlplane import GATE_READINESS_BY_EXIT
+
+    assert GATE_READINESS_BY_EXIT == {0: "ready", 1: "blocked", 2: "insufficient_evidence"}
+
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    _runner(repository, backend, control).run_one(WORK_ORDER)
+    assert ("gate", "ready") in control.calls
+
+    # A second run over the same worktree needs a *different* edit: the first
+    # run already committed `VALUE = 2`, and writing it again would change
+    # nothing, which is now a rejected attempt in its own right.
+    def another_in_scope_edit(worktree: Path) -> None:
+        (worktree / "subject" / "module.py").write_text("VALUE = 3" + chr(10), encoding="utf-8")
+
+    blocked = ScriptedControlPlane(repository["base"], states=["planning"])
+    blocked.gate_readiness = "blocked"
+    report = _runner(
+        repository, ScriptedBackend(edit=another_in_scope_edit), blocked
+    ).run_one(WORK_ORDER)
+    assert ("gate", "blocked") in blocked.calls
+    assert report.outcome == RUN_BLOCKED
+    assert report.final_state == "blocked"
+
+
+def test_a_session_that_changed_nothing_is_a_rejected_attempt(repository):
+    """An empty attempt is not a clean one.
+
+    With nothing committed, the diff is empty, the required tests pass because
+    they passed before the session started, and the receipt would otherwise say
+    `accepted` about work nobody did.
+    """
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    control.max_attempts = 1
+    backend = ScriptedBackend(edit=lambda _worktree: None)
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    receipt = control.receipts[0]
+    assert receipt["outcome"] == "rejected"
+    assert "changed nothing" in receipt["rejection_reason"]
+    assert receipt["files_changed"] == []
+    assert report.outcome == RUN_BLOCKED
 
 
 def test_a_job_already_claimed_is_skipped_rather_than_run_twice(repository):

@@ -555,7 +555,12 @@ class EngineeringRunner:
         commit_sha = self._workspace.commit_all(
             cwd=worktree, message=self._commit_message(envelope, narrative)
         )
-        if not commit_sha:
+        # A session that left the tree exactly as it found it has not done the
+        # work, whatever its report says. Without this the attempt commits
+        # nothing, the diff is empty, the required tests pass because they
+        # passed before, and an empty attempt reads as a success.
+        changed_nothing = not commit_sha
+        if changed_nothing:
             commit_sha = after.head
         settled = self._workspace.status(worktree)
         committed = self._workspace.changed_paths(
@@ -622,7 +627,8 @@ class EngineeringRunner:
             files_changed=changed,
         )
         accepted = (
-            str(narrative.get("outcome", "accepted")).strip().lower() != "rejected"
+            not changed_nothing
+            and str(narrative.get("outcome", "accepted")).strip().lower() != "rejected"
             and all(run.green for run in tests)
             and observation.remote_verified
         )
@@ -635,7 +641,9 @@ class EngineeringRunner:
             completed_at=utcnow(),
             accepted=accepted,
             rejection_reason=(
-                "" if accepted else _rejection(tests, observation, narrative)
+                ""
+                if accepted
+                else _rejection(tests, observation, narrative, changed_nothing)
             ),
         )
         receipt_path = write_json(stage_dir / "receipt.json", receipt)
@@ -841,13 +849,12 @@ class EngineeringRunner:
                 reported_by=f"external-engineering-runner/{self.config.operator}",
             ),
         )
-        result, report = self._control.gate_check(
+        result, report, readiness = self._control.gate_check(
             gate_repo_root=worktree,
             suite_evidence=evidence_path,
             timeout_s=self.config.gate_timeout_s,
         )
         report_path = write_json(stage_dir / "gate-report.json", report)
-        readiness = str(report.get("readiness", ""))
         write_json(
             stage_dir / "gate-command.json",
             {**result.to_dict(), "readiness": readiness},
@@ -1049,8 +1056,16 @@ class EngineeringRunner:
 
 
 def _rejection(
-    tests: Sequence[TestRun], observation: GitObservation, narrative: Mapping[str, Any]
+    tests: Sequence[TestRun],
+    observation: GitObservation,
+    narrative: Mapping[str, Any],
+    changed_nothing: bool = False,
 ) -> str:
+    if changed_nothing:
+        return (
+            "the session changed nothing: the working tree is identical to the "
+            "authorized base commit, so there is no work to review"
+        )
     failing = [run.command for run in tests if not run.green]
     if failing:
         return "required test(s) failed at the implementation commit: " + ", ".join(failing)
