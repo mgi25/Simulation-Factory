@@ -194,6 +194,7 @@ class EngineeringJob:
     opened_on: dt.date
     developer_attempts: int = 0
     reviews_completed: int = 0
+    blocked_attempts: int = 0
     max_developer_attempts: int = DEFAULT_MAX_DEVELOPER_ATTEMPTS
     transitions: tuple[JobTransition, ...] = ()
     pending_decisions: tuple[str, ...] = ()
@@ -210,7 +211,7 @@ class EngineeringJob:
         if not isinstance(self.state, JobState):
             raise EngineeringError("job.state must be a JobState value")
         object.__setattr__(self, "opened_on", assert_day(self.opened_on, "job.opened_on"))
-        for name in ("developer_attempts", "reviews_completed", "max_developer_attempts"):
+        for name in ("developer_attempts", "reviews_completed", "blocked_attempts", "max_developer_attempts"):
             value = getattr(self, name)
             if isinstance(value, bool) or not isinstance(value, int) or value < 0:
                 raise EngineeringError(f"job.{name} must be a non-negative integer")
@@ -341,6 +342,7 @@ class EngineeringJob:
             # Leaving `reviewing` by any door means one review completed.
             reviews_completed=self.reviews_completed
             + (1 if self.state is JobState.REVIEWING else 0),
+            blocked_attempts=self.blocked_attempts + (1 if to_state is JobState.BLOCKED else 0),
             transitions=self.transitions + (transition,),
             pending_decisions=(
                 self.pending_decisions
@@ -444,6 +446,7 @@ class EngineeringJob:
             opened_on=assert_day(data.get("opened_on"), "job.opened_on"),
             developer_attempts=_int(data.get("developer_attempts", 0), "developer_attempts"),
             reviews_completed=_int(data.get("reviews_completed", 0), "reviews_completed"),
+            blocked_attempts=_int(data.get("blocked_attempts", 0), "blocked_attempts"),
             max_developer_attempts=_int(
                 data.get("max_developer_attempts", DEFAULT_MAX_DEVELOPER_ATTEMPTS),
                 "max_developer_attempts",

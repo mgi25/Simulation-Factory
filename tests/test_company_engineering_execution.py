@@ -1245,6 +1245,27 @@ def test_only_issuing_a_packet_spends_a_developer_attempt():
     assert entering == [JobState.PLANNING]
 
 
+def test_blocked_attempts_increments_on_blocked_and_not_on_other_transitions(tmp_path):
+    """blocked_attempts counts entries into BLOCKED and nothing else."""
+    order = _order(tmp_path)
+    job = EngineeringJob.open(order, on=DAY)
+    # Advance into planning (not BLOCKED) - counter stays zero.
+    planned = job.advance(JobState.PLANNING, on=DAY, reason="work order accepted")
+    assert planned.blocked_attempts == 0
+
+    # Advance into BLOCKED - counter increments to one.
+    blocked = planned.advance(JobState.BLOCKED, on=DAY, reason="authority scope violation detected")
+    assert blocked.blocked_attempts == 1
+
+    # Advance out of BLOCKED into planning - counter stays at one.
+    resumed = blocked.advance(JobState.PLANNING, on=DAY, reason="scope violation resolved")
+    assert resumed.blocked_attempts == 1
+
+    # Round-trip through to_dict / from_mapping preserves the counter.
+    restored = EngineeringJob.from_mapping(resumed.to_dict())
+    assert restored.blocked_attempts == 1
+
+
 def test_a_job_cannot_carry_more_attempts_than_the_work_order_allows(tmp_path):
     order = _order(tmp_path)
     job = EngineeringJob.open(order, on=DAY)
