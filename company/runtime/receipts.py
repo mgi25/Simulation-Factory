@@ -133,6 +133,14 @@ class ReceiptUsage:
     # Whether the backend was actually given a spend ceiling. Without this the
     # cost dimension is an observation, not a limit.
     cost_ceiling_enforced: bool = False
+    # Repository Exploration Efficiency V2: a coding session's own tool-call
+    # trace, read from a `stream-json` transcript
+    # (`tools.engineering_runner.exploration_telemetry`) rather than assumed.
+    # `None` means the backend produced no such trace - UNAVAILABLE, not zero
+    # - and `company.efficiency.budget.check_budget` treats it accordingly.
+    repo_file_reads: int | None = None
+    repeated_file_reads: int | None = None
+    repo_searches: int | None = None
 
     def __post_init__(self) -> None:
         for name in ("passes", "retries", "cache_hits", "retrieval_hits"):
@@ -146,6 +154,7 @@ class ReceiptUsage:
         for name in (
             "cache_misses", "tool_calls", "input_units", "output_units",
             "provider_latency_ms", "cache_creation_units", "model_turns",
+            "repo_file_reads", "repeated_file_reads", "repo_searches",
         ):
             value = getattr(self, name)
             if value is None:

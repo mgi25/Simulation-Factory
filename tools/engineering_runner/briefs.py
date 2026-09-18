@@ -35,7 +35,8 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from .authorization import AuthorityEnvelope
-from .repo_map import RepoMap, query as query_repo_map
+from .execution_context import ExecutionContextBundle, build_execution_context, rank_primary_files
+from .repo_map import RepoMap
 from .resources import ResourceStrategy
 
 
@@ -162,51 +163,46 @@ _MINIMALISM_LINES: tuple[str, ...] = (
 )
 
 
-def _repo_map_lines(
-    repo_map: "RepoMap | None",
-    *,
-    objective: str,
-    focus_paths: Sequence[str],
-    limit: int = 5,
-) -> list[str]:
-    """The deterministic map's answer to "which files matter here", not the map.
+def _developer_execution_context(
+    repo_map: "RepoMap | None", *, envelope: AuthorityEnvelope, worktree: Path
+) -> ExecutionContextBundle:
+    """The developer's bundle: authorized paths first, then the objective's
+    own best matches - see `execution_context.rank_primary_files`."""
+    primary = rank_primary_files(
+        repo_map, objective=envelope.objective, focus_paths=envelope.may_write
+    )
+    return build_execution_context(
+        repo_map,
+        primary=primary,
+        context_refs=envelope.packet.get("context_refs", ()),
+        repo_root=worktree,
+    )
 
-    Two questions, each cheap and each avoiding a grep-and-read loop for the
-    session: which modules this objective's own words point at, and which
-    modules already depend on the files you are authorized to change - so a
-    change to one does not surprise a caller you never read.
+
+def _reviewer_execution_context(
+    repo_map: "RepoMap | None", *, envelope: AuthorityEnvelope, changed_paths: Sequence[str]
+) -> ExecutionContextBundle:
+    """The reviewer's bundle: the diff's own changed paths, not the objective's
+    text and not the full authorized scope - see section 5 of the milestone
+    brief. No excerpts: a reviewer reads the diff itself for the bytes that
+    changed, and an excerpt of the pre-existing surrounding code would be the
+    developer's discovery aid repeated for a session that is judging, not
+    discovering.
     """
-    if repo_map is None or not repo_map.modules:
-        return []
-    lines: list[str] = [
-        "",
-        "## What a deterministic repository search already found",
-        "",
-        "Company OS parsed this repository's own Python modules with the "
-        "standard library `ast` module before this session started. This is "
-        "that search's answer, not a substitute for reading the files it "
-        "names - read them; do not re-derive this list with your own grep.",
-        "",
-    ]
-    hits = query_repo_map(repo_map, objective, limit=limit)
-    if hits:
-        lines.append(f"Likely relevant to the objective (\"{objective[:80]}\"):")
-        for hit in hits:
-            symbols = ", ".join(hit.matched_symbols[:5])
-            detail = f" - {symbols}" if symbols else ""
-            lines.append(f"  - {hit.path} (owner: {hit.owner}){detail}")
-        lines.append("")
-    for path in focus_paths:
-        module = repo_map.by_path(path)
-        if module is None:
-            continue
-        tests = repo_map.tests_by_module.get(path, ())
-        if tests:
-            lines.append(f"Tests already covering {path}:")
-            for test in tests[:5]:
-                lines.append(f"  - {test}")
-            lines.append("")
-    return lines
+    primary = tuple((path, "changed by this attempt") for path in changed_paths)
+    return build_execution_context(
+        repo_map,
+        primary=primary,
+        context_refs=envelope.packet.get("context_refs", ()),
+        include_excerpts=False,
+        # Smaller than the developer's own neighborhood, per section 5 of the
+        # milestone brief: the diff already shows what changed, so the
+        # reviewer mainly needs blast radius (dependents) and coverage
+        # (tests), not every symbol in the file repeated as a list.
+        symbol_limit=6,
+        dependent_limit=5,
+        test_limit=3,
+    )
 
 
 def developer_instructions(
@@ -263,11 +259,7 @@ def developer_instructions(
             add(f"  - {item}")
         add("")
     lines.extend(_MINIMALISM_LINES)
-    lines.extend(
-        _repo_map_lines(
-            repo_map, objective=envelope.objective, focus_paths=envelope.may_write
-        )
-    )
+    lines.append(_developer_execution_context(repo_map, envelope=envelope, worktree=worktree).render())
     if envelope.required_tests:
         add("## Tests the work order requires")
         for item in envelope.required_tests:
@@ -319,12 +311,6 @@ def developer_instructions(
 
     lines.extend(_ceiling_lines(strategy, role="developer"))
 
-    add("")
-    add("## The packet Company OS issued, verbatim")
-    add("")
-    add("```json")
-    add(json.dumps(_readable(envelope.packet), indent=2, sort_keys=True))
-    add("```")
     return "\n".join(lines) + "\n"
 
 
@@ -366,10 +352,11 @@ def review_instructions(
     for item in envelope.acceptance_criteria:
         add(f"  - {item}")
     add("")
-    lines.extend(
-        _repo_map_lines(
-            repo_map, objective=envelope.objective, focus_paths=envelope.authorized_paths
-        )
+    changed_paths = tuple(str(p) for p in receipt.get("files_changed", ()) or ())
+    lines.append(
+        _reviewer_execution_context(
+            repo_map, envelope=envelope, changed_paths=changed_paths
+        ).render()
     )
     if envelope.review_instructions:
         add("## What a review is, per the work order")

@@ -522,8 +522,15 @@ def test_every_budget_dimension_declares_what_can_be_done_about_it() -> None:
         dimension("model_turns").enforceability
         is Enforceability.POST_SESSION_OBSERVABLE
     )
-    assert dimension("repo_file_reads").enforceability is Enforceability.UNAVAILABLE
-    assert dimension("repo_searches").enforceability is Enforceability.UNAVAILABLE
+    # Repository Exploration Efficiency V2: the installed CLI's stream-json
+    # output makes these post-session-observable, not unavailable - probed
+    # live rather than assumed. See tools.engineering_runner.exploration_telemetry.
+    assert dimension("repo_file_reads").enforceability is Enforceability.POST_SESSION_OBSERVABLE
+    assert dimension("repo_searches").enforceability is Enforceability.POST_SESSION_OBSERVABLE
+    assert (
+        dimension("repeated_file_reads").enforceability
+        is Enforceability.POST_SESSION_OBSERVABLE
+    )
     assert dimension("wall_seconds").enforceability is Enforceability.LIVE_ENFORCEABLE
     assert (
         dimension("input_tokens").enforceability
@@ -613,17 +620,36 @@ def test_cache_read_units_has_a_real_ceiling_now() -> None:
     assert "repository exploration" in over.observed_violations[0]
 
 
-def test_repo_exploration_dimensions_are_declared_and_never_scorable() -> None:
-    """The gap this milestone measured is named, not silently absent.
+def test_repo_exploration_dimensions_are_unscored_without_a_value() -> None:
+    """A backend that produced no stream-json trace supplies no value.
 
-    No backend this company drives logs a file read or a search, for any
-    session, ever - so these two dimensions can never receive a value and
-    are declared UNAVAILABLE rather than omitted.
+    `None` is not zero: a caller that has nothing to report leaves these
+    unscored, exactly like any other POST_SESSION_OBSERVABLE dimension it did
+    not supply a value for.
     """
     strategy = select_strategy(ReasoningClass.C, Risk.LOW, profile=CONSUMER)
     result = check_budget(strategy, wall_seconds=1.0)
     assert "repo_file_reads" in result.unscored
     assert "repo_searches" in result.unscored
+    assert "repeated_file_reads" in result.unscored
+
+
+def test_repo_exploration_dimensions_are_observable_now_when_supplied() -> None:
+    """Repository Exploration Efficiency V2: a stream-json transcript makes
+    these real, post-session values - recorded, never an enforced ceiling."""
+    strategy = select_strategy(ReasoningClass.C, Risk.LOW, profile=CONSUMER)
+    result = check_budget(
+        strategy,
+        wall_seconds=1.0,
+        repo_file_reads=42,
+        repo_searches=7,
+        repeated_file_reads=3,
+    )
+    assert "repo_file_reads" not in result.unscored
+    assert "repo_searches" not in result.unscored
+    assert "repeated_file_reads" not in result.unscored
+    assert result.within_budget, "an observation, never an enforced ceiling"
+    assert result.enforced_violations == ()
 
 
 def test_budget_check_handles_none_values() -> None:

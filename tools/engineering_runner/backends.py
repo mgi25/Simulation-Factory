@@ -61,13 +61,13 @@ an unavailable backend before a stage rather than half-way through a work order.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-import json
 from pathlib import Path
 import re
 from typing import Any, Mapping, Protocol, Sequence
 import uuid
 
 from .errors import BackendFailure, BackendUnavailable
+from .exploration_telemetry import parse_exploration, split_result_envelope
 from .process import CommandResult, CommandRunner, resolve_executable
 from .redaction import Redactor, child_environment
 
@@ -160,6 +160,14 @@ class SessionOutcome:
     stopped_reason: str = ""
     permission_denials: tuple[str, ...] = ()
     provider: str = ""
+    # POST_SESSION_OBSERVABLE exploration counts (repo_file_reads, repo_searches,
+    # ...), read from a `stream-json` transcript when the backend produced one.
+    # `None` when the format did not carry a tool-call trace - see
+    # `exploration_telemetry.ExplorationTelemetry`. The bounded, normalised
+    # event list travels separately in `exploration_events`, so this small
+    # dict is safe to fold into `to_dict()` without growing it unpredictably.
+    exploration: Mapping[str, Any] | None = None
+    exploration_events: tuple[Mapping[str, Any], ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -183,6 +191,7 @@ class SessionOutcome:
             "stopped_reason": self.stopped_reason,
             "permission_denials": list(self.permission_denials),
             "result_chars": len(self.result_text),
+            "exploration": dict(self.exploration) if self.exploration is not None else None,
         }
 
 
@@ -237,8 +246,18 @@ class ClaudeCodeBackend:
         argv = [
             self.executable(),
             "--print",
+            # `stream-json` under `--print` requires `--verbose` or the CLI
+            # refuses to start ("Error: When using --print,
+            # --output-format=stream-json requires --verbose") - found by
+            # probing the installed CLI, not documented in `--help`. The
+            # switch from plain `json` is what makes `repo_file_reads` /
+            # `repo_searches` observable post-session: see
+            # `exploration_telemetry.py`. `_read` still recovers exactly the
+            # old single-envelope shape via `split_result_envelope`, so
+            # `normalise_claude_usage` below needed no change.
             "--output-format",
-            "json",
+            "stream-json",
+            "--verbose",
             "--session-id",
             request.session_id,
             "--no-session-persistence",
@@ -271,14 +290,8 @@ class ClaudeCodeBackend:
         return self._read(request, result)
 
     def _read(self, request: SessionRequest, result: CommandResult) -> SessionOutcome:
-        payload: dict[str, Any] = {}
-        text = result.stdout.strip()
-        if text.startswith("{"):
-            try:
-                loaded = json.loads(text)
-                payload = loaded if isinstance(loaded, Mapping) else {}
-            except json.JSONDecodeError:
-                payload = {}
+        payload = split_result_envelope(result.stdout)
+        telemetry = parse_exploration(result.stdout, worktree=request.cwd)
         session_id = str(payload.get("session_id", "")) or request.session_id
         if not _SESSION_ID.fullmatch(session_id):
             raise BackendFailure(
@@ -316,6 +329,8 @@ class ClaudeCodeBackend:
             unreliable=usage.unreliable,
             cost_ceiling_enforced=request.max_cost > 0,
             permission_denials=_denials(payload.get("permission_denials")),
+            exploration=telemetry.metrics_dict(),
+            exploration_events=tuple(e.to_dict() for e in telemetry.events),
         )
 
 

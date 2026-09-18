@@ -1,18 +1,26 @@
 """What the stored receipts can honestly say about repository exploration.
 
-## The measurement this milestone opens with
+## The measurement Repository Exploration Efficiency V1 opened with
 
-The brief asks to measure historical sessions before building anything. What
-is actually stored, for every session this company has ever run, is one
-`receipt.json` per developer attempt (`usage.model_turns`, `usage.cache_hits`,
-`usage.cache_creation_units`, `files_changed`) and one runner-written
-`session.json` per stage otherwise (reviewer, gate). Neither is a transcript:
-`tools/engineering_runner/backends.py` runs the coding CLI with
-`--output-format json`, which returns one final result envelope, so no stored
-session anywhere names which file it read or what it searched for. This
-module reads exactly what is there and refuses to invent the rest - see
-`company.efficiency.budget`'s `repo_file_reads` / `repo_searches` dimensions,
-declared UNAVAILABLE for the same reason.
+V1's brief asked to measure historical sessions before building anything, and
+found that every stored session before it - one `receipt.json` per developer
+attempt, one runner-written `session.json` per other stage - carried no record
+of which file a session read or what it searched for, because
+`ClaudeCodeBackend.launch` ran the CLI with `--output-format json`, a single
+final envelope. That measurement was declared UNAVAILABLE, permanently,
+"unless the launch mode itself changes".
+
+## What Repository Exploration Efficiency V2 changed
+
+The launch mode changed: `backends.py` now runs `--output-format stream-json
+--verbose` (probed live against the installed CLI, not assumed - see
+`exploration_telemetry.py`), and a stage now writes a companion
+`exploration.json` alongside `session.json` holding the session's own bounded,
+normalised tool-call trace. `discover_exploration` below reads that file the
+same way `discover_measurements` reads a receipt: present values only,
+`None` left as `None`, never imputed as zero. A run from before this change,
+or from the `codex` backend, simply has no `exploration.json` and is skipped -
+that absence is the honest UNAVAILABLE case, not a zero.
 
 ## Reliability, per field
 
@@ -23,12 +31,11 @@ declared UNAVAILABLE for the same reason.
   `normalise_claude_usage`.
 - `files_touched`: RELIABLE - measured from git by `evidence.py`, not
   self-reported.
-- anything about *which* files were read, or how many times, or what was
-  searched for: UNAVAILABLE. A reviewer's own `evidence` list sometimes names
-  a grep or a full-file read in prose (see `briefs.py`'s
-  `REVIEW_REPORT_FIELDS`), but that is the model's self-report, not a
-  measurement, and this module does not parse it into a count - doing so
-  would launder an unreliable number into one that looks reliable.
+- `file_reads_total` / `_unique` / `_repeated`, `searches_total` /
+  `_repeated`, `git_commands`, `other_shell_commands`: RELIABLE when
+  `exploration.json`'s `format` is `stream_json` - read from the session's own
+  transcript, not self-reported prose. UNAVAILABLE (not zero) when the format
+  is `unsupported` or the file does not exist.
 """
 
 from __future__ import annotations
@@ -36,7 +43,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Mapping, Sequence
+from typing import Any, Mapping, Sequence
 
 
 @dataclass(frozen=True)
@@ -185,6 +192,105 @@ def discover_measurements(run_state_dirs: Sequence[Path]) -> tuple[AttemptMeasur
     return tuple(found)
 
 
+@dataclass(frozen=True)
+class ExplorationMeasurement:
+    """One stage's own exploration trace, read from its `exploration.json`."""
+
+    label: str
+    role: str
+    format: str
+    file_reads_total: int | None
+    file_reads_unique: int | None
+    file_reads_repeated: int | None
+    searches_total: int | None
+    searches_repeated: int | None
+    git_commands: int | None
+    test_commands: int | None
+    other_shell_commands: int | None
+    files_read_never_changed: tuple[str, ...] = ()
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "label": self.label,
+            "role": self.role,
+            "format": self.format,
+            "file_reads_total": self.file_reads_total,
+            "file_reads_unique": self.file_reads_unique,
+            "file_reads_repeated": self.file_reads_repeated,
+            "searches_total": self.searches_total,
+            "searches_repeated": self.searches_repeated,
+            "git_commands": self.git_commands,
+            "test_commands": self.test_commands,
+            "other_shell_commands": self.other_shell_commands,
+            "files_read_never_changed": list(self.files_read_never_changed),
+        }
+
+
+def measure_exploration(
+    path: Path, *, label: str, role: str, changed_paths: Sequence[str] = ()
+) -> ExplorationMeasurement | None:
+    """One stage's `exploration.json`, cross-referenced against what it changed.
+
+    `changed_paths` is the developer stage's own measured `files_changed`
+    (from `changes.json`, read by git - never self-reported). A reviewer
+    stage changes nothing by construction, so an empty sequence there simply
+    means every read the reviewer made counts as "never changed", which is
+    exactly true of a read-only session.
+    """
+    data = _read_json(path)
+    if not data:
+        return None
+    events = data.get("events", ())
+    read_targets = tuple(
+        str(e.get("target", ""))
+        for e in events
+        if isinstance(e, Mapping) and e.get("tool") == "Read" and e.get("target")
+    )
+    changed = set(changed_paths)
+    never_changed = tuple(sorted({t for t in read_targets if t not in changed and t != "<external>"}))
+    return ExplorationMeasurement(
+        label=label,
+        role=role,
+        format=str(data.get("format", "unsupported")),
+        file_reads_total=_int(data.get("file_reads_total")),
+        file_reads_unique=_int(data.get("file_reads_unique")),
+        file_reads_repeated=_int(data.get("file_reads_repeated")),
+        searches_total=_int(data.get("searches_total")),
+        searches_repeated=_int(data.get("searches_repeated")),
+        git_commands=_int(data.get("git_commands")),
+        test_commands=_int(data.get("test_commands")),
+        other_shell_commands=_int(data.get("other_shell_commands")),
+        files_read_never_changed=never_changed,
+    )
+
+
+def discover_exploration(run_state_dirs: Sequence[Path]) -> tuple[ExplorationMeasurement, ...]:
+    """Walk known runner-state directories for every `exploration.json`.
+
+    Same traversal shape as `discover_measurements`, over a different file:
+    each stage directory that has an `exploration.json` is measured, cross-
+    referenced against that same stage's `changes.json` when one exists (a
+    developer stage has one; a reviewer stage does not, and needs none - it
+    is read-only by construction).
+    """
+    found: list[ExplorationMeasurement] = []
+    for base in run_state_dirs:
+        if not base.is_dir():
+            continue
+        for exploration_path in sorted(base.rglob("exploration.json")):
+            stage_dir = exploration_path.parent
+            role = _role_from_dirname(stage_dir.name)
+            label = str(stage_dir.relative_to(base)).replace("\\", "/")
+            changes = _read_json(stage_dir / "changes.json")
+            changed_paths = changes.get("changed", ()) if isinstance(changes, Mapping) else ()
+            measurement = measure_exploration(
+                exploration_path, label=label, role=role, changed_paths=changed_paths
+            )
+            if measurement is not None:
+                found.append(measurement)
+    return tuple(found)
+
+
 def _avg(values: Sequence[float | int | None]) -> float | None:
     present = [v for v in values if v is not None]
     return round(sum(present) / len(present), 1) if present else None
@@ -223,7 +329,10 @@ def summarise(measurements: Sequence[AttemptMeasurement]) -> dict[str, object]:
 
 __all__ = [
     "AttemptMeasurement",
+    "ExplorationMeasurement",
+    "discover_exploration",
     "discover_measurements",
+    "measure_exploration",
     "measure_receipt",
     "measure_session_telemetry",
     "summarise",

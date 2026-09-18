@@ -660,6 +660,13 @@ def _usage(session: SessionOutcome) -> dict[str, Any]:
     if session.cost_usd is not None:
         usage["provider_cost"] = f"{session.cost_usd:.6f}"
         usage["provider_cost_currency"] = "USD"
+    exploration = session.exploration or {}
+    if exploration.get("file_reads_total") is not None:
+        usage["repo_file_reads"] = exploration["file_reads_total"]
+    if exploration.get("file_reads_repeated") is not None:
+        usage["repeated_file_reads"] = exploration["file_reads_repeated"]
+    if exploration.get("searches_total") is not None:
+        usage["repo_searches"] = exploration["searches_total"]
     return usage
 
 

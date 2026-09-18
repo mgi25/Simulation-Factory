@@ -10,7 +10,9 @@ import json
 from pathlib import Path
 
 from tools.engineering_runner.exploration_report import (
+    discover_exploration,
     discover_measurements,
+    measure_exploration,
     measure_receipt,
     measure_session_telemetry,
     summarise,
@@ -141,6 +143,108 @@ def test_summarise_never_imputes_a_missing_value_as_zero(tmp_path: Path) -> None
     # over that one value, not diluted by treating the other as a zero.
     assert summary["developer"]["avg_model_turns"] == 10
     assert summary["developer"]["count"] == 2
+
+
+def test_measure_exploration_reads_the_runner_shape(tmp_path: Path) -> None:
+    exploration = tmp_path / "exploration.json"
+    _write_json(
+        exploration,
+        {
+            "format": "stream_json",
+            "file_reads_total": 10,
+            "file_reads_unique": 7,
+            "file_reads_repeated": 3,
+            "searches_total": 4,
+            "searches_repeated": 1,
+            "git_commands": 2,
+            "test_commands": 1,
+            "other_shell_commands": 0,
+            "events": [
+                {"order": 1, "tool": "Read", "category": "", "target": "a.py", "repeat": False},
+                {"order": 2, "tool": "Read", "category": "", "target": "b.py", "repeat": False},
+            ],
+        },
+    )
+    measurement = measure_exploration(exploration, label="developer-01", role="developer")
+    assert measurement is not None
+    assert measurement.format == "stream_json"
+    assert measurement.file_reads_total == 10
+    assert measurement.file_reads_repeated == 3
+    assert measurement.files_read_never_changed == ("a.py", "b.py")
+
+
+def test_measure_exploration_excludes_changed_paths_from_never_changed(tmp_path: Path) -> None:
+    exploration = tmp_path / "exploration.json"
+    _write_json(
+        exploration,
+        {
+            "format": "stream_json",
+            "events": [
+                {"order": 1, "tool": "Read", "category": "", "target": "a.py", "repeat": False},
+                {"order": 2, "tool": "Read", "category": "", "target": "b.py", "repeat": False},
+            ],
+        },
+    )
+    measurement = measure_exploration(
+        exploration, label="developer-01", role="developer", changed_paths=["a.py"]
+    )
+    assert measurement is not None
+    assert measurement.files_read_never_changed == ("b.py",)
+
+
+def test_measure_exploration_excludes_external_paths_from_never_changed(tmp_path: Path) -> None:
+    exploration = tmp_path / "exploration.json"
+    _write_json(
+        exploration,
+        {
+            "format": "stream_json",
+            "events": [
+                {"order": 1, "tool": "Read", "category": "", "target": "<external>", "repeat": False},
+            ],
+        },
+    )
+    measurement = measure_exploration(exploration, label="x", role="developer")
+    assert measurement is not None
+    assert measurement.files_read_never_changed == ()
+
+
+def test_measure_exploration_of_an_unsupported_format_has_none_counts(tmp_path: Path) -> None:
+    exploration = tmp_path / "exploration.json"
+    _write_json(exploration, {"format": "unsupported", "events": []})
+    measurement = measure_exploration(exploration, label="x", role="developer")
+    assert measurement is not None
+    assert measurement.file_reads_total is None
+    assert measurement.searches_total is None
+
+
+def test_measure_exploration_is_missing_file_safe(tmp_path: Path) -> None:
+    assert measure_exploration(tmp_path / "nope.json", label="x", role="developer") is None
+
+
+def test_discover_exploration_cross_references_changes_json(tmp_path: Path) -> None:
+    base = tmp_path / "runner-state"
+    stage = base / "runs" / "wo-x" / "run-000001" / "developer-01"
+    _write_json(
+        stage / "exploration.json",
+        {
+            "format": "stream_json",
+            "file_reads_total": 2,
+            "events": [
+                {"order": 1, "tool": "Read", "category": "", "target": "a.py", "repeat": False},
+                {"order": 2, "tool": "Read", "category": "", "target": "b.py", "repeat": False},
+            ],
+        },
+    )
+    _write_json(stage / "changes.json", {"changed": ["a.py"]})
+
+    measurements = discover_exploration([base])
+    assert len(measurements) == 1
+    assert measurements[0].role == "developer"
+    assert measurements[0].files_read_never_changed == ("b.py",)
+
+
+def test_discover_exploration_skips_a_missing_directory(tmp_path: Path) -> None:
+    assert discover_exploration([tmp_path / "does-not-exist"]) == ()
 
 
 def test_summarise_counts_unreliable_sessions(tmp_path: Path) -> None:

@@ -14,9 +14,11 @@ from pathlib import Path
 from tools.engineering_runner.repo_map import (
     ModuleMap,
     RepoMap,
+    SymbolSpan,
     build_and_cache,
     build_repo_map,
     load_or_build,
+    neighborhood,
     query,
 )
 
@@ -177,6 +179,89 @@ def test_load_or_build_recovers_from_a_corrupt_cache(tmp_path: Path) -> None:
     recovered = load_or_build(repo, cache, roots=("company", "tools", "tests"))
     assert recovered.by_path("company/widgets/spinner.py") is not None
     assert cache.read_text(encoding="utf-8") != "{not json"
+
+
+def test_symbol_spans_cover_classes_methods_and_functions(tmp_path: Path) -> None:
+    repo = _sample_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    spinner = repo_map.by_path("company/widgets/spinner.py")
+    assert spinner is not None
+    names = {s.qualified_name: s for s in spinner.symbols}
+    assert set(names) == {"Spinner", "Spinner.spin", "start_spinner"}
+    assert names["Spinner"].kind == "class"
+    assert names["Spinner.spin"].kind == "method"
+    assert names["start_spinner"].kind == "function"
+    # Line 6 is `class Spinner:`, line 7 is its one method.
+    assert names["Spinner"].start_line == 6
+    assert names["Spinner.spin"].start_line == 7
+    assert spinner.symbol("Spinner.spin") is names["Spinner.spin"]
+    assert spinner.symbol("does-not-exist") is None
+
+
+def test_reverse_production_index_resolves_real_imports(tmp_path: Path) -> None:
+    """`spinner.py` imports `errors.py` directly - a production dependency,
+    not a test one - so `errors.py` must show `spinner.py` as a dependent."""
+    repo = _sample_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    assert repo_map.production_dependents["company/widgets/errors.py"] == (
+        "company/widgets/spinner.py",
+    )
+    assert "company/widgets/spinner.py" not in repo_map.production_dependents
+
+
+def test_reverse_production_index_excludes_self_imports(tmp_path: Path) -> None:
+    repo = _sample_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    for path, dependents in repo_map.production_dependents.items():
+        assert path not in dependents
+
+
+def test_neighborhood_bundles_symbols_dependents_and_tests(tmp_path: Path) -> None:
+    repo = _sample_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    hood = neighborhood(repo_map, "company/widgets/errors.py")
+    assert hood.found is True
+    assert hood.path == "company/widgets/errors.py"
+    assert any(s.qualified_name == "SpinError" for s in hood.symbols)
+    assert hood.dependents == ("company/widgets/spinner.py",)
+    assert hood.tests == ("tests/test_company_widgets_errors.py",)
+
+
+def test_neighborhood_reports_entry_points_among_dependents(tmp_path: Path) -> None:
+    repo = _sample_repo(tmp_path)
+    _write(
+        repo,
+        "tools/actuator/launcher.py",
+        '"""Launch a process for a widget."""\n\n'
+        "from company.widgets.errors import SpinError\n\n"
+        "def main() -> int:\n"
+        "    return 0\n",
+    )
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    hood = neighborhood(repo_map, "company/widgets/errors.py")
+    assert "tools/actuator/launcher.py" in hood.dependents
+    assert hood.entry_points == ("tools/actuator/launcher.py",)
+
+
+def test_neighborhood_of_an_unknown_path_reports_not_found(tmp_path: Path) -> None:
+    repo = _sample_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    hood = neighborhood(repo_map, "company/widgets/does_not_exist.py")
+    assert hood.found is False
+    assert hood.symbols == ()
+    assert hood.dependents == ()
+
+
+def test_neighborhood_is_bounded_by_its_limits(tmp_path: Path) -> None:
+    repo = _sample_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    hood = neighborhood(repo_map, "company/widgets/spinner.py", symbol_limit=1)
+    assert len(hood.symbols) == 1
+
+
+def test_symbol_span_to_dict_and_from_dict_round_trip() -> None:
+    span = SymbolSpan(qualified_name="Spinner.spin", kind="method", start_line=6, end_line=6)
+    assert SymbolSpan.from_dict(span.to_dict()) == span
 
 
 def test_module_map_to_dict_and_from_dict_round_trip() -> None:

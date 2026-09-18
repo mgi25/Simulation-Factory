@@ -66,7 +66,8 @@ from tools.engineering_runner.backends import (
     SessionRequest,
     normalise_claude_usage,
 )
-from tools.engineering_runner.briefs import review_instructions
+from tools.engineering_runner.briefs import developer_instructions, review_instructions
+from tools.engineering_runner.repo_map import build_repo_map
 from tools.engineering_runner.config import RunnerConfig
 from tools.engineering_runner.errors import (
     AuthorityViolation,
@@ -394,6 +395,65 @@ def test_a_reviewer_sees_the_grant_and_still_holds_no_writable_path():
     grant = instructions.split("may change:")[1].split("must not change:")[0]
     assert "- subject" in grant
     assert "module.py" not in grant
+
+
+def test_developer_instructions_work_with_no_repo_map_at_all():
+    """A missing map degrades the briefing, never stops the session."""
+    envelope = AuthorityEnvelope.parse(developer_briefing("a" * 40))
+    instructions = developer_instructions(
+        envelope, report_path=Path("report.json"), worktree=Path("worktree"), attempt=1, repo_map=None
+    )
+    assert "Authorized engineering work order" in instructions
+    assert "Execution context" not in instructions
+
+
+def test_review_instructions_work_with_no_repo_map_at_all():
+    envelope = AuthorityEnvelope.parse(review_briefing("a" * 40))
+    instructions = review_instructions(
+        envelope,
+        diff_path=Path("diff.patch"),
+        worktree=Path("worktree"),
+        receipt={"files_changed": ["subject/module.py"]},
+        developer_report={"summary": "x"},
+        repo_map=None,
+    )
+    assert "Independent review" in instructions
+    assert "Execution context" not in instructions
+
+
+def test_a_briefing_never_injects_the_whole_repo_map(tmp_path: Path):
+    """The map itself, never handed to a session - only a bounded, ranked slice.
+
+    Twenty unrelated modules exist in the map; the authorized one is the only
+    file the briefing may name in full, and none of the other nineteen
+    modules' own distinctive symbol names should leak into the text.
+    """
+    (tmp_path / "subject").mkdir()
+    (tmp_path / "subject" / "module.py").write_text(
+        "def authorized_marker_symbol():\n    return 1\n", encoding="utf-8"
+    )
+    unrelated_markers = []
+    for index in range(19):
+        marker = f"unrelated_marker_symbol_{index}"
+        unrelated_markers.append(marker)
+        (tmp_path / "subject" / f"other_{index}.py").write_text(
+            f"def {marker}():\n    return {index}\n", encoding="utf-8"
+        )
+    repo_map = build_repo_map(tmp_path, roots=("subject",))
+    assert len(repo_map.modules) == 20
+    envelope = AuthorityEnvelope.parse(
+        developer_briefing("a" * 40, allowed=["subject/module.py"])
+    )
+    instructions = developer_instructions(
+        envelope,
+        report_path=Path("report.json"),
+        worktree=tmp_path,
+        attempt=1,
+        repo_map=repo_map,
+    )
+    assert "authorized_marker_symbol" in instructions
+    leaked = [marker for marker in unrelated_markers if marker in instructions]
+    assert leaked == [], f"unrelated modules leaked into the briefing: {leaked}"
 
 
 def test_a_reviewer_packet_that_grants_a_writable_path_is_refused():
@@ -1060,10 +1120,19 @@ def _command():
 class ScriptedBackend:
     """A backend that edits the tree the way an obedient session would."""
 
-    def __init__(self, *, edit: Any = None, report: Mapping[str, Any] | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        edit: Any = None,
+        report: Mapping[str, Any] | None = None,
+        exploration: Mapping[str, Any] | None = None,
+        exploration_events: tuple[Mapping[str, Any], ...] = (),
+    ) -> None:
         self.name = "claude_code"
         self.edit = edit
         self.report = report
+        self.exploration = exploration
+        self.exploration_events = exploration_events
         self.launched: list[SessionRequest] = []
         self.session_ids: list[str] = []
 
@@ -1117,6 +1186,8 @@ class ScriptedBackend:
             result_text=result,
             transcript="scripted transcript",
             ok=True,
+            exploration=self.exploration,
+            exploration_events=self.exploration_events,
         )
 
 
@@ -2715,6 +2786,41 @@ def test_the_profile_stage_ceiling_tightens_the_run(repository):
     )
     assert applied["stage_limit"] == 4, "the consumer profile's stage ceiling"
     assert applied["stage_limit"] < MAX_STAGES_PER_RUN
+
+
+def test_a_session_with_exploration_telemetry_gets_an_exploration_json(repository):
+    """Repository Exploration Efficiency V2: the backend's own bounded trace
+    is written beside `session.json`, never folded into it."""
+    exploration = {
+        "format": "stream_json",
+        "file_reads_total": 4,
+        "file_reads_unique": 3,
+        "file_reads_repeated": 1,
+        "searches_total": 2,
+    }
+    events = (
+        {"order": 1, "tool": "Read", "category": "", "target": "subject/module.py", "repeat": False},
+    )
+    backend = ScriptedBackend(edit=_in_scope_edit, exploration=exploration, exploration_events=events)
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    runner = _runner(repository, backend, control)
+    report = runner.run_one(WORK_ORDER)
+    exploration_path = Path(report.run_dir) / "developer-01" / "exploration.json"
+    assert exploration_path.is_file()
+    written = json.loads(exploration_path.read_text("utf-8"))
+    assert written["file_reads_total"] == 4
+    assert written["events"][0]["target"] == "subject/module.py"
+
+
+def test_no_exploration_json_is_written_when_the_backend_gave_no_trace(repository):
+    """A backend that never produced exploration telemetry writes nothing -
+    UNAVAILABLE stays absent, not an empty file pretending to be a measurement."""
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    runner = _runner(repository, backend, control)
+    report = runner.run_one(WORK_ORDER)
+    exploration_path = Path(report.run_dir) / "developer-01" / "exploration.json"
+    assert not exploration_path.exists()
 
 
 # --- consumer resource mode: output reduction -----------------------------

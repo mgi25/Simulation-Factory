@@ -343,7 +343,9 @@ def _session() -> SessionOutcome:
     )
 
 
-def _runner_receipt(briefing, *, dependencies: tuple[str, ...] = ()) -> dict:
+def _runner_receipt(
+    briefing, *, dependencies: tuple[str, ...] = (), session: SessionOutcome | None = None
+) -> dict:
     envelope = AuthorityEnvelope.parse(briefing["payload"])
     changed = (f"{envelope.may_write[0]}/verify.py",)
     tests = tuple(
@@ -383,7 +385,7 @@ def _runner_receipt(briefing, *, dependencies: tuple[str, ...] = ()) -> dict:
             "context_refs_used": list(envelope.context_refs[:1]),
             "notes": "",
         },
-        session=_session(),
+        session=session or _session(),
         completed_at=dt.datetime(2026, 9, 18, tzinfo=dt.timezone.utc),
         accepted=True,
         dependencies_added=dependencies,
@@ -404,6 +406,47 @@ def test_a_receipt_the_runner_builds_is_one_company_os_accepts(briefing):
     assert receipt.no_subagents is True
     assert receipt.merge_performed is False
 
+
+
+def test_exploration_telemetry_survives_the_receipt_round_trip(briefing):
+    """Repository Exploration Efficiency V2: the three new usage fields are
+    read by `evidence._usage`, accepted by `ReceiptUsage.from_mapping` as a
+    known field rather than refused, and reach Company OS intact."""
+    session = SessionOutcome(
+        backend="claude_code",
+        role="developer",
+        session_id="00000000-0000-4000-8000-000000000000",
+        model="claude-test",
+        provider="anthropic",
+        exit_code=0,
+        duration_s=2.0,
+        result_text="",
+        transcript="",
+        ok=True,
+        cost_usd=0.25,
+        input_units=100,
+        output_units=200,
+        cache_read_units=50,
+        turns=7,
+        exploration={
+            "format": "stream_json",
+            "file_reads_total": 12,
+            "file_reads_repeated": 3,
+            "searches_total": 4,
+        },
+    )
+    payload = _runner_receipt(briefing, session=session)
+    receipt = SessionReceipt.from_mapping(payload)
+    assert receipt.usage.repo_file_reads == 12
+    assert receipt.usage.repeated_file_reads == 3
+    assert receipt.usage.repo_searches == 4
+    validation = validate_receipt(
+        briefing["packet"],
+        receipt,
+        packet_attempt=1,
+        authority_fingerprint=receipt.authority_fingerprint,
+    )
+    assert validation.failures == (), validation.failures
 
 
 def test_a_dependency_the_runner_measures_is_one_company_os_blocks_on(briefing):

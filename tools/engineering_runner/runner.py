@@ -1166,6 +1166,17 @@ class EngineeringRunner:
                 self._redactor.scrub(session.transcript),
             )
             write_json(stage_dir / "session.json", session.to_dict())
+            if session.exploration is not None:
+                # The bounded, normalised trace `exploration_report.py` and a
+                # human read for "what did this session actually explore" -
+                # separate from `session.json` so that file stays the same
+                # small shape it always was. Never the raw transcript: the
+                # events here are already reduced to a tool name, a category
+                # and a repo-relative path or pattern.
+                write_json(
+                    stage_dir / "exploration.json",
+                    {**session.exploration, "events": list(session.exploration_events)},
+                )
             try:
                 if report_path is not None and report_path.is_file():
                     answer = read_json_object(report_path, what)

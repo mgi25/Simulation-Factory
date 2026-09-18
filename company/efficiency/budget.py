@@ -33,13 +33,26 @@ Every budget dimension is now declared as exactly one of:
 
 `UNAVAILABLE`
     The company has no trustworthy value at all, for any session, by
-    construction. `repo_file_reads` and `repo_searches` are here: every
-    backend this company drives (`tools/engineering_runner/backends.py`,
-    `ClaudeCodeBackend.launch`) runs the CLI with `--output-format json`,
-    which returns one final result envelope and never a per-tool-call log.
-    There is no record, in any stored session, of which files a developer or
-    reviewer read or what it searched for - not a defect to fix, a fact about
-    the artifact the provider emits in this mode.
+    construction. Nothing is declared here as of Repository Exploration
+    Efficiency V2 - see the note on `repo_file_reads` below for what moved out
+    of this class and why.
+
+## `repo_file_reads`, `repo_searches`, `repeated_file_reads`: no longer UNAVAILABLE
+
+Repository Exploration Efficiency V1 declared these UNAVAILABLE because every
+backend this company drives (`tools/engineering_runner/backends.py`,
+`ClaudeCodeBackend.launch`) ran the CLI with `--output-format json`, which
+returns one final result envelope and never a per-tool-call log. V2 probed the
+installed CLI directly rather than trusting that description to still be true,
+and it is not: `--output-format stream-json` exists and, read through
+`tools.engineering_runner.exploration_telemetry`, gives a trustworthy
+post-session count of a session's own `Read` / `Grep` / `Glob` calls. That is
+still **after the session has finished** - nothing here is a live limit, and a
+session cannot be stopped mid-turn for reading too much - so the three move to
+POST_SESSION_OBSERVABLE, not to LIVE_ENFORCEABLE. A session whose transcript
+did not parse as `stream-json` (a different backend, an older CLI) still
+reports `None` for all three, and `check_budget` leaves them unscored exactly
+as it always has for a value it does not have.
 
 ## What check_budget is for, now
 
@@ -157,20 +170,26 @@ DIMENSIONS: tuple[BudgetDimension, ...] = (
     ),
     BudgetDimension(
         name="repo_file_reads",
-        enforceability=Enforceability.UNAVAILABLE,
+        enforceability=Enforceability.POST_SESSION_OBSERVABLE,
         note=(
-            "no stored session, of any age, carries a per-tool-call log; "
-            "see the UNAVAILABLE class note above. Declared so a reader of "
-            "this table sees the gap named rather than the dimension simply "
-            "missing"
+            "read from a stream-json transcript by "
+            "tools.engineering_runner.exploration_telemetry, after the "
+            "session has finished; None (not zero) when the transcript did "
+            "not carry a tool-call trace at all"
         ),
     ),
     BudgetDimension(
         name="repo_searches",
-        enforceability=Enforceability.UNAVAILABLE,
+        enforceability=Enforceability.POST_SESSION_OBSERVABLE,
+        note="same source and same reliability rule as repo_file_reads; Grep plus Glob calls",
+    ),
+    BudgetDimension(
+        name="repeated_file_reads",
+        enforceability=Enforceability.POST_SESSION_OBSERVABLE,
         note=(
-            "same as repo_file_reads: a grep or glob issued inside a coding "
-            "session leaves no trace this company can read"
+            "reads of a path the session had already read this session; an "
+            "observation of thrash, never an enforced ceiling - see "
+            "'Do not create fake enforcement' in the V2 milestone brief"
         ),
     ),
 )
@@ -284,6 +303,9 @@ def check_budget(
     output_tokens: int | None = None,
     cache_read_units: int | None = None,
     model_turns: int | None = None,
+    repo_file_reads: int | None = None,
+    repo_searches: int | None = None,
+    repeated_file_reads: int | None = None,
     unreliable: frozenset[str] | set[str] | tuple[str, ...] = (),
 ) -> BudgetCheck:
     """Score one finished session against the strategy it was issued.
@@ -304,6 +326,13 @@ def check_budget(
     turn counts disagreed. Pass it through and it is scored like any other
     POST_SESSION_OBSERVABLE dimension; leave it `None` (the caller did not
     have it, or marked it unreliable) and it stays unscored, same as before.
+
+    `repo_file_reads`, `repo_searches` and `repeated_file_reads` are
+    `receipt.usage.repo_file_reads` / `.repo_searches` / `.repeated_file_reads`
+    - V2 additions, read from a `stream-json` transcript when the backend
+    produced one. `None` when it did not (a different backend, an older CLI),
+    and `None` stays unscored rather than reading as a session that explored
+    nothing.
     """
     ceiling = strategy.resource_ceiling
     untrusted = frozenset(unreliable)
@@ -432,10 +461,12 @@ def check_budget(
         ),
     )
 
-    # Declared, never scorable: see Enforceability.UNAVAILABLE above. Recorded
-    # so a reader of one BudgetCheck sees the gap stated, not just absent.
-    score("repo_file_reads", "not observable", None, False)
-    score("repo_searches", "not observable", None, False)
+    # POST_SESSION_OBSERVABLE, same as input_tokens/output_tokens above: no
+    # ceiling to compare against, just a value worth recording when it is
+    # there and correctly left unscored (not zero) when it is not.
+    score("repo_file_reads", "observation only", repo_file_reads, False)
+    score("repo_searches", "observation only", repo_searches, False)
+    score("repeated_file_reads", "observation only", repeated_file_reads, False)
 
     return BudgetCheck(results=tuple(results))
 
