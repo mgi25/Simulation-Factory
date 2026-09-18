@@ -35,6 +35,7 @@ import sys
 from typing import Any
 
 from .config import RunnerConfig
+from .resources import DEFAULT_TIER_MODELS, STANDARD, STRONGEST
 from .errors import ConfigurationError, RunnerError
 from .queue import RunStore
 from .runner import COMPLETED, SKIPPED, EngineeringRunner
@@ -97,6 +98,24 @@ def _common(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--reviewer-backend", default="")
     parser.add_argument("--developer-model", default="")
     parser.add_argument("--reviewer-model", default="")
+    parser.add_argument(
+        "--standard-model",
+        default=DEFAULT_TIER_MODELS[STANDARD],
+        help="which vendor model the standard tier means; an alias by default, so "
+        "the account's current model of that strength is what runs",
+    )
+    parser.add_argument(
+        "--strongest-model",
+        default=DEFAULT_TIER_MODELS[STRONGEST],
+        help="which vendor model the strongest tier means",
+    )
+    parser.add_argument(
+        "--ignore-resource-strategy",
+        action="store_true",
+        help="record the resource strategy Company OS recommended and run the "
+        "operator's own settings instead; a debugging seam, not a way to spend "
+        "more, since the runner's own timeouts still bind",
+    )
     parser.add_argument("--python", dest="python_executable", default=sys.executable)
     parser.add_argument("--remote", default="origin")
     parser.add_argument("--poll-interval", type=float, default=20.0)
@@ -138,6 +157,9 @@ def configuration(args: argparse.Namespace) -> RunnerConfig:
         reviewer_backend=args.reviewer_backend,
         developer_model=args.developer_model,
         reviewer_model=args.reviewer_model,
+        standard_model=args.standard_model,
+        strongest_model=args.strongest_model,
+        apply_resource_strategy=not args.ignore_resource_strategy,
         python_executable=args.python_executable,
         remote=args.remote,
         poll_interval_s=args.poll_interval,
