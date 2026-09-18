@@ -14,6 +14,15 @@ from ai_platform.serde import fingerprint
 from ai_platform.usage import Outcome, ResourceUsageRecord
 from company.analytics.integrity import check_integrity as analytics_integrity
 from company.engineering.lifecycle import CEO_STATES, JobState
+
+# The reserved action that makes an engineering branch the CEO's to accept.
+# `company/integration/report.py` cites the same one in its own authorization
+# note: "wiring Company OS into production is a separate CEO decision
+# (permissions.yaml, merge_major_architecture_rewrite)". A job that is blocked
+# or awaiting a decision is a job whose acceptance the CEO must still make, so
+# all three CEO states cite it. `_engineering_reserved` checks the name against
+# `permissions.yaml` rather than trusting this constant.
+ENGINEERING_RESERVED_ACTION = "merge_major_architecture_rewrite"
 from company.engineering.store import EngineeringStore
 from company.analytics.store import AnalyticsStore
 from company.finance.integrity import check_integrity as finance_integrity
@@ -243,6 +252,24 @@ class _Reader:
                                         dims, tuple(r.key for r in refs), integrity_issues=tuple(issues)), refs,
                        attention=tuple(attention), records={k: tuple(r for r, _ in v) for k, v in decoded.items()})
 
+    def _engineering_reserved(self) -> tuple[str, ...]:
+        """The reserved action, confirmed against `permissions.yaml`.
+
+        A decision item that named an action the permissions file does not
+        reserve would claim an authority nobody granted, so the name is looked
+        up rather than asserted. If it is ever removed from `permissions.yaml`
+        the queue carries no reserved action, the dashboard's own integrity
+        check says so, and the drift is visible instead of silent.
+        """
+        declared = self.config.permissions.get("ceo_reserved", ())
+        if not isinstance(declared, (list, tuple)):
+            return ()
+        return (
+            (ENGINEERING_RESERVED_ACTION,)
+            if ENGINEERING_RESERVED_ACTION in declared
+            else ()
+        )
+
     def engineering(self) -> _Result:
         """The engineering lifecycle, as the CEO's own read-only projection.
 
@@ -307,6 +334,7 @@ class _Reader:
                         risk=order.risk.value,
                         reversibility="reversible" if order.reversible else "irreversible",
                         current_state=job.state.value,
+                        reserved_actions=self._engineering_reserved(),
                         blocked=job.state is not JobState.READY_FOR_APPROVAL,
                         created_on=order.authorized_on,
                     )

@@ -1470,3 +1470,98 @@ def test_every_record_round_trips_through_its_own_decoder(tmp_path):
     ):
         again = decoder(json.loads(dumps(record)))
         assert again.fingerprint() == record.fingerprint(), type(record).__name__
+
+
+# --- 16. the CEO dashboard surface --------------------------------------
+#
+# The CEO already has a read-only projection and a brief. These tests hold the
+# engineering section to the two properties that matter: every lifecycle state
+# is visible, and the projection cannot act.
+
+
+def _snapshot(state: Path):
+    from company.dashboard.brief import build_brief
+    from company.dashboard.builder import CompanyStatePaths, build_snapshot
+
+    snapshot = build_snapshot(
+        sources=CompanyStatePaths.flat(state), as_of=DAY, repo_root=ROOT
+    )
+    return snapshot, build_brief(snapshot)
+
+
+def test_every_lifecycle_state_is_a_dashboard_dimension(tmp_path):
+    run = _drive(tmp_path)
+    snapshot, _brief = _snapshot(run["state"])
+    section = snapshot.section("engineering")
+    names = {item.name for item in section.dimensions}
+    for state in JobState:
+        assert f"jobs_{state.value}" in names, state
+    values = {item.name: item.value for item in section.dimensions}
+    assert values["jobs_ready_for_approval"] == 1
+    assert values["work_orders"] == 1
+    assert values["awaiting_ceo"] == 1
+    assert values["developer_attempts"] == 1
+    assert values["reviews_independent"] is True
+
+
+def test_a_ready_job_reaches_the_ceo_decision_queue_and_the_brief(tmp_path):
+    run = _drive(tmp_path)
+    snapshot, brief = _snapshot(run["state"])
+    items = [
+        item for item in snapshot.decision_queue
+        if item.source_subsystem.value == "engineering"
+    ]
+    assert len(items) == 1
+    item = items[0]
+    assert item.current_state == "ready_for_approval"
+    assert item.reserved_actions == ("merge_major_architecture_rewrite",)
+    assert "nothing is merged" in item.why_ceo_attention
+    assert item.evidence_refs
+    assert any(run["order"].objective[:40] in line for line in brief.decisions)
+
+
+def test_the_projection_reports_zero_authorized_merges(tmp_path):
+    run = _drive(tmp_path)
+    snapshot, _brief = _snapshot(run["state"])
+    section = snapshot.section("engineering")
+    merges = next(item for item in section.dimensions if item.name == "merges_authorized")
+    assert merges.value == 0
+    assert merges.known is True
+    assert "structurally zero" in merges.note.lower()
+
+
+def test_a_blocked_job_is_an_attention_item_rather_than_a_silent_state(tmp_path):
+    run = _drive(tmp_path, readiness=GateReadiness.BLOCKED)
+    assert run["job"].state is JobState.BLOCKED
+    snapshot, _brief = _snapshot(run["state"])
+    items = [
+        item for item in snapshot.attention_items if item.category == "engineering"
+    ]
+    assert len(items) == 1
+    assert items[0].level.value == "blocked"
+    assert items[0].resolves_when
+
+
+def test_the_snapshot_over_a_real_run_has_no_integrity_issue(tmp_path):
+    run = _drive(tmp_path)
+    snapshot, _brief = _snapshot(run["state"])
+    assert snapshot.unresolved_integrity_issues == ()
+    assert snapshot.section("engineering").availability.value == "available"
+
+
+def test_an_empty_store_reports_missing_rather_than_zero(tmp_path):
+    """No work order is unknown, not a company with nothing to do."""
+    (tmp_path / "empty").mkdir()
+    snapshot, _brief = _snapshot(tmp_path / "empty")
+    section = snapshot.section("engineering")
+    assert section.availability.value == "missing"
+    assert "engineering:no_work_orders" in section.missing
+
+
+def test_the_dashboard_projection_cannot_act_on_a_work_order():
+    """A read model with a verb is a read model that can be talked into using it."""
+    import company.dashboard as dashboard
+
+    forbidden = ("approve", "reject", "merge", "decide", "advance", "close", "publish")
+    for name in dir(dashboard):
+        assert not any(name.lower().startswith(verb) for verb in forbidden), name

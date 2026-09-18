@@ -1,0 +1,85 @@
+{
+  "cache_hits": 0,
+  "cache_identity": "e59da5a5c1fd3dbc",
+  "cache_misses": null,
+  "capabilities_selected": [
+    "software_implementation"
+  ],
+  "capsule_chars": 16985,
+  "capsule_count": 6,
+  "capsules_selected": [
+    "company-engineering-execution",
+    "ai-platform",
+    "company-knowledge-capsules",
+    "company-knowledge-store",
+    "company-runtime",
+    "company-validation"
+  ],
+  "context_bytes": null,
+  "context_chars": null,
+  "context_expansion_approvals": 0,
+  "context_expansion_denials": 0,
+  "context_expansion_requests": 0,
+  "context_manifest_bytes": 3099,
+  "context_manifest_chars": 3099,
+  "context_manifest_fingerprint": "02d24911b2fed7ab",
+  "cost": {
+    "amount": null,
+    "currency": "",
+    "rate_ref": "",
+    "reason": "provider omitted monetary cost",
+    "source": "unavailable"
+  },
+  "estimated_tokens": {
+    "input_tokens": 1211,
+    "method": "ceil(utf8_bytes/4)",
+    "output_tokens": 66,
+    "reason": "",
+    "source": "estimated",
+    "total_tokens": 1277
+  },
+  "execution_packet_bytes": 4844,
+  "execution_packet_chars": 4844,
+  "integrations": [
+    {
+      "available": false,
+      "enabled": false,
+      "name": "graphify",
+      "reason": "not installed; repository reference provider remains active"
+    },
+    {
+      "available": false,
+      "enabled": false,
+      "name": "rtk",
+      "reason": "not installed; raw tool output remains the model-context output"
+    }
+  ],
+  "latency_ms": null,
+  "minimalism": null,
+  "mode": "real",
+  "model": null,
+  "outcome": "accepted",
+  "packet_attempt": 1,
+  "packet_fingerprint": "2151d8654cee3405",
+  "provider": null,
+  "repository_files_read": [],
+  "repository_references_selected": [],
+  "run_id": "execution:2151d8654cee3405:1:receipt:11fe48649dc7e949",
+  "schema_version": 1,
+  "task_id": "wo-governance-drift-check",
+  "timestamp": "2026-09-18T00:00:00+00:00",
+  "tokens": {
+    "input_tokens": null,
+    "method": "",
+    "output_tokens": null,
+    "reason": "provider omitted token usage",
+    "source": "unavailable",
+    "total_tokens": null
+  },
+  "tool_activity": [],
+  "tool_calls": 31,
+  "tool_context_bytes": null,
+  "tool_context_chars": null,
+  "tool_output_bytes": null,
+  "tool_output_chars": null
+}

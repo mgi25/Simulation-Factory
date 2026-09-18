@@ -1,0 +1,317 @@
+{
+  "implementer": "software_implementation_engineer",
+  "packet": {
+    "acceptance_criteria": [
+      "The stated objective is implemented: Let me check at any time whether the protected governance files have changed since an engineering work order was authorized, without having to run a review to find out.",
+      "company-engineering-execution invariant still holds: The authorized work order is immutable; every later stage carries its fingerprint and refuses a mismatch.",
+      "company-engineering-execution invariant still holds: A review outcome is the worst of the attested and deterministic verdicts, so a reviewer PASS cannot rescue a failed check.",
+      "company-engineering-execution invariant still holds: The implementer and the reviewer are different employees, routed by disjoint capabilities.",
+      "company-engineering-execution invariant still holds: The protected governance surface is digested before the work and re-read at review; a change blocks the job.",
+      "company-engineering-execution invariant still holds: No state means approved and nothing merges, deploys or publishes; the CEO decision is recorded, not acted on.",
+      "company-engineering-execution invariant still holds: The gate verdict is read from the gate's own report; this subsystem holds no code that can produce one.",
+      "Every declared test passes: tests/test_company_engineering_execution.py"
+    ],
+    "automatic_context_refs": [
+      "module_contract:capsule:ai-platform",
+      "module_contract:capsule:company-knowledge-capsules",
+      "module_contract:capsule:company-knowledge-store",
+      "module_contract:capsule:company-runtime",
+      "module_contract:capsule:company-validation"
+    ],
+    "completion_protocol": [
+      "implement the objective, changing only allowed paths",
+      "run every required test and report the result",
+      "commit the work",
+      "push the assigned branch",
+      "verify the exact remote SHA matches the local commit",
+      "do not merge",
+      "return a compact handoff receipt"
+    ],
+    "constraints": [],
+    "context_cache_key": "5bbb447942e058eb",
+    "context_fingerprint": "a6d0cdc79a6cca0e",
+    "context_refs": [
+      {
+        "digest": "",
+        "kind": "module_contract",
+        "reason": "owns company/engineering for task path company/engineering",
+        "ref": "capsule:company-engineering-execution",
+        "span": null
+      },
+      {
+        "digest": "",
+        "kind": "module_contract",
+        "reason": "dependency of company-engineering-execution",
+        "ref": "capsule:ai-platform",
+        "span": null
+      },
+      {
+        "digest": "",
+        "kind": "module_contract",
+        "reason": "dependency of company-engineering-execution",
+        "ref": "capsule:company-knowledge-capsules",
+        "span": null
+      },
+      {
+        "digest": "",
+        "kind": "module_contract",
+        "reason": "dependency of company-engineering-execution",
+        "ref": "capsule:company-knowledge-store",
+        "span": null
+      },
+      {
+        "digest": "",
+        "kind": "module_contract",
+        "reason": "dependency of company-engineering-execution",
+        "ref": "capsule:company-runtime",
+        "span": null
+      },
+      {
+        "digest": "",
+        "kind": "module_contract",
+        "reason": "dependency of company-engineering-execution",
+        "ref": "capsule:company-validation",
+        "span": null
+      },
+      {
+        "digest": "",
+        "kind": "test",
+        "reason": "declared test of the owning capsule",
+        "ref": "tests/test_company_engineering_execution.py",
+        "span": null
+      }
+    ],
+    "employee": "chief_architect",
+    "evidence_required": true,
+    "executor": "claude_code",
+    "expected_base_commit": "6b50b116c52e2fae5fc44a03ebcc2a5b0c358513",
+    "expected_branch": "eng-governance-drift-check",
+    "explicit_context_refs": [
+      "module_contract:capsule:company-engineering-execution",
+      "test:tests/test_company_engineering_execution.py"
+    ],
+    "no_subagents": true,
+    "objective": "Independently review the implementation of work order wo-governance-drift-check against its acceptance criteria.",
+    "path_scope": {
+      "allowed": [],
+      "forbidden": []
+    },
+    "reasoning_class": "D",
+    "required_tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "resource_class": "specialist_reasoning",
+    "task_id": "wo-governance-drift-check-review",
+    "version": 1
+  },
+  "packet_fingerprint": "bc95dc5f5e2cf7af",
+  "persisted": {
+    "authority": {
+      "attempt": 1,
+      "fingerprint": "df2bed395c942c03",
+      "record_ref": "execution/authorities/wo-governance-drift-check-review-5d7f92405bbb/000001.json"
+    },
+    "job": {
+      "fingerprint": "83169f99d4a92aec",
+      "record_ref": "engineering/jobs/wo-governance-drift-check-3e66f7617527/000004.json",
+      "sequence": 4
+    },
+    "packet": {
+      "attempt": 1,
+      "fingerprint": "bc95dc5f5e2cf7af",
+      "record_ref": "execution/packets/wo-governance-drift-check-review-5d7f92405bbb/000001.json"
+    }
+  },
+  "read_only": true,
+  "review_instructions": [
+    "read the work order, the diff, the reported tests and the changed paths",
+    "answer every acceptance criterion with a reference to what satisfies it",
+    "report one finding per defect, with a severity and a reference",
+    "change nothing: this packet grants no writable path",
+    "return pass, changes_required or blocked, and never an approval"
+  ],
+  "reviewer": "chief_architect",
+  "role": "reviewer",
+  "size_chars": 2287,
+  "state": "reviewing",
+  "transport": {
+    "authority_fingerprint": "df2bed395c942c03",
+    "authority_ref": "execution/authorities/wo-governance-drift-check-review-5d7f92405bbb/000001.json",
+    "effective_context_fingerprint": "a6d0cdc79a6cca0e",
+    "expansion_instructions": [
+      "request additional references with context-request",
+      "Company OS decides requests from the stored preparation-time authority",
+      "use only initial or approved context references"
+    ],
+    "no_subagents": true,
+    "packet": {
+      "acceptance_criteria": [
+        "The stated objective is implemented: Let me check at any time whether the protected governance files have changed since an engineering work order was authorized, without having to run a review to find out.",
+        "company-engineering-execution invariant still holds: The authorized work order is immutable; every later stage carries its fingerprint and refuses a mismatch.",
+        "company-engineering-execution invariant still holds: A review outcome is the worst of the attested and deterministic verdicts, so a reviewer PASS cannot rescue a failed check.",
+        "company-engineering-execution invariant still holds: The implementer and the reviewer are different employees, routed by disjoint capabilities.",
+        "company-engineering-execution invariant still holds: The protected governance surface is digested before the work and re-read at review; a change blocks the job.",
+        "company-engineering-execution invariant still holds: No state means approved and nothing merges, deploys or publishes; the CEO decision is recorded, not acted on.",
+        "company-engineering-execution invariant still holds: The gate verdict is read from the gate's own report; this subsystem holds no code that can produce one.",
+        "Every declared test passes: tests/test_company_engineering_execution.py"
+      ],
+      "automatic_context_refs": [
+        "module_contract:capsule:ai-platform",
+        "module_contract:capsule:company-knowledge-capsules",
+        "module_contract:capsule:company-knowledge-store",
+        "module_contract:capsule:company-runtime",
+        "module_contract:capsule:company-validation"
+      ],
+      "completion_protocol": [
+        "implement the objective, changing only allowed paths",
+        "run every required test and report the result",
+        "commit the work",
+        "push the assigned branch",
+        "verify the exact remote SHA matches the local commit",
+        "do not merge",
+        "return a compact handoff receipt"
+      ],
+      "constraints": [],
+      "context_cache_key": "5bbb447942e058eb",
+      "context_fingerprint": "a6d0cdc79a6cca0e",
+      "context_refs": [
+        {
+          "digest": "",
+          "kind": "module_contract",
+          "reason": "owns company/engineering for task path company/engineering",
+          "ref": "capsule:company-engineering-execution",
+          "span": null
+        },
+        {
+          "digest": "",
+          "kind": "module_contract",
+          "reason": "dependency of company-engineering-execution",
+          "ref": "capsule:ai-platform",
+          "span": null
+        },
+        {
+          "digest": "",
+          "kind": "module_contract",
+          "reason": "dependency of company-engineering-execution",
+          "ref": "capsule:company-knowledge-capsules",
+          "span": null
+        },
+        {
+          "digest": "",
+          "kind": "module_contract",
+          "reason": "dependency of company-engineering-execution",
+          "ref": "capsule:company-knowledge-store",
+          "span": null
+        },
+        {
+          "digest": "",
+          "kind": "module_contract",
+          "reason": "dependency of company-engineering-execution",
+          "ref": "capsule:company-runtime",
+          "span": null
+        },
+        {
+          "digest": "",
+          "kind": "module_contract",
+          "reason": "dependency of company-engineering-execution",
+          "ref": "capsule:company-validation",
+          "span": null
+        },
+        {
+          "digest": "",
+          "kind": "test",
+          "reason": "declared test of the owning capsule",
+          "ref": "tests/test_company_engineering_execution.py",
+          "span": null
+        }
+      ],
+      "employee": "chief_architect",
+      "evidence_required": true,
+      "executor": "claude_code",
+      "expected_base_commit": "6b50b116c52e2fae5fc44a03ebcc2a5b0c358513",
+      "expected_branch": "eng-governance-drift-check",
+      "explicit_context_refs": [
+        "module_contract:capsule:company-engineering-execution",
+        "test:tests/test_company_engineering_execution.py"
+      ],
+      "no_subagents": true,
+      "objective": "Independently review the implementation of work order wo-governance-drift-check against its acceptance criteria.",
+      "path_scope": {
+        "allowed": [],
+        "forbidden": []
+      },
+      "reasoning_class": "D",
+      "required_tests": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "resource_class": "specialist_reasoning",
+      "task_id": "wo-governance-drift-check-review",
+      "version": 1
+    },
+    "packet_attempt": 1,
+    "packet_ref": "execution/packets/wo-governance-drift-check-review-5d7f92405bbb/000001.json",
+    "receipt_version": 1
+  },
+  "work_order": {
+    "acceptance_criteria": [
+      "The stated objective is implemented: Let me check at any time whether the protected governance files have changed since an engineering work order was authorized, without having to run a review to find out.",
+      "company-engineering-execution invariant still holds: The authorized work order is immutable; every later stage carries its fingerprint and refuses a mismatch.",
+      "company-engineering-execution invariant still holds: A review outcome is the worst of the attested and deterministic verdicts, so a reviewer PASS cannot rescue a failed check.",
+      "company-engineering-execution invariant still holds: The implementer and the reviewer are different employees, routed by disjoint capabilities.",
+      "company-engineering-execution invariant still holds: The protected governance surface is digested before the work and re-read at review; a change blocks the job.",
+      "company-engineering-execution invariant still holds: No state means approved and nothing merges, deploys or publishes; the CEO decision is recorded, not acted on.",
+      "company-engineering-execution invariant still holds: The gate verdict is read from the gate's own report; this subsystem holds no code that can produce one.",
+      "Every declared test passes: tests/test_company_engineering_execution.py"
+    ],
+    "authorized_branch": "eng-governance-drift-check",
+    "authorized_on": "2026-09-18",
+    "authorized_paths": [
+      "company/engineering",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "base_commit": "6b50b116c52e2fae5fc44a03ebcc2a5b0c358513",
+    "constraints": [],
+    "context_refs": [
+      "module_contract:capsule:company-engineering-execution",
+      "test:tests/test_company_engineering_execution.py"
+    ],
+    "escalate_instead_of": [
+      "changing architecture outside the authorized paths",
+      "adding a dependency the work order did not authorize",
+      "reading or using any credential, token or secret",
+      "widening the objective beyond what the work order states",
+      "editing any protected governance path",
+      "deciding a business question the work order leaves open",
+      "any destructive operation on repository or company data",
+      "merging, deploying, publishing or tagging anything"
+    ],
+    "forbidden_paths": [
+      "company/constitution.md",
+      "company/integration",
+      "company/permissions.yaml",
+      "company/runtime",
+      "sloped",
+      "tools"
+    ],
+    "max_developer_attempts": 3,
+    "objective": "Let me check at any time whether the protected governance files have changed since an engineering work order was authorized, without having to run a review to find out.",
+    "protected_paths": [
+      "ai_platform/policy.py",
+      "company/agent_contract.schema.yaml",
+      "company/constitution.md",
+      "company/integration/checks.py",
+      "company/integration/policy.py",
+      "company/integration/suites.py",
+      "company/org_registry.yaml",
+      "company/permissions.yaml",
+      "company/task_handoff.schema.yaml",
+      "company/validation/no_subagents.py"
+    ],
+    "requested_by": "MGI",
+    "required_tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "work_order_fingerprint": "6c1ce3643e5b86fc",
+    "work_order_id": "wo-governance-drift-check"
+  }
+}
