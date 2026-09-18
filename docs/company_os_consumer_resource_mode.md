@@ -174,7 +174,10 @@ beside a wider packet. `context_refs_scoped` is gone.
 ### Measured, on the real BEFORE work order
 
 Driven through real production intake against the real capsule index, with the
-`attempts-remaining` objective the historical BEFORE job used:
+`attempts-remaining` objective the historical BEFORE job used. Sizes are
+measured the same way on both sides — `json.dumps(..., sort_keys=True)` with
+no indentation — because the runner writes its own copy indented and
+comparing one against the other would measure the whitespace.
 
 | | before (`5d73557`) | after | change |
 |---|---|---|---|
@@ -183,7 +186,7 @@ Driven through real production intake against the real capsule index, with the
 | packet references | 7 | 2 | −71% |
 | packet size | 1,552 chars | 1,124 chars | −27.6% |
 | context manifest | 858 chars | 430 chars | −49.9% |
-| briefing JSON | 9,923 chars | 9,604 chars | −3.2% |
+| briefing JSON (compact) | 9,923 chars | 9,604 chars | −3.2% |
 | **material the references point at** | **16,985 chars** | **3,661 chars** | **−78.4%** |
 | automatic developer attempts | 3 | 1 | −67% |
 
@@ -393,3 +396,87 @@ consumer resource window — by not selecting the strongest model for routine
 work, not spending a second session nobody asked for, not pointing a bounded
 change at a capsule closure it does not need, and not believing a budget check
 that cannot fail.
+
+---
+
+## 13. The matched real job, and what it actually saved
+
+One routine job, the same `attempts-remaining` objective the historical BEFORE
+run used, through real production intake and the real runner. Work order
+`wo-ceo-2026-09-18-attempts-remaining-consumer`, branch
+`eng-attempts-remaining-consumer`, commit `8dde0876`. **Reviewer PASS, gate
+READY 11/11, `ready_for_approval`, one developer attempt.**
+
+Intake classified it routine with no prompting: `specialist_domain: ""`,
+profile `consumer`, one authorized attempt, reason recorded as *"the objective
+names no security, governance, architecture or concurrency work and the risk is
+not high, so this is routine implementation"*. The runner resolved
+`tier:standard` to `sonnet`, applied a 1800 s wall ceiling and a $3.00 provider
+spend ceiling, and wrote both beside the stage.
+
+### The defect the run found
+
+The first attempt was refused by the control plane after the work was finished,
+committed, tested and pushed:
+
+```
+the supplied plan does not match the packet:
+context b2655e65812a5d67 against packet 491e65227d33fd85
+```
+
+The brief stage narrowed context by the resource profile and the receipt stage
+re-planned without it, so `ManualExternalSessionAdapter.ingest` compared two
+manifests assembled under different rules. Same shape as the seven defects the
+first dogfood found — an assumption about the other side of a boundary,
+invisible to any amount of testing one half. Fixed by giving every `plan_task`
+call in the subsystem the same policy, with a behavioural test and a source
+guard, both of which fail when the defect is reintroduced.
+
+The run also demonstrated the checkpoint: 4,008 characters holding the work
+order, the completed work, the commit, the uncommitted paths, failing tests,
+unresolved findings and the context references — and no transcript.
+
+### Measured, against both historical runs of the same objective
+
+| | BEFORE `01a1638` | AFTER-V2 `5d73557` | consumer |
+|---|---|---|---|
+| model | opus | opus | **sonnet** |
+| authorized attempts | 3 | 3 | **1** |
+| developer cost | $1.2719 | $1.7408 | $1.6406 |
+| reviewer cost | $0.3598 | $0.3376 | $0.2956 |
+| **job cost** | **$1.6317** | **$2.0784** | **$1.9362** |
+| turns | 45 | 51 | 46 |
+| output tokens | 9,194 | 11,787 | 14,143 |
+| cache read | 1,488,091 | 2,226,932 | 1,913,995 |
+| cache creation | not captured | not captured | 100,065 |
+| reviewer verdict | pass | pass | pass |
+| gate | ready | ready | ready |
+
+**The model-tier lever is much weaker on this workload than its price
+difference suggests, and the run says so plainly.** Against the immediately
+preceding baseline the job cost 6.8% less; against the original BEFORE it cost
+18.7% *more*. The cheaper model did not do the same work more cheaply — it did
+more work: 39 turns and 11,020 output tokens against BEFORE's 29 and 5,821, on
+the same objective. Price per token fell and token count rose.
+
+**And one sample per condition proves less than it looks.** The two historical
+runs are the *same task on the same model* and their developer sessions differ
+by 37% ($1.27 against $1.74). That spread is larger than either difference
+claimed above. Nothing here establishes a per-session cost saving.
+
+**What is durable is structural, not per-session:**
+
+- **Attempts: 3 → 1.** The worst case is what this milestone exists for. The
+  Efficiency V2 build burned ~201 recorded turns and ~13.2M cache-read units
+  across repeated developer and reviewer attempts on one work order. A first
+  attempt that satisfies review costs the same either way; a first attempt that
+  does not now costs one session and a decision instead of three sessions.
+- **Referenced material: 16,985 → 3,661 characters.** Not the packet — what the
+  packet points at.
+- **A live per-session spend ceiling**, which did not exist before in any form.
+- **Telemetry that can be believed**, including 100,065 cache-creation units
+  that were previously invisible. The zeros in the historical columns are
+  "never captured", not "none".
+
+The `attempts_remaining` change the job delivered is on `eng-attempts-remaining-consumer`
+and is **not merged**; it is the validation artifact, not part of this milestone.
