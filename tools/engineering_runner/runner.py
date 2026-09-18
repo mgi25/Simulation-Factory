@@ -298,24 +298,39 @@ class EngineeringRunner:
         state = ""
         try:
             state = self._state(work_order_id)
+            # The correction loop lives here, and it is Company OS's loop, not
+            # the runner's. A review that requires changes sends the job back
+            # to `planning`, which is actionable, so the next turn of this loop
+            # issues the next attempt - and stops when the work order's attempt
+            # ceiling is spent, because `record_review` then moves the job to
+            # `decision_required` instead, which is not actionable.
+            #
+            # Continuing on a stage that did not pass is therefore correct, and
+            # the thing that must not be continued is a stage that did not
+            # *move* the job: that is a stall, not a correction, and repeating
+            # it would spend sessions on the same state forever.
+            previous = ""
             for _ in range(MAX_STAGES_PER_RUN):
                 if state not in ACTIONABLE:
                     break
+                if state == previous:
+                    outcome = RUN_FAILED
+                    reason = (
+                        f"the {state} stage left the job in {state}; stopping rather "
+                        "than repeating a stage that did not move it"
+                    )
+                    break
+                previous = state
                 lease = self._store.heartbeat(lease, stage=state)
                 record = self._stage(work_order_id, state, run_dir)
                 stages.append(record)
                 state = record.state_after or self._state(work_order_id)
-                if not record.ok:
-                    break
             else:
                 outcome = RUN_FAILED
                 reason = (
                     f"the lifecycle did not settle in {MAX_STAGES_PER_RUN} stages; "
                     "stopping rather than continuing to spend sessions"
                 )
-            if outcome == COMPLETED and stages and not stages[-1].ok:
-                outcome = RUN_FAILED
-                reason = stages[-1].detail
         except AuthorityViolation as exc:
             outcome, reason = RUN_BLOCKED, str(exc)
         except (RunnerError, OSError) as exc:
@@ -327,9 +342,21 @@ class EngineeringRunner:
                 pass
             self._store.release(lease)
 
+        # The run's outcome is the job's state, not the last stage's verdict. A
+        # review that required changes is a stage that did not pass and a run
+        # that may still reach `ready_for_approval` two stages later; and a run
+        # that stopped anywhere short of it did not finish, whichever stage
+        # stopped short.
         if outcome == COMPLETED and state in (BLOCKED, DECISION_REQUIRED):
             outcome = RUN_BLOCKED
             reason = reason or f"the job is {state} and waits for the CEO"
+        elif outcome == COMPLETED and state != READY_FOR_APPROVAL:
+            outcome = RUN_FAILED
+            reason = reason or (
+                stages[-1].detail
+                if stages
+                else f"the job is {state or 'unknown'} and the runner cannot move it"
+            )
 
         report = RunReport(
             work_order_id=work_order_id,

@@ -836,6 +836,8 @@ class ScriptedControlPlane:
         self.attestations: list[dict[str, Any]] = []
         self.review_repo_roots: list[Path] = []
         self.review_outcome = "pass"
+        self.corrections = 0
+        self.max_attempts = 3
         self.receipt_accepted = True
 
     # the surface `EngineeringRunner` uses
@@ -874,12 +876,33 @@ class ScriptedControlPlane:
     def submit_review(
         self, work_order_id: str, attestation_file: Path, *, implementer: str, repo_root: Path
     ):
+        """Adjudicate like the real one: the worst of attested and deterministic.
+
+        The outcome decides the next state, and that mapping is
+        `company/engineering/orchestrator.record_review`: PASS goes to the
+        gate, CHANGES_REQUIRED goes back to `planning` while attempts remain
+        and to `decision_required` when they do not, and BLOCKED goes to
+        `blocked`. A stand-in that always said PASS would let the runner's loop
+        look correct on an attempt Company OS would have sent back.
+        """
         payload = json.loads(Path(attestation_file).read_text(encoding="utf-8"))
         self.attestations.append(payload)
         self.review_repo_roots.append(Path(repo_root))
+        outcome = self.review_outcome
+        if outcome == "pass" and not self.receipts[-1]["outcome"] == "accepted":
+            outcome = "changes_required"
         self.calls.append(("review", payload["verdict"]))
-        self._advance("gate")
-        return _reply({"state": "gate", "review": {"outcome": self.review_outcome}})
+        if outcome == "pass":
+            self._advance("gate")
+            state = "gate"
+        elif outcome == "changes_required":
+            self.corrections += 1
+            state = "planning" if self.corrections < self.max_attempts else "decision_required"
+            self._advance(state)
+        else:
+            self._advance("blocked")
+            state = "blocked"
+        return _reply({"state": state, "review": {"outcome": outcome}})
 
     def gate_check(self, *, gate_repo_root: Path, suite_evidence: Path, timeout_s: float):
         self.calls.append(("gate-check", str(gate_repo_root)))
@@ -1077,13 +1100,74 @@ def test_a_failing_required_test_produces_a_rejected_receipt_rather_than_a_pass(
 
     control = ScriptedControlPlane(repository["base"], states=["planning"])
     control.receipt_accepted = False
+    control.max_attempts = 1  # no correction budget: one attempt, then the CEO
     backend = ScriptedBackend(edit=break_it)
     report = _runner(repository, backend, control).run_one(WORK_ORDER)
 
     receipt = control.receipts[0]
     assert receipt["outcome"] == "rejected"
     assert "required test(s) failed" in receipt["rejection_reason"]
-    assert report.outcome != COMPLETED
+    assert report.outcome == RUN_BLOCKED
+    assert report.final_state == "decision_required"
+
+
+def test_a_review_that_requires_changes_spends_another_authorized_attempt(repository):
+    """The correction loop is Company OS's, and the runner turns its crank.
+
+    A review that requires changes sends the job back to `planning`, which is
+    actionable, so the next turn of the run issues the next attempt. The runner
+    decides nothing about it: the ceiling that stops the loop is the work
+    order's, and it stops the loop by moving the job somewhere the runner
+    cannot act on.
+    """
+    attempts = {"count": 0}
+
+    def fix_on_the_second_try(worktree: Path) -> None:
+        attempts["count"] += 1
+        value = 0 if attempts["count"] == 1 else 2
+        (worktree / "subject" / "module.py").write_text(
+            "VALUE = " + str(value) + chr(10), encoding="utf-8"
+        )
+
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    control.max_attempts = 3
+    backend = ScriptedBackend(edit=fix_on_the_second_try)
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    assert attempts["count"] == 2
+    assert [item.stage for item in report.stages] == [
+        "developer",
+        "reviewer",
+        "developer",
+        "reviewer",
+        "gate",
+    ]
+    assert report.outcome == COMPLETED, report.reason
+    assert report.final_state == "ready_for_approval"
+    assert control.receipts[0]["outcome"] == "rejected"
+    assert control.receipts[1]["outcome"] == "accepted"
+    # Four sessions - two developer, two reviewer - and no two share an id.
+    # The gate stage launches none: it runs suites and a CLI.
+    assert len(set(backend.session_ids)) == len(backend.session_ids) == 4
+
+
+def test_a_stage_that_does_not_move_the_job_stops_the_run(repository):
+    """A stall is not a correction, and repeating it would spend sessions forever."""
+
+    class GoesNowhere(ScriptedControlPlane):
+        def submit_receipt(self, work_order_id, receipt_file, *, repo_dir=None):
+            payload = json.loads(Path(receipt_file).read_text(encoding="utf-8"))
+            self.receipts.append(payload)
+            self._advance("planning")
+            return _reply({"state": "planning", "accepted": False, "failures": []})
+
+    control = GoesNowhere(repository["base"], states=["planning"])
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    assert report.outcome == RUN_FAILED
+    assert "did not move it" in report.reason
+    assert len(report.stages) == 1
 
 
 def test_a_job_already_claimed_is_skipped_rather_than_run_twice(repository):
