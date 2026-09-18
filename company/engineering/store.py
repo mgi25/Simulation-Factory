@@ -60,7 +60,7 @@ from .intake import CEORequest
 from .lifecycle import EngineeringJob
 from .plan import ImplementationPlan
 from .result import EngineeringResult
-from .review import EngineeringReview, ReviewerAttestation
+from .review import EngineeringReview, ReviewOutcome, ReviewerAttestation
 from .work_order import EngineeringWorkOrder
 
 
@@ -316,6 +316,10 @@ class EngineeringStore:
             },
             "state": job.state.value if job else "",
             "developer_attempts": job.developer_attempts if job else 0,
+            "reviewer_passes_completed": sum(
+                1 for item in self.reviews(work_order_id)
+                if item.outcome is ReviewOutcome.PASS
+            ),
             "corrections_remaining": job.corrections_remaining if job else 0,
             "pending_decisions": list(job.pending_decisions) if job else [],
             "transitions": [

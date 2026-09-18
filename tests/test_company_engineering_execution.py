@@ -1627,6 +1627,18 @@ def test_the_history_is_readable_as_one_serialisable_object(tmp_path):
     json.dumps(history)
 
 
+def test_the_history_reports_reviewer_passes_completed(tmp_path):
+    run = _through_review(tmp_path)
+    history = run["store"].history(run["order"].work_order_id)
+    assert history["reviewer_passes_completed"] == 1
+
+
+def test_a_non_passing_review_is_not_counted_as_a_reviewer_pass(tmp_path):
+    run = _through_review(tmp_path, review_verdict=ReviewOutcome.CHANGES_REQUIRED)
+    history = run["store"].history(run["order"].work_order_id)
+    assert history["reviewer_passes_completed"] == 0
+
+
 def test_every_record_round_trips_through_its_own_decoder(tmp_path):
     run = _drive(tmp_path)
     order = run["order"]
