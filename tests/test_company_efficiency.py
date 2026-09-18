@@ -664,3 +664,116 @@ def test_emission_includes_budget_check_and_comparison_fields() -> None:
     assert hasattr(EfficiencyEmission, "budget_check")
     assert hasattr(EfficiencyEmission, "should_checkpoint")
     assert hasattr(EfficiencyEmission, "after_comparison")
+
+
+# --- output reduction applied in production path (capture_tool_output) ------
+
+
+def test_capture_tool_output_applies_reduction_directive() -> None:
+    """capture_tool_output with a directive reduces test output, not just emits JSON."""
+    directive = OutputReductionDirective.standard()
+    raw = "PASSED test_a\nPASSED test_b\nFAILED test_c\n=== 1 failed ==="
+    artifact = capture_tool_output(
+        task_id="task-1", command="pytest", exit_status=1, raw_output=raw,
+        reduction_directive=directive,
+    )
+    # Raw output is preserved
+    assert artifact.raw_output == raw
+    # Context output has passing tests stripped
+    assert "PASSED test_a" not in artifact.context_output
+    assert "FAILED" in artifact.context_output or "failed" in artifact.context_output
+    assert artifact.context_chars < artifact.raw_chars
+
+
+def test_capture_tool_output_applies_git_reduction() -> None:
+    directive = OutputReductionDirective.standard()
+    raw = "On branch main\nnothing to commit, working tree clean"
+    artifact = capture_tool_output(
+        task_id="task-1", command="git status", exit_status=0, raw_output=raw,
+        reduction_directive=directive,
+    )
+    assert artifact.context_output == "working tree clean"
+
+
+def test_capture_tool_output_without_directive_preserves_output() -> None:
+    """Without a directive, output is preserved as before."""
+    raw = "PASSED test_a\nPASSED test_b"
+    artifact = capture_tool_output(
+        task_id="task-1", command="pytest", exit_status=0, raw_output=raw,
+    )
+    assert artifact.context_output == raw
+
+
+# --- expanded AFTER comparison covers all required metrics ------------------
+
+
+def test_after_comparison_covers_cache_latency_files_context(tmp_path) -> None:
+    """AfterComparison includes cache, latency, files read, and context growth."""
+    store = EfficiencyStore(tmp_path)
+    store.append(_record(
+        mode=BenchmarkMode.REAL,
+        model="claude-opus-4-6[1m]",
+        provider="anthropic",
+        outcome="accepted",
+        cache_hits=5,
+        cache_misses=2,
+        latency_ms=30000,
+        repository_files_read=("a.py", "b.py"),
+    ))
+    baseline = extract_baseline(tmp_path)
+    after_record = _record(
+        run_id="after-run-2",
+        mode=BenchmarkMode.REAL,
+        model="claude-sonnet-4-6",
+        outcome="accepted",
+        cache_hits=3,
+        cache_misses=1,
+        latency_ms=15000,
+        repository_files_read=("a.py",),
+    )
+    comparison = compare_against_baseline(baseline, after_record)
+    assert comparison.after_cache_hits == 3
+    assert comparison.after_cache_misses == 1
+    assert comparison.baseline_avg_cache_hits == 5.0
+    assert comparison.after_latency_ms == 15000
+    assert comparison.baseline_avg_latency_ms == 30000.0
+    assert comparison.latency_change_pct is not None and comparison.latency_change_pct < 0
+    assert comparison.after_files_read == 1
+    assert comparison.baseline_avg_files_read == 2.0
+    assert comparison.files_read_change_pct is not None and comparison.files_read_change_pct < 0
+    assert comparison.after_execution_packet_chars is not None
+    payload = comparison.to_dict()
+    assert "after_cache_hits" in payload
+    assert "latency_change_pct" in payload
+    assert "files_read_change_pct" in payload
+    assert "context_growth_change_pct" in payload
+
+
+# --- baseline self-contamination prevention ---------------------------------
+
+
+def test_baseline_extraction_excludes_current_record_in_emission(tmp_path) -> None:
+    """The BEFORE baseline must NOT include the record being appended."""
+    store = EfficiencyStore(tmp_path)
+    # Pre-populate with a known baseline record
+    store.append(_record(
+        run_id="baseline-run",
+        mode=BenchmarkMode.REAL,
+        outcome="accepted",
+    ))
+    # Simulate what emission.py does: extract baseline first, then append
+    baseline = extract_baseline(tmp_path)
+    assert len(baseline.entries) == 1
+    assert baseline.entries[0].run_id == "baseline-run"
+    # Now append the new record (simulating what store.append_idempotent does)
+    new_record = _record(
+        run_id="execution:new-record",
+        mode=BenchmarkMode.REAL,
+        outcome="accepted",
+    )
+    store.append_idempotent(new_record)
+    # The baseline we extracted earlier should still have only the original
+    assert len(baseline.entries) == 1
+    # But a fresh extraction would include both
+    fresh_baseline = extract_baseline(tmp_path)
+    assert len(fresh_baseline.entries) == 2

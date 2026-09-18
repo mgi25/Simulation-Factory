@@ -90,6 +90,14 @@ def emit_execution_efficiency(
     for artifact in tool_outputs:
         store.append_tool_output_idempotent(artifact)
 
+    # Extract baseline BEFORE appending the new record so the current
+    # execution is excluded from its own BEFORE baseline.
+    pre_baseline: Baseline | None = None
+    try:
+        pre_baseline = extract_baseline(state_dir)
+    except Exception:
+        pass
+
     record = EfficiencyRecord(
         run_id=(
             f"execution:{packet.fingerprint()}:{packet_attempt}:"
@@ -171,13 +179,12 @@ def emit_execution_efficiency(
     except Exception:
         pass  # budget check is observational; failure does not replace the result
 
-    # --- AFTER comparison against baseline ---
-    try:
-        baseline = extract_baseline(state_dir)
-        if baseline.entries:
-            after_cmp = compare_against_baseline(baseline, record)
-    except Exception:
-        pass
+    # --- AFTER comparison against pre-extracted baseline ---
+    if pre_baseline is not None and pre_baseline.entries:
+        try:
+            after_cmp = compare_against_baseline(pre_baseline, record)
+        except Exception:
+            pass
 
     return EfficiencyEmission(
         record=record,

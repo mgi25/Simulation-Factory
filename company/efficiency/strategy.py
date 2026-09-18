@@ -211,8 +211,9 @@ def select_strategy(
     """Select execution strategy deterministically from task properties.
 
     The selection rule:
-    - Strongest model for D+ reasoning, HIGH+ risk, or evidence-required tasks
+    - Strongest model for D+ reasoning or HIGH+ risk
     - Standard model for C-class routine implementation at LOW/MEDIUM risk
+    - evidence_required affects review depth, not model tier selection
     - Reviews always use one tier lower resource ceiling than implementation
     """
     # Model tier depends on reasoning class and risk only.  evidence_required
@@ -273,9 +274,6 @@ def select_strategy(
         provider_count=1,
         strategy_reason="; ".join(reasons),
     )
-
-
-import re as _re
 
 
 def reduce_test_output(raw: str, directive: OutputReductionDirective) -> str:

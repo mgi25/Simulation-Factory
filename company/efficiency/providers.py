@@ -250,10 +250,43 @@ def capture_tool_output(
     important_failures: tuple[str, ...] = (), warnings: tuple[str, ...] = (),
     summary: str = "", artifact_references: tuple[str, ...] = (),
     compressor: ToolOutputCompressor | None = None,
+    reduction_directive: object | None = None,
 ) -> ToolOutputArtifact:
+    """Capture tool output, optionally applying deterministic reduction.
+
+    When ``reduction_directive`` is an ``OutputReductionDirective``, the
+    appropriate reduction function is applied based on command type.  This
+    is the production path where Company OS actually reduces model-visible
+    output rather than merely requesting it.
+    """
     context_output = compressor.compress(raw_output) if compressor else raw_output
+    reducer_name = compressor.name if compressor else ""
+    if reduction_directive is not None:
+        reduced = _apply_output_reduction(command, context_output, reduction_directive)
+        if reduced != context_output:
+            context_output = reduced
+            reducer_name = reducer_name or "output_reduction_directive"
     return ToolOutputArtifact(
         task_id, command, exit_status, raw_output, context_output,
         important_failures, warnings, summary, artifact_references,
-        compressor.name if compressor else "",
+        reducer_name,
     )
+
+
+def _apply_output_reduction(command: str, output: str, directive: object) -> str:
+    """Apply the appropriate reduction function based on command type.
+
+    Avoids a circular import by checking the directive's attributes rather
+    than importing OutputReductionDirective directly at module level.
+    """
+    if not hasattr(directive, "omit_passing_test_detail"):
+        return output
+    cmd_lower = command.lower()
+    if any(kw in cmd_lower for kw in ("test", "pytest", "unittest")):
+        from .strategy import reduce_test_output
+        return reduce_test_output(output, directive)
+    if any(kw in cmd_lower for kw in ("git",)):
+        from .strategy import reduce_git_output
+        return reduce_git_output(output, directive)
+    from .strategy import reduce_log_output
+    return reduce_log_output(output, directive)
