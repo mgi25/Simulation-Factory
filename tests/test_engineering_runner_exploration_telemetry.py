@@ -220,6 +220,160 @@ def test_files_read_never_changed_excludes_changed_paths(tmp_path: Path) -> None
     assert files_read_never_changed(telemetry, changed_paths=["a.py"]) == ("b.py",)
 
 
+# --- V3A: read ranges and Edit tracking, shapes confirmed by a live probe --
+# of the installed CLI (2.1.70): `Read` carries {file_path, offset, limit},
+# `Edit` carries {file_path, old_string, new_string, replace_all}.
+
+
+def test_a_targeted_read_records_its_offset_and_limit(tmp_path: Path) -> None:
+    worktree = tmp_path / "repo"
+    worktree.mkdir()
+    transcript = _transcript(
+        _assistant(_tool_use("Read", file_path="a.py", offset=5, limit=3))
+    )
+    telemetry = parse_exploration(transcript, worktree=worktree)
+    event = telemetry.events[0]
+    assert event.read_offset == 5
+    assert event.read_limit == 3
+    assert event.read_full_or_implicit is False
+    assert telemetry.full_or_implicit_reads == 0
+    assert telemetry.targeted_reads == 1
+
+
+def test_a_read_with_no_range_is_full_or_implicit(tmp_path: Path) -> None:
+    worktree = tmp_path / "repo"
+    worktree.mkdir()
+    transcript = _transcript(_assistant(_tool_use("Read", file_path="a.py")))
+    telemetry = parse_exploration(transcript, worktree=worktree)
+    event = telemetry.events[0]
+    assert event.read_offset is None
+    assert event.read_limit is None
+    assert event.read_full_or_implicit is True
+    assert telemetry.full_or_implicit_reads == 1
+    assert telemetry.targeted_reads == 0
+
+
+def test_repeated_full_reads_are_counted_distinctly_from_repeated_targeted_reads(
+    tmp_path: Path,
+) -> None:
+    worktree = tmp_path / "repo"
+    worktree.mkdir()
+    transcript = _transcript(
+        _assistant(_tool_use("Read", file_path="a.py")),
+        _assistant(_tool_use("Read", file_path="a.py")),
+        _assistant(_tool_use("Read", file_path="b.py", offset=1, limit=10)),
+        _assistant(_tool_use("Read", file_path="b.py", offset=1, limit=10)),
+    )
+    telemetry = parse_exploration(transcript, worktree=worktree)
+    assert telemetry.full_or_implicit_reads == 2
+    assert telemetry.repeated_full_or_implicit_reads == 1
+    assert telemetry.targeted_reads == 2
+    # the repeated targeted read is an exact-range repeat, not a full reread
+    assert telemetry.repeated_same_range_reads == 1
+
+
+def test_an_edit_event_keeps_only_path_and_order_never_the_replacement_text(
+    tmp_path: Path,
+) -> None:
+    worktree = tmp_path / "repo"
+    worktree.mkdir()
+    transcript = _transcript(
+        _assistant(
+            _tool_use(
+                "Edit",
+                file_path=str(worktree / "a.py"),
+                old_string="secret old text",
+                new_string="secret new text",
+                replace_all=False,
+            )
+        )
+    )
+    telemetry = parse_exploration(transcript, worktree=worktree)
+    event = telemetry.events[0]
+    assert event.tool == "Edit"
+    assert event.target == "a.py"
+    assert event.order == 1
+    dumped = json.dumps(event.to_dict())
+    assert "secret" not in dumped
+    assert telemetry.edits_total == 1
+
+
+def test_a_read_immediately_after_an_edit_of_the_same_file_is_counted(
+    tmp_path: Path,
+) -> None:
+    worktree = tmp_path / "repo"
+    worktree.mkdir()
+    transcript = _transcript(
+        _assistant(_tool_use("Read", file_path="a.py")),
+        _assistant(
+            _tool_use("Edit", file_path="a.py", old_string="x", new_string="y")
+        ),
+        _assistant(_tool_use("Read", file_path="a.py")),
+    )
+    telemetry = parse_exploration(transcript, worktree=worktree)
+    assert telemetry.read_after_edit_count == 1
+    assert telemetry.same_file_read_after_edit_count == 1
+
+
+def test_a_read_after_an_edit_of_a_different_file_is_not_a_same_file_verification(
+    tmp_path: Path,
+) -> None:
+    worktree = tmp_path / "repo"
+    worktree.mkdir()
+    transcript = _transcript(
+        _assistant(
+            _tool_use("Edit", file_path="a.py", old_string="x", new_string="y")
+        ),
+        _assistant(_tool_use("Read", file_path="b.py")),
+    )
+    telemetry = parse_exploration(transcript, worktree=worktree)
+    assert telemetry.read_after_edit_count == 1
+    assert telemetry.same_file_read_after_edit_count == 0
+
+
+def test_overlapping_targeted_ranges_are_distinguished_from_exact_repeats(
+    tmp_path: Path,
+) -> None:
+    worktree = tmp_path / "repo"
+    worktree.mkdir()
+    transcript = _transcript(
+        _assistant(_tool_use("Read", file_path="a.py", offset=1, limit=20)),
+        _assistant(_tool_use("Read", file_path="a.py", offset=10, limit=20)),
+    )
+    telemetry = parse_exploration(transcript, worktree=worktree)
+    assert telemetry.repeated_same_range_reads == 0
+    assert telemetry.overlapping_read_ranges == 1
+
+
+def test_requested_lines_total_is_none_when_any_read_is_not_fully_targeted(
+    tmp_path: Path,
+) -> None:
+    """A mix of a targeted read and a full/implicit read cannot sum to a
+    trustworthy total line count, so the aggregate is UNAVAILABLE rather than
+    a partial number that looks complete."""
+    worktree = tmp_path / "repo"
+    worktree.mkdir()
+    transcript = _transcript(
+        _assistant(_tool_use("Read", file_path="a.py", offset=1, limit=20)),
+        _assistant(_tool_use("Read", file_path="b.py")),
+    )
+    telemetry = parse_exploration(transcript, worktree=worktree)
+    assert telemetry.requested_read_lines_total is None
+    assert telemetry.repeated_requested_lines is None
+
+
+def test_requested_lines_total_sums_when_every_read_is_targeted(tmp_path: Path) -> None:
+    worktree = tmp_path / "repo"
+    worktree.mkdir()
+    transcript = _transcript(
+        _assistant(_tool_use("Read", file_path="a.py", offset=1, limit=20)),
+        _assistant(_tool_use("Read", file_path="a.py", offset=1, limit=20)),
+    )
+    telemetry = parse_exploration(transcript, worktree=worktree)
+    assert telemetry.requested_read_lines_total == 40
+    assert telemetry.repeated_requested_lines == 20
+
+
 def test_files_read_outside_neighborhood_excludes_known_paths(tmp_path: Path) -> None:
     worktree = tmp_path / "repo"
     worktree.mkdir()

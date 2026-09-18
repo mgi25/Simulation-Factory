@@ -76,7 +76,7 @@ from company.engineering import (
 )
 from ai_platform.resource_classes import Risk
 from company.efficiency.profile import CONSUMER, EXPANDED, resource_profile
-from company.efficiency.strategy import ModelTier, narrow_context_refs
+from company.efficiency.strategy import EscalationReason, ModelTier, narrow_context_refs
 from company.engineering.intake import (
     SPECIALIST_TRIGGERS,
     RoutingDerivation,
@@ -2159,6 +2159,97 @@ def test_every_specialist_trigger_routes_to_its_own_domain():
                 _request(objective=f"Please handle the {term} problem in the loop.")
             )
             assert routed.specialist_domain == domain, (term, routed)
+
+
+# --- 13a. routing precision: a bare "governance" noun is not governance work --
+
+
+def test_a_harmless_governance_mention_stays_routine():
+    """Naming the noun "governance" is not the same as doing governance work.
+
+    Regression for the V3A false positive: `intake.py` used to trigger the
+    governance specialist on the bare substring "governance" anywhere in the
+    objective, so a page that merely *displays* governance activity routed to
+    the strongest tier. The fix narrows the trigger table to specific
+    governance actions (`approval boundary`, `permissions policy`, ...).
+    """
+    routed = derive_routing(
+        _request(objective="Show governance activity on the CEO page.")
+    )
+    assert routed.specialist_domain == ""
+    assert "routine implementation" in routed.reason, routed.reason
+
+
+@pytest.mark.parametrize(
+    "objective",
+    [
+        "Display governance events alongside attempts.",
+        "Document the governance result.",
+    ],
+)
+def test_other_harmless_governance_mentions_stay_routine(objective):
+    routed = derive_routing(_request(objective=objective))
+    assert routed.specialist_domain == "", (objective, routed)
+
+
+def test_governance_mention_in_notes_does_not_route():
+    """`notes` is explanatory metadata, not requested work.
+
+    A note explaining a *past* misclassification must not retrigger it: notes
+    are never consulted for routing, only `objective` and the explicit fields
+    (`specialist_domain`, `escalate_reasoning`, `risk`, `reversible`).
+    """
+    routed = derive_routing(
+        _routine_request(
+            notes=(
+                "The previous request was incorrectly classified as governance "
+                "work and escalated to the strongest tier by mistake."
+            )
+        )
+    )
+    assert routed.specialist_domain == "", routed
+    assert "routine implementation" in routed.reason, routed.reason
+
+
+@pytest.mark.parametrize(
+    "objective",
+    [
+        "Modify the approval boundary so a second reviewer is required.",
+        "Change the permissions policy for reserved actions.",
+        "Amend the constitution's rule about subagents.",
+        "Change separation of duties between developer and reviewer roles.",
+        "Change protected policy so the gate file cannot be hand-edited.",
+        "Change the governance rules for who can approve a merge.",
+    ],
+)
+def test_genuine_governance_actions_still_route_to_specialist(objective):
+    routed = derive_routing(_request(objective=objective))
+    assert routed.specialist_domain == "governance", (objective, routed)
+    assert "which is governance work" in routed.reason, routed.reason
+
+
+def test_explicit_specialist_domain_is_authoritative_over_text():
+    """The CEO-named domain wins even when the objective text is routine."""
+    routed = derive_routing(
+        _routine_request(specialist_domain="governance")
+    )
+    assert routed.specialist_domain == "governance"
+    assert "named the specialist domain" in routed.reason
+
+
+def test_explicit_escalation_routes_without_needing_trigger_text():
+    routed = derive_routing(_routine_request(escalate_reasoning=True))
+    assert routed.specialist_domain == "explicit_escalation"
+    assert routed.escalation is EscalationReason.EXPLICIT
+    assert "explicitly escalated" in routed.reason
+
+
+@pytest.mark.parametrize("risk", [Risk.HIGH, Risk.CRITICAL])
+def test_high_or_critical_risk_still_routes_to_specialist_depth(risk):
+    """Bounded routine text must not suppress genuine risk-based escalation."""
+    routed = derive_routing(_routine_request(risk=risk))
+    assert routed.specialist_domain == "high_risk_change", routed
+    assert risk.value in routed.reason
 
 
 def test_an_irreversible_request_raises_its_own_ceiling():

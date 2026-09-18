@@ -107,7 +107,9 @@ SPECIALIST_TRIGGERS: Mapping[str, tuple[str, ...]] = {
         "exploit",
     ),
     "governance": (
-        "governance",
+        "governance policy",
+        "governance rules",
+        "governance model",
         "permissions policy",
         "protected policy",
         "constitution",
@@ -801,7 +803,11 @@ def derive_routing(request: CEORequest) -> RoutingDerivation:
     routes the same way in this session and the next, which is what makes the
     decision auditable after the fact.
     """
-    text = " ".join((request.objective, request.notes)).lower()
+    # `notes` is explanatory metadata the CEO attaches for humans, not part of
+    # the requested work, so it must never silently raise the model tier: a
+    # note that says "the previous request was misclassified as governance"
+    # would otherwise retrigger the exact misclassification it describes.
+    text = request.objective.lower()
     novel = request.novel or any(term in text for term in NOVEL_TRIGGERS)
 
     domain = request.specialist_domain

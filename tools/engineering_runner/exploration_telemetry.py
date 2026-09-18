@@ -81,13 +81,27 @@ MAX_EVENTS = 500
 
 @dataclass(frozen=True)
 class ExplorationEvent:
-    """One tool call, reduced to what is safe and useful to keep."""
+    """One tool call, reduced to what is safe and useful to keep.
+
+    `read_offset` / `read_limit` are the exact keyword arguments a live probe
+    of the installed CLI (2.1.70) showed the `Read` tool_use block carries -
+    `{"file_path", "offset", "limit"}` - never inferred or estimated. Both are
+    `None` when the call omitted them, which is itself the signal:
+    `read_full_or_implicit` is `True` exactly when both are absent, meaning
+    the session asked for the file with no explicit range (the CLI's own
+    default, typically the whole file up to its own line cap). `Edit` events
+    keep only `target` (the normalised path) and `order` - no `old_string`,
+    `new_string` or diff of any kind ever reaches this dataclass.
+    """
 
     order: int
-    tool: str  # "Read" | "Grep" | "Glob" | "Bash" | "Other"
+    tool: str  # "Read" | "Grep" | "Glob" | "Bash" | "Edit" | "Other"
     category: str  # Bash only: "git" | "test" | "search" | "other"; else ""
-    target: str  # normalised repo-relative path (Read) or pattern (Grep/Glob)
+    target: str  # normalised repo-relative path (Read/Edit) or pattern (Grep/Glob)
     repeat: bool  # this (tool, target) pair was already seen earlier this session
+    read_offset: int | None = None  # Read only
+    read_limit: int | None = None  # Read only
+    read_full_or_implicit: bool | None = None  # Read only: no explicit range given
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -96,6 +110,9 @@ class ExplorationEvent:
             "category": self.category,
             "target": self.target,
             "repeat": self.repeat,
+            "read_offset": self.read_offset,
+            "read_limit": self.read_limit,
+            "read_full_or_implicit": self.read_full_or_implicit,
         }
 
 
@@ -125,6 +142,19 @@ class ExplorationTelemetry:
     other_shell_commands: int | None = None
     bash_total: int | None = None
     tool_errors: int | None = None
+    # Read-pattern metrics (V3A). Every field follows the same discipline as
+    # everything above: `None` means "the transcript did not expose enough to
+    # derive this," never an estimate and never a silent zero.
+    edits_total: int | None = None
+    full_or_implicit_reads: int | None = None
+    repeated_full_or_implicit_reads: int | None = None
+    targeted_reads: int | None = None
+    read_after_edit_count: int | None = None
+    same_file_read_after_edit_count: int | None = None
+    repeated_same_range_reads: int | None = None
+    overlapping_read_ranges: int | None = None
+    requested_read_lines_total: int | None = None
+    repeated_requested_lines: int | None = None
 
     def metrics_dict(self) -> dict[str, Any]:
         """The small summary - no events, safe to embed in `SessionOutcome.to_dict()`."""
@@ -142,6 +172,16 @@ class ExplorationTelemetry:
             "other_shell_commands": self.other_shell_commands,
             "bash_total": self.bash_total,
             "tool_errors": self.tool_errors,
+            "edits_total": self.edits_total,
+            "full_or_implicit_reads": self.full_or_implicit_reads,
+            "repeated_full_or_implicit_reads": self.repeated_full_or_implicit_reads,
+            "targeted_reads": self.targeted_reads,
+            "read_after_edit_count": self.read_after_edit_count,
+            "same_file_read_after_edit_count": self.same_file_read_after_edit_count,
+            "repeated_same_range_reads": self.repeated_same_range_reads,
+            "overlapping_read_ranges": self.overlapping_read_ranges,
+            "requested_read_lines_total": self.requested_read_lines_total,
+            "repeated_requested_lines": self.repeated_requested_lines,
             "events_recorded": len(self.events),
         }
 
@@ -166,6 +206,12 @@ def _relativize(raw: str, root: Path) -> str:
         return text
     except (OSError, ValueError):
         return EXTERNAL
+
+
+def _read_int(value: Any) -> int | None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    return int(value)
 
 
 def _bash_category(command: str) -> str:
@@ -269,7 +315,19 @@ def parse_exploration(text: str, *, worktree: Path) -> ExplorationTelemetry:
                 seen.add(key)
                 read_total += 1
                 reads_repeated += 1 if repeat else 0
-                events.append(ExplorationEvent(order, "Read", "", target, repeat))
+                offset = _read_int(raw_input.get("offset"))
+                limit = _read_int(raw_input.get("limit"))
+                full_or_implicit = offset is None and limit is None
+                events.append(
+                    ExplorationEvent(
+                        order, "Read", "", target, repeat,
+                        read_offset=offset, read_limit=limit,
+                        read_full_or_implicit=full_or_implicit,
+                    )
+                )
+            elif name == "Edit":
+                target = _relativize(str(raw_input.get("file_path", "")), worktree)
+                events.append(ExplorationEvent(order, "Edit", "", target, False))
             elif name in ("Grep", "Glob"):
                 target = str(raw_input.get("pattern", ""))
                 key = (name, target)
@@ -297,6 +355,7 @@ def parse_exploration(text: str, *, worktree: Path) -> ExplorationTelemetry:
 
     unique_reads = len({e.target for e in events if e.tool == "Read"})
     searches_total = grep_total + glob_total
+    read_pattern = _derive_read_pattern(events)
     return ExplorationTelemetry(
         format="stream_json",
         events=tuple(events[:MAX_EVENTS]),
@@ -312,7 +371,99 @@ def parse_exploration(text: str, *, worktree: Path) -> ExplorationTelemetry:
         other_shell_commands=other_shell,
         bash_total=bash_total,
         tool_errors=tool_errors,
+        **read_pattern,
     )
+
+
+def _normalised_interval(event: ExplorationEvent) -> tuple[int, int | None]:
+    """This read's requested line span, 1-indexed, `end=None` meaning "to EOF".
+
+    Only a description of what was *asked for*, never of the file itself - no
+    line count is available here, so an implicit/full read or an offset given
+    without a limit both normalise to an open-ended interval rather than a
+    guessed end line.
+    """
+    start = event.read_offset if event.read_offset is not None else 1
+    end = start + event.read_limit - 1 if event.read_limit is not None else None
+    return start, end
+
+
+def _intervals_overlap(a: tuple[int, int | None], b: tuple[int, int | None]) -> bool:
+    a_start, a_end = a
+    b_start, b_end = b
+    if a_end is not None and b_start > a_end:
+        return False
+    if b_end is not None and a_start > b_end:
+        return False
+    return True
+
+
+def _derive_read_pattern(events: Sequence[ExplorationEvent]) -> dict[str, int | None]:
+    """The V3A metrics: is a repeated read a full reread, a targeted range, or
+    post-edit verification? Every count here is computed only from
+    `ExplorationEvent`s already built above - no second pass over raw JSON.
+    """
+    reads = [e for e in events if e.tool == "Read"]
+    edits_total = sum(1 for e in events if e.tool == "Edit")
+    full_or_implicit = [e for e in reads if e.read_full_or_implicit]
+    repeated_full_or_implicit = [e for e in full_or_implicit if e.repeat]
+    targeted_reads = len(reads) - len(full_or_implicit)
+
+    read_after_edit = 0
+    same_file_read_after_edit = 0
+    previous_tool: str | None = None
+    previous_edit_target: str | None = None
+    for event in events:
+        if event.tool == "Read":
+            if previous_tool == "Edit":
+                read_after_edit += 1
+                if previous_edit_target is not None and event.target == previous_edit_target:
+                    same_file_read_after_edit += 1
+        previous_tool = event.tool
+        if event.tool == "Edit":
+            previous_edit_target = event.target
+
+    # Scoped to explicit-range reads only: a repeated full/implicit read is
+    # already counted by `repeated_full_or_implicit_reads` above, and folding
+    # it in here too would double-count the same event under two metrics.
+    seen_exact: set[tuple[str, int | None, int | None]] = set()
+    seen_intervals: dict[str, list[tuple[int, int | None]]] = {}
+    repeated_same_range = 0
+    overlapping = 0
+    for event in reads:
+        if event.read_full_or_implicit:
+            continue
+        exact_key = (event.target, event.read_offset, event.read_limit)
+        interval = _normalised_interval(event)
+        prior_intervals = seen_intervals.setdefault(event.target, [])
+        if exact_key in seen_exact:
+            repeated_same_range += 1
+        elif any(_intervals_overlap(interval, prior) for prior in prior_intervals):
+            overlapping += 1
+        seen_exact.add(exact_key)
+        prior_intervals.append(interval)
+
+    requested_lines_total: int | None
+    repeated_requested_lines: int | None
+    if reads and all(e.read_limit is not None for e in reads):
+        requested_lines_total = sum(e.read_limit for e in reads)
+        repeated_requested_lines = sum(e.read_limit for e in reads if e.repeat)
+    else:
+        requested_lines_total = None
+        repeated_requested_lines = None
+
+    return {
+        "edits_total": edits_total,
+        "full_or_implicit_reads": len(full_or_implicit),
+        "repeated_full_or_implicit_reads": len(repeated_full_or_implicit),
+        "targeted_reads": targeted_reads,
+        "read_after_edit_count": read_after_edit,
+        "same_file_read_after_edit_count": same_file_read_after_edit,
+        "repeated_same_range_reads": repeated_same_range,
+        "overlapping_read_ranges": overlapping,
+        "requested_read_lines_total": requested_lines_total,
+        "repeated_requested_lines": repeated_requested_lines,
+    }
 
 
 def files_read_never_changed(
