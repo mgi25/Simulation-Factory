@@ -37,7 +37,7 @@ import time
 from typing import Mapping, Sequence
 
 from .errors import ConfigurationError
-from .redaction import Redactor
+from .redaction import Redactor, child_environment
 
 
 @dataclass(frozen=True)
@@ -96,13 +96,17 @@ class CommandRunner:
         directory = Path(cwd)
         if not directory.is_dir():
             raise ConfigurationError(f"{directory}: not a directory to run a command in")
+        # Never the bare inherited environment: `child_environment` is the one
+        # answer to "what does a child get", and it is the same answer for git,
+        # for pytest, for the Company OS CLI and for a coding session.
+        environment = dict(env) if env is not None else child_environment()
         started = time.monotonic()
         timed_out = False
         try:
             completed = subprocess.run(  # noqa: S603 - argv list, never a shell
                 args,
                 cwd=str(directory),
-                env=None if env is None else dict(env),
+                env=environment,
                 input=stdin,
                 capture_output=True,
                 text=True,

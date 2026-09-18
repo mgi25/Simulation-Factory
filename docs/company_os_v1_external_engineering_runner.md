@@ -281,12 +281,14 @@ after.
 `codex exec` reaches the provider and is refused for every model the account
 offers - the installed CLI (0.42.0) is older than the only available model
 (`gpt-5.6-sol`), and the three older model names are refused for a ChatGPT
-account. `available()` therefore probes with a real one-line request rather than
+account. `available()` therefore probes with a real request rather than
 trusting `--version`, which answers perfectly on a CLI that cannot complete a
-single call. The adapter is kept because writing the second one is what
-discovers the assumptions the first one baked in, and because Codex enforces
-read-only at the sandbox rather than through a tool list - a stronger guarantee
-than the Claude backend can give.
+single call - and the probe asks for something its own echoed prompt cannot
+supply, because the first version of it did not and reported the backend
+working (section 14). The adapter is kept because writing the second one is
+what discovers the assumptions the first one baked in, and because Codex
+enforces read-only at the sandbox rather than through a tool list - a stronger
+guarantee than the Claude backend can give.
 
 ---
 
@@ -428,7 +430,7 @@ work order's whole attempt budget.
 
 ---
 
-## 13. The dogfood: two real CEO requests
+## 13. The dogfood: three real CEO requests
 
 The operator started the runner once and typed nothing else at it. Everything
 below - every session, every commit, every pytest run, every gate evaluation,
@@ -484,6 +486,30 @@ at the runner in between.
 Three stages, two sessions, one run, and the only thing a person did between
 starting the runner and reading the result was type the request.
 
+### Job 3 — `wo-stage-timing`, on the frozen code
+
+Job 2 ran clean, but it ran on code that changed twice afterwards. Job 3 was
+submitted after the last runner change, to establish that the code being
+shipped is the code that completed a request.
+
+| | |
+|---|---|
+| CEO objective | "Tell me how long each stage of an engineering job took, measured from the job's own recorded transitions, so I can see where the work actually waits." |
+| work order | `wo-stage-timing`, fingerprint `77a1e240a19dd20c` |
+| developer session | `e1859ca2-5a4e-41bb-a883-fa43d2bfe571`, 44 turns, 347 s, $1.75 |
+| implementation | `StageTiming` + `EngineeringJob.stage_timings()` in `company/engineering/lifecycle.py`, its export, 5 tests |
+| authority check | 7 checks, 0 violations |
+| commit | `ae703ff78e1c…` on `eng-stage-timing`, pushed, remote verified |
+| required tests | 100 passed |
+| receipt | accepted, fingerprint `51bb08341886bd0f` |
+| reviewer session | `07a5cdfe-870f-4d6a-b677-982347cc7d11`, 14 turns, 58 s, $0.37 |
+| review | PASS by `chief_architect`, no findings |
+| gate | CLI exit 0 → `--reported-readiness ready`, cross-checked against the report's own required checks, READY at `ae703ff`, 0 blockers |
+| final state | **ready_for_approval** |
+
+One runner start, three stages, two sessions, no intervention — and this time
+the gate cross-check the runner had been skipping actually ran.
+
 ---
 
 ## 14. What the dogfood found
@@ -500,13 +526,24 @@ the *other* side of the boundary.
 | a 424-character `evidence_ref` cost a whole review session | the brief never said what a reference is, and Company OS refused the attestation one stage later | the brief says one line and 200 characters, and the same budgets are applied when the session answers, so the bounded repair loop restates it |
 | the gate's cross-check silently did not run | the runner looked for a `readiness` field the report does not have and passed an empty `--reported-readiness` | read from the gate CLI's exit code, which is where its verdict lives |
 
-A sixth was found by reading rather than by running: a session that changes
-nothing committed nothing, produced an empty diff, and passed the required
-tests *because they passed before it started* — so an empty attempt read as a
-success. It is a rejected attempt now.
+A sixth and a seventh were found by reading rather than by running.
+
+A session that changes nothing committed nothing, produced an empty diff, and
+passed the required tests *because they passed before it started* — so an empty
+attempt read as a success. It is a rejected attempt now.
+
+And `doctor` reported Codex working, on a machine where Codex could not
+complete a single call. `codex exec` writes its own prompt back to stdout and
+exits 0 even when every request in the session was refused, so a probe that
+asked for a word and looked for that word found its own question. The probe now
+asks for a sum rather than its answer, and reads the provider's failure
+signatures out of the body. That one is worth stating plainly: **the milestone
+brief says not to claim a backend works unless a real session is launched, and
+for about an hour this package claimed exactly that** — the check it needed was
+one that its own echo could not satisfy.
 
 The first three were found by job 1, which therefore took three runner starts.
-Job 2 ran clean in one. Job 3 was run on the frozen code, after every fix, to
+Job 2 ran clean in one. Job 3 was run after every fix to the Claude path, to
 establish that the code being shipped is the code that completed a request.
 
 ---

@@ -34,6 +34,14 @@ so a job with more than one run is a job the runner picked up again.
 | `gate-NN/gate-report.json` | the gate's own report, unaltered |
 | `outcomes/NNNNNN.json` | the append-only outcome log |
 
+**One known blemish.** Every `result.txt` here holds one U+FFFD where the CEO
+page has an em dash. The runner captured child output as UTF-8 while a Python
+child on Windows wrote its stdout in the console codepage; `PYTHONIOENCODING`
+is set for every child now, and these files are kept as the runner wrote them
+rather than re-read with the fixed reader, because each one is the page *at the
+end of its own run* and a later re-read would return the same page for all
+three of job 1's runs.
+
 **Not copied:** the session transcripts. They are the session's own output, they
 run to tens of thousands of characters, and everything a record needs from them
 is in `session.json`. They remain under the runner directory, outside the

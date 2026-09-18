@@ -1,0 +1,69 @@
+{
+  "changed_paths_reviewed": [
+    "company/engineering/lifecycle.py",
+    "company/engineering/__init__.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "criteria": [
+    {
+      "criterion": "The stated objective is implemented: Tell me how long each stage of an engineering job took, measured from the job's own recorded transitions, so I can see where the work actually waits.",
+      "evidence_ref": "company/engineering/lifecycle.py:297-331 \u2014 stage_timings() derives per-state durations from the job's own transitions",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The authorized work order is immutable; every later stage carries its fingerprint and refuses a mismatch.",
+      "evidence_ref": "company/engineering/lifecycle.py:225-228 \u2014 fingerprint validation unchanged",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: A review outcome is the worst of the attested and deterministic verdicts, so a reviewer PASS cannot rescue a failed check.",
+      "evidence_ref": "company/engineering/review.py:644 \u2014 outcome = _worst(attestation.verdict, deterministic_outcome) unchanged",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The implementer and the reviewer are different employees, routed by disjoint capabilities.",
+      "evidence_ref": "company/engineering/review.py \u2014 SelfApproval check unchanged; diff touches no routing code",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The protected governance surface is digested before the work and re-read at review; a change blocks the job.",
+      "evidence_ref": "company/engineering/protected.py \u2014 not in diff; ProtectedSurface unchanged",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: No state means approved and nothing merges, deploys or publishes; the CEO decision is recorded, not acted on.",
+      "evidence_ref": "company/engineering/lifecycle.py:288-295 \u2014 approved property still returns False unconditionally",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The gate verdict is read from the gate's own report; this subsystem holds no code that can produce one.",
+      "evidence_ref": "company/engineering/gate_evidence.py:1 \u2014 'read as evidence \u2014 never computed here' unchanged; diff adds no gate logic",
+      "satisfied": true
+    },
+    {
+      "criterion": "Every declared test passes: tests/test_company_engineering_execution.py",
+      "evidence_ref": "receipt.tests[0]: 100 passed in 22.67s (95 existing + 5 new)",
+      "satisfied": true
+    }
+  ],
+  "evidence": [
+    "company/engineering/lifecycle.py (full file, 538 lines)",
+    "company/engineering/__init__.py (full file, 213 lines)",
+    "tests/test_company_engineering_execution.py (lines 1648-1723, new tests)",
+    "diff.patch (108 lines)",
+    "company/engineering/review.py:644 (adjudicate worst-wins rule)",
+    "company/engineering/gate_evidence.py:1-32 (read-not-computed docstring)",
+    "receipt JSON (100 passed, working_tree_clean, no deps added)"
+  ],
+  "findings": [],
+  "notes": "Clean, minimal addition. StageTiming is frozen, on the read path only, adds no transition or state, and delegates serialization to the existing to_jsonable helper. The five new tests cover the full loop, a fresh job, explicit day arithmetic, open intervals and serialization. The calendar-day granularity limitation noted by the implementer is inherent to the transition data and not a defect.",
+  "packet_fingerprint": "a78e7b48a2c4a398",
+  "receipt_fingerprint": "51bb08341886bd0f",
+  "review_id": "rev-wo-stage-timing-01",
+  "reviewed_on": "2026-09-18",
+  "reviewer": "chief_architect",
+  "verdict": "pass",
+  "version": 1,
+  "work_order_fingerprint": "77a1e240a19dd20c",
+  "work_order_id": "wo-stage-timing"
+}

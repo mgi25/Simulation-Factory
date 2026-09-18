@@ -1,0 +1,49 @@
+{
+  "accepted": true,
+  "failures": [],
+  "handoff": {
+    "artifacts": [
+      "execution/receipts/wo-stage-timing-0c21b800bd64/000001.json"
+    ],
+    "changed": [
+      "company/engineering/__init__.py",
+      "company/engineering/lifecycle.py",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "escalation_reason": "",
+    "escalation_required": false,
+    "evidence": [
+      "company/engineering/lifecycle.py",
+      "company/engineering/__init__.py",
+      "tests/test_company_engineering_execution.py",
+      "commit:ae703ff78e1c6d48f2f718bf2fea4ab7225b8174"
+    ],
+    "next_owner": "",
+    "objective": "Tell me how long each stage of an engineering job took, measured from the job's own recorded transitions, so I can see where the work actually waits.",
+    "owner": "software_implementation_engineer",
+    "resource_usage": {
+      "fingerprint": "e073b1aea6588904",
+      "record_ref": "resource_usage/wo-stage-timing-0c21b800bd64/000001.json"
+    },
+    "result": "Added StageTiming dataclass and EngineeringJob.stage_timings() method that derives how long a job spent in each state from its own recorded transitions. Each visit to a state gets one timing entry with entered_on, exited_on and days; the current (open) state has exited_on=None and days=0. Five tests cover the full loop, fresh jobs, day arithmetic, open intervals and serialization.",
+    "risks": [
+      "StageTiming measures calendar days (dt.date granularity) because that is what transitions record; sub-day precision is not available from the job's own data."
+    ],
+    "status": "completed",
+    "task_id": "wo-stage-timing",
+    "tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "unchanged": []
+  },
+  "packet_attempt": 1,
+  "receipt_fingerprint": "51bb08341886bd0f",
+  "receipt_ref": "execution/receipts/wo-stage-timing-0c21b800bd64/000001.json",
+  "state": "testing",
+  "usage_record": {
+    "fingerprint": "e073b1aea6588904",
+    "record_ref": "resource_usage/wo-stage-timing-0c21b800bd64/000001.json"
+  },
+  "warnings": [],
+  "work_order_id": "wo-stage-timing"
+}

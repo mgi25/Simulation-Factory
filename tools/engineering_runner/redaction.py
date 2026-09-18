@@ -146,18 +146,30 @@ class Redactor:
 
 
 def child_environment(environment: Mapping[str, str] | None = None) -> dict[str, str]:
-    """The environment a launched coding session gets.
+    """The environment every process this runner starts gets.
 
-    `CLAUDECODE` and its companions mark "you are already inside a Claude Code
-    session". A runner started from an ordinary shell does not have them; a
-    runner started from inside one does, and the child then refuses to launch
-    because nested sessions share runtime resources. Dropping them is what
-    makes the child an independent session rather than a nested one, which is
-    exactly the property the review stage needs.
+    Two changes to the inherited one, and both are about the child rather than
+    about secrets - they live here because this module already owns the one
+    question "what environment does a child get", and two answers to that
+    question is how something ends up somewhere nobody looked.
+
+    **`CLAUDECODE` and its companions are dropped.** They mark "you are already
+    inside a Claude Code session". A runner started from an ordinary shell does
+    not have them; a runner started from inside one does, and the child then
+    refuses to launch because nested sessions share runtime resources. Dropping
+    them is what makes the child an independent session rather than a nested
+    one, which is exactly the property the review stage needs.
+
+    **`PYTHONIOENCODING` is set to UTF-8.** Output is captured as UTF-8, and on
+    Windows a Python child writes its stdout in the console codepage unless
+    told otherwise - so the CEO page came back with a replacement character
+    wherever it had an em dash. The page is evidence; a page that cannot be
+    read back exactly is worse evidence.
     """
     source = dict(os.environ if environment is None else environment)
     for name in ("CLAUDECODE", "CLAUDE_CODE_SSE_PORT", "CLAUDE_CODE_ENTRYPOINT"):
         source.pop(name, None)
+    source["PYTHONIOENCODING"] = "utf-8"
     return source
 
 

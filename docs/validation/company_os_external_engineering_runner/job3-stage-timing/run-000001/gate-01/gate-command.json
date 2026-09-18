@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "C:\\Users\\mgial\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "-m",
+    "company.integration",
+    "check",
+    "--repo-root",
+    "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-company-os-runner-tasks\\eng-stage-timing",
+    "--json",
+    "--suite-evidence",
+    "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-stage-timing-0c21b800bd64\\run-000001\\gate-01\\suites.json",
+    "--state-dir",
+    "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-company-os-runner\\state\\external-runner"
+  ],
+  "cwd": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-company-os-runner-tasks\\eng-stage-timing",
+  "duration_s": 6.03,
+  "exit_code": 0,
+  "readiness": "ready",
+  "stderr": "",
+  "stdout_chars": 33325,
+  "timed_out": false
+}

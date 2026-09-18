@@ -1,0 +1,26 @@
+{
+  "outcome": "accepted",
+  "summary": "Added StageTiming dataclass and EngineeringJob.stage_timings() method that derives how long a job spent in each state from its own recorded transitions. Each visit to a state gets one timing entry with entered_on, exited_on and days; the current (open) state has exited_on=None and days=0. Five tests cover the full loop, fresh jobs, day arithmetic, open intervals and serialization.",
+  "rejection_reason": "",
+  "invariants_preserved": [
+    "The authorized work order is immutable; every later stage carries its fingerprint and refuses a mismatch.",
+    "A review outcome is the worst of the attested and deterministic verdicts, so a reviewer PASS cannot rescue a failed check.",
+    "The implementer and the reviewer are different employees, routed by disjoint capabilities.",
+    "The protected governance surface is digested before the work and re-read at review; a change blocks the job.",
+    "No state means approved and nothing merges, deploys or publishes; the CEO decision is recorded, not acted on.",
+    "The gate verdict is read from the gate's own report; this subsystem holds no code that can produce one."
+  ],
+  "unresolved_risks": [
+    "StageTiming measures calendar days (dt.date granularity) because that is what transitions record; sub-day precision is not available from the job's own data."
+  ],
+  "evidence": [
+    "company/engineering/lifecycle.py",
+    "company/engineering/__init__.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "context_refs_used": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "notes": "StageTiming is a frozen dataclass on the read path only; it adds no transition, no state, and no mutation to the job. The existing 95 tests all still pass alongside the 5 new ones (100 total)."
+}

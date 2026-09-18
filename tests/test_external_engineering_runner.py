@@ -820,6 +820,25 @@ def test_the_child_environment_drops_the_nested_session_markers():
     assert "CLAUDECODE" not in env
     assert "CLAUDE_CODE_ENTRYPOINT" not in env
     assert env["PATH"] == "/x"
+    assert env["PYTHONIOENCODING"] == "utf-8"
+
+
+def test_a_child_writes_utf8_that_survives_the_capture(tmp_path: Path):
+    """The CEO page is evidence, and an em dash came back as a replacement char.
+
+    Output is captured as UTF-8; a Python child on Windows writes its stdout in
+    the console codepage unless told otherwise. `PYTHONIOENCODING` is what makes
+    the capture round-trip, and it is set for every child rather than for the
+    one call that noticed.
+    """
+    dash = chr(8212)
+    program = "print('targeted: 1/1 " + dash + " 100 passed')"
+    result = CommandRunner().run(
+        [os.sys.executable, "-c", program], cwd=tmp_path, timeout_s=60
+    )
+    assert result.ok
+    assert dash in result.stdout
+    assert chr(65533) not in result.stdout  # U+FFFD, the replacement character
 
 
 # --- the loop, with a scripted control plane ------------------------------
