@@ -376,3 +376,246 @@ instruction chars, execution-context chars, file reads/unique/repeated
 changed, tests, reviewer result, gate result.
 
 ---
+
+## 10. Deterministic validation, then the one matched job
+
+Full suite at `274d124` (this milestone's implementation commit): **4,600
+passed, 6 failed, 337 skipped** - the known gitignored-artifact fingerprint
+(`test_neon_proof`'s missing replay, `test_sloped_v251_world` x4 and
+`test_sloped_v252_world` x1 missing `output/sloped_race_v1/cameras_v221_5432.json`),
+**zero new failures**. One regression was caught and fixed *before* this
+count: the first full run added a 7th failure,
+`test_company_os_remains_removable_and_production_does_not_import_it` - a
+plain substring scan for `"import company"` / `"from company"` across
+`tools/`, tripped by this milestone's own docstring prose ("an `import
+company.widgets` reaches everything under it," a synthetic example name
+mirroring the test fixtures) rather than by an actual import. Reworded, not
+suppressed; re-ran clean. The three `tools/`-watching research branch-scope
+guards (`test_this_branch_changed_no_race_fight_or_v30_code` in each of
+`test_company_os_research{,_batches,_ingestion}.py`) were re-checked *after*
+committing, per the standing project note that their failure mode is
+invisible before a commit: all three pass, every new and changed file sitting
+inside `tools/engineering_runner/`, which does not exist on `origin/main` at
+all and so shows as additive in that diff regardless of how many times V1 and
+V2 between them have touched it.
+
+**The matched job.** Objective: a new `blocked_attempts` counter on
+`EngineeringJob`, incrementing once per transition into `BLOCKED`, following
+the exact pattern `developer_attempts` and `reviews_completed` already
+establish. Same subsystem (`company/engineering`), same authorized-path shape
+(one module + its test file), same risk level (`medium`) as the historical
+`attempts-remaining` / `reviews-completed` jobs - and, unlike those two
+counters, genuinely not yet implemented anywhere in the repository, confirmed
+by grep before the request was written.
+
+**A real classification defect, caught before it reached the session.** The
+first drafted objective used the word "governance" in one sentence ("so a CEO
+page can show governance activity..."). `company/engineering/intake.py`'s
+`SPECIALIST_TRIGGERS` table fires a `specialist_domain` on that exact word,
+which would have forced this job away from the routine STANDARD tier this
+milestone needs to measure - the same class of defect Consumer Resource Mode
+V1 (`docs/company_os_consumer_resource_mode.md`) found and fixed for the
+*default* specialist domain, now triggered by this request's own wording
+instead. Caught
+by reading the `request` command's derivation output before running anything
+expensive, not by inspection: `specialist_domain: "governance"`,
+`specialist_reason: "the objective names 'governance', which is governance
+work"`. A second attempt's *notes* field re-triggered the same rule by
+explaining the first failure using the word "governance" - reworded again,
+confirmed clean (`specialist_domain: ""`, routine classification), and *that*
+version is the one run. The two earlier, mis-classified work orders
+(`wo-req-repo-exploration-v2-blocked-attempts`,
+`wo-req-repo-exploration-v2-blocked-count`) were left unactioned in the
+private dogfood state directory - `developer_attempts: 0` on both, so nothing
+was spent on them.
+
+Run via `python -m company.engineering request` then `python -m
+tools.engineering_runner run-one`, consumer profile, one developer attempt,
+one reviewer pass, no automatic retry, on top of this milestone's own commit
+(`base_commit 274d1246a691672600c15b9d72faf8dade7a545c`). Result: **developer
+accepted, reviewer verdict `pass` (attested pass, deterministic pass, zero
+findings), gate 11/11 required suites green with zero blockers, final state
+`ready_for_approval`.** The reviewer's own evidence pointers were exact file
+and line citations (`company/engineering/lifecycle.py:197`, `:345`, `:214`,
+`:449`) for every one of the five acceptance criteria.
+
+---
+
+## 11. Result
+
+| | V1 (`reviews-completed`) | V2 (`blocked-count`) | change |
+|---|---:|---:|---:|
+| model | sonnet (standard tier) | sonnet (standard tier) | same |
+| developer turns | 27 | 26 | -3.7% |
+| developer output units | 8,184 | 6,033 | -26.3% |
+| **developer cache-read units** | **990,324** | **783,941** | **-20.84%** |
+| developer cache-creation units | 61,384 | 41,926 | -31.7% |
+| developer cost | $1.083562 | $0.804993 | -25.7% |
+| developer wall time | 209.6 s | 151.96 s | -27.5% |
+| developer instruction chars | (not recorded by V1) | 9,807 | - |
+| execution-context chars (developer) | n/a - no such artifact | 3,330 | - |
+| repo file reads (total / unique / repeated) | UNAVAILABLE | 12 / 2 / 10 | now observable |
+| repo searches / repeated | UNAVAILABLE | 2 / 0 | now observable |
+| files read but never changed | UNAVAILABLE | **0** | now observable |
+| files changed | 2 | 2 | same |
+| reviewer turns | 9 | 5 | -44.4% |
+| reviewer cache-read units | 158,520 | 47,922 | -69.8% |
+| reviewer cost | ~$0.374 | $0.213690 | -42.9% |
+| reviewer instruction chars | (not recorded by V1) | 10,158 | - |
+| execution-context chars (reviewer) | n/a | 1,729 | - |
+| total job cost | ~$1.457 | $1.018683 | -30.1% |
+| review | pass | pass, 0 findings | - |
+| gate | READY 11/11 | READY 11/11 | - |
+
+**Threshold: developer `cache_read_units` ≤ 792,259. Result: 783,941. PASS**,
+by 8,318 units (about 1.05% under the ceiling; the underlying reduction
+against V1 is 20.84%, just clearing the declared 20% bar). Reported as
+measured, at face value, not rounded up or reframed - this is a narrow pass,
+n=1, and is described as one.
+
+**What the new telemetry actually shows, for the first time.** Of the
+developer session's 12 `Read` calls, only **2 were of distinct files** -
+exactly the two files the work order authorized and the developer changed.
+**Zero files were read that were not changed.** Ten of the twelve reads were
+repeats of the *same* file, `tests/test_company_engineering_execution.py`,
+interleaved with four `Edit` calls against it - a read-edit-reread pattern on
+one already-identified file, not a discovery loop across the repository. This
+is a materially different profile from the grep-and-read exploration this
+milestone exists to reduce, and it is only visible because §1's telemetry now
+exists at all: V1 could not have distinguished "the session re-read one known
+file ten times" from "the session searched the whole repository ten times" -
+both were simply UNAVAILABLE.
+
+---
+
+## 12. Interpreting the result honestly
+
+**Attribution, separated where the evidence allows it:**
+
+- **Compiled execution context (§3):** the developer session never issued a
+  single `Grep`/`Glob` against the codebase to *find* `EngineeringJob` or its
+  test file - both were named, with exact symbol spans, in the briefing. The
+  two `Grep` calls it did make were narrow, targeted checks
+  (`developer_attempts|reviews_completed|blocked_attempts` and a search for an
+  existing test naming convention) *inside* files it already knew mattered,
+  not repository-wide discovery. This is the mechanism most directly
+  supported by the event trace: discovery cost is close to zero in this run.
+- **Reverse production-dependency index (§2):** the briefing named
+  `company/dashboard/builder.py` as a production dependent of
+  `lifecycle.py` before the session asked. Whether this changed developer
+  behavior cannot be separated from the rest of the bundle in a single run -
+  the developer's own `unresolved_risks` do not mention checking it - but it
+  is exactly the piece of information V1 claimed to provide and did not.
+- **Reviewer context (§5):** the largest single relative improvement
+  (-69.8% cache-read, -44.4% turns) and the easiest to attribute: the reviewer
+  went from a broad, `authorized_paths`-scoped free-text query to a two-file,
+  diff-scoped neighborhood with no source excerpts. This is a scope change,
+  not a request for the model to work faster, and the effect size matches the
+  scope reduction reasonably well.
+- **Briefing-size effect (§4):** near-neutral, as §4 already reported before
+  this job ran (developer instructions actually *grew* slightly in the earlier
+  synthetic measurement). Not a plausible explanation for the cache-read
+  reduction either way.
+- **Natural workload variance:** real and not dismissed. This is n=1, on a
+  task chosen to be comparable but not identical to V1's `reviews-completed`
+  job (a boolean-shaped counter on the same dataclass, arguably marginally
+  simpler than a second int already derived from the same transitions list).
+  The 20.84% reduction clears the declared 20% bar by a margin (1.05% of the
+  ceiling) that is well within the range V1 itself already documented as
+  variance between two runs of the *same* task on the *same* model
+  ($1.27 vs $1.74, a 37% spread, per
+  `docs/company_os_consumer_resource_mode.md`). **This threshold clearance
+  should not be read as proof the mechanism reliably delivers >20%**; it is
+  the one measurement this milestone committed to taking, taken once, honestly
+  reported.
+- **Model-tier lever:** unchanged from V1 and Consumer V1's own finding - both
+  sessions ran the same tier (standard/sonnet) as their comparators, so tier
+  selection contributes nothing to the delta measured here.
+
+**The gap the result itself names for next time:** ten of twelve reads were
+repeats of one file already known to be relevant. Neither the repo map nor
+the execution context can address that - it is a session re-reading a file it
+is actively editing, most plausibly triggered by the coding CLI's own
+edit-verification behavior rather than by anything this milestone's briefing
+said. Recorded as an open question, not solved here: a future pass could
+check whether the CLI offers a way to reduce redundant post-edit reads, but
+that is a CLI-behavior question, not a repository-navigation one, and it is
+out of this milestone's stated scope.
+
+---
+
+## 13. Autonomous engineering status
+
+Unchanged by this milestone, and this milestone does not change it on its
+own. The controlling record remains
+`docs/company_os_consumer_resource_mode.md`: **autonomous Company OS
+engineering is PAUSED**, pending a CEO/operator decision to resume it -
+`docs/company_os_repository_exploration_efficiency.md` (V1) already named
+itself the precondition, not the lifting, of that pause, and this V2 pass is
+the same kind of evidence, not a different kind of authorization. The current
+acceptable operating stance stays **controlled routine dogfood only**: routine
+STANDARD-tier jobs, consumer profile, one developer attempt, one reviewer,
+CEO/operator approval, no merge/deploy/publish without explicit approval -
+which is exactly the shape of the one job this milestone ran.
+
+---
+
+## FINAL REPORT
+
+**baseline branch:** `company-os-v1-repository-exploration-efficiency` @ `9b5f2242e2dfbcbf06c68ea678d8e9cbd8046df4`
+**baseline SHA:** `9b5f2242e2dfbcbf06c68ea678d8e9cbd8046df4`
+**new branch:** `company-os-v1-repository-exploration-efficiency-v2`
+**new SHA:** `274d1246a691672600c15b9d72faf8dade7a545c`
+**pushed:** yes (this milestone branch, after deterministic verification and the one matched job, per the brief)
+**merged:** no
+
+**CLI exploration telemetry capability:** present.
+**streaming supported:** yes - `--output-format stream-json`, probed live against the installed CLI (2.1.70), not assumed from documentation. Requires `--verbose` under `--print` (undocumented finding).
+**telemetry reliability:** POST_SESSION_OBSERVABLE - read only after the session ends, from the CLI's own transcript; never claimed as a live/mid-session limit.
+
+**V1 repo-map limitations found:** no symbol line spans (module-level granularity only); a claimed-but-missing reverse *production* dependency index (only a test reverse index existed).
+**V2 repo-map changes:** `ModuleMap.symbols` (qualified name, kind, start/end line) for every class, function and method; `RepoMap.production_dependents`; bounded `neighborhood()` query combining both with tests and entry points.
+**symbol indexing:** present, tested (8 new cases), used live in the matched job (the briefing named `EngineeringJob#188-454`, `JobTransition#160-184`, etc., with excerpts).
+**reverse dependencies:** present, tested, used live (`company/dashboard/builder.py` named as a production dependent of `lifecycle.py`).
+**test indexing:** unchanged from V1 (already correct); reused by the new neighborhood query.
+
+**execution context mechanism:** `ExecutionContextBundle` - ranked/given files, their symbols+spans, production dependents, covering tests, entry points, and (for the top developer file) small source excerpts; renders to one canonical "Execution context" section in both developer and reviewer briefings, replacing V1's free-text repo-map section and (developer only) a near-duplicate whole-packet JSON dump.
+**execution context max size:** 6,000 characters (`MAX_BUNDLE_CHARS`), hard-truncated, chosen and documented before the matched job.
+**actual matched-job context size:** 3,330 chars (developer), 1,729 chars (reviewer) - both comfortably under budget, neither truncated.
+**developer instruction chars:** 9,807 (real matched job).
+**reviewer instruction chars:** 10,158 (real matched job).
+
+**exploration metrics available:** yes, POST_SESSION_OBSERVABLE, for the `claude_code` backend when its transcript parses as `stream-json`.
+**file reads:** 12 total (developer), 3 total (reviewer).
+**unique file reads:** 2 (developer), 2 (reviewer).
+**repeated reads:** 10 (developer, all of one file), 1 (reviewer).
+**searches:** 2 grep (developer), 0 (reviewer).
+**repeated searches:** 0 (developer), 0 (reviewer).
+**files read but not changed:** 0 (developer) - both files read were both files changed.
+
+**external tools:**
+**adopted:** none new; the internal `ast`-based repo map, extended.
+**rejected:** none re-evaluated this round (ast-grep's V1 rejection stands, unrevisited).
+**deferred:** Graphify, Serena, RTK, ast-grep (beyond V1's rejection), Ponytail package - none needed this round; the one gap found (the free-text query's real-scale ranking defect, §3) was fixed inside the existing mechanism, not used as grounds to adopt anything external.
+
+**V1 matched result:** developer 27 turns, 8,184 output units, 990,324 cache-read units, 61,384 cache-creation units, $1.083562, 2 files changed, 209.6 s; reviewer 9 turns, 158,520 cache-read, ~$0.374; total ~$1.457.
+**V2 matched result:** developer 26 turns, 6,033 output units, **783,941 cache-read units**, 41,926 cache-creation units, $0.804993, 2 files changed, 151.96 s; reviewer 5 turns, 47,922 cache-read, $0.213690; total $1.018683.
+**change:** developer cache-read -20.84%, turns -3.7%, output -26.3%, cost -25.7%, wall time -27.5%; reviewer cache-read -69.8%, turns -44.4%, cost -42.9%; total job cost -30.1%.
+
+**threshold:** developer `cache_read_units` ≤ 792,259 (20% reduction from V1's 990,324), declared before the job ran.
+**threshold met:** **yes - 783,941, a narrow pass** (8,318 units / 1.05% under the ceiling). Reported as narrow because it is narrow; n=1 variance documented in §12 is real and larger than this margin.
+
+**quality:**
+**tests:** developer's own required suite (`tests/test_company_engineering_execution.py`) 115/115 passed; full deterministic suite at the implementation commit 4,600 passed / 6 failed (known fingerprint) / 337 skipped, zero regressions after one caught-and-fixed defect (§10).
+**review:** verdict `pass` (attested pass, deterministic pass), 0 findings, 5/5 acceptance criteria satisfied with exact file:line evidence.
+**gate:** READY, 11/11 required suites green, 0 blockers.
+
+**consumer viability:** SUPPORTED. One provider, one session per stage, one developer attempt, one reviewer pass, no automatic retry, total job cost $1.018683 - inside the consumer profile's $3.00 session ceiling with room to spare, $0.439 cheaper than V1's own comparable job.
+
+**recommendation:** keep the internal mechanism. The one real gap found this round (the free-text query's ranking defect at real repository scale, §3) was fixed inside the existing `ast`-based approach without new infrastructure, and the matched job's own telemetry (§11-12) shows the remaining cache-read cost concentrated in repeated reads of a single already-identified file - a CLI-behavior question, not a repository-navigation gap an external indexing tool would close. No evidence surfaced this round that Graphify, Serena, RTK or ast-grep would move that number. Investigate the repeated-read pattern (§12) before reaching for a new tool.
+
+**verdict: REPOSITORY EXPLORATION EFFICIENCY V2: PASS** (narrow - see §12). Every §10 acceptance condition met: STANDARD tier resolved and used (after catching and correcting a real specialist-domain misclassification in this milestone's own request wording), deterministic suite clean at the known fingerprint, tests PASS, review PASS, gate READY, no automatic retry occurred, telemetry trustworthy (`unreliable_metrics: []` on both sessions), and repository exploration - measured as the developer attempt's `cache_read_units`, the threshold declared in §9 before this job ran - came in 20.84% below V1's matched figure against a 20% bar. The four gaps V1 named in its own limitations section (§0) are each addressed with evidence, not merely claimed fixed.
+
+**This does not authorize autonomous Company OS engineering to resume.** See §13. The evidence continues to accumulate in the direction the pause named; the decision to act on it remains the CEO's/operator's, exactly as V1's own document already said of itself.
+
+---
