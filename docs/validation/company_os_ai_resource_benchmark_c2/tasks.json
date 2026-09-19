@@ -1,0 +1,69 @@
+{
+  "spec_version": "1.0",
+  "base_sha": "f2116a5fdaf0f5150753b36cb525f94e1c62b1f2",
+  "note_on_base_sha": "C2 runs against a checkout of company-os-resource-lab-benchmark-c2, which equals f2116a5 plus Checkpoint B's benchmark-only tooling under tools/benchmark_c2/ and tests/. No production or godot/ file differs from f2116a5 (verified: `git diff --stat f2116a5 HEAD -- godot/` is empty). All T1/T2/T3 source content is therefore identical to the clean unified baseline.",
+  "not_reused_from_benchmark_c": "BC-1 (the course_scene.gd::_options fix used in C0/C1/C2 of Benchmark C) is not reused. T1/T2/T3 below are fresh tasks in different files.",
+  "common_instructions": "Answer using exactly this structure and nothing more. Do not implement, edit, or propose a code change. Do not write an essay. Do not speculate about alternatives not present in the source.\n\nTASK ID: <T1|T2|T3>\nANSWER: <one or two sentence direct answer>\nFILES: <ordered list of repo-relative file paths you determined are required>\nSYMBOLS: <ordered list of `symbol_name (file:start-end)` entries>\nEVIDENCE: <one short sentence per file/symbol citing what you read that supports it>\nCONFIDENCE: <HIGH|MEDIUM|LOW>",
+  "tasks": [
+    {
+      "id": "T1",
+      "type": "large_file_local_navigation",
+      "question": "Within godot/scripts/neon_scene.gd, the shutter-leaf gate animation is driven by one specific simulation tick value, extracted from the replay's own frame data (the first frame whose data marks the floor/gates as open). Identify: (a) the exact symbol responsible for computing that tick, (b) its kind, (c) its exact line span on this checkout, and (d) the smallest surrounding implementation body a change to how that tick is chosen would need to touch.",
+      "answerable_read_only": true
+    },
+    {
+      "id": "T2",
+      "type": "multi_file_production_path",
+      "question": "A single command-line convention, --race-elevation=<degrees>, overrides a camera's shooting angle at render time somewhere in this repository's GDScript runtime. Identify every production GDScript file that implements this convention, and for each one: the symbol that parses the argument, the symbol/line where the parsed value is stored, and the symbol that ultimately consumes it to compute the camera's actual transform. Do not include a file that only mentions the convention in a comment without implementing it. Do not include a camera-building path that does not consume this value, even if it sits in the same file.",
+      "answerable_read_only": true
+    },
+    {
+      "id": "T3",
+      "type": "structural_change_surface",
+      "question": "godot/assets/marble_machine/lab_palette.gd already supports several named 'machine color passes' that consumer scenes can select to retint the machine's surfaces. If we wanted to add one new selectable machine color pass, preserving how the existing passes and the general material-lookup path behave, which exact symbols in this file would require a code change, and which symbols in this same file are already generic enough that they would need none? Separately, list the other GDScript files in this repository that reference this file, and state whether each one would need to change merely for the new pass to exist and be selectable (as opposed to a specific scene later choosing to adopt it).",
+      "answerable_read_only": true
+    }
+  ],
+  "condition_policies": {
+    "C0": {
+      "description": "Current normal navigation. No candidate provider.",
+      "tools_allowed": ["Bash", "Read", "Write", "Edit", "Glob", "Grep", "TodoWrite"],
+      "tools_denied": ["Task", "WebSearch", "WebFetch", "ctags_query", "treesitter_query"],
+      "note": "Tool list is tools/engineering_runner/config.py's existing DEFAULT_DEVELOPER_TOOLS / DEFAULT_DISALLOWED_TOOLS, unmodified. C0 is not intentionally handicapped relative to a normal session."
+    },
+    "C1": {
+      "description": "C0 toolset plus a bounded Ctags query tool.",
+      "tools_allowed": ["Bash", "Read", "Write", "Edit", "Glob", "Grep", "TodoWrite", "ctags_query"],
+      "tools_denied": ["Task", "WebSearch", "WebFetch", "treesitter_query"],
+      "ctags_query_capability": "CtagsProvider.find_definition(symbol) and .symbols_in_file(path) only. Definitions and file+line only -- no callers/references (Checkpoint B established Ctags has none for GDScript).",
+      "ctags_query_bounds": {"max_matches": 20, "max_result_chars": 4000, "truncation_reported": true},
+      "index_policy": "Prebuilt before the timed/model portion of the session begins; build cost reported separately from per-task model navigation cost (see experiment.json index_policy)."
+    },
+    "C2": {
+      "description": "C0 toolset plus a bounded tree-sitter-gdscript query tool.",
+      "tools_allowed": ["Bash", "Read", "Write", "Edit", "Glob", "Grep", "TodoWrite", "treesitter_query"],
+      "tools_denied": ["Task", "WebSearch", "WebFetch", "ctags_query"],
+      "treesitter_query_capability": "TreeSitterProvider.find_definition(symbol, with_body) and .symbols_in_file(path) only. Definitions, exact body/span, and file+line -- no callers/references across files (same Checkpoint B limitation as Ctags).",
+      "treesitter_query_bounds": {"max_matches": 20, "max_result_chars": 4000, "max_body_chars": 4000, "truncation_reported": true},
+      "index_policy": "Same as C1: prebuilt before the timed/model portion; build cost reported separately."
+    },
+    "universal_denials": {
+      "all_conditions": ["docs/validation/company_os_ai_resource_benchmark_c2/", "any path under C:\\Users\\mgial\\.benchmark-c2\\"],
+      "reason": "Ground-truth isolation. See ground_truth_fingerprint.json and the CHECKPOINT C section of docs/company_os_ai_resource_benchmark_c2_gdscript.md for the isolation design and its proof."
+    }
+  },
+  "model_configuration": {
+    "model": "sonnet (STANDARD tier alias per tools/engineering_runner/resources.py DEFAULT_TIER_MODELS; resolves to claude-sonnet-5 in this account)",
+    "tier": "STANDARD",
+    "effort": "default (no elevated reasoning-effort override applied to any of the 9 runs)",
+    "developer_attempts_per_condition": 1,
+    "automatic_retry": false,
+    "max_stage_retries_override": 0,
+    "wall_ceiling_seconds": 3600,
+    "wall_ceiling_source": "tools/engineering_runner/config.py RunnerConfig.developer_timeout_s default, unmodified",
+    "context_ceiling": "soft, advisory: 50000 cumulative tool-result characters is the predeclared anomaly-flag threshold; the hard bound is the pinned model's native context window (no artificial mid-session cutoff exists in the current runner)",
+    "budget_ceiling_usd": "soft, advisory: $2.00 per developer session is the predeclared anomaly-flag threshold; not a hard enforced stop in the current runner",
+    "reviewer": "none by default per condition/task; invoked once per task only if C0/C1/C2 answers differ materially (see experiment.json scoring)",
+    "subagents": "none; Task tool is denied to every condition (existing runner default)"
+  }
+}

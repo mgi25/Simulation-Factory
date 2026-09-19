@@ -1,0 +1,70 @@
+{
+  "spec_version": "1.0",
+  "scoring": {
+    "scale": ["CORRECT", "PARTIAL", "WRONG"],
+    "rules_generic": {
+      "CORRECT": "Every required file and required symbol from the frozen ground truth appears in FILES/SYMBOLS; no ground-truth distractor is claimed as required; every reported line span is within the frozen tolerance; for T2, both files' chains are present with at least entry/assignment/consumer symbols per file.",
+      "PARTIAL": "The core required symbol/file for the task is correctly identified, but one non-critical supporting item (a call site, a consumer symbol, or one secondary required item) is missing or has a line span outside tolerance; no distractor is fabricated as required.",
+      "WRONG": "The core required symbol/file is missed entirely, a wrong file/symbol is presented as the answer, a ground-truth distractor is claimed as required, or a relationship not present in the source is fabricated."
+    },
+    "scoring_method": "Deterministic comparison of each run's FILES/SYMBOLS/LINE-SPAN fields against the external ground truth file (see ground_truth_fingerprint.json), performed by the operator/harness after all runs complete -- not by another model call, per the no-reviewer-by-default rule.",
+    "reviewer_escalation": "If, for a given task, the three conditions' scored answers are not all the same (CORRECT vs CORRECT vs PARTIAL, etc.) in a way the deterministic comparison cannot resolve as an obvious scoring bug, invoke exactly one independent reviewer session for that task only, given the same frozen ground truth, to adjudicate. Never one reviewer per run."
+  },
+  "resource_metrics": {
+    "model": ["cache_read_tokens", "cache_creation_tokens", "input_tokens_if_reliable", "output_tokens", "turns", "reported_cost_usd_if_reliable", "wall_time_seconds"],
+    "navigation": ["read_calls_total", "full_file_reads", "targeted_reads", "grep_search_calls", "glob_list_calls", "provider_calls", "unique_source_files_opened", "irrelevant_source_files_opened", "repeated_searches", "navigation_result_chars_total"],
+    "provider": ["index_build_time_ms", "index_bytes", "query_latency_ms", "result_chars", "truncation_count", "error_count"],
+    "known_telemetry_limitations": [
+      "Per company-os-ai-resource-efficiency-v2's own recorded defect: cost as reported by the runner is session-total, not per-condition-isolable if multiple conditions share a session -- Checkpoint D MUST run each of the 9 conditions as a fully separate session/process so this defect cannot pool cost across conditions.",
+      "Turns and tokens have previously been observed as final-segment values rather than cumulative in some transports; Checkpoint D must record which the actual backend returns for this run and mark the other UNAVAILABLE rather than assume.",
+      "repository-exploration-efficiency-v2's finding that `stream-json` telemetry requires `--verbose` on this backend must be applied when configuring the 9 sessions, or file-read/search telemetry becomes UNAVAILABLE for the whole run, not just degraded."
+    ],
+    "unavailable_field_policy": "Any field the chosen backend cannot reliably report is recorded as the literal string \"UNAVAILABLE\" with a one-line reason, never estimated from character counts or interpolated from other fields."
+  },
+  "irrelevant_file_definition": {
+    "definition": "A source file the developer session opened (Read) or searched (Grep/Glob matched and was inspected) whose contents are not named as a required file, a required-symbol's file, or an explicitly listed distractor/supporting-evidence file in the frozen ground truth for that task.",
+    "frozen_before_execution": true,
+    "note": "Per-task expected relevant file sets are fixed in the external ground truth file now, at Checkpoint C, before any of the 9 runs happen. Relevance is never decided after seeing which files a winning condition opened."
+  },
+  "run_order": {
+    "rationale": "A balanced Latin-square-style order across the 3x3 matrix, so no condition always runs first (order/session-warmup effects, if any, are spread evenly) and no task is always solved by the same condition ordering.",
+    "T1": ["C0", "C1", "C2"],
+    "T2": ["C1", "C2", "C0"],
+    "T3": ["C2", "C0", "C1"],
+    "no_post_hoc_randomization": true
+  },
+  "session_independence": {
+    "rule": "Each of the 9 runs is a fresh, independent developer session/process with no conversation memory carried from any other run. No prior run's answer, transcript, or score is ever supplied to a later run.",
+    "provider_index_reuse_policy": "The Ctags/tree-sitter index for a given condition (C1 or C2) may be rebuilt once per task or reused across that condition's 3 task runs, as long as the reuse policy is declared before Checkpoint D starts and applied identically across all 3 tasks for that condition. Declared policy: rebuild once per condition (not per task) immediately before that condition's first timed run, then reuse the same in-memory/on-disk index for its remaining runs in the matrix; report the one build cost separately from all 3 tasks' per-task model navigation cost."
+  },
+  "index_policy": {
+    "cold_build_reported_separately_from_model_cost": true,
+    "ctags_cold_build_ms_measured_in_checkpoint_b": 66.5,
+    "ctags_warm_query": "in-memory dict lookup after the one cold build; not re-invoking the ctags binary per query",
+    "tree_sitter_cold_parse_ms_measured_in_checkpoint_b": 214.0,
+    "tree_sitter_warm_query": "in-memory dict lookup after the one cold parse pass; not re-parsing per query",
+    "operational_note_deferred_to_checkpoint_d_report": "Whether either index can be incrementally refreshed rather than fully rebuilt on a source change is an operational-adoption question, not a Checkpoint C/D resource-comparison question; both cold-build numbers above are already far below the 3600s wall ceiling and are not expected to matter for the resource comparison itself."
+  },
+  "stop_conditions": [
+    "source tree changes between conditions (the base checkout must be byte-identical across all 9 runs; re-verify the recorded git blob hashes before and after each run)",
+    "the shared v21-visual-contrast worktree is touched",
+    "main changes unexpectedly (re-verify origin/main SHA before Checkpoint D begins)",
+    "canonical Company OS changes unexpectedly (re-verify origin/company-os-v1-bootstrap SHA before Checkpoint D begins)",
+    "a developer session receives the benchmark ground truth (grep the session transcript for the external ground-truth path or its sha256 as a leak check)",
+    "one candidate's tool leaks into another condition's session (a C0 session calls ctags_query/treesitter_query, or a C1 session calls treesitter_query, etc.)",
+    "telemetry cannot distinguish which condition produced a given record",
+    "model configuration differs between any of the 9 runs (model, tier, effort, tool list beyond the declared per-condition provider tool, timeouts)",
+    "an infrastructure defect (crash, transport failure unrelated to the task itself) invalidates more than one run"
+  ],
+  "infrastructure_crash_policy": "Exactly one isolated infrastructure crash may be replaced with a fresh run of the same condition/task/config, and the replacement must be documented (which run, why, what was different about the replacement). A second crash in the same 9-run matrix stops Checkpoint D entirely rather than being replaced.",
+  "decision_rule": {
+    "eligibility_for_adoption": ["correctness = 3/3 for that provider", "no authority/scope violation", "no extra retries beyond the frozen 1-attempt policy", "no benchmark contamination (no stop condition triggered)", "aggregate model-resource reduction is material", "improvement appears on at least 2 of 3 tasks", "no major regression on the remaining task"],
+    "noise_floor_reference": "Benchmark C's own recorded ~37% project resource-noise spread between two runs of an identical task on identical tooling. Treat any measured improvement smaller than that range cautiously rather than as proven.",
+    "tie_outcome": "If both Ctags and tree-sitter beat C0 materially but do not clearly beat each other beyond the noise floor: result = LIGHTWEIGHT PROVIDERS WIN -- CANDIDATE TIE. The tie-break is then Checkpoint B's own recorded operational-overhead comparison (Ctags: no cross-file references, no body/span, single fast subprocess build, no extra runtime dependency; tree-sitter: no cross-file references, native body/span, isolated venv dependency, ~3x slower cold build but still far under any relevant ceiling) -- not a fabricated statistical winner.",
+    "do_not_force_a_winner": "If neither candidate clears the noise floor over C0, or if correctness is not 3/3 for a candidate, the result is INCONCLUSIVE or BASELINE WINS respectively -- not adjusted after the fact to produce a winner."
+  },
+  "serena_trigger": {
+    "condition": "Serena is benchmarked next only if a real Checkpoint D task exposes a required semantic capability where ALL of the following hold: (1) C0 solves it only through expensive exploration or fails outright, AND (2) Ctags cannot provide it (confirmed unavailable in Checkpoint B: no cross-file references), AND (3) tree-sitter as built here cannot provide it (confirmed unavailable in Checkpoint B: no cross-file references), AND (4) that capability is expected to recur in real future production GDScript engineering, not just this one task.",
+    "not_a_valid_trigger": "Serena having more features (LSP-backed references, a live Godot editor process) is not itself a trigger. The trigger is a demonstrated, recurring gap, not Serena's feature list."
+  }
+}

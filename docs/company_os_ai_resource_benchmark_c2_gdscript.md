@@ -1,9 +1,15 @@
 # AI Resource Optimization Lab — Benchmark C2: Repeated GDScript Efficiency Validation
 
-Status: **Checkpoint B (C2 lab construction) complete.** Checkpoints C
-(freeze the experiment) and D (live benchmark) have not run. This document
-will grow a section per checkpoint; it does not yet contain conclusions
-about which candidate wins — that is Checkpoint D's job.
+Status: **Checkpoint C (freeze T1/T2/T3 + the 3×3 matrix) complete.**
+Checkpoint D (live benchmark) has not run. This document will grow a
+section per checkpoint; it does not yet contain conclusions about which
+candidate wins — that is Checkpoint D's job.
+
+**Deliberate omission in this section**: the actual T1/T2/T3 answers
+(which symbols, which line spans, which files are required vs. distractor)
+are not written anywhere in this document or anywhere else in this git
+working tree. See "Ground-truth isolation" below for why and where they
+live instead.
 
 ## Checkpoint A summary (evidence audit, prior session)
 
@@ -271,3 +277,177 @@ not a runtime default.
 **No live AI/model sessions ran during Checkpoint B.** Every measurement
 above came from local, deterministic subprocess/parse calls against the
 repository's own tracked files.
+
+## Checkpoint C — freeze T1/T2/T3 + the 3×3 matrix
+
+Machine-readable frozen definitions live under
+`docs/validation/company_os_ai_resource_benchmark_c2/`:
+`tasks.json` (questions, common instructions, output schema, per-condition
+tool policy, model configuration), `experiment.json` (scoring rules,
+resource-metric schema, run order, index policy, stop conditions, decision
+rule, Serena trigger), and `ground_truth_fingerprint.json` (a hash, not the
+answer key itself — see below). This section is the narrative companion;
+it does not repeat the actual answers either.
+
+### Source freeze
+
+All nine Checkpoint D runs must see byte-identical `godot/` content. This
+is the same clean unified baseline `f2116a5` Checkpoint B validated —
+`git diff --stat f2116a5 HEAD -- godot/` is empty, so the Checkpoint B
+tooling commit on top changes nothing under `godot/`. Every ground-truth
+file's git blob SHA-1 and SHA-256 are recorded in the (external) ground
+truth file, so a mismatch at Checkpoint D start is immediately detectable
+without revealing what the hash is protecting.
+
+### Task design
+
+Three fresh tasks (none reusing BC-1's `course_scene.gd::_options` fix),
+each in a different file/relationship shape:
+
+- **T1 — large-file local navigation**, in `godot/scripts/neon_scene.gd`
+  (3,086 lines, the largest GDScript file in the repository, confirmed via
+  `wc -c godot/scripts/*.gd`). Asks for the exact symbol behind one
+  concrete, observable behavior, described without naming the symbol.
+  Contains a naturally-occurring in-task distractor: a same-named function
+  exists in a different scene file (confirmed via both providers' own
+  query output during design — Ctags and tree-sitter both returned two
+  matches for the target symbol name, one per file), so selecting the
+  wrong file's version is a real, checkable failure mode, not a
+  hypothetical one.
+- **T2 — multi-file production path**, tracing one shared command-line
+  convention across two independent scene files that each implement it
+  separately (confirmed via `Grep` across `godot/scripts/` during design:
+  exactly two files match). Neither file is named in the frozen question.
+  Contains a same-file distractor: a sibling camera-building path in one
+  of the two files that is reached from the same dispatcher function but
+  explicitly does not consume the traced value (its own source comment
+  says so).
+  This does not require true cross-file caller/reference intelligence —
+  neither provider has it (Checkpoint B). It measures whether compact
+  definition/body lookup reduces the manual search a multi-file task still
+  requires, exactly as instructed.
+- **T3 — structural change-surface discovery**, in
+  `godot/assets/marble_machine/lab_palette.gd`, a file eleven other
+  GDScript files across `godot/scripts/` and
+  `godot/assets/marble_machine/` reference (confirmed via `Grep` for its
+  preload/load path). Asks which exact symbols in that one file would
+  need to change to add one new capability, which symbols in the same file
+  are already generic enough to need no change, and which of the eleven
+  referencing files are genuine-but-irrelevant distractors for that
+  specific question. This is the task instrumented to measure irrelevant
+  navigation, per the milestone's own emphasis.
+
+  **Honest caveat found during the leak-check below**: two pre-existing,
+  already-committed production docs (`docs/sloped_race_v23.md`,
+  `docs/sloped_race_v23_machine_colour.md`, both inherited from the
+  unified baseline, written long before this benchmark) name
+  `lab_palette.MACHINE_PASSES` directly while describing the existing
+  three color passes. This is real, ambient repository documentation, not
+  a benchmark-design leak — it is equally reachable by C0, C1, and C2
+  through the same ordinary `Grep`/`Read` every condition has, so it does
+  not bias the comparison between conditions. It may make T3's core
+  mechanism easier to find for all three conditions than the source-only
+  reading in this section implies, which is a fact about this task's
+  real-world difficulty worth carrying into Checkpoint D's interpretation,
+  not a reason to redesign the task now (Checkpoint C freezes tasks before
+  seeing condition-specific performance, not before seeing the repository
+  itself).
+
+All three were designed by manually navigating the repository with
+Read/Grep-equivalent tools only — the same toolset C0 gets — which is
+itself a lightweight proof that C0 can theoretically solve each task
+without any candidate provider.
+
+### Ground-truth isolation
+
+The actual answer key (required symbols, exact line spans, distractor
+lists, and the reasoning connecting them) is stored at
+`C:\Users\mgial\.benchmark-c2\ground_truth\c2_ground_truth.json` — a path
+outside every git repository on this machine, in the same location family
+as the isolated tree-sitter venv. It is never committed. Only its SHA-256
+and byte length are committed, in `ground_truth_fingerprint.json`, so
+tampering after freezing is detectable without the fingerprint itself
+revealing anything.
+
+**Why not just commit it and deny the path to developer sessions?**
+Because denial is a configuration a future harness change could get wrong
+silently, while a file that is not present at all cannot be leaked by a
+policy bug. `tasks.json` also declares an explicit `universal_denials`
+entry for `docs/validation/company_os_ai_resource_benchmark_c2/` and the
+external ground-truth directory as defense in depth, but the primary
+control is that the answer key is physically outside the checkout
+Checkpoint D's sessions will ever see.
+
+**Proof, deterministic, no model calls:**
+- `git grep` across every committed file in this branch for the six most
+  distinctive ground-truth symbol names returns zero matches outside the
+  actual GDScript source files themselves (verified during this
+  checkpoint) — i.e. no separate document packages the answer conveniently
+  for a shortcut search.
+- `tasks.json`, `experiment.json`, and `ground_truth_fingerprint.json` were
+  each grepped for those same symbol names after being written; zero
+  matches.
+- The external ground-truth file's directory
+  (`C:\Users\mgial\.benchmark-c2\`) is a sibling of the git repository
+  root, not a descendant of it — a session whose working directory is a
+  runner-managed worktree under `worktree_root/<branch>` has no path
+  relationship to it at all.
+
+### Model, condition, and tool policy freeze
+
+Recorded in full in `tasks.json`. Summary: model = `sonnet`
+(`tools/engineering_runner/resources.py`'s own `DEFAULT_TIER_MODELS[STANDARD]`
+alias, which resolves to Claude Sonnet 5 in this account), STANDARD tier,
+default effort, exactly one developer attempt per condition with no
+automatic retry, the existing runner's own `developer_timeout_s` (3,600s)
+as the wall ceiling, and the existing `DEFAULT_DEVELOPER_TOOLS` /
+`DEFAULT_DISALLOWED_TOOLS` as C0's unmodified tool policy (so C0 is not
+handicapped relative to a normal session). C1 adds exactly one bounded
+tool wrapping `CtagsProvider`; C2 adds exactly one bounded tool wrapping
+`TreeSitterProvider`; neither removes anything from C0, and neither
+condition can reach the other's tool. All three ceilings and the tool
+lists come from values already established in this repository's runner
+config or Checkpoint B's own measurements — nothing here is an invented
+number.
+
+### Scoring, telemetry, run order, index policy, stop conditions, decision rule
+
+All frozen in `experiment.json`, structurally: CORRECT/PARTIAL/WRONG rules
+that reference ground-truth field names (required files/symbols,
+distractors, tolerance) without restating their values; the full
+model/navigation/provider telemetry schema from the milestone brief,
+carrying forward two known, already-documented telemetry limitations
+([[ai-resource-efficiency-v2-telemetry-defect]] and
+[[repository-exploration-efficiency-v2-stop-condition]]'s `--verbose`
+requirement) so Checkpoint D does not have to rediscover them mid-run; a
+balanced run order (`T1: C0→C1→C2`, `T2: C1→C2→C0`, `T3: C2→C0→C1`); an
+index policy that rebuilds each provider's index once per condition (not
+per task) and reports that cost separately from per-task model resource
+use; nine stop conditions; a decision rule anchored to Benchmark C's own
+~37% noise-floor finding; and a Serena trigger that requires a demonstrated,
+recurring capability gap rather than a feature-list comparison.
+
+### Validation performed (no model calls)
+
+- Every ground-truth file confirmed to exist and match its recorded git
+  blob hash at `HEAD` (== `f2116a5` for these paths).
+- Every ground-truth symbol confirmed locatable by name via both
+  `CtagsProvider.find_definition()` and `TreeSitterProvider.find_definition()`,
+  with tree-sitter's independently-derived line spans matching the manual
+  reading exactly, and both providers' start lines agreeing with each
+  other exactly.
+- Every call-site/consumer relationship in the ground truth was read
+  directly from source, not inferred.
+- Every distractor's classification is backed by a specific, checkable
+  reason (a same-named symbol in a different file; a sibling function
+  whose own comment disclaims the traced behavior; a real reference that
+  is an adoption site rather than part of the capability's change surface).
+- Ground-truth isolation proven per the "Ground-truth isolation" section
+  above.
+
+### Confirmation
+
+**No live AI/model sessions ran during Checkpoint C.** All task design and
+validation used the same Read/Grep-equivalent navigation C0 will get, plus
+the two providers' own deterministic query methods already validated in
+Checkpoint B.

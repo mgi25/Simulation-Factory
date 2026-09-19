@@ -1,0 +1,11 @@
+{
+  "note": "The actual T1/T2/T3 answer key is deliberately NOT stored in this git working tree, so no developer session's Read/Grep/Glob during Checkpoint D can reach it. It lives at C:\\Users\\mgial\\.benchmark-c2\\ground_truth\\c2_ground_truth.json, a path outside every git repository on this machine. This file records only enough to detect post-hoc tampering: a hash, not the content.",
+  "ground_truth_path_outside_repo": "C:\\Users\\mgial\\.benchmark-c2\\ground_truth\\c2_ground_truth.json",
+  "sha256": "249835ea7fb2c9cbdd927b695d423db9ee27bc9550fb6661fff21b49d5bf44b6",
+  "byte_length": 8935,
+  "spec_version": "1.0",
+  "base_sha": "f2116a5fdaf0f5150753b36cb525f94e1c62b1f2",
+  "created_at_checkpoint": "C",
+  "frozen": true,
+  "verification_instruction": "Before Checkpoint D scoring, recompute sha256 of the external file and compare to the value above. A mismatch means the answer key changed after freezing and Checkpoint D must stop and report, not proceed."
+}
