@@ -1,0 +1,82 @@
+{
+  "checkpoint": "C3_FINAL_CLOSURE",
+  "status": "INCONCLUSIVE",
+  "productionization_decision": "DEFERRED",
+  "note_on_status_semantics": "INCONCLUSIVE is not equivalent to 'productionize neither because both failed'. It means the frozen experiment lacks a valid mechanism to resolve mixed evidence it itself surfaced; the both_fail decision-rule branch was never reached because its precondition (all four eligibility conditions evaluated to a conclusive fail, or a valid Task C tiebreak) was never met.",
+
+  "experiment_identity": {
+    "original_frozen_experiment_commit": "874cf6b5c0db9229562ead43807c2e5fca8d663d",
+    "apparatus_fix_commit": "f82a37437ebbfa5c07928bf1d74956a8c5a7e89b",
+    "claude_code_version": "2.1.70",
+    "model": "claude-sonnet-5",
+    "service_tier": "standard",
+    "execution_mode": "HUMAN-SUPERVISED INTERACTIVE (no -p, no permission bypass)",
+    "subagents_used": false
+  },
+
+  "apparatus_incident": {
+    "invalid_session": "original A/C1 (session 69867a18-...)",
+    "invalid_status": "INVALID_INFRASTRUCTURE_APPARATUS",
+    "exact_cause": "Ctags symbols_in_file branch discarded each match's real symbol name and substituted the queried file path in both the matches list and the compact-line generator, due to a missing e[\"name\"] carry-through in provider_server.py.",
+    "correction": "provider_server.py ctags symbols_in_file branch fixed to carry e[\"name\"] through; find_definition (both providers) and treesitter's symbols_in_file were already correct and untouched. Fix committed at f82a37437ebbfa5c07928bf1d74956a8c5a7e89b, documented in apparatus_amendment_ctags_symbols_in_file.json.",
+    "regression_validation": "8/8 real-MCP regression tests (tools/benchmark_c3/test_provider_server.py, real mcp.client.stdio against the actual server subprocess) passed after the fix, rerun fresh before every subsequent run's launch.",
+    "replacement_datapoint": "A/C1_R1 (session 9dab57a3-486e-4758-910b-b87ff00a86fc) used as the official Ctags Task A datapoint.",
+    "disposition": "The invalid run was preserved as diagnostic evidence (A_C1_invalid_run_record.json) and excluded from all inference. Not deleted."
+  },
+
+  "official_task_A_results": {
+    "A_C0":  {"session_id": "e7a5c569-9ff6-4893-802d-c511168ace6a", "correctness": "CORRECT", "context_load_tokens": 128484, "output_tokens": 1881, "assistant_turns": 9, "navigation_tool_result_chars": 6997},
+    "A_C1_R1_ctags": {"session_id": "9dab57a3-486e-4758-910b-b87ff00a86fc", "correctness": "CORRECT", "context_load_tokens": 78722, "delta_vs_C0": "-38.7%", "output_tokens": 1208, "assistant_turns": 5, "provider_relevant": "PASS", "navigation_tool_result_chars": 14155},
+    "A_C2_treesitter": {"session_id": "ed5e1bd8-9e75-43fb-bf2d-5353278d1a08", "correctness": "CORRECT", "context_load_tokens": 45073, "delta_vs_C0": "-64.9%", "output_tokens": 1166, "assistant_turns": 3, "provider_relevant": "PASS", "navigation_tool_result_chars": 7086}
+  },
+
+  "official_task_B_results": {
+    "B_C0":  {"session_id": "f0e7a63c-9962-4943-a2b5-b54cb0354518", "correctness": "CORRECT", "context_load_tokens": 43806, "output_tokens": 2352, "assistant_turns": 3, "navigation_tool_result_chars": 6415},
+    "B_C1_ctags": {"session_id": "8a0ca601-999a-40cf-a695-8e2deef8ab6b", "correctness": "CORRECT", "context_load_tokens": 44407, "delta_vs_C0": "+1.372%", "output_tokens": 1339, "assistant_turns": 3, "provider_relevant": "PASS", "navigation_tool_result_chars": 6005},
+    "B_C2_treesitter": {"session_id": "d296031c-bf0e-4d5e-a6c6-d31ae23ca3b2", "correctness": "CORRECT", "context_load_tokens": 44300, "delta_vs_C0": "+1.128%", "output_tokens": 1447, "assistant_turns": 3, "provider_relevant": "PASS", "navigation_tool_result_chars": 3385}
+  },
+
+  "frozen_decision_rule_evaluation": {
+    "noise_floor_reference": "~37% (Benchmark C's own recorded resource-noise spread)",
+    "ctags": {
+      "task_A": "clear pass (-38.7%, exceeds noise floor, CORRECT, provider relevant)",
+      "task_B": "clear fail (+1.372%, a regression not a reduction, despite CORRECT and provider relevant)",
+      "mixed_result_contingency": "TRIGGERED"
+    },
+    "treesitter": {
+      "task_A": "clear pass (-64.9%, exceeds noise floor, CORRECT, provider relevant)",
+      "task_B": "clear fail (+1.128%, a regression not a reduction, despite CORRECT and provider relevant)",
+      "mixed_result_contingency": "TRIGGERED"
+    }
+  },
+
+  "task_C_verification_failure": {
+    "exact_draft_question": "godot/assets/marble_machine/course/course_machine.gd defines several config tables (GUARD_BOOSTS, BANK_SLEWS, OPEN_SIDES, EDGE_LIGHTS) keyed by named course run (e.g. 'launch', 'leg1', 'leg2', 'orange', 'blue', 'leg3', 'final'). If a new named run were added to the sloped course, which of these tables would require a new entry, and which functions in this file already resolve a run name generically (needing no change)? Separately, list the other GDScript files in this repository that reference course_machine.gd, and state whether each would need to change merely for a new run name to exist and be usable.",
+    "frozen_verification_status_field": "PARTIAL -- target tables and referencing-file list confirmed by direct inspection; the full distractor/exclusion set has NOT been verified to the same rigor as Task A/B and MUST be completed before this task is ever run.",
+    "no_committed_prompt_artifacts": "No TaskC_C0/C1/C2 prompt files exist on disk anywhere under the benchmark run directories, and prompt_files_and_hashes in tasks.json records hashes only for Task A and Task B; there is no committed Task C hash of any kind.",
+    "find_references_unsupported_ctags": "Empirically confirmed via real MCP client call: ctags_query(query_kind='find_references', value='course_machine') -> {\"available\": false, \"reason\": \"unsupported query_kind 'find_references'\"}",
+    "find_references_unsupported_treesitter": "Empirically confirmed via real MCP client call: treesitter_query(query_kind='find_references', value='course_machine') -> {\"available\": false, \"reason\": \"unsupported query_kind 'find_references'\"}",
+    "capability_gap": "The draft question's second half (enumerate other GDScript files referencing course_machine.gd) requires cross-file reference/caller enumeration that neither provider implements through the real MCP interface (only find_definition and symbols_in_file exist as query_kind values in provider_server.py). This is the same structural flaw that disqualified the original superseded Task B draft (beam_section/channel_section).",
+    "table_entry_ambiguity": "GUARD_BOOSTS, BANK_SLEWS, OPEN_SIDES, and EDGE_LIGHTS are all read via .get(name, <default>) at their call sites (course_machine.gd lines 173, 201, 202, 207), so none of them fails without a new entry for a new run name -- whether a new run 'requires' an entry is a judgment call about intended behavior, not a hard code dependency, and this was never resolved in the frozen draft.",
+    "post_task_C_aggregation_rule_unspecified": "experiment.json's decision_rule.mixed_result_handling states only that Task C must run 'before drawing any conclusion for that provider'; it does not specify whether Task C must independently clear the same noise-floor threshold, nor how a Task C result would mechanically combine with existing Task A/Task B evidence.",
+    "task_C_launched": false,
+    "disposition": "Task C was not redesigned, not given prompt artifacts, and not run. The pre-existing draft is preserved unchanged in tasks.json."
+  },
+
+  "final_conclusion": "Benchmark C3 is INCONCLUSIVE for provider productionization. Both lightweight providers demonstrated substantial context-load benefit on Task A while failing to reduce context load on Task B. The frozen mixed-result rule requires contingency Task C before a conclusion, but the pre-existing Task C draft is not executable as a valid frozen experiment and no mechanical post-C rule exists. No provider productionization conclusion is therefore drawn from C3.",
+
+  "explicit_dispositions": {
+    "ctags": "NOT PRODUCTIONIZED from C3",
+    "treesitter": "NOT PRODUCTIONIZED from C3",
+    "either_provider_classified_as_rejected": false,
+    "decision_deferred_to": "a separately designed experiment, if the CEO chooses to commission one",
+    "serena_eligibility": "Serena remains NOT ELIGIBLE FOR TESTING based solely on C3, because lightweight-provider (Ctags/tree-sitter) utility itself remains unresolved.",
+    "do_not_force_a_winner_honored": true
+  },
+
+  "preserved_runs": {
+    "task_A": ["A_C0", "A_C1 (original, INVALID_INFRASTRUCTURE_APPARATUS, preserved as diagnostic evidence)", "A_C1_R1", "A_C2"],
+    "task_B": ["B_C0", "B_C1", "B_C2"],
+    "deletion_policy": "None of the above were or will be deleted. Telemetry, manifests, and invalid-run records remain on disk under C:\\Users\\mgial\\.benchmark-c3\\runs\\."
+  }
+}
