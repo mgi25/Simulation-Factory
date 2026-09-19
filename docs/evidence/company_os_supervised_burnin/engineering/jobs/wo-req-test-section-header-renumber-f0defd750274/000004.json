@@ -1,0 +1,64 @@
+{
+  "developer_attempts": 1,
+  "max_developer_attempts": 1,
+  "opened_on": "2026-09-20",
+  "pending_decisions": [],
+  "reviews_completed": 0,
+  "state": "reviewing",
+  "transitions": [
+    {
+      "actor": "company-os",
+      "evidence_refs": [],
+      "from_state": "requested",
+      "on": "2026-09-20",
+      "reason": "work order wo-req-test-section-header-renumber authorized by MGI",
+      "to_state": "requested"
+    },
+    {
+      "actor": "company-os",
+      "evidence_refs": [
+        "engineering/plans/wo-req-test-section-header-renumber-f0defd750274/000001.json",
+        "engineering/work_orders/wo-req-test-section-header-renumber-f0defd750274/000001.json"
+      ],
+      "from_state": "requested",
+      "on": "2026-09-20",
+      "reason": "implementation plan 54b6a0fb4c637dd7 derived from the work order",
+      "to_state": "planning"
+    },
+    {
+      "actor": "company-os",
+      "evidence_refs": [
+        "execution/authorities/wo-req-test-section-header-renumber-f0defd750274/000001.json",
+        "execution/packets/wo-req-test-section-header-renumber-f0defd750274/000001.json"
+      ],
+      "from_state": "planning",
+      "on": "2026-09-20",
+      "reason": "packet 6cda69f9fdbc8a0c attempt 1 issued to software_implementation_engineer",
+      "to_state": "developing"
+    },
+    {
+      "actor": "company-os",
+      "evidence_refs": [
+        "execution/receipts/wo-req-test-section-header-renumber-f0defd750274/000001.json",
+        "resource_usage/wo-req-test-section-header-renumber-f0defd750274/000001.json"
+      ],
+      "from_state": "developing",
+      "on": "2026-09-20",
+      "reason": "attempt 1 recorded accepted",
+      "to_state": "testing"
+    },
+    {
+      "actor": "company-os",
+      "evidence_refs": [
+        "execution/packets/wo-req-test-section-header-renumber-review-0f209b153fb4/000001.json"
+      ],
+      "from_state": "testing",
+      "on": "2026-09-20",
+      "reason": "review packet issued to chief_architect (implementer software_implementation_engineer)",
+      "to_state": "reviewing"
+    }
+  ],
+  "version": 1,
+  "work_order_fingerprint": "08be23cd4f3b7c53",
+  "work_order_id": "wo-req-test-section-header-renumber"
+}

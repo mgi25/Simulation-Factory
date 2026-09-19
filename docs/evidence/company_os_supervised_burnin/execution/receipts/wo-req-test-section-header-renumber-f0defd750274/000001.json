@@ -1,0 +1,85 @@
+{
+  "artifacts": [],
+  "authority_fingerprint": "6bceb7c1b4d00456",
+  "base_commit": "a0a6b81abb49dfc07a64eceb54d0d82b3cfdfc4e",
+  "branch": "eng-test-section-header-renumber",
+  "commit_sha": "0bb362842fdac7f8419cb03df5ac9b5fd08e5df8",
+  "completed_at": "2026-09-19T20:06:48.435184+00:00",
+  "context_refs_used": [
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "context_usage_reported": true,
+  "dependencies_added": [],
+  "effective_context_fingerprint": "",
+  "evidence": [
+    "tests/test_company_engineering_execution.py:407  # --- 1.",
+    "tests/test_company_engineering_execution.py:1884 # --- 16. (was 15.)",
+    "tests/test_company_engineering_execution.py:1947 # --- 17. (was 16.)",
+    "tests/test_company_engineering_execution.py:2238 # --- 18. (was 12.)",
+    "tests/test_company_engineering_execution.py:2449 # --- 19. (was 13.)",
+    "commit:0bb362842fdac7f8419cb03df5ac9b5fd08e5df8",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "executor": "claude_code",
+  "expansion_ledger_fingerprint": "",
+  "files_changed": [
+    "tests/test_company_engineering_execution.py"
+  ],
+  "invariants_preserved": [
+    "No executable statement, test function, fixture, or assertion was modified",
+    "All banner title text after the number is identical to what it was before",
+    "Section order and count are unchanged; no sections were added, removed, or reordered",
+    "No files outside tests/test_company_engineering_execution.py were touched",
+    "The sequence 1–19 is now strictly increasing with no duplicates"
+  ],
+  "merge_performed": false,
+  "next_owner": "",
+  "no_subagents": true,
+  "notes": "",
+  "outcome": "accepted",
+  "packet_attempt": 1,
+  "packet_fingerprint": "6cda69f9fdbc8a0c",
+  "rejection_reason": "",
+  "remote_branch_sha": "0bb362842fdac7f8419cb03df5ac9b5fd08e5df8",
+  "remote_verified": true,
+  "subagents_used": 0,
+  "summary": "Renumbered four out-of-sequence section-header banners in tests/test_company_engineering_execution.py. The second '15.' (line 1884) became 16., the '16.' (line 1947) became 17., and the two repeated-early-number banners '12.' (line 2238) and '13.' (line 2449) became 18. and 19. respectively. Only the leading number in each comment line was changed; all title text, executable code, and test logic are untouched.",
+  "task_id": "wo-req-test-section-header-renumber",
+  "tests": [
+    {
+      "command": "tests/test_company_engineering_execution.py",
+      "passed": true,
+      "summary": "140 passed in 14.04s"
+    }
+  ],
+  "unresolved_risks": [
+    "Tests were not executed in this session (no pytest available in the worktree shell); the runner's post-commit test run is the gate"
+  ],
+  "usage": {
+    "cache_creation_units": 24210,
+    "cache_hits": 276846,
+    "cache_misses": null,
+    "cost_ceiling_enforced": true,
+    "duration_s": 81.719,
+    "input_units": 19,
+    "model": "sonnet",
+    "model_turns": 14,
+    "output_units": 3744,
+    "passes": 1,
+    "provider": "anthropic",
+    "provider_cost": "0.383430",
+    "provider_cost_currency": "USD",
+    "provider_latency_ms": null,
+    "repeated_file_reads": 3,
+    "repo_file_reads": 4,
+    "repo_searches": 2,
+    "retries": 0,
+    "retrieval_hits": 0,
+    "tool_calls": null,
+    "unreliable_metrics": [],
+    "usage_source": "model_usage_totals",
+    "usage_unit": "token"
+  },
+  "version": 1,
+  "working_tree_clean": true
+}

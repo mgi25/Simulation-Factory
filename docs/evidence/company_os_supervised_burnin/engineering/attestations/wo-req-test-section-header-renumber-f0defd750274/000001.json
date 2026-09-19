@@ -1,0 +1,52 @@
+{
+  "changed_paths_reviewed": [
+    "tests/test_company_engineering_execution.py"
+  ],
+  "criteria": [
+    {
+      "criterion": "every `# --- N.` section-header banner in tests/test_company_engineering_execution.py has a unique number",
+      "evidence_ref": "tests/test_company_engineering_execution.py:407,514,545,618,726,832,1225,1284,1399,1493,1516,1575,1659,1711,1812,1884,1947,2238,2449 — 19 distinct numbers",
+      "satisfied": true
+    },
+    {
+      "criterion": "the banner numbers are strictly increasing from top to bottom of the file",
+      "evidence_ref": "tests/test_company_engineering_execution.py grep: sequence 1–19 in strict line-number order, no gaps or reversals",
+      "satisfied": true
+    },
+    {
+      "criterion": "only comment text (the banner lines) changes; no executable line changes",
+      "evidence_ref": "diff.patch: 4 hunks, each changing exactly one `# --- N.` comment line; no other lines touched",
+      "satisfied": true
+    },
+    {
+      "criterion": "every banner's title text after the number is unchanged; only the leading number is corrected",
+      "evidence_ref": "diff.patch lines 9-10,18-19,27-28,36-37: titles 'the CEO surface','the CEO dashboard surface','real context narrowing','the routing derivation is deterministic and readable' identical",
+      "satisfied": true
+    },
+    {
+      "criterion": "tests/test_company_engineering_execution.py passes in full, unchanged in outcome from before the renumbering",
+      "evidence_ref": "runner receipt: tests=[{command:tests/test_company_engineering_execution.py, passed:true, summary:'140 passed in 14.04s'}]",
+      "satisfied": true
+    },
+    {
+      "criterion": "no existing test in the required suites regresses",
+      "evidence_ref": "runner receipt: 140 passed, commit 0bb362842fdac7f8419cb03df5ac9b5fd08e5df8, working_tree_clean:true",
+      "satisfied": true
+    }
+  ],
+  "evidence": [
+    "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-supervised-burnin-runner-state\\runs\\wo-req-test-section-header-renumber-f0defd750274\\run-000001\\reviewer-01\\diff.patch",
+    "tests/test_company_engineering_execution.py:407-2449 (grep: # --- \\d+\\.)"
+  ],
+  "findings": [],
+  "notes": "The implementer flagged 'Tests were not executed in this session' as an unresolved risk; the runner receipt resolves it — 140 passed. The diff is minimal and surgical: exactly 4 comment lines changed, matching the 4 out-of-sequence banners named in the work order. No authorized-scope violations observed.",
+  "packet_fingerprint": "6cda69f9fdbc8a0c",
+  "receipt_fingerprint": "41c83230dc0fa2a8",
+  "review_id": "rev-wo-req-test-section-header-renumber-01",
+  "reviewed_on": "2026-09-20",
+  "reviewer": "chief_architect",
+  "verdict": "pass",
+  "version": 1,
+  "work_order_fingerprint": "08be23cd4f3b7c53",
+  "work_order_id": "wo-req-test-section-header-renumber"
+}

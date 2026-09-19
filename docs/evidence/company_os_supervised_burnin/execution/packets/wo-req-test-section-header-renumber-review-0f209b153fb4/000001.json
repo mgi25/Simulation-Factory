@@ -1,0 +1,66 @@
+{
+  "acceptance_criteria": [
+    "every `# --- N.` section-header banner in tests/test_company_engineering_execution.py has a unique number",
+    "the banner numbers are strictly increasing from top to bottom of the file",
+    "only comment text (the banner lines) changes; no executable line changes",
+    "every banner's title text after the number is unchanged; only the leading number is corrected",
+    "tests/test_company_engineering_execution.py passes in full, unchanged in outcome from before the renumbering",
+    "no existing test in the required suites regresses"
+  ],
+  "automatic_context_refs": [],
+  "completion_protocol": [
+    "implement the objective, changing only allowed paths",
+    "run every required test and report the result",
+    "commit the work",
+    "push the assigned branch",
+    "verify the exact remote SHA matches the local commit",
+    "do not merge",
+    "return a compact handoff receipt"
+  ],
+  "constraints": [
+    "comments-only change: do not add, remove, reorder or modify any executable statement, test function, fixture or assertion",
+    "do not add, remove or reorder test cases or sections themselves -- only correct the numbers already printed in their banner comments",
+    "do not touch tools/, ai_platform/, knowledge/, company/runtime, company/integration, or any file outside company/engineering and its own declared tests",
+    "smallest possible change: this is a maintenance/cleanup pass over comment text only"
+  ],
+  "context_cache_key": "47da3273135890f4",
+  "context_fingerprint": "f1cd5080a72314ec",
+  "context_refs": [
+    {
+      "digest": "",
+      "kind": "module_contract",
+      "reason": "requested by id; owns company/engineering for task path company/engineering",
+      "ref": "capsule:company-engineering-execution",
+      "span": null
+    },
+    {
+      "digest": "",
+      "kind": "test",
+      "reason": "declared test of the owning capsule",
+      "ref": "tests/test_company_engineering_execution.py",
+      "span": null
+    }
+  ],
+  "employee": "chief_architect",
+  "evidence_required": true,
+  "executor": "claude_code",
+  "expected_base_commit": "a0a6b81abb49dfc07a64eceb54d0d82b3cfdfc4e",
+  "expected_branch": "eng-test-section-header-renumber",
+  "explicit_context_refs": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "no_subagents": true,
+  "objective": "Independently review the implementation of work order wo-req-test-section-header-renumber against its acceptance criteria.",
+  "path_scope": {
+    "allowed": [],
+    "forbidden": []
+  },
+  "reasoning_class": "C",
+  "required_tests": [
+    "tests/test_company_engineering_execution.py"
+  ],
+  "resource_class": "small_reasoning",
+  "task_id": "wo-req-test-section-header-renumber-review",
+  "version": 1
+}

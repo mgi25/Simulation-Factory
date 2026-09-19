@@ -1,0 +1,35 @@
+{
+  "acceptance_criteria": [
+    "every `# --- N.` section-header banner in tests/test_company_engineering_execution.py has a unique number",
+    "the banner numbers are strictly increasing from top to bottom of the file",
+    "only comment text (the banner lines) changes; no executable line changes",
+    "every banner's title text after the number is unchanged; only the leading number is corrected",
+    "tests/test_company_engineering_execution.py passes in full, unchanged in outcome from before the renumbering",
+    "no existing test in the required suites regresses"
+  ],
+  "authorized_branch": "eng-test-section-header-renumber",
+  "base_commit": "a0a6b81abb49dfc07a64eceb54d0d82b3cfdfc4e",
+  "capsule_hints": [
+    "company-engineering-execution"
+  ],
+  "constraints": [
+    "comments-only change: do not add, remove, reorder or modify any executable statement, test function, fixture or assertion",
+    "do not add, remove or reorder test cases or sections themselves -- only correct the numbers already printed in their banner comments",
+    "do not touch tools/, ai_platform/, knowledge/, company/runtime, company/integration, or any file outside company/engineering and its own declared tests",
+    "smallest possible change: this is a maintenance/cleanup pass over comment text only"
+  ],
+  "escalate_reasoning": false,
+  "max_developer_attempts": 1,
+  "notes": "Company OS supervised burn-in, Job B of the CEO's approved B-then-C continuation, following the successful correction of Job A (wo-req-attempts-remaining-null-safe). This is the deliberately simple/control maintenance job: comment-only, no behavior change. Bounded: one developer attempt, one reviewer pass, no retries, no autonomous continuation.",
+  "novel": false,
+  "objective": "tests/test_company_engineering_execution.py uses `# --- N. <title>` comment banners to number its sections, and the numbering has drifted out of order and duplicated: `15.` appears twice (lines 1812 and 1884, immediately followed by a `16.` banner at line 1947 that duplicates the value the second `15.` should have had), and near the end of the file `12.` and `13.` each reappear a second time (lines 2238 and 2449) even though those numbers were already used earlier in the file (lines 1575 and 1659). Renumber every `# --- N.` banner in the file, top to bottom by line order, so the sequence is unique and strictly increasing from 1, keeping each banner's existing title text unchanged and changing only the leading number.",
+  "request_id": "req-test-section-header-renumber",
+  "requested_by": "MGI",
+  "requested_on": "2026-09-20",
+  "resource_profile": "consumer",
+  "reversible": true,
+  "risk": "low",
+  "scope_ceiling": [],
+  "specialist_domain": "",
+  "subsystem_hint": "company/engineering"
+}

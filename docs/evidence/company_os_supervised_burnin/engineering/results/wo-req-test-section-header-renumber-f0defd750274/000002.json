@@ -1,0 +1,53 @@
+{
+  "acceptance_criteria": [
+    "every `# --- N.` section-header banner in tests/test_company_engineering_execution.py has a unique number",
+    "the banner numbers are strictly increasing from top to bottom of the file",
+    "only comment text (the banner lines) changes; no executable line changes",
+    "every banner's title text after the number is unchanged; only the leading number is corrected",
+    "tests/test_company_engineering_execution.py passes in full, unchanged in outcome from before the renumbering",
+    "no existing test in the required suites regresses"
+  ],
+  "authorized_on": "2026-09-20",
+  "authorized_paths": [
+    "company/engineering",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "authorizes_merge": false,
+  "branch": "eng-test-section-header-renumber",
+  "changed_files": [
+    "tests/test_company_engineering_execution.py"
+  ],
+  "commit_sha": "0bb362842fdac7f8419cb03df5ac9b5fd08e5df8",
+  "decisions_required": [],
+  "developer_attempts": 1,
+  "developer_attempts_remaining": 0,
+  "evidence_refs": [],
+  "gate_blockers": [],
+  "gate_readiness": "ready",
+  "gate_report_id": "integration-readiness-2026-09-20-8c2397783bdfa34a",
+  "implementation_summary": "Renumbered four out-of-sequence section-header banners in tests/test_company_engineering_execution.py. The second '15.' (line 1884) became 16., the '16.' (line 1947) became 17., and the two repeated-early-number banners '12.' (line 2238) and '13.' (line 2449) became 18. and 19. respectively. Only the leading number in each comment line was changed; all title text, executable code, and test logic are untouched.",
+  "implementer": "software_implementation_engineer",
+  "merge_performed": false,
+  "objective": "tests/test_company_engineering_execution.py uses `# --- N. <title>` comment banners to number its sections, and the numbering has drifted out of order and duplicated: `15.` appears twice (lines 1812 and 1884, immediately followed by a `16.` banner at line 1947 that duplicates the value the second `15.` should have had), and near the end of the file `12.` and `13.` each reappear a second time (lines 2238 and 2449) even though those numbers were already used earlier in the file (lines 1575 and 1659). Renumber every `# --- N.` banner in the file, top to bottom by line order, so the sequence is unique and strictly increasing from 1, keeping each banner's existing title text unchanged and changing only the leading number.",
+  "remote_verified": true,
+  "requested_by": "MGI",
+  "review_findings": [],
+  "review_outcome": "pass",
+  "reviewer": "chief_architect",
+  "risks": [
+    "Tests were not executed in this session (no pytest available in the worktree shell); the runner's post-commit test run is the gate"
+  ],
+  "status": "ready_for_approval",
+  "tests": [
+    {
+      "command": "tests/test_company_engineering_execution.py",
+      "passed": true,
+      "scope": "targeted",
+      "summary": "140 passed in 14.04s"
+    }
+  ],
+  "unanswered_criteria": [],
+  "version": 1,
+  "work_order_fingerprint": "08be23cd4f3b7c53",
+  "work_order_id": "wo-req-test-section-header-renumber"
+}

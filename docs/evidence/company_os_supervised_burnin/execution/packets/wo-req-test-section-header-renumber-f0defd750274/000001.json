@@ -1,0 +1,84 @@
+{
+  "acceptance_criteria": [
+    "every `# --- N.` section-header banner in tests/test_company_engineering_execution.py has a unique number",
+    "the banner numbers are strictly increasing from top to bottom of the file",
+    "only comment text (the banner lines) changes; no executable line changes",
+    "every banner's title text after the number is unchanged; only the leading number is corrected",
+    "tests/test_company_engineering_execution.py passes in full, unchanged in outcome from before the renumbering",
+    "no existing test in the required suites regresses"
+  ],
+  "automatic_context_refs": [],
+  "completion_protocol": [
+    "implement the objective, changing only allowed paths",
+    "run every required test and report the result",
+    "commit the work",
+    "push the assigned branch",
+    "verify the exact remote SHA matches the local commit",
+    "do not merge",
+    "return a compact handoff receipt"
+  ],
+  "constraints": [
+    "comments-only change: do not add, remove, reorder or modify any executable statement, test function, fixture or assertion",
+    "do not add, remove or reorder test cases or sections themselves -- only correct the numbers already printed in their banner comments",
+    "do not touch tools/, ai_platform/, knowledge/, company/runtime, company/integration, or any file outside company/engineering and its own declared tests",
+    "smallest possible change: this is a maintenance/cleanup pass over comment text only"
+  ],
+  "context_cache_key": "b3b9a295476b040f",
+  "context_fingerprint": "8582415a7bb65495",
+  "context_refs": [
+    {
+      "digest": "",
+      "kind": "module_contract",
+      "reason": "requested by id; owns company/engineering for task path company/engineering",
+      "ref": "capsule:company-engineering-execution",
+      "span": null
+    },
+    {
+      "digest": "",
+      "kind": "test",
+      "reason": "declared test of the owning capsule",
+      "ref": "tests/test_company_engineering_execution.py",
+      "span": null
+    }
+  ],
+  "employee": "software_implementation_engineer",
+  "evidence_required": true,
+  "executor": "claude_code",
+  "expected_base_commit": "a0a6b81abb49dfc07a64eceb54d0d82b3cfdfc4e",
+  "expected_branch": "eng-test-section-header-renumber",
+  "explicit_context_refs": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "no_subagents": true,
+  "objective": "tests/test_company_engineering_execution.py uses `# --- N. <title>` comment banners to number its sections, and the numbering has drifted out of order and duplicated: `15.` appears twice (lines 1812 and 1884, immediately followed by a `16.` banner at line 1947 that duplicates the value the second `15.` should have had), and near the end of the file `12.` and `13.` each reappear a second time (lines 2238 and 2449) even though those numbers were already used earlier in the file (lines 1575 and 1659). Renumber every `# --- N.` banner in the file, top to bottom by line order, so the sequence is unique and strictly increasing from 1, keeping each banner's existing title text unchanged and changing only the leading number.",
+  "path_scope": {
+    "allowed": [
+      "company/engineering",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "forbidden": [
+      "ai_platform/policy.py",
+      "company/agent_contract.schema.yaml",
+      "company/constitution.md",
+      "company/integration",
+      "company/integration/checks.py",
+      "company/integration/policy.py",
+      "company/integration/suites.py",
+      "company/org_registry.yaml",
+      "company/permissions.yaml",
+      "company/runtime",
+      "company/task_handoff.schema.yaml",
+      "company/validation/no_subagents.py",
+      "sloped",
+      "tools"
+    ]
+  },
+  "reasoning_class": "C",
+  "required_tests": [
+    "tests/test_company_engineering_execution.py"
+  ],
+  "resource_class": "small_reasoning",
+  "task_id": "wo-req-test-section-header-renumber",
+  "version": 1
+}

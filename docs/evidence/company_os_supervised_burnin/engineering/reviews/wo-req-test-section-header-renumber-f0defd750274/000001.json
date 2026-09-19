@@ -1,0 +1,18 @@
+{
+  "attested_outcome": "pass",
+  "deterministic_outcome": "pass",
+  "escalations": [],
+  "findings": [],
+  "implementer": "software_implementation_engineer",
+  "outcome": "pass",
+  "packet_attempt": 1,
+  "packet_fingerprint": "6cda69f9fdbc8a0c",
+  "receipt_fingerprint": "41c83230dc0fa2a8",
+  "review_id": "rev-wo-req-test-section-header-renumber-01",
+  "reviewed_on": "2026-09-20",
+  "reviewer": "chief_architect",
+  "unanswered_criteria": [],
+  "version": 1,
+  "work_order_fingerprint": "08be23cd4f3b7c53",
+  "work_order_id": "wo-req-test-section-header-renumber"
+}
