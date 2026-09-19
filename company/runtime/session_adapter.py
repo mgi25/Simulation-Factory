@@ -58,6 +58,40 @@ from .receipts import ReceiptValidation, SessionReceipt, validate_receipt
 from .usage_store import ResourceUsageStore
 
 
+def authority_for(
+    plan: TaskPlan,
+    packet: SessionPacket,
+    *,
+    packet_attempt: int,
+    employee_contract: Mapping[str, Any] | None = None,
+) -> ExecutionAuthoritySnapshot:
+    """The authority snapshot one packet attempt would be prepared under.
+
+    Computing it does not persist it. `prepare` writes what this returns, and a
+    caller that is not persisting anything - the CLI building a packet with no
+    outbox - can still show the operator the fingerprint and source of the grant
+    it just handed out. Both go through here so the two can never disagree about
+    which source a contract came from.
+    """
+    contract = (
+        employee_contract
+        if employee_contract is not None
+        else contract_from_registry(plan.selected_employee, plan.config)
+    )
+    return ExecutionAuthoritySnapshot.from_contract(
+        task_id=packet.task_id,
+        employee=packet.employee,
+        packet_fingerprint=packet.fingerprint(),
+        packet_attempt=packet_attempt,
+        contract=contract,
+        source=(
+            AuthoritySource.TEMPORARY_TASK_OVERRIDE
+            if employee_contract is not None
+            else AuthoritySource.CANONICAL_CONTRACT
+        ),
+    )
+
+
 @dataclass(frozen=True)
 class PreparedSession:
     """A packet, and where it was written for an external session to collect."""
@@ -122,23 +156,12 @@ class ManualExternalSessionAdapter:
             executor=executor,
             employee_contract=employee_contract,
         )
-        effective_contract = (
-            employee_contract
-            if employee_contract is not None
-            else contract_from_registry(plan.selected_employee, plan.config)
-        )
         pointer = self.store.append_packet(packet)
-        authority = ExecutionAuthoritySnapshot.from_contract(
-            task_id=packet.task_id,
-            employee=packet.employee,
-            packet_fingerprint=packet.fingerprint(),
+        authority = authority_for(
+            plan,
+            packet,
             packet_attempt=pointer.attempt,
-            contract=effective_contract,
-            source=(
-                AuthoritySource.TEMPORARY_TASK_OVERRIDE
-                if employee_contract is not None
-                else AuthoritySource.CANONICAL_CONTRACT
-            ),
+            employee_contract=employee_contract,
         )
         authority_pointer = self.store.append_authority(authority)
         return PreparedSession(
