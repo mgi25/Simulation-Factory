@@ -284,3 +284,110 @@ def test_production_sources_do_not_import_company_runtime() -> None:
                     violations.append(str(source.relative_to(ROOT)))
 
     assert violations == []
+
+
+# --- The packet command's authority line, with and without an outbox ---------
+#
+# `packet --state-dir` persists an authority snapshot and prints its fingerprint
+# and source. Without one, nothing is persisted - but the packet can still carry
+# a writable path, and an operator handed that packet needs the same two fields
+# to say what grant is behind it. The snapshot printed there is the one attempt 1
+# would be prepared under, and `record_ref` is null because it was not recorded.
+
+
+def _echo_task_file(tmp_path: Path, task_id: str) -> Path:
+    import json
+
+    task_file = tmp_path / f"{task_id}.json"
+    task_file.write_text(
+        json.dumps(
+            {
+                "task_id": task_id,
+                "objective": "Show the authority behind a packet built without an outbox.",
+                "required_capabilities": [
+                    "software_implementation",
+                    "test_engineering",
+                ],
+                "deterministic_execution_possible": False,
+                "context": {
+                    "refs": [
+                        {
+                            "kind": "file",
+                            "ref": "company/runtime/packets.py",
+                            "reason": "initial packet boundary",
+                        }
+                    ],
+                    "constraints": ["Do not modify production systems."],
+                    "acceptance_criteria": ["The authority line is printed."],
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    return task_file
+
+
+def test_a_read_only_packet_built_without_an_outbox_still_names_its_authority(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    import json
+
+    from company.runtime.__main__ import main as runtime_main
+
+    task_file = _echo_task_file(tmp_path, "authority-echo-readonly")
+
+    assert (
+        runtime_main(["packet", str(task_file), "--branch", "authority-echo"]) == 0
+    )
+
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["authority"]["record_ref"] is None
+    assert payload["authority"]["source"] == "canonical_contract"
+    assert len(payload["authority"]["fingerprint"]) == 16
+    assert not list(tmp_path.glob("**/execution"))
+
+
+def test_a_write_scoped_packet_prints_the_same_authority_with_or_without_an_outbox(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    import json
+
+    from company.runtime.__main__ import main as runtime_main
+
+    task_file = _echo_task_file(tmp_path, "authority-echo-granted")
+    override = tmp_path / "authority.json"
+    override.write_text(
+        json.dumps({"may_write": ["tests/test_company_runtime.py"]}), encoding="utf-8"
+    )
+    argv = [
+        "packet",
+        str(task_file),
+        "--branch",
+        "authority-echo",
+        "--allow",
+        "tests/test_company_runtime.py",
+        "--authority-override-file",
+        str(override),
+    ]
+
+    assert runtime_main(argv) == 0
+    unpersisted = json.loads(capsys.readouterr().out)
+
+    state = tmp_path / "state"
+    assert runtime_main([*argv, "--state-dir", str(state)]) == 0
+    persisted = json.loads(capsys.readouterr().out)
+
+    # The same grant, named the same way. Only where it was written differs.
+    assert unpersisted["packet"] == persisted["packet"]
+    assert unpersisted["fingerprint"] == persisted["fingerprint"]
+    assert (
+        unpersisted["authority"]["fingerprint"]
+        == persisted["authority"]["fingerprint"]
+    )
+    assert unpersisted["authority"]["source"] == "temporary_task_override"
+    assert persisted["authority"]["source"] == "temporary_task_override"
+    assert unpersisted["authority"]["record_ref"] is None
+    assert persisted["authority"]["record_ref"].startswith("execution/authorities/")
+    # The outbox-less run added no keys of its own and dropped none.
+    assert set(unpersisted) == {"packet", "fingerprint", "size_chars", "authority"}
+    assert set(persisted) == set(unpersisted) | {"persisted", "transport"}

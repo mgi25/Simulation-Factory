@@ -18,7 +18,7 @@ from .lifecycle import contract_from_registry, plan_task
 from .packets import ExecutorHint, build_session_packet
 from .path_scope import PathScope
 from .receipts import SessionReceipt
-from .session_adapter import ManualExternalSessionAdapter
+from .session_adapter import ManualExternalSessionAdapter, authority_for
 from .specification import TaskSpecification
 from .transport import SessionTransportBundle
 from .usage_store import ResourceUsageStore
@@ -381,6 +381,19 @@ def _packet(args: argparse.Namespace) -> int:
             prepared.authority_pointer,
             ledger,
         ).to_dict()
+    else:
+        # No outbox, so nothing is written - but a packet that already carries a
+        # writable path should not reach an operator with no way to name the
+        # grant behind it. The snapshot is the one attempt 1 would be prepared
+        # under; `record_ref` is null because this one was never recorded.
+        unpersisted = authority_for(
+            plan, packet, packet_attempt=1, employee_contract=contract
+        )
+        payload["authority"] = {
+            "record_ref": None,
+            "fingerprint": unpersisted.fingerprint(),
+            "source": unpersisted.source.value,
+        }
     print(json.dumps(payload, indent=2, sort_keys=True))
     return 0
 
