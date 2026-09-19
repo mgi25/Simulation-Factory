@@ -149,6 +149,47 @@ NOVEL_TRIGGERS: tuple[str, ...] = (
     "invent",
 )
 
+# A trigger term inside a clause that itself negates it ("do not redesign",
+# "no migration required") describes work the objective refuses, not work it
+# requests, and must not escalate. The clause - not the whole objective - is
+# the scope: a negation in one sentence has no bearing on a later, independent
+# one ("Do not redesign the API. Migrate the persistence schema." must still
+# escalate on "migrate"). This is deliberately a bounded, deterministic
+# heuristic (clause splitting + a fixed negation-word list), not a grammar or
+# a model call: it reads "any negation word earlier in the same clause" as
+# scoping over the trigger, which is right for every CEO-request phrasing seen
+# so far and is meant to stay that way, not to become a general parser.
+_CLAUSE_BREAK = re.compile(
+    r"[.;!?\n]+|\bbut\b|\bhowever\b|\bexcept\b|\balthough\b|\bthough\b|\byet\b"
+)
+_NEGATION_WORDS = frozenset({"not", "no", "never", "without", "avoid", "cannot"})
+_NEGATION_WORD_PATTERN = re.compile(r"[a-z']+")
+
+
+def _clauses(text: str) -> tuple[str, ...]:
+    return tuple(part for part in _CLAUSE_BREAK.split(text) if part.strip())
+
+
+def _escalates(term: str, clauses: tuple[str, ...]) -> bool:
+    """True if `term` occurs in some clause without a negation word before it.
+
+    Every occurrence of `term` is checked, not just the first: a term can be
+    negated in one clause and repeated with genuine positive intent in
+    another, or even the same one after a semicolon.
+    """
+    for clause in clauses:
+        start = 0
+        while True:
+            index = clause.find(term, start)
+            if index == -1:
+                break
+            words_before = frozenset(_NEGATION_WORD_PATTERN.findall(clause[:index]))
+            if not (words_before & _NEGATION_WORDS):
+                return True
+            start = index + 1
+    return False
+
+
 # Trigger terms for the CEO-reserved decisions in company/permissions.yaml.
 # The keys must be action names that appear in `permissions.yaml: ceo_reserved`;
 # `unscreened_reserved_actions` reports any reserved action this map omits.
@@ -808,7 +849,8 @@ def derive_routing(request: CEORequest) -> RoutingDerivation:
     # note that says "the previous request was misclassified as governance"
     # would otherwise retrigger the exact misclassification it describes.
     text = request.objective.lower()
-    novel = request.novel or any(term in text for term in NOVEL_TRIGGERS)
+    clauses = _clauses(text)
+    novel = request.novel or any(_escalates(term, clauses) for term in NOVEL_TRIGGERS)
 
     domain = request.specialist_domain
     reason = ""
@@ -816,7 +858,7 @@ def derive_routing(request: CEORequest) -> RoutingDerivation:
         reason = f"the request named the specialist domain {domain!r}"
     else:
         for name, terms in SPECIALIST_TRIGGERS.items():
-            hit = next((term for term in terms if term in text), "")
+            hit = next((term for term in terms if _escalates(term, clauses)), "")
             if hit:
                 domain = name
                 reason = f"the objective names {hit!r}, which is {name} work"
