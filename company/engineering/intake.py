@@ -112,6 +112,8 @@ SPECIALIST_TRIGGERS: Mapping[str, tuple[str, ...]] = {
         "governance model",
         "permissions policy",
         "protected policy",
+        "approval policy",
+        "authority policy",
         "constitution",
         "approval boundary",
         "separation of duties",
@@ -127,6 +129,18 @@ SPECIALIST_TRIGGERS: Mapping[str, tuple[str, ...]] = {
         "breaking change",
         "schema change",
         "protocol change",
+        # Coverage gap found while testing "must escalate" wording that names
+        # architecture work without any of the verbs above: a bare noun
+        # ("architecture") is deliberately excluded, the same way a bare
+        # "governance" was narrowed to specific phrases after the V3A false
+        # positive - it would match "architecture.md documentation cleanup"
+        # and any diagram/reference mention. These four phrases are the
+        # common orders of an actual change request and none of them occur
+        # in a documentation-reference sentence.
+        "architecture change",
+        "change the architecture",
+        "system architecture change",
+        "change system architecture",
     ),
     "concurrency": (
         "concurren",
@@ -135,6 +149,11 @@ SPECIALIST_TRIGGERS: Mapping[str, tuple[str, ...]] = {
         "locking",
         "atomicit",
         "thread saf",
+        # Coverage gap: "change synchronization strategy" named no existing
+        # term. Stemmed the same way "concurren"/"atomicit" are, so it also
+        # catches "synchronize"/"synchronizing" - consistent with those
+        # stems' existing willingness to catch a synchronization *test* too.
+        "synchroniz",
     ),
 }
 

@@ -81,6 +81,7 @@ from company.engineering.intake import (
     SPECIALIST_TRIGGERS,
     RoutingDerivation,
     derive_routing,
+    screen_reserved,
 )
 from company.engineering.lifecycle import ALLOWED_TRANSITIONS, MAIN_SEQUENCE
 from company.engineering.transport import (
@@ -2639,6 +2640,186 @@ def test_the_historical_correction_job_wording_is_now_routine():
     routed = derive_routing(_request(objective=objective))
     assert routed.specialist_domain == "", routed
     assert "routine implementation" in routed.reason, routed.reason
+
+
+# --- 13c. routing coverage: vocabulary gaps found while auditing negation ----
+
+
+@pytest.mark.parametrize(
+    "objective",
+    [
+        # security - already fully covered by existing vocabulary
+        "Modify authentication for this endpoint.",
+        "Redesign authentication for this service.",
+        # governance - "approval policy"/"authority policy" newly added
+        "Change the governance policy for who can approve a merge.",
+        "Modify the approval policy for reserved actions.",
+        "Alter the authority policy for developer sessions.",
+        # architecture - the four new phrases
+        "Redesign the architecture for this subsystem.",
+        "An architecture change is required for this feature.",
+        "We must change system architecture to support this.",
+        "Redesign the persistence architecture for this store.",
+        "A security architecture change is required here.",
+        # concurrency - "synchroniz" newly added; "locking" already existed
+        "Redesign concurrent execution for this queue.",
+        "Modify locking behavior for this resource.",
+        "Change the synchronization strategy for these workers.",
+        # migration - already fully covered by existing vocabulary
+        "Perform a schema migration for this table.",
+        "Migrate persistence to the new store.",
+        "A migration is required before this ships.",
+    ],
+)
+def test_positive_specialist_coverage_after_the_vocabulary_fix(objective):
+    routed = derive_routing(_request(objective=objective))
+    assert routed.specialist_domain != "", (objective, routed)
+
+
+def test_deployment_wording_has_no_existing_policy_hook():
+    """A disclosed, deliberate non-fix, pinned so it cannot regress silently.
+
+    "deploy"/"deployment" match no `SPECIALIST_TRIGGERS` term and no
+    `RESERVED_TRIGGERS` phrase under the current policy: `publish_public_video`
+    is scoped to public video content by its own name and by the separate,
+    gate-time `production_publish_request` trigger in `permissions.yaml`, not
+    to software deployment generically. Widening it would conflate two
+    different concepts rather than close a vocabulary gap in an existing one,
+    and inventing a new reserved action or specialist domain for it is a
+    policy decision, not a vocabulary one - out of scope for a deterministic
+    coverage fix. This test pins the current, honest behaviour (stays
+    routine) rather than hiding the gap or silently "fixing" it with an
+    unauthorized policy change.
+    """
+    config = _config()
+    for objective in (
+        "Deploy the service to production.",
+        "Deployment is required before this ships.",
+    ):
+        routed = derive_routing(_request(objective=objective))
+        assert routed.specialist_domain == "", (objective, routed)
+        assert screen_reserved(objective, config.permissions) == (), objective
+
+
+@pytest.mark.parametrize(
+    "objective",
+    [
+        "Do not redesign the architecture for this feature.",
+        "No architecture change is required here.",
+        "Do not deploy the service as part of this change.",
+        "No deployment is required for this fix.",
+        "Do not modify authentication in this task.",
+        "No migration is required for this change.",
+        "Avoid governance policy changes in this pass.",
+        "Do not change concurrency behavior in this fix.",
+        "Avoid changing the synchronization strategy here.",
+    ],
+)
+def test_negated_coverage_terms_stay_routine(objective):
+    """The new vocabulary is exactly as negation-aware as the original set.
+
+    `_escalates` is shared by every trigger table, so a term added to close
+    the coverage gap is checked by the same clause/negation logic as every
+    term that was already there - there is no separate path to re-break.
+    """
+    routed = derive_routing(_request(objective=objective))
+    assert routed.specialist_domain == "", (objective, routed)
+
+
+@pytest.mark.parametrize(
+    "objective",
+    [
+        "Do not change tests; redesign the architecture.",
+        "No documentation changes; perform the schema migration.",
+        "Avoid changing authentication tests; redesign authentication.",
+        "No deployment documentation changes; migrate persistence.",
+        "Do not redesign the API, but migrate the database schema.",
+        "No deployment is required; redesign authentication.",
+        "Avoid architecture changes except migrate persistence.",
+    ],
+)
+def test_a_later_independent_clause_still_escalates_with_new_vocabulary(objective):
+    routed = derive_routing(_request(objective=objective))
+    assert routed.specialist_domain != "", (objective, routed)
+
+
+@pytest.mark.parametrize(
+    "objective",
+    [
+        "architecture.md documentation cleanup",
+        "Update the deployment test assertions.",
+        "Document the system architecture in the README.",
+    ],
+)
+def test_benign_references_do_not_escalate(objective):
+    """A reference or a documentation mention is not the specialist action.
+
+    Every phrase here sits right next to a real trigger word without matching
+    any of the bounded phrases this pass or the negation pass added:
+    "architecture.md" is not "architecture change"/"change the architecture";
+    "deployment test" never matches anything at all, by design (deploy/
+    deployment has no trigger - see
+    `test_deployment_wording_has_no_existing_policy_hook`); "system
+    architecture" alone (no "change") is not any of the four new phrases.
+    """
+    routed = derive_routing(_request(objective=objective))
+    assert routed.specialist_domain == "", (objective, routed)
+
+
+@pytest.mark.parametrize(
+    "objective, expected_domain, expected_term",
+    [
+        ("Improve migration test coverage for this suite.", "architecture", "migration"),
+        ("Rename the authentication fixture used by these tests.", "security", "authentication"),
+    ],
+)
+def test_pre_existing_bare_word_triggers_cannot_distinguish_a_reference(
+    objective, expected_domain, expected_term
+):
+    """A reported, un-fixed limitation - not hidden, and not introduced here.
+
+    `"authentication"` and `"migration"` are single-word triggers that
+    predate both this pass and the negation-fix pass (they are not among the
+    phrases either added). A bare-substring check cannot tell "the
+    authentication fixture" (a reference, in a test-authoring objective) from
+    "modify authentication" (the actual specialist action) - the same shape
+    of problem the V3A fix solved for a bare "governance" mention, left open
+    here because narrowing or removing an already-in-production single-word
+    trigger is a bigger, riskier change than adding a bounded new phrase (it
+    risks silently under-escalating real authentication/migration work that
+    does not happen to use a narrower replacement phrase), and is explicitly
+    out of scope for "the smallest deterministic change required" this pass
+    was chartered to make. Per the brief's own instruction, this is reported
+    rather than hidden or forced to pass: both objectives here **do**
+    escalate today, and this test pins that real, current behaviour so a
+    future change to it is a deliberate decision, not a silent regression.
+    """
+    routed = derive_routing(_request(objective=objective))
+    assert routed.specialist_domain == expected_domain, (objective, routed)
+    assert expected_term in routed.reason, (objective, routed.reason)
+
+
+def test_the_historical_negation_fix_wording_still_stays_routine_with_new_vocabulary():
+    """The exact false-positive text from the correction-job incident, replayed
+    after the coverage-vocabulary fix, to prove the new terms did not reopen
+    it."""
+    objective = (
+        "The reviewer of work order wo-req-legacy-attempts-remaining-default "
+        "(finding from-mapping-null-value-crashes, changes_required) found that "
+        "EngineeringResult.from_mapping (company/engineering/result.py) calls "
+        "int(data['developer_attempts_remaining']) whenever the key is present, "
+        "including when its value is JSON null. Once a result whose "
+        "developer_attempts_remaining field is None is persisted via to_dict(), "
+        "the key round-trips as null rather than being dropped, so from_mapping "
+        "raises TypeError on reload. Correct from_mapping so a present-but-null "
+        "value is treated the same as an absent key (both yield None, rendered "
+        "as 'unknown'), while a present integer value -- including an explicit "
+        "0 -- keeps round-tripping exactly as it already does. This must be the "
+        "smallest backward-compatible fix; it must not redesign the field's "
+        "representation or introduce any migration machinery."
+    )
+    routed = derive_routing(_request(objective=objective))
+    assert routed.specialist_domain == "", routed
 
 
 def test_explicit_specialist_domain_is_authoritative_over_text():
