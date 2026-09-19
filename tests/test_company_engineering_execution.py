@@ -1809,6 +1809,38 @@ def test_the_engineering_package_is_owned_by_exactly_one_capsule():
     assert len(dumps(capsule)) <= 4000
 
 
+# --- 15. EngineeringResult.developer_attempts_remaining -----------------
+
+
+def test_developer_attempts_remaining_field_and_rendering(tmp_path):
+    """The result carries attempts_remaining from the job and renders it beside used."""
+    # Under the consumer profile max_developer_attempts is 1. Before the first
+    # packet is issued the job is in PLANNING with 0 attempts consumed and 1
+    # remaining - exactly the non-zero remaining case the test needs.
+    order = _order(tmp_path)
+    job = (
+        EngineeringJob.open(order, on=DAY)
+        .advance(JobState.PLANNING, on=DAY, reason="planned")
+    )
+    assert job.developer_attempts == 0
+    assert job.corrections_remaining == 1
+
+    result = EngineeringResult.build(order, job)
+
+    # Field value comes directly from job.corrections_remaining, not reimplemented.
+    assert result.developer_attempts_remaining == job.corrections_remaining
+
+    # Rendered page shows the new field beside the existing one.
+    page = result.render_text()
+    assert "developer attempts: 0  remaining: 1" in page
+
+    # Round-trip through to_dict and from_mapping.
+    data = result.to_dict()
+    assert data["developer_attempts_remaining"] == 1
+    restored = EngineeringResult.from_mapping(data)
+    assert restored.developer_attempts_remaining == 1
+
+
 # --- 15. the CEO surface ------------------------------------------------
 
 
