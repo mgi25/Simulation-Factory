@@ -1,0 +1,68 @@
+{
+  "notes": [
+    "Derived deterministically from the work order; a developer may take a better route inside the same authorized scope."
+  ],
+  "proposed_by": "company-os intake",
+  "proposed_on": "2026-09-20",
+  "steps": [
+    {
+      "action": "Read the authorized paths and the capsule contract they belong to before changing anything: company/engineering, tests/test_company_engineering_execution.py",
+      "step_id": "inspect",
+      "touches": [
+        "company/engineering",
+        "tests/test_company_engineering_execution.py"
+      ],
+      "writes": false
+    },
+    {
+      "action": "Identify the smallest contract that the objective is missing, and state it before implementing it",
+      "step_id": "locate-contract",
+      "touches": [
+        "company/engineering",
+        "tests/test_company_engineering_execution.py"
+      ],
+      "writes": false
+    },
+    {
+      "action": "Implement the smallest compatible change inside the authorized paths",
+      "step_id": "implement",
+      "touches": [
+        "company/engineering",
+        "tests/test_company_engineering_execution.py"
+      ],
+      "writes": true
+    },
+    {
+      "action": "Write focused tests for the new behaviour and for each acceptance criterion",
+      "step_id": "test",
+      "touches": [
+        "company/engineering",
+        "tests/test_company_engineering_execution.py"
+      ],
+      "writes": true
+    },
+    {
+      "action": "Run the affected suites and report every result: tests/test_company_engineering_execution.py",
+      "step_id": "run-suites",
+      "touches": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "writes": false
+    },
+    {
+      "action": "Run the existing integration gate over the checkout and keep its report as evidence; do not modify the gate",
+      "step_id": "gate-evidence",
+      "touches": [],
+      "writes": false
+    },
+    {
+      "action": "Return a receipt naming the changed paths, the commit, the pushed branch and one evidence reference per acceptance criterion",
+      "step_id": "review-evidence",
+      "touches": [],
+      "writes": false
+    }
+  ],
+  "version": 1,
+  "work_order_fingerprint": "86d81e400af2e4c0",
+  "work_order_id": "wo-req-attempts-remaining-null-safe"
+}

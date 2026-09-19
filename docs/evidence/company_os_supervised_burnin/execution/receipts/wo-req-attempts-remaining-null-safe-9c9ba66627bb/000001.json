@@ -1,0 +1,84 @@
+{
+  "artifacts": [],
+  "authority_fingerprint": "f74950034183d868",
+  "base_commit": "313ed4e717ed6c1e9b1e035672522a36e2320580",
+  "branch": "eng-attempts-remaining-null-safe",
+  "commit_sha": "532ce7a31ece35a48c5aed8cf61ce83976ab1b03",
+  "completed_at": "2026-09-19T19:51:50.442092+00:00",
+  "context_refs_used": [
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "context_usage_reported": true,
+  "dependencies_added": [],
+  "effective_context_fingerprint": "",
+  "evidence": [
+    "company/engineering/result.py",
+    "tests/test_company_engineering_execution.py",
+    "commit:532ce7a31ece35a48c5aed8cf61ce83976ab1b03"
+  ],
+  "executor": "claude_code",
+  "expansion_ledger_fingerprint": "",
+  "files_changed": [
+    "company/engineering/result.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "invariants_preserved": [
+    "An explicit integer 0 round-trips as 0, distinguishable from the None/unknown case",
+    "A positive integer round-trips unchanged",
+    "developer_attempts (the count of used attempts) is unchanged — still int=0 with the same validation",
+    "to_dict shape is unchanged: the field key is always present; None serializes as JSON null which is what triggers from_mapping's new code path",
+    "render_text output for non-None cases is identical to before (integer's string form)",
+    "No other EngineeringResult field, and no from_mapping/to_dict behavior beyond developer_attempts_remaining, was changed",
+    "All 140 pre-existing tests in test_company_engineering_execution.py continue to pass"
+  ],
+  "merge_performed": false,
+  "next_owner": "",
+  "no_subagents": true,
+  "notes": "",
+  "outcome": "accepted",
+  "packet_attempt": 1,
+  "packet_fingerprint": "a6bdaf63a8e96501",
+  "rejection_reason": "",
+  "remote_branch_sha": "532ce7a31ece35a48c5aed8cf61ce83976ab1b03",
+  "remote_verified": true,
+  "subagents_used": 0,
+  "summary": "Changed EngineeringResult.developer_attempts_remaining from int=0 to int|None=None, updated __post_init__ validation to allow None, updated from_mapping to yield None for both absent and null values (instead of calling int(None) which raised TypeError), and updated render_text to print 'unknown' for None. A new test covers all four cases (absent key, JSON null, explicit 0, positive integer) including the null round-trip that the prior review found uncovered.",
+  "task_id": "wo-req-attempts-remaining-null-safe",
+  "tests": [
+    {
+      "command": "tests/test_company_engineering_execution.py",
+      "passed": true,
+      "summary": "140 passed in 12.05s"
+    }
+  ],
+  "unresolved_risks": [
+    "EngineeringResult.build() passes job.corrections_remaining directly; if that property ever returns None, the field will be None (unknown) rather than an error — this is intentional by the work order but worth verifying downstream consumers of the rendered page handle 'unknown' gracefully"
+  ],
+  "usage": {
+    "cache_creation_units": 42717,
+    "cache_hits": 515658,
+    "cache_misses": null,
+    "cost_ceiling_enforced": true,
+    "duration_s": 231.896,
+    "input_units": 22,
+    "model": "sonnet",
+    "model_turns": 18,
+    "output_units": 10620,
+    "passes": 1,
+    "provider": "anthropic",
+    "provider_cost": "0.790420",
+    "provider_cost_currency": "USD",
+    "provider_latency_ms": null,
+    "repeated_file_reads": 1,
+    "repo_file_reads": 3,
+    "repo_searches": 5,
+    "retries": 0,
+    "retrieval_hits": 0,
+    "tool_calls": null,
+    "unreliable_metrics": [],
+    "usage_source": "model_usage_totals",
+    "usage_unit": "token"
+  },
+  "version": 1,
+  "working_tree_clean": true
+}

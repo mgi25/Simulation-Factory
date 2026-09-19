@@ -1,0 +1,19 @@
+{
+  "as_of": "2026-09-20",
+  "authorizes_production_integration": false,
+  "blockers": [],
+  "policy_version": 1,
+  "readiness": "ready",
+  "report_digest": "48707b58a4a53ca5",
+  "report_id": "integration-readiness-2026-09-20-46a611491c3e1718",
+  "report_ref": "gate-report.json",
+  "source_branch": "eng-attempts-remaining-null-safe",
+  "source_commit": "532ce7a31ece35a48c5aed8cf61ce83976ab1b03",
+  "unknown_check_ids": [
+    "executive.decision_queue_preserves_source_refs",
+    "health.production_failures_separated",
+    "workforce.capability_gaps_visible"
+  ],
+  "version": 1,
+  "work_order_id": "wo-req-attempts-remaining-null-safe"
+}

@@ -1,0 +1,39 @@
+{
+  "acceptance_criteria": [
+    "EngineeringResult.from_mapping handles a legacy mapping with no developer_attempts_remaining key: yields None",
+    "EngineeringResult.from_mapping handles a mapping where developer_attempts_remaining is an explicit integer 0: yields 0, distinguishable from the legacy/unknown case",
+    "EngineeringResult.from_mapping handles a mapping where developer_attempts_remaining is a positive integer: yields that integer unchanged",
+    "EngineeringResult.from_mapping handles a mapping where developer_attempts_remaining is JSON null (a persisted None round-tripping through to_dict): yields None without raising",
+    "for every one of the four cases above, EngineeringResult(...).to_dict() followed by EngineeringResult.from_mapping(...) succeeds and reproduces the same developer_attempts_remaining value",
+    "render_text continues to print 'unknown' for None and the integer's string form otherwise, unchanged from current behavior for the non-null cases",
+    "no other EngineeringResult field, and no other from_mapping/to_dict behavior, changes",
+    "a focused test in tests/test_company_engineering_execution.py proves the null-value round-trip specifically (the case the prior review found uncovered), in addition to the existing absent-key and genuine-zero cases",
+    "tests/test_company_engineering_execution.py passes in full",
+    "no existing test in the required suites regresses"
+  ],
+  "authorized_branch": "eng-attempts-remaining-null-safe",
+  "base_commit": "313ed4e717ed6c1e9b1e035672522a36e2320580",
+  "capsule_hints": [
+    "company-engineering-execution"
+  ],
+  "constraints": [
+    "smallest possible change: do not change EngineeringResult's field shapes or add version-conversion helpers, do not broaden the serialization code in ai_platform/serde.py or elsewhere",
+    "additive/corrective only: do not rename, remove or change the meaning of any other EngineeringResult field",
+    "do not change EngineeringJob, the lifecycle state machine, the reviewer policy, the integration gate, or any authority or receipt validation logic",
+    "do not touch tools/, ai_platform/, knowledge/, company/runtime, company/integration, or any file outside company/engineering and its own declared tests"
+  ],
+  "escalate_reasoning": false,
+  "max_developer_attempts": 1,
+  "notes": "CEO-directed correction of the reviewer-found defect (finding from-mapping-null-value-crashes, severity changes_required) on work order wo-req-legacy-attempts-remaining-default, whose one authorized developer attempt is spent and which remains changes_required, unmerged, and not retried. This is a new work order with its own attempt budget; it does not reopen or extend that job. Reviewer's own diagnosis (docs/evidence/company_os_supervised_burnin/job_a/reviewer/attestation.json): 'The fix is one line in from_mapping: treat a present-but-None value the same as an absent key.' Bounded: one developer attempt, one reviewer pass, no retries, no autonomous continuation, no merge.",
+  "novel": false,
+  "objective": "The reviewer of work order wo-req-legacy-attempts-remaining-default (finding from-mapping-null-value-crashes, changes_required) found that EngineeringResult.from_mapping (company/engineering/result.py) calls int(data['developer_attempts_remaining']) whenever the key is present, including when its value is JSON null. Once a result whose developer_attempts_remaining field is None is persisted via to_dict(), the key round-trips as null rather than being dropped, so from_mapping raises TypeError on reload. Correct from_mapping so a present-but-null value is treated the same as an absent key (both yield None, rendered as 'unknown'), while a present integer value -- including an explicit 0 -- keeps round-tripping exactly as it already does. This must be the smallest backward-compatible fix; it must not change the shape of the field's representation or add any new compatibility-conversion code.",
+  "request_id": "req-attempts-remaining-null-safe",
+  "requested_by": "MGI",
+  "requested_on": "2026-09-20",
+  "resource_profile": "consumer",
+  "reversible": true,
+  "risk": "low",
+  "scope_ceiling": [],
+  "specialist_domain": "",
+  "subsystem_hint": "company/engineering"
+}

@@ -1,0 +1,18 @@
+{
+  "attested_outcome": "pass",
+  "deterministic_outcome": "pass",
+  "escalations": [],
+  "findings": [],
+  "implementer": "software_implementation_engineer",
+  "outcome": "pass",
+  "packet_attempt": 1,
+  "packet_fingerprint": "a6bdaf63a8e96501",
+  "receipt_fingerprint": "16981229b4e1d627",
+  "review_id": "rev-wo-req-attempts-remaining-null-safe-01",
+  "reviewed_on": "2026-09-20",
+  "reviewer": "chief_architect",
+  "unanswered_criteria": [],
+  "version": 1,
+  "work_order_fingerprint": "86d81e400af2e4c0",
+  "work_order_id": "wo-req-attempts-remaining-null-safe"
+}

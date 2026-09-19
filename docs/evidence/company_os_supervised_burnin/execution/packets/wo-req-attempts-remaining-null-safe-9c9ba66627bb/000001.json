@@ -1,0 +1,88 @@
+{
+  "acceptance_criteria": [
+    "EngineeringResult.from_mapping handles a legacy mapping with no developer_attempts_remaining key: yields None",
+    "EngineeringResult.from_mapping handles a mapping where developer_attempts_remaining is an explicit integer 0: yields 0, distinguishable from the legacy/unknown case",
+    "EngineeringResult.from_mapping handles a mapping where developer_attempts_remaining is a positive integer: yields that integer unchanged",
+    "EngineeringResult.from_mapping handles a mapping where developer_attempts_remaining is JSON null (a persisted None round-tripping through to_dict): yields None without raising",
+    "for every one of the four cases above, EngineeringResult(...).to_dict() followed by EngineeringResult.from_mapping(...) succeeds and reproduces the same developer_attempts_remaining value",
+    "render_text continues to print 'unknown' for None and the integer's string form otherwise, unchanged from current behavior for the non-null cases",
+    "no other EngineeringResult field, and no other from_mapping/to_dict behavior, changes",
+    "a focused test in tests/test_company_engineering_execution.py proves the null-value round-trip specifically (the case the prior review found uncovered), in addition to the existing absent-key and genuine-zero cases",
+    "tests/test_company_engineering_execution.py passes in full",
+    "no existing test in the required suites regresses"
+  ],
+  "automatic_context_refs": [],
+  "completion_protocol": [
+    "implement the objective, changing only allowed paths",
+    "run every required test and report the result",
+    "commit the work",
+    "push the assigned branch",
+    "verify the exact remote SHA matches the local commit",
+    "do not merge",
+    "return a compact handoff receipt"
+  ],
+  "constraints": [
+    "smallest possible change: do not change EngineeringResult's field shapes or add version-conversion helpers, do not broaden the serialization code in ai_platform/serde.py or elsewhere",
+    "additive/corrective only: do not rename, remove or change the meaning of any other EngineeringResult field",
+    "do not change EngineeringJob, the lifecycle state machine, the reviewer policy, the integration gate, or any authority or receipt validation logic",
+    "do not touch tools/, ai_platform/, knowledge/, company/runtime, company/integration, or any file outside company/engineering and its own declared tests"
+  ],
+  "context_cache_key": "6b5d764c5c2ddac0",
+  "context_fingerprint": "66ebe78ae0d70e8d",
+  "context_refs": [
+    {
+      "digest": "",
+      "kind": "module_contract",
+      "reason": "requested by id; owns company/engineering for task path company/engineering",
+      "ref": "capsule:company-engineering-execution",
+      "span": null
+    },
+    {
+      "digest": "",
+      "kind": "test",
+      "reason": "declared test of the owning capsule",
+      "ref": "tests/test_company_engineering_execution.py",
+      "span": null
+    }
+  ],
+  "employee": "software_implementation_engineer",
+  "evidence_required": true,
+  "executor": "claude_code",
+  "expected_base_commit": "313ed4e717ed6c1e9b1e035672522a36e2320580",
+  "expected_branch": "eng-attempts-remaining-null-safe",
+  "explicit_context_refs": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "no_subagents": true,
+  "objective": "The reviewer of work order wo-req-legacy-attempts-remaining-default (finding from-mapping-null-value-crashes, changes_required) found that EngineeringResult.from_mapping (company/engineering/result.py) calls int(data['developer_attempts_remaining']) whenever the key is present, including when its value is JSON null. Once a result whose developer_attempts_remaining field is None is persisted via to_dict(), the key round-trips as null rather than being dropped, so from_mapping raises TypeError on reload. Correct from_mapping so a present-but-null value is treated the same as an absent key (both yield None, rendered as 'unknown'), while a present integer value -- including an explicit 0 -- keeps round-tripping exactly as it already does. This must be the smallest backward-compatible fix; it must not change the shape of the field's representation or add any new compatibility-conversion code.",
+  "path_scope": {
+    "allowed": [
+      "company/engineering",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "forbidden": [
+      "ai_platform/policy.py",
+      "company/agent_contract.schema.yaml",
+      "company/constitution.md",
+      "company/integration",
+      "company/integration/checks.py",
+      "company/integration/policy.py",
+      "company/integration/suites.py",
+      "company/org_registry.yaml",
+      "company/permissions.yaml",
+      "company/runtime",
+      "company/task_handoff.schema.yaml",
+      "company/validation/no_subagents.py",
+      "sloped",
+      "tools"
+    ]
+  },
+  "reasoning_class": "C",
+  "required_tests": [
+    "tests/test_company_engineering_execution.py"
+  ],
+  "resource_class": "small_reasoning",
+  "task_id": "wo-req-attempts-remaining-null-safe",
+  "version": 1
+}

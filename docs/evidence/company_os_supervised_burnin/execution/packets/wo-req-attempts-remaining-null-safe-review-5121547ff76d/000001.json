@@ -1,0 +1,70 @@
+{
+  "acceptance_criteria": [
+    "EngineeringResult.from_mapping handles a legacy mapping with no developer_attempts_remaining key: yields None",
+    "EngineeringResult.from_mapping handles a mapping where developer_attempts_remaining is an explicit integer 0: yields 0, distinguishable from the legacy/unknown case",
+    "EngineeringResult.from_mapping handles a mapping where developer_attempts_remaining is a positive integer: yields that integer unchanged",
+    "EngineeringResult.from_mapping handles a mapping where developer_attempts_remaining is JSON null (a persisted None round-tripping through to_dict): yields None without raising",
+    "for every one of the four cases above, EngineeringResult(...).to_dict() followed by EngineeringResult.from_mapping(...) succeeds and reproduces the same developer_attempts_remaining value",
+    "render_text continues to print 'unknown' for None and the integer's string form otherwise, unchanged from current behavior for the non-null cases",
+    "no other EngineeringResult field, and no other from_mapping/to_dict behavior, changes",
+    "a focused test in tests/test_company_engineering_execution.py proves the null-value round-trip specifically (the case the prior review found uncovered), in addition to the existing absent-key and genuine-zero cases",
+    "tests/test_company_engineering_execution.py passes in full",
+    "no existing test in the required suites regresses"
+  ],
+  "automatic_context_refs": [],
+  "completion_protocol": [
+    "implement the objective, changing only allowed paths",
+    "run every required test and report the result",
+    "commit the work",
+    "push the assigned branch",
+    "verify the exact remote SHA matches the local commit",
+    "do not merge",
+    "return a compact handoff receipt"
+  ],
+  "constraints": [
+    "smallest possible change: do not change EngineeringResult's field shapes or add version-conversion helpers, do not broaden the serialization code in ai_platform/serde.py or elsewhere",
+    "additive/corrective only: do not rename, remove or change the meaning of any other EngineeringResult field",
+    "do not change EngineeringJob, the lifecycle state machine, the reviewer policy, the integration gate, or any authority or receipt validation logic",
+    "do not touch tools/, ai_platform/, knowledge/, company/runtime, company/integration, or any file outside company/engineering and its own declared tests"
+  ],
+  "context_cache_key": "e38d2e8073789a7e",
+  "context_fingerprint": "ea29755b25a2b721",
+  "context_refs": [
+    {
+      "digest": "",
+      "kind": "module_contract",
+      "reason": "requested by id; owns company/engineering for task path company/engineering",
+      "ref": "capsule:company-engineering-execution",
+      "span": null
+    },
+    {
+      "digest": "",
+      "kind": "test",
+      "reason": "declared test of the owning capsule",
+      "ref": "tests/test_company_engineering_execution.py",
+      "span": null
+    }
+  ],
+  "employee": "chief_architect",
+  "evidence_required": true,
+  "executor": "claude_code",
+  "expected_base_commit": "313ed4e717ed6c1e9b1e035672522a36e2320580",
+  "expected_branch": "eng-attempts-remaining-null-safe",
+  "explicit_context_refs": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "no_subagents": true,
+  "objective": "Independently review the implementation of work order wo-req-attempts-remaining-null-safe against its acceptance criteria.",
+  "path_scope": {
+    "allowed": [],
+    "forbidden": []
+  },
+  "reasoning_class": "C",
+  "required_tests": [
+    "tests/test_company_engineering_execution.py"
+  ],
+  "resource_class": "small_reasoning",
+  "task_id": "wo-req-attempts-remaining-null-safe-review",
+  "version": 1
+}

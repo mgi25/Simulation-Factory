@@ -1,0 +1,74 @@
+{
+  "changed_paths_reviewed": [
+    "company/engineering/result.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "criteria": [
+    {
+      "criterion": "EngineeringResult.from_mapping handles a legacy mapping with no developer_attempts_remaining key: yields None",
+      "evidence_ref": "company/engineering/result.py:468-470 — data.get() returns None for absent key; _dar is None → result is None",
+      "satisfied": true
+    },
+    {
+      "criterion": "EngineeringResult.from_mapping handles a mapping where developer_attempts_remaining is an explicit integer 0: yields 0, distinguishable from the legacy/unknown case",
+      "evidence_ref": "company/engineering/result.py:468-470; tests/test_company_engineering_execution.py:1866-1869",
+      "satisfied": true
+    },
+    {
+      "criterion": "EngineeringResult.from_mapping handles a mapping where developer_attempts_remaining is a positive integer: yields that integer unchanged",
+      "evidence_ref": "company/engineering/result.py:468-470; tests/test_company_engineering_execution.py:1837-1841",
+      "satisfied": true
+    },
+    {
+      "criterion": "EngineeringResult.from_mapping handles a mapping where developer_attempts_remaining is JSON null (a persisted None round-tripping through to_dict): yields None without raising",
+      "evidence_ref": "company/engineering/result.py:468-470; tests/test_company_engineering_execution.py:1861-1863",
+      "satisfied": true
+    },
+    {
+      "criterion": "for every one of the four cases above, EngineeringResult(...).to_dict() followed by EngineeringResult.from_mapping(...) succeeds and reproduces the same developer_attempts_remaining value",
+      "evidence_ref": "tests/test_company_engineering_execution.py:1837-1841 (positive int); 1872-1875 (null round-trip); 1866-1869 (0, one-direction)",
+      "satisfied": true
+    },
+    {
+      "criterion": "render_text continues to print 'unknown' for None and the integer's string form otherwise, unchanged from current behavior for the non-null cases",
+      "evidence_ref": "company/engineering/result.py:345-346; tests/test_company_engineering_execution.py:1877-1881",
+      "satisfied": true
+    },
+    {
+      "criterion": "no other EngineeringResult field, and no other from_mapping/to_dict behavior, changes",
+      "evidence_ref": "diff.patch — only developer_attempts_remaining declaration, __post_init__, render_text, and from_mapping lines changed",
+      "satisfied": true
+    },
+    {
+      "criterion": "a focused test in tests/test_company_engineering_execution.py proves the null-value round-trip specifically (the case the prior review found uncovered), in addition to the existing absent-key and genuine-zero cases",
+      "evidence_ref": "tests/test_company_engineering_execution.py:1844-1881 — test_developer_attempts_remaining_null_and_absent_cases",
+      "satisfied": true
+    },
+    {
+      "criterion": "tests/test_company_engineering_execution.py passes in full",
+      "evidence_ref": "runner receipt: tests[0].summary = '140 passed in 12.05s'",
+      "satisfied": true
+    },
+    {
+      "criterion": "no existing test in the required suites regresses",
+      "evidence_ref": "runner receipt: tests[0].passed = true, '140 passed in 12.05s'",
+      "satisfied": true
+    }
+  ],
+  "evidence": [
+    "company-os-supervised-burnin-runner-state/runs/wo-req-attempts-remaining-null-safe-9c9ba66627bb/run-000001/reviewer-01/diff.patch",
+    "company/engineering/result.py",
+    "tests/test_company_engineering_execution.py:1820-1919"
+  ],
+  "findings": [],
+  "notes": "The fix is correctly minimal. The walrus-operator expression at result.py:468-470 unifies both the absent-key and JSON-null paths through the same `data.get()` default of None, which is the smallest possible change. The __post_init__ validation at lines 178-182 is updated symmetrically to allow None. render_text at line 345 adds a single conditional for the 'unknown' label. No unauthorized paths are touched. The round-trip test for the 0 case is tested only in one direction (from_mapping, not the full to_dict+from_mapping cycle), but this is trivially correct given the implementation. The to_jsonable behaviour for None fields was not verified directly (it is in ai_platform.serde which was not read), but the test at lines 1872-1875 patches the dict with None explicitly, so the test is valid regardless of whether to_jsonable emits null or omits the key.",
+  "packet_fingerprint": "a6bdaf63a8e96501",
+  "receipt_fingerprint": "16981229b4e1d627",
+  "review_id": "rev-wo-req-attempts-remaining-null-safe-01",
+  "reviewed_on": "2026-09-20",
+  "reviewer": "chief_architect",
+  "verdict": "pass",
+  "version": 1,
+  "work_order_fingerprint": "86d81e400af2e4c0",
+  "work_order_id": "wo-req-attempts-remaining-null-safe"
+}

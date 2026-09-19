@@ -1,0 +1,58 @@
+{
+  "acceptance_criteria": [
+    "EngineeringResult.from_mapping handles a legacy mapping with no developer_attempts_remaining key: yields None",
+    "EngineeringResult.from_mapping handles a mapping where developer_attempts_remaining is an explicit integer 0: yields 0, distinguishable from the legacy/unknown case",
+    "EngineeringResult.from_mapping handles a mapping where developer_attempts_remaining is a positive integer: yields that integer unchanged",
+    "EngineeringResult.from_mapping handles a mapping where developer_attempts_remaining is JSON null (a persisted None round-tripping through to_dict): yields None without raising",
+    "for every one of the four cases above, EngineeringResult(...).to_dict() followed by EngineeringResult.from_mapping(...) succeeds and reproduces the same developer_attempts_remaining value",
+    "render_text continues to print 'unknown' for None and the integer's string form otherwise, unchanged from current behavior for the non-null cases",
+    "no other EngineeringResult field, and no other from_mapping/to_dict behavior, changes",
+    "a focused test in tests/test_company_engineering_execution.py proves the null-value round-trip specifically (the case the prior review found uncovered), in addition to the existing absent-key and genuine-zero cases",
+    "tests/test_company_engineering_execution.py passes in full",
+    "no existing test in the required suites regresses"
+  ],
+  "authorized_on": "2026-09-20",
+  "authorized_paths": [
+    "company/engineering",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "authorizes_merge": false,
+  "branch": "eng-attempts-remaining-null-safe",
+  "changed_files": [
+    "company/engineering/result.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "commit_sha": "532ce7a31ece35a48c5aed8cf61ce83976ab1b03",
+  "decisions_required": [],
+  "developer_attempts": 1,
+  "developer_attempts_remaining": 0,
+  "evidence_refs": [],
+  "gate_blockers": [],
+  "gate_readiness": "ready",
+  "gate_report_id": "integration-readiness-2026-09-20-46a611491c3e1718",
+  "implementation_summary": "Changed EngineeringResult.developer_attempts_remaining from int=0 to int|None=None, updated __post_init__ validation to allow None, updated from_mapping to yield None for both absent and null values (instead of calling int(None) which raised TypeError), and updated render_text to print 'unknown' for None. A new test covers all four cases (absent key, JSON null, explicit 0, positive integer) including the null round-trip that the prior review found uncovered.",
+  "implementer": "software_implementation_engineer",
+  "merge_performed": false,
+  "objective": "The reviewer of work order wo-req-legacy-attempts-remaining-default (finding from-mapping-null-value-crashes, changes_required) found that EngineeringResult.from_mapping (company/engineering/result.py) calls int(data['developer_attempts_remaining']) whenever the key is present, including when its value is JSON null. Once a result whose developer_attempts_remaining field is None is persisted via to_dict(), the key round-trips as null rather than being dropped, so from_mapping raises TypeError on reload. Correct from_mapping so a present-but-null value is treated the same as an absent key (both yield None, rendered as 'unknown'), while a present integer value -- including an explicit 0 -- keeps round-tripping exactly as it already does. This must be the smallest backward-compatible fix; it must not change the shape of the field's representation or add any new compatibility-conversion code.",
+  "remote_verified": true,
+  "requested_by": "MGI",
+  "review_findings": [],
+  "review_outcome": "pass",
+  "reviewer": "chief_architect",
+  "risks": [
+    "EngineeringResult.build() passes job.corrections_remaining directly; if that property ever returns None, the field will be None (unknown) rather than an error — this is intentional by the work order but worth verifying downstream consumers of the rendered page handle 'unknown' gracefully"
+  ],
+  "status": "ready_for_approval",
+  "tests": [
+    {
+      "command": "tests/test_company_engineering_execution.py",
+      "passed": true,
+      "scope": "targeted",
+      "summary": "140 passed in 12.05s"
+    }
+  ],
+  "unanswered_criteria": [],
+  "version": 1,
+  "work_order_fingerprint": "86d81e400af2e4c0",
+  "work_order_id": "wo-req-attempts-remaining-null-safe"
+}
