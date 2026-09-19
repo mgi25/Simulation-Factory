@@ -1,0 +1,54 @@
+{
+  "spec_version": "1.0",
+  "type": "apparatus_amendment",
+  "amends": "benchmark tooling only -- provider_server.py (Ctags branch, symbols_in_file query_kind). Does not amend or supersede any task question, ground truth, rubric, prompt, source SHA, primary metric, decision rule, or run order.",
+  "frozen_c3_commit_unchanged": "874cf6b5c0db9229562ead43807c2e5fca8d663d -- not rewritten, not deleted. This amendment is a new commit on top of it.",
+  "defect": {
+    "discovered_during": "the first-ever live invocation of ctags_query's symbols_in_file query_kind across the entire Benchmark C2 + C3 project (Ctags was invoked 0 times in all of Benchmark C2's official runs)",
+    "affected_run": {
+      "task": "A", "condition": "C1", "benchmark": "C3",
+      "session_id": "69867a18-32cd-49f6-be40-3b0c4ea6564b",
+      "run_directory": "C:\\Users\\mgial\\.benchmark-c3\\runs\\A_C1",
+      "status": "INVALID_INFRASTRUCTURE_APPARATUS",
+      "excluded_from_official_provider_utility_comparison": true
+    },
+    "exact_malformed_behavior": "provider_server.py's ctags branch, query_kind == 'symbols_in_file': the matches list was built as {'file': value, 'kind': e['kind'], 'start_line': e['start_line']} -- discarding e['name'] entirely -- and the compacted output line then used `value` (the QUERIED FILE PATH) as every single entry's symbol name, via `_compact(value if query_kind == 'symbols_in_file' else ..., m)`. Every returned entry for a symbols_in_file call therefore had the identical, useless 'name': the file path itself, e.g. 'godot/.../environment_world.gd:244:m:godot/.../environment_world.gd' instead of '...:244:m:_clear'. Line numbers and kind codes were correct throughout; only the name field was corrupted. find_definition (both providers) and tree-sitter's symbols_in_file were not affected -- confirmed by direct source audit and by live regression testing against the real MCP server (see below).",
+    "root_cause_file": "C:\\Users\\mgial\\.benchmark-c2\\mcp\\provider_server.py (untracked, outside every git repo -- this defect could not have been caught by any prior code review of tools/benchmark_c2/*.py, which does not contain this file)",
+    "why_earlier_dry_run_missed_it": "The Benchmark C3 Phase 4 capability-audit dry run (docs/validation/company_os_ai_resource_benchmark_c3/capability_audit_and_dry_run.json) used a hand-written Python reproduction of the query logic for its 'ctags_symbols_in_file' test helper, and that reproduction used `e['name']` correctly -- unintentionally fixing the bug in simulation without realizing the real server discarded it. That audit's Task A 'PASS (partial)' conclusion for Ctags is invalidated for the symbols_in_file query specifically; find_definition results in that same audit remain valid, since find_definition was never affected."
+  },
+  "correction": {
+    "file_changed_operational": "C:\\Users\\mgial\\.benchmark-c3\\mcp\\provider_server.py (new, C3-specific operational copy; C2's C:\\Users\\mgial\\.benchmark-c2\\mcp\\provider_server.py is left byte-for-byte untouched)",
+    "file_changed_tracked": "tools/benchmark_c3/provider_server.py (new, committed copy for provenance/testing, kept byte-identical in its executable code to the operational copy)",
+    "exact_change": "In the ctags branch's symbols_in_file case: (1) the matches-list comprehension now includes \"name\": e[\"name\"]; (2) the compacted-line generation now uses m[\"name\"] for symbols_in_file entries instead of `value`. find_definition logic, treesitter logic, bounds/truncation logic, and every other line are unchanged (verified: diff of the two files' code bodies, excluding module docstrings, is empty except this one line).",
+    "new_mcp_configs": [
+      "C:\\Users\\mgial\\.benchmark-c3\\mcp\\ctags_mcp_config.json (points at the corrected C3 provider_server.py)",
+      "C:\\Users\\mgial\\.benchmark-c3\\mcp\\treesitter_mcp_config.json (points at the same corrected file; treesitter branch itself unchanged)"
+    ],
+    "cache_reuse": "ctags_cache.json / treesitter_cache.json reused unmodified from Benchmark C2 (C:\\Users\\mgial\\.benchmark-c2\\mcp\\) -- the cache schema already carried the correct per-entry name field; only provider_server.py's use of it was wrong. No rebuild was needed or performed."
+  },
+  "unchanged_confirmation": {
+    "task_questions": "unchanged -- Task A and Task B question text identical to the CEO-approved 874cf6b freeze",
+    "ground_truth": "unchanged -- C:\\Users\\mgial\\.benchmark-c3\\ground_truth\\c3_ground_truth.json not modified by this amendment",
+    "rubrics": "unchanged -- experiment.json scoring rubrics not modified",
+    "prompts_and_hashes": "unchanged -- all six Task A/B x C0/C1/C2 prompt files and their SHA-256 hashes are untouched; A/C1's prompt hash remains 7b6bb4c611bf4e1b46909db0c0704a93de65d227bbc13ce39bf85384bce415f9",
+    "source_sha_and_file_hashes": "unchanged -- godot/ content, base commit lineage (f2116a5 -> ... -> 874cf6b), and every recorded blob hash are untouched",
+    "primary_metric": "unchanged -- context_load_tokens = input_tokens + cache_creation_input_tokens + cache_read_input_tokens",
+    "decision_rule": "unchanged -- experiment.json decision_rule not modified",
+    "run_order": "unchanged -- Task A: C0->C1->C2, Task B: C1->C2->C0"
+  },
+  "run_disposition": {
+    "A_C1_original_session_69867a18": {
+      "status": "INVALID_INFRASTRUCTURE_APPARATUS",
+      "jsonl_preserved": true,
+      "jsonl_path": "C:\\Users\\mgial\\.claude\\projects\\C--Users-mgial--benchmark-c3-runs-A-C1\\69867a18-32cd-49f6-be40-3b0c4ea6564b.jsonl",
+      "jsonl_modified": false,
+      "telemetry_and_scoring_preserved": "yes, as previously reported in chat -- correctness CORRECT, context_load_tokens 76896, -40.2% vs A/C0 -- retained as diagnostic evidence only, NOT counted as official provider-utility evidence, since the -40.2% change cannot be credited to Ctags: the model's usable navigation information came from its subsequent Grep call, not from the malformed provider response.",
+      "excluded_from_official_comparison": true,
+      "must_be_rerun": "yes -- as A/C1_R1, fresh session, after the fix"
+    },
+    "A_C0_session_e7a5c569": {
+      "status": "VALID, UNAFFECTED",
+      "reason": "A/C0 used the empty MCP configuration ({\"mcpServers\":{}}) -- no provider of any kind was configured or callable, so this defect (specific to the ctags_query symbols_in_file path) could not have affected it. A/C0's CORRECT result and its 128484 context_load_tokens baseline stand exactly as accepted."
+    }
+  }
+}
