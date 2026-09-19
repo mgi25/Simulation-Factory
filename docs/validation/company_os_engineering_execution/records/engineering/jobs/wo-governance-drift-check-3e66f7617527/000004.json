@@ -1,0 +1,64 @@
+{
+  "developer_attempts": 1,
+  "max_developer_attempts": 3,
+  "opened_on": "2026-09-18",
+  "pending_decisions": [],
+  "reviews_completed": 0,
+  "state": "reviewing",
+  "transitions": [
+    {
+      "actor": "company-os",
+      "evidence_refs": [],
+      "from_state": "requested",
+      "on": "2026-09-18",
+      "reason": "work order wo-governance-drift-check authorized by MGI",
+      "to_state": "requested"
+    },
+    {
+      "actor": "company-os",
+      "evidence_refs": [
+        "engineering/plans/wo-governance-drift-check-3e66f7617527/000001.json",
+        "engineering/work_orders/wo-governance-drift-check-3e66f7617527/000001.json"
+      ],
+      "from_state": "requested",
+      "on": "2026-09-18",
+      "reason": "implementation plan b40f2f26c0b13014 derived from the work order",
+      "to_state": "planning"
+    },
+    {
+      "actor": "company-os",
+      "evidence_refs": [
+        "execution/authorities/wo-governance-drift-check-3e66f7617527/000001.json",
+        "execution/packets/wo-governance-drift-check-3e66f7617527/000001.json"
+      ],
+      "from_state": "planning",
+      "on": "2026-09-18",
+      "reason": "packet 2151d8654cee3405 attempt 1 issued to software_implementation_engineer",
+      "to_state": "developing"
+    },
+    {
+      "actor": "company-os",
+      "evidence_refs": [
+        "execution/receipts/wo-governance-drift-check-3e66f7617527/000001.json",
+        "resource_usage/wo-governance-drift-check-3e66f7617527/000001.json"
+      ],
+      "from_state": "developing",
+      "on": "2026-09-18",
+      "reason": "attempt 1 recorded accepted",
+      "to_state": "testing"
+    },
+    {
+      "actor": "company-os",
+      "evidence_refs": [
+        "execution/packets/wo-governance-drift-check-review-5d7f92405bbb/000001.json"
+      ],
+      "from_state": "testing",
+      "on": "2026-09-18",
+      "reason": "review packet issued to chief_architect (implementer software_implementation_engineer)",
+      "to_state": "reviewing"
+    }
+  ],
+  "version": 1,
+  "work_order_fingerprint": "6c1ce3643e5b86fc",
+  "work_order_id": "wo-governance-drift-check"
+}

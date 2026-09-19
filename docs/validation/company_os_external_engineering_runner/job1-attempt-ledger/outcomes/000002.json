@@ -1,0 +1,11 @@
+{
+  "final_state": "reviewing",
+  "finished_at": "2026-09-18T09:21:41.897795+00:00",
+  "lease_note": "took a released lease",
+  "outcome": "failed",
+  "reason": "ControlPlaneRefusal: python -m company.engineering review exited 2: criterion.evidence_ref: 424 characters exceeds the 200-character reference budget. This is content, not a pointer.",
+  "run_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-attempt-ledger-93c5b79f0e3b\\run-000002",
+  "stages": [],
+  "started_at": "2026-09-18T09:20:16.802090+00:00",
+  "work_order_id": "wo-attempt-ledger"
+}

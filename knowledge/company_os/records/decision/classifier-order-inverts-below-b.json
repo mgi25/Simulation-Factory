@@ -1,0 +1,49 @@
+{
+  "alternatives": [
+    {
+      "option": "Evaluate all six predicates in README order",
+      "why_not": "Routes a high-risk irreversible task to C, because C's predicate matches first and the escalation predicates are never reached."
+    },
+    {
+      "option": "Classify to C then escalate on a failed pass",
+      "why_not": "Pays for a failed cheap pass before reaching the right class, which is the cost the bootstrap spec explicitly prefers to avoid: one larger correct pass beats repeated short failed ones."
+    }
+  ],
+  "created": "2026-09-16",
+  "decision": "In ai_platform.resource_classes.RULES, classes A and B are evaluated first in the README's order, then F, E and D are evaluated from the top down, with C as the total floor.",
+  "evidence": [
+    {
+      "kind": "document",
+      "note": "decision order 1-6",
+      "ref": "ai_platform/README.md"
+    },
+    {
+      "kind": "document",
+      "note": "rule 4, minimum sufficient intelligence",
+      "ref": "company/constitution.md"
+    },
+    {
+      "kind": "test",
+      "note": "the case the inversion exists for",
+      "ref": "tests/test_company_os_ai_platform.py::test_high_risk_irreversible_never_routes_to_c"
+    }
+  ],
+  "id": "classifier-order-inverts-below-b",
+  "reconsider_if": [
+    "Measured first-pass success for class C is at or above class D's, which would mean the escalation predicates are firing on tasks C could have handled.",
+    "The README's decision order is amended."
+  ],
+  "reconsideration_reason": "",
+  "related_commits": [],
+  "related_experiments": [],
+  "related_tasks": [],
+  "risks": [
+    "Over-routing: a task with a specialist_domain set out of habit lands in D when C would have done. The signal set is the lever, not the rule order."
+  ],
+  "rollback": "Reorder the RULES tuple in ai_platform/resource_classes.py. It is one literal, the rule names are carried in every Classification, and no stored record depends on the order.",
+  "rollback_reason": "",
+  "source": "company-os-v1-ai-efficiency",
+  "status": "active",
+  "superseded_by": "",
+  "why": "The README's decision order is a checklist of increasing capability, not an evaluation order. Evaluating 'can a bounded low-reasoning pass do it?' before the escalation predicates answers yes for a high-risk irreversible change - the exact case that needs a specialist - so the cheap class would become the default for the dangerous task. A and B stay first because constitution rule 4 makes deterministic code and canonical retrieval absolute."
+}

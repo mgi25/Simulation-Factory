@@ -1,0 +1,86 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "capability_research_ingestion",
+    "capability_research_discovery",
+    "capability_research_screening",
+    "capability_research_batching"
+  ],
+  "created": "2026-09-16",
+  "decisions": [],
+  "dependencies": [
+    "ai-platform",
+    "company-knowledge-store",
+    "company-research-intelligence"
+  ],
+  "experiment_learnings": [],
+  "facts": [],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-research-operations",
+  "inputs": [
+    "A captured IngestionEnvelope with platform, URL, date, method, evidence pointer and public payload",
+    "A batch objective, BatchBudget, queries and stop conditions agreed before collection",
+    "A researcher's screening signals, recommendation, reason and review date"
+  ],
+  "invariants": [
+    "No network, scraper, downloader, browser or model runs here: ingestion accepts captured metadata and the package remains isolated from production.",
+    "Unknown payload keys and private channel analytics are refused, not dropped or fabricated.",
+    "A URL is canonicalized or rejected; candidate identity is platform plus external id, never a title.",
+    "Repeated discovery unions provenance without replacing known values or reviving a screened-out candidate.",
+    "Only a person screens, and only a screened-in candidate may be handed to the core ResearchSource contract.",
+    "A batch declares budget and stop conditions before collection; a breached ceiling stops work until a named authoriser escalates it.",
+    "Round logs and public snapshots are chronological and append-only; missing observations remain missing.",
+    "Saturation needs the configured number of measured rounds; insufficient evidence is distinct from not saturated."
+  ],
+  "last_reviewed": "2026-09-16",
+  "may_read": [
+    "ai_platform/**",
+    "knowledge/company_os/**",
+    "intelligence/research/**"
+  ],
+  "may_write": [],
+  "must_not_modify": [
+    "company/constitution.md",
+    "sloped/**",
+    "race/**",
+    "tools/**"
+  ],
+  "outputs": [
+    "DiscoveryQuery and deduplicated DiscoveryCandidate with complete provenance",
+    "SnapshotSeries of dated public observations and supported derived rates",
+    "ScreeningAssessment and an ordered queue with explicit coverage",
+    "ResearchBatch with append-only rounds, consumption and triggered stop conditions",
+    "ResearchResourceRecord with optional measured costs and units",
+    "BatchReport with funnel, duplication, concentration, saturation and missing measurements"
+  ],
+  "owner": "workstream-claude",
+  "owns_paths": [
+    "intelligence/research/batch*.py",
+    "intelligence/research/discovery.py",
+    "intelligence/research/funnel.py",
+    "intelligence/research/ingestion.py",
+    "intelligence/research/promotion.py",
+    "intelligence/research/resources.py",
+    "intelligence/research/screening_queue.py",
+    "intelligence/research/snapshots.py"
+  ],
+  "purpose": "Owns the bounded research operations that turn captured public metadata into screened handoffs: ingestion, discovery, snapshots, batch control, resource accounting, saturation measurement and stop-rule enforcement.",
+  "recheck_on": "2027-09-16",
+  "revalidation_reason": "",
+  "risks": [
+    "Public metrics are dated observations, never permanent properties of a video.",
+    "Deduplication depends on platform identity; canonical URL is only the fallback when no external id exists.",
+    "Saturation reflects only recorded rounds and known creator identities.",
+    "Absent resource measurements make totals and cost-per-outcome unknowable rather than zero."
+  ],
+  "source": "company-os-v1-dogfood-research-capsule",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_os_research_ingestion.py",
+    "tests/test_company_os_research_batches.py"
+  ],
+  "title": "Research operations",
+  "type": "module"
+}

@@ -1,0 +1,72 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "capability_capsule_index",
+    "capability_context_selection",
+    "capability_capsule_freshness"
+  ],
+  "created": "2026-09-16",
+  "decisions": [
+    "knowledge-store-is-files"
+  ],
+  "dependencies": [
+    "ai-platform",
+    "company-knowledge-store"
+  ],
+  "experiment_learnings": [],
+  "facts": [],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-knowledge-capsules",
+  "inputs": [
+    "Task metadata: repository paths, capability tags, explicit capsule ids, type/owner",
+    "A KnowledgeStore, to resolve links and detect superseded decisions",
+    "Observed source digests and a date, for staleness"
+  ],
+  "invariants": [
+    "No capsule field holds more than one line, and every pointer field must be pointer-shaped; embedded source is a construction error.",
+    "A capsule's canonical JSON is capped at 4000 characters; exceeding it raises.",
+    "Selection returns references, never expanded capsule text; knowledge_refs() is a separate opt-in call.",
+    "Every lookup and ranking is reproducible by hand from the query: no embeddings, no similarity score, no database.",
+    "Staleness takes observed digests as an argument; nothing here reads the repository or shells out to git.",
+    "A capsule links facts, decisions and learnings by id, never hypotheses, and never restates their contents."
+  ],
+  "last_reviewed": "2026-09-16",
+  "may_read": [
+    "knowledge/**",
+    "ai_platform/**",
+    "company/**"
+  ],
+  "may_write": [
+    "knowledge/company_os/capsules/**"
+  ],
+  "must_not_modify": [
+    "company/runtime/**",
+    "company/validation/**",
+    "ai_platform/README.md"
+  ],
+  "outputs": [
+    "A ranked CapsuleSelection with every rejection and its reason",
+    "ContextRefs ready for a ContextManifest; knowledge and test refs on request",
+    "SelectionMetrics, integrity problems and per-capsule staleness reasons"
+  ],
+  "owner": "workstream-claude",
+  "owns_paths": [
+    "knowledge/company_os/capsules"
+  ],
+  "purpose": "Compact authoritative module, system, policy and project contracts; a deterministic index over them; and a selector that turns task paths and capability tags into context references without expanding anything.",
+  "recheck_on": "2027-09-16",
+  "revalidation_reason": "",
+  "risks": [
+    "Seed capsules carry no source digests yet, so the source-changed condition cannot fire until a caller supplies them.",
+    "A capsule is only as true as its last review; last_reviewed is asserted by the author, not measured."
+  ],
+  "source": "company-os-v1-knowledge-capsules",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_os_capsules.py"
+  ],
+  "title": "Company knowledge capsules",
+  "type": "module"
+}

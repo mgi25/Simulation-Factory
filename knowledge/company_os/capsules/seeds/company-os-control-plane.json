@@ -1,0 +1,72 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "capability_control_plane",
+    "capability_governance"
+  ],
+  "created": "2026-09-16",
+  "decisions": [],
+  "dependencies": [
+    "company-bootstrap-policy",
+    "company-ceo-dashboard",
+    "company-knowledge-capsules",
+    "company-organizational-intelligence",
+    "company-research-operations",
+    "company-runtime",
+    "company-validation",
+    "company-workforce-employment"
+  ],
+  "experiment_learnings": [],
+  "facts": [
+    "bootstrap-forbids-nested-agents"
+  ],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-os-control-plane",
+  "inputs": [
+    "The four bootstrap YAML contracts under company/",
+    "Task metadata from one invoking session: paths, capabilities, required outputs"
+  ],
+  "invariants": [
+    "Production never imports company/, ai_platform/ or knowledge/; Company OS is removable without breaking simulation, render or tests.",
+    "No component spawns subagents; extra perspectives are separate sequential sessions (constitution rule 2).",
+    "Company OS stays unconnected to production execution until the integration gate in docs/company_os_v1_bootstrap.md passes.",
+    "Deterministic code first, retrieval second, reasoning only where judgment adds value (constitution rule 4)."
+  ],
+  "last_reviewed": "2026-09-16",
+  "may_read": [
+    "company/**",
+    "ai_platform/**",
+    "knowledge/**",
+    "docs/company_os_v1_bootstrap.md"
+  ],
+  "may_write": [],
+  "must_not_modify": [
+    "sloped/**",
+    "tools/**"
+  ],
+  "outputs": [
+    "Validated config, routing results, handoff artifacts",
+    "Context manifests, knowledge records and capsule selections"
+  ],
+  "owner": "company-os",
+  "owns_paths": [],
+  "purpose": "The corporate control plane: bootstrap contracts, validation, capability routing, AI-efficiency primitives, the knowledge store and the capsule layer. It may inspect, plan and route work to production; production may never import it.",
+  "recheck_on": "2027-09-16",
+  "revalidation_reason": "",
+  "risks": [
+    "The integration gate has not passed; treating any of this as production-wired is premature.",
+    "Runtime may invoke validation, but validation must remain independent of runtime implementation modules."
+  ],
+  "source": "company-os-v1-knowledge-capsules",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_runtime.py",
+    "tests/test_company_os_ai_platform.py",
+    "tests/test_company_os_knowledge.py",
+    "tests/test_company_os_capsules.py"
+  ],
+  "title": "Company OS control plane",
+  "type": "system"
+}

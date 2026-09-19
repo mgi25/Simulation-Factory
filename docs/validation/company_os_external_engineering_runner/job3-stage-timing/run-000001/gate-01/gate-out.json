@@ -1,0 +1,37 @@
+{
+  "gate": {
+    "as_of": "2026-09-18",
+    "authorizes_production_integration": false,
+    "blockers": [],
+    "policy_version": 1,
+    "readiness": "ready",
+    "report_digest": "19468548b929b535",
+    "report_id": "integration-readiness-2026-09-18-8fb0cbd96908d338",
+    "report_ref": "gate-report.json",
+    "source_branch": "eng-stage-timing",
+    "source_commit": "ae703ff78e1c6d48f2f718bf2fea4ab7225b8174",
+    "unknown_check_ids": [
+      "executive.decision_queue_preserves_source_refs",
+      "health.production_failures_separated",
+      "workforce.capability_gaps_visible"
+    ],
+    "version": 1,
+    "work_order_id": "wo-stage-timing"
+  },
+  "implementation_commit": "ae703ff78e1c6d48f2f718bf2fea4ab7225b8174",
+  "persisted": {
+    "gate_verdict": {
+      "fingerprint": "49ce48d1121afd8d",
+      "record_ref": "engineering/gate_verdicts/wo-stage-timing-0c21b800bd64/000001.json",
+      "sequence": 1
+    },
+    "job": {
+      "fingerprint": "5399336591738ab9",
+      "record_ref": "engineering/jobs/wo-stage-timing-0c21b800bd64/000006.json",
+      "sequence": 6
+    }
+  },
+  "stale": "",
+  "state": "ready_for_approval",
+  "work_order_id": "wo-stage-timing"
+}

@@ -1,0 +1,55 @@
+{
+  "alternatives": [
+    {
+      "option": "SQLite",
+      "why_not": "Adds a binary artifact that does not diff, for a corpus small enough that the query planner never earns its cost."
+    },
+    {
+      "option": "Vector database with embeddings",
+      "why_not": "Requires an embedding provider, which is provider lock-in for a retrieval problem that exact ids currently solve. Deferred, not rejected."
+    },
+    {
+      "option": "One append-only JSONL ledger",
+      "why_not": "Cheaper to append, but two sessions appending conflict on the same line range, and a record's history becomes a scan."
+    }
+  ],
+  "created": "2026-09-16",
+  "decision": "Store Company OS knowledge as one JSON file per record under knowledge/company_os/records/<kind>/<id>.json, with no database and no embedding index.",
+  "evidence": [
+    {
+      "kind": "document",
+      "note": "'no vector DB' is in scope",
+      "ref": "docs/company_os_v1_bootstrap.md"
+    },
+    {
+      "kind": "document",
+      "note": "rule 17: prove need before building",
+      "ref": "company/constitution.md"
+    },
+    {
+      "kind": "test",
+      "note": "round-trip and sweep tests",
+      "ref": "tests/test_company_os_knowledge.py"
+    }
+  ],
+  "id": "knowledge-store-is-files",
+  "reconsider_if": [
+    "The store exceeds roughly 2000 records, or a full sweep exceeds 100 ms.",
+    "A session demonstrably re-derives knowledge that was in the store but not findable by kind and id.",
+    "Semantic retrieval is needed by a shipped workflow, not by speculation."
+  ],
+  "reconsideration_reason": "",
+  "related_commits": [],
+  "related_experiments": [],
+  "related_tasks": [],
+  "risks": [
+    "Linear scan cost grows with the corpus; a few thousand records is the point where load_all stops being free.",
+    "No semantic retrieval, so a session that does not know a record exists will not find it by meaning."
+  ],
+  "rollback": "Delete knowledge/company_os/records/ and the ledger module. Nothing imports the store from production code, and the records are plain JSON, so any future index can be built over the same files without moving them.",
+  "rollback_reason": "",
+  "source": "company-os-v1-ai-efficiency",
+  "status": "active",
+  "superseded_by": "",
+  "why": "At bootstrap the store holds tens of records retrieved by kind and id or swept whole, so a directory answers both in microseconds. Files also diff in git alongside the code that motivated the change, merge without conflict between parallel sessions, and are readable with cat by a session that has loaded no tooling."
+}

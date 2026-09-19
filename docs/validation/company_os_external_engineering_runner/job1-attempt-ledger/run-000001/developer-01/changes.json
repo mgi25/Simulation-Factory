@@ -1,0 +1,38 @@
+{
+  "changed": [
+    "company/engineering/__init__.py",
+    "company/engineering/attempt_ledger.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "committed": [],
+  "protected_after": {
+    "ai_platform/policy.py": "95c22693d784b176d85525c38aa6b63a3df248aebdea923304bffcc5bc21046b",
+    "company/agent_contract.schema.yaml": "e0ccd35d4746d21d7435dcc3a1332bbc198f4c8b8d5a623bb5a454628dfe62f6",
+    "company/constitution.md": "8fff198edb4565287adc8f98d029f4b5eacab476d90d4392e1737c5b599917ea",
+    "company/integration/checks.py": "594349291fdc43459e990001db8346d87715df0f7ca37c7dc0fc9991bf0c8963",
+    "company/integration/policy.py": "06b22b5788a85cf013d4801ec01b725c67e5b11a7dc97007bef65bab11fc0ebb",
+    "company/integration/suites.py": "28c22f401531bc48dbd1fb1747b717ba55c3a998262294929d8450a251f9315b",
+    "company/org_registry.yaml": "71ee3b414bd71a92fa5ff0fe57695e68b8840011c72cca58af5c5e2793614584",
+    "company/permissions.yaml": "247e1c412c69282415574203c47b58305d2ab7fbe88a6ebb45e0829b24ab6fdb",
+    "company/task_handoff.schema.yaml": "1535563e77fc08bbbfc7978e626c95caad36734a86f3c797fe0284fbd6989885",
+    "company/validation/no_subagents.py": "8470daf24573bcb1da6d5ce9456c41fbc77837c3c8fb09ace3b7c57df2f37cc8"
+  },
+  "uncommitted": [
+    "company/engineering/__init__.py",
+    "tests/test_company_engineering_execution.py",
+    "company/engineering/attempt_ledger.py"
+  ],
+  "verdict": {
+    "checked": [
+      "changed paths against may_write",
+      "changed paths against may_not_modify",
+      "protected governance digests",
+      "branch identity",
+      "worktree identity",
+      "base commit ancestry",
+      "dependency files"
+    ],
+    "ok": true,
+    "violations": []
+  }
+}

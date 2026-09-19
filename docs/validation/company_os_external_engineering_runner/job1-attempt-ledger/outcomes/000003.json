@@ -1,0 +1,37 @@
+{
+  "final_state": "ready_for_approval",
+  "finished_at": "2026-09-18T09:31:27.870887+00:00",
+  "lease_note": "took a released lease",
+  "outcome": "completed",
+  "reason": "",
+  "run_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-attempt-ledger-93c5b79f0e3b\\run-000003",
+  "stages": [
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-attempt-ledger-93c5b79f0e3b\\run-000003\\reviewer-01\\attestation.json"
+      ],
+      "detail": "chief_architect returned pass; Company OS adjudicated pass (attested pass, deterministic pass)",
+      "ok": true,
+      "session_ids": [
+        "5b33b7ea-49ff-497b-bd53-6a76d37ea003"
+      ],
+      "stage": "reviewer",
+      "state_after": "gate",
+      "state_before": "reviewing"
+    },
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-attempt-ledger-93c5b79f0e3b\\run-000003\\gate-01\\gate-report.json",
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-attempt-ledger-93c5b79f0e3b\\run-000003\\gate-01\\suites.json"
+      ],
+      "detail": "11/11 required suites green; gate says  at d681c5a1b970",
+      "ok": true,
+      "session_ids": [],
+      "stage": "gate",
+      "state_after": "ready_for_approval",
+      "state_before": "gate"
+    }
+  ],
+  "started_at": "2026-09-18T09:28:13.449083+00:00",
+  "work_order_id": "wo-attempt-ledger"
+}

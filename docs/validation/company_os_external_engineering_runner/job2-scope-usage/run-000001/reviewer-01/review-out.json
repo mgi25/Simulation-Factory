@@ -1,0 +1,47 @@
+{
+  "persisted": {
+    "attestation": {
+      "fingerprint": "a95d088569f44bb9",
+      "record_ref": "engineering/attestations/wo-scope-usage-060a017cc09c/000001.json",
+      "sequence": 1
+    },
+    "job": {
+      "fingerprint": "10c32c691c317e9d",
+      "record_ref": "engineering/jobs/wo-scope-usage-060a017cc09c/000005.json",
+      "sequence": 5
+    },
+    "review": {
+      "fingerprint": "1b54af27c6bf62a8",
+      "record_ref": "engineering/reviews/wo-scope-usage-060a017cc09c/000001.json",
+      "sequence": 1
+    }
+  },
+  "review": {
+    "attested_outcome": "pass",
+    "deterministic_outcome": "pass",
+    "escalations": [],
+    "findings": [
+      {
+        "deterministic": false,
+        "evidence_ref": "tests/test_company_engineering_execution.py:1562-1572",
+        "finding_id": "test-name-vs-behaviour",
+        "severity": "advisory",
+        "summary": "test_scope_usage_matches_file_to_longest_prefix tests first-match semantics, not longest-prefix; the name is misleading but the body and comment are correct."
+      }
+    ],
+    "implementer": "software_implementation_engineer",
+    "outcome": "pass",
+    "packet_attempt": 1,
+    "packet_fingerprint": "3c16acc80bf8435c",
+    "receipt_fingerprint": "34501f387bb08279",
+    "review_id": "rev-wo-scope-usage-01",
+    "reviewed_on": "2026-09-18",
+    "reviewer": "chief_architect",
+    "unanswered_criteria": [],
+    "version": 1,
+    "work_order_fingerprint": "8d57bdf95a8685de",
+    "work_order_id": "wo-scope-usage"
+  },
+  "state": "gate",
+  "work_order_id": "wo-scope-usage"
+}

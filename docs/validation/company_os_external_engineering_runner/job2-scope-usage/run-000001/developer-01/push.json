@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "git",
+    "push",
+    "--set-upstream",
+    "origin",
+    "eng-scope-usage"
+  ],
+  "cwd": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-company-os-runner-tasks\\eng-scope-usage",
+  "duration_s": 3.249,
+  "exit_code": 0,
+  "stderr": "remote: \nremote: Create a pull request for 'eng-scope-usage' on GitHub by visiting:        \nremote:      https://github.com/mgi25/Simulation-Factory/pull/new/eng-scope-usage        \nremote: \nTo https://github.com/mgi25/Simulation-Factory.git\n * [new branch]      eng-scope-usage -> eng-scope-usage\n",
+  "stdout_chars": 67,
+  "timed_out": false
+}

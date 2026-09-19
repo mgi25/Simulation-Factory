@@ -1,0 +1,83 @@
+{
+  "changed_paths_reviewed": [
+    "company/engineering/attempt_ledger.py",
+    "company/engineering/__init__.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "criteria": [
+    {
+      "criterion": "The stated objective is implemented: Show me, for one engineering job, every developer attempt that was made and what each one cost, so I can tell whether an automated run is converging or thrashing without reading the whole history.",
+      "evidence_ref": "company/engineering/attempt_ledger.py:71-157 \u2014 build_attempt_ledger joins three stores into AttemptLedger with per-attempt entries and aggregates",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The authorized work order is immutable; every later stage carries its fingerprint and refuses a mismatch.",
+      "evidence_ref": "company/engineering/attempt_ledger.py \u2014 read-only projection, no store writes, no fingerprint mutation",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: A review outcome is the worst of the attested and deterministic verdicts, so a reviewer PASS cannot rescue a failed check.",
+      "evidence_ref": "diff.patch \u2014 no changes to company/engineering/review.py or adjudicate()",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The implementer and the reviewer are different employees, routed by disjoint capabilities.",
+      "evidence_ref": "diff.patch \u2014 no changes to routing logic in orchestrator.py",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The protected governance surface is digested before the work and re-read at review; a change blocks the job.",
+      "evidence_ref": "diff.patch \u2014 no changes to company/engineering/protected.py or governance digest code",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: No state means approved and nothing merges, deploys or publishes; the CEO decision is recorded, not acted on.",
+      "evidence_ref": "company/engineering/attempt_ledger.py:1-13 \u2014 docstring declares read-only; no store write calls in the module",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The gate verdict is read from the gate's own report; this subsystem holds no code that can produce one.",
+      "evidence_ref": "diff.patch \u2014 no changes to company/engineering/gate_evidence.py",
+      "satisfied": true
+    },
+    {
+      "criterion": "Every declared test passes: tests/test_company_engineering_execution.py",
+      "evidence_ref": "receipt.tests[0]: 100 passed in 20.08s",
+      "satisfied": true
+    }
+  ],
+  "evidence": [
+    "company/engineering/attempt_ledger.py",
+    "company/engineering/__init__.py",
+    "tests/test_company_engineering_execution.py",
+    "diff.patch",
+    "company/runtime/execution_store.py:380-395 (attempts method)",
+    "company/runtime/usage_store.py:53-68 (records method)"
+  ],
+  "findings": [
+    {
+      "deterministic": false,
+      "evidence_ref": "company/engineering/attempt_ledger.py:18,23,28",
+      "finding_id": "unused-imports",
+      "severity": "advisory",
+      "summary": "attempt_ledger.py imports Mapping (line 18), Outcome (line 23) and JobState (line 28) but never uses any of them."
+    },
+    {
+      "deterministic": false,
+      "evidence_ref": "company/engineering/attempt_ledger.py:103-104",
+      "finding_id": "sequence-correlation-fragility",
+      "severity": "advisory",
+      "summary": "Usage-to-attempt correlation assumes records appear in 1-based sequence order; the implementer disclosed this and the stores use sorted_records(), so it holds today but is implicit."
+    }
+  ],
+  "notes": "Purely additive: one new module, re-export in __init__.py, four new tests. No existing behaviour was modified. The three unused imports are harmless but worth cleaning. The sequence-correlation assumption is documented by the implementer and sound given sorted_records(), but a future store migration should be aware of it.",
+  "packet_fingerprint": "1f146021562d64ef",
+  "receipt_fingerprint": "08cd3fd92f1e7f99",
+  "review_id": "rev-wo-attempt-ledger-01",
+  "reviewed_on": "2026-09-18",
+  "reviewer": "chief_architect",
+  "verdict": "pass",
+  "version": 1,
+  "work_order_fingerprint": "4418d6288e06d39d",
+  "work_order_id": "wo-attempt-ledger"
+}

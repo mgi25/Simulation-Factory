@@ -1,0 +1,25 @@
+{
+  "runs": [
+    {
+      "argv": [
+        "C:\\Users\\mgial\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_company_engineering_execution.py",
+        "-q",
+        "--no-header"
+      ],
+      "command": "tests/test_company_engineering_execution.py",
+      "commit": "d681c5a1b970470bd98c54f352f4f969f97f5ab2",
+      "duration_s": 23.739,
+      "errors": 0,
+      "exit_code": 0,
+      "failed": 0,
+      "green": true,
+      "passed": 100,
+      "skipped": 0,
+      "summary": "100 passed in 20.08s",
+      "timed_out": false
+    }
+  ]
+}

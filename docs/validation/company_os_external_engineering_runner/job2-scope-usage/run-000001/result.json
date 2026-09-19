@@ -1,0 +1,64 @@
+{
+  "acceptance_criteria": [
+    "The stated objective is implemented: For one work order, show me which of the paths it was authorized to change the work actually touched, so I can see how much of the scope I granted was used.",
+    "company-engineering-execution invariant still holds: The authorized work order is immutable; every later stage carries its fingerprint and refuses a mismatch.",
+    "company-engineering-execution invariant still holds: A review outcome is the worst of the attested and deterministic verdicts, so a reviewer PASS cannot rescue a failed check.",
+    "company-engineering-execution invariant still holds: The implementer and the reviewer are different employees, routed by disjoint capabilities.",
+    "company-engineering-execution invariant still holds: The protected governance surface is digested before the work and re-read at review; a change blocks the job.",
+    "company-engineering-execution invariant still holds: No state means approved and nothing merges, deploys or publishes; the CEO decision is recorded, not acted on.",
+    "company-engineering-execution invariant still holds: The gate verdict is read from the gate's own report; this subsystem holds no code that can produce one.",
+    "Every declared test passes: tests/test_company_engineering_execution.py"
+  ],
+  "authorized_on": "2026-09-18",
+  "authorized_paths": [
+    "company/engineering",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "authorizes_merge": false,
+  "branch": "eng-scope-usage",
+  "changed_files": [
+    "company/engineering/__init__.py",
+    "company/engineering/result.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "commit_sha": "be5255dfbacc723da8e5371d8076c0f6558b06a1",
+  "decisions_required": [],
+  "developer_attempts": 1,
+  "evidence_refs": [],
+  "gate_blockers": [],
+  "gate_readiness": "ready",
+  "gate_report_id": "integration-readiness-2026-09-18-7cd302967d2d8eed",
+  "implementation_summary": "Added ScopeUsage dataclass and scope_usage() method to EngineeringResult, plus a SCOPE USAGE section in the CEO render_text() page. For each authorized path the result now shows [USED] or [UNUSED] with file counts, so the CEO can see how much of the granted scope was actually touched. Six new tests cover the feature including exact matches, empty changes, and the render output.",
+  "implementer": "software_implementation_engineer",
+  "merge_performed": false,
+  "not_an_approval": "READY FOR CEO APPROVAL is a request to be read, not an approval. Nothing here merges, deploys or publishes, and Company OS holds no capability to.",
+  "objective": "For one work order, show me which of the paths it was authorized to change the work actually touched, so I can see how much of the scope I granted was used.",
+  "persisted": {
+    "fingerprint": "7c1ca561558a1d64",
+    "record_ref": "engineering/results/wo-scope-usage-060a017cc09c/000001.json",
+    "sequence": 1
+  },
+  "remote_verified": true,
+  "requested_by": "MGI",
+  "review_findings": [
+    "[advisory] test-name-vs-behaviour: test_scope_usage_matches_file_to_longest_prefix tests first-match semantics, not longest-prefix; the name is misleading but the body and comment are correct."
+  ],
+  "review_outcome": "pass",
+  "reviewer": "chief_architect",
+  "risks": [
+    "A changed file that falls outside all authorized paths (e.g. from a path scope violation) is not shown under any authorized path in the scope usage section. This is correct behaviour but a reviewer should verify it reads clearly."
+  ],
+  "status": "ready_for_approval",
+  "tests": [
+    {
+      "command": "tests/test_company_engineering_execution.py",
+      "passed": true,
+      "scope": "targeted",
+      "summary": "101 passed in 18.41s"
+    }
+  ],
+  "unanswered_criteria": [],
+  "version": 1,
+  "work_order_fingerprint": "8d57bdf95a8685de",
+  "work_order_id": "wo-scope-usage"
+}

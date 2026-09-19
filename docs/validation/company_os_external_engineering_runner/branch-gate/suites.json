@@ -1,0 +1,115 @@
+{
+  "max_age_days": 7,
+  "results": [
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "160 passed in 1.04s",
+      "observed_on": "2026-09-18",
+      "passed": true,
+      "reported_by": "external-engineering-runner/MGI",
+      "selected": 160,
+      "suite": "tests/test_company_analytics.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "32 passed in 0.78s",
+      "observed_on": "2026-09-18",
+      "passed": true,
+      "reported_by": "external-engineering-runner/MGI",
+      "selected": 32,
+      "suite": "tests/test_company_dashboard.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "7 passed in 0.45s",
+      "observed_on": "2026-09-18",
+      "passed": true,
+      "reported_by": "external-engineering-runner/MGI",
+      "selected": 7,
+      "suite": "tests/test_company_execution_transport.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "123 passed in 0.90s",
+      "observed_on": "2026-09-18",
+      "passed": true,
+      "reported_by": "external-engineering-runner/MGI",
+      "selected": 123,
+      "suite": "tests/test_company_finance.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "88 passed in 72.30s (0:01:12)",
+      "observed_on": "2026-09-18",
+      "passed": true,
+      "reported_by": "external-engineering-runner/MGI",
+      "selected": 88,
+      "suite": "tests/test_company_integration_gate.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "119 passed in 0.59s",
+      "observed_on": "2026-09-18",
+      "passed": true,
+      "reported_by": "external-engineering-runner/MGI",
+      "selected": 119,
+      "suite": "tests/test_company_org_intelligence.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "46 passed in 0.10s",
+      "observed_on": "2026-09-18",
+      "passed": true,
+      "reported_by": "external-engineering-runner/MGI",
+      "selected": 46,
+      "suite": "tests/test_company_os_ai_platform.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "66 passed in 0.24s",
+      "observed_on": "2026-09-18",
+      "passed": true,
+      "reported_by": "external-engineering-runner/MGI",
+      "selected": 66,
+      "suite": "tests/test_company_os_capsules.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "26 passed in 0.19s",
+      "observed_on": "2026-09-18",
+      "passed": true,
+      "reported_by": "external-engineering-runner/MGI",
+      "selected": 26,
+      "suite": "tests/test_company_os_knowledge.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "20 passed in 0.84s",
+      "observed_on": "2026-09-18",
+      "passed": true,
+      "reported_by": "external-engineering-runner/MGI",
+      "selected": 20,
+      "suite": "tests/test_company_runtime.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "93 passed in 0.42s",
+      "observed_on": "2026-09-18",
+      "passed": true,
+      "reported_by": "external-engineering-runner/MGI",
+      "selected": 93,
+      "suite": "tests/test_company_workforce.py"
+    }
+  ]
+}

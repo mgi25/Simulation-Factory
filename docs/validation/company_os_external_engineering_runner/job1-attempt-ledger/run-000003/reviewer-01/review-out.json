@@ -1,0 +1,54 @@
+{
+  "persisted": {
+    "attestation": {
+      "fingerprint": "2ed84d43088d9b9b",
+      "record_ref": "engineering/attestations/wo-attempt-ledger-93c5b79f0e3b/000001.json",
+      "sequence": 1
+    },
+    "job": {
+      "fingerprint": "0c6ccf7cf57a0281",
+      "record_ref": "engineering/jobs/wo-attempt-ledger-93c5b79f0e3b/000005.json",
+      "sequence": 5
+    },
+    "review": {
+      "fingerprint": "89babc97dfb2ceba",
+      "record_ref": "engineering/reviews/wo-attempt-ledger-93c5b79f0e3b/000001.json",
+      "sequence": 1
+    }
+  },
+  "review": {
+    "attested_outcome": "pass",
+    "deterministic_outcome": "pass",
+    "escalations": [],
+    "findings": [
+      {
+        "deterministic": false,
+        "evidence_ref": "company/engineering/attempt_ledger.py:103-104",
+        "finding_id": "sequence-correlation-fragility",
+        "severity": "advisory",
+        "summary": "Usage-to-attempt correlation assumes records appear in 1-based sequence order; the implementer disclosed this and the stores use sorted_records(), so it holds today but is implicit."
+      },
+      {
+        "deterministic": false,
+        "evidence_ref": "company/engineering/attempt_ledger.py:18,23,28",
+        "finding_id": "unused-imports",
+        "severity": "advisory",
+        "summary": "attempt_ledger.py imports Mapping (line 18), Outcome (line 23) and JobState (line 28) but never uses any of them."
+      }
+    ],
+    "implementer": "software_implementation_engineer",
+    "outcome": "pass",
+    "packet_attempt": 1,
+    "packet_fingerprint": "1f146021562d64ef",
+    "receipt_fingerprint": "08cd3fd92f1e7f99",
+    "review_id": "rev-wo-attempt-ledger-01",
+    "reviewed_on": "2026-09-18",
+    "reviewer": "chief_architect",
+    "unanswered_criteria": [],
+    "version": 1,
+    "work_order_fingerprint": "4418d6288e06d39d",
+    "work_order_id": "wo-attempt-ledger"
+  },
+  "state": "gate",
+  "work_order_id": "wo-attempt-ledger"
+}

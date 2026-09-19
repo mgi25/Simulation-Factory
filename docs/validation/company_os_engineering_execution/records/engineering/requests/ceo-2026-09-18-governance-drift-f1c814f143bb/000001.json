@@ -1,0 +1,17 @@
+{
+  "acceptance_criteria": [],
+  "authorized_branch": "eng-governance-drift-check",
+  "base_commit": "6b50b116c52e2fae5fc44a03ebcc2a5b0c358513",
+  "capsule_hints": [],
+  "constraints": [],
+  "max_developer_attempts": 3,
+  "notes": "",
+  "objective": "Let me check at any time whether the protected governance files have changed since an engineering work order was authorized, without having to run a review to find out.",
+  "request_id": "ceo-2026-09-18-governance-drift",
+  "requested_by": "MGI",
+  "requested_on": "2026-09-18",
+  "reversible": true,
+  "risk": "low",
+  "scope_ceiling": [],
+  "subsystem_hint": "company/engineering"
+}

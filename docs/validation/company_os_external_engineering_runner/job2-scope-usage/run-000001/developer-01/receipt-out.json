@@ -1,0 +1,49 @@
+{
+  "accepted": true,
+  "failures": [],
+  "handoff": {
+    "artifacts": [
+      "execution/receipts/wo-scope-usage-060a017cc09c/000001.json"
+    ],
+    "changed": [
+      "company/engineering/__init__.py",
+      "company/engineering/result.py",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "escalation_reason": "",
+    "escalation_required": false,
+    "evidence": [
+      "company/engineering/result.py",
+      "company/engineering/__init__.py",
+      "tests/test_company_engineering_execution.py",
+      "commit:be5255dfbacc723da8e5371d8076c0f6558b06a1"
+    ],
+    "next_owner": "",
+    "objective": "For one work order, show me which of the paths it was authorized to change the work actually touched, so I can see how much of the scope I granted was used.",
+    "owner": "software_implementation_engineer",
+    "resource_usage": {
+      "fingerprint": "73534b8653d8d2b3",
+      "record_ref": "resource_usage/wo-scope-usage-060a017cc09c/000001.json"
+    },
+    "result": "Added ScopeUsage dataclass and scope_usage() method to EngineeringResult, plus a SCOPE USAGE section in the CEO render_text() page. For each authorized path the result now shows [USED] or [UNUSED] with file counts, so the CEO can see how much of the granted scope was actually touched. Six new tests cover the feature including exact matches, empty changes, and the render output.",
+    "risks": [
+      "A changed file that falls outside all authorized paths (e.g. from a path scope violation) is not shown under any authorized path in the scope usage section. This is correct behaviour but a reviewer should verify it reads clearly."
+    ],
+    "status": "completed",
+    "task_id": "wo-scope-usage",
+    "tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "unchanged": []
+  },
+  "packet_attempt": 1,
+  "receipt_fingerprint": "34501f387bb08279",
+  "receipt_ref": "execution/receipts/wo-scope-usage-060a017cc09c/000001.json",
+  "state": "testing",
+  "usage_record": {
+    "fingerprint": "73534b8653d8d2b3",
+    "record_ref": "resource_usage/wo-scope-usage-060a017cc09c/000001.json"
+  },
+  "warnings": [],
+  "work_order_id": "wo-scope-usage"
+}

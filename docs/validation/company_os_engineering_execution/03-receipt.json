@@ -1,0 +1,63 @@
+{
+  "authority_fingerprint": "26369f8aec216a4a",
+  "base_commit": "6b50b116c52e2fae5fc44a03ebcc2a5b0c358513",
+  "branch": "eng-governance-drift-check",
+  "commit_sha": "d59a5d918630f763d0e93997626636e72a4dedc3",
+  "completed_at": "2026-09-18T00:00:00+00:00",
+  "context_refs_used": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "context_usage_reported": true,
+  "dependencies_added": [],
+  "evidence": [
+    "company/engineering/verify.py",
+    "tests/test_company_engineering_execution.py",
+    "commit:d59a5d918630f763d0e93997626636e72a4dedc3"
+  ],
+  "executor": "claude_code",
+  "files_changed": [
+    "company/engineering/verify.py",
+    "company/engineering/__init__.py",
+    "company/engineering/__main__.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "invariants_preserved": [
+    "no new import: standard library plus ai_platform.serde and this package",
+    "the drift check writes nothing and moves no job state",
+    "company/runtime and company/integration are untouched"
+  ],
+  "merge_performed": false,
+  "next_owner": "chief_architect",
+  "no_subagents": true,
+  "outcome": "accepted",
+  "packet_attempt": 1,
+  "packet_fingerprint": "2151d8654cee3405",
+  "remote_branch_sha": "d59a5d918630f763d0e93997626636e72a4dedc3",
+  "remote_verified": true,
+  "subagents_used": 0,
+  "summary": "Added company/engineering/verify.py: one work order's protected surface re-digested against a named checkout, with three statuses so an unanswerable question cannot read as clean. Wired a read-only `verify` CLI command whose exit code is the answer. 8 new tests.",
+  "task_id": "wo-governance-drift-check",
+  "tests": [
+    {
+      "command": "tests/test_company_engineering_execution.py",
+      "passed": true,
+      "summary": "92 passed (84 before the change, 8 new)"
+    },
+    {
+      "command": "tests/ -k company",
+      "passed": true,
+      "summary": "1579 passed, 3033 deselected"
+    }
+  ],
+  "unresolved_risks": [
+    "The check compares bytes, so a whitespace-only edit to a protected file reads as drift. That is deliberate but will produce a finding a reader has to dismiss."
+  ],
+  "usage": {
+    "passes": 1,
+    "retries": 0,
+    "tool_calls": 31,
+    "usage_unit": "unknown"
+  },
+  "working_tree_clean": true
+}

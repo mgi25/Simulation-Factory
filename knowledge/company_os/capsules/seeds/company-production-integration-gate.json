@@ -1,0 +1,83 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "production_integration_gate",
+    "readiness_evaluation",
+    "architecture_boundary_audit"
+  ],
+  "created": "2026-09-17",
+  "decisions": [],
+  "dependencies": [
+    "ai-platform",
+    "company-knowledge-capsules",
+    "company-runtime",
+    "company-validation"
+  ],
+  "experiment_learnings": [],
+  "facts": [
+    "bootstrap-forbids-nested-agents"
+  ],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-production-integration-gate",
+  "inputs": [
+    "The checkout itself: production and Company OS source, parsed but never imported or executed",
+    "Canonical bootstrap contracts, the capsule graph, and test-suite results the caller supplies"
+  ],
+  "invariants": [
+    "Unknown never satisfies a required condition; a required unknown blocks readiness exactly as a failure does.",
+    "There is no readiness score, health score or percentage; READY means every required check passed and nothing else.",
+    "A READY report does not authorize production integration; that stays a CEO decision (merge_major_architecture_rewrite).",
+    "The gate holds none of the authority it checks for: no network, no process spawn, no delete, no write outside a caller-named directory.",
+    "Every check is classified required or advisory in policy.py; an unclassified check fails the run rather than defaulting.",
+    "A blocker is resolved only with evidence; resolved=true without resolution_evidence is refused at construction.",
+    "Reports are append-only under a caller-supplied state directory and never overwritten with different content.",
+    "Nothing here is imported by another subsystem; this package reads Company OS and is read by none of it."
+  ],
+  "last_reviewed": "2026-09-17",
+  "may_read": [
+    "company/**",
+    "ai_platform/**",
+    "knowledge/**",
+    "intelligence/**",
+    "tests/**",
+    "docs/company_os_v1_bootstrap.md"
+  ],
+  "may_write": [
+    "company/integration/**"
+  ],
+  "must_not_modify": [
+    "production/**",
+    "sloped/**",
+    "engine/**",
+    "modes/**",
+    "powers/**",
+    "marble3d/**",
+    "godot/**",
+    "tools/**"
+  ],
+  "outputs": [
+    "A canonical ProductionIntegrationReadinessReport: checks by category, blockers, unknowns, advisories",
+    "A deterministic READY, BLOCKED or INSUFFICIENT_EVIDENCE verdict tied to a source commit and an as-of date"
+  ],
+  "owner": "company-os",
+  "owns_paths": [
+    "company/integration"
+  ],
+  "purpose": "Evaluates deterministically whether Company OS is safe and complete enough to cross the production integration boundary, and reports what blocks it. It evaluates readiness; it never wires anything to production.",
+  "recheck_on": "2027-09-17",
+  "revalidation_reason": "",
+  "risks": [
+    "A constant-path write scan cannot see a production path assembled at runtime; the no-network, no-spawn and no-delete conditions cover that case instead.",
+    "Suite results are supplied by the caller, so that condition is only as strong as the reporter named on the evidence.",
+    "The CEO dashboard depends on this capsule as its eventual readiness surface; no code coupling exists yet and the boundary checks prove it."
+  ],
+  "source": "company-os-v1-production-integration-gate",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_integration_gate.py"
+  ],
+  "title": "Production integration readiness gate",
+  "type": "module"
+}

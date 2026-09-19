@@ -1,0 +1,48 @@
+version: 1
+required_fields:
+  - employee_id
+  - mission
+  - department
+  - manager
+  - capabilities
+  - input_contract
+  - output_contract
+  - may_read
+  - may_write
+  - may_not_modify
+  - quality_gates
+  - token_policy
+  - escalation_conditions
+  - success_metrics
+  - no_subagents
+
+template:
+  employee_id: ""
+  mission: ""
+  department: ""
+  manager: ""
+  state: candidate
+  capabilities: []
+  tools: []
+  input_contract: []
+  output_contract: []
+  may_read: []
+  may_write: []
+  may_not_modify: []
+  decisions_allowed: []
+  quality_gates: []
+  token_policy:
+    minimum_relevant_context: true
+    deterministic_first: true
+    retrieval_before_reasoning: true
+    prefer_single_pass: true
+    budget_class: small
+  required_tests: []
+  escalation_conditions: []
+  success_metrics:
+    - correctness
+    - first_pass_success
+    - regressions_caused
+    - accepted_recommendations
+    - resource_per_accepted_deliverable
+  no_subagents: true

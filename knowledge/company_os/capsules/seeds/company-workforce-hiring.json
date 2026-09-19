@@ -1,0 +1,71 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "capability_gap",
+    "workforce_proposal",
+    "role_specification"
+  ],
+  "created": "2026-09-16",
+  "decisions": [],
+  "dependencies": [
+    "company-workforce-capabilities",
+    "company-validation"
+  ],
+  "experiment_learnings": [],
+  "facts": [],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-workforce-hiring",
+  "inputs": [
+    "A CoverageReport, a trigger reference, and explicit frequency evidence",
+    "A CapabilityRegistry, for adjacency and for who provides what"
+  ],
+  "invariants": [
+    "A gap needs evidence and something actually missing; full active coverage cannot become a gap (rule 17).",
+    "Frequency is supplied, never inferred: recurring needs at least three counted occurrences plus pointers.",
+    "The decision table checks cheap answers first; a permanent role is the last option considered.",
+    "no_subagents on a role specification must be exactly True (rule 2).",
+    "A restricted role emits an empty may_write no matter what it requested (rule 11).",
+    "Every proposal is born PROPOSED and there is no apply(); acting on one is a human edit elsewhere."
+  ],
+  "last_reviewed": "2026-09-16",
+  "may_read": [
+    "company/permissions.yaml",
+    "company/agent_contract.schema.yaml",
+    "company/workforce/*.py"
+  ],
+  "may_write": [
+    "company/workforce/gaps.py",
+    "company/workforce/proposals.py"
+  ],
+  "must_not_modify": [
+    "company/org_registry.yaml",
+    "company/permissions.yaml",
+    "company/constitution.md"
+  ],
+  "outputs": [
+    "CapabilityGap, ranked ProposalOptions, WorkforceProposal",
+    "RoleSpecification and the agent contract it emits"
+  ],
+  "owner": "workstream-workforce",
+  "owns_paths": [
+    "company/workforce/gaps.py",
+    "company/workforce/proposals.py",
+    "company/workforce/roles.py"
+  ],
+  "purpose": "Turns a proven inability into a ranked recommendation and, at most, a proposed role contract. Recommends only; nothing here hires, activates or archives.",
+  "recheck_on": "2027-09-16",
+  "revalidation_reason": "",
+  "risks": [
+    "requires_ceo_approval reads permissions.yaml ceo_reserved; renaming that key silently stops flagging executive hires.",
+    "Adjacency for retraining comes from registry relations, so a missing edge reads as nobody being retrainable."
+  ],
+  "source": "company-os-v1-workforce-foundation",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_workforce.py"
+  ],
+  "title": "Capability gaps, proposals and role specifications",
+  "type": "module"
+}

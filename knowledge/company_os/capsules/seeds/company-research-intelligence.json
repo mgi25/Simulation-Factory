@@ -1,0 +1,74 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "capability_reference_analysis",
+    "capability_opportunity_scoring"
+  ],
+  "created": "2026-09-16",
+  "decisions": [],
+  "dependencies": [
+    "ai-platform",
+    "company-knowledge-store"
+  ],
+  "experiment_learnings": [],
+  "facts": [],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-research-intelligence",
+  "inputs": [
+    "A screened ResearchSource with Evidence, rights and ResearchConfidence",
+    "A researcher's ReferenceCase, OpportunityDossier or VideoIntelligenceDossier",
+    "A ScoringRubric and an OpportunityScorecard"
+  ],
+  "invariants": [
+    "The company-research-operations capsule is authoritative for the no-network ingestion boundary and batch ceiling escalation; core contracts accept its reviewed handoffs.",
+    "Every number about the outside world is a Measurement with mandatory Evidence, and a rate whose denominator was never observed is absent rather than zero.",
+    "A local copy requires a named authoriser; non-copy rights statuses refuse one.",
+    "Research confidence may never be permanent, and every finding names what would overturn it.",
+    "ResearchSource lifecycle gates require their linked core artefact; rejection is terminal.",
+    "Scoring applies explicit rubric weights to researcher judgements and carries coverage and caveats; public metrics never decide an opportunity."
+  ],
+  "last_reviewed": "2026-09-16",
+  "may_read": [
+    "ai_platform/**",
+    "knowledge/company_os/**"
+  ],
+  "may_write": [
+    "intelligence/research/**"
+  ],
+  "must_not_modify": [
+    "company/constitution.md",
+    "sloped/**",
+    "race/**",
+    "tools/**"
+  ],
+  "outputs": [
+    "ResearchSource with evidence, rights, confidence and lifecycle",
+    "ReferenceCase with analysis and originality boundary",
+    "OpportunityDossier with evidence, limitations and format class",
+    "VideoIntelligenceDossier with experiment, kill conditions and superiority targets",
+    "ScoringRubric, OpportunityScorecard and a qualified ScoreResult"
+  ],
+  "owner": "workstream-claude",
+  "owns_paths": [
+    "intelligence/research"
+  ],
+  "purpose": "Defines the bounded core research contracts and invariants used to turn reviewed evidence into reference analysis, opportunity dossiers, video experiments and qualified scores. Discovery, ingestion and batch execution belong to company-research-operations.",
+  "recheck_on": "2027-09-16",
+  "revalidation_reason": "",
+  "risks": [
+    "Evidence can age while its record remains structurally valid; confidence and would-change conditions must travel with every finding.",
+    "A plausible weighted score can outlive its rubric or conceal incomplete coverage unless its qualification travels with it.",
+    "A format opportunity can collapse into a one-off idea unless its reusable loop and variation space are explicit."
+  ],
+  "source": "company-os-v1-dogfood-research-capsule",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_os_research.py",
+    "tests/test_company_os_research_ingestion.py",
+    "tests/test_company_os_research_batches.py"
+  ],
+  "title": "Research intelligence",
+  "type": "module"
+}

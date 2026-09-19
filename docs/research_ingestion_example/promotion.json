@@ -1,0 +1,23 @@
+{
+  "confidence": {
+    "basis": "One public page, read once, with the counts it showed that day.",
+    "freshness": "time_sensitive",
+    "level": "weak",
+    "limitations": [
+      "Public metrics only; retention and traffic sources are not visible to us.",
+      "One channel observed; no audience data of our own."
+    ],
+    "observed_on": "2026-09-16",
+    "source_quality": "platform_public",
+    "would_change_if": [
+      "The channel stops publishing this format for two months.",
+      "A second reading shows the view count was revised downward."
+    ]
+  },
+  "on": "2026-09-16",
+  "promoted_by": "research_opportunity_lead",
+  "reason": "The elimination loop is worth a reference case.",
+  "rights": "link_only",
+  "source_id": "yt-marble-mountain-2026",
+  "source_type": "competitor_video"
+}

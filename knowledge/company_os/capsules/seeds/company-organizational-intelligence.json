@@ -1,0 +1,82 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "org_design",
+    "organizational_review",
+    "change_proposal"
+  ],
+  "created": "2026-09-16",
+  "decisions": [],
+  "dependencies": [
+    "company-analytics-experiments",
+    "company-finance",
+    "company-workforce-capabilities",
+    "company-workforce-hiring"
+  ],
+  "experiment_learnings": [],
+  "facts": [
+    "bootstrap-forbids-nested-agents"
+  ],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-organizational-intelligence",
+  "inputs": [
+    "Workforce records: CoverageReport, CapabilityGap, CapabilityPerformance, RoleNecessityReview, OrganizationalDebt",
+    "ResourceUsageRecord or ResourceSummary, a research BatchReport shape, and org_registry.yaml manager edges",
+    "ExperimentResult and AnalyticsLearning, read as evidence that work is producing learning rather than only output"
+  ],
+  "invariants": [
+    "Advisory only: no module writes org_registry.yaml, permissions.yaml, constitution.md or the agent contract schema.",
+    "A recommendation never approves itself; APPROVED needs a Decision naming a person who is not an automatic marker.",
+    "An ordinary optimisation may not touch no_subagents, the mission, the constitution or CEO authority (rule 2).",
+    "No company, department, manager or employee score exists; dimensions stay separate (brief section 4).",
+    "Every signal and finding carries an explicit window; an unmeasured value stays None and names what is missing.",
+    "A finding needs evidence and at least one signal; a post-change review can never claim causality.",
+    "Workforce, usage and research numbers are consumed, never recomputed (rule 15).",
+    "The store refuses a silent overwrite: different bytes under one id raise unless replace=True."
+  ],
+  "last_reviewed": "2026-09-16",
+  "may_read": [
+    "company/org_registry.yaml",
+    "company/permissions.yaml",
+    "company/workforce/*.py",
+    "ai_platform/usage.py",
+    "company/finance/*.py",
+    "company/analytics/*.py"
+  ],
+  "may_write": [
+    "company/org_intelligence/*.py"
+  ],
+  "must_not_modify": [
+    "company/org_registry.yaml",
+    "company/permissions.yaml",
+    "company/constitution.md",
+    "company/agent_contract.schema.yaml",
+    "company/workforce/*.py",
+    "intelligence/**"
+  ],
+  "outputs": [
+    "OrganizationalSignal, OrganizationalFinding, OrganizationalRecommendation",
+    "OrganizationChangeProposal, ChangeExperiment, OrganizationChangeReview"
+  ],
+  "owner": "workstream-org-intelligence",
+  "owns_paths": [
+    "company/org_intelligence"
+  ],
+  "purpose": "Reads evidence the other subsystems produced and answers whether the company is organized well: signals, then findings, then evidence-backed recommendations and change proposals a human decides on. It recommends; it never reorganizes.",
+  "recheck_on": "2027-09-16",
+  "revalidation_reason": "",
+  "risks": [
+    "The research BatchReport is read duck-typed, so an upstream rename raises rather than silently yielding None.",
+    "Reserved-action mapping reads permissions.yaml ceo_reserved; unreserved_actions reports a rename, it cannot prevent one.",
+    "Span, depth and recurrence thresholds are opinions; a finding is only as defensible as the configuration recorded beside it."
+  ],
+  "source": "company-os-v1-org-intelligence",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_org_intelligence.py"
+  ],
+  "title": "Organizational intelligence and change proposals",
+  "type": "module"
+}

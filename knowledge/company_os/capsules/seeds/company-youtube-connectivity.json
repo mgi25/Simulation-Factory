@@ -1,0 +1,76 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "youtube_artifact_ingestion",
+    "youtube_evidence_normalization",
+    "youtube_analytics_evidence",
+    "youtube_observation_provenance"
+  ],
+  "created": "2026-09-17",
+  "decisions": [],
+  "dependencies": [
+    "company-analytics-experiments",
+    "company-runtime"
+  ],
+  "experiment_learnings": [],
+  "facts": [],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-youtube-connectivity",
+  "inputs": [
+    "A sanitized YouTube API artifact JSON file written outside Company OS, carrying no token, no header and no query string",
+    "An operator-supplied deliverable id, deliverable kind and format for each video whose readings cross into the analytics ledger"
+  ],
+  "invariants": [
+    "This package performs no network access and holds no credential: the authenticated fetch runs outside Company OS and leaves a file, which is the only input.",
+    "Every reading it commits carries measurement=interval, so a windowed API value cannot collide with a cumulative Studio reading; a channel-wide row set becomes no reading and no invented deliverable id.",
+    "No reading is silently adjusted: an unavailable metric keeps its reason rather than becoming zero, and average_percentage_viewed past 1.0 is carried, not clamped.",
+    "An observation id is derived from what was measured - api, channel, video, deliverable, metric, window, measurement - never from fetch time, file path or the value.",
+    "A replayed pull is a no-op; a revised value for an existing identity is refused as a conflict and nothing is written, not even the source record.",
+    "Incomplete retrieval becomes DataScope(complete=False, excludes=...) naming the video ids that did not come back, never a silently shorter list.",
+    "Provider payload and normalized evidence stay distinct fields of one append-only envelope, digested over a single canonical basis."
+  ],
+  "last_reviewed": "2026-09-17",
+  "may_read": [
+    "company/analytics/**",
+    "company/runtime/state_paths.py",
+    "knowledge/company_os/records.py",
+    "ai_platform/serde.py"
+  ],
+  "may_write": [
+    "company/youtube/**"
+  ],
+  "must_not_modify": [
+    "production/**",
+    "sloped/**",
+    "race2/**",
+    "tools/**"
+  ],
+  "outputs": [
+    "YouTubeArtifact: validated channel, video, interval-analytics and retrieval-completeness evidence parsed from one artifact file",
+    "ApiArtifactSource and interval MetricObservation records for the analytics ledger, both identified by content rather than by fetch",
+    "An append-only evidence envelope with one digest, and secret-free API call telemetry carried through from the fetch"
+  ],
+  "owner": "company-os",
+  "owns_paths": [
+    "company/youtube"
+  ],
+  "purpose": "Turns a sanitized YouTube API artifact, produced by an authenticated fetcher outside Company OS, into validated channel, video and interval analytics evidence, and bridges per-video readings into the analytics ledger by reading a file, never a network.",
+  "recheck_on": "2027-09-17",
+  "revalidation_reason": "",
+  "risks": [
+    "The artifact is only as good as the fetch that wrote it; a malformed or hand-edited file is rejected on validation, but a truthful-looking wrong one is not.",
+    "YouTube analytics can be delayed or revised, so a second pull of the same window surfaces as a conflict for a person to resolve, never a silent update.",
+    "Subscriber counts can be hidden or rounded by YouTube; that arrives as an unavailable reading with a reason rather than as a number.",
+    "The video-id to deliverable mapping is operator-supplied, so a wrong mapping attaches real readings to the wrong deliverable without any signal."
+  ],
+  "source": "company-os-v1-youtube-connectivity",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_youtube_connectivity.py",
+    "tests/test_company_youtube_live_findings.py"
+  ],
+  "title": "Network-free YouTube artifact ingestion",
+  "type": "module"
+}

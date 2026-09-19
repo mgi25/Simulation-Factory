@@ -1,0 +1,32 @@
+{
+  "autonomy_level": null,
+  "contract_fingerprint": "85476fa3d1b148bf",
+  "employee": "chief_architect",
+  "may_not_modify": [
+    "ai_platform/policy.py",
+    "company/agent_contract.schema.yaml",
+    "company/constitution.md",
+    "company/engineering",
+    "company/integration",
+    "company/integration/checks.py",
+    "company/integration/policy.py",
+    "company/integration/suites.py",
+    "company/org_registry.yaml",
+    "company/permissions.yaml",
+    "company/runtime",
+    "company/task_handoff.schema.yaml",
+    "company/validation/no_subagents.py",
+    "sloped",
+    "tests/test_company_engineering_execution.py",
+    "tools"
+  ],
+  "may_not_read": [],
+  "may_read": [],
+  "may_write": [],
+  "no_subagents": true,
+  "packet_attempt": 1,
+  "packet_fingerprint": "bc95dc5f5e2cf7af",
+  "source": "temporary_task_override",
+  "task_id": "wo-governance-drift-check-review",
+  "version": 1
+}

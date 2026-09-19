@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "git",
+    "push",
+    "--set-upstream",
+    "origin",
+    "eng-stage-timing"
+  ],
+  "cwd": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-company-os-runner-tasks\\eng-stage-timing",
+  "duration_s": 3.183,
+  "exit_code": 0,
+  "stderr": "remote: \nremote: Create a pull request for 'eng-stage-timing' on GitHub by visiting:        \nremote:      https://github.com/mgi25/Simulation-Factory/pull/new/eng-stage-timing        \nremote: \nTo https://github.com/mgi25/Simulation-Factory.git\n * [new branch]      eng-stage-timing -> eng-stage-timing\n",
+  "stdout_chars": 69,
+  "timed_out": false
+}

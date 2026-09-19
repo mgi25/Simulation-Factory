@@ -1,0 +1,251 @@
+{
+  "derivation": {
+    "authorized_paths": [
+      "company/engineering",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "ceiling_applied": [],
+    "criteria_derived": true,
+    "forbidden_paths": [
+      "company/constitution.md",
+      "company/integration",
+      "company/permissions.yaml",
+      "company/runtime",
+      "sloped",
+      "tools"
+    ],
+    "matched_tokens": [
+      "authorized",
+      "changed",
+      "check",
+      "engineering",
+      "files",
+      "find",
+      "governance",
+      "have",
+      "having",
+      "order",
+      "protected",
+      "review",
+      "since",
+      "time",
+      "whether",
+      "without"
+    ],
+    "owns_paths": [
+      "company/engineering",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "required_tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "selected_capsule_ids": [
+      "company-engineering-execution"
+    ],
+    "selection_reasons": [
+      "company-engineering-execution: owns company/engineering for task path company/engineering"
+    ],
+    "unscreened_reserved_actions": []
+  },
+  "outcome": "authorized",
+  "persisted": {
+    "job": {
+      "fingerprint": "92f5e4a307d7258a",
+      "record_ref": "engineering/jobs/wo-governance-drift-check-3e66f7617527/000001.json",
+      "sequence": 1
+    },
+    "plan": {
+      "fingerprint": "b40f2f26c0b13014",
+      "record_ref": "engineering/plans/wo-governance-drift-check-3e66f7617527/000001.json",
+      "sequence": 1
+    },
+    "request": {
+      "fingerprint": "35ffccc9d6a5ac43",
+      "record_ref": "engineering/requests/ceo-2026-09-18-governance-drift-f1c814f143bb/000001.json",
+      "sequence": 1
+    },
+    "work_order": {
+      "fingerprint": "6c1ce3643e5b86fc",
+      "record_ref": "engineering/work_orders/wo-governance-drift-check-3e66f7617527/000001.json",
+      "sequence": 1
+    }
+  },
+  "plan": {
+    "notes": [
+      "Derived deterministically from the work order; a developer may take a better route inside the same authorized scope."
+    ],
+    "proposed_by": "company-os intake",
+    "proposed_on": "2026-09-18",
+    "steps": [
+      {
+        "action": "Read the authorized paths and the capsule contract they belong to before changing anything: company/engineering, tests/test_company_engineering_execution.py",
+        "step_id": "inspect",
+        "touches": [
+          "company/engineering",
+          "tests/test_company_engineering_execution.py"
+        ],
+        "writes": false
+      },
+      {
+        "action": "Identify the smallest contract that the objective is missing, and state it before implementing it",
+        "step_id": "locate-contract",
+        "touches": [
+          "company/engineering",
+          "tests/test_company_engineering_execution.py"
+        ],
+        "writes": false
+      },
+      {
+        "action": "Implement the smallest compatible change inside the authorized paths",
+        "step_id": "implement",
+        "touches": [
+          "company/engineering",
+          "tests/test_company_engineering_execution.py"
+        ],
+        "writes": true
+      },
+      {
+        "action": "Write focused tests for the new behaviour and for each acceptance criterion",
+        "step_id": "test",
+        "touches": [
+          "company/engineering",
+          "tests/test_company_engineering_execution.py"
+        ],
+        "writes": true
+      },
+      {
+        "action": "Run the affected suites and report every result: tests/test_company_engineering_execution.py",
+        "step_id": "run-suites",
+        "touches": [
+          "tests/test_company_engineering_execution.py"
+        ],
+        "writes": false
+      },
+      {
+        "action": "Run the existing integration gate over the checkout and keep its report as evidence; do not modify the gate",
+        "step_id": "gate-evidence",
+        "touches": [],
+        "writes": false
+      },
+      {
+        "action": "Return a receipt naming the changed paths, the commit, the pushed branch and one evidence reference per acceptance criterion",
+        "step_id": "review-evidence",
+        "touches": [],
+        "writes": false
+      }
+    ],
+    "version": 1,
+    "work_order_fingerprint": "6c1ce3643e5b86fc",
+    "work_order_id": "wo-governance-drift-check"
+  },
+  "state": "planning",
+  "work_order": {
+    "acceptance_criteria": [
+      "The stated objective is implemented: Let me check at any time whether the protected governance files have changed since an engineering work order was authorized, without having to run a review to find out.",
+      "company-engineering-execution invariant still holds: The authorized work order is immutable; every later stage carries its fingerprint and refuses a mismatch.",
+      "company-engineering-execution invariant still holds: A review outcome is the worst of the attested and deterministic verdicts, so a reviewer PASS cannot rescue a failed check.",
+      "company-engineering-execution invariant still holds: The implementer and the reviewer are different employees, routed by disjoint capabilities.",
+      "company-engineering-execution invariant still holds: The protected governance surface is digested before the work and re-read at review; a change blocks the job.",
+      "company-engineering-execution invariant still holds: No state means approved and nothing merges, deploys or publishes; the CEO decision is recorded, not acted on.",
+      "company-engineering-execution invariant still holds: The gate verdict is read from the gate's own report; this subsystem holds no code that can produce one.",
+      "Every declared test passes: tests/test_company_engineering_execution.py"
+    ],
+    "authorized_branch": "eng-governance-drift-check",
+    "authorized_on": "2026-09-18",
+    "authorized_paths": [
+      "company/engineering",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "base_commit": "6b50b116c52e2fae5fc44a03ebcc2a5b0c358513",
+    "constraints": [],
+    "context_refs": [
+      {
+        "digest": "",
+        "kind": "module_contract",
+        "reason": "owns company/engineering for task path company/engineering",
+        "ref": "capsule:company-engineering-execution",
+        "span": null
+      },
+      {
+        "digest": "",
+        "kind": "test",
+        "reason": "declared test of the owning capsule",
+        "ref": "tests/test_company_engineering_execution.py",
+        "span": null
+      }
+    ],
+    "evidence_refs": [],
+    "evidence_required": true,
+    "forbidden_paths": [
+      "company/constitution.md",
+      "company/integration",
+      "company/permissions.yaml",
+      "company/runtime",
+      "sloped",
+      "tools"
+    ],
+    "implementation_capabilities": [
+      "software_implementation"
+    ],
+    "max_developer_attempts": 3,
+    "objective": "Let me check at any time whether the protected governance files have changed since an engineering work order was authorized, without having to run a review to find out.",
+    "protected": {
+      "entries": [
+        {
+          "digest": "ae5ddf1e644b7cfb",
+          "path": "ai_platform/policy.py"
+        },
+        {
+          "digest": "9fcf0d0a247f399f",
+          "path": "company/agent_contract.schema.yaml"
+        },
+        {
+          "digest": "2d2d1b113ad24120",
+          "path": "company/constitution.md"
+        },
+        {
+          "digest": "61323b6733ff903f",
+          "path": "company/integration/checks.py"
+        },
+        {
+          "digest": "038f13858cd70293",
+          "path": "company/integration/policy.py"
+        },
+        {
+          "digest": "a46792dc96a5e2b9",
+          "path": "company/integration/suites.py"
+        },
+        {
+          "digest": "82da65ecce649567",
+          "path": "company/org_registry.yaml"
+        },
+        {
+          "digest": "404c997d12af4812",
+          "path": "company/permissions.yaml"
+        },
+        {
+          "digest": "f450b38af19435e0",
+          "path": "company/task_handoff.schema.yaml"
+        },
+        {
+          "digest": "3e20803fabf596b4",
+          "path": "company/validation/no_subagents.py"
+        }
+      ]
+    },
+    "reasoning_class_ceiling": "D",
+    "repository": "Simulation Factory",
+    "request_id": "ceo-2026-09-18-governance-drift",
+    "requested_by": "MGI",
+    "required_tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "reversible": true,
+    "review_capability": "software_architecture",
+    "risk": "low",
+    "version": 1,
+    "work_order_id": "wo-governance-drift-check"
+  },
+  "work_order_fingerprint": "6c1ce3643e5b86fc",
+  "work_order_id": "wo-governance-drift-check"
+}

@@ -1,0 +1,40 @@
+{
+  "attested_outcome": "pass",
+  "deterministic_outcome": "pass",
+  "escalations": [],
+  "findings": [
+    {
+      "deterministic": false,
+      "evidence_ref": "company/engineering/verify.py",
+      "finding_id": "absolute-repo-root",
+      "severity": "advisory",
+      "summary": "report.repo_root holds root.as_posix(), an absolute local path. It is only printed today, but the field is on an exported record and a caller that persisted one would put a developer's filesystem layout into company state."
+    },
+    {
+      "deterministic": false,
+      "evidence_ref": "company/engineering/__init__.py",
+      "finding_id": "all-ordering",
+      "severity": "advisory",
+      "summary": "__all__ places DriftStatus between DeveloperBriefing and DeveloperResult, so the class group is no longer in order. Every other Company OS package keeps constants, classes and functions grouped and sorted within each group."
+    },
+    {
+      "deterministic": false,
+      "evidence_ref": "company/engineering/verify.py",
+      "finding_id": "no-decoder",
+      "severity": "advisory",
+      "summary": "GovernanceDriftReport has to_dict() and fingerprint() but no from_mapping, so a stored report cannot be read back. Nothing stores one today, which is consistent with the module writing nothing; the asymmetry is worth stating or closing before a caller persists one."
+    }
+  ],
+  "implementer": "software_implementation_engineer",
+  "outcome": "pass",
+  "packet_attempt": 1,
+  "packet_fingerprint": "2151d8654cee3405",
+  "receipt_fingerprint": "11fe48649dc7e949",
+  "review_id": "rev-governance-drift-001",
+  "reviewed_on": "2026-09-18",
+  "reviewer": "chief_architect",
+  "unanswered_criteria": [],
+  "version": 1,
+  "work_order_fingerprint": "6c1ce3643e5b86fc",
+  "work_order_id": "wo-governance-drift-check"
+}

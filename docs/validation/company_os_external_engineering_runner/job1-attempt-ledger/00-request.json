@@ -1,0 +1,11 @@
+{
+  "request_id": "ceo-2026-09-18-attempt-ledger",
+  "objective": "Show me, for one engineering job, every developer attempt that was made and what each one cost, so I can tell whether an automated run is converging or thrashing without reading the whole history.",
+  "requested_by": "MGI",
+  "requested_on": "2026-09-18",
+  "subsystem_hint": "company/engineering",
+  "authorized_branch": "eng-attempt-ledger",
+  "base_commit": "7ca7edd9153b633af25f99620f7860b09b806342",
+  "max_developer_attempts": 3,
+  "risk": "low"
+}
