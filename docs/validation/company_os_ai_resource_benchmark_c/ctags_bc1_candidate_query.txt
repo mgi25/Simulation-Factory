@@ -1,0 +1,17 @@
+_argument	godot/scripts/neon_scene.gd	/^func _argument(name: String) -> String:$/;"	m	line:650	typeref:typename:String
+_argument	godot/scripts/toy_scene.gd	/^func _argument(name: String) -> String:$/;"	m	line:402	typeref:typename:String
+_options	godot/scripts/course_scene.gd	/^func _options() -> Dictionary:$/;"	m	line:231	typeref:typename:Dictionary
+_options	godot/scripts/hero_scene.gd	/^func _options() -> Dictionary:$/;"	m	line:144	typeref:typename:Dictionary
+_options	godot/scripts/lab_scene.gd	/^func _options() -> Dictionary:$/;"	m	line:141	typeref:typename:Dictionary
+_options	godot/scripts/race2_scene.gd	/^func _options() -> Dictionary:$/;"	m	line:217	typeref:typename:Dictionary
+_options	godot/scripts/track_lab_scene.gd	/^func _options() -> Dictionary:$/;"	m	line:90	typeref:typename:Dictionary
+_parse	godot/scripts/world_kit_probe.gd	/^func _parse() -> Dictionary:$/;"	m	line:118	typeref:typename:Dictionary
+_parse_options	godot/scripts/course_render.gd	/^func _parse_options() -> Dictionary:$/;"	m	line:200	typeref:typename:Dictionary
+_parse_options	godot/scripts/hero_render.gd	/^func _parse_options() -> Dictionary:$/;"	m	line:199	typeref:typename:Dictionary
+_parse_options	godot/scripts/lab_render.gd	/^func _parse_options() -> Dictionary:$/;"	m	line:169	typeref:typename:Dictionary
+_parse_options	godot/scripts/marble3d_axis_check.gd	/^func _parse_options() -> Dictionary:$/;"	m	line:102	typeref:typename:Dictionary
+_parse_options	godot/scripts/marble3d_render.gd	/^func _parse_options() -> Dictionary:$/;"	m	line:212	typeref:typename:Dictionary
+_parse_options	godot/scripts/offline_render.gd	/^func _parse_options() -> Dictionary:$/;"	m	line:187	typeref:typename:Dictionary
+_parse_options	godot/scripts/race2_render.gd	/^func _parse_options() -> Dictionary:$/;"	m	line:269	typeref:typename:Dictionary
+_parse_options	godot/scripts/sloped_race_render.gd	/^func _parse_options() -> Dictionary:$/;"	m	line:270	typeref:typename:Dictionary
+_parse_options	godot/scripts/track_lab_render.gd	/^func _parse_options() -> Dictionary:$/;"	m	line:199	typeref:typename:Dictionary
