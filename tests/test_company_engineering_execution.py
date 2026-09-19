@@ -1841,6 +1841,46 @@ def test_developer_attempts_remaining_field_and_rendering(tmp_path):
     assert restored.developer_attempts_remaining == 1
 
 
+def test_developer_attempts_remaining_null_and_absent_cases(tmp_path):
+    """from_mapping treats a JSON-null value and an absent key identically (both -> None),
+    while an explicit 0 is distinguishable, and to_dict/from_mapping round-trips all four cases."""
+    order = _order(tmp_path)
+    job = EngineeringJob.open(order, on=DAY).advance(JobState.PLANNING, on=DAY, reason="planned")
+    base_result = EngineeringResult.build(order, job)
+
+    # Build a base mapping we can manipulate.
+    base_data = base_result.to_dict()
+
+    # Case 1: absent key -> None.
+    data_absent = {k: v for k, v in base_data.items() if k != "developer_attempts_remaining"}
+    assert "developer_attempts_remaining" not in data_absent
+    restored_absent = EngineeringResult.from_mapping(data_absent)
+    assert restored_absent.developer_attempts_remaining is None
+
+    # Case 2: explicit JSON null (the bug: previously raised TypeError) -> None.
+    data_null = {**base_data, "developer_attempts_remaining": None}
+    restored_null = EngineeringResult.from_mapping(data_null)
+    assert restored_null.developer_attempts_remaining is None
+
+    # Case 3: explicit 0 -> 0, distinguishable from None.
+    data_zero = {**base_data, "developer_attempts_remaining": 0}
+    restored_zero = EngineeringResult.from_mapping(data_zero)
+    assert restored_zero.developer_attempts_remaining == 0
+    assert restored_zero.developer_attempts_remaining is not None
+
+    # Null round-trip: None persists through to_dict (as JSON null) and back.
+    result_none = EngineeringResult.build(order, job)
+    # Patch the dict to simulate a persisted None.
+    patched = {**result_none.to_dict(), "developer_attempts_remaining": None}
+    assert EngineeringResult.from_mapping(patched).developer_attempts_remaining is None
+
+    # render_text shows 'unknown' for None and the integer for non-None.
+    page_none = restored_null.render_text()
+    assert "remaining: unknown" in page_none
+    page_zero = restored_zero.render_text()
+    assert "remaining: 0" in page_zero
+
+
 # --- 15. the CEO surface ------------------------------------------------
 
 
