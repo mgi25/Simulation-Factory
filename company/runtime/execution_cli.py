@@ -67,7 +67,12 @@ def add_parsers(subparsers: Any) -> None:
         "--authority-override-file",
         type=Path,
         default=None,
-        help="preparation-time JSON authority override; never accepted by expansion commands",
+        help=(
+            "preparation-time JSON authority override; never accepted by expansion "
+            "commands. This is also the only way a packet acquires write scope: the "
+            "canonical contract's may_write is empty, so every --allow path is refused "
+            "unless this file grants it"
+        ),
     )
 
     receipt = subparsers.add_parser(
