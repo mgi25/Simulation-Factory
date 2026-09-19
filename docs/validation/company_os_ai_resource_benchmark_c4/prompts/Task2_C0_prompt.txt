@@ -1,0 +1,11 @@
+Answer using exactly this structure and nothing more. Do not implement, edit, or propose a code change. Do not write an essay. Do not speculate about alternatives not present in the source.
+
+TASK ID: <1|2|3>
+ANSWER: <one or two sentence direct answer>
+FILES: <ordered list of repo-relative file paths you determined are required>
+SYMBOLS: <ordered list of `symbol_name (file:start-end)` entries>
+EVIDENCE: <one short sentence per file/symbol citing what you read that supports it>
+CONFIDENCE: <HIGH|MEDIUM|LOW>
+
+TASK ID: 2
+Five separate files in this repository -- godot/assets/marble_machine/course/course_env.gd, godot/assets/marble_machine/environment/environment_builder.gd, godot/assets/marble_machine/environment/environment_stage.gd, godot/assets/marble_machine/hero/hero_world.gd, and godot/assets/marble_machine/v2/v2_world.gd -- each define their own static func _polar(...), converting a bearing/radius description into a position. Identify: (a) the exact symbol, file, kind, and line span of each of the five definitions; (b) for each one, its parameter list, return type, and the exact formula it returns; (c) which of the five are identical to each other in signature, return type, and formula (module-scope constants and cosmetic parameter-name differences aside) and which are distinct, grouping them accordingly and naming what specifically makes each distinct one different. Do not include godot/assets/marble_machine/environment/environment_world.gd in your answer even though it also defines a _polar function -- it is out of scope for this task.

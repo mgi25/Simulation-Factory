@@ -1,0 +1,57 @@
+{
+  "spec_version": "1.0",
+  "benchmark": "C4 - Candidate Prioritization (tree-sitter only)",
+  "objective": "Should the Company OS productionize the lightweight tree-sitter GDScript navigation provider instead of continuing with built-in Read/Grep/Glob/Bash alone?",
+  "background": {
+    "c3_status": "company-os-resource-lab-benchmark-c3 @ dffee0ca375da745b8536c7f75272ba4d964d05e, closed INCONCLUSIVE. Did not productionize or reject either provider.",
+    "c3_evidence": {
+      "task_A": {"C0": 128484, "ctags": 78722, "ctags_pct": -38.7, "tree_sitter": 45073, "tree_sitter_pct": -64.9, "all_correct": true},
+      "task_B": {"C0": 43806, "ctags": 44407, "ctags_pct": 1.372, "tree_sitter": 44300, "tree_sitter_pct": 1.128, "all_correct": true}
+    },
+    "c4_scope": "tree-sitter is the ONLY provider candidate for C4 (candidate prioritization, not a retroactive C3 winner declaration). Ctags and Serena remain DEFERRED, out of scope.",
+    "conditions": "Two only: C0 (baseline) and C2 (tree-sitter). No C1/Ctags condition."
+  },
+  "scoring": {
+    "scale": ["CORRECT", "PARTIAL", "WRONG"],
+    "rubrics": "See ground_truth.json tasks.{1,2,3}.correctness_rubric for the full frozen CORRECT/PARTIAL/WRONG text per task.",
+    "scoring_method": "Deterministic comparison of each run's FILES/SYMBOLS/line-span/grouping fields against ground_truth.json, performed by the operator after all six official runs complete -- not by another model call.",
+    "reviewer_escalation": "If a task's two conditions score inconsistently in a way deterministic comparison cannot resolve, invoke exactly one independent reviewer session for that task only, given the same frozen ground truth. Never one reviewer per run."
+  },
+  "primary_resource_metric": {
+    "name": "context_load_tokens",
+    "formula": "input_tokens + cache_creation_input_tokens + cache_read_input_tokens",
+    "frozen_before_execution": true,
+    "note": "output_tokens is tracked separately as generation cost and is NOT part of the primary metric. This definition must not change after seeing results."
+  },
+  "resource_metrics": {
+    "correctness": ["CORRECT/PARTIAL/WRONG", "exact missing/incorrect fields if PARTIAL or WRONG"],
+    "resource": ["input_tokens", "output_tokens", "cache_creation_input_tokens", "cache_read_input_tokens", "context_load_tokens (primary)", "assistant_turns", "wall_time_seconds"],
+    "navigation": ["Read_count", "Grep_count", "Glob_count", "Bash_count", "treesitter_query_count", "files_read_count", "total_navigation_result_chars", "provider_relevance_for_C2"],
+    "isolation": ["model", "claude_code_version", "permission_mode", "service_tier", "prompt_sha256", "source_sha_or_git_HEAD", "session_id", "contamination_PASS_FAIL"],
+    "unavailable_field_policy": "Any field that cannot be reliably extracted from the transcript is recorded as the literal string \"UNAVAILABLE\" with a one-line reason, never estimated or interpolated."
+  },
+  "decision_rule": {
+    "frozen_before_execution": true,
+    "text": "Tree-sitter is eligible for productionization ONLY if ALL are true: 1. All 6 official runs are procedurally valid. 2. Baseline and tree-sitter conditions produce the same frozen correctness classification on every task, with NO correctness regression caused by tree-sitter. 3. Tree-sitter is actually invoked in every C2 run and its output is genuinely relevant to that task. 4. Aggregate context-load criterion: BASE_TOTAL = sum(context_load_tokens for T1/C0 + T2/C0 + T3/C0); TREE_TOTAL = sum(context_load_tokens for T1/C2 + T2/C2 + T3/C2); tree-sitter must reduce aggregate context load by at least 30%: (TREE_TOTAL - BASE_TOTAL) / BASE_TOTAL <= -0.30. 5. Per-task guardrail: no individual tree-sitter task may regress context_load_tokens by more than 15% versus its corresponding baseline. 6. Operational-overhead guardrail: across the 3 tasks in aggregate, tree-sitter assistant-turn count must not materially exceed baseline, provider/tool behavior must remain bounded, and navigation/tool-result characters must not exceed baseline aggregate by more than 25%. 7. No apparatus/infrastructure defect may materially affect an official result.",
+    "if_all_pass": "C4 conclusion = PRODUCTIONIZE_TREE_SITTER_FOR_GDSCRIPT_NAVIGATION",
+    "if_any_correctness_or_validity_criterion_fails": "C4 conclusion = DO_NOT_PRODUCTIONIZE_TREE_SITTER",
+    "if_savings_or_guardrails_fail": "C4 conclusion = DO_NOT_PRODUCTIONIZE_TREE_SITTER",
+    "no_task_D": true,
+    "no_contingency": true,
+    "no_mixed_result_state": "Unlike C3's mixed_result_handling (which activated a contingency Task C), C4 has no contingency task by design. The decision rule above is applied mechanically to whatever the 6 official runs produce.",
+    "do_not_force_a_winner": "A result is not adjusted after the fact. If the mechanical rule's output is DO_NOT_PRODUCTIONIZE_TREE_SITTER, that is reported as such, not softened."
+  },
+  "session_independence": {
+    "rule": "Each of the 6 C4 runs is a fresh, independent session/process (--no-session-persistence, no --resume/--continue) with no conversation memory carried from any other run. No prior run's answer, transcript, or score is ever supplied to a later run.",
+    "procedural_rule": "The benchmark prompt (with its condition-specific directive, for C2 only) must be the FIRST and only conversational user message in the session -- guaranteed structurally here because the full prompt text is passed as the -p argument itself, not typed into an interactive session. Any run that somehow deviates from this is INVALID_PROCEDURAL_CONTAMINATION and must be replaced with a fresh run, per the rerun policy in run_order.json."
+  },
+  "stop_conditions": [
+    "source tree changes between conditions (re-verify git blob hashes in source_fingerprints.json before and after each run)",
+    "a run process receives the C4 ground truth (grep the transcript for 'ground_truth.json', 'company_os_ai_resource_benchmark_c4', or the ground_truth.json sha256 as a leak check)",
+    "a C0 session calls treesitter_query (tool must be structurally absent -- --tools/--allowedTools do not include it for C0)",
+    "a C2 session completes with zero provider calls despite the forced-use directive -- this specific run is INVALID_DIRECTIVE_NOT_FOLLOWED and must be replaced, not silently accepted as evidence",
+    "Claude Code auto-updates away from 2.1.70 between runs",
+    "an infrastructure crash invalidates more than one run in the six-run set",
+    "any run uses a permission-bypass flag (--dangerously-skip-permissions, --allow-dangerously-skip-permissions, --permission-mode bypassPermissions) -- immediately invalidates that run; per the CEO brief, C4 must not use these under any circumstance, so this stop condition should never trigger"
+  ]
+}

@@ -1,0 +1,13 @@
+Answer using exactly this structure and nothing more. Do not implement, edit, or propose a code change. Do not write an essay. Do not speculate about alternatives not present in the source.
+
+TASK ID: <1|2|3>
+ANSWER: <one or two sentence direct answer>
+FILES: <ordered list of repo-relative file paths you determined are required>
+SYMBOLS: <ordered list of `symbol_name (file:start-end)` entries>
+EVIDENCE: <one short sentence per file/symbol citing what you read that supports it>
+CONFIDENCE: <HIGH|MEDIUM|LOW>
+
+TASK ID: 1
+Within godot/assets/marble_machine/course/course_modules.gd, the shuffle stage's pan and apron form one continuous sloped ramp, and more than one builder function in this file needs to know that ramp's height at an arbitrary station (a given z position along it) rather than at a fixed point. Identify: (a) the exact symbol that computes the ramp's height as a function of an arbitrary query position, (b) its kind, (c) its exact line span on this checkout, (d) the other symbol(s) in this file that call it, and (e) the smallest surrounding implementation body a change to how that height is computed would need to touch. Do not include trough_section, floor_section, or _cradle, which each return a fixed cross-section or offset rather than compute a height at an arbitrary query position.
+
+Before using Grep, Read, or Bash to locate the answer, you MUST invoke treesitter_query at least once with the most relevant query you can formulate for this task. After that provider call, use the built-in read-only tools as needed to complete and verify your answer. Do not skip the provider call.

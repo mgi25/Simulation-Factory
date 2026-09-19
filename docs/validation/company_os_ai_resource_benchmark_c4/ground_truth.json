@@ -1,0 +1,115 @@
+{
+  "spec_version": "1.0",
+  "isolation_note": "This file is committed to the repo (unlike C2/C3, which kept ground truth entirely outside git) but is unreachable from any official run: every condition's --tools/--allowedTools restricts built-ins to Read,Grep,Glob,Bash[,treesitter_query] with no path-scoping needed, because official runs execute in dedicated per-run worktrees (see run directories under C:\\Users\\mgial\\.benchmark-c4\\runs\\) that are separate checkouts -- the operator can additionally verify no run session's transcript ever greps for this file's path or its sha256 as a leak check, per stop_conditions in experiment.json. Verified directly against the source on the frozen branch tip; independently cross-checked against the pre-built treesitter_cache.json (built from byte-identical godot/ content) and found to match exactly on every field.",
+  "tasks": {
+    "1": {
+      "type": "large_file_structural_navigation",
+      "target_file": "godot/assets/marble_machine/course/course_modules.gd",
+      "required_symbol": "_apron_y",
+      "kind": "static func (tree-sitter cache reports GDScript kind as \"method\")",
+      "line_span": "264-278",
+      "signature": "static func _apron_y(contract: Dictionary, z: float) -> float:",
+      "callers_in_file": ["_shuffle_pan (call site at line 298, the only in-file caller)"],
+      "smallest_body_a_change_would_touch": "_apron_y itself, lines 264-278; _shuffle_pan only calls it and needs no change to how the height is computed",
+      "distractors_to_exclude": {
+        "trough_section": "line 532 -- returns a fixed Array of cross-section points for a half-width, not a height at an arbitrary query position",
+        "floor_section": "line 553 -- same shape as trough_section, a fixed cross-section, not a query-position height function",
+        "_cradle": "line 567 -- static func _cradle(x: float, half: float) -> float:, a horizontal (x-axis) offset helper for a different geometry (the trough), not the ramp height at a z-station"
+      },
+      "correctness_rubric": {
+        "CORRECT": "Names _apron_y (course_modules.gd:264-278) as the height-at-a-station function, correctly identifies _shuffle_pan as its only in-file caller, and does not name trough_section, floor_section, or _cradle as the answer.",
+        "PARTIAL": "Correctly names _apron_y but omits the caller, or a line span is outside a 2-line tolerance, or omits part (e).",
+        "WRONG": "Names trough_section, floor_section, _cradle, or any other symbol as the height-at-a-station function, or fabricates a caller relationship not present in the source."
+      },
+      "verification_commands": [
+        "grep -n \"static func _apron_y\" godot/assets/marble_machine/course/course_modules.gd  -> 264:static func _apron_y(contract: Dictionary, z: float) -> float:",
+        "grep -n \"_apron_y(\" godot/assets/marble_machine/course/course_modules.gd  -> lines 264 (def) and 298 (only call site, inside _shuffle_pan)",
+        "sed -n '264,278p' godot/assets/marble_machine/course/course_modules.gd  -> confirms exact 15-line body ending at the return statement on line 278",
+        "python treesitter cache lookup: cache['by_file']['godot/assets/marble_machine/course/course_modules.gd'] contains {'name': '_apron_y', 'kind': 'method', 'start_line': 264, 'end_line': 278} -- exact independent match"
+      ]
+    },
+    "2": {
+      "type": "same_name_definition_lookup_and_body_comparison",
+      "target_symbol": "_polar, defined independently in the 5 named files (a 6th definition exists in environment_world.gd, out of scope by explicit task instruction since that file was already used as C3's Task A target)",
+      "definitions": [
+        {
+          "file": "godot/assets/marble_machine/course/course_env.gd",
+          "line_span": "827-830",
+          "signature": "static func _polar(bearing: float, radius: float, y: float) -> Vector3:",
+          "formula": "angle = deg_to_rad(bearing); return Vector3(sin(angle) * radius, y, cos(angle) * radius)",
+          "group": "IDENTICAL_GROUP_A"
+        },
+        {
+          "file": "godot/assets/marble_machine/environment/environment_builder.gd",
+          "line_span": "51-53",
+          "signature": "static func _polar(bearing: float, radius: float, y: float) -> Vector3:",
+          "formula": "angle = deg_to_rad(bearing); return Vector3(sin(angle) * radius, y, cos(angle) * radius)",
+          "group": "IDENTICAL_GROUP_A"
+        },
+        {
+          "file": "godot/assets/marble_machine/v2/v2_world.gd",
+          "line_span": "131-133",
+          "signature": "static func _polar(bearing_degrees: float, radius: float, y: float) -> Vector3:",
+          "formula": "angle = deg_to_rad(bearing_degrees); return Vector3(sin(angle) * radius, y, cos(angle) * radius)",
+          "group": "IDENTICAL_GROUP_A",
+          "note": "Parameter renamed bearing->bearing_degrees but the formula and return type are otherwise identical to Group A; the task's own instruction says cosmetic parameter-name differences don't break the grouping."
+        },
+        {
+          "file": "godot/assets/marble_machine/hero/hero_world.gd",
+          "line_span": "155-157",
+          "signature": "static func _polar(bearing_degrees: float, radius: float, y: float) -> Vector3:",
+          "formula": "angle = deg_to_rad(bearing_degrees + BEARING_SHIFT); return Vector3(sin(angle) * radius, y, cos(angle) * radius)",
+          "group": "DISTINCT_B",
+          "why_distinct": "Adds a BEARING_SHIFT offset to the angle before conversion -- the same signature and return type as Group A, but a different formula."
+        },
+        {
+          "file": "godot/assets/marble_machine/environment/environment_stage.gd",
+          "line_span": "101-109",
+          "signature": "static func _polar(centre_x: float, centre_z: float, bearing: float, radius: float) -> Vector2:",
+          "formula": "angle = deg_to_rad(bearing); return Vector2(centre_x + sin(angle) * radius, centre_z + cos(angle) * radius)",
+          "group": "DISTINCT_C",
+          "why_distinct": "Different signature entirely (4 params, not 3), different return type (Vector2, not Vector3), computes a position relative to an explicit centre rather than the world origin."
+        }
+      ],
+      "grouping_summary": "course_env.gd + environment_builder.gd + v2_world.gd are identical in signature/return-type/formula (cosmetic param-name aside). hero_world.gd shares the signature/return type but differs in formula (BEARING_SHIFT). environment_stage.gd differs in signature, return type, and formula.",
+      "correctness_rubric": {
+        "CORRECT": "All 5 definitions present with correct file/kind/span/formula; Group A (course_env.gd, environment_builder.gd, v2_world.gd) correctly grouped as identical; hero_world.gd and environment_stage.gd each correctly identified as distinct with the specific reason why; environment_world.gd not included.",
+        "PARTIAL": "4 of 5 definitions correct, or the grouping is incomplete (e.g. hero_world.gd merged into Group A), with no distractor fabricated.",
+        "WRONG": "environment_world.gd included as one of the required 5, a required definition missing entirely alongside another defect, or a formula fabricated/misquoted from a different file."
+      },
+      "verification_commands": [
+        "grep -rn \"static func _polar\" godot/ -> 6 hits (the 5 in-scope files plus environment_world.gd:284)",
+        "sed -n '827,830p' .../course_env.gd; sed -n '51,53p' .../environment_builder.gd; sed -n '131,133p' .../v2_world.gd -> byte-identical formula line, only param name differs in v2_world.gd",
+        "sed -n '155,157p' .../hero_world.gd -> confirms 'bearing_degrees + BEARING_SHIFT' as the sole formula difference from Group A",
+        "sed -n '101,109p' .../environment_stage.gd -> confirms 4-param signature and Vector2 return, distinct from all others",
+        "python treesitter cache lookup: cache['by_name']['_polar'] returns exactly these 6 (file, start_line, end_line) tuples, matching hand verification exactly"
+      ]
+    },
+    "3": {
+      "type": "ordinary_grep_friendly_navigation",
+      "target_file": "godot/scripts/world_kit_probe.gd",
+      "required_symbol": "_environment",
+      "kind": "func (instance method)",
+      "line_span": "108-110",
+      "signature": "func _environment() -> Environment:",
+      "body": "var profile := Profiles.resolve(\"aurora_valley_v25b\", \"v21\"); return Builder.environment(profile, false)",
+      "uniqueness": "The only function named _environment in the entire godot/ tree (verified: grep -rn \"^func _environment\\|^static func _environment\" godot/ returns exactly one hit).",
+      "distractors_to_exclude": {
+        "_layer": "line 101 -- only reassigns VisualInstance3D render layers recursively",
+        "_lights": "line 113 -- only calls Builder.lights(root, profile)",
+        "_parse": "line 118 -- only parses OS.get_cmdline_user_args() into a Dictionary"
+      },
+      "correctness_rubric": {
+        "CORRECT": "Names _environment (world_kit_probe.gd:108-110) and does not name _layer, _lights, or _parse.",
+        "PARTIAL": "Names _environment but the line span is outside a 1-line tolerance.",
+        "WRONG": "Names _layer, _lights, _parse, or any other symbol as the answer."
+      },
+      "verification_commands": [
+        "grep -n \"^func _environment\\|^static func _environment\" godot/scripts/world_kit_probe.gd -> 108:func _environment() -> Environment:",
+        "grep -rln \"^func _environment\\b\" godot/ -> exactly one file (world_kit_probe.gd), confirming this is the intentionally grep-friendly case",
+        "sed -n '107,111p' godot/scripts/world_kit_probe.gd -> confirms the 3-line body and the blank lines bounding it on both sides",
+        "python treesitter cache lookup: cache['by_file']['godot/scripts/world_kit_probe.gd'] contains {'name': '_environment', 'kind': 'method', 'start_line': 108, 'end_line': 110} -- exact independent match"
+      ]
+    }
+  }
+}

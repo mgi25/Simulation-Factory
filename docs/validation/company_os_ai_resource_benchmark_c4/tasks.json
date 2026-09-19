@@ -1,0 +1,70 @@
+{
+  "spec_version": "1.0",
+  "benchmark": "C4 - Candidate Prioritization (tree-sitter only, two conditions)",
+  "parent_commit": "dffee0ca375da745b8536c7f75272ba4d964d05e",
+  "base_sha_note": "Branched directly from company-os-resource-lab-benchmark-c3's closure commit. godot/ is byte-identical to f2116a5 (verified in source_fingerprints.json), the same content Benchmark C2/C3 already validated -- no production or godot/ file differs.",
+  "not_reused_from_c2_or_c3": "None of the 3 tasks below reuse a file or symbol that was an actual measured C2 or C3 task target: excluded neon_scene.gd/race_scene.gd (C2 T2, --race-elevation), lab_palette.gd (C2 T3), environment_world.gd (C3 Task A), hero_bowl.gd/hero_collector.gd/hero_finish.gd/v2_bowl.gd/hero_machine.gd/v2_machine.gd (C3 Task B), course_scene.gd::_options (original Benchmark C). Task C's draft target (course_machine.gd) and its unverified referencing-file list were never measured (PREPARED, NOT SCHEDULED) and are also not reused as a target here, though 2 of that list's files were confirmed absent from this task set by direct check.",
+  "common_instructions": "Answer using exactly this structure and nothing more. Do not implement, edit, or propose a code change. Do not write an essay. Do not speculate about alternatives not present in the source.\n\nTASK ID: <1|2|3>\nANSWER: <one or two sentence direct answer>\nFILES: <ordered list of repo-relative file paths you determined are required>\nSYMBOLS: <ordered list of `symbol_name (file:start-end)` entries>\nEVIDENCE: <one short sentence per file/symbol citing what you read that supports it>\nCONFIDENCE: <HIGH|MEDIUM|LOW>",
+  "forced_use_directive_c2_treesitter": "Before using Grep, Read, or Bash to locate the answer, you MUST invoke treesitter_query at least once with the most relevant query you can formulate for this task. After that provider call, use the built-in read-only tools as needed to complete and verify your answer. Do not skip the provider call.",
+  "directive_placement": "Appended as a final paragraph after the task question, for C2 prompts only. C0's prompt is common_instructions + TASK ID + question, with no directive appended -- the base task text is byte-identical between C0 and C2 (verified via diff, see prompt_hashes.json).",
+  "directive_neutrality_note": "The directive requires provider USE, not a particular provider ANSWER or query content -- the model chooses its own query wording. Ground truth is not exposed anywhere in the directive or the task text.",
+  "tasks": [
+    {
+      "id": "1",
+      "type": "STRUCTURAL_LOCALIZATION",
+      "target_file": "godot/assets/marble_machine/course/course_modules.gd",
+      "question": "Within godot/assets/marble_machine/course/course_modules.gd, the shuffle stage's pan and apron form one continuous sloped ramp, and more than one builder function in this file needs to know that ramp's height at an arbitrary station (a given z position along it) rather than at a fixed point. Identify: (a) the exact symbol that computes the ramp's height as a function of an arbitrary query position, (b) its kind, (c) its exact line span on this checkout, (d) the other symbol(s) in this file that call it, and (e) the smallest surrounding implementation body a change to how that height is computed would need to touch. Do not include trough_section, floor_section, or _cradle, which each return a fixed cross-section or offset rather than compute a height at an arbitrary query position.",
+      "answerable_read_only": true,
+      "why_tests_provider_utility": "course_modules.gd is 1070 lines with 24 top-level functions, several sharing a 'shuffle_*' or '*_section' naming family. A structural symbol index answers 'what functions exist in this file and where' in one bounded symbols_in_file or find_definition call; Grep needs a pattern guess and Read needs to page a 1070-line file to disambiguate _apron_y from its three named-alike/thematically-alike neighbours.",
+      "why_not_favoring_only_treesitter": "The target symbol name (_apron_y) is distinctive and has only 2 occurrences in the whole file (its definition and its one call site), so a single well-aimed Grep also resolves this quickly -- this task is a moderate case, not designed to be uniquely hard for baseline."
+    },
+    {
+      "id": "2",
+      "type": "MULTI_DEFINITION_COMPARISON",
+      "target_symbol": "_polar(...), defined independently in 5 named files",
+      "question": "Five separate files in this repository -- godot/assets/marble_machine/course/course_env.gd, godot/assets/marble_machine/environment/environment_builder.gd, godot/assets/marble_machine/environment/environment_stage.gd, godot/assets/marble_machine/hero/hero_world.gd, and godot/assets/marble_machine/v2/v2_world.gd -- each define their own static func _polar(...), converting a bearing/radius description into a position. Identify: (a) the exact symbol, file, kind, and line span of each of the five definitions; (b) for each one, its parameter list, return type, and the exact formula it returns; (c) which of the five are identical to each other in signature, return type, and formula (module-scope constants and cosmetic parameter-name differences aside) and which are distinct, grouping them accordingly and naming what specifically makes each distinct one different. Do not include godot/assets/marble_machine/environment/environment_world.gd in your answer even though it also defines a _polar function -- it is out of scope for this task.",
+      "answerable_read_only": true,
+      "why_tests_provider_utility": "A single find_definition('_polar') call on tree-sitter returns all 6 definition sites (including the explicitly out-of-scope 6th) with file+span+body in one bounded call -- confirmed live in the Phase 7 apparatus smoke test. Solving part (c) rewards body-level formula comparison, which tree-sitter's with_body option provides directly; a baseline session must Grep once for the symbol name, then Read each of the 5 (6 with the distractor) files' matched line ranges individually to compare formulas.",
+      "why_not_favoring_only_treesitter": "action_clearance-shaped tasks are exactly what C3's Task B already tested; unlike Task 1, this task explicitly avoids caller/reference-graph capability that no provider has (Checkpoint B's finding, unchanged in C4) -- the 5 candidate files and their _polar are named directly in the question, matching C3 Task B's own scoping style rather than requiring open-ended repo search."
+    },
+    {
+      "id": "3",
+      "type": "ORDINARY_GREP_FRIENDLY_NAVIGATION",
+      "target_file": "godot/scripts/world_kit_probe.gd",
+      "question": "Within godot/scripts/world_kit_probe.gd, identify the exact function that builds and returns the Environment resource used when this probe renders, its kind, and its exact line span on this checkout. Do not include _layer (which only reassigns visual-instance render layers), _lights (which only applies lighting to a root node), or _parse (which only parses command-line arguments).",
+      "answerable_read_only": true,
+      "why_this_is_the_easy_case": "world_kit_probe.gd is 130 lines with 5 functions; _environment is the only function in the entire godot/ tree with that name (verified: exactly 1 grep hit repo-wide). A single Grep or even a Read of this small file resolves the task immediately. This task intentionally tests whether the tree-sitter provider adds unnecessary tool-call/token overhead on work built-ins already handle efficiently -- the C4 decision rule's operational-overhead guardrail (experiment.json) exists specifically because of this task."
+    }
+  ],
+  "condition_policies": {
+    "C0": {
+      "description": "Baseline. No candidate provider.",
+      "tools_allowed": ["Read", "Grep", "Glob", "Bash"],
+      "tools_denied": ["Edit", "Write", "TodoWrite", "Task", "Agent", "WebSearch", "WebFetch", "treesitter_query"],
+      "mcp_config": "empty ({\"mcpServers\":{}})",
+      "directive": "none"
+    },
+    "C2": {
+      "description": "tree-sitter, provider use REQUIRED by directive.",
+      "tools_allowed": ["Read", "Grep", "Glob", "Bash", "treesitter_query"],
+      "tools_denied": ["Edit", "Write", "TodoWrite", "Task", "Agent", "WebSearch", "WebFetch"],
+      "mcp_config": "treesitter_query only, --strict-mcp-config",
+      "directive": "forced_use_directive_c2_treesitter, appended to the task prompt"
+    },
+    "universal_denials": {
+      "all_conditions": ["docs/validation/company_os_ai_resource_benchmark_c4/", "any path under C:\\Users\\mgial\\.benchmark-c4\\"],
+      "reason": "Ground-truth isolation, identical design intent to Benchmark C2/C3. Every official run executes in a dedicated per-run worktree/session path (see run_order.json), not the annotated wt-company-os-benchmark-c4 dev checkout, so the run process has no path proximity to ground_truth.json; the operator additionally greps each run's transcript for the ground-truth path and its sha256 as a leak check per experiment.json stop_conditions."
+    }
+  },
+  "model_configuration": {
+    "model": "claude-sonnet-5 (explicit, not the mutable 'sonnet' alias)",
+    "effort": "default (no --effort override on any run)",
+    "claude_code_version": "2.1.70 exactly, held via DISABLE_AUTOUPDATER=1 and DISABLE_UPDATES=1",
+    "permission_mode": "default (validated non-interactive via --allowedTools; no bypass of any kind -- see execution_policy.json)",
+    "setting_sources": "project,local (excludes user)",
+    "memory_isolation": "CLAUDE_CODE_DISABLE_CLAUDE_MDS=1",
+    "execution_mode": "non-interactive via -p, prompt as the first and only conversational message, fresh session per run, no --resume/--continue",
+    "developer_attempts_per_condition": 1,
+    "subagents": "none; Agent/Task tool denied to every condition"
+  }
+}

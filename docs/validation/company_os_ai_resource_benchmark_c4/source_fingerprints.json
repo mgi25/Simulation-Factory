@@ -1,0 +1,22 @@
+{
+  "spec_version": "1.0",
+  "note": "git blob SHA-1 of every source file a C4 task question depends on, captured at the frozen branch tip before any live run. Re-verify each of these against the run worktree immediately before and after every official run; any mismatch is a stop condition (source tree changed mid-benchmark).",
+  "branch": "company-os-resource-lab-benchmark-c4",
+  "branch_tip_at_freeze": "the commit that introduces this file (git log will show it directly; not self-referenced here to avoid a placeholder no commit can satisfy)",
+  "parent_sha": "dffee0ca375da745b8536c7f75272ba4d964d05e",
+  "blobs": {
+    "godot/assets/marble_machine/course/course_modules.gd": "28e4fc53ee6031d37213b6eabfb15ff34fc6e3e9",
+    "godot/assets/marble_machine/course/course_env.gd": "6eff5f22d500ed9d38e386e9aececa348fee4e4d",
+    "godot/assets/marble_machine/environment/environment_builder.gd": "0598db77b18074673ed9b5473e55bea42fdcf6f7",
+    "godot/assets/marble_machine/environment/environment_stage.gd": "e2876e2d0d5cea113b1002aca2aae009d09d6631",
+    "godot/assets/marble_machine/hero/hero_world.gd": "21932159342758a7327f3c85cda66da3abe259b1",
+    "godot/assets/marble_machine/v2/v2_world.gd": "71cfa02030a7a2aca722a9e9344bdce1f525e210",
+    "godot/scripts/world_kit_probe.gd": "ac2fd3ab559c0b8237f9dcf6a83b446abafda512"
+  },
+  "godot_dir_unchanged_since": {
+    "reference_sha": "f2116a5fdaf0f5150753b36cb525f94e1c62b1f2",
+    "verification_command": "git diff --stat f2116a5fdaf0f5150753b36cb525f94e1c62b1f2 HEAD -- godot/",
+    "result": "empty (no godot/ file differs)",
+    "significance": "Task source content is identical to what Benchmark C2/C3 already validated as the clean pre-fix baseline. The pre-built treesitter_cache.json at C:\\Users\\mgial\\.benchmark-c2\\mcp\\ (built from this same godot/ tree) is reused for C4 rather than rebuilt from scratch; a fresh build_cache.py run is used only to reconfirm it, not to produce a different index."
+  }
+}

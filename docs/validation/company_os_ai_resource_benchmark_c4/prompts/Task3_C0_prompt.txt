@@ -1,0 +1,11 @@
+Answer using exactly this structure and nothing more. Do not implement, edit, or propose a code change. Do not write an essay. Do not speculate about alternatives not present in the source.
+
+TASK ID: <1|2|3>
+ANSWER: <one or two sentence direct answer>
+FILES: <ordered list of repo-relative file paths you determined are required>
+SYMBOLS: <ordered list of `symbol_name (file:start-end)` entries>
+EVIDENCE: <one short sentence per file/symbol citing what you read that supports it>
+CONFIDENCE: <HIGH|MEDIUM|LOW>
+
+TASK ID: 3
+Within godot/scripts/world_kit_probe.gd, identify the exact function that builds and returns the Environment resource used when this probe renders, its kind, and its exact line span on this checkout. Do not include _layer (which only reassigns visual-instance render layers), _lights (which only applies lighting to a root node), or _parse (which only parses command-line arguments).

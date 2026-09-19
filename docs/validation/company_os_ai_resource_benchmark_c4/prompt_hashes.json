@@ -1,0 +1,12 @@
+{
+  "spec_version": "1.0",
+  "note": "SHA-256 of each committed prompt file under prompts/. Base question text is byte-identical between C0 and C2 for each task; only C2 carries the appended forced-use directive. Verified via `diff` before this file was written -- the only delta per task is the directive paragraph.",
+  "hashes": {
+    "Task1_C0_prompt.txt": "11038a42c9cac6d7127f3a3167d4b6f287e6e7d3ee343681362fafcdfe0958a6",
+    "Task1_C2_prompt.txt": "6ffba11c55cf282ad41f7724f376e6f8aab5be867b60abf41e8b036d95a88e50",
+    "Task2_C0_prompt.txt": "ec7275c5f6a5615548023dbb7e92ecb2ac64d004e8194471617f26fff6794a86",
+    "Task2_C2_prompt.txt": "58df1d4fe80bf10b5f1729dd8a35cbc845c8c3d8837e66bb0565e77d00724cc2",
+    "Task3_C0_prompt.txt": "bbf783897d3c166d9edca885306b2d25412bf37a77e3ccab86fe6a536445597a",
+    "Task3_C2_prompt.txt": "ca14542058cfd56d8f73a37eefce5fe504eb0a5d4c700cd8ad71cb0e784c7f3e"
+  }
+}

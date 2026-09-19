@@ -1,0 +1,51 @@
+{
+  "spec_version": "1.0",
+  "environment_freeze": {
+    "claude_code_version": "2.1.70 exactly",
+    "model": "claude-sonnet-5 (explicit, not the mutable 'sonnet' alias)",
+    "service_tier": "standard",
+    "effort_override": "none (no --effort flag on any run)",
+    "permission_mode": "default (no bypass of any kind)",
+    "env": {
+      "CLAUDE_CODE_DISABLE_CLAUDE_MDS": "1",
+      "DISABLE_AUTOUPDATER": "1",
+      "DISABLE_UPDATES": "1"
+    },
+    "setting_sources": "project,local",
+    "built_ins": "restricted to Read,Grep,Glob,Bash via --tools on every run",
+    "mcp": "--strict-mcp-config on every run; C0 uses {\"mcpServers\":{}}, C2 uses treesitter_query only",
+    "no_agent_or_subagent_tools": "Task/Agent explicitly in --disallowedTools on every run",
+    "no_edit_write_todowrite": "Edit,Write,TodoWrite explicitly in --disallowedTools on every run",
+    "no_websearch_webfetch": "WebSearch,WebFetch explicitly in --disallowedTools on every run",
+    "no_claude_md_or_rtk": "CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 plus --setting-sources project,local (excludes user-level CLAUDE.md/RTK hook config)",
+    "fresh_session_per_run": "--no-session-persistence, new run directory per official run, no --resume/--continue",
+    "prompt_as_first_message": "the committed prompt file's full text is passed as the -p argument itself, so it is necessarily the first and only conversational user message"
+  },
+  "harness_smoke_test": {
+    "goal": "Determine whether Claude Code 2.1.70 can execute a fresh read-only tool-using session non-interactively via -p under --permission-mode default when the exact required tools are explicitly preapproved, without any bypass flag.",
+    "method": "tools/benchmark_c4/run_condition.py invoked directly (not via the official run_all_c4.ps1 path) against a disposable, non-benchmark smoke directory and, for one probe, the real C4 worktree read-only.",
+    "runs": [
+      {
+        "purpose": "baseline-shaped: --permission-mode default, --tools/--allowedTools Read,Bash, empty --mcp-config, --strict-mcp-config",
+        "result": "exit=0, wall_s=12.33, result=\"SMOKE_OK\", permission_denials=[], service_tier=standard",
+        "verdict": "PASS -- default permission mode with --allowedTools does not hang or prompt interactively"
+      },
+      {
+        "purpose": "denial-boundary: --tools Read,Grep,Glob,Bash (no Write), asked the model to try Write anyway",
+        "result": "exit=0, wall_s=7.23, result=\"WRITE_RESULT=UNAVAILABLE\", file not created, permission_denials=[]",
+        "verdict": "PASS -- --tools genuinely removes Write from the surface (tool unavailable, not merely denied-with-prompt); nothing broader than the named read-only tools was silently granted"
+      },
+      {
+        "purpose": "MCP-shaped: --strict-mcp-config with treesitter_mcp_config.json (treesitter_query only), --allowedTools includes mcp__treesitter_query__treesitter_query, real C4 worktree as cwd (read-only ask)",
+        "result": "exit=0, wall_s=11.02, result=\"TREESITTER_RESULT=godot/assets/marble_machine/course/course_modules.gd:264-278:method:_apron_y\" (matches verified ground truth exactly), permission_denials=[]",
+        "verdict": "PASS -- the provider tool launches under --strict-mcp-config, is callable under default permission mode via --allowedTools, and returns genuinely relevant, correct output; no bypass flag was used"
+      }
+    ],
+    "conclusion": "--allowedTools under --permission-mode default (a) preapproves exactly the named tools, (b) does not broaden the available tool surface beyond --tools' restriction, (c) leaves --strict-mcp-config's MCP isolation intact, and (d) requires no bypassPermissions/dangerously-skip-permissions. Validated and frozen before any official run, per Phase 7's condition for using this harness.",
+    "never_used": ["--dangerously-skip-permissions", "--allow-dangerously-skip-permissions", "--permission-mode bypassPermissions", "any equivalent bypass"]
+  },
+  "nested_session_safety": {
+    "mechanism": "tools/engineering_runner/redaction.child_environment(), an existing reviewed allowlist utility already used by tools/benchmark_c2 and tools/benchmark_c3 for the same purpose: forwarding only a small named-variable allowlist (plus PYTHONIOENCODING=utf-8) to the child process so the orchestrating (this) session's own credentials, session markers, and nested-session detection do not leak into or confuse the spawned official-run session.",
+    "reused_unmodified": true
+  }
+}
