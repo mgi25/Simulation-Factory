@@ -10,8 +10,31 @@ pictures came from.
 
 Two files come out, because overlays and sound are separable decisions:
 
-    real_race_v20.mp4          the Short: overlays, audio
-    real_race_v20_visual.mp4   the same picture with no audio track
+    real_race_v21.mp4          the Short: overlays, audio
+    real_race_v21_visual.mp4   the same picture with no audio track
+
+## V21.1: the start pass
+
+V20 spent 4.02 s of its 19.87 inside the start mechanism and did not put the
+field on the downhill until 4.98 s. A viewer who has already chosen a marble by
+0.7 s then has nothing to watch for four seconds, which is where a Short loses
+them.
+
+V21.1 takes a further **85 whole frames** out of the middle of the start shot -
+the only honest way a master that is already rendered can omit more time - and
+V20's two start windows become one:
+
+    output 0.00-0.70  the held first frame, PICK ONE
+    output 0.70-1.50  replay 0.200-1.000: the gates open at 0.817 and the
+                      eight pour out of their bays and tumble together
+    output 1.50       the cut, 4.833 s of drum omitted, one whoosh
+    output 1.50-2.60  replay 5.833-7.620: the settled field, the floor drops
+                      at 1.80, and they are away down the mountain
+
+Nothing is sped up or slowed down, nothing is interpolated, no frame repeats and
+no frame runs backwards - `presentation.omit_frames` refuses a cut that does not
+step forwards, and `tests/test_sloped_retention.py` pins the rest.
+`--edition v20` still builds V20 from the same master.
 
 Stages:
 
@@ -51,8 +74,30 @@ from sloped import overlays, presentation
 OUT_DIR = os.path.join("output", "sloped_race_v1")
 WORK_DIR = os.path.join(OUT_DIR, "short")
 MASTER = os.path.join(OUT_DIR, "real_race_v19.mp4")
-VIDEO = os.path.join(OUT_DIR, "real_race_v20.mp4")
-VISUAL = os.path.join(OUT_DIR, "real_race_v20_visual.mp4")
+
+# --- the editions -----------------------------------------------------------
+#
+# One machine, one locked master, two cuts of it. V20 keeps every frame; V21.1
+# drops master frames 49 to 133 inclusive - the tail of the drum in the first
+# start window and the head of the second - so the join is master frame 48
+# (replay 1.000) to master frame 134 (replay 5.833333) on the same lens, and
+# everything after it lands 85 frames earlier.
+
+EDITIONS: dict[str, dict[str, Any]] = {
+    "v20": {
+        "cuts": (),
+        "video": os.path.join(OUT_DIR, "real_race_v20.mp4"),
+        "visual": os.path.join(OUT_DIR, "real_race_v20_visual.mp4"),
+        "runtime": (19.8, 20.2),
+    },
+    "v21": {
+        "cuts": ((49, 133),),
+        "video": os.path.join(OUT_DIR, "real_race_v21.mp4"),
+        "visual": os.path.join(OUT_DIR, "real_race_v21_visual.mp4"),
+        "runtime": (18.2, 18.7),
+    },
+}
+DEFAULT_EDITION = "v21"
 
 WIDTH, HEIGHT, FPS = 1080, 1920, 60
 VIDEO_CRF = 17
@@ -114,23 +159,48 @@ def master_frames(path: str) -> int:
     raise ShortError(f"{path} has no video stream")
 
 
-def load_all(seed: int):
+def load_all(seed: int, edition: str = DEFAULT_EDITION):
+    """The replay, the camera track, the clock, and the master frames to keep.
+
+    The clock is the one the finished file runs on, so every cue and every mark
+    is placed through this edition's own map rather than V19's.
+    """
+    if edition not in EDITIONS:
+        raise ShortError(f"no such edition: {edition!r}; try {sorted(EDITIONS)}")
     replay_path = os.path.join(OUT_DIR, f"race_{seed}.json")
     track_path = os.path.join(OUT_DIR, f"cameras_{seed}.json")
     for path in (replay_path, track_path, MASTER):
         if not os.path.isfile(path):
             raise ShortError(f"missing input: {path}")
-    return presentation.load(replay_path, track_path, master_frames(MASTER))
+    replay, track, clock = presentation.load(
+        replay_path, track_path, master_frames(MASTER)
+    )
+    clock, keep = presentation.omit_frames(clock, EDITIONS[edition]["cuts"])
+    return replay, track, clock, keep
+
+
+def _select(cuts: Sequence[tuple[int, int]]) -> str:
+    """The filter that takes whole frames out of the master, or nothing at all.
+
+    `select` decides frame by frame on the master's own frame number, so the cut
+    lands where the map says it does; `setpts=N/FRAME_RATE/TB` closes the gap by
+    renumbering what survives. Neither filter touches a frame's content and
+    neither can reorder or repeat one.
+    """
+    if not cuts:
+        return ""
+    gone = "+".join(f"between(n,{first},{last})" for first, last in cuts)
+    return f"select='not({gone})',setpts=N/FRAME_RATE/TB,"
 
 
 # --- stages -----------------------------------------------------------------
 
 
-def stage_audio(seed: int) -> str:
-    replay, track, clock = load_all(seed)
+def stage_audio(seed: int, edition: str = DEFAULT_EDITION) -> str:
+    replay, track, clock, _keep = load_all(seed, edition)
     mix = marble.build_race_audio(replay, track, clock)
     os.makedirs(WORK_DIR, exist_ok=True)
-    path = os.path.join(WORK_DIR, f"race_{seed}.wav")
+    path = os.path.join(WORK_DIR, f"race_{seed}_{edition}.wav")
     write_wav(path, mix.left, mix.right, sample_rate=mix.sample_rate)
     print(f"audio: {mix.seconds:.4f} s, {len(mix.left)} samples at {mix.sample_rate} Hz")
     print(f"  placed {mix.placed}")
@@ -144,8 +214,8 @@ def stage_audio(seed: int) -> str:
     return path
 
 
-def stage_overlays(seed: int) -> dict[str, Any]:
-    replay, track, clock = load_all(seed)
+def stage_overlays(seed: int, edition: str = DEFAULT_EDITION) -> dict[str, Any]:
+    replay, track, clock, keep = load_all(seed, edition)
     os.makedirs(WORK_DIR, exist_ok=True)
 
     hook = os.path.join(WORK_DIR, "pick_one.png")
@@ -158,7 +228,7 @@ def stage_overlays(seed: int) -> dict[str, Any]:
     if start is None:
         raise ShortError("the winner's crossing is not in the film")
     start += WINNER_DELAY
-    ring_dir = os.path.join(WORK_DIR, "ring")
+    ring_dir = os.path.join(WORK_DIR, f"ring_{edition}")
     if os.path.isdir(ring_dir):
         shutil.rmtree(ring_dir)
     os.makedirs(ring_dir, exist_ok=True)
@@ -195,6 +265,11 @@ def stage_overlays(seed: int) -> dict[str, Any]:
         "duration": clock.duration,
         "hold": clock.hold,
         "frames": clock.frames,
+        "edition": edition,
+        "cuts": EDITIONS[edition]["cuts"],
+        "keep": keep,
+        "video": EDITIONS[edition]["video"],
+        "visual": EDITIONS[edition]["visual"],
     }
 
 
@@ -211,8 +286,11 @@ def stage_mux(seed: int, plan: dict[str, Any], audio_path: str) -> dict[str, str
     ring_seconds = plan["ring_frames"] / FPS
     fact_from = plan["duration"] - END_FACT_SECONDS
 
+    video = plan["video"]
+    visual = plan["visual"]
     graph = (
-        f"[0:v]tpad=start_duration={hold}:start_mode=clone,setpts=PTS-STARTPTS[base];"
+        f"[0:v]{_select(plan['cuts'])}"
+        f"tpad=start_duration={hold}:start_mode=clone,setpts=PTS-STARTPTS[base];"
         f"[1:v]format=rgba,fade=t=in:st={PICK_ONE_IN}:d=0.18:alpha=1,"
         f"fade=t=out:st={PICK_ONE_OUT_FROM}:d={PICK_ONE_OUT_TO - PICK_ONE_OUT_FROM}:alpha=1[hook];"
         f"[base][hook]overlay=0:0:enable='between(t,0,{PICK_ONE_OUT_TO})'[v1];"
@@ -236,19 +314,19 @@ def stage_mux(seed: int, plan: dict[str, Any], audio_path: str) -> dict[str, str
         "-frames:v", str(plan["frames"]),
     ]
 
-    os.makedirs(os.path.dirname(os.path.abspath(VISUAL)), exist_ok=True)
-    _run(common + ["-filter_complex", graph, "-map", "[vout]", "-an", *encode, VISUAL],
+    os.makedirs(os.path.dirname(os.path.abspath(visual)), exist_ok=True)
+    _run(common + ["-filter_complex", graph, "-map", "[vout]", "-an", *encode, visual],
          "encode the silent visual cut")
     _run(
         common + ["-i", audio_path, "-filter_complex", graph, "-map", "[vout]",
                   "-map", "4:a", *encode,
                   "-c:a", "aac", "-b:a", AUDIO_BITRATE, "-ar", str(SAMPLE_RATE),
-                  "-shortest", VIDEO],
+                  "-shortest", video],
         "encode the Short",
     )
-    for path in (VISUAL, VIDEO):
+    for path in (visual, video):
         print(f"video: {path}  {os.path.getsize(path) / (1024 * 1024):.1f} MiB")
-    return {"video": VIDEO, "visual": VISUAL}
+    return {"video": video, "visual": visual}
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -257,24 +335,28 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         "--stage", default="all", choices=("audio", "overlays", "mux", "qc", "all")
     )
+    parser.add_argument(
+        "--edition", default=DEFAULT_EDITION, choices=tuple(EDITIONS),
+        help="v21 is the start/retention cut; v20 rebuilds the earlier one",
+    )
     args = parser.parse_args(argv)
 
     stages = ("audio", "overlays", "mux", "qc") if args.stage == "all" else (args.stage,)
-    audio_path = os.path.join(WORK_DIR, f"race_{args.seed}.wav")
+    audio_path = os.path.join(WORK_DIR, f"race_{args.seed}_{args.edition}.wav")
     plan: dict[str, Any] | None = None
     for stage in stages:
         print(f"--- {stage} ---")
         if stage == "audio":
-            audio_path = stage_audio(args.seed)
+            audio_path = stage_audio(args.seed, args.edition)
         elif stage == "overlays":
-            plan = stage_overlays(args.seed)
+            plan = stage_overlays(args.seed, args.edition)
         elif stage == "mux":
             if plan is None:
-                plan = stage_overlays(args.seed)
+                plan = stage_overlays(args.seed, args.edition)
             stage_mux(args.seed, plan, audio_path)
         elif stage == "qc":
             from tools.sloped_short_qc import report
-            if report(args.seed) is False:
+            if report(args.seed, args.edition) is False:
                 return 1
     return 0
 
