@@ -30,7 +30,7 @@ function Assert-Precondition {
     }
 }
 
-$claudeVersion = (& claude --version) 2>&1
+$claudeVersion = & claude --version
 Assert-Precondition ($claudeVersion -match "^2\.1\.70") "claude --version must report 2.1.70 exactly, got: $claudeVersion"
 
 Assert-Precondition (Test-Path "C:\Users\mgial\.benchmark-c2\mcp\treesitter_cache.json") "treesitter_cache.json missing"
@@ -39,7 +39,9 @@ Assert-Precondition (Test-Path $McpConfig) "C4 treesitter_mcp_config.json missin
 
 Push-Location $RepoDir
 $BranchTip = (git rev-parse $Branch).Trim()
-$RemoteTip = (git rev-parse "origin/$Branch") 2>$null
+$RemoteTip = (git rev-parse "origin/$Branch")
+if ($LASTEXITCODE -ne 0) { $RemoteTip = "" }
+else { $RemoteTip = $RemoteTip.Trim() }
 Pop-Location
 Assert-Precondition ($BranchTip -eq $RemoteTip) "local $Branch ($BranchTip) must match origin/$Branch ($RemoteTip) -- freeze must be pushed before execution"
 
@@ -75,7 +77,7 @@ foreach ($run in $Runs) {
     }
 
     Push-Location $RepoDir
-    git worktree add $runDir $BranchTip --detach 2>&1 | Write-Host
+    git worktree add $runDir $BranchTip --detach
     $addExit = $LASTEXITCODE
     Pop-Location
     Assert-Precondition ($addExit -eq 0) "git worktree add failed for $runId"
