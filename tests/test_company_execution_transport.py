@@ -493,3 +493,243 @@ def test_transport_modules_launch_nothing_and_import_no_provider_or_network_sdk(
         "asyncio",
     ):
         assert token not in text
+
+
+# --- The CLI write-scope path -------------------------------------------------
+#
+# `--authority-override-file` is the only way `python -m company.runtime packet`
+# can hand out a writable path: `contract_from_registry` produces an empty
+# `may_write`, and `_assert_scope_within_contract` reads empty as "grants
+# nothing". That worked from the day the audited transport landed and was never
+# covered, so the CLI read as if it could not grant write scope at all. These
+# tests pin the behaviour in both directions.
+
+
+def _cli_task_file(tmp_path: Path, task_id: str) -> Path:
+    task_file = tmp_path / f"{task_id}.json"
+    task_file.write_text(
+        json.dumps(
+            {
+                "task_id": task_id,
+                "objective": "Exercise the CLI write-scope path end to end.",
+                "required_capabilities": [
+                    "software_implementation",
+                    "test_engineering",
+                ],
+                "deterministic_execution_possible": False,
+                "context": {
+                    "refs": [
+                        {
+                            "kind": "file",
+                            "ref": "company/runtime/packets.py",
+                            "reason": "initial packet boundary",
+                        }
+                    ],
+                    "constraints": ["Do not modify production systems."],
+                    "acceptance_criteria": ["The CLI write-scope path succeeds."],
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    return task_file
+
+
+def _override_file(tmp_path: Path, name: str, payload: dict) -> Path:
+    path = tmp_path / name
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
+def _packet_argv(task_file: Path, *extra: str) -> list[str]:
+    return ["packet", str(task_file), "--branch", BRANCH, *extra]
+
+
+def test_cli_packet_without_an_override_is_still_the_read_only_packet(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Omitting the argument must not change what the CLI did before."""
+    task_file = _cli_task_file(tmp_path, "cli-scope-readonly")
+
+    assert runtime_main(_packet_argv(task_file)) == 0
+
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["packet"]["path_scope"] == {"allowed": [], "forbidden": []}
+    assert payload["packet"]["employee"] == "software_implementation_engineer"
+    assert payload["fingerprint"]
+
+
+def test_cli_packet_accepts_an_override_and_carries_the_bounded_write_scope(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    task_file = _cli_task_file(tmp_path, "cli-scope-granted")
+    override = _override_file(
+        tmp_path,
+        "authority.json",
+        {
+            "may_read": ["company/runtime"],
+            "may_write": ["tests/test_company_execution_transport.py"],
+            "may_not_read": [],
+            "may_not_modify": ["company/permissions.yaml"],
+        },
+    )
+    state = tmp_path / "state"
+
+    assert (
+        runtime_main(
+            _packet_argv(
+                task_file,
+                "--allow",
+                "tests/test_company_execution_transport.py",
+                "--authority-override-file",
+                str(override),
+                "--state-dir",
+                str(state),
+            )
+        )
+        == 0
+    )
+
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["packet"]["path_scope"] == {
+        "allowed": ["tests/test_company_execution_transport.py"],
+        "forbidden": [],
+    }
+    # The grant is recorded as an override, never as the canonical contract.
+    assert (
+        payload["authority"]["source"] == AuthoritySource.TEMPORARY_TASK_OVERRIDE.value
+    )
+    snapshot = ExecutionStore(state).authority(
+        "cli-scope-granted", payload["fingerprint"], 1
+    )
+    assert snapshot is not None
+    assert snapshot.may_write == ("tests/test_company_execution_transport.py",)
+    assert snapshot.fingerprint() == payload["authority"]["fingerprint"]
+
+
+def test_cli_packet_refuses_a_path_the_override_does_not_grant(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The ceiling is `may_write` itself: an unnamed path is outside it."""
+    task_file = _cli_task_file(tmp_path, "cli-scope-ceiling")
+    override = _override_file(
+        tmp_path, "narrow.json", {"may_write": ["tests/test_company_runtime.py"]}
+    )
+
+    assert (
+        runtime_main(
+            _packet_argv(
+                task_file,
+                "--allow",
+                "company/runtime",
+                "--authority-override-file",
+                str(override),
+            )
+        )
+        == 2
+    )
+    assert (
+        "outside software_implementation_engineer's may_write"
+        in capsys.readouterr().err
+    )
+
+
+def test_cli_packet_refuses_a_granted_path_that_reaches_may_not_modify(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """`may_not_modify` outranks `may_write` through the CLI too."""
+    task_file = _cli_task_file(tmp_path, "cli-scope-protected")
+    override = _override_file(
+        tmp_path,
+        "conflicting.json",
+        {"may_write": ["company"], "may_not_modify": ["company/permissions.yaml"]},
+    )
+
+    assert (
+        runtime_main(
+            _packet_argv(
+                task_file,
+                "--allow",
+                "company",
+                "--authority-override-file",
+                str(override),
+            )
+        )
+        == 2
+    )
+    assert "reaches software_implementation_engineer's may_not_modify" in (
+        capsys.readouterr().err
+    )
+
+
+def test_cli_packet_refuses_an_override_carrying_a_non_authority_field(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """An override may move authority and nothing else - not identity."""
+    task_file = _cli_task_file(tmp_path, "cli-scope-invalid")
+    override = _override_file(
+        tmp_path,
+        "invalid.json",
+        {"may_write": ["tests"], "employee_id": "chief_architect"},
+    )
+
+    assert (
+        runtime_main(
+            _packet_argv(
+                task_file,
+                "--allow",
+                "tests",
+                "--authority-override-file",
+                str(override),
+            )
+        )
+        == 2
+    )
+    assert "unknown/non-authority field(s): employee_id" in capsys.readouterr().err
+
+
+def test_cli_packet_refuses_a_missing_override_file(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A named-but-absent grant is an error, never a silent read-only packet."""
+    task_file = _cli_task_file(tmp_path, "cli-scope-missing")
+
+    assert (
+        runtime_main(
+            _packet_argv(
+                task_file,
+                "--allow",
+                "tests",
+                "--authority-override-file",
+                str(tmp_path / "absent.json"),
+            )
+        )
+        == 2
+    )
+    assert "absent.json" in capsys.readouterr().err
+
+
+def test_cli_packet_write_scope_leaves_the_other_commands_alone(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """No expansion or ingestion command grew an authority argument."""
+    assert runtime_main(["validate"]) == 0
+    assert "configuration is valid" in capsys.readouterr().out
+    for argv in (
+        [
+            "context-request",
+            "--state-dir",
+            str(tmp_path),
+            "--task",
+            "t",
+            "--kind",
+            "file",
+            "--ref",
+            INDEX_PATH,
+            "--reason",
+            "r",
+        ],
+        ["receipt", "r.json", "--task", "t.json", "--state-dir", str(tmp_path)],
+    ):
+        with pytest.raises(SystemExit):
+            build_parser().parse_args([*argv, "--authority-override-file", "a.json"])
