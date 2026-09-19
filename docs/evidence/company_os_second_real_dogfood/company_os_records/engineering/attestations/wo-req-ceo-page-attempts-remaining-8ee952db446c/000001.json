@@ -1,0 +1,64 @@
+{
+  "changed_paths_reviewed": [
+    "company/engineering/result.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "criteria": [
+    {
+      "criterion": "EngineeringResult carries one new field reporting developer attempts remaining, populated from EngineeringJob.corrections_remaining and nothing reimplemented",
+      "evidence_ref": "company/engineering/result.py:103 (field decl), result.py:297 (build: developer_attempts_remaining=job.corrections_remaining)",
+      "satisfied": true
+    },
+    {
+      "criterion": "the CEO page's plain-text rendering shows the new field beside the existing developer attempts line",
+      "evidence_ref": "company/engineering/result.py:344 — f\"  developer attempts: {self.developer_attempts}  remaining: {self.developer_attempts_remaining}\"",
+      "satisfied": true
+    },
+    {
+      "criterion": "the new field round-trips through to_dict and from_mapping like every other result field",
+      "evidence_ref": "result.py:211-214 (to_dict delegates to to_jsonable, covers all dataclass fields), result.py:466 (from_mapping: developer_attempts_remaining=int(data.get(...,0)))",
+      "satisfied": true
+    },
+    {
+      "criterion": "a focused test in tests/test_company_engineering_execution.py or tests/test_company_runtime.py proves the field's value and its presence on the rendered page",
+      "evidence_ref": "tests/test_company_engineering_execution.py:1815-1841 — test_developer_attempts_remaining_field_and_rendering covers field value, render string, and round-trip",
+      "satisfied": true
+    },
+    {
+      "criterion": "no existing test in the required suites regresses",
+      "evidence_ref": "receipt: tests/test_company_engineering_execution.py — 139 passed in 21.02s (138 pre-existing + 1 new)",
+      "satisfied": true
+    }
+  ],
+  "evidence": [
+    "company/engineering/result.py:85-481 (EngineeringResult class — field decl, __post_init__, build, render_text, from_mapping)",
+    "diff.patch (full diff reviewed)",
+    "tests/test_company_engineering_execution.py:1812-1844 (new test and surrounding context)"
+  ],
+  "findings": [
+    {
+      "deterministic": false,
+      "evidence_ref": "tests/test_company_engineering_execution.py:1812 and :1844 — both read '# --- 15.'",
+      "finding_id": "duplicate-section-15-comment",
+      "severity": "advisory",
+      "summary": "Two consecutive test sections are both numbered '15' — the new section and the pre-existing CEO-surface section share the same header label."
+    },
+    {
+      "deterministic": false,
+      "evidence_ref": "result.py:466 — int(data.get(\"developer_attempts_remaining\", 0)); also flagged by implementer in unresolved_risks",
+      "finding_id": "historical-record-default-zero",
+      "severity": "advisory",
+      "summary": "from_mapping defaults developer_attempts_remaining to 0, so stored results serialized before this change will silently report 0 remaining even when that was not the actual state at the time."
+    }
+  ],
+  "notes": "Both advisory findings are cosmetic or already documented. The section-numbering collision is cosmetic. The historical-record default is the correct behaviour for a new optional field (0 is the only safe default for unknown-vintage records) and the implementer disclosed it. No blocking or changes-required issues found.",
+  "packet_fingerprint": "9ef0951b60f7fbe7",
+  "receipt_fingerprint": "eb084586b73d5b30",
+  "review_id": "rev-wo-req-ceo-page-attempts-remaining-01",
+  "reviewed_on": "2026-09-19",
+  "reviewer": "chief_architect",
+  "verdict": "pass",
+  "version": 1,
+  "work_order_fingerprint": "9e0f02d3fa64c6de",
+  "work_order_id": "wo-req-ceo-page-attempts-remaining"
+}

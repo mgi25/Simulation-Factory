@@ -1,0 +1,82 @@
+{
+  "acceptance_criteria": [
+    "EngineeringResult carries one new field reporting developer attempts remaining, populated from EngineeringJob.corrections_remaining and nothing reimplemented",
+    "the CEO page's plain-text rendering shows the new field beside the existing developer attempts line",
+    "the new field round-trips through to_dict and from_mapping like every other result field",
+    "a focused test in tests/test_company_engineering_execution.py or tests/test_company_runtime.py proves the field's value and its presence on the rendered page",
+    "no existing test in the required suites regresses"
+  ],
+  "automatic_context_refs": [],
+  "completion_protocol": [
+    "implement the objective, changing only allowed paths",
+    "run every required test and report the result",
+    "commit the work",
+    "push the assigned branch",
+    "verify the exact remote SHA matches the local commit",
+    "do not merge",
+    "return a compact handoff receipt"
+  ],
+  "constraints": [
+    "additive only: do not rename, remove or change the meaning of developer_attempts or any existing EngineeringResult field",
+    "do not change EngineeringJob, the lifecycle state machine, the reviewer policy, the integration gate, or any authority or receipt validation logic",
+    "do not touch tools/, ai_platform/, knowledge/, or any file outside company/engineering and its own tests"
+  ],
+  "context_cache_key": "1555a253be430c8a",
+  "context_fingerprint": "39be1e5e3406fc1b",
+  "context_refs": [
+    {
+      "digest": "",
+      "kind": "module_contract",
+      "reason": "owns company/engineering for task path company/engineering",
+      "ref": "capsule:company-engineering-execution",
+      "span": null
+    },
+    {
+      "digest": "",
+      "kind": "test",
+      "reason": "declared test of the owning capsule",
+      "ref": "tests/test_company_engineering_execution.py",
+      "span": null
+    }
+  ],
+  "employee": "software_implementation_engineer",
+  "evidence_required": true,
+  "executor": "claude_code",
+  "expected_base_commit": "b12caa8ff45fe986e94cdf670ca768b99c385ed9",
+  "expected_branch": "eng-ceo-page-attempts-remaining",
+  "explicit_context_refs": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "no_subagents": true,
+  "objective": "The CEO result page (EngineeringResult) reports how many developer attempts a job has used (developer_attempts) but never how many remain against the work order's own authorized ceiling, so reading the page requires separately looking up max_developer_attempts and subtracting by hand every time. Add a field to EngineeringResult reporting the developer attempts remaining, populated from the job's own existing corrections_remaining property (do not reimplement the arithmetic), and show it on the CEO page's text rendering next to the existing developer attempts line.",
+  "path_scope": {
+    "allowed": [
+      "company/engineering",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "forbidden": [
+      "ai_platform/policy.py",
+      "company/agent_contract.schema.yaml",
+      "company/constitution.md",
+      "company/integration",
+      "company/integration/checks.py",
+      "company/integration/policy.py",
+      "company/integration/suites.py",
+      "company/org_registry.yaml",
+      "company/permissions.yaml",
+      "company/runtime",
+      "company/task_handoff.schema.yaml",
+      "company/validation/no_subagents.py",
+      "sloped",
+      "tools"
+    ]
+  },
+  "reasoning_class": "C",
+  "required_tests": [
+    "tests/test_company_engineering_execution.py"
+  ],
+  "resource_class": "small_reasoning",
+  "task_id": "wo-req-ceo-page-attempts-remaining",
+  "version": 1
+}

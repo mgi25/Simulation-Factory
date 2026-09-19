@@ -1,0 +1,316 @@
+{
+  "efficiency": {
+    "artifact_version": 1,
+    "checkpoint_rule": "continue_if_under_budget",
+    "checkpoint_threshold_chars": 3360,
+    "context": {
+      "narrowed_at": "intake",
+      "note": "The work order's references were narrowed against the authorized paths when it was authorized, and the profile's ceiling bounds how many further capsules the assembler may add. `refs` is what the packet actually carries - there is no wider set behind it and no scoped list beside it.",
+      "ref_ceiling": 8,
+      "ref_count": 2,
+      "refs": [
+        "module_contract:capsule:company-engineering-execution",
+        "test:tests/test_company_engineering_execution.py"
+      ],
+      "work_order_refs": [
+        "module_contract:capsule:company-engineering-execution",
+        "test:tests/test_company_engineering_execution.py"
+      ]
+    },
+    "context_budget_chars": 4800,
+    "enforcement": {
+      "advisory_only": [
+        "max_turns: no backend this company drives accepts a turn ceiling"
+      ],
+      "company_enforces": [
+        "developer_attempts: the job state machine refuses a further attempt",
+        "context_refs: the packet is built from the narrowed set"
+      ],
+      "note": "Company OS does not start a process and therefore enforces nothing inside a session. What it can do is refuse to issue the next one.",
+      "runner_enforces": [
+        "wall_seconds: the runner terminates the session process",
+        "session_cost: passed to the backend when the backend accepts one"
+      ]
+    },
+    "escalation": "none",
+    "model_tier": "standard",
+    "output_reduction": {
+      "max_log_lines": 100,
+      "max_test_failure_lines": 50,
+      "omit_clean_git_detail": true,
+      "omit_passing_test_detail": true,
+      "scope_file_listings": true
+    },
+    "packet_attempt": 1,
+    "parallel_sessions": 1,
+    "profile": "consumer",
+    "profile_terms": {
+      "auto_continue_after_changes_required": false,
+      "checkpoint_threshold_chars": 22400,
+      "context_budget_chars": 32000,
+      "context_ref_ceiling": 8,
+      "cost_currency": "USD",
+      "developer_attempts": 1,
+      "include_capsule_dependencies": false,
+      "name": "consumer",
+      "parallel_sessions": 1,
+      "provider_count": 1,
+      "reviewer_passes": 1,
+      "routine_tier": "standard",
+      "session_cache_read_ceiling": 1000000,
+      "session_cost_ceiling": "3.00",
+      "session_turn_ceiling": 40,
+      "session_wall_seconds": 1800,
+      "stage_ceiling": 4,
+      "strongest_requires_escalation": true
+    },
+    "provider_count": 1,
+    "reasoning_class": "C",
+    "resource_ceiling": {
+      "cost_currency": "USD",
+      "escalation_message": "Stop and report progress rather than exceeding these ceilings. An honest partial result with a checkpoint is cheaper than a complete one that ran out of budget.",
+      "max_cache_read_units": 500000,
+      "max_session_cost": "1.50",
+      "max_turns": 20,
+      "max_wall_seconds": 900
+    },
+    "strategy_reason": "reasoning class C at risk low is routine implementation; profile consumer runs it at the standard tier; evidence is required and affects review depth, not model tier; review session: read-only with reduced context budget"
+  },
+  "implementer": "software_implementation_engineer",
+  "packet": {
+    "acceptance_criteria": [
+      "EngineeringResult carries one new field reporting developer attempts remaining, populated from EngineeringJob.corrections_remaining and nothing reimplemented",
+      "the CEO page's plain-text rendering shows the new field beside the existing developer attempts line",
+      "the new field round-trips through to_dict and from_mapping like every other result field",
+      "a focused test in tests/test_company_engineering_execution.py or tests/test_company_runtime.py proves the field's value and its presence on the rendered page",
+      "no existing test in the required suites regresses"
+    ],
+    "automatic_context_refs": [],
+    "completion_protocol": [
+      "implement the objective, changing only allowed paths",
+      "run every required test and report the result",
+      "commit the work",
+      "push the assigned branch",
+      "verify the exact remote SHA matches the local commit",
+      "do not merge",
+      "return a compact handoff receipt"
+    ],
+    "constraints": [
+      "additive only: do not rename, remove or change the meaning of developer_attempts or any existing EngineeringResult field",
+      "do not change EngineeringJob, the lifecycle state machine, the reviewer policy, the integration gate, or any authority or receipt validation logic",
+      "do not touch tools/, ai_platform/, knowledge/, or any file outside company/engineering and its own tests"
+    ],
+    "context_cache_key": "f3efce5f45d696cc",
+    "context_fingerprint": "3a98c181d83c4c47",
+    "context_refs": [
+      {
+        "digest": "",
+        "kind": "module_contract",
+        "reason": "owns company/engineering for task path company/engineering",
+        "ref": "capsule:company-engineering-execution",
+        "span": null
+      },
+      {
+        "digest": "",
+        "kind": "test",
+        "reason": "declared test of the owning capsule",
+        "ref": "tests/test_company_engineering_execution.py",
+        "span": null
+      }
+    ],
+    "employee": "chief_architect",
+    "evidence_required": true,
+    "executor": "claude_code",
+    "expected_base_commit": "b12caa8ff45fe986e94cdf670ca768b99c385ed9",
+    "expected_branch": "eng-ceo-page-attempts-remaining",
+    "explicit_context_refs": [
+      "module_contract:capsule:company-engineering-execution",
+      "test:tests/test_company_engineering_execution.py"
+    ],
+    "no_subagents": true,
+    "objective": "Independently review the implementation of work order wo-req-ceo-page-attempts-remaining against its acceptance criteria.",
+    "path_scope": {
+      "allowed": [],
+      "forbidden": []
+    },
+    "reasoning_class": "C",
+    "required_tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "resource_class": "small_reasoning",
+    "task_id": "wo-req-ceo-page-attempts-remaining-review",
+    "version": 1
+  },
+  "packet_fingerprint": "f6dddccefcf4a973",
+  "persisted": {
+    "authority": {
+      "attempt": 1,
+      "fingerprint": "4a90418632cb5d94",
+      "record_ref": "execution/authorities/wo-req-ceo-page-attempts-remaining-review-7f8ef1734442/000001.json"
+    },
+    "job": {
+      "fingerprint": "19acd7c904f091ba",
+      "record_ref": "engineering/jobs/wo-req-ceo-page-attempts-remaining-8ee952db446c/000004.json",
+      "sequence": 4
+    },
+    "packet": {
+      "attempt": 1,
+      "fingerprint": "f6dddccefcf4a973",
+      "record_ref": "execution/packets/wo-req-ceo-page-attempts-remaining-review-7f8ef1734442/000001.json"
+    }
+  },
+  "read_only": true,
+  "review_instructions": [
+    "read the work order, the diff, the reported tests and the changed paths",
+    "answer every acceptance criterion with a reference to what satisfies it",
+    "report one finding per defect, with a severity and a reference",
+    "change nothing: this packet grants no writable path",
+    "return pass, changes_required or blocked, and never an approval"
+  ],
+  "reviewer": "chief_architect",
+  "role": "reviewer",
+  "size_chars": 1566,
+  "state": "reviewing",
+  "transport": {
+    "authority_fingerprint": "4a90418632cb5d94",
+    "authority_ref": "execution/authorities/wo-req-ceo-page-attempts-remaining-review-7f8ef1734442/000001.json",
+    "effective_context_fingerprint": "3a98c181d83c4c47",
+    "expansion_instructions": [
+      "request additional references with context-request",
+      "Company OS decides requests from the stored preparation-time authority",
+      "use only initial or approved context references"
+    ],
+    "no_subagents": true,
+    "packet": {
+      "acceptance_criteria": [
+        "EngineeringResult carries one new field reporting developer attempts remaining, populated from EngineeringJob.corrections_remaining and nothing reimplemented",
+        "the CEO page's plain-text rendering shows the new field beside the existing developer attempts line",
+        "the new field round-trips through to_dict and from_mapping like every other result field",
+        "a focused test in tests/test_company_engineering_execution.py or tests/test_company_runtime.py proves the field's value and its presence on the rendered page",
+        "no existing test in the required suites regresses"
+      ],
+      "automatic_context_refs": [],
+      "completion_protocol": [
+        "implement the objective, changing only allowed paths",
+        "run every required test and report the result",
+        "commit the work",
+        "push the assigned branch",
+        "verify the exact remote SHA matches the local commit",
+        "do not merge",
+        "return a compact handoff receipt"
+      ],
+      "constraints": [
+        "additive only: do not rename, remove or change the meaning of developer_attempts or any existing EngineeringResult field",
+        "do not change EngineeringJob, the lifecycle state machine, the reviewer policy, the integration gate, or any authority or receipt validation logic",
+        "do not touch tools/, ai_platform/, knowledge/, or any file outside company/engineering and its own tests"
+      ],
+      "context_cache_key": "f3efce5f45d696cc",
+      "context_fingerprint": "3a98c181d83c4c47",
+      "context_refs": [
+        {
+          "digest": "",
+          "kind": "module_contract",
+          "reason": "owns company/engineering for task path company/engineering",
+          "ref": "capsule:company-engineering-execution",
+          "span": null
+        },
+        {
+          "digest": "",
+          "kind": "test",
+          "reason": "declared test of the owning capsule",
+          "ref": "tests/test_company_engineering_execution.py",
+          "span": null
+        }
+      ],
+      "employee": "chief_architect",
+      "evidence_required": true,
+      "executor": "claude_code",
+      "expected_base_commit": "b12caa8ff45fe986e94cdf670ca768b99c385ed9",
+      "expected_branch": "eng-ceo-page-attempts-remaining",
+      "explicit_context_refs": [
+        "module_contract:capsule:company-engineering-execution",
+        "test:tests/test_company_engineering_execution.py"
+      ],
+      "no_subagents": true,
+      "objective": "Independently review the implementation of work order wo-req-ceo-page-attempts-remaining against its acceptance criteria.",
+      "path_scope": {
+        "allowed": [],
+        "forbidden": []
+      },
+      "reasoning_class": "C",
+      "required_tests": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "resource_class": "small_reasoning",
+      "task_id": "wo-req-ceo-page-attempts-remaining-review",
+      "version": 1
+    },
+    "packet_attempt": 1,
+    "packet_ref": "execution/packets/wo-req-ceo-page-attempts-remaining-review-7f8ef1734442/000001.json",
+    "receipt_version": 1
+  },
+  "work_order": {
+    "acceptance_criteria": [
+      "EngineeringResult carries one new field reporting developer attempts remaining, populated from EngineeringJob.corrections_remaining and nothing reimplemented",
+      "the CEO page's plain-text rendering shows the new field beside the existing developer attempts line",
+      "the new field round-trips through to_dict and from_mapping like every other result field",
+      "a focused test in tests/test_company_engineering_execution.py or tests/test_company_runtime.py proves the field's value and its presence on the rendered page",
+      "no existing test in the required suites regresses"
+    ],
+    "authorized_branch": "eng-ceo-page-attempts-remaining",
+    "authorized_on": "2026-09-19",
+    "authorized_paths": [
+      "company/engineering",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "base_commit": "b12caa8ff45fe986e94cdf670ca768b99c385ed9",
+    "constraints": [
+      "additive only: do not rename, remove or change the meaning of developer_attempts or any existing EngineeringResult field",
+      "do not change EngineeringJob, the lifecycle state machine, the reviewer policy, the integration gate, or any authority or receipt validation logic",
+      "do not touch tools/, ai_platform/, knowledge/, or any file outside company/engineering and its own tests"
+    ],
+    "context_refs": [
+      "module_contract:capsule:company-engineering-execution",
+      "test:tests/test_company_engineering_execution.py"
+    ],
+    "escalate_instead_of": [
+      "changing architecture outside the authorized paths",
+      "adding a dependency the work order did not authorize",
+      "reading or using any credential, token or secret",
+      "widening the objective beyond what the work order states",
+      "editing any protected governance path",
+      "deciding a business question the work order leaves open",
+      "any destructive operation on repository or company data",
+      "merging, deploying, publishing or tagging anything"
+    ],
+    "forbidden_paths": [
+      "company/constitution.md",
+      "company/integration",
+      "company/permissions.yaml",
+      "company/runtime",
+      "sloped",
+      "tools"
+    ],
+    "max_developer_attempts": 1,
+    "objective": "The CEO result page (EngineeringResult) reports how many developer attempts a job has used (developer_attempts) but never how many remain against the work order's own authorized ceiling, so reading the page requires separately looking up max_developer_attempts and subtracting by hand every time. Add a field to EngineeringResult reporting the developer attempts remaining, populated from the job's own existing corrections_remaining property (do not reimplement the arithmetic), and show it on the CEO page's text rendering next to the existing developer attempts line.",
+    "protected_paths": [
+      "ai_platform/policy.py",
+      "company/agent_contract.schema.yaml",
+      "company/constitution.md",
+      "company/integration/checks.py",
+      "company/integration/policy.py",
+      "company/integration/suites.py",
+      "company/org_registry.yaml",
+      "company/permissions.yaml",
+      "company/task_handoff.schema.yaml",
+      "company/validation/no_subagents.py"
+    ],
+    "requested_by": "MGI",
+    "required_tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "resource_profile": "consumer",
+    "work_order_fingerprint": "9e0f02d3fa64c6de",
+    "work_order_id": "wo-req-ceo-page-attempts-remaining"
+  }
+}

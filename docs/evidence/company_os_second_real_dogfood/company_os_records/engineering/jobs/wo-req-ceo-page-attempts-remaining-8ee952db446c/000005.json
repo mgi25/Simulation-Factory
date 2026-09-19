@@ -1,0 +1,75 @@
+{
+  "developer_attempts": 1,
+  "max_developer_attempts": 1,
+  "opened_on": "2026-09-19",
+  "pending_decisions": [],
+  "reviews_completed": 1,
+  "state": "gate",
+  "transitions": [
+    {
+      "actor": "company-os",
+      "evidence_refs": [],
+      "from_state": "requested",
+      "on": "2026-09-19",
+      "reason": "work order wo-req-ceo-page-attempts-remaining authorized by MGI",
+      "to_state": "requested"
+    },
+    {
+      "actor": "company-os",
+      "evidence_refs": [
+        "engineering/plans/wo-req-ceo-page-attempts-remaining-8ee952db446c/000001.json",
+        "engineering/work_orders/wo-req-ceo-page-attempts-remaining-8ee952db446c/000001.json"
+      ],
+      "from_state": "requested",
+      "on": "2026-09-19",
+      "reason": "implementation plan 8f63c1b1404b92b0 derived from the work order",
+      "to_state": "planning"
+    },
+    {
+      "actor": "company-os",
+      "evidence_refs": [
+        "execution/authorities/wo-req-ceo-page-attempts-remaining-8ee952db446c/000001.json",
+        "execution/packets/wo-req-ceo-page-attempts-remaining-8ee952db446c/000001.json"
+      ],
+      "from_state": "planning",
+      "on": "2026-09-19",
+      "reason": "packet 9ef0951b60f7fbe7 attempt 1 issued to software_implementation_engineer",
+      "to_state": "developing"
+    },
+    {
+      "actor": "company-os",
+      "evidence_refs": [
+        "execution/receipts/wo-req-ceo-page-attempts-remaining-8ee952db446c/000001.json",
+        "resource_usage/wo-req-ceo-page-attempts-remaining-8ee952db446c/000001.json"
+      ],
+      "from_state": "developing",
+      "on": "2026-09-19",
+      "reason": "attempt 1 recorded accepted",
+      "to_state": "testing"
+    },
+    {
+      "actor": "company-os",
+      "evidence_refs": [
+        "execution/packets/wo-req-ceo-page-attempts-remaining-review-7f8ef1734442/000001.json"
+      ],
+      "from_state": "testing",
+      "on": "2026-09-19",
+      "reason": "review packet issued to chief_architect (implementer software_implementation_engineer)",
+      "to_state": "reviewing"
+    },
+    {
+      "actor": "chief_architect",
+      "evidence_refs": [
+        "engineering/attestations/wo-req-ceo-page-attempts-remaining-8ee952db446c/000001.json",
+        "engineering/reviews/wo-req-ceo-page-attempts-remaining-8ee952db446c/000001.json"
+      ],
+      "from_state": "reviewing",
+      "on": "2026-09-19",
+      "reason": "review rev-wo-req-ceo-page-attempts-remaining-01 passed (chief_architect)",
+      "to_state": "gate"
+    }
+  ],
+  "version": 1,
+  "work_order_fingerprint": "9e0f02d3fa64c6de",
+  "work_order_id": "wo-req-ceo-page-attempts-remaining"
+}

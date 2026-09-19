@@ -1,0 +1,42 @@
+{
+  "automatic_context_sources": [],
+  "cache_hits": 2057370,
+  "context_cache_key": "1555a253be430c8a",
+  "context_fingerprint": "39be1e5e3406fc1b",
+  "context_refs_used": [],
+  "context_sources": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "context_usage_reported": false,
+  "duration_s": 355.295,
+  "effective_context_fingerprint": "39be1e5e3406fc1b",
+  "expanded_context_sources": [],
+  "expansion_chars": 0,
+  "expansion_count": 0,
+  "expansion_ledger_fingerprint": "",
+  "explicit_context_sources": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "initial_context_fingerprint": "39be1e5e3406fc1b",
+  "initial_context_sources": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "input_units": 46,
+  "notes": "139 tests passed (138 pre-existing + 1 new). The `to_dict` path needed no change because `to_jsonable` serializes all dataclass fields automatically.\ninvariants preserved: developer_attempts field unchanged in meaning, position and validation; authorizes_merge remains always False; all 138 pre-existing tests in tests/test_company_engineering_execution.py continue to pass; no change to EngineeringJob, its lifecycle state machine, or any authority/receipt validation logic; no file outside company/engineering and tests/test_company_engineering_execution.py touched",
+  "outcome": "accepted",
+  "output_units": 16410,
+  "passes": 1,
+  "reasoning_class": "C",
+  "rejected_expansion_sources": [],
+  "rejection_reason": "",
+  "required_expansion_count": 0,
+  "retries": 0,
+  "retrieval_hits": 0,
+  "subagents_used": 0,
+  "task_id": "wo-req-ceo-page-attempts-remaining",
+  "tool_calls": null,
+  "usage_unit": "token"
+}

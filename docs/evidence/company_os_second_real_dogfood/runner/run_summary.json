@@ -1,0 +1,52 @@
+{
+  "final_state": "ready_for_approval",
+  "finished_at": "2026-09-19T18:11:23.731469+00:00",
+  "lease_note": "took a new lease",
+  "outcome": "completed",
+  "reason": "",
+  "run_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-second-dogfood-runner-state\\runs\\wo-req-ceo-page-attempts-remaining-8ee952db446c\\run-000001",
+  "stages": [
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-second-dogfood-runner-state\\runs\\wo-req-ceo-page-attempts-remaining-8ee952db446c\\run-000001\\developer-01\\receipt.json"
+      ],
+      "detail": "attempt 1 by software_implementation_engineer, commit 7a594d28fe9d, 2 path(s)",
+      "ok": true,
+      "session_ids": [
+        "1ae4d644-ab46-4eec-99d1-904192323847"
+      ],
+      "stage": "developer",
+      "state_after": "testing",
+      "state_before": "planning"
+    },
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-second-dogfood-runner-state\\runs\\wo-req-ceo-page-attempts-remaining-8ee952db446c\\run-000001\\reviewer-01\\attestation.json"
+      ],
+      "detail": "chief_architect returned pass; Company OS adjudicated pass (attested pass, deterministic pass)",
+      "ok": true,
+      "session_ids": [
+        "6424b2ba-28fe-4561-aff2-5cb78dd09b03"
+      ],
+      "stage": "reviewer",
+      "state_after": "gate",
+      "state_before": "testing"
+    },
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-second-dogfood-runner-state\\runs\\wo-req-ceo-page-attempts-remaining-8ee952db446c\\run-000001\\gate-01\\gate-report.json",
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-second-dogfood-runner-state\\runs\\wo-req-ceo-page-attempts-remaining-8ee952db446c\\run-000001\\gate-01\\suites.json"
+      ],
+      "detail": "11/11 required suites green; gate says ready at 7a594d28fe9d",
+      "ok": true,
+      "session_ids": [],
+      "stage": "gate",
+      "state_after": "ready_for_approval",
+      "state_before": "gate"
+    }
+  ],
+  "started_at": "2026-09-19T18:01:18.054636+00:00",
+  "work_order_id": "wo-req-ceo-page-attempts-remaining"
+}
+
+[exited with code 0]

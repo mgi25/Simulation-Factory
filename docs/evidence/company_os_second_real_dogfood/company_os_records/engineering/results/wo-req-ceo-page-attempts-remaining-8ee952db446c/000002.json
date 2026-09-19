@@ -1,0 +1,55 @@
+{
+  "acceptance_criteria": [
+    "EngineeringResult carries one new field reporting developer attempts remaining, populated from EngineeringJob.corrections_remaining and nothing reimplemented",
+    "the CEO page's plain-text rendering shows the new field beside the existing developer attempts line",
+    "the new field round-trips through to_dict and from_mapping like every other result field",
+    "a focused test in tests/test_company_engineering_execution.py or tests/test_company_runtime.py proves the field's value and its presence on the rendered page",
+    "no existing test in the required suites regresses"
+  ],
+  "authorized_on": "2026-09-19",
+  "authorized_paths": [
+    "company/engineering",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "authorizes_merge": false,
+  "branch": "eng-ceo-page-attempts-remaining",
+  "changed_files": [
+    "company/engineering/result.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "commit_sha": "7a594d28fe9d0d8c77b14a846e8d53bc4a4b08db",
+  "decisions_required": [],
+  "developer_attempts": 1,
+  "evidence_refs": [],
+  "gate_blockers": [],
+  "gate_readiness": "ready",
+  "gate_report_id": "integration-readiness-2026-09-19-4042a9b35ac14439",
+  "implementation_summary": "Added `developer_attempts_remaining: int` to `EngineeringResult`, populated in `build()` directly from `job.corrections_remaining` (no arithmetic reimplemented), and shown on the CEO page alongside the existing developer attempts line as `developer attempts: N  remaining: M`. The field round-trips through `to_dict` (via `to_jsonable`) and `from_mapping` identically to every other integer field.",
+  "implementer": "software_implementation_engineer",
+  "merge_performed": false,
+  "objective": "The CEO result page (EngineeringResult) reports how many developer attempts a job has used (developer_attempts) but never how many remain against the work order's own authorized ceiling, so reading the page requires separately looking up max_developer_attempts and subtracting by hand every time. Add a field to EngineeringResult reporting the developer attempts remaining, populated from the job's own existing corrections_remaining property (do not reimplement the arithmetic), and show it on the CEO page's text rendering next to the existing developer attempts line.",
+  "remote_verified": true,
+  "requested_by": "MGI",
+  "review_findings": [
+    "[advisory] duplicate-section-15-comment: Two consecutive test sections are both numbered '15' — the new section and the pre-existing CEO-surface section share the same header label.",
+    "[advisory] historical-record-default-zero: from_mapping defaults developer_attempts_remaining to 0, so stored results serialized before this change will silently report 0 remaining even when that was not the actual state at the time."
+  ],
+  "review_outcome": "pass",
+  "reviewer": "chief_architect",
+  "risks": [
+    "Stored results serialized before this change will deserialize with developer_attempts_remaining=0 (the from_mapping default), which is correct for any job that has exhausted its attempts but misleading for a mid-loop snapshot that was stored without the field; a reviewer should confirm whether historical result records matter."
+  ],
+  "status": "ready_for_approval",
+  "tests": [
+    {
+      "command": "tests/test_company_engineering_execution.py",
+      "passed": true,
+      "scope": "targeted",
+      "summary": "139 passed in 21.02s"
+    }
+  ],
+  "unanswered_criteria": [],
+  "version": 1,
+  "work_order_fingerprint": "9e0f02d3fa64c6de",
+  "work_order_id": "wo-req-ceo-page-attempts-remaining"
+}

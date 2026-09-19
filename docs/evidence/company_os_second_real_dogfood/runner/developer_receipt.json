@@ -1,0 +1,75 @@
+{
+  "artifacts": [],
+  "authority_fingerprint": "27d8ea77636dc419",
+  "base_commit": "b12caa8ff45fe986e94cdf670ca768b99c385ed9",
+  "branch": "eng-ceo-page-attempts-remaining",
+  "commit_sha": "7a594d28fe9d0d8c77b14a846e8d53bc4a4b08db",
+  "completed_at": "2026-09-19T18:08:24.872298+00:00",
+  "context_refs_used": [],
+  "context_usage_reported": false,
+  "dependencies_added": [],
+  "evidence": [
+    "company/engineering/result.py",
+    "tests/test_company_engineering_execution.py::test_developer_attempts_remaining_field_and_rendering",
+    "commit:7a594d28fe9d0d8c77b14a846e8d53bc4a4b08db",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "executor": "claude_code",
+  "files_changed": [
+    "company/engineering/result.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "invariants_preserved": [
+    "developer_attempts field unchanged in meaning, position and validation",
+    "authorizes_merge remains always False",
+    "all 138 pre-existing tests in tests/test_company_engineering_execution.py continue to pass",
+    "no change to EngineeringJob, its lifecycle state machine, or any authority/receipt validation logic",
+    "no file outside company/engineering and tests/test_company_engineering_execution.py touched"
+  ],
+  "merge_performed": false,
+  "next_owner": "",
+  "no_subagents": true,
+  "notes": "139 tests passed (138 pre-existing + 1 new). The `to_dict` path needed no change because `to_jsonable` serializes all dataclass fields automatically.",
+  "outcome": "accepted",
+  "packet_attempt": 1,
+  "packet_fingerprint": "9ef0951b60f7fbe7",
+  "rejection_reason": "",
+  "remote_branch_sha": "7a594d28fe9d0d8c77b14a846e8d53bc4a4b08db",
+  "remote_verified": true,
+  "subagents_used": 0,
+  "summary": "Added `developer_attempts_remaining: int` to `EngineeringResult`, populated in `build()` directly from `job.corrections_remaining` (no arithmetic reimplemented), and shown on the CEO page alongside the existing developer attempts line as `developer attempts: N  remaining: M`. The field round-trips through `to_dict` (via `to_jsonable`) and `from_mapping` identically to every other integer field.",
+  "task_id": "wo-req-ceo-page-attempts-remaining",
+  "tests": [
+    {
+      "command": "tests/test_company_engineering_execution.py",
+      "passed": true,
+      "summary": "139 passed in 21.02s"
+    }
+  ],
+  "unresolved_risks": [
+    "Stored results serialized before this change will deserialize with developer_attempts_remaining=0 (the from_mapping default), which is correct for any job that has exhausted its attempts but misleading for a mid-loop snapshot that was stored without the field; a reviewer should confirm whether historical result records matter."
+  ],
+  "usage": {
+    "cache_creation_units": 77125,
+    "cache_hits": 2057370,
+    "cost_ceiling_enforced": true,
+    "duration_s": 355.295,
+    "input_units": 46,
+    "model": "sonnet",
+    "model_turns": 40,
+    "output_units": 16410,
+    "passes": 1,
+    "provider": "anthropic",
+    "provider_cost": "1.921196",
+    "provider_cost_currency": "USD",
+    "repeated_file_reads": 10,
+    "repo_file_reads": 13,
+    "repo_searches": 2,
+    "retries": 0,
+    "unreliable_metrics": [],
+    "usage_source": "model_usage_totals",
+    "usage_unit": "token"
+  },
+  "version": 1,
+  "working_tree_clean": true
+}

@@ -1,0 +1,31 @@
+{
+  "acceptance_criteria": [
+    "EngineeringResult carries one new field reporting developer attempts remaining, populated from EngineeringJob.corrections_remaining and nothing reimplemented",
+    "the CEO page's plain-text rendering shows the new field beside the existing developer attempts line",
+    "the new field round-trips through to_dict and from_mapping like every other result field",
+    "a focused test in tests/test_company_engineering_execution.py or tests/test_company_runtime.py proves the field's value and its presence on the rendered page",
+    "no existing test in the required suites regresses"
+  ],
+  "authorized_branch": "eng-ceo-page-attempts-remaining",
+  "base_commit": "b12caa8ff45fe986e94cdf670ca768b99c385ed9",
+  "capsule_hints": [],
+  "constraints": [
+    "additive only: do not rename, remove or change the meaning of developer_attempts or any existing EngineeringResult field",
+    "do not change EngineeringJob, the lifecycle state machine, the reviewer policy, the integration gate, or any authority or receipt validation logic",
+    "do not touch tools/, ai_platform/, knowledge/, or any file outside company/engineering and its own tests"
+  ],
+  "escalate_reasoning": false,
+  "max_developer_attempts": 1,
+  "notes": "Second real Company OS engineering dogfood, run through the external engineering runner for real provider telemetry. Bounded: one developer attempt, one reviewer pass, no retries, no autonomous continuation.",
+  "novel": false,
+  "objective": "The CEO result page (EngineeringResult) reports how many developer attempts a job has used (developer_attempts) but never how many remain against the work order's own authorized ceiling, so reading the page requires separately looking up max_developer_attempts and subtracting by hand every time. Add a field to EngineeringResult reporting the developer attempts remaining, populated from the job's own existing corrections_remaining property (do not reimplement the arithmetic), and show it on the CEO page's text rendering next to the existing developer attempts line.",
+  "request_id": "req-ceo-page-attempts-remaining",
+  "requested_by": "MGI",
+  "requested_on": "2026-09-19",
+  "resource_profile": "consumer",
+  "reversible": true,
+  "risk": "low",
+  "scope_ceiling": [],
+  "specialist_domain": "",
+  "subsystem_hint": "company/engineering"
+}

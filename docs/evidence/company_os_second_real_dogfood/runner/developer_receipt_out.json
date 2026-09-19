@@ -1,0 +1,49 @@
+{
+  "accepted": true,
+  "evidence_rejected": false,
+  "failures": [],
+  "handoff": {
+    "artifacts": [
+      "execution/receipts/wo-req-ceo-page-attempts-remaining-8ee952db446c/000001.json"
+    ],
+    "changed": [
+      "company/engineering/result.py",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "escalation_reason": "",
+    "escalation_required": false,
+    "evidence": [
+      "company/engineering/result.py",
+      "tests/test_company_engineering_execution.py::test_developer_attempts_remaining_field_and_rendering",
+      "commit:7a594d28fe9d0d8c77b14a846e8d53bc4a4b08db",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "next_owner": "",
+    "objective": "The CEO result page (EngineeringResult) reports how many developer attempts a job has used (developer_attempts) but never how many remain against the work order's own authorized ceiling, so reading the page requires separately looking up max_developer_attempts and subtracting by hand every time. Add a field to EngineeringResult reporting the developer attempts remaining, populated from the job's own existing corrections_remaining property (do not reimplement the arithmetic), and show it on the CEO page's text rendering next to the existing developer attempts line.",
+    "owner": "software_implementation_engineer",
+    "resource_usage": {
+      "fingerprint": "09f9f71c9e07f834",
+      "record_ref": "resource_usage/wo-req-ceo-page-attempts-remaining-8ee952db446c/000001.json"
+    },
+    "result": "Added `developer_attempts_remaining: int` to `EngineeringResult`, populated in `build()` directly from `job.corrections_remaining` (no arithmetic reimplemented), and shown on the CEO page alongside the existing developer attempts line as `developer attempts: N  remaining: M`. The field round-trips through `to_dict` (via `to_jsonable`) and `from_mapping` identically to every other integer field.",
+    "risks": [
+      "Stored results serialized before this change will deserialize with developer_attempts_remaining=0 (the from_mapping default), which is correct for any job that has exhausted its attempts but misleading for a mid-loop snapshot that was stored without the field; a reviewer should confirm whether historical result records matter."
+    ],
+    "status": "completed",
+    "task_id": "wo-req-ceo-page-attempts-remaining",
+    "tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "unchanged": []
+  },
+  "packet_attempt": 1,
+  "receipt_fingerprint": "eb084586b73d5b30",
+  "receipt_ref": "execution/receipts/wo-req-ceo-page-attempts-remaining-8ee952db446c/000001.json",
+  "state": "testing",
+  "usage_record": {
+    "fingerprint": "09f9f71c9e07f834",
+    "record_ref": "resource_usage/wo-req-ceo-page-attempts-remaining-8ee952db446c/000001.json"
+  },
+  "warnings": [],
+  "work_order_id": "wo-req-ceo-page-attempts-remaining"
+}
