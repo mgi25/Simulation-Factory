@@ -8,10 +8,16 @@
       "PARTIAL": "Correctly names _sited as the decision symbol but omits one of _clear/_track_gap, or a line span is outside a 2-line tolerance.",
       "WRONG": "Names _clear, _track_gap, _why, or any other symbol as the primary placement-validity decision function, or fabricates a call relationship not present in the source."
     },
-    "task_B_rubric": {
+    "task_B_rubric_SUPERSEDED": {
+      "status": "Never used for a live run. Retained for the record only -- see tasks.json B_DRAFT1_SUPERSEDED.",
       "CORRECT": "All 3 required files (start_platform.gd, s_curve.gd, toy_scene.gd) present with correct enclosing symbol/line for every real call site and correct function classification (which of beam_section/channel_section, or both) per file; neither v2_track.gd nor toy_geometry_check.gd claimed as a caller of toy_geometry.gd's functions; no fabricated call site.",
       "PARTIAL": "2 of 3 required files present, or one required file's call-site set is incomplete (e.g. only one of two functions reported for a file that calls both), with no distractor fabricated as a caller.",
       "WRONG": "v2_track.gd's local channel_section() or toy_geometry_check.gd is claimed as calling toy_geometry.gd's beam_section/channel_section, a required file is missing entirely alongside another defect, or a call site is fabricated."
+    },
+    "task_B_rubric": {
+      "CORRECT": "All 4 required definitions (hero_bowl.gd:52-60, hero_collector.gd:50-58, hero_finish.gd:51-59, v2_bowl.gd:59-68) present with correct kind/span and correct formula; the correct grouping is reported (hero_bowl.gd + v2_bowl.gd identical; hero_collector.gd and hero_finish.gd each distinct); neither hero_machine.gd nor v2_machine.gd claimed as defining action_clearance().",
+      "PARTIAL": "3 of 4 required definitions present or correctly described, or the grouping in part (c) is incomplete/incorrect while all 4 files and spans are otherwise correctly identified, with no distractor fabricated as a definer.",
+      "WRONG": "hero_machine.gd or v2_machine.gd claimed as defining its own action_clearance(), a required definition is missing entirely alongside another defect, or a formula is fabricated/misquoted from a different file."
     },
     "scoring_method": "Deterministic comparison of each run's FILES/SYMBOLS/line-span fields against the external ground truth file (c3_ground_truth.json), performed by the operator after all six live runs complete -- not by another model call.",
     "reviewer_escalation": "If a task's three conditions score inconsistently in a way deterministic comparison cannot resolve, invoke exactly one independent reviewer session for that task only, given the same frozen ground truth. Never one reviewer per run."

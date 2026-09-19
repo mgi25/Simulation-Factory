@@ -1,0 +1,92 @@
+{
+  "spec_version": "1.0",
+  "purpose": "CEO-directed pre-freeze capability audit (Phase 1) and deterministic no-LLM provider dry run (Phase 4), performed before any live C3 Claude session. All queries in this file were executed via a standalone Python script that reproduces provider_server.py's actual ctags_query/treesitter_query logic line-for-line against the real, already-built caches (ctags_cache.json, treesitter_cache.json) -- not simulated, not estimated.",
+  "source_files_audited": [
+    "tools/benchmark_c2/ctags_provider.py",
+    "tools/benchmark_c2/treesitter_provider.py",
+    "C:\\Users\\mgial\\.benchmark-c2\\mcp\\provider_server.py"
+  ],
+  "capability_matrix": {
+    "exact_symbol_lookup": {"ctags": "YES -- exact dict-key lookup by name", "tree_sitter": "YES -- exact dict-key lookup by name"},
+    "partial_or_fuzzy_name_search": {"ctags": "NO -- cache['by_name'].get(value, []) is an exact-match lookup only", "tree_sitter": "NO -- identical exact-match-only lookup"},
+    "definition_file": {"ctags": "YES", "tree_sitter": "YES"},
+    "definition_line_or_span": {"ctags": "start_line ONLY -- SymbolMatch.end_line is never populated for Ctags (confirmed at the source: `SymbolMatch(name=name, kind=kind, file=file_, start_line=line_no)`, no end_line argument passed, defaults to None); ctags indexing uses `--fields=+n` (line number) with no end-line field requested.", "tree_sitter": "Full start-end span, via the AST node's own end_point -- confirmed real, not synthetic (`end_line=node.end_point[0] + 1`)."},
+    "function_body": {"ctags": "NO -- never available, by construction (no end_line means no body slice is possible).", "tree_sitter": "YES, opt-in via with_body=True on find_definition only (not on symbols_in_file); bounded to 4000 chars, sliced directly from source lines[start-1:end]."},
+    "same_name_symbols_across_files": {"ctags": "YES -- by_name is name -> list of matches; if two files define the same symbol name, both appear in one find_definition call.", "tree_sitter": "YES -- identical mechanism."},
+    "callers_or_references": {"ctags": "NO, explicitly and honestly reported unavailable -- module docstring: 'Ctags has no cross-reference/caller tracking for GDScript (confirmed via ctags --list-kinds-full=GDScript: no kind has a reference role), so CALLERS/DEPENDENCIES/PATH queries are honestly reported unavailable rather than emulated.'", "tree_sitter": "NO, explicitly and honestly reported unavailable -- module docstring: 'It still has no cross-file caller/reference graph: relationship queries beyond same-file structure are honestly reported unavailable, not emulated.'"},
+    "aliases_or_cross_file_relationships": {"ctags": "NO -- no concept of import aliases, preload targets, or call graphs anywhere in the implementation.", "tree_sitter": "NO -- same limitation; its AST walk is per-file structural only."},
+    "per_query_bounds": {"both_providers": "MAX_MATCHES=20 per query, MAX_RESULT_CHARS=4000 total, MAX_BODY_CHARS=4000 for tree-sitter body extraction. Truncation is silent-but-flagged (a 'truncated': true field), not an error."}
+  },
+  "task_A_audit": {
+    "decision": "KEEP -- unchanged question, ground truth, and prompt hashes.",
+    "reasoning": "Both providers return information genuinely relevant to environment_world.gd's placement-validity gate, though asymmetrically (see dry run). Neither requires caller/reference resolution: the target relationship (which function calls which) is entirely within one file, discoverable from a single symbols_in_file-style structural listing plus (for tree-sitter) direct body inspection.",
+    "asymmetry_noted": "A single Ctags symbols_in_file call on this specific 1618-line file, capped at 20 matches, does NOT surface _sited/_track_gap/_why in this run's dry-run ordering (it returns the first 20 tags in the cache's internal order, which happens to be alphabetical-ish and stops at _landmarks). The equivalent tree-sitter call, ordered by file position (top-to-bottom AST walk), DOES surface _track_gap, _clear, AND _sited within its own first-20 window, because the target functions happen to sit relatively early (lines 219-271) in the 1618-line file. This is a real, honest asymmetry, not a defect in either provider -- Ctags still correctly returns _clear (244) as one of the three required symbols in the same call, which is genuine, correct, directly relevant information. Per the CEO's own standard ('do not require identical richness, each must provide information genuinely relevant'), Task A remains valid for both providers, with this asymmetry recorded rather than hidden."
+  },
+  "task_B_audit": {
+    "old_design_decision": "REPLACED. find_definition('beam_section') returns exactly one match (its own definition site in toy_geometry.gd) and structurally cannot return the files that CALL it -- confirmed by direct dry run below. The old task's actual difficulty (distinguishing 3 real callers, 2 aliases, 1 same-name shadow, and 1 out-of-scope real caller across 36 candidate files) is caller-graph work neither provider does. Retained as tasks.json B_DRAFT1_SUPERSEDED, never scheduled for a live run.",
+    "new_design_decision": "ACTIVE. action_clearance() is independently defined in exactly 4 files (verified: `grep -rn \"^static func action_clearance\"` across all of godot/ returns exactly 4 lines). A single find_definition('action_clearance') call on either provider returns all 4 sites in one bounded call -- no caller resolution needed at any point. Excluding the two aggregator files that only CALL it (hero_machine.gd, v2_machine.gd) requires checking whether each candidate file defines the symbol itself, which is a per-file structural fact, not a caller-graph fact."
+  },
+  "dry_run_queries": [
+    {
+      "id": "Q1",
+      "task": "A",
+      "provider": "ctags",
+      "query": "symbols_in_file('godot/assets/marble_machine/environment/environment_world.gd')",
+      "returned_match_count": 20,
+      "truncated": true,
+      "char_count": 1485,
+      "contains_task_relevant_symbol": "Partial -- returns _clear:244 (one of three required symbols) but NOT _sited or _track_gap within the 20-match cap.",
+      "would_grep_read_still_need_to_rediscover": "Yes, for _sited and _track_gap specifically -- a follow-up Read or Grep pass is needed to find them; Ctags alone does not fully resolve Task A from this one query."
+    },
+    {
+      "id": "Q2",
+      "task": "A",
+      "provider": "tree_sitter_gdscript",
+      "query": "symbols_in_file('godot/assets/marble_machine/environment/environment_world.gd')",
+      "returned_match_count": 20,
+      "truncated": true,
+      "char_count": 1641,
+      "contains_task_relevant_symbol": "Yes -- all three required symbols appear: _track_gap (219-241), _clear (244-246), _sited (249-256), each with exact spans, in this single call.",
+      "would_grep_read_still_need_to_rediscover": "No for locating the three symbols -- their exact spans are already in the provider result. A follow-up Read is still useful to read _sited's actual body/logic, but the location-finding step (the expensive part in a 1618-line file) is fully resolved by this one call."
+    },
+    {
+      "id": "Q3",
+      "task": "B (new)",
+      "provider": "ctags",
+      "query": "find_definition('action_clearance')",
+      "returned_match_count": 4,
+      "truncated": false,
+      "char_count": 271,
+      "contains_task_relevant_symbol": "Yes -- all 4 required definition files and exact start lines, in one call.",
+      "would_grep_read_still_need_to_rediscover": "No for locating all 4 files/lines. A follow-up Read per file is still needed to get the body/formula for part (b)/(c) of the question, since Ctags never returns a body."
+    },
+    {
+      "id": "Q4",
+      "task": "B (new)",
+      "provider": "tree_sitter_gdscript",
+      "query": "find_definition('action_clearance', with_body=True)",
+      "returned_match_count": 4,
+      "truncated": false,
+      "char_count": 1130,
+      "contains_task_relevant_symbol": "Yes -- all 4 files/spans AND full bodies (each under 10 lines) in one call, including the doc-comment line that distinguishes v2_bowl.gd from hero_bowl.gd.",
+      "would_grep_read_still_need_to_rediscover": "No -- this single call is, on its own, sufficient to answer parts (a), (b), and (c) of the question without any further Read/Grep."
+    },
+    {
+      "id": "Q5 (sanity check on the superseded design)",
+      "task": "B_DRAFT1_SUPERSEDED",
+      "provider": "ctags",
+      "query": "find_definition('beam_section')",
+      "returned_match_count": 1,
+      "truncated": false,
+      "char_count": 48,
+      "contains_task_relevant_symbol": "No -- returns only toy_geometry.gd's own definition site. Cannot return the 3 files that call it.",
+      "would_grep_read_still_need_to_rediscover": "Yes, entirely -- this confirms the CEO's critique directly: the substantive discovery work for the old Task B (who calls this function) is not touched by this query at all."
+    }
+  ],
+  "pass_fail_by_ceo_criterion": {
+    "criterion": "Each provider must provide genuinely task-relevant navigation information on BOTH initial tasks.",
+    "task_A": "PASS for both (asymmetric depth, both genuinely relevant -- see task_A_audit).",
+    "task_B_new": "PASS for both (Ctags: full location set in one call; tree-sitter: full location+body set, sufficient alone).",
+    "task_B_old": "FAIL for both -- this is exactly why it was replaced rather than run."
+  }
+}

@@ -8,9 +8,10 @@
     "TaskA_C0": "c6e66257f73d370063b74fdad769461c6bf83fb770a67c96d1fb2daf5463685d",
     "TaskA_C1": "7b6bb4c611bf4e1b46909db0c0704a93de65d227bbc13ce39bf85384bce415f9",
     "TaskA_C2": "73f48473028ece70ada99723434d14528108a8180b118060703d9128eb53ae4c",
-    "TaskB_C0": "5fb8bc0eb992700f7cffeff98c84a37162a180f922fe3a5b5e3c0990099efd1e",
-    "TaskB_C1": "28dbf0df89efbefa8d915b44a31ef2550709e5c108176a45861c8700ec85b20a",
-    "TaskB_C2": "b0457e54930d4e7575c7e959d4b99001289e4d3a65b7724e0a45e7b45a87b5d4"
+    "TaskB_C0": "b2678709cdad278521a4b47f71ebc37b2e0ef4652eb36ae4de16e52e7f19e798",
+    "TaskB_C1": "44ecdeca950255673b732c06e00a20baa85070435d2e5c4e304ce0bfaacdf41b",
+    "TaskB_C2": "95698219028e641aab3758d592019eb269b7999e21eaefbb884986222bd5b57e",
+    "note": "TaskB hashes above are the ACTIVE, revised action_clearance task. The superseded beam_section/channel_section draft's hashes are recorded separately under tasks[].B_DRAFT1_SUPERSEDED.original_prompt_hashes and were never used for a live run."
   },
   "common_instructions": "Answer using exactly this structure and nothing more. Do not implement, edit, or propose a code change. Do not write an essay. Do not speculate about alternatives not present in the source.\n\nTASK ID: <A|B|C>\nANSWER: <one or two sentence direct answer>\nFILES: <ordered list of repo-relative file paths you determined are required>\nSYMBOLS: <ordered list of `symbol_name (file:start-end)` entries>\nEVIDENCE: <one short sentence per file/symbol citing what you read that supports it>\nCONFIDENCE: <HIGH|MEDIUM|LOW>",
   "forced_use_directive_template": "Before using Grep, Read, or Bash to locate the answer, you MUST invoke {PROVIDER_TOOL} at least once with the most relevant query you can formulate for this task. After that provider call, use the built-in read-only tools as needed to complete and verify your answer. Do not skip the provider call.",
@@ -31,11 +32,24 @@
     },
     {
       "id": "B",
-      "type": "multi_file_call_site_navigation",
-      "target_symbols": "beam_section() and channel_section() in godot/scripts/toy_geometry.gd",
-      "question": "Two mesh cross-section builder functions defined once in godot/scripts/toy_geometry.gd -- beam_section() and channel_section() -- are called from other production scene-building GDScript files (files that construct an actual Node3D/mesh scene, not diagnostic or reporting scripts) to build swept support and channel geometry. Identify every production scene file that calls either function, and for each one: every call site's enclosing symbol and line, and which of the two functions it calls (a file may call one, the other, or both, more than once). Do not include a file merely because it preloads/references toy_geometry.gd for unrelated geometry helpers. Do not include a file whose own locally-defined function happens to share one of these two names without actually calling toy_geometry.gd's version.",
+      "status": "ACTIVE (revised after CEO capability-audit review; supersedes B_DRAFT1)",
+      "type": "same_name_definition_lookup_and_body_comparison",
+      "target_symbol": "action_clearance() defined independently in 4 files under godot/assets/marble_machine/hero/ and .../v2/",
+      "question": "Four separate marble-machine part files -- godot/assets/marble_machine/hero/hero_bowl.gd, godot/assets/marble_machine/hero/hero_collector.gd, godot/assets/marble_machine/hero/hero_finish.gd, and godot/assets/marble_machine/v2/v2_bowl.gd -- each define their own static func action_clearance() -> Dictionary, describing the cylindrical volume around that part that must stay clear of structure. Identify: (a) the exact symbol, file, kind, and line span of each of the four definitions; (b) for each one, the exact shape/centre/radius/height formula it returns; (c) which of the four are identical to each other in their returned formula structure (same constant names and same numeric offsets) and which are distinct, grouping them accordingly. Do not include any file that only calls action_clearance() on another module's object without defining its own version of the function.",
       "answerable_read_only": true,
-      "why_tests_provider_utility": "36 files reference toy_geometry.gd overall, but only 3 actually call beam_section/channel_section, under two different local aliases (Geometry, Geo), plus one file (v2_track.gd) that defines its own same-named, differently-shaped local function as a realistic false positive, and one file (toy_geometry_check.gd) that is a genuine caller but out of the 'production scene' scope by design. A reference-aware provider should in principle distinguish real calls from mere co-references and from same-name shadowing faster than serial Grep passes across 36 candidate files."
+      "why_tests_provider_utility": "action_clearance is defined independently, verbatim-same-name, in exactly 4 files -- a single find_definition('action_clearance') call on EITHER provider returns all 4 definition sites (file+line for Ctags; file+span+body for tree-sitter) in one bounded call (confirmed by deterministic dry run: Ctags 271 chars/4 matches, tree-sitter 1130 chars/4 matches with full bodies). Solving part (c) rewards body-level comparison, which tree-sitter provides directly and Ctags requires a small follow-up Read for. Neither provider's contribution depends on caller/reference resolution: the two aggregator files that only CALL action_clearance() (hero_machine.gd, v2_machine.gd) are excluded by checking whether each candidate file itself defines the symbol, not by tracing who calls whom."
+    },
+    {
+      "id": "B_DRAFT1_SUPERSEDED",
+      "status": "SUPERSEDED -- never run live",
+      "reason": "Required identifying every production CALLER of toy_geometry.gd's beam_section()/channel_section() across 36 candidate files, aliases, and a same-name local shadow. This is fundamentally a cross-file caller/reference-resolution problem. Confirmed via source-code audit (ctags_provider.py, treesitter_provider.py) and a deterministic dry run that neither Ctags nor tree-sitter has any caller/reference capability for GDScript -- both explicitly and honestly report it unavailable rather than emulating it. A forced provider call on this task would measure mandatory-call overhead, not provider value. Original question/hashes retained below for the record, not deleted.",
+      "original_question": "Two mesh cross-section builder functions defined once in godot/scripts/toy_geometry.gd -- beam_section() and channel_section() -- are called from other production scene-building GDScript files (files that construct an actual Node3D/mesh scene, not diagnostic or reporting scripts) to build swept support and channel geometry. Identify every production scene file that calls either function, and for each one: every call site's enclosing symbol and line, and which of the two functions it calls (a file may call one, the other, or both, more than once). Do not include a file merely because it preloads/references toy_geometry.gd for unrelated geometry helpers. Do not include a file whose own locally-defined function happens to share one of these two names without actually calling toy_geometry.gd's version.",
+      "original_prompt_hashes": {
+        "TaskB_C0_DRAFT1": "5fb8bc0eb992700f7cffeff98c84a37162a180f922fe3a5b5e3c0990099efd1e",
+        "TaskB_C1_DRAFT1": "28dbf0df89efbefa8d915b44a31ef2550709e5c108176a45861c8700ec85b20a",
+        "TaskB_C2_DRAFT1": "b0457e54930d4e7575c7e959d4b99001289e4d3a65b7724e0a45e7b45a87b5d4"
+      },
+      "original_prompt_files_preserved_as": "C:\\Users\\mgial\\.benchmark-c3\\runs\\TaskB_C{0,1,2}_DRAFT1_SUPERSEDED_prompt.txt (renamed, not deleted)"
     }
   ],
   "task_C_contingency": {
