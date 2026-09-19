@@ -1,0 +1,127 @@
+{
+  "spec_version": "1.0",
+  "checkpoint": "D",
+  "status": "CLOSED",
+  "conclusion": "INCONCLUSIVE FOR PROVIDER UTILITY",
+  "recommendation": "Run a targeted forced-provider Benchmark C3. Do not productionize Ctags or tree-sitter on this evidence.",
+  "causality_statement": "No official Benchmark C2 result in which the assigned provider was invoked zero times may be treated as causal evidence for or against that provider. Of 6 provider-bearing official runs (T1/C1, T1/C2, T2/C1, T2/C2, T3/C0-has-no-provider-N/A, T3/C1, T3/C2_R1 -- 6 total provider-bearing slots: T1/C1, T1/C2, T2/C1, T2/C2, T3/C1, T3/C2_R1), the assigned provider was actually invoked in exactly 1 of 6 (T3/C2_R1, treesitter_query x1). Ctags was invoked 0 of 3 times (T1/C1, T2/C1, T3/C1) across its entire run history. All correctness/telemetry differences in the other 5 provider-bearing runs are observational navigation variance, not provider effects.",
+  "base_sha": "f2116a5fdaf0f5150753b36cb525f94e1c62b1f2",
+  "claude_code_version": "2.1.70",
+  "model": "claude-sonnet-5",
+  "execution_policy": "See benchmark_c2_execution_policy_amendment.json in ..\\..\\..\\.benchmark-c2\\runs\\ (local, not committed) -- human-supervised interactive, permission-mode default, no bypass, four built-ins (Read/Grep/Glob/Bash) plus at most one MCP provider per condition, CLAUDE_CODE_DISABLE_CLAUDE_MDS=1, DISABLE_AUTOUPDATER=1, DISABLE_UPDATES=1.",
+  "prompt_hashes": {
+    "T1": "7b3d51c6b8fa42486372c074b786df22e59ed2c23acef7909a297e0510044fcc",
+    "T2": "b4bf2a6c1853c8223681a25171a219df43189334a9a8c00a3c9a27c26e1d7da2",
+    "T3": "77db8c2d32eaebbae1ba7309a887004b30fe90df23a1d8a417fed17ae5805336"
+  },
+  "ground_truth_fingerprint_sha256": "249835ea7fb2c9cbdd927b695d423db9ee27bc9550fb6661fff21b49d5bf44b6",
+  "ground_truth_path_outside_repo": "C:\\Users\\mgial\\.benchmark-c2\\ground_truth\\c2_ground_truth.json",
+  "runs": [
+    {
+      "task": "T1", "condition": "C0", "provider": "none", "provider_calls": null,
+      "session_id": "a7587bea-d102-4ef7-ba26-b5417223d72c",
+      "correctness": "CORRECT",
+      "input_tokens": 22, "output_tokens": 1340, "cache_creation_input_tokens": 34691, "cache_read_input_tokens": 130255,
+      "assistant_turns": 11, "tool_calls": {"Bash": 3, "Read": 2, "Grep": 1, "Glob": 0},
+      "contamination": "PASS"
+    },
+    {
+      "task": "T1", "condition": "C1", "provider": "ctags_query", "provider_calls": 0,
+      "session_id": "df0c3417-c8e5-4b20-b6ee-ddb841171621",
+      "correctness": "CORRECT",
+      "output_tokens": 1128, "cache_creation_input_tokens": 16290, "cache_read_input_tokens": 55647,
+      "assistant_turns": 5, "tool_calls": {"Bash": 1, "Read": 2, "Grep": 1, "Glob": 0, "ctags_query": 0},
+      "contamination": "PASS"
+    },
+    {
+      "task": "T1", "condition": "C2", "provider": "treesitter_query", "provider_calls": 0,
+      "session_id": "56e8db65-0dff-44dd-a711-b3291c3d8e7c",
+      "correctness": "CORRECT",
+      "output_tokens": 843, "cache_creation_input_tokens": 17468, "cache_read_input_tokens": 43371,
+      "assistant_turns": 4, "tool_calls": {"Bash": 0, "Read": 1, "Grep": 1, "Glob": 1, "treesitter_query": 0},
+      "contamination": "PASS"
+    },
+    {
+      "task": "T2", "condition": "C1", "provider": "ctags_query", "provider_calls": 0,
+      "session_id": "0af9cf1c-2528-4edd-bce4-deba130db7e6",
+      "correctness": "PARTIAL",
+      "correctness_detail": "Missing neon_scene.gd assignment-site symbol _build_camera (821-855); substituted with _elevation declaration (489).",
+      "output_tokens": 2299, "cache_creation_input_tokens": 13824, "cache_read_input_tokens": 132346,
+      "assistant_turns": 8, "tool_calls": {"Read": 5, "Grep": 3, "Bash": 0, "Glob": 0, "ctags_query": 0},
+      "contamination": "PASS"
+    },
+    {
+      "task": "T2", "condition": "C2", "provider": "treesitter_query", "provider_calls": 0,
+      "session_id": "5e4f6f84-99a6-4a75-b09d-836eb63d86d1",
+      "correctness": "PARTIAL",
+      "correctness_detail": "Identical miss to T2/C1: neon_scene.gd assignment-site symbol _build_camera (821-855) missing.",
+      "output_tokens": 3745, "cache_creation_input_tokens": 17320, "cache_read_input_tokens": 127070,
+      "assistant_turns": 8, "tool_calls": {"Read": 5, "Grep": 7, "Bash": 0, "Glob": 0, "treesitter_query": 0},
+      "contamination": "PASS"
+    },
+    {
+      "task": "T2", "condition": "C0", "provider": "none", "provider_calls": null,
+      "session_id": "9f15a195-75bb-4f16-96c5-c3726e6dc1d4",
+      "correctness": "PARTIAL",
+      "correctness_detail": "Two misses: race_scene.gd consumer _update_camera (960-983) missing AND neon_scene.gd assignment-site _build_camera (821-855) missing.",
+      "output_tokens": 2255, "cache_creation_input_tokens": 23874, "cache_read_input_tokens": 170266,
+      "assistant_turns": 11, "tool_calls": {"Read": 5, "Grep": 5, "Bash": 0, "Glob": 0},
+      "contamination": "PASS"
+    },
+    {
+      "task": "T3", "condition": "C2", "status": "INVALID_PROCEDURAL_CONTAMINATION",
+      "session_id": "ec81f3b4-c02c-4f8e-a06c-0d2667728997",
+      "reason": "Operator accidentally pasted the PowerShell launch command as the first chat message; the real T3 prompt followed as a second turn. Preserved as diagnostic evidence only, excluded from all official totals and from this closure's aggregate.",
+      "excluded_from_official_totals": true
+    },
+    {
+      "task": "T3", "condition": "C2", "label": "C2_R1 (official replacement)", "provider": "treesitter_query", "provider_calls": 1,
+      "session_id": "a8790941-bb35-4c28-957c-8e2be87c44f2",
+      "correctness": "PARTIAL",
+      "correctness_detail": "MACHINE_SUBTLE/SIGNATURE/SHOWCASE (271-273) omitted entirely from SYMBOLS, with an explicit incorrect exclusivity claim ('Only MACHINE_PASSES...needs a new entry'); _build symbol omitted entirely; 2 real reference files omitted from FILES (course_env.gd, sloped_race_scene.gd). MACHINE_PASSES/get_material/_retune/_init exact; no distractor fabricated as required.",
+      "input_tokens": 30, "output_tokens": 10110, "cache_creation_input_tokens": 48668, "cache_read_input_tokens": 430476,
+      "assistant_turns": 15, "tool_calls": {"Read": 7, "Grep": 28, "Bash": 0, "Glob": 0, "treesitter_query": 1},
+      "contamination": "PASS",
+      "note": "The only official Benchmark C2 run in which an assigned provider was actually invoked. Also the worst-scoring and highest-resource-use of the three T3 conditions -- not read as causal evidence of harm (n=1), but explicitly not usable as evidence of benefit either."
+    },
+    {
+      "task": "T3", "condition": "C0", "provider": "none", "provider_calls": null,
+      "session_id": "0e98f5d6-582c-4f33-95a6-e146936b2499",
+      "correctness": "PARTIAL",
+      "correctness_detail": "MACHINE_SUBTLE/SIGNATURE/SHOWCASE present with exact spans but framed as optional/conditional rather than required; _build span incomplete (684-... / evidence 684-696 vs true 684-1308); 1 real reference file omitted (sloped_race_scene.gd); minor _retune span off by 2 lines (569-681 vs 569-683).",
+      "input_tokens": 18, "output_tokens": 4803, "cache_creation_input_tokens": 31931, "cache_read_input_tokens": 207406,
+      "assistant_turns": 9, "tool_calls": {"Bash": 3, "Read": 5, "Grep": 3, "Glob": 0},
+      "contamination": "PASS"
+    },
+    {
+      "task": "T3", "condition": "C1", "provider": "ctags_query", "provider_calls": 0,
+      "session_id": "5181c14a-966a-4ddf-8c8f-0797502d211d",
+      "correctness": "PARTIAL",
+      "correctness_detail": "Best of the three T3 runs: MACHINE_SUBTLE/SIGNATURE/SHOWCASE present AND correctly stated as required (first T3 run to get this right); MACHINE_PASSES/get_material/_init exact; all 11 real reference files present, none fabricated as required. Sole remaining defect: _build span incomplete (684-... vs true 684-1308); minor _retune span off by 2 lines.",
+      "input_tokens": 22, "output_tokens": 4706, "cache_creation_input_tokens": 23492, "cache_read_input_tokens": 212875,
+      "assistant_turns": 11, "tool_calls": {"Bash": 5, "Read": 5, "Grep": 4, "Glob": 0, "ctags_query": 0},
+      "contamination": "PASS"
+    }
+  ],
+  "provider_invocation_summary": {
+    "ctags_query": {"opportunities": 3, "actual_invocations": 0, "runs": ["T1/C1", "T2/C1", "T3/C1"]},
+    "treesitter_query": {"opportunities": 3, "actual_invocations": 1, "runs": ["T1/C2", "T2/C2", "T3/C2_R1"], "invoked_in": ["T3/C2_R1"]}
+  },
+  "correctness_by_task": {
+    "T1": {"C0": "CORRECT", "C1": "CORRECT", "C2": "CORRECT"},
+    "T2": {"C0": "PARTIAL", "C1": "PARTIAL", "C2": "PARTIAL"},
+    "T3": {"C0": "PARTIAL", "C1": "PARTIAL", "C2 (R1)": "PARTIAL"}
+  },
+  "decision_rule_applied": {
+    "eligibility_bar": "correctness = 3/3 CORRECT for the candidate condition across its 3 tasks",
+    "ctags_result": "1/3 CORRECT (T1 only) -- fails eligibility",
+    "treesitter_result": "1/3 CORRECT (T1 only) -- fails eligibility",
+    "note": "Per experiment.json decision_rule.do_not_force_a_winner: correctness is not 3/3 for either candidate, so the result is INCONCLUSIVE, not BASELINE WINS or a productionization verdict for either provider."
+  },
+  "invalid_or_stale_artifacts_preserved": [
+    {"path": "C:\\Users\\mgial\\.claude\\projects\\C--Users-mgial--benchmark-c2-runs-T3-C2\\ec81f3b4-c02c-4f8e-a06c-0d2667728997.jsonl", "status": "preserved, unmodified, excluded from totals"},
+    {"path": "C:\\Users\\mgial\\.benchmark-c2\\runs\\T3_C2_invalid_run_record.json", "status": "preserved"},
+    {"path": "C:\\Users\\mgial\\.benchmark-c2\\runs\\T1_C0_manifest.json", "status": "stale, superseded by T1_C0_execution_amendment.json, preserved unmodified"}
+  ],
+  "raw_transcripts_note": "No raw Claude Code JSONL transcripts are copied into this repository. Only session IDs, prompt/ground-truth hashes, and derived numeric metrics are recorded here. Raw transcripts remain at their original local paths under C:\\Users\\mgial\\.claude\\projects\\ and are not committed."
+}
