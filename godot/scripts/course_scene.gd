@@ -237,6 +237,8 @@ func _options() -> Dictionary:
 		var split := arg.substr(2).split("=", true, 1)
 		if split.size() == 2:
 			options[split[0]] = split[1]
+		else:
+			options[split[0]] = "1"
 	return options
 
 
