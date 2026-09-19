@@ -2530,6 +2530,117 @@ def test_genuine_governance_actions_still_route_to_specialist(objective):
     assert "which is governance work" in routed.reason, routed.reason
 
 
+# --- 13b. routing precision: a negated prohibition is not the work itself ----
+
+
+@pytest.mark.parametrize(
+    "objective",
+    [
+        "Do not redesign the schema for this table.",
+        "No schema redesign is needed for this change.",
+        "No migration is required for this change.",
+        "Do not perform a migration of this table.",
+        "Do not modify authentication in this task.",
+        "Never rewrite the queue consumer for this fix.",
+        "Avoid a breaking change in this release.",
+    ],
+)
+def test_negated_specialist_terms_stay_routine(objective):
+    """A prohibition naming a specialist term is not a request to do it.
+
+    Regression for the false positive found while drafting a real correction
+    work order: `derive_routing` matched trigger substrings anywhere in the
+    objective with no regard for a preceding "not"/"no"/"avoid" in the same
+    clause, so a constraint like "do not redesign the schema" escalated a
+    routine job to the architecture specialist exactly as if it had asked for
+    a redesign.
+    """
+    routed = derive_routing(_request(objective=objective))
+    assert routed.specialist_domain == "", (objective, routed)
+    assert "routine implementation" in routed.reason, (objective, routed.reason)
+
+
+@pytest.mark.parametrize(
+    "objective",
+    [
+        "Redesign the schema for this table.",
+        "Perform a schema migration for this table.",
+        "Rewrite the queue consumer for this fix.",
+        "Redesign authentication for this service.",
+    ],
+)
+def test_positive_specialist_terms_still_escalate_after_the_negation_fix(objective):
+    """The negation fix must not swallow genuine positive intent.
+
+    Each objective here uses the same trigger vocabulary as the negated cases
+    above, without a negation word in front of it, and must still escalate.
+    """
+    routed = derive_routing(_request(objective=objective))
+    assert routed.specialist_domain != "", (objective, routed)
+
+
+@pytest.mark.parametrize(
+    "objective",
+    [
+        "Do not redesign the API. Migrate the persistence schema to version 3.",
+        "No deployment is required; redesign authentication for this service.",
+        "Avoid architecture changes except migrate the persistence schema.",
+    ],
+)
+def test_a_later_independent_clause_still_escalates(objective):
+    """A negation in one clause has no bearing on a separate, later clause.
+
+    Clause splitting (on sentence terminators and contrastive conjunctions
+    like "except"/"but") is what makes this possible: the negated clause
+    suppresses its own trigger word, and the following clause is judged on
+    its own.
+    """
+    routed = derive_routing(_request(objective=objective))
+    assert routed.specialist_domain != "", (objective, routed)
+
+
+@pytest.mark.parametrize(
+    "objective",
+    [
+        ROUTINE_OBJECTIVE,
+        "Add a CLI flag that prints a work order's authorized paths.",
+        "Fix a typo in the label the CEO result renders for the gate section.",
+    ],
+)
+def test_normal_routine_wording_is_unaffected_by_the_negation_fix(objective):
+    routed = derive_routing(_request(objective=objective))
+    assert routed.specialist_domain == "", (objective, routed)
+
+
+def test_the_historical_correction_job_wording_is_now_routine():
+    """The exact objective text that originally triggered the false positive.
+
+    Drawn verbatim from the first draft of the real work order that fixed
+    `EngineeringResult`'s null-crash (before it was reworded to avoid the bug
+    manually): the two sentences "it must not redesign the field's
+    representation or introduce any migration machinery" contain "redesign"
+    and "migration" only inside a negation, and must not escalate.
+    """
+    objective = (
+        "The reviewer of work order wo-req-legacy-attempts-remaining-default "
+        "(finding from-mapping-null-value-crashes, changes_required) found that "
+        "EngineeringResult.from_mapping (company/engineering/result.py) calls "
+        "int(data['developer_attempts_remaining']) whenever the key is present, "
+        "including when its value is JSON null. Once a result whose "
+        "developer_attempts_remaining field is None is persisted via to_dict(), "
+        "the key round-trips as null rather than being dropped, so from_mapping "
+        "raises TypeError on reload. Correct from_mapping so a present-but-null "
+        "value is treated the same as an absent key (both yield None, rendered "
+        "as 'unknown'), while a present integer value -- including an explicit "
+        "0 -- keeps round-tripping exactly as it already does. This must be the "
+        "smallest backward-compatible fix; it must not redesign the field's "
+        "representation or introduce any migration machinery."
+    )
+    routed = derive_routing(_request(objective=objective))
+    assert routed.specialist_domain == "", routed
+    assert "routine implementation" in routed.reason, routed.reason
+
+
 def test_explicit_specialist_domain_is_authoritative_over_text():
     """The CEO-named domain wins even when the objective text is routine."""
     routed = derive_routing(
