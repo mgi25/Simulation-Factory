@@ -1,0 +1,251 @@
+[
+  {
+    "run_id": "T1_C0",
+    "task": "1",
+    "condition": "C0",
+    "session_id": "639f617c-86ac-42f6-87f3-a25b61f47c17",
+    "claude_code_version": "2.1.70",
+    "permission_mode": "default",
+    "mcp_servers": [],
+    "tools_available": [
+      "Bash",
+      "Glob",
+      "Grep",
+      "Read"
+    ],
+    "input_tokens": 17,
+    "output_tokens": 2373,
+    "cache_creation_input_tokens": 7960,
+    "cache_read_input_tokens": 131241,
+    "context_load_tokens": 139218,
+    "num_turns": 9,
+    "duration_ms": 38100,
+    "total_cost_usd": 0.1747805,
+    "tool_counts": {
+      "Bash": 3,
+      "Grep": 2,
+      "Read": 3
+    },
+    "files_read": [
+      "C:/Users/mgial/.benchmark-c4/runs/T1_C0/godot/assets/marble_machine/course/course_modules.gd"
+    ],
+    "navigation_result_chars": 10775,
+    "treesitter_calls": [],
+    "contamination_leaks": [],
+    "contamination_PASS_FAIL": "PASS",
+    "final_answer_raw": "TASK ID: 1\nANSWER: `_apron_y` is the height function; it is called only by `_shuffle_pan`, and a change to how the height is computed only needs to touch `_apron_y`'s own body since callers use it as an opaque query.\nFILES: godot/assets/marble_machine/course/course_modules.gd\nSYMBOLS: _apron_y (godot/assets/marble_machine/course/course_modules.gd:264-278), _shuffle_pan (godot/assets/marble_machine/course/course_modules.gd:281-337)\nEVIDENCE: `_apron_y` (264-278) is a static func taking `contract` and a `z` station and returning a computed float height via `top + (rim - z) * grade`, with its docstring stating \"this is its height at a station\"; a file-wide grep for `_apron_y(` shows the only call site is inside `_shuffle_pan`'s sampling loop at line 298, which builds `path` by calling `_apron_y(contract, z)` per sample.\nCONFIDENCE: HIGH"
+  },
+  {
+    "run_id": "T1_C2",
+    "task": "1",
+    "condition": "C2",
+    "session_id": "ffbba31f-8354-46d5-87d0-729de2e3e364",
+    "claude_code_version": "2.1.70",
+    "permission_mode": "default",
+    "mcp_servers": [
+      {
+        "name": "treesitter_query",
+        "status": "connected"
+      }
+    ],
+    "tools_available": [
+      "Bash",
+      "Glob",
+      "Grep",
+      "Read",
+      "mcp__treesitter_query__treesitter_query"
+    ],
+    "input_tokens": 11,
+    "output_tokens": 1789,
+    "cache_creation_input_tokens": 12343,
+    "cache_read_input_tokens": 84518,
+    "context_load_tokens": 96872,
+    "num_turns": 6,
+    "duration_ms": 27160,
+    "total_cost_usd": 0.16418275,
+    "tool_counts": {
+      "mcp__treesitter_query__treesitter_query": 1,
+      "Grep": 3,
+      "Read": 1
+    },
+    "files_read": [
+      "C:\\Users\\mgial\\.benchmark-c4\\runs\\T1_C2\\godot\\assets\\marble_machine\\course\\course_modules.gd"
+    ],
+    "navigation_result_chars": 11722,
+    "treesitter_calls": [
+      {
+        "query_kind": "symbols_in_file",
+        "value": "godot/assets/marble_machine/course/course_modules.gd"
+      }
+    ],
+    "contamination_leaks": [],
+    "contamination_PASS_FAIL": "PASS",
+    "final_answer_raw": "Confirmed only one call site.\n\nTASK ID: 1\nANSWER: `_apron_y(contract, z)` is the static function that computes the pan/apron ramp's height at an arbitrary z station; it is called from `_shuffle_pan`, so a change to its height formula must touch `_shuffle_pan` (lines 281-337), the only other symbol using it.\nFILES: godot/assets/marble_machine/course/course_modules.gd\nSYMBOLS: _apron_y (godot/assets/marble_machine/course/course_modules.gd:264-278), _shuffle_pan (godot/assets/marble_machine/course/course_modules.gd:281-337)\nEVIDENCE: `_apron_y (godot/assets/marble_machine/course/course_modules.gd:264-278)` \u2014 treesitter symbols_in_file listed it as a method with docstring \"The pan and apron are ONE ramp, and this is its height at a station,\" matching (a)-(c); `_shuffle_pan (godot/assets/marble_machine/course/course_modules.gd:281-337)` \u2014 Grep for `_apron_y` across the whole file shows the definition at line 264 and its sole call site at line 298 inside `_shuffle_pan`'s sample loop, and Read confirmed no other function in the file references `_apron_y`.\nCONFIDENCE: HIGH"
+  },
+  {
+    "run_id": "T2_C2",
+    "task": "2",
+    "condition": "C2",
+    "session_id": "3edced9f-4a5a-435f-aa6a-06809851aac3",
+    "claude_code_version": "2.1.70",
+    "permission_mode": "default",
+    "mcp_servers": [
+      {
+        "name": "treesitter_query",
+        "status": "connected"
+      }
+    ],
+    "tools_available": [
+      "Bash",
+      "Glob",
+      "Grep",
+      "Read",
+      "mcp__treesitter_query__treesitter_query"
+    ],
+    "input_tokens": 5,
+    "output_tokens": 2320,
+    "cache_creation_input_tokens": 8372,
+    "cache_read_input_tokens": 35349,
+    "context_load_tokens": 43726,
+    "num_turns": 3,
+    "duration_ms": 33755,
+    "total_cost_usd": 0.1280245,
+    "tool_counts": {
+      "mcp__treesitter_query__treesitter_query": 1,
+      "Grep": 1
+    },
+    "files_read": [],
+    "navigation_result_chars": 2876,
+    "treesitter_calls": [
+      {
+        "query_kind": "find_definition",
+        "value": "_polar",
+        "with_body": true
+      }
+    ],
+    "contamination_leaks": [],
+    "contamination_PASS_FAIL": "PASS",
+    "final_answer_raw": "TASK ID: 2\nANSWER: Three of the five (course_env.gd, environment_builder.gd, v2_world.gd) are identical `(bearing, radius, y) -> Vector3` polar-to-Cartesian conversions; hero_world.gd shares that signature/return type but adds a `BEARING_SHIFT` offset inside the angle formula, and environment_stage.gd is distinct with a different `(centre_x, centre_z, bearing, radius) -> Vector2` signature that also offsets by a plan-position centre.\nFILES: godot/assets/marble_machine/course/course_env.gd, godot/assets/marble_machine/environment/environment_builder.gd, godot/assets/marble_machine/environment/environment_stage.gd, godot/assets/marble_machine/hero/hero_world.gd, godot/assets/marble_machine/v2/v2_world.gd\nSYMBOLS: _polar (godot/assets/marble_machine/course/course_env.gd:827-830), _polar (godot/assets/marble_machine/environment/environment_builder.gd:51-53), _polar (godot/assets/marble_machine/environment/environment_stage.gd:101-109), _polar (godot/assets/marble_machine/hero/hero_world.gd:155-157), _polar (godot/assets/marble_machine/v2/v2_world.gd:131-133)\nEVIDENCE: course_env.gd:827-830 body reads `static func _polar(bearing: float, radius: float, y: float) -> Vector3: ... return Vector3(sin(angle)*radius, y, cos(angle)*radius)` with `angle := deg_to_rad(bearing)`; environment_builder.gd:51-53 has the identical signature, return type, and formula with no comment; environment_stage.gd:101-109 has signature `(centre_x: float, centre_z: float, bearing: float, radius: float) -> Vector2` returning `Vector2(centre_x + sin(angle)*radius, centre_z + cos(angle)*radius)`; hero_world.gd:155-157 has signature `(bearing_degrees: float, radius: float, y: float) -> Vector3` but computes `angle := deg_to_rad(bearing_degrees + BEARING_SHIFT)` before the same `Vector3(sin*radius, y, cos*radius)` return, and hero_world.gd:152 shows `BEARING_SHIFT` is a module-level const (`VIEW_BEARING - AUTHORED_BEARING`) used inside the formula; v2_world.gd:131-133 has signature `(bearing_degrees: float, radius: float, y: float) -> Vector3` with `angle := deg_to_rad(bearing_degrees)` and the same `Vector3(sin*radius, y, cos*radius)` return, matching course_env/environment_builder aside from the cosmetic `bearing_degrees` vs `bearing` parameter name.\nCONFIDENCE: HIGH"
+  },
+  {
+    "run_id": "T2_C0",
+    "task": "2",
+    "condition": "C0",
+    "session_id": "42dc3fe0-64d2-49af-8a39-fba6ab29596e",
+    "claude_code_version": "2.1.70",
+    "permission_mode": "default",
+    "mcp_servers": [],
+    "tools_available": [
+      "Bash",
+      "Glob",
+      "Grep",
+      "Read"
+    ],
+    "input_tokens": 5,
+    "output_tokens": 2779,
+    "cache_creation_input_tokens": 5538,
+    "cache_read_input_tokens": 37139,
+    "context_load_tokens": 42682,
+    "num_turns": 7,
+    "duration_ms": 26312,
+    "total_cost_usd": 0.12268200000000001,
+    "tool_counts": {
+      "Grep": 1,
+      "Read": 5
+    },
+    "files_read": [
+      "C:\\Users\\mgial\\.benchmark-c4\\runs\\T2_C0\\godot\\assets\\marble_machine\\course\\course_env.gd",
+      "C:\\Users\\mgial\\.benchmark-c4\\runs\\T2_C0\\godot\\assets\\marble_machine\\environment\\environment_builder.gd",
+      "C:\\Users\\mgial\\.benchmark-c4\\runs\\T2_C0\\godot\\assets\\marble_machine\\environment\\environment_stage.gd",
+      "C:\\Users\\mgial\\.benchmark-c4\\runs\\T2_C0\\godot\\assets\\marble_machine\\hero\\hero_world.gd",
+      "C:\\Users\\mgial\\.benchmark-c4\\runs\\T2_C0\\godot\\assets\\marble_machine\\v2\\v2_world.gd"
+    ],
+    "navigation_result_chars": 6206,
+    "treesitter_calls": [],
+    "contamination_leaks": [],
+    "contamination_PASS_FAIL": "PASS",
+    "final_answer_raw": "TASK ID: 2\nANSWER: Three of the five (environment_builder.gd, course_env.gd, v2_world.gd) are exact-formula duplicates of `_polar(bearing, radius, y) -> Vector3` using `Vector3(sin(deg_to_rad(bearing))*radius, y, cos(deg_to_rad(bearing))*radius)`; hero_world.gd has the same signature/return type but adds a module-level `BEARING_SHIFT` offset to the bearing before conversion; environment_stage.gd is structurally distinct with a 4-parameter `(centre_x, centre_z, bearing, radius) -> Vector2` signature that offsets a 2D centre point instead of returning a raw offset vector.\nFILES: godot/assets/marble_machine/environment/environment_builder.gd, godot/assets/marble_machine/course/course_env.gd, godot/assets/marble_machine/v2/v2_world.gd, godot/assets/marble_machine/hero/hero_world.gd, godot/assets/marble_machine/environment/environment_stage.gd\nSYMBOLS: _polar (godot/assets/marble_machine/environment/environment_builder.gd:51-53), _polar (godot/assets/marble_machine/course/course_env.gd:827-830), _polar (godot/assets/marble_machine/v2/v2_world.gd:131-133), _polar (godot/assets/marble_machine/hero/hero_world.gd:155-157), _polar (godot/assets/marble_machine/environment/environment_stage.gd:101-109)\nEVIDENCE: environment_builder.gd:51-53 defines `_polar(bearing: float, radius: float, y: float) -> Vector3` returning `Vector3(sin(angle)*radius, y, cos(angle)*radius)` with `angle := deg_to_rad(bearing)`; course_env.gd:827-830 has an identical body/signature (with a comment noting it duplicates `course_world._polar`); v2_world.gd:131-133 has the same body/signature except the parameter is named `bearing_degrees`; hero_world.gd:150-157 shows module consts `AUTHORED_BEARING`/`VIEW_BEARING`/`BEARING_SHIFT` and the function adds `BEARING_SHIFT` to `bearing_degrees` before computing `angle`, otherwise same Vector3 formula; environment_stage.gd:101-109 shows a 4-parameter signature `(centre_x, centre_z, bearing, radius) -> Vector2` whose body returns `Vector2(centre_x + sin(angle)*radius, centre_z + cos(angle)*radius)`.\nCONFIDENCE: HIGH"
+  },
+  {
+    "run_id": "T3_C0",
+    "task": "3",
+    "condition": "C0",
+    "session_id": "0ac2dd9f-48ca-4681-a865-9f305f30def0",
+    "claude_code_version": "2.1.70",
+    "permission_mode": "default",
+    "mcp_servers": [],
+    "tools_available": [
+      "Bash",
+      "Glob",
+      "Grep",
+      "Read"
+    ],
+    "input_tokens": 7,
+    "output_tokens": 557,
+    "cache_creation_input_tokens": 2765,
+    "cache_read_input_tokens": 49036,
+    "context_load_tokens": 51808,
+    "num_turns": 4,
+    "duration_ms": 10865,
+    "total_cost_usd": 0.055759249999999996,
+    "tool_counts": {
+      "Glob": 1,
+      "Grep": 1,
+      "Read": 1
+    },
+    "files_read": [
+      "C:\\Users\\mgial\\.benchmark-c4\\runs\\T3_C0\\godot\\scripts\\world_kit_probe.gd"
+    ],
+    "navigation_result_chars": 1466,
+    "treesitter_calls": [],
+    "contamination_leaks": [],
+    "contamination_PASS_FAIL": "PASS",
+    "final_answer_raw": "TASK ID: 3\nANSWER: `_environment()` builds and returns the Environment resource via `Builder.environment(profile, false)`, using a profile resolved from `Profiles.resolve`.\nFILES: godot/scripts/world_kit_probe.gd\nSYMBOLS: _environment (godot/scripts/world_kit_probe.gd:108-110)\nEVIDENCE: godot/scripts/world_kit_probe.gd:108-110 shows a function typed to return `Environment` that resolves a profile and returns `Builder.environment(profile, false)`.\nCONFIDENCE: HIGH"
+  },
+  {
+    "run_id": "T3_C2",
+    "task": "3",
+    "condition": "C2",
+    "session_id": "3cb86b26-663a-4390-8481-9c917fc9f41d",
+    "claude_code_version": "2.1.70",
+    "permission_mode": "default",
+    "mcp_servers": [
+      {
+        "name": "treesitter_query",
+        "status": "connected"
+      }
+    ],
+    "tools_available": [
+      "Bash",
+      "Glob",
+      "Grep",
+      "Read",
+      "mcp__treesitter_query__treesitter_query"
+    ],
+    "input_tokens": 5,
+    "output_tokens": 491,
+    "cache_creation_input_tokens": 6518,
+    "cache_read_input_tokens": 34228,
+    "context_load_tokens": 40751,
+    "num_turns": 3,
+    "duration_ms": 8641,
+    "total_cost_usd": 0.07015149999999999,
+    "tool_counts": {
+      "mcp__treesitter_query__treesitter_query": 1,
+      "Read": 1
+    },
+    "files_read": [
+      "C:\\Users\\mgial\\.benchmark-c4\\runs\\T3_C2\\godot\\scripts\\world_kit_probe.gd"
+    ],
+    "navigation_result_chars": 1702,
+    "treesitter_calls": [
+      {
+        "query_kind": "symbols_in_file",
+        "value": "godot/scripts/world_kit_probe.gd"
+      }
+    ],
+    "contamination_leaks": [],
+    "contamination_PASS_FAIL": "PASS",
+    "final_answer_raw": "TASK ID: 3\nANSWER: `_environment` builds and returns the Environment resource used by the probe, resolving a profile and delegating to `Builder.environment`.\nFILES: godot/scripts/world_kit_probe.gd\nSYMBOLS: _environment (godot/scripts/world_kit_probe.gd:108-110)\nEVIDENCE: treesitter_query symbols_in_file listed `_environment` as a method spanning lines 108-110, and Read confirmed it returns `Environment` via `Builder.environment(profile, false)`.\nCONFIDENCE: HIGH"
+  }
+]

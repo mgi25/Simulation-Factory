@@ -1,0 +1,161 @@
+{
+  "spec_version": "1.0",
+  "benchmark": "C4 - Candidate Prioritization (tree-sitter only, two conditions)",
+  "experiment_identity": {
+    "branch": "company-os-resource-lab-benchmark-c4",
+    "parent_commit": "dffee0ca375da745b8536c7f75272ba4d964d05e",
+    "freeze_commit": "2784973dd21908b997862f31d2fbcd500ec1a723",
+    "apparatus_fix_commit": "472ae5b948d3ca562aa3142e8cf905e765a945b5",
+    "apparatus_fix_note": "run_all_c4.ps1 had a PowerShell-5.1 stderr-redirection bug (native command stderr wrapped as a terminating NativeCommandError under $ErrorActionPreference=Stop) that aborted worktree setup for T1_C0 before any claude session was launched. No official run was attempted or invalidated by this -- fixed and re-pushed before the first official run executed. All six official runs below ran against apparatus_fix_commit, and all six report the identical head_sha, confirming a single consistent source snapshot across the whole batch.",
+    "official_runs_head_sha": "472ae5b948d3ca562aa3142e8cf905e765a945b5"
+  },
+  "six_run_results": [
+    {
+      "run_id": "T1_C0", "task": "1", "condition": "C0",
+      "session_id": "639f617c-86ac-42f6-87f3-a25b61f47c17",
+      "claude_code_version": "2.1.70", "permission_mode": "default", "mcp_servers": [],
+      "input_tokens": "see extracted_metrics.json", "context_load_tokens": 139218,
+      "num_turns": 9, "duration_ms": 38100,
+      "tool_counts": {"Bash": 3, "Grep": 2, "Read": 3},
+      "navigation_result_chars": 10775,
+      "provider_call_count": 0, "provider_relevant": "n/a (C0)",
+      "contamination": "PASS",
+      "correctness": "CORRECT",
+      "correctness_note": "Names _apron_y (264-278) as the height-at-a-station function; correctly identifies _shuffle_pan as its only in-file caller; does not name trough_section/floor_section/_cradle."
+    },
+    {
+      "run_id": "T1_C2", "task": "1", "condition": "C2",
+      "session_id": "ffbba31f-8354-46d5-87d0-729de2e3e364",
+      "claude_code_version": "2.1.70", "permission_mode": "default", "mcp_servers": [{"name": "treesitter_query", "status": "connected"}],
+      "context_load_tokens": 96872,
+      "num_turns": 6, "duration_ms": 27160,
+      "tool_counts": {"mcp__treesitter_query__treesitter_query": 1, "Grep": 3, "Read": 1},
+      "navigation_result_chars": 11722,
+      "provider_call_count": 1,
+      "provider_call": {"query_kind": "symbols_in_file", "value": "godot/assets/marble_machine/course/course_modules.gd"},
+      "provider_call_order": "first tool call, before any Grep/Read (directive followed)",
+      "provider_relevant": true,
+      "contamination": "PASS",
+      "correctness": "CORRECT",
+      "correctness_note": "Same required fields as T1_C0, all correct. Answer's part-(e) phrasing is slightly awkward ('a change... must touch _shuffle_pan') but the frozen rubric's CORRECT conditions (symbol, span, caller, no distractor named) are all satisfied; not scored down for phrasing outside the frozen rubric's own text."
+    },
+    {
+      "run_id": "T2_C2", "task": "2", "condition": "C2",
+      "session_id": "3edced9f-4a5a-435f-aa6a-06809851aac3",
+      "claude_code_version": "2.1.70", "permission_mode": "default", "mcp_servers": [{"name": "treesitter_query", "status": "connected"}],
+      "context_load_tokens": 43726,
+      "num_turns": 3, "duration_ms": 33755,
+      "tool_counts": {"mcp__treesitter_query__treesitter_query": 1, "Grep": 1},
+      "navigation_result_chars": 2876,
+      "provider_call_count": 1,
+      "provider_call": {"query_kind": "find_definition", "value": "_polar", "with_body": true},
+      "provider_call_order": "first tool call, before Grep (directive followed)",
+      "provider_relevant": true,
+      "contamination": "PASS",
+      "correctness": "CORRECT",
+      "correctness_note": "All 5 definitions present with correct file/span/formula; Group A (course_env, environment_builder, v2_world) correctly grouped identical; hero_world.gd and environment_stage.gd each correctly identified distinct with the specific reason; environment_world.gd not included."
+    },
+    {
+      "run_id": "T2_C0", "task": "2", "condition": "C0",
+      "session_id": "42dc3fe0-64d2-49af-8a39-fba6ab29596e",
+      "claude_code_version": "2.1.70", "permission_mode": "default", "mcp_servers": [],
+      "context_load_tokens": 42682,
+      "num_turns": 7, "duration_ms": 26312,
+      "tool_counts": {"Grep": 1, "Read": 5},
+      "navigation_result_chars": 6206,
+      "provider_call_count": 0, "provider_relevant": "n/a (C0)",
+      "contamination": "PASS",
+      "correctness": "CORRECT",
+      "correctness_note": "Same grouping and all 5 spans/formulas correct; environment_world.gd not included."
+    },
+    {
+      "run_id": "T3_C0", "task": "3", "condition": "C0",
+      "session_id": "0ac2dd9f-48ca-4681-a865-9f305f30def0",
+      "claude_code_version": "2.1.70", "permission_mode": "default", "mcp_servers": [],
+      "context_load_tokens": 51808,
+      "num_turns": 4, "duration_ms": 10865,
+      "tool_counts": {"Glob": 1, "Grep": 1, "Read": 1},
+      "navigation_result_chars": 1466,
+      "provider_call_count": 0, "provider_relevant": "n/a (C0)",
+      "contamination": "PASS",
+      "correctness": "CORRECT",
+      "correctness_note": "Names _environment (108-110); no distractor named."
+    },
+    {
+      "run_id": "T3_C2", "task": "3", "condition": "C2",
+      "session_id": "3cb86b26-663a-4390-8481-9c917fc9f41d",
+      "claude_code_version": "2.1.70", "permission_mode": "default", "mcp_servers": [{"name": "treesitter_query", "status": "connected"}],
+      "context_load_tokens": 40751,
+      "num_turns": 3, "duration_ms": 8641,
+      "tool_counts": {"mcp__treesitter_query__treesitter_query": 1, "Read": 1},
+      "navigation_result_chars": 1702,
+      "provider_call_count": 1,
+      "provider_call": {"query_kind": "symbols_in_file", "value": "godot/scripts/world_kit_probe.gd"},
+      "provider_call_order": "first tool call, before Read (directive followed)",
+      "provider_relevant": true,
+      "contamination": "PASS",
+      "correctness": "CORRECT",
+      "correctness_note": "Names _environment (108-110); no distractor named."
+    }
+  ],
+  "procedural_validity": {
+    "all_6_valid": true,
+    "notes": "All 6 runs: claude_code_version=2.1.70, permission_mode=default (no bypass flag used anywhere), consistent head_sha (472ae5b) across every run, contamination PASS on every run (no run's transcript mentions ground_truth.json, the benchmark doc directory, or the ground truth file's sha256), prompt was the sole/first conversational message in every session (--no-session-persistence, prompt passed as the -p argument itself), fresh independent session per run (no --resume/--continue, distinct session_id per run)."
+  },
+  "correctness_comparison": {
+    "task_1": {"C0": "CORRECT", "C2": "CORRECT", "regression": false},
+    "task_2": {"C0": "CORRECT", "C2": "CORRECT", "regression": false},
+    "task_3": {"C0": "CORRECT", "C2": "CORRECT", "regression": false},
+    "any_regression": false
+  },
+  "provider_invocation": {
+    "task_1_C2": {"invoked": true, "call_count": 1, "order": "before any built-in tool", "relevant": true},
+    "task_2_C2": {"invoked": true, "call_count": 1, "order": "before any built-in tool", "relevant": true},
+    "task_3_C2": {"invoked": true, "call_count": 1, "order": "before any built-in tool", "relevant": true},
+    "all_invoked_and_relevant": true
+  },
+  "aggregate_calculations": {
+    "BASE_TOTAL": 233708,
+    "BASE_TOTAL_breakdown": {"T1_C0": 139218, "T2_C0": 42682, "T3_C0": 51808},
+    "TREE_TOTAL": 181349,
+    "TREE_TOTAL_breakdown": {"T1_C2": 96872, "T2_C2": 43726, "T3_C2": 40751},
+    "aggregate_delta_pct": -22.403597651770585,
+    "aggregate_delta_formula": "(TREE_TOTAL - BASE_TOTAL) / BASE_TOTAL = (181349 - 233708) / 233708 = -0.224036...",
+    "required_threshold_pct": -30.0,
+    "meets_aggregate_threshold": false
+  },
+  "per_task_guardrail": {
+    "threshold_pct": 15.0,
+    "task_1_delta_pct": -30.42, "task_1_within_guardrail": true,
+    "task_2_delta_pct": 2.45, "task_2_within_guardrail": true,
+    "task_3_delta_pct": -21.34, "task_3_within_guardrail": true,
+    "any_individual_regression_over_15pct": false,
+    "note": "Task 2 (the multi-definition/comparison task) is the one case where tree-sitter's context load slightly exceeded baseline (+2.45%), consistent with its single find_definition(with_body=True) call returning all 6 matches (5 in-scope + the excluded 6th) with full bodies in one shot -- genuinely useful for the comparison, but not a token-count win over a single well-aimed Grep on this particular task. Well within the 15% per-task guardrail either way."
+  },
+  "operational_overhead_guardrail": {
+    "aggregate_turns_base": 20, "aggregate_turns_tree": 12, "turns_materially_exceeded": false,
+    "aggregate_nav_chars_base": 18447, "aggregate_nav_chars_tree": 16300,
+    "nav_chars_delta_pct": -11.638748848051174, "nav_chars_threshold_pct": 25.0, "nav_chars_within_guardrail": true,
+    "provider_behavior_bounded": true,
+    "guardrail_passed": true
+  },
+  "apparatus_defect_check": {
+    "defect_found": "PowerShell stderr-redirection bug in run_all_c4.ps1 (see experiment_identity.apparatus_fix_note)",
+    "materially_affected_an_official_result": false,
+    "reasoning": "The defect aborted the FIRST attempt at T1_C0's worktree setup before run_condition.py or any claude session was ever invoked -- zero API calls, zero tokens, zero transcript exists for that aborted attempt. It was fixed and pushed, then all 6 official runs executed in the frozen order against the fixed apparatus in a single unbroken batch. No official run used, retried onto, or was scored from the aborted attempt."
+  },
+  "decision_rule_evaluation": {
+    "criterion_1_all_6_procedurally_valid": true,
+    "criterion_2_no_correctness_regression": true,
+    "criterion_3_provider_invoked_and_relevant_every_C2_run": true,
+    "criterion_4_aggregate_reduction_at_least_30pct": false,
+    "criterion_5_no_individual_task_regression_over_15pct": true,
+    "criterion_6_operational_overhead_bounded": true,
+    "criterion_7_no_apparatus_defect_materially_affected_a_result": true,
+    "all_criteria_pass": false,
+    "failing_criterion": "criterion_4: aggregate reduction was -22.4%, short of the required <= -30% threshold",
+    "rule_applied": "IF aggregate savings <30%... C4 conclusion = DO_NOT_PRODUCTIONIZE_TREE_SITTER (experiment.json decision_rule.if_savings_or_guardrails_fail)"
+  },
+  "final_conclusion": "DO_NOT_PRODUCTIONIZE_TREE_SITTER",
+  "closure_note": "This is a clean, mechanically-derived result, not an inconclusive one: correctness was perfect and identical across both conditions on all 3 tasks, the provider was genuinely and correctly used in every C2 run, and no apparatus defect touched any official result -- tree-sitter simply did not clear the frozen 30% aggregate context-load bar on this representative 3-task mix (a strong win on the large structurally-ambiguous file, a strong win on nothing-special navigation surprisingly, a wash-to-small-loss on the multi-definition comparison task, netting -22.4% overall). Per the frozen decision rule, this is DO_NOT_PRODUCTIONIZE, not INCONCLUSIVE -- C4 had no contingency task and none was invoked."
+}
