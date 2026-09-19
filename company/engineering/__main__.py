@@ -104,7 +104,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     receipt = commands.add_parser(
-        "receipt", help="validate and record one developer receipt"
+        "receipt",
+        help=(
+            "validate and record one developer receipt; a receipt rejected for "
+            "its required-test evidence shape alone (evidence_rejected: true) "
+            "leaves the job in developing so a corrected receipt for the same "
+            "commit can be resubmitted here without spending another attempt"
+        ),
     )
     _common(receipt)
     receipt.add_argument("--receipt-file", type=Path, required=True)
@@ -317,6 +323,7 @@ def _receipt(args: argparse.Namespace) -> int:
             "work_order_id": order.work_order_id,
             "state": outcome.job.state.value,
             "accepted": outcome.ingested.accepted,
+            "evidence_rejected": outcome.evidence_rejected,
             "packet_attempt": outcome.receipt.packet_attempt,
             "failures": list(outcome.validation.failures),
             "warnings": list(outcome.validation.warnings),

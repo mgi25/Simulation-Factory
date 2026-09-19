@@ -492,11 +492,23 @@ class SessionReceipt:
 
 @dataclass(frozen=True)
 class ReceiptValidation:
-    """Why a receipt was accepted, or every reason it was not."""
+    """Why a receipt was accepted, or every reason it was not.
+
+    `evidence_format_only` is true when every failure is about the *shape* of
+    the required-test evidence - a required suite reported under a different
+    command than the packet named, or not reported at all - and nothing else
+    is wrong with the receipt. That is the one case a corrected receipt for
+    the same implementation commit is allowed to replace: the developer's
+    work is not in question, the report of it is. Any other failure present
+    - a dirty tree, a wrong branch, a failing test - means this was a real
+    attempt outcome, not a formatting problem, and it is not eligible for
+    correction.
+    """
 
     failures: tuple[str, ...]
     warnings: tuple[str, ...]
     path_verdict: PathScopeVerdict
+    evidence_format_only: bool = False
 
     @property
     def ok(self) -> bool:
@@ -633,8 +645,12 @@ def validate_receipt(
     verdict = packet.path_scope.verdict(receipt.files_changed)
     failures.extend(verdict.failures())
 
+    failures_before_outcome = len(failures)
+    evidence_gap: list[str] = []
     if receipt.outcome is Outcome.ACCEPTED:
-        failures.extend(_accepted_failures(packet, receipt))
+        substantive, evidence_gap = _accepted_failures(packet, receipt)
+        failures.extend(substantive)
+        failures.extend(evidence_gap)
         if receipt.working_tree_clean is None and not _could_have_written(
             packet, receipt
         ):
@@ -656,8 +672,15 @@ def validate_receipt(
             + "); permissions.yaml triggers architecture_and_security_review"
         )
 
+    evidence_format_only = bool(evidence_gap) and len(failures) == (
+        failures_before_outcome + len(evidence_gap)
+    )
+
     return ReceiptValidation(
-        failures=tuple(failures), warnings=tuple(warnings), path_verdict=verdict
+        failures=tuple(failures),
+        warnings=tuple(warnings),
+        path_verdict=verdict,
+        evidence_format_only=evidence_format_only,
     )
 
 
@@ -673,7 +696,18 @@ def _could_have_written(packet: SessionPacket, receipt: SessionReceipt) -> bool:
     return bool(packet.path_scope.allowed) or bool(receipt.files_changed)
 
 
-def _accepted_failures(packet: SessionPacket, receipt: SessionReceipt) -> list[str]:
+def _accepted_failures(
+    packet: SessionPacket, receipt: SessionReceipt
+) -> tuple[list[str], list[str]]:
+    """Substantive failures, and separately the required-test evidence gap.
+
+    The two are returned apart because a receipt whose *only* problem is the
+    evidence gap - a required suite folded into a combined command, or simply
+    absent from the report - is a defect in the report of the work, not in
+    the work. `ReceiptValidation.evidence_format_only` is derived from that
+    split so a caller can tell "the developer's attempt failed" from "the
+    evidence envelope needs to be resubmitted for the same attempt".
+    """
     failures: list[str] = []
     if not receipt.summary.strip():
         failures.append("an accepted result must carry a compact handoff summary")
@@ -702,19 +736,23 @@ def _accepted_failures(packet: SessionPacket, receipt: SessionReceipt) -> list[s
             "tree is not evidence of one"
         )
 
+    failing = receipt.failing_tests
+    if failing:
+        failures.append("reported failing test(s): " + ", ".join(failing))
+    if packet.evidence_required and not receipt.evidence:
+        failures.append("this task requires evidence and the receipt supplies none")
+
+    evidence_gap: list[str] = []
     missing_tests = tuple(
         command
         for command in packet.required_tests
         if command not in receipt.test_commands
     )
     if missing_tests:
-        failures.append("required test(s) not reported: " + ", ".join(missing_tests))
-    failing = receipt.failing_tests
-    if failing:
-        failures.append("reported failing test(s): " + ", ".join(failing))
-    if packet.evidence_required and not receipt.evidence:
-        failures.append("this task requires evidence and the receipt supplies none")
-    return failures
+        evidence_gap.append(
+            "required test(s) not reported: " + ", ".join(missing_tests)
+        )
+    return failures, evidence_gap
 
 
 def _string(data: Mapping[str, Any], field_name: str) -> str:
