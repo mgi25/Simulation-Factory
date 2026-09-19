@@ -959,6 +959,236 @@ def test_a_profile_is_the_ceiling_on_automatic_attempts(tmp_path):
         _request(resource_profile="unlimited")
 
 
+# --- receipt prevalidation: an evidence-format defect must not spend the ---
+# --- one developer attempt. See docs/company_os_first_real_dogfood.md for --
+# --- the run that found it. ------------------------------------------------
+
+TWO_SUITES = (
+    "company/engineering/tests/test_alpha.py",
+    "company/engineering/tests/test_beta.py",
+)
+
+
+def _open_two_suite_job(tmp_path: Path):
+    """A job briefed with two required suites, ready for a developer receipt."""
+    assessment = _assessment(tmp_path)
+    order = replace(assessment.work_order, required_tests=TWO_SUITES)
+    assessment = replace(assessment, work_order=order)
+    state = tmp_path / "state"
+    config = _config()
+    store, execution, usage = _stores(state)
+    opened = open_job(store, assessment, on=DAY)
+    briefing = prepare_developer_session(
+        store, execution, order, opened.job, config, on=DAY
+    )
+    return store, execution, usage, config, order, briefing
+
+
+def test_a_valid_receipt_still_behaves_exactly_as_before(tmp_path):
+    """Requirement 1: the ordinary accepted path is untouched by prevalidation."""
+    store, execution, usage, config, order, briefing = _open_two_suite_job(tmp_path)
+    result = ingest_developer_result(
+        store, execution, usage, order, briefing.job, config,
+        _receipt(briefing.packet), on=DAY,
+    )
+    assert result.evidence_rejected is False
+    assert result.ingested.accepted
+    assert result.job.state is JobState.TESTING
+    assert result.job.developer_attempts == 1
+    assert result.job_pointer is not None
+
+
+def test_a_malformed_receipt_is_rejected_before_attempt_consumption(tmp_path):
+    """Requirement 2: a receipt that cannot even be decoded never reaches the job."""
+    store, execution, usage, config, order, briefing = _open_two_suite_job(tmp_path)
+    before = store.jobs(order.work_order_id)
+    raw = briefing.packet.to_dict()  # the wrong shape entirely: a packet, not a receipt
+    with pytest.raises(ValidationError):
+        SessionReceipt.from_mapping(raw)
+    after = store.jobs(order.work_order_id)
+    assert after == before
+    assert store.job(order.work_order_id).state is JobState.DEVELOPING
+    assert store.job(order.work_order_id).developer_attempts == 1
+
+
+def test_incomplete_required_suite_evidence_is_rejected_before_attempt_consumption(
+    tmp_path,
+):
+    """Requirement 3: one of two required suites simply absent from the receipt."""
+    store, execution, usage, config, order, briefing = _open_two_suite_job(tmp_path)
+    partial = _receipt(
+        briefing.packet,
+        tests=(ReportedTest(command=TWO_SUITES[0], passed=True, summary="ok"),),
+    )
+    result = ingest_developer_result(
+        store, execution, usage, order, briefing.job, config, partial, on=DAY
+    )
+    assert result.evidence_rejected is True
+    assert result.validation.evidence_format_only is True
+    assert result.job.state is JobState.DEVELOPING
+    assert result.job.developer_attempts == 1
+    assert result.job_pointer is None
+
+
+def test_one_combined_receipt_for_two_required_suites_is_rejected_before_attempt_consumption(
+    tmp_path,
+):
+    """Requirement 4: both suites really ran, but as one command, not two entries."""
+    store, execution, usage, config, order, briefing = _open_two_suite_job(tmp_path)
+    combined = _receipt(
+        briefing.packet,
+        tests=(
+            ReportedTest(
+                command="pytest " + " ".join(TWO_SUITES), passed=True, summary="ok"
+            ),
+        ),
+    )
+    result = ingest_developer_result(
+        store, execution, usage, order, briefing.job, config, combined, on=DAY
+    )
+    assert result.evidence_rejected is True
+    assert "required test(s) not reported" in result.validation.reason()
+    assert result.job.state is JobState.DEVELOPING
+    assert result.job.developer_attempts == 1
+    assert result.job_pointer is None
+
+
+def test_a_corrected_receipt_for_the_same_commit_is_ingested_after_a_format_rejection(
+    tmp_path,
+):
+    """Requirement 5: fixing only the report, not the work, is accepted."""
+    store, execution, usage, config, order, briefing = _open_two_suite_job(tmp_path)
+    combined = _receipt(
+        briefing.packet,
+        tests=(
+            ReportedTest(
+                command="pytest " + " ".join(TWO_SUITES), passed=True, summary="ok"
+            ),
+        ),
+    )
+    rejected = ingest_developer_result(
+        store, execution, usage, order, briefing.job, config, combined, on=DAY
+    )
+    assert rejected.job.state is JobState.DEVELOPING
+
+    corrected = _receipt(briefing.packet)  # same commit; one entry per required suite
+    fixed = ingest_developer_result(
+        store, execution, usage, order, rejected.job, config, corrected, on=DAY
+    )
+    assert fixed.evidence_rejected is False
+    assert fixed.ingested.accepted
+    assert fixed.job.state is JobState.TESTING
+    # The correction did not spend a second developer attempt: this job never
+    # left `developing` for the first (rejected) receipt.
+    assert fixed.job.developer_attempts == 1
+
+
+def test_a_corrected_receipt_for_a_different_commit_is_refused(tmp_path):
+    """Requirement 6: a different commit is a new attempt, not an evidence fix."""
+    store, execution, usage, config, order, briefing = _open_two_suite_job(tmp_path)
+    combined = _receipt(
+        briefing.packet,
+        tests=(
+            ReportedTest(
+                command="pytest " + " ".join(TWO_SUITES), passed=True, summary="ok"
+            ),
+        ),
+    )
+    rejected = ingest_developer_result(
+        store, execution, usage, order, briefing.job, config, combined, on=DAY
+    )
+    different_commit = _receipt(
+        briefing.packet, commit_sha=OTHER_SHA, remote_branch_sha=OTHER_SHA
+    )
+    with pytest.raises(EngineeringError, match="different implementation"):
+        ingest_developer_result(
+            store, execution, usage, order, rejected.job, config,
+            different_commit, on=DAY,
+        )
+    # Refused before it could touch the job: still developing, still one attempt.
+    assert store.job(order.work_order_id).state is JobState.DEVELOPING
+    assert store.job(order.work_order_id).developer_attempts == 1
+
+
+def test_a_genuinely_failing_test_still_follows_the_existing_attempt_semantics(
+    tmp_path,
+):
+    """Requirement 7: a real failure, reported in full, is not a format defect."""
+    store, execution, usage, config, order, briefing = _open_two_suite_job(tmp_path)
+    genuinely_failed = _receipt(
+        briefing.packet,
+        tests=(
+            ReportedTest(command=TWO_SUITES[0], passed=True, summary="ok"),
+            ReportedTest(command=TWO_SUITES[1], passed=False, summary="broke"),
+        ),
+    )
+    result = ingest_developer_result(
+        store, execution, usage, order, briefing.job, config,
+        genuinely_failed, on=DAY,
+    )
+    assert result.evidence_rejected is False
+    assert result.validation.evidence_format_only is False
+    assert not result.ingested.accepted
+    assert result.job.state is JobState.TESTING
+    assert result.job.exhausted
+    with pytest.raises(EngineeringError, match="not an allowed transition"):
+        prepare_developer_session(store, execution, order, result.job, config, on=DAY)
+
+
+def test_reviewer_failure_still_follows_existing_policy_after_the_fix(tmp_path):
+    """Requirement 8: an unrelated stage - review - is unaffected."""
+    run = _through_review(
+        tmp_path, receipt_changes={}, review_verdict=ReviewOutcome.CHANGES_REQUIRED,
+    )
+    assert run["job"].state is JobState.DECISION_REQUIRED
+    assert run["job"].exhausted
+
+
+def test_no_automatic_retry_is_introduced_by_the_prevalidation_gate(tmp_path):
+    """Requirement 9: rejection is a stop, never a new packet or a new job move."""
+    store, execution, usage, config, order, briefing = _open_two_suite_job(tmp_path)
+    jobs_before = store.jobs(order.work_order_id)
+    packets_before = execution.packet_records(order.work_order_id)
+    combined = _receipt(
+        briefing.packet,
+        tests=(
+            ReportedTest(
+                command="pytest " + " ".join(TWO_SUITES), passed=True, summary="ok"
+            ),
+        ),
+    )
+    ingest_developer_result(
+        store, execution, usage, order, briefing.job, config, combined, on=DAY
+    )
+    assert store.jobs(order.work_order_id) == jobs_before
+    assert execution.packet_records(order.work_order_id) == packets_before
+
+
+def test_audit_history_records_the_rejection_and_the_correction(tmp_path):
+    """Requirement 10: both the refused evidence and the accepted fix are on file."""
+    store, execution, usage, config, order, briefing = _open_two_suite_job(tmp_path)
+    combined = _receipt(
+        briefing.packet,
+        tests=(
+            ReportedTest(
+                command="pytest " + " ".join(TWO_SUITES), passed=True, summary="ok"
+            ),
+        ),
+    )
+    rejected = ingest_developer_result(
+        store, execution, usage, order, briefing.job, config, combined, on=DAY
+    )
+    corrected = _receipt(briefing.packet)
+    fixed = ingest_developer_result(
+        store, execution, usage, order, rejected.job, config, corrected, on=DAY
+    )
+    stored = execution.receipts(order.work_order_id)
+    assert len(stored) == 2
+    assert stored[0].fingerprint() == rejected.receipt.fingerprint()
+    assert stored[1].fingerprint() == fixed.receipt.fingerprint()
+    assert stored[0].tests != stored[1].tests
+
+
 def test_an_unanswered_acceptance_criterion_prevents_readiness(tmp_path):
     run = _through_review(tmp_path, attestation_changes={"criteria": ()})
     assert run["review"].unanswered_criteria

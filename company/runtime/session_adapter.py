@@ -376,7 +376,15 @@ def _widen(
 ) -> ReceiptValidation:
     if not failures:
         return validation
-    return replace(validation, failures=validation.failures + failures)
+    # An owner or repository-evidence failure is a real defect, never a
+    # formatting one, so a receipt widened this way can no longer be
+    # `evidence_format_only` even if `validate_receipt` found nothing but the
+    # required-test evidence gap on its own.
+    return replace(
+        validation,
+        failures=validation.failures + failures,
+        evidence_format_only=False,
+    )
 
 
 def _associate_receipt(

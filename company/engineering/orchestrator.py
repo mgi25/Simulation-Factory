@@ -129,11 +129,19 @@ class ReviewBriefing:
 
 @dataclass(frozen=True)
 class DeveloperResult:
-    """One ingested developer attempt and the job state it produced."""
+    """One ingested developer attempt and the job state it produced.
+
+    `job_pointer` is `None` exactly when the job did not move: the receipt's
+    evidence envelope was rejected on its own shape
+    (`validation.evidence_format_only`), so nothing here consumed the
+    developer's attempt or left `developing`. The receipt itself is always
+    persisted regardless - see `ManualExternalSessionAdapter.ingest` - so the
+    rejection is in the audit history even though the job is not.
+    """
 
     ingested: IngestedSession
     job: EngineeringJob
-    job_pointer: EngineeringRecordPointer
+    job_pointer: EngineeringRecordPointer | None = None
 
     @property
     def receipt(self) -> SessionReceipt:
@@ -142,6 +150,16 @@ class DeveloperResult:
     @property
     def validation(self) -> ReceiptValidation:
         return self.ingested.validation
+
+    @property
+    def evidence_rejected(self) -> bool:
+        """True when this receipt was refused for its evidence shape alone.
+
+        A corrected receipt for the same implementation commit may be
+        resubmitted through `ingest_developer_result` while this is true; the
+        job is still `developing`.
+        """
+        return self.ingested.validation.evidence_format_only
 
 
 @dataclass(frozen=True)
@@ -309,6 +327,22 @@ def ingest_developer_result(
     adjudicated, because a receipt that fails validation still needs an
     independent reader to decide whether a correction is possible inside the
     same authorization.
+
+    One case is deliberately not a failed attempt: a receipt whose only
+    problem is the shape of its required-test evidence (a required suite
+    folded into a combined command, or missing from the report entirely) is
+    testimony about the *report*, not the work. Rejecting it must not spend
+    the job's one shot at `developing` - that conflation is exactly the
+    defect the first real dogfood found: an evidence-format refusal moved the
+    job to `testing`, `developing` could not be re-entered because the
+    attempt ceiling was already spent at packet issuance, and a corrected
+    receipt for the same passing commit could never be ingested. So this
+    function checks the ingested validation before touching the job's state:
+    an evidence-format-only failure leaves the job in `developing`, recorded
+    but unmoved, so a corrected receipt for the *same* implementation commit
+    can be ingested again. A receipt claiming a different commit is refused
+    outright rather than accepted as a "correction" - that would let a second
+    implementation attempt through a channel meant only to fix a report.
     """
     order.assert_unchanged(job.work_order_fingerprint, "developer ingestion")
     if job.state is not JobState.DEVELOPING:
@@ -328,9 +362,31 @@ def ingest_developer_result(
         context_policy=_context_policy(order),
     )
     resolved = packet or _latest_packet(execution_store, order)
+    prior_receipts = tuple(
+        record
+        for record in execution_store.receipts(order.work_order_id)
+        if record.packet_fingerprint == resolved.fingerprint()
+    )
+    # Every prior receipt found here was, by construction, an
+    # evidence-format-only rejection: the job is still `developing` (asserted
+    # above), and that is the one outcome this function leaves it in.
+    # Anything else - accepted or a genuine failure - would already have
+    # advanced the job to `testing`, and this call would have raised above.
+    if prior_receipts:
+        expected_commit = prior_receipts[-1].commit_sha
+        if expected_commit and receipt.commit_sha and receipt.commit_sha != expected_commit:
+            raise EngineeringError(
+                f"work order {order.work_order_id}: this packet already has a "
+                f"rejected receipt for commit {expected_commit}; a corrected receipt "
+                "must report that same commit. Reporting commit "
+                f"{receipt.commit_sha} is a different implementation, which needs a "
+                "new work order, not an evidence correction"
+            )
     ingested = ManualExternalSessionAdapter(execution_store).ingest(
         scoped, resolved, receipt, usage_store, repo_dir=repo_dir
     )
+    if ingested.validation.evidence_format_only:
+        return DeveloperResult(ingested=ingested, job=job, job_pointer=None)
     moved = job.advance(
         JobState.TESTING,
         on=on,
