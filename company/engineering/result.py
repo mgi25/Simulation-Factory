@@ -100,7 +100,7 @@ class EngineeringResult:
     remote_verified: bool = False
     implementer: str = ""
     developer_attempts: int = 0
-    developer_attempts_remaining: int = 0
+    developer_attempts_remaining: int | None = None
     tests: tuple[ResultTest, ...] = ()
     review_outcome: ReviewOutcome | None = None
     reviewer: str = ""
@@ -175,10 +175,11 @@ class EngineeringResult:
             self.developer_attempts, int
         ):
             raise EngineeringError("result.developer_attempts must be an integer")
-        if isinstance(self.developer_attempts_remaining, bool) or not isinstance(
-            self.developer_attempts_remaining, int
+        if self.developer_attempts_remaining is not None and (
+            isinstance(self.developer_attempts_remaining, bool)
+            or not isinstance(self.developer_attempts_remaining, int)
         ):
-            raise EngineeringError("result.developer_attempts_remaining must be an integer")
+            raise EngineeringError("result.developer_attempts_remaining must be an integer or null")
         if self.authorizes_merge is not False:
             raise EngineeringError(
                 "an engineering result never authorizes a merge. It reports; the CEO "
@@ -341,7 +342,8 @@ class EngineeringResult:
         lines.append(f"  commit: {self.commit_sha or 'none reported'}")
         lines.append(f"  remote verified: {'yes' if self.remote_verified else 'no'}")
         lines.append(f"  implementer: {self.implementer or 'not recorded'}")
-        lines.append(f"  developer attempts: {self.developer_attempts}  remaining: {self.developer_attempts_remaining}")
+        remaining = "unknown" if self.developer_attempts_remaining is None else str(self.developer_attempts_remaining)
+        lines.append(f"  developer attempts: {self.developer_attempts}  remaining: {remaining}")
         lines.append(f"  changed files ({len(self.changed_files)}):")
         lines.extend(f"    {path}" for path in self.changed_files or ("none reported",))
 
@@ -463,7 +465,11 @@ class EngineeringResult:
             remote_verified=bool(data.get("remote_verified", False)),
             implementer=str(data.get("implementer", "")),
             developer_attempts=int(data.get("developer_attempts", 0)),
-            developer_attempts_remaining=int(data.get("developer_attempts_remaining", 0)),
+            developer_attempts_remaining=(
+                int(data["developer_attempts_remaining"])
+                if "developer_attempts_remaining" in data
+                else None
+            ),
             tests=tuple(tests),
             review_outcome=_optional_enum(ReviewOutcome, data.get("review_outcome")),
             reviewer=str(data.get("reviewer", "")),

@@ -1841,6 +1841,32 @@ def test_developer_attempts_remaining_field_and_rendering(tmp_path):
     assert restored.developer_attempts_remaining == 1
 
 
+def test_legacy_missing_attempts_remaining_is_distinguishable_from_genuine_zero(tmp_path):
+    """A legacy record missing developer_attempts_remaining renders differently from a real 0."""
+    order = _order(tmp_path)
+    job = (
+        EngineeringJob.open(order, on=DAY)
+        .advance(JobState.PLANNING, on=DAY, reason="planned")
+    )
+    base = EngineeringResult.build(order, job)
+    data = base.to_dict()
+
+    # Legacy record: key absent entirely.
+    legacy_data = {k: v for k, v in data.items() if k != "developer_attempts_remaining"}
+    legacy = EngineeringResult.from_mapping(legacy_data)
+    assert legacy.developer_attempts_remaining is None
+    assert "remaining: unknown" in legacy.render_text()
+
+    # Genuine zero: key present with value 0.
+    zero_data = {**data, "developer_attempts_remaining": 0}
+    zero = EngineeringResult.from_mapping(zero_data)
+    assert zero.developer_attempts_remaining == 0
+    assert "remaining: 0" in zero.render_text()
+
+    # The two renderings are distinct.
+    assert "remaining: unknown" != "remaining: 0"
+
+
 # --- 15. the CEO surface ------------------------------------------------
 
 
