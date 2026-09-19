@@ -1,0 +1,33 @@
+{
+  "autonomy_level": null,
+  "contract_fingerprint": "efcf2f0870e58e94",
+  "employee": "software_implementation_engineer",
+  "may_not_modify": [
+    "ai_platform/policy.py",
+    "company/agent_contract.schema.yaml",
+    "company/constitution.md",
+    "company/integration",
+    "company/integration/checks.py",
+    "company/integration/policy.py",
+    "company/integration/suites.py",
+    "company/org_registry.yaml",
+    "company/permissions.yaml",
+    "company/runtime",
+    "company/task_handoff.schema.yaml",
+    "company/validation/no_subagents.py",
+    "sloped",
+    "tools"
+  ],
+  "may_not_read": [],
+  "may_read": [],
+  "may_write": [
+    "company/engineering",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "no_subagents": true,
+  "packet_attempt": 1,
+  "packet_fingerprint": "3ea06893600e0720",
+  "source": "temporary_task_override",
+  "task_id": "wo-req-legacy-attempts-remaining-default",
+  "version": 1
+}

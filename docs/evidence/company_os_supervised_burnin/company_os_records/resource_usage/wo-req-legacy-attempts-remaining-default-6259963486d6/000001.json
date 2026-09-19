@@ -1,0 +1,44 @@
+{
+  "automatic_context_sources": [],
+  "cache_hits": 494423,
+  "context_cache_key": "e383f483380eccc1",
+  "context_fingerprint": "b367577cc7b41b73",
+  "context_refs_used": [
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "context_sources": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "context_usage_reported": true,
+  "duration_s": 130.893,
+  "effective_context_fingerprint": "b367577cc7b41b73",
+  "expanded_context_sources": [],
+  "expansion_chars": 0,
+  "expansion_count": 0,
+  "expansion_ledger_fingerprint": "",
+  "explicit_context_sources": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "initial_context_fingerprint": "b367577cc7b41b73",
+  "initial_context_sources": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "input_units": 27,
+  "notes": "invariants preserved: Records that already carry developer_attempts_remaining keep their existing integer value and rendering unchanged; EngineeringResult.build still passes job.corrections_remaining directly, producing an int for all live-job results; No other EngineeringResult field was renamed, removed or had its meaning changed; EngineeringJob, lifecycle state machine, reviewer policy, integration gate, and authority/receipt validation logic are untouched; No files outside company/engineering and tests/test_company_engineering_execution.py were modified",
+  "outcome": "accepted",
+  "output_units": 5317,
+  "passes": 1,
+  "reasoning_class": "C",
+  "rejected_expansion_sources": [],
+  "rejection_reason": "",
+  "required_expansion_count": 0,
+  "retries": 0,
+  "retrieval_hits": 0,
+  "subagents_used": 0,
+  "task_id": "wo-req-legacy-attempts-remaining-default",
+  "tool_calls": null,
+  "usage_unit": "token"
+}

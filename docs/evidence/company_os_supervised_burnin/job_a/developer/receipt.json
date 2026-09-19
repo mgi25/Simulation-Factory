@@ -1,0 +1,82 @@
+{
+  "artifacts": [],
+  "authority_fingerprint": "a7b6b80c6967311e",
+  "base_commit": "88df81747d49e457cf05463525ef676fbf47fe1b",
+  "branch": "eng-legacy-attempts-remaining-default",
+  "commit_sha": "02828c0ad3097af8a99f0c5bfa6dc4c4939b966d",
+  "completed_at": "2026-09-19T19:28:03.651036+00:00",
+  "context_refs_used": [
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "context_usage_reported": true,
+  "dependencies_added": [],
+  "evidence": [
+    "company/engineering/result.py:103 \u2014 field type changed to int | None = None",
+    "company/engineering/result.py:178-181 \u2014 __post_init__ validation accepts None",
+    "company/engineering/result.py:344-345 \u2014 render_text prints 'unknown' for None",
+    "company/engineering/result.py:466-470 \u2014 from_mapping defaults to None when key absent",
+    "tests/test_company_engineering_execution.py \u2014 new test test_legacy_missing_attempts_remaining_is_distinguishable_from_genuine_zero proves both cases",
+    "pytest: 140 passed, 0 failed",
+    "commit:02828c0ad3097af8a99f0c5bfa6dc4c4939b966d",
+    "company/engineering/result.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "executor": "claude_code",
+  "files_changed": [
+    "company/engineering/result.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "invariants_preserved": [
+    "Records that already carry developer_attempts_remaining keep their existing integer value and rendering unchanged",
+    "EngineeringResult.build still passes job.corrections_remaining directly, producing an int for all live-job results",
+    "No other EngineeringResult field was renamed, removed or had its meaning changed",
+    "EngineeringJob, lifecycle state machine, reviewer policy, integration gate, and authority/receipt validation logic are untouched",
+    "No files outside company/engineering and tests/test_company_engineering_execution.py were modified"
+  ],
+  "merge_performed": false,
+  "next_owner": "",
+  "no_subagents": true,
+  "notes": "",
+  "outcome": "accepted",
+  "packet_attempt": 1,
+  "packet_fingerprint": "3ea06893600e0720",
+  "rejection_reason": "",
+  "remote_branch_sha": "02828c0ad3097af8a99f0c5bfa6dc4c4939b966d",
+  "remote_verified": true,
+  "subagents_used": 0,
+  "summary": "Changed EngineeringResult.developer_attempts_remaining from int=0 to int|None=None. from_mapping now defaults to None when the key is absent (legacy records), rather than 0. render_text shows 'unknown' for None and the numeric value for any present integer, making legacy records visually distinct from a genuine zero on the CEO page.",
+  "task_id": "wo-req-legacy-attempts-remaining-default",
+  "tests": [
+    {
+      "command": "tests/test_company_engineering_execution.py",
+      "passed": true,
+      "summary": "140 passed in 12.63s"
+    }
+  ],
+  "unresolved_risks": [
+    "Any code that compares developer_attempts_remaining == 0 or uses it in arithmetic without a None guard will now behave differently for legacy records; a grep for such callers outside the authorized paths was not performed (out of scope), so the CEO or reviewer should confirm no such caller exists in the broader codebase"
+  ],
+  "usage": {
+    "cache_creation_units": 38544,
+    "cache_hits": 494423,
+    "cost_ceiling_enforced": true,
+    "duration_s": 130.893,
+    "input_units": 27,
+    "model": "sonnet",
+    "model_turns": 19,
+    "output_units": 5317,
+    "passes": 1,
+    "provider": "anthropic",
+    "provider_cost": "0.621171",
+    "provider_cost_currency": "USD",
+    "repeated_file_reads": 3,
+    "repo_file_reads": 5,
+    "repo_searches": 2,
+    "retries": 0,
+    "unreliable_metrics": [],
+    "usage_source": "model_usage_totals",
+    "usage_unit": "token"
+  },
+  "version": 1,
+  "working_tree_clean": true
+}

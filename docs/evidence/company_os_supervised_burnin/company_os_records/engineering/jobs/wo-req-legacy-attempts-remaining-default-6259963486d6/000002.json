@@ -1,0 +1,43 @@
+{
+  "developer_attempts": 1,
+  "max_developer_attempts": 1,
+  "opened_on": "2026-09-20",
+  "pending_decisions": [],
+  "reviews_completed": 0,
+  "state": "developing",
+  "transitions": [
+    {
+      "actor": "company-os",
+      "evidence_refs": [],
+      "from_state": "requested",
+      "on": "2026-09-20",
+      "reason": "work order wo-req-legacy-attempts-remaining-default authorized by MGI",
+      "to_state": "requested"
+    },
+    {
+      "actor": "company-os",
+      "evidence_refs": [
+        "engineering/plans/wo-req-legacy-attempts-remaining-default-6259963486d6/000001.json",
+        "engineering/work_orders/wo-req-legacy-attempts-remaining-default-6259963486d6/000001.json"
+      ],
+      "from_state": "requested",
+      "on": "2026-09-20",
+      "reason": "implementation plan 267d4d646db8ee90 derived from the work order",
+      "to_state": "planning"
+    },
+    {
+      "actor": "company-os",
+      "evidence_refs": [
+        "execution/authorities/wo-req-legacy-attempts-remaining-default-6259963486d6/000001.json",
+        "execution/packets/wo-req-legacy-attempts-remaining-default-6259963486d6/000001.json"
+      ],
+      "from_state": "planning",
+      "on": "2026-09-20",
+      "reason": "packet 3ea06893600e0720 attempt 1 issued to software_implementation_engineer",
+      "to_state": "developing"
+    }
+  ],
+  "version": 1,
+  "work_order_fingerprint": "2ead6eba070eea60",
+  "work_order_id": "wo-req-legacy-attempts-remaining-default"
+}

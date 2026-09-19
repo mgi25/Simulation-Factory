@@ -1,0 +1,80 @@
+{
+  "cache_hits": 494423,
+  "cache_identity": "e383f483380eccc1",
+  "cache_misses": null,
+  "capabilities_selected": [
+    "software_implementation"
+  ],
+  "capsule_chars": 3661,
+  "capsule_count": 1,
+  "capsules_selected": [
+    "company-engineering-execution"
+  ],
+  "context_bytes": null,
+  "context_chars": null,
+  "context_expansion_approvals": 0,
+  "context_expansion_denials": 0,
+  "context_expansion_requests": 0,
+  "context_manifest_bytes": 2663,
+  "context_manifest_chars": 2663,
+  "context_manifest_fingerprint": "b367577cc7b41b73",
+  "cost": {
+    "amount": "0.621171",
+    "currency": "USD",
+    "rate_ref": "",
+    "reason": "",
+    "source": "provider_reported"
+  },
+  "estimated_tokens": {
+    "input_tokens": 1040,
+    "method": "ceil(utf8_bytes/4)",
+    "output_tokens": 84,
+    "reason": "",
+    "source": "estimated",
+    "total_tokens": 1124
+  },
+  "execution_packet_bytes": 4159,
+  "execution_packet_chars": 4159,
+  "integrations": [
+    {
+      "available": false,
+      "enabled": false,
+      "name": "graphify",
+      "reason": "not installed; repository reference provider remains active"
+    },
+    {
+      "available": false,
+      "enabled": false,
+      "name": "rtk",
+      "reason": "not installed; raw tool output remains the model-context output"
+    }
+  ],
+  "latency_ms": null,
+  "minimalism": null,
+  "mode": "real",
+  "model": "sonnet",
+  "outcome": "accepted",
+  "packet_attempt": 1,
+  "packet_fingerprint": "3ea06893600e0720",
+  "provider": "anthropic",
+  "repository_files_read": [],
+  "repository_references_selected": [],
+  "run_id": "execution:3ea06893600e0720:1:receipt:ab8e5282b29cce79",
+  "schema_version": 1,
+  "task_id": "wo-req-legacy-attempts-remaining-default",
+  "timestamp": "2026-09-19T19:28:03.651036+00:00",
+  "tokens": {
+    "input_tokens": 27,
+    "method": "normalized external provider usage",
+    "output_tokens": 5317,
+    "reason": "",
+    "source": "provider_reported",
+    "total_tokens": 5344
+  },
+  "tool_activity": [],
+  "tool_calls": null,
+  "tool_context_bytes": null,
+  "tool_context_chars": null,
+  "tool_output_bytes": null,
+  "tool_output_chars": null
+}

@@ -1,0 +1,40 @@
+{
+  "attested_outcome": "changes_required",
+  "deterministic_outcome": "pass",
+  "escalations": [],
+  "findings": [
+    {
+      "deterministic": false,
+      "evidence_ref": "company/engineering/result.py:469 — int(data['developer_attempts_remaining']) when value is None; ai_platform/serde.py:47 — to_jsonable(None) returns None (key retained, not dropped)",
+      "finding_id": "from-mapping-null-value-crashes",
+      "severity": "changes_required",
+      "summary": "from_mapping calls int(data['developer_attempts_remaining']) when the key is present with value None (JSON null), which raises TypeError; to_dict() on a result whose field is None serializes the key as null rather than omitting it, so any round-trip of a legacy result stored after this fix will crash on reload."
+    },
+    {
+      "deterministic": false,
+      "evidence_ref": "tests/test_company_engineering_execution.py:1855-1858 — legacy_data strips the key; no test round-trips a None result through to_dict+from_mapping",
+      "finding_id": "test-missing-none-roundtrip-coverage",
+      "severity": "advisory",
+      "summary": "The new test exercises the absent-key path (legacy record before serialization) but not the null-value path (legacy result re-read after to_dict wrote null), leaving the crash in finding from-mapping-null-value-crashes uncaught by the suite."
+    },
+    {
+      "deterministic": false,
+      "evidence_ref": "grep output: only 2 files match developer_attempts_remaining across all .py files",
+      "finding_id": "unresolved-risk-resolved",
+      "severity": "advisory",
+      "summary": "The implementer's stated unresolved risk (callers of developer_attempts_remaining outside authorized paths) is not a real risk: a codebase-wide grep finds the field referenced only in company/engineering/result.py and tests/test_company_engineering_execution.py."
+    }
+  ],
+  "implementer": "software_implementation_engineer",
+  "outcome": "changes_required",
+  "packet_attempt": 1,
+  "packet_fingerprint": "3ea06893600e0720",
+  "receipt_fingerprint": "ab8e5282b29cce79",
+  "review_id": "rev-wo-req-legacy-attempts-remaining-default-01",
+  "reviewed_on": "2026-09-20",
+  "reviewer": "chief_architect",
+  "unanswered_criteria": [],
+  "version": 1,
+  "work_order_fingerprint": "2ead6eba070eea60",
+  "work_order_id": "wo-req-legacy-attempts-remaining-default"
+}

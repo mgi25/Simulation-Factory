@@ -1,0 +1,65 @@
+{
+  "acceptance_criteria": [
+    "EngineeringResult.from_mapping no longer silently reports 0 for a legacy record missing developer_attempts_remaining; the missing case is distinguishable from a real 0",
+    "the CEO page's plain-text rendering shows the missing case distinctly from a genuine zero remaining attempts",
+    "every record that already carries developer_attempts_remaining keeps its existing value and rendering unchanged",
+    "a focused test in tests/test_company_engineering_execution.py proves both the legacy-missing case and the genuine-zero case render differently",
+    "no existing test in the required suites regresses"
+  ],
+  "authorized_on": "2026-09-20",
+  "authorized_paths": [
+    "company/engineering",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "authorizes_merge": false,
+  "branch": "eng-legacy-attempts-remaining-default",
+  "changed_files": [
+    "company/engineering/result.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "commit_sha": "02828c0ad3097af8a99f0c5bfa6dc4c4939b966d",
+  "decisions_required": [
+    "the work order's 1 authorized developer attempt(s) are spent and the review still requires changes; continuing needs either additional-attempt authorization on this work order or a new one"
+  ],
+  "developer_attempts": 1,
+  "developer_attempts_remaining": 0,
+  "evidence_refs": [],
+  "gate_blockers": [],
+  "gate_readiness": null,
+  "gate_report_id": "",
+  "implementation_summary": "Changed EngineeringResult.developer_attempts_remaining from int=0 to int|None=None. from_mapping now defaults to None when the key is absent (legacy records), rather than 0. render_text shows 'unknown' for None and the numeric value for any present integer, making legacy records visually distinct from a genuine zero on the CEO page.",
+  "implementer": "software_implementation_engineer",
+  "merge_performed": false,
+  "not_an_approval": "READY FOR CEO APPROVAL is a request to be read, not an approval. Nothing here merges, deploys or publishes, and Company OS holds no capability to.",
+  "objective": "EngineeringResult.from_mapping defaults the new developer_attempts_remaining field to 0 when the field is absent from an older serialized record (company/engineering/result.py). A zero here is read on the CEO page as \"no developer attempts remain\", but for a legacy record it actually means the field did not exist yet when the record was written, so the two states are indistinguishable and a CEO could mistakenly treat an unfinished job as exhausted. Change the default for a missing developer_attempts_remaining key so a legacy record is distinguishable from a genuine zero (for example, default to None and render it as unknown rather than a confident 0 on the CEO page's text rendering), without changing the meaning or representation of the field for any record that already carries it.",
+  "persisted": {
+    "fingerprint": "7a1243dab88df01f",
+    "record_ref": "engineering/results/wo-req-legacy-attempts-remaining-default-6259963486d6/000001.json",
+    "sequence": 1
+  },
+  "remote_verified": true,
+  "requested_by": "MGI",
+  "review_findings": [
+    "[changes_required] from-mapping-null-value-crashes: from_mapping calls int(data['developer_attempts_remaining']) when the key is present with value None (JSON null), which raises TypeError; to_dict() on a result whose field is None serializes the key as null rather than omitting it, so any round-trip of a legacy result stored after this fix will crash on reload.",
+    "[advisory] test-missing-none-roundtrip-coverage: The new test exercises the absent-key path (legacy record before serialization) but not the null-value path (legacy result re-read after to_dict wrote null), leaving the crash in finding from-mapping-null-value-crashes uncaught by the suite.",
+    "[advisory] unresolved-risk-resolved: The implementer's stated unresolved risk (callers of developer_attempts_remaining outside authorized paths) is not a real risk: a codebase-wide grep finds the field referenced only in company/engineering/result.py and tests/test_company_engineering_execution.py."
+  ],
+  "review_outcome": "changes_required",
+  "reviewer": "chief_architect",
+  "risks": [
+    "Any code that compares developer_attempts_remaining == 0 or uses it in arithmetic without a None guard will now behave differently for legacy records; a grep for such callers outside the authorized paths was not performed (out of scope), so the CEO or reviewer should confirm no such caller exists in the broader codebase"
+  ],
+  "status": "decision_required",
+  "tests": [
+    {
+      "command": "tests/test_company_engineering_execution.py",
+      "passed": true,
+      "scope": "targeted",
+      "summary": "140 passed in 12.63s"
+    }
+  ],
+  "unanswered_criteria": [],
+  "version": 1,
+  "work_order_fingerprint": "2ead6eba070eea60",
+  "work_order_id": "wo-req-legacy-attempts-remaining-default"
+}

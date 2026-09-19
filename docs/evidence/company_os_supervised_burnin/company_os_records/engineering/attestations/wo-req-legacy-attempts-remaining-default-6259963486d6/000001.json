@@ -1,0 +1,82 @@
+{
+  "changed_paths_reviewed": [
+    "company/engineering/result.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "criteria": [
+    {
+      "criterion": "EngineeringResult.from_mapping no longer silently reports 0 for a legacy record missing developer_attempts_remaining; the missing case is distinguishable from a real 0",
+      "evidence_ref": "company/engineering/result.py:468-472 — absent key yields None; present key with 0 yields 0",
+      "satisfied": true
+    },
+    {
+      "criterion": "the CEO page's plain-text rendering shows the missing case distinctly from a genuine zero remaining attempts",
+      "evidence_ref": "company/engineering/result.py:345 — None → 'unknown'; int → str(int)",
+      "satisfied": true
+    },
+    {
+      "criterion": "every record that already carries developer_attempts_remaining keeps its existing value and rendering unchanged",
+      "evidence_ref": "company/engineering/result.py:468-472 — key-present branch calls int(value), preserving the existing integer",
+      "satisfied": true
+    },
+    {
+      "criterion": "a focused test in tests/test_company_engineering_execution.py proves both the legacy-missing case and the genuine-zero case render differently",
+      "evidence_ref": "tests/test_company_engineering_execution.py:1844-1867 — asserts None/unknown for absent key and 0/'0' for present zero",
+      "satisfied": true
+    },
+    {
+      "criterion": "no existing test in the required suites regresses",
+      "evidence_ref": "receipt: pytest 140 passed, 0 failed",
+      "satisfied": true
+    }
+  ],
+  "evidence": [
+    "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-supervised-burnin-runner-state\\runs\\wo-req-legacy-attempts-remaining-default-6259963486d6\\run-000001\\reviewer-01\\diff.patch",
+    "ai_platform/serde.py:30-49 — to_jsonable: None returned as-is (serializes to JSON null, key not dropped)",
+    "company/engineering/result.py:103 — developer_attempts_remaining: int | None = None",
+    "company/engineering/result.py:119-197 — __post_init__ validation",
+    "company/engineering/result.py:178-182 — None-aware validation for developer_attempts_remaining",
+    "company/engineering/result.py:282-318 — EngineeringResult.build passes job.corrections_remaining (int)",
+    "company/engineering/result.py:298 — developer_attempts_remaining=job.corrections_remaining",
+    "company/engineering/result.py:344-346 — render_text None→'unknown' else str(int)",
+    "company/engineering/result.py:452-487 — from_mapping full body",
+    "company/engineering/result.py:468-472 — key-present branch: int(data['developer_attempts_remaining']); absent: None",
+    "company/engineering/result.py:85-117 — dataclass field declarations",
+    "grep: developer_attempts_remaining appears only in result.py and test file",
+    "tests/test_company_engineering_execution.py:1815-1841 — pre-existing round-trip test for integer value",
+    "tests/test_company_engineering_execution.py:1844-1867 — new test: absent-key legacy and genuine-zero cases"
+  ],
+  "findings": [
+    {
+      "deterministic": false,
+      "evidence_ref": "company/engineering/result.py:469 — int(data['developer_attempts_remaining']) when value is None; ai_platform/serde.py:47 — to_jsonable(None) returns None (key retained, not dropped)",
+      "finding_id": "from-mapping-null-value-crashes",
+      "severity": "changes_required",
+      "summary": "from_mapping calls int(data['developer_attempts_remaining']) when the key is present with value None (JSON null), which raises TypeError; to_dict() on a result whose field is None serializes the key as null rather than omitting it, so any round-trip of a legacy result stored after this fix will crash on reload."
+    },
+    {
+      "deterministic": false,
+      "evidence_ref": "tests/test_company_engineering_execution.py:1855-1858 — legacy_data strips the key; no test round-trips a None result through to_dict+from_mapping",
+      "finding_id": "test-missing-none-roundtrip-coverage",
+      "severity": "advisory",
+      "summary": "The new test exercises the absent-key path (legacy record before serialization) but not the null-value path (legacy result re-read after to_dict wrote null), leaving the crash in finding from-mapping-null-value-crashes uncaught by the suite."
+    },
+    {
+      "deterministic": false,
+      "evidence_ref": "grep output: only 2 files match developer_attempts_remaining across all .py files",
+      "finding_id": "unresolved-risk-resolved",
+      "severity": "advisory",
+      "summary": "The implementer's stated unresolved risk (callers of developer_attempts_remaining outside authorized paths) is not a real risk: a codebase-wide grep finds the field referenced only in company/engineering/result.py and tests/test_company_engineering_execution.py."
+    }
+  ],
+  "notes": "The core logic is correct: absent key → None → 'unknown' on the CEO page is exactly what the work order asked for. The single defect is narrow: to_dict() on a None result emits the key with JSON null, but from_mapping then calls int(null) and crashes. The fix is one line in from_mapping: treat a present-but-None value the same as an absent key. The unresolved risk the implementer listed is not a real risk — no external caller of this field exists.",
+  "packet_fingerprint": "3ea06893600e0720",
+  "receipt_fingerprint": "ab8e5282b29cce79",
+  "review_id": "rev-wo-req-legacy-attempts-remaining-default-01",
+  "reviewed_on": "2026-09-20",
+  "reviewer": "chief_architect",
+  "verdict": "changes_required",
+  "version": 1,
+  "work_order_fingerprint": "2ead6eba070eea60",
+  "work_order_id": "wo-req-legacy-attempts-remaining-default"
+}

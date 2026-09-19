@@ -1,0 +1,65 @@
+{
+  "acceptance_criteria": [
+    "EngineeringResult.from_mapping no longer silently reports 0 for a legacy record missing developer_attempts_remaining; the missing case is distinguishable from a real 0",
+    "the CEO page's plain-text rendering shows the missing case distinctly from a genuine zero remaining attempts",
+    "every record that already carries developer_attempts_remaining keeps its existing value and rendering unchanged",
+    "a focused test in tests/test_company_engineering_execution.py proves both the legacy-missing case and the genuine-zero case render differently",
+    "no existing test in the required suites regresses"
+  ],
+  "automatic_context_refs": [],
+  "completion_protocol": [
+    "implement the objective, changing only allowed paths",
+    "run every required test and report the result",
+    "commit the work",
+    "push the assigned branch",
+    "verify the exact remote SHA matches the local commit",
+    "do not merge",
+    "return a compact handoff receipt"
+  ],
+  "constraints": [
+    "additive/corrective only: do not rename, remove or change the meaning of any other EngineeringResult field",
+    "do not change EngineeringJob, the lifecycle state machine, the reviewer policy, the integration gate, or any authority or receipt validation logic",
+    "do not touch tools/, ai_platform/, knowledge/, company/runtime, company/integration, or any file outside company/engineering and its own declared tests",
+    "no schema migration: this must be the smallest backward-compatible correction the existing model supports"
+  ],
+  "context_cache_key": "07e904c130ddb671",
+  "context_fingerprint": "4aaf7b2383dab963",
+  "context_refs": [
+    {
+      "digest": "",
+      "kind": "module_contract",
+      "reason": "requested by id; owns company/engineering for task path company/engineering",
+      "ref": "capsule:company-engineering-execution",
+      "span": null
+    },
+    {
+      "digest": "",
+      "kind": "test",
+      "reason": "declared test of the owning capsule",
+      "ref": "tests/test_company_engineering_execution.py",
+      "span": null
+    }
+  ],
+  "employee": "chief_architect",
+  "evidence_required": true,
+  "executor": "claude_code",
+  "expected_base_commit": "88df81747d49e457cf05463525ef676fbf47fe1b",
+  "expected_branch": "eng-legacy-attempts-remaining-default",
+  "explicit_context_refs": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "no_subagents": true,
+  "objective": "Independently review the implementation of work order wo-req-legacy-attempts-remaining-default against its acceptance criteria.",
+  "path_scope": {
+    "allowed": [],
+    "forbidden": []
+  },
+  "reasoning_class": "C",
+  "required_tests": [
+    "tests/test_company_engineering_execution.py"
+  ],
+  "resource_class": "small_reasoning",
+  "task_id": "wo-req-legacy-attempts-remaining-default-review",
+  "version": 1
+}

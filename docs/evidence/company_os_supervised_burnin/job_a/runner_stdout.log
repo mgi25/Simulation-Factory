@@ -1,0 +1,39 @@
+{
+  "final_state": "decision_required",
+  "finished_at": "2026-09-19T19:30:25.983621+00:00",
+  "lease_note": "took a new lease",
+  "outcome": "blocked",
+  "reason": "the job is decision_required and waits for the CEO",
+  "run_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-supervised-burnin-runner-state\\runs\\wo-req-legacy-attempts-remaining-default-6259963486d6\\run-000001",
+  "stages": [
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-supervised-burnin-runner-state\\runs\\wo-req-legacy-attempts-remaining-default-6259963486d6\\run-000001\\developer-01\\receipt.json"
+      ],
+      "detail": "attempt 1 by software_implementation_engineer, commit 02828c0ad309, 2 path(s)",
+      "ok": true,
+      "session_ids": [
+        "cdb778f2-610c-4ed8-8d2e-7659ac681a16"
+      ],
+      "stage": "developer",
+      "state_after": "testing",
+      "state_before": "planning"
+    },
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-supervised-burnin-runner-state\\runs\\wo-req-legacy-attempts-remaining-default-6259963486d6\\run-000001\\reviewer-01\\attestation.json"
+      ],
+      "detail": "chief_architect returned changes_required; Company OS adjudicated changes_required (attested changes_required, deterministic pass)",
+      "ok": false,
+      "session_ids": [
+        "b05573e6-11f5-4327-a2b7-ef1769898d85"
+      ],
+      "stage": "reviewer",
+      "state_after": "decision_required",
+      "state_before": "testing"
+    }
+  ],
+  "started_at": "2026-09-19T19:25:16.822928+00:00",
+  "work_order_id": "wo-req-legacy-attempts-remaining-default"
+}
+EXIT:1
