@@ -1,0 +1,61 @@
+WORK ORDER
+  wo-req-packet-authority-echo  (9fced136fae4227d)
+  objective: The packet command prints the authority fingerprint and source only when a state directory is supplied. Run without one it prints a packet that may already carry a writable path, with nothing identifying the grant behind it. Print the same authority fingerprint and source in that case too, computed from the contract already in hand and persisted nowhere.
+  requested by: MGI on 2026-09-19
+  authorized paths:
+    company/efficiency
+    company/runtime
+    tests/test_company_context_assembly.py
+    tests/test_company_efficiency.py
+    tests/test_company_runtime.py
+  acceptance criteria:
+    - Running the packet command without a state directory prints an authority object holding the same fingerprint and source it prints with one.
+    - Nothing is written to disk when no state directory is supplied.
+    - The payload printed with a state directory is unchanged, record_ref included.
+    - A focused test covers the without-state-dir payload for both a read-only packet and a write-scoped one.
+
+STATUS
+  DECISION_REQUIRED
+
+IMPLEMENTATION
+  summary: ManualExternalSessionAdapter.prepare now takes its authority snapshot from a module-level authority_for, and the packet CLI calls the same function with attempt 1 when no state directory is supplied, printing record_ref null beside the fingerprint and source. The payload printed with a state directory is unchanged. Two focused tests in tests/test_company_runtime.py cover the read-only and write-scoped outbox-less payloads.
+  branch: company-os-v1-first-real-dogfood
+  commit: 3997a8ef9a3414a5c887d126efa902cee39e9c77
+  remote verified: yes
+  implementer: software_implementation_engineer
+  developer attempts: 1
+  changed files (3):
+    company/runtime/execution_cli.py
+    company/runtime/session_adapter.py
+    tests/test_company_runtime.py
+
+TESTS
+  targeted: none reported
+  affected Company OS: 2/2 passed
+    [PASS] python -m pytest tests/test_company_context_assembly.py tests/test_company_efficiency.py tests/test_company_runtime.py -q -p no:randomly — 98 passed
+    [PASS] python -m pytest tests/test_company_execution_transport.py tests/test_company_session_execution.py tests/test_company_engineering_execution.py -q -p no:randomly — 190 passed; adjacent suites over the same boundary, not required by the work order
+  full repository suite: none reported
+
+REVIEW
+  CHANGES_REQUIRED by chief_architect
+  findings (4):
+    [advisory] find-attempt-one-assumed: The un-persisted snapshot hardcodes packet_attempt 1, so the printed fingerprint equals a recorded one only for a first attempt into a fresh outbox. Run after an attempt already exists, it names a snapshot no record holds. The null record_ref makes non-persistence explicit, which bounds the harm, and the limitation is disclosed in the code comment and in the receipt's unresolved risks rather than enforced.
+    [advisory] find-helper-not-exported: authority_for is a new public name in company.runtime.session_adapter but is not re-exported from company/runtime/__init__.py, unlike the adapter beside it. Callers inside the package import it by module path, so nothing is broken; the package surface is simply slightly less uniform than before.
+    [changes_required] receipt-01: receipt validation: required test(s) not reported: tests/test_company_context_assembly.py, tests/test_company_efficiency.py, tests/test_company_runtime.py
+    [changes_required] tests-not-reported: required test(s) not reported: tests/test_company_context_assembly.py, tests/test_company_efficiency.py, tests/test_company_runtime.py
+
+GATE
+  no gate report supplied
+
+RISKS
+  - The three required suites all pass when run individually; the recorded receipt reports them as one combined command, which is why the deterministic verdict is changes_required.
+  - The single authorized developer attempt is spent, so no corrected receipt can be ingested without a new work order.
+  - The un-persisted snapshot is fixed at attempt 1, so its fingerprint matches a persisted one only for the first attempt into a given outbox. That is stated in the code comment rather than enforced.
+
+DECISIONS REQUIRED
+  - the work order's 1 authorized developer attempt(s) are spent and the review still requires changes; continuing needs either additional-attempt authorization on this work order or a new one
+
+CEO OPTIONS
+  [APPROVE]  [REQUEST CHANGES]  [REJECT]
+  READY FOR CEO APPROVAL is a request to be read, not an approval. Nothing here merges, deploys or publishes, and Company OS holds no capability to.
+recorded    engineering/results/wo-req-packet-authority-echo-f222300f6c18/000001.json

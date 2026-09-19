@@ -1,0 +1,24 @@
+{
+  "request_id": "req-packet-authority-echo",
+  "objective": "The packet command prints the authority fingerprint and source only when a state directory is supplied. Run without one it prints a packet that may already carry a writable path, with nothing identifying the grant behind it. Print the same authority fingerprint and source in that case too, computed from the contract already in hand and persisted nowhere.",
+  "requested_by": "MGI",
+  "requested_on": "2026-09-19",
+  "subsystem_hint": "company/runtime",
+  "acceptance_criteria": [
+    "Running the packet command without a state directory prints an authority object holding the same fingerprint and source it prints with one.",
+    "Nothing is written to disk when no state directory is supplied.",
+    "The payload printed with a state directory is unchanged, record_ref included.",
+    "A focused test covers the without-state-dir payload for both a read-only packet and a write-scoped one."
+  ],
+  "constraints": [
+    "Do not widen any path grant.",
+    "Do not change how the contract or the snapshot is computed.",
+    "Keep the existing exit codes."
+  ],
+  "authorized_branch": "company-os-v1-first-real-dogfood",
+  "risk": "low",
+  "reversible": true,
+  "resource_profile": "consumer",
+  "max_developer_attempts": 1,
+  "base_commit": "733b21efccf7c168b157b0193d9dce632f6c9ce2"
+}

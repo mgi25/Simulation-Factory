@@ -1,0 +1,58 @@
+{
+  "review_id": "rev-packet-authority-echo-1",
+  "work_order_id": "wo-req-packet-authority-echo",
+  "work_order_fingerprint": "9fced136fae4227d",
+  "reviewer": "chief_architect",
+  "packet_fingerprint": "2945e8594cf08641",
+  "receipt_fingerprint": "0473c9db87e636fc",
+  "verdict": "pass",
+  "reviewed_on": "2026-09-19",
+  "criteria": [
+    {
+      "criterion": "Running the packet command without a state directory prints an authority object holding the same fingerprint and source it prints with one.",
+      "satisfied": true,
+      "evidence_ref": "tests/test_company_runtime.py"
+    },
+    {
+      "criterion": "Nothing is written to disk when no state directory is supplied.",
+      "satisfied": true,
+      "evidence_ref": "company/runtime/execution_cli.py"
+    },
+    {
+      "criterion": "The payload printed with a state directory is unchanged, record_ref included.",
+      "satisfied": true,
+      "evidence_ref": "company/runtime/execution_cli.py"
+    },
+    {
+      "criterion": "A focused test covers the without-state-dir payload for both a read-only packet and a write-scoped one.",
+      "satisfied": true,
+      "evidence_ref": "tests/test_company_runtime.py"
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "find-attempt-one-assumed",
+      "severity": "advisory",
+      "summary": "The un-persisted snapshot hardcodes packet_attempt 1, so the printed fingerprint equals a recorded one only for a first attempt into a fresh outbox. Run after an attempt already exists, it names a snapshot no record holds. The null record_ref makes non-persistence explicit, which bounds the harm, and the limitation is disclosed in the code comment and in the receipt's unresolved risks rather than enforced.",
+      "evidence_ref": "company/runtime/execution_cli.py",
+      "deterministic": false
+    },
+    {
+      "finding_id": "find-helper-not-exported",
+      "severity": "advisory",
+      "summary": "authority_for is a new public name in company.runtime.session_adapter but is not re-exported from company/runtime/__init__.py, unlike the adapter beside it. Callers inside the package import it by module path, so nothing is broken; the package surface is simply slightly less uniform than before.",
+      "evidence_ref": "company/runtime/session_adapter.py",
+      "deterministic": false
+    }
+  ],
+  "evidence": [
+    "commit 3997a8ef9a3414a5c887d126efa902cee39e9c77",
+    "diff 733b21e..3997a8e over company/runtime and tests/test_company_runtime.py"
+  ],
+  "changed_paths_reviewed": [
+    "company/runtime/execution_cli.py",
+    "company/runtime/session_adapter.py",
+    "tests/test_company_runtime.py"
+  ],
+  "notes": "authority_for is prepare's former body moved unchanged, so the persisted path computes exactly what it computed before; the with-state-dir branch of _packet is untouched and the new code sits in a new else. No path grant is widened and no forbidden path is touched. One process observation outside the diff: attempt 1 is recorded rejected because the first receipt reported the three required suites as a single combined pytest command. The suites were re-run individually and all passed, but max_developer_attempts is 1 and corrections_remaining is 0, so the corrected receipt could not be ingested. The code under review is unaffected by that; the evidence trail is."
+}

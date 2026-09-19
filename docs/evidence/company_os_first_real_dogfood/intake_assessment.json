@@ -1,0 +1,312 @@
+{
+  "derivation": {
+    "authorized_paths": [
+      "company/efficiency",
+      "company/runtime",
+      "tests/test_company_context_assembly.py",
+      "tests/test_company_efficiency.py",
+      "tests/test_company_runtime.py"
+    ],
+    "ceiling_applied": [],
+    "context_refs_considered": 4,
+    "context_refs_dropped": [],
+    "context_refs_kept": 4,
+    "criteria_derived": false,
+    "escalation": "none",
+    "forbidden_paths": [
+      "ai_platform",
+      "company/constitution.md",
+      "knowledge"
+    ],
+    "matched_tokens": [
+      "already",
+      "authority",
+      "behind",
+      "carry",
+      "case",
+      "command",
+      "computed",
+      "contract",
+      "directory",
+      "fingerprint",
+      "grant",
+      "hand",
+      "identifying",
+      "nothing",
+      "nowhere",
+      "only",
+      "packet",
+      "path",
+      "persisted",
+      "print",
+      "prints",
+      "runtime",
+      "same",
+      "source",
+      "state",
+      "supplied",
+      "when",
+      "without",
+      "writable"
+    ],
+    "novel": false,
+    "owns_paths": [
+      "company/efficiency",
+      "company/runtime",
+      "tests/test_company_context_assembly.py",
+      "tests/test_company_efficiency.py",
+      "tests/test_company_runtime.py"
+    ],
+    "reasoning_class_ceiling": "D",
+    "required_tests": [
+      "tests/test_company_context_assembly.py",
+      "tests/test_company_efficiency.py",
+      "tests/test_company_runtime.py"
+    ],
+    "resource_profile": "consumer",
+    "selected_capsule_ids": [
+      "company-runtime"
+    ],
+    "selection_reasons": [
+      "company-runtime: owns company/runtime for task path company/runtime"
+    ],
+    "specialist_domain": "",
+    "specialist_reason": "the objective names no security, governance, architecture or concurrency work and the risk is not high, so this is routine implementation",
+    "unscreened_reserved_actions": []
+  },
+  "outcome": "authorized",
+  "persisted": {
+    "job": {
+      "fingerprint": "5ba73a10f91e7520",
+      "record_ref": "engineering/jobs/wo-req-packet-authority-echo-f222300f6c18/000001.json",
+      "sequence": 1
+    },
+    "plan": {
+      "fingerprint": "a269873dbdfbf448",
+      "record_ref": "engineering/plans/wo-req-packet-authority-echo-f222300f6c18/000001.json",
+      "sequence": 1
+    },
+    "request": {
+      "fingerprint": "98404f9deb12bf44",
+      "record_ref": "engineering/requests/req-packet-authority-echo-6e4f03f80be7/000001.json",
+      "sequence": 1
+    },
+    "work_order": {
+      "fingerprint": "9fced136fae4227d",
+      "record_ref": "engineering/work_orders/wo-req-packet-authority-echo-f222300f6c18/000001.json",
+      "sequence": 1
+    }
+  },
+  "plan": {
+    "notes": [
+      "Derived deterministically from the work order; a developer may take a better route inside the same authorized scope."
+    ],
+    "proposed_by": "company-os intake",
+    "proposed_on": "2026-09-19",
+    "steps": [
+      {
+        "action": "Read the authorized paths and the capsule contract they belong to before changing anything: company/efficiency, company/runtime, tests/test_company_context_assembly.py, tests/test_company_efficiency.py, tests/test_company_runtime.py",
+        "step_id": "inspect",
+        "touches": [
+          "company/efficiency",
+          "company/runtime",
+          "tests/test_company_context_assembly.py",
+          "tests/test_company_efficiency.py",
+          "tests/test_company_runtime.py"
+        ],
+        "writes": false
+      },
+      {
+        "action": "Identify the smallest contract that the objective is missing, and state it before implementing it",
+        "step_id": "locate-contract",
+        "touches": [
+          "company/efficiency",
+          "company/runtime",
+          "tests/test_company_context_assembly.py",
+          "tests/test_company_efficiency.py",
+          "tests/test_company_runtime.py"
+        ],
+        "writes": false
+      },
+      {
+        "action": "Implement the smallest compatible change inside the authorized paths",
+        "step_id": "implement",
+        "touches": [
+          "company/efficiency",
+          "company/runtime",
+          "tests/test_company_context_assembly.py",
+          "tests/test_company_efficiency.py",
+          "tests/test_company_runtime.py"
+        ],
+        "writes": true
+      },
+      {
+        "action": "Write focused tests for the new behaviour and for each acceptance criterion",
+        "step_id": "test",
+        "touches": [
+          "company/efficiency",
+          "company/runtime",
+          "tests/test_company_context_assembly.py",
+          "tests/test_company_efficiency.py",
+          "tests/test_company_runtime.py"
+        ],
+        "writes": true
+      },
+      {
+        "action": "Run the affected suites and report every result: tests/test_company_context_assembly.py, tests/test_company_efficiency.py, tests/test_company_runtime.py",
+        "step_id": "run-suites",
+        "touches": [
+          "tests/test_company_context_assembly.py",
+          "tests/test_company_efficiency.py",
+          "tests/test_company_runtime.py"
+        ],
+        "writes": false
+      },
+      {
+        "action": "Run the existing integration gate over the checkout and keep its report as evidence; do not modify the gate",
+        "step_id": "gate-evidence",
+        "touches": [],
+        "writes": false
+      },
+      {
+        "action": "Return a receipt naming the changed paths, the commit, the pushed branch and one evidence reference per acceptance criterion",
+        "step_id": "review-evidence",
+        "touches": [],
+        "writes": false
+      }
+    ],
+    "version": 1,
+    "work_order_fingerprint": "9fced136fae4227d",
+    "work_order_id": "wo-req-packet-authority-echo"
+  },
+  "state": "planning",
+  "work_order": {
+    "acceptance_criteria": [
+      "Running the packet command without a state directory prints an authority object holding the same fingerprint and source it prints with one.",
+      "Nothing is written to disk when no state directory is supplied.",
+      "The payload printed with a state directory is unchanged, record_ref included.",
+      "A focused test covers the without-state-dir payload for both a read-only packet and a write-scoped one."
+    ],
+    "authorized_branch": "company-os-v1-first-real-dogfood",
+    "authorized_on": "2026-09-19",
+    "authorized_paths": [
+      "company/efficiency",
+      "company/runtime",
+      "tests/test_company_context_assembly.py",
+      "tests/test_company_efficiency.py",
+      "tests/test_company_runtime.py"
+    ],
+    "base_commit": "733b21efccf7c168b157b0193d9dce632f6c9ce2",
+    "constraints": [
+      "Do not widen any path grant.",
+      "Do not change how the contract or the snapshot is computed.",
+      "Keep the existing exit codes."
+    ],
+    "context_refs": [
+      {
+        "digest": "",
+        "kind": "module_contract",
+        "reason": "owns company/runtime for task path company/runtime",
+        "ref": "capsule:company-runtime",
+        "span": null
+      },
+      {
+        "digest": "",
+        "kind": "test",
+        "reason": "declared test of the owning capsule",
+        "ref": "tests/test_company_context_assembly.py",
+        "span": null
+      },
+      {
+        "digest": "",
+        "kind": "test",
+        "reason": "declared test of the owning capsule",
+        "ref": "tests/test_company_efficiency.py",
+        "span": null
+      },
+      {
+        "digest": "",
+        "kind": "test",
+        "reason": "declared test of the owning capsule",
+        "ref": "tests/test_company_runtime.py",
+        "span": null
+      }
+    ],
+    "escalation": "none",
+    "evidence_refs": [],
+    "evidence_required": true,
+    "forbidden_paths": [
+      "ai_platform",
+      "company/constitution.md",
+      "knowledge"
+    ],
+    "implementation_capabilities": [
+      "software_implementation"
+    ],
+    "max_developer_attempts": 1,
+    "novel": false,
+    "objective": "The packet command prints the authority fingerprint and source only when a state directory is supplied. Run without one it prints a packet that may already carry a writable path, with nothing identifying the grant behind it. Print the same authority fingerprint and source in that case too, computed from the contract already in hand and persisted nowhere.",
+    "protected": {
+      "entries": [
+        {
+          "digest": "ae5ddf1e644b7cfb",
+          "path": "ai_platform/policy.py"
+        },
+        {
+          "digest": "9fcf0d0a247f399f",
+          "path": "company/agent_contract.schema.yaml"
+        },
+        {
+          "digest": "2d2d1b113ad24120",
+          "path": "company/constitution.md"
+        },
+        {
+          "digest": "61323b6733ff903f",
+          "path": "company/integration/checks.py"
+        },
+        {
+          "digest": "038f13858cd70293",
+          "path": "company/integration/policy.py"
+        },
+        {
+          "digest": "a46792dc96a5e2b9",
+          "path": "company/integration/suites.py"
+        },
+        {
+          "digest": "82da65ecce649567",
+          "path": "company/org_registry.yaml"
+        },
+        {
+          "digest": "404c997d12af4812",
+          "path": "company/permissions.yaml"
+        },
+        {
+          "digest": "f450b38af19435e0",
+          "path": "company/task_handoff.schema.yaml"
+        },
+        {
+          "digest": "3e20803fabf596b4",
+          "path": "company/validation/no_subagents.py"
+        }
+      ]
+    },
+    "reasoning_class_ceiling": "D",
+    "repository": "Simulation Factory",
+    "request_id": "req-packet-authority-echo",
+    "requested_by": "MGI",
+    "required_tests": [
+      "tests/test_company_context_assembly.py",
+      "tests/test_company_efficiency.py",
+      "tests/test_company_runtime.py"
+    ],
+    "resource_profile": "consumer",
+    "reversible": true,
+    "review_capability": "software_architecture",
+    "risk": "low",
+    "specialist_domain": "",
+    "version": 1,
+    "work_order_id": "wo-req-packet-authority-echo"
+  },
+  "work_order_fingerprint": "9fced136fae4227d",
+  "work_order_id": "wo-req-packet-authority-echo"
+}

@@ -1,0 +1,87 @@
+{
+  "task_id": "wo-req-packet-authority-echo",
+  "packet_fingerprint": "2945e8594cf08641",
+  "packet_attempt": 1,
+  "authority_fingerprint": "9cf0eafdf15c4e77",
+  "outcome": "accepted",
+  "summary": "ManualExternalSessionAdapter.prepare now takes its authority snapshot from a module-level authority_for, and the packet CLI calls the same function with attempt 1 when no state directory is supplied, printing record_ref null beside the fingerprint and source. The payload printed with a state directory is unchanged. Two focused tests in tests/test_company_runtime.py cover the read-only and write-scoped outbox-less payloads.",
+  "branch": "company-os-v1-first-real-dogfood",
+  "base_commit": "733b21efccf7c168b157b0193d9dce632f6c9ce2",
+  "commit_sha": "3997a8ef9a3414a5c887d126efa902cee39e9c77",
+  "remote_branch_sha": "3997a8ef9a3414a5c887d126efa902cee39e9c77",
+  "remote_verified": true,
+  "merge_performed": false,
+  "working_tree_clean": true,
+  "files_changed": [
+    "company/runtime/execution_cli.py",
+    "company/runtime/session_adapter.py",
+    "tests/test_company_runtime.py"
+  ],
+  "tests": [
+    {
+      "command": "python -m pytest tests/test_company_context_assembly.py -q -p no:randomly",
+      "passed": true,
+      "summary": "9 passed"
+    },
+    {
+      "command": "python -m pytest tests/test_company_efficiency.py -q -p no:randomly",
+      "passed": true,
+      "summary": "67 passed"
+    },
+    {
+      "command": "python -m pytest tests/test_company_runtime.py -q -p no:randomly",
+      "passed": true,
+      "summary": "22 passed, 2 of them new"
+    },
+    {
+      "command": "python -m pytest tests/test_company_execution_transport.py tests/test_company_session_execution.py tests/test_company_engineering_execution.py -q -p no:randomly",
+      "passed": true,
+      "summary": "190 passed; adjacent suites over the same boundary, not required by the work order"
+    }
+  ],
+  "dependencies_added": [],
+  "invariants_preserved": [
+    "No path grant widened: the diff touches only company/runtime and tests/test_company_runtime.py, both authorized.",
+    "The contract and the snapshot are computed exactly as before; authority_for is the existing prepare body, moved.",
+    "Exit codes unchanged; the with-state-dir payload is unchanged.",
+    "Nothing is written to disk when no state directory is supplied."
+  ],
+  "unresolved_risks": [
+    "The un-persisted snapshot is fixed at attempt 1, so its fingerprint matches a persisted one only for the first attempt into a given outbox. That is stated in the code comment rather than enforced."
+  ],
+  "evidence": [
+    "commit 3997a8ef9a3414a5c887d126efa902cee39e9c77",
+    "remote origin/company-os-v1-first-real-dogfood at 3997a8ef9a3414a5c887d126efa902cee39e9c77"
+  ],
+  "artifacts": [],
+  "context_refs_used": [
+    "module_contract:capsule:company-runtime",
+    "test:tests/test_company_runtime.py"
+  ],
+  "context_usage_reported": true,
+  "next_owner": "chief_architect",
+  "notes": "Supervised single-attempt dogfood. One provider, one session, no subagents, no retries. First receipt was refused: required tests were reported as one combined command. Re-run individually and resubmitted; the implementation is unchanged.",
+  "completed_at": "2026-09-19",
+  "usage": {
+    "passes": 1,
+    "retries": 0,
+    "provider": "anthropic",
+    "model": "claude-opus-5",
+    "usage_unit": "unknown",
+    "cost_ceiling_enforced": false,
+    "unreliable_metrics": [
+      "input_units",
+      "output_units",
+      "cache_creation_units",
+      "cache_hits",
+      "model_turns",
+      "tool_calls",
+      "duration_s",
+      "provider_cost"
+    ],
+    "usage_source": "unavailable: this session is an interactive Claude Code session, not a runner-driven stream-json session, so no provider usage envelope was captured"
+  },
+  "executor": "claude_code",
+  "subagents_used": 0,
+  "no_subagents": true
+}
