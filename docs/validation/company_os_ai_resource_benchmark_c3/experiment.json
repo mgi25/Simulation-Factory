@@ -1,0 +1,61 @@
+{
+  "spec_version": "1.0",
+  "benchmark": "C3 - Provider Utility (forced-use)",
+  "scoring": {
+    "scale": ["CORRECT", "PARTIAL", "WRONG"],
+    "task_A_rubric": {
+      "CORRECT": "Names _sited (environment_world.gd:249-256) as the placement-validity decision symbol, correctly identifies _clear (244-246) and _track_gap (219-241) as the lower-level clearance symbols it calls, and does not name _why (259-271) as the decision function.",
+      "PARTIAL": "Correctly names _sited as the decision symbol but omits one of _clear/_track_gap, or a line span is outside a 2-line tolerance.",
+      "WRONG": "Names _clear, _track_gap, _why, or any other symbol as the primary placement-validity decision function, or fabricates a call relationship not present in the source."
+    },
+    "task_B_rubric": {
+      "CORRECT": "All 3 required files (start_platform.gd, s_curve.gd, toy_scene.gd) present with correct enclosing symbol/line for every real call site and correct function classification (which of beam_section/channel_section, or both) per file; neither v2_track.gd nor toy_geometry_check.gd claimed as a caller of toy_geometry.gd's functions; no fabricated call site.",
+      "PARTIAL": "2 of 3 required files present, or one required file's call-site set is incomplete (e.g. only one of two functions reported for a file that calls both), with no distractor fabricated as a caller.",
+      "WRONG": "v2_track.gd's local channel_section() or toy_geometry_check.gd is claimed as calling toy_geometry.gd's beam_section/channel_section, a required file is missing entirely alongside another defect, or a call site is fabricated."
+    },
+    "scoring_method": "Deterministic comparison of each run's FILES/SYMBOLS/line-span fields against the external ground truth file (c3_ground_truth.json), performed by the operator after all six live runs complete -- not by another model call.",
+    "reviewer_escalation": "If a task's three conditions score inconsistently in a way deterministic comparison cannot resolve, invoke exactly one independent reviewer session for that task only, given the same frozen ground truth. Never one reviewer per run."
+  },
+  "primary_resource_metric": {
+    "name": "context_load_tokens",
+    "formula": "input_tokens + cache_creation_input_tokens + cache_read_input_tokens",
+    "frozen_before_execution": true,
+    "note": "output_tokens is tracked separately as generation cost and is NOT part of the primary metric. This definition must not change after seeing results."
+  },
+  "resource_metrics": {
+    "correctness": ["CORRECT/PARTIAL/WRONG", "exact missing/incorrect fields if PARTIAL or WRONG"],
+    "resource": ["input_tokens", "output_tokens", "cache_creation_input_tokens", "cache_read_input_tokens", "context_load_tokens (primary)", "assistant_turns", "wall_time_seconds (if reliably available from turn_duration markers)"],
+    "navigation": ["Read_count", "Grep_count", "Glob_count", "Bash_count", "provider_call_count", "provider_tool_name", "provider_returned_chars (if deterministically measurable from the tool_result)", "files_read_count (if deterministically measurable)", "total_navigation_result_chars (if deterministically measurable)"],
+    "isolation": ["model", "claude_code_version", "permission_mode", "service_tier", "prompt_sha256", "source_sha_or_git_HEAD", "contamination_PASS_FAIL"],
+    "unavailable_field_policy": "Any field that cannot be reliably extracted from the transcript is recorded as the literal string \"UNAVAILABLE\" with a one-line reason, never estimated or interpolated."
+  },
+  "noise_floor_reference": {
+    "source": "Benchmark C's own recorded resource-noise spread between two runs of an identical task on identical tooling: approximately 37%.",
+    "usage": "Any measured context_load_tokens reduction smaller than this range is treated as within noise, not as a demonstrated provider benefit, per the same standard Benchmark C2 used and explicitly declined to override."
+  },
+  "decision_rule": {
+    "frozen_before_execution": true,
+    "eligibility_for_productionization": [
+      "1. The provider is actually invoked (provider_call_count >= 1) in every one of its official C3 conditions (both Task A and Task B for that provider).",
+      "2. It causes no correctness downgrade versus the corresponding C0 result on the same task (no CORRECT->PARTIAL or PARTIAL->WRONG regression attributable to the condition).",
+      "3. It shows a material context_load_tokens reduction beyond the noise_floor_reference on BOTH Task A and Task B versus C0 -- not merely one lucky run.",
+      "4. It does not introduce disproportionate tool-call or turn overhead relative to C0 (no multi-x blowup in assistant_turns or total tool calls that would offset any token savings operationally)."
+    ],
+    "mixed_result_handling": "If one provider shows a clear pass on one task and a clear fail on the other, activate contingency Task C (run order C2 -> C0 -> C1) before drawing any conclusion for that provider.",
+    "both_fail": "If neither provider clears all four eligibility conditions across Task A and Task B: recommend productionize neither.",
+    "both_pass": "If both providers clear eligibility: compare actual correctness/resource/tool-overhead numbers and recommend the simpler operational choice (fewer moving parts, e.g. no extra venv/runtime dependency) unless one materially outperforms the other on the primary metric.",
+    "do_not_force_a_winner": "Mirrors Benchmark C2's own frozen rule: a result is not adjusted after the fact to manufacture a winner. Inconclusive stays inconclusive and is reported as such."
+  },
+  "session_independence": {
+    "rule": "Each of the (up to) 6 C3 runs is a fresh, independent developer session/process with no conversation memory carried from any other run. No prior run's answer, transcript, or score is ever supplied to a later run.",
+    "procedural_rule_from_c2": "The benchmark prompt (with its condition-specific directive, for C1/C2) must be the FIRST conversational user message in the session, with parentUuid null. Any session where a prior turn (even an accidental paste) precedes it is INVALID_PROCEDURAL_CONTAMINATION and must be replaced with a fresh run, exactly as Benchmark C2's T3/C2 was."
+  },
+  "stop_conditions": [
+    "source tree changes between conditions (re-verify git blob hashes before and after each run)",
+    "a developer session receives the C3 ground truth (grep the transcript for the external ground-truth path or its sha256 as a leak check)",
+    "one candidate's tool leaks into another condition's session (a C0 session calls ctags_query/treesitter_query, a C1 session calls treesitter_query, etc.)",
+    "a C1/C2 session completes with zero provider calls despite the forced-use directive -- this specific run is INVALID_DIRECTIVE_NOT_FOLLOWED and must be replaced, not silently accepted as evidence",
+    "Claude Code auto-updates away from 2.1.70 between runs",
+    "an infrastructure crash invalidates more than one run in the six-run set"
+  ]
+}

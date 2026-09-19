@@ -1,0 +1,106 @@
+{
+  "spec_version": "1.0",
+  "benchmark": "C3 - Provider Utility (forced-use)",
+  "base_sha_note": "This branch (company-os-resource-lab-benchmark-c3) is created directly from the closed Benchmark C2 branch tip (commit 06bdee5 on company-os-resource-lab-benchmark-c2), which is itself f2116a5 plus benchmark-only tooling. No godot/ file differs from f2116a5 or from Benchmark C2's own base (verified: `git diff --stat` across all of godot/ between f2116a5 and this branch's HEAD is empty).",
+  "why_forced_use": "Benchmark C2 (Checkpoint D) closed INCONCLUSIVE FOR PROVIDER UTILITY because the assigned provider was actually invoked in only 1 of 6 provider-bearing official runs (tree-sitter once, Ctags never). C3 exists solely to test the providers WHEN ACTUALLY USED, via a per-condition navigation directive that requires at least one provider call before falling back to Read/Grep/Bash.",
+  "prompt_files_and_hashes": {
+    "note": "Prompt files live outside this repo at C:\\Users\\mgial\\.benchmark-c3\\runs\\. Each is common_instructions + TASK ID + question, with the frozen per-condition directive appended for C1/C2 only. Independently cross-verified via both PowerShell Get-FileHash and sha256sum.",
+    "TaskA_C0": "c6e66257f73d370063b74fdad769461c6bf83fb770a67c96d1fb2daf5463685d",
+    "TaskA_C1": "7b6bb4c611bf4e1b46909db0c0704a93de65d227bbc13ce39bf85384bce415f9",
+    "TaskA_C2": "73f48473028ece70ada99723434d14528108a8180b118060703d9128eb53ae4c",
+    "TaskB_C0": "5fb8bc0eb992700f7cffeff98c84a37162a180f922fe3a5b5e3c0990099efd1e",
+    "TaskB_C1": "28dbf0df89efbefa8d915b44a31ef2550709e5c108176a45861c8700ec85b20a",
+    "TaskB_C2": "b0457e54930d4e7575c7e959d4b99001289e4d3a65b7724e0a45e7b45a87b5d4"
+  },
+  "common_instructions": "Answer using exactly this structure and nothing more. Do not implement, edit, or propose a code change. Do not write an essay. Do not speculate about alternatives not present in the source.\n\nTASK ID: <A|B|C>\nANSWER: <one or two sentence direct answer>\nFILES: <ordered list of repo-relative file paths you determined are required>\nSYMBOLS: <ordered list of `symbol_name (file:start-end)` entries>\nEVIDENCE: <one short sentence per file/symbol citing what you read that supports it>\nCONFIDENCE: <HIGH|MEDIUM|LOW>",
+  "forced_use_directive_template": "Before using Grep, Read, or Bash to locate the answer, you MUST invoke {PROVIDER_TOOL} at least once with the most relevant query you can formulate for this task. After that provider call, use the built-in read-only tools as needed to complete and verify your answer. Do not skip the provider call.",
+  "forced_use_directive_frozen": {
+    "C1_ctags": "Before using Grep, Read, or Bash to locate the answer, you MUST invoke ctags_query at least once with the most relevant query you can formulate for this task. After that provider call, use the built-in read-only tools as needed to complete and verify your answer. Do not skip the provider call.",
+    "C2_treesitter": "Before using Grep, Read, or Bash to locate the answer, you MUST invoke treesitter_query at least once with the most relevant query you can formulate for this task. After that provider call, use the built-in read-only tools as needed to complete and verify your answer. Do not skip the provider call."
+  },
+  "directive_placement": "Appended as a final paragraph after the task question, for C1/C2 prompts only. C0's prompt is common_instructions + TASK ID + question, with no directive appended -- the base task text is byte-identical across all three conditions up to that point.",
+  "directive_neutrality_note": "The directive requires provider USE, not a particular provider ANSWER or query content -- the model chooses its own query wording. Ground truth is not exposed anywhere in the directive or the task text.",
+  "tasks": [
+    {
+      "id": "A",
+      "type": "large_file_structural_navigation",
+      "target_file": "godot/assets/marble_machine/environment/environment_world.gd",
+      "question": "Within godot/assets/marble_machine/environment/environment_world.gd, every terrain feature this file scatters (crests, boulders, spires, trees, landmarks, anchors) is only placed after passing through one specific function that decides whether a candidate site is valid, checking clearance from both the racing line and the camera path in a single call. Identify: (a) the exact symbol responsible for that combined placement-validity decision, (b) its kind, (c) its exact line span on this checkout, (d) the exact lower-level symbol(s) it calls to measure each of the two clearances, and (e) the smallest surrounding implementation body a change to how placement validity is decided would need to touch. Do not include the sibling function that only explains a rejection in human-readable form without itself deciding validity.",
+      "answerable_read_only": true,
+      "why_tests_provider_utility": "environment_world.gd is 1618 lines with ~28 static functions. A structural symbol index (Ctags or tree-sitter) can answer 'what functions exist and where' in one bounded query, versus Grep needing several pattern guesses (_sited, _clear, _track_gap, _why all match loosely-related search terms) and Read needing to page through a large file. This is the profile Benchmark C2's own design predicted a provider should plausibly help with, and which C2 never actually tested because the provider was never called."
+    },
+    {
+      "id": "B",
+      "type": "multi_file_call_site_navigation",
+      "target_symbols": "beam_section() and channel_section() in godot/scripts/toy_geometry.gd",
+      "question": "Two mesh cross-section builder functions defined once in godot/scripts/toy_geometry.gd -- beam_section() and channel_section() -- are called from other production scene-building GDScript files (files that construct an actual Node3D/mesh scene, not diagnostic or reporting scripts) to build swept support and channel geometry. Identify every production scene file that calls either function, and for each one: every call site's enclosing symbol and line, and which of the two functions it calls (a file may call one, the other, or both, more than once). Do not include a file merely because it preloads/references toy_geometry.gd for unrelated geometry helpers. Do not include a file whose own locally-defined function happens to share one of these two names without actually calling toy_geometry.gd's version.",
+      "answerable_read_only": true,
+      "why_tests_provider_utility": "36 files reference toy_geometry.gd overall, but only 3 actually call beam_section/channel_section, under two different local aliases (Geometry, Geo), plus one file (v2_track.gd) that defines its own same-named, differently-shaped local function as a realistic false positive, and one file (toy_geometry_check.gd) that is a genuine caller but out of the 'production scene' scope by design. A reference-aware provider should in principle distinguish real calls from mere co-references and from same-name shadowing faster than serial Grep passes across 36 candidate files."
+    }
+  ],
+  "task_C_contingency": {
+    "id": "C",
+    "status": "PREPARED, NOT SCHEDULED",
+    "verification_status": "PARTIAL -- target tables and referencing-file list confirmed by direct inspection; the full distractor/exclusion set has NOT been verified to the same rigor as Task A/B and MUST be completed before this task is ever run.",
+    "type": "structural_change_surface",
+    "target_file": "godot/assets/marble_machine/course/course_machine.gd",
+    "draft_question": "godot/assets/marble_machine/course/course_machine.gd defines several config tables (GUARD_BOOSTS, BANK_SLEWS, OPEN_SIDES, EDGE_LIGHTS) keyed by named course run (e.g. 'launch', 'leg1', 'leg2', 'orange', 'blue', 'leg3', 'final'). If a new named run were added to the sloped course, which of these tables would require a new entry, and which functions in this file already resolve a run name generically (needing no change)? Separately, list the other GDScript files in this repository that reference course_machine.gd, and state whether each would need to change merely for a new run name to exist and be usable.",
+    "known_referencing_files_unverified_classification": [
+      "godot/assets/marble_machine/course/course_modules.gd",
+      "godot/assets/marble_machine/environment/environment_world.gd",
+      "godot/assets/marble_machine/lab_palette.gd",
+      "godot/assets/marble_machine/v2/v2_track.gd",
+      "godot/scripts/course_scene.gd",
+      "godot/scripts/race2_scene.gd",
+      "godot/scripts/sloped_fork_gap_check.gd",
+      "godot/scripts/sloped_race_scene.gd",
+      "godot/scripts/v23_env_scene.gd"
+    ],
+    "run_order_if_activated": "C2 -> C0 -> C1",
+    "activation_condition": "Only if Task A and Task B are genuinely inconclusive under the frozen decision rule (mixed results across the two tasks for one provider) -- never scheduled automatically."
+  },
+  "condition_policies": {
+    "C0": {
+      "description": "Baseline. No candidate provider.",
+      "tools_allowed": ["Read", "Grep", "Glob", "Bash"],
+      "tools_denied": ["Edit", "Write", "TodoWrite", "Task", "Agent", "WebSearch", "WebFetch", "ctags_query", "treesitter_query"],
+      "mcp_config": "empty ({\"mcpServers\":{}})",
+      "directive": "none"
+    },
+    "C1": {
+      "description": "Ctags, provider use REQUIRED by directive.",
+      "tools_allowed": ["Read", "Grep", "Glob", "Bash", "ctags_query"],
+      "tools_denied": ["Edit", "Write", "TodoWrite", "Task", "Agent", "WebSearch", "WebFetch", "treesitter_query"],
+      "mcp_config": "ctags_query only, --strict-mcp-config",
+      "directive": "forced_use_directive_frozen.C1_ctags, appended to the task prompt"
+    },
+    "C2": {
+      "description": "tree-sitter, provider use REQUIRED by directive.",
+      "tools_allowed": ["Read", "Grep", "Glob", "Bash", "treesitter_query"],
+      "tools_denied": ["Edit", "Write", "TodoWrite", "Task", "Agent", "WebSearch", "WebFetch", "ctags_query"],
+      "mcp_config": "treesitter_query only, --strict-mcp-config",
+      "directive": "forced_use_directive_frozen.C2_treesitter, appended to the task prompt"
+    },
+    "universal_denials": {
+      "all_conditions": ["docs/validation/company_os_ai_resource_benchmark_c3/", "any path under C:\\Users\\mgial\\.benchmark-c3\\"],
+      "reason": "Ground-truth isolation, identical design to Benchmark C2. Ground truth lives at C:\\Users\\mgial\\.benchmark-c3\\ground_truth\\c3_ground_truth.json, outside every git repository and every run worktree."
+    }
+  },
+  "model_configuration": {
+    "model": "claude-sonnet-5 (explicit, not the mutable 'sonnet' alias)",
+    "effort": "default (no --effort override on any run)",
+    "claude_code_version": "2.1.70 exactly, held via DISABLE_AUTOUPDATER=1 and DISABLE_UPDATES=1",
+    "permission_mode": "default (no bypass, no -p, no headless harness)",
+    "setting_sources": "\"project,local\" (excludes user)",
+    "memory_isolation": "CLAUDE_CODE_DISABLE_CLAUDE_MDS=1",
+    "execution_mode": "human-supervised interactive; benchmark prompt as the FIRST conversational user message; immediate /exit after the final structured answer",
+    "developer_attempts_per_condition": 1,
+    "subagents": "none; Agent/Task tool denied to every condition"
+  },
+  "run_order": {
+    "A": ["C0", "C1", "C2"],
+    "B": ["C1", "C2", "C0"],
+    "C_if_activated": ["C2", "C0", "C1"],
+    "rationale": "Balanced across the two live tasks so neither condition always runs first; identical rationale to Benchmark C2's own run_order."
+  }
+}

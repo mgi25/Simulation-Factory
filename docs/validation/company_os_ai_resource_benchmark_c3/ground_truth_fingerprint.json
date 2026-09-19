@@ -1,0 +1,10 @@
+{
+  "note": "The actual Task A/B (and draft C) answer key is deliberately NOT stored in this git working tree, so no developer session's Read/Grep/Glob/provider call during a live C3 run can reach it. It lives at C:\\Users\\mgial\\.benchmark-c3\\ground_truth\\c3_ground_truth.json, a path outside every git repository on this machine. This file records only enough to detect post-hoc tampering: a hash and byte length, not the content.",
+  "ground_truth_path_outside_repo": "C:\\Users\\mgial\\.benchmark-c3\\ground_truth\\c3_ground_truth.json",
+  "sha256": "c6d14edb7159084ac378182561ec24f9927a9f9835b76cf98f6064cbd595cd54",
+  "byte_length": 6410,
+  "spec_version": "1.0",
+  "base_sha_note": "godot/ content identical to f2116a5fdaf0f5150753b36cb525f94e1c62b1f2 across the whole tree",
+  "frozen": true,
+  "verification_instruction": "Before scoring any C3 run, recompute sha256 of the external file and compare to the value above. A mismatch means the answer key changed after freezing and C3 must stop and report, not proceed."
+}
