@@ -1881,7 +1881,7 @@ def test_developer_attempts_remaining_null_and_absent_cases(tmp_path):
     assert "remaining: 0" in page_zero
 
 
-# --- 15. the CEO surface ------------------------------------------------
+# --- 16. the CEO surface ------------------------------------------------
 
 
 def test_the_result_page_answers_every_question_the_brief_lists(tmp_path):
@@ -1944,7 +1944,7 @@ def test_every_record_round_trips_through_its_own_decoder(tmp_path):
         assert again.fingerprint() == record.fingerprint(), type(record).__name__
 
 
-# --- 16. the CEO dashboard surface --------------------------------------
+# --- 17. the CEO dashboard surface --------------------------------------
 #
 # The CEO already has a read-only projection and a brief. These tests hold the
 # engineering section to the two properties that matter: every lifecycle state
@@ -2235,7 +2235,7 @@ def test_a_correction_attempt_escalates_because_the_cheaper_model_failed(tmp_pat
 
 
 
-# --- 12. real context narrowing -----------------------------------------
+# --- 18. real context narrowing -----------------------------------------
 
 
 def test_context_refs_are_narrowed_against_the_real_repository_path(tmp_path):
@@ -2446,7 +2446,7 @@ def test_an_explicit_reference_is_never_dropped_by_a_profile_ceiling():
         assert ref.key in assembled.manifest.keys()
 
 
-# --- 13. the routing derivation is deterministic and readable -------------
+# --- 19. the routing derivation is deterministic and readable -------------
 
 
 def test_routing_is_a_pure_function_of_the_request():
