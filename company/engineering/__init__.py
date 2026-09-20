@@ -13,6 +13,7 @@ README.
     review        Deterministic QA plus one independent reviewer, worst wins.
     gate_evidence The integration gate's verdict, read and never computed here.
     result        The one page the CEO reads.
+    verify        Has the governance surface moved? Asked without a review.
     decision      APPROVE / REQUEST_CHANGES / REJECT, recorded and not acted on.
     store         The append-only history under a caller-supplied directory.
     orchestrator  One function per stage, each one a recorded move.
@@ -128,6 +129,12 @@ from .attempt_ledger import (
     AttemptLedgerEntry,
     build_attempt_ledger,
 )
+from .verify import (
+    DriftStatus,
+    GovernanceDriftReport,
+    verify_all,
+    verify_work_order,
+)
 from .work_order import (
     ALLOWED_CEILINGS,
     DEFAULT_MAX_DEVELOPER_ATTEMPTS,
@@ -167,6 +174,7 @@ __all__ = [
     "CriterionFinding",
     "DecisionRequired",
     "DeveloperBriefing",
+    "DriftStatus",
     "DeveloperResult",
     "EngineeringError",
     "EngineeringJob",
@@ -180,6 +188,7 @@ __all__ = [
     "GateBlocker",
     "GateReadiness",
     "GateVerdict",
+    "GovernanceDriftReport",
     "ImplementationPlan",
     "IntakeAssessment",
     "IntakeOutcome",
@@ -220,4 +229,6 @@ __all__ = [
     "reserved_actions",
     "screen_credentials",
     "screen_reserved",
+    "verify_all",
+    "verify_work_order",
 ]
