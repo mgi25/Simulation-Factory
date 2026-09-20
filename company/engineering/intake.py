@@ -181,6 +181,10 @@ _CLAUSE_BREAK = re.compile(
 )
 _NEGATION_WORDS = frozenset({"not", "no", "never", "without", "avoid", "cannot"})
 _NEGATION_WORD_PATTERN = re.compile(r"[a-z']+")
+# Backtick-quoted identifiers in an objective name things being *referenced*, not
+# work being requested.  A trigger term that appears only inside such a quote must
+# not cause escalation (e.g. "Fix `test_authentication_flow`" is not security work).
+_QUOTED_IDENT = re.compile(r"`[^`]+`")
 
 
 def _clauses(text: str) -> tuple[str, ...]:
@@ -931,7 +935,7 @@ def derive_routing(request: CEORequest) -> RoutingDerivation:
     # note that says "the previous request was misclassified as governance"
     # would otherwise retrigger the exact misclassification it describes.
     text = request.objective.lower()
-    clauses = _clauses(text)
+    clauses = _clauses(_QUOTED_IDENT.sub(" ", text))
     novel = request.novel or any(_escalates(term, clauses) for term in NOVEL_TRIGGERS)
 
     domain = request.specialist_domain

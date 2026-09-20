@@ -2691,6 +2691,10 @@ def test_an_irreversible_request_raises_its_own_ceiling():
         "Show migration status on a dashboard.",
         "Add schema information to a report.",
         "Rename a field in documentation.",
+        # Trigger terms that appear only inside a backtick-quoted test identifier
+        # are references, not requests — they must not cause escalation.
+        "Fix the failing `test_schema_migration_classifier` test.",
+        "Add a case to `test_authentication_flow` for this edge.",
     ],
 )
 def test_harmless_schema_protocol_format_mentions_stay_routine(objective):
@@ -2734,6 +2738,9 @@ def test_routine_objective_with_breaking_change_mentioned_only_in_notes_stays_ro
         "Migrate the persisted storage format.",
         "Replace the serialization format used for stored records.",
         "Introduce a backward-incompatible API contract.",
+        # Regression: a schema migration stated in objective text must still escalate
+        # even after the quoted-identifier fix strips backtick content.
+        "Run a schema migration on the record store.",
     ],
 )
 def test_breaking_migration_schema_protocol_changes_route_to_architecture(objective):
