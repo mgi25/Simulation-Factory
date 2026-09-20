@@ -121,6 +121,11 @@ from .store import (
     EngineeringStore,
     EngineeringStoreError,
 )
+from .attempt_ledger import (
+    AttemptLedger,
+    AttemptLedgerEntry,
+    build_attempt_ledger,
+)
 from .work_order import (
     ALLOWED_CEILINGS,
     DEFAULT_MAX_DEVELOPER_ATTEMPTS,
@@ -132,6 +137,8 @@ from .work_order import (
 
 __all__ = [
     "ALLOWED_CEILINGS",
+    "AttemptLedger",
+    "AttemptLedgerEntry",
     "ALLOWED_TRANSITIONS",
     "CEO_STATES",
     "CREDENTIAL_TRIGGERS",
@@ -194,6 +201,7 @@ __all__ = [
     "adjudicate",
     "assess_request",
     "assert_named_person",
+    "build_attempt_ledger",
     "derive_plan",
     "deterministic_findings",
     "ingest_developer_result",
