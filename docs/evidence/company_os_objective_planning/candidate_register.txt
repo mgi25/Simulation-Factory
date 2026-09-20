@@ -1,0 +1,39 @@
+WORK CANDIDATE REGISTER (7 of 7)
+
+auth-migration-classifier-ambiguity
+  open       medium  engineering  company-engineering-execution
+  Disambiguate bare authentication and migration trigger words
+  source    known_defect <- docs/company_os_canonical_integration_record.md
+
+deployment-policy-gap
+  blocked    high    engineering  company-executive-delegation
+  Decide the deployment policy the delegation model measures against
+  source    known_defect <- docs/company_os_canonical_integration_record.md
+  BLOCKED   a CEO policy decision: Company OS has no deployment policy to delegate against, and inventing one in code would be the delegation model widening itself
+
+intake-unfalsifiable-acceptance-criteria
+  completed  low     engineering  company-engineering-execution
+  Refuse a work order whose acceptance criterion restates the objective
+  source    validation_report <- docs/company_os_first_live_delegation_pilot.md
+
+provider-usage-event-identifier
+  blocked    medium  ai_platform  ai-platform
+  Give a provider usage event a stable identifier
+  source    known_defect <- docs/company_os_canonical_integration_record.md
+  BLOCKED   a design decision nobody has taken: no existing field is a stable per-event id, so this needs a schema change, and schema or storage migration is outside routine engineering
+
+reserved-screening-negation-blindness
+  open       medium  engineering  company-engineering-execution
+  Teach reserved and credential screening to respect negation
+  source    known_defect <- docs/company_os_canonical_integration_record.md
+
+runner-blocked-attempt-repo-dir
+  open       low     engineering  tools-engineering-runner
+  Make the runner blocked_attempt path take --repo-dir consistently
+  source    deferred_followup <- docs/company_os_v1_external_runner_hardening.md
+
+runner-zero-required-tests-policy
+  blocked    medium  engineering  tools-engineering-runner
+  Decide what a work order with zero required_tests means
+  source    deferred_followup <- docs/company_os_v1_external_runner_hardening.md
+  BLOCKED   a policy decision about what evidence a receipt must carry when the work order declares no tests

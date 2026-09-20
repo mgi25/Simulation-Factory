@@ -82,6 +82,27 @@ from .exceptions import (
     ManagementException,
     classify,
 )
+from .candidates import (
+    CandidateRegister,
+    CandidateSource,
+    CandidateStatus,
+    WorkCandidate,
+    load_seed_register,
+    propose_candidate,
+    register_from,
+)
+from .planning import (
+    ELIGIBILITY_CHECKS,
+    CandidateEligibility,
+    EligibilityCheck,
+    PlanningResult,
+    WorkOrderProposal,
+    assess_candidate,
+    eligible_candidates,
+    propose_work_order,
+    select_work,
+)
+from .planning_record import PlanningDecisionRecord, PlanningOutcome
 from .objectives import (
     ExecutivePlan,
     Objective,
@@ -201,4 +222,22 @@ __all__ = [
     "risk_rank",
     "summarise",
     "verify_shadow_mode",
+    "CandidateEligibility",
+    "CandidateRegister",
+    "CandidateSource",
+    "CandidateStatus",
+    "ELIGIBILITY_CHECKS",
+    "EligibilityCheck",
+    "PlanningDecisionRecord",
+    "PlanningOutcome",
+    "PlanningResult",
+    "WorkCandidate",
+    "WorkOrderProposal",
+    "assess_candidate",
+    "eligible_candidates",
+    "load_seed_register",
+    "propose_candidate",
+    "propose_work_order",
+    "register_from",
+    "select_work",
 ]

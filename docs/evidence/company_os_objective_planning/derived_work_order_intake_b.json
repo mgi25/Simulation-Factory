@@ -1,0 +1,252 @@
+{
+  "derivation": {
+    "authorized_paths": [
+      "company/engineering/intake.py",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "ceiling_applied": [
+      "company/engineering/intake.py",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "context_refs_considered": 2,
+    "context_refs_dropped": [],
+    "context_refs_kept": 2,
+    "criteria_derived": false,
+    "escalation": "none",
+    "forbidden_paths": [
+      "company/constitution.md",
+      "company/integration",
+      "company/permissions.yaml",
+      "company/runtime",
+      "sloped",
+      "tools"
+    ],
+    "matched_tokens": [
+      "authentication",
+      "bare",
+      "disambiguate",
+      "migration",
+      "trigger",
+      "words"
+    ],
+    "novel": false,
+    "owns_paths": [
+      "company/engineering",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "reasoning_class_ceiling": "D",
+    "required_tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "resource_profile": "consumer",
+    "selected_capsule_ids": [
+      "company-engineering-execution"
+    ],
+    "selection_reasons": [
+      "company-engineering-execution: requested by id"
+    ],
+    "specialist_domain": "security",
+    "specialist_reason": "the objective names 'authentication', which is security work",
+    "unscreened_reserved_actions": []
+  },
+  "outcome": "authorized",
+  "persisted": {
+    "job": {
+      "fingerprint": "bdbf8c5287f1b31e",
+      "record_ref": "engineering/jobs/wo-wo-auth-migration-classifier-324820bc6887/000001.json",
+      "sequence": 1
+    },
+    "plan": {
+      "fingerprint": "1b09ef57897ec441",
+      "record_ref": "engineering/plans/wo-wo-auth-migration-classifier-324820bc6887/000001.json",
+      "sequence": 1
+    },
+    "request": {
+      "fingerprint": "7e80f97154449c03",
+      "record_ref": "engineering/requests/wo-auth-migration-classifier-993788621b57/000001.json",
+      "sequence": 1
+    },
+    "work_order": {
+      "fingerprint": "16943821e0cdb63a",
+      "record_ref": "engineering/work_orders/wo-wo-auth-migration-classifier-324820bc6887/000001.json",
+      "sequence": 1
+    }
+  },
+  "plan": {
+    "notes": [
+      "Derived deterministically from the work order; a developer may take a better route inside the same authorized scope."
+    ],
+    "proposed_by": "company-os intake",
+    "proposed_on": "2026-09-20",
+    "steps": [
+      {
+        "action": "Read the authorized paths and the capsule contract they belong to before changing anything: company/engineering/intake.py, tests/test_company_engineering_execution.py",
+        "step_id": "inspect",
+        "touches": [
+          "company/engineering/intake.py",
+          "tests/test_company_engineering_execution.py"
+        ],
+        "writes": false
+      },
+      {
+        "action": "Identify the smallest contract that the objective is missing, and state it before implementing it",
+        "step_id": "locate-contract",
+        "touches": [
+          "company/engineering/intake.py",
+          "tests/test_company_engineering_execution.py"
+        ],
+        "writes": false
+      },
+      {
+        "action": "Implement the smallest compatible change inside the authorized paths",
+        "step_id": "implement",
+        "touches": [
+          "company/engineering/intake.py",
+          "tests/test_company_engineering_execution.py"
+        ],
+        "writes": true
+      },
+      {
+        "action": "Write focused tests for the new behaviour and for each acceptance criterion",
+        "step_id": "test",
+        "touches": [
+          "company/engineering/intake.py",
+          "tests/test_company_engineering_execution.py"
+        ],
+        "writes": true
+      },
+      {
+        "action": "Run the affected suites and report every result: tests/test_company_engineering_execution.py",
+        "step_id": "run-suites",
+        "touches": [
+          "tests/test_company_engineering_execution.py"
+        ],
+        "writes": false
+      },
+      {
+        "action": "Run the existing integration gate over the checkout and keep its report as evidence; do not modify the gate",
+        "step_id": "gate-evidence",
+        "touches": [],
+        "writes": false
+      },
+      {
+        "action": "Return a receipt naming the changed paths, the commit, the pushed branch and one evidence reference per acceptance criterion",
+        "step_id": "review-evidence",
+        "touches": [],
+        "writes": false
+      }
+    ],
+    "version": 1,
+    "work_order_fingerprint": "16943821e0cdb63a",
+    "work_order_id": "wo-wo-auth-migration-classifier"
+  },
+  "state": "planning",
+  "work_order": {
+    "acceptance_criteria": [
+      "An objective that names a migration only inside a quoted test identifier derives no specialist domain.",
+      "An objective that asks for a schema migration still derives the specialist domain it derives today.",
+      "tests/test_company_engineering_execution.py passes with a case for each direction."
+    ],
+    "authorized_branch": "eng-wo-auth-migration-classifier",
+    "authorized_on": "2026-09-20",
+    "authorized_paths": [
+      "company/engineering/intake.py",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "base_commit": "",
+    "constraints": [],
+    "context_refs": [
+      {
+        "digest": "",
+        "kind": "module_contract",
+        "reason": "requested by id",
+        "ref": "capsule:company-engineering-execution",
+        "span": null
+      },
+      {
+        "digest": "",
+        "kind": "test",
+        "reason": "declared test of the owning capsule",
+        "ref": "tests/test_company_engineering_execution.py",
+        "span": null
+      }
+    ],
+    "escalation": "none",
+    "evidence_refs": [],
+    "evidence_required": true,
+    "forbidden_paths": [
+      "company/constitution.md",
+      "company/integration",
+      "company/permissions.yaml",
+      "company/runtime",
+      "sloped",
+      "tools"
+    ],
+    "implementation_capabilities": [
+      "software_implementation"
+    ],
+    "max_developer_attempts": 1,
+    "novel": false,
+    "objective": "Disambiguate bare authentication and migration trigger words",
+    "protected": {
+      "entries": [
+        {
+          "digest": "ae5ddf1e644b7cfb",
+          "path": "ai_platform/policy.py"
+        },
+        {
+          "digest": "9fcf0d0a247f399f",
+          "path": "company/agent_contract.schema.yaml"
+        },
+        {
+          "digest": "2d2d1b113ad24120",
+          "path": "company/constitution.md"
+        },
+        {
+          "digest": "61323b6733ff903f",
+          "path": "company/integration/checks.py"
+        },
+        {
+          "digest": "038f13858cd70293",
+          "path": "company/integration/policy.py"
+        },
+        {
+          "digest": "a46792dc96a5e2b9",
+          "path": "company/integration/suites.py"
+        },
+        {
+          "digest": "add3813556b23a50",
+          "path": "company/org_registry.yaml"
+        },
+        {
+          "digest": "404c997d12af4812",
+          "path": "company/permissions.yaml"
+        },
+        {
+          "digest": "f450b38af19435e0",
+          "path": "company/task_handoff.schema.yaml"
+        },
+        {
+          "digest": "3e20803fabf596b4",
+          "path": "company/validation/no_subagents.py"
+        }
+      ]
+    },
+    "reasoning_class_ceiling": "D",
+    "repository": "Simulation Factory",
+    "request_id": "wo-auth-migration-classifier",
+    "requested_by": "engineering_delivery_manager",
+    "required_tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "resource_profile": "consumer",
+    "reversible": true,
+    "review_capability": "software_architecture",
+    "risk": "medium",
+    "specialist_domain": "security",
+    "version": 1,
+    "work_order_id": "wo-wo-auth-migration-classifier"
+  },
+  "work_order_fingerprint": "16943821e0cdb63a",
+  "work_order_id": "wo-wo-auth-migration-classifier"
+}

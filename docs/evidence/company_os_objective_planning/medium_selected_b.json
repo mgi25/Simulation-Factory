@@ -1,0 +1,249 @@
+{
+  "decision": {
+    "acceptance_criteria": [
+      "An objective that names a migration only inside a quoted test identifier derives no specialist domain.",
+      "An objective that asks for a schema migration still derives the specialist domain it derives today.",
+      "tests/test_company_engineering_execution.py passes with a case for each direction."
+    ],
+    "candidate_ids_considered": [
+      "auth-migration-classifier-ambiguity",
+      "deployment-policy-gap",
+      "intake-unfalsifiable-acceptance-criteria",
+      "provider-usage-event-identifier",
+      "reserved-screening-negation-blindness",
+      "runner-blocked-attempt-repo-dir",
+      "runner-zero-required-tests-policy"
+    ],
+    "candidate_ids_rejected": [
+      "deployment-policy-gap",
+      "intake-unfalsifiable-acceptance-criteria",
+      "provider-usage-event-identifier",
+      "runner-blocked-attempt-repo-dir",
+      "runner-zero-required-tests-policy"
+    ],
+    "capsule_id": "company-engineering-execution",
+    "decision": "selected",
+    "department": "engineering",
+    "escalation_reason": "",
+    "escalation_required": false,
+    "estimated_cost": null,
+    "evidence_refs_used": [
+      "docs/company_os_canonical_integration_record.md"
+    ],
+    "executive_employee": "chief_architect",
+    "executive_seat": "cto",
+    "expected_value": "Routine requests that merely mention a sensitive concept reach the cheaper tier instead of the specialist one.",
+    "manager_employee": "engineering_delivery_manager",
+    "manager_seat": "engineering_manager",
+    "objective_alignment": "advances obj-intake-classifier-medium-2026-09-20 (Reduce false escalations in engineering intake classification.) by closing a known_defect recorded in docs/company_os_canonical_integration_record.md",
+    "objective_id": "obj-intake-classifier-medium-2026-09-20",
+    "objective_intent_digest": "8922ac0827a7277d",
+    "planning_decision_id": "plan-intake-classifier-medium",
+    "policy_fingerprint": "1b7730a416527756",
+    "policy_version": "delegation_policy_v1",
+    "recorded_on": "2026-09-20",
+    "risk": "medium",
+    "selected_candidate_id": "auth-migration-classifier-ambiguity",
+    "selection_reason": "auth-migration-classifier-ambiguity is the planner's choice among 2 eligible candidates; 5 other candidate(s) were rejected",
+    "version": 1
+  },
+  "eligibility": [
+    {
+      "candidate_id": "auth-migration-classifier-ambiguity",
+      "eligible": true,
+      "failed": [],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "status_open",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": []
+    },
+    {
+      "candidate_id": "deployment-policy-gap",
+      "eligible": false,
+      "failed": [
+        "status_open",
+        "risk_within_ceiling"
+      ],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "status_open: status is blocked (a CEO policy decision: Company OS has no deployment policy to delegate against, and inventing one in code would be the delegation model widening itself)",
+        "risk_within_ceiling: high risk exceeds the envelope ceiling of medium"
+      ]
+    },
+    {
+      "candidate_id": "intake-unfalsifiable-acceptance-criteria",
+      "eligible": false,
+      "failed": [
+        "status_open"
+      ],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "status_open: status is completed"
+      ]
+    },
+    {
+      "candidate_id": "provider-usage-event-identifier",
+      "eligible": false,
+      "failed": [
+        "department_permitted",
+        "status_open"
+      ],
+      "passed": [
+        "capsule_owned",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "department_permitted: ai_platform is not among the envelope's departments (engineering)",
+        "status_open: status is blocked (a design decision nobody has taken: no existing field is a stable per-event id, so this needs a schema change, and schema or storage migration is outside routine engineering)"
+      ]
+    },
+    {
+      "candidate_id": "reserved-screening-negation-blindness",
+      "eligible": true,
+      "failed": [],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "status_open",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": []
+    },
+    {
+      "candidate_id": "runner-blocked-attempt-repo-dir",
+      "eligible": false,
+      "failed": [
+        "capsule_owned"
+      ],
+      "passed": [
+        "department_permitted",
+        "status_open",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "capsule_owned: no confirmed capsule owns tools-engineering-runner; work whose owner the company cannot name has no declared scope, tests or invariants to be reviewed against"
+      ]
+    },
+    {
+      "candidate_id": "runner-zero-required-tests-policy",
+      "eligible": false,
+      "failed": [
+        "capsule_owned",
+        "status_open"
+      ],
+      "passed": [
+        "department_permitted",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "capsule_owned: no confirmed capsule owns tools-engineering-runner; work whose owner the company cannot name has no declared scope, tests or invariants to be reviewed against",
+        "status_open: status is blocked (a policy decision about what evidence a receipt must carry when the work order declares no tests)"
+      ]
+    }
+  ],
+  "proposal": {
+    "acceptance_criteria": [
+      "An objective that names a migration only inside a quoted test identifier derives no specialist domain.",
+      "An objective that asks for a schema migration still derives the specialist domain it derives today.",
+      "tests/test_company_engineering_execution.py passes with a case for each direction."
+    ],
+    "budget": {
+      "amount": "6",
+      "currency": "USD"
+    },
+    "candidate_id": "auth-migration-classifier-ambiguity",
+    "capsule_id": "company-engineering-execution",
+    "department": "engineering",
+    "evidence_refs": [
+      "docs/company_os_canonical_integration_record.md"
+    ],
+    "objective": "Disambiguate bare authentication and migration trigger words",
+    "objective_id": "obj-intake-classifier-medium-2026-09-20",
+    "planning_decision_id": "plan-intake-classifier-medium",
+    "proposal_id": "wo-auth-migration-classifier-ambiguity",
+    "proposed_by_seat": "engineering_manager",
+    "proposed_on": "2026-09-20",
+    "resource_profile": "consumer",
+    "risk": "medium",
+    "scope_ceiling": [
+      "company/engineering/intake.py",
+      "tests/test_company_engineering_execution.py"
+    ]
+  },
+  "work_order_request": {
+    "acceptance_criteria": [
+      "An objective that names a migration only inside a quoted test identifier derives no specialist domain.",
+      "An objective that asks for a schema migration still derives the specialist domain it derives today.",
+      "tests/test_company_engineering_execution.py passes with a case for each direction."
+    ],
+    "candidate_id": "auth-migration-classifier-ambiguity",
+    "capsule_hints": [
+      "company-engineering-execution"
+    ],
+    "notes": "derived from candidate auth-migration-classifier-ambiguity by planning decision plan-intake-classifier-medium",
+    "objective": "Disambiguate bare authentication and migration trigger words",
+    "planning_decision_id": "plan-intake-classifier-medium",
+    "request_id": "wo-auth-migration-classifier-ambiguity",
+    "requested_by": "engineering_delivery_manager",
+    "requested_on": "2026-09-20",
+    "resource_profile": "consumer",
+    "reversible": true,
+    "risk": "medium",
+    "scope_ceiling": [
+      "company/engineering/intake.py",
+      "tests/test_company_engineering_execution.py"
+    ]
+  }
+}

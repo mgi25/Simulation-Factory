@@ -1,0 +1,24 @@
+{
+  "acceptance_criteria": [
+    "An objective that names a migration only inside a quoted test identifier derives no specialist domain.",
+    "An objective that asks for a schema migration still derives the specialist domain it derives today.",
+    "tests/test_company_engineering_execution.py passes with a case for each direction."
+  ],
+  "candidate_id": "auth-migration-classifier-ambiguity",
+  "capsule_hints": [
+    "company-engineering-execution"
+  ],
+  "notes": "derived from candidate auth-migration-classifier-ambiguity by planning decision plan-intake-classifier-medium",
+  "objective": "Disambiguate bare authentication and migration trigger words",
+  "planning_decision_id": "plan-intake-classifier-medium",
+  "request_id": "wo-auth-migration-classifier",
+  "requested_by": "engineering_delivery_manager",
+  "requested_on": "2026-09-20",
+  "resource_profile": "consumer",
+  "reversible": true,
+  "risk": "medium",
+  "scope_ceiling": [
+    "company/engineering/intake.py",
+    "tests/test_company_engineering_execution.py"
+  ]
+}

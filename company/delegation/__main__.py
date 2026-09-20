@@ -32,6 +32,8 @@ branch on the answer without parsing prose, the same convention
 from __future__ import annotations
 
 import argparse
+from collections.abc import Mapping
+import datetime as dt
 import json
 from pathlib import Path
 import sys
@@ -41,8 +43,10 @@ from ai_platform.serde import to_jsonable
 from company.finance.money import Money
 from company.runtime.config import load_company_config
 from company.validation.errors import CompanyOSError
+from knowledge.company_os.capsules import CapsuleIndex
 
-from .actions import parse_action, reservation_drift
+from .actions import ActionType, parse_action, reservation_drift
+from .candidates import CandidateStatus, load_seed_register
 from .authority import AuthorityRequest, Decision, evaluate
 from .errors import DelegationError
 from .exceptions import classify
@@ -51,6 +55,10 @@ from .policy import DelegationPolicy, load_delegation_policy, parse_risk
 from .deployment import DEPLOYMENT_POLICY, policy_table
 from .metrics import DecisionOutcome, ManagementReport, measure, spend_of
 from .scenarios import CONTROL_SCENARIOS, SCENARIOS, replay, summarise
+from .objectives import Objective, ObjectiveLevel, PlanningEnvelope
+from .planning import eligible_candidates, propose_work_order, select_work
+from .planning_record import PlanningOutcome
+from .store import DelegationStore
 from .shadow import verify_shadow_mode
 from .pilot import PILOT_SEATS, PILOT_VERSION, PilotMode
 from .pilot_integration import PILOT_TARGET, PROTECTED_REFS
@@ -97,6 +105,25 @@ def build_parser() -> argparse.ArgumentParser:
     commands.add_parser(
         "report", help="the management-by-exception report over the replay"
     )
+
+    candidates_cmd = commands.add_parser(
+        "candidates", help="the work candidate register, and what each one is blocked on"
+    )
+    candidates_cmd.add_argument("--capsule", default="", help="only this capsule")
+    candidates_cmd.add_argument(
+        "--status", default="", help="only this status (open, blocked, ...)"
+    )
+    candidates_cmd.add_argument("--seed-file", default="", help="an alternate register")
+
+    plan_cmd = commands.add_parser(
+        "plan",
+        help="select one candidate for a CEO objective and record the decision",
+    )
+    plan_cmd.add_argument("--objective-file", required=True)
+    plan_cmd.add_argument("--seed-file", default="")
+    plan_cmd.add_argument("--state-dir", default="", help="persist the decision here")
+    plan_cmd.add_argument("--prefer", default="", help="choose among eligible candidates")
+    plan_cmd.add_argument("--as-of", default="", help="the day, YYYY-MM-DD")
 
     evaluate_cmd = commands.add_parser("evaluate", help="answer one authority request")
     evaluate_cmd.add_argument("--request-file", type=Path, required=True)
@@ -434,6 +461,142 @@ def _cmd_report(args: argparse.Namespace) -> int:
     return _ANSWERED if metrics.ceo_decisions_required == 0 else _ESCALATED
 
 
+def _register_for(args: argparse.Namespace):
+    return load_seed_register(args.seed_file or None)
+
+
+def _cmd_candidates(args: argparse.Namespace) -> int:
+    """The backlog view a manager asks for: what open work does this capsule own?"""
+    register = _register_for(args)
+    rows = (
+        register.for_capsule(args.capsule) if args.capsule else register.candidates
+    )
+    if args.status:
+        wanted = CandidateStatus(args.status)
+        rows = tuple(item for item in rows if item.status is wanted)
+    lines = [f"WORK CANDIDATE REGISTER ({len(rows)} of {len(register)})"]
+    if args.capsule:
+        lines.append(f"  capsule {args.capsule}")
+    lines.append("")
+    for item in rows:
+        lines.append(f"{item.candidate_id}")
+        lines.append(
+            f"  {item.status.value:10} {item.risk.value:7} {item.department:12} "
+            f"{item.capsule_id}"
+        )
+        lines.append(f"  {item.title}")
+        lines.append(f"  source    {item.source_type.value} <- {item.source_ref}")
+        for blocker in item.blocked_by:
+            lines.append(f"  BLOCKED   {blocker}")
+        lines.append("")
+    problems = register.violations()
+    if problems:
+        lines.append("REGISTER VIOLATIONS")
+        lines.extend(f"  {item}" for item in problems)
+    print("\n".join(lines).rstrip())
+    return _ANSWERED
+
+
+def _objective_and_envelope(
+    data: Mapping[str, Any]
+) -> tuple[Objective, PlanningEnvelope, dict[str, Any]]:
+    """Read one CEO objective file into the two records planning needs."""
+    envelope_raw = data.get("envelope")
+    if not isinstance(envelope_raw, Mapping):
+        raise DelegationError("the objective file needs an envelope")
+    envelope = PlanningEnvelope(
+        objective_id=str(data.get("objective_id", "")),
+        budget=Money.from_dict(dict(envelope_raw.get("budget", {})), "budget"),
+        budget_scope=str(envelope_raw.get("budget_scope", "")),
+        risk_ceiling=parse_risk(envelope_raw.get("risk_ceiling")),
+        allowed_departments=tuple(envelope_raw.get("allowed_departments", ())),
+        forbidden_actions=tuple(
+            parse_action(name) for name in envelope_raw.get("forbidden_actions", ())
+        ),
+        success_metrics=tuple(envelope_raw.get("success_metrics", ())),
+    )
+    objective = Objective(
+        objective_id=str(data.get("objective_id", "")),
+        level=ObjectiveLevel.CEO_OBJECTIVE,
+        title=str(data.get("title", "")),
+        owner_seat=str(data.get("owner_seat", "ceo")),
+        set_by=str(data.get("set_by", "")),
+        set_on=dt.date.fromisoformat(str(data.get("set_on"))),
+        department=(envelope.allowed_departments or ("engineering",))[0],
+        success_metrics=envelope.success_metrics,
+        evidence_refs=tuple(data.get("evidence_refs", ())),
+        envelope=envelope,
+    )
+    return objective, envelope, dict(data.get("planners", {}))
+
+
+def _cmd_plan(args: argparse.Namespace) -> int:
+    """CEO objective -> eligible candidates -> one selection, recorded.
+
+    Planning only. Nothing here runs a work order, spends anything, or writes
+    to a branch; the strongest thing it produces is a proposal a deterministic
+    intake may still refuse.
+    """
+    policy = _load_policy(args)
+    with open(args.objective_file, encoding="utf-8") as handle:
+        data = json.load(handle)
+    objective, envelope, planners = _objective_and_envelope(data)
+    register = _register_for(args)
+    day = dt.date.fromisoformat(args.as_of) if args.as_of else objective.set_on
+    # Ownership is read from the capsule index, never from the register: a
+    # candidate naming a capsule that does not exist is exactly the case the
+    # capsule_owned check has to catch, and letting the register vouch for its
+    # own capsule ids would make the check vacuous.
+    owned = CapsuleIndex.load().ids()
+    reserved = tuple(action for action in ActionType if policy.is_reserved(action))
+
+    result = select_work(
+        register,
+        objective,
+        envelope,
+        planning_decision_id=str(data.get("planning_decision_id", "plan-" + objective.objective_id)),
+        executive_seat=str(planners.get("executive_seat", "cto")),
+        executive_employee=str(planners.get("executive_employee", "chief_architect")),
+        manager_seat=str(planners.get("manager_seat", "engineering_manager")),
+        manager_employee=str(planners.get("manager_employee", "engineering_delivery_manager")),
+        policy_version=policy.version,
+        policy_fingerprint=policy.fingerprint(),
+        recorded_on=day,
+        capsule_ids=owned,
+        reserved_actions=reserved,
+        objective_goal_tags=tuple(data.get("goal_tags", ())),
+        prefer_candidate_id=args.prefer,
+    )
+
+    payload: dict[str, Any] = result.to_dict()
+    if result.outcome is PlanningOutcome.SELECTED:
+        candidate = register.candidate(result.record.selected_candidate_id)
+        proposal = propose_work_order(
+            candidate,
+            envelope,
+            proposal_id=f"wo-{candidate.candidate_id}"[:64],
+            proposed_by_seat=result.record.manager_seat,
+            proposed_on=day,
+            planning_decision_id=result.record.planning_decision_id,
+        )
+        payload["proposal"] = proposal.to_dict()
+        payload["work_order_request"] = proposal.to_request_dict(
+            requested_by=result.record.manager_employee
+        )
+    if args.state_dir:
+        store = DelegationStore(args.state_dir)
+        for item in register.candidates:
+            store.append_candidate(item)
+        pointer = store.append_planning_decision(result.record)
+        payload["persisted"] = pointer.to_dict()
+    print(json.dumps(to_jsonable(payload), indent=2, sort_keys=True))
+    if result.outcome is PlanningOutcome.SELECTED:
+        return _ANSWERED
+    if result.outcome is PlanningOutcome.ESCALATED:
+        return _ESCALATED
+    return _ESCALATED
+
+
 _COMMANDS = {
     "policy": _cmd_policy,
     "deployment": _cmd_deployment,
@@ -444,6 +607,8 @@ _COMMANDS = {
     "evaluate": _cmd_evaluate,
     "replay": _cmd_replay,
     "shadow": _cmd_shadow,
+    "candidates": _cmd_candidates,
+    "plan": _cmd_plan,
 }
 
 
