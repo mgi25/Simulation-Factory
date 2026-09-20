@@ -51,6 +51,7 @@
   ],
   "owner": "workstream-claude",
   "owns_paths": [
+    "intelligence/__init__.py",
     "intelligence/research"
   ],
   "purpose": "Defines the bounded core research contracts and invariants used to turn reviewed evidence into reference analysis, opportunity dossiers, video experiments and qualified scores. Discovery, ingestion and batch execution belong to company-research-operations.",

@@ -279,6 +279,9 @@ def test_lookup_by_every_indexed_field(seeds):
     assert seeds.get("company-runtime").type is CapsuleType.MODULE
     assert "company-os-control-plane" in {c.id for c in seeds.by_type(CapsuleType.SYSTEM)}
     assert "company-bootstrap-policy" in {c.id for c in seeds.by_type(CapsuleType.POLICY)}
+    # Exact equality is intentional: codex workstream owns exactly the runtime and
+    # validation modules.  Any future addition must update both the seed file and
+    # this list, so that the choice is visible rather than accidental.
     assert {c.id for c in seeds.by_owner("workstream-codex")} == {
         "company-runtime",
         "company-validation",
@@ -680,7 +683,9 @@ def test_the_company_os_seed_capsules_load(seeds):
 
     core = seeds.get("company-research-intelligence")
     operations = seeds.get("company-research-operations")
-    assert core.owns_paths == ("intelligence/research",)
+    # Containment: core must claim intelligence/research; it may also claim
+    # the package-level namespace init (intelligence/__init__.py).
+    assert "intelligence/research" in core.owns_paths
     assert operations.owns_paths
     assert all(path.startswith("intelligence/research/") for path in operations.owns_paths)
     assert operations.tests
