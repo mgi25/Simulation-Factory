@@ -1,0 +1,31 @@
+{
+  "as_selected": {
+    "objective": "Teach reserved and credential screening to respect negation",
+    "outcome": "decision_required",
+    "reasons": [
+      "the objective names credential material: credential"
+    ],
+    "note": "the candidate title, verbatim, exactly as planning produced it"
+  },
+  "counterfactual_word_removed": {
+    "objective": "Teach reserved and screening to respect negation",
+    "outcome": "authorized",
+    "reasons": [],
+    "note": "DIAGNOSTIC ONLY, NOT USED. Removing the word 'credential' from a candidate that exists to fix credential screening would be a wording hack, which this pilot forbids. Shown so the cause is named precisely."
+  },
+  "negated_mention_still_escalates": {
+    "objective": "Refactor the retry helper. This work does not touch credentials.",
+    "outcome": "decision_required",
+    "reasons": [
+      "the objective names credential material: credential"
+    ]
+  },
+  "asserted_mention_escalates": {
+    "objective": "Rotate the production credentials.",
+    "outcome": "decision_required",
+    "reasons": [
+      "the objective names credential material: credential"
+    ]
+  },
+  "conclusion": "Exactly one candidate was planning-eligible and it cannot pass intake, because screen_credentials matches the bare word 'credential' anywhere in the objective and the candidate's subject IS credential screening. The defect blocks the authorization of its own fix. No other candidate is planning-eligible: two are completed, three are blocked or out of department, and runner-blocked-attempt-repo-dir fails capsule_owned because nothing owns tools/. So there is no second candidate for management to move to, and rewording is forbidden."
+}

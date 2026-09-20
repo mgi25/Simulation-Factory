@@ -1,0 +1,259 @@
+{
+  "decision": {
+    "acceptance_criteria": [
+      "screen_reserved() returns no DecisionRequired for an objective that negates its trigger term, and still returns one when the term is asserted.",
+      "screen_credentials() behaves identically to screen_reserved() on the same negated input.",
+      "tests/test_company_engineering_execution.py passes, including a new case per screening function covering the negated and the asserted form."
+    ],
+    "candidate_ids_considered": [
+      "auth-migration-classifier-ambiguity",
+      "deployment-policy-gap",
+      "intake-unfalsifiable-acceptance-criteria",
+      "provider-usage-event-identifier",
+      "reserved-screening-negation-blindness",
+      "runner-blocked-attempt-repo-dir",
+      "runner-zero-required-tests-policy"
+    ],
+    "candidate_ids_rejected": [
+      "auth-migration-classifier-ambiguity",
+      "deployment-policy-gap",
+      "intake-unfalsifiable-acceptance-criteria",
+      "provider-usage-event-identifier",
+      "runner-blocked-attempt-repo-dir",
+      "runner-zero-required-tests-policy"
+    ],
+    "capsule_id": "company-engineering-execution",
+    "decision": "selected",
+    "department": "engineering",
+    "escalation_reason": "",
+    "escalation_required": false,
+    "estimated_cost": null,
+    "evidence_refs_used": [
+      "docs/company_os_canonical_integration_record.md",
+      "docs/company_os_intake_classifier_hardening.md"
+    ],
+    "executive_employee": "chief_architect",
+    "executive_seat": "cto",
+    "expected_value": "Fewer false CEO escalations on routine work, and one screening rule rather than two that disagree.",
+    "manager_employee": "engineering_delivery_manager",
+    "manager_seat": "engineering_manager",
+    "objective_alignment": "advances obj-final-e2e-pilot-2026-09-20 (Improve the reliability, maintainability, or operating efficiency of the Company OS by completing ONE useful engineering improvement selected by the company itself.) by closing a known_defect recorded in docs/company_os_canonical_integration_record.md",
+    "objective_id": "obj-final-e2e-pilot-2026-09-20",
+    "objective_intent_digest": "91ba2db67af477da",
+    "planning_decision_id": "plan-obj-final-e2e-pilot-2026-09-20",
+    "policy_fingerprint": "895f19c8dd8885f0",
+    "policy_version": "delegation_policy_v1",
+    "recorded_on": "2026-09-20",
+    "risk": "medium",
+    "selected_candidate_id": "reserved-screening-negation-blindness",
+    "selection_reason": "reserved-screening-negation-blindness is the only candidate that passes every constraint; 6 other candidate(s) were not chosen",
+    "version": 1
+  },
+  "eligibility": [
+    {
+      "candidate_id": "auth-migration-classifier-ambiguity",
+      "eligible": false,
+      "failed": [
+        "status_open"
+      ],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "status_open: status is completed"
+      ]
+    },
+    {
+      "candidate_id": "deployment-policy-gap",
+      "eligible": false,
+      "failed": [
+        "status_open",
+        "risk_within_ceiling"
+      ],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "status_open: status is blocked (a CEO policy decision: Company OS has no deployment policy to delegate against, and inventing one in code would be the delegation model widening itself)",
+        "risk_within_ceiling: high risk exceeds the envelope ceiling of medium"
+      ]
+    },
+    {
+      "candidate_id": "intake-unfalsifiable-acceptance-criteria",
+      "eligible": false,
+      "failed": [
+        "status_open"
+      ],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "status_open: status is completed"
+      ]
+    },
+    {
+      "candidate_id": "provider-usage-event-identifier",
+      "eligible": false,
+      "failed": [
+        "department_permitted",
+        "status_open"
+      ],
+      "passed": [
+        "capsule_owned",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "department_permitted: ai_platform is not among the envelope's departments (engineering)",
+        "status_open: status is blocked (a design decision nobody has taken: no existing field is a stable per-event id, so this needs a schema change, and schema or storage migration is outside routine engineering)"
+      ]
+    },
+    {
+      "candidate_id": "reserved-screening-negation-blindness",
+      "eligible": true,
+      "failed": [],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "status_open",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": []
+    },
+    {
+      "candidate_id": "runner-blocked-attempt-repo-dir",
+      "eligible": false,
+      "failed": [
+        "capsule_owned"
+      ],
+      "passed": [
+        "department_permitted",
+        "status_open",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "capsule_owned: no confirmed capsule owns tools-engineering-runner; work whose owner the company cannot name has no declared scope, tests or invariants to be reviewed against"
+      ]
+    },
+    {
+      "candidate_id": "runner-zero-required-tests-policy",
+      "eligible": false,
+      "failed": [
+        "capsule_owned",
+        "status_open"
+      ],
+      "passed": [
+        "department_permitted",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "capsule_owned: no confirmed capsule owns tools-engineering-runner; work whose owner the company cannot name has no declared scope, tests or invariants to be reviewed against",
+        "status_open: status is blocked (a policy decision about what evidence a receipt must carry when the work order declares no tests)"
+      ]
+    }
+  ],
+  "proposal": {
+    "acceptance_criteria": [
+      "screen_reserved() returns no DecisionRequired for an objective that negates its trigger term, and still returns one when the term is asserted.",
+      "screen_credentials() behaves identically to screen_reserved() on the same negated input.",
+      "tests/test_company_engineering_execution.py passes, including a new case per screening function covering the negated and the asserted form."
+    ],
+    "authorized_branch": "",
+    "base_commit": "",
+    "budget": {
+      "amount": "6",
+      "currency": "USD"
+    },
+    "candidate_id": "reserved-screening-negation-blindness",
+    "capsule_id": "company-engineering-execution",
+    "department": "engineering",
+    "evidence_refs": [
+      "docs/company_os_canonical_integration_record.md",
+      "docs/company_os_intake_classifier_hardening.md"
+    ],
+    "objective": "Teach reserved and credential screening to respect negation",
+    "objective_id": "obj-final-e2e-pilot-2026-09-20",
+    "planning_decision_id": "plan-obj-final-e2e-pilot-2026-09-20",
+    "proposal_id": "wo-reserved-screening-negation-blindness",
+    "proposed_by_seat": "engineering_manager",
+    "proposed_on": "2026-09-20",
+    "resource_profile": "consumer",
+    "risk": "medium",
+    "scope_ceiling": [
+      "company/engineering/intake.py",
+      "tests/test_company_engineering_execution.py"
+    ]
+  },
+  "work_order_request": {
+    "acceptance_criteria": [
+      "screen_reserved() returns no DecisionRequired for an objective that negates its trigger term, and still returns one when the term is asserted.",
+      "screen_credentials() behaves identically to screen_reserved() on the same negated input.",
+      "tests/test_company_engineering_execution.py passes, including a new case per screening function covering the negated and the asserted form."
+    ],
+    "authorized_branch": "",
+    "base_commit": "",
+    "candidate_id": "reserved-screening-negation-blindness",
+    "capsule_hints": [
+      "company-engineering-execution"
+    ],
+    "notes": "derived from candidate reserved-screening-negation-blindness by planning decision plan-obj-final-e2e-pilot-2026-09-20",
+    "objective": "Teach reserved and credential screening to respect negation",
+    "planning_decision_id": "plan-obj-final-e2e-pilot-2026-09-20",
+    "request_id": "wo-reserved-screening-negation-blindness",
+    "requested_by": "engineering_delivery_manager",
+    "requested_on": "2026-09-20",
+    "resource_profile": "consumer",
+    "reversible": true,
+    "risk": "medium",
+    "scope_ceiling": [
+      "company/engineering/intake.py",
+      "tests/test_company_engineering_execution.py"
+    ]
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "decisions": [
+    {
+      "options": [],
+      "question": "Credential access is an escalation, not a work-order scope. Authorize it explicitly and separately, or restate the objective without it.",
+      "reason": "the objective names credential material: credential",
+      "reserved_action": ""
+    }
+  ],
+  "derivation": {
+    "authorized_paths": [
+      "company/engineering/intake.py",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "ceiling_applied": [
+      "company/engineering/intake.py",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "context_refs_considered": 2,
+    "context_refs_dropped": [],
+    "context_refs_kept": 2,
+    "criteria_derived": false,
+    "escalation": "none",
+    "forbidden_paths": [
+      "company/constitution.md",
+      "company/integration",
+      "company/permissions.yaml",
+      "company/runtime",
+      "sloped",
+      "tools"
+    ],
+    "matched_tokens": [
+      "credential",
+      "negation",
+      "reserved",
+      "respect",
+      "screening",
+      "teach"
+    ],
+    "novel": false,
+    "owns_paths": [
+      "company/engineering",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "reasoning_class_ceiling": "D",
+    "required_tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "resource_profile": "consumer",
+    "selected_capsule_ids": [
+      "company-engineering-execution"
+    ],
+    "selection_reasons": [
+      "company-engineering-execution: requested by id"
+    ],
+    "specialist_domain": "",
+    "specialist_reason": "the objective names no security, governance, architecture or concurrency work and the risk is not high, so this is routine implementation",
+    "unscreened_reserved_actions": []
+  },
+  "outcome": "decision_required",
+  "request": {
+    "fingerprint": "f763fbb191800185",
+    "record_ref": "engineering/requests/wo-reserved-screening-negation-blindness-05b7b7e95459/000003.json",
+    "sequence": 3
+  }
+}

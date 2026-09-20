@@ -1,0 +1,26 @@
+{
+  "acceptance_criteria": [
+    "screen_reserved() returns no DecisionRequired for an objective that negates its trigger term, and still returns one when the term is asserted.",
+    "screen_credentials() behaves identically to screen_reserved() on the same negated input.",
+    "tests/test_company_engineering_execution.py passes, including a new case per screening function covering the negated and the asserted form."
+  ],
+  "authorized_branch": "eng-reserved-screening-negation",
+  "base_commit": "f566cfc9c9e644bca8dee9e63d83385bf798d9e3",
+  "candidate_id": "reserved-screening-negation-blindness",
+  "capsule_hints": [
+    "company-engineering-execution"
+  ],
+  "notes": "derived from candidate reserved-screening-negation-blindness by planning decision plan-obj-final-e2e-pilot-2026-09-20",
+  "objective": "Teach reserved and credential screening to respect negation",
+  "planning_decision_id": "plan-obj-final-e2e-pilot-2026-09-20",
+  "request_id": "wo-reserved-screening-negation-blindness",
+  "requested_by": "engineering_delivery_manager",
+  "requested_on": "2026-09-20",
+  "resource_profile": "consumer",
+  "reversible": true,
+  "risk": "medium",
+  "scope_ceiling": [
+    "company/engineering/intake.py",
+    "tests/test_company_engineering_execution.py"
+  ]
+}
