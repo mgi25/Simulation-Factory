@@ -245,7 +245,101 @@ asserts redaction works.
 The primary working tree remains checked out on `v21-visual-contrast`, where
 this consolidation found it. `main` is not checked out anywhere.
 
-## 11. Next roadmap phase
+## 11. Final closure: the four approved engineering items
+
+**Superseded sections.** Sections 1, 8, 9 and 10 describe the state at
+`97b6894`/`1224085`. This section records what happened after, and where the
+two disagree, this section is current.
+
+On 2026-09-21 the CEO approved the four `ready_for_approval` items held back in
+section 8, and they were integrated onto `1224085` by curated cherry-pick.
+
+| | |
+|---|---|
+| final main | `539daa71d9888278b219bf896cf9f94a249a3640` |
+| final milestone tag | `project-factory-pre-media-loop-final-v1` |
+| earlier tag, unmoved | `project-factory-pre-media-loop-v1` → `97b6894` |
+| full suite | 18 failed, 5725 passed, 440 skipped |
+| integration gate | READY, 34/34 required, 0 blockers |
+
+Each was verified independently before integration: branch tip still equal to
+the approved SHA, reviewer PASS, gate READY with 0 blockers, exactly one commit
+beyond its merge-base with main, still absent from main, and no governance
+surface touched — no delta reaches `permissions.yaml`, `delegation_policy.yaml`,
+`org_registry.yaml`, `operating_mode.py`, `pilot*.py` or `company/delegation/`
+at all, and none adds network, subprocess or mutation capability.
+
+| item | commit | added |
+|---|---|---|
+| `eng-attempt-ledger` | `d681c5a` | `company/engineering/attempt_ledger.py`, 286 ins |
+| `eng-scope-usage` | `be5255d` | `ScopeUsage` + a SCOPE USAGE result section, 135 ins / 2 del |
+| `eng-stage-timing` | `ae703ff` | `StageTiming` / `stage_timings()`, 137 ins / 1 del |
+| `eng-governance-drift-check` | `d59a5d9` | `company/engineering/verify.py` + a read-only `verify` CLI, 422 ins / 5 del |
+
+The cumulative delta is **980 insertions and 8 deletions over exactly 7 files** —
+the precise arithmetic sum of the four reviewed deltas, across their exact
+union. Nothing unrelated was carried in. 24 tests were added and all pass.
+
+**Three integration differences, all disclosed.** Two were append-vs-append
+collisions in `tests/test_company_engineering_execution.py` and
+`company/engineering/__init__.py`, where main and an incoming delta add a new
+section or import block at the same anchor; both sides were kept in each case
+and nothing was edited. The third is substantive: the attempt-ledger's
+multi-attempt test asks for `max_developer_attempts=2`, which was unconstrained
+at its base. Main has since introduced resource profiles and refuses a request
+naming more attempts than its profile allows — the default, `consumer`, allows
+one. Main had already migrated its own multi-attempt tests by naming
+`resource_profile="expanded"`; this test now does the same. The attempt count
+under test is unchanged.
+
+**A defect in the earlier cleanup, found and corrected.** Section 9 recorded 73
+remote branches deleted as "fully contained in `main`". Three of them are also
+used by the test suite as diff bases:
+
+| ref | used by | tests |
+|---|---|---|
+| `origin/v29-switchyard-contained-integration` | `test_race2_v30_stage.py` | 2 |
+| `origin/v30-contained-stage-v2` | `test_race2_v301_stage.py` | 3 |
+| `origin/v31-race-readability-camera-track` | `test_race2_v311_track.py` | 11 |
+
+Deleting them turned 16 tests into silent skips — 4 that were already failing,
+and **12 that were genuinely passing**. Ancestry alone was the wrong test for
+whether a branch is disposable; a ref can be dead as code and live as a
+fixture. All three were restored on `origin` (each verified an ancestor of
+`main`, so nothing new entered history), and the suite returned to its
+documented fingerprint. Future branch cleanup must grep the test suite for
+`origin/<name>` before deleting a ref.
+
+## 12. Worktrees and storage, final
+
+Twelve worktrees became three.
+
+- **Ten `.benchmark-c2/runs/T*` removed.** Each held nothing but a byte-identical
+  134-byte `.claude/settings.local.json` granting Bash permission to the local
+  Python interpreter — disposable session metadata, identical across all ten,
+  and no unique commits (their `f2116a5` is reachable from six `origin`
+  branches). The stubs were deleted and each worktree removed normally; `--force`
+  was never used. The real benchmark evidence in sibling `ground_truth/`,
+  `infra_check/`, `mcp/` and `tsvenv/` was not touched. ~5.3 GB recovered.
+- **`wt-v27-contained` preserved, deliberately.** Its 262 MB of un-gitted
+  `exports/` is 37 files. Seven of them — `contact.png`, `finish.png`,
+  `middle.png`, `opening.png`, `hook_card.png`, `envelope.txt`, `measures.txt` —
+  are **byte-identical** to files already committed under
+  `docs/validation/sloped_race_v1/v27_contained/` on
+  `origin/v27-contained-environment-lab`. The genuinely unique content is the
+  **20 mp4 comparison clips, 250 MB** (A/B/C variants plus a V26 control), which
+  exist nowhere else. They are reproducible in principle — `sloped/v27_contained.py`
+  and `tools/sloped_v27_contained.py` are committed and the seed is locked — but
+  only with Godot, which is not on `PATH`, and a full re-render. V27 is a
+  superseded direction (V30 is in `main`), so they are not regenerated and not
+  deleted.
+- **`wt-main` created** at `C:/Users/mgial/OneDrive/Documents/projects/wt-main`,
+  clean, tracking `origin/main`, at the final SHA. This is the workspace for the
+  next phase.
+- The primary tree stays on `v21-visual-contrast`, untouched, in case another
+  session holds it.
+
+## 13. Next roadmap phase
 
 **AUTONOMOUS MEDIA / GROWTH DEPARTMENT LOOP.**
 
