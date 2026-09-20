@@ -1,11 +1,38 @@
 {
-  "final_state": "planning",
-  "finished_at": "2026-09-20T12:38:44.823980+00:00",
-  "lease_note": "took a new lease",
-  "outcome": "failed",
-  "reason": "IntegrityFailure: base commit  is not in C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-e2e-pilot. The work order names a commit this repository does not have, so this is not the repository the work was authorized against.",
-  "run_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-e2e-pilot-runner\\runs\\wo-req-auth-migration-classifier-ambiguity-32665fd65a40\\run-000001",
-  "stages": [],
-  "started_at": "2026-09-20T12:38:43.873295+00:00",
+  "final_state": "decision_required",
+  "finished_at": "2026-09-20T12:48:11.642685+00:00",
+  "lease_note": "took a released lease",
+  "outcome": "blocked",
+  "reason": "the job is decision_required and waits for the CEO",
+  "run_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-e2e-pilot-runner\\runs\\wo-req-auth-migration-classifier-ambiguity-32665fd65a40\\run-000003",
+  "stages": [
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-e2e-pilot-runner\\runs\\wo-req-auth-migration-classifier-ambiguity-32665fd65a40\\run-000003\\developer-01\\receipt.json"
+      ],
+      "detail": "attempt 1 by software_implementation_engineer, commit b95de473a945, 2 path(s); receipt failures: repository evidence: remote-tracking ref refs/remotes/origin/eng-auth-migration-classifier is not present in this clone; the remote claim cannot be checked here",
+      "ok": false,
+      "session_ids": [
+        "9d8ff23f-1a49-4565-92cc-a1ae4b083364"
+      ],
+      "stage": "developer",
+      "state_after": "testing",
+      "state_before": "planning"
+    },
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-e2e-pilot-runner\\runs\\wo-req-auth-migration-classifier-ambiguity-32665fd65a40\\run-000003\\reviewer-01\\attestation.json"
+      ],
+      "detail": "chief_architect returned pass; Company OS adjudicated changes_required (attested pass, deterministic changes_required)",
+      "ok": false,
+      "session_ids": [
+        "dacc1609-3c18-43db-937c-66ad69016d76"
+      ],
+      "stage": "reviewer",
+      "state_after": "decision_required",
+      "state_before": "testing"
+    }
+  ],
+  "started_at": "2026-09-20T12:40:45.527741+00:00",
   "work_order_id": "wo-req-auth-migration-classifier-ambiguity"
 }

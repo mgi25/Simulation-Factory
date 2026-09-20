@@ -1,0 +1,50 @@
+{
+  "final_state": "ready_for_approval",
+  "finished_at": "2026-09-20T13:00:21.521070+00:00",
+  "lease_note": "took a new lease",
+  "outcome": "completed",
+  "reason": "",
+  "run_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-e2e-pilot-runner3\\runs\\wo-req-auth-migration-correction-01-b27d0fdd794d\\run-000001",
+  "stages": [
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-e2e-pilot-runner3\\runs\\wo-req-auth-migration-correction-01-b27d0fdd794d\\run-000001\\developer-01\\receipt.json"
+      ],
+      "detail": "attempt 1 by software_implementation_engineer, commit 477f9435e876, 2 path(s)",
+      "ok": true,
+      "session_ids": [
+        "4c66becd-0f67-4d80-945b-af18add246d4"
+      ],
+      "stage": "developer",
+      "state_after": "testing",
+      "state_before": "planning"
+    },
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-e2e-pilot-runner3\\runs\\wo-req-auth-migration-correction-01-b27d0fdd794d\\run-000001\\reviewer-01\\attestation.json"
+      ],
+      "detail": "chief_architect returned pass; Company OS adjudicated pass (attested pass, deterministic pass)",
+      "ok": true,
+      "session_ids": [
+        "fb808851-a7ad-4faf-a47d-59ab21aed8bc"
+      ],
+      "stage": "reviewer",
+      "state_after": "gate",
+      "state_before": "testing"
+    },
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-e2e-pilot-runner3\\runs\\wo-req-auth-migration-correction-01-b27d0fdd794d\\run-000001\\gate-01\\gate-report.json",
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-e2e-pilot-runner3\\runs\\wo-req-auth-migration-correction-01-b27d0fdd794d\\run-000001\\gate-01\\suites.json"
+      ],
+      "detail": "11/11 required suites green; gate says ready at 477f9435e876",
+      "ok": true,
+      "session_ids": [],
+      "stage": "gate",
+      "state_after": "ready_for_approval",
+      "state_before": "gate"
+    }
+  ],
+  "started_at": "2026-09-20T12:52:44.722406+00:00",
+  "work_order_id": "wo-req-auth-migration-correction-01"
+}

@@ -1,0 +1,56 @@
+{
+  "changed_paths_reviewed": [
+    "company/engineering/intake.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "criteria": [
+    {
+      "criterion": "_QUOTED_IDENT no longer strips a backtick span that contains whitespace, so an objective reading Run `schema migration` on the store still escalates to the architecture specialist.",
+      "evidence_ref": "intake.py:187 \u2014 r\"`\\w+`\" uses \\w+ (no whitespace); `schema migration` contains a space so the span is not matched. Line 137 confirms `schema migration` is an architecture trigger.",
+      "satisfied": true
+    },
+    {
+      "criterion": "A backtick-quoted single identifier such as `test_authentication_flow` is still stripped and still does not escalate.",
+      "evidence_ref": "intake.py:937 \u2014 _QUOTED_IDENT.sub strips `test_authentication_flow` (all \\w chars); authentication trigger at line 100 is therefore absent after stripping.",
+      "satisfied": true
+    },
+    {
+      "criterion": "tests/test_company_engineering_execution.py pins the symmetric authentication direction: a bare authentication mention still escalates, and a quoted one does not.",
+      "evidence_ref": "tests/test_company_engineering_execution.py:2873-2889 \u2014 test_bare_authentication_mention_escalates_to_security and test_quoted_authentication_identifier_does_not_escalate",
+      "satisfied": true
+    },
+    {
+      "criterion": "tests/test_company_engineering_execution.py passes.",
+      "evidence_ref": "runner receipt: tests/test_company_engineering_execution.py \u2014 182 passed in 12.53s",
+      "satisfied": true
+    }
+  ],
+  "evidence": [
+    "diff.patch (full diff read)",
+    "company/engineering/intake.py:184-187 (_QUOTED_IDENT definition)",
+    "company/engineering/intake.py:937 (sub applied before .lower())",
+    "company/engineering/intake.py:98-100 (security trigger: authentication)",
+    "company/engineering/intake.py:127-141 (architecture triggers: schema migration etc.)",
+    "tests/test_company_engineering_execution.py:2873-2889 (two new tests)",
+    "runner receipt: files_changed, tests, working_tree_clean"
+  ],
+  "findings": [
+    {
+      "deterministic": false,
+      "evidence_ref": "intake.py:187 \u2014 r\"`\\w+`\"; pattern anchors on first backtick then \\w+, not on paired-delimiter convention",
+      "finding_id": "advisory-double-backtick-edge",
+      "severity": "advisory",
+      "summary": "A double-backtick span like ``word`` partially matches the regex: the inner `word` is stripped, leaving a stray leading backtick; no CEO request currently uses this Markdown convention and it is outside the work order scope."
+    }
+  ],
+  "notes": "Both changed files are within the authorized boundary. No prohibited paths were touched. The implementation is minimal: one new module-level constant and one pre-processing line in derive_routing. The sub precedes .lower(), which is safe because \\w+ is case-aware and backticks are not case-sensitive. The hyphenated-identifier gap noted as an unresolved risk by the implementer is accurate and is outside the stated scope.",
+  "packet_fingerprint": "e8d832d019944417",
+  "receipt_fingerprint": "5b59cc0941740222",
+  "review_id": "rev-wo-req-auth-migration-correction-01-01",
+  "reviewed_on": "2026-09-20",
+  "reviewer": "chief_architect",
+  "verdict": "pass",
+  "version": 1,
+  "work_order_fingerprint": "2095f4034cdc7955",
+  "work_order_id": "wo-req-auth-migration-correction-01"
+}

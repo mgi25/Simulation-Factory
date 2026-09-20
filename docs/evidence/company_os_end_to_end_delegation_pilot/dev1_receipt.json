@@ -1,0 +1,80 @@
+{
+  "artifacts": [],
+  "authority_fingerprint": "de91f15fafcca653",
+  "base_commit": "19a606a6bf8c677ef0d543e2bae6e1b974b424bd",
+  "branch": "eng-auth-migration-classifier",
+  "commit_sha": "b95de473a945f00a6136cb2f03cb20641fc45d69",
+  "completed_at": "2026-09-20T12:46:05.268785+00:00",
+  "context_refs_used": [
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "context_usage_reported": true,
+  "dependencies_added": [],
+  "evidence": [
+    "company/engineering/intake.py (lines 182-188: _QUOTED_IDENT constant; line 938: _clauses(_QUOTED_IDENT.sub(...)))",
+    "tests/test_company_engineering_execution.py::test_harmless_schema_protocol_format_mentions_stay_routine (two new parametrize entries covering quoted-identifier migration and authentication)",
+    "tests/test_company_engineering_execution.py::test_breaking_migration_schema_protocol_changes_route_to_architecture (new entry 'Run a schema migration on the record store.' covers the literal two-word phrase)",
+    "commit:b95de473a945f00a6136cb2f03cb20641fc45d69",
+    "company/engineering/intake.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "executor": "claude_code",
+  "files_changed": [
+    "company/engineering/intake.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "invariants_preserved": [
+    "All 183 existing tests continue to pass.",
+    "SPECIALIST_TRIGGERS table is unchanged; no triggers were removed or weakened.",
+    "Trigger terms that appear outside any quoted identifier still escalate exactly as before.",
+    "The notes field remains excluded from routing (only request.objective is lowered into text).",
+    "Protected governance paths (ai_platform/policy.py, company/integration/*, company/constitution.md, etc.) were not read or modified."
+  ],
+  "merge_performed": false,
+  "next_owner": "",
+  "no_subagents": true,
+  "notes": "The novel-trigger check also benefits from the same stripping since it reuses the same `clauses` variable, which is correct: a novel trigger inside a quoted identifier should likewise not classify the request as novel.",
+  "outcome": "rejected",
+  "packet_attempt": 1,
+  "packet_fingerprint": "fa05226d2bfbbf61",
+  "rejection_reason": "the branch was not verified on the remote, so the completion protocol is incomplete",
+  "remote_branch_sha": "",
+  "remote_verified": false,
+  "subagents_used": 0,
+  "summary": "Added a _QUOTED_IDENT regex that strips backtick-quoted identifiers from the objective before clause analysis in derive_routing, so trigger terms that appear only inside a quoted test name (e.g. `test_schema_migration_classifier`) do not cause specialist-domain escalation. Extended both parametrize lists in test_company_engineering_execution.py: two new 'routine' cases cover migration and authentication words in backtick-quoted identifiers, and one new 'breaking' case pins that a bare 'schema migration' in objective text still routes to architecture.",
+  "task_id": "wo-req-auth-migration-classifier-ambiguity",
+  "tests": [
+    {
+      "command": "tests/test_company_engineering_execution.py",
+      "passed": true,
+      "summary": "183 passed in 31.05s"
+    }
+  ],
+  "unresolved_risks": [
+    "Only backtick-quoted identifiers are stripped; single- or double-quoted identifiers are not. If CEO objectives routinely use 'test_authentication_flow' (with ASCII quotes) those would still trigger falsely, but the acceptance criteria specify the quoted-test-identifier case which conventionally uses backticks.",
+    "The _QUOTED_IDENT regex matches any backtick-fenced span, not only identifiers. A backtick-quoted phrase that is genuine requested work (unlikely given CEO request conventions) would be silently dropped from routing."
+  ],
+  "usage": {
+    "cache_creation_units": 53486,
+    "cache_hits": 422471,
+    "cost_ceiling_enforced": true,
+    "duration_s": 269.937,
+    "input_units": 16,
+    "model": "sonnet",
+    "model_turns": 12,
+    "output_units": 12595,
+    "passes": 1,
+    "provider": "anthropic",
+    "provider_cost": "0.860478",
+    "provider_cost_currency": "USD",
+    "repeated_file_reads": 1,
+    "repo_file_reads": 3,
+    "repo_searches": 0,
+    "retries": 0,
+    "unreliable_metrics": [],
+    "usage_source": "model_usage_totals",
+    "usage_unit": "token"
+  },
+  "version": 1,
+  "working_tree_clean": true
+}

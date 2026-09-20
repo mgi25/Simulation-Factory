@@ -1,0 +1,63 @@
+{
+  "sessions": [
+    {
+      "stage": "executive-planning",
+      "role": "executive",
+      "model": "claude-haiku-4-5-20251001",
+      "cost_usd": 0.0242665,
+      "turns": 1,
+      "duration_s": 18.018,
+      "input_tokens": 9,
+      "output_tokens": 1662,
+      "cache_creation": 12758,
+      "cache_read": 0
+    },
+    {
+      "stage": "developer-attempt-1",
+      "role": "developer",
+      "model": "sonnet",
+      "cost_usd": 0.860478,
+      "turns": 12,
+      "duration_s": 269.937,
+      "cost_ceiling_enforced": true,
+      "usage_source": "model_usage_totals"
+    },
+    {
+      "stage": "reviewer-round-1",
+      "role": "reviewer",
+      "model": "sonnet",
+      "cost_usd": 0.38534124999999997,
+      "turns": 12,
+      "duration_s": 120.7,
+      "cost_ceiling_enforced": true,
+      "usage_source": "model_usage_totals"
+    },
+    {
+      "stage": "developer-correction",
+      "role": "developer",
+      "model": "sonnet",
+      "cost_usd": 0.7981345,
+      "turns": 22,
+      "duration_s": 188.445,
+      "cost_ceiling_enforced": true,
+      "usage_source": "model_usage_totals"
+    },
+    {
+      "stage": "reviewer-round-2",
+      "role": "reviewer",
+      "model": "sonnet",
+      "cost_usd": 0.3077055,
+      "turns": 9,
+      "duration_s": 95.726,
+      "cost_ceiling_enforced": true,
+      "usage_source": "model_usage_totals"
+    }
+  ],
+  "total_cost_usd": 2.375926,
+  "budget_usd": 6.0,
+  "remaining_usd": 3.624074,
+  "developer_sessions": 2,
+  "reviewer_sessions": 2,
+  "executive_sessions": 1,
+  "subagents_used": 0
+}

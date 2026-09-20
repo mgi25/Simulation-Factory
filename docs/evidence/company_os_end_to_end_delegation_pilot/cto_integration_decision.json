@@ -1,0 +1,14 @@
+{
+  "decision": "escalate",
+  "actor": "ceo",
+  "authorizes_action": false,
+  "reason": "the chain stopped at coo: coo may not approve approve_integration_merge; its grant covers 8 other action type(s)",
+  "ceo_required": true,
+  "integration_branch": "company-os-v1-delegated-engineering-pilot-integration",
+  "protected_refs": [
+    "company-os-v1-bootstrap",
+    "main",
+    "master"
+  ],
+  "activation_id": "act-end-to-end-pilot-2026-09-20"
+}

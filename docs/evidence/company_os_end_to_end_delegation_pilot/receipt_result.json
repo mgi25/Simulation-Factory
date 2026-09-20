@@ -1,0 +1,52 @@
+{
+  "accepted": false,
+  "evidence_rejected": false,
+  "failures": [],
+  "handoff": {
+    "artifacts": [
+      "execution/receipts/wo-req-auth-migration-classifier-ambiguity-32665fd65a40/000001.json"
+    ],
+    "changed": [
+      "company/engineering/intake.py",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "escalation_reason": "",
+    "escalation_required": false,
+    "evidence": [
+      "company/engineering/intake.py (lines 182-188: _QUOTED_IDENT constant; line 938: _clauses(_QUOTED_IDENT.sub(...)))",
+      "tests/test_company_engineering_execution.py::test_harmless_schema_protocol_format_mentions_stay_routine (two new parametrize entries covering quoted-identifier migration and authentication)",
+      "tests/test_company_engineering_execution.py::test_breaking_migration_schema_protocol_changes_route_to_architecture (new entry 'Run a schema migration on the record store.' covers the literal two-word phrase)",
+      "commit:b95de473a945f00a6136cb2f03cb20641fc45d69",
+      "company/engineering/intake.py",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "next_owner": "",
+    "objective": "Disambiguate bare authentication and migration trigger words",
+    "owner": "software_implementation_engineer",
+    "resource_usage": {
+      "fingerprint": "2704e8f3af875079",
+      "record_ref": "resource_usage/wo-req-auth-migration-classifier-ambiguity-32665fd65a40/000001.json"
+    },
+    "result": "Added a _QUOTED_IDENT regex that strips backtick-quoted identifiers from the objective before clause analysis in derive_routing, so trigger terms that appear only inside a quoted test name (e.g. `test_schema_migration_classifier`) do not cause specialist-domain escalation. Extended both parametrize lists in test_company_engineering_execution.py: two new 'routine' cases cover migration and authentication words in backtick-quoted identifiers, and one new 'breaking' case pins that a bare 'schema migration' in objective text still routes to architecture.",
+    "risks": [
+      "Only backtick-quoted identifiers are stripped; single- or double-quoted identifiers are not. If CEO objectives routinely use 'test_authentication_flow' (with ASCII quotes) those would still trigger falsely, but the acceptance criteria specify the quoted-test-identifier case which conventionally uses backticks.",
+      "The _QUOTED_IDENT regex matches any backtick-fenced span, not only identifiers. A backtick-quoted phrase that is genuine requested work (unlikely given CEO request conventions) would be silently dropped from routing."
+    ],
+    "status": "blocked",
+    "task_id": "wo-req-auth-migration-classifier-ambiguity",
+    "tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "unchanged": []
+  },
+  "packet_attempt": 1,
+  "receipt_fingerprint": "824e496edc649302",
+  "receipt_ref": "execution/receipts/wo-req-auth-migration-classifier-ambiguity-32665fd65a40/000001.json",
+  "state": "testing",
+  "usage_record": {
+    "fingerprint": "2704e8f3af875079",
+    "record_ref": "resource_usage/wo-req-auth-migration-classifier-ambiguity-32665fd65a40/000001.json"
+  },
+  "warnings": [],
+  "work_order_id": "wo-req-auth-migration-classifier-ambiguity"
+}

@@ -1,0 +1,61 @@
+{
+  "changed_paths_reviewed": [
+    "company/engineering/intake.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "criteria": [
+    {
+      "criterion": "An objective that names a migration only inside a quoted test identifier derives no specialist domain.",
+      "evidence_ref": "tests/test_company_engineering_execution.py:2696 \u2014 'Fix the failing `test_schema_migration_classifier` test.' in test_harmless_schema_protocol_format_mentions_stay_routine",
+      "satisfied": true
+    },
+    {
+      "criterion": "An objective that asks for a schema migration still derives the specialist domain it derives today.",
+      "evidence_ref": "tests/test_company_engineering_execution.py:2743 \u2014 'Run a schema migration on the record store.' in test_breaking_migration_schema_protocol_changes_route_to_architecture",
+      "satisfied": true
+    },
+    {
+      "criterion": "tests/test_company_engineering_execution.py passes with a case for each direction.",
+      "evidence_ref": "receipt: 183 passed; two new routine cases (lines 2696-2697), one new breaking case (line 2743)",
+      "satisfied": true
+    }
+  ],
+  "evidence": [
+    "runs/wo-req-auth-migration-classifier-ambiguity-32665fd65a40/run-000003/reviewer-01/diff.patch",
+    "company/engineering/intake.py:182-191 (_QUOTED_IDENT, _clauses)",
+    "company/engineering/intake.py:194-211 (_escalates)",
+    "company/engineering/intake.py:935-951 (derive_routing, _QUOTED_IDENT.sub call)",
+    "company/engineering/intake.py:98-156 (SPECIALIST_TRIGGERS)",
+    "company/engineering/intake.py:160-167 (NOVEL_TRIGGERS)",
+    "tests/test_company_engineering_execution.py:2685-2709 (test_harmless_schema_protocol_format_mentions_stay_routine)",
+    "tests/test_company_engineering_execution.py:2732-2749 (test_breaking_migration_schema_protocol_changes_route_to_architecture)",
+    "tests/test_company_engineering_execution.py:2752-2769 (test_other_specialist_domains_are_unaffected)",
+    "tests/test_company_engineering_execution.py:2563-2579 (test_positive_specialist_terms_still_escalate_after_the_negation_fix)"
+  ],
+  "findings": [
+    {
+      "deterministic": false,
+      "evidence_ref": "company/engineering/intake.py:187 \u2014 _QUOTED_IDENT = re.compile(r\"`[^`]+`\")",
+      "finding_id": "backtick-strips-any-span-not-only-idents",
+      "severity": "advisory",
+      "summary": "_QUOTED_IDENT matches any backtick-fenced span, so a CEO objective that intentionally uses backticks around a work phrase (e.g. 'Run `schema migration` on the store') would have that phrase silently dropped from routing and not escalate."
+    },
+    {
+      "deterministic": false,
+      "evidence_ref": "tests/test_company_engineering_execution.py:2569,2756 \u2014 existing auth escalation coverage; no new case added",
+      "finding_id": "no-new-bare-authentication-regression-pin",
+      "severity": "advisory",
+      "summary": "A new test pins that 'schema migration' in bare text still escalates, but no new test pins the symmetric direction for 'authentication'; it is covered only by pre-existing tests at lines 2569 and 2756."
+    }
+  ],
+  "notes": "The change is minimal and correct: one regex constant and one substitution call in derive_routing, applied before both SPECIALIST_TRIGGERS and NOVEL_TRIGGERS matching. The implementer's disclosed risk about non-identifier backtick spans is real but bounded to unusual CEO phrasing; it is not a correctness defect against the acceptance criteria. Both findings are advisory only. The runner receipt and the test suite (183 passed) are consistent with the diff.",
+  "packet_fingerprint": "fa05226d2bfbbf61",
+  "receipt_fingerprint": "824e496edc649302",
+  "review_id": "rev-wo-req-auth-migration-classifier-ambiguity-01",
+  "reviewed_on": "2026-09-20",
+  "reviewer": "chief_architect",
+  "verdict": "pass",
+  "version": 1,
+  "work_order_fingerprint": "78e700ae8be644a1",
+  "work_order_id": "wo-req-auth-migration-classifier-ambiguity"
+}

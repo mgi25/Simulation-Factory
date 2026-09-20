@@ -18,8 +18,8 @@
   "risk": "medium",
   "reversible": true,
   "resource_profile": "consumer",
-  "authorized_branch": "company-os-v1-end-to-end-delegation-pilot",
-  "base_commit": "92b308c6e719e99b8c5d9ec41f12ffddcabefc3b",
+  "authorized_branch": "eng-auth-migration-classifier",
+  "base_commit": "19a606a6bf8c677ef0d543e2bae6e1b974b424bd",
   "candidate_id": "auth-migration-classifier-ambiguity",
   "planning_decision_id": "run-end-to-end-pilot",
   "notes": "derived from candidate auth-migration-classifier-ambiguity by planning decision run-end-to-end-pilot"

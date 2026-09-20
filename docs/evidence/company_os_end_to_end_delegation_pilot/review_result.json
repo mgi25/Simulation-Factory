@@ -1,0 +1,61 @@
+{
+  "persisted": {
+    "attestation": {
+      "fingerprint": "9db866de591a010d",
+      "record_ref": "engineering/attestations/wo-req-auth-migration-classifier-ambiguity-32665fd65a40/000001.json",
+      "sequence": 1
+    },
+    "job": {
+      "fingerprint": "b27fbc1754b62834",
+      "record_ref": "engineering/jobs/wo-req-auth-migration-classifier-ambiguity-32665fd65a40/000005.json",
+      "sequence": 5
+    },
+    "review": {
+      "fingerprint": "4392cf7f334cef48",
+      "record_ref": "engineering/reviews/wo-req-auth-migration-classifier-ambiguity-32665fd65a40/000001.json",
+      "sequence": 1
+    }
+  },
+  "review": {
+    "attested_outcome": "pass",
+    "deterministic_outcome": "changes_required",
+    "escalations": [],
+    "findings": [
+      {
+        "deterministic": true,
+        "evidence_ref": "",
+        "finding_id": "attempt-not-accepted",
+        "severity": "changes_required",
+        "summary": "the implementation attempt ended rejected: the branch was not verified on the remote, so the completion protocol is incomplete"
+      },
+      {
+        "deterministic": false,
+        "evidence_ref": "company/engineering/intake.py:187 \u2014 _QUOTED_IDENT = re.compile(r\"`[^`]+`\")",
+        "finding_id": "backtick-strips-any-span-not-only-idents",
+        "severity": "advisory",
+        "summary": "_QUOTED_IDENT matches any backtick-fenced span, so a CEO objective that intentionally uses backticks around a work phrase (e.g. 'Run `schema migration` on the store') would have that phrase silently dropped from routing and not escalate."
+      },
+      {
+        "deterministic": false,
+        "evidence_ref": "tests/test_company_engineering_execution.py:2569,2756 \u2014 existing auth escalation coverage; no new case added",
+        "finding_id": "no-new-bare-authentication-regression-pin",
+        "severity": "advisory",
+        "summary": "A new test pins that 'schema migration' in bare text still escalates, but no new test pins the symmetric direction for 'authentication'; it is covered only by pre-existing tests at lines 2569 and 2756."
+      }
+    ],
+    "implementer": "software_implementation_engineer",
+    "outcome": "changes_required",
+    "packet_attempt": 1,
+    "packet_fingerprint": "fa05226d2bfbbf61",
+    "receipt_fingerprint": "824e496edc649302",
+    "review_id": "rev-wo-req-auth-migration-classifier-ambiguity-01",
+    "reviewed_on": "2026-09-20",
+    "reviewer": "chief_architect",
+    "unanswered_criteria": [],
+    "version": 1,
+    "work_order_fingerprint": "78e700ae8be644a1",
+    "work_order_id": "wo-req-auth-migration-classifier-ambiguity"
+  },
+  "state": "decision_required",
+  "work_order_id": "wo-req-auth-migration-classifier-ambiguity"
+}

@@ -23,11 +23,16 @@
     ],
     "matched_tokens": [
       "authentication",
-      "bare",
-      "disambiguate",
-      "migration",
-      "trigger",
-      "words"
+      "case",
+      "engineering",
+      "ident",
+      "identifiers",
+      "intake",
+      "narrow",
+      "only",
+      "quoted",
+      "strips",
+      "symmetric"
     ],
     "novel": false,
     "owns_paths": [
@@ -43,7 +48,7 @@
       "company-engineering-execution"
     ],
     "selection_reasons": [
-      "company-engineering-execution: requested by id"
+      "company-engineering-execution: requested by id; owns company/engineering for task path company/engineering"
     ],
     "specialist_domain": "security",
     "specialist_reason": "the objective names 'authentication', which is security work",
@@ -52,23 +57,23 @@
   "outcome": "authorized",
   "persisted": {
     "job": {
-      "fingerprint": "e18f8e06d317bb9d",
-      "record_ref": "engineering/jobs/wo-req-auth-migration-classifier-ambiguity-32665fd65a40/000001.json",
+      "fingerprint": "19aac7a9fe18f379",
+      "record_ref": "engineering/jobs/wo-req-auth-migration-correction-01-b27d0fdd794d/000001.json",
       "sequence": 1
     },
     "plan": {
-      "fingerprint": "325771b755e0480b",
-      "record_ref": "engineering/plans/wo-req-auth-migration-classifier-ambiguity-32665fd65a40/000001.json",
+      "fingerprint": "97530d0a1383720a",
+      "record_ref": "engineering/plans/wo-req-auth-migration-correction-01-b27d0fdd794d/000001.json",
       "sequence": 1
     },
     "request": {
-      "fingerprint": "cae94392bf93f080",
-      "record_ref": "engineering/requests/req-auth-migration-classifier-ambiguity-b721d0835b9b/000001.json",
+      "fingerprint": "493c68f761423915",
+      "record_ref": "engineering/requests/req-auth-migration-correction-01-8ecfb1e64078/000001.json",
       "sequence": 1
     },
     "work_order": {
-      "fingerprint": "78e700ae8be644a1",
-      "record_ref": "engineering/work_orders/wo-req-auth-migration-classifier-ambiguity-32665fd65a40/000001.json",
+      "fingerprint": "2095f4034cdc7955",
+      "record_ref": "engineering/work_orders/wo-req-auth-migration-correction-01-b27d0fdd794d/000001.json",
       "sequence": 1
     }
   },
@@ -137,29 +142,32 @@
       }
     ],
     "version": 1,
-    "work_order_fingerprint": "78e700ae8be644a1",
-    "work_order_id": "wo-req-auth-migration-classifier-ambiguity"
+    "work_order_fingerprint": "2095f4034cdc7955",
+    "work_order_id": "wo-req-auth-migration-correction-01"
   },
   "state": "planning",
   "work_order": {
     "acceptance_criteria": [
-      "An objective that names a migration only inside a quoted test identifier derives no specialist domain.",
-      "An objective that asks for a schema migration still derives the specialist domain it derives today.",
-      "tests/test_company_engineering_execution.py passes with a case for each direction."
+      "_QUOTED_IDENT no longer strips a backtick span that contains whitespace, so an objective reading Run `schema migration` on the store still escalates to the architecture specialist.",
+      "A backtick-quoted single identifier such as `test_authentication_flow` is still stripped and still does not escalate.",
+      "tests/test_company_engineering_execution.py pins the symmetric authentication direction: a bare authentication mention still escalates, and a quoted one does not.",
+      "tests/test_company_engineering_execution.py passes."
     ],
-    "authorized_branch": "eng-auth-migration-classifier",
+    "authorized_branch": "eng-auth-migration-correction",
     "authorized_on": "2026-09-20",
     "authorized_paths": [
       "company/engineering/intake.py",
       "tests/test_company_engineering_execution.py"
     ],
     "base_commit": "19a606a6bf8c677ef0d543e2bae6e1b974b424bd",
-    "constraints": [],
+    "constraints": [
+      "Correct only the two findings the reviewer raised. Do not widen the scope beyond the two authorized files."
+    ],
     "context_refs": [
       {
         "digest": "",
         "kind": "module_contract",
-        "reason": "requested by id",
+        "reason": "requested by id; owns company/engineering for task path company/engineering",
         "ref": "capsule:company-engineering-execution",
         "span": null
       },
@@ -187,7 +195,7 @@
     ],
     "max_developer_attempts": 1,
     "novel": false,
-    "objective": "Disambiguate bare authentication and migration trigger words",
+    "objective": "Narrow _QUOTED_IDENT in company/engineering/intake.py so it strips only quoted identifiers, and pin the symmetric authentication case.",
     "protected": {
       "entries": [
         {
@@ -234,7 +242,7 @@
     },
     "reasoning_class_ceiling": "D",
     "repository": "Simulation Factory",
-    "request_id": "req-auth-migration-classifier-ambiguity",
+    "request_id": "req-auth-migration-correction-01",
     "requested_by": "engineering_delivery_manager",
     "required_tests": [
       "tests/test_company_engineering_execution.py"
@@ -245,8 +253,8 @@
     "risk": "medium",
     "specialist_domain": "security",
     "version": 1,
-    "work_order_id": "wo-req-auth-migration-classifier-ambiguity"
+    "work_order_id": "wo-req-auth-migration-correction-01"
   },
-  "work_order_fingerprint": "78e700ae8be644a1",
-  "work_order_id": "wo-req-auth-migration-classifier-ambiguity"
+  "work_order_fingerprint": "2095f4034cdc7955",
+  "work_order_id": "wo-req-auth-migration-correction-01"
 }

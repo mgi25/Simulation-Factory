@@ -1,0 +1,78 @@
+{
+  "artifacts": [],
+  "authority_fingerprint": "1cfb5a5f7b3eb3e6",
+  "base_commit": "19a606a6bf8c677ef0d543e2bae6e1b974b424bd",
+  "branch": "eng-auth-migration-correction",
+  "commit_sha": "477f9435e876d6a1af6e69437e5ad4034a14aa85",
+  "completed_at": "2026-09-20T12:56:29.535286+00:00",
+  "context_refs_used": [
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "context_usage_reported": true,
+  "dependencies_added": [],
+  "evidence": [
+    "company/engineering/intake.py (added _QUOTED_IDENT near line 183, used in derive_routing at line ~937)",
+    "tests/test_company_engineering_execution.py (added test_bare_authentication_mention_escalates_to_security and test_quoted_authentication_identifier_does_not_escalate before test_no_engineering_stage_plans_without_a_context_policy)",
+    "pytest run: 182 passed, 0 failed",
+    "commit:477f9435e876d6a1af6e69437e5ad4034a14aa85",
+    "company/engineering/intake.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "executor": "claude_code",
+  "files_changed": [
+    "company/engineering/intake.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "invariants_preserved": [
+    "Multi-word backtick spans like `schema migration` are not stripped, so architecture trigger terms inside them still escalate.",
+    "All 180 pre-existing tests continue to pass.",
+    "derive_routing reads only request.objective (not notes) for routing, as before.",
+    "No files outside the authorized paths were changed."
+  ],
+  "merge_performed": false,
+  "next_owner": "",
+  "no_subagents": true,
+  "notes": "",
+  "outcome": "accepted",
+  "packet_attempt": 1,
+  "packet_fingerprint": "e8d832d019944417",
+  "rejection_reason": "",
+  "remote_branch_sha": "477f9435e876d6a1af6e69437e5ad4034a14aa85",
+  "remote_verified": true,
+  "subagents_used": 0,
+  "summary": "Added _QUOTED_IDENT = re.compile(r\"`\\w+`\") in intake.py to match only single-identifier backtick spans (no whitespace), and applied it in derive_routing to strip those spans before trigger matching. Added two new tests pinning the symmetric authentication direction: bare 'authentication' escalates to security, quoted `test_authentication_flow` does not.",
+  "task_id": "wo-req-auth-migration-correction-01",
+  "tests": [
+    {
+      "command": "tests/test_company_engineering_execution.py",
+      "passed": true,
+      "summary": "182 passed in 12.53s"
+    }
+  ],
+  "unresolved_risks": [
+    "_QUOTED_IDENT only strips single-token spans (\\w+ = [a-zA-Z0-9_]+); a hyphenated identifier like `my-func` is not stripped. This is consistent with the objective's stated scope and was not asked for."
+  ],
+  "usage": {
+    "cache_creation_units": 44546,
+    "cache_hits": 688024,
+    "cost_ceiling_enforced": true,
+    "duration_s": 188.445,
+    "input_units": 27,
+    "model": "sonnet",
+    "model_turns": 22,
+    "output_units": 7023,
+    "passes": 1,
+    "provider": "anthropic",
+    "provider_cost": "0.798134",
+    "provider_cost_currency": "USD",
+    "repeated_file_reads": 8,
+    "repo_file_reads": 10,
+    "repo_searches": 4,
+    "retries": 0,
+    "unreliable_metrics": [],
+    "usage_source": "model_usage_totals",
+    "usage_unit": "token"
+  },
+  "version": 1,
+  "working_tree_clean": true
+}

@@ -1,0 +1,30 @@
+{
+  "request_id": "req-auth-migration-correction-01",
+  "objective": "Narrow _QUOTED_IDENT in company/engineering/intake.py so it strips only quoted identifiers, and pin the symmetric authentication case.",
+  "requested_by": "engineering_delivery_manager",
+  "requested_on": "2026-09-20",
+  "capsule_hints": [
+    "company-engineering-execution"
+  ],
+  "scope_ceiling": [
+    "company/engineering/intake.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "acceptance_criteria": [
+    "_QUOTED_IDENT no longer strips a backtick span that contains whitespace, so an objective reading Run `schema migration` on the store still escalates to the architecture specialist.",
+    "A backtick-quoted single identifier such as `test_authentication_flow` is still stripped and still does not escalate.",
+    "tests/test_company_engineering_execution.py pins the symmetric authentication direction: a bare authentication mention still escalates, and a quoted one does not.",
+    "tests/test_company_engineering_execution.py passes."
+  ],
+  "constraints": [
+    "Correct only the two findings the reviewer raised. Do not widen the scope beyond the two authorized files."
+  ],
+  "risk": "medium",
+  "reversible": true,
+  "resource_profile": "consumer",
+  "authorized_branch": "eng-auth-migration-correction",
+  "base_commit": "19a606a6bf8c677ef0d543e2bae6e1b974b424bd",
+  "candidate_id": "auth-migration-classifier-ambiguity",
+  "planning_decision_id": "run-end-to-end-pilot",
+  "notes": "Bounded correction 1 of 1, authorized by engineering_manager after review rev-wo-req-auth-migration-classifier-ambiguity-01 returned changes_required. Derived from the reviewer's findings backtick-strips-any-span-not-only-idents and no-new-bare-authentication-regression-pin, plus the completion-protocol rejection."
+}
