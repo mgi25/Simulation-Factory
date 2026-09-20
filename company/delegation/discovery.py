@@ -47,7 +47,7 @@ is that "we found nothing defensible" stays available as an answer.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 import datetime as dt
 from dataclasses import dataclass
 from enum import Enum
@@ -684,8 +684,119 @@ def capsule_revalidation_proposals(
     return tuple(out)
 
 
+# --- a second bounded reader -----------------------------------------------
+#
+# The capsule reader answers "is anything stale?". In a well-maintained
+# repository the honest answer is usually no, and the final end-to-end pilot
+# ended with discovery reachable and nothing to read. That is a gap in coverage
+# rather than in the architecture: the company runs a deterministic gate that
+# already records, in machine-readable form, the maintenance findings it will
+# not block on. Those are advisory precisely because nobody has been asked to
+# fix them, which is the definition of known work nobody has chosen.
+#
+# This reader turns a failing ADVISORY gate check into a candidate. It reads
+# one report that the caller already produced. It does not run the gate, walk
+# the repository, or read prose, and it refuses to propose anything from a
+# REQUIRED check - a failing required check is a blocker, and routing a blocker
+# into the work register would let the company schedule around something that
+# is supposed to stop it.
+
+
+# Which advisory checks this reader knows how to turn into bounded work, and
+# where the work would be written. A check absent from this table produces no
+# candidate: a finding the reader cannot scope is a finding a person should
+# read, not one to hand a developer a write scope for.
+_ADVISORY_WORK: dict[str, dict[str, Any]] = {
+    "architecture.subsystem_ownership_bounded": {
+        "capsule_id": "company-knowledge-capsules",
+        "write_scope": ("knowledge/company_os/capsules/seeds",),
+        "title": "Declare capsule ownership for the modules no capsule claims",
+        "goal_tags": ("maintenance", "architecture", "ownership"),
+        "expected_value": (
+            "Every module resolves to an owning capsule, so a session handed a "
+            "capsule is handed all of the code that capsule is responsible for."
+        ),
+        "criteria": (
+            "Every module named in the finding is listed in the owns_paths of "
+            "exactly one capsule seed.",
+            "python -m company.integration check --repo-root . reports "
+            "architecture.subsystem_ownership_bounded as passing.",
+            "No module is claimed by two capsules.",
+        ),
+    },
+}
+
+
+def gate_advisory_proposals(
+    envelope: DiscoveryEnvelope,
+    report: Mapping[str, Any],
+    *,
+    today: dt.date,
+    report_ref: str,
+) -> tuple[tuple[WorkCandidate, EvidenceSurface], ...]:
+    """Propose one candidate per failing ADVISORY gate check this reader scopes.
+
+    `report` is the gate's own JSON, produced by the caller. Required checks are
+    skipped whatever their status, and a finding carrying no evidence produces
+    nothing, because a problem statement that cannot name a file is a direction.
+    """
+    if EvidenceSurface.VALIDATION_REPORT not in set(envelope.allowed_surfaces):
+        return ()
+    allowed = set(envelope.allowed_capsules)
+    required = set(report.get("required_check_ids") or ())
+    out: list[tuple[WorkCandidate, EvidenceSurface]] = []
+    for section in report.get("sections") or ():
+        for check in section.get("checks") or ():
+            check_id = str(check.get("check_id", ""))
+            if check.get("status") != "fail" or check_id in required:
+                continue
+            shape = _ADVISORY_WORK.get(check_id)
+            if shape is None:
+                continue
+            if shape["capsule_id"] not in allowed:
+                continue
+            evidence = tuple(str(item) for item in (check.get("evidence") or ()))
+            if not evidence:
+                continue
+            detail = str(check.get("detail", "")).strip()
+            out.append(
+                (
+                    WorkCandidate(
+                        candidate_id=f"gate-{check_id.replace('.', '-')}"[:64],
+                        title=shape["title"],
+                        description=(
+                            f"The production integration gate reports {check_id} "
+                            "as failing. It is advisory, so it blocks nothing and "
+                            "nobody has been asked to fix it."
+                        ),
+                        capsule_id=shape["capsule_id"],
+                        department=envelope.department,
+                        source_type=CandidateSource.VALIDATION_REPORT,
+                        source_ref=report_ref,
+                        problem_statement=(
+                            f"{check_id} fails in {report_ref} on "
+                            f"{today.isoformat()}: {detail}"
+                        ),
+                        expected_value=shape["expected_value"],
+                        risk=Risk.LOW,
+                        created_at=today,
+                        evidence_refs=(report_ref,) + evidence[:4],
+                        acceptance_criteria=tuple(shape["criteria"]),
+                        allowed_write_scope=tuple(shape["write_scope"]),
+                        estimated_resource_profile="consumer",
+                        goal_tags=tuple(shape["goal_tags"]),
+                    ),
+                    EvidenceSurface.VALIDATION_REPORT,
+                )
+            )
+            if len(out) >= envelope.max_candidates:
+                return tuple(out)
+    return tuple(out)
+
+
 __all__ = [
     "ACTIVE_STATUSES",
+    "gate_advisory_proposals",
     "MAX_DISCOVERY_CANDIDATES",
     "PROPOSAL_CHECKS",
     "SURFACE_SOURCES",

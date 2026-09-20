@@ -57,8 +57,15 @@ from .metrics import DecisionOutcome, ManagementReport, measure, spend_of
 from .scenarios import CONTROL_SCENARIOS, SCENARIOS, replay, summarise
 from .objectives import Objective, ObjectiveLevel, PlanningEnvelope
 from .planning import eligible_candidates, propose_work_order, select_work
-from .discovery import DiscoveryEnvelope, EvidenceSurface, capsule_revalidation_proposals, run_discovery
+from .discovery import (
+    DiscoveryEnvelope,
+    EvidenceSurface,
+    capsule_revalidation_proposals,
+    gate_advisory_proposals,
+    run_discovery,
+)
 from .executive import PlanningSessionCost
+from .viability import assess_viability
 from .planning_record import PlanningOutcome
 from .planning_run import ceo_planning_report, plan_objective
 from .store import DelegationStore
@@ -556,7 +563,31 @@ def _cmd_plan_run(args: argparse.Namespace) -> int:
             ),
             max_candidates=int(raw.get("max_candidates", 3)),
         )
+        # Two bounded readers, both deterministic, both over surfaces the
+        # envelope allows. Capsule staleness first because it is the cheaper
+        # question; the gate's own failing advisories second, because in a
+        # well-maintained repository nothing is stale and that reader returns
+        # nothing at all - which is how the previous pilot reached discovery
+        # and still found no work.
         proposals = capsule_revalidation_proposals(discovery_envelope, index, today=day)
+        if len(proposals) < discovery_envelope.max_candidates:
+            # The committed readiness report, not a fresh run. A candidate has
+            # to cite evidence that exists as a file a reviewer can open, and a
+            # report produced in memory during planning is not that. This is
+            # the same rule `validate_proposal` enforces with `evidence_exists`,
+            # and it is the reason the surface is called `validation_report`.
+            root = Path(args.repo_root if hasattr(args, "repo_root") else ".")
+            reports = sorted(root.glob("docs/validation/*/readiness/*.json"))
+            if reports:
+                chosen = reports[-1]
+                with open(chosen, encoding="utf-8") as handle:
+                    gate_report = json.load(handle)
+                proposals = proposals + gate_advisory_proposals(
+                    discovery_envelope,
+                    gate_report,
+                    today=day,
+                    report_ref=chosen.relative_to(root).as_posix(),
+                )[: discovery_envelope.max_candidates - len(proposals)]
         discovery = run_discovery(
             proposals,
             discovery_envelope,
@@ -595,6 +626,29 @@ def _cmd_plan_run(args: argparse.Namespace) -> int:
         def planner(brief, instructions):  # noqa: F811 - the recorded answer
             return answer if isinstance(answer, str) else json.dumps(answer)
 
+    # The real planning path always asks whether the work it is about to choose
+    # could actually be started. Eligibility alone is what let the previous
+    # pilot select a candidate normal intake then refused, with discovery
+    # unreachable behind it.
+    config = load_company_config(args.config_dir)
+    manager_seat = str(planners.get("manager_seat", "engineering_manager"))
+    manager_employee = str(
+        planners.get("manager_employee", "engineering_delivery_manager")
+    )
+    repo_root = getattr(args, "repo_root", ".")
+
+    def viability_check(candidate):
+        return assess_viability(
+            candidate,
+            envelope,
+            permissions=config.permissions,
+            repo_root=repo_root,
+            proposed_by_seat=manager_seat,
+            proposed_on=day,
+            planning_decision_id="plan-" + objective.objective_id,
+            requested_by=manager_employee,
+        )
+
     run = plan_objective(
         register,
         objective,
@@ -615,6 +669,7 @@ def _cmd_plan_run(args: argparse.Namespace) -> int:
         session=session,
         discovery=discovery,
         discovery_envelope=discovery_envelope,
+        viability_check=viability_check,
     )
     if args.json:
         print(json.dumps(to_jsonable(run.to_dict()), indent=2, sort_keys=True, default=str))

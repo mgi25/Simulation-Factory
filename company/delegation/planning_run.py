@@ -46,7 +46,7 @@ discarded.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 import datetime as dt
 from dataclasses import dataclass
 from typing import Any
@@ -69,6 +69,11 @@ from .common import (
 )
 from .discovery import DiscoveryEnvelope, DiscoveryResult
 from .errors import AuthorityViolation, DelegationError
+from .viability import (
+    ViabilityVerdict,
+    executable_ids,
+    refusal_lines,
+)
 from .executive import (
     ExecutiveChoice,
     ExecutiveDecision,
@@ -86,6 +91,10 @@ from .planning import CandidateEligibility, eligible_candidates, only_eligible
 from .planning_record import PlanningDecisionRecord, PlanningOutcome
 
 PLANNING_RUN_VERSION = 1
+
+
+ViabilityCheck = Callable[[Any], ViabilityVerdict]
+"""Answers, for one eligible candidate, whether work could actually start."""
 
 
 @dataclass(frozen=True)
@@ -108,6 +117,15 @@ class PlanningRunRecord:
     policy_fingerprint: str
     eligible_candidate_ids: tuple[str, ...] = ()
     rejected_candidates: tuple[str, ...] = ()
+    # Eligibility says the company MAY choose this. Viability says work could
+    # actually start on it: the candidate derives a bounded work order and
+    # normal intake authorizes that order. They are different questions, and
+    # the final end-to-end pilot ended because only the first was asked.
+    # `viability_assessed` is False for a run that did not ask, so a record
+    # cannot be mistaken for one that checked and found everything workable.
+    viability_assessed: bool = False
+    executable_candidate_ids: tuple[str, ...] = ()
+    not_executable: tuple[str, ...] = ()
     selected_candidate_id: str = ""
     selection_reason: str = ""
     model_used: bool = False
@@ -169,6 +187,18 @@ class PlanningRunRecord:
         )
         object.__setattr__(
             self,
+            "executable_candidate_ids",
+            name_tuple(
+                self.executable_candidate_ids, "executable_candidate_ids", limit=64
+            ),
+        )
+        object.__setattr__(
+            self,
+            "not_executable",
+            text_tuple(self.not_executable, "not_executable", limit=64),
+        )
+        object.__setattr__(
+            self,
             "discovered_candidate_ids",
             name_tuple(
                 self.discovered_candidate_ids, "discovered_candidate_ids", limit=16
@@ -190,9 +220,23 @@ class PlanningRunRecord:
             if not isinstance(value, str):
                 raise DelegationError(f"{field} must be text")
             object.__setattr__(self, field, value.strip())
-        for field in ("model_used", "discovery_requested"):
+        for field in ("model_used", "discovery_requested", "viability_assessed"):
             if not isinstance(getattr(self, field), bool):
                 raise DelegationError(f"{field} must be a bool")
+        if not self.viability_assessed and (
+            self.executable_candidate_ids or self.not_executable
+        ):
+            raise DelegationError(
+                f"{self.planning_run_id}: viability results are recorded but "
+                "viability_assessed is false"
+            )
+        for item in self.executable_candidate_ids:
+            if item not in self.eligible_candidate_ids:
+                raise DelegationError(
+                    f"{self.planning_run_id}: {item} is recorded as executable but "
+                    "is not among the eligible candidates. Viability narrows "
+                    "eligibility; it cannot add to it."
+                )
 
         # --- the four refusals ---------------------------------------------
         if self.outcome is PlanningOutcome.SELECTED:
@@ -206,6 +250,16 @@ class PlanningRunRecord:
                     "among the eligible candidates. A selection outside the set the "
                     "deterministic pass produced is not a selection this company "
                     "authorized."
+                )
+            if (
+                self.viability_assessed
+                and self.selected_candidate_id not in self.executable_candidate_ids
+            ):
+                raise DelegationError(
+                    f"{self.planning_run_id}: {self.selected_candidate_id} was "
+                    "selected although execution viability found it unworkable. "
+                    "Selecting work that intake will refuse is what this check "
+                    "exists to stop."
                 )
         if self.model_used and self.session is None:
             raise DelegationError(
@@ -244,6 +298,9 @@ class PlanningRunRecord:
             "policy_fingerprint": self.policy_fingerprint,
             "eligible_candidate_ids": list(self.eligible_candidate_ids),
             "rejected_candidates": list(self.rejected_candidates),
+            "viability_assessed": self.viability_assessed,
+            "executable_candidate_ids": list(self.executable_candidate_ids),
+            "not_executable": list(self.not_executable),
             "selected_candidate_id": self.selected_candidate_id,
             "selection_reason": self.selection_reason,
             "model_used": self.model_used,
@@ -274,6 +331,11 @@ class PlanningRun:
     brief: PlanningBrief | None = None
     discovery: DiscoveryResult | None = None
     decision: PlanningDecisionRecord | None = None
+    # The register the run actually planned over: the caller's, plus anything
+    # discovery accepted. The CEO page reads this, because a run that selects
+    # discovered work and then cannot name it reports a dash where the answer
+    # is.
+    planned_over: CandidateRegister | None = None
 
     @property
     def outcome(self) -> PlanningOutcome:
@@ -318,6 +380,7 @@ def plan_objective(
     session: PlanningSessionCost | None = None,
     discovery: DiscoveryResult | None = None,
     discovery_envelope: DiscoveryEnvelope | None = None,
+    viability_check: ViabilityCheck | None = None,
 ) -> PlanningRun:
     """One planning run, deterministic first and a model only when it must be.
 
@@ -325,6 +388,15 @@ def plan_objective(
     `discovery_envelope`; this function does not read evidence itself, for the
     same reason `run_discovery` does not - reading is the bounded part, and it
     belongs to whoever holds the envelope.
+
+    `viability_check` answers, per eligible candidate, whether work could
+    actually start on it: whether the candidate derives a bounded work order
+    that normal intake authorizes. When it is supplied the rungs below count
+    EXECUTABLE candidates rather than merely eligible ones, which is what makes
+    bounded discovery reachable when the register holds eligible work that
+    cannot be authorized. Passing None leaves the older behaviour - eligibility
+    alone - and the record says `viability_assessed: false` so the two cannot
+    be confused. `company/delegation/viability.py` has the reasoning.
     """
     if not isinstance(objective, Objective):
         raise DelegationError("plan_objective takes an Objective")
@@ -371,7 +443,21 @@ def plan_objective(
         reserved_actions=reserved_actions,
         objective_goal_tags=objective_goal_tags,
     )
-    winners = only_eligible(results)
+    eligible_ids = only_eligible(results)
+
+    # Eligibility is necessary and not sufficient. A candidate the company may
+    # choose is not the same as one it can start, and the rungs below have to
+    # count the second kind or discovery stays unreachable behind work that
+    # looks available and is not.
+    viability: tuple[ViabilityVerdict, ...] = ()
+    if viability_check is not None and eligible_ids:
+        viability = tuple(
+            viability_check(working.candidate(item)) for item in eligible_ids
+        )
+        winners = executable_ids(viability)
+    else:
+        winners = eligible_ids
+
     common: dict[str, Any] = {
         "planning_run_id": planning_run_id,
         "objective_id": objective.objective_id,
@@ -385,8 +471,11 @@ def plan_objective(
         "authority_source": authority_source,
         "policy_version": policy_version,
         "policy_fingerprint": policy_fingerprint,
-        "eligible_candidate_ids": winners,
+        "eligible_candidate_ids": eligible_ids,
         "rejected_candidates": _rejection_lines(results),
+        "viability_assessed": viability_check is not None,
+        "executable_candidate_ids": executable_ids(viability) if viability else (),
+        "not_executable": refusal_lines(viability) if viability else (),
         "budget": envelope.budget,
         "discovery_requested": discovery is not None,
         "discovery_envelope_id": (
@@ -407,6 +496,27 @@ def plan_objective(
             if discovery is None
             else "discovery produced candidates, and none of them is eligible"
         )
+        # The case this rung exists for now, and did not before: candidates
+        # passed eligibility and none of them can be started. Saying "nothing
+        # is eligible" here would be false and would hide the reason.
+        if eligible_ids and viability:
+            detail = "; ".join(refusal_lines(viability))
+            return PlanningRun(
+                record=PlanningRunRecord(
+                    outcome=PlanningOutcome.NO_ELIGIBLE_WORK_CANDIDATE,
+                    decision_reason=(
+                        f"{len(eligible_ids)} candidate(s) passed eligibility and "
+                        f"none can be worked on ({detail}). {note}. Eligibility is "
+                        "not viability: the company may choose these and normal "
+                        "intake would refuse the work order each one derives, so "
+                        "there is nothing here to start."
+                    ),
+                    model_used=False,
+                    **common,
+                ),
+                eligibility=results,
+                discovery=discovery,
+            )
         return PlanningRun(
             record=PlanningRunRecord(
                 outcome=PlanningOutcome.NO_ELIGIBLE_WORK_CANDIDATE,
@@ -420,6 +530,7 @@ def plan_objective(
             ),
             eligibility=results,
             discovery=discovery,
+            planned_over=working,
         )
 
     # --- rung 2: exactly one eligible, decided without a model -------------
@@ -432,8 +543,15 @@ def plan_objective(
                 selected_candidate_id=chosen.candidate_id,
                 selection_reason=(
                     f"{chosen.candidate_id} is the only candidate that passes every "
-                    "constraint, so the choice is arithmetic and no planning session "
-                    "was opened"
+                    "constraint and can actually be started"
+                    + (
+                        f" ({len(eligible_ids)} passed eligibility, "
+                        f"{len(winners)} of those is executable)"
+                        if viability and len(eligible_ids) != len(winners)
+                        else ""
+                    )
+                    + ", so the choice is arithmetic and no planning session was "
+                    "opened"
                 ),
                 decision_reason=(
                     "one eligible candidate: selected deterministically, at no "
@@ -444,6 +562,7 @@ def plan_objective(
                 **common,
             ),
             eligibility=results,
+            planned_over=working,
         )
 
     # --- rung 3: two or more, one bounded executive session ----------------
@@ -564,8 +683,11 @@ def plan_objective(
 def ceo_planning_report(run: PlanningRun, register: CandidateRegister) -> str:
     """The page the CEO reads. Not the register, and not the run's internals."""
     record = run.record
+    # Prefer the register the run planned over: it contains discovered
+    # candidates, which the caller's register by definition does not.
+    source = run.planned_over or register
     chosen = (
-        register.candidate(record.selected_candidate_id)
+        source.candidate(record.selected_candidate_id)
         if record.selected_candidate_id
         else None
     )
