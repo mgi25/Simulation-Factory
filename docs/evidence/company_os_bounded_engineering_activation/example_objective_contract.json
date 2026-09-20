@@ -1,0 +1,30 @@
+{
+  "contract_id": "con-engineering-reliability-2026-09-20",
+  "objective_id": "obj-engineering-reliability-2026-09-20",
+  "objective": "Improve the reliability, maintainability, or operating efficiency of the Company OS by completing ONE genuinely useful engineering improvement chosen by the company itself.",
+  "mode": "bounded_routine_engineering",
+  "department": "engineering",
+  "budget": {"amount": "6.00", "currency": "USD"},
+  "budget_scope": "engineering-operations",
+  "risk_ceiling": "medium",
+  "expires_on": "2026-12-31",
+  "authorized_by": "MGI (CEO)",
+  "success_criteria": [
+    "one genuinely useful engineering improvement completed",
+    "zero new test regressions"
+  ],
+  "allowed_actions": [
+    "approve_code_change",
+    "approve_review_outcome",
+    "approve_test_progression",
+    "request_bounded_correction",
+    "stop_work_on_invalid_premise",
+    "approve_work_order",
+    "select_work",
+    "discover_work",
+    "approve_integration_merge"
+  ],
+  "forbidden_actions": [],
+  "max_corrections_per_work_order": 1,
+  "notes": "One objective. No standing grant. Expires on the date above."
+}

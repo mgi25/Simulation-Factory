@@ -50,6 +50,18 @@ ACTION
 | `scenarios.py` | five real jobs, replayed against the model |
 | `shadow.py` | proof on every run that the canonical gate is still the only gate |
 
+### The bounded live pilot (not activated)
+
+| File | What it holds |
+|---|---|
+| `pilot.py` | the live action set, the activation token, the gates, `evaluate_live` |
+| `pilot_envelope.py` | the CEO objective envelope: an allow-list and a required expiry |
+| `pilot_integration.py` | the one branch work may land on, and the refs that are never touched |
+| `pilot_correction.py` | one bounded correction, counted against the resource profile |
+| `pilot_record.py` | the live decision row, with employees as well as seats |
+| `pilot_report.py` | the CEO run report and the simulation report |
+| `pilot_simulation.py` | history replayed under live semantics, plus five new probes |
+
 ## Commands
 
 ```
@@ -62,6 +74,9 @@ python -m company.delegation report     # management-by-exception over the repla
 python -m company.delegation evaluate --request-file r.json
 python -m company.delegation replay     # the five historical scenarios
 python -m company.delegation shadow     # the five stop-semantics probes
+
+python -m company.delegation pilot-policy    # the live action set; prints "activated: NO"
+python -m company.delegation pilot-simulate  # history under live semantics; nothing runs
 ```
 
 Exit codes: 0 answered, 1 escalated or a failing condition, 2 malformed input.

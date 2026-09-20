@@ -59,7 +59,29 @@ def build_parser() -> argparse.ArgumentParser:
         parser = commands.add_parser(name, help=help_text)
         _common(parser)
         if name == "run-one":
-            parser.add_argument("work_order_id")
+            # Two spellings, on purpose. `status` takes `--work-order` and
+            # `run-one` took a bare positional, and that inconsistency cost two
+            # operator invocations in the discovery pilot - one passing
+            # `--work-order-id` and getting "unrecognized arguments", one
+            # omitting it and getting a bare "required: work_order_id" with no
+            # hint of the accepted shape. Neither spent money, and both are the
+            # kind of thing that will happen again at 2am. Accept both, name
+            # both in the error.
+            parser.add_argument(
+                "work_order_id",
+                nargs="?",
+                default="",
+                metavar="WORK_ORDER_ID",
+                help="the work order to execute, e.g. wo-my-work-order",
+            )
+            parser.add_argument(
+                "--work-order-id",
+                "--work-order",
+                dest="work_order_id_flag",
+                default="",
+                metavar="WORK_ORDER_ID",
+                help="the same value as the positional argument; either spelling works",
+            )
         if name == "status":
             parser.add_argument("--work-order", dest="work_order_id", default="")
         if name == "watch":
@@ -219,8 +241,35 @@ def _watch(runner: EngineeringRunner, args: argparse.Namespace) -> int:
     return _OK if all(item.outcome == COMPLETED for item in reports) else _STOPPED
 
 
+def resolve_work_order_id(args: argparse.Namespace) -> str:
+    """One id from the two accepted spellings, or a refusal that names both.
+
+    Separate from `_run_one` so the rule is testable without building a runner
+    or touching a repository.
+    """
+    positional = (getattr(args, "work_order_id", "") or "").strip()
+    flag = (getattr(args, "work_order_id_flag", "") or "").strip()
+    if positional and flag and positional != flag:
+        raise RunnerError(
+            f"two different work order ids were given: {positional!r} positionally "
+            f"and {flag!r} as a flag. Pass one."
+        )
+    chosen = positional or flag
+    if not chosen:
+        raise RunnerError(
+            "run-one needs a work order id. Either spelling works:\n"
+            "  python -m tools.engineering_runner run-one WO_ID "
+            "--repo-root . --state-dir S --runner-dir R\n"
+            "  python -m tools.engineering_runner run-one --work-order-id WO_ID "
+            "--repo-root . --state-dir S --runner-dir R\n"
+            "`python -m tools.engineering_runner status` lists the ids this "
+            "runner knows about."
+        )
+    return chosen
+
+
 def _run_one(runner: EngineeringRunner, args: argparse.Namespace) -> int:
-    report = runner.run_one(args.work_order_id)
+    report = runner.run_one(resolve_work_order_id(args))
     _emit(report.to_dict())
     if report.outcome == SKIPPED:
         return _STOPPED

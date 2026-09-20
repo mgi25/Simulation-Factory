@@ -65,11 +65,23 @@ from .discovery import (
     run_discovery,
 )
 from .executive import PlanningSessionCost
+from .operating_mode import ObjectiveContract, OperatingMode, may_activate
 from .viability import assess_viability
 from .planning_record import PlanningOutcome
 from .planning_run import ceo_planning_report, plan_objective
 from .store import DelegationStore
 from .shadow import verify_shadow_mode
+from .pilot import PILOT_SEATS, PILOT_VERSION, PilotMode
+from .pilot_integration import PILOT_TARGET, PROTECTED_REFS
+from .pilot_report import simulation_report
+from .pilot_simulation import (
+    ENGINEERING_ACTIVATION,
+    PILOT_DAY,
+    replay_live,
+    replay_probes,
+    replay_shadow_default,
+    run_full_simulation,
+)
 
 
 _ANSWERED = 0
@@ -146,6 +158,37 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate_cmd = commands.add_parser("evaluate", help="answer one authority request")
     evaluate_cmd.add_argument("--request-file", type=Path, required=True)
     evaluate_cmd.add_argument("--consumed-file", type=Path, default=None)
+
+    commands.add_parser(
+        "pilot-policy",
+        help="the bounded live-pilot action set, seats and protected refs",
+    )
+    contract_cmd = commands.add_parser(
+        "objective-contract",
+        help="validate one CEO objective contract and report what it authorizes",
+    )
+    contract_cmd.add_argument("--contract-file", required=True)
+    contract_cmd.add_argument("--as-of", default="", help="the day, YYYY-MM-DD")
+    contract_cmd.add_argument(
+        "--enable-bounded-engineering",
+        action="store_true",
+        help="treat BOUNDED_ROUTINE_ENGINEERING as an enabled mode for this "
+        "evaluation. Without it the answer is shadow, which is the default and "
+        "the point: there is no configuration file that turns this on.",
+    )
+    contract_cmd.add_argument(
+        "--objective-state",
+        default="",
+        help="the objective's current lifecycle state; a terminal one authorizes nothing",
+    )
+    contract_cmd.add_argument(
+        "--revoked", action="store_true", help="treat the contract as revoked"
+    )
+
+    commands.add_parser(
+        "pilot-simulate",
+        help="replay history under live-pilot semantics (nothing runs)",
+    )
     return root
 
 
@@ -680,8 +723,190 @@ def _cmd_plan_run(args: argparse.Namespace) -> int:
     return _ESCALATED
 
 
+def _pilot_policy_text() -> str:
+    lines = [
+        f"DELEGATED ENGINEERING PILOT {PILOT_VERSION}",
+        "  activated in canonical: NO. This prints the model, not a grant.",
+        "",
+        "LIVE SEATS AND ACTIONS",
+    ]
+    for seat in sorted(PILOT_SEATS):
+        lines.append(f"  {seat}")
+        for action in sorted(PILOT_SEATS[seat], key=lambda item: item.value):
+            lines.append(f"    {action.value}")
+    lines.append("")
+    lines.append("INTEGRATION TARGET")
+    lines.append(f"  {PILOT_TARGET.branch}")
+    lines.append(f"  kind      {PILOT_TARGET.kind.value}")
+    lines.append(f"  {PILOT_TARGET.rationale}")
+    lines.append("")
+    lines.append("PROTECTED REFS (never advanced by any delegated decision)")
+    for ref in sorted(PROTECTED_REFS):
+        lines.append(f"  {ref}")
+    lines.append("")
+    lines.append("DEFAULT MODE")
+    lines.append(
+        f"  {PilotMode.SHADOW.value}: evaluate_live() with no activation authorizes"
+    )
+    lines.append("  nothing. Live authority requires a PilotActivation passed by hand.")
+    return "\n".join(lines)
+
+
+def _pilot_policy(args: argparse.Namespace) -> int:
+    if args.json:
+        payload = {
+            "version": PILOT_VERSION,
+            "activated": False,
+            "default_mode": PilotMode.SHADOW.value,
+            "seats": {
+                seat: sorted(item.value for item in actions)
+                for seat, actions in PILOT_SEATS.items()
+            },
+            "integration_target": PILOT_TARGET.to_dict(),
+            "protected_refs": sorted(PROTECTED_REFS),
+        }
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(_pilot_policy_text())
+    return _ANSWERED
+
+
+def _pilot_simulate(args: argparse.Namespace) -> int:
+    policy = _load_policy(args)
+    summary = run_full_simulation(policy)
+    if args.json:
+        print(json.dumps(summary, indent=2, sort_keys=True))
+    else:
+        groups = {
+            "historical": replay_live(policy, SCENARIOS),
+            "controls": replay_live(policy, CONTROL_SCENARIOS),
+            "pilot_probes": replay_probes(policy),
+        }
+        print(
+            simulation_report(
+                groups,
+                activation=ENGINEERING_ACTIVATION,
+                objective="bounded live-delegation pilot",
+                as_of=PILOT_DAY,
+            )
+        )
+        shadow = replay_shadow_default(policy, SCENARIOS)
+        authorized = [item for item in shadow if item.live.authorizes_action]
+        print("")
+        print("SHADOW REMAINS THE DEFAULT")
+        print(f"  {len(shadow)} scenarios with no activation supplied")
+        print(f"  authorized actions: {len(authorized)} (must be 0)")
+    every = (
+        summary["historical"]["mismatched"]
+        + summary["controls"]["mismatched"]
+        + summary["pilot_probes"]["mismatched"]
+    )
+    if every or summary["shadow_default"]["authorized_any"]:
+        return _ESCALATED
+    return _ANSWERED
+
+
+def _read_json(path: Path) -> Any:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise DelegationError(f"cannot read {path}: {exc}") from exc
+
+
+def _request_from(data: Any) -> AuthorityRequest:
+    if not isinstance(data, dict):
+        raise DelegationError("a request file must hold a JSON object")
+    amount = data.get("amount")
+    return AuthorityRequest(
+        request_id=str(data.get("request_id", "")),
+        action=parse_action(data.get("action"), "request.action"),
+        requesting_seat=str(data.get("requesting_seat", "")),
+        department=str(data.get("department", "")),
+        risk=parse_risk(data.get("risk", "low"), "request.risk"),
+        objective_id=str(data.get("objective_id", "") or ""),
+        work_order_id=str(data.get("work_order_id", "") or ""),
+        budget_scope=str(data.get("budget_scope", "") or ""),
+        amount=Money.from_dict(dict(amount), "request.amount") if amount else None,
+        summary=str(data.get("summary", "") or ""),
+        reversible=bool(data.get("reversible", True)),
+        evidence_refs=tuple(data.get("evidence_refs", ())),
+        write_scope=tuple(data.get("write_scope", ())),
+    )
+
+
+def _consumed_from(data: Any) -> dict[str, Money]:
+    if data is None:
+        return {}
+    if not isinstance(data, dict):
+        raise DelegationError("a consumption file must hold a JSON object")
+    return {
+        str(key): Money.from_dict(dict(value), f"consumed[{key}]")
+        for key, value in data.items()
+    }
+
+
+def _cmd_objective_contract(args: argparse.Namespace) -> int:
+    """The CEO entrypoint: state an objective contract, see what it authorizes.
+
+    Read-only. It opens no objective, spends nothing and activates nothing; it
+    answers whether this contract *would* produce live authority, and refuses a
+    contract that is incomplete rather than filling anything in.
+
+    The exit code is the answer: 0 when the contract would authorize bounded
+    routine engineering, 1 when it would not.
+    """
+    with open(args.contract_file, encoding="utf-8") as handle:
+        raw = json.load(handle)
+    contract = ObjectiveContract.from_mapping(raw)
+    day = dt.date.fromisoformat(args.as_of) if args.as_of else dt.date.today()
+    enabled = (
+        (OperatingMode.SHADOW, OperatingMode.BOUNDED_ROUTINE_ENGINEERING)
+        if args.enable_bounded_engineering
+        else (OperatingMode.SHADOW,)
+    )
+    verdict = may_activate(
+        contract,
+        as_of=day,
+        enabled_modes=enabled,
+        objective_state=args.objective_state or None,
+        revoked=args.revoked,
+    )
+    lines = [
+        f"CONTRACT             {contract.contract_id}",
+        f"OBJECTIVE            {contract.objective}",
+        f"MODE REQUESTED       {contract.mode.value}",
+        f"DEPARTMENT           {contract.department}",
+        f"RISK CEILING         {contract.risk_ceiling.value}",
+        f"BUDGET               {contract.budget.amount} {contract.budget.currency}",
+        f"EXPIRES              {contract.expires_on.isoformat()}",
+        f"SIGNED BY            {contract.authorized_by}",
+        f"CORRECTION CEILING   {contract.max_corrections_per_work_order}",
+        "",
+        "ALLOWS",
+    ]
+    lines += [f"  {item.value}" for item in contract.allowed_actions] or ["  nothing"]
+    lines.append("")
+    lines.append("SUCCESS CRITERIA")
+    lines += [f"  {item}" for item in contract.success_criteria] or ["  none"]
+    lines.append("")
+    lines.append("REPORTING")
+    lines += [f"  {item}" for item in contract.reporting_requirements]
+    lines += [
+        "",
+        f"LIVE AUTHORITY       {'yes' if verdict.may_activate else 'no'}",
+        f"WHY                  {verdict.reason}",
+        "",
+        "NOTE                 this command authorizes nothing. It reports what the",
+        "                     contract would authorize if an activation were built",
+        "                     from it at a call site.",
+    ]
+    print("\n".join(lines))
+    return _ANSWERED if verdict.may_activate else _ESCALATED
+
+
 _COMMANDS = {
     "policy": _cmd_policy,
+    "objective-contract": _cmd_objective_contract,
     "deployment": _cmd_deployment,
     "report": _cmd_report,
     "chart": _cmd_chart,
@@ -691,6 +916,8 @@ _COMMANDS = {
     "candidates": _cmd_candidates,
     "plan": _cmd_plan,
     "plan-run": _cmd_plan_run,
+    "pilot-policy": _pilot_policy,
+    "pilot-simulate": _pilot_simulate,
 }
 
 
