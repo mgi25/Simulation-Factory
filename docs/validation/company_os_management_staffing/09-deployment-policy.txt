@@ -1,0 +1,13 @@
+DEPLOYMENT POLICY deployment_policy_v1 — activated: false
+
+  kind                 classification         reversible  action
+  local_integration    routine_delegatable    true        approve_local_integration
+  canonical_merge      executive_approval     true        approve_canonical_merge
+  staging_release      executive_approval     true        approve_staging_release
+  public_deployment    ceo_reserved           false       approve_deployment
+  content_publishing   ceo_reserved           false       publish_public_video
+  unknown              ceo_reserved           false       approve_deployment
+
+Granted to no seat in this version. Classifying what authority a
+deployment would need and granting it are two CEO decisions, and
+only the first has been taken.

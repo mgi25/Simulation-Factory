@@ -1,0 +1,135 @@
+{
+  "approved_below_ceo": [
+    "dogfood-2",
+    "burnin-job-a",
+    "burnin-correction",
+    "burnin-job-b",
+    "burnin-job-c"
+  ],
+  "ceo_required": [],
+  "disagreements": [],
+  "matching_expectation": 5,
+  "results": [
+    {
+      "actual_ceo_involved": true,
+      "ceo_required": false,
+      "chain": [
+        {
+          "detail": "software_implementation_engineer holds no delegated grant under delegation_policy_v1",
+          "insufficiency": "no_grant",
+          "seat": "software_implementation_engineer"
+        }
+      ],
+      "decision": "approved",
+      "evidence": [
+        "docs/company_os_second_real_dogfood.md"
+      ],
+      "exception_classes": [],
+      "expected_ceo_required": false,
+      "historical": true,
+      "label": "Dogfood #2: developer_attempts_remaining on the CEO result page",
+      "matches_expectation": true,
+      "matches_history": false,
+      "owning_seat": "engineering_manager",
+      "reason": "engineering_manager is the lowest seat with authority over approve_code_change at low risk; 2.157688 USD against 18 USD at engineering-operations with 0 USD already consumed, leaving 18 USD",
+      "scenario_id": "dogfood-2"
+    },
+    {
+      "actual_ceo_involved": true,
+      "ceo_required": false,
+      "chain": [
+        {
+          "detail": "software_implementation_engineer holds no delegated grant under delegation_policy_v1",
+          "insufficiency": "no_grant",
+          "seat": "software_implementation_engineer"
+        }
+      ],
+      "decision": "approved",
+      "evidence": [
+        "docs/company_os_supervised_burnin.md"
+      ],
+      "exception_classes": [],
+      "expected_ceo_required": false,
+      "historical": true,
+      "label": "Job A: legacy attempts-remaining default, reviewer found a real defect",
+      "matches_expectation": true,
+      "matches_history": false,
+      "owning_seat": "engineering_manager",
+      "reason": "engineering_manager is the lowest seat with authority over approve_review_outcome at low risk; 1.0636907499999999 USD against 18 USD at engineering-operations with 0 USD already consumed, leaving 18 USD",
+      "scenario_id": "burnin-job-a"
+    },
+    {
+      "actual_ceo_involved": true,
+      "ceo_required": false,
+      "chain": [
+        {
+          "detail": "software_implementation_engineer holds no delegated grant under delegation_policy_v1",
+          "insufficiency": "no_grant",
+          "seat": "software_implementation_engineer"
+        }
+      ],
+      "decision": "approved",
+      "evidence": [
+        "docs/company_os_supervised_burnin_correction.md"
+      ],
+      "exception_classes": [],
+      "expected_ceo_required": false,
+      "historical": true,
+      "label": "Correction job: null-safe attempts-remaining, clean run",
+      "matches_expectation": true,
+      "matches_history": false,
+      "owning_seat": "engineering_manager",
+      "reason": "engineering_manager is the lowest seat with authority over approve_code_change at low risk; 1.1758087499999998 USD against 18 USD at engineering-operations with 0 USD already consumed, leaving 18 USD",
+      "scenario_id": "burnin-correction"
+    },
+    {
+      "actual_ceo_involved": true,
+      "ceo_required": false,
+      "chain": [
+        {
+          "detail": "software_implementation_engineer holds no delegated grant under delegation_policy_v1",
+          "insufficiency": "no_grant",
+          "seat": "software_implementation_engineer"
+        }
+      ],
+      "decision": "approved",
+      "evidence": [
+        "docs/company_os_supervised_burnin_b_and_c.md"
+      ],
+      "exception_classes": [],
+      "expected_ceo_required": false,
+      "historical": true,
+      "label": "Job B: test section-header renumbering, four lines, reviewer PASS",
+      "matches_expectation": true,
+      "matches_history": false,
+      "owning_seat": "engineering_manager",
+      "reason": "engineering_manager is the lowest seat with authority over approve_test_progression at low risk; 0.5538657499999999 USD against 18 USD at engineering-operations with 0 USD already consumed, leaving 18 USD",
+      "scenario_id": "burnin-job-b"
+    },
+    {
+      "actual_ceo_involved": false,
+      "ceo_required": false,
+      "chain": [
+        {
+          "detail": "cto raised this request and does not decide it. A seat that signs its own work is not a control.",
+          "insufficiency": "self_approval",
+          "seat": "cto"
+        }
+      ],
+      "decision": "approved",
+      "evidence": [
+        "docs/evidence/company_os_supervised_burnin/job_c/SCHEMA_PREFLIGHT_STOP.md"
+      ],
+      "exception_classes": [],
+      "expected_ceo_required": false,
+      "historical": true,
+      "label": "Job C: stopped at the schema pre-flight, never submitted",
+      "matches_expectation": true,
+      "matches_history": true,
+      "owning_seat": "coo",
+      "reason": "coo is the lowest seat with authority over stop_work_on_invalid_premise at low risk",
+      "scenario_id": "burnin-job-c"
+    }
+  ],
+  "scenarios": 5
+}
