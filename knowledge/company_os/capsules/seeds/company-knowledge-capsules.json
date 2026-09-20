@@ -52,6 +52,7 @@
   ],
   "owner": "workstream-claude",
   "owns_paths": [
+    "intelligence/__init__.py",
     "knowledge/company_os/capsules"
   ],
   "purpose": "Compact authoritative module, system, policy and project contracts; a deterministic index over them; and a selector that turns task paths and capability tags into context references without expanding anything.",

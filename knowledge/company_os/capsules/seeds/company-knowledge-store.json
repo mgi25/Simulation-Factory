@@ -49,6 +49,8 @@
   ],
   "owner": "workstream-claude",
   "owns_paths": [
+    "knowledge/__init__.py",
+    "knowledge/company_os/__init__.py",
     "knowledge/company_os/records.py",
     "knowledge/company_os/freshness.py",
     "knowledge/company_os/ledger.py",
