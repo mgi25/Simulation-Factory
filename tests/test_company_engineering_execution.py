@@ -2870,6 +2870,25 @@ def test_every_stage_plans_under_the_same_context_policy(tmp_path):
     assert developed.job.state is JobState.TESTING
 
 
+def test_bare_authentication_mention_escalates_to_security():
+    """A bare 'authentication' in the objective routes to the security specialist."""
+    routed = derive_routing(_request(objective="Refactor the authentication flow."))
+    assert routed.specialist_domain == "security", routed
+
+
+def test_quoted_authentication_identifier_does_not_escalate():
+    """A backtick-quoted single identifier containing 'authentication' is stripped.
+
+    `test_authentication_flow` names a function, not security work.  The
+    quoted-identifier strip removes it before trigger matching, so the
+    objective stays routine.
+    """
+    routed = derive_routing(
+        _request(objective="Rename `test_authentication_flow` in the test suite.")
+    )
+    assert routed.specialist_domain == "", routed
+
+
 def test_no_engineering_stage_plans_without_a_context_policy():
     """A source guard, because the behavioural one only covers the paths it walks.
 

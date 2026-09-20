@@ -181,6 +181,10 @@ _CLAUSE_BREAK = re.compile(
 )
 _NEGATION_WORDS = frozenset({"not", "no", "never", "without", "avoid", "cannot"})
 _NEGATION_WORD_PATTERN = re.compile(r"[a-z']+")
+# A backtick span that contains only word characters (no whitespace): `func_name`.
+# Multi-word spans like `schema migration` are intentionally excluded so that
+# trigger terms inside them still escalate as described work.
+_QUOTED_IDENT = re.compile(r"`\w+`")
 
 
 def _clauses(text: str) -> tuple[str, ...]:
@@ -930,7 +934,7 @@ def derive_routing(request: CEORequest) -> RoutingDerivation:
     # the requested work, so it must never silently raise the model tier: a
     # note that says "the previous request was misclassified as governance"
     # would otherwise retrigger the exact misclassification it describes.
-    text = request.objective.lower()
+    text = _QUOTED_IDENT.sub("", request.objective).lower()
     clauses = _clauses(text)
     novel = request.novel or any(_escalates(term, clauses) for term in NOVEL_TRIGGERS)
 
