@@ -1,0 +1,79 @@
+{
+  "artifacts": [],
+  "authority_fingerprint": "198619f87f02b75e",
+  "base_commit": "f20254f98ad85f49187b909f252eec6839c7dd63",
+  "branch": "eng-capsule-ownership",
+  "commit_sha": "020de2945683c27299152ece1a992891c79e3b7e",
+  "completed_at": "2026-09-20T15:14:36.714925+00:00",
+  "context_refs_used": [],
+  "context_usage_reported": false,
+  "dependencies_added": [],
+  "evidence": [
+    "knowledge/company_os/capsules/seeds/company-workforce-employment.json",
+    "knowledge/company_os/capsules/seeds/company-knowledge-store.json",
+    "knowledge/company_os/capsules/seeds/company-knowledge-capsules.json",
+    "commit:020de2945683c27299152ece1a992891c79e3b7e"
+  ],
+  "executor": "claude_code",
+  "files_changed": [
+    "knowledge/company_os/capsules/seeds/company-knowledge-capsules.json",
+    "knowledge/company_os/capsules/seeds/company-knowledge-store.json",
+    "knowledge/company_os/capsules/seeds/company-workforce-employment.json"
+  ],
+  "invariants_preserved": [
+    "No protected path was modified (company/integration/*, company/validation/*, company/org_registry.yaml, etc.)",
+    "No module is claimed by two capsules: index.integrity() returned 0 problems",
+    "tests/test_company_os_capsules.py: all 66 tests pass",
+    "architecture.subsystem_ownership_bounded: PASS in company.integration check",
+    "The exact-equality assertion at test line 683 (company-research-intelligence.owns_paths == ('intelligence/research',)) still holds",
+    "The prefix assertion at test line 685 (all operations.owns_paths start with 'intelligence/research/') still holds",
+    "Capsule size limit (4000 chars): all modified seeds remain under 4000 bytes"
+  ],
+  "merge_performed": false,
+  "next_owner": "",
+  "no_subagents": true,
+  "notes": "The integration check reports subsystem_ownership_bounded as 'advisory', not 'required'. All 7 previously unclaimed modules now have exactly one capsule owner. No new capsules were created (test asserts len(seeds)==20). No test file was modified.",
+  "outcome": "accepted",
+  "packet_attempt": 1,
+  "packet_fingerprint": "e923a9faccce333b",
+  "rejection_reason": "",
+  "remote_branch_sha": "020de2945683c27299152ece1a992891c79e3b7e",
+  "remote_verified": true,
+  "subagents_used": 0,
+  "summary": "Added 7 unclaimed Company OS modules to the owns_paths of 3 existing capsule seeds. The 4 company/workforce shared files (common.py, errors.py, __init__.py, __main__.py) went to company-workforce-employment; knowledge/__init__.py and knowledge/company_os/__init__.py went to company-knowledge-store; intelligence/__init__.py went to company-knowledge-capsules because the two natural owners (company-research-intelligence and company-research-operations) both have exact-match test assertions that prohibit additions to their owns_paths.",
+  "task_id": "wo-wo-gate-architecture-subsystem_ownership_bounded",
+  "tests": [
+    {
+      "command": "tests/test_company_os_capsules.py",
+      "passed": true,
+      "summary": "66 passed in 0.27s"
+    }
+  ],
+  "unresolved_risks": [
+    "intelligence/__init__.py is assigned to company-knowledge-capsules for constraint reasons, not semantic ones. A reviewer may prefer a different placement once the test-suite guard on company-research-intelligence is relaxed.",
+    "company-workforce-employment now owns all 4 workforce shared-utility files (common.py, errors.py, __init__.py, __main__.py). These files are used equally by all three workforce capsules; a future reviewer might prefer a dedicated shared-utilities capsule."
+  ],
+  "usage": {
+    "cache_creation_units": 80090,
+    "cache_hits": 2720219,
+    "cost_ceiling_enforced": true,
+    "duration_s": 634.445,
+    "input_units": 63,
+    "model": "sonnet",
+    "model_turns": 63,
+    "output_units": 30761,
+    "passes": 1,
+    "provider": "anthropic",
+    "provider_cost": "2.630012",
+    "provider_cost_currency": "USD",
+    "repeated_file_reads": 0,
+    "repo_file_reads": 7,
+    "repo_searches": 2,
+    "retries": 0,
+    "unreliable_metrics": [],
+    "usage_source": "model_usage_totals",
+    "usage_unit": "token"
+  },
+  "version": 1,
+  "working_tree_clean": true
+}

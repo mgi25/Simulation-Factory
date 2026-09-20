@@ -1,0 +1,60 @@
+{
+  "activation_id": "pilot-activation-discovery-e2e",
+  "envelope": {
+    "envelope_id": "pilot-envelope-discovery-e2e",
+    "objective": "Improve the reliability, maintainability, or operating efficiency of the Company OS by completing ONE genuinely useful engineering improvement chosen by the company itself.",
+    "plan": {
+      "objective_id": "obj-discovery-e2e-pilot-2026-09-20",
+      "budget": {
+        "amount": "6",
+        "currency": "USD"
+      },
+      "budget_scope": "engineering-operations",
+      "risk_ceiling": "medium",
+      "deadline": "2026-12-31",
+      "allowed_departments": [
+        "engineering"
+      ],
+      "forbidden_actions": [],
+      "success_metrics": [
+        "one genuinely useful engineering improvement completed",
+        "zero new test regressions"
+      ],
+      "reporting_cadence": "on_exception"
+    },
+    "allowed_actions": [
+      "approve_code_change",
+      "approve_integration_merge",
+      "approve_review_outcome",
+      "approve_test_progression",
+      "approve_work_order",
+      "request_bounded_correction",
+      "stop_work_on_invalid_premise"
+    ],
+    "integration_target": {
+      "target_id": "pilot-internal-integration",
+      "kind": "internal_branch",
+      "branch": "company-os-v1-delegated-engineering-pilot-integration",
+      "rationale": "an internal branch created for this pilot, which no other branch builds on and which is undone completely by deleting it, so that work can be completed and accepted internally without anything leaving the company",
+      "reversible": true,
+      "protects": [
+        "company-os-v1-bootstrap",
+        "main",
+        "master"
+      ]
+    },
+    "expires_on": "2026-12-31",
+    "authorized_by": "MGI (CEO)",
+    "max_corrections_per_work_order": 1,
+    "success_criteria": [],
+    "notes": "",
+    "version": "pilot_envelope_v1"
+  },
+  "activated_by": "MGI (CEO)",
+  "activated_on": "2026-09-20",
+  "acknowledged_live": true,
+  "mode": "live_pilot",
+  "policy_version": "delegation_policy_v1",
+  "notes": "One objective, one pilot. Authorizes routine engineering management approval and internal integration only.",
+  "version": "delegated_engineering_pilot_v1"
+}

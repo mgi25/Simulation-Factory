@@ -1,0 +1,229 @@
+{
+  "brief": null,
+  "decision": null,
+  "discovery": null,
+  "eligibility": [
+    {
+      "candidate_id": "auth-migration-classifier-ambiguity",
+      "eligible": false,
+      "failed": [
+        "status_open"
+      ],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "status_open: status is completed"
+      ]
+    },
+    {
+      "candidate_id": "deployment-policy-gap",
+      "eligible": false,
+      "failed": [
+        "status_open",
+        "risk_within_ceiling"
+      ],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "status_open: status is blocked (a CEO policy decision: Company OS has no deployment policy to delegate against, and inventing one in code would be the delegation model widening itself)",
+        "risk_within_ceiling: high risk exceeds the envelope ceiling of medium"
+      ]
+    },
+    {
+      "candidate_id": "gate-architecture-subsystem_ownership_bounded",
+      "eligible": true,
+      "failed": [],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "status_open",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": []
+    },
+    {
+      "candidate_id": "intake-unfalsifiable-acceptance-criteria",
+      "eligible": false,
+      "failed": [
+        "status_open"
+      ],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "status_open: status is completed"
+      ]
+    },
+    {
+      "candidate_id": "provider-usage-event-identifier",
+      "eligible": false,
+      "failed": [
+        "department_permitted",
+        "status_open"
+      ],
+      "passed": [
+        "capsule_owned",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "department_permitted: ai_platform is not among the envelope's departments (engineering)",
+        "status_open: status is blocked (a design decision nobody has taken: no existing field is a stable per-event id, so this needs a schema change, and schema or storage migration is outside routine engineering)"
+      ]
+    },
+    {
+      "candidate_id": "reserved-screening-negation-blindness",
+      "eligible": true,
+      "failed": [],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "status_open",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": []
+    },
+    {
+      "candidate_id": "runner-blocked-attempt-repo-dir",
+      "eligible": false,
+      "failed": [
+        "capsule_owned"
+      ],
+      "passed": [
+        "department_permitted",
+        "status_open",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "capsule_owned: no confirmed capsule owns tools-engineering-runner; work whose owner the company cannot name has no declared scope, tests or invariants to be reviewed against"
+      ]
+    },
+    {
+      "candidate_id": "runner-zero-required-tests-policy",
+      "eligible": false,
+      "failed": [
+        "capsule_owned",
+        "status_open"
+      ],
+      "passed": [
+        "department_permitted",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "capsule_owned: no confirmed capsule owns tools-engineering-runner; work whose owner the company cannot name has no declared scope, tests or invariants to be reviewed against",
+        "status_open: status is blocked (a policy decision about what evidence a receipt must carry when the work order declares no tests)"
+      ]
+    }
+  ],
+  "run": {
+    "authority_source": "CEO objective envelope, one pilot only, no standing grant",
+    "budget": {
+      "amount": "6",
+      "currency": "USD"
+    },
+    "choice": null,
+    "decision_reason": "one eligible candidate: selected deterministically, at no model cost",
+    "department": "engineering",
+    "discovered_candidate_ids": [
+      "gate-architecture-subsystem_ownership_bounded"
+    ],
+    "discovery_envelope_id": "disc-discovery-e2e-pilot",
+    "discovery_rejected": [],
+    "discovery_requested": true,
+    "discovery_surfaces": [
+      "validation_report"
+    ],
+    "eligible_candidate_ids": [
+      "gate-architecture-subsystem_ownership_bounded",
+      "reserved-screening-negation-blindness"
+    ],
+    "executable_candidate_ids": [
+      "gate-architecture-subsystem_ownership_bounded"
+    ],
+    "executive_employee": "chief_architect",
+    "executive_seat": "cto",
+    "manager_employee": "engineering_delivery_manager",
+    "manager_seat": "engineering_manager",
+    "model_used": false,
+    "not_executable": [
+      "reserved-screening-negation-blindness: not executable at intake - the objective names credential material: credential"
+    ],
+    "objective_id": "obj-discovery-e2e-pilot-2026-09-20",
+    "objective_intent_digest": "7d93ea32fe279e0d",
+    "outcome": "selected",
+    "planning_cost": null,
+    "planning_run_id": "run-discovery-e2e-pilot",
+    "policy_fingerprint": "895f19c8dd8885f0",
+    "policy_version": "delegation_policy_v1",
+    "recorded_on": "2026-09-20",
+    "refusal": "",
+    "rejected_candidates": [
+      "auth-migration-classifier-ambiguity: status_open",
+      "deployment-policy-gap: status_open, risk_within_ceiling",
+      "intake-unfalsifiable-acceptance-criteria: status_open",
+      "provider-usage-event-identifier: department_permitted, status_open",
+      "runner-blocked-attempt-repo-dir: capsule_owned",
+      "runner-zero-required-tests-policy: capsule_owned, status_open"
+    ],
+    "risk": "low",
+    "selected_candidate_id": "gate-architecture-subsystem_ownership_bounded",
+    "selection_reason": "gate-architecture-subsystem_ownership_bounded is the only candidate that passes every constraint and can actually be started (2 passed eligibility, 1 of those is executable), so the choice is arithmetic and no planning session was opened",
+    "session": null,
+    "version": 1,
+    "viability_assessed": true
+  }
+}

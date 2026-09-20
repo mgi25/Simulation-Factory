@@ -1,0 +1,25 @@
+{
+  "acceptance_criteria": [
+    "Every module named in the finding is listed in the owns_paths of exactly one capsule seed.",
+    "python -m company.integration check --repo-root . reports architecture.subsystem_ownership_bounded as passing.",
+    "No module is claimed by two capsules."
+  ],
+  "authorized_branch": "eng-capsule-ownership",
+  "base_commit": "f20254f98ad85f49187b909f252eec6839c7dd63",
+  "candidate_id": "gate-architecture-subsystem_ownership_bounded",
+  "capsule_hints": [
+    "company-knowledge-capsules"
+  ],
+  "notes": "derived from candidate gate-architecture-subsystem_ownership_bounded by planning decision plan-obj-discovery-e2e-pilot-2026-09-20",
+  "objective": "Declare capsule ownership for the modules no capsule claims",
+  "planning_decision_id": "plan-obj-discovery-e2e-pilot-2026-09-20",
+  "request_id": "wo-gate-architecture-subsystem_ownership_bounded",
+  "requested_by": "engineering_delivery_manager",
+  "requested_on": "2026-09-20",
+  "resource_profile": "consumer",
+  "reversible": true,
+  "risk": "low",
+  "scope_ceiling": [
+    "knowledge/company_os/capsules/seeds"
+  ]
+}

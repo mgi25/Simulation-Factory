@@ -1,0 +1,63 @@
+{
+  "changed_paths_reviewed": [
+    "knowledge/company_os/capsules/seeds/company-knowledge-capsules.json",
+    "knowledge/company_os/capsules/seeds/company-knowledge-store.json",
+    "knowledge/company_os/capsules/seeds/company-workforce-employment.json"
+  ],
+  "criteria": [
+    {
+      "criterion": "Every module named in the finding is listed in the owns_paths of exactly one capsule seed.",
+      "evidence_ref": "knowledge/company_os/capsules/seeds/company-workforce-employment.json:57-68 (+4 paths), company-knowledge-store.json:52-53 (+2 paths), company-knowledge-capsules.json:55 (+1 path)",
+      "satisfied": true
+    },
+    {
+      "criterion": "python -m company.integration check --repo-root . reports architecture.subsystem_ownership_bounded as passing.",
+      "evidence_ref": "commit:020de2945683c27299152ece1a992891c79e3b7e; runner receipt invariants_preserved[3]: architecture.subsystem_ownership_bounded: PASS",
+      "satisfied": true
+    },
+    {
+      "criterion": "No module is claimed by two capsules.",
+      "evidence_ref": "knowledge/company_os/capsules/seeds/ \u2014 grep for all 7 added paths returns exactly one file each; runner receipt: index.integrity() returned 0 problems",
+      "satisfied": true
+    }
+  ],
+  "evidence": [
+    "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-discovery-pilot-runner\\runs\\wo-wo-gate-architecture-subsystem_ownership_boun-5593bc5ad26e\\run-000001\\reviewer-01\\diff.patch",
+    "knowledge/company_os/capsules/seeds/company-workforce-employment.json",
+    "knowledge/company_os/capsules/seeds/company-knowledge-store.json",
+    "knowledge/company_os/capsules/seeds/company-knowledge-capsules.json",
+    "knowledge/company_os/capsules/seeds/company-workforce-capabilities.json",
+    "knowledge/company_os/capsules/seeds/company-workforce-hiring.json",
+    "knowledge/company_os/capsules/index.py:58-85",
+    "company/integration/checks.py:602-647",
+    "company/integration/sources.py:45",
+    "tests/test_company_os_capsules.py:675-686",
+    "commit:020de2945683c27299152ece1a992891c79e3b7e"
+  ],
+  "findings": [
+    {
+      "deterministic": false,
+      "evidence_ref": "knowledge/company_os/capsules/seeds/company-knowledge-capsules.json:55; tests/test_company_os_capsules.py:683-685",
+      "finding_id": "intelligence-init-semantic-mismatch",
+      "severity": "advisory",
+      "summary": "intelligence/__init__.py is assigned to company-knowledge-capsules for test-constraint reasons, not semantic ones; the natural owners (company-research-intelligence, company-research-operations) have exact-equality assertions that bar additions."
+    },
+    {
+      "deterministic": false,
+      "evidence_ref": "knowledge/company_os/capsules/seeds/company-workforce-employment.json:57-62",
+      "finding_id": "workforce-shared-utils-single-owner",
+      "severity": "advisory",
+      "summary": "The four shared workforce utility files (common.py, errors.py, __init__.py, __main__.py) are used equally by all three workforce capsules but are now exclusively owned by company-workforce-employment."
+    }
+  ],
+  "notes": "All three changed files are within the authorized path (knowledge/company_os/capsules/seeds). The 7 newly claimed paths correspond to real files confirmed present in the worktree. The reordering of existing paths in company-workforce-employment (alphabetical sort) is cosmetic and not a defect. The two advisory findings were already disclosed by the implementer and do not block acceptance; they are semantic preferences for future work when the test-suite guards on company-research-intelligence are relaxed.",
+  "packet_fingerprint": "e923a9faccce333b",
+  "receipt_fingerprint": "1ab3138c6b97f6a9",
+  "review_id": "rev-wo-wo-gate-architecture-subsystem_ownership_bounded-01",
+  "reviewed_on": "2026-09-20",
+  "reviewer": "software_review_engineer",
+  "verdict": "pass",
+  "version": 1,
+  "work_order_fingerprint": "50ee3cc8acb9d793",
+  "work_order_id": "wo-wo-gate-architecture-subsystem_ownership_bounded"
+}

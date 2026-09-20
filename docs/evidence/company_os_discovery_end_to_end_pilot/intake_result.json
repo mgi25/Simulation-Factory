@@ -1,0 +1,233 @@
+{
+  "derivation": {
+    "authorized_paths": [
+      "knowledge/company_os/capsules/seeds"
+    ],
+    "ceiling_applied": [
+      "knowledge/company_os/capsules/seeds"
+    ],
+    "context_refs_considered": 2,
+    "context_refs_dropped": [
+      "test:tests/test_company_os_capsules.py: tests/test_company_os_capsules.py is outside the authorized scope"
+    ],
+    "context_refs_kept": 1,
+    "criteria_derived": false,
+    "escalation": "none",
+    "forbidden_paths": [
+      "ai_platform/README.md",
+      "company/runtime",
+      "company/validation"
+    ],
+    "matched_tokens": [
+      "capsule",
+      "claims",
+      "declare",
+      "modules",
+      "ownership"
+    ],
+    "novel": false,
+    "owns_paths": [
+      "knowledge/company_os/capsules",
+      "tests/test_company_os_capsules.py"
+    ],
+    "reasoning_class_ceiling": "D",
+    "required_tests": [
+      "tests/test_company_os_capsules.py"
+    ],
+    "resource_profile": "consumer",
+    "selected_capsule_ids": [
+      "company-knowledge-capsules"
+    ],
+    "selection_reasons": [
+      "company-knowledge-capsules: requested by id"
+    ],
+    "specialist_domain": "",
+    "specialist_reason": "the objective names no security, governance, architecture or concurrency work and the risk is not high, so this is routine implementation",
+    "unscreened_reserved_actions": []
+  },
+  "outcome": "authorized",
+  "persisted": {
+    "job": {
+      "fingerprint": "6721fa9c0ae1dc5a",
+      "record_ref": "engineering/jobs/wo-wo-gate-architecture-subsystem_ownership_boun-5593bc5ad26e/000001.json",
+      "sequence": 1
+    },
+    "plan": {
+      "fingerprint": "adf5ae66a396673b",
+      "record_ref": "engineering/plans/wo-wo-gate-architecture-subsystem_ownership_boun-5593bc5ad26e/000001.json",
+      "sequence": 1
+    },
+    "request": {
+      "fingerprint": "35e5b1c15ef97cd9",
+      "record_ref": "engineering/requests/wo-gate-architecture-subsystem_ownership_bounded-0e0193cc72cc/000001.json",
+      "sequence": 1
+    },
+    "work_order": {
+      "fingerprint": "50ee3cc8acb9d793",
+      "record_ref": "engineering/work_orders/wo-wo-gate-architecture-subsystem_ownership_boun-5593bc5ad26e/000001.json",
+      "sequence": 1
+    }
+  },
+  "plan": {
+    "notes": [
+      "Derived deterministically from the work order; a developer may take a better route inside the same authorized scope."
+    ],
+    "proposed_by": "company-os intake",
+    "proposed_on": "2026-09-20",
+    "steps": [
+      {
+        "action": "Read the authorized paths and the capsule contract they belong to before changing anything: knowledge/company_os/capsules/seeds",
+        "step_id": "inspect",
+        "touches": [
+          "knowledge/company_os/capsules/seeds"
+        ],
+        "writes": false
+      },
+      {
+        "action": "Identify the smallest contract that the objective is missing, and state it before implementing it",
+        "step_id": "locate-contract",
+        "touches": [
+          "knowledge/company_os/capsules/seeds"
+        ],
+        "writes": false
+      },
+      {
+        "action": "Implement the smallest compatible change inside the authorized paths",
+        "step_id": "implement",
+        "touches": [
+          "knowledge/company_os/capsules/seeds"
+        ],
+        "writes": true
+      },
+      {
+        "action": "Write focused tests for the new behaviour and for each acceptance criterion",
+        "step_id": "test",
+        "touches": [
+          "knowledge/company_os/capsules/seeds"
+        ],
+        "writes": true
+      },
+      {
+        "action": "Run the affected suites and report every result: tests/test_company_os_capsules.py",
+        "step_id": "run-suites",
+        "touches": [
+          "tests/test_company_os_capsules.py"
+        ],
+        "writes": false
+      },
+      {
+        "action": "Run the existing integration gate over the checkout and keep its report as evidence; do not modify the gate",
+        "step_id": "gate-evidence",
+        "touches": [],
+        "writes": false
+      },
+      {
+        "action": "Return a receipt naming the changed paths, the commit, the pushed branch and one evidence reference per acceptance criterion",
+        "step_id": "review-evidence",
+        "touches": [],
+        "writes": false
+      }
+    ],
+    "version": 1,
+    "work_order_fingerprint": "50ee3cc8acb9d793",
+    "work_order_id": "wo-wo-gate-architecture-subsystem_ownership_bounded"
+  },
+  "state": "planning",
+  "work_order": {
+    "acceptance_criteria": [
+      "Every module named in the finding is listed in the owns_paths of exactly one capsule seed.",
+      "python -m company.integration check --repo-root . reports architecture.subsystem_ownership_bounded as passing.",
+      "No module is claimed by two capsules."
+    ],
+    "authorized_branch": "eng-capsule-ownership",
+    "authorized_on": "2026-09-20",
+    "authorized_paths": [
+      "knowledge/company_os/capsules/seeds"
+    ],
+    "base_commit": "f20254f98ad85f49187b909f252eec6839c7dd63",
+    "constraints": [],
+    "context_refs": [
+      {
+        "digest": "",
+        "kind": "module_contract",
+        "reason": "requested by id",
+        "ref": "capsule:company-knowledge-capsules",
+        "span": null
+      }
+    ],
+    "escalation": "none",
+    "evidence_refs": [],
+    "evidence_required": true,
+    "forbidden_paths": [
+      "ai_platform/README.md",
+      "company/runtime",
+      "company/validation"
+    ],
+    "implementation_capabilities": [
+      "software_implementation"
+    ],
+    "max_developer_attempts": 1,
+    "novel": false,
+    "objective": "Declare capsule ownership for the modules no capsule claims",
+    "protected": {
+      "entries": [
+        {
+          "digest": "ae5ddf1e644b7cfb",
+          "path": "ai_platform/policy.py"
+        },
+        {
+          "digest": "9fcf0d0a247f399f",
+          "path": "company/agent_contract.schema.yaml"
+        },
+        {
+          "digest": "2d2d1b113ad24120",
+          "path": "company/constitution.md"
+        },
+        {
+          "digest": "61323b6733ff903f",
+          "path": "company/integration/checks.py"
+        },
+        {
+          "digest": "038f13858cd70293",
+          "path": "company/integration/policy.py"
+        },
+        {
+          "digest": "a46792dc96a5e2b9",
+          "path": "company/integration/suites.py"
+        },
+        {
+          "digest": "84e71fb6dc232d3a",
+          "path": "company/org_registry.yaml"
+        },
+        {
+          "digest": "404c997d12af4812",
+          "path": "company/permissions.yaml"
+        },
+        {
+          "digest": "f450b38af19435e0",
+          "path": "company/task_handoff.schema.yaml"
+        },
+        {
+          "digest": "3e20803fabf596b4",
+          "path": "company/validation/no_subagents.py"
+        }
+      ]
+    },
+    "reasoning_class_ceiling": "D",
+    "repository": "Simulation Factory",
+    "request_id": "wo-gate-architecture-subsystem_ownership_bounded",
+    "requested_by": "engineering_delivery_manager",
+    "required_tests": [
+      "tests/test_company_os_capsules.py"
+    ],
+    "resource_profile": "consumer",
+    "reversible": true,
+    "review_capability": "code_review",
+    "risk": "low",
+    "specialist_domain": "",
+    "version": 1,
+    "work_order_id": "wo-wo-gate-architecture-subsystem_ownership_bounded"
+  },
+  "work_order_fingerprint": "50ee3cc8acb9d793",
+  "work_order_id": "wo-wo-gate-architecture-subsystem_ownership_bounded"
+}

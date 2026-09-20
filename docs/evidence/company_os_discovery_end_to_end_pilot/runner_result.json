@@ -1,0 +1,61 @@
+{
+  "acceptance_criteria": [
+    "Every module named in the finding is listed in the owns_paths of exactly one capsule seed.",
+    "python -m company.integration check --repo-root . reports architecture.subsystem_ownership_bounded as passing.",
+    "No module is claimed by two capsules."
+  ],
+  "authorized_on": "2026-09-20",
+  "authorized_paths": [
+    "knowledge/company_os/capsules/seeds"
+  ],
+  "authorizes_merge": false,
+  "branch": "eng-capsule-ownership",
+  "changed_files": [
+    "knowledge/company_os/capsules/seeds/company-knowledge-capsules.json",
+    "knowledge/company_os/capsules/seeds/company-knowledge-store.json",
+    "knowledge/company_os/capsules/seeds/company-workforce-employment.json"
+  ],
+  "commit_sha": "020de2945683c27299152ece1a992891c79e3b7e",
+  "decisions_required": [],
+  "developer_attempts": 1,
+  "developer_attempts_remaining": 0,
+  "evidence_refs": [],
+  "gate_blockers": [],
+  "gate_readiness": "ready",
+  "gate_report_id": "integration-readiness-2026-09-20-08bb68c591f013cf",
+  "implementation_summary": "Added 7 unclaimed Company OS modules to the owns_paths of 3 existing capsule seeds. The 4 company/workforce shared files (common.py, errors.py, __init__.py, __main__.py) went to company-workforce-employment; knowledge/__init__.py and knowledge/company_os/__init__.py went to company-knowledge-store; intelligence/__init__.py went to company-knowledge-capsules because the two natural owners (company-research-intelligence and company-research-operations) both have exact-match test assertions that prohibit additions to their owns_paths.",
+  "implementer": "software_implementation_engineer",
+  "merge_performed": false,
+  "not_an_approval": "READY FOR CEO APPROVAL is a request to be read, not an approval. Nothing here merges, deploys or publishes, and Company OS holds no capability to.",
+  "objective": "Declare capsule ownership for the modules no capsule claims",
+  "persisted": {
+    "fingerprint": "fdd988eea3265ee2",
+    "record_ref": "engineering/results/wo-wo-gate-architecture-subsystem_ownership_boun-5593bc5ad26e/000001.json",
+    "sequence": 1
+  },
+  "remote_verified": true,
+  "requested_by": "engineering_delivery_manager",
+  "review_findings": [
+    "[advisory] intelligence-init-semantic-mismatch: intelligence/__init__.py is assigned to company-knowledge-capsules for test-constraint reasons, not semantic ones; the natural owners (company-research-intelligence, company-research-operations) have exact-equality assertions that bar additions.",
+    "[advisory] workforce-shared-utils-single-owner: The four shared workforce utility files (common.py, errors.py, __init__.py, __main__.py) are used equally by all three workforce capsules but are now exclusively owned by company-workforce-employment."
+  ],
+  "review_outcome": "pass",
+  "reviewer": "software_review_engineer",
+  "risks": [
+    "intelligence/__init__.py is assigned to company-knowledge-capsules for constraint reasons, not semantic ones. A reviewer may prefer a different placement once the test-suite guard on company-research-intelligence is relaxed.",
+    "company-workforce-employment now owns all 4 workforce shared-utility files (common.py, errors.py, __init__.py, __main__.py). These files are used equally by all three workforce capsules; a future reviewer might prefer a dedicated shared-utilities capsule."
+  ],
+  "status": "ready_for_approval",
+  "tests": [
+    {
+      "command": "tests/test_company_os_capsules.py",
+      "passed": true,
+      "scope": "targeted",
+      "summary": "66 passed in 0.27s"
+    }
+  ],
+  "unanswered_criteria": [],
+  "version": 1,
+  "work_order_fingerprint": "50ee3cc8acb9d793",
+  "work_order_id": "wo-wo-gate-architecture-subsystem_ownership_bounded"
+}

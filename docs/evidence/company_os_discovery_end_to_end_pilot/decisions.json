@@ -1,0 +1,61 @@
+{
+  "objective_id": "obj-discovery-e2e-pilot-2026-09-20",
+  "work_order_id": "wo-wo-gate-architecture-subsystem_ownership_bounded",
+  "activation_id": "pilot-activation-discovery-e2e",
+  "envelope_id": "pilot-envelope-discovery-e2e",
+  "integration_target": "company-os-v1-delegated-engineering-pilot-integration",
+  "decisions": [
+    {
+      "action": "approve_code_change",
+      "raised_by_seat": "software_implementation_engineer",
+      "risk": "low",
+      "decided_by": "engineering_manager",
+      "decision": "approved",
+      "authorizes_action": true,
+      "ceo_required": false,
+      "reason": "engineering_manager holds live authority for approve_code_change at low risk inside the activated envelope, and every pilot gate held (9 checked)",
+      "gates_failed": [],
+      "summary": "accept the capsule-ownership change at 020de294"
+    },
+    {
+      "action": "approve_test_progression",
+      "raised_by_seat": "software_implementation_engineer",
+      "risk": "low",
+      "decided_by": "engineering_manager",
+      "decision": "approved",
+      "authorizes_action": true,
+      "ceo_required": false,
+      "reason": "engineering_manager holds live authority for approve_test_progression at low risk inside the activated envelope, and every pilot gate held (9 checked)",
+      "gates_failed": [],
+      "summary": "11/11 required suites green"
+    },
+    {
+      "action": "approve_review_outcome",
+      "raised_by_seat": "engineering_reviewer",
+      "risk": "low",
+      "decided_by": "engineering_manager",
+      "decision": "approved",
+      "authorizes_action": true,
+      "ceo_required": false,
+      "reason": "engineering_manager holds live authority for approve_review_outcome at low risk inside the activated envelope, and every pilot gate held (10 checked)",
+      "gates_failed": [],
+      "summary": "software_review_engineer returned pass with one advisory finding"
+    },
+    {
+      "action": "approve_integration_merge",
+      "raised_by_seat": "engineering_manager",
+      "risk": "medium",
+      "decided_by": "cto",
+      "decision": "approved",
+      "authorizes_action": true,
+      "ceo_required": false,
+      "reason": "cto holds live authority for approve_integration_merge at medium risk inside the activated envelope, and every pilot gate held (12 checked)",
+      "gates_failed": [],
+      "summary": "integrate into the isolated pilot target"
+    }
+  ],
+  "ceo_required_anywhere": false,
+  "management_decisions_by_engineering_manager": 3,
+  "integration_decided_by": "cto",
+  "all_authorized": true
+}
