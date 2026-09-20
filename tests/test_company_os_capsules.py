@@ -776,3 +776,9 @@ def test_the_policy_capsule_states_the_rule_and_points_at_the_fact(seeds):
     assert "bootstrap-forbids-nested-agents" in policy.facts
     assert any("subagent" in invariant for invariant in policy.invariants)
     assert KnowledgeStore(DEFAULT_ROOT).get("fact", "bootstrap-forbids-nested-agents")
+
+
+def test_the_executive_delegation_capsule_pins_the_planning_suites(seeds):
+    delegation = seeds.get("company-executive-delegation")
+    assert "tests/test_company_objective_planning.py" in delegation.tests
+    assert "tests/test_company_executive_planning.py" in delegation.tests

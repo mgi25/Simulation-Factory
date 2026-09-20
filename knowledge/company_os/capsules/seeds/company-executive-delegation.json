@@ -26,7 +26,7 @@
   "freshness": "slow_changing",
   "id": "company-executive-delegation",
   "inputs": [
-    "company/delegation_policy.yaml: seats, grants, budget ladder, autonomy, functional authority",
+    "company/delegation_policy.yaml: seats, grants, budget ladder, autonomy, authority",
     "company/org_registry.yaml and company/permissions.yaml, supplied by the caller",
     "One AuthorityRequest: action, seat, department, risk, amount, implementer, reviewer",
     "An ExceptionContext the caller fills from the job, review and gate it already holds"
@@ -39,7 +39,7 @@
     "Escalation stops at the lowest sufficient seat; a dormant, restricted or vacant seat decides nothing.",
     "A subordinate grant may not exceed its escalation target on risk or budget; authority is granted, never taken.",
     "An unknown budget ceiling escalates; sibling ceilings may not sum past their parent.",
-    "Money escalates through the CFO on a functional chain, because no reporting line passes through it."
+    "Money escalates through the CFO on a functional chain; no reporting line passes through it."
   ],
   "last_reviewed": "2026-09-20",
   "may_read": [
@@ -78,16 +78,18 @@
   "recheck_on": "2027-09-20",
   "revalidation_reason": "",
   "risks": [
-    "Nine of thirteen employees are dormant, so most department paths still collapse onto the COO.",
-    "The two new seats have decided nothing real; five replayed jobs are validation, not a burn-in.",
-    "Deployment is modelled and granted to nobody; a policy is not an activation.",
-    "Scenarios are transcribed from reports on other branches, not read from a store."
+    "Nine of thirteen employees are dormant; most department paths collapse onto the COO.",
+    "Two new seats have decided nothing real; five replayed jobs are validation, not burn-in.",
+    "Deployment is modelled and granted to nobody; a policy is not activation.",
+    "Scenarios from branch reports, not read from a store."
   ],
   "source": "company-os-v1-management-staffing-shadow",
   "source_digests": [],
   "status": "active",
   "tests": [
-    "tests/test_company_delegation.py"
+    "tests/test_company_delegation.py",
+    "tests/test_company_objective_planning.py",
+    "tests/test_company_executive_planning.py"
   ],
   "title": "Company executive delegation and separation of duties (shadow)",
   "type": "module"
