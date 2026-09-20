@@ -1,0 +1,74 @@
+{
+  "changed_paths_reviewed": [
+    "company/engineering/result.py",
+    "company/engineering/__init__.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "criteria": [
+    {
+      "criterion": "The stated objective is implemented: For one work order, show me which of the paths it was authorized to change the work actually touched, so I can see how much of the scope I granted was used.",
+      "evidence_ref": "company/engineering/result.py:84-129 ScopeUsage + result.py:394-404 SCOPE USAGE render",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The authorized work order is immutable; every later stage carries its fingerprint and refuses a mismatch.",
+      "evidence_ref": "company/engineering/result.py:254-256 scope_usage() reads authorized_paths/changed_files, adds no field",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: A review outcome is the worst of the attested and deterministic verdicts, so a reviewer PASS cannot rescue a failed check.",
+      "evidence_ref": "diff.patch \u2014 no change to review.py or adjudicate()",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The implementer and the reviewer are different employees, routed by disjoint capabilities.",
+      "evidence_ref": "diff.patch \u2014 no change to orchestrator.py or routing logic",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The protected governance surface is digested before the work and re-read at review; a change blocks the job.",
+      "evidence_ref": "diff.patch \u2014 no change to protected.py",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: No state means approved and nothing merges, deploys or publishes; the CEO decision is recorded, not acted on.",
+      "evidence_ref": "company/engineering/result.py:463-465 NOT_AN_APPROVAL still terminates render_text()",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The gate verdict is read from the gate's own report; this subsystem holds no code that can produce one.",
+      "evidence_ref": "diff.patch \u2014 no change to gate_evidence.py",
+      "satisfied": true
+    },
+    {
+      "criterion": "Every declared test passes: tests/test_company_engineering_execution.py",
+      "evidence_ref": "receipt tests[0]: 101 passed in 18.41s",
+      "satisfied": true
+    }
+  ],
+  "evidence": [
+    "diff.patch (full)",
+    "company/engineering/result.py (full, 602 lines)",
+    "company/engineering/__init__.py (full, 213 lines)",
+    "tests/test_company_engineering_execution.py:1486-1608 (scope-usage tests and round-trip neighbourhood)"
+  ],
+  "findings": [
+    {
+      "deterministic": false,
+      "evidence_ref": "tests/test_company_engineering_execution.py:1562-1572",
+      "finding_id": "test-name-vs-behaviour",
+      "severity": "advisory",
+      "summary": "test_scope_usage_matches_file_to_longest_prefix tests first-match semantics, not longest-prefix; the name is misleading but the body and comment are correct."
+    }
+  ],
+  "notes": "ScopeUsage is frozen, computed at call time from existing fields, and not serialised \u2014 so the EngineeringResult fingerprint is unchanged and `from_mapping` round-trips are unaffected. The feature is confined to one new dataclass, one method and one render block. The unresolved risk (files outside all authorized paths are invisible in the scope section) is real but low-impact: the IMPLEMENTATION section already lists every changed file, so a reader can cross-reference.",
+  "packet_fingerprint": "3c16acc80bf8435c",
+  "receipt_fingerprint": "34501f387bb08279",
+  "review_id": "rev-wo-scope-usage-01",
+  "reviewed_on": "2026-09-18",
+  "reviewer": "chief_architect",
+  "verdict": "pass",
+  "version": 1,
+  "work_order_fingerprint": "8d57bdf95a8685de",
+  "work_order_id": "wo-scope-usage"
+}

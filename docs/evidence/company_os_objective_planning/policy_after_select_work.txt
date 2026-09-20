@@ -1,0 +1,37 @@
+policy delegation_policy_v1 mode=shadow fingerprint=1b7730a416527756
+
+SEATS
+  ai_platform_lead                   active          up to 10 USD
+  analytics_lead                     dormant         up to 4 USD
+  ceo                                external_human  no grant
+  cfo                                active          up to 50 USD
+  content_strategy_lead              dormant         up to 6 USD
+  coo                                active          up to 50 USD
+  cto                                active          up to 40 USD
+  deterministic_qa                   vacant          no grant
+  engineering_manager                active          up to 25 USD
+  integration_gate                   vacant          no grant
+  people_lead                        dormant         up to 2 USD
+  production_lead                    dormant         up to 5 USD
+  research_lead                      dormant         up to 6 USD
+  simulation_physics_engineer        dormant         no grant
+  software_implementation_engineer   dormant         no grant
+  visual_direction                   dormant         no grant
+
+RESERVED (14)
+  amend_constitution
+  approve_architecture_redesign
+  approve_recurring_paid_api_spend
+  change_company_mission
+  change_delegation_policy
+  change_governance_policy
+  change_no_subagents_policy
+  change_primary_engine
+  delete_production_data
+  drop_content_format
+  expand_authority
+  hire_or_remove_executive_role
+  publish_public_video
+  unclassified
+
+REGISTRY CONFLICTS (0)

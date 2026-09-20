@@ -1,0 +1,68 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "capability_task_classification",
+    "capability_context_manifest",
+    "capability_resource_telemetry",
+    "capability_execution_policy"
+  ],
+  "created": "2026-09-16",
+  "decisions": [
+    "classifier-order-inverts-below-b"
+  ],
+  "dependencies": [],
+  "experiment_learnings": [],
+  "facts": [],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "ai-platform",
+  "inputs": [
+    "TaskSignals describing one task: determinism, risk, reversibility, novelty",
+    "An objective, constraints, acceptance criteria and a list of ContextRefs",
+    "Observed usage units and an outcome, after a session finishes"
+  ],
+  "invariants": [
+    "A reference is one non-empty line under 200 characters; a pasted body is a construction error, not a warning.",
+    "ExecutionPolicy.allows_subagents is never true, and the bootstrap lock needs two keys - leaving bootstrap mode and a named CEO amendment.",
+    "Classification and staleness are pure functions; the clock is read at one store boundary only.",
+    "No provider name, model id or paid-API assumption appears anywhere in the package.",
+    "A manifest with no acceptance criteria fails validate() (Reference superiority)."
+  ],
+  "last_reviewed": "2026-09-16",
+  "may_read": [
+    "ai_platform/**",
+    "docs/company_os_v1_bootstrap.md"
+  ],
+  "may_write": [
+    "ai_platform/*.py"
+  ],
+  "must_not_modify": [
+    "ai_platform/README.md",
+    "company/**",
+    "knowledge/**"
+  ],
+  "outputs": [
+    "A Classification naming a ReasoningClass and the rule that chose it",
+    "A validated ContextManifest with a stable fingerprint and a measurable size",
+    "ResourceUsageRecord and ResourceSummary; utilisation and unused-context reports"
+  ],
+  "owner": "workstream-claude",
+  "owns_paths": [
+    "ai_platform"
+  ],
+  "purpose": "Provider-agnostic task classes A-F and the deterministic classifier over them, the context manifest that carries references and never bodies, resource-usage records, and the execution policy that keeps nested agents unreachable.",
+  "recheck_on": "2027-09-16",
+  "revalidation_reason": "",
+  "risks": [
+    "max_context_refs per reasoning class is a budget chosen by judgment, not a measured ceiling; it constrains count, never the size of what a ref points at.",
+    "The classifier evaluates A and B first, then F, E, D - the inverted order is deliberate and easy to break by adding a rule in the obvious place."
+  ],
+  "source": "company-os-v1-knowledge-capsules",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_os_ai_platform.py"
+  ],
+  "title": "AI platform",
+  "type": "module"
+}

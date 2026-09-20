@@ -1,0 +1,450 @@
+{
+  "budget": {
+    "currency": "USD",
+    "scopes": [
+      {
+        "ceiling": {
+          "amount": "4",
+          "currency": "USD"
+        },
+        "label": "ai-platform",
+        "level": "department",
+        "parent_id": "company-operating",
+        "scope_id": "ai-platform"
+      },
+      {
+        "ceiling": {
+          "amount": "4",
+          "currency": "USD"
+        },
+        "label": "analytics",
+        "level": "department",
+        "parent_id": "company-operating",
+        "scope_id": "analytics"
+      },
+      {
+        "ceiling": {
+          "amount": "50",
+          "currency": "USD"
+        },
+        "label": "Monthly company operating budget",
+        "level": "company",
+        "parent_id": "",
+        "scope_id": "company-operating"
+      },
+      {
+        "ceiling": {
+          "amount": "6",
+          "currency": "USD"
+        },
+        "label": "content",
+        "level": "department",
+        "parent_id": "company-operating",
+        "scope_id": "content"
+      },
+      {
+        "ceiling": {
+          "amount": "5",
+          "currency": "USD"
+        },
+        "label": "eng-routine-work-order",
+        "level": "work_order",
+        "parent_id": "engineering-operations",
+        "scope_id": "eng-routine-work-order"
+      },
+      {
+        "ceiling": {
+          "amount": "22",
+          "currency": "USD"
+        },
+        "label": "engineering",
+        "level": "department",
+        "parent_id": "company-operating",
+        "scope_id": "engineering"
+      },
+      {
+        "ceiling": {
+          "amount": "4",
+          "currency": "USD"
+        },
+        "label": "engineering-architecture",
+        "level": "program",
+        "parent_id": "engineering",
+        "scope_id": "engineering-architecture"
+      },
+      {
+        "ceiling": {
+          "amount": "18",
+          "currency": "USD"
+        },
+        "label": "Routine engineering work orders",
+        "level": "program",
+        "parent_id": "engineering",
+        "scope_id": "engineering-operations"
+      },
+      {
+        "ceiling": {
+          "amount": "1",
+          "currency": "USD"
+        },
+        "label": "executive",
+        "level": "department",
+        "parent_id": "company-operating",
+        "scope_id": "executive"
+      },
+      {
+        "ceiling": {
+          "amount": "2",
+          "currency": "USD"
+        },
+        "label": "people",
+        "level": "department",
+        "parent_id": "company-operating",
+        "scope_id": "people"
+      },
+      {
+        "ceiling": {
+          "amount": "5",
+          "currency": "USD"
+        },
+        "label": "production",
+        "level": "department",
+        "parent_id": "company-operating",
+        "scope_id": "production"
+      },
+      {
+        "ceiling": {
+          "amount": "6",
+          "currency": "USD"
+        },
+        "label": "research",
+        "level": "department",
+        "parent_id": "company-operating",
+        "scope_id": "research"
+      }
+    ]
+  },
+  "grants": [
+    {
+      "action_types": [
+        "approve_code_change",
+        "approve_operating_spend",
+        "approve_test_progression",
+        "stop_work_on_invalid_premise"
+      ],
+      "budget_scope": "ai-platform",
+      "max_risk": "low",
+      "may_request_corrections": true,
+      "may_stop_work": true,
+      "per_decision_ceiling": {
+        "amount": "10",
+        "currency": "USD"
+      },
+      "rationale": "Context, retrieval and telemetry work inside the AI platform budget.",
+      "seat": "ai_platform_lead"
+    },
+    {
+      "action_types": [
+        "approve_content_experiment",
+        "stop_work_on_invalid_premise"
+      ],
+      "budget_scope": "analytics",
+      "max_risk": "low",
+      "may_request_corrections": true,
+      "may_stop_work": true,
+      "per_decision_ceiling": {
+        "amount": "4",
+        "currency": "USD"
+      },
+      "rationale": "Experiment design and measurement inside the analytics budget.",
+      "seat": "analytics_lead"
+    },
+    {
+      "action_types": [
+        "allocate_department_budget",
+        "approve_operating_spend"
+      ],
+      "budget_scope": "company-operating",
+      "max_risk": "medium",
+      "may_request_corrections": true,
+      "may_stop_work": true,
+      "per_decision_ceiling": {
+        "amount": "50",
+        "currency": "USD"
+      },
+      "rationale": "Ordinary operating spend and bounded department allocations.",
+      "seat": "cfo"
+    },
+    {
+      "action_types": [
+        "approve_content_experiment",
+        "stop_work_on_invalid_premise"
+      ],
+      "budget_scope": "content",
+      "max_risk": "low",
+      "may_request_corrections": true,
+      "may_stop_work": true,
+      "per_decision_ceiling": {
+        "amount": "6",
+        "currency": "USD"
+      },
+      "rationale": "Format experiments that do not publish anything.",
+      "seat": "content_strategy_lead"
+    },
+    {
+      "action_types": [
+        "approve_content_experiment",
+        "approve_cross_department_schedule",
+        "approve_operating_spend",
+        "approve_production_render",
+        "approve_research_program",
+        "approve_work_order",
+        "approve_workforce_state_change",
+        "stop_work_on_invalid_premise"
+      ],
+      "budget_scope": "company-operating",
+      "max_risk": "medium",
+      "may_request_corrections": true,
+      "may_stop_work": true,
+      "per_decision_ceiling": {
+        "amount": "50",
+        "currency": "USD"
+      },
+      "rationale": "Cross-department coordination and normal operational continuation.",
+      "seat": "coo"
+    },
+    {
+      "action_types": [
+        "approve_code_change",
+        "approve_integration_merge",
+        "approve_new_dependency",
+        "approve_operating_spend",
+        "approve_review_outcome",
+        "approve_test_progression",
+        "approve_work_order",
+        "request_bounded_correction",
+        "stop_work_on_invalid_premise"
+      ],
+      "budget_scope": "engineering",
+      "max_risk": "medium",
+      "may_request_corrections": true,
+      "may_stop_work": true,
+      "per_decision_ceiling": {
+        "amount": "40",
+        "currency": "USD"
+      },
+      "rationale": "Broader engineering decisions and routine integration within scope.",
+      "seat": "cto"
+    },
+    {
+      "action_types": [
+        "approve_code_change",
+        "approve_review_outcome",
+        "approve_test_progression",
+        "approve_work_order",
+        "request_bounded_correction",
+        "stop_work_on_invalid_premise"
+      ],
+      "budget_scope": "engineering-operations",
+      "max_risk": "low",
+      "may_request_corrections": true,
+      "may_stop_work": true,
+      "per_decision_ceiling": {
+        "amount": "25",
+        "currency": "USD"
+      },
+      "rationale": "Routine low-risk engineering work and bounded corrections.",
+      "seat": "engineering_manager"
+    },
+    {
+      "action_types": [
+        "approve_workforce_state_change",
+        "stop_work_on_invalid_premise"
+      ],
+      "budget_scope": "people",
+      "max_risk": "low",
+      "may_request_corrections": true,
+      "may_stop_work": true,
+      "per_decision_ceiling": {
+        "amount": "2",
+        "currency": "USD"
+      },
+      "rationale": "Non-executive employment-state changes only.",
+      "seat": "people_lead"
+    },
+    {
+      "action_types": [
+        "approve_production_render",
+        "stop_work_on_invalid_premise"
+      ],
+      "budget_scope": "production",
+      "max_risk": "low",
+      "may_request_corrections": true,
+      "may_stop_work": true,
+      "per_decision_ceiling": {
+        "amount": "5",
+        "currency": "USD"
+      },
+      "rationale": "Renders and QC progression. Publishing stays CEO-reserved.",
+      "seat": "production_lead"
+    },
+    {
+      "action_types": [
+        "approve_research_program",
+        "stop_work_on_invalid_premise"
+      ],
+      "budget_scope": "research",
+      "max_risk": "low",
+      "may_request_corrections": true,
+      "may_stop_work": true,
+      "per_decision_ceiling": {
+        "amount": "6",
+        "currency": "USD"
+      },
+      "rationale": "Bounded research programs inside the research budget.",
+      "seat": "research_lead"
+    }
+  ],
+  "mode": "shadow",
+  "policy_fingerprint": "318993f98532b029",
+  "policy_version": "delegation_policy_v1",
+  "registry_conflicts": [
+    "simulation_physics_engineer reports to engineering_manager, which no employee fills; in company/org_registry.yaml its employee simulation_physics_engineer reports to chief_architect",
+    "software_implementation_engineer reports to engineering_manager, which no employee fills; in company/org_registry.yaml its employee software_implementation_engineer reports to chief_architect"
+  ],
+  "reservation_drift": {
+    "ok": true,
+    "released": [],
+    "unmapped": []
+  },
+  "reserved": [
+    "amend_constitution",
+    "approve_architecture_redesign",
+    "approve_recurring_paid_api_spend",
+    "change_company_mission",
+    "change_delegation_policy",
+    "change_governance_policy",
+    "change_no_subagents_policy",
+    "change_primary_engine",
+    "delete_production_data",
+    "drop_content_format",
+    "expand_authority",
+    "hire_or_remove_executive_role",
+    "publish_public_video",
+    "unclassified"
+  ],
+  "seats": [
+    {
+      "authority_cap": 5,
+      "availability": "active",
+      "detail": "ai_efficiency_platform_engineer is active, authority capped at 5",
+      "employment_state": "active",
+      "seat_id": "ai_platform_lead"
+    },
+    {
+      "authority_cap": 0,
+      "availability": "dormant",
+      "detail": "analytics_experiment_scientist is dormant: defined but not running (constitution rule 18), so it decides nothing",
+      "employment_state": "dormant",
+      "seat_id": "analytics_lead"
+    },
+    {
+      "authority_cap": 0,
+      "availability": "external_human",
+      "detail": "the CEO is a human outside the registry; reaching this seat is an escalation, never a delegated approval",
+      "employment_state": "",
+      "seat_id": "ceo"
+    },
+    {
+      "authority_cap": 0,
+      "availability": "vacant",
+      "detail": "no employee fills cfo; creating one is hire_or_remove_executive_role, which is CEO-reserved",
+      "employment_state": "",
+      "seat_id": "cfo"
+    },
+    {
+      "authority_cap": 0,
+      "availability": "dormant",
+      "detail": "creative_format_director is dormant: defined but not running (constitution rule 18), so it decides nothing",
+      "employment_state": "dormant",
+      "seat_id": "content_strategy_lead"
+    },
+    {
+      "authority_cap": 5,
+      "availability": "active",
+      "detail": "studio_coo is active, authority capped at 5",
+      "employment_state": "active",
+      "seat_id": "coo"
+    },
+    {
+      "authority_cap": 5,
+      "availability": "active",
+      "detail": "chief_architect is active, authority capped at 5",
+      "employment_state": "active",
+      "seat_id": "cto"
+    },
+    {
+      "authority_cap": 0,
+      "availability": "vacant",
+      "detail": "no employee fills deterministic_qa; creating one is hire_or_remove_executive_role, which is CEO-reserved",
+      "employment_state": "",
+      "seat_id": "deterministic_qa"
+    },
+    {
+      "authority_cap": 0,
+      "availability": "vacant",
+      "detail": "no employee fills engineering_manager; creating one is hire_or_remove_executive_role, which is CEO-reserved",
+      "employment_state": "",
+      "seat_id": "engineering_manager"
+    },
+    {
+      "authority_cap": 0,
+      "availability": "vacant",
+      "detail": "no employee fills integration_gate; creating one is hire_or_remove_executive_role, which is CEO-reserved",
+      "employment_state": "",
+      "seat_id": "integration_gate"
+    },
+    {
+      "authority_cap": 0,
+      "availability": "dormant",
+      "detail": "hr_org_intelligence_lead is dormant: defined but not running (constitution rule 18), so it decides nothing",
+      "employment_state": "dormant",
+      "seat_id": "people_lead"
+    },
+    {
+      "authority_cap": 0,
+      "availability": "dormant",
+      "detail": "production_qc_lead is dormant: defined but not running (constitution rule 18), so it decides nothing",
+      "employment_state": "dormant",
+      "seat_id": "production_lead"
+    },
+    {
+      "authority_cap": 0,
+      "availability": "dormant",
+      "detail": "research_opportunity_lead is dormant: defined but not running (constitution rule 18), so it decides nothing",
+      "employment_state": "dormant",
+      "seat_id": "research_lead"
+    },
+    {
+      "authority_cap": 0,
+      "availability": "dormant",
+      "detail": "simulation_physics_engineer is dormant: defined but not running (constitution rule 18), so it decides nothing",
+      "employment_state": "dormant",
+      "seat_id": "simulation_physics_engineer"
+    },
+    {
+      "authority_cap": 0,
+      "availability": "dormant",
+      "detail": "software_implementation_engineer is dormant: defined but not running (constitution rule 18), so it decides nothing",
+      "employment_state": "dormant",
+      "seat_id": "software_implementation_engineer"
+    },
+    {
+      "authority_cap": 0,
+      "availability": "dormant",
+      "detail": "visual_cinematography_director is dormant: defined but not running (constitution rule 18), so it decides nothing",
+      "employment_state": "dormant",
+      "seat_id": "visual_direction"
+    }
+  ]
+}

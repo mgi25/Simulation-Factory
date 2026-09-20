@@ -1,0 +1,27 @@
+{
+  "outcome": "accepted",
+  "summary": "Added ScopeUsage dataclass and scope_usage() method to EngineeringResult, plus a SCOPE USAGE section in the CEO render_text() page. For each authorized path the result now shows [USED] or [UNUSED] with file counts, so the CEO can see how much of the granted scope was actually touched. Six new tests cover the feature including exact matches, empty changes, and the render output.",
+  "rejection_reason": "",
+  "invariants_preserved": [
+    "The authorized work order is immutable; ScopeUsage is derived at read time from the existing authorized_paths and changed_files fields, adding no mutable state.",
+    "A review outcome is the worst of the attested and deterministic verdicts; no review logic was changed.",
+    "The implementer and the reviewer are different employees, routed by disjoint capabilities; routing logic was not touched.",
+    "The protected governance surface is digested before the work and re-read at review; protected.py was not modified.",
+    "No state means approved and nothing merges, deploys or publishes; the result still reports and does not act.",
+    "The gate verdict is read from the gate's own report; gate_evidence.py was not modified.",
+    "The fingerprint round-trip test still passes; ScopeUsage is computed, not stored, so the fingerprint is unchanged."
+  ],
+  "unresolved_risks": [
+    "A changed file that falls outside all authorized paths (e.g. from a path scope violation) is not shown under any authorized path in the scope usage section. This is correct behaviour but a reviewer should verify it reads clearly."
+  ],
+  "evidence": [
+    "company/engineering/result.py",
+    "company/engineering/__init__.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "context_refs_used": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "notes": "ScopeUsage is a frozen dataclass with a from_result() classmethod. It uses first-match prefix semantics: a changed file is assigned to the first authorized path it falls under (authorized_paths are sorted, so shortest prefixes come first). The feature adds no new dependencies and no stored state."
+}

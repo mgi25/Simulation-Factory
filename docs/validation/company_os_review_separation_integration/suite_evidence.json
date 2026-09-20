@@ -1,0 +1,324 @@
+{
+  "results": [
+    {
+      "suite": "tests/test_company_analytics.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 160
+    },
+    {
+      "suite": "tests/test_company_context_assembly.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 9
+    },
+    {
+      "suite": "tests/test_company_context_expansion.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 17
+    },
+    {
+      "suite": "tests/test_company_dashboard.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 32
+    },
+    {
+      "suite": "tests/test_company_delegation.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 152
+    },
+    {
+      "suite": "tests/test_company_efficiency.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 67
+    },
+    {
+      "suite": "tests/test_company_engineering_execution.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 182
+    },
+    {
+      "suite": "tests/test_company_execution_transport.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 14
+    },
+    {
+      "suite": "tests/test_company_executive_planning.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 72
+    },
+    {
+      "suite": "tests/test_company_external_engineering_runner.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 36
+    },
+    {
+      "suite": "tests/test_company_finance.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 123
+    },
+    {
+      "suite": "tests/test_company_finance_usage_cost.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 48
+    },
+    {
+      "suite": "tests/test_company_integration_gate.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 88
+    },
+    {
+      "suite": "tests/test_company_objective_planning.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 93
+    },
+    {
+      "suite": "tests/test_company_org_intelligence.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 119
+    },
+    {
+      "suite": "tests/test_company_os_ai_platform.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 46
+    },
+    {
+      "suite": "tests/test_company_os_capsules.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 66
+    },
+    {
+      "suite": "tests/test_company_os_knowledge.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 26
+    },
+    {
+      "suite": "tests/test_company_os_research.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 81
+    },
+    {
+      "suite": "tests/test_company_os_research_batches.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 118
+    },
+    {
+      "suite": "tests/test_company_os_research_ingestion.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 122
+    },
+    {
+      "suite": "tests/test_company_review_separation.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 32
+    },
+    {
+      "suite": "tests/test_company_runtime.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 22
+    },
+    {
+      "suite": "tests/test_company_runtime_integration.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 14
+    },
+    {
+      "suite": "tests/test_company_session_execution.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 48
+    },
+    {
+      "suite": "tests/test_company_workforce.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 93
+    },
+    {
+      "suite": "tests/test_company_youtube_connectivity.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 29
+    },
+    {
+      "suite": "tests/test_company_youtube_end_to_end.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 7
+    },
+    {
+      "suite": "tests/test_company_youtube_live_findings.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 55
+    },
+    {
+      "suite": "tests/test_company_youtube_studio_ingestion.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 142
+    },
+    {
+      "suite": "tests/test_external_engineering_runner.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 7
+    },
+    {
+      "suite": "tests/test_youtube_fetch.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated canonical integration candidate: review separation + classifier fix + authority audit",
+      "company_os": true,
+      "selected": 2
+    }
+  ]
+}

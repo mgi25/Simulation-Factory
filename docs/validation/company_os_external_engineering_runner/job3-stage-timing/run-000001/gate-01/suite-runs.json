@@ -1,0 +1,235 @@
+{
+  "runs": [
+    {
+      "argv": [
+        "C:\\Users\\mgial\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_company_analytics.py",
+        "-q",
+        "--no-header"
+      ],
+      "command": "tests/test_company_analytics.py",
+      "commit": "ae703ff78e1c6d48f2f718bf2fea4ab7225b8174",
+      "duration_s": 8.535,
+      "errors": 0,
+      "exit_code": 0,
+      "failed": 0,
+      "green": true,
+      "passed": 160,
+      "skipped": 0,
+      "summary": "160 passed in 2.53s",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "C:\\Users\\mgial\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_company_dashboard.py",
+        "-q",
+        "--no-header"
+      ],
+      "command": "tests/test_company_dashboard.py",
+      "commit": "ae703ff78e1c6d48f2f718bf2fea4ab7225b8174",
+      "duration_s": 3.285,
+      "errors": 0,
+      "exit_code": 0,
+      "failed": 0,
+      "green": true,
+      "passed": 32,
+      "skipped": 0,
+      "summary": "32 passed in 0.97s",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "C:\\Users\\mgial\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_company_execution_transport.py",
+        "-q",
+        "--no-header"
+      ],
+      "command": "tests/test_company_execution_transport.py",
+      "commit": "ae703ff78e1c6d48f2f718bf2fea4ab7225b8174",
+      "duration_s": 2.877,
+      "errors": 0,
+      "exit_code": 0,
+      "failed": 0,
+      "green": true,
+      "passed": 7,
+      "skipped": 0,
+      "summary": "7 passed in 0.63s",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "C:\\Users\\mgial\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_company_finance.py",
+        "-q",
+        "--no-header"
+      ],
+      "command": "tests/test_company_finance.py",
+      "commit": "ae703ff78e1c6d48f2f718bf2fea4ab7225b8174",
+      "duration_s": 3.954,
+      "errors": 0,
+      "exit_code": 0,
+      "failed": 0,
+      "green": true,
+      "passed": 123,
+      "skipped": 0,
+      "summary": "123 passed in 1.24s",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "C:\\Users\\mgial\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_company_integration_gate.py",
+        "-q",
+        "--no-header"
+      ],
+      "command": "tests/test_company_integration_gate.py",
+      "commit": "ae703ff78e1c6d48f2f718bf2fea4ab7225b8174",
+      "duration_s": 74.647,
+      "errors": 0,
+      "exit_code": 0,
+      "failed": 0,
+      "green": true,
+      "passed": 88,
+      "skipped": 0,
+      "summary": "88 passed in 69.95s (0:01:09)",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "C:\\Users\\mgial\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_company_org_intelligence.py",
+        "-q",
+        "--no-header"
+      ],
+      "command": "tests/test_company_org_intelligence.py",
+      "commit": "ae703ff78e1c6d48f2f718bf2fea4ab7225b8174",
+      "duration_s": 3.782,
+      "errors": 0,
+      "exit_code": 0,
+      "failed": 0,
+      "green": true,
+      "passed": 119,
+      "skipped": 0,
+      "summary": "119 passed in 0.89s",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "C:\\Users\\mgial\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_company_os_ai_platform.py",
+        "-q",
+        "--no-header"
+      ],
+      "command": "tests/test_company_os_ai_platform.py",
+      "commit": "ae703ff78e1c6d48f2f718bf2fea4ab7225b8174",
+      "duration_s": 2.575,
+      "errors": 0,
+      "exit_code": 0,
+      "failed": 0,
+      "green": true,
+      "passed": 46,
+      "skipped": 0,
+      "summary": "46 passed in 0.17s",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "C:\\Users\\mgial\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_company_os_capsules.py",
+        "-q",
+        "--no-header"
+      ],
+      "command": "tests/test_company_os_capsules.py",
+      "commit": "ae703ff78e1c6d48f2f718bf2fea4ab7225b8174",
+      "duration_s": 2.746,
+      "errors": 0,
+      "exit_code": 0,
+      "failed": 0,
+      "green": true,
+      "passed": 66,
+      "skipped": 0,
+      "summary": "66 passed in 0.35s",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "C:\\Users\\mgial\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_company_os_knowledge.py",
+        "-q",
+        "--no-header"
+      ],
+      "command": "tests/test_company_os_knowledge.py",
+      "commit": "ae703ff78e1c6d48f2f718bf2fea4ab7225b8174",
+      "duration_s": 2.775,
+      "errors": 0,
+      "exit_code": 0,
+      "failed": 0,
+      "green": true,
+      "passed": 26,
+      "skipped": 0,
+      "summary": "26 passed in 0.23s",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "C:\\Users\\mgial\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_company_runtime.py",
+        "-q",
+        "--no-header"
+      ],
+      "command": "tests/test_company_runtime.py",
+      "commit": "ae703ff78e1c6d48f2f718bf2fea4ab7225b8174",
+      "duration_s": 3.327,
+      "errors": 0,
+      "exit_code": 0,
+      "failed": 0,
+      "green": true,
+      "passed": 20,
+      "skipped": 0,
+      "summary": "20 passed in 0.99s",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "C:\\Users\\mgial\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_company_workforce.py",
+        "-q",
+        "--no-header"
+      ],
+      "command": "tests/test_company_workforce.py",
+      "commit": "ae703ff78e1c6d48f2f718bf2fea4ab7225b8174",
+      "duration_s": 2.547,
+      "errors": 0,
+      "exit_code": 0,
+      "failed": 0,
+      "green": true,
+      "passed": 93,
+      "skipped": 0,
+      "summary": "93 passed in 0.49s",
+      "timed_out": false
+    }
+  ]
+}

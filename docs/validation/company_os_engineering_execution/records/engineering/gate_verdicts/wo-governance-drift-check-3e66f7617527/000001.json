@@ -1,0 +1,19 @@
+{
+  "as_of": "2026-09-18",
+  "authorizes_production_integration": false,
+  "blockers": [],
+  "policy_version": 1,
+  "readiness": "ready",
+  "report_digest": "d64664e0deb289c9",
+  "report_id": "integration-readiness-2026-09-18-06cb98f671e8255c",
+  "report_ref": "06-gate-report.json",
+  "source_branch": "eng-governance-drift-check",
+  "source_commit": "d59a5d918630f763d0e93997626636e72a4dedc3",
+  "unknown_check_ids": [
+    "executive.decision_queue_preserves_source_refs",
+    "health.production_failures_separated",
+    "workforce.capability_gaps_visible"
+  ],
+  "version": 1,
+  "work_order_id": "wo-governance-drift-check"
+}

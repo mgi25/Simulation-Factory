@@ -1,0 +1,27 @@
+{
+  "outcome": "accepted",
+  "summary": "Added company/engineering/attempt_ledger.py with AttemptLedger, AttemptLedgerEntry and build_attempt_ledger(), which joins the engineering, execution and usage stores to produce a per-attempt cost view for one job. Exported from __init__.py and covered by four new tests in the existing suite (100 total pass).",
+  "rejection_reason": "",
+  "invariants_preserved": [
+    "The authorized work order is immutable; the new module is read-only and writes nothing to any store",
+    "A review outcome is the worst of the attested and deterministic verdicts; no review logic was changed",
+    "The implementer and the reviewer are different employees; routing logic is untouched",
+    "The protected governance surface is digested before the work and re-read at review; no governance code changed",
+    "No state means approved and nothing merges, deploys or publishes; the ledger is a read-only projection",
+    "The gate verdict is read from the gate's own report; no gate code was changed"
+  ],
+  "unresolved_risks": [
+    "The usage-record-to-attempt correlation assumes records appear in sequence order (1-based index); a store with gaps or out-of-order records would mis-correlate",
+    "Cost fields (input_units, output_units, duration_s) may all be None when the provider did not expose them; the ledger propagates None honestly but the CEO surface must handle it"
+  ],
+  "evidence": [
+    "company/engineering/attempt_ledger.py",
+    "company/engineering/__init__.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "context_refs_used": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "notes": "The ledger is purely additive — one new module, its re-export, and four tests. No existing module was modified except the package __init__.py (imports and __all__) and the test file (imports and new test functions)."
+}

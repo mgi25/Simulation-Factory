@@ -1,0 +1,55 @@
+WORK ORDER
+  wo-stage-timing  (77a1e240a19dd20c)
+  objective: Tell me how long each stage of an engineering job took, measured from the job's own recorded transitions, so I can see where the work actually waits.
+  requested by: MGI on 2026-09-18
+  authorized paths:
+    company/engineering
+    tests/test_company_engineering_execution.py
+  acceptance criteria:
+    - The stated objective is implemented: Tell me how long each stage of an engineering job took, measured from the job's own recorded transitions, so I can see where the work actually waits.
+    - company-engineering-execution invariant still holds: The authorized work order is immutable; every later stage carries its fingerprint and refuses a mismatch.
+    - company-engineering-execution invariant still holds: A review outcome is the worst of the attested and deterministic verdicts, so a reviewer PASS cannot rescue a failed check.
+    - company-engineering-execution invariant still holds: The implementer and the reviewer are different employees, routed by disjoint capabilities.
+    - company-engineering-execution invariant still holds: The protected governance surface is digested before the work and re-read at review; a change blocks the job.
+    - company-engineering-execution invariant still holds: No state means approved and nothing merges, deploys or publishes; the CEO decision is recorded, not acted on.
+    - company-engineering-execution invariant still holds: The gate verdict is read from the gate's own report; this subsystem holds no code that can produce one.
+    - Every declared test passes: tests/test_company_engineering_execution.py
+
+STATUS
+  READY_FOR_APPROVAL
+
+IMPLEMENTATION
+  summary: Added StageTiming dataclass and EngineeringJob.stage_timings() method that derives how long a job spent in each state from its own recorded transitions. Each visit to a state gets one timing entry with entered_on, exited_on and days; the current (open) state has exited_on=None and days=0. Five tests cover the full loop, fresh jobs, day arithmetic, open intervals and serialization.
+  branch: eng-stage-timing
+  commit: ae703ff78e1c6d48f2f718bf2fea4ab7225b8174
+  remote verified: yes
+  implementer: software_implementation_engineer
+  developer attempts: 1
+  changed files (3):
+    company/engineering/__init__.py
+    company/engineering/lifecycle.py
+    tests/test_company_engineering_execution.py
+
+TESTS
+  targeted: 1/1 passed
+    [PASS] tests/test_company_engineering_execution.py � 100 passed in 22.67s
+  affected Company OS: none reported
+  full repository suite: none reported
+
+REVIEW
+  PASS by chief_architect
+  findings: none
+
+GATE
+  READY  (integration-readiness-2026-09-18-8fb0cbd96908d338)
+  blockers: none
+
+RISKS
+  - StageTiming measures calendar days (dt.date granularity) because that is what transitions record; sub-day precision is not available from the job's own data.
+
+DECISIONS REQUIRED
+  - none
+
+CEO OPTIONS
+  [APPROVE]  [REQUEST CHANGES]  [REJECT]
+  READY FOR CEO APPROVAL is a request to be read, not an approval. Nothing here merges, deploys or publishes, and Company OS holds no capability to.

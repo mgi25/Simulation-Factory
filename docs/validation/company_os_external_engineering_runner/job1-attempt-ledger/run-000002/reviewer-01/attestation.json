@@ -1,0 +1,90 @@
+{
+  "changed_paths_reviewed": [
+    "company/engineering/attempt_ledger.py",
+    "company/engineering/__init__.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "criteria": [
+    {
+      "criterion": "The stated objective is implemented: Show me, for one engineering job, every developer attempt that was made and what each one cost, so I can tell whether an automated run is converging or thrashing without reading the whole history.",
+      "evidence_ref": "company/engineering/attempt_ledger.py:build_attempt_ledger joins EngineeringStore, ExecutionStore and ResourceUsageStore to produce AttemptLedger with per-attempt entries (outcome, input/output/total units, duration, reasoning class) and aggregate totals. Tests at tests/test_company_engineering_execution.py:1648-1757 cover single-attempt, multi-attempt correction loop, empty-before-session, and unknown-order error cases.",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The authorized work order is immutable; every later stage carries its fingerprint and refuses a mismatch.",
+      "evidence_ref": "company/engineering/attempt_ledger.py \u2014 the new module only reads from stores (store.work_order, store.job, execution_store.attempts, usage_store.records); it performs no writes and does not touch work order fields or fingerprints.",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: A review outcome is the worst of the attested and deterministic verdicts, so a reviewer PASS cannot rescue a failed check.",
+      "evidence_ref": "diff.patch \u2014 no changes to company/engineering/review.py or the adjudicate function; the review module is untouched.",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The implementer and the reviewer are different employees, routed by disjoint capabilities.",
+      "evidence_ref": "diff.patch \u2014 no changes to orchestrator.py routing logic (prepare_developer_session, prepare_review_session); employee routing is untouched.",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The protected governance surface is digested before the work and re-read at review; a change blocks the job.",
+      "evidence_ref": "diff.patch \u2014 no changes to company/engineering/protected.py or any governance file; the protected-surface mechanism is untouched.",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: No state means approved and nothing merges, deploys or publishes; the CEO decision is recorded, not acted on.",
+      "evidence_ref": "company/engineering/attempt_ledger.py \u2014 the module is a read-only projection (docstring line 12: 'It does not write to any of them'); it creates no state and performs no merge, deploy or publish action.",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The gate verdict is read from the gate's own report; this subsystem holds no code that can produce one.",
+      "evidence_ref": "diff.patch \u2014 no changes to company/engineering/gate_evidence.py; the new module does not import or reference gate logic.",
+      "satisfied": true
+    },
+    {
+      "criterion": "Every declared test passes: tests/test_company_engineering_execution.py",
+      "evidence_ref": "Receipt reports 100 passed in 20.08s with working_tree_clean: true; commit d681c5a.",
+      "satisfied": true
+    }
+  ],
+  "evidence": [
+    "company/engineering/attempt_ledger.py",
+    "company/engineering/__init__.py",
+    "tests/test_company_engineering_execution.py",
+    "diff.patch",
+    "company/runtime/execution_store.py (attempts method, line 380)",
+    "company/runtime/usage_store.py (records method, line 53)"
+  ],
+  "findings": [
+    {
+      "deterministic": false,
+      "evidence_ref": "company/engineering/attempt_ledger.py:17,23,28",
+      "finding_id": "unused-imports",
+      "severity": "advisory",
+      "summary": "attempt_ledger.py imports Mapping (line 17), Outcome (line 23) and JobState (line 28) but none are referenced in the module body."
+    },
+    {
+      "deterministic": false,
+      "evidence_ref": "company/engineering/__init__.py:140-142",
+      "finding_id": "all-list-sort-order",
+      "severity": "advisory",
+      "summary": "In __init__.py __all__, AttemptLedger and AttemptLedgerEntry are inserted between ALLOWED_CEILINGS and ALLOWED_TRANSITIONS, which breaks the existing ASCII sort order (ALLOWED_T < Attempt in ASCII)."
+    },
+    {
+      "deterministic": false,
+      "evidence_ref": "company/engineering/attempt_ledger.py:103-104",
+      "finding_id": "sequence-correlation-assumption",
+      "severity": "advisory",
+      "summary": "Usage records are correlated to attempts by enumerate index+1, not by an explicit attempt field on the usage record; a gap or reorder in the usage store would mis-correlate (the implementer flagged this)."
+    }
+  ],
+  "notes": "The work is purely additive: one new read-only module, its re-export, and five new tests. No existing behaviour was modified. The three unused imports are harmless but should be cleaned up. The sequence-correlation assumption is real but inherited from the store design (usage records have no explicit attempt field); the implementer correctly disclosed it.",
+  "packet_fingerprint": "1f146021562d64ef",
+  "receipt_fingerprint": "08cd3fd92f1e7f99",
+  "review_id": "rev-wo-attempt-ledger-01",
+  "reviewed_on": "2026-09-18",
+  "reviewer": "chief_architect",
+  "verdict": "pass",
+  "version": 1,
+  "work_order_fingerprint": "4418d6288e06d39d",
+  "work_order_id": "wo-attempt-ledger"
+}

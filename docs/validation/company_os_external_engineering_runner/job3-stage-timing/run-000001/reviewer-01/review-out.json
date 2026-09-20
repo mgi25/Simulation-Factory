@@ -1,0 +1,39 @@
+{
+  "persisted": {
+    "attestation": {
+      "fingerprint": "387b612e11b2f2c9",
+      "record_ref": "engineering/attestations/wo-stage-timing-0c21b800bd64/000001.json",
+      "sequence": 1
+    },
+    "job": {
+      "fingerprint": "21e98561185df1d9",
+      "record_ref": "engineering/jobs/wo-stage-timing-0c21b800bd64/000005.json",
+      "sequence": 5
+    },
+    "review": {
+      "fingerprint": "fec35451884ca55f",
+      "record_ref": "engineering/reviews/wo-stage-timing-0c21b800bd64/000001.json",
+      "sequence": 1
+    }
+  },
+  "review": {
+    "attested_outcome": "pass",
+    "deterministic_outcome": "pass",
+    "escalations": [],
+    "findings": [],
+    "implementer": "software_implementation_engineer",
+    "outcome": "pass",
+    "packet_attempt": 1,
+    "packet_fingerprint": "a78e7b48a2c4a398",
+    "receipt_fingerprint": "51bb08341886bd0f",
+    "review_id": "rev-wo-stage-timing-01",
+    "reviewed_on": "2026-09-18",
+    "reviewer": "chief_architect",
+    "unanswered_criteria": [],
+    "version": 1,
+    "work_order_fingerprint": "77a1e240a19dd20c",
+    "work_order_id": "wo-stage-timing"
+  },
+  "state": "gate",
+  "work_order_id": "wo-stage-timing"
+}

@@ -1,0 +1,50 @@
+{
+  "final_state": "ready_for_approval",
+  "finished_at": "2026-09-18T09:53:27.224102+00:00",
+  "lease_note": "took a new lease",
+  "outcome": "completed",
+  "reason": "",
+  "run_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-stage-timing-0c21b800bd64\\run-000001",
+  "stages": [
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-stage-timing-0c21b800bd64\\run-000001\\developer-01\\receipt.json"
+      ],
+      "detail": "attempt 1 by software_implementation_engineer, commit ae703ff78e1c, 3 path(s)",
+      "ok": true,
+      "session_ids": [
+        "e1859ca2-5a4e-41bb-a883-fa43d2bfe571"
+      ],
+      "stage": "developer",
+      "state_after": "testing",
+      "state_before": "planning"
+    },
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-stage-timing-0c21b800bd64\\run-000001\\reviewer-01\\attestation.json"
+      ],
+      "detail": "chief_architect returned pass; Company OS adjudicated pass (attested pass, deterministic pass)",
+      "ok": true,
+      "session_ids": [
+        "07a5cdfe-870f-4d6a-b677-982347cc7d11"
+      ],
+      "stage": "reviewer",
+      "state_after": "gate",
+      "state_before": "testing"
+    },
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-stage-timing-0c21b800bd64\\run-000001\\gate-01\\gate-report.json",
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-stage-timing-0c21b800bd64\\run-000001\\gate-01\\suites.json"
+      ],
+      "detail": "11/11 required suites green; gate says ready at ae703ff78e1c",
+      "ok": true,
+      "session_ids": [],
+      "stage": "gate",
+      "state_after": "ready_for_approval",
+      "state_before": "gate"
+    }
+  ],
+  "started_at": "2026-09-18T09:44:06.992938+00:00",
+  "work_order_id": "wo-stage-timing"
+}

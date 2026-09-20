@@ -1,0 +1,8 @@
+{
+  "checked": [
+    "HEAD before and after review",
+    "worktree status after review"
+  ],
+  "ok": true,
+  "violations": []
+}

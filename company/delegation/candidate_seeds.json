@@ -1,0 +1,275 @@
+{
+  "note": "Every candidate here is copied from a document this repository already contains. Nothing was discovered by scanning code, nothing was invented, and the classifications are the honest ones rather than the convenient ones: four of the seven are not routine LOW-risk engineering and say so. See docs/company_os_objective_planning.md section 7.",
+  "candidates": [
+    {
+      "candidate_id": "auth-migration-classifier-ambiguity",
+      "title": "Disambiguate bare authentication and migration trigger words",
+      "description": "Single-word triggers fire on any mention, including a test name or a line of documentation that merely refers to the concept.",
+      "capsule_id": "company-engineering-execution",
+      "department": "engineering",
+      "source_type": "known_defect",
+      "source_ref": "docs/company_os_canonical_integration_record.md",
+      "problem_statement": "Bare single-word triggers in company/engineering/intake.py escalate a benign test or documentation mention of authentication or migration to specialist routing.",
+      "expected_value": "Routine requests that merely mention a sensitive concept reach the cheaper tier instead of the specialist one.",
+      "risk": "medium",
+      "created_at": "2026-09-20",
+      "evidence_refs": [
+        "docs/company_os_canonical_integration_record.md",
+        "docs/company_os_end_to_end_delegation_pilot.md",
+        "docs/company_os_review_separation.md"
+      ],
+      "acceptance_criteria": [
+        "An objective that names a migration only inside a quoted test identifier derives no specialist domain.",
+        "An objective that asks for a schema migration still derives the specialist domain it derives today.",
+        "tests/test_company_engineering_execution.py passes with a case for each direction."
+      ],
+      "allowed_write_scope": [
+        "company/engineering/intake.py",
+        "tests/test_company_engineering_execution.py"
+      ],
+      "estimated_resource_profile": "consumer",
+      "goal_tags": [
+        "intake",
+        "classifier",
+        "routing"
+      ],
+      "status": "completed",
+      "notes": "COMPLETED through an explicit CEO exception, not through the ordinary path. The implementation came from the historical end-to-end delegation pilot: a developer implemented it, an independent reviewer asked for changes, the Engineering Manager authorized bounded correction 1 of 1, the correction landed, the second independent review returned PASS and the deterministic required suites ran 11/11 green. That pilot did not fail technically - it stopped at integration because the CTO seat held approve_integration_merge while the CTO's own employee, chief_architect, had reviewed the work, so the seat was disqualified and the chain reached the CEO. Its classification stands unchanged as END_TO_END_DELEGATION_ESCALATED_CORRECTLY. The CEO later authorized curated canonical integration of that specific completed change as an exception, which is how the code reached canonical without re-running a paid developer or reviewer session. The organizational cause is separately fixed by the independent reviewer in docs/company_os_review_separation.md. MEDIUM risk for the original reason: narrowing a trigger narrows an escalation."
+    },
+    {
+      "candidate_id": "capsule-ownership-semantic-review",
+      "title": "Review capsule ownership assignments chosen for test constraints",
+      "description": "Capsule completeness was achieved, but at least one module was assigned to a capsule because the natural owners carry exact-equality assertions, not because the assignment is semantically right.",
+      "capsule_id": "company-knowledge-capsules",
+      "department": "engineering",
+      "source_type": "reviewer_advisory",
+      "source_ref": "docs/company_os_discovery_end_to_end_pilot.md",
+      "problem_statement": "intelligence/__init__.py is listed in the owns_paths of company-knowledge-capsules. The independent reviewer recorded that the semantically natural owners, company-research-intelligence and company-research-operations, were not used because their tests assert their owns_paths by exact equality, which bars additions.",
+      "expected_value": "Capsule ownership that a reader can trust as a statement about responsibility, rather than one that is merely complete.",
+      "risk": "low",
+      "created_at": "2026-09-20",
+      "evidence_refs": [
+        "docs/company_os_discovery_end_to_end_pilot.md",
+        "knowledge/company_os/capsules/seeds/company-knowledge-capsules.json",
+        "tests/test_company_os_capsules.py"
+      ],
+      "acceptance_criteria": [
+        "Every module whose ownership was chosen for test-constraint reasons is either reassigned to its semantic owner or carries a recorded reason for staying where it is.",
+        "Any exact-equality ownership assertion that blocked a correct assignment is stated as a containment assertion or is justified in place.",
+        "python -m company.integration check --repo-root . still reports architecture.subsystem_ownership_bounded as passing.",
+        "tests/test_company_os_capsules.py passes."
+      ],
+      "allowed_write_scope": [
+        "knowledge/company_os/capsules/seeds",
+        "tests/test_company_os_capsules.py"
+      ],
+      "estimated_resource_profile": "consumer",
+      "goal_tags": [
+        "maintenance",
+        "architecture",
+        "ownership"
+      ],
+      "status": "open",
+      "notes": "Raised by software_review_engineer as an advisory finding on wo-wo-gate-architecture-subsystem_ownership_bounded, which it passed. The gate check is green and every module is claimed; this is about whether one of those claims means anything. LOW because it moves metadata and touches no runtime path."
+    },
+    {
+      "candidate_id": "deployment-policy-gap",
+      "title": "Decide the deployment policy the delegation model measures against",
+      "description": "approve_deployment appears in action_autonomy and in no grant. A deployment request escalates with nowhere to stop, which is safe and is not a policy.",
+      "capsule_id": "company-executive-delegation",
+      "department": "engineering",
+      "source_type": "known_defect",
+      "source_ref": "docs/company_os_canonical_integration_record.md",
+      "problem_statement": "The term deploy in company/engineering/intake.py maps to no specialist domain, no reserved action and no routine-eligibility rule, so a deployment request escalates with no seat able to decide it.",
+      "expected_value": "A deployment request would reach a stated answer instead of falling off the end of the chain.",
+      "risk": "high",
+      "created_at": "2026-09-20",
+      "evidence_refs": [
+        "docs/company_os_canonical_integration_record.md",
+        "docs/company_os_executive_delegation.md"
+      ],
+      "acceptance_criteria": [
+        "company/delegation_policy.yaml states which seat, if any, may approve each of the five deployment kinds."
+      ],
+      "allowed_write_scope": [
+        "company/delegation_policy.yaml"
+      ],
+      "estimated_resource_profile": "consumer",
+      "goal_tags": [
+        "deployment",
+        "policy"
+      ],
+      "status": "blocked",
+      "blocked_by": [
+        "a CEO policy decision: Company OS has no deployment policy to delegate against, and inventing one in code would be the delegation model widening itself"
+      ],
+      "notes": "Recorded as a candidate so it stops being invisible. It is not engineering work and must not be selected as any."
+    },
+    {
+      "candidate_id": "intake-unfalsifiable-acceptance-criteria",
+      "title": "Refuse a work order whose acceptance criterion restates the objective",
+      "description": "The defect the first live-delegation pilot exposed: intake authorized a broad CEO objective, copied it into the work order, and derived an unfalsifiable criterion.",
+      "capsule_id": "company-engineering-execution",
+      "department": "engineering",
+      "source_type": "validation_report",
+      "source_ref": "docs/company_os_first_live_delegation_pilot.md",
+      "problem_statement": "assess_request in company/engineering/intake.py returns authorized for an objective that names no subject, deriving the acceptance criterion The stated objective is implemented, which no reviewer or deterministic QA can falsify.",
+      "expected_value": "Planning stops being pushed onto the developer session.",
+      "risk": "low",
+      "created_at": "2026-09-20",
+      "evidence_refs": [
+        "docs/company_os_first_live_delegation_pilot.md",
+        "docs/evidence/company_os_first_live_delegation_pilot/phase1_probe_intake_result.json"
+      ],
+      "acceptance_criteria": [
+        "assess_request returns planning_required, not authorized, for an objective that names no subject and carries no candidate.",
+        "Every objective the existing engineering suites submit is still authorized.",
+        "tests/test_company_objective_planning.py passes."
+      ],
+      "allowed_write_scope": [
+        "company/engineering/intake.py",
+        "company/engineering/criteria.py",
+        "tests/test_company_objective_planning.py"
+      ],
+      "estimated_resource_profile": "consumer",
+      "goal_tags": [
+        "intake",
+        "planning",
+        "maintainability"
+      ],
+      "status": "completed",
+      "notes": "Completed by the objective-planning capability itself, in the same pass that created this register. Kept here because a register that only holds open work cannot show what closing one looks like."
+    },
+    {
+      "candidate_id": "provider-usage-event-identifier",
+      "title": "Give a provider usage event a stable identifier",
+      "description": "Two ingestions of one provider response produce rows nothing can tell apart.",
+      "capsule_id": "ai-platform",
+      "department": "ai_platform",
+      "source_type": "known_defect",
+      "source_ref": "docs/company_os_canonical_integration_record.md",
+      "problem_statement": "ResourceUsageRecord in ai_platform/usage.py carries no field that is a stable per-event identifier, so a repeated ingestion of one provider response cannot be de-duplicated.",
+      "expected_value": "Usage and cost totals would stop double-counting a re-ingested response.",
+      "risk": "medium",
+      "created_at": "2026-09-20",
+      "evidence_refs": [
+        "docs/company_os_canonical_integration_record.md",
+        "docs/company_os_v1_operational_readiness.md"
+      ],
+      "acceptance_criteria": [
+        "ResourceUsageRecord carries an identifier that is equal for two decodes of one provider response and different for two responses."
+      ],
+      "allowed_write_scope": [
+        "ai_platform/usage.py"
+      ],
+      "estimated_resource_profile": "consumer",
+      "goal_tags": [
+        "usage",
+        "cost",
+        "telemetry"
+      ],
+      "status": "blocked",
+      "blocked_by": [
+        "a design decision nobody has taken: no existing field is a stable per-event id, so this needs a schema change, and schema or storage migration is outside routine engineering"
+      ],
+      "notes": "Department is ai_platform, not engineering. Under an engineering-only envelope it is out of scope twice over."
+    },
+    {
+      "candidate_id": "reserved-screening-negation-blindness",
+      "title": "Teach reserved and credential screening to respect negation",
+      "description": "screen_reserved() and screen_credentials() match a trigger term anywhere in the objective text. A sentence that says the term does not apply escalates exactly as one that says it does. The sibling defect in the routing classifier was fixed at da4f3ce; these two functions were disclosed and left.",
+      "capsule_id": "company-engineering-execution",
+      "department": "engineering",
+      "source_type": "known_defect",
+      "source_ref": "docs/company_os_canonical_integration_record.md",
+      "problem_statement": "screen_reserved() and screen_credentials() in company/engineering/intake.py match trigger terms without regard to negation, so a request stating that a reserved action is not involved still returns DecisionRequired.",
+      "expected_value": "Fewer false CEO escalations on routine work, and one screening rule rather than two that disagree.",
+      "risk": "medium",
+      "created_at": "2026-09-20",
+      "evidence_refs": [
+        "docs/company_os_canonical_integration_record.md",
+        "docs/company_os_intake_classifier_hardening.md"
+      ],
+      "acceptance_criteria": [
+        "screen_reserved() returns no DecisionRequired for an objective that negates its trigger term, and still returns one when the term is asserted.",
+        "screen_credentials() behaves identically to screen_reserved() on the same negated input.",
+        "tests/test_company_engineering_execution.py passes, including a new case per screening function covering the negated and the asserted form."
+      ],
+      "allowed_write_scope": [
+        "company/engineering/intake.py",
+        "tests/test_company_engineering_execution.py"
+      ],
+      "estimated_resource_profile": "consumer",
+      "goal_tags": [
+        "intake",
+        "classifier",
+        "escalation"
+      ],
+      "status": "open",
+      "notes": "Risk is MEDIUM rather than LOW deliberately. The current failure is over-escalation, which is fail-safe; a fix that trims it trades a safety margin for accuracy on the path that decides whether the CEO hears about something. That is a judgement above routine engineering."
+    },
+    {
+      "candidate_id": "runner-blocked-attempt-repo-dir",
+      "title": "Make the runner blocked_attempt path take --repo-dir consistently",
+      "description": "One of the four follow-ups the external runner hardening review recorded and did not address.",
+      "capsule_id": "tools-engineering-runner",
+      "department": "engineering",
+      "source_type": "deferred_followup",
+      "source_ref": "docs/company_os_v1_external_runner_hardening.md",
+      "problem_statement": "The external runner passes --repo-dir to company.engineering receipt only when a repo_dir is supplied, and the acceptance review recorded the blocked_attempt path as inconsistent with its siblings.",
+      "expected_value": "One argument convention across the runner's control-plane calls.",
+      "risk": "low",
+      "created_at": "2026-09-20",
+      "evidence_refs": [
+        "docs/company_os_v1_external_runner_hardening.md"
+      ],
+      "acceptance_criteria": [
+        "tools/engineering_runner/controlplane.py passes --repo-dir on the blocked_attempt path under the same condition as the receipt path.",
+        "tests/test_external_engineering_runner.py passes with a case covering the blocked_attempt argument list."
+      ],
+      "allowed_write_scope": [
+        "tools/engineering_runner/controlplane.py",
+        "tests/test_external_engineering_runner.py"
+      ],
+      "estimated_resource_profile": "consumer",
+      "goal_tags": [
+        "runner",
+        "maintenance"
+      ],
+      "status": "open",
+      "notes": "capsule_id names no capsule that exists: nothing in knowledge/company_os/capsules declares ownership of tools/, and company-engineering-execution lists tools/** under must_not_modify. The eligibility pass rejects this on capsule_owned, which is the correct answer and not a bug in the candidate."
+    },
+    {
+      "candidate_id": "runner-zero-required-tests-policy",
+      "title": "Decide what a work order with zero required_tests means",
+      "description": "The second of the four recorded runner follow-ups.",
+      "capsule_id": "tools-engineering-runner",
+      "department": "engineering",
+      "source_type": "deferred_followup",
+      "source_ref": "docs/company_os_v1_external_runner_hardening.md",
+      "problem_statement": "The external runner hardening review recorded the zero required_tests policy as an open follow-up, so a work order declaring no tests has no stated meaning in the runner.",
+      "expected_value": "A work order with no declared tests would get a stated answer instead of an accidental one.",
+      "risk": "medium",
+      "created_at": "2026-09-20",
+      "evidence_refs": [
+        "docs/company_os_v1_external_runner_hardening.md"
+      ],
+      "acceptance_criteria": [
+        "The runner states, and a test pins, whether a work order with zero required_tests is accepted or refused."
+      ],
+      "allowed_write_scope": [
+        "tools/engineering_runner"
+      ],
+      "estimated_resource_profile": "consumer",
+      "goal_tags": [
+        "runner",
+        "policy"
+      ],
+      "status": "blocked",
+      "blocked_by": [
+        "a policy decision about what evidence a receipt must carry when the work order declares no tests"
+      ],
+      "notes": "Also unowned by any capsule."
+    }
+  ]
+}

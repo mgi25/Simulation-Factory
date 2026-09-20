@@ -1,0 +1,25 @@
+{
+  "final_state": "testing",
+  "finished_at": "2026-09-18T09:17:03.018707+00:00",
+  "lease_note": "took a new lease",
+  "outcome": "failed",
+  "reason": "IntegrityFailure: the packet is for task 'wo-attempt-ledger-review' and the work order is 'wo-attempt-ledger'; the runner will not act on the pair",
+  "run_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-attempt-ledger-93c5b79f0e3b\\run-000001",
+  "stages": [
+    {
+      "artifacts": [
+        "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-attempt-ledger-93c5b79f0e3b\\run-000001\\developer-01\\receipt.json"
+      ],
+      "detail": "attempt 1 by software_implementation_engineer, commit d681c5a1b970, 3 path(s)",
+      "ok": true,
+      "session_ids": [
+        "10faa7dd-a262-4595-95b9-b154325437d6"
+      ],
+      "stage": "developer",
+      "state_after": "testing",
+      "state_before": "planning"
+    }
+  ],
+  "started_at": "2026-09-18T09:11:40.225282+00:00",
+  "work_order_id": "wo-attempt-ledger"
+}

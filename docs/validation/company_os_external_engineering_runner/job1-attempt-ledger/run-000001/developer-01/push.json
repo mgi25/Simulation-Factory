@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "git",
+    "push",
+    "--set-upstream",
+    "origin",
+    "eng-attempt-ledger"
+  ],
+  "cwd": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-company-os-runner-tasks\\eng-attempt-ledger",
+  "duration_s": 3.183,
+  "exit_code": 0,
+  "stderr": "remote: \nremote: Create a pull request for 'eng-attempt-ledger' on GitHub by visiting:        \nremote:      https://github.com/mgi25/Simulation-Factory/pull/new/eng-attempt-ledger        \nremote: \nTo https://github.com/mgi25/Simulation-Factory.git\n * [new branch]      eng-attempt-ledger -> eng-attempt-ledger\n",
+  "stdout_chars": 73,
+  "timed_out": false
+}

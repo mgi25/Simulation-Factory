@@ -1,0 +1,83 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "content_analytics",
+    "experiment_design",
+    "result_interpretation",
+    "postmortem"
+  ],
+  "created": "2026-09-17",
+  "decisions": [],
+  "dependencies": [
+    "ai-platform",
+    "company-knowledge-store"
+  ],
+  "experiment_learnings": [],
+  "facts": [
+    "bootstrap-forbids-nested-agents"
+  ],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-analytics-experiments",
+  "inputs": [
+    "MetricObservation from our own authenticated Studio/API export, or our own production measurement",
+    "ExperimentSpecification, AnalyzedDeliverable, ContentFeatures tags, KillCondition thresholds - all supplied",
+    "Our own YouTube Studio CSV export plus an explicit video-id to deliverable-id mapping, never fetched"
+  ],
+  "invariants": [
+    "An observation is an event: frozen, timezone-aware, and the store refuses a second write of one id with different bytes.",
+    "A value is recorded against a MetricDefinition carrying its unit, and a rate carries the denominator it is over.",
+    "A private channel analytic is refused unless its source is authenticated first-party access to our own channel.",
+    "causal_claim_supported is a derived property, false unless assignment was randomised, one variable changed, sample met the pre-set minimum and every primary metric compared.",
+    "Below the pre-declared minimum sample the verdict is insufficient_evidence, whatever the numbers did.",
+    "A comparison refuses a differing observation window and a rate whose denominator is unknown on either side.",
+    "A postmortem must produce a durable learning or a next hypothesis; a learning must carry evidence and what would overturn it.",
+    "No video, format, experiment or channel score exists; a test scans every dataclass and every module for one."
+  ],
+  "last_reviewed": "2026-09-17",
+  "may_read": [
+    "ai_platform/serde.py",
+    "ai_platform/references.py",
+    "knowledge/company_os/records.py",
+    "company/runtime/state_paths.py"
+  ],
+  "may_write": [
+    "company/analytics/*.py"
+  ],
+  "must_not_modify": [
+    "company/finance/*.py",
+    "company/org_intelligence/*.py",
+    "company/workforce/*.py",
+    "company/runtime/*.py",
+    "intelligence/**",
+    "sloped/**",
+    "race2/**"
+  ],
+  "outputs": [
+    "MetricObservation, ObservationSeries, DeliverableComparison, FormatBaseline, GroupedPerformance",
+    "ExperimentResult with a CausalAssessment, DeliverablePostmortem, AnalyticsLearning, AnalyticsReport",
+    "StudioIngestionResult: the source file, its digest, its coverage, and what did not import"
+  ],
+  "owner": "workstream-analytics",
+  "owns_paths": [
+    "company/analytics"
+  ],
+  "purpose": "What happened after we published, and what the evidence supports. Records dated immutable observations, typed in or read from our own Studio CSV export, defines experiment comparisons, and interprets results cautiously - keeping observation, comparison and learning as three records so a single good video cannot become a causal finding.",
+  "recheck_on": "2027-09-17",
+  "revalidation_reason": "",
+  "risks": [
+    "Nothing fetches from YouTube; an import is only as good as the file and the mapping a person supplied for it.",
+    "Finance, research and runtime are cited by id and never imported, so a rename there leaves a dangling reference integrity reports rather than prevents.",
+    "Feature tags are recorded by hand; an untagged deliverable is reported as untagged, but a wrongly tagged one groups silently.",
+    "The IQR fence and the minimum group size are conventions, not laws; a grouping is only as defensible as the rule recorded beside it."
+  ],
+  "source": "company-os-v1-analytics-experiments",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_analytics.py",
+    "tests/test_company_youtube_studio_ingestion.py"
+  ],
+  "title": "Content analytics, experiments and durable learning",
+  "type": "module"
+}

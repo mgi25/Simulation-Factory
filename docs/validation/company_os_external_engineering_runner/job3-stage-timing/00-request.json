@@ -1,0 +1,11 @@
+{
+  "request_id": "ceo-2026-09-18-decision-clock",
+  "objective": "Tell me how long each stage of an engineering job took, measured from the job's own recorded transitions, so I can see where the work actually waits.",
+  "requested_by": "MGI",
+  "requested_on": "2026-09-18",
+  "subsystem_hint": "company/engineering",
+  "authorized_branch": "eng-stage-timing",
+  "base_commit": "bf62eaa574f11d3df3bb94f37c0c5de08bc17dae",
+  "max_developer_attempts": 3,
+  "risk": "low"
+}

@@ -1,0 +1,73 @@
+{
+  "author": "research_opportunity_lead",
+  "created": "2026-09-16",
+  "dimensions": [
+    {
+      "description": "Does the core loop renew the viewer's question on its own?",
+      "higher_is_better": true,
+      "name": "viewer_loop_strength",
+      "scale_max": 5,
+      "weight": 3.0
+    },
+    {
+      "description": "Does it belong beside the Race films we already ship?",
+      "higher_is_better": true,
+      "name": "channel_fit",
+      "scale_max": 5,
+      "weight": 2.0
+    },
+    {
+      "description": "Room to build something of our own rather than a variation on theirs.",
+      "higher_is_better": true,
+      "name": "originality_space",
+      "scale_max": 5,
+      "weight": 2.5
+    },
+    {
+      "description": "Episodes per unit of new engineering.",
+      "higher_is_better": true,
+      "name": "repeatability",
+      "scale_max": 5,
+      "weight": 2.5
+    },
+    {
+      "description": "Can it be built with the systems we have?",
+      "higher_is_better": true,
+      "name": "production_feasibility",
+      "scale_max": 5,
+      "weight": 2.0
+    },
+    {
+      "description": "What survives into the next format if this one is dropped.",
+      "higher_is_better": true,
+      "name": "reusable_asset_value",
+      "scale_max": 5,
+      "weight": 1.5
+    },
+    {
+      "description": "How much of the dossier rests on something checkable.",
+      "higher_is_better": true,
+      "name": "evidence_strength",
+      "scale_max": 5,
+      "weight": 2.0
+    },
+    {
+      "description": "Distance from what the reference channel already occupies.",
+      "higher_is_better": true,
+      "name": "differentiation",
+      "scale_max": 5,
+      "weight": 2.0
+    },
+    {
+      "description": "Render, engineering and attention. Scored high means expensive.",
+      "higher_is_better": false,
+      "name": "estimated_cost",
+      "scale_max": 5,
+      "weight": 1.5
+    }
+  ],
+  "id": "opportunity-v1",
+  "notes": "Weights are a decision, not a measurement. Change them in a new rubric id so old scorecards keep meaning what they meant.",
+  "purpose": "Rank opportunity dossiers for the bootstrap portfolio. The weights say what this company is short of, not what is universally important.",
+  "version": "1"
+}

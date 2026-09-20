@@ -1,0 +1,61 @@
+{
+  "automatic_context_sources": [
+    "module_contract:capsule:ai-platform",
+    "module_contract:capsule:company-knowledge-capsules",
+    "module_contract:capsule:company-knowledge-store",
+    "module_contract:capsule:company-runtime",
+    "module_contract:capsule:company-validation"
+  ],
+  "cache_hits": 0,
+  "context_cache_key": "e59da5a5c1fd3dbc",
+  "context_fingerprint": "02d24911b2fed7ab",
+  "context_refs_used": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "context_sources": [
+    "module_contract:capsule:company-engineering-execution",
+    "module_contract:capsule:ai-platform",
+    "module_contract:capsule:company-knowledge-capsules",
+    "module_contract:capsule:company-knowledge-store",
+    "module_contract:capsule:company-runtime",
+    "module_contract:capsule:company-validation",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "context_usage_reported": true,
+  "duration_s": null,
+  "effective_context_fingerprint": "02d24911b2fed7ab",
+  "expanded_context_sources": [],
+  "expansion_chars": 0,
+  "expansion_count": 0,
+  "expansion_ledger_fingerprint": "",
+  "explicit_context_sources": [
+    "module_contract:capsule:company-engineering-execution",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "initial_context_fingerprint": "02d24911b2fed7ab",
+  "initial_context_sources": [
+    "module_contract:capsule:company-engineering-execution",
+    "module_contract:capsule:ai-platform",
+    "module_contract:capsule:company-knowledge-capsules",
+    "module_contract:capsule:company-knowledge-store",
+    "module_contract:capsule:company-runtime",
+    "module_contract:capsule:company-validation",
+    "test:tests/test_company_engineering_execution.py"
+  ],
+  "input_units": null,
+  "notes": "invariants preserved: no new import: standard library plus ai_platform.serde and this package; the drift check writes nothing and moves no job state; company/runtime and company/integration are untouched",
+  "outcome": "accepted",
+  "output_units": null,
+  "passes": 1,
+  "reasoning_class": "D",
+  "rejected_expansion_sources": [],
+  "rejection_reason": "",
+  "required_expansion_count": 0,
+  "retries": 0,
+  "retrieval_hits": 0,
+  "subagents_used": 0,
+  "task_id": "wo-governance-drift-check",
+  "tool_calls": 31,
+  "usage_unit": "unknown"
+}

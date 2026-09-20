@@ -1,0 +1,142 @@
+{
+  "results": [
+    {
+      "suite": "tests/test_company_analytics.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated objective-planning integration candidate",
+      "company_os": true,
+      "selected": 160
+    },
+    {
+      "suite": "tests/test_company_dashboard.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated objective-planning integration candidate",
+      "company_os": true,
+      "selected": 32
+    },
+    {
+      "suite": "tests/test_company_execution_transport.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated objective-planning integration candidate",
+      "company_os": true,
+      "selected": 14
+    },
+    {
+      "suite": "tests/test_company_finance.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated objective-planning integration candidate",
+      "company_os": true,
+      "selected": 123
+    },
+    {
+      "suite": "tests/test_company_integration_gate.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated objective-planning integration candidate",
+      "company_os": true,
+      "selected": 88
+    },
+    {
+      "suite": "tests/test_company_org_intelligence.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated objective-planning integration candidate",
+      "company_os": true,
+      "selected": 119
+    },
+    {
+      "suite": "tests/test_company_os_ai_platform.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated objective-planning integration candidate",
+      "company_os": true,
+      "selected": 46
+    },
+    {
+      "suite": "tests/test_company_os_capsules.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated objective-planning integration candidate",
+      "company_os": true,
+      "selected": 66
+    },
+    {
+      "suite": "tests/test_company_os_knowledge.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated objective-planning integration candidate",
+      "company_os": true,
+      "selected": 26
+    },
+    {
+      "suite": "tests/test_company_runtime.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated objective-planning integration candidate",
+      "company_os": true,
+      "selected": 22
+    },
+    {
+      "suite": "tests/test_company_workforce.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated objective-planning integration candidate",
+      "company_os": true,
+      "selected": 93
+    },
+    {
+      "suite": "tests/test_company_objective_planning.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated objective-planning integration candidate",
+      "company_os": true,
+      "selected": 91
+    },
+    {
+      "suite": "tests/test_company_delegation.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated objective-planning integration candidate",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_engineering_execution.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "MGI",
+      "failed": 0,
+      "note": "curated objective-planning integration candidate",
+      "company_os": true
+    }
+  ]
+}

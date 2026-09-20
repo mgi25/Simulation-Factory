@@ -1,0 +1,66 @@
+{
+  "note": "Corrected. The first version of this file filed all four management requests with requesting_seat=engineering_manager. authority.evaluate refuses self-approval, so the manager was skipped by construction and every decision landed on the cto. Each request is now raised by the seat that actually raises it.",
+  "future_chain": [
+    {
+      "action": "approve_code_change",
+      "raised_by_seat": "software_implementation_engineer",
+      "risk": "low",
+      "decision": "approved",
+      "actor": "engineering_manager",
+      "expected_actor": "engineering_manager",
+      "matches_expected": true,
+      "ceo_required": false
+    },
+    {
+      "action": "approve_test_progression",
+      "raised_by_seat": "software_implementation_engineer",
+      "risk": "low",
+      "decision": "approved",
+      "actor": "engineering_manager",
+      "expected_actor": "engineering_manager",
+      "matches_expected": true,
+      "ceo_required": false
+    },
+    {
+      "action": "approve_review_outcome",
+      "raised_by_seat": "engineering_reviewer",
+      "risk": "low",
+      "decision": "approved",
+      "actor": "engineering_manager",
+      "expected_actor": "engineering_manager",
+      "matches_expected": true,
+      "ceo_required": false
+    },
+    {
+      "action": "request_bounded_correction",
+      "raised_by_seat": "engineering_reviewer",
+      "risk": "low",
+      "decision": "approved",
+      "actor": "engineering_manager",
+      "expected_actor": "engineering_manager",
+      "matches_expected": true,
+      "ceo_required": false
+    },
+    {
+      "action": "approve_integration_merge",
+      "raised_by_seat": "engineering_manager",
+      "risk": "medium",
+      "decision": "approved",
+      "actor": "cto",
+      "expected_actor": "cto",
+      "matches_expected": true,
+      "ceo_required": false
+    }
+  ],
+  "ceo_required_anywhere": false,
+  "management_decisions_taken_by_engineering_manager": 4,
+  "integration_decided_by": "cto",
+  "manager_risk_ceiling": "low \u2014 a MEDIUM-risk routine job legitimately escalates to the cto; not widened",
+  "architecture_review_self_conflict": {
+    "reviewer": "chief_architect",
+    "decision": "escalate",
+    "actor": "ceo",
+    "ceo_required": true,
+    "note": "unchanged and deliberately not weakened"
+  }
+}

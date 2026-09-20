@@ -1,0 +1,89 @@
+{
+  "changed_paths_reviewed": [
+    "company/engineering/__init__.py",
+    "company/engineering/__main__.py",
+    "company/engineering/verify.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "criteria": [
+    {
+      "criterion": "The stated objective is implemented: Let me check at any time whether the protected governance files have changed since an engineering work order was authorized, without having to run a review to find out.",
+      "evidence_ref": "company/engineering/verify.py",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The authorized work order is immutable; every later stage carries its fingerprint and refuses a mismatch.",
+      "evidence_ref": "company/engineering/verify.py",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: A review outcome is the worst of the attested and deterministic verdicts, so a reviewer PASS cannot rescue a failed check.",
+      "evidence_ref": "company/engineering/review.py",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The implementer and the reviewer are different employees, routed by disjoint capabilities.",
+      "evidence_ref": "company/org_registry.yaml",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The protected governance surface is digested before the work and re-read at review; a change blocks the job.",
+      "evidence_ref": "tests/test_company_engineering_execution.py",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: No state means approved and nothing merges, deploys or publishes; the CEO decision is recorded, not acted on.",
+      "evidence_ref": "tests/test_company_engineering_execution.py",
+      "satisfied": true
+    },
+    {
+      "criterion": "company-engineering-execution invariant still holds: The gate verdict is read from the gate's own report; this subsystem holds no code that can produce one.",
+      "evidence_ref": "company/engineering/gate_evidence.py",
+      "satisfied": true
+    },
+    {
+      "criterion": "Every declared test passes: tests/test_company_engineering_execution.py",
+      "evidence_ref": "commit:d59a5d918630f763d0e93997626636e72a4dedc3",
+      "satisfied": true
+    }
+  ],
+  "evidence": [
+    "commit:d59a5d918630f763d0e93997626636e72a4dedc3",
+    "company/engineering/README.md",
+    "company/engineering/verify.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "findings": [
+    {
+      "deterministic": false,
+      "evidence_ref": "company/engineering/__init__.py",
+      "finding_id": "all-ordering",
+      "severity": "advisory",
+      "summary": "__all__ places DriftStatus between DeveloperBriefing and DeveloperResult, so the class group is no longer in order. Every other Company OS package keeps constants, classes and functions grouped and sorted within each group."
+    },
+    {
+      "deterministic": false,
+      "evidence_ref": "company/engineering/verify.py",
+      "finding_id": "no-decoder",
+      "severity": "advisory",
+      "summary": "GovernanceDriftReport has to_dict() and fingerprint() but no from_mapping, so a stored report cannot be read back. Nothing stores one today, which is consistent with the module writing nothing; the asymmetry is worth stating or closing before a caller persists one."
+    },
+    {
+      "deterministic": false,
+      "evidence_ref": "company/engineering/verify.py",
+      "finding_id": "absolute-repo-root",
+      "severity": "advisory",
+      "summary": "report.repo_root holds root.as_posix(), an absolute local path. It is only printed today, but the field is on an exported record and a caller that persisted one would put a developer's filesystem layout into company state."
+    }
+  ],
+  "notes": "Reviewed the full diff 6b50b11..d59a5d9 (422 insertions, 4 files). All four changed paths are inside the work order's authorized scope. verify.py imports only the standard library, ai_platform.serde and this package: no process, no network, no credential read. company/runtime and company/integration are untouched. The three-status design is right: an unanswerable question returns UNKNOWN rather than a clean bill, and the record refuses to be built in a shape its findings contradict. The write-nothing property is asserted by comparing every state file's mtime either side of a drifted check, which is the right way to test it. Three advisory findings, none blocking.",
+  "packet_fingerprint": "2151d8654cee3405",
+  "receipt_fingerprint": "11fe48649dc7e949",
+  "review_id": "rev-governance-drift-001",
+  "reviewed_on": "2026-09-18",
+  "reviewer": "chief_architect",
+  "verdict": "pass",
+  "version": 1,
+  "work_order_fingerprint": "6c1ce3643e5b86fc",
+  "work_order_id": "wo-governance-drift-check"
+}

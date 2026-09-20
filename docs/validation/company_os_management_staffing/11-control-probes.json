@@ -1,0 +1,202 @@
+{
+  "controls": [
+    {
+      "actual_ceo_involved": true,
+      "ceo_required": true,
+      "chain": [
+        {
+          "detail": "software_implementation_engineer holds no delegated grant under delegation_policy_v1",
+          "insufficiency": "no_grant",
+          "seat": "software_implementation_engineer"
+        },
+        {
+          "detail": "engineering_manager may approve up to low risk and this is medium",
+          "insufficiency": "risk_above_ceiling",
+          "seat": "engineering_manager"
+        },
+        {
+          "detail": "cto is filled by chief_architect, who reviewed the work under decision. Independent review and managerial approval are two controls, and one employee performing both is one control.",
+          "insufficiency": "reviewer_is_approver",
+          "seat": "cto"
+        },
+        {
+          "detail": "coo may not approve approve_review_outcome; its grant covers 7 other action type(s)",
+          "insufficiency": "out_of_scope",
+          "seat": "coo"
+        }
+      ],
+      "decision": "escalate",
+      "evidence": [
+        "docs/company_os_management_staffing.md"
+      ],
+      "exception_classes": [
+        "authority_exceeded",
+        "separation_of_duty"
+      ],
+      "expected_ceo_required": true,
+      "historical": false,
+      "label": "A medium-risk review outcome whose only competent seat is the reviewer",
+      "matches_expectation": true,
+      "matches_history": true,
+      "owning_seat": "ceo",
+      "reason": "the chain stopped at coo: coo may not approve approve_review_outcome; its grant covers 7 other action type(s)",
+      "scenario_id": "control-reviewer-as-approver"
+    },
+    {
+      "actual_ceo_involved": true,
+      "ceo_required": true,
+      "chain": [
+        {
+          "detail": "software_implementation_engineer holds no delegated grant under delegation_policy_v1",
+          "insufficiency": "no_grant",
+          "seat": "software_implementation_engineer"
+        },
+        {
+          "detail": "engineering_manager would be setting aside a failing deterministic check or a reviewer verdict. Management decides what to do about a finding; it does not decide that the finding is wrong.",
+          "insufficiency": "would_override_independent_control",
+          "seat": "engineering_manager"
+        },
+        {
+          "detail": "cto would be setting aside a failing deterministic check or a reviewer verdict. Management decides what to do about a finding; it does not decide that the finding is wrong.",
+          "insufficiency": "would_override_independent_control",
+          "seat": "cto"
+        },
+        {
+          "detail": "coo may not approve approve_code_change; its grant covers 7 other action type(s)",
+          "insufficiency": "out_of_scope",
+          "seat": "coo"
+        }
+      ],
+      "decision": "escalate",
+      "evidence": [
+        "docs/company_os_management_staffing.md"
+      ],
+      "exception_classes": [
+        "authority_exceeded",
+        "separation_of_duty"
+      ],
+      "expected_ceo_required": true,
+      "historical": false,
+      "label": "A manager setting aside a failing deterministic check",
+      "matches_expectation": true,
+      "matches_history": true,
+      "owning_seat": "ceo",
+      "reason": "the chain stopped at coo: coo may not approve approve_code_change; its grant covers 7 other action type(s)",
+      "scenario_id": "control-override-independent-control"
+    },
+    {
+      "actual_ceo_involved": true,
+      "ceo_required": true,
+      "chain": [
+        {
+          "detail": "software_implementation_engineer holds no delegated grant under delegation_policy_v1",
+          "insufficiency": "no_grant",
+          "seat": "software_implementation_engineer"
+        },
+        {
+          "detail": "engineering_manager may not approve approve_deployment; its grant covers 6 other action type(s)",
+          "insufficiency": "out_of_scope",
+          "seat": "engineering_manager"
+        },
+        {
+          "detail": "cto may not approve approve_deployment; its grant covers 9 other action type(s)",
+          "insufficiency": "out_of_scope",
+          "seat": "cto"
+        },
+        {
+          "detail": "coo may not approve approve_deployment; its grant covers 7 other action type(s)",
+          "insufficiency": "out_of_scope",
+          "seat": "coo"
+        }
+      ],
+      "decision": "rejected",
+      "evidence": [
+        "docs/company_os_management_staffing.md"
+      ],
+      "exception_classes": [
+        "authority_exceeded"
+      ],
+      "expected_ceo_required": true,
+      "historical": false,
+      "label": "A deployment nobody classified",
+      "matches_expectation": true,
+      "matches_history": true,
+      "owning_seat": "software_implementation_engineer",
+      "reason": "no seat between software_implementation_engineer and the CEO holds approve_deployment in its grant. The action is outside the delegated model entirely, so it is refused here and carried to the CEO as an unclassified request rather than approved by the nearest seat that happened to be free.",
+      "scenario_id": "control-unknown-deployment"
+    },
+    {
+      "actual_ceo_involved": true,
+      "ceo_required": true,
+      "chain": [
+        {
+          "detail": "software_implementation_engineer holds no delegated grant under delegation_policy_v1",
+          "insufficiency": "no_grant",
+          "seat": "software_implementation_engineer"
+        },
+        {
+          "detail": "engineering_manager may not approve approve_operating_spend; its grant covers 6 other action type(s)",
+          "insufficiency": "out_of_scope",
+          "seat": "engineering_manager"
+        },
+        {
+          "detail": "200 USD is above the 40 USD a single cto decision may approve",
+          "insufficiency": "budget_above_ceiling",
+          "seat": "cto"
+        },
+        {
+          "detail": "coo may not approve approve_operating_spend; its grant covers 7 other action type(s)",
+          "insufficiency": "out_of_scope",
+          "seat": "coo"
+        },
+        {
+          "detail": "200 USD is above the 50 USD a single cfo decision may approve",
+          "insufficiency": "budget_above_ceiling",
+          "seat": "cfo"
+        }
+      ],
+      "decision": "escalate",
+      "evidence": [
+        "docs/company_os_management_staffing.md"
+      ],
+      "exception_classes": [
+        "budget_ceiling_exceeded"
+      ],
+      "expected_ceo_required": true,
+      "historical": false,
+      "label": "A spend larger than the whole company operating budget",
+      "matches_expectation": true,
+      "matches_history": true,
+      "owning_seat": "ceo",
+      "reason": "the chain stopped at cfo: 200 USD is above the 50 USD a single cfo decision may approve",
+      "scenario_id": "control-spend-above-cfo"
+    },
+    {
+      "actual_ceo_involved": true,
+      "ceo_required": true,
+      "chain": [
+        {
+          "detail": "expand_authority is reserved by the delegation model itself: no seat may widen its own ceiling; authority is granted, never taken",
+          "insufficiency": "reserved_action",
+          "seat": "engineering_manager"
+        }
+      ],
+      "decision": "escalate",
+      "evidence": [
+        "docs/company_os_management_staffing.md"
+      ],
+      "exception_classes": [
+        "security_or_governance_event",
+        "reserved_action"
+      ],
+      "expected_ceo_required": true,
+      "historical": false,
+      "label": "A manager widening its own ceiling",
+      "matches_expectation": true,
+      "matches_history": true,
+      "owning_seat": "ceo",
+      "reason": "expand_authority is reserved by the delegation model itself: no seat may widen its own ceiling; authority is granted, never taken",
+      "scenario_id": "control-expand-authority"
+    }
+  ]
+}

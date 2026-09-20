@@ -1,0 +1,69 @@
+{
+  "acceptance_criteria": [
+    "The stated objective is implemented: Let me check at any time whether the protected governance files have changed since an engineering work order was authorized, without having to run a review to find out.",
+    "company-engineering-execution invariant still holds: The authorized work order is immutable; every later stage carries its fingerprint and refuses a mismatch.",
+    "company-engineering-execution invariant still holds: A review outcome is the worst of the attested and deterministic verdicts, so a reviewer PASS cannot rescue a failed check.",
+    "company-engineering-execution invariant still holds: The implementer and the reviewer are different employees, routed by disjoint capabilities.",
+    "company-engineering-execution invariant still holds: The protected governance surface is digested before the work and re-read at review; a change blocks the job.",
+    "company-engineering-execution invariant still holds: No state means approved and nothing merges, deploys or publishes; the CEO decision is recorded, not acted on.",
+    "company-engineering-execution invariant still holds: The gate verdict is read from the gate's own report; this subsystem holds no code that can produce one.",
+    "Every declared test passes: tests/test_company_engineering_execution.py"
+  ],
+  "authorized_on": "2026-09-18",
+  "authorized_paths": [
+    "company/engineering",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "authorizes_merge": false,
+  "branch": "eng-governance-drift-check",
+  "changed_files": [
+    "company/engineering/verify.py",
+    "company/engineering/__init__.py",
+    "company/engineering/__main__.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "commit_sha": "d59a5d918630f763d0e93997626636e72a4dedc3",
+  "decisions_required": [],
+  "developer_attempts": 1,
+  "evidence_refs": [],
+  "gate_blockers": [],
+  "gate_readiness": "ready",
+  "gate_report_id": "integration-readiness-2026-09-18-06cb98f671e8255c",
+  "implementation_summary": "Added company/engineering/verify.py: one work order's protected surface re-digested against a named checkout, with three statuses so an unanswerable question cannot read as clean. Wired a read-only `verify` CLI command whose exit code is the answer. 8 new tests.",
+  "implementer": "software_implementation_engineer",
+  "merge_performed": false,
+  "objective": "Let me check at any time whether the protected governance files have changed since an engineering work order was authorized, without having to run a review to find out.",
+  "remote_verified": true,
+  "requested_by": "MGI",
+  "review_findings": [
+    "[advisory] absolute-repo-root: report.repo_root holds root.as_posix(), an absolute local path. It is only printed today, but the field is on an exported record and a caller that persisted one would put a developer's filesystem layout into company state.",
+    "[advisory] all-ordering: __all__ places DriftStatus between DeveloperBriefing and DeveloperResult, so the class group is no longer in order. Every other Company OS package keeps constants, classes and functions grouped and sorted within each group.",
+    "[advisory] no-decoder: GovernanceDriftReport has to_dict() and fingerprint() but no from_mapping, so a stored report cannot be read back. Nothing stores one today, which is consistent with the module writing nothing; the asymmetry is worth stating or closing before a caller persists one."
+  ],
+  "review_outcome": "pass",
+  "reviewer": "chief_architect",
+  "risks": [
+    "The drift check compares bytes, so a whitespace-only edit to a protected file reports as drift and a reader has to dismiss it.",
+    "The developer and reviewer stages were performed by one Claude Code session sequentially, not by two independent sessions.",
+    "The check compares bytes, so a whitespace-only edit to a protected file reads as drift. That is deliberate but will produce a finding a reader has to dismiss."
+  ],
+  "status": "ready_for_approval",
+  "tests": [
+    {
+      "command": "tests/test_company_engineering_execution.py",
+      "passed": true,
+      "scope": "targeted",
+      "summary": "92 passed (84 before the change, 8 new)"
+    },
+    {
+      "command": "tests/ -k company",
+      "passed": true,
+      "scope": "company_os",
+      "summary": "1579 passed, 3033 deselected"
+    }
+  ],
+  "unanswered_criteria": [],
+  "version": 1,
+  "work_order_fingerprint": "6c1ce3643e5b86fc",
+  "work_order_id": "wo-governance-drift-check"
+}

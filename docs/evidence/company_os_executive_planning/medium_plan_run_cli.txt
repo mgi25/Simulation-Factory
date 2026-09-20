@@ -1,0 +1,14 @@
+OBJECTIVE            obj-intake-classifier-medium-2026-09-20
+PLANNING STATUS      selected
+ELIGIBLE WORK FOUND  2
+CANDIDATES CONSIDERED 7 (5 rejected)
+SELECTED WORK        Teach reserved and credential screening to respect negation
+WHY SELECTED         Negation handling is a fundamental logical requirement. This candidate fixes a core bug where 'we will NOT do X' still triggers escalation for X. The auth-migration candidate addresses a narrower edge case (quoted mentions in tests). Negation is prerequisite correctness; context-detection is a refinement.
+DISCOVERY USED       no
+EXECUTIVE            cto (chief_architect)
+MANAGER              engineering_manager (engineering_delivery_manager)
+EXPECTED VALUE       Fewer false CEO escalations on routine work, and one screening rule rather than two that disagree.
+RISK                 medium
+PLANNING COST        0.028659 USD
+READY FOR EXECUTION  yes
+CEO DECISION NEEDED  no

@@ -1,0 +1,191 @@
+{
+  "decision": {
+    "acceptance_criteria": [],
+    "candidate_ids_considered": [
+      "auth-migration-classifier-ambiguity",
+      "deployment-policy-gap",
+      "intake-unfalsifiable-acceptance-criteria",
+      "provider-usage-event-identifier",
+      "reserved-screening-negation-blindness",
+      "runner-blocked-attempt-repo-dir",
+      "runner-zero-required-tests-policy"
+    ],
+    "candidate_ids_rejected": [
+      "deployment-policy-gap",
+      "intake-unfalsifiable-acceptance-criteria",
+      "provider-usage-event-identifier",
+      "runner-blocked-attempt-repo-dir",
+      "runner-zero-required-tests-policy"
+    ],
+    "capsule_id": "",
+    "decision": "escalated",
+    "department": "engineering",
+    "escalation_reason": "choosing between eligible candidates is a judgement, and this company has delegated eligibility but not preference. A named planner must supply the choice, or the envelope must narrow until one candidate remains.",
+    "escalation_required": true,
+    "estimated_cost": null,
+    "evidence_refs_used": [],
+    "executive_employee": "chief_architect",
+    "executive_seat": "cto",
+    "expected_value": "",
+    "manager_employee": "engineering_delivery_manager",
+    "manager_seat": "engineering_manager",
+    "objective_alignment": "",
+    "objective_id": "obj-intake-classifier-medium-2026-09-20",
+    "objective_intent_digest": "8922ac0827a7277d",
+    "planning_decision_id": "plan-intake-classifier-medium",
+    "policy_fingerprint": "1b7730a416527756",
+    "policy_version": "delegation_policy_v1",
+    "recorded_on": "2026-09-20",
+    "risk": "",
+    "selected_candidate_id": "",
+    "selection_reason": "2 candidates are equally eligible (auth-migration-classifier-ambiguity, reserved-screening-negation-blindness) and no preference was supplied",
+    "version": 1
+  },
+  "eligibility": [
+    {
+      "candidate_id": "auth-migration-classifier-ambiguity",
+      "eligible": true,
+      "failed": [],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "status_open",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": []
+    },
+    {
+      "candidate_id": "deployment-policy-gap",
+      "eligible": false,
+      "failed": [
+        "status_open",
+        "risk_within_ceiling"
+      ],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "status_open: status is blocked (a CEO policy decision: Company OS has no deployment policy to delegate against, and inventing one in code would be the delegation model widening itself)",
+        "risk_within_ceiling: high risk exceeds the envelope ceiling of medium"
+      ]
+    },
+    {
+      "candidate_id": "intake-unfalsifiable-acceptance-criteria",
+      "eligible": false,
+      "failed": [
+        "status_open"
+      ],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "status_open: status is completed"
+      ]
+    },
+    {
+      "candidate_id": "provider-usage-event-identifier",
+      "eligible": false,
+      "failed": [
+        "department_permitted",
+        "status_open"
+      ],
+      "passed": [
+        "capsule_owned",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "department_permitted: ai_platform is not among the envelope's departments (engineering)",
+        "status_open: status is blocked (a design decision nobody has taken: no existing field is a stable per-event id, so this needs a schema change, and schema or storage migration is outside routine engineering)"
+      ]
+    },
+    {
+      "candidate_id": "reserved-screening-negation-blindness",
+      "eligible": true,
+      "failed": [],
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "status_open",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": []
+    },
+    {
+      "candidate_id": "runner-blocked-attempt-repo-dir",
+      "eligible": false,
+      "failed": [
+        "capsule_owned"
+      ],
+      "passed": [
+        "department_permitted",
+        "status_open",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "capsule_owned: no confirmed capsule owns tools-engineering-runner; work whose owner the company cannot name has no declared scope, tests or invariants to be reviewed against"
+      ]
+    },
+    {
+      "candidate_id": "runner-zero-required-tests-policy",
+      "eligible": false,
+      "failed": [
+        "capsule_owned",
+        "status_open"
+      ],
+      "passed": [
+        "department_permitted",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "reasons": [
+        "capsule_owned: no confirmed capsule owns tools-engineering-runner; work whose owner the company cannot name has no declared scope, tests or invariants to be reviewed against",
+        "status_open: status is blocked (a policy decision about what evidence a receipt must carry when the work order declares no tests)"
+      ]
+    }
+  ],
+  "proposal": null
+}

@@ -1,0 +1,13 @@
+{
+  "VIDEO_ID": {
+    "deliverable_id": "race-001",
+    "kind": "short",
+    "format_id": "marble_race",
+    "version": ""
+  },
+  "ANOTHER_VIDEO_ID": {
+    "deliverable_id": "race-002",
+    "kind": "video",
+    "format_id": "marble_race"
+  }
+}

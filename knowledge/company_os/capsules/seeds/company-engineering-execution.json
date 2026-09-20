@@ -1,0 +1,84 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "capability_engineering_work_order",
+    "capability_engineering_review",
+    "capability_engineering_result",
+    "capability_protected_surface"
+  ],
+  "created": "2026-09-18",
+  "decisions": [],
+  "dependencies": [
+    "company-runtime",
+    "company-validation",
+    "company-knowledge-capsules"
+  ],
+  "experiment_learnings": [],
+  "facts": [
+    "bootstrap-forbids-nested-agents"
+  ],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-engineering-execution",
+  "inputs": [
+    "One CEORequest: an objective, an optional subsystem hint and an optional scope ceiling",
+    "A SessionReceipt returned by an external developer session",
+    "A ReviewerAttestation returned by a different external session",
+    "A ProductionIntegrationReadinessReport written by python -m company.integration"
+  ],
+  "invariants": [
+    "The authorized work order is immutable; every later stage carries its fingerprint and refuses a mismatch.",
+    "A review outcome is the worst of the attested and deterministic verdicts, so a reviewer PASS cannot rescue a failed check.",
+    "The implementer and the reviewer are different employees, routed by disjoint capabilities.",
+    "The protected governance surface is digested before the work and re-read at review; a change blocks the job.",
+    "No state means approved and nothing merges, deploys or publishes; the CEO decision is recorded, not acted on.",
+    "The gate verdict is read from the gate's own report; this subsystem holds no code that can produce one.",
+    "A correction loop is bounded by the work order's max_developer_attempts."
+  ],
+  "last_reviewed": "2026-09-18",
+  "may_read": [
+    "company/*.yaml",
+    "company/runtime/**",
+    "company/integration/README.md",
+    "knowledge/company_os/capsules/**",
+    "docs/company_os_v1_engineering_execution.md"
+  ],
+  "may_write": [
+    "company/engineering/**"
+  ],
+  "must_not_modify": [
+    "company/constitution.md",
+    "company/permissions.yaml",
+    "company/integration/**",
+    "company/runtime/**",
+    "sloped/**",
+    "tools/**"
+  ],
+  "outputs": [
+    "An EngineeringWorkOrder, or a DECISION REQUIRED list the CEO must settle",
+    "A developer briefing and a read-only review briefing, both reference-only",
+    "An adjudicated EngineeringReview and a stored GateVerdict",
+    "An EngineeringResult for the CEO, and the recorded CEODecision on it"
+  ],
+  "owner": "company-os",
+  "owns_paths": [
+    "company/engineering"
+  ],
+  "purpose": "Carries one CEO engineering objective to a CEO-readable result: derives a bounded work order from the capsule that owns the subject, issues packets to external developer and reviewer sessions through the existing runtime, adjudicates review against deterministic QA, keeps the gate's own verdict as evidence, and stops at ready_for_approval.",
+  "recheck_on": "2027-09-18",
+  "revalidation_reason": "",
+  "risks": [
+    "The developer and reviewer are human-started external sessions; nothing here can launch one.",
+    "Intake derives scope from capsule ownership, so a subsystem with no capsule produces DECISION REQUIRED rather than a guess.",
+    "The gate verdict is supplied evidence and goes stale against a later commit; GateVerdict.stale_against says so.",
+    "company-ceo-dashboard was at the 8-dependency cap, so it reaches company-runtime through this capsule instead of directly."
+  ],
+  "source": "company-os-v1-engineering-execution",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_engineering_execution.py"
+  ],
+  "title": "Company engineering execution loop",
+  "type": "module"
+}

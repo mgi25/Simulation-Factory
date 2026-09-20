@@ -1,0 +1,726 @@
+{
+  "capabilities": [
+    {
+      "capability_id": "analytics",
+      "criticality": "important",
+      "description": "Connect production variables to measured audience results.",
+      "domain": "data",
+      "name": "Analytics",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "benchmarks",
+      "criticality": "important",
+      "description": "Design the measurement that decides whether a change actually helped.",
+      "domain": "engineering",
+      "name": "Benchmarks",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "budget_control",
+      "criticality": "important",
+      "description": "Hold department and program budget ceilings and answer whether one spend fits inside them.",
+      "domain": "executive",
+      "name": "Budget control",
+      "notes": "Holding a ceiling is not the authority to change it; company budget policy stays CEO-reserved.",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "caching",
+      "criticality": "supporting",
+      "description": "Reuse identical context and results across sessions deterministically.",
+      "domain": "ai_platform",
+      "name": "Caching",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "camera_continuity",
+      "criticality": "important",
+      "description": "Keep screen direction, scale and motion continuous across a cut.",
+      "domain": "creative",
+      "name": "Camera continuity",
+      "notes": "",
+      "required_by": [
+        "visual_cinematography_director"
+      ],
+      "status": "active"
+    },
+    {
+      "capability_id": "capability_graph",
+      "criticality": "important",
+      "description": "Maintain the canonical capability model and derive coverage from the org registry.",
+      "domain": "people",
+      "name": "Capability graph",
+      "notes": "",
+      "required_by": [
+        "hr_org_intelligence_lead"
+      ],
+      "status": "active"
+    },
+    {
+      "capability_id": "cinematography",
+      "criticality": "core",
+      "description": "Own what the camera sees, when it cuts, and whether the payoff is visible.",
+      "domain": "creative",
+      "name": "Cinematography",
+      "notes": "",
+      "required_by": [
+        "visual_cinematography_director"
+      ],
+      "status": "active"
+    },
+    {
+      "capability_id": "code_review",
+      "criticality": "core",
+      "description": "Independently judge whether an authorized change did what its work order asked, and say pass, changes_required or reject.",
+      "domain": "engineering",
+      "name": "Code review",
+      "notes": "Held apart from software_implementation and software_architecture on purpose. The holder reviews and never implements, and never approves the integration of what it reviewed: authority.evaluate disqualifies any seat whose employee reviewed the work.",
+      "required_by": [
+        "software_review_engineer"
+      ],
+      "status": "active"
+    },
+    {
+      "capability_id": "context_engineering",
+      "criticality": "core",
+      "description": "Supply the minimum relevant context for a task and prove it was sufficient.",
+      "domain": "ai_platform",
+      "name": "Context engineering",
+      "notes": "",
+      "required_by": [
+        "ai_efficiency_platform_engineer"
+      ],
+      "status": "active"
+    },
+    {
+      "capability_id": "cost_analysis",
+      "criticality": "supporting",
+      "description": "Read recorded resource cost against accepted output and say where it is going.",
+      "domain": "executive",
+      "name": "Cost analysis",
+      "notes": "An unmeasured cost stays unknown; this capability does not estimate one.",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "creative_direction",
+      "criticality": "core",
+      "description": "Hold a coherent creative intent across episodes and decide what does not ship.",
+      "domain": "creative",
+      "name": "Creative direction",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "cross_department_coordination",
+      "criticality": "important",
+      "description": "Sequence work that spans creative, engineering, production and data.",
+      "domain": "executive",
+      "name": "Cross-department coordination",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "delivery_management",
+      "criticality": "important",
+      "description": "Decide routine engineering outcomes and bounded corrections without implementing or reviewing the work.",
+      "domain": "engineering",
+      "name": "Delivery management",
+      "notes": "Deliberately excludes implementation and review so the holder can never be its own implementer or reviewer.",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "dependency_governance",
+      "criticality": "important",
+      "description": "Decide what the repository is allowed to depend on, and prove the cost.",
+      "domain": "engineering",
+      "name": "Dependency governance",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "employee_evaluation",
+      "criticality": "important",
+      "description": "Run evidence-backed evaluation cases before anyone receives production authority.",
+      "domain": "people",
+      "name": "Employee evaluation",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "environment_review",
+      "criticality": "important",
+      "description": "Judge whether the world around the machine supports or fights the subject.",
+      "domain": "creative",
+      "name": "Environment review",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "escalation",
+      "criticality": "important",
+      "description": "Recognise a decision that is not this session's to make and route it upward.",
+      "domain": "executive",
+      "name": "Escalation",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "experiment_design",
+      "criticality": "important",
+      "description": "Isolate a variable so a result means something.",
+      "domain": "data",
+      "name": "Experiment design",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "fairness",
+      "criticality": "core",
+      "description": "Measure and defend competitive fairness across seeds and starting positions.",
+      "domain": "engineering",
+      "name": "Fairness",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "format_design",
+      "criticality": "core",
+      "description": "Design an original repeatable entertainment format with stated mechanics.",
+      "domain": "creative",
+      "name": "Format design",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "framing",
+      "criticality": "important",
+      "description": "Place the subject in the frame at a size and position the viewer can read.",
+      "domain": "creative",
+      "name": "Framing",
+      "notes": "",
+      "required_by": [
+        "visual_cinematography_director"
+      ],
+      "status": "active"
+    },
+    {
+      "capability_id": "hiring",
+      "criticality": "supporting",
+      "description": "Turn a proven capability gap into a proposal, temporary or permanent.",
+      "domain": "people",
+      "name": "Hiring",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "mobile_readability",
+      "criticality": "core",
+      "description": "Verify a shot still reads at phone size and on a small dynamic range.",
+      "domain": "creative",
+      "name": "Mobile readability",
+      "notes": "",
+      "required_by": [
+        "production_qc_lead",
+        "visual_cinematography_director"
+      ],
+      "status": "active"
+    },
+    {
+      "capability_id": "model_routing",
+      "criticality": "supporting",
+      "description": "Match a task's reasoning class to the cheapest sufficient executor.",
+      "domain": "ai_platform",
+      "name": "Model routing",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "occlusion_analysis",
+      "criticality": "supporting",
+      "description": "Prove the subject is actually visible rather than behind geometry.",
+      "domain": "creative",
+      "name": "Occlusion analysis",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "opportunity_analysis",
+      "criticality": "supporting",
+      "description": "Turn screened sources into a stated, falsifiable opportunity.",
+      "domain": "intelligence",
+      "name": "Opportunity analysis",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "opportunity_dossiers",
+      "criticality": "important",
+      "description": "Assemble the evidence package the creative department receives.",
+      "domain": "intelligence",
+      "name": "Opportunity dossiers",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "org_design",
+      "criticality": "supporting",
+      "description": "Detect duplicated roles, unnecessary layers and approval bottlenecks.",
+      "domain": "people",
+      "name": "Organizational design",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "physics",
+      "criticality": "core",
+      "description": "Model contact, friction and motion so that outcomes are physically honest.",
+      "domain": "engineering",
+      "name": "Physics",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "portfolio_routing",
+      "criticality": "core",
+      "description": "Decide which work is done next and by whom, across departments.",
+      "domain": "executive",
+      "name": "Portfolio routing",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "postmortems",
+      "criticality": "supporting",
+      "description": "Turn a failed release into a documented learning that changes the next one.",
+      "domain": "data",
+      "name": "Postmortems",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "production",
+      "criticality": "core",
+      "description": "Take a locked simulation to rendered, packaged, deliverable frames.",
+      "domain": "production",
+      "name": "Production",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "qc",
+      "criticality": "core",
+      "description": "Run the render, continuity and packaging gates and refuse what fails them.",
+      "domain": "production",
+      "name": "Quality control",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "reference_analysis",
+      "criticality": "important",
+      "description": "Extract principles, mechanics and quality targets from a reference without copying its expression.",
+      "domain": "intelligence",
+      "name": "Reference analysis",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "release_readiness",
+      "criticality": "core",
+      "description": "Decide whether a finished cut is allowed to leave the building.",
+      "domain": "production",
+      "name": "Release readiness",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "research_intelligence",
+      "criticality": "important",
+      "description": "The umbrella capability for finding evidence-backed content and market opportunities.",
+      "domain": "intelligence",
+      "name": "Research intelligence",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "retention_diagnosis",
+      "criticality": "important",
+      "description": "Locate where an audience leaves and state the mechanism, not the timestamp.",
+      "domain": "data",
+      "name": "Retention diagnosis",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "retrieval",
+      "criticality": "important",
+      "description": "Find the already-known fact instead of rediscovering it.",
+      "domain": "ai_platform",
+      "name": "Retrieval",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "simulation",
+      "criticality": "core",
+      "description": "Build and run deterministic simulations whose results reproduce from a seed.",
+      "domain": "engineering",
+      "name": "Simulation",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "software_architecture",
+      "criticality": "core",
+      "description": "Protect module boundaries, contracts, reversibility and long-term maintainability.",
+      "domain": "engineering",
+      "name": "Software architecture",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "software_implementation",
+      "criticality": "important",
+      "description": "Implement an authorized engineering work order inside its granted paths.",
+      "domain": "engineering",
+      "name": "Software implementation",
+      "notes": "",
+      "required_by": [
+        "software_implementation_engineer"
+      ],
+      "status": "active"
+    },
+    {
+      "capability_id": "source_analysis",
+      "criticality": "supporting",
+      "description": "Judge whether a discovered source is worth a reader's attention and record why.",
+      "domain": "intelligence",
+      "name": "Source analysis",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "technology_migration",
+      "criticality": "supporting",
+      "description": "Move a system to a replacement engine, library or format without losing evidence.",
+      "domain": "engineering",
+      "name": "Technology migration",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "telemetry",
+      "criticality": "important",
+      "description": "Record what a task cost in units that survive a provider change.",
+      "domain": "ai_platform",
+      "name": "Telemetry",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "test_engineering",
+      "criticality": "important",
+      "description": "Write the tests that decide whether an implementation met its criteria.",
+      "domain": "engineering",
+      "name": "Test engineering",
+      "notes": "",
+      "required_by": [
+        "software_implementation_engineer"
+      ],
+      "status": "active"
+    },
+    {
+      "capability_id": "trend_research",
+      "criticality": "supporting",
+      "description": "Track format and audience movement across platforms over time.",
+      "domain": "intelligence",
+      "name": "Trend research",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "viewer_psychology",
+      "criticality": "important",
+      "description": "Reason about attention, anticipation and payoff from evidence rather than taste.",
+      "domain": "creative",
+      "name": "Viewer psychology",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "visual_direction",
+      "criticality": "core",
+      "description": "Own the visual language: palette, value structure, environment and machine readability.",
+      "domain": "creative",
+      "name": "Visual direction",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "youtube_research",
+      "criticality": "important",
+      "description": "Read platform performance data and retention behaviour on real published videos.",
+      "domain": "intelligence",
+      "name": "YouTube research",
+      "notes": "",
+      "required_by": [],
+      "status": "active"
+    }
+  ],
+  "relations": [
+    {
+      "kind": "comprises",
+      "note": "",
+      "source": "cinematography",
+      "target": "camera_continuity"
+    },
+    {
+      "kind": "comprises",
+      "note": "",
+      "source": "cinematography",
+      "target": "framing"
+    },
+    {
+      "kind": "comprises",
+      "note": "",
+      "source": "cinematography",
+      "target": "mobile_readability"
+    },
+    {
+      "kind": "comprises",
+      "note": "",
+      "source": "cinematography",
+      "target": "occlusion_analysis"
+    },
+    {
+      "kind": "comprises",
+      "note": "",
+      "source": "production",
+      "target": "qc"
+    },
+    {
+      "kind": "comprises",
+      "note": "",
+      "source": "production",
+      "target": "release_readiness"
+    },
+    {
+      "kind": "comprises",
+      "note": "",
+      "source": "research_intelligence",
+      "target": "opportunity_analysis"
+    },
+    {
+      "kind": "comprises",
+      "note": "",
+      "source": "research_intelligence",
+      "target": "reference_analysis"
+    },
+    {
+      "kind": "comprises",
+      "note": "",
+      "source": "research_intelligence",
+      "target": "source_analysis"
+    },
+    {
+      "kind": "comprises",
+      "note": "",
+      "source": "visual_direction",
+      "target": "cinematography"
+    },
+    {
+      "kind": "comprises",
+      "note": "",
+      "source": "visual_direction",
+      "target": "environment_review"
+    },
+    {
+      "kind": "related_to",
+      "note": "",
+      "source": "benchmarks",
+      "target": "analytics"
+    },
+    {
+      "kind": "related_to",
+      "note": "",
+      "source": "caching",
+      "target": "retrieval"
+    },
+    {
+      "kind": "related_to",
+      "note": "",
+      "source": "experiment_design",
+      "target": "analytics"
+    },
+    {
+      "kind": "related_to",
+      "note": "",
+      "source": "framing",
+      "target": "environment_review"
+    },
+    {
+      "kind": "related_to",
+      "note": "",
+      "source": "mobile_readability",
+      "target": "qc"
+    },
+    {
+      "kind": "related_to",
+      "note": "",
+      "source": "software_architecture",
+      "target": "software_implementation"
+    },
+    {
+      "kind": "related_to",
+      "note": "",
+      "source": "software_implementation",
+      "target": "test_engineering"
+    },
+    {
+      "kind": "related_to",
+      "note": "",
+      "source": "technology_migration",
+      "target": "dependency_governance"
+    },
+    {
+      "kind": "related_to",
+      "note": "",
+      "source": "trend_research",
+      "target": "youtube_research"
+    },
+    {
+      "kind": "related_to",
+      "note": "",
+      "source": "viewer_psychology",
+      "target": "retention_diagnosis"
+    },
+    {
+      "kind": "requires",
+      "note": "",
+      "source": "camera_continuity",
+      "target": "framing"
+    },
+    {
+      "kind": "requires",
+      "note": "",
+      "source": "employee_evaluation",
+      "target": "capability_graph"
+    },
+    {
+      "kind": "requires",
+      "note": "",
+      "source": "fairness",
+      "target": "benchmarks"
+    },
+    {
+      "kind": "requires",
+      "note": "",
+      "source": "fairness",
+      "target": "simulation"
+    },
+    {
+      "kind": "requires",
+      "note": "",
+      "source": "hiring",
+      "target": "capability_graph"
+    },
+    {
+      "kind": "requires",
+      "note": "",
+      "source": "model_routing",
+      "target": "telemetry"
+    },
+    {
+      "kind": "requires",
+      "note": "",
+      "source": "occlusion_analysis",
+      "target": "framing"
+    },
+    {
+      "kind": "requires",
+      "note": "",
+      "source": "opportunity_analysis",
+      "target": "source_analysis"
+    },
+    {
+      "kind": "requires",
+      "note": "",
+      "source": "opportunity_dossiers",
+      "target": "opportunity_analysis"
+    },
+    {
+      "kind": "requires",
+      "note": "",
+      "source": "org_design",
+      "target": "capability_graph"
+    },
+    {
+      "kind": "requires",
+      "note": "",
+      "source": "portfolio_routing",
+      "target": "escalation"
+    },
+    {
+      "kind": "requires",
+      "note": "",
+      "source": "reference_analysis",
+      "target": "source_analysis"
+    },
+    {
+      "kind": "requires",
+      "note": "",
+      "source": "release_readiness",
+      "target": "qc"
+    },
+    {
+      "kind": "requires",
+      "note": "",
+      "source": "retrieval",
+      "target": "context_engineering"
+    }
+  ],
+  "version": 1
+}

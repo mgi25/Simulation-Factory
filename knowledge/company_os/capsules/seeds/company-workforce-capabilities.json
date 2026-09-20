@@ -1,0 +1,70 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "capability_graph",
+    "capability_coverage",
+    "single_point_of_failure"
+  ],
+  "created": "2026-09-16",
+  "decisions": [],
+  "dependencies": [
+    "company-runtime"
+  ],
+  "experiment_learnings": [],
+  "facts": [
+    "bootstrap-forbids-nested-agents"
+  ],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-workforce-capabilities",
+  "inputs": [
+    "org_registry.yaml employees, and capability_registry.json definitions",
+    "An explicit required-capability list from a task or a gap"
+  ],
+  "invariants": [
+    "A Capability record has no provided_by field; providers are derived from the org registry on demand.",
+    "comprises and requires must be acyclic; related_to is symmetric so a cycle in it is the normal case.",
+    "Active capacity and organizational capability are separate: a dormant provider is coverage, not capacity.",
+    "Candidate, shadow and probation providers count as neither - the person under evaluation is not the answer to the gap.",
+    "A required capability that is not registered raises rather than becoming a gap; a typo must not become a hire."
+  ],
+  "last_reviewed": "2026-09-16",
+  "may_read": [
+    "company/org_registry.yaml",
+    "company/workforce/*.py"
+  ],
+  "may_write": [
+    "company/workforce/capabilities.py",
+    "company/workforce/coverage.py"
+  ],
+  "must_not_modify": [
+    "company/org_registry.yaml",
+    "company/permissions.yaml",
+    "company/constitution.md"
+  ],
+  "outputs": [
+    "CapabilityGraph, ResolvedCapability, CoverageReport",
+    "Single-point-of-failure and uncovered-critical-capability lists"
+  ],
+  "owner": "workstream-workforce",
+  "owns_paths": [
+    "company/workforce/capabilities.py",
+    "company/workforce/coverage.py",
+    "company/workforce/capability_registry.json"
+  ],
+  "purpose": "Defines what the company can do, relates capabilities explicitly, and derives who provides each one from org_registry.yaml rather than storing a second copy.",
+  "recheck_on": "2027-09-16",
+  "revalidation_reason": "",
+  "risks": [
+    "Registry JSON is generated; hand-editing it can break the byte-stable round trip test.",
+    "expand() turns one requirement into several, which turns one honest gap into several invented ones if used by default."
+  ],
+  "source": "company-os-v1-workforce-foundation",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_workforce.py"
+  ],
+  "title": "Capability model and coverage",
+  "type": "module"
+}

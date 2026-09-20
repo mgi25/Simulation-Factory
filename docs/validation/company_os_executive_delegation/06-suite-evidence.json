@@ -1,0 +1,124 @@
+{
+  "results": [
+    {
+      "suite": "tests/test_company_analytics.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "docs/company_os_executive_delegation.md",
+      "selected": 160,
+      "failed": 0,
+      "note": "160 passed in 1.04s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_dashboard.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "docs/company_os_executive_delegation.md",
+      "selected": 32,
+      "failed": 0,
+      "note": "32 passed in 0.81s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_execution_transport.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "docs/company_os_executive_delegation.md",
+      "selected": 14,
+      "failed": 0,
+      "note": "14 passed in 0.64s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_finance.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "docs/company_os_executive_delegation.md",
+      "selected": 123,
+      "failed": 0,
+      "note": "123 passed in 0.87s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_integration_gate.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "docs/company_os_executive_delegation.md",
+      "selected": 88,
+      "failed": 0,
+      "note": "88 passed in 62.69s (0:01:02)",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_org_intelligence.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "docs/company_os_executive_delegation.md",
+      "selected": 119,
+      "failed": 0,
+      "note": "119 passed in 0.64s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_os_ai_platform.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "docs/company_os_executive_delegation.md",
+      "selected": 46,
+      "failed": 0,
+      "note": "46 passed in 0.10s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_os_capsules.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "docs/company_os_executive_delegation.md",
+      "selected": 66,
+      "failed": 0,
+      "note": "66 passed in 0.26s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_os_knowledge.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "docs/company_os_executive_delegation.md",
+      "selected": 26,
+      "failed": 0,
+      "note": "26 passed in 0.15s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_runtime.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "docs/company_os_executive_delegation.md",
+      "selected": 22,
+      "failed": 0,
+      "note": "22 passed in 1.02s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_workforce.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "docs/company_os_executive_delegation.md",
+      "selected": 93,
+      "failed": 0,
+      "note": "93 passed in 0.42s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_delegation.py",
+      "passed": true,
+      "observed_on": "2026-09-20",
+      "reported_by": "docs/company_os_executive_delegation.md",
+      "selected": 107,
+      "failed": 0,
+      "note": "107 passed in 0.70s",
+      "company_os": true
+    }
+  ]
+}

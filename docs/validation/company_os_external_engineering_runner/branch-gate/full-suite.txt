@@ -1,0 +1,12 @@
+.....................................sssssss.sssssss.................... [ 95%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+.........................................s..........                     [100%]
+=========================== short test summary info ===========================
+FAILED tests/test_neon_proof.py::test_a_missing_godot_is_reported_rather_than_raised
+FAILED tests/test_sloped_v251_world.py::test_the_siting_tool_uses_the_scenes_own_edit_map
+FAILED tests/test_sloped_v251_world.py::test_the_projector_puts_each_node_in_the_frame_named_for_it
+FAILED tests/test_sloped_v251_world.py::test_every_authored_site_lands_in_at_least_one_frame
+FAILED tests/test_sloped_v251_world.py::test_the_analytic_parallax_finds_a_spread_in_every_chase
+FAILED tests/test_sloped_v252_world.py::test_the_geometric_parallax_field_is_identical_to_v251s
+6 failed, 4389 passed, 337 skipped in 556.21s (0:09:16)

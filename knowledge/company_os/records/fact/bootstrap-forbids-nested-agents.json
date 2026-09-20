@@ -1,0 +1,38 @@
+{
+  "confidence": 1.0,
+  "contradicts": [],
+  "created": "2026-09-16",
+  "derived_from": "",
+  "evidence": [
+    {
+      "kind": "document",
+      "note": "constitutional rules 2 and 3",
+      "ref": "company/constitution.md"
+    },
+    {
+      "kind": "document",
+      "note": "ceo_reserved.change_no_subagents_policy",
+      "ref": "company/permissions.yaml"
+    },
+    {
+      "kind": "document",
+      "note": "hard constraint",
+      "ref": "ai_platform/README.md"
+    },
+    {
+      "kind": "test",
+      "note": "the enforcement tests",
+      "ref": "tests/test_company_os_ai_platform.py"
+    }
+  ],
+  "freshness": "permanent",
+  "id": "bootstrap-forbids-nested-agents",
+  "recheck_on": null,
+  "related_commits": [],
+  "related_experiments": [],
+  "related_tasks": [],
+  "revalidation_reason": "",
+  "source": "company-os-v1-ai-efficiency",
+  "statement": "In Bootstrap Mode no session may spawn a subagent, child agent, worker swarm or nested delegation. Multiple perspectives are separate sessions invoked sequentially, passing the compact handoff artifact between them.",
+  "status": "active"
+}

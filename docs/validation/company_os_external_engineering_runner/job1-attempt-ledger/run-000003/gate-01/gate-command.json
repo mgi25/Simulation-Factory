@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "C:\\Users\\mgial\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "-m",
+    "company.integration",
+    "check",
+    "--repo-root",
+    "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-company-os-runner-tasks\\eng-attempt-ledger",
+    "--json",
+    "--suite-evidence",
+    "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\company-os-runner-state\\runs\\wo-attempt-ledger-93c5b79f0e3b\\run-000003\\gate-01\\suites.json",
+    "--state-dir",
+    "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-company-os-runner\\state\\external-runner"
+  ],
+  "cwd": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-company-os-runner-tasks\\eng-attempt-ledger",
+  "duration_s": 8.385,
+  "exit_code": 0,
+  "readiness": "",
+  "stderr": "",
+  "stdout_chars": 33329,
+  "timed_out": false
+}

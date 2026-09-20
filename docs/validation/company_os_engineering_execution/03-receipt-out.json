@@ -1,0 +1,49 @@
+{
+  "accepted": true,
+  "failures": [],
+  "handoff": {
+    "artifacts": [
+      "execution/receipts/wo-governance-drift-check-3e66f7617527/000001.json"
+    ],
+    "changed": [
+      "company/engineering/verify.py",
+      "company/engineering/__init__.py",
+      "company/engineering/__main__.py",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "escalation_reason": "",
+    "escalation_required": false,
+    "evidence": [
+      "company/engineering/verify.py",
+      "tests/test_company_engineering_execution.py",
+      "commit:d59a5d918630f763d0e93997626636e72a4dedc3"
+    ],
+    "next_owner": "chief_architect",
+    "objective": "Let me check at any time whether the protected governance files have changed since an engineering work order was authorized, without having to run a review to find out.",
+    "owner": "software_implementation_engineer",
+    "resource_usage": {
+      "fingerprint": "186ba0254fa104ba",
+      "record_ref": "resource_usage/wo-governance-drift-check-3e66f7617527/000001.json"
+    },
+    "result": "Added company/engineering/verify.py: one work order's protected surface re-digested against a named checkout, with three statuses so an unanswerable question cannot read as clean. Wired a read-only `verify` CLI command whose exit code is the answer. 8 new tests.",
+    "risks": [
+      "The check compares bytes, so a whitespace-only edit to a protected file reads as drift. That is deliberate but will produce a finding a reader has to dismiss."
+    ],
+    "status": "completed",
+    "task_id": "wo-governance-drift-check",
+    "tests": [
+      "tests/test_company_engineering_execution.py",
+      "tests/ -k company"
+    ],
+    "unchanged": []
+  },
+  "packet_attempt": 1,
+  "receipt_ref": "execution/receipts/wo-governance-drift-check-3e66f7617527/000001.json",
+  "state": "testing",
+  "usage_record": {
+    "fingerprint": "186ba0254fa104ba",
+    "record_ref": "resource_usage/wo-governance-drift-check-3e66f7617527/000001.json"
+  },
+  "warnings": [],
+  "work_order_id": "wo-governance-drift-check"
+}
