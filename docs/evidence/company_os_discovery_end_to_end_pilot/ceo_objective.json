@@ -1,0 +1,48 @@
+{
+  "objective_id": "obj-discovery-e2e-pilot-2026-09-20",
+  "title": "Improve the reliability, maintainability, or operating efficiency of the Company OS by completing ONE genuinely useful engineering improvement chosen by the company itself.",
+  "owner_seat": "ceo",
+  "set_by": "MGI",
+  "set_on": "2026-09-20",
+  "planning_run_id": "run-discovery-e2e-pilot",
+  "authority_source": "CEO objective envelope, one pilot only, no standing grant",
+  "planners": {
+    "executive_seat": "cto",
+    "executive_employee": "chief_architect",
+    "manager_seat": "engineering_manager",
+    "manager_employee": "engineering_delivery_manager"
+  },
+  "envelope": {
+    "objective_id": "obj-discovery-e2e-pilot-2026-09-20",
+    "budget": {"amount": "6.00", "currency": "USD"},
+    "budget_scope": "engineering-operations",
+    "risk_ceiling": "medium",
+    "allowed_departments": ["engineering"],
+    "forbidden_actions": [
+      "approve_deployment",
+      "publish_public_video",
+      "approve_canonical_merge",
+      "approve_staging_release",
+      "expand_authority",
+      "change_delegation_policy",
+      "approve_workforce_state_change",
+      "change_budget_policy"
+    ],
+    "success_metrics": [
+      "one genuinely useful engineering improvement completed",
+      "zero new test regressions"
+    ]
+  },
+  "discovery": {
+    "envelope_id": "disc-discovery-e2e-pilot",
+    "allowed_capsules": [
+      "company-engineering-execution",
+      "company-executive-delegation",
+      "company-knowledge-capsules"
+    ],
+    "allowed_surfaces": ["capsule_metadata", "validation_report"],
+    "max_candidates": 3,
+    "authorized_by": "chief_architect",
+    "authority_source": "discover_work grant under the objective envelope"
+  }
+}

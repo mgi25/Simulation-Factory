@@ -1050,12 +1050,65 @@ def test_planning_spawns_nothing_and_holds_no_live_delegation():
             assert forbidden not in source, f"{module.__name__} names {forbidden}"
 
 
-def test_this_branch_carries_no_live_pilot_machinery():
+def test_planning_never_depends_on_live_pilot_machinery():
+    """The invariant that survives composition.
+
+    An earlier version of this test asserted that *no* `pilot_*.py` existed
+    beside the planning modules. That was true of the branch it was written on
+    and is the wrong thing to assert: the end-to-end pilot composes planning
+    with the live-delegation runtime on purpose, and the check failed for the
+    one composition it was meant to make safe.
+
+    What actually matters does not depend on which branch this runs on: the
+    planning layer must never *reach for* pilot code. Canonical can then carry
+    planning without carrying activation, which is exactly how the curated
+    canonical integration was possible.
+    """
     delegation = Path(__file__).resolve().parents[1] / "company" / "delegation"
-    assert not list(delegation.glob("pilot*.py"))
-    for name in ("PilotActivation", "evaluate_live", "PilotBoundaryViolation"):
-        hits = [p.name for p in delegation.glob("*.py") if name in p.read_text(encoding="utf-8")]
-        assert not hits, f"{name} appears in {hits}"
+    planning_modules = (
+        "candidates.py",
+        "planning.py",
+        "planning_record.py",
+        "planning_run.py",
+        "discovery.py",
+        "executive.py",
+        "objectives.py",
+    )
+    for name in planning_modules:
+        path = delegation / name
+        if not path.exists():  # pragma: no cover - module set differs per branch
+            continue
+        source = path.read_text(encoding="utf-8")
+        for forbidden in (
+            "from .pilot",
+            "import pilot",
+            "PilotActivation",
+            "evaluate_live",
+            "PilotBoundaryViolation",
+        ):
+            assert forbidden not in source, f"{name} reaches for {forbidden}"
+
+
+def test_where_the_live_pilot_exists_it_is_inert_without_an_activation():
+    """Importing the pilot changes nothing; only an activation does.
+
+    Skipped on a branch that carries no pilot, which is the canonical case.
+    """
+    delegation = Path(__file__).resolve().parents[1] / "company" / "delegation"
+    if not (delegation / "pilot.py").exists():
+        pytest.skip("this branch carries no live-pilot runtime")
+    from company.delegation.pilot import PilotMode, evaluate_live
+
+    import inspect
+
+    signature = inspect.signature(evaluate_live)
+    activation = signature.parameters.get("activation")
+    assert activation is not None
+    assert activation.default is None, (
+        "evaluate_live must default to no activation, so importing the pilot "
+        "authorizes nothing"
+    )
+    assert PilotMode.SHADOW.value == "shadow"
 
 
 def test_the_delegation_policy_is_still_shadow():

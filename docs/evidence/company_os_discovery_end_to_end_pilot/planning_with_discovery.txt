@@ -1,0 +1,14 @@
+OBJECTIVE            obj-discovery-e2e-pilot-2026-09-20
+PLANNING STATUS      selected
+ELIGIBLE WORK FOUND  2
+CANDIDATES CONSIDERED 8 (6 rejected)
+SELECTED WORK        Declare capsule ownership for the modules no capsule claims
+WHY SELECTED         gate-architecture-subsystem_ownership_bounded is the only candidate that passes every constraint and can actually be started (2 passed eligibility, 1 of those is executable), so the choice is arithmetic and no planning session was opened
+DISCOVERY USED       yes (1 proposed, 0 rejected)
+EXECUTIVE            cto (chief_architect)
+MANAGER              engineering_manager (engineering_delivery_manager)
+EXPECTED VALUE       Every module resolves to an owning capsule, so a session handed a capsule is handed all of the code that capsule is responsible for.
+RISK                 low
+PLANNING COST        0 (no model)
+READY FOR EXECUTION  yes
+CEO DECISION NEEDED  no
