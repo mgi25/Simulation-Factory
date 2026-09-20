@@ -255,7 +255,10 @@ def _request(args: argparse.Namespace) -> int:
         authorized_on=args.as_of or request.requested_on,
     )
     store = EngineeringStore(args.state_dir)
-    if assessment.outcome is IntakeOutcome.DECISION_REQUIRED:
+    if assessment.outcome in (
+        IntakeOutcome.DECISION_REQUIRED,
+        IntakeOutcome.PLANNING_REQUIRED,
+    ):
         pointer = store.append_request(assessment.request)
         _emit(
             {

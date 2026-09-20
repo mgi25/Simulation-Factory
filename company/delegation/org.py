@@ -149,6 +149,26 @@ class Seat:
         return self.kind is not SeatKind.CEO and not self.employee
 
     @property
+    def is_deterministic_control(self) -> bool:
+        """True for a seat that is a mechanism rather than a person.
+
+        `deterministic_qa` and `integration_gate` are `independent_control`
+        seats that no employee fills and no employee ever should. Deterministic
+        QA is `company/engineering/review.py` computing a verdict; the
+        integration gate is that gate's own CLI producing a report. Both are
+        code, both already run, and staffing either would replace a
+        reproducible check with somebody's opinion.
+
+        They appear as seats so the chart can show that an independent control
+        exists and so `LAYER_RANK` can refuse to let a manager overrule one.
+        They hold no grant, sit at rank 0, and are never a stop on an
+        escalation path, so their emptiness delays nothing. Calling that
+        emptiness a *vacancy* is the only thing here that was ever misleading:
+        a vacancy is a seat waiting for a hire, and these are not.
+        """
+        return self.kind is SeatKind.INDEPENDENT_CONTROL and not self.employee
+
+    @property
     def rank(self) -> int:
         return LAYER_RANK[self.kind]
 
@@ -325,6 +345,23 @@ class Hierarchy:
                 detail=(
                     "the CEO is a human outside the registry; reaching this seat is "
                     "an escalation, never a delegated approval"
+                ),
+            )
+        if seat.is_deterministic_control:
+            # Empty by design, and never to be filled. Same authority as any
+            # unfilled seat - none - and a different reason, so that a reader
+            # of the chart does not go looking for somebody to hire.
+            return SeatStanding(
+                seat=seat,
+                availability=SeatAvailability.VACANT,
+                employment_state="",
+                authority_cap=0,
+                detail=(
+                    f"{seat.seat_id} is a deterministic control, not a post: it is "
+                    "computed by code that already runs, holds no grant, and is "
+                    "never a stop on an escalation path. Nothing waits for it to "
+                    "be filled, and filling it would replace a reproducible check "
+                    "with an opinion."
                 ),
             )
         if seat.is_vacant:

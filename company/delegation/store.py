@@ -4,7 +4,16 @@
 <state_dir>/delegation/decisions/<objective-or-loose>/000001.json
 <state_dir>/delegation/objectives/<objective>/000001.json
 <state_dir>/delegation/plans/<objective>/000001.json
+<state_dir>/delegation/candidates/<candidate>/000001.json
+<state_dir>/delegation/planning/<objective>/000001.json
 ```
+
+Candidates are grouped by candidate rather than by objective because a
+candidate outlives any one objective: it is registered once, considered by
+several objectives, and finally selected by one. Each status change appends a
+new version under the same directory, so `open -> blocked -> open -> selected`
+is a directory listing and never an edit. `CandidateRegister` keeps the last
+version of each id, which is what makes the latest status the effective one.
 
 No database and no index, and no second copy of the exclusive-create loop:
 writing goes through `company.runtime.state_paths.append_json_bytes`, which
@@ -51,7 +60,9 @@ from company.runtime.state_paths import (
 )
 
 from .errors import DelegationError
+from .candidates import CandidateRegister, WorkCandidate, candidate_from
 from .objectives import ExecutivePlan, Objective, objectives_from
+from .planning_record import PlanningDecisionRecord, planning_record_from
 from .record import ExecutiveDecisionRecord
 
 
@@ -99,8 +110,16 @@ class DelegationStore:
     _DECISIONS = "decisions"
     _OBJECTIVES = "objectives"
     _PLANS = "plans"
+    _CANDIDATES = "candidates"
+    _PLANNING = "planning"
 
-    KINDS: tuple[str, ...] = (_DECISIONS, _OBJECTIVES, _PLANS)
+    KINDS: tuple[str, ...] = (
+        _DECISIONS,
+        _OBJECTIVES,
+        _PLANS,
+        _CANDIDATES,
+        _PLANNING,
+    )
 
     def __init__(self, state_dir: str | Path) -> None:
         if isinstance(state_dir, str) and not state_dir.strip():
@@ -130,6 +149,28 @@ class DelegationStore:
             self._OBJECTIVES, root, objective, objective.fingerprint()
         )
 
+    def append_candidate(self, candidate: WorkCandidate) -> DelegationRecordPointer:
+        """The next version of one candidate. Never an update of the last."""
+        if not isinstance(candidate, WorkCandidate):
+            raise DelegationStoreError("append_candidate takes a WorkCandidate")
+        return self._append(
+            self._CANDIDATES,
+            candidate.candidate_id,
+            candidate,
+            candidate.fingerprint(),
+        )
+
+    def append_planning_decision(
+        self, record: PlanningDecisionRecord
+    ) -> DelegationRecordPointer:
+        if not isinstance(record, PlanningDecisionRecord):
+            raise DelegationStoreError(
+                "append_planning_decision takes a PlanningDecisionRecord"
+            )
+        return self._append(
+            self._PLANNING, record.objective_id, record, record.fingerprint()
+        )
+
     def append_plan(self, plan: ExecutivePlan) -> DelegationRecordPointer:
         if not isinstance(plan, ExecutivePlan):
             raise DelegationStoreError("append_plan takes an ExecutivePlan")
@@ -144,6 +185,57 @@ class DelegationStore:
                 self._DECISIONS,
                 objective_id or UNATTRIBUTED,
                 ExecutiveDecisionRecord.from_mapping,
+            )
+        )
+
+    def candidate_versions(self, candidate_id: str) -> tuple[WorkCandidate, ...]:
+        """Every version of one candidate, oldest first. The last one is current."""
+        return tuple(
+            item
+            for _pointer, item in self._records(
+                self._CANDIDATES, candidate_id, candidate_from
+            )
+        )
+
+    def candidate_ids(self) -> tuple[str, ...]:
+        """Every candidate id the store holds, read from the records.
+
+        Not from the directory names: `task_directory_name` appends a digest so
+        two ids that differ only in an unsafe character cannot collide, which
+        makes the directory name unusable as the id it was derived from.
+        """
+        return tuple(sorted(item.candidate_id for item in self._latest_candidates()))
+
+    def _latest_candidates(self) -> tuple[WorkCandidate, ...]:
+        directory = self.root / self._CANDIDATES
+        if not directory.is_dir():
+            return ()
+        latest: list[WorkCandidate] = []
+        for group in sorted(directory.iterdir()):
+            if not group.is_dir():
+                continue
+            records = sorted_records(group)
+            if not records:
+                continue
+            try:
+                latest.append(candidate_from(self._load(records[-1])))
+            except DelegationError as exc:
+                raise DelegationStoreError(
+                    f"{records[-1]}: invalid candidate record: {exc}"
+                ) from exc
+        return tuple(latest)
+
+    def register(self) -> CandidateRegister:
+        """The register as the store currently holds it: latest version of each."""
+        return CandidateRegister(self._latest_candidates())
+
+    def planning_decisions(
+        self, objective_id: str
+    ) -> tuple[PlanningDecisionRecord, ...]:
+        return tuple(
+            item
+            for _pointer, item in self._records(
+                self._PLANNING, objective_id, planning_record_from
             )
         )
 

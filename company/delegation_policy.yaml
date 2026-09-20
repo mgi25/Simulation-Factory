@@ -222,6 +222,11 @@ action_autonomy:
   approve_review_outcome: 3
   approve_code_change: 3
   approve_work_order: 3
+  # Choosing which known candidate advances an objective. Rung 3, the same as
+  # approving the work order it produces: a seat that may not approve a code
+  # change has no business deciding which code changes the company makes, and
+  # an employee capped below 3 (probation, shadow, dormant) cannot plan.
+  select_work: 3
   approve_new_dependency: 3
   approve_research_program: 3
   approve_content_experiment: 3
@@ -268,6 +273,7 @@ functional_authority:
 grants:
   engineering_manager:
     may_approve:
+      - select_work
       - approve_code_change
       - approve_test_progression
       - approve_review_outcome
@@ -277,7 +283,7 @@ grants:
     max_risk: low
     per_decision_ceiling: "25.00"
     budget_scope: engineering-operations
-    rationale: Routine low-risk engineering work and bounded corrections.
+    rationale: Routine low-risk engineering work, bounded corrections, and selecting known candidate work for an objective.
 
   ai_platform_lead:
     may_approve:
@@ -337,6 +343,7 @@ grants:
 
   cto:
     may_approve:
+      - select_work
       - approve_code_change
       - approve_test_progression
       - approve_review_outcome
@@ -349,7 +356,7 @@ grants:
     max_risk: medium
     per_decision_ceiling: "40.00"
     budget_scope: engineering
-    rationale: Broader engineering decisions and routine integration within scope.
+    rationale: Broader engineering decisions, routine integration in scope, and work selection across engineering capsules.
 
   cfo:
     may_approve:
@@ -366,6 +373,7 @@ grants:
   # the CFO reachable only in theory.
   coo:
     may_approve:
+      - select_work
       - approve_cross_department_schedule
       - approve_production_render
       - approve_research_program
@@ -376,4 +384,4 @@ grants:
     max_risk: medium
     per_decision_ceiling: "50.00"
     budget_scope: company-operating
-    rationale: Cross-department coordination and normal operational continuation.
+    rationale: Cross-department coordination, operational continuation, and work selection spanning departments.

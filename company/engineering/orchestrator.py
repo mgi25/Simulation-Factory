@@ -189,8 +189,10 @@ def open_job(
     """
     if assessment.outcome is not IntakeOutcome.AUTHORIZED or assessment.work_order is None:
         raise EngineeringError(
-            "only an authorized intake opens a job; a decision-required assessment "
-            "carries decisions for the CEO and no work order"
+            f"only an authorized intake opens a job; a {assessment.outcome.value} "
+            "assessment carries reasons and no work order. decision_required needs "
+            "the CEO; planning_required needs an executive or a manager to select a "
+            "work candidate first"
         )
     order = assessment.work_order
     day = assert_day(on or order.authorized_on, "on")

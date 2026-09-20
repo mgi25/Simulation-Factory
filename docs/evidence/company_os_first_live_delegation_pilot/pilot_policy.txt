@@ -1,0 +1,33 @@
+DELEGATED ENGINEERING PILOT delegated_engineering_pilot_v1
+  activated in canonical: NO. This prints the model, not a grant.
+
+LIVE SEATS AND ACTIONS
+  cto
+    approve_code_change
+    approve_integration_merge
+    approve_review_outcome
+    approve_test_progression
+    approve_work_order
+    request_bounded_correction
+    stop_work_on_invalid_premise
+  engineering_manager
+    approve_code_change
+    approve_review_outcome
+    approve_test_progression
+    approve_work_order
+    request_bounded_correction
+    stop_work_on_invalid_premise
+
+INTEGRATION TARGET
+  company-os-v1-delegated-engineering-pilot-integration
+  kind      internal_branch
+  an internal branch created for this pilot, which no other branch builds on and which is undone completely by deleting it, so that work can be completed and accepted internally without anything leaving the company
+
+PROTECTED REFS (never advanced by any delegated decision)
+  company-os-v1-bootstrap
+  main
+  master
+
+DEFAULT MODE
+  shadow: evaluate_live() with no activation authorizes
+  nothing. Live authority requires a PilotActivation passed by hand.

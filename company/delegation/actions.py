@@ -51,6 +51,12 @@ class ActionType(str, Enum):
     """Every action the delegation model can reason about. Closed on purpose."""
 
     # -- engineering -------------------------------------------------------
+    # Choosing which known candidate advances a CEO objective. It is listed
+    # first because it happens first: every action below it presupposes that
+    # somebody already decided what the work is, and until this member existed
+    # that decision had no seat, no record and no ceiling. See
+    # `docs/company_os_objective_planning.md`.
+    SELECT_WORK = "select_work"
     APPROVE_WORK_ORDER = "approve_work_order"
     APPROVE_CODE_CHANGE = "approve_code_change"
     APPROVE_TEST_PROGRESSION = "approve_test_progression"

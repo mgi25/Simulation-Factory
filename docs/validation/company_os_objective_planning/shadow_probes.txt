@@ -1,0 +1,12 @@
+SHADOW MODE: ENFORCED
+
+  [ok] ceo_decision_names_a_human
+        a CEO decision signed by an automatic marker is still refused, and a named human is still accepted
+  [ok] approval_carries_no_merge_authority
+        a recorded CEO approval still carries no merge authority, and one claiming it is still refused
+  [ok] only_ready_for_approval_can_be_approved
+        approving a job that is not ready_for_approval is still refused in 3 probed states
+  [ok] delegation_record_cannot_act
+        a delegation decision and a stored record both refuse to claim authority to act, and both refuse to leave shadow mode
+  [ok] policy_cannot_leave_shadow
+        a policy declaring mode=enforcing is still refused at construction

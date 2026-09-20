@@ -1,0 +1,8 @@
+{
+  "request_id": "req-ceo-objective-probe",
+  "objective": "Improve the reliability or maintainability of the Company OS engineering system by completing one genuinely useful, already-existing LOW-risk engineering improvement. The company must identify the specific work itself from real repository evidence.",
+  "requested_by": "MGI",
+  "requested_on": "2026-09-20",
+  "risk": "low",
+  "reversible": true
+}

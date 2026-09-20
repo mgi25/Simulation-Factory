@@ -1,0 +1,24 @@
+{
+  "objective_id": "obj-first-live-delegation-2026-09-20",
+  "title": "Improve the reliability or maintainability of the Company OS engineering system by completing ONE genuinely useful, already-existing LOW-risk engineering improvement.",
+  "owner_seat": "ceo",
+  "set_by": "MGI",
+  "set_on": "2026-09-20",
+  "evidence_refs": ["docs/company_os_first_live_delegation_pilot.md"],
+  "planning_decision_id": "plan-first-live-delegation-replay",
+  "planners": {
+    "executive_seat": "cto",
+    "executive_employee": "chief_architect",
+    "manager_seat": "engineering_manager",
+    "manager_employee": "engineering_delivery_manager"
+  },
+  "envelope": {
+    "objective_id": "obj-first-live-delegation-2026-09-20",
+    "budget": {"amount": "6.00", "currency": "USD"},
+    "budget_scope": "engineering-operations",
+    "risk_ceiling": "low",
+    "allowed_departments": ["engineering"],
+    "forbidden_actions": ["approve_deployment", "publish_public_video", "approve_canonical_merge"],
+    "success_metrics": ["one real low-risk engineering improvement completed", "zero new test regressions"]
+  }
+}

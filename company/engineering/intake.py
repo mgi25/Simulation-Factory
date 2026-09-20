@@ -75,6 +75,7 @@ from .common import (
     ref_tuple,
     text_tuple,
 )
+from .criteria import assess_specificity
 from .errors import EngineeringError
 from .protected import ProtectedSurface
 from .work_order import (
@@ -289,6 +290,12 @@ _STOPWORDS = frozenset(
 class IntakeOutcome(str, Enum):
     AUTHORIZED = "authorized"
     DECISION_REQUIRED = "decision_required"
+    # The objective names a direction and no subject, and nothing upstream has
+    # chosen the work. Distinct from DECISION_REQUIRED because the CEO is not
+    # the one who has to act: an executive or a manager has to select a
+    # candidate first. See `company/engineering/criteria.py` and
+    # `docs/company_os_objective_planning.md`.
+    PLANNING_REQUIRED = "planning_required"
 
 
 @dataclass(frozen=True)
@@ -343,6 +350,11 @@ class CEORequest:
     # says so here, and the routing does not have to guess.
     escalate_reasoning: bool = False
     resource_profile: str = ""
+    # Set when this request was produced by a planning decision rather than
+    # written by hand. It is the evidence that somebody chose this work, and it
+    # is what lets a broad-sounding title through the specificity guard.
+    candidate_id: str = ""
+    planning_decision_id: str = ""
     notes: str = ""
 
     def __post_init__(self) -> None:
@@ -356,7 +368,14 @@ class CEORequest:
         object.__setattr__(
             self, "requested_on", assert_day(self.requested_on, "requested_on")
         )
-        for name in ("subsystem_hint", "authorized_branch", "base_commit", "notes"):
+        for name in (
+            "subsystem_hint",
+            "authorized_branch",
+            "base_commit",
+            "candidate_id",
+            "planning_decision_id",
+            "notes",
+        ):
             if not isinstance(getattr(self, name), str):
                 raise EngineeringError(f"{name} must be a string")
         object.__setattr__(
@@ -464,6 +483,8 @@ class CEORequest:
             novel=bool(data.get("novel", False)),
             escalate_reasoning=bool(data.get("escalate_reasoning", False)),
             resource_profile=str(data.get("resource_profile", "")),
+            candidate_id=str(data.get("candidate_id", "")),
+            planning_decision_id=str(data.get("planning_decision_id", "")),
             notes=str(data.get("notes", "")),
         )
 
@@ -516,7 +537,7 @@ class IntakeAssessment:
                 )
         elif self.work_order is not None or not self.decisions:
             raise EngineeringError(
-                "a decision-required intake carries decisions and no work order"
+                f"a {self.outcome.value} intake carries reasons and no work order"
             )
 
     def to_dict(self) -> dict[str, Any]:
@@ -720,12 +741,57 @@ def assess_request(
         context_refs_dropped=narrowing.dropped_reasons,
     )
 
+    # --- has anybody actually chosen this work? ---------------------------
+    #
+    # Last of the screens, because it is the cheapest to explain and the one
+    # whose answer changes most often: a request that arrives tied to a
+    # selected candidate passes it without inspecting a single word.
+    specificity = assess_specificity(
+        request.objective,
+        acceptance_criteria=request.acceptance_criteria,
+        candidate_id=request.candidate_id,
+    )
+    planning_blocks: tuple[DecisionRequired, ...] = ()
+    if not specificity.specific:
+        planning_blocks = (
+            DecisionRequired(
+                reason=(
+                    "this is an objective, not a work order: "
+                    + specificity.reason
+                ),
+                question=(
+                    "Have an executive or a manager select a work candidate for "
+                    "this objective, then submit the work order that selection "
+                    "produces. `python -m company.delegation plan` does this "
+                    "against the candidate register; the resulting request "
+                    "carries candidate_id and planning_decision_id and passes "
+                    "this screen."
+                ),
+                options=(
+                    "select a candidate and resubmit the derived work order",
+                    "supply explicit falsifiable acceptance criteria on the request",
+                    "narrow the objective until it names a subject",
+                ),
+            ),
+        )
+
     if blocking:
+        # A reserved action or a credential outranks a planning gap: the CEO is
+        # the one who has to act, and telling the company to go and plan first
+        # would send it round a loop that ends in the same refusal.
         return IntakeAssessment(
             request=request,
             outcome=IntakeOutcome.DECISION_REQUIRED,
             derivation=derivation,
-            decisions=tuple(dict.fromkeys(blocking)),
+            decisions=tuple(dict.fromkeys(blocking + planning_blocks)),
+        )
+
+    if planning_blocks:
+        return IntakeAssessment(
+            request=request,
+            outcome=IntakeOutcome.PLANNING_REQUIRED,
+            derivation=derivation,
+            decisions=planning_blocks,
         )
 
     surface = ProtectedSurface.capture(repo_root, authorized_paths=authorized)
