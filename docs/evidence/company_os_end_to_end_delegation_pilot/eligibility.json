@@ -1,0 +1,146 @@
+[
+  {
+    "candidate_id": "auth-migration-classifier-ambiguity",
+    "eligible": true,
+    "passed": [
+      "department_permitted",
+      "capsule_owned",
+      "status_open",
+      "risk_within_ceiling",
+      "cost_within_budget",
+      "no_forbidden_action",
+      "dependencies_satisfied",
+      "criteria_falsifiable",
+      "evidence_present",
+      "goal_overlap"
+    ],
+    "failed": [],
+    "reasons": []
+  },
+  {
+    "candidate_id": "deployment-policy-gap",
+    "eligible": false,
+    "passed": [
+      "department_permitted",
+      "capsule_owned",
+      "cost_within_budget",
+      "no_forbidden_action",
+      "dependencies_satisfied",
+      "criteria_falsifiable",
+      "evidence_present",
+      "goal_overlap"
+    ],
+    "failed": [
+      "status_open",
+      "risk_within_ceiling"
+    ],
+    "reasons": [
+      "status_open: status is blocked (a CEO policy decision: Company OS has no deployment policy to delegate against, and inventing one in code would be the delegation model widening itself)",
+      "risk_within_ceiling: high risk exceeds the envelope ceiling of medium"
+    ]
+  },
+  {
+    "candidate_id": "intake-unfalsifiable-acceptance-criteria",
+    "eligible": false,
+    "passed": [
+      "department_permitted",
+      "capsule_owned",
+      "risk_within_ceiling",
+      "cost_within_budget",
+      "no_forbidden_action",
+      "dependencies_satisfied",
+      "criteria_falsifiable",
+      "evidence_present",
+      "goal_overlap"
+    ],
+    "failed": [
+      "status_open"
+    ],
+    "reasons": [
+      "status_open: status is completed"
+    ]
+  },
+  {
+    "candidate_id": "provider-usage-event-identifier",
+    "eligible": false,
+    "passed": [
+      "capsule_owned",
+      "risk_within_ceiling",
+      "cost_within_budget",
+      "no_forbidden_action",
+      "dependencies_satisfied",
+      "criteria_falsifiable",
+      "evidence_present",
+      "goal_overlap"
+    ],
+    "failed": [
+      "department_permitted",
+      "status_open"
+    ],
+    "reasons": [
+      "department_permitted: ai_platform is not among the envelope's departments (engineering)",
+      "status_open: status is blocked (a design decision nobody has taken: no existing field is a stable per-event id, so this needs a schema change, and schema or storage migration is outside routine engineering)"
+    ]
+  },
+  {
+    "candidate_id": "reserved-screening-negation-blindness",
+    "eligible": true,
+    "passed": [
+      "department_permitted",
+      "capsule_owned",
+      "status_open",
+      "risk_within_ceiling",
+      "cost_within_budget",
+      "no_forbidden_action",
+      "dependencies_satisfied",
+      "criteria_falsifiable",
+      "evidence_present",
+      "goal_overlap"
+    ],
+    "failed": [],
+    "reasons": []
+  },
+  {
+    "candidate_id": "runner-blocked-attempt-repo-dir",
+    "eligible": false,
+    "passed": [
+      "department_permitted",
+      "status_open",
+      "risk_within_ceiling",
+      "cost_within_budget",
+      "no_forbidden_action",
+      "dependencies_satisfied",
+      "criteria_falsifiable",
+      "evidence_present",
+      "goal_overlap"
+    ],
+    "failed": [
+      "capsule_owned"
+    ],
+    "reasons": [
+      "capsule_owned: no confirmed capsule owns tools-engineering-runner; work whose owner the company cannot name has no declared scope, tests or invariants to be reviewed against"
+    ]
+  },
+  {
+    "candidate_id": "runner-zero-required-tests-policy",
+    "eligible": false,
+    "passed": [
+      "department_permitted",
+      "risk_within_ceiling",
+      "cost_within_budget",
+      "no_forbidden_action",
+      "dependencies_satisfied",
+      "criteria_falsifiable",
+      "evidence_present",
+      "goal_overlap"
+    ],
+    "failed": [
+      "capsule_owned",
+      "status_open"
+    ],
+    "reasons": [
+      "capsule_owned: no confirmed capsule owns tools-engineering-runner; work whose owner the company cannot name has no declared scope, tests or invariants to be reviewed against",
+      "status_open: status is blocked (a policy decision about what evidence a receipt must carry when the work order declares no tests)"
+    ]
+  }
+]

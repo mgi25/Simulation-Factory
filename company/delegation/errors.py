@@ -32,4 +32,20 @@ class ShadowModeViolation(AuthorityViolation):
     """Something claimed this phase may execute authority. It may not."""
 
 
-__all__ = ["AuthorityViolation", "DelegationError", "ShadowModeViolation"]
+class PilotBoundaryViolation(AuthorityViolation):
+    """A live-pilot decision tried to leave the bounded pilot envelope.
+
+    Separate from `AuthorityViolation` because the remedy is different again:
+    the seat may genuinely hold the authority, and the request may genuinely be
+    inside its ceiling, and the answer is still no because *this pilot* was not
+    activated for it. The fix is a CEO decision to widen the envelope, never a
+    change to the grant.
+    """
+
+
+__all__ = [
+    "AuthorityViolation",
+    "DelegationError",
+    "PilotBoundaryViolation",
+    "ShadowModeViolation",
+]

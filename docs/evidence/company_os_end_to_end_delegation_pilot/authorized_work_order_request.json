@@ -1,0 +1,26 @@
+{
+  "request_id": "req-auth-migration-classifier-ambiguity",
+  "objective": "Disambiguate bare authentication and migration trigger words",
+  "requested_by": "engineering_delivery_manager",
+  "requested_on": "2026-09-20",
+  "capsule_hints": [
+    "company-engineering-execution"
+  ],
+  "scope_ceiling": [
+    "company/engineering/intake.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "acceptance_criteria": [
+    "An objective that names a migration only inside a quoted test identifier derives no specialist domain.",
+    "An objective that asks for a schema migration still derives the specialist domain it derives today.",
+    "tests/test_company_engineering_execution.py passes with a case for each direction."
+  ],
+  "risk": "medium",
+  "reversible": true,
+  "resource_profile": "consumer",
+  "authorized_branch": "company-os-v1-end-to-end-delegation-pilot",
+  "base_commit": "92b308c6e719e99b8c5d9ec41f12ffddcabefc3b",
+  "candidate_id": "auth-migration-classifier-ambiguity",
+  "planning_decision_id": "run-end-to-end-pilot",
+  "notes": "derived from candidate auth-migration-classifier-ambiguity by planning decision run-end-to-end-pilot"
+}

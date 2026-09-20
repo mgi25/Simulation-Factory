@@ -1,0 +1,14 @@
+[
+  {
+    "candidate": "reserved-screening-negation-blindness",
+    "outcome": "decision_required",
+    "reasons": [
+      "the objective names credential material: credential"
+    ]
+  },
+  {
+    "candidate": "auth-migration-classifier-ambiguity",
+    "outcome": "authorized",
+    "reasons": []
+  }
+]

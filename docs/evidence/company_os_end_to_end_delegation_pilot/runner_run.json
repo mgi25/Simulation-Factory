@@ -1,0 +1,11 @@
+{
+  "final_state": "planning",
+  "finished_at": "2026-09-20T12:38:44.823980+00:00",
+  "lease_note": "took a new lease",
+  "outcome": "failed",
+  "reason": "IntegrityFailure: base commit  is not in C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-e2e-pilot. The work order names a commit this repository does not have, so this is not the repository the work was authorized against.",
+  "run_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-e2e-pilot-runner\\runs\\wo-req-auth-migration-classifier-ambiguity-32665fd65a40\\run-000001",
+  "stages": [],
+  "started_at": "2026-09-20T12:38:43.873295+00:00",
+  "work_order_id": "wo-req-auth-migration-classifier-ambiguity"
+}

@@ -1,0 +1,14 @@
+{
+  "selected": "auth-migration-classifier-ambiguity",
+  "work_order_id": "wo-req-auth-migration-classifier-ambiguity",
+  "authorized_paths": [
+    "company/engineering/intake.py",
+    "tests/test_company_engineering_execution.py"
+  ],
+  "risk": "medium",
+  "acceptance_criteria": [
+    "An objective that names a migration only inside a quoted test identifier derives no specialist domain.",
+    "An objective that asks for a schema migration still derives the specialist domain it derives today.",
+    "tests/test_company_engineering_execution.py passes with a case for each direction."
+  ]
+}

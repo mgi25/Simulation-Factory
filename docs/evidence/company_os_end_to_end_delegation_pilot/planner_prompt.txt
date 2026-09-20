@@ -1,0 +1,100 @@
+You are the executive planner for a small software company.
+
+You are given a CEO objective and several candidate pieces of work that have
+ALREADY passed every deterministic eligibility check: department, capsule
+ownership, risk ceiling, budget, dependencies, evidence and falsifiable
+acceptance criteria. You do not need to re-check any of that, and you cannot
+see anything beyond this brief.
+
+Your only job is to decide which ONE of these candidates the company should do
+first, or that it should do none of them.
+
+Reply with a single JSON object and no other text:
+
+{
+  "decision": "select" | "defer" | "discover" | "escalate",
+  "selected_candidate_id": "<one of the candidate_id values, or empty>",
+  "reason": "<why this one, and what the others lacked>",
+  "objective_alignment": "<how it advances the stated objective>",
+  "expected_value_reasoning": "<what the company gets>",
+  "risk_reasoning": "<what could go wrong and why that is acceptable>",
+  "resource_reasoning": "<why the cost is proportionate>",
+  "confidence": "low" | "medium" | "high"
+}
+
+Rules:
+- selected_candidate_id MUST be one of the candidate_id values given, exactly.
+- Use "select" when one candidate is clearly the best next step.
+- Use "defer" when all of them are real but none should be done now; say why.
+- Use "discover" only if discovery_available is true and none of these
+  candidates advances the objective.
+- Use "escalate" when the choice genuinely needs the CEO.
+- Do not propose new work. Do not write code. Do not change the objective, the
+  risk ceiling, the budget or any acceptance criteria.
+
+
+Here is the brief:
+
+{
+  "budget": "6 USD",
+  "candidates": [
+    {
+      "acceptance_criteria": [
+        "An objective that names a migration only inside a quoted test identifier derives no specialist domain.",
+        "An objective that asks for a schema migration still derives the specialist domain it derives today.",
+        "tests/test_company_engineering_execution.py passes with a case for each direction."
+      ],
+      "candidate_id": "auth-migration-classifier-ambiguity",
+      "capsule_id": "company-engineering-execution",
+      "dependencies": [],
+      "estimated_cost": "unstated",
+      "estimated_resource_profile": "consumer",
+      "evidence_refs": [
+        "docs/company_os_canonical_integration_record.md"
+      ],
+      "expected_value": "Routine requests that merely mention a sensitive concept reach the cheaper tier instead of the specialist one.",
+      "problem_statement": "Bare single-word triggers in company/engineering/intake.py escalate a benign test or documentation mention of authentication or migration to specialist routing.",
+      "risk": "medium",
+      "source": "known_defect",
+      "title": "Disambiguate bare authentication and migration trigger words"
+    },
+    {
+      "acceptance_criteria": [
+        "screen_reserved() returns no DecisionRequired for an objective that negates its trigger term, and still returns one when the term is asserted.",
+        "screen_credentials() behaves identically to screen_reserved() on the same negated input.",
+        "tests/test_company_engineering_execution.py passes, including a new case per screening function covering the negated and the asserted form."
+      ],
+      "candidate_id": "reserved-screening-negation-blindness",
+      "capsule_id": "company-engineering-execution",
+      "dependencies": [],
+      "estimated_cost": "unstated",
+      "estimated_resource_profile": "consumer",
+      "evidence_refs": [
+        "docs/company_os_canonical_integration_record.md",
+        "docs/company_os_intake_classifier_hardening.md"
+      ],
+      "expected_value": "Fewer false CEO escalations on routine work, and one screening rule rather than two that disagree.",
+      "problem_statement": "screen_reserved() and screen_credentials() in company/engineering/intake.py match trigger terms without regard to negation, so a request stating that a reserved action is not involved still returns DecisionRequired.",
+      "risk": "medium",
+      "source": "known_defect",
+      "title": "Teach reserved and credential screening to respect negation"
+    }
+  ],
+  "department": "engineering",
+  "discovery_available": false,
+  "forbidden_actions": [
+    "approve_canonical_merge",
+    "approve_deployment",
+    "approve_staging_release",
+    "change_delegation_policy",
+    "expand_authority",
+    "publish_public_video"
+  ],
+  "objective_id": "obj-end-to-end-pilot-2026-09-20",
+  "objective_title": "Improve the reliability, maintainability, or operating efficiency of the Company OS engineering system by completing ONE genuinely useful existing engineering improvement that Company OS itself determines is appropriate.",
+  "risk_ceiling": "medium",
+  "success_metrics": [
+    "one genuinely useful engineering improvement completed",
+    "zero new test regressions"
+  ]
+}

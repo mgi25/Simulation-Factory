@@ -1,0 +1,30 @@
+{
+  "activation_id": "act-end-to-end-pilot-2026-09-20",
+  "mode": "live_pilot",
+  "envelope_id": "pilot-env-end-to-end-2026-09-20",
+  "expires_on": "2026-09-27",
+  "risk_ceiling": "medium",
+  "budget": {
+    "amount": "6",
+    "currency": "USD"
+  },
+  "integration_target": "company-os-v1-delegated-engineering-pilot-integration",
+  "protected_refs": [
+    "company-os-v1-bootstrap",
+    "main",
+    "master"
+  ],
+  "allowed_actions": [
+    "approve_code_change",
+    "approve_integration_merge",
+    "approve_review_outcome",
+    "approve_test_progression",
+    "approve_work_order",
+    "request_bounded_correction",
+    "stop_work_on_invalid_premise"
+  ],
+  "max_corrections": 1,
+  "authorized_by": "MGI",
+  "activated_by": "MGI",
+  "canonical_policy_changed": false
+}
