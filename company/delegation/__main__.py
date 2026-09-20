@@ -52,6 +52,17 @@ from .deployment import DEPLOYMENT_POLICY, policy_table
 from .metrics import DecisionOutcome, ManagementReport, measure, spend_of
 from .scenarios import CONTROL_SCENARIOS, SCENARIOS, replay, summarise
 from .shadow import verify_shadow_mode
+from .pilot import PILOT_SEATS, PILOT_VERSION, PilotMode
+from .pilot_integration import PILOT_TARGET, PROTECTED_REFS
+from .pilot_report import simulation_report
+from .pilot_simulation import (
+    ENGINEERING_ACTIVATION,
+    PILOT_DAY,
+    replay_live,
+    replay_probes,
+    replay_shadow_default,
+    run_full_simulation,
+)
 
 
 _ANSWERED = 0
@@ -90,6 +101,15 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate_cmd = commands.add_parser("evaluate", help="answer one authority request")
     evaluate_cmd.add_argument("--request-file", type=Path, required=True)
     evaluate_cmd.add_argument("--consumed-file", type=Path, default=None)
+
+    commands.add_parser(
+        "pilot-policy",
+        help="the bounded live-pilot action set, seats and protected refs",
+    )
+    commands.add_parser(
+        "pilot-simulate",
+        help="replay history under live-pilot semantics (nothing runs)",
+    )
     return root
 
 
@@ -100,6 +120,89 @@ def _load_policy(args: argparse.Namespace) -> DelegationPolicy:
         permissions=config.permissions,
         policy_path=args.policy_file,
     )
+
+
+def _pilot_policy_text() -> str:
+    lines = [
+        f"DELEGATED ENGINEERING PILOT {PILOT_VERSION}",
+        "  activated in canonical: NO. This prints the model, not a grant.",
+        "",
+        "LIVE SEATS AND ACTIONS",
+    ]
+    for seat in sorted(PILOT_SEATS):
+        lines.append(f"  {seat}")
+        for action in sorted(PILOT_SEATS[seat], key=lambda item: item.value):
+            lines.append(f"    {action.value}")
+    lines.append("")
+    lines.append("INTEGRATION TARGET")
+    lines.append(f"  {PILOT_TARGET.branch}")
+    lines.append(f"  kind      {PILOT_TARGET.kind.value}")
+    lines.append(f"  {PILOT_TARGET.rationale}")
+    lines.append("")
+    lines.append("PROTECTED REFS (never advanced by any delegated decision)")
+    for ref in sorted(PROTECTED_REFS):
+        lines.append(f"  {ref}")
+    lines.append("")
+    lines.append("DEFAULT MODE")
+    lines.append(
+        f"  {PilotMode.SHADOW.value}: evaluate_live() with no activation authorizes"
+    )
+    lines.append("  nothing. Live authority requires a PilotActivation passed by hand.")
+    return "\n".join(lines)
+
+
+def _pilot_policy(args: argparse.Namespace) -> int:
+    if args.json:
+        payload = {
+            "version": PILOT_VERSION,
+            "activated": False,
+            "default_mode": PilotMode.SHADOW.value,
+            "seats": {
+                seat: sorted(item.value for item in actions)
+                for seat, actions in PILOT_SEATS.items()
+            },
+            "integration_target": PILOT_TARGET.to_dict(),
+            "protected_refs": sorted(PROTECTED_REFS),
+        }
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        print(_pilot_policy_text())
+    return _ANSWERED
+
+
+def _pilot_simulate(args: argparse.Namespace) -> int:
+    policy = _load_policy(args)
+    summary = run_full_simulation(policy)
+    if args.json:
+        print(json.dumps(summary, indent=2, sort_keys=True))
+    else:
+        groups = {
+            "historical": replay_live(policy, SCENARIOS),
+            "controls": replay_live(policy, CONTROL_SCENARIOS),
+            "pilot_probes": replay_probes(policy),
+        }
+        print(
+            simulation_report(
+                groups,
+                activation=ENGINEERING_ACTIVATION,
+                objective="bounded live-delegation pilot",
+                as_of=PILOT_DAY,
+            )
+        )
+        shadow = replay_shadow_default(policy, SCENARIOS)
+        authorized = [item for item in shadow if item.live.authorizes_action]
+        print("")
+        print("SHADOW REMAINS THE DEFAULT")
+        print(f"  {len(shadow)} scenarios with no activation supplied")
+        print(f"  authorized actions: {len(authorized)} (must be 0)")
+    every = (
+        summary["historical"]["mismatched"]
+        + summary["controls"]["mismatched"]
+        + summary["pilot_probes"]["mismatched"]
+    )
+    if every or summary["shadow_default"]["authorized_any"]:
+        return _ESCALATED
+    return _ANSWERED
 
 
 def _read_json(path: Path) -> Any:
@@ -335,6 +438,8 @@ _COMMANDS = {
     "policy": _cmd_policy,
     "deployment": _cmd_deployment,
     "report": _cmd_report,
+    "pilot-policy": _pilot_policy,
+    "pilot-simulate": _pilot_simulate,
     "chart": _cmd_chart,
     "evaluate": _cmd_evaluate,
     "replay": _cmd_replay,

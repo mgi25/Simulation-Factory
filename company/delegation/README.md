@@ -1,15 +1,24 @@
-# company/delegation — executive delegation and management by exception (shadow)
+# company/delegation — executive delegation and management by exception
+
+**Shadow by default. One bounded live pilot exists and is not activated.**
 
 The CEO should set objectives, constraints, budgets and risk tolerance, and
 then receive outcomes and exceptions. This subsystem models everything in
 between: which seat owns an action, whether that seat can decide it, where it
 escalates when it cannot, and which of the results the CEO has to see.
 
-**It decides nothing.** Every record refuses to claim authority to act, the
-policy refuses to leave shadow mode, and `shadow.py` probes the canonical CEO
-stop semantics on every run. The record that closes an engineering job is still
-`company/engineering/decision.py`, still requires a named human, and still
-carries no merge authority.
+**By default it decides nothing.** Every canonical record refuses to claim
+authority to act, the policy refuses to leave shadow mode, and `shadow.py`
+probes the canonical CEO stop semantics on every run. The record that closes an
+engineering job is still `company/engineering/decision.py`, still requires a
+named human, and still carries no merge authority.
+
+The `pilot_*` modules add one exception to that, and it is opt-in at the call
+site: with a `PilotActivation` in hand, `evaluate_live` can approve routine
+low-risk engineering work inside a signed CEO envelope. Without one — which is
+the default argument — it returns the shadow answer and authorizes nothing.
+Importing the pilot changes nothing. See
+`docs/company_os_delegated_engineering_pilot.md`.
 
 ## The shape of one answer
 
@@ -47,6 +56,18 @@ ACTION
 | `scenarios.py` | five real jobs, replayed against the model |
 | `shadow.py` | proof on every run that the canonical gate is still the only gate |
 
+### The bounded live pilot (not activated)
+
+| File | What it holds |
+|---|---|
+| `pilot.py` | the live action set, the activation token, the gates, `evaluate_live` |
+| `pilot_envelope.py` | the CEO objective envelope: an allow-list and a required expiry |
+| `pilot_integration.py` | the one branch work may land on, and the refs that are never touched |
+| `pilot_correction.py` | one bounded correction, counted against the resource profile |
+| `pilot_record.py` | the live decision row, with employees as well as seats |
+| `pilot_report.py` | the CEO run report and the simulation report |
+| `pilot_simulation.py` | history replayed under live semantics, plus five new probes |
+
 ## Commands
 
 ```
@@ -57,6 +78,9 @@ python -m company.delegation report     # management-by-exception over the repla
 python -m company.delegation evaluate --request-file r.json
 python -m company.delegation replay     # the five historical scenarios
 python -m company.delegation shadow     # the five stop-semantics probes
+
+python -m company.delegation pilot-policy    # the live action set; prints "activated: NO"
+python -m company.delegation pilot-simulate  # history under live semantics; nothing runs
 ```
 
 Exit codes: 0 answered, 1 escalated or a failing condition, 2 malformed input.
@@ -78,7 +102,13 @@ Exit codes: 0 answered, 1 escalated or a failing condition, 2 malformed input.
   reserved by this package unconditionally, whatever `permissions.yaml` says.
 - It cannot merge, deploy, publish, spawn a process, read an environment
   variable or delete anything. `tests/test_company_delegation.py` section 16
-  asserts each of those against the package source.
+  asserts each of those against the package source, and section 13 of
+  `tests/test_company_delegation_pilot.py` asserts them again over the parsed
+  AST of the seven pilot modules. A live pilot approval is still only an
+  approval: the act remains outside this package.
+- The pilot cannot advance `main`, `master` or `company-os-v1-bootstrap`.
+  `pilot_integration.PROTECTED_REFS` is a module constant rather than
+  configuration, so no policy edit can empty it.
 
 ## Where the design is written down
 
