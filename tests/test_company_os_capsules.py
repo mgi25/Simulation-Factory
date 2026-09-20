@@ -317,6 +317,18 @@ def test_runtime_and_validation_dependency_graph_is_acyclic(seeds):
     assert seeds.dependency_closure("company-os-control-plane") == tuple(
         sorted(set(seeds.ids()) - {"company-os-control-plane"})
     )
+    # `company-executive-delegation` reaches the control plane through
+    # `company-organizational-intelligence`, whose whole purpose is reading the
+    # evidence other subsystems produce and answering whether the company is
+    # organized well. The vacancies and registry conflicts the delegation model
+    # reports are that evidence, so the edge is the real relationship rather
+    # than a route added to satisfy the closure.
+    assert "company-executive-delegation" in seeds.get(
+        "company-organizational-intelligence"
+    ).dependencies
+    assert "company-executive-delegation" not in seeds.get(
+        "company-os-control-plane"
+    ).dependencies
 
 
 def test_duplicate_capsule_ids_fail_at_construction():
@@ -642,13 +654,14 @@ def test_the_four_staleness_conditions_accumulate_on_one_capsule():
 
 
 def test_the_company_os_seed_capsules_load(seeds):
-    assert len(seeds) == 19
+    assert len(seeds) == 20
     assert seeds.ids() == (
         "ai-platform",
         "company-analytics-experiments",
         "company-bootstrap-policy",
         "company-ceo-dashboard",
         "company-engineering-execution",
+        "company-executive-delegation",
         "company-finance",
         "company-knowledge-capsules",
         "company-knowledge-store",

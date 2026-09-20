@@ -1,0 +1,356 @@
+# Simulation Factory — delegated authority policy, version 1.
+#
+# SHADOW MODE. Nothing in this file authorizes anything. It declares who WOULD
+# be competent to decide what, so that the calculation can be validated against
+# real history before any authority is handed over. Switching `mode` is
+# `change_delegation_policy`, which company/delegation/actions.py reserves to
+# the CEO unconditionally.
+#
+# Read with company/validation/yaml_subset.py, the same restricted loader the
+# four canonical bootstrap contracts use. Amounts are QUOTED so they arrive as
+# exact decimal text: an unquoted 25.00 would reach the code as a float, and a
+# budget is not a float.
+#
+# Two seats are declared that no employee fills — `cfo` and
+# `engineering_manager`. Creating either is `hire_or_remove_executive_role`,
+# which company/permissions.yaml reserves to the CEO, so this file describes
+# them and leaves them VACANT. Every request that would land on one escalates
+# past it, and company/delegation/org.py reports the gap by name.
+
+version: delegation_policy_v1
+mode: shadow
+source_ref: company/delegation_policy.yaml
+reporting_cadence: per_objective_and_on_exception
+
+# --- the hierarchy --------------------------------------------------------
+#
+# `employee` names a row in company/org_registry.yaml. An empty value is a
+# vacant seat. `reports_to` follows the canonical registry manager edge
+# wherever a registry row exists; where the master plan and the registry
+# disagree, Hierarchy.registry_conflicts() reports it rather than picking.
+
+seats:
+  ceo:
+    kind: ceo
+    title: Chief Executive Officer (human)
+    reports_to: ""
+    employee: ""
+    departments: []
+
+  coo:
+    kind: executive
+    title: Chief Operating Officer
+    reports_to: ceo
+    employee: studio_coo
+    departments: [executive, intelligence, creative, production, data, people, engineering, ai_platform, finance]
+
+  cto:
+    kind: executive
+    title: Chief Technology Officer
+    reports_to: coo
+    employee: chief_architect
+    departments: [engineering, ai_platform]
+
+  cfo:
+    kind: executive
+    title: Chief Financial Officer
+    reports_to: coo
+    employee: ""
+    departments: [finance]
+
+  engineering_manager:
+    kind: department_management
+    title: Engineering Manager
+    reports_to: cto
+    employee: ""
+    departments: [engineering]
+
+  ai_platform_lead:
+    kind: department_management
+    title: AI Platform Lead
+    reports_to: cto
+    employee: ai_efficiency_platform_engineer
+    departments: [ai_platform]
+
+  research_lead:
+    kind: department_management
+    title: Research Lead
+    reports_to: coo
+    employee: research_opportunity_lead
+    departments: [intelligence]
+
+  content_strategy_lead:
+    kind: department_management
+    title: Content Strategy Lead
+    reports_to: coo
+    employee: creative_format_director
+    departments: [creative]
+
+  production_lead:
+    kind: department_management
+    title: Production Lead
+    reports_to: coo
+    employee: production_qc_lead
+    departments: [production]
+
+  analytics_lead:
+    kind: department_management
+    title: Analytics Lead
+    reports_to: coo
+    employee: analytics_experiment_scientist
+    departments: [data]
+
+  people_lead:
+    kind: department_management
+    title: Organizational Intelligence Lead
+    reports_to: coo
+    employee: hr_org_intelligence_lead
+    departments: [people]
+
+  software_implementation_engineer:
+    kind: worker
+    title: Software Implementation Engineer
+    reports_to: engineering_manager
+    employee: software_implementation_engineer
+    departments: [engineering]
+
+  simulation_physics_engineer:
+    kind: worker
+    title: Simulation Physics Engineer
+    reports_to: engineering_manager
+    employee: simulation_physics_engineer
+    departments: [engineering]
+
+  visual_direction:
+    kind: worker
+    title: Visual and Cinematography Director
+    reports_to: content_strategy_lead
+    employee: visual_cinematography_director
+    departments: [creative]
+
+  # The independent controls. Both are deterministic mechanisms rather than
+  # employees, which is why they are permanently vacant and hold no grant:
+  # they produce evidence and they stop work, and neither ever approves.
+  integration_gate:
+    kind: independent_control
+    title: Production integration gate (deterministic)
+    reports_to: coo
+    employee: ""
+    departments: [engineering]
+
+  deterministic_qa:
+    kind: independent_control
+    title: Deterministic QA and review adjudication
+    reports_to: coo
+    employee: ""
+    departments: [engineering]
+
+# --- the budget ladder ----------------------------------------------------
+#
+# The company ceiling is set at consumer-subscription scale, not at what the
+# company could afford. Sibling ceilings must sum to at most their parent, so
+# these numbers are a real allocation and not eight independent permissions to
+# spend the whole budget.
+
+budget:
+  currency: USD
+  scopes:
+    company-operating:
+      level: company
+      ceiling: "50.00"
+      label: Monthly company operating budget
+
+    engineering:
+      level: department
+      parent: company-operating
+      ceiling: "22.00"
+    research:
+      level: department
+      parent: company-operating
+      ceiling: "6.00"
+    content:
+      level: department
+      parent: company-operating
+      ceiling: "6.00"
+    production:
+      level: department
+      parent: company-operating
+      ceiling: "5.00"
+    analytics:
+      level: department
+      parent: company-operating
+      ceiling: "4.00"
+    ai-platform:
+      level: department
+      parent: company-operating
+      ceiling: "4.00"
+    people:
+      level: department
+      parent: company-operating
+      ceiling: "2.00"
+    executive:
+      level: department
+      parent: company-operating
+      ceiling: "1.00"
+
+    engineering-operations:
+      level: program
+      parent: engineering
+      ceiling: "18.00"
+      label: Routine engineering work orders
+    engineering-architecture:
+      level: program
+      parent: engineering
+      ceiling: "4.00"
+
+    eng-routine-work-order:
+      level: work_order
+      parent: engineering-operations
+      ceiling: "5.00"
+
+# --- which autonomy rung each action sits on ------------------------------
+#
+# Rungs are the ones company/permissions.yaml declares: 0 observe, 1 recommend,
+# 2 experiment, 3 modify, 4 operate, 5 corporate. A seat needs a state whose
+# authority cap reaches the rung, so a probation employee capped at 2 can run
+# an experiment and can never approve a code change.
+
+action_autonomy:
+  stop_work_on_invalid_premise: 1
+  approve_test_progression: 2
+  request_bounded_correction: 2
+  approve_review_outcome: 3
+  approve_code_change: 3
+  approve_work_order: 3
+  approve_new_dependency: 3
+  approve_research_program: 3
+  approve_content_experiment: 3
+  approve_cross_department_schedule: 3
+  approve_integration_merge: 4
+  approve_deployment: 4
+  approve_production_render: 4
+  approve_operating_spend: 4
+  allocate_department_budget: 4
+  change_budget_policy: 5
+  approve_workforce_state_change: 5
+
+# --- the grants -----------------------------------------------------------
+#
+# A grant names only what a seat MAY approve. Everything absent escalates.
+# Naming a CEO-reserved action here is refused at load time, so this file
+# cannot quietly delegate one.
+#
+# `approve_deployment` appears in action_autonomy and in NO grant. That is the
+# known deployment-policy gap, left open deliberately: Company OS has no
+# deployment policy to delegate against, so a deployment request escalates
+# with nowhere to stop. See docs/company_os_executive_delegation.md.
+
+grants:
+  engineering_manager:
+    may_approve:
+      - approve_code_change
+      - approve_test_progression
+      - approve_review_outcome
+      - request_bounded_correction
+      - stop_work_on_invalid_premise
+      - approve_work_order
+    max_risk: low
+    per_decision_ceiling: "25.00"
+    budget_scope: engineering-operations
+    rationale: Routine low-risk engineering work and bounded corrections.
+
+  ai_platform_lead:
+    may_approve:
+      - approve_code_change
+      - approve_test_progression
+      - approve_operating_spend
+      - stop_work_on_invalid_premise
+    max_risk: low
+    per_decision_ceiling: "10.00"
+    budget_scope: ai-platform
+    rationale: Context, retrieval and telemetry work inside the AI platform budget.
+
+  research_lead:
+    may_approve:
+      - approve_research_program
+      - stop_work_on_invalid_premise
+    max_risk: low
+    per_decision_ceiling: "6.00"
+    budget_scope: research
+    rationale: Bounded research programs inside the research budget.
+
+  content_strategy_lead:
+    may_approve:
+      - approve_content_experiment
+      - stop_work_on_invalid_premise
+    max_risk: low
+    per_decision_ceiling: "6.00"
+    budget_scope: content
+    rationale: Format experiments that do not publish anything.
+
+  production_lead:
+    may_approve:
+      - approve_production_render
+      - stop_work_on_invalid_premise
+    max_risk: low
+    per_decision_ceiling: "5.00"
+    budget_scope: production
+    rationale: Renders and QC progression. Publishing stays CEO-reserved.
+
+  analytics_lead:
+    may_approve:
+      - approve_content_experiment
+      - stop_work_on_invalid_premise
+    max_risk: low
+    per_decision_ceiling: "4.00"
+    budget_scope: analytics
+    rationale: Experiment design and measurement inside the analytics budget.
+
+  people_lead:
+    may_approve:
+      - approve_workforce_state_change
+      - stop_work_on_invalid_premise
+    max_risk: low
+    per_decision_ceiling: "2.00"
+    budget_scope: people
+    rationale: Non-executive employment-state changes only.
+
+  cto:
+    may_approve:
+      - approve_code_change
+      - approve_test_progression
+      - approve_review_outcome
+      - request_bounded_correction
+      - stop_work_on_invalid_premise
+      - approve_work_order
+      - approve_integration_merge
+      - approve_new_dependency
+      - approve_operating_spend
+    max_risk: medium
+    per_decision_ceiling: "40.00"
+    budget_scope: engineering
+    rationale: Broader engineering decisions and routine integration within scope.
+
+  cfo:
+    may_approve:
+      - approve_operating_spend
+      - allocate_department_budget
+    max_risk: medium
+    per_decision_ceiling: "50.00"
+    budget_scope: company-operating
+    rationale: Ordinary operating spend and bounded department allocations.
+
+  coo:
+    may_approve:
+      - approve_cross_department_schedule
+      - approve_operating_spend
+      - approve_production_render
+      - approve_research_program
+      - approve_content_experiment
+      - approve_workforce_state_change
+      - approve_work_order
+      - stop_work_on_invalid_premise
+    max_risk: medium
+    per_decision_ceiling: "50.00"
+    budget_scope: company-operating
+    rationale: Cross-department coordination and normal operational continuation.

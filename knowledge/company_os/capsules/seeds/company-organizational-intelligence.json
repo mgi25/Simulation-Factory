@@ -9,6 +9,7 @@
   "decisions": [],
   "dependencies": [
     "company-analytics-experiments",
+    "company-executive-delegation",
     "company-finance",
     "company-workforce-capabilities",
     "company-workforce-hiring"
@@ -69,7 +70,8 @@
   "risks": [
     "The research BatchReport is read duck-typed, so an upstream rename raises rather than silently yielding None.",
     "Reserved-action mapping reads permissions.yaml ceo_reserved; unreserved_actions reports a rename, it cannot prevent one.",
-    "Span, depth and recurrence thresholds are opinions; a finding is only as defensible as the configuration recorded beside it."
+    "Span, depth and recurrence thresholds are opinions; a finding is only as defensible as the configuration recorded beside it.",
+    "The delegation model it reads is advisory in shadow; a vacancy or a conflict it reports is a finding about the chart, not an approval."
   ],
   "source": "company-os-v1-org-intelligence",
   "source_digests": [],
