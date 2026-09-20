@@ -114,6 +114,19 @@ seats:
     employee: software_implementation_engineer
     departments: [engineering]
 
+  # The independent engineering reviewer. A worker seat, deliberately: it holds
+  # no grant, approves nothing, and its whole output is an attestation the
+  # deterministic side then adjudicates. The separation that matters is not its
+  # place on the chart but its employee identity - `authority.evaluate`
+  # disqualifies any seat whose employee implemented or reviewed the work, and
+  # that is what stops the CTO signing off on work chief_architect reviewed.
+  engineering_reviewer:
+    kind: worker
+    title: Independent Engineering Reviewer
+    reports_to: engineering_manager
+    employee: software_review_engineer
+    departments: [engineering]
+
   simulation_physics_engineer:
     kind: worker
     title: Simulation Physics Engineer

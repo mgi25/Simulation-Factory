@@ -1,0 +1,17 @@
+5/5 scenarios match the expected direction
+
+[ok ] dogfood-2: Dogfood #2: developer_attempts_remaining on the CEO result page
+        owner=engineering_manager decision=approved ceo_required=false (history: true)
+        engineering_manager is the lowest seat with authority over approve_code_change at low risk; 2.157688 USD against 18 USD at engineering-operations with 0 USD already consumed, leaving 18 USD
+[ok ] burnin-job-a: Job A: legacy attempts-remaining default, reviewer found a real defect
+        owner=engineering_manager decision=approved ceo_required=false (history: true)
+        engineering_manager is the lowest seat with authority over approve_review_outcome at low risk; 1.0636907499999999 USD against 18 USD at engineering-operations with 0 USD already consumed, leaving 18 USD
+[ok ] burnin-correction: Correction job: null-safe attempts-remaining, clean run
+        owner=engineering_manager decision=approved ceo_required=false (history: true)
+        engineering_manager is the lowest seat with authority over approve_code_change at low risk; 1.1758087499999998 USD against 18 USD at engineering-operations with 0 USD already consumed, leaving 18 USD
+[ok ] burnin-job-b: Job B: test section-header renumbering, four lines, reviewer PASS
+        owner=engineering_manager decision=approved ceo_required=false (history: true)
+        engineering_manager is the lowest seat with authority over approve_test_progression at low risk; 0.5538657499999999 USD against 18 USD at engineering-operations with 0 USD already consumed, leaving 18 USD
+[ok ] burnin-job-c: Job C: stopped at the schema pre-flight, never submitted
+        owner=coo decision=approved ceo_required=false (history: false)
+        coo is the lowest seat with authority over stop_work_on_invalid_premise at low risk

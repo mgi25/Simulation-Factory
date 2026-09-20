@@ -1,0 +1,29 @@
+{
+  "future_chain": [
+    {
+      "action": "approve_code_change",
+      "decision": "approved",
+      "actor": "cto",
+      "ceo_required": false
+    },
+    {
+      "action": "approve_test_progression",
+      "decision": "approved",
+      "actor": "cto",
+      "ceo_required": false
+    },
+    {
+      "action": "approve_review_outcome",
+      "decision": "approved",
+      "actor": "cto",
+      "ceo_required": false
+    },
+    {
+      "action": "approve_integration_merge",
+      "decision": "approved",
+      "actor": "cto",
+      "ceo_required": false
+    }
+  ],
+  "ceo_required_anywhere": false
+}

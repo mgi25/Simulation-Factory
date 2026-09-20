@@ -287,9 +287,48 @@ class EngineeringRunner:
 
     # --- one work order ----------------------------------------------------
 
+    def _preflight(self) -> str:
+        """Refuse configurations that would spend a session and discard its work.
+
+        The receipt contract requires the authorized branch to be verifiable on
+        the remote: `GitObservation.remote_verified` is false without it, and the
+        receipt is then rejected however good the change is. With `--no-push`
+        the runner never pushes, so `remote_sha` stays empty and **every**
+        attempt is rejected after the developer session has already been paid
+        for.
+
+        That is not hypothetical. The first end-to-end delegation pilot lost a
+        developer session worth USD 0.86 to exactly this: 183 tests passing, an
+        attested reviewer pass, and a receipt rejected because the branch was
+        not on the remote. The session cost is spent before the receipt is
+        validated, so the only place this can be caught cheaply is here, before
+        anything starts.
+        """
+        if not self.config.push:
+            return (
+                "--no-push is incompatible with the receipt contract: the "
+                "completion protocol requires the authorized branch to be "
+                "verifiable on the remote, so every attempt would be rejected "
+                "after its session had already been paid for. Run with push "
+                "enabled, or change the receipt contract deliberately."
+            )
+        return ""
+
     def run_one(self, work_order_id: str) -> RunReport:
         """Drive one work order as far as the runner is allowed to take it."""
         started = utcnow()
+        refusal = self._preflight()
+        if refusal:
+            return RunReport(
+                work_order_id=work_order_id,
+                outcome=BLOCKED,
+                final_state="",
+                stages=(),
+                run_dir="",
+                started_at=started.isoformat(),
+                finished_at=utcnow().isoformat(),
+                reason=refusal,
+            )
         try:
             lease, note = self._store.acquire(
                 work_order_id, lease_seconds=self.config.lease_seconds, stage="starting"

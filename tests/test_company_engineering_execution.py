@@ -231,7 +231,7 @@ def _attestation(order, packet, receipt, **changes) -> ReviewerAttestation:
         "review_id": "rev-001",
         "work_order_id": order.work_order_id,
         "work_order_fingerprint": order.fingerprint(),
-        "reviewer": "chief_architect",
+        "reviewer": "software_review_engineer",
         "packet_fingerprint": packet.fingerprint(),
         "receipt_fingerprint": receipt.fingerprint(),
         "verdict": ReviewOutcome.PASS,
@@ -520,7 +520,7 @@ def test_capability_routing_is_deterministic_and_separates_the_two_roles(tmp_pat
     implement = match_capabilities(list(order.implementation_capabilities), config)
     review = match_capabilities([order.review_capability], config)
     assert implement.eligible_employee_ids == ("software_implementation_engineer",)
-    assert review.eligible_employee_ids == ("chief_architect",)
+    assert review.eligible_employee_ids == ("software_review_engineer",)
     assert set(implement.eligible_employee_ids).isdisjoint(review.eligible_employee_ids)
     again = match_capabilities(list(order.implementation_capabilities), config)
     assert again.eligible_employee_ids == implement.eligible_employee_ids
@@ -676,7 +676,7 @@ def test_an_attestation_cannot_arrive_with_a_field_that_grants_anything(tmp_path
                 "review_id": "rev-x",
                 "work_order_id": order.work_order_id,
                 "work_order_fingerprint": order.fingerprint(),
-                "reviewer": "chief_architect",
+                "reviewer": "software_review_engineer",
                 "packet_fingerprint": "0" * 16,
                 "receipt_fingerprint": "0" * 16,
                 "verdict": "pass",
@@ -759,7 +759,7 @@ def test_review_routing_cannot_select_the_implementer(tmp_path):
     with pytest.raises(AuthorityEscalation, match="who implemented the work"):
         prepare_review_session(
             store, execution, opened.work_order, developed.job, config,
-            implementer="chief_architect", on=DAY,
+            implementer="software_review_engineer", on=DAY,
         )
 
 

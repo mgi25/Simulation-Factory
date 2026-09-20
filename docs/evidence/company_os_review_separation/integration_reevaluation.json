@@ -1,0 +1,15 @@
+{
+  "historical": {
+    "reviewer": "chief_architect",
+    "decision": "escalate",
+    "actor": "ceo",
+    "reason": "the chain stopped at coo: coo may not approve approve_integration_merge; its grant covers 8 other action type(s)"
+  },
+  "future": {
+    "reviewer": "software_review_engineer",
+    "decision": "approved",
+    "actor": "cto",
+    "reason": "cto is the lowest seat with authority over approve_integration_merge at medium risk"
+  },
+  "coo_widened": false
+}

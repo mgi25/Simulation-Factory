@@ -1,0 +1,16 @@
+{
+  "ordinary": {
+    "objective": "Add a field to the engineering result record.",
+    "specialist_domain": "",
+    "review_capability": "code_review",
+    "implementer": "software_implementation_engineer",
+    "reviewer": "software_review_engineer"
+  },
+  "architecture": {
+    "objective": "Rewrite the module boundary between the runtime and the engineering package.",
+    "specialist_domain": "architecture",
+    "review_capability": "software_architecture",
+    "implementer": "software_implementation_engineer",
+    "reviewer": "chief_architect"
+  }
+}

@@ -833,6 +833,35 @@ def test_a_proposal_may_not_exceed_the_envelope_budget():
         _proposal(budget=_usd("99.00"))
 
 
+def test_a_proposal_carries_the_checkout_it_was_planned_against():
+    """Found by running the chain, not by reading it.
+
+    The first end-to-end pilot's work order passed intake and then failed at
+    the runner with "base commit is not in this repository". A proposal named
+    its scope, risk, budget and acceptance criteria and never said which
+    checkout any of that applied to, which is a late and confusing place to
+    learn that planning had not decided.
+    """
+    proposal = _proposal(
+        authorized_branch="eng-demo-work", base_commit="a" * 40
+    )
+    assert proposal.authorized_branch == "eng-demo-work"
+    assert proposal.base_commit == "a" * 40
+    payload = proposal.to_request_dict(requested_by="engineering_delivery_manager")
+    assert payload["authorized_branch"] == "eng-demo-work"
+    assert payload["base_commit"] == "a" * 40
+    assert proposal.to_dict()["base_commit"] == "a" * 40
+
+
+def test_a_proposal_without_a_checkout_still_builds_and_says_nothing():
+    """Empty rather than invented. The caller supplies the checkout or intake
+    falls back to its own default branch name, and neither is this module's
+    business to guess."""
+    payload = _proposal().to_request_dict(requested_by="engineering_delivery_manager")
+    assert payload["authorized_branch"] == ""
+    assert payload["base_commit"] == ""
+
+
 def test_the_proposal_becomes_a_request_that_carries_its_provenance():
     payload = _proposal().to_request_dict(requested_by="engineering_delivery_manager")
     assert payload["candidate_id"] == "cand-demo"

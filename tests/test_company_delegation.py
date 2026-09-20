@@ -1844,7 +1844,11 @@ def test_the_bootstrap_contracts_still_validate():
     from company.runtime.config import load_validated_company_config
 
     loaded = load_validated_company_config()
-    assert len(loaded.org_registry["employees"]) == 13
+    # 14 since `software_review_engineer` was hired. The count is pinned rather
+    # than computed so that adding an employee is a decision somebody makes on
+    # purpose, and this line is where they record it.
+    assert len(loaded.org_registry["employees"]) == 14
+    assert "software_review_engineer" in loaded.org_registry["employees"]
 
 
 def test_a_dormant_role_still_decides_nothing_after_staffing(policy):
