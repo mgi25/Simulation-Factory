@@ -36,7 +36,35 @@ Prefer tasks that are:
 
 Avoid deliberately selecting only tasks known to favor either workflow.
 
-Target at least three matched pairs when practical. One pair is evidence about one job, not a company-wide conclusion.
+Begin with one matched pair. Additional pairs are evidence-triggered under §3A; one pair is evidence about one job and should not be presented as a universal company-wide conclusion.
+
+## 3A. Cost-control and stopping rule
+
+This benchmark is intentionally **sequential**, not a fixed requirement to duplicate many jobs.
+
+Use the cheapest evidence ladder:
+
+1. reuse trustworthy historical telemetry where it answers part of the question;
+2. run **one** carefully selected real matched Direct-vs-Company-OS task;
+3. stop if the result is large, quality-equivalent, and operationally clear enough to support a routing decision;
+4. run a second matched pair only when the first is materially ambiguous, confounded, or too close to justify a decision;
+5. run a third pair only when the first two disagree in a way that matters to the workflow-routing decision.
+
+Do not consume AI budget merely to reach a predetermined sample count.
+
+The phrase "target at least three matched pairs when practical" elsewhere in this protocol means an upper-confidence goal, not a mandatory burn requirement. The default program plan is **one matched pilot, then evidence-triggered continuation**.
+
+Prefer benchmark tasks that are useful work the company already needed. The benchmark should pay for information while also producing a useful engineering result; avoid throwaway benchmark-only implementation.
+
+Before each additional matched pair, record:
+
+- what uncertainty remains;
+- why existing evidence cannot answer it;
+- the maximum resource budget for that pair;
+- what decision would change based on the result.
+
+If no real decision could change, do not run the extra benchmark.
+
 
 ## 4. Frozen equality conditions
 
