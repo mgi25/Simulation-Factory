@@ -1,0 +1,528 @@
+{
+  "as_of": "2026-09-20",
+  "controls": {
+    "authorized_actions": [],
+    "ceo_required": 5,
+    "diverged_from_shadow": [],
+    "escalated": [
+      "control-reviewer-as-approver",
+      "control-override-independent-control",
+      "control-unknown-deployment",
+      "control-spend-above-cfo",
+      "control-expand-authority"
+    ],
+    "internal": [],
+    "matches_expectation": 5,
+    "mismatched": [],
+    "proceeded_internally": 0,
+    "results": [
+      {
+        "actor": "ceo",
+        "actual_ceo_involved": true,
+        "authorizes_action": false,
+        "ceo_required": true,
+        "decision": "escalate",
+        "differs_from_shadow": false,
+        "divergence_reason": "",
+        "expected_ceo_required": true,
+        "failed_gates": [
+          "seat_not_in_pilot",
+          "risk_above_envelope"
+        ],
+        "gates_checked": 8,
+        "historical": false,
+        "label": "A medium-risk review outcome whose only competent seat is the reviewer",
+        "matches_expectation": true,
+        "mode": "live_pilot",
+        "note": "the probe is who approves, not whether it passed",
+        "pilot_expected_ceo_required": null,
+        "proceeded_internally": false,
+        "reason": "the chain stopped at coo: coo may not approve approve_review_outcome; its grant covers 7 other action type(s)",
+        "scenario_id": "control-reviewer-as-approver"
+      },
+      {
+        "actor": "ceo",
+        "actual_ceo_involved": true,
+        "authorizes_action": false,
+        "ceo_required": true,
+        "decision": "escalate",
+        "differs_from_shadow": false,
+        "divergence_reason": "",
+        "expected_ceo_required": true,
+        "failed_gates": [
+          "seat_not_in_pilot",
+          "qa_not_passed"
+        ],
+        "gates_checked": 8,
+        "historical": false,
+        "label": "A manager setting aside a failing deterministic check",
+        "matches_expectation": true,
+        "mode": "live_pilot",
+        "note": "the probe overrides a failing control",
+        "pilot_expected_ceo_required": null,
+        "proceeded_internally": false,
+        "reason": "the chain stopped at coo: coo may not approve approve_code_change; its grant covers 7 other action type(s)",
+        "scenario_id": "control-override-independent-control"
+      },
+      {
+        "actor": "software_implementation_engineer",
+        "actual_ceo_involved": true,
+        "authorizes_action": false,
+        "ceo_required": true,
+        "decision": "rejected",
+        "differs_from_shadow": false,
+        "divergence_reason": "",
+        "expected_ceo_required": true,
+        "failed_gates": [
+          "seat_not_in_pilot",
+          "action_not_in_envelope"
+        ],
+        "gates_checked": 7,
+        "historical": false,
+        "label": "A deployment nobody classified",
+        "matches_expectation": true,
+        "mode": "live_pilot",
+        "note": "an unclassified deployment",
+        "pilot_expected_ceo_required": null,
+        "proceeded_internally": false,
+        "reason": "no seat between software_implementation_engineer and the CEO holds approve_deployment in its grant. The action is outside the delegated model entirely, so it is refused here and carried to the CEO as an unclassified request rather than approved by the nearest seat that happened to be free.",
+        "scenario_id": "control-unknown-deployment"
+      },
+      {
+        "actor": "ceo",
+        "actual_ceo_involved": true,
+        "authorizes_action": false,
+        "ceo_required": true,
+        "decision": "escalate",
+        "differs_from_shadow": false,
+        "divergence_reason": "",
+        "expected_ceo_required": true,
+        "failed_gates": [
+          "seat_not_in_pilot",
+          "action_not_in_envelope",
+          "amount_above_envelope"
+        ],
+        "gates_checked": 7,
+        "historical": false,
+        "label": "A spend larger than the whole company operating budget",
+        "matches_expectation": true,
+        "mode": "live_pilot",
+        "note": "200 USD against an 18 USD envelope",
+        "pilot_expected_ceo_required": null,
+        "proceeded_internally": false,
+        "reason": "the chain stopped at cfo: 200 USD is above the 50 USD a single cfo decision may approve",
+        "scenario_id": "control-spend-above-cfo"
+      },
+      {
+        "actor": "ceo",
+        "actual_ceo_involved": true,
+        "authorizes_action": false,
+        "ceo_required": true,
+        "decision": "escalate",
+        "differs_from_shadow": false,
+        "divergence_reason": "",
+        "expected_ceo_required": true,
+        "failed_gates": [
+          "seat_not_in_pilot",
+          "action_not_in_envelope"
+        ],
+        "gates_checked": 7,
+        "historical": false,
+        "label": "A manager widening its own ceiling",
+        "matches_expectation": true,
+        "mode": "live_pilot",
+        "note": "a seat asking to widen itself",
+        "pilot_expected_ceo_required": null,
+        "proceeded_internally": false,
+        "reason": "expand_authority is reserved by the delegation model itself: no seat may widen its own ceiling; authority is granted, never taken",
+        "scenario_id": "control-expand-authority"
+      }
+    ],
+    "total": 5
+  },
+  "envelopes": {
+    "obj-engineering-operability": {
+      "allowed_actions": [
+        "approve_code_change",
+        "approve_integration_merge",
+        "approve_review_outcome",
+        "approve_test_progression",
+        "approve_work_order",
+        "request_bounded_correction",
+        "stop_work_on_invalid_premise"
+      ],
+      "authorized_by": "MGI (CEO)",
+      "envelope_id": "pilot-envelope-engineering",
+      "expires_on": "2026-12-31",
+      "integration_target": {
+        "branch": "company-os-v1-delegated-engineering-pilot-integration",
+        "kind": "internal_branch",
+        "protects": [
+          "company-os-v1-bootstrap",
+          "main",
+          "master"
+        ],
+        "rationale": "an internal branch created for this pilot, which no other branch builds on and which is undone completely by deleting it, so that work can be completed and accepted internally without anything leaving the company",
+        "reversible": true,
+        "target_id": "pilot-internal-integration"
+      },
+      "max_corrections_per_work_order": 1,
+      "notes": "",
+      "objective": "Keep engineering operable: routine low-risk delivery and corrections",
+      "plan": {
+        "allowed_departments": [
+          "engineering"
+        ],
+        "budget": {
+          "amount": "18",
+          "currency": "USD"
+        },
+        "budget_scope": "engineering-operations",
+        "deadline": "2026-12-31",
+        "forbidden_actions": [],
+        "objective_id": "obj-engineering-operability",
+        "reporting_cadence": "on_exception",
+        "risk_ceiling": "low",
+        "success_metrics": [
+          "every work order independently reviewed",
+          "deterministic QA green",
+          "no new regressions in the full suite"
+        ]
+      },
+      "success_criteria": [
+        "routine engineering progression needs no CEO decision",
+        "every exception still reaches the CEO"
+      ],
+      "version": "pilot_envelope_v1"
+    },
+    "obj-finance-usage-accuracy": {
+      "allowed_actions": [
+        "approve_code_change",
+        "approve_review_outcome",
+        "approve_test_progression",
+        "approve_work_order",
+        "stop_work_on_invalid_premise"
+      ],
+      "authorized_by": "MGI (CEO)",
+      "envelope_id": "pilot-envelope-finance-accuracy",
+      "expires_on": "2026-12-31",
+      "integration_target": {
+        "branch": "company-os-v1-delegated-engineering-pilot-integration",
+        "kind": "internal_branch",
+        "protects": [
+          "company-os-v1-bootstrap",
+          "main",
+          "master"
+        ],
+        "rationale": "an internal branch created for this pilot, which no other branch builds on and which is undone completely by deleting it, so that work can be completed and accepted internally without anything leaving the company",
+        "reversible": true,
+        "target_id": "pilot-internal-integration"
+      },
+      "max_corrections_per_work_order": 1,
+      "notes": "",
+      "objective": "Usage-to-cost accuracy: routine low-risk verification work",
+      "plan": {
+        "allowed_departments": [
+          "engineering"
+        ],
+        "budget": {
+          "amount": "6",
+          "currency": "USD"
+        },
+        "budget_scope": "engineering-operations",
+        "deadline": "2026-12-31",
+        "forbidden_actions": [],
+        "objective_id": "obj-finance-usage-accuracy",
+        "reporting_cadence": "on_exception",
+        "risk_ceiling": "low",
+        "success_metrics": [
+          "every work order independently reviewed",
+          "deterministic QA green",
+          "no new regressions in the full suite"
+        ]
+      },
+      "success_criteria": [
+        "routine engineering progression needs no CEO decision",
+        "every exception still reaches the CEO"
+      ],
+      "version": "pilot_envelope_v1"
+    }
+  },
+  "historical": {
+    "authorized_actions": [
+      "dogfood-2",
+      "burnin-job-a",
+      "burnin-correction",
+      "burnin-job-b"
+    ],
+    "ceo_required": 1,
+    "diverged_from_shadow": [
+      {
+        "reason": "the CTO filed this request, so the CTO cannot approve it and the chain lands on the COO, who holds no live authority in this pilot. Phase 4 delegated two seats and the COO is not one of them, so the correct pilot answer is to escalate.",
+        "scenario_id": "burnin-job-c"
+      }
+    ],
+    "escalated": [
+      "burnin-job-c"
+    ],
+    "internal": [
+      "dogfood-2",
+      "burnin-job-a",
+      "burnin-correction",
+      "burnin-job-b"
+    ],
+    "matches_expectation": 5,
+    "mismatched": [],
+    "proceeded_internally": 4,
+    "results": [
+      {
+        "actor": "engineering_manager",
+        "actual_ceo_involved": true,
+        "authorizes_action": true,
+        "ceo_required": false,
+        "decision": "approved",
+        "differs_from_shadow": false,
+        "divergence_reason": "",
+        "expected_ceo_required": false,
+        "failed_gates": [],
+        "gates_checked": 9,
+        "historical": true,
+        "label": "Dogfood #2: developer_attempts_remaining on the CEO result page",
+        "matches_expectation": true,
+        "mode": "live_pilot",
+        "note": "the reviewer accepted it and the suite was green",
+        "pilot_expected_ceo_required": null,
+        "proceeded_internally": true,
+        "reason": "engineering_manager holds live authority for approve_code_change at low risk inside the activated envelope, and every pilot gate held (9 checked)",
+        "scenario_id": "dogfood-2"
+      },
+      {
+        "actor": "engineering_manager",
+        "actual_ceo_involved": true,
+        "authorizes_action": true,
+        "ceo_required": false,
+        "decision": "approved",
+        "differs_from_shadow": false,
+        "divergence_reason": "",
+        "expected_ceo_required": false,
+        "failed_gates": [],
+        "gates_checked": 10,
+        "historical": true,
+        "label": "Job A: legacy attempts-remaining default, reviewer found a real defect",
+        "matches_expectation": true,
+        "mode": "live_pilot",
+        "note": "the reviewer said changes_required; this is the failed original",
+        "pilot_expected_ceo_required": null,
+        "proceeded_internally": true,
+        "reason": "engineering_manager holds live authority for approve_review_outcome at low risk inside the activated envelope, and every pilot gate held (10 checked)",
+        "scenario_id": "burnin-job-a"
+      },
+      {
+        "actor": "engineering_manager",
+        "actual_ceo_involved": true,
+        "authorizes_action": true,
+        "ceo_required": false,
+        "decision": "approved",
+        "differs_from_shadow": false,
+        "divergence_reason": "",
+        "expected_ceo_required": false,
+        "failed_gates": [],
+        "gates_checked": 9,
+        "historical": true,
+        "label": "Correction job: null-safe attempts-remaining, clean run",
+        "matches_expectation": true,
+        "mode": "live_pilot",
+        "note": "the second bounded work order, independently reviewed and green",
+        "pilot_expected_ceo_required": null,
+        "proceeded_internally": true,
+        "reason": "engineering_manager holds live authority for approve_code_change at low risk inside the activated envelope, and every pilot gate held (9 checked)",
+        "scenario_id": "burnin-correction"
+      },
+      {
+        "actor": "engineering_manager",
+        "actual_ceo_involved": true,
+        "authorizes_action": true,
+        "ceo_required": false,
+        "decision": "approved",
+        "differs_from_shadow": false,
+        "divergence_reason": "",
+        "expected_ceo_required": false,
+        "failed_gates": [],
+        "gates_checked": 9,
+        "historical": true,
+        "label": "Job B: test section-header renumbering, four lines, reviewer PASS",
+        "matches_expectation": true,
+        "mode": "live_pilot",
+        "note": "clean, progressed to deterministic QA",
+        "pilot_expected_ceo_required": null,
+        "proceeded_internally": true,
+        "reason": "engineering_manager holds live authority for approve_test_progression at low risk inside the activated envelope, and every pilot gate held (9 checked)",
+        "scenario_id": "burnin-job-b"
+      },
+      {
+        "actor": "ceo",
+        "actual_ceo_involved": false,
+        "authorizes_action": false,
+        "ceo_required": true,
+        "decision": "escalate",
+        "differs_from_shadow": true,
+        "divergence_reason": "the CTO filed this request, so the CTO cannot approve it and the chain lands on the COO, who holds no live authority in this pilot. Phase 4 delegated two seats and the COO is not one of them, so the correct pilot answer is to escalate.",
+        "expected_ceo_required": false,
+        "failed_gates": [
+          "seat_not_in_pilot"
+        ],
+        "gates_checked": 7,
+        "historical": true,
+        "label": "Job C: stopped at the schema pre-flight, never submitted",
+        "matches_expectation": true,
+        "mode": "live_pilot",
+        "note": "stopped at pre-flight on a premise that turned out to be false",
+        "pilot_expected_ceo_required": true,
+        "proceeded_internally": false,
+        "reason": "coo would be competent under the shadow policy, but this pilot does not cover it: coo holds no live authority in this pilot, which covers only: cto, engineering_manager",
+        "scenario_id": "burnin-job-c"
+      }
+    ],
+    "total": 5
+  },
+  "pilot_probes": {
+    "authorized_actions": [
+      "pilot-probe-integrate-internal"
+    ],
+    "ceo_required": 4,
+    "diverged_from_shadow": [],
+    "escalated": [
+      "pilot-probe-qa-failed",
+      "pilot-probe-integrate-main",
+      "pilot-probe-expired-envelope",
+      "pilot-probe-second-correction"
+    ],
+    "internal": [
+      "pilot-probe-integrate-internal"
+    ],
+    "matches_expectation": 5,
+    "mismatched": [],
+    "proceeded_internally": 1,
+    "results": [
+      {
+        "actor": "ceo",
+        "actual_ceo_involved": null,
+        "authorizes_action": false,
+        "ceo_required": true,
+        "decision": "escalate",
+        "differs_from_shadow": false,
+        "divergence_reason": "",
+        "expected_ceo_required": true,
+        "failed_gates": [
+          "qa_not_passed"
+        ],
+        "gates_checked": 10,
+        "historical": false,
+        "label": "QA failed and progression was requested anyway",
+        "matches_expectation": true,
+        "mode": "live_pilot",
+        "note": "deterministic QA is not a judgement a manager may continue past; the action and the seat are both routine and the failing run is the objection",
+        "pilot_expected_ceo_required": null,
+        "proceeded_internally": false,
+        "reason": "engineering_manager would be competent under the shadow policy, but this pilot does not cover it: deterministic QA failed; progression past a failing QA run is not a routine continuation and no pilot seat may approve it",
+        "scenario_id": "pilot-probe-qa-failed"
+      },
+      {
+        "actor": "ceo",
+        "actual_ceo_involved": null,
+        "authorizes_action": false,
+        "ceo_required": true,
+        "decision": "escalate",
+        "differs_from_shadow": false,
+        "divergence_reason": "",
+        "expected_ceo_required": true,
+        "failed_gates": [
+          "protected_ref"
+        ],
+        "gates_checked": 10,
+        "historical": false,
+        "label": "A routine integration, aimed at main",
+        "matches_expectation": true,
+        "mode": "live_pilot",
+        "note": "the CTO holds approve_integration_merge and the work is reviewed and green; main is a protected ref and no envelope, grant or seat can name it, so the branch is the only objection left",
+        "pilot_expected_ceo_required": null,
+        "proceeded_internally": false,
+        "reason": "cto would be competent under the shadow policy, but this pilot does not cover it: main is protected: main is the production branch; moving it is a public-facing act and the CEO reserved it for this pilot explicitly",
+        "scenario_id": "pilot-probe-integrate-main"
+      },
+      {
+        "actor": "cto",
+        "actual_ceo_involved": null,
+        "authorizes_action": true,
+        "ceo_required": false,
+        "decision": "approved",
+        "differs_from_shadow": false,
+        "divergence_reason": "",
+        "expected_ceo_required": false,
+        "failed_gates": [],
+        "gates_checked": 12,
+        "historical": false,
+        "label": "The same integration, aimed at the pilot branch",
+        "matches_expectation": true,
+        "mode": "live_pilot",
+        "note": "identical to the main probe except for the branch; this is Phase 5's claim that work can be internally accepted without the CEO",
+        "pilot_expected_ceo_required": null,
+        "proceeded_internally": true,
+        "reason": "cto holds live authority for approve_integration_merge at low risk inside the activated envelope, and every pilot gate held (12 checked)",
+        "scenario_id": "pilot-probe-integrate-internal"
+      },
+      {
+        "actor": "ceo",
+        "actual_ceo_involved": null,
+        "authorizes_action": false,
+        "ceo_required": true,
+        "decision": "escalate",
+        "differs_from_shadow": false,
+        "divergence_reason": "",
+        "expected_ceo_required": true,
+        "failed_gates": [
+          "envelope_expired"
+        ],
+        "gates_checked": 9,
+        "historical": false,
+        "label": "Legitimate routine work under an envelope that has expired",
+        "matches_expectation": true,
+        "mode": "live_pilot",
+        "note": "nothing is wrong with the work; the authority to approve it without the CEO expired on 2026-08-31",
+        "pilot_expected_ceo_required": null,
+        "proceeded_internally": false,
+        "reason": "engineering_manager would be competent under the shadow policy, but this pilot does not cover it: the envelope expires 2026-08-31 and the decision is dated 2026-09-20",
+        "scenario_id": "pilot-probe-expired-envelope"
+      },
+      {
+        "actor": "ceo",
+        "actual_ceo_involved": null,
+        "authorizes_action": false,
+        "ceo_required": true,
+        "decision": "escalate",
+        "differs_from_shadow": false,
+        "divergence_reason": "",
+        "expected_ceo_required": true,
+        "failed_gates": [
+          "correction_ceiling"
+        ],
+        "gates_checked": 10,
+        "historical": false,
+        "label": "A second bounded correction on one work order",
+        "matches_expectation": true,
+        "mode": "live_pilot",
+        "note": "one bounded correction is ordinary engineering; the second is exceptional spend on a consumer subscription and is the CEO's call",
+        "pilot_expected_ceo_required": null,
+        "proceeded_internally": false,
+        "reason": "engineering_manager would be competent under the shadow policy, but this pilot does not cover it: 2 correction(s) already authorized against a ceiling of 1",
+        "scenario_id": "pilot-probe-second-correction"
+      }
+    ],
+    "total": 5
+  },
+  "shadow_default": {
+    "all_shadow_mode": true,
+    "authorized_any": false,
+    "total": 5
+  }
+}

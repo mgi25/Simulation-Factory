@@ -1,0 +1,58 @@
+DELEGATED ENGINEERING PILOT - DETERMINISTIC SIMULATION
+  as of      2026-09-20
+  envelope   pilot-envelope-engineering
+  mode       live_pilot (simulation; nothing ran)
+
+HISTORICAL
+  scenarios              5
+  proceeded internally   4
+  required the CEO       1
+  matched expectation    5/5
+    [ok ] dogfood-2                          internal
+    [ok ] burnin-job-a                       internal
+    [ok ] burnin-correction                  internal
+    [ok ] burnin-job-b                       internal
+    [ok ] burnin-job-c                       escalated
+           gates: seat_not_in_pilot
+  DIVERGED FROM SHADOW
+    burnin-job-c: the CTO filed this request, so the CTO cannot approve it and the chain lands on the COO, who holds no live authority in this pilot. Phase 4 delegated two seats and the COO is not one of them, so the correct pilot answer is to escalate.
+
+CONTROLS
+  scenarios              5
+  proceeded internally   0
+  required the CEO       5
+  matched expectation    5/5
+    [ok ] control-reviewer-as-approver       escalated
+           gates: seat_not_in_pilot, risk_above_envelope
+    [ok ] control-override-independent-control escalated
+           gates: seat_not_in_pilot, qa_not_passed
+    [ok ] control-unknown-deployment         escalated
+           gates: seat_not_in_pilot, action_not_in_envelope
+    [ok ] control-spend-above-cfo            escalated
+           gates: seat_not_in_pilot, action_not_in_envelope, amount_above_envelope
+    [ok ] control-expand-authority           escalated
+           gates: seat_not_in_pilot, action_not_in_envelope
+
+PILOT PROBES
+  scenarios              5
+  proceeded internally   1
+  required the CEO       4
+  matched expectation    5/5
+    [ok ] pilot-probe-qa-failed              escalated
+           gates: qa_not_passed
+    [ok ] pilot-probe-integrate-main         escalated
+           gates: protected_ref
+    [ok ] pilot-probe-integrate-internal     internal
+    [ok ] pilot-probe-expired-envelope       escalated
+           gates: envelope_expired
+    [ok ] pilot-probe-second-correction      escalated
+           gates: correction_ceiling
+
+NO REAL WORK ORDER RAN
+  Every decision above is a calculation over recorded history.
+  Nothing was spent, no branch moved, and the pilot is not
+  activated in the canonical Company OS.
+
+SHADOW REMAINS THE DEFAULT
+  5 scenarios with no activation supplied
+  authorized actions: 0 (must be 0)

@@ -1,0 +1,134 @@
+{
+  "results": [
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "160 passed in 1.01s",
+      "observed_on": "2026-09-20",
+      "passed": true,
+      "reported_by": "docs/company_os_delegated_engineering_pilot.md",
+      "selected": 160,
+      "suite": "tests/test_company_analytics.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "32 passed in 0.82s",
+      "observed_on": "2026-09-20",
+      "passed": true,
+      "reported_by": "docs/company_os_delegated_engineering_pilot.md",
+      "selected": 32,
+      "suite": "tests/test_company_dashboard.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "14 passed in 0.73s",
+      "observed_on": "2026-09-20",
+      "passed": true,
+      "reported_by": "docs/company_os_delegated_engineering_pilot.md",
+      "selected": 14,
+      "suite": "tests/test_company_execution_transport.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "123 passed in 0.86s",
+      "observed_on": "2026-09-20",
+      "passed": true,
+      "reported_by": "docs/company_os_delegated_engineering_pilot.md",
+      "selected": 123,
+      "suite": "tests/test_company_finance.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "88 passed in 61.92s (0:01:01)",
+      "observed_on": "2026-09-20",
+      "passed": true,
+      "reported_by": "docs/company_os_delegated_engineering_pilot.md",
+      "selected": 88,
+      "suite": "tests/test_company_integration_gate.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "119 passed in 0.65s",
+      "observed_on": "2026-09-20",
+      "passed": true,
+      "reported_by": "docs/company_os_delegated_engineering_pilot.md",
+      "selected": 119,
+      "suite": "tests/test_company_org_intelligence.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "46 passed in 0.10s",
+      "observed_on": "2026-09-20",
+      "passed": true,
+      "reported_by": "docs/company_os_delegated_engineering_pilot.md",
+      "selected": 46,
+      "suite": "tests/test_company_os_ai_platform.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "66 passed in 0.27s",
+      "observed_on": "2026-09-20",
+      "passed": true,
+      "reported_by": "docs/company_os_delegated_engineering_pilot.md",
+      "selected": 66,
+      "suite": "tests/test_company_os_capsules.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "26 passed in 0.16s",
+      "observed_on": "2026-09-20",
+      "passed": true,
+      "reported_by": "docs/company_os_delegated_engineering_pilot.md",
+      "selected": 26,
+      "suite": "tests/test_company_os_knowledge.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "22 passed in 1.07s",
+      "observed_on": "2026-09-20",
+      "passed": true,
+      "reported_by": "docs/company_os_delegated_engineering_pilot.md",
+      "selected": 22,
+      "suite": "tests/test_company_runtime.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "93 passed in 0.45s",
+      "observed_on": "2026-09-20",
+      "passed": true,
+      "reported_by": "docs/company_os_delegated_engineering_pilot.md",
+      "selected": 93,
+      "suite": "tests/test_company_workforce.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "152 passed in 1.12s",
+      "observed_on": "2026-09-20",
+      "passed": true,
+      "reported_by": "docs/company_os_delegated_engineering_pilot.md",
+      "selected": 152,
+      "suite": "tests/test_company_delegation.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "159 passed in 0.64s",
+      "observed_on": "2026-09-20",
+      "passed": true,
+      "reported_by": "docs/company_os_delegated_engineering_pilot.md",
+      "selected": 159,
+      "suite": "tests/test_company_delegation_pilot.py"
+    }
+  ]
+}

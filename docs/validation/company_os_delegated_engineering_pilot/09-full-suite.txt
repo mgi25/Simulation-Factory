@@ -1,0 +1,136 @@
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 51%]
+........................................................s............... [ 52%]
+........................................................................ [ 53%]
+.......F................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+.................s...................................................... [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+......ssssss..........................................ssssssssssssssss.. [ 72%]
+................................................................s..s.... [ 74%]
+...................ssssssssssssssss.......ssssssssssssssssssssssssssssss [ 75%]
+ss.ssssssss..sss........................................................ [ 76%]
+.................................ss..................................... [ 78%]
+.........................................s...ssssssssssssssssssss..s.... [ 79%]
+s.ssssssssssssss.sss......ss..ssssssssssssssss..ssss..ssss..ss........ss [ 80%]
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 82%]
+ss.s.................................................................... [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+..................................................................s..sss [ 90%]
+ssssssssss.sssssssssss.s..sssss.sssssssssss....ss.s..sssssssssssssssssss [ 91%]
+sssssssssssss....s...........................ss.sss.....ss......s..ssss. [ 92%]
+..............................FFF.F..................................... [ 94%]
+....F................................................................... [ 95%]
+....sssssss.sssssss..................................................... [ 96%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+........s..........                                                      [100%]
+================================== FAILURES ===================================
+_____________ test_a_missing_godot_is_reported_rather_than_raised _____________
+tests\test_neon_proof.py:389: in test_a_missing_godot_is_reported_rather_than_raised
+    assert "nope.exe" in captured.err
+E   AssertionError: assert 'nope.exe' in 'error: no replay at output\\neon_v11\\neon_7.json; run with --replay first\n'
+E    +  where 'error: no replay at output\\neon_v11\\neon_7.json; run with --replay first\n' = CaptureResult(out='', err='error: no replay at output\\neon_v11\\neon_7.json; run with --replay first\n').err
+______________ test_the_siting_tool_uses_the_scenes_own_edit_map ______________
+tests\test_sloped_v251_world.py:421: in test_the_siting_tool_uses_the_scenes_own_edit_map
+    / "cameras_v221_5432.json").read_text(encoding="utf-8"))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\pathlib\_local.py:546: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\pathlib\_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\pathlib\_local.py:537: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-delegated-pilot\\output\\sloped_race_v1\\cameras_v221_5432.json'
+_________ test_the_projector_puts_each_node_in_the_frame_named_for_it _________
+tests\test_sloped_v251_world.py:438: in test_the_projector_puts_each_node_in_the_frame_named_for_it
+    shots = {one.cut: one for one in sites.shots()}
+                                     ^^^^^^^^^^^^^
+tools\sloped_v251_sites.py:169: in shots
+    raise SystemExit(
+E   SystemExit: missing camera track: output\sloped_race_v1\cameras_v221_5432.json
+E   Copy V22.1's solved tracks into output/sloped_race_v1 first.
+____________ test_every_authored_site_lands_in_at_least_one_frame _____________
+tests\test_sloped_v251_world.py:456: in test_every_authored_site_lands_in_at_least_one_frame
+    shots = sites.shots()
+            ^^^^^^^^^^^^^
+tools\sloped_v251_sites.py:169: in shots
+    raise SystemExit(
+E   SystemExit: missing camera track: output\sloped_race_v1\cameras_v221_5432.json
+E   Copy V22.1's solved tracks into output/sloped_race_v1 first.
+__________ test_the_analytic_parallax_finds_a_spread_in_every_chase ___________
+tests\test_sloped_v251_world.py:502: in test_the_analytic_parallax_finds_a_spread_in_every_chase
+    report = sites.geometric_parallax(cfg)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\sloped_v251_sites.py:462: in geometric_parallax
+    first = _shot_at(track, before)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+tools\sloped_v251_sites.py:404: in _shot_at
+    with open(full, encoding="utf-8") as handle:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-delegated-pilot\\output\\sloped_race_v1\\cameras_v221_5432.json'
+___________ test_the_geometric_parallax_field_is_identical_to_v251s ___________
+tests\test_sloped_v252_world.py:519: in test_the_geometric_parallax_field_is_identical_to_v251s
+    first = sites._shot_at(track, before)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools\sloped_v251_sites.py:404: in _shot_at
+    with open(full, encoding="utf-8") as handle:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-delegated-pilot\\output\\sloped_race_v1\\cameras_v221_5432.json'
+6 failed, 5004 passed, 337 skipped in 810.39s (0:13:30)
+C:\Users\mgial\AppData\Local\Programs\Python\Python313\Scripts\pytest.exe\__main__.py:6: DeprecationWarning: Parsing dates involving a day of month without a year specified is ambiguious
+and fails to parse leap day. The default behavior will change in Python 3.15
+to either always raise an exception or to use a different default year (TBD).
+To avoid trouble, add a specific year to the input & format.
+See https://github.com/python/cpython/issues/70647.

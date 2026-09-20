@@ -1,0 +1,41 @@
+{
+  "activated": false,
+  "default_mode": "shadow",
+  "integration_target": {
+    "branch": "company-os-v1-delegated-engineering-pilot-integration",
+    "kind": "internal_branch",
+    "protects": [
+      "company-os-v1-bootstrap",
+      "main",
+      "master"
+    ],
+    "rationale": "an internal branch created for this pilot, which no other branch builds on and which is undone completely by deleting it, so that work can be completed and accepted internally without anything leaving the company",
+    "reversible": true,
+    "target_id": "pilot-internal-integration"
+  },
+  "protected_refs": [
+    "company-os-v1-bootstrap",
+    "main",
+    "master"
+  ],
+  "seats": {
+    "cto": [
+      "approve_code_change",
+      "approve_integration_merge",
+      "approve_review_outcome",
+      "approve_test_progression",
+      "approve_work_order",
+      "request_bounded_correction",
+      "stop_work_on_invalid_premise"
+    ],
+    "engineering_manager": [
+      "approve_code_change",
+      "approve_review_outcome",
+      "approve_test_progression",
+      "approve_work_order",
+      "request_bounded_correction",
+      "stop_work_on_invalid_premise"
+    ]
+  },
+  "version": "delegated_engineering_pilot_v1"
+}
