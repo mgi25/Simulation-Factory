@@ -63,6 +63,7 @@ from company.engineering import (
     ReviewOutcome,
     ReviewerAttestation,
     SelfApproval,
+    StageTiming,
     SuiteScope,
     adjudicate,
     assess_request,
@@ -3096,3 +3097,80 @@ def test_the_attempt_ledger_is_empty_before_any_developer_session(tmp_path):
     assert ledger.developer_attempts == 0
     assert len(ledger.entries) == 0
     assert ledger.total_units is None
+
+
+# --- stage timing: how long each stage took --------------------------------
+
+
+def test_stage_timings_cover_every_transition(tmp_path):
+    """A completed loop produces one timing entry per transition."""
+    run = _drive(tmp_path)
+    timings = run["job"].stage_timings()
+    assert len(timings) == len(run["job"].transitions)
+    for timing, transition in zip(timings, run["job"].transitions):
+        assert timing.state is transition.to_state
+        assert timing.entered_on == transition.on
+
+
+def test_the_current_stage_has_no_exit(tmp_path):
+    """The last timing has exited_on=None and days=0 because it is still open."""
+    run = _drive(tmp_path)
+    timings = run["job"].stage_timings()
+    last = timings[-1]
+    assert last.exited_on is None
+    assert last.days == 0
+    assert last.state is run["job"].state
+
+
+def test_closed_stages_measure_days_between_transitions(tmp_path):
+    """Every stage except the current one has a non-None exit and a day count."""
+    order = _order(tmp_path)
+    day1 = dt.date(2026, 9, 1)
+    day3 = dt.date(2026, 9, 3)
+    day7 = dt.date(2026, 9, 7)
+    job = EngineeringJob.open(order, on=day1)
+    job = job.advance(JobState.PLANNING, on=day3, reason="start planning")
+    job = job.advance(JobState.FAILED, on=day7, reason="cannot proceed")
+    timings = job.stage_timings()
+    assert len(timings) == 3
+    # requested: day1 -> day3 = 2 days
+    assert timings[0].state is JobState.REQUESTED
+    assert timings[0].entered_on == day1
+    assert timings[0].exited_on == day3
+    assert timings[0].days == 2
+    # planning: day3 -> day7 = 4 days
+    assert timings[1].state is JobState.PLANNING
+    assert timings[1].entered_on == day3
+    assert timings[1].exited_on == day7
+    assert timings[1].days == 4
+    # failed: still current
+    assert timings[2].state is JobState.FAILED
+    assert timings[2].exited_on is None
+    assert timings[2].days == 0
+
+
+def test_stage_timings_on_a_fresh_job(tmp_path):
+    """A just-opened job has exactly one timing entry for the opening transition."""
+    order = _order(tmp_path)
+    job = EngineeringJob.open(order, on=DAY)
+    timings = job.stage_timings()
+    assert len(timings) == 1
+    assert timings[0].state is JobState.REQUESTED
+    assert timings[0].exited_on is None
+    assert timings[0].days == 0
+
+
+def test_stage_timing_round_trips_through_to_dict(tmp_path):
+    """StageTiming.to_dict produces a serializable mapping."""
+    order = _order(tmp_path)
+    day1 = dt.date(2026, 9, 1)
+    day3 = dt.date(2026, 9, 3)
+    job = EngineeringJob.open(order, on=day1)
+    job = job.advance(JobState.PLANNING, on=day3, reason="start planning")
+    timings = job.stage_timings()
+    for timing in timings:
+        d = timing.to_dict()
+        assert isinstance(d, dict)
+        assert "state" in d
+        assert "entered_on" in d
+        assert "days" in d

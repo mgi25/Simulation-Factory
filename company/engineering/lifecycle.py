@@ -41,7 +41,7 @@ from collections.abc import Mapping
 import datetime as dt
 from dataclasses import dataclass, replace
 from enum import Enum
-from typing import Any
+from typing import Any, Optional
 
 from ai_platform.serde import fingerprint as _fingerprint
 from ai_platform.serde import to_jsonable
@@ -185,6 +185,25 @@ class JobTransition:
 
 
 @dataclass(frozen=True)
+class StageTiming:
+    """How long a job spent in one state, measured from its own transitions.
+
+    A job that revisits a state (e.g. planning -> developing -> planning) gets
+    one ``StageTiming`` per visit, in transition order. ``exited_on`` is
+    ``None`` for the state the job is currently in, and ``days`` is zero for
+    that open interval.
+    """
+
+    state: JobState
+    entered_on: dt.date
+    exited_on: Optional[dt.date]
+    days: int
+
+    def to_dict(self) -> dict[str, Any]:
+        return to_jsonable(self)
+
+
+@dataclass(frozen=True)
 class EngineeringJob:
     """One engineering job's state, its attempt counters and its whole history."""
 
@@ -274,6 +293,42 @@ class EngineeringJob:
         absence. A CEO decision is a separate record; see `decision.py`.
         """
         return False
+
+    def stage_timings(self) -> tuple[StageTiming, ...]:
+        """Duration of each stage visit, derived from the job's own transitions.
+
+        Returns one ``StageTiming`` per contiguous stay in a state. The
+        current (last) state has ``exited_on=None`` and ``days=0`` because it
+        has no closing transition yet.
+        """
+        if not self.transitions:
+            return ()
+        spans: list[StageTiming] = []
+        for index, transition in enumerate(self.transitions):
+            entered = transition.on
+            # Find the exit: the next transition leaves this state.
+            if index + 1 < len(self.transitions):
+                exited = self.transitions[index + 1].on
+                days = (exited - entered).days
+                spans.append(
+                    StageTiming(
+                        state=transition.to_state,
+                        entered_on=entered,
+                        exited_on=exited,
+                        days=days,
+                    )
+                )
+            else:
+                # Current state, still open.
+                spans.append(
+                    StageTiming(
+                        state=transition.to_state,
+                        entered_on=entered,
+                        exited_on=None,
+                        days=0,
+                    )
+                )
+        return tuple(spans)
 
     def to_dict(self) -> dict[str, Any]:
         return to_jsonable(self)
@@ -479,4 +534,5 @@ __all__ = [
     "EngineeringJob",
     "JobState",
     "JobTransition",
+    "StageTiming",
 ]
