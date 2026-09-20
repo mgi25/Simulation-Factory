@@ -1,0 +1,99 @@
+{
+  "objective_id": "obj-repository-architecture-v1-2026-09-21",
+  "title": "Repository Architecture and AI Efficiency V1",
+  "owner_seat": "ceo",
+  "set_by": "MGI (CEO)",
+  "set_on": "2026-09-21",
+  "planning_run_id": "run-repository-architecture-v1",
+  "planning_decision_id": "plan-repository-architecture-v1",
+  "authority_source": "CEO-authorized Repository Architecture V1 program and ObjectiveContract",
+  "evidence_refs": [
+    "docs/programs/project_factory_repository_architecture_v1.md",
+    "docs/evidence/project_factory_repository_architecture_v1/ceo_objective_contract.json",
+    "docs/evidence/project_factory_repository_architecture_v1/efficiency_benchmark_protocol.md",
+    "docs/evidence/project_factory_repository_architecture_v1/initial_ai_efficiency_baseline.md",
+    "docs/evidence/project_factory_repository_architecture_v1/phase_a_discovery_checkpoint_01.md"
+  ],
+  "goal_tags": [
+    "repository architecture",
+    "codebase health",
+    "repository discoverability",
+    "AI efficiency",
+    "context efficiency",
+    "ownership",
+    "dependency governance",
+    "knowledge freshness"
+  ],
+  "envelope": {
+    "budget": {"amount": "12.00", "currency": "USD"},
+    "budget_scope": "repository-architecture-v1 supporting routine engineering and measured validation",
+    "risk_ceiling": "medium",
+    "allowed_departments": ["engineering"],
+    "forbidden_actions": [
+      "approve_architecture_redesign",
+      "approve_new_dependency",
+      "change_primary_engine",
+      "approve_canonical_merge",
+      "approve_staging_release",
+      "approve_deployment",
+      "approve_production_render",
+      "publish_public_video",
+      "allocate_department_budget",
+      "change_budget_policy",
+      "approve_recurring_paid_api_spend",
+      "approve_workforce_state_change",
+      "hire_or_remove_executive_role",
+      "delete_production_data",
+      "change_delegation_policy",
+      "expand_authority",
+      "change_governance_policy",
+      "change_company_mission",
+      "amend_constitution",
+      "change_no_subagents_policy",
+      "approve_security_exception"
+    ],
+    "success_metrics": [
+      "current repository architecture and lifecycle state are inventoried from repository evidence",
+      "target-state architecture is proposed before major code movement",
+      "AI resource usage and waste are attributed where authoritative telemetry exists",
+      "Company OS economic validation uses the frozen sequential benchmark protocol",
+      "repository stewardship receives an evidence-backed organizational recommendation",
+      "zero new production regressions from bounded supporting engineering"
+    ]
+  },
+  "planners": {
+    "executive_seat": "cto",
+    "executive_employee": "chief_architect",
+    "manager_seat": "engineering_manager",
+    "manager_employee": "engineering_delivery_manager"
+  },
+  "discovery": {
+    "envelope_id": "disc-repository-architecture-v1",
+    "allowed_capsules": [
+      "ai-platform",
+      "company-engineering-execution",
+      "company-knowledge-capsules",
+      "company-organizational-intelligence",
+      "company-os-control-plane",
+      "company-production-integration-gate",
+      "company-runtime",
+      "company-validation",
+      "company-workforce-capabilities",
+      "company-workforce-employment"
+    ],
+    "allowed_surfaces": [
+      "capsule_metadata",
+      "validation_report",
+      "reviewer_advisory",
+      "deferred_followup",
+      "company_os_evidence_record",
+      "known_defect_record"
+    ],
+    "risk_ceiling": "medium",
+    "budget": {"amount": "2.00", "currency": "USD"},
+    "expires_on": "2026-10-31",
+    "authorized_by": "MGI (CEO)",
+    "authority_source": "bounded discovery inside Repository Architecture V1 CEO objective",
+    "max_candidates": 3
+  }
+}
