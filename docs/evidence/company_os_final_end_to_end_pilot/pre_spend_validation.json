@@ -1,0 +1,160 @@
+{
+  "as_of": "2026-09-20",
+  "envelope_id": "pilot-envelope-final-e2e",
+  "activation_id": "pilot-activation-final-e2e",
+  "objective": "Improve the reliability, maintainability, or operating efficiency of the Company OS by completing ONE useful engineering improvement selected by the company itself.",
+  "ordinary_chain": [
+    {
+      "action": "approve_code_change",
+      "raised_by": "software_implementation_engineer",
+      "actor": "engineering_manager",
+      "expected": "engineering_manager",
+      "proceeds_internally": true,
+      "ceo_required": false
+    },
+    {
+      "action": "approve_test_progression",
+      "raised_by": "software_implementation_engineer",
+      "actor": "engineering_manager",
+      "expected": "engineering_manager",
+      "proceeds_internally": true,
+      "ceo_required": false
+    },
+    {
+      "action": "approve_review_outcome",
+      "raised_by": "engineering_reviewer",
+      "actor": "engineering_manager",
+      "expected": "engineering_manager",
+      "proceeds_internally": true,
+      "ceo_required": false
+    },
+    {
+      "action": "request_bounded_correction",
+      "raised_by": "engineering_reviewer",
+      "actor": "engineering_manager",
+      "expected": "engineering_manager",
+      "proceeds_internally": true,
+      "ceo_required": false
+    },
+    {
+      "action": "approve_integration_merge",
+      "raised_by": "engineering_manager",
+      "actor": "cto",
+      "expected": "cto",
+      "proceeds_internally": true,
+      "ceo_required": false
+    }
+  ],
+  "checks": [
+    {
+      "check": "ordinary.approve_code_change_decided_by_engineering_manager",
+      "pass": true,
+      "detail": "actor=engineering_manager live=True ceo=False"
+    },
+    {
+      "check": "ordinary.approve_test_progression_decided_by_engineering_manager",
+      "pass": true,
+      "detail": "actor=engineering_manager live=True ceo=False"
+    },
+    {
+      "check": "ordinary.approve_review_outcome_decided_by_engineering_manager",
+      "pass": true,
+      "detail": "actor=engineering_manager live=True ceo=False"
+    },
+    {
+      "check": "ordinary.request_bounded_correction_decided_by_engineering_manager",
+      "pass": true,
+      "detail": "actor=engineering_manager live=True ceo=False"
+    },
+    {
+      "check": "ordinary.integration_decided_by_cto",
+      "pass": true,
+      "detail": "actor=cto live=True"
+    },
+    {
+      "check": "ordinary.ceo_not_required_anywhere",
+      "pass": true,
+      "detail": "no step in the ordinary chain reaches the CEO"
+    },
+    {
+      "check": "qa_failure_blocks_test_progression",
+      "pass": true,
+      "detail": "gates=['qa_not_passed']"
+    },
+    {
+      "check": "override_of_independent_control_refused",
+      "pass": true,
+      "detail": "gates=['seat_not_in_pilot', 'qa_not_passed'] ceo=True"
+    },
+    {
+      "check": "protected_ref_blocked.company-os-v1-bootstrap",
+      "pass": true,
+      "detail": "gates=['protected_ref']"
+    },
+    {
+      "check": "protected_ref_blocked.main",
+      "pass": true,
+      "detail": "gates=['protected_ref']"
+    },
+    {
+      "check": "protected_ref_blocked.master",
+      "pass": true,
+      "detail": "gates=['protected_ref']"
+    },
+    {
+      "check": "risk_ceiling_enforced",
+      "pass": true,
+      "detail": "gates=['seat_not_in_pilot', 'risk_above_envelope']"
+    },
+    {
+      "check": "public_deployment_blocked",
+      "pass": true,
+      "detail": "gates=['action_not_in_pilot', 'action_not_in_pilot', 'risk_above_pilot_ceiling', 'action_not_in_envelope'] ceo=True"
+    },
+    {
+      "check": "publishing_blocked.approve_staging_release",
+      "pass": true,
+      "detail": "gates=['action_not_in_pilot', 'action_not_in_pilot', 'risk_above_pilot_ceiling', 'action_not_in_envelope'] ceo=True"
+    },
+    {
+      "check": "publishing_blocked.approve_production_render",
+      "pass": true,
+      "detail": "gates=['seat_not_in_pilot', 'action_not_in_envelope'] ceo=True"
+    },
+    {
+      "check": "spend_outside_envelope_blocked",
+      "pass": true,
+      "detail": "gates=['action_not_in_pilot', 'action_not_in_envelope']"
+    },
+    {
+      "check": "first_correction_permitted",
+      "pass": true,
+      "detail": "used=1 ceiling=1"
+    },
+    {
+      "check": "second_correction_blocked",
+      "pass": true,
+      "detail": "used=1 ceiling=1 ceo=True"
+    },
+    {
+      "check": "architecture_review_self_conflict_escalates",
+      "pass": true,
+      "detail": "actor=ceo ceo=True"
+    },
+    {
+      "check": "default_is_shadow_without_activation",
+      "pass": true,
+      "detail": "activation=None authorizes nothing"
+    }
+  ],
+  "observations": [
+    {
+      "note": "evaluate_live does not gate APPROVE_INTEGRATION_MERGE on qa_passed; QA is gated at APPROVE_TEST_PROGRESSION and by overrides_independent_control. Integration ordering is the runner's.",
+      "authorizes_action": true,
+      "gates_failed": []
+    }
+  ],
+  "passed": 20,
+  "total": 20,
+  "blockers": []
+}
