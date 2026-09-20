@@ -1,0 +1,89 @@
+PRODUCTION INTEGRATION READINESS: READY
+report      integration-readiness-2026-09-20-d876c007b59b91c1
+as of       2026-09-20
+source      company-os-v1-bounded-engineering-autonomy bdbe71bf87b5d67eea64c375fb67c4a2d2acbab7
+policy      v1: 34 required, 4 advisory
+
+checks      34 pass, 1 fail, 3 unknown, 0 not_applicable
+
+BLOCKERS    none
+
+ADVISORY (4, not blocking)
+  FAIL     architecture.subsystem_ownership_bounded
+    7 module(s) no capsule claims: company/workforce/__init__.py, company/workforce/__main__.py, company/workforce/common.py, company/workforce/errors.py, knowledge/__init__.py, and 2 more
+  UNKNOWN  executive.decision_queue_preserves_source_refs
+    no company state directory was supplied, so the decision queue is empty and the condition is untested rather than satisfied
+  UNKNOWN  health.production_failures_separated
+    every supplied result is marked as a Company OS suite; no production-environment run was classified either way
+  UNKNOWN  workforce.capability_gaps_visible
+    no company state directory was supplied, so there is no coverage to read
+
+UNKNOWNS (3)
+  executive.decision_queue_preserves_source_refs (advisory)
+    missing  a state directory holding at least one decision: an empty queue proves nothing about what a populated one carries
+  health.production_failures_separated (advisory)
+    missing  no result carries company_os=false, so the separation is asserted rather than shown
+  workforce.capability_gaps_visible (advisory)
+    missing  a workforce store: re-run with --state-dir pointing at the company's records
+
+ANALYTICS
+  PASS     analytics.causal_overclaim_refused (required)
+  PASS     analytics.competitor_private_metrics_unavailable (required)
+  PASS     analytics.learning_requires_results (required)
+
+ARCHITECTURE
+  PASS     architecture.capsule_graph_acyclic (required)
+  PASS     architecture.capsule_graph_integrity (required)
+  PASS     architecture.no_subsystem_import_cycle (required)
+  PASS     architecture.production_does_not_import_company_os (required)
+  PASS     architecture.production_tests_independent (required)
+  FAIL     architecture.subsystem_ownership_bounded (advisory)
+    7 module(s) no capsule claims: company/workforce/__init__.py, company/workforce/__main__.py, company/workforce/common.py, company/workforce/errors.py, knowledge/__init__.py, and 2 more
+
+DATA
+  PASS     data.audit_records_append_only (required)
+  PASS     data.evidence_required_for_claims (required)
+  PASS     data.missing_evidence_stays_unknown (required)
+  PASS     data.private_metric_boundary (required)
+
+EXECUTION
+  PASS     execution.authority_snapshot_immutable (required)
+  PASS     execution.no_subagent_runtime_lock (required)
+  PASS     execution.read_authority_fails_closed (required)
+  PASS     execution.receipt_validation_enforced (required)
+  PASS     execution.write_authority_fails_closed (required)
+
+EXECUTIVE
+  PASS     executive.dashboard_available (required)
+  PASS     executive.dashboard_cannot_approve (required)
+  UNKNOWN  executive.decision_queue_preserves_source_refs (advisory)
+    no company state directory was supplied, so the decision queue is empty and the condition is untested rather than satisfied
+  PASS     executive.missing_and_stale_evidence_visible (required)
+
+FINANCE
+  PASS     finance.no_autonomous_spend_approval (required)
+  PASS     finance.recurring_paid_api_spend_reserved (required)
+  PASS     finance.unknown_is_not_zero (required)
+
+HEALTH
+  PASS     health.no_network_or_model_dependency (required)
+  PASS     health.no_new_dependency (required)
+  UNKNOWN  health.production_failures_separated (advisory)
+    every supplied result is marked as a Company OS suite; no production-environment run was classified either way
+  PASS     health.required_suites_pass (required)
+  PASS     health.sources_parse (required)
+
+PRODUCTION
+  PASS     production.integration_remains_disabled (required)
+  PASS     production.no_automatic_production_mutation (required)
+  PASS     production.no_production_delete_authority (required)
+  PASS     production.no_publishing_capability (required)
+
+WORKFORCE
+  PASS     workforce.advisory_cannot_self_approve (required)
+  UNKNOWN  workforce.capability_gaps_visible (advisory)
+    no company state directory was supplied, so there is no coverage to read
+  PASS     workforce.ceo_reserved_actions_present (required)
+  PASS     workforce.restricted_states_cannot_write_production (required)
+
+This report states whether the technical gate conditions are satisfied. It does not authorize production integration: wiring Company OS into production is a separate CEO decision (permissions.yaml, merge_major_architecture_rewrite).

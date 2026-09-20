@@ -909,6 +909,33 @@ def test_a_worker_asking_to_discover_is_decided_by_management(policy):
 # --- 11. the replays -------------------------------------------------------
 
 
+# Candidates added to the seed register *after* the runs these replays
+# reconstruct. A replay is a statement about a particular past register, so it
+# has to exclude work the company recorded later - otherwise every replay
+# breaks the next time anybody writes down a new piece of work, which is the
+# one thing a working company does constantly.
+_ADDED_AFTER_THE_REPLAYS = frozenset({"capsule-ownership-semantic-review"})
+
+
+def _register_as_replayed(*, reopen=()):
+    """The seed register as the replayed runs saw it.
+
+    `reopen` names candidates that have since been COMPLETED and were OPEN at
+    the time. Appending is the supported idiom: the register is an append-only
+    history and the latest version of an id wins.
+    """
+    seeded = load_seed_register()
+    kept = tuple(
+        item
+        for item in seeded.candidates
+        if item.candidate_id not in _ADDED_AFTER_THE_REPLAYS
+    )
+    reopened = tuple(
+        seeded.candidate(item).with_status(CandidateStatus.OPEN) for item in reopen
+    )
+    return CandidateRegister(candidates=kept + reopened)
+
+
 def test_the_low_objective_replay_finds_nothing_and_invents_nothing(index, capsule_paths):
     """The failed pilot's exact objective, planned rather than executed."""
     from company.delegation.discovery import capsule_revalidation_proposals
@@ -931,13 +958,13 @@ def test_the_low_objective_replay_finds_nothing_and_invents_nothing(index, capsu
     result = run_discovery(
         proposals,
         discovery_envelope,
-        register=load_seed_register(),
+        register=_register_as_replayed(),
         capsule_paths=capsule_paths,
         today=DAY,
         repo_root=REPO_ROOT,
     )
     run = plan_objective(
-        load_seed_register(),
+        _register_as_replayed(),
         objective,
         envelope,
         planning_run_id="run-low-replay",
@@ -959,34 +986,11 @@ def test_the_low_objective_replay_finds_nothing_and_invents_nothing(index, capsu
     assert run.record.selected_candidate_id == ""
 
 
-def _register_with_classifier_candidate_open():
-    """The seeded register with `auth-migration-classifier-ambiguity` reopened.
-
-    That candidate is COMPLETED in the register today: its fix came out of the
-    historical end-to-end pilot and was canonicalized by CEO exception. The
-    test below is about the *mechanism* - a MEDIUM ceiling reaching medium-risk
-    work, and a planner choosing between two eligible candidates - not about
-    which items the company's backlog happens to hold this week. Pinning it to
-    the live seed file made it fail the moment the company finished a piece of
-    work, which is the one thing a working company is supposed to do. So it
-    builds the register it needs.
-
-    Appending is the supported idiom: the register is an append-only history
-    and the latest version of an id wins, so this is a reopened candidate
-    rather than an edited one.
-    """
-    seeded = load_seed_register()
-    reopened = seeded.candidate("auth-migration-classifier-ambiguity").with_status(
-        CandidateStatus.OPEN
-    )
-    return CandidateRegister(candidates=(*seeded.candidates, reopened))
-
-
 def test_the_medium_replay_selects_through_the_executive_without_a_human(index):
     """Two eligible candidates, chosen by the planner, not by a preference."""
     envelope = _envelope("obj-intake-classifier", risk_ceiling="medium")
     objective = _objective("obj-intake-classifier", envelope=envelope)
-    register = _register_with_classifier_candidate_open()
+    register = _register_as_replayed(reopen=("auth-migration-classifier-ambiguity",))
     answer = json.dumps(
         _choice(selected_candidate_id="reserved-screening-negation-blindness").to_dict()
     )
@@ -1050,12 +1054,65 @@ def test_planning_spawns_nothing_and_holds_no_live_delegation():
             assert forbidden not in source, f"{module.__name__} names {forbidden}"
 
 
-def test_this_branch_carries_no_live_pilot_machinery():
+def test_planning_never_depends_on_live_pilot_machinery():
+    """The invariant that survives composition.
+
+    An earlier version of this test asserted that *no* `pilot_*.py` existed
+    beside the planning modules. That was true of the branch it was written on
+    and is the wrong thing to assert: the end-to-end pilot composes planning
+    with the live-delegation runtime on purpose, and the check failed for the
+    one composition it was meant to make safe.
+
+    What actually matters does not depend on which branch this runs on: the
+    planning layer must never *reach for* pilot code. Canonical can then carry
+    planning without carrying activation, which is exactly how the curated
+    canonical integration was possible.
+    """
     delegation = Path(__file__).resolve().parents[1] / "company" / "delegation"
-    assert not list(delegation.glob("pilot*.py"))
-    for name in ("PilotActivation", "evaluate_live", "PilotBoundaryViolation"):
-        hits = [p.name for p in delegation.glob("*.py") if name in p.read_text(encoding="utf-8")]
-        assert not hits, f"{name} appears in {hits}"
+    planning_modules = (
+        "candidates.py",
+        "planning.py",
+        "planning_record.py",
+        "planning_run.py",
+        "discovery.py",
+        "executive.py",
+        "objectives.py",
+    )
+    for name in planning_modules:
+        path = delegation / name
+        if not path.exists():  # pragma: no cover - module set differs per branch
+            continue
+        source = path.read_text(encoding="utf-8")
+        for forbidden in (
+            "from .pilot",
+            "import pilot",
+            "PilotActivation",
+            "evaluate_live",
+            "PilotBoundaryViolation",
+        ):
+            assert forbidden not in source, f"{name} reaches for {forbidden}"
+
+
+def test_where_the_live_pilot_exists_it_is_inert_without_an_activation():
+    """Importing the pilot changes nothing; only an activation does.
+
+    Skipped on a branch that carries no pilot, which is the canonical case.
+    """
+    delegation = Path(__file__).resolve().parents[1] / "company" / "delegation"
+    if not (delegation / "pilot.py").exists():
+        pytest.skip("this branch carries no live-pilot runtime")
+    from company.delegation.pilot import PilotMode, evaluate_live
+
+    import inspect
+
+    signature = inspect.signature(evaluate_live)
+    activation = signature.parameters.get("activation")
+    assert activation is not None
+    assert activation.default is None, (
+        "evaluate_live must default to no activation, so importing the pilot "
+        "authorizes nothing"
+    )
+    assert PilotMode.SHADOW.value == "shadow"
 
 
 def test_the_delegation_policy_is_still_shadow():
