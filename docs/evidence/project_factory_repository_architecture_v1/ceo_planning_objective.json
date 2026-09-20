@@ -25,10 +25,15 @@
     "knowledge freshness"
   ],
   "envelope": {
-    "budget": {"amount": "12.00", "currency": "USD"},
-    "budget_scope": "repository-architecture-v1 supporting routine engineering and measured validation",
+    "budget": {
+      "amount": "12.00",
+      "currency": "USD"
+    },
+    "budget_scope": "repository-architecture-v1",
     "risk_ceiling": "medium",
-    "allowed_departments": ["engineering"],
+    "allowed_departments": [
+      "engineering"
+    ],
     "forbidden_actions": [
       "approve_architecture_redesign",
       "approve_new_dependency",
@@ -90,7 +95,10 @@
       "known_defect_record"
     ],
     "risk_ceiling": "medium",
-    "budget": {"amount": "2.00", "currency": "USD"},
+    "budget": {
+      "amount": "2.00",
+      "currency": "USD"
+    },
     "expires_on": "2026-10-31",
     "authorized_by": "MGI (CEO)",
     "authority_source": "bounded discovery inside Repository Architecture V1 CEO objective",
