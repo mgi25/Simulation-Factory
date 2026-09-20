@@ -1,0 +1,35 @@
+{
+  "checks": [
+    {
+      "check_id": "ceo_decision_names_a_human",
+      "detail": "a CEO decision signed by an automatic marker is still refused, and a named human is still accepted",
+      "evidence": "company/engineering/common.py assert_named_person",
+      "holds": true
+    },
+    {
+      "check_id": "approval_carries_no_merge_authority",
+      "detail": "a recorded CEO approval still carries no merge authority, and one claiming it is still refused",
+      "evidence": "company/engineering/decision.py CEODecision.authorizes_merge",
+      "holds": true
+    },
+    {
+      "check_id": "only_ready_for_approval_can_be_approved",
+      "detail": "approving a job that is not ready_for_approval is still refused in 3 probed states",
+      "evidence": "company/engineering/decision.py CEODecision.__post_init__",
+      "holds": true
+    },
+    {
+      "check_id": "delegation_record_cannot_act",
+      "detail": "a delegation decision and a stored record both refuse to claim authority to act, and both refuse to leave shadow mode",
+      "evidence": "company/delegation/record.py, company/delegation/authority.py",
+      "holds": true
+    },
+    {
+      "check_id": "policy_cannot_leave_shadow",
+      "detail": "a policy declaring mode=enforcing is still refused at construction",
+      "evidence": "company/delegation/policy.py DelegationPolicy.__post_init__",
+      "holds": true
+    }
+  ],
+  "shadow_mode_enforced": true
+}

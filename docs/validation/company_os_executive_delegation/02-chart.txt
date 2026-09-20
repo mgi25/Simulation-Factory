@@ -1,0 +1,16 @@
+ceo  [external_human]
+  coo (executive)
+    analytics_lead (department_management)  [dormant]
+    cfo (executive)  [vacant]
+    content_strategy_lead (department_management)  [dormant]
+      visual_direction (worker)  [dormant]
+    cto (executive)
+      ai_platform_lead (department_management)
+      engineering_manager (department_management)  [vacant]
+        simulation_physics_engineer (worker)  [dormant]
+        software_implementation_engineer (worker)  [dormant]
+    deterministic_qa (independent_control)  [vacant]
+    integration_gate (independent_control)  [vacant]
+    people_lead (department_management)  [dormant]
+    production_lead (department_management)  [dormant]
+    research_lead (department_management)  [dormant]
