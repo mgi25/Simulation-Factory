@@ -27,7 +27,11 @@
         "tests/test_company_engineering_execution.py"
       ],
       "estimated_resource_profile": "consumer",
-      "goal_tags": ["intake", "classifier", "escalation"],
+      "goal_tags": [
+        "intake",
+        "classifier",
+        "escalation"
+      ],
       "status": "open",
       "notes": "Risk is MEDIUM rather than LOW deliberately. The current failure is over-escalation, which is fail-safe; a fix that trims it trades a safety margin for accuracy on the path that decides whether the CEO hears about something. That is a judgement above routine engineering."
     },
@@ -43,7 +47,11 @@
       "expected_value": "Routine requests that merely mention a sensitive concept reach the cheaper tier instead of the specialist one.",
       "risk": "medium",
       "created_at": "2026-09-20",
-      "evidence_refs": ["docs/company_os_canonical_integration_record.md"],
+      "evidence_refs": [
+        "docs/company_os_canonical_integration_record.md",
+        "docs/company_os_end_to_end_delegation_pilot.md",
+        "docs/company_os_review_separation.md"
+      ],
       "acceptance_criteria": [
         "An objective that names a migration only inside a quoted test identifier derives no specialist domain.",
         "An objective that asks for a schema migration still derives the specialist domain it derives today.",
@@ -54,9 +62,13 @@
         "tests/test_company_engineering_execution.py"
       ],
       "estimated_resource_profile": "consumer",
-      "goal_tags": ["intake", "classifier", "routing"],
-      "status": "open",
-      "notes": "MEDIUM for the same reason as the negation candidate: narrowing a trigger narrows an escalation."
+      "goal_tags": [
+        "intake",
+        "classifier",
+        "routing"
+      ],
+      "status": "completed",
+      "notes": "COMPLETED through an explicit CEO exception, not through the ordinary path. The implementation came from the historical end-to-end delegation pilot: a developer implemented it, an independent reviewer asked for changes, the Engineering Manager authorized bounded correction 1 of 1, the correction landed, the second independent review returned PASS and the deterministic required suites ran 11/11 green. That pilot did not fail technically - it stopped at integration because the CTO seat held approve_integration_merge while the CTO's own employee, chief_architect, had reviewed the work, so the seat was disqualified and the chain reached the CEO. Its classification stands unchanged as END_TO_END_DELEGATION_ESCALATED_CORRECTLY. The CEO later authorized curated canonical integration of that specific completed change as an exception, which is how the code reached canonical without re-running a paid developer or reviewer session. The organizational cause is separately fixed by the independent reviewer in docs/company_os_review_separation.md. MEDIUM risk for the original reason: narrowing a trigger narrows an escalation."
     },
     {
       "candidate_id": "deployment-policy-gap",
@@ -77,9 +89,14 @@
       "acceptance_criteria": [
         "company/delegation_policy.yaml states which seat, if any, may approve each of the five deployment kinds."
       ],
-      "allowed_write_scope": ["company/delegation_policy.yaml"],
+      "allowed_write_scope": [
+        "company/delegation_policy.yaml"
+      ],
       "estimated_resource_profile": "consumer",
-      "goal_tags": ["deployment", "policy"],
+      "goal_tags": [
+        "deployment",
+        "policy"
+      ],
       "status": "blocked",
       "blocked_by": [
         "a CEO policy decision: Company OS has no deployment policy to delegate against, and inventing one in code would be the delegation model widening itself"
@@ -105,9 +122,15 @@
       "acceptance_criteria": [
         "ResourceUsageRecord carries an identifier that is equal for two decodes of one provider response and different for two responses."
       ],
-      "allowed_write_scope": ["ai_platform/usage.py"],
+      "allowed_write_scope": [
+        "ai_platform/usage.py"
+      ],
       "estimated_resource_profile": "consumer",
-      "goal_tags": ["usage", "cost", "telemetry"],
+      "goal_tags": [
+        "usage",
+        "cost",
+        "telemetry"
+      ],
       "status": "blocked",
       "blocked_by": [
         "a design decision nobody has taken: no existing field is a stable per-event id, so this needs a schema change, and schema or storage migration is outside routine engineering"
@@ -126,7 +149,9 @@
       "expected_value": "One argument convention across the runner's control-plane calls.",
       "risk": "low",
       "created_at": "2026-09-20",
-      "evidence_refs": ["docs/company_os_v1_external_runner_hardening.md"],
+      "evidence_refs": [
+        "docs/company_os_v1_external_runner_hardening.md"
+      ],
       "acceptance_criteria": [
         "tools/engineering_runner/controlplane.py passes --repo-dir on the blocked_attempt path under the same condition as the receipt path.",
         "tests/test_external_engineering_runner.py passes with a case covering the blocked_attempt argument list."
@@ -136,7 +161,10 @@
         "tests/test_external_engineering_runner.py"
       ],
       "estimated_resource_profile": "consumer",
-      "goal_tags": ["runner", "maintenance"],
+      "goal_tags": [
+        "runner",
+        "maintenance"
+      ],
       "status": "open",
       "notes": "capsule_id names no capsule that exists: nothing in knowledge/company_os/capsules declares ownership of tools/, and company-engineering-execution lists tools/** under must_not_modify. The eligibility pass rejects this on capsule_owned, which is the correct answer and not a bug in the candidate."
     },
@@ -152,13 +180,20 @@
       "expected_value": "A work order with no declared tests would get a stated answer instead of an accidental one.",
       "risk": "medium",
       "created_at": "2026-09-20",
-      "evidence_refs": ["docs/company_os_v1_external_runner_hardening.md"],
+      "evidence_refs": [
+        "docs/company_os_v1_external_runner_hardening.md"
+      ],
       "acceptance_criteria": [
         "The runner states, and a test pins, whether a work order with zero required_tests is accepted or refused."
       ],
-      "allowed_write_scope": ["tools/engineering_runner"],
+      "allowed_write_scope": [
+        "tools/engineering_runner"
+      ],
       "estimated_resource_profile": "consumer",
-      "goal_tags": ["runner", "policy"],
+      "goal_tags": [
+        "runner",
+        "policy"
+      ],
       "status": "blocked",
       "blocked_by": [
         "a policy decision about what evidence a receipt must carry when the work order declares no tests"
@@ -192,7 +227,11 @@
         "tests/test_company_objective_planning.py"
       ],
       "estimated_resource_profile": "consumer",
-      "goal_tags": ["intake", "planning", "maintainability"],
+      "goal_tags": [
+        "intake",
+        "planning",
+        "maintainability"
+      ],
       "status": "completed",
       "notes": "Completed by the objective-planning capability itself, in the same pass that created this register. Kept here because a register that only holds open work cannot show what closing one looks like."
     }

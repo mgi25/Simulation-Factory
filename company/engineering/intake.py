@@ -79,6 +79,9 @@ from .criteria import assess_specificity
 from .errors import EngineeringError
 from .protected import ProtectedSurface
 from .work_order import (
+    ARCHITECTURE_REVIEW_CAPABILITY,
+    ARCHITECTURE_REVIEW_DOMAINS,
+    CODE_REVIEW_CAPABILITY,
     DEFAULT_MAX_DEVELOPER_ATTEMPTS,
     EngineeringWorkOrder,
 )
@@ -181,6 +184,10 @@ _CLAUSE_BREAK = re.compile(
 )
 _NEGATION_WORDS = frozenset({"not", "no", "never", "without", "avoid", "cannot"})
 _NEGATION_WORD_PATTERN = re.compile(r"[a-z']+")
+# A backtick span that contains only word characters (no whitespace): `func_name`.
+# Multi-word spans like `schema migration` are intentionally excluded so that
+# trigger terms inside them still escalate as described work.
+_QUOTED_IDENT = re.compile(r"`\w+`")
 
 
 def _clauses(text: str) -> tuple[str, ...]:
@@ -818,6 +825,14 @@ def assess_request(
         novel=routing.novel,
         escalation=routing.escalation.value,
         resource_profile=request.resource_profile,
+        # Ordinary work gets an ordinary reviewer. Only work the routing called
+        # architectural needs the architect, and asking for the architect has a
+        # price: the CTO cannot then approve that job's integration.
+        review_capability=(
+            ARCHITECTURE_REVIEW_CAPABILITY
+            if routing.specialist_domain in ARCHITECTURE_REVIEW_DOMAINS
+            else CODE_REVIEW_CAPABILITY
+        ),
     )
     return IntakeAssessment(
         request=request,
@@ -930,7 +945,7 @@ def derive_routing(request: CEORequest) -> RoutingDerivation:
     # the requested work, so it must never silently raise the model tier: a
     # note that says "the previous request was misclassified as governance"
     # would otherwise retrigger the exact misclassification it describes.
-    text = request.objective.lower()
+    text = _QUOTED_IDENT.sub("", request.objective).lower()
     clauses = _clauses(text)
     novel = request.novel or any(_escalates(term, clauses) for term in NOVEL_TRIGGERS)
 

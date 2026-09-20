@@ -60,6 +60,13 @@ employees:
     mission: Implement authorized engineering work orders and the tests that prove them.
     capabilities: [software_implementation, test_engineering]
 
+  software_review_engineer:
+    department: engineering
+    manager: engineering_delivery_manager
+    state: active
+    mission: Independently review authorized engineering work and its evidence, and say pass, changes_required or reject.
+    capabilities: [code_review]
+
   simulation_physics_engineer:
     department: engineering
     manager: engineering_delivery_manager

@@ -332,6 +332,12 @@ class WorkOrderProposal:
     proposed_by_seat: str
     proposed_on: dt.date
     planning_decision_id: str
+    # Where the work happens. A proposal without these passes intake and then
+    # fails at the runner with "base commit is not in this repository", which
+    # is a late and confusing place to learn that planning never said which
+    # checkout it was planning against.
+    authorized_branch: str = ""
+    base_commit: str = ""
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -356,6 +362,8 @@ class WorkOrderProposal:
             "risk": self.risk.value,
             "reversible": True,
             "resource_profile": self.resource_profile,
+            "authorized_branch": self.authorized_branch,
+            "base_commit": self.base_commit,
             "candidate_id": self.candidate_id,
             "planning_decision_id": self.planning_decision_id,
             "notes": (
@@ -381,6 +389,8 @@ class WorkOrderProposal:
             "proposed_by_seat": self.proposed_by_seat,
             "proposed_on": self.proposed_on.isoformat(),
             "planning_decision_id": self.planning_decision_id,
+            "authorized_branch": self.authorized_branch,
+            "base_commit": self.base_commit,
         }
 
 
@@ -396,6 +406,8 @@ def propose_work_order(
     narrow_criteria: Sequence[str] = (),
     narrow_risk: Any = None,
     budget: Money | None = None,
+    authorized_branch: str = "",
+    base_commit: str = "",
 ) -> WorkOrderProposal:
     """Turn a selected candidate into a bounded work order proposal.
 
@@ -474,6 +486,8 @@ def propose_work_order(
         proposed_by_seat=proposed_by_seat,
         proposed_on=proposed_on,
         planning_decision_id=planning_decision_id,
+        authorized_branch=authorized_branch,
+        base_commit=base_commit,
     )
 
 

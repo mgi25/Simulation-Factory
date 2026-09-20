@@ -959,11 +959,34 @@ def test_the_low_objective_replay_finds_nothing_and_invents_nothing(index, capsu
     assert run.record.selected_candidate_id == ""
 
 
+def _register_with_classifier_candidate_open():
+    """The seeded register with `auth-migration-classifier-ambiguity` reopened.
+
+    That candidate is COMPLETED in the register today: its fix came out of the
+    historical end-to-end pilot and was canonicalized by CEO exception. The
+    test below is about the *mechanism* - a MEDIUM ceiling reaching medium-risk
+    work, and a planner choosing between two eligible candidates - not about
+    which items the company's backlog happens to hold this week. Pinning it to
+    the live seed file made it fail the moment the company finished a piece of
+    work, which is the one thing a working company is supposed to do. So it
+    builds the register it needs.
+
+    Appending is the supported idiom: the register is an append-only history
+    and the latest version of an id wins, so this is a reopened candidate
+    rather than an edited one.
+    """
+    seeded = load_seed_register()
+    reopened = seeded.candidate("auth-migration-classifier-ambiguity").with_status(
+        CandidateStatus.OPEN
+    )
+    return CandidateRegister(candidates=(*seeded.candidates, reopened))
+
+
 def test_the_medium_replay_selects_through_the_executive_without_a_human(index):
     """Two eligible candidates, chosen by the planner, not by a preference."""
     envelope = _envelope("obj-intake-classifier", risk_ceiling="medium")
     objective = _objective("obj-intake-classifier", envelope=envelope)
-    register = load_seed_register()
+    register = _register_with_classifier_candidate_open()
     answer = json.dumps(
         _choice(selected_candidate_id="reserved-screening-negation-blindness").to_dict()
     )

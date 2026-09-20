@@ -109,6 +109,39 @@ SPECIALIST_DOMAIN = "software_engineering"
 DEFAULT_MAX_DEVELOPER_ATTEMPTS = 3
 
 
+CODE_REVIEW_CAPABILITY = "code_review"
+"""Ordinary engineering review: does this change do what the order asked?
+
+What `company/engineering/intake.py` asks for on every work order it derives
+that the routing did not call architectural. Before the independent reviewer
+existed, every work order asked for `software_architecture`, and because
+`chief_architect` was the only employee holding it, every review routed to the
+CTO's own employee - which then disqualified the CTO from approving that work's
+integration. The first end-to-end pilot escalated to the CEO on exactly that,
+and would have done so on every job forever.
+
+**The choice is made in intake, not by this dataclass default.** Intake is
+where the specialist domain is known, and a constructor default cannot see it.
+The default below stays `software_architecture`, which is the cautious answer
+for a work order assembled by hand with nothing else said: ask the architect.
+See `docs/company_os_review_separation.md`.
+"""
+
+ARCHITECTURE_REVIEW_CAPABILITY = "software_architecture"
+"""Specialist review, for work whose difficulty is in the design.
+
+Still routed to `chief_architect`, and still worth the CTO's time. The cost is
+that the CTO then cannot approve that job's integration, which is the rule
+working rather than a problem to route around.
+"""
+
+# The specialist domains whose review genuinely needs the architect rather than
+# an ordinary code reviewer. `security`, `governance` and `concurrency` escalate
+# their *implementation* tier; only architecture changes who should read the
+# diff.
+ARCHITECTURE_REVIEW_DOMAINS: frozenset[str] = frozenset({"architecture"})
+
+
 @dataclass(frozen=True)
 class EngineeringWorkOrder:
     """One authorized engineering request. Immutable, and the authority ceiling."""
@@ -122,7 +155,7 @@ class EngineeringWorkOrder:
     acceptance_criteria: tuple[str, ...]
     authorized_on: dt.date
     implementation_capabilities: tuple[str, ...] = ("software_implementation",)
-    review_capability: str = "software_architecture"
+    review_capability: str = ARCHITECTURE_REVIEW_CAPABILITY
     forbidden_paths: tuple[str, ...] = ()
     constraints: tuple[str, ...] = ()
     context_refs: tuple[ContextRef, ...] = ()
@@ -444,7 +477,9 @@ class EngineeringWorkOrder:
             implementation_capabilities=_sequence(
                 data.get("implementation_capabilities"), "implementation_capabilities"
             ),
-            review_capability=str(data.get("review_capability", "software_architecture")),
+            review_capability=str(
+                data.get("review_capability", ARCHITECTURE_REVIEW_CAPABILITY)
+            ),
             forbidden_paths=_sequence(data.get("forbidden_paths"), "forbidden_paths"),
             constraints=_sequence(data.get("constraints"), "constraints"),
             context_refs=tuple(

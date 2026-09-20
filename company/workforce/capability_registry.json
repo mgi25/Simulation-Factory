@@ -77,6 +77,18 @@
       "status": "active"
     },
     {
+      "capability_id": "code_review",
+      "criticality": "core",
+      "description": "Independently judge whether an authorized change did what its work order asked, and say pass, changes_required or reject.",
+      "domain": "engineering",
+      "name": "Code review",
+      "notes": "Held apart from software_implementation and software_architecture on purpose. The holder reviews and never implements, and never approves the integration of what it reviewed: authority.evaluate disqualifies any seat whose employee reviewed the work.",
+      "required_by": [
+        "software_review_engineer"
+      ],
+      "status": "active"
+    },
+    {
       "capability_id": "context_engineering",
       "criticality": "core",
       "description": "Supply the minimum relevant context for a task and prove it was sufficient.",
