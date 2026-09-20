@@ -1,0 +1,279 @@
+{
+  "run": {
+    "planning_run_id": "run-medium-executive",
+    "objective_id": "obj-intake-classifier",
+    "objective_intent_digest": "3050f3fb0e1d75cb",
+    "recorded_on": "2026-09-20",
+    "department": "engineering",
+    "executive_seat": "cto",
+    "executive_employee": "chief_architect",
+    "manager_seat": "engineering_manager",
+    "manager_employee": "engineering_delivery_manager",
+    "outcome": "selected",
+    "decision_reason": "2 candidates were eligible; one bounded executive session chose reserved-screening-negation-blindness with high confidence",
+    "authority_source": "CEO objective envelope: engineering, MEDIUM ceiling, USD 6.00",
+    "policy_version": "delegation_policy_v1",
+    "policy_fingerprint": "31e65cee57761665",
+    "eligible_candidate_ids": [
+      "auth-migration-classifier-ambiguity",
+      "reserved-screening-negation-blindness"
+    ],
+    "rejected_candidates": [
+      "deployment-policy-gap: status_open, risk_within_ceiling",
+      "intake-unfalsifiable-acceptance-criteria: status_open",
+      "provider-usage-event-identifier: department_permitted, status_open",
+      "runner-blocked-attempt-repo-dir: capsule_owned",
+      "runner-zero-required-tests-policy: capsule_owned, status_open"
+    ],
+    "selected_candidate_id": "reserved-screening-negation-blindness",
+    "selection_reason": "Negation handling is a fundamental logical requirement. This candidate fixes a core bug where 'we will NOT do X' still triggers escalation for X. The auth-migration candidate addresses a narrower edge case (quoted mentions in tests). Negation is prerequisite correctness; context-detection is a refinement.",
+    "model_used": true,
+    "session": {
+      "session_id": "659b12d5-6cbc-411d-9abf-d447db75ffda",
+      "model": "claude-haiku-4-5-20251001",
+      "provider": "anthropic",
+      "input_tokens": 9,
+      "output_tokens": 2612,
+      "cache_creation_tokens": 12472,
+      "cache_read_tokens": 0,
+      "cost": {
+        "amount": "0.028659",
+        "currency": "USD"
+      },
+      "duration_s": 25.392,
+      "turns": 1,
+      "tool_calls": 0,
+      "reasoning_class": "C"
+    },
+    "choice": {
+      "decision": "select",
+      "selected_candidate_id": "reserved-screening-negation-blindness",
+      "reason": "Negation handling is a fundamental logical requirement. This candidate fixes a core bug where 'we will NOT do X' still triggers escalation for X. The auth-migration candidate addresses a narrower edge case (quoted mentions in tests). Negation is prerequisite correctness; context-detection is a refinement.",
+      "objective_alignment": "Directly reduces false escalations by fixing a logical error that affects all reserved/credential intake paths. Requests that explicitly negate a sensitive action should never trigger CEO escalation for that action.",
+      "expected_value_reasoning": "Negation detection is a foundational classifier capability. Fixing screen_reserved() and screen_credentials() together eliminates an entire category of false escalations while consolidating two divergent rules into coherent behavior. Benefit compounds across all future intake requests.",
+      "risk_reasoning": "Medium risk is acceptable. The fix is logically straightforward (add negation detection), has clear isolation to two functions with no downstream dependencies, and acceptance criteria mandate per-function test coverage for both negated and asserted forms.",
+      "resource_reasoning": "Consumer resource profile with two functions and comprehensive test coverage aligns with 6 USD budget. The work builds on prior intake classifier hardening phases, indicating team context and execution efficiency.",
+      "confidence": "high"
+    },
+    "refusal": "",
+    "discovery_requested": false,
+    "discovery_envelope_id": "",
+    "discovery_surfaces": [],
+    "discovered_candidate_ids": [],
+    "discovery_rejected": [],
+    "risk": "medium",
+    "budget": {
+      "amount": "6",
+      "currency": "USD"
+    },
+    "planning_cost": {
+      "amount": "0.028659",
+      "currency": "USD"
+    },
+    "version": 1
+  },
+  "eligibility": [
+    {
+      "candidate_id": "auth-migration-classifier-ambiguity",
+      "eligible": true,
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "status_open",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "failed": [],
+      "reasons": []
+    },
+    {
+      "candidate_id": "deployment-policy-gap",
+      "eligible": false,
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "failed": [
+        "status_open",
+        "risk_within_ceiling"
+      ],
+      "reasons": [
+        "status_open: status is blocked (a CEO policy decision: Company OS has no deployment policy to delegate against, and inventing one in code would be the delegation model widening itself)",
+        "risk_within_ceiling: high risk exceeds the envelope ceiling of medium"
+      ]
+    },
+    {
+      "candidate_id": "intake-unfalsifiable-acceptance-criteria",
+      "eligible": false,
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "failed": [
+        "status_open"
+      ],
+      "reasons": [
+        "status_open: status is completed"
+      ]
+    },
+    {
+      "candidate_id": "provider-usage-event-identifier",
+      "eligible": false,
+      "passed": [
+        "capsule_owned",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "failed": [
+        "department_permitted",
+        "status_open"
+      ],
+      "reasons": [
+        "department_permitted: ai_platform is not among the envelope's departments (engineering)",
+        "status_open: status is blocked (a design decision nobody has taken: no existing field is a stable per-event id, so this needs a schema change, and schema or storage migration is outside routine engineering)"
+      ]
+    },
+    {
+      "candidate_id": "reserved-screening-negation-blindness",
+      "eligible": true,
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "status_open",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "failed": [],
+      "reasons": []
+    },
+    {
+      "candidate_id": "runner-blocked-attempt-repo-dir",
+      "eligible": false,
+      "passed": [
+        "department_permitted",
+        "status_open",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "failed": [
+        "capsule_owned"
+      ],
+      "reasons": [
+        "capsule_owned: no confirmed capsule owns tools-engineering-runner; work whose owner the company cannot name has no declared scope, tests or invariants to be reviewed against"
+      ]
+    },
+    {
+      "candidate_id": "runner-zero-required-tests-policy",
+      "eligible": false,
+      "passed": [
+        "department_permitted",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "failed": [
+        "capsule_owned",
+        "status_open"
+      ],
+      "reasons": [
+        "capsule_owned: no confirmed capsule owns tools-engineering-runner; work whose owner the company cannot name has no declared scope, tests or invariants to be reviewed against",
+        "status_open: status is blocked (a policy decision about what evidence a receipt must carry when the work order declares no tests)"
+      ]
+    }
+  ],
+  "brief": {
+    "objective_id": "obj-intake-classifier",
+    "objective_title": "Reduce false escalations in engineering intake classification.",
+    "success_metrics": [
+      "fewer false CEO escalations",
+      "zero new test regressions"
+    ],
+    "department": "engineering",
+    "risk_ceiling": "medium",
+    "budget": "6 USD",
+    "forbidden_actions": [],
+    "discovery_available": false,
+    "candidates": [
+      {
+        "candidate_id": "auth-migration-classifier-ambiguity",
+        "title": "Disambiguate bare authentication and migration trigger words",
+        "expected_value": "Routine requests that merely mention a sensitive concept reach the cheaper tier instead of the specialist one.",
+        "problem_statement": "Bare single-word triggers in company/engineering/intake.py escalate a benign test or documentation mention of authentication or migration to specialist routing.",
+        "risk": "medium",
+        "estimated_resource_profile": "consumer",
+        "estimated_cost": "unstated",
+        "capsule_id": "company-engineering-execution",
+        "dependencies": [],
+        "acceptance_criteria": [
+          "An objective that names a migration only inside a quoted test identifier derives no specialist domain.",
+          "An objective that asks for a schema migration still derives the specialist domain it derives today.",
+          "tests/test_company_engineering_execution.py passes with a case for each direction."
+        ],
+        "evidence_refs": [
+          "docs/company_os_canonical_integration_record.md"
+        ],
+        "source": "known_defect"
+      },
+      {
+        "candidate_id": "reserved-screening-negation-blindness",
+        "title": "Teach reserved and credential screening to respect negation",
+        "expected_value": "Fewer false CEO escalations on routine work, and one screening rule rather than two that disagree.",
+        "problem_statement": "screen_reserved() and screen_credentials() in company/engineering/intake.py match trigger terms without regard to negation, so a request stating that a reserved action is not involved still returns DecisionRequired.",
+        "risk": "medium",
+        "estimated_resource_profile": "consumer",
+        "estimated_cost": "unstated",
+        "capsule_id": "company-engineering-execution",
+        "dependencies": [],
+        "acceptance_criteria": [
+          "screen_reserved() returns no DecisionRequired for an objective that negates its trigger term, and still returns one when the term is asserted.",
+          "screen_credentials() behaves identically to screen_reserved() on the same negated input.",
+          "tests/test_company_engineering_execution.py passes, including a new case per screening function covering the negated and the asserted form."
+        ],
+        "evidence_refs": [
+          "docs/company_os_canonical_integration_record.md",
+          "docs/company_os_intake_classifier_hardening.md"
+        ],
+        "source": "known_defect"
+      }
+    ]
+  },
+  "discovery": null,
+  "decision": null
+}

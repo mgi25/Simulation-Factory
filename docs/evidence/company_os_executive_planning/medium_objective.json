@@ -1,0 +1,39 @@
+{
+  "objective_id": "obj-intake-classifier-medium-2026-09-20",
+  "title": "Reduce false escalations in engineering intake classification.",
+  "owner_seat": "ceo",
+  "set_by": "MGI",
+  "set_on": "2026-09-20",
+  "evidence_refs": [
+    "docs/company_os_first_live_delegation_pilot.md"
+  ],
+  "planning_decision_id": "plan-intake-classifier-medium",
+  "planners": {
+    "executive_seat": "cto",
+    "executive_employee": "chief_architect",
+    "manager_seat": "engineering_manager",
+    "manager_employee": "engineering_delivery_manager"
+  },
+  "envelope": {
+    "objective_id": "obj-intake-classifier-medium-2026-09-20",
+    "budget": {
+      "amount": "6.00",
+      "currency": "USD"
+    },
+    "budget_scope": "engineering-operations",
+    "risk_ceiling": "medium",
+    "allowed_departments": [
+      "engineering"
+    ],
+    "forbidden_actions": [
+      "approve_deployment",
+      "publish_public_video",
+      "approve_canonical_merge"
+    ],
+    "success_metrics": [
+      "fewer false CEO escalations",
+      "zero new test regressions"
+    ]
+  },
+  "planning_run_id": "run-medium-executive-cli"
+}

@@ -57,7 +57,10 @@ from .metrics import DecisionOutcome, ManagementReport, measure, spend_of
 from .scenarios import CONTROL_SCENARIOS, SCENARIOS, replay, summarise
 from .objectives import Objective, ObjectiveLevel, PlanningEnvelope
 from .planning import eligible_candidates, propose_work_order, select_work
+from .discovery import DiscoveryEnvelope, EvidenceSurface, capsule_revalidation_proposals, run_discovery
+from .executive import PlanningSessionCost
 from .planning_record import PlanningOutcome
+from .planning_run import ceo_planning_report, plan_objective
 from .store import DelegationStore
 from .shadow import verify_shadow_mode
 
@@ -113,6 +116,25 @@ def build_parser() -> argparse.ArgumentParser:
     plan_cmd.add_argument("--state-dir", default="", help="persist the decision here")
     plan_cmd.add_argument("--prefer", default="", help="choose among eligible candidates")
     plan_cmd.add_argument("--as-of", default="", help="the day, YYYY-MM-DD")
+
+    planrun_cmd = commands.add_parser(
+        "plan-run",
+        help="the full planning ordering: eligibility, then discovery or one choice",
+    )
+    planrun_cmd.add_argument("--objective-file", required=True)
+    planrun_cmd.add_argument("--seed-file", default="")
+    planrun_cmd.add_argument("--as-of", default="")
+    planrun_cmd.add_argument(
+        "--discover",
+        action="store_true",
+        help="authorize one bounded discovery run when nothing is eligible",
+    )
+    planrun_cmd.add_argument(
+        "--planner-answer-file",
+        default="",
+        help="a recorded executive planning answer; without one, several eligible "
+        "candidates escalate rather than being guessed between",
+    )
 
     evaluate_cmd = commands.add_parser("evaluate", help="answer one authority request")
     evaluate_cmd.add_argument("--request-file", type=Path, required=True)
@@ -494,6 +516,115 @@ def _cmd_plan(args: argparse.Namespace) -> int:
     return _ESCALATED
 
 
+def _cmd_plan_run(args: argparse.Namespace) -> int:
+    """CEO objective -> eligibility -> discovery or one choice -> a CEO page.
+
+    Planning only. It opens no work order, spends nothing by itself, and the
+    executive answer it uses is one the caller already obtained.
+    """
+    policy = _load_policy(args)
+    with open(args.objective_file, encoding="utf-8") as handle:
+        data = json.load(handle)
+    objective, envelope, planners = _objective_and_envelope(data)
+    register = _register_for(args)
+    day = dt.date.fromisoformat(args.as_of) if args.as_of else objective.set_on
+    index = CapsuleIndex.load()
+    capsule_ids = index.ids()
+    paths = {cid: index.get(cid).owns_paths for cid in capsule_ids}
+    reserved = tuple(action for action in ActionType if policy.is_reserved(action))
+
+    discovery = None
+    discovery_envelope = None
+    if args.discover:
+        raw = data.get("discovery") or {}
+        discovery_envelope = DiscoveryEnvelope(
+            envelope_id=str(raw.get("envelope_id", "disc-" + objective.objective_id))[:64],
+            objective_id=objective.objective_id,
+            department=(envelope.allowed_departments or ("engineering",))[0],
+            allowed_capsules=tuple(raw.get("allowed_capsules", capsule_ids[:2])),
+            allowed_surfaces=tuple(
+                raw.get("allowed_surfaces", (EvidenceSurface.CAPSULE_METADATA.value,))
+            ),
+            risk_ceiling=envelope.risk_ceiling,
+            budget=Money.from_dict(dict(raw.get("budget", envelope.budget.to_dict()))),
+            expires_on=dt.date.fromisoformat(
+                str(raw.get("expires_on", (day + dt.timedelta(days=7)).isoformat()))
+            ),
+            authorized_by=str(raw.get("authorized_by", planners.get("executive_employee", "chief_architect"))),
+            authority_source=str(
+                raw.get("authority_source", "discover_work grant under the objective envelope")
+            ),
+            max_candidates=int(raw.get("max_candidates", 3)),
+        )
+        proposals = capsule_revalidation_proposals(discovery_envelope, index, today=day)
+        discovery = run_discovery(
+            proposals,
+            discovery_envelope,
+            register=register,
+            capsule_paths=paths,
+            today=day,
+            reserved_actions=reserved,
+            repo_root=args.repo_root if hasattr(args, "repo_root") else ".",
+        )
+
+    planner = None
+    session = None
+    if args.planner_answer_file:
+        with open(args.planner_answer_file, encoding="utf-8") as handle:
+            recorded = json.load(handle)
+        answer = recorded.get("result", recorded)
+        usage = recorded.get("usage", {})
+        cost_value = recorded.get("total_cost_usd")
+        session = PlanningSessionCost(
+            session_id=str(recorded.get("session_id", "recorded-session"))[:64],
+            model=str(next(iter(recorded.get("modelUsage", {})), "")),
+            provider="anthropic" if recorded.get("modelUsage") else "",
+            input_tokens=usage.get("input_tokens"),
+            output_tokens=usage.get("output_tokens"),
+            cache_creation_tokens=usage.get("cache_creation_input_tokens"),
+            cache_read_tokens=usage.get("cache_read_input_tokens"),
+            cost=(
+                Money.from_dict({"amount": f"{cost_value:.6f}", "currency": "USD"})
+                if isinstance(cost_value, (int, float))
+                else None
+            ),
+            duration_s=(recorded.get("duration_ms") or 0) / 1000.0 or None,
+            turns=recorded.get("num_turns"),
+        )
+
+        def planner(brief, instructions):  # noqa: F811 - the recorded answer
+            return answer if isinstance(answer, str) else json.dumps(answer)
+
+    run = plan_objective(
+        register,
+        objective,
+        envelope,
+        planning_run_id=str(data.get("planning_run_id", "run-" + objective.objective_id))[:64],
+        executive_seat=str(planners.get("executive_seat", "cto")),
+        executive_employee=str(planners.get("executive_employee", "chief_architect")),
+        manager_seat=str(planners.get("manager_seat", "engineering_manager")),
+        manager_employee=str(planners.get("manager_employee", "engineering_delivery_manager")),
+        policy_version=policy.version,
+        policy_fingerprint=policy.fingerprint(),
+        authority_source=str(data.get("authority_source", "the CEO objective envelope")),
+        recorded_on=day,
+        capsule_ids=capsule_ids,
+        reserved_actions=reserved,
+        objective_goal_tags=tuple(data.get("goal_tags", ())),
+        planner=planner,
+        session=session,
+        discovery=discovery,
+        discovery_envelope=discovery_envelope,
+    )
+    if args.json:
+        print(json.dumps(to_jsonable(run.to_dict()), indent=2, sort_keys=True, default=str))
+    else:
+        print(ceo_planning_report(run, register))
+    if run.outcome is PlanningOutcome.SELECTED:
+        return _ANSWERED
+    return _ESCALATED
+
+
 _COMMANDS = {
     "policy": _cmd_policy,
     "deployment": _cmd_deployment,
@@ -504,6 +635,7 @@ _COMMANDS = {
     "shadow": _cmd_shadow,
     "candidates": _cmd_candidates,
     "plan": _cmd_plan,
+    "plan-run": _cmd_plan_run,
 }
 
 

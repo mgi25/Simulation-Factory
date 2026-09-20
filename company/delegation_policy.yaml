@@ -227,6 +227,10 @@ action_autonomy:
   # change has no business deciding which code changes the company makes, and
   # an employee capped below 3 (probation, shadow, dormant) cannot plan.
   select_work: 3
+  # Discovery proposes candidates rather than approving anything, and still
+  # sits at 3: what a company believes is worth doing shapes everything it
+  # then approves, and an employee capped below 3 has no standing to shape it.
+  discover_work: 3
   approve_new_dependency: 3
   approve_research_program: 3
   approve_content_experiment: 3
@@ -296,8 +300,13 @@ grants:
     budget_scope: ai-platform
     rationale: Context, retrieval and telemetry work inside the AI platform budget.
 
+  # The research lead may open a discovery run but holds no engineering
+  # approval, so finding work and authorizing it stay in different hands. The
+  # seat is dormant today, which means discovery is effectively the CTO's until
+  # a CEO workforce decision activates it.
   research_lead:
     may_approve:
+      - discover_work
       - approve_research_program
       - stop_work_on_invalid_premise
     max_risk: low
@@ -344,6 +353,7 @@ grants:
   cto:
     may_approve:
       - select_work
+      - discover_work
       - approve_code_change
       - approve_test_progression
       - approve_review_outcome

@@ -57,6 +57,11 @@ class ActionType(str, Enum):
     # that decision had no seat, no record and no ceiling. See
     # `docs/company_os_objective_planning.md`.
     SELECT_WORK = "select_work"
+    # Proposing work the register does not yet hold. Separate from SELECT_WORK
+    # on purpose: selection is bounded by the register, discovery is bounded by
+    # nothing until an envelope bounds it, and a seat that may choose from a
+    # list is not automatically a seat that may write the list.
+    DISCOVER_WORK = "discover_work"
     APPROVE_WORK_ORDER = "approve_work_order"
     APPROVE_CODE_CHANGE = "approve_code_change"
     APPROVE_TEST_PROGRESSION = "approve_test_progression"

@@ -1,0 +1,210 @@
+{
+  "run": {
+    "planning_run_id": "run-low-replay",
+    "objective_id": "obj-first-live-delegation-2026-09-20",
+    "objective_intent_digest": "f578324fba807f96",
+    "recorded_on": "2026-09-20",
+    "department": "engineering",
+    "executive_seat": "cto",
+    "executive_employee": "chief_architect",
+    "manager_seat": "engineering_manager",
+    "manager_employee": "engineering_delivery_manager",
+    "outcome": "no_eligible_work_candidate",
+    "decision_reason": "no candidate passes every constraint of this envelope (auth-migration-classifier-ambiguity: risk_within_ceiling; deployment-policy-gap: status_open, risk_within_ceiling; intake-unfalsifiable-acceptance-criteria: status_open; provider-usage-event-identifier: department_permitted, status_open, risk_within_ceiling; reserved-screening-negation-blindness: risk_within_ceiling; runner-blocked-attempt-repo-dir: capsule_owned; runner-zero-required-tests-policy: capsule_owned, status_open, risk_within_ceiling). discovery ran and produced nothing that passed validation. Creating work anyway would mean inventing a task the evidence does not support.",
+    "authority_source": "CEO objective envelope: engineering, LOW ceiling, USD 6.00",
+    "policy_version": "delegation_policy_v1",
+    "policy_fingerprint": "31e65cee57761665",
+    "eligible_candidate_ids": [],
+    "rejected_candidates": [
+      "auth-migration-classifier-ambiguity: risk_within_ceiling",
+      "deployment-policy-gap: status_open, risk_within_ceiling",
+      "intake-unfalsifiable-acceptance-criteria: status_open",
+      "provider-usage-event-identifier: department_permitted, status_open, risk_within_ceiling",
+      "reserved-screening-negation-blindness: risk_within_ceiling",
+      "runner-blocked-attempt-repo-dir: capsule_owned",
+      "runner-zero-required-tests-policy: capsule_owned, status_open, risk_within_ceiling"
+    ],
+    "selected_candidate_id": "",
+    "selection_reason": "",
+    "model_used": false,
+    "session": null,
+    "choice": null,
+    "refusal": "",
+    "discovery_requested": true,
+    "discovery_envelope_id": "disc-first-live-delegation",
+    "discovery_surfaces": [],
+    "discovered_candidate_ids": [],
+    "discovery_rejected": [],
+    "risk": "",
+    "budget": {
+      "amount": "6",
+      "currency": "USD"
+    },
+    "planning_cost": null,
+    "version": 1
+  },
+  "eligibility": [
+    {
+      "candidate_id": "auth-migration-classifier-ambiguity",
+      "eligible": false,
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "status_open",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "failed": [
+        "risk_within_ceiling"
+      ],
+      "reasons": [
+        "risk_within_ceiling: medium risk exceeds the envelope ceiling of low"
+      ]
+    },
+    {
+      "candidate_id": "deployment-policy-gap",
+      "eligible": false,
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "failed": [
+        "status_open",
+        "risk_within_ceiling"
+      ],
+      "reasons": [
+        "status_open: status is blocked (a CEO policy decision: Company OS has no deployment policy to delegate against, and inventing one in code would be the delegation model widening itself)",
+        "risk_within_ceiling: high risk exceeds the envelope ceiling of low"
+      ]
+    },
+    {
+      "candidate_id": "intake-unfalsifiable-acceptance-criteria",
+      "eligible": false,
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "failed": [
+        "status_open"
+      ],
+      "reasons": [
+        "status_open: status is completed"
+      ]
+    },
+    {
+      "candidate_id": "provider-usage-event-identifier",
+      "eligible": false,
+      "passed": [
+        "capsule_owned",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "failed": [
+        "department_permitted",
+        "status_open",
+        "risk_within_ceiling"
+      ],
+      "reasons": [
+        "department_permitted: ai_platform is not among the envelope's departments (engineering)",
+        "status_open: status is blocked (a design decision nobody has taken: no existing field is a stable per-event id, so this needs a schema change, and schema or storage migration is outside routine engineering)",
+        "risk_within_ceiling: medium risk exceeds the envelope ceiling of low"
+      ]
+    },
+    {
+      "candidate_id": "reserved-screening-negation-blindness",
+      "eligible": false,
+      "passed": [
+        "department_permitted",
+        "capsule_owned",
+        "status_open",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "failed": [
+        "risk_within_ceiling"
+      ],
+      "reasons": [
+        "risk_within_ceiling: medium risk exceeds the envelope ceiling of low"
+      ]
+    },
+    {
+      "candidate_id": "runner-blocked-attempt-repo-dir",
+      "eligible": false,
+      "passed": [
+        "department_permitted",
+        "status_open",
+        "risk_within_ceiling",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "failed": [
+        "capsule_owned"
+      ],
+      "reasons": [
+        "capsule_owned: no confirmed capsule owns tools-engineering-runner; work whose owner the company cannot name has no declared scope, tests or invariants to be reviewed against"
+      ]
+    },
+    {
+      "candidate_id": "runner-zero-required-tests-policy",
+      "eligible": false,
+      "passed": [
+        "department_permitted",
+        "cost_within_budget",
+        "no_forbidden_action",
+        "dependencies_satisfied",
+        "criteria_falsifiable",
+        "evidence_present",
+        "goal_overlap"
+      ],
+      "failed": [
+        "capsule_owned",
+        "status_open",
+        "risk_within_ceiling"
+      ],
+      "reasons": [
+        "capsule_owned: no confirmed capsule owns tools-engineering-runner; work whose owner the company cannot name has no declared scope, tests or invariants to be reviewed against",
+        "status_open: status is blocked (a policy decision about what evidence a receipt must carry when the work order declares no tests)",
+        "risk_within_ceiling: medium risk exceeds the envelope ceiling of low"
+      ]
+    }
+  ],
+  "brief": null,
+  "discovery": {
+    "envelope_id": "disc-first-live-delegation",
+    "objective_id": "obj-first-live-delegation-2026-09-20",
+    "verdicts": [],
+    "accepted": [],
+    "surfaces_read": [],
+    "notes": ""
+  },
+  "decision": null
+}
