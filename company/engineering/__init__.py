@@ -102,6 +102,7 @@ from .result import (
     RESULT_VERSION,
     EngineeringResult,
     ResultTest,
+    ScopeUsage,
     SuiteScope,
 )
 from .review import (
@@ -195,6 +196,7 @@ __all__ = [
     "ReviewResult",
     "ReviewerAttestation",
     "ScopeDerivation",
+    "ScopeUsage",
     "SelfApproval",
     "SuiteScope",
     "accepted",
