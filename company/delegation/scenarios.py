@@ -77,6 +77,10 @@ class Scenario:
     expected_ceo_required: bool
     expectation: str
     evidence: tuple[str, ...]
+    # False for a counterfactual probe in CONTROL_SCENARIOS, which never
+    # happened and whose `actual_*` fields describe the condition being
+    # probed rather than a recorded run.
+    historical: bool = True
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -85,6 +89,7 @@ class Scenario:
             "request": self.request.to_dict(),
             "actual_outcome": self.actual_outcome,
             "actual_ceo_involved": self.actual_ceo_involved,
+            "historical": self.historical,
             "expected_ceo_required": self.expected_ceo_required,
             "expectation": self.expectation,
             "evidence": list(self.evidence),
@@ -123,6 +128,7 @@ class ReplayResult:
             "actual_ceo_involved": self.scenario.actual_ceo_involved,
             "matches_expectation": self.matches_expectation,
             "matches_history": self.matches_history,
+            "historical": self.scenario.historical,
             "reason": self.decision.reason,
             "exception_classes": [item.value for item in self.exceptions.classes],
             "chain": [step.to_dict() for step in self.decision.chain],
@@ -156,6 +162,8 @@ DOGFOOD_2 = Scenario(
             "Add attempts-remaining to EngineeringResult and show it on the CEO page; "
             "reviewer PASS, gate READY, ready_for_approval"
         ),
+        implementer="software_implementation_engineer",
+        reviewer="chief_architect",
         evidence_refs=("docs/company_os_second_real_dogfood.md",),
     ),
     context=ExceptionContext(failed_attempts=0, attempt_ceiling=1),
@@ -176,7 +184,7 @@ JOB_A_ORIGINAL = Scenario(
     request=AuthorityRequest(
         request_id="replay-burnin-job-a",
         action=ActionType.APPROVE_REVIEW_OUTCOME,
-        requesting_seat="cto",
+        requesting_seat="software_implementation_engineer",
         department="engineering",
         risk=Risk.LOW,
         objective_id="obj-engineering-operability",
@@ -187,11 +195,14 @@ JOB_A_ORIGINAL = Scenario(
             "Reviewer verdict changes_required on a real round-trip TypeError the "
             "deterministic suite did not cover; the single authorized attempt is spent"
         ),
+        implementer="software_implementation_engineer",
+        reviewer="chief_architect",
         evidence_refs=("docs/company_os_supervised_burnin.md",),
     ),
     context=ExceptionContext(
         failed_attempts=1,
         attempt_ceiling=1,
+        failed_work_orders=0,
         reviewer_disputed=False,
     ),
     actual_outcome=(
@@ -199,10 +210,12 @@ JOB_A_ORIGINAL = Scenario(
         "still requires changes"
     ),
     actual_ceo_involved=True,
-    expected_ceo_required=True,
+    expected_ceo_required=False,
     expectation=(
-        "the reviewer finding itself is a manager decision, but a work order whose "
-        "attempt ceiling is spent needs a new authorization, which is a level up"
+        "a reviewer finding a real defect is the correction path working, and the "
+        "Engineering Manager owns it. Before that seat was staffed this escalated, "
+        "because chief_architect had both reviewed the work and filled the only seat "
+        "that could approve the outcome; the two controls are now two employees."
     ),
     evidence=("docs/company_os_supervised_burnin.md",),
 )
@@ -225,6 +238,8 @@ JOB_A_CORRECTION = Scenario(
             "Reviewer PASS, gate READY, ready_for_approval; one developer attempt, "
             "one reviewer pass, zero retries"
         ),
+        implementer="software_implementation_engineer",
+        reviewer="chief_architect",
         evidence_refs=("docs/company_os_supervised_burnin_correction.md",),
     ),
     context=ExceptionContext(failed_attempts=0, attempt_ceiling=1),
@@ -256,6 +271,8 @@ JOB_B = Scenario(
             "Four lines changed in one test file, 140 passed unchanged, reviewer PASS "
             "with no findings, gate READY 11/11"
         ),
+        implementer="software_implementation_engineer",
+        reviewer="chief_architect",
         evidence_refs=("docs/company_os_supervised_burnin_b_and_c.md",),
     ),
     context=ExceptionContext(failed_attempts=0, attempt_ceiling=1),
@@ -277,6 +294,8 @@ JOB_C = Scenario(
         request_id="replay-burnin-job-c",
         action=ActionType.STOP_WORK_ON_INVALID_PREMISE,
         requesting_seat="cto",
+        implementer="",
+        reviewer="chief_architect",
         department="engineering",
         risk=Risk.LOW,
         objective_id="obj-finance-usage-accuracy",
@@ -308,6 +327,164 @@ SCENARIOS: tuple[Scenario, ...] = (
     JOB_A_CORRECTION,
     JOB_B,
     JOB_C,
+)
+
+
+# --- control scenarios -----------------------------------------------------
+#
+# Counterfactual probes, never run and never recorded. They exist because a
+# replay in which every scenario is approved below the CEO proves only that the
+# model approves things. These are the conditions under which it must still
+# refuse, and they are reported separately so nothing here can be mistaken for
+# history.
+
+
+CONTROL_REVIEWER_AS_APPROVER = Scenario(
+    scenario_id="control-reviewer-as-approver",
+    label="A medium-risk review outcome whose only competent seat is the reviewer",
+    request=AuthorityRequest(
+        request_id="control-reviewer-as-approver",
+        action=ActionType.APPROVE_REVIEW_OUTCOME,
+        requesting_seat="software_implementation_engineer",
+        department="engineering",
+        risk=Risk.MEDIUM,
+        objective_id="obj-engineering-operability",
+        implementer="software_implementation_engineer",
+        reviewer="chief_architect",
+        summary=(
+            "Medium risk is above the Engineering Manager ceiling, and the next seat "
+            "up is filled by the employee who performed the review"
+        ),
+        evidence_refs=("docs/company_os_management_staffing.md",),
+    ),
+    context=ExceptionContext(),
+    actual_outcome="never run; probes that separation still bites above the manager",
+    actual_ceo_involved=True,
+    historical=False,
+    expected_ceo_required=True,
+    expectation=(
+        "staffing the Engineering Manager fixes the routine case; it does not let a "
+        "reviewer approve its own finding once the risk outgrows that seat"
+    ),
+    evidence=("docs/company_os_management_staffing.md",),
+)
+
+
+CONTROL_OVERRIDE_INDEPENDENT_CONTROL = Scenario(
+    scenario_id="control-override-independent-control",
+    label="A manager setting aside a failing deterministic check",
+    request=AuthorityRequest(
+        request_id="control-override-qa",
+        action=ActionType.APPROVE_CODE_CHANGE,
+        requesting_seat="software_implementation_engineer",
+        department="engineering",
+        risk=Risk.LOW,
+        objective_id="obj-engineering-operability",
+        implementer="software_implementation_engineer",
+        reviewer="chief_architect",
+        overrides_independent_control=True,
+        summary="Low risk, inside every ceiling, and it overrules a failing QA run",
+        evidence_refs=("docs/company_os_management_staffing.md",),
+    ),
+    context=ExceptionContext(),
+    actual_outcome="never run; probes that no delegated seat may overrule a control",
+    actual_ceo_involved=True,
+    historical=False,
+    expected_ceo_required=True,
+    expectation=(
+        "management decides what to do about a finding and never decides that the "
+        "finding is wrong; low risk and a small amount do not change that"
+    ),
+    evidence=("docs/company_os_management_staffing.md",),
+)
+
+
+CONTROL_UNKNOWN_DEPLOYMENT = Scenario(
+    scenario_id="control-unknown-deployment",
+    label="A deployment nobody classified",
+    request=AuthorityRequest(
+        request_id="control-unknown-deployment",
+        action=ActionType.APPROVE_DEPLOYMENT,
+        requesting_seat="software_implementation_engineer",
+        department="engineering",
+        risk=Risk.LOW,
+        objective_id="obj-engineering-operability",
+        summary="Deployment authority is modelled and granted to nobody",
+        evidence_refs=("docs/company_os_management_staffing.md",),
+    ),
+    context=ExceptionContext(),
+    actual_outcome="never run; probes that deployment still fails closed",
+    actual_ceo_involved=True,
+    historical=False,
+    expected_ceo_required=True,
+    expectation=(
+        "the deployment policy classifies what authority each kind would need and "
+        "grants none of it; an unclassified deployment gets the largest answer"
+    ),
+    evidence=("docs/company_os_management_staffing.md",),
+)
+
+
+CONTROL_SPEND_ABOVE_CFO = Scenario(
+    scenario_id="control-spend-above-cfo",
+    label="A spend larger than the whole company operating budget",
+    request=AuthorityRequest(
+        request_id="control-spend-above-cfo",
+        action=ActionType.APPROVE_OPERATING_SPEND,
+        requesting_seat="software_implementation_engineer",
+        department="engineering",
+        risk=Risk.LOW,
+        objective_id="obj-engineering-operability",
+        budget_scope="company-operating",
+        amount=_usd("200.00"),
+        summary="Four times the monthly company ceiling",
+        evidence_refs=("docs/company_os_management_staffing.md",),
+    ),
+    context=ExceptionContext(),
+    actual_outcome="never run; probes the financial chain terminates at the CEO",
+    actual_ceo_involved=True,
+    historical=False,
+    expected_ceo_required=True,
+    expectation=(
+        "the CFO is the last delegated stop for money and holds a ceiling, not a "
+        "chequebook"
+    ),
+    evidence=("docs/company_os_management_staffing.md",),
+)
+
+
+CONTROL_EXPAND_AUTHORITY = Scenario(
+    scenario_id="control-expand-authority",
+    label="A manager widening its own ceiling",
+    request=AuthorityRequest(
+        request_id="control-expand-authority",
+        action=ActionType.EXPAND_AUTHORITY,
+        requesting_seat="engineering_manager",
+        department="engineering",
+        risk=Risk.LOW,
+        objective_id="obj-engineering-operability",
+        summary="The seat that would benefit is the seat asking",
+        evidence_refs=("docs/company_os_management_staffing.md",),
+    ),
+    context=ExceptionContext(),
+    actual_outcome="never run; probes that authority is granted and never taken",
+    actual_ceo_involved=True,
+    historical=False,
+    expected_ceo_required=True,
+    expectation=(
+        "expanding authority is reserved by the delegation model itself, whatever "
+        "company/permissions.yaml says"
+    ),
+    evidence=("docs/company_os_management_staffing.md",),
+)
+
+
+CONTROL_SCENARIOS: tuple[Scenario, ...] = (
+    CONTROL_REVIEWER_AS_APPROVER,
+    CONTROL_OVERRIDE_INDEPENDENT_CONTROL,
+    CONTROL_UNKNOWN_DEPLOYMENT,
+    CONTROL_SPEND_ABOVE_CFO,
+    CONTROL_EXPAND_AUTHORITY,
 )
 
 # The real provider-reported totals the transcriptions above must match, as the
@@ -368,6 +545,7 @@ def summarise(results: Sequence[ReplayResult]) -> dict[str, Any]:
 
 
 __all__ = [
+    "CONTROL_SCENARIOS",
     "REPORTED_TOTALS",
     "SCENARIOS",
     "ReplayResult",

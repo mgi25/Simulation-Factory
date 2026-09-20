@@ -42,7 +42,7 @@ seats:
     title: Chief Operating Officer
     reports_to: ceo
     employee: studio_coo
-    departments: [executive, intelligence, creative, production, data, people, engineering, ai_platform, finance]
+    departments: [ai_platform, creative, data, engineering, executive, intelligence, people, production]
 
   cto:
     kind: executive
@@ -54,15 +54,15 @@ seats:
   cfo:
     kind: executive
     title: Chief Financial Officer
-    reports_to: coo
-    employee: ""
-    departments: [finance]
+    reports_to: ceo
+    employee: finance_operations_lead
+    departments: [ai_platform, creative, data, engineering, executive, intelligence, people, production]
 
   engineering_manager:
     kind: department_management
     title: Engineering Manager
     reports_to: cto
-    employee: ""
+    employee: engineering_delivery_manager
     departments: [engineering]
 
   ai_platform_lead:
@@ -227,12 +227,32 @@ action_autonomy:
   approve_content_experiment: 3
   approve_cross_department_schedule: 3
   approve_integration_merge: 4
+  approve_local_integration: 3
+  approve_canonical_merge: 4
+  approve_staging_release: 4
   approve_deployment: 4
   approve_production_render: 4
   approve_operating_spend: 4
   allocate_department_budget: 4
   change_budget_policy: 5
   approve_workforce_state_change: 5
+
+# --- functional authority -------------------------------------------------
+#
+# Money does not escalate along the reporting line. The CFO reports to the CEO
+# and sits beside the operating executives, so a spend that outgrows a
+# department budget would never reach it by walking managers upward. These
+# entries splice the CFO into the chain for financial actions, just below the
+# CEO, giving the ladder the brief asks for:
+#
+#   work order -> program -> department -> CFO -> CEO
+#
+# A functional seat whose grant does not cover the action is refused at load:
+# a stop that cannot decide only lengthens the chain.
+
+functional_authority:
+  approve_operating_spend: [cfo]
+  allocate_department_budget: [cfo]
 
 # --- the grants -----------------------------------------------------------
 #
@@ -340,10 +360,13 @@ grants:
     budget_scope: company-operating
     rationale: Ordinary operating spend and bounded department allocations.
 
+  # The COO holds no spend grant. Money escalates along the financial chain to
+  # the CFO, and a COO that could also approve company-wide spend would take
+  # every such request first by sitting lower in the reporting line, leaving
+  # the CFO reachable only in theory.
   coo:
     may_approve:
       - approve_cross_department_schedule
-      - approve_operating_spend
       - approve_production_render
       - approve_research_program
       - approve_content_experiment

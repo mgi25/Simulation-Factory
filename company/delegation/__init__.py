@@ -51,6 +51,22 @@ from .authority import (
     evaluate_all,
 )
 from .brief import ExecutiveBrief, brief_from_records, build_brief, portfolio_spend
+from .deployment import (
+    DEPLOYMENT_POLICY,
+    DeploymentClass,
+    DeploymentDecision,
+    DeploymentKind,
+    DeploymentPolicy,
+    classification_of,
+    policy_table,
+)
+from .metrics import (
+    DecisionOutcome,
+    ManagementMetrics,
+    ManagementReport,
+    measure,
+    spend_of,
+)
 from .budget import (
     BudgetFinding,
     BudgetLadder,
@@ -94,13 +110,33 @@ from .policy import (
     risk_rank,
 )
 from .record import ExecutiveDecisionRecord, record_decision
-from .scenarios import SCENARIOS, ReplayResult, Scenario, replay, summarise
+from .scenarios import (
+    CONTROL_SCENARIOS,
+    SCENARIOS,
+    ReplayResult,
+    Scenario,
+    replay,
+    summarise,
+)
 from .shadow import ShadowCheck, ShadowReport, assert_shadow_mode, verify_shadow_mode
 from .store import DelegationStore, DelegationStoreError
 
 
 __all__ = [
     "CEO_SEAT",
+    "CONTROL_SCENARIOS",
+    "DEPLOYMENT_POLICY",
+    "DecisionOutcome",
+    "DeploymentClass",
+    "DeploymentDecision",
+    "DeploymentKind",
+    "DeploymentPolicy",
+    "ManagementMetrics",
+    "ManagementReport",
+    "classification_of",
+    "measure",
+    "policy_table",
+    "spend_of",
     "POLICY_VERSION",
     "RESERVED_AS",
     "RESERVED_HERE",

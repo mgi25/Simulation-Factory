@@ -82,6 +82,9 @@ class Insufficiency(str, Enum):
     OUT_OF_SCOPE = "out_of_scope"
     WRONG_DEPARTMENT = "wrong_department"
     SELF_APPROVAL = "self_approval"
+    IMPLEMENTER_IS_APPROVER = "implementer_is_approver"
+    REVIEWER_IS_APPROVER = "reviewer_is_approver"
+    WOULD_OVERRIDE_INDEPENDENT_CONTROL = "would_override_independent_control"
     SEAT_VACANT = "seat_vacant"
     SEAT_DORMANT = "seat_dormant"
     SEAT_RESTRICTED = "seat_restricted"
@@ -131,6 +134,16 @@ class AuthorityRequest:
     reversible: bool = True
     evidence_refs: tuple[str, ...] = ()
     write_scope: tuple[str, ...] = ()
+    # Separation of duties. These name *employees*, not seats, because the
+    # implementer and the reviewer are routed per work order by capability and
+    # are not positions on the chart. A seat is disqualified when the employee
+    # sitting in it is the one whose work is being judged, or the one who
+    # already judged it.
+    implementer: str = ""
+    reviewer: str = ""
+    # True when the action would set aside a failing deterministic QA run or a
+    # reviewer verdict. No delegated seat may do this at any risk or amount.
+    overrides_independent_control: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -178,6 +191,16 @@ class AuthorityRequest:
         object.__setattr__(
             self, "write_scope", text_tuple(self.write_scope, "request.write_scope")
         )
+        for name in ("implementer", "reviewer"):
+            value = getattr(self, name)
+            if value:
+                object.__setattr__(
+                    self, name, assert_seat_id(value, f"request.{name}")
+                )
+        if not isinstance(self.overrides_independent_control, bool):
+            raise DelegationError(
+                "request.overrides_independent_control must be a boolean"
+            )
 
     @property
     def spends_money(self) -> bool:
@@ -198,6 +221,9 @@ class AuthorityRequest:
             "reversible": self.reversible,
             "evidence_refs": list(self.evidence_refs),
             "write_scope": list(self.write_scope),
+            "implementer": self.implementer,
+            "reviewer": self.reviewer,
+            "overrides_independent_control": self.overrides_independent_control,
         }
 
     def fingerprint(self) -> str:
@@ -325,7 +351,10 @@ def evaluate(
         raise DelegationError("evaluate takes a DelegationPolicy")
 
     fingerprint = policy.fingerprint()
-    chain_ids = policy.hierarchy.chain(request.requesting_seat)
+    # The line chain, with any functional seats for this action spliced in
+    # below the CEO. For money that is the CFO, which no reporting line
+    # passes through.
+    chain_ids = policy.effective_chain(request.requesting_seat, request.action)
 
     # 1. Reserved beats everything, and is answered before anything is measured.
     if policy.is_reserved(request.action):
@@ -402,6 +431,55 @@ def evaluate(
                     detail=(
                         f"{seat_id} raised this request and does not decide it. A seat "
                         "that signs its own work is not a control."
+                    ),
+                )
+            )
+            continue
+
+        # Separation of duties, checked against the *employee* in the seat.
+        # Before the ceilings, for the same reason self-approval is: a
+        # disqualified approver cannot become qualified by the request being
+        # small. No delegated seat may set aside an independent control, so
+        # that condition disqualifies every seat below the CEO rather than
+        # being passed up one level at a time.
+        if request.overrides_independent_control:
+            steps.append(
+                ChainStep(
+                    seat=seat_id,
+                    insufficiency=Insufficiency.WOULD_OVERRIDE_INDEPENDENT_CONTROL,
+                    detail=(
+                        f"{seat_id} would be setting aside a failing deterministic "
+                        "check or a reviewer verdict. Management decides what to do "
+                        "about a finding; it does not decide that the finding is "
+                        "wrong."
+                    ),
+                )
+            )
+            continue
+
+        seat_employee = policy.hierarchy.seat(seat_id).employee
+        if seat_employee and seat_employee == request.implementer:
+            steps.append(
+                ChainStep(
+                    seat=seat_id,
+                    insufficiency=Insufficiency.IMPLEMENTER_IS_APPROVER,
+                    detail=(
+                        f"{seat_id} is filled by {seat_employee}, who implemented the "
+                        "work under decision"
+                    ),
+                )
+            )
+            continue
+        if seat_employee and seat_employee == request.reviewer:
+            steps.append(
+                ChainStep(
+                    seat=seat_id,
+                    insufficiency=Insufficiency.REVIEWER_IS_APPROVER,
+                    detail=(
+                        f"{seat_id} is filled by {seat_employee}, who reviewed the "
+                        "work under decision. Independent review and managerial "
+                        "approval are two controls, and one employee performing both "
+                        "is one control."
                     ),
                 )
             )

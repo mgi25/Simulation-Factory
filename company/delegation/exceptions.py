@@ -68,6 +68,7 @@ class ExceptionClass(str, Enum):
     UNCLASSIFIED_HIGH_RISK = "unclassified_high_risk"
     ENVELOPE_BREACH = "envelope_breach"
     VACANT_AUTHORITY = "vacant_authority"
+    SEPARATION_OF_DUTY = "separation_of_duty"
 
 
 # How loudly each class asks for attention. Used only for ordering a report;
@@ -84,6 +85,7 @@ SEVERITY: dict[ExceptionClass, int] = {
     ExceptionClass.ENVELOPE_BREACH: 8,
     ExceptionClass.UNRESOLVED_DISPUTE: 9,
     ExceptionClass.REPEATED_EXECUTION_FAILURE: 10,
+    ExceptionClass.SEPARATION_OF_DUTY: 5,
     ExceptionClass.UNCLASSIFIED_HIGH_RISK: 11,
     ExceptionClass.VACANT_AUTHORITY: 12,
 }
@@ -121,6 +123,10 @@ class ExceptionContext:
 
     failed_attempts: int = 0
     attempt_ceiling: int = 0
+    # How many *earlier* work orders on this objective already failed. Zero
+    # means this is the first try. See `classify` for why it decides whether a
+    # spent attempt ceiling is a CEO matter.
+    failed_work_orders: int = 0
     reviewer_disputed: bool = False
     dispute_detail: str = ""
     envelope_violations: tuple[str, ...] = ()
@@ -130,7 +136,7 @@ class ExceptionContext:
     protected_surface_changed: bool = False
 
     def __post_init__(self) -> None:
-        for name in ("failed_attempts", "attempt_ceiling"):
+        for name in ("failed_attempts", "attempt_ceiling", "failed_work_orders"):
             value = getattr(self, name)
             if isinstance(value, bool) or not isinstance(value, int) or value < 0:
                 raise DelegationError(f"context.{name} must be a non-negative integer")
@@ -226,6 +232,11 @@ _INSUFFICIENCY_CLASS: dict[Insufficiency, ExceptionClass] = {
     Insufficiency.AUTONOMY_TOO_LOW: ExceptionClass.AUTHORITY_EXCEEDED,
     Insufficiency.OUT_OF_SCOPE: ExceptionClass.AUTHORITY_EXCEEDED,
     Insufficiency.WRONG_DEPARTMENT: ExceptionClass.AUTHORITY_EXCEEDED,
+    Insufficiency.IMPLEMENTER_IS_APPROVER: ExceptionClass.SEPARATION_OF_DUTY,
+    Insufficiency.REVIEWER_IS_APPROVER: ExceptionClass.SEPARATION_OF_DUTY,
+    Insufficiency.WOULD_OVERRIDE_INDEPENDENT_CONTROL: (
+        ExceptionClass.SEPARATION_OF_DUTY
+    ),
 }
 
 
@@ -244,7 +255,24 @@ def classify(
     refs = tuple(evidence_refs)
     found: list[ManagementException] = []
 
-    def add(kind: ExceptionClass, detail: str, own: Sequence[str] = ()) -> None:
+    # Classes derived from the decision itself have one cause, so they are
+    # added at most once: a CEO reading "reserved_action" twice with two
+    # phrasings of the same fact learns nothing the second time. Classes fed
+    # from the caller's lists are not collapsed, because two envelope breaches
+    # really are two things.
+    from_decision: set[ExceptionClass] = set()
+
+    def add(
+        kind: ExceptionClass,
+        detail: str,
+        own: Sequence[str] = (),
+        *,
+        once: bool = False,
+    ) -> None:
+        if once:
+            if kind in from_decision:
+                return
+            from_decision.add(kind)
         found.append(
             ManagementException(
                 exception_class=kind,
@@ -259,51 +287,83 @@ def classify(
             ExceptionClass.SECURITY_OR_GOVERNANCE_EVENT,
             f"{decision.action.value} touches the governance surface every other "
             "limit is measured against",
+            once=True,
         )
     if decision.reserved_as or decision.action in RESERVED_AS:
         add(
             ExceptionClass.RESERVED_ACTION,
             decision.reason,
             ("company/permissions.yaml",),
+            once=True,
         )
     elif decision.action in GOVERNANCE_ACTIONS and decision.ceo_required:
-        add(ExceptionClass.RESERVED_ACTION, decision.reason)
+        add(ExceptionClass.RESERVED_ACTION, decision.reason, once=True)
     if decision.action in ARCHITECTURE_ACTIONS:
         add(
             ExceptionClass.MAJOR_ARCHITECTURE_DECISION,
             f"{decision.action.value} is an architecture decision whatever its diff",
+            once=True,
         )
     if decision.action is ActionType.UNCLASSIFIED:
         add(
             ExceptionClass.UNCLASSIFIED_HIGH_RISK,
             "the action carries no classification, so its risk is unmeasured rather "
             "than low",
+            once=True,
         )
     elif decision.risk in (Risk.HIGH, Risk.CRITICAL) and decision.ceo_required:
         add(
             ExceptionClass.RISK_CEILING_EXCEEDED,
             f"{decision.risk.value} risk exceeded every delegated ceiling in the chain",
+            once=True,
         )
 
     if decision.escalation_required and decision.chain:
         blocking = decision.chain[-1]
         mapped = _INSUFFICIENCY_CLASS.get(blocking.insufficiency)
         if mapped is not None:
-            add(mapped, f"{blocking.seat}: {blocking.detail}")
+            add(mapped, f"{blocking.seat}: {blocking.detail}", once=True)
+        # A separation breach is rarely the *last* step: the chain keeps
+        # climbing past the disqualified seat and usually stops somewhere else
+        # for an unrelated reason. Reporting only the last step would tell the
+        # CEO "the COO does not hold this action" and leave out the fact that
+        # the seat which does hold it was the reviewer. So the whole chain is
+        # scanned for separation, not just its end.
+        for step in decision.chain:
+            if step is blocking:
+                continue
+            separation = _INSUFFICIENCY_CLASS.get(step.insufficiency)
+            if separation is ExceptionClass.SEPARATION_OF_DUTY:
+                add(separation, f"{step.seat}: {step.detail}", once=True)
     if decision.decision is Decision.REJECTED:
-        add(
-            ExceptionClass.AUTHORITY_EXCEEDED,
-            decision.reason,
-        )
+        add(ExceptionClass.AUTHORITY_EXCEEDED, decision.reason, once=True)
     if decision.budget is not None and not decision.budget.within:
-        add(ExceptionClass.BUDGET_CEILING_EXCEEDED, decision.budget.reason)
+        add(
+            ExceptionClass.BUDGET_CEILING_EXCEEDED,
+            decision.budget.reason,
+            once=True,
+        )
 
     # -- from the context the caller supplied -----------------------------
-    if ctx.attempts_exhausted:
+    # A spent attempt ceiling is not, by itself, a CEO matter.
+    #
+    # One work order, one attempt, a reviewer finding a real defect, and a
+    # second bounded work order that fixes it is ordinary engineering — it is
+    # literally what happened between the burn-in's Job A and its correction
+    # job, and both were clean runs. Raising it as an exception would put the
+    # CEO back in the middle of the correction path this phase exists to take
+    # them out of.
+    #
+    # It becomes an exception when the work is *repeatedly* failing — a second
+    # work order on the same objective has already been spent — or when the
+    # decision needed the CEO anyway, in which case the exhausted ceiling is
+    # context they should have.
+    if ctx.attempts_exhausted and (ctx.failed_work_orders >= 1 or decision.ceo_required):
         add(
             ExceptionClass.REPEATED_EXECUTION_FAILURE,
             f"{ctx.failed_attempts} of {ctx.attempt_ceiling} developer attempts are "
-            "spent; a further correction needs a new work order",
+            f"spent after {ctx.failed_work_orders} earlier failed work order(s); the "
+            "correction path is no longer routine",
         )
     if ctx.reviewer_disputed:
         add(ExceptionClass.UNRESOLVED_DISPUTE, ctx.dispute_detail)

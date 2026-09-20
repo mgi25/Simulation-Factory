@@ -21,6 +21,16 @@
       "status": "active"
     },
     {
+      "capability_id": "budget_control",
+      "criticality": "important",
+      "description": "Hold department and program budget ceilings and answer whether one spend fits inside them.",
+      "domain": "executive",
+      "name": "Budget control",
+      "notes": "Holding a ceiling is not the authority to change it; company budget policy stays CEO-reserved.",
+      "required_by": [],
+      "status": "active"
+    },
+    {
       "capability_id": "caching",
       "criticality": "supporting",
       "description": "Reuse identical context and results across sessions deterministically.",
@@ -79,6 +89,16 @@
       "status": "active"
     },
     {
+      "capability_id": "cost_analysis",
+      "criticality": "supporting",
+      "description": "Read recorded resource cost against accepted output and say where it is going.",
+      "domain": "executive",
+      "name": "Cost analysis",
+      "notes": "An unmeasured cost stays unknown; this capability does not estimate one.",
+      "required_by": [],
+      "status": "active"
+    },
+    {
       "capability_id": "creative_direction",
       "criticality": "core",
       "description": "Hold a coherent creative intent across episodes and decide what does not ship.",
@@ -95,6 +115,16 @@
       "domain": "executive",
       "name": "Cross-department coordination",
       "notes": "",
+      "required_by": [],
+      "status": "active"
+    },
+    {
+      "capability_id": "delivery_management",
+      "criticality": "important",
+      "description": "Decide routine engineering outcomes and bounded corrections without implementing or reviewing the work.",
+      "domain": "engineering",
+      "name": "Delivery management",
+      "notes": "Deliberately excludes implementation and review so the holder can never be its own implementer or reviewer.",
       "required_by": [],
       "status": "active"
     },

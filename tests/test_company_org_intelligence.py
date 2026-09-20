@@ -1013,10 +1013,18 @@ def test_management_depth_is_measured_deterministically(config):
     graph = ManagementGraph.from_org_registry(config.org_registry)
     assert graph.depth_of("studio_coo") == 1
     assert graph.depth_of("chief_architect") == 2
-    assert graph.depth_of("simulation_physics_engineer") == 3
+    # The engineers sit one rung lower than they used to: the CEO-authorized
+    # Engineering Manager was inserted between them and the Chief Architect so
+    # that managerial approval stops being the same employee as independent
+    # review. Four is the configured ceiling, not over it.
+    assert graph.depth_of("engineering_delivery_manager") == 3
+    assert graph.depth_of("simulation_physics_engineer") == 4
+    assert graph.excessive_depth(ManagementPolicy(max_depth=4)) == ()
     assert graph.cycles() == ()
     assert graph.orphans() == ()
     assert graph.invalid_references() == ()
+    # The CFO reports to the CEO rather than the COO, which is where the master
+    # plan puts it and what keeps this span at its threshold rather than over it.
     assert dict(graph.span_of_control())["studio_coo"] == 6
 
 

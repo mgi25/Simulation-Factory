@@ -58,6 +58,20 @@ from company.delegation.budget import (
     BudgetScope,
     money_from_text,
 )
+from company.delegation.deployment import (
+    DEPLOYMENT_POLICY,
+    DeploymentClass,
+    DeploymentKind,
+    DeploymentPolicy,
+    classification_of,
+    parse_kind,
+)
+from company.delegation.metrics import (
+    DecisionOutcome,
+    ManagementReport,
+    measure,
+    spend_of,
+)
 from company.delegation.errors import (
     AuthorityViolation,
     DelegationError,
@@ -93,7 +107,13 @@ from company.delegation.policy import (
     load_delegation_policy,
 )
 from company.delegation.record import ExecutiveDecisionRecord, record_decision
-from company.delegation.scenarios import REPORTED_TOTALS, SCENARIOS, replay, summarise
+from company.delegation.scenarios import (
+    CONTROL_SCENARIOS,
+    REPORTED_TOTALS,
+    SCENARIOS,
+    replay,
+    summarise,
+)
 from company.delegation.shadow import assert_shadow_mode, verify_shadow_mode
 from company.delegation.store import DelegationStore, DelegationStoreError
 from company.finance.money import Money
@@ -455,11 +475,16 @@ def test_one_employee_holding_two_seats_is_reported():
     assert any("own escalation" in item for item in problems)
 
 
-def test_the_canonical_chart_reports_exactly_the_inserted_manager_layer(policy):
-    conflicts = policy.hierarchy.registry_conflicts()
-    assert len(conflicts) == 2
-    assert all("engineering_manager" in item for item in conflicts)
-    assert all("no employee fills" in item for item in conflicts)
+def test_the_declared_chart_and_the_registry_now_agree(policy):
+    """The two conflicts the previous phase reported are what staffing closed.
+
+    Both said the same thing: the engineers reported to `engineering_manager`
+    on the declared chart and to `chief_architect` in `org_registry.yaml`,
+    because no employee filled the seat in between. The CEO authorized filling
+    it, the registry was re-parented to match, and there is nothing left to
+    report.
+    """
+    assert policy.hierarchy.registry_conflicts() == ()
 
 
 def test_the_canonical_policy_seats_every_registry_employee(policy, config):
@@ -736,17 +761,66 @@ def test_escalation_never_jumps_straight_to_the_ceo():
     assert CEO_SEAT not in {step.seat for step in decision.chain}
 
 
-def test_a_vacant_seat_is_passed_over_and_named_in_the_chain(policy):
-    decision = evaluate(
-        _request(requesting_seat="software_implementation_engineer"), policy
+def test_no_granted_seat_in_the_canonical_policy_is_vacant_any_more(policy):
+    """Staffing removed the last vacancy that could hold up a decision.
+
+    The two seats still vacant are `integration_gate` and `deterministic_qa`,
+    which are deterministic mechanisms rather than employees and hold no grant.
+    A vacancy that carries authority is the condition this asserts is gone; the
+    pass-over *behaviour* is still proven on the toy hierarchy below.
+    """
+    vacant = [
+        item.seat.seat_id
+        for item in policy.hierarchy.standings()
+        if item.availability is SeatAvailability.VACANT
+    ]
+    assert sorted(vacant) == ["deterministic_qa", "integration_gate"]
+    assert all(policy.grant(seat_id) is None for seat_id in vacant)
+
+
+def test_a_vacant_seat_is_still_passed_over_and_named_in_the_chain():
+    hierarchy = Hierarchy(
+        seats=(
+            Seat(seat_id=CEO_SEAT, kind=SeatKind.CEO, title="CEO", reports_to=""),
+            Seat(
+                seat_id="exec",
+                kind=SeatKind.EXECUTIVE,
+                title="Executive",
+                reports_to=CEO_SEAT,
+                employee="an_executive",
+                departments=("engineering",),
+            ),
+            Seat(
+                seat_id="manager",
+                kind=SeatKind.DEPARTMENT_MANAGEMENT,
+                title="Manager",
+                reports_to="exec",
+                employee="",  # the condition staffing removed from the real chart
+                departments=("engineering",),
+            ),
+            Seat(
+                seat_id="worker",
+                kind=SeatKind.WORKER,
+                title="Worker",
+                reports_to="manager",
+                employee="a_worker",
+                departments=("engineering",),
+            ),
+        ),
+        org_registry=_registry(
+            an_executive={"state": "active", "department": "engineering", "manager": "ceo"},
+            a_worker={"state": "active", "department": "engineering", "manager": "a_manager"},
+        ),
+        permissions=_permissions(),
     )
+    decision = evaluate(_request(), _toy_policy(hierarchy=hierarchy))
     assert decision.decision is Decision.APPROVED
-    assert decision.actor == "cto"
+    assert decision.actor == "exec"
     vacant = [
         step for step in decision.chain
         if step.insufficiency is Insufficiency.SEAT_VACANT
     ]
-    assert [step.seat for step in vacant] == ["engineering_manager"]
+    assert [step.seat for step in vacant] == ["manager"]
 
 
 def test_a_dormant_seat_is_passed_over_and_named_in_the_chain():
@@ -1144,9 +1218,38 @@ def test_a_budget_breach_and_a_risk_breach_each_raise_their_own_class():
     assert ExceptionClass.RISK_CEILING_EXCEEDED in risk.classes
 
 
-def test_exhausted_attempts_raise_repeated_execution_failure():
+def test_one_spent_attempt_ceiling_is_not_a_ceo_matter():
+    """A reviewer finding a defect on the first try is engineering, not an alarm.
+
+    It is what happened between the burn-in's Job A and its correction job, and
+    both runs were clean. Raising it would put the CEO back in the correction
+    path this phase exists to take them out of.
+    """
     decision = evaluate(_request(), _toy_policy())
-    report = classify(decision, ExceptionContext(failed_attempts=1, attempt_ceiling=1))
+    report = classify(
+        decision,
+        ExceptionContext(failed_attempts=1, attempt_ceiling=1, failed_work_orders=0),
+    )
+    assert ExceptionClass.REPEATED_EXECUTION_FAILURE not in report.classes
+
+
+def test_a_second_failed_work_order_does_raise_repeated_execution_failure():
+    decision = evaluate(_request(), _toy_policy())
+    report = classify(
+        decision,
+        ExceptionContext(failed_attempts=1, attempt_ceiling=1, failed_work_orders=1),
+    )
+    assert ExceptionClass.REPEATED_EXECUTION_FAILURE in report.classes
+    assert not decision.ceo_required  # the manager still decides; the CEO is told
+
+
+def test_an_exhausted_ceiling_on_a_ceo_decision_is_reported_as_context():
+    decision = evaluate(_request(risk=Risk.CRITICAL), _toy_policy())
+    report = classify(
+        decision,
+        ExceptionContext(failed_attempts=1, attempt_ceiling=1, failed_work_orders=0),
+    )
+    assert decision.ceo_required
     assert ExceptionClass.REPEATED_EXECUTION_FAILURE in report.classes
 
 
@@ -1549,14 +1652,26 @@ def test_routine_successful_work_does_not_need_the_ceo(policy):
         assert item.exceptions.exceptions == (), scenario_id
 
 
-def test_the_reviewer_finding_escalates_because_one_employee_holds_both_seats(policy):
-    """Job A: the architect reviewed it and is the only seat that could approve it."""
+def test_the_reviewer_finding_is_now_handled_by_the_engineering_manager(policy):
+    """Job A, the scenario this whole phase was authorized to fix.
+
+    Before staffing it escalated: `chief_architect` had reviewed the work *and*
+    filled the only seat with authority over a review outcome, so self-approval
+    forced it upward and nothing above held the action. With the Engineering
+    Manager staffed, independent review and managerial approval are two
+    employees, and the correction path stays inside engineering.
+    """
     item = next(x for x in replay(policy) if x.scenario.scenario_id == "burnin-job-a")
-    assert item.decision.ceo_required
-    assert any(
-        step.insufficiency is Insufficiency.SELF_APPROVAL for step in item.decision.chain
-    )
-    assert ExceptionClass.REPEATED_EXECUTION_FAILURE in item.exceptions.classes
+    assert item.decision.decision is Decision.APPROVED
+    assert item.decision.actor == "engineering_manager"
+    assert not item.decision.ceo_required
+    assert item.exceptions.exceptions == ()
+    # And it is separation that makes this safe, not luck: the approving seat is
+    # filled by someone who neither implemented nor reviewed the work.
+    approver = policy.hierarchy.seat(item.decision.actor).employee
+    assert approver == "engineering_delivery_manager"
+    assert approver != item.scenario.request.reviewer
+    assert approver != item.scenario.request.implementer
 
 
 def test_stopping_work_on_an_invalid_premise_never_reaches_the_ceo(policy):
@@ -1662,3 +1777,500 @@ def test_the_package_does_not_import_production():
             elif isinstance(node, ast.ImportFrom) and node.module:
                 root = node.module.split(".")[0]
             assert root not in production_roots, f"{path.name}:{node.lineno}"
+
+
+# --- 17. staffing: the two seats the CEO authorized ------------------------
+
+
+def test_the_engineering_manager_seat_is_filled_by_a_role_that_cannot_implement(
+    policy, config
+):
+    """The seat exists to separate approval from review, so its holder does neither.
+
+    `engineering_delivery_manager` carries `delivery_management` and
+    `escalation` and deliberately carries no implementation or review
+    capability. That is what makes the separation structural rather than a
+    convention somebody has to remember: the employee cannot be routed the work
+    it would later approve.
+    """
+    seat = policy.hierarchy.seat("engineering_manager")
+    assert seat.employee == "engineering_delivery_manager"
+    assert policy.hierarchy.standing("engineering_manager").can_decide
+
+    row = config.org_registry["employees"]["engineering_delivery_manager"]
+    assert row["department"] == "engineering"
+    assert row["manager"] == "chief_architect"
+    assert row["state"] == "active"
+    capabilities = set(row["capabilities"])
+    assert capabilities == {"delivery_management", "escalation"}
+    assert not capabilities & {
+        "software_implementation",
+        "test_engineering",
+        "software_architecture",
+        "dependency_governance",
+    }
+
+
+def test_the_cfo_seat_is_filled_and_reports_to_the_ceo(policy, config):
+    seat = policy.hierarchy.seat("cfo")
+    assert seat.employee == "finance_operations_lead"
+    assert seat.reports_to == CEO_SEAT
+    assert policy.hierarchy.standing("cfo").can_decide
+
+    row = config.org_registry["employees"]["finance_operations_lead"]
+    assert row["manager"] == "ceo"
+    assert row["department"] == "executive"  # there is no finance department
+    assert set(row["capabilities"]) == {"budget_control", "cost_analysis"}
+
+
+def test_the_engineers_now_report_to_the_engineering_manager(config):
+    employees = config.org_registry["employees"]
+    for engineer in ("software_implementation_engineer", "simulation_physics_engineer"):
+        assert employees[engineer]["manager"] == "engineering_delivery_manager"
+    # The AI platform engineer was not re-parented: it is not engineering delivery.
+    assert employees["ai_efficiency_platform_engineer"]["manager"] == "chief_architect"
+
+
+def test_every_new_capability_is_registered():
+    from company.workforce.capabilities import load_capability_graph
+
+    declared = load_capability_graph().ids()
+    for capability in ("delivery_management", "budget_control", "cost_analysis"):
+        assert capability in declared
+
+
+def test_the_bootstrap_contracts_still_validate():
+    """The registry changed, so the canonical validator is the thing to ask."""
+    from company.runtime.config import load_validated_company_config
+
+    loaded = load_validated_company_config()
+    assert len(loaded.org_registry["employees"]) == 13
+
+
+def test_a_dormant_role_still_decides_nothing_after_staffing(policy):
+    """Staffing two seats did not quietly wake the other nine."""
+    dormant = [
+        item.seat.seat_id
+        for item in policy.hierarchy.standings()
+        if item.availability is SeatAvailability.DORMANT
+    ]
+    assert "research_lead" in dormant and "production_lead" in dormant
+    for seat_id in dormant:
+        assert not policy.hierarchy.standing(seat_id).can_decide
+
+
+def test_staffing_introduced_no_session_or_process_capability():
+    """A role existing must not cost anything. Nothing here can run a session."""
+    source = "\n".join(
+        path.read_text(encoding="utf-8") for path in sorted(PACKAGE.glob("*.py"))
+    )
+    for forbidden in ("subprocess", "Popen", "posix_spawn"):
+        assert forbidden not in source, forbidden
+
+
+# --- 18. separation of duties ---------------------------------------------
+
+
+def _sod_request(**overrides) -> AuthorityRequest:
+    fields = {
+        "request_id": "req-separation",
+        "action": ActionType.APPROVE_REVIEW_OUTCOME,
+        "requesting_seat": "software_implementation_engineer",
+        "department": "engineering",
+        "risk": Risk.LOW,
+        "implementer": "software_implementation_engineer",
+        "reviewer": "chief_architect",
+    }
+    fields.update(overrides)
+    return AuthorityRequest(**fields)
+
+
+def test_the_implementer_cannot_be_the_approver(policy):
+    decision = evaluate(
+        _sod_request(
+            action=ActionType.APPROVE_CODE_CHANGE,
+            implementer="engineering_delivery_manager",
+        ),
+        policy,
+    )
+    assert decision.actor != "engineering_manager"
+    assert any(
+        step.insufficiency is Insufficiency.IMPLEMENTER_IS_APPROVER
+        and step.seat == "engineering_manager"
+        for step in decision.chain
+    )
+
+
+def test_the_reviewer_cannot_be_the_final_managerial_approver(policy):
+    """chief_architect reviewed it, so the CTO seat it fills cannot approve it."""
+    decision = evaluate(_sod_request(risk=Risk.MEDIUM), policy)
+    assert decision.ceo_required
+    assert any(
+        step.insufficiency is Insufficiency.REVIEWER_IS_APPROVER and step.seat == "cto"
+        for step in decision.chain
+    )
+    assert ExceptionClass.SEPARATION_OF_DUTY in classify(decision).classes
+
+
+def test_separation_is_checked_before_the_ceilings(policy):
+    """A disqualified approver does not become qualified by the request being small."""
+    decision = evaluate(
+        _sod_request(
+            action=ActionType.APPROVE_CODE_CHANGE,
+            implementer="engineering_delivery_manager",
+            amount=usd("0.01"),
+            budget_scope="engineering-operations",
+        ),
+        policy,
+    )
+    step = next(item for item in decision.chain if item.seat == "engineering_manager")
+    assert step.insufficiency is Insufficiency.IMPLEMENTER_IS_APPROVER
+
+
+def test_no_delegated_seat_may_override_an_independent_control(policy):
+    decision = evaluate(
+        _sod_request(
+            action=ActionType.APPROVE_CODE_CHANGE,
+            overrides_independent_control=True,
+        ),
+        policy,
+    )
+    assert decision.ceo_required
+    overrides = [
+        step
+        for step in decision.chain
+        if step.insufficiency is Insufficiency.WOULD_OVERRIDE_INDEPENDENT_CONTROL
+    ]
+    # Every seat that could otherwise have decided it, not just the first.
+    assert {step.seat for step in overrides} >= {"engineering_manager", "cto"}
+    assert ExceptionClass.SEPARATION_OF_DUTY in classify(decision).classes
+
+
+def test_a_manager_cannot_alter_its_own_authority(policy):
+    decision = evaluate(
+        _request(
+            action=ActionType.EXPAND_AUTHORITY, requesting_seat="engineering_manager"
+        ),
+        policy,
+    )
+    assert decision.ceo_required
+    assert ExceptionClass.RESERVED_ACTION in classify(decision).classes
+
+
+def test_an_executive_cannot_approve_its_own_authority_expansion(policy):
+    for seat in ("cto", "coo", "cfo"):
+        decision = evaluate(
+            _request(action=ActionType.EXPAND_AUTHORITY, requesting_seat=seat), policy
+        )
+        assert decision.ceo_required, seat
+        assert decision.actor == CEO_SEAT, seat
+
+
+def test_escalation_only_ever_moves_upward(policy):
+    """Every step in every chain is at the same layer or higher than the last."""
+    from company.delegation.org import LAYER_RANK
+
+    for seat_id in policy.hierarchy.seat_ids():
+        chain = policy.hierarchy.chain(seat_id)
+        ranks = [LAYER_RANK[policy.hierarchy.seat(item).kind] for item in chain]
+        assert ranks == sorted(ranks), seat_id
+        assert chain[-1] == CEO_SEAT
+
+
+def test_no_chain_in_the_canonical_policy_repeats_a_seat(policy):
+    for seat_id in policy.hierarchy.seat_ids():
+        chain = policy.hierarchy.chain(seat_id)
+        assert len(chain) == len(set(chain)), seat_id
+
+
+# --- 19. the engineering and financial delegation chains ------------------
+
+
+def test_the_engineering_chain_runs_developer_manager_cto_ceo(policy):
+    assert policy.hierarchy.chain("software_implementation_engineer") == (
+        "software_implementation_engineer",
+        "engineering_manager",
+        "cto",
+        "coo",
+        CEO_SEAT,
+    )
+
+
+def test_a_routine_low_risk_engineering_change_stops_at_the_manager(policy):
+    decision = evaluate(_sod_request(action=ActionType.APPROVE_CODE_CHANGE), policy)
+    assert decision.decision is Decision.APPROVED
+    assert decision.actor == "engineering_manager"
+    assert not decision.ceo_required
+
+
+def test_medium_risk_engineering_passes_the_manager_and_reaches_the_cto(policy):
+    """With no reviewer named, the CTO is free to take it."""
+    decision = evaluate(
+        _request(
+            action=ActionType.APPROVE_CODE_CHANGE,
+            requesting_seat="software_implementation_engineer",
+            risk=Risk.MEDIUM,
+        ),
+        policy,
+    )
+    assert decision.decision is Decision.APPROVED
+    assert decision.actor == "cto"
+    assert decision.chain[-1].insufficiency is Insufficiency.RISK_ABOVE_CEILING
+
+
+def test_money_escalates_through_the_cfo_which_no_reporting_line_passes(policy):
+    line = policy.hierarchy.chain("software_implementation_engineer")
+    assert "cfo" not in line
+    effective = policy.effective_chain(
+        "software_implementation_engineer", ActionType.APPROVE_OPERATING_SPEND
+    )
+    assert effective == (*line[:-1], "cfo", CEO_SEAT)
+
+
+def test_a_spend_inside_the_department_budget_never_reaches_the_cfo(policy):
+    decision = evaluate(
+        _request(
+            action=ActionType.APPROVE_OPERATING_SPEND,
+            requesting_seat="software_implementation_engineer",
+            amount=usd("2.00"),
+            budget_scope="engineering-operations",
+        ),
+        policy,
+    )
+    assert decision.decision is Decision.APPROVED
+    assert decision.actor == "cto"
+
+
+def test_a_spend_above_the_department_reaches_the_cfo_and_not_the_ceo(policy):
+    decision = evaluate(
+        _request(
+            action=ActionType.APPROVE_OPERATING_SPEND,
+            requesting_seat="software_implementation_engineer",
+            amount=usd("45.00"),
+            budget_scope="company-operating",
+        ),
+        policy,
+    )
+    assert decision.decision is Decision.APPROVED
+    assert decision.actor == "cfo"
+    assert not decision.ceo_required
+
+
+def test_a_spend_above_the_cfo_ceiling_reaches_the_ceo(policy):
+    decision = evaluate(
+        _request(
+            action=ActionType.APPROVE_OPERATING_SPEND,
+            requesting_seat="software_implementation_engineer",
+            amount=usd("200.00"),
+            budget_scope="company-operating",
+        ),
+        policy,
+    )
+    assert decision.ceo_required
+    assert decision.chain[-1].seat == "cfo"
+
+
+def test_changing_budget_policy_is_granted_to_nobody(policy):
+    decision = evaluate(
+        _request(action=ActionType.CHANGE_BUDGET_POLICY, requesting_seat="cto"), policy
+    )
+    assert decision.ceo_required
+    granted = {a for grant in policy.grants for a in grant.action_types}
+    assert ActionType.CHANGE_BUDGET_POLICY not in granted
+
+
+def test_a_functional_seat_that_cannot_decide_the_action_is_refused():
+    with pytest.raises(DelegationError) as exc:
+        _toy_policy(functional_authority={"approve_operating_spend": ["manager"]})
+    assert "only lengthens the chain" in str(exc.value)
+
+
+# --- 20. the deployment policy model --------------------------------------
+
+
+def test_every_deployment_kind_is_classified():
+    for kind in DeploymentKind:
+        decision = DEPLOYMENT_POLICY.classify(kind)
+        assert isinstance(decision.classification, DeploymentClass)
+        assert decision.authorized is False
+
+
+def test_the_five_kinds_carry_the_classifications_the_ceo_asked_for():
+    expected = {
+        DeploymentKind.LOCAL_INTEGRATION: DeploymentClass.ROUTINE_DELEGATABLE,
+        DeploymentKind.CANONICAL_MERGE: DeploymentClass.EXECUTIVE_APPROVAL,
+        DeploymentKind.STAGING_RELEASE: DeploymentClass.EXECUTIVE_APPROVAL,
+        DeploymentKind.PUBLIC_DEPLOYMENT: DeploymentClass.CEO_RESERVED,
+        DeploymentKind.CONTENT_PUBLISHING: DeploymentClass.CEO_RESERVED,
+    }
+    for kind, classification in expected.items():
+        assert DEPLOYMENT_POLICY.classify(kind).classification is classification
+
+
+def test_an_unknown_deployment_fails_closed():
+    decision = DEPLOYMENT_POLICY.classify("some_new_kind_of_shipping")
+    assert decision.kind is DeploymentKind.UNKNOWN
+    assert decision.classification is DeploymentClass.CEO_RESERVED
+    assert decision.ceo_required
+    assert parse_kind("nonsense", allow_unknown=True) is DeploymentKind.UNKNOWN
+    with pytest.raises(DelegationError):
+        parse_kind("nonsense")
+
+
+def test_content_publishing_follows_permissions_yaml(config):
+    rule = DEPLOYMENT_POLICY.rule(DeploymentKind.CONTENT_PUBLISHING)
+    assert rule.reserved_as == "publish_public_video"
+    assert rule.reserved_as in config.permissions["ceo_reserved"]
+
+
+def test_no_deployment_action_is_granted_to_any_seat(policy):
+    granted = {action for grant in policy.grants for action in grant.action_types}
+    assert not granted & DEPLOYMENT_POLICY.actions()
+
+
+def test_a_policy_that_granted_a_deployment_action_is_refused():
+    grant = DelegatedAuthority(
+        seat="manager",
+        action_types=frozenset({ActionType.APPROVE_LOCAL_INTEGRATION}),
+        max_risk=Risk.LOW,
+        per_decision_ceiling=usd("1.00"),
+        budget_scope="prog-budget",
+    )
+    with pytest.raises(ShadowModeViolation) as exc:
+        _toy_policy(
+            grants=(grant,),
+            action_autonomy={**_AUTONOMY, "approve_local_integration": 3},
+        )
+    assert "the switch is off" in str(exc.value)
+
+
+def test_the_deployment_policy_cannot_be_activated():
+    with pytest.raises(ShadowModeViolation):
+        DeploymentPolicy(activated=True)
+
+
+def test_a_deployment_policy_missing_a_kind_is_refused():
+    partial = tuple(
+        rule
+        for rule in DEPLOYMENT_POLICY.rules
+        if rule.kind is not DeploymentKind.UNKNOWN
+    )
+    with pytest.raises(DelegationError) as exc:
+        DeploymentPolicy(rules=partial)
+    assert "stops failing closed" in str(exc.value)
+
+
+def test_the_strictest_classification_wins_for_a_shared_action():
+    assert (
+        classification_of(ActionType.APPROVE_DEPLOYMENT) is DeploymentClass.CEO_RESERVED
+    )
+    assert classification_of(ActionType.APPROVE_CODE_CHANGE) is None
+
+
+def test_a_deployment_request_still_fails_closed_to_the_ceo(policy):
+    for action in sorted(DEPLOYMENT_POLICY.actions(), key=lambda item: item.value):
+        decision = evaluate(
+            _request(action=action, requesting_seat="software_implementation_engineer"),
+            policy,
+        )
+        assert decision.ceo_required, action
+
+
+# --- 21. management-by-exception metrics and the CEO report ---------------
+
+
+def _outcomes(policy, scenarios):
+    return [
+        DecisionOutcome(decision=item.decision, exceptions=item.exceptions)
+        for item in replay(policy, scenarios=scenarios)
+    ]
+
+
+def test_the_five_historical_jobs_now_resolve_without_the_ceo(policy):
+    metrics = measure(_outcomes(policy, SCENARIOS))
+    assert metrics.total_decisions == 5
+    assert metrics.resolved_internally == 5
+    assert metrics.ceo_decisions_required == 0
+    assert metrics.ceo_notifications == 0
+    assert metrics.ceo_attention == 0
+    assert metrics.reasons == ()
+    assert dict(metrics.by_seat)["engineering_manager"] == 4
+
+
+def test_every_control_probe_still_requires_the_ceo(policy):
+    """The number that makes the one above mean something."""
+    metrics = measure(_outcomes(policy, CONTROL_SCENARIOS))
+    assert metrics.total_decisions == 5
+    assert metrics.ceo_decisions_required == 5
+    assert metrics.resolved_internally == 0
+    assert {name for name, _count in metrics.reasons} >= {
+        "separation_of_duty",
+        "budget_ceiling_exceeded",
+        "reserved_action",
+    }
+
+
+def test_a_decision_and_its_report_must_be_about_the_same_request(policy):
+    results = replay(policy)
+    with pytest.raises(DelegationError):
+        DecisionOutcome(decision=results[0].decision, exceptions=results[1].exceptions)
+
+
+def test_a_ceo_notification_is_not_a_ceo_decision():
+    """A manager decides it and the CEO is told. Two different counts."""
+    decision = evaluate(_request(), _toy_policy())
+    report = classify(
+        decision,
+        ExceptionContext(failed_attempts=1, attempt_ceiling=1, failed_work_orders=1),
+    )
+    metrics = measure([DecisionOutcome(decision=decision, exceptions=report)])
+    assert metrics.ceo_decisions_required == 0
+    assert metrics.ceo_notifications == 1
+    assert metrics.ceo_attention == 1
+    assert metrics.resolved_internally == 1
+
+
+def test_a_portfolio_total_with_no_measured_cost_is_unknown(policy):
+    outcomes = _outcomes(policy, SCENARIOS)
+    assert spend_of(outcomes, "USD") is not None
+    assert spend_of([], "USD") is None
+
+
+def test_the_report_renders_the_shape_the_ceo_asked_for(policy):
+    historical = _outcomes(policy, SCENARIOS)
+    report = ManagementReport(
+        programme="Engineering reliability validation",
+        metrics=measure(historical, spend=spend_of(historical, "USD")),
+        outcomes=("Three clean engineering jobs",),
+        next_action="Run the model in shadow beside live work",
+        control_metrics=measure(_outcomes(policy, CONTROL_SCENARIOS)),
+    )
+    text = report.render()
+    for heading in (
+        "OBJECTIVE / PROGRAM",
+        "MANAGEMENT BY EXCEPTION",
+        "CEO decisions required",
+        "ESCALATION REASONS",
+        "RESOURCE SPEND",
+        "OUTCOMES",
+        "NEXT ACTION",
+        "CONTROL PROBES",
+    ):
+        assert heading in text
+
+
+def test_no_metric_is_an_aggregate_verdict():
+    """`company/dashboard/integrity.py` refuses these by name; so does this."""
+    from company.dashboard.integrity import FORBIDDEN_AGGREGATE_FIELDS
+
+    payload = json.dumps(measure([]).to_dict())
+    for forbidden in FORBIDDEN_AGGREGATE_FIELDS:
+        assert forbidden not in payload
+
+
+def test_control_scenarios_are_marked_as_never_having_happened():
+    for scenario in CONTROL_SCENARIOS:
+        assert scenario.historical is False
+        assert "never run" in scenario.actual_outcome
+    for scenario in SCENARIOS:
+        assert scenario.historical is True

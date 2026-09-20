@@ -58,7 +58,8 @@ from company.validation.yaml_subset import load_yaml_subset
 
 from .actions import ActionType, parse_action, reserved_action_types
 from .budget import BudgetLadder, BudgetLevel, BudgetScope, money_from_text
-from .common import assert_prose, assert_seat_id, name_tuple
+from .common import assert_prose, assert_seat_id, name_tuple, seat_tuple
+from .deployment import DEPLOYMENT_ACTIONS
 from .errors import AuthorityViolation, DelegationError, ShadowModeViolation
 from .org import Hierarchy, Seat, SeatKind
 
@@ -163,6 +164,10 @@ class DelegationPolicy:
     grants: tuple[DelegatedAuthority, ...]
     ladder: BudgetLadder
     action_autonomy: Mapping[str, int]
+    # Actions that escalate along a *functional* chain rather than the line
+    # chain: money reaches the CFO, which sits beside the operating executives
+    # and not above them. Read from the policy file; empty means line-only.
+    functional_authority: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
     mode: DelegationMode = DelegationMode.SHADOW
     version: str = POLICY_VERSION
     reporting_cadence: str = "per_objective_and_on_exception"
@@ -233,6 +238,18 @@ class DelegationPolicy:
                     + ". A reserved decision is not delegable; removing it from "
                     "company/permissions.yaml is itself CEO-reserved."
                 )
+            granted_deployment = sorted(
+                action.value for action in grant.action_types & DEPLOYMENT_ACTIONS
+            )
+            if granted_deployment:
+                raise ShadowModeViolation(
+                    f"the policy grants {grant.seat} deployment action(s): "
+                    + ", ".join(granted_deployment)
+                    + ". company/delegation/deployment.py classifies what authority "
+                    "each deployment kind would need; granting it is a separate CEO "
+                    "decision that has not been taken. The policy model is built and "
+                    "the switch is off."
+                )
             missing = sorted(
                 action.value
                 for action in grant.action_types
@@ -249,6 +266,37 @@ class DelegationPolicy:
                     f"{grant.budget_scope!r}, which the ladder does not carry"
                 )
         object.__setattr__(self, "_grants", {g.seat: g for g in self.grants})
+
+        if not isinstance(self.functional_authority, Mapping):
+            raise DelegationError("policy.functional_authority must be a mapping")
+        functional: dict[str, tuple[str, ...]] = {}
+        for key, value in self.functional_authority.items():
+            action = parse_action(key, "functional_authority key")
+            seats = seat_tuple(
+                list(value) if isinstance(value, (list, tuple)) else value,
+                f"functional_authority[{action.value}]",
+            )
+            if not seats:
+                raise DelegationError(
+                    f"functional_authority[{action.value}] names no seat. An empty "
+                    "functional chain is the line chain; leave the entry out."
+                )
+            for seat_id in seats:
+                candidate = self.hierarchy.seat(seat_id)
+                if candidate.kind is SeatKind.CEO:
+                    raise DelegationError(
+                        "the CEO seat is already the end of every chain and is not "
+                        "named as functional authority"
+                    )
+                grant = self._index.get(seat_id)
+                if grant is None or not grant.covers(action):
+                    raise DelegationError(
+                        f"functional_authority[{action.value}] routes through "
+                        f"{seat_id}, whose grant does not cover it. A functional stop "
+                        "that cannot decide the action only lengthens the chain."
+                    )
+            functional[action.value] = seats
+        object.__setattr__(self, "functional_authority", dict(sorted(functional.items())))
 
         # A subordinate may not out-rank the seat it escalates to.
         for grant in self.grants:
@@ -293,6 +341,25 @@ class DelegationPolicy:
                 return grant
         return None
 
+    def effective_chain(self, seat_id: str, action: ActionType) -> tuple[str, ...]:
+        """The seats this action passes through, nearest first, CEO last.
+
+        The line chain, with any functional seats for this action spliced in
+        just below the CEO. Money is the case this exists for: the CFO sits
+        beside the operating executives rather than above them, so a spend that
+        outgrows a department never reaches it along the reporting line. A seat
+        already in the line chain is not added twice, and the CEO stays last.
+        """
+        line = self.hierarchy.chain(seat_id)
+        extra = tuple(
+            seat
+            for seat in self.functional_authority.get(action.value, ())
+            if seat not in line
+        )
+        if not extra:
+            return line
+        return (*line[:-1], *extra, line[-1])
+
     def required_autonomy(self, action: ActionType) -> int:
         """The autonomy rung this action sits on, or the top of the ladder.
 
@@ -317,6 +384,9 @@ class DelegationPolicy:
             "grants": [grant.to_dict() for grant in self.grants],
             "ladder": self.ladder.to_dict(),
             "action_autonomy": dict(self.action_autonomy),
+            "functional_authority": {
+                key: list(value) for key, value in self.functional_authority.items()
+            },
             "reserved": sorted(item.value for item in self.reserved),
         }
 
@@ -480,11 +550,21 @@ def load_delegation_policy(
             "the policy file must carry an 'action_autonomy' mapping of action name "
             "to a rung of permissions.yaml autonomy_levels"
         )
+    functional_raw = data.get("functional_authority", {})
+    if not isinstance(functional_raw, Mapping):
+        raise DelegationError(
+            "the policy file's 'functional_authority' must be a mapping of action "
+            "name to the seats that action escalates through"
+        )
     return DelegationPolicy(
         hierarchy=hierarchy,
         grants=_grants_from(data, ladder.currency),
         ladder=ladder,
         action_autonomy={str(k): v for k, v in autonomy_raw.items()},
+        functional_authority={
+            str(k): tuple(v) if isinstance(v, (list, tuple)) else v
+            for k, v in functional_raw.items()
+        },
         mode=mode,
         version=version,
         reporting_cadence=str(

@@ -3,9 +3,10 @@
   "capabilities": [
     "capability_delegated_authority",
     "capability_escalation_chain",
+    "capability_separation_of_duties",
     "capability_budget_delegation",
     "capability_management_by_exception",
-    "capability_objective_lineage"
+    "capability_deployment_policy"
   ],
   "created": "2026-09-20",
   "decisions": [],
@@ -25,20 +26,20 @@
   "freshness": "slow_changing",
   "id": "company-executive-delegation",
   "inputs": [
-    "company/delegation_policy.yaml: seats, grants, budget ladder, autonomy map",
+    "company/delegation_policy.yaml: seats, grants, budget ladder, autonomy, functional authority",
     "company/org_registry.yaml and company/permissions.yaml, supplied by the caller",
-    "One AuthorityRequest: action, requesting seat, department, risk, optional amount",
+    "One AuthorityRequest: action, seat, department, risk, amount, implementer, reviewer",
     "An ExceptionContext the caller fills from the job, review and gate it already holds"
   ],
   "invariants": [
     "Shadow only: every decision and record refuses to claim authority to act, and mode=enforcing is refused at construction.",
     "The reserved set is read from company/permissions.yaml, never restated; a grant naming a reserved action is refused at load.",
-    "Changing the delegation policy, expanding authority, changing governance and an unclassified action are reserved unconditionally.",
-    "A seat never decides a request it raised, and self-approval is checked before any ceiling.",
+    "Deployment authority is classified and granted to nobody; an unrecognised kind is CEO-reserved.",
+    "A seat never decides a request it raised, implemented or reviewed, and none may overrule an independent control.",
     "Escalation stops at the lowest sufficient seat; a dormant, restricted or vacant seat decides nothing.",
-    "A subordinate grant may not exceed its escalation target on risk or on budget.",
-    "An unknown budget ceiling escalates rather than counting as unlimited; sibling ceilings may not sum past their parent.",
-    "Each objective records its parent intent digest, so an edited CEO objective orphans its decompositions."
+    "A subordinate grant may not exceed its escalation target on risk or budget; authority is granted, never taken.",
+    "An unknown budget ceiling escalates; sibling ceilings may not sum past their parent.",
+    "Money escalates through the CFO on a functional chain, because no reporting line passes through it."
   ],
   "last_reviewed": "2026-09-20",
   "may_read": [
@@ -65,29 +66,29 @@
   "outputs": [
     "An AuthorityDecision: APPROVED, REJECTED or ESCALATE, with the chain it walked",
     "An ExceptionReport naming why the CEO has to see this, empty for routine success",
-    "An ExecutiveDecisionRecord, appended and never rewritten",
-    "An ExecutiveBrief: outcome, cost against budget, decisions held internally, escalations",
+    "ManagementMetrics separating CEO decisions from CEO notifications",
+    "A DeploymentDecision saying what authority a deployment kind would need",
     "A ShadowReport proving the canonical CEO stop semantics still hold"
   ],
   "owner": "company-os",
   "owns_paths": [
     "company/delegation"
   ],
-  "purpose": "Calculates, in shadow, which seat would be competent to approve an action, where it escalates, which management exceptions the CEO must see, and how an objective decomposes inside a planning envelope. It authorizes nothing.",
+  "purpose": "Calculates, in shadow, which seat may approve an action, whether separation of duties allows it, where it escalates, which exceptions the CEO must see, and what authority a deployment would need. It authorizes nothing.",
   "recheck_on": "2027-09-20",
   "revalidation_reason": "",
   "risks": [
-    "Three registry employees are active, so most paths collapse onto studio_coo and chief_architect.",
-    "The cfo and engineering_manager seats are vacant because hiring an executive is CEO-reserved.",
-    "approve_deployment is granted to no seat and reserved by nobody: there is no deployment policy yet.",
-    "Historical scenarios are transcribed from reports on other branches, not read from a state directory."
+    "Nine of thirteen employees are dormant, so most department paths still collapse onto the COO.",
+    "The two new seats have decided nothing real; five replayed jobs are validation, not a burn-in.",
+    "Deployment is modelled and granted to nobody; a policy is not an activation.",
+    "Scenarios are transcribed from reports on other branches, not read from a store."
   ],
-  "source": "company-os-v1-executive-delegation-shadow",
+  "source": "company-os-v1-management-staffing-shadow",
   "source_digests": [],
   "status": "active",
   "tests": [
     "tests/test_company_delegation.py"
   ],
-  "title": "Company executive delegation (shadow)",
+  "title": "Company executive delegation and separation of duties (shadow)",
   "type": "module"
 }

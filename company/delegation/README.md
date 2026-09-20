@@ -16,9 +16,11 @@ carries no merge authority.
 ```
 ACTION
   -> is it CEO-reserved?            (read from company/permissions.yaml)
-  -> walk the chain upward:
+  -> walk the chain upward (with the CFO spliced in for money):
        does this seat hold the action?
        is it this seat's own request?
+       did its employee implement or review the work?
+       would it overrule an independent control?
        is the seat filled, active, and high enough on the autonomy ladder?
        is the risk inside its ceiling?
        is the amount inside its per-decision ceiling and every budget rung?
@@ -34,6 +36,8 @@ ACTION
 | `org.py` | seats, who fills them, and which can decide anything today |
 | `policy.py` | grants, ceilings, and the four structural refusals; loads the YAML |
 | `budget.py` | company → department → program → work order, with the sibling sum |
+| `deployment.py` | five deployment kinds, classified, and granted to nobody |
+| `metrics.py` | management-by-exception counts and the CEO report |
 | `authority.py` | `evaluate`: one request, one deterministic answer, and the chain |
 | `exceptions.py` | the closed set of conditions under which the CEO hears about it |
 | `objectives.py` | the objective ladder, intent digests, and the planning envelope |
@@ -48,6 +52,8 @@ ACTION
 ```
 python -m company.delegation policy     # seats, grants, reserved set, conflicts
 python -m company.delegation chart      # the hierarchy as a tree
+python -m company.delegation deployment # the deployment policy model
+python -m company.delegation report     # management-by-exception over the replay
 python -m company.delegation evaluate --request-file r.json
 python -m company.delegation replay     # the five historical scenarios
 python -m company.delegation shadow     # the five stop-semantics probes
@@ -57,9 +63,16 @@ Exit codes: 0 answered, 1 escalated or a failing condition, 2 malformed input.
 
 ## What this subsystem cannot do
 
-- It cannot hire. `cfo` and `engineering_manager` are declared and vacant
-  because creating either is `hire_or_remove_executive_role`, which the CEO
-  reserves. Requests that should land there escalate past them, visibly.
+- It cannot hire. `cfo` and `engineering_manager` are now filled, by explicit
+  CEO authorization recorded in `docs/company_os_management_staffing.md`. This
+  subsystem did not create them and cannot create another:
+  `hire_or_remove_executive_role` stays reserved.
+- It cannot deploy. `deployment.py` classifies what authority each of the five
+  deployment kinds would need; the policy grants none of it, and a grant naming
+  a deployment action is refused at load.
+- It cannot let one employee be two controls. A seat is disqualified from
+  deciding work its own employee implemented or reviewed, checked before any
+  ceiling.
 - It cannot delegate a reserved action. A grant naming one is refused at load.
 - It cannot widen itself. `change_delegation_policy` and `expand_authority` are
   reserved by this package unconditionally, whatever `permissions.yaml` says.

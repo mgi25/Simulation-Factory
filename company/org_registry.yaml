@@ -18,6 +18,13 @@ employees:
     mission: Route work, compress decisions, protect CEO attention.
     capabilities: [portfolio_routing, escalation, cross_department_coordination]
 
+  finance_operations_lead:
+    department: executive
+    manager: ceo
+    state: active
+    mission: Hold department and program budget ceilings, answer whether a spend fits, and escalate what does not.
+    capabilities: [budget_control, cost_analysis]
+
   research_opportunity_lead:
     department: intelligence
     manager: studio_coo
@@ -39,16 +46,23 @@ employees:
     mission: Protect architecture, contracts, reversibility, and long-term maintainability.
     capabilities: [software_architecture, dependency_governance, technology_migration]
 
-  software_implementation_engineer:
+  engineering_delivery_manager:
     department: engineering
     manager: chief_architect
+    state: active
+    mission: Decide routine engineering outcomes and bounded corrections without implementing or reviewing them.
+    capabilities: [delivery_management, escalation]
+
+  software_implementation_engineer:
+    department: engineering
+    manager: engineering_delivery_manager
     state: dormant
     mission: Implement authorized engineering work orders and the tests that prove them.
     capabilities: [software_implementation, test_engineering]
 
   simulation_physics_engineer:
     department: engineering
-    manager: chief_architect
+    manager: engineering_delivery_manager
     state: dormant
     mission: Develop competitive systems and validate determinism, fairness, and stability.
     capabilities: [simulation, physics, fairness, benchmarks]

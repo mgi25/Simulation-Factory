@@ -60,8 +60,16 @@ class ActionType(str, Enum):
     APPROVE_INTEGRATION_MERGE = "approve_integration_merge"
     APPROVE_ARCHITECTURE_REDESIGN = "approve_architecture_redesign"
     APPROVE_NEW_DEPENDENCY = "approve_new_dependency"
-    APPROVE_DEPLOYMENT = "approve_deployment"
     CHANGE_PRIMARY_ENGINE = "change_primary_engine"
+
+    # -- deployment, split five ways by company/delegation/deployment.py ----
+    # `APPROVE_DEPLOYMENT` is the public one *and* the fail-closed one: it
+    # carries both the PUBLIC_DEPLOYMENT kind and the UNKNOWN kind, and both
+    # are CEO-reserved, so an unrecognised deployment gets the largest answer.
+    APPROVE_LOCAL_INTEGRATION = "approve_local_integration"
+    APPROVE_CANONICAL_MERGE = "approve_canonical_merge"
+    APPROVE_STAGING_RELEASE = "approve_staging_release"
+    APPROVE_DEPLOYMENT = "approve_deployment"
 
     # -- money -------------------------------------------------------------
     APPROVE_OPERATING_SPEND = "approve_operating_spend"

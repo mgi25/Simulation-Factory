@@ -5,6 +5,8 @@
     python -m company.delegation replay   [--json]
     python -m company.delegation shadow   [--json]
     python -m company.delegation chart    [--json]
+    python -m company.delegation deployment [--json]
+    python -m company.delegation report   [--json]
 
 `policy` loads the delegation policy against the canonical bootstrap contracts
 and prints the seats, their standing and the conflicts between the declared
@@ -46,7 +48,9 @@ from .errors import DelegationError
 from .exceptions import classify
 from .org import CEO_SEAT, SeatKind
 from .policy import DelegationPolicy, load_delegation_policy, parse_risk
-from .scenarios import replay, summarise
+from .deployment import DEPLOYMENT_POLICY, policy_table
+from .metrics import DecisionOutcome, ManagementReport, measure, spend_of
+from .scenarios import CONTROL_SCENARIOS, SCENARIOS, replay, summarise
 from .shadow import verify_shadow_mode
 
 
@@ -76,6 +80,12 @@ def build_parser() -> argparse.ArgumentParser:
     commands.add_parser("chart", help="print the hierarchy as a tree")
     commands.add_parser("replay", help="run the historical scenarios")
     commands.add_parser("shadow", help="probe that the CEO stop semantics still hold")
+    commands.add_parser(
+        "deployment", help="print the deployment policy model (granted to nobody)"
+    )
+    commands.add_parser(
+        "report", help="the management-by-exception report over the replay"
+    )
 
     evaluate_cmd = commands.add_parser("evaluate", help="answer one authority request")
     evaluate_cmd.add_argument("--request-file", type=Path, required=True)
@@ -272,8 +282,59 @@ def _cmd_shadow(args: argparse.Namespace) -> int:
     return _ANSWERED if report.enforced else _ESCALATED
 
 
+def _cmd_deployment(args: argparse.Namespace) -> int:
+    if args.json:
+        print(json.dumps(to_jsonable(DEPLOYMENT_POLICY.to_dict()), indent=2, sort_keys=True))
+    else:
+        print(policy_table())
+        print("")
+        print("Granted to no seat in this version. Classifying what authority a")
+        print("deployment would need and granting it are two CEO decisions, and")
+        print("only the first has been taken.")
+    return _ANSWERED
+
+
+def _cmd_report(args: argparse.Namespace) -> int:
+    policy = _load_policy(args)
+    historical = [
+        DecisionOutcome(decision=item.decision, exceptions=item.exceptions)
+        for item in replay(policy, scenarios=SCENARIOS)
+    ]
+    controls = [
+        DecisionOutcome(decision=item.decision, exceptions=item.exceptions)
+        for item in replay(policy, scenarios=CONTROL_SCENARIOS)
+    ]
+    metrics = measure(
+        historical,
+        spend=spend_of(historical, policy.ladder.currency),
+        budget=policy.ladder.scope("engineering-operations").ceiling
+        if policy.ladder.scope("engineering-operations")
+        else None,
+    )
+    report = ManagementReport(
+        programme="Engineering reliability validation (five real jobs, replayed)",
+        metrics=metrics,
+        outcomes=(
+            "Three clean engineering jobs shipped to ready_for_approval",
+            "One reviewer-found defect corrected through a second bounded work order",
+            "One job stopped at pre-flight on a premise that turned out to be false",
+        ),
+        next_action=(
+            "Run the model in shadow beside live work before any authority is granted"
+        ),
+        control_metrics=measure(controls),
+    )
+    if args.json:
+        print(json.dumps(to_jsonable(report.to_dict()), indent=2, sort_keys=True))
+    else:
+        print(report.render())
+    return _ANSWERED if metrics.ceo_decisions_required == 0 else _ESCALATED
+
+
 _COMMANDS = {
     "policy": _cmd_policy,
+    "deployment": _cmd_deployment,
+    "report": _cmd_report,
     "chart": _cmd_chart,
     "evaluate": _cmd_evaluate,
     "replay": _cmd_replay,
