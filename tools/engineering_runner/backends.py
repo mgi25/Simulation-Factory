@@ -101,6 +101,20 @@ CODEX_PROBE_EXPECTED = "OK42"
 _CODEX_FAILURE_MARKERS = ("stream error", "ERROR:", '"detail"')
 
 
+def _claude_environment() -> dict[str, str]:
+    """The isolated environment for Project Factory Claude Code sessions.
+
+    Claude.ai-managed MCP servers are injected from the logged-in account and
+    are not controlled by --strict-mcp-config. Claude Code 2.1.63+ provides
+    ENABLE_CLAUDEAI_MCP_SERVERS=false specifically to opt out. Set it only on
+    runner-launched Claude subprocesses so normal interactive Claude usage on
+    the operator machine is unchanged.
+    """
+    environment = child_environment()
+    environment["ENABLE_CLAUDEAI_MCP_SERVERS"] = "false"
+    return environment
+
+
 @dataclass(frozen=True)
 class SessionRequest:
     """One session to launch: where, with what instructions, and how bounded."""
@@ -243,7 +257,7 @@ class ClaudeCodeBackend:
             [path, "--version"],
             cwd=Path.cwd(),
             timeout_s=120.0,
-            env=child_environment(),
+            env=_claude_environment(),
         )
         if not result.ok:
             return False, f"{path} --version exited {result.exit_code}"
@@ -306,7 +320,7 @@ class ClaudeCodeBackend:
             argv,
             cwd=request.cwd,
             timeout_s=request.timeout_s,
-            env=child_environment(),
+            env=_claude_environment(),
             stdin=request.instructions,
         )
         return self._read(request, result)
