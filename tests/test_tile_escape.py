@@ -483,22 +483,30 @@ def test_category_three_imports_no_other_category_and_no_company_os() -> None:
     import ast
     import pathlib
 
-    # The standard library, Pillow, and Category 3's own package. The boundary
-    # this guard holds is the *workstream* one - no race, no duel, no Company
-    # OS - so the list grows when Category 3 needs another stdlib module and
-    # never when it needs another package.
+    # The standard library, Pillow, numpy, and Category 3's own package. The
+    # boundary this guard holds is the *workstream* one - no race, no duel, no
+    # Company OS - so the list grows when Category 3 needs another stdlib
+    # module and never when it needs another workstream.
     #
     # `glob`, `shutil` and `subprocess` arrived with Phase 3's Godot driver,
     # which finds the binary, launches it and collects the PNGs it wrote. Every
     # other render driver in this repository does the same three things.
+    #
+    # `array`, `collections` and `numpy` arrived with Phase 5's soundtrack:
+    # a mono cue is an `array("d")`, the limiter's sliding minimum is a
+    # `deque`, and every loudness measurement is numpy, which is already a
+    # declared dependency of this repository.
     allowed = {
         "__future__",
         "argparse",
+        "array",
+        "collections",
         "dataclasses",
         "glob",
         "hashlib",
         "json",
         "math",
+        "numpy",
         "os",
         "PIL",
         "random",
@@ -510,8 +518,74 @@ def test_category_three_imports_no_other_category_and_no_company_os() -> None:
         "typing",
         "satisfying",
     }
+    # And `audio/`, which is the one package outside `satisfying/` that
+    # Category 3 is allowed to reach - but only these three modules of it, and
+    # `test_category_three_uses_only_the_leaf_audio_modules` is why that is a
+    # boundary rather than a hole.
+    allowed_audio = {"audio.synthesis", "audio.wav_io", "audio.loudness"}
+
     package = pathlib.Path(REPO_ROOT) / "satisfying"
     for path in sorted(package.rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                names = [alias.name for alias in node.names]
+            elif isinstance(node, ast.ImportFrom):
+                names = [
+                    f"{node.module}.{alias.name}" if node.module else alias.name
+                    for alias in node.names
+                ]
+            else:
+                continue
+            for name in names:
+                if name.split(".")[0] != "audio":
+                    assert name.split(".")[0] in allowed, (
+                        f"{path.name} imports {name.split('.')[0]!r}"
+                    )
+                    continue
+                # `from audio import loudness` and `from audio.loudness import x`
+                # both have to land on the same three-module allowlist.
+                module = name if name.count(".") else name
+                while module and module not in allowed_audio:
+                    module = module.rsplit(".", 1)[0] if "." in module else ""
+                assert module in allowed_audio, (
+                    f"{path.name} imports {name!r}; Category 3 may use only "
+                    f"{sorted(allowed_audio)}"
+                )
+
+
+def test_category_three_uses_only_the_leaf_audio_modules() -> None:
+    """The `audio/` dependency is a leaf, and that is what makes it allowed.
+
+    Phase 5 needed oscillators, a WAV writer and a loudness meter, and the
+    repository already had all three. Reimplementing them inside `satisfying/`
+    would have meant a second true-peak meter that could drift from the first,
+    so the guard above was widened to let Category 3 reach `audio/`.
+
+    Widening it would have been a hole rather than a boundary without this
+    test. `audio/soundtrack.py` opens with `from audio import cues` - the
+    battle cue library - so importing it for its mastering functions would
+    have pulled another workstream's sound design into Category 3's import
+    graph. Phase 5's first draft did exactly that, this guard caught it, and
+    `satisfying/tile_audio.py` now carries its own sixty-line master stage
+    instead.
+
+    So the three modules Category 3 may reach are checked here to import
+    nothing but the standard library and numpy. If one of them ever grows a
+    dependency on the rest of `audio/`, this fails before the guard above
+    starts silently allowing it.
+    """
+    import ast
+    import pathlib
+
+    leaves = ("synthesis", "wav_io", "loudness")
+    stdlib_and_numpy = {
+        "__future__", "array", "dataclasses", "hashlib", "math", "numpy",
+        "os", "struct", "sys", "typing", "wave",
+    }
+    for name in leaves:
+        path = pathlib.Path(REPO_ROOT) / "audio" / f"{name}.py"
+        assert path.is_file(), f"audio/{name}.py is gone"
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
@@ -521,7 +595,10 @@ def test_category_three_imports_no_other_category_and_no_company_os() -> None:
             else:
                 continue
             for root in roots:
-                assert root in allowed, f"{path.name} imports {root!r}"
+                assert root in stdlib_and_numpy, (
+                    f"audio/{name}.py imports {root!r}, so it is no longer a "
+                    "leaf and Category 3 may no longer depend on it"
+                )
 
 
 def test_no_other_category_imports_category_three() -> None:
