@@ -898,31 +898,53 @@ instead of `csv`, for exactly this reason. No Phase 1 test was touched.
 | `tests/test_tile_escape.py` (Phase 1, 39 tests) | **pass**, file unmodified |
 | `tests/test_tile_escape_phase2.py` (Phase 2, 58 tests) | **pass** |
 | `test_this_branch_changed_no_race_fight_or_v30_code` x 3, plus their three `test_the_branch_guard_still_refuses_...` partners | **pass** (6 tests) |
+| full repository suite | 18 failed, 5822 passed, 440 skipped — **the same 18 fail on the Phase 1 base**, see 12.5 |
 
 The branch guards are the ones that matter most here, because they are the
 tests Phase 1 had to work around: they diff `origin/main...HEAD` and reject any
 file added under a declared production root. They pass because nothing was added
 under one.
 
-### 12.5 Why no existing behaviour can have changed
+### 12.5 The full suite, before and after
 
-`git status` on this branch lists **19 untracked files and zero modified files**.
-Every path is new: three modules under `satisfying/`, one test file under
-`tests/`, one report and fifteen evidence files under `docs/`. No existing
-module, test, fixture or configuration file was edited, renamed or deleted, and
-nothing under `satisfying/` is imported by anything outside it - Phase 1's
-`test_no_other_category_imports_category_three` walks sixteen subsystem roots
-and asserts exactly that, and it still passes.
+```
+72e29f6 (Phase 2)   18 failed, 5822 passed, 440 skipped in 1481s
+7b7f0f8 (Phase 1)   the same 18, test for test
+```
 
-So no pre-existing test can have changed behaviour through this branch: there is
-no edited code for it to observe. **No unrelated test guard was modified,
-skipped or xfailed to make anything pass.**
+The full suite was run on this commit, and then the **exact 18 failing node ids
+were re-run on the Phase 1 base commit `7b7f0f8`**. All 18 fail there too.
+**Phase 2 introduces no new failure.**
 
-The repository's full suite carries a set of failures that predate this branch
-and belong to other workstreams; it is slow enough that a full before-and-after
-comparison was not run for this phase, and the argument above is the stronger
-one in any case - a diff of pure additions cannot regress a test that does not
-import them.
+The 18 are two pre-existing groups, neither of which belongs to Category 3:
+
+- **12 stale cross-workstream branch guards** — `test_race2_v30_stage`,
+  `v301_stage`, `v311_track` (2), `v321_geometry`, `v32_final` (6),
+  `v33_bookends`. Each diffs `origin/main...HEAD` and asserts the branch changed
+  only its own workstream's files, so on *any* branch whose diff from `main` is
+  wider than its allowlist it fails. The list they print is dominated by
+  `.gitignore`, `ai_platform/` and `company/` — the Company OS integration — with
+  the nine `satisfying/` files appended, six of which are Phase 1's. Phase 2
+  lengthens a list that was already failing; it changes no verdict.
+- **6 missing-artefact failures** — `test_neon_proof` (1),
+  `test_sloped_v251_world` (4), `test_sloped_v252_world` (1). All six open a file
+  under `output/` (`output/neon_v11/neon_7.json`,
+  `output/sloped_race_v1/cameras_v221_5432.json`). `output/` is an un-gitted
+  render directory that does not exist in this worktree, so these fail on
+  environment rather than on code.
+
+Two facts make this conclusive rather than merely reassuring.
+`git diff --name-status 7b7f0f8..HEAD` reports **`A` for all 20 paths and
+nothing else** — no `M`, no `D`, no `R`. And nothing under `satisfying/` is
+imported from outside it, which Phase 1's
+`test_no_other_category_imports_category_three` asserts by walking sixteen
+subsystem roots. A diff of pure additions that nothing imports cannot regress a
+test that does not reference it.
+
+**No unrelated test guard was modified, skipped or xfailed to make anything
+pass.** The 13 stale guards are a repository-level problem for whoever owns
+them; widening their allowlists from a Category 3 branch is the same
+overreach Phase 1 declined in its section 2.1.
 
 ## 13. Evidence
 
