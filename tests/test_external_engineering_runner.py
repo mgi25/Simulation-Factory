@@ -1286,7 +1286,7 @@ def test_consumer_developer_has_no_model_owned_shell_or_todo_loop(repository):
     control = ScriptedControlPlane(repository["base"], states=["planning"])
     backend = ScriptedBackend(edit=_in_scope_edit)
 
-    _runner(repository, backend, control).run_one(WORK_ORDER)
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
 
     developer = [item for item in backend.launched if item.role == "developer"][0]
     assert developer.allowed_tools == ("Read", "Write", "Edit", "Glob", "Grep")
@@ -1295,6 +1295,13 @@ def test_consumer_developer_has_no_model_owned_shell_or_todo_loop(repository):
     assert "Do not run these tests inside this model session." in developer.instructions
     assert "tests/test_subject.py" in developer.instructions
     assert "Run them yourself" not in developer.instructions
+
+    resources = json.loads(
+        (Path(report.run_dir) / "developer-01" / "resources.json").read_text("utf-8")
+    )
+    assert resources["available_tools"] == ["Read", "Write", "Edit", "Glob", "Grep"]
+    assert resources["deterministic_validation_owner"] == "runner"
+    assert resources["model_runs_required_tests"] is False
 
 
 def test_expanded_developer_keeps_the_operator_shell_capability(repository):
