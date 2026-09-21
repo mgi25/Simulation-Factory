@@ -37,7 +37,7 @@ from pathlib import Path
 import sys
 
 from .errors import ConfigurationError
-from .resources import DEFAULT_TIER_MODELS, STANDARD, STRONGEST
+from .resources import DEFAULT_TIER_MODELS, ECONOMY, STANDARD, STRONGEST
 
 
 # The CLI a coding session is launched through, by name. Resolved to an
@@ -85,6 +85,7 @@ class RunnerConfig:
     # Which vendor model each tier means. The company never names a model;
     # this is the one place a tier becomes one, and aliases are used so the
     # account's current model of each strength is what runs.
+    economy_model: str = DEFAULT_TIER_MODELS[ECONOMY]
     standard_model: str = DEFAULT_TIER_MODELS[STANDARD]
     strongest_model: str = DEFAULT_TIER_MODELS[STRONGEST]
     # Whether to apply the recommendation at all. False records it and runs
@@ -115,7 +116,11 @@ class RunnerConfig:
     disallowed_tools: tuple[str, ...] = DEFAULT_DISALLOWED_TOOLS
 
     def tier_models(self) -> dict[str, str]:
-        return {STANDARD: self.standard_model, STRONGEST: self.strongest_model}
+        return {
+            ECONOMY: self.economy_model,
+            STANDARD: self.standard_model,
+            STRONGEST: self.strongest_model,
+        }
 
     def __post_init__(self) -> None:
         for name in ("repo_root", "state_dir", "runner_dir", "worktree_root"):
@@ -164,6 +169,7 @@ class RunnerConfig:
             "reviewer_backend": self.reviewer_backend_name,
             "developer_model": self.developer_model,
             "reviewer_model": self.reviewer_model,
+            "economy_model": self.economy_model,
             "standard_model": self.standard_model,
             "strongest_model": self.strongest_model,
             "apply_resource_strategy": self.apply_resource_strategy,
