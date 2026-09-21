@@ -1,0 +1,48 @@
+{
+  "validation_id": "val-token-efficiency-v4-p1-static-2026-09-21",
+  "objective_id": "obj-token-efficiency-v4-2026-09-21",
+  "implementation_branch": "project-factory-token-efficiency-v4-p1",
+  "implementation_commit": "41b7f6df5fda38578c553db1114bdca2a2afb8d1",
+  "validated_on": "2026-09-21",
+  "model_calls_used_for_validation": 0,
+  "focused_validation": {
+    "compileall": "pass",
+    "pytest_selected": 419,
+    "pytest_passed": 419,
+    "pytest_failed": 0,
+    "duration_seconds": 104.24
+  },
+  "installed_claude_code": {
+    "version": "2.1.70",
+    "help_exposes": [
+      "--allowedTools",
+      "--disallowedTools",
+      "--mcp-config",
+      "--strict-mcp-config",
+      "--tools"
+    ],
+    "help_does_not_expose": [
+      "--max-turns",
+      "--safe-mode"
+    ]
+  },
+  "mcp_isolation_probe": {
+    "empty_config_with_strict_mcp_only": "claude.ai Claude Docs remained connected",
+    "with_ENABLE_CLAUDEAI_MCP_SERVERS_false": "No MCP servers configured",
+    "result": "account-injected Claude.ai MCP isolation confirmed on installed CLI"
+  },
+  "p1_controls_at_commit": [
+    "bounded worker tools are passed through --tools as the available built-in tool set",
+    "the same bounded worker tools remain passed through --allowedTools for permission",
+    "--strict-mcp-config is combined with an explicit empty MCP config",
+    "Project Factory Claude subprocesses set ENABLE_CLAUDEAI_MCP_SERVERS=false without changing the operator's global environment",
+    "system/init startup surface is parsed into bounded session evidence"
+  ],
+  "status": "static_controls_green_gate_pending",
+  "notes": [
+    "No run-one or paid Claude model session was used for this validation.",
+    "The next step is deterministic required-suite and integration-gate validation at the exact P1 commit before any paid startup-surface probe.",
+    "No canonical merge, deployment, publishing or production integration is authorized."
+  ],
+  "version": "token_efficiency_v4_p1_static_validation_v1"
+}
