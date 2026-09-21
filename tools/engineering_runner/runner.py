@@ -83,7 +83,7 @@ from .briefs import (
     review_instructions,
 )
 from .execution_context import failure_symbol_hints
-from .repo_map import RepoMap, build_repo_map
+from .repo_map import RepoMap, build_repo_map, build_repo_map_cached
 from .config import RunnerConfig
 from .controlplane import ControlPlane
 from .errors import (
@@ -780,7 +780,7 @@ class EngineeringRunner:
                 },
             )
 
-        repo_map = self._repo_map(worktree)
+        repo_map, repo_map_cache = self._repo_map(worktree)
         context_bundle = developer_execution_context(
             repo_map,
             envelope=envelope,
@@ -792,6 +792,7 @@ class EngineeringRunner:
         )
         applied = {
             **applied,
+            "repository_map_cache": repo_map_cache,
             "compiled_context": {
                 "artifact": str(context_path),
                 "fingerprint": context_bundle.fingerprint(),
@@ -1097,6 +1098,12 @@ class EngineeringRunner:
         developer_report = read_json_object(
             developer_dir / DEVELOPER_REPORT_NAME, "the developer report"
         )
+        repo_map, repo_map_cache = self._repo_map(worktree)
+        applied = {
+            **applied,
+            "repository_map_cache": repo_map_cache,
+        }
+        write_json(stage_dir / "resources.json", applied)
         instructions = review_instructions(
             envelope,
             diff_path=diff_path,
@@ -1104,7 +1111,7 @@ class EngineeringRunner:
             receipt=receipt,
             developer_report=developer_report,
             strategy=strategy,
-            repo_map=self._repo_map(worktree),
+            repo_map=repo_map,
         )
         write_text(stage_dir / "instructions.md", instructions)
 
@@ -1429,21 +1436,35 @@ class EngineeringRunner:
             ]
         return tuple(rendered[-6:])
 
-    def _repo_map(self, worktree: Path) -> RepoMap | None:
-        """The deterministic map of the worktree the session is about to read.
+    def _repo_map(self, worktree: Path) -> tuple[RepoMap | None, dict[str, Any]]:
+        """The deterministic map plus measured content-addressed-cache reuse.
 
-        Built fresh per stage rather than cached across work orders: each
-        work order's worktree can sit at a different commit, a stale map
-        naming a file that moved is worse than no map, and a full `ast` parse
-        of `company/` + `tools/` + `tests/` measures at about two seconds -
-        negligible beside a session that runs for minutes. Best-effort: a map
-        that failed to build is a missing convenience, never a reason to stop
-        an authorized session.
+        P4 keeps cache state under the runner's own directory, never in the
+        repository or Company OS state. The cache is advisory: its keys prove
+        exact source identity, and any cache I/O failure falls back to a fresh
+        deterministic build rather than changing authority or blocking work.
         """
+        cache_root = self.config.runner_dir / "cache" / "repo-map"
         try:
-            return build_repo_map(worktree)
+            repo_map, evidence = build_repo_map_cached(
+                worktree,
+                cache_root,
+            )
+            return repo_map, {
+                "available": True,
+                **evidence.to_dict(),
+            }
         except OSError:
-            return None
+            try:
+                return build_repo_map(worktree), {
+                    "available": False,
+                    "fallback": "fresh deterministic build after cache I/O failure",
+                }
+            except OSError:
+                return None, {
+                    "available": False,
+                    "fallback": "repository map unavailable",
+                }
 
     def _state(self, work_order_id: str) -> str:
         reply = self._control.status(work_order_id)
