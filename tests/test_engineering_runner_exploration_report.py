@@ -259,3 +259,87 @@ def test_summarise_counts_unreliable_sessions(tmp_path: Path) -> None:
     )
     summary = summarise(discover_measurements([base]))
     assert summary["sessions_with_unreliable_metrics"] == 1
+
+
+def test_numbered_sessions_are_measured_instead_of_a_last_session_alias_or_receipt(
+    tmp_path: Path,
+) -> None:
+    """A stage can contain multiple paid provider subprocesses.
+
+    The numbered artifacts are the source of truth. Neither the aggregate
+    receipt nor the mutable last-session alias may hide session-1.
+    """
+    base = tmp_path / "runner-state"
+    stage = base / "runs" / "wo-x" / "run-000001" / "developer-01"
+    _write_json(
+        stage / "receipt.json",
+        {
+            "files_changed": ["a.py"],
+            "usage": {"provider_cost": "3.500000", "cache_hits": 1250},
+        },
+    )
+    _write_json(
+        stage / "session.json",
+        {"cost_usd": 0.5, "cache_read_units": 250, "output_units": 50},
+    )
+    _write_json(
+        stage / "session-1.json",
+        {"cost_usd": 3.0, "cache_read_units": 1000, "output_units": 100},
+    )
+    _write_json(
+        stage / "session-2.json",
+        {"cost_usd": 0.5, "cache_read_units": 250, "output_units": 50},
+    )
+
+    measurements = discover_measurements([base])
+
+    assert len(measurements) == 2
+    assert [item.label.rsplit("/", 1)[-1] for item in measurements] == [
+        "session-1",
+        "session-2",
+    ]
+    assert sum(item.cost_usd or 0 for item in measurements) == 3.5
+    assert sum(item.cache_read_units or 0 for item in measurements) == 1250
+
+
+def test_numbered_exploration_traces_are_not_collapsed_to_the_latest_alias(
+    tmp_path: Path,
+) -> None:
+    base = tmp_path / "runner-state"
+    stage = base / "runs" / "wo-x" / "run-000001" / "developer-01"
+    first = {
+        "format": "stream_json",
+        "file_reads_total": 10,
+        "file_reads_unique": 4,
+        "file_reads_repeated": 6,
+        "searches_total": 5,
+        "searches_repeated": 0,
+        "git_commands": 0,
+        "test_commands": 1,
+        "other_shell_commands": 10,
+        "events": [],
+    }
+    second = {
+        "format": "stream_json",
+        "file_reads_total": 2,
+        "file_reads_unique": 2,
+        "file_reads_repeated": 0,
+        "searches_total": 0,
+        "searches_repeated": 0,
+        "git_commands": 0,
+        "test_commands": 1,
+        "other_shell_commands": 2,
+        "events": [],
+    }
+    _write_json(stage / "exploration-1.json", first)
+    _write_json(stage / "exploration-2.json", second)
+    _write_json(stage / "exploration.json", second)
+
+    measurements = discover_exploration([base])
+
+    assert len(measurements) == 2
+    assert [item.file_reads_total for item in measurements] == [10, 2]
+    assert [item.label.rsplit("/", 1)[-1] for item in measurements] == [
+        "exploration-1",
+        "exploration-2",
+    ]
