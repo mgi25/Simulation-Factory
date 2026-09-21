@@ -691,6 +691,17 @@ def test_the_company_os_seed_capsules_load(seeds):
     assert operations.tests
 
 
+def test_the_delegation_capsule_pins_planning_tests_as_semantic(seeds):
+    """The objective-planning and executive-planning suites are semantic tests of
+    company-executive-delegation: they replay the established regression scenarios
+    and verify what functional authority means at the planning layer, not merely
+    that the delegation code compiles and routes correctly."""
+    capsule = seeds.get("company-executive-delegation")
+    assert "tests/test_company_delegation.py" in capsule.tests
+    assert "tests/test_company_objective_planning.py" in capsule.tests
+    assert "tests/test_company_executive_planning.py" in capsule.tests
+
+
 def test_every_seed_names_a_test_file_that_exists(seeds):
     for capsule in seeds.all():
         for test_ref in capsule.tests:

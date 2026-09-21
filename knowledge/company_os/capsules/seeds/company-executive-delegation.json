@@ -27,19 +27,18 @@
   "id": "company-executive-delegation",
   "inputs": [
     "company/delegation_policy.yaml: seats, grants, budget ladder, autonomy, functional authority",
-    "company/org_registry.yaml and company/permissions.yaml, supplied by the caller",
+    "company/org_registry.yaml and company/permissions.yaml, caller-supplied",
     "One AuthorityRequest: action, seat, department, risk, amount, implementer, reviewer",
     "An ExceptionContext the caller fills from the job, review and gate it already holds"
   ],
   "invariants": [
-    "Shadow only: every decision and record refuses to claim authority to act, and mode=enforcing is refused at construction.",
-    "The reserved set is read from company/permissions.yaml, never restated; a grant naming a reserved action is refused at load.",
+    "Shadow only: every decision and record refuses to claim authority; mode=enforcing is refused at construction.",
+    "Reserved actions come from company/permissions.yaml, never restated; a grant naming one is refused at load.",
     "Deployment authority is classified and granted to nobody; an unrecognised kind is CEO-reserved.",
-    "A seat never decides a request it raised, implemented or reviewed, and none may overrule an independent control.",
+    "A seat never decides a request it raised, implemented or reviewed; none may overrule an independent control.",
     "Escalation stops at the lowest sufficient seat; a dormant, restricted or vacant seat decides nothing.",
     "A subordinate grant may not exceed its escalation target on risk or budget; authority is granted, never taken.",
-    "An unknown budget ceiling escalates; sibling ceilings may not sum past their parent.",
-    "Money escalates through the CFO on a functional chain, because no reporting line passes through it."
+    "An unknown ceiling escalates; sibling ceilings may not sum past their parent; money escalates via the CFO, not the reporting line."
   ],
   "last_reviewed": "2026-09-20",
   "may_read": [
@@ -64,8 +63,7 @@
     "tools/**"
   ],
   "outputs": [
-    "An AuthorityDecision: APPROVED, REJECTED or ESCALATE, with the chain it walked",
-    "An ExceptionReport naming why the CEO has to see this, empty for routine success",
+    "An AuthorityDecision (APPROVED, REJECTED or ESCALATE) with the chain it walked; an ExceptionReport naming why the CEO must see this, empty on success.",
     "ManagementMetrics separating CEO decisions from CEO notifications",
     "A DeploymentDecision saying what authority a deployment kind would need",
     "A ShadowReport proving the canonical CEO stop semantics still hold"
@@ -79,15 +77,17 @@
   "revalidation_reason": "",
   "risks": [
     "Nine of thirteen employees are dormant, so most department paths still collapse onto the COO.",
-    "The two new seats have decided nothing real; five replayed jobs are validation, not a burn-in.",
-    "Deployment is modelled and granted to nobody; a policy is not an activation.",
+    "The two new seats have decided nothing real; five replayed jobs are not a burn-in.",
+    "A deployment policy is not an activation.",
     "Scenarios are transcribed from reports on other branches, not read from a store."
   ],
   "source": "company-os-v1-management-staffing-shadow",
   "source_digests": [],
   "status": "active",
   "tests": [
-    "tests/test_company_delegation.py"
+    "tests/test_company_delegation.py",
+    "tests/test_company_objective_planning.py",
+    "tests/test_company_executive_planning.py"
   ],
   "title": "Company executive delegation and separation of duties (shadow)",
   "type": "module"
