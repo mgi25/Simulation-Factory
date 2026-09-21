@@ -2778,9 +2778,12 @@ def test_the_runner_refuses_an_artifact_version_it_cannot_read(repository):
         ResourceStrategy.parse(payload)
 
 
-def test_the_runner_refuses_a_tier_it_does_not_know(repository):
+@pytest.mark.parametrize("tier", ["cheapest", "economy"])
+def test_the_runner_refuses_a_primary_tier_that_bypasses_adaptive_routing(
+    repository, tier
+):
     payload = developer_briefing(repository["base"])
-    payload["efficiency"]["model_tier"] = "cheapest"
+    payload["efficiency"]["model_tier"] = tier
     with pytest.raises(IntegrityFailure, match="model tier"):
         ResourceStrategy.parse(payload)
 
