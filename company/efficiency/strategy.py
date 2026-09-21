@@ -18,8 +18,10 @@ session, so it cannot enforce one - and this module never pretends it does.
 low-to-medium risk, concrete acceptance criteria. **Strongest** is for class D
 and above - specialist judgment, deep reasoning, multi-perspective review -
 for HIGH and CRITICAL risk, for explicit escalation, and for a correction
-attempt after a standard-tier attempt failed review. There is no tier below
-standard: the quality constraint is hard.
+attempt after a standard-tier attempt failed review. `Standard` remains the Company OS recommendation for routine implementation.
+P5 adds an `economy` *downshift target* that the runner may use only after
+free deterministic execution evidence proves the task is narrowly localized;
+Company OS never emits `economy` as the primary model tier.
 
 The default used to be unreachable. `EngineeringWorkOrder.task_specification`
 declared a specialist domain for every work order, so the classifier's
@@ -280,8 +282,11 @@ def select_strategy(
     - **a cheaper capable model already failed** - a correction attempt after a
       standard-tier attempt did not satisfy review.
 
-    Everything else is routine and gets the profile's routine tier. That is
-    the whole cost lever, and before this milestone it could not be pulled:
+    Everything else is routine and gets the profile's routine tier. P5 may
+    separately mark a narrow first-attempt developer task as an economy
+    candidate, but the primary tier remains standard until the runner proves
+    localization from the immutable-base diagnostic. Before the original
+    standard-tier milestone this cost lever could not be pulled:
     every engineering work order declared a specialist domain, so every job
     classified D and the standard tier was unreachable in production.
 
