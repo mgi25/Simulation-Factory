@@ -557,5 +557,6 @@ __all__ = [
     "files_read_never_changed",
     "files_read_outside_neighborhood",
     "parse_exploration",
+    "parse_startup_context",
     "split_result_envelope",
 ]
