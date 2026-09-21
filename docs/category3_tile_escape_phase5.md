@@ -917,7 +917,35 @@ dispersion that was measured and removed.
 
 Both measured with `python -m pytest -q` on the committed tree.
 
-REGRESSION_TABLE
+| | failures | passed | skipped |
+|---|---|---|---|
+| `85c4e89` (Phase 4, as that report recorded it) | **18** | 5,937 | 440 |
+| `e434fe5` (this branch, committed) | **18** | 6,012 | 440 |
+
+**The two failure sets are byte-identical** — diffed, not eyeballed — so Phase 5
+adds no failure and fixes none. The deltas account for themselves exactly:
+
+```
+5,937  Phase 4 passes
+  +74  Phase 5 tests
+   +1  test_category_three_uses_only_the_leaf_audio_modules, the new half of
+       the boundary guard in section 2.1
+-----
+6,012
+```
+
+17 min 53 s, against Phase 4's 16 min 02 s.
+
+**And a nineteenth failure was found and fixed on the way**, which is the part
+worth recording. The first full run came back **19 failed / 6,010 passed**, and
+the extra one was
+`tests/test_tile_escape.py::test_category_three_imports_no_other_category_and_no_company_os`
+— Phase 1's boundary guard, catching Phase 5's own import of
+`audio/soundtrack.py`. Section 2.1 is what happened next. Per
+[[suite-has-14-known-failures]] a failure above the base is real until proven
+otherwise; this one was real, and the fix was to remove the dependency rather
+than to widen the guard around it.
+
 
 The eighteen are the fingerprint Phases 2, 3 and 4 all recorded: twelve stale
 cross-workstream branch guards that diff `origin/main...HEAD` and reject
