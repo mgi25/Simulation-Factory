@@ -1,0 +1,39 @@
+{
+  "request_id": "req-token-efficiency-v4-review-separation-yaml-dependency",
+  "objective": "Make the review-separation regression suite use the repository's canonical YAML-subset loader instead of an undeclared PyYAML import.",
+  "requested_by": "MGI",
+  "requested_on": "2026-09-21",
+  "subsystem_hint": "company/engineering",
+  "capsule_hints": [
+    "company-engineering-execution"
+  ],
+  "scope_ceiling": [
+    "tests/test_company_review_separation.py"
+  ],
+  "acceptance_criteria": [
+    "Only tests/test_company_review_separation.py is modified.",
+    "The test file no longer imports yaml or PyYAML.",
+    "The registry fixture loads company/org_registry.yaml with company.validation.yaml_subset.load_yaml_subset.",
+    "All existing review-separation behavioral assertions remain unchanged.",
+    "tests/test_company_review_separation.py passes in the repository's declared validation environment without installing PyYAML.",
+    "No dependency manifest, runtime code, capsule metadata, governance file or production code is modified."
+  ],
+  "constraints": [
+    "Test dependency repair only.",
+    "Do not add PyYAML to requirements.txt or any dependency manifest.",
+    "Do not alter review-separation behavior, authority rules, employees, seats, permissions or assertions.",
+    "Do not weaken or remove tests.",
+    "Do not modify canonical main, production simulation code, Company OS runtime behavior, or CEO-reserved actions.",
+    "The runner, not the model session, owns deterministic test execution under Token Efficiency V4 P2."
+  ],
+  "authorized_branch": "eng-token-efficiency-v4-review-separation-yaml-dependency",
+  "base_commit": "615dfea4ddadc56bedc108d91aae1663448f9f94",
+  "max_developer_attempts": 1,
+  "risk": "low",
+  "reversible": true,
+  "specialist_domain": "",
+  "novel": false,
+  "escalate_reasoning": false,
+  "resource_profile": "consumer",
+  "notes": "Pre-existing test dependency repair exposed by extended P2 validation. Keep its provider usage separate from the matched benchmark accounting."
+}
