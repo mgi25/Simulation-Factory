@@ -60,7 +60,9 @@ proxy rather than dressed up as the real thing.
 from __future__ import annotations
 
 import ast
+import hashlib
 import json
+import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -80,6 +82,37 @@ DEFAULT_ROOTS: tuple[str, ...] = (
 _EXCLUDED_PARTS = frozenset({".git", "__pycache__", ".venv", "venv", "node_modules"})
 
 _TOKEN_RE = re.compile(r"[a-zA-Z0-9]+")
+
+# P4: cache parser/index products only when their source identity proves they
+# belong to the exact repository content being mapped. Increment this if the
+# serialized map semantics change in a way old entries cannot represent.
+REPO_MAP_CACHE_VERSION = 1
+
+
+@dataclass(frozen=True)
+class RepoMapCacheEvidence:
+    """Measured reuse from one deterministic repository-map build."""
+
+    version: int
+    tree_fingerprint: str
+    roots: tuple[str, ...]
+    module_count: int
+    module_hits: int
+    module_misses: int
+    snapshot_hit: bool
+    invalid_entries: int = 0
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "version": self.version,
+            "tree_fingerprint": self.tree_fingerprint,
+            "roots": list(self.roots),
+            "module_count": self.module_count,
+            "module_hits": self.module_hits,
+            "module_misses": self.module_misses,
+            "snapshot_hit": self.snapshot_hit,
+            "invalid_entries": self.invalid_entries,
+        }
 
 
 def _tokenize(text: str) -> tuple[str, ...]:
@@ -303,9 +336,10 @@ def _symbol_spans(tree: ast.AST) -> tuple[SymbolSpan, ...]:
     return tuple(spans)
 
 
-def _module_map(repo_root: Path, path: Path, owner_root: str) -> ModuleMap:
+def _module_map_from_text(
+    repo_root: Path, path: Path, owner_root: str, text: str
+) -> ModuleMap:
     rel = path.relative_to(repo_root).as_posix()
-    text = path.read_text(encoding="utf-8", errors="replace")
     owner = "/".join(path.relative_to(repo_root).parts[:-1]) or owner_root
     try:
         tree = ast.parse(text, filename=str(path))
@@ -330,6 +364,71 @@ def _module_map(repo_root: Path, path: Path, owner_root: str) -> ModuleMap:
         is_entry_point=entry_point,
         symbols=_symbol_spans(tree),
     )
+
+
+def _module_map(repo_root: Path, path: Path, owner_root: str) -> ModuleMap:
+    return _module_map_from_text(
+        repo_root,
+        path,
+        owner_root,
+        path.read_text(encoding="utf-8", errors="replace"),
+    )
+
+
+def _assemble_repo_map(
+    modules: Iterable[ModuleMap], roots: tuple[str, ...]
+) -> RepoMap:
+    modules_t = tuple(sorted(modules, key=lambda module: module.path))
+    return RepoMap(
+        modules=modules_t,
+        tests_by_module=_reverse_test_index(modules_t),
+        production_dependents=_reverse_production_index(modules_t),
+        roots=roots,
+    )
+
+
+def _module_cache_key(relative_path: str, raw: bytes) -> str:
+    digest = hashlib.sha256()
+    digest.update(f"repo-map-v{REPO_MAP_CACHE_VERSION}\0".encode("utf-8"))
+    digest.update(relative_path.encode("utf-8"))
+    digest.update(b"\0")
+    digest.update(raw)
+    return digest.hexdigest()
+
+
+def _tree_cache_key(
+    roots: tuple[str, ...], entries: Iterable[tuple[str, str]]
+) -> str:
+    digest = hashlib.sha256()
+    digest.update(f"repo-map-tree-v{REPO_MAP_CACHE_VERSION}\0".encode("utf-8"))
+    for root in roots:
+        digest.update(root.encode("utf-8"))
+        digest.update(b"\0")
+    for relative_path, module_key in entries:
+        digest.update(relative_path.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(module_key.encode("ascii"))
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def _cache_object(path: Path) -> dict[str, object] | None:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _write_cache_object(path: Path, payload: Mapping[str, object]) -> None:
+    """Atomically publish one disposable runner-owned cache object."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    temporary.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    temporary.replace(path)
 
 
 def _resolve_imports_to_paths(
@@ -406,15 +505,145 @@ def build_repo_map(repo_root: Path, *, roots: Iterable[str] = DEFAULT_ROOTS) -> 
             if _EXCLUDED_PARTS & set(path.parts):
                 continue
             modules.append(_module_map(repo_root, path, root_name))
-    modules.sort(key=lambda m: m.path)
-    modules_t = tuple(modules)
-    tests_index = _reverse_test_index(modules_t)
-    production_index = _reverse_production_index(modules_t)
-    return RepoMap(
-        modules=modules_t,
-        tests_by_module=tests_index,
-        production_dependents=production_index,
-        roots=roots,
+    return _assemble_repo_map(modules, roots)
+
+
+def build_repo_map_cached(
+    repo_root: Path,
+    cache_root: Path,
+    *,
+    roots: Iterable[str] = DEFAULT_ROOTS,
+) -> tuple[RepoMap, RepoMapCacheEvidence]:
+    """Build the map from immutable content identities, reusing safe entries.
+
+    The cache is advisory runner state, not authority. Every key includes the
+    source path and exact source bytes. An exact-tree snapshot avoids all AST
+    and reverse-index work on a warm hit; when one file changes, unchanged
+    module surfaces are reused and only changed modules are parsed again.
+
+    Missing or corrupt entries are treated as misses and rewritten. Nothing
+    stale is ever accepted merely because a JSON file exists.
+    """
+    repo_root = Path(repo_root)
+    cache_root = Path(cache_root)
+    roots_t = tuple(roots)
+
+    entries: list[tuple[Path, str, str, bytes, str]] = []
+    for root_name in roots_t:
+        base = repo_root / root_name
+        if not base.is_dir():
+            continue
+        for source in sorted(base.rglob("*.py")):
+            if _EXCLUDED_PARTS & set(source.parts):
+                continue
+            relative = source.relative_to(repo_root).as_posix()
+            raw = source.read_bytes()
+            entries.append(
+                (
+                    source,
+                    root_name,
+                    relative,
+                    raw,
+                    _module_cache_key(relative, raw),
+                )
+            )
+
+    tree_fingerprint = _tree_cache_key(
+        roots_t,
+        ((relative, module_key) for _p, _r, relative, _raw, module_key in entries),
+    )
+    snapshot_path = cache_root / "snapshots" / f"{tree_fingerprint}.json"
+    invalid_entries = 0
+
+    if snapshot_path.is_file():
+        snapshot = _cache_object(snapshot_path)
+        expected_paths = tuple(relative for _p, _r, relative, _raw, _key in entries)
+        if (
+            snapshot is not None
+            and snapshot.get("version") == REPO_MAP_CACHE_VERSION
+            and snapshot.get("tree_fingerprint") == tree_fingerprint
+            and tuple(str(item) for item in snapshot.get("roots", ())) == roots_t
+            and isinstance(snapshot.get("repo_map"), Mapping)
+        ):
+            try:
+                repo_map = RepoMap.from_dict(snapshot["repo_map"])
+            except (TypeError, ValueError):
+                repo_map = None
+            if (
+                repo_map is not None
+                and tuple(module.path for module in repo_map.modules) == expected_paths
+            ):
+                return repo_map, RepoMapCacheEvidence(
+                    version=REPO_MAP_CACHE_VERSION,
+                    tree_fingerprint=tree_fingerprint[:16],
+                    roots=roots_t,
+                    module_count=len(entries),
+                    module_hits=len(entries),
+                    module_misses=0,
+                    snapshot_hit=True,
+                    invalid_entries=0,
+                )
+        invalid_entries += 1
+
+    modules: list[ModuleMap] = []
+    module_hits = 0
+    module_misses = 0
+    for source, owner_root, relative, raw, module_key in entries:
+        cache_path = cache_root / "modules" / f"{module_key}.json"
+        cached = _cache_object(cache_path) if cache_path.is_file() else None
+        module: ModuleMap | None = None
+        if (
+            cached is not None
+            and cached.get("version") == REPO_MAP_CACHE_VERSION
+            and cached.get("key") == module_key
+            and cached.get("path") == relative
+            and isinstance(cached.get("module"), Mapping)
+        ):
+            try:
+                candidate = ModuleMap.from_dict(cached["module"])
+            except (TypeError, ValueError):
+                candidate = None
+            if candidate is not None and candidate.path == relative:
+                module = candidate
+
+        if module is None:
+            if cache_path.is_file():
+                invalid_entries += 1
+            text = raw.decode("utf-8", errors="replace")
+            module = _module_map_from_text(repo_root, source, owner_root, text)
+            _write_cache_object(
+                cache_path,
+                {
+                    "version": REPO_MAP_CACHE_VERSION,
+                    "key": module_key,
+                    "path": relative,
+                    "module": module.to_dict(),
+                },
+            )
+            module_misses += 1
+        else:
+            module_hits += 1
+        modules.append(module)
+
+    repo_map = _assemble_repo_map(modules, roots_t)
+    _write_cache_object(
+        snapshot_path,
+        {
+            "version": REPO_MAP_CACHE_VERSION,
+            "tree_fingerprint": tree_fingerprint,
+            "roots": list(roots_t),
+            "repo_map": repo_map.to_dict(),
+        },
+    )
+    return repo_map, RepoMapCacheEvidence(
+        version=REPO_MAP_CACHE_VERSION,
+        tree_fingerprint=tree_fingerprint[:16],
+        roots=roots_t,
+        module_count=len(entries),
+        module_hits=module_hits,
+        module_misses=module_misses,
+        snapshot_hit=False,
+        invalid_entries=invalid_entries,
     )
 
 
@@ -571,13 +800,16 @@ def load_or_build(repo_root: Path, cache_path: Path, *, roots: Iterable[str] = D
 
 __all__ = [
     "DEFAULT_ROOTS",
+    "REPO_MAP_CACHE_VERSION",
     "ModuleMap",
     "Neighborhood",
     "QueryHit",
     "RepoMap",
+    "RepoMapCacheEvidence",
     "SymbolSpan",
     "build_and_cache",
     "build_repo_map",
+    "build_repo_map_cached",
     "load_or_build",
     "neighborhood",
     "query",
