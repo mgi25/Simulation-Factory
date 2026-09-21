@@ -1,0 +1,52 @@
+{
+  "contract_id": "con-token-efficiency-v4-p3-2026-09-21",
+  "objective_id": "obj-token-efficiency-v4-p3-2026-09-21",
+  "parent_objective_id": "obj-token-efficiency-v4-2026-09-21",
+  "title": "Token Efficiency V4 P3 - Deterministic Read-Once Semantic Context",
+  "owner": "ceo",
+  "set_by": "MGI",
+  "requested_on": "2026-09-21",
+  "risk": "medium",
+  "reversible": true,
+  "objective": "Reduce repeated repository reading and semantic rediscovery in routine engineering sessions by compiling bounded, fingerprinted, task-specific source and test spans locally before a model session, while preserving P2 tool isolation, runner-owned deterministic validation, independent review and all authority boundaries.",
+  "success_criteria": [
+    "Routine developer briefings can include multiple deterministically selected source/test spans under one hard context budget.",
+    "Compiled spans are derived only from authorized files, declared tests and deterministic repository indexes.",
+    "The compiled context is fingerprinted and persisted as runner evidence before the provider session.",
+    "The model retains Read as a fallback when compiled context is insufficient; compiler misses cannot block valid engineering work.",
+    "P2 restrictions remain unchanged: no Bash or TodoWrite for consumer developer sessions, no unrelated MCP, no model-owned deterministic test loop and no model git operations.",
+    "Static regression tests prove stable ranking, hard budgets, deterministic fingerprints, authority monotonicity and fallback behavior.",
+    "A later matched benchmark demonstrates lower repeated reads/cache-read units without a regression in deterministic tests, independent review or integration readiness."
+  ],
+  "forbidden": [
+    "authority widening",
+    "new external dependency",
+    "canonical main merge",
+    "deployment",
+    "public publishing",
+    "production simulation behavior changes",
+    "removing Read as a safety fallback",
+    "weakening deterministic validation",
+    "weakening independent review"
+  ],
+  "benchmark_accounting": {
+    "baseline": "P2 correction high-read pattern at commit 615dfea4ddadc56bedc108d91aae1663448f9f94",
+    "primary_metrics": [
+      "provider sessions",
+      "turns",
+      "cache_read_units",
+      "cache_creation_units",
+      "output_units",
+      "provider_cost",
+      "file_reads_total",
+      "file_reads_repeated",
+      "searches_total"
+    ],
+    "quality_floor": [
+      "all required deterministic tests green",
+      "independent reviewer pass",
+      "deterministic review pass",
+      "integration gate READY with zero blockers"
+    ]
+  }
+}
