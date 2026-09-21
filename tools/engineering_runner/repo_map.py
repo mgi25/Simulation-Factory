@@ -86,7 +86,7 @@ _TOKEN_RE = re.compile(r"[a-zA-Z0-9]+")
 # P4: cache parser/index products only when their source identity proves they
 # belong to the exact repository content being mapped. Increment this if the
 # serialized map semantics change in a way old entries cannot represent.
-REPO_MAP_CACHE_VERSION = 1
+REPO_MAP_CACHE_VERSION = 2
 
 
 @dataclass(frozen=True)
@@ -514,15 +514,21 @@ def build_repo_map_cached(
     *,
     roots: Iterable[str] = DEFAULT_ROOTS,
 ) -> tuple[RepoMap, RepoMapCacheEvidence]:
-    """Build the map from immutable content identities, reusing safe entries.
+    """Build the map from exact content identities, reusing safe snapshots.
 
-    The cache is advisory runner state, not authority. Every key includes the
-    source path and exact source bytes. An exact-tree snapshot avoids all AST
-    and reverse-index work on a warm hit; when one file changes, unchanged
-    module surfaces are reused and only changed modules are parsed again.
+    P4B keeps two deterministic records under runner-owned state:
 
-    Missing or corrupt entries are treated as misses and rewritten. Nothing
-    stale is ever accepted merely because a JSON file exists.
+    * an exact-tree snapshot keyed by the complete scoped tree fingerprint;
+    * a tiny `latest.json` manifest that points at the previous snapshot and
+      records each path's exact content key.
+
+    An unchanged tree loads its exact snapshot. A changed tree loads at most
+    one previous snapshot and reuses only ModuleMaps whose path *and* exact
+    source-content key still match. Changed/new modules are parsed again and
+    reverse indexes are rebuilt deterministically.
+
+    The cache is advisory. Missing/corrupt records are misses, never authority,
+    and nothing stale is accepted merely because a cache file exists.
     """
     repo_root = Path(repo_root)
     cache_root = Path(cache_root)
@@ -548,18 +554,21 @@ def build_repo_map_cached(
                 )
             )
 
+    current_keys = {
+        relative: module_key
+        for _source, _root, relative, _raw, module_key in entries
+    }
+    expected_paths = tuple(sorted(current_keys))
     tree_fingerprint = _tree_cache_key(
         roots_t,
-        ((relative, module_key) for _p, _r, relative, _raw, module_key in entries),
+        ((relative, current_keys[relative]) for relative in expected_paths),
     )
     snapshot_path = cache_root / "snapshots" / f"{tree_fingerprint}.json"
+    latest_path = cache_root / "latest.json"
     invalid_entries = 0
 
     if snapshot_path.is_file():
         snapshot = _cache_object(snapshot_path)
-        expected_paths = tuple(
-            sorted(relative for _p, _r, relative, _raw, _key in entries)
-        )
         if (
             snapshot is not None
             and snapshot.get("version") == REPO_MAP_CACHE_VERSION
@@ -575,6 +584,15 @@ def build_repo_map_cached(
                 repo_map is not None
                 and tuple(module.path for module in repo_map.modules) == expected_paths
             ):
+                _write_cache_object(
+                    latest_path,
+                    {
+                        "version": REPO_MAP_CACHE_VERSION,
+                        "tree_fingerprint": tree_fingerprint,
+                        "roots": list(roots_t),
+                        "module_keys": current_keys,
+                    },
+                )
                 return repo_map, RepoMapCacheEvidence(
                     version=REPO_MAP_CACHE_VERSION,
                     tree_fingerprint=tree_fingerprint[:16],
@@ -587,41 +605,70 @@ def build_repo_map_cached(
                 )
         invalid_entries += 1
 
+    previous_keys: dict[str, str] = {}
+    previous_modules: dict[str, ModuleMap] = {}
+
+    if latest_path.is_file():
+        latest = _cache_object(latest_path)
+        latest_fingerprint = ""
+        if (
+            latest is not None
+            and latest.get("version") == REPO_MAP_CACHE_VERSION
+            and tuple(str(item) for item in latest.get("roots", ())) == roots_t
+            and isinstance(latest.get("module_keys"), Mapping)
+        ):
+            latest_fingerprint = str(latest.get("tree_fingerprint", ""))
+            previous_keys = {
+                str(path): str(key)
+                for path, key in dict(latest["module_keys"]).items()
+            }
+
+        previous_snapshot_path = (
+            cache_root / "snapshots" / f"{latest_fingerprint}.json"
+            if latest_fingerprint
+            else None
+        )
+        previous_snapshot = (
+            _cache_object(previous_snapshot_path)
+            if previous_snapshot_path is not None
+            and previous_snapshot_path.is_file()
+            else None
+        )
+        if (
+            previous_snapshot is not None
+            and previous_snapshot.get("version") == REPO_MAP_CACHE_VERSION
+            and previous_snapshot.get("tree_fingerprint") == latest_fingerprint
+            and tuple(str(item) for item in previous_snapshot.get("roots", ())) == roots_t
+            and isinstance(previous_snapshot.get("repo_map"), Mapping)
+        ):
+            try:
+                previous_map = RepoMap.from_dict(previous_snapshot["repo_map"])
+            except (TypeError, ValueError):
+                previous_map = None
+            if previous_map is not None:
+                previous_modules = {
+                    module.path: module for module in previous_map.modules
+                }
+            else:
+                previous_keys = {}
+                invalid_entries += 1
+        else:
+            previous_keys = {}
+            invalid_entries += 1
+
     modules: list[ModuleMap] = []
     module_hits = 0
     module_misses = 0
     for source, owner_root, relative, raw, module_key in entries:
-        cache_path = cache_root / "modules" / f"{module_key}.json"
-        cached = _cache_object(cache_path) if cache_path.is_file() else None
-        module: ModuleMap | None = None
-        if (
-            cached is not None
-            and cached.get("version") == REPO_MAP_CACHE_VERSION
-            and cached.get("key") == module_key
-            and cached.get("path") == relative
-            and isinstance(cached.get("module"), Mapping)
-        ):
-            try:
-                candidate = ModuleMap.from_dict(cached["module"])
-            except (TypeError, ValueError):
-                candidate = None
+        module = None
+        if previous_keys.get(relative) == module_key:
+            candidate = previous_modules.get(relative)
             if candidate is not None and candidate.path == relative:
                 module = candidate
 
         if module is None:
-            if cache_path.is_file():
-                invalid_entries += 1
             text = raw.decode("utf-8", errors="replace")
             module = _module_map_from_text(repo_root, source, owner_root, text)
-            _write_cache_object(
-                cache_path,
-                {
-                    "version": REPO_MAP_CACHE_VERSION,
-                    "key": module_key,
-                    "path": relative,
-                    "module": module.to_dict(),
-                },
-            )
             module_misses += 1
         else:
             module_hits += 1
@@ -635,6 +682,15 @@ def build_repo_map_cached(
             "tree_fingerprint": tree_fingerprint,
             "roots": list(roots_t),
             "repo_map": repo_map.to_dict(),
+        },
+    )
+    _write_cache_object(
+        latest_path,
+        {
+            "version": REPO_MAP_CACHE_VERSION,
+            "tree_fingerprint": tree_fingerprint,
+            "roots": list(roots_t),
+            "module_keys": current_keys,
         },
     )
     return repo_map, RepoMapCacheEvidence(
