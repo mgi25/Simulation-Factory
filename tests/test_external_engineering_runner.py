@@ -2703,6 +2703,111 @@ class _Recorder:
         )
 
 
+def test_claude_builtin_tools_and_mcp_surface_are_isolated():
+    recorder = _Recorder()
+    backend = ClaudeCodeBackend(recorder, executable=sys.executable)
+    backend._resolved = sys.executable
+    backend.launch(
+        SessionRequest(
+            role="developer",
+            cwd=Path("."),
+            instructions="x",
+            timeout_s=60.0,
+            allowed_tools=("Bash", "Read", "Edit"),
+            disallowed_tools=("WebSearch",),
+        )
+    )
+
+    argv = recorder.calls[0]
+    assert argv[argv.index("--tools") + 1] == "Bash,Read,Edit"
+    assert argv[argv.index("--allowedTools") + 1] == "Bash Read Edit"
+    assert argv[argv.index("--disallowedTools") + 1] == "WebSearch"
+    assert "--strict-mcp-config" in argv
+    assert argv[argv.index("--mcp-config") + 1] == '{"mcpServers":{}}'
+
+
+def test_empty_worker_tool_contract_exposes_no_builtin_tools():
+    recorder = _Recorder()
+    backend = ClaudeCodeBackend(recorder, executable=sys.executable)
+    backend._resolved = sys.executable
+    backend.launch(
+        SessionRequest(
+            role="reviewer",
+            cwd=Path("."),
+            instructions="x",
+            timeout_s=60.0,
+            allowed_tools=(),
+            read_only=True,
+        )
+    )
+    argv = recorder.calls[0]
+    assert argv[argv.index("--tools") + 1] == ""
+    assert "--allowedTools" not in argv
+    assert "--strict-mcp-config" in argv
+
+
+def test_claude_system_init_is_preserved_as_bounded_startup_evidence():
+    recorder = _Recorder()
+    transcript = "\n".join(
+        [
+            json.dumps(
+                {
+                    "type": "system",
+                    "subtype": "init",
+                    "model": "claude-sonnet-4-6",
+                    "permissionMode": "acceptEdits",
+                    "tools": ["Bash", "Read", "Edit"],
+                    "mcp_servers": [],
+                    "plugins": [],
+                    "skills": ["debug"],
+                }
+            ),
+            json.dumps(
+                {
+                    "type": "result",
+                    "subtype": "success",
+                    "is_error": False,
+                    "session_id": "03dff822-7d61-4865-b0b5-2efe8a35ab40",
+                    "result": "ok",
+                    "usage": {},
+                    "modelUsage": {},
+                }
+            ),
+        ]
+    )
+    recorder.run = lambda argv, **kwargs: CommandResult(
+        argv=tuple(argv),
+        cwd=".",
+        exit_code=0,
+        stdout=transcript,
+        stderr="",
+        duration_s=0.1,
+    )
+    backend = ClaudeCodeBackend(recorder, executable=sys.executable)
+    backend._resolved = sys.executable
+    outcome = backend.launch(
+        SessionRequest(
+            role="developer",
+            cwd=Path("."),
+            instructions="x",
+            timeout_s=60.0,
+            allowed_tools=("Bash", "Read", "Edit"),
+        )
+    )
+
+    assert outcome.startup_context == {
+        "model": "claude-sonnet-4-6",
+        "permission_mode": "acceptEdits",
+        "tools": ["Bash", "Read", "Edit"],
+        "mcp_servers": [],
+        "plugins": [],
+        "skills": ["debug"],
+    }
+    stored = outcome.to_dict()["startup_context"]
+    assert stored["tools"] == ["Bash", "Read", "Edit"]
+    assert stored["mcp_servers"] == []
+
+
 def test_a_spend_ceiling_reaches_the_command_line():
     """The one live spend limit either CLI offers, actually passed."""
     recorder = _Recorder()
