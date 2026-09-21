@@ -140,6 +140,56 @@ const DUP_HIT_PULSE_SCALE := 0.22
 const COMPLETION_PULSE_SECONDS := 0.9
 const COMPLETION_HOLD_SECONDS := 2.0
 
+# --- The ending ------------------------------------------------------------
+# Beat 1. The final tile's response, against a normal activation's 0.30 s /
+# 2.6 energy / 0.30 push. Three times the recoil and four times the peak
+# energy, held twice as long: the brief asks that "that was the last one" be
+# unmistakable, and a difference of degree at these magnitudes reads as a
+# difference in kind.
+const FINAL_HIT_SECONDS := 0.55
+const FINAL_HIT_ENERGY := 11.0
+const FINAL_HIT_PUSH := 0.92
+# The shock ring leaves the contact point and crosses half the arena. Its
+# radius is in world units, so it is the same size relative to the arena at
+# every output resolution.
+#
+# **A scaled ring thickens as it grows**, which is not obvious until it is on
+# screen: the mesh is built at radius 1.0 and animated with a uniform scale, so
+# a 0.42 wu rim at radius 13 is a 5.5 wu band - a khaki donut wider than the
+# frame that buried the arena, the ball and the wave under it. The rim is built
+# thin enough that it is still a line at full extent: 0.085 * 6.0 = 0.51 wu,
+# which is 24 px at delivery size and about a third of a tile.
+const SHOCK_RING_SECONDS := 0.55
+const SHOCK_RING_START_RADIUS := 0.9
+const SHOCK_RING_RADIUS := 6.0
+const SHOCK_RING_SEGMENTS := 72
+const SHOCK_RING_WIDTH := 0.085
+const SHOCK_RING_ALPHA := 0.55
+
+# Beat 2. Each tile's own flare as the wave front passes it. Shorter than an
+# activation pulse, because fifty-one of them overlapping at activation length
+# would be one long flash rather than a wave.
+const RIPPLE_TILE_SECONDS := 0.30
+const RIPPLE_ENERGY := 3.4
+const RIPPLE_PUSH := 0.20
+
+# Beat 3. The gate flares in a different hue before it moves, so the section is
+# identified as a section before it is seen to open; then it retracts outward
+# and shrinks away.
+#
+# There is deliberately **no glow behind the opening**. One was built - a bar of
+# light on the wall line, spanning the gate arc - on the theory that a phone
+# frame needs the doorway marked. The render says otherwise: nine missing tiles
+# in a ring of fifty-one read as an opening at 270 px without help, and the bar
+# read as a lens flare parked outside the arena, still sitting there through the
+# closing hold. The cyan flare on the tiles themselves does the whole job.
+const GATE_FLARE_LEAD_SECONDS := 0.16
+const GATE_FLARE_ENERGY := 6.5
+const GATE_RETRACT_WU := 3.1
+
+# Beat 5. The hook steps back so the escape owns the frame.
+const HOOK_CLIMAX_ALPHA := 0.34
+
 # --- Colour ----------------------------------------------------------------
 const BACKGROUND := Color(0.027, 0.031, 0.047)
 const FLOOR_COLOUR := Color(0.043, 0.050, 0.070)
@@ -148,6 +198,14 @@ const TILE_INACTIVE_EMISSION := Color(0.035, 0.048, 0.075)
 const TILE_ACTIVE := Color(1.0, 0.560, 0.180)
 const TILE_ACTIVE_EMISSION := Color(1.0, 0.470, 0.110)
 const TILE_COMPLETE_EMISSION := Color(1.0, 0.760, 0.330)
+# The last tile goes white, not brighter amber: a hue nothing else in the frame
+# has ever used, so the eye cannot mistake it for a very good ordinary hit.
+const TILE_FINAL_EMISSION := Color(1.0, 0.960, 0.880)
+const SHOCK_RING_COLOUR := Color(1.0, 0.88, 0.62)
+# The gate announces itself in cyan - the opposite end of the wheel from the
+# amber the whole arena is lit in, and the same family as the ball and its
+# trail, which is the association the shot wants: this is where the ball goes.
+const GATE_EMISSION := Color(0.45, 0.88, 1.0)
 const BALL_COLOUR := Color(1.0, 1.0, 1.0)
 const TRAIL_COLOUR := Color(0.45, 0.78, 1.0)
 const TEXT_PRIMARY := Color(0.925, 0.941, 0.972)
@@ -161,6 +219,10 @@ var trail_mode := "temporal"
 var trail_seconds := TRAIL_SECONDS
 var show_counter := true
 var show_debug := false
+## Play the Phase 4 ending. Off by default so every Phase 3 render, still and
+## audit reproduces exactly as it did: with this false the scene is the Phase 3
+## scene, line for line.
+var climax_enabled := false
 
 var _width := 1080
 var _height := 1920
@@ -189,6 +251,26 @@ var _end_seconds := 0.0
 var _pixels_per_unit := 1.0
 var _time := 0.0
 
+# --- The ending, all read from the document's `completion` block ------------
+var _has_completion := false
+var _climax := false
+var _timeline: Array = []
+var _final_tile := -1
+var _final_seconds := 0.0
+var _final_contact := Vector2.ZERO
+var _ripple_phase: PackedFloat64Array = PackedFloat64Array()
+var _is_gate: PackedByteArray = PackedByteArray()
+var _escape_t := 0.0
+var _escape_p := Vector2.ZERO
+var _escape_v := Vector2.ZERO
+var _confirm_seconds := 0.0
+var _gate_open_at := 0.0
+var _gate_open_seconds := 0.0
+var _release_at := 0.0
+var _total_render_seconds := 0.0
+var _shock_ring: MeshInstance3D
+var _shock_material: StandardMaterial3D
+
 
 func configure(document: Dictionary, width: int, height: int) -> void:
 	playback = document
@@ -214,7 +296,57 @@ func configure(document: Dictionary, width: int, height: int) -> void:
 		_last_new_hit.append(-1.0e9)
 		_last_dup_hit.append(-1.0e9)
 
+	_read_completion(document)
 	_build()
+
+
+func _read_completion(document: Dictionary) -> void:
+	## Parse the `completion` block, or leave the scene in its Phase 3 state.
+	##
+	## Every number the ending uses comes from here. The scene never computes a
+	## gate side, an escape flight or a beat offset - `satisfying.tile_completion`
+	## did, and a renderer that recomputed any of them would be a second opinion
+	## about the physics, which is the one thing this architecture forbids.
+	_has_completion = false
+	_climax = false
+	_timeline = []
+	_is_gate = PackedByteArray()
+	_ripple_phase = PackedFloat64Array()
+	for _i in _total_tiles:
+		_is_gate.append(0)
+		_ripple_phase.append(0.0)
+	if not document.has("completion") or document["completion"] == null:
+		return
+	var block: Dictionary = document["completion"]
+	if int(block.get("format", -1)) != 1:
+		push_error("tile_escape: completion format %s, this renderer reads 1"
+			% block.get("format"))
+		return
+
+	_final_tile = int(block["final_tile"])
+	_final_seconds = float(block["final_seconds"])
+	_final_contact = Vector2(
+		float(block["final_contact"][0]), float(block["final_contact"][1]))
+	var phases: Array = block["ripple_phase"]
+	for i in mini(phases.size(), _total_tiles):
+		_ripple_phase[i] = float(phases[i])
+	for entry in block["route"]["gate_tiles"]:
+		var index := int(entry)
+		if index >= 0 and index < _total_tiles:
+			_is_gate[index] = 1
+	var escape: Dictionary = block["escape"]
+	_escape_t = float(escape["t"])
+	_escape_p = Vector2(float(escape["p"][0]), float(escape["p"][1]))
+	_escape_v = Vector2(float(escape["v"][0]), float(escape["v"][1]))
+	var timing: Dictionary = block["timing"]
+	_confirm_seconds = float(timing["confirm_seconds"])
+	_gate_open_at = float(timing["gate_open_at_seconds"])
+	_gate_open_seconds = float(timing["gate_open_seconds"])
+	_release_at = float(timing["release_at_seconds"])
+	_timeline = block["timeline"]
+	_total_render_seconds = float(block["total_render_seconds"])
+	_has_completion = true
+	_climax = climax_enabled
 
 
 ## The run's own length plus the completion hold. The renderer's clip mode uses
@@ -224,6 +356,42 @@ func playback_duration() -> float:
 	if _completion >= 0.0:
 		end = maxf(end, _completion)
 	return end + COMPLETION_HOLD_SECONDS
+
+
+## How long the video is. With the ending on this is the completion block's own
+## total; without it, the Phase 3 run length plus the prototype hold.
+func render_duration() -> float:
+	if _climax:
+		return _total_render_seconds
+	return playback_duration()
+
+
+func has_completion() -> bool:
+	return _has_completion
+
+
+## Simulation time at a render instant, from the document's timeline.
+##
+## Below the completion this is the identity - the segment is `locked` with
+## rate 1.0 - and that is the property the whole ending rests on: turning the
+## climax on cannot move one frame of the run that earned it.
+func sim_time_at(render_t: float) -> float:
+	if not _climax or _timeline.is_empty():
+		return render_t
+	for segment in _timeline:
+		if render_t < float(segment["render_end"]):
+			return float(segment["sim_start"]) 				+ (render_t - float(segment["render_start"])) * float(segment["sim_rate"])
+	var last: Dictionary = _timeline[_timeline.size() - 1]
+	return float(last["sim_start"]) 		+ (float(last["render_end"]) - float(last["render_start"])) * float(last["sim_rate"])
+
+
+func climax_state_at(render_t: float) -> String:
+	if not _climax or _timeline.is_empty():
+		return "locked"
+	for segment in _timeline:
+		if render_t < float(segment["render_end"]):
+			return str(segment["state"])
+	return str(_timeline[_timeline.size() - 1]["state"])
 
 
 func world_to_pixel_scale() -> float:
@@ -252,7 +420,63 @@ func _build() -> void:
 	_build_floor(arena)
 	_build_tiles(arena)
 	_build_ball()
+	_build_climax_props()
 	_build_overlay()
+
+
+func _build_climax_props() -> void:
+	## The shock ring, built once and hidden unless the ending is playing.
+	##
+	## Unshaded, additive and with culling disabled, so it cannot fall foul of
+	## the winding trap that cost this scene its first two renders - a
+	## counter-clockwise ring would simply be invisible, and that is exactly the
+	## bug that is hardest to see in a still.
+	##
+	## It is the only prop. A second one - a bar of light behind the opening -
+	## was built and removed; see the note on GATE_FLARE_LEAD_SECONDS.
+	if not _has_completion:
+		return
+
+	_shock_material = StandardMaterial3D.new()
+	_shock_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_shock_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_shock_material.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	_shock_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	_shock_material.albedo_color = SHOCK_RING_COLOUR
+	_shock_ring = MeshInstance3D.new()
+	_shock_ring.name = "ShockRing"
+	_shock_ring.mesh = _annulus_mesh(1.0, SHOCK_RING_WIDTH, SHOCK_RING_SEGMENTS)
+	_shock_ring.material_override = _shock_material
+	# In front of the tiles and behind the ball, so the ring passes over the
+	# arena without ever standing between the viewer and the thing escaping.
+	_shock_ring.position = Vector3(_final_contact.x, _final_contact.y, 0.30)
+	_shock_ring.visible = false
+	add_child(_shock_ring)
+
+
+func _annulus_mesh(radius: float, width: float, segments: int) -> ArrayMesh:
+	## A flat ring in the XY plane, built once and scaled to animate.
+	var vertices := PackedVector3Array()
+	var indices := PackedInt32Array()
+	var inner := maxf(0.01, radius - width * 0.5)
+	var outer := radius + width * 0.5
+	for k in segments:
+		var angle := TAU * float(k) / float(segments)
+		vertices.append(Vector3(inner * cos(angle), inner * sin(angle), 0.0))
+		vertices.append(Vector3(outer * cos(angle), outer * sin(angle), 0.0))
+	for k in segments:
+		var a := 2 * k
+		var b := 2 * k + 1
+		var c := 2 * ((k + 1) % segments)
+		var d := 2 * ((k + 1) % segments) + 1
+		indices.append_array([a, b, d, a, d, c])
+	var arrays := []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = vertices
+	arrays[Mesh.ARRAY_INDEX] = indices
+	var mesh := ArrayMesh.new()
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	return mesh
 
 
 func _build_environment() -> void:
@@ -606,9 +830,20 @@ func _flight_index_at(t: float) -> int:
 ## close to it". GDScript's own `float` is a double, so evaluating here and
 ## narrowing only at the point of drawing keeps the audit exact.
 func position_pair(raw: float) -> Array:
-	# Clamped to the run's end, exactly as `tile_playback.position_at` does.
-	# The document defines the trajectory on [0, end_seconds]; past that the
-	# last flight would carry the ball straight through the wall, and during
+	# Past the run's end the ball is on the escape flight, if the document
+	# carries one and the ending is on. That flight is the *same* record the
+	# canonical run left in `flights[-1]`, so evaluating it here is the
+	# continuation the solver would have produced - the wall it would have hit
+	# is simply not there any more.
+	if _climax and _has_completion and raw > _end_seconds:
+		var dt := raw - _escape_t
+		return [
+			_escape_p.x + _escape_v.x * dt,
+			_escape_p.y + _escape_v.y * dt - 0.5 * _gravity * dt * dt,
+		]
+	# Otherwise clamped to the run's end, exactly as `tile_playback.position_at`
+	# does. The document defines the trajectory on [0, end_seconds]; past that
+	# the last flight would carry the ball straight through the wall, and during
 	# the completion hold that is several arena widths off frame.
 	var t := minf(raw, _end_seconds)
 	var flight: Dictionary = playback["flights"][_flight_index_at(t)]
@@ -649,6 +884,157 @@ func set_time(t: float) -> void:
 	_apply_tiles(t)
 	_apply_ball(t)
 	_apply_overlay(t)
+	if _climax:
+		# A still or an audit that addresses the scene in *simulation* time
+		# still has to be a complete picture, so the ending is applied at the
+		# render instant the timeline maps that simulation time back to. Below
+		# the completion that is the identity and this does nothing.
+		_apply_climax(_render_time_for(t))
+
+
+## Set the world to **render** time `r`, which is what a clip of the ending is
+## indexed by. Simulation time comes from the document's timeline; everything
+## else follows from it.
+func set_render_time(r: float) -> void:
+	var t := sim_time_at(r)
+	_time = t
+	_apply_hits(t)
+	_apply_tiles(t)
+	_apply_ball(t)
+	_apply_overlay(t)
+	if _climax:
+		_apply_climax(r)
+
+
+func _render_time_for(sim_t: float) -> float:
+	## The first render instant that shows simulation time `sim_t`.
+	##
+	## The inverse of `sim_time_at`, which is only well defined because the
+	## timeline is monotonic: every segment has a rate of zero or a positive
+	## one, so simulation time never goes backwards and "the first render
+	## instant" is the right choice at a hold.
+	if not _climax or _timeline.is_empty():
+		return sim_t
+	for segment in _timeline:
+		var rate := float(segment["sim_rate"])
+		var sim_start := float(segment["sim_start"])
+		var render_start := float(segment["render_start"])
+		var render_end := float(segment["render_end"])
+		if rate <= 0.0:
+			if is_equal_approx(sim_t, sim_start):
+				return render_start
+			continue
+		var reached: float = sim_start + (render_end - render_start) * rate
+		if sim_t <= reached:
+			return render_start + (sim_t - sim_start) / rate
+	return float(_timeline[_timeline.size() - 1]["render_end"])
+
+
+func _apply_climax(render_t: float) -> void:
+	## The ending, as a pure function of render time.
+	##
+	## Nothing accumulates. Every envelope below is evaluated from `since`, the
+	## render seconds elapsed since the fifty-first activation, so a still taken
+	## at any instant of the ending is identical whether it was reached by
+	## rendering every frame before it or by jumping straight there - the same
+	## property the rest of the scene has, and the reason the climax stills and
+	## the climax clip cannot disagree.
+	var since := render_t - _final_seconds
+	if since < 0.0:
+		_hide_climax_props()
+		return
+
+	var gate_phase := clampf(
+		(since - _gate_open_at) / maxf(_gate_open_seconds, 0.001), 0.0, 1.0)
+	var gate_flare := 0.0
+	var flare_from := _gate_open_at - GATE_FLARE_LEAD_SECONDS
+	if since >= flare_from and since < _gate_open_at:
+		gate_flare = (since - flare_from) / maxf(GATE_FLARE_LEAD_SECONDS, 0.001)
+	elif gate_phase > 0.0:
+		gate_flare = 1.0 - gate_phase
+
+	for i in _total_tiles:
+		var material := _tile_materials[i]
+		var push := 0.0
+		var energy := material.emission_energy_multiplier
+		var emission := material.emission
+
+		# Beat 2: the wave. `_ripple_phase[i]` is this tile's share of the
+		# journey around the ring, so the front reaches it at that fraction of
+		# `confirm_seconds` and it then flares on its own short envelope.
+		var wave_at := _ripple_phase[i] * _confirm_seconds
+		var since_wave := since - wave_at
+		if since_wave >= 0.0 and since_wave < RIPPLE_TILE_SECONDS:
+			var w := since_wave / RIPPLE_TILE_SECONDS
+			var ripple := 1.0 - w * w
+			emission = emission.lerp(TILE_COMPLETE_EMISSION, ripple)
+			energy += RIPPLE_ENERGY * ripple
+			push += RIPPLE_PUSH * ripple
+
+		# Beat 1: the fifty-first tile itself.
+		if i == _final_tile and since < FINAL_HIT_SECONDS:
+			var f := since / FINAL_HIT_SECONDS
+			var flash := (1.0 - f) * (1.0 - f)
+			emission = emission.lerp(TILE_FINAL_EMISSION, flash)
+			energy += FINAL_HIT_ENERGY * flash
+			push += FINAL_HIT_PUSH * flash
+
+		# Beat 3: the gate. It is named in cyan first and only then moves, so
+		# the viewer reads "that section" before reading "that section opened".
+		if _is_gate[i] == 1:
+			if gate_flare > 0.0:
+				emission = emission.lerp(GATE_EMISSION, gate_flare)
+				energy += GATE_FLARE_ENERGY * gate_flare
+			if gate_phase > 0.0:
+				# Ease out: the section leaves quickly and settles, which reads
+				# as a mechanism opening rather than a tile drifting away.
+				var e := 1.0 - (1.0 - gate_phase) * (1.0 - gate_phase)
+				push += GATE_RETRACT_WU * e
+				energy *= (1.0 - e)
+				var shrink := maxf(0.02, 1.0 - e)
+				_tiles[i].scale = Vector3(shrink, shrink, shrink)
+			else:
+				_tiles[i].scale = Vector3.ONE
+		material.emission = emission
+		material.emission_energy_multiplier = energy
+		if push != 0.0:
+			# Added to whatever `_apply_tiles` already set this frame, read
+			# back along the normal rather than accumulated in a variable: this
+			# function runs after that one on every frame and neither of them
+			# remembers anything between frames.
+			var existing: float = (_tiles[i].position - _tile_home[i]).dot(_tile_normal[i])
+			_tiles[i].position = _tile_home[i] + _tile_normal[i] * (existing + push)
+
+	_apply_shock_ring(since)
+	if _hook_label != null:
+		var fade := clampf((since - _release_at) / 0.35, 0.0, 1.0)
+		_hook_label.add_theme_color_override("font_color", Color(
+			TEXT_PRIMARY.r, TEXT_PRIMARY.g, TEXT_PRIMARY.b,
+			lerpf(1.0, HOOK_CLIMAX_ALPHA, fade)))
+
+
+func _apply_shock_ring(since: float) -> void:
+	if _shock_ring == null:
+		return
+	if since < 0.0 or since >= SHOCK_RING_SECONDS:
+		_shock_ring.visible = false
+		return
+	var f := since / SHOCK_RING_SECONDS
+	# Radius eases out and alpha falls off as the square, so the ring is
+	# brightest where it leaves the tile and thins as it crosses the arena
+	# rather than arriving at the far wall as a hard line.
+	var radius: float = SHOCK_RING_START_RADIUS + (
+		SHOCK_RING_RADIUS - SHOCK_RING_START_RADIUS) * (1.0 - (1.0 - f) * (1.0 - f))
+	_shock_ring.visible = true
+	_shock_ring.scale = Vector3(radius, radius, 1.0)
+	_shock_material.albedo_color = Color(
+		SHOCK_RING_COLOUR.r, SHOCK_RING_COLOUR.g, SHOCK_RING_COLOUR.b,
+		SHOCK_RING_ALPHA * (1.0 - f) * (1.0 - f))
+
+
+func _hide_climax_props() -> void:
+	if _shock_ring != null:
+		_shock_ring.visible = false
 
 
 func _apply_hits(t: float) -> void:
@@ -677,7 +1063,12 @@ func _apply_hits(t: float) -> void:
 
 func _apply_tiles(t: float) -> void:
 	var complete_at := _completion
-	var completing := complete_at >= 0.0 and t >= complete_at
+	# With the ending on, the whole-arena response is the Phase 4 wave and not
+	# this flat pulse. Leaving both in would hold every tile at the completion
+	# colour for the length of the hold, which is exactly the brightness the
+	# wave needs to rise out of - the first render of the climax was a
+	# uniformly gold arena with an invisible ripple crossing it.
+	var completing := complete_at >= 0.0 and t >= complete_at and not _climax
 	var completion_pulse := 0.0
 	if completing:
 		completion_pulse = maxf(0.0,
