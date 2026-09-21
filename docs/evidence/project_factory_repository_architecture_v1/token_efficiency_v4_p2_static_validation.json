@@ -1,0 +1,30 @@
+{
+  "validation_id": "val-token-efficiency-v4-p2-static-2026-09-21",
+  "objective_id": "obj-token-efficiency-v4-2026-09-21",
+  "implementation_branch": "project-factory-token-efficiency-v4-p2",
+  "implementation_commit": "619b2a0374ab935c1eb21b19517d3eeecc7d0b42",
+  "validated_on": "2026-09-21",
+  "model_calls_used_for_validation": 0,
+  "focused_validation": {
+    "compileall": "pass",
+    "pytest_selected": 422,
+    "pytest_passed": 422,
+    "pytest_failed": 0,
+    "duration_seconds": 137.12
+  },
+  "p2_controls": [
+    "consumer developer tool surface removes Bash and TodoWrite",
+    "consumer developer retains Read, Write, Edit, Glob and Grep",
+    "expanded/non-consumer execution preserves the operator-configured full developer tool set",
+    "required tests remain visible as acceptance evidence but are explicitly runner-owned",
+    "runner continues to execute every required test after the implementation commit",
+    "resources.json records available_tools, deterministic_validation_owner=runner and model_runs_required_tests=false"
+  ],
+  "status": "static_controls_green_gate_pending",
+  "notes": [
+    "No run-one or paid Claude model session was used for P2 implementation or focused validation.",
+    "The next step is the canonical 11-suite and integration-gate validation at the exact P2 commit.",
+    "No canonical merge, deployment, publishing or production integration is authorized."
+  ],
+  "version": "token_efficiency_v4_p2_static_validation_v1"
+}
