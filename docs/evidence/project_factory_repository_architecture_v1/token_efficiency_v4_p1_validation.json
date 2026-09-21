@@ -1,0 +1,50 @@
+{
+  "validation_id": "val-token-efficiency-v4-p1-2026-09-21",
+  "objective_id": "obj-token-efficiency-v4-2026-09-21",
+  "implementation_branch": "project-factory-token-efficiency-v4-p1",
+  "implementation_commit": "41b7f6df5fda38578c553db1114bdca2a2afb8d1",
+  "validated_on": "2026-09-21",
+  "model_calls_used_for_validation": 0,
+  "focused_validation": {
+    "compileall": "pass",
+    "pytest_selected": 419,
+    "pytest_passed": 419,
+    "pytest_failed": 0,
+    "duration_seconds": 104.24
+  },
+  "mcp_isolation": {
+    "strict_empty_config_without_account_opt_out": "claude.ai Claude Docs remained connected",
+    "strict_empty_config_with_ENABLE_CLAUDEAI_MCP_SERVERS_false": "No MCP servers configured",
+    "status": "pass"
+  },
+  "required_suite_validation": {
+    "required_suites": 11,
+    "green": 11,
+    "exit_code": 0,
+    "source_commit": "41b7f6df5fda38578c553db1114bdca2a2afb8d1",
+    "suites": [
+      {"suite": "tests/test_company_analytics.py", "passed": 160},
+      {"suite": "tests/test_company_dashboard.py", "passed": 32},
+      {"suite": "tests/test_company_execution_transport.py", "passed": 14},
+      {"suite": "tests/test_company_finance.py", "passed": 123},
+      {"suite": "tests/test_company_integration_gate.py", "passed": 88},
+      {"suite": "tests/test_company_org_intelligence.py", "passed": 119},
+      {"suite": "tests/test_company_os_ai_platform.py", "passed": 46},
+      {"suite": "tests/test_company_os_capsules.py", "passed": 66},
+      {"suite": "tests/test_company_os_knowledge.py", "passed": 26},
+      {"suite": "tests/test_company_runtime.py", "passed": 22},
+      {"suite": "tests/test_company_workforce.py", "passed": 93}
+    ]
+  },
+  "integration_gate": {
+    "exit_code": 0,
+    "readiness": "ready",
+    "report_id": "integration-readiness-2026-09-21-f842cafb8199d185",
+    "blockers": 0,
+    "authorizes_production_integration": false,
+    "source_commit": "41b7f6df5fda38578c553db1114bdca2a2afb8d1"
+  },
+  "p1_acceptance": "passed",
+  "next_step": "one tiny provider-capped startup-surface probe; no run-one",
+  "version": "token_efficiency_v4_p1_validation_v1"
+}
