@@ -716,6 +716,13 @@ class EngineeringRunner:
         write_json(stage_dir / "briefing.json", payload)
         envelope = AuthorityEnvelope.parse(payload)
         strategy, applied = self._resource_plan(payload, role="developer")
+        developer_tools = self._developer_tools(strategy)
+        applied = {
+            **applied,
+            "available_tools": list(developer_tools),
+            "deterministic_validation_owner": "runner",
+            "model_runs_required_tests": False,
+        }
         write_json(stage_dir / "resources.json", applied)
 
         worktree = self._workspace.ensure_worktree(
@@ -752,7 +759,7 @@ class EngineeringRunner:
                 cwd=worktree,
                 instructions=instructions,
                 timeout_s=applied["applied_timeout_s"],
-                allowed_tools=self._developer_tools(strategy),
+                allowed_tools=developer_tools,
                 disallowed_tools=self.config.disallowed_tools,
                 model=applied["applied_model"],
                 read_only=False,
