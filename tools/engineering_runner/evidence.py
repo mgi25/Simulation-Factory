@@ -713,13 +713,22 @@ def _strings(values: Any) -> list[str]:
 
 
 def _summary_line(text: str) -> str:
+    # On failing pytest runs, "==== short test summary info ====" appears
+    # immediately before the final counted summary. Prefer a line that
+    # actually carries pytest counts so numeric evidence cannot become zero
+    # merely because a decorative heading was encountered first.
+    for line in reversed(text.splitlines()):
+        stripped = line.strip()
+        if not _COUNT.search(stripped):
+            continue
+        match = _SUMMARY.match(stripped)
+        return (match.group("body").strip() if match else stripped)[:280]
+    # Empty selections and a few plugin modes can have a framed summary with
+    # no numeric count ("no tests ran"). Preserve that fallback.
     for line in reversed(text.splitlines()):
         match = _SUMMARY.match(line.strip())
         if match:
             return match.group("body").strip()[:280]
-    for line in reversed(text.splitlines()):
-        if _COUNT.search(line):
-            return line.strip()[:280]
     return ""
 
 
