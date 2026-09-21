@@ -249,7 +249,7 @@ def efficiency_block(**changes: Any) -> dict[str, Any]:
     be testing a payload production cannot produce.
     """
     block: dict[str, Any] = {
-        "artifact_version": 1,
+        "artifact_version": 2,
         "profile": "consumer",
         "model_tier": "standard",
         "escalation": "none",
@@ -282,6 +282,17 @@ def efficiency_block(**changes: Any) -> dict[str, Any]:
         },
         "context": {"refs": ["module_contract:subject"], "ref_count": 1},
         "strategy_reason": "reasoning class C at risk medium is routine implementation",
+        "adaptive_routing": {
+            "eligible": False,
+            "downshift_tier": "economy",
+            "static_reasons": [],
+            "runtime_requirements": [
+                "base diagnostic ran",
+                "base diagnostic found at least one failing required test",
+                "every failure-symbol hint is present as a failure-guided compiled span",
+                "operator did not pin a developer model",
+            ],
+        },
     }
     block.update(changes)
     return block
@@ -2808,6 +2819,97 @@ def test_the_operator_does_not_restate_the_model_for_every_job(repository):
     assert applied["timeout_source"] == "resource_strategy"
     assert applied["cost_ceiling_enforced"] is True
     assert any("max_turns" in line for line in applied["not_enforced"])
+
+
+def test_p5_economy_candidate_is_vetoed_when_the_base_test_is_green(repository):
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    control = ScriptedControlPlane(
+        repository["base"],
+        states=["planning"],
+        efficiency={
+            "adaptive_routing": {
+                "eligible": True,
+                "downshift_tier": "economy",
+            }
+        },
+    )
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    assert developer.model == "sonnet"
+    resources = json.loads(
+        (Path(report.run_dir) / "developer-01" / "resources.json").read_text("utf-8")
+    )
+    adaptive = resources["adaptive_model_routing"]
+    assert adaptive["candidate"] is True
+    assert adaptive["applied"] is False
+    assert "base diagnostic found no counted failing tests" in adaptive["veto_reasons"]
+
+
+def test_p5_downshifts_only_after_a_complete_failure_guided_base_localization(repository):
+    repo = repository["repo"]
+    (repo / "tests" / "test_subject.py").write_text(
+        "from subject.module import VALUE\n\n\n"
+        "def test_value():\n"
+        "    assert VALUE == 2\n",
+        encoding="utf-8",
+    )
+    _git(repo, "add", "--all")
+    _git(repo, "commit", "--message", "make benchmark base fail")
+    base = _git(repo, "rev-parse", "HEAD")
+
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    control = ScriptedControlPlane(
+        base,
+        states=["planning"],
+        efficiency={
+            "adaptive_routing": {
+                "eligible": True,
+                "downshift_tier": "economy",
+            }
+        },
+    )
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    reviewer = [item for item in backend.launched if item.role == "reviewer"][0]
+    assert developer.model == "haiku"
+    assert reviewer.model == "sonnet"
+
+    resources = json.loads(
+        (Path(report.run_dir) / "developer-01" / "resources.json").read_text("utf-8")
+    )
+    adaptive = resources["adaptive_model_routing"]
+    assert adaptive["candidate"] is True
+    assert adaptive["applied"] is True
+    assert adaptive["base_failed_tests"] == 1
+    assert adaptive["failure_symbol_hints"] == 1
+    assert adaptive["failure_guided_complete_spans"] == 1
+    assert adaptive["veto_reasons"] == []
+    assert resources["model_source"] == "adaptive:economy"
+
+
+def test_p5_never_downshifts_a_strongest_tier_even_if_candidate_flag_is_forged(repository):
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    control = ScriptedControlPlane(
+        repository["base"],
+        states=["planning"],
+        efficiency={
+            "model_tier": "strongest",
+            "adaptive_routing": {
+                "eligible": True,
+                "downshift_tier": "economy",
+            },
+        },
+    )
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    assert developer.model == "opus"
+    resources = json.loads(
+        (Path(report.run_dir) / "developer-01" / "resources.json").read_text("utf-8")
+    )
+    adaptive = resources["adaptive_model_routing"]
+    assert adaptive["applied"] is False
+    assert "Company OS did not recommend the standard tier" in adaptive["veto_reasons"]
 
 
 def test_the_strongest_tier_resolves_to_the_stronger_model(repository):
