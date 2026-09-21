@@ -24,7 +24,6 @@ import datetime as dt
 from pathlib import Path
 
 import pytest
-import yaml
 
 from ai_platform.resource_classes import Risk
 from company.delegation.actions import ActionType
@@ -44,6 +43,7 @@ from company.engineering.work_order import (
 )
 from company.runtime.config import load_company_config
 from company.runtime.lifecycle import plan_task
+from company.validation.yaml_subset import load_yaml_subset
 
 DAY = dt.date(2026, 9, 20)
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -69,8 +69,7 @@ def policy(config):
 
 @pytest.fixture(scope="module")
 def registry():
-    text = (REPO_ROOT / "company" / "org_registry.yaml").read_text(encoding="utf-8")
-    return yaml.safe_load(text)
+    return load_yaml_subset(REPO_ROOT / "company" / "org_registry.yaml")
 
 
 # --- 1. the seat and the employee ------------------------------------------
