@@ -1,0 +1,43 @@
+{
+  "request_id": "req-token-efficiency-v4-p3-benchmark-contract-correction",
+  "objective": "Update the exact engineering-execution regression expectations that legitimately change because company-engineering-execution now names tests/test_company_review_separation.py as a semantic test.",
+  "requested_by": "MGI",
+  "requested_on": "2026-09-21",
+  "subsystem_hint": "company/engineering",
+  "capsule_hints": [
+    "company-engineering-execution"
+  ],
+  "scope_ceiling": [
+    "tests/test_company_engineering_execution.py"
+  ],
+  "acceptance_criteria": [
+    "Only tests/test_company_engineering_execution.py is modified.",
+    "The exact engineering-execution expectations that change because tests/test_company_review_separation.py is declared by the capsule are updated and nothing else is broadened.",
+    "Exact tuple assertions remain exact tuple assertions; no containment, subset, unordered or partial assertion is substituted.",
+    "Expected authorized paths, plan writing paths, packet scope and persisted authority include tests/test_company_review_separation.py solely because it is now a declared semantic test.",
+    "The capsule's exact tests assertion expects both tests/test_company_engineering_execution.py and tests/test_company_review_separation.py.",
+    "tests/test_company_engineering_execution.py passes.",
+    "No production, runtime, runner, capsule, dependency or governance file is modified."
+  ],
+  "constraints": [
+    "Matched P3 benchmark of the previously measured P2 high-read correction pattern.",
+    "Test expectation correction only.",
+    "Do not modify capsule metadata or tests/test_company_os_capsules.py.",
+    "Do not change implementation behavior.",
+    "Do not weaken exact assertions.",
+    "Do not add dependencies.",
+    "Do not modify canonical main, production simulation code, governance or CEO-reserved controls.",
+    "The runner owns deterministic tests; the model must not run them.",
+    "One developer attempt only."
+  ],
+  "authorized_branch": "eng-token-efficiency-v4-p3-benchmark-contract-correction",
+  "base_commit": "287d690b7bf87c988edb3eb34d1f57a4dcec5ab1",
+  "max_developer_attempts": 1,
+  "risk": "low",
+  "reversible": true,
+  "specialist_domain": "",
+  "novel": false,
+  "escalate_reasoning": false,
+  "resource_profile": "consumer",
+  "notes": "Run with the validated P3 runner at 0be53a49b0f97a9c96fbe78bf1de018637c4621a. Compare developer telemetry against the prior P2 correction session. Do not merge."
+}
