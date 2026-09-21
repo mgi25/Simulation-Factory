@@ -408,6 +408,58 @@ def test_strategy_selects_standard_for_routine_c_class() -> None:
     assert "routine" in strategy.strategy_reason
 
 
+def test_p5_marks_only_narrow_first_attempt_low_risk_work_as_economy_candidate() -> None:
+    strategy = select_strategy(
+        ReasoningClass.C,
+        Risk.LOW,
+        profile=CONSUMER,
+        authorized_path_count=1,
+        required_test_count=1,
+        packet_attempt=1,
+        novel=False,
+        specialist_domain="",
+    )
+    assert strategy.model_tier is ModelTier.STANDARD
+    assert strategy.adaptive_routing.eligible is True
+    assert strategy.adaptive_routing.downshift_tier is ModelTier.ECONOMY
+    assert "base diagnostic ran" in strategy.adaptive_routing.runtime_requirements
+
+    for changed in (
+        {"risk": Risk.MEDIUM},
+        {"authorized_path_count": 2},
+        {"required_test_count": 0},
+        {"packet_attempt": 2},
+        {"novel": True},
+        {"specialist_domain": "security"},
+        {"is_review": True},
+    ):
+        kwargs = {
+            "profile": CONSUMER,
+            "authorized_path_count": 1,
+            "required_test_count": 1,
+            "packet_attempt": 1,
+            "novel": False,
+            "specialist_domain": "",
+            **changed,
+        }
+        risk = kwargs.pop("risk", Risk.LOW)
+        candidate = select_strategy(ReasoningClass.C, risk, **kwargs)
+        assert candidate.adaptive_routing.eligible is False
+
+
+def test_p5_never_marks_strongest_tier_work_as_an_economy_candidate() -> None:
+    strategy = select_strategy(
+        ReasoningClass.D,
+        Risk.LOW,
+        profile=CONSUMER,
+        authorized_path_count=1,
+        required_test_count=1,
+        packet_attempt=1,
+    )
+    assert strategy.model_tier is ModelTier.STRONGEST
+    assert strategy.adaptive_routing.eligible is False
+
+
 def test_strategy_standard_even_with_evidence_required() -> None:
     """evidence_required does not force strongest — only reasoning class and risk do."""
     strategy = select_strategy(ReasoningClass.C, Risk.LOW, evidence_required=True)
