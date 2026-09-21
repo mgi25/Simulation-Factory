@@ -1,0 +1,57 @@
+{
+  "contract_id": "con-token-efficiency-v4-2026-09-21",
+  "objective_id": "obj-token-efficiency-v4-2026-09-21",
+  "parent_objective_id": "obj-repository-architecture-v1-2026-09-21",
+  "objective": "Make Company OS Claude execution truthfully measurable and radically more token-efficient without weakening developer quality, independent review, deterministic validation, integration readiness, authority boundaries, or CEO approval.",
+  "program": "Repository Architecture V1",
+  "phase": "Agent Context and Token Efficiency V4",
+  "mode": "blocking_supporting_engineering",
+  "authorized_by": "MGI (CEO)",
+  "authorized_on": "2026-09-21",
+  "authority_source": "con-repository-architecture-v1-2026-09-21",
+  "authority_change": "none; this sub-phase narrows execution under the existing Repository Architecture V1 contract",
+  "model_execution_status": "frozen_until_p0_acceptance",
+  "confirmed_baseline_findings": [
+    "wo-delegation-planning-test-ownership-v2 developer stage launched two paid Claude sessions inside one Company OS developer attempt",
+    "developer session-1 stopped at error_max_budget_usd after USD 3.033953, 1,917,651 cache-read units, 85,218 cache-creation units, and 61,693 output units",
+    "developer session-2 succeeded after an additional USD 0.4383165, 194,273 cache-read units, 39,252 cache-creation units, and 3,832 output units",
+    "the developer-stage total was USD 3.4722695, 2,111,924 cache-read units, 124,470 cache-creation units, and 65,525 output units before reviewer usage",
+    "the repair SessionRequest omits max_cost, whose dataclass default is 0.0 meaning no provider spend ceiling",
+    "stage-level session.json and exploration.json are overwritten by a later internal repair session while session-N artifacts remain, allowing summaries to understate prior paid sessions",
+    "Claude system/init exposed many built-in tools plus the connected claude.ai Claude Docs MCP server even though the runner passed a narrow --allowedTools set",
+    "the installed CLI distinguishes --tools availability from --allowedTools permission and supports --strict-mcp-config; current binary support for other controls must be probed before use"
+  ],
+  "p0_acceptance_criteria": [
+    "every Claude subprocess launched within a stage is preserved as an individually attributable session and included in stage/job aggregate usage",
+    "receipts and efficiency reports cannot silently substitute the final repair session for total stage usage",
+    "a provider budget-stop outcome such as error_max_budget_usd cannot automatically trigger another paid model session",
+    "every explicitly authorized repair session preserves or tightens the original model, timeout, tool, and provider-cost ceilings",
+    "stage evidence states paid_session_count and aggregate cost, cache-read, cache-creation, output, input, and reliability metadata without imputing unavailable values",
+    "regression tests reproduce the historical two-session failure shape and fail against the old behavior",
+    "no production simulation code, canonical main, deployment, publishing, workforce activation, or CEO-reserved authority is changed"
+  ],
+  "post_p0_experiments": [
+    "isolated Claude startup using supported safe-mode or equivalent after auditing required worker instructions",
+    "actual tool-surface minimization using --tools in addition to permission controls",
+    "strict MCP isolation with no unrelated MCP servers in routine engineering sessions",
+    "hard model-turn circuit breaker where supported by the pinned Claude Code version",
+    "deterministic test execution outside the developer model with compact failure-only correction evidence",
+    "live stream resource guard if justified after static controls are measured",
+    "token-budgeted semantic context compiler using local deterministic indexing/ranking",
+    "reviewer evidence minimization while preserving independent judgment"
+  ],
+  "quality_invariants": [
+    "developer and reviewer remain separate model sessions when a model reviewer is required",
+    "review independence is not replaced by developer self-attestation",
+    "required deterministic tests and the full integration gate remain authoritative",
+    "no subagents or nested agents",
+    "no automatic merge, deploy, publish, tag, or canonical promotion",
+    "optimization is evaluated on total processed resources per accepted verified outcome, not prompt length alone"
+  ],
+  "stop_conditions": [
+    "do not run another paid Company OS Claude job until P0 acceptance criteria pass deterministically",
+    "stop an experiment if quality, authority, evidence integrity, or integration readiness regresses",
+    "do not add an external MCP or dependency merely because it claims token savings; prove a measured gap first"
+  ],
+  "version": "token_efficiency_v4_contract_v1"
+}
