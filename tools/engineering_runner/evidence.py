@@ -56,6 +56,7 @@ import datetime as dt
 import json
 from pathlib import Path
 import re
+import tempfile
 from typing import Any, Iterable, Mapping, Sequence
 
 from .authorization import AuthorityEnvelope, normalise_path
@@ -63,6 +64,7 @@ from .backends import SessionOutcome
 from .errors import IntegrityFailure
 from .process import CommandRunner
 from .resources import failure_detail
+from .redaction import child_environment
 
 
 # pytest's own last line. Both shapes appear: with a duration and, under
@@ -167,7 +169,25 @@ def run_tests(
     runs: list[TestRun] = []
     for command in commands:
         argv = [python_executable, "-m", "pytest", *command.split(), "-q", "--no-header"]
-        result = runner.run(argv, cwd=worktree, timeout_s=timeout_s)
+
+        # A pre-provider diagnostic and the post-edit acceptance test can run
+        # only seconds apart. CPython's normal timestamp+size .pyc validation
+        # can therefore reuse bytecode from the base checkout after a same-size
+        # source edit (for example VALUE = 1 -> VALUE = 0), turning a real
+        # regression into a false green. Give every deterministic pytest
+        # invocation a fresh cache prefix outside the worktree, then delete it
+        # immediately after the subprocess exits.
+        with tempfile.TemporaryDirectory(
+            prefix="engineering-runner-pycache-"
+        ) as bytecode_cache:
+            env = child_environment()
+            env["PYTHONPYCACHEPREFIX"] = bytecode_cache
+            result = runner.run(
+                argv,
+                cwd=worktree,
+                timeout_s=timeout_s,
+                env=env,
+            )
         counts = _counts(result.stdout)
         runs.append(
             TestRun(
