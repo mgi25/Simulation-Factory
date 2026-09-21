@@ -126,8 +126,8 @@ def _ceiling_lines(strategy: "ResourceStrategy | None", *, role: str) -> list[st
     if role == "developer":
         out.append(
             "Work to finish inside them rather than up to them. If the task turns "
-            "out not to fit, stop, commit what is complete and correct, and say so "
-            "in your report: a partial result somebody can continue is worth more "
+            "out not to fit, stop, leave what is complete and correct in the working "
+            "tree, and say so in your report: a partial result somebody can continue is worth more "
             "than a complete one that was cut off at the ceiling."
         )
     else:
@@ -289,8 +289,10 @@ def developer_instructions(
             add(f"  - {item}")
         add("")
         add(
-            "Run them yourself and iterate until they pass. They are run again "
-            "afterwards, at the commit, and a failure there ends the attempt."
+            "Do not run these tests inside this model session. The runner owns "
+            "deterministic validation and runs every required test afterwards at "
+            "the committed implementation SHA. Treat these commands as acceptance "
+            "evidence you must design for, not as work for the model to execute."
         )
         add("")
 
