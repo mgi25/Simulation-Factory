@@ -78,6 +78,7 @@ from company.engineering import (
     publish_result,
     readiness_from,
     record_decision,
+    record_execution_stop,
     record_gate,
     record_review,
     verify_all,
@@ -411,6 +412,35 @@ def _drive(tmp_path: Path, *, readiness=GateReadiness.READY, **kwargs):
     )
     run.update(gate=gate, job=job, result=result)
     return run
+
+
+def test_an_external_execution_stop_is_durable_and_requires_a_ceo_decision(tmp_path):
+    assessment = _assessment(tmp_path)
+    assert assessment.outcome is IntakeOutcome.AUTHORIZED
+    store, execution, _usage_store = _stores(tmp_path / "state")
+    opened = open_job(store, assessment, on=DAY)
+    briefing = prepare_developer_session(
+        store,
+        execution,
+        opened.work_order,
+        opened.job,
+        _config(),
+        on=DAY,
+    )
+
+    moved, pointer = record_execution_stop(
+        store,
+        opened.work_order,
+        briefing.job,
+        reason="provider stopped at its resource ceiling",
+        on=DAY,
+    )
+
+    assert moved.state is JobState.DECISION_REQUIRED
+    assert moved.awaits_ceo is True
+    assert moved.pending_decisions == ("provider stopped at its resource ceiling",)
+    assert store.job(opened.work_order.work_order_id) == moved
+    assert pointer.record_ref
 
 
 # --- 1. intake produces a bounded work order, or stops --------------------
