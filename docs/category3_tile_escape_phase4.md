@@ -61,7 +61,7 @@ The resulting commit and the remote SHA are in section 9.
 | `satisfying/tile_phase4_cli.py` | the driver — `pacing`, `export`, `verify`, `clip`, `climax`, `stills`, `audit`, `encode` |
 | `godot/scripts/tile_escape_scene.gd` | +the ending, as a pure function of render time |
 | `godot/scripts/tile_escape_render.gd` | +`--climax`, +`--climax-stills` |
-| `tests/test_tile_escape_phase4.py` | 63 tests |
+| `tests/test_tile_escape_phase4.py` | 65 tests |
 
 Nothing in `satisfying/tile_escape.py`, `tile_arena.py`, `tile_evaluator.py`,
 `tile_cast.py`, `tile_sweep.py` or `tile_playback.py` changed. The physics, the
@@ -509,6 +509,29 @@ The six moments are chosen by `tile_escape_render.gd` from the completion
 block's own timeline, so the same six names mean the same six beats under any
 timing preset.
 
+### Reproducing
+
+```
+$env:GODOT_BIN = "...\Godot_v4.7.2-stable_win64_console.exe"
+python -m satisfying.tile_phase4_cli pacing --out output/category3_v4 --seeds 3530 6132 20814 7541 10557 38864
+python -m satisfying.tile_phase4_cli export --out output/category3_v4 --seeds 3530 38864 6132 20814 --timing standard
+python -m satisfying.tile_phase4_cli verify --out output/category3_v4 --seeds 3530 38864 6132 20814
+python -m satisfying.tile_phase4_cli clip   --out output/category3_v4 --seeds 3530 6132 20814 --fps 30
+python -m satisfying.tile_phase4_cli climax --out output/category3_v4 --seeds 3530 38864 --fps 30
+python -m satisfying.tile_phase4_cli stills --out output/category3_v4 --seeds 3530 38864 --fps 30
+python -m satisfying.tile_phase4_cli stills --out output/category3_v4 --seeds 3530 38864 --fps 30 --phone
+python -m satisfying.tile_phase4_cli audit  --out output/category3_v4 --seeds 3530 38864 6132 20814 --fps 30
+python -m satisfying.tile_phase4_cli encode --out output/category3_v4 --seeds 3530 --fps 30 --kind climax30_standard --label climax
+```
+
+**Render on an idle machine.** Phase 3 recorded that a clip went from 127 ms a
+frame to no frames at all for ten minutes while the suite and other Godot jobs
+shared the GPU; Phase 4 hit the same wall — a full climax clip stalled at frame
+63 of 1,038 for five minutes with pytest running beside it, and completed in
+132.1 s at **127 ms a frame** once the machine was quiet. It is not a scene
+defect and it is not worth diagnosing again: do not run the suite and a render
+at the same time.
+
 ### Other evidence
 
 | path | what |
@@ -523,7 +546,7 @@ timing preset.
 
 ## 9. Tests and regression
 
-`tests/test_tile_escape_phase4.py` — **63 tests**, covering every item the brief
+`tests/test_tile_escape_phase4.py` — **65 tests**, covering every item the brief
 listed:
 
 | brief's requirement | tests |
@@ -543,18 +566,48 @@ and the shock ring's rim scaling with its radius.
 
 ### Full-suite comparison
 
-Measured on this branch and on the base `517198e`, in the same worktree.
+Both measured with `python -m pytest -q`, the base in a detached worktree at
+`517198e`.
 
 | | failures | passed | skipped |
 |---|---|---|---|
-| `517198e` (Phase 3) | *(section 9.1)* | | |
-| this branch | *(section 9.1)* | | |
+| `517198e` (Phase 3 base) | **18** | 5,871 | 441 |
+| `85c4e89` (this branch) | **18** | 5,937 | 440 |
 
-See [[suite-has-14-known-failures]] and Phase 2's and Phase 3's reports: a
-Category 3 branch shows 18 failures, twelve stale cross-workstream branch guards
-that diff `origin/main...HEAD` and reject anything outside their own allowlist,
-and six that open files under the un-gitted `output/`. The comparison that
-matters is against the base, not against 14.
+**The two failure sets are byte-identical** — diffed, not eyeballed — so Phase 4
+adds no failure and fixes none. The deltas account for themselves exactly:
+
+```
+5,871  base passes
+  +65  Phase 4 tests
+   +1  test_tile_escape_phase3.py::test_every_recorded_audit_agrees_with_its_document
+       skips on the base because output/ is gitignored and absent in a fresh
+       worktree; it runs and passes here, which is also the -1 on skipped
+-----
+5,937
+```
+
+Both branch numbers were measured on the **committed** tree, 16 min 02 s; the
+base took 16 min 42 s in its detached worktree.
+
+The eighteen are the fingerprint Phase 2 and Phase 3 both recorded. Twelve are
+stale cross-workstream branch guards that diff `origin/main...HEAD` and reject
+anything outside their own allowlist:
+
+```
+test_race2_v30_stage.py   test_race2_v301_stage.py   test_race2_v311_track.py (x2)
+test_race2_v321_geometry.py   test_race2_v32_final.py (x6)   test_race2_v33_bookends.py
+```
+
+and six open files under the un-gitted `output/`: `test_neon_proof.py`,
+`test_sloped_v251_world.py` (x4) and `test_sloped_v252_world.py`. Neither group
+indicates a regression, and per [[suite-has-14-known-failures]] the comparison
+that matters is against the base, not against 14.
+
+**Re-run after committing**, which per Phase 1's finding is the only run that
+counts for the guards: the 439 Company OS and research guard tests pass, and the
+race2 guard count is still exactly 18 — unchanged from the pre-commit run, so
+committing the new files did not move a single guard.
 
 ---
 
