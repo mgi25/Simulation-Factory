@@ -483,17 +483,28 @@ def test_category_three_imports_no_other_category_and_no_company_os() -> None:
     import ast
     import pathlib
 
+    # The standard library, Pillow, and Category 3's own package. The boundary
+    # this guard holds is the *workstream* one - no race, no duel, no Company
+    # OS - so the list grows when Category 3 needs another stdlib module and
+    # never when it needs another package.
+    #
+    # `glob`, `shutil` and `subprocess` arrived with Phase 3's Godot driver,
+    # which finds the binary, launches it and collects the PNGs it wrote. Every
+    # other render driver in this repository does the same three things.
     allowed = {
         "__future__",
         "argparse",
         "dataclasses",
+        "glob",
         "hashlib",
         "json",
         "math",
         "os",
         "PIL",
         "random",
+        "shutil",
         "struct",
+        "subprocess",
         "sys",
         "time",
         "typing",
