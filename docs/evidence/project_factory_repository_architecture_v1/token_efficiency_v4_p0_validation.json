@@ -1,0 +1,48 @@
+{
+  "validation_id": "val-token-efficiency-v4-p0-2026-09-21",
+  "objective_id": "obj-token-efficiency-v4-2026-09-21",
+  "implementation_branch": "project-factory-token-efficiency-v4-p0",
+  "implementation_commit": "278b5bef76e4dc0aa13273b135e80841b0e9e5d5",
+  "validated_on": "2026-09-21",
+  "model_calls_used_for_validation": 0,
+  "focused_validation": {
+    "compileall": "pass",
+    "pytest_selected": 415,
+    "pytest_passed": 415,
+    "pytest_failed": 0,
+    "duration_seconds": 113.22
+  },
+  "required_suite_validation": {
+    "required_suites": 11,
+    "green": 11,
+    "exit_code": 0,
+    "suites": [
+      {"suite": "tests/test_company_analytics.py", "passed": 160},
+      {"suite": "tests/test_company_dashboard.py", "passed": 32},
+      {"suite": "tests/test_company_execution_transport.py", "passed": 14},
+      {"suite": "tests/test_company_finance.py", "passed": 123},
+      {"suite": "tests/test_company_integration_gate.py", "passed": 88},
+      {"suite": "tests/test_company_org_intelligence.py", "passed": 119},
+      {"suite": "tests/test_company_os_ai_platform.py", "passed": 46},
+      {"suite": "tests/test_company_os_capsules.py", "passed": 66},
+      {"suite": "tests/test_company_os_knowledge.py", "passed": 26},
+      {"suite": "tests/test_company_runtime.py", "passed": 22},
+      {"suite": "tests/test_company_workforce.py", "passed": 93}
+    ]
+  },
+  "integration_gate": {
+    "exit_code": 0,
+    "readiness": "ready",
+    "report_id": "integration-readiness-2026-09-21-7a960a5bb2280774",
+    "blockers": 0,
+    "authorizes_production_integration": false,
+    "source_commit": "278b5bef76e4dc0aa13273b135e80841b0e9e5d5"
+  },
+  "p0_acceptance": "passed",
+  "notes": [
+    "The gate contained advisory unknowns for decision-queue source refs, production-failure separation and workforce capability coverage; none is a required blocker.",
+    "P0 validation used deterministic local commands only and did not invoke Claude or another model.",
+    "This validation does not authorize canonical merge, deployment, publishing or production integration."
+  ],
+  "version": "token_efficiency_v4_p0_validation_v1"
+}
