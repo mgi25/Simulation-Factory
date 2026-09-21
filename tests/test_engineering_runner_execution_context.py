@@ -11,10 +11,14 @@ from pathlib import Path
 
 from tools.engineering_runner.execution_context import (
     MAX_BUNDLE_CHARS,
+    MAX_COMPILED_SPAN_CHARS,
+    MAX_COMPILED_SPANS,
     MAX_TEST_ANCHOR_EXCERPTS,
     MAX_TEST_ANCHORS,
+    SEMANTIC_COMPILER_VERSION,
     build_execution_context,
     rank_primary_files,
+    rank_task_spans,
     rank_test_anchors,
 )
 from tools.engineering_runner.repo_map import build_repo_map
@@ -229,6 +233,123 @@ def test_build_execution_context_renders_test_anchors_within_budget(tmp_path: Pa
     assert "test_stop_count_increments_on_stop" in rendered
     assert len(rendered) <= MAX_BUNDLE_CHARS
     assert bundle.truncated is False
+
+
+def test_rank_task_spans_compiles_multiple_exact_matches_once(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    spans = rank_task_spans(
+        repo_map,
+        objective="add a launch_count field",
+        acceptance_criteria=["follow spin_count and stop_count exactly"],
+        paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+    )
+    assert {span.qualified_name for span in spans} == {
+        "test_spin_count_increments_on_spin",
+        "test_stop_count_increments_on_stop",
+    }
+    assert len(spans) <= MAX_COMPILED_SPANS
+    assert sum(len(span.text) for span in spans) <= MAX_COMPILED_SPAN_CHARS
+    assert all(len(span.digest) == 16 for span in spans)
+    assert "spin_count" in next(
+        span.text for span in spans if "spin_count" in span.qualified_name
+    )
+    assert "stop_count" in next(
+        span.text for span in spans if "stop_count" in span.qualified_name
+    )
+
+
+def test_rank_task_spans_is_deterministic_and_path_bounded(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    kwargs = dict(
+        objective="add a launch_count field",
+        acceptance_criteria=["follow spin_count"],
+        paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+    )
+    first = rank_task_spans(repo_map, **kwargs)
+    second = rank_task_spans(repo_map, **kwargs)
+    assert first == second
+    assert first
+    assert {span.path for span in first} == {"tests/test_widget_counter.py"}
+
+
+def test_rank_task_spans_hard_caps_the_excerpt_budget(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    spans = rank_task_spans(
+        repo_map,
+        objective="launch_count",
+        acceptance_criteria=["spin_count and stop_count"],
+        paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+        max_total_chars=40,
+    )
+    assert sum(len(span.text) for span in spans) <= 40
+
+
+def test_rank_task_spans_does_not_manufacture_context(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    assert rank_task_spans(
+        repo_map,
+        objective="improve reliability",
+        acceptance_criteria=["be clear"],
+        paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+    ) == ()
+
+
+def test_compiled_context_is_fingerprinted_and_rendered_read_once(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    spans = rank_task_spans(
+        repo_map,
+        objective="add launch_count",
+        acceptance_criteria=["follow spin_count and stop_count"],
+        paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+    )
+    bundle = build_execution_context(
+        repo_map,
+        primary=[("company/widgets/counter.py", "authorized")],
+        compiled_spans=spans,
+        repo_root=repo,
+        include_excerpts=False,
+    )
+    rendered = bundle.render()
+    data = bundle.to_dict()
+    assert "Precompiled task spans (read-once semantic context)" in rendered
+    assert "Do not broadly re-read" in rendered
+    assert data["compiler_version"] == SEMANTIC_COMPILER_VERSION
+    assert data["compiled_spans"]
+    assert len(data["fingerprint"]) == 16
+    assert data["fingerprint"] == bundle.fingerprint()
+    assert bundle.files[0].excerpts == ()
+    assert len(rendered) <= MAX_BUNDLE_CHARS
+
+
+def test_compiled_context_fingerprint_changes_with_source_body(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    kwargs = dict(
+        objective="launch_count",
+        acceptance_criteria=["follow spin_count"],
+        paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+    )
+    first = rank_task_spans(repo_map, **kwargs)
+    first_bundle = build_execution_context(repo_map, primary=[], compiled_spans=first)
+
+    path = repo / "tests" / "test_widget_counter.py"
+    path.write_text(path.read_text("utf-8").replace("== 1", "== 2", 1), encoding="utf-8")
+    changed_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    second = rank_task_spans(changed_map, **kwargs)
+    second_bundle = build_execution_context(changed_map, primary=[], compiled_spans=second)
+
+    assert first_bundle.fingerprint() != second_bundle.fingerprint()
 
 
 def test_rank_primary_files_puts_authorized_paths_first(tmp_path: Path) -> None:
