@@ -635,9 +635,15 @@ def rank_task_spans(
             body = _read_excerpt_full(repo_root, path, symbol)
             if body is None:
                 continue
-            body_phrases = _identifier_phrases(body)
+            symbol_text = symbol.qualified_name
+            body_phrases = _identifier_phrases(body) | _identifier_phrases(symbol_text)
             phrase_hits = tuple(sorted(body_phrases & phrase_targets))
-            token_hits_set = tuple(sorted(_meaningful_tokens(body) & token_targets))
+            token_hits_set = tuple(
+                sorted(
+                    (_meaningful_tokens(body) | _meaningful_tokens(symbol_text))
+                    & token_targets
+                )
+            )
             score = 7 * len(phrase_hits) + len(token_hits_set)
             if score <= 0:
                 continue
