@@ -86,6 +86,9 @@ _IDENTIFIER_PHRASE_RE = re.compile(
     r"[A-Z][a-z0-9]+(?:[A-Z][a-z0-9]*)+|[a-zA-Z][a-zA-Z0-9]*(?:_[a-zA-Z0-9]+)+"
 )
 _WORD_RE = re.compile(r"[a-zA-Z0-9]+")
+_FAILED_NODE_RE = re.compile(
+    r"(?m)^FAILED\s+(?P<path>[^:\s]+\.py)::(?P<node>[^\s]+)"
+)
 
 # Tokens too generic to count as a meaningful match on their own - fixture and
 # control-flow vocabulary that appears in nearly every test regardless of
@@ -549,6 +552,35 @@ def _test_symbols(repo_map: RepoMap, path: str) -> tuple[SymbolSpan, ...]:
     return tuple(s for s in module.symbols if s.kind == "function" and s.qualified_name.startswith("test_"))
 
 
+def failure_symbol_hints(details: Sequence[str]) -> tuple[tuple[str, str], ...]:
+    """Parse pytest FAILED node ids into deterministic repository symbol hints.
+
+    These are navigation hints only. A caller must still intersect the path
+    against the work order's already-authorized/readable context before using
+    one. Parameter ids are stripped because AST symbols name the test function,
+    not one parametrized case.
+    """
+    hints: list[tuple[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+    for detail in details:
+        for match in _FAILED_NODE_RE.finditer(str(detail)):
+            path = match.group("path").replace("\\", "/")
+            raw_node = match.group("node").split(" - ", 1)[0]
+            parts = [
+                re.sub(r"\[[^\]]*\]$", "", part)
+                for part in raw_node.split("::")
+                if part
+            ]
+            if not parts:
+                continue
+            symbol = ".".join(parts)
+            key = (path, symbol)
+            if key not in seen:
+                seen.add(key)
+                hints.append(key)
+    return tuple(hints)
+
+
 def _focused_excerpt(
     repo_root: Path,
     path: str,
@@ -597,6 +629,7 @@ def rank_task_spans(
     repo_root: Path | None,
     limit: int = MAX_COMPILED_SPANS,
     max_total_chars: int = MAX_COMPILED_SPAN_CHARS,
+    preferred_symbols: Sequence[tuple[str, str]] = (),
 ) -> tuple[CompiledSpan, ...]:
     """Compile the most relevant exact source/test spans before a model starts.
 
@@ -626,12 +659,57 @@ def rank_task_spans(
         return ()
 
     path_rank = {path: index for index, path in enumerate(clean_paths)}
+
+    # Deterministic base-test failures are stronger evidence than prose
+    # similarity for repair tasks. Consume those exact symbols first, but only
+    # when the path is already in the caller-supplied eligible context.
+    selected: list[CompiledSpan] = []
+    used_chars = 0
+    selected_keys: set[tuple[str, str]] = set()
+    for path, qualified_name in preferred_symbols:
+        if len(selected) >= limit or used_chars >= max_total_chars:
+            break
+        if path not in path_rank:
+            continue
+        module = repo_map.by_path(path)
+        symbol = module.symbol(qualified_name) if module is not None else None
+        if symbol is None:
+            continue
+        body = _read_excerpt_full(repo_root, path, symbol)
+        if body is None:
+            continue
+        excerpt = _read_excerpt(repo_root, path, symbol)
+        if not excerpt:
+            continue
+        remaining = max_total_chars - used_chars
+        excerpt = excerpt[:remaining]
+        if not excerpt:
+            break
+        selected.append(
+            CompiledSpan(
+                path=path,
+                qualified_name=symbol.qualified_name,
+                start_line=symbol.start_line,
+                end_line=min(
+                    symbol.end_line,
+                    symbol.start_line + max(excerpt.count("\n"), 0),
+                ),
+                reason="failing required test at the immutable task base",
+                text=excerpt,
+                digest=hashlib.sha256(body.encode("utf-8")).hexdigest()[:16],
+            )
+        )
+        selected_keys.add((path, symbol.qualified_name))
+        used_chars += len(excerpt)
+
     scored: list[tuple[int, int, str, SymbolSpan, tuple[str, ...], tuple[str, ...], str]] = []
     for path in clean_paths:
         module = repo_map.by_path(path)
         if module is None:
             continue
         for symbol in module.symbols:
+            if (path, symbol.qualified_name) in selected_keys:
+                continue
             body = _read_excerpt_full(repo_root, path, symbol)
             if body is None:
                 continue
@@ -660,8 +738,6 @@ def rank_task_spans(
             )
 
     scored.sort(key=lambda item: (-item[0], item[1], item[2], item[3].start_line))
-    selected: list[CompiledSpan] = []
-    used_chars = 0
     for _score, _rank, path, symbol, phrase_hits, token_hits, body in scored:
         if len(selected) >= limit or used_chars >= max_total_chars:
             break
@@ -817,6 +893,7 @@ __all__ = [
     "SEMANTIC_COMPILER_VERSION",
     "CompiledSpan",
     "ContextPointer",
+    "failure_symbol_hints",
     "ExecutionContextBundle",
     "RelevantFile",
     "SourceExcerpt",
