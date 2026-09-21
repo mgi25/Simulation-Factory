@@ -222,6 +222,18 @@ class ControlPlane:
             args += ["--implementation-commit", implementation_commit]
         return self._engineering(args)
 
+    def execution_stop(self, work_order_id: str, *, reason: str) -> StageReply:
+        """Persist an external-session stop so a restart cannot spend again."""
+        return self._engineering(
+            [
+                "execution-stop",
+                "--work-order",
+                work_order_id,
+                "--reason",
+                reason,
+            ]
+        )
+
     def result(self, work_order_id: str, *, risks: Sequence[str] = ()) -> StageReply:
         args = ["result", "--work-order", work_order_id, "--json"]
         for risk in risks:
