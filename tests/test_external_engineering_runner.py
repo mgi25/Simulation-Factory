@@ -1891,6 +1891,7 @@ def test_the_runner_adds_no_dependency():
         "socket",
         "subprocess",
         "sys",
+        "tempfile",
         "time",
         "typing",
         "uuid",
