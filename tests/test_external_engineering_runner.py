@@ -2703,6 +2703,33 @@ class _Recorder:
         )
 
 
+def test_project_factory_claude_sessions_disable_account_injected_mcp_servers():
+    class EnvironmentRecorder(_Recorder):
+        def __init__(self):
+            super().__init__()
+            self.environments: list[dict[str, str]] = []
+
+        def run(self, argv, **kwargs):
+            self.environments.append(dict(kwargs.get("env") or {}))
+            return super().run(argv, **kwargs)
+
+    recorder = EnvironmentRecorder()
+    backend = ClaudeCodeBackend(recorder, executable=sys.executable)
+    backend._resolved = sys.executable
+    backend.launch(
+        SessionRequest(
+            role="developer",
+            cwd=Path("."),
+            instructions="x",
+            timeout_s=60.0,
+            allowed_tools=("Bash", "Read", "Edit"),
+        )
+    )
+
+    assert recorder.environments
+    assert recorder.environments[0]["ENABLE_CLAUDEAI_MCP_SERVERS"] == "false"
+
+
 def test_claude_builtin_tools_and_mcp_surface_are_isolated():
     recorder = _Recorder()
     backend = ClaudeCodeBackend(recorder, executable=sys.executable)
