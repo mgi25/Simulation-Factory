@@ -1,0 +1,41 @@
+{
+  "request_id": "req-token-efficiency-v4-p2-review-test-ownership-v2",
+  "objective": "Add tests/test_company_review_separation.py to the company-engineering-execution capsule's semantic test list and pin that test-list relationship in the capsule regression suite.",
+  "requested_by": "MGI",
+  "requested_on": "2026-09-21",
+  "subsystem_hint": "knowledge/company_os/capsules",
+  "capsule_hints": [
+    "company-knowledge-capsules"
+  ],
+  "scope_ceiling": [
+    "knowledge/company_os/capsules/seeds/company-engineering-execution.json",
+    "tests/test_company_os_capsules.py"
+  ],
+  "acceptance_criteria": [
+    "The company-engineering-execution capsule lists both tests/test_company_engineering_execution.py and tests/test_company_review_separation.py in its tests field.",
+    "tests/test_company_os_capsules.py pins tests/test_company_review_separation.py as a semantic test of company-engineering-execution.",
+    "Every top-level field of company-engineering-execution other than tests is semantically unchanged from base commit 619b2a0374ab935c1eb21b19517d3eeecc7d0b42.",
+    "The capsule canonical JSON remains at most 3800 characters after the change.",
+    "No owns_paths, may_write, must_not_modify, capabilities, inputs, invariants, risks, outputs, purpose, authority rule, runtime behavior, or production behavior is widened or weakened.",
+    "tests/test_company_os_capsules.py passes.",
+    "The change remains limited to the two authorized files and adds no dependency."
+  ],
+  "constraints": [
+    "Metadata and capsule regression tests only.",
+    "Do not add tests/test_company_review_separation.py to owns_paths; this records semantic test responsibility, not source ownership.",
+    "Do not edit tests/test_company_review_separation.py in this work order.",
+    "Do not rewrite or compress capsule prose; there is sufficient size headroom for the one new test reference.",
+    "Do not modify company/engineering runtime code, tools/engineering_runner, Company OS authority policy, canonical main, production simulation code, or CEO-reserved actions.",
+    "The runner, not the model session, owns deterministic test execution under Token Efficiency V4 P2."
+  ],
+  "authorized_branch": "eng-token-efficiency-v4-p2-review-test-ownership-v2",
+  "base_commit": "619b2a0374ab935c1eb21b19517d3eeecc7d0b42",
+  "max_developer_attempts": 1,
+  "risk": "low",
+  "reversible": true,
+  "specialist_domain": "",
+  "novel": false,
+  "escalate_reasoning": false,
+  "resource_profile": "consumer",
+  "notes": "V2 of the P2 matched benchmark request. The first request failed deterministic intake before persistence because objective vocabulary selected an additional capsule whose forbidden knowledge prefix conflicted with the intended metadata path. V2 narrows only objective wording; scope, acceptance criteria, constraints, profile and validated P2 base are unchanged."
+}
