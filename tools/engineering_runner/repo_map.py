@@ -557,7 +557,9 @@ def build_repo_map_cached(
 
     if snapshot_path.is_file():
         snapshot = _cache_object(snapshot_path)
-        expected_paths = tuple(relative for _p, _r, relative, _raw, _key in entries)
+        expected_paths = tuple(
+            sorted(relative for _p, _r, relative, _raw, _key in entries)
+        )
         if (
             snapshot is not None
             and snapshot.get("version") == REPO_MAP_CACHE_VERSION
