@@ -95,7 +95,7 @@ def _work_order_terms(order: EngineeringWorkOrder) -> dict[str, Any]:
 
 # The version of the resource-strategy artifact. The runner refuses a version
 # it does not know, rather than reading a payload whose fields may have moved.
-RESOURCE_STRATEGY_VERSION = 1
+RESOURCE_STRATEGY_VERSION = 2
 
 
 def _efficiency_directives(
@@ -141,6 +141,11 @@ def _efficiency_directives(
         is_review=is_review,
         profile=profile,
         escalation=escalation,
+        authorized_path_count=len(order.authorized_paths),
+        required_test_count=len(order.required_tests),
+        packet_attempt=packet_attempt,
+        novel=order.novel,
+        specialist_domain=order.specialist_domain,
     )
     directives = strategy.to_dict()
     directives["artifact_version"] = RESOURCE_STRATEGY_VERSION
