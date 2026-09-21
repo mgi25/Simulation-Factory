@@ -394,6 +394,43 @@ def test_compiled_context_is_fingerprinted_and_rendered_read_once(tmp_path: Path
     assert len(rendered) <= MAX_BUNDLE_CHARS
 
 
+def test_preferred_failure_symbol_works_even_without_semantic_targets(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    spans = rank_task_spans(
+        repo_map,
+        objective="x",
+        acceptance_criteria=[],
+        paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+        preferred_symbols=[
+            ("tests/test_widget_counter.py", "test_spin_count_increments_on_spin")
+        ],
+    )
+    assert [span.qualified_name for span in spans] == [
+        "test_spin_count_increments_on_spin"
+    ]
+
+
+def test_a_compiled_only_bundle_still_renders(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    spans = rank_task_spans(
+        repo_map,
+        objective="x",
+        acceptance_criteria=[],
+        paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+        preferred_symbols=[
+            ("tests/test_widget_counter.py", "test_spin_count_increments_on_spin")
+        ],
+    )
+    bundle = build_execution_context(repo_map, primary=[], compiled_spans=spans)
+    rendered = bundle.render()
+    assert "Precompiled task spans" in rendered
+    assert "test_spin_count_increments_on_spin" in rendered
+
+
 def test_compiled_context_fingerprint_changes_with_source_body(tmp_path: Path) -> None:
     repo = _pattern_repo(tmp_path)
     repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
