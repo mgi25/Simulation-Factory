@@ -1,0 +1,74 @@
+{
+  "probe_id": "probe-token-efficiency-v4-p1-startup-2026-09-21",
+  "objective_id": "obj-token-efficiency-v4-2026-09-21",
+  "implementation_commit": "41b7f6df5fda38578c553db1114bdca2a2afb8d1",
+  "claude_code_version": "2.1.70",
+  "model": "claude-sonnet-4-6",
+  "probe_kind": "single-turn startup-surface measurement",
+  "engineering_work_order": false,
+  "run_one": false,
+  "repository_mutation_requested": false,
+  "repository_mutation_observed": false,
+  "requested_builtin_tools": [
+    "Bash",
+    "Read",
+    "Write",
+    "Edit",
+    "Glob",
+    "Grep",
+    "TodoWrite"
+  ],
+  "observed_system_init": {
+    "tools": [
+      "Bash",
+      "Glob",
+      "Grep",
+      "Read",
+      "Edit",
+      "Write",
+      "TodoWrite"
+    ],
+    "mcp_servers": [],
+    "plugins": [],
+    "skills": [
+      "keybindings-help",
+      "debug",
+      "simplify",
+      "batch",
+      "claude-api",
+      "enable-ai-project"
+    ],
+    "agents": [
+      "general-purpose",
+      "statusline-setup",
+      "Explore",
+      "Plan"
+    ],
+    "permission_mode": "default"
+  },
+  "observed_tool_calls": 0,
+  "provider_result": {
+    "subtype": "error_max_budget_usd",
+    "is_error": false,
+    "num_turns": 1,
+    "requested_max_budget_usd": 0.10,
+    "observed_total_cost_usd": 0.11184,
+    "model_usage": {
+      "input_tokens": 3,
+      "output_tokens": 4,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 17876
+    }
+  },
+  "findings": [
+    "P1 reduced the actual available built-in tool surface to exactly the seven requested Company OS developer tools.",
+    "The claude.ai Claude Docs MCP server and all other MCP servers were absent from system/init.",
+    "No plugin was loaded and no tool was called.",
+    "Skill, agent and slash-command names remain startup metadata, but their callable Skill/Task tool schemas were not present in the observed tools array.",
+    "A one-turn no-tool response still created 17,876 cache input tokens, establishing a measurable Claude Code startup/context floor for this configuration.",
+    "The requested USD 0.10 max-budget value was exceeded by the completed first turn to USD 0.11184; max-budget is therefore a boundary/stop control, not a strict penny-exact cap."
+  ],
+  "transcript_encoding_note": "Windows PowerShell Tee-Object wrote the local transcript with a UTF-16 BOM, so a later parser that forced UTF-8 raised UnicodeDecodeError. This did not affect the provider run or the visible stream-json evidence.",
+  "status": "p1_startup_surface_verified",
+  "version": "token_efficiency_v4_p1_startup_probe_v1"
+}
