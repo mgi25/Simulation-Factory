@@ -70,7 +70,7 @@ MAX_TEST_ANCHOR_EXCERPTS = 1
 # P3: compile several exact task-relevant spans up front so a routine session
 # does not have to rediscover the same file repeatedly. The spans share the
 # existing bundle budget; this is a tighter sub-budget, not additional context.
-SEMANTIC_COMPILER_VERSION = 2
+SEMANTIC_COMPILER_VERSION = 3
 MAX_COMPILED_SPANS = 6
 MAX_COMPILED_SPAN_CHARS = 3200
 MAX_COMPILED_SINGLE_SPAN_CHARS = 900
@@ -666,27 +666,49 @@ def rank_task_spans(
     path_rank = {path: index for index, path in enumerate(clean_paths)}
 
     # Deterministic base-test failures are stronger evidence than prose
-    # similarity for repair tasks. Consume those exact symbols first, but only
-    # when the path is already in the caller-supplied eligible context.
+    # similarity for repair tasks. Resolve them first, but only from paths the
+    # caller already made eligible. P3C preserves the complete failing symbol
+    # whenever the complete preferred set fits the existing global compiled
+    # context budget. This avoids hiding a second stale assertion later in the
+    # same failing test merely because pytest stopped at the first assertion.
     selected: list[CompiledSpan] = []
     used_chars = 0
     selected_keys: set[tuple[str, str]] = set()
+    preferred: list[tuple[str, SymbolSpan, str]] = []
+    seen_preferred: set[tuple[str, str]] = set()
     for path, qualified_name in preferred_symbols:
-        if len(selected) >= limit or used_chars >= max_total_chars:
+        if len(preferred) >= limit:
             break
-        if path not in path_rank:
+        key = (path, qualified_name)
+        if key in seen_preferred or path not in path_rank:
             continue
+        seen_preferred.add(key)
         module = repo_map.by_path(path)
         symbol = module.symbol(qualified_name) if module is not None else None
         if symbol is None:
             continue
         body = _read_excerpt_full(repo_root, path, symbol)
-        if body is None:
+        if not body:
             continue
-        excerpt = _read_excerpt(repo_root, path, symbol)
-        if not excerpt:
-            continue
+        preferred.append((path, symbol, body))
+
+    preserve_all_preferred = (
+        bool(preferred)
+        and sum(len(body) for _path, _symbol, body in preferred) <= max_total_chars
+    )
+
+    for index, (path, symbol, body) in enumerate(preferred):
+        if len(selected) >= limit or used_chars >= max_total_chars:
+            break
         remaining = max_total_chars - used_chars
+        if preserve_all_preferred:
+            excerpt = body
+        else:
+            # Preserve a fair share for every remaining failing symbol rather
+            # than letting one long test consume the whole context budget.
+            remaining_symbols = max(len(preferred) - index, 1)
+            fair_share = max(remaining // remaining_symbols, 1)
+            excerpt = body[:fair_share]
         excerpt = excerpt[:remaining]
         if not excerpt:
             break
