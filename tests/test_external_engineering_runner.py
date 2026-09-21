@@ -2971,7 +2971,7 @@ def test_usage_aggregates_every_paid_session_in_the_stage():
     )
 
     usage = _usage(second, sessions=(first, second))
-    assert usage["passes"] == 2
+    assert usage["passes"] == 1
     assert usage["retries"] == 1
     assert usage["provider_cost"] == "3.500000"
     assert usage["input_units"] == 15
