@@ -170,7 +170,11 @@ _MINIMALISM_LINES: tuple[str, ...] = (
 
 
 def developer_execution_context(
-    repo_map: "RepoMap | None", *, envelope: AuthorityEnvelope, worktree: Path
+    repo_map: "RepoMap | None",
+    *,
+    envelope: AuthorityEnvelope,
+    worktree: Path,
+    preferred_symbols: Sequence[tuple[str, str]] = (),
 ) -> ExecutionContextBundle:
     """The developer's bundle: authorized paths first, then the objective's
     own best matches - see `execution_context.rank_primary_files`."""
@@ -202,6 +206,7 @@ def developer_execution_context(
         acceptance_criteria=envelope.acceptance_criteria,
         paths=semantic_paths,
         repo_root=worktree,
+        preferred_symbols=preferred_symbols,
     )
     test_anchors = rank_test_anchors(
         repo_map,
