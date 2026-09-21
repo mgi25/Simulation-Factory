@@ -17,6 +17,7 @@ from tools.engineering_runner.execution_context import (
     MAX_TEST_ANCHORS,
     SEMANTIC_COMPILER_VERSION,
     build_execution_context,
+    failure_symbol_hints,
     rank_primary_files,
     rank_task_spans,
     rank_test_anchors,
@@ -233,6 +234,68 @@ def test_build_execution_context_renders_test_anchors_within_budget(tmp_path: Pa
     assert "test_stop_count_increments_on_stop" in rendered
     assert len(rendered) <= MAX_BUNDLE_CHARS
     assert bundle.truncated is False
+
+
+def test_failure_symbol_hints_parse_pytest_node_ids_deterministically() -> None:
+    hints = failure_symbol_hints(
+        [
+            (
+                "FAILED tests/test_widget_counter.py::"
+                "test_spin_count_increments_on_spin - assert 0 == 1\n"
+                "FAILED tests/test_widget_counter.py::CounterCases::"
+                "test_stop_count[param-1] - AssertionError"
+            ),
+            "unrelated diagnostic line",
+        ]
+    )
+    assert hints == (
+        ("tests/test_widget_counter.py", "test_spin_count_increments_on_spin"),
+        ("tests/test_widget_counter.py", "CounterCases.test_stop_count"),
+    )
+
+
+def test_failure_symbol_hints_deduplicate_repeated_failures() -> None:
+    detail = (
+        "FAILED tests/test_widget_counter.py::test_spin_count_increments_on_spin\n"
+        "FAILED tests/test_widget_counter.py::test_spin_count_increments_on_spin"
+    )
+    assert failure_symbol_hints([detail]) == (
+        ("tests/test_widget_counter.py", "test_spin_count_increments_on_spin"),
+    )
+
+
+def test_preferred_failure_symbol_beats_generic_semantic_overlap(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    spans = rank_task_spans(
+        repo_map,
+        objective="improve widget reliability",
+        acceptance_criteria=["keep counter behaviour correct"],
+        paths=["tests/test_widget_counter.py"],
+        repo_root=repo,
+        preferred_symbols=[
+            ("tests/test_widget_counter.py", "test_stop_count_increments_on_stop")
+        ],
+    )
+    assert spans
+    assert spans[0].qualified_name == "test_stop_count_increments_on_stop"
+    assert spans[0].reason == "failing required test at the immutable task base"
+
+
+def test_preferred_failure_symbol_outside_eligible_paths_is_ignored(tmp_path: Path) -> None:
+    repo = _pattern_repo(tmp_path)
+    repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
+    spans = rank_task_spans(
+        repo_map,
+        objective="improve widget reliability",
+        acceptance_criteria=["keep counter behaviour correct"],
+        paths=["company/widgets/counter.py"],
+        repo_root=repo,
+        preferred_symbols=[
+            ("tests/test_widget_counter.py", "test_stop_count_increments_on_stop")
+        ],
+    )
+    assert all(span.path == "company/widgets/counter.py" for span in spans)
 
 
 def test_rank_task_spans_compiles_multiple_exact_matches_once(tmp_path: Path) -> None:
