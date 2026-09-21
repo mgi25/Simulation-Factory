@@ -1350,6 +1350,7 @@ def test_consumer_developer_has_no_model_owned_shell_or_todo_loop(repository):
     assert resources["deterministic_validation_owner"] == "runner"
     assert resources["model_runs_required_tests"] is False
     assert resources["repository_map_cache"]["available"] is True
+    assert resources["repository_map_cache"]["identity_source"] == "git_blob"
     assert resources["repository_map_cache"]["snapshot_hit"] is False
     assert resources["repository_map_cache"]["module_misses"] >= 1
 
@@ -1435,6 +1436,8 @@ def test_reviewer_reuses_the_runner_owned_repository_map_cache(repository):
 
     assert developer_cache["available"] is True
     assert reviewer_cache["available"] is True
+    assert developer_cache["identity_source"] == "git_blob"
+    assert reviewer_cache["identity_source"] == "git_blob"
     assert developer_cache["snapshot_hit"] is False
     # The fixture edits subject/module.py, which is outside the repo-map roots.
     # The reviewer therefore sees the exact same company/tools/tests tree.
