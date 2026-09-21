@@ -82,6 +82,7 @@ from .briefs import (
     repair_instructions,
     review_instructions,
 )
+from .execution_context import failure_symbol_hints
 from .repo_map import RepoMap, build_repo_map
 from .config import RunnerConfig
 from .controlplane import ControlPlane
@@ -740,9 +741,38 @@ class EngineeringRunner:
             },
         )
 
+        base_runs: tuple[TestRun, ...] = ()
+        preferred_symbols: tuple[tuple[str, str], ...] = ()
+        if not resume and envelope.required_tests:
+            base_runs = run_tests(
+                self._commands,
+                python_executable=self.config.python_executable,
+                worktree=worktree,
+                commands=envelope.required_tests,
+                commit=before.head,
+                timeout_s=self.config.test_timeout_s,
+            )
+            preferred_symbols = failure_symbol_hints(
+                tuple(run.failure_detail for run in base_runs if not run.green)
+            )
+            write_json(
+                stage_dir / "base-tests.json",
+                {
+                    "commit": before.head,
+                    "runs": [run.to_dict() for run in base_runs],
+                    "failure_symbol_hints": [
+                        {"path": path, "qualified_name": name}
+                        for path, name in preferred_symbols
+                    ],
+                },
+            )
+
         repo_map = self._repo_map(worktree)
         context_bundle = developer_execution_context(
-            repo_map, envelope=envelope, worktree=worktree
+            repo_map,
+            envelope=envelope,
+            worktree=worktree,
+            preferred_symbols=preferred_symbols,
         )
         context_path = write_json(
             stage_dir / "execution-context.json", context_bundle.to_dict()
@@ -755,6 +785,14 @@ class EngineeringRunner:
                 "compiled_spans": len(context_bundle.compiled_spans),
                 "rendered_chars": len(context_bundle.render()),
                 "truncated": context_bundle.truncated,
+            },
+            "base_diagnostic": {
+                "ran": bool(base_runs),
+                "test_runs": len(base_runs),
+                "green": sum(1 for run in base_runs if run.green),
+                "failed": sum(1 for run in base_runs if not run.green),
+                "failure_symbol_hints": len(preferred_symbols),
+                "duration_s": round(sum(run.duration_s for run in base_runs), 6),
             },
         }
         write_json(stage_dir / "resources.json", applied)
