@@ -70,7 +70,7 @@ MAX_TEST_ANCHOR_EXCERPTS = 1
 # P3: compile several exact task-relevant spans up front so a routine session
 # does not have to rediscover the same file repeatedly. The spans share the
 # existing bundle budget; this is a tighter sub-budget, not additional context.
-SEMANTIC_COMPILER_VERSION = 1
+SEMANTIC_COMPILER_VERSION = 2
 MAX_COMPILED_SPANS = 6
 MAX_COMPILED_SPAN_CHARS = 3200
 MAX_COMPILED_SINGLE_SPAN_CHARS = 900
@@ -217,7 +217,12 @@ class ExecutionContextBundle:
     truncated: bool = False
 
     def render(self) -> str:
-        if not self.files and not self.context_refs and not self.test_anchors:
+        if (
+            not self.files
+            and not self.context_refs
+            and not self.test_anchors
+            and not self.compiled_spans
+        ):
             return ""
         lines: list[str] = [
             "",
@@ -655,7 +660,7 @@ def rank_task_spans(
         self_references |= _meaningful_tokens(stem)
     phrase_targets = phrase_targets - self_references
     token_targets = token_targets - self_references
-    if not phrase_targets and not token_targets:
+    if not phrase_targets and not token_targets and not preferred_symbols:
         return ()
 
     path_rank = {path: index for index, path in enumerate(clean_paths)}
