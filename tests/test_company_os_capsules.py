@@ -776,3 +776,8 @@ def test_the_policy_capsule_states_the_rule_and_points_at_the_fact(seeds):
     assert "bootstrap-forbids-nested-agents" in policy.facts
     assert any("subagent" in invariant for invariant in policy.invariants)
     assert KnowledgeStore(DEFAULT_ROOT).get("fact", "bootstrap-forbids-nested-agents")
+
+
+def test_review_separation_is_pinned_as_a_semantic_test_of_engineering_execution(seeds):
+    capsule = seeds.get("company-engineering-execution")
+    assert "tests/test_company_review_separation.py" in capsule.tests

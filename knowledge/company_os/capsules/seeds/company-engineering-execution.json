@@ -77,7 +77,8 @@
   "source_digests": [],
   "status": "active",
   "tests": [
-    "tests/test_company_engineering_execution.py"
+    "tests/test_company_engineering_execution.py",
+    "tests/test_company_review_separation.py"
   ],
   "title": "Company engineering execution loop",
   "type": "module"
