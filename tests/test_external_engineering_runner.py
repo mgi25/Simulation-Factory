@@ -92,7 +92,7 @@ from tools.engineering_runner.evidence import (
     parse_json_object,
     suite_evidence,
 )
-from tools.engineering_runner.evidence import _usage
+from tools.engineering_runner.evidence import _counts, _summary_line, _usage
 from tools.engineering_runner.process import CommandResult, CommandRunner
 from tools.engineering_runner.queue import LEASE_NAME, RunStore, utcnow
 from tools.engineering_runner.redaction import (
@@ -3101,6 +3101,17 @@ def test_no_exploration_json_is_written_when_the_backend_gave_no_trace(repositor
 
 
 # --- consumer resource mode: output reduction -----------------------------
+
+
+def test_failed_pytest_summary_prefers_the_counted_final_line() -> None:
+    stdout = (
+        "================ short test summary info ================\n"
+        "FAILED tests/test_subject.py::test_one - assert 1 == 2\n"
+        "FAILED tests/test_subject.py::test_two - assert 1 == 2\n"
+        "================ 2 failed, 205 passed in 19.88s ================\n"
+    )
+    assert _summary_line(stdout) == "2 failed, 205 passed in 19.88s"
+    assert _counts(stdout) == {"failed": 2, "passed": 205}
 
 
 def test_a_successful_command_is_one_line_and_a_failing_one_is_its_failure():
