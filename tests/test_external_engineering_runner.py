@@ -66,7 +66,11 @@ from tools.engineering_runner.backends import (
     SessionRequest,
     normalise_claude_usage,
 )
-from tools.engineering_runner.briefs import developer_instructions, review_instructions
+from tools.engineering_runner.briefs import (
+    developer_execution_context,
+    developer_instructions,
+    review_instructions,
+)
 from tools.engineering_runner.repo_map import build_repo_map
 from tools.engineering_runner.config import RunnerConfig
 from tools.engineering_runner.errors import (
@@ -405,6 +409,49 @@ def test_developer_instructions_work_with_no_repo_map_at_all():
     )
     assert "Authorized engineering work order" in instructions
     assert "Execution context" not in instructions
+
+
+def test_p3_compiler_miss_falls_back_to_the_p2_generic_excerpt(tmp_path: Path):
+    """A weak semantic match may cost more reads, but it must not starve the model."""
+    (tmp_path / "subject").mkdir()
+    (tmp_path / "subject" / "module.py").write_text(
+        "def unrelated_helper():\n    return 1\n", encoding="utf-8"
+    )
+    repo_map = build_repo_map(tmp_path, roots=("subject",))
+    envelope = AuthorityEnvelope.parse(
+        developer_briefing("a" * 40, allowed=["subject/module.py"])
+    )
+
+    bundle = developer_execution_context(repo_map, envelope=envelope, worktree=tmp_path)
+
+    assert bundle.compiled_spans == ()
+    assert bundle.files
+    assert bundle.files[0].excerpts, "P3 miss must retain the P2 fallback excerpt"
+
+
+def test_p3_required_test_context_never_widens_write_authority(tmp_path: Path):
+    (tmp_path / "subject").mkdir()
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "subject" / "module.py").write_text(
+        "def set_value():\n    return 2\n", encoding="utf-8"
+    )
+    (tmp_path / "tests" / "test_subject.py").write_text(
+        "def test_value_is_two():\n    VALUE = 2\n    assert VALUE == 2\n",
+        encoding="utf-8",
+    )
+    repo_map = build_repo_map(tmp_path, roots=("subject", "tests"))
+    envelope = AuthorityEnvelope.parse(
+        developer_briefing("a" * 40, allowed=["subject/module.py"])
+    )
+
+    bundle = developer_execution_context(repo_map, envelope=envelope, worktree=tmp_path)
+
+    assert envelope.may_write == ("subject/module.py",)
+    assert all(
+        span.path in {"subject/module.py", "tests/test_subject.py"}
+        for span in bundle.compiled_spans
+    )
+    assert "tests/test_subject.py" not in envelope.may_write
 
 
 def test_review_instructions_work_with_no_repo_map_at_all():
