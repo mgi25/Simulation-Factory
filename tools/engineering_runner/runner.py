@@ -86,6 +86,7 @@ from .config import RunnerConfig
 from .controlplane import ControlPlane
 from .errors import (
     AuthorityViolation,
+    BackendFailure,
     BackendUnavailable,
     ClaimUnavailable,
     IntegrityFailure,
@@ -702,7 +703,7 @@ class EngineeringRunner:
         )
         write_text(stage_dir / "instructions.md", instructions)
 
-        session, narrative = self._session_with_report(
+        session, narrative, sessions = self._session_with_report(
             backend_name=self.config.backend,
             request=SessionRequest(
                 role="developer",
@@ -760,6 +761,7 @@ class EngineeringRunner:
                 state_before=state_before,
                 verdict=verdict,
                 session=session,
+                sessions=sessions,
                 narrative=narrative,
                 observation=GitObservation(
                     branch=after.branch,
@@ -807,6 +809,7 @@ class EngineeringRunner:
                 state_before=state_before,
                 verdict=verdict,
                 session=session,
+                sessions=sessions,
                 narrative=narrative,
                 observation=GitObservation(
                     branch=settled.branch,
@@ -875,6 +878,7 @@ class EngineeringRunner:
             tests=tests,
             narrative=narrative,
             session=session,
+            sessions=sessions,
             completed_at=utcnow(),
             accepted=accepted,
             rejection_reason=(
@@ -904,7 +908,7 @@ class EngineeringRunner:
                 + ("" if not failures else "; receipt failures: " + "; ".join(failures[:3]))
             ),
             artifacts=(str(receipt_path),),
-            session_ids=(session.session_id,),
+            session_ids=tuple(item.session_id for item in sessions),
         )
 
     def _review_stage(
@@ -978,7 +982,7 @@ class EngineeringRunner:
         )
         write_text(stage_dir / "instructions.md", instructions)
 
-        session, reported = self._session_with_report(
+        session, reported, sessions = self._session_with_report(
             backend_name=self.config.reviewer_backend_name,
             request=SessionRequest(
                 role="reviewer",
@@ -1053,7 +1057,7 @@ class EngineeringRunner:
                 f"{review.get('deterministic_outcome', '?')})"
             ),
             artifacts=(str(attestation_path),),
-            session_ids=(session.session_id,),
+            session_ids=tuple(item.session_id for item in sessions),
         )
 
     def _gate_stage(self, work_order_id: str, run_dir: Path) -> StageRecord:
@@ -1136,6 +1140,7 @@ class EngineeringRunner:
         state_before: str,
         verdict: AuthorityVerdict,
         session: SessionOutcome,
+        sessions: Sequence[SessionOutcome],
         narrative: Mapping[str, Any],
         observation: GitObservation,
     ) -> StageRecord:
@@ -1155,6 +1160,7 @@ class EngineeringRunner:
             tests=(),
             narrative=narrative,
             session=session,
+            sessions=sessions,
             completed_at=utcnow(),
             accepted=False,
             rejection_reason=reason,
@@ -1175,13 +1181,14 @@ class EngineeringRunner:
         report_path: Path | None,
         what: str,
         validate: Callable[[Mapping[str, Any]], None] | None = None,
-    ) -> tuple[SessionOutcome, dict[str, Any]]:
-        """Launch a session and read its structured answer, with one repair try.
+    ) -> tuple[SessionOutcome, dict[str, Any], tuple[SessionOutcome, ...]]:
+        """Launch a session and read its structured answer, with one bounded repair.
 
-        `validate` runs against the decoded answer, so a reply that parses but
-        does not fit the contract Company OS will hold it to is repaired here -
-        by the session that made the judgment - instead of being refused a
-        stage later, when the judgment is already gone.
+        Every provider subprocess is preserved and returned to the caller. A
+        backend/resource stop is terminal to automatic repair: a session that
+        already hit a provider ceiling is not a malformed JSON answer and must
+        never trigger another paid session. Only a successful session whose
+        structured report is unreadable may use the configured repair slot.
         """
         backend = self.backend(backend_name)
         available, detail = backend.available()
@@ -1189,14 +1196,11 @@ class EngineeringRunner:
             raise BackendUnavailable(f"{backend_name}: {detail}")
         attempt = request
         problem = ""
+        sessions: list[SessionOutcome] = []
         for index in range(self.config.max_stage_retries + 1):
             session = backend.launch(attempt)
-            # The report is the one channel the session writes straight to
-            # disk, and everything downstream - the receipt, the attestation,
-            # the Company OS record, the committed evidence - is built from it.
-            # Scrub it where it lands, before anything reads it, so there is no
-            # arrangement of later code that can persist a credential a session
-            # happened to quote back.
+            sessions.append(session)
+
             if report_path is not None:
                 sanitize_json_file(report_path, self._redactor)
             write_json(stage_dir / f"session-{index + 1}.json", session.to_dict())
@@ -1204,18 +1208,33 @@ class EngineeringRunner:
                 stage_dir / f"session-{index + 1}.transcript.txt",
                 self._redactor.scrub(session.transcript),
             )
+            # Compatibility alias only. Truthful accounting reads session-N
+            # artifacts (and the receipt aggregate), never this last-session view.
             write_json(stage_dir / "session.json", session.to_dict())
+            write_json(
+                stage_dir / "sessions.json",
+                {
+                    "paid_session_count": len(sessions),
+                    "sessions": [item.to_dict() for item in sessions],
+                },
+            )
             if session.exploration is not None:
-                # The bounded, normalised trace `exploration_report.py` and a
-                # human read for "what did this session actually explore" -
-                # separate from `session.json` so that file stays the same
-                # small shape it always was. Never the raw transcript: the
-                # events here are already reduced to a tool name, a category
-                # and a repo-relative path or pattern.
-                write_json(
-                    stage_dir / "exploration.json",
-                    {**session.exploration, "events": list(session.exploration_events)},
+                exploration = {
+                    **session.exploration,
+                    "events": list(session.exploration_events),
+                }
+                write_json(stage_dir / f"exploration-{index + 1}.json", exploration)
+                # Compatibility alias: latest session only.
+                write_json(stage_dir / "exploration.json", exploration)
+
+            if not session.ok:
+                stopped = session.stopped_reason or f"exit_code={session.exit_code}"
+                raise BackendFailure(
+                    f"{backend_name} {request.role} session stopped before a usable "
+                    f"{what}: {stopped}; automatic report repair is disabled after "
+                    "a backend or provider stop"
                 )
+
             try:
                 if report_path is not None and report_path.is_file():
                     answer = read_json_object(report_path, what)
@@ -1223,7 +1242,7 @@ class EngineeringRunner:
                     answer = parse_json_object(session.result_text, what)
                 if validate is not None:
                     validate(answer)
-                return session, answer
+                return session, answer, tuple(sessions)
             except IntegrityFailure as exc:
                 problem = str(exc)
                 if index >= self.config.max_stage_retries:
@@ -1238,6 +1257,7 @@ class EngineeringRunner:
                     model=request.model,
                     read_only=request.read_only,
                     extra_dirs=request.extra_dirs,
+                    max_cost=request.max_cost,
                 )
         raise IntegrityFailure(problem or f"{what}: no usable answer")
 
