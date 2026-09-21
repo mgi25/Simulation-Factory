@@ -86,7 +86,7 @@ _TOKEN_RE = re.compile(r"[a-zA-Z0-9]+")
 # P4: cache parser/index products only when their source identity proves they
 # belong to the exact repository content being mapped. Increment this if the
 # serialized map semantics change in a way old entries cannot represent.
-REPO_MAP_CACHE_VERSION = 2
+REPO_MAP_CACHE_VERSION = 3
 
 
 @dataclass(frozen=True)
@@ -396,6 +396,16 @@ def _module_cache_key(relative_path: str, raw: bytes) -> str:
     return digest.hexdigest()
 
 
+def _module_identity_key(relative_path: str, identity: str) -> str:
+    """Versioned cache key from a trusted content identity such as a Git blob id."""
+    digest = hashlib.sha256()
+    digest.update(f"repo-map-v{REPO_MAP_CACHE_VERSION}\0identity\0".encode("utf-8"))
+    digest.update(relative_path.encode("utf-8"))
+    digest.update(b"\0")
+    digest.update(identity.encode("utf-8"))
+    return digest.hexdigest()
+
+
 def _tree_cache_key(
     roots: tuple[str, ...], entries: Iterable[tuple[str, str]]
 ) -> str:
@@ -513,10 +523,16 @@ def build_repo_map_cached(
     cache_root: Path,
     *,
     roots: Iterable[str] = DEFAULT_ROOTS,
+    content_identities: Mapping[str, str] | None = None,
 ) -> tuple[RepoMap, RepoMapCacheEvidence]:
     """Build the map from exact content identities, reusing safe snapshots.
 
-    P4B keeps two deterministic records under runner-owned state:
+    P4C accepts an optional trusted path -> content identity mapping. The
+    runner supplies Git blob ids only for a clean worktree. In that mode the
+    cache can determine unchanged modules without reopening their source files.
+    With no identity mapping, the P4B filesystem-content path remains intact.
+
+    The cache keeps two deterministic records under runner-owned state:
 
     * an exact-tree snapshot keyed by the complete scoped tree fingerprint;
     * a tiny `latest.json` manifest that points at the previous snapshot and
@@ -524,8 +540,8 @@ def build_repo_map_cached(
 
     An unchanged tree loads its exact snapshot. A changed tree loads at most
     one previous snapshot and reuses only ModuleMaps whose path *and* exact
-    source-content key still match. Changed/new modules are parsed again and
-    reverse indexes are rebuilt deterministically.
+    content key still match. Changed/new modules are parsed again and reverse
+    indexes are rebuilt deterministically.
 
     The cache is advisory. Missing/corrupt records are misses, never authority,
     and nothing stale is accepted merely because a cache file exists.
@@ -534,25 +550,54 @@ def build_repo_map_cached(
     cache_root = Path(cache_root)
     roots_t = tuple(roots)
 
-    entries: list[tuple[Path, str, str, bytes, str]] = []
-    for root_name in roots_t:
-        base = repo_root / root_name
-        if not base.is_dir():
-            continue
-        for source in sorted(base.rglob("*.py")):
-            if _EXCLUDED_PARTS & set(source.parts):
+    entries: list[tuple[Path, str, str, bytes | None, str]] = []
+
+    if content_identities is not None:
+        for relative, identity in sorted(
+            (str(path).replace("\\", "/"), str(value))
+            for path, value in content_identities.items()
+        ):
+            if not relative.endswith(".py"):
                 continue
-            relative = source.relative_to(repo_root).as_posix()
-            raw = source.read_bytes()
+            owner_root = next(
+                (
+                    root
+                    for root in roots_t
+                    if relative == root or relative.startswith(root + "/")
+                ),
+                "",
+            )
+            if not owner_root:
+                continue
+            source = repo_root / relative
             entries.append(
                 (
                     source,
-                    root_name,
+                    owner_root,
                     relative,
-                    raw,
-                    _module_cache_key(relative, raw),
+                    None,
+                    _module_identity_key(relative, identity),
                 )
             )
+    else:
+        for root_name in roots_t:
+            base = repo_root / root_name
+            if not base.is_dir():
+                continue
+            for source in sorted(base.rglob("*.py")):
+                if _EXCLUDED_PARTS & set(source.parts):
+                    continue
+                relative = source.relative_to(repo_root).as_posix()
+                raw = source.read_bytes()
+                entries.append(
+                    (
+                        source,
+                        root_name,
+                        relative,
+                        raw,
+                        _module_cache_key(relative, raw),
+                    )
+                )
 
     current_keys = {
         relative: module_key
@@ -667,6 +712,8 @@ def build_repo_map_cached(
                 module = candidate
 
         if module is None:
+            if raw is None:
+                raw = source.read_bytes()
             text = raw.decode("utf-8", errors="replace")
             module = _module_map_from_text(repo_root, source, owner_root, text)
             module_misses += 1
