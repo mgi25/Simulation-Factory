@@ -1,0 +1,111 @@
+{
+ "rows": [
+  {
+   "accepted": 11609,
+   "rate": 0.58045,
+   "rule": "very_loose",
+   "thresholds": {
+    "max_body_gap": 8.0,
+    "max_cycle_length": 12,
+    "max_duration": 50.0,
+    "max_final_three": 25.0,
+    "max_final_tile": 16.0,
+    "max_first_collision": 1.0,
+    "max_tail_share_from_90": 0.6,
+    "max_two_tile_run": 4,
+    "min_duration": 20.0,
+    "min_final_tile": 0.8,
+    "min_opening_activations": 3
+   }
+  },
+  {
+   "accepted": 7590,
+   "rate": 0.3795,
+   "rule": "loose",
+   "thresholds": {
+    "max_body_gap": 6.0,
+    "max_cycle_length": 12,
+    "max_duration": 45.0,
+    "max_final_three": 18.0,
+    "max_final_tile": 12.0,
+    "max_first_collision": 1.0,
+    "max_tail_share_from_90": 0.5,
+    "max_two_tile_run": 4,
+    "min_duration": 22.0,
+    "min_final_tile": 1.0,
+    "min_opening_activations": 3
+   }
+  },
+  {
+   "accepted": 2282,
+   "rate": 0.1141,
+   "rule": "default",
+   "thresholds": {
+    "max_body_gap": 4.0,
+    "max_cycle_length": 12,
+    "max_duration": 40.0,
+    "max_final_three": 14.0,
+    "max_final_tile": 9.0,
+    "max_first_collision": 1.0,
+    "max_tail_share_from_90": 0.4,
+    "max_two_tile_run": 4,
+    "min_duration": 25.0,
+    "min_final_tile": 1.5,
+    "min_opening_activations": 3
+   }
+  },
+  {
+   "accepted": 295,
+   "rate": 0.01475,
+   "rule": "strict",
+   "thresholds": {
+    "max_body_gap": 3.0,
+    "max_cycle_length": 12,
+    "max_duration": 38.0,
+    "max_final_three": 11.0,
+    "max_final_tile": 7.0,
+    "max_first_collision": 1.0,
+    "max_tail_share_from_90": 0.33,
+    "max_two_tile_run": 4,
+    "min_duration": 28.0,
+    "min_final_tile": 2.0,
+    "min_opening_activations": 3
+   }
+  },
+  {
+   "accepted": 23,
+   "rate": 0.00115,
+   "rule": "very_strict",
+   "thresholds": {
+    "max_body_gap": 2.5,
+    "max_cycle_length": 12,
+    "max_duration": 36.0,
+    "max_final_three": 9.0,
+    "max_final_tile": 6.0,
+    "max_first_collision": 1.0,
+    "max_tail_share_from_90": 0.28,
+    "max_two_tile_run": 4,
+    "min_duration": 30.0,
+    "min_final_tile": 2.5,
+    "min_opening_activations": 3
+   }
+  },
+  {
+   "accepted": 10158,
+   "rate": 0.5079,
+   "rule": "runtime_only_25_40"
+  },
+  {
+   "accepted": 7028,
+   "rate": 0.3514,
+   "rule": "runtime_only_28_38"
+  },
+  {
+   "accepted": 4364,
+   "rate": 0.2182,
+   "rule": "runtime_only_30_36"
+  }
+ ],
+ "seeds": 20000,
+ "speed": 85.0
+}

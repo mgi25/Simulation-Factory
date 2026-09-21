@@ -1,0 +1,2899 @@
+{
+ "accept_rate": 0.11514,
+ "accepted_total": 5757,
+ "arena": {
+  "sides": 17,
+  "total_tiles": 51
+ },
+ "candidates": [
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 10,
+    "collisions": 158,
+    "collisions_per_second": 4.916,
+    "completed": true,
+    "completion_seconds": 32.143,
+    "duplicate_hits": 107,
+    "duplicate_share": 0.6772,
+    "duplicate_share_thirds": [
+     0.4038,
+     0.717,
+     0.9057
+    ],
+    "duplicates_per_new_thirds": [
+     0.677,
+     2.533,
+     9.6
+    ],
+    "early_activation_rate": 5.0,
+    "end_seconds": 32.143,
+    "final_three_seconds": 8.253,
+    "final_tile_over_median_interval": 17.13,
+    "final_tile_seconds": 3.821,
+    "first_activation_seconds": 0.114,
+    "first_collision_seconds": 0.114,
+    "long_gap_count": 1,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 45,
+    "longest_body_gap_seconds": 1.703,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 5,
+     "members": [
+      8,
+      19,
+      31,
+      44
+     ],
+     "start_index": 78,
+     "start_seconds": 16.659
+    },
+    "longest_gap_after_tiles": 50,
+    "longest_gap_progress": 0.9804,
+    "longest_gap_seconds": 3.821,
+    "longest_gap_start_seconds": 28.322,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 2,
+     "members": [
+      5,
+      26
+     ],
+     "start_index": 0,
+     "start_seconds": 0.114
+    },
+    "max_hits_on_one_tile": 8,
+    "median_activation_interval": 0.223,
+    "milestones": {
+     "complete": 32.143,
+     "first": 0.114,
+     "n_minus_1": 28.322,
+     "n_minus_2": 26.368,
+     "p25": 3.063,
+     "p50": 6.873,
+     "p75": 14.572,
+     "p90": 21.371,
+     "p95": 26.368
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 3530,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 10.772,
+    "tail_from_95_seconds": 5.775,
+    "tail_from_second_last_seconds": 3.821,
+    "tail_from_third_last_seconds": 5.775,
+    "tail_share_from_90": 0.3351,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.6385,
+     "no_stagnation": 0.5742,
+     "opening": 1.0,
+     "runtime": 0.9841,
+     "tail_tension": 0.9642
+    },
+    "total": 0.8592,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 3530,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 9,
+    "collisions": 151,
+    "collisions_per_second": 4.75,
+    "completed": true,
+    "completion_seconds": 31.789,
+    "duplicate_hits": 100,
+    "duplicate_share": 0.6623,
+    "duplicate_share_thirds": [
+     0.32,
+     0.74,
+     0.9216
+    ],
+    "duplicates_per_new_thirds": [
+     0.471,
+     2.846,
+     11.75
+    ],
+    "early_activation_rate": 4.5,
+    "end_seconds": 31.789,
+    "final_three_seconds": 10.556,
+    "final_tile_over_median_interval": 16.86,
+    "final_tile_seconds": 3.742,
+    "first_activation_seconds": 0.13,
+    "first_collision_seconds": 0.13,
+    "long_gap_count": 2,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 42,
+    "longest_body_gap_seconds": 1.6,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 4,
+     "members": [
+      0,
+      22,
+      25,
+      49
+     ],
+     "start_index": 0,
+     "start_seconds": 0.13
+    },
+    "longest_gap_after_tiles": 49,
+    "longest_gap_progress": 0.9608,
+    "longest_gap_seconds": 6.387,
+    "longest_gap_start_seconds": 21.66,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 2,
+     "members": [
+      22,
+      49
+     ],
+     "start_index": 0,
+     "start_seconds": 0.13
+    },
+    "max_hits_on_one_tile": 6,
+    "median_activation_interval": 0.222,
+    "milestones": {
+     "complete": 31.789,
+     "first": 0.13,
+     "n_minus_1": 28.047,
+     "n_minus_2": 21.66,
+     "p25": 2.717,
+     "p50": 6.299,
+     "p75": 14.207,
+     "p90": 19.95,
+     "p95": 21.66
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 2281,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 11.838,
+    "tail_from_95_seconds": 10.129,
+    "tail_from_second_last_seconds": 3.742,
+    "tail_from_third_last_seconds": 10.129,
+    "tail_share_from_90": 0.3724,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.5834,
+     "no_stagnation": 0.6001,
+     "opening": 1.0,
+     "runtime": 0.9765,
+     "tail_tension": 0.9483
+    },
+    "total": 0.8555,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 2281,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 9,
+    "collisions": 153,
+    "collisions_per_second": 4.91,
+    "completed": true,
+    "completion_seconds": 31.161,
+    "duplicate_hits": 102,
+    "duplicate_share": 0.6667,
+    "duplicate_share_thirds": [
+     0.4118,
+     0.7255,
+     0.8627
+    ],
+    "duplicates_per_new_thirds": [
+     0.7,
+     2.643,
+     6.286
+    ],
+    "early_activation_rate": 4.5,
+    "end_seconds": 31.161,
+    "final_three_seconds": 6.542,
+    "final_tile_over_median_interval": 9.65,
+    "final_tile_seconds": 3.548,
+    "first_activation_seconds": 0.11,
+    "first_collision_seconds": 0.11,
+    "long_gap_count": 1,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 41,
+    "longest_body_gap_seconds": 1.092,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 5,
+     "members": [
+      0,
+      12,
+      18,
+      40
+     ],
+     "start_index": 4,
+     "start_seconds": 0.861
+    },
+    "longest_gap_after_tiles": 50,
+    "longest_gap_progress": 0.9804,
+    "longest_gap_seconds": 3.548,
+    "longest_gap_start_seconds": 27.613,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 3,
+     "members": [
+      12,
+      40
+     ],
+     "start_index": 6,
+     "start_seconds": 1.274
+    },
+    "max_hits_on_one_tile": 4,
+    "median_activation_interval": 0.367,
+    "milestones": {
+     "complete": 31.161,
+     "first": 0.11,
+     "n_minus_1": 27.613,
+     "n_minus_2": 25.57,
+     "p25": 2.731,
+     "p50": 8.28,
+     "p75": 15.571,
+     "p90": 22.577,
+     "p95": 25.57
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 12183,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 8.584,
+    "tail_from_95_seconds": 5.59,
+    "tail_from_second_last_seconds": 3.548,
+    "tail_from_third_last_seconds": 5.59,
+    "tail_share_from_90": 0.2755,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.6367,
+     "no_stagnation": 0.727,
+     "opening": 1.0,
+     "runtime": 0.9068,
+     "tail_tension": 0.9096
+    },
+    "total": 0.8538,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 12183,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 13,
+    "collisions": 194,
+    "collisions_per_second": 6.033,
+    "completed": true,
+    "completion_seconds": 32.156,
+    "duplicate_hits": 143,
+    "duplicate_share": 0.7371,
+    "duplicate_share_thirds": [
+     0.4688,
+     0.8,
+     0.9385
+    ],
+    "duplicates_per_new_thirds": [
+     0.882,
+     4.0,
+     15.25
+    ],
+    "early_activation_rate": 6.5,
+    "end_seconds": 32.156,
+    "final_three_seconds": 10.43,
+    "final_tile_over_median_interval": 18.53,
+    "final_tile_seconds": 4.094,
+    "first_activation_seconds": 0.107,
+    "first_collision_seconds": 0.107,
+    "long_gap_count": 2,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 47,
+    "longest_body_gap_seconds": 2.158,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 7,
+     "members": [
+      5,
+      11,
+      23,
+      35
+     ],
+     "start_index": 23,
+     "start_seconds": 3.896
+    },
+    "longest_gap_after_tiles": 48,
+    "longest_gap_progress": 0.9412,
+    "longest_gap_seconds": 4.423,
+    "longest_gap_start_seconds": 21.726,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 3,
+     "members": [
+      3,
+      30
+     ],
+     "start_index": 13,
+     "start_seconds": 2.177
+    },
+    "max_hits_on_one_tile": 8,
+    "median_activation_interval": 0.221,
+    "milestones": {
+     "complete": 32.156,
+     "first": 0.107,
+     "n_minus_1": 28.062,
+     "n_minus_2": 26.149,
+     "p25": 1.964,
+     "p50": 6.01,
+     "p75": 12.984,
+     "p90": 19.352,
+     "p95": 26.149
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 37169,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 12.804,
+    "tail_from_95_seconds": 6.007,
+    "tail_from_second_last_seconds": 4.094,
+    "tail_from_third_last_seconds": 6.007,
+    "tail_share_from_90": 0.3982,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.989,
+     "no_stagnation": 0.4606,
+     "opening": 1.0,
+     "runtime": 0.9827,
+     "tail_tension": 0.9812
+    },
+    "total": 0.8529,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 37169,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 14,
+    "collisions": 189,
+    "collisions_per_second": 5.995,
+    "completed": true,
+    "completion_seconds": 31.524,
+    "duplicate_hits": 138,
+    "duplicate_share": 0.7302,
+    "duplicate_share_thirds": [
+     0.4444,
+     0.8095,
+     0.9365
+    ],
+    "duplicates_per_new_thirds": [
+     0.8,
+     4.25,
+     14.75
+    ],
+    "early_activation_rate": 7.0,
+    "end_seconds": 31.524,
+    "final_three_seconds": 10.347,
+    "final_tile_over_median_interval": 19.5,
+    "final_tile_seconds": 4.191,
+    "first_activation_seconds": 0.127,
+    "first_collision_seconds": 0.127,
+    "long_gap_count": 2,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 37,
+    "longest_body_gap_seconds": 1.9,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 7,
+     "members": [
+      3,
+      24,
+      36,
+      48
+     ],
+     "start_index": 12,
+     "start_seconds": 1.645
+    },
+    "longest_gap_after_tiles": 48,
+    "longest_gap_progress": 0.9412,
+    "longest_gap_seconds": 4.192,
+    "longest_gap_start_seconds": 21.176,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 3,
+     "members": [
+      24,
+      48
+     ],
+     "start_index": 14,
+     "start_seconds": 2.057
+    },
+    "max_hits_on_one_tile": 8,
+    "median_activation_interval": 0.215,
+    "milestones": {
+     "complete": 31.524,
+     "first": 0.127,
+     "n_minus_1": 27.333,
+     "n_minus_2": 25.368,
+     "p25": 1.645,
+     "p50": 5.87,
+     "p75": 13.422,
+     "p90": 19.469,
+     "p95": 25.368
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 8949,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 12.055,
+    "tail_from_95_seconds": 6.156,
+    "tail_from_second_last_seconds": 4.191,
+    "tail_from_third_last_seconds": 6.156,
+    "tail_share_from_90": 0.3824,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.9985,
+     "no_stagnation": 0.5249,
+     "opening": 1.0,
+     "runtime": 0.9471,
+     "tail_tension": 0.9618
+    },
+    "total": 0.8512,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 8949,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 14,
+    "collisions": 192,
+    "collisions_per_second": 6.059,
+    "completed": true,
+    "completion_seconds": 31.69,
+    "duplicate_hits": 141,
+    "duplicate_share": 0.7344,
+    "duplicate_share_thirds": [
+     0.4375,
+     0.8281,
+     0.9375
+    ],
+    "duplicates_per_new_thirds": [
+     0.778,
+     4.818,
+     15.0
+    ],
+    "early_activation_rate": 7.0,
+    "end_seconds": 31.69,
+    "final_three_seconds": 10.143,
+    "final_tile_over_median_interval": 17.97,
+    "final_tile_seconds": 3.976,
+    "first_activation_seconds": 0.102,
+    "first_collision_seconds": 0.102,
+    "long_gap_count": 2,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 45,
+    "longest_body_gap_seconds": 2.191,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 7,
+     "members": [
+      0,
+      12,
+      25,
+      31
+     ],
+     "start_index": 21,
+     "start_seconds": 3.441
+    },
+    "longest_gap_after_tiles": 49,
+    "longest_gap_progress": 0.9608,
+    "longest_gap_seconds": 3.976,
+    "longest_gap_start_seconds": 23.737,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 3,
+     "members": [
+      22,
+      47
+     ],
+     "start_index": 15,
+     "start_seconds": 2.253
+    },
+    "max_hits_on_one_tile": 7,
+    "median_activation_interval": 0.221,
+    "milestones": {
+     "complete": 31.69,
+     "first": 0.102,
+     "n_minus_1": 27.714,
+     "n_minus_2": 23.737,
+     "p25": 1.666,
+     "p50": 5.491,
+     "p75": 12.993,
+     "p90": 19.761,
+     "p95": 23.737
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 14694,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 11.928,
+    "tail_from_95_seconds": 7.952,
+    "tail_from_second_last_seconds": 3.976,
+    "tail_from_third_last_seconds": 7.952,
+    "tail_share_from_90": 0.3764,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.9804,
+     "no_stagnation": 0.4524,
+     "opening": 1.0,
+     "runtime": 0.9655,
+     "tail_tension": 0.9952
+    },
+    "total": 0.8486,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 14694,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 14,
+    "collisions": 192,
+    "collisions_per_second": 6.061,
+    "completed": true,
+    "completion_seconds": 31.68,
+    "duplicate_hits": 141,
+    "duplicate_share": 0.7344,
+    "duplicate_share_thirds": [
+     0.4375,
+     0.8281,
+     0.9375
+    ],
+    "duplicates_per_new_thirds": [
+     0.778,
+     4.818,
+     15.0
+    ],
+    "early_activation_rate": 7.0,
+    "end_seconds": 31.68,
+    "final_three_seconds": 10.143,
+    "final_tile_over_median_interval": 17.97,
+    "final_tile_seconds": 3.976,
+    "first_activation_seconds": 0.093,
+    "first_collision_seconds": 0.093,
+    "long_gap_count": 2,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 45,
+    "longest_body_gap_seconds": 2.191,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 7,
+     "members": [
+      4,
+      10,
+      23,
+      35
+     ],
+     "start_index": 13,
+     "start_seconds": 1.831
+    },
+    "longest_gap_after_tiles": 49,
+    "longest_gap_progress": 0.9608,
+    "longest_gap_seconds": 3.976,
+    "longest_gap_start_seconds": 23.728,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 3,
+     "members": [
+      10,
+      35
+     ],
+     "start_index": 15,
+     "start_seconds": 2.243
+    },
+    "max_hits_on_one_tile": 7,
+    "median_activation_interval": 0.221,
+    "milestones": {
+     "complete": 31.68,
+     "first": 0.093,
+     "n_minus_1": 27.704,
+     "n_minus_2": 23.728,
+     "p25": 1.657,
+     "p50": 5.481,
+     "p75": 12.983,
+     "p90": 19.752,
+     "p95": 23.728
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 15517,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 11.928,
+    "tail_from_95_seconds": 7.952,
+    "tail_from_second_last_seconds": 3.976,
+    "tail_from_third_last_seconds": 7.952,
+    "tail_share_from_90": 0.3765,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.9798,
+     "no_stagnation": 0.4523,
+     "opening": 1.0,
+     "runtime": 0.9645,
+     "tail_tension": 0.9952
+    },
+    "total": 0.8482,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 15517,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 9,
+    "collisions": 177,
+    "collisions_per_second": 5.601,
+    "completed": true,
+    "completion_seconds": 31.603,
+    "duplicate_hits": 126,
+    "duplicate_share": 0.7119,
+    "duplicate_share_thirds": [
+     0.3898,
+     0.8475,
+     0.8983
+    ],
+    "duplicates_per_new_thirds": [
+     0.639,
+     5.556,
+     8.833
+    ],
+    "early_activation_rate": 4.5,
+    "end_seconds": 31.603,
+    "final_three_seconds": 9.609,
+    "final_tile_over_median_interval": 19.34,
+    "final_tile_seconds": 4.315,
+    "first_activation_seconds": 0.108,
+    "first_collision_seconds": 0.108,
+    "long_gap_count": 2,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 41,
+    "longest_body_gap_seconds": 1.844,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 5,
+     "members": [
+      14,
+      30,
+      45,
+      49
+     ],
+     "start_index": 32,
+     "start_seconds": 6.793
+    },
+    "longest_gap_after_tiles": 50,
+    "longest_gap_progress": 0.9804,
+    "longest_gap_seconds": 4.315,
+    "longest_gap_start_seconds": 27.288,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 2,
+     "members": [
+      9,
+      37
+     ],
+     "start_index": 0,
+     "start_seconds": 0.108
+    },
+    "max_hits_on_one_tile": 7,
+    "median_activation_interval": 0.223,
+    "milestones": {
+     "complete": 31.603,
+     "first": 0.108,
+     "n_minus_1": 27.288,
+     "n_minus_2": 23.531,
+     "p25": 2.644,
+     "p50": 6.2,
+     "p75": 12.449,
+     "p90": 19.559,
+     "p95": 23.531
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 13968,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 12.044,
+    "tail_from_95_seconds": 8.072,
+    "tail_from_second_last_seconds": 4.315,
+    "tail_from_third_last_seconds": 8.072,
+    "tail_share_from_90": 0.3811,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.8669,
+     "no_stagnation": 0.539,
+     "opening": 1.0,
+     "runtime": 0.9559,
+     "tail_tension": 0.9371
+    },
+    "total": 0.8438,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 13968,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 10,
+    "collisions": 167,
+    "collisions_per_second": 5.278,
+    "completed": true,
+    "completion_seconds": 31.639,
+    "duplicate_hits": 116,
+    "duplicate_share": 0.6946,
+    "duplicate_share_thirds": [
+     0.4727,
+     0.6607,
+     0.9464
+    ],
+    "duplicates_per_new_thirds": [
+     0.897,
+     1.947,
+     17.667
+    ],
+    "early_activation_rate": 5.0,
+    "end_seconds": 31.639,
+    "final_three_seconds": 11.376,
+    "final_tile_over_median_interval": 15.36,
+    "final_tile_seconds": 3.378,
+    "first_activation_seconds": 0.119,
+    "first_collision_seconds": 0.119,
+    "long_gap_count": 3,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 39,
+    "longest_body_gap_seconds": 1.501,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 7,
+     "members": [
+      0,
+      6,
+      28,
+      40
+     ],
+     "start_index": 7,
+     "start_seconds": 1.391
+    },
+    "longest_gap_after_tiles": 48,
+    "longest_gap_progress": 0.9412,
+    "longest_gap_seconds": 4.03,
+    "longest_gap_start_seconds": 20.264,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 3,
+     "members": [
+      0,
+      28
+     ],
+     "start_index": 9,
+     "start_seconds": 1.8
+    },
+    "max_hits_on_one_tile": 10,
+    "median_activation_interval": 0.22,
+    "milestones": {
+     "complete": 31.639,
+     "first": 0.119,
+     "n_minus_1": 28.261,
+     "n_minus_2": 24.293,
+     "p25": 3.23,
+     "p50": 8.066,
+     "p75": 14.373,
+     "p90": 19.01,
+     "p95": 24.293
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 8108,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 12.63,
+    "tail_from_95_seconds": 7.346,
+    "tail_from_second_last_seconds": 3.378,
+    "tail_from_third_last_seconds": 7.346,
+    "tail_share_from_90": 0.3992,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.7594,
+     "no_stagnation": 0.6246,
+     "opening": 1.0,
+     "runtime": 0.9599,
+     "tail_tension": 0.8756
+    },
+    "total": 0.8428,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 8108,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 14,
+    "collisions": 191,
+    "collisions_per_second": 6.072,
+    "completed": true,
+    "completion_seconds": 31.456,
+    "duplicate_hits": 140,
+    "duplicate_share": 0.733,
+    "duplicate_share_thirds": [
+     0.4444,
+     0.8281,
+     0.9219
+    ],
+    "duplicates_per_new_thirds": [
+     0.8,
+     4.818,
+     11.8
+    ],
+    "early_activation_rate": 7.0,
+    "end_seconds": 31.456,
+    "final_three_seconds": 7.952,
+    "final_tile_over_median_interval": 17.98,
+    "final_tile_seconds": 3.976,
+    "first_activation_seconds": 0.09,
+    "first_collision_seconds": 0.09,
+    "long_gap_count": 1,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 44,
+    "longest_body_gap_seconds": 2.191,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 7,
+     "members": [
+      15,
+      27,
+      40,
+      46
+     ],
+     "start_index": 20,
+     "start_seconds": 3.207
+    },
+    "longest_gap_after_tiles": 50,
+    "longest_gap_progress": 0.9804,
+    "longest_gap_seconds": 3.976,
+    "longest_gap_start_seconds": 27.479,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 3,
+     "members": [
+      11,
+      37
+     ],
+     "start_index": 14,
+     "start_seconds": 2.019
+    },
+    "max_hits_on_one_tile": 7,
+    "median_activation_interval": 0.221,
+    "milestones": {
+     "complete": 31.456,
+     "first": 0.09,
+     "n_minus_1": 27.479,
+     "n_minus_2": 24.796,
+     "p25": 1.607,
+     "p50": 5.407,
+     "p75": 12.867,
+     "p90": 20.82,
+     "p95": 24.796
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 30725,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 10.636,
+    "tail_from_95_seconds": 6.66,
+    "tail_from_second_last_seconds": 3.976,
+    "tail_from_third_last_seconds": 6.66,
+    "tail_share_from_90": 0.3381,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.976,
+     "no_stagnation": 0.4523,
+     "opening": 1.0,
+     "runtime": 0.9395,
+     "tail_tension": 0.9952
+    },
+    "total": 0.8393,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 30725,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 9,
+    "collisions": 154,
+    "collisions_per_second": 4.831,
+    "completed": true,
+    "completion_seconds": 31.881,
+    "duplicate_hits": 103,
+    "duplicate_share": 0.6688,
+    "duplicate_share_thirds": [
+     0.3137,
+     0.8039,
+     0.8846
+    ],
+    "duplicates_per_new_thirds": [
+     0.457,
+     4.1,
+     7.667
+    ],
+    "early_activation_rate": 4.5,
+    "end_seconds": 31.881,
+    "final_three_seconds": 8.391,
+    "final_tile_over_median_interval": 17.81,
+    "final_tile_seconds": 3.926,
+    "first_activation_seconds": 0.13,
+    "first_collision_seconds": 0.13,
+    "long_gap_count": 2,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 45,
+    "longest_body_gap_seconds": 2.132,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 4,
+     "members": [
+      1,
+      22,
+      25,
+      49
+     ],
+     "start_index": 0,
+     "start_seconds": 0.13
+    },
+    "longest_gap_after_tiles": 50,
+    "longest_gap_progress": 0.9804,
+    "longest_gap_seconds": 3.926,
+    "longest_gap_start_seconds": 27.955,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 2,
+     "members": [
+      1,
+      25
+     ],
+     "start_index": 0,
+     "start_seconds": 0.13
+    },
+    "max_hits_on_one_tile": 5,
+    "median_activation_interval": 0.22,
+    "milestones": {
+     "complete": 31.881,
+     "first": 0.13,
+     "n_minus_1": 27.955,
+     "n_minus_2": 24.56,
+     "p25": 2.669,
+     "p50": 6.869,
+     "p75": 13.627,
+     "p90": 22.707,
+     "p95": 24.56
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 17276,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 9.174,
+    "tail_from_95_seconds": 7.32,
+    "tail_from_second_last_seconds": 3.926,
+    "tail_from_third_last_seconds": 7.32,
+    "tail_share_from_90": 0.2878,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.6102,
+     "no_stagnation": 0.4671,
+     "opening": 1.0,
+     "runtime": 0.9867,
+     "tail_tension": 0.9852
+    },
+    "total": 0.8382,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 17276,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 9,
+    "collisions": 186,
+    "collisions_per_second": 5.796,
+    "completed": true,
+    "completion_seconds": 32.094,
+    "duplicate_hits": 135,
+    "duplicate_share": 0.7258,
+    "duplicate_share_thirds": [
+     0.4516,
+     0.7742,
+     0.9516
+    ],
+    "duplicates_per_new_thirds": [
+     0.824,
+     3.429,
+     19.667
+    ],
+    "early_activation_rate": 4.5,
+    "end_seconds": 32.094,
+    "final_three_seconds": 10.294,
+    "final_tile_over_median_interval": 10.56,
+    "final_tile_seconds": 3.688,
+    "first_activation_seconds": 0.102,
+    "first_collision_seconds": 0.102,
+    "long_gap_count": 2,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 41,
+    "longest_body_gap_seconds": 2.18,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 5,
+     "members": [
+      8,
+      24,
+      39,
+      44
+     ],
+     "start_index": 86,
+     "start_seconds": 17.738
+    },
+    "longest_gap_after_tiles": 49,
+    "longest_gap_progress": 0.9608,
+    "longest_gap_seconds": 5.407,
+    "longest_gap_start_seconds": 22.998,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 2,
+     "members": [
+      1,
+      25
+     ],
+     "start_index": 0,
+     "start_seconds": 0.102
+    },
+    "max_hits_on_one_tile": 10,
+    "median_activation_interval": 0.349,
+    "milestones": {
+     "complete": 32.094,
+     "first": 0.102,
+     "n_minus_1": 28.406,
+     "n_minus_2": 22.998,
+     "p25": 2.709,
+     "p50": 7.041,
+     "p75": 14.064,
+     "p90": 19.404,
+     "p95": 22.998
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 37393,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 12.69,
+    "tail_from_95_seconds": 9.095,
+    "tail_from_second_last_seconds": 3.688,
+    "tail_from_third_last_seconds": 9.095,
+    "tail_share_from_90": 0.3954,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.9318,
+     "no_stagnation": 0.4551,
+     "opening": 1.0,
+     "runtime": 0.9896,
+     "tail_tension": 0.9376
+    },
+    "total": 0.838,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 37393,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 9,
+    "collisions": 163,
+    "collisions_per_second": 5.051,
+    "completed": true,
+    "completion_seconds": 32.271,
+    "duplicate_hits": 112,
+    "duplicate_share": 0.6871,
+    "duplicate_share_thirds": [
+     0.3889,
+     0.7407,
+     0.9273
+    ],
+    "duplicates_per_new_thirds": [
+     0.636,
+     2.857,
+     12.75
+    ],
+    "early_activation_rate": 4.5,
+    "end_seconds": 32.271,
+    "final_three_seconds": 10.019,
+    "final_tile_over_median_interval": 17.4,
+    "final_tile_seconds": 3.845,
+    "first_activation_seconds": 0.111,
+    "first_collision_seconds": 0.111,
+    "long_gap_count": 2,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 32,
+    "longest_body_gap_seconds": 2.035,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 4,
+     "members": [
+      7,
+      11,
+      31,
+      34
+     ],
+     "start_index": 0,
+     "start_seconds": 0.111
+    },
+    "longest_gap_after_tiles": 48,
+    "longest_gap_progress": 0.9412,
+    "longest_gap_seconds": 4.854,
+    "longest_gap_start_seconds": 22.253,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 2,
+     "members": [
+      7,
+      31
+     ],
+     "start_index": 0,
+     "start_seconds": 0.111
+    },
+    "max_hits_on_one_tile": 9,
+    "median_activation_interval": 0.221,
+    "milestones": {
+     "complete": 32.271,
+     "first": 0.111,
+     "n_minus_1": 28.427,
+     "n_minus_2": 27.106,
+     "p25": 2.699,
+     "p50": 5.503,
+     "p75": 15.1,
+     "p90": 20.546,
+     "p95": 27.106
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 9521,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 11.726,
+    "tail_from_95_seconds": 5.165,
+    "tail_from_second_last_seconds": 3.845,
+    "tail_from_third_last_seconds": 5.165,
+    "tail_share_from_90": 0.3633,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.6836,
+     "no_stagnation": 0.4911,
+     "opening": 1.0,
+     "runtime": 0.9698,
+     "tail_tension": 0.9689
+    },
+    "total": 0.8371,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 9521,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 8,
+    "collisions": 150,
+    "collisions_per_second": 4.696,
+    "completed": true,
+    "completion_seconds": 31.944,
+    "duplicate_hits": 99,
+    "duplicate_share": 0.66,
+    "duplicate_share_thirds": [
+     0.38,
+     0.76,
+     0.84
+    ],
+    "duplicates_per_new_thirds": [
+     0.613,
+     3.167,
+     5.25
+    ],
+    "early_activation_rate": 4.0,
+    "end_seconds": 31.944,
+    "final_three_seconds": 5.984,
+    "final_tile_over_median_interval": 6.87,
+    "final_tile_seconds": 2.992,
+    "first_activation_seconds": 0.112,
+    "first_collision_seconds": 0.112,
+    "long_gap_count": 0,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 47,
+    "longest_body_gap_seconds": 1.285,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 4,
+     "members": [
+      3,
+      16,
+      29,
+      33
+     ],
+     "start_index": 0,
+     "start_seconds": 0.112
+    },
+    "longest_gap_after_tiles": 50,
+    "longest_gap_progress": 0.9804,
+    "longest_gap_seconds": 2.992,
+    "longest_gap_start_seconds": 28.952,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 2,
+     "members": [
+      3,
+      29
+     ],
+     "start_index": 0,
+     "start_seconds": 0.112
+    },
+    "max_hits_on_one_tile": 5,
+    "median_activation_interval": 0.435,
+    "milestones": {
+     "complete": 31.944,
+     "first": 0.112,
+     "n_minus_1": 28.952,
+     "n_minus_2": 26.6,
+     "p25": 2.884,
+     "p50": 8.009,
+     "p75": 16.985,
+     "p90": 23.608,
+     "p95": 26.6
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 35688,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 8.335,
+    "tail_from_95_seconds": 5.343,
+    "tail_from_second_last_seconds": 2.992,
+    "tail_from_third_last_seconds": 5.343,
+    "tail_share_from_90": 0.2609,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.5653,
+     "no_stagnation": 0.6786,
+     "opening": 1.0,
+     "runtime": 0.9937,
+     "tail_tension": 0.7984
+    },
+    "total": 0.8352,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 35688,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 10,
+    "collisions": 184,
+    "collisions_per_second": 5.97,
+    "completed": true,
+    "completion_seconds": 30.821,
+    "duplicate_hits": 133,
+    "duplicate_share": 0.7228,
+    "duplicate_share_thirds": [
+     0.4098,
+     0.8197,
+     0.9355
+    ],
+    "duplicates_per_new_thirds": [
+     0.694,
+     4.545,
+     14.5
+    ],
+    "early_activation_rate": 5.0,
+    "end_seconds": 30.821,
+    "final_three_seconds": 9.268,
+    "final_tile_over_median_interval": 17.06,
+    "final_tile_seconds": 3.773,
+    "first_activation_seconds": 0.128,
+    "first_collision_seconds": 0.128,
+    "long_gap_count": 1,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 46,
+    "longest_body_gap_seconds": 1.683,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 4,
+     "members": [
+      6,
+      8,
+      27,
+      35
+     ],
+     "start_index": 0,
+     "start_seconds": 0.128
+    },
+    "longest_gap_after_tiles": 50,
+    "longest_gap_progress": 0.9804,
+    "longest_gap_seconds": 3.773,
+    "longest_gap_start_seconds": 27.047,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 2,
+     "members": [
+      6,
+      35
+     ],
+     "start_index": 0,
+     "start_seconds": 0.128
+    },
+    "max_hits_on_one_tile": 8,
+    "median_activation_interval": 0.221,
+    "milestones": {
+     "complete": 30.821,
+     "first": 0.128,
+     "n_minus_1": 27.047,
+     "n_minus_2": 24.226,
+     "p25": 2.516,
+     "p50": 5.184,
+     "p75": 13.481,
+     "p90": 19.01,
+     "p95": 24.226
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 2427,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 11.811,
+    "tail_from_95_seconds": 6.595,
+    "tail_from_second_last_seconds": 3.773,
+    "tail_from_third_last_seconds": 6.595,
+    "tail_share_from_90": 0.3832,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.99,
+     "no_stagnation": 0.5794,
+     "opening": 1.0,
+     "runtime": 0.869,
+     "tail_tension": 0.9547
+    },
+    "total": 0.8349,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 2427,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 10,
+    "collisions": 155,
+    "collisions_per_second": 4.956,
+    "completed": true,
+    "completion_seconds": 31.278,
+    "duplicate_hits": 104,
+    "duplicate_share": 0.671,
+    "duplicate_share_thirds": [
+     0.3137,
+     0.8077,
+     0.8846
+    ],
+    "duplicates_per_new_thirds": [
+     0.457,
+     4.2,
+     7.667
+    ],
+    "early_activation_rate": 5.0,
+    "end_seconds": 31.278,
+    "final_three_seconds": 7.11,
+    "final_tile_over_median_interval": 10.47,
+    "final_tile_seconds": 4.252,
+    "first_activation_seconds": 0.128,
+    "first_collision_seconds": 0.128,
+    "long_gap_count": 1,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 46,
+    "longest_body_gap_seconds": 1.688,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 5,
+     "members": [
+      9,
+      10,
+      33,
+      39
+     ],
+     "start_index": 6,
+     "start_seconds": 1.299
+    },
+    "longest_gap_after_tiles": 50,
+    "longest_gap_progress": 0.9804,
+    "longest_gap_seconds": 4.252,
+    "longest_gap_start_seconds": 27.026,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 3,
+     "members": [
+      11,
+      35
+     ],
+     "start_index": 13,
+     "start_seconds": 2.766
+    },
+    "max_hits_on_one_tile": 6,
+    "median_activation_interval": 0.406,
+    "milestones": {
+     "complete": 31.278,
+     "first": 0.128,
+     "n_minus_1": 27.026,
+     "n_minus_2": 25.855,
+     "p25": 2.987,
+     "p50": 6.645,
+     "p75": 12.733,
+     "p90": 21.309,
+     "p95": 25.855
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 36557,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 9.969,
+    "tail_from_95_seconds": 5.422,
+    "tail_from_second_last_seconds": 4.252,
+    "tail_from_third_last_seconds": 5.422,
+    "tail_share_from_90": 0.3187,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.6519,
+     "no_stagnation": 0.5781,
+     "opening": 1.0,
+     "runtime": 0.9197,
+     "tail_tension": 0.9497
+    },
+    "total": 0.8339,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 36557,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 9,
+    "collisions": 156,
+    "collisions_per_second": 4.833,
+    "completed": true,
+    "completion_seconds": 32.281,
+    "duplicate_hits": 105,
+    "duplicate_share": 0.6731,
+    "duplicate_share_thirds": [
+     0.3462,
+     0.7885,
+     0.8846
+    ],
+    "duplicates_per_new_thirds": [
+     0.529,
+     3.727,
+     7.667
+    ],
+    "early_activation_rate": 4.5,
+    "end_seconds": 32.281,
+    "final_three_seconds": 8.391,
+    "final_tile_over_median_interval": 17.71,
+    "final_tile_seconds": 3.926,
+    "first_activation_seconds": 0.092,
+    "first_collision_seconds": 0.092,
+    "long_gap_count": 2,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 45,
+    "longest_body_gap_seconds": 2.132,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 4,
+     "members": [
+      16,
+      20,
+      40,
+      42
+     ],
+     "start_index": 0,
+     "start_seconds": 0.092
+    },
+    "longest_gap_after_tiles": 50,
+    "longest_gap_progress": 0.9804,
+    "longest_gap_seconds": 3.926,
+    "longest_gap_start_seconds": 28.355,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 2,
+     "members": [
+      20,
+      42
+     ],
+     "start_index": 0,
+     "start_seconds": 0.092
+    },
+    "max_hits_on_one_tile": 5,
+    "median_activation_interval": 0.222,
+    "milestones": {
+     "complete": 32.281,
+     "first": 0.092,
+     "n_minus_1": 28.355,
+     "n_minus_2": 24.961,
+     "p25": 2.678,
+     "p50": 7.27,
+     "p75": 14.028,
+     "p90": 23.108,
+     "p95": 24.961
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 33377,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 9.174,
+    "tail_from_95_seconds": 7.32,
+    "tail_from_second_last_seconds": 3.926,
+    "tail_from_third_last_seconds": 7.32,
+    "tail_share_from_90": 0.2842,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.6108,
+     "no_stagnation": 0.4671,
+     "opening": 1.0,
+     "runtime": 0.9687,
+     "tail_tension": 0.9852
+    },
+    "total": 0.8319,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 33377,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 10,
+    "collisions": 185,
+    "collisions_per_second": 6.032,
+    "completed": true,
+    "completion_seconds": 30.671,
+    "duplicate_hits": 134,
+    "duplicate_share": 0.7243,
+    "duplicate_share_thirds": [
+     0.4098,
+     0.8065,
+     0.9516
+    ],
+    "duplicates_per_new_thirds": [
+     0.694,
+     4.167,
+     19.667
+    ],
+    "early_activation_rate": 5.0,
+    "end_seconds": 30.671,
+    "final_three_seconds": 7.316,
+    "final_tile_over_median_interval": 10.76,
+    "final_tile_seconds": 4.142,
+    "first_activation_seconds": 0.122,
+    "first_collision_seconds": 0.122,
+    "long_gap_count": 1,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 45,
+    "longest_body_gap_seconds": 1.733,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 5,
+     "members": [
+      9,
+      22,
+      34,
+      45
+     ],
+     "start_index": 6,
+     "start_seconds": 1.327
+    },
+    "longest_gap_after_tiles": 50,
+    "longest_gap_progress": 0.9804,
+    "longest_gap_seconds": 4.142,
+    "longest_gap_start_seconds": 26.53,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 2,
+     "members": [
+      18,
+      48
+     ],
+     "start_index": 0,
+     "start_seconds": 0.122
+    },
+    "max_hits_on_one_tile": 7,
+    "median_activation_interval": 0.385,
+    "milestones": {
+     "complete": 30.671,
+     "first": 0.122,
+     "n_minus_1": 26.53,
+     "n_minus_2": 24.601,
+     "p25": 2.46,
+     "p50": 6.117,
+     "p75": 13.698,
+     "p90": 21.259,
+     "p95": 24.601
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 15088,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 9.412,
+    "tail_from_95_seconds": 6.07,
+    "tail_from_second_last_seconds": 4.142,
+    "tail_from_third_last_seconds": 6.07,
+    "tail_share_from_90": 0.3069,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.9894,
+     "no_stagnation": 0.5668,
+     "opening": 1.0,
+     "runtime": 0.8523,
+     "tail_tension": 0.9717
+    },
+    "total": 0.831,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 15088,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 8,
+    "collisions": 151,
+    "collisions_per_second": 4.694,
+    "completed": true,
+    "completion_seconds": 32.166,
+    "duplicate_hits": 100,
+    "duplicate_share": 0.6623,
+    "duplicate_share_thirds": [
+     0.38,
+     0.76,
+     0.8431
+    ],
+    "duplicates_per_new_thirds": [
+     0.613,
+     3.167,
+     5.375
+    ],
+    "early_activation_rate": 4.0,
+    "end_seconds": 32.166,
+    "final_three_seconds": 5.984,
+    "final_tile_over_median_interval": 6.87,
+    "final_tile_seconds": 2.992,
+    "first_activation_seconds": 0.115,
+    "first_collision_seconds": 0.115,
+    "long_gap_count": 0,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 47,
+    "longest_body_gap_seconds": 1.285,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 4,
+     "members": [
+      2,
+      6,
+      25,
+      27
+     ],
+     "start_index": 0,
+     "start_seconds": 0.115
+    },
+    "longest_gap_after_tiles": 50,
+    "longest_gap_progress": 0.9804,
+    "longest_gap_seconds": 2.992,
+    "longest_gap_start_seconds": 29.175,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 2,
+     "members": [
+      2,
+      25
+     ],
+     "start_index": 0,
+     "start_seconds": 0.115
+    },
+    "max_hits_on_one_tile": 5,
+    "median_activation_interval": 0.436,
+    "milestones": {
+     "complete": 32.166,
+     "first": 0.115,
+     "n_minus_1": 29.175,
+     "n_minus_2": 26.823,
+     "p25": 3.107,
+     "p50": 8.232,
+     "p75": 17.207,
+     "p90": 23.831,
+     "p95": 26.823
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 5672,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 8.335,
+    "tail_from_95_seconds": 5.343,
+    "tail_from_second_last_seconds": 2.992,
+    "tail_from_third_last_seconds": 5.343,
+    "tail_share_from_90": 0.2591,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.5648,
+     "no_stagnation": 0.6786,
+     "opening": 1.0,
+     "runtime": 0.9815,
+     "tail_tension": 0.7984
+    },
+    "total": 0.8309,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 5672,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  },
+  {
+   "evaluation": {
+    "activated_tiles": 51,
+    "activations_in_opening": 10,
+    "collisions": 145,
+    "collisions_per_second": 4.785,
+    "completed": true,
+    "completion_seconds": 30.305,
+    "duplicate_hits": 94,
+    "duplicate_share": 0.6483,
+    "duplicate_share_thirds": [
+     0.2917,
+     0.7292,
+     0.9184
+    ],
+    "duplicates_per_new_thirds": [
+     0.412,
+     2.692,
+     11.25
+    ],
+    "early_activation_rate": 5.0,
+    "end_seconds": 30.305,
+    "final_three_seconds": 8.743,
+    "final_tile_over_median_interval": 18.16,
+    "final_tile_seconds": 4.035,
+    "first_activation_seconds": 0.1,
+    "first_collision_seconds": 0.1,
+    "long_gap_count": 2,
+    "long_gap_threshold_seconds": 3.0,
+    "longest_alternation": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_body_gap_after_tiles": 31,
+    "longest_body_gap_seconds": 1.299,
+    "longest_four_tile_run": {
+     "distinct": 4,
+     "length": 5,
+     "members": [
+      20,
+      25,
+      37,
+      50
+     ],
+     "start_index": 21,
+     "start_seconds": 4.494
+    },
+    "longest_gap_after_tiles": 49,
+    "longest_gap_progress": 0.9608,
+    "longest_gap_seconds": 4.05,
+    "longest_gap_start_seconds": 22.22,
+    "longest_side_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_tile_cycle": {
+     "length": 0,
+     "members": [],
+     "period": 0,
+     "repeats": 0,
+     "start_index": -1,
+     "start_seconds": 0.0
+    },
+    "longest_two_tile_run": {
+     "distinct": 2,
+     "length": 3,
+     "members": [
+      25,
+      50
+     ],
+     "start_index": 23,
+     "start_seconds": 4.898
+    },
+    "max_hits_on_one_tile": 6,
+    "median_activation_interval": 0.222,
+    "milestones": {
+     "complete": 30.305,
+     "first": 0.1,
+     "n_minus_1": 26.269,
+     "n_minus_2": 22.22,
+     "p25": 2.609,
+     "p50": 7.057,
+     "p75": 13.77,
+     "p90": 19.623,
+     "p95": 22.22
+    },
+    "new_hits": 51,
+    "opening_window_seconds": 2.0,
+    "seed": 26267,
+    "stop_reason": "complete",
+    "tail_from_90_seconds": 10.682,
+    "tail_from_95_seconds": 8.085,
+    "tail_from_second_last_seconds": 4.035,
+    "tail_from_third_last_seconds": 8.085,
+    "tail_share_from_90": 0.3525,
+    "total_tiles": 51,
+    "untouched_tiles": []
+   },
+   "score": {
+    "components": {
+     "event_density": 0.5949,
+     "no_stagnation": 0.6753,
+     "opening": 1.0,
+     "runtime": 0.8116,
+     "tail_tension": 0.993
+    },
+    "total": 0.8305,
+    "weights": {
+     "event_density": 0.05,
+     "no_stagnation": 0.25,
+     "opening": 0.05,
+     "runtime": 0.35,
+     "tail_tension": 0.3
+    }
+   },
+   "seed": 26267,
+   "verdict": {
+    "accepted": true,
+    "failures": [],
+    "passes": [
+     "completes",
+     "duration_at_least_min",
+     "duration_at_most_max",
+     "opens_immediately",
+     "opening_is_busy",
+     "no_mid_run_dead_zone",
+     "last_tile_has_tension",
+     "last_tile_is_not_a_wait",
+     "final_three_are_a_hunt",
+     "tail_is_proportionate",
+     "no_two_tile_loop",
+     "no_long_cycle"
+    ]
+   }
+  }
+ ],
+ "config": {
+  "ball_radius": 0.45,
+  "duration": 1000000.0,
+  "gravity": 0.0,
+  "graze_fraction": 0.05,
+  "max_collisions": 8000,
+  "restitution": 1.0,
+  "skin": 1e-09,
+  "speed": 85.0,
+  "stop_on_complete": true,
+  "time_epsilon": 1e-12
+ },
+ "rule": {
+  "max_body_gap": 4.0,
+  "max_cycle_length": 12,
+  "max_duration": 40.0,
+  "max_final_three": 14.0,
+  "max_final_tile": 9.0,
+  "max_first_collision": 1.0,
+  "max_tail_share_from_90": 0.4,
+  "max_two_tile_run": 4,
+  "min_duration": 25.0,
+  "min_final_tile": 1.5,
+  "min_opening_activations": 3
+ },
+ "seed_range": [
+  0,
+  49999
+ ]
+}

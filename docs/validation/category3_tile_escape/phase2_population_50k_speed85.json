@@ -1,0 +1,902 @@
+{
+ "acceptance": {
+  "accept_rate": 0.11514,
+  "accepted": 5757,
+  "failure_counts": {
+   "completes": 101,
+   "duration_at_least_min": 9482,
+   "duration_at_most_max": 15181,
+   "final_three_are_a_hunt": 16295,
+   "last_tile_has_tension": 15154,
+   "last_tile_is_not_a_wait": 10516,
+   "no_long_cycle": 256,
+   "no_mid_run_dead_zone": 17816,
+   "tail_is_proportionate": 26371
+  },
+  "rule": {
+   "max_body_gap": 4.0,
+   "max_cycle_length": 12,
+   "max_duration": 40.0,
+   "max_final_three": 14.0,
+   "max_final_tile": 9.0,
+   "max_first_collision": 1.0,
+   "max_tail_share_from_90": 0.4,
+   "max_two_tile_run": 4,
+   "min_duration": 25.0,
+   "min_final_tile": 1.5,
+   "min_opening_activations": 3
+  }
+ },
+ "arena": {
+  "circumradius": 10.0,
+  "sides": 17,
+  "tile_length": 1.224997,
+  "tiles_per_side": 3,
+  "total_tiles": 51
+ },
+ "completion": {
+  "collisions": {
+   "count": 49899,
+   "max": 7923,
+   "mean": 232.779,
+   "min": 51,
+   "p10": 116,
+   "p25": 144,
+   "p50": 181,
+   "p75": 231,
+   "p90": 306,
+   "p95": 412,
+   "p99": 1410
+  },
+  "collisions_per_second": {
+   "count": 49899,
+   "max": 9.713,
+   "mean": 5.441,
+   "min": 4.551,
+   "p10": 4.781,
+   "p25": 4.939,
+   "p50": 5.317,
+   "p75": 5.825,
+   "p90": 6.219,
+   "p95": 6.556,
+   "p99": 7.403
+  },
+  "completed": 49899,
+  "completion_rate": 0.99798,
+  "duplicate_share": {
+   "count": 49899,
+   "max": 0.994,
+   "mean": 0.705,
+   "min": 0.0,
+   "p10": 0.56,
+   "p25": 0.646,
+   "p50": 0.718,
+   "p75": 0.779,
+   "p90": 0.833,
+   "p95": 0.876,
+   "p99": 0.964
+  },
+  "max_hits_on_one_tile": {
+   "count": 49899,
+   "max": 421,
+   "mean": 9.63,
+   "min": 1,
+   "p10": 4,
+   "p25": 6,
+   "p50": 7,
+   "p75": 9,
+   "p90": 12,
+   "p95": 17,
+   "p99": 64
+  },
+  "seconds": {
+   "count": 49899,
+   "max": 1691.788,
+   "mean": 42.831,
+   "min": 10.179,
+   "p10": 21.684,
+   "p25": 26.79,
+   "p50": 33.357,
+   "p75": 42.397,
+   "p90": 55.692,
+   "p95": 74.488,
+   "p99": 254.871
+  }
+ },
+ "config": {
+  "ball_radius": 0.45,
+  "duration": 1000000.0,
+  "gravity": 0.0,
+  "graze_fraction": 0.05,
+  "max_collisions": 8000,
+  "restitution": 1.0,
+  "skin": 1e-09,
+  "speed": 85.0,
+  "stop_on_complete": true,
+  "time_epsilon": 1e-12
+ },
+ "failures": {
+  "completed_but_unusable": {
+   "final_tile_over_10s": {
+    "count": 9052,
+    "example_seeds": [
+     8,
+     11,
+     15,
+     16,
+     19
+    ],
+    "share_of_all": 0.18104
+   },
+   "final_tile_under_1s": {
+    "count": 10928,
+    "example_seeds": [
+     2,
+     5,
+     14,
+     18,
+     33
+    ],
+    "share_of_all": 0.21856
+   },
+   "mid_run_dead_zone_over_4s": {
+    "count": 17717,
+    "example_seeds": [
+     4,
+     10,
+     11,
+     12,
+     13
+    ],
+    "share_of_all": 0.35434
+   },
+   "mid_run_dead_zone_over_8s": {
+    "count": 5298,
+    "example_seeds": [
+     11,
+     16,
+     27,
+     31,
+     49
+    ],
+    "share_of_all": 0.10596
+   },
+   "too_fast_under_25s": {
+    "count": 9381,
+    "example_seeds": [
+     5,
+     14,
+     23,
+     28,
+     32
+    ],
+    "share_of_all": 0.18762
+   },
+   "too_slow_over_40s": {
+    "count": 15080,
+    "example_seeds": [
+     7,
+     11,
+     15,
+     16,
+     19
+    ],
+    "share_of_all": 0.3016
+   },
+   "too_slow_over_60s": {
+    "count": 4048,
+    "example_seeds": [
+     11,
+     16,
+     31,
+     49,
+     51
+    ],
+    "share_of_all": 0.08096
+   },
+   "two_tile_loop_over_6": {
+    "count": 0,
+    "example_seeds": [],
+    "share_of_all": 0.0
+   }
+  },
+  "incomplete": {
+   "count": 101,
+   "example_seeds": [
+    87,
+    388,
+    833,
+    1171,
+    1802,
+    1937,
+    2898,
+    2938,
+    3553,
+    4126
+   ],
+   "missing_tiles_by_side": [
+    [
+     0,
+     52
+    ],
+    [
+     1,
+     44
+    ],
+    [
+     2,
+     48
+    ],
+    [
+     3,
+     56
+    ],
+    [
+     4,
+     49
+    ],
+    [
+     5,
+     60
+    ],
+    [
+     6,
+     53
+    ],
+    [
+     7,
+     54
+    ],
+    [
+     8,
+     56
+    ],
+    [
+     9,
+     46
+    ],
+    [
+     10,
+     45
+    ],
+    [
+     11,
+     49
+    ],
+    [
+     12,
+     53
+    ],
+    [
+     13,
+     55
+    ],
+    [
+     14,
+     49
+    ],
+    [
+     15,
+     53
+    ],
+    [
+     16,
+     51
+    ]
+   ],
+   "share_of_all": 0.00202,
+   "stop_reasons": {
+    "collision_cap": 101
+   },
+   "tiles_missing": {
+    "count": 101,
+    "max": 40,
+    "mean": 8.644,
+    "min": 1,
+    "p10": 1,
+    "p25": 2,
+    "p50": 5,
+    "p75": 14,
+    "p90": 21,
+    "p95": 25,
+    "p99": 34
+   }
+  },
+  "seeds": 50000
+ },
+ "milestones": {
+  "complete": {
+   "count": 49899,
+   "max": 1691.788,
+   "mean": 42.831,
+   "min": 10.179,
+   "p10": 21.684,
+   "p25": 26.79,
+   "p50": 33.357,
+   "p75": 42.397,
+   "p90": 55.692,
+   "p95": 74.488,
+   "p99": 254.871
+  },
+  "first": {
+   "count": 49899,
+   "max": 0.136,
+   "mean": 0.111,
+   "min": 0.087,
+   "p10": 0.094,
+   "p25": 0.101,
+   "p50": 0.11,
+   "p75": 0.12,
+   "p90": 0.127,
+   "p95": 0.13,
+   "p99": 0.133
+  },
+  "n_minus_1": {
+   "count": 49899,
+   "max": 1691.567,
+   "mean": 36.069,
+   "min": 9.085,
+   "p10": 19.232,
+   "p25": 23.382,
+   "p50": 28.316,
+   "p75": 35.005,
+   "p90": 45.611,
+   "p95": 61.219,
+   "p99": 215.182
+  },
+  "n_minus_2": {
+   "count": 49899,
+   "max": 1691.348,
+   "mean": 30.571,
+   "min": 8.746,
+   "p10": 17.328,
+   "p25": 20.682,
+   "p50": 24.635,
+   "p75": 29.865,
+   "p90": 37.593,
+   "p95": 49.255,
+   "p99": 172.034
+  },
+  "p25": {
+   "count": 49899,
+   "max": 116.374,
+   "mean": 2.683,
+   "min": 1.543,
+   "p10": 2.257,
+   "p25": 2.519,
+   "p50": 2.677,
+   "p75": 2.777,
+   "p90": 2.977,
+   "p95": 3.095,
+   "p99": 3.388
+  },
+  "p50": {
+   "count": 49899,
+   "max": 552.151,
+   "mean": 6.615,
+   "min": 3.166,
+   "p10": 5.269,
+   "p25": 5.705,
+   "p50": 6.257,
+   "p75": 6.81,
+   "p90": 7.484,
+   "p95": 8.047,
+   "p99": 12.194
+  },
+  "p75": {
+   "count": 49899,
+   "max": 1689.151,
+   "mean": 14.624,
+   "min": 5.167,
+   "p10": 9.609,
+   "p25": 10.967,
+   "p50": 12.416,
+   "p75": 14.143,
+   "p90": 16.74,
+   "p95": 20.107,
+   "p99": 63.534
+  },
+  "p90": {
+   "count": 49899,
+   "max": 1690.688,
+   "mean": 23.194,
+   "min": 6.344,
+   "p10": 14.117,
+   "p25": 16.35,
+   "p50": 18.97,
+   "p75": 22.432,
+   "p90": 27.629,
+   "p95": 35.61,
+   "p99": 120.217
+  },
+  "p95": {
+   "count": 49899,
+   "max": 1691.348,
+   "mean": 30.571,
+   "min": 8.746,
+   "p10": 17.328,
+   "p25": 20.682,
+   "p50": 24.635,
+   "p75": 29.865,
+   "p90": 37.593,
+   "p95": 49.255,
+   "p99": 172.034
+  }
+ },
+ "opening": {
+  "activations_in_first_2s": {
+   "count": 49899,
+   "max": 18,
+   "mean": 9.616,
+   "min": 3,
+   "p10": 9,
+   "p25": 9,
+   "p50": 9,
+   "p75": 10,
+   "p90": 11,
+   "p95": 13,
+   "p99": 14
+  },
+  "first_collision_seconds": {
+   "count": 49899,
+   "max": 0.136,
+   "mean": 0.111,
+   "min": 0.087,
+   "p10": 0.094,
+   "p25": 0.101,
+   "p50": 0.11,
+   "p75": 0.12,
+   "p90": 0.127,
+   "p95": 0.13,
+   "p99": 0.133
+  }
+ },
+ "periodic": {
+  "longest_alternation": {
+   "count": 50000,
+   "max": 0.0,
+   "mean": 0.0,
+   "min": 0.0,
+   "p10": 0.0,
+   "p25": 0.0,
+   "p50": 0.0,
+   "p75": 0.0,
+   "p90": 0.0,
+   "p95": 0.0,
+   "p99": 0.0
+  },
+  "longest_four_tile_run": {
+   "count": 50000,
+   "max": 174.0,
+   "mean": 4.914,
+   "min": 4.0,
+   "p10": 4.0,
+   "p25": 4.0,
+   "p50": 5.0,
+   "p75": 5.0,
+   "p90": 6.0,
+   "p95": 7.0,
+   "p99": 7.0
+  },
+  "longest_side_cycle": {
+   "count": 50000,
+   "max": 682.0,
+   "mean": 0.2,
+   "min": 0.0,
+   "p10": 0.0,
+   "p25": 0.0,
+   "p50": 0.0,
+   "p75": 0.0,
+   "p90": 0.0,
+   "p95": 0.0,
+   "p99": 0.0
+  },
+  "longest_tile_cycle": {
+   "count": 50000,
+   "max": 682.0,
+   "mean": 0.2,
+   "min": 0.0,
+   "p10": 0.0,
+   "p25": 0.0,
+   "p50": 0.0,
+   "p75": 0.0,
+   "p90": 0.0,
+   "p95": 0.0,
+   "p99": 0.0
+  },
+  "longest_two_tile_run": {
+   "count": 50000,
+   "max": 3.0,
+   "mean": 2.31,
+   "min": 2.0,
+   "p10": 2.0,
+   "p25": 2.0,
+   "p50": 2.0,
+   "p75": 3.0,
+   "p90": 3.0,
+   "p95": 3.0,
+   "p99": 3.0
+  },
+  "side_cycle_period_histogram": [
+   [
+    0,
+    49677
+   ],
+   [
+    8,
+    210
+   ],
+   [
+    4,
+    113
+   ]
+  ],
+  "tile_cycle_period_histogram": [
+   [
+    0,
+    49677
+   ],
+   [
+    8,
+    210
+   ],
+   [
+    4,
+    113
+   ]
+  ],
+  "two_tile_run_histogram": [
+   [
+    2,
+    34482
+   ],
+   [
+    3,
+    15518
+   ]
+  ],
+  "worst_tile_cycle_seeds": [
+   {
+    "length": 682,
+    "period": 8,
+    "repeats": 85,
+    "seed": 24981,
+    "start_seconds": 0.124
+   },
+   {
+    "length": 323,
+    "period": 8,
+    "repeats": 40,
+    "seed": 47212,
+    "start_seconds": 520.972
+   },
+   {
+    "length": 289,
+    "period": 8,
+    "repeats": 36,
+    "seed": 48019,
+    "start_seconds": 867.898
+   },
+   {
+    "length": 235,
+    "period": 8,
+    "repeats": 29,
+    "seed": 38670,
+    "start_seconds": 1103.102
+   },
+   {
+    "length": 209,
+    "period": 8,
+    "repeats": 26,
+    "seed": 9784,
+    "start_seconds": 115.083
+   },
+   {
+    "length": 195,
+    "period": 8,
+    "repeats": 24,
+    "seed": 40270,
+    "start_seconds": 523.285
+   },
+   {
+    "length": 173,
+    "period": 4,
+    "repeats": 43,
+    "seed": 45922,
+    "start_seconds": 1214.39
+   },
+   {
+    "length": 141,
+    "period": 4,
+    "repeats": 35,
+    "seed": 8845,
+    "start_seconds": 20.168
+   },
+   {
+    "length": 129,
+    "period": 8,
+    "repeats": 16,
+    "seed": 43971,
+    "start_seconds": 171.414
+   },
+   {
+    "length": 121,
+    "period": 4,
+    "repeats": 30,
+    "seed": 11031,
+    "start_seconds": 400.867
+   }
+  ],
+  "worst_two_tile_seeds": [
+   {
+    "length": 3,
+    "seed": 0,
+    "start_seconds": 1.783,
+    "tiles": [
+     14,
+     38
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 1,
+    "start_seconds": 10.958,
+    "tiles": [
+     14,
+     40
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 2,
+    "start_seconds": 1.14,
+    "tiles": [
+     15,
+     43
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 13,
+    "start_seconds": 11.086,
+    "tiles": [
+     0,
+     28
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 14,
+    "start_seconds": 15.316,
+    "tiles": [
+     3,
+     27
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 15,
+    "start_seconds": 0.543,
+    "tiles": [
+     2,
+     28
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 21,
+    "start_seconds": 1.955,
+    "tiles": [
+     1,
+     29
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 22,
+    "start_seconds": 16.56,
+    "tiles": [
+     4,
+     32
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 23,
+    "start_seconds": 1.953,
+    "tiles": [
+     1,
+     27
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 25,
+    "start_seconds": 0.515,
+    "tiles": [
+     11,
+     37
+    ]
+   }
+  ]
+ },
+ "seed_range": [
+  0,
+  49999
+ ],
+ "seeds": 50000,
+ "stagnation": {
+  "long_gap_count": {
+   "count": 49899,
+   "max": 26,
+   "mean": 2.272,
+   "min": 0,
+   "p10": 0,
+   "p25": 1,
+   "p50": 2,
+   "p75": 3,
+   "p90": 4,
+   "p95": 6,
+   "p99": 10
+  },
+  "longest_body_gap_seconds": {
+   "count": 49899,
+   "max": 1680.932,
+   "mean": 5.636,
+   "min": 0.218,
+   "p10": 1.492,
+   "p25": 2.125,
+   "p50": 3.189,
+   "p75": 4.982,
+   "p90": 8.306,
+   "p95": 12.768,
+   "p99": 48.199
+  },
+  "longest_gap_progress": {
+   "count": 49899,
+   "max": 0.98,
+   "mean": 0.937,
+   "min": 0.039,
+   "p10": 0.863,
+   "p25": 0.922,
+   "p50": 0.961,
+   "p75": 0.98,
+   "p90": 0.98,
+   "p95": 0.98,
+   "p99": 0.98
+  },
+  "longest_gap_seconds": {
+   "count": 49899,
+   "max": 1680.932,
+   "mean": 11.329,
+   "min": 0.219,
+   "p10": 2.55,
+   "p25": 4.01,
+   "p50": 6.756,
+   "p75": 11.408,
+   "p90": 19.103,
+   "p95": 27.524,
+   "p99": 87.668
+  },
+  "median_activation_interval": {
+   "count": 49899,
+   "max": 3.416,
+   "mean": 0.235,
+   "min": 0.133,
+   "p10": 0.212,
+   "p25": 0.218,
+   "p50": 0.221,
+   "p75": 0.222,
+   "p90": 0.283,
+   "p95": 0.37,
+   "p99": 0.429
+  }
+ },
+ "tail": {
+  "final_three_seconds": {
+   "count": 49899,
+   "max": 1262.779,
+   "mean": 15.004,
+   "min": 0.29,
+   "p10": 2.89,
+   "p25": 5.402,
+   "p50": 9.797,
+   "p75": 16.558,
+   "p90": 26.054,
+   "p95": 35.954,
+   "p99": 105.738
+  },
+  "final_tile_over_median_interval": {
+   "count": 49899,
+   "max": 4040.107,
+   "mean": 29.431,
+   "min": 0.013,
+   "p10": 1.828,
+   "p25": 4.958,
+   "p50": 14.283,
+   "p75": 33.69,
+   "p90": 64.126,
+   "p95": 91.666,
+   "p99": 218.308
+  },
+  "final_tile_seconds": {
+   "count": 49899,
+   "max": 891.268,
+   "mean": 6.762,
+   "min": 0.003,
+   "p10": 0.415,
+   "p25": 1.157,
+   "p50": 3.328,
+   "p75": 7.748,
+   "p90": 14.581,
+   "p95": 20.671,
+   "p99": 51.647
+  },
+  "from_90_percent": {
+   "count": 49899,
+   "max": 1321.863,
+   "mean": 19.637,
+   "min": 0.872,
+   "p10": 5.135,
+   "p25": 8.45,
+   "p50": 13.535,
+   "p75": 21.138,
+   "p90": 31.587,
+   "p95": 42.948,
+   "p99": 137.894
+  },
+  "from_95_percent": {
+   "count": 49899,
+   "max": 1261.275,
+   "mean": 12.26,
+   "min": 0.053,
+   "p10": 1.702,
+   "p25": 3.647,
+   "p50": 7.363,
+   "p75": 13.593,
+   "p90": 22.539,
+   "p95": 31.269,
+   "p99": 93.047
+  },
+  "from_second_last": {
+   "count": 49899,
+   "max": 891.268,
+   "mean": 6.762,
+   "min": 0.003,
+   "p10": 0.415,
+   "p25": 1.157,
+   "p50": 3.328,
+   "p75": 7.748,
+   "p90": 14.581,
+   "p95": 20.671,
+   "p99": 51.647
+  },
+  "from_third_last": {
+   "count": 49899,
+   "max": 1261.275,
+   "mean": 12.26,
+   "min": 0.053,
+   "p10": 1.702,
+   "p25": 3.647,
+   "p50": 7.363,
+   "p75": 13.593,
+   "p90": 22.539,
+   "p95": 31.269,
+   "p99": 93.047
+  },
+  "tail_share_from_90": {
+   "count": 49899,
+   "max": 0.986,
+   "mean": 0.41,
+   "min": 0.001,
+   "p10": 0.218,
+   "p25": 0.306,
+   "p50": 0.41,
+   "p75": 0.512,
+   "p90": 0.603,
+   "p95": 0.653,
+   "p99": 0.747
+  }
+ },
+ "wall_seconds": 269.52
+}

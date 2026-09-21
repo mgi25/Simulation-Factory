@@ -1,0 +1,42 @@
+{
+ "billiard_17x3_50k_seeds": {
+  "count": 49899,
+  "max": 7923,
+  "mean": 232.779,
+  "min": 51,
+  "p10": 116,
+  "p25": 144,
+  "p50": 181,
+  "p75": 231,
+  "p90": 306,
+  "p95": 412,
+  "p99": 1410
+ },
+ "iid_coupon_collector": {
+  "analytic_mean_N_times_H_N": 230.459,
+  "max": 709,
+  "mean": 230.693,
+  "min": 96,
+  "p10": 162,
+  "p25": 186,
+  "p50": 220,
+  "p75": 263,
+  "p90": 314,
+  "p95": 350,
+  "p99": 430,
+  "rng_seed": 20260921,
+  "tiles": 51,
+  "trials": 50000
+ },
+ "ratio_billiard_over_iid": {
+  "max": 11.1749,
+  "mean": 1.009,
+  "p10": 0.716,
+  "p25": 0.7742,
+  "p50": 0.8227,
+  "p75": 0.8783,
+  "p90": 0.9745,
+  "p99": 3.2791
+ },
+ "what": "collisions (billiard) against draws (iid) to activate all 51 tiles"
+}

@@ -1,0 +1,902 @@
+{
+ "acceptance": {
+  "accept_rate": 0.0932,
+  "accepted": 932,
+  "failure_counts": {
+   "completes": 14,
+   "duration_at_least_min": 349,
+   "duration_at_most_max": 7006,
+   "final_three_are_a_hunt": 5036,
+   "last_tile_has_tension": 2236,
+   "last_tile_is_not_a_wait": 3174,
+   "no_long_cycle": 51,
+   "no_mid_run_dead_zone": 5809,
+   "tail_is_proportionate": 5317
+  },
+  "rule": {
+   "max_body_gap": 4.0,
+   "max_cycle_length": 12,
+   "max_duration": 40.0,
+   "max_final_three": 14.0,
+   "max_final_tile": 9.0,
+   "max_first_collision": 1.0,
+   "max_tail_share_from_90": 0.4,
+   "max_two_tile_run": 4,
+   "min_duration": 25.0,
+   "min_final_tile": 1.5,
+   "min_opening_activations": 3
+  }
+ },
+ "arena": {
+  "circumradius": 10.0,
+  "sides": 17,
+  "tile_length": 1.224997,
+  "tiles_per_side": 3,
+  "total_tiles": 51
+ },
+ "completion": {
+  "collisions": {
+   "count": 9986,
+   "max": 7923,
+   "mean": 234.817,
+   "min": 52,
+   "p10": 117,
+   "p25": 145,
+   "p50": 183,
+   "p75": 233,
+   "p90": 310,
+   "p95": 422,
+   "p99": 1316
+  },
+  "collisions_per_second": {
+   "count": 9986,
+   "max": 6.793,
+   "mean": 3.842,
+   "min": 3.213,
+   "p10": 3.374,
+   "p25": 3.488,
+   "p50": 3.755,
+   "p75": 4.122,
+   "p90": 4.385,
+   "p95": 4.623,
+   "p99": 5.244
+  },
+  "completed": 9986,
+  "completion_rate": 0.9986,
+  "duplicate_share": {
+   "count": 9986,
+   "max": 0.994,
+   "mean": 0.707,
+   "min": 0.019,
+   "p10": 0.564,
+   "p25": 0.648,
+   "p50": 0.721,
+   "p75": 0.781,
+   "p90": 0.835,
+   "p95": 0.879,
+   "p99": 0.961
+  },
+  "max_hits_on_one_tile": {
+   "count": 9986,
+   "max": 421,
+   "mean": 9.723,
+   "min": 2,
+   "p10": 4,
+   "p25": 6,
+   "p50": 7,
+   "p75": 9,
+   "p90": 13,
+   "p95": 18,
+   "p99": 62
+  },
+  "seconds": {
+   "count": 9986,
+   "max": 2084.615,
+   "mean": 61.116,
+   "min": 14.75,
+   "p10": 30.975,
+   "p25": 38.021,
+   "p50": 47.487,
+   "p75": 60.777,
+   "p90": 80.178,
+   "p95": 107.781,
+   "p99": 346.249
+  }
+ },
+ "config": {
+  "ball_radius": 0.45,
+  "duration": 1000000.0,
+  "gravity": 0.0,
+  "graze_fraction": 0.05,
+  "max_collisions": 8000,
+  "restitution": 1.0,
+  "skin": 1e-09,
+  "speed": 60.0,
+  "stop_on_complete": true,
+  "time_epsilon": 1e-12
+ },
+ "failures": {
+  "completed_but_unusable": {
+   "final_tile_over_10s": {
+    "count": 2839,
+    "example_seeds": [
+     8,
+     9,
+     11,
+     15,
+     16
+    ],
+    "share_of_all": 0.2839
+   },
+   "final_tile_under_1s": {
+    "count": 1695,
+    "example_seeds": [
+     2,
+     5,
+     14,
+     18,
+     33
+    ],
+    "share_of_all": 0.1695
+   },
+   "mid_run_dead_zone_over_4s": {
+    "count": 5795,
+    "example_seeds": [
+     0,
+     1,
+     3,
+     4,
+     7
+    ],
+    "share_of_all": 0.5795
+   },
+   "mid_run_dead_zone_over_8s": {
+    "count": 2011,
+    "example_seeds": [
+     11,
+     12,
+     16,
+     19,
+     27
+    ],
+    "share_of_all": 0.2011
+   },
+   "too_fast_under_25s": {
+    "count": 335,
+    "example_seeds": [
+     5,
+     78,
+     103,
+     156,
+     234
+    ],
+    "share_of_all": 0.0335
+   },
+   "too_slow_over_40s": {
+    "count": 6992,
+    "example_seeds": [
+     0,
+     1,
+     2,
+     3,
+     4
+    ],
+    "share_of_all": 0.6992
+   },
+   "too_slow_over_60s": {
+    "count": 2604,
+    "example_seeds": [
+     11,
+     15,
+     16,
+     19,
+     26
+    ],
+    "share_of_all": 0.2604
+   },
+   "two_tile_loop_over_6": {
+    "count": 0,
+    "example_seeds": [],
+    "share_of_all": 0.0
+   }
+  },
+  "incomplete": {
+   "count": 14,
+   "example_seeds": [
+    87,
+    388,
+    833,
+    1171,
+    1802,
+    1937,
+    2898,
+    2938,
+    3553,
+    4126
+   ],
+   "missing_tiles_by_side": [
+    [
+     0,
+     6
+    ],
+    [
+     1,
+     5
+    ],
+    [
+     2,
+     5
+    ],
+    [
+     3,
+     6
+    ],
+    [
+     4,
+     6
+    ],
+    [
+     5,
+     9
+    ],
+    [
+     6,
+     8
+    ],
+    [
+     7,
+     5
+    ],
+    [
+     8,
+     7
+    ],
+    [
+     9,
+     4
+    ],
+    [
+     10,
+     5
+    ],
+    [
+     11,
+     7
+    ],
+    [
+     12,
+     10
+    ],
+    [
+     13,
+     5
+    ],
+    [
+     14,
+     8
+    ],
+    [
+     15,
+     6
+    ],
+    [
+     16,
+     7
+    ]
+   ],
+   "share_of_all": 0.0014,
+   "stop_reasons": {
+    "collision_cap": 14
+   },
+   "tiles_missing": {
+    "count": 14,
+    "max": 21,
+    "mean": 7.786,
+    "min": 1,
+    "p10": 1,
+    "p25": 1,
+    "p50": 4,
+    "p75": 14,
+    "p90": 15,
+    "p95": 21,
+    "p99": 21
+   }
+  },
+  "seeds": 10000
+ },
+ "milestones": {
+  "complete": {
+   "count": 9986,
+   "max": 2084.615,
+   "mean": 61.116,
+   "min": 14.75,
+   "p10": 30.975,
+   "p25": 38.021,
+   "p50": 47.487,
+   "p75": 60.777,
+   "p90": 80.178,
+   "p95": 107.781,
+   "p99": 346.249
+  },
+  "first": {
+   "count": 9986,
+   "max": 0.192,
+   "mean": 0.157,
+   "min": 0.123,
+   "p10": 0.134,
+   "p25": 0.143,
+   "p50": 0.156,
+   "p75": 0.17,
+   "p90": 0.18,
+   "p95": 0.184,
+   "p99": 0.188
+  },
+  "n_minus_1": {
+   "count": 9986,
+   "max": 1946.415,
+   "mean": 51.295,
+   "min": 12.87,
+   "p10": 27.518,
+   "p25": 33.198,
+   "p50": 40.241,
+   "p75": 49.722,
+   "p90": 65.25,
+   "p95": 88.264,
+   "p99": 296.048
+  },
+  "n_minus_2": {
+   "count": 9986,
+   "max": 1628.503,
+   "mean": 43.551,
+   "min": 12.655,
+   "p10": 24.736,
+   "p25": 29.341,
+   "p50": 34.958,
+   "p75": 42.454,
+   "p90": 53.535,
+   "p95": 71.957,
+   "p99": 251.311
+  },
+  "p25": {
+   "count": 9986,
+   "max": 164.863,
+   "mean": 3.812,
+   "min": 2.199,
+   "p10": 3.19,
+   "p25": 3.566,
+   "p50": 3.789,
+   "p75": 3.942,
+   "p90": 4.22,
+   "p95": 4.389,
+   "p99": 4.815
+  },
+  "p50": {
+   "count": 9986,
+   "max": 473.66,
+   "mean": 9.364,
+   "min": 4.547,
+   "p10": 7.464,
+   "p25": 8.072,
+   "p50": 8.852,
+   "p75": 9.647,
+   "p90": 10.616,
+   "p95": 11.396,
+   "p99": 17.867
+  },
+  "p75": {
+   "count": 9986,
+   "max": 851.055,
+   "mean": 20.729,
+   "min": 8.894,
+   "p10": 13.631,
+   "p25": 15.523,
+   "p50": 17.604,
+   "p75": 20.046,
+   "p90": 23.872,
+   "p95": 28.974,
+   "p99": 89.335
+  },
+  "p90": {
+   "count": 9986,
+   "max": 1237.241,
+   "mean": 33.079,
+   "min": 10.774,
+   "p10": 20.037,
+   "p25": 23.209,
+   "p50": 26.917,
+   "p75": 31.902,
+   "p90": 39.344,
+   "p95": 51.994,
+   "p99": 178.142
+  },
+  "p95": {
+   "count": 9986,
+   "max": 1628.503,
+   "mean": 43.551,
+   "min": 12.655,
+   "p10": 24.736,
+   "p25": 29.341,
+   "p50": 34.958,
+   "p75": 42.454,
+   "p90": 53.535,
+   "p95": 71.957,
+   "p99": 251.311
+  }
+ },
+ "opening": {
+  "activations_in_first_2s": {
+   "count": 9986,
+   "max": 12,
+   "mean": 6.921,
+   "min": 3,
+   "p10": 6,
+   "p25": 6,
+   "p50": 7,
+   "p75": 7,
+   "p90": 8,
+   "p95": 9,
+   "p99": 11
+  },
+  "first_collision_seconds": {
+   "count": 9986,
+   "max": 0.192,
+   "mean": 0.157,
+   "min": 0.123,
+   "p10": 0.134,
+   "p25": 0.143,
+   "p50": 0.156,
+   "p75": 0.17,
+   "p90": 0.18,
+   "p95": 0.184,
+   "p99": 0.188
+  }
+ },
+ "periodic": {
+  "longest_alternation": {
+   "count": 10000,
+   "max": 0.0,
+   "mean": 0.0,
+   "min": 0.0,
+   "p10": 0.0,
+   "p25": 0.0,
+   "p50": 0.0,
+   "p75": 0.0,
+   "p90": 0.0,
+   "p95": 0.0,
+   "p99": 0.0
+  },
+  "longest_four_tile_run": {
+   "count": 10000,
+   "max": 142.0,
+   "mean": 4.922,
+   "min": 4.0,
+   "p10": 4.0,
+   "p25": 4.0,
+   "p50": 5.0,
+   "p75": 5.0,
+   "p90": 6.0,
+   "p95": 7.0,
+   "p99": 7.0
+  },
+  "longest_side_cycle": {
+   "count": 10000,
+   "max": 209.0,
+   "mean": 0.176,
+   "min": 0.0,
+   "p10": 0.0,
+   "p25": 0.0,
+   "p50": 0.0,
+   "p75": 0.0,
+   "p90": 0.0,
+   "p95": 0.0,
+   "p99": 0.0
+  },
+  "longest_tile_cycle": {
+   "count": 10000,
+   "max": 209.0,
+   "mean": 0.176,
+   "min": 0.0,
+   "p10": 0.0,
+   "p25": 0.0,
+   "p50": 0.0,
+   "p75": 0.0,
+   "p90": 0.0,
+   "p95": 0.0,
+   "p99": 0.0
+  },
+  "longest_two_tile_run": {
+   "count": 10000,
+   "max": 3.0,
+   "mean": 2.312,
+   "min": 2.0,
+   "p10": 2.0,
+   "p25": 2.0,
+   "p50": 2.0,
+   "p75": 3.0,
+   "p90": 3.0,
+   "p95": 3.0,
+   "p99": 3.0
+  },
+  "side_cycle_period_histogram": [
+   [
+    0,
+    9933
+   ],
+   [
+    8,
+    41
+   ],
+   [
+    4,
+    26
+   ]
+  ],
+  "tile_cycle_period_histogram": [
+   [
+    0,
+    9933
+   ],
+   [
+    8,
+    41
+   ],
+   [
+    4,
+    26
+   ]
+  ],
+  "two_tile_run_histogram": [
+   [
+    2,
+    6884
+   ],
+   [
+    3,
+    3116
+   ]
+  ],
+  "worst_tile_cycle_seeds": [
+   {
+    "length": 209,
+    "period": 8,
+    "repeats": 26,
+    "seed": 9784,
+    "start_seconds": 163.034
+   },
+   {
+    "length": 141,
+    "period": 4,
+    "repeats": 35,
+    "seed": 8845,
+    "start_seconds": 28.571
+   },
+   {
+    "length": 113,
+    "period": 8,
+    "repeats": 14,
+    "seed": 7620,
+    "start_seconds": 60.907
+   },
+   {
+    "length": 83,
+    "period": 8,
+    "repeats": 10,
+    "seed": 7780,
+    "start_seconds": 75.244
+   },
+   {
+    "length": 81,
+    "period": 4,
+    "repeats": 20,
+    "seed": 5856,
+    "start_seconds": 850.457
+   },
+   {
+    "length": 59,
+    "period": 8,
+    "repeats": 7,
+    "seed": 5490,
+    "start_seconds": 200.724
+   },
+   {
+    "length": 35,
+    "period": 8,
+    "repeats": 4,
+    "seed": 1932,
+    "start_seconds": 127.826
+   },
+   {
+    "length": 35,
+    "period": 8,
+    "repeats": 4,
+    "seed": 6891,
+    "start_seconds": 77.52
+   },
+   {
+    "length": 33,
+    "period": 8,
+    "repeats": 4,
+    "seed": 69,
+    "start_seconds": 3.755
+   },
+   {
+    "length": 33,
+    "period": 8,
+    "repeats": 4,
+    "seed": 7389,
+    "start_seconds": 28.002
+   }
+  ],
+  "worst_two_tile_seeds": [
+   {
+    "length": 3,
+    "seed": 0,
+    "start_seconds": 2.525,
+    "tiles": [
+     14,
+     38
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 1,
+    "start_seconds": 15.524,
+    "tiles": [
+     14,
+     40
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 2,
+    "start_seconds": 1.615,
+    "tiles": [
+     15,
+     43
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 13,
+    "start_seconds": 15.706,
+    "tiles": [
+     0,
+     28
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 14,
+    "start_seconds": 21.698,
+    "tiles": [
+     3,
+     27
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 15,
+    "start_seconds": 0.769,
+    "tiles": [
+     2,
+     28
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 21,
+    "start_seconds": 2.769,
+    "tiles": [
+     1,
+     29
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 22,
+    "start_seconds": 23.461,
+    "tiles": [
+     4,
+     32
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 23,
+    "start_seconds": 2.766,
+    "tiles": [
+     1,
+     27
+    ]
+   },
+   {
+    "length": 3,
+    "seed": 25,
+    "start_seconds": 0.729,
+    "tiles": [
+     11,
+     37
+    ]
+   }
+  ]
+ },
+ "seed_range": [
+  0,
+  9999
+ ],
+ "seeds": 10000,
+ "stagnation": {
+  "long_gap_count": {
+   "count": 9986,
+   "max": 24,
+   "mean": 3.354,
+   "min": 0,
+   "p10": 1,
+   "p25": 2,
+   "p50": 3,
+   "p75": 4,
+   "p90": 6,
+   "p95": 7,
+   "p99": 12
+  },
+  "longest_body_gap_seconds": {
+   "count": 9986,
+   "max": 689.239,
+   "mean": 7.825,
+   "min": 0.314,
+   "p10": 2.126,
+   "p25": 3.009,
+   "p50": 4.543,
+   "p75": 7.043,
+   "p90": 11.872,
+   "p95": 18.155,
+   "p99": 67.52
+  },
+  "longest_gap_progress": {
+   "count": 9986,
+   "max": 0.98,
+   "mean": 0.937,
+   "min": 0.078,
+   "p10": 0.882,
+   "p25": 0.922,
+   "p50": 0.961,
+   "p75": 0.98,
+   "p90": 0.98,
+   "p95": 0.98,
+   "p99": 0.98
+  },
+  "longest_gap_seconds": {
+   "count": 9986,
+   "max": 1262.629,
+   "mean": 15.97,
+   "min": 0.56,
+   "p10": 3.616,
+   "p25": 5.763,
+   "p50": 9.699,
+   "p75": 16.4,
+   "p90": 27.931,
+   "p95": 39.352,
+   "p99": 123.275
+  },
+  "median_activation_interval": {
+   "count": 9986,
+   "max": 1.354,
+   "mean": 0.332,
+   "min": 0.205,
+   "p10": 0.3,
+   "p25": 0.309,
+   "p50": 0.313,
+   "p75": 0.315,
+   "p90": 0.398,
+   "p95": 0.524,
+   "p99": 0.608
+  }
+ },
+ "tail": {
+  "final_three_seconds": {
+   "count": 9986,
+   "max": 1267.474,
+   "mean": 21.427,
+   "min": 0.413,
+   "p10": 4.223,
+   "p25": 7.821,
+   "p50": 14.111,
+   "p75": 23.796,
+   "p90": 37.853,
+   "p95": 51.779,
+   "p99": 145.945
+  },
+  "final_tile_over_median_interval": {
+   "count": 9986,
+   "max": 4040.107,
+   "mean": 30.127,
+   "min": 0.045,
+   "p10": 1.836,
+   "p25": 5.116,
+   "p50": 14.681,
+   "p75": 34.503,
+   "p90": 66.473,
+   "p95": 94.762,
+   "p99": 209.797
+  },
+  "final_tile_seconds": {
+   "count": 9986,
+   "max": 1262.629,
+   "mean": 9.821,
+   "min": 0.012,
+   "p10": 0.588,
+   "p25": 1.707,
+   "p50": 4.838,
+   "p75": 11.295,
+   "p90": 21.526,
+   "p95": 30.471,
+   "p99": 69.067
+  },
+  "from_90_percent": {
+   "count": 9986,
+   "max": 1445.357,
+   "mean": 28.037,
+   "min": 1.239,
+   "p10": 7.306,
+   "p25": 12.165,
+   "p50": 19.375,
+   "p75": 30.291,
+   "p90": 45.925,
+   "p95": 61.492,
+   "p99": 187.014
+  },
+  "from_95_percent": {
+   "count": 9986,
+   "max": 1266.875,
+   "mean": 17.564,
+   "min": 0.318,
+   "p10": 2.455,
+   "p25": 5.273,
+   "p50": 10.625,
+   "p75": 19.695,
+   "p90": 32.737,
+   "p95": 44.999,
+   "p99": 129.043
+  },
+  "from_second_last": {
+   "count": 9986,
+   "max": 1262.629,
+   "mean": 9.821,
+   "min": 0.012,
+   "p10": 0.588,
+   "p25": 1.707,
+   "p50": 4.838,
+   "p75": 11.295,
+   "p90": 21.526,
+   "p95": 30.471,
+   "p99": 69.067
+  },
+  "from_third_last": {
+   "count": 9986,
+   "max": 1266.875,
+   "mean": 17.564,
+   "min": 0.318,
+   "p10": 2.455,
+   "p25": 5.273,
+   "p50": 10.625,
+   "p75": 19.695,
+   "p90": 32.737,
+   "p95": 44.999,
+   "p99": 129.043
+  },
+  "tail_share_from_90": {
+   "count": 9986,
+   "max": 0.972,
+   "mean": 0.412,
+   "min": 0.002,
+   "p10": 0.22,
+   "p25": 0.309,
+   "p50": 0.411,
+   "p75": 0.514,
+   "p90": 0.604,
+   "p95": 0.654,
+   "p99": 0.747
+  }
+ },
+ "wall_seconds": 48.04
+}
