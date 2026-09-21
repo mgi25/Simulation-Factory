@@ -23,11 +23,14 @@ measurement.
 | starting SHA | `5ef311a992efbe120a3158fc7940cdc3c342dd5b` (Phase 2) |
 | branch | `category3-tile-escape-v3`, created from `5ef311a` |
 | worktree | `../wt-category3-tile-escape` |
-| resulting commit | see section 11 |
+| resulting commit | `7acdd050ea26c988232840950f8f4511ad6d6046` |
+| remote | `origin/category3-tile-escape-v3` at `7acdd05` |
 | merged | **no**, as instructed |
+| history rewritten | **no** |
 
-No other workstream was touched. One Category 3-owned test was widened and the
-reason is in section 10.3.
+Ten files, 4,367 insertions, 0 deletions. Nine are new; the tenth is an
+eleven-line addition to a Category 3-owned test, explained in section 10.3.
+No other workstream was touched.
 
 ---
 
@@ -300,10 +303,25 @@ line through the wall on the frame after a bounce.
 
 ### 5.4 So which frame rate?
 
-**30 fps is sufficient and is the recommendation for previews**, at half the
-render cost (129 s against 233 s for seed 3530 at 1080×1920). 60 fps is
-smoother in the hand and needs no trail for continuity. The decision does not
-affect the simulation, the event order or the completion time — section 6.
+**30 fps is sufficient and is the recommendation for previews.** Per-frame cost
+is the same at either rate — 124 ms at 1080×1920 on this machine, since the
+frame drawn is identical work — so 30 fps costs exactly half as much wall time
+for the same run: seed 3530's 32.14 s took 1,025 frames and 129 s at 30 fps,
+and needs 2,050 frames at 60.
+
+60 fps is smoother in the hand and needs no trail for continuity. The decision
+does not affect the simulation, the event order or the completion time —
+section 6 checked that at both rates.
+
+### 5.5 The five approaches the brief named
+
+| approach | what happened |
+|---|---|
+| **motion interpolation** | Already exact, and for free. The scene evaluates the closed-form position at any instant, so a frame at 8.0333 s is the true position at 8.0333 s, not a blend of two sampled states. There is no interpolation error to reduce — which is also why raising the frame rate improves continuity monotonically instead of exposing a sampling artefact. |
+| **temporal trail** | Adopted, at 0.09 s. The measurement is 5.2 and the length comparison is 5.3. |
+| **controlled halo** | Kept, and it is not what fixes the strobe. Tested alone at both rates: identical results to the bare ball — 16/18 gaps at 30 fps, none at 60. A radially symmetric glow adds brightness but no *direction*, so it cannot bridge a directional gap. It stays because it separates the ball from a lit wall it is passing. |
+| **ball size** | Rejected as a solution, on arithmetic. Closing a 131.6 px step needs a 131.6 px ball — a third of the arena, larger than four tiles. The drawn ball is 1.45× the collision radius for legibility against a lit wall, and that is all it is for; the collision radius is untouched. |
+| **motion blur** | Present, in the only form that is honest here. A temporal trail whose window equals one frame interval *is* a 360°-shutter motion blur, integrated along the true path. At 30 fps that would be 0.0333 s; 0.09 s is 2.7× it, so the treatment is a deliberately long blur rather than a physical one. Godot's own camera motion blur was not used: it works from screen-space velocity and would smear across the bounce instead of bending at it. |
 
 ---
 
@@ -453,9 +471,17 @@ elaborate escape sequence is deliberately not here — that is Phase 4.
 
 ## 9. What went wrong, and what each one cost
 
-Four of these produced a wrong picture or a wrong number, and none of them
-touched the simulation. That is the architecture working: every one of them was
-a renderer drawing the right run badly.
+Six defects, and **not one of them touched the simulation.** That is the
+architecture working rather than a run of luck: the scene has no way to reach
+the physics, so the worst any of these could do was draw the right run badly or
+report it wrongly. Four produced a wrong picture; two produced a spurious
+failure on output that was correct.
+
+Two further traps are recorded where they belong rather than here, because both
+would have put a wrong *number* in this report: the 32-bit `Vector2` that would
+have forced the playback audit to a tolerance a hundred times too loose
+(section 6), and the hit-feedback measurement that sampled the ball's bloom and
+read 255.0 for everything (section 8.2).
 
 **The arena was invisible.** The first render showed the hook, the counter, the
 ball and its trail, and no arena at all. Two causes: the arena's vertices run
@@ -547,9 +573,30 @@ reason is in a comment beside it.
 No cross-workstream guard was modified, skipped or xfailed. No `output/`
 artefact was manufactured to make an unrelated test pass.
 
-### 10.4 Full suite
+### 10.4 Full suite, and the baseline comparison
 
-See section 11 for the count and the baseline comparison against `5ef311a`.
+**18 failed, 5,872 passed, 440 skipped in 1,609.66 s** on `7acdd05`.
+
+Phase 2 recorded **18 failed, 5,822 passed, 440 skipped** on `5ef311a`. The
+failure count is unchanged and the pass count is up by exactly 50, which is
+`tests/test_tile_escape_phase3.py`. Nothing was skipped or xfailed to get
+there.
+
+The 18 are not compared by count. The exact failing tests were extracted and
+re-run on the Phase 3 base `5ef311a`, in a throwaway
+`git worktree add --detach` so the comparison could not see this branch's
+working tree: **18 failed, 28 passed**, and the fourteen distinct test
+functions and their five parametrised repeats are the same ones, at the same
+line numbers.
+
+| group | count | why |
+|---|---|---|
+| stale cross-workstream branch guards | **12** | `test_race2_v30_stage`, `v301_stage`, `v311_track` ×2, `v321_geometry`, `v32_final` ×6, `v33_bookends`. Each diffs `origin/main...HEAD` against a per-brief allowlist. The files they print are `.gitignore`, `ai_platform/*` and `race2/*` — everything on `main` that their brief predates. Not one of them names a Category 3 file. |
+| absent `output/` artefacts | **6** | `test_neon_proof` ×1 and `test_sloped_v251_world` ×4, `v252_world` ×1. Each opens a file under `output/`, which is gitignored and therefore absent from any fresh worktree. They fail on environment, not on code. |
+
+Both groups are exactly the two Phase 2 described, in the same 12 / 6 split.
+**No unrelated guard was modified, skipped or xfailed, and no `output/`
+artefact was manufactured to turn one green.**
 
 ---
 
@@ -568,6 +615,9 @@ track render output, so these paths are on this machine.
 | `clip60/seed_3530/frame_*.png` | 60 fps, frames 0–1970 (see below) |
 | `preview_seed3530_30fps.mp4` | the 30 fps clip encoded, 1080×1920, 34.17 s, 2.2 MB |
 | `preview_seed3530_60fps.mp4` | the 60 fps clip encoded, 1080×1920, 32.85 s, 2.6 MB |
+| `clip30/seed_38864/frame_*.png` | the tension candidate, 30 fps, 1,249 frames |
+| `preview_seed38864_30fps.mp4` | the tension candidate encoded, 41.63 s |
+| `tension_38864_last_tile.png` | one frame per second across its 6.20 s last-tile wait |
 | `holdtest/` | the completion hold at 60 fps, rendered on an idle machine |
 | `feedback/{before_new,new50,quiet_n,dup50,quiet_d}/` | the frames section 8.1 measures |
 | `audit/seed_<n>/audit_{30,60}fps.json` | what the scene drew, per frame |
@@ -630,21 +680,41 @@ of 6.20 s, both the largest in the accepted set, against a median activation
 interval of 0.42 s — the last tile takes about fifteen ordinary activations'
 worth of time. This is the strongest *ending* in the cast. It is also the
 longest run and reaches 90% at 24.0 s, so 40% of its length is the last five
-tiles. Whether that reads as tension or as waiting is the one judgement in this
-report a measurement does not settle; the 30 fps clip is the evidence to watch.
+tiles.
+
+Whether 6.20 s reads as tension or as waiting is the one judgement in this
+report a measurement does not settle. What the frames *do* settle is the
+structure of it. `tension_38864_last_tile.png` is one frame per second across
+the whole wait, 33.39 s to 39.59 s.
+
+**The remaining dark tile holds one screen position throughout** — tile 39,
+midpoint (−9.90, 0.31), which projects to (80, 945) px in a 1080×1920 frame:
+hard against the left wall, a hair above the midline. The viewer has a fixed
+target to watch rather than something to re-find each time. And the ball keeps
+coming back to it; the distance from ball to target across those seven seconds,
+in units of the arena circumradius:
+
+| t | 33.5 | 34.5 | 35.5 | 36.5 | 37.5 | 38.5 | 39.5 |
+|---|---|---|---|---|---|---|---|
+| distance | 1.12 | 1.05 | 1.52 | **0.53** | **0.36** | **0.39** | 0.79 |
+
+Three of the seven are inside half a circumradius, and the run of 0.53 → 0.36
+→ 0.39 is the ball working the same corner of the arena for three seconds
+without connecting. That is the shape of a near-miss sequence rather than of a
+pause — a reason to expect the wait to read, not a substitute for watching it.
 
 **32052 (25.81 s) — the smooth one.** Worst mid-run gap of 0.88 s, the smallest
 in the cast, and only 123 collisions. It never pauses. It is also the shortest,
 and its duplicate share in the final third is 0.88 — the ending is busy without
 being productive. A good hook candidate, a weaker payoff.
 
-**34081 (28.10 s) — the fast end.** Holds up. Tiles arrive quickly enough that
+**34081 (28.09 s) — the fast end.** Holds up. Tiles arrive quickly enough that
 the arena visibly fills rather than accumulating, and the 8.84 s final three
 still separates the ending from the body.
 
 **10928 (36.93 s) — the slow end.** Does *not* go dead: worst body gap 2.12 s,
-which is under the median seed's. A 37-second run is not a problem at this
-operating point. Its final tile at height 0.99 is the arena's top vertex, the
+which is the 25th percentile of accepted seeds (their median is 2.59 s). A
+37-second run is not a problem at this operating point. Its final tile at height 0.99 is the arena's top vertex, the
 hardest place to see, and section 7 says it is still found at 3.06× separation
 on a phone.
 
@@ -664,6 +734,26 @@ Pacing is not, and the thing that catches it is the Phase 2 evaluator's
 `longest_body_gap_seconds`, which rejected this seed before anyone rendered it.
 The two instruments are complementary and neither is sufficient.
 
+### 12.1 One caveat on how far this generalises
+
+**The seven accepted seeds are smoother than a typical accepted seed, and the
+proof should be read with that in mind.** Their worst mid-run gaps run 0.88 to
+2.27 s. Over the accepted population the same statistic has a median of 2.59 s,
+a p75 of 3.15 s and a p90 of 3.62 s against an acceptance limit of 4.0 s — so
+every seed rendered here sits at or below the population's 25th percentile.
+
+That is not an accident and it is not a flaw in the selection: six of the seven
+roles rank by `candidate_score`, whose `no_stagnation` component is a quarter
+of the weight, so the roles systematically return the smooth end of whatever
+they are allowed to choose from. It does mean this phase has **not** shown that
+a seed with a 3.6-second mid-run gap reads acceptably, only that seeds under
+2.3 s do. Everything else in the report — composition, contrast, ball
+readability, target visibility, frame rate — is a property of the presentation
+and does not depend on which accepted seed was rendered.
+
+The gap between a 2.3-second pause and the 4.0-second one acceptance currently
+permits is the open question, and section 15 carries it into Phase 4.
+
 ---
 
 ## 13. The brief's inspection questions, answered
@@ -672,8 +762,8 @@ The two instruments are complementary and neither is sufficient.
 |---|---|
 | Is frame one understandable? | Yes. 17-gon flats read plainly, the ball is the brightest thing in frame, the hook is above it. |
 | Can the eye continuously track the ball? | Yes at 60 fps unaided; yes at 30 fps with the 0.09 s trail. Measured, section 5.2. |
-| Is each new tile hit satisfying enough to notice? | Yes — 2.9× emission spike plus an outward recoil over 0.30 s. |
-| Are duplicate collisions visually acceptable? | Yes, and they do not read as progress: brightness only, 22% magnitude, no recoil. |
+| Is each new tile hit satisfying enough to notice? | Yes. Measured +178.5 luminance levels, 3.82×, from a 2.9× emission spike on top of the dark→lit state change, plus an outward recoil over 0.30 s. |
+| Are duplicate collisions visually acceptable? | Yes, and they do not read as progress: measured +11.4 levels, **6% of an activation**, brightness only and no recoil. |
 | Does progress remain obvious without a counter? | **Yes, and it was tested rather than assumed.** `nocounter/progression_no_counter.png` is the five moments at 270×480 with the counter switched off; 1 → 26 → 46 → 50 → 51 is unambiguous, and the 50/51 frame's single dark tile is findable even at contact-sheet size. |
 | At 45+/51 can the viewer spot remaining targets? | Yes. At 46/51 the 4–5 dark tiles sit at 3.5–3.8× separation. |
 | Does 50/51 create genuine visual tension? | Yes. One dark tile, 3.1–3.7× dimmer, 131–154 level gap, at phone size. |
@@ -716,8 +806,14 @@ the line the brief drew.
 4. **Add a pacing gate to seed selection before any batch production.** Seed
    43311 is the proof that a run can pass every compositional check and still
    be unwatchable, and that only the Phase 2 evaluator catches it.
-5. **Render at 30 fps for review and decide the delivery rate separately.** It
+5. **Render two seeds near the acceptance limit for mid-run gap, and watch
+   them.** Section 12.1: every seed this phase rendered sits at or below the
+   accepted population's 25th percentile for `longest_body_gap_seconds`, so a
+   2.3-second pause is shown to read and a 3.6-second one is not. Either the
+   limit tightens from 4.0 s or it is confirmed — it should not stay at 4.0 s
+   on the strength of runs that never approached it. Two renders answer it.
+6. **Render at 30 fps for review and decide the delivery rate separately.** It
    halves the cost, and section 6 shows the event order and completion time are
    identical either way.
-6. **Audio, particles, colour grading and the final type treatment are still
+7. **Audio, particles, colour grading and the final type treatment are still
    open** and were deliberately not touched.
