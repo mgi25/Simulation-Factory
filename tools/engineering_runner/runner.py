@@ -588,6 +588,26 @@ class EngineeringRunner:
 
     # --- the resource strategy ----------------------------------------------
 
+    def _developer_tools(self, strategy: ResourceStrategy) -> tuple[str, ...]:
+        """The model gets only the tools whose work cannot be done deterministically.
+
+        Consumer work is the default bounded/routine path. Its tests, git checks,
+        commits and pushes are already owned by the runner after the model exits,
+        so giving the model Bash invites duplicate validation loops without adding
+        authority or evidence. TodoWrite is likewise session-local planning state
+        that Company OS does not consume. Expanded/specialist work keeps the
+        operator-configured full tool set because its implementation may genuinely
+        require generation or inspection through a shell.
+
+        This is a reduction only: it filters the operator's configured tool set and
+        never adds a tool that was not already present.
+        """
+        tools = tuple(self.config.developer_tools)
+        if strategy.profile.strip().lower() != "consumer":
+            return tools
+        removed = {"Bash", "TodoWrite"}
+        return tuple(tool for tool in tools if tool not in removed)
+
     def _resource_plan(
         self, payload: Mapping[str, Any], *, role: str
     ) -> tuple[ResourceStrategy, dict[str, Any]]:
@@ -732,7 +752,7 @@ class EngineeringRunner:
                 cwd=worktree,
                 instructions=instructions,
                 timeout_s=applied["applied_timeout_s"],
-                allowed_tools=self.config.developer_tools,
+                allowed_tools=self._developer_tools(strategy),
                 disallowed_tools=self.config.disallowed_tools,
                 model=applied["applied_model"],
                 read_only=False,
