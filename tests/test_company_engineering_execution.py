@@ -2339,6 +2339,9 @@ def test_developer_briefing_carries_a_resource_strategy_artifact(tmp_path):
     assert eff["context"]["narrowed_at"] == "intake"
     assert eff["context"]["ref_count"] == len(briefing.packet.context_refs)
     assert eff["strategy_reason"]
+    assert isinstance(eff["adaptive_routing"]["eligible"], bool)
+    assert eff["adaptive_routing"]["downshift_tier"] == "economy"
+    assert eff["adaptive_routing"]["runtime_requirements"]
 
     # Governance: the artifact carries no authority of any kind. A resource
     # strategy that could name a path would be a second place a scope is set.
