@@ -1362,6 +1362,19 @@ def test_consumer_developer_has_no_model_owned_shell_or_todo_loop(repository):
     assert resources["compiled_context"]["rendered_chars"] == context["rendered_chars"]
     assert resources["compiled_context"]["compiled_spans"] == len(context["compiled_spans"])
 
+    base_tests = Path(report.run_dir) / "developer-01" / "base-tests.json"
+    assert base_tests.is_file()
+    base_evidence = json.loads(base_tests.read_text("utf-8"))
+    assert base_evidence["commit"] == repository["base"]
+    assert len(base_evidence["runs"]) == 1
+    assert base_evidence["runs"][0]["command"] == "tests/test_subject.py"
+    assert base_evidence["failure_symbol_hints"] == []
+    assert resources["base_diagnostic"]["ran"] is True
+    assert resources["base_diagnostic"]["test_runs"] == 1
+    assert resources["base_diagnostic"]["green"] == 1
+    assert resources["base_diagnostic"]["failed"] == 0
+    assert resources["base_diagnostic"]["failure_symbol_hints"] == 0
+
 
 def test_expanded_developer_keeps_the_operator_shell_capability(repository):
     control = ScriptedControlPlane(
