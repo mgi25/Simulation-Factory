@@ -1075,6 +1075,14 @@ class ScriptedControlPlane:
             state = "blocked"
         return _reply({"state": state, "review": {"outcome": outcome}})
 
+    def execution_stop(self, work_order_id: str, *, reason: str):
+        self.calls.append(("execution-stop", reason))
+        self._advance("decision_required")
+        return _reply(
+            {"state": "decision_required", "reason": reason},
+            exit_code=1,
+        )
+
     def gate_check(self, *, gate_repo_root: Path, suite_evidence: Path, timeout_s: float):
         self.calls.append(("gate-check", str(gate_repo_root)))
         # Report, then verdict - and the verdict is not a field of the report.
@@ -2910,8 +2918,11 @@ def test_a_budget_stopped_stage_never_spawns_an_automatic_repair_session(reposit
 
     developer = [request for request in backend.launched if request.role == "developer"]
     assert len(developer) == 1
-    assert report.outcome == RUN_FAILED
+    assert report.outcome == RUN_BLOCKED
+    assert report.final_state == "decision_required"
     assert "error_max_budget_usd" in report.reason
+    assert control.states[0] == "decision_required"
+    assert [call[0] for call in control.calls].count("execution-stop") == 1
 
     stage = Path(report.run_dir) / "developer-01"
     assert (stage / "session-1.json").is_file()
