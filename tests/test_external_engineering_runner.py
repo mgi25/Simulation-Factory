@@ -862,6 +862,10 @@ def test_a_reviewer_that_answers_badly_is_asked_again_in_the_same_session(reposi
     first, second = [r for r in backend.launched if r.role == "reviewer"]
     assert second.instructions.startswith(first.instructions)
     assert "could not be read" in second.instructions
+    assert second.max_cost == first.max_cost
+    assert second.timeout_s == first.timeout_s
+    assert second.allowed_tools == first.allowed_tools
+    assert second.disallowed_tools == first.disallowed_tools
 
 
 def test_suite_evidence_reports_a_failure_rather_than_hiding_it():
@@ -2866,6 +2870,118 @@ def test_a_passing_test_run_carries_no_failure_detail(repository):
     )["runs"]
     assert runs
     assert all(run["failure_detail"] == "" for run in runs)
+
+
+def test_a_budget_stopped_stage_never_spawns_an_automatic_repair_session(repository):
+    """Regression for the V4 hidden-spend incident.
+
+    A provider resource stop is a backend stop, not malformed report JSON. The
+    runner persists that paid session and stops; it must not consume the one
+    structured-report repair slot.
+    """
+
+    class BudgetStopped(ScriptedBackend):
+        def launch(self, request: SessionRequest) -> SessionOutcome:
+            self.launched.append(request)
+            self.session_ids.append(request.session_id)
+            return SessionOutcome(
+                backend=self.name,
+                role=request.role,
+                session_id=request.session_id,
+                model="scripted",
+                provider="anthropic",
+                exit_code=0,
+                duration_s=0.01,
+                result_text="",
+                transcript="stopped",
+                ok=False,
+                cost_usd=3.0,
+                input_units=10,
+                output_units=100,
+                cache_read_units=1000,
+                cache_creation_units=200,
+                stopped_reason="error_max_budget_usd",
+                cost_ceiling_enforced=True,
+            )
+
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    backend = BudgetStopped()
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    developer = [request for request in backend.launched if request.role == "developer"]
+    assert len(developer) == 1
+    assert report.outcome == RUN_FAILED
+    assert "error_max_budget_usd" in report.reason
+
+    stage = Path(report.run_dir) / "developer-01"
+    assert (stage / "session-1.json").is_file()
+    assert not (stage / "session-2.json").exists()
+    sessions = json.loads((stage / "sessions.json").read_text("utf-8"))
+    assert sessions["paid_session_count"] == 1
+
+
+def test_usage_aggregates_every_paid_session_in_the_stage():
+    first = SessionOutcome(
+        backend="claude_code",
+        role="developer",
+        session_id="00000000-0000-4000-8000-000000000001",
+        model="sonnet",
+        provider="anthropic",
+        exit_code=0,
+        duration_s=2.0,
+        result_text="",
+        transcript="",
+        ok=True,
+        cost_usd=3.0,
+        input_units=10,
+        output_units=100,
+        cache_read_units=1000,
+        cache_creation_units=200,
+        turns=3,
+        cost_ceiling_enforced=True,
+        exploration={
+            "file_reads_total": 2,
+            "file_reads_repeated": 1,
+            "searches_total": 1,
+        },
+    )
+    second = SessionOutcome(
+        backend="claude_code",
+        role="developer",
+        session_id="00000000-0000-4000-8000-000000000002",
+        model="sonnet",
+        provider="anthropic",
+        exit_code=0,
+        duration_s=1.0,
+        result_text="",
+        transcript="",
+        ok=True,
+        cost_usd=0.5,
+        input_units=5,
+        output_units=50,
+        cache_read_units=250,
+        cache_creation_units=75,
+        turns=2,
+        cost_ceiling_enforced=True,
+        exploration={
+            "file_reads_total": 1,
+            "file_reads_repeated": 0,
+            "searches_total": 0,
+        },
+    )
+
+    usage = _usage(second, sessions=(first, second))
+    assert usage["passes"] == 2
+    assert usage["retries"] == 1
+    assert usage["provider_cost"] == "3.500000"
+    assert usage["input_units"] == 15
+    assert usage["output_units"] == 150
+    assert usage["cache_hits"] == 1250
+    assert usage["cache_creation_units"] == 275
+    assert usage["model_turns"] == 5
+    assert usage["repo_file_reads"] == 3
+    assert usage["repeated_file_reads"] == 1
+    assert usage["repo_searches"] == 1
 
 
 def test_a_session_stopped_at_its_spend_ceiling_is_not_a_successful_session():
