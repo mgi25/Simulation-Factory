@@ -182,6 +182,74 @@ def test_content_addressed_cache_reuses_an_exact_tree_snapshot(tmp_path: Path) -
     assert warm.tree_fingerprint == cold.tree_fingerprint
 
 
+def test_content_identity_map_reuses_unchanged_modules_without_source_reads(
+    tmp_path: Path,
+) -> None:
+    repo = _sample_repo(tmp_path)
+    cache = tmp_path / "runner-cache"
+
+    paths = sorted(
+        path
+        for root in ("company", "tools", "tests")
+        for path in (repo / root).rglob("*.py")
+    )
+
+    def identities() -> dict[str, str]:
+        return {
+            path.relative_to(repo).as_posix(): str(path.stat().st_size) + ":" + path.read_text("utf-8")
+            for path in paths
+        }
+
+    original_ids = identities()
+    first, cold = build_repo_map_cached(
+        repo,
+        cache,
+        roots=("company", "tools", "tests"),
+        content_identities=original_ids,
+    )
+    assert cold.module_misses == cold.module_count
+
+    spinner_path = repo / "company/widgets/spinner.py"
+    spinner_path.write_text(
+        '"""Spin a widget until it stops."""\n\n'
+        "import os\n"
+        "from company.widgets.errors import SpinError\n\n"
+        "class Spinner:\n"
+        "    def spin(self) -> None: ...\n"
+        "    def stop(self) -> None: ...\n\n"
+        "def start_spinner() -> Spinner:\n"
+        "    return Spinner()\n",
+        encoding="utf-8",
+    )
+
+    changed_ids = dict(original_ids)
+    changed_ids["company/widgets/spinner.py"] = (
+        str(spinner_path.stat().st_size) + ":" + spinner_path.read_text("utf-8")
+    )
+
+    # If an unchanged module were reopened on this path, this missing source
+    # would fail the build. Its cached ModuleMap must be enough.
+    missing_unchanged = repo / "company/widgets/errors.py"
+    missing_unchanged.unlink()
+
+    second, changed = build_repo_map_cached(
+        repo,
+        cache,
+        roots=("company", "tools", "tests"),
+        content_identities=changed_ids,
+    )
+
+    assert changed.snapshot_hit is False
+    assert changed.module_misses == 1
+    assert changed.module_hits == changed.module_count - 1
+    assert second.by_path("company/widgets/errors.py") == first.by_path(
+        "company/widgets/errors.py"
+    )
+    spinner = second.by_path("company/widgets/spinner.py")
+    assert spinner is not None
+    assert spinner.symbol("Spinner.stop") is not None
+
+
 def test_content_addressed_cache_reparses_only_a_changed_module(tmp_path: Path) -> None:
     repo = _sample_repo(tmp_path)
     cache = tmp_path / "runner-cache"
