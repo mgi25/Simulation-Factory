@@ -65,8 +65,62 @@ extreme.** The lateral tip speed is `length * A * rate`, which for a fixed
 reach is very nearly `reach * rate` at any amplitude - so `rate` sets how hard
 the arm shoves and `amplitude` sets what the arm looks like doing it.
 
-The channel also bounds the amplitude from above, which is worth writing down
-because it is not obvious: the pivot has to clear the rail it hangs over, so
+## A marble diameter beside the arm is not enough for a field
+
+`race2.parts.Wheel` set the test for whether an obstacle is safe: leave more
+than a marble diameter of clear channel beside it and "nothing is ever stopped
+- a marble is deflected, delayed or let through". This module inherits that
+test, and at `reach` 0.56 in a `W_LANE` corridor it passes it - 0.633 of clear
+channel against a 0.570 marble.
+
+It is a **single-marble** test, and a six-racer field does not arrive one at a
+time. Measured on the P0 lab, seed 37: two racers come to a **dead stop**
+against the arm and are released when it swings away, while the same seed on
+the same course with the arm removed never drops a racer below 12.95 layout
+units a second anywhere in the corridor. A 0.633 gap fits one marble with 0.063
+to spare and cannot pass two abreast, so a pack queues.
+
+So `describe()` reports the side gap in marble diameters as well, and flags
+`pack_gate` under two of them. The queue is not a defect - it is where the
+reordering comes from - but a mechanism that stops racers dead is a different
+thing from one that deflects them, and the metadata should not call the first
+one the second.
+
+## The arm has to uncover the centreline, or it is a plug
+
+The swing sweeps the arm's *axis* through `+/- length * sin(amplitude)`, and the
+box carries `half depth` either side of that axis. If
+
+    length * sin(amplitude) <= 0.5 * depth
+
+then the box covers the channel's centreline **at every angle in the arc**, and
+a marble - which its own cradle centres on that line - is held against the arm
+for the rest of the race. Not delayed: held. Traced on the P0 lab, a racer sat
+at `across` 0.000, resting on the cradle, with a zero gap to the box, through
+every angle from -9.9 to +10.0 degrees, from 4 s to the 20 s limit.
+
+The quantity is reported as `centre_uncovered` and a non-positive one is
+refused. Measured over nine configurations and 450 races, it orders the failures
+perfectly:
+
+    uncovered  -0.099  -0.013  -0.008  +0.073  +0.078  +0.131  +0.136  +0.193
+    racers      10       4       3       1       2       0       0       0
+    pinned
+
+So the constructor refuses `<= 0` because that case is provably a plug, and the
+number is published because the margin matters: about +0.13 - half a marble
+radius - was where pinning stopped in this channel.
+
+**This is why a lower `reach` is not a safer one.** Reach sets the lateral
+excursion, and lowering it shortens the arm; a shorter arm at the same amplitude
+sweeps its axis a shorter distance while keeping its width, so it approaches the
+plug condition from above. Over 50 seeds each, reach 0.40 finished all six in
+76% of races and reach 0.60 in 94% - the opposite of what the side-gap reading
+alone predicts.
+
+## The channel bounds the amplitude from above
+
+Worth writing down because it is not obvious: the pivot has to clear the rail it hangs over, so
 `arm length` cannot fall below `rail top + pivot radius - cradle`. In a 3.01
 unit corridor at `reach` 0.56 that caps the amplitude near 25 degrees. A wider
 sample admits a wider swing, so *where along the run the pendulum stands* and
@@ -278,6 +332,16 @@ class PendulumCross(MarbleModule):
                 f"is under a {2.0 * layout.MARBLE_RADIUS:.3f} marble - it would pin a "
                 "racer against the rail; lower the reach"
             )
+        uncovered = self.centre_uncovered()
+        if uncovered <= 0.0:
+            raise ValueError(
+                f"{module_id}: the arm sweeps its axis "
+                f"{self.arm_length * math.sin(self.amplitude):.3f} across and is "
+                f"{self.depth:.3f} wide, so the swept box never uncovers the "
+                f"channel centreline ({uncovered:+.3f}) - it would hold a racer "
+                "there for the whole race rather than deflect it; raise the reach "
+                "or the amplitude, or thin the arm"
+            )
         floor = self.axle_floor()
         if self.pivot_rise < floor:
             raise ValueError(
@@ -302,6 +366,28 @@ class PendulumCross(MarbleModule):
         on the seed nobody ran.
         """
         return self.half_width() - self.swept_across
+
+    def side_gap_marbles(self) -> float:
+        """The side gap in marble diameters - the number a field cares about.
+
+        Under 1.0 the arm can pin a racer against the rail and the constructor
+        refuses it. Under 2.0 two racers cannot pass abreast, so a pack queues
+        rather than filtering through; see the module docstring.
+        """
+        return self.side_gap() / (2.0 * layout.MARBLE_RADIUS)
+
+    def pack_gate(self) -> bool:
+        """Would a field of racers queue here rather than filter through?"""
+        return self.side_gap_marbles() < 2.0
+
+    def centre_uncovered(self) -> float:
+        """How far past the centreline the box's inner edge retreats, in layout.
+
+        Non-positive means the swept box covers the channel's centre at every
+        angle in the arc, and a marble centred there is held for the whole
+        race. See the module docstring for the measurement.
+        """
+        return self.arm_length * math.sin(self.amplitude) - 0.5 * self.depth
 
     def cradle_floor(self) -> float:
         """The cradle's lowest point, in layout units below the centreline."""
@@ -527,13 +613,19 @@ class PendulumCross(MarbleModule):
             "pivot_rise": round(self.pivot_rise, 4),
             "half_width": round(self.half_width(), 4),
             "side_gap": round(self.side_gap(), 4),
+            "side_gap_marbles": round(self.side_gap_marbles(), 4),
+            "centre_uncovered": round(self.centre_uncovered(), 4),
             "rail_top": round(self.rail_top(), 4),
             "cradle_clearance": round(clear, 4),
             "reach_across": round(across, 4),
             "sweep_speed": round(self.sweep_speed(), 4),
             "blocked_fraction": round(self.blocked_fraction(), 4),
             "swept_fraction": round(self.swept_fraction(), 4),
+            # `gate` is `Wheel`'s single-marble test, kept so the two modules
+            # report the same thing by the same name. `pack_gate` is the one a
+            # six-racer field is actually decided by.
             "gate": self.side_gap() < 2.0 * layout.MARBLE_RADIUS,
+            "pack_gate": self.pack_gate(),
             "reactive": False,
             "selection": "arrival_phase_only",
         }

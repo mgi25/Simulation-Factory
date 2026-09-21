@@ -656,7 +656,15 @@ def measure_seed(setting, seed: int, duration: float = DEFAULT_DURATION) -> P0Se
             [racer.marble_id, racer.state, list(place) if place else None,
              round(racer.progress, 2), racer.lost_how]
         )
-        if abs(racer.progress - centre) <= REGION_IN + REGION_OUT:
+        # **The run, not the distance.** This counted a non-finisher whose
+        # *progress* fell inside the measurement window, and the window is a
+        # stretch of course rather than a stretch of the arm: with the arm at
+        # station 0.30 the window reaches back far enough to swallow the
+        # course's own `pan1` failures, so station 0.30 reported two racers
+        # "lost at the arm" and had none. `corr1` carries the arm and nothing
+        # else - the thirteen no-arm controls lose nobody on it in 650 races -
+        # so the run the racer was lost on is the attribution.
+        if place is not None and place[0] == lab.PENDULUM_RUN:
             stuck_at_pendulum += 1
 
     hits = sum(

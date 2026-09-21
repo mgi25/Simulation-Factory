@@ -183,6 +183,87 @@ def test_the_swept_arm_leaves_more_than_a_marble_beside_it(name, fraction):
     assert module.describe()["gate"] is False
 
 
+def test_a_marble_diameter_beside_the_arm_is_not_enough_for_a_field():
+    """`Wheel`'s safety test is a single-marble test; a field is not one.
+
+    The constructor refuses a side gap under one marble diameter because that
+    pins a racer against the rail. Between one and two diameters nothing is
+    pinned and a *pack* still cannot pass two abreast, so it queues - which is
+    measurably what happens. `describe()` has to report both, because the
+    single-marble reading calls the default configuration safe while it is
+    stopping racers dead.
+    """
+    run = _run("corr1")
+    narrow = PendulumCross("narrow", run, at=_at(run, 0.62))
+    data = narrow.describe()
+
+    assert narrow.side_gap() > MARBLE
+    assert 1.0 < narrow.side_gap_marbles() < 2.0
+    assert narrow.pack_gate() is True
+    assert data["gate"] is False, "the single-marble test passes"
+    assert data["pack_gate"] is True, "and the pack test does not"
+    assert data["side_gap_marbles"] == pytest.approx(
+        narrow.side_gap() / MARBLE, abs=1e-4
+    )
+
+    # The corridor's entry has not funnelled down from the pan yet, so a low
+    # reach there does leave two racers room to pass abreast.
+    wide = PendulumCross("wide", run, at=_at(run, 0.20), reach=0.40)
+    assert wide.side_gap_marbles() > 2.0
+    assert wide.pack_gate() is False
+    assert wide.describe()["pack_gate"] is False
+
+
+def test_an_arm_that_never_uncovers_the_centreline_is_refused():
+    """The plug condition, and the one a lower reach walks into.
+
+    The swing moves the arm's axis through +/- L sin A and the box carries half
+    its depth either side, so at `L sin A <= depth / 2` the box covers the
+    channel's centre at every angle in the arc and a marble centred there is
+    held for the whole race. Measured over nine configurations and 450 races,
+    `centre_uncovered` orders the pinning perfectly: -0.099 pinned ten racers,
+    -0.013 pinned four, +0.073 pinned one, +0.131 and above pinned none.
+    """
+    run = _run("corr1")
+    with pytest.raises(ValueError, match="uncovers the channel centreline"):
+        PendulumCross("plug", run, at=_at(run, 0.62), amplitude_deg=10.0, reach=0.40)
+
+    # And the shipped default clears it, by about half a marble radius.
+    fine = PendulumCross("fine", run, at=_at(run, 0.62))
+    assert fine.centre_uncovered() > 0.0
+    assert fine.centre_uncovered() == pytest.approx(
+        fine.arm_length * math.sin(fine.amplitude) - 0.5 * fine.depth, abs=1e-9
+    )
+    assert fine.centre_uncovered() > 0.4 * layout.MARBLE_RADIUS
+    assert fine.describe()["centre_uncovered"] == pytest.approx(
+        fine.centre_uncovered(), abs=1e-4
+    )
+
+
+def test_a_lower_reach_is_not_a_safer_one():
+    """Reach trades lateral room against arm length, and length is what matters.
+
+    Lowering the reach widens the side gap and shortens the arm, which walks
+    the geometry *towards* the plug condition. Over 50 seeds each, reach 0.40
+    finished all six racers in 76% of races and reach 0.60 in 94% - the
+    opposite of what the side gap alone predicts.
+
+    0.52 is used as the low end rather than the 0.40 that produced that number,
+    because the guard added with this finding now refuses 0.40 and 0.46 here.
+    Those configurations are in the recorded evidence and are no longer
+    buildable, which is the point of the guard.
+    """
+    run = _run("corr1")
+    index = _at(run, 0.62)
+    wide_gap = PendulumCross("low", run, at=index, reach=0.52)
+    tight_gap = PendulumCross("high", run, at=index, reach=0.60)
+
+    assert wide_gap.side_gap() > tight_gap.side_gap()
+    assert wide_gap.arm_length < tight_gap.arm_length
+    assert wide_gap.pivot_rise < tight_gap.pivot_rise
+    assert wide_gap.centre_uncovered() < tight_gap.centre_uncovered()
+
+
 @pytest.mark.parametrize("name,fraction", STATIONS)
 def test_the_axle_hangs_over_the_channel_and_not_inside_it(name, fraction):
     run = _run(name)
@@ -358,6 +439,9 @@ def test_the_description_carries_the_geometry_a_report_has_to_quote():
         "pivot_rise",
         "half_width",
         "side_gap",
+        "side_gap_marbles",
+        "centre_uncovered",
+        "pack_gate",
         "rail_top",
         "cradle_clearance",
         "reach_across",

@@ -322,6 +322,29 @@ def test_six_racers_finish_and_the_arm_is_measured():
     assert seed.touched() >= 1
 
 
+def test_a_loss_is_attributed_to_the_run_it_happened_on():
+    """The arm is blamed for `corr1` only, not for everything nearby.
+
+    `stuck_at_pendulum` first counted a non-finisher whose *progress* fell
+    inside the measurement window. The window is a stretch of course, so with
+    the arm at station 0.30 it reached back far enough to swallow the lab
+    course's own `pan1` failures and reported two racers "lost at the arm"
+    where the run-level attribution showed none. Seed 353 is one of those
+    `pan1` failures, and it fails on the bare course too.
+    """
+    early = lab.PendulumSetting(at=0.30)
+    seed = measure.measure_seed(early, 353, duration=DURATION)
+
+    assert seed.finished < seed.racers, "seed 353 loses a racer on this course"
+    runs = {place[0] for _m, _s, place, _p, _h in seed.stuck_where if place}
+    assert runs and lab.PENDULUM_RUN not in runs
+    assert seed.stuck_at_pendulum == 0
+
+    control = measure.measure_seed(early.bare(), 353, duration=DURATION)
+    assert control.finished < control.racers, "and so does the control"
+    assert control.stuck_at_pendulum == 0
+
+
 def test_the_arm_reorders_the_corridor_the_bare_control_does_not():
     """The P0 finding, as a regression test on one seed.
 

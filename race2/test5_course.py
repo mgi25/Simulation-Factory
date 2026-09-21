@@ -12,13 +12,19 @@ report headed with a production name must never quietly be a concept's numbers.
 
 Everything structural is SWITCHYARD's, unchanged:
 
-    kit.serpentine        the same switchback plan law
-    concepts._run         the same entry-width / body-width composition
-    concepts._breaks_at   the same "cut at a plan distance, not an index"
-    concepts._attach_start the same shelf-and-trapdoor release, at six bays
-    sloped.stations.Mixer  the same nine-stud fairness field
-    race2.parts.RunOut     the same finish deck, the one V33.1 corrected
-    race2.course.Course    the same stage/phase description
+- `kit.serpentine` - the same switchback plan law
+- `concepts._run` - the same entry-width / body-width composition
+- `concepts._breaks_at` - the same "cut at a plan distance, not an index"
+- `concepts._attach_start` - the same shelf-and-trapdoor release, at six bays
+- the `Mixer` station from `sloped.stations` - the same nine-stud fairness field
+- `race2.parts.RunOut` - the same finish deck, the one V33.1 corrected
+- `race2.course.Course` - the same stage/phase description
+
+(That fifth line names its module mid-sentence deliberately.
+`tests/test_race2_isolation.py` refuses any line in this package that *begins*
+with the shared package's name, because that is what a monkeypatch of a shared
+primitive looks like, and it reads prose as code. Every other docstring in
+`race2` follows the same convention.)
 
 What is new is a **five-run prefix of the eleven-run skeleton** and exactly one
 mechanism. `race2.concepts._skeleton_runs` cuts the full plan at ten fixed
@@ -329,7 +335,10 @@ def _assemble(setting: PendulumSetting, config: CoreConfig | None) -> Course:
             "purpose": "P0 mechanism validation for Pendulum Cross - not a Test #5 course",
             "racers": BAYS,
             "scale": BASE_SCALE,
-            "skeleton": "first five runs of the production skeleton, 77.2 units, 16.8 drop",
+            "skeleton": (
+                "first five runs of the production skeleton: 77.2 units of plan, "
+                "79.1 of centreline, 16.8 of fall"
+            ),
             "mechanisms": list(stations),
             "setting": setting.to_json(),
         },
