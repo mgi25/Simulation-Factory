@@ -60,7 +60,7 @@ SUPPORTED_VERSIONS: frozenset[int] = frozenset({1, 2})
 ECONOMY = "economy"
 STANDARD = "standard"
 STRONGEST = "strongest"
-TIERS: frozenset[str] = frozenset({ECONOMY, STANDARD, STRONGEST})
+TIERS: frozenset[str] = frozenset({STANDARD, STRONGEST})
 
 # Aliases, so the account's current model of each strength is what runs.
 DEFAULT_TIER_MODELS: Mapping[str, str] = {
