@@ -650,7 +650,7 @@ def _usage(
     duration_s = total("duration_s")
 
     usage: dict[str, Any] = {
-        "passes": len(members),
+        "passes": 1,
         "retries": max(0, len(members) - 1),
         "usage_unit": "token" if input_units is not None else "unknown",
         "provider": next(iter(providers)) if len(providers) == 1 else ("mixed" if providers else ""),
