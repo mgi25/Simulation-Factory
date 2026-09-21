@@ -1282,6 +1282,59 @@ def test_an_authorized_job_runs_developer_then_review_then_gate(repository):
     assert control.attestations[0]["verdict"] == "pass"
 
 
+def test_consumer_developer_has_no_model_owned_shell_or_todo_loop(repository):
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    backend = ScriptedBackend(edit=_in_scope_edit)
+
+    _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    assert developer.allowed_tools == ("Read", "Write", "Edit", "Glob", "Grep")
+    assert "Bash" not in developer.allowed_tools
+    assert "TodoWrite" not in developer.allowed_tools
+    assert "Do not run these tests inside this model session." in developer.instructions
+    assert "tests/test_subject.py" in developer.instructions
+    assert "Run them yourself" not in developer.instructions
+
+
+def test_expanded_developer_keeps_the_operator_shell_capability(repository):
+    control = ScriptedControlPlane(
+        repository["base"],
+        states=["planning"],
+        efficiency={
+            "profile": "expanded",
+            "profile_terms": {
+                "name": "expanded",
+                "developer_attempts": 3,
+                "stage_ceiling": 12,
+                "context_ref_ceiling": 20,
+            },
+        },
+    )
+    backend = ScriptedBackend(edit=_in_scope_edit)
+
+    _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    assert "Bash" in developer.allowed_tools
+    assert "TodoWrite" in developer.allowed_tools
+
+
+def test_consumer_tool_reduction_never_adds_a_tool_the_operator_removed(repository):
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    backend = ScriptedBackend(edit=_in_scope_edit)
+
+    _runner(
+        repository,
+        backend,
+        control,
+        developer_tools=("Read", "Edit", "Grep"),
+    ).run_one(WORK_ORDER)
+
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    assert developer.allowed_tools == ("Read", "Edit", "Grep")
+
+
 def test_the_developer_and_reviewer_run_in_different_sessions(repository):
     control = ScriptedControlPlane(repository["base"], states=["planning"])
     backend = ScriptedBackend(edit=_in_scope_edit)
