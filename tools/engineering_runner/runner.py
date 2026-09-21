@@ -148,6 +148,12 @@ MAX_STAGES_PER_RUN = 16
 # last one happened to contain.
 CHECKPOINT_NAME = "checkpoint.json"
 
+# P3B pre-provider diagnostics are deliberately bounded. If a work order names
+# a large test surface, the runner falls back to semantic context instead of
+# doubling an expensive validation phase before the model starts.
+MAX_BASE_DIAGNOSTIC_TESTS = 2
+MAX_BASE_DIAGNOSTIC_TIMEOUT_S = 180.0
+
 # Run outcomes, as the outcome log records them.
 COMPLETED = "completed"
 RUN_BLOCKED = "blocked"
@@ -743,14 +749,21 @@ class EngineeringRunner:
 
         base_runs: tuple[TestRun, ...] = ()
         preferred_symbols: tuple[tuple[str, str], ...] = ()
-        if not resume and envelope.required_tests:
+        diagnostic_eligible = (
+            not resume
+            and 0 < len(envelope.required_tests) <= MAX_BASE_DIAGNOSTIC_TESTS
+        )
+        if diagnostic_eligible:
             base_runs = run_tests(
                 self._commands,
                 python_executable=self.config.python_executable,
                 worktree=worktree,
                 commands=envelope.required_tests,
                 commit=before.head,
-                timeout_s=self.config.test_timeout_s,
+                timeout_s=min(
+                    self.config.test_timeout_s,
+                    MAX_BASE_DIAGNOSTIC_TIMEOUT_S,
+                ),
             )
             preferred_symbols = failure_symbol_hints(
                 tuple(run.failure_detail for run in base_runs if not run.green)
@@ -787,12 +800,18 @@ class EngineeringRunner:
                 "truncated": context_bundle.truncated,
             },
             "base_diagnostic": {
+                "eligible": diagnostic_eligible,
                 "ran": bool(base_runs),
                 "test_runs": len(base_runs),
                 "green": sum(1 for run in base_runs if run.green),
                 "failed": sum(1 for run in base_runs if not run.green),
                 "failure_symbol_hints": len(preferred_symbols),
                 "duration_s": round(sum(run.duration_s for run in base_runs), 6),
+                "max_tests": MAX_BASE_DIAGNOSTIC_TESTS,
+                "timeout_s": min(
+                    self.config.test_timeout_s,
+                    MAX_BASE_DIAGNOSTIC_TIMEOUT_S,
+                ),
             },
         }
         write_json(stage_dir / "resources.json", applied)
