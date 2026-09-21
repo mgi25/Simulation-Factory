@@ -1,0 +1,43 @@
+{
+  "request_id": "req-token-efficiency-v4-p2-benchmark-contract-correction",
+  "objective": "Update the exact engineering-execution regression expectations that legitimately change because company-engineering-execution now names tests/test_company_review_separation.py as a semantic test.",
+  "requested_by": "MGI",
+  "requested_on": "2026-09-21",
+  "subsystem_hint": "company/engineering",
+  "capsule_hints": [
+    "company-engineering-execution"
+  ],
+  "scope_ceiling": [
+    "tests/test_company_engineering_execution.py"
+  ],
+  "acceptance_criteria": [
+    "Only tests/test_company_engineering_execution.py is modified by this correction.",
+    "The five failing exact-contract assertions observed at commit 287d690b7bf87c988edb3eb34d1f57a4dcec5ab1 are updated only where their expected values legitimately gain tests/test_company_review_separation.py.",
+    "No assertion is deleted, weakened, broadened to an unordered or partial check, or changed to stop checking the exact engineering execution contract.",
+    "The expected authorized paths, plan writing paths, packet scope and persisted execution authority continue to be exact tuples and now include tests/test_company_review_separation.py only because it is a declared semantic test.",
+    "The company-engineering-execution capsule exact tests assertion expects tests/test_company_engineering_execution.py and tests/test_company_review_separation.py.",
+    "tests/test_company_engineering_execution.py passes.",
+    "tests/test_company_os_capsules.py passes against the correction base plus this test-only correction.",
+    "No production code, Company OS runtime code, runner code, capsule metadata, dependency manifest or governance surface is modified."
+  ],
+  "constraints": [
+    "Test expectation correction only.",
+    "Do not modify knowledge/company_os/capsules/seeds/company-engineering-execution.json; the worker commit's capsule metadata is already correct.",
+    "Do not modify tests/test_company_os_capsules.py; the worker commit's capsule regression assertion is already correct.",
+    "Do not change implementation behavior to make a test pass.",
+    "Do not replace exact tuple equality with containment, set membership, subset checks or looser assertions.",
+    "Do not add or remove dependencies.",
+    "Do not modify canonical main, production simulation code, Company OS authority policy, or CEO-reserved actions.",
+    "The runner, not the model session, owns deterministic test execution under Token Efficiency V4 P2."
+  ],
+  "authorized_branch": "eng-token-efficiency-v4-p2-benchmark-contract-correction",
+  "base_commit": "287d690b7bf87c988edb3eb34d1f57a4dcec5ab1",
+  "max_developer_attempts": 1,
+  "risk": "low",
+  "reversible": true,
+  "specialist_domain": "",
+  "novel": false,
+  "escalate_reasoning": false,
+  "resource_profile": "consumer",
+  "notes": "Bounded correction after the P2 matched benchmark. The original work order was under-scoped: adding a semantic test to the engineering-execution capsule intentionally changes derived exact test authority, so five exact-contract assertions in tests/test_company_engineering_execution.py need updated expected values. Preserve exactness; do not weaken assertions."
+}
