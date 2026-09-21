@@ -1303,6 +1303,18 @@ def test_consumer_developer_has_no_model_owned_shell_or_todo_loop(repository):
     assert resources["deterministic_validation_owner"] == "runner"
     assert resources["model_runs_required_tests"] is False
 
+    # P3 compiles and persists the exact deterministic context before provider
+    # launch. The resource evidence names the same fingerprint, so the prompt
+    # cannot silently be built from a different context than the artifact.
+    context_path = Path(report.run_dir) / "developer-01" / "execution-context.json"
+    assert context_path.is_file()
+    context = json.loads(context_path.read_text("utf-8"))
+    assert context["compiler_version"] == 1
+    assert len(context["fingerprint"]) == 16
+    assert resources["compiled_context"]["fingerprint"] == context["fingerprint"]
+    assert resources["compiled_context"]["rendered_chars"] == context["rendered_chars"]
+    assert resources["compiled_context"]["compiled_spans"] == len(context["compiled_spans"])
+
 
 def test_expanded_developer_keeps_the_operator_shell_capability(repository):
     control = ScriptedControlPlane(
