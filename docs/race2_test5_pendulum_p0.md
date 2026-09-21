@@ -442,7 +442,8 @@ slot-fairness number in this package is a rank correlation.
 The obvious suspect was the stud row: at six bays, the +/−1.23 bays sit 0.105
 from a stud and the +/−2.05 bays thread between two studs 0.62 and 0.72 away,
 against a marble-plus-pin contact distance of 0.360. **The scan falsifies it.**
-Six stud spans, 50 seeds each, bare:
+Six stud spans, 50 seeds each, bare
+(`docs/validation/race2/test5_p0/mixer_span_scan.json`):
 
 | stud span | bays meeting a stud head-on | all six | mean rank by bay | spread |
 |---|---|---|---|---|
