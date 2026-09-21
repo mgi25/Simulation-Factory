@@ -220,7 +220,7 @@ def test_content_addressed_cache_reparses_only_a_changed_module(tmp_path: Path) 
     assert first.to_dict() != second.to_dict()
 
 
-def test_content_addressed_cache_recovers_from_a_corrupt_module_entry(
+def test_content_addressed_cache_recovers_from_a_corrupt_latest_manifest(
     tmp_path: Path,
 ) -> None:
     repo = _sample_repo(tmp_path)
@@ -233,9 +233,9 @@ def test_content_addressed_cache_recovers_from_a_corrupt_module_entry(
     for snapshot in (cache / "snapshots").glob("*.json"):
         snapshot.unlink()
 
-    module_files = sorted((cache / "modules").glob("*.json"))
-    assert module_files
-    module_files[0].write_text("{not json", encoding="utf-8")
+    latest = cache / "latest.json"
+    assert latest.is_file()
+    latest.write_text("{not json", encoding="utf-8")
 
     recovered, evidence = build_repo_map_cached(
         repo, cache, roots=("company", "tools", "tests")
@@ -244,8 +244,8 @@ def test_content_addressed_cache_recovers_from_a_corrupt_module_entry(
     assert recovered.to_dict() == expected.to_dict()
     assert evidence.snapshot_hit is False
     assert evidence.invalid_entries == 1
-    assert evidence.module_misses == 1
-    assert evidence.module_hits == evidence.module_count - 1
+    assert evidence.module_misses == evidence.module_count
+    assert evidence.module_hits == 0
 
 
 def test_content_addressed_cache_never_reuses_a_snapshot_after_source_change(
