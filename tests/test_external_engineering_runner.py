@@ -1349,6 +1349,9 @@ def test_consumer_developer_has_no_model_owned_shell_or_todo_loop(repository):
     assert resources["available_tools"] == ["Read", "Write", "Edit", "Glob", "Grep"]
     assert resources["deterministic_validation_owner"] == "runner"
     assert resources["model_runs_required_tests"] is False
+    assert resources["repository_map_cache"]["available"] is True
+    assert resources["repository_map_cache"]["snapshot_hit"] is False
+    assert resources["repository_map_cache"]["module_misses"] >= 1
 
     # P3 compiles and persists the exact deterministic context before provider
     # launch. The resource evidence names the same fingerprint, so the prompt
@@ -1413,6 +1416,31 @@ def test_consumer_tool_reduction_never_adds_a_tool_the_operator_removed(reposito
 
     developer = [item for item in backend.launched if item.role == "developer"][0]
     assert developer.allowed_tools == ("Read", "Edit", "Grep")
+
+
+def test_reviewer_reuses_the_runner_owned_repository_map_cache(repository):
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    developer_resources = json.loads(
+        (Path(report.run_dir) / "developer-01" / "resources.json").read_text("utf-8")
+    )
+    reviewer_resources = json.loads(
+        (Path(report.run_dir) / "reviewer-01" / "resources.json").read_text("utf-8")
+    )
+
+    developer_cache = developer_resources["repository_map_cache"]
+    reviewer_cache = reviewer_resources["repository_map_cache"]
+
+    assert developer_cache["available"] is True
+    assert reviewer_cache["available"] is True
+    assert developer_cache["snapshot_hit"] is False
+    # The fixture edits subject/module.py, which is outside the repo-map roots.
+    # The reviewer therefore sees the exact same company/tools/tests tree.
+    assert reviewer_cache["snapshot_hit"] is True
+    assert reviewer_cache["tree_fingerprint"] == developer_cache["tree_fingerprint"]
+    assert reviewer_cache["module_misses"] == 0
 
 
 def test_the_developer_and_reviewer_run_in_different_sessions(repository):
