@@ -73,7 +73,7 @@ from .authorization import (
     verify_reviewer_left_no_trace,
 )
 from .backends import CodingBackend, SessionOutcome, SessionRequest, build_backend, executor_hint
-from .resources import ResourceStrategy
+from .resources import ECONOMY, STANDARD, ResourceStrategy
 from .briefs import (
     DEVELOPER_REPORT_NAME,
     REVIEW_DIFF_NAME,
@@ -687,6 +687,103 @@ class EngineeringRunner:
             )
         return strategy, applied
 
+    def _adaptive_developer_model(
+        self,
+        strategy: ResourceStrategy,
+        applied: Mapping[str, Any],
+        *,
+        envelope: AuthorityEnvelope,
+        repo_map: RepoMap | None,
+        context_bundle: Any,
+        base_runs: Sequence[TestRun],
+        preferred_symbols: Sequence[tuple[str, str]],
+        diagnostic_eligible: bool,
+    ) -> dict[str, Any]:
+        """Downshift a routine developer only after deterministic localization.
+
+        Company OS may nominate a standard-tier task as an economy candidate,
+        but the runner owns the evidence that exists only at execution time:
+        the immutable-base pytest result and the exact AST spans compiled from
+        it. Any missing or ambiguous evidence leaves the existing standard
+        model untouched. Strongest-tier work is never considered here.
+        """
+        result = dict(applied)
+        routing = strategy.raw.get("adaptive_routing")
+        routing = routing if isinstance(routing, Mapping) else {}
+
+        evidence: dict[str, Any] = {
+            "candidate": bool(routing.get("eligible", False)),
+            "requested_downshift_tier": str(routing.get("downshift_tier", "")),
+            "applied": False,
+            "source_tier": strategy.model_tier,
+            "target_tier": ECONOMY,
+            "veto_reasons": [],
+            "base_failed_tests": sum(run.failed for run in base_runs),
+            "failure_symbol_hints": len(preferred_symbols),
+            "failure_guided_complete_spans": 0,
+        }
+        veto: list[str] = []
+
+        if not self.config.apply_resource_strategy:
+            veto.append("resource strategy application is disabled")
+        if self.config.developer_model:
+            veto.append("operator pinned a developer model")
+        if strategy.model_tier != STANDARD:
+            veto.append("Company OS did not recommend the standard tier")
+        if not evidence["candidate"]:
+            veto.append("Company OS did not mark this task economy-eligible")
+        if routing.get("downshift_tier") != ECONOMY:
+            veto.append("briefing does not request the economy downshift")
+        if not diagnostic_eligible or not base_runs:
+            veto.append("base diagnostic did not run")
+
+        failed_total = sum(run.failed for run in base_runs)
+        if failed_total <= 0:
+            veto.append("base diagnostic found no counted failing tests")
+        if not preferred_symbols:
+            veto.append("base diagnostic produced no failure-symbol hints")
+        elif failed_total != len(preferred_symbols):
+            veto.append(
+                "counted failures and unique failure-symbol hints do not match"
+            )
+
+        span_by_key = {
+            (span.path, span.qualified_name): span
+            for span in context_bundle.compiled_spans
+            if span.reason == "failing required test at the immutable task base"
+        }
+        complete = 0
+        for path, qualified_name in preferred_symbols:
+            span = span_by_key.get((path, qualified_name))
+            module = repo_map.by_path(path) if repo_map is not None else None
+            symbol = module.symbol(qualified_name) if module is not None else None
+            if span is None or symbol is None:
+                continue
+            if span.start_line == symbol.start_line and span.end_line == symbol.end_line:
+                complete += 1
+        evidence["failure_guided_complete_spans"] = complete
+
+        if preferred_symbols and complete != len(preferred_symbols):
+            veto.append("not every failure hint has a complete failure-guided AST span")
+
+        if len(envelope.authorized_paths) != 1:
+            veto.append("runtime authority is not a one-path write scope")
+        if not (1 <= len(envelope.required_tests) <= MAX_BASE_DIAGNOSTIC_TESTS):
+            veto.append("runtime required-test surface is outside the bounded diagnostic")
+
+        if not veto:
+            model = self.config.tier_models().get(ECONOMY, "")
+            if not model:
+                veto.append("runner has no economy model mapping")
+            else:
+                result["applied_model"] = model
+                result["model_source"] = "adaptive:economy"
+                evidence["applied"] = True
+
+        evidence["veto_reasons"] = veto
+        result["adaptive_model_routing"] = evidence
+        return result
+
     def _backend_accepts_cost_ceiling(self) -> bool:
         """Only the Claude Code adapter passes a spend ceiling to the provider."""
         return self.config.backend == "claude_code"
@@ -786,6 +883,16 @@ class EngineeringRunner:
             envelope=envelope,
             worktree=worktree,
             preferred_symbols=preferred_symbols,
+        )
+        applied = self._adaptive_developer_model(
+            strategy,
+            applied,
+            envelope=envelope,
+            repo_map=repo_map,
+            context_bundle=context_bundle,
+            base_runs=base_runs,
+            preferred_symbols=preferred_symbols,
+            diagnostic_eligible=diagnostic_eligible,
         )
         context_path = write_json(
             stage_dir / "execution-context.json", context_bundle.to_dict()
