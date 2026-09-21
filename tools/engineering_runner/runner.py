@@ -77,6 +77,7 @@ from .resources import ResourceStrategy
 from .briefs import (
     DEVELOPER_REPORT_NAME,
     REVIEW_DIFF_NAME,
+    developer_execution_context,
     developer_instructions,
     repair_instructions,
     review_instructions,
@@ -723,7 +724,6 @@ class EngineeringRunner:
             "deterministic_validation_owner": "runner",
             "model_runs_required_tests": False,
         }
-        write_json(stage_dir / "resources.json", applied)
 
         worktree = self._workspace.ensure_worktree(
             envelope.authorized_branch, envelope.base_commit
@@ -740,6 +740,25 @@ class EngineeringRunner:
             },
         )
 
+        repo_map = self._repo_map(worktree)
+        context_bundle = developer_execution_context(
+            repo_map, envelope=envelope, worktree=worktree
+        )
+        context_path = write_json(
+            stage_dir / "execution-context.json", context_bundle.to_dict()
+        )
+        applied = {
+            **applied,
+            "compiled_context": {
+                "artifact": str(context_path),
+                "fingerprint": context_bundle.fingerprint(),
+                "compiled_spans": len(context_bundle.compiled_spans),
+                "rendered_chars": len(context_bundle.render()),
+                "truncated": context_bundle.truncated,
+            },
+        }
+        write_json(stage_dir / "resources.json", applied)
+
         report_path = stage_dir / DEVELOPER_REPORT_NAME
         instructions = developer_instructions(
             envelope,
@@ -748,7 +767,8 @@ class EngineeringRunner:
             attempt=envelope.packet_attempt,
             prior_findings=self._prior_findings(work_order_id),
             strategy=strategy,
-            repo_map=self._repo_map(worktree),
+            repo_map=repo_map,
+            context_bundle=context_bundle,
         )
         write_text(stage_dir / "instructions.md", instructions)
 
