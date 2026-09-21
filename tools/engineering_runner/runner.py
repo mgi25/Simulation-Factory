@@ -1445,24 +1445,46 @@ class EngineeringRunner:
         deterministic build rather than changing authority or blocking work.
         """
         cache_root = self.config.runner_dir / "cache" / "repo-map"
+        content_identities: Mapping[str, str] | None = None
+        identity_source = "filesystem"
+
+        # A clean task worktree is exactly represented by its Git index/HEAD.
+        # Git blob ids are content-addressed, so unchanged files need not be
+        # reopened merely to recompute the same hashes. Dirty/resumed trees
+        # deliberately fall back to exact filesystem hashing.
+        try:
+            status = self._workspace.status(worktree)
+            if status.clean:
+                tracked = self._workspace.tracked_blob_ids(worktree)
+                if tracked:
+                    content_identities = tracked
+                    identity_source = "git_blob"
+        except RunnerError:
+            content_identities = None
+            identity_source = "filesystem"
+
         try:
             repo_map, evidence = build_repo_map_cached(
                 worktree,
                 cache_root,
+                content_identities=content_identities,
             )
             return repo_map, {
                 "available": True,
+                "identity_source": identity_source,
                 **evidence.to_dict(),
             }
         except OSError:
             try:
                 return build_repo_map(worktree), {
                     "available": False,
+                    "identity_source": "filesystem",
                     "fallback": "fresh deterministic build after cache I/O failure",
                 }
             except OSError:
                 return None, {
                     "available": False,
+                    "identity_source": "filesystem",
                     "fallback": "repository map unavailable",
                 }
 
