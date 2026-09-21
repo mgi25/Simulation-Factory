@@ -282,6 +282,83 @@ def test_preferred_failure_symbol_beats_generic_semantic_overlap(tmp_path: Path)
     assert spans[0].reason == "failing required test at the immutable task base"
 
 
+def test_preferred_failure_symbol_preserves_complete_body_when_it_fits(
+    tmp_path: Path,
+) -> None:
+    padding = "\n".join(
+        f"    # deterministic context padding {index:02d} keeps this function long"
+        for index in range(12)
+    )
+    _write(
+        tmp_path,
+        "tests/test_long_contract.py",
+        (
+            "def test_contract_has_two_stale_assertions():\n"
+            "    authorized_paths = ('old.py',)\n"
+            "    assert authorized_paths == ('old.py',)\n"
+            f"{padding}\n"
+            "    required_tests = ('old_test.py',)\n"
+            "    assert required_tests == ('old_test.py',)\n"
+        ),
+    )
+    repo_map = build_repo_map(tmp_path, roots=("tests",))
+    spans = rank_task_spans(
+        repo_map,
+        objective="x",
+        acceptance_criteria=[],
+        paths=["tests/test_long_contract.py"],
+        repo_root=tmp_path,
+        preferred_symbols=[
+            ("tests/test_long_contract.py", "test_contract_has_two_stale_assertions")
+        ],
+    )
+    assert len(spans) == 1
+    assert len(spans[0].text) > 600
+    assert "assert authorized_paths" in spans[0].text
+    assert "assert required_tests" in spans[0].text
+    assert spans[0].end_line == repo_map.by_path(
+        "tests/test_long_contract.py"
+    ).symbol("test_contract_has_two_stale_assertions").end_line
+
+
+def test_preferred_failure_symbols_share_a_tight_global_budget(tmp_path: Path) -> None:
+    long_body = "\n".join(
+        f"    # long deterministic line {index:02d} " + ("x" * 30)
+        for index in range(18)
+    )
+    _write(
+        tmp_path,
+        "tests/test_long_contract.py",
+        (
+            "def test_first_failure():\n"
+            f"{long_body}\n"
+            "    assert False\n\n"
+            "def test_second_failure():\n"
+            f"{long_body}\n"
+            "    assert False\n"
+        ),
+    )
+    repo_map = build_repo_map(tmp_path, roots=("tests",))
+    spans = rank_task_spans(
+        repo_map,
+        objective="x",
+        acceptance_criteria=[],
+        paths=["tests/test_long_contract.py"],
+        repo_root=tmp_path,
+        preferred_symbols=[
+            ("tests/test_long_contract.py", "test_first_failure"),
+            ("tests/test_long_contract.py", "test_second_failure"),
+        ],
+        max_total_chars=400,
+    )
+    assert [span.qualified_name for span in spans] == [
+        "test_first_failure",
+        "test_second_failure",
+    ]
+    assert sum(len(span.text) for span in spans) <= 400
+    assert all(span.text for span in spans)
+
+
 def test_preferred_failure_symbol_outside_eligible_paths_is_ignored(tmp_path: Path) -> None:
     repo = _pattern_repo(tmp_path)
     repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
