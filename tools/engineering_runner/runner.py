@@ -394,6 +394,28 @@ class EngineeringRunner:
                 state = record.state_after or self._state(work_order_id)
         except AuthorityViolation as exc:
             outcome, reason = RUN_BLOCKED, str(exc)
+        except BackendFailure as exc:
+            # A provider/backend session was already launched and consumed
+            # resources. Persist the stop in Company OS before returning so a
+            # restarted watch loop cannot see the in-flight state and silently
+            # spend another session.
+            stop_reason = f"{type(exc).__name__}: {exc}"
+            try:
+                stopped = self._control.execution_stop(
+                    work_order_id,
+                    reason=stop_reason,
+                )
+                if stopped.refused:
+                    stopped.require()
+                state = str(stopped.payload.get("state", "")) or state
+                outcome = RUN_BLOCKED if state == DECISION_REQUIRED else RUN_FAILED
+                reason = stop_reason
+            except RunnerError as stop_exc:
+                outcome = RUN_FAILED
+                reason = (
+                    f"{stop_reason}; failed to persist the execution stop: "
+                    f"{type(stop_exc).__name__}: {stop_exc}"
+                )
         except (RunnerError, OSError) as exc:
             outcome, reason = RUN_FAILED, f"{type(exc).__name__}: {exc}"
         finally:
