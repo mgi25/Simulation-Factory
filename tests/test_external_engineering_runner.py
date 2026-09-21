@@ -1356,7 +1356,7 @@ def test_consumer_developer_has_no_model_owned_shell_or_todo_loop(repository):
     context_path = Path(report.run_dir) / "developer-01" / "execution-context.json"
     assert context_path.is_file()
     context = json.loads(context_path.read_text("utf-8"))
-    assert context["compiler_version"] == 1
+    assert context["compiler_version"] == 2
     assert len(context["fingerprint"]) == 16
     assert resources["compiled_context"]["fingerprint"] == context["fingerprint"]
     assert resources["compiled_context"]["rendered_chars"] == context["rendered_chars"]
@@ -1369,6 +1369,7 @@ def test_consumer_developer_has_no_model_owned_shell_or_todo_loop(repository):
     assert len(base_evidence["runs"]) == 1
     assert base_evidence["runs"][0]["command"] == "tests/test_subject.py"
     assert base_evidence["failure_symbol_hints"] == []
+    assert resources["base_diagnostic"]["eligible"] is True
     assert resources["base_diagnostic"]["ran"] is True
     assert resources["base_diagnostic"]["test_runs"] == 1
     assert resources["base_diagnostic"]["green"] == 1
