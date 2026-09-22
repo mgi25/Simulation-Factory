@@ -929,10 +929,18 @@ def test_the_soundtrack_is_exactly_as_long_as_the_video(document, plan, rendered
     assert len(rendered.right) == plan.total_samples
 
 
-def test_the_frame_count_matches_the_phase4_render_for_seed_3530(plan):
-    """1,038 frames, which is what Phase 4 actually wrote to disk."""
-    assert plan.frames == 1038
-    assert plan.total_seconds == pytest.approx(34.6)
+def test_the_frame_count_matches_the_phase6_render_for_seed_3530(plan):
+    """1,040 frames, which is what Phase 6 actually wrote to disk.
+
+    It was 1,038 through Phases 4 and 5. Phase 6 moved the arena off centre
+    and narrowed it to clear the player's action rail, which made the delivery
+    frame wider in world units - 11.63 to 13.07 half-widths - so the ball has
+    further to travel before it has left and the escape is 0.067 s longer.
+    Both the 1,040 PNGs on disk and `ffprobe` on the delivered MP4 agree with
+    the number below; it is not a relaxed assertion but a re-measured one.
+    """
+    assert plan.frames == 1040
+    assert plan.total_seconds == pytest.approx(34.6667, abs=1e-4)
 
 
 def test_no_cue_is_scheduled_past_the_end(plan):

@@ -77,6 +77,7 @@ from satisfying.tile_escape import TileEscapeRun
 __all__ = [
     "COMPLETION_FORMAT",
     "ARENA_WIDTH_FRACTION",
+    "ARENA_CENTRE_OFFSET_FRACTION",
     "DELIVERY_ASPECT",
     "CompletionError",
     "ClimaxTiming",
@@ -104,7 +105,13 @@ COMPLETION_FORMAT = 1
 # escape needs to know where the frame edge is in simulation units, because
 # "the ball has left" is a statement about the frame and not about the arena.
 # A test asserts the two constants agree.
-ARENA_WIDTH_FRACTION = 0.86
+ARENA_WIDTH_FRACTION = 0.765
+# And the offset, for the same reason: Phase 6 moved the arena left of centre
+# to clear the player's action rail, so the frame's world bounds moved with it.
+# "The ball has left the frame" is asymmetric now - the left edge is nearer in
+# world units than the right one - and an escape computed against a centred
+# frame would cut the ball off on one side and leave it hanging on the other.
+ARENA_CENTRE_OFFSET_FRACTION = -0.060
 # 9:16, the locked delivery frame. 1080x1920 and the 270x480 phone check have
 # the same aspect, so one number covers both and the ending is the same length
 # at either size.
@@ -236,6 +243,16 @@ TIMINGS: dict[str, ClimaxTiming] = {
     # second overcorrected into an escape *faster* than `standard`'s, which
     # made "stretched" 4 ms shorter than the preset it was meant to be longer
     # than.
+    #
+    # Phase 6 shortened the tail hold from 0.40 to 0.33. Not a creative change:
+    # moving the arena off centre and narrowing it made the delivery frame
+    # *wider in world units*, from 11.63 to 13.07 half-widths, so the ball has
+    # further to travel before it has left - and every preset's escape got
+    # 0.067 s longer for free. `standard` absorbed that (2.412 -> 2.479 s) but
+    # `stretched` was deliberately parked 0.029 s under the 2.6 s ceiling and
+    # tipped over it to 2.639. The tail hold is the right dial to take it out
+    # of, because the axis this preset exists to vary is the *front* beats and
+    # the hold is not one of them.
     "stretched": ClimaxTiming(
         name="stretched",
         impact_hold_seconds=0.20,
@@ -244,7 +261,7 @@ TIMINGS: dict[str, ClimaxTiming] = {
         gate_open_seconds=0.38,
         release_at_seconds=1.18,
         escape_rate=0.45,
-        end_hold_seconds=0.40,
+        end_hold_seconds=0.33,
     ),
     "narrow_gate": ClimaxTiming(name="narrow_gate", gate_neighbour_sides=0),
 }
@@ -364,12 +381,15 @@ def escape_route(run: TileEscapeRun,
 
     half_width = arena.circumradius / ARENA_WIDTH_FRACTION
     half_height = half_width * DELIVERY_ASPECT
-    margin_x = half_width + timing.exit_margin_wu
+    # The frame's centre in world units. The camera sits `-offset * camera_size`
+    # from the origin and `camera_size` is `2 * half_width`, so a leftward
+    # offset puts the frame centre to the *right* of the arena's centre.
+    centre_x = -ARENA_CENTRE_OFFSET_FRACTION * 2.0 * half_width
     margin_y = half_height + timing.exit_margin_wu
     exit_dt = math.inf
     for bound, axis_p, axis_v, curved in (
-        (margin_x, px, vx, False),
-        (-margin_x, px, vx, False),
+        (centre_x + half_width + timing.exit_margin_wu, px, vx, False),
+        (centre_x - half_width - timing.exit_margin_wu, px, vx, False),
         (margin_y, py, vy, True),
         (-margin_y, py, vy, True),
     ):

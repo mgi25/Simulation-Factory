@@ -73,9 +73,26 @@ const HOOK_DEFAULT := "HIT EVERY TILE TO ESCAPE"
 # about a quarter of the height clear above and below - which is where the hook
 # and the counter go. 0.86 rather than the Phase 1 renderer's 0.88 because the
 # chamfered slab is thicker than a drawn line and needs the extra margin.
-const ARENA_WIDTH_FRACTION := 0.86
+# Phase 6 narrowed this from 0.86 and moved the arena off centre. The reason is
+# not the frame, it is the player: YouTube draws an action rail down the right
+# side of a Short, and `satisfying/tile_safe_area.py` measured that a 0.86-wide
+# centred arena puts nine of its fifty-one tiles underneath it - including, on
+# seed 3530, the forty-ninth tile to activate, so one of the three remaining
+# dark tiles at 48/51 was behind an icon.
+#
+# 0.765 with the offset below is the widest composition that clears every tile
+# on all five pacing-valid seeds. It costs 11% of scale rather than the 21% a
+# centred shrink would have cost to clear the same rail.
+const ARENA_WIDTH_FRACTION := 0.765
+# Negative is left. The camera moves the other way, which is what shifts the
+# world on screen - see `_build_camera`.
+const ARENA_CENTRE_OFFSET_FRACTION := -0.060
 const HOOK_TOP_FRACTION := 0.075
-const COUNTER_TOP_FRACTION := 0.815
+# Phase 6 raised this from 0.815. Measured on a real frame, the counter's
+# glyphs sat at 0.836-0.878 of the height and YouTube's title and @handle block
+# begins at 0.84, so more than half of "X / 51" was underneath it. The counter
+# carries the premise; it clears every model now.
+const COUNTER_TOP_FRACTION := 0.745
 const DEBUG_TOP_FRACTION := 0.905
 const SAFE_MARGIN_FRACTION := 0.05
 
@@ -186,6 +203,20 @@ const RIPPLE_PUSH := 0.20
 const GATE_FLARE_LEAD_SECONDS := 0.16
 const GATE_FLARE_ENERGY := 6.5
 const GATE_RETRACT_WU := 3.1
+# The smallest scale a retracting gate tile is drawn at before it is hidden
+# outright. Phase 6 found fourteen stray lit pixels sitting on the gate's arc
+# from the settled beat to the last frame of the video: the retraction scaled
+# each tile to this floor and dropped its emission to zero, but nothing ever
+# hid the node, so fourteen sub-pixel slabs of albedo stayed on screen, lit by
+# the scene's own lights. At the delivery scale each was 0.86 px and measured
+# 84 of 255 against a background of 8.
+#
+# Emission reaching zero is not the same as the object being gone. The floor
+# stays - a zero scale is a degenerate transform - and visibility is now tied
+# to it, so the tile disappears at exactly the instant it would otherwise stop
+# shrinking. At that instant it is already under a pixel wide with 2% of its
+# energy, so the animation does not change; only the leftovers do.
+const GATE_RETRACT_MIN_SCALE := 0.02
 
 # Beat 5. The hook steps back so the escape owns the frame.
 const HOOK_CLIMAX_ALPHA := 0.34
@@ -527,9 +558,21 @@ func _build_camera(circumradius: float) -> void:
 	_camera.size = (2.0 * circumradius) / ARENA_WIDTH_FRACTION
 	_camera.near = 0.05
 	_camera.far = 200.0
+	# Moving the arena left on screen means moving the camera right in the
+	# world, and the amount is exact rather than fitted. A point at world x
+	# lands at `width/2 + (x - camera_x) * scale`, and we want it at
+	# `width/2 + offset*width + x*scale`, so
+	#
+	#     camera_x = -offset * width / scale = -offset * camera.size
+	#
+	# because `scale` is `width / camera.size`. Stated in camera units, so it
+	# holds at any render resolution - the same reason the offset is a fraction
+	# of the frame rather than a pixel count.
+	var centre_x := -ARENA_CENTRE_OFFSET_FRACTION * _camera.size
 	# `look_at` needs the node in the tree; `look_at_from_position` does not, and
 	# the camera is built before it is parented.
-	_camera.look_at_from_position(Vector3(0.0, 0.0, 60.0), Vector3.ZERO, Vector3.UP)
+	_camera.look_at_from_position(Vector3(centre_x, 0.0, 60.0),
+		Vector3(centre_x, 0.0, 0.0), Vector3.UP)
 	add_child(_camera)
 	_pixels_per_unit = float(_width) / _camera.size
 
@@ -991,10 +1034,17 @@ func _apply_climax(render_t: float) -> void:
 				var e := 1.0 - (1.0 - gate_phase) * (1.0 - gate_phase)
 				push += GATE_RETRACT_WU * e
 				energy *= (1.0 - e)
-				var shrink := maxf(0.02, 1.0 - e)
+				var raw_shrink := 1.0 - e
+				var shrink := maxf(GATE_RETRACT_MIN_SCALE, raw_shrink)
 				_tiles[i].scale = Vector3(shrink, shrink, shrink)
+				_tiles[i].visible = raw_shrink > GATE_RETRACT_MIN_SCALE
 			else:
 				_tiles[i].scale = Vector3.ONE
+				# Restored explicitly. This function runs fresh on every frame
+				# and remembers nothing, so a tile hidden at the end of one
+				# render has to be shown again at the start of the next - which
+				# is also what makes a single still of any instant correct.
+				_tiles[i].visible = true
 		material.emission = emission
 		material.emission_energy_multiplier = energy
 		if push != 0.0:

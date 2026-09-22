@@ -68,8 +68,11 @@ from satisfying import tile_playback
 
 __all__ = [
     "ARENA_WIDTH_FRACTION",
+    "ARENA_CENTRE_OFFSET_FRACTION",
     "BALL_DRAW_SCALE",
     "TRAIL_SECONDS",
+    "TILE_GAP_FRACTION",
+    "TILE_RADIAL_THICKNESS",
     "SAFE_MARGIN_FRACTION",
     "HOOK_TOP_FRACTION",
     "COUNTER_TOP_FRACTION",
@@ -86,14 +89,40 @@ __all__ = [
 # than imported because GDScript constants cannot be imported into Python, and
 # `test_tile_escape_phase3.py` parses the GDScript and asserts the two copies
 # agree - which is a stronger guarantee than a shared file nobody checks.
-ARENA_WIDTH_FRACTION = 0.86
+# Phase 6. Was 0.86 through Phases 3-5, which was chosen against the frame and
+# not against the player. Measured in `tile_safe_area`, a 0.86-wide centred
+# arena puts nine of its fifty-one tiles under YouTube's action rail, and on
+# seed 3530 one of those - tile 11 - is the forty-ninth tile to activate, so
+# during the 48/51 window one of the three remaining dark tiles is behind an
+# icon. 0.765 with the offset below is the widest composition that clears every
+# tile on all five pacing-valid seeds. It costs 11% of scale: the ball goes
+# from 60.6 to 53.9 drawn pixels and a tile from 48.4 to 43.0, and every
+# Phase 3 motion verdict is unchanged because the trail and the frame step
+# scale together - `trail_covers_frame_step` holds at 2.70x either way.
+ARENA_WIDTH_FRACTION = 0.765
+# How far left of centre the arena sits, as a fraction of the frame width.
+# The rail is on the right and only on the right, so the cheapest way to clear
+# it is to stop pretending the frame is symmetric. A pure shrink would have had
+# to reach 0.68 to clear the same rail centred, which costs 21% of scale
+# instead of 11%; the offset buys back half the loss. Negative is left.
+ARENA_CENTRE_OFFSET_FRACTION = -0.060
 BALL_DRAW_SCALE = 1.45
 TRAIL_SECONDS = 0.09
 TRAIL_SAMPLES = 34
 SAFE_MARGIN_FRACTION = 0.05
 HOOK_TOP_FRACTION = 0.075
-COUNTER_TOP_FRACTION = 0.815
+# Phase 6. Was 0.815, which put the counter's glyphs at 0.836-0.878 of the
+# frame - measured on a real frame, not predicted - and YouTube's title and
+# @handle block starts at 0.84. Over half of "X / 51" was underneath it on the
+# measured model and all of it on the strict one. The counter is the only
+# element carrying the premise, so it moves up until it clears every model.
+COUNTER_TOP_FRACTION = 0.745
 TILE_GAP_FRACTION = 0.075
+# The tile slab's depth in world units, outward from the collision segment.
+# Mirrored here in Phase 6 so `tile_safe_area` can build a tile's drawn face
+# rather than its collision line - what the player's UI can cover is what is
+# drawn, and a tile is a quadrilateral on screen, not a segment.
+TILE_RADIAL_THICKNESS = 0.62
 
 # How big the largest luminance jump between two tiles has to be before the
 # frame is treated as holding two populations rather than one. Thirty levels
@@ -120,9 +149,16 @@ def pixels_per_unit(document: dict[str, Any], width: int) -> float:
 def project(
     document: dict[str, Any], point: Sequence[float], width: int, height: int
 ) -> tuple[float, float]:
-    """A simulation point in pixels. Exact: the camera is orthographic."""
+    """A simulation point in pixels. Exact: the camera is orthographic.
+
+    Still a pure scale plus a translation, which is what keeps every distance
+    measurement in this module valid after Phase 6 moved the arena off centre:
+    the offset cancels in any difference of two projected points.
+    """
     scale = pixels_per_unit(document, width)
-    return (width * 0.5 + point[0] * scale, height * 0.5 - point[1] * scale)
+    return (width * 0.5 + ARENA_CENTRE_OFFSET_FRACTION * width
+            + point[0] * scale,
+            height * 0.5 - point[1] * scale)
 
 
 def frame_geometry(
@@ -167,6 +203,11 @@ def frame_geometry(
         ),
         "ball_diameter_px": 2.0 * ball_radius * scale,
         "ball_drawn_diameter_px": 2.0 * ball_radius * BALL_DRAW_SCALE * scale,
+        "arena_centre_px": width * 0.5 + ARENA_CENTRE_OFFSET_FRACTION * width,
+        "arena_left_px": (width * 0.5 + ARENA_CENTRE_OFFSET_FRACTION * width
+                          - 0.5 * arena_width_px),
+        "arena_right_px": (width * 0.5 + ARENA_CENTRE_OFFSET_FRACTION * width
+                           + 0.5 * arena_width_px),
         "arena_top_px": top_px,
         "arena_bottom_px": bottom_px,
         "hook_top_px": hook_top,

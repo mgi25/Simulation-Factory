@@ -269,6 +269,67 @@ class AudioConfig:
     duck_per_event: float = 0.115
     duck_floor: float = 0.55
 
+    # --- the activation duck ----------------------------------------------
+    # A look-ahead duck on the duplicate bed around a new tile, and on nothing
+    # else. Phase 5's recommendation, built here.
+    #
+    # The two dampers above are blind to *what* is arriving: `restrike` asks
+    # how recently this tile rang and `duck` asks how crowded the window is.
+    # Neither knows that the next contact is progress. This one does, and it
+    # is the only damper in the module that reads a neighbouring event's kind.
+    #
+    # It is a look-ahead: a duplicate is ducked for `lead` seconds *before* an
+    # activation as well as `tail` seconds after it. That is only possible
+    # because the score is built offline from a finished run, and it is what
+    # the measurement asks for - the contrast an activation has to win is
+    # against the bed immediately preceding it. A broadcast ducker does the
+    # same thing with the same look-ahead.
+    #
+    # Shaped, not switched: the reduction is full at the activation's own
+    # instant and tapers linearly to nothing at both edges, so consecutive
+    # duplicates step by a fraction of a decibel rather than jumping. And
+    # because the whole thing resolves to one scalar per cue, applied before
+    # the cue is placed, **there is no moving gain anywhere inside a sounding
+    # voice** - pumping is not merely avoided, it is structurally unavailable.
+    # This is also why it is not a compressor: it is driven by the event list,
+    # not by the signal, so it cannot act on the activation it is protecting
+    # and cannot change any gain relationship the hierarchy is stated in.
+    #
+    # **It ships off, and that is a measurement rather than a preference.**
+    # Phase 5 reported that on the densest pacing-valid seed nine activations
+    # in fifty did not clear 3 dB above what was sounding under them, and named
+    # this duck as the fix. Phase 6 measured what was in that bed before
+    # building it, and the answer is: not duplicates. Across 250 activations on
+    # five seeds **no activation has a duplicate inside the 55 ms window the
+    # measurement reads**, the duplicate share of the bed's energy under every
+    # masked activation is 0.000, and deleting every duplicate from the mix
+    # raises the worst reading by 0.10 dB. Swept from 0 to 0.55 the duck moves
+    # the nine-of-fifty count not at all and the fifth-percentile emergence by
+    # 0.03 dB. What is actually under an activation is the tail of the
+    # activations before it - a 620 ms cue at four to six contacts a second -
+    # and ducking that is forbidden by the brief and wrong anyway, because a
+    # previous activation is also progress.
+    #
+    # `tile_audio.band_masking_report` is the rest of that story: measured in
+    # each activation's own third-octave band, which is how masking in the ear
+    # actually works, every one of those nine emerges by +3.3 to +73.6 dB and
+    # the production seed's worst activation clears by +8.4 dB on the master
+    # and +8.1 dB through a phone. There was no defect to duck.
+    #
+    # So the smallest reduction that makes progress hits consistently
+    # perceptible is zero, and that is what is configured. The mechanism stays
+    # because it is correct and because a seed whose duplicate bed does crowd
+    # an activation would want it; turning it on is one field.
+    activation_duck: bool = False
+    activation_duck_lead_seconds: float = 0.080
+    activation_duck_tail_seconds: float = 0.140
+    # The deepest the bed would be taken, as a fraction, if it were enabled.
+    # 0.32 is -3.3 dB at the centre of the duck. A duplicate cannot disappear
+    # at any legal depth: the value is bounded below 1.0 at construction, and
+    # at 0.32 the quietest a duplicate can become is 0.68 of the level the two
+    # dampers above already left it.
+    activation_duck_depth: float = 0.32
+
     # --- the confirmation hold --------------------------------------------
     # "resonant": the final hit rings through the whole 0.92 s pause.
     # "breath":   the final hit decays out, leaving near-silence before the
@@ -348,6 +409,14 @@ class AudioConfig:
             raise ScoreError("restrike_floor must be in (0, 1]")
         if not 0.0 < self.duck_floor <= 1.0:
             raise ScoreError("duck_floor must be in (0, 1]")
+        if not 0.0 <= self.activation_duck_depth < 1.0:
+            raise ScoreError(
+                "activation_duck_depth must be in [0, 1) - a duplicate that "
+                "is ducked to silence has been removed, not ducked"
+            )
+        if (self.activation_duck_lead_seconds < 0.0
+                or self.activation_duck_tail_seconds < 0.0):
+            raise ScoreError("the activation duck's window cannot be negative")
 
     @property
     def pitches(self) -> int:
@@ -411,7 +480,16 @@ CONFIGS: dict[str, AudioConfig] = {
     # V3. V2 with hold C.
     "v3_hold_drone": AudioConfig(name="v3_hold_drone", confirmation="drone"),
 }
-DEFAULT_CONFIG = CONFIGS["v2_refined"]
+# Phase 6. Phase 5 rendered four previews over a bit-identical picture so that
+# one listening pass could settle the confirmation hold, recommended `drone`,
+# and left the choice open. The hold has been chosen and it is `drone`, so the
+# default moves - which is the one-line change Phase 5 said it would be.
+#
+# Deliberately not a fifth `CONFIGS` entry named "production". A new entry that
+# sounded exactly like `v3_hold_drone` would give the configuration registry two
+# names for one sound, and the test that four configurations produce four
+# distinct waveforms is worth more than a nicer label.
+DEFAULT_CONFIG = CONFIGS["v3_hold_drone"]
 
 
 def named_config(name: str, **overrides: Any) -> AudioConfig:
@@ -438,6 +516,53 @@ def frame_for(t: float, fps: float) -> int:
     if abs(exact - round(exact)) < 1.0e-9:
         return int(round(exact))
     return int(math.ceil(exact))
+
+
+def activation_duck_weight(dt: float, config: AudioConfig) -> float:
+    """How strongly a duplicate `dt` seconds from an activation is ducked.
+
+    `dt` is signed: negative is a duplicate *before* the activation, which is
+    the look-ahead side and the side the measurement reads. 1.0 at the
+    activation's own instant, tapering linearly to 0.0 at `-lead` and at
+    `+tail`, and exactly 0.0 outside them - so a duplicate far from any
+    activation is untouched, bit for bit.
+    """
+    if dt < 0.0:
+        span = config.activation_duck_lead_seconds
+        distance = -dt
+    else:
+        span = config.activation_duck_tail_seconds
+        distance = dt
+    if span <= 0.0 or distance >= span:
+        return 0.0
+    return 1.0 - distance / span
+
+
+def activation_duck_scale_for(t: float,
+                              activation_times: Sequence[float],
+                              config: AudioConfig) -> float:
+    """The scalar a duplicate at `t` is multiplied by.
+
+    The strongest nearby activation wins rather than the ducks accumulating:
+    two activations either side of one duplicate should not drive it twice as
+    far down as one, because the thing being protected is each activation's
+    own contrast and not the sum of them.
+    """
+    if not config.activation_duck or config.activation_duck_depth <= 0.0:
+        return 1.0
+    lead = config.activation_duck_lead_seconds
+    tail = config.activation_duck_tail_seconds
+    weight = 0.0
+    for at in activation_times:
+        dt = t - at
+        if dt < -lead:
+            break          # sorted, so nothing later is nearer
+        if dt > tail:
+            continue
+        found = activation_duck_weight(dt, config)
+        if found > weight:
+            weight = found
+    return 1.0 - config.activation_duck_depth * weight
 
 
 # --------------------------------------------------------------------------
@@ -551,6 +676,9 @@ class AudioEvent:
     # What the two dampers did, kept so a schedule explains its own levels.
     restrike_scale: float = 1.0
     duck_scale: float = 1.0
+    # What the activation duck did to this event. 1.0 on everything that is
+    # not a ducked duplicate, which is every other kind by construction.
+    activation_duck_scale: float = 1.0
     # Seconds since this tile was last struck, or None for a first contact.
     since_tile_seconds: float | None = None
     # How long the state this event belongs to lasts, in render seconds. Only
@@ -575,6 +703,7 @@ class AudioEvent:
             "progress": self.progress,
             "restrike_scale": self.restrike_scale,
             "duck_scale": self.duck_scale,
+            "activation_duck_scale": self.activation_duck_scale,
             "since_tile_seconds": self.since_tile_seconds,
             "duration_seconds": self.duration_seconds,
         }
@@ -683,6 +812,16 @@ def schedule(document: dict[str, Any],
     recent: list[float] = []          # render times, for the density duck
     final_render: float | None = None
 
+    # Every instant at which a tile lights, including the fifty-first, read in
+    # one pass before any event is built. The activation duck needs to see
+    # forwards - a duplicate is ducked for the lead time *before* the
+    # activation it is making room for - and a single-pass loop cannot. Taken
+    # on the canonical times for the same reason the density duck is: the duck
+    # must not move when the frame grid does.
+    activation_times: tuple[float, ...] = tuple(
+        float(hit["t"]) for hit in document["collisions"] if bool(hit["new"])
+    )
+
     for hit in document["collisions"]:
         t = float(hit["t"])
         tile = int(hit["tile"])
@@ -703,6 +842,7 @@ def schedule(document: dict[str, Any],
 
         restrike = 1.0
         duck = 1.0
+        activation_duck = 1.0
         if is_final:
             kind = "final"
             gain = config.final_gain
@@ -726,7 +866,9 @@ def schedule(document: dict[str, Any],
                 )
             duck = max(config.duck_floor,
                        1.0 / (1.0 + config.duck_per_event * crowd))
-            gain *= restrike * duck
+            activation_duck = activation_duck_scale_for(
+                t, activation_times, config)
+            gain *= restrike * duck * activation_duck
 
         frame = frame_for(t, config.fps)
         events.append(AudioEvent(
@@ -744,6 +886,7 @@ def schedule(document: dict[str, Any],
             progress=count / total_tiles,
             restrike_scale=restrike,
             duck_scale=duck,
+            activation_duck_scale=activation_duck,
             since_tile_seconds=since,
         ))
         if is_final:
