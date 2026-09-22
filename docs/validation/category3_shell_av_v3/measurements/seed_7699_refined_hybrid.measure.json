@@ -1,0 +1,97 @@
+{
+ "render_version": "category3-test2-shell-audio-render/1.0.0",
+ "seed": 7699,
+ "playback_digest": "42361f2a8f7a7a47cc6138dde47ce9d29938a18a8a1244d03f4d36f1c405f0b6",
+ "score_fingerprint": "fa886ea8cfc3071aa508f79c5994d8f9054190ef55cc7c13bb3046c333ff6be7",
+ "config_fingerprint": "eaedaafdb37866f1",
+ "pcm_digest": "da71fe4fed3e1beb8e0544319cfc9026c82b151aba8ea2950705d2c59023f476",
+ "duration_seconds": 26.292875,
+ "sample_rate": 48000,
+ "channels": 2,
+ "peak": {
+  "sample_peak_dbfs": -3.09,
+  "true_peak_dbtp": -3.08,
+  "clipped_samples": 0,
+  "static_gain": 1.35,
+  "limiter_used": false
+ },
+ "loudness": {
+  "integrated_lufs": -20.99,
+  "lra_lu": 6.09,
+  "lra_low_lufs": -24.86,
+  "lra_high_lufs": -18.78,
+  "true_peak_dbtp": -3.08,
+  "sample_peak_dbfs": -3.09
+ },
+ "rms_dbfs": -23.93,
+ "event_density_hz": 3.2366,
+ "maximum_polyphony": 4,
+ "note_overlap_seconds": 5.385717,
+ "phone": {
+  "rms_dbfs": -30.4,
+  "relative_to_master_db": -6.47,
+  "band_energy_percent": {
+   "20-120": 0.0,
+   "120-300": 2.834,
+   "300-800": 73.445,
+   "800-2000": 22.061,
+   "2000-5000": 1.661,
+   "5000-10000": 0.0,
+   "10000-20000": 0.0
+  }
+ },
+ "mono": {
+  "stereo_rms_dbfs": -23.93,
+  "mono_rms_dbfs": -24.02,
+  "mono_loss_db": -0.09,
+  "correlation": 0.9762,
+  "mono_integrated_lufs": -21.08,
+  "band_shift": {
+   "20-120": 0.0,
+   "120-300": 0.0,
+   "300-800": 0.0,
+   "800-2000": 0.0,
+   "2000-5000": 0.0,
+   "5000-10000": 0.0,
+   "10000-20000": 0.0
+  }
+ },
+ "spectrum_percent": {
+  "20-120": 0.024,
+  "120-300": 15.782,
+  "300-800": 74.432,
+  "800-2000": 9.275,
+  "2000-5000": 0.484,
+  "5000-10000": 0.0,
+  "10000-20000": 0.0
+ },
+ "event_hierarchy": {
+  "break": {
+   "count": 18,
+   "median_peak_dbfs": -6.07,
+   "max_peak_dbfs": -3.09
+  },
+  "collision": {
+   "count": 82,
+   "median_peak_dbfs": -13.44,
+   "max_peak_dbfs": -3.09
+  },
+  "escape": {
+   "count": 1,
+   "median_peak_dbfs": -6.91,
+   "max_peak_dbfs": -6.91
+  },
+  "transition": {
+   "count": 6,
+   "median_peak_dbfs": -12.33,
+   "max_peak_dbfs": -7.82
+  }
+ },
+ "synchronization": {
+  "events": 107,
+  "max_placement_error_seconds": 1.0383267859737089e-05,
+  "max_placement_error_samples": 0.49839685726738026,
+  "within_half_sample": true
+ },
+ "ending_silence_peak": 0.0
+}

@@ -1,0 +1,29 @@
+{
+ "format": "category3-test2-shell-av-integration/1.0.0",
+ "candidate_seeds": [
+  9589,
+  11929,
+  3654,
+  7699
+ ],
+ "config": {
+  "hook": "CAN THE BALL ESCAPE?",
+  "audio": "refined_hybrid",
+  "review_width": 540,
+  "review_height": 960,
+  "review_fps": 30,
+  "full_width": 1080,
+  "full_height": 1920,
+  "full_fps": 60,
+  "video_codec": "libx264",
+  "review_crf": 20,
+  "full_crf": 17,
+  "preset": "slow",
+  "pixel_format": "yuv420p",
+  "audio_codec": "aac",
+  "audio_bitrate": "192k",
+  "audio_sample_rate": 48000,
+  "final_frame_padding": "clone_to_audio_end"
+ },
+ "config_digest": "063a4fa0c0f1d819"
+}

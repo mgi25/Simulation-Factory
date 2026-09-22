@@ -501,6 +501,12 @@ def test_category_three_imports_no_other_category_and_no_company_os() -> None:
     # its Phase 1 answer is a question about a population of ten thousand
     # seeds, so it needs a process pool to produce one and quantiles to report
     # it. Both are stdlib, so both are the kind of growth this list is for.
+    #
+    # `pathlib` arrived with Test #2's Phase 3 A/V driver, which joins the
+    # Phase 1 playback, Godot's frame directory, the score WAV and the muxed
+    # preview into one tree of derived paths. It is stdlib, and it crosses no
+    # workstream: the driver still reaches only `satisfying/` and the same
+    # three leaf `audio/` modules the rest of Category 3 is held to.
     allowed = {
         "__future__",
         "argparse",
@@ -514,6 +520,7 @@ def test_category_three_imports_no_other_category_and_no_company_os() -> None:
         "math",
         "numpy",
         "os",
+        "pathlib",
         "PIL",
         "random",
         "shutil",

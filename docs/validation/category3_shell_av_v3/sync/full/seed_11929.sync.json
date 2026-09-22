@@ -1,0 +1,65 @@
+{
+ "format": "category3-test2-shell-av-integration/1.0.0",
+ "seed": 11929,
+ "fps": 60,
+ "frame_seconds": 0.016666666666666666,
+ "playback_digest": "4c0434a8d497fea64c6e6e27089b97ae971f567569ba339effbf67b3330f3b0b",
+ "visual_playback_digest": "4c0434a8d497fea64c6e6e27089b97ae971f567569ba339effbf67b3330f3b0b",
+ "score_playback_digest": "4c0434a8d497fea64c6e6e27089b97ae971f567569ba339effbf67b3330f3b0b",
+ "event_order_digest": "1694c7658daebaad0118885fe68136b51101f966fb0270606cfce2ff89abe526",
+ "visual_event_order_exact": true,
+ "visual_max_event_time_error_seconds": 4.973799150320701e-14,
+ "audio_source_order_shared": true,
+ "mapping_complete": true,
+ "timing": {
+  "collision": {
+   "count": 76,
+   "max_error_seconds": 0.016458333333333464,
+   "max_error_frames": 0.9875000000000078,
+   "mean_error_seconds": 0.008483826754385993,
+   "within_one_frame": true
+  },
+  "post": {
+   "count": 15,
+   "max_error_seconds": 0.01641666666666808,
+   "max_error_frames": 0.9850000000000847,
+   "mean_error_seconds": 0.009006944444444638,
+   "within_one_frame": true
+  },
+  "near_miss": {
+   "count": 12,
+   "max_error_seconds": 0.016458333333332575,
+   "max_error_frames": 0.9874999999999545,
+   "mean_error_seconds": 0.008715277777777914,
+   "within_one_frame": true
+  },
+  "break": {
+   "count": 14,
+   "max_error_seconds": 0.01641666666666808,
+   "max_error_frames": 0.9850000000000847,
+   "mean_error_seconds": 0.009377976190476454,
+   "within_one_frame": true
+  },
+  "shell_exit": {
+   "count": 6,
+   "max_error_seconds": 0.015208333333333712,
+   "max_error_frames": 0.9125000000000227,
+   "mean_error_seconds": 0.010076388888888657,
+   "within_one_frame": true
+  },
+  "escape": {
+   "count": 1,
+   "max_error_seconds": 0.0019583333333343944,
+   "max_error_frames": 0.11750000000006366,
+   "mean_error_seconds": 0.0019583333333343944,
+   "within_one_frame": true
+  }
+ },
+ "maximum_sync_error_seconds": 0.016458333333333464,
+ "maximum_sync_error_frames": 0.9875000000000078,
+ "within_one_rendered_frame": true,
+ "score_fingerprint": "0d589af4af5413a822d2329e5c472d19a4827755f20721c32c28b14c3dd3fd5d",
+ "visual_config_digest": "77335e59def5e7f7",
+ "integration_config_digest": "063a4fa0c0f1d819",
+ "pass": true
+}

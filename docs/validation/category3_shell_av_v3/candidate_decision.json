@@ -1,0 +1,73 @@
+{
+ "format": "category3-test2-shell-av-decision/1.0.0",
+ "primary_seed": 9589,
+ "backup_seed": 11929,
+ "rejected_seeds": [3654, 7699],
+ "selection_basis": "explicit comparison, not an aggregate score",
+ "candidates": {
+  "9589": {
+   "decision": "primary",
+   "frame_one_hook": "strong; the complete six-shell challenge and locked hook are immediately legible",
+   "early_activity": "collision at 0.209 s and first outward exit at 1.739 s; first near miss is later at 5.245 s",
+   "near_miss_quality": "best overall distribution: 1 opening, 10 middle, 4 late; flashes remain local and the ornament stays subordinate",
+   "route_uncertainty": "balanced 3-opening/3-break route with distinct route changes through the middle and late sections",
+   "damage_progression": "17 breaks with strong persistent geometry change and no loss of ball clarity",
+   "visual_clarity": "strong; damage, missing passages, moving openings, and outward region remain readable",
+   "musical_pleasantness": "best balance of pace and space: 2.958 Hz collision density, 0.277 s median gap, 6.03 LU LRA, maximum identical-note run 2",
+   "audiovisual_causality": "pass; all cue classes share the playback digest and stay below one frame",
+   "middle_section_evolution": "strongest: 10 near misses, 10 breaks, and 6 shell exits in the middle segment",
+   "outer_shell_tension": "6.233 s from first arrival in region 5 to final escape, supported by 23 late collisions and 5 late breaks",
+   "final_escape": "clean opening escape with immediate visual release, D-major resolution, and exact source silence",
+   "total_duration": "22.941 s simulation; 23.761 s A/V preview",
+   "replay_appeal": "highest; prediction, damage, route changes, and musical register changes remain active without feeling over-dense"
+  },
+  "11929": {
+   "decision": "backup",
+   "frame_one_hook": "strong; same locked composition",
+   "early_activity": "first collision and near miss coincide at 0.298 s; first exit at 1.653 s and first break at 2.140 s",
+   "near_miss_quality": "excellent opening signal: 5 opening, 3 middle, 4 late",
+   "route_uncertainty": "distinctive 2-opening/4-break route and break finale",
+   "damage_progression": "14 breaks, distributed 5/5/4 across opening/middle/late",
+   "visual_clarity": "strong, although the denser opening asks more attention than 9589",
+   "musical_pleasantness": "energetic but busier: 3.475 Hz collision density, 0.194 s median gap, and narrower 3.86 LU LRA",
+   "audiovisual_causality": "pass; all cue classes share the playback digest and stay below one frame",
+   "middle_section_evolution": "good; sustained break-led change, but frontier progress reaches region 5 by 12.775 s",
+   "outer_shell_tension": "9.288 s from region 5 to the final break; exciting but less compact than 9589",
+   "final_escape": "the visible final panel break and chord bloom land as one decisive event before resolution",
+   "total_duration": "22.115 s simulation; 22.935 s A/V preview",
+   "replay_appeal": "high; strongest alternative because the route and break ending contrast with 9589"
+  },
+  "3654": {
+   "decision": "reject",
+   "frame_one_hook": "strong; same locked composition",
+   "early_activity": "fast collision at 0.199 s, exit at 1.511 s, and break at 2.041 s",
+   "near_miss_quality": "good but later first prediction at 3.571 s",
+   "route_uncertainty": "opening-led 5/1 route becomes comparatively predictable",
+   "damage_progression": "only 9 breaks; clean but visibly less consequential",
+   "visual_clarity": "excellent",
+   "musical_pleasantness": "cleanest and least overlapped, but also the least rich of the four",
+   "audiovisual_causality": "pass",
+   "middle_section_evolution": "rejecting defect: approximately 12.04 s between first-time region 3 and region 4 progress",
+   "outer_shell_tension": "4.407 s from region 5 to escape",
+   "final_escape": "clean opening escape and resolution",
+   "total_duration": "21.206 s simulation; 22.025 s A/V preview",
+   "replay_appeal": "moderate; the clean control repeats Test #1's largely unchanged-middle weakness"
+  },
+  "7699": {
+   "decision": "reject",
+   "frame_one_hook": "strong; same locked composition",
+   "early_activity": "fastest collision at 0.189 s and early near miss at 1.034 s, but first exit waits until 2.991 s",
+   "near_miss_quality": "good 6/4/4 distribution",
+   "route_uncertainty": "strong locally, with a 4-opening/2-break route, but progress stalls twice",
+   "damage_progression": "strongest accumulated visual state with 18 breaks",
+   "visual_clarity": "strong despite heavy damage",
+   "musical_pleasantness": "rich and varied, but longest overlap at 5.386 s and the cast's longest 1.006 s collision gap",
+   "audiovisual_causality": "pass",
+   "middle_section_evolution": "damage-rich, but approximately 9.01 s separates first-time region 2 and region 3 progress",
+   "outer_shell_tension": "10.770 s from region 5 to escape, the longest of the cast",
+   "final_escape": "clean opening escape and resolution",
+   "total_duration": "25.473 s simulation; 26.293 s A/V preview",
+   "replay_appeal": "moderate-high, but the extra runtime is not earned over 9589 or 11929"
+  }
+ }
+}

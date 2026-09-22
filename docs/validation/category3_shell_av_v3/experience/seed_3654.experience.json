@@ -1,0 +1,79 @@
+{
+ "seed": 3654,
+ "duration_seconds": 21.205564342407087,
+ "first_collision_seconds": 0.19921377216440683,
+ "first_near_miss_seconds": 3.570911051336652,
+ "first_break_seconds": 2.041011280520595,
+ "first_shell_exit_seconds": 1.511054165779404,
+ "segments": {
+  "opening": {
+   "start": 0.0,
+   "end": 5.301391,
+   "collisions": 16,
+   "near_misses": 2,
+   "damage_events": 16,
+   "panel_breaks": 3,
+   "shell_exits": 3
+  },
+  "middle": {
+   "start": 5.301391,
+   "end": 13.783617,
+   "collisions": 24,
+   "near_misses": 8,
+   "damage_events": 24,
+   "panel_breaks": 4,
+   "shell_exits": 2
+  },
+  "late": {
+   "start": 13.783617,
+   "end": 21.205564,
+   "collisions": 22,
+   "near_misses": 3,
+   "damage_events": 22,
+   "panel_breaks": 2,
+   "shell_exits": 6
+  }
+ },
+ "longest_collision_gap_seconds": 0.7502158583255785,
+ "median_collision_gap_seconds": 0.30869,
+ "immediate_note_repeat_fraction": 0.06557377049180328,
+ "longest_identical_note_run": 3,
+ "progression": [
+  {
+   "t": 1.511054165779404,
+   "shell_id": 0,
+   "to_region": 1,
+   "method": "opening"
+  },
+  {
+   "t": 4.2115385544418285,
+   "shell_id": 1,
+   "to_region": 2,
+   "method": "break"
+  },
+  {
+   "t": 4.421463198365293,
+   "shell_id": 2,
+   "to_region": 3,
+   "method": "opening"
+  },
+  {
+   "t": 16.45949542914278,
+   "shell_id": 3,
+   "to_region": 4,
+   "method": "opening"
+  },
+  {
+   "t": 16.72605647273543,
+   "shell_id": 4,
+   "to_region": 5,
+   "method": "opening"
+  },
+  {
+   "t": 21.13292560487221,
+   "shell_id": 5,
+   "to_region": 6,
+   "method": "opening"
+  }
+ ]
+}
