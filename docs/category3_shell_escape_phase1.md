@@ -479,9 +479,15 @@ differ · cycle detection · summaries carry no score · batch records rebuild t
 summary · shortlist spread · no Godot/audio/rendering import · no Test #1
 import.
 
-Regressions: `tests/test_tile_escape.py` and `tests/test_tile_escape_phase2.py`
-— **98 passed**. No existing guard weakened; the only change is two stdlib
-names added to an allowlist whose own comment provides for exactly that.
+Regressions. Category 3 Test #1, all six phases: **331 passed**. Whole
+repository: **6104 passed, 441 skipped, 18 failed** in 34 minutes. The same 18
+tests, by name, fail on the baseline worktree at `d2a3002` with none of this
+branch's code present — twelve race2/sloped branch-scope guards that compare
+against stale `origin/<branch>` refs, five that need un-gitted artifacts under
+`output/`, and one that needs Godot on PATH. This branch introduces no new
+failure. No existing guard weakened; the only change to an existing file is two
+stdlib names added to an allowlist whose own comment provides for exactly
+that.
 
 ---
 
