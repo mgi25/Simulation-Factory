@@ -1,0 +1,59 @@
+{
+ "safe_area": "shorts_conservative",
+ "safe_area_fingerprint": "26df08b0844c8aac",
+ "frame": [
+  1080,
+  1920
+ ],
+ "arena_box_px": [
+  54.0,
+  571.2,
+  831.6,
+  1348.8
+ ],
+ "arena_occupancy_width_pct": 72.0,
+ "outer_shell_clearance_px": 75.6,
+ "hook_clearance_px": 34.56,
+ "openings_clear": true,
+ "openings_min_clearance_px": 78.915,
+ "ball_frames": 1385,
+ "ball_hidden_frames": 0,
+ "ball_longest_hidden_seconds": 0.0,
+ "ball_min_clearance_px": 132.778,
+ "final_escape_clearance_px": 414.742,
+ "gate_pass": true,
+ "regions": {
+  "action_rail": [
+   907.2,
+   806.4,
+   1080.0,
+   1785.6
+  ],
+  "title_block": [
+   0.0,
+   1612.8,
+   907.2,
+   1804.8
+  ],
+  "progress_bar": [
+   0.0,
+   1804.8,
+   1080.0,
+   1843.2
+  ],
+  "nav_bar": [
+   0.0,
+   1843.2,
+   1080.0,
+   1920.0
+  ],
+  "top_bar": [
+   0.0,
+   0.0,
+   1080.0,
+   115.2
+  ]
+ },
+ "fps": 60.0,
+ "seed": 9589
+}

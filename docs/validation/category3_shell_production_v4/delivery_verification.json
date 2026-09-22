@@ -1,0 +1,146 @@
+{
+ "format": "category3-test2-shell-production-verify/1.0.0",
+ "seed": 9589,
+ "production_fingerprint": "ae538ed8df0944d3",
+ "production_digest": "dc84bcd7f5351e75",
+ "playback_digest": "0978e0644f27a7f8ac0d79708702222e439892d7fa2cf0d507d7dee08f058c5a",
+ "container": {
+  "path": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\Simulation Factory-category3-shell-av-v3\\output\\category3_shell_production_v4\\master\\category3_test2_seed9589_delivery.mp4",
+  "size_bytes": 6414322,
+  "width": 1080,
+  "height": 1920,
+  "fps": 60.0,
+  "video_codec": "h264",
+  "pixel_format": "yuv420p",
+  "colour": [
+   "bt709",
+   "iec61966-2-1",
+   "bt709"
+  ],
+  "audio_codec": "aac",
+  "audio_sample_rate": 48000,
+  "audio_channels": 2,
+  "muxed_frames": 1425,
+  "rendered_frames": 1422,
+  "duration_seconds": 23.761,
+  "faststart": true
+ },
+ "final_frame_padding_frames": 3,
+ "audio": {
+  "seconds": 23.7653,
+  "source_seconds": 23.7611,
+  "sample_peak_dbfs": -4.544,
+  "true_peak_dbtp": -4.54,
+  "integrated_lufs": -21.17,
+  "loudness_range_lu": 6.023,
+  "loudness_low_lufs": -25.3,
+  "loudness_high_lufs": -19.28,
+  "clipped_samples": 0,
+  "final_50ms_peak_dbfs": -240.0,
+  "delivery_ceiling_dbtp": -1.0
+ },
+ "mono": {
+  "stereo_rms_dbfs": -24.17,
+  "mono_rms_dbfs": -24.27,
+  "mono_loss_db": -0.1,
+  "correlation": 0.9654,
+  "mono_integrated_lufs": -21.27,
+  "band_shift": {
+   "20-120": 0.0,
+   "120-300": 0.0,
+   "300-800": 0.0,
+   "800-2000": 0.0,
+   "2000-5000": 0.0,
+   "5000-10000": 0.0,
+   "10000-20000": 0.0
+  }
+ },
+ "phone": {
+  "energy_300_2000_pct": 95.351,
+  "energy_above_300_pct": 96.407,
+  "bands_pct": {
+   "20-120": 0.0,
+   "120-300": 3.593,
+   "300-800": 72.741,
+   "800-2000": 22.61,
+   "2000-5000": 1.056,
+   "5000-10000": 0.0,
+   "10000-20000": 0.0
+  },
+  "integrated_lufs": -30.24
+ },
+ "sync": {
+  "format": "category3-test2-shell-av-integration/1.0.0",
+  "seed": 9589,
+  "fps": 60,
+  "frame_seconds": 0.016666666666666666,
+  "playback_digest": "0978e0644f27a7f8ac0d79708702222e439892d7fa2cf0d507d7dee08f058c5a",
+  "visual_playback_digest": "0978e0644f27a7f8ac0d79708702222e439892d7fa2cf0d507d7dee08f058c5a",
+  "score_playback_digest": "0978e0644f27a7f8ac0d79708702222e439892d7fa2cf0d507d7dee08f058c5a",
+  "event_order_digest": "3e67d1331c322f71e04cbac8203bb85a5448c132bb3b58ae22e1a59d60dbbd9b",
+  "visual_event_order_exact": true,
+  "visual_max_event_time_error_seconds": 4.973799150320701e-14,
+  "audio_source_order_shared": true,
+  "mapping_complete": true,
+  "timing": {
+   "collision": {
+    "count": 66,
+    "max_error_seconds": 0.0165416666666669,
+    "max_error_frames": 0.9925000000000139,
+    "mean_error_seconds": 0.008672348484848536,
+    "within_one_frame": true
+   },
+   "post": {
+    "count": 10,
+    "max_error_seconds": 0.01618750000000091,
+    "max_error_frames": 0.9712500000000546,
+    "mean_error_seconds": 0.009137500000000642,
+    "within_one_frame": true
+   },
+   "near_miss": {
+    "count": 15,
+    "max_error_seconds": 0.01352083333333276,
+    "max_error_frames": 0.8112499999999656,
+    "mean_error_seconds": 0.006195833333333726,
+    "within_one_frame": true
+   },
+   "break": {
+    "count": 17,
+    "max_error_seconds": 0.0165416666666669,
+    "max_error_frames": 0.9925000000000139,
+    "mean_error_seconds": 0.009624999999999877,
+    "within_one_frame": true
+   },
+   "shell_exit": {
+    "count": 6,
+    "max_error_seconds": 0.011395833333333272,
+    "max_error_frames": 0.6837499999999963,
+    "mean_error_seconds": 0.005347222222222984,
+    "within_one_frame": true
+   },
+   "escape": {
+    "count": 1,
+    "max_error_seconds": 0.008874999999999744,
+    "max_error_frames": 0.5324999999999847,
+    "mean_error_seconds": 0.008874999999999744,
+    "within_one_frame": true
+   }
+  },
+  "maximum_sync_error_seconds": 0.0165416666666669,
+  "maximum_sync_error_frames": 0.9925000000000139,
+  "within_one_rendered_frame": true,
+  "score_fingerprint": "69f30e04729bde825b0ce1c14934249d1b94c005ca0c88c0da9a69255f4b7b33",
+  "visual_config_digest": "77335e59def5e7f7",
+  "integration_config_digest": "063a4fa0c0f1d819",
+  "pass": true
+ },
+ "drift_seconds": -0.0043,
+ "hashes": {
+  "playback_sha256": "99d9989a65427a27f79e8553652197ad3e4a6af649e9dd1bc7ca3f1a44cf4a00",
+  "wav_sha256": "10849b1eb5f1d548403eea050f487c71e509e1667c92cc860811b2e773894433",
+  "delivery_sha256": "15255300bb5c7f0675005518e36df7ba96c18bc8430532770ed9dd873eff2e58",
+  "archive_sha256": "1895cd9e90a52de68bd9bd0f50cdc91ceaab51622cac2eaf03b09204f2699174"
+ },
+ "failures": [],
+ "pass": true
+}
