@@ -1,0 +1,32 @@
+{
+ "format": "category3-shell-visual-preview-manifest/1.0.0",
+ "production_masters": false,
+ "audio": false,
+ "codec": "h264",
+ "pixel_format": "yuv420p",
+ "frame": [540, 960],
+ "fps": 30,
+ "previews": [
+  {
+   "seed": 9589,
+   "path": "output/category3_shell_visual_v2a/previews/seed9589_visual_preview_540x960_30fps.mp4",
+   "duration_seconds": 23.7,
+   "size_bytes": 2514553,
+   "final_method": "opening"
+  },
+  {
+   "seed": 11929,
+   "path": "output/category3_shell_visual_v2a/previews/seed11929_visual_preview_540x960_30fps.mp4",
+   "duration_seconds": 22.866667,
+   "size_bytes": 2436825,
+   "final_method": "break"
+  },
+  {
+   "seed": 7699,
+   "path": "output/category3_shell_visual_v2a/previews/seed7699_visual_preview_540x960_30fps.mp4",
+   "duration_seconds": 26.233333,
+   "size_bytes": 2840695,
+   "final_method": "opening"
+  }
+ ]
+}
