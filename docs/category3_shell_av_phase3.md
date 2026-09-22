@@ -20,7 +20,9 @@ This phase makes previews, not an upload master.
 - Visual input: `8dc61c27d9f9c2a8e848239771a33adf4d1a7b35`.
 - Audio input: `0c8ce1f8132b3ec6188dd53ec931af4717f5c9f9`.
 - Merge order: visual, then audio; two ordinary merge commits, no squash or
-  rebase; no conflicts.
+  rebase; no conflicts. Visual merge `db5dd21`, audio merge `5adbf1a`.
+- Phase 3 integration commit: `8dc12cc`, on branch `category3-shell-av-v3`.
+  Nothing is merged to `main`.
 - Event schema: `category3-test2-shell-escape/1.0.0`.
 - Frozen config digest: `7da0cbc80d595826…`.
 - Visual config digest: `77335e59def5e7f7`.
