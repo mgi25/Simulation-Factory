@@ -8,6 +8,7 @@ __pycache__/
 .venv/
 venv/
 env/
+.tools/
 
 # Generated simulation output (replays, frames, videos)
 output/

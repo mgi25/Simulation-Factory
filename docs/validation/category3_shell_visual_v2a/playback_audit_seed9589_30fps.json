@@ -1,0 +1,13 @@
+{
+ "seed": 9589,
+ "digest_matches": true,
+ "schema_matches": true,
+ "config_digest_matches": true,
+ "event_order_unchanged": true,
+ "max_event_time_error": 4.973799150320701e-14,
+ "event_kinds_unchanged": true,
+ "panel_states_unchanged": true,
+ "sampled_positions_match": true,
+ "worst_position_error": 7.795251197362611e-07,
+ "pass": true
+}
