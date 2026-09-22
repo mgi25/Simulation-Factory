@@ -1,0 +1,99 @@
+{
+ "render_version": "category3-test2-shell-audio-render/1.0.0",
+ "seed": 19607,
+ "playback_digest": "9002c702b82fb3f91e24742bab60f67e3711f856b88e306fffe72bbdeb55077c",
+ "score_fingerprint": "cac39b34d15ed0d9c443d776923dc4c889f7a6b78e22ac1f4f7fe7297eb2f25e",
+ "config_fingerprint": "eaedaafdb37866f1",
+ "pcm_digest": "f7a487ee07a5d2c278d1b9a16cbc0e34a4beac6d8ecc5b3fe225667152454619",
+ "duration_seconds": 19.503083,
+ "sample_rate": 48000,
+ "channels": 2,
+ "peak": {
+  "sample_peak_dbfs": -4.48,
+  "true_peak_dbtp": -4.48,
+  "clipped_samples": 0,
+  "static_gain": 1.35,
+  "limiter_used": false
+ },
+ "loudness": {
+  "integrated_lufs": -22.0,
+  "lra_lu": 5.7,
+  "lra_low_lufs": -26.33,
+  "lra_high_lufs": -20.63,
+  "true_peak_dbtp": -4.48,
+  "sample_peak_dbfs": -4.48
+ },
+ "rms_dbfs": -25.17,
+ "event_density_hz": 2.8161,
+ "maximum_polyphony": 4,
+ "note_overlap_seconds": 2.824681,
+ "phone": {
+  "rms_dbfs": -30.61,
+  "relative_to_master_db": -5.45,
+  "band_energy_percent": {
+   "20-120": 0.0,
+   "120-300": 0.706,
+   "300-800": 62.614,
+   "800-2000": 34.797,
+   "2000-5000": 1.883,
+   "5000-10000": 0.0,
+   "10000-20000": 0.0
+  }
+ },
+ "mono": {
+  "stereo_rms_dbfs": -25.17,
+  "mono_rms_dbfs": -25.25,
+  "mono_loss_db": -0.08,
+  "correlation": 0.9628,
+  "mono_integrated_lufs": -22.08,
+  "band_shift": {
+   "20-120": 0.0,
+   "120-300": 0.0,
+   "300-800": 0.0,
+   "800-2000": 0.0,
+   "2000-5000": 0.0,
+   "5000-10000": 0.0,
+   "10000-20000": 0.0
+  }
+ },
+ "spectrum_percent": {
+  "20-120": 0.011,
+  "120-300": 4.724,
+  "300-800": 76.228,
+  "800-2000": 18.374,
+  "2000-5000": 0.662,
+  "5000-10000": 0.0,
+  "10000-20000": 0.0
+ },
+ "event_hierarchy": {
+  "break": {
+   "count": 8,
+   "median_peak_dbfs": -6.18,
+   "max_peak_dbfs": -4.48
+  },
+  "collision": {
+   "count": 52,
+   "median_peak_dbfs": -13.95,
+   "max_peak_dbfs": -4.48
+  },
+  "escape": {
+   "count": 1,
+   "median_peak_dbfs": -5.79,
+   "max_peak_dbfs": -5.79
+  },
+  "transition": {
+   "count": 6,
+   "median_peak_dbfs": -12.5,
+   "max_peak_dbfs": -9.72
+  }
+ },
+ "synchronization": {
+  "events": 67,
+  "max_placement_error_seconds": 1.0414776241418622e-05,
+  "max_placement_error_samples": 0.49990925958809385,
+  "within_half_sample": true
+ },
+ "ending_silence_peak": 0.0,
+ "wav": "wav/seed_19607_refined_hybrid.wav",
+ "score": "scores/seed_19607_refined_hybrid.score.json"
+}
