@@ -27,6 +27,7 @@ been measured, not listened to.
 | starting branch | `category3-shell-av-v3` |
 | starting SHA | `b39204a4acc648161821835da42a481a4a11a647` |
 | this branch | `category3-shell-production-v4` |
+| production commit | `13c3aa5` |
 | worktree | `../Simulation Factory-category3-shell-av-v3` |
 | Godot | 4.7.2 stable, the portable build in the Phase 2A worktree |
 | ffmpeg | 8.1.1 full build |
