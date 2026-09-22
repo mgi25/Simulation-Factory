@@ -106,9 +106,11 @@ neither by any test that only checked that a ball bounced:
 question by sampling every live panel a few thousand times along the flight —
 a hundred times slower, with no geometric insight in it, so agreement is
 evidence rather than a tautology. `test_solver_agrees_with_the_brute_force_reference`
-runs it against every contact search of six seeds: **2503 searches, zero
+runs it against every contact search of six seeds: **980 searches, zero
 disagreements**, and the windowed nearest-panel search never differs from the
-all-panel one.
+all-panel one. The same check was run over wider samples during development -
+3439 searches across twelve seeds at one point in the parameter search - and
+never disagreed after the two fixes above.
 
 ### 2.2 Collision response, and why it looks the way it does
 
