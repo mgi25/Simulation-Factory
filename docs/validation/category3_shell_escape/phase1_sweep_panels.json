@@ -1,0 +1,233 @@
+{
+ "seeds": 3000,
+ "base": {
+  "shell_count": 6,
+  "inner_radius": 5.0,
+  "shell_spacing": 3.6,
+  "panel_counts": [
+   16,
+   17,
+   18,
+   19,
+   20,
+   21
+  ],
+  "openings_per_shell": [
+   2,
+   3,
+   3,
+   4,
+   4,
+   5
+  ],
+  "opening_slots": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "panel_thickness": 0.3,
+  "omega_base": 0.62,
+  "omega_falloff": 1.0,
+  "omega_jitter": 0.22,
+  "alternate_direction": true,
+  "ball_radius": 0.4,
+  "speed": 17.0,
+  "restitution": 1.0,
+  "panel_momentum_transfer": 1.0,
+  "constant_speed": true,
+  "damage_reference_speed": 17.0,
+  "damage_exponent": 1.5,
+  "break_threshold": 1.6,
+  "breakable": true,
+  "horizon": 26.0,
+  "max_collisions": 20000,
+  "near_miss_arc_ball_radii": 2.5,
+  "near_miss_seconds": 0.15,
+  "graze_fraction": 0.06,
+  "skin": 1e-07,
+  "clearance_tolerance": 1e-11,
+  "min_dt": 1e-09,
+  "max_newton_iterations": 2000
+ },
+ "rows": [
+  {
+   "axis": "panel_counts",
+   "value": "10,11,12,13,14,15",
+   "config_digest": "c610dd95ba1619d526140979b8c41662825ebe92432bf51a8b52bb4a762f870e",
+   "escape_rate": 0.607,
+   "usable_rate": 0.18066666666666667,
+   "in_acceptable_band": 631,
+   "in_preferred_band": 325,
+   "median_duration": 14.88248578658336,
+   "median_collision_rate": 2.2848615994319683,
+   "median_near_misses": 7.0,
+   "median_breaks": 11.0,
+   "progression_opening_share": 0.8504149899396378,
+   "escaped_using_both": 1105,
+   "pathological": 0,
+   "flags": {
+    "instrument_fault": 0,
+    "failed": 1179,
+    "instant_escape": 922,
+    "photo_finish": 42,
+    "one_shell_hog": 189,
+    "too_few_near_misses": 1161,
+    "dead_stretch": 4,
+    "dead_middle": 3,
+    "frantic": 0,
+    "sparse": 2,
+    "repetitive_orbit": 0,
+    "few_distinct_panels": 132,
+    "no_breaks": 57,
+    "no_opening_progress": 3
+   },
+   "instruments": {
+    "runs_with_penetration": 0,
+    "runs_with_anomalies": 0,
+    "runs_with_solver_failures": 0,
+    "worst_penetration": 9.992784377743646e-12,
+    "worst_speed_drift": 4.179663151530002e-16,
+    "speed_correction": {
+     "p50": 0.3013896755661433,
+     "p95": 0.40211617617248846,
+     "p100": 0.4424339945252255
+    }
+   }
+  },
+  {
+   "axis": "panel_counts",
+   "value": "13,14,15,16,17,18",
+   "config_digest": "ad9c8ae11b3862786c9be477b5d21eab335341ae9b0a8eb15d3c8df491c232aa",
+   "escape_rate": 0.475,
+   "usable_rate": 0.18066666666666667,
+   "in_acceptable_band": 590,
+   "in_preferred_band": 293,
+   "median_duration": 16.495109910657558,
+   "median_collision_rate": 2.5203226453932457,
+   "median_near_misses": 9.0,
+   "median_breaks": 13.0,
+   "progression_opening_share": 0.8018085395703018,
+   "escaped_using_both": 1002,
+   "pathological": 0,
+   "flags": {
+    "instrument_fault": 0,
+    "failed": 1575,
+    "instant_escape": 590,
+    "photo_finish": 42,
+    "one_shell_hog": 456,
+    "too_few_near_misses": 661,
+    "dead_stretch": 16,
+    "dead_middle": 9,
+    "frantic": 0,
+    "sparse": 0,
+    "repetitive_orbit": 0,
+    "few_distinct_panels": 30,
+    "no_breaks": 28,
+    "no_opening_progress": 12
+   },
+   "instruments": {
+    "runs_with_penetration": 0,
+    "runs_with_anomalies": 0,
+    "runs_with_solver_failures": 0,
+    "worst_penetration": 9.99955673819386e-12,
+    "worst_speed_drift": 4.179663151530002e-16,
+    "speed_correction": {
+     "p50": 0.31161239612416347,
+     "p95": 0.40598811357858344,
+     "p100": 0.4410772209215067
+    }
+   }
+  },
+  {
+   "axis": "panel_counts",
+   "value": "16,17,18,19,20,21",
+   "config_digest": "7da0cbc80d5958260b65417c1ac94fac2285471aaf8adc4f093b27e3445afb3e",
+   "escape_rate": 0.385,
+   "usable_rate": 0.15666666666666668,
+   "in_acceptable_band": 555,
+   "in_preferred_band": 297,
+   "median_duration": 17.68696052111489,
+   "median_collision_rate": 2.6923076923076925,
+   "median_near_misses": 11.0,
+   "median_breaks": 14.0,
+   "progression_opening_share": 0.7560726530016777,
+   "escaped_using_both": 884,
+   "pathological": 0,
+   "flags": {
+    "instrument_fault": 0,
+    "failed": 1845,
+    "instant_escape": 394,
+    "photo_finish": 32,
+    "one_shell_hog": 770,
+    "too_few_near_misses": 408,
+    "dead_stretch": 20,
+    "dead_middle": 19,
+    "frantic": 0,
+    "sparse": 0,
+    "repetitive_orbit": 0,
+    "few_distinct_panels": 11,
+    "no_breaks": 21,
+    "no_opening_progress": 42
+   },
+   "instruments": {
+    "runs_with_penetration": 0,
+    "runs_with_anomalies": 0,
+    "runs_with_solver_failures": 0,
+    "worst_penetration": 9.999889805101247e-12,
+    "worst_speed_drift": 4.179663151530002e-16,
+    "speed_correction": {
+     "p50": 0.31312632443596927,
+     "p95": 0.40488039484704996,
+     "p100": 0.4399320418538462
+    }
+   }
+  },
+  {
+   "axis": "panel_counts",
+   "value": "20,21,22,23,24,25",
+   "config_digest": "26e8b832c0ddec18ce5583ad6b8de6fd1e114180f108655793470591a0c95b9f",
+   "escape_rate": 0.2886666666666667,
+   "usable_rate": 0.13266666666666665,
+   "in_acceptable_band": 503,
+   "in_preferred_band": 252,
+   "median_duration": 19.2207668715308,
+   "median_collision_rate": 2.825833419424132,
+   "median_near_misses": 14.0,
+   "median_breaks": 15.0,
+   "progression_opening_share": 0.6811688311688312,
+   "escaped_using_both": 749,
+   "pathological": 0,
+   "flags": {
+    "instrument_fault": 0,
+    "failed": 2134,
+    "instant_escape": 214,
+    "photo_finish": 46,
+    "one_shell_hog": 1166,
+    "too_few_near_misses": 186,
+    "dead_stretch": 47,
+    "dead_middle": 27,
+    "frantic": 0,
+    "sparse": 0,
+    "repetitive_orbit": 0,
+    "few_distinct_panels": 5,
+    "no_breaks": 4,
+    "no_opening_progress": 183
+   },
+   "instruments": {
+    "runs_with_penetration": 0,
+    "runs_with_anomalies": 0,
+    "runs_with_solver_failures": 0,
+    "worst_penetration": 9.997558336749535e-12,
+    "worst_speed_drift": 4.179663151530002e-16,
+    "speed_correction": {
+     "p50": 0.3226750504283089,
+     "p95": 0.40913706523611826,
+     "p100": 0.44149613054501224
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,1482 @@
+{
+ "seeds_searched": 20000,
+ "config": {
+  "shell_count": 6,
+  "inner_radius": 5.0,
+  "shell_spacing": 3.6,
+  "panel_counts": [
+   16,
+   17,
+   18,
+   19,
+   20,
+   21
+  ],
+  "openings_per_shell": [
+   2,
+   3,
+   3,
+   4,
+   4,
+   5
+  ],
+  "opening_slots": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "panel_thickness": 0.3,
+  "omega_base": 0.62,
+  "omega_falloff": 1.0,
+  "omega_jitter": 0.22,
+  "alternate_direction": true,
+  "ball_radius": 0.4,
+  "speed": 17.0,
+  "restitution": 1.0,
+  "panel_momentum_transfer": 1.0,
+  "constant_speed": true,
+  "damage_reference_speed": 17.0,
+  "damage_exponent": 1.5,
+  "break_threshold": 1.6,
+  "breakable": true,
+  "horizon": 26.0,
+  "max_collisions": 20000,
+  "near_miss_arc_ball_radii": 2.5,
+  "near_miss_seconds": 0.15,
+  "graze_fraction": 0.06,
+  "skin": 1e-07,
+  "clearance_tolerance": 1e-11,
+  "min_dt": 1e-09,
+  "max_newton_iterations": 2000
+ },
+ "config_digest": "7da0cbc80d5958260b65417c1ac94fac2285471aaf8adc4f093b27e3445afb3e",
+ "candidates": [
+  {
+   "seed": 17534,
+   "flags": [],
+   "escaped": true,
+   "duration": 21.12724972652694,
+   "max_region": 6,
+   "digest": "3979f57089f08a143ef22c1343157f7fa19417620a7f4ac816fb7c581ca7672a",
+   "collisions": 71,
+   "collision_rate": 3.3605888565256015,
+   "grazing": 0,
+   "post_contacts": 10,
+   "near_misses": 14,
+   "near_miss_rate": 0.6626513238219496,
+   "breaks": 13,
+   "first_break": 3.7643265431757893,
+   "progression_opening": 4,
+   "progression_break": 2,
+   "exit_opening": 5,
+   "exit_break": 2,
+   "final_method": "break",
+   "regressions": 1,
+   "max_region_share": 0.33265009268704887,
+   "longest_no_event": 2.260323360641852,
+   "longest_no_progress": 7.216989601553484,
+   "middle_third_stagnation": 2.260323360641852,
+   "longest_cycle_run": 2,
+   "distinct_panels": 46,
+   "max_penetration": 9.229617070616314e-12,
+   "speed_drift_relative": 0.0,
+   "max_speed_correction": 0.2875788303918938,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "escalation": {
+    "collisions": [
+     15,
+     29,
+     27
+    ],
+    "near_misses": [
+     5,
+     4,
+     5
+    ],
+    "breaks": [
+     4,
+     4,
+     5
+    ],
+    "progress": [
+     1,
+     1,
+     4
+    ]
+   },
+   "dwell": [
+    7.028,
+    3.9983,
+    4.1932,
+    1.9347,
+    1.7422,
+    2.1539,
+    0.077
+   ],
+   "near_misses_per_shell": [
+    5,
+    3,
+    3,
+    1,
+    0,
+    2
+   ],
+   "collisions_per_shell": [
+    20,
+    18,
+    15,
+    7,
+    7,
+    4
+   ],
+   "breaks_per_shell": [
+    7,
+    2,
+    1,
+    1,
+    1,
+    1
+   ],
+   "band": "20-22s"
+  },
+  {
+   "seed": 3654,
+   "flags": [],
+   "escaped": true,
+   "duration": 21.205564342407087,
+   "max_region": 6,
+   "digest": "2cbd8b869452af8dcc2062d497d646170eb879d89c731a25c93c99b2fc4910ea",
+   "collisions": 62,
+   "collision_rate": 2.923760905339917,
+   "grazing": 1,
+   "post_contacts": 6,
+   "near_misses": 13,
+   "near_miss_rate": 0.6130466414422406,
+   "breaks": 9,
+   "first_break": 2.041011280520595,
+   "progression_opening": 5,
+   "progression_break": 1,
+   "exit_opening": 8,
+   "exit_break": 3,
+   "final_method": "opening",
+   "regressions": 5,
+   "max_region_share": 0.2615103973943813,
+   "longest_no_event": 4.368473814969093,
+   "longest_no_progress": 12.038032230777487,
+   "middle_third_stagnation": 2.0460212807643696,
+   "longest_cycle_run": 2,
+   "distinct_panels": 42,
+   "max_penetration": 5.063505170710414e-12,
+   "speed_drift_relative": 0.0,
+   "max_speed_correction": 0.3596168266680851,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "escalation": {
+    "collisions": [
+     21,
+     20,
+     21
+    ],
+    "near_misses": [
+     3,
+     7,
+     3
+    ],
+    "breaks": [
+     3,
+     4,
+     2
+    ],
+    "progress": [
+     3,
+     0,
+     3
+    ]
+   },
+   "dwell": [
+    5.5455,
+    5.4292,
+    4.3313,
+    1.9837,
+    1.8986,
+    1.9447,
+    0.0726
+   ],
+   "near_misses_per_shell": [
+    6,
+    2,
+    1,
+    2,
+    2,
+    0
+   ],
+   "collisions_per_shell": [
+    23,
+    13,
+    8,
+    8,
+    6,
+    4
+   ],
+   "breaks_per_shell": [
+    5,
+    2,
+    0,
+    1,
+    1,
+    0
+   ],
+   "band": "20-22s"
+  },
+  {
+   "seed": 6903,
+   "flags": [],
+   "escaped": true,
+   "duration": 21.390757944698365,
+   "max_region": 6,
+   "digest": "593fcd93a816d3fe144d2634db7e449cbb5257e05a1ec7693318a1628b96f2d1",
+   "collisions": 60,
+   "collision_rate": 2.8049496962715534,
+   "grazing": 0,
+   "post_contacts": 9,
+   "near_misses": 12,
+   "near_miss_rate": 0.5609899392543107,
+   "breaks": 10,
+   "first_break": 4.982249001345494,
+   "progression_opening": 5,
+   "progression_break": 1,
+   "exit_opening": 10,
+   "exit_break": 5,
+   "final_method": "break",
+   "regressions": 9,
+   "max_region_share": 0.22962335721203952,
+   "longest_no_event": 3.043943900546071,
+   "longest_no_progress": 12.183165499152217,
+   "middle_third_stagnation": 0.7668738407789109,
+   "longest_cycle_run": 2,
+   "distinct_panels": 41,
+   "max_penetration": 6.104228233994036e-12,
+   "speed_drift_relative": 2.0898315757650005e-16,
+   "max_speed_correction": 0.35706966600647844,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "escalation": {
+    "collisions": [
+     23,
+     23,
+     14
+    ],
+    "near_misses": [
+     6,
+     0,
+     6
+    ],
+    "breaks": [
+     2,
+     8,
+     0
+    ],
+    "progress": [
+     1,
+     4,
+     1
+    ]
+   },
+   "dwell": [
+    4.5386,
+    3.9829,
+    1.872,
+    4.9118,
+    4.1818,
+    1.8408,
+    0.0628
+   ],
+   "near_misses_per_shell": [
+    1,
+    7,
+    1,
+    3,
+    0,
+    0
+   ],
+   "collisions_per_shell": [
+    18,
+    14,
+    6,
+    14,
+    4,
+    4
+   ],
+   "breaks_per_shell": [
+    3,
+    2,
+    1,
+    2,
+    1,
+    1
+   ],
+   "band": "20-22s"
+  },
+  {
+   "seed": 18645,
+   "flags": [],
+   "escaped": true,
+   "duration": 21.718091119873066,
+   "max_region": 6,
+   "digest": "a11089d17210306f7b543361382489e71a734fd219bd30d58e4789e08ab53004",
+   "collisions": 69,
+   "collision_rate": 3.1770747999515385,
+   "grazing": 0,
+   "post_contacts": 13,
+   "near_misses": 12,
+   "near_miss_rate": 0.5525347478176589,
+   "breaks": 14,
+   "first_break": 7.373542858487489,
+   "progression_opening": 4,
+   "progression_break": 2,
+   "exit_opening": 9,
+   "exit_break": 6,
+   "final_method": "opening",
+   "regressions": 9,
+   "max_region_share": 0.2501783778603362,
+   "longest_no_event": 1.8185200961829509,
+   "longest_no_progress": 6.659002272543131,
+   "middle_third_stagnation": 1.54566541237923,
+   "longest_cycle_run": 2,
+   "distinct_panels": 43,
+   "max_penetration": 4.082845173059013e-12,
+   "speed_drift_relative": 0.0,
+   "max_speed_correction": 0.3890020072884056,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "escalation": {
+    "collisions": [
+     21,
+     31,
+     17
+    ],
+    "near_misses": [
+     5,
+     6,
+     1
+    ],
+    "breaks": [
+     0,
+     10,
+     4
+    ],
+    "progress": [
+     2,
+     1,
+     3
+    ]
+   },
+   "dwell": [
+    4.4612,
+    5.4334,
+    4.7862,
+    3.1608,
+    1.9764,
+    1.7773,
+    0.1228
+   ],
+   "near_misses_per_shell": [
+    4,
+    4,
+    2,
+    1,
+    0,
+    1
+   ],
+   "collisions_per_shell": [
+    21,
+    19,
+    14,
+    8,
+    5,
+    2
+   ],
+   "breaks_per_shell": [
+    2,
+    5,
+    4,
+    3,
+    0,
+    0
+   ],
+   "band": "20-22s"
+  },
+  {
+   "seed": 9589,
+   "flags": [],
+   "escaped": true,
+   "duration": 22.941135274662866,
+   "max_region": 6,
+   "digest": "0978e0644f27a7f8ac0d79708702222e439892d7fa2cf0d507d7dee08f058c5a",
+   "collisions": 66,
+   "collision_rate": 2.8769282430801546,
+   "grazing": 0,
+   "post_contacts": 10,
+   "near_misses": 15,
+   "near_miss_rate": 0.6538473279727625,
+   "breaks": 17,
+   "first_break": 4.839502543173338,
+   "progression_opening": 3,
+   "progression_break": 3,
+   "exit_opening": 9,
+   "exit_break": 5,
+   "final_method": "opening",
+   "regressions": 8,
+   "max_region_share": 0.3625212749975817,
+   "longest_no_event": 2.738845647125071,
+   "longest_no_progress": 8.785640225067654,
+   "middle_third_stagnation": 1.3122486343348294,
+   "longest_cycle_run": 2,
+   "distinct_panels": 41,
+   "max_penetration": 1.6896484211770257e-12,
+   "speed_drift_relative": 0.0,
+   "max_speed_correction": 0.3077315901644956,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "escalation": {
+    "collisions": [
+     19,
+     25,
+     22
+    ],
+    "near_misses": [
+     3,
+     8,
+     4
+    ],
+    "breaks": [
+     5,
+     7,
+     5
+    ],
+    "progress": [
+     1,
+     3,
+     2
+    ]
+   },
+   "dwell": [
+    8.3166,
+    2.2076,
+    2.6449,
+    1.8976,
+    5.1106,
+    2.6721,
+    0.0918
+   ],
+   "near_misses_per_shell": [
+    6,
+    1,
+    2,
+    1,
+    3,
+    2
+   ],
+   "collisions_per_shell": [
+    20,
+    12,
+    8,
+    10,
+    11,
+    5
+   ],
+   "breaks_per_shell": [
+    5,
+    3,
+    3,
+    3,
+    2,
+    1
+   ],
+   "band": "22-24s"
+  },
+  {
+   "seed": 16513,
+   "flags": [],
+   "escaped": true,
+   "duration": 23.800367438916666,
+   "max_region": 6,
+   "digest": "d1173bb5a3bc5c6836970352f0058658eb8123cd9b67ae7a0a03578ecfca9903",
+   "collisions": 58,
+   "collision_rate": 2.4369371669935873,
+   "grazing": 0,
+   "post_contacts": 12,
+   "near_misses": 14,
+   "near_miss_rate": 0.58822621272259,
+   "breaks": 14,
+   "first_break": 3.186205702178804,
+   "progression_opening": 4,
+   "progression_break": 2,
+   "exit_opening": 10,
+   "exit_break": 6,
+   "final_method": "opening",
+   "regressions": 10,
+   "max_region_share": 0.38406168633515736,
+   "longest_no_event": 2.48516849842067,
+   "longest_no_progress": 13.437042385220725,
+   "middle_third_stagnation": 1.283898448444539,
+   "longest_cycle_run": 3,
+   "distinct_panels": 40,
+   "max_penetration": 8.720024702313367e-12,
+   "speed_drift_relative": 2.0898315757650005e-16,
+   "max_speed_correction": 0.402998234966239,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "escalation": {
+    "collisions": [
+     16,
+     23,
+     19
+    ],
+    "near_misses": [
+     7,
+     3,
+     4
+    ],
+    "breaks": [
+     3,
+     9,
+     2
+    ],
+    "progress": [
+     4,
+     0,
+     2
+    ]
+   },
+   "dwell": [
+    9.1408,
+    2.8101,
+    2.5916,
+    4.0251,
+    1.9546,
+    3.0286,
+    0.2496
+   ],
+   "near_misses_per_shell": [
+    6,
+    0,
+    2,
+    3,
+    1,
+    2
+   ],
+   "collisions_per_shell": [
+    16,
+    11,
+    11,
+    10,
+    5,
+    5
+   ],
+   "breaks_per_shell": [
+    6,
+    2,
+    3,
+    1,
+    2,
+    0
+   ],
+   "band": "22-24s"
+  },
+  {
+   "seed": 8952,
+   "flags": [],
+   "escaped": true,
+   "duration": 23.833522932744586,
+   "max_region": 6,
+   "digest": "74779d1c9d5dcc03aadf1e109960ac082a165ae1a54b0985b28051543ef3dcad",
+   "collisions": 66,
+   "collision_rate": 2.7692087395658747,
+   "grazing": 0,
+   "post_contacts": 10,
+   "near_misses": 13,
+   "near_miss_rate": 0.5454502062781268,
+   "breaks": 11,
+   "first_break": 1.2302037463633018,
+   "progression_opening": 5,
+   "progression_break": 1,
+   "exit_opening": 6,
+   "exit_break": 5,
+   "final_method": "break",
+   "regressions": 5,
+   "max_region_share": 0.293187743571983,
+   "longest_no_event": 1.838882118848538,
+   "longest_no_progress": 10.164217300310659,
+   "middle_third_stagnation": 1.549903408654897,
+   "longest_cycle_run": 3,
+   "distinct_panels": 40,
+   "max_penetration": 9.530265465684806e-12,
+   "speed_drift_relative": 2.089831575765001e-16,
+   "max_speed_correction": 0.3232670734602104,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "escalation": {
+    "collisions": [
+     18,
+     21,
+     27
+    ],
+    "near_misses": [
+     7,
+     3,
+     3
+    ],
+    "breaks": [
+     2,
+     3,
+     6
+    ],
+    "progress": [
+     2,
+     0,
+     4
+    ]
+   },
+   "dwell": [
+    6.9877,
+    4.698,
+    4.4312,
+    2.3109,
+    2.9833,
+    2.3628,
+    0.0597
+   ],
+   "near_misses_per_shell": [
+    6,
+    2,
+    2,
+    2,
+    1,
+    0
+   ],
+   "collisions_per_shell": [
+    14,
+    17,
+    12,
+    7,
+    10,
+    6
+   ],
+   "breaks_per_shell": [
+    3,
+    2,
+    0,
+    1,
+    2,
+    3
+   ],
+   "band": "22-24s"
+  },
+  {
+   "seed": 11929,
+   "flags": [],
+   "escaped": true,
+   "duration": 22.11471189799638,
+   "max_region": 6,
+   "digest": "4c0434a8d497fea64c6e6e27089b97ae971f567569ba339effbf67b3330f3b0b",
+   "collisions": 76,
+   "collision_rate": 3.4366262762340436,
+   "grazing": 0,
+   "post_contacts": 15,
+   "near_misses": 12,
+   "near_miss_rate": 0.5426252015106385,
+   "breaks": 14,
+   "first_break": 2.1398166758131865,
+   "progression_opening": 2,
+   "progression_break": 4,
+   "exit_opening": 7,
+   "exit_break": 4,
+   "final_method": "break",
+   "regressions": 5,
+   "max_region_share": 0.2638249605729601,
+   "longest_no_event": 2.795765273732947,
+   "longest_no_progress": 9.28811848838396,
+   "middle_third_stagnation": 1.658550710787683,
+   "longest_cycle_run": 3,
+   "distinct_panels": 50,
+   "max_penetration": 8.734346579331032e-12,
+   "speed_drift_relative": 0.0,
+   "max_speed_correction": 0.32603364714815747,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "escalation": {
+    "collisions": [
+     29,
+     22,
+     25
+    ],
+    "near_misses": [
+     5,
+     3,
+     4
+    ],
+    "breaks": [
+     8,
+     2,
+     4
+    ],
+    "progress": [
+     3,
+     2,
+     1
+    ]
+   },
+   "dwell": [
+    2.715,
+    2.1395,
+    5.8344,
+    4.4957,
+    2.3268,
+    4.5518,
+    0.0515
+   ],
+   "near_misses_per_shell": [
+    4,
+    1,
+    2,
+    2,
+    0,
+    3
+   ],
+   "collisions_per_shell": [
+    12,
+    14,
+    19,
+    10,
+    11,
+    10
+   ],
+   "breaks_per_shell": [
+    2,
+    4,
+    4,
+    2,
+    1,
+    1
+   ],
+   "band": "22-24s"
+  },
+  {
+   "seed": 7699,
+   "flags": [],
+   "escaped": true,
+   "duration": 25.472873400322023,
+   "max_region": 6,
+   "digest": "42361f2a8f7a7a47cc6138dde47ce9d29938a18a8a1244d03f4d36f1c405f0b6",
+   "collisions": 82,
+   "collision_rate": 3.2191107265882057,
+   "grazing": 0,
+   "post_contacts": 10,
+   "near_misses": 14,
+   "near_miss_rate": 0.5496042703931082,
+   "breaks": 18,
+   "first_break": 4.226376338373338,
+   "progression_opening": 4,
+   "progression_break": 2,
+   "exit_opening": 13,
+   "exit_break": 6,
+   "final_method": "opening",
+   "regressions": 13,
+   "max_region_share": 0.30048933308119286,
+   "longest_no_event": 1.7353669426219813,
+   "longest_no_progress": 10.770154997868445,
+   "middle_third_stagnation": 1.7353669426219813,
+   "longest_cycle_run": 2,
+   "distinct_panels": 48,
+   "max_penetration": 7.95796761821066e-12,
+   "speed_drift_relative": 0.0,
+   "max_speed_correction": 0.3656995314302635,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "escalation": {
+    "collisions": [
+     34,
+     30,
+     18
+    ],
+    "near_misses": [
+     7,
+     3,
+     4
+    ],
+    "breaks": [
+     7,
+     7,
+     4
+    ],
+    "progress": [
+     2,
+     3,
+     1
+    ]
+   },
+   "dwell": [
+    2.9915,
+    7.6543,
+    4.1886,
+    4.2775,
+    3.5445,
+    2.6726,
+    0.1439
+   ],
+   "near_misses_per_shell": [
+    3,
+    5,
+    0,
+    4,
+    0,
+    2
+   ],
+   "collisions_per_shell": [
+    26,
+    15,
+    13,
+    12,
+    9,
+    7
+   ],
+   "breaks_per_shell": [
+    4,
+    6,
+    2,
+    3,
+    2,
+    1
+   ],
+   "band": "24-26s"
+  },
+  {
+   "seed": 13761,
+   "flags": [],
+   "escaped": true,
+   "duration": 24.596057300897122,
+   "max_region": 6,
+   "digest": "c269aba18952becaa2d50cc0e4fa918d8b58d55e6d01c5ab80f083e5b65ecdfd",
+   "collisions": 75,
+   "collision_rate": 3.0492692012578955,
+   "grazing": 0,
+   "post_contacts": 12,
+   "near_misses": 14,
+   "near_miss_rate": 0.5691969175681405,
+   "breaks": 8,
+   "first_break": 1.6648221372786474,
+   "progression_opening": 5,
+   "progression_break": 1,
+   "exit_opening": 8,
+   "exit_break": 2,
+   "final_method": "opening",
+   "regressions": 4,
+   "max_region_share": 0.26842065045593205,
+   "longest_no_event": 3.102713263778157,
+   "longest_no_progress": 11.132358666624832,
+   "middle_third_stagnation": 2.8827030764086423,
+   "longest_cycle_run": 2,
+   "distinct_panels": 50,
+   "max_penetration": 4.5994319464170985e-12,
+   "speed_drift_relative": 0.0,
+   "max_speed_correction": 0.3769674380559997,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "escalation": {
+    "collisions": [
+     26,
+     23,
+     26
+    ],
+    "near_misses": [
+     6,
+     4,
+     4
+    ],
+    "breaks": [
+     4,
+     2,
+     2
+    ],
+    "progress": [
+     2,
+     1,
+     3
+    ]
+   },
+   "dwell": [
+    3.2829,
+    4.8596,
+    6.6021,
+    4.862,
+    2.8566,
+    2.0697,
+    0.0632
+   ],
+   "near_misses_per_shell": [
+    5,
+    1,
+    3,
+    4,
+    1,
+    0
+   ],
+   "collisions_per_shell": [
+    18,
+    14,
+    15,
+    13,
+    10,
+    5
+   ],
+   "breaks_per_shell": [
+    2,
+    3,
+    1,
+    1,
+    1,
+    0
+   ],
+   "band": "24-26s"
+  },
+  {
+   "seed": 18920,
+   "flags": [],
+   "escaped": true,
+   "duration": 25.16134929079663,
+   "max_region": 6,
+   "digest": "ab880e692000c218bf76e3764c411d4b7d61cd658a3c52d42acc88cfb9f9b2a7",
+   "collisions": 65,
+   "collision_rate": 2.583327279025347,
+   "grazing": 0,
+   "post_contacts": 10,
+   "near_misses": 13,
+   "near_miss_rate": 0.5166654558050694,
+   "breaks": 12,
+   "first_break": 1.6635751049039467,
+   "progression_opening": 5,
+   "progression_break": 1,
+   "exit_opening": 10,
+   "exit_break": 7,
+   "final_method": "opening",
+   "regressions": 11,
+   "max_region_share": 0.28392513854048546,
+   "longest_no_event": 2.3413061126001296,
+   "longest_no_progress": 9.645295936278064,
+   "middle_third_stagnation": 1.6702813877452751,
+   "longest_cycle_run": 2,
+   "distinct_panels": 46,
+   "max_penetration": 7.025158232920603e-12,
+   "speed_drift_relative": 0.0,
+   "max_speed_correction": 0.32290010931160906,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "escalation": {
+    "collisions": [
+     21,
+     26,
+     18
+    ],
+    "near_misses": [
+     5,
+     5,
+     3
+    ],
+    "breaks": [
+     2,
+     6,
+     4
+    ],
+    "progress": [
+     3,
+     1,
+     2
+    ]
+   },
+   "dwell": [
+    3.6875,
+    3.9284,
+    3.1533,
+    7.1439,
+    2.4777,
+    4.7216,
+    0.049
+   ],
+   "near_misses_per_shell": [
+    2,
+    3,
+    1,
+    4,
+    0,
+    3
+   ],
+   "collisions_per_shell": [
+    12,
+    14,
+    12,
+    12,
+    9,
+    6
+   ],
+   "breaks_per_shell": [
+    2,
+    1,
+    3,
+    3,
+    3,
+    0
+   ],
+   "band": "24-26s"
+  },
+  {
+   "seed": 15804,
+   "flags": [],
+   "escaped": true,
+   "duration": 24.244501448793155,
+   "max_region": 6,
+   "digest": "fca7c7a5115f201a7bc173e8cb2afae96fe9153f9f4f6548666c87983f9fb138",
+   "collisions": 72,
+   "collision_rate": 2.96974553805824,
+   "grazing": 0,
+   "post_contacts": 15,
+   "near_misses": 13,
+   "near_miss_rate": 0.5362040554827378,
+   "breaks": 13,
+   "first_break": 5.610561028389446,
+   "progression_opening": 5,
+   "progression_break": 1,
+   "exit_opening": 9,
+   "exit_break": 4,
+   "final_method": "opening",
+   "regressions": 7,
+   "max_region_share": 0.262406163153626,
+   "longest_no_event": 2.2612934536514437,
+   "longest_no_progress": 7.891683904315685,
+   "middle_third_stagnation": 1.2164681752242839,
+   "longest_cycle_run": 2,
+   "distinct_panels": 47,
+   "max_penetration": 4.215183757594332e-12,
+   "speed_drift_relative": 0.0,
+   "max_speed_correction": 0.41933735964846575,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "escalation": {
+    "collisions": [
+     24,
+     23,
+     25
+    ],
+    "near_misses": [
+     7,
+     4,
+     2
+    ],
+    "breaks": [
+     4,
+     4,
+     5
+    ],
+    "progress": [
+     1,
+     3,
+     2
+    ]
+   },
+   "dwell": [
+    5.4179,
+    6.3619,
+    2.9572,
+    4.7027,
+    2.3977,
+    2.2802,
+    0.127
+   ],
+   "near_misses_per_shell": [
+    5,
+    3,
+    3,
+    1,
+    0,
+    1
+   ],
+   "collisions_per_shell": [
+    20,
+    18,
+    12,
+    13,
+    7,
+    2
+   ],
+   "breaks_per_shell": [
+    3,
+    4,
+    2,
+    2,
+    2,
+    0
+   ],
+   "band": "24-26s"
+  },
+  {
+   "seed": 1511,
+   "flags": [],
+   "escaped": true,
+   "duration": 18.712112492068414,
+   "max_region": 6,
+   "digest": "641d48c58af40c6767609d346b0a2ce9ffc9dc47006ccf5d0d1b22c9c9a6457d",
+   "collisions": 58,
+   "collision_rate": 3.0995965861462578,
+   "grazing": 0,
+   "post_contacts": 7,
+   "near_misses": 11,
+   "near_miss_rate": 0.587854524958773,
+   "breaks": 9,
+   "first_break": 1.2393554624507195,
+   "progression_opening": 3,
+   "progression_break": 3,
+   "exit_opening": 4,
+   "exit_break": 4,
+   "final_method": "break",
+   "regressions": 2,
+   "max_region_share": 0.3699068815251697,
+   "longest_no_event": 3.280447935764826,
+   "longest_no_progress": 6.313520203409924,
+   "middle_third_stagnation": 0.9614670129494609,
+   "longest_cycle_run": 3,
+   "distinct_panels": 41,
+   "max_penetration": 7.46591677369679e-12,
+   "speed_drift_relative": 0.0,
+   "max_speed_correction": 0.3072671312142996,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "escalation": {
+    "collisions": [
+     17,
+     19,
+     22
+    ],
+    "near_misses": [
+     3,
+     7,
+     1
+    ],
+    "breaks": [
+     2,
+     4,
+     3
+    ],
+    "progress": [
+     2,
+     1,
+     3
+    ]
+   },
+   "dwell": [
+    2.2882,
+    6.9217,
+    2.7185,
+    1.5839,
+    3.4909,
+    1.6568,
+    0.0521
+   ],
+   "near_misses_per_shell": [
+    0,
+    10,
+    0,
+    0,
+    1,
+    0
+   ],
+   "collisions_per_shell": [
+    11,
+    19,
+    8,
+    7,
+    9,
+    4
+   ],
+   "breaks_per_shell": [
+    2,
+    4,
+    0,
+    1,
+    1,
+    1
+   ],
+   "band": "18-20s"
+  },
+  {
+   "seed": 11141,
+   "flags": [],
+   "escaped": true,
+   "duration": 19.233983531565993,
+   "max_region": 6,
+   "digest": "34120d169540a773a159495967e5a4e405bfecf9c1e4750937c2036b1fe80207",
+   "collisions": 58,
+   "collision_rate": 3.015495979021344,
+   "grazing": 0,
+   "post_contacts": 6,
+   "near_misses": 9,
+   "near_miss_rate": 0.4679217898481396,
+   "breaks": 9,
+   "first_break": 2.8090432442043225,
+   "progression_opening": 3,
+   "progression_break": 3,
+   "exit_opening": 4,
+   "exit_break": 3,
+   "final_method": "break",
+   "regressions": 1,
+   "max_region_share": 0.30711428646233974,
+   "longest_no_event": 3.202044127865916,
+   "longest_no_progress": 5.907031128125284,
+   "middle_third_stagnation": 3.0762033188456837,
+   "longest_cycle_run": 3,
+   "distinct_panels": 39,
+   "max_penetration": 4.6954662380471746e-12,
+   "speed_drift_relative": 2.0898315757650005e-16,
+   "max_speed_correction": 0.23556063086091097,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "escalation": {
+    "collisions": [
+     14,
+     22,
+     22
+    ],
+    "near_misses": [
+     3,
+     2,
+     4
+    ],
+    "breaks": [
+     3,
+     4,
+     2
+    ],
+    "progress": [
+     1,
+     2,
+     3
+    ]
+   },
+   "dwell": [
+    5.907,
+    1.768,
+    3.4941,
+    2.7834,
+    1.6277,
+    3.6061,
+    0.0475
+   ],
+   "near_misses_per_shell": [
+    3,
+    1,
+    0,
+    2,
+    1,
+    2
+   ],
+   "collisions_per_shell": [
+    16,
+    10,
+    7,
+    7,
+    11,
+    7
+   ],
+   "breaks_per_shell": [
+    4,
+    2,
+    1,
+    0,
+    1,
+    1
+   ],
+   "band": "18-20s"
+  },
+  {
+   "seed": 2023,
+   "flags": [],
+   "escaped": true,
+   "duration": 18.986559430057273,
+   "max_region": 6,
+   "digest": "cbec4ecf046d9b638ef4162a3d05e44ee21e770955ffd43c6509f5ebef553783",
+   "collisions": 53,
+   "collision_rate": 2.7914483503576046,
+   "grazing": 0,
+   "post_contacts": 13,
+   "near_misses": 9,
+   "near_miss_rate": 0.4740195311928008,
+   "breaks": 8,
+   "first_break": 1.7471768581792124,
+   "progression_opening": 4,
+   "progression_break": 2,
+   "exit_opening": 7,
+   "exit_break": 3,
+   "final_method": "opening",
+   "regressions": 4,
+   "max_region_share": 0.35183138977229367,
+   "longest_no_event": 2.14934209099823,
+   "longest_no_progress": 7.681820043882279,
+   "middle_third_stagnation": 1.7667345951836193,
+   "longest_cycle_run": 2,
+   "distinct_panels": 37,
+   "max_penetration": 9.472422846101836e-12,
+   "speed_drift_relative": 0.0,
+   "max_speed_correction": 0.3586216674980347,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "escalation": {
+    "collisions": [
+     20,
+     21,
+     12
+    ],
+    "near_misses": [
+     4,
+     3,
+     2
+    ],
+    "breaks": [
+     4,
+     4,
+     0
+    ],
+    "progress": [
+     2,
+     2,
+     2
+    ]
+   },
+   "dwell": [
+    3.9996,
+    2.0344,
+    6.6801,
+    1.682,
+    1.9603,
+    2.5402,
+    0.0901
+   ],
+   "near_misses_per_shell": [
+    2,
+    2,
+    4,
+    0,
+    0,
+    1
+   ],
+   "collisions_per_shell": [
+    14,
+    14,
+    15,
+    2,
+    5,
+    3
+   ],
+   "breaks_per_shell": [
+    2,
+    4,
+    2,
+    0,
+    0,
+    0
+   ],
+   "band": "18-20s"
+  },
+  {
+   "seed": 19607,
+   "flags": [],
+   "escaped": true,
+   "duration": 18.683083528536642,
+   "max_region": 6,
+   "digest": "9002c702b82fb3f91e24742bab60f67e3711f856b88e306fffe72bbdeb55077c",
+   "collisions": 52,
+   "collision_rate": 2.7832664731480175,
+   "grazing": 0,
+   "post_contacts": 8,
+   "near_misses": 9,
+   "near_miss_rate": 0.48171919727561846,
+   "breaks": 8,
+   "first_break": 4.557740925215745,
+   "progression_opening": 5,
+   "progression_break": 1,
+   "exit_opening": 8,
+   "exit_break": 1,
+   "final_method": "break",
+   "regressions": 3,
+   "max_region_share": 0.3433497744292113,
+   "longest_no_event": 3.121611098691555,
+   "longest_no_progress": 7.182293203708064,
+   "middle_third_stagnation": 2.2183971553931885,
+   "longest_cycle_run": 3,
+   "distinct_panels": 36,
+   "max_penetration": 7.143952096555495e-12,
+   "speed_drift_relative": 0.0,
+   "max_speed_correction": 0.35044181864315005,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "escalation": {
+    "collisions": [
+     16,
+     18,
+     18
+    ],
+    "near_misses": [
+     4,
+     3,
+     2
+    ],
+    "breaks": [
+     2,
+     2,
+     4
+    ],
+    "progress": [
+     2,
+     1,
+     3
+    ]
+   },
+   "dwell": [
+    1.7553,
+    6.4148,
+    3.0327,
+    2.285,
+    3.4221,
+    1.7257,
+    0.0475
+   ],
+   "near_misses_per_shell": [
+    1,
+    3,
+    3,
+    0,
+    2,
+    0
+   ],
+   "collisions_per_shell": [
+    4,
+    16,
+    11,
+    9,
+    8,
+    4
+   ],
+   "breaks_per_shell": [
+    0,
+    1,
+    2,
+    2,
+    2,
+    1
+   ],
+   "band": "18-20s"
+  }
+ ]
+}

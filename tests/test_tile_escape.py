@@ -496,11 +496,17 @@ def test_category_three_imports_no_other_category_and_no_company_os() -> None:
     # a mono cue is an `array("d")`, the limiter's sliding minimum is a
     # `deque`, and every loudness measurement is numpy, which is already a
     # declared dependency of this repository.
+    #
+    # `concurrent` and `statistics` arrived with Test #2, the shell escape:
+    # its Phase 1 answer is a question about a population of ten thousand
+    # seeds, so it needs a process pool to produce one and quantiles to report
+    # it. Both are stdlib, so both are the kind of growth this list is for.
     allowed = {
         "__future__",
         "argparse",
         "array",
         "collections",
+        "concurrent",
         "dataclasses",
         "glob",
         "hashlib",
@@ -511,6 +517,7 @@ def test_category_three_imports_no_other_category_and_no_company_os() -> None:
         "PIL",
         "random",
         "shutil",
+        "statistics",
         "struct",
         "subprocess",
         "sys",

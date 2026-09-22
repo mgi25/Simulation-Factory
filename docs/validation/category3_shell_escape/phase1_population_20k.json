@@ -1,0 +1,269 @@
+{
+ "seeds": 20000,
+ "seconds": 59.577888800005894,
+ "seeds_per_second": 335.6950103944942,
+ "config": {
+  "shell_count": 6,
+  "inner_radius": 5.0,
+  "shell_spacing": 3.6,
+  "panel_counts": [
+   16,
+   17,
+   18,
+   19,
+   20,
+   21
+  ],
+  "openings_per_shell": [
+   2,
+   3,
+   3,
+   4,
+   4,
+   5
+  ],
+  "opening_slots": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "panel_thickness": 0.3,
+  "omega_base": 0.62,
+  "omega_falloff": 1.0,
+  "omega_jitter": 0.22,
+  "alternate_direction": true,
+  "ball_radius": 0.4,
+  "speed": 17.0,
+  "restitution": 1.0,
+  "panel_momentum_transfer": 1.0,
+  "constant_speed": true,
+  "damage_reference_speed": 17.0,
+  "damage_exponent": 1.5,
+  "break_threshold": 1.6,
+  "breakable": true,
+  "horizon": 26.0,
+  "max_collisions": 20000,
+  "near_miss_arc_ball_radii": 2.5,
+  "near_miss_seconds": 0.15,
+  "graze_fraction": 0.06,
+  "skin": 1e-07,
+  "clearance_tolerance": 1e-11,
+  "min_dt": 1e-09,
+  "max_newton_iterations": 2000
+ },
+ "config_digest": "7da0cbc80d5958260b65417c1ac94fac2285471aaf8adc4f093b27e3445afb3e",
+ "summary": {
+  "seeds": 20000,
+  "outcome": {
+   "escaped": 7813,
+   "escape_rate": 0.39065,
+   "timeout_rate": 0.6093500000000001,
+   "usable": 2091,
+   "usable_rate": 0.10455,
+   "in_acceptable_band": 3807,
+   "in_preferred_band": 1895,
+   "acceptable_share_of_escapes": 0.48726481505183666
+  },
+  "duration": {
+   "quantiles": {
+    "p5": 7.902122654864267,
+    "p25": 13.356975780744847,
+    "p50": 17.78317201904945,
+    "p75": 21.769848407236825,
+    "p95": 25.139643666593805
+   },
+   "mean": 17.333983219665893,
+   "histogram": {
+    "<10": 825,
+    "10-12": 605,
+    "12-14": 799,
+    "14-16": 865,
+    "16-18": 912,
+    "18-20": 992,
+    "20-22": 977,
+    "22-24": 918,
+    "24-26": 920,
+    ">=26": 0
+   }
+  },
+  "max_region": {
+   "<1": 0,
+   "1-2": 29,
+   "2-3": 1751,
+   "3-4": 3410,
+   "4-5": 3866,
+   "5-6": 3092,
+   ">=6": 7852
+  },
+  "collisions": {
+   "quantiles": {
+    "p5": 30.0,
+    "p50": 63.0,
+    "p95": 79.0
+   },
+   "rate_quantiles": {
+    "p5": 2.1153846153846154,
+    "p50": 2.688024645037785,
+    "p95": 3.292195311413896
+   }
+  },
+  "near_misses": {
+   "quantiles": {
+    "p5": 3.0,
+    "p25": 8.0,
+    "p50": 11.0,
+    "p75": 14.0,
+    "p95": 19.0
+   },
+   "histogram": {
+    "<2": 289,
+    "2-4": 883,
+    "4-6": 1523,
+    "6-9": 3385,
+    "9-12": 4671,
+    "12-16": 5628,
+    "16-22": 3298,
+    ">=22": 323
+   },
+   "zero_runs": 76
+  },
+  "breaks": {
+   "quantiles": {
+    "p5": 4.0,
+    "p50": 14.0,
+    "p95": 21.0
+   },
+   "histogram": {
+    "<1": 96,
+    "1-3": 381,
+    "3-6": 1322,
+    "6-10": 2826,
+    "10-16": 6921,
+    "16-24": 8223,
+    ">=24": 231
+   },
+   "zero_runs": 96
+  },
+  "routes": {
+   "progression_opening": 68738,
+   "progression_break": 23059,
+   "progression_opening_share": 0.748804427159929,
+   "escaped_using_a_break": 6091,
+   "escaped_using_an_opening": 7813,
+   "escaped_using_both": 6091
+  },
+  "dwell": {
+   "max_region_share": {
+    "p50": 0.41684864163731267,
+    "p75": 0.5041071273082337,
+    "p95": 0.636429704013193
+   },
+   "regressions": {
+    "p5": 1.0,
+    "p50": 9.0,
+    "p95": 17.0
+   }
+  },
+  "stagnation": {
+   "longest_no_event": {
+    "p50": 2.5553852755647384,
+    "p75": 3.287941346309408,
+    "p95": 4.4349113580551744,
+    "p99": 5.638078409137807
+   },
+   "longest_no_progress": {
+    "p50": 10.678774959243938,
+    "p75": 13.906796362433894,
+    "p95": 19.216966484258283
+   },
+   "middle_third": {
+    "p50": 1.502348385088867,
+    "p95": 3.2307157379940676
+   }
+  },
+  "repetition": {
+   "longest_cycle_run": {
+    "p50": 2.0,
+    "p95": 3.0,
+    "p99": 5.0
+   },
+   "pathological": 1,
+   "distinct_panels": {
+    "p5": 22.0,
+    "p50": 36.0
+   }
+  },
+  "escalation": {
+   "collisions_by_third": [
+    20.3421,
+    20.7354,
+    19.0212
+   ],
+   "near_misses_by_third": [
+    4.1196,
+    3.96915,
+    2.9888
+   ],
+   "breaks_by_third": [
+    3.8484,
+    5.1072,
+    4.7143
+   ],
+   "progress_by_third": [
+    1.53755,
+    1.36005,
+    1.69225
+   ]
+  },
+  "flags": {
+   "instrument_fault": 0,
+   "failed": 12187,
+   "instant_escape": 2678,
+   "photo_finish": 226,
+   "one_shell_hog": 11143,
+   "too_few_near_misses": 2695,
+   "dead_stretch": 135,
+   "dead_middle": 102,
+   "frantic": 0,
+   "sparse": 0,
+   "repetitive_orbit": 1,
+   "few_distinct_panels": 78,
+   "no_breaks": 96,
+   "no_opening_progress": 344
+  },
+  "instruments": {
+   "runs_with_penetration": 0,
+   "runs_with_anomalies": 0,
+   "runs_with_solver_failures": 0,
+   "worst_penetration": 9.999889805101247e-12,
+   "worst_speed_drift": 4.179663151530002e-16,
+   "speed_correction": {
+    "p50": 0.31527201290359297,
+    "p95": 0.40709394769986623,
+    "p100": 0.44286881911727605
+   }
+  },
+  "thresholds": {
+   "preferred_low": 20.0,
+   "preferred_high": 24.0,
+   "acceptable_low": 18.0,
+   "acceptable_high": 26.0,
+   "min_escape_seconds": 15.0,
+   "photo_finish_seconds": 0.5,
+   "max_region_share": 0.4,
+   "min_near_misses": 6,
+   "max_stagnation_seconds": 6.0,
+   "max_middle_stagnation_seconds": 5.0,
+   "max_collision_rate": 8.0,
+   "min_collision_rate": 1.2,
+   "max_cycle_run": 10,
+   "max_cycle_period": 6,
+   "min_distinct_panels": 12,
+   "min_breaks": 1,
+   "min_progression_openings": 1
+  }
+ }
+}
