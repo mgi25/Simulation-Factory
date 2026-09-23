@@ -735,10 +735,21 @@ def assess_request(
     # may widen. Five sources, each one already a statement the company made:
     #
     #   the owning capsules' declared `may_read`  - what this subsystem reads
+    #   the owning capsules' `owns_paths`         - and the subsystem itself
     #   the authorized paths                      - you must read what you write
     #   the declared tests                        - and the test you must pass
     #   the narrowed context refs that name files - what the packet will carry
     #   the evidence refs                         - what the criteria point at
+    #
+    # `owns_paths` is in that list because the store is split on whether owning
+    # implies reading: eleven of the twenty-one capsules restate their owned
+    # paths inside `may_read` and ten do not, which means reading `may_read`
+    # alone starves exactly the ten whose authors thought it went without
+    # saying. It also matters when a CEO ceiling narrows the writable set - the
+    # ceiling is there to narrow what may be *changed*, and a developer sent to
+    # edit one file inside a subsystem still has to be able to read the
+    # subsystem. So the grant follows `owns`, before the ceiling, while the
+    # writable set follows `authorized`, after it.
     #
     # `collapse_read_rules` then drops every rule another rule already covers.
     # That is not a narrowing - coverage is identical - it is what keeps the
@@ -750,6 +761,7 @@ def assess_request(
             for capsule in capsules
             for path in capsule.may_read
         }
+        | set(owns)
         | set(authorized)
         | {normalise_path(path, "capsule.tests") for path in tests}
         | {

@@ -40,8 +40,13 @@ from pathlib import Path
 import pytest
 
 from ai_platform.context_manifest import ContextKind, ContextRef
-from company.engineering.intake import CEORequest, IntakeOutcome, assess_request
-from company.engineering.errors import AuthorityEscalation
+from company.engineering.intake import (
+    CEORequest,
+    IntakeOutcome,
+    _strip_glob,
+    assess_request,
+)
+from company.engineering.errors import AuthorityEscalation, EngineeringError
 from company.engineering.work_order import (
     EngineeringWorkOrder,
     _read_covers,
@@ -214,12 +219,6 @@ def test_the_authority_snapshot_records_the_read_scope(config, engineering):
 # --- 2. what the read ceiling is made of ------------------------------------
 
 
-def _strip_glob(rule: str) -> str:
-    while rule.endswith(("/**", "/*")):
-        rule = rule.rsplit("/", 1)[0]
-    return rule
-
-
 def test_the_capsules_declared_read_scope_reaches_the_ceiling(seeds, engineering):
     """Retrieval, not invention: the company already wrote down what it reads."""
     order = engineering.work_order
@@ -277,6 +276,64 @@ def test_a_capsule_pointer_is_not_treated_as_a_path(engineering):
     order = engineering.work_order
     assert any(ref.ref.startswith("capsule:") for ref in order.context_refs)
     assert not any(rule.startswith("capsule:") for rule in order.authorized_read_paths)
+
+
+def test_a_ceo_ceiling_narrows_writing_without_blinding_the_developer(config, seeds):
+    """The ceiling is there to narrow what may be *changed*.
+
+    A work order ceilinged to one file inside a subsystem still has to let its
+    developer read the subsystem, or the work cannot be done. So the read grant
+    follows the capsule's `owns_paths`, before the ceiling, while the writable
+    set follows `authorized_paths`, after it.
+    """
+    assessment = derive(
+        config, seeds, ENGINEERING_OBJECTIVE,
+        capsule_hints=("company-engineering-execution",),
+        scope_ceiling=("tests/test_company_read_authority.py",),
+    )
+    order = assessment.work_order
+    assert order.authorized_paths == ("tests/test_company_read_authority.py",)
+    assert "company/engineering" in order.authorized_read_paths
+    assert any(
+        _read_covers(rule, "company/engineering/intake.py")
+        for rule in order.authorized_read_paths
+    )
+
+
+def test_no_representative_work_order_is_starved_of_its_own_subsystem(config, seeds):
+    """Replayed against every capsule that owns a module, not just the easy ones.
+
+    The store is split on whether owning implies reading - eleven capsules
+    restate their owned paths inside `may_read` and ten do not - so a ceiling
+    built from `may_read` alone starves exactly the ten whose authors thought
+    it went without saying.
+    """
+    starved = []
+    for capsule in seeds.all():
+        if not capsule.owns_paths or not capsule.tests:
+            continue
+        try:
+            assessment = derive(
+                config, seeds,
+                "Correct the bounded defect the acceptance criteria name in "
+                "this subsystem.",
+                capsule_hints=(capsule.id,),
+            )
+        except EngineeringError:
+            # A capsule owning a tree that contains a protected file cannot be
+            # given a work order at all, which is a pre-existing refusal and
+            # not a read-authority question.
+            continue
+        if assessment.outcome is not IntakeOutcome.AUTHORIZED:
+            continue
+        order = assessment.work_order
+        for owned in capsule.owns_paths:
+            path = _strip_glob(owned)
+            if not any(
+                _read_covers(rule, path) for rule in order.authorized_read_paths
+            ):
+                starved.append((capsule.id, path))
+    assert starved == []
 
 
 # --- 3. developer and reviewer ----------------------------------------------
@@ -345,6 +402,33 @@ def test_a_work_order_with_no_declared_read_scope_grants_none(config):
     )
     assert not decision.approved_refs
     assert "may_read is empty" in decision.rejected_refs[0].reason
+
+
+def test_a_derived_work_order_can_never_have_an_empty_ceiling(config, seeds):
+    """Which is what makes the empty case unambiguously "legacy record".
+
+    `authorized_paths` is refused when empty and is always unioned into the
+    ceiling, so every work order intake produces has a non-empty read scope.
+    The runner skips its context cross-check when the ceiling is empty, and
+    that branch is only reachable for a record stored before the field
+    existed - for which there is nothing to cross-check against.
+    """
+    for objective, hints in (
+        (ENGINEERING_OBJECTIVE, ("company-engineering-execution",)),
+        (EVIDENCE_OBJECTIVE, ()),
+        ("Update the analytics observation records the capsule declares.", ()),
+        ("Correct the workforce employment contract the registry emits.", ()),
+    ):
+        assessment = derive(config, seeds, objective, capsule_hints=hints)
+        if assessment.outcome is not IntakeOutcome.AUTHORIZED:
+            continue
+        order = assessment.work_order
+        assert order.authorized_read_paths, order.work_order_id
+        assert set(order.authorized_paths) <= {
+            path
+            for path in order.authorized_paths
+            if any(_read_covers(rule, path) for rule in order.authorized_read_paths)
+        }
 
 
 def test_a_stored_work_order_without_the_field_decodes_to_no_read_scope(
@@ -528,9 +612,11 @@ def test_every_capsule_read_scope_stays_inside_the_control_plane(seeds):
     """
     reaching = {}
     for capsule in seeds.all():
-        rules = collapse_read_rules(
-            rule.replace("/**", "").replace("/*", "") for rule in capsule.may_read
-        )
+        # `_strip_glob`, not a blind replace: `company/*.yaml` names four files
+        # and must stay a wildcard, while `company/**` names a tree and becomes
+        # `company`. A replace turns the first into `company.yaml`, which is a
+        # path that does not exist and quietly matches nothing.
+        rules = collapse_read_rules(_strip_glob(rule) for rule in capsule.may_read)
         hits = [
             path for path in OUTSIDE_THE_CONTROL_PLANE
             if any(_read_covers(rule, path) for rule in rules)
