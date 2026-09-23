@@ -1,0 +1,5347 @@
+{
+ "kind": "category3_two_team_shortlist",
+ "rule": {
+  "duration_seconds": [
+   20.0,
+   26.0
+  ],
+  "first_spawn_seconds_preferred_max": 2.0,
+  "first_spawn_seconds_reject_above": 3.0,
+  "min_population": 12,
+  "min_team_population": 4,
+  "min_loser_frontier": 3,
+  "max_winner_population_share": 0.75,
+  "min_breaks": 6,
+  "max_collision_rate": 18.0,
+  "flags": "none"
+ },
+ "eligible": 414,
+ "buckets": {
+  "cyan/descendant/opening": 204,
+  "cyan/founder/opening": 21,
+  "orange/descendant/break": 3,
+  "orange/descendant/opening": 170,
+  "orange/founder/opening": 16
+ },
+ "seeds": [
+  179,
+  182,
+  292,
+  320,
+  341,
+  589,
+  593,
+  614,
+  704,
+  712,
+  907,
+  935,
+  945,
+  951,
+  952,
+  1056,
+  1062,
+  1084,
+  1134,
+  1141,
+  1144,
+  1149,
+  1176,
+  1187,
+  1233,
+  1264,
+  1382,
+  1388,
+  1396,
+  1423,
+  1428,
+  1490,
+  1558,
+  1599,
+  1777,
+  1815,
+  1820,
+  1880,
+  1939,
+  1997,
+  2042,
+  2064,
+  2124,
+  2181,
+  2316,
+  2452,
+  2478,
+  2490,
+  2494,
+  2556,
+  2566,
+  2598,
+  2626,
+  2659,
+  2726,
+  2845,
+  2861,
+  2945,
+  2954,
+  2968,
+  3003,
+  3012,
+  3126,
+  3143,
+  3307,
+  3368,
+  3410,
+  3434,
+  3440,
+  3495,
+  3518,
+  3563,
+  3665,
+  3671,
+  3672,
+  3725,
+  3762,
+  3807,
+  3891,
+  3931,
+  3968,
+  3969,
+  4006,
+  4047,
+  4230,
+  4323,
+  4331,
+  4435,
+  4468,
+  4469,
+  4498,
+  4542,
+  4588,
+  4629,
+  4656,
+  4739,
+  4755,
+  4757,
+  4785,
+  4870,
+  4919,
+  4922,
+  4941,
+  4951,
+  5121,
+  5241,
+  5265,
+  5370,
+  5429,
+  5469,
+  5627,
+  5629,
+  5651,
+  5669,
+  5775,
+  5840,
+  5915,
+  5965,
+  6027,
+  6036,
+  6088,
+  6123,
+  6202,
+  6218,
+  6229,
+  6245,
+  6252,
+  6257,
+  6274,
+  6298,
+  6378,
+  6387,
+  6398,
+  6479,
+  6526,
+  6554,
+  6582,
+  6651,
+  6772,
+  6879,
+  6936,
+  7009,
+  7038,
+  7115,
+  7142,
+  7148,
+  7157,
+  7190,
+  7193,
+  7214,
+  7285,
+  7379,
+  7418,
+  7505,
+  7515,
+  7563,
+  7581,
+  7592,
+  7667,
+  7668,
+  7682,
+  7684,
+  7714,
+  7748,
+  7771,
+  7791,
+  7812,
+  7839,
+  7910,
+  7983,
+  8005,
+  8131,
+  8210,
+  8236,
+  8329,
+  8343,
+  8427,
+  8454,
+  8572,
+  8582,
+  8584,
+  8751,
+  8814,
+  8865,
+  8879,
+  8970,
+  9002,
+  9097,
+  9104,
+  9127,
+  9148,
+  9155,
+  9195,
+  9238,
+  9242,
+  9255,
+  9267,
+  9292,
+  9321,
+  9351,
+  9402,
+  9430,
+  9600,
+  9633,
+  9707,
+  9715,
+  9799,
+  9823,
+  9870,
+  9954,
+  9980,
+  10144,
+  10212,
+  10217,
+  10223,
+  10229,
+  10237,
+  10265,
+  10426,
+  10428,
+  10455,
+  10473,
+  10530,
+  10558,
+  10579,
+  10636,
+  10665,
+  10701,
+  10708,
+  10733,
+  10751,
+  10763,
+  10913,
+  10943,
+  10958,
+  11013,
+  11046,
+  11137,
+  11150,
+  11238,
+  11255,
+  11365,
+  11402,
+  11439,
+  11448,
+  11562,
+  11591,
+  11601,
+  11735,
+  11763,
+  11769,
+  11774,
+  11842,
+  11852,
+  11861,
+  11870,
+  11895,
+  11922,
+  11958,
+  11988,
+  12018,
+  12074,
+  12095,
+  12148,
+  12331,
+  12349,
+  12384,
+  12398,
+  12542,
+  12543,
+  12694,
+  12715,
+  12788,
+  12796,
+  12875,
+  12885,
+  12938,
+  13006,
+  13016,
+  13173,
+  13268,
+  13288,
+  13333,
+  13370,
+  13382,
+  13387,
+  13469,
+  13509,
+  13568,
+  13573,
+  13682,
+  13686,
+  13721,
+  13801,
+  13895,
+  13904,
+  13980,
+  14056,
+  14082,
+  14090,
+  14180,
+  14258,
+  14411,
+  14462,
+  14710,
+  14722,
+  14762,
+  14835,
+  14836,
+  14884,
+  14904,
+  14978,
+  15000,
+  15030,
+  15074,
+  15088,
+  15103,
+  15120,
+  15141,
+  15188,
+  15281,
+  15308,
+  15334,
+  15358,
+  15511,
+  15526,
+  15550,
+  15599,
+  15640,
+  15696,
+  15723,
+  15828,
+  15872,
+  15980,
+  16010,
+  16020,
+  16061,
+  16155,
+  16258,
+  16282,
+  16283,
+  16435,
+  16606,
+  16623,
+  16630,
+  16696,
+  16775,
+  16828,
+  16860,
+  16898,
+  16901,
+  16910,
+  16914,
+  16936,
+  17029,
+  17095,
+  17097,
+  17291,
+  17465,
+  17660,
+  17688,
+  17726,
+  17733,
+  17735,
+  17753,
+  17790,
+  17813,
+  17819,
+  17890,
+  17899,
+  17964,
+  18056,
+  18065,
+  18105,
+  18160,
+  18189,
+  18257,
+  18268,
+  18269,
+  18304,
+  18350,
+  18358,
+  18375,
+  18377,
+  18466,
+  18469,
+  18475,
+  18545,
+  18549,
+  18604,
+  18623,
+  18665,
+  18690,
+  18707,
+  18738,
+  18791,
+  18817,
+  18854,
+  18953,
+  19104,
+  19159,
+  19246,
+  19304,
+  19371,
+  19461,
+  19521,
+  19621,
+  19691,
+  19719,
+  19792,
+  19807,
+  19867,
+  19871,
+  19969
+ ],
+ "review_seeds": [
+  18549,
+  3762,
+  17964,
+  12349,
+  7148,
+  952,
+  10636,
+  17660,
+  15358,
+  19807,
+  10943,
+  6298,
+  16020,
+  16914,
+  8751,
+  593,
+  9633,
+  19371,
+  11852,
+  1176
+ ],
+ "candidates": [
+  {
+   "seed": 18549,
+   "flags": [],
+   "escaped": true,
+   "duration": 23.52021872856738,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 2,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 18,
+   "population_max": 18,
+   "population_early": 6,
+   "generations": 4,
+   "suppressed": 0,
+   "spawns": 16,
+   "first_spawn": 0.7236762763549683,
+   "violations": 0,
+   "collisions": 422,
+   "collision_rate": 17.942010015725057,
+   "peak_collision_rate": 44.5,
+   "grazing": 1,
+   "ball_ball": 0,
+   "near_misses": 24,
+   "damage_events": 422,
+   "damage_scoring": 421,
+   "transitions": 144,
+   "breaks": 25,
+   "shared_breaks": 23,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 5,
+   "mean_break_cumulative": 3.8928866217524103,
+   "progression_opening": 38,
+   "progression_break": 35,
+   "meaningful_total": 767,
+   "meaningful_rate": 32.61024095275147,
+   "meaningful_peak": 80.5,
+   "stagnation": 0.8309837615777025,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 150,
+   "trajectory_spread": 0.36503061965429295,
+   "difficulty_increasing": true,
+   "max_penetration": 4.676148357418697e-12,
+   "min_spawn_clearance": 0.40048126476778734,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 0.9434890655852712,
+   "mean_speed_correction": 0.06597663998330491,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "082ef58a1259022287c6bb95a2e01446f51c9cd21d7aaaeae545f424ba5fd7a7",
+   "curve": [
+    2,
+    3,
+    5,
+    6,
+    6,
+    6,
+    8,
+    9,
+    10,
+    11,
+    18
+   ],
+   "thirds_population": [
+    6,
+    8,
+    18
+   ],
+   "by_region": [
+    0,
+    1,
+    4,
+    7,
+    4,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    6,
+    3,
+    1
+   ],
+   "reached": [
+    8,
+    8,
+    12,
+    13,
+    6
+   ],
+   "crossed": [
+    8,
+    7,
+    10,
+    3,
+    1
+   ],
+   "crossings": [
+    34,
+    17,
+    18,
+    3,
+    1
+   ],
+   "regressions": [
+    32,
+    14,
+    15,
+    1,
+    0
+   ],
+   "dwell": [
+    42.434456,
+    38.242732,
+    49.805433,
+    23.509012,
+    16.975918,
+    0.1527
+   ],
+   "pass_rate": [
+    1.0,
+    0.875,
+    0.8333333333333334,
+    0.23076923076923078,
+    0.16666666666666666
+   ],
+   "blocked": [
+    11,
+    46,
+    83,
+    53,
+    49
+   ],
+   "damage_absorbed": [
+    22.211137,
+    83.543714,
+    88.372834,
+    88.776365,
+    47.637911
+   ],
+   "collisions_per_shell": [
+    27,
+    120,
+    126,
+    100,
+    49
+   ],
+   "breaks_per_shell": [
+    10,
+    10,
+    5,
+    0,
+    0
+   ],
+   "collision_thirds": [
+    81,
+    106,
+    235
+   ],
+   "spawn_thirds": [
+    4,
+    2,
+    10
+   ],
+   "break_thirds": [
+    10,
+    6,
+    9
+   ],
+   "meaningful_thirds": [
+    166,
+    209,
+    392
+   ],
+   "escalation": {
+    "collisions": 2.8780487804878048,
+    "spawns": 2.2,
+    "breaks": 0.9090909090909091,
+    "meaningful": 2.3532934131736525,
+    "population": 2.7142857142857144
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 1,
+    "winner_name": "orange",
+    "winner_ball": 15,
+    "winner_founder_slot": 1,
+    "winner_generation": 2,
+    "winner_route": "opening",
+    "win_margin_seconds": 5.230049762143135,
+    "first_to_clone": 0,
+    "first_spawn_by_team": [
+     0.7236762763549683,
+     3.887790886393788
+    ],
+    "population_by_team": [
+     6,
+     12
+    ],
+    "population_share_winner": 0.6666666666666666,
+    "spawns_by_team": [
+     5,
+     11
+    ],
+    "collisions_by_team": [
+     134,
+     288
+    ],
+    "crossings_by_team": [
+     42,
+     31
+    ],
+    "frontier_by_team": [
+     3,
+     5
+    ],
+    "loser_frontier": 3,
+    "damage_by_team": [
+     85.89496,
+     244.647002
+    ],
+    "breaks_by_team": [
+     10,
+     15
+    ],
+    "breaks_by_largest_team": [
+     7,
+     18
+    ],
+    "cross_team_breaks": 18,
+    "stolen_breaks": 9,
+    "population_lead_changes": 1,
+    "frontier_lead_changes": 1,
+    "max_population_lead": 6,
+    "team_digest": "e42cb73f8c20249bbe26b09b5b437bac94a7c1aecc00c935f72825a63b4d68ac"
+   }
+  },
+  {
+   "seed": 3762,
+   "flags": [],
+   "escaped": true,
+   "duration": 24.12209121153899,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 1,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 18,
+   "population_max": 18,
+   "population_early": 4,
+   "generations": 3,
+   "suppressed": 0,
+   "spawns": 16,
+   "first_spawn": 0.7843466195323487,
+   "violations": 0,
+   "collisions": 425,
+   "collision_rate": 17.618704625273033,
+   "peak_collision_rate": 45.0,
+   "grazing": 0,
+   "ball_ball": 0,
+   "near_misses": 38,
+   "damage_events": 425,
+   "damage_scoring": 424,
+   "transitions": 133,
+   "breaks": 14,
+   "shared_breaks": 14,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 6,
+   "mean_break_cumulative": 2.879245847499383,
+   "progression_opening": 34,
+   "progression_break": 7,
+   "meaningful_total": 705,
+   "meaningful_rate": 29.226321790158796,
+   "meaningful_peak": 70.0,
+   "stagnation": 0.4533231206420423,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 139,
+   "trajectory_spread": 0.3276080018241132,
+   "difficulty_increasing": false,
+   "max_penetration": 8.35609359484124e-12,
+   "min_spawn_clearance": 0.03705032017518206,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 1.0571718052683081,
+   "mean_speed_correction": 0.06365022081655664,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "65a89eb883cc202ab3a7b850c31379735481c350793f0a4cd36edcdcea4d6571",
+   "curve": [
+    2,
+    3,
+    3,
+    4,
+    5,
+    6,
+    8,
+    9,
+    12,
+    13,
+    18
+   ],
+   "thirds_population": [
+    4,
+    9,
+    18
+   ],
+   "by_region": [
+    3,
+    1,
+    3,
+    2,
+    7,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    4,
+    5,
+    1
+   ],
+   "reached": [
+    6,
+    6,
+    11,
+    10,
+    10
+   ],
+   "crossed": [
+    5,
+    4,
+    5,
+    5,
+    1
+   ],
+   "crossings": [
+    25,
+    5,
+    5,
+    5,
+    1
+   ],
+   "regressions": [
+    26,
+    5,
+    4,
+    2,
+    0
+   ],
+   "dwell": [
+    43.00197,
+    27.129155,
+    55.589462,
+    30.252469,
+    18.819365,
+    0.18836
+   ],
+   "pass_rate": [
+    0.8333333333333334,
+    0.6666666666666666,
+    0.45454545454545453,
+    0.5,
+    0.1
+   ],
+   "blocked": [
+    26,
+    44,
+    94,
+    61,
+    39
+   ],
+   "damage_absorbed": [
+    21.54125,
+    66.278733,
+    90.849594,
+    64.61638,
+    25.107854
+   ],
+   "collisions_per_shell": [
+    40,
+    108,
+    144,
+    91,
+    42
+   ],
+   "breaks_per_shell": [
+    10,
+    4,
+    0,
+    0,
+    0
+   ],
+   "collision_thirds": [
+    40,
+    107,
+    278
+   ],
+   "spawn_thirds": [
+    2,
+    5,
+    9
+   ],
+   "break_thirds": [
+    2,
+    7,
+    5
+   ],
+   "meaningful_thirds": [
+    81,
+    198,
+    426
+   ],
+   "escalation": {
+    "collisions": 6.804878048780488,
+    "spawns": 3.3333333333333335,
+    "breaks": 2.0,
+    "meaningful": 5.2073170731707314,
+    "population": 3.8
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 0,
+    "winner_name": "cyan",
+    "winner_ball": 17,
+    "winner_founder_slot": 1,
+    "winner_generation": 1,
+    "winner_route": "opening",
+    "win_margin_seconds": 5.292325637101904,
+    "first_to_clone": 1,
+    "first_spawn_by_team": [
+     5.053292606270127,
+     0.7843466195323487
+    ],
+    "population_by_team": [
+     11,
+     7
+    ],
+    "population_share_winner": 0.6111111111111112,
+    "spawns_by_team": [
+     10,
+     6
+    ],
+    "collisions_by_team": [
+     235,
+     190
+    ],
+    "crossings_by_team": [
+     24,
+     17
+    ],
+    "frontier_by_team": [
+     5,
+     4
+    ],
+    "loser_frontier": 4,
+    "damage_by_team": [
+     183.163649,
+     85.230162
+    ],
+    "breaks_by_team": [
+     10,
+     4
+    ],
+    "breaks_by_largest_team": [
+     12,
+     2
+    ],
+    "cross_team_breaks": 14,
+    "stolen_breaks": 4,
+    "population_lead_changes": 3,
+    "frontier_lead_changes": 3,
+    "max_population_lead": 4,
+    "team_digest": "b5df157e44eb17cf443be1797d9ae4cac249be6393a21f6f0073ad93d3375410"
+   }
+  },
+  {
+   "seed": 17964,
+   "flags": [],
+   "escaped": true,
+   "duration": 25.775764133147725,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 3,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 18,
+   "population_max": 18,
+   "population_early": 5,
+   "generations": 5,
+   "suppressed": 0,
+   "spawns": 16,
+   "first_spawn": 0.5209490288424855,
+   "violations": 0,
+   "collisions": 442,
+   "collision_rate": 17.147891240655266,
+   "peak_collision_rate": 35.0,
+   "grazing": 0,
+   "ball_ball": 0,
+   "near_misses": 64,
+   "damage_events": 442,
+   "damage_scoring": 442,
+   "transitions": 156,
+   "breaks": 31,
+   "shared_breaks": 30,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 6,
+   "mean_break_cumulative": 4.369043830083987,
+   "progression_opening": 37,
+   "progression_break": 41,
+   "meaningful_total": 863,
+   "meaningful_rate": 33.48106366670926,
+   "meaningful_peak": 61.0,
+   "stagnation": 0.5565874459867679,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 142,
+   "trajectory_spread": 0.3338748324449328,
+   "difficulty_increasing": true,
+   "max_penetration": 7.759570763710144e-12,
+   "min_spawn_clearance": 0.2023223625142645,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 0.8795624032242895,
+   "mean_speed_correction": 0.08623326368902197,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "0c8a934bd159c704cc02739adaca9b247dc4b55b45175dafe2ad37cca87c79bd",
+   "curve": [
+    2,
+    3,
+    5,
+    6,
+    8,
+    11,
+    11,
+    11,
+    12,
+    14,
+    18
+   ],
+   "thirds_population": [
+    6,
+    11,
+    18
+   ],
+   "by_region": [
+    1,
+    4,
+    4,
+    1,
+    6,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    5,
+    4,
+    1
+   ],
+   "reached": [
+    10,
+    12,
+    13,
+    11,
+    8
+   ],
+   "crossed": [
+    10,
+    12,
+    7,
+    4,
+    1
+   ],
+   "crossings": [
+    43,
+    21,
+    9,
+    4,
+    1
+   ],
+   "regressions": [
+    42,
+    22,
+    10,
+    1,
+    0
+   ],
+   "dwell": [
+    48.433926,
+    62.907383,
+    56.650958,
+    50.64191,
+    14.723597,
+    0.166922
+   ],
+   "pass_rate": [
+    1.0,
+    1.0,
+    0.5384615384615384,
+    0.36363636363636365,
+    0.125
+   ],
+   "blocked": [
+    14,
+    67,
+    96,
+    82,
+    27
+   ],
+   "damage_absorbed": [
+    21.832355,
+    91.096492,
+    98.582127,
+    65.36304,
+    21.53483
+   ],
+   "collisions_per_shell": [
+    27,
+    138,
+    144,
+    106,
+    27
+   ],
+   "breaks_per_shell": [
+    10,
+    12,
+    8,
+    1,
+    0
+   ],
+   "collision_thirds": [
+    51,
+    210,
+    181
+   ],
+   "spawn_thirds": [
+    4,
+    5,
+    7
+   ],
+   "break_thirds": [
+    8,
+    13,
+    10
+   ],
+   "meaningful_thirds": [
+    127,
+    370,
+    366
+   ],
+   "escalation": {
+    "collisions": 3.5,
+    "spawns": 1.6,
+    "breaks": 1.2222222222222223,
+    "meaningful": 2.8671875,
+    "population": 2.7142857142857144
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 1,
+    "winner_name": "orange",
+    "winner_ball": 11,
+    "winner_founder_slot": 1,
+    "winner_generation": 3,
+    "winner_route": "opening",
+    "win_margin_seconds": 4.468706036109214,
+    "first_to_clone": 0,
+    "first_spawn_by_team": [
+     0.5209490288424855,
+     3.6921320544329106
+    ],
+    "population_by_team": [
+     9,
+     9
+    ],
+    "population_share_winner": 0.5,
+    "spawns_by_team": [
+     8,
+     8
+    ],
+    "collisions_by_team": [
+     253,
+     189
+    ],
+    "crossings_by_team": [
+     29,
+     49
+    ],
+    "frontier_by_team": [
+     4,
+     5
+    ],
+    "loser_frontier": 4,
+    "damage_by_team": [
+     157.771775,
+     140.637068
+    ],
+    "breaks_by_team": [
+     16,
+     15
+    ],
+    "breaks_by_largest_team": [
+     13,
+     18
+    ],
+    "cross_team_breaks": 25,
+    "stolen_breaks": 7,
+    "population_lead_changes": 2,
+    "frontier_lead_changes": 1,
+    "max_population_lead": 2,
+    "team_digest": "199db57c2ff0e75c0e782fdaf84158967f16545564b2954c7a19d23b45b1d0ce"
+   }
+  },
+  {
+   "seed": 12349,
+   "flags": [],
+   "escaped": true,
+   "duration": 25.7788033867051,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 3,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 18,
+   "population_max": 18,
+   "population_early": 6,
+   "generations": 5,
+   "suppressed": 0,
+   "spawns": 16,
+   "first_spawn": 0.8368850320261289,
+   "violations": 0,
+   "collisions": 447,
+   "collision_rate": 17.33982734941573,
+   "peak_collision_rate": 46.5,
+   "grazing": 4,
+   "ball_ball": 0,
+   "near_misses": 42,
+   "damage_events": 447,
+   "damage_scoring": 443,
+   "transitions": 143,
+   "breaks": 22,
+   "shared_breaks": 18,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 6,
+   "mean_break_cumulative": 4.009204176958669,
+   "progression_opening": 46,
+   "progression_break": 22,
+   "meaningful_total": 803,
+   "meaningful_rate": 31.149622732843028,
+   "meaningful_peak": 79.0,
+   "stagnation": 0.8290049214286408,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 134,
+   "trajectory_spread": 0.31208394835770764,
+   "difficulty_increasing": true,
+   "max_penetration": 9.224065955493188e-12,
+   "min_spawn_clearance": 0.13886220035040964,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 1.0645962938152285,
+   "mean_speed_correction": 0.10219513134030911,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "099909ff9280bff612f33632b07e01e08be66377d969bbfbcce80baf0f4bd7b2",
+   "curve": [
+    2,
+    3,
+    3,
+    6,
+    8,
+    8,
+    9,
+    12,
+    12,
+    13,
+    18
+   ],
+   "thirds_population": [
+    6,
+    12,
+    18
+   ],
+   "by_region": [
+    1,
+    4,
+    1,
+    7,
+    3,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    6,
+    3,
+    1
+   ],
+   "reached": [
+    6,
+    7,
+    12,
+    13,
+    6
+   ],
+   "crossed": [
+    6,
+    6,
+    10,
+    3,
+    1
+   ],
+   "crossings": [
+    33,
+    13,
+    18,
+    3,
+    1
+   ],
+   "regressions": [
+    32,
+    14,
+    16,
+    2,
+    0
+   ],
+   "dwell": [
+    45.226346,
+    60.235175,
+    63.003229,
+    45.178254,
+    5.635616,
+    0.140248
+   ],
+   "pass_rate": [
+    1.0,
+    0.8571428571428571,
+    0.8333333333333334,
+    0.23076923076923078,
+    0.16666666666666666
+   ],
+   "blocked": [
+    15,
+    74,
+    98,
+    85,
+    14
+   ],
+   "damage_absorbed": [
+    23.231647,
+    85.014481,
+    89.169647,
+    68.600574,
+    12.062903
+   ],
+   "collisions_per_shell": [
+    28,
+    141,
+    167,
+    97,
+    14
+   ],
+   "breaks_per_shell": [
+    10,
+    7,
+    5,
+    0,
+    0
+   ],
+   "collision_thirds": [
+    59,
+    126,
+    262
+   ],
+   "spawn_thirds": [
+    4,
+    6,
+    6
+   ],
+   "break_thirds": [
+    3,
+    9,
+    10
+   ],
+   "meaningful_thirds": [
+    116,
+    242,
+    445
+   ],
+   "escalation": {
+    "collisions": 4.383333333333334,
+    "spawns": 1.4,
+    "breaks": 2.75,
+    "meaningful": 3.8119658119658117,
+    "population": 2.7142857142857144
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 0,
+    "winner_name": "cyan",
+    "winner_ball": 15,
+    "winner_founder_slot": 0,
+    "winner_generation": 3,
+    "winner_route": "opening",
+    "win_margin_seconds": 20.05853404935278,
+    "first_to_clone": 1,
+    "first_spawn_by_team": [
+     9.104101759572371,
+     0.8368850320261289
+    ],
+    "population_by_team": [
+     11,
+     7
+    ],
+    "population_share_winner": 0.6111111111111112,
+    "spawns_by_team": [
+     10,
+     6
+    ],
+    "collisions_by_team": [
+     185,
+     262
+    ],
+    "crossings_by_team": [
+     34,
+     34
+    ],
+    "frontier_by_team": [
+     5,
+     3
+    ],
+    "loser_frontier": 3,
+    "damage_by_team": [
+     126.486397,
+     151.592855
+    ],
+    "breaks_by_team": [
+     7,
+     15
+    ],
+    "breaks_by_largest_team": [
+     12,
+     10
+    ],
+    "cross_team_breaks": 16,
+    "stolen_breaks": 7,
+    "population_lead_changes": 1,
+    "frontier_lead_changes": 1,
+    "max_population_lead": 4,
+    "team_digest": "39c74bee0371ab1dca8fdc44fa1035086174bc2aa30e49d0036ba65d363f7555"
+   }
+  },
+  {
+   "seed": 7148,
+   "flags": [],
+   "escaped": true,
+   "duration": 22.348314443202923,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 3,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 17,
+   "population_max": 17,
+   "population_early": 4,
+   "generations": 6,
+   "suppressed": 0,
+   "spawns": 15,
+   "first_spawn": 1.6127802315320836,
+   "violations": 0,
+   "collisions": 280,
+   "collision_rate": 12.52890909118025,
+   "peak_collision_rate": 31.5,
+   "grazing": 0,
+   "ball_ball": 0,
+   "near_misses": 39,
+   "damage_events": 280,
+   "damage_scoring": 280,
+   "transitions": 75,
+   "breaks": 15,
+   "shared_breaks": 14,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 6,
+   "mean_break_cumulative": 3.6871018269614706,
+   "progression_opening": 37,
+   "progression_break": 20,
+   "meaningful_total": 533,
+   "meaningful_rate": 23.84967337713955,
+   "meaningful_peak": 48.5,
+   "stagnation": 0.9084173834259612,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 131,
+   "trajectory_spread": 0.3654725461754302,
+   "difficulty_increasing": true,
+   "max_penetration": 9.542922008165533e-12,
+   "min_spawn_clearance": 0.027871017121391617,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 0.9635416248592523,
+   "mean_speed_correction": 0.12122899658787711,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "85436d1609b09f743f9c7f297ae809a14b9f720d233be0e5b85908b7bf7f0603",
+   "curve": [
+    2,
+    3,
+    4,
+    4,
+    6,
+    6,
+    8,
+    11,
+    12,
+    12,
+    17
+   ],
+   "thirds_population": [
+    4,
+    10,
+    17
+   ],
+   "by_region": [
+    2,
+    1,
+    3,
+    5,
+    2,
+    4
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    4,
+    3,
+    2
+   ],
+   "reached": [
+    6,
+    7,
+    10,
+    9,
+    6
+   ],
+   "crossed": [
+    6,
+    6,
+    5,
+    3,
+    2
+   ],
+   "crossings": [
+    36,
+    7,
+    8,
+    4,
+    2
+   ],
+   "regressions": [
+    36,
+    6,
+    6,
+    3,
+    0
+   ],
+   "dwell": [
+    42.184037,
+    47.918751,
+    22.292268,
+    25.600257,
+    25.907437,
+    0.377373
+   ],
+   "pass_rate": [
+    1.0,
+    0.8571428571428571,
+    0.5,
+    0.3333333333333333,
+    0.3333333333333333
+   ],
+   "blocked": [
+    11,
+    66,
+    41,
+    35,
+    46
+   ],
+   "damage_absorbed": [
+    26.928578,
+    59.609667,
+    22.697533,
+    26.480272,
+    17.869857
+   ],
+   "collisions_per_shell": [
+    31,
+    87,
+    57,
+    59,
+    46
+   ],
+   "breaks_per_shell": [
+    10,
+    4,
+    0,
+    1,
+    0
+   ],
+   "collision_thirds": [
+    45,
+    72,
+    163
+   ],
+   "spawn_thirds": [
+    2,
+    6,
+    7
+   ],
+   "break_thirds": [
+    5,
+    7,
+    3
+   ],
+   "meaningful_thirds": [
+    91,
+    167,
+    275
+   ],
+   "escalation": {
+    "collisions": 3.5652173913043477,
+    "spawns": 2.6666666666666665,
+    "breaks": 0.6666666666666666,
+    "meaningful": 3.0,
+    "population": 3.6
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 1,
+    "winner_name": "orange",
+    "winner_ball": 5,
+    "winner_founder_slot": 1,
+    "winner_generation": 3,
+    "winner_route": "opening",
+    "win_margin_seconds": 5.8659207178464,
+    "first_to_clone": 0,
+    "first_spawn_by_team": [
+     1.6127802315320836,
+     4.049758918449182
+    ],
+    "population_by_team": [
+     7,
+     10
+    ],
+    "population_share_winner": 0.5882352941176471,
+    "spawns_by_team": [
+     6,
+     9
+    ],
+    "collisions_by_team": [
+     142,
+     138
+    ],
+    "crossings_by_team": [
+     26,
+     31
+    ],
+    "frontier_by_team": [
+     4,
+     5
+    ],
+    "loser_frontier": 4,
+    "damage_by_team": [
+     71.936856,
+     81.649051
+    ],
+    "breaks_by_team": [
+     7,
+     8
+    ],
+    "breaks_by_largest_team": [
+     7,
+     8
+    ],
+    "cross_team_breaks": 12,
+    "stolen_breaks": 4,
+    "population_lead_changes": 3,
+    "frontier_lead_changes": 1,
+    "max_population_lead": 3,
+    "team_digest": "b1b8f0b573a9789741248ba5cb8a47082ae57ea9086b847349c576c3287ddd54"
+   }
+  },
+  {
+   "seed": 952,
+   "flags": [],
+   "escaped": true,
+   "duration": 24.214387142057646,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 0,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 17,
+   "population_max": 17,
+   "population_early": 3,
+   "generations": 5,
+   "suppressed": 0,
+   "spawns": 15,
+   "first_spawn": 0.49903878637941956,
+   "violations": 0,
+   "collisions": 328,
+   "collision_rate": 13.545665974353783,
+   "peak_collision_rate": 31.0,
+   "grazing": 0,
+   "ball_ball": 0,
+   "near_misses": 39,
+   "damage_events": 328,
+   "damage_scoring": 328,
+   "transitions": 127,
+   "breaks": 23,
+   "shared_breaks": 21,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 6,
+   "mean_break_cumulative": 3.8549840688507886,
+   "progression_opening": 36,
+   "progression_break": 23,
+   "meaningful_total": 649,
+   "meaningful_rate": 26.80224761388904,
+   "meaningful_peak": 60.5,
+   "stagnation": 0.6298095176747105,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 119,
+   "trajectory_spread": 0.33230048247111105,
+   "difficulty_increasing": true,
+   "max_penetration": 8.86490880702695e-12,
+   "min_spawn_clearance": 0.09541774303114714,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 0.9061078765178987,
+   "mean_speed_correction": 0.09658155052913704,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "e3b1e7f499a6ed7bfc5060f94e627eab868d1dbc2d4c54ed4f3b4e165d34ac68",
+   "curve": [
+    2,
+    3,
+    3,
+    4,
+    5,
+    5,
+    6,
+    10,
+    10,
+    11,
+    17
+   ],
+   "thirds_population": [
+    5,
+    8,
+    17
+   ],
+   "by_region": [
+    4,
+    2,
+    0,
+    4,
+    5,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    5,
+    3,
+    1
+   ],
+   "reached": [
+    9,
+    9,
+    10,
+    10,
+    6
+   ],
+   "crossed": [
+    9,
+    7,
+    6,
+    3,
+    1
+   ],
+   "crossings": [
+    34,
+    10,
+    11,
+    3,
+    1
+   ],
+   "regressions": [
+    36,
+    12,
+    9,
+    0,
+    0
+   ],
+   "dwell": [
+    53.085885,
+    36.576098,
+    40.093129,
+    25.256592,
+    5.672645,
+    0.140263
+   ],
+   "pass_rate": [
+    1.0,
+    0.7777777777777778,
+    0.6,
+    0.3,
+    0.16666666666666666
+   ],
+   "blocked": [
+    14,
+    52,
+    66,
+    55,
+    12
+   ],
+   "damage_absorbed": [
+    24.036712,
+    80.528614,
+    73.399261,
+    46.193807,
+    9.220299
+   ],
+   "collisions_per_shell": [
+    26,
+    115,
+    109,
+    66,
+    12
+   ],
+   "breaks_per_shell": [
+    10,
+    9,
+    4,
+    0,
+    0
+   ],
+   "collision_thirds": [
+    39,
+    92,
+    197
+   ],
+   "spawn_thirds": [
+    3,
+    3,
+    9
+   ],
+   "break_thirds": [
+    7,
+    4,
+    12
+   ],
+   "meaningful_thirds": [
+    96,
+    178,
+    375
+   ],
+   "escalation": {
+    "collisions": 4.95,
+    "spawns": 2.5,
+    "breaks": 1.625,
+    "meaningful": 3.8762886597938144,
+    "population": 3.0
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 0,
+    "winner_name": "cyan",
+    "winner_ball": 1,
+    "winner_founder_slot": 1,
+    "winner_generation": 0,
+    "winner_route": "opening",
+    "win_margin_seconds": 1.1050649502472076,
+    "first_to_clone": 1,
+    "first_spawn_by_team": [
+     7.214217099758292,
+     0.49903878637941956
+    ],
+    "population_by_team": [
+     8,
+     9
+    ],
+    "population_share_winner": 0.47058823529411764,
+    "spawns_by_team": [
+     7,
+     8
+    ],
+    "collisions_by_team": [
+     138,
+     190
+    ],
+    "crossings_by_team": [
+     26,
+     33
+    ],
+    "frontier_by_team": [
+     5,
+     4
+    ],
+    "loser_frontier": 4,
+    "damage_by_team": [
+     99.191876,
+     134.186817
+    ],
+    "breaks_by_team": [
+     13,
+     10
+    ],
+    "breaks_by_largest_team": [
+     7,
+     16
+    ],
+    "cross_team_breaks": 14,
+    "stolen_breaks": 6,
+    "population_lead_changes": 0,
+    "frontier_lead_changes": 1,
+    "max_population_lead": 2,
+    "team_digest": "2dc0117354258d052a99c5a27b808304f60e0807924d7cfc8b62771e16ac4d9b"
+   }
+  },
+  {
+   "seed": 10636,
+   "flags": [],
+   "escaped": true,
+   "duration": 24.410904335674964,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 2,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 17,
+   "population_max": 17,
+   "population_early": 5,
+   "generations": 5,
+   "suppressed": 0,
+   "spawns": 15,
+   "first_spawn": 1.7126026134961787,
+   "violations": 0,
+   "collisions": 348,
+   "collision_rate": 14.255924123688462,
+   "peak_collision_rate": 43.0,
+   "grazing": 1,
+   "ball_ball": 0,
+   "near_misses": 42,
+   "damage_events": 348,
+   "damage_scoring": 347,
+   "transitions": 132,
+   "breaks": 24,
+   "shared_breaks": 23,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 8,
+   "mean_break_cumulative": 3.868027678803689,
+   "progression_opening": 34,
+   "progression_break": 29,
+   "meaningful_total": 691,
+   "meaningful_rate": 28.30702175134692,
+   "meaningful_peak": 75.0,
+   "stagnation": 0.955857285618989,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 136,
+   "trajectory_spread": 0.43997262405609466,
+   "difficulty_increasing": false,
+   "max_penetration": 7.658873535376642e-12,
+   "min_spawn_clearance": 0.04949684715817593,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 1.0184748110463846,
+   "mean_speed_correction": 0.09291283856112853,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "a2aa22dfd4c54035d47e799092574d44bb2bdff8ac2b8e106f4ed7f32c05dabf",
+   "curve": [
+    2,
+    3,
+    5,
+    5,
+    5,
+    5,
+    7,
+    8,
+    10,
+    13,
+    17
+   ],
+   "thirds_population": [
+    5,
+    8,
+    17
+   ],
+   "by_region": [
+    5,
+    0,
+    3,
+    5,
+    2,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    5,
+    3,
+    1
+   ],
+   "reached": [
+    8,
+    9,
+    12,
+    12,
+    6
+   ],
+   "crossed": [
+    5,
+    6,
+    7,
+    4,
+    1
+   ],
+   "crossings": [
+    40,
+    10,
+    8,
+    4,
+    1
+   ],
+   "regressions": [
+    43,
+    11,
+    8,
+    4,
+    0
+   ],
+   "dwell": [
+    54.398085,
+    37.338453,
+    35.907832,
+    30.347964,
+    10.111789,
+    0.20063
+   ],
+   "pass_rate": [
+    0.625,
+    0.6666666666666666,
+    0.5833333333333334,
+    0.3333333333333333,
+    0.16666666666666666
+   ],
+   "blocked": [
+    13,
+    60,
+    70,
+    49,
+    27
+   ],
+   "damage_absorbed": [
+    22.962849,
+    91.761415,
+    69.278721,
+    52.186038,
+    24.505727
+   ],
+   "collisions_per_shell": [
+    28,
+    118,
+    102,
+    72,
+    28
+   ],
+   "breaks_per_shell": [
+    10,
+    11,
+    3,
+    0,
+    0
+   ],
+   "collision_thirds": [
+    62,
+    87,
+    199
+   ],
+   "spawn_thirds": [
+    3,
+    3,
+    9
+   ],
+   "break_thirds": [
+    4,
+    11,
+    9
+   ],
+   "meaningful_thirds": [
+    130,
+    199,
+    362
+   ],
+   "escalation": {
+    "collisions": 3.1746031746031744,
+    "spawns": 2.5,
+    "breaks": 2.0,
+    "meaningful": 2.7709923664122136,
+    "population": 3.0
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 0,
+    "winner_name": "cyan",
+    "winner_ball": 11,
+    "winner_founder_slot": 0,
+    "winner_generation": 2,
+    "winner_route": "opening",
+    "win_margin_seconds": 5.231634060060067,
+    "first_to_clone": 1,
+    "first_spawn_by_team": [
+     3.910162213243051,
+     1.7126026134961787
+    ],
+    "population_by_team": [
+     9,
+     8
+    ],
+    "population_share_winner": 0.5294117647058824,
+    "spawns_by_team": [
+     8,
+     7
+    ],
+    "collisions_by_team": [
+     129,
+     219
+    ],
+    "crossings_by_team": [
+     35,
+     28
+    ],
+    "frontier_by_team": [
+     5,
+     4
+    ],
+    "loser_frontier": 4,
+    "damage_by_team": [
+     88.88204,
+     171.812711
+    ],
+    "breaks_by_team": [
+     13,
+     11
+    ],
+    "breaks_by_largest_team": [
+     9,
+     15
+    ],
+    "cross_team_breaks": 16,
+    "stolen_breaks": 8,
+    "population_lead_changes": 3,
+    "frontier_lead_changes": 1,
+    "max_population_lead": 2,
+    "team_digest": "bfc4b9e6e778e0372452897449f3e664436396ab5983f0a0eb29285a6bdc19fd"
+   }
+  },
+  {
+   "seed": 17660,
+   "flags": [],
+   "escaped": true,
+   "duration": 24.424572792754855,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 1,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 17,
+   "population_max": 17,
+   "population_early": 3,
+   "generations": 4,
+   "suppressed": 0,
+   "spawns": 15,
+   "first_spawn": 0.6449496065820797,
+   "violations": 0,
+   "collisions": 334,
+   "collision_rate": 13.674752997074961,
+   "peak_collision_rate": 45.5,
+   "grazing": 0,
+   "ball_ball": 0,
+   "near_misses": 43,
+   "damage_events": 334,
+   "damage_scoring": 334,
+   "transitions": 102,
+   "breaks": 15,
+   "shared_breaks": 14,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 5,
+   "mean_break_cumulative": 3.4339013138231818,
+   "progression_opening": 31,
+   "progression_break": 13,
+   "meaningful_total": 591,
+   "meaningful_rate": 24.196943177458987,
+   "meaningful_peak": 67.0,
+   "stagnation": 0.6388753622835601,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 126,
+   "trajectory_spread": 0.29130062590273437,
+   "difficulty_increasing": true,
+   "max_penetration": 4.612199511200288e-12,
+   "min_spawn_clearance": 0.03350678461745216,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 1.043180242490482,
+   "mean_speed_correction": 0.08169128256762281,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "11be6894ee012f704d8a3eab36aa3b71eafc2e13309afcada7f0372ec95be622",
+   "curve": [
+    2,
+    3,
+    3,
+    4,
+    4,
+    4,
+    5,
+    6,
+    11,
+    15,
+    17
+   ],
+   "thirds_population": [
+    4,
+    5,
+    17
+   ],
+   "by_region": [
+    0,
+    3,
+    4,
+    4,
+    4,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    5,
+    3,
+    1
+   ],
+   "reached": [
+    4,
+    5,
+    13,
+    12,
+    6
+   ],
+   "crossed": [
+    4,
+    4,
+    7,
+    5,
+    1
+   ],
+   "crossings": [
+    24,
+    4,
+    10,
+    5,
+    1
+   ],
+   "regressions": [
+    22,
+    3,
+    9,
+    3,
+    0
+   ],
+   "dwell": [
+    45.762937,
+    33.789058,
+    26.733046,
+    35.14046,
+    14.143029,
+    0.167654
+   ],
+   "pass_rate": [
+    1.0,
+    0.8,
+    0.5384615384615384,
+    0.4166666666666667,
+    0.16666666666666666
+   ],
+   "blocked": [
+    27,
+    50,
+    36,
+    71,
+    28
+   ],
+   "damage_absorbed": [
+    19.863471,
+    41.257657,
+    68.377808,
+    69.085869,
+    20.95589
+   ],
+   "collisions_per_shell": [
+    34,
+    84,
+    94,
+    94,
+    28
+   ],
+   "breaks_per_shell": [
+    9,
+    2,
+    4,
+    0,
+    0
+   ],
+   "collision_thirds": [
+    27,
+    54,
+    253
+   ],
+   "spawn_thirds": [
+    2,
+    1,
+    12
+   ],
+   "break_thirds": [
+    2,
+    7,
+    6
+   ],
+   "meaningful_thirds": [
+    66,
+    118,
+    407
+   ],
+   "escalation": {
+    "collisions": 9.071428571428571,
+    "spawns": 4.333333333333333,
+    "breaks": 2.3333333333333335,
+    "meaningful": 6.08955223880597,
+    "population": 3.6
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 1,
+    "winner_name": "orange",
+    "winner_ball": 6,
+    "winner_founder_slot": 0,
+    "winner_generation": 1,
+    "winner_route": "opening",
+    "win_margin_seconds": 0.360701842030835,
+    "first_to_clone": 1,
+    "first_spawn_by_team": [
+     7.0027153660524695,
+     0.6449496065820797
+    ],
+    "population_by_team": [
+     7,
+     10
+    ],
+    "population_share_winner": 0.5882352941176471,
+    "spawns_by_team": [
+     6,
+     9
+    ],
+    "collisions_by_team": [
+     129,
+     205
+    ],
+    "crossings_by_team": [
+     18,
+     26
+    ],
+    "frontier_by_team": [
+     4,
+     5
+    ],
+    "loser_frontier": 4,
+    "damage_by_team": [
+     84.582823,
+     134.957871
+    ],
+    "breaks_by_team": [
+     9,
+     6
+    ],
+    "breaks_by_largest_team": [
+     8,
+     7
+    ],
+    "cross_team_breaks": 12,
+    "stolen_breaks": 5,
+    "population_lead_changes": 0,
+    "frontier_lead_changes": 0,
+    "max_population_lead": 5,
+    "team_digest": "fe5e4f6b7cf97dd2be447fc1da279d835bc21fb6ef1dc3de2cd1a287eafc6e71"
+   }
+  },
+  {
+   "seed": 15358,
+   "flags": [],
+   "escaped": true,
+   "duration": 24.692847771144443,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 3,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 17,
+   "population_max": 17,
+   "population_early": 4,
+   "generations": 5,
+   "suppressed": 0,
+   "spawns": 15,
+   "first_spawn": 0.6168423697836687,
+   "violations": 0,
+   "collisions": 348,
+   "collision_rate": 14.093149693599361,
+   "peak_collision_rate": 36.5,
+   "grazing": 0,
+   "ball_ball": 0,
+   "near_misses": 29,
+   "damage_events": 348,
+   "damage_scoring": 346,
+   "transitions": 125,
+   "breaks": 15,
+   "shared_breaks": 15,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 6,
+   "mean_break_cumulative": 3.0880040453335336,
+   "progression_opening": 36,
+   "progression_break": 25,
+   "meaningful_total": 652,
+   "meaningful_rate": 26.4044068972034,
+   "meaningful_peak": 55.5,
+   "stagnation": 0.5145709352709976,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 141,
+   "trajectory_spread": 0.3867182753652033,
+   "difficulty_increasing": true,
+   "max_penetration": 6.06203975905828e-12,
+   "min_spawn_clearance": 0.13340001100175047,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 1.007519761341244,
+   "mean_speed_correction": 0.062407844916391834,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "0234b730b82ec48fd0f43a77cd8b3fb491a031ac49a5c839bd42b0a14af65f5e",
+   "curve": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    6,
+    7,
+    10,
+    12,
+    12,
+    17
+   ],
+   "thirds_population": [
+    5,
+    8,
+    17
+   ],
+   "by_region": [
+    3,
+    1,
+    4,
+    1,
+    6,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    4,
+    4,
+    1
+   ],
+   "reached": [
+    7,
+    7,
+    11,
+    9,
+    8
+   ],
+   "crossed": [
+    6,
+    5,
+    5,
+    4,
+    1
+   ],
+   "crossings": [
+    42,
+    9,
+    5,
+    4,
+    1
+   ],
+   "regressions": [
+    43,
+    9,
+    5,
+    1,
+    0
+   ],
+   "dwell": [
+    64.186853,
+    34.039379,
+    30.893284,
+    24.065664,
+    29.423555,
+    0.170221
+   ],
+   "pass_rate": [
+    0.8571428571428571,
+    0.7142857142857143,
+    0.45454545454545453,
+    0.4444444444444444,
+    0.125
+   ],
+   "blocked": [
+    28,
+    44,
+    56,
+    44,
+    52
+   ],
+   "damage_absorbed": [
+    21.320899,
+    65.863663,
+    67.904192,
+    66.373445,
+    38.251393
+   ],
+   "collisions_per_shell": [
+    33,
+    87,
+    93,
+    83,
+    52
+   ],
+   "breaks_per_shell": [
+    10,
+    3,
+    2,
+    0,
+    0
+   ],
+   "collision_thirds": [
+    43,
+    114,
+    191
+   ],
+   "spawn_thirds": [
+    3,
+    3,
+    9
+   ],
+   "break_thirds": [
+    5,
+    6,
+    4
+   ],
+   "meaningful_thirds": [
+    96,
+    228,
+    328
+   ],
+   "escalation": {
+    "collisions": 4.363636363636363,
+    "spawns": 2.5,
+    "breaks": 0.8333333333333334,
+    "meaningful": 3.3917525773195876,
+    "population": 3.0
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 0,
+    "winner_name": "cyan",
+    "winner_ball": 13,
+    "winner_founder_slot": 0,
+    "winner_generation": 3,
+    "winner_route": "opening",
+    "win_margin_seconds": 8.348044535496562,
+    "first_to_clone": 1,
+    "first_spawn_by_team": [
+     3.571528992289875,
+     0.6168423697836687
+    ],
+    "population_by_team": [
+     8,
+     9
+    ],
+    "population_share_winner": 0.47058823529411764,
+    "spawns_by_team": [
+     7,
+     8
+    ],
+    "collisions_by_team": [
+     95,
+     253
+    ],
+    "crossings_by_team": [
+     34,
+     27
+    ],
+    "frontier_by_team": [
+     5,
+     4
+    ],
+    "loser_frontier": 4,
+    "damage_by_team": [
+     77.748158,
+     181.965434
+    ],
+    "breaks_by_team": [
+     9,
+     6
+    ],
+    "breaks_by_largest_team": [
+     4,
+     11
+    ],
+    "cross_team_breaks": 11,
+    "stolen_breaks": 5,
+    "population_lead_changes": 0,
+    "frontier_lead_changes": 1,
+    "max_population_lead": 6,
+    "team_digest": "c189ecbd784694b6f0bcf87108635e35796c4ec65d83d2c990469b02303c1714"
+   }
+  },
+  {
+   "seed": 19807,
+   "flags": [],
+   "escaped": true,
+   "duration": 25.2077710771882,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 1,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 17,
+   "population_max": 17,
+   "population_early": 4,
+   "generations": 4,
+   "suppressed": 0,
+   "spawns": 15,
+   "first_spawn": 1.605537969777807,
+   "violations": 0,
+   "collisions": 376,
+   "collision_rate": 14.91603517219583,
+   "peak_collision_rate": 30.5,
+   "grazing": 2,
+   "ball_ball": 0,
+   "near_misses": 32,
+   "damage_events": 376,
+   "damage_scoring": 374,
+   "transitions": 117,
+   "breaks": 20,
+   "shared_breaks": 19,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 5,
+   "mean_break_cumulative": 3.6633158893429796,
+   "progression_opening": 32,
+   "progression_break": 23,
+   "meaningful_total": 664,
+   "meaningful_rate": 26.341083389196893,
+   "meaningful_peak": 54.0,
+   "stagnation": 0.8155624431035224,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 144,
+   "trajectory_spread": 0.38609929377330593,
+   "difficulty_increasing": true,
+   "max_penetration": 9.975020809349644e-12,
+   "min_spawn_clearance": 0.09658205858907998,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 1.002725955099983,
+   "mean_speed_correction": 0.07084543719234501,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "c6536329fa846b0852392ba26a5a480cab2ba66fbb2bd126f5b43c77c86e8eb1",
+   "curve": [
+    2,
+    3,
+    4,
+    4,
+    4,
+    8,
+    8,
+    9,
+    10,
+    12,
+    17
+   ],
+   "thirds_population": [
+    4,
+    8,
+    17
+   ],
+   "by_region": [
+    0,
+    4,
+    2,
+    5,
+    4,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    5,
+    3,
+    1
+   ],
+   "reached": [
+    7,
+    7,
+    11,
+    11,
+    6
+   ],
+   "crossed": [
+    7,
+    6,
+    7,
+    3,
+    1
+   ],
+   "crossings": [
+    34,
+    8,
+    9,
+    3,
+    1
+   ],
+   "regressions": [
+    32,
+    8,
+    7,
+    1,
+    0
+   ],
+   "dwell": [
+    47.313699,
+    38.987709,
+    50.035719,
+    24.156752,
+    17.325186,
+    0.16771
+   ],
+   "pass_rate": [
+    1.0,
+    0.8571428571428571,
+    0.6363636363636364,
+    0.2727272727272727,
+    0.16666666666666666
+   ],
+   "blocked": [
+    19,
+    55,
+    74,
+    51,
+    39
+   ],
+   "damage_absorbed": [
+    23.543013,
+    68.579773,
+    71.288687,
+    61.154213,
+    25.278674
+   ],
+   "collisions_per_shell": [
+    37,
+    94,
+    118,
+    87,
+    40
+   ],
+   "breaks_per_shell": [
+    10,
+    6,
+    4,
+    0,
+    0
+   ],
+   "collision_thirds": [
+    43,
+    146,
+    187
+   ],
+   "spawn_thirds": [
+    2,
+    4,
+    9
+   ],
+   "break_thirds": [
+    4,
+    9,
+    7
+   ],
+   "meaningful_thirds": [
+    89,
+    260,
+    315
+   ],
+   "escalation": {
+    "collisions": 4.2727272727272725,
+    "spawns": 3.3333333333333335,
+    "breaks": 1.6,
+    "meaningful": 3.511111111111111,
+    "population": 3.6
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 0,
+    "winner_name": "cyan",
+    "winner_ball": 2,
+    "winner_founder_slot": 0,
+    "winner_generation": 1,
+    "winner_route": "opening",
+    "win_margin_seconds": 7.005282238520355,
+    "first_to_clone": 0,
+    "first_spawn_by_team": [
+     1.605537969777807,
+     4.164579713736029
+    ],
+    "population_by_team": [
+     8,
+     9
+    ],
+    "population_share_winner": 0.47058823529411764,
+    "spawns_by_team": [
+     7,
+     8
+    ],
+    "collisions_by_team": [
+     75,
+     301
+    ],
+    "crossings_by_team": [
+     27,
+     28
+    ],
+    "frontier_by_team": [
+     5,
+     4
+    ],
+    "loser_frontier": 4,
+    "damage_by_team": [
+     48.2772,
+     201.56716
+    ],
+    "breaks_by_team": [
+     7,
+     13
+    ],
+    "breaks_by_largest_team": [
+     6,
+     14
+    ],
+    "cross_team_breaks": 12,
+    "stolen_breaks": 3,
+    "population_lead_changes": 1,
+    "frontier_lead_changes": 2,
+    "max_population_lead": 6,
+    "team_digest": "4729c330726e2cbb166c8aadc3b567356f9007f93699f85469bb96c07227d74b"
+   }
+  },
+  {
+   "seed": 10943,
+   "flags": [],
+   "escaped": true,
+   "duration": 20.02575716476655,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 0,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 16,
+   "population_max": 16,
+   "population_early": 3,
+   "generations": 3,
+   "suppressed": 0,
+   "spawns": 14,
+   "first_spawn": 1.5445312749099096,
+   "violations": 0,
+   "collisions": 355,
+   "collision_rate": 17.727169918178642,
+   "peak_collision_rate": 39.0,
+   "grazing": 0,
+   "ball_ball": 0,
+   "near_misses": 34,
+   "damage_events": 355,
+   "damage_scoring": 355,
+   "transitions": 133,
+   "breaks": 19,
+   "shared_breaks": 18,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 7,
+   "mean_break_cumulative": 3.6414691543417237,
+   "progression_opening": 30,
+   "progression_break": 17,
+   "meaningful_total": 650,
+   "meaningful_rate": 32.45819844173554,
+   "meaningful_peak": 74.0,
+   "stagnation": 1.115893197034688,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 135,
+   "trajectory_spread": 0.3595792460636601,
+   "difficulty_increasing": true,
+   "max_penetration": 9.541145651326133e-12,
+   "min_spawn_clearance": 0.05007165701457339,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 0.86222702204544,
+   "mean_speed_correction": 0.06954426379520781,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "bf2762e2fad9befc6266d393aceaab4f3df563a4b5174a0d2b671b0717af2cbd",
+   "curve": [
+    2,
+    3,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    12,
+    14,
+    16
+   ],
+   "thirds_population": [
+    5,
+    8,
+    16
+   ],
+   "by_region": [
+    3,
+    4,
+    1,
+    1,
+    5,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    4,
+    3,
+    1
+   ],
+   "reached": [
+    9,
+    11,
+    11,
+    9,
+    6
+   ],
+   "crossed": [
+    8,
+    6,
+    6,
+    4,
+    1
+   ],
+   "crossings": [
+    25,
+    7,
+    9,
+    5,
+    1
+   ],
+   "regressions": [
+    26,
+    10,
+    9,
+    2,
+    0
+   ],
+   "dwell": [
+    38.094432,
+    34.535756,
+    33.099811,
+    21.30222,
+    15.356942,
+    0.256749
+   ],
+   "pass_rate": [
+    0.8888888888888888,
+    0.5454545454545454,
+    0.5454545454545454,
+    0.4444444444444444,
+    0.16666666666666666
+   ],
+   "blocked": [
+    15,
+    46,
+    67,
+    38,
+    41
+   ],
+   "damage_absorbed": [
+    21.786552,
+    85.301173,
+    74.936779,
+    57.775715,
+    36.045684
+   ],
+   "collisions_per_shell": [
+    31,
+    109,
+    99,
+    74,
+    42
+   ],
+   "breaks_per_shell": [
+    9,
+    8,
+    2,
+    0,
+    0
+   ],
+   "collision_thirds": [
+    30,
+    105,
+    220
+   ],
+   "spawn_thirds": [
+    3,
+    3,
+    8
+   ],
+   "break_thirds": [
+    4,
+    4,
+    11
+   ],
+   "meaningful_thirds": [
+    72,
+    191,
+    387
+   ],
+   "escalation": {
+    "collisions": 7.129032258064516,
+    "spawns": 2.25,
+    "breaks": 2.4,
+    "meaningful": 5.315068493150685,
+    "population": 2.8333333333333335
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 0,
+    "winner_name": "cyan",
+    "winner_ball": 0,
+    "winner_founder_slot": 0,
+    "winner_generation": 0,
+    "winner_route": "opening",
+    "win_margin_seconds": 3.28213603249878,
+    "first_to_clone": 0,
+    "first_spawn_by_team": [
+     1.5445312749099096,
+     8.164576122562424
+    ],
+    "population_by_team": [
+     9,
+     7
+    ],
+    "population_share_winner": 0.5625,
+    "spawns_by_team": [
+     8,
+     6
+    ],
+    "collisions_by_team": [
+     226,
+     129
+    ],
+    "crossings_by_team": [
+     23,
+     24
+    ],
+    "frontier_by_team": [
+     5,
+     4
+    ],
+    "loser_frontier": 4,
+    "damage_by_team": [
+     160.641402,
+     115.204502
+    ],
+    "breaks_by_team": [
+     9,
+     10
+    ],
+    "breaks_by_largest_team": [
+     13,
+     6
+    ],
+    "cross_team_breaks": 14,
+    "stolen_breaks": 8,
+    "population_lead_changes": 0,
+    "frontier_lead_changes": 0,
+    "max_population_lead": 3,
+    "team_digest": "eef3471fdb2c06f44a0a8fdea7f272bca0c91ab828dde95469e692fe6b1dbeaa"
+   }
+  },
+  {
+   "seed": 6298,
+   "flags": [],
+   "escaped": true,
+   "duration": 22.478895718032263,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 0,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 16,
+   "population_max": 16,
+   "population_early": 4,
+   "generations": 4,
+   "suppressed": 0,
+   "spawns": 14,
+   "first_spawn": 1.569147074095786,
+   "violations": 0,
+   "collisions": 361,
+   "collision_rate": 16.059507750214383,
+   "peak_collision_rate": 42.5,
+   "grazing": 1,
+   "ball_ball": 0,
+   "near_misses": 33,
+   "damage_events": 361,
+   "damage_scoring": 360,
+   "transitions": 148,
+   "breaks": 20,
+   "shared_breaks": 20,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 5,
+   "mean_break_cumulative": 3.6440185751647762,
+   "progression_opening": 32,
+   "progression_break": 8,
+   "meaningful_total": 658,
+   "meaningful_rate": 29.271900553022334,
+   "meaningful_peak": 74.5,
+   "stagnation": 1.112897494391765,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 126,
+   "trajectory_spread": 0.352727232939109,
+   "difficulty_increasing": true,
+   "max_penetration": 9.443668069764044e-12,
+   "min_spawn_clearance": 0.04716851505108366,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 1.1247751396401966,
+   "mean_speed_correction": 0.07816569596719265,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "98392426ed81fef0e1a4b332b82d59682650cee2c28ca7af4e5c5a1f8b6c2fa3",
+   "curve": [
+    2,
+    3,
+    4,
+    4,
+    4,
+    6,
+    6,
+    7,
+    9,
+    13,
+    16
+   ],
+   "thirds_population": [
+    4,
+    7,
+    16
+   ],
+   "by_region": [
+    3,
+    3,
+    2,
+    3,
+    3,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    4,
+    3,
+    1
+   ],
+   "reached": [
+    8,
+    8,
+    11,
+    9,
+    6
+   ],
+   "crossed": [
+    8,
+    5,
+    5,
+    3,
+    1
+   ],
+   "crossings": [
+    26,
+    5,
+    5,
+    3,
+    1
+   ],
+   "regressions": [
+    27,
+    7,
+    5,
+    2,
+    0
+   ],
+   "dwell": [
+    41.828623,
+    36.252155,
+    32.95378,
+    32.314598,
+    3.545807,
+    0.178877
+   ],
+   "pass_rate": [
+    1.0,
+    0.625,
+    0.45454545454545453,
+    0.3333333333333333,
+    0.16666666666666666
+   ],
+   "blocked": [
+    19,
+    55,
+    61,
+    73,
+    9
+   ],
+   "damage_absorbed": [
+    22.369283,
+    80.286227,
+    100.391109,
+    64.285837,
+    8.962301
+   ],
+   "collisions_per_shell": [
+    33,
+    110,
+    129,
+    79,
+    10
+   ],
+   "breaks_per_shell": [
+    10,
+    9,
+    0,
+    1,
+    0
+   ],
+   "collision_thirds": [
+    37,
+    76,
+    248
+   ],
+   "spawn_thirds": [
+    2,
+    3,
+    9
+   ],
+   "break_thirds": [
+    3,
+    6,
+    11
+   ],
+   "meaningful_thirds": [
+    86,
+    136,
+    436
+   ],
+   "escalation": {
+    "collisions": 6.552631578947368,
+    "spawns": 3.3333333333333335,
+    "breaks": 3.0,
+    "meaningful": 5.022988505747127,
+    "population": 3.4
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 1,
+    "winner_name": "orange",
+    "winner_ball": 0,
+    "winner_founder_slot": 0,
+    "winner_generation": 0,
+    "winner_route": "opening",
+    "win_margin_seconds": 1.0151069443619,
+    "first_to_clone": 1,
+    "first_spawn_by_team": [
+     2.7459481650111677,
+     1.569147074095786
+    ],
+    "population_by_team": [
+     7,
+     9
+    ],
+    "population_share_winner": 0.5625,
+    "spawns_by_team": [
+     6,
+     8
+    ],
+    "collisions_by_team": [
+     183,
+     178
+    ],
+    "crossings_by_team": [
+     22,
+     18
+    ],
+    "frontier_by_team": [
+     4,
+     5
+    ],
+    "loser_frontier": 4,
+    "damage_by_team": [
+     137.376375,
+     138.918382
+    ],
+    "breaks_by_team": [
+     16,
+     4
+    ],
+    "breaks_by_largest_team": [
+     11,
+     9
+    ],
+    "cross_team_breaks": 18,
+    "stolen_breaks": 7,
+    "population_lead_changes": 2,
+    "frontier_lead_changes": 2,
+    "max_population_lead": 4,
+    "team_digest": "b4bf6d8265b3efeaf966ce474bd51b6a0016128c1191ff2adb85118cd074f4d8"
+   }
+  },
+  {
+   "seed": 16020,
+   "flags": [],
+   "escaped": true,
+   "duration": 25.154006135257482,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 0,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 16,
+   "population_max": 16,
+   "population_early": 5,
+   "generations": 4,
+   "suppressed": 0,
+   "spawns": 14,
+   "first_spawn": 0.6361062399393693,
+   "violations": 0,
+   "collisions": 440,
+   "collision_rate": 17.49224348734127,
+   "peak_collision_rate": 34.0,
+   "grazing": 0,
+   "ball_ball": 0,
+   "near_misses": 35,
+   "damage_events": 440,
+   "damage_scoring": 440,
+   "transitions": 183,
+   "breaks": 34,
+   "shared_breaks": 33,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 6,
+   "mean_break_cumulative": 4.11726307358586,
+   "progression_opening": 37,
+   "progression_break": 28,
+   "meaningful_total": 837,
+   "meaningful_rate": 33.275017724783275,
+   "meaningful_peak": 67.5,
+   "stagnation": 0.8221645162640909,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 145,
+   "trajectory_spread": 0.425860017958778,
+   "difficulty_increasing": true,
+   "max_penetration": 8.190004230357317e-12,
+   "min_spawn_clearance": 0.2883645627297611,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 0.9471991424262555,
+   "mean_speed_correction": 0.06646490800301427,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "838d700dd95ecafefea95f8d3436a8b7e332383c3e7e80e705fde67ed0b558af",
+   "curve": [
+    2,
+    4,
+    5,
+    5,
+    6,
+    8,
+    8,
+    8,
+    10,
+    14,
+    16
+   ],
+   "thirds_population": [
+    5,
+    8,
+    16
+   ],
+   "by_region": [
+    2,
+    4,
+    3,
+    1,
+    4,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    4,
+    3,
+    1
+   ],
+   "reached": [
+    8,
+    9,
+    11,
+    9,
+    6
+   ],
+   "crossed": [
+    8,
+    6,
+    7,
+    3,
+    1
+   ],
+   "crossings": [
+    38,
+    10,
+    13,
+    3,
+    1
+   ],
+   "regressions": [
+    38,
+    12,
+    14,
+    1,
+    0
+   ],
+   "dwell": [
+    56.994281,
+    40.473987,
+    52.618581,
+    23.74338,
+    20.738918,
+    0.234612
+   ],
+   "pass_rate": [
+    1.0,
+    0.6666666666666666,
+    0.6363636363636364,
+    0.3333333333333333,
+    0.16666666666666666
+   ],
+   "blocked": [
+    21,
+    52,
+    104,
+    45,
+    40
+   ],
+   "damage_absorbed": [
+    20.465306,
+    118.224193,
+    99.757782,
+    53.853401,
+    27.500104
+   ],
+   "collisions_per_shell": [
+    35,
+    152,
+    133,
+    80,
+    40
+   ],
+   "breaks_per_shell": [
+    9,
+    19,
+    6,
+    0,
+    0
+   ],
+   "collision_thirds": [
+    81,
+    170,
+    189
+   ],
+   "spawn_thirds": [
+    3,
+    3,
+    8
+   ],
+   "break_thirds": [
+    2,
+    13,
+    19
+   ],
+   "meaningful_thirds": [
+    149,
+    307,
+    381
+   ],
+   "escalation": {
+    "collisions": 2.317073170731707,
+    "spawns": 2.25,
+    "breaks": 6.666666666666667,
+    "meaningful": 2.546666666666667,
+    "population": 2.8333333333333335
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 0,
+    "winner_name": "cyan",
+    "winner_ball": 0,
+    "winner_founder_slot": 0,
+    "winner_generation": 0,
+    "winner_route": "opening",
+    "win_margin_seconds": 6.646895874110346,
+    "first_to_clone": 0,
+    "first_spawn_by_team": [
+     0.6361062399393693,
+     1.613420499586468
+    ],
+    "population_by_team": [
+     10,
+     6
+    ],
+    "population_share_winner": 0.625,
+    "spawns_by_team": [
+     9,
+     5
+    ],
+    "collisions_by_team": [
+     185,
+     255
+    ],
+    "crossings_by_team": [
+     33,
+     32
+    ],
+    "frontier_by_team": [
+     5,
+     4
+    ],
+    "loser_frontier": 4,
+    "damage_by_team": [
+     139.489641,
+     180.311145
+    ],
+    "breaks_by_team": [
+     18,
+     16
+    ],
+    "breaks_by_largest_team": [
+     9,
+     25
+    ],
+    "cross_team_breaks": 28,
+    "stolen_breaks": 11,
+    "population_lead_changes": 2,
+    "frontier_lead_changes": 2,
+    "max_population_lead": 4,
+    "team_digest": "f4514a64b9aebef8070e7798a175720f4eeefbe76ffb98c695ab43e653f26600"
+   }
+  },
+  {
+   "seed": 16914,
+   "flags": [],
+   "escaped": true,
+   "duration": 25.959605948860634,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 0,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 16,
+   "population_max": 16,
+   "population_early": 5,
+   "generations": 3,
+   "suppressed": 0,
+   "spawns": 14,
+   "first_spawn": 1.792112791723741,
+   "violations": 0,
+   "collisions": 459,
+   "collision_rate": 17.68131615341971,
+   "peak_collision_rate": 37.0,
+   "grazing": 0,
+   "ball_ball": 0,
+   "near_misses": 39,
+   "damage_events": 459,
+   "damage_scoring": 459,
+   "transitions": 123,
+   "breaks": 17,
+   "shared_breaks": 17,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 5,
+   "mean_break_cumulative": 3.8293033380818478,
+   "progression_opening": 37,
+   "progression_break": 19,
+   "meaningful_total": 761,
+   "meaningful_rate": 29.31477471187887,
+   "meaningful_peak": 60.0,
+   "stagnation": 1.0200168162180194,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 167,
+   "trajectory_spread": 0.41366479355091146,
+   "difficulty_increasing": false,
+   "max_penetration": 8.350209412810727e-12,
+   "min_spawn_clearance": 0.00468207618648564,
+   "speed_min": 9.999999999999996,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 1.0910653311411818,
+   "mean_speed_correction": 0.08642257497238283,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "656c1e06a550c364ae6bdbb293442bb64924c464b3798aacc524d97f5a693ee1",
+   "curve": [
+    2,
+    3,
+    4,
+    5,
+    5,
+    6,
+    8,
+    13,
+    13,
+    13,
+    16
+   ],
+   "thirds_population": [
+    5,
+    10,
+    16
+   ],
+   "by_region": [
+    3,
+    1,
+    1,
+    3,
+    6,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    3,
+    3,
+    5,
+    1
+   ],
+   "reached": [
+    7,
+    7,
+    8,
+    8,
+    10
+   ],
+   "crossed": [
+    7,
+    3,
+    4,
+    6,
+    1
+   ],
+   "crossings": [
+    40,
+    3,
+    5,
+    7,
+    1
+   ],
+   "regressions": [
+    41,
+    3,
+    3,
+    5,
+    0
+   ],
+   "dwell": [
+    56.805429,
+    33.553867,
+    28.551458,
+    38.582665,
+    46.131214,
+    0.169435
+   ],
+   "pass_rate": [
+    1.0,
+    0.42857142857142855,
+    0.5,
+    0.75,
+    0.1
+   ],
+   "blocked": [
+    21,
+    52,
+    51,
+    65,
+    87
+   ],
+   "damage_absorbed": [
+    23.339189,
+    64.863097,
+    59.981858,
+    82.833364,
+    53.887625
+   ],
+   "collisions_per_shell": [
+    32,
+    85,
+    115,
+    140,
+    87
+   ],
+   "breaks_per_shell": [
+    10,
+    3,
+    3,
+    1,
+    0
+   ],
+   "collision_thirds": [
+    50,
+    121,
+    288
+   ],
+   "spawn_thirds": [
+    3,
+    5,
+    6
+   ],
+   "break_thirds": [
+    6,
+    6,
+    5
+   ],
+   "meaningful_thirds": [
+    108,
+    219,
+    434
+   ],
+   "escalation": {
+    "collisions": 5.666666666666667,
+    "spawns": 1.75,
+    "breaks": 0.8571428571428571,
+    "meaningful": 3.9908256880733943,
+    "population": 2.8333333333333335
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 0,
+    "winner_name": "cyan",
+    "winner_ball": 1,
+    "winner_founder_slot": 1,
+    "winner_generation": 0,
+    "winner_route": "opening",
+    "win_margin_seconds": 12.900118836441754,
+    "first_to_clone": 1,
+    "first_spawn_by_team": [
+     2.7120023674108102,
+     1.792112791723741
+    ],
+    "population_by_team": [
+     7,
+     9
+    ],
+    "population_share_winner": 0.4375,
+    "spawns_by_team": [
+     6,
+     8
+    ],
+    "collisions_by_team": [
+     173,
+     286
+    ],
+    "crossings_by_team": [
+     25,
+     31
+    ],
+    "frontier_by_team": [
+     5,
+     4
+    ],
+    "loser_frontier": 4,
+    "damage_by_team": [
+     119.017578,
+     165.887554
+    ],
+    "breaks_by_team": [
+     9,
+     8
+    ],
+    "breaks_by_largest_team": [
+     7,
+     10
+    ],
+    "cross_team_breaks": 13,
+    "stolen_breaks": 10,
+    "population_lead_changes": 0,
+    "frontier_lead_changes": 1,
+    "max_population_lead": 4,
+    "team_digest": "48994211bf2480f1e0f46412483ee167cd3b87922b2e7c9986923a58f70ed2ff"
+   }
+  },
+  {
+   "seed": 8751,
+   "flags": [],
+   "escaped": true,
+   "duration": 21.084590524804266,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 0,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 15,
+   "population_max": 15,
+   "population_early": 3,
+   "generations": 4,
+   "suppressed": 0,
+   "spawns": 13,
+   "first_spawn": 1.9185843763314336,
+   "violations": 0,
+   "collisions": 315,
+   "collision_rate": 14.939820606401092,
+   "peak_collision_rate": 41.5,
+   "grazing": 0,
+   "ball_ball": 0,
+   "near_misses": 27,
+   "damage_events": 315,
+   "damage_scoring": 314,
+   "transitions": 121,
+   "breaks": 20,
+   "shared_breaks": 19,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 7,
+   "mean_break_cumulative": 3.7324420964721754,
+   "progression_opening": 28,
+   "progression_break": 8,
+   "meaningful_total": 570,
+   "meaningful_rate": 27.033961097297215,
+   "meaningful_peak": 71.5,
+   "stagnation": 0.9814317221727903,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 120,
+   "trajectory_spread": 0.3841132762212365,
+   "difficulty_increasing": false,
+   "max_penetration": 9.744205442530074e-12,
+   "min_spawn_clearance": 0.06656958637189447,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 0.850177599116002,
+   "mean_speed_correction": 0.07063579273752582,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "cd25fa3e0caf8edcaf7428adc0167461f81c1287783daed14e5d43c1b5ed2940",
+   "curve": [
+    2,
+    3,
+    3,
+    3,
+    3,
+    6,
+    7,
+    8,
+    10,
+    13,
+    15
+   ],
+   "thirds_population": [
+    3,
+    8,
+    15
+   ],
+   "by_region": [
+    2,
+    4,
+    3,
+    3,
+    1,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    5,
+    1,
+    1
+   ],
+   "reached": [
+    6,
+    9,
+    12,
+    10,
+    2
+   ],
+   "crossed": [
+    5,
+    5,
+    8,
+    1,
+    1
+   ],
+   "crossings": [
+    16,
+    7,
+    11,
+    1,
+    1
+   ],
+   "regressions": [
+    16,
+    9,
+    12,
+    0,
+    0
+   ],
+   "dwell": [
+    37.163604,
+    27.850923,
+    39.843384,
+    21.296094,
+    5.301905,
+    0.153251
+   ],
+   "pass_rate": [
+    0.8333333333333334,
+    0.5555555555555556,
+    0.6666666666666666,
+    0.1,
+    0.5
+   ],
+   "blocked": [
+    19,
+    38,
+    70,
+    48,
+    16
+   ],
+   "damage_absorbed": [
+    22.49963,
+    62.926137,
+    77.02762,
+    52.603249,
+    14.44291
+   ],
+   "collisions_per_shell": [
+    30,
+    100,
+    105,
+    63,
+    17
+   ],
+   "breaks_per_shell": [
+    10,
+    5,
+    5,
+    0,
+    0
+   ],
+   "collision_thirds": [
+    25,
+    72,
+    218
+   ],
+   "spawn_thirds": [
+    1,
+    5,
+    7
+   ],
+   "break_thirds": [
+    4,
+    3,
+    13
+   ],
+   "meaningful_thirds": [
+    55,
+    143,
+    372
+   ],
+   "escalation": {
+    "collisions": 8.423076923076923,
+    "spawns": 4.0,
+    "breaks": 2.8,
+    "meaningful": 6.660714285714286,
+    "population": 4.0
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 1,
+    "winner_name": "orange",
+    "winner_ball": 0,
+    "winner_founder_slot": 0,
+    "winner_generation": 0,
+    "winner_route": "opening",
+    "win_margin_seconds": 10.746708306436316,
+    "first_to_clone": 0,
+    "first_spawn_by_team": [
+     1.9185843763314336,
+     9.435662487501578
+    ],
+    "population_by_team": [
+     6,
+     9
+    ],
+    "population_share_winner": 0.6,
+    "spawns_by_team": [
+     5,
+     8
+    ],
+    "collisions_by_team": [
+     106,
+     209
+    ],
+    "crossings_by_team": [
+     20,
+     16
+    ],
+    "frontier_by_team": [
+     3,
+     5
+    ],
+    "loser_frontier": 3,
+    "damage_by_team": [
+     62.431899,
+     167.067647
+    ],
+    "breaks_by_team": [
+     9,
+     11
+    ],
+    "breaks_by_largest_team": [
+     12,
+     8
+    ],
+    "cross_team_breaks": 18,
+    "stolen_breaks": 3,
+    "population_lead_changes": 1,
+    "frontier_lead_changes": 1,
+    "max_population_lead": 3,
+    "team_digest": "9a08b91db0eef54a7b06b015fcb98df3ba214a3874afc753e5f4624f270b6e06"
+   }
+  },
+  {
+   "seed": 593,
+   "flags": [],
+   "escaped": true,
+   "duration": 21.03929969724128,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 0,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 14,
+   "population_max": 14,
+   "population_early": 3,
+   "generations": 4,
+   "suppressed": 0,
+   "spawns": 12,
+   "first_spawn": 0.7287977375960569,
+   "violations": 0,
+   "collisions": 331,
+   "collision_rate": 15.732462808322534,
+   "peak_collision_rate": 36.5,
+   "grazing": 0,
+   "ball_ball": 0,
+   "near_misses": 27,
+   "damage_events": 331,
+   "damage_scoring": 330,
+   "transitions": 110,
+   "breaks": 15,
+   "shared_breaks": 15,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 6,
+   "mean_break_cumulative": 2.9692134521015268,
+   "progression_opening": 24,
+   "progression_break": 15,
+   "meaningful_total": 571,
+   "meaningful_rate": 27.13968659683434,
+   "meaningful_peak": 58.5,
+   "stagnation": 0.7984676038495928,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 151,
+   "trajectory_spread": 0.39630091914738286,
+   "difficulty_increasing": false,
+   "max_penetration": 9.895195773879095e-12,
+   "min_spawn_clearance": 0.2679584013742923,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 0.9385460001037345,
+   "mean_speed_correction": 0.05593690618402827,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "3d937bb41c814b8d80414a73f33ddd202016c446f7f574f7a8ba6a258e9915c8",
+   "curve": [
+    2,
+    3,
+    3,
+    3,
+    5,
+    6,
+    8,
+    8,
+    9,
+    11,
+    14
+   ],
+   "thirds_population": [
+    3,
+    8,
+    14
+   ],
+   "by_region": [
+    1,
+    2,
+    6,
+    1,
+    2,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    3,
+    2,
+    1
+   ],
+   "reached": [
+    6,
+    7,
+    11,
+    7,
+    4
+   ],
+   "crossed": [
+    6,
+    5,
+    3,
+    2,
+    1
+   ],
+   "crossings": [
+    25,
+    8,
+    3,
+    2,
+    1
+   ],
+   "regressions": [
+    24,
+    7,
+    4,
+    1,
+    0
+   ],
+   "dwell": [
+    46.68792,
+    20.810041,
+    31.961077,
+    18.979241,
+    15.448481,
+    0.17954
+   ],
+   "pass_rate": [
+    1.0,
+    0.7142857142857143,
+    0.2727272727272727,
+    0.2857142857142857,
+    0.25
+   ],
+   "blocked": [
+    21,
+    27,
+    54,
+    52,
+    44
+   ],
+   "damage_absorbed": [
+    19.753488,
+    53.347456,
+    84.152092,
+    83.593392,
+    39.994331
+   ],
+   "collisions_per_shell": [
+    23,
+    68,
+    103,
+    93,
+    44
+   ],
+   "breaks_per_shell": [
+    10,
+    3,
+    2,
+    0,
+    0
+   ],
+   "collision_thirds": [
+    21,
+    95,
+    215
+   ],
+   "spawn_thirds": [
+    1,
+    5,
+    6
+   ],
+   "break_thirds": [
+    5,
+    5,
+    5
+   ],
+   "meaningful_thirds": [
+    53,
+    176,
+    342
+   ],
+   "escalation": {
+    "collisions": 9.818181818181818,
+    "spawns": 3.5,
+    "breaks": 1.0,
+    "meaningful": 6.351851851851852,
+    "population": 3.75
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 1,
+    "winner_name": "orange",
+    "winner_ball": 1,
+    "winner_founder_slot": 1,
+    "winner_generation": 0,
+    "winner_route": "opening",
+    "win_margin_seconds": 0.9866471332974811,
+    "first_to_clone": 0,
+    "first_spawn_by_team": [
+     0.7287977375960569,
+     8.193831097758151
+    ],
+    "population_by_team": [
+     5,
+     9
+    ],
+    "population_share_winner": 0.6428571428571429,
+    "spawns_by_team": [
+     4,
+     8
+    ],
+    "collisions_by_team": [
+     52,
+     279
+    ],
+    "crossings_by_team": [
+     17,
+     22
+    ],
+    "frontier_by_team": [
+     3,
+     5
+    ],
+    "loser_frontier": 3,
+    "damage_by_team": [
+     41.142802,
+     239.697957
+    ],
+    "breaks_by_team": [
+     11,
+     4
+    ],
+    "breaks_by_largest_team": [
+     8,
+     7
+    ],
+    "cross_team_breaks": 10,
+    "stolen_breaks": 5,
+    "population_lead_changes": 1,
+    "frontier_lead_changes": 1,
+    "max_population_lead": 6,
+    "team_digest": "394056699480c2b52bb4a67a083857caa9de0884f5171bcdf651ec4c05ba49ad"
+   }
+  },
+  {
+   "seed": 9633,
+   "flags": [],
+   "escaped": true,
+   "duration": 22.014676234356358,
+   "failure_reason": null,
+   "escape_route": "break",
+   "escape_generation": 2,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 14,
+   "population_max": 14,
+   "population_early": 4,
+   "generations": 4,
+   "suppressed": 0,
+   "spawns": 12,
+   "first_spawn": 1.6630822334299482,
+   "violations": 0,
+   "collisions": 307,
+   "collision_rate": 13.945242561455084,
+   "peak_collision_rate": 41.0,
+   "grazing": 2,
+   "ball_ball": 0,
+   "near_misses": 31,
+   "damage_events": 307,
+   "damage_scoring": 305,
+   "transitions": 105,
+   "breaks": 17,
+   "shared_breaks": 16,
+   "cooperative_outer_breaks": 1,
+   "max_break_contributors": 5,
+   "mean_break_cumulative": 4.035972280090618,
+   "progression_opening": 36,
+   "progression_break": 18,
+   "meaningful_total": 576,
+   "meaningful_rate": 26.16436389380498,
+   "meaningful_peak": 63.5,
+   "stagnation": 0.9149157836652237,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 112,
+   "trajectory_spread": 0.35246672128298806,
+   "difficulty_increasing": true,
+   "max_penetration": 8.463119094415106e-12,
+   "min_spawn_clearance": 0.295720353436117,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 0.9427616150849477,
+   "mean_speed_correction": 0.0766183759525223,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "a1e49e1027763732f39ce5127b728d0120ac420d2848f935f01862d648d263c3",
+   "curve": [
+    2,
+    3,
+    4,
+    5,
+    5,
+    6,
+    6,
+    8,
+    11,
+    13,
+    14
+   ],
+   "thirds_population": [
+    5,
+    8,
+    14
+   ],
+   "by_region": [
+    1,
+    2,
+    5,
+    1,
+    3,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    3,
+    2,
+    1
+   ],
+   "reached": [
+    6,
+    6,
+    10,
+    6,
+    4
+   ],
+   "crossed": [
+    6,
+    6,
+    4,
+    2,
+    1
+   ],
+   "crossings": [
+    36,
+    8,
+    7,
+    2,
+    1
+   ],
+   "regressions": [
+    35,
+    7,
+    7,
+    0,
+    0
+   ],
+   "dwell": [
+    49.355467,
+    35.849958,
+    35.588164,
+    7.069056,
+    19.417689,
+    0.232277
+   ],
+   "pass_rate": [
+    1.0,
+    1.0,
+    0.4,
+    0.3333333333333333,
+    0.25
+   ],
+   "blocked": [
+    18,
+    49,
+    67,
+    13,
+    51
+   ],
+   "damage_absorbed": [
+    22.888003,
+    72.47777,
+    47.780004,
+    45.040223,
+    38.070433
+   ],
+   "collisions_per_shell": [
+    26,
+    93,
+    75,
+    62,
+    51
+   ],
+   "breaks_per_shell": [
+    10,
+    4,
+    2,
+    0,
+    1
+   ],
+   "collision_thirds": [
+    33,
+    56,
+    218
+   ],
+   "spawn_thirds": [
+    3,
+    3,
+    6
+   ],
+   "break_thirds": [
+    4,
+    6,
+    7
+   ],
+   "meaningful_thirds": [
+    82,
+    150,
+    344
+   ],
+   "escalation": {
+    "collisions": 6.4411764705882355,
+    "spawns": 1.75,
+    "breaks": 1.6,
+    "meaningful": 4.156626506024097,
+    "population": 2.5
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 1,
+    "winner_name": "orange",
+    "winner_ball": 10,
+    "winner_founder_slot": 0,
+    "winner_generation": 2,
+    "winner_route": "break",
+    "win_margin_seconds": 3.450153524311318,
+    "first_to_clone": 1,
+    "first_spawn_by_team": [
+     3.6439365440679325,
+     1.6630822334299482
+    ],
+    "population_by_team": [
+     5,
+     9
+    ],
+    "population_share_winner": 0.6428571428571429,
+    "spawns_by_team": [
+     4,
+     8
+    ],
+    "collisions_by_team": [
+     82,
+     225
+    ],
+    "crossings_by_team": [
+     18,
+     36
+    ],
+    "frontier_by_team": [
+     3,
+     5
+    ],
+    "loser_frontier": 3,
+    "damage_by_team": [
+     62.278233,
+     163.9782
+    ],
+    "breaks_by_team": [
+     8,
+     9
+    ],
+    "breaks_by_largest_team": [
+     8,
+     9
+    ],
+    "cross_team_breaks": 9,
+    "stolen_breaks": 2,
+    "population_lead_changes": 0,
+    "frontier_lead_changes": 0,
+    "max_population_lead": 5,
+    "team_digest": "3e7a0db2a962c3b538d30cf21bb667e6a5dd4d256ae5d3be47672984ecc43804"
+   }
+  },
+  {
+   "seed": 19371,
+   "flags": [],
+   "escaped": true,
+   "duration": 22.4125901108319,
+   "failure_reason": null,
+   "escape_route": "break",
+   "escape_generation": 3,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 14,
+   "population_max": 14,
+   "population_early": 5,
+   "generations": 5,
+   "suppressed": 0,
+   "spawns": 12,
+   "first_spawn": 1.6873680509958173,
+   "violations": 0,
+   "collisions": 371,
+   "collision_rate": 16.55319613509094,
+   "peak_collision_rate": 35.5,
+   "grazing": 0,
+   "ball_ball": 0,
+   "near_misses": 46,
+   "damage_events": 371,
+   "damage_scoring": 371,
+   "transitions": 134,
+   "breaks": 21,
+   "shared_breaks": 21,
+   "cooperative_outer_breaks": 1,
+   "max_break_contributors": 6,
+   "mean_break_cumulative": 4.317310463047621,
+   "progression_opening": 44,
+   "progression_break": 18,
+   "meaningful_total": 706,
+   "meaningful_rate": 31.500152213946638,
+   "meaningful_peak": 58.0,
+   "stagnation": 1.0526486329781624,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 122,
+   "trajectory_spread": 0.4060076336849082,
+   "difficulty_increasing": false,
+   "max_penetration": 8.324119171732036e-12,
+   "min_spawn_clearance": 0.1627667389698484,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 0.7202851497637127,
+   "mean_speed_correction": 0.083189043036883,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "4d954388a096dc64ab41f04765fd4afe3b5f55b1b04f8b116814fe1a91d597af",
+   "curve": [
+    2,
+    3,
+    4,
+    5,
+    7,
+    8,
+    9,
+    9,
+    10,
+    12,
+    14
+   ],
+   "thirds_population": [
+    5,
+    9,
+    14
+   ],
+   "by_region": [
+    3,
+    2,
+    0,
+    6,
+    1,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    4,
+    1,
+    1
+   ],
+   "reached": [
+    7,
+    9,
+    10,
+    8,
+    2
+   ],
+   "crossed": [
+    7,
+    7,
+    6,
+    1,
+    1
+   ],
+   "crossings": [
+    37,
+    12,
+    11,
+    1,
+    1
+   ],
+   "regressions": [
+    38,
+    13,
+    8,
+    0,
+    0
+   ],
+   "dwell": [
+    53.964157,
+    37.672431,
+    51.072747,
+    18.565987,
+    7.641091,
+    0.150606
+   ],
+   "pass_rate": [
+    1.0,
+    0.7777777777777778,
+    0.6,
+    0.125,
+    0.5
+   ],
+   "blocked": [
+    24,
+    59,
+    88,
+    40,
+    21
+   ],
+   "damage_absorbed": [
+    22.446449,
+    80.061181,
+    76.331072,
+    43.43467,
+    17.779106
+   ],
+   "collisions_per_shell": [
+    33,
+    138,
+    119,
+    60,
+    21
+   ],
+   "breaks_per_shell": [
+    9,
+    8,
+    3,
+    0,
+    1
+   ],
+   "collision_thirds": [
+    48,
+    136,
+    187
+   ],
+   "spawn_thirds": [
+    3,
+    4,
+    5
+   ],
+   "break_thirds": [
+    4,
+    9,
+    8
+   ],
+   "meaningful_thirds": [
+    103,
+    272,
+    331
+   ],
+   "escalation": {
+    "collisions": 3.836734693877551,
+    "spawns": 1.5,
+    "breaks": 1.8,
+    "meaningful": 3.1923076923076925,
+    "population": 2.5
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 1,
+    "winner_name": "orange",
+    "winner_ball": 11,
+    "winner_founder_slot": 0,
+    "winner_generation": 3,
+    "winner_route": "break",
+    "win_margin_seconds": 9.817014049863886,
+    "first_to_clone": 0,
+    "first_spawn_by_team": [
+     1.6873680509958173,
+     2.8104540034988896
+    ],
+    "population_by_team": [
+     6,
+     8
+    ],
+    "population_share_winner": 0.5714285714285714,
+    "spawns_by_team": [
+     5,
+     7
+    ],
+    "collisions_by_team": [
+     175,
+     196
+    ],
+    "crossings_by_team": [
+     27,
+     35
+    ],
+    "frontier_by_team": [
+     3,
+     5
+    ],
+    "loser_frontier": 3,
+    "damage_by_team": [
+     102.655258,
+     137.397221
+    ],
+    "breaks_by_team": [
+     12,
+     9
+    ],
+    "breaks_by_largest_team": [
+     12,
+     9
+    ],
+    "cross_team_breaks": 14,
+    "stolen_breaks": 4,
+    "population_lead_changes": 3,
+    "frontier_lead_changes": 1,
+    "max_population_lead": 2,
+    "team_digest": "7d50b1eb148d72c55efd633f1ec91761979ec0803228bcb2d4b959c011391317"
+   }
+  },
+  {
+   "seed": 11852,
+   "flags": [],
+   "escaped": true,
+   "duration": 22.74223280052531,
+   "failure_reason": null,
+   "escape_route": "opening",
+   "escape_generation": 0,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 14,
+   "population_max": 14,
+   "population_early": 5,
+   "generations": 4,
+   "suppressed": 0,
+   "spawns": 12,
+   "first_spawn": 0.8403871849516344,
+   "violations": 0,
+   "collisions": 366,
+   "collision_rate": 16.093406624152838,
+   "peak_collision_rate": 42.0,
+   "grazing": 0,
+   "ball_ball": 0,
+   "near_misses": 36,
+   "damage_events": 366,
+   "damage_scoring": 366,
+   "transitions": 117,
+   "breaks": 15,
+   "shared_breaks": 15,
+   "cooperative_outer_breaks": 0,
+   "max_break_contributors": 5,
+   "mean_break_cumulative": 3.2674141450762826,
+   "progression_opening": 28,
+   "progression_break": 18,
+   "meaningful_total": 634,
+   "meaningful_rate": 27.877649725991528,
+   "meaningful_peak": 57.5,
+   "stagnation": 0.6326401339327565,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 115,
+   "trajectory_spread": 0.2964425370333327,
+   "difficulty_increasing": false,
+   "max_penetration": 5.93891602562735e-12,
+   "min_spawn_clearance": 0.00011427219298421054,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 0.864655957670351,
+   "mean_speed_correction": 0.08096227932228801,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "a852e39faa321afcdc82a7d3957817a335bd47da089b1fc347e2e95a0af5b797",
+   "curve": [
+    2,
+    5,
+    5,
+    5,
+    6,
+    6,
+    7,
+    9,
+    9,
+    12,
+    14
+   ],
+   "thirds_population": [
+    5,
+    8,
+    14
+   ],
+   "by_region": [
+    1,
+    3,
+    2,
+    5,
+    1,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    4,
+    1,
+    1
+   ],
+   "reached": [
+    6,
+    8,
+    10,
+    8,
+    2
+   ],
+   "crossed": [
+    6,
+    6,
+    4,
+    1,
+    1
+   ],
+   "crossings": [
+    31,
+    9,
+    4,
+    1,
+    1
+   ],
+   "regressions": [
+    30,
+    9,
+    2,
+    0,
+    0
+   ],
+   "dwell": [
+    39.624419,
+    57.651352,
+    28.180422,
+    32.671005,
+    2.686729,
+    0.208053
+   ],
+   "pass_rate": [
+    1.0,
+    0.75,
+    0.4,
+    0.125,
+    0.5
+   ],
+   "blocked": [
+    17,
+    73,
+    50,
+    72,
+    7
+   ],
+   "damage_absorbed": [
+    21.430173,
+    63.405098,
+    73.250338,
+    56.501801,
+    7.185803
+   ],
+   "collisions_per_shell": [
+    37,
+    120,
+    122,
+    79,
+    8
+   ],
+   "breaks_per_shell": [
+    9,
+    5,
+    1,
+    0,
+    0
+   ],
+   "collision_thirds": [
+    52,
+    74,
+    240
+   ],
+   "spawn_thirds": [
+    3,
+    3,
+    6
+   ],
+   "break_thirds": [
+    4,
+    7,
+    4
+   ],
+   "meaningful_thirds": [
+    118,
+    156,
+    360
+   ],
+   "escalation": {
+    "collisions": 4.547169811320755,
+    "spawns": 1.75,
+    "breaks": 1.0,
+    "meaningful": 3.033613445378151,
+    "population": 2.5
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 1,
+    "winner_name": "orange",
+    "winner_ball": 1,
+    "winner_founder_slot": 1,
+    "winner_generation": 0,
+    "winner_route": "opening",
+    "win_margin_seconds": 6.954021759258632,
+    "first_to_clone": 0,
+    "first_spawn_by_team": [
+     0.8403871849516344,
+     1.3772049334563994
+    ],
+    "population_by_team": [
+     6,
+     8
+    ],
+    "population_share_winner": 0.5714285714285714,
+    "spawns_by_team": [
+     5,
+     7
+    ],
+    "collisions_by_team": [
+     194,
+     172
+    ],
+    "crossings_by_team": [
+     25,
+     21
+    ],
+    "frontier_by_team": [
+     3,
+     5
+    ],
+    "loser_frontier": 3,
+    "damage_by_team": [
+     115.916503,
+     105.856711
+    ],
+    "breaks_by_team": [
+     9,
+     6
+    ],
+    "breaks_by_largest_team": [
+     9,
+     6
+    ],
+    "cross_team_breaks": 10,
+    "stolen_breaks": 2,
+    "population_lead_changes": 1,
+    "frontier_lead_changes": 1,
+    "max_population_lead": 2,
+    "team_digest": "b0902fd96a1114c904a18d7b689bf7ddf88b985ecd3b7279196bff79b4436b7e"
+   }
+  },
+  {
+   "seed": 1176,
+   "flags": [],
+   "escaped": true,
+   "duration": 23.765145819199738,
+   "failure_reason": null,
+   "escape_route": "break",
+   "escape_generation": 4,
+   "frontier_region": 5,
+   "frontier_balls": 0,
+   "shell_count": 5,
+   "population_total": 12,
+   "population_max": 12,
+   "population_early": 3,
+   "generations": 6,
+   "suppressed": 0,
+   "spawns": 10,
+   "first_spawn": 0.5445248977009047,
+   "violations": 0,
+   "collisions": 335,
+   "collision_rate": 14.096273700511244,
+   "peak_collision_rate": 31.0,
+   "grazing": 0,
+   "ball_ball": 0,
+   "near_misses": 22,
+   "damage_events": 335,
+   "damage_scoring": 335,
+   "transitions": 129,
+   "breaks": 20,
+   "shared_breaks": 20,
+   "cooperative_outer_breaks": 1,
+   "max_break_contributors": 4,
+   "mean_break_cumulative": 4.069915970342938,
+   "progression_opening": 28,
+   "progression_break": 19,
+   "meaningful_total": 606,
+   "meaningful_rate": 25.49952794779049,
+   "meaningful_peak": 54.0,
+   "stagnation": 0.591963899630449,
+   "longest_cycle_run": 7,
+   "longest_cycle_period": 6,
+   "distinct_panels": 114,
+   "trajectory_spread": 0.3631127974655039,
+   "difficulty_increasing": false,
+   "max_penetration": 9.17999010141557e-12,
+   "min_spawn_clearance": 0.06699552712633983,
+   "speed_min": 9.999999999999998,
+   "speed_max": 10.000000000000002,
+   "max_speed_correction": 0.9606299386737962,
+   "mean_speed_correction": 0.05852454982974816,
+   "anomalous_crossings": 0,
+   "newton_failures": 0,
+   "reproduction_violations": 0,
+   "digest": "312617c9151f80be3a4cee1837ca53fd18a01864ddc0b913c223be5251b3f16d",
+   "curve": [
+    2,
+    3,
+    3,
+    3,
+    4,
+    4,
+    7,
+    10,
+    11,
+    11,
+    12
+   ],
+   "thirds_population": [
+    3,
+    9,
+    12
+   ],
+   "by_region": [
+    2,
+    1,
+    3,
+    3,
+    1,
+    2
+   ],
+   "spawns_by_shell": [
+    2,
+    4,
+    2,
+    1,
+    1
+   ],
+   "reached": [
+    7,
+    7,
+    9,
+    4,
+    2
+   ],
+   "crossed": [
+    7,
+    7,
+    3,
+    1,
+    1
+   ],
+   "crossings": [
+    29,
+    12,
+    4,
+    1,
+    1
+   ],
+   "regressions": [
+    29,
+    11,
+    2,
+    0,
+    0
+   ],
+   "dwell": [
+    46.695939,
+    35.50338,
+    42.285952,
+    15.204837,
+    10.901652,
+    0.274112
+   ],
+   "pass_rate": [
+    1.0,
+    1.0,
+    0.3333333333333333,
+    0.25,
+    0.5
+   ],
+   "blocked": [
+    15,
+    47,
+    86,
+    30,
+    30
+   ],
+   "damage_absorbed": [
+    23.826868,
+    81.102219,
+    69.514584,
+    38.083017,
+    24.248567
+   ],
+   "collisions_per_shell": [
+    29,
+    106,
+    111,
+    58,
+    31
+   ],
+   "breaks_per_shell": [
+    10,
+    8,
+    1,
+    0,
+    1
+   ],
+   "collision_thirds": [
+    39,
+    109,
+    187
+   ],
+   "spawn_thirds": [
+    1,
+    6,
+    3
+   ],
+   "break_thirds": [
+    6,
+    7,
+    7
+   ],
+   "meaningful_thirds": [
+    86,
+    214,
+    306
+   ],
+   "escalation": {
+    "collisions": 4.7,
+    "spawns": 2.0,
+    "breaks": 1.1428571428571428,
+    "meaningful": 3.528735632183908,
+    "population": 3.25
+   },
+   "race": {
+    "teams": [
+     "cyan",
+     "orange"
+    ],
+    "winner": 1,
+    "winner_name": "orange",
+    "winner_ball": 10,
+    "winner_founder_slot": 1,
+    "winner_generation": 4,
+    "winner_route": "break",
+    "win_margin_seconds": 8.73679200625441,
+    "first_to_clone": 1,
+    "first_spawn_by_team": [
+     8.329744797385594,
+     0.5445248977009047
+    ],
+    "population_by_team": [
+     5,
+     7
+    ],
+    "population_share_winner": 0.5833333333333334,
+    "spawns_by_team": [
+     4,
+     6
+    ],
+    "collisions_by_team": [
+     125,
+     210
+    ],
+    "crossings_by_team": [
+     21,
+     26
+    ],
+    "frontier_by_team": [
+     3,
+     5
+    ],
+    "loser_frontier": 3,
+    "damage_by_team": [
+     80.315873,
+     156.459382
+    ],
+    "breaks_by_team": [
+     4,
+     16
+    ],
+    "breaks_by_largest_team": [
+     4,
+     16
+    ],
+    "cross_team_breaks": 16,
+    "stolen_breaks": 2,
+    "population_lead_changes": 2,
+    "frontier_lead_changes": 2,
+    "max_population_lead": 2,
+    "team_digest": "281147e1eb181caf139fceb5f3ef0dd0af04f01e49bb64de87466654ac5d91c8"
+   }
+  }
+ ],
+ "config_digest": "4a3ab8ba22ae7c54981700823cc5b4eaf147c72fc5ab609a244d9cbaeb6ce572"
+}

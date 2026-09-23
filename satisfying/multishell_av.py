@@ -1474,29 +1474,41 @@ def av_moments(document: Mapping[str, Any]) -> list[dict[str, Any]]:
             final_exit,
         )
 
-    def at(event: Mapping[str, Any] | None, offset: float = 0.0) -> float:
-        return min(duration + visual.RELEASE_SECONDS,
-                   max(0.0, float(event["t"]) + offset)) if event else 0.0
+    # Every view except the escape and the final frame is a view of the *race*,
+    # so it is clamped to before the escape. Without this the small forward
+    # offsets can push a still past the end: on seed 17964 the population peaks
+    # 0.09 s before the winner leaves, and `late_high_population` + 0.12 s
+    # landed 0.03 s *after* it - a tile captioned "the late population peak"
+    # showing the payoff banner instead.
+    RACE_LIMIT = max(0.0, duration - 0.04)
+
+    def at(event: Mapping[str, Any] | None, offset: float = 0.0,
+           limit: float | None = None) -> float:
+        ceiling = duration + visual.RELEASE_SECONDS if limit is None else limit
+        return min(ceiling, max(0.0, float(event["t"]) + offset)) if event else 0.0
+
+    def during(event: Mapping[str, Any] | None, offset: float = 0.0) -> float:
+        return at(event, offset, RACE_LIMIT)
 
     rows = [
         ("two_founders", 0.0, "frame zero: one cyan, one orange, nothing else"),
-        ("first_clone", at(spawn, 0.10), "the first canonical reproduction"),
-        ("both_teams_multiplying", at(both_multiplying, 0.12),
+        ("first_clone", during(spawn, 0.10), "the first canonical reproduction"),
+        ("both_teams_multiplying", during(both_multiplying, 0.12),
          "both colours have now reproduced"),
-        ("first_lead_change", at(lead_change or widest, 0.12),
+        ("first_lead_change", during(lead_change or widest, 0.12),
          "the first population lead change"
          if lead_change is not None
          else "no lead change: the widest population lead instead"),
-        ("eight_ball_state", at(eight, 0.12), "the race at eight balls"),
-        ("shared_panel_damage", at(cooperative_damage, 0.04),
+        ("eight_ball_state", during(eight, 0.12), "the race at eight balls"),
+        ("shared_panel_damage", during(cooperative_damage, 0.04),
          "a second ball joins a panel's ledger"),
-        ("critical_outer_panel", at(outer_damaged or outer_attack, 0.06),
+        ("critical_outer_panel", during(outer_damaged or outer_attack, 0.06),
          "a panel of the final wall takes visible damage"
          if outer_damaged is not None
          else "no panel of the final wall ever cracked: first contact instead"),
-        ("late_high_population", at(late_population, 0.12),
+        ("late_high_population", during(late_population, 0.12),
          "the late population peak, both colours on screen"),
-        ("final_wall_struggle", at(both_on_outer or outer_attack, 0.10),
+        ("final_wall_struggle", during(both_on_outer or outer_attack, 0.10),
          "both colours working the outermost barrier"),
         ("winning_escape", at(escape, 0.10), "the first genuine final escape"),
         ("winner_frame", duration + visual.RELEASE_SECONDS,
