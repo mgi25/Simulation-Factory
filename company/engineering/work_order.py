@@ -102,8 +102,8 @@ from .protected import ProtectedSurface
 WORK_ORDER_VERSION = 1
 
 # The authority fields added when read authority stopped being assumed. They
-# are omitted from `fingerprint()` while empty, so adding them did not restamp
-# every work order the company had already authorized. See `fingerprint`.
+# are omitted from `fingerprint()` only when *all* of them are empty, which is
+# the record that predates read authority. See `fingerprint`.
 _READ_FIELDS = ("authorized_read_paths", "forbidden_read_paths")
 
 # A branch an engineering job is never assigned. Integration is a CEO act that
@@ -416,13 +416,15 @@ class EngineeringWorkOrder:
         strictly *less* privileged than one carrying them, so this is not a
         route to forging authority - only to forfeiting it.
         """
-        return _fingerprint(
-            {
-                key: value
-                for key, value in to_jsonable(self).items()
-                if key not in _READ_FIELDS or value
-            }
-        )
+        record = to_jsonable(self)
+        # All of them or none. Dropping an empty `forbidden_read_paths` beside
+        # a granted `authorized_read_paths` would restamp every work order
+        # authorized *during* this milestone, which is the same failure one
+        # step smaller - a record carrying read authority must hash the way it
+        # hashed when it was stored.
+        if not any(record.get(field) for field in _READ_FIELDS):
+            record = {key: value for key, value in record.items() if key not in _READ_FIELDS}
+        return _fingerprint(record)
 
     # --- derivations, all of them narrowing --------------------------------
 

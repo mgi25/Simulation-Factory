@@ -48,6 +48,7 @@ from company.engineering.intake import (
 )
 from company.engineering.errors import AuthorityEscalation, EngineeringError
 from company.engineering.protected import ProtectedSurface
+from ai_platform.serde import fingerprint as _unfiltered_fingerprint
 from company.engineering.work_order import (
     EngineeringWorkOrder,
     _read_covers,
@@ -464,6 +465,16 @@ def test_adding_the_fields_did_not_restamp_every_historical_work_order(config):
     # And a *granted* read scope is still inside the digest.
     granted = dataclasses.replace(order, authorized_read_paths=("company/engineering",))
     assert granted.fingerprint() != order.fingerprint()
+
+    # All of them or none. A record that carries *any* read authority hashes
+    # exactly as the unmodified function hashed it, empty companion field
+    # included - dropping that empty companion restamps every work order
+    # authorized during this milestone, which is the same failure one step
+    # smaller and is how this rule was first written.
+    assert granted.forbidden_read_paths == ()
+    assert granted.fingerprint() == _unfiltered_fingerprint(granted)
+    # The legacy record is the one and only case that diverges.
+    assert order.fingerprint() != _unfiltered_fingerprint(order)
 
 
 def test_stripping_the_read_fields_forfeits_authority_rather_than_forging_it(
