@@ -14,8 +14,18 @@ import pathlib
 import re
 import sys
 
-P = pathlib.Path(r"C:\Users\mgial\OneDrive\Documents\projects")
+# Directory holding the per-arm runner state directories. Defaults to the
+# parent of this repository checkout; pass an explicit path as argv[1] to
+# re-run the verification from a different layout.
+P = (pathlib.Path(sys.argv[1]) if len(sys.argv) > 1
+     else pathlib.Path(__file__).resolve().parents[6])
 STATE = P / "project-factory-runner-state"
+if not STATE.is_dir():
+    raise SystemExit(
+        f"runner state directory not found: {STATE}. "
+        "Pass the directory holding the per-arm runner state dirs as argv[1]. "
+        "Refusing to verify against an empty tree, which would silently "
+        "recompute every total as zero.")
 
 ARMS = {
     "control1": "p3c-vs-p5-control",
@@ -126,9 +136,8 @@ print("\n" + "=" * 78)
 print("CROSS-CHECK AGAINST RESULT.md CLAIMS")
 print("=" * 78)
 
-md = (P / "wt-bench-evidence" / "docs" / "evidence"
-      / "project_factory_repository_architecture_v1"
-      / "p3c_vs_p5_matched_benchmark" / "RESULT.md").read_text(encoding="utf-8")
+md = (pathlib.Path(__file__).resolve().parent.parent
+      / "RESULT.md").read_text(encoding="utf-8")
 
 print("\nHeadline cost claim:")
 check("whole-task cost change %", round(pooled["cost_usd"]["pct"], 2), -46.47, 0.01)
