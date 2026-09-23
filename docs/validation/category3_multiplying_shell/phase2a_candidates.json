@@ -1,0 +1,204 @@
+{
+  "format": 1,
+  "phase": "category3-test2-multiplying-shell/visual-2a",
+  "config_digest": "dcf3c2bf05879e087246bd3ae22bacbb273d64411405356fd5f329bf8c1ea0bd",
+  "expected_config_digest": "dcf3c2bf05879e087246bd3ae22bacbb273d64411405356fd5f329bf8c1ea0bd",
+  "shortlist_seeds": [
+    13009,
+    16458,
+    16067,
+    368,
+    17758,
+    949,
+    9091,
+    19998,
+    12004,
+    547,
+    11319,
+    10038,
+    3622,
+    12818,
+    7183,
+    17693,
+    6625,
+    3909
+  ],
+  "rule": {
+    "source": "docs\\validation\\category3_multiplying_shell\\phase1_shortlist.json",
+    "duration_seconds": [
+      20.0,
+      24.0
+    ],
+    "first_spawn_seconds_max": 2.5,
+    "first_spawn_seconds_reject_above": 3.0,
+    "population_total": [
+      8,
+      15
+    ],
+    "flags": "none",
+    "note": "The brief's own filter, applied to the eighteen Phase 1 shortlisted seeds and to nothing else. No new seed search was run. The rule is stated here so the set can be re-derived rather than trusted; it is not a ranking and the seven are not in preference order."
+  },
+  "seeds": [
+    949,
+    12004,
+    547,
+    11319,
+    3622,
+    12818,
+    7183
+  ],
+  "candidates": [
+    {
+      "seed": 949,
+      "duration": 20.16224491236035,
+      "first_split": 2.307972141329938,
+      "population": 8,
+      "generations": 5,
+      "escape_route": "opening",
+      "escape_generation": 3,
+      "escape_by": "descendant",
+      "progression_opening": 18,
+      "progression_break": 4,
+      "breaks": 13,
+      "shared_breaks": 13,
+      "near_misses": 2,
+      "escalation": 6.2727272727272725,
+      "digest": "dba3be80cfd6a449cbc2ecc23f8175c0ed37cfec1b94300c9e1c27f3a4c125d2"
+    },
+    {
+      "seed": 12004,
+      "duration": 21.709319519005426,
+      "first_split": 2.398059953250905,
+      "population": 15,
+      "generations": 5,
+      "escape_route": "opening",
+      "escape_generation": 2,
+      "escape_by": "descendant",
+      "progression_opening": 29,
+      "progression_break": 12,
+      "breaks": 9,
+      "shared_breaks": 9,
+      "near_misses": 6,
+      "escalation": 8.423076923076923,
+      "digest": "744d8c0b9e8e44b81f5399d58b09aa4ea997b594bb20d58b325b1baecf0eb3fb"
+    },
+    {
+      "seed": 547,
+      "duration": 21.73202037128077,
+      "first_split": 2.245821319076037,
+      "population": 11,
+      "generations": 4,
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "escape_by": "founder",
+      "progression_opening": 31,
+      "progression_break": 3,
+      "breaks": 14,
+      "shared_breaks": 13,
+      "near_misses": 12,
+      "escalation": 6.76,
+      "digest": "e91c8a962e1d95e24e0ddefbb005d4187b50d215ad24f5e620a05d38a50a9b8f"
+    },
+    {
+      "seed": 11319,
+      "duration": 21.795864042004585,
+      "first_split": 1.4706694318555769,
+      "population": 14,
+      "generations": 5,
+      "escape_route": "break",
+      "escape_generation": 0,
+      "escape_by": "founder",
+      "progression_opening": 30,
+      "progression_break": 23,
+      "breaks": 18,
+      "shared_breaks": 17,
+      "near_misses": 15,
+      "escalation": 3.892857142857143,
+      "digest": "cd694a9ef80b488555fede52152cb59bfd9b8b35acccb45b3402ebffb672741a"
+    },
+    {
+      "seed": 3622,
+      "duration": 22.818286583520187,
+      "first_split": 0.44509147362173845,
+      "population": 11,
+      "generations": 5,
+      "escape_route": "break",
+      "escape_generation": 3,
+      "escape_by": "descendant",
+      "progression_opening": 31,
+      "progression_break": 5,
+      "breaks": 13,
+      "shared_breaks": 11,
+      "near_misses": 12,
+      "escalation": 5.5,
+      "digest": "4009b0a3d5bb71769d50020cd5b93588181faa4124868670b5e0774de4b61ba5"
+    },
+    {
+      "seed": 12818,
+      "duration": 22.84318184382008,
+      "first_split": 0.49515989042535224,
+      "population": 15,
+      "generations": 5,
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "escape_by": "founder",
+      "progression_opening": 28,
+      "progression_break": 16,
+      "breaks": 19,
+      "shared_breaks": 18,
+      "near_misses": 11,
+      "escalation": 4.218181818181818,
+      "digest": "5c96f6d7a185b523b8667c84c1369b7b174824edccba8d3eb0a1312046fa9cd9"
+    },
+    {
+      "seed": 7183,
+      "duration": 23.212396192108102,
+      "first_split": 0.6199176912432472,
+      "population": 13,
+      "generations": 5,
+      "escape_route": "break",
+      "escape_generation": 3,
+      "escape_by": "descendant",
+      "progression_opening": 21,
+      "progression_break": 20,
+      "breaks": 16,
+      "shared_breaks": 15,
+      "near_misses": 8,
+      "escalation": 4.782608695652174,
+      "digest": "0915c69d8d9ca2c5b7061887df640e0f3025c8528d146a85544b7532735b8173"
+    }
+  ],
+  "coverage": {
+    "count": 7,
+    "escape_route": {
+      "opening": 4,
+      "break": 3
+    },
+    "escaping_ball": {
+      "founder": 3,
+      "descendant": 4
+    },
+    "duration_seconds": [
+      20.16224491236035,
+      23.212396192108102
+    ],
+    "first_split_seconds": [
+      0.44509147362173845,
+      2.398059953250905
+    ],
+    "population": [
+      8,
+      15
+    ],
+    "opening_dominant": [
+      949,
+      547,
+      3622
+    ],
+    "break_heavy": [
+      11319,
+      7183
+    ]
+  },
+  "render_config_digest": "8b377107693743e3"
+}
