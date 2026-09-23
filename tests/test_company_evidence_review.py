@@ -149,12 +149,31 @@ def test_the_capsule_owns_the_attestation_surface_and_nothing_else_in_docs(seeds
 def test_the_review_surface_holds_no_evidence_record():
     """An attestation is the output of a review, never the subject of one.
 
-    If a frozen record were ever placed inside the writable surface it would
-    become writable, and every other guard here would still pass.
+    If a record were ever placed inside the writable surface it would become
+    writable, and every other guard here would still pass. A first version of
+    this test looked only for subdirectories, which a record file dropped
+    straight into the surface would have walked past.
     """
     surface = REPO_ROOT / REVIEW_SURFACE
     assert surface.is_dir()
     assert sorted(p.name for p in surface.iterdir() if p.is_dir()) == []
+
+    # The shapes an evidence record arrives in. An attestation is prose about
+    # a record; a manifest, an accounting file or a raw capture *is* one.
+    record_shaped = sorted(
+        p.name
+        for p in surface.rglob("*")
+        if p.is_file()
+        and (
+            p.suffix in {".json", ".csv", ".jsonl"}
+            or p.name.endswith(".sha256")
+            or "manifest" in p.name.lower()
+        )
+    )
+    assert record_shaped == [], (
+        "a record-shaped file inside the writable review surface is writable "
+        "evidence; attestations go here, records do not"
+    )
 
 
 # --- 2. why the broad grant was rejected, measured --------------------------
@@ -394,6 +413,53 @@ def test_no_recorded_objective_derives_differently_than_it_did_before(
         if derivation(objective, without_the_capsule) != derivation(objective, seeds)
     ]
     assert changed == []
+
+
+# Objectives an engineer would plausibly write that are *not* evidence review.
+# Named here rather than mined from the recorded corpus: the first version of
+# this suite relied on the corpus alone, it contained none of these words, and
+# so it reported "nothing else is broadened" while the capsule's `audit` and
+# `provenance` tags were pulling in every one of them. A corpus can only show
+# what somebody already wrote down.
+NOT_EVIDENCE_REVIEW = (
+    "Audit the finance ledger so an unknown provider cost is never recorded as zero.",
+    "Audit the workforce registry for roles in a restricted state that emit a "
+    "writable contract.",
+    "Audit the delegation policy for a seat that can approve its own review outcome.",
+    "Add provenance to the research ingestion record so an external id keeps its case.",
+    "Record the provenance of every YouTube Studio row the dashboard shows.",
+    "Review the dashboard identity defect across the ten record kinds it spanned.",
+)
+
+
+@pytest.mark.parametrize("objective", NOT_EVIDENCE_REVIEW)
+def test_an_ordinary_objective_does_not_route_to_the_review_capsule(
+    config, seeds, objective
+):
+    """The capability tags are the whole routing surface, so they must be narrow.
+
+    Intake derives one path signal per token, `company/<token>`, which can
+    never match a `docs/` path. A capsule owning only documentation is
+    therefore reachable by capability tag alone - and a tag that is an ordinary
+    engineering word routes unrelated work here, which both widens that work's
+    scope and, when this capsule is the only match, sends it to the wrong place
+    entirely.
+    """
+    try:
+        assessment = derive(a_request(objective), config, seeds)
+    except Exception:  # a pre-existing refusal is not this capsule's doing
+        return
+    assert CAPSULE_ID not in assessment.derivation.selected_capsule_ids
+    assert REVIEW_SURFACE not in assessment.derivation.authorized_paths
+
+
+def test_no_capability_tag_is_an_ordinary_engineering_word(seeds):
+    """Stated as a list, so adding a broad tag back is a visible decision."""
+    assert seeds.get(CAPSULE_ID).capabilities == (
+        "attestation",
+        "evidence_review",
+        "reviewability",
+    )
 
 
 def test_an_unrelated_docs_objective_is_still_refused(config, seeds):

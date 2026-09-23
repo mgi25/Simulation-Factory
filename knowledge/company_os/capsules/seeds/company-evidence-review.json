@@ -1,10 +1,8 @@
 {
   "benchmarks": [],
   "capabilities": [
-    "evidence_review",
-    "audit",
     "attestation",
-    "provenance",
+    "evidence_review",
     "reviewability"
   ],
   "created": "2026-09-23",
@@ -65,7 +63,7 @@
   "revalidation_reason": "",
   "risks": [
     "The surface is writable, so a second review of one record can be written beside the first; provenance is what distinguishes them, not the filesystem.",
-    "Capability tags are the only selection signal here, because the path signal intake derives is company/<token> and never matches a docs path.",
+    "Capability tags are the only selection signal here, so a tag that is an ordinary engineering word routes unrelated work to this capsule; the tags are deliberately narrow and a test names the objectives that must not reach it.",
     "must_not_modify names frozen records only: a rule broad enough to cover a co-selected capsule's owned path would refuse that work order's packet outright.",
     "An attestation is a judgement; the deterministic verifier beside a record checks arithmetic only and cannot stand in for one."
   ],
