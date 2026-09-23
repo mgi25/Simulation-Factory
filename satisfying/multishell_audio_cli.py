@@ -62,32 +62,33 @@ __all__ = [
 ]
 
 PHASE1_SHORTLIST = os.path.join(
-    "docs", "validation", "category3_multiplying_shell_adjust_v3b", "phase3b_shortlist.json"
+    "docs", "validation", "category3_two_team_shell_race_v4a", "phase4a_shortlist.json"
 )
-OUTPUT_ROOT = os.path.join("output", "category3_multishell_adjust_v3b", "audio")
+OUTPUT_ROOT = os.path.join("output", "category3_two_team_v4a", "audio")
 VALIDATION_ROOT = os.path.join(
-    "docs", "validation", "category3_multiplying_shell_adjust_v3b", "audio"
+    "docs", "validation", "category3_two_team_shell_race_v4a", "audio"
 )
 
 #: The reference seeds the three-system comparison is decided on: the densest
 #: run in the set, which is where a musical system fails if it is going to, and
-#: a mid-density run that ends on a break and on a third-generation descendant,
+#: a calmer run that ends on a break and on a fourth-generation descendant,
 #: which is where the lineage and hierarchy claims are visible.
-REFERENCE_SEEDS: tuple[int, ...] = (17251, 15793)
+REFERENCE_SEEDS: tuple[int, ...] = (17964, 1176)
 
 #: Written into the manifest so the rules are readable next to their result.
 CANDIDATE_RULES: dict[str, Any] = {
     "source": PHASE1_SHORTLIST,
     "new_search": False,
     "duration_seconds": [20.0, 26.0],
-    "first_spawn_preferred_max": 2.5,
+    "first_spawn_preferred_max": 2.0,
     "first_spawn_hard_max": 3.0,
-    "population_total": [8, 15],
+    "population_total": [12, 26],
     "wanted": [6, 8],
     "requires": [
         "both escape routes present",
         "at least one founder final escape (generation 0)",
         "at least one descendant final escape (generation > 0)",
+        "both colours win at least one candidate",
     ],
     "order": "ascending duration",
 }
@@ -98,15 +99,51 @@ def _load_shortlist(path: str) -> Mapping[str, Any]:
         return json.load(handle)
 
 
-def derive_candidates(shortlist: Mapping[str, Any]) -> dict[str, Any]:
-    """The proof set, from the Phase 1 shortlist, by the brief's rules alone.
+def _cover(chosen: list[dict[str, Any]],
+           pool: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Make `CANDIDATE_RULES["requires"]` true, by swapping rather than adding.
 
-    The visual branch is deriving its own set from the same eighteen seeds and
-    the same criteria at the same time. If the two sessions are truly parallel
-    there is no manifest to read, so this reproduces the criteria exactly and
-    records both the survivors and the reason every rejected seed lost - which
-    is what a later reconciliation needs in order to be an intersection rather
-    than an argument.
+    The requirements used to be a sentence in the manifest that nothing
+    enforced, and on the Phase 4A shortlist that showed: ordering the pool by
+    population and taking the first eight gave eight opening-route escapes and
+    no break, because a break-route win is 0.7% of the eligible population and
+    never near the top of any ordering. So a missing axis now costs the *last*
+    chosen row rather than a ninth slot - the set stays the size the rules ask
+    for, and what it loses is the least distinctive member.
+    """
+    def axes(row: Mapping[str, Any]) -> tuple[str, str]:
+        return (str(row["escape_route"]), str(row["final_escape"]))
+
+    for index in (0, 1):
+        present = {axes(row)[index] for row in chosen}
+        for row in pool:
+            value = axes(row)[index]
+            if value in present:
+                continue
+            replacement = next(
+                (r for r in reversed(chosen)
+                 if sum(1 for o in chosen if axes(o)[index] == axes(r)[index]) > 1),
+                None,
+            )
+            if replacement is None:
+                break
+            chosen = [r for r in chosen if r is not replacement] + [row]
+            present.add(value)
+    chosen.sort(key=lambda row: row["duration"])
+    return chosen
+
+
+def derive_candidates(shortlist: Mapping[str, Any]) -> dict[str, Any]:
+    """The proof set, from the Phase 4A shortlist, by the brief's rules alone.
+
+    Phase 2B derived this independently of the visual branch, because the two
+    were running in parallel sessions with no manifest to share. Phase 4A is
+    one branch, so the review set has one definition -
+    `multishell_visual.CANDIDATE_SEEDS` - and what this function still does is
+    *judge* every shortlisted seed against the audio rules and record why each
+    rejected one lost. That is the part worth keeping: it is what says the six
+    chosen seeds are inside the audio rules and not merely inside the visual
+    ones.
     """
     low, high = CANDIDATE_RULES["duration_seconds"]
     preferred = CANDIDATE_RULES["first_spawn_preferred_max"]
@@ -150,10 +187,16 @@ def derive_candidates(shortlist: Mapping[str, Any]) -> dict[str, Any]:
         })
 
     accepted = [row for row in judged if row["accepted"]]
+    # The shortlist's own review list, in its own order, truncated to the size
+    # the rules ask for. This module still may not import the composition
+    # module - the audio judgement has to be independent of the visual one, or
+    # "both layers agree" would only mean "one layer was asked twice" - so the
+    # shortlist file is the whole of what it reads.
     review_seeds = [int(seed) for seed in shortlist.get("review_seeds", [])]
     if review_seeds:
         by_seed = {int(row["seed"]): row for row in accepted}
         chosen = [by_seed[seed] for seed in review_seeds if seed in by_seed]
+        chosen = _cover(chosen[:want_high], [by_seed[s] for s in review_seeds if s in by_seed])
     else:
         chosen = [row for row in accepted if row["preferred_split"]]
         # The 2.5 s split is a preference and the 3.0 s one a limit, so the band
@@ -171,7 +214,7 @@ def derive_candidates(shortlist: Mapping[str, Any]) -> dict[str, Any]:
     routes = sorted({row["escape_route"] for row in chosen})
     finals = sorted({row["final_escape"] for row in chosen})
     return {
-        "kind": "category3_multiplying_shell_audio_candidates",
+        "kind": "category3_two_team_shell_race_audio_candidates",
         "score_version": score.SCORE_VERSION,
         "config_digest": shortlist["config_digest"],
         "rules": CANDIDATE_RULES,

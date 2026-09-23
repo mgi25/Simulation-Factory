@@ -1,29 +1,81 @@
-"""MULTIPLYING SHELL ESCAPE: the balls, the shells, the ledger, the lineage.
+"""TWO-TEAM SHELL RACE: two colours, five shells, and one question.
 
-Category 3 Test #2, redesigned. One ball starts inside five nested rotating
-segmented shells. **Every time a ball gets through a shell it has not been
-through before, it becomes two.** The child is a real simulation object with its
-own trajectory, its own damage contribution and its own right to reproduce, so
-growth is recursive: 1 to 2 to 4 to 8, held back only by the shells getting
-harder as they go out.
+Category 3 Test #2, Phase 4A. **Two** balls start inside five nested rotating
+segmented shells, one cyan and one orange, and every time a ball gets through a
+shell it has not been through before it becomes two of its own colour. The
+video asks one thing and answers it with physics:
 
-The single-ball version this replaces was correct and dull. It was correct
-because nothing steered the ball and the answer was genuinely unknown; it was
-dull because one ball in six shells produces one thread of action whose density
-is flat from the first second to the last, and the thing a viewer is promised -
-escalation - never arrives. Multiplication supplies escalation from the
-mechanic rather than from the edit: the second half of a run has more balls in
-it than the first half *because of what happened in the first half*.
+    WHO ESCAPES FIRST?
 
-## The rule, stated so it can be argued with
+The winner is the colour whose first ball or descendant crosses the outermost
+shell. Nothing steers, nothing is weighted, and the answer is not known until
+it happens.
 
-**Reproduction.** A ball that crosses a shell outward, for the first time for
-that ball at that shell, continues unchanged and a child appears beside it. The
-child's ledger is pre-charged with every shell inside the one it was born
+## What changed from the one-founder version, and why
+
+The Phase 3B video was mechanically correct and had no story in it. One
+founder multiplying into eight is escalation, but escalation with nobody to
+beat is a graph, not a race. Two founders turn the same mechanic into a
+competition for free: the population is already the scoreboard, so the video
+needs no counter, no caption and no editing to say who is ahead.
+
+Three other things had to move with it.
+
+**The arena shrank.** Outer radius 24.4 to 18.5, inner 6.0 to 6.5. The camera
+has to open out across the whole radial span, and 24.4/6.0 forced a 3.63x zoom
+that left a ball 21 px wide at the final wall. 18.5/6.5 is 2.80x.
+
+**The ball grew,** 0.40 to 0.53. Partly to hold its share of a smaller frame,
+and partly because it is a difficulty knob: the outermost opening is 1.38 ball
+diameters wide at 0.53 and was 3.79 at 0.40, so the final wall is now hard to
+*thread* and not only hard to break.
+
+**The walls got harder,** because two founders roughly double the number of
+attempts every shell has to survive. `docs/category3_two_team_shell_race_phase4a.md`
+carries the measured ladder.
+
+## The team rule, stated so it can be argued with
+
+**A ball's team is fixed at birth and is its parent's.** A child is the same
+colour as the ball it came from, for every generation, with no mechanism
+anywhere that could change it. `team_id` is on the ball record and on every
+event that names a ball.
+
+**The physics never reads the team.** This is structural rather than
+disciplined. `start_states` builds two release states from the seed;
+`team_assignment` then decides which of those two *finished* states is called
+cyan, and the simulation never consults a team again. So no arrangement of the
+colours can change a position, a velocity or a time, and the claim is checkable
+two ways:
+
+* `config.team_swap` flips the colour map. `MultishellConfig.physics_digest`
+  excludes it by name, `MultishellRun.state_digest` is built from that digest
+  and carries no team, and `MultishellRun.team_digest` is over the labels
+  alone. A swapped run therefore has the *same* state digest and the *mirrored*
+  team digest, and that pair is the whole proof.
+* The label map itself is a seeded coin. The two founder slots are physically
+  equivalent but not quite interchangeable in the implementation - slot 0 is
+  ball 0, and the ball id breaks scheduling ties - so a fixed slot-to-colour
+  map would promote any such asymmetry into a standing colour advantage. The
+  coin removes it by construction, and the batch reports the per-slot outcome
+  as well so the asymmetry is measured rather than laundered.
+
+**Fair starting conditions.** Both founders are released on one circle at one
+radius, antipodally, with the same speed, the same radius, the same collision
+model and independently drawn headings. One radius is the whole of "equivalent
+distance from relevant geometry"; independent headings are what stop the pair
+being a mirror image of each other, which on an even-panelled shell would trace
+two copies of one trajectory rather than a race.
+
+## Reproduction, unchanged in substance
+
+A ball that crosses a shell outward, for the first time for that ball at that
+shell, continues unchanged and a child of the same colour appears beside it.
+The child's ledger is pre-charged with every shell inside the one it was born
 outside, so it can only reproduce by making *new* outward progress. A ball may
-therefore produce at most `shell_count` children in a whole run, one per shell,
-and the population is bounded above by `2 ** shell_count` before any difficulty
-is applied at all.
+therefore produce at most `shell_count` children in a whole run, and the
+population is bounded above by `2 * 2 ** shell_count` = 64 before any
+difficulty is applied at all.
 
 That per-ball-per-shell credit is the entire anti-farming rule and it is
 enforced by a bitmask, not by a heuristic. Falling back inward through a hole
@@ -37,14 +89,20 @@ reads as the simulation cheating. The child is born just ahead of the parent, in
 the region the parent has just entered, with the parent's speed and the parent's
 heading turned by a small fixed angle.
 
-**Why the turn alternates rather than being random.** The split is
-`+spawn_turn` on even-numbered spawns and `-spawn_turn` on odd ones. This is
-deterministic, exactly balanced over any run with an even number of spawns, and
-reads nothing at all about where the openings are - so it cannot aim a child at
-a hole. A seeded random split would be strictly worse: it would put a random
-number between the physics and the outcome, so "the child got lucky" would be a
-thing the seed decided rather than a thing the geometry decided.
-`satisfying.multishell_seeds` sets this out at more length.
+**Why the turn alternates on the global spawn index.** `+spawn_turn` on
+even-numbered spawns and `-spawn_turn` on odd ones. This is deterministic,
+exactly balanced over any run with an even number of spawns, and reads nothing
+at all about where the openings are - so it cannot aim a child at a hole.
+Alternating on the parent's own child count was tried instead, on the argument
+that it would be balanced per colour as well: it is not balanced at all, because
+most balls have one or two children, so "the first child turns +" put 70% of a
+population's turns the same way and gave the whole simulation a chirality.
+Whether the global rule is *also* balanced between the colours is then an
+empirical question, and `tests/test_multiplying_shell.py` answers it over a
+population. A seeded random split would be strictly worse than either: it would
+put a random number between the physics and the outcome, so "the child got
+lucky" would be a thing the seed decided rather than a thing the geometry
+decided.
 
 **Why the child cannot be born inside a panel.** The nominal birth point is
 `spawn_lead_ball_radii` ball radii ahead of the parent along the child's own
@@ -58,32 +116,26 @@ written into the spawn event, so this is a measurement and not a promise.
 
 Five shells, and the outer ones are harder in ways a viewer can see:
 
-| shell | radius | panels | openings x slots | open fraction | break threshold |
-|-------|--------|--------|------------------|---------------|-----------------|
-| 0     |  6.0   | 12     | 3 x 2            | 0.500         | 1.8             |
-| 1     | 10.6   | 24     | 3 x 2            | 0.250         | 2.8             |
-| 2     | 15.2   | 28     | 2 x 2            | 0.143         | 4.4             |
-| 3     | 19.8   | 38     | 2 x 2            | 0.105         | 6.6             |
-| 4     | 24.4   | 46     | 2 x 1            | 0.043         | 9.0             |
+| shell | radius | panels | openings x slots | open fraction | gap / ball | break threshold |
+|-------|--------|--------|------------------|---------------|------------|-----------------|
+| 0     |  6.5   | 16     | 3 x 2            | 0.375         | 4.41       |  1.8            |
+| 1     |  9.5   | 38     | 3 x 2            | 0.158         | 2.67       |  4.0            |
+| 2     | 12.5   | 46     | 2 x 2            | 0.087         | 2.93       |  5.6            |
+| 3     | 15.5   | 64     | 2 x 2            | 0.063         | 2.58       |  9.5            |
+| 4     | 18.5   | 66     | 2 x 1            | 0.030         | 1.38       | 15.0            |
 
-Two dimensions, both physical and both legible: **the holes get smaller** and
-**the panels get stronger**. Nothing is hidden in a probability. `difficulty_profile`
-reports the whole table including the measured open fraction and the gap-to-ball
-ratio, and asserts for itself whether the profile is monotonic.
+Three dimensions, all physical and all legible: **the holes get rarer**, **the
+last hole gets narrower than a ball is comfortable with**, and **the panels get
+stronger**. Nothing is hidden in a probability. `difficulty_profile` reports the
+whole table including the measured open fraction and the gap-to-ball ratio, and
+asserts for itself whether the profile is monotonic.
 
 Rotation adds a restrained, readable timing ramp. `omega_falloff = 0.82` makes
-surface speed rise only from 3.72 to 4.79 units/s while directions alternate.
-The openings remain trackable; the much larger difficulty change still comes
-from visible segmentation and toughness rather than blur.
+surface speed rise only from 4.29 to 5.18 units/s while directions alternate.
 
-## Damage, redesigned
+## Damage, and which colour paid for it
 
-The single-ball model added `(v_n / v_ref) ** 1.5` per contact and broke at a
-fixed 1.6. Two things were wrong with it. The exponent was a fitted number with
-no physical reading, and there was no floor, so a panel could be broken by an
-accumulation of grazes that a viewer would not believe had done anything.
-
-The model here is **normalised impact energy above a chip floor**:
+The model is **normalised impact energy above a chip floor**:
 
     f     = v_n / damage_reference_speed
     added = ((f - floor) / (1 - floor)) ** 2   for f > floor, else 0
@@ -92,37 +144,28 @@ At `exponent = 2` that is the kinetic energy carried in the contact normal,
 scaled so a head-on hit at the reference speed is exactly `1.0` damage. A
 grazing hit is not "a little damage", it is *no* damage, which is both what
 stone does and what a viewer expects. The shell's own `break_thresholds[k]` then
-says how many reference hits that shell is worth: 1.8 for the innermost (two
-solid hits and it goes) up to 9.0 for the outermost (nine).
+says how many reference hits that shell is worth: 1.8 for the innermost up to
+15.0 for the outermost.
 
 Damage runs through five named states - `healthy`, `damaged`, `critical`,
 `fractured`, `broken` - at deterministic fractions of the shell's threshold, and
-every transition is its own event, because the visual branch needs to know when
-to start drawing cracks and the audio branch needs to know when to change the
-panel's voice. Contributions from different balls accumulate on the same ledger
-and the break event records how many distinct balls paid for it: an early ball
-softening a panel that a later ball walks through is the emergent behaviour the
-concept wants, and `contributors > 1` is how it is detected rather than asserted.
+every transition is its own event.
+
+**Every panel keeps two ledgers: one total and one per colour.** That is what
+turns "the panel broke" into a story: `team_cumulative` says how much each
+colour paid, `team_contributors` says how many of its balls did, and
+`largest_team` says which colour did most of the work. A break whose
+`largest_team` is not the colour of the ball that triggered it is one team
+walking through a wall the other one softened, and it is common enough to be a
+recurring moment rather than a curiosity.
 
 ## The speed model
 
-Two are implemented and both are bounded.
-
-`speed_model = "constant"` is the single-ball version's constraint: the bounce
-is specular in the panel's own frame and the resulting speed is renormalised to
-the config's `speed`. It exists because the two obvious alternatives were
-measured and both fail - ignoring the panel's motion makes a near-tangential
-arrival chatter tens of thousands of times, and taking the panel's motion with
-restitution 1 and no constraint makes every shell a Fermi accelerator with a
-median speed drift of +34% and a worst case of +225%.
-
-`speed_model = "bounded"` keeps the same bounce and clamps the speed into
-`speed_band` instead of pinning it. It exists because this redesign is *about*
-impacts, and under a hard pin every head-on hit on a stationary-looking panel
-delivers the same energy, so the damage model has less to say than it could. A
-band lets a ball genuinely arrive harder or softer while still forbidding both
-runaway and energy death. `docs/category3_multiplying_shell_phase1.md` reports
-the measured comparison and which one production uses.
+`speed_model = "constant"` is the production setting: the bounce is specular in
+the panel's own frame and the resulting speed is renormalised to the config's
+`speed`. `speed_model = "bounded"` keeps the same bounce and clamps the speed
+into `speed_band` instead of pinning it. `docs/category3_multiplying_shell_phase1.md`
+reports the measured comparison.
 
 ## Multi-ball scheduling
 
@@ -140,17 +183,20 @@ event is at or after it; and because removing material can only move a contact
 later, never earlier. It is also cheap, because breaks are rare.
 
 `ball_ball_collisions` adds exact equal-mass elastic contact between balls. It
-is off by default and the reason is in the phase document, with numbers.
+is off by default and stays off: the Phase 1 measurement found repeat contacts,
+penetration, fewer breaks and solver instability, and the chaos this video wants
+comes from population, walls, rotation and damage instead.
 
 ## Determinism
 
-`start_state` derives the release point, the heading, every shell's initial
+`start_states` derives both release points, both headings, every shell's initial
 angle and every shell's rate jitter from the seed through
 `satisfying.multishell_seeds`, and nothing else in a run is random - not the
-reproduction, not the spawn geometry, not the damage. `MultishellRun.state_digest`
-is a SHA-256 over the raw IEEE-754 bytes of every collision, spawn, break and
-crossing including the ball ids, so two runs that agree for three hundred events
-and diverge at the next compare as different rather than as equal.
+reproduction, not the spawn geometry, not the damage, not the colours.
+`MultishellRun.state_digest` is a SHA-256 over the raw IEEE-754 bytes of every
+collision, spawn, break and crossing including the ball ids, so two runs that
+agree for three hundred events and diverge at the next compare as different
+rather than as equal.
 
 ## What is borrowed
 
@@ -160,11 +206,7 @@ copied: `_ShellState`, `_nearest_live`, `_contact_in_interval`, `_band_intervals
 whose correctness argument took the whole of the single-ball phase to establish -
 the curvature bound, the two-nearest-panel rule for corners, the two-point
 verification of a Newton step - and a second copy of them would be a second
-thing to keep right. They are private names in another module of the same
-package and this module is their only other caller; `tests/test_multiplying_shell.py`
-pins that they still exist and still have these signatures. Nothing in
-`shell_escape` is modified, so schema `category3-test2-shell-escape/1.0.0` and
-the rejected production branch that pins it are untouched.
+thing to keep right. Nothing in `shell_escape` is modified.
 """
 
 from __future__ import annotations
@@ -192,6 +234,8 @@ from satisfying.shell_escape import (
 __all__ = [
     "MultishellConfig",
     "DEFAULT_CONFIG",
+    "TEAM_NAMES",
+    "TEAM_COUNT",
     "EVENT_SCHEMA",
     "EVENT_KINDS",
     "SCHEMA_VERSION",
@@ -201,6 +245,8 @@ __all__ = [
     "BallRecord",
     "MultishellRun",
     "start_state",
+    "start_states",
+    "team_assignment",
     "resolve_shells",
     "build_arena_for",
     "difficulty_profile",
@@ -215,7 +261,14 @@ TAU = 2.0 * math.pi
 # Bumped whenever an event kind, a field name or a field meaning changes. The
 # single-ball schema `category3-test2-shell-escape/1.0.0` is a different stream
 # with a different meaning for `escape`, and is deliberately not reused.
-SCHEMA_VERSION = "category3-test2-multiplying-shell/2.0.0"
+SCHEMA_VERSION = "category3-test2-two-team-shell-race/3.0.0"
+
+# The two teams, in team-index order. This is a *labelling* table: nothing in
+# this module reads it to decide anything physical, and `TEAM_COUNT` is fixed at
+# two because a third colour would make "who escapes first" a three-way race
+# that a six-second attention span cannot read.
+TEAM_NAMES: tuple[str, ...] = ("cyan", "orange")
+TEAM_COUNT = len(TEAM_NAMES)
 
 # Ordered worst-last. Index into this tuple is what the digest and the events
 # carry; the name is what the visual and audio branches will switch on.
@@ -233,9 +286,14 @@ class MultishellConfig:
 
     # --- arena -----------------------------------------------------------
     shell_count: int = 5
-    inner_radius: float = 6.0
-    shell_spacing: float = 4.6
-    panel_counts: tuple[int, ...] = (12, 24, 28, 38, 46)
+    # Phase 4A shrinks the arena from 6.0/4.6 (outer radius 24.4) to 6.5/3.0
+    # (outer radius 18.5). The radial span is what the camera has to open out
+    # across, and 24.4/6.0 forced a 3.63x zoom that shrank a ball to 21 px by
+    # the last shell. 18.5/6.5 is a 2.85x span, which is the single largest
+    # contribution to "the frontier stays large".
+    inner_radius: float = 6.5
+    shell_spacing: float = 3.0
+    panel_counts: tuple[int, ...] = (16, 38, 46, 64, 66)
     openings_per_shell: tuple[int, ...] = (3, 3, 2, 2, 2)
     opening_slots: tuple[int, ...] = (2, 2, 2, 2, 1)
     panel_thickness: float = 0.30
@@ -245,13 +303,19 @@ class MultishellConfig:
     # with the sign alternating by index and a bounded seeded jitter. Falloff 1
     # A falloff just below one adds a modest outward surface-speed ramp while
     # keeping every opening readable; see the module docstring.
-    omega_base: float = 0.62
+    omega_base: float = 0.66
     omega_falloff: float = 0.82
     omega_jitter: float = 0.22
     alternate_direction: bool = True
 
     # --- ball ------------------------------------------------------------
-    ball_radius: float = 0.40
+    # Raised from 0.40 with the arena shrink. What a viewer reads is the ball as
+    # a fraction of the frontier, and holding that fraction roughly constant
+    # while the arena shrinks means the ball grows. It is also a difficulty
+    # knob: the outermost opening is 1.43 ball diameters wide at 0.53 and was
+    # 3.79 at 0.40, so the final wall is hard to *thread* and not only hard to
+    # break.
+    ball_radius: float = 0.53
     speed: float = 10.0
     restitution: float = 1.0
     panel_momentum_transfer: float = 1.0
@@ -262,11 +326,21 @@ class MultishellConfig:
     speed_band: tuple[float, float] = (0.80, 1.25)
     ball_ball_collisions: bool = False
 
-    # --- reproduction ----------------------------------------------------
+    # --- teams and reproduction ------------------------------------------
+    # Exactly two founders, one per team. Not a free parameter: one founder is
+    # the Phase 3B video that had no race in it, and three would make the
+    # colours a legend rather than a fact.
+    founder_count: int = 2
+    # Swap which physical founder slot wears which colour. This is the whole of
+    # the fairness instrument: it changes a label and provably nothing else, so
+    # a swapped run has the same physics digest and the mirrored team digest.
+    team_swap: bool = False
     reproduction: bool = True
-    # A safety limit, not the mechanic. If runs hit this often, the difficulty
-    # profile is wrong and capping is hiding it.
-    max_population: int = 32
+    # A safety limit, not the mechanic. Two founders over five reproducing
+    # layers can reach 2 * 2**5 = 64, so 64 is the ceiling that cannot bind
+    # before the mechanic itself does. If runs hit it, the difficulty profile is
+    # wrong and capping is hiding it.
+    max_population: int = 64
     spawn_lead_ball_radii: float = 2.6
     spawn_lead_steps: int = 7
     spawn_turn: float = 0.16
@@ -276,7 +350,7 @@ class MultishellConfig:
     damage_exponent: float = 2.0
     # Below this fraction of the reference speed a contact chips nothing.
     damage_floor_fraction: float = 0.08
-    break_thresholds: tuple[float, ...] = (1.8, 2.8, 4.4, 6.6, 9.0)
+    break_thresholds: tuple[float, ...] = (1.8, 4.0, 5.6, 9.5, 15.0)
     # Fractions of a shell's own threshold at which the named states begin.
     damage_state_fractions: tuple[float, ...] = (0.24, 0.52, 0.78)
     breakable: bool = True
@@ -312,6 +386,11 @@ class MultishellConfig:
             raise ValueError("damage_state_fractions must be increasing")
         if self.max_population < 1:
             raise ValueError("max_population must be at least 1")
+        if self.founder_count != TEAM_COUNT:
+            raise ValueError(
+                f"this is a {TEAM_COUNT}-team race: founder_count must be "
+                f"{TEAM_COUNT}, got {self.founder_count}"
+            )
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -333,6 +412,8 @@ class MultishellConfig:
             "speed_model": self.speed_model,
             "speed_band": list(self.speed_band),
             "ball_ball_collisions": self.ball_ball_collisions,
+            "founder_count": self.founder_count,
+            "team_swap": self.team_swap,
             "reproduction": self.reproduction,
             "max_population": self.max_population,
             "spawn_lead_ball_radii": self.spawn_lead_ball_radii,
@@ -355,9 +436,30 @@ class MultishellConfig:
             "max_newton_iterations": self.max_newton_iterations,
         }
 
+    #: Fields that decide a *label* and never a trajectory. They are excluded
+    #: from `physics_digest` for a reason that is the whole fairness argument:
+    #: if flipping the colour map changed the physics fingerprint, "the swap
+    #: changed nothing physical" would be untestable, because the instrument
+    #: would move with the thing it is measuring.
+    LABEL_ONLY_FIELDS: tuple[str, ...] = ("team_swap",)
+
     def digest(self) -> str:
         """A stable fingerprint of the config, for the playback document."""
         blob = json.dumps(self.as_dict(), sort_keys=True, separators=(",", ":"))
+        return hashlib.sha256(blob.encode("utf-8")).hexdigest()
+
+    def physics_digest(self) -> str:
+        """The fingerprint of everything that can move a ball.
+
+        `digest` minus the label-only fields. Two configs with the same
+        `physics_digest` produce identical trajectories on every seed; whether
+        they agree on `digest` says only whether they also agree on which
+        colour is which.
+        """
+        payload = {
+            k: v for k, v in self.as_dict().items() if k not in self.LABEL_ONLY_FIELDS
+        }
+        blob = json.dumps(payload, sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(blob.encode("utf-8")).hexdigest()
 
     def replace(self, **changes: Any) -> "MultishellConfig":
@@ -482,6 +584,7 @@ def impact_damage(impact_speed: float, config: MultishellConfig = DEFAULT_CONFIG
 EVENT_SCHEMA: dict[str, tuple[str, ...]] = {
     "ball_spawn": (
         "ball_id",
+        "team_id",
         "parent_id",
         "generation",
         "birth_shell",
@@ -498,6 +601,7 @@ EVENT_SCHEMA: dict[str, tuple[str, ...]] = {
     ),
     "collision": (
         "ball_id",
+        "team_id",
         "shell_id",
         "panel_id",
         "region",
@@ -517,7 +621,9 @@ EVENT_SCHEMA: dict[str, tuple[str, ...]] = {
     ),
     "ball_collision": (
         "ball_id",
+        "team_id",
         "other_id",
+        "other_team_id",
         "position",
         "other_position",
         "normal",
@@ -529,6 +635,7 @@ EVENT_SCHEMA: dict[str, tuple[str, ...]] = {
     ),
     "near_miss": (
         "ball_id",
+        "team_id",
         "shell_id",
         "panel_id",
         "opening_id",
@@ -547,6 +654,7 @@ EVENT_SCHEMA: dict[str, tuple[str, ...]] = {
     ),
     "damage": (
         "ball_id",
+        "team_id",
         "shell_id",
         "panel_id",
         "contribution",
@@ -556,9 +664,11 @@ EVENT_SCHEMA: dict[str, tuple[str, ...]] = {
         "state",
         "impact_speed",
         "contributors",
+        "team_cumulative",
     ),
     "damage_state": (
         "ball_id",
+        "team_id",
         "shell_id",
         "panel_id",
         "previous_state",
@@ -569,6 +679,7 @@ EVENT_SCHEMA: dict[str, tuple[str, ...]] = {
     ),
     "panel_break": (
         "ball_id",
+        "team_id",
         "shell_id",
         "panel_id",
         "position",
@@ -577,9 +688,13 @@ EVENT_SCHEMA: dict[str, tuple[str, ...]] = {
         "threshold",
         "hits",
         "contributors",
+        "team_cumulative",
+        "team_contributors",
+        "largest_team",
     ),
     "shell_exit": (
         "ball_id",
+        "team_id",
         "shell_id",
         "panel_id",
         "route",
@@ -595,6 +710,7 @@ EVENT_SCHEMA: dict[str, tuple[str, ...]] = {
     ),
     "shell_entry": (
         "ball_id",
+        "team_id",
         "shell_id",
         "panel_id",
         "route",
@@ -608,6 +724,8 @@ EVENT_SCHEMA: dict[str, tuple[str, ...]] = {
     ),
     "escape": (
         "ball_id",
+        "team_id",
+        "team_name",
         "shell_id",
         "route",
         "position",
@@ -619,6 +737,9 @@ EVENT_SCHEMA: dict[str, tuple[str, ...]] = {
         "collisions",
         "breaks",
         "population",
+        "population_by_team",
+        "damage_by_team",
+        "margin_seconds",
     ),
     "failure": (
         "reason",
@@ -630,6 +751,9 @@ EVENT_SCHEMA: dict[str, tuple[str, ...]] = {
         "balls_by_region",
         "collisions",
         "breaks",
+        "balls_by_team",
+        "frontier_by_team",
+        "damage_by_team",
     ),
 }
 
@@ -691,6 +815,7 @@ class BallRecord:
     """The identity and the fate of one ball, kept after the run."""
 
     ball_id: int
+    team_id: int
     parent_id: int | None
     generation: int
     birth_time: float
@@ -705,10 +830,13 @@ class BallRecord:
     final_region: int = 0
     escaped: bool = False
     death_time: float | None = None
+    damage_dealt: float = 0.0
 
     def as_dict(self) -> dict[str, Any]:
         return {
             "ball_id": self.ball_id,
+            "team_id": self.team_id,
+            "team_colour": TEAM_NAMES[self.team_id],
             "parent_id": self.parent_id,
             "generation": self.generation,
             "birth_time": self.birth_time,
@@ -722,6 +850,7 @@ class BallRecord:
             "max_region": self.max_region,
             "final_region": self.final_region,
             "escaped": self.escaped,
+            "damage_dealt": self.damage_dealt,
         }
 
 
@@ -763,23 +892,84 @@ def build_arena_for(seed: int, config: MultishellConfig) -> ShellArena:
     )
 
 
-def start_state(
+def start_states(
     seed: int, config: MultishellConfig, arena: ShellArena
-) -> tuple[float, float, float, float]:
-    """Where the first ball is let go and which way it is pointing."""
+) -> list[tuple[float, float, float, float]]:
+    """The two founders' release states, in physical slot order.
+
+    **The fairness argument is in the construction, not in a later check.**
+
+    Both founders are placed on one circle of radius `r` about the arena
+    centre, at antipodal angles. One radius means one distance to every shell,
+    to every panel band and to the escape radius, so neither slot starts nearer
+    anything. Antipodal means the largest separation the release disc allows,
+    so the two never begin on top of each other and the early frame reads as
+    two competitors rather than one smudge.
+
+    `r` is drawn uniformly by *area* over the annulus between
+    `FOUNDER_MIN_RADIUS_FRACTION` and the full release disc, which keeps the
+    density flat and keeps the pair apart. The axis angle is uniform over the
+    circle, so the unordered pair of positions has a distribution invariant
+    under exchanging the two slots.
+
+    The two headings are drawn independently from the heading stream. Giving
+    the second founder the first one's heading turned by pi would make the pair
+    exactly point-symmetric, and on the shells whose panel count happens to be
+    even that is a symmetry of the lattice: the two would trace mirror images
+    for as long as the openings agreed, which is a duplicate and not a race.
+    Independent headings are unbiased - the pair's distribution is unchanged by
+    exchanging the slots - and they diverge immediately.
+
+    Speed, radius, restitution and the collision model are config-wide, so
+    there is no per-slot physical parameter anywhere for a bias to live in.
+    """
     pos_rng = multishell_seeds.make_position_rng(seed)
     head_rng = multishell_seeds.make_heading_rng(seed)
     limit = multishell_seeds.RELEASE_RADIUS_FRACTION * arena.shells[0].apothem
-    # Uniform over the disc, not over (r, theta): sqrt keeps the density flat.
-    r = limit * math.sqrt(pos_rng.random())
-    a = pos_rng.uniform(0.0, TAU)
-    heading = head_rng.uniform(0.0, TAU)
-    return (
-        r * math.cos(a),
-        r * math.sin(a),
-        config.speed * math.cos(heading),
-        config.speed * math.sin(heading),
-    )
+    floor = multishell_seeds.FOUNDER_MIN_RADIUS_FRACTION
+    r = limit * math.sqrt(floor * floor + (1.0 - floor * floor) * pos_rng.random())
+    axis = pos_rng.uniform(0.0, TAU)
+    out: list[tuple[float, float, float, float]] = []
+    for slot in range(config.founder_count):
+        angle = axis + slot * TAU / config.founder_count
+        heading = head_rng.uniform(0.0, TAU)
+        out.append(
+            (
+                r * math.cos(angle),
+                r * math.sin(angle),
+                config.speed * math.cos(heading),
+                config.speed * math.sin(heading),
+            )
+        )
+    return out
+
+
+def start_state(
+    seed: int, config: MultishellConfig, arena: ShellArena
+) -> tuple[float, float, float, float]:
+    """The first founder's release state. Kept for callers that want one."""
+    return start_states(seed, config, arena)[0]
+
+
+def team_assignment(seed: int, config: MultishellConfig) -> tuple[int, ...]:
+    """Which team each physical founder slot belongs to.
+
+    A permutation of the team indices and nothing else. It is applied *after*
+    `start_states` has produced the physical states, so no arrangement of it
+    can change a position, a heading, a speed or a distance to a wall - which
+    is what makes "no colour-dependent physics" a structural fact rather than a
+    thing to test for.
+
+    The permutation is a seeded coin (`multishell_seeds.team_parity`) XORed with
+    `config.team_swap`. The coin is there because the two *slots* are not quite
+    interchangeable in the implementation even though they are in the physics -
+    slot 0 is ball 0, and the ball id breaks scheduling ties - so a fixed
+    slot-to-colour map would promote any such asymmetry into a standing colour
+    advantage. The batch reports per-slot outcomes as well, so the asymmetry is
+    measured rather than laundered.
+    """
+    parity = multishell_seeds.team_parity(seed) ^ int(bool(config.team_swap))
+    return tuple((slot ^ parity) % TEAM_COUNT for slot in range(config.founder_count))
 
 
 # --------------------------------------------------------------------------
@@ -800,6 +990,12 @@ class MultishellRun:
 
     escaped: bool = False
     escape_ball: int | None = None
+    # The race result. `winner_team` is an index into `TEAM_NAMES`; it is set
+    # only by the first legitimate crossing of the escape radius, so a run that
+    # times out has no winner rather than a defaulted one.
+    winner_team: int | None = None
+    winner_generation: int | None = None
+    winner_route: str | None = None
     failure_reason: str | None = None
     duration: float = 0.0
     escape_time: float | None = None
@@ -837,6 +1033,28 @@ class MultishellRun:
     region_dwell: list[float] = field(default_factory=list)
     population_samples: list[tuple[float, int]] = field(default_factory=list)
 
+    # --- the race ---------------------------------------------------------
+    # Every one of these is a count of a thing that happened, sampled at the
+    # instant it happened. Nothing here is interpolated and nothing is a score.
+    team_population_samples: list[tuple[float, tuple[int, ...]]] = field(default_factory=list)
+    team_frontier_samples: list[tuple[float, tuple[int, ...]]] = field(default_factory=list)
+    team_balls: list[int] = field(default_factory=list)
+    team_spawns: list[int] = field(default_factory=list)
+    team_collisions: list[int] = field(default_factory=list)
+    team_damage: list[float] = field(default_factory=list)
+    team_breaks: list[int] = field(default_factory=list)
+    team_crossings: list[int] = field(default_factory=list)
+    team_frontier: list[int] = field(default_factory=list)
+    # A lead change is a sample at which the sign of (team 0 minus team 1)
+    # changes to a *different non-zero* sign. Passing through a tie is not two
+    # lead changes, and a tie that resolves the way it came is not one at all.
+    population_lead_changes: int = 0
+    frontier_lead_changes: int = 0
+    max_population_lead: int = 0
+    # How long the loser had been the last team to make frontier progress when
+    # the winner crossed out. Small means the race was still live at the end.
+    win_margin_seconds: float | None = None
+
     @property
     def mean_speed_correction(self) -> float:
         """The average renormalisation per panel contact, as a fraction."""
@@ -844,6 +1062,16 @@ class MultishellRun:
 
     def events_of(self, kind: str) -> list[Event]:
         return [e for e in self.events if e.kind == kind]
+
+    def team_population_at(self, t: float) -> tuple[int, ...]:
+        """How many balls each team had at `t`. Step function, from the samples."""
+        counts: tuple[int, ...] = tuple(0 for _ in range(TEAM_COUNT))
+        for at, row in self.team_population_samples:
+            if at <= t:
+                counts = row
+            else:
+                break
+        return counts
 
     def population_at(self, t: float) -> int:
         """How many balls existed at time `t`. Step function, from the samples."""
@@ -864,7 +1092,9 @@ class MultishellRun:
         """
         h = hashlib.sha256()
         h.update(SCHEMA_VERSION.encode("utf-8"))
-        h.update(self.config.digest().encode("utf-8"))
+        # The *physics* digest, not the full one: a run and its label-swapped
+        # twin must fingerprint identically here, because they are the same run.
+        h.update(self.config.physics_digest().encode("utf-8"))
         h.update(struct.pack("<q", int(self.seed)))
         for ev in self.events:
             d = ev.data
@@ -939,11 +1169,43 @@ class MultishellRun:
                 h.update(struct.pack("<cid", b"f", d["total_balls"], ev.t))
         return h.hexdigest()
 
+    def team_digest(self) -> str:
+        """SHA-256 over the *labelling*: which ball wore which colour, in order.
+
+        Deliberately a second digest rather than fields folded into
+        `state_digest`. `state_digest` is over the physics and carries no team,
+        so a label swap leaves it identical - which is the proof that the swap
+        changed nothing physical. This one is over the labels alone, so a swap
+        changes it, and the two together say exactly what a swap did.
+        """
+        h = hashlib.sha256()
+        h.update(b"team-labels")
+        for record in self.balls:
+            h.update(struct.pack("<2i", record.ball_id, record.team_id))
+        return h.hexdigest()
+
     def summary(self) -> dict[str, Any]:
         return {
             "seed": self.seed,
             "escaped": self.escaped,
             "escape_ball": self.escape_ball,
+            "winner_team": self.winner_team,
+            "winner_team_name": (
+                TEAM_NAMES[self.winner_team] if self.winner_team is not None else None
+            ),
+            "winner_generation": self.winner_generation,
+            "winner_route": self.winner_route,
+            "win_margin_seconds": self.win_margin_seconds,
+            "team_balls": list(self.team_balls),
+            "team_spawns": list(self.team_spawns),
+            "team_collisions": list(self.team_collisions),
+            "team_damage": list(self.team_damage),
+            "team_breaks": list(self.team_breaks),
+            "team_crossings": list(self.team_crossings),
+            "team_frontier": list(self.team_frontier),
+            "population_lead_changes": self.population_lead_changes,
+            "frontier_lead_changes": self.frontier_lead_changes,
+            "max_population_lead": self.max_population_lead,
             "failure_reason": self.failure_reason,
             "duration": self.duration,
             "escape_time": self.escape_time,
@@ -967,6 +1229,7 @@ class MultishellRun:
             "newton_failures": self.newton_failures,
             "reproduction_violations": self.reproduction_violations,
             "digest": self.state_digest(),
+            "team_digest": self.team_digest(),
         }
 
 
@@ -987,6 +1250,7 @@ class _Ball:
 
     __slots__ = (
         "ball_id",
+        "team",
         "parent_id",
         "generation",
         "birth_time",
@@ -1015,6 +1279,7 @@ class _Ball:
     def __init__(
         self,
         ball_id: int,
+        team: int,
         parent_id: int | None,
         generation: int,
         birth_time: float,
@@ -1030,6 +1295,7 @@ class _Ball:
         route: str = "none",
     ) -> None:
         self.ball_id = ball_id
+        self.team = team
         self.parent_id = parent_id
         self.generation = generation
         self.birth_time = birth_time
@@ -1265,28 +1531,90 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
     diameter = 2.0 * config.ball_radius
 
     # Per-panel ledgers that `_ShellState` does not carry: the damage state
-    # index and the set of balls that have paid into the panel.
+    # index, the set of balls that have paid into the panel, and the same split
+    # by team. The team split is what turns "the panel broke" into "cyan did
+    # most of the work and orange walked through it", which is the story the
+    # two-team rule is for.
     panel_state = [[0] * st.panel_count for st in states]
     contributors: list[list[set[int]]] = [[set() for _ in range(st.panel_count)] for st in states]
+    team_contributors: list[list[list[set[int]]]] = [
+        [[set() for _ in range(TEAM_COUNT)] for _ in range(st.panel_count)] for st in states
+    ]
+    team_panel_damage: list[list[list[float]]] = [
+        [[0.0] * TEAM_COUNT for _ in range(st.panel_count)] for st in states
+    ]
 
-    x0, y0, vx0, vy0 = start_state(seed, config, arena)
-    root = _Ball(0, None, 0, 0.0, None, (0,), 0, 0.0, x0, y0, vx0, vy0, arena.region_of(x0, y0))
-    balls: list[_Ball] = [root]
-    records: dict[int, BallRecord] = {
-        0: BallRecord(0, None, 0, 0.0, None, (0,), (), ())
-    }
-    run.flights[0] = [Flight(0.0, x0, y0, vx0, vy0)]
-    run.population_samples.append((0.0, 1))
-    run.frontier_region = root.region
-    run.speed_min = run.speed_max = math.hypot(vx0, vy0)
+    teams = team_assignment(seed, config)
+    founders = start_states(seed, config, arena)
+    balls: list[_Ball] = []
+    records: dict[int, BallRecord] = {}
+    run.team_balls = [0] * TEAM_COUNT
+    run.team_spawns = [0] * TEAM_COUNT
+    run.team_collisions = [0] * TEAM_COUNT
+    run.team_damage = [0.0] * TEAM_COUNT
+    run.team_breaks = [0] * TEAM_COUNT
+    run.team_crossings = [0] * TEAM_COUNT
+    run.team_frontier = [0] * TEAM_COUNT
+    team_advance_time = [0.0] * TEAM_COUNT
+    run.speed_min = math.inf
+    run.speed_max = 0.0
+    for slot, (x0, y0, vx0, vy0) in enumerate(founders):
+        team = teams[slot]
+        founder = _Ball(
+            slot, team, None, 0, 0.0, None, (slot,), 0, 0.0,
+            x0, y0, vx0, vy0, arena.region_of(x0, y0),
+        )
+        balls.append(founder)
+        records[slot] = BallRecord(slot, team, None, 0, 0.0, None, (slot,), (), ())
+        run.flights[slot] = [Flight(0.0, x0, y0, vx0, vy0)]
+        run.team_balls[team] += 1
+        run.frontier_region = max(run.frontier_region, founder.region)
+        run.team_frontier[team] = max(run.team_frontier[team], founder.region)
+        speed0 = math.hypot(vx0, vy0)
+        run.speed_min = min(run.speed_min, speed0)
+        run.speed_max = max(run.speed_max, speed0)
+    run.max_population = len(balls)
+    run.population_samples.append((0.0, len(balls)))
+    run.team_population_samples.append((0.0, tuple(run.team_balls)))
+    run.team_frontier_samples.append((0.0, tuple(run.team_frontier)))
 
     events = run.events
     region_dwell = [0.0] * (n_shells + 1)
     spawn_index = 0
-    next_id = 1
+    next_id = len(balls)
     clock = 0.0
 
-    _resolve_next_event(root, states, n_shells, escape_radius, horizon, config, run)
+    # Lead bookkeeping. `sign` is +1 when team 0 is ahead. A lead change is a
+    # transition between two *opposite non-zero* signs, so a run that ties and
+    # then resumes the same lead has not changed lead, and a run that ties and
+    # then flips has changed it once rather than twice.
+    lead_sign = 0
+    frontier_sign = 0
+
+    def note_population(at: float) -> None:
+        nonlocal lead_sign
+        counts = tuple(run.team_balls)
+        run.team_population_samples.append((at, counts))
+        lead = counts[0] - counts[1]
+        run.max_population_lead = max(run.max_population_lead, abs(lead))
+        sign = (lead > 0) - (lead < 0)
+        if sign != 0:
+            if lead_sign != 0 and sign != lead_sign:
+                run.population_lead_changes += 1
+            lead_sign = sign
+
+    def note_frontier(at: float) -> None:
+        nonlocal frontier_sign
+        run.team_frontier_samples.append((at, tuple(run.team_frontier)))
+        lead = run.team_frontier[0] - run.team_frontier[1]
+        sign = (lead > 0) - (lead < 0)
+        if sign != 0:
+            if frontier_sign != 0 and sign != frontier_sign:
+                run.frontier_lead_changes += 1
+            frontier_sign = sign
+
+    for founder in balls:
+        _resolve_next_event(founder, states, n_shells, escape_radius, horizon, config, run)
 
     def note_region(b: _Ball, new_region: int, at: float) -> None:
         region_dwell[b.region] += at - b.region_entered_at
@@ -1297,6 +1625,10 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
             b.max_region = new_region
         if new_region > run.frontier_region:
             run.frontier_region = new_region
+        if new_region > run.team_frontier[b.team]:
+            run.team_frontier[b.team] = new_region
+            team_advance_time[b.team] = at
+            note_frontier(at)
 
     def lineage_of(b: _Ball) -> list[int]:
         return list(b.lineage)
@@ -1356,7 +1688,9 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                         tb,
                         {
                             "ball_id": a.ball_id,
+                            "team_id": a.team,
                             "other_id": c.ball_id,
+                            "other_team_id": c.team,
                             "position": (a.x, a.y),
                             "other_position": (c.x, c.y),
                             "normal": (nx, ny),
@@ -1429,6 +1763,7 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
             grazing = impact < graze_cut
 
             run.collisions += 1
+            run.team_collisions[b.team] += 1
             b.collisions += 1
             st.hits[slot] += 1
             if grazing:
@@ -1439,6 +1774,7 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                     t_event,
                     {
                         "ball_id": b.ball_id,
+                        "team_id": b.team,
                         "shell_id": k,
                         "panel_id": slot,
                         "region": b.region,
@@ -1463,6 +1799,7 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                 miss = _near_miss(st, b.x, b.y, vx_in, vy_in, t_event, contact_angle, config)
                 if miss is not None:
                     miss["ball_id"] = b.ball_id
+                    miss["team_id"] = b.team
                     miss["shell_id"] = k
                     miss["panel_id"] = slot
                     miss["region"] = b.region
@@ -1476,7 +1813,12 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                 if added > 0.0:
                     st.damage[slot] += added
                     contributors[k][slot].add(b.ball_id)
+                    team_contributors[k][slot][b.team].add(b.ball_id)
+                    team_panel_damage[k][slot][b.team] += added
+                    run.team_damage[b.team] += added
+                    records[b.ball_id].damage_dealt += added
                 cumulative = st.damage[slot]
+                team_cumulative = list(team_panel_damage[k][slot])
                 new_state = damage_state_of(cumulative, threshold, fractions)
                 events.append(
                     Event(
@@ -1484,6 +1826,7 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                         t_event,
                         {
                             "ball_id": b.ball_id,
+                            "team_id": b.team,
                             "shell_id": k,
                             "panel_id": slot,
                             "contribution": added,
@@ -1493,6 +1836,7 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                             "state": DAMAGE_STATES[new_state],
                             "impact_speed": impact,
                             "contributors": len(contributors[k][slot]),
+                            "team_cumulative": team_cumulative,
                         },
                     )
                 )
@@ -1505,6 +1849,7 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                             t_event,
                             {
                                 "ball_id": b.ball_id,
+                                "team_id": b.team,
                                 "shell_id": k,
                                 "panel_id": slot,
                                 "previous_state": DAMAGE_STATES[previous],
@@ -1518,13 +1863,21 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                 if new_state == len(DAMAGE_STATES) - 1:
                     st.live[slot] = False
                     run.breaks += 1
+                    run.team_breaks[b.team] += 1
                     broke = True
+                    paid = team_panel_damage[k][slot]
+                    largest_team = (
+                        max(range(TEAM_COUNT), key=lambda i: (paid[i], -i))
+                        if any(paid)
+                        else None
+                    )
                     events.append(
                         Event(
                             "panel_break",
                             t_event,
                             {
                                 "ball_id": b.ball_id,
+                                "team_id": b.team,
                                 "shell_id": k,
                                 "panel_id": slot,
                                 "position": (qx, qy),
@@ -1533,6 +1886,11 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                                 "threshold": threshold,
                                 "hits": st.hits[slot],
                                 "contributors": len(contributors[k][slot]),
+                                "team_cumulative": list(paid),
+                                "team_contributors": [
+                                    len(team_contributors[k][slot][i]) for i in range(TEAM_COUNT)
+                                ],
+                                "largest_team": largest_team,
                             },
                         )
                     )
@@ -1559,6 +1917,15 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
             run.escape_ball = b.ball_id
             run.escape_time = t_event
             run.duration = t_event
+            run.winner_team = b.team
+            run.winner_generation = b.generation
+            run.winner_route = b.last_route
+            # How long the losing colour had been sitting at its own high-water
+            # mark when this happened. A small number is a race still live at
+            # the last second; a large one is a procession. Measured, never
+            # targeted - nothing anywhere steers towards a close finish.
+            loser = (b.team + 1) % TEAM_COUNT
+            run.win_margin_seconds = t_event - team_advance_time[loser]
             note_region(b, b.region, t_event)
             records[b.ball_id].escaped = True
             run.flights[b.ball_id].append(Flight(t_event, b.x, b.y, b.vx, b.vy))
@@ -1568,6 +1935,8 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                     t_event,
                     {
                         "ball_id": b.ball_id,
+                        "team_id": b.team,
+                        "team_name": TEAM_NAMES[b.team],
                         "shell_id": n_shells - 1,
                         "route": b.last_route,
                         "position": (b.x, b.y),
@@ -1579,6 +1948,9 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                         "collisions": run.collisions,
                         "breaks": run.breaks,
                         "population": len(balls),
+                        "population_by_team": list(run.team_balls),
+                        "damage_by_team": list(run.team_damage),
+                        "margin_seconds": run.win_margin_seconds,
                     },
                 )
             )
@@ -1600,6 +1972,8 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
         else:
             route = "break"
         b.last_route = route
+        if outward:
+            run.team_crossings[b.team] += 1
         new_region = b.region + 1 if outward else b.region - 1
         dwell_seconds = t_event - b.region_entered_at
         from_region = b.region
@@ -1630,6 +2004,16 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
             if len(balls) >= config.max_population:
                 run.spawns_suppressed += 1
             else:
+                # The *global* spawn index, because that is the only version
+                # of this rule that is exactly balanced. Alternating on the
+                # parent's own child count was tried and measured instead, and
+                # it is not: most balls have one or two children, so "the first
+                # child turns +" put 70% of a population's turns the same way
+                # and gave the whole simulation a chirality. Whether the global
+                # rule is *also* balanced between the two colours is then an
+                # empirical question rather than a constructional one, and
+                # `test_the_spawn_turn_is_balanced_across_the_two_teams`
+                # answers it over a population.
                 turn = config.spawn_turn * (1.0 if spawn_index % 2 == 0 else -1.0)
                 ct, stn = math.cos(turn), math.sin(turn)
                 cvx = b.vx * ct - b.vy * stn
@@ -1655,6 +2039,7 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                 credited_mask = (1 << (shell_index + 1)) - 1
                 child = _Ball(
                     child_id,
+                    b.team,
                     b.ball_id,
                     b.generation + 1,
                     t_event,
@@ -1673,6 +2058,7 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                 run.flights[child_id] = [Flight(t_event, px, py, cvx, cvy)]
                 records[child_id] = BallRecord(
                     child_id,
+                    b.team,
                     b.ball_id,
                     b.generation + 1,
                     t_event,
@@ -1683,6 +2069,8 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                 parent_record = records[b.ball_id]
                 parent_record.children = parent_record.children + (child_id,)
                 run.spawns += 1
+                run.team_spawns[b.team] += 1
+                run.team_balls[b.team] += 1
                 spawn_index += 1
                 reproduced = True
                 if child.generation > run.max_generation:
@@ -1690,13 +2078,19 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                 if len(balls) > run.max_population:
                     run.max_population = len(balls)
                 run.population_samples.append((t_event, len(balls)))
+                note_population(t_event)
                 if new_region > run.frontier_region:
                     run.frontier_region = new_region
+                if new_region > run.team_frontier[child.team]:
+                    run.team_frontier[child.team] = new_region
+                    team_advance_time[child.team] = t_event
+                    note_frontier(t_event)
                 spawn_event = Event(
                     "ball_spawn",
                     t_event,
                     {
                         "ball_id": child_id,
+                        "team_id": b.team,
                         "parent_id": b.ball_id,
                         "generation": child.generation,
                         "birth_shell": shell_index,
@@ -1720,6 +2114,7 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                 _ordered(
                     {
                         "ball_id": b.ball_id,
+                        "team_id": b.team,
                         "shell_id": shell_index,
                         "panel_id": slot,
                         "route": route,
@@ -1736,6 +2131,7 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                     if outward
                     else {
                         "ball_id": b.ball_id,
+                        "team_id": b.team,
                         "shell_id": shell_index,
                         "panel_id": slot,
                         "route": route,
@@ -1797,6 +2193,9 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
                     "balls_by_region": by_region,
                     "collisions": run.collisions,
                     "breaks": run.breaks,
+                    "balls_by_team": list(run.team_balls),
+                    "frontier_by_team": list(run.team_frontier),
+                    "damage_by_team": list(run.team_damage),
                 },
             )
         )

@@ -69,6 +69,7 @@ from typing import Any, Iterable, Sequence
 from satisfying.multishell import (
     DAMAGE_STATES,
     DEFAULT_CONFIG,
+    TEAM_NAMES,
     MultishellConfig,
     MultishellRun,
     simulate,
@@ -118,10 +119,16 @@ class EvaluationThresholds:
     min_escape_seconds: float = 12.0
 
     # --- population, from the brief's target progression -----------------
-    # "too weak: population stays around 1-3 for almost the entire video"
-    min_final_population: int = 5
-    min_late_population: int = 4
-    # "too explosive: population jumps to 20+ almost immediately"
+    # Every line here moved with the second founder. A run now *starts* at two,
+    # so the Phase 3B floor of five was one spawn away from being met by a
+    # failure, and the measured Phase 4A distribution has p5 = 7 and p50 = 12.
+    # "too weak" is a run that barely reproduced at all.
+    min_final_population: int = 8
+    min_late_population: int = 5
+    # "too explosive: population jumps to 20+ almost immediately". The early
+    # population (at a quarter of the run) measures p90 = 7 and p99 = 10, so
+    # eight still names the tail rather than the middle and did not need to
+    # move.
     max_early_population: int = 8
     early_fraction: float = 0.25
     # "runaway population": the safety limit is a configuration failure, not a
@@ -139,16 +146,32 @@ class EvaluationThresholds:
     max_outer_pass_rate: float = 0.85
 
     # --- activity --------------------------------------------------------
-    # "excessive sonic/event density". The brief's caution region is 8-10
-    # collisions/sec sustained; the sustained number is the windowed peak, not
-    # the mean, and the mean gets its own looser line.
-    max_peak_collision_rate: float = 16.0
-    max_collision_rate: float = 9.0
-    min_collision_rate: float = 1.5
+    # **These are the numbers the second founder moved furthest, and they had
+    # to move.** Phase 3B drew the caution line at 9 collisions a second with a
+    # 16/s windowed peak, on a population whose median was 6.2/s. Phase 4A's
+    # median is 14.7/s: two founders roughly double the cast, and the arena
+    # shrank from an outer radius of 24.4 to 18.5 so each ball meets a wall
+    # sooner. Left alone, the two flags fired on 92% of a three-thousand-seed
+    # population and `usable` fell to one run in three thousand - a flag that
+    # rejects almost everything has stopped measuring anything.
+    #
+    # Re-drawn against the measured Phase 4A distribution rather than against a
+    # remembered one. Over the escaped population the mean rate is p75 = 23.0
+    # and p90 = 28.8, and the two-second windowed peak is p75 = 44.5 and
+    # p90 = 53.0, so these two lines name roughly the busiest fifth and the
+    # busiest eighth. The brief asked for more activity than Phase 3B and got
+    # it; what it did not ask for is a video nobody can follow, and that is the
+    # tail these still catch.
+    max_peak_collision_rate: float = 48.0
+    max_collision_rate: float = 24.0
+    min_collision_rate: float = 3.0
     audio_window: float = 2.0
 
-    # "long stalls"
-    max_stagnation_seconds: float = 4.0
+    # "long stalls". The measured longest silent stretch is p99 = 1.14 s - one
+    # crossing of the opened-out arena - so four seconds was a line nothing
+    # could reach. 2.5 s still sits well clear of the population and would
+    # actually catch a run that stalled.
+    max_stagnation_seconds: float = 2.5
 
     # --- escalation, the redesign's headline claim -----------------------
     min_escalation: float = 1.15
@@ -158,12 +181,31 @@ class EvaluationThresholds:
     # over.
     max_cycle_run: int = 10
     max_cycle_period: int = 6
-    # "all balls following nearly identical trajectories"
-    min_distinct_panels: int = 14
-    min_trajectory_spread: float = 0.10
+    # "all balls following nearly identical trajectories". Both of these were
+    # dead guards at the Phase 3B values: the Phase 4A population has p1 = 41
+    # distinct panels and p1 = 0.248 spread, so 14 and 0.10 could not fire on
+    # any run, healthy or not. Moved to just outside the measured population so
+    # they are guards again rather than decoration.
+    min_distinct_panels: int = 30
+    min_trajectory_spread: float = 0.18
+
+    # --- the race ---------------------------------------------------------
+    # A two-team video whose second colour never got going is a one-founder
+    # video with a spare ball in it. Both of these are about whether there was
+    # a race at all, and neither is about whether it was *close*: nothing here
+    # rewards a narrow finish, because rewarding one would be the first step
+    # towards arranging one.
+    #: Every team must have reproduced at least this many times.
+    min_team_population: int = 3
+    #: The losing team must have got at least this far out. Two means it was
+    #: through the first two shells and genuinely in the race.
+    min_loser_frontier: int = 2
+    #: The winning colour may not have had more than this share of the final
+    #: population. Above it, the "race" is one team with a passenger.
+    max_population_share: float = 0.80
 
     # --- mechanic coverage -----------------------------------------------
-    min_breaks: int = 1
+    min_breaks: int = 1  # noqa: E501 - a run with no break never showed the damage model at all
     min_progression_openings: int = 2
 
     def as_dict(self) -> dict[str, Any]:
@@ -192,6 +234,9 @@ class EvaluationThresholds:
             "min_trajectory_spread": self.min_trajectory_spread,
             "min_breaks": self.min_breaks,
             "min_progression_openings": self.min_progression_openings,
+            "min_team_population": self.min_team_population,
+            "min_loser_frontier": self.min_loser_frontier,
+            "max_population_share": self.max_population_share,
         }
 
 
@@ -218,6 +263,9 @@ FLAG_NAMES: tuple[str, ...] = (
     "clone_trajectories",
     "no_breaks",
     "no_opening_progress",
+    "team_starved",
+    "loser_stalled",
+    "one_sided",
 )
 
 
@@ -265,6 +313,13 @@ class RunEvaluation:
             "progression_openings": m["routes"]["progression_opening"],
             "progression_breaks": m["routes"]["progression_break"],
             "escape_route": m["outcome"]["escape_route"],
+            "winner": m["race"]["winner_name"],
+            "winner_generation": m["race"]["winner_generation"],
+            "population_by_team": m["race"]["population_by_team"],
+            "lead_changes": m["race"]["population_lead_changes"],
+            "frontier_lead_changes": m["race"]["frontier_lead_changes"],
+            "win_margin_seconds": m["race"]["win_margin_seconds"],
+            "cross_team_breaks": m["race"]["cross_team_breaks"],
             "outer_pass_rate": round(m["difficulty"]["pass_rate"][-1], 3),
             "flags": list(self.flags),
         }
@@ -555,6 +610,63 @@ def evaluate(
                 spreads.append(math.sqrt(variance) / mean)
     trajectory_spread = sum(spreads) / len(spreads) if spreads else 1.0
 
+    # --- the race ---------------------------------------------------------
+    team_count = len(TEAM_NAMES)
+    team_of = {record.ball_id: record.team_id for record in run.balls}
+    team_curve = [list(run.team_population_at(t)) for t in samples]
+    seconds = [float(i) for i in range(int(math.floor(duration)) + 1)]
+    team_by_second = [list(run.team_population_at(t)) for t in seconds]
+    first_spawn_by_team: list[float | None] = [None] * team_count
+    for ev in spawns:
+        team = int(ev.data["team_id"])
+        if first_spawn_by_team[team] is None:
+            first_spawn_by_team[team] = ev.t
+    known = [t for t in first_spawn_by_team if t is not None]
+    first_to_clone = (
+        None
+        if not known
+        else min(
+            range(team_count),
+            key=lambda i: (
+                math.inf if first_spawn_by_team[i] is None else first_spawn_by_team[i],
+                i,
+            ),
+        )
+    )
+
+    # Damage, split by team, and the breaks both colours paid into. A break
+    # whose contributors span both teams is the emergent moment the brief
+    # names: one colour softened the panel and the other went through it.
+    cross_team_breaks = 0
+    breaks_by_largest_team = [0] * team_count
+    breaks_triggered_by_team = [0] * team_count
+    for ev in breaks:
+        paid = list(ev.data["team_contributors"])
+        if sum(1 for c in paid if c > 0) > 1:
+            cross_team_breaks += 1
+        largest = ev.data["largest_team"]
+        if largest is not None:
+            breaks_by_largest_team[int(largest)] += 1
+        breaks_triggered_by_team[int(ev.data["team_id"])] += 1
+    stolen_breaks = sum(
+        1
+        for ev in breaks
+        if ev.data["largest_team"] is not None
+        and int(ev.data["largest_team"]) != int(ev.data["team_id"])
+    )
+
+    crossings_by_team = [0] * team_count
+    for ev in exits:
+        crossings_by_team[int(ev.data["team_id"])] += 1
+
+    winner = run.winner_team
+    loser = None if winner is None else (winner + 1) % team_count
+    final_team_population = list(run.team_balls)
+    total_population = sum(final_team_population) or 1
+    winner_share = (
+        None if winner is None else final_team_population[winner] / total_population
+    )
+
     escape_event = by_kind.get("escape", [None])[0]
     failure_event = by_kind.get("failure", [None])[0]
 
@@ -675,6 +787,45 @@ def evaluate(
             "newton_failures": run.newton_failures,
             "reproduction_violations": run.reproduction_violations,
         },
+        "race": {
+            "teams": list(TEAM_NAMES),
+            "winner": winner,
+            "winner_name": None if winner is None else TEAM_NAMES[winner],
+            "winner_ball": run.escape_ball,
+            # Which physical founder slot the winner descends from. A founder's
+            # ball id is its slot, and a lineage starts at its founder, so this
+            # is the head of the winner's lineage. It is the *implementation*
+            # side of the fairness question, kept next to the colour so the two
+            # can never be confused for each other.
+            "winner_founder_slot": (
+                None if run.escape_ball is None
+                else int(run.balls[run.escape_ball].lineage[0])
+            ),
+            "winner_generation": run.winner_generation,
+            "winner_route": run.winner_route,
+            "win_margin_seconds": run.win_margin_seconds,
+            "first_to_clone": first_to_clone,
+            "first_spawn_by_team": first_spawn_by_team,
+            "population_by_team": final_team_population,
+            "population_share_winner": winner_share,
+            "population_curve_by_team": team_curve,
+            "population_by_second": team_by_second,
+            "population_seconds": seconds,
+            "spawns_by_team": list(run.team_spawns),
+            "collisions_by_team": list(run.team_collisions),
+            "crossings_by_team": crossings_by_team,
+            "frontier_by_team": list(run.team_frontier),
+            "loser_frontier": None if loser is None else run.team_frontier[loser],
+            "damage_by_team": [round(v, 6) for v in run.team_damage],
+            "breaks_by_team": list(run.team_breaks),
+            "breaks_by_largest_team": breaks_by_largest_team,
+            "cross_team_breaks": cross_team_breaks,
+            "stolen_breaks": stolen_breaks,
+            "population_lead_changes": run.population_lead_changes,
+            "frontier_lead_changes": run.frontier_lead_changes,
+            "max_population_lead": run.max_population_lead,
+            "team_digest": run.team_digest(),
+        },
         "config_digest": config.digest(),
         "digest": run.state_digest(),
     }
@@ -746,6 +897,13 @@ def evaluate(
     if progression_opening < thresholds.min_progression_openings:
         flags.append("no_opening_progress")
 
+    if min(final_team_population) < thresholds.min_team_population:
+        flags.append("team_starved")
+    if loser is not None and run.team_frontier[loser] < thresholds.min_loser_frontier:
+        flags.append("loser_stalled")
+    if winner_share is not None and winner_share > thresholds.max_population_share:
+        flags.append("one_sided")
+
     return RunEvaluation(seed=run.seed, metrics=metrics, flags=flags)
 
 
@@ -779,6 +937,111 @@ def _histogram(values: Sequence[float], edges: Sequence[float]) -> dict[str, int
         out[f"{lo:g}-{hi:g}"] = sum(1 for v in values if lo <= v < hi)
     out[f">={edges[-1]:g}"] = sum(1 for v in values if v >= edges[-1])
     return out
+
+
+def _race_summary(
+    evaluations: Sequence[RunEvaluation],
+    escaped: Sequence[RunEvaluation],
+    points: Sequence[float],
+) -> dict[str, Any]:
+    """Who won, how often, and whether the split is anything but a coin.
+
+    Two different questions and they need separate answers:
+
+    * **Colour.** How often cyan won. This is what the viewer sees, and it is
+      what "no colour-dependent physics" has to show up in. It is also the one
+      the labelling coin makes unbiased by construction, so a deviation here is
+      either the coin or the sample.
+    * **Slot.** How often physical founder *slot 0* won. This is the
+      implementation question: slot 0 is ball 0, its heading is drawn first and
+      its id breaks scheduling ties. A deviation here is a real asymmetry in
+      the simulation, and reporting it separately is what stops the coin from
+      laundering it.
+
+    Both come with a two-sided binomial z, so "281 of 538" can be read as
+    "+1.03 sigma" rather than argued about.
+    """
+    count = len(TEAM_NAMES)
+    wins = [0] * count
+    slot_wins = [0] * count
+    for e in escaped:
+        winner = e.metrics["race"]["winner"]
+        if winner is not None:
+            wins[int(winner)] += 1
+        slot = e.metrics["race"]["winner_founder_slot"]
+        if slot is not None and int(slot) < count:
+            slot_wins[int(slot)] += 1
+
+    def z(head: int, total: int) -> float:
+        if total <= 0:
+            return float("nan")
+        return (head - 0.5 * total) / (math.sqrt(total) * 0.5)
+
+    total_wins = sum(wins)
+    total_slots = sum(slot_wins)
+
+    def flat(key: str) -> list[float]:
+        return [e.metrics["race"][key] for e in evaluations]
+
+    return {
+        "teams": list(TEAM_NAMES),
+        "wins_by_team": wins,
+        "win_rate_by_team": [w / total_wins if total_wins else 0.0 for w in wins],
+        "team_win_z": z(wins[0], total_wins),
+        "wins_by_founder_slot": slot_wins,
+        "slot_win_z": z(slot_wins[0], total_slots),
+        "first_to_clone_by_team": [
+            sum(1 for e in evaluations if e.metrics["race"]["first_to_clone"] == i)
+            for i in range(count)
+        ],
+        "population_by_team_mean": [
+            sum(e.metrics["race"]["population_by_team"][i] for e in evaluations)
+            / max(1, len(evaluations))
+            for i in range(count)
+        ],
+        "damage_by_team_mean": [
+            sum(e.metrics["race"]["damage_by_team"][i] for e in evaluations)
+            / max(1, len(evaluations))
+            for i in range(count)
+        ],
+        "population_lead_changes": _quantiles(flat("population_lead_changes"), points),
+        "population_lead_change_histogram": _histogram(
+            flat("population_lead_changes"), (0, 1, 2, 3, 4, 6)
+        ),
+        "frontier_lead_changes": _quantiles(flat("frontier_lead_changes"), points),
+        "max_population_lead": _quantiles(flat("max_population_lead"), points),
+        "win_margin_seconds": _quantiles(
+            [e.metrics["race"]["win_margin_seconds"] for e in escaped], points
+        ),
+        "win_margin_histogram": _histogram(
+            [e.metrics["race"]["win_margin_seconds"] for e in escaped],
+            (0, 1, 2, 4, 8, 12, 18),
+        ),
+        "winner_population_share": _quantiles(
+            [e.metrics["race"]["population_share_winner"] for e in escaped], points
+        ),
+        "cross_team_breaks": _quantiles(flat("cross_team_breaks"), points),
+        "cross_team_break_runs": sum(
+            1 for e in evaluations if e.metrics["race"]["cross_team_breaks"]
+        ),
+        "stolen_breaks": _quantiles(flat("stolen_breaks"), points),
+        "stolen_break_runs": sum(
+            1 for e in evaluations if e.metrics["race"]["stolen_breaks"]
+        ),
+        "winner_generation": _quantiles(
+            [e.metrics["race"]["winner_generation"] for e in escaped], points
+        ),
+        "winner_route": {
+            route: sum(1 for e in escaped if e.metrics["race"]["winner_route"] == route)
+            for route in ("opening", "break", "anomaly", "none")
+        },
+        "founder_wins": sum(
+            1 for e in escaped if e.metrics["race"]["winner_generation"] == 0
+        ),
+        "descendant_wins": sum(
+            1 for e in escaped if (e.metrics["race"]["winner_generation"] or 0) > 0
+        ),
+    }
 
 
 def summarise(
@@ -950,6 +1213,7 @@ def summarise(
             1 for e in evaluations if e.metrics["progression"]["crossed"][-1] > 0
         )
         / total,
+        "race": _race_summary(evaluations, escaped, points),
         "stagnation": _quantiles(metric(["stagnation", "longest_no_event"]), points),
         "trajectory_spread": _quantiles(metric(["repetition", "trajectory_spread"]), points),
         "instruments": {

@@ -51,9 +51,13 @@ from satisfying.multishell import (
     damage_state_of,
     difficulty_profile,
     impact_damage,
+    TEAM_COUNT,
+    TEAM_NAMES,
     resolve_shells,
     simulate,
     start_state,
+    start_states,
+    team_assignment,
     validate_events,
 )
 from satisfying.multishell_evaluator import (
@@ -151,13 +155,14 @@ def test_lineage_ids_are_stable_and_well_formed(runs) -> None:
         ids = [b.ball_id for b in run.balls]
         assert ids == list(range(len(ids))), "ball ids must be a dense sequence from 0"
         by_id = {b.ball_id: b for b in run.balls}
-        root = by_id[0]
-        assert root.parent_id is None
-        assert root.generation == 0
-        assert root.birth_time == 0.0
-        assert root.birth_shell is None
-        assert root.lineage == (0,)
-        for record in run.balls[1:]:
+        for slot in range(TEAM_COUNT):
+            root = by_id[slot]
+            assert root.parent_id is None
+            assert root.generation == 0
+            assert root.birth_time == 0.0
+            assert root.birth_shell is None
+            assert root.lineage == (slot,)
+        for record in run.balls[TEAM_COUNT:]:
             parent = by_id[record.parent_id]
             assert record.ball_id > record.parent_id, "a child is always created after its parent"
             assert record.generation == parent.generation + 1
@@ -182,7 +187,7 @@ def test_lineage_in_the_event_stream_matches_the_records(runs) -> None:
 
 def test_a_child_is_pre_charged_with_every_shell_inside_its_birthplace(runs) -> None:
     for run in runs:
-        for record in run.balls[1:]:
+        for record in run.balls[TEAM_COUNT:]:
             assert record.credited_at_birth == tuple(range(record.birth_shell + 1))
             # And the ball cannot un-credit itself later.
             assert set(record.credited_at_birth) <= set(record.credited)
@@ -260,8 +265,8 @@ def test_a_ball_driven_in_and_out_of_one_shell_produces_exactly_one_child() -> N
 def test_reproduction_can_be_turned_off() -> None:
     run = simulate(3, DEFAULT_CONFIG.replace(reproduction=False))
     assert run.spawns == 0
-    assert len(run.balls) == 1
-    assert run.max_population == 1
+    assert len(run.balls) == TEAM_COUNT
+    assert run.max_population == TEAM_COUNT
 
 
 def test_every_ball_can_have_descendants(runs) -> None:
@@ -274,7 +279,7 @@ def test_every_ball_can_have_descendants(runs) -> None:
         for ev in run.events
         if ev.kind == "ball_spawn" and ev.data["generation"] >= 2
     }
-    assert non_founder_parents - {0}, "only the founder ever reproduced"
+    assert non_founder_parents - set(range(TEAM_COUNT)), "only a founder ever reproduced"
 
 
 # --------------------------------------------------------------------------
@@ -321,14 +326,50 @@ def test_the_spawn_velocity_is_the_parents_turned_by_a_fixed_angle(runs) -> None
 
 
 def test_the_spawn_turn_is_balanced_over_the_population(runs) -> None:
-    """Deterministic and symmetric: exactly balanced, never biased one way."""
+    """Deterministic and symmetric: exactly balanced, never biased one way.
+
+    Alternating on the parent's own child count was tried instead and measured:
+    most balls have one or two children, so "the first child turns +" put 70%
+    of a population's turns one way and gave the whole simulation a chirality.
+    The global counter is exactly balanced by construction, which is why it is
+    the one that survived.
+    """
     for run in runs:
         turns = [ev.data["turn"] for ev in run.events if ev.kind == "ball_spawn"]
         positive = sum(1 for t in turns if t > 0)
         negative = len(turns) - positive
         assert abs(positive - negative) <= 1, f"seed {run.seed}: {positive} vs {negative}"
+        assert [i for i, t in enumerate(turns) if t < 0] == list(
+            range(1, len(turns), 2)
+        ), "the alternation is not the global spawn index"
     total = [ev.data["turn"] for run in runs for ev in run.events if ev.kind == "ball_spawn"]
     assert abs(sum(1 for t in total if t > 0) - sum(1 for t in total if t < 0)) <= len(runs)
+
+
+def test_the_spawn_turn_is_balanced_across_the_two_teams(runs) -> None:
+    """Neither colour may collect the +turn more often than the other."""
+    positive = [0] * TEAM_COUNT
+    negative = [0] * TEAM_COUNT
+    for run in runs:
+        for ev in run.events:
+            if ev.kind != "ball_spawn":
+                continue
+            team = ev.data["team_id"]
+            if ev.data["turn"] > 0:
+                positive[team] += 1
+            else:
+                negative[team] += 1
+    for team in range(TEAM_COUNT):
+        total = positive[team] + negative[team]
+        assert total > 100, f"team {team} barely reproduced over the population"
+        # The global alternation balances the *run*, not each colour inside it,
+        # so this is a statistical claim and not a constructional one: three
+        # standard deviations of a fair coin over this many spawns.
+        limit = 3.0 * math.sqrt(total)
+        assert abs(positive[team] - negative[team]) <= limit + 1, (
+            f"team {TEAM_NAMES[team]}: {positive[team]} positive turns against "
+            f"{negative[team]} negative"
+        )
 
 
 def test_the_child_is_born_in_the_region_the_parent_just_entered(runs) -> None:
@@ -644,7 +685,10 @@ def test_both_outcomes_occur(runs) -> None:
     failed = [r for r in runs if not r.escaped]
     assert escaped, "no seed ever escaped"
     assert failed, "every seed escaped; the outcome is not uncertain"
-    assert 0.25 < len(escaped) / len(runs) < 0.90, (
+    # The brief's search region for the two-team race is 20-40% over a large
+    # population; a 120-seed sample of a 23% process has a standard deviation of
+    # about 3.8 points, so this is deliberately wider than the region itself.
+    assert 0.10 < len(escaped) / len(runs) < 0.45, (
         f"escape rate {len(escaped)/len(runs):.1%} is not a genuine question"
     )
     for run in failed:
@@ -793,8 +837,13 @@ def test_the_constant_speed_constraint_and_ball_ball_contact_are_incompatible() 
 def test_the_schema_version_is_new() -> None:
     from satisfying.shell_escape import SCHEMA_VERSION as OLD
 
-    assert SCHEMA_VERSION == "category3-test2-multiplying-shell/2.0.0"
+    assert SCHEMA_VERSION == "category3-test2-two-team-shell-race/3.0.0"
     assert SCHEMA_VERSION != OLD
+    # And not the one-founder Phase 3B stream either: every event grew a
+    # `team_id` and the ball record grew two fields, so a Phase 3B consumer
+    # reading a Phase 4A document would draw a plausible video of a different
+    # simulation.
+    assert SCHEMA_VERSION != "category3-test2-multiplying-shell/2.0.0"
 
 
 def test_the_schema_is_exactly_this() -> None:
@@ -814,6 +863,7 @@ def test_the_schema_is_exactly_this() -> None:
     }
     assert EVENT_SCHEMA["ball_spawn"] == (
         "ball_id",
+        "team_id",
         "parent_id",
         "generation",
         "birth_shell",
@@ -830,6 +880,7 @@ def test_the_schema_is_exactly_this() -> None:
     )
     assert EVENT_SCHEMA["damage_state"] == (
         "ball_id",
+        "team_id",
         "shell_id",
         "panel_id",
         "previous_state",
@@ -840,6 +891,8 @@ def test_the_schema_is_exactly_this() -> None:
     )
     assert EVENT_SCHEMA["escape"] == (
         "ball_id",
+        "team_id",
+        "team_name",
         "shell_id",
         "route",
         "position",
@@ -851,6 +904,9 @@ def test_the_schema_is_exactly_this() -> None:
         "collisions",
         "breaks",
         "population",
+        "population_by_team",
+        "damage_by_team",
+        "margin_seconds",
     )
     assert EVENT_SCHEMA["failure"] == (
         "reason",
@@ -862,6 +918,9 @@ def test_the_schema_is_exactly_this() -> None:
         "balls_by_region",
         "collisions",
         "breaks",
+        "balls_by_team",
+        "frontier_by_team",
+        "damage_by_team",
     )
     # Every ball-scoped event names its ball first.
     for kind, fields in EVENT_SCHEMA.items():
@@ -958,7 +1017,7 @@ def test_the_evaluator_population_metrics_agree_with_the_run(runs) -> None:
         assert m["population"]["total"] == len(run.balls)
         assert m["population"]["max"] == run.max_population
         assert m["population"]["generations"] == run.max_generation + 1
-        assert m["population"]["curve"][0] == 1
+        assert m["population"]["curve"][0] == TEAM_COUNT
         assert m["population"]["curve"][-1] == len(run.balls)
         assert m["population"]["curve"] == sorted(m["population"]["curve"])
         assert sum(m["population"]["by_region"]) == len(run.balls)
@@ -1019,11 +1078,21 @@ def test_every_flag_name_is_reachable_from_the_evaluator() -> None:
         assert f'"{name}"' in source, f"{name} is declared but never raised"
 
 
-def test_a_flagged_run_is_not_usable() -> None:
-    evaluation = evaluate_seed(1)
-    assert evaluation.flags
-    assert not evaluation.usable
-    assert evaluate_seed(15793).usable
+def test_a_flagged_run_is_not_usable(runs) -> None:
+    """`usable` is exactly "no flags" - and both halves of that must occur.
+
+    Written against the population rather than against two named seeds. Two
+    named seeds is how Phase 3B's version of this test came to assert that a
+    seed which now flags `frantic_mean` is usable: the seed was right when it
+    was chosen and the configuration moved underneath it.
+    """
+    evaluations = [evaluate(run) for run in runs]
+    flagged = [e for e in evaluations if e.flags]
+    clean = [e for e in evaluations if not e.flags]
+    assert flagged, "no run in the population was flagged for anything"
+    assert clean, "every run in the population was flagged; the flags reject everything"
+    assert all(not e.usable for e in flagged)
+    assert all(e.usable for e in clean)
 
 
 def test_summarise_reports_the_distributions(runs) -> None:
@@ -1164,3 +1233,329 @@ def test_the_single_ball_module_is_untouched_by_the_redesign() -> None:
     assert shell_escape.SCHEMA_VERSION == "category3-test2-shell-escape/1.0.0"
     assert shell_escape.DEFAULT_CONFIG.digest() == before
     assert shell_escape.DEFAULT_CONFIG.shell_count == 6
+
+
+# --------------------------------------------------------------------------
+# The two-team race
+# --------------------------------------------------------------------------
+
+
+def test_a_run_starts_with_exactly_two_founders_one_per_team(runs) -> None:
+    for run in runs:
+        founders = [b for b in run.balls if b.parent_id is None]
+        assert len(founders) == TEAM_COUNT == 2
+        assert sorted(b.team_id for b in founders) == [0, 1]
+        assert {b.ball_id for b in founders} == {0, 1}
+        assert all(b.birth_time == 0.0 for b in founders)
+        assert run.population_samples[0] == (0.0, 2)
+        assert run.team_population_samples[0] == (0.0, (1, 1))
+
+
+def test_the_config_refuses_any_other_number_of_founders() -> None:
+    """One founder is the video this replaces; three is a legend, not a race."""
+    for count in (1, 3, 4):
+        with pytest.raises(ValueError):
+            DEFAULT_CONFIG.replace(founder_count=count)
+
+
+def test_the_two_founders_are_physically_equivalent() -> None:
+    """Same radius from the centre, same speed, and far enough apart to read."""
+    diameter = 2.0 * DEFAULT_CONFIG.ball_radius
+    for seed in POPULATION:
+        arena = build_arena_for(seed, DEFAULT_CONFIG)
+        states = start_states(seed, DEFAULT_CONFIG, arena)
+        assert len(states) == 2
+        (ax, ay, avx, avy), (bx, by, bvx, bvy) = states
+        assert math.hypot(ax, ay) == pytest.approx(math.hypot(bx, by), abs=1e-12)
+        assert math.hypot(avx, avy) == pytest.approx(DEFAULT_CONFIG.speed, abs=1e-12)
+        assert math.hypot(bvx, bvy) == pytest.approx(DEFAULT_CONFIG.speed, abs=1e-12)
+        # Antipodal, so the separation is twice the shared radius.
+        assert math.hypot(ax - bx, ay - by) == pytest.approx(
+            2.0 * math.hypot(ax, ay), abs=1e-9
+        )
+        assert math.hypot(ax - bx, ay - by) > 2.0 * diameter
+        assert arena.region_of(ax, ay) == arena.region_of(bx, by) == 0
+        # `start_state` is the first of the two, so an older caller still works.
+        assert start_state(seed, DEFAULT_CONFIG, arena) == states[0]
+
+
+def test_the_two_founders_do_not_trace_the_same_path(runs) -> None:
+    """Fair is not the same as identical: a mirror image would be one ball."""
+    same = 0
+    for run in runs:
+        a = run.flights[0]
+        b = run.flights[1]
+        # Compare the headings, which is where the two are allowed to differ.
+        if (a[0].vx, a[0].vy) == (b[0].vx, b[0].vy):
+            same += 1
+    assert same == 0, f"{same} seeds released both founders on the same heading"
+
+
+def test_team_assignment_is_deterministic_and_a_permutation() -> None:
+    for seed in POPULATION:
+        first = team_assignment(seed, DEFAULT_CONFIG)
+        assert first == team_assignment(seed, DEFAULT_CONFIG)
+        assert sorted(first) == list(range(TEAM_COUNT))
+        swapped = team_assignment(seed, DEFAULT_CONFIG.replace(team_swap=True))
+        assert sorted(swapped) == list(range(TEAM_COUNT))
+        assert all(a != b for a, b in zip(first, swapped))
+
+
+def test_the_colour_coin_is_not_biased() -> None:
+    """Over a large seed block, neither slot wears either colour more often."""
+    ones = sum(multishell_seeds.team_parity(seed) for seed in range(20_000))
+    # Three standard deviations of a fair coin over twenty thousand throws.
+    assert abs(ones - 10_000) < 3.0 * math.sqrt(20_000) / 2.0
+
+
+def test_a_child_is_always_its_parents_team(runs) -> None:
+    for run in runs:
+        by_id = {b.ball_id: b for b in run.balls}
+        for record in run.balls:
+            if record.parent_id is None:
+                continue
+            assert record.team_id == by_id[record.parent_id].team_id
+        for record in run.balls:
+            assert record.as_dict()["team_colour"] == TEAM_NAMES[record.team_id]
+        for ev in run.events:
+            if ev.kind != "ball_spawn":
+                continue
+            assert ev.data["team_id"] == by_id[ev.data["parent_id"]].team_id
+            assert ev.data["team_id"] == by_id[ev.data["ball_id"]].team_id
+
+
+def test_a_whole_lineage_is_one_colour(runs) -> None:
+    """Follow a lineage to its root: every member wears the founder's colour."""
+    for run in runs:
+        by_id = {b.ball_id: b for b in run.balls}
+        for record in run.balls:
+            root = by_id[record.lineage[0]]
+            assert root.parent_id is None
+            assert record.team_id == root.team_id
+            assert all(by_id[b].team_id == record.team_id for b in record.lineage)
+
+
+def test_every_event_with_a_ball_carries_that_balls_team(runs) -> None:
+    for run in runs:
+        team_of = {b.ball_id: b.team_id for b in run.balls}
+        seen = 0
+        for ev in run.events:
+            if "ball_id" not in ev.data or ev.kind == "ball_spawn":
+                continue
+            assert ev.data["team_id"] == team_of[ev.data["ball_id"]], ev.kind
+            seen += 1
+        assert seen > 0
+
+
+def test_the_label_swap_changes_the_labels_and_nothing_else() -> None:
+    """The fairness instrument, run on real seeds.
+
+    `state_digest` is over the physics and carries no team, so it must be
+    identical; `team_digest` is over the labels alone, so it must differ; and
+    every event's non-team fields must compare equal member by member. Those
+    three together say exactly what the swap did.
+    """
+    label_fields = {
+        "team_id", "other_team_id", "team_name", "team_cumulative",
+        "team_contributors", "largest_team", "population_by_team",
+        "damage_by_team", "balls_by_team", "frontier_by_team",
+    }
+
+    def physical(run):
+        return [
+            (ev.kind, ev.t, tuple((k, v) for k, v in ev.data.items()
+                                  if k not in label_fields))
+            for ev in run.events
+        ]
+
+    swapped_config = DEFAULT_CONFIG.replace(team_swap=True)
+    assert DEFAULT_CONFIG.physics_digest() == swapped_config.physics_digest()
+    assert DEFAULT_CONFIG.digest() != swapped_config.digest()
+
+    for seed in POPULATION[:40]:
+        plain = simulate(seed)
+        swapped = simulate(seed, swapped_config)
+        assert plain.state_digest() == swapped.state_digest(), seed
+        assert plain.team_digest() != swapped.team_digest(), seed
+        assert physical(plain) == physical(swapped), seed
+        assert plain.duration == swapped.duration
+        assert plain.escape_ball == swapped.escape_ball
+        assert plain.collisions == swapped.collisions
+        assert plain.breaks == swapped.breaks
+        assert [b.team_id for b in plain.balls] == [
+            1 - b.team_id for b in swapped.balls
+        ]
+        assert list(plain.team_balls) == list(reversed(swapped.team_balls))
+        assert list(plain.team_damage) == list(reversed(swapped.team_damage))
+        if plain.winner_team is not None:
+            assert swapped.winner_team == 1 - plain.winner_team
+
+
+def test_no_physical_quantity_can_be_derived_from_the_team() -> None:
+    """The structural half of the same claim, stated as a source fact.
+
+    `team_assignment` is applied to states `start_states` has already built,
+    and `simulate` never passes a team into anything that computes a position,
+    a velocity or a time. This checks the one thing a reader would otherwise
+    have to take on trust: that the label-only field really is label-only, so
+    no arrangement of it can reach the physics fingerprint.
+    """
+    assert MultishellConfig.LABEL_ONLY_FIELDS == ("team_swap",)
+    for value in (False, True):
+        config = DEFAULT_CONFIG.replace(team_swap=value)
+        assert config.physics_digest() == DEFAULT_CONFIG.physics_digest()
+    # And a real physical change does move it.
+    assert DEFAULT_CONFIG.replace(speed=9.0).physics_digest() != (
+        DEFAULT_CONFIG.physics_digest()
+    )
+
+
+def test_team_damage_is_attributed_and_adds_up(runs) -> None:
+    for run in runs:
+        by_id = {b.ball_id: b for b in run.balls}
+        ledger: dict[tuple[int, int], list[float]] = {}
+        for ev in run.events:
+            if ev.kind != "damage":
+                continue
+            key = (ev.data["shell_id"], ev.data["panel_id"])
+            row = ledger.setdefault(key, [0.0] * TEAM_COUNT)
+            row[by_id[ev.data["ball_id"]].team_id] += ev.data["contribution"]
+            assert ev.data["team_cumulative"] == pytest.approx(row, abs=1e-9)
+            assert sum(ev.data["team_cumulative"]) == pytest.approx(
+                ev.data["cumulative"], abs=1e-9
+            )
+        totals = [0.0] * TEAM_COUNT
+        for row in ledger.values():
+            for i in range(TEAM_COUNT):
+                totals[i] += row[i]
+        assert list(run.team_damage) == pytest.approx(totals, abs=1e-9)
+
+
+def test_a_break_records_which_colour_paid_for_it(runs) -> None:
+    cross_team = 0
+    stolen = 0
+    for run in runs:
+        for ev in run.events:
+            if ev.kind != "panel_break":
+                continue
+            paid = ev.data["team_cumulative"]
+            contributors = ev.data["team_contributors"]
+            assert len(paid) == len(contributors) == TEAM_COUNT
+            assert sum(paid) == pytest.approx(ev.data["cumulative"], abs=1e-9)
+            assert sum(contributors) == ev.data["contributors"]
+            largest = ev.data["largest_team"]
+            assert largest is not None
+            assert paid[largest] == max(paid)
+            if sum(1 for c in contributors if c) > 1:
+                cross_team += 1
+                if largest != ev.data["team_id"]:
+                    stolen += 1
+    assert cross_team > 0, "no panel was ever broken by both colours together"
+    assert stolen > 0, (
+        "one colour never broke a panel the other colour had done most of the "
+        "work on; the cooperative-damage story never happened"
+    )
+
+
+def test_the_winner_is_the_first_ball_out_and_is_deterministic(runs) -> None:
+    for run in runs:
+        escapes = [ev for ev in run.events if ev.kind == "escape"]
+        if not run.escaped:
+            assert not escapes
+            assert run.winner_team is None
+            assert run.winner_generation is None
+            assert run.win_margin_seconds is None
+            continue
+        assert len(escapes) == 1, "the run resolves on the first escape and stops"
+        event = escapes[0]
+        assert event.data["ball_id"] == run.escape_ball
+        assert event.data["team_id"] == run.winner_team
+        assert event.data["team_name"] == TEAM_NAMES[run.winner_team]
+        assert event.data["generation"] == run.winner_generation
+        assert event.t == run.escape_time == run.duration
+        assert event.data["margin_seconds"] == run.win_margin_seconds
+        assert run.win_margin_seconds >= 0.0
+        again = simulate(run.seed)
+        assert again.winner_team == run.winner_team
+        assert again.escape_ball == run.escape_ball
+        assert again.team_digest() == run.team_digest()
+
+
+def test_the_race_is_not_decided_before_it_is_run(runs) -> None:
+    """Both colours win seeds, and the winner is not a function of the slot."""
+    winners = [run.winner_team for run in runs if run.escaped]
+    assert len(winners) >= 10
+    assert set(winners) == {0, 1}, "one colour won every seed in the population"
+    # And both physical slots win, so the result is not "ball 0 always gets out".
+    slots = {run.balls[run.escape_ball].lineage[0] for run in runs if run.escaped}
+    assert slots == {0, 1}
+
+
+def test_lead_changes_are_counted_at_the_moments_they_happen(runs) -> None:
+    for run in runs:
+        samples = run.team_population_samples
+        assert samples[0] == (0.0, (1, 1))
+        assert [t for t, _ in samples] == sorted(t for t, _ in samples)
+        changes = 0
+        sign = 0
+        for _, counts in samples:
+            lead = counts[0] - counts[1]
+            now = (lead > 0) - (lead < 0)
+            if now:
+                if sign and now != sign:
+                    changes += 1
+                sign = now
+        assert changes == run.population_lead_changes
+        assert run.max_population_lead == max(abs(a - b) for _, (a, b) in samples)
+        assert samples[-1][1] == tuple(run.team_balls)
+
+
+def test_the_evaluator_race_block_agrees_with_the_run(runs) -> None:
+    for run in runs:
+        race = evaluate(run).metrics["race"]
+        assert race["winner"] == run.winner_team
+        assert race["population_by_team"] == list(run.team_balls)
+        assert race["damage_by_team"] == pytest.approx(
+            [round(v, 6) for v in run.team_damage]
+        )
+        assert race["population_lead_changes"] == run.population_lead_changes
+        assert race["frontier_lead_changes"] == run.frontier_lead_changes
+        assert sum(race["population_by_team"]) == len(run.balls)
+        assert race["team_digest"] == run.team_digest()
+        if run.escaped:
+            assert race["winner_founder_slot"] == run.balls[run.escape_ball].lineage[0]
+            assert race["winner_name"] == TEAM_NAMES[run.winner_team]
+        else:
+            assert race["winner_founder_slot"] is None
+
+
+def test_the_race_flags_fire_and_do_not_fire_on_the_same_population(runs) -> None:
+    """Each race flag must name a tail, not the middle and not nothing."""
+    evaluations = [evaluate(run) for run in runs]
+    for flag in ("team_starved", "loser_stalled", "one_sided"):
+        count = sum(1 for e in evaluations if flag in e.flags)
+        assert count < 0.5 * len(evaluations), f"{flag} rejects most of the population"
+
+
+def test_nothing_in_the_selection_path_prefers_a_close_race() -> None:
+    """A rule that rewarded a narrow finish would select for arranged ones.
+
+    Checked as a source fact because it is a claim about what the code does
+    *not* do, and no batch can demonstrate an absence.
+    """
+    import inspect
+
+    from satisfying import multishell_av
+    from tools import two_team_phase4a_lab
+
+    rule = two_team_phase4a_lab.SHORTLIST_RULE
+    for key in rule:
+        assert "margin" not in key
+        assert "lead_change" not in key
+        assert "close" not in key
+    source = inspect.getsource(two_team_phase4a_lab.shortlist)
+    assert "win_margin" not in source
+    assert "lead_changes" not in source
+    genuine = inspect.getsource(multishell_av.race_report)
+    # `race_report` may *report* the margin; what it may not do is gate on it.
+    assert "if" not in genuine.split('"win_margin_seconds"')[1].split("\n")[0]

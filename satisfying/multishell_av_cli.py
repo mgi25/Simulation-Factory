@@ -42,9 +42,9 @@ from satisfying.multishell_playback import (
     write_playback,
 )
 
-OUTPUT_ROOT = os.path.join("output", "category3_multishell_adjust_v3b")
+OUTPUT_ROOT = os.path.join("output", "category3_two_team_v4a")
 VALIDATION_ROOT = os.path.join(
-    "docs", "validation", "category3_multiplying_shell_adjust_v3b"
+    "docs", "validation", "category3_two_team_shell_race_v4a"
 )
 
 
@@ -251,7 +251,7 @@ def cmd_measure(args: argparse.Namespace) -> int:
               f"sync {row['max_sync_error_frames']:.3f}fr  "
               f"{'ELIGIBLE' if row['eligible'] else 'REJECT: ' + rows[-1]['rejection_reasons'][0]}")
     payload = {
-        "kind": "category3_multiplying_shell_av_candidates",
+        "kind": "category3_two_team_shell_race_av_candidates",
         "format": av.INTEGRATION_VERSION,
         "base_sha": av.BASE_SHA,
         "visual_sha": av.VISUAL_SHA,
@@ -281,7 +281,8 @@ def cmd_detail(args: argparse.Namespace) -> int:
             "population": av.population_report(doc, float(args.fps)),
             "retention": av.retention_report(doc),
             "density": av.density_report(doc),
-            "lineage": av.lineage_audit(doc),
+            "teams": av.team_audit(doc),
+            "race": av.race_report(doc),
         }
         path = write_json(payload, os.path.join(
             VALIDATION_ROOT, "detail", f"seed_{seed}_detail.json"))
@@ -408,7 +409,7 @@ def cmd_mux(args: argparse.Namespace) -> int:
               f"drift {row['av_drift_seconds'] * 1000:+.1f} ms  "
               f"{row['size_mb']:.1f} MB")
     write_json({
-        "kind": "category3_multiplying_shell_av_muxed",
+        "kind": "category3_two_team_shell_race_av_muxed",
         "profile": args.profile,
         "integration_config_digest": config.fingerprint(),
         "rows": rows,

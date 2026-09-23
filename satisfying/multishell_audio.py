@@ -67,7 +67,7 @@ __all__ = [
 ]
 
 #: Changes when the same schedule would produce different samples.
-RENDER_VERSION = "category3-test2-multiplying-shell-audio-render/1.0.0"
+RENDER_VERSION = "category3-test2-two-team-shell-race-audio-render/2.0.0"
 
 #: The tier at and above which an event is on the marked bus and never ducks.
 MARKED_TIER = 4

@@ -1,6 +1,6 @@
-"""The canonical multiplying-shell run, written down once so a consumer can only replay it.
+"""The canonical two-team race, written down once so a consumer can only replay it.
 
-The visual and audio phases will be built from this document and nothing else.
+The visual and audio layers are built from this document and nothing else.
 The rule they inherit is the one Test #1 settled and the single-ball Test #2
 made enforceable:
 
@@ -16,10 +16,13 @@ just a different trajectory but a different *cast*.
 
 ## What is in the document, and why each part has to be
 
-- **`balls`** - one record per ball: id, parent, generation, birth time, birth
-  shell, lineage, the shells it was credited for and the regions it stood in.
-  A renderer tints a lineage with this; a sequencer gives a lineage a voice
-  with it. It is the thing the single-ball schema had no way to express.
+- **`balls`** - one record per ball: id, **team and team colour**, parent,
+  generation, birth time, birth shell, lineage, the shells it was credited for,
+  the regions it stood in and the damage it dealt. A renderer tints a ball with
+  `team_id`; a sequencer voices it with the same field. There is no second
+  source for the cast, which is why the two layers cannot disagree about which
+  colour a ball is: `multishell_av.team_audit` checks that they do not, and
+  neither of them could reach a different answer if it tried.
 - **`flights`** - keyed by ball id, one record per straight-line arc: `t`,
   position and velocity at its start. Gravity is zero and speed is constant, so
   this *is* the trajectory, complete and exact. A ball does not exist before

@@ -1,11 +1,11 @@
-"""Category 3, Test #2 redesign - the PREMIUM visual contract, Phase 2A.
+"""Category 3, Test #2 - the TWO-TEAM composition contract, Phase 4A.
 
 This module is a **playback consumer and nothing else**. It reads the canonical
-V2 document written by `satisfying.multishell_playback` and turns it into the
+V3 document written by `satisfying.multishell_playback` and turns it into the
 numbers a renderer needs: where the camera is, how big a thing is in pixels,
-what colour a ball's family is, which of the five damage states a panel is in.
-It never imports `satisfying.multishell`, never integrates, never resolves a
-contact, and never touches a seed. The one rule the Phase 1 document states -
+which of two colours a ball wears, which of the five damage states a panel is
+in. It never imports `satisfying.multishell`, never integrates, never resolves
+a contact, and never touches a seed. The one rule the document states -
 
     a consumer of this document may read a trajectory and may not compute one
 
@@ -14,71 +14,106 @@ every constant the scene draws with is declared here, a test parses the
 GDScript and compares the two, and a measurement printed in the report is
 therefore a measurement of the render that was actually made.
 
-## Why the previous visual language was thrown away
+## The frustum, and why that sentence was not true until Phase 4A
 
-The single-ball Phase 2A drew the arena with `draw_line` on a `Node2D`: five
-concentric polylines six to eleven pixels wide, a 1.9x ball on a 0.72-wide
-frame, damage as a recolour of the whole panel and a break as a panel that
-stopped being drawn. Every complaint in the rejection is a direct consequence
-of that choice, and none of them is fixable by picking better colours. So the
-geometry is rebuilt as real material: chamfered slabs with depth, pillars at
-the vertices, cracks that start where the ball actually hit, and a break that
-fractures and retracts instead of vanishing.
+It was not. From Phase 2A until Phase 4A, `CAMERA_FRUSTUM_SIZE` was the near
+plane's *height* while `Camera3D.keep_aspect = KEEP_WIDTH` made Godot read it
+as the near plane's *width*. The horizontal field was therefore 74.4 degrees
+rather than the declared 47, every framing was 1.778x wider than this module
+computed, and the arena filled **46.9% of the frame where the report said
+83.4%**. Every pixel figure in the Phase 2A, Phase 3 and Phase 3B evidence -
+ball diameter, wall thickness, opening width, the 18.4 px action-rail clearance
+- described a render nobody made.
 
-## The one composition problem, stated as arithmetic
+It survived three phases because the only test on the constant compared the
+Python copy with the GDScript copy, and both copies were wrong in the same way.
+Two files agreeing is not a measurement. `test_the_frustum_matches_the_declared_field_of_view`
+re-derives the half-angle from Godot's own frustum arithmetic instead, which is
+the check that would have caught it on the day.
 
-The arena is 49.1 world units across and the ball is 0.8 units across. The ball
-is **1.6% of the arena's width**, and no choice of frame, palette or material
-changes that ratio. At the largest framing the Shorts safe area permits - the
-disc has to clear the action rail at x=0.840 and the title block at y=0.840, so
-it caps at 0.834 of the frame width - a full-arena camera puts the ball at
-**15 px across on a 1080 px frame**. Frame one of a fixed full-arena camera is
-a speck in the middle of five rings, which is exactly what was rejected.
+It also explains the Phase 3B human review. "The arena becomes too small
+relative to the vertical frame" and "too much empty dark space appears
+precisely when action should be increasing" are exactly what a camera 1.778x
+too wide looks like, and no amount of retuning `VIEW_DIAMETER_FRACTION` could
+have fixed it, because that number was not the one the renderer used.
 
-The answer is not a bigger ball. Drawing the ball past 1.375x its true radius
-makes it overlap a panel it is only touching, and the rejected version's 1.9x
-already did. The answer is that **the camera frames the frontier, not the
-arena**: at t=0 it frames shell 0, and each time the canonical high-water
-frontier advances a region it opens out one shell. At the opening the ball is
-83 px across and shell 0's openings are 367 px wide; by the climax the camera
-has settled on the whole arena and stays there for the last seven to nine
-seconds without moving at all.
+## The Phase 4A camera, in four decisions
 
-That schedule is a pure function of the document - `frame_marks` reads the
-`shell_exit` stream and nothing else - it is monotone by construction, and it
-is the escalation: the world the viewer is looking at gets bigger because the
-balls got further, and it gets bigger exactly when they do.
+**Centred.** `ARENA_CENTRE_X_FRACTION` was 0.420. Sliding the arena 8% of the
+frame left bought a disc 22% wider and the review's first finding is that the
+result looks off-centre - which it is, by 86 px at 1080. The arena is now on
+the frame's own vertical axis and the width is whatever that allows: the
+conservative action rail begins at x = 0.840, so the frontier gets 0.652 of the
+frame width and clears the rail by 15.1 px. The only asymmetry left is
+vertical, and it is the midpoint of the band the player's furniture leaves
+visible.
+
+**Constant frontier size.** The framed radius is the frontier's material edge
+times a fixed fraction, not plus a fixed number of world units. A constant pad
+is a shrinking *fraction* as the arena opens out - 14% of the framing at the
+innermost shell and 3.5% at the outermost - so the Phase 3B frontier crept from
+73% to 81% of the frame and the schedule was never actually constant. The
+proportional pad makes `frontier_occupancy_report` return the same number at
+every stage, exactly, with nothing fitted.
+
+**Less zoom.** The total zoom-out is now a property of the arena rather than of
+the camera: under a proportional pad it is the outermost material edge over the
+innermost, so the only way to change it is to change the shells. Phase 1 shrank
+the arena from an outer radius of 24.4 to 18.5 for this reason, and the ratio
+fell from 3.63x to 2.80x. A ball is 73 px across at the opening and still 26 px
+at the final wall, where Phase 3B's own arithmetic said 21 px and its renders
+actually gave 12.
+
+**Gradual revelation.** At t = 0 the camera frames shell 0 and the outer shells
+run off the top and bottom of the frame; each time the canonical high-water
+frontier advances a region it opens out one shell. The schedule is a pure
+function of the document - `frame_marks` reads the `shell_exit` stream and
+nothing else - it is monotone by construction, and it is the escalation: the
+world the viewer is looking at gets bigger because the balls got further.
+
+## Two colours, and what had to move out of their way
+
+A ball's hue is its team's hue, exactly, for every generation. Phase 3B gave
+each founder-child its own family hue and paled each generation toward white;
+both are gone, because the video's question is "which colour gets out first"
+and a fourth-generation cyan paled 45% toward white stops answering it.
+Generation reads as emission only.
+
+Taking the warm end of the spectrum for a team cost the arena its damage
+palette. Phase 3B reserved amber-to-red for damage on the argument that a
+viewer should never have to ask whether an orange thing is a ball or a wound;
+that argument is now paid for by moving the damage ramp to crimson-to-hot-white
+and the opening-post highlight from cyan to steel.
+`test_no_damage_or_structure_colour_can_be_mistaken_for_a_team` measures the
+separation rather than asserting it - which is how the first replacement ramp,
+a red that sat 0.354 from orange, was caught.
 
 ## Depth, and why the camera is perspective
 
-A wall 0.30 units thick is 5.3 px at the final framing. Nothing drawn inside
-the canonical silhouette can be made to look massive at 5.3 px, so the mass
+A wall 0.30 units thick is 5.7 px at the final framing. Nothing drawn inside
+the canonical silhouette can be made to look massive at 5.7 px, so the mass
 comes from **behind** it: each panel is extruded backwards, away from the
 camera, and a perspective camera sees the receding flank. A point at `z = -d`
 and radius `r` projects to radius `r*D/(D+d)`, which is *inside* the panel's
 front face, so a flank never covers a ball - every ball is at `z = 0`, in front
-of every flank. The flank is `r*d/(D+d)` wide, which at the final framing is
-18.9 px for the outermost shell and 1.3 px for the innermost - fourteen times
-the flank, and 3.6 times the whole wall once the 5.3 px face is counted in.
-The outer wall looks like the hardest barrier because it is drawn with that
-much more material, and the depth ramp is the only place the difference comes
-from.
+of every flank. `PANEL_DEPTH` was re-spread for the smaller arena, because a
+flank is `r*d/(D+d)` and the old ramp lost most of its spread with the radius:
+the outermost wall now measures 23.8 px against the innermost's 7.0.
 
 Everything the physics cares about is at `z = 0`, and a perspective camera
-looking down `-Z` projects that plane by an exact uniform scale. The earlier
-camera achieved the safe-area offset by translating its eye sideways. Because
-the five slabs have different extrusion depths, that introduced depth-dependent
-parallax and made their rear rims appear to have different centres. Phase 3B
-keeps the eye on the invariant world origin and uses an asymmetric frustum to
-place that origin at the same safe-area point. Scale can change, but the
-principal point cannot drift with depth.
+looking down `-Z` projects that plane by an exact uniform scale. The eye stays
+on the invariant world origin and an asymmetric frustum places the principal
+point; a laterally translated eye would give the five slabs depth-dependent
+parallax and make their rear rims appear to have different centres.
 
 ## The candidate set
 
-Sixteen successful seeds were taken from the new 20,000-seed run. A measured
-screen rejected three severe visual piles, leaving thirteen engineering
-survivors. `CANDIDATE_RULE` and the committed shortlist record the six rendered
-review candidates and why they span the desired routes and cooperative damage.
+414 seeds of the 20,000-seed population pass the engineering rule.
+`CANDIDATE_SEEDS` names the six rendered for human review and says why each one
+is there; `CANDIDATE_RULE` is the gate they all clear. Nothing in either
+mentions the finishing margin or the lead-change count, because a rule that
+rewarded a narrow finish would be, one sweep later, a rule that selects for
+arranged ones.
 """
 
 from __future__ import annotations
@@ -100,7 +135,11 @@ __all__ = [
     "VIEW_DIAMETER_FRACTION",
     "ARENA_CENTRE_X_FRACTION",
     "ARENA_CENTRE_Y_FRACTION",
-    "VIEW_RADIUS_PAD",
+    "VIEW_PAD_FRACTION",
+    "FRONTIER_WIDTH_FRACTION",
+    "USABLE_WIDTH_FRACTION",
+    "TEAM_RGB",
+    "TEAM_NAMES",
     "CAMERA_HFOV_DEGREES",
     "CAMERA_NEAR",
     "CAMERA_FRUSTUM_SIZE",
@@ -129,7 +168,13 @@ __all__ = [
     "projected_shell_centres",
     "centre_alignment_report",
     "alignment_moments",
-    "lineage_palette",
+    "shell_material_radii",
+    "zoom_ratio",
+    "frontier_occupancy_report",
+    "centring_report",
+    "team_palette",
+    "team_of",
+    "team_population_at",
     "shell_geometry_report",
     "composition_report",
     "safe_area_report",
@@ -147,12 +192,12 @@ __all__ = [
 # What this consumer will read, and refuses to read
 # --------------------------------------------------------------------------
 
-EXPECTED_SCHEMA_VERSION = "category3-test2-multiplying-shell/2.0.0"
+EXPECTED_SCHEMA_VERSION = "category3-test2-two-team-shell-race/3.0.0"
 # The frozen Phase 1 operating configuration. A document from any other config
 # renders a plausible video of a different simulation, which is worse than an
 # error, so this is checked rather than trusted.
 EXPECTED_CONFIG_DIGEST = (
-    "1803a066cc67ed08088294e64dd42b7264e2bcc210f055ab225d9983e2725d38"
+    "4a3ab8ba22ae7c54981700823cc5b4eaf147c72fc5ab609a244d9cbaeb6ce572"
 )
 EXPECTED_SHELL_COUNT = 5
 
@@ -167,22 +212,49 @@ DAMAGE_STATES: tuple[str, ...] = (
 FRAME_WIDTH = 1080
 FRAME_HEIGHT = 1920
 
-# The framed disc's diameter as a fraction of the frame width. Derived, not
-# chosen: the conservative Shorts action rail starts at x=0.840 and the title
-# block at y=0.840, so the largest disc that clears both is centred at x=0.420
-# with a radius of 0.420 of the frame width. 0.834 with a 0.85-unit pad leaves
-# the outermost shell's material 18.4 px clear of the rail on the right and of
-# the frame edge on the left. `safe_area_report` measures it rather than
-# asserting it.
-VIEW_DIAMETER_FRACTION = 0.834
-ARENA_CENTRE_X_FRACTION = 0.420
-# 0.440 rather than 0.500: the disc has to clear the top bar at y=0.060 and the
-# title block at y=0.840, and sitting slightly above the frame's middle leaves
-# the larger of the two bands at the bottom, where the escapee's run-out and
-# the player's own title block both live.
-ARENA_CENTRE_Y_FRACTION = 0.440
-# World units of clear space beyond the framed shell's outer material edge.
-VIEW_RADIUS_PAD = 0.85
+# --- the Phase 4A camera --------------------------------------------------
+#
+# Three things changed and each one answers a specific line of the human review.
+#
+# **Centred.** `ARENA_CENTRE_X_FRACTION` was 0.420. Sliding the arena 8% of the
+# frame to the left bought a disc 22% wider, and the review's first finding is
+# that the result looks off-centre - which it is, by 86 px at 1080. The arena is
+# now on the frame's own vertical axis and the width is whatever that allows.
+ARENA_CENTRE_X_FRACTION = 0.500
+# The Shorts furniture is not symmetric top to bottom: the top bar takes 6% and
+# the title block, scrubber and nav row take the bottom 16%, so the midpoint of
+# the band a viewer actually sees is 0.450, not 0.500. This is the *only*
+# asymmetry left in the composition and it is vertical, where nothing about the
+# arena's shape makes it read as a slide.
+ARENA_CENTRE_Y_FRACTION = 0.450
+# **Constant frontier size.** The framed radius is the frontier shell's own
+# material edge scaled by a fixed fraction, not its material edge plus a fixed
+# number of world units. A constant pad is a *shrinking* fraction as the arena
+# opens out - 14% of the framing at the innermost shell and 3.5% at the
+# outermost under Phase 3B - so the frontier crept from 73% to 81% of the frame
+# and the schedule was never actually constant. A proportional pad makes the
+# frontier occupy the same fraction of the frame at every stage, by
+# construction, which is what "constant frontier screen size" has to mean if it
+# is to be checkable.
+VIEW_PAD_FRACTION = 0.055
+# **How big the frontier is.** The frontier shell's outer material diameter, as
+# a fraction of the frame width, at every stage. Derived rather than chosen: the
+# conservative action rail begins at x = 0.840, so a disc centred on the axis
+# has 0.340 of the frame width to play with, which is 367.2 px at 1080. 0.652
+# puts the material edge at 352.1 px and leaves 15.1 px of rail clearance -
+# measured, not asserted, by `safe_area_report` and `centring_report`.
+FRONTIER_WIDTH_FRACTION = 0.652
+# What is left after the player's own controls, as the brief's "usable screen
+# width": the widest horizontally centred band that clears the action rail.
+# Stated here so the occupancy report can quote the frontier against both this
+# and the raw frame width rather than leaving the reader to guess which one a
+# percentage means.
+USABLE_WIDTH_FRACTION = 2.0 * (0.840 - ARENA_CENTRE_X_FRACTION)
+# The framed disc, pad included, as a fraction of the frame width.
+VIEW_DIAMETER_FRACTION = FRONTIER_WIDTH_FRACTION * (1.0 + VIEW_PAD_FRACTION)
+# Kept for readers of the old constant: at the final framing the proportional
+# pad is worth this many world units. Nothing reads it.
+VIEW_RADIUS_PAD = None
 
 # Horizontal field of view. `Camera3D.keep_aspect = KEEP_WIDTH` makes `fov` the
 # horizontal angle, so this and VIEW_DIAMETER_FRACTION together fix the camera
@@ -195,19 +267,43 @@ CAMERA_NEAR = 0.20
 # world centre.  The offset moves the principal point to the Shorts-safe
 # composition point without introducing the depth-dependent parallax caused by
 # translating the camera laterally.
-CAMERA_FRUSTUM_SIZE = (
-    2.0
-    * CAMERA_NEAR
-    * math.tan(math.radians(CAMERA_HFOV_DEGREES) * 0.5)
-    * FRAME_HEIGHT
-    / FRAME_WIDTH
-)
+#
+# **This constant was wrong from Phase 2A until Phase 4A and the error was
+# 1.778x.** `Camera3D.keep_aspect = KEEP_WIDTH` makes Godot read the frustum
+# `size` as the near plane's *width*:
+#
+#     left/right  = -+ size / 2            + offset.x
+#     top/bottom  = -+ size / aspect / 2   + offset.y      (aspect = W / H)
+#
+# so `size` is `2 * near * tan(hfov / 2)` and the height follows from the
+# aspect. The old constant multiplied that by `FRAME_HEIGHT / FRAME_WIDTH`,
+# which set the near width to the near *height* and opened the horizontal field
+# from 47 to 74.4 degrees. Every pixel figure this module reported therefore
+# described a render nobody made: `VIEW_DIAMETER_FRACTION` said the framed disc
+# filled 83.4% of the frame and it actually filled 46.9%, and the outermost
+# shell sat 250 px clear of the action rail rather than the 18.4 px the
+# safe-area report claimed.
+#
+# It also explains the human review directly. "The arena becomes too small
+# relative to the vertical frame" and "too much empty dark space appears
+# precisely when action should be increasing" are what a 1.778x over-wide
+# camera looks like, and no amount of retuning `VIEW_DIAMETER_FRACTION` would
+# have fixed it, because the number was not the one the renderer used.
+#
+# `test_the_frustum_matches_the_declared_field_of_view` is the check that would
+# have caught it: it re-derives the horizontal half-angle from the constant and
+# from Godot's own frustum arithmetic, rather than comparing two copies of the
+# same wrong number.
+CAMERA_FRUSTUM_SIZE = 2.0 * CAMERA_NEAR * math.tan(math.radians(CAMERA_HFOV_DEGREES) * 0.5)
+# The offsets are expressed against the near plane's own width and height, so
+# each one moves the principal point by its fraction of the frame. With the
+# arena now on the frame's axis the horizontal offset is exactly zero.
 CAMERA_FRUSTUM_OFFSET = (
-    (0.5 - ARENA_CENTRE_X_FRACTION)
+    (0.5 - ARENA_CENTRE_X_FRACTION) * CAMERA_FRUSTUM_SIZE,
+    (ARENA_CENTRE_Y_FRACTION - 0.5)
     * CAMERA_FRUSTUM_SIZE
-    * FRAME_WIDTH
-    / FRAME_HEIGHT,
-    (ARENA_CENTRE_Y_FRACTION - 0.5) * CAMERA_FRUSTUM_SIZE,
+    * FRAME_HEIGHT
+    / FRAME_WIDTH,
 )
 
 # The framing opens this long before the canonical crossing that triggers it,
@@ -220,17 +316,20 @@ FRAME_EASE_SECONDS = 0.55
 # Balls
 # --------------------------------------------------------------------------
 
-# A ball touching a panel has its centre 0.55 units from the chord axis
-# (0.40 radius + 0.15 half-thickness), so 1.375 is the largest scale that never
-# draws the ball inside a panel it is only touching. 1.50 overlaps by 0.05
-# units - 3.2 px at the opening framing, 0.9 px at the final one - which is
+# A ball touching a panel has its centre `ball_radius + 0.15` units from the
+# chord axis, so `(0.53 + 0.15) / 0.53 = 1.283` is the largest scale that never
+# draws the ball inside a panel it is only touching. 1.30 overlaps by 0.009
+# units - 0.5 px at the opening framing, 0.2 px at the final one - which is
 # below the bloom's own falloff and reads as contact rather than penetration.
-BALL_DRAW_SCALE = 1.50
-# The additive halo billboard, as a multiple of the drawn core radius. This is
-# where the apparent size comes from at the final framing, and it is light
-# rather than material: a halo over a panel reads as spill, not as a ball
-# inside the wall.
-HALO_SCALE = 2.60
+# It is down from Phase 3B's 1.50 only because the ball itself grew from 0.40
+# to 0.53; the drawn ball is larger in world units and much larger on screen.
+BALL_DRAW_SCALE = 1.30
+# The additive halo billboard, as a multiple of the drawn core radius. Down from
+# 2.60: with two saturated team colours and fifteen to thirty balls late on, a
+# wide additive halo is exactly the mechanism that turns a crowd into one white
+# blob, and the blob would destroy the one thing this redesign must protect -
+# which colour is which.
+HALO_SCALE = 2.10
 # A near-black disc behind each core, slightly larger than it, drawn at a small
 # negative z so a core always wins the depth test against another ball's rim.
 # Seven balls inside two drawn diameters happens - seed 7183 at 15.6 s - and
@@ -264,7 +363,12 @@ TRAIL_TAIL_WIDTH = 0.34
 # Backward extrusion per shell, inner to outer. The whole "the outer wall is
 # the hardest" read lives in this ramp: nothing else about a panel may grow,
 # because the front face is the canonical collision silhouette.
-PANEL_DEPTH: tuple[float, ...] = (0.90, 1.30, 1.80, 2.40, 3.20)
+# Re-spread for the smaller Phase 4A arena. The outer radius fell from 24.4 to
+# 18.5 and a flank is `r * d / (D + d)`, so the old ramp lost most of its
+# spread with the radius: the outermost wall came out 2.99 times the innermost
+# where Phase 3B measured 3.6. 0.70 to 3.60 restores it to 3.4 and makes the
+# final wall the heaviest object in the frame again.
+PANEL_DEPTH: tuple[float, ...] = (0.70, 1.15, 1.75, 2.55, 3.60)
 # Pillars at the shell vertices are the panels' own round caps, so their radius
 # is the canonical half-thickness and only their depth is a drawing choice.
 POST_DEPTH_FACTOR = 1.55
@@ -321,46 +425,71 @@ GLOW_POOL_Z = -4.0
 GLOW_POOL_RADII = 2.60
 GLOW_POOL_ALPHA = 0.42
 
-# The founder, and then one base hue per founder-child. Cool jewel tones only:
-# the warm end of the spectrum belongs to damage and breaks, so a viewer never
-# has to ask whether an orange thing is a ball or a wound. A founder can have
-# at most five children, so five families is the whole space.
-FOUNDER_RGB = (0.960, 0.980, 1.000)
-FAMILY_RGB: tuple[tuple[float, float, float], ...] = (
-    (0.250, 0.860, 1.000),   # cyan
-    (0.440, 0.620, 1.000),   # azure
-    (0.660, 0.500, 1.000),   # violet
-    (0.940, 0.440, 0.920),   # magenta
-    (0.300, 0.980, 0.840),   # aqua
+# Two teams, two hues, and nothing else in the frame may use either of them.
+#
+# Phase 3B gave each founder-child its own family hue and reserved the whole
+# warm end of the spectrum for damage, on the argument that a viewer should
+# never have to ask whether an orange thing is a ball or a wound. The two-team
+# rule takes the warm end for a team, so that argument has to be paid for
+# somewhere else: the damage ramp below moved from amber to red-to-white-hot,
+# and the opening-post highlight moved from cyan to steel. A viewer still never
+# has to ask, because nothing warm is a wound any more and nothing cyan is a
+# panel.
+#
+# Cyan at 0.14 red and orange at 0.13 blue are near-complementary and roughly
+# matched in luminance, so neither colour wins the eye by being brighter and
+# both survive the bloom.
+TEAM_RGB: tuple[tuple[float, float, float], ...] = (
+    (0.140, 0.880, 1.000),   # team 0, cyan
+    (1.000, 0.540, 0.130),   # team 1, orange
 )
-# Each generation below the family root pales toward white and gains emission.
-GENERATION_WHITEN = 0.13
-GENERATION_WHITEN_MAX = 0.45
-GENERATION_ENERGY_STEP = 0.12
+TEAM_NAMES: tuple[str, ...] = ("cyan", "orange")
+# A descendant keeps its team's hue *exactly*. Phase 3B paled each generation
+# toward white, which is the one thing this redesign cannot afford: a
+# fourth-generation cyan paled 45% toward white is no longer obviously cyan in a
+# crowd of thirty, and "which colour is winning" is the whole video. Generation
+# reads as emission only, which separates siblings under bloom without touching
+# the hue.
+GENERATION_WHITEN = 0.0
+GENERATION_WHITEN_MAX = 0.0
+GENERATION_ENERGY_STEP = 0.09
+GENERATION_ENERGY_MAX = 1.36
 
-PANEL_RGB = (0.400, 0.455, 0.560)
+PANEL_RGB = (0.400, 0.440, 0.500)
 # The lit face and the lit back rim. A panel's collision surface is 0.30 units
 # thick - 5.3 px at the final framing - so it is emitted rather than merely lit,
 # and the back rim at z = -depth turns each panel into a well seen down its own
 # axis: two bright lines with the flank between them, and the distance between
 # them *is* the depth. That is where "the outer wall is the hardest" comes from.
-FACE_RGB = (0.560, 0.720, 0.880)
+FACE_RGB = (0.620, 0.680, 0.780)
 FACE_ENERGY = 0.62
-BACK_RGB = (0.300, 0.480, 0.680)
+BACK_RGB = (0.340, 0.430, 0.560)
 BACK_ENERGY = 0.30
 # A pillar exists only where a panel ends, because a pillar is the panel
 # capsule's own round cap. One that flanks an opening is the one a ball clips
 # when it aims at the hole and misses, so it carries a cool cap and more depth.
-POST_RGB = (0.330, 0.380, 0.470)
-POST_HOT_RGB = (1.000, 0.680, 0.300)
-POST_EDGE_RGB = (0.420, 0.860, 1.000)
+POST_RGB = (0.330, 0.370, 0.440)
+# Was amber, which is now a team. A struck post glows the same crimson the
+# damage ramp uses, because that is what it is: a hit registering on material.
+POST_HOT_RGB = (1.000, 0.160, 0.440)
+# Was cyan, which is now a team. Steel keeps the opening-flanking posts legible
+# as structure without borrowing either colour.
+POST_EDGE_RGB = (0.700, 0.780, 0.900)
 POST_EDGE_ENERGY = 1.60
 POST_BASE_ENERGY = 0.26
 POST_EDGE_DEPTH = 1.35
-CRACK_RGB = (1.000, 0.620, 0.220)
-CRITICAL_RGB = (1.000, 0.440, 0.160)
-FRACTURE_RGB = (1.000, 0.300, 0.140)
-BREAK_FLASH_RGB = (1.000, 0.930, 0.800)
+# The damage ramp, crimson to hot white. It used to run amber to red, which
+# collides with team orange at its first two stops - and so, measurably, did the
+# first red-to-white version: `CRACK_RGB = (0.92, 0.22, 0.26)` sits 0.354 from
+# orange in RGB, inside the 0.45 separation
+# `test_no_damage_or_structure_colour_can_be_mistaken_for_a_team` requires.
+# Pushing the whole ramp toward magenta buys the blue channel back: every stop
+# is now at least 0.45 from both team hues, and the ramp still reads as one
+# escalating thing because it is monotone in luminance.
+CRACK_RGB = (0.880, 0.100, 0.420)
+CRITICAL_RGB = (1.000, 0.060, 0.300)
+FRACTURE_RGB = (1.000, 0.520, 0.720)
+BREAK_FLASH_RGB = (1.000, 0.940, 0.960)
 
 # Emission energy by damage state, in the same order as DAMAGE_STATES. The
 # progression a viewer reads is this ramp times the crack count below it, not a
@@ -395,29 +524,52 @@ FRACTURE_RECESS = 0.10
 # --------------------------------------------------------------------------
 
 SHORTLIST_PATH = os.path.join(
-    "docs", "validation", "category3_multiplying_shell_adjust_v3b",
-    "phase3b_shortlist.json"
+    "docs", "validation", "category3_two_team_shell_race_v4a",
+    "phase4a_shortlist.json"
 )
 
 CANDIDATE_RULE: dict[str, Any] = {
     "source": SHORTLIST_PATH,
     "duration_seconds": [20.0, 26.0],
-    "first_spawn_seconds_preferred_max": 2.5,
+    "first_spawn_seconds_preferred_max": 2.0,
     "first_spawn_seconds_max": 3.0,
     "first_spawn_seconds_reject_above": 3.0,
-    "population_total": [8, 15],
+    "population_total": [12, 26],
+    "min_team_population": 4,
     "flags": "none",
     "note": (
-        "Six review renders selected from the thirteen engineering-screened "
-        "survivors of the new 20,000-seed Phase 3B run. The set spans opening "
-        "and break routes, descendant escapes, cooperative outer-wall breaks, "
-        "and high-but-readable populations."
+        "Six review renders drawn from the Phase 4A 20,000-seed population. "
+        "The set spans both winning colours, founder and descendant winners, "
+        "opening and break routes, and populations from the middle to the top "
+        "of the band. Nothing in the rule mentions the finishing margin or the "
+        "lead-change count: a rule that rewarded a narrow finish would select "
+        "for arranged ones."
     ),
 }
 
 # The result of applying CANDIDATE_RULE, frozen so a test catches a drift in
 # either the rule or the shortlist.
-CANDIDATE_SEEDS: tuple[int, ...] = (15793, 8292, 17251, 16733, 12197, 14705)
+# The result of applying CANDIDATE_RULE to the Phase 4A shortlist, then
+# choosing six for variety by hand. Each one is here for a different reason and
+# the reason is named, because "the top six by some score" is exactly the
+# selection the brief forbids:
+#
+#   17964  the biggest and the most even - 18 balls, nine each, 31 breaks and
+#          25 of them paid for by both colours. The top candidate.
+#    3762  the most back-and-forth: three population lead changes and three
+#          frontier lead changes, which is the most in the eligible pool.
+#   10943  a *founder* wins, 3.28 s after the other colour's last advance, and
+#          the camera has been settled for 3.05 s when it happens. Seed 952 was
+#          the first pick here - a founder winning 1.11 s after the other
+#          colour's last advance - and it was dropped because its last frontier
+#          advance lands 0.68 s before the escape, so the camera is still
+#          opening out over the payoff.
+#   17660  the closest finish in the pool: 0.36 s.
+#   16020  the most cooperative damage - 34 breaks, 28 of them cross-team and
+#          11 broken by the colour that did not do most of the work.
+#    1176  the only break-route win in the six, and the deepest winner: a
+#          fourth-generation descendant.
+CANDIDATE_SEEDS: tuple[int, ...] = (17964, 3762, 10943, 17660, 16020, 1176)
 
 
 # --------------------------------------------------------------------------
@@ -467,12 +619,29 @@ def _require_valid(document: dict[str, Any]) -> None:
 # --------------------------------------------------------------------------
 
 
-def shell_view_radii(document: dict[str, Any]) -> tuple[float, ...]:
-    """The framed radius at each stage: a shell's material edge plus the pad."""
+def shell_material_radii(document: dict[str, Any]) -> tuple[float, ...]:
+    """Each shell's outer material edge: its radius plus half its thickness."""
     return tuple(
-        float(shell["radius"]) + 0.5 * float(shell["thickness"]) + VIEW_RADIUS_PAD
+        float(shell["radius"]) + 0.5 * float(shell["thickness"])
         for shell in document["shells"]
     )
+
+
+def shell_view_radii(document: dict[str, Any]) -> tuple[float, ...]:
+    """The framed radius at each stage: a shell's material edge times the pad.
+
+    Proportional rather than additive, which is the whole of "constant frontier
+    screen size": `pixels_per_unit` divides by the framed radius, so a framed
+    radius proportional to the material edge makes the material edge's share of
+    the frame the same number at every stage, exactly, with no fitting.
+    """
+    return tuple(r * (1.0 + VIEW_PAD_FRACTION) for r in shell_material_radii(document))
+
+
+def zoom_ratio(document: dict[str, Any]) -> float:
+    """Total zoom-out: the last framing's radius over the first's."""
+    radii = shell_view_radii(document)
+    return radii[-1] / radii[0]
 
 
 def frame_marks(document: dict[str, Any]) -> tuple[tuple[float, int], ...]:
@@ -655,62 +824,162 @@ def flank_width(radius: float, depth: float, view_radius: float) -> float:
     return radius * depth / (distance + depth)
 
 
-# --------------------------------------------------------------------------
-# Lineage colour
-# --------------------------------------------------------------------------
+def frontier_occupancy_report(document: dict[str, Any]) -> dict[str, Any]:
+    """How big the frontier, the ball and the openings are at every stage.
 
+    The review's second, third and fourth findings are all one measurement: at
+    each frontier stage, how much of the frame does the shell the viewer is
+    being asked to care about actually fill? This answers it per stage, against
+    both the raw frame width and the brief's "usable screen width" - the widest
+    horizontally centred band that clears the action rail - because the two
+    differ by a factor of 1.47 and a bare percentage would be unreadable.
 
-def lineage_palette(document: dict[str, Any]) -> dict[int, dict[str, Any]]:
-    """One colour per ball, from `lineage` and `generation` and nothing else.
-
-    The founder is the only white ball. Every other ball belongs to the family
-    of the founder-child it descends from - `lineage[1]`, which is on every
-    ball record - and keeps that family's base hue for the rest of the run. A
-    generation below the family root pales the hue toward white by a fixed step
-    and lifts its emission, so a fifth-generation descendant is recognisably
-    the same family as its great-great-grandparent and recognisably younger.
-
-    Families are numbered by the order their roots appear in `balls`, which is
-    birth order, so the mapping is a function of the document and two renders
-    of the same seed tint the same ball the same colour.
+    `ball_px` is the *drawn* ball, `BALL_DRAW_SCALE` included, because that is
+    the object a viewer sees; `ball_physical_px` is the collision ball, which is
+    what has to fit through `gap_px`.
     """
-    balls = document["balls"]
-    roots: list[int] = []
-    for ball in balls:
-        lineage = ball["lineage"]
-        if len(lineage) >= 2 and lineage[1] not in roots:
-            roots.append(int(lineage[1]))
-
-    palette: dict[int, dict[str, Any]] = {}
-    for ball in balls:
-        ball_id = int(ball["ball_id"])
-        lineage = ball["lineage"]
-        generation = int(ball["generation"])
-        if len(lineage) < 2:
-            palette[ball_id] = {
-                "family": -1,
-                "family_root": None,
-                "depth": 0,
-                "rgb": FOUNDER_RGB,
-                "energy": 1.0,
-                "generation": generation,
+    _require_valid(document)
+    material = shell_material_radii(document)
+    views = shell_view_radii(document)
+    ball_radius = float(document["config"]["ball_radius"])
+    usable_px = USABLE_WIDTH_FRACTION * FRAME_WIDTH
+    rows: list[dict[str, Any]] = []
+    for index, shell in enumerate(document["shells"]):
+        scale = pixels_per_unit(views[index])
+        diameter_px = 2.0 * material[index] * scale
+        gap = min(float(o["gap_chord"]) for o in shell["openings"])
+        depth = PANEL_DEPTH[index]
+        rows.append(
+            {
+                "stage": index,
+                "shell_id": int(shell["shell_id"]),
+                "view_radius": views[index],
+                "material_radius": material[index],
+                "pixels_per_unit": scale,
+                "frontier_diameter_px": diameter_px,
+                "frontier_over_frame_width": diameter_px / FRAME_WIDTH,
+                "frontier_over_usable_width": diameter_px / usable_px,
+                "frontier_over_frame_height": diameter_px / FRAME_HEIGHT,
+                "ball_px": 2.0 * ball_radius * BALL_DRAW_SCALE * scale,
+                "ball_physical_px": 2.0 * ball_radius * scale,
+                "opening_px": gap * scale,
+                "wall_px": (
+                    float(shell["thickness"])
+                    + flank_width(float(shell["radius"]), depth, views[index])
+                ) * scale,
+                "panel_chord_px": float(shell["chord_length"]) * scale,
             }
-            continue
-        root = int(lineage[1])
-        family = roots.index(root) % len(FAMILY_RGB)
-        depth = max(0, generation - 1)
-        whiten = min(GENERATION_WHITEN_MAX, GENERATION_WHITEN * depth)
-        base = FAMILY_RGB[family]
-        rgb = tuple(base[i] + (1.0 - base[i]) * whiten for i in range(3))
+        )
+    fractions = [row["frontier_over_frame_width"] for row in rows]
+    return {
+        "frame": [FRAME_WIDTH, FRAME_HEIGHT],
+        "usable_width_fraction": USABLE_WIDTH_FRACTION,
+        "target_frame_width_fraction": FRONTIER_WIDTH_FRACTION,
+        "stages": rows,
+        "min_frontier_over_frame_width": min(fractions),
+        "max_frontier_over_frame_width": max(fractions),
+        "frontier_fraction_spread": max(fractions) - min(fractions),
+        "zoom_ratio": zoom_ratio(document),
+        "ball_px_first": rows[0]["ball_px"],
+        "ball_px_last": rows[-1]["ball_px"],
+    }
+
+
+def centring_report(document: dict[str, Any], samples: int = 240) -> dict[str, Any]:
+    """Where the arena sits in the frame, and whether it ever moves sideways.
+
+    Two numbers the human review asked for and Phase 3B could not answer. The
+    first is the arena's own centre as a fraction of the frame width, which is
+    0.500 by construction now and was 0.420. The second is the largest lateral
+    movement of that centre over the whole run, which must be exactly zero: the
+    camera only ever changes its distance, so the world centre projects to the
+    same pixel on every frame of every candidate.
+
+    `rail_clearance_px` is the gap between the outermost shell's drawn material
+    and the conservative action rail at the final framing, which is the single
+    tightest constraint the centred composition has.
+    """
+    _require_valid(document)
+    duration = float(document["summary"]["duration"])
+    centres: list[tuple[float, float]] = []
+    for index in range(samples + 1):
+        t = duration * index / samples
+        centres.append(project((0.0, 0.0), view_radius_at(document, t)))
+    xs = [c[0] for c in centres]
+    ys = [c[1] for c in centres]
+    material = shell_material_radii(document)
+    final_scale = pixels_per_unit(shell_view_radii(document)[-1])
+    outer_px = material[-1] * final_scale
+    rail_left = 0.840 * FRAME_WIDTH
+    return {
+        "samples": samples + 1,
+        "arena_centre_x_fraction": ARENA_CENTRE_X_FRACTION,
+        "arena_centre_y_fraction": ARENA_CENTRE_Y_FRACTION,
+        "arena_centre_px": [xs[0], ys[0]],
+        "lateral_offset_from_frame_centre_px": xs[0] - 0.5 * FRAME_WIDTH,
+        "max_lateral_movement_px": max(xs) - min(xs),
+        "max_vertical_movement_px": max(ys) - min(ys),
+        "outer_material_radius_px": outer_px,
+        "rail_left_px": rail_left,
+        "rail_clearance_px": rail_left - (0.5 * FRAME_WIDTH + outer_px),
+        "left_margin_px": 0.5 * FRAME_WIDTH - outer_px,
+        "centred": abs(ARENA_CENTRE_X_FRACTION - 0.5) < 1e-9,
+        "stationary": (max(xs) - min(xs)) < 1e-9 and (max(ys) - min(ys)) < 1e-9,
+    }
+
+
+# --------------------------------------------------------------------------
+# Team colour
+# --------------------------------------------------------------------------
+
+
+def team_palette(document: dict[str, Any]) -> dict[int, dict[str, Any]]:
+    """One colour per ball, from `team_id` and `generation` and nothing else.
+
+    A ball's hue is its team's hue, exactly, for every generation. That is the
+    whole rule, and it is deliberately duller than Phase 3B's per-family
+    palette: the video's question is "which colour gets out first", and a
+    palette that answers "which family is this" instead answers a question
+    nobody asked while making the one that matters harder.
+
+    Generation reads as emission only. A great-great-grandchild is the same
+    cyan as its founder and glows about a third brighter, which separates
+    siblings inside a knot without ever putting a third hue on screen.
+
+    `team_id` is on every ball record and is set by the simulation's labelling
+    permutation, so this is a pure function of the document and two renders of
+    one seed tint the same ball the same colour.
+    """
+    palette: dict[int, dict[str, Any]] = {}
+    for ball in document["balls"]:
+        ball_id = int(ball["ball_id"])
+        team = int(ball["team_id"])
+        generation = int(ball["generation"])
+        energy = min(
+            GENERATION_ENERGY_MAX, 1.0 + GENERATION_ENERGY_STEP * generation
+        )
         palette[ball_id] = {
-            "family": family,
-            "family_root": root,
-            "depth": depth,
-            "rgb": rgb,
-            "energy": 1.0 + GENERATION_ENERGY_STEP * depth,
+            "team": team,
+            "team_name": TEAM_NAMES[team],
+            "rgb": TEAM_RGB[team],
+            "energy": energy,
             "generation": generation,
         }
     return palette
+
+
+def team_of(document: dict[str, Any]) -> dict[int, int]:
+    """Ball id to team index, for consumers that only need the label."""
+    return {int(ball["ball_id"]): int(ball["team_id"]) for ball in document["balls"]}
+
+
+def team_population_at(document: dict[str, Any], t: float) -> tuple[int, ...]:
+    """How many balls of each team have been born by `t`."""
+    counts = [0] * len(TEAM_NAMES)
+    for ball in document["balls"]:
+        if float(ball["birth_time"]) <= t:
+            counts[int(ball["team_id"])] += 1
+    return tuple(counts)
 
 
 # --------------------------------------------------------------------------
@@ -1058,12 +1327,14 @@ def readability_report(document: dict[str, Any], fps: float = 30.0) -> dict[str,
       it; Test #1 found 2.2 at 30 fps and had to add one.
     * **Escalation.** The population at each third of the run, which is the one
       thing the redesign exists to show.
-    * **Lineage load.** How many distinct families are on screen at once.
+    * **Team load.** How many of each colour are on screen at once, and how
+      often a cluster the eye has to separate contains *both* colours - which
+      is the only overlap that can damage the one read the video exists for.
     """
     _require_valid(document)
     duration = float(document["summary"]["duration"])
     ball_radius = float(document["config"]["ball_radius"])
-    palette = lineage_palette(document)
+    palette = team_palette(document)
     frames = max(2, int(round(duration * fps)))
 
     closest = math.inf
@@ -1072,7 +1343,10 @@ def readability_report(document: dict[str, Any], fps: float = 30.0) -> dict[str,
     max_step_t = 0.0
     peak_population = 0
     peak_t = 0.0
-    max_families = 0
+    max_teams = 0
+    max_on_screen_by_team = [0] * len(TEAM_NAMES)
+    mixed_cluster_frames = 0
+    largest_mixed_cluster = 0
     largest_cluster = 1
     largest_cluster_t = 0.0
     merge_run = 0
@@ -1094,8 +1368,12 @@ def readability_report(document: dict[str, Any], fps: float = 30.0) -> dict[str,
         if len(screen) > peak_population:
             peak_population = len(screen)
             peak_t = t
-        families = {palette[b]["family"] for b in screen}
-        max_families = max(max_families, len(families))
+        on_screen = [0] * len(TEAM_NAMES)
+        for b in screen:
+            on_screen[palette[b]["team"]] += 1
+        max_teams = max(max_teams, sum(1 for c in on_screen if c))
+        for index, count in enumerate(on_screen):
+            max_on_screen_by_team[index] = max(max_on_screen_by_team[index], count)
 
         ids = sorted(screen)
         # Union-find over "centres closer than one drawn diameter". A component
@@ -1122,10 +1400,21 @@ def readability_report(document: dict[str, Any], fps: float = 30.0) -> dict[str,
                         parent[ra] = rb
 
         sizes: dict[int, int] = {}
+        cluster_teams: dict[int, set[int]] = {}
         for ball_id in ids:
             root = find(ball_id)
             sizes[root] = sizes.get(root, 0) + 1
+            cluster_teams.setdefault(root, set()).add(palette[ball_id]["team"])
         biggest = max(sizes.values()) if sizes else 1
+        # A cluster holding both colours is the only overlap that can put the
+        # video's one question in doubt, so it is counted on its own rather than
+        # folded into the cluster-size number.
+        mixed = [root for root, seen in cluster_teams.items() if len(seen) > 1]
+        if mixed:
+            mixed_cluster_frames += 1
+            largest_mixed_cluster = max(
+                largest_mixed_cluster, max(sizes[root] for root in mixed)
+            )
         blobs = len(sizes)
         blob_sum += blobs
         ball_sum += len(ids)
@@ -1163,8 +1452,11 @@ def readability_report(document: dict[str, Any], fps: float = 30.0) -> dict[str,
         "peak_population_t": peak_t,
         "population_by_third": thirds,
         "population_first_frame": len(positions_at(document, 0.0)),
-        "families_max_on_screen": max_families,
-        "families_total": len(document["balls"][0]["children"]),
+        "teams_on_screen_max": max_teams,
+        "max_on_screen_by_team": list(max_on_screen_by_team),
+        "mixed_cluster_frames": mixed_cluster_frames,
+        "mixed_cluster_fraction": mixed_cluster_frames / float(frames + 1),
+        "largest_mixed_cluster": largest_mixed_cluster,
         "closest_pair_diameters": closest if closest < math.inf else None,
         "closest_pair_t": closest_t,
         "largest_cluster": largest_cluster,
@@ -1452,7 +1744,12 @@ def candidate_seeds(shortlist: dict[str, Any]) -> list[dict[str, Any]]:
     low, high = CANDIDATE_RULE["duration_seconds"]
     split_max = CANDIDATE_RULE["first_spawn_seconds_max"]
     pop_low, pop_high = CANDIDATE_RULE["population_total"]
-    selected = set(int(seed) for seed in shortlist.get("review_seeds", CANDIDATE_SEEDS))
+    team_low = CANDIDATE_RULE["min_team_population"]
+    # The shortlist is the *pool* and `CANDIDATE_SEEDS` is the review set drawn
+    # from it, so the intersection is the contract: a seed that is not eligible
+    # cannot be reviewed, and a review seed that has dropped out of the pool
+    # disappears here rather than being rendered anyway.
+    selected = set(CANDIDATE_SEEDS) & {int(seed) for seed in shortlist["seeds"]}
     kept: list[dict[str, Any]] = []
     for candidate in shortlist["candidates"]:
         if int(candidate["seed"]) not in selected:
@@ -1464,6 +1761,9 @@ def candidate_seeds(shortlist: dict[str, Any]) -> list[dict[str, Any]]:
         if float(candidate["first_spawn"]) > split_max:
             continue
         if not pop_low <= int(candidate["population_total"]) <= pop_high:
+            continue
+        race = candidate["race"]
+        if min(race["population_by_team"]) < team_low:
             continue
         kept.append(
             {
@@ -1484,6 +1784,16 @@ def candidate_seeds(shortlist: dict[str, Any]) -> list[dict[str, Any]]:
                 "shared_breaks": int(candidate["shared_breaks"]),
                 "near_misses": int(candidate["near_misses"]),
                 "escalation": float(candidate["escalation"]["meaningful"]),
+                "winner": race["winner_name"],
+                "winner_generation": race["winner_generation"],
+                "winner_route": race["winner_route"],
+                "population_by_team": list(race["population_by_team"]),
+                "damage_by_team": list(race["damage_by_team"]),
+                "cross_team_breaks": int(race["cross_team_breaks"]),
+                "stolen_breaks": int(race["stolen_breaks"]),
+                "population_lead_changes": int(race["population_lead_changes"]),
+                "frontier_lead_changes": int(race["frontier_lead_changes"]),
+                "win_margin_seconds": race["win_margin_seconds"],
                 "digest": candidate["digest"],
             }
         )
@@ -1502,12 +1812,14 @@ def candidate_manifest(shortlist: dict[str, Any]) -> dict[str, Any]:
     kept = candidate_seeds(shortlist)
     routes = {"opening": 0, "break": 0}
     who = {"founder": 0, "descendant": 0}
+    colours = {name: 0 for name in TEAM_NAMES}
     for entry in kept:
         routes[entry["escape_route"]] += 1
         who[entry["escape_by"]] += 1
+        colours[entry["winner"]] += 1
     return {
-        "format": 1,
-        "phase": "category3-test2-multiplying-shell/adjust-v3b",
+        "format": 2,
+        "phase": "category3-test2-two-team-shell-race/v4a",
         "config_digest": shortlist["config_digest"],
         "expected_config_digest": EXPECTED_CONFIG_DIGEST,
         "shortlist_seeds": list(shortlist["seeds"]),
@@ -1518,6 +1830,16 @@ def candidate_manifest(shortlist: dict[str, Any]) -> dict[str, Any]:
             "count": len(kept),
             "escape_route": routes,
             "escaping_ball": who,
+            "winning_colour": colours,
+            "both_colours_win": all(colours[name] > 0 for name in TEAM_NAMES),
+            "population_lead_changes": [
+                min(e["population_lead_changes"] for e in kept),
+                max(e["population_lead_changes"] for e in kept),
+            ],
+            "win_margin_seconds": [
+                min(e["win_margin_seconds"] for e in kept),
+                max(e["win_margin_seconds"] for e in kept),
+            ],
             "duration_seconds": [
                 min(e["duration"] for e in kept),
                 max(e["duration"] for e in kept),
@@ -1562,7 +1884,9 @@ def render_config() -> dict[str, Any]:
         "frame": [FRAME_WIDTH, FRAME_HEIGHT],
         "view_diameter_fraction": VIEW_DIAMETER_FRACTION,
         "arena_centre": [ARENA_CENTRE_X_FRACTION, ARENA_CENTRE_Y_FRACTION],
-        "view_radius_pad": VIEW_RADIUS_PAD,
+        "view_pad_fraction": VIEW_PAD_FRACTION,
+        "frontier_width_fraction": FRONTIER_WIDTH_FRACTION,
+        "usable_width_fraction": USABLE_WIDTH_FRACTION,
         "camera_hfov_degrees": CAMERA_HFOV_DEGREES,
         "camera_near": CAMERA_NEAR,
         "camera_frustum_size": CAMERA_FRUSTUM_SIZE,
@@ -1597,10 +1921,11 @@ def render_config() -> dict[str, Any]:
         "ending": [RELEASE_SECONDS, END_HOLD_SECONDS],
         "background": list(BACKGROUND_RGB),
         "floor": list(FLOOR_RGB),
-        "founder": list(FOUNDER_RGB),
-        "families": [list(rgb) for rgb in FAMILY_RGB],
+        "teams": [list(rgb) for rgb in TEAM_RGB],
+        "team_names": list(TEAM_NAMES),
         "generation": [
             GENERATION_WHITEN, GENERATION_WHITEN_MAX, GENERATION_ENERGY_STEP,
+            GENERATION_ENERGY_MAX,
         ],
         "panel": list(PANEL_RGB),
         "face": [list(FACE_RGB), FACE_ENERGY],

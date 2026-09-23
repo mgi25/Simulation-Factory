@@ -75,8 +75,8 @@ REVIEW_CRF = 16
 REVIEW_PRESET = "slow"
 SHORTLIST = os.path.join(REPO, visual.SHORTLIST_PATH)
 MANIFEST = os.path.join(
-    REPO, "docs", "validation", "category3_multiplying_shell_adjust_v3b",
-    "phase3b_candidates.json",
+    REPO, "docs", "validation", "category3_two_team_shell_race_v4a",
+    "phase4a_candidates.json",
 )
 
 
@@ -648,7 +648,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="multishell_visual_cli", description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--out", default="output/category3_multishell_v2a",
+    parser.add_argument("--out", default="output/category3_two_team_v4a",
                         help="working directory for playback, frames and clips")
     parser.add_argument("--godot", default=None)
     parser.add_argument("--ffmpeg", default=None)

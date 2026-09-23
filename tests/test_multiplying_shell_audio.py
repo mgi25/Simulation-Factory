@@ -52,10 +52,12 @@ from satisfying import multishell_visual as visual
 from satisfying.multishell import EVENT_SCHEMA, SCHEMA_VERSION, DEFAULT_CONFIG as SIM_CONFIG
 from satisfying.multishell_playback import document_for
 
-#: The densest run in the proof set, which is where anything that fails does.
-REFERENCE_SEED = 17251
-#: A mid-density run that ends on a break and on a third-generation descendant.
-SECOND_SEED = 15793
+#: The densest run in the review set, which is where anything that fails does.
+#: 38 breaks, sixteen balls evenly split eight and eight, 25.2 s.
+REFERENCE_SEED = 17964
+#: A calmer run with a wide population lead, so the two colours are unevenly
+#: represented and a per-team voice rule has something to get wrong.
+SECOND_SEED = 1176
 
 _DOCUMENTS: dict[int, dict] = {}
 _RENDERS: dict[tuple[int, str], audio.RenderedAudio] = {}
@@ -81,8 +83,8 @@ def rendered(seed: int = REFERENCE_SEED, system: str | None = None) -> audio.Ren
 # --------------------------------------------------------------------------
 
 
-def test_the_v2_schema_is_the_one_this_phase_was_written_against() -> None:
-    assert SCHEMA_VERSION == "category3-test2-multiplying-shell/2.0.0"
+def test_the_v3_schema_is_the_one_this_phase_was_written_against() -> None:
+    assert SCHEMA_VERSION == "category3-test2-two-team-shell-race/3.0.0"
     assert score.SCHEMA_VERSION == SCHEMA_VERSION
     assert SIM_CONFIG.digest() == score.CONFIG_DIGEST
 
@@ -90,10 +92,10 @@ def test_the_v2_schema_is_the_one_this_phase_was_written_against() -> None:
 def test_every_canonical_event_kind_still_carries_the_fields_audio_reads() -> None:
     """Field by field, for the eight kinds this layer actually consumes."""
     needed = {
-        "collision": ("ball_id", "shell_id", "panel_id", "region", "position",
-                      "impact_speed", "incidence", "feature"),
-        "ball_spawn": ("ball_id", "parent_id", "generation", "birth_shell",
-                       "region", "position", "lineage"),
+        "collision": ("ball_id", "team_id", "shell_id", "panel_id", "region",
+                      "position", "impact_speed", "incidence", "feature"),
+        "ball_spawn": ("ball_id", "team_id", "parent_id", "generation",
+                       "birth_shell", "region", "position", "lineage"),
         "near_miss": ("ball_id", "shell_id", "panel_id", "signed_lead"),
         "damage": ("ball_id", "shell_id", "panel_id", "contribution",
                    "cumulative", "threshold", "state"),
@@ -102,8 +104,8 @@ def test_every_canonical_event_kind_still_carries_the_fields_audio_reads() -> No
         "panel_break": ("ball_id", "shell_id", "panel_id", "position"),
         "shell_exit": ("ball_id", "shell_id", "panel_id", "route", "from_region",
                        "to_region", "position", "first_for_ball", "reproduced"),
-        "escape": ("ball_id", "shell_id", "route", "position", "generation",
-                   "parent_id", "lineage"),
+        "escape": ("ball_id", "team_id", "team_name", "shell_id", "route",
+                   "position", "generation", "parent_id", "lineage"),
     }
     for kind, fields in needed.items():
         present = EVENT_SCHEMA[kind]
@@ -257,8 +259,11 @@ def test_a_shell_maps_to_its_own_window_of_the_ladder() -> None:
         by_shell.setdefault(event.shell_id, []).append(event.ladder_index)
     for shell_id, indices in sorted(by_shell.items()):
         base = system.shell_bases[shell_id]
-        # A window plus the lineage's register preference and octave, clamped.
-        assert min(indices) >= max(0, base - 2)
+        # A window plus the lineage's register walk, the octave and now the
+        # team's own register offset, clamped. The team offset is what widens
+        # the floor from two steps to three.
+        allowance = 2 + abs(plan.config.team_register)
+        assert min(indices) >= max(0, base - allowance)
         assert max(indices) <= score.LADDER_TOP
     means = {shell: sum(v) / len(v) for shell, v in by_shell.items()}
     ordered = [means[shell] for shell in sorted(means)]
@@ -270,13 +275,73 @@ def test_a_shell_maps_to_its_own_window_of_the_ladder() -> None:
 # --------------------------------------------------------------------------
 
 
-def test_the_founder_is_the_neutral_centre_of_every_voice_axis() -> None:
-    voices = score.voices_for(document()["balls"])
-    founder = voices[0]
-    assert founder.parent_id is None
-    assert founder.tint == founder.edge == 0.5
-    assert founder.pan_bias == 0.0 and founder.detune == 0.0
-    assert founder.register == 0 and founder.octave_up is False
+def test_each_founder_sits_at_its_own_teams_centre() -> None:
+    """Two founders, two centres, mirrored about the neutral one.
+
+    Phase 2B put the single founder at 0.5 on every unit axis so the family had
+    a middle. With two teams the middle is per-team, and the two centres are
+    exact reflections of each other - which is what makes the texture
+    difference read as identity rather than as one colour being brighter.
+    """
+    config = score.DEFAULT_CONFIG
+    voices = score.voices_for(document()["balls"], config)
+    founders = {v.team: v for v in voices.values() if v.parent_id is None}
+    assert sorted(founders) == [0, 1]
+    cyan, orange = founders[0], founders[1]
+    assert cyan.tint == pytest.approx(0.5 + config.team_tint)
+    assert orange.tint == pytest.approx(0.5 - config.team_tint)
+    assert cyan.edge == pytest.approx(0.5 + config.team_edge)
+    assert orange.edge == pytest.approx(0.5 - config.team_edge)
+    assert cyan.pan_bias == pytest.approx(-orange.pan_bias)
+    assert cyan.register == config.team_register
+    assert orange.register == -config.team_register
+    # The two centres are reflections, so neither colour is nearer the neutral
+    # one and neither is louder, brighter or higher by construction.
+    assert cyan.tint + orange.tint == pytest.approx(1.0)
+    assert cyan.edge + orange.edge == pytest.approx(1.0)
+    assert cyan.register + orange.register == 0
+    for founder in (cyan, orange):
+        assert founder.detune == 0.0
+        assert founder.octave_up is False
+
+
+def test_both_teams_play_one_tonal_collection() -> None:
+    """Different texture, same notes. This is the line the brief drew.
+
+    The team offsets move a ball's *position in the ladder*; the ladder itself
+    is one `TonalSystem` with one scale. So every pitch class either colour can
+    sound is a pitch class the other could have sounded, and two growing
+    populations make one chord rather than two keys.
+    """
+    plan = score.schedule(document())
+    system = plan.config.tonal
+    by_team: dict[int, set[int]] = {}
+    for event in plan.of_kind("collision"):
+        team = plan.voices[event.ball_id].team
+        by_team.setdefault(team, set()).add(
+            score.semitones_for_index(system, event.ladder_index) % 12
+        )
+    assert sorted(by_team) == [0, 1]
+    collection = {s % 12 for s in system.scale}
+    for team, classes in by_team.items():
+        assert classes <= collection, (
+            f"team {team} sounded a pitch class outside the collection"
+        )
+    shared = by_team[0] & by_team[1]
+    assert len(shared) >= 2, "the two colours barely share any pitch classes"
+
+
+def test_a_lineage_cannot_walk_out_of_its_teams_register() -> None:
+    """A long cyan line may not drift down into orange's half of the ladder."""
+    config = score.DEFAULT_CONFIG
+    for seed in (REFERENCE_SEED, SECOND_SEED):
+        voices = score.voices_for(document(seed)["balls"], config)
+        for voice in voices.values():
+            centre = config.team_register * (1 - 2 * voice.team)
+            assert abs(voice.register - centre) <= 2, (
+                f"ball {voice.ball_id} walked to register {voice.register} "
+                f"from a centre of {centre}"
+            )
 
 
 def test_a_child_is_one_step_from_its_parent_on_every_axis() -> None:
@@ -409,9 +474,43 @@ def test_a_cluster_does_not_sound_the_same_note_twice() -> None:
 
 
 def test_a_ball_trapped_on_one_pitch_is_nudged_rather_than_repeated() -> None:
+    """Bounded where a listener can hear it, not where the metric is largest.
+
+    `longest_same_pitch_run` counts one *ball's* consecutive contacts at one
+    ladder position. Phase 2B held it at four on a one-founder run, where that
+    ball's contacts were most of the stream. With sixteen balls the same number
+    means something else: five contacts by one ball are spread over several
+    seconds and interleaved with three hundred others, and nothing about that
+    sounds like a repeated note.
+
+    What a listener actually hears is bounded by the two measurements below -
+    how many collisions *in a row anywhere in the stream* share a pitch, and
+    how many share one inside a single repeat window. Both are what the nudge
+    exists to hold down, and both are small.
+    """
     plan = score.schedule(document())
     assert plan.metrics["repeat_nudged"] > 0
-    assert plan.metrics["longest_same_pitch_run"] <= 4
+    assert plan.metrics["longest_same_pitch_run"] <= 6
+
+    collisions = [e for e in plan.events if e.kind == "collision"]
+    longest = run = 1
+    for before, after in zip(collisions, collisions[1:]):
+        run = run + 1 if before.ladder_index == after.ladder_index else 1
+        longest = max(longest, run)
+    assert longest <= 2, "one pitch sounds three times in a row"
+
+    window = plan.config.repeat_seconds
+    worst = 0
+    for index, event in enumerate(collisions):
+        count = 0
+        cursor = index
+        while (cursor < len(collisions)
+               and collisions[cursor].source_seconds - event.source_seconds <= window):
+            if collisions[cursor].ladder_index == event.ladder_index:
+                count += 1
+            cursor += 1
+        worst = max(worst, count)
+    assert worst <= 3, f"{worst} collisions share one pitch inside {window}s"
 
 
 # --------------------------------------------------------------------------
@@ -571,6 +670,12 @@ def test_a_repeat_crossing_stays_under_the_collision_bed() -> None:
     assert crossings
     quietest_bounce = min(event.gain for event in plan.of_kind("collision"))
     assert max(event.gain for event in crossings) < quietest_bounce
+    # And the relationship is a constructor check rather than a property of
+    # this one seed, so a future density floor cannot quietly invert it.
+    config = plan.config
+    assert config.crossing_gain < config.collision_gain_low * config.density_gain_floor
+    with pytest.raises(score.ScoreError):
+        score.named_config("open_quartal", crossing_gain=0.20)
 
 
 # --------------------------------------------------------------------------
@@ -734,10 +839,20 @@ def test_the_music_survives_a_phone_speaker() -> None:
 
 
 def test_a_contact_always_lifts_the_mix() -> None:
-    """No bounce is buried: the one failure a musical bed can hide."""
+    """No bounce is buried: the one failure a musical bed can hide.
+
+    The hard line is 3 dB and it is absolute - *every* contact must be audible
+    as a contact. The 6 dB line is a quality reading and it has to be a
+    fraction, because at fifteen collisions a second some of them land inside a
+    louder neighbour's decay by arithmetic rather than by fault. Phase 2B's 2%
+    was measured on a bed running at six collisions a second; 6% is the same
+    claim at this density, and `below_3db` staying at zero is what says the
+    difference is crowding and not burial.
+    """
     for seed in (REFERENCE_SEED, SECOND_SEED):
         report = audio.masking_report(rendered(seed))
-        assert report["below_6db_fraction"] <= 0.02, report
+        assert report["below_3db"] == 0, report
+        assert report["below_6db_fraction"] <= 0.06, report
         assert report["median_onset_rise_db"] > 6.0, report
 
 
@@ -831,7 +946,7 @@ def test_the_proof_candidates_come_from_phase_one_and_obey_the_rules() -> None:
     assert set(manifest["seeds"]) <= set(shortlist["seeds"])
     coverage = manifest["coverage"]
     assert coverage["mixed_routes"] and coverage["founder_and_descendant"]
-    assert coverage["population_range"][0] >= 8 and coverage["population_range"][1] <= 15
+    assert coverage["population_range"][0] >= 12 and coverage["population_range"][1] <= 26
     assert 20.0 <= coverage["duration_range"][0] <= coverage["duration_range"][1] <= 26.0
     for row in manifest["candidates"]:
         assert float(row["first_spawn"]) <= 3.0
@@ -840,8 +955,8 @@ def test_the_proof_candidates_come_from_phase_one_and_obey_the_rules() -> None:
 
 def test_the_recorded_manifest_is_the_one_the_rules_produce_now() -> None:
     path = os.path.join(
-        REPO_ROOT, "docs", "validation", "category3_multiplying_shell_adjust_v3b",
-        "phase3b_candidates.json",
+        REPO_ROOT, "docs", "validation", "category3_two_team_shell_race_v4a",
+        "phase4a_candidates.json",
     )
     with open(path, encoding="utf-8") as handle:
         stored = json.load(handle)
@@ -852,7 +967,7 @@ def test_the_recorded_manifest_is_the_one_the_rules_produce_now() -> None:
 def test_the_committed_measurements_match_a_fresh_render() -> None:
     """One seed, end to end, against the committed phone/A/V measurement."""
     path = os.path.join(
-        REPO_ROOT, "docs", "validation", "category3_multiplying_shell_adjust_v3b",
+        REPO_ROOT, "docs", "validation", "category3_two_team_shell_race_v4a",
         "phone_validation.json",
     )
     with open(path, encoding="utf-8") as handle:

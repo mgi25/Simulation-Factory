@@ -23,7 +23,8 @@ from satisfying.multishell import SCHEMA_VERSION
 from satisfying.multishell_playback import document_for, document_digest
 
 SEEDS = av.CANDIDATE_SEEDS
-REFERENCE_SEED = 15793
+#: The busiest of the review set, which is where anything that fails does.
+REFERENCE_SEED = SEEDS[0]
 
 
 @pytest.fixture(scope="module")
@@ -41,14 +42,18 @@ def reference(documents) -> dict:
 # --------------------------------------------------------------------------
 
 
-def test_both_branches_are_pinned_to_the_phase_shas():
-    assert av.BASE_SHA == "78739b266d9c8872c350bf239ae3c60e02c7fe65"
-    assert av.VISUAL_SHA == "585d85ef7abbc363f058670dd7d56effed30aee1"
-    assert av.AUDIO_SHA == "14522d9e02d1dd4630d6bbb398e818494d914d44"
+def test_the_branch_is_pinned_to_the_phase3b_tip_it_was_cut_from():
+    """Phase 4A is one branch, not a merge of three, so the three SHAs agree."""
+    assert av.BASE_SHA == "335ae3c647676be37421e082268f650b8541e8c9"
+    assert av.VISUAL_SHA == av.BASE_SHA
+    assert av.AUDIO_SHA == av.BASE_SHA
+    assert av.INTEGRATION_VERSION == "category3-test2-two-team-shell-race-av/2.0.0"
 
 
-def test_the_candidate_set_is_the_phase3b_review_six():
-    assert SEEDS == (15793, 8292, 17251, 16733, 12197, 14705)
+def test_the_candidate_set_has_one_definition():
+    assert av.CANDIDATE_SEEDS is visual.CANDIDATE_SEEDS
+    assert len(SEEDS) == 6
+    assert len(set(SEEDS)) == 6
 
 
 @pytest.mark.parametrize("seed", SEEDS)
@@ -63,7 +68,7 @@ def test_both_consumers_read_the_same_playback_digest(documents, seed):
 
 
 @pytest.mark.parametrize("seed", SEEDS)
-def test_the_document_is_the_frozen_v2_schema(documents, seed):
+def test_the_document_is_the_frozen_v3_schema(documents, seed):
     assert documents[seed]["schema"] == SCHEMA_VERSION
     assert documents[seed]["config_digest"] == score.CONFIG_DIGEST
 
@@ -78,7 +83,7 @@ def test_neither_consumer_mutates_the_canonical_playback(documents, seed):
     score.schedule(document, score.named_config(av.CONFIG.audio))
     visual.validate_document(document)
     visual.measure_document(document)
-    visual.lineage_palette(document)
+    visual.team_palette(document)
     visual.event_moments(document)
     av.sync_audit(document, 30.0)
     av.camera_report(document, 30.0)
@@ -86,7 +91,8 @@ def test_neither_consumer_mutates_the_canonical_playback(documents, seed):
     av.population_report(document, 30.0)
     av.retention_report(document)
     av.density_report(document)
-    av.lineage_audit(document)
+    av.team_audit(document)
+    av.race_report(document)
 
     assert document_digest(document) == before
     assert document == snapshot
@@ -112,14 +118,38 @@ def test_event_order_is_unchanged_by_either_consumer(documents, seed):
 
 
 @pytest.mark.parametrize("seed", SEEDS)
-def test_lineage_ids_are_shared_consistently(documents, seed):
-    report = av.lineage_audit(documents[seed])
+def test_the_two_layers_agree_on_the_cast_and_on_the_colours(documents, seed):
+    report = av.team_audit(documents[seed])
     assert report["same_cast"]
+    assert report["visual_team_agrees"]
+    assert report["audio_team_agrees"]
     assert report["generation_agrees"]
     assert report["lineage_agrees"]
-    assert report["family_partitions_agree"]
-    assert report["single_founder"]
+    assert report["children_inherit_team"]
+    assert report["two_founders_one_each"]
+    assert report["founders"] == 2
     assert report["pass"]
+
+
+@pytest.mark.parametrize("seed", SEEDS)
+def test_the_two_colours_share_one_tonal_collection(documents, seed):
+    """Distinguishable texture, one key. The registers may differ; the scale
+    may not."""
+    report = av.team_audit(documents[seed])
+    registers = report["registers_by_team"]
+    assert sorted(registers) == [0, 1]
+    assert registers[0] != registers[1], "the two colours sit in one register"
+    assert report["shared_tonal_collection"]
+
+
+@pytest.mark.parametrize("seed", SEEDS)
+def test_the_race_reads_as_a_race(documents, seed):
+    race = av.race_report(documents[seed])
+    assert race["genuine"], race["reason"]
+    assert race["winner"] in (0, 1)
+    assert min(race["population_by_team"]) >= 4
+    assert race["loser_frontier"] >= 3
+    assert race["winner_population_share"] <= 0.75
 
 
 def test_the_two_layers_have_no_independent_id_space(reference):
@@ -138,11 +168,11 @@ def test_the_two_layers_have_no_independent_id_space(reference):
         if int(ball["generation"]) > 0:
             ball["generation"] = int(ball["generation"]) + 1
             break
-    report = av.lineage_audit(edited)
+    report = av.team_audit(edited)
     assert report["generation_agrees"], "both layers must move together"
 
     voices = score.voices_for(edited["balls"], score.named_config(av.CONFIG.audio))
-    palette = visual.lineage_palette(edited)
+    palette = visual.team_palette(edited)
     assert sorted(voices) == sorted(palette) == sorted(
         int(ball["ball_id"]) for ball in edited["balls"])
 
@@ -158,13 +188,14 @@ def test_a_stale_visual_audit_is_rejected(reference, documents):
     walk = {"seed": int(reference["seed"]), "digest": reference["digest"], "frames": 10}
     assert av.sync_audit(reference, 30.0, walk)["pass"]
 
-    stale = dict(walk, digest=documents[8292]["digest"])
+    other = SEEDS[1]
+    stale = dict(walk, digest=documents[other]["digest"])
     report = av.sync_audit(reference, 30.0, stale)
     assert not report["visual_digest_matches"]
     assert not report["pass"]
 
     with pytest.raises(av.AVIntegrationError):
-        av.sync_audit(reference, 30.0, dict(walk, seed=8292))
+        av.sync_audit(reference, 30.0, dict(walk, seed=other))
 
 
 # --------------------------------------------------------------------------
@@ -305,8 +336,16 @@ def test_no_reframe_outpaces_the_ball_at_its_fastest(documents, seed):
 
 @pytest.mark.parametrize("seed", SEEDS)
 def test_the_clip_ends_on_a_still_camera(documents, seed):
-    """The final hold is a feature and the brief asks for it to be preserved."""
-    assert av.camera_report(documents[seed], 30.0)["static_tail_seconds"] >= 3.0
+    """The final hold is a feature and the brief asks for it to be preserved.
+
+    The gate is `av.MIN_STATIC_TAIL_SECONDS` rather than a number written here,
+    because it is the same line `candidate_row` rejects on - and it is a line
+    that does real work: on a wall this hard the last reframe can land under a
+    second before the winner crosses out, which puts the camera in motion over
+    the payoff.
+    """
+    tail = av.camera_report(documents[seed], 30.0)["static_tail_seconds"]
+    assert tail >= av.MIN_STATIC_TAIL_SECONDS, seed
 
 
 # --------------------------------------------------------------------------
@@ -341,15 +380,26 @@ def test_the_audio_peak_arrives_in_the_final_third(documents, seed):
 
 
 @pytest.mark.parametrize("seed", SEEDS)
-def test_human_review_evidence_covers_all_ten_required_beats(documents, seed):
-    moments = av.av_moments(documents[seed])
+def test_human_review_evidence_covers_all_eleven_required_beats(documents, seed):
+    """The brief names eleven views; the sheet has to be those eleven."""
+    document = documents[seed]
+    moments = av.av_moments(document)
     assert [row["name"].split("_", 1)[1] for row in moments] == [
-        "frame_0", "first_spawn", "four_ball_state", "first_critical_panel",
-        "first_break", "cooperative_damage", "late_high_population",
-        "outer_shell_attack", "final_break_or_opening", "first_final_escape",
+        "two_founders", "first_clone", "both_teams_multiplying",
+        "first_lead_change", "eight_ball_state", "shared_panel_damage",
+        "critical_outer_panel", "late_high_population", "final_wall_struggle",
+        "winning_escape", "winner_frame",
     ]
     assert moments[0]["t"] == 0.0
     assert all(row["t"] > 0.0 for row in moments[1:])
+    # Every one is a real instant of this run, not a fraction of its length.
+    duration = float(document["summary"]["duration"])
+    assert all(row["t"] <= duration + visual.RELEASE_SECONDS + 1e-9 for row in moments)
+    assert moments[-1]["t"] == pytest.approx(duration + visual.RELEASE_SECONDS)
+    # And the numbering is stable, so a sheet's tiles can be named.
+    assert [row["name"][:2] for row in moments] == [
+        f"{i:02d}" for i in range(1, len(moments) + 1)
+    ]
 
 
 # --------------------------------------------------------------------------
@@ -357,8 +407,48 @@ def test_human_review_evidence_covers_all_ten_required_beats(documents, seed):
 # --------------------------------------------------------------------------
 
 
-def test_the_phase3b_severe_pile_rejection_is_found():
-    report = visual.readability_report(document_for(17970), fps=60.0)
+def test_the_pile_instrument_can_still_find_a_pile():
+    """A rejection rule nothing triggers is not a rule.
+
+    Phase 3B named a seed that piled; the redesign changed the arena, the ball
+    radius and the cast, so that seed no longer says anything. The instrument
+    is checked against a *constructed* pile instead: three balls held within a
+    drawn diameter of each other is a cluster of three, whatever seed it came
+    from, and this proves the detector says so.
+    """
+    document = copy.deepcopy(document_for(REFERENCE_SEED))
+    radius = float(document["config"]["ball_radius"]) * visual.BALL_DRAW_SCALE
+    anchor = document["flights"][str(0)][0]
+    victims = [b for b in document["balls"] if int(b["ball_id"]) in (1, 2)]
+    assert len(victims) == 2, "the reference run has too few balls to stack"
+    for offset, ball in enumerate(victims, start=1):
+        ball_id = str(int(ball["ball_id"]))
+        ball["birth_time"] = 0.0
+        document["flights"][ball_id] = [
+            {
+                "t": 0.0,
+                "x": anchor["x"] + 0.25 * radius * offset,
+                "y": anchor["y"],
+                # Held, not launched: the first version of this test copied
+                # the anchor's velocity and the three balls flew apart in a
+                # quarter of a second, which is what the detector then reported.
+                "vx": 0.0,
+                "vy": 0.0,
+            },
+            {
+                "t": float(document["summary"]["duration"]),
+                "x": anchor["x"] + 0.25 * radius * offset,
+                "y": anchor["y"],
+                "vx": 0.0,
+                "vy": 0.0,
+            },
+        ]
+    document["flights"]["0"] = [
+        {"t": 0.0, "x": anchor["x"], "y": anchor["y"], "vx": 0.0, "vy": 0.0},
+        {"t": float(document["summary"]["duration"]),
+         "x": anchor["x"], "y": anchor["y"], "vx": 0.0, "vy": 0.0},
+    ]
+    report = visual.readability_report(document, fps=60.0)
     assert report["largest_cluster"] >= 3
     assert report["longest_triple_merge_seconds"] > 2.0
 
@@ -373,5 +463,5 @@ def test_the_review_set_has_no_severe_visual_pile(documents):
 def test_every_candidate_holds_the_two_shared_contracts(documents, seed):
     row = av.candidate_row(documents[seed], 30.0)
     assert row["sync_pass"]
-    assert row["lineage_pass"]
+    assert row["team_pass"]
     assert row["playback_digest"] == documents[seed]["digest"]

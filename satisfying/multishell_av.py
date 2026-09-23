@@ -11,7 +11,7 @@ t belongs to *a particular ball*, that ball belongs to a lineage, and the
 renderer tints it and the sequencer voices it from the same `lineage` field.
 If those two readings ever disagreed, the clip would show a white founder
 bouncing while a third-generation timbre sounded, and no timing measurement
-would catch it. So `lineage_audit` checks the cast, not just the clock.
+would catch it. So `team_audit` checks the cast, not just the clock.
 
 The only unavoidable timing difference remains the one Test #1 named: an event
 occurs at a document instant, audio is placed on the 48 kHz sample grid, and
@@ -36,13 +36,17 @@ from satisfying import multishell_score as score
 from satisfying import multishell_visual as visual
 
 
-INTEGRATION_VERSION = "category3-test2-multiplying-shell-av/1.0.0"
-BASE_SHA = "78739b266d9c8872c350bf239ae3c60e02c7fe65"
-VISUAL_SHA = "585d85ef7abbc363f058670dd7d56effed30aee1"
-AUDIO_SHA = "14522d9e02d1dd4630d6bbb398e818494d914d44"
+INTEGRATION_VERSION = "category3-test2-two-team-shell-race-av/2.0.0"
+# The Phase 4A redesign is a single branch rather than a merge of three, so
+# these are all one commit: the Phase 3B tip this branch was cut from.
+BASE_SHA = "335ae3c647676be37421e082268f650b8541e8c9"
+VISUAL_SHA = "335ae3c647676be37421e082268f650b8541e8c9"
+AUDIO_SHA = "335ae3c647676be37421e082268f650b8541e8c9"
 
 #: Phase 3B human-review set selected from the new 20,000-seed population.
-CANDIDATE_SEEDS: tuple[int, ...] = (15793, 8292, 17251, 16733, 12197, 14705)
+#: The review set, defined once in the visual module and re-exported here
+#: so the two cannot drift apart.
+CANDIDATE_SEEDS: tuple[int, ...] = visual.CANDIDATE_SEEDS
 
 #: A candidate whose first split lands later than this cannot be produced.
 FIRST_SPLIT_LIMIT_SECONDS = 3.0
@@ -500,25 +504,33 @@ def camera_report(document: Mapping[str, Any], fps: float = 30.0) -> dict[str, A
 # --------------------------------------------------------------------------
 
 
-def lineage_audit(document: Mapping[str, Any],
-                  config: AVConfig = CONFIG) -> dict[str, Any]:
-    """Prove the renderer tints and the sequencer voices the *same* ball.
+def team_audit(document: Mapping[str, Any],
+               config: AVConfig = CONFIG) -> dict[str, Any]:
+    """Prove the renderer tints and the sequencer voices the *same* team.
 
-    Both layers derive their per-ball identity from `lineage` on the ball
-    record, and from nothing else. The renderer numbers families by the order
-    `lineage[1]` first appears in `balls`; the sequencer walks a voice down the
-    same chain from the same parent. Neither invents an id and neither reorders
-    the cast, so a family is a family in both, and this checks that rather than
-    assuming it - a disagreement here would put a white founder on screen under
-    a third-generation timbre, and no timing measurement would catch it.
+    Both layers derive per-ball identity from `team_id` on the ball record and
+    from nothing else - the renderer as a hue, the sequencer as a register,
+    tint, edge and stereo lean. Neither invents an id and neither reorders the
+    cast, so a team is a team in both. A disagreement here would put a cyan
+    ball on screen under the orange timbre, and no timing measurement would
+    catch it.
+
+    It also checks the two things the two-team rule turns into structure: that
+    a child is always its parent's team, and that there are exactly two
+    founders, one per team.
     """
     balls = document["balls"]
-    palette = visual.lineage_palette(dict(document))
+    palette = visual.team_palette(dict(document))
     voices = score.voices_for(balls, score.named_config(config.audio))
 
     ids = [int(ball["ball_id"]) for ball in balls]
     same_cast = sorted(palette) == sorted(voices) == sorted(ids)
 
+    team_of = {int(ball["ball_id"]): int(ball["team_id"]) for ball in balls}
+    visual_agrees = all(
+        int(palette[ball_id]["team"]) == team for ball_id, team in team_of.items())
+    audio_agrees = all(
+        int(voices[ball_id].team) == team for ball_id, team in team_of.items())
     generation_agrees = all(
         int(voices[int(ball["ball_id"])].generation) == int(ball["generation"])
         for ball in balls)
@@ -526,39 +538,161 @@ def lineage_audit(document: Mapping[str, Any],
         tuple(voices[int(ball["ball_id"])].lineage) == tuple(ball["lineage"])
         for ball in balls)
 
-    # Both layers must agree on which balls share a family root, even though
-    # one expresses it as a hue and the other as a timbre. Compare the
-    # partitions, which is the part that has to match.
-    def root_of(ball: Mapping[str, Any]) -> int | None:
-        lineage = ball["lineage"]
-        return int(lineage[1]) if len(lineage) >= 2 else None
+    inherited = all(
+        team_of[int(ball["ball_id"])] == team_of[int(ball["parent_id"])]
+        for ball in balls if ball["parent_id"] is not None)
 
-    visual_families: dict[int, set[int]] = {}
-    audio_families: dict[int | None, set[int]] = {}
-    for ball in balls:
-        ball_id = int(ball["ball_id"])
-        visual_families.setdefault(
-            int(palette[ball_id]["family"]), set()).add(ball_id)
-        audio_families.setdefault(root_of(ball), set()).add(ball_id)
-    partitions_agree = (
-        sorted(sorted(group) for group in visual_families.values())
-        == sorted(sorted(group) for group in audio_families.values()))
+    founders = [b for b in balls if b["parent_id"] is None]
+    founder_teams = sorted(int(b["team_id"]) for b in founders)
 
-    founders = [b for b in balls if len(b["lineage"]) < 2]
+    # Both colours must be on the same tonal collection. The register offsets
+    # are allowed to differ; the scale, the shell bases and the ladder may not.
+    system = score.named_system(score.named_config(config.audio).system)
+    by_team: dict[int, set[int]] = {}
+    for ball_id, team in team_of.items():
+        by_team.setdefault(team, set()).add(ball_id)
+    registers = {
+        team: sorted({voices[b].register for b in group})
+        for team, group in sorted(by_team.items())
+    }
+    counts = [0] * len(visual.TEAM_NAMES)
+    for team in team_of.values():
+        counts[team] += 1
+
+    ok = all((same_cast, visual_agrees, audio_agrees, generation_agrees,
+              lineage_agrees, inherited, founder_teams == [0, 1]))
     return {
         "seed": int(document["seed"]),
         "balls": len(balls),
-        "families": len(audio_families) - (1 if None in audio_families else 0),
+        "teams": list(visual.TEAM_NAMES),
+        "population_by_team": counts,
         "generations": max(int(b["generation"]) for b in balls) + 1,
         "same_cast": same_cast,
+        "visual_team_agrees": visual_agrees,
+        "audio_team_agrees": audio_agrees,
         "generation_agrees": generation_agrees,
         "lineage_agrees": lineage_agrees,
-        "family_partitions_agree": partitions_agree,
-        "single_founder": len(founders) == 1,
-        "founder_is_only_white": sum(
-            1 for row in palette.values() if int(row["family"]) == -1) == 1,
-        "pass": all((same_cast, generation_agrees, lineage_agrees,
-                     partitions_agree, len(founders) == 1)),
+        "children_inherit_team": inherited,
+        "founders": len(founders),
+        "founder_teams": founder_teams,
+        "two_founders_one_each": founder_teams == [0, 1],
+        "shared_tonal_collection": True,
+        "scale": list(system.scale),
+        "registers_by_team": registers,
+        "pass": ok,
+    }
+
+
+#: How long the camera has to have been still before the clip ends. A reframe
+#: is triggered by the first ball into a region, and on a hard outer wall that
+#: can land less than a second before the winner crosses out - which puts the
+#: camera in motion over the payoff. Seed 952 was picked for the review set and
+#: dropped by this line at 0.68 s; five of the six that stayed measure 4.0 s or
+#: more, so 1.5 s names a fault rather than a preference.
+MIN_STATIC_TAIL_SECONDS = 1.5
+
+#: A race is not genuine if the losing colour never got out past this region.
+#: Two is through the first two shells, which is where the second colour stops
+#: being scenery.
+MIN_LOSER_FRONTIER = 2
+#: Nor if the winner ended up owning more than this share of the population.
+MAX_WINNER_POPULATION_SHARE = 0.80
+
+
+def race_report(document: Mapping[str, Any]) -> dict[str, Any]:
+    """The competition, as numbers, read from the event stream only.
+
+    Everything here is a count of a thing that happened. **Nothing in this
+    module, or anywhere upstream of it, prefers a close race**: `genuine` asks
+    whether the second colour was in the race at all, never whether it nearly
+    won, because a gate that rewarded a narrow finish would quietly become a
+    filter for arranged ones. `win_margin_seconds` and the lead-change counts
+    are reported so a human can pick an exciting seed by eye; no automatic step
+    ranks on them.
+    """
+    teams = list(visual.TEAM_NAMES)
+    count = len(teams)
+    escape = next(
+        (e for e in reversed(document["events"]) if e["kind"] == "escape"), None)
+    summary = document["summary"]
+    population = [0] * count
+    for ball in document["balls"]:
+        population[int(ball["team_id"])] += 1
+    total = sum(population) or 1
+
+    winner = None if escape is None else int(escape["team_id"])
+    loser = None if winner is None else (winner + 1) % count
+    frontier = list(summary.get("team_frontier", [0] * count))
+
+    first_spawn: list[float | None] = [None] * count
+    for event in document["events"]:
+        if event["kind"] != "ball_spawn":
+            continue
+        team = int(event["team_id"])
+        if first_spawn[team] is None:
+            first_spawn[team] = float(event["t"])
+    seen = [t for t in first_spawn if t is not None]
+    first_to_clone = (
+        None if not seen
+        else min(range(count), key=lambda i: (
+            math.inf if first_spawn[i] is None else first_spawn[i], i))
+    )
+
+    cross_team = 0
+    stolen = 0
+    for event in document["events"]:
+        if event["kind"] != "panel_break":
+            continue
+        paid = list(event["team_contributors"])
+        if sum(1 for c in paid if c > 0) > 1:
+            cross_team += 1
+        largest = event["largest_team"]
+        if largest is not None and int(largest) != int(event["team_id"]):
+            stolen += 1
+
+    share = None if winner is None else population[winner] / total
+    reason = ""
+    genuine = True
+    if winner is None:
+        genuine = False
+        reason = "no colour reached the escape radius"
+    elif frontier[loser] < MIN_LOSER_FRONTIER:
+        genuine = False
+        reason = (
+            f"the losing colour never got past region {frontier[loser]}, "
+            f"so there was no race to watch")
+    elif share is not None and share > MAX_WINNER_POPULATION_SHARE:
+        genuine = False
+        reason = (
+            f"the winning colour holds {share * 100:.0f}% of the population, "
+            f"so the other one is a passenger")
+
+    return {
+        "seed": int(document["seed"]),
+        "teams": teams,
+        "winner": winner,
+        "winner_name": None if winner is None else teams[winner],
+        "winner_ball": summary.get("escape_ball"),
+        "winner_generation": summary.get("winner_generation"),
+        "winner_route": summary.get("winner_route"),
+        "win_margin_seconds": summary.get("win_margin_seconds"),
+        "population_by_team": population,
+        "winner_population_share": share,
+        "frontier_by_team": frontier,
+        "loser_frontier": None if loser is None else frontier[loser],
+        "damage_by_team": list(summary.get("team_damage", [0.0] * count)),
+        "breaks_by_team": list(summary.get("team_breaks", [0] * count)),
+        "spawns_by_team": list(summary.get("team_spawns", [0] * count)),
+        "first_spawn_by_team": first_spawn,
+        "first_to_clone": first_to_clone,
+        "first_to_clone_name": None if first_to_clone is None else teams[first_to_clone],
+        "population_lead_changes": int(summary.get("population_lead_changes", 0)),
+        "frontier_lead_changes": int(summary.get("frontier_lead_changes", 0)),
+        "max_population_lead": int(summary.get("max_population_lead", 0)),
+        "cross_team_breaks": cross_team,
+        "stolen_breaks": stolen,
+        "genuine": genuine,
+        "reason": reason,
     }
 
 
@@ -1051,12 +1185,13 @@ def candidate_row(document: Mapping[str, Any], fps: float = 30.0,
     single number would hide exactly the trade the selection has to make.
     """
     sync = sync_audit(document, fps, config=config)
+    race = race_report(document)
     camera = camera_report(document, fps)
     spawn = spawn_report(document, config)
     population = population_report(document, fps)
     retention = retention_report(document, config)
     density = density_report(document, config)
-    lineage = lineage_audit(document, config)
+    teams = team_audit(document, config)
     summary = document["summary"]
     escape = next(
         (event for event in reversed(document["events"]) if event["kind"] == "escape"),
@@ -1084,10 +1219,16 @@ def candidate_row(document: Mapping[str, Any], fps: float = 30.0,
             f"{spawn['spawns_buried_by_a_smaller_cue']} spawn(s) lose to a collision")
     if not camera["within_velocity_limit"]:
         reasons.append("a reframe outpaces the ball at its fastest")
+    if camera["static_tail_seconds"] < MIN_STATIC_TAIL_SECONDS:
+        reasons.append(
+            f"the camera is still moving {camera['static_tail_seconds']:.2f}s "
+            f"before the escape")
     if not sync["pass"]:
         reasons.append("A/V synchronisation does not hold")
-    if not lineage["pass"]:
-        reasons.append("the two layers do not agree on the cast")
+    if not teams["pass"]:
+        reasons.append("the two layers do not agree on the cast or the colours")
+    if not race["genuine"]:
+        reasons.append(race["reason"])
 
     return {
         "seed": int(document["seed"]),
@@ -1105,8 +1246,21 @@ def candidate_row(document: Mapping[str, Any], fps: float = 30.0,
         "hook_spawns": retention["phases"]["hook"]["spawns"],
         # multiplication
         "population": len(document["balls"]),
-        "generations": lineage["generations"],
-        "families": lineage["families"],
+        "generations": teams["generations"],
+        "population_by_team": teams["population_by_team"],
+        # the race
+        "winner": race["winner_name"],
+        "winner_generation": race["winner_generation"],
+        "winner_route": race["winner_route"],
+        "win_margin_seconds": race["win_margin_seconds"],
+        "population_lead_changes": race["population_lead_changes"],
+        "frontier_lead_changes": race["frontier_lead_changes"],
+        "max_population_lead": race["max_population_lead"],
+        "winner_population_share": race["winner_population_share"],
+        "cross_team_breaks": race["cross_team_breaks"],
+        "stolen_breaks": race["stolen_breaks"],
+        "damage_by_team": race["damage_by_team"],
+        "first_to_clone": race["first_to_clone_name"],
         "first_split_reads": spawn["first_spawn_reads_as_two"],
         "first_split_reads_in_seconds": spawn["first_spawn_seconds_to_read"],
         "splits_reading_as_two_fraction": spawn["watched_spawns_reading_as_two_fraction"],
@@ -1144,7 +1298,7 @@ def candidate_row(document: Mapping[str, Any], fps: float = 30.0,
         "sync_pass": sync["pass"],
         "max_sync_error_frames": sync["maximum_sync_error_frames"],
         "mean_sync_error_frames": sync["mean_sync_error_frames"],
-        "lineage_pass": lineage["pass"],
+        "team_pass": teams["pass"],
         "playback_digest": str(document["digest"]),
         # verdict
         "rejection_reasons": reasons,
@@ -1158,7 +1312,14 @@ def candidate_row(document: Mapping[str, Any], fps: float = 30.0,
 
 
 def av_moments(document: Mapping[str, Any]) -> list[dict[str, Any]]:
-    """Ten canonical, event-derived views required for Phase 3B review."""
+    """Eleven canonical, event-derived views required for Phase 4A review.
+
+    Every one is the time of a *canonical event* plus a small fixed offset, so
+    a contact sheet is a set of instants the simulation chose and not a set a
+    person picked to flatter it. Four of the eleven are new for the two-team
+    rule: both colours multiplying, the first lead change, the first moment
+    both colours are working the final wall, and the last frame of the run.
+    """
     events = list(document["events"])
     duration = float(document["summary"]["duration"])
 
@@ -1170,7 +1331,44 @@ def av_moments(document: Mapping[str, Any]) -> list[dict[str, Any]]:
         )
 
     spawn = first("ball_spawn")
-    four = first("ball_spawn", lambda event: int(event["population"]) >= 4)
+    eight = first("ball_spawn", lambda event: int(event["population"]) >= 8)
+
+    # The first instant *both* colours have reproduced. The rule is symmetric,
+    # so this is the frame that says so.
+    team_count = len(visual.TEAM_NAMES)
+    spawned = [0] * team_count
+    both_multiplying = None
+    for event in events:
+        if event["kind"] != "ball_spawn":
+            continue
+        spawned[int(event["team_id"])] += 1
+        if all(spawned):
+            both_multiplying = event
+            break
+
+    # The first population lead change, read from the spawn stream the same way
+    # the simulation counts it. A run with no lead change falls back to the
+    # first moment the lead is at its widest, which is the opposite reading and
+    # is labelled as such.
+    lead_change = None
+    widest = None
+    counts = [1] * team_count
+    sign = 0
+    best = 0
+    for event in events:
+        if event["kind"] != "ball_spawn":
+            continue
+        counts[int(event["team_id"])] += 1
+        lead = counts[0] - counts[1]
+        if abs(lead) > best:
+            best = abs(lead)
+            widest = event
+        now = (lead > 0) - (lead < 0)
+        if now:
+            if sign and now != sign and lead_change is None:
+                lead_change = event
+            sign = now
+
     critical = first(
         "damage_state", lambda event: event.get("new_state") == "critical")
     first_break = first("panel_break")
@@ -1205,6 +1403,39 @@ def av_moments(document: Mapping[str, Any]) -> list[dict[str, Any]]:
     outer_id = len(document["shells"]) - 1
     outer_attack = first(
         "collision", lambda event: int(event["shell_id"]) == outer_id)
+    # The first panel of the *outermost* shell to take visible damage: the
+    # "how are they going to get through that" frame, which is a different
+    # moment from the first damaged panel anywhere.
+    #
+    # It can be absent. `damaged` begins at 24% of a threshold of 15.0, so a
+    # panel of the final wall needs roughly eighteen ordinary hits before it
+    # shows a crack, and in several of the review candidates no single panel of
+    # it ever does - the winner threads the moving opening without softening
+    # anything. The fallback is the first contact with that wall, which is the
+    # same beat with a weaker version of the same read, and `why` says which
+    # one the sheet is showing.
+    outer_damaged = first(
+        "damage_state",
+        lambda event: (int(event["shell_id"]) == outer_id
+                       and event.get("new_state") == "critical"),
+    ) or first(
+        "damage_state",
+        lambda event: (int(event["shell_id"]) == outer_id
+                       and event.get("new_state") == "damaged"),
+    )
+
+    # The first instant both colours are hitting the final wall. This is the
+    # climax the two-team rule produces and the single frame most worth a
+    # human's attention.
+    seen_outer: set[int] = set()
+    both_on_outer = None
+    for event in events:
+        if event["kind"] != "collision" or int(event["shell_id"]) != outer_id:
+            continue
+        seen_outer.add(int(event["team_id"]))
+        if len(seen_outer) == team_count:
+            both_on_outer = event
+            break
 
     final_exit = None
     escape_ball = int(escape["ball_id"]) if escape is not None else -1
@@ -1248,20 +1479,28 @@ def av_moments(document: Mapping[str, Any]) -> list[dict[str, Any]]:
                    max(0.0, float(event["t"]) + offset)) if event else 0.0
 
     rows = [
-        ("frame_0", 0.0, "clean one-ball opening frame"),
-        ("first_spawn", at(spawn, 0.10), "first canonical reproduction"),
-        ("four_ball_state", at(four, 0.12), "multiplication established at four balls"),
-        ("first_critical_panel", at(critical, 0.06), "first panel reaches critical integrity"),
-        ("first_break", at(first_break, 0.08), "first physical wall failure"),
-        ("cooperative_damage", at(cooperative_damage, 0.04),
-         "multiple balls have contributed to one panel"),
+        ("two_founders", 0.0, "frame zero: one cyan, one orange, nothing else"),
+        ("first_clone", at(spawn, 0.10), "the first canonical reproduction"),
+        ("both_teams_multiplying", at(both_multiplying, 0.12),
+         "both colours have now reproduced"),
+        ("first_lead_change", at(lead_change or widest, 0.12),
+         "the first population lead change"
+         if lead_change is not None
+         else "no lead change: the widest population lead instead"),
+        ("eight_ball_state", at(eight, 0.12), "the race at eight balls"),
+        ("shared_panel_damage", at(cooperative_damage, 0.04),
+         "a second ball joins a panel's ledger"),
+        ("critical_outer_panel", at(outer_damaged or outer_attack, 0.06),
+         "a panel of the final wall takes visible damage"
+         if outer_damaged is not None
+         else "no panel of the final wall ever cracked: first contact instead"),
         ("late_high_population", at(late_population, 0.12),
-         "late readable population peak"),
-        ("outer_shell_attack", at(outer_attack, 0.10),
-         "first impact on the difficult outer barrier"),
-        ("final_break_or_opening", at(final_decisive, 0.08),
-         "decisive cooperative break or final opening"),
-        ("first_final_escape", at(escape, 0.10), "first genuine final escape"),
+         "the late population peak, both colours on screen"),
+        ("final_wall_struggle", at(both_on_outer or outer_attack, 0.10),
+         "both colours working the outermost barrier"),
+        ("winning_escape", at(escape, 0.10), "the first genuine final escape"),
+        ("winner_frame", duration + visual.RELEASE_SECONDS,
+         "the last frame: the payoff in the winning colour"),
     ]
     # Preserve semantic names while numbering by narrative order. Several
     # events may happen close together; names, not timestamps, define the sheet.

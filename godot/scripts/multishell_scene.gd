@@ -38,31 +38,44 @@ extends Node3D
 ## has not moved. Without it, frame one is a 15 px ball in the middle of five
 ## rings, which is what was rejected.
 
-const EXPECTED_SCHEMA := "category3-test2-multiplying-shell/2.0.0"
+const EXPECTED_SCHEMA := "category3-test2-two-team-shell-race/3.0.0"
 const EXPECTED_CONFIG_DIGEST := \
-	"1803a066cc67ed08088294e64dd42b7264e2bcc210f055ab225d9983e2725d38"
+	"4a3ab8ba22ae7c54981700823cc5b4eaf147c72fc5ab609a244d9cbaeb6ce572"
 const EXPECTED_SHELL_COUNT := 5
 
 # ---------------------------------------------------------------- composition
 const FRAME_WIDTH := 1080
 const FRAME_HEIGHT := 1920
-const VIEW_DIAMETER_FRACTION := 0.834
-const ARENA_CENTRE_X_FRACTION := 0.420
-const ARENA_CENTRE_Y_FRACTION := 0.440
-const VIEW_RADIUS_PAD := 0.85
+## Phase 4A. The arena sits on the frame's own vertical axis, the framed radius
+## is the frontier's material edge times a fixed fraction rather than plus a
+## fixed number of units, and the frontier therefore occupies exactly
+## 65.20% of the frame width at every stage. These five numbers must agree with
+## `satisfying.multishell_visual`; `test_multishell_visual` compares them.
+const VIEW_PAD_FRACTION := 0.055
+const FRONTIER_WIDTH_FRACTION := 0.652
+const VIEW_DIAMETER_FRACTION := FRONTIER_WIDTH_FRACTION * (1.0 + VIEW_PAD_FRACTION)
+const ARENA_CENTRE_X_FRACTION := 0.500
+const ARENA_CENTRE_Y_FRACTION := 0.450
 const CAMERA_HFOV_DEGREES := 47.0
 const CAMERA_NEAR := 0.20
+## `keep_aspect = KEEP_WIDTH` makes Godot read this as the near plane's *width*
+## and derive the height from the aspect. Phase 2A multiplied it by H/W, which
+## set the width to the height and opened the horizontal field from 47 to 74.4
+## degrees - so every framing this project reported between Phase 2A and Phase
+## 4A described a render nobody made, and the arena filled 46.9% of the frame
+## where the report said 83.4%. See `satisfying.multishell_visual`.
 const CAMERA_FRUSTUM_SIZE := 2.0 * CAMERA_NEAR * tan(
-	deg_to_rad(CAMERA_HFOV_DEGREES) * 0.5) * FRAME_HEIGHT / FRAME_WIDTH
+	deg_to_rad(CAMERA_HFOV_DEGREES) * 0.5)
 const CAMERA_FRUSTUM_OFFSET := Vector2(
-	(0.5 - ARENA_CENTRE_X_FRACTION) * CAMERA_FRUSTUM_SIZE * FRAME_WIDTH / FRAME_HEIGHT,
-	(ARENA_CENTRE_Y_FRACTION - 0.5) * CAMERA_FRUSTUM_SIZE)
+	(0.5 - ARENA_CENTRE_X_FRACTION) * CAMERA_FRUSTUM_SIZE,
+	(ARENA_CENTRE_Y_FRACTION - 0.5) * CAMERA_FRUSTUM_SIZE
+		* float(FRAME_HEIGHT) / float(FRAME_WIDTH))
 const FRAME_LEAD_SECONDS := 0.12
 const FRAME_EASE_SECONDS := 0.55
 
 # ---------------------------------------------------------------------- balls
-const BALL_DRAW_SCALE := 1.50
-const HALO_SCALE := 2.60
+const BALL_DRAW_SCALE := 1.30
+const HALO_SCALE := 2.10
 const BALL_RIM_SCALE := 1.24
 # Draw order along z. Everything the physics cares about is at z = 0; these are
 # the presentation layers around it. The rim, the trail and the halo sit just
@@ -80,7 +93,7 @@ const TRAIL_HEAD_WIDTH := 0.92
 const TRAIL_TAIL_WIDTH := 0.34
 
 # ---------------------------------------------------------------------- walls
-const PANEL_DEPTH := [0.90, 1.30, 1.80, 2.40, 3.20]
+const PANEL_DEPTH := [0.70, 1.15, 1.75, 2.55, 3.60]
 const POST_DEPTH_FACTOR := 1.55
 const PANEL_CHAMFER := 0.085
 const PANEL_SEGMENTS := 3
@@ -118,21 +131,45 @@ const ESCAPE_RING_SECONDS := 0.75
 const RELEASE_SECONDS := 0.55
 const END_HOLD_SECONDS := 0.40
 
+# ------------------------------------------------------------------- overlay
+## Two pieces of type and no third. The hook states the question in the band
+## above the arena, which a centred 65%-wide disc leaves empty in a 9:16 frame,
+## and the payoff answers it in the team's own colour. There is no score, no
+## population counter and no per-team tally: the two growing populations are
+## the score, and a number on top of them would be a worse version of the same
+## information competing with it for the same eye.
+const HOOK_TEXT := "WHO ESCAPES FIRST?"
+const HOOK_TOP_FRACTION := 0.082
+const HOOK_SIZE_FRACTION := 0.0315
+## The hook steps back once the arena is busy, rather than cutting: at four
+## balls the question has been answered by the picture and the type is only
+## competing with it.
+const HOOK_FADE_START := 3.4
+const HOOK_FADE_SECONDS := 0.9
+const HOOK_FADE_TO := 0.22
+## The payoff. It lands on the canonical escape instant, not on the release
+## beat, so the word and the ball leaving the arena are the same frame.
+const WINNER_SIZE_FRACTION := 0.052
+const WINNER_TOP_FRACTION := 0.735
+const WINNER_RISE_SECONDS := 0.22
+const TEXT_PRIMARY := Color(0.94, 0.96, 1.00)
+const SAFE_MARGIN_FRACTION := 0.075
+
 # --------------------------------------------------------------------- colour
 const BACKGROUND := Color(0.020, 0.026, 0.042)
 const FLOOR_COLOUR := Color(0.075, 0.100, 0.165)
-const FOUNDER_RGB := Color(0.960, 0.980, 1.000)
-const FAMILY_RGB := [
-	Color(0.250, 0.860, 1.000),
-	Color(0.440, 0.620, 1.000),
-	Color(0.660, 0.500, 1.000),
-	Color(0.940, 0.440, 0.920),
-	Color(0.300, 0.980, 0.840),
+## Two teams, two hues, and nothing else in the frame may use either of them.
+## The damage ramp below moved from amber to red-to-white-hot and the
+## opening-post highlight from cyan to steel to pay for it.
+const TEAM_RGB := [
+	Color(0.140, 0.880, 1.000),
+	Color(1.000, 0.540, 0.130),
 ]
-const GENERATION_WHITEN := 0.13
-const GENERATION_WHITEN_MAX := 0.45
-const GENERATION_ENERGY_STEP := 0.12
-const PANEL_RGB := Color(0.400, 0.455, 0.560)
+const TEAM_NAMES := ["CYAN", "ORANGE"]
+## A descendant keeps its team's hue exactly. Generation reads as emission only.
+const GENERATION_ENERGY_STEP := 0.09
+const GENERATION_ENERGY_MAX := 1.36
+const PANEL_RGB := Color(0.400, 0.440, 0.500)
 # The lit face. A panel collision surface is 0.30 units thick - 5.3 px at the
 # final framing - and a 5.3 px line that *emits* reads as a wall where a 5.3 px
 # line that is merely lit reads as a pencil stroke. The plate is exactly the
@@ -140,7 +177,7 @@ const PANEL_RGB := Color(0.400, 0.455, 0.560)
 # sits below the glow threshold so it lifts the panel without blooming the
 # whole ring. Damage takes it away: a worn panel loses its sheen before it
 # gains a crack.
-const FACE_RGB := Color(0.560, 0.720, 0.880)
+const FACE_RGB := Color(0.620, 0.680, 0.780)
 const FACE_ENERGY := 0.62
 const FACE_Z := 0.004
 # The back rim, and the reason the five shells look different from each other.
@@ -156,20 +193,20 @@ const FACE_Z := 0.004
 #
 # The rim is at z = -depth, so it projects *inside* the front face and can
 # never put a pixel outside the canonical silhouette.
-const BACK_RGB := Color(0.300, 0.480, 0.680)
+const BACK_RGB := Color(0.340, 0.430, 0.560)
 const BACK_ENERGY := 0.30
 const MARK_Z := 0.010
 const STRESS_Z := 0.024
-const CRACK_RGB := Color(1.000, 0.620, 0.220)
-const CRITICAL_RGB := Color(1.000, 0.440, 0.160)
-const FRACTURE_RGB := Color(1.000, 0.300, 0.140)
-const BREAK_FLASH_RGB := Color(1.000, 0.930, 0.800)
-const POST_RGB := Color(0.330, 0.380, 0.470)
-const POST_HOT_RGB := Color(1.000, 0.680, 0.300)
+const CRACK_RGB := Color(0.880, 0.100, 0.420)
+const CRITICAL_RGB := Color(1.000, 0.060, 0.300)
+const FRACTURE_RGB := Color(1.000, 0.520, 0.720)
+const BREAK_FLASH_RGB := Color(1.000, 0.940, 0.960)
+const POST_RGB := Color(0.330, 0.370, 0.440)
+const POST_HOT_RGB := Color(1.000, 0.160, 0.440)
 # A pillar that flanks an opening is the one the ball clips when it aims at the
 # hole and misses, so it is the one the viewer has to see. It gets a cool cap
 # and a little more depth; the pillars between two panels do not.
-const POST_EDGE_RGB := Color(0.420, 0.860, 1.000)
+const POST_EDGE_RGB := Color(0.700, 0.780, 0.900)
 const POST_EDGE_ENERGY := 1.60
 # Pillars between two panels still read as the joints that hold the ring
 # together, just quietly.
@@ -239,6 +276,7 @@ var _post_edge: Array = []
 var _ball_ids: PackedInt32Array = PackedInt32Array()
 var _ball_birth: PackedFloat64Array = PackedFloat64Array()
 var _ball_colour: Array[Color] = []
+var _ball_team: PackedInt32Array = PackedInt32Array()
 var _ball_energy: PackedFloat64Array = PackedFloat64Array()
 var _ball_flights: Array = []
 var _ball_core: Array[MeshInstance3D] = []
@@ -268,6 +306,8 @@ var _escape := {}
 var _escape_ring: MeshInstance3D
 var _escape_ring_material: StandardMaterial3D
 
+var _hook_label: Label
+var _winner_label: Label
 var _panel_impacts := {}
 var _backdrop: MeshInstance3D
 var _glow_pool: MeshInstance3D
@@ -346,10 +386,13 @@ func frame_mark_count() -> int:
 
 
 func _shell_view_radii() -> PackedFloat64Array:
+	## Proportional pad, so the frontier is the same size on screen at every
+	## stage. A constant pad is a shrinking fraction as the arena opens out, and
+	## that is what made the Phase 3B frontier creep from 73% to 81% of the frame.
 	var out := PackedFloat64Array()
 	for shell in playback["shells"]:
-		out.append(float(shell["radius"]) + 0.5 * float(shell["thickness"])
-			+ VIEW_RADIUS_PAD)
+		out.append((float(shell["radius"]) + 0.5 * float(shell["thickness"]))
+			* (1.0 + VIEW_PAD_FRACTION))
 	return out
 
 
@@ -445,6 +488,7 @@ func _build() -> void:
 	_build_balls()
 	_read_events()
 	_build_effects()
+	_build_overlay()
 	if show_debug:
 		_build_debug_overlay()
 		_update_debug_overlay()
@@ -1013,6 +1057,7 @@ func _read_events() -> void:
 			_escape = {
 				"t": float(event["t"]),
 				"ball_id": int(event["ball_id"]),
+				"team_id": int(event["team_id"]),
 				"position": Vector2(float(event["position"][0]),
 					float(event["position"][1])),
 			}
@@ -1024,21 +1069,13 @@ func _read_events() -> void:
 
 
 func _build_balls() -> void:
-	## One colour per ball, from `lineage` and `generation` and nothing else.
-	## The founder is the only white ball; every other ball keeps the hue of the
-	## founder-child it descends from - `lineage[1]` - for the whole run, and
-	## pales one step toward white per generation below that root. A viewer
-	## never has to work the genealogy out; the point is that a new ball looks
-	## like the ball it came from.
+	## One colour per ball, from `team_id` and nothing else. Every descendant is
+	## exactly its team's hue for the whole run; generation lifts the emission
+	## and never the hue, because "which colour is winning" is the only question
+	## the video asks and a paled fourth-generation cyan stops answering it.
 	var container := Node3D.new()
 	container.name = "Balls"
 	add_child(container)
-
-	var roots := []
-	for ball in playback["balls"]:
-		var lineage: Array = ball["lineage"]
-		if lineage.size() >= 2 and not roots.has(int(lineage[1])):
-			roots.append(int(lineage[1]))
 
 	var radius := float(playback["config"]["ball_radius"]) * BALL_DRAW_SCALE
 	var sphere := SphereMesh.new()
@@ -1054,17 +1091,12 @@ func _build_balls() -> void:
 
 	for ball in playback["balls"]:
 		var ball_id := int(ball["ball_id"])
-		var lineage: Array = ball["lineage"]
 		var generation := int(ball["generation"])
-		var colour := FOUNDER_RGB
-		var energy := 1.0
-		if lineage.size() >= 2:
-			var family: int = roots.find(int(lineage[1])) % FAMILY_RGB.size()
-			var depth: int = maxi(0, generation - 1)
-			var whiten: float = minf(GENERATION_WHITEN_MAX,
-				GENERATION_WHITEN * float(depth))
-			colour = Color(FAMILY_RGB[family]).lerp(Color.WHITE, whiten)
-			energy = 1.0 + GENERATION_ENERGY_STEP * float(depth)
+		var team: int = int(ball["team_id"]) % TEAM_RGB.size()
+		var colour: Color = TEAM_RGB[team]
+		var energy: float = minf(GENERATION_ENERGY_MAX,
+			1.0 + GENERATION_ENERGY_STEP * float(generation))
+		_ball_team.append(team)
 
 		_ball_row_of[ball_id] = _ball_ids.size()
 		_ball_ids.append(ball_id)
@@ -1296,6 +1328,75 @@ func _build_effects() -> void:
 	container.add_child(_escape_ring)
 
 
+func _label(size: int, colour: Color, top: float) -> Label:
+	var label := Label.new()
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+	label.add_theme_font_size_override("font_size", size)
+	label.add_theme_color_override("font_color", colour)
+	label.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	label.offset_top = top
+	label.offset_bottom = top + float(size) * 2.2
+	label.offset_left = float(_width) * SAFE_MARGIN_FRACTION
+	label.offset_right = -float(_width) * SAFE_MARGIN_FRACTION
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return label
+
+
+func _build_overlay() -> void:
+	var layer := CanvasLayer.new()
+	layer.name = "Overlay"
+	add_child(layer)
+
+	var root := Control.new()
+	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(root)
+
+	var hook_size := int(float(_height) * HOOK_SIZE_FRACTION)
+	var hook_top := float(_height) * HOOK_TOP_FRACTION
+	_hook_label = _label(hook_size, TEXT_PRIMARY, hook_top)
+	_hook_label.text = HOOK_TEXT
+	root.add_child(_hook_label)
+
+	# **No team legend.** The brief offers a "cyan dot vs orange dot" beside the
+	# question and makes it conditional: add an indicator only if the two colours
+	# are not self-explanatory. At frame zero they are - two balls, 73 px across,
+	# one of each colour, on a black field, under the words. The first render
+	# with the dots in settled it the other way round as well: at this type size
+	# they landed inside the words and the hook read "WHO(o)ESCAPES FI(o)RST?".
+	# So the overlay is one line at the top and one at the bottom, and nothing
+	# else.
+
+	var winner_size := int(float(_height) * WINNER_SIZE_FRACTION)
+	_winner_label = _label(winner_size, TEXT_PRIMARY,
+		float(_height) * WINNER_TOP_FRACTION)
+	_winner_label.visible = false
+	if not _escape.is_empty():
+		var team: int = int(_escape.get("team_id", 0)) % TEAM_NAMES.size()
+		_winner_label.text = "%s ESCAPES!" % TEAM_NAMES[team]
+		_winner_label.add_theme_color_override("font_color", TEAM_RGB[team])
+	root.add_child(_winner_label)
+
+
+func _apply_overlay(render_t: float) -> void:
+	if _hook_label != null:
+		var fade: float = clampf(
+			(render_t - HOOK_FADE_START) / HOOK_FADE_SECONDS, 0.0, 1.0)
+		var alpha: float = lerpf(1.0, HOOK_FADE_TO, fade)
+		_hook_label.add_theme_color_override("font_color", Color(
+			TEXT_PRIMARY.r, TEXT_PRIMARY.g, TEXT_PRIMARY.b, alpha))
+	if _winner_label != null and not _escape.is_empty():
+		var at := float(_escape["t"])
+		if render_t < at:
+			_winner_label.visible = false
+		else:
+			_winner_label.visible = true
+			var rise: float = clampf(
+				(render_t - at) / WINNER_RISE_SECONDS, 0.0, 1.0)
+			_winner_label.modulate = Color(1.0, 1.0, 1.0, rise)
+
+
 # --------------------------------------------------------------------------
 # The clock
 # --------------------------------------------------------------------------
@@ -1317,6 +1418,7 @@ func set_render_time(r: float) -> void:
 	_apply_panels(_time)
 	_apply_balls(_render_time)
 	_apply_effects(_render_time)
+	_apply_overlay(_render_time)
 
 
 func playback_time() -> float:

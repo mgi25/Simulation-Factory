@@ -1,6 +1,6 @@
-"""Deterministic musical scoring for the multiplying-shell arena.
+"""Deterministic musical scoring for the two-team shell race.
 
-This is the middle layer between the frozen V2 playback document and sample
+This is the middle layer between the frozen V3 playback document and sample
 synthesis. It reads canonical events and emits musical decisions; it imports
 neither the simulator nor the synthesiser. That boundary is what lets audio
 describe the physics and never influence it.
@@ -23,11 +23,28 @@ the shells into positions of one scale ladder keeps the union of everything
 playable equal to the collection itself.
 
 **Family, not randomness.** A ball's voice is its parent's voice plus a small
-deterministic step - a walk down the lineage rather than a draw per ball. The
-founder sits at the neutral centre of every axis, so siblings are near each
-other, cousins further, and a fourth-generation descendant is recognisably of
-the same family without being a copy. Nothing here is seeded from the run; the
-same lineage always produces the same voice.
+deterministic step - a walk down the lineage rather than a draw per ball. Each
+*founder* sits at its own team's centre, so siblings are near each other,
+cousins further, and a fourth-generation descendant is recognisably of the same
+family without being a copy. Nothing here is seeded from the run; the same
+lineage always produces the same voice.
+
+**Two colours, one collection.** Phase 4A adds a second founder and a second
+colour, and team identity is everything *except* pitch class: a register
+preference of one ladder step, an overtone-mix offset, an attack-sharpness
+offset and a stereo lean, applied at the founder and inherited down. Both teams
+index the same `TonalSystem`, so there is no mechanism here that could put them
+in different keys even if the offsets were large - and they are small, because
+the two populations have to make one chord and not two songs. A lineage's
+register walk is clamped around its own team's centre, so a long cyan line
+cannot drift into orange's half of the ladder.
+
+**Constrained voice duration.** Two founders roughly doubled the contact rate.
+Phase 3B only ever *divided* a bounce's nominal length, so at fifteen collisions
+a second an ordinary late-run bounce still rang for a quarter of a second. Each
+collision tier now has a hard ceiling, applied after the tier is decided.
+Nothing is dropped and nothing is moved, so physical causality is exact; the bed
+simply stops sustaining.
 
 ## What each canonical fact means
 
@@ -35,7 +52,8 @@ same lineage always produces the same voice.
 | --- | --- |
 | `collision.position.y / shell.radius` | degree inside the shell's five-note window |
 | `collision.shell_id` | which window of the ladder, and how much weight and ring |
-| `ball_id` lineage | overtone tint, attack, pan bias, register preference, detune |
+| `team_id` | register preference, overtone tint, attack, stereo lean |
+| `ball_id` lineage | one step per generation from the team's centre, plus detune |
 | `impact_speed` | note gain and transient energy |
 | `incidence` | articulation: head-on is short and struck, glancing is long and soft |
 | `feature == "post"` | a sharper, higher transient |
@@ -94,13 +112,13 @@ __all__ = [
     "schedule_metrics",
 ]
 
-SCORE_VERSION = "category3-test2-multiplying-shell-audio-score/1.0.0"
+SCORE_VERSION = "category3-test2-two-team-shell-race-audio-score/2.0.0"
 #: The only event stream this layer will read. Phase 1 froze it.
-SCHEMA_VERSION = "category3-test2-multiplying-shell/2.0.0"
+SCHEMA_VERSION = "category3-test2-two-team-shell-race/3.0.0"
 #: The locked Phase 3B arena. A document made with any other configuration is
 #: refused rather than scored, because every register and threshold below was
 #: chosen against this geometry.
-CONFIG_DIGEST = "1803a066cc67ed08088294e64dd42b7264e2bcc210f055ab225d9983e2725d38"
+CONFIG_DIGEST = "4a3ab8ba22ae7c54981700823cc5b4eaf147c72fc5ab609a244d9cbaeb6ce572"
 
 SAMPLE_RATE = 48_000
 
@@ -292,6 +310,28 @@ class AudioConfig:
     system: str = "bright_pentatonic"
     sample_rate: int = SAMPLE_RATE
 
+    # --- team identity ---------------------------------------------------
+    # Two colours, one tonal collection. The teams share `system` exactly -
+    # the same scale, the same shell bases, the same ladder - so every note
+    # either team plays is a note the other could have played, and two growing
+    # populations make one chord rather than two keys. What separates them is
+    # everything *except* pitch class: where in the ladder they prefer to sit,
+    # how bright the overtone mix is, how sharp the attack is, and which side
+    # of the image they lean to.
+    #
+    # The sizes are deliberately small. At `team_register = 1` the two teams
+    # prefer ladder positions one scale degree apart, which is audible as
+    # weight rather than as transposition; `satisfying.multishell_score` has no
+    # mechanism that could put them in different keys even if these were large.
+    #: Ladder steps team 0 sits above the shell window and team 1 below.
+    team_register: int = 1
+    #: Overtone-mix offset, applied +/- about the neutral 0.5.
+    team_tint: float = 0.18
+    #: Attack-sharpness offset, applied +/- about the neutral 0.5.
+    team_edge: float = 0.14
+    #: Stereo lean, before `lineage_pan` scales it. Team 0 leans left.
+    team_pan: float = 0.34
+
     # --- voice identity --------------------------------------------------
     #: How far one generation may step from its parent on each voice axis.
     lineage_spread: float = 0.30
@@ -315,6 +355,20 @@ class AudioConfig:
     #: Above this many contacts in the backward window a bounce is also pulled
     #: down in level, so a cluster does not simply sum.
     density_gain_floor: float = 0.62
+    #: The hard ceiling on how long an *ordinary* bounce may ring, whatever the
+    #: impact, the shell and the accumulated damage would otherwise multiply it
+    #: to. Two founders roughly double the contact rate, and the Phase 3B
+    #: scaling - which only ever divided the nominal length - left an ordinary
+    #: late-run bounce at a quarter of a second with fifteen of them a second
+    #: arriving. A ceiling is the difference between "every contact sounds" and
+    #: "every contact sustains": causality is preserved exactly, because nothing
+    #: is dropped and nothing is moved, and the bed stops being a drone.
+    ordinary_ceiling_seconds: float = 0.150
+    #: The same ceiling for a strong or frontier hit, which is allowed to ring
+    #: longer because that is the hierarchy the brief asks for.
+    strong_ceiling_seconds: float = 0.300
+    #: And for a hit that also carried a near miss or a damage transition.
+    marked_ceiling_seconds: float = 0.420
     resonance: float = 0.36
     transient: float = 0.20
     brightness: float = 0.50
@@ -331,7 +385,15 @@ class AudioConfig:
     strong_gain: float = 1.16
 
     # --- the marked events -----------------------------------------------
-    crossing_gain: float = 0.055
+    #: A *repeat* crossing - a ball going back through a shell it has already
+    #: been credited for - is a non-event and has to stay under the quietest
+    #: bounce in the piece, or the mix rewards going backwards. The quietest
+    #: bounce is `collision_gain_low * density_gain_floor`, and Phase 4A pushed
+    #: `density_gain_floor` from 0.62 to 0.50 to hold a denser bed down, which
+    #: took the floor from 0.0527 to 0.0425 and left the old 0.055 above it.
+    #: `__post_init__` now checks the relationship rather than leaving it to a
+    #: test on one seed.
+    crossing_gain: float = 0.038
     crossing_seconds: float = 0.150
     spawn_gain: float = 0.205
     #: How far to either side the two halves of a split are placed. The child
@@ -398,6 +460,29 @@ class AudioConfig:
             raise ScoreError(f"unknown tonal system {self.system!r}")
         if not 0.0 <= self.pan_depth <= 0.6:
             raise ScoreError("pan depth must preserve a strong mono centre")
+        if self.crossing_gain >= self.collision_gain_low * self.density_gain_floor:
+            raise ScoreError(
+                "a repeat crossing must stay under the quietest bounce: "
+                f"crossing_gain {self.crossing_gain} is not below "
+                f"{self.collision_gain_low * self.density_gain_floor}"
+            )
+        if abs(self.team_register) > 2:
+            raise ScoreError(
+                "team_register beyond two ladder steps stops being an accent "
+                "and starts being a transposition"
+            )
+        if not 0.0 <= self.team_tint <= 0.35 or not 0.0 <= self.team_edge <= 0.35:
+            raise ScoreError("team timbre offsets must stay inside the unit axes")
+        if not (
+            0.0 < self.ordinary_ceiling_seconds
+            <= self.strong_ceiling_seconds
+            <= self.marked_ceiling_seconds
+        ):
+            raise ScoreError(
+                "the collision ceilings must rise with the tier: an ordinary "
+                "bounce may never be allowed to ring longer than a break-adjacent "
+                "one"
+            )
         if not 0.0 < self.density_floor <= 1.0:
             raise ScoreError("the density floor must shorten a voice, not silence it")
         if self.end_silence_seconds >= self.tail_seconds:
@@ -434,7 +519,9 @@ CONFIGS: dict[str, AudioConfig] = {
         brightness=0.44,
         shell_ring=0.40,
         damage_ring=0.65,
-        density_tighten=0.125,
+        density_tighten=0.155,
+        density_floor=0.34,
+        density_gain_floor=0.50,
         break_seconds=0.470,
         lift_seconds=0.580,
         spawn_seconds=0.340,
@@ -482,6 +569,7 @@ class Voice:
     """One ball's timbral identity, inherited rather than drawn."""
 
     ball_id: int
+    team: int
     parent_id: int | None
     generation: int
     lineage: tuple[int, ...]
@@ -510,12 +598,18 @@ def _walk(base: float, unit: float, spread: float) -> float:
 
 def voices_for(balls: Sequence[Mapping[str, Any]],
                config: AudioConfig = DEFAULT_CONFIG) -> dict[int, Voice]:
-    """A voice per ball, each one its parent's voice plus one small step.
+    """A voice per ball: its team's centre, then its parent's walk from there.
 
-    The founder is the neutral centre of every axis - 0.5 on the unit axes, no
-    register preference, no detune - so the family has a middle rather than an
-    arbitrary corner, and a descendant's distance from the founder is a
-    readable measure of how far down the lineage it sits.
+    Each founder sits at its *team's* centre rather than at the neutral one -
+    offset on tint, edge, register and pan by the four `team_*` dials and by
+    nothing else. Descendants then walk from their parent exactly as before, so
+    a team stays recognisably one texture while its members stay separable
+    inside it, and a ball's distance from its team's centre still reads as how
+    far down the lineage it sits.
+
+    Team identity never touches pitch *class*. Both teams index the same
+    `TonalSystem`, so the register offset moves a note within one collection
+    and can never put the two colours in different keys.
     """
     ordered = sorted(balls, key=lambda row: (float(row["birth_time"]), int(row["ball_id"])))
     voices: dict[int, Voice] = {}
@@ -524,16 +618,22 @@ def voices_for(balls: Sequence[Mapping[str, Any]],
         parent_id = row.get("parent_id")
         lineage = tuple(int(v) for v in row.get("lineage", (ball_id,)))
         generation = int(row.get("generation", 0))
+        team = int(row.get("team_id", 0))
+        # +1 for team 0, -1 for team 1. Written from the team index rather than
+        # from a table so a third team, if one were ever added, would be a
+        # loud IndexError rather than a silent copy of team 0.
+        lean = 1.0 - 2.0 * team
         if parent_id is None:
             voices[ball_id] = Voice(
                 ball_id=ball_id,
+                team=team,
                 parent_id=None,
                 generation=generation,
                 lineage=lineage,
-                tint=0.5,
-                edge=0.5,
-                pan_bias=0.0,
-                register=0,
+                tint=_clamp(0.5 + lean * config.team_tint, 0.0, 1.0),
+                edge=_clamp(0.5 + lean * config.team_edge, 0.0, 1.0),
+                pan_bias=_clamp(lean * config.team_pan, -1.0, 1.0),
+                register=int(lean) * config.team_register,
                 octave_up=False,
                 detune=0.0,
             )
@@ -553,7 +653,11 @@ def voices_for(balls: Sequence[Mapping[str, Any]],
         # two voices and one blurred one.
         roll = _unit("register", ball_id, parent_id)
         step = -1 if roll < 0.28 else (1 if roll > 0.72 else 0)
-        register = max(-2, min(2, parent.register + step))
+        # Clamped around the team's own centre rather than around zero, so a
+        # long cyan lineage cannot walk down into orange's register and undo
+        # the separation the founders were given.
+        centre = int(lean) * config.team_register
+        register = max(centre - 2, min(centre + 2, parent.register + step))
         octave_up = _unit("octave", ball_id, parent_id) > 0.78
         detune = _clamp(
             parent.detune + 0.5 * (2.0 * _unit("detune", ball_id, parent_id) - 1.0),
@@ -561,6 +665,7 @@ def voices_for(balls: Sequence[Mapping[str, Any]],
         )
         voices[ball_id] = Voice(
             ball_id=ball_id,
+            team=team,
             parent_id=int(parent_id),
             generation=generation,
             lineage=lineage,
@@ -708,7 +813,7 @@ class AudioSchedule:
     def as_dict(self) -> dict[str, Any]:
         return {
             "score_version": SCORE_VERSION,
-            "kind": "category3_multiplying_shell_audio_score",
+            "kind": "category3_two_team_shell_race_audio_score",
             "schema": SCHEMA_VERSION,
             "seed": self.seed,
             "playback_digest": self.playback_digest,
@@ -872,6 +977,16 @@ def schedule(document: Mapping[str, Any],
                 gain *= config.strong_gain
             if near_event is not None or state_event is not None:
                 tier = COLLISION_TIER_MARKED
+
+            # The ceiling is applied after the tier and never before it, so
+            # what a contact is allowed to sustain is decided by what it *is* -
+            # ordinary, strong, or carrying a damage transition - rather than by
+            # how loud the arithmetic above happened to make it.
+            seconds = min(seconds, (
+                config.marked_ceiling_seconds if tier == COLLISION_TIER_MARKED
+                else config.strong_ceiling_seconds if tier == COLLISION_TIER_STRONG
+                else config.ordinary_ceiling_seconds
+            ))
 
             repeat_nudged = False
             previous = last_pitch_at.get(index)

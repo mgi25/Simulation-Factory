@@ -131,6 +131,13 @@ COMPACT_LISTS: tuple[tuple[str, tuple[str, ...]], ...] = (
 
 ESCALATION_KEYS = ("collisions", "spawns", "breaks", "meaningful", "population")
 
+#: The race block travels whole, minus the two per-sample curves. Whole because
+#: `summarise` reads a dozen of its keys and a list of paths would have to be
+#: kept in step with it by hand; minus the curves because they are eleven and
+#: `ceil(duration)` entries per run and a twenty-thousand-seed archive does not
+#: need either of them to re-summarise.
+RACE_DROPPED = ("population_curve_by_team", "population_by_second", "population_seconds")
+
 
 def _compact(evaluation: RunEvaluation) -> dict[str, Any]:
     out: dict[str, Any] = {"seed": evaluation.seed, "flags": list(evaluation.flags)}
@@ -140,6 +147,9 @@ def _compact(evaluation: RunEvaluation) -> dict[str, Any]:
             value = value[key]
         out[name] = list(value) if isinstance(value, (list, tuple)) else value
     out["escalation"] = {k: evaluation.metrics["escalation"][k] for k in ESCALATION_KEYS}
+    out["race"] = {
+        k: v for k, v in evaluation.metrics["race"].items() if k not in RACE_DROPPED
+    }
     return out
 
 
@@ -154,6 +164,9 @@ def _rehydrate(records: Sequence[dict[str, Any]]) -> list[RunEvaluation]:
                 node = node.setdefault(key, {})
             node[path[-1]] = record[name]
         metrics["escalation"] = record["escalation"]
+        metrics["race"] = dict(record["race"])
+        for key in RACE_DROPPED:
+            metrics["race"].setdefault(key, [])
         metrics["population"]["curve_times"] = []
         metrics["population"]["capped"] = bool(record["suppressed"])
         metrics["progression"]["first_cross"] = [None] * record["shell_count"]

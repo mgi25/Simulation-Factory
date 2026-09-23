@@ -46,13 +46,13 @@ RENDER_GD = os.path.join(REPO, "godot", "scripts", "multishell_render.gd")
 RENDER_SCENE = os.path.join(REPO, "godot", "scenes", "MultishellRender.tscn")
 SHORTLIST = os.path.join(REPO, visual.SHORTLIST_PATH)
 MANIFEST = os.path.join(
-    REPO, "docs", "validation", "category3_multiplying_shell_adjust_v3b",
-    "phase3b_candidates.json",
+    REPO, "docs", "validation", "category3_two_team_shell_race_v4a",
+    "phase4a_candidates.json",
 )
 
-# One seed carries most of the event-mapping work. 12818 is the busiest of the
-# seven - 607 events, 19 breaks, 15 balls - so it exercises every branch.
-PROOF_SEED = 15793
+# One seed carries most of the event-mapping work: the busiest of the review
+# set, so it exercises every branch. It is the Phase 4A top candidate.
+PROOF_SEED = 17964
 
 
 @pytest.fixture(scope="module")
@@ -144,11 +144,15 @@ def test_the_candidate_set_is_the_rule_applied_to_the_phase_one_shortlist():
         shortlist = json.load(handle)
     kept = visual.candidate_seeds(shortlist)
     assert [entry["seed"] for entry in kept] == list(visual.CANDIDATE_SEEDS)
-    assert 6 <= len(kept) <= 8, "the brief asks for approximately six to eight"
+    assert len(kept) == 6, "the brief asks for six human-review renders"
+    low, high = visual.CANDIDATE_RULE["population_total"]
     for entry in kept:
         assert 20.0 <= entry["duration"] <= 26.0
-        assert entry["first_split"] <= 3.0
-        assert 8 <= entry["population"] <= 15
+        assert entry["first_split"] <= visual.CANDIDATE_RULE["first_spawn_seconds_max"]
+        assert low <= entry["population"] <= high
+        assert min(entry["population_by_team"]) >= visual.CANDIDATE_RULE[
+            "min_team_population"
+        ]
     # No seed outside the Phase 1 shortlist may appear: no new search was run.
     assert set(visual.CANDIDATE_SEEDS).issubset(set(shortlist["seeds"]))
 
@@ -159,9 +163,15 @@ def test_the_candidate_set_spans_both_routes_and_both_kinds_of_escaping_ball():
     manifest = visual.candidate_manifest(shortlist)
     coverage = manifest["coverage"]
     assert coverage["escape_route"]["opening"] >= 1
-    assert coverage["escape_route"]["break"] >= 4
+    # A break-route *final* escape is 0.7% of the eligible population - the
+    # outermost wall is 15.0 reference hits and the moving opening is usually
+    # the cheaper way out - so one is what the set can carry, not four.
+    assert coverage["escape_route"]["break"] >= 1
     assert coverage["escaping_ball"]["founder"] >= 1
-    assert coverage["escaping_ball"]["descendant"] >= 4
+    assert coverage["escaping_ball"]["descendant"] >= 1
+    # The one coverage line that is new, and the one the video is about.
+    assert coverage["both_colours_win"], coverage["winning_colour"]
+    assert min(coverage["winning_colour"].values()) >= 2
     assert coverage["opening_dominant"], "no opening-dominant route in the set"
 
 
@@ -196,7 +206,7 @@ def test_a_document_from_another_configuration_is_refused(document):
     wrong["config_digest"] = "0" * 64
     assert "configuration" in visual.validate_document(wrong)
     wrong = dict(document)
-    wrong["schema"] = "category3-test2-multiplying-shell/1.0.0"
+    wrong["schema"] = "category3-test2-multiplying-shell/2.0.0"
     assert "schema" in visual.validate_document(wrong)
     wrong = dict(document)
     wrong["shells"] = document["shells"][:4]
@@ -300,51 +310,103 @@ def test_a_flank_is_drawn_inside_the_panel_it_belongs_to(document):
 # --------------------------------------------------------------------------
 
 
-def test_the_lineage_tint_is_a_function_of_the_document(document):
-    first = visual.lineage_palette(document)
-    second = visual.lineage_palette(document_for(PROOF_SEED))
+def test_the_team_tint_is_a_function_of_the_document(document):
+    first = visual.team_palette(document)
+    second = visual.team_palette(document_for(PROOF_SEED))
     assert {k: v["rgb"] for k, v in first.items()} == \
         {k: v["rgb"] for k, v in second.items()}
+    assert {k: v["team"] for k, v in first.items()} == \
+        {k: v["team"] for k, v in second.items()}
 
 
-def test_a_descendant_keeps_its_founder_childs_hue(document):
-    palette = visual.lineage_palette(document)
+def test_every_ball_wears_exactly_its_teams_hue(document):
+    palette = visual.team_palette(document)
     balls = {int(b["ball_id"]): b for b in document["balls"]}
     for ball_id, entry in palette.items():
-        lineage = balls[ball_id]["lineage"]
-        if len(lineage) < 2:
-            assert entry["family"] == -1
-            assert entry["rgb"] == visual.FOUNDER_RGB
-            continue
-        root = int(lineage[1])
-        assert entry["family_root"] == root
-        assert entry["family"] == palette[root]["family"], (
-            "a descendant left its family"
-        )
+        team = int(balls[ball_id]["team_id"])
+        assert entry["team"] == team
+        assert entry["rgb"] == visual.TEAM_RGB[team]
+        assert entry["team_name"] == visual.TEAM_NAMES[team]
 
 
-def test_the_palette_is_not_a_rainbow(document):
-    """At most one hue per founder-child, plus the founder. Five is the ceiling
-    because a founder can reproduce at most once per shell."""
-    palette = visual.lineage_palette(document)
-    families = {entry["family"] for entry in palette.values()}
-    assert len(families) <= len(visual.FAMILY_RGB) + 1
-    assert len(visual.FAMILY_RGB) == 5
+def test_a_descendant_is_exactly_its_founders_colour(document):
+    """No generation drift in hue at all: this is the read the video needs."""
+    palette = visual.team_palette(document)
+    balls = {int(b["ball_id"]): b for b in document["balls"]}
+    checked = 0
+    for ball_id, entry in palette.items():
+        root = int(balls[ball_id]["lineage"][0])
+        assert entry["rgb"] == palette[root]["rgb"], "a descendant changed hue"
+        if int(balls[ball_id]["generation"]) > 0:
+            checked += 1
+    assert checked > 0, "the document has no descendants to check"
 
 
-def test_a_deeper_generation_is_paler_than_its_parent(document):
-    palette = visual.lineage_palette(document)
+def test_the_palette_is_exactly_two_hues(document):
+    """Two teams, two colours, and no third thing anywhere in the cast."""
+    palette = visual.team_palette(document)
+    hues = {entry["rgb"] for entry in palette.values()}
+    assert hues <= set(visual.TEAM_RGB)
+    assert len(visual.TEAM_RGB) == len(visual.TEAM_NAMES) == 2
+    assert len(hues) == 2, "only one colour was ever on screen"
+
+
+def test_the_two_team_colours_are_far_apart_and_evenly_weighted():
+    """Distinguishable on a phone, under bloom, and neither one wins the eye."""
+    cyan, orange = visual.TEAM_RGB
+    # Rec. 709 luma. Within a fifth of each other, so neither colour reads as
+    # the important one before anything has happened.
+    def luma(rgb):
+        return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]
+
+    assert abs(luma(cyan) - luma(orange)) < 0.20
+    # And far apart in chroma: the red and blue channels are opposed.
+    assert cyan[0] < 0.30 < orange[0]
+    assert orange[2] < 0.30 < cyan[2]
+    separation = sum((a - b) ** 2 for a, b in zip(cyan, orange)) ** 0.5
+    assert separation > 1.0
+
+
+def test_no_damage_or_structure_colour_can_be_mistaken_for_a_team():
+    """The warm end used to belong to damage; a team took it, so damage moved.
+
+    Every colour the arena itself can show has to be far enough from both team
+    hues that a wound is never read as a ball. Measured as a distance in RGB
+    rather than asserted, because the ramp was re-picked by hand and a hand can
+    drift a channel back.
+    """
+    arena = {
+        "crack": visual.CRACK_RGB,
+        "critical": visual.CRITICAL_RGB,
+        "fracture": visual.FRACTURE_RGB,
+        "break_flash": visual.BREAK_FLASH_RGB,
+        "post_hot": visual.POST_HOT_RGB,
+        "post_edge": visual.POST_EDGE_RGB,
+        "face": visual.FACE_RGB,
+        "panel": visual.PANEL_RGB,
+        "back": visual.BACK_RGB,
+    }
+    for name, rgb in arena.items():
+        for team, colour in zip(visual.TEAM_NAMES, visual.TEAM_RGB):
+            distance = sum((a - b) ** 2 for a, b in zip(rgb, colour)) ** 0.5
+            assert distance > 0.45, f"{name} is within {distance:.2f} of {team}"
+
+
+def test_a_deeper_generation_glows_brighter_and_never_changes_hue(document):
+    palette = visual.team_palette(document)
     balls = {int(b["ball_id"]): b for b in document["balls"]}
     checked = 0
     for ball_id, entry in palette.items():
         parent = balls[ball_id]["parent_id"]
-        if parent is None or int(parent) == 0:
+        if parent is None:
+            assert entry["energy"] == pytest.approx(1.0)
             continue
-        mine = sum(entry["rgb"]) / 3.0
-        theirs = sum(palette[int(parent)]["rgb"]) / 3.0
-        assert mine >= theirs - 1e-9, "a child was darker than its parent"
+        assert entry["energy"] >= palette[int(parent)]["energy"] - 1e-9
+        assert entry["energy"] <= visual.GENERATION_ENERGY_MAX + 1e-9
+        assert entry["rgb"] == palette[int(parent)]["rgb"]
         checked += 1
     assert checked > 0
+    assert visual.GENERATION_WHITEN == 0.0, "a paled descendant stops reading as its team"
 
 
 # --------------------------------------------------------------------------
@@ -450,25 +512,91 @@ def test_the_arena_clears_the_conservative_shorts_safe_area(document):
         DEFAULT_SAFE_AREA.ball_hidden_budget_seconds
 
 
-def test_the_framing_is_the_largest_disc_the_rail_and_the_title_block_allow():
-    """0.834 is derived, not chosen, and this is the derivation.
+def test_the_arena_is_on_the_frames_own_axis():
+    """The review's first finding, as an assertion rather than an intention."""
+    assert visual.ARENA_CENTRE_X_FRACTION == 0.500
+    # The vertical offset is the only asymmetry left, and it is the midpoint of
+    # the band the player's furniture leaves visible, not a lateral slide.
+    top = next(r for r in DEFAULT_SAFE_AREA.regions if r.name == "top_bar")
+    title = next(r for r in DEFAULT_SAFE_AREA.regions if r.name == "title_block")
+    assert visual.ARENA_CENTRE_Y_FRACTION == pytest.approx(
+        0.5 * (top.bottom + title.top), abs=0.01
+    )
 
-    The action rail starts at x=0.840 and the arena is centred at x=0.420, so
-    the disc's radius cannot exceed 0.420 of the frame width. The pad turns
-    that into the view radius, and what is left over is the clearance the
-    safe-area report measures.
+
+def test_the_framing_is_the_largest_centred_disc_the_rail_allows():
+    """0.652 is derived, not chosen, and this is the derivation.
+
+    The conservative action rail starts at x = 0.840. A disc centred on the
+    frame's axis therefore has 0.340 of the frame width to its right before it
+    touches the rail, and the framed radius - the frontier's material edge times
+    the proportional pad - has to fit inside that with a margin left over. What
+    is left is the clearance the safe-area report measures.
     """
     rail = next(r for r in DEFAULT_SAFE_AREA.regions if r.name == "action_rail")
-    assert visual.ARENA_CENTRE_X_FRACTION < rail.left
-    ceiling = 2.0 * min(visual.ARENA_CENTRE_X_FRACTION,
-                        rail.left - visual.ARENA_CENTRE_X_FRACTION)
-    assert visual.VIEW_DIAMETER_FRACTION < ceiling
+    room = rail.left - visual.ARENA_CENTRE_X_FRACTION
+    assert visual.FRONTIER_WIDTH_FRACTION < 2.0 * room
+    assert visual.VIEW_DIAMETER_FRACTION == pytest.approx(
+        visual.FRONTIER_WIDTH_FRACTION * (1.0 + visual.VIEW_PAD_FRACTION)
+    )
+    assert visual.USABLE_WIDTH_FRACTION == pytest.approx(2.0 * room)
+    # The brief's target band for the frontier, against the raw frame width.
+    assert 0.65 <= visual.FRONTIER_WIDTH_FRACTION <= 0.78
     title = next(r for r in DEFAULT_SAFE_AREA.regions if r.name == "title_block")
     top = next(r for r in DEFAULT_SAFE_AREA.regions if r.name == "top_bar")
     half_height = 0.5 * visual.VIEW_DIAMETER_FRACTION * visual.FRAME_WIDTH \
         / visual.FRAME_HEIGHT
     assert visual.ARENA_CENTRE_Y_FRACTION - half_height > top.bottom
     assert visual.ARENA_CENTRE_Y_FRACTION + half_height < title.top
+
+
+def test_the_frontier_is_the_same_size_on_screen_at_every_stage(document):
+    """"Constant frontier screen size", measured rather than intended."""
+    report = visual.frontier_occupancy_report(document)
+    assert report["frontier_fraction_spread"] == pytest.approx(0.0, abs=1e-12)
+    for row in report["stages"]:
+        assert row["frontier_over_frame_width"] == pytest.approx(
+            visual.FRONTIER_WIDTH_FRACTION, abs=1e-9
+        )
+        assert 0.65 <= row["frontier_over_frame_width"] <= 0.78
+
+
+def test_the_total_zoom_out_is_bounded_by_the_arena_and_not_by_the_camera(document):
+    """The review rejected 3.63x; the schedule may not quietly get it back.
+
+    The ratio is a property of the *arena* under the proportional pad - the
+    outermost material edge over the innermost - so the only way to change it
+    is to change the shells. That is the point: the camera can no longer choose
+    to open out further than the geometry requires.
+    """
+    radii = visual.shell_material_radii(document)
+    assert visual.zoom_ratio(document) == pytest.approx(radii[-1] / radii[0])
+    assert visual.zoom_ratio(document) < 3.0, "the Phase 3B zoom is back"
+    assert visual.zoom_ratio(document) > 1.5, "the outer shells are never revealed"
+
+
+def test_the_ball_stays_readable_all_the_way_to_the_final_wall(document):
+    report = visual.frontier_occupancy_report(document)
+    first, last = report["stages"][0], report["stages"][-1]
+    assert first["ball_px"] > 60.0, "the opening ball is not large"
+    assert last["ball_px"] >= 24.0, (
+        f"the ball falls to {last['ball_px']:.1f} px at the final wall"
+    )
+    # And the shrink is the zoom ratio and nothing else.
+    assert first["ball_px"] / last["ball_px"] == pytest.approx(
+        visual.zoom_ratio(document), rel=1e-9
+    )
+
+
+def test_the_camera_never_moves_sideways(document):
+    report = visual.centring_report(document)
+    assert report["centred"]
+    assert report["stationary"]
+    assert report["lateral_offset_from_frame_centre_px"] == pytest.approx(0.0)
+    assert report["max_lateral_movement_px"] == pytest.approx(0.0)
+    assert report["max_vertical_movement_px"] == pytest.approx(0.0)
+    assert report["rail_clearance_px"] > 10.0
+    assert report["left_margin_px"] > report["rail_clearance_px"]
 
 
 def test_the_ball_is_never_drawn_far_enough_into_a_panel_to_read_as_through_it():
@@ -484,9 +612,8 @@ def test_the_ball_is_never_drawn_far_enough_into_a_panel_to_read_as_through_it()
     assert overlap > 0.0, "the constant no longer needs this argument"
     assert overlap < 0.10, "the ball is drawn far enough in to read as through"
     # Worst case is the tightest framing, where a world unit is the most pixels.
-    worst = visual.pixels_per_unit(min(
-        float(s["radius"]) + 0.5 * float(s["thickness"]) + visual.VIEW_RADIUS_PAD
-        for s in [{"radius": 6.0, "thickness": 0.3}]))
+    innermost = DEFAULT_CONFIG.inner_radius + 0.5 * DEFAULT_CONFIG.panel_thickness
+    worst = visual.pixels_per_unit(innermost * (1.0 + visual.VIEW_PAD_FRACTION))
     assert overlap * worst < 4.0
 
 
@@ -510,9 +637,17 @@ def test_an_opening_is_bigger_than_the_ball_that_has_to_thread_it(document):
         * visual.BALL_DRAW_SCALE
     for entry in report:
         scale = entry["at_final_stage"]["pixels_per_unit"]
-        assert entry["at_final_stage"]["gap_px"] > 2.5 * ball * scale, (
+        # The outermost wall is *meant* to look barely passable - that is the
+        # whole "how are they going to get through that" read - so it gets its
+        # own, tighter line rather than being exempted from this one.
+        floor = 1.0 if entry["shell_id"] == len(report) - 1 else 1.8
+        assert entry["at_final_stage"]["gap_px"] > floor * ball * scale, (
             f"shell {entry['shell_id']} reads as impassable"
         )
+    last = report[-1]["at_final_stage"]
+    assert last["gap_px"] < 1.4 * ball * last["pixels_per_unit"], (
+        "the final wall does not read as the hard one"
+    )
 
 
 def test_the_balls_do_not_merge_into_one_blob_at_peak_population(document):
@@ -524,6 +659,12 @@ def test_the_balls_do_not_merge_into_one_blob_at_peak_population(document):
     assert not report["strobes"], report["max_step_diameters"]
     assert report["mean_blobs_per_ball"] > 0.80
     assert report["longest_triple_merge_seconds"] <= 0.75
+    # Both colours are on screen, and a knot holding both of them at once - the
+    # only overlap that can put "which colour is winning" in doubt - is rare.
+    assert report["teams_on_screen_max"] == 2
+    assert min(report["max_on_screen_by_team"]) >= 2
+    assert report["mixed_cluster_fraction"] < 0.35, report["mixed_cluster_fraction"]
+    assert report["largest_mixed_cluster"] <= 4
 
 
 # --------------------------------------------------------------------------
@@ -541,10 +682,10 @@ def test_the_render_scene_and_its_scripts_exist():
 @pytest.mark.parametrize(
     "name, python_value",
     [
-        ("VIEW_DIAMETER_FRACTION", visual.VIEW_DIAMETER_FRACTION),
         ("ARENA_CENTRE_X_FRACTION", visual.ARENA_CENTRE_X_FRACTION),
         ("ARENA_CENTRE_Y_FRACTION", visual.ARENA_CENTRE_Y_FRACTION),
-        ("VIEW_RADIUS_PAD", visual.VIEW_RADIUS_PAD),
+        ("VIEW_PAD_FRACTION", visual.VIEW_PAD_FRACTION),
+        ("FRONTIER_WIDTH_FRACTION", visual.FRONTIER_WIDTH_FRACTION),
         ("CAMERA_HFOV_DEGREES", visual.CAMERA_HFOV_DEGREES),
         ("FRAME_LEAD_SECONDS", visual.FRAME_LEAD_SECONDS),
         ("FRAME_EASE_SECONDS", visual.FRAME_EASE_SECONDS),
@@ -574,9 +715,8 @@ def test_the_render_scene_and_its_scripts_exist():
         ("ESCAPE_RING_SECONDS", visual.ESCAPE_RING_SECONDS),
         ("RELEASE_SECONDS", visual.RELEASE_SECONDS),
         ("END_HOLD_SECONDS", visual.END_HOLD_SECONDS),
-        ("GENERATION_WHITEN", visual.GENERATION_WHITEN),
-        ("GENERATION_WHITEN_MAX", visual.GENERATION_WHITEN_MAX),
         ("GENERATION_ENERGY_STEP", visual.GENERATION_ENERGY_STEP),
+        ("GENERATION_ENERGY_MAX", visual.GENERATION_ENERGY_MAX),
         ("FACE_ENERGY", visual.FACE_ENERGY),
         ("BACK_ENERGY", visual.BACK_ENERGY),
         ("POST_EDGE_ENERGY", visual.POST_EDGE_ENERGY),
@@ -704,16 +844,49 @@ def test_every_effect_is_timed_from_its_own_canonical_event(scene_code):
     assert 'float(_escape["t"])' in body
 
 
-def test_the_scene_draws_no_text(scene_code):
-    """The brief allows an arrow or a caption only if geometry alone fails.
+def test_the_scene_draws_exactly_two_pieces_of_type(scene_code, scene_source):
+    """The competitive hook and the colour-specific payoff. Nothing else.
 
-    It did not: the narrowest opening in the arena is 3.7 ball diameters wide
-    at the final framing and every opening is posted. So the render carries no
-    type at all, and this is the assertion that keeps it that way.
+    Phase 3B drew no type at all, and the argument was that geometry said
+    everything. It no longer does: "who escapes first" is a question about two
+    colours and the first second of the video has to ask it. The brief allows
+    the question and the answer and explicitly forbids a scoreboard, so this
+    counts the labels rather than banning them - two `Label.new` calls, no
+    counter, no per-team tally, and nothing that reads a population into type.
     """
-    for forbidden in ("Label.new", "Label3D", "RichTextLabel", "draw_string",
-                      "TextMesh", "hook_text"):
+    # One constructor behind one helper, called once per label.
+    assert scene_code.count("Label.new") == 1
+    assert scene_code.count("_label(") == 3  # the definition and two calls
+    # And no team legend: the brief makes one conditional on the colours not
+    # being self-explanatory, and at frame zero they are.
+    assert "ColorRect" not in scene_code
+    assert "_team_dot" not in scene_code
+    for forbidden in ("Label3D", "RichTextLabel", "draw_string", "TextMesh"):
         assert forbidden not in scene_code, f"{forbidden} in the scene"
+    assert '"WHO ESCAPES FIRST?"' in scene_source
+    assert '"%s ESCAPES!"' in scene_source
+    # No number is ever formatted into a label: a scoreboard would need one.
+    overlay = scene_code.split("func _apply_overlay(")[1].split(chr(10) + "func ")[0]
+    for forbidden in ("%d", "population_at", "_ball_ids.size()", "counter"):
+        assert forbidden not in overlay, f"{forbidden} in the overlay"
+
+
+def test_the_payoff_is_the_winning_teams_colour(scene_code):
+    build = scene_code.split("func _build_overlay(")[1].split(chr(10) + "func ")[0]
+    assert '_escape.get("team_id"' in build
+    assert "TEAM_NAMES[team]" in build
+    assert "TEAM_RGB[team]" in build
+    apply_ = scene_code.split("func _apply_overlay(")[1].split(chr(10) + "func ")[0]
+    # Timed from the canonical escape instant, like every other effect.
+    assert 'float(_escape["t"])' in apply_
+
+
+def test_the_scene_tints_a_ball_from_its_team_and_from_nothing_else(scene_code):
+    body = scene_code.split("func _build_balls(")[1].split(chr(10) + "func ")[0]
+    assert 'int(ball["team_id"])' in body
+    assert "TEAM_RGB[team]" in body
+    for forbidden in ("FAMILY_RGB", "FOUNDER_RGB", "GENERATION_WHITEN", "lerp(Color.WHITE"):
+        assert forbidden not in body, f"{forbidden} still tints a ball"
 
 
 def test_a_near_miss_is_reinforced_and_never_manufactured(scene_code):
@@ -799,3 +972,65 @@ def test_the_render_config_names_the_safe_area_it_was_measured_against():
     assert config["safe_area"] == DEFAULT_SAFE_AREA.fingerprint()
     assert config["config_digest"] == visual.EXPECTED_CONFIG_DIGEST
     assert config["frame"] == [1080, 1920]
+
+
+def test_the_frustum_matches_the_declared_field_of_view():
+    """The check that would have caught a 1.778x error for three phases.
+
+    `CAMERA_FRUSTUM_SIZE` was wrong from Phase 2A until Phase 4A: under
+    `keep_aspect = KEEP_WIDTH` Godot reads the frustum size as the near plane's
+    *width*, and the constant was the near plane's height. The horizontal field
+    was therefore 74.4 degrees rather than the 47 every pixel figure in the
+    reports was computed from, so the arena filled 46.9% of the frame where the
+    report said 83.4%.
+
+    It survived because the only test on it compared the Python constant with
+    the GDScript constant, and both copies were wrong in the same way. This
+    re-derives the angle from Godot's own frustum arithmetic instead:
+
+        left/right = -+ size / 2          + offset.x
+        top/bottom = -+ size / aspect / 2 + offset.y      (aspect = W / H)
+
+    so `atan((size / 2) / near)` has to be the declared half-angle, and the
+    vertical half-angle has to follow from the aspect ratio.
+    """
+    near = visual.CAMERA_NEAR
+    size = visual.CAMERA_FRUSTUM_SIZE
+    half = math.degrees(math.atan((size / 2.0) / near))
+    assert half == pytest.approx(visual.CAMERA_HFOV_DEGREES / 2.0)
+
+    aspect = visual.FRAME_WIDTH / visual.FRAME_HEIGHT
+    half_height = size / aspect / 2.0
+    vertical = math.degrees(math.atan(half_height / near))
+    assert math.tan(math.radians(vertical)) == pytest.approx(
+        math.tan(math.radians(half)) / aspect
+    )
+
+    # And the framing the rest of the module reports follows from that angle:
+    # at any view radius the framed disc is VIEW_DIAMETER_FRACTION of the frame.
+    for view in (7.0, 12.0, 19.7):
+        distance = visual.camera_distance(view)
+        half_width_units = distance * math.tan(math.radians(half))
+        assert 2.0 * view / (2.0 * half_width_units) == pytest.approx(
+            visual.VIEW_DIAMETER_FRACTION
+        )
+
+
+def test_the_frustum_offset_places_the_principal_point(scene_source):
+    """The offsets are fractions of the near plane, one per axis."""
+    size = visual.CAMERA_FRUSTUM_SIZE
+    aspect = visual.FRAME_WIDTH / visual.FRAME_HEIGHT
+    offset_x, offset_y = visual.CAMERA_FRUSTUM_OFFSET
+    assert offset_x == pytest.approx((0.5 - visual.ARENA_CENTRE_X_FRACTION) * size)
+    assert offset_y == pytest.approx(
+        (visual.ARENA_CENTRE_Y_FRACTION - 0.5) * size / aspect
+    )
+    # The arena is centred, so there is no lateral offset left at all.
+    assert offset_x == pytest.approx(0.0)
+    # The scene computes both from the same two composition fractions, and
+    # derives the framed fraction the same way this module does.
+    body = scene_source.split("const CAMERA_FRUSTUM_OFFSET")[1].split("const ")[0]
+    assert "ARENA_CENTRE_X_FRACTION" in body
+    assert "ARENA_CENTRE_Y_FRACTION" in body
+    derived = scene_source.split("const VIEW_DIAMETER_FRACTION :=")[1].splitlines()[0]
+    assert "FRONTIER_WIDTH_FRACTION * (1.0 + VIEW_PAD_FRACTION)" in derived
