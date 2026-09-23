@@ -83,6 +83,8 @@ def _work_order_terms(order: EngineeringWorkOrder) -> dict[str, Any]:
         "authorized_paths": list(order.authorized_paths),
         "forbidden_paths": list(order.forbidden_paths),
         "protected_paths": list(order.protected.paths),
+        "authorized_read_paths": list(order.authorized_read_paths),
+        "forbidden_read_paths": list(order.forbidden_read_paths),
         "acceptance_criteria": list(order.acceptance_criteria),
         "constraints": list(order.constraints),
         "required_tests": list(order.required_tests),

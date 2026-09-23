@@ -84,7 +84,13 @@ from .work_order import (
     CODE_REVIEW_CAPABILITY,
     DEFAULT_MAX_DEVELOPER_ATTEMPTS,
     EngineeringWorkOrder,
+    collapse_read_rules,
 )
+
+# The context-ref kinds whose `ref` is a repository path rather than a record
+# id. `capsule:company-runtime` is a pointer into the knowledge store and names
+# no file, so feeding it to a path scope would produce a rule matching nothing.
+_PATH_SHAPED_REFS = (ContextKind.FILE, ContextKind.TEST, ContextKind.BENCHMARK)
 
 
 # Terms in an objective that mean the work needs specialist domain judgment
@@ -340,6 +346,11 @@ class CEORequest:
     subsystem_hint: str = ""
     capsule_hints: tuple[str, ...] = ()
     scope_ceiling: tuple[str, ...] = ()
+    # Paths this work order may never read, whatever the owning capsules
+    # declare. A denial the CEO states outranks a grant the company derived,
+    # and it is the only way a read restriction enters the system - nothing
+    # else produces one, so leaving this empty leaves the derived grant intact.
+    forbidden_read_paths: tuple[str, ...] = ()
     acceptance_criteria: tuple[str, ...] = ()
     constraints: tuple[str, ...] = ()
     authorized_branch: str = ""
@@ -477,6 +488,9 @@ class CEORequest:
             subsystem_hint=str(data.get("subsystem_hint", "")),
             capsule_hints=_strings(data.get("capsule_hints"), "capsule_hints"),
             scope_ceiling=_strings(data.get("scope_ceiling"), "scope_ceiling"),
+            forbidden_read_paths=_strings(
+                data.get("forbidden_read_paths"), "forbidden_read_paths"
+            ),
             acceptance_criteria=_strings(
                 data.get("acceptance_criteria"), "acceptance_criteria"
             ),
@@ -507,6 +521,8 @@ class ScopeDerivation:
     ceiling_applied: tuple[str, ...] = ()
     authorized_paths: tuple[str, ...] = ()
     forbidden_paths: tuple[str, ...] = ()
+    authorized_read_paths: tuple[str, ...] = ()
+    forbidden_read_paths: tuple[str, ...] = ()
     required_tests: tuple[str, ...] = ()
     criteria_derived: bool = False
     unscreened_reserved_actions: tuple[str, ...] = ()
@@ -712,6 +728,45 @@ def assess_request(
             ),
         )
 
+    # --- the read ceiling --------------------------------------------------
+    #
+    # Read authority is derived here, beside the write ceiling, because it is
+    # the same kind of thing: a grant the work order carries and no later stage
+    # may widen. Five sources, each one already a statement the company made:
+    #
+    #   the owning capsules' declared `may_read`  - what this subsystem reads
+    #   the authorized paths                      - you must read what you write
+    #   the declared tests                        - and the test you must pass
+    #   the narrowed context refs that name files - what the packet will carry
+    #   the evidence refs                         - what the criteria point at
+    #
+    # `collapse_read_rules` then drops every rule another rule already covers.
+    # That is not a narrowing - coverage is identical - it is what keeps the
+    # union inside the thirty-two paths a work order may name.
+    narrowing = _narrow_refs(selection, tests, authorized)
+    read_grants = collapse_read_rules(
+        {
+            normalise_path(_strip_glob(path), "capsule.may_read")
+            for capsule in capsules
+            for path in capsule.may_read
+        }
+        | set(authorized)
+        | {normalise_path(path, "capsule.tests") for path in tests}
+        | {
+            normalise_path(ref.ref, "context_ref")
+            for ref in narrowing.kept
+            if ref.kind in _PATH_SHAPED_REFS
+        }
+    )
+    read_denials = tuple(
+        sorted(
+            {
+                normalise_path(item, f"forbidden_read_paths[{index}]")
+                for index, item in enumerate(request.forbidden_read_paths)
+            }
+        )
+    )
+
     criteria = request.acceptance_criteria
     derived = not criteria
     if derived and capsules:
@@ -723,7 +778,6 @@ def assess_request(
     # milestone found in the briefing, and the way to not have it is to not
     # have two answers.
     routing = derive_routing(request)
-    narrowing = _narrow_refs(selection, tests, authorized)
     derivation = ScopeDerivation(
         matched_tokens=tokens,
         selected_capsule_ids=selection.ids(),
@@ -734,6 +788,8 @@ def assess_request(
         ceiling_applied=request.scope_ceiling,
         authorized_paths=authorized,
         forbidden_paths=forbidden,
+        authorized_read_paths=read_grants,
+        forbidden_read_paths=read_denials,
         required_tests=tests,
         criteria_derived=derived,
         unscreened_reserved_actions=unscreened,
@@ -812,6 +868,8 @@ def assess_request(
         acceptance_criteria=criteria,
         authorized_on=authorized_on or request.requested_on,
         forbidden_paths=forbidden,
+        authorized_read_paths=read_grants,
+        forbidden_read_paths=read_denials,
         constraints=request.constraints,
         context_refs=narrowing.kept,
         required_tests=tests,
