@@ -1,0 +1,32 @@
+{
+  "assessment": "External provider infrastructure fault, not a P5 defect. The control arm pushed successfully 4 minutes earlier and the evidence branch pushed successfully 6 minutes later, so the fault was transient and arm-independent. The attempt is reported in full and its spend is included in the P5 as-spent total; it is excluded from the matched comparison because the reviewer brief carried the rejected receipt outcome, which confounds the reviewer stage.",
+  "downstream_receipt_failures": [
+    "repository evidence: remote-tracking ref refs/remotes/origin/eng-token-efficiency-v4-p5-challenger is not present in this clone; the remote claim cannot be checked here"
+  ],
+  "downstream_review": {
+    "attested_outcome": "pass",
+    "deterministic_outcome": "changes_required",
+    "findings": [
+      {
+        "deterministic": true,
+        "evidence_ref": "",
+        "finding_id": "attempt-not-accepted",
+        "severity": "changes_required",
+        "summary": "the implementation attempt ended rejected: the branch was not verified on the remote, so the completion protocol is incomplete"
+      }
+    ],
+    "unanswered_criteria": []
+  },
+  "push_argv": [
+    "git",
+    "push",
+    "--set-upstream",
+    "origin",
+    "eng-token-efficiency-v4-p5-challenger"
+  ],
+  "push_duration_s": 3.413,
+  "push_exit_code": 1,
+  "push_stderr": "remote: Internal Server Error        \nremote: Request ID F0B9:206277:AF8472:C7A220:6AB38621        \nremote: Time 2026-09-23T07:56:19Z\nTo https://github.com/mgi25/Simulation-Factory.git\n ! [remote rejected] eng-token-efficiency-v4-p5-challenger -> eng-token-efficiency-v4-p5-challenger (Internal Server Error)\nerror: failed to push some refs to 'https://github.com/mgi25/Simulation-Factory.git'\n",
+  "receipt_accepted": false,
+  "what_happened": "GitHub returned HTTP 500 Internal Server Error for git push during the first P5 challenger attempt"
+}

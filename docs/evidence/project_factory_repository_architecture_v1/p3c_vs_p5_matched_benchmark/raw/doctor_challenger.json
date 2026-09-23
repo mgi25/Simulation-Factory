@@ -15,14 +15,14 @@
     "poll_interval_s": 20.0,
     "push": true,
     "remote": "origin",
-    "repo_root": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-bench-p5-challenger",
+    "repo_root": "<projects>\\wt-bench-p5-challenger",
     "reviewer_backend": "claude_code",
     "reviewer_model": "",
-    "runner_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\project-factory-runner-state\\p3c-vs-p5-challenger",
+    "runner_dir": "<projects>\\project-factory-runner-state\\p3c-vs-p5-challenger",
     "standard_model": "sonnet",
-    "state_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\project-factory-company-state\\p3c-vs-p5-challenger",
+    "state_dir": "<projects>\\project-factory-company-state\\p3c-vs-p5-challenger",
     "strongest_model": "opus",
-    "worktree_root": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\project-factory-benchmark-worktrees\\p3c-vs-p5-challenger"
+    "worktree_root": "<projects>\\project-factory-benchmark-worktrees\\p3c-vs-p5-challenger"
   },
   "control_plane": {
     "exit_code": 0,
@@ -30,7 +30,7 @@
   },
   "repository": {
     "branch": "HEAD",
-    "common_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\Simulation Factory\\.git",
+    "common_dir": "<projects>\\Simulation Factory\\.git",
     "head": "533ae4e4f03f6faf10b5b316ada7edcabb49972d"
   },
   "required_suites": [

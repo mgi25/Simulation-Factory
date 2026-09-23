@@ -14,14 +14,14 @@
     "poll_interval_s": 20.0,
     "push": true,
     "remote": "origin",
-    "repo_root": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-bench-p3c-control",
+    "repo_root": "<projects>\\wt-bench-p3c-control",
     "reviewer_backend": "claude_code",
     "reviewer_model": "",
-    "runner_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\project-factory-runner-state\\p3c-vs-p5-control",
+    "runner_dir": "<projects>\\project-factory-runner-state\\p3c-vs-p5-control",
     "standard_model": "sonnet",
-    "state_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\project-factory-company-state\\p3c-vs-p5-control",
+    "state_dir": "<projects>\\project-factory-company-state\\p3c-vs-p5-control",
     "strongest_model": "opus",
-    "worktree_root": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\project-factory-benchmark-worktrees\\p3c-vs-p5-control"
+    "worktree_root": "<projects>\\project-factory-benchmark-worktrees\\p3c-vs-p5-control"
   },
   "control_plane": {
     "exit_code": 0,
@@ -29,7 +29,7 @@
   },
   "repository": {
     "branch": "HEAD",
-    "common_dir": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\Simulation Factory\\.git",
+    "common_dir": "<projects>\\Simulation Factory\\.git",
     "head": "1705720eb9fac38990639c82477fbfbc2f55aa7e"
   },
   "required_suites": [

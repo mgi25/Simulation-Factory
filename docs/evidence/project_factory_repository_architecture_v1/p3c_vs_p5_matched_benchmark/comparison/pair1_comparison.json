@@ -1,0 +1,478 @@
+{
+  "adaptive_routing": {
+    "challenger": [
+      {
+        "applied": true,
+        "base_failed_tests": 5,
+        "candidate": true,
+        "failure_guided_complete_spans": 5,
+        "failure_symbol_hints": 5,
+        "requested_downshift_tier": "economy",
+        "source_tier": "standard",
+        "stage": "developer-01",
+        "target_tier": "economy",
+        "veto_reasons": []
+      }
+    ],
+    "control": []
+  },
+  "anomalies": {
+    "challenger": [],
+    "control": []
+  },
+  "deterministic_compute": {
+    "base_diagnostic_s": {
+      "absolute_change": -2.063558,
+      "challenger": 50.272636,
+      "control": 52.336194,
+      "dimension": "deterministic base_diagnostic_s",
+      "direction": "improved",
+      "percent_change": -3.9429,
+      "status": "OBSERVED"
+    },
+    "gate_suite_s": {
+      "absolute_change": -55.966,
+      "challenger": 128.545,
+      "control": 184.511,
+      "dimension": "deterministic gate_suite_s",
+      "direction": "improved",
+      "percent_change": -30.3321,
+      "status": "OBSERVED"
+    },
+    "required_test_s": {
+      "absolute_change": -7.91,
+      "challenger": 34.515,
+      "control": 42.425,
+      "dimension": "deterministic required_test_s",
+      "direction": "improved",
+      "percent_change": -18.6447,
+      "status": "OBSERVED"
+    },
+    "total_s": {
+      "absolute_change": -65.939558,
+      "challenger": 213.332636,
+      "control": 279.272194,
+      "dimension": "deterministic total_s",
+      "direction": "improved",
+      "percent_change": -23.6112,
+      "status": "OBSERVED"
+    }
+  },
+  "developer_only": {
+    "cache_creation_units": {
+      "absolute_change": 16275,
+      "challenger": 42290,
+      "control": 26015,
+      "dimension": "total cache creation",
+      "direction": "worsened",
+      "percent_change": 62.5601,
+      "status": "OBSERVED"
+    },
+    "cache_read_units": {
+      "absolute_change": 1084128,
+      "challenger": 1339894,
+      "control": 255766,
+      "dimension": "total cache read",
+      "direction": "worsened",
+      "percent_change": 423.8749,
+      "status": "OBSERVED"
+    },
+    "cost_usd": {
+      "absolute_change": -0.18916785,
+      "challenger": 0.2555039,
+      "control": 0.44467175,
+      "dimension": "total provider cost (USD)",
+      "direction": "improved",
+      "percent_change": -42.541,
+      "status": "OBSERVED"
+    },
+    "duration_s": {
+      "absolute_change": 331.054,
+      "challenger": 437.64,
+      "control": 106.586,
+      "dimension": "total model wall time (s)",
+      "direction": "worsened",
+      "percent_change": 310.598,
+      "status": "OBSERVED"
+    },
+    "input_units": {
+      "absolute_change": 323,
+      "challenger": 337,
+      "control": 14,
+      "dimension": "total input units",
+      "direction": "worsened",
+      "percent_change": 2307.1429,
+      "status": "OBSERVED"
+    },
+    "output_units": {
+      "absolute_change": 7498,
+      "challenger": 13663,
+      "control": 6165,
+      "dimension": "total output",
+      "direction": "worsened",
+      "percent_change": 121.6221,
+      "status": "OBSERVED"
+    },
+    "paid_sessions": {
+      "absolute_change": 0,
+      "challenger": 1,
+      "control": 1,
+      "dimension": "total paid sessions",
+      "direction": "unchanged",
+      "percent_change": 0.0,
+      "status": "OBSERVED"
+    },
+    "turns": {
+      "absolute_change": 29,
+      "challenger": 42,
+      "control": 13,
+      "dimension": "total model turns",
+      "direction": "worsened",
+      "percent_change": 223.0769,
+      "status": "OBSERVED"
+    }
+  },
+  "quality": {
+    "challenger": {
+      "acceptance_criteria_count": 7,
+      "authorized_paths": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "branch": "eng-token-efficiency-v4-p5-challenger-b",
+      "changed_files": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "commit_sha": "63e76c092761216df28a124d719500fcef25c56b",
+      "decisions_required": [],
+      "developer_attempts": 1,
+      "gate_blockers": [],
+      "gate_readiness": "ready",
+      "gate_report_id": "integration-readiness-2026-09-23-5972e4cae6c76b6c",
+      "implementer": "software_implementation_engineer",
+      "merge_performed": false,
+      "remote_verified": true,
+      "review_findings": [],
+      "review_outcome": "pass",
+      "reviewer": "software_review_engineer",
+      "risks": [
+        "The test expectations depend on the capsule seed file already being updated to declare both test files - this has been verified in the JSON seed"
+      ],
+      "status": "ready_for_approval",
+      "tests": [
+        {
+          "command": "tests/test_company_engineering_execution.py",
+          "passed": true,
+          "scope": "targeted",
+          "summary": "207 passed in 33.05s"
+        }
+      ],
+      "unanswered_criteria": []
+    },
+    "control": {
+      "acceptance_criteria_count": 7,
+      "authorized_paths": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "branch": "eng-token-efficiency-v4-p3c-control",
+      "changed_files": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "commit_sha": "889aaa99638c6f83ab5f8d7020be45bf403d76f9",
+      "decisions_required": [],
+      "developer_attempts": 1,
+      "gate_blockers": [],
+      "gate_readiness": "ready",
+      "gate_report_id": "integration-readiness-2026-09-23-8de1cd468e2a2a86",
+      "implementer": "software_implementation_engineer",
+      "merge_performed": false,
+      "remote_verified": true,
+      "review_findings": [
+        "[advisory] commit-msg-count-off: Commit message and implementer summary both say 'five exact tuple assertions' but six assertions were changed (authorized_paths, required_tests, writing_paths, scope.allowed, authority.may_write, capsule.tests)."
+      ],
+      "review_outcome": "pass",
+      "reviewer": "software_review_engineer",
+      "risks": [
+        "order.required_tests was updated to include tests/test_company_review_separation.py on the assumption it derives from capsule.tests; if the implementation computes required_tests differently (e.g. only the primary test), this assertion will fail and would need to be reverted"
+      ],
+      "status": "ready_for_approval",
+      "tests": [
+        {
+          "command": "tests/test_company_engineering_execution.py",
+          "passed": true,
+          "scope": "targeted",
+          "summary": "207 passed in 40.92s"
+        }
+      ],
+      "unanswered_criteria": []
+    }
+  },
+  "repository_map_cache": {
+    "challenger": [
+      {
+        "cache": {
+          "available": true,
+          "identity_source": "git_blob",
+          "invalid_entries": 0,
+          "module_count": 510,
+          "module_hits": 0,
+          "module_misses": 510,
+          "roots": [
+            "company",
+            "tools",
+            "tests"
+          ],
+          "snapshot_hit": false,
+          "tree_fingerprint": "9f0395907629c967",
+          "version": 3
+        },
+        "stage": "developer-01"
+      },
+      {
+        "cache": {
+          "available": true,
+          "identity_source": "git_blob",
+          "invalid_entries": 0,
+          "module_count": 510,
+          "module_hits": 509,
+          "module_misses": 1,
+          "roots": [
+            "company",
+            "tools",
+            "tests"
+          ],
+          "snapshot_hit": false,
+          "tree_fingerprint": "9abc2a910edc6038",
+          "version": 3
+        },
+        "stage": "reviewer-01"
+      }
+    ],
+    "control": []
+  },
+  "reviewer_only": {
+    "cache_creation_units": {
+      "absolute_change": 1844,
+      "challenger": 21793,
+      "control": 19949,
+      "dimension": "total cache creation",
+      "direction": "worsened",
+      "percent_change": 9.2436,
+      "status": "OBSERVED"
+    },
+    "cache_read_units": {
+      "absolute_change": 117607,
+      "challenger": 225441,
+      "control": 107834,
+      "dimension": "total cache read",
+      "direction": "worsened",
+      "percent_change": 109.063,
+      "status": "OBSERVED"
+    },
+    "cost_usd": {
+      "absolute_change": 0.1256035,
+      "challenger": 0.37779175,
+      "control": 0.25218825,
+      "dimension": "total provider cost (USD)",
+      "direction": "worsened",
+      "percent_change": 49.8055,
+      "status": "OBSERVED"
+    },
+    "duration_s": {
+      "absolute_change": 147.694,
+      "challenger": 200.406,
+      "control": 52.712,
+      "dimension": "total model wall time (s)",
+      "direction": "worsened",
+      "percent_change": 280.1905,
+      "status": "OBSERVED"
+    },
+    "input_units": {
+      "absolute_change": 5,
+      "challenger": 13,
+      "control": 8,
+      "dimension": "total input units",
+      "direction": "worsened",
+      "percent_change": 62.5,
+      "status": "OBSERVED"
+    },
+    "output_units": {
+      "absolute_change": 2210,
+      "challenger": 5152,
+      "control": 2942,
+      "dimension": "total output",
+      "direction": "worsened",
+      "percent_change": 75.119,
+      "status": "OBSERVED"
+    },
+    "paid_sessions": {
+      "absolute_change": 0,
+      "challenger": 1,
+      "control": 1,
+      "dimension": "total paid sessions",
+      "direction": "unchanged",
+      "percent_change": 0.0,
+      "status": "OBSERVED"
+    },
+    "turns": {
+      "absolute_change": 5,
+      "challenger": 12,
+      "control": 7,
+      "dimension": "total model turns",
+      "direction": "worsened",
+      "percent_change": 71.4286,
+      "status": "OBSERVED"
+    }
+  },
+  "sessions": {
+    "challenger": [
+      {
+        "cache_creation_units": 42290,
+        "cache_read_units": 1339894,
+        "cost_usd": 0.2555039,
+        "duration_s": 437.64,
+        "exit_code": 0,
+        "input_units": 337,
+        "model": "haiku",
+        "ok": true,
+        "output_units": 13663,
+        "role": "developer",
+        "stage": "developer-01",
+        "startup_model": "claude-haiku-4-5-20251001",
+        "stopped_reason": "",
+        "turns": 42,
+        "unreliable": [],
+        "usage_source": "model_usage_totals"
+      },
+      {
+        "cache_creation_units": 21793,
+        "cache_read_units": 225441,
+        "cost_usd": 0.37779175,
+        "duration_s": 200.406,
+        "exit_code": 0,
+        "input_units": 13,
+        "model": "sonnet",
+        "ok": true,
+        "output_units": 5152,
+        "role": "reviewer",
+        "stage": "reviewer-01",
+        "startup_model": "claude-sonnet-4-6",
+        "stopped_reason": "",
+        "turns": 12,
+        "unreliable": [],
+        "usage_source": "model_usage_totals"
+      }
+    ],
+    "control": [
+      {
+        "cache_creation_units": 26015,
+        "cache_read_units": 255766,
+        "cost_usd": 0.44467175000000003,
+        "duration_s": 106.586,
+        "exit_code": 0,
+        "input_units": 14,
+        "model": "sonnet",
+        "ok": true,
+        "output_units": 6165,
+        "role": "developer",
+        "stage": "developer-01",
+        "startup_model": "claude-sonnet-4-6",
+        "stopped_reason": "",
+        "turns": 13,
+        "unreliable": [],
+        "usage_source": "model_usage_totals"
+      },
+      {
+        "cache_creation_units": 19949,
+        "cache_read_units": 107834,
+        "cost_usd": 0.25218825,
+        "duration_s": 52.712,
+        "exit_code": 0,
+        "input_units": 8,
+        "model": "sonnet",
+        "ok": true,
+        "output_units": 2942,
+        "role": "reviewer",
+        "stage": "reviewer-01",
+        "startup_model": "claude-sonnet-4-6",
+        "stopped_reason": "",
+        "turns": 7,
+        "unreliable": [],
+        "usage_source": "model_usage_totals"
+      }
+    ]
+  },
+  "whole_task": {
+    "cache_creation_units": {
+      "absolute_change": 18119,
+      "challenger": 64083,
+      "control": 45964,
+      "dimension": "total cache creation",
+      "direction": "worsened",
+      "percent_change": 39.42,
+      "status": "OBSERVED"
+    },
+    "cache_read_units": {
+      "absolute_change": 1201735,
+      "challenger": 1565335,
+      "control": 363600,
+      "dimension": "total cache read",
+      "direction": "worsened",
+      "percent_change": 330.5102,
+      "status": "OBSERVED"
+    },
+    "cost_usd": {
+      "absolute_change": -0.06356435,
+      "challenger": 0.63329565,
+      "control": 0.69686,
+      "dimension": "total provider cost (USD)",
+      "direction": "improved",
+      "percent_change": -9.1215,
+      "status": "OBSERVED"
+    },
+    "duration_s": {
+      "absolute_change": 478.748,
+      "challenger": 638.046,
+      "control": 159.298,
+      "dimension": "total model wall time (s)",
+      "direction": "worsened",
+      "percent_change": 300.5361,
+      "status": "OBSERVED"
+    },
+    "input_units": {
+      "absolute_change": 328,
+      "challenger": 350,
+      "control": 22,
+      "dimension": "total input units",
+      "direction": "worsened",
+      "percent_change": 1490.9091,
+      "status": "OBSERVED"
+    },
+    "output_units": {
+      "absolute_change": 9708,
+      "challenger": 18815,
+      "control": 9107,
+      "dimension": "total output",
+      "direction": "worsened",
+      "percent_change": 106.5993,
+      "status": "OBSERVED"
+    },
+    "paid_sessions": {
+      "absolute_change": 0,
+      "challenger": 2,
+      "control": 2,
+      "dimension": "total paid sessions",
+      "direction": "unchanged",
+      "percent_change": 0.0,
+      "status": "OBSERVED"
+    },
+    "turns": {
+      "absolute_change": 34,
+      "challenger": 54,
+      "control": 20,
+      "dimension": "total model turns",
+      "direction": "worsened",
+      "percent_change": 170.0,
+      "status": "OBSERVED"
+    }
+  }
+}

@@ -1,0 +1,267 @@
+{
+  "derivation": {
+    "authorized_paths": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "ceiling_applied": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "context_refs_considered": 2,
+    "context_refs_dropped": [],
+    "context_refs_kept": 2,
+    "criteria_derived": false,
+    "escalation": "none",
+    "forbidden_paths": [
+      "company/constitution.md",
+      "company/integration",
+      "company/permissions.yaml",
+      "company/runtime",
+      "sloped",
+      "tools"
+    ],
+    "matched_tokens": [
+      "because",
+      "engineering",
+      "exact",
+      "execution",
+      "expectations",
+      "legitimately",
+      "names",
+      "regression",
+      "review",
+      "semantic",
+      "separation",
+      "test",
+      "tests",
+      "update"
+    ],
+    "novel": false,
+    "owns_paths": [
+      "company/engineering",
+      "tests/test_company_engineering_execution.py"
+    ],
+    "reasoning_class_ceiling": "D",
+    "required_tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "resource_profile": "consumer",
+    "selected_capsule_ids": [
+      "company-engineering-execution"
+    ],
+    "selection_reasons": [
+      "company-engineering-execution: requested by id; owns company/engineering for task path company/engineering"
+    ],
+    "specialist_domain": "",
+    "specialist_reason": "the objective names no security, governance, architecture or concurrency work and the risk is not high, so this is routine implementation",
+    "unscreened_reserved_actions": []
+  },
+  "outcome": "authorized",
+  "persisted": {
+    "job": {
+      "fingerprint": "4a552550824c660d",
+      "record_ref": "engineering/jobs/wo-req-token-efficiency-v4-p5-challenger-8da2ad126920/000001.json",
+      "sequence": 1
+    },
+    "plan": {
+      "fingerprint": "5bf34fbd908a6fa4",
+      "record_ref": "engineering/plans/wo-req-token-efficiency-v4-p5-challenger-8da2ad126920/000001.json",
+      "sequence": 1
+    },
+    "request": {
+      "fingerprint": "b3de0a561910d069",
+      "record_ref": "engineering/requests/req-token-efficiency-v4-p5-challenger-90b42560ce15/000001.json",
+      "sequence": 1
+    },
+    "work_order": {
+      "fingerprint": "ac00fa9a4ab4a7ae",
+      "record_ref": "engineering/work_orders/wo-req-token-efficiency-v4-p5-challenger-8da2ad126920/000001.json",
+      "sequence": 1
+    }
+  },
+  "plan": {
+    "notes": [
+      "Derived deterministically from the work order; a developer may take a better route inside the same authorized scope."
+    ],
+    "proposed_by": "company-os intake",
+    "proposed_on": "2026-09-23",
+    "steps": [
+      {
+        "action": "Read the authorized paths and the capsule contract they belong to before changing anything: tests/test_company_engineering_execution.py",
+        "step_id": "inspect",
+        "touches": [
+          "tests/test_company_engineering_execution.py"
+        ],
+        "writes": false
+      },
+      {
+        "action": "Identify the smallest contract that the objective is missing, and state it before implementing it",
+        "step_id": "locate-contract",
+        "touches": [
+          "tests/test_company_engineering_execution.py"
+        ],
+        "writes": false
+      },
+      {
+        "action": "Implement the smallest compatible change inside the authorized paths",
+        "step_id": "implement",
+        "touches": [
+          "tests/test_company_engineering_execution.py"
+        ],
+        "writes": true
+      },
+      {
+        "action": "Write focused tests for the new behaviour and for each acceptance criterion",
+        "step_id": "test",
+        "touches": [
+          "tests/test_company_engineering_execution.py"
+        ],
+        "writes": true
+      },
+      {
+        "action": "Run the affected suites and report every result: tests/test_company_engineering_execution.py",
+        "step_id": "run-suites",
+        "touches": [
+          "tests/test_company_engineering_execution.py"
+        ],
+        "writes": false
+      },
+      {
+        "action": "Run the existing integration gate over the checkout and keep its report as evidence; do not modify the gate",
+        "step_id": "gate-evidence",
+        "touches": [],
+        "writes": false
+      },
+      {
+        "action": "Return a receipt naming the changed paths, the commit, the pushed branch and one evidence reference per acceptance criterion",
+        "step_id": "review-evidence",
+        "touches": [],
+        "writes": false
+      }
+    ],
+    "version": 1,
+    "work_order_fingerprint": "ac00fa9a4ab4a7ae",
+    "work_order_id": "wo-req-token-efficiency-v4-p5-challenger"
+  },
+  "state": "planning",
+  "work_order": {
+    "acceptance_criteria": [
+      "Only tests/test_company_engineering_execution.py is modified.",
+      "The exact engineering-execution expectations that change because tests/test_company_review_separation.py is declared by the capsule are updated and nothing else is broadened.",
+      "Exact tuple assertions remain exact tuple assertions; no containment, subset, unordered or partial assertion is substituted.",
+      "Expected authorized paths, plan writing paths, packet scope and persisted authority include tests/test_company_review_separation.py solely because it is now a declared semantic test.",
+      "The capsule's exact tests assertion expects both tests/test_company_engineering_execution.py and tests/test_company_review_separation.py.",
+      "tests/test_company_engineering_execution.py passes.",
+      "No production, runtime, runner, capsule, dependency or governance file is modified."
+    ],
+    "authorized_branch": "eng-token-efficiency-v4-p5-challenger",
+    "authorized_on": "2026-09-23",
+    "authorized_paths": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "base_commit": "287d690b7bf87c988edb3eb34d1f57a4dcec5ab1",
+    "constraints": [
+      "Matched P3C benchmark of the previously measured P2 high-read correction pattern.",
+      "Test expectation correction only.",
+      "Do not modify capsule metadata or tests/test_company_os_capsules.py.",
+      "Do not change implementation behavior.",
+      "Do not weaken exact assertions.",
+      "Do not add dependencies.",
+      "Do not modify canonical main, production simulation code, governance or CEO-reserved controls.",
+      "The runner owns deterministic tests; the model must not run them.",
+      "One developer attempt only."
+    ],
+    "context_refs": [
+      {
+        "digest": "",
+        "kind": "module_contract",
+        "reason": "requested by id; owns company/engineering for task path company/engineering",
+        "ref": "capsule:company-engineering-execution",
+        "span": null
+      },
+      {
+        "digest": "",
+        "kind": "test",
+        "reason": "declared test of the owning capsule",
+        "ref": "tests/test_company_engineering_execution.py",
+        "span": null
+      }
+    ],
+    "escalation": "none",
+    "evidence_refs": [],
+    "evidence_required": true,
+    "forbidden_paths": [
+      "company/constitution.md",
+      "company/integration",
+      "company/permissions.yaml",
+      "company/runtime",
+      "sloped",
+      "tools"
+    ],
+    "implementation_capabilities": [
+      "software_implementation"
+    ],
+    "max_developer_attempts": 1,
+    "novel": false,
+    "objective": "Update the exact engineering-execution regression expectations that legitimately change because company-engineering-execution now names tests/test_company_review_separation.py as a semantic test.",
+    "protected": {
+      "entries": [
+        {
+          "digest": "ae5ddf1e644b7cfb",
+          "path": "ai_platform/policy.py"
+        },
+        {
+          "digest": "9fcf0d0a247f399f",
+          "path": "company/agent_contract.schema.yaml"
+        },
+        {
+          "digest": "2d2d1b113ad24120",
+          "path": "company/constitution.md"
+        },
+        {
+          "digest": "61323b6733ff903f",
+          "path": "company/integration/checks.py"
+        },
+        {
+          "digest": "038f13858cd70293",
+          "path": "company/integration/policy.py"
+        },
+        {
+          "digest": "a46792dc96a5e2b9",
+          "path": "company/integration/suites.py"
+        },
+        {
+          "digest": "84e71fb6dc232d3a",
+          "path": "company/org_registry.yaml"
+        },
+        {
+          "digest": "404c997d12af4812",
+          "path": "company/permissions.yaml"
+        },
+        {
+          "digest": "f450b38af19435e0",
+          "path": "company/task_handoff.schema.yaml"
+        },
+        {
+          "digest": "3e20803fabf596b4",
+          "path": "company/validation/no_subagents.py"
+        }
+      ]
+    },
+    "reasoning_class_ceiling": "D",
+    "repository": "Simulation Factory",
+    "request_id": "req-token-efficiency-v4-p5-challenger",
+    "requested_by": "MGI",
+    "required_tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "resource_profile": "consumer",
+    "reversible": true,
+    "review_capability": "code_review",
+    "risk": "low",
+    "specialist_domain": "",
+    "version": 1,
+    "work_order_id": "wo-req-token-efficiency-v4-p5-challenger"
+  },
+  "work_order_fingerprint": "ac00fa9a4ab4a7ae",
+  "work_order_id": "wo-req-token-efficiency-v4-p5-challenger"
+}

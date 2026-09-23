@@ -1,0 +1,523 @@
+{
+  "adaptive_routing": [
+    {
+      "applied": true,
+      "base_failed_tests": 5,
+      "candidate": true,
+      "failure_guided_complete_spans": 5,
+      "failure_symbol_hints": 5,
+      "requested_downshift_tier": "economy",
+      "source_tier": "standard",
+      "stage": "developer-01",
+      "target_tier": "economy",
+      "veto_reasons": []
+    }
+  ],
+  "anomalies": [],
+  "arm": "challenger",
+  "by_role": {
+    "developer": {
+      "cache_creation_units": 42290,
+      "cache_read_units": 1339894,
+      "cost_usd": 0.2555039,
+      "duration_s": 437.64,
+      "input_units": 337,
+      "output_units": 13663,
+      "paid_sessions": 1,
+      "turns": 42
+    },
+    "reviewer": {
+      "cache_creation_units": 21793,
+      "cache_read_units": 225441,
+      "cost_usd": 0.37779175,
+      "duration_s": 200.406,
+      "input_units": 13,
+      "output_units": 5152,
+      "paid_sessions": 1,
+      "turns": 12
+    }
+  },
+  "deterministic": {
+    "base_diagnostic_s": 50.272636,
+    "gate_suite_s": 128.545,
+    "required_test_s": 34.515,
+    "runs": [
+      {
+        "duration_s": 50.272636,
+        "kind": "base_diagnostic",
+        "stage": "developer-01"
+      },
+      {
+        "command": "tests/test_company_engineering_execution.py",
+        "duration_s": 34.515,
+        "green": true,
+        "kind": "required_test_s",
+        "stage": "developer-01",
+        "summary": "207 passed in 33.05s"
+      },
+      {
+        "command": "tests/test_company_analytics.py",
+        "duration_s": 9.253,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "160 passed in 8.03s"
+      },
+      {
+        "command": "tests/test_company_dashboard.py",
+        "duration_s": 4.745,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "32 passed in 3.46s"
+      },
+      {
+        "command": "tests/test_company_execution_transport.py",
+        "duration_s": 2.06,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "14 passed in 0.87s"
+      },
+      {
+        "command": "tests/test_company_finance.py",
+        "duration_s": 2.443,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "123 passed in 1.23s"
+      },
+      {
+        "command": "tests/test_company_integration_gate.py",
+        "duration_s": 99.033,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "88 passed in 97.75s (0:01:37)"
+      },
+      {
+        "command": "tests/test_company_org_intelligence.py",
+        "duration_s": 2.379,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "119 passed in 1.06s"
+      },
+      {
+        "command": "tests/test_company_os_ai_platform.py",
+        "duration_s": 1.39,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "46 passed in 0.15s"
+      },
+      {
+        "command": "tests/test_company_os_capsules.py",
+        "duration_s": 1.561,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "67 passed in 0.39s"
+      },
+      {
+        "command": "tests/test_company_os_knowledge.py",
+        "duration_s": 1.46,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "26 passed in 0.24s"
+      },
+      {
+        "command": "tests/test_company_runtime.py",
+        "duration_s": 2.318,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "22 passed in 1.17s"
+      },
+      {
+        "command": "tests/test_company_workforce.py",
+        "duration_s": 1.903,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "93 passed in 0.66s"
+      }
+    ],
+    "total_s": 213.332636
+  },
+  "repository_map_cache": [
+    {
+      "cache": {
+        "available": true,
+        "identity_source": "git_blob",
+        "invalid_entries": 0,
+        "module_count": 510,
+        "module_hits": 0,
+        "module_misses": 510,
+        "roots": [
+          "company",
+          "tools",
+          "tests"
+        ],
+        "snapshot_hit": false,
+        "tree_fingerprint": "9f0395907629c967",
+        "version": 3
+      },
+      "stage": "developer-01"
+    },
+    {
+      "cache": {
+        "available": true,
+        "identity_source": "git_blob",
+        "invalid_entries": 0,
+        "module_count": 510,
+        "module_hits": 509,
+        "module_misses": 1,
+        "roots": [
+          "company",
+          "tools",
+          "tests"
+        ],
+        "snapshot_hit": false,
+        "tree_fingerprint": "9abc2a910edc6038",
+        "version": 3
+      },
+      "stage": "reviewer-01"
+    }
+  ],
+  "resources_applied": [
+    {
+      "applied_cost_ceiling": 3.0,
+      "applied_model": "haiku",
+      "applied_timeout_s": 1800.0,
+      "available_tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep"
+      ],
+      "base_diagnostic": {
+        "duration_s": 50.272636,
+        "eligible": true,
+        "failed": 1,
+        "failure_symbol_hints": 5,
+        "green": 0,
+        "max_tests": 2,
+        "ran": true,
+        "test_runs": 1,
+        "timeout_s": 180.0
+      },
+      "compiled_context": {
+        "artifact": "<projects>\\project-factory-runner-state\\p3c-vs-p5-challenger2\\runs\\wo-req-token-efficiency-v4-p5-challenger-b-77203a447173\\run-000001\\developer-01\\execution-context.json",
+        "compiled_spans": 6,
+        "fingerprint": "10ac9e1101666255",
+        "rendered_chars": 6000,
+        "truncated": true
+      },
+      "deterministic_validation_owner": "runner",
+      "model_runs_required_tests": false,
+      "model_source": "adaptive:economy",
+      "not_enforced": [
+        "max_turns: no backend this runner drives accepts a turn ceiling; it is carried into the session's instructions as guidance only"
+      ],
+      "recommended": {
+        "artifact_version": 2,
+        "context_budget_chars": 8000,
+        "context_ref_count": 2,
+        "cost_currency": "USD",
+        "escalation": "none",
+        "max_session_cost": "3.00",
+        "max_turns_advisory": 40,
+        "max_wall_seconds": 1800,
+        "model_tier": "standard",
+        "profile": "consumer",
+        "reasoning_class": "C",
+        "strategy_reason": "reasoning class C at risk low is routine implementation; profile consumer runs it at the standard tier; evidence is required and affects review depth, not model tier; candidate for an economy downshift only if the runner's deterministic base diagnostic localizes every failure into compiled context"
+      },
+      "role": "developer",
+      "stage": "developer-01"
+    },
+    {
+      "applied_cost_ceiling": 1.5,
+      "applied_model": "sonnet",
+      "applied_timeout_s": 900.0,
+      "available_tools": null,
+      "base_diagnostic": null,
+      "compiled_context": null,
+      "deterministic_validation_owner": null,
+      "model_runs_required_tests": null,
+      "model_source": "tier:standard",
+      "not_enforced": [
+        "max_turns: no backend this runner drives accepts a turn ceiling; it is carried into the session's instructions as guidance only"
+      ],
+      "recommended": {
+        "artifact_version": 2,
+        "context_budget_chars": 4800,
+        "context_ref_count": 2,
+        "cost_currency": "USD",
+        "escalation": "none",
+        "max_session_cost": "1.50",
+        "max_turns_advisory": 20,
+        "max_wall_seconds": 900,
+        "model_tier": "standard",
+        "profile": "consumer",
+        "reasoning_class": "C",
+        "strategy_reason": "reasoning class C at risk low is routine implementation; profile consumer runs it at the standard tier; evidence is required and affects review depth, not model tier; review session: read-only with reduced context budget"
+      },
+      "role": "reviewer",
+      "stage": "reviewer-01"
+    }
+  ],
+  "results": [
+    {
+      "acceptance_criteria": [
+        "Only tests/test_company_engineering_execution.py is modified.",
+        "The exact engineering-execution expectations that change because tests/test_company_review_separation.py is declared by the capsule are updated and nothing else is broadened.",
+        "Exact tuple assertions remain exact tuple assertions; no containment, subset, unordered or partial assertion is substituted.",
+        "Expected authorized paths, plan writing paths, packet scope and persisted authority include tests/test_company_review_separation.py solely because it is now a declared semantic test.",
+        "The capsule's exact tests assertion expects both tests/test_company_engineering_execution.py and tests/test_company_review_separation.py.",
+        "tests/test_company_engineering_execution.py passes.",
+        "No production, runtime, runner, capsule, dependency or governance file is modified."
+      ],
+      "authorized_on": "2026-09-23",
+      "authorized_paths": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "authorizes_merge": false,
+      "branch": "eng-token-efficiency-v4-p5-challenger-b",
+      "changed_files": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "commit_sha": "63e76c092761216df28a124d719500fcef25c56b",
+      "decisions_required": [],
+      "developer_attempts": 1,
+      "developer_attempts_remaining": 0,
+      "evidence_refs": [],
+      "gate_blockers": [],
+      "gate_readiness": "ready",
+      "gate_report_id": "integration-readiness-2026-09-23-5972e4cae6c76b6c",
+      "implementation_summary": "Updated 7 test expectations in tests/test_company_engineering_execution.py to include tests/test_company_review_separation.py in all assertions about authorized paths, plan writing paths, packet scope, and persisted authority. The capsule now declares both test files as semantic tests, so all regression expectations that reference the scope and authority have been updated to expect both files as exact tuple assertions.",
+      "implementer": "software_implementation_engineer",
+      "merge_performed": false,
+      "not_an_approval": "READY FOR CEO APPROVAL is a request to be read, not an approval. Nothing here merges, deploys or publishes, and Company OS holds no capability to.",
+      "objective": "Update the exact engineering-execution regression expectations that legitimately change because company-engineering-execution now names tests/test_company_review_separation.py as a semantic test.",
+      "persisted": {
+        "fingerprint": "36d44ffdf644bce9",
+        "record_ref": "engineering/results/wo-req-token-efficiency-v4-p5-challenger-b-77203a447173/000001.json",
+        "sequence": 1
+      },
+      "remote_verified": true,
+      "requested_by": "MGI",
+      "review_findings": [],
+      "review_outcome": "pass",
+      "reviewer": "software_review_engineer",
+      "risks": [
+        "The test expectations depend on the capsule seed file already being updated to declare both test files - this has been verified in the JSON seed"
+      ],
+      "status": "ready_for_approval",
+      "tests": [
+        {
+          "command": "tests/test_company_engineering_execution.py",
+          "passed": true,
+          "scope": "targeted",
+          "summary": "207 passed in 33.05s"
+        }
+      ],
+      "unanswered_criteria": [],
+      "version": 1,
+      "work_order_fingerprint": "901ab51f12234e23",
+      "work_order_id": "wo-req-token-efficiency-v4-p5-challenger-b"
+    }
+  ],
+  "runner_dir": "<projects>\\project-factory-runner-state\\p3c-vs-p5-challenger2",
+  "sessions": [
+    {
+      "cache_creation_units": 42290,
+      "cache_read_units": 1339894,
+      "cost_usd": 0.2555039,
+      "duration_s": 437.64,
+      "exit_code": 0,
+      "exploration": {
+        "bash_total": 0,
+        "edits_total": 7,
+        "events_recorded": 41,
+        "file_reads_repeated": 22,
+        "file_reads_total": 24,
+        "file_reads_unique": 2,
+        "format": "stream_json",
+        "full_or_implicit_reads": 1,
+        "git_commands": 0,
+        "glob_total": 4,
+        "grep_total": 5,
+        "other_shell_commands": 0,
+        "overlapping_read_ranges": 11,
+        "read_after_edit_count": 1,
+        "repeated_full_or_implicit_reads": 0,
+        "repeated_requested_lines": null,
+        "repeated_same_range_reads": 1,
+        "requested_read_lines_total": null,
+        "same_file_read_after_edit_count": 1,
+        "searches_repeated": 1,
+        "searches_total": 9,
+        "targeted_reads": 23,
+        "test_commands": 0,
+        "tool_errors": 0
+      },
+      "input_units": 337,
+      "model": "haiku",
+      "ok": true,
+      "output_units": 13663,
+      "permission_denials": [],
+      "provider": "anthropic",
+      "role": "developer",
+      "session_id": "c4f546a7-ac09-4e84-8d97-5f80800a53db",
+      "stage": "developer-01",
+      "startup_context": {
+        "mcp_servers": [],
+        "model": "claude-haiku-4-5-20251001",
+        "permission_mode": "acceptEdits",
+        "plugins": [],
+        "skills": [
+          "keybindings-help",
+          "debug",
+          "simplify",
+          "batch",
+          "claude-api",
+          "enable-ai-project"
+        ],
+        "tools": [
+          "Glob",
+          "Grep",
+          "Read",
+          "Edit",
+          "Write"
+        ]
+      },
+      "startup_model": "claude-haiku-4-5-20251001",
+      "stopped_reason": "",
+      "turns": 42,
+      "unreliable": [],
+      "usage_source": "model_usage_totals"
+    },
+    {
+      "cache_creation_units": 21793,
+      "cache_read_units": 225441,
+      "cost_usd": 0.37779175,
+      "duration_s": 200.406,
+      "exit_code": 0,
+      "exploration": {
+        "bash_total": 0,
+        "edits_total": 0,
+        "events_recorded": 11,
+        "file_reads_repeated": 6,
+        "file_reads_total": 8,
+        "file_reads_unique": 2,
+        "format": "stream_json",
+        "full_or_implicit_reads": 1,
+        "git_commands": 0,
+        "glob_total": 0,
+        "grep_total": 3,
+        "other_shell_commands": 0,
+        "overlapping_read_ranges": 0,
+        "read_after_edit_count": 0,
+        "repeated_full_or_implicit_reads": 0,
+        "repeated_requested_lines": null,
+        "repeated_same_range_reads": 0,
+        "requested_read_lines_total": null,
+        "same_file_read_after_edit_count": 0,
+        "searches_repeated": 0,
+        "searches_total": 3,
+        "targeted_reads": 7,
+        "test_commands": 0,
+        "tool_errors": 0
+      },
+      "input_units": 13,
+      "model": "sonnet",
+      "ok": true,
+      "output_units": 5152,
+      "permission_denials": [],
+      "provider": "anthropic",
+      "role": "reviewer",
+      "session_id": "828b2212-9c63-4d5e-87e6-e54e49e2be37",
+      "stage": "reviewer-01",
+      "startup_context": {
+        "mcp_servers": [],
+        "model": "claude-sonnet-4-6",
+        "permission_mode": "default",
+        "plugins": [],
+        "skills": [
+          "keybindings-help",
+          "debug",
+          "simplify",
+          "batch",
+          "claude-api",
+          "enable-ai-project"
+        ],
+        "tools": [
+          "Glob",
+          "Grep",
+          "Read"
+        ]
+      },
+      "startup_model": "claude-sonnet-4-6",
+      "stopped_reason": "",
+      "turns": 12,
+      "unreliable": [],
+      "usage_source": "model_usage_totals"
+    }
+  ],
+  "stages": [
+    {
+      "final_state": "ready_for_approval",
+      "finished_at": "2026-09-23T08:17:26.123785+00:00",
+      "outcome": "completed",
+      "outcome_file": "000001.json",
+      "reason": "",
+      "stages": [
+        {
+          "detail": "attempt 1 by software_implementation_engineer, commit 63e76c092761, 1 path(s)",
+          "ok": true,
+          "session_ids": [
+            "c4f546a7-ac09-4e84-8d97-5f80800a53db"
+          ],
+          "stage": "developer",
+          "state_after": "testing",
+          "state_before": "planning"
+        },
+        {
+          "detail": "software_review_engineer returned pass; Company OS adjudicated pass (attested pass, deterministic pass)",
+          "ok": true,
+          "session_ids": [
+            "828b2212-9c63-4d5e-87e6-e54e49e2be37"
+          ],
+          "stage": "reviewer",
+          "state_after": "gate",
+          "state_before": "testing"
+        },
+        {
+          "detail": "11/11 required suites green; gate says ready at 63e76c092761",
+          "ok": true,
+          "session_ids": [],
+          "stage": "gate",
+          "state_after": "ready_for_approval",
+          "state_before": "gate"
+        }
+      ]
+    }
+  ],
+  "whole_task_paid": {
+    "cache_creation_units": 64083,
+    "cache_read_units": 1565335,
+    "cost_usd": 0.63329565,
+    "duration_s": 638.046,
+    "input_units": 350,
+    "output_units": 18815,
+    "paid_sessions": 2,
+    "turns": 54
+  },
+  "work_orders": [
+    "wo-req-token-efficiency-v4-p5-challenger-b-77203a447173"
+  ]
+}
