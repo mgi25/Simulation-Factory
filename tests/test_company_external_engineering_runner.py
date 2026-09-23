@@ -35,6 +35,7 @@ company.
 
 from __future__ import annotations
 
+import ast
 import datetime as dt
 import io
 import json
@@ -45,7 +46,7 @@ from pathlib import Path
 import pytest
 
 from company.engineering import __main__ as engineering_cli
-from company.engineering.intake import CEORequest, assess_request
+from company.engineering.intake import CEORequest, IntakeOutcome, assess_request
 from company.engineering.lifecycle import CEO_STATES, TERMINAL_STATES, JobState
 from company.engineering.orchestrator import open_job, prepare_developer_session
 from company.engineering.protected import DEFAULT_PROTECTED_PATHS
@@ -614,14 +615,374 @@ def test_the_refusals_behind_that_check_are_unchanged():
         assert name in NETWORK_MODULES
 
 
-def test_the_runner_is_not_a_company_os_module_and_is_not_claimed_by_a_capsule():
+def test_the_runner_is_production_and_is_claimed_by_exactly_one_capsule():
     """It is production, on purpose. That is what lets it hold a subprocess.
 
-    If a capsule ever claimed `tools/engineering_runner`, the package would be
-    inside the control plane's declared surface while living outside its import
-    boundary, and the two statements would contradict each other.
+    This assertion used to read the other way: no capsule may claim anything
+    under `tools/`, because a claimed package would be "inside the control
+    plane's declared surface while living outside its import boundary". The two
+    halves of that sentence turned out to be separable, and separating them is
+    what P5-R3 did.
+
+    What `owns_paths` decides is which capsule a work order is derived from -
+    who reviews a change, and what a developer session may write. What the
+    import boundary decides is which packages may import which. A subsystem
+    nobody owns gets no bounded work order and therefore no independent
+    review, which is how the P5-R2 change to `authorization.py` reached this
+    branch ungoverned. So the runner is owned and still external: no import was
+    added in either direction, and
+    `architecture.production_does_not_import_company_os` is still required.
+
+    The old assertion never ran its own message - `capsule.capsule_id` does not
+    exist, and the attribute error surfaced only when it first failed.
     """
     index = CapsuleIndex.load(ROOT / "knowledge/company_os/capsules/seeds")
-    for capsule in index.all():
-        for owned in capsule.owns_paths:
-            assert not owned.startswith("tools/"), f"{capsule.capsule_id} claims {owned}"
+    claims = sorted(
+        (owned, capsule.id)
+        for capsule in index.all()
+        for owned in capsule.owns_paths
+        if owned == "tools" or owned.startswith("tools/")
+    )
+    assert claims == [("tools/engineering_runner", "company-external-engineering-runner")]
+
+
+def test_owning_the_runner_did_not_put_it_inside_the_import_boundary():
+    """Ownership is a governance record, not a membership claim.
+
+    Both directions are read off the source here, because the gate check that
+    proves the first one only runs inside the gate.
+    """
+    banned = ("company", "ai_platform", "knowledge", "intelligence")
+    for path in sorted((ROOT / "tools" / "engineering_runner").glob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                names = [alias.name for alias in node.names]
+            elif isinstance(node, ast.ImportFrom):
+                names = [node.module or ""]
+            else:
+                continue
+            for name in names:
+                assert name.split(".")[0] not in banned, f"{path.name} imports {name}"
+
+    for path in sorted((ROOT / "company" / "engineering").glob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                module = node.names[0].name
+            elif isinstance(node, ast.ImportFrom):
+                module = node.module or ""
+            else:
+                continue
+            assert not module.startswith("tools"), f"{path.name} imports {module}"
+
+
+# Required suites restate the exemption rather than import the dashboard, to
+# keep their own import surface small. Every restatement is listed here, and
+# every one is compared against the single definition below.
+_RESTATING_SUITES = (
+    "tests/test_company_os_capsules.py",
+    "tests/test_company_finance.py",
+    "tests/test_company_org_intelligence.py",
+)
+
+
+def _declared_external_capsules(relative_path: str) -> set[str]:
+    """The `EXTERNAL_CAPSULES` literal a suite declares, read without importing it."""
+    source = (ROOT / relative_path).read_text(encoding="utf-8")
+    for node in ast.parse(source).body:
+        if isinstance(node, ast.Assign) and any(
+            isinstance(t, ast.Name) and t.id == "EXTERNAL_CAPSULES" for t in node.targets
+        ):
+            return set(ast.literal_eval(node.value))
+    raise AssertionError(f"{relative_path} no longer declares EXTERNAL_CAPSULES")
+
+
+def test_the_external_capsule_exemption_is_stated_once_and_agrees():
+    """The capsule suite restates this set; the two copies are pinned here.
+
+    `test_company_os_capsules.py` keeps its own import surface small on
+    purpose, so it holds a literal rather than importing the dashboard. This
+    module already imports both halves, so it is where the two are compared.
+    """
+    from company.dashboard.builder import EXTERNAL_CAPSULES
+
+    assert EXTERNAL_CAPSULES == frozenset({"company-external-engineering-runner"})
+    for suite in _RESTATING_SUITES:
+        assert _declared_external_capsules(suite) == set(EXTERNAL_CAPSULES), suite
+
+
+# --- what ownership buys: a bounded work order for a runner change ---------
+
+
+def _runner_request(**overrides):
+    base = dict(
+        request_id="runner-scope-probe",
+        objective="Correct the read ceiling the runner carries into a session",
+        requested_by="ceo",
+        requested_on=dt.date(2026, 9, 24),
+        capsule_hints=("company-external-engineering-runner",),
+        authorized_branch="p5-runner-ownership-v1",
+        base_commit="d7944aaceb901eabf1d962ac77463f47836dc790",
+        max_developer_attempts=1,
+    )
+    base.update(overrides)
+    return CEORequest(**base)
+
+
+def _assess(request):
+    config = load_company_config()
+    return assess_request(request, config.permissions, repo_root=ROOT)
+
+
+def test_company_os_can_now_derive_a_bounded_work_order_for_a_runner_change():
+    """The refusal P5-R3 was opened to remove.
+
+    Before the capsule existed this objective either produced DECISION
+    REQUIRED - no capsule owns the subject - or, worse, matched
+    `company-engineering-execution` on the token "engineering" and authorized
+    `company/engineering` while forbidding `tools`, sending a developer to the
+    wrong subsystem with the right one out of bounds.
+    """
+    assessment = _assess(_runner_request())
+    assert assessment.outcome is IntakeOutcome.AUTHORIZED
+    assert assessment.decisions == ()
+    assert assessment.derivation.selected_capsule_ids == (
+        "company-external-engineering-runner",
+    )
+    order = assessment.work_order
+    assert order is not None
+    assert "tools/engineering_runner" in order.authorized_paths
+
+
+def test_that_work_order_authorizes_the_runner_and_nothing_else_in_tools():
+    order = _assess(_runner_request()).work_order
+    assert order is not None
+    in_tools = [p for p in order.authorized_paths if p == "tools" or p.startswith("tools/")]
+    assert in_tools == ["tools/engineering_runner"]
+    scope = PathScope(allowed=order.authorized_paths, forbidden=order.forbidden_paths)
+    assert scope.permits("tools/engineering_runner/authorization.py")
+    for outside in (
+        "tools/youtube_fetch/client.py",
+        "tools/race2_render.py",
+        "sloped/course.py",
+    ):
+        assert not scope.permits(outside), outside
+
+
+def test_ownership_does_not_grant_authority_over_the_control_plane():
+    """Owning a production path is not a licence to edit what governs it."""
+    order = _assess(_runner_request()).work_order
+    assert order is not None
+    scope = PathScope(allowed=order.authorized_paths, forbidden=order.forbidden_paths)
+    for protected in (
+        "company/engineering/intake.py",
+        "company/permissions.yaml",
+        "company/constitution.md",
+        "ai_platform/policy.py",
+        "knowledge/company_os/capsules/seeds/company-engineering-execution.json",
+    ):
+        assert not scope.permits(protected), protected
+    assert scope.forbids("company/engineering/intake.py")
+
+
+def test_the_protected_surface_is_still_digested_for_a_runner_work_order():
+    order = _assess(_runner_request()).work_order
+    assert order is not None
+    digested = {entry.path for entry in order.protected.entries}
+    assert set(DEFAULT_PROTECTED_PATHS) <= digested
+    assert "company/validation/no_subagents.py" in digested
+
+
+def test_a_runner_work_order_carries_a_bounded_read_ceiling():
+    """Read authority is derived, not assumed, and it is not the repository."""
+    order = _assess(_runner_request()).work_order
+    assert order is not None
+    assert order.authorized_read_paths
+    assert "tools/engineering_runner" in order.authorized_read_paths
+    assert "." not in order.authorized_read_paths
+    assert "tools" not in order.authorized_read_paths
+    for rule in order.authorized_read_paths:
+        assert not rule.startswith("sloped"), rule
+
+
+def test_ownership_confers_no_production_authority():
+    """A work order is not a publish button, and the capsule says so."""
+    index = CapsuleIndex.load(ROOT / "knowledge/company_os/capsules/seeds")
+    capsule = index.get("company-external-engineering-runner")
+    assert any(
+        "merges, deploys, publishes or uploads" in line for line in capsule.invariants
+    )
+    assert "production.no_publishing_capability" in DEFAULT_POLICY.required
+
+
+def test_the_no_subagent_invariant_survives_the_new_capsule():
+    index = CapsuleIndex.load(ROOT / "knowledge/company_os/capsules/seeds")
+    capsule = index.get("company-external-engineering-runner")
+    assert "bootstrap-forbids-nested-agents" in capsule.facts
+    assert any("no-subagent" in line for line in capsule.invariants)
+    order = _assess(_runner_request()).work_order
+    assert order is not None
+    assert "ai_platform/policy.py" in {entry.path for entry in order.protected.entries}
+
+
+# --- the governed review of the P5-R2 read-authority change ----------------
+#
+# `tools/engineering_runner/authorization.py` gained its read ceiling in P5-R2,
+# before any capsule owned the package, so the change never went through a
+# bounded work order or an independent review. P5-R3 created the owner; these
+# are the cases that review ran, kept as evidence rather than as prose.
+#
+# The behaviour they pin is one whole contract, including the part that is a
+# limitation rather than a guarantee. An enforcement claim that is not true is
+# worse than an absent one, so the limit is asserted too.
+
+
+def _read_briefing(read_allowed=(), read_denied=(), refs=(), role="developer"):
+    """One briefing payload, varying only the read ceiling and the context."""
+    task = "wo-read-probe" + (REVIEW_TASK_SUFFIX if role == "reviewer" else "")
+    return {
+        "role": role,
+        "employee": "dev-1",
+        "packet_fingerprint": "f" * 16,
+        "work_order": {
+            "work_order_id": "wo-read-probe",
+            "work_order_fingerprint": "a" * 16,
+            "objective": "probe the read ceiling",
+            "authorized_branch": "b",
+            "base_commit": "c" * 40,
+            "authorized_paths": ["tools/engineering_runner"],
+            "forbidden_paths": [],
+            "protected_paths": [],
+            "required_tests": [],
+            "acceptance_criteria": ["the ceiling is carried"],
+            "authorized_read_paths": list(read_allowed),
+            "forbidden_read_paths": list(read_denied),
+        },
+        "packet": {
+            "task_id": task,
+            "attempt": 1,
+            "path_scope": (
+                {"allowed": ["tools/engineering_runner"], "forbidden": []}
+                if role == "developer"
+                else {"allowed": [], "forbidden": []}
+            ),
+            "context_refs": [{"kind": "file", "ref": ref} for ref in refs],
+        },
+        "transport": {"authority_fingerprint": "d" * 16},
+    }
+
+
+def test_the_read_ceiling_reaches_the_envelope_and_is_serialised():
+    envelope = AuthorityEnvelope.parse(
+        _read_briefing(
+            read_allowed=["tools/engineering_runner"],
+            read_denied=["sloped"],
+            refs=["tools/engineering_runner/runner.py"],
+        )
+    )
+    assert envelope.may_read == ("tools/engineering_runner",)
+    assert envelope.may_not_read == ("sloped",)
+    summary = envelope.summary()
+    assert summary["may_read"] == ["tools/engineering_runner"]
+    assert summary["may_not_read"] == ["sloped"]
+
+
+def test_both_roles_receive_the_same_read_scope_and_differ_only_in_write():
+    shared = dict(read_allowed=["tools/engineering_runner"], refs=["tools/engineering_runner/runner.py"])
+    developer = AuthorityEnvelope.parse(_read_briefing(role="developer", **shared))
+    reviewer = AuthorityEnvelope.parse(_read_briefing(role="reviewer", **shared))
+    assert developer.may_read == reviewer.may_read
+    assert developer.may_not_read == reviewer.may_not_read
+    assert developer.may_write == ("tools/engineering_runner",)
+    assert reviewer.may_write == ()
+    assert reviewer.read_only and not developer.read_only
+
+
+def test_a_packet_carrying_context_outside_the_ceiling_is_refused():
+    with pytest.raises(Exception, match="outside the work order's authorized_read_paths"):
+        AuthorityEnvelope.parse(
+            _read_briefing(read_allowed=["tools/engineering_runner"], refs=["sloped/course.py"])
+        )
+
+
+def test_a_denied_read_beats_an_allowed_one():
+    """Forbidden wins on the read side too, and it wins over a broader allow."""
+    with pytest.raises(Exception, match="forbids reading"):
+        AuthorityEnvelope.parse(
+            _read_briefing(
+                read_allowed=["tools"],
+                read_denied=["tools/engineering_runner"],
+                refs=["tools/engineering_runner/runner.py"],
+            )
+        )
+
+
+def test_a_read_rule_may_carry_a_wildcard_and_still_bind():
+    AuthorityEnvelope.parse(
+        _read_briefing(read_allowed=["company/*.yaml"], refs=["company/permissions.yaml"])
+    )
+    with pytest.raises(Exception, match="outside the work order's authorized_read_paths"):
+        AuthorityEnvelope.parse(
+            _read_briefing(read_allowed=["company/*.yaml"], refs=["company/runtime/state.yaml"])
+        )
+
+
+def test_an_empty_read_ceiling_skips_the_packet_check_and_that_is_the_limit():
+    """The one asymmetry the review found, pinned so it stays deliberate.
+
+    An absent ceiling grants no read authority - `context_expansion_policy`
+    refuses a governed expansion outright when `may_read` is empty. The runner
+    does not restate that refusal, because a work order stored before these
+    fields existed decodes to `()` and refusing here would strand every one of
+    them; P5-R2 required that adding the fields restamp nothing.
+
+    So an empty ceiling means "unchecked here", not "unrestricted anywhere".
+    The denial list still binds with no allow-list, which is what keeps the
+    empty case from being a hole rather than a gap.
+    """
+    envelope = AuthorityEnvelope.parse(_read_briefing(read_allowed=[], refs=["sloped/secret.py"]))
+    assert envelope.may_read == ()
+
+    with pytest.raises(Exception, match="forbids reading"):
+        AuthorityEnvelope.parse(
+            _read_briefing(read_allowed=[], read_denied=["sloped"], refs=["sloped/secret.py"])
+        )
+
+
+def test_the_refusal_on_an_empty_contract_lives_where_enforcement_does():
+    """The claim the previous test leans on, asserted rather than assumed."""
+    from ai_platform import ContextKind, ContextRef
+    from company.runtime.context_expansion_policy import _reference_problem
+    from knowledge.company_os.capsules import CapsuleIndex
+
+    index = CapsuleIndex.load(ROOT / "knowledge/company_os/capsules/seeds")
+    ref = ContextRef(
+        kind=ContextKind.FILE,
+        ref="tools/engineering_runner/runner.py",
+        reason="the file the probe asks to read",
+    )
+    assert _reference_problem(ref, (), (), index, ROOT) == (
+        "employee may_read is empty; the contract grants no read authority"
+    )
+    # and a non-empty ceiling that covers it produces no problem at all
+    assert _reference_problem(ref, ("tools/engineering_runner",), (), index, ROOT) == ""
+
+
+def test_the_runner_does_not_claim_an_enforcement_it_cannot_perform():
+    """The docstring says what it cannot do, and that sentence is the contract."""
+    source = (ROOT / "tools/engineering_runner/authorization.py").read_text(encoding="utf-8")
+    assert "cannot stop a process from" in source
+    assert "no sandbox" in source
+
+
+def test_no_broad_repository_read_claim_is_ever_produced():
+    """The envelope carries the order's paths, never a root that means everything."""
+    envelope = AuthorityEnvelope.parse(
+        _read_briefing(
+            read_allowed=["tools/engineering_runner"], refs=["tools/engineering_runner/runner.py"]
+        )
+    )
+    for rule in envelope.may_read:
+        assert rule not in (".", "/", "*", "**", "")
+    assert envelope.may_read == ("tools/engineering_runner",)

@@ -1,0 +1,84 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "capability_external_runner_execution",
+    "capability_external_runner_authorization",
+    "capability_external_runner_workspace",
+    "capability_external_runner_evidence"
+  ],
+  "created": "2026-09-24",
+  "decisions": [],
+  "dependencies": [],
+  "experiment_learnings": [],
+  "facts": [
+    "bootstrap-forbids-nested-agents"
+  ],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-external-engineering-runner",
+  "inputs": [
+    "A work order and its developer or reviewer packet, read off disk from a state directory",
+    "A runner configuration naming the repository, the workspace root and the backend"
+  ],
+  "invariants": [
+    "A separate program: it imports no company, ai_platform, knowledge or intelligence module, and architecture.production_does_not_import_company_os proves that on every gate run.",
+    "Company OS does not import the runner either. The halves meet as files, and only tests/test_company_external_engineering_runner.py imports both.",
+    "It restates four control-plane contracts - path scope, job states, required suites, receipt shape - and the drift test pins each to its original.",
+    "Owning this path is governance responsibility, not production authority. Nothing here merges, deploys, publishes or uploads.",
+    "Ceilings are applied in-process. Without an OS sandbox the runner cannot stop a session reading wider, and it reports that limit rather than claiming enforcement.",
+    "An absent read ceiling grants no read authority rather than unrestricted authority.",
+    "The no-subagent policy is restated here and may not be weakened."
+  ],
+  "last_reviewed": "2026-09-24",
+  "may_read": [
+    "tools/engineering_runner/**",
+    "company/runtime/path_scope.py",
+    "company/runtime/packets.py",
+    "company/runtime/receipts.py",
+    "company/engineering/lifecycle.py",
+    "company/integration/suites.py",
+    "docs/company_os_v1_external_engineering_runner.md",
+    "knowledge/company_os/capsules/**"
+  ],
+  "may_write": [
+    "tools/engineering_runner/**"
+  ],
+  "must_not_modify": [
+    "company/**",
+    "ai_platform/**",
+    "knowledge/**",
+    "intelligence/**",
+    "tools/youtube_fetch/**",
+    "sloped/**"
+  ],
+  "outputs": [
+    "A receipt or a reviewer attestation, written where Company OS reads it",
+    "An exploration report, resource telemetry, and a run log scrubbed of secrets and absolute paths"
+  ],
+  "owner": "company-os",
+  "owns_paths": [
+    "tools/engineering_runner"
+  ],
+  "purpose": "Owns the external engineering runner: the separate program that takes a work order off disk, leases a workspace, drives a coding session under the order's ceilings, and writes back a receipt. Ownership exists so runner changes get a bounded work order and an independent review.",
+  "recheck_on": "2027-09-24",
+  "revalidation_reason": "",
+  "risks": [
+    "tools/ is a declared production root, so the production-import check and the research guards apply to every change made here.",
+    "The runner's copies of control-plane contracts drift silently; only the drift test catches it.",
+    "Objective tokens alone never select this capsule: intake turns tokens into company/<token> signals, so a path-shaped subsystem_hint or a capsule hint is required.",
+    "Seven capsules forbid tools/**. A work order co-selecting one of them with this capsule inherits the broader rule, and forbidden wins."
+  ],
+  "source": "company-os-v1-external-engineering-runner",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_external_engineering_runner.py",
+    "tests/test_company_external_engineering_runner.py",
+    "tests/test_engineering_runner_execution_context.py",
+    "tests/test_engineering_runner_exploration_report.py",
+    "tests/test_engineering_runner_exploration_telemetry.py",
+    "tests/test_engineering_runner_repo_map.py"
+  ],
+  "title": "External engineering runner",
+  "type": "module"
+}

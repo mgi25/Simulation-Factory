@@ -116,6 +116,12 @@ from company.workforce import (
     summarise_observations,
 )
 from company.workforce.proposals import Recommendation as WorkforceRecommendation
+
+# Governed, but not part of the control plane. Restated here rather than
+# imported so this required suite keeps its own import surface; every copy is
+# pinned against `company.dashboard.builder.EXTERNAL_CAPSULES` in
+# `tests/test_company_external_engineering_runner.py`.
+EXTERNAL_CAPSULES = {"company-external-engineering-runner"}
 from knowledge.company_os.capsules import CapsuleIndex
 from knowledge.company_os.capsules.budget import DEFAULT_BUDGET
 from knowledge.company_os.capsules.index import SEED_ROOT
@@ -1871,6 +1877,10 @@ def test_the_control_plane_stays_within_its_dependency_cap(seeds):
 
 
 def test_the_dependency_closure_still_covers_every_company_os_capsule(seeds):
+    # The external engineering runner is governed by a capsule but is not a
+    # member of the control plane: it owns a path under a production root, so
+    # an edge reaching it would declare the control plane rests on production.
+    # `company.dashboard.builder.EXTERNAL_CAPSULES` is where that is stated.
     assert seeds.dependency_closure("company-os-control-plane") == tuple(
-        sorted(set(seeds.ids()) - {"company-os-control-plane"})
+        sorted(set(seeds.ids()) - {"company-os-control-plane"} - EXTERNAL_CAPSULES)
     )
