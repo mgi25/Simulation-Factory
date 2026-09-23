@@ -1,0 +1,328 @@
+{
+  "render_version": "category3-test2-multiplying-shell-audio-render/1.0.0",
+  "seed": 547,
+  "config_name": "open_quartal",
+  "tonal_system": "open_quartal",
+  "playback_digest": "e91c8a962e1d95e24e0ddefbb005d4187b50d215ad24f5e620a05d38a50a9b8f",
+  "score_fingerprint": "5889e122261946a9917700ae8f67ac446310ca391064fb0ee71674a959a1aa7b",
+  "config_fingerprint": "487d19ecf326621d",
+  "pcm_digest": "01250653529e7477ac62e5573f99900b183b1479a1ab4e4c7c709cd773e58809",
+  "duration_seconds": 23.882021,
+  "sample_rate": 48000,
+  "channels": 2,
+  "peak": {
+    "sample_peak_dbfs": -3.32,
+    "true_peak_dbtp": -3.31,
+    "clipped_samples": 0,
+    "static_gain": 1.35,
+    "limiter_used": false
+  },
+  "loudness": {
+    "integrated_lufs": -18.83,
+    "lra_lu": 6.14,
+    "lra_low_lufs": -23.35,
+    "lra_high_lufs": -17.21,
+    "true_peak_dbtp": -3.31,
+    "sample_peak_dbfs": -3.32
+  },
+  "rms_dbfs": -22.49,
+  "buses": {
+    "bed_rms_dbfs": -24.82,
+    "marked_rms_dbfs": -26.27,
+    "marked_over_bed_db": -1.45
+  },
+  "density": {
+    "collision_density_hz": 5.2719,
+    "event_density_hz": 7.7691,
+    "median_collision_gap_seconds": 0.086481,
+    "minimum_collision_gap_seconds": 0.00034,
+    "simultaneous_within_cluster": 18
+  },
+  "polyphony": {
+    "scheduled_max": 9,
+    "scheduled_median": 2.0,
+    "scheduled_mean": 2.5919,
+    "audible": {
+      "max": 9,
+      "median": 2.0,
+      "mean": 2.6279,
+      "p95": 5.0
+    }
+  },
+  "voices": {
+    "total_voice_seconds": 45.907964,
+    "collision_median_seconds": 0.244288,
+    "collision_min_seconds": 0.166959,
+    "collision_max_seconds": 0.378164,
+    "overlap_ratio": 1.9223,
+    "distinct_balls": 11,
+    "generations": 3
+  },
+  "repetition": {
+    "longest_same_pitch_run": 2,
+    "runs_of_three_or_more": 0,
+    "repeat_nudged": 16,
+    "cluster_nudged": 7
+  },
+  "consonance": {
+    "simultaneous_pairs": 58,
+    "harsh_pairs": 0,
+    "harsh_fraction": 0.0
+  },
+  "duck": {
+    "escape_space_db": -22.48,
+    "bed_before_escape_dbfs": -22.63,
+    "bed_after_escape_dbfs": -45.11,
+    "max_duck_db": 9.0,
+    "median_duck_db": -0.0,
+    "seconds_below_minus_1db": 6.21,
+    "fraction_below_minus_1db": 0.26,
+    "duck_onsets": 17,
+    "duck_onsets_per_second": 0.712
+  },
+  "masking": {
+    "collisions": 114,
+    "median_onset_rise_db": 12.87,
+    "p10_onset_rise_db": 8.67,
+    "min_onset_rise_db": 6.61,
+    "below_3db": 0,
+    "below_3db_fraction": 0.0,
+    "below_6db": 0,
+    "below_6db_fraction": 0.0
+  },
+  "phone": {
+    "rms_dbfs": -27.72,
+    "relative_to_master_db": -5.23,
+    "band_energy_percent": {
+      "20-120": 0.003,
+      "120-300": 2.86,
+      "300-800": 39.809,
+      "800-2000": 53.124,
+      "2000-5000": 4.192,
+      "5000-10000": 0.012,
+      "10000-20000": 0.0
+    }
+  },
+  "mono": {
+    "stereo_rms_dbfs": -22.49,
+    "mono_rms_dbfs": -22.55,
+    "mono_loss_db": -0.06,
+    "correlation": 0.9738,
+    "mono_integrated_lufs": -18.89,
+    "band_shift": {
+      "20-120": 0.0,
+      "120-300": 0.0,
+      "300-800": 0.0,
+      "800-2000": 0.0,
+      "2000-5000": 0.0,
+      "5000-10000": 0.0,
+      "10000-20000": 0.0
+    }
+  },
+  "spectrum_percent": {
+    "20-120": 0.419,
+    "120-300": 22.4,
+    "300-800": 51.145,
+    "800-2000": 24.517,
+    "2000-5000": 1.512,
+    "5000-10000": 0.004,
+    "10000-20000": 0.0
+  },
+  "event_hierarchy": {
+    "break": {
+      "count": 14,
+      "shadowed": 0,
+      "median_peak_dbfs": -8.34,
+      "max_peak_dbfs": -7.89
+    },
+    "collision": {
+      "count": 80,
+      "shadowed": 0,
+      "median_peak_dbfs": -15.34,
+      "max_peak_dbfs": -12.82
+    },
+    "collision_strong": {
+      "count": 34,
+      "shadowed": 0,
+      "median_peak_dbfs": -13.23,
+      "max_peak_dbfs": -11.93
+    },
+    "crossing": {
+      "count": 24,
+      "shadowed": 0,
+      "median_peak_dbfs": -22.59,
+      "max_peak_dbfs": -22.59
+    },
+    "escape": {
+      "count": 1,
+      "shadowed": 0,
+      "median_peak_dbfs": -5.35,
+      "max_peak_dbfs": -5.35
+    },
+    "lift": {
+      "count": 5,
+      "shadowed": 0,
+      "median_peak_dbfs": -9.36,
+      "max_peak_dbfs": -8.93
+    },
+    "spawn": {
+      "count": 5,
+      "shadowed": 0,
+      "median_peak_dbfs": -11.16,
+      "max_peak_dbfs": -11.16
+    },
+    "spawn_with_lift": {
+      "count": 5,
+      "shadowed": 0,
+      "median_peak_dbfs": -14.26,
+      "max_peak_dbfs": -14.26
+    }
+  },
+  "event_hierarchy_in_mix": {
+    "break": {
+      "count": 14,
+      "shadowed": 0,
+      "median_peak_dbfs": -8.33,
+      "max_peak_dbfs": -6.45
+    },
+    "collision": {
+      "count": 23,
+      "shadowed": 57,
+      "median_peak_dbfs": -10.82,
+      "max_peak_dbfs": -6.98
+    },
+    "collision_strong": {
+      "count": 13,
+      "shadowed": 21,
+      "median_peak_dbfs": -12.42,
+      "max_peak_dbfs": -11.49
+    },
+    "crossing": {
+      "count": 4,
+      "shadowed": 20,
+      "median_peak_dbfs": -22.59,
+      "max_peak_dbfs": -22.59
+    },
+    "escape": {
+      "count": 1,
+      "shadowed": 0,
+      "median_peak_dbfs": -3.61,
+      "max_peak_dbfs": -3.61
+    },
+    "lift": {
+      "count": 5,
+      "shadowed": 0,
+      "median_peak_dbfs": -10.84,
+      "max_peak_dbfs": -9.71
+    }
+  },
+  "richness": {
+    "thirds": [
+      {
+        "third": "early",
+        "events": 20,
+        "events_per_second": 2.5124,
+        "collisions": 12,
+        "distinct_balls": 4,
+        "max_polyphony": 3,
+        "mean_polyphony": 1.4866,
+        "distinct_pitches": 8,
+        "distinct_pitch_classes": 5,
+        "mean_ladder_index": 3.35,
+        "marked_events": 6,
+        "centroid_hz": 350.86,
+        "tonal_percent": 88.685,
+        "crest_db": 31.89,
+        "above_2k_percent": 0.001,
+        "rms_dbfs": -25.97,
+        "short_term_lufs": -22.43,
+        "peak_dbfs": -7.48
+      },
+      {
+        "third": "middle",
+        "events": 71,
+        "events_per_second": 8.9188,
+        "collisions": 53,
+        "distinct_balls": 6,
+        "max_polyphony": 7,
+        "mean_polyphony": 2.5794,
+        "distinct_pitches": 14,
+        "distinct_pitch_classes": 5,
+        "mean_ladder_index": 7.1831,
+        "marked_events": 8,
+        "centroid_hz": 953.0,
+        "tonal_percent": 94.73,
+        "crest_db": 31.68,
+        "above_2k_percent": 4.012,
+        "rms_dbfs": -21.78,
+        "short_term_lufs": -18.7,
+        "peak_dbfs": -5.82
+      },
+      {
+        "third": "late",
+        "events": 77,
+        "events_per_second": 9.6725,
+        "collisions": 49,
+        "distinct_balls": 11,
+        "max_polyphony": 9,
+        "mean_polyphony": 3.0801,
+        "distinct_pitches": 14,
+        "distinct_pitch_classes": 5,
+        "mean_ladder_index": 6.5455,
+        "marked_events": 16,
+        "centroid_hz": 616.28,
+        "tonal_percent": 92.662,
+        "crest_db": 30.37,
+        "above_2k_percent": 0.495,
+        "rms_dbfs": -21.24,
+        "short_term_lufs": -17.67,
+        "peak_dbfs": -3.67
+      }
+    ],
+    "verdict": {
+      "late_polyphony_over_early": 1.5935,
+      "late_density_over_early": 7.1601,
+      "late_centroid_over_early_hz": 265.42,
+      "late_pitches_over_early": 6,
+      "late_balls_over_early": 7,
+      "late_lufs_over_early": 4.76,
+      "tonal_percent_early": 88.685,
+      "tonal_percent_late": 92.662,
+      "tonal_percent_change": 3.977,
+      "crest_db_late": 30.37,
+      "richer_late": true,
+      "not_noise": true,
+      "middle_peak_density": false
+    }
+  },
+  "synchronization": {
+    "events": 168,
+    "max_placement_error_seconds": 1.0343834649262362e-05,
+    "max_placement_error_samples": 0.4965040631645934,
+    "within_half_sample": true
+  },
+  "ending_silence_peak": 0.0,
+  "by_kind": {
+    "crossing": 24,
+    "collision": 114,
+    "spawn": 10,
+    "break": 14,
+    "lift": 5,
+    "escape": 1
+  },
+  "by_tier": {
+    "0": 24,
+    "1": 19,
+    "2": 22,
+    "3": 73,
+    "4": 10,
+    "5": 19,
+    "6": 1
+  },
+  "paths": {
+    "playback": "output\\category3_multiplying_shell_audio_v2b\\playback\\seed_547.playback.json",
+    "score": "docs\\validation\\category3_multiplying_shell_audio_v2b\\scores\\seed_547_open_quartal.score.json",
+    "measure": "docs\\validation\\category3_multiplying_shell_audio_v2b\\measurements\\seed_547_open_quartal.measure.json",
+    "wav": "output\\category3_multiplying_shell_audio_v2b\\wav\\seed_547_open_quartal.wav"
+  }
+}

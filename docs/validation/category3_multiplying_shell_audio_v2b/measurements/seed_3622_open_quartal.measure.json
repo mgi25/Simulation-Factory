@@ -1,0 +1,334 @@
+{
+  "render_version": "category3-test2-multiplying-shell-audio-render/1.0.0",
+  "seed": 3622,
+  "config_name": "open_quartal",
+  "tonal_system": "open_quartal",
+  "playback_digest": "4009b0a3d5bb71769d50020cd5b93588181faa4124868670b5e0774de4b61ba5",
+  "score_fingerprint": "222bdd8137eee5aa339100fda2ae1618ffa78c52c2d0605e05d75694b73704bd",
+  "config_fingerprint": "487d19ecf326621d",
+  "pcm_digest": "d27a1ee11dbcd6ddc9174b41da86243d8c572116b39c8993baef2ebcd9b1dd18",
+  "duration_seconds": 24.968292,
+  "sample_rate": 48000,
+  "channels": 2,
+  "peak": {
+    "sample_peak_dbfs": -2.5,
+    "true_peak_dbtp": -2.5,
+    "clipped_samples": 0,
+    "static_gain": 1.29794544,
+    "limiter_used": false
+  },
+  "loudness": {
+    "integrated_lufs": -19.98,
+    "lra_lu": 8.55,
+    "lra_low_lufs": -26.4,
+    "lra_high_lufs": -17.85,
+    "true_peak_dbtp": -2.5,
+    "sample_peak_dbfs": -2.5
+  },
+  "rms_dbfs": -23.42,
+  "buses": {
+    "bed_rms_dbfs": -26.29,
+    "marked_rms_dbfs": -26.88,
+    "marked_over_bed_db": -0.6
+  },
+  "density": {
+    "collision_density_hz": 5.2829,
+    "event_density_hz": 7.7042,
+    "median_collision_gap_seconds": 0.109599,
+    "minimum_collision_gap_seconds": 2.5e-05,
+    "simultaneous_within_cluster": 21
+  },
+  "polyphony": {
+    "scheduled_max": 9,
+    "scheduled_median": 2.0,
+    "scheduled_mean": 2.4478,
+    "audible": {
+      "max": 9,
+      "median": 2.0,
+      "mean": 2.4926,
+      "p95": 6.0
+    }
+  },
+  "voices": {
+    "total_voice_seconds": 46.07817,
+    "collision_median_seconds": 0.226828,
+    "collision_min_seconds": 0.145873,
+    "collision_max_seconds": 0.405913,
+    "overlap_ratio": 1.8455,
+    "distinct_balls": 11,
+    "generations": 4
+  },
+  "repetition": {
+    "longest_same_pitch_run": 3,
+    "runs_of_three_or_more": 2,
+    "repeat_nudged": 14,
+    "cluster_nudged": 4
+  },
+  "consonance": {
+    "simultaneous_pairs": 46,
+    "harsh_pairs": 0,
+    "harsh_fraction": 0.0
+  },
+  "duck": {
+    "escape_space_db": -22.67,
+    "bed_before_escape_dbfs": -24.59,
+    "bed_after_escape_dbfs": -47.26,
+    "max_duck_db": 9.0,
+    "median_duck_db": -0.0,
+    "seconds_below_minus_1db": 6.206,
+    "fraction_below_minus_1db": 0.2486,
+    "duck_onsets": 13,
+    "duck_onsets_per_second": 0.521
+  },
+  "masking": {
+    "collisions": 120,
+    "median_onset_rise_db": 11.99,
+    "p10_onset_rise_db": 8.81,
+    "min_onset_rise_db": 6.23,
+    "below_3db": 0,
+    "below_3db_fraction": 0.0,
+    "below_6db": 0,
+    "below_6db_fraction": 0.0
+  },
+  "phone": {
+    "rms_dbfs": -30.08,
+    "relative_to_master_db": -6.66,
+    "band_energy_percent": {
+      "20-120": 0.003,
+      "120-300": 4.693,
+      "300-800": 52.042,
+      "800-2000": 41.945,
+      "2000-5000": 1.316,
+      "5000-10000": 0.0,
+      "10000-20000": 0.0
+    }
+  },
+  "mono": {
+    "stereo_rms_dbfs": -23.42,
+    "mono_rms_dbfs": -23.55,
+    "mono_loss_db": -0.13,
+    "correlation": 0.9518,
+    "mono_integrated_lufs": -20.11,
+    "band_shift": {
+      "20-120": 0.0,
+      "120-300": 0.0,
+      "300-800": 0.0,
+      "800-2000": 0.0,
+      "2000-5000": 0.0,
+      "5000-10000": 0.0,
+      "10000-20000": 0.0
+    }
+  },
+  "spectrum_percent": {
+    "20-120": 0.35,
+    "120-300": 27.356,
+    "300-800": 55.792,
+    "800-2000": 16.135,
+    "2000-5000": 0.363,
+    "5000-10000": 0.0,
+    "10000-20000": 0.0
+  },
+  "event_hierarchy": {
+    "break": {
+      "count": 13,
+      "shadowed": 0,
+      "median_peak_dbfs": -8.68,
+      "max_peak_dbfs": -8.02
+    },
+    "collision": {
+      "count": 90,
+      "shadowed": 0,
+      "median_peak_dbfs": -16.34,
+      "max_peak_dbfs": -13.32
+    },
+    "collision_strong": {
+      "count": 30,
+      "shadowed": 0,
+      "median_peak_dbfs": -14.06,
+      "max_peak_dbfs": -12.13
+    },
+    "crossing": {
+      "count": 26,
+      "shadowed": 0,
+      "median_peak_dbfs": -22.93,
+      "max_peak_dbfs": -22.93
+    },
+    "escape": {
+      "count": 1,
+      "shadowed": 0,
+      "median_peak_dbfs": -5.69,
+      "max_peak_dbfs": -5.69
+    },
+    "lift": {
+      "count": 5,
+      "shadowed": 0,
+      "median_peak_dbfs": -9.7,
+      "max_peak_dbfs": -9.27
+    },
+    "spawn": {
+      "count": 5,
+      "shadowed": 0,
+      "median_peak_dbfs": -11.5,
+      "max_peak_dbfs": -11.5
+    },
+    "spawn_with_lift": {
+      "count": 5,
+      "shadowed": 0,
+      "median_peak_dbfs": -14.6,
+      "max_peak_dbfs": -14.6
+    }
+  },
+  "event_hierarchy_in_mix": {
+    "break": {
+      "count": 13,
+      "shadowed": 0,
+      "median_peak_dbfs": -8.46,
+      "max_peak_dbfs": -5.56
+    },
+    "collision": {
+      "count": 32,
+      "shadowed": 58,
+      "median_peak_dbfs": -13.91,
+      "max_peak_dbfs": -9.13
+    },
+    "collision_strong": {
+      "count": 12,
+      "shadowed": 18,
+      "median_peak_dbfs": -12.25,
+      "max_peak_dbfs": -9.57
+    },
+    "crossing": {
+      "count": 2,
+      "shadowed": 24,
+      "median_peak_dbfs": -23.08,
+      "max_peak_dbfs": -22.93
+    },
+    "escape": {
+      "count": 1,
+      "shadowed": 0,
+      "median_peak_dbfs": -2.62,
+      "max_peak_dbfs": -2.62
+    },
+    "lift": {
+      "count": 5,
+      "shadowed": 0,
+      "median_peak_dbfs": -10.23,
+      "max_peak_dbfs": -8.7
+    },
+    "spawn": {
+      "count": 3,
+      "shadowed": 2,
+      "median_peak_dbfs": -13.46,
+      "max_peak_dbfs": -12.71
+    }
+  },
+  "richness": {
+    "thirds": [
+      {
+        "third": "early",
+        "events": 23,
+        "events_per_second": 2.7635,
+        "collisions": 16,
+        "distinct_balls": 2,
+        "max_polyphony": 3,
+        "mean_polyphony": 1.3639,
+        "distinct_pitches": 7,
+        "distinct_pitch_classes": 5,
+        "mean_ladder_index": 2.2174,
+        "marked_events": 2,
+        "centroid_hz": 386.39,
+        "tonal_percent": 89.683,
+        "crest_db": 32.13,
+        "above_2k_percent": 0.001,
+        "rms_dbfs": -27.02,
+        "short_term_lufs": -23.29,
+        "peak_dbfs": -9.8
+      },
+      {
+        "third": "middle",
+        "events": 59,
+        "events_per_second": 7.089,
+        "collisions": 36,
+        "distinct_balls": 8,
+        "max_polyphony": 7,
+        "mean_polyphony": 2.3253,
+        "distinct_pitches": 11,
+        "distinct_pitch_classes": 5,
+        "mean_ladder_index": 4.322,
+        "marked_events": 13,
+        "centroid_hz": 449.17,
+        "tonal_percent": 90.97,
+        "crest_db": 31.63,
+        "above_2k_percent": 0.087,
+        "rms_dbfs": -22.89,
+        "short_term_lufs": -20.12,
+        "peak_dbfs": -5.32
+      },
+      {
+        "third": "late",
+        "events": 93,
+        "events_per_second": 11.1742,
+        "collisions": 68,
+        "distinct_balls": 11,
+        "max_polyphony": 9,
+        "mean_polyphony": 3.0801,
+        "distinct_pitches": 13,
+        "distinct_pitch_classes": 5,
+        "mean_ladder_index": 6.2473,
+        "marked_events": 14,
+        "centroid_hz": 656.92,
+        "tonal_percent": 93.104,
+        "crest_db": 29.32,
+        "above_2k_percent": 0.689,
+        "rms_dbfs": -22.12,
+        "short_term_lufs": -18.71,
+        "peak_dbfs": -2.66
+      }
+    ],
+    "verdict": {
+      "late_polyphony_over_early": 1.7162,
+      "late_density_over_early": 8.4107,
+      "late_centroid_over_early_hz": 270.53,
+      "late_pitches_over_early": 6,
+      "late_balls_over_early": 9,
+      "late_lufs_over_early": 4.58,
+      "tonal_percent_early": 89.683,
+      "tonal_percent_late": 93.104,
+      "tonal_percent_change": 3.421,
+      "crest_db_late": 29.32,
+      "richer_late": true,
+      "not_noise": true,
+      "middle_peak_density": false
+    }
+  },
+  "synchronization": {
+    "events": 175,
+    "max_placement_error_seconds": 1.0335585745480103e-05,
+    "max_placement_error_samples": 0.4961081157830449,
+    "within_half_sample": true
+  },
+  "ending_silence_peak": 0.0,
+  "by_kind": {
+    "crossing": 26,
+    "collision": 120,
+    "spawn": 10,
+    "break": 13,
+    "lift": 5,
+    "escape": 1
+  },
+  "by_tier": {
+    "0": 26,
+    "1": 35,
+    "2": 14,
+    "3": 71,
+    "4": 10,
+    "5": 18,
+    "6": 1
+  },
+  "paths": {
+    "playback": "output\\category3_multiplying_shell_audio_v2b\\playback\\seed_3622.playback.json",
+    "score": "docs\\validation\\category3_multiplying_shell_audio_v2b\\scores\\seed_3622_open_quartal.score.json",
+    "measure": "docs\\validation\\category3_multiplying_shell_audio_v2b\\measurements\\seed_3622_open_quartal.measure.json",
+    "wav": "output\\category3_multiplying_shell_audio_v2b\\wav\\seed_3622_open_quartal.wav"
+  }
+}
