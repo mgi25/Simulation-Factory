@@ -1,0 +1,17 @@
+{
+  "format": 1,
+  "rows": [
+    {
+      "seed": 15793,
+      "fps": 60.0,
+      "frames": 1233,
+      "digest_matches": true,
+      "max_position_error": 4.2882372589941853e-13,
+      "max_position_error_t": 19.2166666666667,
+      "panel_rows": 155358,
+      "panel_mismatches": 0,
+      "population_mismatch_frames": 0,
+      "max_centre_error_px": 6.103515625e-05
+    }
+  ]
+}

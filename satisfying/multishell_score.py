@@ -97,10 +97,10 @@ __all__ = [
 SCORE_VERSION = "category3-test2-multiplying-shell-audio-score/1.0.0"
 #: The only event stream this layer will read. Phase 1 froze it.
 SCHEMA_VERSION = "category3-test2-multiplying-shell/2.0.0"
-#: The locked Phase 1 arena. A document made with any other configuration is
+#: The locked Phase 3B arena. A document made with any other configuration is
 #: refused rather than scored, because every register and threshold below was
 #: chosen against this geometry.
-CONFIG_DIGEST = "dcf3c2bf05879e087246bd3ae22bacbb273d64411405356fd5f329bf8c1ea0bd"
+CONFIG_DIGEST = "1803a066cc67ed08088294e64dd42b7264e2bcc210f055ab225d9983e2725d38"
 
 SAMPLE_RATE = 48_000
 

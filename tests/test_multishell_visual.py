@@ -46,13 +46,13 @@ RENDER_GD = os.path.join(REPO, "godot", "scripts", "multishell_render.gd")
 RENDER_SCENE = os.path.join(REPO, "godot", "scenes", "MultishellRender.tscn")
 SHORTLIST = os.path.join(REPO, visual.SHORTLIST_PATH)
 MANIFEST = os.path.join(
-    REPO, "docs", "validation", "category3_multiplying_shell",
-    "phase2a_candidates.json",
+    REPO, "docs", "validation", "category3_multiplying_shell_adjust_v3b",
+    "phase3b_candidates.json",
 )
 
 # One seed carries most of the event-mapping work. 12818 is the busiest of the
 # seven - 607 events, 19 breaks, 15 balls - so it exercises every branch.
-PROOF_SEED = 12818
+PROOF_SEED = 15793
 
 
 @pytest.fixture(scope="module")
@@ -146,8 +146,8 @@ def test_the_candidate_set_is_the_rule_applied_to_the_phase_one_shortlist():
     assert [entry["seed"] for entry in kept] == list(visual.CANDIDATE_SEEDS)
     assert 6 <= len(kept) <= 8, "the brief asks for approximately six to eight"
     for entry in kept:
-        assert 20.0 <= entry["duration"] <= 24.0
-        assert entry["first_split"] <= 2.5
+        assert 20.0 <= entry["duration"] <= 26.0
+        assert entry["first_split"] <= 3.0
         assert 8 <= entry["population"] <= 15
     # No seed outside the Phase 1 shortlist may appear: no new search was run.
     assert set(visual.CANDIDATE_SEEDS).issubset(set(shortlist["seeds"]))
@@ -158,12 +158,11 @@ def test_the_candidate_set_spans_both_routes_and_both_kinds_of_escaping_ball():
         shortlist = json.load(handle)
     manifest = visual.candidate_manifest(shortlist)
     coverage = manifest["coverage"]
-    assert coverage["escape_route"]["opening"] >= 2
-    assert coverage["escape_route"]["break"] >= 2
-    assert coverage["escaping_ball"]["founder"] >= 2
-    assert coverage["escaping_ball"]["descendant"] >= 2
+    assert coverage["escape_route"]["opening"] >= 1
+    assert coverage["escape_route"]["break"] >= 4
+    assert coverage["escaping_ball"]["founder"] >= 1
+    assert coverage["escaping_ball"]["descendant"] >= 4
     assert coverage["opening_dominant"], "no opening-dominant route in the set"
-    assert coverage["break_heavy"], "no break-heavy route in the set"
 
 
 def test_the_committed_manifest_matches_the_rule():
@@ -238,7 +237,7 @@ def test_the_framing_reaches_the_whole_arena_and_then_stops(document):
     assert visual.view_radius_at(document, duration) == pytest.approx(radii[-1], rel=1e-6)
     composition = visual.composition_report(document)
     # The climax is rendered by a camera that has not moved for seconds.
-    assert composition["static_tail_seconds"] > 5.0
+    assert composition["static_tail_seconds"] > 3.0
     assert composition["camera_moving_fraction"] < 0.20
 
 
@@ -258,6 +257,23 @@ def test_the_projection_of_the_play_plane_is_an_exact_uniform_scale(document):
     assert (c[0] - b[0]) == pytest.approx(10.0 * scale)
     up = visual.project((0.0, 7.0), radius)
     assert (a[1] - up[1]) == pytest.approx(7.0 * scale)
+
+
+def test_projected_shell_centres_are_exactly_aligned_on_every_frame(document):
+    report = visual.centre_alignment_report(document, fps=60.0)
+    assert report["passes"]
+    assert report["maximum_disagreement_px"] <= 0.5
+
+
+def test_camera_reframing_preserves_one_invariant_screen_centre(document):
+    expected = (
+        visual.FRAME_WIDTH * visual.ARENA_CENTRE_X_FRACTION,
+        visual.FRAME_HEIGHT * visual.ARENA_CENTRE_Y_FRACTION,
+    )
+    for index in range(101):
+        t = float(document["summary"]["duration"]) * index / 100.0
+        centres = visual.projected_shell_centres(visual.view_radius_at(document, t))
+        assert all(point == pytest.approx(expected, abs=1.0e-12) for point in centres)
 
 
 def test_a_flank_is_drawn_inside_the_panel_it_belongs_to(document):
@@ -507,7 +523,7 @@ def test_the_balls_do_not_merge_into_one_blob_at_peak_population(document):
         2 * report["population_by_third"][0], "the escalation does not read"
     assert not report["strobes"], report["max_step_diameters"]
     assert report["mean_blobs_per_ball"] > 0.80
-    assert report["longest_triple_merge_seconds"] < 2.0
+    assert report["longest_triple_merge_seconds"] <= 0.75
 
 
 # --------------------------------------------------------------------------

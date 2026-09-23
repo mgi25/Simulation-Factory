@@ -75,8 +75,8 @@ REVIEW_CRF = 16
 REVIEW_PRESET = "slow"
 SHORTLIST = os.path.join(REPO, visual.SHORTLIST_PATH)
 MANIFEST = os.path.join(
-    REPO, "docs", "validation", "category3_multiplying_shell",
-    "phase2a_candidates.json",
+    REPO, "docs", "validation", "category3_multiplying_shell_adjust_v3b",
+    "phase3b_candidates.json",
 )
 
 
@@ -403,17 +403,20 @@ def cmd_audit(args: argparse.Namespace) -> int:
         json.dump({"format": 1, "rows": rows}, handle, indent=2)
         handle.write("\n")
     print(f"{'seed':>7}{'fps':>6}{'frames':>8}{'max ball err':>14}"
-          f"{'panel rows':>12}{'panel bad':>11}{'digest':>9}")
+          f"{'centre px':>12}{'panel rows':>12}{'panel bad':>11}{'digest':>9}")
     for row in rows:
         print(f"{row['seed']:>7}{row['fps']:>6.0f}{row['frames']:>8}"
-              f"{row['max_position_error']:>14.3e}{row['panel_rows']:>12}"
+              f"{row['max_position_error']:>14.3e}"
+              f"{row['max_centre_error_px']:>12.3e}{row['panel_rows']:>12}"
               f"{row['panel_mismatches']:>11}"
               f"{'ok' if row['digest_matches'] else 'BAD':>9}")
     worst = max(row["max_position_error"] for row in rows)
     bad = sum(row["panel_mismatches"] for row in rows)
+    centre_worst = max(row["max_centre_error_px"] for row in rows)
     print(f"  worst ball position error {worst:.3e} world units, "
+          f"centre disagreement {centre_worst:.3e} px, "
           f"{bad} panel-state mismatches -> {path}")
-    return 0 if (worst < 1e-9 and bad == 0) else 1
+    return 0 if (worst < 1e-9 and centre_worst <= 1.0 and bad == 0) else 1
 
 
 def _check_audit(document: dict[str, Any], audit: dict[str, Any]) -> dict[str, Any]:
@@ -422,6 +425,7 @@ def _check_audit(document: dict[str, Any], audit: dict[str, Any]) -> dict[str, A
     panel_rows = 0
     mismatches = 0
     population_bad = 0
+    max_centre_error = 0.0
     for row in audit["rows"]:
         t = float(row["t"])
         for ball in row["balls"]:
@@ -436,6 +440,9 @@ def _check_audit(document: dict[str, Any], audit: dict[str, Any]) -> dict[str, A
                 worst_t = t
         if len(row["balls"]) != _population_at(document, t):
             population_bad += 1
+        max_centre_error = max(
+            max_centre_error, float(row.get("centre_max_error_px", math.inf))
+        )
         for entry in row["panels"]:
             panel_rows += 1
             expected_state = panel_state_at(
@@ -452,6 +459,7 @@ def _check_audit(document: dict[str, Any], audit: dict[str, Any]) -> dict[str, A
         "panel_rows": panel_rows,
         "panel_mismatches": mismatches,
         "population_mismatch_frames": population_bad,
+        "max_centre_error_px": max_centre_error,
     }
 
 

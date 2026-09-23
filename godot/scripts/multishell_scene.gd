@@ -40,7 +40,7 @@ extends Node3D
 
 const EXPECTED_SCHEMA := "category3-test2-multiplying-shell/2.0.0"
 const EXPECTED_CONFIG_DIGEST := \
-	"dcf3c2bf05879e087246bd3ae22bacbb273d64411405356fd5f329bf8c1ea0bd"
+	"1803a066cc67ed08088294e64dd42b7264e2bcc210f055ab225d9983e2725d38"
 const EXPECTED_SHELL_COUNT := 5
 
 # ---------------------------------------------------------------- composition
@@ -51,6 +51,12 @@ const ARENA_CENTRE_X_FRACTION := 0.420
 const ARENA_CENTRE_Y_FRACTION := 0.440
 const VIEW_RADIUS_PAD := 0.85
 const CAMERA_HFOV_DEGREES := 47.0
+const CAMERA_NEAR := 0.20
+const CAMERA_FRUSTUM_SIZE := 2.0 * CAMERA_NEAR * tan(
+	deg_to_rad(CAMERA_HFOV_DEGREES) * 0.5) * FRAME_HEIGHT / FRAME_WIDTH
+const CAMERA_FRUSTUM_OFFSET := Vector2(
+	(0.5 - ARENA_CENTRE_X_FRACTION) * CAMERA_FRUSTUM_SIZE * FRAME_WIDTH / FRAME_HEIGHT,
+	(ARENA_CENTRE_Y_FRACTION - 0.5) * CAMERA_FRUSTUM_SIZE)
 const FRAME_LEAD_SECONDS := 0.12
 const FRAME_EASE_SECONDS := 0.55
 
@@ -268,6 +274,14 @@ var _glow_pool: MeshInstance3D
 var _radial_texture: GradientTexture2D
 var _halo_texture: GradientTexture2D
 var _configured := false
+var _debug_crosshair: Array = []
+var _debug_markers: Array = []
+var _debug_outlines: Array = []
+const DEBUG_COLOURS := [
+	Color(1.00, 0.30, 0.30, 0.95), Color(1.00, 0.82, 0.20, 0.95),
+	Color(0.30, 1.00, 0.50, 0.95), Color(0.25, 0.75, 1.00, 0.95),
+	Color(0.85, 0.35, 1.00, 0.95),
+]
 
 
 # --------------------------------------------------------------------------
@@ -385,14 +399,14 @@ func _camera_distance(view: float) -> float:
 func _apply_camera(t: float) -> void:
 	_view_radius = _view_radius_at(t)
 	_pixels_per_unit = float(_width) * VIEW_DIAMETER_FRACTION / (2.0 * _view_radius)
-	# Where the arena centre has to sit, in world units, for it to land on the
-	# composition point. Both offsets grow with the framing, which is exactly
-	# what keeps the centre at the same fraction of the frame at every stage.
-	var offset_x := (0.5 - ARENA_CENTRE_X_FRACTION) * float(_width) / _pixels_per_unit
-	var offset_y := (ARENA_CENTRE_Y_FRACTION - 0.5) * float(_height) / _pixels_per_unit
 	var distance := _camera_distance(_view_radius)
-	_camera.fov = CAMERA_HFOV_DEGREES
-	_camera.position = Vector3(offset_x, offset_y, distance)
+	# The eye stays on the one invariant world centre.  An asymmetric frustum
+	# places that optical axis at the Shorts-safe composition point; unlike a
+	# lateral camera translation it gives the same principal point at every Z,
+	# so slabs with different depths remain concentric.
+	_camera.set_frustum(
+		CAMERA_FRUSTUM_SIZE, CAMERA_FRUSTUM_OFFSET, CAMERA_NEAR, 400.0)
+	_camera.position = Vector3(0.0, 0.0, distance)
 	_camera.rotation = Vector3.ZERO
 
 	# Fill the frame at the backdrop plane, whatever the framing. The quad sits
@@ -411,6 +425,7 @@ func _apply_camera(t: float) -> void:
 			Basis(Vector3(pool, 0.0, 0.0), Vector3(0.0, pool, 0.0),
 				Vector3(0.0, 0.0, 1.0)),
 			Vector3(0.0, 0.0, GLOW_POOL_Z))
+	_update_debug_overlay()
 
 
 # --------------------------------------------------------------------------
@@ -430,6 +445,59 @@ func _build() -> void:
 	_build_balls()
 	_read_events()
 	_build_effects()
+	if show_debug:
+		_build_debug_overlay()
+		_update_debug_overlay()
+
+
+func _circle_points(centre: Vector2, radius: float, segments: int = 96) -> PackedVector2Array:
+	var points := PackedVector2Array()
+	for index in segments + 1:
+		var angle := TAU * float(index) / float(segments)
+		points.append(centre + radius * Vector2(cos(angle), sin(angle)))
+	return points
+
+
+func _debug_line(parent: Node, colour: Color, width: float) -> Line2D:
+	var line := Line2D.new()
+	line.default_color = colour
+	line.width = width
+	line.antialiased = true
+	parent.add_child(line)
+	return line
+
+
+func _build_debug_overlay() -> void:
+	## Measurement media only: five slab-midpoint markers, the canonical centre
+	## crosshair, and the five collision-shell outlines in screen space.
+	var layer := CanvasLayer.new()
+	layer.name = "CentreAlignmentDiagnostic"
+	layer.layer = 50
+	add_child(layer)
+	_debug_crosshair.append(_debug_line(layer, Color(1.0, 1.0, 1.0, 0.95), 2.0))
+	_debug_crosshair.append(_debug_line(layer, Color(1.0, 1.0, 1.0, 0.95), 2.0))
+	for shell_id in EXPECTED_SHELL_COUNT:
+		_debug_markers.append(_debug_line(layer, DEBUG_COLOURS[shell_id], 2.0))
+		var colour: Color = DEBUG_COLOURS[shell_id]
+		_debug_outlines.append(_debug_line(
+			layer, Color(colour.r, colour.g, colour.b, 0.30), 1.0))
+
+
+func _update_debug_overlay() -> void:
+	if _debug_crosshair.is_empty() or _camera == null:
+		return
+	var canonical := _camera.unproject_position(Vector3.ZERO)
+	_debug_crosshair[0].points = PackedVector2Array([
+		canonical + Vector2(-22.0, 0.0), canonical + Vector2(22.0, 0.0)])
+	_debug_crosshair[1].points = PackedVector2Array([
+		canonical + Vector2(0.0, -22.0), canonical + Vector2(0.0, 22.0)])
+	for shell_id in EXPECTED_SHELL_COUNT:
+		var centre := _camera.unproject_position(Vector3(
+			0.0, 0.0, -0.5 * float(PANEL_DEPTH[shell_id])))
+		_debug_markers[shell_id].points = _circle_points(
+			centre, 4.0 + 3.0 * shell_id, 32)
+		var radius := float(playback["shells"][shell_id]["radius"]) * _pixels_per_unit
+		_debug_outlines[shell_id].points = _circle_points(canonical, radius)
 
 
 func _build_environment() -> void:
@@ -470,12 +538,12 @@ func _build_environment() -> void:
 
 func _build_camera() -> void:
 	_camera = Camera3D.new()
-	_camera.projection = Camera3D.PROJECTION_PERSPECTIVE
+	_camera.projection = Camera3D.PROJECTION_FRUSTUM
 	# KEEP_WIDTH makes `fov` the horizontal angle, which is what ties it to
 	# VIEW_DIAMETER_FRACTION. Under KEEP_HEIGHT the framing would depend on the
 	# aspect ratio and every pixel number in the report would be wrong.
 	_camera.keep_aspect = Camera3D.KEEP_WIDTH
-	_camera.near = 0.20
+	_camera.near = CAMERA_NEAR
 	_camera.far = 400.0
 	add_child(_camera)
 	_apply_camera(0.0)
@@ -1720,6 +1788,15 @@ func audit_state() -> Dictionary:
 			"panel_id": int(_panel_slot[index]),
 			"state": DAMAGE_STATES_ORDER[_panel_state_at(index, _time)],
 		})
+	var projected_centres := []
+	var centre_max_error := 0.0
+	for depth in PANEL_DEPTH:
+		var pixel := _camera.unproject_position(Vector3(0.0, 0.0, -0.5 * float(depth)))
+		projected_centres.append([float(pixel.x), float(pixel.y)])
+	for a in projected_centres:
+		for b in projected_centres:
+			centre_max_error = maxf(centre_max_error, Vector2(
+				float(a[0]) - float(b[0]), float(a[1]) - float(b[1])).length())
 	return {
 		"t": float(_time),
 		"render_t": float(_render_time),
@@ -1728,4 +1805,6 @@ func audit_state() -> Dictionary:
 		"population": population_at(_time),
 		"balls": balls,
 		"panels": states,
+		"projected_shell_centres": projected_centres,
+		"centre_max_error_px": centre_max_error,
 	}

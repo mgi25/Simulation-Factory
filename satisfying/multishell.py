@@ -60,21 +60,21 @@ Five shells, and the outer ones are harder in ways a viewer can see:
 
 | shell | radius | panels | openings x slots | open fraction | break threshold |
 |-------|--------|--------|------------------|---------------|-----------------|
-| 0     |  6.0   | 12     | 3 x 2            | 0.500         | 1.6             |
-| 1     | 10.6   | 16     | 3 x 2            | 0.375         | 2.4             |
-| 2     | 15.2   | 20     | 2 x 2            | 0.200         | 3.6             |
-| 3     | 19.8   | 26     | 2 x 2            | 0.154         | 5.2             |
-| 4     | 24.4   | 32     | 2 x 1            | 0.062         | 7.2             |
+| 0     |  6.0   | 12     | 3 x 2            | 0.500         | 1.8             |
+| 1     | 10.6   | 24     | 3 x 2            | 0.250         | 2.8             |
+| 2     | 15.2   | 28     | 2 x 2            | 0.143         | 4.4             |
+| 3     | 19.8   | 38     | 2 x 2            | 0.105         | 6.6             |
+| 4     | 24.4   | 46     | 2 x 1            | 0.043         | 9.0             |
 
 Two dimensions, both physical and both legible: **the holes get smaller** and
 **the panels get stronger**. Nothing is hidden in a probability. `difficulty_profile`
 reports the whole table including the measured open fraction and the gap-to-ball
 ratio, and asserts for itself whether the profile is monotonic.
 
-Rotation is *not* used as a difficulty dial. `omega_falloff = 1` keeps every
-shell's surface moving at the same linear speed, which is what stops the outer
-shells reading as a blur, and spinning an outer shell faster purely to make it
-fail would be difficulty the viewer cannot see.
+Rotation adds a restrained, readable timing ramp. `omega_falloff = 0.82` makes
+surface speed rise only from 3.72 to 4.79 units/s while directions alternate.
+The openings remain trackable; the much larger difficulty change still comes
+from visible segmentation and toughness rather than blur.
 
 ## Damage, redesigned
 
@@ -92,8 +92,8 @@ At `exponent = 2` that is the kinetic energy carried in the contact normal,
 scaled so a head-on hit at the reference speed is exactly `1.0` damage. A
 grazing hit is not "a little damage", it is *no* damage, which is both what
 stone does and what a viewer expects. The shell's own `break_thresholds[k]` then
-says how many reference hits that shell is worth: 1.6 for the innermost (two
-solid hits and it goes) up to 7.2 for the outermost (seven).
+says how many reference hits that shell is worth: 1.8 for the innermost (two
+solid hits and it goes) up to 9.0 for the outermost (nine).
 
 Damage runs through five named states - `healthy`, `damaged`, `critical`,
 `fractured`, `broken` - at deterministic fractions of the shell's threshold, and
@@ -207,6 +207,7 @@ __all__ = [
     "simulate",
     "validate_events",
     "damage_state_of",
+    "impact_damage",
 ]
 
 TAU = 2.0 * math.pi
@@ -234,7 +235,7 @@ class MultishellConfig:
     shell_count: int = 5
     inner_radius: float = 6.0
     shell_spacing: float = 4.6
-    panel_counts: tuple[int, ...] = (12, 16, 20, 26, 32)
+    panel_counts: tuple[int, ...] = (12, 24, 28, 38, 46)
     openings_per_shell: tuple[int, ...] = (3, 3, 2, 2, 2)
     opening_slots: tuple[int, ...] = (2, 2, 2, 2, 1)
     panel_thickness: float = 0.30
@@ -242,10 +243,10 @@ class MultishellConfig:
     # --- rotation --------------------------------------------------------
     # Shell k turns at `omega_base * (inner_radius / R_k) ** omega_falloff`,
     # with the sign alternating by index and a bounded seeded jitter. Falloff 1
-    # gives every shell the same surface speed. Rotation is deliberately not a
-    # difficulty dial - see the module docstring.
+    # A falloff just below one adds a modest outward surface-speed ramp while
+    # keeping every opening readable; see the module docstring.
     omega_base: float = 0.62
-    omega_falloff: float = 1.0
+    omega_falloff: float = 0.82
     omega_jitter: float = 0.22
     alternate_direction: bool = True
 
@@ -275,9 +276,9 @@ class MultishellConfig:
     damage_exponent: float = 2.0
     # Below this fraction of the reference speed a contact chips nothing.
     damage_floor_fraction: float = 0.08
-    break_thresholds: tuple[float, ...] = (1.6, 2.4, 3.6, 5.2, 7.2)
+    break_thresholds: tuple[float, ...] = (1.8, 2.8, 4.4, 6.6, 9.0)
     # Fractions of a shell's own threshold at which the named states begin.
-    damage_state_fractions: tuple[float, ...] = (0.25, 0.55, 0.80)
+    damage_state_fractions: tuple[float, ...] = (0.24, 0.52, 0.78)
     breakable: bool = True
 
     # --- horizon ---------------------------------------------------------
@@ -448,6 +449,26 @@ def damage_state_of(cumulative: float, threshold: float, fractions: Sequence[flo
         if ratio >= f:
             state = i + 1
     return state
+
+
+def impact_damage(impact_speed: float, config: MultishellConfig = DEFAULT_CONFIG) -> float:
+    """Damage from the contact-normal kinetic-energy proxy.
+
+    ``impact_speed`` is already the velocity relative to the rotating panel,
+    projected onto the contact normal.  Tangential speed therefore contributes
+    nothing: a weak glancing contact remains weak even when the ball is moving
+    quickly across the face.  Squaring the normal-speed fraction is the
+    equal-mass kinetic-energy relationship, after the explicit chip floor.
+    """
+    reference = config.damage_reference_speed
+    if reference <= 0.0:
+        return 0.0
+    fraction = abs(impact_speed) / reference
+    floor = config.damage_floor_fraction
+    if fraction <= floor:
+        return 0.0
+    span = 1.0 - floor
+    return ((fraction - floor) / span) ** config.damage_exponent
 
 
 # --------------------------------------------------------------------------
@@ -1238,10 +1259,6 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
     escape_radius = outer.radius + outer.rho
     horizon = config.horizon
     graze_cut = config.graze_fraction * config.speed
-    floor = config.damage_floor_fraction
-    span = 1.0 - floor
-    exponent = config.damage_exponent
-    ref = config.damage_reference_speed
     rest = config.restitution
     transfer = config.panel_momentum_transfer
     fractions = config.damage_state_fractions
@@ -1455,8 +1472,7 @@ def simulate(seed: int, config: MultishellConfig = DEFAULT_CONFIG) -> Multishell
             broke = False
             if config.breakable and st.live[slot]:
                 threshold = config.break_thresholds[k]
-                f = abs(impact) / ref if ref else 0.0
-                added = ((f - floor) / span) ** exponent if f > floor else 0.0
+                added = impact_damage(impact, config)
                 if added > 0.0:
                     st.damage[slot] += added
                     contributors[k][slot].add(b.ball_id)

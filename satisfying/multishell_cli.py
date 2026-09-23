@@ -82,6 +82,8 @@ COMPACT_PATHS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("transitions", ("damage", "transitions")),
     ("breaks", ("damage", "breaks")),
     ("shared_breaks", ("damage", "shared_breaks")),
+    ("cooperative_outer_breaks", ("damage", "cooperative_outer_breaks")),
+    ("max_break_contributors", ("damage", "max_break_contributors")),
     ("mean_break_cumulative", ("damage", "mean_break_cumulative")),
     ("progression_opening", ("routes", "progression_opening")),
     ("progression_break", ("routes", "progression_break")),

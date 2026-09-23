@@ -42,8 +42,10 @@ from satisfying.multishell_playback import (
     write_playback,
 )
 
-OUTPUT_ROOT = os.path.join("output", "category3_multishell_av_v3")
-VALIDATION_ROOT = os.path.join("docs", "validation", "category3_multiplying_shell_av_v3")
+OUTPUT_ROOT = os.path.join("output", "category3_multishell_adjust_v3b")
+VALIDATION_ROOT = os.path.join(
+    "docs", "validation", "category3_multiplying_shell_adjust_v3b"
+)
 
 
 class CLIError(RuntimeError):

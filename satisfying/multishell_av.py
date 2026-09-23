@@ -41,8 +41,8 @@ BASE_SHA = "78739b266d9c8872c350bf239ae3c60e02c7fe65"
 VISUAL_SHA = "585d85ef7abbc363f058670dd7d56effed30aee1"
 AUDIO_SHA = "14522d9e02d1dd4630d6bbb398e818494d914d44"
 
-#: The seven seeds both independent branches converged on, in Phase 2A order.
-CANDIDATE_SEEDS: tuple[int, ...] = (949, 12004, 547, 11319, 3622, 12818, 7183)
+#: Phase 3B human-review set selected from the new 20,000-seed population.
+CANDIDATE_SEEDS: tuple[int, ...] = (15793, 8292, 17251, 16733, 12197, 14705)
 
 #: A candidate whose first split lands later than this cannot be produced.
 FIRST_SPLIT_LIMIT_SECONDS = 3.0
@@ -1058,6 +1058,11 @@ def candidate_row(document: Mapping[str, Any], fps: float = 30.0,
     density = density_report(document, config)
     lineage = lineage_audit(document, config)
     summary = document["summary"]
+    escape = next(
+        (event for event in reversed(document["events"]) if event["kind"] == "escape"),
+        {},
+    )
+    escape_generation = escape.get("generation")
 
     reasons: list[str] = []
     if not spawn["first_spawn_within_limit"]:
@@ -1087,9 +1092,12 @@ def candidate_row(document: Mapping[str, Any], fps: float = 30.0,
     return {
         "seed": int(document["seed"]),
         "duration_seconds": float(summary["duration"]),
-        "escape_route": str(summary.get("escape_route", "")),
-        "escape_generation": summary.get("escape_generation"),
-        "escape_by": summary.get("escape_by"),
+        "escape_route": str(escape.get("route", "")),
+        "escape_generation": escape_generation,
+        "escape_by": (
+            None if escape_generation is None
+            else "founder" if int(escape_generation) == 0 else "descendant"
+        ),
         # frame-one appeal and the hook
         "first_collision_seconds": retention["first_collision_seconds"],
         "first_split_seconds": spawn["first_spawn_seconds"],
@@ -1150,64 +1158,114 @@ def candidate_row(document: Mapping[str, Any], fps: float = 30.0,
 
 
 def av_moments(document: Mapping[str, Any]) -> list[dict[str, Any]]:
-    """The twelve event-centred stills this phase has to show.
-
-    The brief names eleven; this is twelve because Phase 2A splits damage into
-    the first mark and the fractured state, and both are worth seeing. Its nine
-    are kept exactly as they are - they are already canonical instants rather
-    than round numbers - and three the brief adds are inserted:
-    the first collision, which is the moment the rule is proved; the outer-shell
-    tension, which is the hardest wall with the population at its largest; and
-    the final frame, which is what a viewer is left looking at.
-
-    Names are re-lettered so that sorting the directory is watching the run in
-    order, because a contact sheet built from an unsorted directory is a
-    contact sheet of a different story.
-    """
-    events = document["events"]
+    """Ten canonical, event-derived views required for Phase 3B review."""
+    events = list(document["events"])
     duration = float(document["summary"]["duration"])
-    base = list(visual.event_moments(dict(document)))
 
-    first_collision = next(
-        (float(e["t"]) for e in events if e["kind"] == "collision"), None)
-    extra: list[dict[str, Any]] = []
-    if first_collision is not None:
-        extra.append({
-            "name": "first_collision",
-            "t": first_collision + 0.04,
-            "why": f"first contact at {first_collision:.2f}s, the rule proved",
-        })
+    def first(kind: str, predicate=None) -> Mapping[str, Any] | None:
+        return next(
+            (event for event in events
+             if event["kind"] == kind and (predicate is None or predicate(event))),
+            None,
+        )
 
-    # Outer-shell tension: the last frontier advance is the moment the hardest
-    # wall becomes the wall, and the population is at or near its peak there.
-    outward = _first_outward_exits(document)
-    if outward:
-        last_advance = float(outward[-1]["t"])
-        extra.append({
-            "name": "outer_shell_tension",
-            "t": min(duration, last_advance + 1.20),
-            "why": (f"1.20 s after the frontier reached region "
-                    f"{int(outward[-1]['to_region'])}"),
-        })
+    spawn = first("ball_spawn")
+    four = first("ball_spawn", lambda event: int(event["population"]) >= 4)
+    critical = first(
+        "damage_state", lambda event: event.get("new_state") == "critical")
+    first_break = first("panel_break")
+    escape = first("escape")
 
-    extra.append({
-        "name": "final_frame",
-        "t": duration + visual.RELEASE_SECONDS,
-        "why": "what the viewer is left looking at",
-    })
+    # Find a naturally cooperative panel. Prefer the outer wall and show the
+    # instant the second distinct ball joins its ledger, not the final hit; that
+    # makes the cumulative sequence visible instead of duplicating the break.
+    contributors: dict[tuple[int, int], set[int]] = {}
+    second_contributor_hit: dict[tuple[int, int], Mapping[str, Any]] = {}
+    cooperative_breaks: list[tuple[Mapping[str, Any], Mapping[str, Any]]] = []
+    for event in events:
+        if event["kind"] == "damage" and float(event.get("contribution", 0.0)) > 0.0:
+            key = (int(event["shell_id"]), int(event["panel_id"]))
+            paid = contributors.setdefault(key, set())
+            before = len(paid)
+            paid.add(int(event["ball_id"]))
+            if before == 1 and len(paid) == 2:
+                second_contributor_hit[key] = event
+        elif event["kind"] == "panel_break":
+            key = (int(event["shell_id"]), int(event["panel_id"]))
+            if len(contributors.get(key, set())) > 1 and key in second_contributor_hit:
+                cooperative_breaks.append((event, second_contributor_hit[key]))
 
-    merged = sorted(base + extra, key=lambda row: float(row["t"]))
-    letters = "abcdefghijklmnopqrstuvwxyz"
-    out: list[dict[str, Any]] = []
-    for index, row in enumerate(merged):
-        stem = str(row["name"])
-        # Phase 2A already prefixes its nine; strip it so the merged order can
-        # letter the whole set rather than interleaving two schemes.
-        if len(stem) > 2 and stem[1] == "_" and stem[0] in letters:
-            stem = stem[2:]
-        out.append({
-            "name": f"{letters[index]}_{stem}",
-            "t": float(row["t"]),
-            "why": str(row["why"]),
-        })
-    return out
+    # The late high-pop view is the first spawn reaching the run's maximum.
+    peak_population = int(document["summary"]["max_population"])
+    late_population = first(
+        "ball_spawn", lambda event: int(event["population"]) >= peak_population)
+
+    # First real contact with the hardest shell; this is the outer-wall attack,
+    # not a camera-schedule proxy.
+    outer_id = len(document["shells"]) - 1
+    outer_attack = first(
+        "collision", lambda event: int(event["shell_id"]) == outer_id)
+
+    final_exit = None
+    escape_ball = int(escape["ball_id"]) if escape is not None else -1
+    for event in events:
+        if (event["kind"] == "shell_exit"
+                and int(event["shell_id"]) == outer_id
+                and int(event["ball_id"]) == escape_ball):
+            final_exit = event
+    # A child born outside the final shell can be the first ball to reach the
+    # escape radius. In that case its parent's immediately preceding outer exit
+    # is the decisive passage the climax must show.
+    if final_exit is None and escape is not None:
+        final_exit = next(
+            (event for event in reversed(events)
+             if event["kind"] == "shell_exit"
+             and int(event["shell_id"]) == outer_id
+             and float(event["t"]) <= float(escape["t"])),
+            None,
+        )
+
+    outer_cooperative = [
+        pair for pair in cooperative_breaks if int(pair[0]["shell_id"]) == outer_id
+    ]
+    chosen_cooperative = (outer_cooperative[-1] if outer_cooperative
+                          else cooperative_breaks[0] if cooperative_breaks else None)
+    cooperative_damage = chosen_cooperative[1] if chosen_cooperative else None
+
+    final_decisive = final_exit
+    if final_exit is not None and final_exit.get("route") == "break":
+        key = (int(final_exit["shell_id"]), int(final_exit["panel_id"]))
+        final_decisive = next(
+            (event for event in reversed(events)
+             if event["kind"] == "panel_break"
+             and (int(event["shell_id"]), int(event["panel_id"])) == key
+             and float(event["t"]) <= float(final_exit["t"])),
+            final_exit,
+        )
+
+    def at(event: Mapping[str, Any] | None, offset: float = 0.0) -> float:
+        return min(duration + visual.RELEASE_SECONDS,
+                   max(0.0, float(event["t"]) + offset)) if event else 0.0
+
+    rows = [
+        ("frame_0", 0.0, "clean one-ball opening frame"),
+        ("first_spawn", at(spawn, 0.10), "first canonical reproduction"),
+        ("four_ball_state", at(four, 0.12), "multiplication established at four balls"),
+        ("first_critical_panel", at(critical, 0.06), "first panel reaches critical integrity"),
+        ("first_break", at(first_break, 0.08), "first physical wall failure"),
+        ("cooperative_damage", at(cooperative_damage, 0.04),
+         "multiple balls have contributed to one panel"),
+        ("late_high_population", at(late_population, 0.12),
+         "late readable population peak"),
+        ("outer_shell_attack", at(outer_attack, 0.10),
+         "first impact on the difficult outer barrier"),
+        ("final_break_or_opening", at(final_decisive, 0.08),
+         "decisive cooperative break or final opening"),
+        ("first_final_escape", at(escape, 0.10), "first genuine final escape"),
+    ]
+    # Preserve semantic names while numbering by narrative order. Several
+    # events may happen close together; names, not timestamps, define the sheet.
+    return [
+        {"name": f"{index:02d}_{name}", "t": t, "why": why}
+        for index, (name, t, why) in enumerate(rows, start=1)
+    ]

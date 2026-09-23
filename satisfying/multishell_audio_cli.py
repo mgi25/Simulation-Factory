@@ -62,22 +62,24 @@ __all__ = [
 ]
 
 PHASE1_SHORTLIST = os.path.join(
-    "docs", "validation", "category3_multiplying_shell", "phase1_shortlist.json"
+    "docs", "validation", "category3_multiplying_shell_adjust_v3b", "phase3b_shortlist.json"
 )
-OUTPUT_ROOT = os.path.join("output", "category3_multiplying_shell_audio_v2b")
-VALIDATION_ROOT = os.path.join("docs", "validation", "category3_multiplying_shell_audio_v2b")
+OUTPUT_ROOT = os.path.join("output", "category3_multishell_adjust_v3b", "audio")
+VALIDATION_ROOT = os.path.join(
+    "docs", "validation", "category3_multiplying_shell_adjust_v3b", "audio"
+)
 
 #: The reference seeds the three-system comparison is decided on: the densest
 #: run in the set, which is where a musical system fails if it is going to, and
 #: a mid-density run that ends on a break and on a third-generation descendant,
 #: which is where the lineage and hierarchy claims are visible.
-REFERENCE_SEEDS: tuple[int, ...] = (12818, 7183)
+REFERENCE_SEEDS: tuple[int, ...] = (17251, 15793)
 
 #: Written into the manifest so the rules are readable next to their result.
 CANDIDATE_RULES: dict[str, Any] = {
     "source": PHASE1_SHORTLIST,
     "new_search": False,
-    "duration_seconds": [20.0, 24.0],
+    "duration_seconds": [20.0, 26.0],
     "first_spawn_preferred_max": 2.5,
     "first_spawn_hard_max": 3.0,
     "population_total": [8, 15],
@@ -148,18 +150,23 @@ def derive_candidates(shortlist: Mapping[str, Any]) -> dict[str, Any]:
         })
 
     accepted = [row for row in judged if row["accepted"]]
-    chosen = [row for row in accepted if row["preferred_split"]]
-    # The 2.5 s split is a preference and the 3.0 s one a limit, so the band
-    # between them is only opened if the preference cannot fill the set.
-    if len(chosen) < want_low:
-        for row in accepted:
-            if row in chosen:
-                continue
-            chosen.append(row)
-            if len(chosen) >= want_low:
-                break
-        chosen.sort(key=lambda row: row["duration"])
-    chosen = chosen[:want_high]
+    review_seeds = [int(seed) for seed in shortlist.get("review_seeds", [])]
+    if review_seeds:
+        by_seed = {int(row["seed"]): row for row in accepted}
+        chosen = [by_seed[seed] for seed in review_seeds if seed in by_seed]
+    else:
+        chosen = [row for row in accepted if row["preferred_split"]]
+        # The 2.5 s split is a preference and the 3.0 s one a limit, so the band
+        # between them is only opened if the preference cannot fill the set.
+        if len(chosen) < want_low:
+            for row in accepted:
+                if row in chosen:
+                    continue
+                chosen.append(row)
+                if len(chosen) >= want_low:
+                    break
+            chosen.sort(key=lambda row: row["duration"])
+        chosen = chosen[:want_high]
 
     routes = sorted({row["escape_route"] for row in chosen})
     finals = sorted({row["final_escape"] for row in chosen})

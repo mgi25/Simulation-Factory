@@ -1,0 +1,4719 @@
+{
+  "config_digest": "1803a066cc67ed08088294e64dd42b7264e2bcc210f055ab225d9983e2725d38",
+  "source_seed_count": 20000,
+  "accepted_seeds": [
+    17275,
+    15793,
+    9324,
+    13361,
+    14705,
+    17283,
+    8292,
+    16629,
+    17251,
+    16733,
+    3499,
+    14773,
+    12197
+  ],
+  "review_seeds": [
+    15793,
+    8292,
+    17251,
+    16733,
+    12197,
+    14705
+  ],
+  "rows": [
+    {
+      "seed": 15009,
+      "duration": 20.06791898132248,
+      "first_spawn": 0.5151110236414489,
+      "population": 12,
+      "population_thirds": [
+        5,
+        7,
+        12
+      ],
+      "collision_thirds": [
+        29,
+        68,
+        72
+      ],
+      "meaningful_thirds": [
+        80,
+        135,
+        125
+      ],
+      "strict_escalation": {
+        "population": true,
+        "collisions": true,
+        "meaningful": false
+      },
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "breaks": 9,
+      "shared_breaks": 9,
+      "cooperative_outer_breaks": 0,
+      "cooperative_break_details": [
+        {
+          "shell_id": 0,
+          "panel_id": 2,
+          "t": 2.2520336551494116,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            2,
+            3
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 1.1455836238535622,
+          "final_triggering_ball": 0
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 11,
+          "t": 5.139424624100344,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            2,
+            3
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 1.0610510422216848,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 10,
+          "t": 5.183789149876068,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            3
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.050653084682376,
+          "final_triggering_ball": 3
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 3,
+          "t": 6.18171738927275,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            1,
+            2
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.161571511101759,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 7,
+          "t": 6.808323968654988,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 1.0449632636680415,
+          "final_triggering_ball": 0
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 6,
+          "t": 7.137436235043625,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            2
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 1.7705278240585898,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 10,
+          "t": 11.82782577025476,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            2
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 1.5465027179459983,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 7,
+          "t": 17.337577553836628,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            2,
+            3,
+            4
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 3,
+          "largest_contribution": 1.8762084340496537,
+          "final_triggering_ball": 3
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 24,
+          "t": 18.22715547717971,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            3
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 2.815220973458124,
+          "final_triggering_ball": 0
+        }
+      ],
+      "outer_dwell_ball_seconds": 30.925971,
+      "readability": {
+        "fps": 60.0,
+        "peak_population": 12,
+        "peak_population_t": 20.017915860937126,
+        "population_by_third": [
+          5,
+          7,
+          12
+        ],
+        "population_first_frame": 1,
+        "families_max_on_screen": 6,
+        "families_total": 5,
+        "closest_pair_diameters": 0.0828845023824377,
+        "closest_pair_t": 19.784567965805472,
+        "largest_cluster": 4,
+        "largest_cluster_t": 1.0333978212973371,
+        "longest_triple_merge_seconds": 1.1666666666666667,
+        "longest_triple_merge_t": 2.183469590160503,
+        "blob_deficit_frames": 333,
+        "blob_deficit_fraction": 0.27634854771784234,
+        "mean_blobs_per_ball": 0.9217488164856585,
+        "max_step_diameters": 0.2663392589510562,
+        "max_step_t": 7.300455576261834,
+        "strobes": false
+      },
+      "pile_warning": true,
+      "alignment": {
+        "fps": 60.0,
+        "frames": 1206,
+        "maximum_disagreement_px": 0.0,
+        "worst_t": 0.0,
+        "worst_centres": [],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": true
+      },
+      "safe_area": {
+        "safe_area": "shorts_conservative",
+        "fingerprint": "3776358f1bf13326",
+        "final_view_radius": 25.4,
+        "pixels_per_unit": 17.73070866141732,
+        "arena_radius_px": 435.2888976377952,
+        "arena_regions": [
+          {
+            "region": "action_rail",
+            "clearance_px": 18.311102362204792,
+            "clear": true
+          },
+          {
+            "region": "title_block",
+            "clearance_px": 332.7111023622048,
+            "clear": true
+          },
+          {
+            "region": "progress_bar",
+            "clearance_px": 524.7111023622049,
+            "clear": true
+          },
+          {
+            "region": "nav_bar",
+            "clearance_px": 563.1111023622047,
+            "clear": true
+          },
+          {
+            "region": "top_bar",
+            "clearance_px": 294.31110236220474,
+            "clear": true
+          }
+        ],
+        "arena_clear": true,
+        "min_clearance_px": 18.311102362204792,
+        "ball_hidden_frames": 0,
+        "ball_hidden_seconds": 0.0,
+        "ball_hidden_longest_seconds": 0.0,
+        "ball_hidden_budget_seconds": 0.25,
+        "ball_hidden_by_region": {
+          "action_rail": 0,
+          "title_block": 0,
+          "progress_bar": 0,
+          "nav_bar": 0,
+          "top_bar": 0
+        },
+        "ball_pass": true
+      },
+      "audio": {
+        "events_per_second": 11.0207,
+        "collisions_per_second": 8.4276,
+        "max_polyphony": 7,
+        "median_polyphony": 3.0,
+        "simultaneous_onsets": 41,
+        "harsh_pairs": 0,
+        "thirds": [
+          {
+            "third": "early",
+            "events": 58,
+            "events_per_second": 7.8315,
+            "collisions": 37,
+            "distinct_balls": 6,
+            "max_polyphony": 7,
+            "mean_polyphony": 2.8883,
+            "distinct_pitches": 10,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 3.7414,
+            "marked_events": 15
+          },
+          {
+            "third": "middle",
+            "events": 87,
+            "events_per_second": 11.7473,
+            "collisions": 74,
+            "distinct_balls": 7,
+            "max_polyphony": 6,
+            "mean_polyphony": 2.557,
+            "distinct_pitches": 13,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 6.4253,
+            "marked_events": 2
+          },
+          {
+            "third": "late",
+            "events": 76,
+            "events_per_second": 10.262,
+            "collisions": 58,
+            "distinct_balls": 12,
+            "max_polyphony": 7,
+            "mean_polyphony": 2.6794,
+            "distinct_pitches": 14,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 7.3421,
+            "marked_events": 9
+          }
+        ],
+        "density_warning": false
+      },
+      "decision": "rejected",
+      "decision_reason": "1.167 s severe triple-ball merge and non-monotonic meaningful thirds"
+    },
+    {
+      "seed": 17275,
+      "duration": 20.145845802989992,
+      "first_spawn": 2.805671835574341,
+      "population": 11,
+      "population_thirds": [
+        2,
+        4,
+        11
+      ],
+      "collision_thirds": [
+        9,
+        34,
+        60
+      ],
+      "meaningful_thirds": [
+        22,
+        68,
+        133
+      ],
+      "strict_escalation": {
+        "population": true,
+        "collisions": true,
+        "meaningful": true
+      },
+      "escape_route": "opening",
+      "escape_generation": 2,
+      "breaks": 8,
+      "shared_breaks": 8,
+      "cooperative_outer_breaks": 0,
+      "cooperative_break_details": [
+        {
+          "shell_id": 0,
+          "panel_id": 10,
+          "t": 13.192100368602045,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 1.2650866236491245,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 21,
+          "t": 13.536877770915645,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            3
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.2360231586220136,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 25,
+          "t": 14.640398808242374,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            1,
+            3
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 3,
+          "largest_contribution": 2.5539249440150855,
+          "final_triggering_ball": 3
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 2,
+          "t": 15.160502877090643,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            1,
+            3
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.5816924364839289,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 11,
+          "t": 16.608200157102065,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 0.9410017858159072,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 23,
+          "t": 17.506548286761888,
+          "unique_contributing_balls": 4,
+          "contributing_ball_ids": [
+            0,
+            1,
+            3,
+            4
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 0.9081227607304778,
+          "final_triggering_ball": 4
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 19,
+          "t": 19.484102004557823,
+          "unique_contributing_balls": 4,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 1.033568766943053,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 10,
+          "t": 19.48842097946381,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            2,
+            5
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            3
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 2.071134884732555,
+          "final_triggering_ball": 0
+        }
+      ],
+      "outer_dwell_ball_seconds": 1.835021,
+      "readability": {
+        "fps": 60.0,
+        "peak_population": 11,
+        "peak_population_t": 20.112519341777435,
+        "population_by_third": [
+          2,
+          4,
+          11
+        ],
+        "population_first_frame": 1,
+        "families_max_on_screen": 4,
+        "families_total": 3,
+        "closest_pair_diameters": 0.05436027623361664,
+        "closest_pair_t": 11.39764973469409,
+        "largest_cluster": 5,
+        "largest_cluster_t": 20.112519341777435,
+        "longest_triple_merge_seconds": 0.45,
+        "longest_triple_merge_t": 20.145845802989992,
+        "blob_deficit_frames": 356,
+        "blob_deficit_fraction": 0.29421487603305785,
+        "mean_blobs_per_ball": 0.8891543239369326,
+        "max_step_diameters": 0.26734552104331,
+        "max_step_t": 19.74592826843932,
+        "strobes": false
+      },
+      "pile_warning": false,
+      "alignment": {
+        "fps": 60.0,
+        "frames": 1210,
+        "maximum_disagreement_px": 0.0,
+        "worst_t": 0.0,
+        "worst_centres": [],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": true
+      },
+      "safe_area": {
+        "safe_area": "shorts_conservative",
+        "fingerprint": "3776358f1bf13326",
+        "final_view_radius": 25.4,
+        "pixels_per_unit": 17.73070866141732,
+        "arena_radius_px": 435.2888976377952,
+        "arena_regions": [
+          {
+            "region": "action_rail",
+            "clearance_px": 18.311102362204792,
+            "clear": true
+          },
+          {
+            "region": "title_block",
+            "clearance_px": 332.7111023622048,
+            "clear": true
+          },
+          {
+            "region": "progress_bar",
+            "clearance_px": 524.7111023622049,
+            "clear": true
+          },
+          {
+            "region": "nav_bar",
+            "clearance_px": 563.1111023622047,
+            "clear": true
+          },
+          {
+            "region": "top_bar",
+            "clearance_px": 294.31110236220474,
+            "clear": true
+          }
+        ],
+        "arena_clear": true,
+        "min_clearance_px": 18.311102362204792,
+        "ball_hidden_frames": 0,
+        "ball_hidden_seconds": 0.0,
+        "ball_hidden_longest_seconds": 0.0,
+        "ball_hidden_budget_seconds": 0.25,
+        "ball_hidden_by_region": {
+          "action_rail": 0,
+          "title_block": 0,
+          "progress_bar": 0,
+          "nav_bar": 0,
+          "top_bar": 0
+        },
+        "ball_pass": true
+      },
+      "audio": {
+        "events_per_second": 6.8571,
+        "collisions_per_second": 5.118,
+        "max_polyphony": 9,
+        "median_polyphony": 2.0,
+        "simultaneous_onsets": 21,
+        "harsh_pairs": 0,
+        "thirds": [
+          {
+            "third": "early",
+            "events": 14,
+            "events_per_second": 1.8838,
+            "collisions": 10,
+            "distinct_balls": 2,
+            "max_polyphony": 3,
+            "mean_polyphony": 1.3487,
+            "distinct_pitches": 7,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 2.4286,
+            "marked_events": 2
+          },
+          {
+            "third": "middle",
+            "events": 53,
+            "events_per_second": 7.1314,
+            "collisions": 45,
+            "distinct_balls": 4,
+            "max_polyphony": 5,
+            "mean_polyphony": 1.9205,
+            "distinct_pitches": 10,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 4.8302,
+            "marked_events": 6
+          },
+          {
+            "third": "late",
+            "events": 71,
+            "events_per_second": 9.5533,
+            "collisions": 48,
+            "distinct_balls": 11,
+            "max_polyphony": 9,
+            "mean_polyphony": 2.9258,
+            "distinct_pitches": 12,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 5.9859,
+            "marked_events": 16
+          }
+        ],
+        "density_warning": false
+      },
+      "decision": "accepted",
+      "decision_reason": "passes engineering screen"
+    },
+    {
+      "seed": 15793,
+      "duration": 20.53724497969299,
+      "first_spawn": 2.5158100772475724,
+      "population": 12,
+      "population_thirds": [
+        5,
+        6,
+        12
+      ],
+      "collision_thirds": [
+        19,
+        65,
+        80
+      ],
+      "meaningful_thirds": [
+        51,
+        111,
+        154
+      ],
+      "strict_escalation": {
+        "population": true,
+        "collisions": true,
+        "meaningful": true
+      },
+      "escape_route": "break",
+      "escape_generation": 3,
+      "breaks": 9,
+      "shared_breaks": 7,
+      "cooperative_outer_breaks": 1,
+      "cooperative_break_details": [
+        {
+          "shell_id": 0,
+          "panel_id": 11,
+          "t": 3.4247428594761162,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.272819938848173,
+          "final_triggering_ball": 0
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 2,
+          "t": 3.5771739931180044,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.966474675453402,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 2,
+          "t": 5.090903961110273,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 0.9922903478624793,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 4,
+          "t": 9.582286492790354,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            1,
+            4
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 2.25482105917781,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 3,
+          "t": 11.972706003356793,
+          "unique_contributing_balls": 4,
+          "contributing_ball_ids": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.0858835010227808,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 7,
+          "t": 16.98275515606326,
+          "unique_contributing_balls": 4,
+          "contributing_ball_ids": [
+            1,
+            3,
+            4,
+            5
+          ],
+          "contributing_generations": [
+            1,
+            2,
+            3
+          ],
+          "largest_contributor": 5,
+          "largest_contribution": 1.8320853664182652,
+          "final_triggering_ball": 5
+        },
+        {
+          "shell_id": 4,
+          "panel_id": 42,
+          "t": 20.053706169208315,
+          "unique_contributing_balls": 4,
+          "contributing_ball_ids": [
+            4,
+            5,
+            6,
+            7
+          ],
+          "contributing_generations": [
+            2,
+            3,
+            4
+          ],
+          "largest_contributor": 7,
+          "largest_contribution": 3.522104064152905,
+          "final_triggering_ball": 7
+        }
+      ],
+      "outer_dwell_ball_seconds": 11.970804,
+      "readability": {
+        "fps": 60.0,
+        "peak_population": 12,
+        "peak_population_t": 20.520575137988693,
+        "population_by_third": [
+          5,
+          6,
+          12
+        ],
+        "population_first_frame": 1,
+        "families_max_on_screen": 3,
+        "families_total": 2,
+        "closest_pair_diameters": 0.15068501056282713,
+        "closest_pair_t": 20.253857670719956,
+        "largest_cluster": 4,
+        "largest_cluster_t": 17.520003631215367,
+        "longest_triple_merge_seconds": 0.35,
+        "longest_triple_merge_t": 6.901314465578651,
+        "blob_deficit_frames": 311,
+        "blob_deficit_fraction": 0.2522303325223033,
+        "mean_blobs_per_ball": 0.9336784212229052,
+        "max_step_diameters": 0.26210044031443647,
+        "max_step_t": 4.417508051638508,
+        "strobes": false
+      },
+      "pile_warning": false,
+      "alignment": {
+        "fps": 60.0,
+        "frames": 1234,
+        "maximum_disagreement_px": 0.0,
+        "worst_t": 0.0,
+        "worst_centres": [],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": true
+      },
+      "safe_area": {
+        "safe_area": "shorts_conservative",
+        "fingerprint": "3776358f1bf13326",
+        "final_view_radius": 25.4,
+        "pixels_per_unit": 17.73070866141732,
+        "arena_radius_px": 435.2888976377952,
+        "arena_regions": [
+          {
+            "region": "action_rail",
+            "clearance_px": 18.311102362204792,
+            "clear": true
+          },
+          {
+            "region": "title_block",
+            "clearance_px": 332.7111023622048,
+            "clear": true
+          },
+          {
+            "region": "progress_bar",
+            "clearance_px": 524.7111023622049,
+            "clear": true
+          },
+          {
+            "region": "nav_bar",
+            "clearance_px": 563.1111023622047,
+            "clear": true
+          },
+          {
+            "region": "top_bar",
+            "clearance_px": 294.31110236220474,
+            "clear": true
+          }
+        ],
+        "arena_clear": true,
+        "min_clearance_px": 18.311102362204792,
+        "ball_hidden_frames": 0,
+        "ball_hidden_seconds": 0.0,
+        "ball_hidden_longest_seconds": 0.0,
+        "ball_hidden_budget_seconds": 0.25,
+        "ball_hidden_by_region": {
+          "action_rail": 0,
+          "title_block": 0,
+          "progress_bar": 0,
+          "nav_bar": 0,
+          "top_bar": 0
+        },
+        "ball_pass": true
+      },
+      "audio": {
+        "events_per_second": 9.7047,
+        "collisions_per_second": 7.9978,
+        "max_polyphony": 8,
+        "median_polyphony": 2.0,
+        "simultaneous_onsets": 32,
+        "harsh_pairs": 0,
+        "thirds": [
+          {
+            "third": "early",
+            "events": 39,
+            "events_per_second": 5.1571,
+            "collisions": 27,
+            "distinct_balls": 5,
+            "max_polyphony": 4,
+            "mean_polyphony": 2.1558,
+            "distinct_pitches": 11,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 4.2564,
+            "marked_events": 10
+          },
+          {
+            "third": "middle",
+            "events": 80,
+            "events_per_second": 10.5786,
+            "collisions": 73,
+            "distinct_balls": 6,
+            "max_polyphony": 5,
+            "mean_polyphony": 2.201,
+            "distinct_pitches": 13,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 6.775,
+            "marked_events": 4
+          },
+          {
+            "third": "late",
+            "events": 80,
+            "events_per_second": 10.5786,
+            "collisions": 64,
+            "distinct_balls": 12,
+            "max_polyphony": 8,
+            "mean_polyphony": 2.8156,
+            "distinct_pitches": 14,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 6.5875,
+            "marked_events": 12
+          }
+        ],
+        "density_warning": false
+      },
+      "decision": "accepted",
+      "decision_reason": "passes engineering screen"
+    },
+    {
+      "seed": 9324,
+      "duration": 21.461662703222085,
+      "first_spawn": 2.404812799679408,
+      "population": 9,
+      "population_thirds": [
+        3,
+        5,
+        9
+      ],
+      "collision_thirds": [
+        11,
+        60,
+        85
+      ],
+      "meaningful_thirds": [
+        30,
+        99,
+        131
+      ],
+      "strict_escalation": {
+        "population": true,
+        "collisions": true,
+        "meaningful": true
+      },
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "breaks": 2,
+      "shared_breaks": 1,
+      "cooperative_outer_breaks": 0,
+      "cooperative_break_details": [
+        {
+          "shell_id": 1,
+          "panel_id": 18,
+          "t": 17.50921503250846,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 1.7974555448461476,
+          "final_triggering_ball": 2
+        }
+      ],
+      "outer_dwell_ball_seconds": 13.641465,
+      "readability": {
+        "fps": 60.0,
+        "peak_population": 9,
+        "peak_population_t": 21.411674358416445,
+        "population_by_third": [
+          3,
+          5,
+          9
+        ],
+        "population_first_frame": 1,
+        "families_max_on_screen": 6,
+        "families_total": 5,
+        "closest_pair_diameters": 0.19606116801885584,
+        "closest_pair_t": 4.282334871683289,
+        "largest_cluster": 2,
+        "largest_cluster_t": 2.4161033322726726,
+        "longest_triple_merge_seconds": 0.0,
+        "longest_triple_merge_t": 0.0,
+        "blob_deficit_frames": 436,
+        "blob_deficit_fraction": 0.33824670287044223,
+        "mean_blobs_per_ball": 0.9172500448752469,
+        "max_step_diameters": 0.2511885796760259,
+        "max_step_t": 8.098111858513924,
+        "strobes": false
+      },
+      "pile_warning": false,
+      "alignment": {
+        "fps": 60.0,
+        "frames": 1289,
+        "maximum_disagreement_px": 0.0,
+        "worst_t": 0.0,
+        "worst_centres": [],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": true
+      },
+      "safe_area": {
+        "safe_area": "shorts_conservative",
+        "fingerprint": "3776358f1bf13326",
+        "final_view_radius": 25.4,
+        "pixels_per_unit": 17.73070866141732,
+        "arena_radius_px": 435.2888976377952,
+        "arena_regions": [
+          {
+            "region": "action_rail",
+            "clearance_px": 18.311102362204792,
+            "clear": true
+          },
+          {
+            "region": "title_block",
+            "clearance_px": 332.7111023622048,
+            "clear": true
+          },
+          {
+            "region": "progress_bar",
+            "clearance_px": 524.7111023622049,
+            "clear": true
+          },
+          {
+            "region": "nav_bar",
+            "clearance_px": 563.1111023622047,
+            "clear": true
+          },
+          {
+            "region": "top_bar",
+            "clearance_px": 294.31110236220474,
+            "clear": true
+          }
+        ],
+        "arena_clear": true,
+        "min_clearance_px": 18.311102362204792,
+        "ball_hidden_frames": 0,
+        "ball_hidden_seconds": 0.0,
+        "ball_hidden_longest_seconds": 0.0,
+        "ball_hidden_budget_seconds": 0.25,
+        "ball_hidden_by_region": {
+          "action_rail": 0,
+          "title_block": 0,
+          "progress_bar": 0,
+          "nav_bar": 0,
+          "top_bar": 0
+        },
+        "ball_pass": true
+      },
+      "audio": {
+        "events_per_second": 8.4099,
+        "collisions_per_second": 7.2886,
+        "max_polyphony": 7,
+        "median_polyphony": 2.0,
+        "simultaneous_onsets": 33,
+        "harsh_pairs": 0,
+        "thirds": [
+          {
+            "third": "early",
+            "events": 21,
+            "events_per_second": 2.6682,
+            "collisions": 14,
+            "distinct_balls": 3,
+            "max_polyphony": 3,
+            "mean_polyphony": 1.4904,
+            "distinct_pitches": 8,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 2.3333,
+            "marked_events": 4
+          },
+          {
+            "third": "middle",
+            "events": 83,
+            "events_per_second": 10.5456,
+            "collisions": 74,
+            "distinct_balls": 6,
+            "max_polyphony": 6,
+            "mean_polyphony": 2.5004,
+            "distinct_pitches": 15,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 6.3012,
+            "marked_events": 6
+          },
+          {
+            "third": "late",
+            "events": 76,
+            "events_per_second": 9.6562,
+            "collisions": 68,
+            "distinct_balls": 9,
+            "max_polyphony": 7,
+            "mean_polyphony": 2.4434,
+            "distinct_pitches": 12,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 7.5132,
+            "marked_events": 6
+          }
+        ],
+        "density_warning": false
+      },
+      "decision": "accepted",
+      "decision_reason": "passes engineering screen"
+    },
+    {
+      "seed": 13361,
+      "duration": 21.508663092063166,
+      "first_spawn": 2.738121017080686,
+      "population": 12,
+      "population_thirds": [
+        3,
+        9,
+        12
+      ],
+      "collision_thirds": [
+        15,
+        57,
+        91
+      ],
+      "meaningful_thirds": [
+        33,
+        110,
+        173
+      ],
+      "strict_escalation": {
+        "population": true,
+        "collisions": true,
+        "meaningful": true
+      },
+      "escape_route": "opening",
+      "escape_generation": 1,
+      "breaks": 8,
+      "shared_breaks": 8,
+      "cooperative_outer_breaks": 0,
+      "cooperative_break_details": [
+        {
+          "shell_id": 1,
+          "panel_id": 2,
+          "t": 14.451436417289653,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 1.5085163483538944,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 7,
+          "t": 15.40835175853856,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.6328001770329066,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 25,
+          "t": 16.774533258208113,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            4,
+            6,
+            7
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 7,
+          "largest_contribution": 3.2459322483973567,
+          "final_triggering_ball": 7
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 24,
+          "t": 18.602122063488988,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            3,
+            6,
+            7
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 6,
+          "largest_contribution": 3.6950354046588214,
+          "final_triggering_ball": 7
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 18,
+          "t": 18.979950016654513,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            2,
+            7
+          ],
+          "contributing_generations": [
+            1
+          ],
+          "largest_contributor": 7,
+          "largest_contribution": 2.544660935794027,
+          "final_triggering_ball": 7
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 23,
+          "t": 19.4381394307543,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            2,
+            4,
+            6
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 6,
+          "largest_contribution": 3.027673223417846,
+          "final_triggering_ball": 6
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 11,
+          "t": 19.69398881964381,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            1,
+            2
+          ],
+          "contributing_generations": [
+            1
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 1.2794519121346353,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 19,
+          "t": 20.41012603670207,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            2,
+            7
+          ],
+          "contributing_generations": [
+            1
+          ],
+          "largest_contributor": 7,
+          "largest_contribution": 2.0195617295194905,
+          "final_triggering_ball": 7
+        }
+      ],
+      "outer_dwell_ball_seconds": 16.146419,
+      "readability": {
+        "fps": 60.0,
+        "peak_population": 12,
+        "peak_population_t": 21.442021223458788,
+        "population_by_third": [
+          3,
+          9,
+          12
+        ],
+        "population_first_frame": 1,
+        "families_max_on_screen": 5,
+        "families_total": 4,
+        "closest_pair_diameters": 0.011827873816995262,
+        "closest_pair_t": 21.12547234758799,
+        "largest_cluster": 4,
+        "largest_cluster_t": 11.162512991233402,
+        "longest_triple_merge_seconds": 0.15,
+        "longest_triple_merge_t": 20.925546741774856,
+        "blob_deficit_frames": 338,
+        "blob_deficit_fraction": 0.26160990712074306,
+        "mean_blobs_per_ball": 0.9453401494298073,
+        "max_step_diameters": 0.24468830385512894,
+        "max_step_t": 11.212494392686686,
+        "strobes": false
+      },
+      "pile_warning": false,
+      "alignment": {
+        "fps": 60.0,
+        "frames": 1292,
+        "maximum_disagreement_px": 0.0,
+        "worst_t": 0.0,
+        "worst_centres": [],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": true
+      },
+      "safe_area": {
+        "safe_area": "shorts_conservative",
+        "fingerprint": "3776358f1bf13326",
+        "final_view_radius": 25.4,
+        "pixels_per_unit": 17.73070866141732,
+        "arena_radius_px": 435.2888976377952,
+        "arena_regions": [
+          {
+            "region": "action_rail",
+            "clearance_px": 18.311102362204792,
+            "clear": true
+          },
+          {
+            "region": "title_block",
+            "clearance_px": 332.7111023622048,
+            "clear": true
+          },
+          {
+            "region": "progress_bar",
+            "clearance_px": 524.7111023622049,
+            "clear": true
+          },
+          {
+            "region": "nav_bar",
+            "clearance_px": 563.1111023622047,
+            "clear": true
+          },
+          {
+            "region": "top_bar",
+            "clearance_px": 294.31110236220474,
+            "clear": true
+          }
+        ],
+        "arena_clear": true,
+        "min_clearance_px": 18.311102362204792,
+        "ball_hidden_frames": 0,
+        "ball_hidden_seconds": 0.0,
+        "ball_hidden_longest_seconds": 0.0,
+        "ball_hidden_budget_seconds": 0.25,
+        "ball_hidden_by_region": {
+          "action_rail": 0,
+          "title_block": 0,
+          "progress_bar": 0,
+          "nav_bar": 0,
+          "top_bar": 0
+        },
+        "ball_pass": true
+      },
+      "audio": {
+        "events_per_second": 9.346,
+        "collisions_per_second": 7.5791,
+        "max_polyphony": 8,
+        "median_polyphony": 2.0,
+        "simultaneous_onsets": 51,
+        "harsh_pairs": 0,
+        "thirds": [
+          {
+            "third": "early",
+            "events": 20,
+            "events_per_second": 2.5361,
+            "collisions": 16,
+            "distinct_balls": 3,
+            "max_polyphony": 4,
+            "mean_polyphony": 1.6275,
+            "distinct_pitches": 9,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 3.55,
+            "marked_events": 4
+          },
+          {
+            "third": "middle",
+            "events": 92,
+            "events_per_second": 11.6659,
+            "collisions": 77,
+            "distinct_balls": 9,
+            "max_polyphony": 7,
+            "mean_polyphony": 2.7567,
+            "distinct_pitches": 11,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 6.7283,
+            "marked_events": 10
+          },
+          {
+            "third": "late",
+            "events": 89,
+            "events_per_second": 11.2855,
+            "collisions": 70,
+            "distinct_balls": 12,
+            "max_polyphony": 8,
+            "mean_polyphony": 2.993,
+            "distinct_pitches": 11,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 7.1348,
+            "marked_events": 11
+          }
+        ],
+        "density_warning": false
+      },
+      "decision": "accepted",
+      "decision_reason": "passes engineering screen"
+    },
+    {
+      "seed": 14705,
+      "duration": 21.9141039923404,
+      "first_spawn": 1.6782662298527207,
+      "population": 12,
+      "population_thirds": [
+        2,
+        7,
+        12
+      ],
+      "collision_thirds": [
+        18,
+        50,
+        93
+      ],
+      "meaningful_thirds": [
+        38,
+        99,
+        166
+      ],
+      "strict_escalation": {
+        "population": true,
+        "collisions": true,
+        "meaningful": true
+      },
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "breaks": 8,
+      "shared_breaks": 8,
+      "cooperative_outer_breaks": 0,
+      "cooperative_break_details": [
+        {
+          "shell_id": 1,
+          "panel_id": 2,
+          "t": 6.5144330684483815,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.7162690039476325,
+          "final_triggering_ball": 0
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 3,
+          "t": 6.893385160127183,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 2.5114963209421033,
+          "final_triggering_ball": 0
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 2,
+          "t": 11.75994907570438,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            3
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 3,
+          "largest_contribution": 3.6127578976510506,
+          "final_triggering_ball": 3
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 27,
+          "t": 12.257157337587184,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            4
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 2.577571034132158,
+          "final_triggering_ball": 0
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 11,
+          "t": 13.999168616132678,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            3
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 0.9827761420275801,
+          "final_triggering_ball": 3
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 7,
+          "t": 19.12655895758977,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            1,
+            3
+          ],
+          "contributing_generations": [
+            1
+          ],
+          "largest_contributor": 3,
+          "largest_contribution": 1.8982832059137276,
+          "final_triggering_ball": 3
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 2,
+          "t": 20.93803392704497,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            3,
+            4
+          ],
+          "contributing_generations": [
+            1
+          ],
+          "largest_contributor": 3,
+          "largest_contribution": 0.9645950971930152,
+          "final_triggering_ball": 4
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 10,
+          "t": 21.30819517638432,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            4
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.8844162446202994,
+          "final_triggering_ball": 4
+        }
+      ],
+      "outer_dwell_ball_seconds": 19.30208,
+      "readability": {
+        "fps": 60.0,
+        "peak_population": 12,
+        "peak_population_t": 21.86410983874571,
+        "population_by_third": [
+          2,
+          7,
+          12
+        ],
+        "population_first_frame": 1,
+        "families_max_on_screen": 6,
+        "families_total": 5,
+        "closest_pair_diameters": 0.022025835761862986,
+        "closest_pair_t": 20.947550356176336,
+        "largest_cluster": 4,
+        "largest_cluster_t": 20.380949948769818,
+        "longest_triple_merge_seconds": 0.5666666666666667,
+        "longest_triple_merge_t": 20.93088563831144,
+        "blob_deficit_frames": 308,
+        "blob_deficit_fraction": 0.23404255319148937,
+        "mean_blobs_per_ball": 0.938645542093818,
+        "max_step_diameters": 0.2549224447681605,
+        "max_step_t": 14.331657363811974,
+        "strobes": false
+      },
+      "pile_warning": false,
+      "alignment": {
+        "fps": 60.0,
+        "frames": 1316,
+        "maximum_disagreement_px": 0.0,
+        "worst_t": 0.0,
+        "worst_centres": [],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": true
+      },
+      "safe_area": {
+        "safe_area": "shorts_conservative",
+        "fingerprint": "3776358f1bf13326",
+        "final_view_radius": 25.4,
+        "pixels_per_unit": 17.73070866141732,
+        "arena_radius_px": 435.2888976377952,
+        "arena_regions": [
+          {
+            "region": "action_rail",
+            "clearance_px": 18.311102362204792,
+            "clear": true
+          },
+          {
+            "region": "title_block",
+            "clearance_px": 332.7111023622048,
+            "clear": true
+          },
+          {
+            "region": "progress_bar",
+            "clearance_px": 524.7111023622049,
+            "clear": true
+          },
+          {
+            "region": "nav_bar",
+            "clearance_px": 563.1111023622047,
+            "clear": true
+          },
+          {
+            "region": "top_bar",
+            "clearance_px": 294.31110236220474,
+            "clear": true
+          }
+        ],
+        "arena_clear": true,
+        "min_clearance_px": 18.311102362204792,
+        "ball_hidden_frames": 0,
+        "ball_hidden_seconds": 0.0,
+        "ball_hidden_longest_seconds": 0.0,
+        "ball_hidden_budget_seconds": 0.25,
+        "ball_hidden_by_region": {
+          "action_rail": 0,
+          "title_block": 0,
+          "progress_bar": 0,
+          "nav_bar": 0,
+          "top_bar": 0
+        },
+        "ball_pass": true
+      },
+      "audio": {
+        "events_per_second": 8.9571,
+        "collisions_per_second": 7.3576,
+        "max_polyphony": 7,
+        "median_polyphony": 2.0,
+        "simultaneous_onsets": 28,
+        "harsh_pairs": 0,
+        "thirds": [
+          {
+            "third": "early",
+            "events": 24,
+            "events_per_second": 2.992,
+            "collisions": 19,
+            "distinct_balls": 2,
+            "max_polyphony": 3,
+            "mean_polyphony": 1.5767,
+            "distinct_pitches": 7,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 2.7083,
+            "marked_events": 4
+          },
+          {
+            "third": "middle",
+            "events": 83,
+            "events_per_second": 10.3474,
+            "collisions": 69,
+            "distinct_balls": 7,
+            "max_polyphony": 7,
+            "mean_polyphony": 2.5113,
+            "distinct_pitches": 13,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 5.4458,
+            "marked_events": 11
+          },
+          {
+            "third": "late",
+            "events": 89,
+            "events_per_second": 11.0954,
+            "collisions": 73,
+            "distinct_balls": 12,
+            "max_polyphony": 7,
+            "mean_polyphony": 2.681,
+            "distinct_pitches": 13,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 7.2584,
+            "marked_events": 10
+          }
+        ],
+        "density_warning": false
+      },
+      "decision": "accepted",
+      "decision_reason": "passes engineering screen"
+    },
+    {
+      "seed": 17283,
+      "duration": 22.44712779848884,
+      "first_spawn": 0.8340022927706473,
+      "population": 9,
+      "population_thirds": [
+        2,
+        5,
+        9
+      ],
+      "collision_thirds": [
+        11,
+        45,
+        90
+      ],
+      "meaningful_thirds": [
+        27,
+        86,
+        149
+      ],
+      "strict_escalation": {
+        "population": true,
+        "collisions": true,
+        "meaningful": true
+      },
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "breaks": 5,
+      "shared_breaks": 4,
+      "cooperative_outer_breaks": 0,
+      "cooperative_break_details": [
+        {
+          "shell_id": 1,
+          "panel_id": 19,
+          "t": 11.023970950589401,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 1.8696422097866803,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 18,
+          "t": 14.020193222353207,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            3
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 2.8208296229009977,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 2,
+          "t": 19.91244168103727,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            1,
+            3,
+            4
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 3,
+          "largest_contribution": 1.989695188457007,
+          "final_triggering_ball": 3
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 4,
+          "t": 21.302337083361515,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            1,
+            3
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 3,
+          "largest_contribution": 2.0011069930015113,
+          "final_triggering_ball": 3
+        }
+      ],
+      "outer_dwell_ball_seconds": 11.112423,
+      "readability": {
+        "fps": 60.0,
+        "peak_population": 9,
+        "peak_population_t": 22.397134195374164,
+        "population_by_third": [
+          2,
+          5,
+          9
+        ],
+        "population_first_frame": 1,
+        "families_max_on_screen": 6,
+        "families_total": 5,
+        "closest_pair_diameters": 0.1448773976656216,
+        "closest_pair_t": 21.347268529966,
+        "largest_cluster": 2,
+        "largest_cluster_t": 0.8498912529494661,
+        "longest_triple_merge_seconds": 0.0,
+        "longest_triple_merge_t": 0.0,
+        "blob_deficit_frames": 446,
+        "blob_deficit_fraction": 0.33086053412462907,
+        "mean_blobs_per_ball": 0.8962386511024644,
+        "max_step_diameters": 0.2651053759581046,
+        "max_step_t": 17.081147730847114,
+        "strobes": false
+      },
+      "pile_warning": false,
+      "alignment": {
+        "fps": 60.0,
+        "frames": 1348,
+        "maximum_disagreement_px": 0.0,
+        "worst_t": 0.0,
+        "worst_centres": [],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": true
+      },
+      "safe_area": {
+        "safe_area": "shorts_conservative",
+        "fingerprint": "3776358f1bf13326",
+        "final_view_radius": 25.4,
+        "pixels_per_unit": 17.73070866141732,
+        "arena_radius_px": 435.2888976377952,
+        "arena_regions": [
+          {
+            "region": "action_rail",
+            "clearance_px": 18.311102362204792,
+            "clear": true
+          },
+          {
+            "region": "title_block",
+            "clearance_px": 332.7111023622048,
+            "clear": true
+          },
+          {
+            "region": "progress_bar",
+            "clearance_px": 524.7111023622049,
+            "clear": true
+          },
+          {
+            "region": "nav_bar",
+            "clearance_px": 563.1111023622047,
+            "clear": true
+          },
+          {
+            "region": "top_bar",
+            "clearance_px": 294.31110236220474,
+            "clear": true
+          }
+        ],
+        "arena_clear": true,
+        "min_clearance_px": 18.311102362204792,
+        "ball_hidden_frames": 0,
+        "ball_hidden_seconds": 0.0,
+        "ball_hidden_longest_seconds": 0.0,
+        "ball_hidden_budget_seconds": 0.25,
+        "ball_hidden_by_region": {
+          "action_rail": 0,
+          "title_block": 0,
+          "progress_bar": 0,
+          "nav_bar": 0,
+          "top_bar": 0
+        },
+        "ball_pass": true
+      },
+      "audio": {
+        "events_per_second": 7.7205,
+        "collisions_per_second": 6.5156,
+        "max_polyphony": 6,
+        "median_polyphony": 2.0,
+        "simultaneous_onsets": 25,
+        "harsh_pairs": 0,
+        "thirds": [
+          {
+            "third": "early",
+            "events": 15,
+            "events_per_second": 1.8295,
+            "collisions": 11,
+            "distinct_balls": 2,
+            "max_polyphony": 2,
+            "mean_polyphony": 1.2768,
+            "distinct_pitches": 7,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 2.8,
+            "marked_events": 2
+          },
+          {
+            "third": "middle",
+            "events": 65,
+            "events_per_second": 7.9278,
+            "collisions": 56,
+            "distinct_balls": 5,
+            "max_polyphony": 5,
+            "mean_polyphony": 2.1622,
+            "distinct_pitches": 12,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 7.0615,
+            "marked_events": 7
+          },
+          {
+            "third": "late",
+            "events": 93,
+            "events_per_second": 11.3428,
+            "collisions": 79,
+            "distinct_balls": 9,
+            "max_polyphony": 6,
+            "mean_polyphony": 2.7205,
+            "distinct_pitches": 14,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 7.5054,
+            "marked_events": 10
+          }
+        ],
+        "density_warning": false
+      },
+      "decision": "accepted",
+      "decision_reason": "passes engineering screen"
+    },
+    {
+      "seed": 8292,
+      "duration": 22.457387142732713,
+      "first_spawn": 0.46929401611256205,
+      "population": 8,
+      "population_thirds": [
+        3,
+        6,
+        8
+      ],
+      "collision_thirds": [
+        10,
+        63,
+        69
+      ],
+      "meaningful_thirds": [
+        36,
+        114,
+        132
+      ],
+      "strict_escalation": {
+        "population": true,
+        "collisions": true,
+        "meaningful": true
+      },
+      "escape_route": "break",
+      "escape_generation": 2,
+      "breaks": 7,
+      "shared_breaks": 7,
+      "cooperative_outer_breaks": 1,
+      "cooperative_break_details": [
+        {
+          "shell_id": 0,
+          "panel_id": 11,
+          "t": 13.20520762619718,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            2
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 1.3929363874359177,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 3,
+          "t": 16.418233835052995,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 1.5343245075713772,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 23,
+          "t": 16.866791407113194,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            3
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 3,
+          "largest_contribution": 1.179676789679956,
+          "final_triggering_ball": 3
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 3,
+          "t": 21.27096173083723,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            2,
+            3
+          ],
+          "contributing_generations": [
+            2
+          ],
+          "largest_contributor": 3,
+          "largest_contribution": 1.6870834703987567,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 4,
+          "panel_id": 4,
+          "t": 21.538725128826286,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            1,
+            6
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 5.044843660207192,
+          "final_triggering_ball": 6
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 19,
+          "t": 21.540078409394752,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            1,
+            2,
+            3
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.5980514103203696,
+          "final_triggering_ball": 3
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 18,
+          "t": 22.044928574191392,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            1,
+            2,
+            4
+          ],
+          "contributing_generations": [
+            1,
+            2,
+            3
+          ],
+          "largest_contributor": 4,
+          "largest_contribution": 1.6478529716695032,
+          "final_triggering_ball": 4
+        }
+      ],
+      "outer_dwell_ball_seconds": 14.50894,
+      "readability": {
+        "fps": 60.0,
+        "peak_population": 8,
+        "peak_population_t": 22.390698539487776,
+        "population_by_third": [
+          3,
+          6,
+          8
+        ],
+        "population_first_frame": 1,
+        "families_max_on_screen": 3,
+        "families_total": 2,
+        "closest_pair_diameters": 0.17700913962614107,
+        "closest_pair_t": 11.587144813807896,
+        "largest_cluster": 2,
+        "largest_cluster_t": 0.48349237352579705,
+        "longest_triple_merge_seconds": 0.0,
+        "longest_triple_merge_t": 0.0,
+        "blob_deficit_frames": 323,
+        "blob_deficit_fraction": 0.23961424332344214,
+        "mean_blobs_per_ball": 0.943309916680281,
+        "max_step_diameters": 0.2684153718527749,
+        "max_step_t": 15.238345841468226,
+        "strobes": false
+      },
+      "pile_warning": false,
+      "alignment": {
+        "fps": 60.0,
+        "frames": 1349,
+        "maximum_disagreement_px": 0.0,
+        "worst_t": 0.0,
+        "worst_centres": [],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": true
+      },
+      "safe_area": {
+        "safe_area": "shorts_conservative",
+        "fingerprint": "3776358f1bf13326",
+        "final_view_radius": 25.4,
+        "pixels_per_unit": 17.73070866141732,
+        "arena_radius_px": 435.2888976377952,
+        "arena_regions": [
+          {
+            "region": "action_rail",
+            "clearance_px": 18.311102362204792,
+            "clear": true
+          },
+          {
+            "region": "title_block",
+            "clearance_px": 332.7111023622048,
+            "clear": true
+          },
+          {
+            "region": "progress_bar",
+            "clearance_px": 524.7111023622049,
+            "clear": true
+          },
+          {
+            "region": "nav_bar",
+            "clearance_px": 563.1111023622047,
+            "clear": true
+          },
+          {
+            "region": "top_bar",
+            "clearance_px": 294.31110236220474,
+            "clear": true
+          }
+        ],
+        "arena_clear": true,
+        "min_clearance_px": 18.311102362204792,
+        "ball_hidden_frames": 0,
+        "ball_hidden_seconds": 0.0,
+        "ball_hidden_longest_seconds": 0.0,
+        "ball_hidden_budget_seconds": 0.25,
+        "ball_hidden_by_region": {
+          "action_rail": 0,
+          "title_block": 0,
+          "progress_bar": 0,
+          "nav_bar": 0,
+          "top_bar": 0
+        },
+        "ball_pass": true
+      },
+      "audio": {
+        "events_per_second": 8.0415,
+        "collisions_per_second": 6.3793,
+        "max_polyphony": 8,
+        "median_polyphony": 2.0,
+        "simultaneous_onsets": 18,
+        "harsh_pairs": 0,
+        "thirds": [
+          {
+            "third": "early",
+            "events": 26,
+            "events_per_second": 3.1698,
+            "collisions": 16,
+            "distinct_balls": 3,
+            "max_polyphony": 4,
+            "mean_polyphony": 1.7579,
+            "distinct_pitches": 7,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 2.3077,
+            "marked_events": 4
+          },
+          {
+            "third": "middle",
+            "events": 79,
+            "events_per_second": 9.6313,
+            "collisions": 68,
+            "distinct_balls": 7,
+            "max_polyphony": 6,
+            "mean_polyphony": 2.2775,
+            "distinct_pitches": 10,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 4.1899,
+            "marked_events": 7
+          },
+          {
+            "third": "late",
+            "events": 74,
+            "events_per_second": 9.0217,
+            "collisions": 58,
+            "distinct_balls": 8,
+            "max_polyphony": 8,
+            "mean_polyphony": 2.4792,
+            "distinct_pitches": 9,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 4.5135,
+            "marked_events": 9
+          }
+        ],
+        "density_warning": false
+      },
+      "decision": "accepted",
+      "decision_reason": "passes engineering screen"
+    },
+    {
+      "seed": 16629,
+      "duration": 22.589737476992656,
+      "first_spawn": 2.4838624425846096,
+      "population": 11,
+      "population_thirds": [
+        2,
+        5,
+        11
+      ],
+      "collision_thirds": [
+        11,
+        29,
+        96
+      ],
+      "meaningful_thirds": [
+        28,
+        61,
+        180
+      ],
+      "strict_escalation": {
+        "population": true,
+        "collisions": true,
+        "meaningful": true
+      },
+      "escape_route": "opening",
+      "escape_generation": 3,
+      "breaks": 7,
+      "shared_breaks": 6,
+      "cooperative_outer_breaks": 0,
+      "cooperative_break_details": [
+        {
+          "shell_id": 2,
+          "panel_id": 27,
+          "t": 15.350502726547077,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            1,
+            2,
+            4
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 2.351457120639024,
+          "final_triggering_ball": 4
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 18,
+          "t": 16.0499589211299,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 2.043120130492172,
+          "final_triggering_ball": 0
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 2,
+          "t": 17.895615113738273,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            1,
+            2
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.3956128819341322,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 10,
+          "t": 18.76689983271961,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            5
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 1.6777240955431663,
+          "final_triggering_ball": 5
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 21,
+          "t": 19.463206495649363,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            1,
+            2,
+            5
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 1.812503430366427,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 3,
+          "t": 20.605590142656734,
+          "unique_contributing_balls": 4,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2,
+            5
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 0.929550057229637,
+          "final_triggering_ball": 5
+        }
+      ],
+      "outer_dwell_ball_seconds": 8.970202,
+      "readability": {
+        "fps": 60.0,
+        "peak_population": 11,
+        "peak_population_t": 22.539723298076805,
+        "population_by_third": [
+          2,
+          5,
+          11
+        ],
+        "population_first_frame": 1,
+        "families_max_on_screen": 4,
+        "families_total": 3,
+        "closest_pair_diameters": 0.03849167470481066,
+        "closest_pair_t": 14.687497208288216,
+        "largest_cluster": 2,
+        "largest_cluster_t": 2.484037552820595,
+        "longest_triple_merge_seconds": 0.0,
+        "longest_triple_merge_t": 0.0,
+        "blob_deficit_frames": 347,
+        "blob_deficit_fraction": 0.2558997050147493,
+        "mean_blobs_per_ball": 0.933624295326423,
+        "max_step_diameters": 0.2724870080606974,
+        "max_step_t": 19.705586492845256,
+        "strobes": false
+      },
+      "pile_warning": false,
+      "alignment": {
+        "fps": 60.0,
+        "frames": 1357,
+        "maximum_disagreement_px": 0.0,
+        "worst_t": 0.0,
+        "worst_centres": [],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": true
+      },
+      "safe_area": {
+        "safe_area": "shorts_conservative",
+        "fingerprint": "3776358f1bf13326",
+        "final_view_radius": 25.4,
+        "pixels_per_unit": 17.73070866141732,
+        "arena_radius_px": 435.2888976377952,
+        "arena_regions": [
+          {
+            "region": "action_rail",
+            "clearance_px": 18.311102362204792,
+            "clear": true
+          },
+          {
+            "region": "title_block",
+            "clearance_px": 332.7111023622048,
+            "clear": true
+          },
+          {
+            "region": "progress_bar",
+            "clearance_px": 524.7111023622049,
+            "clear": true
+          },
+          {
+            "region": "nav_bar",
+            "clearance_px": 563.1111023622047,
+            "clear": true
+          },
+          {
+            "region": "top_bar",
+            "clearance_px": 294.31110236220474,
+            "clear": true
+          }
+        ],
+        "arena_clear": true,
+        "min_clearance_px": 18.311102362204792,
+        "ball_hidden_frames": 0,
+        "ball_hidden_seconds": 0.0,
+        "ball_hidden_longest_seconds": 0.0,
+        "ball_hidden_budget_seconds": 0.25,
+        "ball_hidden_by_region": {
+          "action_rail": 0,
+          "title_block": 0,
+          "progress_bar": 0,
+          "nav_bar": 0,
+          "top_bar": 0
+        },
+        "ball_pass": true
+      },
+      "audio": {
+        "events_per_second": 7.5361,
+        "collisions_per_second": 6.0289,
+        "max_polyphony": 7,
+        "median_polyphony": 2.0,
+        "simultaneous_onsets": 31,
+        "harsh_pairs": 0,
+        "thirds": [
+          {
+            "third": "early",
+            "events": 17,
+            "events_per_second": 2.0615,
+            "collisions": 13,
+            "distinct_balls": 2,
+            "max_polyphony": 3,
+            "mean_polyphony": 1.3772,
+            "distinct_pitches": 6,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 2.1765,
+            "marked_events": 2
+          },
+          {
+            "third": "middle",
+            "events": 58,
+            "events_per_second": 7.0332,
+            "collisions": 44,
+            "distinct_balls": 6,
+            "max_polyphony": 6,
+            "mean_polyphony": 2.2251,
+            "distinct_pitches": 12,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 6.1379,
+            "marked_events": 9
+          },
+          {
+            "third": "late",
+            "events": 95,
+            "events_per_second": 11.5199,
+            "collisions": 79,
+            "distinct_balls": 11,
+            "max_polyphony": 7,
+            "mean_polyphony": 2.9927,
+            "distinct_pitches": 14,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 6.0842,
+            "marked_events": 12
+          }
+        ],
+        "density_warning": false
+      },
+      "decision": "accepted",
+      "decision_reason": "passes engineering screen"
+    },
+    {
+      "seed": 17251,
+      "duration": 22.85229710103979,
+      "first_spawn": 1.6898269925903153,
+      "population": 13,
+      "population_thirds": [
+        4,
+        6,
+        13
+      ],
+      "collision_thirds": [
+        29,
+        40,
+        84
+      ],
+      "meaningful_thirds": [
+        73,
+        101,
+        158
+      ],
+      "strict_escalation": {
+        "population": true,
+        "collisions": true,
+        "meaningful": true
+      },
+      "escape_route": "break",
+      "escape_generation": 4,
+      "breaks": 12,
+      "shared_breaks": 11,
+      "cooperative_outer_breaks": 1,
+      "cooperative_break_details": [
+        {
+          "shell_id": 1,
+          "panel_id": 13,
+          "t": 3.002315894473387,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 1.7401765211205538,
+          "final_triggering_ball": 0
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 3,
+          "t": 6.2715732245104485,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.490656242647884,
+          "final_triggering_ball": 0
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 2,
+          "t": 6.674924217376467,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.4097710212198318,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 10,
+          "t": 10.495674488465994,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 0.7935257758880953,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 21,
+          "t": 13.251088547365166,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            1,
+            2
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.9714582054273815,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 11,
+          "t": 13.604300581488694,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 2.1684924520826603,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 6,
+          "t": 13.60902374691696,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 0.9428541222416903,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 14,
+          "t": 13.72222994089663,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            1,
+            2,
+            5
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 5,
+          "largest_contribution": 1.8467274615937652,
+          "final_triggering_ball": 5
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 22,
+          "t": 13.969794999667196,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.5623960082384025,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 15,
+          "t": 21.299852568616632,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            1,
+            2,
+            4
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 1.8893442490216847,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 4,
+          "panel_id": 14,
+          "t": 21.95129993349497,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            3,
+            6
+          ],
+          "contributing_generations": [
+            3,
+            4
+          ],
+          "largest_contributor": 6,
+          "largest_contribution": 4.988107797378214,
+          "final_triggering_ball": 6
+        }
+      ],
+      "outer_dwell_ball_seconds": 18.598217,
+      "readability": {
+        "fps": 60.0,
+        "peak_population": 13,
+        "peak_population_t": 22.80229207456049,
+        "population_by_third": [
+          4,
+          6,
+          13
+        ],
+        "population_first_frame": 1,
+        "families_max_on_screen": 5,
+        "families_total": 4,
+        "closest_pair_diameters": 0.025783545252575837,
+        "closest_pair_t": 18.851894982695846,
+        "largest_cluster": 4,
+        "largest_cluster_t": 22.752287048081193,
+        "longest_triple_merge_seconds": 0.03333333333333333,
+        "longest_triple_merge_t": 22.76895539024096,
+        "blob_deficit_frames": 501,
+        "blob_deficit_fraction": 0.3651603498542274,
+        "mean_blobs_per_ball": 0.9181648209406011,
+        "max_step_diameters": 0.2680497930551884,
+        "max_step_t": 16.11828686849415,
+        "strobes": false
+      },
+      "pile_warning": false,
+      "alignment": {
+        "fps": 60.0,
+        "frames": 1373,
+        "maximum_disagreement_px": 0.0,
+        "worst_t": 0.0,
+        "worst_centres": [],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": true
+      },
+      "safe_area": {
+        "safe_area": "shorts_conservative",
+        "fingerprint": "3776358f1bf13326",
+        "final_view_radius": 25.4,
+        "pixels_per_unit": 17.73070866141732,
+        "arena_radius_px": 435.2888976377952,
+        "arena_regions": [
+          {
+            "region": "action_rail",
+            "clearance_px": 18.311102362204792,
+            "clear": true
+          },
+          {
+            "region": "title_block",
+            "clearance_px": 332.7111023622048,
+            "clear": true
+          },
+          {
+            "region": "progress_bar",
+            "clearance_px": 524.7111023622049,
+            "clear": true
+          },
+          {
+            "region": "nav_bar",
+            "clearance_px": 563.1111023622047,
+            "clear": true
+          },
+          {
+            "region": "top_bar",
+            "clearance_px": 294.31110236220474,
+            "clear": true
+          }
+        ],
+        "arena_clear": true,
+        "min_clearance_px": 18.311102362204792,
+        "ball_hidden_frames": 0,
+        "ball_hidden_seconds": 0.0,
+        "ball_hidden_longest_seconds": 0.0,
+        "ball_hidden_budget_seconds": 0.25,
+        "ball_hidden_by_region": {
+          "action_rail": 0,
+          "title_block": 0,
+          "progress_bar": 0,
+          "nav_bar": 0,
+          "top_bar": 0
+        },
+        "ball_pass": true
+      },
+      "audio": {
+        "events_per_second": 9.1632,
+        "collisions_per_second": 6.708,
+        "max_polyphony": 10,
+        "median_polyphony": 2.0,
+        "simultaneous_onsets": 32,
+        "harsh_pairs": 0,
+        "thirds": [
+          {
+            "third": "early",
+            "events": 42,
+            "events_per_second": 5.0395,
+            "collisions": 31,
+            "distinct_balls": 4,
+            "max_polyphony": 5,
+            "mean_polyphony": 1.889,
+            "distinct_pitches": 10,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 4.381,
+            "marked_events": 9
+          },
+          {
+            "third": "middle",
+            "events": 73,
+            "events_per_second": 8.7592,
+            "collisions": 49,
+            "distinct_balls": 7,
+            "max_polyphony": 7,
+            "mean_polyphony": 2.4879,
+            "distinct_pitches": 10,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 4.1781,
+            "marked_events": 11
+          },
+          {
+            "third": "late",
+            "events": 94,
+            "events_per_second": 11.279,
+            "collisions": 73,
+            "distinct_balls": 13,
+            "max_polyphony": 10,
+            "mean_polyphony": 2.875,
+            "distinct_pitches": 12,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 7.234,
+            "marked_events": 10
+          }
+        ],
+        "density_warning": false
+      },
+      "decision": "accepted",
+      "decision_reason": "passes engineering screen"
+    },
+    {
+      "seed": 16733,
+      "duration": 23.23895649727187,
+      "first_spawn": 2.28882868539065,
+      "population": 8,
+      "population_thirds": [
+        2,
+        4,
+        8
+      ],
+      "collision_thirds": [
+        15,
+        27,
+        77
+      ],
+      "meaningful_thirds": [
+        36,
+        70,
+        135
+      ],
+      "strict_escalation": {
+        "population": true,
+        "collisions": true,
+        "meaningful": true
+      },
+      "escape_route": "break",
+      "escape_generation": 2,
+      "breaks": 8,
+      "shared_breaks": 7,
+      "cooperative_outer_breaks": 1,
+      "cooperative_break_details": [
+        {
+          "shell_id": 0,
+          "panel_id": 3,
+          "t": 7.889092560622205,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.1194302907656866,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 2,
+          "t": 14.045314642261541,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            2,
+            3
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 3,
+          "largest_contribution": 1.023282489662289,
+          "final_triggering_ball": 0
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 12,
+          "t": 14.19985893598702,
+          "unique_contributing_balls": 4,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 2.0158182859397384,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 4,
+          "t": 15.31414354099546,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 1.1107506105905431,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 3,
+          "t": 16.409552047074392,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 1.2226875670978774,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 11,
+          "t": 18.03114953495007,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 0.995579504717551,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 4,
+          "panel_id": 34,
+          "t": 22.349244681103446,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            4,
+            5
+          ],
+          "contributing_generations": [
+            2,
+            3
+          ],
+          "largest_contributor": 5,
+          "largest_contribution": 5.198300743152819,
+          "final_triggering_ball": 4
+        }
+      ],
+      "outer_dwell_ball_seconds": 10.20651,
+      "readability": {
+        "fps": 60.0,
+        "peak_population": 8,
+        "peak_population_t": 23.188944395771287,
+        "population_by_third": [
+          2,
+          4,
+          8
+        ],
+        "population_first_frame": 1,
+        "families_max_on_screen": 3,
+        "families_total": 2,
+        "closest_pair_diameters": 0.05594886883049202,
+        "closest_pair_t": 14.25344892766675,
+        "largest_cluster": 4,
+        "largest_cluster_t": 13.503267405157974,
+        "longest_triple_merge_seconds": 0.26666666666666666,
+        "longest_triple_merge_t": 13.970047019163434,
+        "blob_deficit_frames": 250,
+        "blob_deficit_fraction": 0.17921146953405018,
+        "mean_blobs_per_ball": 0.937281513469052,
+        "max_step_diameters": 0.2672935195962387,
+        "max_step_t": 15.887177576685863,
+        "strobes": false
+      },
+      "pile_warning": false,
+      "alignment": {
+        "fps": 60.0,
+        "frames": 1396,
+        "maximum_disagreement_px": 0.0,
+        "worst_t": 0.0,
+        "worst_centres": [],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": true
+      },
+      "safe_area": {
+        "safe_area": "shorts_conservative",
+        "fingerprint": "3776358f1bf13326",
+        "final_view_radius": 25.4,
+        "pixels_per_unit": 17.73070866141732,
+        "arena_radius_px": 435.2888976377952,
+        "arena_regions": [
+          {
+            "region": "action_rail",
+            "clearance_px": 18.311102362204792,
+            "clear": true
+          },
+          {
+            "region": "title_block",
+            "clearance_px": 332.7111023622048,
+            "clear": true
+          },
+          {
+            "region": "progress_bar",
+            "clearance_px": 524.7111023622049,
+            "clear": true
+          },
+          {
+            "region": "nav_bar",
+            "clearance_px": 563.1111023622047,
+            "clear": true
+          },
+          {
+            "region": "top_bar",
+            "clearance_px": 294.31110236220474,
+            "clear": true
+          }
+        ],
+        "arena_clear": true,
+        "min_clearance_px": 18.311102362204792,
+        "ball_hidden_frames": 0,
+        "ball_hidden_seconds": 0.0,
+        "ball_hidden_longest_seconds": 0.0,
+        "ball_hidden_budget_seconds": 0.25,
+        "ball_hidden_by_region": {
+          "action_rail": 0,
+          "title_block": 0,
+          "progress_bar": 0,
+          "nav_bar": 0,
+          "top_bar": 0
+        },
+        "ball_pass": true
+      },
+      "audio": {
+        "events_per_second": 6.662,
+        "collisions_per_second": 5.1479,
+        "max_polyphony": 7,
+        "median_polyphony": 2.0,
+        "simultaneous_onsets": 19,
+        "harsh_pairs": 0,
+        "thirds": [
+          {
+            "third": "early",
+            "events": 21,
+            "events_per_second": 2.4814,
+            "collisions": 16,
+            "distinct_balls": 2,
+            "max_polyphony": 3,
+            "mean_polyphony": 1.4634,
+            "distinct_pitches": 6,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 1.6667,
+            "marked_events": 3
+          },
+          {
+            "third": "middle",
+            "events": 51,
+            "events_per_second": 6.0262,
+            "collisions": 36,
+            "distinct_balls": 5,
+            "max_polyphony": 6,
+            "mean_polyphony": 2.3,
+            "distinct_pitches": 10,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 5.0,
+            "marked_events": 10
+          },
+          {
+            "third": "late",
+            "events": 82,
+            "events_per_second": 9.6893,
+            "collisions": 67,
+            "distinct_balls": 8,
+            "max_polyphony": 7,
+            "mean_polyphony": 2.5718,
+            "distinct_pitches": 10,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 6.1463,
+            "marked_events": 8
+          }
+        ],
+        "density_warning": false
+      },
+      "decision": "accepted",
+      "decision_reason": "passes engineering screen"
+    },
+    {
+      "seed": 19945,
+      "duration": 23.373217812033495,
+      "first_spawn": 2.119832907060207,
+      "population": 10,
+      "population_thirds": [
+        2,
+        7,
+        10
+      ],
+      "collision_thirds": [
+        12,
+        54,
+        106
+      ],
+      "meaningful_thirds": [
+        26,
+        94,
+        177
+      ],
+      "strict_escalation": {
+        "population": true,
+        "collisions": true,
+        "meaningful": true
+      },
+      "escape_route": "opening",
+      "escape_generation": 1,
+      "breaks": 4,
+      "shared_breaks": 4,
+      "cooperative_outer_breaks": 0,
+      "cooperative_break_details": [
+        {
+          "shell_id": 3,
+          "panel_id": 33,
+          "t": 14.325172129057057,
+          "unique_contributing_balls": 4,
+          "contributing_ball_ids": [
+            0,
+            3,
+            4,
+            5
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 4,
+          "largest_contribution": 2.655270479150158,
+          "final_triggering_ball": 3
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 2,
+          "t": 15.609919810966167,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            2
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 1.8168741239093051,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 11,
+          "t": 19.82721965710987,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            2
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 1.10499113369076,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 10,
+          "t": 21.291402832871995,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            1,
+            6
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.6541298507280344,
+          "final_triggering_ball": 6
+        }
+      ],
+      "outer_dwell_ball_seconds": 18.078927,
+      "readability": {
+        "fps": 60.0,
+        "peak_population": 10,
+        "peak_population_t": 23.32320379389077,
+        "population_by_third": [
+          2,
+          7,
+          10
+        ],
+        "population_first_frame": 1,
+        "families_max_on_screen": 5,
+        "families_total": 4,
+        "closest_pair_diameters": 0.02919876108701883,
+        "closest_pair_t": 13.036987395870323,
+        "largest_cluster": 4,
+        "largest_cluster_t": 12.47016185691944,
+        "longest_triple_merge_seconds": 1.3,
+        "longest_triple_merge_t": 13.753854989249383,
+        "blob_deficit_frames": 383,
+        "blob_deficit_fraction": 0.2729864575908767,
+        "mean_blobs_per_ball": 0.9136832524271845,
+        "max_step_diameters": 0.27022960757068815,
+        "max_step_t": 15.27094687291204,
+        "strobes": false
+      },
+      "pile_warning": true,
+      "alignment": {
+        "fps": 60.0,
+        "frames": 1404,
+        "maximum_disagreement_px": 0.0,
+        "worst_t": 0.0,
+        "worst_centres": [],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": true
+      },
+      "safe_area": {
+        "safe_area": "shorts_conservative",
+        "fingerprint": "3776358f1bf13326",
+        "final_view_radius": 25.4,
+        "pixels_per_unit": 17.73070866141732,
+        "arena_radius_px": 435.2888976377952,
+        "arena_regions": [
+          {
+            "region": "action_rail",
+            "clearance_px": 18.311102362204792,
+            "clear": true
+          },
+          {
+            "region": "title_block",
+            "clearance_px": 332.7111023622048,
+            "clear": true
+          },
+          {
+            "region": "progress_bar",
+            "clearance_px": 524.7111023622049,
+            "clear": true
+          },
+          {
+            "region": "nav_bar",
+            "clearance_px": 563.1111023622047,
+            "clear": true
+          },
+          {
+            "region": "top_bar",
+            "clearance_px": 294.31110236220474,
+            "clear": true
+          }
+        ],
+        "arena_clear": true,
+        "min_clearance_px": 18.311102362204792,
+        "ball_hidden_frames": 0,
+        "ball_hidden_seconds": 0.0,
+        "ball_hidden_longest_seconds": 0.0,
+        "ball_hidden_budget_seconds": 0.25,
+        "ball_hidden_by_region": {
+          "action_rail": 0,
+          "title_block": 0,
+          "progress_bar": 0,
+          "nav_bar": 0,
+          "top_bar": 0
+        },
+        "ball_pass": true
+      },
+      "audio": {
+        "events_per_second": 8.3796,
+        "collisions_per_second": 7.4294,
+        "max_polyphony": 8,
+        "median_polyphony": 2.0,
+        "simultaneous_onsets": 35,
+        "harsh_pairs": 0,
+        "thirds": [
+          {
+            "third": "early",
+            "events": 16,
+            "events_per_second": 1.8806,
+            "collisions": 13,
+            "distinct_balls": 2,
+            "max_polyphony": 3,
+            "mean_polyphony": 1.2433,
+            "distinct_pitches": 7,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 2.5625,
+            "marked_events": 2
+          },
+          {
+            "third": "middle",
+            "events": 85,
+            "events_per_second": 9.9909,
+            "collisions": 75,
+            "distinct_balls": 7,
+            "max_polyphony": 8,
+            "mean_polyphony": 2.6963,
+            "distinct_pitches": 11,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 5.5294,
+            "marked_events": 10
+          },
+          {
+            "third": "late",
+            "events": 93,
+            "events_per_second": 10.9312,
+            "collisions": 84,
+            "distinct_balls": 10,
+            "max_polyphony": 7,
+            "mean_polyphony": 2.5191,
+            "distinct_pitches": 13,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 6.6882,
+            "marked_events": 7
+          }
+        ],
+        "density_warning": false
+      },
+      "decision": "rejected",
+      "decision_reason": "1.300 s severe triple-ball merge"
+    },
+    {
+      "seed": 17970,
+      "duration": 23.38304518071256,
+      "first_spawn": 0.7087002357024585,
+      "population": 12,
+      "population_thirds": [
+        3,
+        4,
+        12
+      ],
+      "collision_thirds": [
+        19,
+        33,
+        61
+      ],
+      "meaningful_thirds": [
+        46,
+        67,
+        152
+      ],
+      "strict_escalation": {
+        "population": true,
+        "collisions": true,
+        "meaningful": true
+      },
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "breaks": 9,
+      "shared_breaks": 8,
+      "cooperative_outer_breaks": 0,
+      "cooperative_break_details": [
+        {
+          "shell_id": 1,
+          "panel_id": 18,
+          "t": 10.713845366446733,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 2.0653308815753038,
+          "final_triggering_ball": 0
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 7,
+          "t": 16.46455112418554,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 1.775836420354448,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 4,
+          "t": 17.508162539129486,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            3
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 3,
+          "largest_contribution": 1.7422666768605264,
+          "final_triggering_ball": 3
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 15,
+          "t": 17.53940139329672,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.720155313302413,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 10,
+          "t": 18.55179813136514,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 3.436329540401161,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 26,
+          "t": 22.374796283434982,
+          "unique_contributing_balls": 5,
+          "contributing_ball_ids": [
+            2,
+            6,
+            7,
+            8,
+            9
+          ],
+          "contributing_generations": [
+            1,
+            2,
+            3
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 1.0675484154107806,
+          "final_triggering_ball": 6
+        },
+        {
+          "shell_id": 3,
+          "panel_id": 2,
+          "t": 22.74234726274772,
+          "unique_contributing_balls": 6,
+          "contributing_ball_ids": [
+            3,
+            4,
+            6,
+            8,
+            9,
+            10
+          ],
+          "contributing_generations": [
+            1,
+            2,
+            3
+          ],
+          "largest_contributor": 6,
+          "largest_contribution": 1.9633229191911794,
+          "final_triggering_ball": 10
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 25,
+          "t": 23.00273474369147,
+          "unique_contributing_balls": 5,
+          "contributing_ball_ids": [
+            0,
+            2,
+            4,
+            8,
+            9
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "largest_contributor": 4,
+          "largest_contribution": 1.1352583539548833,
+          "final_triggering_ball": 9
+        }
+      ],
+      "outer_dwell_ball_seconds": 8.000141,
+      "readability": {
+        "fps": 60.0,
+        "peak_population": 12,
+        "peak_population_t": 23.33304579686214,
+        "population_by_third": [
+          3,
+          4,
+          12
+        ],
+        "population_first_frame": 1,
+        "families_max_on_screen": 6,
+        "families_total": 5,
+        "closest_pair_diameters": 0.040786591222845586,
+        "closest_pair_t": 22.899717803491843,
+        "largest_cluster": 6,
+        "largest_cluster_t": 22.433056887554603,
+        "longest_triple_merge_seconds": 2.8,
+        "longest_triple_merge_t": 23.31637933557867,
+        "blob_deficit_frames": 316,
+        "blob_deficit_fraction": 0.22507122507122507,
+        "mean_blobs_per_ball": 0.8547278469255062,
+        "max_step_diameters": 0.24781414992363499,
+        "max_step_t": 6.716583897239602,
+        "strobes": false
+      },
+      "pile_warning": true,
+      "alignment": {
+        "fps": 60.0,
+        "frames": 1404,
+        "maximum_disagreement_px": 0.0,
+        "worst_t": 0.0,
+        "worst_centres": [],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": true
+      },
+      "safe_area": {
+        "safe_area": "shorts_conservative",
+        "fingerprint": "3776358f1bf13326",
+        "final_view_radius": 25.4,
+        "pixels_per_unit": 17.73070866141732,
+        "arena_radius_px": 435.2888976377952,
+        "arena_regions": [
+          {
+            "region": "action_rail",
+            "clearance_px": 18.311102362204792,
+            "clear": true
+          },
+          {
+            "region": "title_block",
+            "clearance_px": 332.7111023622048,
+            "clear": true
+          },
+          {
+            "region": "progress_bar",
+            "clearance_px": 524.7111023622049,
+            "clear": true
+          },
+          {
+            "region": "nav_bar",
+            "clearance_px": 563.1111023622047,
+            "clear": true
+          },
+          {
+            "region": "top_bar",
+            "clearance_px": 294.31110236220474,
+            "clear": true
+          }
+        ],
+        "arena_clear": true,
+        "min_clearance_px": 18.311102362204792,
+        "ball_hidden_frames": 0,
+        "ball_hidden_seconds": 0.0,
+        "ball_hidden_longest_seconds": 0.0,
+        "ball_hidden_budget_seconds": 0.25,
+        "ball_hidden_by_region": {
+          "action_rail": 0,
+          "title_block": 0,
+          "progress_bar": 0,
+          "nav_bar": 0,
+          "top_bar": 0
+        },
+        "ball_pass": true
+      },
+      "audio": {
+        "events_per_second": 6.5079,
+        "collisions_per_second": 4.8381,
+        "max_polyphony": 8,
+        "median_polyphony": 2.0,
+        "simultaneous_onsets": 23,
+        "harsh_pairs": 0,
+        "thirds": [
+          {
+            "third": "early",
+            "events": 32,
+            "events_per_second": 3.7598,
+            "collisions": 25,
+            "distinct_balls": 3,
+            "max_polyphony": 4,
+            "mean_polyphony": 1.7817,
+            "distinct_pitches": 9,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 4.2188,
+            "marked_events": 5
+          },
+          {
+            "third": "middle",
+            "events": 41,
+            "events_per_second": 4.8173,
+            "collisions": 35,
+            "distinct_balls": 4,
+            "max_polyphony": 4,
+            "mean_polyphony": 1.7156,
+            "distinct_pitches": 10,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 4.0244,
+            "marked_events": 3
+          },
+          {
+            "third": "late",
+            "events": 79,
+            "events_per_second": 9.2821,
+            "collisions": 53,
+            "distinct_balls": 12,
+            "max_polyphony": 8,
+            "mean_polyphony": 2.9214,
+            "distinct_pitches": 14,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 7.1519,
+            "marked_events": 18
+          }
+        ],
+        "density_warning": false
+      },
+      "decision": "rejected",
+      "decision_reason": "2.800 s severe triple-ball merge"
+    },
+    {
+      "seed": 3499,
+      "duration": 23.486333520985053,
+      "first_spawn": 0.895250350057141,
+      "population": 12,
+      "population_thirds": [
+        2,
+        4,
+        12
+      ],
+      "collision_thirds": [
+        17,
+        42,
+        92
+      ],
+      "meaningful_thirds": [
+        33,
+        86,
+        203
+      ],
+      "strict_escalation": {
+        "population": true,
+        "collisions": true,
+        "meaningful": true
+      },
+      "escape_route": "opening",
+      "escape_generation": 2,
+      "breaks": 10,
+      "shared_breaks": 10,
+      "cooperative_outer_breaks": 0,
+      "cooperative_break_details": [
+        {
+          "shell_id": 2,
+          "panel_id": 17,
+          "t": 11.679242291542568,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 3.935848793337396,
+          "final_triggering_ball": 0
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 18,
+          "t": 12.024236027976787,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 2.3022584820537118,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 20,
+          "t": 15.060207585964942,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 1.7559566115466327,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 11,
+          "t": 15.681595713567482,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 0.9802567894274156,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 23,
+          "t": 17.268356116108745,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            2,
+            3
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 1.6137578726947126,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 10,
+          "t": 19.328399893120295,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 1.5625700224769556,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 13,
+          "t": 19.544811461330866,
+          "unique_contributing_balls": 4,
+          "contributing_ball_ids": [
+            0,
+            2,
+            4,
+            5
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "largest_contributor": 5,
+          "largest_contribution": 0.9828053114220785,
+          "final_triggering_ball": 4
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 13,
+          "t": 20.088922146093836,
+          "unique_contributing_balls": 6,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            7
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.00025340178213,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 19,
+          "t": 22.69672317358636,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            2,
+            3
+          ],
+          "contributing_generations": [
+            1
+          ],
+          "largest_contributor": 3,
+          "largest_contribution": 2.2120990056836636,
+          "final_triggering_ball": 3
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 9,
+          "t": 22.939078920828226,
+          "unique_contributing_balls": 5,
+          "contributing_ball_ids": [
+            0,
+            1,
+            2,
+            3,
+            8
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            2
+          ],
+          "largest_contributor": 3,
+          "largest_contribution": 1.607615582377703,
+          "final_triggering_ball": 1
+        }
+      ],
+      "outer_dwell_ball_seconds": 7.764946,
+      "readability": {
+        "fps": 60.0,
+        "peak_population": 12,
+        "peak_population_t": 23.41965833710717,
+        "population_by_third": [
+          2,
+          4,
+          12
+        ],
+        "population_first_frame": 1,
+        "families_max_on_screen": 5,
+        "families_total": 4,
+        "closest_pair_diameters": 0.018042796718627442,
+        "closest_pair_t": 18.66905148580785,
+        "largest_cluster": 4,
+        "largest_cluster_t": 18.402350750296307,
+        "longest_triple_merge_seconds": 0.5833333333333334,
+        "longest_triple_merge_t": 19.435816100403528,
+        "blob_deficit_frames": 378,
+        "blob_deficit_fraction": 0.2680851063829787,
+        "mean_blobs_per_ball": 0.9168900804289544,
+        "max_step_diameters": 0.2727917162960699,
+        "max_step_t": 18.885745833410976,
+        "strobes": false
+      },
+      "pile_warning": false,
+      "alignment": {
+        "fps": 60.0,
+        "frames": 1411,
+        "maximum_disagreement_px": 0.0,
+        "worst_t": 0.0,
+        "worst_centres": [],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": true
+      },
+      "safe_area": {
+        "safe_area": "shorts_conservative",
+        "fingerprint": "3776358f1bf13326",
+        "final_view_radius": 25.4,
+        "pixels_per_unit": 17.73070866141732,
+        "arena_radius_px": 435.2888976377952,
+        "arena_regions": [
+          {
+            "region": "action_rail",
+            "clearance_px": 18.311102362204792,
+            "clear": true
+          },
+          {
+            "region": "title_block",
+            "clearance_px": 332.7111023622048,
+            "clear": true
+          },
+          {
+            "region": "progress_bar",
+            "clearance_px": 524.7111023622049,
+            "clear": true
+          },
+          {
+            "region": "nav_bar",
+            "clearance_px": 563.1111023622047,
+            "clear": true
+          },
+          {
+            "region": "top_bar",
+            "clearance_px": 294.31110236220474,
+            "clear": true
+          }
+        ],
+        "arena_clear": true,
+        "min_clearance_px": 18.311102362204792,
+        "ball_hidden_frames": 0,
+        "ball_hidden_seconds": 0.0,
+        "ball_hidden_longest_seconds": 0.0,
+        "ball_hidden_budget_seconds": 0.25,
+        "ball_hidden_by_region": {
+          "action_rail": 0,
+          "title_block": 0,
+          "progress_bar": 0,
+          "nav_bar": 0,
+          "top_bar": 0
+        },
+        "ball_pass": true
+      },
+      "audio": {
+        "events_per_second": 8.283,
+        "collisions_per_second": 6.4471,
+        "max_polyphony": 9,
+        "median_polyphony": 2.0,
+        "simultaneous_onsets": 31,
+        "harsh_pairs": 0,
+        "thirds": [
+          {
+            "third": "early",
+            "events": 24,
+            "events_per_second": 2.8085,
+            "collisions": 18,
+            "distinct_balls": 3,
+            "max_polyphony": 3,
+            "mean_polyphony": 1.3478,
+            "distinct_pitches": 6,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 2.4583,
+            "marked_events": 4
+          },
+          {
+            "third": "middle",
+            "events": 64,
+            "events_per_second": 7.4894,
+            "collisions": 54,
+            "distinct_balls": 4,
+            "max_polyphony": 5,
+            "mean_polyphony": 2.1857,
+            "distinct_pitches": 10,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 5.4219,
+            "marked_events": 6
+          },
+          {
+            "third": "late",
+            "events": 106,
+            "events_per_second": 12.4043,
+            "collisions": 79,
+            "distinct_balls": 12,
+            "max_polyphony": 9,
+            "mean_polyphony": 3.3675,
+            "distinct_pitches": 14,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 7.4434,
+            "marked_events": 17
+          }
+        ],
+        "density_warning": true
+      },
+      "decision": "accepted",
+      "decision_reason": "passes engineering screen"
+    },
+    {
+      "seed": 14773,
+      "duration": 25.789713654452118,
+      "first_spawn": 0.6219531445656077,
+      "population": 12,
+      "population_thirds": [
+        3,
+        7,
+        12
+      ],
+      "collision_thirds": [
+        20,
+        72,
+        113
+      ],
+      "meaningful_thirds": [
+        47,
+        124,
+        204
+      ],
+      "strict_escalation": {
+        "population": true,
+        "collisions": true,
+        "meaningful": true
+      },
+      "escape_route": "opening",
+      "escape_generation": 2,
+      "breaks": 4,
+      "shared_breaks": 4,
+      "cooperative_outer_breaks": 0,
+      "cooperative_break_details": [
+        {
+          "shell_id": 1,
+          "panel_id": 6,
+          "t": 10.071814342758858,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            2
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 2.059991722284474,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 0,
+          "panel_id": 3,
+          "t": 18.29233132192599,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.550453382529775,
+          "final_triggering_ball": 0
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 7,
+          "t": 22.66478685491855,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            2
+          ],
+          "contributing_generations": [
+            0,
+            2
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 1.7900216784280634,
+          "final_triggering_ball": 0
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 4,
+          "t": 22.9197140873049,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            0,
+            7,
+            9
+          ],
+          "contributing_generations": [
+            0,
+            1,
+            3
+          ],
+          "largest_contributor": 7,
+          "largest_contribution": 1.414780326260359,
+          "final_triggering_ball": 7
+        }
+      ],
+      "outer_dwell_ball_seconds": 9.20582,
+      "readability": {
+        "fps": 60.0,
+        "peak_population": 12,
+        "peak_population_t": 25.739701281495844,
+        "population_by_third": [
+          3,
+          7,
+          12
+        ],
+        "population_first_frame": 1,
+        "families_max_on_screen": 4,
+        "families_total": 3,
+        "closest_pair_diameters": 0.12231262245234735,
+        "closest_pair_t": 16.370716747687123,
+        "largest_cluster": 4,
+        "largest_cluster_t": 17.204256296958363,
+        "longest_triple_merge_seconds": 0.2833333333333333,
+        "longest_triple_merge_t": 18.454565620865218,
+        "blob_deficit_frames": 416,
+        "blob_deficit_fraction": 0.268733850129199,
+        "mean_blobs_per_ball": 0.9435334872979215,
+        "max_step_diameters": 0.2679626601333296,
+        "max_step_t": 16.420729120643397,
+        "strobes": false
+      },
+      "pile_warning": false,
+      "alignment": {
+        "fps": 60.0,
+        "frames": 1549,
+        "maximum_disagreement_px": 0.0,
+        "worst_t": 0.0,
+        "worst_centres": [],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": true
+      },
+      "safe_area": {
+        "safe_area": "shorts_conservative",
+        "fingerprint": "3776358f1bf13326",
+        "final_view_radius": 25.4,
+        "pixels_per_unit": 17.73070866141732,
+        "arena_radius_px": 435.2888976377952,
+        "arena_regions": [
+          {
+            "region": "action_rail",
+            "clearance_px": 18.311102362204792,
+            "clear": true
+          },
+          {
+            "region": "title_block",
+            "clearance_px": 332.7111023622048,
+            "clear": true
+          },
+          {
+            "region": "progress_bar",
+            "clearance_px": 524.7111023622049,
+            "clear": true
+          },
+          {
+            "region": "nav_bar",
+            "clearance_px": 563.1111023622047,
+            "clear": true
+          },
+          {
+            "region": "top_bar",
+            "clearance_px": 294.31110236220474,
+            "clear": true
+          }
+        ],
+        "arena_clear": true,
+        "min_clearance_px": 18.311102362204792,
+        "ball_hidden_frames": 0,
+        "ball_hidden_seconds": 0.0,
+        "ball_hidden_longest_seconds": 0.0,
+        "ball_hidden_budget_seconds": 0.25,
+        "ball_hidden_by_region": {
+          "action_rail": 0,
+          "title_block": 0,
+          "progress_bar": 0,
+          "nav_bar": 0,
+          "top_bar": 0
+        },
+        "ball_pass": true
+      },
+      "audio": {
+        "events_per_second": 9.5019,
+        "collisions_per_second": 7.9831,
+        "max_polyphony": 9,
+        "median_polyphony": 2.0,
+        "simultaneous_onsets": 47,
+        "harsh_pairs": 0,
+        "thirds": [
+          {
+            "third": "early",
+            "events": 33,
+            "events_per_second": 3.5433,
+            "collisions": 22,
+            "distinct_balls": 4,
+            "max_polyphony": 3,
+            "mean_polyphony": 1.4505,
+            "distinct_pitches": 7,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 2.1818,
+            "marked_events": 6
+          },
+          {
+            "third": "middle",
+            "events": 98,
+            "events_per_second": 10.5227,
+            "collisions": 85,
+            "distinct_balls": 9,
+            "max_polyphony": 7,
+            "mean_polyphony": 2.4906,
+            "distinct_pitches": 10,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 4.6939,
+            "marked_events": 8
+          },
+          {
+            "third": "late",
+            "events": 113,
+            "events_per_second": 12.1333,
+            "collisions": 98,
+            "distinct_balls": 12,
+            "max_polyphony": 9,
+            "mean_polyphony": 2.8087,
+            "distinct_pitches": 12,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 6.292,
+            "marked_events": 7
+          }
+        ],
+        "density_warning": true
+      },
+      "decision": "accepted",
+      "decision_reason": "passes engineering screen"
+    },
+    {
+      "seed": 12197,
+      "duration": 25.858239905118804,
+      "first_spawn": 2.659527348222199,
+      "population": 11,
+      "population_thirds": [
+        3,
+        6,
+        11
+      ],
+      "collision_thirds": [
+        12,
+        61,
+        100
+      ],
+      "meaningful_thirds": [
+        36,
+        100,
+        169
+      ],
+      "strict_escalation": {
+        "population": true,
+        "collisions": true,
+        "meaningful": true
+      },
+      "escape_route": "break",
+      "escape_generation": 3,
+      "breaks": 9,
+      "shared_breaks": 8,
+      "cooperative_outer_breaks": 1,
+      "cooperative_break_details": [
+        {
+          "shell_id": 0,
+          "panel_id": 7,
+          "t": 5.465017138929619,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.0615285245391968,
+          "final_triggering_ball": 0
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 10,
+          "t": 9.223292109710046,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            1,
+            2
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.933943268029946,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 26,
+          "t": 10.181902212706348,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            1,
+            2
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 2,
+          "largest_contribution": 2.8528877242505777,
+          "final_triggering_ball": 2
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 11,
+          "t": 13.609218628302301,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            0,
+            1
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 0,
+          "largest_contribution": 2.0247197294214074,
+          "final_triggering_ball": 0
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 22,
+          "t": 18.210573680111896,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            1,
+            3,
+            5
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 3.832225498347136,
+          "final_triggering_ball": 5
+        },
+        {
+          "shell_id": 2,
+          "panel_id": 21,
+          "t": 19.02542856191807,
+          "unique_contributing_balls": 4,
+          "contributing_ball_ids": [
+            0,
+            1,
+            5,
+            6
+          ],
+          "contributing_generations": [
+            0,
+            1
+          ],
+          "largest_contributor": 1,
+          "largest_contribution": 1.6432833689735038,
+          "final_triggering_ball": 1
+        },
+        {
+          "shell_id": 1,
+          "panel_id": 12,
+          "t": 19.03281410551664,
+          "unique_contributing_balls": 3,
+          "contributing_ball_ids": [
+            1,
+            2,
+            5
+          ],
+          "contributing_generations": [
+            1,
+            2
+          ],
+          "largest_contributor": 5,
+          "largest_contribution": 2.22084784098282,
+          "final_triggering_ball": 5
+        },
+        {
+          "shell_id": 4,
+          "panel_id": 35,
+          "t": 25.62821532649925,
+          "unique_contributing_balls": 2,
+          "contributing_ball_ids": [
+            4,
+            7
+          ],
+          "contributing_generations": [
+            3,
+            4
+          ],
+          "largest_contributor": 7,
+          "largest_contribution": 5.932813150364151,
+          "final_triggering_ball": 7
+        }
+      ],
+      "outer_dwell_ball_seconds": 15.670612,
+      "readability": {
+        "fps": 60.0,
+        "peak_population": 11,
+        "peak_population_t": 25.808223967197875,
+        "population_by_third": [
+          3,
+          6,
+          11
+        ],
+        "population_first_frame": 1,
+        "families_max_on_screen": 4,
+        "families_total": 3,
+        "closest_pair_diameters": 0.10835211533361964,
+        "closest_pair_t": 13.03748781805474,
+        "largest_cluster": 3,
+        "largest_cluster_t": 18.422537134207786,
+        "longest_triple_merge_seconds": 0.43333333333333335,
+        "longest_triple_merge_t": 24.841249167393304,
+        "blob_deficit_frames": 498,
+        "blob_deficit_fraction": 0.32087628865979384,
+        "mean_blobs_per_ball": 0.9193243243243243,
+        "max_step_diameters": 0.25373746611201864,
+        "max_step_t": 19.389511934012358,
+        "strobes": false
+      },
+      "pile_warning": false,
+      "alignment": {
+        "fps": 60.0,
+        "frames": 1553,
+        "maximum_disagreement_px": 0.0,
+        "worst_t": 0.0,
+        "worst_centres": [],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": true
+      },
+      "safe_area": {
+        "safe_area": "shorts_conservative",
+        "fingerprint": "3776358f1bf13326",
+        "final_view_radius": 25.4,
+        "pixels_per_unit": 17.73070866141732,
+        "arena_radius_px": 435.2888976377952,
+        "arena_regions": [
+          {
+            "region": "action_rail",
+            "clearance_px": 18.311102362204792,
+            "clear": true
+          },
+          {
+            "region": "title_block",
+            "clearance_px": 332.7111023622048,
+            "clear": true
+          },
+          {
+            "region": "progress_bar",
+            "clearance_px": 524.7111023622049,
+            "clear": true
+          },
+          {
+            "region": "nav_bar",
+            "clearance_px": 563.1111023622047,
+            "clear": true
+          },
+          {
+            "region": "top_bar",
+            "clearance_px": 294.31110236220474,
+            "clear": true
+          }
+        ],
+        "arena_clear": true,
+        "min_clearance_px": 18.311102362204792,
+        "ball_hidden_frames": 0,
+        "ball_hidden_seconds": 0.0,
+        "ball_hidden_longest_seconds": 0.0,
+        "ball_hidden_budget_seconds": 0.25,
+        "ball_hidden_by_region": {
+          "action_rail": 0,
+          "title_block": 0,
+          "progress_bar": 0,
+          "nav_bar": 0,
+          "top_bar": 0
+        },
+        "ball_pass": true
+      },
+      "audio": {
+        "events_per_second": 8.1855,
+        "collisions_per_second": 6.7433,
+        "max_polyphony": 8,
+        "median_polyphony": 2.0,
+        "simultaneous_onsets": 39,
+        "harsh_pairs": 0,
+        "thirds": [
+          {
+            "third": "early",
+            "events": 26,
+            "events_per_second": 2.7849,
+            "collisions": 17,
+            "distinct_balls": 3,
+            "max_polyphony": 4,
+            "mean_polyphony": 1.6377,
+            "distinct_pitches": 7,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 2.0,
+            "marked_events": 6
+          },
+          {
+            "third": "middle",
+            "events": 80,
+            "events_per_second": 8.5689,
+            "collisions": 70,
+            "distinct_balls": 7,
+            "max_polyphony": 6,
+            "mean_polyphony": 2.1611,
+            "distinct_pitches": 10,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 4.7125,
+            "marked_events": 8
+          },
+          {
+            "third": "late",
+            "events": 104,
+            "events_per_second": 11.1396,
+            "collisions": 86,
+            "distinct_balls": 11,
+            "max_polyphony": 8,
+            "mean_polyphony": 2.928,
+            "distinct_pitches": 10,
+            "distinct_pitch_classes": 5,
+            "mean_ladder_index": 6.9712,
+            "marked_events": 11
+          }
+        ],
+        "density_warning": false
+      },
+      "decision": "accepted",
+      "decision_reason": "passes engineering screen"
+    }
+  ]
+}

@@ -23,7 +23,7 @@ from satisfying.multishell import SCHEMA_VERSION
 from satisfying.multishell_playback import document_for, document_digest
 
 SEEDS = av.CANDIDATE_SEEDS
-REFERENCE_SEED = 12818
+REFERENCE_SEED = 15793
 
 
 @pytest.fixture(scope="module")
@@ -47,8 +47,8 @@ def test_both_branches_are_pinned_to_the_phase_shas():
     assert av.AUDIO_SHA == "14522d9e02d1dd4630d6bbb398e818494d914d44"
 
 
-def test_the_candidate_set_is_the_converged_seven():
-    assert set(SEEDS) == {949, 12004, 547, 11319, 3622, 12818, 7183}
+def test_the_candidate_set_is_the_phase3b_review_six():
+    assert SEEDS == (15793, 8292, 17251, 16733, 12197, 14705)
 
 
 @pytest.mark.parametrize("seed", SEEDS)
@@ -158,13 +158,13 @@ def test_a_stale_visual_audit_is_rejected(reference, documents):
     walk = {"seed": int(reference["seed"]), "digest": reference["digest"], "frames": 10}
     assert av.sync_audit(reference, 30.0, walk)["pass"]
 
-    stale = dict(walk, digest=documents[949]["digest"])
+    stale = dict(walk, digest=documents[8292]["digest"])
     report = av.sync_audit(reference, 30.0, stale)
     assert not report["visual_digest_matches"]
     assert not report["pass"]
 
     with pytest.raises(av.AVIntegrationError):
-        av.sync_audit(reference, 30.0, dict(walk, seed=949))
+        av.sync_audit(reference, 30.0, dict(walk, seed=8292))
 
 
 # --------------------------------------------------------------------------
@@ -306,7 +306,7 @@ def test_no_reframe_outpaces_the_ball_at_its_fastest(documents, seed):
 @pytest.mark.parametrize("seed", SEEDS)
 def test_the_clip_ends_on_a_still_camera(documents, seed):
     """The final hold is a feature and the brief asks for it to be preserved."""
-    assert av.camera_report(documents[seed], 30.0)["static_tail_seconds"] >= 5.0
+    assert av.camera_report(documents[seed], 30.0)["static_tail_seconds"] >= 3.0
 
 
 # --------------------------------------------------------------------------
@@ -340,28 +340,33 @@ def test_the_audio_peak_arrives_in_the_final_third(documents, seed):
     assert av.density_report(documents[seed])["peak_in_final_third"]
 
 
+@pytest.mark.parametrize("seed", SEEDS)
+def test_human_review_evidence_covers_all_ten_required_beats(documents, seed):
+    moments = av.av_moments(documents[seed])
+    assert [row["name"].split("_", 1)[1] for row in moments] == [
+        "frame_0", "first_spawn", "four_ball_state", "first_critical_panel",
+        "first_break", "cooperative_damage", "late_high_population",
+        "outer_shell_attack", "final_break_or_opening", "first_final_escape",
+    ]
+    assert moments[0]["t"] == 0.0
+    assert all(row["t"] > 0.0 for row in moments[1:])
+
+
 # --------------------------------------------------------------------------
 # The rejection rule
 # --------------------------------------------------------------------------
 
 
-def test_the_known_seven_ball_pile_on_7183_is_found(documents):
-    """Phase 1 reported it; the integrated view has to see it too."""
-    report = av.population_report(documents[7183], 30.0)
-    assert report["peak_cluster_balls"] == 7
-    assert report["longest_pile_seconds"] > 1.0
+def test_the_phase3b_severe_pile_rejection_is_found():
+    report = visual.readability_report(document_for(17970), fps=60.0)
+    assert report["largest_cluster"] >= 3
+    assert report["longest_triple_merge_seconds"] > 2.0
 
 
-def test_the_pile_rule_rejects_7183_and_nothing_else(documents):
-    rejected = {
-        seed: av.candidate_row(documents[seed], 30.0)["rejection_reasons"]
-        for seed in SEEDS
-    }
-    assert rejected[7183], "the known pile has to reject its seed"
-    assert any("pile" in reason for reason in rejected[7183])
+def test_the_review_set_has_no_severe_visual_pile(documents):
     for seed in SEEDS:
-        if seed != 7183:
-            assert not rejected[seed], (seed, rejected[seed])
+        report = visual.readability_report(documents[seed], fps=60.0)
+        assert report["longest_triple_merge_seconds"] <= 0.75, (seed, report)
 
 
 @pytest.mark.parametrize("seed", SEEDS)

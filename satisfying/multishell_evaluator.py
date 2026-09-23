@@ -109,9 +109,9 @@ class EvaluationThresholds:
     """Every line a flag is drawn at, in one place and all of them named."""
 
     # --- runtime, from the brief -----------------------------------------
-    preferred_low: float = 20.0
+    preferred_low: float = 21.0
     preferred_high: float = 24.0
-    acceptable_low: float = 18.0
+    acceptable_low: float = 20.0
     acceptable_high: float = 26.0
 
     # "instant escape with no suspense"
@@ -130,9 +130,9 @@ class EvaluationThresholds:
     min_generations: int = 2
     # "first reproduction happens quickly". The split is the concept's hook and
     # a viewer who has not seen it has not been told what the video is about.
-    # p50 is 1.42 s and p75 2.59 s over the batch, so 4.0 cuts above the third
-    # quartile and rejects the runs that are one ball for a fifth of the video.
-    max_first_spawn_seconds: float = 4.0
+    # Phase 3B hard-rejects anything above 3 s; the preferred candidates are at
+    # or below 2.5 s.  This is a selection rule only and never changes motion.
+    max_first_spawn_seconds: float = 3.0
 
     # --- difficulty ------------------------------------------------------
     # "outer shell impossible" / "outer shell trivial", measured on the run.
@@ -443,12 +443,46 @@ def evaluate(
     # --- damage ----------------------------------------------------------
     breaks_by_shell = [0] * n_shells
     shared_breaks = 0
+    outer_cooperative_breaks = 0
     break_cumulative: list[float] = []
+    break_details: list[dict[str, Any]] = []
+    generation_by_ball = {record.ball_id: record.generation for record in run.balls}
     for ev in breaks:
-        breaks_by_shell[ev.data["shell_id"]] += 1
+        shell_id = ev.data["shell_id"]
+        panel_id = ev.data["panel_id"]
+        breaks_by_shell[shell_id] += 1
         break_cumulative.append(ev.data["cumulative"])
         if ev.data["contributors"] > 1:
             shared_breaks += 1
+            if shell_id == n_shells - 1:
+                outer_cooperative_breaks += 1
+        paid: dict[int, float] = {}
+        for damage in damages:
+            if damage.t > ev.t:
+                continue
+            if (
+                damage.data["shell_id"] == shell_id
+                and damage.data["panel_id"] == panel_id
+                and damage.data["contribution"] > 0.0
+            ):
+                ball_id = int(damage.data["ball_id"])
+                paid[ball_id] = paid.get(ball_id, 0.0) + float(damage.data["contribution"])
+        largest_ball = max(paid, key=lambda ball_id: (paid[ball_id], -ball_id)) if paid else None
+        break_details.append(
+            {
+                "shell_id": shell_id,
+                "panel_id": panel_id,
+                "t": ev.t,
+                "unique_contributing_balls": len(paid),
+                "contributing_ball_ids": sorted(paid),
+                "contributing_generations": sorted(
+                    {generation_by_ball[ball_id] for ball_id in paid}
+                ),
+                "largest_contributor": largest_ball,
+                "largest_contribution": paid.get(largest_ball, 0.0),
+                "final_triggering_ball": int(ev.data["ball_id"]),
+            }
+        )
     transitions_by_state = {name: 0 for name in DAMAGE_STATES}
     for ev in transitions:
         transitions_by_state[ev.data["new_state"]] += 1
@@ -591,6 +625,11 @@ def evaluate(
             "breaks": run.breaks,
             "breaks_per_shell": breaks_by_shell,
             "shared_breaks": shared_breaks,
+            "cooperative_outer_breaks": outer_cooperative_breaks,
+            "max_break_contributors": max(
+                (detail["unique_contributing_balls"] for detail in break_details), default=0
+            ),
+            "break_details": break_details,
             "mean_break_cumulative": (
                 sum(break_cumulative) / len(break_cumulative) if break_cumulative else 0.0
             ),
@@ -853,6 +892,15 @@ def summarise(
         "breaks_by_shell": per_shell(["damage", "breaks_per_shell"], evaluations),
         "shared_breaks": _quantiles(metric(["damage", "shared_breaks"]), points),
         "shared_break_runs": sum(1 for e in evaluations if e.metrics["damage"]["shared_breaks"]),
+        "cooperative_outer_breaks": sum(
+            metric(["damage", "cooperative_outer_breaks"])
+        ),
+        "cooperative_outer_break_runs": sum(
+            1 for e in evaluations if e.metrics["damage"]["cooperative_outer_breaks"]
+        ),
+        "max_break_contributors": _quantiles(
+            metric(["damage", "max_break_contributors"]), points
+        ),
         "collision_rate": _quantiles(metric(["collisions", "per_second"]), points),
         "collision_rate_histogram": _histogram(
             metric(["collisions", "per_second"]), (0, 2, 4, 6, 8, 10, 12, 16)

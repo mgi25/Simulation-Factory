@@ -65,16 +65,20 @@ much more material, and the depth ramp is the only place the difference comes
 from.
 
 Everything the physics cares about is at `z = 0`, and a perspective camera
-looking down `-Z` projects that plane by an exact uniform scale. So every pixel
-measurement in this module is exact rather than fitted, and a ball's drawn
-position is its canonical position times a constant.
+looking down `-Z` projects that plane by an exact uniform scale. The earlier
+camera achieved the safe-area offset by translating its eye sideways. Because
+the five slabs have different extrusion depths, that introduced depth-dependent
+parallax and made their rear rims appear to have different centres. Phase 3B
+keeps the eye on the invariant world origin and uses an asymmetric frustum to
+place that origin at the same safe-area point. Scale can change, but the
+principal point cannot drift with depth.
 
 ## The candidate set
 
-Eighteen seeds were shortlisted in Phase 1. `CANDIDATE_RULE` states the filter
-the brief asked for, `candidate_seeds` applies it, and the answer is seven.
-Nothing is hand-picked: the manifest records the rule beside the seeds so Audio
-Phase 2B can re-derive the same list rather than trust it.
+Sixteen successful seeds were taken from the new 20,000-seed run. A measured
+screen rejected three severe visual piles, leaving thirteen engineering
+survivors. `CANDIDATE_RULE` and the committed shortlist record the six rendered
+review candidates and why they span the desired routes and cooperative damage.
 """
 
 from __future__ import annotations
@@ -98,6 +102,9 @@ __all__ = [
     "ARENA_CENTRE_Y_FRACTION",
     "VIEW_RADIUS_PAD",
     "CAMERA_HFOV_DEGREES",
+    "CAMERA_NEAR",
+    "CAMERA_FRUSTUM_SIZE",
+    "CAMERA_FRUSTUM_OFFSET",
     "FRAME_LEAD_SECONDS",
     "FRAME_EASE_SECONDS",
     "BALL_DRAW_SCALE",
@@ -118,6 +125,10 @@ __all__ = [
     "camera_distance",
     "flank_width",
     "project",
+    "project_3d",
+    "projected_shell_centres",
+    "centre_alignment_report",
+    "alignment_moments",
     "lineage_palette",
     "shell_geometry_report",
     "composition_report",
@@ -141,7 +152,7 @@ EXPECTED_SCHEMA_VERSION = "category3-test2-multiplying-shell/2.0.0"
 # renders a plausible video of a different simulation, which is worse than an
 # error, so this is checked rather than trusted.
 EXPECTED_CONFIG_DIGEST = (
-    "dcf3c2bf05879e087246bd3ae22bacbb273d64411405356fd5f329bf8c1ea0bd"
+    "1803a066cc67ed08088294e64dd42b7264e2bcc210f055ab225d9983e2725d38"
 )
 EXPECTED_SHELL_COUNT = 5
 
@@ -179,6 +190,25 @@ VIEW_RADIUS_PAD = 0.85
 # outermost shell 19.2 degrees off axis at the final framing, which is what
 # makes its 3.2-unit flank 18.9 px wide.
 CAMERA_HFOV_DEGREES = 47.0
+CAMERA_NEAR = 0.20
+# An asymmetric perspective frustum keeps the camera itself on the canonical
+# world centre.  The offset moves the principal point to the Shorts-safe
+# composition point without introducing the depth-dependent parallax caused by
+# translating the camera laterally.
+CAMERA_FRUSTUM_SIZE = (
+    2.0
+    * CAMERA_NEAR
+    * math.tan(math.radians(CAMERA_HFOV_DEGREES) * 0.5)
+    * FRAME_HEIGHT
+    / FRAME_WIDTH
+)
+CAMERA_FRUSTUM_OFFSET = (
+    (0.5 - ARENA_CENTRE_X_FRACTION)
+    * CAMERA_FRUSTUM_SIZE
+    * FRAME_WIDTH
+    / FRAME_HEIGHT,
+    (ARENA_CENTRE_Y_FRACTION - 0.5) * CAMERA_FRUSTUM_SIZE,
+)
 
 # The framing opens this long before the canonical crossing that triggers it,
 # so the frame is already moving as the ball goes through rather than reacting
@@ -365,27 +395,29 @@ FRACTURE_RECESS = 0.10
 # --------------------------------------------------------------------------
 
 SHORTLIST_PATH = os.path.join(
-    "docs", "validation", "category3_multiplying_shell", "phase1_shortlist.json"
+    "docs", "validation", "category3_multiplying_shell_adjust_v3b",
+    "phase3b_shortlist.json"
 )
 
 CANDIDATE_RULE: dict[str, Any] = {
     "source": SHORTLIST_PATH,
-    "duration_seconds": [20.0, 24.0],
-    "first_spawn_seconds_max": 2.5,
+    "duration_seconds": [20.0, 26.0],
+    "first_spawn_seconds_preferred_max": 2.5,
+    "first_spawn_seconds_max": 3.0,
     "first_spawn_seconds_reject_above": 3.0,
     "population_total": [8, 15],
     "flags": "none",
     "note": (
-        "The brief's own filter, applied to the eighteen Phase 1 shortlisted "
-        "seeds and to nothing else. No new seed search was run. The rule is "
-        "stated here so the set can be re-derived rather than trusted; it is "
-        "not a ranking and the seven are not in preference order."
+        "Six review renders selected from the thirteen engineering-screened "
+        "survivors of the new 20,000-seed Phase 3B run. The set spans opening "
+        "and break routes, descendant escapes, cooperative outer-wall breaks, "
+        "and high-but-readable populations."
     ),
 }
 
 # The result of applying CANDIDATE_RULE, frozen so a test catches a drift in
 # either the rule or the shortlist.
-CANDIDATE_SEEDS: tuple[int, ...] = (949, 12004, 547, 11319, 3622, 12818, 7183)
+CANDIDATE_SEEDS: tuple[int, ...] = (15793, 8292, 17251, 16733, 12197, 14705)
 
 
 # --------------------------------------------------------------------------
@@ -401,7 +433,7 @@ def validate_document(document: dict[str, Any]) -> str:
             f"{EXPECTED_SCHEMA_VERSION!r}"
         )
     if str(document.get("config_digest", "")) != EXPECTED_CONFIG_DIGEST:
-        return "config digest is not the frozen Phase 1 operating configuration"
+        return "config digest is not the locked Phase 3B operating configuration"
     shells = document.get("shells", [])
     if len(shells) != EXPECTED_SHELL_COUNT:
         return (
@@ -519,6 +551,96 @@ def project(
         width * ARENA_CENTRE_X_FRACTION + float(point[0]) * scale,
         height * ARENA_CENTRE_Y_FRACTION - float(point[1]) * scale,
     )
+
+
+def project_3d(
+    point: Sequence[float],
+    z: float,
+    view_radius: float,
+    width: int = FRAME_WIDTH,
+    height: int = FRAME_HEIGHT,
+) -> tuple[float, float]:
+    """Project a point through the centred asymmetric perspective frustum."""
+    distance = camera_distance(view_radius)
+    scale = pixels_per_unit(view_radius, width) * distance / (distance - float(z))
+    return (
+        width * ARENA_CENTRE_X_FRACTION + float(point[0]) * scale,
+        height * ARENA_CENTRE_Y_FRACTION - float(point[1]) * scale,
+    )
+
+
+def projected_shell_centres(view_radius: float) -> tuple[tuple[float, float], ...]:
+    """Projected centres of the five thick slabs, sampled at slab mid-depth."""
+    return tuple(project_3d((0.0, 0.0), -0.5 * depth, view_radius) for depth in PANEL_DEPTH)
+
+
+def centre_alignment_report(
+    document: dict[str, Any], fps: float = 60.0
+) -> dict[str, Any]:
+    """Measure shell-centre agreement on every rendered frame.
+
+    The shell centres are sampled at their visual mid-depth, not merely at the
+    shared front plane.  That is the measurement that exposes the old lateral
+    camera's parallax and proves the off-axis frustum removed it.
+    """
+    _require_valid(document)
+    duration = float(document["summary"]["duration"])
+    frame_count = int(math.ceil(duration * fps)) + 1
+    maximum = 0.0
+    worst_t = 0.0
+    worst_centres: tuple[tuple[float, float], ...] = ()
+    for frame in range(frame_count):
+        t = min(duration, frame / fps)
+        centres = projected_shell_centres(view_radius_at(document, t))
+        for a in centres:
+            for b in centres:
+                error = math.hypot(a[0] - b[0], a[1] - b[1])
+                if error > maximum:
+                    maximum = error
+                    worst_t = t
+                    worst_centres = centres
+    return {
+        "fps": fps,
+        "frames": frame_count,
+        "maximum_disagreement_px": maximum,
+        "worst_t": worst_t,
+        "worst_centres": [list(point) for point in worst_centres],
+        "target_px": 1.0,
+        "preferred_px": 0.5,
+        "passes": maximum <= 1.0,
+    }
+
+
+def alignment_moments(document: dict[str, Any]) -> list[dict[str, Any]]:
+    """Diagnostic still times around every centred frontier reframe."""
+    _require_valid(document)
+    duration = float(document["summary"]["duration"])
+    rows: list[dict[str, Any]] = [
+        {"name": "frame_0", "t": 0.0, "why": "opening frame"}
+    ]
+    for index, (at, stage) in enumerate(frame_marks(document), start=1):
+        rows.append(
+            {
+                "name": f"transition_{index}_mid",
+                "t": max(0.0, at - FRAME_LEAD_SECONDS + 0.5 * FRAME_EASE_SECONDS),
+                "why": f"mid-transition to frontier stage {stage}",
+            }
+        )
+        rows.append(
+            {
+                "name": f"frontier_{index}_settled",
+                "t": min(duration, at - FRAME_LEAD_SECONDS + FRAME_EASE_SECONDS),
+                "why": f"after frontier stage {stage} settled",
+            }
+        )
+    rows.append(
+        {
+            "name": "final_outer_section",
+            "t": max(0.0, duration - 0.5),
+            "why": "final outer-shell section",
+        }
+    )
+    return rows
 
 
 def flank_width(radius: float, depth: float, view_radius: float) -> float:
@@ -1326,20 +1448,15 @@ def _escape_generation(document: dict[str, Any]) -> int | None:
 
 
 def candidate_seeds(shortlist: dict[str, Any]) -> list[dict[str, Any]]:
-    """Apply CANDIDATE_RULE to the Phase 1 shortlist. No new search is run.
-
-    The rule is the brief's, stated once: 20-24 s of runtime, a first split at
-    2.5 s or sooner - the brief rejects anything past 3 s outright and 2.5 is
-    its stated preference - a final population between 8 and 15, and no Phase 1
-    flag. Seven of the eighteen survive it, and between them they carry both
-    escape routes, both kinds of escaping ball, and the full spread of the
-    opening-to-break route mix.
-    """
+    """Apply the hard gates and Phase 3B review selection to the shortlist."""
     low, high = CANDIDATE_RULE["duration_seconds"]
     split_max = CANDIDATE_RULE["first_spawn_seconds_max"]
     pop_low, pop_high = CANDIDATE_RULE["population_total"]
+    selected = set(int(seed) for seed in shortlist.get("review_seeds", CANDIDATE_SEEDS))
     kept: list[dict[str, Any]] = []
     for candidate in shortlist["candidates"]:
+        if int(candidate["seed"]) not in selected:
+            continue
         if candidate["flags"]:
             continue
         if not low <= float(candidate["duration"]) <= high:
@@ -1370,7 +1487,8 @@ def candidate_seeds(shortlist: dict[str, Any]) -> list[dict[str, Any]]:
                 "digest": candidate["digest"],
             }
         )
-    kept.sort(key=lambda entry: entry["duration"])
+    order = {seed: index for index, seed in enumerate(CANDIDATE_SEEDS)}
+    kept.sort(key=lambda entry: order.get(entry["seed"], len(order)))
     return kept
 
 
@@ -1389,7 +1507,7 @@ def candidate_manifest(shortlist: dict[str, Any]) -> dict[str, Any]:
         who[entry["escape_by"]] += 1
     return {
         "format": 1,
-        "phase": "category3-test2-multiplying-shell/visual-2a",
+        "phase": "category3-test2-multiplying-shell/adjust-v3b",
         "config_digest": shortlist["config_digest"],
         "expected_config_digest": EXPECTED_CONFIG_DIGEST,
         "shortlist_seeds": list(shortlist["seeds"]),
@@ -1446,6 +1564,9 @@ def render_config() -> dict[str, Any]:
         "arena_centre": [ARENA_CENTRE_X_FRACTION, ARENA_CENTRE_Y_FRACTION],
         "view_radius_pad": VIEW_RADIUS_PAD,
         "camera_hfov_degrees": CAMERA_HFOV_DEGREES,
+        "camera_near": CAMERA_NEAR,
+        "camera_frustum_size": CAMERA_FRUSTUM_SIZE,
+        "camera_frustum_offset": list(CAMERA_FRUSTUM_OFFSET),
         "frame_lead_seconds": FRAME_LEAD_SECONDS,
         "frame_ease_seconds": FRAME_EASE_SECONDS,
         "ball_draw_scale": BALL_DRAW_SCALE,
