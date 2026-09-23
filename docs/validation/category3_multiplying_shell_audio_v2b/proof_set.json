@@ -1,0 +1,687 @@
+{
+  "kind": "category3_multiplying_shell_audio_proof_set",
+  "score_version": "category3-test2-multiplying-shell-audio-score/1.0.0",
+  "render_version": "category3-test2-multiplying-shell-audio-render/1.0.0",
+  "system": "open_quartal",
+  "tonal_system": {
+    "name": "open_quartal",
+    "scale": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "shell_bases": [
+      0,
+      2,
+      4,
+      6,
+      8
+    ],
+    "root_hz": 220.0,
+    "window": 4
+  },
+  "config_fingerprint": "487d19ecf326621d",
+  "manifest": "docs\\validation\\category3_multiplying_shell_audio_v2b\\proof_candidates.json",
+  "seeds": [
+    949,
+    12004,
+    547,
+    11319,
+    3622,
+    12818,
+    7183
+  ],
+  "rows": [
+    {
+      "seed": 949,
+      "config": "open_quartal",
+      "duration_seconds": 22.31225,
+      "integrated_lufs": -19.12,
+      "lra_lu": 6.16,
+      "true_peak_dbtp": -3.13,
+      "clipped_samples": 0,
+      "collision_density_hz": 5.9215,
+      "event_density_hz": 7.9617,
+      "polyphony_max": 8,
+      "polyphony_median": 2.0,
+      "polyphony_mean": 2.6243,
+      "audible_polyphony_max": 8,
+      "collision_voice_median_seconds": 0.227563,
+      "overlap_ratio": 1.9288,
+      "longest_same_pitch_run": 3,
+      "harsh_pairs": 0,
+      "duck_fraction": 0.243,
+      "onset_rise_median_db": 11.95,
+      "onset_rise_p10_db": 7.92,
+      "masked_below_3db": 0.0,
+      "duck_onsets_per_second": 0.583,
+      "mono_loss_db": -0.05,
+      "phone_relative_db": -6.27,
+      "richer_late": true,
+      "not_noise": true,
+      "tonal_percent_late": 94.002,
+      "late_polyphony_over_early": 1.6493,
+      "late_lufs_over_early": 4.61,
+      "hierarchy_medians": {
+        "break": -8.34,
+        "collision": -15.89,
+        "collision_strong": -14.24,
+        "crossing": -22.59,
+        "escape": -5.35,
+        "lift": -9.36,
+        "spawn": -11.16,
+        "spawn_with_lift": -14.26
+      },
+      "score_fingerprint": "d0f4a0c6f8b6cd50",
+      "pcm_digest": "2b3f15c890a94d6f",
+      "hierarchy": {
+        "chain": [
+          "crossing",
+          "collision",
+          "collision_strong",
+          "spawn",
+          "break",
+          "escape"
+        ],
+        "steps": [
+          {
+            "from": "crossing",
+            "to": "collision",
+            "gain_db": 6.7
+          },
+          {
+            "from": "collision",
+            "to": "collision_strong",
+            "gain_db": 1.65
+          },
+          {
+            "from": "collision_strong",
+            "to": "spawn",
+            "gain_db": 3.08
+          },
+          {
+            "from": "spawn",
+            "to": "break",
+            "gain_db": 2.82
+          },
+          {
+            "from": "break",
+            "to": "escape",
+            "gain_db": 2.99
+          }
+        ],
+        "monotonic": true,
+        "lift_between_spawn_and_escape": true,
+        "ok": true
+      }
+    },
+    {
+      "seed": 12004,
+      "config": "open_quartal",
+      "duration_seconds": 23.859313,
+      "integrated_lufs": -19.73,
+      "lra_lu": 7.75,
+      "true_peak_dbtp": -2.5,
+      "clipped_samples": 0,
+      "collision_density_hz": 6.1769,
+      "event_density_hz": 8.7583,
+      "polyphony_max": 10,
+      "polyphony_median": 2.0,
+      "polyphony_mean": 2.7528,
+      "audible_polyphony_max": 10,
+      "collision_voice_median_seconds": 0.203129,
+      "overlap_ratio": 1.9299,
+      "longest_same_pitch_run": 3,
+      "harsh_pairs": 0,
+      "duck_fraction": 0.2565,
+      "onset_rise_median_db": 10.67,
+      "onset_rise_p10_db": 7.89,
+      "masked_below_3db": 0.0,
+      "duck_onsets_per_second": 0.671,
+      "mono_loss_db": -0.07,
+      "phone_relative_db": -6.11,
+      "richer_late": true,
+      "not_noise": true,
+      "tonal_percent_late": 93.696,
+      "late_polyphony_over_early": 1.8762,
+      "late_lufs_over_early": 3.51,
+      "hierarchy_medians": {
+        "break": -8.95,
+        "collision": -17.32,
+        "collision_strong": -14.59,
+        "crossing": -23.2,
+        "escape": -5.96,
+        "lift": -9.97,
+        "spawn": -11.77,
+        "spawn_with_lift": -14.87
+      },
+      "score_fingerprint": "200a5fecfab36de5",
+      "pcm_digest": "d89a552b4c7dc63c",
+      "hierarchy": {
+        "chain": [
+          "crossing",
+          "collision",
+          "collision_strong",
+          "spawn",
+          "break",
+          "escape"
+        ],
+        "steps": [
+          {
+            "from": "crossing",
+            "to": "collision",
+            "gain_db": 5.88
+          },
+          {
+            "from": "collision",
+            "to": "collision_strong",
+            "gain_db": 2.73
+          },
+          {
+            "from": "collision_strong",
+            "to": "spawn",
+            "gain_db": 2.82
+          },
+          {
+            "from": "spawn",
+            "to": "break",
+            "gain_db": 2.82
+          },
+          {
+            "from": "break",
+            "to": "escape",
+            "gain_db": 2.99
+          }
+        ],
+        "monotonic": true,
+        "lift_between_spawn_and_escape": true,
+        "ok": true
+      }
+    },
+    {
+      "seed": 547,
+      "config": "open_quartal",
+      "duration_seconds": 23.882021,
+      "integrated_lufs": -18.83,
+      "lra_lu": 6.14,
+      "true_peak_dbtp": -3.31,
+      "clipped_samples": 0,
+      "collision_density_hz": 5.2719,
+      "event_density_hz": 7.7691,
+      "polyphony_max": 9,
+      "polyphony_median": 2.0,
+      "polyphony_mean": 2.5919,
+      "audible_polyphony_max": 9,
+      "collision_voice_median_seconds": 0.244288,
+      "overlap_ratio": 1.9223,
+      "longest_same_pitch_run": 2,
+      "harsh_pairs": 0,
+      "duck_fraction": 0.26,
+      "onset_rise_median_db": 12.87,
+      "onset_rise_p10_db": 8.67,
+      "masked_below_3db": 0.0,
+      "duck_onsets_per_second": 0.712,
+      "mono_loss_db": -0.06,
+      "phone_relative_db": -5.23,
+      "richer_late": true,
+      "not_noise": true,
+      "tonal_percent_late": 92.662,
+      "late_polyphony_over_early": 1.5935,
+      "late_lufs_over_early": 4.76,
+      "hierarchy_medians": {
+        "break": -8.34,
+        "collision": -15.34,
+        "collision_strong": -13.23,
+        "crossing": -22.59,
+        "escape": -5.35,
+        "lift": -9.36,
+        "spawn": -11.16,
+        "spawn_with_lift": -14.26
+      },
+      "score_fingerprint": "5889e122261946a9",
+      "pcm_digest": "01250653529e7477",
+      "hierarchy": {
+        "chain": [
+          "crossing",
+          "collision",
+          "collision_strong",
+          "spawn",
+          "break",
+          "escape"
+        ],
+        "steps": [
+          {
+            "from": "crossing",
+            "to": "collision",
+            "gain_db": 7.25
+          },
+          {
+            "from": "collision",
+            "to": "collision_strong",
+            "gain_db": 2.11
+          },
+          {
+            "from": "collision_strong",
+            "to": "spawn",
+            "gain_db": 2.07
+          },
+          {
+            "from": "spawn",
+            "to": "break",
+            "gain_db": 2.82
+          },
+          {
+            "from": "break",
+            "to": "escape",
+            "gain_db": 2.99
+          }
+        ],
+        "monotonic": true,
+        "lift_between_spawn_and_escape": true,
+        "ok": true
+      }
+    },
+    {
+      "seed": 11319,
+      "config": "open_quartal",
+      "duration_seconds": 23.945854,
+      "integrated_lufs": -19.65,
+      "lra_lu": 4.65,
+      "true_peak_dbtp": -2.5,
+      "clipped_samples": 0,
+      "collision_density_hz": 6.8379,
+      "event_density_hz": 10.3715,
+      "polyphony_max": 9,
+      "polyphony_median": 3.0,
+      "polyphony_mean": 2.8748,
+      "audible_polyphony_max": 9,
+      "collision_voice_median_seconds": 0.214658,
+      "overlap_ratio": 2.3847,
+      "longest_same_pitch_run": 2,
+      "harsh_pairs": 0,
+      "duck_fraction": 0.3454,
+      "onset_rise_median_db": 11.13,
+      "onset_rise_p10_db": 7.71,
+      "masked_below_3db": 0.0,
+      "duck_onsets_per_second": 0.919,
+      "mono_loss_db": -0.1,
+      "phone_relative_db": -6.81,
+      "richer_late": true,
+      "not_noise": true,
+      "tonal_percent_late": 93.726,
+      "late_polyphony_over_early": 1.3802,
+      "late_lufs_over_early": 1.2,
+      "hierarchy_medians": {
+        "break": -9.1,
+        "collision": -16.97,
+        "collision_strong": -15.37,
+        "crossing": -23.34,
+        "escape": -6.11,
+        "lift": -10.11,
+        "spawn": -11.91,
+        "spawn_with_lift": -15.01
+      },
+      "score_fingerprint": "8d12ae79baa1173b",
+      "pcm_digest": "49ef0ac103799361",
+      "hierarchy": {
+        "chain": [
+          "crossing",
+          "collision",
+          "collision_strong",
+          "spawn",
+          "break",
+          "escape"
+        ],
+        "steps": [
+          {
+            "from": "crossing",
+            "to": "collision",
+            "gain_db": 6.37
+          },
+          {
+            "from": "collision",
+            "to": "collision_strong",
+            "gain_db": 1.6
+          },
+          {
+            "from": "collision_strong",
+            "to": "spawn",
+            "gain_db": 3.46
+          },
+          {
+            "from": "spawn",
+            "to": "break",
+            "gain_db": 2.81
+          },
+          {
+            "from": "break",
+            "to": "escape",
+            "gain_db": 2.99
+          }
+        ],
+        "monotonic": true,
+        "lift_between_spawn_and_escape": true,
+        "ok": true
+      }
+    },
+    {
+      "seed": 3622,
+      "config": "open_quartal",
+      "duration_seconds": 24.968292,
+      "integrated_lufs": -19.98,
+      "lra_lu": 8.55,
+      "true_peak_dbtp": -2.5,
+      "clipped_samples": 0,
+      "collision_density_hz": 5.2829,
+      "event_density_hz": 7.7042,
+      "polyphony_max": 9,
+      "polyphony_median": 2.0,
+      "polyphony_mean": 2.4478,
+      "audible_polyphony_max": 9,
+      "collision_voice_median_seconds": 0.226828,
+      "overlap_ratio": 1.8455,
+      "longest_same_pitch_run": 3,
+      "harsh_pairs": 0,
+      "duck_fraction": 0.2486,
+      "onset_rise_median_db": 11.99,
+      "onset_rise_p10_db": 8.81,
+      "masked_below_3db": 0.0,
+      "duck_onsets_per_second": 0.521,
+      "mono_loss_db": -0.13,
+      "phone_relative_db": -6.66,
+      "richer_late": true,
+      "not_noise": true,
+      "tonal_percent_late": 93.104,
+      "late_polyphony_over_early": 1.7162,
+      "late_lufs_over_early": 4.58,
+      "hierarchy_medians": {
+        "break": -8.68,
+        "collision": -16.34,
+        "collision_strong": -14.06,
+        "crossing": -22.93,
+        "escape": -5.69,
+        "lift": -9.7,
+        "spawn": -11.5,
+        "spawn_with_lift": -14.6
+      },
+      "score_fingerprint": "222bdd8137eee5aa",
+      "pcm_digest": "d27a1ee11dbcd6dd",
+      "hierarchy": {
+        "chain": [
+          "crossing",
+          "collision",
+          "collision_strong",
+          "spawn",
+          "break",
+          "escape"
+        ],
+        "steps": [
+          {
+            "from": "crossing",
+            "to": "collision",
+            "gain_db": 6.59
+          },
+          {
+            "from": "collision",
+            "to": "collision_strong",
+            "gain_db": 2.28
+          },
+          {
+            "from": "collision_strong",
+            "to": "spawn",
+            "gain_db": 2.56
+          },
+          {
+            "from": "spawn",
+            "to": "break",
+            "gain_db": 2.82
+          },
+          {
+            "from": "break",
+            "to": "escape",
+            "gain_db": 2.99
+          }
+        ],
+        "monotonic": true,
+        "lift_between_spawn_and_escape": true,
+        "ok": true
+      }
+    },
+    {
+      "seed": 12818,
+      "config": "open_quartal",
+      "duration_seconds": 24.993188,
+      "integrated_lufs": -18.95,
+      "lra_lu": 5.33,
+      "true_peak_dbtp": -2.5,
+      "clipped_samples": 0,
+      "collision_density_hz": 8.3073,
+      "event_density_hz": 11.3401,
+      "polyphony_max": 9,
+      "polyphony_median": 3.0,
+      "polyphony_mean": 2.9009,
+      "audible_polyphony_max": 9,
+      "collision_voice_median_seconds": 0.202006,
+      "overlap_ratio": 2.4807,
+      "longest_same_pitch_run": 3,
+      "harsh_pairs": 0,
+      "duck_fraction": 0.3093,
+      "onset_rise_median_db": 11.37,
+      "onset_rise_p10_db": 8.07,
+      "masked_below_3db": 0.0,
+      "duck_onsets_per_second": 0.84,
+      "mono_loss_db": -0.09,
+      "phone_relative_db": -5.91,
+      "richer_late": true,
+      "not_noise": true,
+      "tonal_percent_late": 93.23,
+      "late_polyphony_over_early": 1.5521,
+      "late_lufs_over_early": 3.18,
+      "hierarchy_medians": {
+        "break": -8.19,
+        "collision": -16.65,
+        "collision_strong": -15.27,
+        "crossing": -22.66,
+        "escape": -5.43,
+        "lift": -9.43,
+        "spawn": -11.23,
+        "spawn_with_lift": -14.33
+      },
+      "score_fingerprint": "64e80d125e08f5b8",
+      "pcm_digest": "d9f3bf4089c61903",
+      "hierarchy": {
+        "chain": [
+          "crossing",
+          "collision",
+          "collision_strong",
+          "spawn",
+          "break",
+          "escape"
+        ],
+        "steps": [
+          {
+            "from": "crossing",
+            "to": "collision",
+            "gain_db": 6.01
+          },
+          {
+            "from": "collision",
+            "to": "collision_strong",
+            "gain_db": 1.38
+          },
+          {
+            "from": "collision_strong",
+            "to": "spawn",
+            "gain_db": 4.04
+          },
+          {
+            "from": "spawn",
+            "to": "break",
+            "gain_db": 3.04
+          },
+          {
+            "from": "break",
+            "to": "escape",
+            "gain_db": 2.76
+          }
+        ],
+        "monotonic": true,
+        "lift_between_spawn_and_escape": true,
+        "ok": true
+      }
+    },
+    {
+      "seed": 7183,
+      "config": "open_quartal",
+      "duration_seconds": 25.362396,
+      "integrated_lufs": -19.75,
+      "lra_lu": 5.88,
+      "true_peak_dbtp": -2.5,
+      "clipped_samples": 0,
+      "collision_density_hz": 6.6793,
+      "event_density_hz": 9.3941,
+      "polyphony_max": 10,
+      "polyphony_median": 2.0,
+      "polyphony_mean": 2.6958,
+      "audible_polyphony_max": 10,
+      "collision_voice_median_seconds": 0.206782,
+      "overlap_ratio": 2.1362,
+      "longest_same_pitch_run": 3,
+      "harsh_pairs": 0,
+      "duck_fraction": 0.2916,
+      "onset_rise_median_db": 11.38,
+      "onset_rise_p10_db": 8.26,
+      "masked_below_3db": 0.0,
+      "duck_onsets_per_second": 0.828,
+      "mono_loss_db": -0.1,
+      "phone_relative_db": -6.5,
+      "richer_late": true,
+      "not_noise": true,
+      "tonal_percent_late": 94.087,
+      "late_polyphony_over_early": 1.3761,
+      "late_lufs_over_early": 2.0,
+      "hierarchy_medians": {
+        "break": -8.95,
+        "collision": -17.4,
+        "collision_strong": -15.7,
+        "crossing": -23.19,
+        "escape": -5.96,
+        "lift": -9.96,
+        "spawn": -11.76,
+        "spawn_with_lift": -14.86
+      },
+      "score_fingerprint": "ee4321221f7cec82",
+      "pcm_digest": "5a6126a93a674cee",
+      "hierarchy": {
+        "chain": [
+          "crossing",
+          "collision",
+          "collision_strong",
+          "spawn",
+          "break",
+          "escape"
+        ],
+        "steps": [
+          {
+            "from": "crossing",
+            "to": "collision",
+            "gain_db": 5.79
+          },
+          {
+            "from": "collision",
+            "to": "collision_strong",
+            "gain_db": 1.7
+          },
+          {
+            "from": "collision_strong",
+            "to": "spawn",
+            "gain_db": 3.94
+          },
+          {
+            "from": "spawn",
+            "to": "break",
+            "gain_db": 2.81
+          },
+          {
+            "from": "break",
+            "to": "escape",
+            "gain_db": 2.99
+          }
+        ],
+        "monotonic": true,
+        "lift_between_spawn_and_escape": true,
+        "ok": true
+      }
+    }
+  ],
+  "summary": {
+    "seeds": 7,
+    "integrated_lufs": [
+      -19.98,
+      -18.83
+    ],
+    "true_peak_dbtp": [
+      -3.31,
+      -2.5
+    ],
+    "clipped_samples": 0,
+    "collision_density_hz": [
+      5.272,
+      8.307
+    ],
+    "event_density_hz": [
+      7.704,
+      11.34
+    ],
+    "polyphony_max": [
+      8.0,
+      10.0
+    ],
+    "polyphony_median": [
+      2.0,
+      3.0
+    ],
+    "collision_voice_median_seconds": [
+      0.202,
+      0.244
+    ],
+    "longest_same_pitch_run": [
+      2.0,
+      3.0
+    ],
+    "harsh_pairs_total": 0,
+    "duck_fraction": [
+      0.243,
+      0.345
+    ],
+    "onset_rise_median_db": [
+      10.67,
+      12.87
+    ],
+    "onset_rise_p10_db": [
+      7.71,
+      8.81
+    ],
+    "masked_below_3db": [
+      0.0,
+      0.0
+    ],
+    "mono_loss_db": [
+      -0.13,
+      -0.05
+    ],
+    "phone_relative_db": [
+      -6.81,
+      -5.23
+    ],
+    "tonal_percent_late": [
+      92.662,
+      94.087
+    ],
+    "all_richer_late": true,
+    "all_not_noise": true,
+    "all_hierarchy_ok": true
+  }
+}
