@@ -1,0 +1,89 @@
+{
+  "compensating_control": "A deterministic re-verification was run instead: review/verify_claims.py re-reads every sessions.json under all five runner state directories by an independent code path, re-derives every headline number and range-overlap verdict, and checks them against the literal claims in RESULT.md. It verifies arithmetic and accounting completeness only; it cannot verify judgement and is not a substitute for the independent reviewer.",
+  "compensating_control_result": "PASSED - all numbers reproducible, 10 distinct provider sessions, none double counted, no session omitted.",
+  "consequence": "The established independent reviewer could not inspect the benchmark report. The benchmark is therefore NOT approved and carries no approval claim.",
+  "derived_authorized_paths": [],
+  "full_intake_record": {
+    "decisions": [
+      {
+        "options": [
+          "ai-platform",
+          "company-analytics-experiments",
+          "company-bootstrap-policy",
+          "company-ceo-dashboard",
+          "company-engineering-execution",
+          "company-executive-delegation",
+          "company-finance",
+          "company-knowledge-capsules"
+        ],
+        "question": "Name the subsystem this belongs to (subsystem_hint), or the capsule that owns it (capsule_hints).",
+        "reason": "no capsule owns the subject of this objective, so the company cannot derive a bounded scope for it",
+        "reserved_action": ""
+      }
+    ],
+    "derivation": {
+      "authorized_paths": [],
+      "ceiling_applied": [
+        "docs/evidence/project_factory_repository_architecture_v1/p3c_vs_p5_matched_benchmark/INDEPENDENT_AUDIT.md"
+      ],
+      "context_refs_considered": 0,
+      "context_refs_dropped": [],
+      "context_refs_kept": 0,
+      "criteria_derived": false,
+      "escalation": "none",
+      "forbidden_paths": [],
+      "matched_tokens": [
+        "accounting",
+        "adaptive",
+        "arithmetic",
+        "audit",
+        "benchmark",
+        "claim",
+        "classification",
+        "conditions",
+        "contract",
+        "docs",
+        "equivalence",
+        "evidence",
+        "final",
+        "independently",
+        "matched",
+        "quality",
+        "record",
+        "resource",
+        "routing",
+        "sound",
+        "whether"
+      ],
+      "novel": false,
+      "owns_paths": [],
+      "reasoning_class_ceiling": "D",
+      "required_tests": [],
+      "resource_profile": "consumer",
+      "selected_capsule_ids": [],
+      "selection_reasons": [],
+      "specialist_domain": "",
+      "specialist_reason": "the objective names no security, governance, architecture or concurrency work and the risk is not high, so this is routine implementation",
+      "unscreened_reserved_actions": []
+    },
+    "outcome": "decision_required",
+    "request": {
+      "fingerprint": "f46a772daef20fb0",
+      "record_ref": "engineering/requests/req-p3c-vs-p5-benchmark-audit-b756c15d1f49/000001.json",
+      "sequence": 1
+    }
+  },
+  "intake_outcome": "decision_required",
+  "refusal_question": [
+    "Name the subsystem this belongs to (subsystem_hint), or the capsule that owns it (capsule_hints)."
+  ],
+  "refusal_reason": [
+    "no capsule owns the subject of this objective, so the company cannot derive a bounded scope for it"
+  ],
+  "scope_ceiling_requested": [
+    "docs/evidence/project_factory_repository_architecture_v1/p3c_vs_p5_matched_benchmark/INDEPENDENT_AUDIT.md"
+  ],
+  "structural_cause": "No knowledge capsule declares ownership of any docs/ path. All 20 capsule seeds were enumerated and none owns docs/evidence/. Company OS derives a work order scope from capsule ownership, so it cannot authorize a writable path it does not own, and therefore cannot run its reviewer chain over a document in docs/evidence/.",
+  "this_is_correct_behaviour": "Yes. Refusing to derive a bounded scope for an unowned path is the intake behaviour the constitution requires; the benchmark should not have been able to widen its own authority.",
+  "what_was_attempted": "Phase 8 independent review: submit the benchmark evidence to the established Company OS developer/reviewer/gate chain as an adversarial audit work order, so the benchmark implementer could not self-approve."
+}

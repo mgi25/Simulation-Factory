@@ -1,0 +1,99 @@
+==============================================================================
+INDEPENDENT RE-VERIFICATION (recomputed from raw runner state)
+==============================================================================
+
+control1: sessions=2 turns=20 cache_read=363600 cost=$0.69686000
+    developer: model=['sonnet'] turns=13 cost=$0.44467175
+    reviewer: model=['sonnet'] turns=7 cost=$0.25218825
+
+challenger1: sessions=2 turns=61 cache_read=1650055 cost=$0.80951730
+    developer: model=['haiku'] turns=40 cost=$0.23570005
+    reviewer: model=['sonnet'] turns=21 cost=$0.57381725
+
+challenger2: sessions=2 turns=54 cache_read=1565335 cost=$0.63329565
+    developer: model=['haiku'] turns=42 cost=$0.25550390
+    reviewer: model=['sonnet'] turns=12 cost=$0.37779175
+
+control2: sessions=2 turns=33 cache_read=814942 cost=$1.04781600
+    developer: model=['sonnet'] turns=26 cost=$0.79144800
+    reviewer: model=['sonnet'] turns=7 cost=$0.25636800
+
+challenger3: sessions=2 turns=26 cache_read=581333 cost=$0.30068525
+    developer: model=['haiku'] turns=20 cost=$0.12361375
+    reviewer: model=['sonnet'] turns=6 cost=$0.17707150
+
+Distinct provider sessions across every arm: 10
+Every session id is unique: True
+
+==============================================================================
+POOLED (matched pairs only; void attempt excluded by design)
+==============================================================================
+turns                    control        26.5000  challenger        40.0000    +50.94%  overlap=True
+input_units              control        28.0000  challenger       258.0000   +821.43%  overlap=False
+cache_read_units         control    589271.0000  challenger   1073334.0000    +82.15%  overlap=True
+cache_creation_units     control     48694.0000  challenger     54893.0000    +12.73%  overlap=True
+output_units             control     10929.0000  challenger     13767.5000    +25.97%  overlap=True
+cost_usd                 control         0.8723  challenger         0.4670    -46.47%  overlap=False
+duration_s               control       261.9155  challenger       421.5035    +60.93%  overlap=True
+paid_sessions            control         2.0000  challenger         2.0000     +0.00%  overlap=True
+
+==============================================================================
+CROSS-CHECK AGAINST RESULT.md CLAIMS
+==============================================================================
+
+Headline cost claim:
+  [OK ] whole-task cost change %: recomputed -46.47  claimed -46.47
+  [OK ] control mean cost: recomputed 0.8723  claimed 0.8723
+  [OK ] challenger mean cost: recomputed 0.467  claimed 0.467
+  [OK ] cost ranges do NOT overlap: recomputed False  claimed False
+
+Stage split:
+  [OK ] developer mean cost change %: recomputed -69.33  claimed -69.33
+  [OK ] reviewer mean cost change %: recomputed 9.11  claimed 9.11
+  [OK ] developer ranges do NOT overlap: recomputed False  claimed False
+  [OK ] reviewer ranges DO overlap: recomputed True  claimed True
+
+Token dimensions RESULT.md calls NOT ESTABLISHED:
+  [OK ] turns change %: recomputed 50.94  claimed 50.94
+  [OK ] turns ranges DO overlap: recomputed True  claimed True
+  [OK ] cache_read_units change %: recomputed 82.15  claimed 82.15
+  [OK ] cache_read_units ranges DO overlap: recomputed True  claimed True
+  [OK ] cache_creation_units change %: recomputed 12.73  claimed 12.73
+  [OK ] cache_creation_units ranges DO overlap: recomputed True  claimed True
+  [OK ] output_units change %: recomputed 25.97  claimed 25.97
+  [OK ] output_units ranges DO overlap: recomputed True  claimed True
+  [OK ] duration_s change %: recomputed 60.93  claimed 60.93
+  [OK ] duration_s ranges DO overlap: recomputed True  claimed True
+
+Per-pair cost claims:
+  [OK ] pair1 cost change %: recomputed -9.12  claimed -9.12
+  [OK ] pair2 cost change %: recomputed -71.3  claimed -71.3
+
+Void attempt and as-spent:
+  [OK ] void attempt cost: recomputed 0.80952  claimed 0.80952
+  [OK ] void attempt turns: recomputed 61  claimed 61
+  [OK ] P5 as-spent total: recomputed 1.7435  claimed 1.7435
+  [OK ] P3C as-spent total: recomputed 1.74468  claimed 1.74468
+  [OK ] as-spent per-result change %: recomputed -0.07  claimed -0.07
+
+Model routing:
+  [OK ] challenger2: developer=['haiku'] reviewer=['sonnet']
+  [OK ] challenger3: developer=['haiku'] reviewer=['sonnet']
+  [OK ] challenger1: developer=['haiku'] reviewer=['sonnet']
+  [OK ] control1: developer=['sonnet'] reviewer=['sonnet']
+  [OK ] control2: developer=['sonnet'] reviewer=['sonnet']
+
+RESULT.md internal consistency:
+  [OK ] RESULT.md mentions 'P5_WIN'
+  [OK ] RESULT.md mentions '46.47'
+  [OK ] RESULT.md mentions '0.80952'
+  [OK ] RESULT.md mentions 'not established'
+  [OK ] RESULT.md mentions 'UNAVAILABLE'
+  [OK ] RESULT.md mentions 'not concealed'
+  [OK ] RESULT.md mentions 'eng-token-efficiency-v4-p5-challenger'
+
+==============================================================================
+VERIFICATION PASSED: every headline number in RESULT.md is reproducible
+from raw runner state, every paid session is accounted for exactly once,
+and no session id is double counted.
+==============================================================================

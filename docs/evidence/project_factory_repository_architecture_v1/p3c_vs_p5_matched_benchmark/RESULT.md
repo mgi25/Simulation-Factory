@@ -176,6 +176,45 @@ reviewer stage. It is **included in the P5 as-spent total**:
 As-spent parity (−0.07%) is a coincidence of one external outage, not a
 property of P5. Both figures are reported; neither is the headline.
 
+## Independent review — attempted, structurally blocked
+
+The benchmark implementer may not approve the benchmark, so Phase 8 tried to
+put this evidence through the established Company OS developer/reviewer/gate
+chain as an adversarial audit work order.
+
+**Company OS refused it, correctly.** Intake returned `decision_required`:
+
+> no capsule owns the subject of this objective, so the company cannot derive a
+> bounded scope for it
+
+All 20 knowledge-capsule seeds were enumerated. **None declares ownership of any
+`docs/` path.** Company OS derives a work order's writable scope from capsule
+ownership and a `scope_ceiling` only narrows it, so there is no way to authorize
+a write under `docs/evidence/` — and therefore no way to run the established
+reviewer chain over a document living there. Refusing is the right behaviour: the
+benchmark should not be able to widen its own authority in order to get itself
+reviewed. The full intake record is in `review/independent_review_blocked.json`.
+
+**Consequence: this benchmark is NOT approved and claims no approval.** It is a
+request to be read.
+
+**Compensating control, with its limits stated.** In place of the reviewer, a
+deterministic re-verification was run (`review/verify_claims.py`, output in
+`review/deterministic_verification.txt`). It re-reads every `sessions.json`
+under all five runner state directories by an independent code path — it does
+not reuse the collector that produced the accounting files — then re-derives
+every headline number, every stage split, every range-overlap verdict and the
+as-spent totals, and checks each against the literal claim in this document.
+
+Result: **PASSED**. Every number is reproducible from raw runner state; 10
+distinct provider sessions were found across the five arms; none is double
+counted and none is omitted.
+
+That verifies arithmetic and accounting completeness. It cannot verify
+judgement — the P5_WIN classification, the decision to exclude the void attempt
+from the matched comparison, and the reading of "nothing else is broadened" all
+remain unreviewed by an independent party.
+
 ## Limitations
 
 1. **n = 2 per arm.** Only the cost dimension separates the arms cleanly. Every
@@ -234,3 +273,11 @@ authorized minimum in one of two accepted runs, while the standard developer was
 byte-identical in both. If the economy tier is kept, the acceptance criterion
 "nothing else is broadened" deserves a deterministic check rather than relying
 on reviewer judgement.
+
+A third item, surfaced by Phase 8 and blocking for every future benchmark: **no
+capsule owns `docs/`**, so Company OS cannot run its own review chain over its
+own evidence. Every stop-condition document this company has produced is
+therefore unreviewable by the company. Either a capsule takes ownership of
+`docs/evidence/`, or evidence review needs a path that does not run through
+capsule-derived authority. This is a governance gap, not a benchmark defect, and
+it should be decided before the next measured experiment rather than after.
