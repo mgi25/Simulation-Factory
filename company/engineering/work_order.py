@@ -101,6 +101,11 @@ from .protected import ProtectedSurface
 
 WORK_ORDER_VERSION = 1
 
+# The authority fields added when read authority stopped being assumed. They
+# are omitted from `fingerprint()` while empty, so adding them did not restamp
+# every work order the company had already authorized. See `fingerprint`.
+_READ_FIELDS = ("authorized_read_paths", "forbidden_read_paths")
+
 # A branch an engineering job is never assigned. Integration is a CEO act that
 # happens somewhere else, so the work is always on a branch of its own.
 FORBIDDEN_BRANCHES = frozenset({"main", "master", "HEAD", "trunk"})
@@ -396,8 +401,28 @@ class EngineeringWorkOrder:
         return to_jsonable(self)
 
     def fingerprint(self) -> str:
-        """The immutability proof every later stage compares against."""
-        return _fingerprint(self)
+        """The immutability proof every later stage compares against.
+
+        An empty read field is omitted, so that a work order authorized before
+        read authority existed keeps the fingerprint it was stored with. The
+        alternative was worse than it sounds: adding the fields changed the
+        identity of every historical record, which meant a completed job could
+        no longer have a decision recorded against it - its stage referenced a
+        digest the work order no longer produced.
+
+        Absent and empty already mean the same thing here, because an empty
+        read scope grants nothing, so hashing them the same asserts nothing
+        new. And a record stripped of the fields to chase an old digest is
+        strictly *less* privileged than one carrying them, so this is not a
+        route to forging authority - only to forfeiting it.
+        """
+        return _fingerprint(
+            {
+                key: value
+                for key, value in to_jsonable(self).items()
+                if key not in _READ_FIELDS or value
+            }
+        )
 
     # --- derivations, all of them narrowing --------------------------------
 

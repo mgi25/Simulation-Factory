@@ -47,6 +47,7 @@ from company.engineering.intake import (
     assess_request,
 )
 from company.engineering.errors import AuthorityEscalation, EngineeringError
+from company.engineering.protected import ProtectedSurface
 from company.engineering.work_order import (
     EngineeringWorkOrder,
     _read_covers,
@@ -429,6 +430,55 @@ def test_a_derived_work_order_can_never_have_an_empty_ceiling(config, seeds):
             for path in order.authorized_paths
             if any(_read_covers(rule, path) for rule in order.authorized_read_paths)
         }
+
+
+def test_adding_the_fields_did_not_restamp_every_historical_work_order(config):
+    """A schema change to an authority record changes its identity. Not this one.
+
+    `fingerprint()` omits an empty read field, so a work order authorized
+    before read authority existed still produces the digest it was stored
+    with. Without that, every completed job in every archived state directory
+    became un-decidable: its stage referenced a digest the work order no
+    longer produced, and the immutability check - correctly - refused.
+
+    Absent and empty already mean the same thing, because an empty read scope
+    grants nothing, so hashing them the same asserts nothing new.
+    """
+    order = EngineeringWorkOrder(
+        work_order_id="wo-read-authority-legacy",
+        objective="Do the bounded thing the criteria name.",
+        requested_by="MGI",
+        request_id="req-read-authority-legacy",
+        authorized_branch="eng-read-authority-legacy",
+        authorized_paths=("company/engineering",),
+        acceptance_criteria=("The bounded thing is done.",),
+        authorized_on=DAY,
+        max_developer_attempts=1,
+        protected=ProtectedSurface.capture(REPO_ROOT),
+    )
+    legacy = order.to_dict()
+    legacy.pop("authorized_read_paths")
+    legacy.pop("forbidden_read_paths")
+    assert EngineeringWorkOrder.from_mapping(legacy).fingerprint() == order.fingerprint()
+
+    # And a *granted* read scope is still inside the digest.
+    granted = dataclasses.replace(order, authorized_read_paths=("company/engineering",))
+    assert granted.fingerprint() != order.fingerprint()
+
+
+def test_stripping_the_read_fields_forfeits_authority_rather_than_forging_it(
+    engineering,
+):
+    """The one way the omission could be abused, measured instead of argued."""
+    order = engineering.work_order
+    stripped = order.to_dict()
+    stripped["authorized_read_paths"] = []
+    stripped["forbidden_read_paths"] = []
+    forged = EngineeringWorkOrder.from_mapping(stripped)
+
+    assert forged.fingerprint() != order.fingerprint()
+    assert forged.authorized_read_paths == ()
+    assert forged.employee_contract(load_company_config(None), DEVELOPER)["may_read"] == []
 
 
 def test_a_stored_work_order_without_the_field_decodes_to_no_read_scope(
