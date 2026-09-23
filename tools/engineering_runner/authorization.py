@@ -30,6 +30,22 @@ imports both implementations and asserts they agree on a table of cases,
 including the ones where they could plausibly differ. That test is the only
 place in the repository where the two halves meet.
 
+## Read scope: carried and checked, not imposed
+
+The envelope carries `may_read` and `may_not_read` from the work order, the
+same values for developer and reviewer - read is a property of the task, write
+is a property of the role.
+
+Be exact about what that buys. **This runner cannot stop a process from
+opening a file.** It has no sandbox; it hands a session a checkout. So the read
+ceiling is enforced where it can be - `company/runtime/context_expansion_policy`
+refuses a governed context request outside it - and here it is *checked*: a
+packet whose context references fall outside the work order's
+`authorized_read_paths`, or inside its `forbidden_read_paths`, is refused
+before the session starts. That catches the escalation that matters, which is
+a read grant widening between authorization and execution, and it does not
+pretend to catch a session that simply reads a file nobody told it about.
+
 ## What counts as a violation
 
 Anything that would make the receipt a lie, and two things that would not:
@@ -50,7 +66,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import hashlib
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -104,6 +120,43 @@ def normalise_path(value: str, field_name: str = "path") -> str:
 
 def _covers(rule: str, path: str) -> bool:
     return path == rule or path.startswith(rule + "/")
+
+
+def _path_shaped_refs(refs: Any) -> tuple[str, ...]:
+    """The context references that name a file, as plain paths.
+
+    A packet's refs are `{kind, ref, ...}` mappings, and only some kinds hold a
+    repository path: `capsule:company-runtime` is a knowledge-store id and
+    names no file, so judging it against a path rule would refuse a reference
+    that was never a path in the first place.
+    """
+    if not isinstance(refs, (list, tuple)):
+        return ()
+    out: list[str] = []
+    for item in refs:
+        if isinstance(item, Mapping):
+            kind, ref = str(item.get("kind", "")), str(item.get("ref", ""))
+        else:
+            kind, ref = "", str(item)
+        if kind and kind not in ("file", "test", "benchmark"):
+            continue
+        ref = ref.split("::", 1)[0].split("#", 1)[0].strip()
+        if ref and ":" not in ref:
+            out.append(normalise_path(ref, "packet.context_refs"))
+    return tuple(sorted(set(out)))
+
+
+def _read_covers(rule: str, path: str) -> bool:
+    """Coverage for a read rule, which unlike a write rule may hold a wildcard.
+
+    Capsules declare reads like `company/*.yaml`, and the trailing-glob strip
+    that normalises `company/**` to `company` leaves that one intact on purpose:
+    it names four files rather than a tree. A prefix test would match none of
+    them and report a widening that is not there.
+    """
+    if any(token in rule for token in "*?["):
+        return PurePosixPath(path).match(rule)
+    return _covers(rule, path)
 
 
 @dataclass(frozen=True)
@@ -176,6 +229,14 @@ class AuthorityEnvelope:
     # stayed in scope means comparing the diff with the grant, and a reviewer
     # shown its own empty scope has nothing to compare against.
     authorized_paths: tuple[str, ...]
+    # The read ceiling, identical for both roles: read is a property of the
+    # task, write is a property of the role. The runner cannot stop a process
+    # from opening a file - it has no sandbox - so this is carried and checked
+    # rather than imposed. What it does do is refuse a briefing whose read
+    # scope is not the work order's, which is the escalation route that matters:
+    # a read grant widened somewhere between authorization and execution.
+    may_read: tuple[str, ...]
+    may_not_read: tuple[str, ...]
     may_not_modify: tuple[str, ...]
     protected_paths: tuple[str, ...]
     required_tests: tuple[str, ...]
@@ -210,6 +271,8 @@ class AuthorityEnvelope:
             "base_commit": self.base_commit,
             "may_write": list(self.may_write),
             "authorized_paths": list(self.authorized_paths),
+            "may_read": list(self.may_read),
+            "may_not_read": list(self.may_not_read),
             "may_not_modify": list(self.may_not_modify),
             "required_tests": list(self.required_tests),
             "read_only": self.read_only,
@@ -287,6 +350,43 @@ class AuthorityEnvelope:
         forbidden = _strings(order.get("forbidden_paths", ()))
         protected = _strings(order.get("protected_paths", ()))
 
+        # The read ceiling comes from the work order, which is the record that
+        # granted it. The transport bundle deliberately carries pointers and
+        # fingerprints rather than a copy of the authority, so there is no
+        # second copy here to compare against - and inventing one would create
+        # exactly the drift that design avoids.
+        #
+        # What *is* worth checking is the packet's own context references: they
+        # are the files Company OS decided this session should read, and if one
+        # of them falls outside the read ceiling then the ceiling and the
+        # context disagree about the same session. A packet may carry fewer
+        # references than the ceiling allows; it may never carry more.
+        read_allowed = _strings(order.get("authorized_read_paths", ()))
+        read_denied = _strings(order.get("forbidden_read_paths", ()))
+        if read_allowed:
+            outside = sorted(
+                ref
+                for ref in _path_shaped_refs(packet.get("context_refs", ()))
+                if not any(_read_covers(rule, ref) for rule in read_allowed)
+            )
+            if outside:
+                raise IntegrityFailure(
+                    "the packet carries context outside the work order's "
+                    f"authorized_read_paths: {outside} is outside "
+                    f"{sorted(read_allowed)}"
+                )
+        denied = sorted(
+            ref
+            for ref in _path_shaped_refs(packet.get("context_refs", ()))
+            for rule in read_denied
+            if _read_covers(rule, ref)
+        )
+        if denied:
+            raise IntegrityFailure(
+                "the packet carries context the work order forbids reading: "
+                + ", ".join(denied)
+            )
+
         if role == "developer":
             # Both halves of the packet's scope are checked, not just the
             # permissive one. A packet that allowed the right paths but had
@@ -328,6 +428,8 @@ class AuthorityEnvelope:
             base_commit=base,
             may_write=tuple(sorted(authorized)) if role == "developer" else (),
             authorized_paths=tuple(sorted(authorized)),
+            may_read=read_allowed,
+            may_not_read=read_denied,
             may_not_modify=tuple(sorted(set(forbidden) | set(protected))),
             protected_paths=tuple(sorted(protected)),
             required_tests=_strings(order.get("required_tests", ())),
