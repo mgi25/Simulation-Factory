@@ -490,6 +490,7 @@ def test_an_ordinary_engineering_objective_keeps_its_exact_scope(config, seeds):
     assert assessment.derivation.authorized_paths == (
         "company/engineering",
         "tests/test_company_engineering_execution.py",
+        "tests/test_company_read_authority.py",
     )
 
 
