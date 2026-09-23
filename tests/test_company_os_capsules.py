@@ -657,13 +657,14 @@ def test_the_four_staleness_conditions_accumulate_on_one_capsule():
 
 
 def test_the_company_os_seed_capsules_load(seeds):
-    assert len(seeds) == 20
+    assert len(seeds) == 21
     assert seeds.ids() == (
         "ai-platform",
         "company-analytics-experiments",
         "company-bootstrap-policy",
         "company-ceo-dashboard",
         "company-engineering-execution",
+        "company-evidence-review",
         "company-executive-delegation",
         "company-finance",
         "company-knowledge-capsules",
@@ -697,12 +698,42 @@ def test_every_seed_names_a_test_file_that_exists(seeds):
             assert (REPO_ROOT / test_ref.split("::")[0]).exists(), f"{capsule.id}: {test_ref}"
 
 
+# The one documentation path any capsule may own: the surface independent
+# evidence review writes its attestations to. Named exactly, never as a `docs/`
+# prefix, because `owns_paths` is where a developer contract's `may_write`
+# comes from - a capsule owning `docs/` or `docs/evidence` would hand a
+# developer session write authority over every frozen evidence record in the
+# repository. See `tests/test_company_evidence_review.py`, which measures that.
+EVIDENCE_REVIEW_SURFACE = "docs/evidence/reviews"
+
+
 def test_the_seeds_cover_the_control_plane_and_nothing_in_production(seeds):
     owned = [path for capsule in seeds.all() for path in capsule.owns_paths]
     assert all(
         path.startswith(("company/", "ai_platform", "knowledge/", "intelligence/"))
+        or path == EVIDENCE_REVIEW_SURFACE
         for path in owned
     ), owned
+
+
+def test_no_capsule_owns_any_documentation_path_but_the_review_surface(seeds):
+    """The exception above is one directory, and stays one directory.
+
+    Widening it is the cheapest way to make an evidence audit pass, and it is
+    the specific move this assertion exists to catch: frozen evidence is
+    protected by being owned by nobody, so a second `docs/` claim - or the same
+    claim written one level up - silently unfreezes what it contains.
+    """
+    owned_docs = sorted(
+        path
+        for capsule in seeds.all()
+        for path in capsule.owns_paths
+        if path == "docs" or path.startswith("docs/")
+    )
+    assert owned_docs == [EVIDENCE_REVIEW_SURFACE]
+    assert {c.id for c in seeds.by_path(EVIDENCE_REVIEW_SURFACE)} == {
+        "company-evidence-review"
+    }
 
 
 def test_no_seed_capsule_links_a_hypothesis(seeds):
