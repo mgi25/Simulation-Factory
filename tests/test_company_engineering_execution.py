@@ -452,14 +452,18 @@ def test_a_ceo_objective_produces_a_bounded_work_order(tmp_path):
     order = assessment.work_order
     assert order is not None
     # The CEO named no file. The scope came from the capsule that owns the
-    # subject, plus the one test file that capsule declares - a work order that
+    # subject, plus the two test files that capsule declares - a work order that
     # requires a test to pass has to allow writing it.
     assert order.authorized_paths == (
         "company/engineering",
         "tests/test_company_engineering_execution.py",
+        "tests/test_company_review_separation.py",
     )
     assert assessment.derivation.selected_capsule_ids == ("company-engineering-execution",)
-    assert order.required_tests == ("tests/test_company_engineering_execution.py",)
+    assert order.required_tests == (
+        "tests/test_company_engineering_execution.py",
+        "tests/test_company_review_separation.py",
+    )
     assert order.acceptance_criteria
     assert assessment.derivation.criteria_derived is True
 
@@ -547,6 +551,7 @@ def test_the_derived_plan_names_the_stages_the_brief_asks_for(tmp_path):
     assert plan.writing_paths == (
         "company/engineering",
         "tests/test_company_engineering_execution.py",
+        "tests/test_company_review_separation.py",
     )
 
 
@@ -590,6 +595,7 @@ def test_authorized_paths_are_enforced_on_the_packet_scope(tmp_path):
     assert scope.allowed == (
         "company/engineering",
         "tests/test_company_engineering_execution.py",
+        "tests/test_company_review_separation.py",
     )
     assert scope.permits("company/engineering/verify.py")
     assert not scope.permits("company/runtime/packets.py")
@@ -1714,6 +1720,7 @@ def test_the_execution_history_is_append_only_and_provenanced(tmp_path):
     assert authority.may_write == (
         "company/engineering",
         "tests/test_company_engineering_execution.py",
+        "tests/test_company_review_separation.py",
     )
     assert "company/permissions.yaml" in authority.may_not_modify
 
@@ -1844,7 +1851,10 @@ def test_the_engineering_package_is_owned_by_exactly_one_capsule():
     ]
     assert owners == ["company-engineering-execution"]
     capsule = index.get("company-engineering-execution")
-    assert capsule.tests == ("tests/test_company_engineering_execution.py",)
+    assert capsule.tests == (
+        "tests/test_company_engineering_execution.py",
+        "tests/test_company_review_separation.py",
+    )
     assert len(dumps(capsule)) <= 4000
 
 
