@@ -60,6 +60,7 @@ from company.integration.suites import REQUIRED_SUITES as GATE_REQUIRED_SUITES
 from company.runtime.config import load_company_config
 from company.runtime.execution_store import ExecutionStore
 from company.runtime.packets import ExecutorHint
+from company.engineering.work_order import _read_covers as company_read_covers
 from company.runtime.path_scope import PathScope
 from company.runtime.path_scope import normalise_path as company_normalise
 from company.runtime.receipts import SessionReceipt, validate_receipt
@@ -70,6 +71,7 @@ from tools.engineering_runner.authorization import (
     AuthorityEnvelope,
     PathRules,
 )
+from tools.engineering_runner.authorization import _read_covers as runner_read_covers
 from tools.engineering_runner.authorization import normalise_path as runner_normalise
 from tools.engineering_runner.backends import SessionOutcome, executor_hint
 from tools.engineering_runner.evidence import (
@@ -123,6 +125,30 @@ def test_the_runners_path_rules_agree_with_the_packets_path_scope(allowed, forbi
     assert runner.forbids(path) == company.forbids(path)
     assert bool(runner.violations([path])) == bool(company.verdict((path,)).failures())
     assert runner.read_only == company.read_only
+
+
+# The read rule is duplicated for the same reason the write rule is, and it is
+# the harder of the two: a read rule may carry a wildcard, because a capsule
+# declares `company/*.yaml` to mean four files rather than a tree. A prefix
+# test would match none of them, so the two halves are held to the same table.
+READ_CASES = (
+    ("company", "company/runtime/packets.py", True),
+    ("company/runtime", "company/runtime_extra.py", False),
+    ("company/*.yaml", "company/permissions.yaml", True),
+    ("company/*.yaml", "company/runtime/state.yaml", False),
+    ("company/*.yaml", "company/permissions.yaml.bak", False),
+    ("company/workforce/*.py", "company/workforce/roles.py", True),
+    ("company/workforce/*.py", "company/workforce/sub/roles.py", False),
+    ("docs/evidence", "docs/evidence/x/RESULT.md", True),
+    ("docs/evidence", "docs/evidence_other/RESULT.md", False),
+    ("ai_platform", "ai_platform", True),
+)
+
+
+@pytest.mark.parametrize("rule,path,expected", READ_CASES)
+def test_the_runners_read_rule_agrees_with_the_work_orders(rule, path, expected):
+    assert runner_read_covers(rule, path) is expected
+    assert company_read_covers(rule, path) is expected
 
 
 @pytest.mark.parametrize(
