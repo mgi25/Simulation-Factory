@@ -1,0 +1,45 @@
+{
+ "kind": "category3_multiplying_shell_av_muxed",
+ "profile": "full",
+ "integration_config_digest": "e5e9cd6baa43a64c",
+ "rows": [
+  {
+   "seed": 12818,
+   "path": "output\\category3_multishell_av_v3\\review\\seed_12818_full_av.mp4",
+   "playback_digest": "5c96f6d7a185b523b8667c84c1369b7b174824edccba8d3eb0a1312046fa9cd9",
+   "width": 1080,
+   "height": 1920,
+   "aspect_is_9_16": true,
+   "video_codec": "h264",
+   "audio_codec": "aac",
+   "sample_rate": 48000,
+   "channels": 2,
+   "source_frames": 1429,
+   "fps": 60,
+   "video_seconds": 25.0,
+   "audio_seconds": 24.993,
+   "av_drift_seconds": 0.0070000000000014495,
+   "container_seconds": 25.0,
+   "size_mb": 14.24918
+  },
+  {
+   "seed": 547,
+   "path": "output\\category3_multishell_av_v3\\review\\seed_547_full_av.mp4",
+   "playback_digest": "e91c8a962e1d95e24e0ddefbb005d4187b50d215ad24f5e620a05d38a50a9b8f",
+   "width": 1080,
+   "height": 1920,
+   "aspect_is_9_16": true,
+   "video_codec": "h264",
+   "audio_codec": "aac",
+   "sample_rate": 48000,
+   "channels": 2,
+   "source_frames": 1362,
+   "fps": 60,
+   "video_seconds": 23.883333,
+   "audio_seconds": 23.882,
+   "av_drift_seconds": 0.0013329999999989184,
+   "container_seconds": 23.883333,
+   "size_mb": 13.670393
+  }
+ ]
+}
