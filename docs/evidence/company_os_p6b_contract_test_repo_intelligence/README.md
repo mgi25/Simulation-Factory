@@ -264,6 +264,28 @@ rules would be jointly unsatisfiable. The way out is to move the script into a
 package or drop the dependency, never to widen the claim. No Company OS suite
 imports a top-level `tools/` script today.
 
+## A gap P6B found and did not close
+
+`satisfying/` is 43 Python modules of production simulation code, and it is
+**not in `DECLARED_PRODUCTION_ROOTS`**. The integration gate therefore does not
+scan it at all: `architecture.production_does_not_import_company_os` never
+looks at it, `health.sources_parse` never parses it, and
+`architecture.governed_subsystem_ownership` — P6B's own new check — cannot see
+it either, because it only considers roots the gate already declares.
+
+Nothing in it imports Company OS today; that was checked directly against
+`origin/main`, which is now `bf0dd1f`. So this is a gap in coverage, not a live
+violation.
+
+It is **not fixed here**, deliberately. Which trees the gate polices is a
+governance decision with its own blast radius — adding a root makes 43 modules
+newly subject to four required checks — and it belongs to whoever owns the
+production boundary, not to a milestone about contract/test dependency
+discovery. It is reported so the decision is made rather than defaulted.
+
+The same reasoning applies to `intelligence/`, which *is* scanned, because it
+is in `COMPANY_OS_ROOTS`. `satisfying/` is in neither list.
+
 ## Files
 
 | file | what it holds |
