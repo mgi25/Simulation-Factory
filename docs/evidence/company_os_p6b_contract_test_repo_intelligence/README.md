@@ -62,12 +62,32 @@ imports, and the graph saw neither hop. `tests/test_company_gate_suite_requireme
 is the worked example — it imports `company.integration`, whose `__init__`
 reaches `suites.py` relatively, and neither link existed.
 
+Both resolvers were run over the same P6B tree, so the difference below is
+the parser and not the repository (`resolver-before-after.json`).
+
 | measure | before | after |
 | --- | ---: | ---: |
-| runner-map edges | — (two independent indexes) | 1,932 from one canonical graph |
-| `tests_by_module` entries | 167 | 172 |
-| `production_dependents` entries | 97 | 248 |
+| modules with at least one direct test | 169 | 173 |
+| total module→test edges | 435 | 445 |
+| **`production_dependents` entries** | **97** | **248** |
+| transitive reach | not computable | closure, cycle-safe |
 | dynamic imports reported | 0 | 22 |
+
+The direct-test numbers barely move, and saying so matters more than the
+headline would. The old resolver already matched an exact dotted name and a
+package prefix, so a test importing `a.b.c` directly was found. What it could
+not see was everything written relatively — which is almost all of the
+*production* graph, hence 97 → 248 — and it had no closure at all, so a chain
+could never be followed.
+
+That chain is the case this milestone exists for.
+`tests/test_company_gate_suite_requirements.py` imports the integration
+package by its facade; the facade re-exports `suites.py` with a relative
+import. The first hop credits only the package (correctly — the names imported
+are symbols), the second hop did not exist, and so the suite that most
+directly exercises the required-set resolver appeared to have no relationship
+to it. It now reaches it transitively, and the audit can say which of those
+two kinds of reach it is.
 
 The two reverse indexes are now views of one `_direct_edges` map. Closures are
 computed on demand, cycle-safe, and never serialized: a stored transitive
@@ -255,3 +275,9 @@ imports a top-level `tools/` script today.
 | `governed-subsystems.json` | the two production packages the contract depends on |
 | `eleven-undeclared-suites.json` | each of the eleven, its dependencies and its disposition |
 | `measurements.json` | graph, runner-map, bounded-query and change-impact measurements |
+| `resolver-before-after.json` | the 39fbd44 resolver and the P6B resolver over the same tree |
+| `suites.json` | the 45 required suites as actually run on the branch |
+| `gate-report-on-branch.json` | the real gate run: BLOCKED |
+| `suites-post-merge-modelled.json` | the same, with the three branch-scope guards modelled |
+| `gate-report-post-merge-modelled.json` | the modelled gate run: READY. Supporting evidence, not proof |
+| `full-suite.md` | the 6,767-test run and every failure classified against 39fbd44 |

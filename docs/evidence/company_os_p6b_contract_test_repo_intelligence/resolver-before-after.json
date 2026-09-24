@@ -1,0 +1,59 @@
+{
+  "modules_with_at_least_one_direct_test": {
+    "after": 173,
+    "before": 169
+  },
+  "note": "before = the 39fbd44 resolver, after = the P6B resolver, both run over the same P6B tree. The difference is the parser, not the repository.",
+  "probes": [
+    {
+      "after_direct": 2,
+      "after_transitive": 4,
+      "before_direct": 2,
+      "gained_direct": [],
+      "path": "company/integration/suites.py"
+    },
+    {
+      "after_direct": 3,
+      "after_transitive": 3,
+      "before_direct": 3,
+      "gained_direct": [],
+      "path": "company/integration/checks.py"
+    },
+    {
+      "after_direct": 1,
+      "after_transitive": 32,
+      "before_direct": 1,
+      "gained_direct": [],
+      "path": "company/runtime/routing.py"
+    },
+    {
+      "after_direct": 1,
+      "after_transitive": 32,
+      "before_direct": 1,
+      "gained_direct": [],
+      "path": "company/runtime/context_cache.py"
+    },
+    {
+      "after_direct": 2,
+      "after_transitive": 6,
+      "before_direct": 2,
+      "gained_direct": [],
+      "path": "company/delegation/planning.py"
+    },
+    {
+      "after_direct": 4,
+      "after_transitive": 5,
+      "before_direct": 4,
+      "gained_direct": [],
+      "path": "tools/engineering_runner/repo_map.py"
+    }
+  ],
+  "production_dependents_entries": {
+    "after": 248,
+    "before": 97
+  },
+  "total_module_to_test_edges": {
+    "after": 445,
+    "before": 435
+  }
+}

@@ -1,0 +1,455 @@
+{
+  "max_age_days": 7,
+  "results": [
+    {
+      "suite": "tests/test_company_analytics.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 160,
+      "failed": 0,
+      "note": "160 passed in 1.72s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_bounded_engineering_activation.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 63,
+      "failed": 0,
+      "note": "63 passed in 0.56s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_bounded_engineering_autonomy.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 72,
+      "failed": 0,
+      "note": "72 passed in 0.49s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_context_assembly.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 9,
+      "failed": 0,
+      "note": "9 passed in 0.18s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_context_expansion.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 17,
+      "failed": 0,
+      "note": "17 passed in 1.05s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_dashboard.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 32,
+      "failed": 0,
+      "note": "32 passed in 1.02s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_delegation.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 152,
+      "failed": 0,
+      "note": "152 passed in 1.80s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_delegation_pilot.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 159,
+      "failed": 0,
+      "note": "159 passed in 0.81s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_dependency_graph.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 54,
+      "failed": 0,
+      "note": "54 passed in 37.13s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_efficiency.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 69,
+      "failed": 0,
+      "note": "69 passed in 0.45s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_engineering_execution.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 207,
+      "failed": 0,
+      "note": "207 passed in 38.14s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_evidence_review.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 25,
+      "failed": 0,
+      "note": "25 passed in 2.92s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_executable_work_planning.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 23,
+      "failed": 0,
+      "note": "23 passed in 0.48s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_execution_transport.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 14,
+      "failed": 0,
+      "note": "14 passed in 1.01s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_executive_planning.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 73,
+      "failed": 0,
+      "note": "73 passed in 0.47s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_external_engineering_runner.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 64,
+      "failed": 0,
+      "note": "64 passed in 2.46s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_finance.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 123,
+      "failed": 0,
+      "note": "123 passed in 1.10s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_finance_usage_cost.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 48,
+      "failed": 0,
+      "note": "48 passed in 0.82s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_gate_suite_requirements.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 46,
+      "failed": 0,
+      "note": "46 passed in 153.27s (0:02:33)",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_integration_gate.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 89,
+      "failed": 0,
+      "note": "89 passed in 146.10s (0:02:26)",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_objective_planning.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 93,
+      "failed": 0,
+      "note": "93 passed in 0.59s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_org_intelligence.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 119,
+      "failed": 0,
+      "note": "119 passed in 0.72s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_os_ai_platform.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 46,
+      "failed": 0,
+      "note": "46 passed in 0.11s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_os_capsules.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 68,
+      "failed": 0,
+      "note": "68 passed in 0.33s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_os_knowledge.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 26,
+      "failed": 0,
+      "note": "26 passed in 0.23s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_os_research.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 81,
+      "failed": 0,
+      "note": "MODELLED, NOT RUN. This suite's only failure on the P6B branch is test_this_branch_changed_no_race_fight_or_v30_code, a branch-scope guard asserting that git diff origin/main...HEAD touches no production path. P6B legitimately modifies tools/engineering_runner, so it fires on the branch and cannot pass there. Post-merge origin/main...HEAD is empty and the predicate holds; the same three suites pass in wt-p6b-baseline, whose HEAD equals origin/main. Every other test in this file passed on the branch.",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_os_research_batches.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 118,
+      "failed": 0,
+      "note": "MODELLED, NOT RUN. This suite's only failure on the P6B branch is test_this_branch_changed_no_race_fight_or_v30_code, a branch-scope guard asserting that git diff origin/main...HEAD touches no production path. P6B legitimately modifies tools/engineering_runner, so it fires on the branch and cannot pass there. Post-merge origin/main...HEAD is empty and the predicate holds; the same three suites pass in wt-p6b-baseline, whose HEAD equals origin/main. Every other test in this file passed on the branch.",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_os_research_ingestion.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 122,
+      "failed": 0,
+      "note": "MODELLED, NOT RUN. This suite's only failure on the P6B branch is test_this_branch_changed_no_race_fight_or_v30_code, a branch-scope guard asserting that git diff origin/main...HEAD touches no production path. P6B legitimately modifies tools/engineering_runner, so it fires on the branch and cannot pass there. Post-merge origin/main...HEAD is empty and the predicate holds; the same three suites pass in wt-p6b-baseline, whose HEAD equals origin/main. Every other test in this file passed on the branch.",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_read_authority.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 34,
+      "failed": 0,
+      "note": "34 passed in 0.46s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_review_separation.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 32,
+      "failed": 0,
+      "note": "32 passed in 0.56s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_runtime.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 22,
+      "failed": 0,
+      "note": "22 passed in 1.17s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_runtime_integration.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 14,
+      "failed": 0,
+      "note": "14 passed in 0.39s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_session_execution.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 48,
+      "failed": 0,
+      "note": "48 passed in 1.70s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_typed_evidence_context.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 59,
+      "failed": 0,
+      "note": "59 passed in 0.20s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_workforce.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 93,
+      "failed": 0,
+      "note": "93 passed in 0.49s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_youtube_connectivity.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 29,
+      "failed": 0,
+      "note": "29 passed in 11.97s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_youtube_end_to_end.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 7,
+      "failed": 0,
+      "note": "7 passed in 0.76s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_youtube_live_findings.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 55,
+      "failed": 0,
+      "note": "55 passed in 0.75s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_youtube_studio_ingestion.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 142,
+      "failed": 0,
+      "note": "142 passed in 3.98s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_engineering_runner_execution_context.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 40,
+      "failed": 0,
+      "note": "40 passed in 0.51s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_engineering_runner_exploration_report.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 19,
+      "failed": 0,
+      "note": "19 passed in 0.34s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_engineering_runner_exploration_telemetry.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 25,
+      "failed": 0,
+      "note": "25 passed in 0.18s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_engineering_runner_repo_map.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 25,
+      "failed": 0,
+      "note": "25 passed in 0.54s",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_external_engineering_runner.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 185,
+      "failed": 0,
+      "note": "185 passed in 1263.48s (0:21:03)",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_youtube_fetch.py",
+      "passed": true,
+      "observed_on": "2026-09-25",
+      "reported_by": "p6b-validation-session",
+      "selected": 68,
+      "failed": 0,
+      "note": "68 passed, 1 skipped in 0.79s",
+      "company_os": true
+    }
+  ]
+}
