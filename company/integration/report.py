@@ -29,6 +29,7 @@ commit with the tree a reader is holding.
 from __future__ import annotations
 
 import datetime as dt
+from collections.abc import Iterable
 from pathlib import Path
 
 from company.runtime.git_evidence import read_ref
@@ -78,11 +79,14 @@ def build_report(
     capsule_root: Path | str | None = None,
     policy: GatePolicy = DEFAULT_POLICY,
     scan: GateScan | None = None,
+    changed_paths: Iterable[str] = (),
 ) -> ProductionIntegrationReadinessReport:
     """Run every condition over `repo_root` and assemble the report.
 
     `scan` lets a caller that already parsed this checkout reuse it; see
-    `GateInputs.scan` for why that changes no verdict.
+    `GateInputs.scan` for why that changes no verdict. `changed_paths` names
+    the change under review and can only widen what the run demands; see
+    `GateInputs.changed_paths`.
     """
     root = Path(repo_root).resolve()
     inputs = GateInputs(
@@ -92,6 +96,7 @@ def build_report(
         state_dir=Path(state_dir).resolve() if state_dir is not None else None,
         capsule_root=Path(capsule_root).resolve() if capsule_root is not None else None,
         scan=scan,
+        changed_paths=tuple(changed_paths),
     )
     checks = tuple(policy.coerce(check) for check in evaluate(inputs))
     policy.assert_covers(check.check_id for check in checks)

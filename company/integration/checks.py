@@ -72,7 +72,13 @@ from .sources import (
     production_files,
     production_roots,
 )
-from .suites import REQUIRED_SUITES, SuiteEvidence
+from .suites import (
+    REQUIRED_SUITES,
+    RequiredSuites,
+    SuiteEvidence,
+    SuiteOrigin,
+    resolve_required_suites,
+)
 
 # Callables the executive read model must not expose. A dashboard that can
 # approve is not a view of the company, it is a second control plane.
@@ -151,6 +157,12 @@ class GateInputs:
     may parse once and hand the result in. It is a pure function of the
     checkout, so reusing one across runs of the same unchanged tree changes no
     verdict. Left None, every run parses for itself.
+
+    `changed_paths` is the change under review, repository-relative. It only
+    ever *widens* what the run demands - see `resolve_required_suites` - so a
+    caller who omits it gets the stricter answer, not the cheaper one. That
+    direction is deliberate: an optional input that could relax a gate is an
+    optional input that will be omitted exactly when it matters.
     """
 
     repo_root: Path
@@ -159,12 +171,13 @@ class GateInputs:
     state_dir: Path | None = None
     capsule_root: Path | None = None
     scan: "GateScan | None" = None
+    changed_paths: tuple[str, ...] = ()
 
 
 def evaluate(inputs: GateInputs) -> tuple[GateCheck, ...]:
     """Run every condition and return the checks, in check-id order."""
     scan = inputs.scan if inputs.scan is not None else GateScan.of(inputs.repo_root)
-    index = _load_capsules(inputs)
+    index = load_capsule_index(inputs)
     config = _load_config(inputs)
     checks: list[GateCheck] = []
     for builder in _BUILDERS:
@@ -172,7 +185,7 @@ def evaluate(inputs: GateInputs) -> tuple[GateCheck, ...]:
     return tuple(sorted(checks, key=lambda check: check.check_id))
 
 
-def _load_capsules(inputs: GateInputs) -> CapsuleIndex | None:
+def load_capsule_index(inputs: GateInputs) -> CapsuleIndex | None:
     try:
         if inputs.capsule_root is not None:
             return CapsuleIndex.load(inputs.capsule_root)
@@ -925,28 +938,80 @@ def _decision_queue_refs(inputs, scan, index, config) -> GateCheck:
 
 
 def _required_suites(inputs, scan, index, config) -> GateCheck:
+    """Every suite the Company OS contract requires here is reported green.
+
+    The required set is derived on every run rather than read from a list; see
+    `company.integration.suites.resolve_required_suites` for the three sources
+    and for why change scope can only widen it. Four things block, in the order
+    a reader would ask them:
+
+    1. the set could not be worked out in full -> `unknown`;
+    2. a required suite has no reported run -> `unknown`;
+    3. a required suite is reported failing -> `fail`;
+    4. a suite the caller themselves marked Company OS is reported failing,
+       even though no contract names it -> `fail`. Discarding a red result the
+       reporter handed over is how supplied evidence disappears;
+    5. a required result is older than the freshness window -> `unknown`.
+    """
+    required = resolve_required_suites(index, changed_paths=inputs.changed_paths)
+    names = required.names()
     requirement = (
-        f"All {len(REQUIRED_SUITES)} required Company OS suites are reported as passing, "
-        "on evidence no older than the freshness window."
+        f"Every suite required by the Company OS contract for this change "
+        f"({len(names)} on this checkout: the {len(REQUIRED_SUITES)} canonical "
+        "subsystem suites plus the tests declared by the active capsules the "
+        "change touches) is reported passing, on evidence no older than the "
+        "freshness window."
     )
     evidence = inputs.suites
-    missing = evidence.missing()
+    provenance = (
+        f"required-set {required.fingerprint()} "
+        f"({len(required.by_origin(SuiteOrigin.CANONICAL))} canonical, "
+        f"{len(required.by_origin(SuiteOrigin.ACTIVE_CAPSULE))} declared by an "
+        f"active capsule, "
+        f"{len(required.by_origin(SuiteOrigin.CHANGE_SCOPE))} in change scope)"
+    )
+
+    if not required.resolved:
+        return _check(
+            "health.required_suites_pass",
+            GateCategory.TEST_BUILD_HEALTH,
+            GateStatus.UNKNOWN,
+            requirement,
+            "the set of required suites could not be determined in full; "
+            f"{provenance}",
+            EvidenceKind.SUPPLIED,
+            missing_evidence=tuple(required.unresolved[:8]),
+            remediation=(
+                "Make the capsule store readable, then re-run. The required set is "
+                "derived from the active capsules; a gate that cannot read them "
+                "does not know what evidence it is missing."
+            ),
+            evidence_as_of=inputs.as_of,
+        )
+
+    missing = evidence.missing(names)
     if missing:
         return _check(
             "health.required_suites_pass",
             GateCategory.TEST_BUILD_HEALTH,
             GateStatus.UNKNOWN,
             requirement,
-            f"{len(missing)} of {len(REQUIRED_SUITES)} required suites have no reported run",
+            f"{len(missing)} of {len(names)} required suites have no reported run; "
+            f"{provenance}",
             EvidenceKind.SUPPLIED,
-            missing_evidence=tuple(f"no reported run for {suite}" for suite in missing[:8]),
+            missing_evidence=tuple(
+                f"no reported run for {suite} ({required.get(suite).reason()})"
+                for suite in missing[:8]
+            ),
             remediation=(
                 "Run the suites and supply the results with --suite-evidence. The gate "
-                "holds no process-spawn authority, so it cannot run them itself."
+                "holds no process-spawn authority, so it cannot run them itself. "
+                "`python -m company.integration required-suites` prints the exact list."
             ),
             evidence_as_of=inputs.as_of,
         )
-    failing = evidence.failing()
+
+    failing = evidence.failing(names)
     if failing:
         return _check(
             "health.required_suites_pass",
@@ -956,11 +1021,46 @@ def _required_suites(inputs, scan, index, config) -> GateCheck:
             "; ".join(item.reference() for item in failing[:_MAX_NAMED_FINDINGS]),
             EvidenceKind.SUPPLIED,
             evidence=tuple(item.suite for item in failing[:_MAX_NAMED_FINDINGS]),
-            blocker_reason=f"{len(failing)} required suite(s) are reported failing",
+            blocker_reason=(
+                f"{len(failing)} required suite(s) are reported failing, including "
+                + ", ".join(
+                    f"{item.suite} ({required.get(item.suite).reason()})"
+                    for item in failing[:2]
+                )
+            ),
             remediation="Fix the failing suite, re-run it, and supply the new result.",
             evidence_as_of=min(item.observed_on for item in evidence.results),
         )
-    stale = evidence.stale(inputs.as_of)
+
+    unclaimed = tuple(
+        item
+        for item in evidence.results
+        if item.company_os and not item.passed and item.suite not in required
+    )
+    if unclaimed:
+        return _check(
+            "health.required_suites_pass",
+            GateCategory.TEST_BUILD_HEALTH,
+            GateStatus.FAIL,
+            requirement,
+            "; ".join(item.reference() for item in unclaimed[:_MAX_NAMED_FINDINGS])
+            + " - reported as Company OS suites by the caller, and failing",
+            EvidenceKind.SUPPLIED,
+            evidence=tuple(item.suite for item in unclaimed[:_MAX_NAMED_FINDINGS]),
+            blocker_reason=(
+                f"{len(unclaimed)} supplied Company OS suite(s) are reported failing. "
+                "No capsule declares them, so no contract required them - but the "
+                "reporter marked them Company OS and red, and a gate that drops a "
+                "red result it was handed is not reading its evidence."
+            ),
+            remediation=(
+                "Fix the suite, or mark the result company_os=false if it is a "
+                "production-environment failure rather than a control-plane one."
+            ),
+            evidence_as_of=min(item.observed_on for item in evidence.results),
+        )
+
+    stale = evidence.stale(inputs.as_of, names)
     if stale:
         return _check(
             "health.required_suites_pass",
@@ -978,16 +1078,19 @@ def _required_suites(inputs, scan, index, config) -> GateCheck:
             remediation="Re-run the stale suites and supply the fresh results.",
             evidence_as_of=min(item.observed_on for item in stale),
         )
+
+    reported = tuple(item for item in evidence.results if item.suite in required)
     return _check(
         "health.required_suites_pass",
         GateCategory.TEST_BUILD_HEALTH,
         GateStatus.PASS,
         requirement,
-        f"all {len(REQUIRED_SUITES)} required suites reported passing, oldest run "
-        f"{max(item.age_days(inputs.as_of) for item in evidence.results)} day(s) ago",
+        f"all {len(names)} required suites reported passing, oldest run "
+        f"{max(item.age_days(inputs.as_of) for item in reported)} day(s) ago; "
+        f"{provenance}",
         EvidenceKind.SUPPLIED,
-        evidence=tuple(item.suite for item in evidence.results[:_MAX_NAMED_FINDINGS]),
-        evidence_as_of=min(item.observed_on for item in evidence.results),
+        evidence=tuple(item.suite for item in reported[:_MAX_NAMED_FINDINGS]),
+        evidence_as_of=min(item.observed_on for item in reported),
     )
 
 

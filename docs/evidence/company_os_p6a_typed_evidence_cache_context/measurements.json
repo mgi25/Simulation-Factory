@@ -1,0 +1,50 @@
+{
+  "cache_stability": {
+    "one_unit_appended": {
+      "identical": false,
+      "left_chars": 8054,
+      "ratio": 0.981357,
+      "right_chars": 8207,
+      "shared_prefix_chars": 8054
+    },
+    "reassembled_in_reverse": {
+      "identical": true,
+      "left_chars": 8054,
+      "ratio": 1.0,
+      "right_chars": 8054,
+      "shared_prefix_chars": 8054
+    }
+  },
+  "context_bytes": {
+    "canonical_chars": 111678,
+    "compressed_bundle_chars": 8054,
+    "note": "Characters, not tokens. The platform is provider-agnostic by contract, and a token count belongs to one tokenizer.",
+    "reduction_pct": 93.23,
+    "units": 8,
+    "whole_bundle_chars": 118890
+  },
+  "not_measured": [
+    "provider token counts (input, output, cache creation, cache read)",
+    "provider monetary cost",
+    "READY rate over real work orders",
+    "reviewer corrections",
+    "whole-task wall-clock or session count"
+  ],
+  "read_once": {
+    "canonical_chars_reused": 125122,
+    "distinct_sources": 7,
+    "hits": 7,
+    "loader_calls": 7,
+    "misses": 7,
+    "reads_avoided": 7,
+    "reads_requested": 14,
+    "reuse_ratio": 0.4667,
+    "stale_rejections": 1
+  },
+  "repo_root": "wt-p6a",
+  "staleness": {
+    "detail": "source changed since it was cached (cached 67fb2cb16aa4a134, now 33b5b310670e8069); evicted",
+    "outcome": "stale",
+    "returned_a_unit": false
+  }
+}

@@ -60,8 +60,10 @@ from company.integration import (
     render_cycle,
     render_text,
     reserved_action_drift,
+    resolve_required_suites,
     subsystem_import_graph,
 )
+from knowledge.company_os.capsules import CapsuleIndex
 from company.integration.boundary import (
     MODEL_MODULES,
     NETWORK_MODULES,
@@ -876,8 +878,29 @@ def a_suite(name: str, *, passed: bool = True, day: int = 17, company_os: bool =
     )
 
 
+def required_here(**kwargs) -> tuple[str, ...]:
+    """The suites this checkout actually requires, derived the way the gate does.
+
+    Not `REQUIRED_SUITES`. That constant is only the canonical floor; the gate
+    derives the rest from the active capsules, so a fixture built from the
+    constant would supply eleven results against a thirty-suite demand and
+    every test below would be exercising the missing-evidence path by accident.
+    """
+    return resolve_required_suites(
+        CapsuleIndex.load(REPO_ROOT / "knowledge/company_os/capsules/seeds"), **kwargs
+    ).names()
+
+
 def green_evidence(**kwargs) -> SuiteEvidence:
-    return SuiteEvidence(tuple(a_suite(name, **kwargs) for name in REQUIRED_SUITES))
+    return SuiteEvidence(tuple(a_suite(name, **kwargs) for name in required_here()))
+
+
+def test_the_derived_set_never_loses_the_canonical_floor():
+    """`REQUIRED_SUITES` is a floor the derivation adds to, never a list it
+    replaces. One of its members is declared by no capsule, so a derivation
+    that dropped the floor would quietly stop requiring it."""
+    assert set(REQUIRED_SUITES) <= set(required_here())
+    assert len(required_here()) > len(REQUIRED_SUITES)
 
 
 def test_without_supplied_suite_results_the_suite_condition_is_unknown(repo_report):
@@ -896,7 +919,7 @@ def test_a_reported_failure_fails_the_suite_condition(repo_scan):
     evidence = SuiteEvidence(
         tuple(
             a_suite(name, passed=name != "tests/test_company_runtime.py")
-            for name in REQUIRED_SUITES
+            for name in required_here()
         )
     )
     report = build_report(REPO_ROOT, as_of=AS_OF, scan=repo_scan, suites=evidence)
@@ -907,7 +930,7 @@ def test_a_reported_failure_fails_the_suite_condition(repo_scan):
 
 def test_stale_suite_evidence_is_visible_and_does_not_count_as_a_pass(repo_scan):
     stale = SuiteEvidence(
-        tuple(a_suite(name, day=1) for name in REQUIRED_SUITES), max_age_days=7
+        tuple(a_suite(name, day=1) for name in required_here()), max_age_days=7
     )
     report = build_report(REPO_ROOT, as_of=AS_OF, scan=repo_scan, suites=stale)
     check = report.check("health.required_suites_pass")
@@ -942,7 +965,7 @@ def test_supplied_evidence_refuses_a_field_outside_its_schema():
 
 def test_production_environment_failures_are_separated_from_company_os_ones(repo_scan):
     evidence = SuiteEvidence(
-        tuple(a_suite(name) for name in REQUIRED_SUITES)
+        tuple(a_suite(name) for name in required_here())
         + (a_suite("tests/test_sloped_scale.py", passed=False, company_os=False),)
     )
     report = build_report(REPO_ROOT, as_of=AS_OF, scan=repo_scan, suites=evidence)

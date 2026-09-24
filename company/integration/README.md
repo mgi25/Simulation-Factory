@@ -113,7 +113,43 @@ honest default for a company nobody has tested is BLOCKED.
 
 `company_os: false` marks a production-environment suite, which keeps a
 missing render dependency from reading as a defect in the control plane.
-Results older than `max_age_days` go stale and stop counting as a pass.
+Results older than `max_age_days` go stale and stop counting as a pass. A
+result marked `company_os: true` and reported failing blocks even when no
+contract required that suite: the gate does not discard red evidence it was
+handed.
+
+## Which suites are required
+
+Ask, rather than keeping a copy of the list:
+
+```
+python -m company.integration required-suites --repo-root . --json
+```
+
+The set is **derived on every run**, not read from a constant, from three
+sources:
+
+| Origin | What it means |
+|---|---|
+| `canonical` | `REQUIRED_SUITES` - the subsystems the gate's own checks depend on. A floor. |
+| `active_capsule` | a suite named in `capsule.tests` of an `active` capsule. The contract asked for it. |
+| `change_scope` | a suite reached by `--changed-path`: a capsule whose owned paths the change touches, or a Company OS test file the change edits. |
+
+`REQUIRED_SUITES` was once the whole answer, and that was a fail-open hole: on
+2026-09-24 a candidate reached READY while two tests declared by the active
+`company-research-intelligence` capsule were failing, because neither name was
+in the list. Appending the two names would have closed that instance and left
+the hole.
+
+**Change scope only widens.** There is no input to this command that makes the
+gate ask for less, because a gate that gets cheaper when you describe the
+change less fully is a gate with a dial on it.
+
+**An underivable set is not an empty set.** If the capsule store cannot be read
+- or holds no capsules, which in a Company OS checkout means the same thing -
+the command exits 2, prints `UNRESOLVED`, and `health.required_suites_pass`
+answers `unknown`. "I could not work out what evidence I need" and "I have all
+the evidence I need" must never produce the same verdict.
 
 ## Freshness
 

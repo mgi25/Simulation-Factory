@@ -89,7 +89,15 @@ from .report import (
     render_text,
 )
 from .store import ReadinessReportStore
-from .suites import REQUIRED_SUITES, SuiteEvidence, SuiteResult
+from .suites import (
+    REQUIRED_SUITES,
+    RequiredSuites,
+    SuiteEvidence,
+    SuiteOrigin,
+    SuiteRequirement,
+    SuiteResult,
+    resolve_required_suites,
+)
 
 __all__ = [
     "ADVISORY_CHECKS",
@@ -121,7 +129,10 @@ __all__ = [
     "ReadinessReportStore",
     "Readiness",
     "ReportStoreError",
+    "RequiredSuites",
     "SuiteEvidence",
+    "SuiteOrigin",
+    "SuiteRequirement",
     "SuiteResult",
     "assemble",
     "blockers_for",
@@ -135,6 +146,7 @@ __all__ = [
     "render_cycle",
     "render_text",
     "reserved_action_drift",
+    "resolve_required_suites",
     "review_trigger_drift",
     "subsystem_import_graph",
     "type_checking_edges",

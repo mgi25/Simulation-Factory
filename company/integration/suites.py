@@ -26,20 +26,63 @@ accepting a green run from three architectural changes ago.
 
 `tests/test_company_runtime.py` is a pointer a reader can run. A label like
 "runtime suite" is not.
+
+## Why the required set is derived rather than written down
+
+`REQUIRED_SUITES` used to be the whole answer, and that was a fail-open hole.
+It is a hand-maintained list of eleven canonical subsystem suites; a capsule
+can declare a test in `capsule.tests` and the gate would never ask about it.
+That is not hypothetical - the P5 integration reached READY while two tests
+declared by the active `company-research-intelligence` capsule were failing,
+because neither name appeared in the list and nobody had to notice.
+
+Appending those two names would have closed that instance and left the hole.
+So the required set is now *derived*, by `resolve_required_suites`, from three
+sources that each answer a different question:
+
+* **canonical** (`REQUIRED_SUITES`) - the subsystems whose invariants the gate's
+  own checks depend on. A floor. It is still written down because some of it
+  (`tests/test_company_execution_transport.py`) is required by the gate and
+  declared by no capsule.
+* **active capsules** (`capsule.tests`) - the tests the Company OS contract
+  itself names. A capsule is the authoritative description of a subsystem; if
+  it says a suite covers it, that suite is evidence the gate needs. Only
+  `status == active` capsules contribute: a retired contract is not in force.
+* **change scope** (`changed_paths`) - the suites a particular change reaches,
+  including ones declared by a capsule that is *not* active, and Company OS
+  test files the change edits directly.
+
+Scope only ever **adds**. There is no path by which naming a narrow change
+shrinks the required set below canonical-plus-active-capsules, because a gate
+that can be made cheaper by describing the change less fully is a gate with a
+dial on it.
+
+## Why an underivable set is not an empty set
+
+`RequiredSuites.unresolved` names every reason the set could not be fully
+determined - a capsule index that would not load, most of all. It is not a
+warning. `health.required_suites_pass` answers `unknown` while it is non-empty,
+because "I could not work out what evidence I need" and "I have all the
+evidence I need" must never produce the same verdict.
 """
 
 from __future__ import annotations
 
 import datetime as dt
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from typing import Any
 
 from ai_platform.references import assert_reference, assert_text
 from ai_platform.serde import as_date, read_json, to_jsonable
+from ai_platform.serde import fingerprint as _fingerprint
+from knowledge.company_os import RecordStatus
+from knowledge.company_os.capsules import CapsuleIndex, normalise_path, path_related
 
 from .errors import IntegrationGateError
+from .sources import COMPANY_OS_TEST_PREFIX, TEST_ROOT
 
 
 # How long a recorded suite run stays evidence. A week is long enough to cover
@@ -210,9 +253,243 @@ class SuiteEvidence:
         return to_jsonable(self)
 
 
+# -- the derived required set ----------------------------------------------
+
+
+class SuiteOrigin(Enum):
+    """Why a suite is required. A reader disputing the set disputes an origin."""
+
+    CANONICAL = "canonical"
+    ACTIVE_CAPSULE = "active_capsule"
+    CHANGE_SCOPE = "change_scope"
+
+
+@dataclass(frozen=True)
+class SuiteRequirement:
+    """One required suite and the full reason it is required.
+
+    `origins` is a tuple rather than a single value because a suite is very
+    often required twice over - canonical *and* declared by an active capsule -
+    and dropping one of the two reasons would make the set look more fragile
+    than it is.
+    """
+
+    suite: str
+    origins: tuple[SuiteOrigin, ...]
+    capsule_ids: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "suite", assert_reference(self.suite, "suite"))
+        origins = tuple(dict.fromkeys(self.origins))
+        if not origins:
+            raise IntegrationGateError(
+                f"suite {self.suite}: a requirement with no origin is a requirement "
+                "nobody can argue with"
+            )
+        for origin in origins:
+            if not isinstance(origin, SuiteOrigin):
+                raise IntegrationGateError(
+                    f"suite {self.suite}: origins hold SuiteOrigin values"
+                )
+        object.__setattr__(self, "origins", origins)
+        object.__setattr__(self, "capsule_ids", tuple(sorted(set(self.capsule_ids))))
+
+    def reason(self) -> str:
+        parts = [origin.value for origin in self.origins]
+        if self.capsule_ids:
+            parts.append("declared by " + ", ".join(self.capsule_ids))
+        return "; ".join(parts)
+
+    def to_dict(self) -> dict[str, Any]:
+        return to_jsonable(self)
+
+
+@dataclass(frozen=True)
+class RequiredSuites:
+    """The suites this run needs evidence for, and why it may not know them all.
+
+    `unresolved` is the safety property. An empty `requirements` and an
+    unreadable capsule index both produce a short list; only `unresolved`
+    distinguishes "this repository genuinely requires little" from "I could not
+    find out what it requires", and the gate must answer `unknown` for the
+    second.
+    """
+
+    requirements: tuple[SuiteRequirement, ...] = ()
+    unresolved: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        for item in self.requirements:
+            if not isinstance(item, SuiteRequirement):
+                raise IntegrationGateError(
+                    "required suites hold SuiteRequirement values"
+                )
+        names = [item.suite for item in self.requirements]
+        duplicates = sorted({name for name in names if names.count(name) > 1})
+        if duplicates:
+            raise IntegrationGateError(
+                "a suite appears twice in the required set: " + ", ".join(duplicates)
+            )
+        object.__setattr__(
+            self, "requirements", tuple(sorted(self.requirements, key=lambda r: r.suite))
+        )
+        object.__setattr__(self, "unresolved", tuple(self.unresolved))
+
+    def __len__(self) -> int:
+        return len(self.requirements)
+
+    def __iter__(self):
+        return iter(self.requirements)
+
+    def __contains__(self, suite: object) -> bool:
+        return any(item.suite == suite for item in self.requirements)
+
+    @property
+    def resolved(self) -> bool:
+        """True when nothing stopped the set being worked out in full."""
+        return not self.unresolved
+
+    def names(self) -> tuple[str, ...]:
+        return tuple(item.suite for item in self.requirements)
+
+    def get(self, suite: str) -> "SuiteRequirement | None":
+        for item in self.requirements:
+            if item.suite == suite:
+                return item
+        return None
+
+    def by_origin(self, origin: SuiteOrigin) -> tuple[SuiteRequirement, ...]:
+        return tuple(item for item in self.requirements if origin in item.origins)
+
+    def fingerprint(self) -> str:
+        """Stable identity of the set, so a report can say which set it used."""
+        return _fingerprint(
+            {
+                "requirements": [item.to_dict() for item in self.requirements],
+                "unresolved": list(self.unresolved),
+            }
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return to_jsonable(self)
+
+
+def _suite_path(reference: str) -> str:
+    """The test *file* a capsule reference names, or "" when it names none.
+
+    A capsule may write `tests/test_x.py::test_one`; suite evidence is reported
+    per file, so the node id is dropped. Anything that is not a `.py` file
+    under `tests/` is not a suite and is ignored rather than guessed at.
+    """
+    cleaned = normalise_path(reference)
+    if not cleaned.endswith(".py"):
+        return ""
+    if not cleaned.startswith(TEST_ROOT + "/"):
+        return ""
+    return cleaned
+
+
+def _is_company_os_test(suite: str) -> bool:
+    return suite.rsplit("/", 1)[-1].startswith(COMPANY_OS_TEST_PREFIX)
+
+
+def resolve_required_suites(
+    index: "CapsuleIndex | None",
+    *,
+    changed_paths: Iterable[str] = (),
+    canonical: Iterable[str] = REQUIRED_SUITES,
+) -> RequiredSuites:
+    """Work out which suites this run needs evidence for.
+
+    Deterministic and side-effect free: it reads an already-loaded capsule
+    index and a list of changed paths, runs no tests, and touches no clock.
+    The same index and the same paths always give the same set, which is what
+    lets the result be fingerprinted into a report.
+
+    `index` is `None` when the caller could not load the capsule store, and an
+    *empty* index means the same thing in practice. Neither is treated as "no
+    capsules declare anything": the canonical floor is still returned, and
+    `unresolved` says the contract-declared part is unknown, which keeps
+    `health.required_suites_pass` at `unknown`.
+    """
+    origins: dict[str, list[SuiteOrigin]] = {}
+    capsules: dict[str, set[str]] = {}
+    unresolved: list[str] = []
+
+    def require(suite: str, origin: SuiteOrigin, capsule_id: str = "") -> None:
+        found = origins.setdefault(suite, [])
+        if origin not in found:
+            found.append(origin)
+        if capsule_id:
+            capsules.setdefault(suite, set()).add(capsule_id)
+
+    for suite in canonical:
+        require(str(suite), SuiteOrigin.CANONICAL)
+
+    changed = tuple(
+        normalise_path(path) for path in changed_paths if str(path).strip()
+    )
+
+    if index is None:
+        unresolved.append(
+            "the capsule index could not be loaded, so the suites declared by the "
+            "Company OS contract are unknown; only the canonical floor is required"
+        )
+    elif len(index) == 0:
+        # An empty store and a store nobody could read are the same fact wearing
+        # different clothes. A Company OS checkout has capsules; a directory
+        # with none in it is a directory that was not found, pointed at the
+        # wrong place, or emptied - never a repository that genuinely declares
+        # no tests. Reading it as "nothing is required" is the fail-open this
+        # whole function exists to close.
+        unresolved.append(
+            "the capsule store holds no capsules, so the suites declared by the "
+            "Company OS contract are unknown; only the canonical floor is required"
+        )
+    else:
+        for capsule in index.all():
+            active = capsule.status is RecordStatus.ACTIVE
+            in_scope = bool(changed) and any(
+                path_related(owned, path)
+                for owned in capsule.owns_paths
+                for path in changed
+            )
+            if not active and not in_scope:
+                continue
+            for reference in capsule.tests:
+                suite = _suite_path(reference)
+                if not suite:
+                    continue
+                if active:
+                    require(suite, SuiteOrigin.ACTIVE_CAPSULE, capsule.id)
+                if in_scope:
+                    require(suite, SuiteOrigin.CHANGE_SCOPE, capsule.id)
+
+    for path in changed:
+        suite = _suite_path(path)
+        if suite and _is_company_os_test(suite):
+            require(suite, SuiteOrigin.CHANGE_SCOPE)
+
+    return RequiredSuites(
+        requirements=tuple(
+            SuiteRequirement(
+                suite=suite,
+                origins=tuple(found),
+                capsule_ids=tuple(sorted(capsules.get(suite, ()))),
+            )
+            for suite, found in origins.items()
+        ),
+        unresolved=tuple(unresolved),
+    )
+
+
 __all__ = [
     "DEFAULT_MAX_EVIDENCE_AGE_DAYS",
     "REQUIRED_SUITES",
+    "RequiredSuites",
     "SuiteEvidence",
+    "SuiteOrigin",
+    "SuiteRequirement",
     "SuiteResult",
+    "resolve_required_suites",
 ]

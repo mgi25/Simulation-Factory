@@ -3,6 +3,14 @@
     python -m company.integration check --repo-root .
     python -m company.integration check --repo-root . --json
     python -m company.integration policy
+    python -m company.integration required-suites --repo-root . --json
+
+`required-suites` exists so that a caller who must *produce* the evidence can
+ask what evidence is wanted, instead of keeping a second copy of the list and
+drifting from it. It is the only supported way for the external engineering
+runner to learn the set: that package may not import - or even name - the
+capsule layer the set is derived from, so the boundary has to be this command
+line. It reads the checkout and prints; it runs nothing.
 
 `check` writes nothing unless `--output-dir` is given, and even then it writes
 only the derived report, under the directory the caller named. Nothing in this
@@ -17,13 +25,17 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+from pathlib import Path
 import sys
 
+from ai_platform.serde import dumps
+
+from .checks import GateInputs, load_capsule_index
 from .model import Readiness
 from .policy import DEFAULT_POLICY
 from .report import build_report, render_text
 from .store import ReadinessReportStore
-from .suites import SuiteEvidence
+from .suites import SuiteEvidence, SuiteOrigin, resolve_required_suites
 
 
 _EXIT = {
@@ -49,10 +61,31 @@ def parser() -> argparse.ArgumentParser:
     check.add_argument(
         "--output-dir", help="write the derived report here (append-only)"
     )
+    check.add_argument(
+        "--changed-path",
+        action="append",
+        default=[],
+        metavar="PATH",
+        help=(
+            "a repository-relative path this change touches; repeatable. Only ever "
+            "widens the required-suite set, never narrows it."
+        ),
+    )
     check.add_argument("--json", action="store_true", help="print canonical JSON")
     check.add_argument("--verbose", action="store_true", help="show passing detail too")
 
     commands.add_parser("policy", help="print the required/advisory split")
+
+    suites = commands.add_parser(
+        "required-suites",
+        help="print the suites this checkout requires evidence for",
+    )
+    suites.add_argument("--repo-root", default=".")
+    suites.add_argument("--capsule-root", help="a capsule seed directory, for tests")
+    suites.add_argument(
+        "--changed-path", action="append", default=[], metavar="PATH", help="repeatable"
+    )
+    suites.add_argument("--json", action="store_true", help="print canonical JSON")
     return root
 
 
@@ -60,6 +93,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     if args.command == "policy":
         return _policy()
+    if args.command == "required-suites":
+        return _required_suites(args)
     return _check(args)
 
 
@@ -88,6 +123,7 @@ def _check(args: argparse.Namespace) -> int:
         as_of=args.as_of,
         suites=suites,
         state_dir=args.state_dir,
+        changed_paths=tuple(args.changed_path),
     )
     if args.json:
         print(report.canonical_json(), end="")
@@ -99,6 +135,33 @@ def _check(args: argparse.Namespace) -> int:
         if not args.json:
             print(f"written     {path}")
     return _EXIT[report.readiness]
+
+
+def _required_suites(args: argparse.Namespace) -> int:
+    """Print the derived required set. Exit 2 when it could not be resolved.
+
+    The exit code matters: a caller scripting `--suite-evidence` off this
+    output must not treat a partial list as the whole answer, and 2 is the
+    gate's own code for "evidence is missing", which is exactly the condition.
+    """
+    inputs = GateInputs(
+        repo_root=Path(args.repo_root).resolve(),
+        as_of=dt.date.today(),
+        capsule_root=Path(args.capsule_root).resolve() if args.capsule_root else None,
+    )
+    required = resolve_required_suites(
+        load_capsule_index(inputs), changed_paths=tuple(args.changed_path)
+    )
+    if args.json:
+        print(dumps({**required.to_dict(), "fingerprint": required.fingerprint()}), end="")
+    else:
+        print(f"required suites ({len(required)}) - set {required.fingerprint()}")
+        for item in required:
+            print(f"  {item.suite}")
+            print(f"      {item.reason()}")
+        for reason in required.unresolved:
+            print(f"  UNRESOLVED: {reason}")
+    return 0 if required.resolved else 2
 
 
 if __name__ == "__main__":  # pragma: no cover
