@@ -77,6 +77,24 @@ Deciding which would mean executing the package. The extra edge can only add a
 required suite or a recommended file, never remove one, so the error is in the
 direction the rest of this design already chose.
 
+## Two graphs in one package, and why they are not one graph
+
+`graph.py` already builds an import graph, and this is not a second copy of
+it. That one has **one node per subsystem** - `company/runtime`, not
+`company/runtime/routing.py` - because the question it answers is whether the
+control plane has a cycle in it, and a cycle is a property of subsystems.
+Collapsing files into subsystems is exactly what makes that question cheap.
+
+This module needs the opposite. "Which suites load this module" and "does this
+capsule's declared test reach the code it owns" are file-level questions, and a
+subsystem-level graph answers both with "yes, something in that subsystem
+does", which is not an answer.
+
+The two agree where they overlap. Both exclude `if TYPE_CHECKING:` imports from
+the runtime graph and report them separately, for the same reason: a guarded
+import never executes, so it cannot make one thing need another at run time,
+and hiding it entirely would be the opposite mistake.
+
 ## Why the transitive closure is deliberately not a coverage claim
 
 Rule 3 has a consequence worth stating plainly, because it decided the capsule
