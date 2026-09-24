@@ -336,12 +336,19 @@ def test_the_camera_only_moves_on_a_canonical_frontier_advance(documents, seed):
 
 
 @pytest.mark.parametrize("seed", SEEDS)
-def test_the_camera_moves_twice(documents, seed):
-    """Fewer, better reframes: two moves for five shells, not four."""
+def test_the_camera_moves_exactly_once(documents, seed):
+    """One reframe for five shells: four in 4A, two in 4B, one now.
+
+    **This asserted `transitions == 2` in 4B.** The 4C brief allows at most one
+    noticeable zoom, and grouping to one also shrinks the total camera range
+    from 1.933 to 1.474 - both stages divide by the same frame fraction, so the
+    single move is the same 12.65 -> 18.65 units at any fraction the brief
+    named.
+    """
     report = av.camera_report(documents[seed], 30.0)
-    assert report["transitions"] == 2
+    assert report["transitions"] == 1
     assert report["overlapping_transitions"] == 0
-    assert report["total_radius_growth"] < 2.0
+    assert report["total_radius_growth"] < 1.6
 
 
 @pytest.mark.parametrize("seed", SEEDS)

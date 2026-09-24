@@ -52,12 +52,16 @@ const FRAME_HEIGHT := 1920
 ## 65.20% of the frame width at every stage. These five numbers must agree with
 ## `satisfying.multishell_visual`; `test_multishell_visual` compares them.
 const VIEW_PAD_FRACTION := 0.055
-## Phase 4B. 0.652 fitted the whole arena inside the band that clears the
-## Shorts action rail; the human review rejected the result and the brief
-## replaced the rule with "keep the interesting action large". 0.850 was picked
-## against rendered evidence and 0.900 rejected because it puts 45% of seed
-## 3762's winning escape under the action rail.
-const FRONTIER_WIDTH_FRACTION := 0.850
+## Phase 4C. 0.652 fitted the whole arena inside the band that clears the
+## Shorts action rail and 0.850 fitted it inside the frame; the human review
+## rejected both for the same reason. The rule is now "keep the interesting
+## action large even if parts of the arena are cropped", so this is allowed
+## above 1.0 - at 1.200 the outer wall's material diameter is 1296 px in a
+## 1080 px frame and its left and right caps are off screen on purpose.
+## Selected from rendered frames on seed 17964 against 1.00 and 1.10: it is the
+## only one of the three whose late frame is not emptier than its opening.
+## See `satisfying.multishell_visual` and `tools/two_team_phase4c_lab.py`.
+const FRONTIER_WIDTH_FRACTION := 1.200
 const VIEW_DIAMETER_FRACTION := FRONTIER_WIDTH_FRACTION * (1.0 + VIEW_PAD_FRACTION)
 ## The frame fraction the A/B/C comparison sweeps. It defaults to the constant
 ## above and `test_the_scene_defaults_to_the_declared_frame_fraction` is what
@@ -96,10 +100,15 @@ const CAMERA_FRUSTUM_OFFSET := Vector2(
 	(ARENA_CENTRE_Y_FRACTION - 0.5) * CAMERA_FRUSTUM_SIZE
 		* float(FRAME_HEIGHT) / float(FRAME_WIDTH))
 const FRAME_LEAD_SECONDS := 0.14
-const FRAME_EASE_SECONDS := 0.45
+## 0.40 s: the slowest the 4C brief allows, and the only value in its
+## 0.25-0.40 band whose induced screen velocity stays under the gate now that
+## the opening frames shell 2 instead of shell 1.
+const FRAME_EASE_SECONDS := 0.40
 ## `[trigger_region, extent_shell]`. The camera holds `extent_shell` until the
-## canonical high-water frontier reaches `trigger_region`. Two moves, not four.
-const CAMERA_STAGE_PLAN := [[0, 1], [2, 3], [4, 4]]
+## canonical high-water frontier reaches `trigger_region`. **One move**, not
+## two and not four: the brief allows a single reframe and requires the last
+## 6-10 s to be static, which rules out triggering on the outermost region.
+const CAMERA_STAGE_PLAN := [[0, 2], [2, 4]]
 const EVENT_GUARD_BEFORE_SECONDS := 0.12
 const EVENT_GUARD_AFTER_SECONDS := 0.22
 const EVENT_GUARD_MAX_DEFER_SECONDS := 0.90
@@ -166,11 +175,49 @@ const DAMAGE_CRACK_TILT_DEGREES := 34.0
 const DAMAGE_BRANCH_COUNT := [0, 0, 1, 2, 0]
 const DAMAGE_BRANCH_SPREAD_DEGREES := 26.0
 const DAMAGE_BRANCH_LENGTH := 0.62
-## One chip, one crack and two branches per drawn wound.
-const MARK_PARTS := 4
+## The broken lip around a chip: the bright edge where material was knocked
+## away. A dark notch alone reads as a painted dot; a dark notch with a lit rim
+## reads as a hole, because that is what a chip in a lit solid does.
+const DAMAGE_RIM_RGB := Color(0.800, 0.815, 0.855)
+const DAMAGE_RIM_ENERGY := 0.60
+const DAMAGE_RIM_MARGIN := 0.070
+## How tall the lip is radially, as a share of the panel's own thickness. The
+## first version sized it as the chip plus the margin on both axes, which is
+## 0.344 against a 0.300 panel, so every wound stuck out past the band it was
+## supposed to be a hole in and read as a plate stuck on a wall.
+const DAMAGE_RIM_SPAN := 0.92
+## The connection in "connected crack network": from `critical` upward a seam
+## joins consecutive wounds along the chord, so a panel with three wounds shows
+## one fissure system rather than three separate injuries.
+const DAMAGE_SEAM_STATES := [false, false, true, true, false]
+const DAMAGE_SEAM_WIDTH := 0.030
+const DAMAGE_SEAM_MIN_CHORD := 0.16
+## A worn panel stops taking a clean highlight before it ever cracks. This is
+## the one part of a wound no added geometry can supply - it is a property of
+## the whole face rather than a shape on it.
+const DAMAGE_WEAR_ROUGHNESS := 0.55
+const DAMAGE_STATE_ROUGHNESS := [0.00, 0.22, 0.40, 0.55, 0.00]
+## The brief's "tiny local Cyan/Orange stress tint", on the localised glow
+## only and only where both teams really did wear the panel down.
+const DAMAGE_TEAM_TINT := 0.20
+const DAMAGE_TEAM_TINT_MIN_SHARE := 0.20
+## A chip, its broken lip, one crack, two branches and the seam to the next
+## wound. The lip is what turned the 4B wound from a mark into a hole.
+const MARK_PARTS := 6
+const MARK_PART_CHIP := 0
+const MARK_PART_RIM := 1
+const MARK_PART_CRACK := 2
+const MARK_PART_BRANCH_A := 3
+const MARK_PART_BRANCH_B := 4
+const MARK_PART_SEAM := 5
 const FRACTURE_GAP := 0.20
 const FRACTURE_TILT_DEGREES := 9.0
 const FRACTURE_RECESS := 0.10
+## Each of a fractured panel's three sub-slabs recedes by a different amount,
+## so the section boundaries throw their own edges and the slab reads as three
+## pieces that have shifted. Inward only: a fractured panel still never
+## occupies a pixel a healthy one did not.
+const FRACTURE_SEGMENT_RECESS := [0.06, 0.22, 0.12]
 
 # --------------------------------------------------------------------- events
 const SPAWN_FLASH_SECONDS := 0.30
@@ -179,8 +226,14 @@ const SPAWN_LINK_SECONDS := 0.18
 const NEAR_MISS_SECONDS := 0.16
 const BREAK_FLASH_SECONDS := 0.16
 const BREAK_RETRACT_SECONDS := 0.30
-const BREAK_STRESS_SECONDS := 0.10
-const BREAK_FRAGMENT_COUNT := 4
+## The wall is seen to give before it goes. Lengthened from 0.10 so the flare
+## is four frames at 30 fps rather than three, which is the difference between
+## a cue and a single bright frame.
+const BREAK_STRESS_SECONDS := 0.14
+## Five, inside the brief's 3-6. The slab has to be seen to come apart into
+## substantial pieces of itself rather than to shatter, so the count stays low
+## and each chunk keeps the panel's own radial thickness.
+const BREAK_FRAGMENT_COUNT := 5
 const BREAK_FRAGMENT_SECONDS := 0.42
 const BREAK_FRAGMENT_CHORD_FRACTION := 0.22
 const BREAK_FRAGMENT_DEPTH_FRACTION := 0.60
@@ -277,12 +330,22 @@ const BACK_RGB := Color(0.340, 0.430, 0.560)
 const BACK_ENERGY := 0.30
 const MARK_Z := 0.010
 const STRESS_Z := 0.024
-const CRACK_RGB := Color(0.880, 0.100, 0.420)
-const CRITICAL_RGB := Color(1.000, 0.060, 0.300)
-const FRACTURE_RGB := Color(1.000, 0.520, 0.720)
+## Exposed material, then heat. 4B ran crimson to magenta to pink and the human
+## review called it "red/pink marks rather than physical destruction". 4C keeps
+## the separation from both team hues and buys it by *desaturating* rather than
+## by rotating: a chipped material first shows fresh unweathered surface, which
+## is not coloured at all, and only a critical panel glows - which is
+## incandescence, warm and washing out to white.
+const CRACK_RGB := Color(0.760, 0.790, 0.840)
+const CRITICAL_RGB := Color(1.000, 0.820, 0.700)
+const FRACTURE_RGB := Color(1.000, 0.930, 0.870)
 const BREAK_FLASH_RGB := Color(1.000, 0.940, 0.960)
 const POST_RGB := Color(0.330, 0.370, 0.440)
-const POST_HOT_RGB := Color(1.000, 0.160, 0.440)
+## **The pink the human review kept seeing.** A pillar flanking a broken panel
+## keeps this cast for the rest of the run, so a late frame carried up to 62
+## saturated magenta pillars - a coloured dot beside every break, which is the
+## floating marker the brief bans. It keeps its job and loses its colour.
+const POST_HOT_RGB := Color(1.000, 0.870, 0.760)
 # A pillar that flanks an opening is the one the ball clips when it aims at the
 # hole and misses, so it is the one the viewer has to see. It gets a cool cap
 # and a little more depth; the pillars between two panels do not.
@@ -395,6 +458,14 @@ var _winner_label: Label
 var _panel_impacts := {}
 var _panel_clusters := {}
 var _panel_wear := {}
+## Per panel key: `{state: [[row_index, centre, length], ...]}` - the seams that
+## join consecutive wounds into one crack network from `critical` upward.
+var _panel_seams := {}
+## Per panel key: `[lead_team, tint]`, read from the canonical `team_cumulative`
+## on the damage stream. Nothing is accumulated here that the simulation did
+## not already publish.
+var _panel_teams := {}
+var _panel_rim_material: StandardMaterial3D
 var _backdrop: MeshInstance3D
 var _glow_pool: MeshInstance3D
 var _radial_texture: GradientTexture2D
@@ -670,6 +741,7 @@ func _build() -> void:
 	# slots, which is what makes four parts per wound affordable.
 	_read_impacts()
 	_read_wear()
+	_read_damage_teams()
 	_build_shells()
 	_read_panel_states()
 	_build_balls()
@@ -848,6 +920,16 @@ func _build_shells() -> void:
 	chip_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	chip_material.albedo_color = DAMAGE_CHIP_RGB
 
+	# And one shared lip. A broken edge does not get hotter as the panel gets
+	# worse - it is just broken - so the rim is state-independent and one
+	# material serves the whole arena, exactly like the chip.
+	_panel_rim_material = StandardMaterial3D.new()
+	_panel_rim_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_panel_rim_material.albedo_color = DAMAGE_RIM_RGB
+	_panel_rim_material.emission_enabled = true
+	_panel_rim_material.emission = DAMAGE_RIM_RGB
+	_panel_rim_material.emission_energy_multiplier = DAMAGE_RIM_ENERGY
+
 	var running := 0
 	for shell in playback["shells"]:
 		var shell_id := int(shell["shell_id"])
@@ -1022,12 +1104,20 @@ func _build_shells() -> void:
 				slabs.append(slab)
 			_panel_slabs.append(slabs)
 
-			# **A wound, not a marker.** Four parts: a dark chip where the
-			# material went, a bright hairline in the bottom of it, and two
-			# branches that only appear once the panel is critical. Each part
-			# runs from just in front of the face back into the wall, so it
-			# protrudes through the inset flank and is read on the flank too -
-			# which on the outer shells is most of what is on screen.
+			# **A wound, not a marker.** Six parts: a dark chip where the
+			# material went, the **lit lip of broken material around it**, a
+			# hairline in the bottom of the pit, two branches that only appear
+			# once the panel is critical, and the seam that joins this wound to
+			# the next one. Each part runs from just in front of the face back
+			# into the wall, so it protrudes through the inset flank and is read
+			# on the flank too - which on the outer shells is most of what is on
+			# screen.
+			#
+			# The lip is the 4C addition and it is the one that changed the read.
+			# A dark notch with a bright hairline in it is still a mark lying on
+			# a surface; a dark notch with a *lit broken edge* is a hole, because
+			# a chip in a lit solid catches light on its rim and nothing drawn on
+			# a wall does.
 			var clusters: Array = _panel_clusters.get(
 				"%d:%d" % [shell_id, slot], [])
 			var wounds: int = mini(clusters.size(), MAX_DAMAGE_MARKS)
@@ -1035,6 +1125,21 @@ func _build_shells() -> void:
 			for _m in wounds * MARK_PARTS:
 				marks.append(null)
 			for wound in wounds:
+				# The lip is added first, so the chip's own dark box is drawn over
+				# its middle: what survives is a ring of bright broken material
+				# around a dark pit.
+				var rim := MeshInstance3D.new()
+				var rim_box := BoxMesh.new()
+				rim_box.size = Vector3(
+					DAMAGE_MARK_CHORD + 2.0 * DAMAGE_RIM_MARGIN,
+					thickness * DAMAGE_RIM_SPAN,
+					depth * 0.50)
+				rim.mesh = rim_box
+				rim.material_override = _panel_rim_material
+				rim.visible = false
+				root.add_child(rim)
+				marks[wound * MARK_PARTS + MARK_PART_RIM] = rim
+
 				var chip := MeshInstance3D.new()
 				var chip_box := BoxMesh.new()
 				chip_box.size = Vector3(
@@ -1043,22 +1148,36 @@ func _build_shells() -> void:
 				chip.material_override = chip_material
 				chip.visible = false
 				root.add_child(chip)
-				marks[wound * MARK_PARTS] = chip
-				for part in range(1, MARK_PARTS):
+				marks[wound * MARK_PARTS + MARK_PART_CHIP] = chip
+
+				for part in [MARK_PART_CRACK, MARK_PART_BRANCH_A,
+					MARK_PART_BRANCH_B]:
 					var line := MeshInstance3D.new()
 					var line_box := BoxMesh.new()
-					var span: float = DAMAGE_CRACK_SPAN if part == 1 \
+					var span: float = DAMAGE_CRACK_SPAN if part == MARK_PART_CRACK \
 						else DAMAGE_CRACK_SPAN * DAMAGE_BRANCH_LENGTH
-					var width: float = DAMAGE_CRACK_WIDTH if part == 1 \
+					var width: float = DAMAGE_CRACK_WIDTH if part == MARK_PART_CRACK \
 						else DAMAGE_CRACK_WIDTH * 0.68
 					line_box.size = Vector3(
 						width, thickness * span,
-						depth * (0.80 if part == 1 else 0.45))
+						depth * (0.80 if part == MARK_PART_CRACK else 0.45))
 					line.mesh = line_box
 					line.material_override = mark_material
 					line.visible = false
 					root.add_child(line)
 					marks[wound * MARK_PARTS + part] = line
+
+				# The seam, one unit long along the chord and scaled at apply time
+				# to the gap between this wound and the next, so one mesh serves
+				# every seam this wound can ever have.
+				var seam := MeshInstance3D.new()
+				var seam_box := BoxMesh.new()
+				seam_box.size = Vector3(1.0, DAMAGE_SEAM_WIDTH, depth * 0.62)
+				seam.mesh = seam_box
+				seam.material_override = mark_material
+				seam.visible = false
+				root.add_child(seam)
+				marks[wound * MARK_PARTS + MARK_PART_SEAM] = seam
 			_panel_marks.append(marks)
 		_panel_index.append(panel_row)
 
@@ -1289,6 +1408,75 @@ func _read_impacts() -> void:
 			if int(a[1]) != int(b[1]):
 				return int(a[1]) > int(b[1])
 			return int(a[2]) < int(b[2]))
+	_build_seams()
+
+
+func _build_seams() -> void:
+	## The fissures that join a panel's wounds into one crack network.
+	##
+	## `critical` asks for a *connected* network and up to 4B a panel with three
+	## wounds drew three unconnected injuries however bad it got - the count
+	## went up, the structure did not change. A seam joins consecutive shown
+	## wounds **in chord order**, and it invents nothing: both endpoints are
+	## canonical impact positions and the state comes from the canonical ledger.
+	##
+	## Precomputed per state because the shown set is a function of the state,
+	## and deterministic for the same reason the wounds are.
+	for key in _panel_clusters:
+		var row: Array = _panel_clusters[key]
+		var by_state := {}
+		for state in DAMAGE_SEAM_STATES.size():
+			if not bool(DAMAGE_SEAM_STATES[state]):
+				continue
+			var wanted: int = mini(int(DAMAGE_CRACK_COUNT[state]), row.size())
+			if wanted < 2:
+				continue
+			# The shown set is the first `wanted` of the worst-first row; the
+			# seams run along the chord, so they are ordered by offset.
+			var shown := []
+			for index in wanted:
+				shown.append([float(row[index][0]), index])
+			shown.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
+			var seams := []
+			for pair in shown.size() - 1:
+				var low: Array = shown[pair]
+				var high: Array = shown[pair + 1]
+				var length: float = absf(float(high[0]) - float(low[0]))
+				if length < DAMAGE_SEAM_MIN_CHORD:
+					continue
+				seams.append([int(low[1]),
+					0.5 * (float(low[0]) + float(high[0])), length])
+			if not seams.is_empty():
+				by_state[state] = seams
+		if not by_state.is_empty():
+			_panel_seams[key] = by_state
+
+
+func _read_damage_teams() -> void:
+	## Which team has worn each panel down, from `team_cumulative`.
+	##
+	## The brief allows "a tiny local Cyan/Orange stress tint" where both teams
+	## contributed. `both` is deliberately not "the minority is non-zero" - one
+	## glancing hit out of nineteen is not two teams wearing a panel down
+	## together, and a tint that fired on it would be noise.
+	for event in playback["events"]:
+		if str(event["kind"]) != "damage":
+			continue
+		var totals: Array = event["team_cumulative"]
+		var total := 0.0
+		for value in totals:
+			total += float(value)
+		var lead := 0
+		for index in totals.size():
+			if float(totals[index]) > float(totals[lead]):
+				lead = index
+		var minority: float = 0.0
+		if total > 0.0:
+			minority = (total - float(totals[lead])) / total
+		_panel_teams["%d:%d" % [int(event["shell_id"]), int(event["panel_id"])]] = [
+			lead,
+			DAMAGE_TEAM_TINT if minority >= DAMAGE_TEAM_TINT_MIN_SHARE else 0.0,
+		]
 
 
 func _panel_state_at(index: int, t: float) -> int:
@@ -1843,6 +2031,10 @@ func _apply_panels(t: float) -> void:
 			retract = ease_out_cubic(
 				clampf((t - broken_at) / BREAK_RETRACT_SECONDS, 0.0, 1.0))
 		var fractured: bool = state >= 3
+		# Which end of the panel carries the deepest section, from the panel's
+		# own identity, so neighbouring panels do not fracture into the same
+		# shape and no two renders of one seed differ.
+		var tilt_parity: float = 1.0 if (shell_id * 5 + slot * 3) % 2 == 0 else -1.0
 		var gap: float = FRACTURE_GAP if fractured else 0.0
 		var piece := chord / float(PANEL_SEGMENTS)
 		var slabs: Array = _panel_slabs[index]
@@ -1874,8 +2066,16 @@ func _apply_panels(t: float) -> void:
 				offset = lerpf(offset, anchor, retract)
 			var tilt := deg_to_rad(FRACTURE_TILT_DEGREES) * float(segment - 1) \
 				if fractured else 0.0
-			var recess := (-FRACTURE_RECESS if fractured else 0.0) \
-				- depth * 0.6 * retract
+			# Each section recedes by its own amount once the panel fractures, so
+			# the boundaries between them throw edges and the slab reads as three
+			# pieces that have shifted rather than one piece with two lines drawn
+			# on it. Inward only - a fractured panel still never occupies a pixel
+			# a healthy one did not, which is what keeps presentation off the
+			# collision silhouette until the canonical break.
+			var recess := -depth * 0.6 * retract
+			if fractured:
+				recess -= FRACTURE_RECESS + float(FRACTURE_SEGMENT_RECESS[
+					segment if tilt_parity > 0.0 else PANEL_SEGMENTS - 1 - segment])
 			# Scale the local x axis by building the basis with a pre-scaled
 			# column: `Basis.scaled` scales rows, which is the *global* axes,
 			# and would shear a panel that is not axis-aligned. Then roll about
@@ -1900,6 +2100,20 @@ func _apply_panels(t: float) -> void:
 			and t < broken_at + BREAK_FLASH_SECONDS
 		material.emission = BREAK_FLASH_RGB
 		material.emission_energy_multiplier = 16.0 if flashing else 0.0
+		# **Surface roughness, which the brief asks for at `damaged` and which
+		# no amount of added geometry supplies.** A beaten panel stops taking a
+		# clean specular highlight before it has a single crack on it, because
+		# that is a property of the whole face rather than a shape on it.
+		# Continuous in the canonical `fraction` below the first damage state
+		# and stepped by the ledger above it, so the two halves of one read
+		# meet without a discontinuity.
+		var roughness: float = float(SHELL_ROUGHNESS[shell_id])
+		if state == 0:
+			roughness += DAMAGE_WEAR_ROUGHNESS * clampf(
+				_wear_at(index, t), 0.0, 1.0)
+		else:
+			roughness += float(DAMAGE_STATE_ROUGHNESS[state])
+		material.roughness = minf(1.0, roughness)
 
 		# A worn panel loses its sheen before it gains a crack, which is a
 		# reading a viewer gets without being told and without the panel
@@ -1930,8 +2144,17 @@ func _apply_panels(t: float) -> void:
 			stress.transform = Transform3D(Basis.IDENTITY,
 				Vector3(centre.x, centre.y, STRESS_Z))
 			var glow: float = (0.16 if state == 2 else 0.30) * (1.0 - retract)
-			stress_material.albedo_color = Color(
-				CRITICAL_RGB if state == 2 else FRACTURE_RGB, glow)
+			var hot: Color = CRITICAL_RGB if state == 2 else FRACTURE_RGB
+			# **The brief's "tiny local Cyan/Orange stress tint".** Where both
+			# teams really have worn this panel down, its glow leans a fifth of
+			# the way toward whichever of them has done more - and no further,
+			# and on this localised glow only. The panel body, the chip, the lip
+			# and the cracks are never tinted, because the wall has to keep
+			# looking like a wall.
+			var team_row: Array = _panel_teams.get(_panel_key(index), [])
+			if team_row.size() == 2 and float(team_row[1]) > 0.0:
+				hot = hot.lerp(TEAM_RGB[int(team_row[0])], float(team_row[1]))
+			stress_material.albedo_color = Color(hot, glow)
 
 
 func ease_out_cubic(u: float) -> float:
@@ -1942,23 +2165,27 @@ func ease_out_cubic(u: float) -> float:
 func _apply_panel_marks(index: int, state: int, t: float, chord: float,
 		centre: Vector2, along: Vector2, basis: Basis, depth: float,
 		wear: float) -> void:
-	## Damage that happened *to the material*: a dark chip where it went, a
-	## hairline in the bottom of it, and branches once the panel is critical.
+	## Damage that happened *to the material*: a dark chip where it went, the
+	## lit lip of broken material around it, a hairline in the bottom of the
+	## pit, branches once the panel is critical, and a seam joining this wound
+	## to the next one so the network is connected rather than repeated.
 	##
 	## The 4A version drew up to six identical bright bars of a fixed width at
 	## the first six impact offsets, at up to 4.0 emission on an unshaded
-	## material. That is a row of lit markers lying on a wall, which is exactly
-	## what the human review called "UI annotations". Here the count comes from
-	## the wounds the panel actually has, the size comes from how many times
-	## each one was hit, and the bright part is a hairline inside a dark pit.
+	## material - a row of lit markers lying on a wall, which is what the human
+	## review called "UI annotations". 4B made it a pit with a hairline in it and
+	## the review still called it marks. 4C adds the two things a pit was
+	## missing: **a lit broken edge**, which is what makes a dark notch read as a
+	## hole rather than as a dot, and **a connection between wounds**, which is
+	## what makes three injuries read as one failing panel.
 	var marks: Array = _panel_marks[index]
 	if marks.is_empty():
 		return
 	var clusters: Array = _panel_clusters.get(_panel_key(index), [])
 	var wanted: int = mini(DAMAGE_CRACK_COUNT[state], clusters.size())
 	var branches: int = DAMAGE_BRANCH_COUNT[state]
-	# A scuff at the heaviest wound, below the first damage state: the chip
-	# alone, scaled by how worn the panel canonically is, and no crack.
+	# A scuff at the heaviest wound, below the first damage state: the chip and
+	# its lip, scaled by how worn the panel canonically is, and no crack.
 	var scuff := 0.0
 	if state == 0 and wear >= DAMAGE_WEAR_FLOOR and not clusters.is_empty():
 		wanted = 1
@@ -1967,6 +2194,12 @@ func _apply_panel_marks(index: int, state: int, t: float, chord: float,
 	var breaking := broken_at >= 0.0 and t >= broken_at - BREAK_STRESS_SECONDS
 	if broken_at >= 0.0 and t >= broken_at:
 		wanted = 0
+	# The seams this panel shows in this state, by the wound they start from.
+	var seams := {}
+	var seam_rows: Dictionary = _panel_seams.get(_panel_key(index), {})
+	if seam_rows.has(state) and wanted > 0:
+		for row in seam_rows[state]:
+			seams[int(row[0])] = row
 	var material: StandardMaterial3D = _panel_mark_material[index]
 	var colour := CRACK_RGB
 	if state >= 3:
@@ -1978,8 +2211,8 @@ func _apply_panel_marks(index: int, state: int, t: float, chord: float,
 	var energy: float = DAMAGE_EMISSION_ENERGY[state]
 	if breaking and broken_at >= 0.0 and t < broken_at:
 		# The wall is seen to give before it goes: the crack network it
-		# already has flares over the last tenth of a second rather than a new
-		# effect appearing out of nowhere at the break.
+		# already has flares over the last seventh of a second rather than a
+		# new effect appearing out of nowhere at the break.
 		var u := clampf((t - (broken_at - BREAK_STRESS_SECONDS))
 			/ BREAK_STRESS_SECONDS, 0.0, 1.0)
 		energy = lerpf(energy, 9.0, u * u)
@@ -2001,15 +2234,24 @@ func _apply_panel_marks(index: int, state: int, t: float, chord: float,
 			var node: MeshInstance3D = marks[wound * MARK_PARTS + part]
 			if node == null:
 				continue
-			if not shown or (part >= 2 and part - 1 > branches) \
-					or (scuff > 0.0 and part >= 1):
+			var draw := shown
+			if part == MARK_PART_CRACK:
+				draw = shown and scuff <= 0.0
+			elif part == MARK_PART_BRANCH_A:
+				draw = shown and scuff <= 0.0 and branches >= 1
+			elif part == MARK_PART_BRANCH_B:
+				draw = shown and scuff <= 0.0 and branches >= 2
+			elif part == MARK_PART_SEAM:
+				draw = shown and scuff <= 0.0 and seams.has(wound)
+			if not draw:
 				node.visible = false
 				continue
 			node.visible = true
-			if part == 0:
+			if part == MARK_PART_CHIP or part == MARK_PART_RIM:
 				# The chip grows with the wound, which is the whole of
-				# "repeated impacts build on one another". Below the first
-				# damage state it is scaled down to a scuff instead.
+				# "repeated impacts build on one another", and its lip grows
+				# with it so the hole stays a hole. Below the first damage
+				# state both are scaled down to a scuff instead.
 				#
 				# Built with `_oriented_basis` rather than `Basis.scaled`:
 				# `scaled` multiplies the basis *rows*, which are the global
@@ -2018,23 +2260,42 @@ func _apply_panel_marks(index: int, state: int, t: float, chord: float,
 				# avoid it for the same reason.
 				var chip_scale: float = growth if scuff <= 0.0 else scuff
 				var chip_thick: float = 1.0 if scuff <= 0.0 else scuff
+				# The lip sits a hair deeper than the chip so the chip's own
+				# box wins the middle of it and only the ring survives.
+				var z: float = MARK_Z - 0.275 * depth
+				if part == MARK_PART_RIM:
+					z -= 0.020 * depth
 				node.transform = Transform3D(
 					_oriented_basis(along, chip_scale, chip_thick),
-					here + Vector3(0.0, 0.0, MARK_Z - 0.275 * depth))
+					here + Vector3(0.0, 0.0, z))
+				continue
+			if part == MARK_PART_SEAM:
+				# A fissure along the chord between this wound and the next.
+				# Both endpoints are canonical impact offsets, so the network
+				# is as tied to where the ball hit as the wounds are.
+				var row: Array = seams[wound]
+				var seam_centre: float = clampf(float(row[1]),
+					-0.5 * chord, 0.5 * chord)
+				var seam_length: float = float(row[2])
+				node.transform = Transform3D(
+					_oriented_basis(along, seam_length, 1.0),
+					Vector3(centre.x + along.x * seam_centre,
+						centre.y + along.y * seam_centre,
+						MARK_Z - 0.30 * depth))
 				continue
 			# The crack and its branches lean out of the chip. The roll is
 			# about the panel's own normal, so a rotated crack stays inside the
 			# panel's radial thickness - see DAMAGE_CRACK_SPAN.
 			var tilt: float = deg_to_rad(DAMAGE_CRACK_TILT_DEGREES) * tilt_sign
 			var slide := 0.0
-			if part >= 2:
-				var side: float = 1.0 if part == 2 else -1.0
+			if part >= MARK_PART_BRANCH_A:
+				var side: float = 1.0 if part == MARK_PART_BRANCH_A else -1.0
 				tilt += deg_to_rad(DAMAGE_BRANCH_SPREAD_DEGREES) * side * tilt_sign
 				slide = 0.30 * chip_width * side
 			var rolled := _rolled_basis(basis, tilt)
 			node.transform = Transform3D(rolled,
 				here + Vector3(along.x * slide, along.y * slide,
-					MARK_Z - (0.40 if part == 1 else 0.22) * depth))
+					MARK_Z - (0.40 if part == MARK_PART_CRACK else 0.22) * depth))
 
 
 func _rolled_basis(basis: Basis, tilt: float) -> Basis:

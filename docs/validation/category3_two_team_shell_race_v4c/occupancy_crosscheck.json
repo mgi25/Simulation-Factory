@@ -1,0 +1,510 @@
+{
+ "format": 2,
+ "variant": "C",
+ "fraction": 1.2,
+ "samples": 25,
+ "seeds": {
+  "1176": {
+   "rows": [
+    {
+     "t": 0.0,
+     "measured_ink": 0.587271412037037,
+     "measured_solid": 0.16022858796296297,
+     "modelled_ink": 0.38220628487352465,
+     "difference": 0.20506512716351238,
+     "empty_band_px": 86,
+     "white_share_of_bright": 0.42568246802106846
+    },
+    {
+     "t": 0.9902144091333224,
+     "measured_ink": 0.5977555941358025,
+     "measured_solid": 0.16624710648148147,
+     "modelled_ink": 0.38409354729747275,
+     "difference": 0.21366204683832973,
+     "empty_band_px": 85,
+     "white_share_of_bright": 0.4347779421576306
+    },
+    {
+     "t": 1.9804288182666447,
+     "measured_ink": 0.589468074845679,
+     "measured_solid": 0.16170283564814814,
+     "modelled_ink": 0.38409354729747275,
+     "difference": 0.20537452754820623,
+     "empty_band_px": 86,
+     "white_share_of_bright": 0.42827021207430804
+    },
+    {
+     "t": 2.970643227399967,
+     "measured_ink": 0.5722000385802469,
+     "measured_solid": 0.1551490162037037,
+     "modelled_ink": 0.38409354729747275,
+     "difference": 0.18810649128277418,
+     "empty_band_px": 86,
+     "white_share_of_bright": 0.42948616330501654
+    },
+    {
+     "t": 3.9608576365332895,
+     "measured_ink": 0.6054856288580247,
+     "measured_solid": 0.16581163194444445,
+     "modelled_ink": 0.38409354729747275,
+     "difference": 0.22139208156055196,
+     "empty_band_px": 86,
+     "white_share_of_bright": 0.41969362499163826
+    },
+    {
+     "t": 4.951072045666613,
+     "measured_ink": 0.6090272955246914,
+     "measured_solid": 0.16518759645061729,
+     "modelled_ink": 0.38409354729747275,
+     "difference": 0.22493374822721862,
+     "empty_band_px": 86,
+     "white_share_of_bright": 0.4133733100168451
+    },
+    {
+     "t": 5.941286454799934,
+     "measured_ink": 0.5944024884259259,
+     "measured_solid": 0.16414882330246913,
+     "modelled_ink": 0.38409354729747275,
+     "difference": 0.21030894112845316,
+     "empty_band_px": 86,
+     "white_share_of_bright": 0.421480173571225
+    },
+    {
+     "t": 6.931500863933256,
+     "measured_ink": 0.5875670331790124,
+     "measured_solid": 0.16239872685185186,
+     "modelled_ink": 0.38409354729747275,
+     "difference": 0.20347348588153963,
+     "empty_band_px": 85,
+     "white_share_of_bright": 0.41851818856718637
+    },
+    {
+     "t": 7.921715273066579,
+     "measured_ink": 0.5822878086419753,
+     "measured_solid": 0.16093074845679012,
+     "modelled_ink": 0.38409354729747275,
+     "difference": 0.19819426134450252,
+     "empty_band_px": 86,
+     "white_share_of_bright": 0.4012933540301942
+    },
+    {
+     "t": 8.911929682199903,
+     "measured_ink": 0.584927662037037,
+     "measured_solid": 0.158695987654321,
+     "modelled_ink": 0.38598080972142074,
+     "difference": 0.19894685231561632,
+     "empty_band_px": 86,
+     "white_share_of_bright": 0.40350743910147324
+    },
+    {
+     "t": 9.902144091333225,
+     "measured_ink": 0.5758810763888889,
+     "measured_solid": 0.15667341820987654,
+     "modelled_ink": 0.38598080972142074,
+     "difference": 0.18990026666746812,
+     "empty_band_px": 86,
+     "white_share_of_bright": 0.40386852910938875
+    },
+    {
+     "t": 10.892358500466548,
+     "measured_ink": 0.5913994984567901,
+     "measured_solid": 0.16158854166666667,
+     "modelled_ink": 0.38598080972142074,
+     "difference": 0.20541868873536934,
+     "empty_band_px": 86,
+     "white_share_of_bright": 0.39840928761154387
+    },
+    {
+     "t": 11.882572909599867,
+     "measured_ink": 0.5934432870370371,
+     "measured_solid": 0.1638869598765432,
+     "modelled_ink": 0.38598080972142074,
+     "difference": 0.20746247731561634,
+     "empty_band_px": 86,
+     "white_share_of_bright": 0.3889405477936416
+    },
+    {
+     "t": 12.87278731873319,
+     "measured_ink": 0.5560035686728395,
+     "measured_solid": 0.11666329089506172,
+     "modelled_ink": 0.26777602128142725,
+     "difference": 0.28822754739141226,
+     "empty_band_px": 381,
+     "white_share_of_bright": 0.3865976611426422
+    },
+    {
+     "t": 13.863001727866513,
+     "measured_ink": 0.5530246913580247,
+     "measured_solid": 0.11672164351851852,
+     "modelled_ink": 0.26777602128142725,
+     "difference": 0.28524867007659743,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.3733525041936257
+    },
+    {
+     "t": 14.853216136999835,
+     "measured_ink": 0.5594970100308642,
+     "measured_solid": 0.11881751543209877,
+     "modelled_ink": 0.2686442930327838,
+     "difference": 0.29085271699808035,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.378305868982872
+    },
+    {
+     "t": 15.843430546133158,
+     "measured_ink": 0.5602430555555555,
+     "measured_solid": 0.12726273148148148,
+     "modelled_ink": 0.26951256478414043,
+     "difference": 0.2907304907714151,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.401808315523017
+    },
+    {
+     "t": 16.833644955266482,
+     "measured_ink": 0.5590181327160494,
+     "measured_solid": 0.12320650077160494,
+     "modelled_ink": 0.270380836535497,
+     "difference": 0.2886372961805524,
+     "empty_band_px": 381,
+     "white_share_of_bright": 0.3789440310629753
+    },
+    {
+     "t": 17.823859364399805,
+     "measured_ink": 0.5616251929012346,
+     "measured_solid": 0.12247588734567902,
+     "modelled_ink": 0.270380836535497,
+     "difference": 0.2912443563657376,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.374932077522188
+    },
+    {
+     "t": 18.814073773533128,
+     "measured_ink": 0.5607609953703704,
+     "measured_solid": 0.11996624228395061,
+     "modelled_ink": 0.26951256478414043,
+     "difference": 0.29124843058622996,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.3881219800451837
+    },
+    {
+     "t": 19.80428818266645,
+     "measured_ink": 0.5541329089506173,
+     "measured_solid": 0.12000192901234567,
+     "modelled_ink": 0.270380836535497,
+     "difference": 0.2837520724151203,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.3926602260123133
+    },
+    {
+     "t": 20.79450259179977,
+     "measured_ink": 0.5633159722222222,
+     "measured_solid": 0.12683449074074074,
+     "modelled_ink": 0.27124910828685356,
+     "difference": 0.2920668639353686,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.39226399598485195
+    },
+    {
+     "t": 21.784717000933096,
+     "measured_ink": 0.5632344714506173,
+     "measured_solid": 0.1254957561728395,
+     "modelled_ink": 0.27124910828685356,
+     "difference": 0.2919853631637638,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.4050832347018768
+    },
+    {
+     "t": 22.774931410066415,
+     "measured_ink": 0.5674869791666667,
+     "measured_solid": 0.1252319637345679,
+     "modelled_ink": 0.27124910828685356,
+     "difference": 0.2962378708798131,
+     "empty_band_px": 381,
+     "white_share_of_bright": 0.43550356013724534
+    },
+    {
+     "t": 23.765145819199734,
+     "measured_ink": 0.583052662037037,
+     "measured_solid": 0.1419579475308642,
+     "modelled_ink": 0.2721173800382101,
+     "difference": 0.31093528199882686,
+     "empty_band_px": 280,
+     "white_share_of_bright": 0.38272682800885977
+    }
+   ],
+   "thirds": {
+    "early": {
+     "measured_ink": 0.5928971956983025,
+     "measured_solid": 0.1626092906057099,
+     "modelled_ink": 0.38385763949447926,
+     "worst_empty_band_px": 86
+    },
+    "middle": {
+     "measured_ink": 0.5745580753279321,
+     "measured_solid": 0.14424726321373457,
+     "modelled_ink": 0.34152664022234924,
+     "worst_empty_band_px": 382
+    },
+    "late": {
+     "measured_ink": 0.5640784143518518,
+     "measured_solid": 0.12564633969907407,
+     "modelled_ink": 0.27081497241117525,
+     "worst_empty_band_px": 382
+    },
+    "late_not_emptier_than_middle": false,
+    "late_over_early": 0.9513932911885197
+   }
+  },
+  "17964": {
+   "rows": [
+    {
+     "t": 0.0,
+     "measured_ink": 0.5869825424382716,
+     "measured_solid": 0.1576075424382716,
+     "modelled_ink": 0.38220628487352465,
+     "difference": 0.204776257564747,
+     "empty_band_px": 85,
+     "white_share_of_bright": 0.4363997980508851
+    },
+    {
+     "t": 1.0739901722144884,
+     "measured_ink": 0.5943036265432099,
+     "measured_solid": 0.16670958719135803,
+     "modelled_ink": 0.38409354729747275,
+     "difference": 0.21021007924573715,
+     "empty_band_px": 86,
+     "white_share_of_bright": 0.4374654675155993
+    },
+    {
+     "t": 2.147980344428977,
+     "measured_ink": 0.5867645640432099,
+     "measured_solid": 0.16869791666666667,
+     "modelled_ink": 0.38409354729747275,
+     "difference": 0.20267101674573712,
+     "empty_band_px": 86,
+     "white_share_of_bright": 0.43589127874401107
+    },
+    {
+     "t": 3.221970516643465,
+     "measured_ink": 0.6256481481481482,
+     "measured_solid": 0.16811921296296295,
+     "modelled_ink": 0.38409354729747275,
+     "difference": 0.24155460085067543,
+     "empty_band_px": 86,
+     "white_share_of_bright": 0.4115176758115039
+    },
+    {
+     "t": 4.295960688857954,
+     "measured_ink": 0.6078674768518518,
+     "measured_solid": 0.16733314043209876,
+     "modelled_ink": 0.38598080972142074,
+     "difference": 0.2218866671304311,
+     "empty_band_px": 86,
+     "white_share_of_bright": 0.40105826815223844
+    },
+    {
+     "t": 5.369950861072443,
+     "measured_ink": 0.5515509259259259,
+     "measured_solid": 0.11339457947530865,
+     "modelled_ink": 0.2660394777787141,
+     "difference": 0.2855114481472118,
+     "empty_band_px": 381,
+     "white_share_of_bright": 0.4026963233886916
+    },
+    {
+     "t": 6.44394103328693,
+     "measured_ink": 0.5531577932098766,
+     "measured_solid": 0.10876446759259259,
+     "modelled_ink": 0.2660394777787141,
+     "difference": 0.28711831543116245,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.4120487376626141
+    },
+    {
+     "t": 7.517931205501419,
+     "measured_ink": 0.5538662229938272,
+     "measured_solid": 0.10998215663580246,
+     "modelled_ink": 0.2660394777787141,
+     "difference": 0.28782674521511303,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.4014092844395529
+    },
+    {
+     "t": 8.591921377715908,
+     "measured_ink": 0.5592934992283951,
+     "measured_solid": 0.11532166280864198,
+     "modelled_ink": 0.2669077495300707,
+     "difference": 0.2923857496983244,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.4142666571879012
+    },
+    {
+     "t": 9.665911549930398,
+     "measured_ink": 0.5577652391975308,
+     "measured_solid": 0.11299672067901234,
+     "modelled_ink": 0.26777602128142725,
+     "difference": 0.2899892179161036,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.3966412018266399
+    },
+    {
+     "t": 10.739901722144886,
+     "measured_ink": 0.5557904128086419,
+     "measured_solid": 0.11752555941358024,
+     "modelled_ink": 0.26951256478414043,
+     "difference": 0.2862778480245015,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.3833837366280811
+    },
+    {
+     "t": 11.813891894359374,
+     "measured_ink": 0.5587422839506173,
+     "measured_solid": 0.12182773919753087,
+     "modelled_ink": 0.270380836535497,
+     "difference": 0.2883614474151203,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.3584406742088971
+    },
+    {
+     "t": 12.88788206657386,
+     "measured_ink": 0.5713927469135802,
+     "measured_solid": 0.13013117283950618,
+     "modelled_ink": 0.27124910828685356,
+     "difference": 0.30014363862672666,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.3606841091016899
+    },
+    {
+     "t": 13.96187223878835,
+     "measured_ink": 0.5623119212962963,
+     "measured_solid": 0.12487654320987654,
+     "modelled_ink": 0.27124910828685356,
+     "difference": 0.2910628130094427,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.36832288062283736
+    },
+    {
+     "t": 15.035862411002839,
+     "measured_ink": 0.5764973958333334,
+     "measured_solid": 0.1273996913580247,
+     "modelled_ink": 0.27124910828685356,
+     "difference": 0.3052482875464798,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.35018699654775604
+    },
+    {
+     "t": 16.10985258321733,
+     "measured_ink": 0.5601133294753087,
+     "measured_solid": 0.12467110339506172,
+     "modelled_ink": 0.27124910828685356,
+     "difference": 0.2888642211884551,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.35821490186370003
+    },
+    {
+     "t": 17.183842755431815,
+     "measured_ink": 0.5599141589506172,
+     "measured_solid": 0.12461998456790123,
+     "modelled_ink": 0.27124910828685356,
+     "difference": 0.2886650506637637,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.35158583966688856
+    },
+    {
+     "t": 18.257832927646305,
+     "measured_ink": 0.5693701774691358,
+     "measured_solid": 0.12289448302469136,
+     "modelled_ink": 0.27124910828685356,
+     "difference": 0.2981210691822822,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.36680741188381455
+    },
+    {
+     "t": 19.331823099860795,
+     "measured_ink": 0.5650564236111111,
+     "measured_solid": 0.13199122299382715,
+     "modelled_ink": 0.2721173800382101,
+     "difference": 0.29293904357290096,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.3973737381118536
+    },
+    {
+     "t": 20.40581327207528,
+     "measured_ink": 0.5555189043209876,
+     "measured_solid": 0.12454427083333333,
+     "modelled_ink": 0.2721173800382101,
+     "difference": 0.2834015242827775,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.38869334572418734
+    },
+    {
+     "t": 21.47980344428977,
+     "measured_ink": 0.5586844135802469,
+     "measured_solid": 0.1300361689814815,
+     "modelled_ink": 0.2738539235409233,
+     "difference": 0.2848304900393236,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.33699743735235105
+    },
+    {
+     "t": 22.55379361650426,
+     "measured_ink": 0.5604296875,
+     "measured_solid": 0.13173177083333334,
+     "modelled_ink": 0.2738539235409233,
+     "difference": 0.2865757639590767,
+     "empty_band_px": 382,
+     "white_share_of_bright": 0.3200224045336233
+    },
+    {
+     "t": 23.627783788718748,
+     "measured_ink": 0.5695814043209877,
+     "measured_solid": 0.1322709297839506,
+     "modelled_ink": 0.2738539235409233,
+     "difference": 0.2957274807800644,
+     "empty_band_px": 381,
+     "white_share_of_bright": 0.32860210662942935
+    },
+    {
+     "t": 24.701773960933238,
+     "measured_ink": 0.5653718171296296,
+     "measured_solid": 0.13489824459876543,
+     "modelled_ink": 0.2755904670436364,
+     "difference": 0.2897813500859932,
+     "empty_band_px": 381,
+     "white_share_of_bright": 0.3354222897488605
+    },
+    {
+     "t": 25.77576413314772,
+     "measured_ink": 0.5701451581790123,
+     "measured_solid": 0.14158854166666668,
+     "modelled_ink": 0.27645873879499294,
+     "difference": 0.2936864193840194,
+     "empty_band_px": 381,
+     "white_share_of_bright": 0.3188679759398906
+    }
+   ],
+   "thirds": {
+    "early": {
+     "measured_ink": 0.5825176625192902,
+     "measured_solid": 0.14507607542438272,
+     "modelled_ink": 0.33982327122793826,
+     "worst_empty_band_px": 382
+    },
+    "middle": {
+     "measured_ink": 0.562738353587963,
+     "measured_solid": 0.12184377411265432,
+     "modelled_ink": 0.2699467006598187,
+     "worst_empty_band_px": 382
+    },
+    "late": {
+     "measured_ink": 0.5642697482638889,
+     "measured_solid": 0.13124445408950616,
+     "modelled_ink": 0.27363685560308415,
+     "worst_empty_band_px": 382
+    },
+    "late_not_emptier_than_middle": true,
+    "late_over_early": 0.9686740584371603
+   }
+  }
+ }
+}

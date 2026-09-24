@@ -181,6 +181,11 @@ __all__ = [
     "safe_area_report",
     "readability_report",
     "damage_report",
+    "wound_seams",
+    "panel_damage_teams",
+    "panel_roughness",
+    "critical_visibility_report",
+    "containment_report",
     "event_moments",
     "measure_document",
     "candidate_seeds",
@@ -241,30 +246,53 @@ VIEW_PAD_FRACTION = 0.055
 # **How big the important play region is.**  The framed shell's outer material
 # diameter as a fraction of the frame width.
 #
-# Phase 4A derived 0.652 from a rule the Phase 4B human review overturned: fit
-# the whole arena inside the band that clears the Shorts action rail. That rule
-# optimises for "the viewer can see every shell" and it produced exactly the
-# complaint the review made - a small disc in a tall black frame, getting
-# smaller as the population grew. The rail band is 0.680 of the width, so *any*
-# rule of that shape caps the arena below 0.68 forever.
+# Phase 4A derived 0.652 from "fit the whole arena inside the band that clears
+# the Shorts action rail". Phase 4B overturned that rule and reached 0.850 -
+# still a rule that fits the whole arena inside the *frame*, just a different
+# rectangle. The human review rejected 4B for the same reason it rejected 4A:
+# the race is too small and there is too much empty dark space.
 #
-# 4B optimises for "the interesting action is large" instead and lets the
-# irrelevant outer arc cross the rail. 0.850 was chosen from measurement, not
-# taste, and 0.900 was rejected by one:
+# 4C drops the last of it. The rule is now *keep the interesting action large,
+# even if parts of the arena are cropped*, so the constant is allowed above
+# 1.0, where the framed shell's material diameter is **wider than the frame**
+# and its left and right caps are off screen. The brief named three widths for
+# the final structure - 100%, 110% and 120% of the frame - and they were
+# rendered on seed 17964 and compared as frames
+# (`tools/two_team_phase4c_lab.py framing`), with the 4B fraction carried as
+# the "what we had" control at the 4C stage plan:
 #
-#   * every panel break that any ball later used as a passage - 19 of them on
-#     17964, 5 on 3762, 9 on 1176 - is 0.00 covered by every safe-area region
-#     at 0.80, 0.85 and 0.90 alike. The breaks that do fall under the rail are
-#     ones no ball ever went through, which is the arc the review agreed to
-#     spend.
-#   * the winning escape is 0.00 covered at 0.80 and 0.85 on all three
-#     candidates, and **0.45 covered by the action rail on 3762 at 0.90**. The
-#     payoff is the one thing that may never be behind the player's controls,
-#     so 0.90 is out on evidence.
+#   | variant | mean ink | early | late | worst empty band | ball | opening | wall |
+#   |---|---:|---:|---:|---:|---:|---:|---:|
+#   | 4B 0.850 | 0.456 | 0.504 | 0.402 | 531 px | 33.9 | 35.9 | 57.2 |
+#   | A 1.000  | 0.531 | 0.560 | 0.508 | 479 px | 39.9 | 42.3 | 76.3 |
+#   | B 1.100  | 0.566 | 0.580 | 0.564 | 431 px | 43.9 | 46.5 | 90.4 |
+#   | C 1.200  | 0.590 | 0.590 | **0.607** | **382 px** | **47.9** | **50.7** | **105.4** |
 #
-# `critical_visibility_report` is the measurement; `safe_area_report` keeps the
-# old whole-arena number as context and no longer gates on it.
-FRONTIER_WIDTH_FRACTION = 0.850
+# **C is the only variant whose late frame is not emptier than its opening** -
+# 0.607 against 0.590 measured off the pixels on 17964, and 0.648 against
+# 0.590 on 1176 - which is the one item the 4B phase could not deliver at all.
+# It is also monotone in every other column, so there is no trade inside the
+# brief's band: C is simply the far end of it.
+#
+# What C costs, stated rather than hidden:
+#
+#   * 7 of 17964's 78 ordinary frontier crossings and 3 of its near misses end
+#     up partly under the action rail or off the frame edge. **Every hard class
+#     - the first clone, every break some ball later used as a passage, and the
+#     winning escape - is fully visible at 1.00, 1.10 and 1.20 alike on both
+#     production candidates.**
+#   * a ball is partly off frame on 8.5% of 17964's frames and 11.6% of
+#     1176's, always at the horizontal caps of the outer region, never before
+#     the camera locks.
+#   * the escapee's *run-on* past the arena leaves the frame sooner. On 17964
+#     it is fully framed for 0.05 s of the 0.55 s release at C against 0.47 s
+#     at A; on 1176 it is framed for the whole release at every fraction,
+#     because its escape is at the bottom-left rather than at a cap. That is
+#     one of the reasons 1176 is the production candidate.
+#
+# `critical_visibility_report` measures the action rail *and* the frame edge,
+# because above 1.0 the edge is the binding one.
+FRONTIER_WIDTH_FRACTION = 1.200
 # What is left after the player's own controls, as the brief's "usable screen
 # width": the widest horizontally centred band that clears the action rail.
 # Stated here so the occupancy report can quote the frontier against both this
@@ -327,59 +355,64 @@ CAMERA_FRUSTUM_OFFSET = (
     / FRAME_WIDTH,
 )
 
-# --- the Phase 4B camera schedule ----------------------------------------
+# --- the Phase 4C camera schedule ----------------------------------------
 #
 # `(trigger_region, extent_shell)`, outward. The camera holds `extent_shell`'s
 # material edge at FRONTIER_WIDTH_FRACTION of the frame until the canonical
 # high-water frontier reaches `trigger_region`, and then eases out to the next
 # stage. Stage 0 has no trigger and is the opening framing.
 #
-# **Why exactly these three.** Phase 4A moved once per shell - four eased
-# zoom-outs over five shells - because the schedule was a function of the shell
-# list rather than of the race. Two rules from the human review pin the answer
-# down completely:
+# **One transition, and the grouping is again forced rather than chosen.**
+# Phase 4A moved four times, 4B twice, and the review asks for at most one. The
+# brief adds a requirement 4B did not have - the final 6 to 10 seconds must be
+# fully static - and that is what picks the pair:
 #
-#   1. a ball may never be outside the framed disc, so the extent must be at
-#      least the frontier region at every instant;
-#   2. the outermost shell may not be revealed before the race reaches it, so
-#      the last stage's trigger is region 4 and not earlier.
+#   1. the last stage's extent is shell 4, because the final wall has to be
+#      framed when the winner leaves through it;
+#   2. no ball may be outside the frame *before* the move, so the opening
+#      extent must cover every region the race reaches first;
+#   3. the move must leave at least 6 s of locked camera, which rules out
+#      triggering on region 4: that arrives 4.47 s and 5.52 s before the escape
+#      on the two production candidates, and 4B's static tails were 4.16 s and
+#      5.21 s for exactly this reason.
 #
-# Rule 2 fixes the final stage at `(4, 4)`. Rule 1 then requires some stage to
-# cover frontier regions 2 and 3, so its extent is at least 3; taking it to be
-# exactly 3 is what avoids a fourth stage. The opening covers regions 0 and 1
-# for the same reason - region 1 is reached 0.52 s in on 17964, and a reframe
-# there would be a camera move in the first half second for no story reason.
-# So this is not one grouping among many: it is the *only* grouping with two
-# transitions that satisfies both rules, and a third rule - the final wall must
-# be framed when the winner leaves through it - forbids dropping to one.
-CAMERA_STAGE_PLAN: tuple[tuple[int, int], ...] = ((0, 1), (2, 3), (4, 4))
+# Triggering on region 2 - the frontier crossing shell 1 - is the latest
+# trigger that clears rule 3 on both candidates with room to spare (20.79 s and
+# 11.46 s of static tail) and it is late enough to be *meaningful*: the race
+# has left the two inner shells and is into the second half of the arena.
+# Rule 2 then wants the opening to cover regions 0 and 1, whose material edge
+# is shell 1's at 9.65 units; extent shell 2 frames 12.65 units, which contains
+# it with the drawn ball at every fraction the experiment tested and is the
+# tightest opening that does.
+#
+# The pleasant arithmetic: both stages divide by the same fraction, so the
+# single zoom is 12.65 -> 18.65 = **1.474x whatever the fraction is**, against
+# 4B's 1.62x first step and 1.933x total. One move, and a smaller one.
+CAMERA_STAGE_PLAN: tuple[tuple[int, int], ...] = ((0, 2), (2, 4))
 
 # The framing opens this long before the canonical crossing that triggers it,
 # so the frame is already moving as the ball goes through rather than reacting
 # after it.
 FRAME_LEAD_SECONDS = 0.14
-# Down from 0.55, to the top of the brief's 0.25-0.45 band, and **the top
-# rather than the middle because grouping the shells made each move bigger**.
+# The brief's band is 0.25-0.40 s in 4C, down from 4B's 0.25-0.45, and there is
+# now only one payment to make.
 #
-# Two transitions instead of four is the same total zoom spent in half as many
-# payments: stage 1 grows the framed radius by 1.62x where Phase 4A's largest
-# single step was 1.45x. A zoom's cost to the viewer is the screen velocity it
-# induces - a world point at the frame edge slides inward while the radius
-# grows - and that velocity is the step divided by the duration. Phase 4A could
-# hold "a reframe never moves the screen faster than a ball does" because its
-# steps were small; 4B cannot, and pretending otherwise would mean either four
-# transitions again or a gate that no longer means anything.
+# A zoom's cost to the viewer is the screen velocity it induces: a world point
+# at the frame edge slides inward while the framed radius grows, and that
+# velocity is the step divided by the duration. The gate is unchanged from 4B -
+# `CAMERA_VELOCITY_HEADROOM`, twice the fastest a ball ever crosses the opening
+# framing - and it is **not** slack here, because the 4C opening frames shell 2
+# rather than shell 1, so the ball's own reference screen velocity is a third
+# smaller and the same move costs more against it. Measured on both production
+# candidates at 60 fps:
 #
-# So the duration was swept against the measurement rather than chosen. Screen
-# velocity at the worst instant, as a multiple of the ball's own screen
-# velocity at the opening framing, on all three candidates:
+#     0.25 s -> 3.07x    0.30 s -> 2.57x    0.35 s -> 2.20x    0.40 s -> 1.93x
 #
-#     0.25 s -> 2.81x    0.30 s -> 2.38x    0.35 s -> 2.06x
-#     0.40 s -> 1.81x    0.45 s -> 1.61x
-#
-# 0.45 is the slowest the brief allows and it costs 0.10 s of static tail. Ball
-# containment holds at every value, so nothing else is trading against it.
-FRAME_EASE_SECONDS = 0.45
+# 0.40 s is the slowest the brief allows and the **only** value in the band
+# that passes the 2.0x gate, so it is not a preference: every faster value in
+# the band makes the one remaining move more noticeable than either of 4B's
+# two, and the gate says so rather than my taste saying so.
+FRAME_EASE_SECONDS = 0.40
 
 # --- event protection ------------------------------------------------------
 #
@@ -539,11 +572,16 @@ BREAK_FLASH_SECONDS = 0.16
 # open within nine frames at 30 fps, while the chunks are still in the air.
 BREAK_RETRACT_SECONDS = 0.30
 #: The stress emphasis that precedes the failure, so the wall is seen to give.
-BREAK_STRESS_SECONDS = 0.10
-#: Substantial readable chunks, inside the brief's 3-6. Four is one per
-#: sub-slab plus one, which is what makes the count read as "the panel came
-#: apart" rather than as a number of particles.
-BREAK_FRAGMENT_COUNT = 4
+#: 4C lengthens it from 0.10: at 30 fps that was three frames, which is a
+#: single bright instant rather than a wall visibly straining.
+BREAK_STRESS_SECONDS = 0.14
+#: Substantial readable chunks, inside the brief's 3-6. Five is one per
+#: sub-slab plus two, which is what makes the count read as "the panel came
+#: apart" rather than as a number of particles - and 4C raised it from four
+#: because the 4C framing draws the outer wall 90 px thick instead of 57, so
+#: each chunk is half again as large and four of them left visible gaps in the
+#: slab's own footprint as it went.
+BREAK_FRAGMENT_COUNT = 5
 BREAK_FRAGMENT_SECONDS = 0.42
 #: A fragment is a piece of the panel, so its size is the panel's own geometry:
 #: this fraction of the chord long, the canonical thickness radially, and this
@@ -639,27 +677,77 @@ BACK_ENERGY = 0.30
 # capsule's own round cap. One that flanks an opening is the one a ball clips
 # when it aims at the hole and misses, so it carries a cool cap and more depth.
 POST_RGB = (0.330, 0.370, 0.440)
-# Was amber, which is now a team. A struck post glows the same crimson the
-# damage ramp uses, because that is what it is: a hit registering on material.
-POST_HOT_RGB = (1.000, 0.160, 0.440)
+# **The pink the human review kept seeing.** A pillar flanking a broken panel
+# keeps this cast for the rest of the run - "the arena remembers" - so with 31
+# breaks on 17964 the late frame carried up to 62 saturated magenta pillars,
+# and the first 4C render made it obvious that *this*, not the wounds, was the
+# dominant pink in the picture. It is by construction a coloured dot beside
+# every break, which is the definition of the floating marker the brief bans.
+#
+# It keeps its job and loses its colour: a pale warm cast, the same "this was
+# heated and it stayed heated" read as the rest of the 4C damage ramp, still
+# 0.71 from team orange and 0.89 from team cyan, and distinguished from the
+# cool `POST_EDGE_RGB` cap by being warm rather than by being loud.
+POST_HOT_RGB = (1.000, 0.870, 0.760)
 # Was cyan, which is now a team. Steel keeps the opening-flanking posts legible
 # as structure without borrowing either colour.
 POST_EDGE_RGB = (0.700, 0.780, 0.900)
 POST_EDGE_ENERGY = 1.60
 POST_BASE_ENERGY = 0.26
 POST_EDGE_DEPTH = 1.35
-# The damage ramp, crimson to hot white. It used to run amber to red, which
-# collides with team orange at its first two stops - and so, measurably, did the
-# first red-to-white version: `CRACK_RGB = (0.92, 0.22, 0.26)` sits 0.354 from
-# orange in RGB, inside the 0.45 separation
-# `test_no_damage_or_structure_colour_can_be_mistaken_for_a_team` requires.
-# Pushing the whole ramp toward magenta buys the blue channel back: every stop
-# is now at least 0.45 from both team hues, and the ramp still reads as one
-# escalating thing because it is monotone in luminance.
-CRACK_RGB = (0.880, 0.100, 0.420)
-CRITICAL_RGB = (1.000, 0.060, 0.300)
-FRACTURE_RGB = (1.000, 0.520, 0.720)
+# The damage ramp: **exposed material, then heat.**
+#
+# 4B ran crimson to magenta to pink, which is how it satisfied
+# `test_no_damage_or_structure_colour_can_be_mistaken_for_a_team` - pushing
+# toward magenta buys back the blue channel team orange does not have. The
+# human review then said the result "still reads too much like red/pink marks
+# rather than physical destruction", and it was right: a saturated magenta
+# hairline is a colour nothing in a wall has, so the eye reads it as a symbol
+# drawn on the wall rather than as the wall failing.
+#
+# 4C keeps the separation requirement and satisfies it the other way, by
+# *desaturating* instead of rotating the hue. The physical reading is a
+# two-part one and the ramp is now that reading:
+#
+#   * the first thing a chipped material shows is **fresh unweathered
+#     surface** - lighter than the dirty face around it and not coloured at
+#     all. `CRACK_RGB` is that, and `DAMAGE_RIM_RGB` is the lip of it around
+#     the chip.
+#   * only once the panel is *critical* does anything glow, and what glows is
+#     stress inside the fissure, which is incandescence: warm, and washing out
+#     to white as it rises.
+#
+# Saturation is what does the separating now. Team orange is (1.00, 0.54,
+# 0.13), saturation 0.87; `CRITICAL_RGB` is the same hue family at saturation
+# 0.30 and 0.635 away in RGB, so it reads as "hot", never as "the orange
+# team". Every stop still clears the 0.45 gate against both teams and the ramp
+# is still monotone in luminance, so it still reads as one escalating thing.
+CRACK_RGB = (0.760, 0.790, 0.840)
+CRITICAL_RGB = (1.000, 0.820, 0.700)
+FRACTURE_RGB = (1.000, 0.930, 0.870)
 BREAK_FLASH_RGB = (1.000, 0.940, 0.960)
+#: The broken lip around a chip: the bright edge where material was knocked
+#: away. **This is the single strongest "it happened to the material" cue in
+#: the wound** - a dark notch alone reads as a painted dot, and a dark notch
+#: with a lit rim on it reads as a hole, because that is what a chip in a lit
+#: solid does. It is state-independent on purpose: a broken edge does not get
+#: hotter, it is just broken, so one shared material serves the whole arena.
+DAMAGE_RIM_RGB = (0.800, 0.815, 0.855)
+DAMAGE_RIM_ENERGY = 0.60
+#: How far the lip stands proud of the chip **along the chord**.
+DAMAGE_RIM_MARGIN = 0.070
+#: And how tall it is radially, as a share of the panel's own thickness.
+#:
+#: **This is a separate constant because the first version did not have one
+#: and the render showed why.** The lip was sized as the chip plus the margin
+#: on both axes, which is `0.68 * 0.30 + 2 * 0.070 = 0.344` against a panel
+#: 0.300 thick - so every wound stuck out past the top and bottom of the band
+#: it was supposed to be a hole in, and the whole point of a lit rim inverted:
+#: instead of a chip in a wall it read as a plate stuck on one. A crack has
+#: been held to the canonical silhouette since Phase 4A by
+#: `DAMAGE_CRACK_SPAN`; the lip needed the same rule and now has it, with
+#: `test_a_wound_never_leaves_its_panel_radially` recomputing both.
+DAMAGE_RIM_SPAN = 0.92
 
 # Emission energy by damage state, in the same order as DAMAGE_STATES. The
 # progression a viewer reads is this ramp times the crack count below it, not a
@@ -725,6 +813,20 @@ DAMAGE_CLUSTER_CHORD = 0.13
 DAMAGE_BRANCH_COUNT: tuple[int, ...] = (0, 0, 1, 2, 0)
 DAMAGE_BRANCH_SPREAD_DEGREES = 26.0
 DAMAGE_BRANCH_LENGTH = 0.62
+#: **The connection in "connected crack network".** From `critical` upward a
+#: seam runs along the chord from each shown wound to the next one, so a panel
+#: with three wounds shows one fissure system rather than three separate
+#: injuries. Below `critical` there is no seam: a `damaged` panel is supposed
+#: to read as two local chips, and joining them would skip a state.
+#:
+#: It is derived entirely from the wound offsets, which are canonical impact
+#: positions, so the network is still tied to where the ball actually hit -
+#: the seam has no freedom of its own at all.
+DAMAGE_SEAM_STATES: tuple[bool, ...] = (False, False, True, True, False)
+DAMAGE_SEAM_WIDTH = 0.030
+#: A seam shorter than this is inside the two chips it would join and drawing
+#: it only thickens them.
+DAMAGE_SEAM_MIN_CHORD = 0.16
 #: The crack that runs out of a chip, as a fraction of the panel thickness. It
 #: crosses the wall rather than sitting on the face, so it is visible on the
 #: flank of the outer shells, where the flank is most of what is on screen.
@@ -750,6 +852,34 @@ DAMAGE_CRACK_COUNT: tuple[int, ...] = (0, 2, 4, 6, 0)
 # thick as the panel radially, so a mark never puts a pixel outside the
 # canonical silhouette.
 DAMAGE_MARK_CHORD = 0.30
+#: **Surface roughness, which the brief asks for at `damaged` and which no
+#: amount of added geometry supplies.** A panel's material roughness rises
+#: with how worn it is, so a beaten panel stops taking a clean specular
+#: highlight before it has a single crack on it. It is a continuous read of
+#: the same canonical `fraction` the scuff uses, clamped at 1.0 - fully rough.
+DAMAGE_WEAR_ROUGHNESS = 0.55
+#: And the state ladder on top of it, for panels past the wear range.
+DAMAGE_STATE_ROUGHNESS: tuple[float, ...] = (0.00, 0.22, 0.40, 0.55, 0.00)
+#: **Fractured: "separated crack planes, visible section boundaries, small
+#: displaced-looking chunks".** The three sub-slabs a panel is built from are
+#: each pushed back by a different amount once it fractures, so the section
+#: boundaries throw their own edges and the slab reads as three pieces that
+#: have shifted rather than one piece with two lines on it. Displacement is
+#: *inward only* - a fractured panel still never occupies a pixel a healthy one
+#: did not, which is the rule that keeps presentation off the collision
+#: silhouette until the canonical break.
+FRACTURE_SEGMENT_RECESS: tuple[float, ...] = (0.06, 0.22, 0.12)
+#: **The brief's "tiny local Cyan/Orange stress tint" allowance.** When both
+#: teams have damaged the same panel, its stress glow leans this far toward
+#: whichever team has done more of it - and no further: the wall has to keep
+#: looking like a wall, so the tint is a fifth of the way and it is on the
+#: localised glow only, never on the panel body, the chip, the rim or the
+#: crack. A panel one team damaged alone is not tinted at all, because there
+#: is nothing being said by it.
+DAMAGE_TEAM_TINT = 0.20
+#: The minority team has to own at least this share of a panel's damage before
+#: "both teams did this" is a true statement about it.
+DAMAGE_TEAM_TINT_MIN_SHARE = 0.20
 # `fractured` opens two gaps between the three sub-slabs. The gaps are cut out
 # of the sub-slabs rather than made by pushing them apart, so the panel's two
 # ends stay exactly where they were and a fractured panel never occupies a
@@ -1873,6 +2003,38 @@ def _disc_rect_fraction(px: float, py: float, radius: float, region: Region) -> 
     return inside / float(total) if total else 0.0
 
 
+def _disc_offframe_fraction(px: float, py: float, radius: float) -> float:
+    """How much of a drawn disc falls outside the frame rectangle itself.
+
+    **New in 4C and the reason it is new.** Up to 4B the framed arena was
+    always narrower than the frame, so the frame edge could never hide
+    anything and the only way to lose a subject was the Shorts action rail.
+    Above `FRONTIER_WIDTH_FRACTION = 1.0` the arena is *wider* than the frame
+    by construction and the edge becomes the binding constraint - so a report
+    that still only measured the rail would pass a framing that cropped the
+    winning escape clean off the screen.
+
+    Sampled on the same 9x9 grid as `_disc_rect_fraction` so the two numbers
+    are comparable, and 0.0 means the whole drawn ball is on screen.
+    """
+    if radius <= 0.0:
+        inside = 0.0 <= px <= FRAME_WIDTH and 0.0 <= py <= FRAME_HEIGHT
+        return 0.0 if inside else 1.0
+    inside = 0
+    total = 0
+    steps = 9
+    for iy in range(steps):
+        for ix in range(steps):
+            x = px + radius * (2.0 * (ix + 0.5) / steps - 1.0)
+            y = py + radius * (2.0 * (iy + 0.5) / steps - 1.0)
+            if (x - px) ** 2 + (y - py) ** 2 > radius * radius:
+                continue
+            total += 1
+            if 0.0 <= x <= FRAME_WIDTH and 0.0 <= y <= FRAME_HEIGHT:
+                inside += 1
+    return 1.0 - inside / float(total) if total else 1.0
+
+
 # --------------------------------------------------------------------------
 # Phase 4B: damage, fracture and flood-through, specified once
 # --------------------------------------------------------------------------
@@ -2045,6 +2207,99 @@ def visible_damage_clusters(
     return order[:wanted]
 
 
+def wound_seams(
+    document: dict[str, Any], shell_id: int, panel_id: int, state_index: int,
+    wear: float = 0.0,
+) -> list[dict[str, float]]:
+    """The fissures that join a panel's wounds into one crack network.
+
+    The brief's `critical` state asks for a *connected* crack network, and up
+    to 4B a panel with three wounds drew three unconnected injuries however bad
+    it got - the count went up, the structure did not change. A seam is the
+    link: from `critical` upward, consecutive shown wounds **in chord order**
+    are joined along the chord.
+
+    It invents nothing. The endpoints are two canonical impact positions and
+    the state comes from the canonical ledger, so the network is as tied to
+    where the ball actually hit as the wounds are. Seams shorter than
+    `DAMAGE_SEAM_MIN_CHORD` are dropped because they would be inside the two
+    chips they join.
+    """
+    if not DAMAGE_SEAM_STATES[state_index]:
+        return []
+    shown = visible_damage_clusters(document, shell_id, panel_id, state_index, wear)
+    if len(shown) < 2:
+        return []
+    order = sorted(shown, key=lambda cluster: float(cluster["offset"]))
+    seams: list[dict[str, float]] = []
+    for low, high in zip(order, order[1:]):
+        a = float(low["offset"])
+        b = float(high["offset"])
+        length = abs(b - a)
+        if length < DAMAGE_SEAM_MIN_CHORD:
+            continue
+        seams.append({
+            "centre": 0.5 * (a + b),
+            "length": length,
+            "from_index": int(low["index"]),
+            "to_index": int(high["index"]),
+        })
+    return seams
+
+
+def panel_damage_teams(document: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Which team has done a panel's damage, from `team_cumulative`.
+
+    The brief allows "a tiny local Cyan/Orange stress tint" where both teams
+    contributed. This is the read that decides it, and it is a read: every
+    `damage` event carries the running per-team totals already, so nothing is
+    accumulated here that the simulation did not publish.
+
+    `both` is deliberately not "the minority is non-zero" - a single glancing
+    hit out of nineteen is not two teams wearing a panel down together, and a
+    tint that fired on it would be noise. `DAMAGE_TEAM_TINT_MIN_SHARE` is the
+    share the minority has to hold.
+    """
+    _require_valid(document)
+    out: dict[str, dict[str, Any]] = {}
+    for event in document["events"]:
+        if event["kind"] != "damage":
+            continue
+        totals = [float(value) for value in event["team_cumulative"]]
+        out[_panel_key(event["shell_id"], event["panel_id"])] = {
+            "team_cumulative": totals,
+            "total": sum(totals),
+        }
+    for row in out.values():
+        totals = row["team_cumulative"]
+        total = row["total"]
+        lead = max(range(len(totals)), key=lambda index: totals[index])
+        minority = (total - totals[lead]) / total if total > 0.0 else 0.0
+        row["lead_team"] = lead
+        row["minority_share"] = minority
+        row["both"] = minority >= DAMAGE_TEAM_TINT_MIN_SHARE
+        row["tint"] = DAMAGE_TEAM_TINT if row["both"] else 0.0
+    return out
+
+
+def panel_roughness(
+    shell_id: int, state_index: int, wear: float = 0.0
+) -> float:
+    """A worn panel stops taking a clean highlight before it ever cracks.
+
+    The brief's `damaged` state asks for "subtle surface roughness", which is
+    the one part of a wound that no added geometry can supply: it is a material
+    property of the whole face, not a shape on it. Continuous in the canonical
+    `fraction` below the first damage state and stepped by the ledger above it,
+    so the two halves of the same read meet without a discontinuity.
+    """
+    base = float(SHELL_ROUGHNESS[shell_id])
+    added = DAMAGE_STATE_ROUGHNESS[state_index]
+    if state_index == 0:
+        added = DAMAGE_WEAR_ROUGHNESS * min(1.0, max(0.0, wear))
+    return min(1.0, base + added)
+
+
 def break_fragments(document: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
     """The few substantial chunks a panel comes apart into, per break.
 
@@ -2191,23 +2446,42 @@ def containment_report(document: dict[str, Any], fps: float = 60.0) -> dict[str,
 
     Measured against the **frame rectangle**, not against the framed material
     disc. Those are different numbers once the arena is allowed to cross the
-    frame's own edge: at 0.850 the frontier's material edge is 459 px from the
-    axis and the frame edge is 540, so 81 px of a ball's travel is legitimately
-    outside the framed disc and still perfectly visible. Gating on the disc
-    would reject framings that show everything, which is the Phase 4A mistake
-    in a new place.
+    frame's own edge, and gating on the disc would reject framings that show
+    everything, which is the Phase 4A mistake in a new place.
 
-    Reported as the worst ratio of a ball's drawn extent to the nearest frame
-    edge. Below 1.0 the whole ball is on screen.
+    **4C changes what the answer is allowed to be.** Up to 4B the framed arena
+    was narrower than the frame, so "no ball is ever off screen" was free and
+    the report only had to confirm it. At `FRONTIER_WIDTH_FRACTION = 1.200` the
+    arena is 108 px wider than the half frame on each side by construction, so
+    a ball out at a horizontal cap of the outer region *is* off screen and
+    saying otherwise would mean giving up the framing the review asked for.
+
+    So the question becomes *when* and *how much*, and the two properties worth
+    holding are here as numbers rather than as one boolean:
+
+    * `outside_before_lock` - the camera is still moving then, and a ball
+      leaving a frame that is itself moving is the one version of this a viewer
+      reads as a mistake. It is 0 on both production candidates.
+    * `outside_frames` against `frames` - how often it happens at all, which is
+      8.5% and 11.6%, every one of them after the lock.
+
+    What may never happen is a *critical subject* off frame, and that is
+    `critical_visibility_report`, which measures the frame edge as well as the
+    action rail for exactly this reason.
     """
     _require_valid(document)
     duration = float(document["summary"]["duration"])
     ball_radius = float(document["config"]["ball_radius"]) * BALL_DRAW_SCALE
     frames = max(1, int(math.ceil(duration * fps)))
+    lock = camera_lock_time(document)
     worst = 0.0
     worst_t = 0.0
     worst_ball = -1
+    worst_overshoot_px = 0.0
     outside_frames = 0
+    outside_before_lock = 0
+    ball_samples = 0
+    ball_samples_outside = 0
     for index in range(frames + 1):
         t = duration * index / frames
         view = view_radius_at(document, t)
@@ -2218,20 +2492,34 @@ def containment_report(document: dict[str, Any], fps: float = 60.0) -> dict[str,
             px, py = project(point, view)
             margin = min(px, FRAME_WIDTH - px, py, FRAME_HEIGHT - py)
             ratio = radius_px / margin if margin > 0.0 else float("inf")
+            ball_samples += 1
             if ratio > worst:
                 worst, worst_t, worst_ball = ratio, t, int(ball_id)
             if ratio > 1.0:
                 any_out = True
+                ball_samples_outside += 1
+                worst_overshoot_px = max(worst_overshoot_px, radius_px - margin)
         if any_out:
             outside_frames += 1
+            if t < lock:
+                outside_before_lock += 1
     return {
         "fps": fps,
         "frames": frames + 1,
+        "camera_lock_time": lock,
         "worst_ratio": worst,
         "worst_t": worst_t,
         "worst_ball": worst_ball,
+        "worst_overshoot_px": worst_overshoot_px,
         "outside_frames": outside_frames,
+        "outside_before_lock": outside_before_lock,
+        "outside_frame_fraction": outside_frames / float(frames + 1),
+        "ball_samples": ball_samples,
+        "ball_samples_outside": ball_samples_outside,
+        "ball_sample_outside_fraction": (
+            ball_samples_outside / float(ball_samples) if ball_samples else 0.0),
         "contained": outside_frames == 0,
+        "contained_while_moving": outside_before_lock == 0,
     }
 
 
@@ -2323,19 +2611,30 @@ def critical_visibility_report(
             fraction = _disc_rect_fraction(px, py, radius_px, region)
             if fraction > covered:
                 covered, where = fraction, region.name
+        # 4C: the frame edge counts too, and it counts the same way. A subject
+        # half off the screen is exactly as lost as a subject half under the
+        # player's controls, so the two are combined into one "how much of this
+        # can the viewer not see" rather than gated separately.
+        offframe = _disc_offframe_fraction(px, py, radius_px)
+        if offframe > covered:
+            covered, where = offframe, "off_frame"
         rows.append({
             "what": subject["what"], "t": float(subject["t"]),
             "detail": subject["detail"], "x_px": px, "y_px": py,
             "radius_px": radius_px, "covered": covered, "region": where,
+            "off_frame": offframe,
             "visible": covered < CRITICAL_COVER_LIMIT,
         })
     by_kind: dict[str, dict[str, Any]] = {}
     for row in rows:
         entry = by_kind.setdefault(
-            row["what"], {"count": 0, "hidden": 0, "worst_covered": 0.0})
+            row["what"], {"count": 0, "hidden": 0, "worst_covered": 0.0,
+                          "worst_off_frame": 0.0})
         entry["count"] += 1
         entry["hidden"] += 0 if row["visible"] else 1
         entry["worst_covered"] = max(entry["worst_covered"], row["covered"])
+        entry["worst_off_frame"] = max(
+            entry["worst_off_frame"], row["off_frame"])
     worst = max(rows, key=lambda row: row["covered"]) if rows else None
     return {
         "safe_area": config.name,
@@ -2349,6 +2648,13 @@ def critical_visibility_report(
             row["visible"] for row in rows
             if row["what"] in CRITICAL_HARD_CLASSES
         ),
+        "hard_on_frame": all(
+            row["off_frame"] <= 0.0 for row in rows
+            if row["what"] in CRITICAL_HARD_CLASSES
+        ),
+        "worst_hard_off_frame": max(
+            [row["off_frame"] for row in rows
+             if row["what"] in CRITICAL_HARD_CLASSES] or [0.0]),
         "pass": all(row["visible"] for row in rows),
     }
 
@@ -3184,6 +3490,14 @@ def render_config() -> dict[str, Any]:
         "shell_roughness": list(SHELL_ROUGHNESS),
         "damage_emission_energy": list(DAMAGE_EMISSION_ENERGY),
         "damage_crack_count": list(DAMAGE_CRACK_COUNT),
+        "damage_rim": [list(DAMAGE_RIM_RGB), DAMAGE_RIM_ENERGY,
+                       DAMAGE_RIM_MARGIN, DAMAGE_RIM_SPAN],
+        "damage_seam": [list(DAMAGE_SEAM_STATES), DAMAGE_SEAM_WIDTH,
+                        DAMAGE_SEAM_MIN_CHORD],
+        "damage_roughness": [DAMAGE_WEAR_ROUGHNESS,
+                             list(DAMAGE_STATE_ROUGHNESS)],
+        "fracture_segment_recess": list(FRACTURE_SEGMENT_RECESS),
+        "damage_team_tint": [DAMAGE_TEAM_TINT, DAMAGE_TEAM_TINT_MIN_SHARE],
         "damage_mark_chord": DAMAGE_MARK_CHORD,
         "damage_chip": [list(DAMAGE_CHIP_RGB), DAMAGE_CHIP_DEPTH],
         "damage_wear": [

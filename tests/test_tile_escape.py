@@ -623,6 +623,7 @@ CATEGORY_THREE_TOOLS = frozenset({
     "multishell_phase3b_screen.py",
     "two_team_phase4a_lab.py",
     "two_team_phase4b_lab.py",
+    "two_team_phase4c_lab.py",
 })
 
 

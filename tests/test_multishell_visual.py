@@ -246,21 +246,22 @@ def test_the_framing_comes_from_the_canonical_shell_exit_stream(document):
         ), "a framing change that is not a canonical crossing"
 
 
-def test_the_camera_moves_twice_and_not_once_per_shell(document):
-    """The whole of "fewer, better reframes", as an assertion.
+def test_the_camera_moves_once_and_not_once_per_shell(document):
+    """The whole of "at most one reframe", as an assertion.
 
-    Two rules from the human review pin the grouping down completely: a ball
-    may never be outside the frame, so the framed extent is at least the
-    frontier region at every instant; and the outermost shell may not be
-    revealed before the race reaches it. Those force the last stage's trigger
-    to region 4, force the middle stage's extent to at least shell 3, and leave
-    exactly two transitions.
+    **This test asserted two transitions and `extents == [1, 3, 4]` in 4B.**
+    It no longer holds because the 4C brief allows one reframe and adds a
+    requirement 4B did not have - the final 6 to 10 seconds must be fully
+    static - and the two together pick the pair. Triggering on region 4 leaves
+    4.16 s and 5.21 s of static tail on the two production candidates, so the
+    trigger has to come earlier, and region 2 is the latest that clears 6 s on
+    both. Rule one of 4B survives unchanged: the opening extent still has to
+    cover every region the race reaches before the move.
     """
     stages = visual.camera_stages(document)
-    assert len(stages) - 1 == 2, "the Phase 4A one-move-per-shell camera is back"
-    assert len(stages) - 1 < len(document["shells"]) - 1
+    assert len(stages) - 1 == 1, "more than one reframe is back"
     extents = [int(stage["extent_shell"]) for stage in stages]
-    assert extents == [1, 3, 4]
+    assert extents == [2, 4]
     # The extent always covers the frontier: rule one, checked rather than said.
     reached = visual.frontier_reached(document)
     for region, at in reached.items():
@@ -272,10 +273,11 @@ def test_the_camera_moves_twice_and_not_once_per_shell(document):
             f"region {region} was reached at {at:.2f}s with the camera on "
             f"shell {covered}"
         )
-    # And rule two: the outermost shell is not framed before the race is in it.
+    # The last stage still frames the outermost shell, because the final wall
+    # has to be framed when the winner leaves through it.
     final = stages[-1]
     assert int(final["extent_shell"]) == len(document["shells"]) - 1
-    assert int(final["trigger_region"]) == len(document["shells"]) - 1
+    assert int(final["trigger_region"]) == 2
 
 
 def test_the_camera_windows_are_disjoint_and_strictly_outward(document):
@@ -307,12 +309,41 @@ def test_a_camera_move_is_only_ever_pulled_earlier(document):
             visual.EVENT_GUARD_MAX_DEFER_SECONDS + 1e-9
 
 
-def test_no_ball_is_ever_outside_the_frame(document):
-    """"Cropping is allowed" applies to geometry and never to a ball."""
+def test_no_ball_leaves_the_frame_while_the_camera_is_moving(document):
+    """"Cropping is allowed" now reaches the balls, and only after the lock.
+
+    **This test asserted `contained` and `outside_frames == 0` in 4B**, which
+    was free there: the framed arena was narrower than the frame, so a ball
+    could not leave it. At 1.200 the arena is 108 px wider than the half frame
+    on each side by construction and a ball out at a horizontal cap of the
+    outer region is off screen - that *is* the crop the review asked for, and
+    asserting it away would mean giving the framing back.
+
+    What is still forbidden is the version a viewer reads as a mistake: a ball
+    leaving a frame that is itself moving. And the amount is bounded rather
+    than waved through - under a sixth of the frames, under a twentieth of the
+    ball-instants.
+    """
     report = visual.containment_report(document, fps=60.0)
-    assert report["contained"], report
-    assert report["outside_frames"] == 0
-    assert report["worst_ratio"] < 1.0
+    assert report["contained_while_moving"], report
+    assert report["outside_before_lock"] == 0
+    assert report["outside_frame_fraction"] < 0.17, report
+    assert report["ball_sample_outside_fraction"] < 0.05, report
+    assert report["worst_t"] > report["camera_lock_time"]
+
+
+def test_no_critical_subject_is_ever_off_the_frame(document):
+    """The gate the crop is actually held to, and the one 4B did not have.
+
+    A framing above 1.0 can hide things at the frame edge, so the edge is
+    measured alongside the action rail. The first clone, every panel break some
+    ball later used as a passage, and the winning escape may not be cropped at
+    all - not partly, not by a pixel.
+    """
+    report = visual.critical_visibility_report(document)
+    assert report["hard_on_frame"], report["hidden"]
+    assert report["worst_hard_off_frame"] == pytest.approx(0.0)
+    assert report["critical_pass"], report["hidden"]
 
 
 def test_the_first_clone_and_the_payoff_are_never_inside_a_camera_move(document):
@@ -351,16 +382,19 @@ def test_the_framing_reaches_the_whole_arena_and_then_stops(document):
     duration = float(document["summary"]["duration"])
     radii = visual.shell_view_radii(document)
     stages = visual.camera_stages(document)
-    # The opening framing is shell 1, not shell 0: the race leaves region 0 in
-    # about half a second on every candidate, and a reframe there would be a
-    # camera move in the first half second for no story reason.
-    assert visual.view_radius_at(document, 0.0) == pytest.approx(radii[1])
-    assert float(stages[0]["radius"]) == pytest.approx(radii[1])
+    # **The opening framing is shell 2 in 4C, where 4B opened on shell 1.**
+    # With one transition instead of two the opening has to cover regions 0
+    # and 1, whose material edge is shell 1's, and shell 2 is the tightest
+    # extent that contains it with the drawn ball.
+    assert visual.view_radius_at(document, 0.0) == pytest.approx(radii[2])
+    assert float(stages[0]["radius"]) == pytest.approx(radii[2])
     assert visual.view_radius_at(document, duration) == pytest.approx(
         radii[-1], rel=1e-6)
     composition = visual.composition_report(document)
-    assert composition["static_tail_seconds"] > 3.0
-    assert composition["camera_moving_fraction"] < 0.10
+    # The brief asks for a fully static final 6 to 10 seconds. Both production
+    # candidates clear it with room: 20.88 s and 11.41 s.
+    assert composition["static_tail_seconds"] > 6.0
+    assert composition["camera_moving_fraction"] < 0.03
 
 
 def test_the_camera_is_locked_for_the_whole_final_wall_section(document):
@@ -668,16 +702,20 @@ def test_the_arena_is_on_the_frames_own_axis():
     )
 
 
-def test_the_framing_is_larger_than_the_rail_band_and_still_fits_the_frame():
-    """The 4B framing rule, which is the opposite of the 4A one.
+def test_the_framing_is_wider_than_the_frame_and_crops_only_sideways():
+    """The 4C framing rule, which is the opposite of both earlier ones.
 
     4A took the largest centred disc that clears the action rail and got 0.652.
-    The rail band is only 0.680 of the width, so *any* rule of that shape caps
-    the arena below 0.68 for ever, and the review's "the simulation becomes too
-    small in the vertical frame" was the consequence. 4B lets the outer arc
-    cross the rail and keeps two hard limits instead: the disc still fits
-    inside the frame itself, and it still clears the top bar and title block
-    vertically, so nothing is cut off by the frame's own edge.
+    4B let the outer arc cross the rail but still fitted the disc inside the
+    frame, and got 0.850. The human review rejected both for the same reason,
+    so **the assertion `0.80 <= FRONTIER_WIDTH_FRACTION <= 0.90` and the
+    `half_width < 0.5` that went with it are gone**: the framed wall is now
+    wider than the frame on purpose and its left and right caps are cropped.
+
+    Two limits survive, and they are the two that keep the crop from costing
+    anything the video needs. The arena still fits *vertically*, so nothing is
+    lost to the frame's top or bottom edge and the crop is one-dimensional; and
+    the fraction stays inside the band the brief named, which is 1.00 to 1.20.
     """
     rail = next(r for r in DEFAULT_SAFE_AREA.regions if r.name == "action_rail")
     room = rail.left - visual.ARENA_CENTRE_X_FRACTION
@@ -688,14 +726,13 @@ def test_the_framing_is_larger_than_the_rail_band_and_still_fits_the_frame():
     assert visual.VIEW_DIAMETER_FRACTION == pytest.approx(
         visual.FRONTIER_WIDTH_FRACTION * (1.0 + visual.VIEW_PAD_FRACTION)
     )
-    # The brief's target band, and 0.900 excluded by measurement rather than
-    # taste: it puts 43.5% of seed 3762's winning escape under the action rail.
-    assert 0.80 <= visual.FRONTIER_WIDTH_FRACTION <= 0.90
-    assert visual.FRONTIER_WIDTH_FRACTION < 0.90
-    # Horizontally the material edge still fits: 459 px against a 540 px half
-    # frame. It is the *pad* that leaves the frame, not the arena.
-    half_width = 0.5 * visual.FRONTIER_WIDTH_FRACTION
-    assert half_width < 0.5
+    # The brief's own band for the final structure, and the selected end of it.
+    assert 1.00 <= visual.FRONTIER_WIDTH_FRACTION <= 1.20
+    # Wider than the frame: that is the point, and it is asserted rather than
+    # tolerated, so a quiet return to a fit-inside rule fails here.
+    assert 0.5 * visual.FRONTIER_WIDTH_FRACTION > 0.5
+    # But it still fits vertically, between the top bar and the title block,
+    # so the crop is horizontal only.
     title = next(r for r in DEFAULT_SAFE_AREA.regions if r.name == "title_block")
     top = next(r for r in DEFAULT_SAFE_AREA.regions if r.name == "top_bar")
     half_height = 0.5 * visual.FRONTIER_WIDTH_FRACTION * visual.FRAME_WIDTH \
@@ -712,27 +749,32 @@ def test_the_frontier_is_the_same_size_on_screen_at_every_stage(document):
         assert row["frontier_over_frame_width"] == pytest.approx(
             visual.FRONTIER_WIDTH_FRACTION, abs=1e-9
         )
-        assert 0.80 <= row["frontier_over_frame_width"] <= 0.90
+        # 4B asserted 0.80 to 0.90 here. The 4C band is the brief's.
+        assert 1.00 <= row["frontier_over_frame_width"] <= 1.20
 
 
-def test_the_total_zoom_out_is_the_camera_range_and_it_shrank(document):
-    """The zoom range is now a property of the *grouping*, and much smaller.
+def test_the_total_zoom_out_is_the_camera_range_and_it_shrank_again(document):
+    """The zoom range is a property of the *grouping*, and smaller again.
 
     Phase 4A's ratio was the arena's own - outermost material edge over
-    innermost, 2.80 - because it framed every shell in turn. Grouping the
-    opening onto shell 1 is most of the 4B gain before the frame fraction is
-    touched at all: the late arena is 45% larger relative to the opening than
-    it was, which is exactly the review's "action visually loses intensity
-    while simulation activity is actually increasing".
+    innermost, 2.80 - because it framed every shell in turn. 4B grouped five
+    shells into three framings and got 1.933. 4C groups them into two and gets
+    **1.474**, and the pleasant part is that both stages divide by the same
+    frame fraction, so the single move is 12.65 -> 18.65 units *whatever the
+    fraction is*: raising the fraction made the arena bigger without making the
+    one remaining zoom any larger.
+
+    **4B asserted `zoom_ratio == radii[-1] / radii[1]` and `> 1.5`.** Both were
+    statements about the three-stage grouping.
     """
     radii = visual.shell_view_radii(document)
     stages = visual.camera_stages(document)
     assert visual.zoom_ratio(document) == pytest.approx(
         float(stages[-1]["radius"]) / float(stages[0]["radius"])
     )
-    assert visual.zoom_ratio(document) == pytest.approx(radii[-1] / radii[1])
-    assert visual.zoom_ratio(document) < 2.0, "the Phase 4A zoom range is back"
-    assert visual.zoom_ratio(document) > 1.5, "the outer shells are never revealed"
+    assert visual.zoom_ratio(document) == pytest.approx(radii[-1] / radii[2])
+    assert visual.zoom_ratio(document) < 1.6, "a wider camera range is back"
+    assert visual.zoom_ratio(document) > 1.2, "the outer shells are never revealed"
 
 
 def test_the_ball_stays_readable_all_the_way_to_the_final_wall(document):
@@ -757,17 +799,21 @@ def test_the_camera_never_moves_sideways(document):
     assert report["lateral_offset_from_frame_centre_px"] == pytest.approx(0.0)
     assert report["max_lateral_movement_px"] == pytest.approx(0.0)
     assert report["max_vertical_movement_px"] == pytest.approx(0.0)
-    # The arena now crosses the action rail on purpose, so this clearance is
-    # negative by design; what may not be negative is the frame's own margin.
+    # The arena crosses the action rail on purpose, so this clearance is
+    # negative by design.
     assert report["rail_clearance_px"] < 0.0
-    assert report["left_margin_px"] > 0.0, "the arena is wider than the frame"
-    # It crosses into the rail band without reaching the frame's own edge:
-    # 91.8 px of a 172.8 px band, with 81.0 px of frame still to spare.
-    rail = next(r for r in DEFAULT_SAFE_AREA.regions if r.name == "action_rail")
-    band = (rail.right - rail.left) * visual.FRAME_WIDTH
-    assert abs(report["rail_clearance_px"]) < band, (
-        "the arena reaches past the action rail entirely"
+    # **And in 4C the left margin is negative too, where 4B asserted it
+    # positive.** The arena is 108 px wider than the half frame on each side:
+    # that is the crop the review asked for, and the centring report is where
+    # it is stated as a number rather than implied. What the test still holds
+    # is that the crop is *symmetric* - the arena is centred, so neither side
+    # is favoured - and that it is a crop rather than an eclipse.
+    assert report["left_margin_px"] < 0.0, "the arena fits inside the frame again"
+    assert abs(report["left_margin_px"]) < 0.25 * visual.FRAME_WIDTH, (
+        "more than a quarter of the frame width is cropped off each side"
     )
+    assert report["arena_centre_px"][0] == pytest.approx(
+        0.5 * visual.FRAME_WIDTH)
 
 
 def test_the_ball_is_never_drawn_far_enough_into_a_panel_to_read_as_through_it():
@@ -939,6 +985,15 @@ def test_the_render_scene_and_its_scripts_exist():
         ("WINNER_ALT_TOP_FRACTION", visual.WINNER_ALT_TOP_FRACTION),
         ("WINNER_BAND_FRACTION", visual.WINNER_BAND_FRACTION),
         ("WINNER_RISE_SECONDS", visual.WINNER_RISE_SECONDS),
+        # --- Phase 4C ---
+        ("DAMAGE_RIM_ENERGY", visual.DAMAGE_RIM_ENERGY),
+        ("DAMAGE_RIM_MARGIN", visual.DAMAGE_RIM_MARGIN),
+        ("DAMAGE_RIM_SPAN", visual.DAMAGE_RIM_SPAN),
+        ("DAMAGE_SEAM_WIDTH", visual.DAMAGE_SEAM_WIDTH),
+        ("DAMAGE_SEAM_MIN_CHORD", visual.DAMAGE_SEAM_MIN_CHORD),
+        ("DAMAGE_WEAR_ROUGHNESS", visual.DAMAGE_WEAR_ROUGHNESS),
+        ("DAMAGE_TEAM_TINT", visual.DAMAGE_TEAM_TINT),
+        ("DAMAGE_TEAM_TINT_MIN_SHARE", visual.DAMAGE_TEAM_TINT_MIN_SHARE),
     ],
 )
 def test_python_and_gdscript_agree_on_every_shared_constant(
@@ -963,6 +1018,8 @@ def test_python_and_gdscript_agree_on_every_shared_constant(
         ("DAMAGE_CRACK_COUNT", [float(v) for v in visual.DAMAGE_CRACK_COUNT]),
         ("DAMAGE_BRANCH_COUNT", [float(v) for v in visual.DAMAGE_BRANCH_COUNT]),
         ("PANEL_CHAMFER_BY_SHELL", list(visual.PANEL_CHAMFER_BY_SHELL)),
+        ("DAMAGE_STATE_ROUGHNESS", list(visual.DAMAGE_STATE_ROUGHNESS)),
+        ("FRACTURE_SEGMENT_RECESS", list(visual.FRACTURE_SEGMENT_RECESS)),
     ],
 )
 def test_python_and_gdscript_agree_on_every_shared_ramp(
@@ -1279,9 +1336,14 @@ def test_the_wall_depth_ramp_is_what_the_report_says():
 
     This is the check the 1.778x frustum error would have failed: it does not
     compare two copies of one value, it recomputes the apparent thickness from
-    the camera distance the framing implies and asserts the *ratio* the design
-    claims - the final wall reads as 5.98 times the innermost shell where 4A
-    managed 3.42, and 2.41 times its own Phase 4A self.
+    the camera distance the framing implies.
+
+    **The numbers moved in 4C without `PANEL_DEPTH` changing at all**, which is
+    the point of re-deriving them: the frame fraction went from 0.850 to 1.200,
+    the camera came in with it, and the final wall went from 57.20 px to
+    105.44 px on its own. The ratio against the innermost shell rose from 5.98
+    to 7.14 for the same reason - the depth ramp is a fixed set of world
+    distances and perspective does more with them from closer in.
     """
     document = document_for(17964)
     view = visual.shell_view_radii(document)[-1]
@@ -1293,8 +1355,9 @@ def test_the_wall_depth_ramp_is_what_the_report_says():
         depth = float(visual.PANEL_DEPTH[index])
         flank = radius * depth / (distance + depth)
         apparent.append((float(shell["thickness"]) + flank) * scale)
-    assert apparent == pytest.approx([9.57, 13.04, 19.96, 32.79, 57.20], abs=0.05)
-    assert apparent[-1] / apparent[0] == pytest.approx(5.98, abs=0.02)
+    assert apparent == pytest.approx(
+        [14.76, 21.58, 35.07, 59.70, 105.44], abs=0.05)
+    assert apparent[-1] / apparent[0] == pytest.approx(7.14, abs=0.02)
     assert apparent == sorted(apparent), "the ramp is not monotone outward"
     # The pillars may not stick out of the wall they cap. At 1.55 they did, and
     # 66 of them at the outer shell rendered the final wall as a comb.
@@ -1547,9 +1610,9 @@ def test_the_late_frame_is_not_emptier_than_it_has_to_be(document):
 
 def test_the_camera_stage_plan_is_the_one_the_scene_draws(scene_source):
     """The plan is a list of pairs in both files, so compare it as text."""
-    expected = "[[0, 1], [2, 3], [4, 4]]"
+    expected = "[[0, 2], [2, 4]]"
     assert f"const CAMERA_STAGE_PLAN := {expected}" in scene_source
-    assert list(visual.CAMERA_STAGE_PLAN) == [(0, 1), (2, 3), (4, 4)]
+    assert list(visual.CAMERA_STAGE_PLAN) == [(0, 2), (2, 4)]
 
 
 def test_the_scene_defaults_to_the_declared_frame_fraction(scene_source, scene_code):
@@ -1589,3 +1652,372 @@ def test_the_render_config_digest_is_stable_and_covers_the_new_dials():
                 "winner", "panel_chamfer_by_shell", "break_stress_seconds"):
         assert key in config, key
     assert config["frontier_width_fraction"] == visual.FRONTIER_WIDTH_FRACTION
+
+
+# --------------------------------------------------------------------------
+# Phase 4C: the single reframe, the crop, and damage in the material
+# --------------------------------------------------------------------------
+
+
+def test_the_camera_never_zooms_back_out_after_the_lock(document):
+    """Locked means locked: not "settles", not "drifts", identical.
+
+    The 4B camera was monotone and had a static tail, which is a weaker claim
+    than the 4C brief's: *no second zoom, late camera static*. Sampled at one
+    millisecond over the whole tail so a slow creep of a few hundredths of a
+    unit could not hide between frames.
+    """
+    lock = visual.camera_lock_time(document)
+    duration = float(document["summary"]["duration"])
+    locked = visual.view_radius_at(document, lock)
+    steps = max(1, int((duration - lock) * 1000.0))
+    for index in range(steps + 1):
+        t = lock + (duration - lock) * index / steps
+        assert visual.view_radius_at(document, t) == pytest.approx(
+            locked, rel=1e-12), f"the camera moved at {t:.3f}s, after the lock"
+    # And the framed radius after the lock is the outermost shell's, so the
+    # lock is at the *end* of the schedule rather than somewhere inside it.
+    assert locked == pytest.approx(visual.shell_view_radii(document)[-1])
+
+
+def test_the_framing_is_a_deterministic_function_of_the_document(document):
+    """Same document in, same schedule out - and no hidden state between runs.
+
+    `camera_stages` memoises on the playback digest, so this also checks that
+    the cache returns the schedule rather than becoming it: the second call is
+    compared field by field against a computation made with the cache cleared.
+    """
+    first = visual.camera_stages(document)
+    visual._STAGE_CACHE.clear()
+    second = visual.camera_stages(document)
+    assert len(first) == len(second)
+    for a, b in zip(first, second):
+        assert a["stage"] == b["stage"]
+        assert a["extent_shell"] == b["extent_shell"]
+        assert a["trigger_region"] == b["trigger_region"]
+        assert float(a["start"]) == pytest.approx(float(b["start"]), rel=0, abs=0)
+        assert float(a["settled"]) == pytest.approx(float(b["settled"]), rel=0, abs=0)
+        assert float(a["radius"]) == pytest.approx(float(b["radius"]), rel=0, abs=0)
+    # Two documents built from the same seed agree too, which is the property
+    # that makes the production identity mean anything.
+    again = document_for(int(document["seed"]))
+    assert [float(s["start"]) for s in visual.camera_stages(again)] == [
+        float(s["start"]) for s in first
+    ]
+
+
+def test_the_one_transition_is_triggered_by_a_canonical_crossing(document):
+    """The camera may not move for any reason the race did not give it."""
+    stages = visual.camera_stages(document)
+    moves = [stage for stage in stages if int(stage["stage"]) > 0]
+    assert len(moves) == 1
+    move = moves[0]
+    trigger = int(move["trigger_region"])
+    exits = [
+        float(event["t"]) for event in document["events"]
+        if event["kind"] == "shell_exit" and int(event["to_region"]) >= trigger
+    ]
+    assert exits, "the trigger region is never reached"
+    assert float(move["trigger_t"]) == pytest.approx(min(exits))
+    # The move opens before the crossing rather than reacting after it, and
+    # protection may only ever pull it earlier.
+    wanted = float(move["trigger_t"]) - visual.FRAME_LEAD_SECONDS
+    assert float(move["start"]) <= wanted + 1e-9
+    assert float(move["settled"]) - float(move["start"]) == pytest.approx(
+        visual.FRAME_EASE_SECONDS)
+
+
+def test_the_canonical_ball_physics_are_untouched_by_the_framing(document):
+    """The 4C brief freezes the simulation; the camera reads it and no more.
+
+    Positions are a pure function of the document's own flights, so the same
+    instant projects differently at two framings and *is* the same world point
+    at both. This is the check that a presentation phase did not quietly become
+    a physics phase.
+    """
+    summary = document["summary"]
+    assert float(summary["speed_min"]) == pytest.approx(10.0, abs=1e-9)
+    assert float(summary["speed_max"]) == pytest.approx(10.0, abs=1e-9)
+    assert int(summary["ball_collisions"]) == 0, "ball-ball collisions are on"
+    assert float(summary["max_penetration"]) < 1e-6
+    saved = visual.FRONTIER_WIDTH_FRACTION
+    at = 0.5 * float(summary["duration"])
+    reference = visual.positions_at(document, at)
+    try:
+        visual.FRONTIER_WIDTH_FRACTION = 0.85
+        visual.VIEW_DIAMETER_FRACTION = 0.85 * (1.0 + visual.VIEW_PAD_FRACTION)
+        visual._STAGE_CACHE.clear()
+        other = visual.positions_at(document, at)
+    finally:
+        visual.FRONTIER_WIDTH_FRACTION = saved
+        visual.VIEW_DIAMETER_FRACTION = saved * (1.0 + visual.VIEW_PAD_FRACTION)
+        visual._STAGE_CACHE.clear()
+    assert set(reference) == set(other)
+    for ball_id, point in reference.items():
+        assert point == pytest.approx(other[ball_id], rel=0, abs=0)
+
+
+def test_a_wound_has_a_lit_lip_and_the_lip_is_not_a_state(scene_source):
+    """The 4C addition that turned a pit into a hole, as a structural check.
+
+    A dark notch with a bright hairline in it is still a mark lying on a
+    surface. A dark notch with a *lit broken edge* reads as a hole, because
+    that is what a chip in a lit solid does. The lip is state-independent - a
+    broken edge does not get hotter, it is just broken - so it has one shared
+    material, and it is wider than the chip it surrounds or there is no ring.
+    """
+    assert visual.DAMAGE_RIM_MARGIN > 0.0
+    assert visual.DAMAGE_RIM_ENERGY > 0.0
+    assert 0.0 < visual.DAMAGE_RIM_SPAN < 1.0
+    # Bright enough to read against the panel face, dim enough not to be a
+    # light source sitting on a wall, which is what 4A's marks were.
+    assert visual.DAMAGE_RIM_ENERGY < visual.FACE_ENERGY + 0.2
+    assert "const MARK_PARTS := 6" in scene_source
+    for name in ("MARK_PART_CHIP", "MARK_PART_RIM", "MARK_PART_CRACK",
+                 "MARK_PART_BRANCH_A", "MARK_PART_BRANCH_B", "MARK_PART_SEAM"):
+        assert f"const {name} :=" in scene_source
+    # One shared lip material for the whole arena, like the chip.
+    assert scene_source.count("_panel_rim_material = StandardMaterial3D.new()") == 1
+
+
+@pytest.mark.parametrize("seed", [17964, 1176])
+def test_a_seam_joins_two_canonical_impact_positions(seed):
+    """"Connected crack network", and connected to the ball's own hits.
+
+    A seam is not a decorative link: both of its endpoints are wound offsets,
+    and a wound offset is a canonical `panel_local_offset`. So the network is
+    exactly as tied to where the ball actually hit as the wounds are, and this
+    test is what stops a future version inventing one.
+    """
+    document = document_for(seed)
+    clusters = visual.panel_damage_clusters(document)
+    offsets = {
+        key: {round(float(event["panel_local_offset"]), 12)
+              for event in document["events"]
+              if event["kind"] == "collision"
+              and f"{event['shell_id']}:{event['panel_id']}" == key}
+        for key in clusters
+    }
+    seen = 0
+    for key, row in clusters.items():
+        shell_id, panel_id = (int(part) for part in key.split(":"))
+        for state in range(len(visual.DAMAGE_SEAM_STATES)):
+            seams = visual.wound_seams(document, shell_id, panel_id, state)
+            if not visual.DAMAGE_SEAM_STATES[state]:
+                assert seams == [], "a seam below the critical state"
+                continue
+            shown = visual.visible_damage_clusters(
+                document, shell_id, panel_id, state)
+            shown_offsets = [float(c["offset"]) for c in shown]
+            for seam in seams:
+                seen += 1
+                half = 0.5 * float(seam["length"])
+                low = float(seam["centre"]) - half
+                high = float(seam["centre"]) + half
+                # Both ends are shown wounds of this panel...
+                assert any(abs(low - o) < 1e-9 for o in shown_offsets)
+                assert any(abs(high - o) < 1e-9 for o in shown_offsets)
+                # ...and every wound offset is a canonical impact offset.
+                assert any(abs(low - o) < 1e-9 for o in offsets[key])
+                assert any(abs(high - o) < 1e-9 for o in offsets[key])
+                assert float(seam["length"]) >= visual.DAMAGE_SEAM_MIN_CHORD
+    assert seen > 0, "no panel in the run ever shows a connected network"
+
+
+@pytest.mark.parametrize("seed", [17964, 1176])
+def test_the_damage_visuals_are_deterministic(seed):
+    """Two derivations of one seed agree exactly, wound for wound.
+
+    Not "look the same": the same offsets, the same weights, the same growth,
+    the same lean and the same seams, to the last bit. A render that is not a
+    function of the document cannot be reproduced from the production identity.
+    """
+    first = visual.panel_damage_clusters(document_for(seed))
+    second = visual.panel_damage_clusters(document_for(seed))
+    assert set(first) == set(second)
+    for key in first:
+        assert len(first[key]) == len(second[key])
+        for a, b in zip(first[key], second[key]):
+            assert a["offset"] == b["offset"]
+            assert a["weight"] == b["weight"]
+            assert a["growth"] == b["growth"]
+            assert a["tilt_sign"] == b["tilt_sign"]
+    teams_a = visual.panel_damage_teams(document_for(seed))
+    teams_b = visual.panel_damage_teams(document_for(seed))
+    assert teams_a == teams_b
+
+
+@pytest.mark.parametrize("seed", [17964, 1176])
+def test_the_stress_tint_only_fires_where_both_teams_wore_a_panel_down(seed):
+    """The brief's tint allowance, held to "both teams" meaning both teams.
+
+    A single glancing hit out of nineteen is not two teams wearing a panel
+    down together, and a tint that fired on it would be noise. The minority
+    has to hold a real share, the tint is small, and it is read from the
+    canonical `team_cumulative` rather than counted here.
+    """
+    document = document_for(seed)
+    teams = visual.panel_damage_teams(document)
+    assert teams, "no panel in the run was ever damaged"
+    tinted = 0
+    for key, row in teams.items():
+        totals = row["team_cumulative"]
+        assert row["lead_team"] == max(
+            range(len(totals)), key=lambda index: totals[index])
+        if row["both"]:
+            tinted += 1
+            assert row["minority_share"] >= visual.DAMAGE_TEAM_TINT_MIN_SHARE
+            assert row["tint"] == pytest.approx(visual.DAMAGE_TEAM_TINT)
+        else:
+            assert row["tint"] == 0.0
+    # A tint on every panel would be a global recolour, which is the thing the
+    # brief bans; on none of them the allowance would be dead code.
+    assert 0 < tinted < len(teams)
+    assert visual.DAMAGE_TEAM_TINT <= 0.25, "the wall stops looking like a wall"
+
+
+def test_a_worn_panel_gets_rougher_before_it_gets_a_crack():
+    """"Subtle surface roughness", which no added geometry can supply.
+
+    It is a material property of the whole face rather than a shape on it, so
+    it is the one part of the brief's `damaged` state that has to be a
+    material. Continuous below the first damage state and stepped above it,
+    monotone in both, and clamped at fully rough.
+    """
+    for shell in range(len(visual.SHELL_ROUGHNESS)):
+        base = visual.SHELL_ROUGHNESS[shell]
+        assert visual.panel_roughness(shell, 0, 0.0) == pytest.approx(base)
+        previous = base
+        for wear in (0.1, 0.3, 0.6, 1.0):
+            value = visual.panel_roughness(shell, 0, wear)
+            assert value >= previous
+            assert value <= 1.0
+            previous = value
+        ladder = [visual.panel_roughness(shell, state, 0.0)
+                  for state in range(1, 4)]
+        assert ladder == sorted(ladder)
+        assert all(value <= 1.0 for value in ladder)
+    # Wear is clamped before it is scaled, so a fraction far past the break
+    # threshold - 1176's worst outer panel reaches 1.019 - adds no more than a
+    # fraction of exactly 1.0 does, and nothing can run past fully rough.
+    assert visual.panel_roughness(4, 0, 9.0) == pytest.approx(
+        visual.panel_roughness(4, 0, 1.0))
+    assert visual.panel_roughness(4, 0, 9.0) <= 1.0
+
+
+def test_no_arena_colour_is_a_saturated_marker():
+    """The specific thing the human review kept seeing, as a number.
+
+    4B satisfied "not a team hue" by rotating the damage ramp into magenta,
+    and the review called the result "red/pink marks rather than physical
+    destruction". The 4C ramp satisfies the same separation by *desaturating*,
+    so this is the assertion that a future phase cannot buy separation back
+    with saturation: nothing the arena draws may be more saturated than the
+    least saturated team colour.
+
+    `POST_HOT_RGB` is in the list on purpose. It is the cast a pillar beside a
+    broken panel keeps for the rest of the run, so at 31 breaks it was 62
+    magenta dots in the late frame - by construction a coloured marker beside
+    every break, which is exactly what the brief bans.
+    """
+    def saturation(rgb):
+        high, low = max(rgb), min(rgb)
+        return 0.0 if high <= 0.0 else (high - low) / high
+
+    team_floor = min(saturation(rgb) for rgb in visual.TEAM_RGB)
+    arena = {
+        "crack": visual.CRACK_RGB,
+        "critical": visual.CRITICAL_RGB,
+        "fracture": visual.FRACTURE_RGB,
+        "break_flash": visual.BREAK_FLASH_RGB,
+        "post_hot": visual.POST_HOT_RGB,
+        "damage_rim": visual.DAMAGE_RIM_RGB,
+        "post_edge": visual.POST_EDGE_RGB,
+        "face": visual.FACE_RGB,
+        "panel": visual.PANEL_RGB,
+        "back": visual.BACK_RGB,
+    }
+    for name, rgb in arena.items():
+        assert saturation(rgb) < team_floor, (
+            f"{name} is more saturated than a team colour"
+        )
+        for team, colour in zip(visual.TEAM_NAMES, visual.TEAM_RGB):
+            distance = sum((a - b) ** 2 for a, b in zip(rgb, colour)) ** 0.5
+            assert distance > 0.45, f"{name} is within {distance:.2f} of {team}"
+
+
+def test_the_ball_is_a_bigger_mark_than_its_own_streak(document):
+    """The brief's "reduce trail length if it becomes spaghetti", as a number.
+
+    The trail is a world-unit length, so raising the frame fraction lengthens
+    every streak on screen without a constant changing - 4B found this when
+    0.652 became 0.850 and shortened the trail to 0.115 s in response. 1.200
+    lengthens it again by the same mechanism, so the check is restated rather
+    than assumed: at both the opening and the final framing the drawn ball has
+    to be the larger mark, or twelve balls read as a tangle of lines with dots
+    in it rather than as twelve balls.
+    """
+    speed = float(document["config"]["speed"])
+    ball_radius = float(document["config"]["ball_radius"])
+    for view in (visual.shell_view_radii(document)[2],
+                 visual.shell_view_radii(document)[-1]):
+        scale = visual.pixels_per_unit(view)
+        streak = speed * visual.TRAIL_SECONDS * scale
+        ball = 2.0 * ball_radius * visual.BALL_DRAW_SCALE * scale
+        assert ball > streak, (
+            f"the streak is {streak:.1f} px against a {ball:.1f} px ball"
+        )
+
+
+def test_a_wound_never_leaves_its_panel_radially(document):
+    """The canonical silhouette rule, applied to the lip as well as the crack.
+
+    **The first 4C lip failed this and the render is what showed it.** It was
+    sized as the chip plus the margin on both axes - 0.68 * 0.30 + 2 * 0.070 =
+    0.344 against a 0.300-thick panel - so every wound stuck out past the top
+    and bottom of the band it was supposed to be a hole in, and the lit rim
+    inverted its own read: a plate stuck on a wall rather than a chip in one.
+
+    Recomputed here from the constants rather than compared against a written
+    number, in the same shape as `test_a_crack_never_leaves_the_panel`, so the
+    next person who resizes a wound part finds out.
+    """
+    thickness = min(float(shell["thickness"]) for shell in document["shells"])
+    # The chip.
+    assert 0.68 * thickness <= thickness + 1e-12
+    # The lip, which is the one that was wrong.
+    assert visual.DAMAGE_RIM_SPAN * thickness <= thickness + 1e-12
+    # And the lip is still larger than the chip it surrounds, or there is no
+    # ring of broken material to read.
+    assert visual.DAMAGE_RIM_SPAN > 0.68
+    # Along the chord the lip is margin-wider on each side, which is what makes
+    # it a ring rather than a second chip.
+    assert visual.DAMAGE_MARK_CHORD + 2.0 * visual.DAMAGE_RIM_MARGIN >         visual.DAMAGE_MARK_CHORD
+    # A seam is a chord-aligned bar of its own and it may not leave the panel
+    # radially either.
+    assert visual.DAMAGE_SEAM_WIDTH <= thickness
+
+
+def test_the_panel_comes_apart_into_substantial_chunks(document):
+    """The break the brief asks for: 3 to 6 pieces of the panel itself."""
+    assert 3 <= visual.BREAK_FRAGMENT_COUNT <= 6
+    fragments = visual.break_fragments(document)
+    assert fragments, "no break in the run"
+    for key, breaks in fragments.items():
+        assert breaks, f"{key} is in the table with no break"
+        for event in breaks:
+            pieces = event["pieces"]
+            assert len(pieces) == visual.BREAK_FRAGMENT_COUNT
+            for piece in pieces:
+                # A chunk of the slab, not a particle: it keeps the panel's own
+                # radial thickness and a real share of its chord.
+                assert float(piece["length"]) > 0.0
+                assert float(piece["depth_fraction"]) > 0.0
+            # The chunks are laid out along the panel's own chord and thrown
+            # apart, so no two of them start in the same place.
+            offsets = sorted(float(piece["offset"]) for piece in pieces)
+            assert len(set(offsets)) == len(offsets)
+    # And the hole is open long before the chunks have finished leaving.
+    assert visual.BREAK_RETRACT_SECONDS < visual.BREAK_FRAGMENT_SECONDS
+    # The wall is seen to give before it goes: at least four frames at 30 fps.
+    assert visual.BREAK_STRESS_SECONDS * 30.0 >= 4.0

@@ -1,0 +1,4199 @@
+{
+ "kind": "category3_two_team_shell_race_phase4c_measurements",
+ "render_config_digest": "e438b716da30f062",
+ "frame_fraction": 1.2,
+ "camera_stage_plan": [
+  [
+   0,
+   2
+  ],
+  [
+   2,
+   4
+  ]
+ ],
+ "frame_ease_seconds": 0.4,
+ "seeds": {
+  "17964": {
+   "seed": 17964,
+   "summary": {
+    "seed": 17964,
+    "escaped": true,
+    "escape_ball": 11,
+    "winner_team": 1,
+    "winner_team_name": "orange",
+    "winner_generation": 3,
+    "winner_route": "opening",
+    "win_margin_seconds": 4.468706036109214,
+    "team_balls": [
+     9,
+     9
+    ],
+    "team_spawns": [
+     8,
+     8
+    ],
+    "team_collisions": [
+     253,
+     189
+    ],
+    "team_damage": [
+     157.77177515399438,
+     140.63706806828574
+    ],
+    "team_breaks": [
+     16,
+     15
+    ],
+    "team_crossings": [
+     29,
+     49
+    ],
+    "team_frontier": [
+     4,
+     5
+    ],
+    "population_lead_changes": 2,
+    "frontier_lead_changes": 1,
+    "max_population_lead": 2,
+    "failure_reason": null,
+    "duration": 25.775764133147725,
+    "escape_time": 25.775764133147725,
+    "frontier_region": 5,
+    "collisions": 442,
+    "ball_collisions": 0,
+    "near_misses": 64,
+    "breaks": 31,
+    "grazing_collisions": 0,
+    "spawns": 16,
+    "spawns_suppressed": 0,
+    "max_population": 18,
+    "max_generation": 4,
+    "max_penetration": 7.759570763710144e-12,
+    "min_spawn_clearance": 0.2023223625142645,
+    "speed_min": 9.999999999999998,
+    "speed_max": 10.000000000000002,
+    "max_speed_correction": 0.8795624032242895,
+    "mean_speed_correction": 0.08623326368902197,
+    "anomalous_crossings": 0,
+    "newton_failures": 0,
+    "reproduction_violations": 0,
+    "digest": "0c8a934bd159c704cc02739adaca9b247dc4b55b45175dafe2ad37cca87c79bd",
+    "team_digest": "199db57c2ff0e75c0e782fdaf84158967f16545564b2954c7a19d23b45b1d0ce"
+   },
+   "camera_stages": [
+    {
+     "stage": 0,
+     "trigger_region": null,
+     "extent_shell": 2,
+     "trigger_t": 0.0,
+     "start": 0.0,
+     "settled": 0.0,
+     "deferred": 0.0,
+     "radius": 13.345749999999999
+    },
+    {
+     "stage": 1,
+     "trigger_region": 2,
+     "extent_shell": 4,
+     "trigger_t": 4.773970042431505,
+     "start": 4.633970042431505,
+     "settled": 5.0339700424315055,
+     "deferred": 0.0,
+     "radius": 19.675749999999997
+    }
+   ],
+   "camera_lock_time": 5.0339700424315055,
+   "static_tail_seconds": 20.74179409071622,
+   "zoom_ratio": 1.4743083003952568,
+   "centring": {
+    "samples": 241,
+    "arena_centre_x_fraction": 0.5,
+    "arena_centre_y_fraction": 0.45,
+    "arena_centre_px": [
+     540.0,
+     864.0
+    ],
+    "lateral_offset_from_frame_centre_px": 0.0,
+    "max_lateral_movement_px": 0.0,
+    "max_vertical_movement_px": 0.0,
+    "outer_material_radius_px": 648.0,
+    "rail_left_px": 907.1999999999999,
+    "rail_clearance_px": -280.80000000000007,
+    "left_margin_px": -108.0,
+    "centred": true,
+    "stationary": true
+   },
+   "safe_area": {
+    "safe_area": "shorts_conservative",
+    "fingerprint": "3776358f1bf13326",
+    "final_view_radius": 19.675749999999997,
+    "pixels_per_unit": 34.74530831099196,
+    "arena_radius_px": 648.0,
+    "arena_regions": [
+     {
+      "region": "action_rail",
+      "clearance_px": -280.80000000000007,
+      "clear": false
+     },
+     {
+      "region": "title_block",
+      "clearance_px": 100.79999999999995,
+      "clear": true
+     },
+     {
+      "region": "progress_bar",
+      "clearance_px": 292.79999999999995,
+      "clear": true
+     },
+     {
+      "region": "nav_bar",
+      "clearance_px": 331.1999999999998,
+      "clear": true
+     },
+     {
+      "region": "top_bar",
+      "clearance_px": 100.79999999999995,
+      "clear": true
+     }
+    ],
+    "arena_clear": false,
+    "min_clearance_px": -280.80000000000007,
+    "ball_hidden_frames": 189,
+    "ball_hidden_seconds": 6.3,
+    "ball_hidden_longest_seconds": 3.3666666666666667,
+    "ball_hidden_budget_seconds": 0.25,
+    "ball_hidden_by_region": {
+     "action_rail": 297,
+     "title_block": 0,
+     "progress_bar": 0,
+     "nav_bar": 0,
+     "top_bar": 0
+    },
+    "ball_pass": false
+   },
+   "readability": {
+    "fps": 30.0,
+    "peak_population": 18,
+    "peak_population_t": 25.70907392840478,
+    "population_by_third": [
+     6,
+     11,
+     18
+    ],
+    "population_first_frame": 2,
+    "teams_on_screen_max": 2,
+    "max_on_screen_by_team": [
+     9,
+     9
+    ],
+    "mixed_cluster_frames": 86,
+    "mixed_cluster_fraction": 0.1111111111111111,
+    "largest_mixed_cluster": 3,
+    "closest_pair_diameters": 0.047039414555037184,
+    "closest_pair_t": 10.670432758870986,
+    "largest_cluster": 3,
+    "largest_cluster_t": 20.20713203711193,
+    "longest_triple_merge_seconds": 0.36666666666666664,
+    "longest_triple_merge_t": 24.708720857260627,
+    "blob_deficit_frames": 325,
+    "blob_deficit_fraction": 0.4198966408268734,
+    "mean_blobs_per_ball": 0.9322783005417736,
+    "max_step_diameters": 0.6040018889160531,
+    "max_step_t": 4.9017300486063595,
+    "strobes": false
+   },
+   "damage": {
+    "states_reached": {
+     "damaged": 64,
+     "critical": 34,
+     "fractured": 27,
+     "broken": 62
+    },
+    "panel_chord_px_when_reached": {
+     "damaged": {
+      "min": 52.851015650894,
+      "median": 54.515651552565984,
+      "max": 129.91627451888255
+     },
+     "critical": {
+      "min": 52.851015650894,
+      "median": 54.515651552565984,
+      "max": 129.91627451888255
+     },
+     "fractured": {
+      "min": 52.851015650894,
+      "median": 54.515651552565984,
+      "max": 88.12015403023402
+     },
+     "broken": {
+      "min": 52.851015650894,
+      "median": 59.27759230604128,
+      "max": 129.91627451888255
+     }
+    },
+    "final_counts": {
+     "healthy": 136,
+     "damaged": 29,
+     "critical": 8,
+     "fractured": 4,
+     "broken": 31,
+     "panels": 208
+    },
+    "damaged_or_worse_at_end": 72,
+    "broken_at_end": 31,
+    "shared_breaks": 30,
+    "timeline": [
+     {
+      "t": 0.0,
+      "healthy": 208,
+      "damaged": 0,
+      "critical": 0,
+      "fractured": 0,
+      "broken": 0,
+      "panels": 208
+     },
+     {
+      "t": 0.21479803444289772,
+      "healthy": 208,
+      "damaged": 0,
+      "critical": 0,
+      "fractured": 0,
+      "broken": 0,
+      "panels": 208
+     },
+     {
+      "t": 0.42959606888579543,
+      "healthy": 208,
+      "damaged": 0,
+      "critical": 0,
+      "fractured": 0,
+      "broken": 0,
+      "panels": 208
+     },
+     {
+      "t": 0.6443941033286931,
+      "healthy": 206,
+      "damaged": 1,
+      "critical": 1,
+      "fractured": 0,
+      "broken": 0,
+      "panels": 208
+     },
+     {
+      "t": 0.8591921377715909,
+      "healthy": 206,
+      "damaged": 0,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 0,
+      "panels": 208
+     },
+     {
+      "t": 1.0739901722144887,
+      "healthy": 205,
+      "damaged": 0,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 1.2887882066573861,
+      "healthy": 205,
+      "damaged": 0,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 1.5035862411002838,
+      "healthy": 205,
+      "damaged": 0,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 1.7183842755431817,
+      "healthy": 204,
+      "damaged": 0,
+      "critical": 3,
+      "fractured": 0,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 1.9331823099860794,
+      "healthy": 204,
+      "damaged": 0,
+      "critical": 3,
+      "fractured": 0,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 2.1479803444289773,
+      "healthy": 204,
+      "damaged": 0,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 2,
+      "panels": 208
+     },
+     {
+      "t": 2.362778378871875,
+      "healthy": 204,
+      "damaged": 0,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 2,
+      "panels": 208
+     },
+     {
+      "t": 2.5775764133147723,
+      "healthy": 204,
+      "damaged": 0,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 2,
+      "panels": 208
+     },
+     {
+      "t": 2.79237444775767,
+      "healthy": 203,
+      "damaged": 0,
+      "critical": 3,
+      "fractured": 0,
+      "broken": 2,
+      "panels": 208
+     },
+     {
+      "t": 3.0071724822005677,
+      "healthy": 203,
+      "damaged": 0,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 3,
+      "panels": 208
+     },
+     {
+      "t": 3.2219705166434656,
+      "healthy": 203,
+      "damaged": 0,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 3,
+      "panels": 208
+     },
+     {
+      "t": 3.4367685510863635,
+      "healthy": 202,
+      "damaged": 1,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 3,
+      "panels": 208
+     },
+     {
+      "t": 3.651566585529261,
+      "healthy": 202,
+      "damaged": 1,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 3,
+      "panels": 208
+     },
+     {
+      "t": 3.866364619972159,
+      "healthy": 202,
+      "damaged": 1,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 3,
+      "panels": 208
+     },
+     {
+      "t": 4.081162654415056,
+      "healthy": 201,
+      "damaged": 1,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 4,
+      "panels": 208
+     },
+     {
+      "t": 4.295960688857955,
+      "healthy": 201,
+      "damaged": 1,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 4,
+      "panels": 208
+     },
+     {
+      "t": 4.510758723300852,
+      "healthy": 201,
+      "damaged": 1,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 4,
+      "panels": 208
+     },
+     {
+      "t": 4.72555675774375,
+      "healthy": 201,
+      "damaged": 1,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 4,
+      "panels": 208
+     },
+     {
+      "t": 4.940354792186648,
+      "healthy": 201,
+      "damaged": 1,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 4,
+      "panels": 208
+     },
+     {
+      "t": 5.1551528266295445,
+      "healthy": 201,
+      "damaged": 1,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 4,
+      "panels": 208
+     },
+     {
+      "t": 5.369950861072442,
+      "healthy": 201,
+      "damaged": 1,
+      "critical": 1,
+      "fractured": 0,
+      "broken": 5,
+      "panels": 208
+     },
+     {
+      "t": 5.58474889551534,
+      "healthy": 199,
+      "damaged": 3,
+      "critical": 1,
+      "fractured": 0,
+      "broken": 5,
+      "panels": 208
+     },
+     {
+      "t": 5.799546929958238,
+      "healthy": 197,
+      "damaged": 3,
+      "critical": 2,
+      "fractured": 1,
+      "broken": 5,
+      "panels": 208
+     },
+     {
+      "t": 6.014344964401135,
+      "healthy": 195,
+      "damaged": 5,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 6,
+      "panels": 208
+     },
+     {
+      "t": 6.229142998844034,
+      "healthy": 194,
+      "damaged": 5,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 6.443941033286931,
+      "healthy": 194,
+      "damaged": 5,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 6.658739067729829,
+      "healthy": 194,
+      "damaged": 5,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 6.873537102172727,
+      "healthy": 194,
+      "damaged": 5,
+      "critical": 1,
+      "fractured": 1,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 7.088335136615624,
+      "healthy": 193,
+      "damaged": 6,
+      "critical": 1,
+      "fractured": 1,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 7.303133171058522,
+      "healthy": 192,
+      "damaged": 7,
+      "critical": 1,
+      "fractured": 1,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 7.51793120550142,
+      "healthy": 192,
+      "damaged": 7,
+      "critical": 1,
+      "fractured": 1,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 7.732729239944318,
+      "healthy": 191,
+      "damaged": 8,
+      "critical": 1,
+      "fractured": 1,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 7.947527274387215,
+      "healthy": 191,
+      "damaged": 6,
+      "critical": 3,
+      "fractured": 1,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 8.162325308830113,
+      "healthy": 191,
+      "damaged": 6,
+      "critical": 2,
+      "fractured": 2,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 8.377123343273011,
+      "healthy": 191,
+      "damaged": 6,
+      "critical": 2,
+      "fractured": 2,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 8.59192137771591,
+      "healthy": 190,
+      "damaged": 7,
+      "critical": 2,
+      "fractured": 1,
+      "broken": 8,
+      "panels": 208
+     },
+     {
+      "t": 8.806719412158806,
+      "healthy": 190,
+      "damaged": 7,
+      "critical": 2,
+      "fractured": 1,
+      "broken": 8,
+      "panels": 208
+     },
+     {
+      "t": 9.021517446601704,
+      "healthy": 190,
+      "damaged": 7,
+      "critical": 2,
+      "fractured": 1,
+      "broken": 8,
+      "panels": 208
+     },
+     {
+      "t": 9.236315481044603,
+      "healthy": 190,
+      "damaged": 6,
+      "critical": 2,
+      "fractured": 2,
+      "broken": 8,
+      "panels": 208
+     },
+     {
+      "t": 9.4511135154875,
+      "healthy": 190,
+      "damaged": 6,
+      "critical": 1,
+      "fractured": 3,
+      "broken": 8,
+      "panels": 208
+     },
+     {
+      "t": 9.665911549930398,
+      "healthy": 189,
+      "damaged": 7,
+      "critical": 1,
+      "fractured": 3,
+      "broken": 8,
+      "panels": 208
+     },
+     {
+      "t": 9.880709584373296,
+      "healthy": 187,
+      "damaged": 9,
+      "critical": 1,
+      "fractured": 3,
+      "broken": 8,
+      "panels": 208
+     },
+     {
+      "t": 10.095507618816193,
+      "healthy": 184,
+      "damaged": 11,
+      "critical": 1,
+      "fractured": 4,
+      "broken": 8,
+      "panels": 208
+     },
+     {
+      "t": 10.310305653259089,
+      "healthy": 182,
+      "damaged": 12,
+      "critical": 2,
+      "fractured": 3,
+      "broken": 9,
+      "panels": 208
+     },
+     {
+      "t": 10.525103687701987,
+      "healthy": 182,
+      "damaged": 11,
+      "critical": 3,
+      "fractured": 3,
+      "broken": 9,
+      "panels": 208
+     },
+     {
+      "t": 10.739901722144884,
+      "healthy": 181,
+      "damaged": 11,
+      "critical": 4,
+      "fractured": 2,
+      "broken": 10,
+      "panels": 208
+     },
+     {
+      "t": 10.954699756587782,
+      "healthy": 178,
+      "damaged": 13,
+      "critical": 4,
+      "fractured": 2,
+      "broken": 11,
+      "panels": 208
+     },
+     {
+      "t": 11.16949779103068,
+      "healthy": 178,
+      "damaged": 10,
+      "critical": 7,
+      "fractured": 2,
+      "broken": 11,
+      "panels": 208
+     },
+     {
+      "t": 11.384295825473577,
+      "healthy": 177,
+      "damaged": 10,
+      "critical": 8,
+      "fractured": 1,
+      "broken": 12,
+      "panels": 208
+     },
+     {
+      "t": 11.599093859916476,
+      "healthy": 177,
+      "damaged": 10,
+      "critical": 8,
+      "fractured": 1,
+      "broken": 12,
+      "panels": 208
+     },
+     {
+      "t": 11.813891894359374,
+      "healthy": 176,
+      "damaged": 10,
+      "critical": 9,
+      "fractured": 1,
+      "broken": 12,
+      "panels": 208
+     },
+     {
+      "t": 12.02868992880227,
+      "healthy": 176,
+      "damaged": 10,
+      "critical": 7,
+      "fractured": 3,
+      "broken": 12,
+      "panels": 208
+     },
+     {
+      "t": 12.243487963245169,
+      "healthy": 175,
+      "damaged": 10,
+      "critical": 7,
+      "fractured": 4,
+      "broken": 12,
+      "panels": 208
+     },
+     {
+      "t": 12.458285997688067,
+      "healthy": 174,
+      "damaged": 11,
+      "critical": 7,
+      "fractured": 2,
+      "broken": 14,
+      "panels": 208
+     },
+     {
+      "t": 12.673084032130964,
+      "healthy": 174,
+      "damaged": 10,
+      "critical": 8,
+      "fractured": 2,
+      "broken": 14,
+      "panels": 208
+     },
+     {
+      "t": 12.887882066573862,
+      "healthy": 173,
+      "damaged": 10,
+      "critical": 8,
+      "fractured": 2,
+      "broken": 15,
+      "panels": 208
+     },
+     {
+      "t": 13.10268010101676,
+      "healthy": 173,
+      "damaged": 10,
+      "critical": 8,
+      "fractured": 2,
+      "broken": 15,
+      "panels": 208
+     },
+     {
+      "t": 13.317478135459657,
+      "healthy": 173,
+      "damaged": 10,
+      "critical": 7,
+      "fractured": 2,
+      "broken": 16,
+      "panels": 208
+     },
+     {
+      "t": 13.532276169902556,
+      "healthy": 172,
+      "damaged": 11,
+      "critical": 7,
+      "fractured": 2,
+      "broken": 16,
+      "panels": 208
+     },
+     {
+      "t": 13.747074204345454,
+      "healthy": 169,
+      "damaged": 12,
+      "critical": 9,
+      "fractured": 2,
+      "broken": 16,
+      "panels": 208
+     },
+     {
+      "t": 13.96187223878835,
+      "healthy": 169,
+      "damaged": 11,
+      "critical": 8,
+      "fractured": 4,
+      "broken": 16,
+      "panels": 208
+     },
+     {
+      "t": 14.176670273231249,
+      "healthy": 168,
+      "damaged": 11,
+      "critical": 9,
+      "fractured": 4,
+      "broken": 16,
+      "panels": 208
+     },
+     {
+      "t": 14.391468307674147,
+      "healthy": 167,
+      "damaged": 12,
+      "critical": 9,
+      "fractured": 3,
+      "broken": 17,
+      "panels": 208
+     },
+     {
+      "t": 14.606266342117044,
+      "healthy": 166,
+      "damaged": 12,
+      "critical": 10,
+      "fractured": 1,
+      "broken": 19,
+      "panels": 208
+     },
+     {
+      "t": 14.821064376559942,
+      "healthy": 166,
+      "damaged": 11,
+      "critical": 11,
+      "fractured": 1,
+      "broken": 19,
+      "panels": 208
+     },
+     {
+      "t": 15.03586241100284,
+      "healthy": 165,
+      "damaged": 12,
+      "critical": 11,
+      "fractured": 1,
+      "broken": 19,
+      "panels": 208
+     },
+     {
+      "t": 15.250660445445737,
+      "healthy": 164,
+      "damaged": 13,
+      "critical": 11,
+      "fractured": 1,
+      "broken": 19,
+      "panels": 208
+     },
+     {
+      "t": 15.465458479888635,
+      "healthy": 164,
+      "damaged": 12,
+      "critical": 11,
+      "fractured": 2,
+      "broken": 19,
+      "panels": 208
+     },
+     {
+      "t": 15.680256514331534,
+      "healthy": 163,
+      "damaged": 13,
+      "critical": 10,
+      "fractured": 3,
+      "broken": 19,
+      "panels": 208
+     },
+     {
+      "t": 15.89505454877443,
+      "healthy": 163,
+      "damaged": 13,
+      "critical": 9,
+      "fractured": 3,
+      "broken": 20,
+      "panels": 208
+     },
+     {
+      "t": 16.10985258321733,
+      "healthy": 163,
+      "damaged": 12,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 20,
+      "panels": 208
+     },
+     {
+      "t": 16.324650617660225,
+      "healthy": 163,
+      "damaged": 12,
+      "critical": 8,
+      "fractured": 4,
+      "broken": 21,
+      "panels": 208
+     },
+     {
+      "t": 16.539448652103125,
+      "healthy": 162,
+      "damaged": 13,
+      "critical": 8,
+      "fractured": 4,
+      "broken": 21,
+      "panels": 208
+     },
+     {
+      "t": 16.754246686546022,
+      "healthy": 161,
+      "damaged": 13,
+      "critical": 9,
+      "fractured": 4,
+      "broken": 21,
+      "panels": 208
+     },
+     {
+      "t": 16.96904472098892,
+      "healthy": 161,
+      "damaged": 13,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 21,
+      "panels": 208
+     },
+     {
+      "t": 17.18384275543182,
+      "healthy": 161,
+      "damaged": 13,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 21,
+      "panels": 208
+     },
+     {
+      "t": 17.398640789874715,
+      "healthy": 160,
+      "damaged": 14,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 21,
+      "panels": 208
+     },
+     {
+      "t": 17.613438824317612,
+      "healthy": 160,
+      "damaged": 14,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 21,
+      "panels": 208
+     },
+     {
+      "t": 17.828236858760512,
+      "healthy": 159,
+      "damaged": 15,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 21,
+      "panels": 208
+     },
+     {
+      "t": 18.04303489320341,
+      "healthy": 159,
+      "damaged": 15,
+      "critical": 8,
+      "fractured": 4,
+      "broken": 22,
+      "panels": 208
+     },
+     {
+      "t": 18.257832927646305,
+      "healthy": 159,
+      "damaged": 15,
+      "critical": 7,
+      "fractured": 5,
+      "broken": 22,
+      "panels": 208
+     },
+     {
+      "t": 18.472630962089205,
+      "healthy": 158,
+      "damaged": 16,
+      "critical": 7,
+      "fractured": 5,
+      "broken": 22,
+      "panels": 208
+     },
+     {
+      "t": 18.687428996532102,
+      "healthy": 157,
+      "damaged": 17,
+      "critical": 7,
+      "fractured": 5,
+      "broken": 22,
+      "panels": 208
+     },
+     {
+      "t": 18.902227030975,
+      "healthy": 156,
+      "damaged": 18,
+      "critical": 7,
+      "fractured": 4,
+      "broken": 23,
+      "panels": 208
+     },
+     {
+      "t": 19.1170250654179,
+      "healthy": 155,
+      "damaged": 19,
+      "critical": 7,
+      "fractured": 3,
+      "broken": 24,
+      "panels": 208
+     },
+     {
+      "t": 19.331823099860795,
+      "healthy": 154,
+      "damaged": 20,
+      "critical": 7,
+      "fractured": 2,
+      "broken": 25,
+      "panels": 208
+     },
+     {
+      "t": 19.54662113430369,
+      "healthy": 153,
+      "damaged": 21,
+      "critical": 6,
+      "fractured": 3,
+      "broken": 25,
+      "panels": 208
+     },
+     {
+      "t": 19.761419168746592,
+      "healthy": 153,
+      "damaged": 21,
+      "critical": 6,
+      "fractured": 3,
+      "broken": 25,
+      "panels": 208
+     },
+     {
+      "t": 19.97621720318949,
+      "healthy": 153,
+      "damaged": 21,
+      "critical": 5,
+      "fractured": 4,
+      "broken": 25,
+      "panels": 208
+     },
+     {
+      "t": 20.191015237632385,
+      "healthy": 153,
+      "damaged": 20,
+      "critical": 5,
+      "fractured": 4,
+      "broken": 26,
+      "panels": 208
+     },
+     {
+      "t": 20.405813272075285,
+      "healthy": 153,
+      "damaged": 20,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 28,
+      "panels": 208
+     },
+     {
+      "t": 20.620611306518178,
+      "healthy": 153,
+      "damaged": 19,
+      "critical": 5,
+      "fractured": 3,
+      "broken": 28,
+      "panels": 208
+     },
+     {
+      "t": 20.835409340961075,
+      "healthy": 153,
+      "damaged": 19,
+      "critical": 5,
+      "fractured": 3,
+      "broken": 28,
+      "panels": 208
+     },
+     {
+      "t": 21.050207375403975,
+      "healthy": 152,
+      "damaged": 20,
+      "critical": 5,
+      "fractured": 3,
+      "broken": 28,
+      "panels": 208
+     },
+     {
+      "t": 21.26500540984687,
+      "healthy": 151,
+      "damaged": 21,
+      "critical": 5,
+      "fractured": 3,
+      "broken": 28,
+      "panels": 208
+     },
+     {
+      "t": 21.479803444289768,
+      "healthy": 150,
+      "damaged": 22,
+      "critical": 5,
+      "fractured": 3,
+      "broken": 28,
+      "panels": 208
+     },
+     {
+      "t": 21.694601478732668,
+      "healthy": 149,
+      "damaged": 22,
+      "critical": 6,
+      "fractured": 2,
+      "broken": 29,
+      "panels": 208
+     },
+     {
+      "t": 21.909399513175565,
+      "healthy": 149,
+      "damaged": 22,
+      "critical": 6,
+      "fractured": 2,
+      "broken": 29,
+      "panels": 208
+     },
+     {
+      "t": 22.12419754761846,
+      "healthy": 149,
+      "damaged": 22,
+      "critical": 6,
+      "fractured": 2,
+      "broken": 29,
+      "panels": 208
+     },
+     {
+      "t": 22.33899558206136,
+      "healthy": 148,
+      "damaged": 22,
+      "critical": 6,
+      "fractured": 3,
+      "broken": 29,
+      "panels": 208
+     },
+     {
+      "t": 22.553793616504258,
+      "healthy": 148,
+      "damaged": 22,
+      "critical": 6,
+      "fractured": 3,
+      "broken": 29,
+      "panels": 208
+     },
+     {
+      "t": 22.768591650947155,
+      "healthy": 146,
+      "damaged": 24,
+      "critical": 5,
+      "fractured": 4,
+      "broken": 29,
+      "panels": 208
+     },
+     {
+      "t": 22.983389685390055,
+      "healthy": 145,
+      "damaged": 25,
+      "critical": 5,
+      "fractured": 4,
+      "broken": 29,
+      "panels": 208
+     },
+     {
+      "t": 23.19818771983295,
+      "healthy": 144,
+      "damaged": 26,
+      "critical": 5,
+      "fractured": 4,
+      "broken": 29,
+      "panels": 208
+     },
+     {
+      "t": 23.412985754275848,
+      "healthy": 144,
+      "damaged": 26,
+      "critical": 5,
+      "fractured": 4,
+      "broken": 29,
+      "panels": 208
+     },
+     {
+      "t": 23.627783788718748,
+      "healthy": 144,
+      "damaged": 26,
+      "critical": 5,
+      "fractured": 4,
+      "broken": 29,
+      "panels": 208
+     },
+     {
+      "t": 23.842581823161645,
+      "healthy": 144,
+      "damaged": 24,
+      "critical": 6,
+      "fractured": 5,
+      "broken": 29,
+      "panels": 208
+     },
+     {
+      "t": 24.05737985760454,
+      "healthy": 143,
+      "damaged": 25,
+      "critical": 6,
+      "fractured": 4,
+      "broken": 30,
+      "panels": 208
+     },
+     {
+      "t": 24.27217789204744,
+      "healthy": 143,
+      "damaged": 25,
+      "critical": 6,
+      "fractured": 4,
+      "broken": 30,
+      "panels": 208
+     },
+     {
+      "t": 24.486975926490338,
+      "healthy": 143,
+      "damaged": 25,
+      "critical": 6,
+      "fractured": 3,
+      "broken": 31,
+      "panels": 208
+     },
+     {
+      "t": 24.701773960933235,
+      "healthy": 142,
+      "damaged": 25,
+      "critical": 7,
+      "fractured": 3,
+      "broken": 31,
+      "panels": 208
+     },
+     {
+      "t": 24.916571995376135,
+      "healthy": 141,
+      "damaged": 25,
+      "critical": 8,
+      "fractured": 3,
+      "broken": 31,
+      "panels": 208
+     },
+     {
+      "t": 25.13137002981903,
+      "healthy": 139,
+      "damaged": 26,
+      "critical": 8,
+      "fractured": 4,
+      "broken": 31,
+      "panels": 208
+     },
+     {
+      "t": 25.346168064261928,
+      "healthy": 139,
+      "damaged": 26,
+      "critical": 8,
+      "fractured": 4,
+      "broken": 31,
+      "panels": 208
+     },
+     {
+      "t": 25.560966098704828,
+      "healthy": 138,
+      "damaged": 27,
+      "critical": 8,
+      "fractured": 4,
+      "broken": 31,
+      "panels": 208
+     },
+     {
+      "t": 25.775764133147725,
+      "healthy": 136,
+      "damaged": 29,
+      "critical": 8,
+      "fractured": 4,
+      "broken": 31,
+      "panels": 208
+     }
+    ]
+   },
+   "wear": {
+    "t": 25.725764133147724,
+    "shell_id": 4,
+    "panels": 66,
+    "states": {
+     "healthy": 64,
+     "damaged": 2
+    },
+    "non_healthy": 2,
+    "worn_healthy": 8,
+    "touched_healthy": 13,
+    "visibly_marked": 10,
+    "worst_wear": 0.3460227309502529,
+    "wear_floor": 0.04
+   },
+   "winner_banner": {
+    "placed": true,
+    "team_id": 1,
+    "team_name": "orange",
+    "escape_y_px": 428.293013984299,
+    "release_y_px": [
+     245.5232518143398,
+     428.293013984299
+    ],
+    "swept_y_px": [
+     221.58373438806635,
+     452.2325314105725
+    ],
+    "ball_radius_px": 23.93951742627346,
+    "top_fraction": 0.735,
+    "band_px": [
+     1411.2,
+     1612.8
+    ],
+    "moved_to_top": false,
+    "clear_of_ball": true
+   },
+   "passages": [
+    {
+     "shell_id": 2,
+     "panel_id": 44,
+     "break_t": 10.753659923626703,
+     "first_use_t": 11.155552806146991,
+     "last_use_t": 11.155552806146991,
+     "balls": 1,
+     "ball_ids": [
+      0
+     ],
+     "teams": [
+      0
+     ],
+     "both_teams": false,
+     "response_until": 11.705552806146992
+    },
+    {
+     "shell_id": 2,
+     "panel_id": 4,
+     "break_t": 11.273979055278632,
+     "first_use_t": 12.822592440856695,
+     "last_use_t": 12.822592440856695,
+     "balls": 1,
+     "ball_ids": [
+      1
+     ],
+     "teams": [
+      1
+     ],
+     "both_teams": false,
+     "response_until": 13.372592440856696
+    }
+   ],
+   "by_variant": {
+    "4B": {
+     "fraction": 0.85,
+     "frame_size": [
+      {
+       "stage": 0,
+       "extent_shell": 2,
+       "start": 0.0,
+       "settled": 0.0,
+       "view_radius": 13.345749999999999,
+       "pixels_per_unit": 36.284584980237156,
+       "camera_distance": 34.22706849710429,
+       "frontier_diameter_px": 918.0000000000001,
+       "ball_diameter_px": 38.461660079051384,
+       "ball_drawn_diameter_px": 50.000158102766804,
+       "opening_width_px": 112.63338327110118,
+       "opening_over_ball": 2.9284587051001556,
+       "wall_face_thickness_px": 10.885375494071146,
+       "wall_apparent_thickness_px": 37.69204963334374,
+       "wall_flank_px": 26.8066741392726,
+       "occupancy": {
+        "t": 0.0,
+        "material_fraction": 0.2714894591976236,
+        "ball_fraction": 0.0018938154184756177,
+        "ink_fraction": 0.2733832746160992,
+        "arena_footprint_fraction": 0.3192001319429452,
+        "empty_fraction": 0.7266167253839009
+       }
+      },
+      {
+       "stage": 1,
+       "extent_shell": 4,
+       "start": 4.633970042431505,
+       "settled": 5.0339700424315055,
+       "view_radius": 19.675749999999997,
+       "pixels_per_unit": 24.611260053619304,
+       "camera_distance": 50.46125118347786,
+       "frontier_diameter_px": 918.0,
+       "ball_diameter_px": 26.087935656836464,
+       "ball_drawn_diameter_px": 33.9143163538874,
+       "opening_width_px": 35.94550543885337,
+       "opening_over_ball": 1.3778593259230798,
+       "wall_face_thickness_px": 7.383378016085791,
+       "wall_apparent_thickness_px": 57.20422505331607,
+       "wall_flank_px": 49.82084703723029,
+       "occupancy": {
+        "t": 5.0339700424315055,
+        "material_fraction": 0.13388794691880201,
+        "ball_fraction": 0.002178216459566406,
+        "ink_fraction": 0.1360661633783684,
+        "arena_footprint_fraction": 0.31920013194294516,
+        "empty_fraction": 0.8639338366216316
+       }
+      }
+     ],
+     "critical_visibility": {
+      "safe_area": "shorts_conservative",
+      "fingerprint": "3776358f1bf13326",
+      "cover_limit": 0.34,
+      "subjects": 126,
+      "by_kind": {
+       "frontier_crossing": {
+        "count": 78,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "first_clone": {
+        "count": 1,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "passage_break": {
+        "count": 19,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "strong_near_miss": {
+        "count": 27,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "winning_escape": {
+        "count": 1,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       }
+      },
+      "worst": {
+       "what": "frontier_crossing",
+       "t": 0.5209490288424855,
+       "detail": "opening to region 1",
+       "x_px": 365.800205359478,
+       "y_px": 1016.1921660384921,
+       "radius_px": 25.000079051383402,
+       "covered": 0.0,
+       "region": "",
+       "off_frame": 0.0,
+       "visible": true
+      },
+      "hidden": [],
+      "critical_pass": true,
+      "hard_on_frame": true,
+      "worst_hard_off_frame": 0.0,
+      "pass": true
+     },
+     "containment": {
+      "fps": 60.0,
+      "frames": 1548,
+      "camera_lock_time": 5.0339700424315055,
+      "worst_ratio": 0.14497763240704187,
+      "worst_t": 24.992660762586677,
+      "worst_ball": 7,
+      "worst_overshoot_px": 0.0,
+      "outside_frames": 0,
+      "outside_before_lock": 0,
+      "outside_frame_fraction": 0.0,
+      "ball_samples": 14026,
+      "ball_samples_outside": 0,
+      "ball_sample_outside_fraction": 0.0,
+      "contained": true,
+      "contained_while_moving": true
+     },
+     "occupancy": {
+      "samples": 96,
+      "thirds": {
+       "early": {
+        "material_fraction": 0.21268120157581727,
+        "ball_fraction": 0.0026672324204891017,
+        "ink_fraction": 0.21534843399630635,
+        "arena_footprint_fraction": 0.3192001319429452,
+        "empty_fraction": 0.7846515660036937
+       },
+       "middle": {
+        "material_fraction": 0.13388794691880201,
+        "ball_fraction": 0.004233908243282202,
+        "ink_fraction": 0.13812185516208422,
+        "arena_footprint_fraction": 0.31920013194294516,
+        "empty_fraction": 0.8618781448379158
+       },
+       "late": {
+        "material_fraction": 0.13388794691880201,
+        "ball_fraction": 0.005775786870205116,
+        "ink_fraction": 0.13966373378900712,
+        "arena_footprint_fraction": 0.31920013194294516,
+        "empty_fraction": 0.8603362662109928
+       }
+      },
+      "late_minus_early_ink": -0.07568470020729923,
+      "late_not_emptier": false,
+      "min_ink_fraction": 0.1360661633783684,
+      "max_ink_fraction": 0.27527709003457473
+     }
+    },
+    "A": {
+     "fraction": 1.0,
+     "frame_size": [
+      {
+       "stage": 0,
+       "extent_shell": 2,
+       "start": 0.0,
+       "settled": 0.0,
+       "view_radius": 13.345749999999999,
+       "pixels_per_unit": 42.68774703557312,
+       "camera_distance": 29.09300822253865,
+       "frontier_diameter_px": 1080.0,
+       "ball_diameter_px": 45.24901185770751,
+       "ball_drawn_diameter_px": 58.82371541501976,
+       "opening_width_px": 132.50986267188372,
+       "opening_over_ball": 2.9284587051001556,
+       "wall_face_thickness_px": 12.806324110671936,
+       "wall_apparent_thickness_px": 49.526002107409,
+       "wall_flank_px": 36.71967799673706,
+       "occupancy": {
+        "t": 0.0,
+        "material_fraction": 0.35245115831102614,
+        "ball_fraction": 0.0026211978110389166,
+        "ink_fraction": 0.35507235612206506,
+        "arena_footprint_fraction": 0.4417994905784707,
+        "empty_fraction": 0.644927643877935
+       }
+      },
+      {
+       "stage": 1,
+       "extent_shell": 4,
+       "start": 4.633970042431505,
+       "settled": 5.0339700424315055,
+       "view_radius": 19.675749999999997,
+       "pixels_per_unit": 28.9544235924933,
+       "camera_distance": 42.89206350595619,
+       "frontier_diameter_px": 1080.0,
+       "ball_diameter_px": 30.6916890080429,
+       "ball_drawn_diameter_px": 39.89919571045577,
+       "opening_width_px": 42.28882992806279,
+       "opening_over_ball": 1.3778593259230798,
+       "wall_face_thickness_px": 8.68632707774799,
+       "wall_apparent_thickness_px": 76.33621076324525,
+       "wall_flank_px": 67.64988368549727,
+       "occupancy": {
+        "t": 5.0339700424315055,
+        "material_fraction": 0.20670882209699057,
+        "ball_fraction": 0.003014832469988106,
+        "ink_fraction": 0.20972365456697867,
+        "arena_footprint_fraction": 0.4417994905784707,
+        "empty_fraction": 0.7902763454330213
+       }
+      }
+     ],
+     "critical_visibility": {
+      "safe_area": "shorts_conservative",
+      "fingerprint": "3776358f1bf13326",
+      "cover_limit": 0.34,
+      "subjects": 126,
+      "by_kind": {
+       "frontier_crossing": {
+        "count": 78,
+        "hidden": 0,
+        "worst_covered": 0.30434782608695654,
+        "worst_off_frame": 0.0
+       },
+       "first_clone": {
+        "count": 1,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "passage_break": {
+        "count": 19,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "strong_near_miss": {
+        "count": 27,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "winning_escape": {
+        "count": 1,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       }
+      },
+      "worst": {
+       "what": "frontier_crossing",
+       "t": 20.65562841085825,
+       "detail": "break to region 3",
+       "x_px": 900.9279526376506,
+       "y_px": 853.2990218662394,
+       "radius_px": 19.949597855227886,
+       "covered": 0.30434782608695654,
+       "region": "action_rail",
+       "off_frame": 0.0,
+       "visible": true
+      },
+      "hidden": [],
+      "critical_pass": true,
+      "hard_on_frame": true,
+      "worst_hard_off_frame": 0.0,
+      "pass": true
+     },
+     "containment": {
+      "fps": 60.0,
+      "frames": 1548,
+      "camera_lock_time": 5.0339700424315055,
+      "worst_ratio": 0.47150418347052175,
+      "worst_t": 24.992660762586677,
+      "worst_ball": 7,
+      "worst_overshoot_px": 0.0,
+      "outside_frames": 0,
+      "outside_before_lock": 0,
+      "outside_frame_fraction": 0.0,
+      "ball_samples": 14026,
+      "ball_samples_outside": 0,
+      "ball_sample_outside_fraction": 0.0,
+      "contained": true,
+      "contained_while_moving": true
+     },
+     "occupancy": {
+      "samples": 96,
+      "thirds": {
+       "early": {
+        "material_fraction": 0.2894555276887022,
+        "ball_fraction": 0.00369167117022713,
+        "ink_fraction": 0.2931471988589293,
+        "arena_footprint_fraction": 0.4417994905784707,
+        "empty_fraction": 0.7068528011410706
+       },
+       "middle": {
+        "material_fraction": 0.20670882209699057,
+        "ball_fraction": 0.005860080613539382,
+        "ink_fraction": 0.21256890271052994,
+        "arena_footprint_fraction": 0.4417994905784707,
+        "empty_fraction": 0.78743109728947
+       },
+       "late": {
+        "material_fraction": 0.20670882209699057,
+        "ball_fraction": 0.00799416867848459,
+        "ink_fraction": 0.21470299077547517,
+        "arena_footprint_fraction": 0.4417994905784707,
+        "empty_fraction": 0.7852970092245248
+       }
+      },
+      "late_minus_early_ink": -0.07844420808345415,
+      "late_not_emptier": false,
+      "min_ink_fraction": 0.20972365456697867,
+      "max_ink_fraction": 0.357693553933104
+     }
+    },
+    "B": {
+     "fraction": 1.1,
+     "frame_size": [
+      {
+       "stage": 0,
+       "extent_shell": 2,
+       "start": 0.0,
+       "settled": 0.0,
+       "view_radius": 13.345749999999999,
+       "pixels_per_unit": 46.956521739130444,
+       "camera_distance": 26.44818929321695,
+       "frontier_diameter_px": 1188.0000000000002,
+       "ball_diameter_px": 49.773913043478274,
+       "ball_drawn_diameter_px": 64.70608695652176,
+       "opening_width_px": 145.76084893907213,
+       "opening_over_ball": 2.9284587051001556,
+       "wall_face_thickness_px": 14.086956521739133,
+       "wall_apparent_thickness_px": 58.214104181344545,
+       "wall_flank_px": 44.127147659605406,
+       "occupancy": {
+        "t": 0.0,
+        "material_fraction": 0.37582673260191823,
+        "ball_fraction": 0.0031716493513570913,
+        "ink_fraction": 0.37899838195327534,
+        "arena_footprint_fraction": 0.517229932455425,
+        "empty_fraction": 0.6210016180467246
+       }
+      },
+      {
+       "stage": 1,
+       "extent_shell": 4,
+       "start": 4.633970042431505,
+       "settled": 5.0339700424315055,
+       "view_radius": 19.675749999999997,
+       "pixels_per_unit": 31.849865951742636,
+       "camera_distance": 38.99278500541471,
+       "frontier_diameter_px": 1188.0000000000002,
+       "ball_diameter_px": 33.76085790884719,
+       "ball_drawn_diameter_px": 43.889115281501354,
+       "opening_width_px": 46.51771292086907,
+       "opening_over_ball": 1.3778593259230798,
+       "wall_face_thickness_px": 9.55495978552279,
+       "wall_apparent_thickness_px": 90.39042111474114,
+       "wall_flank_px": 80.83546132921836,
+       "occupancy": {
+        "t": 5.0339700424315055,
+        "material_fraction": 0.22705888799936064,
+        "ball_fraction": 0.003647947288685609,
+        "ink_fraction": 0.23070683528804625,
+        "arena_footprint_fraction": 0.517229932455425,
+        "empty_fraction": 0.7692931647119537
+       }
+      }
+     ],
+     "critical_visibility": {
+      "safe_area": "shorts_conservative",
+      "fingerprint": "3776358f1bf13326",
+      "cover_limit": 0.34,
+      "subjects": 126,
+      "by_kind": {
+       "frontier_crossing": {
+        "count": 78,
+        "hidden": 3,
+        "worst_covered": 1.0,
+        "worst_off_frame": 0.0
+       },
+       "first_clone": {
+        "count": 1,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "passage_break": {
+        "count": 19,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "strong_near_miss": {
+        "count": 27,
+        "hidden": 1,
+        "worst_covered": 0.43478260869565216,
+        "worst_off_frame": 0.0
+       },
+       "winning_escape": {
+        "count": 1,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       }
+      },
+      "worst": {
+       "what": "frontier_crossing",
+       "t": 20.65562841085825,
+       "detail": "break to region 3",
+       "x_px": 937.0207479014157,
+       "y_px": 852.2289240528634,
+       "radius_px": 21.944557640750677,
+       "covered": 1.0,
+       "region": "action_rail",
+       "off_frame": 0.0,
+       "visible": false
+      },
+      "hidden": [
+       {
+        "what": "frontier_crossing",
+        "t": 4.773970042431505,
+        "detail": "opening to region 2",
+        "x_px": 931.106424459231,
+        "y_px": 835.3152704628668,
+        "radius_px": 28.539172274327974,
+        "covered": 0.927536231884058,
+        "region": "action_rail",
+        "off_frame": 0.0,
+        "visible": false
+       },
+       {
+        "what": "strong_near_miss",
+        "t": 19.11957238509611,
+        "detail": "0.18 radii",
+        "x_px": 904.5053433074341,
+        "y_px": 992.7306716718474,
+        "radius_px": 21.944557640750677,
+        "covered": 0.43478260869565216,
+        "region": "action_rail",
+        "off_frame": 0.0,
+        "visible": false
+       },
+       {
+        "what": "frontier_crossing",
+        "t": 20.65562841085825,
+        "detail": "break to region 3",
+        "x_px": 937.0207479014157,
+        "y_px": 852.2289240528634,
+        "radius_px": 21.944557640750677,
+        "covered": 1.0,
+        "region": "action_rail",
+        "off_frame": 0.0,
+        "visible": false
+       },
+       {
+        "what": "frontier_crossing",
+        "t": 21.453180726795576,
+        "detail": "break to region 3",
+        "x_px": 908.7344267140151,
+        "y_px": 1011.6446919094612,
+        "radius_px": 21.944557640750677,
+        "covered": 0.5652173913043478,
+        "region": "action_rail",
+        "off_frame": 0.0,
+        "visible": false
+       }
+      ],
+      "critical_pass": true,
+      "hard_on_frame": true,
+      "worst_hard_off_frame": 0.0,
+      "pass": false
+     },
+     "containment": {
+      "fps": 60.0,
+      "frames": 1548,
+      "camera_lock_time": 5.0339700424315055,
+      "worst_ratio": Infinity,
+      "worst_t": 24.809381250327704,
+      "worst_ball": 7,
+      "worst_overshoot_px": 29.402960747109123,
+      "outside_frames": 64,
+      "outside_before_lock": 0,
+      "outside_frame_fraction": 0.041343669250646,
+      "ball_samples": 14026,
+      "ball_samples_outside": 64,
+      "ball_sample_outside_fraction": 0.004562954513047198,
+      "contained": false,
+      "contained_while_moving": true
+     },
+     "occupancy": {
+      "samples": 96,
+      "thirds": {
+       "early": {
+        "material_fraction": 0.31192401374486445,
+        "ball_fraction": 0.0044669221159748295,
+        "ink_fraction": 0.3163909358608393,
+        "arena_footprint_fraction": 0.517229932455425,
+        "empty_fraction": 0.6836090641391607
+       },
+       "middle": {
+        "material_fraction": 0.22705888799936064,
+        "ball_fraction": 0.0070906975423826535,
+        "ink_fraction": 0.2341495855417433,
+        "arena_footprint_fraction": 0.517229932455425,
+        "empty_fraction": 0.7658504144582567
+       },
+       "late": {
+        "material_fraction": 0.22705888799936064,
+        "ball_fraction": 0.009672944100966356,
+        "ink_fraction": 0.236731832100327,
+        "arena_footprint_fraction": 0.517229932455425,
+        "empty_fraction": 0.7632681678996731
+       }
+      },
+      "late_minus_early_ink": -0.07965910376051227,
+      "late_not_emptier": false,
+      "min_ink_fraction": 0.23070683528804625,
+      "max_ink_fraction": 0.38217003130463245
+     }
+    },
+    "C": {
+     "fraction": 1.2,
+     "frame_size": [
+      {
+       "stage": 0,
+       "extent_shell": 2,
+       "start": 0.0,
+       "settled": 0.0,
+       "view_radius": 13.345749999999999,
+       "pixels_per_unit": 51.22529644268774,
+       "camera_distance": 24.244173518782212,
+       "frontier_diameter_px": 1296.0,
+       "ball_diameter_px": 54.29881422924901,
+       "ball_drawn_diameter_px": 70.58845849802371,
+       "opening_width_px": 159.01183520626046,
+       "opening_over_ball": 2.9284587051001556,
+       "wall_face_thickness_px": 15.367588932806322,
+       "wall_apparent_thickness_px": 67.52606401889234,
+       "wall_flank_px": 52.158475086086014,
+       "occupancy": {
+        "t": 0.0,
+        "material_fraction": 0.3784317600256286,
+        "ball_fraction": 0.0037745248478960394,
+        "ink_fraction": 0.38220628487352465,
+        "arena_footprint_fraction": 0.5855488997879399,
+        "empty_fraction": 0.6177937151264754
+       }
+      },
+      {
+       "stage": 1,
+       "extent_shell": 4,
+       "start": 4.633970042431505,
+       "settled": 5.0339700424315055,
+       "view_radius": 19.675749999999997,
+       "pixels_per_unit": 34.74530831099196,
+       "camera_distance": 35.7433862549635,
+       "frontier_diameter_px": 1296.0,
+       "ball_diameter_px": 36.83002680965148,
+       "ball_drawn_diameter_px": 47.87903485254692,
+       "opening_width_px": 50.74659591367534,
+       "opening_over_ball": 1.3778593259230798,
+       "wall_face_thickness_px": 10.423592493297587,
+       "wall_apparent_thickness_px": 105.43945122833632,
+       "wall_flank_px": 95.01585873503875,
+       "occupancy": {
+        "t": 5.0339700424315055,
+        "material_fraction": 0.26169811902193124,
+        "ball_fraction": 0.0043413587567828725,
+        "ink_fraction": 0.2660394777787141,
+        "arena_footprint_fraction": 0.5855488997879399,
+        "empty_fraction": 0.7339605222212859
+       }
+      }
+     ],
+     "critical_visibility": {
+      "safe_area": "shorts_conservative",
+      "fingerprint": "3776358f1bf13326",
+      "cover_limit": 0.34,
+      "subjects": 126,
+      "by_kind": {
+       "frontier_crossing": {
+        "count": 78,
+        "hidden": 3,
+        "worst_covered": 1.0,
+        "worst_off_frame": 0.0
+       },
+       "first_clone": {
+        "count": 1,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "passage_break": {
+        "count": 19,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "strong_near_miss": {
+        "count": 27,
+        "hidden": 4,
+        "worst_covered": 1.0,
+        "worst_off_frame": 0.5652173913043479
+       },
+       "winning_escape": {
+        "count": 1,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       }
+      },
+      "worst": {
+       "what": "strong_near_miss",
+       "t": 19.11957238509611,
+       "detail": "0.18 radii",
+       "x_px": 937.642192699019,
+       "y_px": 1004.4334600056517,
+       "radius_px": 23.93951742627346,
+       "covered": 1.0,
+       "region": "action_rail",
+       "off_frame": 0.0,
+       "visible": false
+      },
+      "hidden": [
+       {
+        "what": "frontier_crossing",
+        "t": 4.773970042431505,
+        "detail": "opening to region 2",
+        "x_px": 966.6615539555246,
+        "y_px": 832.7075677776729,
+        "radius_px": 31.13364248108505,
+        "covered": 0.927536231884058,
+        "region": "action_rail",
+        "off_frame": 0.0,
+        "visible": false
+       },
+       {
+        "what": "strong_near_miss",
+        "t": 19.11957238509611,
+        "detail": "0.18 radii",
+        "x_px": 937.642192699019,
+        "y_px": 1004.4334600056517,
+        "radius_px": 23.93951742627346,
+        "covered": 1.0,
+        "region": "action_rail",
+        "off_frame": 0.0,
+        "visible": false
+       },
+       {
+        "what": "strong_near_miss",
+        "t": 19.442702484273397,
+        "detail": "0.56 radii",
+        "x_px": 912.0271453888363,
+        "y_px": 1225.310687252278,
+        "radius_px": 23.93951742627346,
+        "covered": 0.5652173913043478,
+        "region": "action_rail",
+        "off_frame": 0.0,
+        "visible": false
+       },
+       {
+        "what": "frontier_crossing",
+        "t": 20.65562841085825,
+        "detail": "break to region 3",
+        "x_px": 973.1135431651807,
+        "y_px": 851.1588262394872,
+        "radius_px": 23.93951742627346,
+        "covered": 1.0,
+        "region": "action_rail",
+        "off_frame": 0.0,
+        "visible": false
+       },
+       {
+        "what": "frontier_crossing",
+        "t": 21.453180726795576,
+        "detail": "break to region 3",
+        "x_px": 942.2557382334709,
+        "y_px": 1025.066936628503,
+        "radius_px": 23.93951742627346,
+        "covered": 1.0,
+        "region": "action_rail",
+        "off_frame": 0.0,
+        "visible": false
+       },
+       {
+        "what": "strong_near_miss",
+        "t": 21.50352207021098,
+        "detail": "0.32 radii",
+        "x_px": 920.0943451570968,
+        "y_px": 1038.2047695469391,
+        "radius_px": 23.93951742627346,
+        "covered": 0.8260869565217391,
+        "region": "action_rail",
+        "off_frame": 0.0,
+        "visible": false
+       },
+       {
+        "what": "strong_near_miss",
+        "t": 25.19175144188135,
+        "detail": "0.57 radii",
+        "x_px": 1080.667272482746,
+        "y_px": 554.9673106269486,
+        "radius_px": 23.93951742627346,
+        "covered": 0.5652173913043479,
+        "region": "off_frame",
+        "off_frame": 0.5652173913043479,
+        "visible": false
+       }
+      ],
+      "critical_pass": true,
+      "hard_on_frame": true,
+      "worst_hard_off_frame": 0.0,
+      "pass": false
+     },
+     "containment": {
+      "fps": 60.0,
+      "frames": 1548,
+      "camera_lock_time": 5.0339700424315055,
+      "worst_ratio": Infinity,
+      "worst_t": 23.676380629090445,
+      "worst_ball": 7,
+      "worst_overshoot_px": 81.16686626957343,
+      "outside_frames": 132,
+      "outside_before_lock": 0,
+      "outside_frame_fraction": 0.08527131782945736,
+      "ball_samples": 14026,
+      "ball_samples_outside": 209,
+      "ball_sample_outside_fraction": 0.014900898331669757,
+      "contained": false,
+      "contained_while_moving": true
+     },
+     "occupancy": {
+      "samples": 96,
+      "thirds": {
+       "early": {
+        "material_fraction": 0.3285826038301231,
+        "ball_fraction": 0.005316006485127067,
+        "ink_fraction": 0.3338986103152502,
+        "arena_footprint_fraction": 0.5855488997879399,
+        "empty_fraction": 0.6661013896847499
+       },
+       "middle": {
+        "material_fraction": 0.26169811902193124,
+        "ball_fraction": 0.008438516083496708,
+        "ink_fraction": 0.27013663510542796,
+        "arena_footprint_fraction": 0.5855488997879399,
+        "empty_fraction": 0.729863364894572
+       },
+       "late": {
+        "material_fraction": 0.26169811902193124,
+        "ball_fraction": 0.01139956783232664,
+        "ink_fraction": 0.2730976868542579,
+        "arena_footprint_fraction": 0.5855488997879399,
+        "empty_fraction": 0.7269023131457422
+       }
+      },
+      "late_minus_early_ink": -0.06080092346099231,
+      "late_not_emptier": false,
+      "min_ink_fraction": 0.2660394777787141,
+      "max_ink_fraction": 0.38598080972142074
+     }
+    }
+   }
+  },
+  "1176": {
+   "seed": 1176,
+   "summary": {
+    "seed": 1176,
+    "escaped": true,
+    "escape_ball": 10,
+    "winner_team": 1,
+    "winner_team_name": "orange",
+    "winner_generation": 4,
+    "winner_route": "break",
+    "win_margin_seconds": 8.73679200625441,
+    "team_balls": [
+     5,
+     7
+    ],
+    "team_spawns": [
+     4,
+     6
+    ],
+    "team_collisions": [
+     125,
+     210
+    ],
+    "team_damage": [
+     80.31587295013337,
+     156.45938244891246
+    ],
+    "team_breaks": [
+     4,
+     16
+    ],
+    "team_crossings": [
+     21,
+     26
+    ],
+    "team_frontier": [
+     3,
+     5
+    ],
+    "population_lead_changes": 2,
+    "frontier_lead_changes": 2,
+    "max_population_lead": 2,
+    "failure_reason": null,
+    "duration": 23.765145819199738,
+    "escape_time": 23.765145819199738,
+    "frontier_region": 5,
+    "collisions": 335,
+    "ball_collisions": 0,
+    "near_misses": 22,
+    "breaks": 20,
+    "grazing_collisions": 0,
+    "spawns": 10,
+    "spawns_suppressed": 0,
+    "max_population": 12,
+    "max_generation": 5,
+    "max_penetration": 9.17999010141557e-12,
+    "min_spawn_clearance": 0.06699552712633983,
+    "speed_min": 9.999999999999998,
+    "speed_max": 10.000000000000002,
+    "max_speed_correction": 0.9606299386737962,
+    "mean_speed_correction": 0.05852454982974816,
+    "anomalous_crossings": 0,
+    "newton_failures": 0,
+    "reproduction_violations": 0,
+    "digest": "312617c9151f80be3a4cee1837ca53fd18a01864ddc0b913c223be5251b3f16d",
+    "team_digest": "281147e1eb181caf139fceb5f3ef0dd0af04f01e49bb64de87466654ac5d91c8"
+   },
+   "camera_stages": [
+    {
+     "stage": 0,
+     "trigger_region": null,
+     "extent_shell": 2,
+     "trigger_t": 0.0,
+     "start": 0.0,
+     "settled": 0.0,
+     "deferred": 0.0,
+     "radius": 13.345749999999999
+    },
+    {
+     "stage": 1,
+     "trigger_region": 2,
+     "extent_shell": 4,
+     "trigger_t": 12.096635759753728,
+     "start": 11.956635759753727,
+     "settled": 12.356635759753727,
+     "deferred": 0.0,
+     "radius": 19.675749999999997
+    }
+   ],
+   "camera_lock_time": 12.356635759753727,
+   "static_tail_seconds": 11.40851005944601,
+   "zoom_ratio": 1.4743083003952568,
+   "centring": {
+    "samples": 241,
+    "arena_centre_x_fraction": 0.5,
+    "arena_centre_y_fraction": 0.45,
+    "arena_centre_px": [
+     540.0,
+     864.0
+    ],
+    "lateral_offset_from_frame_centre_px": 0.0,
+    "max_lateral_movement_px": 0.0,
+    "max_vertical_movement_px": 0.0,
+    "outer_material_radius_px": 648.0,
+    "rail_left_px": 907.1999999999999,
+    "rail_clearance_px": -280.80000000000007,
+    "left_margin_px": -108.0,
+    "centred": true,
+    "stationary": true
+   },
+   "safe_area": {
+    "safe_area": "shorts_conservative",
+    "fingerprint": "3776358f1bf13326",
+    "final_view_radius": 19.675749999999997,
+    "pixels_per_unit": 34.74530831099196,
+    "arena_radius_px": 648.0,
+    "arena_regions": [
+     {
+      "region": "action_rail",
+      "clearance_px": -280.80000000000007,
+      "clear": false
+     },
+     {
+      "region": "title_block",
+      "clearance_px": 100.79999999999995,
+      "clear": true
+     },
+     {
+      "region": "progress_bar",
+      "clearance_px": 292.79999999999995,
+      "clear": true
+     },
+     {
+      "region": "nav_bar",
+      "clearance_px": 331.1999999999998,
+      "clear": true
+     },
+     {
+      "region": "top_bar",
+      "clearance_px": 100.79999999999995,
+      "clear": true
+     }
+    ],
+    "arena_clear": false,
+    "min_clearance_px": -280.80000000000007,
+    "ball_hidden_frames": 100,
+    "ball_hidden_seconds": 3.3333333333333335,
+    "ball_hidden_longest_seconds": 0.7,
+    "ball_hidden_budget_seconds": 0.25,
+    "ball_hidden_by_region": {
+     "action_rail": 123,
+     "title_block": 0,
+     "progress_bar": 0,
+     "nav_bar": 0,
+     "top_bar": 0
+    },
+    "ball_pass": false
+   },
+   "readability": {
+    "fps": 30.0,
+    "peak_population": 12,
+    "peak_population_t": 23.631821017970008,
+    "population_by_third": [
+     3,
+     9,
+     12
+    ],
+    "population_first_frame": 2,
+    "teams_on_screen_max": 2,
+    "max_on_screen_by_team": [
+     5,
+     7
+    ],
+    "mixed_cluster_frames": 51,
+    "mixed_cluster_fraction": 0.07142857142857142,
+    "largest_mixed_cluster": 3,
+    "closest_pair_diameters": 0.05630845252787713,
+    "closest_pair_t": 21.765273800753757,
+    "largest_cluster": 3,
+    "largest_cluster_t": 22.631885008747012,
+    "longest_triple_merge_seconds": 0.2,
+    "longest_triple_merge_t": 22.79854101028418,
+    "blob_deficit_frames": 369,
+    "blob_deficit_fraction": 0.5168067226890757,
+    "mean_blobs_per_ball": 0.891510474090408,
+    "max_step_diameters": 0.5787591583519548,
+    "max_step_t": 12.232550512827915,
+    "strobes": false
+   },
+   "damage": {
+    "states_reached": {
+     "damaged": 53,
+     "critical": 33,
+     "fractured": 23,
+     "broken": 40
+    },
+    "panel_chord_px_when_reached": {
+     "damaged": {
+      "min": 52.851015650894,
+      "median": 59.27759230604128,
+      "max": 129.91627451888255
+     },
+     "critical": {
+      "min": 54.515651552565984,
+      "median": 59.27759230604128,
+      "max": 129.91627451888255
+     },
+     "fractured": {
+      "min": 54.515651552565984,
+      "median": 59.27759230604128,
+      "max": 129.91627451888255
+     },
+     "broken": {
+      "min": 54.515651552565984,
+      "median": 88.12015403023402,
+      "max": 129.91627451888255
+     }
+    },
+    "final_counts": {
+     "healthy": 150,
+     "damaged": 19,
+     "critical": 11,
+     "fractured": 8,
+     "broken": 20,
+     "panels": 208
+    },
+    "damaged_or_worse_at_end": 58,
+    "broken_at_end": 20,
+    "shared_breaks": 20,
+    "timeline": [
+     {
+      "t": 0.0,
+      "healthy": 208,
+      "damaged": 0,
+      "critical": 0,
+      "fractured": 0,
+      "broken": 0,
+      "panels": 208
+     },
+     {
+      "t": 0.1980428818266645,
+      "healthy": 208,
+      "damaged": 0,
+      "critical": 0,
+      "fractured": 0,
+      "broken": 0,
+      "panels": 208
+     },
+     {
+      "t": 0.396085763653329,
+      "healthy": 208,
+      "damaged": 0,
+      "critical": 0,
+      "fractured": 0,
+      "broken": 0,
+      "panels": 208
+     },
+     {
+      "t": 0.5941286454799933,
+      "healthy": 208,
+      "damaged": 0,
+      "critical": 0,
+      "fractured": 0,
+      "broken": 0,
+      "panels": 208
+     },
+     {
+      "t": 0.792171527306658,
+      "healthy": 207,
+      "damaged": 0,
+      "critical": 1,
+      "fractured": 0,
+      "broken": 0,
+      "panels": 208
+     },
+     {
+      "t": 0.9902144091333225,
+      "healthy": 204,
+      "damaged": 2,
+      "critical": 1,
+      "fractured": 0,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 1.1882572909599867,
+      "healthy": 204,
+      "damaged": 1,
+      "critical": 2,
+      "fractured": 0,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 1.3863001727866513,
+      "healthy": 204,
+      "damaged": 1,
+      "critical": 1,
+      "fractured": 1,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 1.584343054613316,
+      "healthy": 204,
+      "damaged": 1,
+      "critical": 1,
+      "fractured": 1,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 1.7823859364399803,
+      "healthy": 202,
+      "damaged": 3,
+      "critical": 1,
+      "fractured": 1,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 1.980428818266645,
+      "healthy": 201,
+      "damaged": 4,
+      "critical": 1,
+      "fractured": 1,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 2.1784717000933096,
+      "healthy": 200,
+      "damaged": 5,
+      "critical": 1,
+      "fractured": 1,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 2.3765145819199733,
+      "healthy": 200,
+      "damaged": 4,
+      "critical": 2,
+      "fractured": 1,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 2.574557463746638,
+      "healthy": 200,
+      "damaged": 4,
+      "critical": 2,
+      "fractured": 1,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 2.7726003455733026,
+      "healthy": 199,
+      "damaged": 5,
+      "critical": 2,
+      "fractured": 1,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 2.9706432273999672,
+      "healthy": 197,
+      "damaged": 6,
+      "critical": 3,
+      "fractured": 1,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 3.168686109226632,
+      "healthy": 197,
+      "damaged": 6,
+      "critical": 3,
+      "fractured": 1,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 3.366728991053296,
+      "healthy": 197,
+      "damaged": 5,
+      "critical": 3,
+      "fractured": 2,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 3.5647718728799607,
+      "healthy": 197,
+      "damaged": 5,
+      "critical": 3,
+      "fractured": 2,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 3.7628147547066253,
+      "healthy": 197,
+      "damaged": 4,
+      "critical": 3,
+      "fractured": 3,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 3.96085763653329,
+      "healthy": 197,
+      "damaged": 2,
+      "critical": 4,
+      "fractured": 4,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 4.158900518359954,
+      "healthy": 197,
+      "damaged": 2,
+      "critical": 4,
+      "fractured": 4,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 4.356943400186619,
+      "healthy": 197,
+      "damaged": 2,
+      "critical": 4,
+      "fractured": 4,
+      "broken": 1,
+      "panels": 208
+     },
+     {
+      "t": 4.554986282013283,
+      "healthy": 197,
+      "damaged": 2,
+      "critical": 4,
+      "fractured": 3,
+      "broken": 2,
+      "panels": 208
+     },
+     {
+      "t": 4.753029163839947,
+      "healthy": 197,
+      "damaged": 2,
+      "critical": 4,
+      "fractured": 2,
+      "broken": 3,
+      "panels": 208
+     },
+     {
+      "t": 4.951072045666612,
+      "healthy": 197,
+      "damaged": 2,
+      "critical": 4,
+      "fractured": 2,
+      "broken": 3,
+      "panels": 208
+     },
+     {
+      "t": 5.149114927493276,
+      "healthy": 196,
+      "damaged": 2,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 3,
+      "panels": 208
+     },
+     {
+      "t": 5.347157809319941,
+      "healthy": 196,
+      "damaged": 2,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 3,
+      "panels": 208
+     },
+     {
+      "t": 5.545200691146605,
+      "healthy": 196,
+      "damaged": 2,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 3,
+      "panels": 208
+     },
+     {
+      "t": 5.74324357297327,
+      "healthy": 196,
+      "damaged": 2,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 3,
+      "panels": 208
+     },
+     {
+      "t": 5.9412864547999344,
+      "healthy": 196,
+      "damaged": 2,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 3,
+      "panels": 208
+     },
+     {
+      "t": 6.1393293366265995,
+      "healthy": 195,
+      "damaged": 2,
+      "critical": 5,
+      "fractured": 3,
+      "broken": 3,
+      "panels": 208
+     },
+     {
+      "t": 6.337372218453264,
+      "healthy": 195,
+      "damaged": 2,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 4,
+      "panels": 208
+     },
+     {
+      "t": 6.535415100279928,
+      "healthy": 195,
+      "damaged": 2,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 4,
+      "panels": 208
+     },
+     {
+      "t": 6.733457982106592,
+      "healthy": 195,
+      "damaged": 2,
+      "critical": 5,
+      "fractured": 1,
+      "broken": 5,
+      "panels": 208
+     },
+     {
+      "t": 6.931500863933256,
+      "healthy": 194,
+      "damaged": 3,
+      "critical": 5,
+      "fractured": 1,
+      "broken": 5,
+      "panels": 208
+     },
+     {
+      "t": 7.129543745759921,
+      "healthy": 194,
+      "damaged": 3,
+      "critical": 5,
+      "fractured": 0,
+      "broken": 6,
+      "panels": 208
+     },
+     {
+      "t": 7.3275866275865855,
+      "healthy": 194,
+      "damaged": 1,
+      "critical": 6,
+      "fractured": 1,
+      "broken": 6,
+      "panels": 208
+     },
+     {
+      "t": 7.525629509413251,
+      "healthy": 194,
+      "damaged": 1,
+      "critical": 6,
+      "fractured": 1,
+      "broken": 6,
+      "panels": 208
+     },
+     {
+      "t": 7.723672391239915,
+      "healthy": 194,
+      "damaged": 1,
+      "critical": 6,
+      "fractured": 1,
+      "broken": 6,
+      "panels": 208
+     },
+     {
+      "t": 7.92171527306658,
+      "healthy": 194,
+      "damaged": 1,
+      "critical": 6,
+      "fractured": 1,
+      "broken": 6,
+      "panels": 208
+     },
+     {
+      "t": 8.119758154893244,
+      "healthy": 194,
+      "damaged": 1,
+      "critical": 6,
+      "fractured": 1,
+      "broken": 6,
+      "panels": 208
+     },
+     {
+      "t": 8.317801036719908,
+      "healthy": 194,
+      "damaged": 1,
+      "critical": 6,
+      "fractured": 1,
+      "broken": 6,
+      "panels": 208
+     },
+     {
+      "t": 8.515843918546572,
+      "healthy": 194,
+      "damaged": 1,
+      "critical": 6,
+      "fractured": 1,
+      "broken": 6,
+      "panels": 208
+     },
+     {
+      "t": 8.713886800373238,
+      "healthy": 194,
+      "damaged": 1,
+      "critical": 5,
+      "fractured": 1,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 8.911929682199903,
+      "healthy": 194,
+      "damaged": 1,
+      "critical": 5,
+      "fractured": 1,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 9.109972564026567,
+      "healthy": 194,
+      "damaged": 1,
+      "critical": 5,
+      "fractured": 1,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 9.308015445853231,
+      "healthy": 194,
+      "damaged": 1,
+      "critical": 5,
+      "fractured": 1,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 9.506058327679893,
+      "healthy": 194,
+      "damaged": 1,
+      "critical": 5,
+      "fractured": 1,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 9.70410120950656,
+      "healthy": 194,
+      "damaged": 1,
+      "critical": 5,
+      "fractured": 1,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 9.902144091333223,
+      "healthy": 194,
+      "damaged": 1,
+      "critical": 5,
+      "fractured": 1,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 10.100186973159888,
+      "healthy": 193,
+      "damaged": 2,
+      "critical": 5,
+      "fractured": 1,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 10.298229854986552,
+      "healthy": 193,
+      "damaged": 1,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 10.496272736813218,
+      "healthy": 193,
+      "damaged": 1,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 10.694315618639882,
+      "healthy": 193,
+      "damaged": 1,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 10.892358500466546,
+      "healthy": 193,
+      "damaged": 1,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 11.09040138229321,
+      "healthy": 192,
+      "damaged": 2,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 11.288444264119875,
+      "healthy": 192,
+      "damaged": 2,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 11.48648714594654,
+      "healthy": 192,
+      "damaged": 2,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 11.684530027773205,
+      "healthy": 191,
+      "damaged": 3,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 11.882572909599869,
+      "healthy": 191,
+      "damaged": 3,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 12.080615791426533,
+      "healthy": 191,
+      "damaged": 3,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 12.278658673253199,
+      "healthy": 191,
+      "damaged": 3,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 12.476701555079863,
+      "healthy": 190,
+      "damaged": 4,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 12.674744436906527,
+      "healthy": 189,
+      "damaged": 4,
+      "critical": 6,
+      "fractured": 2,
+      "broken": 7,
+      "panels": 208
+     },
+     {
+      "t": 12.872787318733192,
+      "healthy": 188,
+      "damaged": 5,
+      "critical": 5,
+      "fractured": 2,
+      "broken": 8,
+      "panels": 208
+     },
+     {
+      "t": 13.070830200559856,
+      "healthy": 186,
+      "damaged": 6,
+      "critical": 6,
+      "fractured": 2,
+      "broken": 8,
+      "panels": 208
+     },
+     {
+      "t": 13.268873082386522,
+      "healthy": 185,
+      "damaged": 7,
+      "critical": 3,
+      "fractured": 3,
+      "broken": 10,
+      "panels": 208
+     },
+     {
+      "t": 13.466915964213184,
+      "healthy": 185,
+      "damaged": 7,
+      "critical": 3,
+      "fractured": 3,
+      "broken": 10,
+      "panels": 208
+     },
+     {
+      "t": 13.664958846039848,
+      "healthy": 181,
+      "damaged": 11,
+      "critical": 2,
+      "fractured": 4,
+      "broken": 10,
+      "panels": 208
+     },
+     {
+      "t": 13.863001727866513,
+      "healthy": 179,
+      "damaged": 12,
+      "critical": 3,
+      "fractured": 4,
+      "broken": 10,
+      "panels": 208
+     },
+     {
+      "t": 14.061044609693178,
+      "healthy": 176,
+      "damaged": 15,
+      "critical": 3,
+      "fractured": 4,
+      "broken": 10,
+      "panels": 208
+     },
+     {
+      "t": 14.259087491519843,
+      "healthy": 173,
+      "damaged": 18,
+      "critical": 3,
+      "fractured": 4,
+      "broken": 10,
+      "panels": 208
+     },
+     {
+      "t": 14.457130373346507,
+      "healthy": 170,
+      "damaged": 20,
+      "critical": 4,
+      "fractured": 4,
+      "broken": 10,
+      "panels": 208
+     },
+     {
+      "t": 14.655173255173171,
+      "healthy": 169,
+      "damaged": 19,
+      "critical": 6,
+      "fractured": 4,
+      "broken": 10,
+      "panels": 208
+     },
+     {
+      "t": 14.853216136999835,
+      "healthy": 168,
+      "damaged": 19,
+      "critical": 6,
+      "fractured": 5,
+      "broken": 10,
+      "panels": 208
+     },
+     {
+      "t": 15.051259018826501,
+      "healthy": 168,
+      "damaged": 18,
+      "critical": 7,
+      "fractured": 5,
+      "broken": 10,
+      "panels": 208
+     },
+     {
+      "t": 15.249301900653165,
+      "healthy": 168,
+      "damaged": 18,
+      "critical": 6,
+      "fractured": 6,
+      "broken": 10,
+      "panels": 208
+     },
+     {
+      "t": 15.44734478247983,
+      "healthy": 167,
+      "damaged": 18,
+      "critical": 6,
+      "fractured": 6,
+      "broken": 11,
+      "panels": 208
+     },
+     {
+      "t": 15.645387664306494,
+      "healthy": 165,
+      "damaged": 20,
+      "critical": 6,
+      "fractured": 4,
+      "broken": 13,
+      "panels": 208
+     },
+     {
+      "t": 15.84343054613316,
+      "healthy": 165,
+      "damaged": 18,
+      "critical": 7,
+      "fractured": 5,
+      "broken": 13,
+      "panels": 208
+     },
+     {
+      "t": 16.041473427959822,
+      "healthy": 165,
+      "damaged": 17,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 13,
+      "panels": 208
+     },
+     {
+      "t": 16.239516309786488,
+      "healthy": 165,
+      "damaged": 16,
+      "critical": 9,
+      "fractured": 5,
+      "broken": 13,
+      "panels": 208
+     },
+     {
+      "t": 16.43755919161315,
+      "healthy": 165,
+      "damaged": 16,
+      "critical": 9,
+      "fractured": 5,
+      "broken": 13,
+      "panels": 208
+     },
+     {
+      "t": 16.635602073439816,
+      "healthy": 164,
+      "damaged": 17,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 14,
+      "panels": 208
+     },
+     {
+      "t": 16.833644955266482,
+      "healthy": 164,
+      "damaged": 17,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 14,
+      "panels": 208
+     },
+     {
+      "t": 17.031687837093145,
+      "healthy": 164,
+      "damaged": 17,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 14,
+      "panels": 208
+     },
+     {
+      "t": 17.22973071891981,
+      "healthy": 163,
+      "damaged": 18,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 14,
+      "panels": 208
+     },
+     {
+      "t": 17.427773600746477,
+      "healthy": 163,
+      "damaged": 18,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 14,
+      "panels": 208
+     },
+     {
+      "t": 17.62581648257314,
+      "healthy": 163,
+      "damaged": 18,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 14,
+      "panels": 208
+     },
+     {
+      "t": 17.823859364399805,
+      "healthy": 162,
+      "damaged": 19,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 14,
+      "panels": 208
+     },
+     {
+      "t": 18.021902246226468,
+      "healthy": 162,
+      "damaged": 19,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 14,
+      "panels": 208
+     },
+     {
+      "t": 18.219945128053133,
+      "healthy": 162,
+      "damaged": 19,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 14,
+      "panels": 208
+     },
+     {
+      "t": 18.4179880098798,
+      "healthy": 162,
+      "damaged": 19,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 14,
+      "panels": 208
+     },
+     {
+      "t": 18.616030891706462,
+      "healthy": 162,
+      "damaged": 19,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 14,
+      "panels": 208
+     },
+     {
+      "t": 18.814073773533128,
+      "healthy": 161,
+      "damaged": 20,
+      "critical": 8,
+      "fractured": 5,
+      "broken": 14,
+      "panels": 208
+     },
+     {
+      "t": 19.012116655359787,
+      "healthy": 160,
+      "damaged": 20,
+      "critical": 9,
+      "fractured": 4,
+      "broken": 15,
+      "panels": 208
+     },
+     {
+      "t": 19.210159537186453,
+      "healthy": 159,
+      "damaged": 21,
+      "critical": 9,
+      "fractured": 4,
+      "broken": 15,
+      "panels": 208
+     },
+     {
+      "t": 19.40820241901312,
+      "healthy": 158,
+      "damaged": 21,
+      "critical": 10,
+      "fractured": 4,
+      "broken": 15,
+      "panels": 208
+     },
+     {
+      "t": 19.60624530083978,
+      "healthy": 158,
+      "damaged": 20,
+      "critical": 11,
+      "fractured": 4,
+      "broken": 15,
+      "panels": 208
+     },
+     {
+      "t": 19.804288182666447,
+      "healthy": 156,
+      "damaged": 22,
+      "critical": 10,
+      "fractured": 5,
+      "broken": 15,
+      "panels": 208
+     },
+     {
+      "t": 20.002331064493113,
+      "healthy": 155,
+      "damaged": 22,
+      "critical": 11,
+      "fractured": 5,
+      "broken": 15,
+      "panels": 208
+     },
+     {
+      "t": 20.200373946319775,
+      "healthy": 155,
+      "damaged": 22,
+      "critical": 11,
+      "fractured": 5,
+      "broken": 15,
+      "panels": 208
+     },
+     {
+      "t": 20.39841682814644,
+      "healthy": 155,
+      "damaged": 20,
+      "critical": 13,
+      "fractured": 5,
+      "broken": 15,
+      "panels": 208
+     },
+     {
+      "t": 20.596459709973104,
+      "healthy": 153,
+      "damaged": 22,
+      "critical": 13,
+      "fractured": 5,
+      "broken": 15,
+      "panels": 208
+     },
+     {
+      "t": 20.79450259179977,
+      "healthy": 151,
+      "damaged": 24,
+      "critical": 12,
+      "fractured": 6,
+      "broken": 15,
+      "panels": 208
+     },
+     {
+      "t": 20.992545473626436,
+      "healthy": 151,
+      "damaged": 24,
+      "critical": 12,
+      "fractured": 6,
+      "broken": 15,
+      "panels": 208
+     },
+     {
+      "t": 21.190588355453098,
+      "healthy": 151,
+      "damaged": 23,
+      "critical": 13,
+      "fractured": 6,
+      "broken": 15,
+      "panels": 208
+     },
+     {
+      "t": 21.388631237279764,
+      "healthy": 151,
+      "damaged": 21,
+      "critical": 14,
+      "fractured": 6,
+      "broken": 16,
+      "panels": 208
+     },
+     {
+      "t": 21.586674119106426,
+      "healthy": 151,
+      "damaged": 20,
+      "critical": 15,
+      "fractured": 6,
+      "broken": 16,
+      "panels": 208
+     },
+     {
+      "t": 21.784717000933092,
+      "healthy": 151,
+      "damaged": 20,
+      "critical": 15,
+      "fractured": 6,
+      "broken": 16,
+      "panels": 208
+     },
+     {
+      "t": 21.98275988275976,
+      "healthy": 151,
+      "damaged": 20,
+      "critical": 14,
+      "fractured": 7,
+      "broken": 16,
+      "panels": 208
+     },
+     {
+      "t": 22.18080276458642,
+      "healthy": 151,
+      "damaged": 20,
+      "critical": 13,
+      "fractured": 8,
+      "broken": 16,
+      "panels": 208
+     },
+     {
+      "t": 22.378845646413087,
+      "healthy": 151,
+      "damaged": 20,
+      "critical": 12,
+      "fractured": 8,
+      "broken": 17,
+      "panels": 208
+     },
+     {
+      "t": 22.57688852823975,
+      "healthy": 151,
+      "damaged": 18,
+      "critical": 14,
+      "fractured": 8,
+      "broken": 17,
+      "panels": 208
+     },
+     {
+      "t": 22.774931410066415,
+      "healthy": 151,
+      "damaged": 18,
+      "critical": 14,
+      "fractured": 7,
+      "broken": 18,
+      "panels": 208
+     },
+     {
+      "t": 22.97297429189308,
+      "healthy": 150,
+      "damaged": 19,
+      "critical": 14,
+      "fractured": 7,
+      "broken": 18,
+      "panels": 208
+     },
+     {
+      "t": 23.171017173719743,
+      "healthy": 150,
+      "damaged": 19,
+      "critical": 14,
+      "fractured": 7,
+      "broken": 18,
+      "panels": 208
+     },
+     {
+      "t": 23.36906005554641,
+      "healthy": 150,
+      "damaged": 19,
+      "critical": 13,
+      "fractured": 7,
+      "broken": 19,
+      "panels": 208
+     },
+     {
+      "t": 23.567102937373075,
+      "healthy": 150,
+      "damaged": 19,
+      "critical": 12,
+      "fractured": 8,
+      "broken": 19,
+      "panels": 208
+     },
+     {
+      "t": 23.765145819199738,
+      "healthy": 150,
+      "damaged": 19,
+      "critical": 11,
+      "fractured": 8,
+      "broken": 20,
+      "panels": 208
+     }
+    ]
+   },
+   "wear": {
+    "t": 23.715145819199737,
+    "shell_id": 4,
+    "panels": 66,
+    "states": {
+     "healthy": 64,
+     "broken": 1,
+     "damaged": 1
+    },
+    "non_healthy": 2,
+    "worn_healthy": 1,
+    "touched_healthy": 1,
+    "visibly_marked": 3,
+    "worst_wear": 1.018620760117542,
+    "wear_floor": 0.04
+   },
+   "winner_banner": {
+    "placed": true,
+    "team_id": 1,
+    "team_name": "orange",
+    "escape_y_px": 1504.7709664846348,
+    "release_y_px": [
+     1504.7709664846348,
+     1647.1399232603944
+    ],
+    "swept_y_px": [
+     1480.8314490583614,
+     1671.0794406866678
+    ],
+    "ball_radius_px": 23.93951742627346,
+    "top_fraction": 0.15,
+    "band_px": [
+     288.0,
+     489.6
+    ],
+    "moved_to_top": true,
+    "clear_of_ball": true
+   },
+   "passages": [
+    {
+     "shell_id": 0,
+     "panel_id": 4,
+     "break_t": 6.1579456861642505,
+     "first_use_t": 6.665511387539743,
+     "last_use_t": 6.665511387539743,
+     "balls": 1,
+     "ball_ids": [
+      2
+     ],
+     "teams": [
+      1
+     ],
+     "both_teams": false,
+     "response_until": 7.215511387539743
+    },
+    {
+     "shell_id": 4,
+     "panel_id": 19,
+     "break_t": 23.267151414988984,
+     "first_use_t": 23.62808960202232,
+     "last_use_t": 23.62808960202232,
+     "balls": 1,
+     "ball_ids": [
+      10
+     ],
+     "teams": [
+      1
+     ],
+     "both_teams": false,
+     "response_until": 24.17808960202232
+    }
+   ],
+   "by_variant": {
+    "4B": {
+     "fraction": 0.85,
+     "frame_size": [
+      {
+       "stage": 0,
+       "extent_shell": 2,
+       "start": 0.0,
+       "settled": 0.0,
+       "view_radius": 13.345749999999999,
+       "pixels_per_unit": 36.284584980237156,
+       "camera_distance": 34.22706849710429,
+       "frontier_diameter_px": 918.0000000000001,
+       "ball_diameter_px": 38.461660079051384,
+       "ball_drawn_diameter_px": 50.000158102766804,
+       "opening_width_px": 112.63338327110118,
+       "opening_over_ball": 2.9284587051001556,
+       "wall_face_thickness_px": 10.885375494071146,
+       "wall_apparent_thickness_px": 37.69204963334374,
+       "wall_flank_px": 26.8066741392726,
+       "occupancy": {
+        "t": 0.0,
+        "material_fraction": 0.2714894591976236,
+        "ball_fraction": 0.0018938154184756177,
+        "ink_fraction": 0.2733832746160992,
+        "arena_footprint_fraction": 0.3192001319429452,
+        "empty_fraction": 0.7266167253839009
+       }
+      },
+      {
+       "stage": 1,
+       "extent_shell": 4,
+       "start": 11.956635759753727,
+       "settled": 12.356635759753727,
+       "view_radius": 19.675749999999997,
+       "pixels_per_unit": 24.611260053619304,
+       "camera_distance": 50.46125118347786,
+       "frontier_diameter_px": 918.0,
+       "ball_diameter_px": 26.087935656836464,
+       "ball_drawn_diameter_px": 33.9143163538874,
+       "opening_width_px": 35.94550543885337,
+       "opening_over_ball": 1.3778593259230798,
+       "wall_face_thickness_px": 7.383378016085791,
+       "wall_apparent_thickness_px": 57.20422505331607,
+       "wall_flank_px": 49.82084703723029,
+       "occupancy": {
+        "t": 12.356635759753727,
+        "material_fraction": 0.13388794691880201,
+        "ball_fraction": 0.002178216459566406,
+        "ink_fraction": 0.1360661633783684,
+        "arena_footprint_fraction": 0.31920013194294516,
+        "empty_fraction": 0.8639338366216316
+       }
+      }
+     ],
+     "critical_visibility": {
+      "safe_area": "shorts_conservative",
+      "fingerprint": "3776358f1bf13326",
+      "cover_limit": 0.34,
+      "subjects": 63,
+      "by_kind": {
+       "frontier_crossing": {
+        "count": 47,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "first_clone": {
+        "count": 1,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "passage_break": {
+        "count": 9,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "strong_near_miss": {
+        "count": 5,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "winning_escape": {
+        "count": 1,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       }
+      },
+      "worst": {
+       "what": "frontier_crossing",
+       "t": 0.5445248977009047,
+       "detail": "opening to region 1",
+       "x_px": 759.6488275536266,
+       "y_px": 791.4574854957094,
+       "radius_px": 25.000079051383402,
+       "covered": 0.0,
+       "region": "",
+       "off_frame": 0.0,
+       "visible": true
+      },
+      "hidden": [],
+      "critical_pass": true,
+      "hard_on_frame": true,
+      "worst_hard_off_frame": 0.0,
+      "pass": true
+     },
+     "containment": {
+      "fps": 60.0,
+      "frames": 1427,
+      "camera_lock_time": 12.356635759753727,
+      "worst_ratio": 0.16556178836237292,
+      "worst_t": 18.782131373238503,
+      "worst_ball": 10,
+      "worst_overshoot_px": 0.0,
+      "outside_frames": 0,
+      "outside_before_lock": 0,
+      "outside_frame_fraction": 0.0,
+      "ball_samples": 9061,
+      "ball_samples_outside": 0,
+      "ball_sample_outside_fraction": 0.0,
+      "contained": true,
+      "contained_while_moving": true
+     },
+     "occupancy": {
+      "samples": 96,
+      "thirds": {
+       "early": {
+        "material_fraction": 0.2714894591976236,
+        "ball_fraction": 0.002751950529972382,
+        "ink_fraction": 0.274241409727596,
+        "arena_footprint_fraction": 0.3192001319429452,
+        "empty_fraction": 0.7257585902724041
+       },
+       "middle": {
+        "material_fraction": 0.20742843578292183,
+        "ball_fraction": 0.00342566273732133,
+        "ink_fraction": 0.21085409852024312,
+        "arena_footprint_fraction": 0.31920013194294516,
+        "empty_fraction": 0.7891459014797569
+       },
+       "late": {
+        "material_fraction": 0.13388794691880201,
+        "ball_fraction": 0.0046695515351954835,
+        "ink_fraction": 0.1385574984539975,
+        "arena_footprint_fraction": 0.31920013194294516,
+        "empty_fraction": 0.8614425015460024
+       }
+      },
+      "late_minus_early_ink": -0.13568391127359847,
+      "late_not_emptier": false,
+      "min_ink_fraction": 0.1360661633783684,
+      "max_ink_fraction": 0.27527709003457473
+     }
+    },
+    "A": {
+     "fraction": 1.0,
+     "frame_size": [
+      {
+       "stage": 0,
+       "extent_shell": 2,
+       "start": 0.0,
+       "settled": 0.0,
+       "view_radius": 13.345749999999999,
+       "pixels_per_unit": 42.68774703557312,
+       "camera_distance": 29.09300822253865,
+       "frontier_diameter_px": 1080.0,
+       "ball_diameter_px": 45.24901185770751,
+       "ball_drawn_diameter_px": 58.82371541501976,
+       "opening_width_px": 132.50986267188372,
+       "opening_over_ball": 2.9284587051001556,
+       "wall_face_thickness_px": 12.806324110671936,
+       "wall_apparent_thickness_px": 49.526002107409,
+       "wall_flank_px": 36.71967799673706,
+       "occupancy": {
+        "t": 0.0,
+        "material_fraction": 0.35245115831102614,
+        "ball_fraction": 0.0026211978110389166,
+        "ink_fraction": 0.35507235612206506,
+        "arena_footprint_fraction": 0.4417994905784707,
+        "empty_fraction": 0.644927643877935
+       }
+      },
+      {
+       "stage": 1,
+       "extent_shell": 4,
+       "start": 11.956635759753727,
+       "settled": 12.356635759753727,
+       "view_radius": 19.675749999999997,
+       "pixels_per_unit": 28.9544235924933,
+       "camera_distance": 42.89206350595619,
+       "frontier_diameter_px": 1080.0,
+       "ball_diameter_px": 30.6916890080429,
+       "ball_drawn_diameter_px": 39.89919571045577,
+       "opening_width_px": 42.28882992806279,
+       "opening_over_ball": 1.3778593259230798,
+       "wall_face_thickness_px": 8.68632707774799,
+       "wall_apparent_thickness_px": 76.33621076324525,
+       "wall_flank_px": 67.64988368549727,
+       "occupancy": {
+        "t": 12.356635759753727,
+        "material_fraction": 0.20670882209699057,
+        "ball_fraction": 0.003014832469988106,
+        "ink_fraction": 0.20972365456697867,
+        "arena_footprint_fraction": 0.4417994905784707,
+        "empty_fraction": 0.7902763454330213
+       }
+      }
+     ],
+     "critical_visibility": {
+      "safe_area": "shorts_conservative",
+      "fingerprint": "3776358f1bf13326",
+      "cover_limit": 0.34,
+      "subjects": 63,
+      "by_kind": {
+       "frontier_crossing": {
+        "count": 47,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "first_clone": {
+        "count": 1,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "passage_break": {
+        "count": 9,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "strong_near_miss": {
+        "count": 5,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "winning_escape": {
+        "count": 1,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       }
+      },
+      "worst": {
+       "what": "frontier_crossing",
+       "t": 0.5445248977009047,
+       "detail": "opening to region 1",
+       "x_px": 798.4103853572077,
+       "y_px": 778.6558652890699,
+       "radius_px": 29.41185770750988,
+       "covered": 0.0,
+       "region": "",
+       "off_frame": 0.0,
+       "visible": true
+      },
+      "hidden": [],
+      "critical_pass": true,
+      "hard_on_frame": true,
+      "worst_hard_off_frame": 0.0,
+      "pass": true
+     },
+     "containment": {
+      "fps": 60.0,
+      "frames": 1427,
+      "camera_lock_time": 12.356635759753727,
+      "worst_ratio": 0.7915793229099153,
+      "worst_t": 18.782131373238503,
+      "worst_ball": 10,
+      "worst_overshoot_px": 0.0,
+      "outside_frames": 0,
+      "outside_before_lock": 0,
+      "outside_frame_fraction": 0.0,
+      "ball_samples": 9061,
+      "ball_samples_outside": 0,
+      "ball_sample_outside_fraction": 0.0,
+      "contained": true,
+      "contained_while_moving": true
+     },
+     "occupancy": {
+      "samples": 96,
+      "thirds": {
+       "early": {
+        "material_fraction": 0.35245115831102614,
+        "ball_fraction": 0.0038089280691659256,
+        "ink_fraction": 0.356260086380192,
+        "arena_footprint_fraction": 0.4417994905784707,
+        "empty_fraction": 0.6437399136198079
+       },
+       "middle": {
+        "material_fraction": 0.2838474697071745,
+        "ball_fraction": 0.004741401712555474,
+        "ink_fraction": 0.28858887141973,
+        "arena_footprint_fraction": 0.4417994905784707,
+        "empty_fraction": 0.71141112858027
+       },
+       "late": {
+        "material_fraction": 0.20670882209699057,
+        "ball_fraction": 0.006463047107537003,
+        "ink_fraction": 0.21317186920452758,
+        "arena_footprint_fraction": 0.4417994905784707,
+        "empty_fraction": 0.7868281307954724
+       }
+      },
+      "late_minus_early_ink": -0.14308821717566444,
+      "late_not_emptier": false,
+      "min_ink_fraction": 0.20972365456697867,
+      "max_ink_fraction": 0.357693553933104
+     }
+    },
+    "B": {
+     "fraction": 1.1,
+     "frame_size": [
+      {
+       "stage": 0,
+       "extent_shell": 2,
+       "start": 0.0,
+       "settled": 0.0,
+       "view_radius": 13.345749999999999,
+       "pixels_per_unit": 46.956521739130444,
+       "camera_distance": 26.44818929321695,
+       "frontier_diameter_px": 1188.0000000000002,
+       "ball_diameter_px": 49.773913043478274,
+       "ball_drawn_diameter_px": 64.70608695652176,
+       "opening_width_px": 145.76084893907213,
+       "opening_over_ball": 2.9284587051001556,
+       "wall_face_thickness_px": 14.086956521739133,
+       "wall_apparent_thickness_px": 58.214104181344545,
+       "wall_flank_px": 44.127147659605406,
+       "occupancy": {
+        "t": 0.0,
+        "material_fraction": 0.37582673260191823,
+        "ball_fraction": 0.0031716493513570913,
+        "ink_fraction": 0.37899838195327534,
+        "arena_footprint_fraction": 0.517229932455425,
+        "empty_fraction": 0.6210016180467246
+       }
+      },
+      {
+       "stage": 1,
+       "extent_shell": 4,
+       "start": 11.956635759753727,
+       "settled": 12.356635759753727,
+       "view_radius": 19.675749999999997,
+       "pixels_per_unit": 31.849865951742636,
+       "camera_distance": 38.99278500541471,
+       "frontier_diameter_px": 1188.0000000000002,
+       "ball_diameter_px": 33.76085790884719,
+       "ball_drawn_diameter_px": 43.889115281501354,
+       "opening_width_px": 46.51771292086907,
+       "opening_over_ball": 1.3778593259230798,
+       "wall_face_thickness_px": 9.55495978552279,
+       "wall_apparent_thickness_px": 90.39042111474114,
+       "wall_flank_px": 80.83546132921836,
+       "occupancy": {
+        "t": 12.356635759753727,
+        "material_fraction": 0.22705888799936064,
+        "ball_fraction": 0.003647947288685609,
+        "ink_fraction": 0.23070683528804625,
+        "arena_footprint_fraction": 0.517229932455425,
+        "empty_fraction": 0.7692931647119537
+       }
+      }
+     ],
+     "critical_visibility": {
+      "safe_area": "shorts_conservative",
+      "fingerprint": "3776358f1bf13326",
+      "cover_limit": 0.34,
+      "subjects": 63,
+      "by_kind": {
+       "frontier_crossing": {
+        "count": 47,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "first_clone": {
+        "count": 1,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "passage_break": {
+        "count": 9,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "strong_near_miss": {
+        "count": 5,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "winning_escape": {
+        "count": 1,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       }
+      },
+      "worst": {
+       "what": "frontier_crossing",
+       "t": 0.5445248977009047,
+       "detail": "opening to region 1",
+       "x_px": 824.2514238929285,
+       "y_px": 770.1214518179769,
+       "radius_px": 32.35304347826088,
+       "covered": 0.0,
+       "region": "",
+       "off_frame": 0.0,
+       "visible": true
+      },
+      "hidden": [],
+      "critical_pass": true,
+      "hard_on_frame": true,
+      "worst_hard_off_frame": 0.0,
+      "pass": true
+     },
+     "containment": {
+      "fps": 60.0,
+      "frames": 1427,
+      "camera_lock_time": 12.356635759753727,
+      "worst_ratio": Infinity,
+      "worst_t": 18.31549456893444,
+      "worst_ball": 10,
+      "worst_overshoot_px": 48.22205781586834,
+      "outside_frames": 124,
+      "outside_before_lock": 0,
+      "outside_frame_fraction": 0.08689558514365803,
+      "ball_samples": 9061,
+      "ball_samples_outside": 193,
+      "ball_sample_outside_fraction": 0.021300077254166206,
+      "contained": false,
+      "contained_while_moving": true
+     },
+     "occupancy": {
+      "samples": 96,
+      "thirds": {
+       "early": {
+        "material_fraction": 0.37582673260191823,
+        "ball_fraction": 0.004608802963690773,
+        "ink_fraction": 0.38043553556560905,
+        "arena_footprint_fraction": 0.517229932455425,
+        "empty_fraction": 0.6195644644343908
+       },
+       "middle": {
+        "material_fraction": 0.30706763431446876,
+        "ball_fraction": 0.005737096072192127,
+        "ink_fraction": 0.3128047303866609,
+        "arena_footprint_fraction": 0.517229932455425,
+        "empty_fraction": 0.6871952696133391
+       },
+       "late": {
+        "material_fraction": 0.22705888799936064,
+        "ball_fraction": 0.007820287000119774,
+        "ink_fraction": 0.23487917499948044,
+        "arena_footprint_fraction": 0.517229932455425,
+        "empty_fraction": 0.7651208250005196
+       }
+      },
+      "late_minus_early_ink": -0.1455563605661286,
+      "late_not_emptier": false,
+      "min_ink_fraction": 0.23070683528804625,
+      "max_ink_fraction": 0.3915310267964833
+     }
+    },
+    "C": {
+     "fraction": 1.2,
+     "frame_size": [
+      {
+       "stage": 0,
+       "extent_shell": 2,
+       "start": 0.0,
+       "settled": 0.0,
+       "view_radius": 13.345749999999999,
+       "pixels_per_unit": 51.22529644268774,
+       "camera_distance": 24.244173518782212,
+       "frontier_diameter_px": 1296.0,
+       "ball_diameter_px": 54.29881422924901,
+       "ball_drawn_diameter_px": 70.58845849802371,
+       "opening_width_px": 159.01183520626046,
+       "opening_over_ball": 2.9284587051001556,
+       "wall_face_thickness_px": 15.367588932806322,
+       "wall_apparent_thickness_px": 67.52606401889234,
+       "wall_flank_px": 52.158475086086014,
+       "occupancy": {
+        "t": 0.0,
+        "material_fraction": 0.3784317600256286,
+        "ball_fraction": 0.0037745248478960394,
+        "ink_fraction": 0.38220628487352465,
+        "arena_footprint_fraction": 0.5855488997879399,
+        "empty_fraction": 0.6177937151264754
+       }
+      },
+      {
+       "stage": 1,
+       "extent_shell": 4,
+       "start": 11.956635759753727,
+       "settled": 12.356635759753727,
+       "view_radius": 19.675749999999997,
+       "pixels_per_unit": 34.74530831099196,
+       "camera_distance": 35.7433862549635,
+       "frontier_diameter_px": 1296.0,
+       "ball_diameter_px": 36.83002680965148,
+       "ball_drawn_diameter_px": 47.87903485254692,
+       "opening_width_px": 50.74659591367534,
+       "opening_over_ball": 1.3778593259230798,
+       "wall_face_thickness_px": 10.423592493297587,
+       "wall_apparent_thickness_px": 105.43945122833632,
+       "wall_flank_px": 95.01585873503875,
+       "occupancy": {
+        "t": 12.356635759753727,
+        "material_fraction": 0.26169811902193124,
+        "ball_fraction": 0.0043413587567828725,
+        "ink_fraction": 0.2660394777787141,
+        "arena_footprint_fraction": 0.5855488997879399,
+        "empty_fraction": 0.7339605222212859
+       }
+      }
+     ],
+     "critical_visibility": {
+      "safe_area": "shorts_conservative",
+      "fingerprint": "3776358f1bf13326",
+      "cover_limit": 0.34,
+      "subjects": 63,
+      "by_kind": {
+       "frontier_crossing": {
+        "count": 47,
+        "hidden": 0,
+        "worst_covered": 0.17391304347826086,
+        "worst_off_frame": 0.17391304347826086
+       },
+       "first_clone": {
+        "count": 1,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "passage_break": {
+        "count": 9,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "strong_near_miss": {
+        "count": 5,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       },
+       "winning_escape": {
+        "count": 1,
+        "hidden": 0,
+        "worst_covered": 0.0,
+        "worst_off_frame": 0.0
+       }
+      },
+      "worst": {
+       "what": "frontier_crossing",
+       "t": 18.245791783653516,
+       "detail": "opening to region 4",
+       "x_px": 13.599973940166024,
+       "y_px": 753.350724706427,
+       "radius_px": 23.93951742627346,
+       "covered": 0.17391304347826086,
+       "region": "off_frame",
+       "off_frame": 0.17391304347826086,
+       "visible": true
+      },
+      "hidden": [],
+      "critical_pass": true,
+      "hard_on_frame": true,
+      "worst_hard_off_frame": 0.0,
+      "pass": true
+     },
+     "containment": {
+      "fps": 60.0,
+      "frames": 1427,
+      "camera_lock_time": 12.356635759753727,
+      "worst_ratio": Infinity,
+      "worst_t": 18.248832168319574,
+      "worst_ball": 10,
+      "worst_overshoot_px": 101.69679034458349,
+      "outside_frames": 166,
+      "outside_before_lock": 0,
+      "outside_frame_fraction": 0.11632796075683252,
+      "ball_samples": 9061,
+      "ball_samples_outside": 315,
+      "ball_sample_outside_fraction": 0.034764374793069194,
+      "contained": false,
+      "contained_while_moving": true
+     },
+     "occupancy": {
+      "samples": 96,
+      "thirds": {
+       "early": {
+        "material_fraction": 0.3784317600256286,
+        "ball_fraction": 0.005484856419598933,
+        "ink_fraction": 0.3839166164452276,
+        "arena_footprint_fraction": 0.5855488997879399,
+        "empty_fraction": 0.6160833835547724
+       },
+       "middle": {
+        "material_fraction": 0.32409392967498146,
+        "ball_fraction": 0.006827618466079882,
+        "ink_fraction": 0.33092154814106134,
+        "arena_footprint_fraction": 0.5855488997879399,
+        "empty_fraction": 0.6690784518589385
+       },
+       "late": {
+        "material_fraction": 0.26169811902193124,
+        "ball_fraction": 0.008926918943634782,
+        "ink_fraction": 0.27062503796556603,
+        "arena_footprint_fraction": 0.5855488997879399,
+        "empty_fraction": 0.729374962034434
+       }
+      },
+      "late_minus_early_ink": -0.11329157847966159,
+      "late_not_emptier": false,
+      "min_ink_fraction": 0.2660394777787141,
+      "max_ink_fraction": 0.38598080972142074
+     }
+    }
+   }
+  }
+ }
+}

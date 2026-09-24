@@ -1,0 +1,759 @@
+{
+  "format": 1,
+  "seed": 17964,
+  "render_config_digest": "e438b716da30f062",
+  "ink_luminance": 0.14,
+  "solid_luminance": 0.3,
+  "white_saturation": 0.22,
+  "moments": [
+    "a_opening",
+    "b_first_split",
+    "c_first_transition",
+    "d_four_balls",
+    "e_damaged_panel",
+    "f_critical_panel",
+    "g_panel_break",
+    "g2_flood_through",
+    "h_final_wall",
+    "i_final_escape",
+    "j_winner_frame"
+  ],
+  "rows": [
+    {
+      "variant": "4B",
+      "fraction": 0.85,
+      "frames": 11,
+      "measured": [
+        {
+          "ink_fraction": 0.5241493055555555,
+          "solid_fraction": 0.11038532021604938,
+          "mean_luma": 0.17956608533859253,
+          "empty_band_px": 360,
+          "empty_band_fraction": 0.1875,
+          "white_share_of_bright": 0.463037637344634,
+          "mean_saturation_of_bright": 0.2803661823272705,
+          "file": "a_opening.png"
+        },
+        {
+          "ink_fraction": 0.5294704861111111,
+          "solid_fraction": 0.11274932484567901,
+          "mean_luma": 0.18099549412727356,
+          "empty_band_px": 360,
+          "empty_band_fraction": 0.1875,
+          "white_share_of_bright": 0.45165677917167457,
+          "mean_saturation_of_bright": 0.29007261991500854,
+          "file": "b_first_split.png"
+        },
+        {
+          "ink_fraction": 0.4590036651234568,
+          "solid_fraction": 0.08353298611111111,
+          "mean_luma": 0.16187745332717896,
+          "empty_band_px": 478,
+          "empty_band_fraction": 0.24895833333333334,
+          "white_share_of_bright": 0.41637511979401204,
+          "mean_saturation_of_bright": 0.31659621000289917,
+          "file": "c_first_transition.png"
+        },
+        {
+          "ink_fraction": 0.5281230709876543,
+          "solid_fraction": 0.1176123649691358,
+          "mean_luma": 0.18068453669548035,
+          "empty_band_px": 360,
+          "empty_band_fraction": 0.1875,
+          "white_share_of_bright": 0.4258511323145304,
+          "mean_saturation_of_bright": 0.30101022124290466,
+          "file": "d_four_balls.png"
+        },
+        {
+          "ink_fraction": 0.5347333140432099,
+          "solid_fraction": 0.11345920138888889,
+          "mean_luma": 0.1808679848909378,
+          "empty_band_px": 360,
+          "empty_band_fraction": 0.1875,
+          "white_share_of_bright": 0.45941029204867617,
+          "mean_saturation_of_bright": 0.2813124358654022,
+          "file": "e_damaged_panel.png"
+        },
+        {
+          "ink_fraction": 0.3526572145061728,
+          "solid_fraction": 0.059722222222222225,
+          "mean_luma": 0.14551202952861786,
+          "empty_band_px": 531,
+          "empty_band_fraction": 0.2765625,
+          "white_share_of_bright": 0.42294089147286823,
+          "mean_saturation_of_bright": 0.3116243779659271,
+          "file": "f_critical_panel.png"
+        },
+        {
+          "ink_fraction": 0.35693045910493826,
+          "solid_fraction": 0.06845582561728394,
+          "mean_luma": 0.15043960511684418,
+          "empty_band_px": 531,
+          "empty_band_fraction": 0.2765625,
+          "white_share_of_bright": 0.3579992955265939,
+          "mean_saturation_of_bright": 0.3582621216773987,
+          "file": "g2_flood_through.png"
+        },
+        {
+          "ink_fraction": 0.5290663580246914,
+          "solid_fraction": 0.11651427469135803,
+          "mean_luma": 0.18166953325271606,
+          "empty_band_px": 360,
+          "empty_band_fraction": 0.1875,
+          "white_share_of_bright": 0.45394529891889207,
+          "mean_saturation_of_bright": 0.2882702350616455,
+          "file": "g_panel_break.png"
+        },
+        {
+          "ink_fraction": 0.3636159336419753,
+          "solid_fraction": 0.0792872299382716,
+          "mean_luma": 0.15501300990581512,
+          "empty_band_px": 531,
+          "empty_band_fraction": 0.2765625,
+          "white_share_of_bright": 0.2956754455325102,
+          "mean_saturation_of_bright": 0.3951077461242676,
+          "file": "h_final_wall.png"
+        },
+        {
+          "ink_fraction": 0.4061766975308642,
+          "solid_fraction": 0.13985435956790124,
+          "mean_luma": 0.17677468061447144,
+          "empty_band_px": 402,
+          "empty_band_fraction": 0.209375,
+          "white_share_of_bright": 0.5056275473962248,
+          "mean_saturation_of_bright": 0.3238571882247925,
+          "file": "i_final_escape.png"
+        },
+        {
+          "ink_fraction": 0.4352464313271605,
+          "solid_fraction": 0.15298996913580246,
+          "mean_luma": 0.18345214426517487,
+          "empty_band_px": 402,
+          "empty_band_fraction": 0.209375,
+          "white_share_of_bright": 0.5443197579119909,
+          "mean_saturation_of_bright": 0.30747362971305847,
+          "file": "j_winner_frame.png"
+        }
+      ],
+      "measured_mean_ink": 0.45628844872334456,
+      "measured_early_ink": 0.5042078189300412,
+      "measured_late_ink": 0.4016796875,
+      "measured_worst_empty_band": 531,
+      "measured_white_share": 0.5443197579119909,
+      "derived_ink_thirds": {
+        "early": 0.21534843399630635,
+        "middle": 0.13812185516208422,
+        "late": 0.13966373378900712
+      },
+      "opening_stage": {
+        "stage": 0,
+        "extent_shell": 2,
+        "start": 0.0,
+        "settled": 0.0,
+        "view_radius": 13.345749999999999,
+        "pixels_per_unit": 36.284584980237156,
+        "camera_distance": 34.22706849710429,
+        "frontier_diameter_px": 918.0000000000001,
+        "ball_diameter_px": 38.461660079051384,
+        "ball_drawn_diameter_px": 50.000158102766804,
+        "opening_width_px": 112.63338327110118,
+        "opening_over_ball": 2.9284587051001556,
+        "wall_face_thickness_px": 10.885375494071146,
+        "wall_apparent_thickness_px": 37.69204963334374,
+        "wall_flank_px": 26.8066741392726,
+        "occupancy": {
+          "t": 0.0,
+          "material_fraction": 0.2714894591976236,
+          "ball_fraction": 0.0018938154184756177,
+          "ink_fraction": 0.2733832746160992,
+          "arena_footprint_fraction": 0.3192001319429452,
+          "empty_fraction": 0.7266167253839009
+        }
+      },
+      "final_stage": {
+        "stage": 1,
+        "extent_shell": 4,
+        "start": 4.633970042431505,
+        "settled": 5.0339700424315055,
+        "view_radius": 19.675749999999997,
+        "pixels_per_unit": 24.611260053619304,
+        "camera_distance": 50.46125118347786,
+        "frontier_diameter_px": 918.0,
+        "ball_diameter_px": 26.087935656836464,
+        "ball_drawn_diameter_px": 33.9143163538874,
+        "opening_width_px": 35.94550543885337,
+        "opening_over_ball": 1.3778593259230798,
+        "wall_face_thickness_px": 7.383378016085791,
+        "wall_apparent_thickness_px": 57.20422505331607,
+        "wall_flank_px": 49.82084703723029,
+        "occupancy": {
+          "t": 5.0339700424315055,
+          "material_fraction": 0.13388794691880201,
+          "ball_fraction": 0.002178216459566406,
+          "ink_fraction": 0.1360661633783684,
+          "arena_footprint_fraction": 0.31920013194294516,
+          "empty_fraction": 0.8639338366216316
+        }
+      },
+      "critical_hidden": 0,
+      "critical_pass": true,
+      "hard_on_frame": true,
+      "worst_hard_off_frame": 0.0,
+      "contained": true,
+      "ball_frames_off_frame": 0,
+      "frames_measured": 1548
+    },
+    {
+      "variant": "A",
+      "fraction": 1.0,
+      "frames": 11,
+      "measured": [
+        {
+          "ink_fraction": 0.5642708333333334,
+          "solid_fraction": 0.1358400848765432,
+          "mean_luma": 0.2014603614807129,
+          "empty_band_px": 243,
+          "empty_band_fraction": 0.1265625,
+          "white_share_of_bright": 0.4582928024197843,
+          "mean_saturation_of_bright": 0.2832070589065552,
+          "file": "a_opening.png"
+        },
+        {
+          "ink_fraction": 0.5721474729938272,
+          "solid_fraction": 0.1389284336419753,
+          "mean_luma": 0.20338183641433716,
+          "empty_band_px": 243,
+          "empty_band_fraction": 0.1265625,
+          "white_share_of_bright": 0.4475704834040308,
+          "mean_saturation_of_bright": 0.29294759035110474,
+          "file": "b_first_split.png"
+        },
+        {
+          "ink_fraction": 0.5445433063271605,
+          "solid_fraction": 0.10998167438271605,
+          "mean_luma": 0.1816503405570984,
+          "empty_band_px": 389,
+          "empty_band_fraction": 0.20260416666666667,
+          "white_share_of_bright": 0.4017048294732042,
+          "mean_saturation_of_bright": 0.3194637894630432,
+          "file": "c_first_transition.png"
+        },
+        {
+          "ink_fraction": 0.5813184799382716,
+          "solid_fraction": 0.14696614583333334,
+          "mean_luma": 0.20453336834907532,
+          "empty_band_px": 243,
+          "empty_band_fraction": 0.1265625,
+          "white_share_of_bright": 0.42930411584615535,
+          "mean_saturation_of_bright": 0.3016057014465332,
+          "file": "d_four_balls.png"
+        },
+        {
+          "ink_fraction": 0.5815205439814815,
+          "solid_fraction": 0.1400245949074074,
+          "mean_luma": 0.20331703126430511,
+          "empty_band_px": 243,
+          "empty_band_fraction": 0.1265625,
+          "white_share_of_bright": 0.45771899915620534,
+          "mean_saturation_of_bright": 0.28275641798973083,
+          "file": "e_damaged_panel.png"
+        },
+        {
+          "ink_fraction": 0.45111882716049384,
+          "solid_fraction": 0.08402633101851852,
+          "mean_luma": 0.1656542718410492,
+          "empty_band_px": 478,
+          "empty_band_fraction": 0.24895833333333334,
+          "white_share_of_bright": 0.4287034326807739,
+          "mean_saturation_of_bright": 0.30748453736305237,
+          "file": "f_critical_panel.png"
+        },
+        {
+          "ink_fraction": 0.46119839891975306,
+          "solid_fraction": 0.09543354552469135,
+          "mean_luma": 0.17229336500167847,
+          "empty_band_px": 479,
+          "empty_band_fraction": 0.24947916666666667,
+          "white_share_of_bright": 0.3735035954136368,
+          "mean_saturation_of_bright": 0.350467711687088,
+          "file": "g2_flood_through.png"
+        },
+        {
+          "ink_fraction": 0.5646720679012346,
+          "solid_fraction": 0.14337818287037038,
+          "mean_luma": 0.20321974158287048,
+          "empty_band_px": 243,
+          "empty_band_fraction": 0.1265625,
+          "white_share_of_bright": 0.449660117924449,
+          "mean_saturation_of_bright": 0.29059794545173645,
+          "file": "g_panel_break.png"
+        },
+        {
+          "ink_fraction": 0.4704716435185185,
+          "solid_fraction": 0.10968219521604938,
+          "mean_luma": 0.17835359275341034,
+          "empty_band_px": 478,
+          "empty_band_fraction": 0.24895833333333334,
+          "white_share_of_bright": 0.31209521757673553,
+          "mean_saturation_of_bright": 0.38566628098487854,
+          "file": "h_final_wall.png"
+        },
+        {
+          "ink_fraction": 0.5122530864197531,
+          "solid_fraction": 0.17385416666666667,
+          "mean_luma": 0.20062735676765442,
+          "empty_band_px": 402,
+          "empty_band_fraction": 0.209375,
+          "white_share_of_bright": 0.48153973326232163,
+          "mean_saturation_of_bright": 0.3282519578933716,
+          "file": "i_final_escape.png"
+        },
+        {
+          "ink_fraction": 0.5410325038580247,
+          "solid_fraction": 0.18814139660493828,
+          "mean_luma": 0.20846709609031677,
+          "empty_band_px": 402,
+          "empty_band_fraction": 0.209375,
+          "white_share_of_bright": 0.5218978289288186,
+          "mean_saturation_of_bright": 0.3124961256980896,
+          "file": "j_winner_frame.png"
+        }
+      ],
+      "measured_mean_ink": 0.531322469486532,
+      "measured_early_ink": 0.5603205375514403,
+      "measured_late_ink": 0.5079190779320988,
+      "measured_worst_empty_band": 479,
+      "measured_white_share": 0.5218978289288186,
+      "derived_ink_thirds": {
+        "early": 0.2931471988589293,
+        "middle": 0.21256890271052994,
+        "late": 0.21470299077547517
+      },
+      "opening_stage": {
+        "stage": 0,
+        "extent_shell": 2,
+        "start": 0.0,
+        "settled": 0.0,
+        "view_radius": 13.345749999999999,
+        "pixels_per_unit": 42.68774703557312,
+        "camera_distance": 29.09300822253865,
+        "frontier_diameter_px": 1080.0,
+        "ball_diameter_px": 45.24901185770751,
+        "ball_drawn_diameter_px": 58.82371541501976,
+        "opening_width_px": 132.50986267188372,
+        "opening_over_ball": 2.9284587051001556,
+        "wall_face_thickness_px": 12.806324110671936,
+        "wall_apparent_thickness_px": 49.526002107409,
+        "wall_flank_px": 36.71967799673706,
+        "occupancy": {
+          "t": 0.0,
+          "material_fraction": 0.35245115831102614,
+          "ball_fraction": 0.0026211978110389166,
+          "ink_fraction": 0.35507235612206506,
+          "arena_footprint_fraction": 0.4417994905784707,
+          "empty_fraction": 0.644927643877935
+        }
+      },
+      "final_stage": {
+        "stage": 1,
+        "extent_shell": 4,
+        "start": 4.633970042431505,
+        "settled": 5.0339700424315055,
+        "view_radius": 19.675749999999997,
+        "pixels_per_unit": 28.9544235924933,
+        "camera_distance": 42.89206350595619,
+        "frontier_diameter_px": 1080.0,
+        "ball_diameter_px": 30.6916890080429,
+        "ball_drawn_diameter_px": 39.89919571045577,
+        "opening_width_px": 42.28882992806279,
+        "opening_over_ball": 1.3778593259230798,
+        "wall_face_thickness_px": 8.68632707774799,
+        "wall_apparent_thickness_px": 76.33621076324525,
+        "wall_flank_px": 67.64988368549727,
+        "occupancy": {
+          "t": 5.0339700424315055,
+          "material_fraction": 0.20670882209699057,
+          "ball_fraction": 0.003014832469988106,
+          "ink_fraction": 0.20972365456697867,
+          "arena_footprint_fraction": 0.4417994905784707,
+          "empty_fraction": 0.7902763454330213
+        }
+      },
+      "critical_hidden": 0,
+      "critical_pass": true,
+      "hard_on_frame": true,
+      "worst_hard_off_frame": 0.0,
+      "contained": true,
+      "ball_frames_off_frame": 0,
+      "frames_measured": 1548
+    },
+    {
+      "variant": "B",
+      "fraction": 1.1,
+      "frames": 11,
+      "measured": [
+        {
+          "ink_fraction": 0.5747627314814815,
+          "solid_fraction": 0.14568190586419752,
+          "mean_luma": 0.21169792115688324,
+          "empty_band_px": 164,
+          "empty_band_fraction": 0.08541666666666667,
+          "white_share_of_bright": 0.4509245711486133,
+          "mean_saturation_of_bright": 0.28555309772491455,
+          "file": "a_opening.png"
+        },
+        {
+          "ink_fraction": 0.5838401813271605,
+          "solid_fraction": 0.14943287037037037,
+          "mean_luma": 0.21403315663337708,
+          "empty_band_px": 164,
+          "empty_band_fraction": 0.08541666666666667,
+          "white_share_of_bright": 0.43947344641520153,
+          "mean_saturation_of_bright": 0.2964731752872467,
+          "file": "b_first_split.png"
+        },
+        {
+          "ink_fraction": 0.5812152777777778,
+          "solid_fraction": 0.12350212191358025,
+          "mean_luma": 0.19157354533672333,
+          "empty_band_px": 327,
+          "empty_band_fraction": 0.1703125,
+          "white_share_of_bright": 0.388665880497005,
+          "mean_saturation_of_bright": 0.3231339156627655,
+          "file": "c_first_transition.png"
+        },
+        {
+          "ink_fraction": 0.604897762345679,
+          "solid_fraction": 0.16225308641975308,
+          "mean_luma": 0.21714895963668823,
+          "empty_band_px": 164,
+          "empty_band_fraction": 0.08541666666666667,
+          "white_share_of_bright": 0.4258577848582842,
+          "mean_saturation_of_bright": 0.30373266339302063,
+          "file": "d_four_balls.png"
+        },
+        {
+          "ink_fraction": 0.5910812114197531,
+          "solid_fraction": 0.15088686342592592,
+          "mean_luma": 0.21408657729625702,
+          "empty_band_px": 164,
+          "empty_band_fraction": 0.08541666666666667,
+          "white_share_of_bright": 0.4526030829809607,
+          "mean_saturation_of_bright": 0.2847050428390503,
+          "file": "e_damaged_panel.png"
+        },
+        {
+          "ink_fraction": 0.5037644675925926,
+          "solid_fraction": 0.09625,
+          "mean_luma": 0.17555131018161774,
+          "empty_band_px": 430,
+          "empty_band_fraction": 0.22395833333333334,
+          "white_share_of_bright": 0.42105078563411896,
+          "mean_saturation_of_bright": 0.30904802680015564,
+          "file": "f_critical_panel.png"
+        },
+        {
+          "ink_fraction": 0.5189906442901234,
+          "solid_fraction": 0.11017071759259259,
+          "mean_luma": 0.18362852931022644,
+          "empty_band_px": 431,
+          "empty_band_fraction": 0.22447916666666667,
+          "white_share_of_bright": 0.3693061939155176,
+          "mean_saturation_of_bright": 0.35184070467948914,
+          "file": "g2_flood_through.png"
+        },
+        {
+          "ink_fraction": 0.5786390817901235,
+          "solid_fraction": 0.15438850308641974,
+          "mean_luma": 0.21376731991767883,
+          "empty_band_px": 164,
+          "empty_band_fraction": 0.08541666666666667,
+          "white_share_of_bright": 0.44243768351346285,
+          "mean_saturation_of_bright": 0.2929772436618805,
+          "file": "g_panel_break.png"
+        },
+        {
+          "ink_fraction": 0.5285325038580246,
+          "solid_fraction": 0.1255811149691358,
+          "mean_luma": 0.19034646451473236,
+          "empty_band_px": 431,
+          "empty_band_fraction": 0.22447916666666667,
+          "white_share_of_bright": 0.30909544747604695,
+          "mean_saturation_of_bright": 0.38605979084968567,
+          "file": "h_final_wall.png"
+        },
+        {
+          "ink_fraction": 0.5665504436728395,
+          "solid_fraction": 0.1876171875,
+          "mean_luma": 0.21192175149917603,
+          "empty_band_px": 402,
+          "empty_band_fraction": 0.209375,
+          "white_share_of_bright": 0.46558863673167233,
+          "mean_saturation_of_bright": 0.3342612385749817,
+          "file": "i_final_escape.png"
+        },
+        {
+          "ink_fraction": 0.599053337191358,
+          "solid_fraction": 0.20725983796296296,
+          "mean_luma": 0.22144675254821777,
+          "empty_band_px": 402,
+          "empty_band_fraction": 0.209375,
+          "white_share_of_bright": 0.5149753126061605,
+          "mean_saturation_of_bright": 0.312534898519516,
+          "file": "j_winner_frame.png"
+        }
+      ],
+      "measured_mean_ink": 0.5664843311588104,
+      "measured_early_ink": 0.5799393968621399,
+      "measured_late_ink": 0.5647120949074074,
+      "measured_worst_empty_band": 431,
+      "measured_white_share": 0.5149753126061605,
+      "derived_ink_thirds": {
+        "early": 0.3163909358608393,
+        "middle": 0.2341495855417433,
+        "late": 0.236731832100327
+      },
+      "opening_stage": {
+        "stage": 0,
+        "extent_shell": 2,
+        "start": 0.0,
+        "settled": 0.0,
+        "view_radius": 13.345749999999999,
+        "pixels_per_unit": 46.956521739130444,
+        "camera_distance": 26.44818929321695,
+        "frontier_diameter_px": 1188.0000000000002,
+        "ball_diameter_px": 49.773913043478274,
+        "ball_drawn_diameter_px": 64.70608695652176,
+        "opening_width_px": 145.76084893907213,
+        "opening_over_ball": 2.9284587051001556,
+        "wall_face_thickness_px": 14.086956521739133,
+        "wall_apparent_thickness_px": 58.214104181344545,
+        "wall_flank_px": 44.127147659605406,
+        "occupancy": {
+          "t": 0.0,
+          "material_fraction": 0.37582673260191823,
+          "ball_fraction": 0.0031716493513570913,
+          "ink_fraction": 0.37899838195327534,
+          "arena_footprint_fraction": 0.517229932455425,
+          "empty_fraction": 0.6210016180467246
+        }
+      },
+      "final_stage": {
+        "stage": 1,
+        "extent_shell": 4,
+        "start": 4.633970042431505,
+        "settled": 5.0339700424315055,
+        "view_radius": 19.675749999999997,
+        "pixels_per_unit": 31.849865951742636,
+        "camera_distance": 38.99278500541471,
+        "frontier_diameter_px": 1188.0000000000002,
+        "ball_diameter_px": 33.76085790884719,
+        "ball_drawn_diameter_px": 43.889115281501354,
+        "opening_width_px": 46.51771292086907,
+        "opening_over_ball": 1.3778593259230798,
+        "wall_face_thickness_px": 9.55495978552279,
+        "wall_apparent_thickness_px": 90.39042111474114,
+        "wall_flank_px": 80.83546132921836,
+        "occupancy": {
+          "t": 5.0339700424315055,
+          "material_fraction": 0.22705888799936064,
+          "ball_fraction": 0.003647947288685609,
+          "ink_fraction": 0.23070683528804625,
+          "arena_footprint_fraction": 0.517229932455425,
+          "empty_fraction": 0.7692931647119537
+        }
+      },
+      "critical_hidden": 4,
+      "critical_pass": true,
+      "hard_on_frame": true,
+      "worst_hard_off_frame": 0.0,
+      "contained": false,
+      "ball_frames_off_frame": 64,
+      "frames_measured": 1548
+    },
+    {
+      "variant": "C",
+      "fraction": 1.2,
+      "frames": 11,
+      "measured": [
+        {
+          "ink_fraction": 0.5750024112654321,
+          "solid_fraction": 0.15448591820987653,
+          "mean_luma": 0.2200770080089569,
+          "empty_band_px": 86,
+          "empty_band_fraction": 0.04479166666666667,
+          "white_share_of_bright": 0.4417684849317292,
+          "mean_saturation_of_bright": 0.28733500838279724,
+          "file": "a_opening.png"
+        },
+        {
+          "ink_fraction": 0.5831655092592593,
+          "solid_fraction": 0.15889515817901234,
+          "mean_luma": 0.22279737889766693,
+          "empty_band_px": 86,
+          "empty_band_fraction": 0.04479166666666667,
+          "white_share_of_bright": 0.4284140400928722,
+          "mean_saturation_of_bright": 0.2998831570148468,
+          "file": "b_first_split.png"
+        },
+        {
+          "ink_fraction": 0.613041087962963,
+          "solid_fraction": 0.1394921875,
+          "mean_luma": 0.20355035364627838,
+          "empty_band_px": 265,
+          "empty_band_fraction": 0.13802083333333334,
+          "white_share_of_bright": 0.3891706510954154,
+          "mean_saturation_of_bright": 0.3231658339500427,
+          "file": "c_first_transition.png"
+        },
+        {
+          "ink_fraction": 0.6136255787037037,
+          "solid_fraction": 0.1745924961419753,
+          "mean_luma": 0.22728100419044495,
+          "empty_band_px": 86,
+          "empty_band_fraction": 0.04479166666666667,
+          "white_share_of_bright": 0.41940696341513944,
+          "mean_saturation_of_bright": 0.30632680654525757,
+          "file": "d_four_balls.png"
+        },
+        {
+          "ink_fraction": 0.5864631558641975,
+          "solid_fraction": 0.1608135609567901,
+          "mean_luma": 0.2229021191596985,
+          "empty_band_px": 86,
+          "empty_band_fraction": 0.04479166666666667,
+          "white_share_of_bright": 0.4438033604927683,
+          "mean_saturation_of_bright": 0.28711068630218506,
+          "file": "e_damaged_panel.png"
+        },
+        {
+          "ink_fraction": 0.5481544174382716,
+          "solid_fraction": 0.11392988040123457,
+          "mean_luma": 0.18615184724330902,
+          "empty_band_px": 381,
+          "empty_band_fraction": 0.1984375,
+          "white_share_of_bright": 0.41052720692501427,
+          "mean_saturation_of_bright": 0.3105113208293915,
+          "file": "f_critical_panel.png"
+        },
+        {
+          "ink_fraction": 0.5711868248456791,
+          "solid_fraction": 0.12998842592592594,
+          "mean_luma": 0.1948910504579544,
+          "empty_band_px": 382,
+          "empty_band_fraction": 0.19895833333333332,
+          "white_share_of_bright": 0.36044207995726113,
+          "mean_saturation_of_bright": 0.3523603677749634,
+          "file": "g2_flood_through.png"
+        },
+        {
+          "ink_fraction": 0.5809524498456791,
+          "solid_fraction": 0.16532552083333332,
+          "mean_luma": 0.2229011058807373,
+          "empty_band_px": 86,
+          "empty_band_fraction": 0.04479166666666667,
+          "white_share_of_bright": 0.4323185121011379,
+          "mean_saturation_of_bright": 0.29551437497138977,
+          "file": "g_panel_break.png"
+        },
+        {
+          "ink_fraction": 0.5707518325617283,
+          "solid_fraction": 0.1409669174382716,
+          "mean_luma": 0.20003783702850342,
+          "empty_band_px": 382,
+          "empty_band_fraction": 0.19895833333333332,
+          "white_share_of_bright": 0.3211327738796958,
+          "mean_saturation_of_bright": 0.3716503381729126,
+          "file": "h_final_wall.png"
+        },
+        {
+          "ink_fraction": 0.6087273341049383,
+          "solid_fraction": 0.20210069444444445,
+          "mean_luma": 0.22068022191524506,
+          "empty_band_px": 381,
+          "empty_band_fraction": 0.1984375,
+          "white_share_of_bright": 0.4700030543385925,
+          "mean_saturation_of_bright": 0.32569149136543274,
+          "file": "i_final_escape.png"
+        },
+        {
+          "ink_fraction": 0.646869212962963,
+          "solid_fraction": 0.2242409336419753,
+          "mean_luma": 0.23131518065929413,
+          "empty_band_px": 381,
+          "empty_band_fraction": 0.1984375,
+          "white_share_of_bright": 0.5227662768341412,
+          "mean_saturation_of_bright": 0.3013675808906555,
+          "file": "j_winner_frame.png"
+        }
+      ],
+      "measured_mean_ink": 0.5907218013468014,
+      "measured_early_ink": 0.5904030028292181,
+      "measured_late_ink": 0.6087827932098765,
+      "measured_worst_empty_band": 382,
+      "measured_white_share": 0.5227662768341412,
+      "derived_ink_thirds": {
+        "early": 0.3338986103152502,
+        "middle": 0.27013663510542796,
+        "late": 0.2730976868542579
+      },
+      "opening_stage": {
+        "stage": 0,
+        "extent_shell": 2,
+        "start": 0.0,
+        "settled": 0.0,
+        "view_radius": 13.345749999999999,
+        "pixels_per_unit": 51.22529644268774,
+        "camera_distance": 24.244173518782212,
+        "frontier_diameter_px": 1296.0,
+        "ball_diameter_px": 54.29881422924901,
+        "ball_drawn_diameter_px": 70.58845849802371,
+        "opening_width_px": 159.01183520626046,
+        "opening_over_ball": 2.9284587051001556,
+        "wall_face_thickness_px": 15.367588932806322,
+        "wall_apparent_thickness_px": 67.52606401889234,
+        "wall_flank_px": 52.158475086086014,
+        "occupancy": {
+          "t": 0.0,
+          "material_fraction": 0.3784317600256286,
+          "ball_fraction": 0.0037745248478960394,
+          "ink_fraction": 0.38220628487352465,
+          "arena_footprint_fraction": 0.5855488997879399,
+          "empty_fraction": 0.6177937151264754
+        }
+      },
+      "final_stage": {
+        "stage": 1,
+        "extent_shell": 4,
+        "start": 4.633970042431505,
+        "settled": 5.0339700424315055,
+        "view_radius": 19.675749999999997,
+        "pixels_per_unit": 34.74530831099196,
+        "camera_distance": 35.7433862549635,
+        "frontier_diameter_px": 1296.0,
+        "ball_diameter_px": 36.83002680965148,
+        "ball_drawn_diameter_px": 47.87903485254692,
+        "opening_width_px": 50.74659591367534,
+        "opening_over_ball": 1.3778593259230798,
+        "wall_face_thickness_px": 10.423592493297587,
+        "wall_apparent_thickness_px": 105.43945122833632,
+        "wall_flank_px": 95.01585873503875,
+        "occupancy": {
+          "t": 5.0339700424315055,
+          "material_fraction": 0.26169811902193124,
+          "ball_fraction": 0.0043413587567828725,
+          "ink_fraction": 0.2660394777787141,
+          "arena_footprint_fraction": 0.5855488997879399,
+          "empty_fraction": 0.7339605222212859
+        }
+      },
+      "critical_hidden": 7,
+      "critical_pass": true,
+      "hard_on_frame": true,
+      "worst_hard_off_frame": 0.0,
+      "contained": false,
+      "ball_frames_off_frame": 132,
+      "frames_measured": 1548
+    }
+  ]
+}
