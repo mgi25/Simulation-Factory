@@ -281,7 +281,22 @@ class EngineeringRunner:
                 ok, detail = False, str(exc)
             backends[name] = {"available": ok, "detail": detail}
         checks["backends"] = backends
-        checks["required_suites"] = list(REQUIRED_SUITES)
+        # The floor, not the answer. The gate derives its required set from the
+        # contracts in the checkout under test, so the real list is only known
+        # once there is a task worktree - `_gate_stage` asks for it there. What
+        # preflight can honestly report is the canonical minimum plus whatever
+        # the gate says about this repository right now.
+        checks["canonical_suites"] = list(REQUIRED_SUITES)
+        try:
+            checks["required_suites"] = list(
+                self._control.required_suites(
+                    gate_repo_root=self._workspace.repo_root,
+                    timeout_s=self.config.gate_timeout_s,
+                )
+            )
+        except RunnerError as exc:
+            checks["required_suites"] = []
+            checks["required_suites_error"] = str(exc)
         return checks
 
     def actionable(self) -> tuple[dict[str, Any], ...]:
@@ -1318,7 +1333,9 @@ class EngineeringRunner:
                 f"{commit[:12]}; the gate would describe a different tree"
             )
 
-        suites = self.config.gate_suites or REQUIRED_SUITES
+        suites = self.config.gate_suites or self._control.required_suites(
+            gate_repo_root=worktree, timeout_s=self.config.gate_timeout_s
+        )
         runs = run_tests(
             self._commands,
             python_executable=self.config.python_executable,

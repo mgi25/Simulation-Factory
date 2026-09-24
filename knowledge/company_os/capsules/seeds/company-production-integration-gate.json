@@ -76,6 +76,7 @@
   "source_digests": [],
   "status": "active",
   "tests": [
+    "tests/test_company_gate_suite_requirements.py",
     "tests/test_company_integration_gate.py"
   ],
   "title": "Production integration readiness gate",

@@ -1613,7 +1613,9 @@ def test_the_research_capsule_stays_within_budget_with_the_batch_layer_in_it():
     index = CapsuleIndex.load(SEED_ROOT)
     capsule = index.get("company-research-intelligence")
     assert capsule.size_chars() <= DEFAULT_BUDGET.max_capsule_chars
-    assert capsule.owns_paths == ("intelligence/research",)
+    # The capsule also claims the package-level namespace init; see
+    # tests/test_company_os_capsules.py for the canonical ownership assertion.
+    assert capsule.owns_paths == ("intelligence/__init__.py", "intelligence/research")
     assert "tests/test_company_os_research_batches.py" in capsule.tests
 
 

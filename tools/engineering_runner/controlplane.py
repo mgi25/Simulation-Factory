@@ -309,6 +309,60 @@ class ControlPlane:
             )
         return result, _parse_json(result.stdout, "company.integration check"), readiness
 
+    def required_suites(
+        self,
+        *,
+        gate_repo_root: Path,
+        timeout_s: float,
+        changed_paths: Sequence[str] = (),
+    ) -> tuple[str, ...]:
+        """Ask the gate which suites it wants evidence for, and run those.
+
+        The gate derives its required set from the contracts in the checkout,
+        and this package may not read those contracts - not by import and not
+        by name. So the list is asked for across the same command-line boundary
+        every other gate interaction uses, rather than kept as a second copy
+        here that would drift the moment a contract changed.
+
+        Exit code 2 means the gate could not work the set out in full. That is
+        refused rather than accepted as a shorter list: running the part it did
+        manage to name would produce evidence that looks complete and is not.
+        """
+        argv = [
+            self._python,
+            "-m",
+            INTEGRATION_MODULE,
+            "required-suites",
+            "--repo-root",
+            str(gate_repo_root),
+            "--json",
+        ]
+        for path in changed_paths:
+            argv.extend(["--changed-path", str(path)])
+        result = self._runner.run(argv, cwd=gate_repo_root, timeout_s=timeout_s)
+        command = f"python -m {INTEGRATION_MODULE} required-suites"
+        if result.timed_out or not result.stdout.strip():
+            raise ControlPlaneRefusal(command, result.exit_code, result.stderr.strip())
+        payload = _parse_json(result.stdout, command)
+        unresolved = payload.get("unresolved", []) or []
+        if result.exit_code != 0 or unresolved:
+            raise ControlPlaneRefusal(
+                command,
+                result.exit_code,
+                "the gate could not determine its required suites: "
+                + ("; ".join(str(item) for item in unresolved) or "no reason given"),
+            )
+        suites = tuple(
+            str(item.get("suite", ""))
+            for item in payload.get("requirements", [])
+            if str(item.get("suite", ""))
+        )
+        if not suites:
+            raise ControlPlaneRefusal(
+                command, result.exit_code, "the gate named no required suites"
+            )
+        return suites
+
     # --- internals ---------------------------------------------------------
 
     def _engineering(self, args: Sequence[str]) -> StageReply:

@@ -28,7 +28,9 @@
     "Capability matching is exact and deterministic: active before dormant, then fewest unrelated capabilities, then employee id.",
     "match_capabilities explains every employee's result, not only the winners.",
     "No LLM call, no network, no third-party dependency - standard library only.",
-    "A handoff or contract with no_subagents not exactly true is rejected (rule 2)."
+    "A handoff or contract with no_subagents not exactly true is rejected (rule 2).",
+    "Resolved context is reused only while its source digest matches: a stale entry is evicted, never returned, and a miss is preferred to stale evidence.",
+    "Compressed context is reversible against its canonical source or refused; reuse and compression carry a unit's authority through and never raise it."
   ],
   "last_reviewed": "2026-09-16",
   "may_read": [
@@ -70,9 +72,10 @@
   "source_digests": [],
   "status": "active",
   "tests": [
-    "tests/test_company_runtime.py",
     "tests/test_company_context_assembly.py",
-    "tests/test_company_efficiency.py"
+    "tests/test_company_efficiency.py",
+    "tests/test_company_runtime.py",
+    "tests/test_company_typed_evidence_context.py"
   ],
   "title": "Company runtime",
   "type": "module"
