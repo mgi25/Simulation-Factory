@@ -106,6 +106,7 @@ from ai_platform.serde import fingerprint as _fingerprint
 from knowledge.company_os import RecordStatus
 from knowledge.company_os.capsules import CapsuleIndex, normalise_path, path_related
 
+from .dependencies import DependencyGraph
 from .errors import IntegrationGateError
 from .sources import COMPANY_OS_TEST_PREFIX, TEST_ROOT
 
@@ -287,6 +288,7 @@ class SuiteOrigin(Enum):
     CANONICAL = "canonical"
     CAPSULE_CONTRACT = "capsule_contract"
     CHANGE_SCOPE = "change_scope"
+    DEPENDENCY_OBSERVED = "dependency_observed"
 
 
 @dataclass(frozen=True)
@@ -297,11 +299,20 @@ class SuiteRequirement:
     often required twice over - canonical *and* declared by a capsule contract
     - and dropping one of the two reasons would make the set look more fragile
     than it is.
+
+    The two capsule lists are kept apart because they are different claims.
+    `capsule_ids` are capsules that *named* this suite in `capsule.tests`.
+    `dependency_capsule_ids` are capsules whose owned code this suite imports,
+    which is something the repository says and the capsule may know nothing
+    about. Merging them was tried and produced report lines reading "declared
+    by ai-platform" for a suite `ai-platform` has never mentioned - a false
+    sentence in the one document a reader uses to dispute the set.
     """
 
     suite: str
     origins: tuple[SuiteOrigin, ...]
     capsule_ids: tuple[str, ...] = ()
+    dependency_capsule_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "suite", assert_reference(self.suite, "suite"))
@@ -318,11 +329,20 @@ class SuiteRequirement:
                 )
         object.__setattr__(self, "origins", origins)
         object.__setattr__(self, "capsule_ids", tuple(sorted(set(self.capsule_ids))))
+        object.__setattr__(
+            self,
+            "dependency_capsule_ids",
+            tuple(sorted(set(self.dependency_capsule_ids))),
+        )
 
     def reason(self) -> str:
         parts = [origin.value for origin in self.origins]
         if self.capsule_ids:
             parts.append("declared by " + ", ".join(self.capsule_ids))
+        if self.dependency_capsule_ids:
+            parts.append(
+                "imports code owned by " + ", ".join(self.dependency_capsule_ids)
+            )
         return "; ".join(parts)
 
     def to_dict(self) -> dict[str, Any]:
@@ -445,13 +465,14 @@ def resolve_required_suites(
     *,
     changed_paths: Iterable[str] = (),
     canonical: Iterable[str] = REQUIRED_SUITES,
+    graph: "DependencyGraph | None" = None,
 ) -> RequiredSuites:
     """Work out which suites this run needs evidence for.
 
     Deterministic and side-effect free: it reads an already-loaded capsule
-    index and a list of changed paths, runs no tests, and touches no clock.
-    The same index and the same paths always give the same set, which is what
-    lets the result be fingerprinted into a report.
+    index, a list of changed paths and an already-built dependency graph, runs
+    no tests, and touches no clock. The same inputs always give the same set,
+    which is what lets the result be fingerprinted into a report.
 
     `index` is `None` when the caller could not load the capsule store; an
     *empty* index and a *structurally broken* one mean the same thing in
@@ -459,17 +480,55 @@ def resolve_required_suites(
     the canonical floor is still returned, and `unresolved` says the
     contract-declared part is unknown, which keeps
     `health.required_suites_pass` at `unknown`.
+
+    ## The fourth source, and why it was needed
+
+    P6A derived the set from three sources and reported, at the bottom of
+    `python -m company.integration required-suites`, eleven Company OS suites
+    that no capsule declared and the gate therefore never asked about. They
+    could go red on a green gate.
+
+    Appending eleven names to `REQUIRED_SUITES` would have closed that
+    instance and restored the hand-maintained list P6A had just removed. The
+    twelfth suite, written next month, would be undeclared again.
+
+    `DEPENDENCY_OBSERVED` closes it as a class. A `test_company*` file whose
+    own import statements name a module an in-force capsule owns is evidence
+    the contract needs, whether or not a capsule got around to declaring it.
+    On this repository that is exactly the eleven, and no twelfth: all 38
+    Company OS suites reach owned code, and 27 were already required.
+
+    It is derived, not listed, so it needs no maintenance. It cannot shrink
+    the set - like every other source here it only ever adds. And it uses
+    *direct* imports, not the transitive closure: through a package facade
+    almost every suite reaches almost every module, which would make the
+    origin true of everything and therefore say nothing.
+
+    ## Why `graph=None` is unresolved rather than skipped
+
+    Same argument as `index is None`, one source along. A caller with no
+    dependency evidence has not learned that nothing is dependency-observed;
+    they have learned nothing about it. Returning the narrower set silently
+    would make omitting the graph the cheapest way to shrink the gate, which
+    is the one property this function exists to deny.
     """
     origins: dict[str, list[SuiteOrigin]] = {}
     capsules: dict[str, set[str]] = {}
+    reached: dict[str, set[str]] = {}
     unresolved: list[str] = []
 
     def require(suite: str, origin: SuiteOrigin, capsule_id: str = "") -> None:
         found = origins.setdefault(suite, [])
         if origin not in found:
             found.append(origin)
-        if capsule_id:
-            capsules.setdefault(suite, set()).add(capsule_id)
+        if not capsule_id:
+            return
+        # Which list an id lands in is decided by the origin that supplied it,
+        # not by the suite. The same capsule can legitimately appear in both:
+        # `company-runtime` declares `tests/test_company_runtime.py` and that
+        # suite also imports its code.
+        bucket = reached if origin is SuiteOrigin.DEPENDENCY_OBSERVED else capsules
+        bucket.setdefault(suite, set()).add(capsule_id)
 
     for suite in canonical:
         require(str(suite), SuiteOrigin.CANONICAL)
@@ -533,18 +592,81 @@ def resolve_required_suites(
         if suite and _is_company_os_test(suite):
             require(suite, SuiteOrigin.CHANGE_SCOPE)
 
+    unresolved.extend(
+        _require_dependency_observed(index, graph, require)
+    )
+
     return RequiredSuites(
         requirements=tuple(
             SuiteRequirement(
                 suite=suite,
                 origins=tuple(found),
                 capsule_ids=tuple(sorted(capsules.get(suite, ()))),
+                dependency_capsule_ids=tuple(sorted(reached.get(suite, ()))),
             )
             for suite, found in origins.items()
         ),
         unresolved=tuple(unresolved),
         derived_from=() if index is None else tuple(c.id for c in index.all()),
     )
+
+
+def _require_dependency_observed(
+    index: "CapsuleIndex | None",
+    graph: "DependencyGraph | None",
+    require,
+) -> tuple[str, ...]:
+    """Require every Company OS suite that imports code a capsule owns.
+
+    Returns the reasons the dependency-derived part could not be worked out,
+    so the caller can put them in `unresolved`. Three of them, and each is a
+    different way of not knowing rather than a way of knowing nothing:
+
+    * no graph was supplied at all;
+    * the graph could not parse part of the tree, so a suite that reaches
+      owned code may be sitting in the unparsed part;
+    * there is no usable capsule index, so "owned" has no meaning here. That
+      case is already unresolved for the contract-declared source; it is
+      repeated rather than assumed, because the two could drift apart.
+    """
+    if graph is None:
+        return (
+            "no dependency evidence was supplied, so the Company OS suites that "
+            "import capsule-owned code cannot be identified; only the declared "
+            "sources are required",
+        )
+    if graph.parse_failures:
+        return (
+            f"the dependency graph could not parse {len(graph.parse_failures)} "
+            f"file(s) (first: {graph.parse_failures[0]}), so a suite reaching "
+            "capsule-owned code may not be visible in it",
+        )
+    if index is None or len(index) == 0:
+        return (
+            "the capsule store is unreadable or empty, so no path can be shown to "
+            "be capsule-owned and the dependency-observed suites are unknown",
+        )
+
+    claims = [
+        (normalise_path(path), capsule.id)
+        for capsule in index.all()
+        if capsule.status in _IN_FORCE
+        for path in capsule.owns_paths
+    ]
+    for module in graph.modules:
+        if not graph.is_company_os_test(module):
+            continue
+        owners = sorted(
+            {
+                capsule_id
+                for reached in graph.modules_reached_by(module, transitive=False)
+                for claim, capsule_id in claims
+                if path_related(claim, reached)
+            }
+        )
+        for capsule_id in owners:
+            require(module, SuiteOrigin.DEPENDENCY_OBSERVED, capsule_id)
+    return ()
 
 
 def undeclared_company_os_suites(
