@@ -1,0 +1,115 @@
+{
+  "max_age_days": 7,
+  "results": [
+    {
+      "suite": "tests/test_company_analytics.py",
+      "passed": true,
+      "observed_on": "2026-09-24",
+      "reported_by": "p5-production-integration",
+      "selected": 160,
+      "failed": 0,
+      "note": "run on merged tree 03e4336 (integrate-p5-v1)",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_dashboard.py",
+      "passed": true,
+      "observed_on": "2026-09-24",
+      "reported_by": "p5-production-integration",
+      "selected": 32,
+      "failed": 0,
+      "note": "run on merged tree 03e4336 (integrate-p5-v1)",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_execution_transport.py",
+      "passed": true,
+      "observed_on": "2026-09-24",
+      "reported_by": "p5-production-integration",
+      "selected": 14,
+      "failed": 0,
+      "note": "run on merged tree 03e4336 (integrate-p5-v1)",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_finance.py",
+      "passed": true,
+      "observed_on": "2026-09-24",
+      "reported_by": "p5-production-integration",
+      "selected": 123,
+      "failed": 0,
+      "note": "run on merged tree 03e4336 (integrate-p5-v1)",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_integration_gate.py",
+      "passed": true,
+      "observed_on": "2026-09-24",
+      "reported_by": "p5-production-integration",
+      "selected": 88,
+      "failed": 0,
+      "note": "run on merged tree 03e4336 (integrate-p5-v1)",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_org_intelligence.py",
+      "passed": true,
+      "observed_on": "2026-09-24",
+      "reported_by": "p5-production-integration",
+      "selected": 119,
+      "failed": 0,
+      "note": "run on merged tree 03e4336 (integrate-p5-v1)",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_os_ai_platform.py",
+      "passed": true,
+      "observed_on": "2026-09-24",
+      "reported_by": "p5-production-integration",
+      "selected": 46,
+      "failed": 0,
+      "note": "run on merged tree 03e4336 (integrate-p5-v1)",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_os_capsules.py",
+      "passed": true,
+      "observed_on": "2026-09-24",
+      "reported_by": "p5-production-integration",
+      "selected": 68,
+      "failed": 0,
+      "note": "run on merged tree 03e4336 (integrate-p5-v1)",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_os_knowledge.py",
+      "passed": true,
+      "observed_on": "2026-09-24",
+      "reported_by": "p5-production-integration",
+      "selected": 26,
+      "failed": 0,
+      "note": "run on merged tree 03e4336 (integrate-p5-v1)",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_runtime.py",
+      "passed": true,
+      "observed_on": "2026-09-24",
+      "reported_by": "p5-production-integration",
+      "selected": 22,
+      "failed": 0,
+      "note": "run on merged tree 03e4336 (integrate-p5-v1)",
+      "company_os": true
+    },
+    {
+      "suite": "tests/test_company_workforce.py",
+      "passed": true,
+      "observed_on": "2026-09-24",
+      "reported_by": "p5-production-integration",
+      "selected": 93,
+      "failed": 0,
+      "note": "run on merged tree 03e4336 (integrate-p5-v1)",
+      "company_os": true
+    }
+  ]
+}
