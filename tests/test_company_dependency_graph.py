@@ -839,6 +839,40 @@ def test_the_runner_does_not_import_the_capsule_layer():
         assert not (_imported_roots(path) & banned), path
 
 
+# The raw strings `test_company_session_execution.py` greps every module under
+# a production root for. Restated here rather than imported because that suite
+# keeps its own import surface small, and pinned by value so the two copies
+# cannot drift.
+_FORBIDDEN_TEXT = (
+    "import company",
+    "from company",
+    "import ai_platform",
+    "from ai_platform",
+    "from knowledge.company_os",
+)
+
+
+def test_the_runner_does_not_even_write_the_control_plane_import_lines():
+    """The stricter, text-level form of the same rule, and why both exist.
+
+    `test_company_session_execution.py` greps production modules for these
+    strings rather than parsing them. A text guard cannot tell an import from
+    a docstring quoting one - and that is deliberate, because it is the only
+    form of the rule that survives a module reaching the control plane by
+    something other than a plain `import` statement.
+
+    P6B tripped it. Documenting the resolver's package-facade rule meant
+    writing an example import in a docstring, the AST-level test above passed,
+    and the full suite caught what it could not. Both are kept: the AST test
+    says what the module does, this one says what the file may contain, and
+    the second is the one a new docstring will break first.
+    """
+    for path in sorted((REPO_ROOT / "tools/engineering_runner").rglob("*.py")):
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        for banned in _FORBIDDEN_TEXT:
+            assert banned not in text, f"{path.name} contains {banned!r}"
+
+
 # --------------------------------------------------------------------------
 # Gate policy: the new condition is required, and it says so out loud
 # --------------------------------------------------------------------------

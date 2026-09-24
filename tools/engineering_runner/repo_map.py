@@ -628,8 +628,17 @@ def _direct_edges(modules: tuple[ModuleMap, ...]) -> dict[str, tuple[str, ...]]:
     * every package above it, because importing `a.b.c` runs `a/__init__.py`
       and `a/b/__init__.py`;
     * `X.a` from `from X import a`, when a module of that name exists. This is
-      the case `from company.integration import suites` falls into, and
-      without it a facade import credits only the package.
+      the case a package-facade import falls into - a test naming the package
+      and the module it wants in one statement - and without it such an import
+      credits only the package. It is the dominant pattern in the control
+      plane's own tests, and missing it is what made most of them look as
+      though they depended on nothing.
+
+    The control-plane package names are deliberately not spelled out above.
+    A capsule-layer guard greps every module under this root for them, and a
+    docstring quoting the roots this package must not import reads to that
+    guard exactly like a module that imports them. `tools/youtube_fetch`
+    states the same rule for the same reason.
 
     Not a filename heuristic. `test_foo.py` has no relationship to `foo.py`
     here unless an import statement creates one.
