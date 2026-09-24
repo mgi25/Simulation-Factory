@@ -122,7 +122,8 @@ import hashlib
 import json
 import math
 import os
-from typing import Any, Sequence
+import statistics
+from typing import Any, Mapping, Sequence
 
 from satisfying.multishell_playback import panel_state_at, position_at
 from satisfying.tile_safe_area import DEFAULT_SAFE_AREA, Region, SafeAreaConfig
@@ -237,13 +238,33 @@ ARENA_CENTRE_Y_FRACTION = 0.450
 # construction, which is what "constant frontier screen size" has to mean if it
 # is to be checkable.
 VIEW_PAD_FRACTION = 0.055
-# **How big the frontier is.** The frontier shell's outer material diameter, as
-# a fraction of the frame width, at every stage. Derived rather than chosen: the
-# conservative action rail begins at x = 0.840, so a disc centred on the axis
-# has 0.340 of the frame width to play with, which is 367.2 px at 1080. 0.652
-# puts the material edge at 352.1 px and leaves 15.1 px of rail clearance -
-# measured, not asserted, by `safe_area_report` and `centring_report`.
-FRONTIER_WIDTH_FRACTION = 0.652
+# **How big the important play region is.**  The framed shell's outer material
+# diameter as a fraction of the frame width.
+#
+# Phase 4A derived 0.652 from a rule the Phase 4B human review overturned: fit
+# the whole arena inside the band that clears the Shorts action rail. That rule
+# optimises for "the viewer can see every shell" and it produced exactly the
+# complaint the review made - a small disc in a tall black frame, getting
+# smaller as the population grew. The rail band is 0.680 of the width, so *any*
+# rule of that shape caps the arena below 0.68 forever.
+#
+# 4B optimises for "the interesting action is large" instead and lets the
+# irrelevant outer arc cross the rail. 0.850 was chosen from measurement, not
+# taste, and 0.900 was rejected by one:
+#
+#   * every panel break that any ball later used as a passage - 19 of them on
+#     17964, 5 on 3762, 9 on 1176 - is 0.00 covered by every safe-area region
+#     at 0.80, 0.85 and 0.90 alike. The breaks that do fall under the rail are
+#     ones no ball ever went through, which is the arc the review agreed to
+#     spend.
+#   * the winning escape is 0.00 covered at 0.80 and 0.85 on all three
+#     candidates, and **0.45 covered by the action rail on 3762 at 0.90**. The
+#     payoff is the one thing that may never be behind the player's controls,
+#     so 0.90 is out on evidence.
+#
+# `critical_visibility_report` is the measurement; `safe_area_report` keeps the
+# old whole-arena number as context and no longer gates on it.
+FRONTIER_WIDTH_FRACTION = 0.850
 # What is left after the player's own controls, as the brief's "usable screen
 # width": the widest horizontally centred band that clears the action rail.
 # Stated here so the occupancy report can quote the frontier against both this
@@ -306,11 +327,76 @@ CAMERA_FRUSTUM_OFFSET = (
     / FRAME_WIDTH,
 )
 
+# --- the Phase 4B camera schedule ----------------------------------------
+#
+# `(trigger_region, extent_shell)`, outward. The camera holds `extent_shell`'s
+# material edge at FRONTIER_WIDTH_FRACTION of the frame until the canonical
+# high-water frontier reaches `trigger_region`, and then eases out to the next
+# stage. Stage 0 has no trigger and is the opening framing.
+#
+# **Why exactly these three.** Phase 4A moved once per shell - four eased
+# zoom-outs over five shells - because the schedule was a function of the shell
+# list rather than of the race. Two rules from the human review pin the answer
+# down completely:
+#
+#   1. a ball may never be outside the framed disc, so the extent must be at
+#      least the frontier region at every instant;
+#   2. the outermost shell may not be revealed before the race reaches it, so
+#      the last stage's trigger is region 4 and not earlier.
+#
+# Rule 2 fixes the final stage at `(4, 4)`. Rule 1 then requires some stage to
+# cover frontier regions 2 and 3, so its extent is at least 3; taking it to be
+# exactly 3 is what avoids a fourth stage. The opening covers regions 0 and 1
+# for the same reason - region 1 is reached 0.52 s in on 17964, and a reframe
+# there would be a camera move in the first half second for no story reason.
+# So this is not one grouping among many: it is the *only* grouping with two
+# transitions that satisfies both rules, and a third rule - the final wall must
+# be framed when the winner leaves through it - forbids dropping to one.
+CAMERA_STAGE_PLAN: tuple[tuple[int, int], ...] = ((0, 1), (2, 3), (4, 4))
+
 # The framing opens this long before the canonical crossing that triggers it,
 # so the frame is already moving as the ball goes through rather than reacting
 # after it.
-FRAME_LEAD_SECONDS = 0.12
-FRAME_EASE_SECONDS = 0.55
+FRAME_LEAD_SECONDS = 0.14
+# Down from 0.55, to the top of the brief's 0.25-0.45 band, and **the top
+# rather than the middle because grouping the shells made each move bigger**.
+#
+# Two transitions instead of four is the same total zoom spent in half as many
+# payments: stage 1 grows the framed radius by 1.62x where Phase 4A's largest
+# single step was 1.45x. A zoom's cost to the viewer is the screen velocity it
+# induces - a world point at the frame edge slides inward while the radius
+# grows - and that velocity is the step divided by the duration. Phase 4A could
+# hold "a reframe never moves the screen faster than a ball does" because its
+# steps were small; 4B cannot, and pretending otherwise would mean either four
+# transitions again or a gate that no longer means anything.
+#
+# So the duration was swept against the measurement rather than chosen. Screen
+# velocity at the worst instant, as a multiple of the ball's own screen
+# velocity at the opening framing, on all three candidates:
+#
+#     0.25 s -> 2.81x    0.30 s -> 2.38x    0.35 s -> 2.06x
+#     0.40 s -> 1.81x    0.45 s -> 1.61x
+#
+# 0.45 is the slowest the brief allows and it costs 0.10 s of static tail. Ball
+# containment holds at every value, so nothing else is trading against it.
+FRAME_EASE_SECONDS = 0.45
+
+# --- event protection ------------------------------------------------------
+#
+# A zoom may not run across a moment the viewer is supposed to be watching. The
+# protected instants are canonical: the first clone, every panel break, every
+# strong near miss, and the escape. If the motion window would contain one, the
+# transition is pushed to just after it and re-checked.
+#
+# The deferral is bounded, because an unbounded one could push a transition
+# past the event it exists to frame. Measured on the three review candidates
+# the cap is never reached: the deferrals are 0.00, 0.52, 0.77, 0.00, 0.00 and
+# 0.00 seconds, against a cap of 0.90.
+EVENT_GUARD_BEFORE_SECONDS = 0.12
+EVENT_GUARD_AFTER_SECONDS = 0.22
+EVENT_GUARD_MAX_DEFER_SECONDS = 0.90
+#: A near miss closer than this many ball radii is worth protecting.
+STRONG_NEAR_MISS_RADII = 0.75
 
 # --------------------------------------------------------------------------
 # Balls
@@ -329,7 +415,13 @@ BALL_DRAW_SCALE = 1.30
 # wide additive halo is exactly the mechanism that turns a crowd into one white
 # blob, and the blob would destroy the one thing this redesign must protect -
 # which colour is which.
-HALO_SCALE = 2.10
+# Down again for 4B. Bloom is a world-unit radius, so it scales with the ball
+# on screen and the white-out risk is unchanged by the framing - but the frame
+# now holds the late population at a size where overlapping halos are actually
+# read, rather than being a 26 px smudge. 1.90 keeps the additive glow inside
+# the drawn rim at the final framing, which is what stops a cyan knot and an
+# orange knot both resolving to white.
+HALO_SCALE = 1.90
 # A near-black disc behind each core, slightly larger than it, drawn at a small
 # negative z so a core always wins the depth test against another ball's rim.
 # Seven balls inside two drawn diameters happens - seed 7183 at 15.6 s - and
@@ -348,13 +440,20 @@ EFFECT_Z = 0.16
 # 30 fps, so - unlike Test #1 - it never strobes and the trail is not needed
 # for continuity at all. It is here for two other jobs: it says which ball is
 # which inside a knot, and it is what turns a pile of seven balls into seven
-# diverging streaks. 0.16 s is 1.6 world units at the constant speed of 10, so
-# the trail is 34 px at the final framing against a 21 px ball, and the vector
-# is the larger signal. `readability_report` is what raised it from 0.11.
-TRAIL_SECONDS = 0.16
+# diverging streaks.
+#
+# **Shortened for 4B.** The trail is a length in world units, so raising the
+# frame fraction from 0.652 to 0.850 made every streak 30% longer on screen
+# without a constant changing. At eighteen balls that is the "spaghetti"
+# the brief warns about, and the brief is explicit that team identification
+# beats motion streaks. At the constant speed of 10, 0.16 s was 30.2 px at
+# Phase 4A's final framing against a 26.0 px drawn ball - the streak was the
+# bigger mark. 0.115 s is 28.3 px at 4B's against a 33.9 px ball, so the ball
+# is now the bigger mark and the vector is a hint rather than a ribbon.
+TRAIL_SECONDS = 0.115
 TRAIL_SAMPLES = 20
-TRAIL_HEAD_WIDTH = 0.92
-TRAIL_TAIL_WIDTH = 0.34
+TRAIL_HEAD_WIDTH = 0.78
+TRAIL_TAIL_WIDTH = 0.24
 
 # --------------------------------------------------------------------------
 # Walls
@@ -368,11 +467,47 @@ TRAIL_TAIL_WIDTH = 0.34
 # spread with the radius: the outermost wall came out 2.99 times the innermost
 # where Phase 3B measured 3.6. 0.70 to 3.60 restores it to 3.4 and makes the
 # final wall the heaviest object in the frame again.
-PANEL_DEPTH: tuple[float, ...] = (0.70, 1.15, 1.75, 2.55, 3.60)
+#
+# **Re-spread again for 4B, and this is the whole of "the final wall must feel
+# massive".** The brief forbids faking thicker collision geometry, so the front
+# silhouette at z = 0 is untouched on every shell and every extra gram of the
+# final wall comes from behind it. Three things compound:
+#
+#   * the ramp itself goes 0.70 -> 6.20 rather than 0.70 -> 3.60;
+#   * the larger frame fraction brings the camera in from 65.8 to 50.5 world
+#     units at the final framing, and a flank is `r * d / (D + d)`, so the same
+#     depth already buys 30% more flank;
+#   * the outer shells get a heavier chamfer and a brighter back rim below.
+#
+# Measured at each phase's own final framing, face plus flank, in 1080-wide
+# pixels: Phase 4A ran 6.96 / 8.74 / 11.78 / 16.58 / 23.78 and 4B runs
+# 9.57 / 13.04 / 19.96 / 32.79 / 57.20. The final wall is 2.41 times as thick
+# as it was, and it is 5.98 times the innermost shell where 4A managed 3.42 -
+# and that ramp is the thing a viewer reads as "these get harder".
+# `test_the_wall_depth_ramp_is_what_the_report_says` recomputes all ten numbers
+# from the frustum rather than comparing two copies of one constant.
+PANEL_DEPTH: tuple[float, ...] = (0.70, 1.25, 2.15, 3.60, 6.20)
 # Pillars at the shell vertices are the panels' own round caps, so their radius
 # is the canonical half-thickness and only their depth is a drawing choice.
-POST_DEPTH_FACTOR = 1.55
+#
+# **1.55 was the reason the outer walls looked like a cage, and rendering is
+# what found it.** A pillar is a cylinder pointing at the camera; at 1.55 times
+# the panel depth the outermost shell's pillars were 9.6 world units long and
+# projected as 66 radial spikes reaching inward from the wall. Every frame of
+# the first 4B render showed the final wall as a comb you could see through -
+# which is the opposite of massive, and it was there in Phase 4A too, hidden by
+# a camera half the size.
+#
+# At 0.55 the pillar ends well inside the panel's own depth and reads as what
+# it is: the seam between two blocks. The final wall then reads as a solid
+# segmented band, which is the "structural segmentation" the brief asked for.
+POST_DEPTH_FACTOR = 0.55
+# Per shell now rather than one number. A chamfer is a lit edge running the
+# length of the panel, and on the outer walls it is the line that separates the
+# front face from the flank - the single cue that says "this is a solid block
+# seen slightly from the side" rather than "this is a painted arc".
 PANEL_CHAMFER = 0.085
+PANEL_CHAMFER_BY_SHELL: tuple[float, ...] = (0.085, 0.085, 0.100, 0.115, 0.135)
 # Each panel is drawn as three sub-slabs so that `fractured` can separate them
 # and a break can retract them into the two posts. They are flush and share one
 # material until the panel fractures.
@@ -392,14 +527,49 @@ SPAWN_FLASH_RADIUS = 3.10
 SPAWN_LINK_SECONDS = 0.18
 NEAR_MISS_SECONDS = 0.16
 BREAK_FLASH_SECONDS = 0.16
-BREAK_RETRACT_SECONDS = 0.55
-BREAK_DEBRIS_SECONDS = 0.45
-BREAK_DEBRIS_COUNT = 8
-BREAK_DEBRIS_SIZE = 0.55
-BREAK_DEBRIS_SPEED = 7.0
-BREAK_DEBRIS_SPEED_SPREAD = 7.5
-BREAK_RING_SECONDS = 0.60
-BREAK_RING_RADIUS = 5.50
+# **The break, rebuilt.** The human review's complaint is that a break reads as
+# a marker disappearing rather than as a wall failing. The old sequence was a
+# 0.55 s retraction plus eight identical crimson sparks thrown on hashed
+# headings - which is a particle puff, and a particle puff is what "indicator"
+# looks like. The new sequence is the one the brief spells out: the crack
+# network flashes, the slab breaks into a few substantial chunks, the chunks
+# leave fast, and a passage is left open.
+#
+# Retraction is faster because the passage is the point: at 0.30 s the hole is
+# open within nine frames at 30 fps, while the chunks are still in the air.
+BREAK_RETRACT_SECONDS = 0.30
+#: The stress emphasis that precedes the failure, so the wall is seen to give.
+BREAK_STRESS_SECONDS = 0.10
+#: Substantial readable chunks, inside the brief's 3-6. Four is one per
+#: sub-slab plus one, which is what makes the count read as "the panel came
+#: apart" rather than as a number of particles.
+BREAK_FRAGMENT_COUNT = 4
+BREAK_FRAGMENT_SECONDS = 0.42
+#: A fragment is a piece of the panel, so its size is the panel's own geometry:
+#: this fraction of the chord long, the canonical thickness radially, and this
+#: fraction of the shell's depth behind. Nothing about it is a sprite.
+BREAK_FRAGMENT_CHORD_FRACTION = 0.22
+BREAK_FRAGMENT_DEPTH_FRACTION = 0.60
+#: Outward along the break normal, and along the chord, in world units/second.
+BREAK_FRAGMENT_OUT_SPEED = 5.2
+BREAK_FRAGMENT_SPIN_DEGREES = 220.0
+#: Secondary only. Small, few and short, so they read as grit off the fracture
+#: rather than as the event itself.
+BREAK_DEBRIS_SECONDS = 0.26
+BREAK_DEBRIS_COUNT = 5
+BREAK_DEBRIS_SIZE = 0.22
+BREAK_DEBRIS_SPEED = 6.0
+BREAK_DEBRIS_SPEED_SPREAD = 5.0
+BREAK_RING_SECONDS = 0.34
+BREAK_RING_RADIUS = 3.40
+#: **Flood-through.** If this many balls or more use a freshly opened passage
+#: within the window, the passage itself answers - the two flanking pillars
+#: brighten and a soft light sits in the gap. No screen shake, no global flash,
+#: and not one pixel of ball motion changes.
+FLOOD_WINDOW_SECONDS = 1.80
+FLOOD_MIN_BALLS = 2
+FLOOD_RESPONSE_SECONDS = 0.55
+FLOOD_POST_ENERGY = 5.4
 ESCAPE_FLARE_SECONDS = 0.60
 ESCAPE_RING_SECONDS = 0.75
 # The release beat. The document ends at the escape, so only the escapee has a
@@ -494,7 +664,81 @@ BREAK_FLASH_RGB = (1.000, 0.940, 0.960)
 # Emission energy by damage state, in the same order as DAMAGE_STATES. The
 # progression a viewer reads is this ramp times the crack count below it, not a
 # recolour of the panel body, which keeps its own material throughout.
-DAMAGE_EMISSION_ENERGY: tuple[float, ...] = (0.00, 0.90, 2.20, 4.00, 0.00)
+#
+# **Halved for 4B.** The old ramp lit a saturated crimson bar at up to 4.0
+# emission on an unshaded material, which is a light source sitting on a wall,
+# and a light source sitting on a wall is what "UI annotation" means. Damage in
+# 4B is a dark chip taken out of the material with a thin bright line in the
+# bottom of it, so the bright part is small and the ramp does not have to shout.
+DAMAGE_EMISSION_ENERGY: tuple[float, ...] = (0.00, 0.55, 1.30, 2.10, 0.00)
+#: The chip is the part that reads as damage: unlit, darker than the panel,
+#: recessed into the front face. It is what makes the crack look like it is in
+#: something rather than on something.
+DAMAGE_CHIP_RGB = (0.115, 0.130, 0.160)
+#: **Wear below the first damage state, which is canonical and was not drawn.**
+#:
+#: `damage` events carry `fraction` - the panel's cumulative damage over its own
+#: threshold - on every single collision, and Phase 4A read only the quantised
+#: `panel_states` ledger. So a panel at 0.34 of its threshold was drawn exactly
+#: like one that had never been touched, and on the outer shell that is almost
+#: every panel: the final wall's threshold is high enough that at the final
+#: struggle it is 64/66 healthy on 17964 and **66/66 healthy on 3762**, which
+#: fails the brief's own five-part final-wall gate on "accumulated damage".
+#:
+#: Drawing it is reading the document, not inventing: 15, 28 and 3 outer panels
+#: carry a non-zero fraction on the three candidates, up to 0.346, 0.233 and
+#: 1.019. A worn panel loses its sheen and takes a scuff at its heaviest wound
+#: before it ever gains a crack - which is what the Phase 4A comment said the
+#: design wanted, and what quantising to five states prevented.
+#:
+#: The floor and the curve are both set by what is actually visible. A chip is
+#: `DAMAGE_MARK_CHORD` wide, which is 7.4 px at the final framing, so a chip
+#: scaled *linearly* by a wear of 0.07 is 0.4 px and there is no point drawing
+#: it; the scale is the square root, which puts that same panel at 2.0 px. The
+#: sheen loss carries the rest and needs no floor at all, because it is the
+#: whole panel face rather than a notch in it.
+DAMAGE_WEAR_FLOOR = 0.04
+DAMAGE_WEAR_FACE_LOSS = 0.60
+DAMAGE_WEAR_CHIP_SCALE = 0.85
+DAMAGE_CHIP_DEPTH = 0.055
+#: How much wider a chip gets per extra impact in its cluster, capped.
+DAMAGE_CLUSTER_GROWTH = 0.34
+DAMAGE_CLUSTER_GROWTH_MAX = 2.10
+#: Two impacts closer than this along the chord are the same wound. Repeated
+#: hits in one area then visibly build on one another instead of drawing a
+#: second identical marker beside the first, which is the brief's own
+#: requirement and the difference between wear and a tally.
+#:
+#: Swept rather than chosen. Across the three review candidates, half a ball
+#: radius (0.26) merges so hard that only 2 to 7 panels in a whole run end up
+#: with two distinct wounds and none ever has three - every panel becomes one
+#: growing dent, which loses the "multiple connected cracks" the critical state
+#: is supposed to read as. A quarter of that (0.065) barely merges at all and
+#: the result is the row of identical bars 4B exists to remove. 0.13 - a
+#: quarter of a ball *radius* - leaves 13 to 18 panels per run with two wounds
+#: and a maximum of three, while the heaviest single wound still absorbs 9, 12
+#: and 19 impacts.
+DAMAGE_CLUSTER_CHORD = 0.13
+#: Hairlines that run out of a wound once it is bad enough. They are derived
+#: from the wound, not from new impact positions, so "multiple connected
+#: cracks" stays connected to the one place the ball actually kept hitting.
+DAMAGE_BRANCH_COUNT: tuple[int, ...] = (0, 0, 1, 2, 0)
+DAMAGE_BRANCH_SPREAD_DEGREES = 26.0
+DAMAGE_BRANCH_LENGTH = 0.62
+#: The crack that runs out of a chip, as a fraction of the panel thickness. It
+#: crosses the wall rather than sitting on the face, so it is visible on the
+#: flank of the outer shells, where the flank is most of what is on screen.
+# A crack is a `width x span*thickness` rectangle rolled by the tilt, and its
+# rotated radial extent is `span*cos(tilt) + (width/thickness)*sin(tilt)`. At 34
+# degrees that stays inside the panel for any span up to 1.128, so 1.10 is the
+# longest crack that never puts a pixel outside the canonical silhouette - the
+# same rule the 4A marks were held to, and the reason they had to be bars
+# rather than lines. `test_a_crack_never_leaves_the_panel` recomputes it.
+DAMAGE_CRACK_SPAN = 1.10
+DAMAGE_CRACK_WIDTH = 0.035
+#: A deterministic lean per crack, from the panel's own identity and the
+#: cluster's index, so no two panels crack identically and no render differs.
+DAMAGE_CRACK_TILT_DEGREES = 34.0
 # How many of a panel's crack marks are shown in each state. The marks are
 # placed at the panel's own canonical impact offsets, in the order the impacts
 # happened, so damage appears where the ball actually hit it.
@@ -518,6 +762,120 @@ FRACTURE_GAP = 0.20
 # buckled rather than repainted.
 FRACTURE_TILT_DEGREES = 9.0
 FRACTURE_RECESS = 0.10
+
+# --------------------------------------------------------------------------
+# Overlay
+# --------------------------------------------------------------------------
+
+HOOK_TEXT = "WHO ESCAPES FIRST?"
+HOOK_TOP_FRACTION = 0.082
+HOOK_SIZE_FRACTION = 0.0315
+#: **The hook leaves.** Phase 4A faded it from 1.0 to 0.22 starting at 3.4 s
+#: and left it there: a ghost of the question sat over the whole race, which is
+#: exactly the human review's complaint. It is now held solid for the brief's
+#: 1.5-2.0 s, taken to nothing over half a second, and the label is *hidden*
+#: rather than made transparent, so nothing of it can survive a colour grade.
+HOOK_HOLD_SECONDS = 1.85
+HOOK_FADE_SECONDS = 0.55
+HOOK_FADE_TO = 0.0
+#: After this the label is not drawn at all.
+HOOK_GONE_SECONDS = HOOK_HOLD_SECONDS + HOOK_FADE_SECONDS
+
+WINNER_SIZE_FRACTION = 0.052
+#: The banner goes on whichever side of the frame the escaping ball is not on.
+#: Phase 4A pinned it at 0.735 of the height, and on a candidate whose escape
+#: happens low and right that is the payoff covered by its own caption.
+WINNER_TOP_FRACTION = 0.735
+WINNER_ALT_TOP_FRACTION = 0.150
+WINNER_RISE_SECONDS = 0.22
+#: The banner's own band, as a fraction of the height, used to decide which
+#: end it goes to and to prove the escaping ball is not inside it.
+WINNER_BAND_FRACTION = 0.105
+
+
+#: How many points of the escapee's release flight the placement is tested at.
+WINNER_RELEASE_SAMPLES = 25
+
+
+def winner_banner_placement(document: dict[str, Any]) -> dict[str, Any]:
+    """Which end of the frame the winner banner goes to, and why.
+
+    Deterministic, and derived from the escapee's **whole release flight**
+    rather than from its position at the escape instant.
+
+    **Testing only the escape instant gives the wrong answer, and a rendered
+    contact sheet is what caught it.** The banner appears at the escape and
+    stays up through the 0.55 s release beat, during which the escapee keeps
+    flying outward - it is the one ball with a canonical flight worth
+    continuing, because there is nothing outside the arena for it to hit. On
+    1176 the escape is at the bottom of the arena at y = 1317.9 px, which is
+    93 px clear of the banner band, and 0.55 s later the ball is at 1418.7 px,
+    which is inside it. The old check reported `clear_of_ball: True` for a
+    frame in which the ball sits on the letters.
+
+    So both candidate bands are tested against the ball's whole swept extent,
+    the lower one is preferred, and the report says which was chosen.
+    """
+    _require_valid(document)
+    escape = None
+    for event in document["events"]:
+        if event["kind"] == "escape":
+            escape = event
+    if escape is None:
+        return {"placed": False}
+    duration = float(document["summary"]["duration"])
+    view = view_radius_at(document, float(escape["t"]))
+    scale = pixels_per_unit(view)
+    ball_px = float(document["config"]["ball_radius"]) * BALL_DRAW_SCALE * scale
+
+    ys: list[float] = []
+    ball_id = int(escape["ball_id"])
+    for index in range(WINNER_RELEASE_SAMPLES):
+        t = duration + RELEASE_SECONDS * index / (WINNER_RELEASE_SAMPLES - 1)
+        point = position_at(document, ball_id, t)
+        if point is None:
+            continue
+        ys.append(project(point, view)[1])
+    if not ys:
+        ys = [project(tuple(escape["position"]), view)[1]]
+    low = min(ys) - ball_px
+    high = max(ys) + ball_px
+
+    def clear(top_fraction: float) -> bool:
+        band_top = top_fraction * FRAME_HEIGHT
+        band_bottom = band_top + WINNER_BAND_FRACTION * FRAME_HEIGHT
+        return not (high > band_top and low < band_bottom)
+
+    if clear(WINNER_TOP_FRACTION):
+        top = WINNER_TOP_FRACTION
+    elif clear(WINNER_ALT_TOP_FRACTION):
+        top = WINNER_ALT_TOP_FRACTION
+    else:
+        # Neither end is clear. Take the one the ball is furthest from, and say
+        # so rather than reporting a pass.
+        def distance(top_fraction: float) -> float:
+            band_top = top_fraction * FRAME_HEIGHT
+            band_bottom = band_top + WINNER_BAND_FRACTION * FRAME_HEIGHT
+            return min(abs(low - band_bottom), abs(high - band_top))
+
+        top = max(
+            (WINNER_TOP_FRACTION, WINNER_ALT_TOP_FRACTION), key=distance
+        )
+    band = (top * FRAME_HEIGHT, (top + WINNER_BAND_FRACTION) * FRAME_HEIGHT)
+    return {
+        "placed": True,
+        "team_id": int(escape["team_id"]),
+        "team_name": str(escape["team_name"]),
+        "escape_y_px": ys[0],
+        "release_y_px": [low + ball_px, high - ball_px],
+        "swept_y_px": [low, high],
+        "ball_radius_px": ball_px,
+        "top_fraction": top,
+        "band_px": list(band),
+        "moved_to_top": top == WINNER_ALT_TOP_FRACTION,
+        "clear_of_ball": clear(top),
+    }
+
 
 # --------------------------------------------------------------------------
 # The candidate rule
@@ -639,19 +997,29 @@ def shell_view_radii(document: dict[str, Any]) -> tuple[float, ...]:
 
 
 def zoom_ratio(document: dict[str, Any]) -> float:
-    """Total zoom-out: the last framing's radius over the first's."""
-    radii = shell_view_radii(document)
-    return radii[-1] / radii[0]
+    """Total zoom-out the camera actually performs, last stage over first.
+
+    Not `radii[-1] / radii[0]`, which is the *shells'* ratio and was the number
+    Phase 4A reported because its camera framed every shell in turn. Grouping
+    the opening stage onto shell 1 is most of the 4B gain on its own: 2.80
+    becomes 1.93, so the late arena is 45% larger relative to the opening than
+    it was, before the frame fraction is raised at all.
+    """
+    stages = camera_stages(document)
+    return float(stages[-1]["radius"]) / float(stages[0]["radius"])
 
 
-def frame_marks(document: dict[str, Any]) -> tuple[tuple[float, int], ...]:
-    """`(t, stage)` for each advance of the canonical high-water frontier.
+def frontier_marks(document: dict[str, Any]) -> tuple[tuple[float, int], ...]:
+    """`(t, region)` for each advance of the canonical high-water frontier.
 
     Read from the `shell_exit` stream and from nothing else. `to_region` is the
     region a ball moved into, so the first exit to region `k` is the first
-    moment any ball is bounded by shell `k` and the first moment shell `k` has
-    to be in frame. Stage 5 - escaped - has no shell to frame, so the schedule
-    stops at 4.
+    moment any ball is bounded by shell `k`. Region 5 - escaped - has no shell,
+    so the progression stops at 4.
+
+    This is the *race*, not the camera. Phase 4A framed one stage per mark,
+    which is why the camera moved four times; `camera_stages` consumes these
+    marks and moves twice.
     """
     limit = len(document["shells"]) - 1
     marks: list[tuple[float, int]] = []
@@ -666,6 +1034,198 @@ def frame_marks(document: dict[str, Any]) -> tuple[tuple[float, int], ...]:
     return tuple(marks)
 
 
+def frontier_reached(document: dict[str, Any]) -> dict[int, float]:
+    """The first instant the race's high-water frontier reached each region."""
+    reached: dict[int, float] = {}
+    for at, region in frontier_marks(document):
+        reached.setdefault(region, at)
+    return reached
+
+
+def protected_instants(document: dict[str, Any]) -> tuple[dict[str, Any], ...]:
+    """Canonical moments a camera move may not run across.
+
+    Every one is an event in the document, so the guard cannot drift from the
+    thing it guards, and a reader can check any entry against the event stream.
+    """
+    _require_valid(document)
+    out: list[dict[str, Any]] = []
+    first_spawn = True
+    for event in document["events"]:
+        kind = event["kind"]
+        if kind == "ball_spawn" and first_spawn:
+            first_spawn = False
+            out.append({"t": float(event["t"]), "why": "first clone"})
+        elif kind == "panel_break":
+            out.append(
+                {
+                    "t": float(event["t"]),
+                    "why": f"break s{event['shell_id']}p{event['panel_id']}",
+                }
+            )
+        elif kind == "near_miss" and float(
+            event["arc_separation_ball_radii"]
+        ) <= STRONG_NEAR_MISS_RADII:
+            out.append(
+                {
+                    "t": float(event["t"]),
+                    "why": f"near miss {float(event['arc_separation_ball_radii']):.2f}r",
+                }
+            )
+        elif kind == "escape":
+            out.append({"t": float(event["t"]), "why": "escape"})
+    out.sort(key=lambda entry: (entry["t"], entry["why"]))
+    return tuple(out)
+
+
+def _guarded(start: float, guards: Sequence[float]) -> list[float]:
+    """The protected instants a move starting at `start` would run across."""
+    low = start - EVENT_GUARD_BEFORE_SECONDS
+    high = start + FRAME_EASE_SECONDS + EVENT_GUARD_AFTER_SECONDS
+    return [g for g in guards if low <= g <= high]
+
+
+def _clear_start(
+    wanted: float, floor: float, guards: Sequence[float]
+) -> float:
+    """The start nearest `wanted` whose whole move clears every guard.
+
+    **Protection may only pull a transition earlier, never push it later, and
+    measurement is what settled that.** The first version deferred a blocked
+    move to just after the last guard in its window. On 17964 that put the
+    final reframe 0.56 s late; the stage it was still holding is framed on
+    shell 3 while the race had already entered region 4, so ball 7 spent 63
+    frames outside the frame. On 3762 the same rule cost 98 frames. A camera
+    that can put a ball off-screen is worse than one that moves over a near
+    miss, and the trigger *is* the moment the old framing stops being big
+    enough - so there is no slack after it to spend.
+
+    Pulling earlier costs nothing: the camera consumes a finished document, so
+    a lead is not clairvoyance, and `FRAME_LEAD_SECONDS` is already one. The
+    nearest clear earlier start wins. `floor` keeps the windows disjoint and
+    monotone. If nothing inside the cap is clear the unshifted start is used -
+    an unprotected move is a far smaller fault than a late one.
+    """
+    if not _guarded(wanted, guards) and wanted >= floor:
+        return wanted
+    best: float | None = None
+    for guard in guards:
+        option = guard - EVENT_GUARD_BEFORE_SECONDS - FRAME_EASE_SECONDS
+        if option < floor or option > wanted:
+            continue
+        if wanted - option > EVENT_GUARD_MAX_DEFER_SECONDS:
+            continue
+        if _guarded(option, guards):
+            continue
+        if best is None or option > best:
+            best = option
+    if best is None:
+        return max(wanted, floor)
+    return best
+
+
+_STAGE_CACHE: dict[str, tuple[dict[str, Any], ...]] = {}
+
+
+def camera_stages(document: dict[str, Any]) -> tuple[dict[str, Any], ...]:
+    """The whole camera schedule: one entry per stage, outward and monotone.
+
+    `start` is when the move into that stage begins and `settled` is when it
+    ends. Stage 0 starts before the clip does, so both are 0.0 and the opening
+    framing is already in place at frame one.
+
+    Three properties hold by construction and are tested rather than assumed:
+    the radii are strictly increasing, the windows never overlap, and no
+    window contains a protected instant unless the deferral cap was reached.
+    """
+    _require_valid(document)
+    key = str(document.get("digest", "")) or json.dumps(
+        document["summary"], sort_keys=True)
+    cached = _STAGE_CACHE.get(key)
+    if cached is not None:
+        return cached
+    radii = shell_view_radii(document)
+    reached = frontier_reached(document)
+    guards = [entry["t"] for entry in protected_instants(document)]
+
+    protected = protected_instants(document)
+    stages: list[dict[str, Any]] = []
+    previous_end = 0.0
+    for index, (trigger, extent) in enumerate(CAMERA_STAGE_PLAN):
+        if index == 0:
+            stages.append(
+                {
+                    "stage": 0,
+                    "trigger_region": None,
+                    "extent_shell": extent,
+                    "trigger_t": 0.0,
+                    "start": 0.0,
+                    "settled": 0.0,
+                    "deferred": 0.0,
+                    "radius": radii[extent],
+                    "guard_conflicts": [],
+                }
+            )
+            continue
+        if trigger not in reached:
+            # The race never got this far; the stage simply does not happen.
+            continue
+        trigger_t = reached[trigger]
+        wanted = trigger_t - FRAME_LEAD_SECONDS
+        start = _clear_start(wanted, previous_end, guards)
+        deferred = start - wanted
+        settled = start + FRAME_EASE_SECONDS
+        previous_end = settled
+        stages.append(
+            {
+                "stage": index,
+                "trigger_region": trigger,
+                "extent_shell": extent,
+                "trigger_t": trigger_t,
+                "start": start,
+                "settled": settled,
+                "deferred": deferred,
+                "radius": radii[extent],
+                # What the move could not be shifted clear of, named. On the
+                # three review candidates this is only ever a near miss or a
+                # break that the triggering crossing itself caused, within
+                # 0.25 s of the trigger - there is no earlier slot because the
+                # trigger is the moment the old framing stops being big enough.
+                # It is never the first clone, a passage break or the escape.
+                "guard_conflicts": [
+                    dict(entry) for entry in protected
+                    if start - EVENT_GUARD_BEFORE_SECONDS
+                    <= entry["t"]
+                    <= settled + EVENT_GUARD_AFTER_SECONDS
+                ],
+            }
+        )
+    result = tuple(stages)
+    _STAGE_CACHE[key] = result
+    return result
+
+
+def frame_marks(document: dict[str, Any]) -> tuple[tuple[float, int], ...]:
+    """`(start, stage)` for each camera transition. Stage 0 is not a move."""
+    return tuple(
+        (float(stage["start"]), int(stage["stage"]))
+        for stage in camera_stages(document)
+        if stage["stage"] > 0
+    )
+
+
+def camera_lock_time(document: dict[str, Any]) -> float:
+    """The instant after which the camera never moves again."""
+    stages = camera_stages(document)
+    return float(stages[-1]["settled"]) if stages else 0.0
+
+
+def static_tail_seconds(document: dict[str, Any]) -> float:
+    """How long the composition is fixed before the winning escape."""
+    escape = float(document["summary"]["escape_time"])
+    return max(0.0, escape - camera_lock_time(document))
+
+
 def _smoothstep(u: float) -> float:
     if u <= 0.0:
         return 0.0
@@ -677,17 +1237,18 @@ def _smoothstep(u: float) -> float:
 def view_radius_at(document: dict[str, Any], t: float) -> float:
     """The framed world radius at `t`. Monotone non-decreasing by construction.
 
-    Each frontier advance contributes an independent eased step, so two
-    advances 0.36 s apart - which happens in four of the seven candidates -
-    simply overlap instead of fighting over one target, and the result is still
-    monotone and still exactly reproducible from the document.
+    Phase 4A summed one eased step per frontier advance, which let two advances
+    overlap. The 4B schedule already guarantees the windows are disjoint, so
+    this reads as what it is: hold a stage's radius, ease to the next, hold.
+    The camera can only ever move outward, and it cannot move at all after
+    `camera_lock_time`.
     """
-    radii = shell_view_radii(document)
-    radius = radii[0]
-    for at, stage in frame_marks(document):
-        span = radii[stage] - radii[stage - 1]
-        radius += span * _smoothstep(
-            (t - (at - FRAME_LEAD_SECONDS)) / FRAME_EASE_SECONDS
+    stages = camera_stages(document)
+    radius = float(stages[0]["radius"])
+    for stage in stages[1:]:
+        previous = radius
+        radius = previous + (float(stage["radius"]) - previous) * _smoothstep(
+            (t - float(stage["start"])) / FRAME_EASE_SECONDS
         )
     return radius
 
@@ -843,39 +1404,52 @@ def frontier_occupancy_report(document: dict[str, Any]) -> dict[str, Any]:
     views = shell_view_radii(document)
     ball_radius = float(document["config"]["ball_radius"])
     usable_px = USABLE_WIDTH_FRACTION * FRAME_WIDTH
-    rows: list[dict[str, Any]] = []
-    for index, shell in enumerate(document["shells"]):
-        scale = pixels_per_unit(views[index])
-        diameter_px = 2.0 * material[index] * scale
+
+    def row_for(stage: int, shell_index: int) -> dict[str, Any]:
+        shell = document["shells"][shell_index]
+        view = views[shell_index]
+        scale = pixels_per_unit(view)
+        diameter_px = 2.0 * material[shell_index] * scale
         gap = min(float(o["gap_chord"]) for o in shell["openings"])
-        depth = PANEL_DEPTH[index]
-        rows.append(
-            {
-                "stage": index,
-                "shell_id": int(shell["shell_id"]),
-                "view_radius": views[index],
-                "material_radius": material[index],
-                "pixels_per_unit": scale,
-                "frontier_diameter_px": diameter_px,
-                "frontier_over_frame_width": diameter_px / FRAME_WIDTH,
-                "frontier_over_usable_width": diameter_px / usable_px,
-                "frontier_over_frame_height": diameter_px / FRAME_HEIGHT,
-                "ball_px": 2.0 * ball_radius * BALL_DRAW_SCALE * scale,
-                "ball_physical_px": 2.0 * ball_radius * scale,
-                "opening_px": gap * scale,
-                "wall_px": (
-                    float(shell["thickness"])
-                    + flank_width(float(shell["radius"]), depth, views[index])
-                ) * scale,
-                "panel_chord_px": float(shell["chord_length"]) * scale,
-            }
-        )
+        depth = PANEL_DEPTH[shell_index]
+        return {
+            "stage": stage,
+            "shell_id": int(shell["shell_id"]),
+            "view_radius": view,
+            "material_radius": material[shell_index],
+            "pixels_per_unit": scale,
+            "frontier_diameter_px": diameter_px,
+            "frontier_over_frame_width": diameter_px / FRAME_WIDTH,
+            "frontier_over_usable_width": diameter_px / usable_px,
+            "frontier_over_frame_height": diameter_px / FRAME_HEIGHT,
+            "ball_px": 2.0 * ball_radius * BALL_DRAW_SCALE * scale,
+            "ball_physical_px": 2.0 * ball_radius * scale,
+            "opening_px": gap * scale,
+            "wall_px": (
+                float(shell["thickness"])
+                + flank_width(float(shell["radius"]), depth, view)
+            ) * scale,
+            "panel_chord_px": float(shell["chord_length"]) * scale,
+        }
+
+    # **The stages are the camera's, not the arena's.** Phase 4A had one per
+    # shell so the two were the same list; 4B frames three of the five, and
+    # reporting all five as "stages" would quote a ball size at a framing the
+    # viewer is never shown. The per-shell arithmetic is kept below it, because
+    # "how big would shell 2 be if it were framed" is still worth being able to
+    # look up - it is just not a stage.
+    rows = [
+        row_for(int(stage["stage"]), int(stage["extent_shell"]))
+        for stage in camera_stages(document)
+    ]
+    per_shell = [row_for(index, index) for index in range(len(document["shells"]))]
     fractions = [row["frontier_over_frame_width"] for row in rows]
     return {
         "frame": [FRAME_WIDTH, FRAME_HEIGHT],
         "usable_width_fraction": USABLE_WIDTH_FRACTION,
         "target_frame_width_fraction": FRONTIER_WIDTH_FRACTION,
         "stages": rows,
+        "per_shell": per_shell,
         "min_frontier_over_frame_width": min(fractions),
         "max_frontier_over_frame_width": max(fractions),
         "frontier_fraction_spread": max(fractions) - min(fractions),
@@ -1300,6 +1874,631 @@ def _disc_rect_fraction(px: float, py: float, radius: float, region: Region) -> 
 
 
 # --------------------------------------------------------------------------
+# Phase 4B: damage, fracture and flood-through, specified once
+# --------------------------------------------------------------------------
+#
+# Everything below is the *specification* the GDScript renderer mirrors. The
+# Phase 4A post-mortem is the reason it is written down here at all: the
+# 1.778x frustum error survived three phases because the only test compared a
+# Python constant with a GDScript constant and both copies were wrong the same
+# way. So these are not constants - they are derivations from the canonical
+# event stream, and `multishell_visual_cli audit` makes the scene emit what it
+# actually built so Python can diff it against what this module says it should
+# have built. Two files agreeing is not a measurement; a render agreeing with a
+# derivation is.
+
+
+def _panel_key(shell_id: int, panel_id: int) -> str:
+    return "%d:%d" % (int(shell_id), int(panel_id))
+
+
+def panel_damage_clusters(document: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
+    """Where each panel is worn, from where the ball actually hit it.
+
+    A cluster is a wound. Impacts land along the panel's own chord at
+    `panel_local_offset`, which is canonical; two impacts within
+    `DAMAGE_CLUSTER_CHORD` of each other are the same wound and the second one
+    deepens the first rather than drawing a second marker beside it. The first
+    impact anchors the cluster, so the result depends only on the collision
+    order and is exactly reproducible.
+
+    That "repeated impacts in similar areas visibly build on one another" is
+    the brief's requirement, and it is also the difference between damage that
+    reads as wear and damage that reads as a tally of hits.
+    """
+    _require_valid(document)
+    clusters: dict[str, list[dict[str, Any]]] = {}
+    for event in document["events"]:
+        if event["kind"] != "collision":
+            continue
+        key = _panel_key(event["shell_id"], event["panel_id"])
+        offset = float(event["panel_local_offset"])
+        row = clusters.setdefault(key, [])
+        for cluster in row:
+            if abs(cluster["offset"] - offset) <= DAMAGE_CLUSTER_CHORD:
+                cluster["weight"] += 1
+                cluster["last_t"] = float(event["t"])
+                break
+        else:
+            row.append(
+                {
+                    "offset": offset,
+                    "weight": 1,
+                    "first_t": float(event["t"]),
+                    "last_t": float(event["t"]),
+                    "index": len(row),
+                }
+            )
+    for key, row in clusters.items():
+        shell_id, panel_id = (int(part) for part in key.split(":"))
+        for cluster in row:
+            cluster["growth"] = min(
+                DAMAGE_CLUSTER_GROWTH_MAX,
+                1.0 + DAMAGE_CLUSTER_GROWTH * (int(cluster["weight"]) - 1),
+            )
+            # A deterministic lean, so no two panels crack the same way and no
+            # two renders of one seed differ. The parity of the panel's own
+            # identity plus the cluster index is the whole of it.
+            cluster["tilt_sign"] = 1 if (
+                shell_id * 7 + panel_id * 3 + int(cluster["index"])
+            ) % 2 == 0 else -1
+    return clusters
+
+
+def panel_wear(document: dict[str, Any]) -> dict[str, list[list[float]]]:
+    """`[t, fraction]` per panel, from the canonical `damage` stream.
+
+    `fraction` is cumulative damage over the panel's own threshold and is on
+    every damage event, so this is the continuous version of the five-state
+    ledger the renderer already reads - not a second opinion about it.
+    """
+    _require_valid(document)
+    out: dict[str, list[list[float]]] = {}
+    for event in document["events"]:
+        if event["kind"] != "damage":
+            continue
+        key = _panel_key(event["shell_id"], event["panel_id"])
+        out.setdefault(key, []).append(
+            [float(event["t"]), float(event["fraction"])]
+        )
+    return out
+
+
+def panel_wear_at(
+    document: dict[str, Any], shell_id: int, panel_id: int, t: float
+) -> float:
+    """How worn a panel is at `t`, as a fraction of its own break threshold."""
+    rows = panel_wear(document).get(_panel_key(shell_id, panel_id), [])
+    wear = 0.0
+    for at, fraction in rows:
+        if at <= t:
+            wear = fraction
+        else:
+            break
+    return wear
+
+
+def wear_report(document: dict[str, Any]) -> dict[str, Any]:
+    """What the final wall shows at the final struggle, before and after.
+
+    The number the brief's five-part gate turns on: how many panels of the
+    outermost shell a viewer can see have been hit.
+    """
+    _require_valid(document)
+    outer = document["shells"][-1]
+    shell_id = int(outer["shell_id"])
+    moment = None
+    for entry in event_moments(document):
+        if entry["name"] == "h_final_wall":
+            moment = float(entry["t"])
+    if moment is None:
+        moment = float(document["summary"]["escape_time"])
+    states: dict[str, int] = {}
+    worn = 0
+    touched = 0
+    worst = 0.0
+    for panel_id in range(int(outer["panel_count"])):
+        state = panel_state_at(document, shell_id, panel_id, moment)
+        states[state] = states.get(state, 0) + 1
+        wear = panel_wear_at(document, shell_id, panel_id, moment)
+        worst = max(worst, wear)
+        if state == "healthy" and wear >= DAMAGE_WEAR_FLOOR:
+            worn += 1
+        if state == "healthy" and wear > 0.0:
+            touched += 1
+    marked = sum(count for state, count in states.items() if state != "healthy")
+    return {
+        "t": moment,
+        "shell_id": shell_id,
+        "panels": int(outer["panel_count"]),
+        "states": states,
+        "non_healthy": marked,
+        "worn_healthy": worn,
+        "touched_healthy": touched,
+        "visibly_marked": marked + worn,
+        "worst_wear": worst,
+        "wear_floor": DAMAGE_WEAR_FLOOR,
+    }
+
+
+def visible_damage_clusters(
+    document: dict[str, Any], shell_id: int, panel_id: int, state_index: int,
+    wear: float = 0.0,
+) -> list[dict[str, Any]]:
+    """The clusters a panel draws in a given damage state, worst wound first.
+
+    `DAMAGE_CRACK_COUNT` says how many; which ones is decided by weight, then
+    by the order the wounds appeared. A panel that has been hit eight times in
+    one place and once elsewhere shows the deep one first, which is what makes
+    the damage look like it happened to the material.
+
+    Below the first damage state a panel with canonical wear at or above
+    `DAMAGE_WEAR_FLOOR` still shows its heaviest wound - as a scuff, the chip
+    alone with no crack - which is what puts marks on a final wall that the
+    five-state ledger calls entirely healthy.
+    """
+    row = panel_damage_clusters(document).get(_panel_key(shell_id, panel_id), [])
+    wanted = int(DAMAGE_CRACK_COUNT[state_index])
+    if state_index == 0 and wear >= DAMAGE_WEAR_FLOOR and row:
+        wanted = 1
+    order = sorted(row, key=lambda c: (-int(c["weight"]), int(c["index"])))
+    return order[:wanted]
+
+
+def break_fragments(document: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
+    """The few substantial chunks a panel comes apart into, per break.
+
+    Presentation only: nothing here is read by the simulation, no fragment has
+    a collider, and `test_break_fragments_cannot_reach_the_physics` is the
+    check that keeps it that way. The chunks are laid out along the panel's own
+    chord rather than thrown from its centre, because a slab that fails breaks
+    into pieces of itself - that is the entire difference between this and the
+    eight hashed sparks it replaces.
+    """
+    _require_valid(document)
+    shells = {int(shell["shell_id"]): shell for shell in document["shells"]}
+    out: dict[str, list[dict[str, Any]]] = {}
+    for event in document["events"]:
+        if event["kind"] != "panel_break":
+            continue
+        shell_id = int(event["shell_id"])
+        panel_id = int(event["panel_id"])
+        shell = shells[shell_id]
+        chord = float(shell["chord_length"])
+        key = _panel_key(shell_id, panel_id)
+        pieces: list[dict[str, Any]] = []
+        for index in range(BREAK_FRAGMENT_COUNT):
+            # Evenly along the chord, so the chunks tile the panel they came
+            # from and the viewer reads them as its pieces.
+            share = (index + 0.5) / BREAK_FRAGMENT_COUNT - 0.5
+            spin = BREAK_FRAGMENT_SPIN_DEGREES * (1.0 if index % 2 == 0 else -1.0)
+            pieces.append(
+                {
+                    "index": index,
+                    "offset": chord * share,
+                    "length": chord * BREAK_FRAGMENT_CHORD_FRACTION,
+                    "depth_fraction": BREAK_FRAGMENT_DEPTH_FRACTION,
+                    # Outward, plus a lean along the chord away from the middle.
+                    "out_speed": BREAK_FRAGMENT_OUT_SPEED * (0.70 + 0.30 * abs(share) * 2.0),
+                    "along_speed": BREAK_FRAGMENT_OUT_SPEED * share * 1.10,
+                    "spin_degrees": spin,
+                    "seconds": BREAK_FRAGMENT_SECONDS,
+                }
+            )
+        out.setdefault(key, []).append({"t": float(event["t"]), "pieces": pieces})
+    return out
+
+
+def passage_responses(document: dict[str, Any]) -> list[dict[str, Any]]:
+    """Freshly broken passages a ball actually went through, and when.
+
+    This is the tier the renderer responds to: break, hole, ball through hole,
+    the two flanking pillars answer for half a second. It fires twice per run
+    on each of the three review candidates, and on 1176 the first of the two is
+    the winner's own break-route escape through the final wall - the single
+    most important instant in that candidate.
+
+    `flood_through` is the same list filtered to the brief's stronger
+    condition, and that one fires nowhere. See its note.
+    """
+    _require_valid(document)
+    breaks: dict[str, float] = {}
+    for event in document["events"]:
+        if event["kind"] == "panel_break":
+            breaks.setdefault(
+                _panel_key(event["shell_id"], event["panel_id"]), float(event["t"])
+            )
+    uses: dict[str, list[dict[str, Any]]] = {}
+    for event in document["events"]:
+        if event["kind"] != "shell_exit" or event.get("route") != "break":
+            continue
+        key = _panel_key(event["shell_id"], event["panel_id"])
+        uses.setdefault(key, []).append(
+            {"t": float(event["t"]), "ball_id": int(event["ball_id"]),
+             "team_id": int(event["team_id"])}
+        )
+    out: list[dict[str, Any]] = []
+    for key, at in sorted(breaks.items()):
+        window = [
+            use for use in uses.get(key, [])
+            if at <= use["t"] <= at + FLOOD_WINDOW_SECONDS
+        ]
+        if not window:
+            continue
+        shell_id, panel_id = (int(part) for part in key.split(":"))
+        teams = sorted({use["team_id"] for use in window})
+        out.append(
+            {
+                "shell_id": shell_id,
+                "panel_id": panel_id,
+                "break_t": at,
+                "first_use_t": window[0]["t"],
+                "last_use_t": window[-1]["t"],
+                "balls": len(window),
+                "ball_ids": [use["ball_id"] for use in window],
+                "teams": teams,
+                "both_teams": len(teams) > 1,
+                "response_until": window[-1]["t"] + FLOOD_RESPONSE_SECONDS,
+            }
+        )
+    out.sort(key=lambda entry: (entry["break_t"], entry["shell_id"], entry["panel_id"]))
+    return out
+
+
+def flood_through(document: dict[str, Any]) -> list[dict[str, Any]]:
+    """Passages that *several* balls poured through soon after they opened.
+
+    **This never happens, and the reason is structural rather than a tuning
+    miss.** The brief calls it potentially the best moment in the video. The
+    detection is exact - a `panel_break` opens a slot and `shell_exit` events
+    with `route == "break"` on that same slot are the balls going through it -
+    and on 17964, 3762 and 1176 it returns nothing at 1.8 s, nothing at 3.0 s,
+    one/none/none at 5.0 s, and two/none/two at 8.0 s.
+
+    Every shell rotates, at 0.27 to 0.77 rad/s. A broken slot is therefore not
+    a door, it is a gap sweeping past the population, and by the time a second
+    ball is anywhere near it the gap has moved. Ball-ball collisions are off
+    and nothing steers, so there is no mechanism that would bring a second ball
+    to the same slot in the same second. Measured first-use delays are 0.36 to
+    14.44 s and the *second* use, where there is one, is 3.45 to 12.42 s after
+    the break.
+
+    The mechanism is kept because it is correct and costs nothing, and because
+    a future phase that slowed the outer shells would want it. What the
+    renderer actually responds to is `passage_responses`.
+    """
+    return [
+        entry for entry in passage_responses(document)
+        if int(entry["balls"]) >= FLOOD_MIN_BALLS
+    ]
+
+
+
+
+# --------------------------------------------------------------------------
+# Phase 4B: containment, critical visibility, occupancy and frame sizes
+# --------------------------------------------------------------------------
+
+
+def containment_report(document: dict[str, Any], fps: float = 60.0) -> dict[str, Any]:
+    """Is every ball inside the framed disc on every rendered frame?
+
+    This is the check that makes "cropping is allowed" safe to say. The brief
+    permits outer *geometry* to leave the frame; it does not permit a ball to.
+    A grouped camera holds one framing across two frontier regions, so the
+    question has teeth for the first time - Phase 4A's per-shell schedule could
+    not fail it by construction and therefore never measured it.
+
+    Measured against the **frame rectangle**, not against the framed material
+    disc. Those are different numbers once the arena is allowed to cross the
+    frame's own edge: at 0.850 the frontier's material edge is 459 px from the
+    axis and the frame edge is 540, so 81 px of a ball's travel is legitimately
+    outside the framed disc and still perfectly visible. Gating on the disc
+    would reject framings that show everything, which is the Phase 4A mistake
+    in a new place.
+
+    Reported as the worst ratio of a ball's drawn extent to the nearest frame
+    edge. Below 1.0 the whole ball is on screen.
+    """
+    _require_valid(document)
+    duration = float(document["summary"]["duration"])
+    ball_radius = float(document["config"]["ball_radius"]) * BALL_DRAW_SCALE
+    frames = max(1, int(math.ceil(duration * fps)))
+    worst = 0.0
+    worst_t = 0.0
+    worst_ball = -1
+    outside_frames = 0
+    for index in range(frames + 1):
+        t = duration * index / frames
+        view = view_radius_at(document, t)
+        scale = pixels_per_unit(view)
+        radius_px = ball_radius * scale
+        any_out = False
+        for ball_id, point in positions_at(document, t).items():
+            px, py = project(point, view)
+            margin = min(px, FRAME_WIDTH - px, py, FRAME_HEIGHT - py)
+            ratio = radius_px / margin if margin > 0.0 else float("inf")
+            if ratio > worst:
+                worst, worst_t, worst_ball = ratio, t, int(ball_id)
+            if ratio > 1.0:
+                any_out = True
+        if any_out:
+            outside_frames += 1
+    return {
+        "fps": fps,
+        "frames": frames + 1,
+        "worst_ratio": worst,
+        "worst_t": worst_t,
+        "worst_ball": worst_ball,
+        "outside_frames": outside_frames,
+        "contained": outside_frames == 0,
+    }
+
+
+def _critical_subjects(document: dict[str, Any]) -> list[dict[str, Any]]:
+    """Every instant at which something specific must be visible, and what.
+
+    Each entry names a canonical event, the instant to check and the world
+    point that may not sit behind the player's controls. "The whole arena" is
+    deliberately not on this list: the review agreed to spend the outer arc.
+    """
+    subjects: list[dict[str, Any]] = []
+    used_passages: set[tuple[int, int]] = set()
+    for event in document["events"]:
+        if event["kind"] == "shell_exit" and event.get("route") == "break":
+            used_passages.add((int(event["shell_id"]), int(event["panel_id"])))
+
+    first_spawn = True
+    for event in document["events"]:
+        kind = event["kind"]
+        if kind == "ball_spawn" and first_spawn:
+            first_spawn = False
+            subjects.append({
+                "what": "first_clone", "t": float(event["t"]),
+                "point": tuple(event["position"]),
+                "detail": "ball %d" % int(event["ball_id"]),
+            })
+        elif kind == "panel_break":
+            key = (int(event["shell_id"]), int(event["panel_id"]))
+            if key in used_passages:
+                subjects.append({
+                    "what": "passage_break", "t": float(event["t"]),
+                    "point": tuple(event["position"]),
+                    "detail": "s%dp%d" % key,
+                })
+        elif kind == "shell_exit":
+            subjects.append({
+                "what": "frontier_crossing", "t": float(event["t"]),
+                "point": tuple(event["position"]),
+                "detail": "%s to region %d" % (event["route"], int(event["to_region"])),
+            })
+        elif kind == "near_miss" and float(
+            event["arc_separation_ball_radii"]
+        ) <= STRONG_NEAR_MISS_RADII:
+            subjects.append({
+                "what": "strong_near_miss", "t": float(event["t"]),
+                "point": tuple(event["ball_position"]),
+                "detail": "%.2f radii" % float(event["arc_separation_ball_radii"]),
+            })
+        elif kind == "escape":
+            subjects.append({
+                "what": "winning_escape", "t": float(event["t"]),
+                "point": tuple(event["position"]),
+                "detail": "ball %d %s" % (int(event["ball_id"]), event["team_name"]),
+            })
+    return subjects
+
+
+#: How much of a critical subject may be covered before it counts as hidden.
+CRITICAL_COVER_LIMIT = 0.34
+
+#: The classes that may never be hidden, whatever the framing buys elsewhere.
+CRITICAL_HARD_CLASSES: tuple[str, ...] = (
+    "winning_escape", "passage_break", "first_clone",
+)
+
+
+def critical_visibility_report(
+    document: dict[str, Any], config: SafeAreaConfig = DEFAULT_SAFE_AREA
+) -> dict[str, Any]:
+    """Event-aware safe area: is the thing the viewer is watching visible?
+
+    Phase 4A asked "does the arena clear the action rail", answered 15.12 px,
+    and that single number is what capped the arena at 0.652 of the frame. It
+    is the wrong question for a 9:16 arena the viewer never needs to see all
+    of. This asks the question the human review actually cares about, once per
+    canonical critical instant, and reports the worst.
+    """
+    _require_valid(document)
+    ball_radius = float(document["config"]["ball_radius"]) * BALL_DRAW_SCALE
+    rows: list[dict[str, Any]] = []
+    for subject in _critical_subjects(document):
+        view = view_radius_at(document, float(subject["t"]))
+        scale = pixels_per_unit(view)
+        px, py = project(subject["point"], view)
+        radius_px = ball_radius * scale
+        covered = 0.0
+        where = ""
+        for region in config.regions:
+            fraction = _disc_rect_fraction(px, py, radius_px, region)
+            if fraction > covered:
+                covered, where = fraction, region.name
+        rows.append({
+            "what": subject["what"], "t": float(subject["t"]),
+            "detail": subject["detail"], "x_px": px, "y_px": py,
+            "radius_px": radius_px, "covered": covered, "region": where,
+            "visible": covered < CRITICAL_COVER_LIMIT,
+        })
+    by_kind: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        entry = by_kind.setdefault(
+            row["what"], {"count": 0, "hidden": 0, "worst_covered": 0.0})
+        entry["count"] += 1
+        entry["hidden"] += 0 if row["visible"] else 1
+        entry["worst_covered"] = max(entry["worst_covered"], row["covered"])
+    worst = max(rows, key=lambda row: row["covered"]) if rows else None
+    return {
+        "safe_area": config.name,
+        "fingerprint": config.fingerprint(),
+        "cover_limit": CRITICAL_COVER_LIMIT,
+        "subjects": len(rows),
+        "by_kind": by_kind,
+        "worst": worst,
+        "hidden": [row for row in rows if not row["visible"]],
+        "critical_pass": all(
+            row["visible"] for row in rows
+            if row["what"] in CRITICAL_HARD_CLASSES
+        ),
+        "pass": all(row["visible"] for row in rows),
+    }
+
+
+def _arc_material_fraction(shell: Mapping[str, Any]) -> float:
+    """What share of a shell's circumference is panel rather than opening."""
+    count = int(shell["panel_count"])
+    open_slots = len(shell["open_slots"])
+    return (count - open_slots) / float(count) if count else 0.0
+
+
+def _ring_frame_clip(outer_px: float) -> float:
+    """Roughly what share of a ring of that radius is inside the frame."""
+    if outer_px <= 0.0:
+        return 1.0
+    cx = ARENA_CENTRE_X_FRACTION * FRAME_WIDTH
+    cy = ARENA_CENTRE_Y_FRACTION * FRAME_HEIGHT
+    inside = 0
+    steps = 360
+    for index in range(steps):
+        angle = 2.0 * math.pi * index / steps
+        x = cx + outer_px * math.cos(angle)
+        y = cy - outer_px * math.sin(angle)
+        if 0.0 <= x <= FRAME_WIDTH and 0.0 <= y <= FRAME_HEIGHT:
+            inside += 1
+    return inside / float(steps)
+
+
+def occupancy_at(document: dict[str, Any], t: float) -> dict[str, float]:
+    """An analytic estimate of how much of the frame is not empty dark space.
+
+    Not computer vision, as the brief allows, and deliberately not a Monte
+    Carlo: every drawn thing here is a disc, an annulus or a ring segment, so
+    the areas are closed forms clipped to the frame rectangle. The renderer's
+    own frames are measured separately by the laboratory tool, and the two
+    agreeing is what makes either of them worth quoting.
+    """
+    view = view_radius_at(document, t)
+    scale = pixels_per_unit(view)
+    distance = camera_distance(view)
+    frame_area = float(FRAME_WIDTH * FRAME_HEIGHT)
+
+    material = 0.0
+    for index, shell in enumerate(document["shells"]):
+        radius = float(shell["radius"])
+        thickness = float(shell["thickness"])
+        depth = float(PANEL_DEPTH[index])
+        # The flank a viewer sees is the band between the front silhouette and
+        # the back face's projection, which perspective shrinks by d / (D + d).
+        flank = radius * depth / (distance + depth)
+        outer = (radius + 0.5 * thickness) * scale
+        inner = max(0.0, radius - 0.5 * thickness - flank) * scale
+        ring = math.pi * (outer * outer - inner * inner)
+        material += ring * _arc_material_fraction(shell) * _ring_frame_clip(outer)
+
+    ball_radius_px = float(document["config"]["ball_radius"]) * BALL_DRAW_SCALE * scale
+    balls = 0.0
+    for point in positions_at(document, t).values():
+        px, py = project(point, view)
+        if (-ball_radius_px <= px <= FRAME_WIDTH + ball_radius_px
+                and -ball_radius_px <= py <= FRAME_HEIGHT + ball_radius_px):
+            balls += math.pi * ball_radius_px * ball_radius_px
+
+    footprint = _disc_frame_fraction((view / (1.0 + VIEW_PAD_FRACTION)) * scale)
+    return {
+        "t": t,
+        "material_fraction": material / frame_area,
+        "ball_fraction": balls / frame_area,
+        "ink_fraction": (material + balls) / frame_area,
+        "arena_footprint_fraction": footprint,
+        "empty_fraction": 1.0 - (material + balls) / frame_area,
+    }
+
+
+def occupancy_report(document: dict[str, Any], samples: int = 96) -> dict[str, Any]:
+    """Early, middle and late occupancy, which is the review's own complaint.
+
+    "Action visually loses intensity while simulation activity is actually
+    increasing" is a claim about this number falling while the population
+    rises. The thirds are of the playback, so they are comparable between
+    candidates without any tuning.
+    """
+    _require_valid(document)
+    duration = float(document["summary"]["duration"])
+    rows = [
+        occupancy_at(document, duration * index / max(1, samples - 1))
+        for index in range(samples)
+    ]
+    keys = ("material_fraction", "ball_fraction", "ink_fraction",
+            "arena_footprint_fraction", "empty_fraction")
+    thirds: dict[str, dict[str, float]] = {}
+    for name, (low, high) in (("early", (0.0, 1.0 / 3.0)),
+                              ("middle", (1.0 / 3.0, 2.0 / 3.0)),
+                              ("late", (2.0 / 3.0, 1.0))):
+        window = [row for row in rows
+                  if low * duration <= row["t"] <= high * duration]
+        thirds[name] = {
+            key: statistics.fmean([row[key] for row in window]) for key in keys
+        }
+    return {
+        "samples": samples,
+        "thirds": thirds,
+        "late_minus_early_ink": (thirds["late"]["ink_fraction"]
+                                 - thirds["early"]["ink_fraction"]),
+        "late_not_emptier": (thirds["late"]["ink_fraction"]
+                             >= thirds["early"]["ink_fraction"]),
+        "min_ink_fraction": min(row["ink_fraction"] for row in rows),
+        "max_ink_fraction": max(row["ink_fraction"] for row in rows),
+    }
+
+
+def frame_size_report(document: dict[str, Any]) -> list[dict[str, Any]]:
+    """The brief's frame-size table: what things measure, per camera stage."""
+    _require_valid(document)
+    shells = document["shells"]
+    ball_radius = float(document["config"]["ball_radius"])
+    rows: list[dict[str, Any]] = []
+    for stage in camera_stages(document):
+        extent = int(stage["extent_shell"])
+        view = float(stage["radius"])
+        scale = pixels_per_unit(view)
+        distance = camera_distance(view)
+        shell = shells[extent]
+        radius = float(shell["radius"])
+        thickness = float(shell["thickness"])
+        depth = float(PANEL_DEPTH[extent])
+        gap = min(float(opening["gap_chord"]) for opening in shell["openings"])
+        flank = radius * depth / (distance + depth)
+        rows.append({
+            "stage": int(stage["stage"]),
+            "extent_shell": extent,
+            "start": float(stage["start"]),
+            "settled": float(stage["settled"]),
+            "view_radius": view,
+            "pixels_per_unit": scale,
+            "camera_distance": distance,
+            "frontier_diameter_px": 2.0 * (radius + 0.5 * thickness) * scale,
+            "ball_diameter_px": 2.0 * ball_radius * scale,
+            "ball_drawn_diameter_px": 2.0 * ball_radius * BALL_DRAW_SCALE * scale,
+            "opening_width_px": gap * scale,
+            "opening_over_ball": gap / (2.0 * ball_radius),
+            "wall_face_thickness_px": thickness * scale,
+            "wall_apparent_thickness_px": (thickness + flank) * scale,
+            "wall_flank_px": flank * scale,
+            "occupancy": occupancy_at(document, float(stage["settled"])),
+        })
+    return rows
+
+
+# --------------------------------------------------------------------------
 # Readability
 # --------------------------------------------------------------------------
 
@@ -1538,16 +2737,24 @@ def damage_report(document: dict[str, Any], samples: int = 120) -> dict[str, Any
 # The stills the brief asks for
 # --------------------------------------------------------------------------
 
+#: The eleven views the Phase 4B contact sheet has to answer for, in order.
+#: `c_first_transition` and `h_final_wall` are new because the review's
+#: complaints were about the camera and the final wall, and a sheet that never
+#: shows either cannot be used to judge whether they were fixed.
+#: `g_flood_through` is on the list and is expected to be absent - see
+#: `flood_through`.
 STILL_ORDER: tuple[str, ...] = (
     "a_opening",
     "b_first_split",
-    "c_four_balls",
-    "d_near_miss",
+    "c_first_transition",
+    "d_four_balls",
     "e_damaged_panel",
     "f_critical_panel",
     "g_panel_break",
-    "h_late_population",
+    "g2_flood_through",
+    "h_final_wall",
     "i_final_escape",
+    "j_winner_frame",
 )
 
 
@@ -1581,6 +2788,23 @@ def event_moments(document: dict[str, Any]) -> list[dict[str, Any]]:
 
     moments.append({"name": "a_opening", "t": min(0.30, duration), "why": "frame one"})
 
+    stages = camera_stages(document)
+    if len(stages) > 1:
+        first_move = stages[1]
+        moments.append(
+            {
+                "name": "c_first_transition",
+                "t": min(duration, float(first_move["start"])
+                         + 0.5 * FRAME_EASE_SECONDS),
+                "why": (
+                    f"mid-way through the only reframe before the final wall, "
+                    f"triggered by the race reaching region "
+                    f"{first_move['trigger_region']} at "
+                    f"{float(first_move['trigger_t']):.2f}s"
+                ),
+            }
+        )
+
     spawn = first("ball_spawn")
     if spawn is not None:
         moments.append(
@@ -1597,27 +2821,31 @@ def event_moments(document: dict[str, Any]) -> list[dict[str, Any]]:
             fourth = float(ball["birth_time"])
     if fourth is not None:
         moments.append(
-            {"name": "c_four_balls", "t": min(duration, fourth + 0.45),
+            {"name": "d_four_balls", "t": min(duration, fourth + 0.45),
              "why": "0.45 s after the fourth ball exists"}
         )
 
-    # The closest near miss in the run, which is the one worth a still.
-    near = None
-    for event in events:
-        if event["kind"] != "near_miss":
-            continue
-        if near is None or float(event["arc_separation_ball_radii"]) < float(
-            near["arc_separation_ball_radii"]
-        ):
-            near = event
-    if near is not None:
+    # **The final-wall struggle**, which is the view the brief sets a five-part
+    # human gate on. Taken at the latest population peak inside the locked
+    # final framing, so it is the busiest instant of the hardest section, and
+    # clamped before the escape so it cannot show the payoff banner.
+    escape_t = float(document["summary"]["escape_time"])
+    lock = camera_lock_time(document)
+    if lock < escape_t:
+        best_t = 0.5 * (lock + escape_t)
+        best = -1
+        for index in range(41):
+            t = lock + (escape_t - lock) * index / 40.0
+            alive = len(live_balls_at(document, t))
+            if alive > best:
+                best, best_t = alive, t
         moments.append(
             {
-                "name": "d_near_miss",
-                "t": float(near["t"]) + 0.4 * NEAR_MISS_SECONDS,
+                "name": "h_final_wall",
+                "t": min(escape_t - 0.05, best_t),
                 "why": (
-                    f"{float(near['arc_separation_ball_radii']):.2f} ball radii "
-                    f"from opening {near['opening_id']}, criterion {near['criterion']}"
+                    f"{best} balls against the final wall, "
+                    f"{escape_t - lock:.2f}s of locked camera"
                 ),
             }
         )
@@ -1656,21 +2884,34 @@ def event_moments(document: dict[str, Any]) -> list[dict[str, Any]]:
             }
         )
 
-    # The last moment before the escape at which the population is at its peak.
-    peak_t = duration
-    peak = 0
-    for ball in document["balls"]:
-        birth = float(ball["birth_time"])
-        if birth <= 0.0:
-            continue
-        count = len([b for b in document["balls"] if float(b["birth_time"]) <= birth])
-        if count >= peak and birth < duration - 0.2:
-            peak = count
-            peak_t = birth
-    moments.append(
-        {"name": "h_late_population", "t": min(duration - 0.05, peak_t + 0.60),
-         "why": f"{peak} balls alive"}
-    )
+    # A ball going through a passage it or its team broke open. The brief asks
+    # for the stronger version - several balls pouring through at once - and
+    # `flood_through` explains at length why no candidate has one. This is the
+    # strongest thing that does happen, and on 1176 it is the winning escape.
+    passages = passage_responses(document)
+    if passages:
+        # Most balls wins; then the outermost shell, then the latest break.
+        # Ranking by earliest break instead picked 1176's shell-0 passage over
+        # its shell-4 one - and the shell-4 one *is* that candidate's winning
+        # escape, which is the whole reason 1176 is in the review set.
+        best_passage = max(
+            passages,
+            key=lambda entry: (
+                int(entry["balls"]), int(entry["shell_id"]), float(entry["break_t"])
+            ),
+        )
+        moments.append(
+            {
+                "name": "g2_flood_through",
+                "t": min(duration - 0.02, float(best_passage["first_use_t"]) + 0.06),
+                "why": (
+                    f"{best_passage['balls']} ball(s) through the s"
+                    f"{best_passage['shell_id']}p{best_passage['panel_id']} passage "
+                    f"{float(best_passage['first_use_t']) - float(best_passage['break_t']):.2f}s "
+                    f"after it opened"
+                ),
+            }
+        )
 
     escape = last("escape")
     if escape is not None:
@@ -1681,6 +2922,18 @@ def event_moments(document: dict[str, Any]) -> list[dict[str, Any]]:
                 "why": (
                     f"ball {escape['ball_id']}, generation {escape['generation']}, "
                     f"route {escape['route']}"
+                ),
+            }
+        )
+        placement = winner_banner_placement(document)
+        moments.append(
+            {
+                "name": "j_winner_frame",
+                "t": float(escape["t"]) + RELEASE_SECONDS * 0.8,
+                "why": (
+                    f"{placement.get('team_name', '?').upper()} ESCAPES! at "
+                    f"{'top' if placement.get('moved_to_top') else 'lower'} third, "
+                    f"clear of the ball: {placement.get('clear_of_ball')}"
                 ),
             }
         )
@@ -1724,6 +2977,23 @@ def measure_document(document: dict[str, Any], fps: float = 30.0) -> dict[str, A
         "moments": event_moments(document),
         "occupancy_samples": len(samples),
         "damage_samples": len(timeline),
+        # --- Phase 4B ---
+        "camera": {
+            "stages": [dict(stage) for stage in camera_stages(document)],
+            "transitions": len(camera_stages(document)) - 1,
+            "zoom_ratio": zoom_ratio(document),
+            "lock_time": camera_lock_time(document),
+            "static_tail_seconds": static_tail_seconds(document),
+            "frontier_marks": [list(mark) for mark in frontier_marks(document)],
+        },
+        "containment": containment_report(document, fps=max(fps, 60.0)),
+        "critical_visibility": critical_visibility_report(document),
+        "occupancy": occupancy_report(document),
+        "frame_sizes": frame_size_report(document),
+        "passages": passage_responses(document),
+        "flood_through": flood_through(document),
+        "winner_banner": winner_banner_placement(document),
+        "final_wall_wear": wear_report(document),
     }
 
 
@@ -1893,6 +3163,11 @@ def render_config() -> dict[str, Any]:
         "camera_frustum_offset": list(CAMERA_FRUSTUM_OFFSET),
         "frame_lead_seconds": FRAME_LEAD_SECONDS,
         "frame_ease_seconds": FRAME_EASE_SECONDS,
+        "camera_stage_plan": [list(entry) for entry in CAMERA_STAGE_PLAN],
+        "event_guard": [
+            EVENT_GUARD_BEFORE_SECONDS, EVENT_GUARD_AFTER_SECONDS,
+            EVENT_GUARD_MAX_DEFER_SECONDS, STRONG_NEAR_MISS_RADII,
+        ],
         "ball_draw_scale": BALL_DRAW_SCALE,
         "halo_scale": HALO_SCALE,
         "ball_rim": [BALL_RIM_SCALE, BALL_RIM_Z],
@@ -1910,12 +3185,45 @@ def render_config() -> dict[str, Any]:
         "damage_emission_energy": list(DAMAGE_EMISSION_ENERGY),
         "damage_crack_count": list(DAMAGE_CRACK_COUNT),
         "damage_mark_chord": DAMAGE_MARK_CHORD,
+        "damage_chip": [list(DAMAGE_CHIP_RGB), DAMAGE_CHIP_DEPTH],
+        "damage_wear": [
+            DAMAGE_WEAR_FLOOR, DAMAGE_WEAR_FACE_LOSS, DAMAGE_WEAR_CHIP_SCALE,
+        ],
+        "damage_cluster": [
+            DAMAGE_CLUSTER_CHORD, DAMAGE_CLUSTER_GROWTH, DAMAGE_CLUSTER_GROWTH_MAX,
+        ],
+        "damage_crack": [
+            DAMAGE_CRACK_SPAN, DAMAGE_CRACK_WIDTH, DAMAGE_CRACK_TILT_DEGREES,
+        ],
+        "damage_branch": [
+            list(DAMAGE_BRANCH_COUNT), DAMAGE_BRANCH_SPREAD_DEGREES,
+            DAMAGE_BRANCH_LENGTH,
+        ],
+        "panel_chamfer_by_shell": list(PANEL_CHAMFER_BY_SHELL),
         "fracture": [FRACTURE_GAP, FRACTURE_TILT_DEGREES, FRACTURE_RECESS],
         "spawn": [SPAWN_FLASH_SECONDS, SPAWN_FLASH_RADIUS, SPAWN_LINK_SECONDS],
         "near_miss_seconds": NEAR_MISS_SECONDS,
         "break": [
             BREAK_FLASH_SECONDS, BREAK_RETRACT_SECONDS, BREAK_DEBRIS_SECONDS,
             BREAK_DEBRIS_COUNT, BREAK_RING_SECONDS, BREAK_RING_RADIUS,
+        ],
+        "break_stress_seconds": BREAK_STRESS_SECONDS,
+        "fragments": [
+            BREAK_FRAGMENT_COUNT, BREAK_FRAGMENT_SECONDS,
+            BREAK_FRAGMENT_CHORD_FRACTION, BREAK_FRAGMENT_DEPTH_FRACTION,
+            BREAK_FRAGMENT_OUT_SPEED, BREAK_FRAGMENT_SPIN_DEGREES,
+        ],
+        "flood": [
+            FLOOD_WINDOW_SECONDS, FLOOD_MIN_BALLS, FLOOD_RESPONSE_SECONDS,
+            FLOOD_POST_ENERGY,
+        ],
+        "hook": [
+            HOOK_HOLD_SECONDS, HOOK_FADE_SECONDS, HOOK_FADE_TO,
+            HOOK_TOP_FRACTION, HOOK_SIZE_FRACTION,
+        ],
+        "winner": [
+            WINNER_SIZE_FRACTION, WINNER_TOP_FRACTION, WINNER_ALT_TOP_FRACTION,
+            WINNER_RISE_SECONDS, WINNER_BAND_FRACTION,
         ],
         "escape": [ESCAPE_FLARE_SECONDS, ESCAPE_RING_SECONDS],
         "ending": [RELEASE_SECONDS, END_HOLD_SECONDS],

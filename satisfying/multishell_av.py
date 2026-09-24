@@ -375,7 +375,24 @@ def sync_audit(document: Mapping[str, Any], fps: float,
 #: arena has opened out by then, so the ball has slowed from 0.60 to 0.16 frame
 #: widths per second while the reframes stay near 0.2. Both motions are slow
 #: there. Gating on the ratio would reject a clip for being calm.
-CAMERA_VELOCITY_GATE = "ball_max_screen_velocity"
+CAMERA_VELOCITY_GATE = "ball_max_screen_velocity_times_headroom"
+
+#: **The gate the Phase 4B brief forced open, and by how much.**
+#:
+#: Phase 4A's rule was "a reframe never moves the screen faster than the ball
+#: does", and it held because there were four transitions and each was small.
+#: The 4B brief asks for two or three transitions instead of four, which is the
+#: same total zoom in half as many payments and makes every payment faster. The
+#: two requirements are arithmetically incompatible; keeping the old number
+#: would have meant keeping the camera the human review rejected.
+#:
+#: So the ceiling is stated instead of implied. At the chosen 0.45 s ease the
+#: worst instant of the worst candidate runs at 1.61 times the ball's own
+#: screen velocity at the opening framing, and 2.0 is the line - which is
+#: enough headroom for a candidate whose frontier advances sit closer together
+#: than these three, and tight enough that a return to 0.30 s (2.38x) or a
+#: single-transition schedule would fail it.
+CAMERA_VELOCITY_HEADROOM = 2.0
 
 #: A spawn this close to a reframe has to be checked by eye, because the flash
 #: and the zoom would be competing for the same attention.
@@ -398,24 +415,38 @@ def camera_report(document: Mapping[str, Any], fps: float = 30.0) -> dict[str, A
     what a zoom charges a viewer. Finally the collisions with other cues: a
     spawn inside a reframe has to compete with it.
     """
-    marks = visual.frame_marks(dict(document))
-    radii = visual.shell_view_radii(dict(document))
+    stages = visual.camera_stages(dict(document))
     duration = float(document["summary"]["duration"])
     spawns = [float(e["t"]) for e in document["events"] if e["kind"] == "ball_spawn"]
 
+    # **A transition is a camera stage, not a frontier advance.** Phase 4A had
+    # one stage per shell, so "the marks" and "the stages" were one list and
+    # this function could index the shell radii by the stage number. Phase 4B
+    # groups five shells into three framings, so the radius a transition ends
+    # on is the *previous stage's* radius and the shell it frames is named by
+    # `extent_shell`.
     transitions: list[dict[str, Any]] = []
-    for at, stage in marks:
-        start = at - visual.FRAME_LEAD_SECONDS
-        end = start + visual.FRAME_EASE_SECONDS
+    for index, stage in enumerate(stages):
+        if index == 0:
+            continue
+        previous = stages[index - 1]
+        start = float(stage["start"])
+        end = float(stage["settled"])
         transitions.append({
-            "stage": int(stage),
-            "event_seconds": float(at),
+            "stage": int(stage["stage"]),
+            "extent_shell": int(stage["extent_shell"]),
+            "trigger_region": stage["trigger_region"],
+            "event_seconds": float(stage["trigger_t"]),
             "start_seconds": start,
             "end_seconds": end,
             "duration_seconds": visual.FRAME_EASE_SECONDS,
-            "from_radius": radii[stage - 1],
-            "to_radius": radii[stage],
-            "radius_growth": radii[stage] / radii[stage - 1],
+            "deferred_seconds": float(stage["deferred"]),
+            "from_radius": float(previous["radius"]),
+            "to_radius": float(stage["radius"]),
+            "radius_growth": float(stage["radius"]) / float(previous["radius"]),
+            "guard_conflicts": [
+                dict(entry) for entry in stage.get("guard_conflicts", [])
+            ],
             "spawns_inside": sum(
                 1 for t in spawns
                 if start - SPAWN_NEAR_TRANSITION_SECONDS <= t
@@ -462,10 +493,13 @@ def camera_report(document: Mapping[str, Any], fps: float = 30.0) -> dict[str, A
                 over += 1
         previous = radius
 
-    ball_fastest = speed * visual.VIEW_DIAMETER_FRACTION / (2.0 * radii[0])
+    # The opening framing, not the innermost shell: 4B never frames shell 0, so
+    # the fastest a ball ever crosses the screen is set by stage 0's radius.
+    first_radius = float(stages[0]["radius"])
+    last_radius = float(stages[-1]["radius"])
+    ball_fastest = speed * visual.VIEW_DIAMETER_FRACTION / (2.0 * first_radius)
 
-    still_tail = duration - (marks[-1][0] + visual.FRAME_EASE_SECONDS
-                             - visual.FRAME_LEAD_SECONDS) if marks else duration
+    still_tail = duration - visual.camera_lock_time(dict(document))
     gaps = [b["start_seconds"] - a["end_seconds"]
             for a, b in zip(transitions, transitions[1:])]
     return {
@@ -475,17 +509,20 @@ def camera_report(document: Mapping[str, Any], fps: float = 30.0) -> dict[str, A
         "transition_seconds": visual.FRAME_EASE_SECONDS,
         "lead_seconds": visual.FRAME_LEAD_SECONDS,
         "detail": transitions,
-        "total_radius_growth": radii[-1] / radii[0],
+        "total_radius_growth": last_radius / first_radius,
         "monotone_non_decreasing": all(
             b >= a - 1.0e-12 for (_, a), (_, b) in zip(curve, curve[1:])),
         "gate": CAMERA_VELOCITY_GATE,
         "ball_screen_velocity_first_shell": ball_fastest,
         "ball_screen_velocity_outer_shell": (
-            speed * visual.VIEW_DIAMETER_FRACTION / (2.0 * radii[-1])),
+            speed * visual.VIEW_DIAMETER_FRACTION / (2.0 * last_radius)),
         "max_screen_velocity_per_second": worst,
         "max_screen_velocity_at": worst_at,
-        "within_velocity_limit": worst <= ball_fastest,
-        "headroom_against_ball": ball_fastest - worst,
+        "velocity_ceiling": ball_fastest * CAMERA_VELOCITY_HEADROOM,
+        "velocity_over_ball": (
+            worst / ball_fastest if ball_fastest > 0.0 else 0.0),
+        "within_velocity_limit": worst <= ball_fastest * CAMERA_VELOCITY_HEADROOM,
+        "headroom_against_ball": ball_fastest * CAMERA_VELOCITY_HEADROOM - worst,
         # Reported, not gated. See CAMERA_VELOCITY_GATE.
         "max_concurrent_velocity_ratio": worst_ratio,
         "max_concurrent_velocity_ratio_at": worst_ratio_at,
@@ -494,8 +531,22 @@ def camera_report(document: Mapping[str, Any], fps: float = 30.0) -> dict[str, A
         "min_gap_seconds": min(gaps) if gaps else None,
         "spawns_inside_transitions": sum(t["spawns_inside"] for t in transitions),
         "static_tail_seconds": still_tail,
-        "camera_moves_are_canonical": len(marks) == len(
-            _first_outward_exits(document)[:len(radii) - 1]),
+        # Every move is still a canonical frontier advance, and now the
+        # stronger statement holds too: every move's *trigger* is the first
+        # exit into its own region, so the camera cannot move for any reason
+        # the race did not give it.
+        "camera_moves_are_canonical": all(
+            any(
+                abs(float(event["t"]) - float(entry["event_seconds"])) < 1e-12
+                and int(event["to_region"]) >= int(entry["trigger_region"])
+                for event in document["events"]
+                if event["kind"] == "shell_exit"
+            )
+            for entry in transitions
+        ),
+        "camera_lock_time": visual.camera_lock_time(dict(document)),
+        "guard_conflicts": sum(
+            len(entry["guard_conflicts"]) for entry in transitions),
     }
 
 

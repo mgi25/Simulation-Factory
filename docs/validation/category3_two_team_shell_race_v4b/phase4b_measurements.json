@@ -1,0 +1,3326 @@
+{
+ "format": 2,
+ "render_config_digest": "dfe8208b31d717b6",
+ "seeds": {
+  "17964": {
+   "seed": 17964,
+   "digest": "0c8a934bd159c704cc02739adaca9b247dc4b55b45175dafe2ad37cca87c79bd",
+   "summary": {
+    "duration": 25.775764133147725,
+    "escaped": true,
+    "escape_ball": 11,
+    "escape_time": 25.775764133147725,
+    "max_population": 18,
+    "max_generation": 4,
+    "breaks": 31,
+    "near_misses": 64,
+    "collisions": 442,
+    "spawns": 16
+   },
+   "escape_generation": 3,
+   "composition": {
+    "duration": 25.775764133147725,
+    "frame_marks": [
+     {
+      "t": 4.633970042431505,
+      "stage": 1
+     },
+     {
+      "t": 21.16705809703851,
+      "stage": 2
+     }
+    ],
+    "stage_view_radii": [
+     7.01575,
+     10.18075,
+     13.345749999999999,
+     16.510749999999998,
+     19.675749999999997
+    ],
+    "camera_moving_fraction": 0.041666666666666664,
+    "camera_moving_seconds": 1.0739901722144884,
+    "static_tail_seconds": 4.298706036109216,
+    "ball_px_first_frame": 65.54424870466322,
+    "ball_px_last_frame": 33.9143163538874,
+    "halo_px_last_frame": 64.43720107238607,
+    "structure_occupancy_min": 0.31920013194294516,
+    "structure_occupancy_mean": 0.5066655197424227,
+    "structure_occupancy_first": 0.8603137363931932,
+    "structure_occupancy_last": 0.31920013194294516
+   },
+   "shells": [
+    {
+     "shell_id": 0,
+     "radius": 6.5,
+     "panel_count": 16,
+     "panels": 10,
+     "openings": 3,
+     "open_fraction": 0.375,
+     "chord_length": 2.536174186209667,
+     "gap_chord": 4.674884620746167,
+     "depth": 0.7,
+     "at_own_stage": {
+      "view_radius": 7.01575,
+      "pixels_per_unit": 69.02255639097744,
+      "face_px": 20.706766917293233,
+      "flank_px": 16.800649977686398,
+      "wall_px": 37.50741689497963,
+      "chord_px": 175.05322578499806,
+      "gap_px": 322.6724873567655,
+      "ring_radius_px": 448.64661654135335
+     },
+     "at_final_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 2.18878996610879,
+      "wall_px": 9.57216798219458,
+      "chord_px": 62.41844243808243,
+      "gap_px": 115.05480112184937,
+      "ring_radius_px": 159.97319034852546
+     }
+    },
+    {
+     "shell_id": 1,
+     "radius": 9.5,
+     "panel_count": 38,
+     "panels": 32,
+     "openings": 3,
+     "open_fraction": 0.15789473684210525,
+     "chord_length": 1.5690075639743142,
+     "gap_chord": 2.827297215333944,
+     "depth": 1.25,
+     "at_own_stage": {
+      "view_radius": 10.18075,
+      "pixels_per_unit": 47.56476683937824,
+      "face_px": 14.26943005181347,
+      "flank_px": 20.644447290291023,
+      "wall_px": 34.91387734210449,
+      "chord_px": 74.62947894965909,
+      "gap_px": 134.47973283298242,
+      "ring_radius_px": 451.86528497409324
+     },
+     "at_final_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 5.651743217346636,
+      "wall_px": 13.035121233432427,
+      "chord_px": 38.61525318306757,
+      "gap_px": 69.58334701545739,
+      "ring_radius_px": 233.8069705093834
+     }
+    },
+    {
+     "shell_id": 2,
+     "radius": 12.5,
+     "panel_count": 46,
+     "panels": 42,
+     "openings": 2,
+     "open_fraction": 0.08695652173913043,
+     "chord_length": 1.7060603341167744,
+     "gap_chord": 3.104166227406165,
+     "depth": 2.15,
+     "at_own_stage": {
+      "view_radius": 13.345749999999999,
+      "pixels_per_unit": 36.284584980237156,
+      "face_px": 10.885375494071146,
+      "flank_px": 26.8066741392726,
+      "wall_px": 37.69204963334374,
+      "chord_px": 61.9036911746719,
+      "gap_px": 112.63338327110118,
+      "ring_radius_px": 453.55731225296444
+     },
+     "at_final_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 12.571980309579384,
+      "wall_px": 19.955358325665173,
+      "chord_px": 41.98829455011257,
+      "gap_px": 76.39744227235549,
+      "ring_radius_px": 307.6407506702413
+     }
+    },
+    {
+     "shell_id": 3,
+     "radius": 15.5,
+     "panel_count": 64,
+     "panels": 60,
+     "openings": 2,
+     "open_fraction": 0.0625,
+     "chord_length": 1.5210979041499584,
+     "gap_chord": 2.738531350216379,
+     "depth": 3.6,
+     "at_own_stage": {
+      "view_radius": 16.510749999999998,
+      "pixels_per_unit": 29.329073482428115,
+      "face_px": 8.798722044728434,
+      "flank_px": 35.62068184527543,
+      "wall_px": 44.41940389000386,
+      "chord_px": 44.61239220478153,
+      "gap_px": 80.31858720442926,
+      "ring_radius_px": 454.60063897763575
+     },
+     "at_final_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 25.40282144656811,
+      "wall_px": 32.786199462653904,
+      "chord_px": 37.43613608604991,
+      "gap_px": 67.3987072251645,
+      "ring_radius_px": 381.47453083109923
+     }
+    },
+    {
+     "shell_id": 4,
+     "radius": 18.5,
+     "panel_count": 66,
+     "panels": 64,
+     "openings": 2,
+     "open_fraction": 0.030303030303030304,
+     "chord_length": 1.7605308854784647,
+     "gap_chord": 1.4605308854784647,
+     "depth": 6.2,
+     "at_own_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 49.82084703723029,
+      "wall_px": 57.20422505331607,
+      "chord_px": 43.32888345493916,
+      "gap_px": 35.94550543885337,
+      "ring_radius_px": 455.3083109919571
+     },
+     "at_final_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 49.82084703723029,
+      "wall_px": 57.20422505331607,
+      "chord_px": 43.32888345493916,
+      "gap_px": 35.94550543885337,
+      "ring_radius_px": 455.3083109919571
+     }
+    }
+   ],
+   "safe_area": {
+    "safe_area": "shorts_conservative",
+    "fingerprint": "3776358f1bf13326",
+    "final_view_radius": 19.675749999999997,
+    "pixels_per_unit": 24.611260053619304,
+    "arena_radius_px": 459.0,
+    "arena_regions": [
+     {
+      "region": "action_rail",
+      "clearance_px": -91.80000000000007,
+      "clear": false
+     },
+     {
+      "region": "title_block",
+      "clearance_px": 289.79999999999995,
+      "clear": true
+     },
+     {
+      "region": "progress_bar",
+      "clearance_px": 481.79999999999995,
+      "clear": true
+     },
+     {
+      "region": "nav_bar",
+      "clearance_px": 520.1999999999998,
+      "clear": true
+     },
+     {
+      "region": "top_bar",
+      "clearance_px": 289.79999999999995,
+      "clear": true
+     }
+    ],
+    "arena_clear": false,
+    "min_clearance_px": -91.80000000000007,
+    "ball_hidden_frames": 129,
+    "ball_hidden_seconds": 4.3,
+    "ball_hidden_longest_seconds": 1.8333333333333333,
+    "ball_hidden_budget_seconds": 0.25,
+    "ball_hidden_by_region": {
+     "action_rail": 137,
+     "title_block": 0,
+     "progress_bar": 0,
+     "nav_bar": 0,
+     "top_bar": 0
+    },
+    "ball_pass": false
+   },
+   "readability": {
+    "fps": 30.0,
+    "peak_population": 18,
+    "peak_population_t": 25.70907392840478,
+    "population_by_third": [
+     6,
+     11,
+     18
+    ],
+    "population_first_frame": 2,
+    "teams_on_screen_max": 2,
+    "max_on_screen_by_team": [
+     9,
+     9
+    ],
+    "mixed_cluster_frames": 86,
+    "mixed_cluster_fraction": 0.1111111111111111,
+    "largest_mixed_cluster": 3,
+    "closest_pair_diameters": 0.04703941455503878,
+    "closest_pair_t": 10.670432758870986,
+    "largest_cluster": 3,
+    "largest_cluster_t": 20.20713203711193,
+    "longest_triple_merge_seconds": 0.36666666666666664,
+    "longest_triple_merge_t": 24.708720857260627,
+    "blob_deficit_frames": 325,
+    "blob_deficit_fraction": 0.4198966408268734,
+    "mean_blobs_per_ball": 0.9322783005417736,
+    "max_step_diameters": 0.6770598517962215,
+    "max_step_t": 4.9017300486063595,
+    "strobes": false
+   },
+   "damage": {
+    "states_reached": {
+     "damaged": 64,
+     "critical": 34,
+     "fractured": 27,
+     "broken": 62
+    },
+    "panel_chord_px_when_reached": {
+     "damaged": {
+      "min": 37.43613608604991,
+      "median": 46.01753813828819,
+      "max": 120.63253383111267
+     },
+     "critical": {
+      "min": 37.43613608604991,
+      "median": 46.01753813828819,
+      "max": 120.63253383111267
+     },
+     "fractured": {
+      "min": 37.43613608604991,
+      "median": 46.01753813828819,
+      "max": 74.38363907158065
+     },
+     "broken": {
+      "min": 37.43613608604991,
+      "median": 50.03716890476674,
+      "max": 120.63253383111267
+     }
+    },
+    "final_counts": {
+     "healthy": 136,
+     "damaged": 29,
+     "critical": 8,
+     "fractured": 4,
+     "broken": 31,
+     "panels": 208
+    },
+    "damaged_or_worse_at_end": 72,
+    "broken_at_end": 31,
+    "shared_breaks": 30
+   },
+   "moments": [
+    {
+     "name": "a_opening",
+     "t": 0.3,
+     "why": "frame one"
+    },
+    {
+     "name": "b_first_split",
+     "t": 0.6109490288424855,
+     "why": "ball 2 born at 0.52s"
+    },
+    {
+     "name": "c_first_transition",
+     "t": 4.858970042431505,
+     "why": "mid-way through the only reframe before the final wall, triggered by the race reaching region 2 at 4.77s"
+    },
+    {
+     "name": "d_four_balls",
+     "t": 4.142132054432911,
+     "why": "0.45 s after the fourth ball exists"
+    },
+    {
+     "name": "e_damaged_panel",
+     "t": 0.9811128477491061,
+     "why": "shell 1 panel 14"
+    },
+    {
+     "name": "f_critical_panel",
+     "t": 6.011835946905864,
+     "why": "fractured on shell 0 panel 13"
+    },
+    {
+     "name": "g_panel_break",
+     "t": 2.0209442355763767,
+     "why": "shell 0 panel 14, 2 hits from 2 balls"
+    },
+    {
+     "name": "g2_flood_through",
+     "t": 12.882592440856696,
+     "why": "1 ball(s) through the s2p4 passage 1.55s after it opened"
+    },
+    {
+     "name": "h_final_wall",
+     "t": 25.725764133147724,
+     "why": "18 balls against the final wall, 4.16s of locked camera"
+    },
+    {
+     "name": "i_final_escape",
+     "t": 26.045764133147724,
+     "why": "ball 11, generation 3, route opening"
+    },
+    {
+     "name": "j_winner_frame",
+     "t": 26.215764133147726,
+     "why": "ORANGE ESCAPES! at lower third, clear of the ball: True"
+    }
+   ],
+   "occupancy_samples": 241,
+   "damage_samples": 121,
+   "camera": {
+    "stages": [
+     {
+      "stage": 0,
+      "trigger_region": null,
+      "extent_shell": 1,
+      "trigger_t": 0.0,
+      "start": 0.0,
+      "settled": 0.0,
+      "deferred": 0.0,
+      "radius": 10.18075,
+      "guard_conflicts": []
+     },
+     {
+      "stage": 1,
+      "trigger_region": 2,
+      "extent_shell": 3,
+      "trigger_t": 4.773970042431505,
+      "start": 4.633970042431505,
+      "settled": 5.083970042431505,
+      "deferred": 0.0,
+      "radius": 16.510749999999998,
+      "guard_conflicts": []
+     },
+     {
+      "stage": 2,
+      "trigger_region": 4,
+      "extent_shell": 4,
+      "trigger_t": 21.30705809703851,
+      "start": 21.16705809703851,
+      "settled": 21.61705809703851,
+      "deferred": 0.0,
+      "radius": 19.675749999999997,
+      "guard_conflicts": [
+       {
+        "t": 21.50352207021098,
+        "why": "break s2p42"
+       },
+       {
+        "t": 21.50352207021098,
+        "why": "near miss 0.32r"
+       }
+      ]
+     }
+    ],
+    "transitions": 2,
+    "zoom_ratio": 1.9326424870466319,
+    "lock_time": 21.61705809703851,
+    "static_tail_seconds": 4.158706036109216,
+    "frontier_marks": [
+     [
+      0.5209490288424855,
+      1
+     ],
+     [
+      4.773970042431505,
+      2
+     ],
+     [
+      10.31954970262228,
+      3
+     ],
+     [
+      21.30705809703851,
+      4
+     ]
+    ]
+   },
+   "containment": {
+    "fps": 60.0,
+    "frames": 1548,
+    "worst_ratio": 0.30726220016466815,
+    "worst_t": 4.781929092574917,
+    "worst_ball": 4,
+    "outside_frames": 0,
+    "contained": true
+   },
+   "critical_visibility": {
+    "safe_area": "shorts_conservative",
+    "fingerprint": "3776358f1bf13326",
+    "cover_limit": 0.34,
+    "subjects": 126,
+    "by_kind": {
+     "frontier_crossing": {
+      "count": 78,
+      "hidden": 2,
+      "worst_covered": 1.0
+     },
+     "first_clone": {
+      "count": 1,
+      "hidden": 0,
+      "worst_covered": 0.0
+     },
+     "passage_break": {
+      "count": 19,
+      "hidden": 0,
+      "worst_covered": 0.0
+     },
+     "strong_near_miss": {
+      "count": 27,
+      "hidden": 0,
+      "worst_covered": 0.0
+     },
+     "winning_escape": {
+      "count": 1,
+      "hidden": 0,
+      "worst_covered": 0.0
+     }
+    },
+    "worst": {
+     "what": "frontier_crossing",
+     "t": 4.773970042431505,
+     "detail": "opening to region 2",
+     "x_px": 932.8942041437294,
+     "y_px": 835.1841502011818,
+     "radius_px": 28.669627181774175,
+     "covered": 1.0,
+     "region": "action_rail",
+     "visible": false
+    },
+    "hidden": [
+     {
+      "what": "frontier_crossing",
+      "t": 4.773970042431505,
+      "detail": "opening to region 2",
+      "x_px": 932.8942041437294,
+      "y_px": 835.1841502011818,
+      "radius_px": 28.669627181774175,
+      "covered": 1.0,
+      "region": "action_rail",
+      "visible": false
+     },
+     {
+      "what": "frontier_crossing",
+      "t": 20.65562841085825,
+      "detail": "break to region 3",
+      "x_px": 905.5981066574029,
+      "y_px": 853.1605587306428,
+      "radius_px": 20.207731629392974,
+      "covered": 0.43478260869565216,
+      "region": "action_rail",
+      "visible": false
+     }
+    ],
+    "critical_pass": true,
+    "pass": false
+   },
+   "occupancy": {
+    "samples": 96,
+    "thirds": {
+     "early": {
+      "material_fraction": 0.29840011693762863,
+      "ball_fraction": 0.004299249569649289,
+      "ink_fraction": 0.30269936650727797,
+      "arena_footprint_fraction": 0.31920013194294516,
+      "empty_fraction": 0.6973006334927221
+     },
+     "middle": {
+      "material_fraction": 0.20163693876295086,
+      "ball_fraction": 0.006012712388404591,
+      "ink_fraction": 0.20764965115135545,
+      "arena_footprint_fraction": 0.3192001319429451,
+      "empty_fraction": 0.7923503488486445
+     },
+     "late": {
+      "material_fraction": 0.1674154903636071,
+      "ball_fraction": 0.0068203468168167285,
+      "ink_fraction": 0.17423583718042385,
+      "arena_footprint_fraction": 0.31920013194294516,
+      "empty_fraction": 0.8257641628195762
+     }
+    },
+    "late_minus_early_ink": -0.12846352932685412,
+    "late_not_emptier": false,
+    "min_ink_fraction": 0.13998695300558794,
+    "max_ink_fraction": 0.37674809144695887
+   },
+   "frame_sizes": [
+    {
+     "stage": 0,
+     "extent_shell": 1,
+     "start": 0.0,
+     "settled": 0.0,
+     "view_radius": 10.18075,
+     "pixels_per_unit": 47.56476683937824,
+     "camera_distance": 26.109977153917505,
+     "frontier_diameter_px": 918.0,
+     "ball_diameter_px": 50.41865284974094,
+     "ball_drawn_diameter_px": 65.54424870466322,
+     "opening_width_px": 134.47973283298242,
+     "opening_over_ball": 2.6672615238999473,
+     "wall_face_thickness_px": 14.26943005181347,
+     "wall_apparent_thickness_px": 34.91387734210449,
+     "wall_flank_px": 20.644447290291023,
+     "occupancy": {
+      "t": 0.0,
+      "material_fraction": 0.37023939424052615,
+      "ball_fraction": 0.0032543486032163495,
+      "ink_fraction": 0.3734937428437425,
+      "arena_footprint_fraction": 0.31920013194294516,
+      "empty_fraction": 0.6265062571562575
+     }
+    },
+    {
+     "stage": 1,
+     "extent_shell": 3,
+     "start": 4.633970042431505,
+     "settled": 5.083970042431505,
+     "view_radius": 16.510749999999998,
+     "pixels_per_unit": 29.329073482428115,
+     "camera_distance": 42.34415984029108,
+     "frontier_diameter_px": 918.0,
+     "ball_diameter_px": 31.088817891373804,
+     "ball_drawn_diameter_px": 40.41546325878595,
+     "opening_width_px": 80.31858720442926,
+     "opening_over_ball": 2.583520141713565,
+     "wall_face_thickness_px": 8.798722044728434,
+     "wall_apparent_thickness_px": 44.41940389000386,
+     "wall_flank_px": 35.62068184527543,
+     "occupancy": {
+      "t": 5.083970042431505,
+      "material_fraction": 0.20163693876295086,
+      "ball_fraction": 0.003093356855770851,
+      "ink_fraction": 0.2047302956187217,
+      "arena_footprint_fraction": 0.3192001319429451,
+      "empty_fraction": 0.7952697043812783
+     }
+    },
+    {
+     "stage": 2,
+     "extent_shell": 4,
+     "start": 21.16705809703851,
+     "settled": 21.61705809703851,
+     "view_radius": 19.675749999999997,
+     "pixels_per_unit": 24.611260053619304,
+     "camera_distance": 50.46125118347786,
+     "frontier_diameter_px": 918.0,
+     "ball_diameter_px": 26.087935656836464,
+     "ball_drawn_diameter_px": 33.9143163538874,
+     "opening_width_px": 35.94550543885337,
+     "opening_over_ball": 1.3778593259230798,
+     "wall_face_thickness_px": 7.383378016085791,
+     "wall_apparent_thickness_px": 57.20422505331607,
+     "wall_flank_px": 49.82084703723029,
+     "occupancy": {
+      "t": 21.61705809703851,
+      "material_fraction": 0.13388794691880201,
+      "ball_fraction": 0.006099006086785938,
+      "ink_fraction": 0.13998695300558794,
+      "arena_footprint_fraction": 0.31920013194294516,
+      "empty_fraction": 0.8600130469944121
+     }
+    }
+   ],
+   "passages": [
+    {
+     "shell_id": 2,
+     "panel_id": 44,
+     "break_t": 10.753659923626703,
+     "first_use_t": 11.155552806146991,
+     "last_use_t": 11.155552806146991,
+     "balls": 1,
+     "ball_ids": [
+      0
+     ],
+     "teams": [
+      0
+     ],
+     "both_teams": false,
+     "response_until": 11.705552806146992
+    },
+    {
+     "shell_id": 2,
+     "panel_id": 4,
+     "break_t": 11.273979055278632,
+     "first_use_t": 12.822592440856695,
+     "last_use_t": 12.822592440856695,
+     "balls": 1,
+     "ball_ids": [
+      1
+     ],
+     "teams": [
+      1
+     ],
+     "both_teams": false,
+     "response_until": 13.372592440856696
+    }
+   ],
+   "flood_through": [],
+   "winner_banner": {
+    "placed": true,
+    "team_id": 1,
+    "team_name": "orange",
+    "escape_y_px": 555.3742182388785,
+    "release_y_px": [
+     425.9123033684907,
+     555.3742182388785
+    ],
+    "swept_y_px": [
+     408.955145191547,
+     572.3313764158222
+    ],
+    "ball_radius_px": 16.9571581769437,
+    "top_fraction": 0.735,
+    "band_px": [
+     1411.2,
+     1612.8
+    ],
+    "moved_to_top": false,
+    "clear_of_ball": true
+   },
+   "final_wall_wear": {
+    "t": 25.725764133147724,
+    "shell_id": 4,
+    "panels": 66,
+    "states": {
+     "healthy": 64,
+     "damaged": 2
+    },
+    "non_healthy": 2,
+    "worn_healthy": 8,
+    "touched_healthy": 13,
+    "visibly_marked": 10,
+    "worst_wear": 0.3460227309502529,
+    "wear_floor": 0.04
+   },
+   "av_camera": {
+    "seed": 17964,
+    "fps": 30.0,
+    "transitions": 2,
+    "transition_seconds": 0.45,
+    "lead_seconds": 0.14,
+    "detail": [
+     {
+      "stage": 1,
+      "extent_shell": 3,
+      "trigger_region": 2,
+      "event_seconds": 4.773970042431505,
+      "start_seconds": 4.633970042431505,
+      "end_seconds": 5.083970042431505,
+      "duration_seconds": 0.45,
+      "deferred_seconds": 0.0,
+      "from_radius": 10.18075,
+      "to_radius": 16.510749999999998,
+      "radius_growth": 1.6217616580310878,
+      "guard_conflicts": [],
+      "spawns_inside": 1
+     },
+     {
+      "stage": 2,
+      "extent_shell": 4,
+      "trigger_region": 4,
+      "event_seconds": 21.30705809703851,
+      "start_seconds": 21.16705809703851,
+      "end_seconds": 21.61705809703851,
+      "duration_seconds": 0.45,
+      "deferred_seconds": 0.0,
+      "from_radius": 16.510749999999998,
+      "to_radius": 19.675749999999997,
+      "radius_growth": 1.1916932907348243,
+      "guard_conflicts": [
+       {
+        "t": 21.50352207021098,
+        "why": "break s2p42"
+       },
+       {
+        "t": 21.50352207021098,
+        "why": "near miss 0.32r"
+       }
+      ],
+      "spawns_inside": 2
+     }
+    ],
+    "total_radius_growth": 1.9326424870466319,
+    "monotone_non_decreasing": true,
+    "gate": "ball_max_screen_velocity_times_headroom",
+    "ball_screen_velocity_first_shell": 0.4404145077720207,
+    "ball_screen_velocity_outer_shell": 0.22788203753351208,
+    "max_screen_velocity_per_second": 0.7112411155277709,
+    "max_screen_velocity_at": 4.833333333333333,
+    "velocity_ceiling": 0.8808290155440414,
+    "velocity_over_ball": 1.6149357093748211,
+    "within_velocity_limit": true,
+    "headroom_against_ball": 0.16958790001627044,
+    "max_concurrent_velocity_ratio": 2.1027872696187333,
+    "max_concurrent_velocity_ratio_at": 4.866666666666666,
+    "frames_reframe_outpaces_ball": 13,
+    "overlapping_transitions": 0,
+    "min_gap_seconds": 16.083088054607003,
+    "spawns_inside_transitions": 3,
+    "static_tail_seconds": 4.158706036109216,
+    "camera_moves_are_canonical": true,
+    "camera_lock_time": 21.61705809703851,
+    "guard_conflicts": 2
+   },
+   "av_sync": {
+    "format": "category3-test2-two-team-shell-race-av/2.0.0",
+    "seed": 17964,
+    "fps": 30.0,
+    "frame_seconds": 0.03333333333333333,
+    "playback_digest": "0c8a934bd159c704cc02739adaca9b247dc4b55b45175dafe2ad37cca87c79bd",
+    "score_playback_digest": "0c8a934bd159c704cc02739adaca9b247dc4b55b45175dafe2ad37cca87c79bd",
+    "event_order_digest": "582c15e29e5f1d9bf2a1c0020723341b8467ac97fdc537740acbf5ff76587bd8",
+    "audio_time_order_monotone": true,
+    "audio_cross_instant_order_shared": true,
+    "audio_has_simultaneous_cues": true,
+    "audio_never_retimed": true,
+    "mapping_complete": true,
+    "timing": {
+     "collision": {
+      "count": 442,
+      "max_error_seconds": 0.03329166666666694,
+      "max_error_frames": 0.9987500000000082,
+      "mean_error_seconds": 0.016663791478129717,
+      "mean_error_frames": 0.4999137443438915,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "spawn": {
+      "count": 16,
+      "max_error_seconds": 0.028812500000000796,
+      "max_error_frames": 0.8643750000000239,
+      "mean_error_seconds": 0.0121406250000001,
+      "mean_error_frames": 0.364218750000003,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "near_miss": {
+      "count": 64,
+      "max_error_seconds": 0.0328749999999971,
+      "max_error_frames": 0.986249999999913,
+      "mean_error_seconds": 0.018275390625000047,
+      "mean_error_frames": 0.5482617187500014,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "damage_state": {
+      "count": 156,
+      "max_error_seconds": 0.03329166666666694,
+      "max_error_frames": 0.9987500000000082,
+      "mean_error_seconds": 0.01635029380341891,
+      "mean_error_frames": 0.4905088141025673,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "break": {
+      "count": 31,
+      "max_error_seconds": 0.03106250000000088,
+      "max_error_frames": 0.9318750000000264,
+      "mean_error_seconds": 0.018043010752688535,
+      "mean_error_frames": 0.541290322580656,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "shell_exit": {
+      "count": 5,
+      "max_error_seconds": 0.026270833333331467,
+      "max_error_frames": 0.788124999999944,
+      "mean_error_seconds": 0.01722916666666636,
+      "mean_error_frames": 0.5168749999999909,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "escape": {
+      "count": 1,
+      "max_error_seconds": 0.02422916666666808,
+      "max_error_frames": 0.7268750000000423,
+      "mean_error_seconds": 0.02422916666666808,
+      "mean_error_frames": 0.7268750000000423,
+      "video_never_early": true,
+      "within_one_frame": true
+     }
+    },
+    "maximum_sync_error_seconds": 0.03329166666666694,
+    "maximum_sync_error_frames": 0.9987500000000082,
+    "within_one_rendered_frame": true,
+    "mean_sync_error_frames": 0.5013828671328685,
+    "video_never_early": true,
+    "score_fingerprint": "975136c1dfbfd99aeb1d9d5b8381f938668c8b8e7485bd1d21ac0a770ee3725c",
+    "visual_config_digest": "dfe8208b31d717b6",
+    "integration_config_digest": "e5e9cd6baa43a64c",
+    "visual_playback_digest": null,
+    "visual_digest_matches": null,
+    "visual_frames": null,
+    "pass": true
+   }
+  },
+  "3762": {
+   "seed": 3762,
+   "digest": "65a89eb883cc202ab3a7b850c31379735481c350793f0a4cd36edcdcea4d6571",
+   "summary": {
+    "duration": 24.12209121153899,
+    "escaped": true,
+    "escape_ball": 17,
+    "escape_time": 24.12209121153899,
+    "max_population": 18,
+    "max_generation": 2,
+    "breaks": 14,
+    "near_misses": 38,
+    "collisions": 425,
+    "spawns": 16
+   },
+   "escape_generation": 1,
+   "composition": {
+    "duration": 24.12209121153899,
+    "frame_marks": [
+     {
+      "t": 8.285444868012283,
+      "stage": 1
+     },
+     {
+      "t": 18.689765574437086,
+      "stage": 2
+     }
+    ],
+    "stage_view_radii": [
+     7.01575,
+     10.18075,
+     13.345749999999999,
+     16.510749999999998,
+     19.675749999999997
+    ],
+    "camera_moving_fraction": 0.04583333333333333,
+    "camera_moving_seconds": 1.105595847195537,
+    "static_tail_seconds": 5.1223256371019055,
+    "ball_px_first_frame": 65.54424870466322,
+    "ball_px_last_frame": 33.9143163538874,
+    "halo_px_last_frame": 64.43720107238607,
+    "structure_occupancy_min": 0.31920013194294516,
+    "structure_occupancy_mean": 0.5672934931430876,
+    "structure_occupancy_first": 0.8603137363931932,
+    "structure_occupancy_last": 0.31920013194294516
+   },
+   "shells": [
+    {
+     "shell_id": 0,
+     "radius": 6.5,
+     "panel_count": 16,
+     "panels": 10,
+     "openings": 3,
+     "open_fraction": 0.375,
+     "chord_length": 2.536174186209667,
+     "gap_chord": 4.674884620746167,
+     "depth": 0.7,
+     "at_own_stage": {
+      "view_radius": 7.01575,
+      "pixels_per_unit": 69.02255639097744,
+      "face_px": 20.706766917293233,
+      "flank_px": 16.800649977686398,
+      "wall_px": 37.50741689497963,
+      "chord_px": 175.05322578499806,
+      "gap_px": 322.6724873567655,
+      "ring_radius_px": 448.64661654135335
+     },
+     "at_final_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 2.18878996610879,
+      "wall_px": 9.57216798219458,
+      "chord_px": 62.41844243808243,
+      "gap_px": 115.05480112184937,
+      "ring_radius_px": 159.97319034852546
+     }
+    },
+    {
+     "shell_id": 1,
+     "radius": 9.5,
+     "panel_count": 38,
+     "panels": 32,
+     "openings": 3,
+     "open_fraction": 0.15789473684210525,
+     "chord_length": 1.5690075639743142,
+     "gap_chord": 2.827297215333944,
+     "depth": 1.25,
+     "at_own_stage": {
+      "view_radius": 10.18075,
+      "pixels_per_unit": 47.56476683937824,
+      "face_px": 14.26943005181347,
+      "flank_px": 20.644447290291023,
+      "wall_px": 34.91387734210449,
+      "chord_px": 74.62947894965909,
+      "gap_px": 134.47973283298242,
+      "ring_radius_px": 451.86528497409324
+     },
+     "at_final_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 5.651743217346636,
+      "wall_px": 13.035121233432427,
+      "chord_px": 38.61525318306757,
+      "gap_px": 69.58334701545739,
+      "ring_radius_px": 233.8069705093834
+     }
+    },
+    {
+     "shell_id": 2,
+     "radius": 12.5,
+     "panel_count": 46,
+     "panels": 42,
+     "openings": 2,
+     "open_fraction": 0.08695652173913043,
+     "chord_length": 1.7060603341167744,
+     "gap_chord": 3.104166227406165,
+     "depth": 2.15,
+     "at_own_stage": {
+      "view_radius": 13.345749999999999,
+      "pixels_per_unit": 36.284584980237156,
+      "face_px": 10.885375494071146,
+      "flank_px": 26.8066741392726,
+      "wall_px": 37.69204963334374,
+      "chord_px": 61.9036911746719,
+      "gap_px": 112.63338327110118,
+      "ring_radius_px": 453.55731225296444
+     },
+     "at_final_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 12.571980309579384,
+      "wall_px": 19.955358325665173,
+      "chord_px": 41.98829455011257,
+      "gap_px": 76.39744227235549,
+      "ring_radius_px": 307.6407506702413
+     }
+    },
+    {
+     "shell_id": 3,
+     "radius": 15.5,
+     "panel_count": 64,
+     "panels": 60,
+     "openings": 2,
+     "open_fraction": 0.0625,
+     "chord_length": 1.5210979041499584,
+     "gap_chord": 2.738531350216379,
+     "depth": 3.6,
+     "at_own_stage": {
+      "view_radius": 16.510749999999998,
+      "pixels_per_unit": 29.329073482428115,
+      "face_px": 8.798722044728434,
+      "flank_px": 35.62068184527543,
+      "wall_px": 44.41940389000386,
+      "chord_px": 44.61239220478153,
+      "gap_px": 80.31858720442926,
+      "ring_radius_px": 454.60063897763575
+     },
+     "at_final_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 25.40282144656811,
+      "wall_px": 32.786199462653904,
+      "chord_px": 37.43613608604991,
+      "gap_px": 67.3987072251645,
+      "ring_radius_px": 381.47453083109923
+     }
+    },
+    {
+     "shell_id": 4,
+     "radius": 18.5,
+     "panel_count": 66,
+     "panels": 64,
+     "openings": 2,
+     "open_fraction": 0.030303030303030304,
+     "chord_length": 1.7605308854784647,
+     "gap_chord": 1.4605308854784647,
+     "depth": 6.2,
+     "at_own_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 49.82084703723029,
+      "wall_px": 57.20422505331607,
+      "chord_px": 43.32888345493916,
+      "gap_px": 35.94550543885337,
+      "ring_radius_px": 455.3083109919571
+     },
+     "at_final_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 49.82084703723029,
+      "wall_px": 57.20422505331607,
+      "chord_px": 43.32888345493916,
+      "gap_px": 35.94550543885337,
+      "ring_radius_px": 455.3083109919571
+     }
+    }
+   ],
+   "safe_area": {
+    "safe_area": "shorts_conservative",
+    "fingerprint": "3776358f1bf13326",
+    "final_view_radius": 19.675749999999997,
+    "pixels_per_unit": 24.611260053619304,
+    "arena_radius_px": 459.0,
+    "arena_regions": [
+     {
+      "region": "action_rail",
+      "clearance_px": -91.80000000000007,
+      "clear": false
+     },
+     {
+      "region": "title_block",
+      "clearance_px": 289.79999999999995,
+      "clear": true
+     },
+     {
+      "region": "progress_bar",
+      "clearance_px": 481.79999999999995,
+      "clear": true
+     },
+     {
+      "region": "nav_bar",
+      "clearance_px": 520.1999999999998,
+      "clear": true
+     },
+     {
+      "region": "top_bar",
+      "clearance_px": 289.79999999999995,
+      "clear": true
+     }
+    ],
+    "arena_clear": false,
+    "min_clearance_px": -91.80000000000007,
+    "ball_hidden_frames": 106,
+    "ball_hidden_seconds": 3.533333333333333,
+    "ball_hidden_longest_seconds": 3.5,
+    "ball_hidden_budget_seconds": 0.25,
+    "ball_hidden_by_region": {
+     "action_rail": 106,
+     "title_block": 0,
+     "progress_bar": 0,
+     "nav_bar": 0,
+     "top_bar": 0
+    },
+    "ball_pass": false
+   },
+   "readability": {
+    "fps": 30.0,
+    "peak_population": 18,
+    "peak_population_t": 24.05545560045739,
+    "population_by_third": [
+     4,
+     9,
+     18
+    ],
+    "population_first_frame": 2,
+    "teams_on_screen_max": 2,
+    "max_on_screen_by_team": [
+     11,
+     7
+    ],
+    "mixed_cluster_frames": 56,
+    "mixed_cluster_fraction": 0.07724137931034483,
+    "largest_mixed_cluster": 2,
+    "closest_pair_diameters": 0.07087936593126469,
+    "closest_pair_t": 9.562210190209518,
+    "largest_cluster": 5,
+    "largest_cluster_t": 23.855548767212593,
+    "longest_triple_merge_seconds": 0.3,
+    "longest_triple_merge_t": 24.122091211538994,
+    "blob_deficit_frames": 238,
+    "blob_deficit_fraction": 0.32827586206896553,
+    "mean_blobs_per_ball": 0.9466083982519475,
+    "max_step_diameters": 0.530933451066356,
+    "max_step_t": 8.462722607363126,
+    "strobes": false
+   },
+   "damage": {
+    "states_reached": {
+     "damaged": 68,
+     "critical": 36,
+     "fractured": 15,
+     "broken": 28
+    },
+    "panel_chord_px_when_reached": {
+     "damaged": {
+      "min": 37.43613608604991,
+      "median": 46.01753813828819,
+      "max": 120.63253383111267
+     },
+     "critical": {
+      "min": 37.43613608604991,
+      "median": 42.52549727475349,
+      "max": 120.63253383111267
+     },
+     "fractured": {
+      "min": 37.43613608604991,
+      "median": 41.98829455011257,
+      "max": 120.63253383111267
+     },
+     "broken": {
+      "min": 38.61525318306757,
+      "median": 74.38363907158065,
+      "max": 120.63253383111267
+     }
+    },
+    "final_counts": {
+     "healthy": 134,
+     "damaged": 36,
+     "critical": 17,
+     "fractured": 7,
+     "broken": 14,
+     "panels": 208
+    },
+    "damaged_or_worse_at_end": 74,
+    "broken_at_end": 14,
+    "shared_breaks": 14
+   },
+   "moments": [
+    {
+     "name": "a_opening",
+     "t": 0.3,
+     "why": "frame one"
+    },
+    {
+     "name": "b_first_split",
+     "t": 0.8743466195323487,
+     "why": "ball 2 born at 0.78s"
+    },
+    {
+     "name": "c_first_transition",
+     "t": 8.510444868012282,
+     "why": "mid-way through the only reframe before the final wall, triggered by the race reaching region 2 at 8.43s"
+    },
+    {
+     "name": "d_four_balls",
+     "t": 5.5032926062701275,
+     "why": "0.45 s after the fourth ball exists"
+    },
+    {
+     "name": "e_damaged_panel",
+     "t": 1.049925694155854,
+     "why": "shell 0 panel 15"
+    },
+    {
+     "name": "f_critical_panel",
+     "t": 2.3057855279924713,
+     "why": "fractured on shell 0 panel 2"
+    },
+    {
+     "name": "g_panel_break",
+     "t": 2.250713683822471,
+     "why": "shell 0 panel 2, 4 hits from 3 balls"
+    },
+    {
+     "name": "g2_flood_through",
+     "t": 15.504688397575938,
+     "why": "1 ball(s) through the s0p12 passage 1.45s after it opened"
+    },
+    {
+     "name": "h_final_wall",
+     "t": 24.07209121153899,
+     "why": "18 balls against the final wall, 4.98s of locked camera"
+    },
+    {
+     "name": "i_final_escape",
+     "t": 24.39209121153899,
+     "why": "ball 17, generation 1, route opening"
+    },
+    {
+     "name": "j_winner_frame",
+     "t": 24.56209121153899,
+     "why": "CYAN ESCAPES! at lower third, clear of the ball: True"
+    }
+   ],
+   "occupancy_samples": 241,
+   "damage_samples": 121,
+   "camera": {
+    "stages": [
+     {
+      "stage": 0,
+      "trigger_region": null,
+      "extent_shell": 1,
+      "trigger_t": 0.0,
+      "start": 0.0,
+      "settled": 0.0,
+      "deferred": 0.0,
+      "radius": 10.18075,
+      "guard_conflicts": []
+     },
+     {
+      "stage": 1,
+      "trigger_region": 2,
+      "extent_shell": 3,
+      "trigger_t": 8.425444868012283,
+      "start": 8.285444868012283,
+      "settled": 8.735444868012282,
+      "deferred": 0.0,
+      "radius": 16.510749999999998,
+      "guard_conflicts": [
+       {
+        "t": 8.313700316091754,
+        "why": "near miss 0.11r"
+       },
+       {
+        "t": 8.87936777948106,
+        "why": "break s0p4"
+       },
+       {
+        "t": 8.87936777948106,
+        "why": "near miss 0.15r"
+       }
+      ]
+     },
+     {
+      "stage": 2,
+      "trigger_region": 4,
+      "extent_shell": 4,
+      "trigger_t": 18.829765574437086,
+      "start": 18.689765574437086,
+      "settled": 19.139765574437085,
+      "deferred": 0.0,
+      "radius": 19.675749999999997,
+      "guard_conflicts": []
+     }
+    ],
+    "transitions": 2,
+    "zoom_ratio": 1.9326424870466319,
+    "lock_time": 19.139765574437085,
+    "static_tail_seconds": 4.982325637101905,
+    "frontier_marks": [
+     [
+      0.7843466195323487,
+      1
+     ],
+     [
+      8.425444868012283,
+      2
+     ],
+     [
+      13.221306499956738,
+      3
+     ],
+     [
+      18.829765574437086,
+      4
+     ]
+    ]
+   },
+   "containment": {
+    "fps": 60.0,
+    "frames": 1449,
+    "worst_ratio": 0.25361063386319427,
+    "worst_t": 6.347041955522345,
+    "worst_ball": 3,
+    "outside_frames": 0,
+    "contained": true
+   },
+   "critical_visibility": {
+    "safe_area": "shorts_conservative",
+    "fingerprint": "3776358f1bf13326",
+    "cover_limit": 0.34,
+    "subjects": 62,
+    "by_kind": {
+     "strong_near_miss": {
+      "count": 14,
+      "hidden": 0,
+      "worst_covered": 0.30434782608695654
+     },
+     "frontier_crossing": {
+      "count": 41,
+      "hidden": 0,
+      "worst_covered": 0.0
+     },
+     "first_clone": {
+      "count": 1,
+      "hidden": 0,
+      "worst_covered": 0.0
+     },
+     "passage_break": {
+      "count": 5,
+      "hidden": 0,
+      "worst_covered": 0.0
+     },
+     "winning_escape": {
+      "count": 1,
+      "hidden": 0,
+      "worst_covered": 0.0
+     }
+    },
+    "worst": {
+     "what": "strong_near_miss",
+     "t": 14.219508964053002,
+     "detail": "0.14 radii",
+     "x_px": 902.1269473214542,
+     "y_px": 1122.6698100350948,
+     "radius_px": 20.207731629392974,
+     "covered": 0.30434782608695654,
+     "region": "action_rail",
+     "visible": true
+    },
+    "hidden": [],
+    "critical_pass": true,
+    "pass": true
+   },
+   "occupancy": {
+    "samples": 96,
+    "thirds": {
+     "early": {
+      "material_fraction": 0.37023939424052615,
+      "ball_fraction": 0.005288316480226568,
+      "ink_fraction": 0.37552771072075275,
+      "arena_footprint_fraction": 0.31920013194294516,
+      "empty_fraction": 0.6244722892792473
+     },
+     "middle": {
+      "material_fraction": 0.2124223271553302,
+      "ball_fraction": 0.0042003514817521015,
+      "ink_fraction": 0.2166226786370823,
+      "arena_footprint_fraction": 0.3192001319429451,
+      "empty_fraction": 0.7833773213629177
+     },
+     "late": {
+      "material_fraction": 0.15736454020385415,
+      "ball_fraction": 0.005890102336164342,
+      "ink_fraction": 0.1632546425400185,
+      "arena_footprint_fraction": 0.31920013194294516,
+      "empty_fraction": 0.8367453574599815
+     }
+    },
+    "late_minus_early_ink": -0.21227306818073424,
+    "late_not_emptier": false,
+    "min_ink_fraction": 0.13911566642176137,
+    "max_ink_fraction": 0.37674809144695887
+   },
+   "frame_sizes": [
+    {
+     "stage": 0,
+     "extent_shell": 1,
+     "start": 0.0,
+     "settled": 0.0,
+     "view_radius": 10.18075,
+     "pixels_per_unit": 47.56476683937824,
+     "camera_distance": 26.109977153917505,
+     "frontier_diameter_px": 918.0,
+     "ball_diameter_px": 50.41865284974094,
+     "ball_drawn_diameter_px": 65.54424870466322,
+     "opening_width_px": 134.47973283298242,
+     "opening_over_ball": 2.6672615238999473,
+     "wall_face_thickness_px": 14.26943005181347,
+     "wall_apparent_thickness_px": 34.91387734210449,
+     "wall_flank_px": 20.644447290291023,
+     "occupancy": {
+      "t": 0.0,
+      "material_fraction": 0.37023939424052615,
+      "ball_fraction": 0.0032543486032163495,
+      "ink_fraction": 0.3734937428437425,
+      "arena_footprint_fraction": 0.31920013194294516,
+      "empty_fraction": 0.6265062571562575
+     }
+    },
+    {
+     "stage": 1,
+     "extent_shell": 3,
+     "start": 8.285444868012283,
+     "settled": 8.735444868012282,
+     "view_radius": 16.510749999999998,
+     "pixels_per_unit": 29.329073482428115,
+     "camera_distance": 42.34415984029108,
+     "frontier_diameter_px": 918.0,
+     "ball_diameter_px": 31.088817891373804,
+     "ball_drawn_diameter_px": 40.41546325878595,
+     "opening_width_px": 80.31858720442926,
+     "opening_over_ball": 2.583520141713565,
+     "wall_face_thickness_px": 8.798722044728434,
+     "wall_apparent_thickness_px": 44.41940389000386,
+     "wall_flank_px": 35.62068184527543,
+     "occupancy": {
+      "t": 8.735444868012282,
+      "material_fraction": 0.20163693876295086,
+      "ball_fraction": 0.003093356855770851,
+      "ink_fraction": 0.2047302956187217,
+      "arena_footprint_fraction": 0.3192001319429451,
+      "empty_fraction": 0.7952697043812783
+     }
+    },
+    {
+     "stage": 2,
+     "extent_shell": 4,
+     "start": 18.689765574437086,
+     "settled": 19.139765574437085,
+     "view_radius": 19.675749999999997,
+     "pixels_per_unit": 24.611260053619304,
+     "camera_distance": 50.46125118347786,
+     "frontier_diameter_px": 918.0,
+     "ball_diameter_px": 26.087935656836464,
+     "ball_drawn_diameter_px": 33.9143163538874,
+     "opening_width_px": 35.94550543885337,
+     "opening_over_ball": 1.3778593259230798,
+     "wall_face_thickness_px": 7.383378016085791,
+     "wall_apparent_thickness_px": 57.20422505331607,
+     "wall_flank_px": 49.82084703723029,
+     "occupancy": {
+      "t": 19.139765574437085,
+      "material_fraction": 0.13388794691880201,
+      "ball_fraction": 0.005227719502959375,
+      "ink_fraction": 0.13911566642176137,
+      "arena_footprint_fraction": 0.31920013194294516,
+      "empty_fraction": 0.8608843335782386
+     }
+    }
+   ],
+   "passages": [
+    {
+     "shell_id": 0,
+     "panel_id": 4,
+     "break_t": 8.87936777948106,
+     "first_use_t": 10.242884797494984,
+     "last_use_t": 10.242884797494984,
+     "balls": 1,
+     "ball_ids": [
+      2
+     ],
+     "teams": [
+      1
+     ],
+     "both_teams": false,
+     "response_until": 10.792884797494985
+    },
+    {
+     "shell_id": 0,
+     "panel_id": 12,
+     "break_t": 13.99810135004704,
+     "first_use_t": 15.444688397575938,
+     "last_use_t": 15.444688397575938,
+     "balls": 1,
+     "ball_ids": [
+      1
+     ],
+     "teams": [
+      0
+     ],
+     "both_teams": false,
+     "response_until": 15.994688397575938
+    }
+   ],
+   "flood_through": [],
+   "winner_banner": {
+    "placed": true,
+    "team_id": 0,
+    "team_name": "cyan",
+    "escape_y_px": 1184.2871708444154,
+    "release_y_px": [
+     1184.2871708444154,
+     1193.0918383937403
+    ],
+    "swept_y_px": [
+     1167.3300126674717,
+     1210.048996570684
+    ],
+    "ball_radius_px": 16.9571581769437,
+    "top_fraction": 0.735,
+    "band_px": [
+     1411.2,
+     1612.8
+    ],
+    "moved_to_top": false,
+    "clear_of_ball": true
+   },
+   "final_wall_wear": {
+    "t": 24.07209121153899,
+    "shell_id": 4,
+    "panels": 66,
+    "states": {
+     "healthy": 66
+    },
+    "non_healthy": 0,
+    "worn_healthy": 19,
+    "touched_healthy": 28,
+    "visibly_marked": 19,
+    "worst_wear": 0.23349179505840484,
+    "wear_floor": 0.04
+   },
+   "av_camera": {
+    "seed": 3762,
+    "fps": 30.0,
+    "transitions": 2,
+    "transition_seconds": 0.45,
+    "lead_seconds": 0.14,
+    "detail": [
+     {
+      "stage": 1,
+      "extent_shell": 3,
+      "trigger_region": 2,
+      "event_seconds": 8.425444868012283,
+      "start_seconds": 8.285444868012283,
+      "end_seconds": 8.735444868012282,
+      "duration_seconds": 0.45,
+      "deferred_seconds": 0.0,
+      "from_radius": 10.18075,
+      "to_radius": 16.510749999999998,
+      "radius_growth": 1.6217616580310878,
+      "guard_conflicts": [
+       {
+        "t": 8.313700316091754,
+        "why": "near miss 0.11r"
+       },
+       {
+        "t": 8.87936777948106,
+        "why": "break s0p4"
+       },
+       {
+        "t": 8.87936777948106,
+        "why": "near miss 0.15r"
+       }
+      ],
+      "spawns_inside": 1
+     },
+     {
+      "stage": 2,
+      "extent_shell": 4,
+      "trigger_region": 4,
+      "event_seconds": 18.829765574437086,
+      "start_seconds": 18.689765574437086,
+      "end_seconds": 19.139765574437085,
+      "duration_seconds": 0.45,
+      "deferred_seconds": 0.0,
+      "from_radius": 16.510749999999998,
+      "to_radius": 19.675749999999997,
+      "radius_growth": 1.1916932907348243,
+      "guard_conflicts": [],
+      "spawns_inside": 2
+     }
+    ],
+    "total_radius_growth": 1.9326424870466319,
+    "monotone_non_decreasing": true,
+    "gate": "ball_max_screen_velocity_times_headroom",
+    "ball_screen_velocity_first_shell": 0.4404145077720207,
+    "ball_screen_velocity_outer_shell": 0.22788203753351208,
+    "max_screen_velocity_per_second": 0.709003963086728,
+    "max_screen_velocity_at": 8.5,
+    "velocity_ceiling": 0.8808290155440414,
+    "velocity_over_ball": 1.6098560573616296,
+    "within_velocity_limit": true,
+    "headroom_against_ball": 0.1718250524573134,
+    "max_concurrent_velocity_ratio": 2.104527405175377,
+    "max_concurrent_velocity_ratio_at": 8.533333333333333,
+    "frames_reframe_outpaces_ball": 13,
+    "overlapping_transitions": 0,
+    "min_gap_seconds": 9.954320706424804,
+    "spawns_inside_transitions": 3,
+    "static_tail_seconds": 4.982325637101905,
+    "camera_moves_are_canonical": true,
+    "camera_lock_time": 19.139765574437085,
+    "guard_conflicts": 3
+   },
+   "av_sync": {
+    "format": "category3-test2-two-team-shell-race-av/2.0.0",
+    "seed": 3762,
+    "fps": 30.0,
+    "frame_seconds": 0.03333333333333333,
+    "playback_digest": "65a89eb883cc202ab3a7b850c31379735481c350793f0a4cd36edcdcea4d6571",
+    "score_playback_digest": "65a89eb883cc202ab3a7b850c31379735481c350793f0a4cd36edcdcea4d6571",
+    "event_order_digest": "a3c05c9c2dca70a9e65799782a20bcf765266b65153b5878b8983241a717946c",
+    "audio_time_order_monotone": true,
+    "audio_cross_instant_order_shared": true,
+    "audio_has_simultaneous_cues": true,
+    "audio_never_retimed": true,
+    "mapping_complete": true,
+    "timing": {
+     "collision": {
+      "count": 425,
+      "max_error_seconds": 0.033124999999998295,
+      "max_error_frames": 0.9937499999999488,
+      "mean_error_seconds": 0.01598691176470587,
+      "mean_error_frames": 0.4796073529411761,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "spawn": {
+      "count": 16,
+      "max_error_seconds": 0.02931249999999963,
+      "max_error_frames": 0.8793749999999889,
+      "mean_error_seconds": 0.01144401041666683,
+      "mean_error_frames": 0.34332031250000494,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "near_miss": {
+      "count": 38,
+      "max_error_seconds": 0.03297916666666367,
+      "max_error_frames": 0.9893749999999102,
+      "mean_error_seconds": 0.015111293859649193,
+      "mean_error_frames": 0.4533388157894758,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "damage_state": {
+      "count": 133,
+      "max_error_seconds": 0.033124999999998295,
+      "max_error_frames": 0.9937499999999488,
+      "mean_error_seconds": 0.015002976190476169,
+      "mean_error_frames": 0.4500892857142851,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "break": {
+      "count": 14,
+      "max_error_seconds": 0.030083333333331908,
+      "max_error_frames": 0.9024999999999572,
+      "mean_error_seconds": 0.014547619047619096,
+      "mean_error_frames": 0.4364285714285729,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "shell_exit": {
+      "count": 5,
+      "max_error_seconds": 0.01564583333333336,
+      "max_error_frames": 0.46937500000000076,
+      "mean_error_seconds": 0.008908333333333341,
+      "mean_error_frames": 0.2672500000000002,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "escape": {
+      "count": 1,
+      "max_error_seconds": 0.011250000000000426,
+      "max_error_frames": 0.3375000000000128,
+      "mean_error_seconds": 0.011250000000000426,
+      "mean_error_frames": 0.3375000000000128,
+      "video_never_early": true,
+      "within_one_frame": true
+     }
+    },
+    "maximum_sync_error_seconds": 0.033124999999998295,
+    "maximum_sync_error_frames": 0.9937499999999488,
+    "within_one_rendered_frame": true,
+    "mean_sync_error_frames": 0.4655043512658227,
+    "video_never_early": true,
+    "score_fingerprint": "59a65cfe63bc223950342b6f032875d2cfd92630ee1fbb7f092fbdc61620f0fc",
+    "visual_config_digest": "dfe8208b31d717b6",
+    "integration_config_digest": "e5e9cd6baa43a64c",
+    "visual_playback_digest": null,
+    "visual_digest_matches": null,
+    "visual_frames": null,
+    "pass": true
+   }
+  },
+  "1176": {
+   "seed": 1176,
+   "digest": "312617c9151f80be3a4cee1837ca53fd18a01864ddc0b913c223be5251b3f16d",
+   "summary": {
+    "duration": 23.765145819199738,
+    "escaped": true,
+    "escape_ball": 10,
+    "escape_time": 23.765145819199738,
+    "max_population": 12,
+    "max_generation": 5,
+    "breaks": 20,
+    "near_misses": 22,
+    "collisions": 335,
+    "spawns": 10
+   },
+   "escape_generation": 4,
+   "composition": {
+    "duration": 23.765145819199738,
+    "frame_marks": [
+     {
+      "t": 11.956635759753727,
+      "stage": 1
+     },
+     {
+      "t": 18.105791783653515,
+      "stage": 2
+     }
+    ],
+    "stage_view_radii": [
+     7.01575,
+     10.18075,
+     13.345749999999999,
+     16.510749999999998,
+     19.675749999999997
+    ],
+    "camera_moving_fraction": 0.05,
+    "camera_moving_seconds": 1.188257290959987,
+    "static_tail_seconds": 5.349354035546224,
+    "ball_px_first_frame": 65.54424870466322,
+    "ball_px_last_frame": 33.9143163538874,
+    "halo_px_last_frame": 64.43720107238607,
+    "structure_occupancy_min": 0.31920013194294516,
+    "structure_occupancy_mean": 0.6304733861428263,
+    "structure_occupancy_first": 0.8603137363931932,
+    "structure_occupancy_last": 0.31920013194294516
+   },
+   "shells": [
+    {
+     "shell_id": 0,
+     "radius": 6.5,
+     "panel_count": 16,
+     "panels": 10,
+     "openings": 3,
+     "open_fraction": 0.375,
+     "chord_length": 2.536174186209667,
+     "gap_chord": 4.674884620746167,
+     "depth": 0.7,
+     "at_own_stage": {
+      "view_radius": 7.01575,
+      "pixels_per_unit": 69.02255639097744,
+      "face_px": 20.706766917293233,
+      "flank_px": 16.800649977686398,
+      "wall_px": 37.50741689497963,
+      "chord_px": 175.05322578499806,
+      "gap_px": 322.6724873567655,
+      "ring_radius_px": 448.64661654135335
+     },
+     "at_final_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 2.18878996610879,
+      "wall_px": 9.57216798219458,
+      "chord_px": 62.41844243808243,
+      "gap_px": 115.05480112184937,
+      "ring_radius_px": 159.97319034852546
+     }
+    },
+    {
+     "shell_id": 1,
+     "radius": 9.5,
+     "panel_count": 38,
+     "panels": 32,
+     "openings": 3,
+     "open_fraction": 0.15789473684210525,
+     "chord_length": 1.5690075639743142,
+     "gap_chord": 2.827297215333944,
+     "depth": 1.25,
+     "at_own_stage": {
+      "view_radius": 10.18075,
+      "pixels_per_unit": 47.56476683937824,
+      "face_px": 14.26943005181347,
+      "flank_px": 20.644447290291023,
+      "wall_px": 34.91387734210449,
+      "chord_px": 74.62947894965909,
+      "gap_px": 134.47973283298242,
+      "ring_radius_px": 451.86528497409324
+     },
+     "at_final_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 5.651743217346636,
+      "wall_px": 13.035121233432427,
+      "chord_px": 38.61525318306757,
+      "gap_px": 69.58334701545739,
+      "ring_radius_px": 233.8069705093834
+     }
+    },
+    {
+     "shell_id": 2,
+     "radius": 12.5,
+     "panel_count": 46,
+     "panels": 42,
+     "openings": 2,
+     "open_fraction": 0.08695652173913043,
+     "chord_length": 1.7060603341167744,
+     "gap_chord": 3.104166227406165,
+     "depth": 2.15,
+     "at_own_stage": {
+      "view_radius": 13.345749999999999,
+      "pixels_per_unit": 36.284584980237156,
+      "face_px": 10.885375494071146,
+      "flank_px": 26.8066741392726,
+      "wall_px": 37.69204963334374,
+      "chord_px": 61.9036911746719,
+      "gap_px": 112.63338327110118,
+      "ring_radius_px": 453.55731225296444
+     },
+     "at_final_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 12.571980309579384,
+      "wall_px": 19.955358325665173,
+      "chord_px": 41.98829455011257,
+      "gap_px": 76.39744227235549,
+      "ring_radius_px": 307.6407506702413
+     }
+    },
+    {
+     "shell_id": 3,
+     "radius": 15.5,
+     "panel_count": 64,
+     "panels": 60,
+     "openings": 2,
+     "open_fraction": 0.0625,
+     "chord_length": 1.5210979041499584,
+     "gap_chord": 2.738531350216379,
+     "depth": 3.6,
+     "at_own_stage": {
+      "view_radius": 16.510749999999998,
+      "pixels_per_unit": 29.329073482428115,
+      "face_px": 8.798722044728434,
+      "flank_px": 35.62068184527543,
+      "wall_px": 44.41940389000386,
+      "chord_px": 44.61239220478153,
+      "gap_px": 80.31858720442926,
+      "ring_radius_px": 454.60063897763575
+     },
+     "at_final_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 25.40282144656811,
+      "wall_px": 32.786199462653904,
+      "chord_px": 37.43613608604991,
+      "gap_px": 67.3987072251645,
+      "ring_radius_px": 381.47453083109923
+     }
+    },
+    {
+     "shell_id": 4,
+     "radius": 18.5,
+     "panel_count": 66,
+     "panels": 64,
+     "openings": 2,
+     "open_fraction": 0.030303030303030304,
+     "chord_length": 1.7605308854784647,
+     "gap_chord": 1.4605308854784647,
+     "depth": 6.2,
+     "at_own_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 49.82084703723029,
+      "wall_px": 57.20422505331607,
+      "chord_px": 43.32888345493916,
+      "gap_px": 35.94550543885337,
+      "ring_radius_px": 455.3083109919571
+     },
+     "at_final_stage": {
+      "view_radius": 19.675749999999997,
+      "pixels_per_unit": 24.611260053619304,
+      "face_px": 7.383378016085791,
+      "flank_px": 49.82084703723029,
+      "wall_px": 57.20422505331607,
+      "chord_px": 43.32888345493916,
+      "gap_px": 35.94550543885337,
+      "ring_radius_px": 455.3083109919571
+     }
+    }
+   ],
+   "safe_area": {
+    "safe_area": "shorts_conservative",
+    "fingerprint": "3776358f1bf13326",
+    "final_view_radius": 19.675749999999997,
+    "pixels_per_unit": 24.611260053619304,
+    "arena_radius_px": 459.0,
+    "arena_regions": [
+     {
+      "region": "action_rail",
+      "clearance_px": -91.80000000000007,
+      "clear": false
+     },
+     {
+      "region": "title_block",
+      "clearance_px": 289.79999999999995,
+      "clear": true
+     },
+     {
+      "region": "progress_bar",
+      "clearance_px": 481.79999999999995,
+      "clear": true
+     },
+     {
+      "region": "nav_bar",
+      "clearance_px": 520.1999999999998,
+      "clear": true
+     },
+     {
+      "region": "top_bar",
+      "clearance_px": 289.79999999999995,
+      "clear": true
+     }
+    ],
+    "arena_clear": false,
+    "min_clearance_px": -91.80000000000007,
+    "ball_hidden_frames": 14,
+    "ball_hidden_seconds": 0.4666666666666667,
+    "ball_hidden_longest_seconds": 0.26666666666666666,
+    "ball_hidden_budget_seconds": 0.25,
+    "ball_hidden_by_region": {
+     "action_rail": 14,
+     "title_block": 0,
+     "progress_bar": 0,
+     "nav_bar": 0,
+     "top_bar": 0
+    },
+    "ball_pass": false
+   },
+   "readability": {
+    "fps": 30.0,
+    "peak_population": 12,
+    "peak_population_t": 23.631821017970008,
+    "population_by_third": [
+     3,
+     9,
+     12
+    ],
+    "population_first_frame": 2,
+    "teams_on_screen_max": 2,
+    "max_on_screen_by_team": [
+     5,
+     7
+    ],
+    "mixed_cluster_frames": 51,
+    "mixed_cluster_fraction": 0.07142857142857142,
+    "largest_mixed_cluster": 3,
+    "closest_pair_diameters": 0.056308452527875544,
+    "closest_pair_t": 21.765273800753757,
+    "largest_cluster": 3,
+    "largest_cluster_t": 22.631885008747012,
+    "longest_triple_merge_seconds": 0.2,
+    "longest_triple_merge_t": 22.79854101028418,
+    "blob_deficit_frames": 369,
+    "blob_deficit_fraction": 0.5168067226890757,
+    "mean_blobs_per_ball": 0.891510474090408,
+    "max_step_diameters": 0.6545970930257831,
+    "max_step_t": 12.232550512827915,
+    "strobes": false
+   },
+   "damage": {
+    "states_reached": {
+     "damaged": 53,
+     "critical": 33,
+     "fractured": 23,
+     "broken": 40
+    },
+    "panel_chord_px_when_reached": {
+     "damaged": {
+      "min": 37.43613608604991,
+      "median": 50.03716890476674,
+      "max": 120.63253383111267
+     },
+     "critical": {
+      "min": 38.61525318306757,
+      "median": 46.01753813828819,
+      "max": 120.63253383111267
+     },
+     "fractured": {
+      "min": 38.61525318306757,
+      "median": 46.01753813828819,
+      "max": 120.63253383111267
+     },
+     "broken": {
+      "min": 38.61525318306757,
+      "median": 62.41844243808243,
+      "max": 120.63253383111267
+     }
+    },
+    "final_counts": {
+     "healthy": 150,
+     "damaged": 19,
+     "critical": 11,
+     "fractured": 8,
+     "broken": 20,
+     "panels": 208
+    },
+    "damaged_or_worse_at_end": 58,
+    "broken_at_end": 20,
+    "shared_breaks": 20
+   },
+   "moments": [
+    {
+     "name": "a_opening",
+     "t": 0.3,
+     "why": "frame one"
+    },
+    {
+     "name": "b_first_split",
+     "t": 0.6345248977009047,
+     "why": "ball 2 born at 0.54s"
+    },
+    {
+     "name": "c_first_transition",
+     "t": 12.181635759753727,
+     "why": "mid-way through the only reframe before the final wall, triggered by the race reaching region 2 at 12.10s"
+    },
+    {
+     "name": "d_four_balls",
+     "t": 8.779744797385593,
+     "why": "0.45 s after the fourth ball exists"
+    },
+    {
+     "name": "e_damaged_panel",
+     "t": 1.1425632963665358,
+     "why": "shell 1 panel 27"
+    },
+    {
+     "name": "f_critical_panel",
+     "t": 1.664335558974896,
+     "why": "fractured on shell 0 panel 14"
+    },
+    {
+     "name": "g_panel_break",
+     "t": 1.042697850283624,
+     "why": "shell 0 panel 15, 2 hits from 2 balls"
+    },
+    {
+     "name": "g2_flood_through",
+     "t": 23.68808960202232,
+     "why": "1 ball(s) through the s4p19 passage 0.36s after it opened"
+    },
+    {
+     "name": "h_final_wall",
+     "t": 23.63491196831108,
+     "why": "12 balls against the final wall, 5.21s of locked camera"
+    },
+    {
+     "name": "i_final_escape",
+     "t": 24.035145819199737,
+     "why": "ball 10, generation 4, route break"
+    },
+    {
+     "name": "j_winner_frame",
+     "t": 24.20514581919974,
+     "why": "ORANGE ESCAPES! at top third, clear of the ball: True"
+    }
+   ],
+   "occupancy_samples": 241,
+   "damage_samples": 121,
+   "camera": {
+    "stages": [
+     {
+      "stage": 0,
+      "trigger_region": null,
+      "extent_shell": 1,
+      "trigger_t": 0.0,
+      "start": 0.0,
+      "settled": 0.0,
+      "deferred": 0.0,
+      "radius": 10.18075,
+      "guard_conflicts": []
+     },
+     {
+      "stage": 1,
+      "trigger_region": 2,
+      "extent_shell": 3,
+      "trigger_t": 12.096635759753728,
+      "start": 11.956635759753727,
+      "settled": 12.406635759753726,
+      "deferred": 0.0,
+      "radius": 16.510749999999998,
+      "guard_conflicts": []
+     },
+     {
+      "stage": 2,
+      "trigger_region": 4,
+      "extent_shell": 4,
+      "trigger_t": 18.245791783653516,
+      "start": 18.105791783653515,
+      "settled": 18.555791783653515,
+      "deferred": 0.0,
+      "radius": 19.675749999999997,
+      "guard_conflicts": [
+       {
+        "t": 18.00919752518823,
+        "why": "near miss 0.02r"
+       }
+      ]
+     }
+    ],
+    "transitions": 2,
+    "zoom_ratio": 1.9326424870466319,
+    "lock_time": 18.555791783653515,
+    "static_tail_seconds": 5.209354035546223,
+    "frontier_marks": [
+     [
+      0.5445248977009047,
+      1
+     ],
+     [
+      12.096635759753728,
+      2
+     ],
+     [
+      14.618964431310273,
+      3
+     ],
+     [
+      18.245791783653516,
+      4
+     ]
+    ]
+   },
+   "containment": {
+    "fps": 60.0,
+    "frames": 1427,
+    "worst_ratio": 0.2687479404975772,
+    "worst_t": 1.516569613988202,
+    "worst_ball": 1,
+    "outside_frames": 0,
+    "contained": true
+   },
+   "critical_visibility": {
+    "safe_area": "shorts_conservative",
+    "fingerprint": "3776358f1bf13326",
+    "cover_limit": 0.34,
+    "subjects": 63,
+    "by_kind": {
+     "frontier_crossing": {
+      "count": 47,
+      "hidden": 0,
+      "worst_covered": 0.0
+     },
+     "first_clone": {
+      "count": 1,
+      "hidden": 0,
+      "worst_covered": 0.0
+     },
+     "passage_break": {
+      "count": 9,
+      "hidden": 0,
+      "worst_covered": 0.0
+     },
+     "strong_near_miss": {
+      "count": 5,
+      "hidden": 0,
+      "worst_covered": 0.0
+     },
+     "winning_escape": {
+      "count": 1,
+      "hidden": 0,
+      "worst_covered": 0.0
+     }
+    },
+    "worst": {
+     "what": "frontier_crossing",
+     "t": 0.5445248977009047,
+     "detail": "opening to region 1",
+     "x_px": 827.9334371557902,
+     "y_px": 768.9054084477434,
+     "radius_px": 32.77212435233161,
+     "covered": 0.0,
+     "region": "",
+     "visible": true
+    },
+    "hidden": [],
+    "critical_pass": true,
+    "pass": true
+   },
+   "occupancy": {
+    "samples": 96,
+    "thirds": {
+     "early": {
+      "material_fraction": 0.37023939424052615,
+      "ball_fraction": 0.004728975314048758,
+      "ink_fraction": 0.3749683695545749,
+      "arena_footprint_fraction": 0.31920013194294516,
+      "empty_fraction": 0.6250316304454251
+     },
+     "middle": {
+      "material_fraction": 0.29245261411510415,
+      "ball_fraction": 0.005457501446077452,
+      "ink_fraction": 0.2979101155611816,
+      "arena_footprint_fraction": 0.31920013194294516,
+      "empty_fraction": 0.7020898844388184
+     },
+     "late": {
+      "material_fraction": 0.1546293724817858,
+      "ball_fraction": 0.005221926234098126,
+      "ink_fraction": 0.15985129871588394,
+      "arena_footprint_fraction": 0.31920013194294516,
+      "empty_fraction": 0.840148701284116
+     }
+    },
+    "late_minus_early_ink": -0.21511707083869097,
+    "late_not_emptier": false,
+    "min_ink_fraction": 0.13868002312984812,
+    "max_ink_fraction": 0.3831094357259756
+   },
+   "frame_sizes": [
+    {
+     "stage": 0,
+     "extent_shell": 1,
+     "start": 0.0,
+     "settled": 0.0,
+     "view_radius": 10.18075,
+     "pixels_per_unit": 47.56476683937824,
+     "camera_distance": 26.109977153917505,
+     "frontier_diameter_px": 918.0,
+     "ball_diameter_px": 50.41865284974094,
+     "ball_drawn_diameter_px": 65.54424870466322,
+     "opening_width_px": 134.47973283298242,
+     "opening_over_ball": 2.6672615238999473,
+     "wall_face_thickness_px": 14.26943005181347,
+     "wall_apparent_thickness_px": 34.91387734210449,
+     "wall_flank_px": 20.644447290291023,
+     "occupancy": {
+      "t": 0.0,
+      "material_fraction": 0.37023939424052615,
+      "ball_fraction": 0.0032543486032163495,
+      "ink_fraction": 0.3734937428437425,
+      "arena_footprint_fraction": 0.31920013194294516,
+      "empty_fraction": 0.6265062571562575
+     }
+    },
+    {
+     "stage": 1,
+     "extent_shell": 3,
+     "start": 11.956635759753727,
+     "settled": 12.406635759753726,
+     "view_radius": 16.510749999999998,
+     "pixels_per_unit": 29.329073482428115,
+     "camera_distance": 42.34415984029108,
+     "frontier_diameter_px": 918.0,
+     "ball_diameter_px": 31.088817891373804,
+     "ball_drawn_diameter_px": 40.41546325878595,
+     "opening_width_px": 80.31858720442926,
+     "opening_over_ball": 2.583520141713565,
+     "wall_face_thickness_px": 8.798722044728434,
+     "wall_apparent_thickness_px": 44.41940389000386,
+     "wall_flank_px": 35.62068184527543,
+     "occupancy": {
+      "t": 12.406635759753726,
+      "material_fraction": 0.20163693876295086,
+      "ball_fraction": 0.003093356855770851,
+      "ink_fraction": 0.2047302956187217,
+      "arena_footprint_fraction": 0.3192001319429451,
+      "empty_fraction": 0.7952697043812783
+     }
+    },
+    {
+     "stage": 2,
+     "extent_shell": 4,
+     "start": 18.105791783653515,
+     "settled": 18.555791783653515,
+     "view_radius": 19.675749999999997,
+     "pixels_per_unit": 24.611260053619304,
+     "camera_distance": 50.46125118347786,
+     "frontier_diameter_px": 918.0,
+     "ball_diameter_px": 26.087935656836464,
+     "ball_drawn_diameter_px": 33.9143163538874,
+     "opening_width_px": 35.94550543885337,
+     "opening_over_ball": 1.3778593259230798,
+     "wall_face_thickness_px": 7.383378016085791,
+     "wall_apparent_thickness_px": 57.20422505331607,
+     "wall_flank_px": 49.82084703723029,
+     "occupancy": {
+      "t": 18.555791783653515,
+      "material_fraction": 0.13388794691880201,
+      "ball_fraction": 0.004792076211046094,
+      "ink_fraction": 0.13868002312984812,
+      "arena_footprint_fraction": 0.31920013194294516,
+      "empty_fraction": 0.8613199768701518
+     }
+    }
+   ],
+   "passages": [
+    {
+     "shell_id": 0,
+     "panel_id": 4,
+     "break_t": 6.1579456861642505,
+     "first_use_t": 6.665511387539743,
+     "last_use_t": 6.665511387539743,
+     "balls": 1,
+     "ball_ids": [
+      2
+     ],
+     "teams": [
+      1
+     ],
+     "both_teams": false,
+     "response_until": 7.215511387539743
+    },
+    {
+     "shell_id": 4,
+     "panel_id": 19,
+     "break_t": 23.267151414988984,
+     "first_use_t": 23.62808960202232,
+     "last_use_t": 23.62808960202232,
+     "balls": 1,
+     "ball_ids": [
+      10
+     ],
+     "teams": [
+      1
+     ],
+     "both_teams": false,
+     "response_until": 24.17808960202232
+    }
+   ],
+   "flood_through": [],
+   "winner_banner": {
+    "placed": true,
+    "team_id": 1,
+    "team_name": "orange",
+    "escape_y_px": 1317.879434593283,
+    "release_y_px": [
+     1317.879434593283,
+     1418.7241123094461
+    ],
+    "swept_y_px": [
+     1300.9222764163392,
+     1435.6812704863898
+    ],
+    "ball_radius_px": 16.9571581769437,
+    "top_fraction": 0.15,
+    "band_px": [
+     288.0,
+     489.6
+    ],
+    "moved_to_top": true,
+    "clear_of_ball": true
+   },
+   "final_wall_wear": {
+    "t": 23.63491196831108,
+    "shell_id": 4,
+    "panels": 66,
+    "states": {
+     "healthy": 64,
+     "broken": 1,
+     "damaged": 1
+    },
+    "non_healthy": 2,
+    "worn_healthy": 1,
+    "touched_healthy": 1,
+    "visibly_marked": 3,
+    "worst_wear": 1.018620760117542,
+    "wear_floor": 0.04
+   },
+   "av_camera": {
+    "seed": 1176,
+    "fps": 30.0,
+    "transitions": 2,
+    "transition_seconds": 0.45,
+    "lead_seconds": 0.14,
+    "detail": [
+     {
+      "stage": 1,
+      "extent_shell": 3,
+      "trigger_region": 2,
+      "event_seconds": 12.096635759753728,
+      "start_seconds": 11.956635759753727,
+      "end_seconds": 12.406635759753726,
+      "duration_seconds": 0.45,
+      "deferred_seconds": 0.0,
+      "from_radius": 10.18075,
+      "to_radius": 16.510749999999998,
+      "radius_growth": 1.6217616580310878,
+      "guard_conflicts": [],
+      "spawns_inside": 1
+     },
+     {
+      "stage": 2,
+      "extent_shell": 4,
+      "trigger_region": 4,
+      "event_seconds": 18.245791783653516,
+      "start_seconds": 18.105791783653515,
+      "end_seconds": 18.555791783653515,
+      "duration_seconds": 0.45,
+      "deferred_seconds": 0.0,
+      "from_radius": 16.510749999999998,
+      "to_radius": 19.675749999999997,
+      "radius_growth": 1.1916932907348243,
+      "guard_conflicts": [
+       {
+        "t": 18.00919752518823,
+        "why": "near miss 0.02r"
+       }
+      ],
+      "spawns_inside": 1
+     }
+    ],
+    "total_radius_growth": 1.9326424870466319,
+    "monotone_non_decreasing": true,
+    "gate": "ball_max_screen_velocity_times_headroom",
+    "ball_screen_velocity_first_shell": 0.4404145077720207,
+    "ball_screen_velocity_outer_shell": 0.22788203753351208,
+    "max_screen_velocity_per_second": 0.7103695849950076,
+    "max_screen_velocity_at": 12.166666666666666,
+    "velocity_ceiling": 0.8808290155440414,
+    "velocity_over_ball": 1.6129568224004291,
+    "within_velocity_limit": true,
+    "headroom_against_ball": 0.17045943054903379,
+    "max_concurrent_velocity_ratio": 2.1060207234438835,
+    "max_concurrent_velocity_ratio_at": 12.2,
+    "frames_reframe_outpaces_ball": 12,
+    "overlapping_transitions": 0,
+    "min_gap_seconds": 5.699156023899789,
+    "spawns_inside_transitions": 2,
+    "static_tail_seconds": 5.209354035546223,
+    "camera_moves_are_canonical": true,
+    "camera_lock_time": 18.555791783653515,
+    "guard_conflicts": 1
+   },
+   "av_sync": {
+    "format": "category3-test2-two-team-shell-race-av/2.0.0",
+    "seed": 1176,
+    "fps": 30.0,
+    "frame_seconds": 0.03333333333333333,
+    "playback_digest": "312617c9151f80be3a4cee1837ca53fd18a01864ddc0b913c223be5251b3f16d",
+    "score_playback_digest": "312617c9151f80be3a4cee1837ca53fd18a01864ddc0b913c223be5251b3f16d",
+    "event_order_digest": "f45a70f752ac0bdbd92af4fa7f93d349b18ee022c5277e5141ae63bdd4010eaa",
+    "audio_time_order_monotone": true,
+    "audio_cross_instant_order_shared": true,
+    "audio_has_simultaneous_cues": true,
+    "audio_never_retimed": true,
+    "mapping_complete": true,
+    "timing": {
+     "collision": {
+      "count": 335,
+      "max_error_seconds": 0.03322916666666664,
+      "max_error_frames": 0.9968749999999993,
+      "mean_error_seconds": 0.01671318407960204,
+      "mean_error_frames": 0.5013955223880612,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "spawn": {
+      "count": 10,
+      "max_error_seconds": 0.02214583333333331,
+      "max_error_frames": 0.6643749999999993,
+      "mean_error_seconds": 0.011743750000000141,
+      "mean_error_frames": 0.35231250000000425,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "near_miss": {
+      "count": 22,
+      "max_error_seconds": 0.03247916666666839,
+      "max_error_frames": 0.9743750000000517,
+      "mean_error_seconds": 0.015896780303030645,
+      "mean_error_frames": 0.47690340909091933,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "damage_state": {
+      "count": 129,
+      "max_error_seconds": 0.03322916666666664,
+      "max_error_frames": 0.9968749999999993,
+      "mean_error_seconds": 0.016333817829457305,
+      "mean_error_frames": 0.49001453488371916,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "break": {
+      "count": 20,
+      "max_error_seconds": 0.03322916666666664,
+      "max_error_frames": 0.9968749999999993,
+      "mean_error_seconds": 0.015141666666666442,
+      "mean_error_frames": 0.45424999999999327,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "shell_exit": {
+      "count": 5,
+      "max_error_seconds": 0.02214583333333331,
+      "max_error_frames": 0.6643749999999993,
+      "mean_error_seconds": 0.013199999999999833,
+      "mean_error_frames": 0.395999999999995,
+      "video_never_early": true,
+      "within_one_frame": true
+     },
+     "escape": {
+      "count": 1,
+      "max_error_seconds": 0.0015208333333340818,
+      "max_error_frames": 0.04562500000002245,
+      "mean_error_seconds": 0.0015208333333340818,
+      "mean_error_frames": 0.04562500000002245,
+      "video_never_early": true,
+      "within_one_frame": true
+     }
+    },
+    "maximum_sync_error_seconds": 0.03322916666666664,
+    "maximum_sync_error_frames": 0.9968749999999993,
+    "within_one_rendered_frame": true,
+    "mean_sync_error_frames": 0.4910057471264375,
+    "video_never_early": true,
+    "score_fingerprint": "2b3828d70a289a294b03046f66118841be17527938f3e19f174b363f83439f5d",
+    "visual_config_digest": "dfe8208b31d717b6",
+    "integration_config_digest": "e5e9cd6baa43a64c",
+    "visual_playback_digest": null,
+    "visual_digest_matches": null,
+    "visual_frames": null,
+    "pass": true
+   }
+  }
+ },
+ "render_config": {
+  "format": 1,
+  "schema": "category3-test2-two-team-shell-race/3.0.0",
+  "config_digest": "4a3ab8ba22ae7c54981700823cc5b4eaf147c72fc5ab609a244d9cbaeb6ce572",
+  "frame": [
+   1080,
+   1920
+  ],
+  "view_diameter_fraction": 0.8967499999999999,
+  "arena_centre": [
+   0.5,
+   0.45
+  ],
+  "view_pad_fraction": 0.055,
+  "frontier_width_fraction": 0.85,
+  "usable_width_fraction": 0.6799999999999999,
+  "camera_hfov_degrees": 47.0,
+  "camera_near": 0.2,
+  "camera_frustum_size": 0.17392494998437347,
+  "camera_frustum_offset": [
+   0.0,
+   -0.015459995554166528
+  ],
+  "frame_lead_seconds": 0.14,
+  "frame_ease_seconds": 0.45,
+  "camera_stage_plan": [
+   [
+    0,
+    1
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    4,
+    4
+   ]
+  ],
+  "event_guard": [
+   0.12,
+   0.22,
+   0.9,
+   0.75
+  ],
+  "ball_draw_scale": 1.3,
+  "halo_scale": 1.9,
+  "ball_rim": [
+   1.24,
+   0.02
+  ],
+  "layer_z": [
+   0.06,
+   0.12,
+   0.16
+  ],
+  "trail_width": [
+   0.78,
+   0.24
+  ],
+  "trail_seconds": 0.115,
+  "trail_samples": 20,
+  "panel_depth": [
+   0.7,
+   1.25,
+   2.15,
+   3.6,
+   6.2
+  ],
+  "post_depth_factor": 0.55,
+  "panel_chamfer": 0.085,
+  "panel_segments": 3,
+  "shell_albedo_value": [
+   1.0,
+   0.97,
+   0.94,
+   0.91,
+   0.88
+  ],
+  "shell_metallic": [
+   0.05,
+   0.15,
+   0.25,
+   0.35,
+   0.45
+  ],
+  "shell_roughness": [
+   0.55,
+   0.49,
+   0.43,
+   0.37,
+   0.31
+  ],
+  "damage_emission_energy": [
+   0.0,
+   0.55,
+   1.3,
+   2.1,
+   0.0
+  ],
+  "damage_crack_count": [
+   0,
+   2,
+   4,
+   6,
+   0
+  ],
+  "damage_mark_chord": 0.3,
+  "damage_chip": [
+   [
+    0.115,
+    0.13,
+    0.16
+   ],
+   0.055
+  ],
+  "damage_wear": [
+   0.04,
+   0.6,
+   0.85
+  ],
+  "damage_cluster": [
+   0.13,
+   0.34,
+   2.1
+  ],
+  "damage_crack": [
+   1.1,
+   0.035,
+   34.0
+  ],
+  "damage_branch": [
+   [
+    0,
+    0,
+    1,
+    2,
+    0
+   ],
+   26.0,
+   0.62
+  ],
+  "panel_chamfer_by_shell": [
+   0.085,
+   0.085,
+   0.1,
+   0.115,
+   0.135
+  ],
+  "fracture": [
+   0.2,
+   9.0,
+   0.1
+  ],
+  "spawn": [
+   0.3,
+   3.1,
+   0.18
+  ],
+  "near_miss_seconds": 0.16,
+  "break": [
+   0.16,
+   0.3,
+   0.26,
+   5,
+   0.34,
+   3.4
+  ],
+  "break_stress_seconds": 0.1,
+  "fragments": [
+   4,
+   0.42,
+   0.22,
+   0.6,
+   5.2,
+   220.0
+  ],
+  "flood": [
+   1.8,
+   2,
+   0.55,
+   5.4
+  ],
+  "hook": [
+   1.85,
+   0.55,
+   0.0,
+   0.082,
+   0.0315
+  ],
+  "winner": [
+   0.052,
+   0.735,
+   0.15,
+   0.22,
+   0.105
+  ],
+  "escape": [
+   0.6,
+   0.75
+  ],
+  "ending": [
+   0.55,
+   0.4
+  ],
+  "background": [
+   0.02,
+   0.026,
+   0.042
+  ],
+  "floor": [
+   0.075,
+   0.1,
+   0.165
+  ],
+  "teams": [
+   [
+    0.14,
+    0.88,
+    1.0
+   ],
+   [
+    1.0,
+    0.54,
+    0.13
+   ]
+  ],
+  "team_names": [
+   "cyan",
+   "orange"
+  ],
+  "generation": [
+   0.0,
+   0.0,
+   0.09,
+   1.36
+  ],
+  "panel": [
+   0.4,
+   0.44,
+   0.5
+  ],
+  "face": [
+   [
+    0.62,
+    0.68,
+    0.78
+   ],
+   0.62
+  ],
+  "back": [
+   [
+    0.34,
+    0.43,
+    0.56
+   ],
+   0.3
+  ],
+  "post": [
+   [
+    0.33,
+    0.37,
+    0.44
+   ],
+   [
+    1.0,
+    0.16,
+    0.44
+   ],
+   [
+    0.7,
+    0.78,
+    0.9
+   ],
+   1.6,
+   0.26,
+   1.35
+  ],
+  "backdrop": [
+   -6.0,
+   -4.0,
+   2.6,
+   0.42
+  ],
+  "debris": [
+   0.22,
+   6.0,
+   5.0
+  ],
+  "damage_colours": [
+   [
+    0.88,
+    0.1,
+    0.42
+   ],
+   [
+    1.0,
+    0.06,
+    0.3
+   ],
+   [
+    1.0,
+    0.52,
+    0.72
+   ],
+   [
+    1.0,
+    0.94,
+    0.96
+   ]
+  ],
+  "safe_area": "3776358f1bf13326"
+ },
+ "framing_decision": [
+  {
+   "fraction": 0.652,
+   "seed": 17964,
+   "critical_pass": true,
+   "hidden": 0,
+   "by_kind": {
+    "frontier_crossing": {
+     "count": 78,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "first_clone": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "passage_break": {
+     "count": 19,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "strong_near_miss": {
+     "count": 27,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "winning_escape": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    }
+   },
+   "final_ball_px": 26.014275603217165,
+   "final_opening_px": 27.57231711309694,
+   "final_wall_px": 35.743751441692076,
+   "contained": true
+  },
+  {
+   "fraction": 0.652,
+   "seed": 3762,
+   "critical_pass": true,
+   "hidden": 0,
+   "by_kind": {
+    "strong_near_miss": {
+     "count": 14,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "frontier_crossing": {
+     "count": 41,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "first_clone": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "passage_break": {
+     "count": 5,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "winning_escape": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    }
+   },
+   "final_ball_px": 26.014275603217165,
+   "final_opening_px": 27.57231711309694,
+   "final_wall_px": 35.743751441692076,
+   "contained": true
+  },
+  {
+   "fraction": 0.652,
+   "seed": 1176,
+   "critical_pass": true,
+   "hidden": 0,
+   "by_kind": {
+    "frontier_crossing": {
+     "count": 47,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "first_clone": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "passage_break": {
+     "count": 9,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "strong_near_miss": {
+     "count": 5,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "winning_escape": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    }
+   },
+   "final_ball_px": 26.014275603217165,
+   "final_opening_px": 27.57231711309694,
+   "final_wall_px": 35.743751441692076,
+   "contained": true
+  },
+  {
+   "fraction": 0.8,
+   "seed": 17964,
+   "critical_pass": true,
+   "hidden": 1,
+   "by_kind": {
+    "frontier_crossing": {
+     "count": 78,
+     "hidden": 1,
+     "worst_covered": 0.5652173913043478
+    },
+    "first_clone": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "passage_break": {
+     "count": 19,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "strong_near_miss": {
+     "count": 27,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "winning_escape": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    }
+   },
+   "final_ball_px": 31.919356568364616,
+   "final_opening_px": 33.83106394245023,
+   "final_wall_px": 51.36692311582593,
+   "contained": true
+  },
+  {
+   "fraction": 0.8,
+   "seed": 3762,
+   "critical_pass": true,
+   "hidden": 0,
+   "by_kind": {
+    "strong_near_miss": {
+     "count": 14,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "frontier_crossing": {
+     "count": 41,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "first_clone": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "passage_break": {
+     "count": 5,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "winning_escape": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    }
+   },
+   "final_ball_px": 31.919356568364616,
+   "final_opening_px": 33.83106394245023,
+   "final_wall_px": 51.36692311582593,
+   "contained": true
+  },
+  {
+   "fraction": 0.8,
+   "seed": 1176,
+   "critical_pass": true,
+   "hidden": 0,
+   "by_kind": {
+    "frontier_crossing": {
+     "count": 47,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "first_clone": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "passage_break": {
+     "count": 9,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "strong_near_miss": {
+     "count": 5,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "winning_escape": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    }
+   },
+   "final_ball_px": 31.919356568364616,
+   "final_opening_px": 33.83106394245023,
+   "final_wall_px": 51.36692311582593,
+   "contained": true
+  },
+  {
+   "fraction": 0.85,
+   "seed": 17964,
+   "critical_pass": true,
+   "hidden": 2,
+   "by_kind": {
+    "frontier_crossing": {
+     "count": 78,
+     "hidden": 2,
+     "worst_covered": 1.0
+    },
+    "first_clone": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "passage_break": {
+     "count": 19,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "strong_near_miss": {
+     "count": 27,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "winning_escape": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    }
+   },
+   "final_ball_px": 33.9143163538874,
+   "final_opening_px": 35.94550543885337,
+   "final_wall_px": 57.20422505331607,
+   "contained": true
+  },
+  {
+   "fraction": 0.85,
+   "seed": 3762,
+   "critical_pass": true,
+   "hidden": 0,
+   "by_kind": {
+    "strong_near_miss": {
+     "count": 14,
+     "hidden": 0,
+     "worst_covered": 0.30434782608695654
+    },
+    "frontier_crossing": {
+     "count": 41,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "first_clone": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "passage_break": {
+     "count": 5,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "winning_escape": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    }
+   },
+   "final_ball_px": 33.9143163538874,
+   "final_opening_px": 35.94550543885337,
+   "final_wall_px": 57.20422505331607,
+   "contained": true
+  },
+  {
+   "fraction": 0.85,
+   "seed": 1176,
+   "critical_pass": true,
+   "hidden": 0,
+   "by_kind": {
+    "frontier_crossing": {
+     "count": 47,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "first_clone": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "passage_break": {
+     "count": 9,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "strong_near_miss": {
+     "count": 5,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "winning_escape": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    }
+   },
+   "final_ball_px": 33.9143163538874,
+   "final_opening_px": 35.94550543885337,
+   "final_wall_px": 57.20422505331607,
+   "contained": true
+  },
+  {
+   "fraction": 0.9,
+   "seed": 17964,
+   "critical_pass": true,
+   "hidden": 2,
+   "by_kind": {
+    "frontier_crossing": {
+     "count": 78,
+     "hidden": 2,
+     "worst_covered": 1.0
+    },
+    "first_clone": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "passage_break": {
+     "count": 19,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "strong_near_miss": {
+     "count": 27,
+     "hidden": 0,
+     "worst_covered": 0.17391304347826086
+    },
+    "winning_escape": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    }
+   },
+   "final_ball_px": 35.909276139410196,
+   "final_opening_px": 38.05994693525651,
+   "final_wall_px": 63.314994013039204,
+   "contained": true
+  },
+  {
+   "fraction": 0.9,
+   "seed": 3762,
+   "critical_pass": false,
+   "hidden": 2,
+   "by_kind": {
+    "strong_near_miss": {
+     "count": 14,
+     "hidden": 1,
+     "worst_covered": 0.927536231884058
+    },
+    "frontier_crossing": {
+     "count": 41,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "first_clone": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "passage_break": {
+     "count": 5,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "winning_escape": {
+     "count": 1,
+     "hidden": 1,
+     "worst_covered": 0.43478260869565216
+    }
+   },
+   "final_ball_px": 35.909276139410196,
+   "final_opening_px": 38.05994693525651,
+   "final_wall_px": 63.314994013039204,
+   "contained": true
+  },
+  {
+   "fraction": 0.9,
+   "seed": 1176,
+   "critical_pass": true,
+   "hidden": 0,
+   "by_kind": {
+    "frontier_crossing": {
+     "count": 47,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "first_clone": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "passage_break": {
+     "count": 9,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "strong_near_miss": {
+     "count": 5,
+     "hidden": 0,
+     "worst_covered": 0.0
+    },
+    "winning_escape": {
+     "count": 1,
+     "hidden": 0,
+     "worst_covered": 0.0
+    }
+   },
+   "final_ball_px": 35.909276139410196,
+   "final_opening_px": 38.05994693525651,
+   "final_wall_px": 63.314994013039204,
+   "contained": true
+  }
+ ]
+}

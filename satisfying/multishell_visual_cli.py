@@ -413,10 +413,28 @@ def cmd_audit(args: argparse.Namespace) -> int:
     worst = max(row["max_position_error"] for row in rows)
     bad = sum(row["panel_mismatches"] for row in rows)
     centre_worst = max(row["max_centre_error_px"] for row in rows)
+    radius_worst = max(row["max_view_radius_error"] for row in rows)
+    stage_worst = max(row["max_camera_stage_error"] for row in rows)
+    wound_worst = max(row["max_wound_error"] for row in rows)
+    wound_bad = sum(row["wound_mismatches"] for row in rows)
+    wear_worst = max(row["max_wear_error"] for row in rows)
+    structure = all(
+        row["camera_stage_count_matches"] and row["wound_count_matches"]
+        and row["passage_count_matches"] for row in rows
+    )
     print(f"  worst ball position error {worst:.3e} world units, "
           f"centre disagreement {centre_worst:.3e} px, "
           f"{bad} panel-state mismatches -> {path}")
-    return 0 if (worst < 1e-9 and centre_worst <= 1.0 and bad == 0) else 1
+    print(f"  camera: view radius {radius_worst:.3e}, stage times "
+          f"{stage_worst:.3e}; wounds: {wound_bad} mismatched, worst "
+          f"{wound_worst:.3e}; wear worst {wear_worst:.3e}; "
+          f"structure {'ok' if structure else 'BAD'}")
+    return 0 if (
+        worst < 1e-9 and centre_worst <= 1.0 and bad == 0
+        and radius_worst < 1e-6 and stage_worst < 1e-6
+        and wound_bad == 0 and wound_worst < 1e-9 and wear_worst < 1e-9
+        and structure
+    ) else 1
 
 
 def _check_audit(document: dict[str, Any], audit: dict[str, Any]) -> dict[str, Any]:
@@ -449,6 +467,79 @@ def _check_audit(document: dict[str, Any], audit: dict[str, Any]) -> dict[str, A
                 document, int(entry["shell_id"]), int(entry["panel_id"]), t)
             if str(entry["state"]) != expected_state:
                 mismatches += 1
+    # --- Phase 4B: the render against the derivation, not against a copy ---
+    #
+    # The 1.778x frustum error survived three phases because the only check
+    # compared a Python constant with a GDScript constant, and both copies were
+    # wrong the same way. So the scene now emits what it actually built - its
+    # camera stages, its wounds and its passage responses - and Python diffs
+    # them against what `multishell_visual` independently derives from the same
+    # document. Two files agreeing is not a measurement; a render agreeing with
+    # a derivation is.
+    sample = audit["rows"][0] if audit["rows"] else {}
+
+    stage_error = 0.0
+    stage_rows = 0
+    expected_stages = visual.camera_stages(document)
+    for built, wanted in zip(sample.get("camera_stages", []), expected_stages):
+        stage_rows += 1
+        if int(built["stage"]) != int(wanted["stage"]) or \
+                int(built["extent_shell"]) != int(wanted["extent_shell"]):
+            mismatches += 1
+            continue
+        for key in ("start", "settled", "radius"):
+            stage_error = max(
+                stage_error, abs(float(built[key]) - float(wanted[key])))
+    stage_count_matches = stage_rows == len(expected_stages)
+
+    radius_error = 0.0
+    for row in audit["rows"]:
+        radius_error = max(radius_error, abs(
+            float(row["view_radius"])
+            - visual.view_radius_at(document, float(row["t"]))))
+
+    wound_error = 0.0
+    wound_rows = 0
+    wound_mismatch = 0
+    derived = visual.panel_damage_clusters(document)
+    built_wounds = sample.get("wounds", [])
+    flat: list[tuple[int, int, int, dict[str, Any]]] = []
+    for key, row in derived.items():
+        shell_id, panel_id = (int(part) for part in key.split(":"))
+        for cluster in row:
+            flat.append((shell_id, panel_id, int(cluster["index"]), cluster))
+    flat.sort(key=lambda entry: (entry[0], entry[1], entry[2]))
+    wound_count_matches = len(built_wounds) == len(flat)
+    for built, (shell_id, panel_id, index, cluster) in zip(built_wounds, flat):
+        wound_rows += 1
+        if (int(built["shell_id"]), int(built["panel_id"]), int(built["index"])) \
+                != (shell_id, panel_id, index):
+            wound_mismatch += 1
+            continue
+        if int(built["weight"]) != int(cluster["weight"]) or \
+                int(built["tilt_sign"]) != int(cluster["tilt_sign"]):
+            wound_mismatch += 1
+            continue
+        wound_error = max(
+            wound_error,
+            abs(float(built["offset"]) - float(cluster["offset"])),
+            abs(float(built["growth"]) - float(cluster["growth"])),
+        )
+
+    wear_error = 0.0
+    wear_rows = 0
+    for built in sample.get("wear", []):
+        wear_rows += 1
+        wanted_wear = visual.panel_wear_at(
+            document, int(built["shell_id"]), int(built["panel_id"]),
+            float(sample["t"]))
+        wear_error = max(wear_error, abs(float(built["wear"]) - wanted_wear))
+
+    passages = visual.passage_responses(document)
+    built_passages = sample.get("passage_uses", [])
+    passage_matches = len(built_passages) == sum(
+        int(entry["balls"]) for entry in passages)
+
     return {
         "seed": int(audit["seed"]),
         "fps": float(audit["fps"]),
@@ -460,6 +551,16 @@ def _check_audit(document: dict[str, Any], audit: dict[str, Any]) -> dict[str, A
         "panel_mismatches": mismatches,
         "population_mismatch_frames": population_bad,
         "max_centre_error_px": max_centre_error,
+        "camera_stage_count_matches": stage_count_matches,
+        "max_camera_stage_error": stage_error,
+        "max_view_radius_error": radius_error,
+        "wound_count_matches": wound_count_matches,
+        "wound_rows": wound_rows,
+        "wound_mismatches": wound_mismatch,
+        "max_wound_error": wound_error,
+        "passage_count_matches": passage_matches,
+        "wear_rows": wear_rows,
+        "max_wear_error": wear_error,
     }
 
 

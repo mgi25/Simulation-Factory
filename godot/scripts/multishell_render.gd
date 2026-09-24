@@ -24,6 +24,7 @@ extends Node
 ##     --moments=JSON       the still times, from `multishell_visual`
 ##     --fps=30             output rate
 ##     --width= --height=   default 1080x1920
+##     --frontier-width=    override the frame fraction (A/B/C sweep only)
 ##     --start= --end=      seconds, to render part of a clip
 ##     --fixed=1            the control: pin the framing to the whole arena
 ##     --release=0.55       the escapee's run-on past the document's end
@@ -155,6 +156,14 @@ func _build_viewport(options: Dictionary) -> void:
 		_scene.release_seconds = maxf(0.0, float(options["release"]))
 	if options.has("hold"):
 		_scene.hold_seconds = maxf(0.0, float(options["hold"]))
+	if options.has("panel-depth"):
+		var parts: PackedStringArray = str(options["panel-depth"]).split(",")
+		var ramp := []
+		for part in parts:
+			ramp.append(float(part))
+		_scene.set_panel_depth(ramp)
+	if options.has("frontier-width"):
+		_scene.set_frontier_width(float(options["frontier-width"]))
 	_scene.fixed_framing = str(options.get("fixed", "0")) == "1"
 	_scene.show_debug = str(options.get("debug", "0")) == "1"
 	_viewport.add_child(_scene)

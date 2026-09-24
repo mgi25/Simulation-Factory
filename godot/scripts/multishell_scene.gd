@@ -52,8 +52,33 @@ const FRAME_HEIGHT := 1920
 ## 65.20% of the frame width at every stage. These five numbers must agree with
 ## `satisfying.multishell_visual`; `test_multishell_visual` compares them.
 const VIEW_PAD_FRACTION := 0.055
-const FRONTIER_WIDTH_FRACTION := 0.652
+## Phase 4B. 0.652 fitted the whole arena inside the band that clears the
+## Shorts action rail; the human review rejected the result and the brief
+## replaced the rule with "keep the interesting action large". 0.850 was picked
+## against rendered evidence and 0.900 rejected because it puts 45% of seed
+## 3762's winning escape under the action rail.
+const FRONTIER_WIDTH_FRACTION := 0.850
 const VIEW_DIAMETER_FRACTION := FRONTIER_WIDTH_FRACTION * (1.0 + VIEW_PAD_FRACTION)
+## The frame fraction the A/B/C comparison sweeps. It defaults to the constant
+## above and `test_the_scene_defaults_to_the_declared_frame_fraction` is what
+## keeps the default honest; only the laboratory tool ever sets it.
+var frontier_width := FRONTIER_WIDTH_FRACTION
+var view_diameter := VIEW_DIAMETER_FRACTION
+
+
+func set_frontier_width(fraction: float) -> void:
+	frontier_width = fraction
+	view_diameter = fraction * (1.0 + VIEW_PAD_FRACTION)
+
+
+## The depth ramp the "massive final wall" sweep varies. Defaults to the
+## constant and only the laboratory tool ever sets it.
+var panel_depth: Array = PANEL_DEPTH.duplicate()
+
+
+func set_panel_depth(values: Array) -> void:
+	if values.size() == panel_depth.size():
+		panel_depth = values.duplicate()
 const ARENA_CENTRE_X_FRACTION := 0.500
 const ARENA_CENTRE_Y_FRACTION := 0.450
 const CAMERA_HFOV_DEGREES := 47.0
@@ -70,12 +95,19 @@ const CAMERA_FRUSTUM_OFFSET := Vector2(
 	(0.5 - ARENA_CENTRE_X_FRACTION) * CAMERA_FRUSTUM_SIZE,
 	(ARENA_CENTRE_Y_FRACTION - 0.5) * CAMERA_FRUSTUM_SIZE
 		* float(FRAME_HEIGHT) / float(FRAME_WIDTH))
-const FRAME_LEAD_SECONDS := 0.12
-const FRAME_EASE_SECONDS := 0.55
+const FRAME_LEAD_SECONDS := 0.14
+const FRAME_EASE_SECONDS := 0.45
+## `[trigger_region, extent_shell]`. The camera holds `extent_shell` until the
+## canonical high-water frontier reaches `trigger_region`. Two moves, not four.
+const CAMERA_STAGE_PLAN := [[0, 1], [2, 3], [4, 4]]
+const EVENT_GUARD_BEFORE_SECONDS := 0.12
+const EVENT_GUARD_AFTER_SECONDS := 0.22
+const EVENT_GUARD_MAX_DEFER_SECONDS := 0.90
+const STRONG_NEAR_MISS_RADII := 0.75
 
 # ---------------------------------------------------------------------- balls
 const BALL_DRAW_SCALE := 1.30
-const HALO_SCALE := 2.10
+const HALO_SCALE := 1.90
 const BALL_RIM_SCALE := 1.24
 # Draw order along z. Everything the physics cares about is at z = 0; these are
 # the presentation layers around it. The rim, the trail and the halo sit just
@@ -87,24 +119,55 @@ const TRAIL_Z := 0.06
 const HALO_Z := 0.12
 const EFFECT_Z := 0.16
 const MAX_DAMAGE_MARKS := 6
-const TRAIL_SECONDS := 0.16
+const TRAIL_SECONDS := 0.115
 const TRAIL_SAMPLES := 20
-const TRAIL_HEAD_WIDTH := 0.92
-const TRAIL_TAIL_WIDTH := 0.34
+const TRAIL_HEAD_WIDTH := 0.78
+const TRAIL_TAIL_WIDTH := 0.24
 
 # ---------------------------------------------------------------------- walls
-const PANEL_DEPTH := [0.70, 1.15, 1.75, 2.55, 3.60]
-const POST_DEPTH_FACTOR := 1.55
+## Nothing at z = 0 moves: the front face is still the canonical collision
+## silhouette on every shell. All of the added mass is behind it.
+const PANEL_DEPTH := [0.70, 1.25, 2.15, 3.60, 6.20]
+const POST_DEPTH_FACTOR := 0.55
 const PANEL_CHAMFER := 0.085
+const PANEL_CHAMFER_BY_SHELL := [0.085, 0.085, 0.100, 0.115, 0.135]
 const PANEL_SEGMENTS := 3
 const SHELL_ALBEDO_VALUE := [1.00, 0.97, 0.94, 0.91, 0.88]
 const SHELL_METALLIC := [0.05, 0.15, 0.25, 0.35, 0.45]
 const SHELL_ROUGHNESS := [0.55, 0.49, 0.43, 0.37, 0.31]
 
 # --------------------------------------------------------------------- damage
-const DAMAGE_EMISSION_ENERGY := [0.00, 0.90, 2.20, 4.00, 0.00]
+## Halved: in 4B the bright part of a wound is a hairline in the bottom of a
+## dark chip, not a lit bar lying on the panel.
+const DAMAGE_EMISSION_ENERGY := [0.00, 0.55, 1.30, 2.10, 0.00]
 const DAMAGE_CRACK_COUNT := [0, 2, 4, 6, 0]
 const DAMAGE_MARK_CHORD := 0.30
+const DAMAGE_CHIP_RGB := Color(0.115, 0.130, 0.160)
+const DAMAGE_CHIP_DEPTH := 0.055
+## Wear below the first damage state. `fraction` is canonical and on every
+## damage event; 4A read only the quantised ledger, so a panel at a third of
+## its threshold was drawn identical to an untouched one - and on the final
+## wall that is nearly every panel.
+const DAMAGE_WEAR_FLOOR := 0.04
+const DAMAGE_WEAR_FACE_LOSS := 0.60
+const DAMAGE_WEAR_CHIP_SCALE := 0.85
+const DAMAGE_CLUSTER_CHORD := 0.13
+const DAMAGE_CLUSTER_GROWTH := 0.34
+const DAMAGE_CLUSTER_GROWTH_MAX := 2.10
+## A crack is a `width x span*thickness` rectangle rolled by the tilt, and its
+## rotated radial extent is `span*cos(tilt) + width/thickness*sin(tilt)`. At 34
+## degrees that stays inside the panel for any span up to 1.128, so 1.10 is the
+## longest crack that never puts a pixel outside the canonical silhouette -
+## which is the same rule the 4A marks were held to and the reason they were
+## bars rather than lines.
+const DAMAGE_CRACK_SPAN := 1.10
+const DAMAGE_CRACK_WIDTH := 0.035
+const DAMAGE_CRACK_TILT_DEGREES := 34.0
+const DAMAGE_BRANCH_COUNT := [0, 0, 1, 2, 0]
+const DAMAGE_BRANCH_SPREAD_DEGREES := 26.0
+const DAMAGE_BRANCH_LENGTH := 0.62
+## One chip, one crack and two branches per drawn wound.
+const MARK_PARTS := 4
 const FRACTURE_GAP := 0.20
 const FRACTURE_TILT_DEGREES := 9.0
 const FRACTURE_RECESS := 0.10
@@ -115,17 +178,28 @@ const SPAWN_FLASH_RADIUS := 3.10
 const SPAWN_LINK_SECONDS := 0.18
 const NEAR_MISS_SECONDS := 0.16
 const BREAK_FLASH_SECONDS := 0.16
-const BREAK_RETRACT_SECONDS := 0.55
-const BREAK_DEBRIS_SECONDS := 0.45
-const BREAK_DEBRIS_COUNT := 8
-const BREAK_RING_SECONDS := 0.60
+const BREAK_RETRACT_SECONDS := 0.30
+const BREAK_STRESS_SECONDS := 0.10
+const BREAK_FRAGMENT_COUNT := 4
+const BREAK_FRAGMENT_SECONDS := 0.42
+const BREAK_FRAGMENT_CHORD_FRACTION := 0.22
+const BREAK_FRAGMENT_DEPTH_FRACTION := 0.60
+const BREAK_FRAGMENT_OUT_SPEED := 5.2
+const BREAK_FRAGMENT_SPIN_DEGREES := 220.0
+const FLOOD_WINDOW_SECONDS := 1.80
+const FLOOD_MIN_BALLS := 2
+const FLOOD_RESPONSE_SECONDS := 0.55
+const FLOOD_POST_ENERGY := 5.4
+const BREAK_DEBRIS_SECONDS := 0.26
+const BREAK_DEBRIS_COUNT := 5
+const BREAK_RING_SECONDS := 0.34
 # World units, so it is the same fraction of whatever shell it happens on. 2.2
 # was the first value and it was 47 px at the final framing - smaller than the
 # panel it destroyed, and unreadable as an event.
-const BREAK_RING_RADIUS := 5.50
-const BREAK_DEBRIS_SIZE := 0.55
-const BREAK_DEBRIS_SPEED := 7.0
-const BREAK_DEBRIS_SPEED_SPREAD := 7.5
+const BREAK_RING_RADIUS := 3.40
+const BREAK_DEBRIS_SIZE := 0.22
+const BREAK_DEBRIS_SPEED := 6.0
+const BREAK_DEBRIS_SPEED_SPREAD := 5.0
 const ESCAPE_FLARE_SECONDS := 0.60
 const ESCAPE_RING_SECONDS := 0.75
 const RELEASE_SECONDS := 0.55
@@ -144,14 +218,20 @@ const HOOK_SIZE_FRACTION := 0.0315
 ## The hook steps back once the arena is busy, rather than cutting: at four
 ## balls the question has been answered by the picture and the type is only
 ## competing with it.
-const HOOK_FADE_START := 3.4
-const HOOK_FADE_SECONDS := 0.9
-const HOOK_FADE_TO := 0.22
+## The hook leaves. 4A faded it to 0.22 and left a ghost of the question over
+## the whole race, which is what the human review objected to. It is now solid
+## for the brief's 1.5-2.0 s, gone over half a second, and then not drawn.
+const HOOK_HOLD_SECONDS := 1.85
+const HOOK_FADE_SECONDS := 0.55
+const HOOK_FADE_TO := 0.0
 ## The payoff. It lands on the canonical escape instant, not on the release
 ## beat, so the word and the ball leaving the arena are the same frame.
 const WINNER_SIZE_FRACTION := 0.052
 const WINNER_TOP_FRACTION := 0.735
+const WINNER_ALT_TOP_FRACTION := 0.150
+const WINNER_BAND_FRACTION := 0.105
 const WINNER_RISE_SECONDS := 0.22
+const WINNER_RELEASE_SAMPLES := 25
 const TEXT_PRIMARY := Color(0.94, 0.96, 1.00)
 const SAFE_MARGIN_FRACTION := 0.075
 
@@ -302,6 +382,10 @@ var _break_ring: Array[MeshInstance3D] = []
 var _break_ring_material: Array = []
 var _debris: Array[MeshInstance3D] = []
 var _debris_material: Array = []
+var _fragments: Array[MeshInstance3D] = []
+var _fragment_material: Array = []
+var _passage_exits: Array = []
+var _passage_uses: Array = []
 var _escape := {}
 var _escape_ring: MeshInstance3D
 var _escape_ring_material: StandardMaterial3D
@@ -309,11 +393,14 @@ var _escape_ring_material: StandardMaterial3D
 var _hook_label: Label
 var _winner_label: Label
 var _panel_impacts := {}
+var _panel_clusters := {}
+var _panel_wear := {}
 var _backdrop: MeshInstance3D
 var _glow_pool: MeshInstance3D
 var _radial_texture: GradientTexture2D
 var _halo_texture: GradientTexture2D
 var _configured := false
+var _stages: Array = []
 var _debug_crosshair: Array = []
 var _debug_markers: Array = []
 var _debug_outlines: Array = []
@@ -377,7 +464,8 @@ func view_radius() -> float:
 
 
 func frame_mark_count() -> int:
-	return _frame_marks().size()
+	## Camera transitions, which under 4B is two rather than one per shell.
+	return maxi(0, _camera_stages().size() - 1)
 
 
 # --------------------------------------------------------------------------
@@ -396,20 +484,103 @@ func _shell_view_radii() -> PackedFloat64Array:
 	return out
 
 
-func _frame_marks() -> Array:
-	## `[t, stage]` for each advance of the canonical high-water frontier.
+func _frontier_reached() -> Dictionary:
+	## The first instant the canonical high-water frontier reached each region.
+	## Read from the `shell_exit` stream and from nothing else, so the camera
+	## consumes the race rather than a schedule that merely runs beside it.
 	var limit := int(playback["shells"].size()) - 1
-	var marks := []
+	var reached := {}
 	var high_water := 0
 	for event in playback["events"]:
 		if str(event["kind"]) != "shell_exit":
 			continue
-		var to_region := int(event["to_region"])
-		var target: int = mini(to_region, limit)
+		var target: int = mini(int(event["to_region"]), limit)
 		while high_water < target:
 			high_water += 1
-			marks.append([float(event["t"]), high_water])
-	return marks
+			if not reached.has(high_water):
+				reached[high_water] = float(event["t"])
+	return reached
+
+
+func _protected_instants() -> PackedFloat64Array:
+	## Moments a camera move may not run across: the first clone, every panel
+	## break, every strong near miss, and the escape.
+	var out := PackedFloat64Array()
+	var first_spawn := true
+	for event in playback["events"]:
+		var kind := str(event["kind"])
+		if kind == "ball_spawn" and first_spawn:
+			first_spawn = false
+			out.append(float(event["t"]))
+		elif kind == "panel_break":
+			out.append(float(event["t"]))
+		elif kind == "near_miss" and float(
+				event["arc_separation_ball_radii"]) <= STRONG_NEAR_MISS_RADII:
+			out.append(float(event["t"]))
+		elif kind == "escape":
+			out.append(float(event["t"]))
+	var sorted_out := Array(out)
+	sorted_out.sort()
+	return PackedFloat64Array(sorted_out)
+
+
+func _guarded(start: float, guards: PackedFloat64Array) -> bool:
+	var low := start - EVENT_GUARD_BEFORE_SECONDS
+	var high := start + FRAME_EASE_SECONDS + EVENT_GUARD_AFTER_SECONDS
+	for guard in guards:
+		if guard >= low and guard <= high:
+			return true
+	return false
+
+
+func _clear_start(wanted: float, floor_t: float,
+		guards: PackedFloat64Array) -> float:
+	## Protection may pull a move **earlier** and never later. Deferring a
+	## blocked move past the frontier crossing that triggered it is what left
+	## balls outside the frame for 63 and 98 frames on 17964 and 3762; the
+	## trigger is the instant the old framing stops being big enough, so there
+	## is no slack after it to spend.
+	if not _guarded(wanted, guards) and wanted >= floor_t:
+		return wanted
+	var best := -1.0
+	for guard in guards:
+		var option: float = guard - EVENT_GUARD_BEFORE_SECONDS - FRAME_EASE_SECONDS
+		if option < floor_t or option > wanted:
+			continue
+		if wanted - option > EVENT_GUARD_MAX_DEFER_SECONDS:
+			continue
+		if _guarded(option, guards):
+			continue
+		if best < 0.0 or option > best:
+			best = option
+	if best < 0.0:
+		return maxf(wanted, floor_t)
+	return best
+
+
+func _camera_stages() -> Array:
+	## `[stage, extent_shell, start, settled, radius]`, outward and monotone.
+	if not _stages.is_empty():
+		return _stages
+	var radii := _shell_view_radii()
+	var reached := _frontier_reached()
+	var guards := _protected_instants()
+	var previous_end := 0.0
+	for index in CAMERA_STAGE_PLAN.size():
+		var plan: Array = CAMERA_STAGE_PLAN[index]
+		var trigger: int = int(plan[0])
+		var extent: int = int(plan[1])
+		if index == 0:
+			_stages.append([0, extent, 0.0, 0.0, radii[extent]])
+			continue
+		if not reached.has(trigger):
+			continue
+		var wanted: float = float(reached[trigger]) - FRAME_LEAD_SECONDS
+		var start := _clear_start(wanted, previous_end, guards)
+		var settled := start + FRAME_EASE_SECONDS
+		previous_end = settled
+		_stages.append([index, extent, start, settled, radii[extent]])
+	return _stages
 
 
 func _smoothstep01(u: float) -> float:
@@ -424,24 +595,34 @@ func _view_radius_at(t: float) -> float:
 	var radii := _shell_view_radii()
 	if fixed_framing:
 		return radii[radii.size() - 1]
-	var radius: float = radii[0]
-	for mark in _frame_marks():
-		var at: float = mark[0]
-		var stage: int = mark[1]
-		var span: float = radii[stage] - radii[stage - 1]
-		radius += span * _smoothstep01(
-			(t - (at - FRAME_LEAD_SECONDS)) / FRAME_EASE_SECONDS)
+	var stages := _camera_stages()
+	var radius: float = float(stages[0][4])
+	for index in range(1, stages.size()):
+		var stage: Array = stages[index]
+		var previous := radius
+		radius = previous + (float(stage[4]) - previous) * _smoothstep01(
+			(t - float(stage[2])) / FRAME_EASE_SECONDS)
 	return radius
 
 
+func camera_stage_at(t: float) -> int:
+	## Which stage the composition is in: the last one that has settled.
+	var stages := _camera_stages()
+	var current := 0
+	for index in range(1, stages.size()):
+		if t >= float(stages[index][3]):
+			current = int(stages[index][0])
+	return current
+
+
 func _camera_distance(view: float) -> float:
-	var half_width_units := view / VIEW_DIAMETER_FRACTION
+	var half_width_units := view / view_diameter
 	return half_width_units / tan(deg_to_rad(CAMERA_HFOV_DEGREES) * 0.5)
 
 
 func _apply_camera(t: float) -> void:
 	_view_radius = _view_radius_at(t)
-	_pixels_per_unit = float(_width) * VIEW_DIAMETER_FRACTION / (2.0 * _view_radius)
+	_pixels_per_unit = float(_width) * view_diameter / (2.0 * _view_radius)
 	var distance := _camera_distance(_view_radius)
 	# The eye stays on the one invariant world centre.  An asymmetric frustum
 	# places that optical axis at the Shorts-safe composition point; unlike a
@@ -482,11 +663,18 @@ func _build() -> void:
 	_build_environment()
 	_build_camera()
 	_build_backdrop()
+	# `_read_impacts` moved ahead of `_build_shells`: a panel now allocates one
+	# wound's worth of geometry per cluster it actually has, rather than six
+	# slots for every panel in the arena whether it is ever touched or not.
+	# Across the review candidates that is about 160 wounds instead of 1,380
+	# slots, which is what makes four parts per wound affordable.
+	_read_impacts()
+	_read_wear()
 	_build_shells()
 	_read_panel_states()
-	_read_impacts()
 	_build_balls()
 	_read_events()
+	_resolve_passage_uses()
 	_build_effects()
 	_build_overlay()
 	if show_debug:
@@ -537,7 +725,7 @@ func _update_debug_overlay() -> void:
 		canonical + Vector2(0.0, -22.0), canonical + Vector2(0.0, 22.0)])
 	for shell_id in EXPECTED_SHELL_COUNT:
 		var centre := _camera.unproject_position(Vector3(
-			0.0, 0.0, -0.5 * float(PANEL_DEPTH[shell_id])))
+			0.0, 0.0, -0.5 * float(panel_depth[shell_id])))
 		_debug_markers[shell_id].points = _circle_points(
 			centre, 4.0 + 3.0 * shell_id, 32)
 		var radius := float(playback["shells"][shell_id]["radius"]) * _pixels_per_unit
@@ -653,6 +841,13 @@ func _build_shells() -> void:
 	container.name = "Shells"
 	add_child(container)
 
+	# One shared chip material for the whole arena: a chip is absence of
+	# material and its colour never depends on the state, so a per-panel copy
+	# would be 230 identical StandardMaterial3Ds.
+	var chip_material := StandardMaterial3D.new()
+	chip_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	chip_material.albedo_color = DAMAGE_CHIP_RGB
+
 	var running := 0
 	for shell in playback["shells"]:
 		var shell_id := int(shell["shell_id"])
@@ -661,7 +856,7 @@ func _build_shells() -> void:
 		var count := int(shell["panel_count"])
 		var slot_width := float(shell["slot_width"])
 		var chord := float(shell["chord_length"])
-		var depth: float = PANEL_DEPTH[shell_id]
+		var depth: float = panel_depth[shell_id]
 
 		var root := Node3D.new()
 		root.name = "Shell%d" % shell_id
@@ -782,6 +977,7 @@ func _build_shells() -> void:
 			root.add_child(stress)
 			_panel_stress.append(stress)
 
+			var chamfer: float = PANEL_CHAMFER_BY_SHELL[shell_id]
 			var piece_length := chord / float(PANEL_SEGMENTS)
 			var slabs: Array[MeshInstance3D] = []
 			for segment in PANEL_SEGMENTS:
@@ -789,7 +985,7 @@ func _build_shells() -> void:
 				slab.name = "S%dP%02dS%d" % [shell_id, slot, segment]
 				slab.mesh = _chamfered_slab(
 					piece_length, thickness, depth,
-					PANEL_CHAMFER, segment == 0, segment == PANEL_SEGMENTS - 1)
+					chamfer, segment == 0, segment == PANEL_SEGMENTS - 1)
 				slab.material_override = material
 				root.add_child(slab)
 				# The lit face rides the slab as a child, so it splits when the
@@ -800,8 +996,8 @@ func _build_shells() -> void:
 				# panel was drawn as three bright bars with two dark gaps -
 				# every panel in the arena looked pre-fractured, and the two
 				# gaps that are supposed to mean `fractured` meant nothing.
-				var trim_low: float = PANEL_CHAMFER if segment == 0 else 0.0
-				var trim_high: float = PANEL_CHAMFER \
+				var trim_low: float = chamfer if segment == 0 else 0.0
+				var trim_high: float = chamfer \
 					if segment == PANEL_SEGMENTS - 1 else 0.0
 				var plate := MeshInstance3D.new()
 				var plate_quad := QuadMesh.new()
@@ -816,8 +1012,8 @@ func _build_shells() -> void:
 				var back := MeshInstance3D.new()
 				var back_quad := QuadMesh.new()
 				back_quad.size = Vector2(
-					piece_length - trim_low - trim_high - 2.0 * PANEL_CHAMFER,
-					thickness - 2.0 * PANEL_CHAMFER)
+					piece_length - trim_low - trim_high - 2.0 * chamfer,
+					thickness - 2.0 * chamfer)
 				back.mesh = back_quad
 				back.material_override = back_material
 				back.position = Vector3(
@@ -826,19 +1022,43 @@ func _build_shells() -> void:
 				slabs.append(slab)
 			_panel_slabs.append(slabs)
 
+			# **A wound, not a marker.** Four parts: a dark chip where the
+			# material went, a bright hairline in the bottom of it, and two
+			# branches that only appear once the panel is critical. Each part
+			# runs from just in front of the face back into the wall, so it
+			# protrudes through the inset flank and is read on the flank too -
+			# which on the outer shells is most of what is on screen.
+			var clusters: Array = _panel_clusters.get(
+				"%d:%d" % [shell_id, slot], [])
+			var wounds: int = mini(clusters.size(), MAX_DAMAGE_MARKS)
 			var marks: Array[MeshInstance3D] = []
-			for _m in MAX_DAMAGE_MARKS:
-				var mark := MeshInstance3D.new()
-				var box := BoxMesh.new()
-				# Exactly as thick as the panel radially and as deep as it is
-				# behind: a mark spans the whole wall and never puts a pixel
-				# outside the canonical silhouette.
-				box.size = Vector3(DAMAGE_MARK_CHORD, thickness, depth)
-				mark.mesh = box
-				mark.material_override = mark_material
-				mark.visible = false
-				root.add_child(mark)
-				marks.append(mark)
+			for _m in wounds * MARK_PARTS:
+				marks.append(null)
+			for wound in wounds:
+				var chip := MeshInstance3D.new()
+				var chip_box := BoxMesh.new()
+				chip_box.size = Vector3(
+					DAMAGE_MARK_CHORD, thickness * 0.68, depth * 0.55)
+				chip.mesh = chip_box
+				chip.material_override = chip_material
+				chip.visible = false
+				root.add_child(chip)
+				marks[wound * MARK_PARTS] = chip
+				for part in range(1, MARK_PARTS):
+					var line := MeshInstance3D.new()
+					var line_box := BoxMesh.new()
+					var span: float = DAMAGE_CRACK_SPAN if part == 1 \
+						else DAMAGE_CRACK_SPAN * DAMAGE_BRANCH_LENGTH
+					var width: float = DAMAGE_CRACK_WIDTH if part == 1 \
+						else DAMAGE_CRACK_WIDTH * 0.68
+					line_box.size = Vector3(
+						width, thickness * span,
+						depth * (0.80 if part == 1 else 0.45))
+					line.mesh = line_box
+					line.material_override = mark_material
+					line.visible = false
+					root.add_child(line)
+					marks[wound * MARK_PARTS + part] = line
 			_panel_marks.append(marks)
 		_panel_index.append(panel_row)
 
@@ -1002,17 +1222,73 @@ func _read_panel_states() -> void:
 			_panel_break_time[index] = float(entry["break_time"])
 
 
+func _read_wear() -> void:
+	## `[t, fraction]` per panel from the canonical `damage` stream: the
+	## continuous version of the five-state ledger, not a second opinion on it.
+	for event in playback["events"]:
+		if str(event["kind"]) != "damage":
+			continue
+		var key := "%d:%d" % [int(event["shell_id"]), int(event["panel_id"])]
+		if not _panel_wear.has(key):
+			_panel_wear[key] = []
+		_panel_wear[key].append([float(event["t"]), float(event["fraction"])])
+
+
+func _wear_at(index: int, t: float) -> float:
+	var rows: Array = _panel_wear.get(_panel_key(index), [])
+	var wear := 0.0
+	for row in rows:
+		if float(row[0]) <= t:
+			wear = float(row[1])
+		else:
+			break
+	return wear
+
+
 func _read_impacts() -> void:
-	## Where each panel was hit, along its own chord, in time order.
-	## `panel_local_offset` is on every canonical collision, so a crack can
-	## start at an impact rather than at a decorative position.
+	## Where each panel was hit, along its own chord, in time order, and the
+	## wounds those impacts add up to.
+	##
+	## `panel_local_offset` is on every canonical collision, so a crack starts
+	## where the ball actually hit rather than at a decorative position. Two
+	## impacts within `DAMAGE_CLUSTER_CHORD` of each other are the same wound
+	## and the second deepens the first: repeated hits in one area build on one
+	## another instead of drawing a second identical marker beside the first.
 	for event in playback["events"]:
 		if str(event["kind"]) != "collision":
 			continue
-		var key := "%d:%d" % [int(event["shell_id"]), int(event["panel_id"])]
+		var shell_id := int(event["shell_id"])
+		var panel_id := int(event["panel_id"])
+		var key := "%d:%d" % [shell_id, panel_id]
+		var offset := float(event["panel_local_offset"])
 		if not _panel_impacts.has(key):
 			_panel_impacts[key] = []
-		_panel_impacts[key].append(float(event["panel_local_offset"]))
+		_panel_impacts[key].append(offset)
+		if not _panel_clusters.has(key):
+			_panel_clusters[key] = []
+		var row: Array = _panel_clusters[key]
+		var merged := false
+		for cluster in row:
+			if absf(float(cluster[0]) - offset) <= DAMAGE_CLUSTER_CHORD:
+				cluster[1] = int(cluster[1]) + 1
+				merged = true
+				break
+		if not merged:
+			# [offset, weight, index, tilt_sign, growth]
+			row.append([offset, 1, row.size(),
+				1 if (shell_id * 7 + panel_id * 3 + row.size()) % 2 == 0 else -1,
+				1.0])
+	for key in _panel_clusters:
+		var row: Array = _panel_clusters[key]
+		for cluster in row:
+			cluster[4] = minf(DAMAGE_CLUSTER_GROWTH_MAX,
+				1.0 + DAMAGE_CLUSTER_GROWTH * float(int(cluster[1]) - 1))
+		# Worst wound first, ties by the order the wounds appeared. A panel hit
+		# twelve times in one place and once elsewhere shows the deep one.
+		row.sort_custom(func(a, b):
+			if int(a[1]) != int(b[1]):
+				return int(a[1]) > int(b[1])
+			return int(a[2]) < int(b[2]))
 
 
 func _panel_state_at(index: int, t: float) -> int:
@@ -1053,6 +1329,13 @@ func _read_events() -> void:
 					float(event["position"][1])),
 				"contributors": int(event["contributors"]),
 			})
+		elif kind == "shell_exit" and str(event.get("route", "")) == "break":
+			_passage_exits.append({
+				"t": float(event["t"]),
+				"shell_id": int(event["shell_id"]),
+				"panel_id": int(event["panel_id"]),
+				"ball_id": int(event["ball_id"]),
+			})
 		elif kind == "escape":
 			_escape = {
 				"t": float(event["t"]),
@@ -1066,6 +1349,26 @@ func _read_events() -> void:
 # --------------------------------------------------------------------------
 # Balls
 # --------------------------------------------------------------------------
+
+
+func _resolve_passage_uses() -> void:
+	## An exit through a slot that broke open within the window. Derived from
+	## the canonical streams only: `panel_break` opens the slot and a
+	## `shell_exit` with `route == "break"` on that slot is a ball using it.
+	var opened := {}
+	for entry in _breaks:
+		var key := "%d:%d" % [int(entry["shell_id"]), int(entry["panel_id"])]
+		if not opened.has(key):
+			opened[key] = float(entry["t"])
+	for exit_event in _passage_exits:
+		var key := "%d:%d" % [int(exit_event["shell_id"]), int(exit_event["panel_id"])]
+		if not opened.has(key):
+			continue
+		var at: float = float(opened[key])
+		var when: float = float(exit_event["t"])
+		if when < at or when > at + FLOOD_WINDOW_SECONDS:
+			continue
+		_passage_uses.append(exit_event)
 
 
 func _build_balls() -> void:
@@ -1315,6 +1618,36 @@ func _build_effects() -> void:
 			container.add_child(spark)
 			_debris.append(spark)
 
+		# **Chunks of the panel, not particles.** A fragment is a box with the
+		# panel's own radial thickness and a share of its depth, in the panel's
+		# own material dimmed - so what leaves the wall is recognisably the
+		# wall. Four of them, laid along the chord, is the brief's 3-6 and is
+		# what makes the failure read as "it came apart" rather than as a puff.
+		var shell_id := int(_breaks[_break_ring.size() - 1]["shell_id"])
+		var panel_id := int(_breaks[_break_ring.size() - 1]["panel_id"])
+		var shell: Dictionary = playback["shells"][shell_id]
+		var chord := float(shell["chord_length"])
+		var thickness := float(shell["thickness"])
+		var depth: float = panel_depth[shell_id]
+		var fragment_material := StandardMaterial3D.new()
+		fragment_material.albedo_color = PANEL_RGB \
+			* float(SHELL_ALBEDO_VALUE[shell_id]) * 0.82
+		fragment_material.metallic = float(SHELL_METALLIC[shell_id])
+		fragment_material.roughness = float(SHELL_ROUGHNESS[shell_id])
+		fragment_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		_fragment_material.append(fragment_material)
+		for piece in BREAK_FRAGMENT_COUNT:
+			var chunk := MeshInstance3D.new()
+			var chunk_box := BoxMesh.new()
+			chunk_box.size = Vector3(
+				chord * BREAK_FRAGMENT_CHORD_FRACTION, thickness,
+				depth * BREAK_FRAGMENT_DEPTH_FRACTION)
+			chunk.mesh = chunk_box
+			chunk.material_override = fragment_material
+			chunk.visible = false
+			container.add_child(chunk)
+			_fragments.append(chunk)
+
 	_escape_ring_material = StandardMaterial3D.new()
 	_escape_ring_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_escape_ring_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -1368,9 +1701,36 @@ func _build_overlay() -> void:
 	# So the overlay is one line at the top and one at the bottom, and nothing
 	# else.
 
+	# **The banner goes to whichever end the escaping ball is not at.** 4A
+	# pinned it at 0.735 of the height; on a candidate whose escape happens low
+	# the payoff is then covered by its own caption. The choice is made from
+	# the canonical escape position under the canonical final framing, so it is
+	# deterministic and `winner_banner_placement` predicts it exactly.
 	var winner_size := int(float(_height) * WINNER_SIZE_FRACTION)
+	var winner_top: float = WINNER_TOP_FRACTION
+	if not _escape.is_empty():
+		# The escapee keeps flying through the release beat while the banner is
+		# on screen, so the whole swept extent is what has to clear it - not the
+		# position at the escape instant. On 1176 those differ by 101 px and the
+		# instant-only version put the caption under the ball.
+		var view := _view_radius_at(float(_escape["t"]))
+		var scale := float(_width) * view_diameter / (2.0 * view)
+		var ball_px := float(playback["config"]["ball_radius"]) \
+			* BALL_DRAW_SCALE * scale
+		var row := int(_ball_row_of[int(_escape["ball_id"])])
+		var low := INF
+		var high := -INF
+		for index in WINNER_RELEASE_SAMPLES:
+			var t: float = _duration + release_seconds * float(index) \
+				/ float(WINNER_RELEASE_SAMPLES - 1)
+			var point := _position_row(row, t)
+			var py := float(_height) * ARENA_CENTRE_Y_FRACTION - point.y * scale
+			low = minf(low, py - ball_px)
+			high = maxf(high, py + ball_px)
+		if not _band_clear(WINNER_TOP_FRACTION, low, high):
+			winner_top = WINNER_ALT_TOP_FRACTION
 	_winner_label = _label(winner_size, TEXT_PRIMARY,
-		float(_height) * WINNER_TOP_FRACTION)
+		float(_height) * winner_top)
 	_winner_label.visible = false
 	if not _escape.is_empty():
 		var team: int = int(_escape.get("team_id", 0)) % TEAM_NAMES.size()
@@ -1379,11 +1739,21 @@ func _build_overlay() -> void:
 	root.add_child(_winner_label)
 
 
+func _band_clear(top_fraction: float, low: float, high: float) -> bool:
+	var band_top := top_fraction * float(_height)
+	var band_bottom := band_top + WINNER_BAND_FRACTION * float(_height)
+	return not (high > band_top and low < band_bottom)
+
+
 func _apply_overlay(render_t: float) -> void:
 	if _hook_label != null:
+		# Solid, then gone. The label is *hidden* rather than made transparent
+		# once the fade completes, so no residue of the question can survive a
+		# grade, a codec or a thumbnail - which is what the review saw.
 		var fade: float = clampf(
-			(render_t - HOOK_FADE_START) / HOOK_FADE_SECONDS, 0.0, 1.0)
+			(render_t - HOOK_HOLD_SECONDS) / HOOK_FADE_SECONDS, 0.0, 1.0)
 		var alpha: float = lerpf(1.0, HOOK_FADE_TO, fade)
+		_hook_label.visible = alpha > 0.002
 		_hook_label.add_theme_color_override("font_color", Color(
 			TEXT_PRIMARY.r, TEXT_PRIMARY.g, TEXT_PRIMARY.b, alpha))
 	if _winner_label != null and not _escape.is_empty():
@@ -1453,7 +1823,7 @@ func _apply_panels(t: float) -> void:
 		var radius := float(shell["radius"])
 		var slot_width := float(shell["slot_width"])
 		var chord: float = _panel_chord[index]
-		var depth: float = PANEL_DEPTH[shell_id]
+		var depth: float = panel_depth[shell_id]
 		var state := _panel_state_at(index, t)
 		var broken_at: float = _panel_break_time[index]
 
@@ -1516,7 +1886,8 @@ func _apply_panels(t: float) -> void:
 				Vector3(centre.x + along.x * offset,
 					centre.y + along.y * offset, recess))
 
-		_apply_panel_marks(index, state, t, chord, centre, along, basis, depth)
+		_apply_panel_marks(index, state, t, chord, centre, along, basis, depth,
+			_wear_at(index, t))
 
 		# The panel body keeps its own material in every state. A recolour of
 		# the whole panel is the thing the redesign exists to avoid, and the
@@ -1533,8 +1904,15 @@ func _apply_panels(t: float) -> void:
 		# A worn panel loses its sheen before it gains a crack, which is a
 		# reading a viewer gets without being told and without the panel
 		# changing colour.
+		# A worn panel loses its sheen before it gains a crack. 4A made that a
+		# five-step ladder, so the whole of `healthy` was one flat value; the
+		# canonical `fraction` makes it continuous, and on the final wall that
+		# is the difference between a pristine ring and one being worn down.
+		var wear := _wear_at(index, t)
 		var face: StandardMaterial3D = _panel_face_material[index]
 		var face_energy: float = FACE_ENERGY * [1.0, 0.72, 0.45, 0.22, 0.0][state]
+		if state == 0:
+			face_energy *= 1.0 - DAMAGE_WEAR_FACE_LOSS * clampf(wear, 0.0, 1.0)
 		if flashing:
 			face_energy = 9.0
 		face.emission_energy_multiplier = face_energy * (1.0 - retract)
@@ -1562,13 +1940,33 @@ func ease_out_cubic(u: float) -> float:
 
 
 func _apply_panel_marks(index: int, state: int, t: float, chord: float,
-		centre: Vector2, along: Vector2, basis: Basis, depth: float) -> void:
+		centre: Vector2, along: Vector2, basis: Basis, depth: float,
+		wear: float) -> void:
+	## Damage that happened *to the material*: a dark chip where it went, a
+	## hairline in the bottom of it, and branches once the panel is critical.
+	##
+	## The 4A version drew up to six identical bright bars of a fixed width at
+	## the first six impact offsets, at up to 4.0 emission on an unshaded
+	## material. That is a row of lit markers lying on a wall, which is exactly
+	## what the human review called "UI annotations". Here the count comes from
+	## the wounds the panel actually has, the size comes from how many times
+	## each one was hit, and the bright part is a hairline inside a dark pit.
 	var marks: Array = _panel_marks[index]
-	var wanted: int = DAMAGE_CRACK_COUNT[state]
+	if marks.is_empty():
+		return
+	var clusters: Array = _panel_clusters.get(_panel_key(index), [])
+	var wanted: int = mini(DAMAGE_CRACK_COUNT[state], clusters.size())
+	var branches: int = DAMAGE_BRANCH_COUNT[state]
+	# A scuff at the heaviest wound, below the first damage state: the chip
+	# alone, scaled by how worn the panel canonically is, and no crack.
+	var scuff := 0.0
+	if state == 0 and wear >= DAMAGE_WEAR_FLOOR and not clusters.is_empty():
+		wanted = 1
+		scuff = DAMAGE_WEAR_CHIP_SCALE * sqrt(clampf(wear, 0.0, 1.0))
 	var broken_at: float = _panel_break_time[index]
+	var breaking := broken_at >= 0.0 and t >= broken_at - BREAK_STRESS_SECONDS
 	if broken_at >= 0.0 and t >= broken_at:
 		wanted = 0
-	var offsets: Array = _panel_impacts.get(_panel_key(index), [])
 	var material: StandardMaterial3D = _panel_mark_material[index]
 	var colour := CRACK_RGB
 	if state >= 3:
@@ -1577,30 +1975,72 @@ func _apply_panel_marks(index: int, state: int, t: float, chord: float,
 		colour = CRITICAL_RGB
 	material.albedo_color = colour
 	material.emission = colour
-	material.emission_energy_multiplier = DAMAGE_EMISSION_ENERGY[state]
+	var energy: float = DAMAGE_EMISSION_ENERGY[state]
+	if breaking and broken_at >= 0.0 and t < broken_at:
+		# The wall is seen to give before it goes: the crack network it
+		# already has flares over the last tenth of a second rather than a new
+		# effect appearing out of nowhere at the break.
+		var u := clampf((t - (broken_at - BREAK_STRESS_SECONDS))
+			/ BREAK_STRESS_SECONDS, 0.0, 1.0)
+		energy = lerpf(energy, 9.0, u * u)
+	material.emission_energy_multiplier = energy
 
-	for slot_index in marks.size():
-		var mark: MeshInstance3D = marks[slot_index]
-		if slot_index >= wanted:
-			mark.visible = false
-			continue
-		mark.visible = true
-		# Where the ball actually hit, in the order it hit. A panel with fewer
-		# recorded impacts than marks spreads the remainder evenly.
-		var offset: float
-		if slot_index < offsets.size():
-			offset = float(offsets[slot_index])
-		else:
-			offset = chord * (float(slot_index + 1) / float(marks.size() + 1) - 0.5)
-		var limit := 0.5 * chord - 0.5 * DAMAGE_MARK_CHORD
+	var wounds: int = marks.size() / MARK_PARTS
+	for wound in wounds:
+		var shown: bool = wound < wanted
+		var cluster: Array = clusters[wound] if wound < clusters.size() else []
+		var offset: float = float(cluster[0]) if not cluster.is_empty() else 0.0
+		var growth: float = float(cluster[4]) if not cluster.is_empty() else 1.0
+		var tilt_sign: float = float(cluster[3]) if not cluster.is_empty() else 1.0
+		var chip_width: float = DAMAGE_MARK_CHORD * growth
+		var limit := maxf(0.0, 0.5 * chord - 0.5 * chip_width)
 		offset = clampf(offset, -limit, limit)
-		# In front of the lit face and as deep as the panel behind it, so the
-		# mark reads on the face *and* down the flank: 5.5 px wide and 24 px
-		# tall on an 85 px outer panel, where a hairline across a 5.3 px face
-		# would not read at all.
-		mark.transform = Transform3D(basis,
-			Vector3(centre.x + along.x * offset, centre.y + along.y * offset,
-				MARK_Z - 0.5 * depth))
+		var here := Vector3(centre.x + along.x * offset,
+			centre.y + along.y * offset, 0.0)
+		for part in MARK_PARTS:
+			var node: MeshInstance3D = marks[wound * MARK_PARTS + part]
+			if node == null:
+				continue
+			if not shown or (part >= 2 and part - 1 > branches) \
+					or (scuff > 0.0 and part >= 1):
+				node.visible = false
+				continue
+			node.visible = true
+			if part == 0:
+				# The chip grows with the wound, which is the whole of
+				# "repeated impacts build on one another". Below the first
+				# damage state it is scaled down to a scuff instead.
+				#
+				# Built with `_oriented_basis` rather than `Basis.scaled`:
+				# `scaled` multiplies the basis *rows*, which are the global
+				# axes, so it stretches a diagonal panel's chip along world X
+				# instead of along its own chord. The panel slabs already
+				# avoid it for the same reason.
+				var chip_scale: float = growth if scuff <= 0.0 else scuff
+				var chip_thick: float = 1.0 if scuff <= 0.0 else scuff
+				node.transform = Transform3D(
+					_oriented_basis(along, chip_scale, chip_thick),
+					here + Vector3(0.0, 0.0, MARK_Z - 0.275 * depth))
+				continue
+			# The crack and its branches lean out of the chip. The roll is
+			# about the panel's own normal, so a rotated crack stays inside the
+			# panel's radial thickness - see DAMAGE_CRACK_SPAN.
+			var tilt: float = deg_to_rad(DAMAGE_CRACK_TILT_DEGREES) * tilt_sign
+			var slide := 0.0
+			if part >= 2:
+				var side: float = 1.0 if part == 2 else -1.0
+				tilt += deg_to_rad(DAMAGE_BRANCH_SPREAD_DEGREES) * side * tilt_sign
+				slide = 0.30 * chip_width * side
+			var rolled := _rolled_basis(basis, tilt)
+			node.transform = Transform3D(rolled,
+				here + Vector3(along.x * slide, along.y * slide,
+					MARK_Z - (0.40 if part == 1 else 0.22) * depth))
+
+
+func _rolled_basis(basis: Basis, tilt: float) -> Basis:
+	## Roll about the panel's own outward normal - the basis's third column -
+	## so the crack turns in the plane of the wall and never tips out of it.
+	return basis.rotated(basis.z.normalized(), tilt)
 
 
 func _panel_key(index: int) -> String:
@@ -1782,6 +2222,42 @@ func _apply_effects(render_t: float) -> void:
 				Vector3(point.x, point.y, EFFECT_Z))
 			var material: StandardMaterial3D = _break_ring_material[index]
 			material.albedo_color = Color(BREAK_FLASH_RGB, 0.9 * (1.0 - u))
+		# The chunks. Laid out along the panel's own chord and thrown outward
+		# along its normal, so they are its pieces leaving rather than sparks
+		# from a point. Presentation only: no fragment has a collider and
+		# nothing here is read back by anything.
+		var shell_id := int(entry["shell_id"])
+		var out_dir := point.normalized() if point.length() > 1e-6 else Vector2.UP
+		var along_dir := Vector2(-out_dir.y, out_dir.x)
+		var chord := float(playback["shells"][shell_id]["chord_length"])
+		for piece in BREAK_FRAGMENT_COUNT:
+			var chunk: MeshInstance3D = _fragments[index * BREAK_FRAGMENT_COUNT + piece]
+			if since < 0.0 or since > BREAK_FRAGMENT_SECONDS:
+				chunk.visible = false
+				continue
+			var fu := since / BREAK_FRAGMENT_SECONDS
+			var share := (float(piece) + 0.5) / float(BREAK_FRAGMENT_COUNT) - 0.5
+			var out_speed: float = BREAK_FRAGMENT_OUT_SPEED \
+				* (0.70 + 0.30 * absf(share) * 2.0)
+			var along_speed: float = BREAK_FRAGMENT_OUT_SPEED * share * 1.10
+			var travel := out_dir * out_speed * since \
+				+ along_dir * (chord * share + along_speed * since)
+			var spin: float = deg_to_rad(BREAK_FRAGMENT_SPIN_DEGREES) \
+				* (1.0 if piece % 2 == 0 else -1.0) * since
+			chunk.visible = true
+			chunk.transform = Transform3D(
+				_oriented_basis(along_dir, 1.0, 1.0).rotated(
+					Vector3(out_dir.x, out_dir.y, 0.0), spin),
+				Vector3(point.x + travel.x, point.y + travel.y,
+					-0.25 * float(panel_depth[shell_id]) - 2.0 * since))
+		var fragment_material: StandardMaterial3D = _fragment_material[index]
+		if since >= 0.0 and since <= BREAK_FRAGMENT_SECONDS:
+			# Gone quickly: the scene already holds up to eighteen balls and
+			# the brief is explicit that fragments may not become clutter.
+			fragment_material.albedo_color = Color(
+				PANEL_RGB * float(SHELL_ALBEDO_VALUE[shell_id]) * 0.82,
+				clampf(1.6 * (1.0 - since / BREAK_FRAGMENT_SECONDS), 0.0, 1.0))
+
 		# Deterministic sparks: the direction comes from a hash of the panel's
 		# own identity, so two renders of one seed throw the same debris.
 		var seed_value := int(entry["shell_id"]) * 1009 + int(entry["panel_id"]) * 97
@@ -1813,6 +2289,24 @@ func _apply_effects(render_t: float) -> void:
 		if since >= 0.0:
 			_light_post(int(entry["shell_id"]), int(entry["panel_id"]),
 				1.6 if since > 0.8 else lerpf(7.0, 1.6, since / 0.8))
+
+	# **Break, hole, ball through hole.** When a ball uses a passage soon after
+	# it opened, the passage itself answers for half a second - its two
+	# flanking pillars, nothing global. No screen shake and no flash, because
+	# the satisfaction is meant to be the sequence.
+	#
+	# The brief asks for the stronger version, several balls pouring through at
+	# once, and no candidate has one: every shell rotates, so a broken slot is
+	# a gap sweeping past the population rather than a door. This is the tier
+	# that does fire - twice per run - and on 1176 the second one is the
+	# winning escape through the final wall.
+	for use in _passage_uses:
+		var since := sim_t - float(use["t"])
+		if since < 0.0 or since > FLOOD_RESPONSE_SECONDS:
+			continue
+		var fade := 1.0 - since / FLOOD_RESPONSE_SECONDS
+		_light_post(int(use["shell_id"]), int(use["panel_id"]),
+			FLOOD_POST_ENERGY * fade * fade)
 
 	if _escape.has("t"):
 		var since := render_t - float(_escape["t"])
@@ -1892,13 +2386,75 @@ func audit_state() -> Dictionary:
 		})
 	var projected_centres := []
 	var centre_max_error := 0.0
-	for depth in PANEL_DEPTH:
+	for depth in panel_depth:
 		var pixel := _camera.unproject_position(Vector3(0.0, 0.0, -0.5 * float(depth)))
 		projected_centres.append([float(pixel.x), float(pixel.y)])
 	for a in projected_centres:
 		for b in projected_centres:
 			centre_max_error = maxf(centre_max_error, Vector2(
 				float(a[0]) - float(b[0]), float(a[1]) - float(b[1])).length())
+	# The wounds the scene built, so Python can diff them against its own
+	# derivation rather than against a second copy of the same rule. This is
+	# the check the 1.778x frustum error would have failed in Phase 2A.
+	var wounds := []
+	for key in _panel_clusters:
+		var row: Array = _panel_clusters[key]
+		var parts: PackedStringArray = str(key).split(":")
+		for cluster in row:
+			wounds.append({
+				"shell_id": int(parts[0]),
+				"panel_id": int(parts[1]),
+				"offset": float(cluster[0]),
+				"weight": int(cluster[1]),
+				"index": int(cluster[2]),
+				"tilt_sign": int(cluster[3]),
+				"growth": float(cluster[4]),
+			})
+	wounds.sort_custom(func(a, b):
+		if a["shell_id"] != b["shell_id"]:
+			return a["shell_id"] < b["shell_id"]
+		if a["panel_id"] != b["panel_id"]:
+			return a["panel_id"] < b["panel_id"]
+		return a["index"] < b["index"])
+	# The wear the scene is drawing with, so Python can diff it against its own
+	# read of the same `damage` stream rather than trusting that both read it
+	# the same way.
+	var wear_rows := []
+	for key in _panel_wear:
+		var parts: PackedStringArray = str(key).split(":")
+		var shell_id := int(parts[0])
+		var panel_id := int(parts[1])
+		if shell_id >= _panel_index.size():
+			continue
+		var row: Dictionary = _panel_index[shell_id]
+		if not row.has(panel_id):
+			continue
+		wear_rows.append({
+			"shell_id": shell_id,
+			"panel_id": panel_id,
+			"wear": _wear_at(int(row[panel_id]), _time),
+		})
+	wear_rows.sort_custom(func(a, b):
+		if a["shell_id"] != b["shell_id"]:
+			return a["shell_id"] < b["shell_id"]
+		return a["panel_id"] < b["panel_id"])
+	var passages := []
+	for use in _passage_uses:
+		passages.append({
+			"t": float(use["t"]),
+			"shell_id": int(use["shell_id"]),
+			"panel_id": int(use["panel_id"]),
+			"ball_id": int(use["ball_id"]),
+		})
+	var stage_rows := []
+	for stage in _camera_stages():
+		stage_rows.append({
+			"stage": int(stage[0]),
+			"extent_shell": int(stage[1]),
+			"start": float(stage[2]),
+			"settled": float(stage[3]),
+			"radius": float(stage[4]),
+		})
 	return {
 		"t": float(_time),
 		"render_t": float(_render_time),
@@ -1909,4 +2465,13 @@ func audit_state() -> Dictionary:
 		"panels": states,
 		"projected_shell_centres": projected_centres,
 		"centre_max_error_px": centre_max_error,
+		"camera_stage": camera_stage_at(_time),
+		"camera_stages": stage_rows,
+		"wounds": wounds,
+		"wear": wear_rows,
+		"passage_uses": passages,
+		"hook_visible": _hook_label != null and _hook_label.visible,
+		"winner_visible": _winner_label != null and _winner_label.visible,
+		"winner_top": (_winner_label.offset_top / float(_height)
+			if _winner_label != null else -1.0),
 	}

@@ -1,0 +1,275 @@
+{
+ "17964": {
+  "format": "category3-test2-two-team-shell-race-av/2.0.0",
+  "seed": 17964,
+  "fps": 30.0,
+  "frame_seconds": 0.03333333333333333,
+  "playback_digest": "0c8a934bd159c704cc02739adaca9b247dc4b55b45175dafe2ad37cca87c79bd",
+  "score_playback_digest": "0c8a934bd159c704cc02739adaca9b247dc4b55b45175dafe2ad37cca87c79bd",
+  "event_order_digest": "582c15e29e5f1d9bf2a1c0020723341b8467ac97fdc537740acbf5ff76587bd8",
+  "audio_time_order_monotone": true,
+  "audio_cross_instant_order_shared": true,
+  "audio_has_simultaneous_cues": true,
+  "audio_never_retimed": true,
+  "mapping_complete": true,
+  "timing": {
+   "collision": {
+    "count": 442,
+    "max_error_seconds": 0.03329166666666694,
+    "max_error_frames": 0.9987500000000082,
+    "mean_error_seconds": 0.016663791478129717,
+    "mean_error_frames": 0.4999137443438915,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "spawn": {
+    "count": 16,
+    "max_error_seconds": 0.028812500000000796,
+    "max_error_frames": 0.8643750000000239,
+    "mean_error_seconds": 0.0121406250000001,
+    "mean_error_frames": 0.364218750000003,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "near_miss": {
+    "count": 64,
+    "max_error_seconds": 0.0328749999999971,
+    "max_error_frames": 0.986249999999913,
+    "mean_error_seconds": 0.018275390625000047,
+    "mean_error_frames": 0.5482617187500014,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "damage_state": {
+    "count": 156,
+    "max_error_seconds": 0.03329166666666694,
+    "max_error_frames": 0.9987500000000082,
+    "mean_error_seconds": 0.01635029380341891,
+    "mean_error_frames": 0.4905088141025673,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "break": {
+    "count": 31,
+    "max_error_seconds": 0.03106250000000088,
+    "max_error_frames": 0.9318750000000264,
+    "mean_error_seconds": 0.018043010752688535,
+    "mean_error_frames": 0.541290322580656,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "shell_exit": {
+    "count": 5,
+    "max_error_seconds": 0.026270833333331467,
+    "max_error_frames": 0.788124999999944,
+    "mean_error_seconds": 0.01722916666666636,
+    "mean_error_frames": 0.5168749999999909,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "escape": {
+    "count": 1,
+    "max_error_seconds": 0.02422916666666808,
+    "max_error_frames": 0.7268750000000423,
+    "mean_error_seconds": 0.02422916666666808,
+    "mean_error_frames": 0.7268750000000423,
+    "video_never_early": true,
+    "within_one_frame": true
+   }
+  },
+  "maximum_sync_error_seconds": 0.03329166666666694,
+  "maximum_sync_error_frames": 0.9987500000000082,
+  "within_one_rendered_frame": true,
+  "mean_sync_error_frames": 0.5013828671328685,
+  "video_never_early": true,
+  "score_fingerprint": "975136c1dfbfd99aeb1d9d5b8381f938668c8b8e7485bd1d21ac0a770ee3725c",
+  "visual_config_digest": "1a5ae98fd8d9bd60",
+  "integration_config_digest": "e5e9cd6baa43a64c",
+  "visual_playback_digest": null,
+  "visual_digest_matches": null,
+  "visual_frames": null,
+  "pass": true
+ },
+ "3762": {
+  "format": "category3-test2-two-team-shell-race-av/2.0.0",
+  "seed": 3762,
+  "fps": 30.0,
+  "frame_seconds": 0.03333333333333333,
+  "playback_digest": "65a89eb883cc202ab3a7b850c31379735481c350793f0a4cd36edcdcea4d6571",
+  "score_playback_digest": "65a89eb883cc202ab3a7b850c31379735481c350793f0a4cd36edcdcea4d6571",
+  "event_order_digest": "a3c05c9c2dca70a9e65799782a20bcf765266b65153b5878b8983241a717946c",
+  "audio_time_order_monotone": true,
+  "audio_cross_instant_order_shared": true,
+  "audio_has_simultaneous_cues": true,
+  "audio_never_retimed": true,
+  "mapping_complete": true,
+  "timing": {
+   "collision": {
+    "count": 425,
+    "max_error_seconds": 0.033124999999998295,
+    "max_error_frames": 0.9937499999999488,
+    "mean_error_seconds": 0.01598691176470587,
+    "mean_error_frames": 0.4796073529411761,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "spawn": {
+    "count": 16,
+    "max_error_seconds": 0.02931249999999963,
+    "max_error_frames": 0.8793749999999889,
+    "mean_error_seconds": 0.01144401041666683,
+    "mean_error_frames": 0.34332031250000494,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "near_miss": {
+    "count": 38,
+    "max_error_seconds": 0.03297916666666367,
+    "max_error_frames": 0.9893749999999102,
+    "mean_error_seconds": 0.015111293859649193,
+    "mean_error_frames": 0.4533388157894758,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "damage_state": {
+    "count": 133,
+    "max_error_seconds": 0.033124999999998295,
+    "max_error_frames": 0.9937499999999488,
+    "mean_error_seconds": 0.015002976190476169,
+    "mean_error_frames": 0.4500892857142851,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "break": {
+    "count": 14,
+    "max_error_seconds": 0.030083333333331908,
+    "max_error_frames": 0.9024999999999572,
+    "mean_error_seconds": 0.014547619047619096,
+    "mean_error_frames": 0.4364285714285729,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "shell_exit": {
+    "count": 5,
+    "max_error_seconds": 0.01564583333333336,
+    "max_error_frames": 0.46937500000000076,
+    "mean_error_seconds": 0.008908333333333341,
+    "mean_error_frames": 0.2672500000000002,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "escape": {
+    "count": 1,
+    "max_error_seconds": 0.011250000000000426,
+    "max_error_frames": 0.3375000000000128,
+    "mean_error_seconds": 0.011250000000000426,
+    "mean_error_frames": 0.3375000000000128,
+    "video_never_early": true,
+    "within_one_frame": true
+   }
+  },
+  "maximum_sync_error_seconds": 0.033124999999998295,
+  "maximum_sync_error_frames": 0.9937499999999488,
+  "within_one_rendered_frame": true,
+  "mean_sync_error_frames": 0.4655043512658227,
+  "video_never_early": true,
+  "score_fingerprint": "59a65cfe63bc223950342b6f032875d2cfd92630ee1fbb7f092fbdc61620f0fc",
+  "visual_config_digest": "1a5ae98fd8d9bd60",
+  "integration_config_digest": "e5e9cd6baa43a64c",
+  "visual_playback_digest": null,
+  "visual_digest_matches": null,
+  "visual_frames": null,
+  "pass": true
+ },
+ "1176": {
+  "format": "category3-test2-two-team-shell-race-av/2.0.0",
+  "seed": 1176,
+  "fps": 30.0,
+  "frame_seconds": 0.03333333333333333,
+  "playback_digest": "312617c9151f80be3a4cee1837ca53fd18a01864ddc0b913c223be5251b3f16d",
+  "score_playback_digest": "312617c9151f80be3a4cee1837ca53fd18a01864ddc0b913c223be5251b3f16d",
+  "event_order_digest": "f45a70f752ac0bdbd92af4fa7f93d349b18ee022c5277e5141ae63bdd4010eaa",
+  "audio_time_order_monotone": true,
+  "audio_cross_instant_order_shared": true,
+  "audio_has_simultaneous_cues": true,
+  "audio_never_retimed": true,
+  "mapping_complete": true,
+  "timing": {
+   "collision": {
+    "count": 335,
+    "max_error_seconds": 0.03322916666666664,
+    "max_error_frames": 0.9968749999999993,
+    "mean_error_seconds": 0.01671318407960204,
+    "mean_error_frames": 0.5013955223880612,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "spawn": {
+    "count": 10,
+    "max_error_seconds": 0.02214583333333331,
+    "max_error_frames": 0.6643749999999993,
+    "mean_error_seconds": 0.011743750000000141,
+    "mean_error_frames": 0.35231250000000425,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "near_miss": {
+    "count": 22,
+    "max_error_seconds": 0.03247916666666839,
+    "max_error_frames": 0.9743750000000517,
+    "mean_error_seconds": 0.015896780303030645,
+    "mean_error_frames": 0.47690340909091933,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "damage_state": {
+    "count": 129,
+    "max_error_seconds": 0.03322916666666664,
+    "max_error_frames": 0.9968749999999993,
+    "mean_error_seconds": 0.016333817829457305,
+    "mean_error_frames": 0.49001453488371916,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "break": {
+    "count": 20,
+    "max_error_seconds": 0.03322916666666664,
+    "max_error_frames": 0.9968749999999993,
+    "mean_error_seconds": 0.015141666666666442,
+    "mean_error_frames": 0.45424999999999327,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "shell_exit": {
+    "count": 5,
+    "max_error_seconds": 0.02214583333333331,
+    "max_error_frames": 0.6643749999999993,
+    "mean_error_seconds": 0.013199999999999833,
+    "mean_error_frames": 0.395999999999995,
+    "video_never_early": true,
+    "within_one_frame": true
+   },
+   "escape": {
+    "count": 1,
+    "max_error_seconds": 0.0015208333333340818,
+    "max_error_frames": 0.04562500000002245,
+    "mean_error_seconds": 0.0015208333333340818,
+    "mean_error_frames": 0.04562500000002245,
+    "video_never_early": true,
+    "within_one_frame": true
+   }
+  },
+  "maximum_sync_error_seconds": 0.03322916666666664,
+  "maximum_sync_error_frames": 0.9968749999999993,
+  "within_one_rendered_frame": true,
+  "mean_sync_error_frames": 0.4910057471264375,
+  "video_never_early": true,
+  "score_fingerprint": "2b3828d70a289a294b03046f66118841be17527938f3e19f174b363f83439f5d",
+  "visual_config_digest": "1a5ae98fd8d9bd60",
+  "integration_config_digest": "e5e9cd6baa43a64c",
+  "visual_playback_digest": null,
+  "visual_digest_matches": null,
+  "visual_frames": null,
+  "pass": true
+ }
+}

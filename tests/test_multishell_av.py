@@ -312,13 +312,36 @@ def test_candidate_rows_are_reproducible(documents, seed):
 
 @pytest.mark.parametrize("seed", SEEDS)
 def test_the_camera_only_moves_on_a_canonical_frontier_advance(documents, seed):
+    """The move's *trigger* is a canonical crossing; its start may be earlier.
+
+    Phase 4A could assert the start time was itself in the `shell_exit` stream,
+    because the start was the crossing minus a fixed lead. Phase 4B may pull a
+    start earlier to keep a move clear of a protected instant, so the assertion
+    is on the trigger - which is still exactly one canonical crossing, and the
+    *first* one into that region.
+    """
     document = documents[seed]
-    marks = visual.frame_marks(document)
+    stages = visual.camera_stages(document)
     report = av.camera_report(document, 30.0)
-    assert report["transitions"] == len(marks)
+    assert report["transitions"] == len(stages) - 1
+    assert report["camera_moves_are_canonical"]
     exits = {float(e["t"]) for e in document["events"] if e["kind"] == "shell_exit"}
-    for at, _stage in marks:
-        assert at in exits
+    reached = visual.frontier_reached(document)
+    for entry in report["detail"]:
+        assert entry["event_seconds"] in exits
+        assert entry["event_seconds"] == pytest.approx(
+            reached[int(entry["trigger_region"])])
+        assert entry["start_seconds"] <= entry["event_seconds"] \
+            - visual.FRAME_LEAD_SECONDS + 1e-9
+
+
+@pytest.mark.parametrize("seed", SEEDS)
+def test_the_camera_moves_twice(documents, seed):
+    """Fewer, better reframes: two moves for five shells, not four."""
+    report = av.camera_report(documents[seed], 30.0)
+    assert report["transitions"] == 2
+    assert report["overlapping_transitions"] == 0
+    assert report["total_radius_growth"] < 2.0
 
 
 @pytest.mark.parametrize("seed", SEEDS)
@@ -327,11 +350,33 @@ def test_the_framed_radius_never_shrinks(documents, seed):
 
 
 @pytest.mark.parametrize("seed", SEEDS)
-def test_no_reframe_outpaces_the_ball_at_its_fastest(documents, seed):
+def test_no_reframe_outpaces_the_ball_by_more_than_the_stated_headroom(
+        documents, seed):
+    """**The gate the 4B brief forced open, and by exactly how much.**
+
+    4A's rule was "a reframe never moves the screen faster than the ball does",
+    and it held because there were four transitions and each was small. The
+    brief asks for two or three instead of four, which is the same total zoom
+    in half as many payments; the two requirements are arithmetically
+    incompatible, and keeping the old number would have meant keeping the
+    camera the review rejected.
+
+    So the ceiling is stated rather than implied, and the ease was swept
+    against it: 0.25 s runs at 2.81x the ball, 0.35 s at 2.06x and the chosen
+    0.45 s at 1.61x. 2.0 is the line - loose enough for a candidate whose
+    frontier advances sit closer together than these three, tight enough that
+    going back to 0.30 s or to a single transition would fail it.
+    """
     report = av.camera_report(documents[seed], 30.0)
-    assert report["within_velocity_limit"]
-    assert report["max_screen_velocity_per_second"] <= report[
-        "ball_screen_velocity_first_shell"]
+    assert report["within_velocity_limit"], report["velocity_over_ball"]
+    assert report["velocity_over_ball"] <= av.CAMERA_VELOCITY_HEADROOM
+    assert report["max_screen_velocity_per_second"] <= report["velocity_ceiling"]
+    # And it is not merely under the ceiling by luck: at the brief's shortest
+    # allowed ease the same schedule would be well over it.
+    assert report["velocity_over_ball"] > 1.0, (
+        "the reframe is slower than the ball, which means the schedule went "
+        "back to one move per shell"
+    )
 
 
 @pytest.mark.parametrize("seed", SEEDS)
