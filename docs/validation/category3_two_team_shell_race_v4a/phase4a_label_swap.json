@@ -1,0 +1,33 @@
+{
+ "kind": "category3_two_team_label_swap",
+ "config_digest": "4a3ab8ba22ae7c54981700823cc5b4eaf147c72fc5ab609a244d9cbaeb6ce572",
+ "physics_digest": "14c070194427714be0d7a8ee463ec5eef9c5edaa620a039725f27f4bcc6adec9",
+ "swapped_physics_digest": "14c070194427714be0d7a8ee463ec5eef9c5edaa620a039725f27f4bcc6adec9",
+ "seeds": 1000,
+ "checks": [
+  "state_digest_equal",
+  "team_digest_differs",
+  "labels_mirrored",
+  "physical_events_equal",
+  "event_count_equal",
+  "duration_equal",
+  "escape_ball_equal",
+  "winner_flipped",
+  "damage_swapped",
+  "population_swapped"
+ ],
+ "all_pass": true,
+ "failures": {},
+ "failure_counts": {
+  "state_digest_equal": 0,
+  "team_digest_differs": 0,
+  "labels_mirrored": 0,
+  "physical_events_equal": 0,
+  "event_count_equal": 0,
+  "duration_equal": 0,
+  "escape_ball_equal": 0,
+  "winner_flipped": 0,
+  "damage_swapped": 0,
+  "population_swapped": 0
+ }
+}

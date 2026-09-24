@@ -1,0 +1,690 @@
+{
+ "kind": "category3_multiplying_shell_av_phone",
+ "profile": "review",
+ "rows": [
+  {
+   "seed": 17964,
+   "phone_clip": "output\\category3_two_team_v4a\\phone\\seed_17964_phone.mp4",
+   "phone_size": [
+    450,
+    800
+   ],
+   "mono_audio": "output\\category3_two_team_v4a\\phone\\seed_17964_mono.m4a",
+   "phone_band_audio": "output\\category3_two_team_v4a\\phone\\seed_17964_phoneband.m4a",
+   "mono_loss_db": -0.08,
+   "mono_correlation": 0.9649,
+   "phone_relative_db": -5.69,
+   "phone_band_energy_percent": {
+    "20-120": 0.002,
+    "120-300": 2.831,
+    "300-800": 48.896,
+    "800-2000": 45.999,
+    "2000-5000": 2.268,
+    "5000-10000": 0.004,
+    "10000-20000": 0.0
+   },
+   "integrated_lufs": -19.07,
+   "true_peak_dbtp": -2.49,
+   "clipped_samples": 0,
+   "masking": {
+    "collisions": 442,
+    "median_onset_rise_db": 9.94,
+    "p10_onset_rise_db": 7.26,
+    "min_onset_rise_db": 5.01,
+    "below_3db": 0,
+    "below_3db_fraction": 0.0,
+    "below_6db": 9,
+    "below_6db_fraction": 0.0204
+   },
+   "safe_area": {
+    "safe_area": "shorts_conservative",
+    "fingerprint": "3776358f1bf13326",
+    "final_view_radius": 19.675749999999997,
+    "pixels_per_unit": 18.878284182305634,
+    "arena_radius_px": 352.08000000000004,
+    "arena_regions": [
+     {
+      "region": "action_rail",
+      "clearance_px": 15.11999999999989,
+      "clear": true
+     },
+     {
+      "region": "title_block",
+      "clearance_px": 396.7199999999999,
+      "clear": true
+     },
+     {
+      "region": "progress_bar",
+      "clearance_px": 588.7199999999999,
+      "clear": true
+     },
+     {
+      "region": "nav_bar",
+      "clearance_px": 627.1199999999998,
+      "clear": true
+     },
+     {
+      "region": "top_bar",
+      "clearance_px": 396.7199999999999,
+      "clear": true
+     }
+    ],
+    "arena_clear": true,
+    "min_clearance_px": 15.11999999999989,
+    "ball_hidden_frames": 4,
+    "ball_hidden_seconds": 0.13333333333333333,
+    "ball_hidden_longest_seconds": 0.13333333333333333,
+    "ball_hidden_budget_seconds": 0.25,
+    "ball_hidden_by_region": {
+     "action_rail": 4,
+     "title_block": 0,
+     "progress_bar": 0,
+     "nav_bar": 0,
+     "top_bar": 0
+    },
+    "ball_pass": true
+   },
+   "readability": {
+    "fps": 30.0,
+    "peak_population": 18,
+    "peak_population_t": 25.70907392840478,
+    "population_by_third": [
+     6,
+     11,
+     18
+    ],
+    "population_first_frame": 2,
+    "teams_on_screen_max": 2,
+    "max_on_screen_by_team": [
+     9,
+     9
+    ],
+    "mixed_cluster_frames": 86,
+    "mixed_cluster_fraction": 0.1111111111111111,
+    "largest_mixed_cluster": 3,
+    "closest_pair_diameters": 0.04703941455503808,
+    "closest_pair_t": 10.670432758870986,
+    "largest_cluster": 3,
+    "largest_cluster_t": 20.20713203711193,
+    "longest_triple_merge_seconds": 0.36666666666666664,
+    "longest_triple_merge_t": 24.708720857260627,
+    "blob_deficit_frames": 325,
+    "blob_deficit_fraction": 0.4198966408268734,
+    "mean_blobs_per_ball": 0.9322783005417736,
+    "max_step_diameters": 0.4524975339358288,
+    "max_step_t": 4.9017300486063595,
+    "strobes": false
+   }
+  },
+  {
+   "seed": 3762,
+   "phone_clip": "output\\category3_two_team_v4a\\phone\\seed_3762_phone.mp4",
+   "phone_size": [
+    450,
+    800
+   ],
+   "mono_audio": "output\\category3_two_team_v4a\\phone\\seed_3762_mono.m4a",
+   "phone_band_audio": "output\\category3_two_team_v4a\\phone\\seed_3762_phoneband.m4a",
+   "mono_loss_db": -0.08,
+   "mono_correlation": 0.9652,
+   "phone_relative_db": -5.79,
+   "phone_band_energy_percent": {
+    "20-120": 0.002,
+    "120-300": 2.634,
+    "300-800": 51.907,
+    "800-2000": 43.079,
+    "2000-5000": 2.373,
+    "5000-10000": 0.005,
+    "10000-20000": 0.0
+   },
+   "integrated_lufs": -19.48,
+   "true_peak_dbtp": -2.5,
+   "clipped_samples": 0,
+   "masking": {
+    "collisions": 425,
+    "median_onset_rise_db": 9.8,
+    "p10_onset_rise_db": 7.33,
+    "min_onset_rise_db": 3.85,
+    "below_3db": 0,
+    "below_3db_fraction": 0.0,
+    "below_6db": 9,
+    "below_6db_fraction": 0.0212
+   },
+   "safe_area": {
+    "safe_area": "shorts_conservative",
+    "fingerprint": "3776358f1bf13326",
+    "final_view_radius": 19.675749999999997,
+    "pixels_per_unit": 18.878284182305634,
+    "arena_radius_px": 352.08000000000004,
+    "arena_regions": [
+     {
+      "region": "action_rail",
+      "clearance_px": 15.11999999999989,
+      "clear": true
+     },
+     {
+      "region": "title_block",
+      "clearance_px": 396.7199999999999,
+      "clear": true
+     },
+     {
+      "region": "progress_bar",
+      "clearance_px": 588.7199999999999,
+      "clear": true
+     },
+     {
+      "region": "nav_bar",
+      "clearance_px": 627.1199999999998,
+      "clear": true
+     },
+     {
+      "region": "top_bar",
+      "clearance_px": 396.7199999999999,
+      "clear": true
+     }
+    ],
+    "arena_clear": true,
+    "min_clearance_px": 15.11999999999989,
+    "ball_hidden_frames": 0,
+    "ball_hidden_seconds": 0.0,
+    "ball_hidden_longest_seconds": 0.0,
+    "ball_hidden_budget_seconds": 0.25,
+    "ball_hidden_by_region": {
+     "action_rail": 0,
+     "title_block": 0,
+     "progress_bar": 0,
+     "nav_bar": 0,
+     "top_bar": 0
+    },
+    "ball_pass": true
+   },
+   "readability": {
+    "fps": 30.0,
+    "peak_population": 18,
+    "peak_population_t": 24.05545560045739,
+    "population_by_third": [
+     4,
+     9,
+     18
+    ],
+    "population_first_frame": 2,
+    "teams_on_screen_max": 2,
+    "max_on_screen_by_team": [
+     11,
+     7
+    ],
+    "mixed_cluster_frames": 56,
+    "mixed_cluster_fraction": 0.07724137931034483,
+    "largest_mixed_cluster": 2,
+    "closest_pair_diameters": 0.0708793659312648,
+    "closest_pair_t": 9.562210190209518,
+    "largest_cluster": 5,
+    "largest_cluster_t": 23.855548767212593,
+    "longest_triple_merge_seconds": 0.3,
+    "longest_triple_merge_t": 24.122091211538994,
+    "blob_deficit_frames": 238,
+    "blob_deficit_fraction": 0.32827586206896553,
+    "mean_blobs_per_ball": 0.9466083982519475,
+    "max_step_diameters": 0.44892971338047993,
+    "max_step_t": 13.360440021860684,
+    "strobes": false
+   }
+  },
+  {
+   "seed": 10943,
+   "phone_clip": "output\\category3_two_team_v4a\\phone\\seed_10943_phone.mp4",
+   "phone_size": [
+    450,
+    800
+   ],
+   "mono_audio": "output\\category3_two_team_v4a\\phone\\seed_10943_mono.m4a",
+   "phone_band_audio": "output\\category3_two_team_v4a\\phone\\seed_10943_phoneband.m4a",
+   "mono_loss_db": -0.09,
+   "mono_correlation": 0.9623,
+   "phone_relative_db": -5.58,
+   "phone_band_energy_percent": {
+    "20-120": 0.002,
+    "120-300": 2.429,
+    "300-800": 46.928,
+    "800-2000": 47.352,
+    "2000-5000": 3.281,
+    "5000-10000": 0.007,
+    "10000-20000": 0.0
+   },
+   "integrated_lufs": -18.53,
+   "true_peak_dbtp": -3.6,
+   "clipped_samples": 0,
+   "masking": {
+    "collisions": 355,
+    "median_onset_rise_db": 9.48,
+    "p10_onset_rise_db": 6.83,
+    "min_onset_rise_db": 4.11,
+    "below_3db": 0,
+    "below_3db_fraction": 0.0,
+    "below_6db": 13,
+    "below_6db_fraction": 0.0366
+   },
+   "safe_area": {
+    "safe_area": "shorts_conservative",
+    "fingerprint": "3776358f1bf13326",
+    "final_view_radius": 19.675749999999997,
+    "pixels_per_unit": 18.878284182305634,
+    "arena_radius_px": 352.08000000000004,
+    "arena_regions": [
+     {
+      "region": "action_rail",
+      "clearance_px": 15.11999999999989,
+      "clear": true
+     },
+     {
+      "region": "title_block",
+      "clearance_px": 396.7199999999999,
+      "clear": true
+     },
+     {
+      "region": "progress_bar",
+      "clearance_px": 588.7199999999999,
+      "clear": true
+     },
+     {
+      "region": "nav_bar",
+      "clearance_px": 627.1199999999998,
+      "clear": true
+     },
+     {
+      "region": "top_bar",
+      "clearance_px": 396.7199999999999,
+      "clear": true
+     }
+    ],
+    "arena_clear": true,
+    "min_clearance_px": 15.11999999999989,
+    "ball_hidden_frames": 0,
+    "ball_hidden_seconds": 0.0,
+    "ball_hidden_longest_seconds": 0.0,
+    "ball_hidden_budget_seconds": 0.25,
+    "ball_hidden_by_region": {
+     "action_rail": 0,
+     "title_block": 0,
+     "progress_bar": 0,
+     "nav_bar": 0,
+     "top_bar": 0
+    },
+    "ball_pass": true
+   },
+   "readability": {
+    "fps": 30.0,
+    "peak_population": 16,
+    "peak_population_t": 19.925794982579696,
+    "population_by_third": [
+     5,
+     8,
+     16
+    ],
+    "population_first_frame": 2,
+    "teams_on_screen_max": 2,
+    "max_on_screen_by_team": [
+     9,
+     7
+    ],
+    "mixed_cluster_frames": 28,
+    "mixed_cluster_fraction": 0.046511627906976744,
+    "largest_mixed_cluster": 3,
+    "closest_pair_diameters": 0.10635518122676284,
+    "closest_pair_t": 12.828480047313015,
+    "largest_cluster": 4,
+    "largest_cluster_t": 15.327534601984382,
+    "longest_triple_merge_seconds": 0.23333333333333334,
+    "longest_triple_merge_t": 15.460817511566853,
+    "blob_deficit_frames": 144,
+    "blob_deficit_fraction": 0.23920265780730898,
+    "mean_blobs_per_ball": 0.9549906716417911,
+    "max_step_diameters": 0.4567991850318357,
+    "max_step_t": 1.699357097176529,
+    "strobes": false
+   }
+  },
+  {
+   "seed": 17660,
+   "phone_clip": "output\\category3_two_team_v4a\\phone\\seed_17660_phone.mp4",
+   "phone_size": [
+    450,
+    800
+   ],
+   "mono_audio": "output\\category3_two_team_v4a\\phone\\seed_17660_mono.m4a",
+   "phone_band_audio": "output\\category3_two_team_v4a\\phone\\seed_17660_phoneband.m4a",
+   "mono_loss_db": -0.09,
+   "mono_correlation": 0.961,
+   "phone_relative_db": -6.46,
+   "phone_band_energy_percent": {
+    "20-120": 0.003,
+    "120-300": 3.79,
+    "300-800": 60.068,
+    "800-2000": 34.529,
+    "2000-5000": 1.609,
+    "5000-10000": 0.001,
+    "10000-20000": 0.0
+   },
+   "integrated_lufs": -19.68,
+   "true_peak_dbtp": -2.5,
+   "clipped_samples": 0,
+   "masking": {
+    "collisions": 334,
+    "median_onset_rise_db": 10.23,
+    "p10_onset_rise_db": 7.39,
+    "min_onset_rise_db": 4.79,
+    "below_3db": 0,
+    "below_3db_fraction": 0.0,
+    "below_6db": 9,
+    "below_6db_fraction": 0.0269
+   },
+   "safe_area": {
+    "safe_area": "shorts_conservative",
+    "fingerprint": "3776358f1bf13326",
+    "final_view_radius": 19.675749999999997,
+    "pixels_per_unit": 18.878284182305634,
+    "arena_radius_px": 352.08000000000004,
+    "arena_regions": [
+     {
+      "region": "action_rail",
+      "clearance_px": 15.11999999999989,
+      "clear": true
+     },
+     {
+      "region": "title_block",
+      "clearance_px": 396.7199999999999,
+      "clear": true
+     },
+     {
+      "region": "progress_bar",
+      "clearance_px": 588.7199999999999,
+      "clear": true
+     },
+     {
+      "region": "nav_bar",
+      "clearance_px": 627.1199999999998,
+      "clear": true
+     },
+     {
+      "region": "top_bar",
+      "clearance_px": 396.7199999999999,
+      "clear": true
+     }
+    ],
+    "arena_clear": true,
+    "min_clearance_px": 15.11999999999989,
+    "ball_hidden_frames": 0,
+    "ball_hidden_seconds": 0.0,
+    "ball_hidden_longest_seconds": 0.0,
+    "ball_hidden_budget_seconds": 0.25,
+    "ball_hidden_by_region": {
+     "action_rail": 0,
+     "title_block": 0,
+     "progress_bar": 0,
+     "nav_bar": 0,
+     "top_bar": 0
+    },
+    "ball_pass": true
+   },
+   "readability": {
+    "fps": 30.0,
+    "peak_population": 17,
+    "peak_population_t": 24.3579300293367,
+    "population_by_third": [
+     4,
+     5,
+     17
+    ],
+    "population_first_frame": 2,
+    "teams_on_screen_max": 2,
+    "max_on_screen_by_team": [
+     7,
+     10
+    ],
+    "mixed_cluster_frames": 62,
+    "mixed_cluster_fraction": 0.08446866485013624,
+    "largest_mixed_cluster": 4,
+    "closest_pair_diameters": 0.021082799843960272,
+    "closest_pair_t": 5.93120594421605,
+    "largest_cluster": 4,
+    "largest_cluster_t": 17.960224741193542,
+    "longest_triple_merge_seconds": 0.26666666666666666,
+    "longest_triple_merge_t": 18.060188886320777,
+    "blob_deficit_frames": 250,
+    "blob_deficit_fraction": 0.3405994550408719,
+    "mean_blobs_per_ball": 0.9263135412217002,
+    "max_step_diameters": 0.4412239135397042,
+    "max_step_t": 20.12611455228367,
+    "strobes": false
+   }
+  },
+  {
+   "seed": 16020,
+   "phone_clip": "output\\category3_two_team_v4a\\phone\\seed_16020_phone.mp4",
+   "phone_size": [
+    450,
+    800
+   ],
+   "mono_audio": "output\\category3_two_team_v4a\\phone\\seed_16020_mono.m4a",
+   "phone_band_audio": "output\\category3_two_team_v4a\\phone\\seed_16020_phoneband.m4a",
+   "mono_loss_db": -0.08,
+   "mono_correlation": 0.9654,
+   "phone_relative_db": -5.84,
+   "phone_band_energy_percent": {
+    "20-120": 0.002,
+    "120-300": 2.593,
+    "300-800": 56.227,
+    "800-2000": 39.319,
+    "2000-5000": 1.856,
+    "5000-10000": 0.003,
+    "10000-20000": 0.0
+   },
+   "integrated_lufs": -18.43,
+   "true_peak_dbtp": -3.96,
+   "clipped_samples": 0,
+   "masking": {
+    "collisions": 440,
+    "median_onset_rise_db": 10.0,
+    "p10_onset_rise_db": 6.97,
+    "min_onset_rise_db": 2.04,
+    "below_3db": 1,
+    "below_3db_fraction": 0.0023,
+    "below_6db": 15,
+    "below_6db_fraction": 0.0341
+   },
+   "safe_area": {
+    "safe_area": "shorts_conservative",
+    "fingerprint": "3776358f1bf13326",
+    "final_view_radius": 19.675749999999997,
+    "pixels_per_unit": 18.878284182305634,
+    "arena_radius_px": 352.08000000000004,
+    "arena_regions": [
+     {
+      "region": "action_rail",
+      "clearance_px": 15.11999999999989,
+      "clear": true
+     },
+     {
+      "region": "title_block",
+      "clearance_px": 396.7199999999999,
+      "clear": true
+     },
+     {
+      "region": "progress_bar",
+      "clearance_px": 588.7199999999999,
+      "clear": true
+     },
+     {
+      "region": "nav_bar",
+      "clearance_px": 627.1199999999998,
+      "clear": true
+     },
+     {
+      "region": "top_bar",
+      "clearance_px": 396.7199999999999,
+      "clear": true
+     }
+    ],
+    "arena_clear": true,
+    "min_clearance_px": 15.11999999999989,
+    "ball_hidden_frames": 0,
+    "ball_hidden_seconds": 0.0,
+    "ball_hidden_longest_seconds": 0.0,
+    "ball_hidden_budget_seconds": 0.25,
+    "ball_hidden_by_region": {
+     "action_rail": 0,
+     "title_block": 0,
+     "progress_bar": 0,
+     "nav_bar": 0,
+     "top_bar": 0
+    },
+    "ball_pass": true
+   },
+   "readability": {
+    "fps": 30.0,
+    "peak_population": 16,
+    "peak_population_t": 25.054056442004804,
+    "population_by_third": [
+     5,
+     8,
+     16
+    ],
+    "population_first_frame": 2,
+    "teams_on_screen_max": 2,
+    "max_on_screen_by_team": [
+     10,
+     6
+    ],
+    "mixed_cluster_frames": 70,
+    "mixed_cluster_fraction": 0.09259259259259259,
+    "largest_mixed_cluster": 2,
+    "closest_pair_diameters": 0.06712461317088583,
+    "closest_pair_t": 16.924814724120267,
+    "largest_cluster": 3,
+    "largest_cluster_t": 21.355917791655692,
+    "longest_triple_merge_seconds": 0.13333333333333333,
+    "longest_triple_merge_t": 21.455867484908367,
+    "blob_deficit_frames": 304,
+    "blob_deficit_fraction": 0.4021164021164021,
+    "mean_blobs_per_ball": 0.9361447840191224,
+    "max_step_diameters": 0.4564677779082068,
+    "max_step_t": 0.79959754602143,
+    "strobes": false
+   }
+  },
+  {
+   "seed": 1176,
+   "phone_clip": "output\\category3_two_team_v4a\\phone\\seed_1176_phone.mp4",
+   "phone_size": [
+    450,
+    800
+   ],
+   "mono_audio": "output\\category3_two_team_v4a\\phone\\seed_1176_mono.m4a",
+   "phone_band_audio": "output\\category3_two_team_v4a\\phone\\seed_1176_phoneband.m4a",
+   "mono_loss_db": -0.08,
+   "mono_correlation": 0.966,
+   "phone_relative_db": -8.3,
+   "phone_band_energy_percent": {
+    "20-120": 0.006,
+    "120-300": 8.867,
+    "300-800": 72.362,
+    "800-2000": 18.42,
+    "2000-5000": 0.346,
+    "5000-10000": 0.0,
+    "10000-20000": 0.0
+   },
+   "integrated_lufs": -19.17,
+   "true_peak_dbtp": -2.5,
+   "clipped_samples": 0,
+   "masking": {
+    "collisions": 335,
+    "median_onset_rise_db": 9.69,
+    "p10_onset_rise_db": 7.09,
+    "min_onset_rise_db": 3.15,
+    "below_3db": 0,
+    "below_3db_fraction": 0.0,
+    "below_6db": 12,
+    "below_6db_fraction": 0.0358
+   },
+   "safe_area": {
+    "safe_area": "shorts_conservative",
+    "fingerprint": "3776358f1bf13326",
+    "final_view_radius": 19.675749999999997,
+    "pixels_per_unit": 18.878284182305634,
+    "arena_radius_px": 352.08000000000004,
+    "arena_regions": [
+     {
+      "region": "action_rail",
+      "clearance_px": 15.11999999999989,
+      "clear": true
+     },
+     {
+      "region": "title_block",
+      "clearance_px": 396.7199999999999,
+      "clear": true
+     },
+     {
+      "region": "progress_bar",
+      "clearance_px": 588.7199999999999,
+      "clear": true
+     },
+     {
+      "region": "nav_bar",
+      "clearance_px": 627.1199999999998,
+      "clear": true
+     },
+     {
+      "region": "top_bar",
+      "clearance_px": 396.7199999999999,
+      "clear": true
+     }
+    ],
+    "arena_clear": true,
+    "min_clearance_px": 15.11999999999989,
+    "ball_hidden_frames": 0,
+    "ball_hidden_seconds": 0.0,
+    "ball_hidden_longest_seconds": 0.0,
+    "ball_hidden_budget_seconds": 0.25,
+    "ball_hidden_by_region": {
+     "action_rail": 0,
+     "title_block": 0,
+     "progress_bar": 0,
+     "nav_bar": 0,
+     "top_bar": 0
+    },
+    "ball_pass": true
+   },
+   "readability": {
+    "fps": 30.0,
+    "peak_population": 12,
+    "peak_population_t": 23.631821017970008,
+    "population_by_third": [
+     3,
+     9,
+     12
+    ],
+    "population_first_frame": 2,
+    "teams_on_screen_max": 2,
+    "max_on_screen_by_team": [
+     5,
+     7
+    ],
+    "mixed_cluster_frames": 51,
+    "mixed_cluster_fraction": 0.07142857142857142,
+    "largest_mixed_cluster": 3,
+    "closest_pair_diameters": 0.05630845252787707,
+    "closest_pair_t": 21.765273800753757,
+    "largest_cluster": 3,
+    "largest_cluster_t": 22.631885008747012,
+    "longest_triple_merge_seconds": 0.2,
+    "longest_triple_merge_t": 22.79854101028418,
+    "blob_deficit_frames": 369,
+    "blob_deficit_fraction": 0.5168067226890757,
+    "mean_blobs_per_ball": 0.891510474090408,
+    "max_step_diameters": 0.45717072270772036,
+    "max_step_t": 0.6999552064560932,
+    "strobes": false
+   }
+  }
+ ]
+}

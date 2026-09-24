@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/multishell_render.gd" id="1_multishell_render"]
+
+[node name="MultishellRender" type="Node"]
+script = ExtResource("1_multishell_render")

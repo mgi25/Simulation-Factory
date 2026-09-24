@@ -1,0 +1,519 @@
+{
+  "kind": "category3_multiplying_shell_audio_candidates",
+  "score_version": "category3-test2-multiplying-shell-audio-score/1.0.0",
+  "config_digest": "dcf3c2bf05879e087246bd3ae22bacbb273d64411405356fd5f329bf8c1ea0bd",
+  "rules": {
+    "source": "docs\\validation\\category3_multiplying_shell\\phase1_shortlist.json",
+    "new_search": false,
+    "duration_seconds": [
+      20.0,
+      24.0
+    ],
+    "first_spawn_preferred_max": 2.5,
+    "first_spawn_hard_max": 3.0,
+    "population_total": [
+      8,
+      15
+    ],
+    "wanted": [
+      6,
+      8
+    ],
+    "requires": [
+      "both escape routes present",
+      "at least one founder final escape (generation 0)",
+      "at least one descendant final escape (generation > 0)"
+    ],
+    "order": "ascending duration"
+  },
+  "reference_seeds": [
+    12818,
+    7183
+  ],
+  "considered": 18,
+  "accepted": 7,
+  "seeds": [
+    949,
+    12004,
+    547,
+    11319,
+    3622,
+    12818,
+    7183
+  ],
+  "coverage": {
+    "routes": [
+      "break",
+      "opening"
+    ],
+    "mixed_routes": true,
+    "final_escapes": [
+      "descendant",
+      "founder"
+    ],
+    "founder_and_descendant": true,
+    "population_range": [
+      8,
+      15
+    ],
+    "duration_range": [
+      20.162,
+      23.212
+    ],
+    "in_wanted_band": true
+  },
+  "candidates": [
+    {
+      "seed": 949,
+      "duration": 20.16224491236035,
+      "first_spawn": 2.307972141329938,
+      "population_total": 8,
+      "escape_route": "opening",
+      "escape_generation": 3,
+      "final_escape": "descendant",
+      "collisions": 119,
+      "collision_rate": 5.902120548443875,
+      "breaks": 13,
+      "spawns": 7,
+      "generations": 5,
+      "accepted": true,
+      "preferred_split": true,
+      "rejected_for": []
+    },
+    {
+      "seed": 12004,
+      "duration": 21.709319519005426,
+      "first_spawn": 2.398059953250905,
+      "population_total": 15,
+      "escape_route": "opening",
+      "escape_generation": 2,
+      "final_escape": "descendant",
+      "collisions": 134,
+      "collision_rate": 6.172464313434131,
+      "breaks": 9,
+      "spawns": 14,
+      "generations": 5,
+      "accepted": true,
+      "preferred_split": true,
+      "rejected_for": []
+    },
+    {
+      "seed": 547,
+      "duration": 21.73202037128077,
+      "first_spawn": 2.245821319076037,
+      "population_total": 11,
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "final_escape": "founder",
+      "collisions": 114,
+      "collision_rate": 5.245715679093184,
+      "breaks": 14,
+      "spawns": 10,
+      "generations": 4,
+      "accepted": true,
+      "preferred_split": true,
+      "rejected_for": []
+    },
+    {
+      "seed": 11319,
+      "duration": 21.795864042004585,
+      "first_spawn": 1.4706694318555769,
+      "population_total": 14,
+      "escape_route": "break",
+      "escape_generation": 0,
+      "final_escape": "founder",
+      "collisions": 149,
+      "collision_rate": 6.836159360915905,
+      "breaks": 18,
+      "spawns": 13,
+      "generations": 5,
+      "accepted": true,
+      "preferred_split": true,
+      "rejected_for": []
+    },
+    {
+      "seed": 3622,
+      "duration": 22.818286583520187,
+      "first_spawn": 0.44509147362173845,
+      "population_total": 11,
+      "escape_route": "break",
+      "escape_generation": 3,
+      "final_escape": "descendant",
+      "collisions": 120,
+      "collision_rate": 5.258939998004335,
+      "breaks": 13,
+      "spawns": 10,
+      "generations": 5,
+      "accepted": true,
+      "preferred_split": true,
+      "rejected_for": []
+    },
+    {
+      "seed": 12818,
+      "duration": 22.84318184382008,
+      "first_spawn": 0.49515989042535224,
+      "population_total": 15,
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "final_escape": "founder",
+      "collisions": 189,
+      "collision_rate": 8.273803592345496,
+      "breaks": 19,
+      "spawns": 14,
+      "generations": 5,
+      "accepted": true,
+      "preferred_split": true,
+      "rejected_for": []
+    },
+    {
+      "seed": 7183,
+      "duration": 23.212396192108102,
+      "first_spawn": 0.6199176912432472,
+      "population_total": 13,
+      "escape_route": "break",
+      "escape_generation": 3,
+      "final_escape": "descendant",
+      "collisions": 155,
+      "collision_rate": 6.67746658799051,
+      "breaks": 16,
+      "spawns": 12,
+      "generations": 5,
+      "accepted": true,
+      "preferred_split": true,
+      "rejected_for": []
+    }
+  ],
+  "judged": [
+    {
+      "seed": 13009,
+      "duration": 18.181917147717687,
+      "first_spawn": 3.3168896180335814,
+      "population_total": 14,
+      "escape_route": "opening",
+      "escape_generation": 2,
+      "final_escape": "descendant",
+      "collisions": 138,
+      "collision_rate": 7.589958686910124,
+      "breaks": 13,
+      "spawns": 13,
+      "generations": 4,
+      "accepted": false,
+      "preferred_split": false,
+      "rejected_for": [
+        "duration 18.18s outside 20.0-24.0s",
+        "first split 3.32s over the 3.0s limit"
+      ]
+    },
+    {
+      "seed": 16458,
+      "duration": 18.42605213683645,
+      "first_spawn": 1.750300341518441,
+      "population_total": 10,
+      "escape_route": "break",
+      "escape_generation": 0,
+      "final_escape": "founder",
+      "collisions": 85,
+      "collision_rate": 4.613033729025015,
+      "breaks": 11,
+      "spawns": 9,
+      "generations": 3,
+      "accepted": false,
+      "preferred_split": true,
+      "rejected_for": [
+        "duration 18.43s outside 20.0-24.0s"
+      ]
+    },
+    {
+      "seed": 16067,
+      "duration": 18.560327970220907,
+      "first_spawn": 3.517573541997618,
+      "population_total": 9,
+      "escape_route": "break",
+      "escape_generation": 2,
+      "final_escape": "descendant",
+      "collisions": 108,
+      "collision_rate": 5.818862693228291,
+      "breaks": 10,
+      "spawns": 8,
+      "generations": 4,
+      "accepted": false,
+      "preferred_split": false,
+      "rejected_for": [
+        "duration 18.56s outside 20.0-24.0s",
+        "first split 3.52s over the 3.0s limit"
+      ]
+    },
+    {
+      "seed": 368,
+      "duration": 19.463516070355855,
+      "first_spawn": 0.4721440129951723,
+      "population_total": 12,
+      "escape_route": "break",
+      "escape_generation": 2,
+      "final_escape": "descendant",
+      "collisions": 104,
+      "collision_rate": 5.343330548502409,
+      "breaks": 14,
+      "spawns": 11,
+      "generations": 5,
+      "accepted": false,
+      "preferred_split": true,
+      "rejected_for": [
+        "duration 19.46s outside 20.0-24.0s"
+      ]
+    },
+    {
+      "seed": 17758,
+      "duration": 19.980556560014428,
+      "first_spawn": 3.572348491323308,
+      "population_total": 12,
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "final_escape": "founder",
+      "collisions": 129,
+      "collision_rate": 6.456276611341143,
+      "breaks": 10,
+      "spawns": 11,
+      "generations": 5,
+      "accepted": false,
+      "preferred_split": false,
+      "rejected_for": [
+        "duration 19.98s outside 20.0-24.0s",
+        "first split 3.57s over the 3.0s limit"
+      ]
+    },
+    {
+      "seed": 949,
+      "duration": 20.16224491236035,
+      "first_spawn": 2.307972141329938,
+      "population_total": 8,
+      "escape_route": "opening",
+      "escape_generation": 3,
+      "final_escape": "descendant",
+      "collisions": 119,
+      "collision_rate": 5.902120548443875,
+      "breaks": 13,
+      "spawns": 7,
+      "generations": 5,
+      "accepted": true,
+      "preferred_split": true,
+      "rejected_for": []
+    },
+    {
+      "seed": 9091,
+      "duration": 20.809329113184678,
+      "first_spawn": 3.4234082622224595,
+      "population_total": 13,
+      "escape_route": "opening",
+      "escape_generation": 5,
+      "final_escape": "descendant",
+      "collisions": 105,
+      "collision_rate": 5.045813799613202,
+      "breaks": 8,
+      "spawns": 12,
+      "generations": 6,
+      "accepted": false,
+      "preferred_split": false,
+      "rejected_for": [
+        "first split 3.42s over the 3.0s limit"
+      ]
+    },
+    {
+      "seed": 19998,
+      "duration": 21.590743856641406,
+      "first_spawn": 3.5713701240573403,
+      "population_total": 15,
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "final_escape": "founder",
+      "collisions": 186,
+      "collision_rate": 8.61480277080799,
+      "breaks": 18,
+      "spawns": 14,
+      "generations": 5,
+      "accepted": false,
+      "preferred_split": false,
+      "rejected_for": [
+        "first split 3.57s over the 3.0s limit"
+      ]
+    },
+    {
+      "seed": 12004,
+      "duration": 21.709319519005426,
+      "first_spawn": 2.398059953250905,
+      "population_total": 15,
+      "escape_route": "opening",
+      "escape_generation": 2,
+      "final_escape": "descendant",
+      "collisions": 134,
+      "collision_rate": 6.172464313434131,
+      "breaks": 9,
+      "spawns": 14,
+      "generations": 5,
+      "accepted": true,
+      "preferred_split": true,
+      "rejected_for": []
+    },
+    {
+      "seed": 547,
+      "duration": 21.73202037128077,
+      "first_spawn": 2.245821319076037,
+      "population_total": 11,
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "final_escape": "founder",
+      "collisions": 114,
+      "collision_rate": 5.245715679093184,
+      "breaks": 14,
+      "spawns": 10,
+      "generations": 4,
+      "accepted": true,
+      "preferred_split": true,
+      "rejected_for": []
+    },
+    {
+      "seed": 11319,
+      "duration": 21.795864042004585,
+      "first_spawn": 1.4706694318555769,
+      "population_total": 14,
+      "escape_route": "break",
+      "escape_generation": 0,
+      "final_escape": "founder",
+      "collisions": 149,
+      "collision_rate": 6.836159360915905,
+      "breaks": 18,
+      "spawns": 13,
+      "generations": 5,
+      "accepted": true,
+      "preferred_split": true,
+      "rejected_for": []
+    },
+    {
+      "seed": 10038,
+      "duration": 22.35111808581454,
+      "first_spawn": 3.432939019363706,
+      "population_total": 12,
+      "escape_route": "break",
+      "escape_generation": 1,
+      "final_escape": "descendant",
+      "collisions": 139,
+      "collision_rate": 6.218928264184616,
+      "breaks": 14,
+      "spawns": 11,
+      "generations": 4,
+      "accepted": false,
+      "preferred_split": false,
+      "rejected_for": [
+        "first split 3.43s over the 3.0s limit"
+      ]
+    },
+    {
+      "seed": 3622,
+      "duration": 22.818286583520187,
+      "first_spawn": 0.44509147362173845,
+      "population_total": 11,
+      "escape_route": "break",
+      "escape_generation": 3,
+      "final_escape": "descendant",
+      "collisions": 120,
+      "collision_rate": 5.258939998004335,
+      "breaks": 13,
+      "spawns": 10,
+      "generations": 5,
+      "accepted": true,
+      "preferred_split": true,
+      "rejected_for": []
+    },
+    {
+      "seed": 12818,
+      "duration": 22.84318184382008,
+      "first_spawn": 0.49515989042535224,
+      "population_total": 15,
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "final_escape": "founder",
+      "collisions": 189,
+      "collision_rate": 8.273803592345496,
+      "breaks": 19,
+      "spawns": 14,
+      "generations": 5,
+      "accepted": true,
+      "preferred_split": true,
+      "rejected_for": []
+    },
+    {
+      "seed": 7183,
+      "duration": 23.212396192108102,
+      "first_spawn": 0.6199176912432472,
+      "population_total": 13,
+      "escape_route": "break",
+      "escape_generation": 3,
+      "final_escape": "descendant",
+      "collisions": 155,
+      "collision_rate": 6.67746658799051,
+      "breaks": 16,
+      "spawns": 12,
+      "generations": 5,
+      "accepted": true,
+      "preferred_split": true,
+      "rejected_for": []
+    },
+    {
+      "seed": 17693,
+      "duration": 23.50499543298177,
+      "first_spawn": 3.554626552086483,
+      "population_total": 10,
+      "escape_route": "break",
+      "escape_generation": 0,
+      "final_escape": "founder",
+      "collisions": 119,
+      "collision_rate": 5.062753589520866,
+      "breaks": 13,
+      "spawns": 9,
+      "generations": 4,
+      "accepted": false,
+      "preferred_split": false,
+      "rejected_for": [
+        "first split 3.55s over the 3.0s limit"
+      ]
+    },
+    {
+      "seed": 6625,
+      "duration": 23.871335279204096,
+      "first_spawn": 3.6204292891042846,
+      "population_total": 13,
+      "escape_route": "break",
+      "escape_generation": 0,
+      "final_escape": "founder",
+      "collisions": 169,
+      "collision_rate": 7.079620726002165,
+      "breaks": 17,
+      "spawns": 12,
+      "generations": 5,
+      "accepted": false,
+      "preferred_split": false,
+      "rejected_for": [
+        "first split 3.62s over the 3.0s limit"
+      ]
+    },
+    {
+      "seed": 3909,
+      "duration": 24.133031495831624,
+      "first_spawn": 1.5297130403724153,
+      "population_total": 13,
+      "escape_route": "break",
+      "escape_generation": 0,
+      "final_escape": "founder",
+      "collisions": 168,
+      "collision_rate": 6.961413033792202,
+      "breaks": 14,
+      "spawns": 12,
+      "generations": 4,
+      "accepted": false,
+      "preferred_split": true,
+      "rejected_for": [
+        "duration 24.13s outside 20.0-24.0s"
+      ]
+    }
+  ]
+}

@@ -496,11 +496,17 @@ def test_category_three_imports_no_other_category_and_no_company_os() -> None:
     # a mono cue is an `array("d")`, the limiter's sliding minimum is a
     # `deque`, and every loudness measurement is numpy, which is already a
     # declared dependency of this repository.
+    #
+    # `concurrent` and `statistics` arrived with Test #2, the shell escape:
+    # its Phase 1 answer is a question about a population of ten thousand
+    # seeds, so it needs a process pool to produce one and quantiles to report
+    # it. Both are stdlib, so both are the kind of growth this list is for.
     allowed = {
         "__future__",
         "argparse",
         "array",
         "collections",
+        "concurrent",
         "dataclasses",
         "glob",
         "hashlib",
@@ -511,6 +517,7 @@ def test_category_three_imports_no_other_category_and_no_company_os() -> None:
         "PIL",
         "random",
         "shutil",
+        "statistics",
         "struct",
         "subprocess",
         "sys",
@@ -601,6 +608,25 @@ def test_category_three_uses_only_the_leaf_audio_modules() -> None:
                 )
 
 
+#: Category 3's own laboratory tools live under `tools/` because that is where
+#: this repository keeps every runnable tool, and they import `satisfying`
+#: because measuring Category 3 is what they are for. They are named here
+#: rather than exempted by a path pattern, so adding one is a deliberate act.
+#:
+#: This list exists because the guard below was failing on `main` before it was
+#: read: Phase 3B added `multishell_phase3b_lab.py` and left the assertion red,
+#: and a red guard is one nobody reads. Anything *not* on this list - a race
+#: module, a sloped module, a render tool - still fails, which is what the
+#: guard was written to catch.
+CATEGORY_THREE_TOOLS = frozenset({
+    "multishell_phase3b_lab.py",
+    "multishell_phase3b_screen.py",
+    "two_team_phase4a_lab.py",
+    "two_team_phase4b_lab.py",
+    "two_team_phase4c_lab.py",
+})
+
+
 def test_no_other_category_imports_category_three() -> None:
     """By import, not by substring: "satisfying" is also an ordinary English
     word and several race modules use it in prose."""
@@ -630,6 +656,8 @@ def test_no_other_category_imports_category_three() -> None:
         if not base.is_dir():
             continue
         for path in sorted(base.rglob("*.py")):
+            if directory == "tools" and path.name in CATEGORY_THREE_TOOLS:
+                continue
             tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
             for node in ast.walk(tree):
                 if isinstance(node, ast.Import):
@@ -639,3 +667,18 @@ def test_no_other_category_imports_category_three() -> None:
                 else:
                     continue
                 assert "satisfying" not in roots, path
+    # The exemption is a named list, not a hole: every name on it has to be a
+    # file that exists and that really does import Category 3, or the list is
+    # quietly permitting something it no longer describes.
+    for name in CATEGORY_THREE_TOOLS:
+        path = root / "tools" / name
+        assert path.is_file(), f"{name} is exempted and does not exist"
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        imports = {
+            (alias.name.split(".")[0] if isinstance(node, ast.Import)
+             else (node.module or "").split(".")[0])
+            for node in ast.walk(tree)
+            if isinstance(node, (ast.Import, ast.ImportFrom))
+            for alias in (node.names if isinstance(node, ast.Import) else [node])
+        }
+        assert "satisfying" in imports, f"{name} no longer needs its exemption"

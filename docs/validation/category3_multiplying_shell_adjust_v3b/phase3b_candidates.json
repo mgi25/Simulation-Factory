@@ -1,0 +1,181 @@
+{
+  "format": 1,
+  "phase": "category3-test2-multiplying-shell/adjust-v3b",
+  "config_digest": "1803a066cc67ed08088294e64dd42b7264e2bcc210f055ab225d9983e2725d38",
+  "expected_config_digest": "1803a066cc67ed08088294e64dd42b7264e2bcc210f055ab225d9983e2725d38",
+  "shortlist_seeds": [
+    17275,
+    15793,
+    9324,
+    13361,
+    14705,
+    17283,
+    8292,
+    16629,
+    17251,
+    16733,
+    3499,
+    14773,
+    12197
+  ],
+  "rule": {
+    "source": "docs\\validation\\category3_multiplying_shell_adjust_v3b\\phase3b_shortlist.json",
+    "duration_seconds": [
+      20.0,
+      26.0
+    ],
+    "first_spawn_seconds_preferred_max": 2.5,
+    "first_spawn_seconds_max": 3.0,
+    "first_spawn_seconds_reject_above": 3.0,
+    "population_total": [
+      8,
+      15
+    ],
+    "flags": "none",
+    "note": "Six review renders selected from the thirteen engineering-screened survivors of the new 20,000-seed Phase 3B run. The set spans opening and break routes, descendant escapes, cooperative outer-wall breaks, and high-but-readable populations."
+  },
+  "seeds": [
+    15793,
+    8292,
+    17251,
+    16733,
+    12197,
+    14705
+  ],
+  "candidates": [
+    {
+      "seed": 15793,
+      "duration": 20.53724497969299,
+      "first_split": 2.5158100772475724,
+      "population": 12,
+      "generations": 5,
+      "escape_route": "break",
+      "escape_generation": 3,
+      "escape_by": "descendant",
+      "progression_opening": 14,
+      "progression_break": 6,
+      "breaks": 9,
+      "shared_breaks": 7,
+      "near_misses": 12,
+      "escalation": 2.980769230769231,
+      "digest": "d25e426be904c891306796947afa86a93687f313680274b5c46ad60f72c64458"
+    },
+    {
+      "seed": 8292,
+      "duration": 22.457387142732713,
+      "first_split": 0.46929401611256205,
+      "population": 8,
+      "generations": 4,
+      "escape_route": "break",
+      "escape_generation": 2,
+      "escape_by": "descendant",
+      "progression_opening": 21,
+      "progression_break": 3,
+      "breaks": 7,
+      "shared_breaks": 7,
+      "near_misses": 9,
+      "escalation": 3.5945945945945947,
+      "digest": "d8bd80825f38f4322511565647f7d49365de290a75b4dfc4e4c46b1479ce1dfc"
+    },
+    {
+      "seed": 17251,
+      "duration": 22.85229710103979,
+      "first_split": 1.6898269925903153,
+      "population": 13,
+      "generations": 6,
+      "escape_route": "break",
+      "escape_generation": 4,
+      "escape_by": "descendant",
+      "progression_opening": 29,
+      "progression_break": 9,
+      "breaks": 12,
+      "shared_breaks": 11,
+      "near_misses": 9,
+      "escalation": 2.1486486486486487,
+      "digest": "804dac12a9137e0b234a6d1d6b4acba1c5348c8f1d75d920e1c280db6dc4f443"
+    },
+    {
+      "seed": 16733,
+      "duration": 23.23895649727187,
+      "first_split": 2.28882868539065,
+      "population": 8,
+      "generations": 4,
+      "escape_route": "break",
+      "escape_generation": 2,
+      "escape_by": "descendant",
+      "progression_opening": 17,
+      "progression_break": 4,
+      "breaks": 8,
+      "shared_breaks": 7,
+      "near_misses": 7,
+      "escalation": 3.675675675675676,
+      "digest": "ff39465574744a2a0b27d4be4ef60a21db0682ddf55d3f9cee27094327195ed6"
+    },
+    {
+      "seed": 12197,
+      "duration": 25.858239905118804,
+      "first_split": 2.659527348222199,
+      "population": 11,
+      "generations": 5,
+      "escape_route": "break",
+      "escape_generation": 3,
+      "escape_by": "descendant",
+      "progression_opening": 18,
+      "progression_break": 4,
+      "breaks": 9,
+      "shared_breaks": 8,
+      "near_misses": 9,
+      "escalation": 4.594594594594595,
+      "digest": "2c288bb1aa5dcae44a0642bd0e8bc88d77c022edfb445c7bd04c4bdadb9e1a36"
+    },
+    {
+      "seed": 14705,
+      "duration": 21.9141039923404,
+      "first_split": 1.6782662298527207,
+      "population": 12,
+      "generations": 5,
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "escape_by": "founder",
+      "progression_opening": 20,
+      "progression_break": 1,
+      "breaks": 8,
+      "shared_breaks": 8,
+      "near_misses": 11,
+      "escalation": 4.282051282051282,
+      "digest": "f2d5900df0dabf17ef0bc08fb0eeee3eaff10fa59af6ac2e4ff387c4df550445"
+    }
+  ],
+  "coverage": {
+    "count": 6,
+    "escape_route": {
+      "opening": 1,
+      "break": 5
+    },
+    "escaping_ball": {
+      "founder": 1,
+      "descendant": 5
+    },
+    "duration_seconds": [
+      20.53724497969299,
+      25.858239905118804
+    ],
+    "first_split_seconds": [
+      0.46929401611256205,
+      2.659527348222199
+    ],
+    "population": [
+      8,
+      13
+    ],
+    "opening_dominant": [
+      8292,
+      17251,
+      16733,
+      12197,
+      14705
+    ],
+    "break_heavy": []
+  },
+  "render_config_digest": "ea9f6fb3ad908930"
+}

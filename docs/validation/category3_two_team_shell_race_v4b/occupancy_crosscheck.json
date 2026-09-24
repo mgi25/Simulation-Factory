@@ -1,0 +1,95 @@
+{
+ "format": 2,
+ "ink_luminance": 0.14,
+ "solid_luminance": 0.3,
+ "rows": [
+  {
+   "moment": "a_opening",
+   "t": 0.3,
+   "measured_ink": 0.536318962191358,
+   "measured_solid": 0.1456129436728395,
+   "modelled": 0.3734937428437425,
+   "empty_band_px": 155
+  },
+  {
+   "moment": "b_first_split",
+   "t": 0.6109490288424855,
+   "measured_ink": 0.544092399691358,
+   "measured_solid": 0.1496363811728395,
+   "modelled": 0.3751209171453507,
+   "empty_band_px": 155
+  },
+  {
+   "moment": "c_first_transition",
+   "t": 4.858970042431505,
+   "measured_ink": 0.5387475887345679,
+   "measured_solid": 0.11568769290123457,
+   "modelled": 0.27622399774381307,
+   "empty_band_px": 360
+  },
+  {
+   "moment": "d_four_balls",
+   "t": 4.142132054432911,
+   "measured_ink": 0.5662885802469135,
+   "measured_solid": 0.16084104938271604,
+   "modelled": 0.37674809144695887,
+   "empty_band_px": 155
+  },
+  {
+   "moment": "e_damaged_panel",
+   "t": 0.9811128477491061,
+   "measured_ink": 0.5472791280864198,
+   "measured_solid": 0.14999662422839505,
+   "modelled": 0.3751209171453507,
+   "empty_band_px": 155
+  },
+  {
+   "moment": "f_critical_panel",
+   "t": 6.011835946905864,
+   "measured_ink": 0.4506283757716049,
+   "measured_solid": 0.08444926697530865,
+   "modelled": 0.2047302956187217,
+   "empty_band_px": 478
+  },
+  {
+   "moment": "g_panel_break",
+   "t": 2.0209442355763767,
+   "measured_ink": 0.5413695987654321,
+   "measured_solid": 0.15395351080246913,
+   "modelled": 0.3751209171453507,
+   "empty_band_px": 155
+  },
+  {
+   "moment": "g2_flood_through",
+   "t": 12.882592440856696,
+   "measured_ink": 0.4620896026234568,
+   "measured_solid": 0.09326051311728395,
+   "modelled": 0.20844232384564673,
+   "empty_band_px": 478
+  },
+  {
+   "moment": "h_final_wall",
+   "t": 25.725764133147724,
+   "measured_ink": 0.3633887924382716,
+   "measured_solid": 0.07475887345679012,
+   "modelled": 0.14172952617324105,
+   "empty_band_px": 531
+  },
+  {
+   "moment": "i_final_escape",
+   "t": 26.045764133147724,
+   "measured_ink": 0.40600935570987656,
+   "measured_solid": 0.13537229938271605,
+   "modelled": 0.14172952617324105,
+   "empty_band_px": 402
+  },
+  {
+   "moment": "j_winner_frame",
+   "t": 26.215764133147726,
+   "measured_ink": 0.43507908950617286,
+   "measured_solid": 0.14763551311728396,
+   "modelled": 0.14172952617324105,
+   "empty_band_px": 402
+  }
+ ]
+}

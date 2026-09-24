@@ -1,0 +1,3338 @@
+{
+  "config_digest": "dcf3c2bf05879e087246bd3ae22bacbb273d64411405356fd5f329bf8c1ea0bd",
+  "taken": 18,
+  "seeds": [
+    13009,
+    16458,
+    16067,
+    368,
+    17758,
+    949,
+    9091,
+    19998,
+    12004,
+    547,
+    11319,
+    10038,
+    3622,
+    12818,
+    7183,
+    17693,
+    6625,
+    3909
+  ],
+  "candidates": [
+    {
+      "seed": 13009,
+      "flags": [],
+      "escaped": true,
+      "duration": 18.181917147717687,
+      "failure_reason": null,
+      "escape_route": "opening",
+      "escape_generation": 2,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 14,
+      "population_max": 14,
+      "population_early": 2,
+      "generations": 4,
+      "suppressed": 0,
+      "spawns": 13,
+      "first_spawn": 3.3168896180335814,
+      "violations": 0,
+      "collisions": 138,
+      "collision_rate": 7.589958686910124,
+      "peak_collision_rate": 14.0,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 4,
+      "damage_events": 138,
+      "damage_scoring": 138,
+      "transitions": 78,
+      "breaks": 13,
+      "shared_breaks": 12,
+      "mean_break_cumulative": 3.1836983661677922,
+      "progression_opening": 37,
+      "progression_break": 8,
+      "meaningful_total": 339,
+      "meaningful_rate": 18.644898513496607,
+      "meaningful_peak": 40.0,
+      "stagnation": 1.0047815176539903,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 54,
+      "trajectory_spread": 0.29753577172260076,
+      "difficulty_increasing": false,
+      "max_penetration": 8.190670364172092e-12,
+      "min_spawn_clearance": 0.08991451297823971,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.7155357768267286,
+      "mean_speed_correction": 0.07527883802485437,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "c55270a03c9c98a836844796c0ff3ac785cfd3ee92550e46288acbbcf1866ac5",
+      "curve": [
+        1,
+        1,
+        2,
+        3,
+        6,
+        8,
+        8,
+        8,
+        12,
+        12,
+        14
+      ],
+      "thirds_population": [
+        5,
+        8,
+        14
+      ],
+      "by_region": [
+        1,
+        3,
+        1,
+        3,
+        4,
+        2
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        4,
+        5,
+        1
+      ],
+      "reached": [
+        4,
+        6,
+        10,
+        13,
+        10
+      ],
+      "crossed": [
+        3,
+        5,
+        8,
+        8,
+        1
+      ],
+      "crossings": [
+        7,
+        9,
+        11,
+        17,
+        1
+      ],
+      "regressions": [
+        7,
+        11,
+        12,
+        17,
+        0
+      ],
+      "dwell": [
+        10.855656,
+        18.030411,
+        33.887429,
+        35.279962,
+        23.729558,
+        0.192954
+      ],
+      "pass_rate": [
+        0.75,
+        0.8333333333333334,
+        0.8,
+        0.6153846153846154,
+        0.1
+      ],
+      "blocked": [
+        6,
+        7,
+        19,
+        22,
+        27
+      ],
+      "damage_absorbed": [
+        8.813124,
+        15.149509,
+        34.970976,
+        25.530928,
+        23.912998
+      ],
+      "collisions_per_shell": [
+        11,
+        23,
+        45,
+        31,
+        28
+      ],
+      "breaks_per_shell": [
+        3,
+        4,
+        5,
+        1,
+        0
+      ],
+      "collision_thirds": [
+        7,
+        65,
+        66
+      ],
+      "spawn_thirds": [
+        4,
+        3,
+        6
+      ],
+      "break_thirds": [
+        0,
+        4,
+        9
+      ],
+      "meaningful_thirds": [
+        24,
+        132,
+        183
+      ],
+      "escalation": {
+        "collisions": 8.375,
+        "spawns": 1.4,
+        "breaks": 10.0,
+        "meaningful": 7.36,
+        "population": 2.5
+      }
+    },
+    {
+      "seed": 16458,
+      "flags": [],
+      "escaped": true,
+      "duration": 18.42605213683645,
+      "failure_reason": null,
+      "escape_route": "break",
+      "escape_generation": 0,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 10,
+      "population_max": 10,
+      "population_early": 2,
+      "generations": 3,
+      "suppressed": 0,
+      "spawns": 9,
+      "first_spawn": 1.750300341518441,
+      "violations": 0,
+      "collisions": 85,
+      "collision_rate": 4.613033729025015,
+      "peak_collision_rate": 15.0,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 10,
+      "damage_events": 85,
+      "damage_scoring": 85,
+      "transitions": 49,
+      "breaks": 11,
+      "shared_breaks": 9,
+      "mean_break_cumulative": 3.0299891000811177,
+      "progression_opening": 20,
+      "progression_break": 3,
+      "meaningful_total": 206,
+      "meaningful_rate": 11.179822919754743,
+      "meaningful_peak": 26.5,
+      "stagnation": 1.0695409341264421,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 33,
+      "trajectory_spread": 0.33877622600231716,
+      "difficulty_increasing": false,
+      "max_penetration": 7.364331366943588e-12,
+      "min_spawn_clearance": 0.030597193787366805,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.47742371666662226,
+      "mean_speed_correction": 0.06841003667737261,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "01e36f38ca0dbded55bcf5d4d47829d9835d83ef90b3321128a46a28180a2cb7",
+      "curve": [
+        1,
+        2,
+        2,
+        2,
+        2,
+        3,
+        3,
+        5,
+        7,
+        9,
+        10
+      ],
+      "thirds_population": [
+        2,
+        4,
+        10
+      ],
+      "by_region": [
+        0,
+        1,
+        3,
+        1,
+        3,
+        2
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "reached": [
+        4,
+        4,
+        5,
+        6,
+        4
+      ],
+      "crossed": [
+        4,
+        3,
+        4,
+        2,
+        1
+      ],
+      "crossings": [
+        10,
+        6,
+        4,
+        2,
+        1
+      ],
+      "regressions": [
+        9,
+        5,
+        4,
+        0,
+        0
+      ],
+      "dwell": [
+        18.472974,
+        18.214694,
+        14.1235,
+        9.184907,
+        14.331414,
+        0.136177
+      ],
+      "pass_rate": [
+        1.0,
+        0.75,
+        0.8,
+        0.3333333333333333,
+        0.25
+      ],
+      "blocked": [
+        10,
+        14,
+        11,
+        6,
+        18
+      ],
+      "damage_absorbed": [
+        11.9304,
+        15.763607,
+        7.838038,
+        15.530775,
+        14.979667
+      ],
+      "collisions_per_shell": [
+        16,
+        19,
+        11,
+        21,
+        18
+      ],
+      "breaks_per_shell": [
+        5,
+        4,
+        1,
+        0,
+        1
+      ],
+      "collision_thirds": [
+        12,
+        13,
+        60
+      ],
+      "spawn_thirds": [
+        1,
+        2,
+        6
+      ],
+      "break_thirds": [
+        1,
+        3,
+        7
+      ],
+      "meaningful_thirds": [
+        29,
+        47,
+        130
+      ],
+      "escalation": {
+        "collisions": 4.6923076923076925,
+        "spawns": 3.5,
+        "breaks": 4.0,
+        "meaningful": 4.366666666666666,
+        "population": 3.6666666666666665
+      }
+    },
+    {
+      "seed": 16067,
+      "flags": [],
+      "escaped": true,
+      "duration": 18.560327970220907,
+      "failure_reason": null,
+      "escape_route": "break",
+      "escape_generation": 2,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 9,
+      "population_max": 9,
+      "population_early": 2,
+      "generations": 4,
+      "suppressed": 0,
+      "spawns": 8,
+      "first_spawn": 3.517573541997618,
+      "violations": 0,
+      "collisions": 108,
+      "collision_rate": 5.818862693228291,
+      "peak_collision_rate": 15.5,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 7,
+      "damage_events": 108,
+      "damage_scoring": 108,
+      "transitions": 53,
+      "breaks": 10,
+      "shared_breaks": 10,
+      "mean_break_cumulative": 3.3701918463626326,
+      "progression_opening": 20,
+      "progression_break": 4,
+      "meaningful_total": 228,
+      "meaningful_rate": 12.284265685704169,
+      "meaningful_peak": 25.5,
+      "stagnation": 1.0119650726894396,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 48,
+      "trajectory_spread": 0.2832945900412697,
+      "difficulty_increasing": false,
+      "max_penetration": 5.108247158602808e-12,
+      "min_spawn_clearance": 0.26549238367547723,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.6447657969625755,
+      "mean_speed_correction": 0.07175987670716048,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "d2390c156c99742b5da520e4ea56a9b122ffda42f321f74c61ea1271ba236955",
+      "curve": [
+        1,
+        1,
+        2,
+        2,
+        3,
+        4,
+        4,
+        8,
+        8,
+        8,
+        9
+      ],
+      "thirds_population": [
+        2,
+        8,
+        9
+      ],
+      "by_region": [
+        0,
+        0,
+        2,
+        3,
+        2,
+        2
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        2,
+        2,
+        1
+      ],
+      "reached": [
+        4,
+        4,
+        4,
+        5,
+        4
+      ],
+      "crossed": [
+        4,
+        4,
+        2,
+        3,
+        1
+      ],
+      "crossings": [
+        8,
+        7,
+        2,
+        6,
+        1
+      ],
+      "regressions": [
+        7,
+        5,
+        0,
+        5,
+        0
+      ],
+      "dwell": [
+        15.317045,
+        15.929318,
+        10.401558,
+        20.413944,
+        21.925723,
+        0.1445
+      ],
+      "pass_rate": [
+        1.0,
+        1.0,
+        0.5,
+        0.6,
+        0.25
+      ],
+      "blocked": [
+        9,
+        10,
+        11,
+        10,
+        27
+      ],
+      "damage_absorbed": [
+        11.667077,
+        10.536414,
+        15.102009,
+        21.515304,
+        23.96903
+      ],
+      "collisions_per_shell": [
+        14,
+        15,
+        21,
+        31,
+        27
+      ],
+      "breaks_per_shell": [
+        6,
+        1,
+        0,
+        2,
+        1
+      ],
+      "collision_thirds": [
+        7,
+        30,
+        71
+      ],
+      "spawn_thirds": [
+        1,
+        6,
+        1
+      ],
+      "break_thirds": [
+        0,
+        5,
+        5
+      ],
+      "meaningful_thirds": [
+        17,
+        82,
+        129
+      ],
+      "escalation": {
+        "collisions": 9.0,
+        "spawns": 1.0,
+        "breaks": 6.0,
+        "meaningful": 7.222222222222222,
+        "population": 3.3333333333333335
+      }
+    },
+    {
+      "seed": 368,
+      "flags": [],
+      "escaped": true,
+      "duration": 19.463516070355855,
+      "failure_reason": null,
+      "escape_route": "break",
+      "escape_generation": 2,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 12,
+      "population_max": 12,
+      "population_early": 2,
+      "generations": 5,
+      "suppressed": 0,
+      "spawns": 11,
+      "first_spawn": 0.4721440129951723,
+      "violations": 0,
+      "collisions": 104,
+      "collision_rate": 5.343330548502409,
+      "peak_collision_rate": 13.5,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 5,
+      "damage_events": 104,
+      "damage_scoring": 104,
+      "transitions": 61,
+      "breaks": 14,
+      "shared_breaks": 13,
+      "mean_break_cumulative": 2.967635343405623,
+      "progression_opening": 28,
+      "progression_break": 7,
+      "meaningful_total": 272,
+      "meaningful_rate": 13.974864511467839,
+      "meaningful_peak": 34.5,
+      "stagnation": 0.6541835388785611,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 41,
+      "trajectory_spread": 0.25821019433686443,
+      "difficulty_increasing": true,
+      "max_penetration": 8.330336420669937e-12,
+      "min_spawn_clearance": 0.07412116120473122,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.7096304930145536,
+      "mean_speed_correction": 0.08791772842652829,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "8cfd1b6dad024d147a793d86ebf84b7489a2bed941911593f478b32324e4e3c5",
+      "curve": [
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        6,
+        8,
+        11,
+        11,
+        12
+      ],
+      "thirds_population": [
+        2,
+        8,
+        12
+      ],
+      "by_region": [
+        1,
+        2,
+        5,
+        2,
+        0,
+        2
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        4,
+        3,
+        1
+      ],
+      "reached": [
+        5,
+        8,
+        8,
+        10,
+        6
+      ],
+      "crossed": [
+        5,
+        7,
+        7,
+        4,
+        1
+      ],
+      "crossings": [
+        8,
+        12,
+        10,
+        4,
+        1
+      ],
+      "regressions": [
+        8,
+        13,
+        14,
+        6,
+        0
+      ],
+      "dwell": [
+        13.379986,
+        32.60335,
+        27.253682,
+        20.015451,
+        9.646052,
+        0.134399
+      ],
+      "pass_rate": [
+        1.0,
+        0.875,
+        0.875,
+        0.4,
+        0.16666666666666666
+      ],
+      "blocked": [
+        7,
+        19,
+        14,
+        16,
+        12
+      ],
+      "damage_absorbed": [
+        10.692577,
+        25.067453,
+        15.999458,
+        18.737814,
+        11.17806
+      ],
+      "collisions_per_shell": [
+        17,
+        33,
+        20,
+        22,
+        12
+      ],
+      "breaks_per_shell": [
+        5,
+        7,
+        1,
+        0,
+        1
+      ],
+      "collision_thirds": [
+        13,
+        31,
+        60
+      ],
+      "spawn_thirds": [
+        1,
+        6,
+        4
+      ],
+      "break_thirds": [
+        0,
+        3,
+        11
+      ],
+      "meaningful_thirds": [
+        27,
+        76,
+        169
+      ],
+      "escalation": {
+        "collisions": 4.357142857142857,
+        "spawns": 2.5,
+        "breaks": 12.0,
+        "meaningful": 6.071428571428571,
+        "population": 4.333333333333333
+      }
+    },
+    {
+      "seed": 17758,
+      "flags": [],
+      "escaped": true,
+      "duration": 19.980556560014428,
+      "failure_reason": null,
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 12,
+      "population_max": 12,
+      "population_early": 2,
+      "generations": 5,
+      "suppressed": 0,
+      "spawns": 11,
+      "first_spawn": 3.572348491323308,
+      "violations": 0,
+      "collisions": 129,
+      "collision_rate": 6.456276611341143,
+      "peak_collision_rate": 15.5,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 7,
+      "damage_events": 129,
+      "damage_scoring": 129,
+      "transitions": 62,
+      "breaks": 10,
+      "shared_breaks": 9,
+      "mean_break_cumulative": 2.8107297365428017,
+      "progression_opening": 23,
+      "progression_break": 9,
+      "meaningful_total": 283,
+      "meaningful_rate": 14.16376962022902,
+      "meaningful_peak": 33.5,
+      "stagnation": 1.1022511987225094,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 52,
+      "trajectory_spread": 0.27863568169932607,
+      "difficulty_increasing": true,
+      "max_penetration": 9.085843188927356e-12,
+      "min_spawn_clearance": 0.008278812684681114,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.7602947630787706,
+      "mean_speed_correction": 0.06719828625868077,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "30b159178d55b00073ea1c0a785bb52c3dbc1db653330f07bcf5098f7bfdf8ff",
+      "curve": [
+        1,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        6,
+        9,
+        10,
+        12
+      ],
+      "thirds_population": [
+        4,
+        6,
+        12
+      ],
+      "by_region": [
+        1,
+        1,
+        3,
+        2,
+        3,
+        2
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        4,
+        3,
+        1
+      ],
+      "reached": [
+        6,
+        6,
+        8,
+        10,
+        6
+      ],
+      "crossed": [
+        6,
+        6,
+        6,
+        3,
+        1
+      ],
+      "crossings": [
+        8,
+        11,
+        9,
+        3,
+        1
+      ],
+      "regressions": [
+        8,
+        11,
+        10,
+        2,
+        0
+      ],
+      "dwell": [
+        10.966457,
+        19.519067,
+        32.911809,
+        22.625593,
+        17.771673,
+        0.133557
+      ],
+      "pass_rate": [
+        1.0,
+        1.0,
+        0.75,
+        0.3,
+        0.16666666666666666
+      ],
+      "blocked": [
+        6,
+        9,
+        22,
+        21,
+        19
+      ],
+      "damage_absorbed": [
+        10.218538,
+        15.922315,
+        21.870271,
+        24.222281,
+        13.60822
+      ],
+      "collisions_per_shell": [
+        16,
+        22,
+        35,
+        37,
+        19
+      ],
+      "breaks_per_shell": [
+        5,
+        3,
+        1,
+        1,
+        0
+      ],
+      "collision_thirds": [
+        10,
+        49,
+        70
+      ],
+      "spawn_thirds": [
+        3,
+        2,
+        6
+      ],
+      "break_thirds": [
+        1,
+        4,
+        5
+      ],
+      "meaningful_thirds": [
+        32,
+        94,
+        157
+      ],
+      "escalation": {
+        "collisions": 6.454545454545454,
+        "spawns": 1.75,
+        "breaks": 3.0,
+        "meaningful": 4.787878787878788,
+        "population": 2.6
+      }
+    },
+    {
+      "seed": 949,
+      "flags": [],
+      "escaped": true,
+      "duration": 20.16224491236035,
+      "failure_reason": null,
+      "escape_route": "opening",
+      "escape_generation": 3,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 8,
+      "population_max": 8,
+      "population_early": 2,
+      "generations": 5,
+      "suppressed": 0,
+      "spawns": 7,
+      "first_spawn": 2.307972141329938,
+      "violations": 0,
+      "collisions": 119,
+      "collision_rate": 5.902120548443875,
+      "peak_collision_rate": 12.0,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 2,
+      "damage_events": 119,
+      "damage_scoring": 119,
+      "transitions": 68,
+      "breaks": 13,
+      "shared_breaks": 13,
+      "mean_break_cumulative": 3.617497194386347,
+      "progression_opening": 18,
+      "progression_break": 4,
+      "meaningful_total": 252,
+      "meaningful_rate": 12.498608220234088,
+      "meaningful_peak": 24.0,
+      "stagnation": 1.1018444387557964,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 46,
+      "trajectory_spread": 0.4606514282886752,
+      "difficulty_increasing": false,
+      "max_penetration": 7.840394999902855e-12,
+      "min_spawn_clearance": 0.025252114517305024,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.6587008813368633,
+      "mean_speed_correction": 0.06632447229312599,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "dba3be80cfd6a449cbc2ecc23f8175c0ed37cfec1b94300c9e1c27f3a4c125d2",
+      "curve": [
+        1,
+        1,
+        2,
+        2,
+        3,
+        3,
+        7,
+        7,
+        7,
+        7,
+        8
+      ],
+      "thirds_population": [
+        2,
+        7,
+        8
+      ],
+      "by_region": [
+        2,
+        0,
+        1,
+        1,
+        2,
+        2
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        1,
+        2,
+        1
+      ],
+      "reached": [
+        3,
+        3,
+        4,
+        4,
+        4
+      ],
+      "crossed": [
+        3,
+        2,
+        1,
+        4,
+        1
+      ],
+      "crossings": [
+        9,
+        6,
+        1,
+        5,
+        1
+      ],
+      "regressions": [
+        10,
+        6,
+        0,
+        4,
+        0
+      ],
+      "dwell": [
+        19.979213,
+        18.586777,
+        11.894275,
+        10.269285,
+        25.838479,
+        0.164534
+      ],
+      "pass_rate": [
+        1.0,
+        0.6666666666666666,
+        0.25,
+        1.0,
+        0.25
+      ],
+      "blocked": [
+        11,
+        14,
+        13,
+        3,
+        33
+      ],
+      "damage_absorbed": [
+        10.985308,
+        16.35295,
+        13.167397,
+        28.430427,
+        31.043356
+      ],
+      "collisions_per_shell": [
+        14,
+        21,
+        18,
+        32,
+        34
+      ],
+      "breaks_per_shell": [
+        5,
+        3,
+        1,
+        3,
+        1
+      ],
+      "collision_thirds": [
+        9,
+        43,
+        67
+      ],
+      "spawn_thirds": [
+        1,
+        5,
+        1
+      ],
+      "break_thirds": [
+        0,
+        2,
+        11
+      ],
+      "meaningful_thirds": [
+        21,
+        94,
+        137
+      ],
+      "escalation": {
+        "collisions": 6.8,
+        "spawns": 1.0,
+        "breaks": 12.0,
+        "meaningful": 6.2727272727272725,
+        "population": 3.0
+      }
+    },
+    {
+      "seed": 9091,
+      "flags": [],
+      "escaped": true,
+      "duration": 20.809329113184678,
+      "failure_reason": null,
+      "escape_route": "opening",
+      "escape_generation": 5,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 13,
+      "population_max": 13,
+      "population_early": 2,
+      "generations": 6,
+      "suppressed": 0,
+      "spawns": 12,
+      "first_spawn": 3.4234082622224595,
+      "violations": 0,
+      "collisions": 105,
+      "collision_rate": 5.045813799613202,
+      "peak_collision_rate": 12.0,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 12,
+      "damage_events": 105,
+      "damage_scoring": 105,
+      "transitions": 55,
+      "breaks": 8,
+      "shared_breaks": 8,
+      "mean_break_cumulative": 3.6213135659872426,
+      "progression_opening": 19,
+      "progression_break": 4,
+      "meaningful_total": 239,
+      "meaningful_rate": 11.485233315310051,
+      "meaningful_peak": 28.0,
+      "stagnation": 1.489691111501914,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 38,
+      "trajectory_spread": 0.21812410308065916,
+      "difficulty_increasing": false,
+      "max_penetration": 6.777467476126731e-12,
+      "min_spawn_clearance": 0.13516789358875947,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.7293679525640634,
+      "mean_speed_correction": 0.07786634665175564,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "31e35cf2f5646bdb996ee0d4f9a6af07dce826fcfa6beaefd68cd7544bf2219b",
+      "curve": [
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        6,
+        6,
+        7,
+        8,
+        13
+      ],
+      "thirds_population": [
+        2,
+        6,
+        13
+      ],
+      "by_region": [
+        0,
+        1,
+        3,
+        7,
+        0,
+        2
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        4,
+        4,
+        1
+      ],
+      "reached": [
+        2,
+        5,
+        6,
+        11,
+        8
+      ],
+      "crossed": [
+        2,
+        4,
+        5,
+        4,
+        1
+      ],
+      "crossings": [
+        5,
+        7,
+        6,
+        4,
+        1
+      ],
+      "regressions": [
+        4,
+        6,
+        6,
+        7,
+        0
+      ],
+      "dwell": [
+        11.025582,
+        19.75278,
+        15.763851,
+        29.159201,
+        15.003902,
+        0.108827
+      ],
+      "pass_rate": [
+        1.0,
+        0.8,
+        0.8333333333333334,
+        0.36363636363636365,
+        0.125
+      ],
+      "blocked": [
+        10,
+        11,
+        10,
+        27,
+        12
+      ],
+      "damage_absorbed": [
+        6.445757,
+        12.63118,
+        22.985511,
+        22.271446,
+        8.606196
+      ],
+      "collisions_per_shell": [
+        13,
+        17,
+        31,
+        32,
+        12
+      ],
+      "breaks_per_shell": [
+        2,
+        1,
+        4,
+        1,
+        0
+      ],
+      "collision_thirds": [
+        11,
+        25,
+        69
+      ],
+      "spawn_thirds": [
+        1,
+        4,
+        7
+      ],
+      "break_thirds": [
+        0,
+        0,
+        8
+      ],
+      "meaningful_thirds": [
+        23,
+        53,
+        163
+      ],
+      "escalation": {
+        "collisions": 5.833333333333333,
+        "spawns": 4.0,
+        "breaks": 9.0,
+        "meaningful": 6.833333333333333,
+        "population": 4.666666666666667
+      }
+    },
+    {
+      "seed": 19998,
+      "flags": [],
+      "escaped": true,
+      "duration": 21.590743856641406,
+      "failure_reason": null,
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 15,
+      "population_max": 15,
+      "population_early": 3,
+      "generations": 5,
+      "suppressed": 0,
+      "spawns": 14,
+      "first_spawn": 3.5713701240573403,
+      "violations": 0,
+      "collisions": 186,
+      "collision_rate": 8.61480277080799,
+      "peak_collision_rate": 16.0,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 9,
+      "damage_events": 186,
+      "damage_scoring": 186,
+      "transitions": 101,
+      "breaks": 18,
+      "shared_breaks": 18,
+      "mean_break_cumulative": 3.7100640934182354,
+      "progression_opening": 33,
+      "progression_break": 15,
+      "meaningful_total": 425,
+      "meaningful_rate": 19.68436116985697,
+      "meaningful_peak": 39.0,
+      "stagnation": 1.1136580937811087,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 58,
+      "trajectory_spread": 0.2897845363404425,
+      "difficulty_increasing": true,
+      "max_penetration": 7.426947945532447e-12,
+      "min_spawn_clearance": 0.014776513021036664,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.6714023663333517,
+      "mean_speed_correction": 0.07577367265080602,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "03a079220424933f75d992844e6f7d9ffc83c43c1392753a6ec6d47c04dc04ae",
+      "curve": [
+        1,
+        1,
+        2,
+        3,
+        6,
+        7,
+        9,
+        11,
+        12,
+        12,
+        15
+      ],
+      "thirds_population": [
+        3,
+        11,
+        15
+      ],
+      "by_region": [
+        0,
+        1,
+        5,
+        3,
+        4,
+        2
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        4,
+        6,
+        1
+      ],
+      "reached": [
+        4,
+        10,
+        11,
+        13,
+        12
+      ],
+      "crossed": [
+        4,
+        10,
+        9,
+        6,
+        1
+      ],
+      "crossings": [
+        7,
+        18,
+        16,
+        6,
+        1
+      ],
+      "regressions": [
+        6,
+        17,
+        18,
+        7,
+        0
+      ],
+      "dwell": [
+        10.075291,
+        35.431883,
+        42.027056,
+        34.30911,
+        28.931616,
+        0.13376
+      ],
+      "pass_rate": [
+        1.0,
+        1.0,
+        0.8181818181818182,
+        0.46153846153846156,
+        0.08333333333333333
+      ],
+      "blocked": [
+        4,
+        18,
+        24,
+        29,
+        37
+      ],
+      "damage_absorbed": [
+        9.310883,
+        24.106139,
+        28.564715,
+        47.290813,
+        33.326951
+      ],
+      "collisions_per_shell": [
+        15,
+        38,
+        38,
+        58,
+        37
+      ],
+      "breaks_per_shell": [
+        3,
+        7,
+        4,
+        2,
+        2
+      ],
+      "collision_thirds": [
+        20,
+        65,
+        101
+      ],
+      "spawn_thirds": [
+        2,
+        8,
+        4
+      ],
+      "break_thirds": [
+        1,
+        7,
+        10
+      ],
+      "meaningful_thirds": [
+        43,
+        148,
+        234
+      ],
+      "escalation": {
+        "collisions": 4.857142857142857,
+        "spawns": 1.6666666666666667,
+        "breaks": 5.5,
+        "meaningful": 5.340909090909091,
+        "population": 4.0
+      }
+    },
+    {
+      "seed": 12004,
+      "flags": [],
+      "escaped": true,
+      "duration": 21.709319519005426,
+      "failure_reason": null,
+      "escape_route": "opening",
+      "escape_generation": 2,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 15,
+      "population_max": 15,
+      "population_early": 2,
+      "generations": 5,
+      "suppressed": 0,
+      "spawns": 14,
+      "first_spawn": 2.398059953250905,
+      "violations": 0,
+      "collisions": 134,
+      "collision_rate": 6.172464313434131,
+      "peak_collision_rate": 15.5,
+      "grazing": 2,
+      "ball_ball": 0,
+      "near_misses": 6,
+      "damage_events": 134,
+      "damage_scoring": 132,
+      "transitions": 67,
+      "breaks": 9,
+      "shared_breaks": 9,
+      "mean_break_cumulative": 3.516803838362466,
+      "progression_opening": 29,
+      "progression_break": 12,
+      "meaningful_total": 317,
+      "meaningful_rate": 14.602023786258354,
+      "meaningful_peak": 34.0,
+      "stagnation": 1.0676594005809057,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 54,
+      "trajectory_spread": 0.28819259020788396,
+      "difficulty_increasing": true,
+      "max_penetration": 5.136779890335674e-12,
+      "min_spawn_clearance": 0.02235990243505681,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.8393135895325905,
+      "mean_speed_correction": 0.0953448641162009,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "744d8c0b9e8e44b81f5399d58b09aa4ea997b594bb20d58b325b1baecf0eb3fb",
+      "curve": [
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        4,
+        9,
+        11,
+        12,
+        15
+      ],
+      "thirds_population": [
+        2,
+        9,
+        15
+      ],
+      "by_region": [
+        0,
+        5,
+        1,
+        4,
+        1,
+        4
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        4,
+        5,
+        2
+      ],
+      "reached": [
+        3,
+        8,
+        9,
+        12,
+        10
+      ],
+      "crossed": [
+        3,
+        6,
+        6,
+        7,
+        2
+      ],
+      "crossings": [
+        10,
+        10,
+        8,
+        11,
+        2
+      ],
+      "regressions": [
+        9,
+        13,
+        10,
+        13,
+        0
+      ],
+      "dwell": [
+        12.21093,
+        27.160001,
+        20.017413,
+        41.16238,
+        16.887059,
+        0.272681
+      ],
+      "pass_rate": [
+        1.0,
+        0.75,
+        0.6666666666666666,
+        0.5833333333333334,
+        0.2
+      ],
+      "blocked": [
+        3,
+        15,
+        10,
+        31,
+        19
+      ],
+      "damage_absorbed": [
+        6.961164,
+        18.589512,
+        28.373776,
+        27.476127,
+        21.681324
+      ],
+      "collisions_per_shell": [
+        10,
+        22,
+        42,
+        39,
+        21
+      ],
+      "breaks_per_shell": [
+        1,
+        4,
+        3,
+        1,
+        0
+      ],
+      "collision_thirds": [
+        8,
+        28,
+        98
+      ],
+      "spawn_thirds": [
+        1,
+        7,
+        6
+      ],
+      "break_thirds": [
+        0,
+        2,
+        7
+      ],
+      "meaningful_thirds": [
+        25,
+        74,
+        218
+      ],
+      "escalation": {
+        "collisions": 11.0,
+        "spawns": 3.5,
+        "breaks": 8.0,
+        "meaningful": 8.423076923076923,
+        "population": 5.333333333333333
+      }
+    },
+    {
+      "seed": 547,
+      "flags": [],
+      "escaped": true,
+      "duration": 21.73202037128077,
+      "failure_reason": null,
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 11,
+      "population_max": 11,
+      "population_early": 2,
+      "generations": 4,
+      "suppressed": 0,
+      "spawns": 10,
+      "first_spawn": 2.245821319076037,
+      "violations": 0,
+      "collisions": 114,
+      "collision_rate": 5.245715679093184,
+      "peak_collision_rate": 10.0,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 12,
+      "damage_events": 114,
+      "damage_scoring": 114,
+      "transitions": 72,
+      "breaks": 14,
+      "shared_breaks": 13,
+      "mean_break_cumulative": 2.8630857216743095,
+      "progression_opening": 31,
+      "progression_break": 3,
+      "meaningful_total": 294,
+      "meaningful_rate": 13.52842464608242,
+      "meaningful_peak": 27.0,
+      "stagnation": 0.9503666138758158,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 48,
+      "trajectory_spread": 0.4469588724048798,
+      "difficulty_increasing": false,
+      "max_penetration": 9.975242853954569e-12,
+      "min_spawn_clearance": 0.09260099947586742,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.7045930832893198,
+      "mean_speed_correction": 0.07869128925262187,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "e91c8a962e1d95e24e0ddefbb005d4187b50d215ad24f5e620a05d38a50a9b8f",
+      "curve": [
+        1,
+        1,
+        2,
+        2,
+        5,
+        5,
+        5,
+        6,
+        6,
+        8,
+        11
+      ],
+      "thirds_population": [
+        2,
+        6,
+        11
+      ],
+      "by_region": [
+        3,
+        1,
+        1,
+        1,
+        1,
+        4
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        2,
+        3,
+        2
+      ],
+      "reached": [
+        5,
+        6,
+        8,
+        6,
+        6
+      ],
+      "crossed": [
+        3,
+        4,
+        4,
+        4,
+        2
+      ],
+      "crossings": [
+        7,
+        7,
+        9,
+        9,
+        2
+      ],
+      "regressions": [
+        9,
+        9,
+        10,
+        9,
+        0
+      ],
+      "dwell": [
+        20.249423,
+        17.261168,
+        25.870979,
+        23.221183,
+        11.409012,
+        0.382414
+      ],
+      "pass_rate": [
+        0.6,
+        0.6666666666666666,
+        0.5,
+        0.6666666666666666,
+        0.3333333333333333
+      ],
+      "blocked": [
+        15,
+        9,
+        17,
+        19,
+        13
+      ],
+      "damage_absorbed": [
+        12.806723,
+        20.312911,
+        28.596844,
+        20.8705,
+        13.811857
+      ],
+      "collisions_per_shell": [
+        18,
+        26,
+        34,
+        22,
+        14
+      ],
+      "breaks_per_shell": [
+        6,
+        6,
+        1,
+        1,
+        0
+      ],
+      "collision_thirds": [
+        12,
+        43,
+        59
+      ],
+      "spawn_thirds": [
+        1,
+        4,
+        5
+      ],
+      "break_thirds": [
+        0,
+        3,
+        11
+      ],
+      "meaningful_thirds": [
+        24,
+        102,
+        168
+      ],
+      "escalation": {
+        "collisions": 4.615384615384615,
+        "spawns": 3.0,
+        "breaks": 12.0,
+        "meaningful": 6.76,
+        "population": 4.0
+      }
+    },
+    {
+      "seed": 11319,
+      "flags": [],
+      "escaped": true,
+      "duration": 21.795864042004585,
+      "failure_reason": null,
+      "escape_route": "break",
+      "escape_generation": 0,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 14,
+      "population_max": 14,
+      "population_early": 3,
+      "generations": 5,
+      "suppressed": 0,
+      "spawns": 13,
+      "first_spawn": 1.4706694318555769,
+      "violations": 0,
+      "collisions": 149,
+      "collision_rate": 6.836159360915905,
+      "peak_collision_rate": 15.0,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 15,
+      "damage_events": 149,
+      "damage_scoring": 149,
+      "transitions": 88,
+      "breaks": 18,
+      "shared_breaks": 17,
+      "mean_break_cumulative": 3.6173741462116857,
+      "progression_opening": 30,
+      "progression_break": 23,
+      "meaningful_total": 394,
+      "meaningful_rate": 18.076824081885007,
+      "meaningful_peak": 35.0,
+      "stagnation": 1.1077506994638144,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 56,
+      "trajectory_spread": 0.3484548262861057,
+      "difficulty_increasing": false,
+      "max_penetration": 9.826250924049873e-12,
+      "min_spawn_clearance": 0.24647705316954038,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.7242891329873246,
+      "mean_speed_correction": 0.07321629939332808,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "cd694a9ef80b488555fede52152cb59bfd9b8b35acccb45b3402ebffb672741a",
+      "curve": [
+        1,
+        2,
+        3,
+        3,
+        3,
+        7,
+        7,
+        10,
+        13,
+        13,
+        14
+      ],
+      "thirds_population": [
+        3,
+        8,
+        14
+      ],
+      "by_region": [
+        0,
+        3,
+        4,
+        3,
+        2,
+        2
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        4,
+        5,
+        1
+      ],
+      "reached": [
+        8,
+        9,
+        10,
+        12,
+        10
+      ],
+      "crossed": [
+        8,
+        8,
+        5,
+        7,
+        1
+      ],
+      "crossings": [
+        21,
+        15,
+        6,
+        10,
+        1
+      ],
+      "regressions": [
+        20,
+        16,
+        9,
+        12,
+        0
+      ],
+      "dwell": [
+        23.842351,
+        38.691026,
+        23.520595,
+        35.755371,
+        26.033271,
+        0.13364
+      ],
+      "pass_rate": [
+        1.0,
+        0.8888888888888888,
+        0.5,
+        0.5833333333333334,
+        0.1
+      ],
+      "blocked": [
+        5,
+        22,
+        16,
+        27,
+        28
+      ],
+      "damage_absorbed": [
+        11.535917,
+        22.793384,
+        32.179451,
+        33.397778,
+        21.979868
+      ],
+      "collisions_per_shell": [
+        13,
+        27,
+        41,
+        40,
+        28
+      ],
+      "breaks_per_shell": [
+        5,
+        6,
+        2,
+        4,
+        1
+      ],
+      "collision_thirds": [
+        18,
+        45,
+        86
+      ],
+      "spawn_thirds": [
+        2,
+        5,
+        6
+      ],
+      "break_thirds": [
+        4,
+        5,
+        9
+      ],
+      "meaningful_thirds": [
+        55,
+        122,
+        217
+      ],
+      "escalation": {
+        "collisions": 4.578947368421052,
+        "spawns": 2.3333333333333335,
+        "breaks": 2.0,
+        "meaningful": 3.892857142857143,
+        "population": 3.75
+      }
+    },
+    {
+      "seed": 10038,
+      "flags": [],
+      "escaped": true,
+      "duration": 22.35111808581454,
+      "failure_reason": null,
+      "escape_route": "break",
+      "escape_generation": 1,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 12,
+      "population_max": 12,
+      "population_early": 2,
+      "generations": 4,
+      "suppressed": 0,
+      "spawns": 11,
+      "first_spawn": 3.432939019363706,
+      "violations": 0,
+      "collisions": 139,
+      "collision_rate": 6.218928264184616,
+      "peak_collision_rate": 16.0,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 4,
+      "damage_events": 139,
+      "damage_scoring": 139,
+      "transitions": 78,
+      "breaks": 14,
+      "shared_breaks": 14,
+      "mean_break_cumulative": 4.0916294270466835,
+      "progression_opening": 21,
+      "progression_break": 11,
+      "meaningful_total": 302,
+      "meaningful_rate": 13.511628314991036,
+      "meaningful_peak": 32.0,
+      "stagnation": 1.034511221690737,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 52,
+      "trajectory_spread": 0.29422887419157256,
+      "difficulty_increasing": true,
+      "max_penetration": 7.711609129046337e-12,
+      "min_spawn_clearance": 0.03499517693051857,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.5033176901130826,
+      "mean_speed_correction": 0.05743799206969614,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "0e47d15cb507aefa9f1c6256dce8ef6c84ccdff8dbd89abd8ed45b1c54673951",
+      "curve": [
+        1,
+        1,
+        2,
+        2,
+        3,
+        4,
+        5,
+        7,
+        7,
+        9,
+        12
+      ],
+      "thirds_population": [
+        3,
+        6,
+        12
+      ],
+      "by_region": [
+        0,
+        1,
+        1,
+        2,
+        4,
+        4
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        3,
+        3,
+        2
+      ],
+      "reached": [
+        4,
+        4,
+        5,
+        7,
+        6
+      ],
+      "crossed": [
+        4,
+        4,
+        4,
+        4,
+        2
+      ],
+      "crossings": [
+        10,
+        9,
+        7,
+        4,
+        2
+      ],
+      "regressions": [
+        9,
+        8,
+        5,
+        1,
+        0
+      ],
+      "dwell": [
+        14.433162,
+        15.996994,
+        25.666509,
+        28.630802,
+        19.647973,
+        0.173445
+      ],
+      "pass_rate": [
+        1.0,
+        1.0,
+        0.8,
+        0.5714285714285714,
+        0.3333333333333333
+      ],
+      "blocked": [
+        6,
+        8,
+        18,
+        29,
+        22
+      ],
+      "damage_absorbed": [
+        9.697574,
+        13.394431,
+        31.152325,
+        40.259298,
+        18.585047
+      ],
+      "collisions_per_shell": [
+        11,
+        18,
+        39,
+        49,
+        22
+      ],
+      "breaks_per_shell": [
+        4,
+        2,
+        3,
+        3,
+        2
+      ],
+      "collision_thirds": [
+        11,
+        41,
+        87
+      ],
+      "spawn_thirds": [
+        2,
+        3,
+        6
+      ],
+      "break_thirds": [
+        2,
+        4,
+        8
+      ],
+      "meaningful_thirds": [
+        33,
+        92,
+        177
+      ],
+      "escalation": {
+        "collisions": 7.333333333333333,
+        "spawns": 2.3333333333333335,
+        "breaks": 3.0,
+        "meaningful": 5.235294117647059,
+        "population": 3.25
+      }
+    },
+    {
+      "seed": 3622,
+      "flags": [],
+      "escaped": true,
+      "duration": 22.818286583520187,
+      "failure_reason": null,
+      "escape_route": "break",
+      "escape_generation": 3,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 11,
+      "population_max": 11,
+      "population_early": 2,
+      "generations": 5,
+      "suppressed": 0,
+      "spawns": 10,
+      "first_spawn": 0.44509147362173845,
+      "violations": 0,
+      "collisions": 120,
+      "collision_rate": 5.258939998004335,
+      "peak_collision_rate": 14.0,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 12,
+      "damage_events": 120,
+      "damage_scoring": 120,
+      "transitions": 67,
+      "breaks": 13,
+      "shared_breaks": 11,
+      "mean_break_cumulative": 3.6410971212584022,
+      "progression_opening": 31,
+      "progression_break": 5,
+      "meaningful_total": 298,
+      "meaningful_rate": 13.059700995044098,
+      "meaningful_peak": 29.0,
+      "stagnation": 0.8681652460465763,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 48,
+      "trajectory_spread": 0.32301363017094764,
+      "difficulty_increasing": false,
+      "max_penetration": 9.38260580340966e-12,
+      "min_spawn_clearance": 0.1308320823294391,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.7740348460769153,
+      "mean_speed_correction": 0.08488244519835199,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "4009b0a3d5bb71769d50020cd5b93588181faa4124868670b5e0774de4b61ba5",
+      "curve": [
+        1,
+        2,
+        2,
+        2,
+        2,
+        3,
+        4,
+        7,
+        9,
+        9,
+        11
+      ],
+      "thirds_population": [
+        2,
+        6,
+        11
+      ],
+      "by_region": [
+        1,
+        3,
+        2,
+        1,
+        2,
+        2
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        3,
+        3,
+        1
+      ],
+      "reached": [
+        3,
+        6,
+        7,
+        8,
+        6
+      ],
+      "crossed": [
+        3,
+        5,
+        4,
+        5,
+        1
+      ],
+      "crossings": [
+        11,
+        9,
+        6,
+        9,
+        1
+      ],
+      "regressions": [
+        11,
+        11,
+        8,
+        9,
+        0
+      ],
+      "dwell": [
+        13.695178,
+        31.362251,
+        18.612449,
+        25.862425,
+        15.367933,
+        0.135859
+      ],
+      "pass_rate": [
+        1.0,
+        0.8333333333333334,
+        0.5714285714285714,
+        0.625,
+        0.16666666666666666
+      ],
+      "blocked": [
+        8,
+        23,
+        10,
+        19,
+        18
+      ],
+      "damage_absorbed": [
+        7.68218,
+        19.957686,
+        21.502341,
+        24.541738,
+        16.757369
+      ],
+      "collisions_per_shell": [
+        17,
+        30,
+        27,
+        28,
+        18
+      ],
+      "breaks_per_shell": [
+        3,
+        4,
+        3,
+        2,
+        1
+      ],
+      "collision_thirds": [
+        13,
+        25,
+        82
+      ],
+      "spawn_thirds": [
+        1,
+        4,
+        5
+      ],
+      "break_thirds": [
+        0,
+        4,
+        9
+      ],
+      "meaningful_thirds": [
+        33,
+        79,
+        186
+      ],
+      "escalation": {
+        "collisions": 5.928571428571429,
+        "spawns": 3.0,
+        "breaks": 10.0,
+        "meaningful": 5.5,
+        "population": 4.0
+      }
+    },
+    {
+      "seed": 12818,
+      "flags": [],
+      "escaped": true,
+      "duration": 22.84318184382008,
+      "failure_reason": null,
+      "escape_route": "opening",
+      "escape_generation": 0,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 15,
+      "population_max": 15,
+      "population_early": 4,
+      "generations": 5,
+      "suppressed": 0,
+      "spawns": 14,
+      "first_spawn": 0.49515989042535224,
+      "violations": 0,
+      "collisions": 189,
+      "collision_rate": 8.273803592345496,
+      "peak_collision_rate": 16.0,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 11,
+      "damage_events": 189,
+      "damage_scoring": 189,
+      "transitions": 96,
+      "breaks": 19,
+      "shared_breaks": 18,
+      "mean_break_cumulative": 3.5617649340942674,
+      "progression_opening": 28,
+      "progression_break": 16,
+      "meaningful_total": 418,
+      "meaningful_rate": 18.298676728044537,
+      "meaningful_peak": 35.5,
+      "stagnation": 0.9868816885539149,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 70,
+      "trajectory_spread": 0.3167895166629657,
+      "difficulty_increasing": false,
+      "max_penetration": 8.990364008809593e-12,
+      "min_spawn_clearance": 0.009731100506735202,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.6996491385036044,
+      "mean_speed_correction": 0.08984246064581146,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "5c96f6d7a185b523b8667c84c1369b7b174824edccba8d3eb0a1312046fa9cd9",
+      "curve": [
+        1,
+        3,
+        4,
+        4,
+        4,
+        5,
+        6,
+        9,
+        13,
+        13,
+        15
+      ],
+      "thirds_population": [
+        4,
+        9,
+        15
+      ],
+      "by_region": [
+        1,
+        2,
+        3,
+        0,
+        7,
+        2
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        4,
+        6,
+        1
+      ],
+      "reached": [
+        6,
+        8,
+        9,
+        11,
+        12
+      ],
+      "crossed": [
+        6,
+        7,
+        5,
+        7,
+        1
+      ],
+      "crossings": [
+        10,
+        14,
+        9,
+        10,
+        1
+      ],
+      "regressions": [
+        10,
+        15,
+        11,
+        8,
+        0
+      ],
+      "dwell": [
+        14.507652,
+        25.271913,
+        33.821052,
+        51.138179,
+        33.742759,
+        0.189028
+      ],
+      "pass_rate": [
+        1.0,
+        0.875,
+        0.5555555555555556,
+        0.6363636363636364,
+        0.08333333333333333
+      ],
+      "blocked": [
+        6,
+        11,
+        22,
+        42,
+        34
+      ],
+      "damage_absorbed": [
+        10.798301,
+        18.490158,
+        40.27512,
+        43.503706,
+        25.645095
+      ],
+      "collisions_per_shell": [
+        15,
+        24,
+        53,
+        63,
+        34
+      ],
+      "breaks_per_shell": [
+        4,
+        5,
+        7,
+        3,
+        0
+      ],
+      "collision_thirds": [
+        22,
+        65,
+        102
+      ],
+      "spawn_thirds": [
+        3,
+        5,
+        6
+      ],
+      "break_thirds": [
+        1,
+        5,
+        13
+      ],
+      "meaningful_thirds": [
+        54,
+        133,
+        231
+      ],
+      "escalation": {
+        "collisions": 4.478260869565218,
+        "spawns": 1.75,
+        "breaks": 7.0,
+        "meaningful": 4.218181818181818,
+        "population": 3.2
+      }
+    },
+    {
+      "seed": 7183,
+      "flags": [],
+      "escaped": true,
+      "duration": 23.212396192108102,
+      "failure_reason": null,
+      "escape_route": "break",
+      "escape_generation": 3,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 13,
+      "population_max": 13,
+      "population_early": 2,
+      "generations": 5,
+      "suppressed": 0,
+      "spawns": 12,
+      "first_spawn": 0.6199176912432472,
+      "violations": 0,
+      "collisions": 155,
+      "collision_rate": 6.67746658799051,
+      "peak_collision_rate": 15.0,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 8,
+      "damage_events": 155,
+      "damage_scoring": 155,
+      "transitions": 76,
+      "breaks": 16,
+      "shared_breaks": 15,
+      "mean_break_cumulative": 3.184157423560191,
+      "progression_opening": 21,
+      "progression_break": 20,
+      "meaningful_total": 357,
+      "meaningful_rate": 15.379713367178143,
+      "meaningful_peak": 36.0,
+      "stagnation": 0.9753402718292044,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 59,
+      "trajectory_spread": 0.36884497378656816,
+      "difficulty_increasing": false,
+      "max_penetration": 8.737011114590132e-12,
+      "min_spawn_clearance": 0.027809774171839052,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.5011100784721055,
+      "mean_speed_correction": 0.058031117269117874,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "0915c69d8d9ca2c5b7061887df640e0f3025c8528d146a85544b7532735b8173",
+      "curve": [
+        1,
+        2,
+        2,
+        2,
+        3,
+        4,
+        5,
+        11,
+        12,
+        12,
+        13
+      ],
+      "thirds_population": [
+        3,
+        10,
+        13
+      ],
+      "by_region": [
+        3,
+        1,
+        2,
+        3,
+        2,
+        2
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        3,
+        5,
+        1
+      ],
+      "reached": [
+        5,
+        6,
+        10,
+        10,
+        10
+      ],
+      "crossed": [
+        5,
+        6,
+        5,
+        8,
+        1
+      ],
+      "crossings": [
+        16,
+        9,
+        5,
+        10,
+        1
+      ],
+      "regressions": [
+        18,
+        11,
+        7,
+        12,
+        0
+      ],
+      "dwell": [
+        25.712482,
+        22.111667,
+        27.382935,
+        34.858377,
+        26.710001,
+        0.133574
+      ],
+      "pass_rate": [
+        1.0,
+        1.0,
+        0.5,
+        0.8,
+        0.1
+      ],
+      "blocked": [
+        10,
+        14,
+        23,
+        23,
+        31
+      ],
+      "damage_absorbed": [
+        11.119769,
+        20.095951,
+        29.868812,
+        24.115609,
+        24.206876
+      ],
+      "collisions_per_shell": [
+        15,
+        25,
+        42,
+        42,
+        31
+      ],
+      "breaks_per_shell": [
+        5,
+        6,
+        3,
+        1,
+        1
+      ],
+      "collision_thirds": [
+        15,
+        37,
+        103
+      ],
+      "spawn_thirds": [
+        2,
+        7,
+        3
+      ],
+      "break_thirds": [
+        3,
+        5,
+        8
+      ],
+      "meaningful_thirds": [
+        45,
+        93,
+        219
+      ],
+      "escalation": {
+        "collisions": 6.5,
+        "spawns": 1.3333333333333333,
+        "breaks": 2.25,
+        "meaningful": 4.782608695652174,
+        "population": 3.5
+      }
+    },
+    {
+      "seed": 17693,
+      "flags": [],
+      "escaped": true,
+      "duration": 23.50499543298177,
+      "failure_reason": null,
+      "escape_route": "break",
+      "escape_generation": 0,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 10,
+      "population_max": 10,
+      "population_early": 2,
+      "generations": 4,
+      "suppressed": 0,
+      "spawns": 9,
+      "first_spawn": 3.554626552086483,
+      "violations": 0,
+      "collisions": 119,
+      "collision_rate": 5.062753589520866,
+      "peak_collision_rate": 14.0,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 6,
+      "damage_events": 119,
+      "damage_scoring": 118,
+      "transitions": 73,
+      "breaks": 13,
+      "shared_breaks": 11,
+      "mean_break_cumulative": 3.254065445958195,
+      "progression_opening": 38,
+      "progression_break": 8,
+      "meaningful_total": 312,
+      "meaningful_rate": 13.273774117063109,
+      "meaningful_peak": 28.5,
+      "stagnation": 1.1019134103125525,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 47,
+      "trajectory_spread": 0.260486368601799,
+      "difficulty_increasing": true,
+      "max_penetration": 9.532818978641444e-12,
+      "min_spawn_clearance": 0.15153979940459372,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.8109229065995613,
+      "mean_speed_correction": 0.08227345250769462,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "c6fc370a451315958e61e09e8b9023e9d998b28ddb91d800df18e0bbd27c5b0f",
+      "curve": [
+        1,
+        1,
+        2,
+        3,
+        3,
+        3,
+        6,
+        6,
+        9,
+        9,
+        10
+      ],
+      "thirds_population": [
+        3,
+        6,
+        10
+      ],
+      "by_region": [
+        1,
+        0,
+        3,
+        4,
+        0,
+        2
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "reached": [
+        5,
+        6,
+        8,
+        8,
+        4
+      ],
+      "crossed": [
+        5,
+        6,
+        6,
+        2,
+        1
+      ],
+      "crossings": [
+        17,
+        15,
+        9,
+        4,
+        1
+      ],
+      "regressions": [
+        17,
+        14,
+        9,
+        5,
+        0
+      ],
+      "dwell": [
+        20.605354,
+        27.581949,
+        26.23761,
+        24.459152,
+        11.848657,
+        0.136675
+      ],
+      "pass_rate": [
+        1.0,
+        1.0,
+        0.75,
+        0.25,
+        0.25
+      ],
+      "blocked": [
+        8,
+        13,
+        19,
+        21,
+        14
+      ],
+      "damage_absorbed": [
+        11.41326,
+        20.438009,
+        27.418833,
+        23.625634,
+        12.186505
+      ],
+      "collisions_per_shell": [
+        17,
+        25,
+        31,
+        32,
+        14
+      ],
+      "breaks_per_shell": [
+        4,
+        5,
+        3,
+        0,
+        1
+      ],
+      "collision_thirds": [
+        14,
+        34,
+        71
+      ],
+      "spawn_thirds": [
+        2,
+        3,
+        4
+      ],
+      "break_thirds": [
+        2,
+        4,
+        7
+      ],
+      "meaningful_thirds": [
+        41,
+        95,
+        176
+      ],
+      "escalation": {
+        "collisions": 4.8,
+        "spawns": 1.6666666666666667,
+        "breaks": 2.6666666666666665,
+        "meaningful": 4.214285714285714,
+        "population": 2.75
+      }
+    },
+    {
+      "seed": 6625,
+      "flags": [],
+      "escaped": true,
+      "duration": 23.871335279204096,
+      "failure_reason": null,
+      "escape_route": "break",
+      "escape_generation": 0,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 13,
+      "population_max": 13,
+      "population_early": 4,
+      "generations": 5,
+      "suppressed": 0,
+      "spawns": 12,
+      "first_spawn": 3.6204292891042846,
+      "violations": 0,
+      "collisions": 169,
+      "collision_rate": 7.079620726002165,
+      "peak_collision_rate": 14.5,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 16,
+      "damage_events": 169,
+      "damage_scoring": 169,
+      "transitions": 84,
+      "breaks": 17,
+      "shared_breaks": 17,
+      "mean_break_cumulative": 3.128246998450669,
+      "progression_opening": 37,
+      "progression_break": 15,
+      "meaningful_total": 402,
+      "meaningful_rate": 16.84028125356728,
+      "meaningful_peak": 30.0,
+      "stagnation": 1.113889943549272,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 60,
+      "trajectory_spread": 0.37493414841266454,
+      "difficulty_increasing": true,
+      "max_penetration": 7.553846437247103e-12,
+      "min_spawn_clearance": 0.008055278814721234,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.8835883339309788,
+      "mean_speed_correction": 0.07008320204574214,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "c83100cc77d7fec893eb209dde5151b2dfbbfd9e7bc1ff3526f1678ac2a13aaa",
+      "curve": [
+        1,
+        1,
+        4,
+        4,
+        4,
+        6,
+        8,
+        11,
+        11,
+        11,
+        13
+      ],
+      "thirds_population": [
+        4,
+        10,
+        13
+      ],
+      "by_region": [
+        1,
+        1,
+        3,
+        2,
+        4,
+        2
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        4,
+        4,
+        1
+      ],
+      "reached": [
+        4,
+        8,
+        8,
+        9,
+        8
+      ],
+      "crossed": [
+        4,
+        7,
+        7,
+        4,
+        1
+      ],
+      "crossings": [
+        12,
+        22,
+        12,
+        5,
+        1
+      ],
+      "regressions": [
+        12,
+        22,
+        13,
+        4,
+        0
+      ],
+      "dwell": [
+        18.638477,
+        36.423347,
+        39.247093,
+        32.303938,
+        30.686029,
+        0.133634
+      ],
+      "pass_rate": [
+        1.0,
+        0.875,
+        0.875,
+        0.4444444444444444,
+        0.125
+      ],
+      "blocked": [
+        10,
+        11,
+        28,
+        31,
+        31
+      ],
+      "damage_absorbed": [
+        10.243187,
+        22.045056,
+        32.494634,
+        32.51191,
+        22.032063
+      ],
+      "collisions_per_shell": [
+        18,
+        27,
+        39,
+        54,
+        31
+      ],
+      "breaks_per_shell": [
+        5,
+        6,
+        5,
+        0,
+        1
+      ],
+      "collision_thirds": [
+        23,
+        58,
+        88
+      ],
+      "spawn_thirds": [
+        3,
+        6,
+        3
+      ],
+      "break_thirds": [
+        3,
+        6,
+        8
+      ],
+      "meaningful_thirds": [
+        64,
+        137,
+        201
+      ],
+      "escalation": {
+        "collisions": 3.7083333333333335,
+        "spawns": 1.0,
+        "breaks": 2.25,
+        "meaningful": 3.1076923076923078,
+        "population": 2.8
+      }
+    },
+    {
+      "seed": 3909,
+      "flags": [],
+      "escaped": true,
+      "duration": 24.133031495831624,
+      "failure_reason": null,
+      "escape_route": "break",
+      "escape_generation": 0,
+      "frontier_region": 5,
+      "frontier_balls": 0,
+      "shell_count": 5,
+      "population_total": 13,
+      "population_max": 13,
+      "population_early": 4,
+      "generations": 4,
+      "suppressed": 0,
+      "spawns": 12,
+      "first_spawn": 1.5297130403724153,
+      "violations": 0,
+      "collisions": 168,
+      "collision_rate": 6.961413033792202,
+      "peak_collision_rate": 16.0,
+      "grazing": 0,
+      "ball_ball": 0,
+      "near_misses": 9,
+      "damage_events": 168,
+      "damage_scoring": 168,
+      "transitions": 79,
+      "breaks": 14,
+      "shared_breaks": 13,
+      "mean_break_cumulative": 3.4777732343531502,
+      "progression_opening": 28,
+      "progression_break": 10,
+      "meaningful_total": 356,
+      "meaningful_rate": 14.75156571446443,
+      "meaningful_peak": 33.0,
+      "stagnation": 1.0420901233984885,
+      "longest_cycle_run": 7,
+      "longest_cycle_period": 6,
+      "distinct_panels": 60,
+      "trajectory_spread": 0.31743752954687776,
+      "difficulty_increasing": true,
+      "max_penetration": 8.838929588250721e-12,
+      "min_spawn_clearance": 0.06556286482792117,
+      "speed_min": 9.999999999999998,
+      "speed_max": 10.000000000000002,
+      "max_speed_correction": 0.7357640392853302,
+      "mean_speed_correction": 0.07903043377880434,
+      "anomalous_crossings": 0,
+      "newton_failures": 0,
+      "reproduction_violations": 0,
+      "digest": "7250a860adc22d2442bc3788f627e8003221061698810a39e8667c0779968723",
+      "curve": [
+        1,
+        2,
+        4,
+        4,
+        6,
+        7,
+        7,
+        8,
+        8,
+        10,
+        13
+      ],
+      "thirds_population": [
+        4,
+        8,
+        13
+      ],
+      "by_region": [
+        0,
+        1,
+        3,
+        4,
+        3,
+        2
+      ],
+      "spawns_by_shell": [
+        1,
+        2,
+        4,
+        4,
+        1
+      ],
+      "reached": [
+        5,
+        5,
+        8,
+        11,
+        8
+      ],
+      "crossed": [
+        5,
+        5,
+        6,
+        5,
+        1
+      ],
+      "crossings": [
+        9,
+        12,
+        10,
+        6,
+        1
+      ],
+      "regressions": [
+        8,
+        11,
+        10,
+        6,
+        0
+      ],
+      "dwell": [
+        14.360457,
+        27.266784,
+        42.331839,
+        41.4817,
+        24.403584,
+        0.13381
+      ],
+      "pass_rate": [
+        1.0,
+        1.0,
+        0.75,
+        0.45454545454545453,
+        0.125
+      ],
+      "blocked": [
+        7,
+        15,
+        25,
+        33,
+        26
+      ],
+      "damage_absorbed": [
+        11.041898,
+        16.37512,
+        30.941677,
+        38.262989,
+        20.169511
+      ],
+      "collisions_per_shell": [
+        15,
+        24,
+        49,
+        54,
+        26
+      ],
+      "breaks_per_shell": [
+        5,
+        3,
+        3,
+        2,
+        1
+      ],
+      "collision_thirds": [
+        24,
+        53,
+        91
+      ],
+      "spawn_thirds": [
+        3,
+        4,
+        5
+      ],
+      "break_thirds": [
+        3,
+        6,
+        5
+      ],
+      "meaningful_thirds": [
+        61,
+        124,
+        171
+      ],
+      "escalation": {
+        "collisions": 3.68,
+        "spawns": 1.5,
+        "breaks": 1.5,
+        "meaningful": 2.774193548387097,
+        "population": 2.8
+      }
+    }
+  ]
+}

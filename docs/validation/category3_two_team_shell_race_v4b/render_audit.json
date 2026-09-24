@@ -1,0 +1,27 @@
+{
+  "format": 1,
+  "rows": [
+    {
+      "seed": 17964,
+      "fps": 30.0,
+      "frames": 774,
+      "digest_matches": true,
+      "max_position_error": 4.4784629889129575e-13,
+      "max_position_error_t": 24.4666666666667,
+      "panel_rows": 160992,
+      "panel_mismatches": 0,
+      "population_mismatch_frames": 0,
+      "max_centre_error_px": 6.103515625e-05,
+      "camera_stage_count_matches": true,
+      "max_camera_stage_error": 1.0658141036401503e-14,
+      "max_view_radius_error": 3.765876499528531e-13,
+      "wound_count_matches": true,
+      "wound_rows": 160,
+      "wound_mismatches": 0,
+      "max_wound_error": 4.996003610813204e-16,
+      "passage_count_matches": true,
+      "wear_rows": 142,
+      "max_wear_error": 0.0
+    }
+  ]
+}

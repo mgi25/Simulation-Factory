@@ -1,0 +1,1774 @@
+{
+  "axis": "damage_exponent",
+  "seeds": 800,
+  "rows": [
+    {
+      "value": 1.0,
+      "config_digest": "3cd6e367ac18168f25da7820a1a2d316f3543d94908a3a0b9d482fb950bcc695",
+      "difficulty": {
+        "shells": [
+          {
+            "shell_id": 0,
+            "radius": 6.0,
+            "panel_count": 12,
+            "openings": 3,
+            "opening_slots": 2,
+            "open_fraction": 0.5,
+            "gap_chord": 5.699999999999999,
+            "gap_over_diameter": 7.124999999999999,
+            "fits": true,
+            "break_threshold": 1.6,
+            "surface_speed": 3.7199999999999998
+          },
+          {
+            "shell_id": 1,
+            "radius": 10.6,
+            "panel_count": 16,
+            "openings": 3,
+            "opening_slots": 2,
+            "open_fraction": 0.375,
+            "gap_chord": 7.812888766139904,
+            "gap_over_diameter": 9.76611095767488,
+            "fits": true,
+            "break_threshold": 2.4,
+            "surface_speed": 3.7199999999999998
+          },
+          {
+            "shell_id": 2,
+            "radius": 15.2,
+            "panel_count": 20,
+            "openings": 2,
+            "opening_slots": 2,
+            "open_fraction": 0.2,
+            "gap_chord": 9.0941166289984,
+            "gap_over_diameter": 11.367645786248,
+            "fits": true,
+            "break_threshold": 3.6,
+            "surface_speed": 3.72
+          },
+          {
+            "shell_id": 3,
+            "radius": 19.799999999999997,
+            "panel_count": 26,
+            "openings": 2,
+            "opening_slots": 2,
+            "open_fraction": 0.15384615384615385,
+            "gap_chord": 9.176900305787285,
+            "gap_over_diameter": 11.471125382234106,
+            "fits": true,
+            "break_threshold": 5.2,
+            "surface_speed": 3.72
+          },
+          {
+            "shell_id": 4,
+            "radius": 24.4,
+            "panel_count": 32,
+            "openings": 2,
+            "opening_slots": 1,
+            "open_fraction": 0.0625,
+            "gap_chord": 4.4832364480825575,
+            "gap_over_diameter": 5.604045560103197,
+            "fits": true,
+            "break_threshold": 7.2,
+            "surface_speed": 3.72
+          }
+        ],
+        "open_fraction_monotonic": true,
+        "break_threshold_monotonic": true,
+        "all_fit": true,
+        "monotonic": true
+      },
+      "summary": {
+        "count": 800,
+        "escaped": 498,
+        "escape_rate": 0.6225,
+        "usable": 232,
+        "usable_rate": 0.29,
+        "in_band": 221,
+        "in_band_rate": 0.27625,
+        "preferred": 119,
+        "preferred_rate": 0.14875,
+        "failure_reasons": {
+          "timeout": 302,
+          "collision_cap": 0
+        },
+        "duration": {
+          "p5": 4.970549219453174,
+          "p25": 11.414704380245166,
+          "p50": 16.931536095843263,
+          "p75": 21.14677149457036,
+          "p95": 25.062003453347437
+        },
+        "duration_histogram": {
+          "0-6": 33,
+          "6-10": 56,
+          "10-14": 90,
+          "14-18": 98,
+          "18-20": 55,
+          "20-22": 61,
+          "22-24": 58,
+          "24-26": 47,
+          ">=26": 0
+        },
+        "population_total": {
+          "p5": 7,
+          "p25": 9,
+          "p50": 10,
+          "p75": 12,
+          "p95": 14
+        },
+        "population_max": {
+          "p5": 7,
+          "p25": 9,
+          "p50": 10,
+          "p75": 12,
+          "p95": 14
+        },
+        "population_histogram": {
+          "1-4": 0,
+          "4-7": 35,
+          "7-10": 264,
+          "10-13": 357,
+          "13-16": 129,
+          "16-20": 14,
+          "20-24": 1,
+          "24-28": 0,
+          "28-32": 0,
+          ">=32": 0
+        },
+        "population_curve": [
+          1.0,
+          2.035,
+          2.9275,
+          3.785,
+          4.56375,
+          5.48125,
+          6.27625,
+          7.0975,
+          8.0025,
+          8.83875,
+          10.37625
+        ],
+        "population_curve_in_band": [
+          1.0,
+          2.1131221719457014,
+          3.1357466063348416,
+          3.9728506787330318,
+          4.891402714932127,
+          5.828054298642534,
+          6.5565610859728505,
+          7.4343891402714934,
+          8.357466063348417,
+          9.393665158371041,
+          11.461538461538462
+        ],
+        "generations": {
+          "p5": 3,
+          "p25": 4,
+          "p50": 4,
+          "p75": 5,
+          "p95": 6
+        },
+        "spawns": {
+          "p5": 6,
+          "p25": 8,
+          "p50": 9,
+          "p75": 11,
+          "p95": 13
+        },
+        "first_spawn": {
+          "p5": 0.4307022827210757,
+          "p25": 0.5818463340312836,
+          "p50": 1.4073500942381862,
+          "p75": 2.589402740599903,
+          "p95": 6.75249525256867
+        },
+        "never_reproduced": 0,
+        "spawns_by_shell": [
+          1.0,
+          1.975,
+          3.11,
+          2.59375,
+          0.6975
+        ],
+        "reproduction_violations": 0,
+        "reached_by_shell": [
+          4.39875,
+          5.87,
+          7.11875,
+          7.77125,
+          5.1875
+        ],
+        "crossed_by_shell": [
+          4.21625,
+          5.3025,
+          5.02875,
+          3.2925,
+          0.6975
+        ],
+        "pass_rate_by_shell": [
+          0.9581458333333334,
+          0.8965319715007215,
+          0.6807666604229103,
+          0.4112715270840271,
+          0.16348958333333333
+        ],
+        "blocked_by_shell": [
+          5.855,
+          12.9125,
+          20.97625,
+          20.3625,
+          13.8675
+        ],
+        "dwell_by_region": [
+          15.440659643750001,
+          26.508339245000002,
+          29.7764653425,
+          24.37041465875,
+          13.11873231625,
+          0.10054027625
+        ],
+        "damage_by_shell": [
+          9.73982430875,
+          19.63961592875,
+          28.15006321375,
+          23.895164060000003,
+          12.0735985975
+        ],
+        "breaks": {
+          "p5": 3,
+          "p25": 9,
+          "p50": 15,
+          "p75": 19,
+          "p95": 25
+        },
+        "breaks_by_shell": [
+          4.41,
+          5.28625,
+          3.23,
+          0.96375,
+          0.18625
+        ],
+        "shared_breaks": {
+          "p5": 3,
+          "p25": 7,
+          "p50": 13,
+          "p75": 17,
+          "p95": 24
+        },
+        "shared_break_runs": 795,
+        "collision_rate": {
+          "p5": 2.923076923076923,
+          "p25": 4.269230769230769,
+          "p50": 5.538461538461538,
+          "p75": 6.96565733486196,
+          "p95": 9.471489067488957
+        },
+        "collision_rate_histogram": {
+          "0-2": 3,
+          "2-4": 160,
+          "4-6": 296,
+          "6-8": 234,
+          "8-10": 78,
+          "10-12": 29,
+          "12-16": 0,
+          ">=16": 0
+        },
+        "peak_collision_rate": {
+          "p5": 6.0,
+          "p25": 9.5,
+          "p50": 12.0,
+          "p75": 14.5,
+          "p95": 18.5
+        },
+        "peak_collision_histogram": {
+          "0-4": 3,
+          "4-8": 107,
+          "8-10": 123,
+          "10-12": 161,
+          "12-16": 282,
+          "16-20": 111,
+          "20-26": 13,
+          ">=26": 0
+        },
+        "meaningful_rate": {
+          "p5": 8.846153846153847,
+          "p25": 11.846153846153847,
+          "p50": 14.385144953967673,
+          "p75": 17.609625467970783,
+          "p95": 23.162045278968584
+        },
+        "meaningful_peak": {
+          "p5": 17.0,
+          "p25": 22.5,
+          "p50": 27.0,
+          "p75": 32.0,
+          "p95": 38.5
+        },
+        "escalation_meaningful": {
+          "p5": 1.2972972972972974,
+          "p25": 1.8888888888888888,
+          "p50": 2.6774193548387095,
+          "p75": 3.9375,
+          "p95": 8.090909090909092
+        },
+        "escalation_collisions": {
+          "p5": 1.1290322580645162,
+          "p25": 1.92,
+          "p50": 2.935483870967742,
+          "p75": 4.375,
+          "p95": 9.375
+        },
+        "escalation_population": {
+          "p5": 1.3333333333333333,
+          "p25": 1.8,
+          "p50": 2.25,
+          "p75": 3.0,
+          "p95": 5.5
+        },
+        "escalation_above_one": 0.9975,
+        "route_progression": {
+          "opening": 20934,
+          "break": 9423
+        },
+        "escape_route": {
+          "opening": 395,
+          "break": 103,
+          "anomaly": 0
+        },
+        "escape_generation": {
+          "p5": 1,
+          "p25": 1,
+          "p50": 2,
+          "p75": 3,
+          "p95": 4
+        },
+        "difficulty_increasing": 0.56375,
+        "pass_rate_monotonic": true,
+        "outer_shell_reached_rate": 0.93,
+        "outer_shell_crossed_rate": 0.62625,
+        "stagnation": {
+          "p5": 0.4846516227849,
+          "p25": 0.682801946223545,
+          "p50": 0.9806622334228918,
+          "p75": 1.0664887574157067,
+          "p95": 1.105498554096605
+        },
+        "trajectory_spread": {
+          "p5": 0.19470887260301864,
+          "p25": 0.2825122650587278,
+          "p50": 0.32597041256260273,
+          "p75": 0.3663732067369169,
+          "p95": 0.4237095506340804
+        },
+        "instruments": {
+          "max_penetration": 1.0010992035347499e-11,
+          "min_spawn_clearance": 7.933209335320157e-05,
+          "max_speed_correction": 0.8994708830324953,
+          "mean_speed_correction": 0.08077094635315037,
+          "speed_min": 9.999999999999996,
+          "speed_max": 10.000000000000004,
+          "anomalous_crossings": 0,
+          "newton_failures": 0,
+          "reproduction_violations": 0
+        },
+        "flags": {
+          "instrument_fault": 0,
+          "spawn_farming": 0,
+          "failed": 302,
+          "instant_escape": 134,
+          "population_weak": 53,
+          "population_explosive": 16,
+          "population_capped": 0,
+          "too_few_generations": 0,
+          "slow_first_spawn": 119,
+          "outer_shell_trivial": 0,
+          "frantic_peak": 96,
+          "frantic_mean": 60,
+          "sparse": 1,
+          "dead_stretch": 0,
+          "no_escalation": 16,
+          "repetitive_orbit": 0,
+          "few_distinct_panels": 37,
+          "clone_trajectories": 4,
+          "no_breaks": 4,
+          "no_opening_progress": 0
+        },
+        "in_band_flags": {
+          "instrument_fault": 0,
+          "spawn_farming": 0,
+          "failed": 0,
+          "instant_escape": 0,
+          "population_weak": 7,
+          "population_explosive": 3,
+          "population_capped": 0,
+          "too_few_generations": 0,
+          "slow_first_spawn": 36,
+          "outer_shell_trivial": 0,
+          "frantic_peak": 38,
+          "frantic_mean": 15,
+          "sparse": 0,
+          "dead_stretch": 0,
+          "no_escalation": 2,
+          "repetitive_orbit": 0,
+          "few_distinct_panels": 0,
+          "clone_trajectories": 0,
+          "no_breaks": 0,
+          "no_opening_progress": 0
+        },
+        "thresholds": {
+          "preferred_low": 20.0,
+          "preferred_high": 24.0,
+          "acceptable_low": 18.0,
+          "acceptable_high": 26.0,
+          "min_escape_seconds": 12.0,
+          "min_final_population": 5,
+          "min_late_population": 4,
+          "max_early_population": 8,
+          "early_fraction": 0.25,
+          "min_generations": 2,
+          "max_first_spawn_seconds": 4.0,
+          "max_outer_pass_rate": 0.85,
+          "max_peak_collision_rate": 16.0,
+          "max_collision_rate": 9.0,
+          "min_collision_rate": 1.5,
+          "audio_window": 2.0,
+          "max_stagnation_seconds": 4.0,
+          "min_escalation": 1.15,
+          "max_cycle_run": 10,
+          "max_cycle_period": 6,
+          "min_distinct_panels": 14,
+          "min_trajectory_spread": 0.1,
+          "min_breaks": 1,
+          "min_progression_openings": 2
+        }
+      }
+    },
+    {
+      "value": 1.5,
+      "config_digest": "16b3449e10abad86778fdd78147fec781ca3ed4c87e3d7b00cd4b9c4b96a1fc3",
+      "difficulty": {
+        "shells": [
+          {
+            "shell_id": 0,
+            "radius": 6.0,
+            "panel_count": 12,
+            "openings": 3,
+            "opening_slots": 2,
+            "open_fraction": 0.5,
+            "gap_chord": 5.699999999999999,
+            "gap_over_diameter": 7.124999999999999,
+            "fits": true,
+            "break_threshold": 1.6,
+            "surface_speed": 3.7199999999999998
+          },
+          {
+            "shell_id": 1,
+            "radius": 10.6,
+            "panel_count": 16,
+            "openings": 3,
+            "opening_slots": 2,
+            "open_fraction": 0.375,
+            "gap_chord": 7.812888766139904,
+            "gap_over_diameter": 9.76611095767488,
+            "fits": true,
+            "break_threshold": 2.4,
+            "surface_speed": 3.7199999999999998
+          },
+          {
+            "shell_id": 2,
+            "radius": 15.2,
+            "panel_count": 20,
+            "openings": 2,
+            "opening_slots": 2,
+            "open_fraction": 0.2,
+            "gap_chord": 9.0941166289984,
+            "gap_over_diameter": 11.367645786248,
+            "fits": true,
+            "break_threshold": 3.6,
+            "surface_speed": 3.72
+          },
+          {
+            "shell_id": 3,
+            "radius": 19.799999999999997,
+            "panel_count": 26,
+            "openings": 2,
+            "opening_slots": 2,
+            "open_fraction": 0.15384615384615385,
+            "gap_chord": 9.176900305787285,
+            "gap_over_diameter": 11.471125382234106,
+            "fits": true,
+            "break_threshold": 5.2,
+            "surface_speed": 3.72
+          },
+          {
+            "shell_id": 4,
+            "radius": 24.4,
+            "panel_count": 32,
+            "openings": 2,
+            "opening_slots": 1,
+            "open_fraction": 0.0625,
+            "gap_chord": 4.4832364480825575,
+            "gap_over_diameter": 5.604045560103197,
+            "fits": true,
+            "break_threshold": 7.2,
+            "surface_speed": 3.72
+          }
+        ],
+        "open_fraction_monotonic": true,
+        "break_threshold_monotonic": true,
+        "all_fit": true,
+        "monotonic": true
+      },
+      "summary": {
+        "count": 800,
+        "escaped": 510,
+        "escape_rate": 0.6375,
+        "usable": 226,
+        "usable_rate": 0.2825,
+        "in_band": 232,
+        "in_band_rate": 0.29,
+        "preferred": 127,
+        "preferred_rate": 0.15875,
+        "failure_reasons": {
+          "timeout": 290,
+          "collision_cap": 0
+        },
+        "duration": {
+          "p5": 4.970549219453174,
+          "p25": 11.321624318259566,
+          "p50": 17.05345910168973,
+          "p75": 21.437973821984762,
+          "p95": 24.85558504797931
+        },
+        "duration_histogram": {
+          "0-6": 33,
+          "6-10": 54,
+          "10-14": 99,
+          "14-18": 92,
+          "18-20": 56,
+          "20-22": 66,
+          "22-24": 61,
+          "24-26": 49,
+          ">=26": 0
+        },
+        "population_total": {
+          "p5": 7,
+          "p25": 9,
+          "p50": 10,
+          "p75": 12,
+          "p95": 14
+        },
+        "population_max": {
+          "p5": 7,
+          "p25": 9,
+          "p50": 10,
+          "p75": 12,
+          "p95": 14
+        },
+        "population_histogram": {
+          "1-4": 0,
+          "4-7": 35,
+          "7-10": 254,
+          "10-13": 369,
+          "13-16": 125,
+          "16-20": 16,
+          "20-24": 1,
+          "24-28": 0,
+          "28-32": 0,
+          ">=32": 0
+        },
+        "population_curve": [
+          1.0,
+          2.01625,
+          2.93,
+          3.78875,
+          4.56375,
+          5.45375,
+          6.25,
+          7.10625,
+          8.02625,
+          8.86875,
+          10.3675
+        ],
+        "population_curve_in_band": [
+          1.0,
+          2.1206896551724137,
+          3.1767241379310347,
+          4.043103448275862,
+          4.943965517241379,
+          5.831896551724138,
+          6.642241379310345,
+          7.491379310344827,
+          8.383620689655173,
+          9.426724137931034,
+          11.379310344827585
+        ],
+        "generations": {
+          "p5": 3,
+          "p25": 4,
+          "p50": 4,
+          "p75": 5,
+          "p95": 6
+        },
+        "spawns": {
+          "p5": 6,
+          "p25": 8,
+          "p50": 9,
+          "p75": 11,
+          "p95": 13
+        },
+        "first_spawn": {
+          "p5": 0.4307022827210757,
+          "p25": 0.5818463340312836,
+          "p50": 1.4073500942381862,
+          "p75": 2.589402740599903,
+          "p95": 6.75249525256867
+        },
+        "never_reproduced": 0,
+        "spawns_by_shell": [
+          1.0,
+          1.9725,
+          3.07625,
+          2.625,
+          0.69375
+        ],
+        "reproduction_violations": 0,
+        "reached_by_shell": [
+          4.30625,
+          5.73875,
+          7.03625,
+          7.7225,
+          5.25125
+        ],
+        "crossed_by_shell": [
+          4.11625,
+          5.15625,
+          4.9225,
+          3.3375,
+          0.69375
+        ],
+        "pass_rate_by_shell": [
+          0.9573834325396825,
+          0.8927548874736375,
+          0.6732873168498169,
+          0.41896976634476635,
+          0.159046875
+        ],
+        "blocked_by_shell": [
+          6.04375,
+          13.12,
+          21.1625,
+          20.5175,
+          14.1925
+        ],
+        "dwell_by_region": [
+          15.078074418749999,
+          26.0732721825,
+          29.4552311625,
+          24.5022818825,
+          13.43790255875,
+          0.09843029375000001
+        ],
+        "damage_by_shell": [
+          9.5536857525,
+          18.920189996250002,
+          26.92691770375,
+          22.584010435,
+          11.672421702500001
+        ],
+        "breaks": {
+          "p5": 2,
+          "p25": 8,
+          "p50": 13,
+          "p75": 18,
+          "p95": 24
+        },
+        "breaks_by_shell": [
+          4.15,
+          4.88875,
+          2.95125,
+          0.9425,
+          0.18375
+        ],
+        "shared_breaks": {
+          "p5": 2,
+          "p25": 7,
+          "p50": 12,
+          "p75": 16,
+          "p95": 22
+        },
+        "shared_break_runs": 795,
+        "collision_rate": {
+          "p5": 3.076923076923077,
+          "p25": 4.408971812340122,
+          "p50": 5.6923076923076925,
+          "p75": 7.184064922927628,
+          "p95": 9.721933627753552
+        },
+        "collision_rate_histogram": {
+          "0-2": 4,
+          "2-4": 138,
+          "4-6": 296,
+          "6-8": 240,
+          "8-10": 90,
+          "10-12": 31,
+          "12-16": 1,
+          ">=16": 0
+        },
+        "peak_collision_rate": {
+          "p5": 6.5,
+          "p25": 9.5,
+          "p50": 12.0,
+          "p75": 15.0,
+          "p95": 18.5
+        },
+        "peak_collision_histogram": {
+          "0-4": 4,
+          "4-8": 82,
+          "8-10": 122,
+          "10-12": 165,
+          "12-16": 281,
+          "16-20": 122,
+          "20-26": 23,
+          ">=26": 1
+        },
+        "meaningful_rate": {
+          "p5": 8.73076923076923,
+          "p25": 11.753980974980273,
+          "p50": 14.231458666765972,
+          "p75": 17.40199179448427,
+          "p95": 22.84778667326265
+        },
+        "meaningful_peak": {
+          "p5": 17.0,
+          "p25": 22.5,
+          "p50": 27.0,
+          "p75": 31.5,
+          "p95": 39.0
+        },
+        "escalation_meaningful": {
+          "p5": 1.3291139240506329,
+          "p25": 1.9183673469387754,
+          "p50": 2.7083333333333335,
+          "p75": 4.105263157894737,
+          "p95": 8.0
+        },
+        "escalation_collisions": {
+          "p5": 1.236842105263158,
+          "p25": 1.9545454545454546,
+          "p50": 3.0,
+          "p75": 4.666666666666667,
+          "p95": 9.555555555555555
+        },
+        "escalation_population": {
+          "p5": 1.3333333333333333,
+          "p25": 1.75,
+          "p50": 2.25,
+          "p75": 3.0,
+          "p95": 5.5
+        },
+        "escalation_above_one": 0.99625,
+        "route_progression": {
+          "opening": 20674,
+          "break": 8619
+        },
+        "escape_route": {
+          "opening": 408,
+          "break": 102,
+          "anomaly": 0
+        },
+        "escape_generation": {
+          "p5": 0,
+          "p25": 1,
+          "p50": 2,
+          "p75": 3,
+          "p95": 4
+        },
+        "difficulty_increasing": 0.5625,
+        "pass_rate_monotonic": true,
+        "outer_shell_reached_rate": 0.92625,
+        "outer_shell_crossed_rate": 0.64,
+        "stagnation": {
+          "p5": 0.4828348986684539,
+          "p25": 0.6818012434557383,
+          "p50": 0.9792254473818156,
+          "p75": 1.066349822843291,
+          "p95": 1.105498554096605
+        },
+        "trajectory_spread": {
+          "p5": 0.19614516188566905,
+          "p25": 0.27734895632650913,
+          "p50": 0.32278553034979507,
+          "p75": 0.3689615974632791,
+          "p95": 0.4167947825529379
+        },
+        "instruments": {
+          "max_penetration": 9.997891403656922e-12,
+          "min_spawn_clearance": 7.933209335320157e-05,
+          "max_speed_correction": 0.9015545193778077,
+          "mean_speed_correction": 0.08050299397049324,
+          "speed_min": 9.999999999999996,
+          "speed_max": 10.000000000000004,
+          "anomalous_crossings": 0,
+          "newton_failures": 0,
+          "reproduction_violations": 0
+        },
+        "flags": {
+          "instrument_fault": 0,
+          "spawn_farming": 0,
+          "failed": 290,
+          "instant_escape": 140,
+          "population_weak": 52,
+          "population_explosive": 13,
+          "population_capped": 0,
+          "too_few_generations": 0,
+          "slow_first_spawn": 119,
+          "outer_shell_trivial": 0,
+          "frantic_peak": 115,
+          "frantic_mean": 63,
+          "sparse": 1,
+          "dead_stretch": 0,
+          "no_escalation": 13,
+          "repetitive_orbit": 0,
+          "few_distinct_panels": 37,
+          "clone_trajectories": 4,
+          "no_breaks": 5,
+          "no_opening_progress": 0
+        },
+        "in_band_flags": {
+          "instrument_fault": 0,
+          "spawn_farming": 0,
+          "failed": 0,
+          "instant_escape": 0,
+          "population_weak": 4,
+          "population_explosive": 5,
+          "population_capped": 0,
+          "too_few_generations": 0,
+          "slow_first_spawn": 38,
+          "outer_shell_trivial": 0,
+          "frantic_peak": 55,
+          "frantic_mean": 22,
+          "sparse": 0,
+          "dead_stretch": 0,
+          "no_escalation": 1,
+          "repetitive_orbit": 0,
+          "few_distinct_panels": 0,
+          "clone_trajectories": 0,
+          "no_breaks": 0,
+          "no_opening_progress": 0
+        },
+        "thresholds": {
+          "preferred_low": 20.0,
+          "preferred_high": 24.0,
+          "acceptable_low": 18.0,
+          "acceptable_high": 26.0,
+          "min_escape_seconds": 12.0,
+          "min_final_population": 5,
+          "min_late_population": 4,
+          "max_early_population": 8,
+          "early_fraction": 0.25,
+          "min_generations": 2,
+          "max_first_spawn_seconds": 4.0,
+          "max_outer_pass_rate": 0.85,
+          "max_peak_collision_rate": 16.0,
+          "max_collision_rate": 9.0,
+          "min_collision_rate": 1.5,
+          "audio_window": 2.0,
+          "max_stagnation_seconds": 4.0,
+          "min_escalation": 1.15,
+          "max_cycle_run": 10,
+          "max_cycle_period": 6,
+          "min_distinct_panels": 14,
+          "min_trajectory_spread": 0.1,
+          "min_breaks": 1,
+          "min_progression_openings": 2
+        }
+      }
+    },
+    {
+      "value": 2.0,
+      "config_digest": "dcf3c2bf05879e087246bd3ae22bacbb273d64411405356fd5f329bf8c1ea0bd",
+      "difficulty": {
+        "shells": [
+          {
+            "shell_id": 0,
+            "radius": 6.0,
+            "panel_count": 12,
+            "openings": 3,
+            "opening_slots": 2,
+            "open_fraction": 0.5,
+            "gap_chord": 5.699999999999999,
+            "gap_over_diameter": 7.124999999999999,
+            "fits": true,
+            "break_threshold": 1.6,
+            "surface_speed": 3.7199999999999998
+          },
+          {
+            "shell_id": 1,
+            "radius": 10.6,
+            "panel_count": 16,
+            "openings": 3,
+            "opening_slots": 2,
+            "open_fraction": 0.375,
+            "gap_chord": 7.812888766139904,
+            "gap_over_diameter": 9.76611095767488,
+            "fits": true,
+            "break_threshold": 2.4,
+            "surface_speed": 3.7199999999999998
+          },
+          {
+            "shell_id": 2,
+            "radius": 15.2,
+            "panel_count": 20,
+            "openings": 2,
+            "opening_slots": 2,
+            "open_fraction": 0.2,
+            "gap_chord": 9.0941166289984,
+            "gap_over_diameter": 11.367645786248,
+            "fits": true,
+            "break_threshold": 3.6,
+            "surface_speed": 3.72
+          },
+          {
+            "shell_id": 3,
+            "radius": 19.799999999999997,
+            "panel_count": 26,
+            "openings": 2,
+            "opening_slots": 2,
+            "open_fraction": 0.15384615384615385,
+            "gap_chord": 9.176900305787285,
+            "gap_over_diameter": 11.471125382234106,
+            "fits": true,
+            "break_threshold": 5.2,
+            "surface_speed": 3.72
+          },
+          {
+            "shell_id": 4,
+            "radius": 24.4,
+            "panel_count": 32,
+            "openings": 2,
+            "opening_slots": 1,
+            "open_fraction": 0.0625,
+            "gap_chord": 4.4832364480825575,
+            "gap_over_diameter": 5.604045560103197,
+            "fits": true,
+            "break_threshold": 7.2,
+            "surface_speed": 3.72
+          }
+        ],
+        "open_fraction_monotonic": true,
+        "break_threshold_monotonic": true,
+        "all_fit": true,
+        "monotonic": true
+      },
+      "summary": {
+        "count": 800,
+        "escaped": 520,
+        "escape_rate": 0.65,
+        "usable": 233,
+        "usable_rate": 0.29125,
+        "in_band": 236,
+        "in_band_rate": 0.295,
+        "preferred": 124,
+        "preferred_rate": 0.155,
+        "failure_reasons": {
+          "timeout": 280,
+          "collision_cap": 0
+        },
+        "duration": {
+          "p5": 5.371331599665557,
+          "p25": 11.779818938710774,
+          "p50": 17.223743982234936,
+          "p75": 21.272195157180562,
+          "p95": 24.86817830017778
+        },
+        "duration_histogram": {
+          "0-6": 30,
+          "6-10": 57,
+          "10-14": 94,
+          "14-18": 103,
+          "18-20": 63,
+          "20-22": 67,
+          "22-24": 57,
+          "24-26": 49,
+          ">=26": 0
+        },
+        "population_total": {
+          "p5": 7,
+          "p25": 9,
+          "p50": 10,
+          "p75": 12,
+          "p95": 14
+        },
+        "population_max": {
+          "p5": 7,
+          "p25": 9,
+          "p50": 10,
+          "p75": 12,
+          "p95": 14
+        },
+        "population_histogram": {
+          "1-4": 0,
+          "4-7": 31,
+          "7-10": 287,
+          "10-13": 339,
+          "13-16": 130,
+          "16-20": 12,
+          "20-24": 1,
+          "24-28": 0,
+          "28-32": 0,
+          ">=32": 0
+        },
+        "population_curve": [
+          1.0,
+          2.0325,
+          2.9425,
+          3.77375,
+          4.58625,
+          5.43625,
+          6.2275,
+          7.03875,
+          7.95125,
+          8.76875,
+          10.3025
+        ],
+        "population_curve_in_band": [
+          1.0,
+          2.1779661016949152,
+          3.1779661016949152,
+          3.9533898305084745,
+          4.906779661016949,
+          5.805084745762712,
+          6.6059322033898304,
+          7.389830508474576,
+          8.364406779661017,
+          9.25,
+          11.275423728813559
+        ],
+        "generations": {
+          "p5": 3,
+          "p25": 4,
+          "p50": 4,
+          "p75": 5,
+          "p95": 6
+        },
+        "spawns": {
+          "p5": 6,
+          "p25": 8,
+          "p50": 9,
+          "p75": 11,
+          "p95": 13
+        },
+        "first_spawn": {
+          "p5": 0.4307022827210757,
+          "p25": 0.5818463340312836,
+          "p50": 1.4073500942381862,
+          "p75": 2.589402740599903,
+          "p95": 6.758682070423303
+        },
+        "never_reproduced": 0,
+        "spawns_by_shell": [
+          1.0,
+          1.97,
+          3.03875,
+          2.59125,
+          0.7025
+        ],
+        "reproduction_violations": 0,
+        "reached_by_shell": [
+          4.22375,
+          5.64125,
+          6.92625,
+          7.6,
+          5.1825
+        ],
+        "crossed_by_shell": [
+          4.02,
+          5.04625,
+          4.8275,
+          3.3075,
+          0.7025
+        ],
+        "pass_rate_by_shell": [
+          0.9513809523809523,
+          0.8875627705627706,
+          0.6705745018870019,
+          0.42670736208236204,
+          0.16422470238095235
+        ],
+        "blocked_by_shell": [
+          6.26,
+          13.41,
+          20.9425,
+          20.565,
+          14.445
+        ],
+        "dwell_by_region": [
+          14.92967756,
+          25.75532546875,
+          28.9233484425,
+          24.45838268,
+          13.676544745000001,
+          0.10112000125
+        ],
+        "damage_by_shell": [
+          9.434301585,
+          18.1958439525,
+          25.4151191375,
+          21.6876144025,
+          11.2779104675
+        ],
+        "breaks": {
+          "p5": 2,
+          "p25": 8,
+          "p50": 13,
+          "p75": 17,
+          "p95": 22
+        },
+        "breaks_by_shell": [
+          4.02,
+          4.53375,
+          2.6825,
+          0.92375,
+          0.1875
+        ],
+        "shared_breaks": {
+          "p5": 2,
+          "p25": 6,
+          "p50": 11,
+          "p75": 15,
+          "p95": 21
+        },
+        "shared_break_runs": 793,
+        "collision_rate": {
+          "p5": 3.1247199428594037,
+          "p25": 4.456408789337224,
+          "p50": 5.758718972466743,
+          "p75": 7.230769230769231,
+          "p95": 9.767904745209163
+        },
+        "collision_rate_histogram": {
+          "0-2": 3,
+          "2-4": 136,
+          "4-6": 299,
+          "6-8": 234,
+          "8-10": 89,
+          "10-12": 36,
+          "12-16": 3,
+          ">=16": 0
+        },
+        "peak_collision_rate": {
+          "p5": 6.5,
+          "p25": 9.5,
+          "p50": 12.5,
+          "p75": 15.0,
+          "p95": 19.0
+        },
+        "peak_collision_histogram": {
+          "0-4": 3,
+          "4-8": 90,
+          "8-10": 117,
+          "10-12": 144,
+          "12-16": 288,
+          "16-20": 134,
+          "20-26": 23,
+          ">=26": 1
+        },
+        "meaningful_rate": {
+          "p5": 8.615384615384615,
+          "p25": 11.384615384615385,
+          "p50": 13.923076923076923,
+          "p75": 17.0,
+          "p95": 22.768869730740803
+        },
+        "meaningful_peak": {
+          "p5": 17.0,
+          "p25": 22.0,
+          "p50": 26.5,
+          "p75": 31.5,
+          "p95": 38.5
+        },
+        "escalation_meaningful": {
+          "p5": 1.3333333333333333,
+          "p25": 1.9090909090909092,
+          "p50": 2.6486486486486487,
+          "p75": 4.066666666666666,
+          "p95": 7.8
+        },
+        "escalation_collisions": {
+          "p5": 1.25,
+          "p25": 2.0,
+          "p50": 3.0,
+          "p75": 4.666666666666667,
+          "p95": 9.666666666666666
+        },
+        "escalation_population": {
+          "p5": 1.3333333333333333,
+          "p25": 1.75,
+          "p50": 2.25,
+          "p75": 3.0,
+          "p95": 5.333333333333333
+        },
+        "escalation_above_one": 0.99625,
+        "route_progression": {
+          "opening": 20400,
+          "break": 8058
+        },
+        "escape_route": {
+          "opening": 419,
+          "break": 101,
+          "anomaly": 0
+        },
+        "escape_generation": {
+          "p5": 0,
+          "p25": 2,
+          "p50": 2,
+          "p75": 3,
+          "p95": 4
+        },
+        "difficulty_increasing": 0.52875,
+        "pass_rate_monotonic": true,
+        "outer_shell_reached_rate": 0.935,
+        "outer_shell_crossed_rate": 0.65375,
+        "stagnation": {
+          "p5": 0.487367296266902,
+          "p25": 0.6808915765423389,
+          "p50": 0.972244051530631,
+          "p75": 1.066349822843291,
+          "p95": 1.1045733300978167
+        },
+        "trajectory_spread": {
+          "p5": 0.19202059632920446,
+          "p25": 0.27850866665864266,
+          "p50": 0.3244899667087279,
+          "p75": 0.36708405889892115,
+          "p95": 0.41937155179054786
+        },
+        "instruments": {
+          "max_penetration": 9.997891403656922e-12,
+          "min_spawn_clearance": 7.933209335320157e-05,
+          "max_speed_correction": 0.9054968526807847,
+          "mean_speed_correction": 0.08002426545376229,
+          "speed_min": 9.999999999999996,
+          "speed_max": 10.000000000000004,
+          "anomalous_crossings": 0,
+          "newton_failures": 0,
+          "reproduction_violations": 0
+        },
+        "flags": {
+          "instrument_fault": 0,
+          "spawn_farming": 0,
+          "failed": 280,
+          "instant_escape": 136,
+          "population_weak": 47,
+          "population_explosive": 13,
+          "population_capped": 0,
+          "too_few_generations": 0,
+          "slow_first_spawn": 119,
+          "outer_shell_trivial": 0,
+          "frantic_peak": 121,
+          "frantic_mean": 67,
+          "sparse": 1,
+          "dead_stretch": 0,
+          "no_escalation": 13,
+          "repetitive_orbit": 0,
+          "few_distinct_panels": 38,
+          "clone_trajectories": 4,
+          "no_breaks": 5,
+          "no_opening_progress": 0
+        },
+        "in_band_flags": {
+          "instrument_fault": 0,
+          "spawn_farming": 0,
+          "failed": 0,
+          "instant_escape": 0,
+          "population_weak": 4,
+          "population_explosive": 8,
+          "population_capped": 0,
+          "too_few_generations": 0,
+          "slow_first_spawn": 41,
+          "outer_shell_trivial": 0,
+          "frantic_peak": 52,
+          "frantic_mean": 24,
+          "sparse": 0,
+          "dead_stretch": 0,
+          "no_escalation": 2,
+          "repetitive_orbit": 0,
+          "few_distinct_panels": 0,
+          "clone_trajectories": 0,
+          "no_breaks": 0,
+          "no_opening_progress": 0
+        },
+        "thresholds": {
+          "preferred_low": 20.0,
+          "preferred_high": 24.0,
+          "acceptable_low": 18.0,
+          "acceptable_high": 26.0,
+          "min_escape_seconds": 12.0,
+          "min_final_population": 5,
+          "min_late_population": 4,
+          "max_early_population": 8,
+          "early_fraction": 0.25,
+          "min_generations": 2,
+          "max_first_spawn_seconds": 4.0,
+          "max_outer_pass_rate": 0.85,
+          "max_peak_collision_rate": 16.0,
+          "max_collision_rate": 9.0,
+          "min_collision_rate": 1.5,
+          "audio_window": 2.0,
+          "max_stagnation_seconds": 4.0,
+          "min_escalation": 1.15,
+          "max_cycle_run": 10,
+          "max_cycle_period": 6,
+          "min_distinct_panels": 14,
+          "min_trajectory_spread": 0.1,
+          "min_breaks": 1,
+          "min_progression_openings": 2
+        }
+      }
+    },
+    {
+      "value": 3.0,
+      "config_digest": "64aa30ac50f95bd667a3a62ff570485b2e92d149a724ec73a9aeee33bf79ec60",
+      "difficulty": {
+        "shells": [
+          {
+            "shell_id": 0,
+            "radius": 6.0,
+            "panel_count": 12,
+            "openings": 3,
+            "opening_slots": 2,
+            "open_fraction": 0.5,
+            "gap_chord": 5.699999999999999,
+            "gap_over_diameter": 7.124999999999999,
+            "fits": true,
+            "break_threshold": 1.6,
+            "surface_speed": 3.7199999999999998
+          },
+          {
+            "shell_id": 1,
+            "radius": 10.6,
+            "panel_count": 16,
+            "openings": 3,
+            "opening_slots": 2,
+            "open_fraction": 0.375,
+            "gap_chord": 7.812888766139904,
+            "gap_over_diameter": 9.76611095767488,
+            "fits": true,
+            "break_threshold": 2.4,
+            "surface_speed": 3.7199999999999998
+          },
+          {
+            "shell_id": 2,
+            "radius": 15.2,
+            "panel_count": 20,
+            "openings": 2,
+            "opening_slots": 2,
+            "open_fraction": 0.2,
+            "gap_chord": 9.0941166289984,
+            "gap_over_diameter": 11.367645786248,
+            "fits": true,
+            "break_threshold": 3.6,
+            "surface_speed": 3.72
+          },
+          {
+            "shell_id": 3,
+            "radius": 19.799999999999997,
+            "panel_count": 26,
+            "openings": 2,
+            "opening_slots": 2,
+            "open_fraction": 0.15384615384615385,
+            "gap_chord": 9.176900305787285,
+            "gap_over_diameter": 11.471125382234106,
+            "fits": true,
+            "break_threshold": 5.2,
+            "surface_speed": 3.72
+          },
+          {
+            "shell_id": 4,
+            "radius": 24.4,
+            "panel_count": 32,
+            "openings": 2,
+            "opening_slots": 1,
+            "open_fraction": 0.0625,
+            "gap_chord": 4.4832364480825575,
+            "gap_over_diameter": 5.604045560103197,
+            "fits": true,
+            "break_threshold": 7.2,
+            "surface_speed": 3.72
+          }
+        ],
+        "open_fraction_monotonic": true,
+        "break_threshold_monotonic": true,
+        "all_fit": true,
+        "monotonic": true
+      },
+      "summary": {
+        "count": 800,
+        "escaped": 495,
+        "escape_rate": 0.61875,
+        "usable": 207,
+        "usable_rate": 0.25875,
+        "in_band": 218,
+        "in_band_rate": 0.2725,
+        "preferred": 119,
+        "preferred_rate": 0.14875,
+        "failure_reasons": {
+          "timeout": 305,
+          "collision_cap": 0
+        },
+        "duration": {
+          "p5": 5.021491633338808,
+          "p25": 11.414704380245166,
+          "p50": 16.936967430109192,
+          "p75": 21.102789838174065,
+          "p95": 24.637688867855246
+        },
+        "duration_histogram": {
+          "0-6": 33,
+          "6-10": 57,
+          "10-14": 92,
+          "14-18": 95,
+          "18-20": 58,
+          "20-22": 66,
+          "22-24": 53,
+          "24-26": 41,
+          ">=26": 0
+        },
+        "population_total": {
+          "p5": 7,
+          "p25": 9,
+          "p50": 10,
+          "p75": 12,
+          "p95": 14
+        },
+        "population_max": {
+          "p5": 7,
+          "p25": 9,
+          "p50": 10,
+          "p75": 12,
+          "p95": 14
+        },
+        "population_histogram": {
+          "1-4": 0,
+          "4-7": 30,
+          "7-10": 275,
+          "10-13": 355,
+          "13-16": 131,
+          "16-20": 8,
+          "20-24": 1,
+          "24-28": 0,
+          "28-32": 0,
+          ">=32": 0
+        },
+        "population_curve": [
+          1.0,
+          2.0225,
+          2.91625,
+          3.7375,
+          4.57625,
+          5.40875,
+          6.2025,
+          7.085,
+          7.99375,
+          8.84875,
+          10.29125
+        ],
+        "population_curve_in_band": [
+          1.0,
+          2.1055045871559632,
+          3.146788990825688,
+          4.013761467889908,
+          4.986238532110092,
+          5.798165137614679,
+          6.614678899082569,
+          7.481651376146789,
+          8.435779816513762,
+          9.353211009174313,
+          11.357798165137615
+        ],
+        "generations": {
+          "p5": 3,
+          "p25": 4,
+          "p50": 4,
+          "p75": 5,
+          "p95": 5
+        },
+        "spawns": {
+          "p5": 6,
+          "p25": 8,
+          "p50": 9,
+          "p75": 11,
+          "p95": 13
+        },
+        "first_spawn": {
+          "p5": 0.4307022827210757,
+          "p25": 0.5818463340312836,
+          "p50": 1.4073500942381862,
+          "p75": 2.589402740599903,
+          "p95": 6.773458716108342
+        },
+        "never_reproduced": 0,
+        "spawns_by_shell": [
+          1.0,
+          1.9725,
+          3.05625,
+          2.59,
+          0.6725
+        ],
+        "reproduction_violations": 0,
+        "reached_by_shell": [
+          4.125,
+          5.53125,
+          6.8975,
+          7.645,
+          5.18
+        ],
+        "crossed_by_shell": [
+          3.93625,
+          4.95,
+          4.81375,
+          3.31375,
+          0.6725
+        ],
+        "pass_rate_by_shell": [
+          0.9547182539682539,
+          0.8887301587301587,
+          0.675676008019758,
+          0.425562166999667,
+          0.15298883928571427
+        ],
+        "blocked_by_shell": [
+          6.56875,
+          13.48125,
+          21.6425,
+          20.93375,
+          14.68
+        ],
+        "dwell_by_region": [
+          14.62664243875,
+          25.512057730000002,
+          29.485135852499997,
+          24.754269455,
+          13.893368725,
+          0.09586930499999999
+        ],
+        "damage_by_shell": [
+          9.33337537375,
+          17.372549536250002,
+          23.95025461875,
+          20.19244600375,
+          10.4955831175
+        ],
+        "breaks": {
+          "p5": 2,
+          "p25": 7,
+          "p50": 11,
+          "p75": 15,
+          "p95": 20
+        },
+        "breaks_by_shell": [
+          3.7075,
+          4.1125,
+          2.4225,
+          0.82625,
+          0.17125
+        ],
+        "shared_breaks": {
+          "p5": 2,
+          "p25": 6,
+          "p50": 10,
+          "p75": 14,
+          "p95": 19
+        },
+        "shared_break_runs": 790,
+        "collision_rate": {
+          "p5": 3.147648079897528,
+          "p25": 4.538461538461538,
+          "p50": 5.988307722129059,
+          "p75": 7.334302697145111,
+          "p95": 10.09883690062565
+        },
+        "collision_rate_histogram": {
+          "0-2": 3,
+          "2-4": 131,
+          "4-6": 268,
+          "6-8": 256,
+          "8-10": 97,
+          "10-12": 40,
+          "12-16": 5,
+          ">=16": 0
+        },
+        "peak_collision_rate": {
+          "p5": 6.5,
+          "p25": 10.0,
+          "p50": 12.5,
+          "p75": 15.5,
+          "p95": 19.0
+        },
+        "peak_collision_histogram": {
+          "0-4": 3,
+          "4-8": 71,
+          "8-10": 116,
+          "10-12": 140,
+          "12-16": 298,
+          "16-20": 145,
+          "20-26": 25,
+          ">=26": 2
+        },
+        "meaningful_rate": {
+          "p5": 8.536403467650697,
+          "p25": 11.423076923076923,
+          "p50": 13.73076923076923,
+          "p75": 16.66367709164485,
+          "p95": 22.146336201750124
+        },
+        "meaningful_peak": {
+          "p5": 16.5,
+          "p25": 22.0,
+          "p50": 26.5,
+          "p75": 31.0,
+          "p95": 37.5
+        },
+        "escalation_meaningful": {
+          "p5": 1.3010752688172043,
+          "p25": 2.0,
+          "p50": 2.7333333333333334,
+          "p75": 4.111111111111111,
+          "p95": 7.27027027027027
+        },
+        "escalation_collisions": {
+          "p5": 1.2758620689655173,
+          "p25": 2.1666666666666665,
+          "p50": 3.12,
+          "p75": 4.714285714285714,
+          "p95": 9.666666666666666
+        },
+        "escalation_population": {
+          "p5": 1.3333333333333333,
+          "p25": 1.8,
+          "p50": 2.25,
+          "p75": 3.0,
+          "p95": 5.0
+        },
+        "escalation_above_one": 0.9975,
+        "route_progression": {
+          "opening": 20344,
+          "break": 7306
+        },
+        "escape_route": {
+          "opening": 396,
+          "break": 99,
+          "anomaly": 0
+        },
+        "escape_generation": {
+          "p5": 0,
+          "p25": 1,
+          "p50": 2,
+          "p75": 3,
+          "p95": 4
+        },
+        "difficulty_increasing": 0.5275,
+        "pass_rate_monotonic": true,
+        "outer_shell_reached_rate": 0.9325,
+        "outer_shell_crossed_rate": 0.62125,
+        "stagnation": {
+          "p5": 0.4828348986684539,
+          "p25": 0.6877236324996758,
+          "p50": 0.9730553823519512,
+          "p75": 1.066349822843291,
+          "p95": 1.1045733300978167
+        },
+        "trajectory_spread": {
+          "p5": 0.18112884220800168,
+          "p25": 0.2733739715493156,
+          "p50": 0.3177796554247655,
+          "p75": 0.36016662881480704,
+          "p95": 0.42199083049088976
+        },
+        "instruments": {
+          "max_penetration": 9.997003225237222e-12,
+          "min_spawn_clearance": 7.933209335320157e-05,
+          "max_speed_correction": 0.9054968526807847,
+          "mean_speed_correction": 0.08011412909764941,
+          "speed_min": 9.999999999999996,
+          "speed_max": 10.000000000000004,
+          "anomalous_crossings": 0,
+          "newton_failures": 0,
+          "reproduction_violations": 0
+        },
+        "flags": {
+          "instrument_fault": 0,
+          "spawn_farming": 0,
+          "failed": 305,
+          "instant_escape": 133,
+          "population_weak": 45,
+          "population_explosive": 9,
+          "population_capped": 0,
+          "too_few_generations": 0,
+          "slow_first_spawn": 119,
+          "outer_shell_trivial": 0,
+          "frantic_peak": 139,
+          "frantic_mean": 79,
+          "sparse": 1,
+          "dead_stretch": 0,
+          "no_escalation": 17,
+          "repetitive_orbit": 0,
+          "few_distinct_panels": 38,
+          "clone_trajectories": 4,
+          "no_breaks": 8,
+          "no_opening_progress": 0
+        },
+        "in_band_flags": {
+          "instrument_fault": 0,
+          "spawn_farming": 0,
+          "failed": 0,
+          "instant_escape": 0,
+          "population_weak": 5,
+          "population_explosive": 4,
+          "population_capped": 0,
+          "too_few_generations": 0,
+          "slow_first_spawn": 37,
+          "outer_shell_trivial": 0,
+          "frantic_peak": 55,
+          "frantic_mean": 28,
+          "sparse": 0,
+          "dead_stretch": 0,
+          "no_escalation": 2,
+          "repetitive_orbit": 0,
+          "few_distinct_panels": 0,
+          "clone_trajectories": 0,
+          "no_breaks": 0,
+          "no_opening_progress": 0
+        },
+        "thresholds": {
+          "preferred_low": 20.0,
+          "preferred_high": 24.0,
+          "acceptable_low": 18.0,
+          "acceptable_high": 26.0,
+          "min_escape_seconds": 12.0,
+          "min_final_population": 5,
+          "min_late_population": 4,
+          "max_early_population": 8,
+          "early_fraction": 0.25,
+          "min_generations": 2,
+          "max_first_spawn_seconds": 4.0,
+          "max_outer_pass_rate": 0.85,
+          "max_peak_collision_rate": 16.0,
+          "max_collision_rate": 9.0,
+          "min_collision_rate": 1.5,
+          "audio_window": 2.0,
+          "max_stagnation_seconds": 4.0,
+          "min_escalation": 1.15,
+          "max_cycle_run": 10,
+          "max_cycle_period": 6,
+          "min_distinct_panels": 14,
+          "min_trajectory_spread": 0.1,
+          "min_breaks": 1,
+          "min_progression_openings": 2
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+ "kind": "category3_two_team_controlled_tuning",
+ "note": "A named matrix, not a product search. Every row changes one understandable part of the arena and all rows in a block use the same deterministic seed interval, so a difference is attributable to geometry or toughness rather than to sampling noise. Blocks A-Q used seeds 1..1000; block K/R/S used 100001..103000 (an independent interval, to check that the finalist was not fitted to the tuning seeds). The brief's search regions are pass rates of 90-96 / 65-80 / 35-50 / 15-28 / 3-8 percent and a race-success rate of 20-40 percent.",
+ "fixed_across_all_rows": {
+  "shell_count": 5,
+  "founder_count": 2,
+  "ball_ball_collisions": false,
+  "speed_model": "constant",
+  "horizon": 26.0,
+  "max_population": 64,
+  "omega_falloff": 0.82,
+  "omega_jitter": 0.22
+ },
+ "blocks": [
+  {
+   "block": "A-E",
+   "seeds": "1..1000",
+   "question": "does the shrunken arena (inner 6.5, spacing 3.0, ball 0.53) work at all, and where does the ladder sit?",
+   "rows": [
+    {"label": "A_base", "panel_counts": [14, 28, 40, 48, 64], "opening_slots": [2, 2, 2, 1, 1], "break_thresholds": [1.6, 3.0, 5.4, 8.6, 13.0], "escape_rate": 0.2010, "pass_rate": [0.969, 0.926, 0.550, 0.148, 0.087], "population_p50": 13, "collision_rate_p50": 14.61},
+    {"label": "B_harder_ladder", "panel_counts": [16, 36, 48, 60, 72], "opening_slots": [2, 2, 2, 2, 1], "break_thresholds": [1.8, 3.6, 6.0, 9.0, 15.0], "escape_rate": 0.2000, "pass_rate": [0.972, 0.836, 0.424, 0.309, 0.058], "population_p50": 12, "collision_rate_p50": 14.69},
+    {"label": "C_speed9", "speed": 9.0, "damage_reference_speed": 9.0, "escape_rate": 0.1560, "pass_rate": [0.969, 0.911, 0.506, 0.147, 0.074], "population_p50": 13, "collision_rate_p50": 13.08},
+    {"label": "D_spacing33", "shell_spacing": 3.3, "escape_rate": 0.1890, "pass_rate": [0.972, 0.920, 0.525, 0.150, 0.084], "population_p50": 13, "collision_rate_p50": 13.58},
+    {"label": "E_harder_slow", "note": "B plus speed 9 plus spacing 3.2", "escape_rate": 0.1740, "pass_rate": [0.965, 0.783, 0.391, 0.306, 0.056], "population_p50": 12, "collision_rate_p50": 12.00}
+   ],
+   "read": "B is the shape; the 2-slot shell 3 is what lifts shell 3 from 14.8 to 30.9 percent. Slowing the ball buys a calmer bed and costs escape rate one-for-one, so speed stays at 10 and density is managed in audio instead."
+  },
+  {
+   "block": "F-J",
+   "seeds": "1..1000",
+   "question": "can population be raised without leaving the pass-rate regions?",
+   "rows": [
+    {"label": "F_pop", "panel_counts": [14, 28, 40, 56, 72], "break_thresholds": [1.8, 3.4, 6.0, 10.0, 17.0], "escape_rate": 0.2380, "pass_rate": [0.969, 0.907, 0.520, 0.285, 0.056], "population_p50": 14},
+    {"label": "G_s1hard", "panel_counts": [16, 40, 48, 66, 72], "break_thresholds": [1.8, 4.2, 6.0, 10.5, 16.0], "escape_rate": 0.1710, "pass_rate": [0.965, 0.728, 0.456, 0.278, 0.058], "population_p50": 12},
+    {"label": "H_s0hard", "panel_counts": [18, 36, 48, 60, 72], "break_thresholds": [2.0, 4.0, 6.6, 9.5, 16.0], "escape_rate": 0.1980, "pass_rate": [0.968, 0.808, 0.423, 0.328, 0.054], "population_p50": 12, "first_spawn_p50": 1.45, "first_spawn_p75": 2.72},
+    {"label": "I_pop_spacing", "shell_spacing": 3.2, "escape_rate": 0.2010, "pass_rate": [0.971, 0.911, 0.460, 0.284, 0.053], "population_p50": 13},
+    {"label": "J_wide_s2", "openings_per_shell": [3, 3, 3, 2, 2], "escape_rate": 0.2380, "pass_rate": [0.958, 0.796, 0.619, 0.273, 0.053], "population_p50": 14}
+   ],
+   "read": "No. G is the first row with all four outer shells inside the regions and its population is 12. H is the answer to 'make shell 1 harder': 18 panels barely moves its pass rate (96.8 percent) and costs the hook - median first clone 0.84 s to 1.45 s, 75th percentile past 2.7 s. Population and the difficulty regions are in genuine conflict; see the phase document."
+  },
+  {
+   "block": "K-Q",
+   "seeds": "1..1000",
+   "question": "where exactly inside the regions should the ladder sit?",
+   "rows": [
+    {"label": "K_band_top", "panel_counts": [16, 38, 46, 64, 72], "break_thresholds": [1.8, 4.0, 5.6, 9.5, 16.0], "escape_rate": 0.1950, "pass_rate": [0.967, 0.769, 0.482, 0.284, 0.058], "population_p50": 12},
+    {"label": "N_s2_three", "openings_per_shell": [3, 3, 3, 2, 2], "escape_rate": 0.2030, "pass_rate": [0.968, 0.726, 0.472, 0.280, 0.063], "population_p50": 12},
+    {"label": "O_tight", "shell_spacing": 2.8, "escape_rate": 0.1570, "pass_rate": [0.968, 0.747, 0.453, 0.270, 0.054], "population_p50": 11},
+    {"label": "P_s1_mid", "break_thresholds": [1.8, 3.8, 5.6, 9.5, 16.5], "escape_rate": 0.1950, "pass_rate": [0.968, 0.819, 0.479, 0.273, 0.057], "population_p50": 12},
+    {"label": "Q_fast", "speed": 11.5, "damage_reference_speed": 11.5, "escape_rate": 0.2080, "pass_rate": [0.971, 0.782, 0.476, 0.291, 0.059], "population_p50": 13, "collision_rate_p50": 18.19}
+   ],
+   "read": "K is the ladder. Q buys one ball of population for 3.6 more collisions a second, which is the wrong trade at this density."
+  },
+  {
+   "block": "K-R-S",
+   "seeds": "100001..103000",
+   "question": "does the finalist hold on seeds it was not tuned on, and is the final wall the right hardness?",
+   "rows": [
+    {"label": "K", "break_thresholds": [1.8, 4.0, 5.6, 9.5, 16.0], "panel_counts": [16, 38, 46, 64, 72], "escape_rate": 0.1793, "pass_rate": [0.967, 0.771, 0.471, 0.283, 0.055]},
+    {"label": "R_s4_soft", "break_thresholds": [1.8, 4.0, 5.6, 9.5, 14.0], "escape_rate": 0.1817, "pass_rate": [0.967, 0.771, 0.471, 0.283, 0.056], "read": "lowering the outermost threshold from 16 to 14 moves nothing: the final wall is almost never crossed by breaking it, so its toughness is not what gates the race"},
+    {"label": "S_s4_wider", "panel_counts": [16, 38, 46, 64, 66], "break_thresholds": [1.8, 4.0, 5.6, 9.5, 15.0], "escape_rate": 0.2323, "pass_rate": [0.967, 0.764, 0.467, 0.279, 0.074], "read": "SELECTED. Widening the outermost opening from 1/72 to 1/66 of the shell is what moves the race-success rate, because the moving opening is the route almost every winner takes"}
+   ]
+  }
+ ],
+ "selected": {
+  "label": "S_s4_wider",
+  "config_digest": "4a3ab8ba22ae7c54981700823cc5b4eaf147c72fc5ab609a244d9cbaeb6ce572",
+  "inner_radius": 6.5,
+  "shell_spacing": 3.0,
+  "ball_radius": 0.53,
+  "speed": 10.0,
+  "omega_base": 0.66,
+  "panel_counts": [16, 38, 46, 64, 66],
+  "openings_per_shell": [3, 3, 2, 2, 2],
+  "opening_slots": [2, 2, 2, 2, 1],
+  "break_thresholds": [1.8, 4.0, 5.6, 9.5, 15.0],
+  "confirmed_at_20000_seeds": {
+   "escape_rate": 0.2245,
+   "pass_rate": [0.9670, 0.7414, 0.4274, 0.2498, 0.0654]
+  }
+ }
+}

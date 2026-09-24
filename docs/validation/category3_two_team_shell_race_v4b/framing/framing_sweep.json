@@ -1,0 +1,937 @@
+{
+  "format": 1,
+  "seed": 17964,
+  "render_config_digest": "dfe8208b31d717b6",
+  "ink_luminance": 0.14,
+  "moments": [
+    "a_opening",
+    "b_first_split",
+    "c_first_transition",
+    "d_four_balls",
+    "e_damaged_panel",
+    "f_critical_panel",
+    "g_panel_break",
+    "g2_flood_through",
+    "h_final_wall",
+    "i_final_escape",
+    "j_winner_frame"
+  ],
+  "rows": [
+    {
+      "fraction": 0.652,
+      "frames": 11,
+      "measured": [
+        {
+          "ink_fraction": 0.4940330825617284,
+          "solid_fraction": 0.11038917824074074,
+          "mean_luma": 0.17291401326656342,
+          "empty_band_px": 358,
+          "empty_band_fraction": 0.18645833333333334,
+          "ink_bbox": [
+            0,
+            167,
+            1080,
+            1562
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1395,
+          "file": "a_opening.png"
+        },
+        {
+          "ink_fraction": 0.5009596836419753,
+          "solid_fraction": 0.11266878858024691,
+          "mean_luma": 0.1743408441543579,
+          "empty_band_px": 358,
+          "empty_band_fraction": 0.18645833333333334,
+          "ink_bbox": [
+            0,
+            167,
+            1080,
+            1562
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1395,
+          "file": "b_first_split.png"
+        },
+        {
+          "ink_fraction": 0.41697868441358027,
+          "solid_fraction": 0.07474054783950618,
+          "mean_luma": 0.14719480276107788,
+          "empty_band_px": 510,
+          "empty_band_fraction": 0.265625,
+          "ink_bbox": [
+            7,
+            319,
+            1074,
+            1410
+          ],
+          "ink_width_px": 1067,
+          "ink_height_px": 1091,
+          "file": "c_first_transition.png"
+        },
+        {
+          "ink_fraction": 0.5011815200617284,
+          "solid_fraction": 0.11650125385802469,
+          "mean_luma": 0.17350304126739502,
+          "empty_band_px": 358,
+          "empty_band_fraction": 0.18645833333333334,
+          "ink_bbox": [
+            0,
+            167,
+            1080,
+            1562
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1395,
+          "file": "d_four_balls.png"
+        },
+        {
+          "ink_fraction": 0.5068446180555556,
+          "solid_fraction": 0.11293981481481481,
+          "mean_luma": 0.174015611410141,
+          "empty_band_px": 358,
+          "empty_band_fraction": 0.18645833333333334,
+          "ink_bbox": [
+            0,
+            167,
+            1080,
+            1562
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1395,
+          "file": "e_damaged_panel.png"
+        },
+        {
+          "ink_fraction": 0.2988435570987654,
+          "solid_fraction": 0.04896026234567901,
+          "mean_luma": 0.129419207572937,
+          "empty_band_px": 575,
+          "empty_band_fraction": 0.2994791666666667,
+          "ink_bbox": [
+            104,
+            383,
+            976,
+            1345
+          ],
+          "ink_width_px": 872,
+          "ink_height_px": 962,
+          "file": "f_critical_panel.png"
+        },
+        {
+          "ink_fraction": 0.3021802662037037,
+          "solid_fraction": 0.055229070216049385,
+          "mean_luma": 0.1327783316373825,
+          "empty_band_px": 575,
+          "empty_band_fraction": 0.2994791666666667,
+          "ink_bbox": [
+            104,
+            383,
+            976,
+            1345
+          ],
+          "ink_width_px": 872,
+          "ink_height_px": 962,
+          "file": "g2_flood_through.png"
+        },
+        {
+          "ink_fraction": 0.4989144483024691,
+          "solid_fraction": 0.11604600694444445,
+          "mean_luma": 0.17474186420440674,
+          "empty_band_px": 358,
+          "empty_band_fraction": 0.18645833333333334,
+          "ink_bbox": [
+            0,
+            167,
+            1080,
+            1562
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1395,
+          "file": "g_panel_break.png"
+        },
+        {
+          "ink_fraction": 0.2575033757716049,
+          "solid_fraction": 0.0444897762345679,
+          "mean_luma": 0.12553834915161133,
+          "empty_band_px": 579,
+          "empty_band_fraction": 0.3015625,
+          "ink_bbox": [
+            160,
+            387,
+            918,
+            1341
+          ],
+          "ink_width_px": 758,
+          "ink_height_px": 954,
+          "file": "h_final_wall.png"
+        },
+        {
+          "ink_fraction": 0.28510802469135804,
+          "solid_fraction": 0.08638937114197531,
+          "mean_luma": 0.14070619642734528,
+          "empty_band_px": 402,
+          "empty_band_fraction": 0.209375,
+          "ink_bbox": [
+            110,
+            387,
+            979,
+            1518
+          ],
+          "ink_width_px": 869,
+          "ink_height_px": 1131,
+          "file": "i_final_escape.png"
+        },
+        {
+          "ink_fraction": 0.3125038580246914,
+          "solid_fraction": 0.10615981867283951,
+          "mean_luma": 0.14815451204776764,
+          "empty_band_px": 402,
+          "empty_band_fraction": 0.209375,
+          "ink_bbox": [
+            110,
+            373,
+            1065,
+            1518
+          ],
+          "ink_width_px": 955,
+          "ink_height_px": 1145,
+          "file": "j_winner_frame.png"
+        }
+      ],
+      "measured_mean_ink": 0.39773191989337825,
+      "measured_worst_empty_band": 579,
+      "derived_ink_thirds": {
+        "early": 0.2055499182621161,
+        "middle": 0.10890519264318983,
+        "late": 0.08948256840253238
+      },
+      "final_stage": {
+        "stage": 2,
+        "extent_shell": 4,
+        "start": 21.16705809703851,
+        "settled": 21.61705809703851,
+        "view_radius": 19.675749999999997,
+        "pixels_per_unit": 18.878284182305634,
+        "camera_distance": 65.78537347539292,
+        "frontier_diameter_px": 704.1600000000001,
+        "ball_diameter_px": 20.010981233243974,
+        "ball_drawn_diameter_px": 26.014275603217165,
+        "opening_width_px": 27.57231711309694,
+        "opening_over_ball": 1.3778593259230798,
+        "wall_face_thickness_px": 5.6634852546916905,
+        "wall_apparent_thickness_px": 35.743751441692076,
+        "wall_flank_px": 30.08026618700039,
+        "occupancy": {
+          "t": 21.61705809703851,
+          "material_fraction": 0.06610690907450505,
+          "ball_fraction": 0.003588528558501106,
+          "ink_fraction": 0.06969543763300615,
+          "arena_footprint_fraction": 0.18781073064287007,
+          "empty_fraction": 0.9303045623669939
+        }
+      },
+      "critical_hidden": 0,
+      "critical_pass": true,
+      "worst_critical": {
+        "what": "frontier_crossing",
+        "t": 0.5209490288424855,
+        "detail": "opening to region 1",
+        "x_px": 364.838151022725,
+        "y_px": 1017.0326787018928,
+        "radius_px": 25.138147150259073,
+        "covered": 0.0,
+        "region": "",
+        "visible": true
+      },
+      "contained": true,
+      "worst_containment_ratio": 0.11054254543164657
+    },
+    {
+      "fraction": 0.8,
+      "frames": 11,
+      "measured": [
+        {
+          "ink_fraction": 0.5339289158950618,
+          "solid_fraction": 0.139819637345679,
+          "mean_luma": 0.20126253366470337,
+          "empty_band_px": 207,
+          "empty_band_fraction": 0.1078125,
+          "ink_bbox": [
+            0,
+            14,
+            1080,
+            1713
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1699,
+          "file": "a_opening.png"
+        },
+        {
+          "ink_fraction": 0.5418233989197531,
+          "solid_fraction": 0.14274787808641975,
+          "mean_luma": 0.2032889872789383,
+          "empty_band_px": 207,
+          "empty_band_fraction": 0.1078125,
+          "ink_bbox": [
+            0,
+            14,
+            1080,
+            1713
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1699,
+          "file": "b_first_split.png"
+        },
+        {
+          "ink_fraction": 0.5200554591049382,
+          "solid_fraction": 0.10623505015432098,
+          "mean_luma": 0.173492431640625,
+          "empty_band_px": 398,
+          "empty_band_fraction": 0.20729166666666668,
+          "ink_bbox": [
+            0,
+            207,
+            1080,
+            1522
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1315,
+          "file": "c_first_transition.png"
+        },
+        {
+          "ink_fraction": 0.5588252314814814,
+          "solid_fraction": 0.15297743055555554,
+          "mean_luma": 0.20527972280979156,
+          "empty_band_px": 207,
+          "empty_band_fraction": 0.1078125,
+          "ink_bbox": [
+            0,
+            14,
+            1080,
+            1713
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1699,
+          "file": "d_four_balls.png"
+        },
+        {
+          "ink_fraction": 0.5473263888888888,
+          "solid_fraction": 0.1430637538580247,
+          "mean_luma": 0.20293040573596954,
+          "empty_band_px": 207,
+          "empty_band_fraction": 0.1078125,
+          "ink_bbox": [
+            0,
+            14,
+            1080,
+            1713
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1699,
+          "file": "e_damaged_panel.png"
+        },
+        {
+          "ink_fraction": 0.41227912808641975,
+          "solid_fraction": 0.07495900848765433,
+          "mean_luma": 0.15312106907367706,
+          "empty_band_px": 506,
+          "empty_band_fraction": 0.2635416666666667,
+          "ink_bbox": [
+            11,
+            315,
+            1070,
+            1414
+          ],
+          "ink_width_px": 1059,
+          "ink_height_px": 1099,
+          "file": "f_critical_panel.png"
+        },
+        {
+          "ink_fraction": 0.42140190972222225,
+          "solid_fraction": 0.08305989583333333,
+          "mean_luma": 0.15776754915714264,
+          "empty_band_px": 507,
+          "empty_band_fraction": 0.2640625,
+          "ink_bbox": [
+            11,
+            315,
+            1070,
+            1413
+          ],
+          "ink_width_px": 1059,
+          "ink_height_px": 1098,
+          "file": "g2_flood_through.png"
+        },
+        {
+          "ink_fraction": 0.5383883101851852,
+          "solid_fraction": 0.1464380787037037,
+          "mean_luma": 0.2025696486234665,
+          "empty_band_px": 207,
+          "empty_band_fraction": 0.1078125,
+          "ink_bbox": [
+            0,
+            14,
+            1080,
+            1713
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1699,
+          "file": "g_panel_break.png"
+        },
+        {
+          "ink_fraction": 0.3328346836419753,
+          "solid_fraction": 0.06642505787037037,
+          "mean_luma": 0.1451105773448944,
+          "empty_band_px": 544,
+          "empty_band_fraction": 0.2833333333333333,
+          "ink_bbox": [
+            89,
+            352,
+            991,
+            1376
+          ],
+          "ink_width_px": 902,
+          "ink_height_px": 1024,
+          "file": "h_final_wall.png"
+        },
+        {
+          "ink_fraction": 0.3728245563271605,
+          "solid_fraction": 0.12239149305555555,
+          "mean_luma": 0.165341317653656,
+          "empty_band_px": 402,
+          "empty_band_fraction": 0.209375,
+          "ink_bbox": [
+            87,
+            352,
+            1078,
+            1518
+          ],
+          "ink_width_px": 991,
+          "ink_height_px": 1166,
+          "file": "i_final_escape.png"
+        },
+        {
+          "ink_fraction": 0.4029224537037037,
+          "solid_fraction": 0.13989776234567902,
+          "mean_luma": 0.1730477213859558,
+          "empty_band_px": 402,
+          "empty_band_fraction": 0.209375,
+          "ink_bbox": [
+            87,
+            264,
+            1080,
+            1518
+          ],
+          "ink_width_px": 993,
+          "ink_height_px": 1254,
+          "file": "j_winner_frame.png"
+        }
+      ],
+      "measured_mean_ink": 0.4711464032687991,
+      "measured_worst_empty_band": 544,
+      "derived_ink_thirds": {
+        "early": 0.29358965996184694,
+        "middle": 0.18724800538675876,
+        "late": 0.1534856171512032
+      },
+      "final_stage": {
+        "stage": 2,
+        "extent_shell": 4,
+        "start": 21.16705809703851,
+        "settled": 21.61705809703851,
+        "view_radius": 19.675749999999997,
+        "pixels_per_unit": 23.16353887399464,
+        "camera_distance": 53.61507938244523,
+        "frontier_diameter_px": 864.0,
+        "ball_diameter_px": 24.553351206434318,
+        "ball_drawn_diameter_px": 31.919356568364616,
+        "opening_width_px": 33.83106394245023,
+        "opening_over_ball": 1.3778593259230798,
+        "wall_face_thickness_px": 6.949061662198392,
+        "wall_apparent_thickness_px": 51.36692311582593,
+        "wall_flank_px": 44.41786145362753,
+        "occupancy": {
+          "t": 21.61705809703851,
+          "material_fraction": 0.11389336714287636,
+          "ball_fraction": 0.005402579786218685,
+          "ink_fraction": 0.11929594692909504,
+          "arena_footprint_fraction": 0.28275167397022133,
+          "empty_fraction": 0.8807040530709049
+        }
+      },
+      "critical_hidden": 1,
+      "critical_pass": true,
+      "worst_critical": {
+        "what": "frontier_crossing",
+        "t": 4.773970042431505,
+        "detail": "opening to region 2",
+        "x_px": 909.7827803705688,
+        "y_px": 836.8792001893476,
+        "radius_px": 26.98317852402275,
+        "covered": 0.5652173913043478,
+        "region": "action_rail",
+        "visible": false
+      },
+      "contained": true,
+      "worst_containment_ratio": 0.2248941376737948
+    },
+    {
+      "fraction": 0.85,
+      "frames": 11,
+      "measured": [
+        {
+          "ink_fraction": 0.536318962191358,
+          "solid_fraction": 0.1456129436728395,
+          "mean_luma": 0.20819386839866638,
+          "empty_band_px": 155,
+          "empty_band_fraction": 0.08072916666666667,
+          "ink_bbox": [
+            0,
+            0,
+            1080,
+            1765
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1765,
+          "file": "a_opening.png"
+        },
+        {
+          "ink_fraction": 0.544092399691358,
+          "solid_fraction": 0.1496363811728395,
+          "mean_luma": 0.21055565774440765,
+          "empty_band_px": 155,
+          "empty_band_fraction": 0.08072916666666667,
+          "ink_bbox": [
+            0,
+            0,
+            1080,
+            1765
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1765,
+          "file": "b_first_split.png"
+        },
+        {
+          "ink_fraction": 0.5387475887345679,
+          "solid_fraction": 0.11568769290123457,
+          "mean_luma": 0.18036359548568726,
+          "empty_band_px": 360,
+          "empty_band_fraction": 0.1875,
+          "ink_bbox": [
+            0,
+            168,
+            1080,
+            1560
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1392,
+          "file": "c_first_transition.png"
+        },
+        {
+          "ink_fraction": 0.5662885802469135,
+          "solid_fraction": 0.16084104938271604,
+          "mean_luma": 0.21275287866592407,
+          "empty_band_px": 155,
+          "empty_band_fraction": 0.08072916666666667,
+          "ink_bbox": [
+            0,
+            0,
+            1080,
+            1765
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1765,
+          "file": "d_four_balls.png"
+        },
+        {
+          "ink_fraction": 0.5472791280864198,
+          "solid_fraction": 0.14999662422839505,
+          "mean_luma": 0.21018408238887787,
+          "empty_band_px": 155,
+          "empty_band_fraction": 0.08072916666666667,
+          "ink_bbox": [
+            0,
+            0,
+            1080,
+            1765
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1765,
+          "file": "e_damaged_panel.png"
+        },
+        {
+          "ink_fraction": 0.4506283757716049,
+          "solid_fraction": 0.08444926697530865,
+          "mean_luma": 0.1612720638513565,
+          "empty_band_px": 478,
+          "empty_band_fraction": 0.24895833333333334,
+          "ink_bbox": [
+            0,
+            286,
+            1080,
+            1442
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1156,
+          "file": "f_critical_panel.png"
+        },
+        {
+          "ink_fraction": 0.4620896026234568,
+          "solid_fraction": 0.09326051311728395,
+          "mean_luma": 0.16636574268341064,
+          "empty_band_px": 478,
+          "empty_band_fraction": 0.24895833333333334,
+          "ink_bbox": [
+            0,
+            287,
+            1080,
+            1442
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1155,
+          "file": "g2_flood_through.png"
+        },
+        {
+          "ink_fraction": 0.5413695987654321,
+          "solid_fraction": 0.15395351080246913,
+          "mean_luma": 0.2097560167312622,
+          "empty_band_px": 155,
+          "empty_band_fraction": 0.08072916666666667,
+          "ink_bbox": [
+            0,
+            0,
+            1080,
+            1765
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1765,
+          "file": "g_panel_break.png"
+        },
+        {
+          "ink_fraction": 0.3633887924382716,
+          "solid_fraction": 0.07475887345679012,
+          "mean_luma": 0.1520872414112091,
+          "empty_band_px": 531,
+          "empty_band_fraction": 0.2765625,
+          "ink_bbox": [
+            64,
+            340,
+            1017,
+            1389
+          ],
+          "ink_width_px": 953,
+          "ink_height_px": 1049,
+          "file": "h_final_wall.png"
+        },
+        {
+          "ink_fraction": 0.40600935570987656,
+          "solid_fraction": 0.13537229938271605,
+          "mean_luma": 0.17392925918102264,
+          "empty_band_px": 402,
+          "empty_band_fraction": 0.209375,
+          "ink_bbox": [
+            62,
+            340,
+            1080,
+            1518
+          ],
+          "ink_width_px": 1018,
+          "ink_height_px": 1178,
+          "file": "i_final_escape.png"
+        },
+        {
+          "ink_fraction": 0.43507908950617286,
+          "solid_fraction": 0.14763551311728396,
+          "mean_luma": 0.180669367313385,
+          "empty_band_px": 402,
+          "empty_band_fraction": 0.209375,
+          "ink_bbox": [
+            62,
+            228,
+            1080,
+            1518
+          ],
+          "ink_width_px": 1018,
+          "ink_height_px": 1290,
+          "file": "j_winner_frame.png"
+        }
+      ],
+      "measured_mean_ink": 0.4901174067059484,
+      "measured_worst_empty_band": 531,
+      "derived_ink_thirds": {
+        "early": 0.30269936650727797,
+        "middle": 0.20764965115135545,
+        "late": 0.17423583718042385
+      },
+      "final_stage": {
+        "stage": 2,
+        "extent_shell": 4,
+        "start": 21.16705809703851,
+        "settled": 21.61705809703851,
+        "view_radius": 19.675749999999997,
+        "pixels_per_unit": 24.611260053619304,
+        "camera_distance": 50.46125118347786,
+        "frontier_diameter_px": 918.0,
+        "ball_diameter_px": 26.087935656836464,
+        "ball_drawn_diameter_px": 33.9143163538874,
+        "opening_width_px": 35.94550543885337,
+        "opening_over_ball": 1.3778593259230798,
+        "wall_face_thickness_px": 7.383378016085791,
+        "wall_apparent_thickness_px": 57.20422505331607,
+        "wall_flank_px": 49.82084703723029,
+        "occupancy": {
+          "t": 21.61705809703851,
+          "material_fraction": 0.13388794691880201,
+          "ball_fraction": 0.006099006086785938,
+          "ink_fraction": 0.13998695300558794,
+          "arena_footprint_fraction": 0.31920013194294516,
+          "empty_fraction": 0.8600130469944121
+        }
+      },
+      "critical_hidden": 2,
+      "critical_pass": true,
+      "worst_critical": {
+        "what": "frontier_crossing",
+        "t": 4.773970042431505,
+        "detail": "opening to region 2",
+        "x_px": 932.8942041437294,
+        "y_px": 835.1841502011818,
+        "radius_px": 28.669627181774175,
+        "covered": 1.0,
+        "region": "action_rail",
+        "visible": false
+      },
+      "contained": true,
+      "worst_containment_ratio": 0.30726220016466815
+    },
+    {
+      "fraction": 0.9,
+      "frames": 11,
+      "measured": [
+        {
+          "ink_fraction": 0.5409939236111111,
+          "solid_fraction": 0.15239197530864199,
+          "mean_luma": 0.21501228213310242,
+          "empty_band_px": 103,
+          "empty_band_fraction": 0.05364583333333333,
+          "ink_bbox": [
+            0,
+            0,
+            1080,
+            1817
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1817,
+          "file": "a_opening.png"
+        },
+        {
+          "ink_fraction": 0.5474339313271605,
+          "solid_fraction": 0.15650752314814814,
+          "mean_luma": 0.21757405996322632,
+          "empty_band_px": 103,
+          "empty_band_fraction": 0.05364583333333333,
+          "ink_bbox": [
+            0,
+            0,
+            1080,
+            1817
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1817,
+          "file": "b_first_split.png"
+        },
+        {
+          "ink_fraction": 0.5529899691358025,
+          "solid_fraction": 0.12398582175925926,
+          "mean_luma": 0.18751467764377594,
+          "empty_band_px": 321,
+          "empty_band_fraction": 0.1671875,
+          "ink_bbox": [
+            0,
+            129,
+            1080,
+            1599
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1470,
+          "file": "c_first_transition.png"
+        },
+        {
+          "ink_fraction": 0.5745814043209877,
+          "solid_fraction": 0.16877604166666665,
+          "mean_luma": 0.22028055787086487,
+          "empty_band_px": 103,
+          "empty_band_fraction": 0.05364583333333333,
+          "ink_bbox": [
+            0,
+            0,
+            1080,
+            1817
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1817,
+          "file": "d_four_balls.png"
+        },
+        {
+          "ink_fraction": 0.5506978202160494,
+          "solid_fraction": 0.15729359567901235,
+          "mean_luma": 0.21717046201229095,
+          "empty_band_px": 103,
+          "empty_band_fraction": 0.05364583333333333,
+          "ink_bbox": [
+            0,
+            0,
+            1080,
+            1817
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1817,
+          "file": "e_damaged_panel.png"
+        },
+        {
+          "ink_fraction": 0.4773972800925926,
+          "solid_fraction": 0.09126398533950618,
+          "mean_luma": 0.16746295988559723,
+          "empty_band_px": 448,
+          "empty_band_fraction": 0.23333333333333334,
+          "ink_bbox": [
+            0,
+            257,
+            1080,
+            1472
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1215,
+          "file": "f_critical_panel.png"
+        },
+        {
+          "ink_fraction": 0.49561149691358025,
+          "solid_fraction": 0.1008839699074074,
+          "mean_luma": 0.17310385406017303,
+          "empty_band_px": 449,
+          "empty_band_fraction": 0.23385416666666667,
+          "ink_bbox": [
+            0,
+            258,
+            1080,
+            1471
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1213,
+          "file": "g2_flood_through.png"
+        },
+        {
+          "ink_fraction": 0.5463421103395062,
+          "solid_fraction": 0.1615282600308642,
+          "mean_luma": 0.2169729620218277,
+          "empty_band_px": 103,
+          "empty_band_fraction": 0.05364583333333333,
+          "ink_bbox": [
+            0,
+            0,
+            1080,
+            1817
+          ],
+          "ink_width_px": 1080,
+          "ink_height_px": 1817,
+          "file": "g_panel_break.png"
+        },
+        {
+          "ink_fraction": 0.3968947723765432,
+          "solid_fraction": 0.08356192129629629,
+          "mean_luma": 0.1592259407043457,
+          "empty_band_px": 518,
+          "empty_band_fraction": 0.26979166666666665,
+          "ink_bbox": [
+            38,
+            327,
+            1043,
+            1402
+          ],
+          "ink_width_px": 1005,
+          "ink_height_px": 1075,
+          "file": "h_final_wall.png"
+        },
+        {
+          "ink_fraction": 0.44026716820987655,
+          "solid_fraction": 0.14646219135802468,
+          "mean_luma": 0.18172471225261688,
+          "empty_band_px": 402,
+          "empty_band_fraction": 0.209375,
+          "ink_bbox": [
+            36,
+            310,
+            1080,
+            1518
+          ],
+          "ink_width_px": 1044,
+          "ink_height_px": 1208,
+          "file": "i_final_escape.png"
+        },
+        {
+          "ink_fraction": 0.46902633101851854,
+          "solid_fraction": 0.15739631558641975,
+          "mean_luma": 0.1884460151195526,
+          "empty_band_px": 402,
+          "empty_band_fraction": 0.209375,
+          "ink_bbox": [
+            36,
+            191,
+            1080,
+            1518
+          ],
+          "ink_width_px": 1044,
+          "ink_height_px": 1327,
+          "file": "j_winner_frame.png"
+        }
+      ],
+      "measured_mean_ink": 0.508385109778339,
+      "measured_worst_empty_band": 518,
+      "derived_ink_thirds": {
+        "early": 0.3135393289593961,
+        "middle": 0.22351156674949801,
+        "late": 0.19390456612046078
+      },
+      "final_stage": {
+        "stage": 2,
+        "extent_shell": 4,
+        "start": 21.16705809703851,
+        "settled": 21.61705809703851,
+        "view_radius": 19.675749999999997,
+        "pixels_per_unit": 26.058981233243973,
+        "camera_distance": 47.657848339951315,
+        "frontier_diameter_px": 972.0000000000001,
+        "ball_diameter_px": 27.622520107238614,
+        "ball_drawn_diameter_px": 35.909276139410196,
+        "opening_width_px": 38.05994693525651,
+        "opening_over_ball": 1.3778593259230798,
+        "wall_face_thickness_px": 7.817694369973191,
+        "wall_apparent_thickness_px": 63.314994013039204,
+        "wall_flank_px": 55.497299643066015,
+        "occupancy": {
+          "t": 21.61705809703851,
+          "material_fraction": 0.1559681982191996,
+          "ball_fraction": 0.006837640041933026,
+          "ink_fraction": 0.16280583826113262,
+          "arena_footprint_fraction": 0.3578575873685613,
+          "empty_fraction": 0.8371941617388674
+        }
+      },
+      "critical_hidden": 2,
+      "critical_pass": true,
+      "worst_critical": {
+        "what": "frontier_crossing",
+        "t": 4.773970042431505,
+        "detail": "opening to region 2",
+        "x_px": 956.00562791689,
+        "y_px": 833.489100213016,
+        "radius_px": 30.3560758395256,
+        "covered": 1.0,
+        "region": "action_rail",
+        "visible": false
+      },
+      "contained": true,
+      "worst_containment_ratio": 0.4555797817131064
+    }
+  ]
+}
