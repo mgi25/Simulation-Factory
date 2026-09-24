@@ -35,7 +35,7 @@ import sys
 from typing import Any
 
 from .config import RunnerConfig
-from .resources import DEFAULT_TIER_MODELS, STANDARD, STRONGEST
+from .resources import DEFAULT_TIER_MODELS, ECONOMY, STANDARD, STRONGEST
 from .errors import ConfigurationError, RunnerError
 from .queue import RunStore
 from .runner import COMPLETED, SKIPPED, EngineeringRunner
@@ -121,6 +121,12 @@ def _common(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--developer-model", default="")
     parser.add_argument("--reviewer-model", default="")
     parser.add_argument(
+        "--economy-model",
+        default=DEFAULT_TIER_MODELS[ECONOMY],
+        help="which vendor model the economy tier means; used only after the "
+        "deterministic P5 downshift gate passes",
+    )
+    parser.add_argument(
         "--standard-model",
         default=DEFAULT_TIER_MODELS[STANDARD],
         help="which vendor model the standard tier means; an alias by default, so "
@@ -179,6 +185,7 @@ def configuration(args: argparse.Namespace) -> RunnerConfig:
         reviewer_backend=args.reviewer_backend,
         developer_model=args.developer_model,
         reviewer_model=args.reviewer_model,
+        economy_model=args.economy_model,
         standard_model=args.standard_model,
         strongest_model=args.strongest_model,
         apply_resource_strategy=not args.ignore_resource_strategy,

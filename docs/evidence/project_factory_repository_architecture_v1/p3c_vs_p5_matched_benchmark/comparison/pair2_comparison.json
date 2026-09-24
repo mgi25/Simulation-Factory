@@ -1,0 +1,475 @@
+{
+  "adaptive_routing": {
+    "challenger": [
+      {
+        "applied": true,
+        "base_failed_tests": 5,
+        "candidate": true,
+        "failure_guided_complete_spans": 5,
+        "failure_symbol_hints": 5,
+        "requested_downshift_tier": "economy",
+        "source_tier": "standard",
+        "stage": "developer-01",
+        "target_tier": "economy",
+        "veto_reasons": []
+      }
+    ],
+    "control": []
+  },
+  "anomalies": {
+    "challenger": [],
+    "control": []
+  },
+  "deterministic_compute": {
+    "base_diagnostic_s": {
+      "absolute_change": -3.075527,
+      "challenger": 34.310518,
+      "control": 37.386045,
+      "dimension": "deterministic base_diagnostic_s",
+      "direction": "improved",
+      "percent_change": -8.2264,
+      "status": "OBSERVED"
+    },
+    "gate_suite_s": {
+      "absolute_change": -13.222,
+      "challenger": 157.769,
+      "control": 170.991,
+      "dimension": "deterministic gate_suite_s",
+      "direction": "improved",
+      "percent_change": -7.7326,
+      "status": "OBSERVED"
+    },
+    "required_test_s": {
+      "absolute_change": 1.755,
+      "challenger": 31.373,
+      "control": 29.618,
+      "dimension": "deterministic required_test_s",
+      "direction": "worsened",
+      "percent_change": 5.9255,
+      "status": "OBSERVED"
+    },
+    "total_s": {
+      "absolute_change": -14.542527,
+      "challenger": 223.452518,
+      "control": 237.995045,
+      "dimension": "deterministic total_s",
+      "direction": "improved",
+      "percent_change": -6.1104,
+      "status": "OBSERVED"
+    }
+  },
+  "developer_only": {
+    "cache_creation_units": {
+      "absolute_change": -4081,
+      "challenger": 28327,
+      "control": 32408,
+      "dimension": "total cache creation",
+      "direction": "improved",
+      "percent_change": -12.5926,
+      "status": "OBSERVED"
+    },
+    "cache_read_units": {
+      "absolute_change": -189736,
+      "challenger": 520090,
+      "control": 709826,
+      "dimension": "total cache read",
+      "direction": "improved",
+      "percent_change": -26.7299,
+      "status": "OBSERVED"
+    },
+    "cost_usd": {
+      "absolute_change": -0.66783425,
+      "challenger": 0.12361375,
+      "control": 0.791448,
+      "dimension": "total provider cost (USD)",
+      "direction": "improved",
+      "percent_change": -84.3813,
+      "status": "OBSERVED"
+    },
+    "duration_s": {
+      "absolute_change": -112.684,
+      "challenger": 164.475,
+      "control": 277.159,
+      "dimension": "total model wall time (s)",
+      "direction": "improved",
+      "percent_change": -40.6568,
+      "status": "OBSERVED"
+    },
+    "input_units": {
+      "absolute_change": 134,
+      "challenger": 161,
+      "control": 27,
+      "dimension": "total input units",
+      "direction": "worsened",
+      "percent_change": 496.2963,
+      "status": "OBSERVED"
+    },
+    "output_units": {
+      "absolute_change": -2147,
+      "challenger": 7207,
+      "control": 9354,
+      "dimension": "total output",
+      "direction": "improved",
+      "percent_change": -22.9527,
+      "status": "OBSERVED"
+    },
+    "paid_sessions": {
+      "absolute_change": 0,
+      "challenger": 1,
+      "control": 1,
+      "dimension": "total paid sessions",
+      "direction": "unchanged",
+      "percent_change": 0.0,
+      "status": "OBSERVED"
+    },
+    "turns": {
+      "absolute_change": -6,
+      "challenger": 20,
+      "control": 26,
+      "dimension": "total model turns",
+      "direction": "improved",
+      "percent_change": -23.0769,
+      "status": "OBSERVED"
+    }
+  },
+  "quality": {
+    "challenger": {
+      "acceptance_criteria_count": 7,
+      "authorized_paths": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "branch": "eng-token-efficiency-v4-p5-challenger-c",
+      "changed_files": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "commit_sha": "30e6bbfbac811bc4bf1d287a7008db263a1e29cb",
+      "decisions_required": [],
+      "developer_attempts": 1,
+      "gate_blockers": [],
+      "gate_readiness": "ready",
+      "gate_report_id": "integration-readiness-2026-09-23-0c4f9ffb976b8039",
+      "implementer": "software_implementation_engineer",
+      "merge_performed": false,
+      "remote_verified": true,
+      "review_findings": [],
+      "review_outcome": "pass",
+      "reviewer": "software_review_engineer",
+      "risks": [],
+      "status": "ready_for_approval",
+      "tests": [
+        {
+          "command": "tests/test_company_engineering_execution.py",
+          "passed": true,
+          "scope": "targeted",
+          "summary": "207 passed in 29.86s"
+        }
+      ],
+      "unanswered_criteria": []
+    },
+    "control": {
+      "acceptance_criteria_count": 7,
+      "authorized_paths": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "branch": "eng-token-efficiency-v4-p3c-control-b",
+      "changed_files": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "commit_sha": "eb8b8cfbf1c49359c962fc83a1df026eeb005ec9",
+      "decisions_required": [],
+      "developer_attempts": 1,
+      "gate_blockers": [],
+      "gate_readiness": "ready",
+      "gate_report_id": "integration-readiness-2026-09-23-7cb949f5c25d6e64",
+      "implementer": "software_implementation_engineer",
+      "merge_performed": false,
+      "remote_verified": true,
+      "review_findings": [],
+      "review_outcome": "pass",
+      "reviewer": "software_review_engineer",
+      "risks": [
+        "The untouched_paths assertion at line 1980 only asserts tests/test_company_engineering_execution.py is untouched; tests/test_company_review_separation.py is also untouched in the fake receipt but the test does not assert that. This is not a regression \u2014 just an observation.",
+        "The scope-usage granted count (usage.granted == len(result.authorized_paths)) at line 1968 now counts 3 authorized paths instead of 2; the fake receipt still only touches company/engineering, so used >= 1 and the untouched assertion remain valid."
+      ],
+      "status": "ready_for_approval",
+      "tests": [
+        {
+          "command": "tests/test_company_engineering_execution.py",
+          "passed": true,
+          "scope": "targeted",
+          "summary": "207 passed in 28.15s"
+        }
+      ],
+      "unanswered_criteria": []
+    }
+  },
+  "repository_map_cache": {
+    "challenger": [
+      {
+        "cache": {
+          "available": true,
+          "identity_source": "git_blob",
+          "invalid_entries": 0,
+          "module_count": 510,
+          "module_hits": 0,
+          "module_misses": 510,
+          "roots": [
+            "company",
+            "tools",
+            "tests"
+          ],
+          "snapshot_hit": false,
+          "tree_fingerprint": "9f0395907629c967",
+          "version": 3
+        },
+        "stage": "developer-01"
+      },
+      {
+        "cache": {
+          "available": true,
+          "identity_source": "git_blob",
+          "invalid_entries": 0,
+          "module_count": 510,
+          "module_hits": 509,
+          "module_misses": 1,
+          "roots": [
+            "company",
+            "tools",
+            "tests"
+          ],
+          "snapshot_hit": false,
+          "tree_fingerprint": "d95cf4958cd25dc9",
+          "version": 3
+        },
+        "stage": "reviewer-01"
+      }
+    ],
+    "control": []
+  },
+  "reviewer_only": {
+    "cache_creation_units": {
+      "absolute_change": -1640,
+      "challenger": 17376,
+      "control": 19016,
+      "dimension": "total cache creation",
+      "direction": "improved",
+      "percent_change": -8.6243,
+      "status": "OBSERVED"
+    },
+    "cache_read_units": {
+      "absolute_change": -43873,
+      "challenger": 61243,
+      "control": 105116,
+      "dimension": "total cache read",
+      "direction": "improved",
+      "percent_change": -41.7377,
+      "status": "OBSERVED"
+    },
+    "cost_usd": {
+      "absolute_change": -0.0792965,
+      "challenger": 0.1770715,
+      "control": 0.256368,
+      "dimension": "total provider cost (USD)",
+      "direction": "improved",
+      "percent_change": -30.9307,
+      "status": "OBSERVED"
+    },
+    "duration_s": {
+      "absolute_change": -46.888,
+      "challenger": 40.486,
+      "control": 87.374,
+      "dimension": "total model wall time (s)",
+      "direction": "improved",
+      "percent_change": -53.6636,
+      "status": "OBSERVED"
+    },
+    "input_units": {
+      "absolute_change": -2,
+      "challenger": 5,
+      "control": 7,
+      "dimension": "total input units",
+      "direction": "improved",
+      "percent_change": -28.5714,
+      "status": "OBSERVED"
+    },
+    "output_units": {
+      "absolute_change": -1884,
+      "challenger": 1513,
+      "control": 3397,
+      "dimension": "total output",
+      "direction": "improved",
+      "percent_change": -55.4607,
+      "status": "OBSERVED"
+    },
+    "paid_sessions": {
+      "absolute_change": 0,
+      "challenger": 1,
+      "control": 1,
+      "dimension": "total paid sessions",
+      "direction": "unchanged",
+      "percent_change": 0.0,
+      "status": "OBSERVED"
+    },
+    "turns": {
+      "absolute_change": -1,
+      "challenger": 6,
+      "control": 7,
+      "dimension": "total model turns",
+      "direction": "improved",
+      "percent_change": -14.2857,
+      "status": "OBSERVED"
+    }
+  },
+  "sessions": {
+    "challenger": [
+      {
+        "cache_creation_units": 28327,
+        "cache_read_units": 520090,
+        "cost_usd": 0.12361375000000001,
+        "duration_s": 164.475,
+        "exit_code": 0,
+        "input_units": 161,
+        "model": "haiku",
+        "ok": true,
+        "output_units": 7207,
+        "role": "developer",
+        "stage": "developer-01",
+        "startup_model": "claude-haiku-4-5-20251001",
+        "stopped_reason": "",
+        "turns": 20,
+        "unreliable": [],
+        "usage_source": "model_usage_totals"
+      },
+      {
+        "cache_creation_units": 17376,
+        "cache_read_units": 61243,
+        "cost_usd": 0.1770715,
+        "duration_s": 40.486,
+        "exit_code": 0,
+        "input_units": 5,
+        "model": "sonnet",
+        "ok": true,
+        "output_units": 1513,
+        "role": "reviewer",
+        "stage": "reviewer-01",
+        "startup_model": "claude-sonnet-4-6",
+        "stopped_reason": "",
+        "turns": 6,
+        "unreliable": [],
+        "usage_source": "model_usage_totals"
+      }
+    ],
+    "control": [
+      {
+        "cache_creation_units": 32408,
+        "cache_read_units": 709826,
+        "cost_usd": 0.7914479999999998,
+        "duration_s": 277.159,
+        "exit_code": 0,
+        "input_units": 27,
+        "model": "sonnet",
+        "ok": true,
+        "output_units": 9354,
+        "role": "developer",
+        "stage": "developer-01",
+        "startup_model": "claude-sonnet-4-6",
+        "stopped_reason": "",
+        "turns": 26,
+        "unreliable": [],
+        "usage_source": "model_usage_totals"
+      },
+      {
+        "cache_creation_units": 19016,
+        "cache_read_units": 105116,
+        "cost_usd": 0.25636800000000004,
+        "duration_s": 87.374,
+        "exit_code": 0,
+        "input_units": 7,
+        "model": "sonnet",
+        "ok": true,
+        "output_units": 3397,
+        "role": "reviewer",
+        "stage": "reviewer-01",
+        "startup_model": "claude-sonnet-4-6",
+        "stopped_reason": "",
+        "turns": 7,
+        "unreliable": [],
+        "usage_source": "model_usage_totals"
+      }
+    ]
+  },
+  "whole_task": {
+    "cache_creation_units": {
+      "absolute_change": -5721,
+      "challenger": 45703,
+      "control": 51424,
+      "dimension": "total cache creation",
+      "direction": "improved",
+      "percent_change": -11.1252,
+      "status": "OBSERVED"
+    },
+    "cache_read_units": {
+      "absolute_change": -233609,
+      "challenger": 581333,
+      "control": 814942,
+      "dimension": "total cache read",
+      "direction": "improved",
+      "percent_change": -28.6657,
+      "status": "OBSERVED"
+    },
+    "cost_usd": {
+      "absolute_change": -0.74713075,
+      "challenger": 0.30068525,
+      "control": 1.047816,
+      "dimension": "total provider cost (USD)",
+      "direction": "improved",
+      "percent_change": -71.3036,
+      "status": "OBSERVED"
+    },
+    "duration_s": {
+      "absolute_change": -159.572,
+      "challenger": 204.961,
+      "control": 364.533,
+      "dimension": "total model wall time (s)",
+      "direction": "improved",
+      "percent_change": -43.7744,
+      "status": "OBSERVED"
+    },
+    "input_units": {
+      "absolute_change": 132,
+      "challenger": 166,
+      "control": 34,
+      "dimension": "total input units",
+      "direction": "worsened",
+      "percent_change": 388.2353,
+      "status": "OBSERVED"
+    },
+    "output_units": {
+      "absolute_change": -4031,
+      "challenger": 8720,
+      "control": 12751,
+      "dimension": "total output",
+      "direction": "improved",
+      "percent_change": -31.6132,
+      "status": "OBSERVED"
+    },
+    "paid_sessions": {
+      "absolute_change": 0,
+      "challenger": 2,
+      "control": 2,
+      "dimension": "total paid sessions",
+      "direction": "unchanged",
+      "percent_change": 0.0,
+      "status": "OBSERVED"
+    },
+    "turns": {
+      "absolute_change": -7,
+      "challenger": 26,
+      "control": 33,
+      "dimension": "total model turns",
+      "direction": "improved",
+      "percent_change": -21.2121,
+      "status": "OBSERVED"
+    }
+  }
+}

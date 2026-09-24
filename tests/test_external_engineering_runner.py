@@ -66,7 +66,11 @@ from tools.engineering_runner.backends import (
     SessionRequest,
     normalise_claude_usage,
 )
-from tools.engineering_runner.briefs import developer_instructions, review_instructions
+from tools.engineering_runner.briefs import (
+    developer_execution_context,
+    developer_instructions,
+    review_instructions,
+)
 from tools.engineering_runner.repo_map import build_repo_map
 from tools.engineering_runner.config import RunnerConfig
 from tools.engineering_runner.errors import (
@@ -88,7 +92,7 @@ from tools.engineering_runner.evidence import (
     parse_json_object,
     suite_evidence,
 )
-from tools.engineering_runner.evidence import _usage
+from tools.engineering_runner.evidence import _counts, _summary_line, _usage
 from tools.engineering_runner.process import CommandResult, CommandRunner
 from tools.engineering_runner.queue import LEASE_NAME, RunStore, utcnow
 from tools.engineering_runner.redaction import (
@@ -245,7 +249,7 @@ def efficiency_block(**changes: Any) -> dict[str, Any]:
     be testing a payload production cannot produce.
     """
     block: dict[str, Any] = {
-        "artifact_version": 1,
+        "artifact_version": 2,
         "profile": "consumer",
         "model_tier": "standard",
         "escalation": "none",
@@ -278,6 +282,17 @@ def efficiency_block(**changes: Any) -> dict[str, Any]:
         },
         "context": {"refs": ["module_contract:subject"], "ref_count": 1},
         "strategy_reason": "reasoning class C at risk medium is routine implementation",
+        "adaptive_routing": {
+            "eligible": False,
+            "downshift_tier": "economy",
+            "static_reasons": [],
+            "runtime_requirements": [
+                "base diagnostic ran",
+                "base diagnostic found at least one failing required test",
+                "every failure-symbol hint is present as a failure-guided compiled span",
+                "operator did not pin a developer model",
+            ],
+        },
     }
     block.update(changes)
     return block
@@ -405,6 +420,49 @@ def test_developer_instructions_work_with_no_repo_map_at_all():
     )
     assert "Authorized engineering work order" in instructions
     assert "Execution context" not in instructions
+
+
+def test_p3_compiler_miss_falls_back_to_the_p2_generic_excerpt(tmp_path: Path):
+    """A weak semantic match may cost more reads, but it must not starve the model."""
+    (tmp_path / "subject").mkdir()
+    (tmp_path / "subject" / "module.py").write_text(
+        "def unrelated_helper():\n    return 1\n", encoding="utf-8"
+    )
+    repo_map = build_repo_map(tmp_path, roots=("subject",))
+    envelope = AuthorityEnvelope.parse(
+        developer_briefing("a" * 40, allowed=["subject/module.py"])
+    )
+
+    bundle = developer_execution_context(repo_map, envelope=envelope, worktree=tmp_path)
+
+    assert bundle.compiled_spans == ()
+    assert bundle.files
+    assert bundle.files[0].excerpts, "P3 miss must retain the P2 fallback excerpt"
+
+
+def test_p3_required_test_context_never_widens_write_authority(tmp_path: Path):
+    (tmp_path / "subject").mkdir()
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "subject" / "module.py").write_text(
+        "def set_value():\n    return 2\n", encoding="utf-8"
+    )
+    (tmp_path / "tests" / "test_subject.py").write_text(
+        "def test_value_is_two():\n    VALUE = 2\n    assert VALUE == 2\n",
+        encoding="utf-8",
+    )
+    repo_map = build_repo_map(tmp_path, roots=("subject", "tests"))
+    envelope = AuthorityEnvelope.parse(
+        developer_briefing("a" * 40, allowed=["subject/module.py"])
+    )
+
+    bundle = developer_execution_context(repo_map, envelope=envelope, worktree=tmp_path)
+
+    assert envelope.may_write == ("subject/module.py",)
+    assert all(
+        span.path in {"subject/module.py", "tests/test_subject.py"}
+        for span in bundle.compiled_spans
+    )
+    assert "tests/test_subject.py" not in envelope.may_write
 
 
 def test_review_instructions_work_with_no_repo_map_at_all():
@@ -862,6 +920,10 @@ def test_a_reviewer_that_answers_badly_is_asked_again_in_the_same_session(reposi
     first, second = [r for r in backend.launched if r.role == "reviewer"]
     assert second.instructions.startswith(first.instructions)
     assert "could not be read" in second.instructions
+    assert second.max_cost == first.max_cost
+    assert second.timeout_s == first.timeout_s
+    assert second.allowed_tools == first.allowed_tools
+    assert second.disallowed_tools == first.disallowed_tools
 
 
 def test_suite_evidence_reports_a_failure_rather_than_hiding_it():
@@ -1071,6 +1133,14 @@ class ScriptedControlPlane:
             state = "blocked"
         return _reply({"state": state, "review": {"outcome": outcome}})
 
+    def execution_stop(self, work_order_id: str, *, reason: str):
+        self.calls.append(("execution-stop", reason))
+        self._advance("decision_required")
+        return _reply(
+            {"state": "decision_required", "reason": reason},
+            exit_code=1,
+        )
+
     def gate_check(self, *, gate_repo_root: Path, suite_evidence: Path, timeout_s: float):
         self.calls.append(("gate-check", str(gate_repo_root)))
         # Report, then verdict - and the verdict is not a field of the report.
@@ -1268,6 +1338,123 @@ def test_an_authorized_job_runs_developer_then_review_then_gate(repository):
     assert receipt["files_changed"] == ["subject/module.py"]
     assert receipt["remote_verified"] is True
     assert control.attestations[0]["verdict"] == "pass"
+
+
+def test_consumer_developer_has_no_model_owned_shell_or_todo_loop(repository):
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    backend = ScriptedBackend(edit=_in_scope_edit)
+
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    assert developer.allowed_tools == ("Read", "Write", "Edit", "Glob", "Grep")
+    assert "Bash" not in developer.allowed_tools
+    assert "TodoWrite" not in developer.allowed_tools
+    assert "Do not run these tests inside this model session." in developer.instructions
+    assert "tests/test_subject.py" in developer.instructions
+    assert "Run them yourself" not in developer.instructions
+
+    resources = json.loads(
+        (Path(report.run_dir) / "developer-01" / "resources.json").read_text("utf-8")
+    )
+    assert resources["available_tools"] == ["Read", "Write", "Edit", "Glob", "Grep"]
+    assert resources["deterministic_validation_owner"] == "runner"
+    assert resources["model_runs_required_tests"] is False
+    assert resources["repository_map_cache"]["available"] is True
+    assert resources["repository_map_cache"]["identity_source"] == "git_blob"
+    assert resources["repository_map_cache"]["snapshot_hit"] is False
+    assert resources["repository_map_cache"]["module_misses"] >= 1
+
+    # P3 compiles and persists the exact deterministic context before provider
+    # launch. The resource evidence names the same fingerprint, so the prompt
+    # cannot silently be built from a different context than the artifact.
+    context_path = Path(report.run_dir) / "developer-01" / "execution-context.json"
+    assert context_path.is_file()
+    context = json.loads(context_path.read_text("utf-8"))
+    assert context["compiler_version"] == 3
+    assert len(context["fingerprint"]) == 16
+    assert resources["compiled_context"]["fingerprint"] == context["fingerprint"]
+    assert resources["compiled_context"]["rendered_chars"] == context["rendered_chars"]
+    assert resources["compiled_context"]["compiled_spans"] == len(context["compiled_spans"])
+
+    base_tests = Path(report.run_dir) / "developer-01" / "base-tests.json"
+    assert base_tests.is_file()
+    base_evidence = json.loads(base_tests.read_text("utf-8"))
+    assert base_evidence["commit"] == repository["base"]
+    assert len(base_evidence["runs"]) == 1
+    assert base_evidence["runs"][0]["command"] == "tests/test_subject.py"
+    assert base_evidence["failure_symbol_hints"] == []
+    assert resources["base_diagnostic"]["eligible"] is True
+    assert resources["base_diagnostic"]["ran"] is True
+    assert resources["base_diagnostic"]["test_runs"] == 1
+    assert resources["base_diagnostic"]["green"] == 1
+    assert resources["base_diagnostic"]["failed"] == 0
+    assert resources["base_diagnostic"]["failure_symbol_hints"] == 0
+
+
+def test_expanded_developer_keeps_the_operator_shell_capability(repository):
+    control = ScriptedControlPlane(
+        repository["base"],
+        states=["planning"],
+        efficiency={
+            "profile": "expanded",
+            "profile_terms": {
+                "name": "expanded",
+                "developer_attempts": 3,
+                "stage_ceiling": 12,
+                "context_ref_ceiling": 20,
+            },
+        },
+    )
+    backend = ScriptedBackend(edit=_in_scope_edit)
+
+    _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    assert "Bash" in developer.allowed_tools
+    assert "TodoWrite" in developer.allowed_tools
+
+
+def test_consumer_tool_reduction_never_adds_a_tool_the_operator_removed(repository):
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    backend = ScriptedBackend(edit=_in_scope_edit)
+
+    _runner(
+        repository,
+        backend,
+        control,
+        developer_tools=("Read", "Edit", "Grep"),
+    ).run_one(WORK_ORDER)
+
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    assert developer.allowed_tools == ("Read", "Edit", "Grep")
+
+
+def test_reviewer_reuses_the_runner_owned_repository_map_cache(repository):
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    developer_resources = json.loads(
+        (Path(report.run_dir) / "developer-01" / "resources.json").read_text("utf-8")
+    )
+    reviewer_resources = json.loads(
+        (Path(report.run_dir) / "reviewer-01" / "resources.json").read_text("utf-8")
+    )
+
+    developer_cache = developer_resources["repository_map_cache"]
+    reviewer_cache = reviewer_resources["repository_map_cache"]
+
+    assert developer_cache["available"] is True
+    assert reviewer_cache["available"] is True
+    assert developer_cache["identity_source"] == "git_blob"
+    assert reviewer_cache["identity_source"] == "git_blob"
+    assert developer_cache["snapshot_hit"] is False
+    # The fixture edits subject/module.py, which is outside the repo-map roots.
+    # The reviewer therefore sees the exact same company/tools/tests tree.
+    assert reviewer_cache["snapshot_hit"] is True
+    assert reviewer_cache["tree_fingerprint"] == developer_cache["tree_fingerprint"]
+    assert reviewer_cache["module_misses"] == 0
 
 
 def test_the_developer_and_reviewer_run_in_different_sessions(repository):
@@ -1746,6 +1933,7 @@ def test_the_runner_adds_no_dependency():
         "socket",
         "subprocess",
         "sys",
+        "tempfile",
         "time",
         "typing",
         "uuid",
@@ -2590,9 +2778,12 @@ def test_the_runner_refuses_an_artifact_version_it_cannot_read(repository):
         ResourceStrategy.parse(payload)
 
 
-def test_the_runner_refuses_a_tier_it_does_not_know(repository):
+@pytest.mark.parametrize("tier", ["cheapest", "economy"])
+def test_the_runner_refuses_a_primary_tier_that_bypasses_adaptive_routing(
+    repository, tier
+):
     payload = developer_briefing(repository["base"])
-    payload["efficiency"]["model_tier"] = "cheapest"
+    payload["efficiency"]["model_tier"] = tier
     with pytest.raises(IntegrityFailure, match="model tier"):
         ResourceStrategy.parse(payload)
 
@@ -2631,6 +2822,97 @@ def test_the_operator_does_not_restate_the_model_for_every_job(repository):
     assert applied["timeout_source"] == "resource_strategy"
     assert applied["cost_ceiling_enforced"] is True
     assert any("max_turns" in line for line in applied["not_enforced"])
+
+
+def test_p5_economy_candidate_is_vetoed_when_the_base_test_is_green(repository):
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    control = ScriptedControlPlane(
+        repository["base"],
+        states=["planning"],
+        efficiency={
+            "adaptive_routing": {
+                "eligible": True,
+                "downshift_tier": "economy",
+            }
+        },
+    )
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    assert developer.model == "sonnet"
+    resources = json.loads(
+        (Path(report.run_dir) / "developer-01" / "resources.json").read_text("utf-8")
+    )
+    adaptive = resources["adaptive_model_routing"]
+    assert adaptive["candidate"] is True
+    assert adaptive["applied"] is False
+    assert "base diagnostic found no counted failing tests" in adaptive["veto_reasons"]
+
+
+def test_p5_downshifts_only_after_a_complete_failure_guided_base_localization(repository):
+    repo = repository["repo"]
+    (repo / "tests" / "test_subject.py").write_text(
+        "from subject.module import VALUE\n\n\n"
+        "def test_value():\n"
+        "    assert VALUE == 2\n",
+        encoding="utf-8",
+    )
+    _git(repo, "add", "--all")
+    _git(repo, "commit", "--message", "make benchmark base fail")
+    base = _git(repo, "rev-parse", "HEAD")
+
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    control = ScriptedControlPlane(
+        base,
+        states=["planning"],
+        efficiency={
+            "adaptive_routing": {
+                "eligible": True,
+                "downshift_tier": "economy",
+            }
+        },
+    )
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    reviewer = [item for item in backend.launched if item.role == "reviewer"][0]
+    assert developer.model == "haiku"
+    assert reviewer.model == "sonnet"
+
+    resources = json.loads(
+        (Path(report.run_dir) / "developer-01" / "resources.json").read_text("utf-8")
+    )
+    adaptive = resources["adaptive_model_routing"]
+    assert adaptive["candidate"] is True
+    assert adaptive["applied"] is True
+    assert adaptive["base_failed_tests"] == 1
+    assert adaptive["failure_symbol_hints"] == 1
+    assert adaptive["failure_guided_complete_spans"] == 1
+    assert adaptive["veto_reasons"] == []
+    assert resources["model_source"] == "adaptive:economy"
+
+
+def test_p5_never_downshifts_a_strongest_tier_even_if_candidate_flag_is_forged(repository):
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    control = ScriptedControlPlane(
+        repository["base"],
+        states=["planning"],
+        efficiency={
+            "model_tier": "strongest",
+            "adaptive_routing": {
+                "eligible": True,
+                "downshift_tier": "economy",
+            },
+        },
+    )
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    assert developer.model == "opus"
+    resources = json.loads(
+        (Path(report.run_dir) / "developer-01" / "resources.json").read_text("utf-8")
+    )
+    adaptive = resources["adaptive_model_routing"]
+    assert adaptive["applied"] is False
+    assert "Company OS did not recommend the standard tier" in adaptive["veto_reasons"]
 
 
 def test_the_strongest_tier_resolves_to_the_stronger_model(repository):
@@ -2689,6 +2971,138 @@ class _Recorder:
             stderr="",
             duration_s=0.1,
         )
+
+
+def test_project_factory_claude_sessions_disable_account_injected_mcp_servers():
+    class EnvironmentRecorder(_Recorder):
+        def __init__(self):
+            super().__init__()
+            self.environments: list[dict[str, str]] = []
+
+        def run(self, argv, **kwargs):
+            self.environments.append(dict(kwargs.get("env") or {}))
+            return super().run(argv, **kwargs)
+
+    recorder = EnvironmentRecorder()
+    backend = ClaudeCodeBackend(recorder, executable=sys.executable)
+    backend._resolved = sys.executable
+    backend.launch(
+        SessionRequest(
+            role="developer",
+            cwd=Path("."),
+            instructions="x",
+            timeout_s=60.0,
+            allowed_tools=("Bash", "Read", "Edit"),
+        )
+    )
+
+    assert recorder.environments
+    assert recorder.environments[0]["ENABLE_CLAUDEAI_MCP_SERVERS"] == "false"
+
+
+def test_claude_builtin_tools_and_mcp_surface_are_isolated():
+    recorder = _Recorder()
+    backend = ClaudeCodeBackend(recorder, executable=sys.executable)
+    backend._resolved = sys.executable
+    backend.launch(
+        SessionRequest(
+            role="developer",
+            cwd=Path("."),
+            instructions="x",
+            timeout_s=60.0,
+            allowed_tools=("Bash", "Read", "Edit"),
+            disallowed_tools=("WebSearch",),
+        )
+    )
+
+    argv = recorder.calls[0]
+    assert argv[argv.index("--tools") + 1] == "Bash,Read,Edit"
+    assert argv[argv.index("--allowedTools") + 1] == "Bash Read Edit"
+    assert argv[argv.index("--disallowedTools") + 1] == "WebSearch"
+    assert "--strict-mcp-config" in argv
+    assert argv[argv.index("--mcp-config") + 1] == '{"mcpServers":{}}'
+
+
+def test_empty_worker_tool_contract_exposes_no_builtin_tools():
+    recorder = _Recorder()
+    backend = ClaudeCodeBackend(recorder, executable=sys.executable)
+    backend._resolved = sys.executable
+    backend.launch(
+        SessionRequest(
+            role="reviewer",
+            cwd=Path("."),
+            instructions="x",
+            timeout_s=60.0,
+            allowed_tools=(),
+            read_only=True,
+        )
+    )
+    argv = recorder.calls[0]
+    assert argv[argv.index("--tools") + 1] == ""
+    assert "--allowedTools" not in argv
+    assert "--strict-mcp-config" in argv
+
+
+def test_claude_system_init_is_preserved_as_bounded_startup_evidence():
+    recorder = _Recorder()
+    transcript = "\n".join(
+        [
+            json.dumps(
+                {
+                    "type": "system",
+                    "subtype": "init",
+                    "model": "claude-sonnet-4-6",
+                    "permissionMode": "acceptEdits",
+                    "tools": ["Bash", "Read", "Edit"],
+                    "mcp_servers": [],
+                    "plugins": [],
+                    "skills": ["debug"],
+                }
+            ),
+            json.dumps(
+                {
+                    "type": "result",
+                    "subtype": "success",
+                    "is_error": False,
+                    "session_id": "03dff822-7d61-4865-b0b5-2efe8a35ab40",
+                    "result": "ok",
+                    "usage": {},
+                    "modelUsage": {},
+                }
+            ),
+        ]
+    )
+    recorder.run = lambda argv, **kwargs: CommandResult(
+        argv=tuple(argv),
+        cwd=".",
+        exit_code=0,
+        stdout=transcript,
+        stderr="",
+        duration_s=0.1,
+    )
+    backend = ClaudeCodeBackend(recorder, executable=sys.executable)
+    backend._resolved = sys.executable
+    outcome = backend.launch(
+        SessionRequest(
+            role="developer",
+            cwd=Path("."),
+            instructions="x",
+            timeout_s=60.0,
+            allowed_tools=("Bash", "Read", "Edit"),
+        )
+    )
+
+    assert outcome.startup_context == {
+        "model": "claude-sonnet-4-6",
+        "permission_mode": "acceptEdits",
+        "tools": ["Bash", "Read", "Edit"],
+        "mcp_servers": [],
+        "plugins": [],
+        "skills": ["debug"],
+    }
+    stored = outcome.to_dict()["startup_context"]
+    assert stored["tools"] == ["Bash", "Read", "Edit"]
+    assert stored["mcp_servers"] == []
 
 
 def test_a_spend_ceiling_reaches_the_command_line():
@@ -2826,6 +3240,17 @@ def test_no_exploration_json_is_written_when_the_backend_gave_no_trace(repositor
 # --- consumer resource mode: output reduction -----------------------------
 
 
+def test_failed_pytest_summary_prefers_the_counted_final_line() -> None:
+    stdout = (
+        "================ short test summary info ================\n"
+        "FAILED tests/test_subject.py::test_one - assert 1 == 2\n"
+        "FAILED tests/test_subject.py::test_two - assert 1 == 2\n"
+        "================ 2 failed, 205 passed in 19.88s ================\n"
+    )
+    assert _summary_line(stdout) == "2 failed, 205 passed in 19.88s"
+    assert _counts(stdout) == {"failed": 2, "passed": 205}
+
+
 def test_a_successful_command_is_one_line_and_a_failing_one_is_its_failure():
     """The honest half of output reduction: what the runner itself captures.
 
@@ -2866,6 +3291,121 @@ def test_a_passing_test_run_carries_no_failure_detail(repository):
     )["runs"]
     assert runs
     assert all(run["failure_detail"] == "" for run in runs)
+
+
+def test_a_budget_stopped_stage_never_spawns_an_automatic_repair_session(repository):
+    """Regression for the V4 hidden-spend incident.
+
+    A provider resource stop is a backend stop, not malformed report JSON. The
+    runner persists that paid session and stops; it must not consume the one
+    structured-report repair slot.
+    """
+
+    class BudgetStopped(ScriptedBackend):
+        def launch(self, request: SessionRequest) -> SessionOutcome:
+            self.launched.append(request)
+            self.session_ids.append(request.session_id)
+            return SessionOutcome(
+                backend=self.name,
+                role=request.role,
+                session_id=request.session_id,
+                model="scripted",
+                provider="anthropic",
+                exit_code=0,
+                duration_s=0.01,
+                result_text="",
+                transcript="stopped",
+                ok=False,
+                cost_usd=3.0,
+                input_units=10,
+                output_units=100,
+                cache_read_units=1000,
+                cache_creation_units=200,
+                stopped_reason="error_max_budget_usd",
+                cost_ceiling_enforced=True,
+            )
+
+    control = ScriptedControlPlane(repository["base"], states=["planning"])
+    backend = BudgetStopped()
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    developer = [request for request in backend.launched if request.role == "developer"]
+    assert len(developer) == 1
+    assert report.outcome == RUN_BLOCKED
+    assert report.final_state == "decision_required"
+    assert "error_max_budget_usd" in report.reason
+    assert control.states[0] == "decision_required"
+    assert [call[0] for call in control.calls].count("execution-stop") == 1
+
+    stage = Path(report.run_dir) / "developer-01"
+    assert (stage / "session-1.json").is_file()
+    assert not (stage / "session-2.json").exists()
+    sessions = json.loads((stage / "sessions.json").read_text("utf-8"))
+    assert sessions["paid_session_count"] == 1
+
+
+def test_usage_aggregates_every_paid_session_in_the_stage():
+    first = SessionOutcome(
+        backend="claude_code",
+        role="developer",
+        session_id="00000000-0000-4000-8000-000000000001",
+        model="sonnet",
+        provider="anthropic",
+        exit_code=0,
+        duration_s=2.0,
+        result_text="",
+        transcript="",
+        ok=True,
+        cost_usd=3.0,
+        input_units=10,
+        output_units=100,
+        cache_read_units=1000,
+        cache_creation_units=200,
+        turns=3,
+        cost_ceiling_enforced=True,
+        exploration={
+            "file_reads_total": 2,
+            "file_reads_repeated": 1,
+            "searches_total": 1,
+        },
+    )
+    second = SessionOutcome(
+        backend="claude_code",
+        role="developer",
+        session_id="00000000-0000-4000-8000-000000000002",
+        model="sonnet",
+        provider="anthropic",
+        exit_code=0,
+        duration_s=1.0,
+        result_text="",
+        transcript="",
+        ok=True,
+        cost_usd=0.5,
+        input_units=5,
+        output_units=50,
+        cache_read_units=250,
+        cache_creation_units=75,
+        turns=2,
+        cost_ceiling_enforced=True,
+        exploration={
+            "file_reads_total": 1,
+            "file_reads_repeated": 0,
+            "searches_total": 0,
+        },
+    )
+
+    usage = _usage(second, sessions=(first, second))
+    assert usage["passes"] == 1
+    assert usage["retries"] == 1
+    assert usage["provider_cost"] == "3.500000"
+    assert usage["input_units"] == 15
+    assert usage["output_units"] == 150
+    assert usage["cache_hits"] == 1250
+    assert usage["cache_creation_units"] == 275
+    assert usage["model_turns"] == 5
+    assert usage["repo_file_reads"] == 3
+    assert usage["repeated_file_reads"] == 1
+    assert usage["repo_searches"] == 1
 
 
 def test_a_session_stopped_at_its_spend_ceiling_is_not_a_successful_session():

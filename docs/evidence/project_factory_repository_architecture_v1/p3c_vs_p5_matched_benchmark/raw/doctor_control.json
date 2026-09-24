@@ -1,0 +1,48 @@
+{
+  "backends": {
+    "claude_code": {
+      "available": true,
+      "detail": "2.1.70 (Claude Code)"
+    }
+  },
+  "config": {
+    "apply_resource_strategy": true,
+    "backend": "claude_code",
+    "developer_model": "",
+    "lease_seconds": 3600.0,
+    "operator": "MGI",
+    "poll_interval_s": 20.0,
+    "push": true,
+    "remote": "origin",
+    "repo_root": "<projects>\\wt-bench-p3c-control",
+    "reviewer_backend": "claude_code",
+    "reviewer_model": "",
+    "runner_dir": "<projects>\\project-factory-runner-state\\p3c-vs-p5-control",
+    "standard_model": "sonnet",
+    "state_dir": "<projects>\\project-factory-company-state\\p3c-vs-p5-control",
+    "strongest_model": "opus",
+    "worktree_root": "<projects>\\project-factory-benchmark-worktrees\\p3c-vs-p5-control"
+  },
+  "control_plane": {
+    "exit_code": 0,
+    "work_orders": []
+  },
+  "repository": {
+    "branch": "HEAD",
+    "common_dir": "<projects>\\Simulation Factory\\.git",
+    "head": "1705720eb9fac38990639c82477fbfbc2f55aa7e"
+  },
+  "required_suites": [
+    "tests/test_company_analytics.py",
+    "tests/test_company_dashboard.py",
+    "tests/test_company_execution_transport.py",
+    "tests/test_company_finance.py",
+    "tests/test_company_integration_gate.py",
+    "tests/test_company_org_intelligence.py",
+    "tests/test_company_os_ai_platform.py",
+    "tests/test_company_os_capsules.py",
+    "tests/test_company_os_knowledge.py",
+    "tests/test_company_runtime.py",
+    "tests/test_company_workforce.py"
+  ]
+}

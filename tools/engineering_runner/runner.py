@@ -73,19 +73,22 @@ from .authorization import (
     verify_reviewer_left_no_trace,
 )
 from .backends import CodingBackend, SessionOutcome, SessionRequest, build_backend, executor_hint
-from .resources import ResourceStrategy
+from .resources import ECONOMY, STANDARD, ResourceStrategy
 from .briefs import (
     DEVELOPER_REPORT_NAME,
     REVIEW_DIFF_NAME,
+    developer_execution_context,
     developer_instructions,
     repair_instructions,
     review_instructions,
 )
-from .repo_map import RepoMap, build_repo_map
+from .execution_context import failure_symbol_hints
+from .repo_map import RepoMap, build_repo_map, build_repo_map_cached
 from .config import RunnerConfig
 from .controlplane import ControlPlane
 from .errors import (
     AuthorityViolation,
+    BackendFailure,
     BackendUnavailable,
     ClaimUnavailable,
     IntegrityFailure,
@@ -144,6 +147,12 @@ MAX_STAGES_PER_RUN = 16
 # a checkpoint is what the next session needs, and a conversation is what the
 # last one happened to contain.
 CHECKPOINT_NAME = "checkpoint.json"
+
+# P3B pre-provider diagnostics are deliberately bounded. If a work order names
+# a large test surface, the runner falls back to semantic context instead of
+# doubling an expensive validation phase before the model starts.
+MAX_BASE_DIAGNOSTIC_TESTS = 2
+MAX_BASE_DIAGNOSTIC_TIMEOUT_S = 180.0
 
 # Run outcomes, as the outcome log records them.
 COMPLETED = "completed"
@@ -393,6 +402,28 @@ class EngineeringRunner:
                 state = record.state_after or self._state(work_order_id)
         except AuthorityViolation as exc:
             outcome, reason = RUN_BLOCKED, str(exc)
+        except BackendFailure as exc:
+            # A provider/backend session was already launched and consumed
+            # resources. Persist the stop in Company OS before returning so a
+            # restarted watch loop cannot see the in-flight state and silently
+            # spend another session.
+            stop_reason = f"{type(exc).__name__}: {exc}"
+            try:
+                stopped = self._control.execution_stop(
+                    work_order_id,
+                    reason=stop_reason,
+                )
+                if stopped.refused:
+                    stopped.require()
+                state = str(stopped.payload.get("state", "")) or state
+                outcome = RUN_BLOCKED if state == DECISION_REQUIRED else RUN_FAILED
+                reason = stop_reason
+            except RunnerError as stop_exc:
+                outcome = RUN_FAILED
+                reason = (
+                    f"{stop_reason}; failed to persist the execution stop: "
+                    f"{type(stop_exc).__name__}: {stop_exc}"
+                )
         except (RunnerError, OSError) as exc:
             outcome, reason = RUN_FAILED, f"{type(exc).__name__}: {exc}"
         finally:
@@ -565,6 +596,26 @@ class EngineeringRunner:
 
     # --- the resource strategy ----------------------------------------------
 
+    def _developer_tools(self, strategy: ResourceStrategy) -> tuple[str, ...]:
+        """The model gets only the tools whose work cannot be done deterministically.
+
+        Consumer work is the default bounded/routine path. Its tests, git checks,
+        commits and pushes are already owned by the runner after the model exits,
+        so giving the model Bash invites duplicate validation loops without adding
+        authority or evidence. TodoWrite is likewise session-local planning state
+        that Company OS does not consume. Expanded/specialist work keeps the
+        operator-configured full tool set because its implementation may genuinely
+        require generation or inspection through a shell.
+
+        This is a reduction only: it filters the operator's configured tool set and
+        never adds a tool that was not already present.
+        """
+        tools = tuple(self.config.developer_tools)
+        if strategy.profile.strip().lower() != "consumer":
+            return tools
+        removed = {"Bash", "TodoWrite"}
+        return tuple(tool for tool in tools if tool not in removed)
+
     def _resource_plan(
         self, payload: Mapping[str, Any], *, role: str
     ) -> tuple[ResourceStrategy, dict[str, Any]]:
@@ -636,6 +687,103 @@ class EngineeringRunner:
             )
         return strategy, applied
 
+    def _adaptive_developer_model(
+        self,
+        strategy: ResourceStrategy,
+        applied: Mapping[str, Any],
+        *,
+        envelope: AuthorityEnvelope,
+        repo_map: RepoMap | None,
+        context_bundle: Any,
+        base_runs: Sequence[TestRun],
+        preferred_symbols: Sequence[tuple[str, str]],
+        diagnostic_eligible: bool,
+    ) -> dict[str, Any]:
+        """Downshift a routine developer only after deterministic localization.
+
+        Company OS may nominate a standard-tier task as an economy candidate,
+        but the runner owns the evidence that exists only at execution time:
+        the immutable-base pytest result and the exact AST spans compiled from
+        it. Any missing or ambiguous evidence leaves the existing standard
+        model untouched. Strongest-tier work is never considered here.
+        """
+        result = dict(applied)
+        routing = strategy.raw.get("adaptive_routing")
+        routing = routing if isinstance(routing, Mapping) else {}
+
+        evidence: dict[str, Any] = {
+            "candidate": bool(routing.get("eligible", False)),
+            "requested_downshift_tier": str(routing.get("downshift_tier", "")),
+            "applied": False,
+            "source_tier": strategy.model_tier,
+            "target_tier": ECONOMY,
+            "veto_reasons": [],
+            "base_failed_tests": sum(run.failed for run in base_runs),
+            "failure_symbol_hints": len(preferred_symbols),
+            "failure_guided_complete_spans": 0,
+        }
+        veto: list[str] = []
+
+        if not self.config.apply_resource_strategy:
+            veto.append("resource strategy application is disabled")
+        if self.config.developer_model:
+            veto.append("operator pinned a developer model")
+        if strategy.model_tier != STANDARD:
+            veto.append("Company OS did not recommend the standard tier")
+        if not evidence["candidate"]:
+            veto.append("Company OS did not mark this task economy-eligible")
+        if routing.get("downshift_tier") != ECONOMY:
+            veto.append("briefing does not request the economy downshift")
+        if not diagnostic_eligible or not base_runs:
+            veto.append("base diagnostic did not run")
+
+        failed_total = sum(run.failed for run in base_runs)
+        if failed_total <= 0:
+            veto.append("base diagnostic found no counted failing tests")
+        if not preferred_symbols:
+            veto.append("base diagnostic produced no failure-symbol hints")
+        elif failed_total != len(preferred_symbols):
+            veto.append(
+                "counted failures and unique failure-symbol hints do not match"
+            )
+
+        span_by_key = {
+            (span.path, span.qualified_name): span
+            for span in context_bundle.compiled_spans
+            if span.reason == "failing required test at the immutable task base"
+        }
+        complete = 0
+        for path, qualified_name in preferred_symbols:
+            span = span_by_key.get((path, qualified_name))
+            module = repo_map.by_path(path) if repo_map is not None else None
+            symbol = module.symbol(qualified_name) if module is not None else None
+            if span is None or symbol is None:
+                continue
+            if span.start_line == symbol.start_line and span.end_line == symbol.end_line:
+                complete += 1
+        evidence["failure_guided_complete_spans"] = complete
+
+        if preferred_symbols and complete != len(preferred_symbols):
+            veto.append("not every failure hint has a complete failure-guided AST span")
+
+        if len(envelope.authorized_paths) != 1:
+            veto.append("runtime authority is not a one-path write scope")
+        if not (1 <= len(envelope.required_tests) <= MAX_BASE_DIAGNOSTIC_TESTS):
+            veto.append("runtime required-test surface is outside the bounded diagnostic")
+
+        if not veto:
+            model = self.config.tier_models().get(ECONOMY, "")
+            if not model:
+                veto.append("runner has no economy model mapping")
+            else:
+                result["applied_model"] = model
+                result["model_source"] = "adaptive:economy"
+                evidence["applied"] = True
+
+        evidence["veto_reasons"] = veto
+        result["adaptive_model_routing"] = evidence
+        return result
+
     def _backend_accepts_cost_ceiling(self) -> bool:
         """Only the Claude Code adapter passes a spend ceiling to the provider."""
         return self.config.backend == "claude_code"
@@ -673,7 +821,13 @@ class EngineeringRunner:
         write_json(stage_dir / "briefing.json", payload)
         envelope = AuthorityEnvelope.parse(payload)
         strategy, applied = self._resource_plan(payload, role="developer")
-        write_json(stage_dir / "resources.json", applied)
+        developer_tools = self._developer_tools(strategy)
+        applied = {
+            **applied,
+            "available_tools": list(developer_tools),
+            "deterministic_validation_owner": "runner",
+            "model_runs_required_tests": False,
+        }
 
         worktree = self._workspace.ensure_worktree(
             envelope.authorized_branch, envelope.base_commit
@@ -690,6 +844,86 @@ class EngineeringRunner:
             },
         )
 
+        base_runs: tuple[TestRun, ...] = ()
+        preferred_symbols: tuple[tuple[str, str], ...] = ()
+        diagnostic_eligible = (
+            not resume
+            and 0 < len(envelope.required_tests) <= MAX_BASE_DIAGNOSTIC_TESTS
+        )
+        if diagnostic_eligible:
+            base_runs = run_tests(
+                self._commands,
+                python_executable=self.config.python_executable,
+                worktree=worktree,
+                commands=envelope.required_tests,
+                commit=before.head,
+                timeout_s=min(
+                    self.config.test_timeout_s,
+                    MAX_BASE_DIAGNOSTIC_TIMEOUT_S,
+                ),
+            )
+            preferred_symbols = failure_symbol_hints(
+                tuple(run.failure_detail for run in base_runs if not run.green)
+            )
+            write_json(
+                stage_dir / "base-tests.json",
+                {
+                    "commit": before.head,
+                    "runs": [run.to_dict() for run in base_runs],
+                    "failure_symbol_hints": [
+                        {"path": path, "qualified_name": name}
+                        for path, name in preferred_symbols
+                    ],
+                },
+            )
+
+        repo_map, repo_map_cache = self._repo_map(worktree)
+        context_bundle = developer_execution_context(
+            repo_map,
+            envelope=envelope,
+            worktree=worktree,
+            preferred_symbols=preferred_symbols,
+        )
+        applied = self._adaptive_developer_model(
+            strategy,
+            applied,
+            envelope=envelope,
+            repo_map=repo_map,
+            context_bundle=context_bundle,
+            base_runs=base_runs,
+            preferred_symbols=preferred_symbols,
+            diagnostic_eligible=diagnostic_eligible,
+        )
+        context_path = write_json(
+            stage_dir / "execution-context.json", context_bundle.to_dict()
+        )
+        applied = {
+            **applied,
+            "repository_map_cache": repo_map_cache,
+            "compiled_context": {
+                "artifact": str(context_path),
+                "fingerprint": context_bundle.fingerprint(),
+                "compiled_spans": len(context_bundle.compiled_spans),
+                "rendered_chars": len(context_bundle.render()),
+                "truncated": context_bundle.truncated,
+            },
+            "base_diagnostic": {
+                "eligible": diagnostic_eligible,
+                "ran": bool(base_runs),
+                "test_runs": len(base_runs),
+                "green": sum(1 for run in base_runs if run.green),
+                "failed": sum(1 for run in base_runs if not run.green),
+                "failure_symbol_hints": len(preferred_symbols),
+                "duration_s": round(sum(run.duration_s for run in base_runs), 6),
+                "max_tests": MAX_BASE_DIAGNOSTIC_TESTS,
+                "timeout_s": min(
+                    self.config.test_timeout_s,
+                    MAX_BASE_DIAGNOSTIC_TIMEOUT_S,
+                ),
+            },
+        }
+        write_json(stage_dir / "resources.json", applied)
+
         report_path = stage_dir / DEVELOPER_REPORT_NAME
         instructions = developer_instructions(
             envelope,
@@ -698,18 +932,19 @@ class EngineeringRunner:
             attempt=envelope.packet_attempt,
             prior_findings=self._prior_findings(work_order_id),
             strategy=strategy,
-            repo_map=self._repo_map(worktree),
+            repo_map=repo_map,
+            context_bundle=context_bundle,
         )
         write_text(stage_dir / "instructions.md", instructions)
 
-        session, narrative = self._session_with_report(
+        session, narrative, sessions = self._session_with_report(
             backend_name=self.config.backend,
             request=SessionRequest(
                 role="developer",
                 cwd=worktree,
                 instructions=instructions,
                 timeout_s=applied["applied_timeout_s"],
-                allowed_tools=self.config.developer_tools,
+                allowed_tools=developer_tools,
                 disallowed_tools=self.config.disallowed_tools,
                 model=applied["applied_model"],
                 read_only=False,
@@ -760,6 +995,7 @@ class EngineeringRunner:
                 state_before=state_before,
                 verdict=verdict,
                 session=session,
+                sessions=sessions,
                 narrative=narrative,
                 observation=GitObservation(
                     branch=after.branch,
@@ -807,6 +1043,7 @@ class EngineeringRunner:
                 state_before=state_before,
                 verdict=verdict,
                 session=session,
+                sessions=sessions,
                 narrative=narrative,
                 observation=GitObservation(
                     branch=settled.branch,
@@ -875,6 +1112,7 @@ class EngineeringRunner:
             tests=tests,
             narrative=narrative,
             session=session,
+            sessions=sessions,
             completed_at=utcnow(),
             accepted=accepted,
             rejection_reason=(
@@ -904,7 +1142,7 @@ class EngineeringRunner:
                 + ("" if not failures else "; receipt failures: " + "; ".join(failures[:3]))
             ),
             artifacts=(str(receipt_path),),
-            session_ids=(session.session_id,),
+            session_ids=tuple(item.session_id for item in sessions),
         )
 
     def _review_stage(
@@ -967,6 +1205,12 @@ class EngineeringRunner:
         developer_report = read_json_object(
             developer_dir / DEVELOPER_REPORT_NAME, "the developer report"
         )
+        repo_map, repo_map_cache = self._repo_map(worktree)
+        applied = {
+            **applied,
+            "repository_map_cache": repo_map_cache,
+        }
+        write_json(stage_dir / "resources.json", applied)
         instructions = review_instructions(
             envelope,
             diff_path=diff_path,
@@ -974,11 +1218,11 @@ class EngineeringRunner:
             receipt=receipt,
             developer_report=developer_report,
             strategy=strategy,
-            repo_map=self._repo_map(worktree),
+            repo_map=repo_map,
         )
         write_text(stage_dir / "instructions.md", instructions)
 
-        session, reported = self._session_with_report(
+        session, reported, sessions = self._session_with_report(
             backend_name=self.config.reviewer_backend_name,
             request=SessionRequest(
                 role="reviewer",
@@ -1053,7 +1297,7 @@ class EngineeringRunner:
                 f"{review.get('deterministic_outcome', '?')})"
             ),
             artifacts=(str(attestation_path),),
-            session_ids=(session.session_id,),
+            session_ids=tuple(item.session_id for item in sessions),
         )
 
     def _gate_stage(self, work_order_id: str, run_dir: Path) -> StageRecord:
@@ -1136,6 +1380,7 @@ class EngineeringRunner:
         state_before: str,
         verdict: AuthorityVerdict,
         session: SessionOutcome,
+        sessions: Sequence[SessionOutcome],
         narrative: Mapping[str, Any],
         observation: GitObservation,
     ) -> StageRecord:
@@ -1155,6 +1400,7 @@ class EngineeringRunner:
             tests=(),
             narrative=narrative,
             session=session,
+            sessions=sessions,
             completed_at=utcnow(),
             accepted=False,
             rejection_reason=reason,
@@ -1175,13 +1421,14 @@ class EngineeringRunner:
         report_path: Path | None,
         what: str,
         validate: Callable[[Mapping[str, Any]], None] | None = None,
-    ) -> tuple[SessionOutcome, dict[str, Any]]:
-        """Launch a session and read its structured answer, with one repair try.
+    ) -> tuple[SessionOutcome, dict[str, Any], tuple[SessionOutcome, ...]]:
+        """Launch a session and read its structured answer, with one bounded repair.
 
-        `validate` runs against the decoded answer, so a reply that parses but
-        does not fit the contract Company OS will hold it to is repaired here -
-        by the session that made the judgment - instead of being refused a
-        stage later, when the judgment is already gone.
+        Every provider subprocess is preserved and returned to the caller. A
+        backend/resource stop is terminal to automatic repair: a session that
+        already hit a provider ceiling is not a malformed JSON answer and must
+        never trigger another paid session. Only a successful session whose
+        structured report is unreadable may use the configured repair slot.
         """
         backend = self.backend(backend_name)
         available, detail = backend.available()
@@ -1189,14 +1436,11 @@ class EngineeringRunner:
             raise BackendUnavailable(f"{backend_name}: {detail}")
         attempt = request
         problem = ""
+        sessions: list[SessionOutcome] = []
         for index in range(self.config.max_stage_retries + 1):
             session = backend.launch(attempt)
-            # The report is the one channel the session writes straight to
-            # disk, and everything downstream - the receipt, the attestation,
-            # the Company OS record, the committed evidence - is built from it.
-            # Scrub it where it lands, before anything reads it, so there is no
-            # arrangement of later code that can persist a credential a session
-            # happened to quote back.
+            sessions.append(session)
+
             if report_path is not None:
                 sanitize_json_file(report_path, self._redactor)
             write_json(stage_dir / f"session-{index + 1}.json", session.to_dict())
@@ -1204,18 +1448,33 @@ class EngineeringRunner:
                 stage_dir / f"session-{index + 1}.transcript.txt",
                 self._redactor.scrub(session.transcript),
             )
+            # Compatibility alias only. Truthful accounting reads session-N
+            # artifacts (and the receipt aggregate), never this last-session view.
             write_json(stage_dir / "session.json", session.to_dict())
+            write_json(
+                stage_dir / "sessions.json",
+                {
+                    "paid_session_count": len(sessions),
+                    "sessions": [item.to_dict() for item in sessions],
+                },
+            )
             if session.exploration is not None:
-                # The bounded, normalised trace `exploration_report.py` and a
-                # human read for "what did this session actually explore" -
-                # separate from `session.json` so that file stays the same
-                # small shape it always was. Never the raw transcript: the
-                # events here are already reduced to a tool name, a category
-                # and a repo-relative path or pattern.
-                write_json(
-                    stage_dir / "exploration.json",
-                    {**session.exploration, "events": list(session.exploration_events)},
+                exploration = {
+                    **session.exploration,
+                    "events": list(session.exploration_events),
+                }
+                write_json(stage_dir / f"exploration-{index + 1}.json", exploration)
+                # Compatibility alias: latest session only.
+                write_json(stage_dir / "exploration.json", exploration)
+
+            if not session.ok:
+                stopped = session.stopped_reason or f"exit_code={session.exit_code}"
+                raise BackendFailure(
+                    f"{backend_name} {request.role} session stopped before a usable "
+                    f"{what}: {stopped}; automatic report repair is disabled after "
+                    "a backend or provider stop"
                 )
+
             try:
                 if report_path is not None and report_path.is_file():
                     answer = read_json_object(report_path, what)
@@ -1223,7 +1482,7 @@ class EngineeringRunner:
                     answer = parse_json_object(session.result_text, what)
                 if validate is not None:
                     validate(answer)
-                return session, answer
+                return session, answer, tuple(sessions)
             except IntegrityFailure as exc:
                 problem = str(exc)
                 if index >= self.config.max_stage_retries:
@@ -1238,6 +1497,7 @@ class EngineeringRunner:
                     model=request.model,
                     read_only=request.read_only,
                     extra_dirs=request.extra_dirs,
+                    max_cost=request.max_cost,
                 )
         raise IntegrityFailure(problem or f"{what}: no usable answer")
 
@@ -1283,21 +1543,57 @@ class EngineeringRunner:
             ]
         return tuple(rendered[-6:])
 
-    def _repo_map(self, worktree: Path) -> RepoMap | None:
-        """The deterministic map of the worktree the session is about to read.
+    def _repo_map(self, worktree: Path) -> tuple[RepoMap | None, dict[str, Any]]:
+        """The deterministic map plus measured content-addressed-cache reuse.
 
-        Built fresh per stage rather than cached across work orders: each
-        work order's worktree can sit at a different commit, a stale map
-        naming a file that moved is worse than no map, and a full `ast` parse
-        of `company/` + `tools/` + `tests/` measures at about two seconds -
-        negligible beside a session that runs for minutes. Best-effort: a map
-        that failed to build is a missing convenience, never a reason to stop
-        an authorized session.
+        P4 keeps cache state under the runner's own directory, never in the
+        repository or Company OS state. The cache is advisory: its keys prove
+        exact source identity, and any cache I/O failure falls back to a fresh
+        deterministic build rather than changing authority or blocking work.
         """
+        cache_root = self.config.runner_dir / "cache" / "repo-map"
+        content_identities: Mapping[str, str] | None = None
+        identity_source = "filesystem"
+
+        # A clean task worktree is exactly represented by its Git index/HEAD.
+        # Git blob ids are content-addressed, so unchanged files need not be
+        # reopened merely to recompute the same hashes. Dirty/resumed trees
+        # deliberately fall back to exact filesystem hashing.
         try:
-            return build_repo_map(worktree)
+            status = self._workspace.status(worktree)
+            if status.clean:
+                tracked = self._workspace.tracked_blob_ids(worktree)
+                if tracked:
+                    content_identities = tracked
+                    identity_source = "git_blob"
+        except RunnerError:
+            content_identities = None
+            identity_source = "filesystem"
+
+        try:
+            repo_map, evidence = build_repo_map_cached(
+                worktree,
+                cache_root,
+                content_identities=content_identities,
+            )
+            return repo_map, {
+                "available": True,
+                "identity_source": identity_source,
+                **evidence.to_dict(),
+            }
         except OSError:
-            return None
+            try:
+                return build_repo_map(worktree), {
+                    "available": False,
+                    "identity_source": "filesystem",
+                    "fallback": "fresh deterministic build after cache I/O failure",
+                }
+            except OSError:
+                return None, {
+                    "available": False,
+                    "identity_source": "filesystem",
+                    "fallback": "repository map unavailable",
+                }
 
     def _state(self, work_order_id: str) -> str:
         reply = self._control.status(work_order_id)

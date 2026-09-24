@@ -1,0 +1,447 @@
+{
+  "per_pair": {
+    "pair1": {
+      "cache_creation_units": {
+        "challenger": 64083,
+        "control": 45964,
+        "pct_change": 39.42
+      },
+      "cache_read_units": {
+        "challenger": 1565335,
+        "control": 363600,
+        "pct_change": 330.51
+      },
+      "challenger": "challenger2",
+      "control": "control1",
+      "cost_usd": {
+        "challenger": 0.63329565,
+        "control": 0.69686,
+        "pct_change": -9.12
+      },
+      "deterministic_total_s": {
+        "challenger": 213.332636,
+        "control": 279.272194,
+        "pct_change": -23.61
+      },
+      "duration_s": {
+        "challenger": 638.046,
+        "control": 159.298,
+        "pct_change": 300.54
+      },
+      "end_to_end_wall_s": {
+        "challenger": 892.365,
+        "control": 518.086,
+        "pct_change": 72.24
+      },
+      "input_units": {
+        "challenger": 350,
+        "control": 22,
+        "pct_change": 1490.91
+      },
+      "output_units": {
+        "challenger": 18815,
+        "control": 9107,
+        "pct_change": 106.6
+      },
+      "paid_sessions": {
+        "challenger": 2,
+        "control": 2,
+        "pct_change": 0.0
+      },
+      "turns": {
+        "challenger": 54,
+        "control": 20,
+        "pct_change": 170.0
+      }
+    },
+    "pair2": {
+      "cache_creation_units": {
+        "challenger": 45703,
+        "control": 51424,
+        "pct_change": -11.13
+      },
+      "cache_read_units": {
+        "challenger": 581333,
+        "control": 814942,
+        "pct_change": -28.67
+      },
+      "challenger": "challenger3",
+      "control": "control2",
+      "cost_usd": {
+        "challenger": 0.30068525,
+        "control": 1.047816,
+        "pct_change": -71.3
+      },
+      "deterministic_total_s": {
+        "challenger": 223.452518,
+        "control": 237.995045,
+        "pct_change": -6.11
+      },
+      "duration_s": {
+        "challenger": 204.961,
+        "control": 364.533,
+        "pct_change": -43.77
+      },
+      "end_to_end_wall_s": {
+        "challenger": 494.191,
+        "control": 661.103,
+        "pct_change": -25.25
+      },
+      "input_units": {
+        "challenger": 166,
+        "control": 34,
+        "pct_change": 388.24
+      },
+      "output_units": {
+        "challenger": 8720,
+        "control": 12751,
+        "pct_change": -31.61
+      },
+      "paid_sessions": {
+        "challenger": 2,
+        "control": 2,
+        "pct_change": 0.0
+      },
+      "turns": {
+        "challenger": 26,
+        "control": 33,
+        "pct_change": -21.21
+      }
+    }
+  },
+  "per_run": {
+    "challenger2": {
+      "cache_creation_units": 64083,
+      "cache_read_units": 1565335,
+      "commit_sha": "63e76c092761216df28a124d719500fcef25c56b",
+      "cost_usd": 0.63329565,
+      "deterministic_total_s": 213.332636,
+      "developer_cost_usd": 0.2555039,
+      "developer_model": "haiku",
+      "developer_model_source": "adaptive:economy",
+      "duration_s": 638.046,
+      "end_to_end_wall_s": 892.365,
+      "gate_readiness": "ready",
+      "input_units": 350,
+      "output_units": 18815,
+      "paid_sessions": 2,
+      "review_outcome": "pass",
+      "reviewer_cost_usd": 0.37779175,
+      "turns": 54
+    },
+    "challenger3": {
+      "cache_creation_units": 45703,
+      "cache_read_units": 581333,
+      "commit_sha": "30e6bbfbac811bc4bf1d287a7008db263a1e29cb",
+      "cost_usd": 0.30068525,
+      "deterministic_total_s": 223.452518,
+      "developer_cost_usd": 0.12361375,
+      "developer_model": "haiku",
+      "developer_model_source": "adaptive:economy",
+      "duration_s": 204.961,
+      "end_to_end_wall_s": 494.191,
+      "gate_readiness": "ready",
+      "input_units": 166,
+      "output_units": 8720,
+      "paid_sessions": 2,
+      "review_outcome": "pass",
+      "reviewer_cost_usd": 0.1770715,
+      "turns": 26
+    },
+    "control1": {
+      "cache_creation_units": 45964,
+      "cache_read_units": 363600,
+      "commit_sha": "889aaa99638c6f83ab5f8d7020be45bf403d76f9",
+      "cost_usd": 0.69686,
+      "deterministic_total_s": 279.272194,
+      "developer_cost_usd": 0.44467175,
+      "developer_model": "sonnet",
+      "developer_model_source": "tier:standard",
+      "duration_s": 159.298,
+      "end_to_end_wall_s": 518.086,
+      "gate_readiness": "ready",
+      "input_units": 22,
+      "output_units": 9107,
+      "paid_sessions": 2,
+      "review_outcome": "pass",
+      "reviewer_cost_usd": 0.25218825,
+      "turns": 20
+    },
+    "control2": {
+      "cache_creation_units": 51424,
+      "cache_read_units": 814942,
+      "commit_sha": "eb8b8cfbf1c49359c962fc83a1df026eeb005ec9",
+      "cost_usd": 1.047816,
+      "deterministic_total_s": 237.995045,
+      "developer_cost_usd": 0.791448,
+      "developer_model": "sonnet",
+      "developer_model_source": "tier:standard",
+      "duration_s": 364.533,
+      "end_to_end_wall_s": 661.103,
+      "gate_readiness": "ready",
+      "input_units": 34,
+      "output_units": 12751,
+      "paid_sessions": 2,
+      "review_outcome": "pass",
+      "reviewer_cost_usd": 0.256368,
+      "turns": 33
+    }
+  },
+  "pooled": {
+    "cache_creation_units": {
+      "challenger_mean": 54893.0,
+      "challenger_range": [
+        45703,
+        64083
+      ],
+      "challenger_values": [
+        64083,
+        45703
+      ],
+      "control_mean": 48694.0,
+      "control_range": [
+        45964,
+        51424
+      ],
+      "control_values": [
+        45964,
+        51424
+      ],
+      "direction_consistent_across_pairs": false,
+      "mean_pct_change": 12.73,
+      "ranges_overlap": true,
+      "verdict": "NOT ESTABLISHED (inside run-to-run variation)"
+    },
+    "cache_read_units": {
+      "challenger_mean": 1073334.0,
+      "challenger_range": [
+        581333,
+        1565335
+      ],
+      "challenger_values": [
+        1565335,
+        581333
+      ],
+      "control_mean": 589271.0,
+      "control_range": [
+        363600,
+        814942
+      ],
+      "control_values": [
+        363600,
+        814942
+      ],
+      "direction_consistent_across_pairs": false,
+      "mean_pct_change": 82.15,
+      "ranges_overlap": true,
+      "verdict": "NOT ESTABLISHED (inside run-to-run variation)"
+    },
+    "cost_usd": {
+      "challenger_mean": 0.46699045,
+      "challenger_range": [
+        0.30068525,
+        0.63329565
+      ],
+      "challenger_values": [
+        0.63329565,
+        0.30068525
+      ],
+      "control_mean": 0.872338,
+      "control_range": [
+        0.69686,
+        1.047816
+      ],
+      "control_values": [
+        0.69686,
+        1.047816
+      ],
+      "direction_consistent_across_pairs": true,
+      "mean_pct_change": -46.47,
+      "ranges_overlap": false,
+      "verdict": "ESTABLISHED"
+    },
+    "deterministic_total_s": {
+      "challenger_mean": 218.392577,
+      "challenger_range": [
+        213.332636,
+        223.452518
+      ],
+      "challenger_values": [
+        213.332636,
+        223.452518
+      ],
+      "control_mean": 258.6336195,
+      "control_range": [
+        237.995045,
+        279.272194
+      ],
+      "control_values": [
+        279.272194,
+        237.995045
+      ],
+      "direction_consistent_across_pairs": true,
+      "mean_pct_change": -15.56,
+      "ranges_overlap": false,
+      "verdict": "ESTABLISHED"
+    },
+    "duration_s": {
+      "challenger_mean": 421.5035,
+      "challenger_range": [
+        204.961,
+        638.046
+      ],
+      "challenger_values": [
+        638.046,
+        204.961
+      ],
+      "control_mean": 261.9155,
+      "control_range": [
+        159.298,
+        364.533
+      ],
+      "control_values": [
+        159.298,
+        364.533
+      ],
+      "direction_consistent_across_pairs": false,
+      "mean_pct_change": 60.93,
+      "ranges_overlap": true,
+      "verdict": "NOT ESTABLISHED (inside run-to-run variation)"
+    },
+    "end_to_end_wall_s": {
+      "challenger_mean": 693.278,
+      "challenger_range": [
+        494.191,
+        892.365
+      ],
+      "challenger_values": [
+        892.365,
+        494.191
+      ],
+      "control_mean": 589.5945,
+      "control_range": [
+        518.086,
+        661.103
+      ],
+      "control_values": [
+        518.086,
+        661.103
+      ],
+      "direction_consistent_across_pairs": false,
+      "mean_pct_change": 17.59,
+      "ranges_overlap": true,
+      "verdict": "NOT ESTABLISHED (inside run-to-run variation)"
+    },
+    "input_units": {
+      "challenger_mean": 258.0,
+      "challenger_range": [
+        166,
+        350
+      ],
+      "challenger_values": [
+        350,
+        166
+      ],
+      "control_mean": 28.0,
+      "control_range": [
+        22,
+        34
+      ],
+      "control_values": [
+        22,
+        34
+      ],
+      "direction_consistent_across_pairs": true,
+      "mean_pct_change": 821.43,
+      "ranges_overlap": false,
+      "verdict": "ESTABLISHED"
+    },
+    "output_units": {
+      "challenger_mean": 13767.5,
+      "challenger_range": [
+        8720,
+        18815
+      ],
+      "challenger_values": [
+        18815,
+        8720
+      ],
+      "control_mean": 10929.0,
+      "control_range": [
+        9107,
+        12751
+      ],
+      "control_values": [
+        9107,
+        12751
+      ],
+      "direction_consistent_across_pairs": false,
+      "mean_pct_change": 25.97,
+      "ranges_overlap": true,
+      "verdict": "NOT ESTABLISHED (inside run-to-run variation)"
+    },
+    "paid_sessions": {
+      "challenger_mean": 2.0,
+      "challenger_range": [
+        2,
+        2
+      ],
+      "challenger_values": [
+        2,
+        2
+      ],
+      "control_mean": 2.0,
+      "control_range": [
+        2,
+        2
+      ],
+      "control_values": [
+        2,
+        2
+      ],
+      "direction_consistent_across_pairs": true,
+      "mean_pct_change": 0.0,
+      "ranges_overlap": true,
+      "verdict": "NOT ESTABLISHED (inside run-to-run variation)"
+    },
+    "turns": {
+      "challenger_mean": 40.0,
+      "challenger_range": [
+        26,
+        54
+      ],
+      "challenger_values": [
+        54,
+        26
+      ],
+      "control_mean": 26.5,
+      "control_range": [
+        20,
+        33
+      ],
+      "control_values": [
+        20,
+        33
+      ],
+      "direction_consistent_across_pairs": false,
+      "mean_pct_change": 50.94,
+      "ranges_overlap": true,
+      "verdict": "NOT ESTABLISHED (inside run-to-run variation)"
+    }
+  },
+  "void_attempt": {
+    "cache_creation_units": 69944,
+    "cache_read_units": 1650055,
+    "cause": "GitHub returned Internal Server Error on git push; the completion protocol requires a verified remote SHA, so the receipt was rejected and deterministic review adjudicated changes_required",
+    "cost_usd": 0.8095173,
+    "counts_toward_p5_as_spent_total": true,
+    "duration_s": 263.457,
+    "end_to_end_wall_s": 350.212,
+    "excluded_from_matched_comparison": true,
+    "final_state": "decision_required",
+    "input_units": 343,
+    "output_units": 19537,
+    "paid_sessions": 2,
+    "turns": 61
+  }
+}

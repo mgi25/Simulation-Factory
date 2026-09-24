@@ -56,6 +56,7 @@ import datetime as dt
 import json
 from pathlib import Path
 import re
+import tempfile
 from typing import Any, Iterable, Mapping, Sequence
 
 from .authorization import AuthorityEnvelope, normalise_path
@@ -63,6 +64,7 @@ from .backends import SessionOutcome
 from .errors import IntegrityFailure
 from .process import CommandRunner
 from .resources import failure_detail
+from .redaction import child_environment
 
 
 # pytest's own last line. Both shapes appear: with a duration and, under
@@ -167,7 +169,25 @@ def run_tests(
     runs: list[TestRun] = []
     for command in commands:
         argv = [python_executable, "-m", "pytest", *command.split(), "-q", "--no-header"]
-        result = runner.run(argv, cwd=worktree, timeout_s=timeout_s)
+
+        # A pre-provider diagnostic and the post-edit acceptance test can run
+        # only seconds apart. CPython's normal timestamp+size .pyc validation
+        # can therefore reuse bytecode from the base checkout after a same-size
+        # source edit (for example VALUE = 1 -> VALUE = 0), turning a real
+        # regression into a false green. Give every deterministic pytest
+        # invocation a fresh cache prefix outside the worktree, then delete it
+        # immediately after the subprocess exits.
+        with tempfile.TemporaryDirectory(
+            prefix="engineering-runner-pycache-"
+        ) as bytecode_cache:
+            env = child_environment()
+            env["PYTHONPYCACHEPREFIX"] = bytecode_cache
+            result = runner.run(
+                argv,
+                cwd=worktree,
+                timeout_s=timeout_s,
+                env=env,
+            )
         counts = _counts(result.stdout)
         runs.append(
             TestRun(
@@ -348,6 +368,7 @@ def build_receipt(
     tests: Sequence[TestRun],
     narrative: Mapping[str, Any],
     session: SessionOutcome,
+    sessions: Sequence[SessionOutcome] = (),
     completed_at: dt.datetime,
     accepted: bool,
     rejection_reason: str = "",
@@ -390,7 +411,7 @@ def build_receipt(
         "rejection_reason": rejection_reason or str(narrative.get("rejection_reason", "")),
         "notes": str(narrative.get("notes", "")),
         "completed_at": completed_at.isoformat(),
-        "usage": _usage(session),
+        "usage": _usage(session, sessions=sessions),
         "executor": _executor(session.backend),
         "subagents_used": 0,
         "no_subagents": True,
@@ -614,59 +635,81 @@ def _evidence(narrative: Mapping[str, Any], observation: GitObservation) -> list
     return refs[:32]
 
 
-def _usage(session: SessionOutcome) -> dict[str, Any]:
-    """The session's resource usage, each number under its own name.
+def _usage(
+    session: SessionOutcome,
+    *,
+    sessions: Sequence[SessionOutcome] = (),
+) -> dict[str, Any]:
+    """Resource usage for the whole paid stage, not merely its final session.
 
-    Two things this deliberately does not do:
-
-    **It does not record turns as tool calls.** `num_turns` is the provider's
-    count of model turns and `tool_calls` is a count of tool invocations. They
-    are different quantities, they were measured differing, and writing one
-    into the other made a number nobody had measured look measured. `tool_calls`
-    is now left absent unless a provider actually reports one, and the turn
-    count travels as `model_turns`.
-
-    **It does not report a metric the normaliser could not vouch for.** A
-    session whose envelope carried a final-segment `usage` block has no
-    trustworthy turn count anywhere in it; `unreliable_metrics` says so and the
-    company's budget check refuses to score it, rather than scoring a number
-    known to be wrong.
-
-    `passes` and `retries` stay 1 and 0 because that is the truth of one
-    session: it is one pass, and the runner does not retry a session inside a
-    stage. They are not a turn count and were never one.
+    `session` remains the final successful outcome for compatibility and for
+    executor identity. When `sessions` is supplied, every provider subprocess
+    launched inside the stage contributes to additive totals. A metric is
+    omitted when any component session did not report it; missing evidence is
+    never imputed as zero.
     """
+    members = tuple(sessions) or (session,)
+
+    def total(name: str) -> int | float | None:
+        values = [getattr(item, name) for item in members]
+        if any(value is None for value in values):
+            return None
+        return sum(values)  # type: ignore[arg-type]
+
+    providers = {item.provider for item in members if item.provider}
+    models = {item.model for item in members if item.model}
+    unreliable = tuple(
+        sorted({name for item in members for name in item.unreliable})
+    )
+    input_units = total("input_units")
+    output_units = total("output_units")
+    cache_reads = total("cache_read_units")
+    cache_creation = total("cache_creation_units")
+    model_turns = total("turns")
+    provider_cost = total("cost_usd")
+    duration_s = total("duration_s")
+
     usage: dict[str, Any] = {
         "passes": 1,
-        "retries": 0,
-        "usage_unit": "token" if session.input_units is not None else "unknown",
-        "provider": session.provider,
-        "model": session.model,
-        "duration_s": round(session.duration_s, 3),
-        "usage_source": session.usage_source,
-        "unreliable_metrics": list(session.unreliable),
-        "cost_ceiling_enforced": session.cost_ceiling_enforced,
+        "retries": max(0, len(members) - 1),
+        "usage_unit": "token" if input_units is not None else "unknown",
+        "provider": next(iter(providers)) if len(providers) == 1 else ("mixed" if providers else ""),
+        "model": next(iter(models)) if len(models) == 1 else ("mixed" if models else ""),
+        "duration_s": round(float(duration_s), 3) if duration_s is not None else None,
+        "usage_source": (
+            session.usage_source
+            if len(members) == 1
+            else f"aggregate:{len(members)}-provider-sessions"
+        ),
+        "unreliable_metrics": list(unreliable),
+        "cost_ceiling_enforced": all(item.cost_ceiling_enforced for item in members),
     }
-    if session.input_units is not None:
-        usage["input_units"] = session.input_units
-    if session.output_units is not None:
-        usage["output_units"] = session.output_units
-    if session.cache_read_units is not None:
-        usage["cache_hits"] = session.cache_read_units
-    if session.cache_creation_units is not None:
-        usage["cache_creation_units"] = session.cache_creation_units
-    if session.turns is not None:
-        usage["model_turns"] = session.turns
-    if session.cost_usd is not None:
-        usage["provider_cost"] = f"{session.cost_usd:.6f}"
+    if input_units is not None:
+        usage["input_units"] = int(input_units)
+    if output_units is not None:
+        usage["output_units"] = int(output_units)
+    if cache_reads is not None:
+        usage["cache_hits"] = int(cache_reads)
+    if cache_creation is not None:
+        usage["cache_creation_units"] = int(cache_creation)
+    if model_turns is not None:
+        usage["model_turns"] = int(model_turns)
+    if provider_cost is not None:
+        usage["provider_cost"] = f"{float(provider_cost):.6f}"
         usage["provider_cost_currency"] = "USD"
-    exploration = session.exploration or {}
-    if exploration.get("file_reads_total") is not None:
-        usage["repo_file_reads"] = exploration["file_reads_total"]
-    if exploration.get("file_reads_repeated") is not None:
-        usage["repeated_file_reads"] = exploration["file_reads_repeated"]
-    if exploration.get("searches_total") is not None:
-        usage["repo_searches"] = exploration["searches_total"]
+
+    for source_name, receipt_name in (
+        ("file_reads_total", "repo_file_reads"),
+        ("file_reads_repeated", "repeated_file_reads"),
+        ("searches_total", "repo_searches"),
+    ):
+        values = [
+            (item.exploration or {}).get(source_name)
+            for item in members
+        ]
+        if values and all(value is not None for value in values):
+            usage[receipt_name] = sum(int(value) for value in values)
+
     return usage
 
 
@@ -690,13 +733,22 @@ def _strings(values: Any) -> list[str]:
 
 
 def _summary_line(text: str) -> str:
+    # On failing pytest runs, "==== short test summary info ====" appears
+    # immediately before the final counted summary. Prefer a line that
+    # actually carries pytest counts so numeric evidence cannot become zero
+    # merely because a decorative heading was encountered first.
+    for line in reversed(text.splitlines()):
+        stripped = line.strip()
+        if not _COUNT.search(stripped):
+            continue
+        match = _SUMMARY.match(stripped)
+        return (match.group("body").strip() if match else stripped)[:280]
+    # Empty selections and a few plugin modes can have a framed summary with
+    # no numeric count ("no tests ran"). Preserve that fallback.
     for line in reversed(text.splitlines()):
         match = _SUMMARY.match(line.strip())
         if match:
             return match.group("body").strip()[:280]
-    for line in reversed(text.splitlines()):
-        if _COUNT.search(line):
-            return line.strip()[:280]
     return ""
 
 

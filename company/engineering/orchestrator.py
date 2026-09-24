@@ -608,6 +608,36 @@ def record_review(
     )
 
 
+def record_execution_stop(
+    store: EngineeringStore,
+    order: EngineeringWorkOrder,
+    job: EngineeringJob,
+    *,
+    reason: str,
+    on: dt.date,
+    actor: str = "engineering-runner",
+) -> tuple[EngineeringJob, EngineeringRecordPointer]:
+    """Persist an external-session stop as a CEO-visible decision requirement.
+
+    This is deliberately a one-way safety action. It grants no retry, performs
+    no adjudication and cannot approve anything. Its purpose is to make a
+    provider/backend stop durable so a restarted runner cannot see the same
+    in-flight state and silently launch another paid session.
+    """
+    order.assert_unchanged(job.work_order_fingerprint, "execution stop")
+    if job.state not in (JobState.DEVELOPING, JobState.REVIEWING):
+        raise EngineeringError(
+            "an execution stop is recorded only while a developer or reviewer "
+            f"session is in flight, not from {job.state.value}"
+        )
+    moved = job.requiring_decision(
+        (reason,),
+        on=assert_day(on, "on"),
+        actor=actor,
+    )
+    return moved, store.append_job(moved)
+
+
 # --- stage 4: the gate ----------------------------------------------------
 
 
@@ -803,6 +833,7 @@ __all__ = [
     "prepare_review_session",
     "publish_result",
     "record_decision",
+    "record_execution_stop",
     "record_gate",
     "record_review",
 ]

@@ -1,0 +1,49 @@
+{
+  "contract_id": "con-repository-architecture-v1-2026-09-21",
+  "objective_id": "obj-repository-architecture-v1-2026-09-21",
+  "objective": "Improve the reliability, maintainability, repository discoverability, and AI operating efficiency of Project Factory through measured architecture discovery, bounded supporting engineering work, and evidence-backed target-state design without performing an unauthorized major architecture rewrite or canonical merge.",
+  "mode": "bounded_routine_engineering",
+  "department": "engineering",
+  "budget": {"amount": "12.00", "currency": "USD"},
+  "budget_scope": "repository-architecture-v1 supporting routine engineering and measured validation",
+  "risk_ceiling": "medium",
+  "expires_on": "2026-10-31",
+  "authorized_by": "MGI (CEO)",
+  "success_criteria": [
+    "current repository architecture and lifecycle state are inventoried from repository evidence",
+    "target-state architecture and an incremental reversible migration sequence are documented before major code movement",
+    "AI usage is attributed by role and stage wherever authoritative telemetry exists, with unavailable metrics explicitly marked unavailable",
+    "resource hotspots including repeated reads, searches, retries, oversized context, and coordination overhead are identified",
+    "a matched Company OS versus direct-session benchmark design is frozen before benchmark outcomes are observed",
+    "the Repository Architecture Steward capability receives an evidence-backed organizational recommendation",
+    "zero new production regressions are introduced by bounded supporting engineering work",
+    "no major architecture rewrite, canonical merge, workforce activation, destructive cleanup, publishing, or deployment occurs under this contract"
+  ],
+  "allowed_actions": [
+    "approve_code_change",
+    "approve_review_outcome",
+    "approve_test_progression",
+    "request_bounded_correction",
+    "stop_work_on_invalid_premise",
+    "approve_work_order",
+    "select_work",
+    "discover_work",
+    "approve_integration_merge"
+  ],
+  "forbidden_actions": [],
+  "max_corrections_per_work_order": 1,
+  "reporting_requirements": [
+    "a final executive outcome report",
+    "every management decision and who took it",
+    "total model cost against the authorized budget where authoritative monetary telemetry exists",
+    "AI resource usage broken down by role and stage wherever telemetry exists",
+    "all unavailable token or plan-usage measurements explicitly marked unavailable rather than estimated",
+    "identified resource waste and the recommended correction",
+    "Company OS versus direct-session benchmark results with quality and reliability outcomes",
+    "a recommendation on whether Company OS should be kept, simplified, or selectively routed",
+    "a recommendation on whether repository_architecture_steward should become a permanent capability",
+    "any exception that ended the objective early"
+  ],
+  "notes": "CEO authorizes architecture discovery, target-state design, efficiency measurement, and bounded supporting engineering. Major architecture redesign approval and canonical promotion remain separate CEO gates. No standing grant.",
+  "version": "objective_contract_v1"
+}

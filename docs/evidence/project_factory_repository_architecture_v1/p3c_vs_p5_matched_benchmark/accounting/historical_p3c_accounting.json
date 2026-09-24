@@ -1,0 +1,474 @@
+{
+  "adaptive_routing": [],
+  "anomalies": [],
+  "arm": "historical-p3c",
+  "by_role": {
+    "developer": {
+      "cache_creation_units": 25041,
+      "cache_read_units": 222727,
+      "cost_usd": 0.42913475,
+      "duration_s": 99.528,
+      "input_units": 13,
+      "output_units": 6448,
+      "paid_sessions": 1,
+      "turns": 12
+    },
+    "reviewer": {
+      "cache_creation_units": 25883,
+      "cache_read_units": 113907,
+      "cost_usd": 0.34621225,
+      "duration_s": 98.686,
+      "input_units": 8,
+      "output_units": 5098,
+      "paid_sessions": 1,
+      "turns": 13
+    }
+  },
+  "deterministic": {
+    "base_diagnostic_s": 28.9535,
+    "gate_suite_s": 129.611,
+    "required_test_s": 20.962,
+    "runs": [
+      {
+        "duration_s": 28.9535,
+        "kind": "base_diagnostic",
+        "stage": "developer-01"
+      },
+      {
+        "command": "tests/test_company_engineering_execution.py",
+        "duration_s": 20.962,
+        "green": true,
+        "kind": "required_test_s",
+        "stage": "developer-01",
+        "summary": "207 passed in 19.71s"
+      },
+      {
+        "command": "tests/test_company_analytics.py",
+        "duration_s": 2.397,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "160 passed in 1.29s"
+      },
+      {
+        "command": "tests/test_company_dashboard.py",
+        "duration_s": 3.499,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "32 passed in 2.35s"
+      },
+      {
+        "command": "tests/test_company_execution_transport.py",
+        "duration_s": 2.807,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "14 passed in 1.67s"
+      },
+      {
+        "command": "tests/test_company_finance.py",
+        "duration_s": 2.267,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "123 passed in 1.15s"
+      },
+      {
+        "command": "tests/test_company_integration_gate.py",
+        "duration_s": 108.702,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "88 passed in 107.47s (0:01:47)"
+      },
+      {
+        "command": "tests/test_company_org_intelligence.py",
+        "duration_s": 2.035,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "119 passed in 0.91s"
+      },
+      {
+        "command": "tests/test_company_os_ai_platform.py",
+        "duration_s": 1.221,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "46 passed in 0.13s"
+      },
+      {
+        "command": "tests/test_company_os_capsules.py",
+        "duration_s": 1.432,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "67 passed in 0.34s"
+      },
+      {
+        "command": "tests/test_company_os_knowledge.py",
+        "duration_s": 1.327,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "26 passed in 0.22s"
+      },
+      {
+        "command": "tests/test_company_runtime.py",
+        "duration_s": 2.197,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "22 passed in 1.09s"
+      },
+      {
+        "command": "tests/test_company_workforce.py",
+        "duration_s": 1.727,
+        "green": true,
+        "kind": "gate_suite_s",
+        "stage": "gate-01",
+        "summary": "93 passed in 0.60s"
+      }
+    ],
+    "total_s": 179.5265
+  },
+  "repository_map_cache": [],
+  "resources_applied": [
+    {
+      "applied_cost_ceiling": 3.0,
+      "applied_model": "sonnet",
+      "applied_timeout_s": 1800.0,
+      "available_tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep"
+      ],
+      "base_diagnostic": {
+        "duration_s": 28.9535,
+        "eligible": true,
+        "failed": 1,
+        "failure_symbol_hints": 5,
+        "green": 0,
+        "max_tests": 2,
+        "ran": true,
+        "test_runs": 1,
+        "timeout_s": 180.0
+      },
+      "compiled_context": {
+        "artifact": "<projects>\\project-factory-runner-state\\token-efficiency-v4-p3c-benchmark\\runs\\wo-token-efficiency-v4-p3c-benchmark-contract-co-cdea4d60825c\\run-000001\\developer-01\\execution-context.json",
+        "compiled_spans": 6,
+        "fingerprint": "10ac9e1101666255",
+        "rendered_chars": 6000,
+        "truncated": true
+      },
+      "deterministic_validation_owner": "runner",
+      "model_runs_required_tests": false,
+      "model_source": "tier:standard",
+      "not_enforced": [
+        "max_turns: no backend this runner drives accepts a turn ceiling; it is carried into the session's instructions as guidance only"
+      ],
+      "recommended": {
+        "artifact_version": 1,
+        "context_budget_chars": 8000,
+        "context_ref_count": 2,
+        "cost_currency": "USD",
+        "escalation": "none",
+        "max_session_cost": "3.00",
+        "max_turns_advisory": 40,
+        "max_wall_seconds": 1800,
+        "model_tier": "standard",
+        "profile": "consumer",
+        "reasoning_class": "C",
+        "strategy_reason": "reasoning class C at risk low is routine implementation; profile consumer runs it at the standard tier; evidence is required and affects review depth, not model tier"
+      },
+      "role": "developer",
+      "stage": "developer-01"
+    },
+    {
+      "applied_cost_ceiling": 1.5,
+      "applied_model": "sonnet",
+      "applied_timeout_s": 900.0,
+      "available_tools": null,
+      "base_diagnostic": null,
+      "compiled_context": null,
+      "deterministic_validation_owner": null,
+      "model_runs_required_tests": null,
+      "model_source": "tier:standard",
+      "not_enforced": [
+        "max_turns: no backend this runner drives accepts a turn ceiling; it is carried into the session's instructions as guidance only"
+      ],
+      "recommended": {
+        "artifact_version": 1,
+        "context_budget_chars": 4800,
+        "context_ref_count": 2,
+        "cost_currency": "USD",
+        "escalation": "none",
+        "max_session_cost": "1.50",
+        "max_turns_advisory": 20,
+        "max_wall_seconds": 900,
+        "model_tier": "standard",
+        "profile": "consumer",
+        "reasoning_class": "C",
+        "strategy_reason": "reasoning class C at risk low is routine implementation; profile consumer runs it at the standard tier; evidence is required and affects review depth, not model tier; review session: read-only with reduced context budget"
+      },
+      "role": "reviewer",
+      "stage": "reviewer-01"
+    }
+  ],
+  "results": [
+    {
+      "acceptance_criteria": [
+        "Only tests/test_company_engineering_execution.py is modified.",
+        "The exact engineering-execution expectations that change because tests/test_company_review_separation.py is declared by the capsule are updated and nothing else is broadened.",
+        "Exact tuple assertions remain exact tuple assertions; no containment, subset, unordered or partial assertion is substituted.",
+        "Expected authorized paths, plan writing paths, packet scope and persisted authority include tests/test_company_review_separation.py solely because it is now a declared semantic test.",
+        "The capsule's exact tests assertion expects both tests/test_company_engineering_execution.py and tests/test_company_review_separation.py.",
+        "tests/test_company_engineering_execution.py passes.",
+        "No production, runtime, runner, capsule, dependency or governance file is modified."
+      ],
+      "authorized_on": "2026-09-21",
+      "authorized_paths": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "authorizes_merge": false,
+      "branch": "eng-token-efficiency-v4-p3c-benchmark-contract-correction",
+      "changed_files": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "commit_sha": "1343a4d770cecb0d7ad683d9bff954156606535d",
+      "decisions_required": [],
+      "developer_attempts": 1,
+      "developer_attempts_remaining": 0,
+      "evidence_refs": [],
+      "gate_blockers": [],
+      "gate_readiness": "ready",
+      "gate_report_id": "integration-readiness-2026-09-21-632403a54cd2cbb3",
+      "implementation_summary": "Updated five exact tuple assertions in tests/test_company_engineering_execution.py to include tests/test_company_review_separation.py, which is now declared as a semantic test by the company-engineering-execution capsule. The affected assertions are: authorized_paths, required_tests, writing_paths, scope.allowed, authority.may_write, and capsule.tests. No other assertions were changed.",
+      "implementer": "software_implementation_engineer",
+      "merge_performed": false,
+      "not_an_approval": "READY FOR CEO APPROVAL is a request to be read, not an approval. Nothing here merges, deploys or publishes, and Company OS holds no capability to.",
+      "objective": "Update the exact engineering-execution regression expectations that legitimately change because company-engineering-execution now names tests/test_company_review_separation.py as a semantic test.",
+      "persisted": {
+        "fingerprint": "8cd492512c8b7e5f",
+        "record_ref": "engineering/results/wo-token-efficiency-v4-p3c-benchmark-contract-co-cdea4d60825c/000001.json",
+        "sequence": 1
+      },
+      "remote_verified": true,
+      "requested_by": "MGI",
+      "review_findings": [
+        "[advisory] commit-msg-count-mismatch: Commit message says 'five exact tuple assertions' but six were updated (authorized_paths, required_tests, writing_paths, scope.allowed, authority.may_write, capsule.tests) \u2014 the count is wrong but the changes are correct.",
+        "[advisory] required-tests-risk-resolved: The implementer flagged required_tests update as a risk, but the capsule seed JSON confirms tests field is the source of truth for required_tests, so no independent logic conflict exists."
+      ],
+      "review_outcome": "pass",
+      "reviewer": "software_review_engineer",
+      "risks": [
+        "required_tests was updated alongside authorized_paths on the assumption that it derives from capsule.tests; if required_tests has independent logic, this may be wrong and needs verification"
+      ],
+      "status": "ready_for_approval",
+      "tests": [
+        {
+          "command": "tests/test_company_engineering_execution.py",
+          "passed": true,
+          "scope": "targeted",
+          "summary": "207 passed in 19.71s"
+        }
+      ],
+      "unanswered_criteria": [],
+      "version": 1,
+      "work_order_fingerprint": "237e2a9d7a69c0dd",
+      "work_order_id": "wo-token-efficiency-v4-p3c-benchmark-contract-correction"
+    }
+  ],
+  "runner_dir": "<projects>\\project-factory-runner-state\\token-efficiency-v4-p3c-benchmark",
+  "sessions": [
+    {
+      "cache_creation_units": 25041,
+      "cache_read_units": 222727,
+      "cost_usd": 0.4291347499999999,
+      "duration_s": 99.528,
+      "exit_code": 0,
+      "exploration": {
+        "bash_total": 0,
+        "edits_total": 5,
+        "events_recorded": 11,
+        "file_reads_repeated": 4,
+        "file_reads_total": 5,
+        "file_reads_unique": 1,
+        "format": "stream_json",
+        "full_or_implicit_reads": 0,
+        "git_commands": 0,
+        "glob_total": 0,
+        "grep_total": 0,
+        "other_shell_commands": 0,
+        "overlapping_read_ranges": 0,
+        "read_after_edit_count": 0,
+        "repeated_full_or_implicit_reads": 0,
+        "repeated_requested_lines": 85,
+        "repeated_same_range_reads": 0,
+        "requested_read_lines_total": 105,
+        "same_file_read_after_edit_count": 0,
+        "searches_repeated": 0,
+        "searches_total": 0,
+        "targeted_reads": 5,
+        "test_commands": 0,
+        "tool_errors": 0
+      },
+      "input_units": 13,
+      "model": "sonnet",
+      "ok": true,
+      "output_units": 6448,
+      "permission_denials": [],
+      "provider": "anthropic",
+      "role": "developer",
+      "session_id": "716019ad-045a-4596-89d1-c092ad1edfa6",
+      "stage": "developer-01",
+      "startup_context": {
+        "mcp_servers": [],
+        "model": "claude-sonnet-4-6",
+        "permission_mode": "acceptEdits",
+        "plugins": [],
+        "skills": [
+          "keybindings-help",
+          "debug",
+          "simplify",
+          "batch",
+          "claude-api",
+          "enable-ai-project"
+        ],
+        "tools": [
+          "Glob",
+          "Grep",
+          "Read",
+          "Edit",
+          "Write"
+        ]
+      },
+      "startup_model": "claude-sonnet-4-6",
+      "stopped_reason": "",
+      "turns": 12,
+      "unreliable": [],
+      "usage_source": "model_usage_totals"
+    },
+    {
+      "cache_creation_units": 25883,
+      "cache_read_units": 113907,
+      "cost_usd": 0.34621225,
+      "duration_s": 98.686,
+      "exit_code": 0,
+      "exploration": {
+        "bash_total": 0,
+        "edits_total": 0,
+        "events_recorded": 12,
+        "file_reads_repeated": 5,
+        "file_reads_total": 8,
+        "file_reads_unique": 3,
+        "format": "stream_json",
+        "full_or_implicit_reads": 2,
+        "git_commands": 0,
+        "glob_total": 3,
+        "grep_total": 1,
+        "other_shell_commands": 0,
+        "overlapping_read_ranges": 0,
+        "read_after_edit_count": 0,
+        "repeated_full_or_implicit_reads": 0,
+        "repeated_requested_lines": null,
+        "repeated_same_range_reads": 0,
+        "requested_read_lines_total": null,
+        "same_file_read_after_edit_count": 0,
+        "searches_repeated": 0,
+        "searches_total": 4,
+        "targeted_reads": 6,
+        "test_commands": 0,
+        "tool_errors": 0
+      },
+      "input_units": 8,
+      "model": "sonnet",
+      "ok": true,
+      "output_units": 5098,
+      "permission_denials": [],
+      "provider": "anthropic",
+      "role": "reviewer",
+      "session_id": "875c4648-52a9-4586-ab0d-9b7217d4192c",
+      "stage": "reviewer-01",
+      "startup_context": {
+        "mcp_servers": [],
+        "model": "claude-sonnet-4-6",
+        "permission_mode": "default",
+        "plugins": [],
+        "skills": [
+          "keybindings-help",
+          "debug",
+          "simplify",
+          "batch",
+          "claude-api",
+          "enable-ai-project"
+        ],
+        "tools": [
+          "Glob",
+          "Grep",
+          "Read"
+        ]
+      },
+      "startup_model": "claude-sonnet-4-6",
+      "stopped_reason": "",
+      "turns": 13,
+      "unreliable": [],
+      "usage_source": "model_usage_totals"
+    }
+  ],
+  "stages": [
+    {
+      "final_state": "ready_for_approval",
+      "finished_at": "2026-09-21T13:11:19.252846+00:00",
+      "outcome": "completed",
+      "outcome_file": "000001.json",
+      "reason": "",
+      "stages": [
+        {
+          "detail": "attempt 1 by software_implementation_engineer, commit 1343a4d770ce, 1 path(s)",
+          "ok": true,
+          "session_ids": [
+            "716019ad-045a-4596-89d1-c092ad1edfa6"
+          ],
+          "stage": "developer",
+          "state_after": "testing",
+          "state_before": "planning"
+        },
+        {
+          "detail": "software_review_engineer returned pass; Company OS adjudicated pass (attested pass, deterministic pass)",
+          "ok": true,
+          "session_ids": [
+            "875c4648-52a9-4586-ab0d-9b7217d4192c"
+          ],
+          "stage": "reviewer",
+          "state_after": "gate",
+          "state_before": "testing"
+        },
+        {
+          "detail": "11/11 required suites green; gate says ready at 1343a4d770ce",
+          "ok": true,
+          "session_ids": [],
+          "stage": "gate",
+          "state_after": "ready_for_approval",
+          "state_before": "gate"
+        }
+      ]
+    }
+  ],
+  "whole_task_paid": {
+    "cache_creation_units": 50924,
+    "cache_read_units": 336634,
+    "cost_usd": 0.775347,
+    "duration_s": 198.214,
+    "input_units": 21,
+    "output_units": 11546,
+    "paid_sessions": 2,
+    "turns": 25
+  },
+  "work_orders": [
+    "wo-token-efficiency-v4-p3c-benchmark-contract-co-cdea4d60825c"
+  ]
+}

@@ -51,6 +51,20 @@ from knowledge.company_os.ledger import DEFAULT_ROOT
 TODAY = dt.date(2026, 9, 16)
 CAPSULE_PACKAGE = Path(__file__).resolve().parents[1] / "knowledge" / "company_os" / "capsules"
 
+# Governed, but not part of the control plane. Restated here rather than
+# imported so this suite keeps its own import surface; the two copies are
+# pinned against each other in `tests/test_company_external_engineering_runner.py`,
+# which is the module that already imports both halves.
+EXTERNAL_CAPSULES = {"company-external-engineering-runner"}
+
+# The one path outside the control plane that a capsule may own, and the
+# capsule that may own it. Named as a pair, never as a `tools/` prefix, for the
+# same reason `EVIDENCE_REVIEW_SURFACE` is named exactly: `owns_paths` is where
+# a developer contract's `may_write` comes from, and a claim on `tools` would
+# hand a session write authority over every production script in it.
+EXTERNAL_RUNNER_SURFACE = "tools/engineering_runner"
+EXTERNAL_RUNNER_CAPSULE = "company-external-engineering-runner"
+
 
 def a_capsule(**overrides) -> Capsule:
     base = dict(
@@ -279,6 +293,9 @@ def test_lookup_by_every_indexed_field(seeds):
     assert seeds.get("company-runtime").type is CapsuleType.MODULE
     assert "company-os-control-plane" in {c.id for c in seeds.by_type(CapsuleType.SYSTEM)}
     assert "company-bootstrap-policy" in {c.id for c in seeds.by_type(CapsuleType.POLICY)}
+    # Exact equality is intentional: codex workstream owns exactly the runtime and
+    # validation modules.  Any future addition must update both the seed file and
+    # this list, so that the choice is visible rather than accidental.
     assert {c.id for c in seeds.by_owner("workstream-codex")} == {
         "company-runtime",
         "company-validation",
@@ -314,9 +331,16 @@ def test_runtime_and_validation_dependency_graph_is_acyclic(seeds):
     )
     assert seeds.dependency_closure("company-validation") == ()
     assert "company-runtime" not in seeds.dependency_closure("company-validation")
+    # The control plane reaches every capsule that is part of it. The external
+    # engineering runner is the one that is not: it owns a path under a
+    # production root and imports no Company OS package, so an edge making it
+    # reachable would declare the control plane rests on production. It is
+    # governed by a capsule without being a member of the graph, and
+    # `company.dashboard.builder.EXTERNAL_CAPSULES` is where that is stated.
     assert seeds.dependency_closure("company-os-control-plane") == tuple(
-        sorted(set(seeds.ids()) - {"company-os-control-plane"})
+        sorted(set(seeds.ids()) - {"company-os-control-plane"} - EXTERNAL_CAPSULES)
     )
+    assert EXTERNAL_CAPSULES == {"company-external-engineering-runner"}
     # `company-executive-delegation` reaches the control plane through
     # `company-organizational-intelligence`, whose whole purpose is reading the
     # evidence other subsystems produce and answering whether the company is
@@ -654,14 +678,16 @@ def test_the_four_staleness_conditions_accumulate_on_one_capsule():
 
 
 def test_the_company_os_seed_capsules_load(seeds):
-    assert len(seeds) == 20
+    assert len(seeds) == 22
     assert seeds.ids() == (
         "ai-platform",
         "company-analytics-experiments",
         "company-bootstrap-policy",
         "company-ceo-dashboard",
         "company-engineering-execution",
+        "company-evidence-review",
         "company-executive-delegation",
+        "company-external-engineering-runner",
         "company-finance",
         "company-knowledge-capsules",
         "company-knowledge-store",
@@ -680,7 +706,9 @@ def test_the_company_os_seed_capsules_load(seeds):
 
     core = seeds.get("company-research-intelligence")
     operations = seeds.get("company-research-operations")
-    assert core.owns_paths == ("intelligence/research",)
+    # Containment: core must claim intelligence/research; it may also claim
+    # the package-level namespace init (intelligence/__init__.py).
+    assert "intelligence/research" in core.owns_paths
     assert operations.owns_paths
     assert all(path.startswith("intelligence/research/") for path in operations.owns_paths)
     assert operations.tests
@@ -692,12 +720,69 @@ def test_every_seed_names_a_test_file_that_exists(seeds):
             assert (REPO_ROOT / test_ref.split("::")[0]).exists(), f"{capsule.id}: {test_ref}"
 
 
+# The one documentation path any capsule may own: the surface independent
+# evidence review writes its attestations to. Named exactly, never as a `docs/`
+# prefix, because `owns_paths` is where a developer contract's `may_write`
+# comes from - a capsule owning `docs/` or `docs/evidence` would hand a
+# developer session write authority over every frozen evidence record in the
+# repository. See `tests/test_company_evidence_review.py`, which measures that.
+EVIDENCE_REVIEW_SURFACE = "docs/evidence/reviews"
+
+
 def test_the_seeds_cover_the_control_plane_and_nothing_in_production(seeds):
+    """Two named exceptions, and they stay named.
+
+    `EXTERNAL_RUNNER_SURFACE` is the second. The external engineering runner
+    lives under a production root on purpose - that is what lets it hold a
+    subprocess - but a subsystem no capsule owns is a subsystem intake cannot
+    derive a bounded work order for, so its changes never get an independent
+    governed review. Owning exactly that one directory buys the review without
+    moving the code: the import boundary is unchanged and still checked by
+    `architecture.production_does_not_import_company_os`.
+    """
     owned = [path for capsule in seeds.all() for path in capsule.owns_paths]
     assert all(
         path.startswith(("company/", "ai_platform", "knowledge/", "intelligence/"))
+        or path in (EVIDENCE_REVIEW_SURFACE, EXTERNAL_RUNNER_SURFACE)
         for path in owned
     ), owned
+
+
+def test_no_capsule_owns_any_tools_path_but_the_external_runner(seeds):
+    """`tools/` holds ~130 production scripts beside the runner package.
+
+    The same move that would widen the `docs/` exception widens this one: a
+    claim written one level up, on `tools` rather than `tools/engineering_runner`,
+    would hand a runner work order write authority over the entire video
+    production toolchain. The claim is asserted by value, and by owner.
+    """
+    claims = sorted(
+        (path, capsule.id)
+        for capsule in seeds.all()
+        for path in capsule.owns_paths
+        if path == "tools" or path.startswith("tools/")
+    )
+    assert claims == [(EXTERNAL_RUNNER_SURFACE, EXTERNAL_RUNNER_CAPSULE)], claims
+
+
+def test_no_capsule_owns_any_documentation_path_but_the_review_surface(seeds):
+    """The exception above is one directory, and stays one directory.
+
+    Widening it is the cheapest way to make an evidence audit pass, and it is
+    the specific move this assertion exists to catch: frozen evidence is
+    protected by being owned by nobody, so a second `docs/` claim - or the same
+    claim written one level up - silently unfreezes what it contains.
+    """
+    owned_docs = sorted(
+        path
+        for capsule in seeds.all()
+        for path in capsule.owns_paths
+        if path == "docs" or path.startswith("docs/")
+    )
+    assert owned_docs == [EVIDENCE_REVIEW_SURFACE]
+    assert {c.id for c in seeds.by_path(EVIDENCE_REVIEW_SURFACE)} == {
+        "company-evidence-review"
+    }
 
 
 def test_no_seed_capsule_links_a_hypothesis(seeds):

@@ -1,0 +1,78 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "attestation",
+    "evidence_review",
+    "reviewability"
+  ],
+  "created": "2026-09-23",
+  "decisions": [],
+  "dependencies": [
+    "company-engineering-execution",
+    "company-knowledge-store"
+  ],
+  "experiment_learnings": [],
+  "facts": [
+    "bootstrap-forbids-nested-agents"
+  ],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-evidence-review",
+  "inputs": [
+    "An evidence record under docs/evidence/ named by the work order, read and never written",
+    "The record's own manifest and digests, so the attestation can name the bytes it read",
+    "The claim the record makes, quoted, so the verdict is about a stated claim rather than a topic"
+  ],
+  "invariants": [
+    "The capsule owns the attestation surface and no evidence record, so authorizing a review never authorizes writing what is reviewed.",
+    "An evidence record is read-only to this capsule: it is outside every authorized path, and a path no capsule owns is outside every may_write.",
+    "An attestation names the evidence record it reviewed and the digest it read, so a verdict cannot drift from the bytes it was about.",
+    "A verdict is exactly one of PASS, CHANGES_REQUIRED or FAIL, and carries the reasons that produced it.",
+    "An attestation records what the evidence does not establish as explicitly as what it does; an unmeasured claim is reported unmeasured, not omitted.",
+    "A factual correction to a reviewed record is an addendum carrying its own provenance; the original bytes are never overwritten.",
+    "The reviewer is not the implementer of the work it reviews, and the reviewer contract grants no writable path."
+  ],
+  "last_reviewed": "2026-09-23",
+  "may_read": [
+    "docs/evidence",
+    "docs/validation",
+    "company/engineering/review.py",
+    "company/engineering/intake.py"
+  ],
+  "may_write": [
+    "docs/evidence/reviews/*.md",
+    "docs/evidence/reviews/*.json"
+  ],
+  "must_not_modify": [
+    "docs/evidence/company_os_first_live_delegation_pilot",
+    "docs/evidence/company_os_objective_planning",
+    "docs/evidence/project_factory_repository_architecture_v1",
+    "docs/validation"
+  ],
+  "outputs": [
+    "One attestation per review: the verdict, what was examined, and the reasons",
+    "The scope limit of the verdict: which claims it covers and which it explicitly does not",
+    "An addendum with provenance when a review finds a factual defect in a frozen record"
+  ],
+  "owner": "workstream-engineering",
+  "owns_paths": [
+    "docs/evidence/reviews"
+  ],
+  "purpose": "Lets the company independently audit the evidence it produced, without letting it rewrite that evidence. Owns one narrow attestation surface and nothing else under docs/, so a review work order can be scoped deterministically while every frozen evidence record stays outside authority and therefore unwritable.",
+  "recheck_on": "2027-09-23",
+  "revalidation_reason": "",
+  "risks": [
+    "The surface is writable, so a second review of one record can be written beside the first; provenance is what distinguishes them, not the filesystem.",
+    "Capability tags are the only selection signal here, so a tag that is an ordinary engineering word routes unrelated work to this capsule; the tags are deliberately narrow and a test names the objectives that must not reach it.",
+    "must_not_modify names frozen records only: a rule broad enough to cover a co-selected capsule's owned path would refuse that work order's packet outright.",
+    "An attestation is a judgement; the deterministic verifier beside a record checks arithmetic only and cannot stand in for one."
+  ],
+  "source": "p5-evidence-reviewability-v1",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_evidence_review.py"
+  ],
+  "title": "Independent review of frozen evidence",
+  "type": "module"
+}

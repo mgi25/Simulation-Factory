@@ -39,6 +39,7 @@ from .execution_context import (
     ExecutionContextBundle,
     build_execution_context,
     rank_primary_files,
+    rank_task_spans,
     rank_test_anchors,
 )
 from .repo_map import RepoMap
@@ -126,8 +127,8 @@ def _ceiling_lines(strategy: "ResourceStrategy | None", *, role: str) -> list[st
     if role == "developer":
         out.append(
             "Work to finish inside them rather than up to them. If the task turns "
-            "out not to fit, stop, commit what is complete and correct, and say so "
-            "in your report: a partial result somebody can continue is worth more "
+            "out not to fit, stop, leave what is complete and correct in the working "
+            "tree, and say so in your report: a partial result somebody can continue is worth more "
             "than a complete one that was cut off at the ceiling."
         )
     else:
@@ -168,8 +169,12 @@ _MINIMALISM_LINES: tuple[str, ...] = (
 )
 
 
-def _developer_execution_context(
-    repo_map: "RepoMap | None", *, envelope: AuthorityEnvelope, worktree: Path
+def developer_execution_context(
+    repo_map: "RepoMap | None",
+    *,
+    envelope: AuthorityEnvelope,
+    worktree: Path,
+    preferred_symbols: Sequence[tuple[str, str]] = (),
 ) -> ExecutionContextBundle:
     """The developer's bundle: authorized paths first, then the objective's
     own best matches - see `execution_context.rank_primary_files`."""
@@ -186,19 +191,43 @@ def _developer_execution_context(
             + [path for path in envelope.may_write if path.startswith("tests/")]
         )
     )
+    semantic_paths = tuple(
+        dict.fromkeys(
+            [
+                *envelope.may_write,
+                *test_paths,
+                *envelope.required_tests,
+            ]
+        )
+    )
+    compiled_spans = rank_task_spans(
+        repo_map,
+        objective=envelope.objective,
+        acceptance_criteria=envelope.acceptance_criteria,
+        paths=semantic_paths,
+        repo_root=worktree,
+        preferred_symbols=preferred_symbols,
+    )
     test_anchors = rank_test_anchors(
         repo_map,
         objective=envelope.objective,
         acceptance_criteria=envelope.acceptance_criteria,
         test_paths=test_paths,
         repo_root=worktree,
+        # P3 compiled spans already carry the relevant source body. Keep test
+        # anchors as cheap pointers instead of injecting a duplicate excerpt.
+        with_excerpt=not bool(compiled_spans),
     )
     return build_execution_context(
         repo_map,
         primary=primary,
         context_refs=envelope.packet.get("context_refs", ()),
         test_anchors=test_anchors,
+        compiled_spans=compiled_spans,
         repo_root=worktree,
+        # If P3 found useful task spans, do not repeat the generic first-symbol
+        # excerpt. A compiler miss falls back to the exact P2 behavior.
+        include_excerpts=not bool(compiled_spans),
     )
 
 
@@ -237,6 +266,7 @@ def developer_instructions(
     prior_findings: Sequence[str] = (),
     strategy: "ResourceStrategy | None" = None,
     repo_map: "RepoMap | None" = None,
+    context_bundle: "ExecutionContextBundle | None" = None,
 ) -> str:
     lines: list[str] = []
     add = lines.append
@@ -282,15 +312,20 @@ def developer_instructions(
             add(f"  - {item}")
         add("")
     lines.extend(_MINIMALISM_LINES)
-    lines.append(_developer_execution_context(repo_map, envelope=envelope, worktree=worktree).render())
+    bundle = context_bundle or developer_execution_context(
+        repo_map, envelope=envelope, worktree=worktree
+    )
+    lines.append(bundle.render())
     if envelope.required_tests:
         add("## Tests the work order requires")
         for item in envelope.required_tests:
             add(f"  - {item}")
         add("")
         add(
-            "Run them yourself and iterate until they pass. They are run again "
-            "afterwards, at the commit, and a failure there ends the attempt."
+            "Do not run these tests inside this model session. The runner owns "
+            "deterministic validation and runs every required test afterwards at "
+            "the committed implementation SHA. Treat these commands as acceptance "
+            "evidence you must design for, not as work for the model to execute."
         )
         add("")
 
@@ -476,6 +511,7 @@ __all__ = [
     "DEVELOPER_REPORT_NAME",
     "REVIEW_DIFF_NAME",
     "REVIEW_REPORT_FIELDS",
+    "developer_execution_context",
     "developer_instructions",
     "repair_instructions",
     "review_instructions",

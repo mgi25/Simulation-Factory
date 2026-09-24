@@ -44,6 +44,26 @@ so a packet built from it can carry no writable path at all. This method fills
 `forbidden_paths` **plus every protected path**. `build_session_packet` then
 re-reads that contract and refuses any scope outside it — so the work order
 reaches the packet through the existing authority check rather than around it.
+
+## Read authority is authority, so it lives here
+
+`authorized_read_paths` and `forbidden_read_paths` are fields of the work order
+for the same reason `authorized_paths` is: they are a grant, they travel into
+the fingerprint, and a later stage must not be able to derive a different one.
+
+The runtime has always *modelled* read authority — `ExecutionAuthoritySnapshot`
+carries `may_read`/`may_not_read` and `context_expansion_policy` enforces them
+— but nothing ever filled it, so every snapshot recorded `may_read: []` and
+reading worked only because the external session already held the checkout.
+That is possession, not authorization.
+
+Both roles receive the **same** read scope and differ only in write scope:
+**read is a property of the task, write is a property of the role.** A reviewer
+unable to read what the developer was allowed to change could not review it.
+
+Empty stays empty. A work order stored before these fields existed decodes to
+`()`, and an empty `may_read` grants nothing rather than everything — the
+reading `context_expansion_policy` already gives it.
 """
 
 from __future__ import annotations
@@ -51,6 +71,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 import datetime as dt
 from dataclasses import dataclass, field
+from pathlib import PurePosixPath
 from typing import Any
 
 from ai_platform.context_manifest import ContextKind, ContextRef
@@ -79,6 +100,11 @@ from .protected import ProtectedSurface
 
 
 WORK_ORDER_VERSION = 1
+
+# The authority fields added when read authority stopped being assumed. They
+# are omitted from `fingerprint()` only when *all* of them are empty, which is
+# the record that predates read authority. See `fingerprint`.
+_READ_FIELDS = ("authorized_read_paths", "forbidden_read_paths")
 
 # A branch an engineering job is never assigned. Integration is a CEO act that
 # happens somewhere else, so the work is always on a branch of its own.
@@ -157,6 +183,13 @@ class EngineeringWorkOrder:
     implementation_capabilities: tuple[str, ...] = ("software_implementation",)
     review_capability: str = ARCHITECTURE_REVIEW_CAPABILITY
     forbidden_paths: tuple[str, ...] = ()
+    # The read ceiling, derived from the owning capsules' declared `may_read`
+    # together with the paths this task must necessarily inspect. Empty means
+    # empty: a work order authorized before this field existed grants no read
+    # scope rather than an unrestricted one.
+    authorized_read_paths: tuple[str, ...] = ()
+    # Read denials, which outrank the grant above wherever the two meet.
+    forbidden_read_paths: tuple[str, ...] = ()
     constraints: tuple[str, ...] = ()
     context_refs: tuple[ContextRef, ...] = ()
     required_tests: tuple[str, ...] = ()
@@ -219,6 +252,31 @@ class EngineeringWorkOrder:
         object.__setattr__(
             self, "forbidden_paths", _path_tuple(self.forbidden_paths, "forbidden_paths")
         )
+        object.__setattr__(
+            self,
+            "authorized_read_paths",
+            _path_tuple(self.authorized_read_paths, "authorized_read_paths"),
+        )
+        object.__setattr__(
+            self,
+            "forbidden_read_paths",
+            _path_tuple(self.forbidden_read_paths, "forbidden_read_paths"),
+        )
+        # A path the work order requires to be changed and forbids to be read
+        # is an incoherent grant: the work cannot be done and the contradiction
+        # would be resolved by whichever guard happened to run first. Refuse it
+        # here instead, the way `ProtectedSurface.capture` refuses a path that
+        # is both protected and authorized.
+        unreadable = sorted(
+            f"{rule} may not be read but must be written ({denial})"
+            for rule in self.authorized_paths
+            for denial in self.forbidden_read_paths
+            if _read_overlaps(denial, rule)
+        )
+        if unreadable:
+            raise AuthorityEscalation(
+                "forbidden_read_paths reach a writable path: " + "; ".join(unreadable)
+            )
         object.__setattr__(
             self,
             "acceptance_criteria",
@@ -343,8 +401,30 @@ class EngineeringWorkOrder:
         return to_jsonable(self)
 
     def fingerprint(self) -> str:
-        """The immutability proof every later stage compares against."""
-        return _fingerprint(self)
+        """The immutability proof every later stage compares against.
+
+        An empty read field is omitted, so that a work order authorized before
+        read authority existed keeps the fingerprint it was stored with. The
+        alternative was worse than it sounds: adding the fields changed the
+        identity of every historical record, which meant a completed job could
+        no longer have a decision recorded against it - its stage referenced a
+        digest the work order no longer produced.
+
+        Absent and empty already mean the same thing here, because an empty
+        read scope grants nothing, so hashing them the same asserts nothing
+        new. And a record stripped of the fields to chase an old digest is
+        strictly *less* privileged than one carrying them, so this is not a
+        route to forging authority - only to forfeiting it.
+        """
+        record = to_jsonable(self)
+        # All of them or none. Dropping an empty `forbidden_read_paths` beside
+        # a granted `authorized_read_paths` would restamp every work order
+        # authorized *during* this milestone, which is the same failure one
+        # step smaller - a record carrying read authority must hash the way it
+        # hashed when it was stored.
+        if not any(record.get(field) for field in _READ_FIELDS):
+            record = {key: value for key, value in record.items() if key not in _READ_FIELDS}
+        return _fingerprint(record)
 
     # --- derivations, all of them narrowing --------------------------------
 
@@ -422,6 +502,8 @@ class EngineeringWorkOrder:
         contract["may_not_modify"] = sorted(
             set(self.forbidden_paths) | set(self.protected.paths)
         )
+        contract["may_read"] = list(self.authorized_read_paths)
+        contract["may_not_read"] = list(self.forbidden_read_paths)
         contract["required_tests"] = list(self.required_tests)
         return contract
 
@@ -430,6 +512,12 @@ class EngineeringWorkOrder:
 
         `may_write` stays empty, which in Bootstrap Mode means the only packet
         this contract can carry is a read-only one.
+
+        The read scope is the *same* one the developer held, because that is
+        exactly the material under review: the files the work order authorized,
+        the tests it required, the evidence it named and the capsule context it
+        was given. Narrowing it below the developer's would leave the reviewer
+        judging work it was not allowed to look at.
         """
         contract = contract_from_registry(employee, config)
         contract["may_not_modify"] = sorted(
@@ -437,6 +525,8 @@ class EngineeringWorkOrder:
             | set(self.forbidden_paths)
             | set(self.protected.paths)
         )
+        contract["may_read"] = list(self.authorized_read_paths)
+        contract["may_not_read"] = list(self.forbidden_read_paths)
         return contract
 
     def assert_unchanged(self, fingerprint: str, stage: str) -> None:
@@ -481,6 +571,16 @@ class EngineeringWorkOrder:
                 data.get("review_capability", ARCHITECTURE_REVIEW_CAPABILITY)
             ),
             forbidden_paths=_sequence(data.get("forbidden_paths"), "forbidden_paths"),
+            # Absent on a record stored before read authority existed. `()` is
+            # the fail-closed reading and the only safe default: an empty
+            # `may_read` grants nothing, so an old work order cannot acquire a
+            # read scope simply by being decoded by newer code.
+            authorized_read_paths=_sequence(
+                data.get("authorized_read_paths"), "authorized_read_paths"
+            ),
+            forbidden_read_paths=_sequence(
+                data.get("forbidden_read_paths"), "forbidden_read_paths"
+            ),
             constraints=_sequence(data.get("constraints"), "constraints"),
             context_refs=tuple(
                 _context_ref(item, index)
@@ -524,6 +624,57 @@ def _path_tuple(values: Any, field_name: str) -> tuple[str, ...]:
         for index, item in enumerate(values)
     }
     return tuple(sorted(paths))
+
+
+def _read_covers(rule: str, path: str) -> bool:
+    """Whether `rule` grants `path`, wildcards included.
+
+    Deliberately the same reading `company.runtime.context_expansion_policy`
+    uses, because a rule that means one thing when the scope is derived and
+    another when the scope is enforced is not a rule.
+    """
+    if any(token in rule for token in "*?["):
+        return PurePosixPath(path).match(rule)
+    return path == rule or path.startswith(rule + "/")
+
+
+def _read_overlaps(rule: str, path: str) -> bool:
+    """Whether `rule` and `path` touch at all, in either direction.
+
+    A denial covering a subdirectory of a granted tree still touches it, and so
+    does a denial the granted rule sits inside. Both directions count, because
+    a denial that only half-applies is a denial nobody can reason about.
+    """
+    if _read_covers(rule, path) or _read_covers(path, rule):
+        return True
+    wildcard = min(
+        (position for token in ("*", "?", "[") if (position := rule.find(token)) >= 0),
+        default=-1,
+    )
+    if wildcard < 0:
+        return False
+    prefix = rule[:wildcard].rstrip("/")
+    return bool(prefix) and _read_covers(path, prefix)
+
+
+def collapse_read_rules(rules: Any) -> tuple[str, ...]:
+    """Drop every rule another rule already covers, keeping coverage identical.
+
+    Three capsules may each declare up to twelve read paths, so an un-collapsed
+    union overruns the thirty-two a work order may name — measured at 35 for the
+    widest real three-capsule selection. Collapsing brings the same selection to
+    22 without removing a single readable path, because a rule is only dropped
+    when another rule in the set already grants everything it grants.
+
+    Public because the derivation in `intake` and the tests that check it must
+    agree on what "the same scope" means.
+    """
+    kept = sorted({str(rule) for rule in rules if str(rule).strip()})
+    return tuple(
+        rule
+        for rule in kept
+        if not any(other != rule and _read_covers(other, rule) for other in kept)
+    )
 
 
 def _capability_tuple(values: Any, field_name: str) -> tuple[str, ...]:

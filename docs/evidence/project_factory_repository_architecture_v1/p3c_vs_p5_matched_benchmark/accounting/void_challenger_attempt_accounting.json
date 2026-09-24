@@ -1,0 +1,431 @@
+{
+  "adaptive_routing": [
+    {
+      "applied": true,
+      "base_failed_tests": 5,
+      "candidate": true,
+      "failure_guided_complete_spans": 5,
+      "failure_symbol_hints": 5,
+      "requested_downshift_tier": "economy",
+      "source_tier": "standard",
+      "stage": "developer-01",
+      "target_tier": "economy",
+      "veto_reasons": []
+    }
+  ],
+  "anomalies": [],
+  "arm": "challenger",
+  "by_role": {
+    "developer": {
+      "cache_creation_units": 42699,
+      "cache_read_units": 1166803,
+      "cost_usd": 0.23570005,
+      "duration_s": 125.879,
+      "input_units": 321,
+      "output_units": 13065,
+      "paid_sessions": 1,
+      "turns": 40
+    },
+    "reviewer": {
+      "cache_creation_units": 27245,
+      "cache_read_units": 483252,
+      "cost_usd": 0.57381725,
+      "duration_s": 137.578,
+      "input_units": 22,
+      "output_units": 6472,
+      "paid_sessions": 1,
+      "turns": 21
+    }
+  },
+  "deterministic": {
+    "base_diagnostic_s": 40.854922,
+    "gate_suite_s": 0.0,
+    "required_test_s": 18.453,
+    "runs": [
+      {
+        "duration_s": 40.854922,
+        "kind": "base_diagnostic",
+        "stage": "developer-01"
+      },
+      {
+        "command": "tests/test_company_engineering_execution.py",
+        "duration_s": 18.453,
+        "green": true,
+        "kind": "required_test_s",
+        "stage": "developer-01",
+        "summary": "207 passed in 16.94s"
+      }
+    ],
+    "total_s": 59.307922
+  },
+  "repository_map_cache": [
+    {
+      "cache": {
+        "available": true,
+        "identity_source": "git_blob",
+        "invalid_entries": 0,
+        "module_count": 510,
+        "module_hits": 0,
+        "module_misses": 510,
+        "roots": [
+          "company",
+          "tools",
+          "tests"
+        ],
+        "snapshot_hit": false,
+        "tree_fingerprint": "9f0395907629c967",
+        "version": 3
+      },
+      "stage": "developer-01"
+    },
+    {
+      "cache": {
+        "available": true,
+        "identity_source": "git_blob",
+        "invalid_entries": 0,
+        "module_count": 510,
+        "module_hits": 509,
+        "module_misses": 1,
+        "roots": [
+          "company",
+          "tools",
+          "tests"
+        ],
+        "snapshot_hit": false,
+        "tree_fingerprint": "27c6c52a54d1f100",
+        "version": 3
+      },
+      "stage": "reviewer-01"
+    }
+  ],
+  "resources_applied": [
+    {
+      "applied_cost_ceiling": 3.0,
+      "applied_model": "haiku",
+      "applied_timeout_s": 1800.0,
+      "available_tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep"
+      ],
+      "base_diagnostic": {
+        "duration_s": 40.854922,
+        "eligible": true,
+        "failed": 1,
+        "failure_symbol_hints": 5,
+        "green": 0,
+        "max_tests": 2,
+        "ran": true,
+        "test_runs": 1,
+        "timeout_s": 180.0
+      },
+      "compiled_context": {
+        "artifact": "<projects>\\project-factory-runner-state\\p3c-vs-p5-challenger\\runs\\wo-req-token-efficiency-v4-p5-challenger-8da2ad126920\\run-000001\\developer-01\\execution-context.json",
+        "compiled_spans": 6,
+        "fingerprint": "10ac9e1101666255",
+        "rendered_chars": 6000,
+        "truncated": true
+      },
+      "deterministic_validation_owner": "runner",
+      "model_runs_required_tests": false,
+      "model_source": "adaptive:economy",
+      "not_enforced": [
+        "max_turns: no backend this runner drives accepts a turn ceiling; it is carried into the session's instructions as guidance only"
+      ],
+      "recommended": {
+        "artifact_version": 2,
+        "context_budget_chars": 8000,
+        "context_ref_count": 2,
+        "cost_currency": "USD",
+        "escalation": "none",
+        "max_session_cost": "3.00",
+        "max_turns_advisory": 40,
+        "max_wall_seconds": 1800,
+        "model_tier": "standard",
+        "profile": "consumer",
+        "reasoning_class": "C",
+        "strategy_reason": "reasoning class C at risk low is routine implementation; profile consumer runs it at the standard tier; evidence is required and affects review depth, not model tier; candidate for an economy downshift only if the runner's deterministic base diagnostic localizes every failure into compiled context"
+      },
+      "role": "developer",
+      "stage": "developer-01"
+    },
+    {
+      "applied_cost_ceiling": 1.5,
+      "applied_model": "sonnet",
+      "applied_timeout_s": 900.0,
+      "available_tools": null,
+      "base_diagnostic": null,
+      "compiled_context": null,
+      "deterministic_validation_owner": null,
+      "model_runs_required_tests": null,
+      "model_source": "tier:standard",
+      "not_enforced": [
+        "max_turns: no backend this runner drives accepts a turn ceiling; it is carried into the session's instructions as guidance only"
+      ],
+      "recommended": {
+        "artifact_version": 2,
+        "context_budget_chars": 4800,
+        "context_ref_count": 2,
+        "cost_currency": "USD",
+        "escalation": "none",
+        "max_session_cost": "1.50",
+        "max_turns_advisory": 20,
+        "max_wall_seconds": 900,
+        "model_tier": "standard",
+        "profile": "consumer",
+        "reasoning_class": "C",
+        "strategy_reason": "reasoning class C at risk low is routine implementation; profile consumer runs it at the standard tier; evidence is required and affects review depth, not model tier; review session: read-only with reduced context budget"
+      },
+      "role": "reviewer",
+      "stage": "reviewer-01"
+    }
+  ],
+  "results": [
+    {
+      "acceptance_criteria": [
+        "Only tests/test_company_engineering_execution.py is modified.",
+        "The exact engineering-execution expectations that change because tests/test_company_review_separation.py is declared by the capsule are updated and nothing else is broadened.",
+        "Exact tuple assertions remain exact tuple assertions; no containment, subset, unordered or partial assertion is substituted.",
+        "Expected authorized paths, plan writing paths, packet scope and persisted authority include tests/test_company_review_separation.py solely because it is now a declared semantic test.",
+        "The capsule's exact tests assertion expects both tests/test_company_engineering_execution.py and tests/test_company_review_separation.py.",
+        "tests/test_company_engineering_execution.py passes.",
+        "No production, runtime, runner, capsule, dependency or governance file is modified."
+      ],
+      "authorized_on": "2026-09-23",
+      "authorized_paths": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "authorizes_merge": false,
+      "branch": "eng-token-efficiency-v4-p5-challenger",
+      "changed_files": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "commit_sha": "af7b937ee788dce243597e5dc614916b4a1364ae",
+      "decisions_required": [
+        "the work order's 1 authorized developer attempt(s) are spent and the review still requires changes; continuing needs either additional-attempt authorization on this work order or a new one"
+      ],
+      "developer_attempts": 1,
+      "developer_attempts_remaining": 0,
+      "evidence_refs": [],
+      "gate_blockers": [],
+      "gate_readiness": null,
+      "gate_report_id": "",
+      "implementation_summary": "Updated all engineering-execution regression expectations in tests/test_company_engineering_execution.py to account for tests/test_company_review_separation.py now being a declared semantic test of the company-engineering-execution capsule. Nine locations updated: authorized_paths, required_tests, writing_paths, scope.allowed, authority.may_write, capsule.tests, and four helper function test expectations. All exact tuple assertions remain exact tuple assertions.",
+      "implementer": "software_implementation_engineer",
+      "merge_performed": false,
+      "not_an_approval": "READY FOR CEO APPROVAL is a request to be read, not an approval. Nothing here merges, deploys or publishes, and Company OS holds no capability to.",
+      "objective": "Update the exact engineering-execution regression expectations that legitimately change because company-engineering-execution now names tests/test_company_review_separation.py as a semantic test.",
+      "persisted": {
+        "fingerprint": "e4997a88058e26f2",
+        "record_ref": "engineering/results/wo-req-token-efficiency-v4-p5-challenger-8da2ad126920/000001.json",
+        "sequence": 1
+      },
+      "remote_verified": false,
+      "requested_by": "MGI",
+      "review_findings": [
+        "[changes_required] attempt-not-accepted: the implementation attempt ended rejected: the branch was not verified on the remote, so the completion protocol is incomplete"
+      ],
+      "review_outcome": "changes_required",
+      "reviewer": "software_review_engineer",
+      "risks": [
+        "Ensure the actual capsule definition (company/integration/suites.py) declares both test files - these test expectations assume the capsule has been properly updated upstream"
+      ],
+      "status": "decision_required",
+      "tests": [
+        {
+          "command": "tests/test_company_engineering_execution.py",
+          "passed": true,
+          "scope": "targeted",
+          "summary": "207 passed in 16.94s"
+        }
+      ],
+      "unanswered_criteria": [],
+      "version": 1,
+      "work_order_fingerprint": "ac00fa9a4ab4a7ae",
+      "work_order_id": "wo-req-token-efficiency-v4-p5-challenger"
+    }
+  ],
+  "runner_dir": "<projects>\\project-factory-runner-state\\p3c-vs-p5-challenger",
+  "sessions": [
+    {
+      "cache_creation_units": 42699,
+      "cache_read_units": 1166803,
+      "cost_usd": 0.23570005,
+      "duration_s": 125.879,
+      "exit_code": 0,
+      "exploration": {
+        "bash_total": 0,
+        "edits_total": 9,
+        "events_recorded": 39,
+        "file_reads_repeated": 24,
+        "file_reads_total": 25,
+        "file_reads_unique": 1,
+        "format": "stream_json",
+        "full_or_implicit_reads": 1,
+        "git_commands": 0,
+        "glob_total": 0,
+        "grep_total": 4,
+        "other_shell_commands": 0,
+        "overlapping_read_ranges": 9,
+        "read_after_edit_count": 3,
+        "repeated_full_or_implicit_reads": 0,
+        "repeated_requested_lines": null,
+        "repeated_same_range_reads": 1,
+        "requested_read_lines_total": null,
+        "same_file_read_after_edit_count": 3,
+        "searches_repeated": 0,
+        "searches_total": 4,
+        "targeted_reads": 24,
+        "test_commands": 0,
+        "tool_errors": 0
+      },
+      "input_units": 321,
+      "model": "haiku",
+      "ok": true,
+      "output_units": 13065,
+      "permission_denials": [],
+      "provider": "anthropic",
+      "role": "developer",
+      "session_id": "35dc709b-8707-41ea-842c-1a843ccd12ab",
+      "stage": "developer-01",
+      "startup_context": {
+        "mcp_servers": [],
+        "model": "claude-haiku-4-5-20251001",
+        "permission_mode": "acceptEdits",
+        "plugins": [],
+        "skills": [
+          "keybindings-help",
+          "debug",
+          "simplify",
+          "batch",
+          "claude-api",
+          "enable-ai-project"
+        ],
+        "tools": [
+          "Glob",
+          "Grep",
+          "Read",
+          "Edit",
+          "Write"
+        ]
+      },
+      "startup_model": "claude-haiku-4-5-20251001",
+      "stopped_reason": "",
+      "turns": 40,
+      "unreliable": [],
+      "usage_source": "model_usage_totals"
+    },
+    {
+      "cache_creation_units": 27245,
+      "cache_read_units": 483252,
+      "cost_usd": 0.5738172500000001,
+      "duration_s": 137.578,
+      "exit_code": 0,
+      "exploration": {
+        "bash_total": 0,
+        "edits_total": 0,
+        "events_recorded": 20,
+        "file_reads_repeated": 8,
+        "file_reads_total": 12,
+        "file_reads_unique": 4,
+        "format": "stream_json",
+        "full_or_implicit_reads": 2,
+        "git_commands": 0,
+        "glob_total": 0,
+        "grep_total": 8,
+        "other_shell_commands": 0,
+        "overlapping_read_ranges": 0,
+        "read_after_edit_count": 0,
+        "repeated_full_or_implicit_reads": 0,
+        "repeated_requested_lines": null,
+        "repeated_same_range_reads": 0,
+        "requested_read_lines_total": null,
+        "same_file_read_after_edit_count": 0,
+        "searches_repeated": 2,
+        "searches_total": 8,
+        "targeted_reads": 10,
+        "test_commands": 0,
+        "tool_errors": 0
+      },
+      "input_units": 22,
+      "model": "sonnet",
+      "ok": true,
+      "output_units": 6472,
+      "permission_denials": [],
+      "provider": "anthropic",
+      "role": "reviewer",
+      "session_id": "2c807bcf-ad7c-4f5a-b1d4-37edf60cd986",
+      "stage": "reviewer-01",
+      "startup_context": {
+        "mcp_servers": [],
+        "model": "claude-sonnet-4-6",
+        "permission_mode": "default",
+        "plugins": [],
+        "skills": [
+          "keybindings-help",
+          "debug",
+          "simplify",
+          "batch",
+          "claude-api",
+          "enable-ai-project"
+        ],
+        "tools": [
+          "Glob",
+          "Grep",
+          "Read"
+        ]
+      },
+      "startup_model": "claude-sonnet-4-6",
+      "stopped_reason": "",
+      "turns": 21,
+      "unreliable": [],
+      "usage_source": "model_usage_totals"
+    }
+  ],
+  "stages": [
+    {
+      "final_state": "decision_required",
+      "finished_at": "2026-09-23T07:58:41.483518+00:00",
+      "outcome": "blocked",
+      "outcome_file": "000001.json",
+      "reason": "the job is decision_required and waits for the CEO",
+      "stages": [
+        {
+          "detail": "attempt 1 by software_implementation_engineer, commit af7b937ee788, 1 path(s); receipt failures: repository evidence: remote-tracking ref refs/remotes/origin/eng-token-efficiency-v4-p5-challenger is not present in this clone; the remote claim cannot be checked here",
+          "ok": false,
+          "session_ids": [
+            "35dc709b-8707-41ea-842c-1a843ccd12ab"
+          ],
+          "stage": "developer",
+          "state_after": "testing",
+          "state_before": "planning"
+        },
+        {
+          "detail": "software_review_engineer returned pass; Company OS adjudicated changes_required (attested pass, deterministic changes_required)",
+          "ok": false,
+          "session_ids": [
+            "2c807bcf-ad7c-4f5a-b1d4-37edf60cd986"
+          ],
+          "stage": "reviewer",
+          "state_after": "decision_required",
+          "state_before": "testing"
+        }
+      ]
+    }
+  ],
+  "whole_task_paid": {
+    "cache_creation_units": 69944,
+    "cache_read_units": 1650055,
+    "cost_usd": 0.8095173,
+    "duration_s": 263.457,
+    "input_units": 343,
+    "output_units": 19537,
+    "paid_sessions": 2,
+    "turns": 61
+  },
+  "work_orders": [
+    "wo-req-token-efficiency-v4-p5-challenger-8da2ad126920"
+  ]
+}

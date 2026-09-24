@@ -9,6 +9,7 @@
   "decisions": [],
   "dependencies": [
     "company-analytics-experiments",
+    "company-evidence-review",
     "company-executive-delegation",
     "company-finance",
     "company-workforce-capabilities",

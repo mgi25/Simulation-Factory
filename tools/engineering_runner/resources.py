@@ -55,14 +55,16 @@ from .errors import IntegrityFailure
 # The artifact versions this runner knows how to read. A version outside this
 # set is refused: reading a payload whose fields may have moved is how a
 # ceiling silently becomes zero.
-SUPPORTED_VERSIONS: frozenset[int] = frozenset({1})
+SUPPORTED_VERSIONS: frozenset[int] = frozenset({1, 2})
 
+ECONOMY = "economy"
 STANDARD = "standard"
 STRONGEST = "strongest"
 TIERS: frozenset[str] = frozenset({STANDARD, STRONGEST})
 
 # Aliases, so the account's current model of each strength is what runs.
 DEFAULT_TIER_MODELS: Mapping[str, str] = {
+    ECONOMY: "haiku",
     STANDARD: "sonnet",
     STRONGEST: "opus",
 }
@@ -307,6 +309,7 @@ def _summary_line(stdout: str) -> str:
 __all__ = [
     "AUTHORITY_KEYS",
     "DEFAULT_TIER_MODELS",
+    "ECONOMY",
     "STANDARD",
     "STRONGEST",
     "SUPPORTED_VERSIONS",

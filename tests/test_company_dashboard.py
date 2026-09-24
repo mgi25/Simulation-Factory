@@ -19,7 +19,7 @@ from company.dashboard import (
     build_snapshot, check_integrity, diff_snapshots,
 )
 from company.dashboard.models import DashboardError
-from company.dashboard.builder import _dependency_cycles
+from company.dashboard.builder import EXTERNAL_CAPSULES, _dependency_cycles
 from company.finance import (
     CostCategory, CostRecord, FinanceStore, Money, Recurrence, RevenueCategory,
     RevenueRecord, SpendProposal, SubjectKind, SubjectRef,
@@ -341,7 +341,14 @@ def test_capsule_is_bounded_and_control_plane_stays_at_eight_with_full_closure()
     assert "company-ceo-dashboard" in control.dependencies
     assert "company-research-intelligence" not in control.dependencies
     assert "company-research-intelligence" in index.dependency_closure("company-os-control-plane")
-    assert index.dependency_closure("company-os-control-plane") == tuple(sorted(set(index.ids()) - {"company-os-control-plane"}))
+    # Full closure over the control plane, which the external engineering
+    # runner is deliberately not part of: it owns a path under a production
+    # root, so an edge reaching it would declare the control plane rests on
+    # production. It is governed without being a member.
+    assert index.dependency_closure("company-os-control-plane") == tuple(
+        sorted(set(index.ids()) - {"company-os-control-plane"} - EXTERNAL_CAPSULES)
+    )
+    assert EXTERNAL_CAPSULES == frozenset({"company-external-engineering-runner"})
     assert _dependency_cycles(index) == ()
     assert index.integrity(repo_root=ROOT) == ()
 

@@ -67,7 +67,7 @@ from typing import Any, Mapping, Protocol, Sequence
 import uuid
 
 from .errors import BackendFailure, BackendUnavailable
-from .exploration_telemetry import parse_exploration, split_result_envelope
+from .exploration_telemetry import parse_exploration, parse_startup_context, split_result_envelope
 from .process import CommandResult, CommandRunner, resolve_executable
 from .redaction import Redactor, child_environment
 
@@ -99,6 +99,20 @@ CODEX_PROBE_PROMPT = (
 )
 CODEX_PROBE_EXPECTED = "OK42"
 _CODEX_FAILURE_MARKERS = ("stream error", "ERROR:", '"detail"')
+
+
+def _claude_environment() -> dict[str, str]:
+    """The isolated environment for Project Factory Claude Code sessions.
+
+    Claude.ai-managed MCP servers are injected from the logged-in account and
+    are not controlled by --strict-mcp-config. Claude Code 2.1.63+ provides
+    ENABLE_CLAUDEAI_MCP_SERVERS=false specifically to opt out. Set it only on
+    runner-launched Claude subprocesses so normal interactive Claude usage on
+    the operator machine is unchanged.
+    """
+    environment = child_environment()
+    environment["ENABLE_CLAUDEAI_MCP_SERVERS"] = "false"
+    return environment
 
 
 @dataclass(frozen=True)
@@ -168,6 +182,10 @@ class SessionOutcome:
     # dict is safe to fold into `to_dict()` without growing it unpredictably.
     exploration: Mapping[str, Any] | None = None
     exploration_events: tuple[Mapping[str, Any], ...] = ()
+    # Bounded names from Claude Code's system/init event. This is how V4
+    # verifies the startup context surface actually shrank after changing CLI
+    # flags; a configured allow-list is not evidence of what the model saw.
+    startup_context: Mapping[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -192,6 +210,9 @@ class SessionOutcome:
             "permission_denials": list(self.permission_denials),
             "result_chars": len(self.result_text),
             "exploration": dict(self.exploration) if self.exploration is not None else None,
+            "startup_context": (
+                dict(self.startup_context) if self.startup_context is not None else None
+            ),
         }
 
 
@@ -236,7 +257,7 @@ class ClaudeCodeBackend:
             [path, "--version"],
             cwd=Path.cwd(),
             timeout_s=120.0,
-            env=child_environment(),
+            env=_claude_environment(),
         )
         if not result.ok:
             return False, f"{path} --version exited {result.exit_code}"
@@ -266,8 +287,23 @@ class ClaudeCodeBackend:
             argv += ["--model", request.model]
         for directory in request.extra_dirs:
             argv += ["--add-dir", str(directory)]
+
+        # V4 P1: permission is not context restriction. --allowedTools only
+        # decides what may execute; --tools decides which built-in tools are
+        # exposed to the model at all. Use the same bounded contract for both.
+        # Strict MCP with an explicit empty config prevents user/global MCP
+        # servers (for example Claude Docs) from joining an engineering
+        # session merely because they are configured on the operator machine.
         if request.allowed_tools:
+            argv += ["--tools", ",".join(request.allowed_tools)]
             argv += ["--allowedTools", " ".join(request.allowed_tools)]
+        else:
+            argv += ["--tools", ""]
+        argv += [
+            "--strict-mcp-config",
+            "--mcp-config",
+            '{"mcpServers":{}}',
+        ]
         if request.disallowed_tools:
             argv += ["--disallowedTools", " ".join(request.disallowed_tools)]
         # A reviewer gets no writing tool at all, so `default` is right: there
@@ -284,7 +320,7 @@ class ClaudeCodeBackend:
             argv,
             cwd=request.cwd,
             timeout_s=request.timeout_s,
-            env=child_environment(),
+            env=_claude_environment(),
             stdin=request.instructions,
         )
         return self._read(request, result)
@@ -292,6 +328,7 @@ class ClaudeCodeBackend:
     def _read(self, request: SessionRequest, result: CommandResult) -> SessionOutcome:
         payload = split_result_envelope(result.stdout)
         telemetry = parse_exploration(result.stdout, worktree=request.cwd)
+        startup = parse_startup_context(result.stdout)
         session_id = str(payload.get("session_id", "")) or request.session_id
         if not _SESSION_ID.fullmatch(session_id):
             raise BackendFailure(
@@ -331,6 +368,7 @@ class ClaudeCodeBackend:
             permission_denials=_denials(payload.get("permission_denials")),
             exploration=telemetry.metrics_dict(),
             exploration_events=tuple(e.to_dict() for e in telemetry.events),
+            startup_context=startup or None,
         )
 
 

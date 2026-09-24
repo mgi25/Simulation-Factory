@@ -18,8 +18,10 @@ session, so it cannot enforce one - and this module never pretends it does.
 low-to-medium risk, concrete acceptance criteria. **Strongest** is for class D
 and above - specialist judgment, deep reasoning, multi-perspective review -
 for HIGH and CRITICAL risk, for explicit escalation, and for a correction
-attempt after a standard-tier attempt failed review. There is no tier below
-standard: the quality constraint is hard.
+attempt after a standard-tier attempt failed review. `Standard` remains the Company OS recommendation for routine implementation.
+P5 adds an `economy` *downshift target* that the runner may use only after
+free deterministic execution evidence proves the task is narrowly localized;
+Company OS never emits `economy` as the primary model tier.
 
 The default used to be unreachable. `EngineeringWorkOrder.task_specification`
 declared a specialist domain for every work order, so the classifier's
@@ -75,8 +77,27 @@ if TYPE_CHECKING:  # the profile imports this module, so the arrow points one wa
 class ModelTier(str, Enum):
     """Which model strength the operator should apply."""
 
+    ECONOMY = "economy"
     STANDARD = "standard"
     STRONGEST = "strongest"
+
+
+@dataclass(frozen=True)
+class AdaptiveRoutingDirective:
+    """A cheaper-tier candidate, never an instruction to lower quality blindly."""
+
+    eligible: bool
+    downshift_tier: ModelTier
+    static_reasons: tuple[str, ...]
+    runtime_requirements: tuple[str, ...]
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "eligible": self.eligible,
+            "downshift_tier": self.downshift_tier.value,
+            "static_reasons": list(self.static_reasons),
+            "runtime_requirements": list(self.runtime_requirements),
+        }
 
 
 class CheckpointRule(str, Enum):
@@ -189,6 +210,7 @@ class ExecutionStrategy:
     profile_name: str
     escalation: EscalationReason
     strategy_reason: str
+    adaptive_routing: AdaptiveRoutingDirective
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -216,6 +238,7 @@ class ExecutionStrategy:
             "provider_count": self.provider_count,
             "parallel_sessions": self.parallel_sessions,
             "strategy_reason": self.strategy_reason,
+            "adaptive_routing": self.adaptive_routing.to_dict(),
         }
 
 
@@ -240,6 +263,11 @@ def select_strategy(
     is_review: bool = False,
     profile: "ResourceProfile | None" = None,
     escalation: EscalationReason = EscalationReason.NONE,
+    authorized_path_count: int = 0,
+    required_test_count: int = 0,
+    packet_attempt: int = 0,
+    novel: bool = False,
+    specialist_domain: str = "",
 ) -> ExecutionStrategy:
     """Select execution strategy deterministically from task properties.
 
@@ -254,8 +282,11 @@ def select_strategy(
     - **a cheaper capable model already failed** - a correction attempt after a
       standard-tier attempt did not satisfy review.
 
-    Everything else is routine and gets the profile's routine tier. That is
-    the whole cost lever, and before this milestone it could not be pulled:
+    Everything else is routine and gets the profile's routine tier. P5 may
+    separately mark a narrow first-attempt developer task as an economy
+    candidate, but the primary tier remains standard until the runner proves
+    localization from the immutable-base diagnostic. Before the original
+    standard-tier milestone this cost lever could not be pulled:
     every engineering work order declared a specialist domain, so every job
     classified D and the standard tier was unreachable in production.
 
@@ -298,6 +329,34 @@ def select_strategy(
     )
     ceiling = ResourceCeiling.from_profile(active, is_review=is_review)
 
+    economy_checks = {
+        "developer session": not is_review,
+        "consumer profile": active.name.value == "consumer",
+        "reasoning class C": reasoning_class is ReasoningClass.C,
+        "low risk": risk is Risk.LOW,
+        "no escalation": escalation is EscalationReason.NONE,
+        "first attempt": packet_attempt == 1,
+        "one writable path": authorized_path_count == 1,
+        "one or two required tests": 1 <= required_test_count <= 2,
+        "not novel": not novel,
+        "no specialist domain": not specialist_domain.strip(),
+        "standard recommended tier": tier is ModelTier.STANDARD,
+    }
+    economy_eligible = all(economy_checks.values())
+    adaptive_routing = AdaptiveRoutingDirective(
+        eligible=economy_eligible,
+        downshift_tier=ModelTier.ECONOMY,
+        static_reasons=tuple(
+            name for name, passed in economy_checks.items() if passed
+        ),
+        runtime_requirements=(
+            "base diagnostic ran",
+            "base diagnostic found at least one failing required test",
+            "every failure-symbol hint is present as a failure-guided compiled span",
+            "operator did not pin a developer model",
+        ),
+    )
+
     reasons: list[str] = []
     if specialist:
         reasons.append(f"reasoning class {reasoning_class.value} requires specialist depth")
@@ -320,6 +379,11 @@ def select_strategy(
         reasons.append("evidence is required and affects review depth, not model tier")
     if is_review:
         reasons.append("review session: read-only with reduced context budget")
+    if economy_eligible:
+        reasons.append(
+            "candidate for an economy downshift only if the runner's deterministic "
+            "base diagnostic localizes every failure into compiled context"
+        )
 
     return ExecutionStrategy(
         model_tier=tier,
@@ -333,6 +397,7 @@ def select_strategy(
         profile_name=active.name.value,
         escalation=escalation,
         strategy_reason="; ".join(reasons),
+        adaptive_routing=adaptive_routing,
     )
 
 

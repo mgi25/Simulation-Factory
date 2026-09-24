@@ -17,6 +17,7 @@ from tools.engineering_runner.repo_map import (
     SymbolSpan,
     build_and_cache,
     build_repo_map,
+    build_repo_map_cached,
     load_or_build,
     neighborhood,
     query,
@@ -158,6 +159,183 @@ def test_query_with_no_recognisable_token_returns_nothing(tmp_path: Path) -> Non
     repo = _sample_repo(tmp_path)
     repo_map = build_repo_map(repo, roots=("company", "tools", "tests"))
     assert query(repo_map, "zzzznotpresentanywhere", limit=5) == ()
+
+
+def test_content_addressed_cache_reuses_an_exact_tree_snapshot(tmp_path: Path) -> None:
+    repo = _sample_repo(tmp_path)
+    cache = tmp_path / "runner-cache"
+
+    first, cold = build_repo_map_cached(
+        repo, cache, roots=("company", "tools", "tests")
+    )
+    second, warm = build_repo_map_cached(
+        repo, cache, roots=("company", "tools", "tests")
+    )
+
+    assert first.to_dict() == second.to_dict()
+    assert cold.snapshot_hit is False
+    assert cold.module_hits == 0
+    assert cold.module_misses == cold.module_count
+    assert warm.snapshot_hit is True
+    assert warm.module_hits == warm.module_count
+    assert warm.module_misses == 0
+    assert warm.tree_fingerprint == cold.tree_fingerprint
+
+
+def test_content_identity_map_reuses_unchanged_modules_without_source_reads(
+    tmp_path: Path,
+) -> None:
+    repo = _sample_repo(tmp_path)
+    cache = tmp_path / "runner-cache"
+
+    paths = sorted(
+        path
+        for root in ("company", "tools", "tests")
+        for path in (repo / root).rglob("*.py")
+    )
+
+    def identities() -> dict[str, str]:
+        return {
+            path.relative_to(repo).as_posix(): str(path.stat().st_size) + ":" + path.read_text("utf-8")
+            for path in paths
+        }
+
+    original_ids = identities()
+    first, cold = build_repo_map_cached(
+        repo,
+        cache,
+        roots=("company", "tools", "tests"),
+        content_identities=original_ids,
+    )
+    assert cold.module_misses == cold.module_count
+
+    spinner_path = repo / "company/widgets/spinner.py"
+    spinner_path.write_text(
+        '"""Spin a widget until it stops."""\n\n'
+        "import os\n"
+        "from company.widgets.errors import SpinError\n\n"
+        "class Spinner:\n"
+        "    def spin(self) -> None: ...\n"
+        "    def stop(self) -> None: ...\n\n"
+        "def start_spinner() -> Spinner:\n"
+        "    return Spinner()\n",
+        encoding="utf-8",
+    )
+
+    changed_ids = dict(original_ids)
+    changed_ids["company/widgets/spinner.py"] = (
+        str(spinner_path.stat().st_size) + ":" + spinner_path.read_text("utf-8")
+    )
+
+    # If an unchanged module were reopened on this path, this missing source
+    # would fail the build. Its cached ModuleMap must be enough.
+    missing_unchanged = repo / "company/widgets/errors.py"
+    missing_unchanged.unlink()
+
+    second, changed = build_repo_map_cached(
+        repo,
+        cache,
+        roots=("company", "tools", "tests"),
+        content_identities=changed_ids,
+    )
+
+    assert changed.snapshot_hit is False
+    assert changed.module_misses == 1
+    assert changed.module_hits == changed.module_count - 1
+    assert second.by_path("company/widgets/errors.py") == first.by_path(
+        "company/widgets/errors.py"
+    )
+    spinner = second.by_path("company/widgets/spinner.py")
+    assert spinner is not None
+    assert spinner.symbol("Spinner.stop") is not None
+
+
+def test_content_addressed_cache_reparses_only_a_changed_module(tmp_path: Path) -> None:
+    repo = _sample_repo(tmp_path)
+    cache = tmp_path / "runner-cache"
+
+    first, cold = build_repo_map_cached(
+        repo, cache, roots=("company", "tools", "tests")
+    )
+    _write(
+        repo,
+        "company/widgets/spinner.py",
+        '"""Spin a widget until it stops."""\n\n'
+        "import os\n"
+        "from company.widgets.errors import SpinError\n\n"
+        "class Spinner:\n"
+        "    def spin(self) -> None: ...\n"
+        "    def stop(self) -> None: ...\n\n"
+        "def start_spinner() -> Spinner:\n"
+        "    return Spinner()\n",
+    )
+
+    second, changed = build_repo_map_cached(
+        repo, cache, roots=("company", "tools", "tests")
+    )
+
+    assert changed.snapshot_hit is False
+    assert changed.tree_fingerprint != cold.tree_fingerprint
+    assert changed.module_count == cold.module_count
+    assert changed.module_misses == 1
+    assert changed.module_hits == changed.module_count - 1
+    spinner = second.by_path("company/widgets/spinner.py")
+    assert spinner is not None
+    assert spinner.symbol("Spinner.stop") is not None
+    assert second.to_dict() == build_repo_map(
+        repo, roots=("company", "tools", "tests")
+    ).to_dict()
+    assert first.to_dict() != second.to_dict()
+
+
+def test_content_addressed_cache_recovers_from_a_corrupt_latest_manifest(
+    tmp_path: Path,
+) -> None:
+    repo = _sample_repo(tmp_path)
+    cache = tmp_path / "runner-cache"
+
+    expected, _cold = build_repo_map_cached(
+        repo, cache, roots=("company", "tools", "tests")
+    )
+
+    for snapshot in (cache / "snapshots").glob("*.json"):
+        snapshot.unlink()
+
+    latest = cache / "latest.json"
+    assert latest.is_file()
+    latest.write_text("{not json", encoding="utf-8")
+
+    recovered, evidence = build_repo_map_cached(
+        repo, cache, roots=("company", "tools", "tests")
+    )
+
+    assert recovered.to_dict() == expected.to_dict()
+    assert evidence.snapshot_hit is False
+    assert evidence.invalid_entries == 1
+    assert evidence.module_misses == evidence.module_count
+    assert evidence.module_hits == 0
+
+
+def test_content_addressed_cache_never_reuses_a_snapshot_after_source_change(
+    tmp_path: Path,
+) -> None:
+    repo = _sample_repo(tmp_path)
+    cache = tmp_path / "runner-cache"
+
+    _original, cold = build_repo_map_cached(
+        repo, cache, roots=("company", "tools", "tests")
+    )
+    _write(repo, "company/widgets/errors.py", "class NewError(Exception):\n    pass\n")
+
+    changed, evidence = build_repo_map_cached(
+        repo, cache, roots=("company", "tools", "tests")
+    )
+
+    assert evidence.snapshot_hit is False
+    assert evidence.tree_fingerprint != cold.tree_fingerprint
+    errors = changed.by_path("company/widgets/errors.py")
+    assert errors is not None
+    assert errors.classes == ("NewError",)
 
 
 def test_build_and_cache_then_load_or_build_reads_the_cache(tmp_path: Path) -> None:

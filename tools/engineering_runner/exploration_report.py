@@ -117,9 +117,13 @@ def measure_receipt(path: Path, *, label: str, role: str = "developer") -> Attem
 
 
 def measure_session_telemetry(
-    path: Path, *, label: str, role: str
+    path: Path, *, label: str, role: str, files_touched: int | None = None
 ) -> AttemptMeasurement | None:
-    """A stage's runner-written `session.json`, used when no receipt exists."""
+    """One runner-written provider session.
+
+    Numbered `session-N.json` files are authoritative when present because a
+    single stage may launch more than one paid provider subprocess.
+    """
     data = _read_json(path)
     if not data:
         return None
@@ -131,7 +135,7 @@ def measure_session_telemetry(
         cache_creation_units=_int(data.get("cache_creation_units")),
         output_units=_int(data.get("output_units")),
         cost_usd=_float(data.get("cost_usd")),
-        files_touched=None,
+        files_touched=files_touched,
         unreliable_metrics=tuple(str(x) for x in data.get("unreliable", ())),
     )
 
@@ -157,32 +161,59 @@ def _role_from_dirname(name: str) -> str:
 
 
 def discover_measurements(run_state_dirs: Sequence[Path]) -> tuple[AttemptMeasurement, ...]:
-    """Walk known runner-state directories for every `receipt.json` / `session.json`.
+    """Measure every paid provider subprocess exactly once.
 
-    Each `run_state_dirs` entry is a `runner_dir` (`config.py`'s term for
-    where `tools/engineering_runner/queue.py`'s `RunStore` writes leases, run
-    records and session transcripts) - in every stored instance on this
-    machine, an operator-chosen path outside this repository and outside
-    git, though nothing in `config.py` requires that. A missing directory is
-    skipped rather than raised: this is measurement over whatever evidence a
-    machine happens to hold, not a required input.
+    New and historical runner stages preserve numbered `session-N.json`
+    artifacts. Those are authoritative over the mutable `session.json` alias
+    and over a receipt aggregate: counting the aggregate plus its components
+    would double count, while counting only the final alias can hide an
+    expensive earlier repair session.
     """
     found: list[AttemptMeasurement] = []
     for base in run_state_dirs:
         if not base.is_dir():
             continue
+
+        numbered_stage_dirs: set[Path] = set()
+        for session_path in sorted(base.rglob("session-*.json")):
+            suffix = session_path.stem.removeprefix("session-")
+            if not suffix.isdigit():
+                continue
+            stage_dir = session_path.parent
+            numbered_stage_dirs.add(stage_dir)
+            role = _role_from_dirname(stage_dir.name)
+            label = (
+                str(stage_dir.relative_to(base)).replace("\\", "/")
+                + "/"
+                + session_path.stem
+            )
+            changes = _read_json(stage_dir / "changes.json")
+            changed = changes.get("changed", ()) if isinstance(changes, Mapping) else ()
+            files_touched = len(changed) if isinstance(changed, Sequence) else None
+            measurement = measure_session_telemetry(
+                session_path,
+                label=label,
+                role=role,
+                files_touched=files_touched,
+            )
+            if measurement is not None:
+                found.append(measurement)
+
         receipted_dirs: set[Path] = set()
         for receipt_path in sorted(base.rglob("receipt.json")):
             stage_dir = receipt_path.parent
+            if stage_dir in numbered_stage_dirs:
+                continue
             role = _role_from_dirname(stage_dir.name)
             label = str(stage_dir.relative_to(base)).replace("\\", "/")
             measurement = measure_receipt(receipt_path, label=label, role=role)
             if measurement is not None:
                 found.append(measurement)
                 receipted_dirs.add(stage_dir)
+
         for session_path in sorted(base.rglob("session.json")):
             stage_dir = session_path.parent
-            if stage_dir in receipted_dirs:
+            if stage_dir in numbered_stage_dirs or stage_dir in receipted_dirs:
                 continue
             role = _role_from_dirname(stage_dir.name)
             label = str(stage_dir.relative_to(base)).replace("\\", "/")
@@ -265,20 +296,42 @@ def measure_exploration(
 
 
 def discover_exploration(run_state_dirs: Sequence[Path]) -> tuple[ExplorationMeasurement, ...]:
-    """Walk known runner-state directories for every `exploration.json`.
+    """Measure each preserved session exploration trace exactly once.
 
-    Same traversal shape as `discover_measurements`, over a different file:
-    each stage directory that has an `exploration.json` is measured, cross-
-    referenced against that same stage's `changes.json` when one exists (a
-    developer stage has one; a reviewer stage does not, and needs none - it
-    is read-only by construction).
+    V4 writes `exploration-N.json` beside every numbered session. Older
+    stages have only the mutable `exploration.json` alias; that legacy file is
+    used only when no numbered exploration artifacts exist for the stage.
     """
     found: list[ExplorationMeasurement] = []
     for base in run_state_dirs:
         if not base.is_dir():
             continue
+
+        numbered_stage_dirs: set[Path] = set()
+        for exploration_path in sorted(base.rglob("exploration-*.json")):
+            suffix = exploration_path.stem.removeprefix("exploration-")
+            if not suffix.isdigit():
+                continue
+            stage_dir = exploration_path.parent
+            numbered_stage_dirs.add(stage_dir)
+            role = _role_from_dirname(stage_dir.name)
+            label = (
+                str(stage_dir.relative_to(base)).replace("\\", "/")
+                + "/"
+                + exploration_path.stem
+            )
+            changes = _read_json(stage_dir / "changes.json")
+            changed_paths = changes.get("changed", ()) if isinstance(changes, Mapping) else ()
+            measurement = measure_exploration(
+                exploration_path, label=label, role=role, changed_paths=changed_paths
+            )
+            if measurement is not None:
+                found.append(measurement)
+
         for exploration_path in sorted(base.rglob("exploration.json")):
             stage_dir = exploration_path.parent
+            if stage_dir in numbered_stage_dirs:
+                continue
             role = _role_from_dirname(stage_dir.name)
             label = str(stage_dir.relative_to(base)).replace("\\", "/")
             changes = _read_json(stage_dir / "changes.json")

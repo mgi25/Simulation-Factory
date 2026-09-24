@@ -49,11 +49,13 @@
   ],
   "owner": "workstream-claude",
   "owns_paths": [
-    "knowledge/company_os/records.py",
+    "knowledge/__init__.py",
+    "knowledge/company_os/README.md",
+    "knowledge/company_os/__init__.py",
     "knowledge/company_os/freshness.py",
     "knowledge/company_os/ledger.py",
     "knowledge/company_os/records",
-    "knowledge/company_os/README.md"
+    "knowledge/company_os/records.py"
   ],
   "purpose": "Five sibling record types with no inheritance, four decay classes, and one directory of JSON files. A guess cannot be stored in the shape of a fact, and a claim that has gone stale can be found.",
   "recheck_on": "2027-09-16",

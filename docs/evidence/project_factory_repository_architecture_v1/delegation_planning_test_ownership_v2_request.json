@@ -1,0 +1,43 @@
+{
+  "request_id": "req-delegation-planning-test-ownership-v2",
+  "objective": "Record the established objective-planning and executive-planning regression suites as semantic tests of company-executive-delegation while preserving the capsule's authoritative meaning and leaving maintainable context-budget headroom.",
+  "requested_by": "engineering_delivery_manager",
+  "requested_on": "2026-09-21",
+  "subsystem_hint": "knowledge/company_os/capsules",
+  "capsule_hints": [
+    "company-knowledge-capsules"
+  ],
+  "scope_ceiling": [
+    "knowledge/company_os/capsules/seeds/company-executive-delegation.json",
+    "tests/test_company_os_capsules.py"
+  ],
+  "acceptance_criteria": [
+    "The company-executive-delegation capsule lists tests/test_company_delegation.py, tests/test_company_objective_planning.py, and tests/test_company_executive_planning.py in its tests field.",
+    "The capsule tests pin tests/test_company_objective_planning.py and tests/test_company_executive_planning.py as semantic tests of company-executive-delegation.",
+    "The inputs retain the distinction that the delegation policy describes functional authority rather than collapsing it to generic authority.",
+    "The risks retain the explicit fact that scenarios are transcribed from reports on other branches, preserving the manual-transcription accuracy risk.",
+    "The capsule canonical size is at most 3900 characters after the change.",
+    "No owns_paths, may_write, must_not_modify, capabilities, authority rules, runtime behavior, or production behavior is widened.",
+    "tests/test_company_os_capsules.py passes.",
+    "tests/test_company_delegation.py passes.",
+    "python -m company.integration check --repo-root . remains ready with all required checks passing."
+  ],
+  "constraints": [
+    "Metadata and capsule tests only.",
+    "Do not add planning test files to owns_paths; this records test responsibility, not source ownership.",
+    "Do not change the meanings of inputs, invariants, risks, outputs, purpose, authority boundaries, or governance claims merely to meet the size limit.",
+    "Prefer deleting genuinely redundant wording over replacing precise domain terms with broader ones.",
+    "Do not modify company/delegation runtime code in this work order.",
+    "Do not modify canonical main, production simulation code, Company OS authority policy, or CEO-reserved actions."
+  ],
+  "authorized_branch": "",
+  "base_commit": "",
+  "max_developer_attempts": 1,
+  "risk": "low",
+  "reversible": true,
+  "specialist_domain": "",
+  "novel": false,
+  "escalate_reasoning": false,
+  "resource_profile": "consumer",
+  "notes": "Replacement for rejected work order wo-delegation-planning-test-ownership. Preserve semantic precision and target <=3900 capsule characters."
+}

@@ -39,6 +39,7 @@ of the milestone brief. Same renderer, same budget, different input.
 
 from __future__ import annotations
 
+import hashlib
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -66,6 +67,14 @@ MAX_SYMBOLS_PER_EXCERPT = 2
 MAX_TEST_ANCHORS = 2
 MAX_TEST_ANCHOR_EXCERPTS = 1
 
+# P3: compile several exact task-relevant spans up front so a routine session
+# does not have to rediscover the same file repeatedly. The spans share the
+# existing bundle budget; this is a tighter sub-budget, not additional context.
+SEMANTIC_COMPILER_VERSION = 3
+MAX_COMPILED_SPANS = 6
+MAX_COMPILED_SPAN_CHARS = 3200
+MAX_COMPILED_SINGLE_SPAN_CHARS = 900
+
 TRUNCATION_MARKER = "\n... (execution context truncated at the size budget)\n"
 
 # Two identifier shapes count as an "exact identifier phrase": snake_case
@@ -77,6 +86,9 @@ _IDENTIFIER_PHRASE_RE = re.compile(
     r"[A-Z][a-z0-9]+(?:[A-Z][a-z0-9]*)+|[a-zA-Z][a-zA-Z0-9]*(?:_[a-zA-Z0-9]+)+"
 )
 _WORD_RE = re.compile(r"[a-zA-Z0-9]+")
+_FAILED_NODE_RE = re.compile(
+    r"(?m)^FAILED\s+(?P<path>[^:\s]+\.py)::(?P<node>[^\s]+)"
+)
 
 # Tokens too generic to count as a meaningful match on their own - fixture and
 # control-flow vocabulary that appears in nearly every test regardless of
@@ -157,6 +169,30 @@ class TestPatternAnchor:
 
 
 @dataclass(frozen=True)
+class CompiledSpan:
+    """One locally-selected symbol span injected before the provider starts."""
+
+    path: str
+    qualified_name: str
+    start_line: int
+    end_line: int
+    reason: str
+    text: str
+    digest: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "path": self.path,
+            "qualified_name": self.qualified_name,
+            "start_line": self.start_line,
+            "end_line": self.end_line,
+            "reason": self.reason,
+            "text": self.text,
+            "digest": self.digest,
+        }
+
+
+@dataclass(frozen=True)
 class ContextPointer:
     """One packet-authorized context reference: never a body, always a pointer."""
 
@@ -176,11 +212,17 @@ class ExecutionContextBundle:
     files: tuple[RelevantFile, ...]
     context_refs: tuple[ContextPointer, ...] = ()
     test_anchors: tuple[TestPatternAnchor, ...] = ()
+    compiled_spans: tuple[CompiledSpan, ...] = ()
     budget_chars: int = MAX_BUNDLE_CHARS
     truncated: bool = False
 
     def render(self) -> str:
-        if not self.files and not self.context_refs and not self.test_anchors:
+        if (
+            not self.files
+            and not self.context_refs
+            and not self.test_anchors
+            and not self.compiled_spans
+        ):
             return ""
         lines: list[str] = [
             "",
@@ -191,6 +233,24 @@ class ExecutionContextBundle:
             "this list with your own grep.",
             "",
         ]
+        if self.compiled_spans:
+            lines.append("Precompiled task spans (read-once semantic context):")
+            lines.append(
+                "  Start here. These exact ranges were selected locally from the work "
+                "order before the provider session. Do not broadly re-read or grep the "
+                "same span. If a missing detail is genuinely needed, Read remains a "
+                "fallback: use a targeted, preferably non-overlapping range."
+            )
+            for span in self.compiled_spans:
+                lines.append(
+                    f"  - {span.path}::{span.qualified_name} "
+                    f"#{span.start_line}-{span.end_line} "
+                    f"[{span.digest}] - {span.reason}"
+                )
+                lines.append("    ```")
+                lines.extend(f"    {line}" for line in span.text.splitlines())
+                lines.append("    ```")
+            lines.append("")
         if self.files:
             lines.append("Primary relevant files:")
             for index, file in enumerate(self.files, start=1):
@@ -247,11 +307,36 @@ class ExecutionContextBundle:
             return text[:cut] + TRUNCATION_MARKER
         return text
 
+    def fingerprint(self) -> str:
+        """Stable short digest of the semantic context actually handed to the session."""
+        parts = [f"v={SEMANTIC_COMPILER_VERSION}"]
+        for span in self.compiled_spans:
+            parts.append(
+                "|".join(
+                    (
+                        span.path,
+                        span.qualified_name,
+                        str(span.start_line),
+                        str(span.end_line),
+                        span.digest,
+                    )
+                )
+            )
+        parts.extend(f"ref:{item.kind}:{item.ref}:{item.span}" for item in self.context_refs)
+        parts.extend(
+            f"test:{item.path}:{item.qualified_name}:{item.start_line}:{item.end_line}"
+            for item in self.test_anchors
+        )
+        return hashlib.sha256("\n".join(parts).encode("utf-8")).hexdigest()[:16]
+
     def to_dict(self) -> dict[str, Any]:
         return {
+            "compiler_version": SEMANTIC_COMPILER_VERSION,
+            "fingerprint": self.fingerprint(),
             "files": [f.to_dict() for f in self.files],
             "context_refs": [r.to_dict() for r in self.context_refs],
             "test_anchors": [a.to_dict() for a in self.test_anchors],
+            "compiled_spans": [s.to_dict() for s in self.compiled_spans],
             "budget_chars": self.budget_chars,
             "truncated": self.truncated,
             "rendered_chars": len(self.render()),
@@ -317,6 +402,7 @@ def build_execution_context(
     primary: Sequence[tuple[str, str]],
     context_refs: Sequence[Mapping[str, Any]] = (),
     test_anchors: Sequence[TestPatternAnchor] = (),
+    compiled_spans: Sequence[CompiledSpan] = (),
     repo_root: Path | None = None,
     limit: int = 5,
     include_excerpts: bool = True,
@@ -374,6 +460,7 @@ def build_execution_context(
         files=tuple(files),
         context_refs=_context_pointers(context_refs),
         test_anchors=tuple(test_anchors),
+        compiled_spans=tuple(compiled_spans),
         budget_chars=budget_chars,
     )
     truncated = len(bundle.render()) >= budget_chars
@@ -381,6 +468,7 @@ def build_execution_context(
         files=bundle.files,
         context_refs=bundle.context_refs,
         test_anchors=bundle.test_anchors,
+        compiled_spans=bundle.compiled_spans,
         budget_chars=budget_chars,
         truncated=truncated,
     )
@@ -467,6 +555,255 @@ def _test_symbols(repo_map: RepoMap, path: str) -> tuple[SymbolSpan, ...]:
     if module is None or not path.startswith("tests/"):
         return ()
     return tuple(s for s in module.symbols if s.kind == "function" and s.qualified_name.startswith("test_"))
+
+
+def failure_symbol_hints(details: Sequence[str]) -> tuple[tuple[str, str], ...]:
+    """Parse pytest FAILED node ids into deterministic repository symbol hints.
+
+    These are navigation hints only. A caller must still intersect the path
+    against the work order's already-authorized/readable context before using
+    one. Parameter ids are stripped because AST symbols name the test function,
+    not one parametrized case.
+    """
+    hints: list[tuple[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+    for detail in details:
+        for match in _FAILED_NODE_RE.finditer(str(detail)):
+            path = match.group("path").replace("\\", "/")
+            raw_node = match.group("node").split(" - ", 1)[0]
+            parts = [
+                re.sub(r"\[[^\]]*\]$", "", part)
+                for part in raw_node.split("::")
+                if part
+            ]
+            if not parts:
+                continue
+            symbol = ".".join(parts)
+            key = (path, symbol)
+            if key not in seen:
+                seen.add(key)
+                hints.append(key)
+    return tuple(hints)
+
+
+def _focused_excerpt(
+    repo_root: Path,
+    path: str,
+    symbol: SymbolSpan,
+    *,
+    phrase_targets: frozenset[str],
+    token_targets: frozenset[str],
+) -> tuple[str, int] | None:
+    """Return a bounded window centered on the first strongest matching line."""
+    try:
+        text = (repo_root / path).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    lines = text.splitlines()
+    start = max(symbol.start_line - 1, 0)
+    end = min(symbol.end_line, len(lines))
+    body = lines[start:end]
+    if not body:
+        return None
+
+    match_index = 0
+    for index, line in enumerate(body):
+        lowered = line.lower()
+        if any(phrase in lowered for phrase in phrase_targets):
+            match_index = index
+            break
+    else:
+        for index, line in enumerate(body):
+            if _meaningful_tokens(line) & token_targets:
+                match_index = index
+                break
+
+    window_start = max(match_index - 4, 0)
+    window_end = min(match_index + 7, len(body))
+    excerpt = "\n".join(body[window_start:window_end])
+    absolute_start = symbol.start_line + window_start
+    return excerpt[:MAX_COMPILED_SINGLE_SPAN_CHARS], absolute_start
+
+
+def rank_task_spans(
+    repo_map: RepoMap | None,
+    *,
+    objective: str,
+    acceptance_criteria: Sequence[str],
+    paths: Sequence[str],
+    repo_root: Path | None,
+    limit: int = MAX_COMPILED_SPANS,
+    max_total_chars: int = MAX_COMPILED_SPAN_CHARS,
+    preferred_symbols: Sequence[tuple[str, str]] = (),
+) -> tuple[CompiledSpan, ...]:
+    """Compile the most relevant exact source/test spans before a model starts.
+
+    Selection is deterministic and local. Only paths explicitly supplied by
+    the caller are eligible; callers build that list from immutable work-order
+    write scope plus declared/effective tests, so this function has no authority
+    of its own.
+    """
+    if repo_map is None or repo_root is None or limit < 1 or max_total_chars < 1:
+        return ()
+
+    criteria_text = " ".join((objective, *acceptance_criteria))
+    phrase_targets = _identifier_phrases(criteria_text)
+    token_targets = _meaningful_tokens(criteria_text)
+
+    # File names are routing signals, not evidence that every symbol inside a
+    # named file is relevant. Remove those self-referential terms from scoring.
+    self_references: set[str] = set()
+    clean_paths = tuple(dict.fromkeys(path for path in paths if path))
+    for path in clean_paths:
+        stem = Path(path).stem.lower()
+        self_references.add(stem)
+        self_references |= _meaningful_tokens(stem)
+    phrase_targets = phrase_targets - self_references
+    token_targets = token_targets - self_references
+    if not phrase_targets and not token_targets and not preferred_symbols:
+        return ()
+
+    path_rank = {path: index for index, path in enumerate(clean_paths)}
+
+    # Deterministic base-test failures are stronger evidence than prose
+    # similarity for repair tasks. Resolve them first, but only from paths the
+    # caller already made eligible. P3C preserves the complete failing symbol
+    # whenever the complete preferred set fits the existing global compiled
+    # context budget. This avoids hiding a second stale assertion later in the
+    # same failing test merely because pytest stopped at the first assertion.
+    selected: list[CompiledSpan] = []
+    used_chars = 0
+    selected_keys: set[tuple[str, str]] = set()
+    preferred: list[tuple[str, SymbolSpan, str]] = []
+    seen_preferred: set[tuple[str, str]] = set()
+    for path, qualified_name in preferred_symbols:
+        if len(preferred) >= limit:
+            break
+        key = (path, qualified_name)
+        if key in seen_preferred or path not in path_rank:
+            continue
+        seen_preferred.add(key)
+        module = repo_map.by_path(path)
+        symbol = module.symbol(qualified_name) if module is not None else None
+        if symbol is None:
+            continue
+        body = _read_excerpt_full(repo_root, path, symbol)
+        if not body:
+            continue
+        preferred.append((path, symbol, body))
+
+    preserve_all_preferred = (
+        bool(preferred)
+        and sum(len(body) for _path, _symbol, body in preferred) <= max_total_chars
+    )
+
+    for index, (path, symbol, body) in enumerate(preferred):
+        if len(selected) >= limit or used_chars >= max_total_chars:
+            break
+        remaining = max_total_chars - used_chars
+        if preserve_all_preferred:
+            excerpt = body
+        else:
+            # Preserve a fair share for every remaining failing symbol rather
+            # than letting one long test consume the whole context budget.
+            remaining_symbols = max(len(preferred) - index, 1)
+            fair_share = max(remaining // remaining_symbols, 1)
+            excerpt = body[:fair_share]
+        excerpt = excerpt[:remaining]
+        if not excerpt:
+            break
+        selected.append(
+            CompiledSpan(
+                path=path,
+                qualified_name=symbol.qualified_name,
+                start_line=symbol.start_line,
+                end_line=min(
+                    symbol.end_line,
+                    symbol.start_line + max(excerpt.count("\n"), 0),
+                ),
+                reason="failing required test at the immutable task base",
+                text=excerpt,
+                digest=hashlib.sha256(body.encode("utf-8")).hexdigest()[:16],
+            )
+        )
+        selected_keys.add((path, symbol.qualified_name))
+        used_chars += len(excerpt)
+
+    scored: list[tuple[int, int, str, SymbolSpan, tuple[str, ...], tuple[str, ...], str]] = []
+    for path in clean_paths:
+        module = repo_map.by_path(path)
+        if module is None:
+            continue
+        for symbol in module.symbols:
+            if (path, symbol.qualified_name) in selected_keys:
+                continue
+            body = _read_excerpt_full(repo_root, path, symbol)
+            if body is None:
+                continue
+            symbol_text = symbol.qualified_name
+            body_phrases = _identifier_phrases(body) | _identifier_phrases(symbol_text)
+            phrase_hits = tuple(sorted(body_phrases & phrase_targets))
+            token_hits_set = tuple(
+                sorted(
+                    (_meaningful_tokens(body) | _meaningful_tokens(symbol_text))
+                    & token_targets
+                )
+            )
+            score = 7 * len(phrase_hits) + len(token_hits_set)
+            if score <= 0:
+                continue
+            scored.append(
+                (
+                    score,
+                    path_rank[path],
+                    path,
+                    symbol,
+                    phrase_hits,
+                    token_hits_set,
+                    body,
+                )
+            )
+
+    scored.sort(key=lambda item: (-item[0], item[1], item[2], item[3].start_line))
+    for _score, _rank, path, symbol, phrase_hits, token_hits, body in scored:
+        if len(selected) >= limit or used_chars >= max_total_chars:
+            break
+        focused = _focused_excerpt(
+            repo_root,
+            path,
+            symbol,
+            phrase_targets=phrase_targets,
+            token_targets=token_targets,
+        )
+        if focused is None:
+            continue
+        excerpt, excerpt_start = focused
+        remaining = max_total_chars - used_chars
+        if remaining <= 0:
+            break
+        excerpt = excerpt[:remaining]
+        if not excerpt:
+            continue
+        if phrase_hits:
+            reason = "work order names: " + ", ".join(phrase_hits[:3])
+        else:
+            reason = "work order overlaps: " + ", ".join(token_hits[:4])
+        selected.append(
+            CompiledSpan(
+                path=path,
+                qualified_name=symbol.qualified_name,
+                start_line=excerpt_start,
+                end_line=min(
+                    symbol.end_line,
+                    excerpt_start + max(excerpt.count("\n"), 0),
+                ),
+                reason=reason,
+                text=excerpt,
+                digest=hashlib.sha256(body.encode("utf-8")).hexdigest()[:16],
+            )
+        )
+        used_chars += len(excerpt)
+    return tuple(selected)
 
 
 def rank_test_anchors(
@@ -578,12 +915,18 @@ __all__ = [
     "MAX_SYMBOLS_PER_EXCERPT",
     "MAX_TEST_ANCHORS",
     "MAX_TEST_ANCHOR_EXCERPTS",
+    "MAX_COMPILED_SPANS",
+    "MAX_COMPILED_SPAN_CHARS",
+    "SEMANTIC_COMPILER_VERSION",
+    "CompiledSpan",
     "ContextPointer",
+    "failure_symbol_hints",
     "ExecutionContextBundle",
     "RelevantFile",
     "SourceExcerpt",
     "TestPatternAnchor",
     "build_execution_context",
     "rank_primary_files",
+    "rank_task_spans",
     "rank_test_anchors",
 ]

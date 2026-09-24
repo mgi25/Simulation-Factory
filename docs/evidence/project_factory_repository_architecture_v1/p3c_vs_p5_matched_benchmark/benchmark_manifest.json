@@ -1,0 +1,197 @@
+{
+  "accounting_rules": [
+    "every paid provider subprocess counts, including failed, budget-stopped, repaired and retried sessions",
+    "reporting only the final successful session is a protocol violation",
+    "developer and reviewer are reported separately and also summed into a whole-task total",
+    "deterministic unpaid compute is reported separately and never netted against paid cost",
+    "a dimension the telemetry does not make observable is reported UNAVAILABLE, never zero",
+    "the primary metric is whole-task paid model resources per accepted READY result"
+  ],
+  "arms": {
+    "challenger": {
+      "authorized_branch": "eng-token-efficiency-v4-p5-challenger",
+      "name": "P5 challenger",
+      "repo_root": "projects/wt-bench-p5-challenger (detached)",
+      "request_id": "req-token-efficiency-v4-p5-challenger",
+      "resource_strategy_artifact_version": 2,
+      "runner_and_company_os_sha": "533ae4e4f03f6faf10b5b316ada7edcabb49972d",
+      "runner_dir": "projects/project-factory-runner-state/p3c-vs-p5-challenger",
+      "state_dir": "projects/project-factory-company-state/p3c-vs-p5-challenger",
+      "worktree_root": "projects/project-factory-benchmark-worktrees/p3c-vs-p5-challenger"
+    },
+    "control": {
+      "authorized_branch": "eng-token-efficiency-v4-p3c-control",
+      "name": "P3C control",
+      "repo_root": "projects/wt-bench-p3c-control (detached)",
+      "request_id": "req-token-efficiency-v4-p3c-control",
+      "resource_strategy_artifact_version": 1,
+      "runner_and_company_os_sha": "1705720eb9fac38990639c82477fbfbc2f55aa7e",
+      "runner_dir": "projects/project-factory-runner-state/p3c-vs-p5-control",
+      "state_dir": "projects/project-factory-company-state/p3c-vs-p5-control",
+      "worktree_root": "projects/project-factory-benchmark-worktrees/p3c-vs-p5-control"
+    }
+  },
+  "benchmark_id": "p3c-vs-p5-matched-real-work-benchmark-v1",
+  "canonical_integration_suites": [
+    "tests/test_company_analytics.py",
+    "tests/test_company_dashboard.py",
+    "tests/test_company_execution_transport.py",
+    "tests/test_company_finance.py",
+    "tests/test_company_integration_gate.py",
+    "tests/test_company_org_intelligence.py",
+    "tests/test_company_os_ai_platform.py",
+    "tests/test_company_os_capsules.py",
+    "tests/test_company_os_knowledge.py",
+    "tests/test_company_runtime.py",
+    "tests/test_company_workforce.py"
+  ],
+  "decision_rules": {
+    "P5_NEUTRAL": "quality is equal and the whole-task resource difference is too small or too mixed to justify another optimization round",
+    "P5_REGRESSION": "quality regresses OR whole-task paid resources materially worsen",
+    "P5_WIN": "quality is non-regressive AND whole-task paid resources clearly improve",
+    "quality_gate": "the challenger may only count as an efficiency success if acceptance criteria are satisfied, authorized scope and protected paths are intact, no subagent was used, required deterministic validation passes, the independent reviewer passes, deterministic review adjudication passes, the canonical integration gate is READY, no new blocker exists, the accepted output is semantically equivalent or better, no extra developer correction was hidden and no paid subprocess was omitted",
+    "replication": "if one matched pair leaves the direction ambiguous, run exactly ONE additional matched pair and no more"
+  },
+  "environment": {
+    "claude_code": "2.1.70",
+    "git": "2.47.0.windows.2",
+    "known_condition": "One orphaned pytest process (PID 10724) from a dead session dated 2026-09-21 is resident. It has consumed 74 CPU-seconds in 37.8 hours, holds a 3.5 MB working set and has no children, so it is blocked rather than running. It is not a runner or watch process and holds no lease. It was left untouched and affects both arms identically.",
+    "os": "Windows 11 Home Single Language 10.0.26200",
+    "python": "3.13.0 (repository .venv)"
+  },
+  "frozen_at_utc": "2026-09-23T07:42:05.105264+00:00",
+  "frozen_before_paid_execution": true,
+  "historical_p3c_reference_not_used_as_control": {
+    "historical_result_commit": "1343a4d770cecb0d7ad683d9bff954156606535d",
+    "historical_whole_task": {
+      "cache_creation": 50924,
+      "cache_read": 336634,
+      "cost_usd": 0.775347,
+      "output": 11546,
+      "paid_sessions": 2,
+      "turns": 25
+    },
+    "historical_work_order": "wo-token-efficiency-v4-p3c-benchmark-contract-correction",
+    "why": "the historical 2026-09-21 P3C result ran on a different Claude Code build and a different operator skill/plugin startup surface, so it is recorded for context only; the control arm of this benchmark is a fresh run under today's environment"
+  },
+  "immutable_task_base": "287d690b7bf87c988edb3eb34d1f57a4dcec5ab1",
+  "manifest_version": 1,
+  "no_subagent_requirement": {
+    "enforced_by": [
+      "--disallowedTools Task",
+      "Task absent from the --tools allowlist",
+      "gate check execution.no_subagent_runtime_lock",
+      "attempt record field subagents_used equals 0"
+    ],
+    "operator_requirement": "the operator ran this benchmark without subagents"
+  },
+  "prohibitions": [
+    "no merge into main",
+    "no merge of P5 into production",
+    "no permission change",
+    "no architecture integration authorization",
+    "no deploy",
+    "no publish",
+    "no deletion of benchmark control branches",
+    "no speculative P6 work"
+  ],
+  "provider": {
+    "cli": "claude",
+    "cli_version": "2.1.70 (Claude Code)",
+    "economy_alias_available_only_on": "challenger (P5); the P3C runner has no economy tier at all",
+    "invocation_flags": [
+      "--print",
+      "--output-format stream-json",
+      "--verbose",
+      "--no-session-persistence",
+      "--strict-mcp-config",
+      "--mcp-config with an empty mcpServers object"
+    ],
+    "model_aliases": {
+      "economy": "haiku",
+      "standard": "sonnet",
+      "strongest": "opus"
+    },
+    "model_pinning": "NONE. --developer-model and --reviewer-model are left empty on both arms so the P5 deterministic gate, not the operator, decides any downshift.",
+    "name": "anthropic"
+  },
+  "purpose": "Determine causally whether the P5 runner/Company OS increment improves whole-task paid model resource consumption against the P3C baseline on the same real task, while preserving accepted quality.",
+  "repository": {
+    "evidence_branch": "bench-p3c-vs-p5-matched-v1",
+    "main_head": "d2a30027aeaf044c3e9d03ef961b8f8331a16140",
+    "main_vs_p5": {
+      "merge_base": "65df08a3e22d692d2783ab6004ce6f3d4046f54e",
+      "p5_ahead": 89,
+      "p5_behind": 10
+    },
+    "p5_branch": "project-factory-token-efficiency-v4-p5",
+    "p5_head": "533ae4e4f03f6faf10b5b316ada7edcabb49972d",
+    "remote": "https://github.com/mgi25/Simulation-Factory"
+  },
+  "review_requirements": [
+    "an independent reviewer session separate from the developer session",
+    "reviewer is read-only; no write tool is exposed",
+    "Company OS deterministically adjudicates the reviewer attestation",
+    "the implementer may not self-approve"
+  ],
+  "separate_state_dirs_rationale": "The P3C runner accepts resource-strategy artifact version {1}; P5 emits version 2 and accepts {1,2}. A shared Company OS state directory could hand a v2 artifact to the v1 reader. Each arm therefore gets its own empty state and runner directory. Both arms start from an empty control plane, so the condition is symmetric.",
+  "task_contract": {
+    "acceptance_criteria": [
+      "Only tests/test_company_engineering_execution.py is modified.",
+      "The exact engineering-execution expectations that change because tests/test_company_review_separation.py is declared by the capsule are updated and nothing else is broadened.",
+      "Exact tuple assertions remain exact tuple assertions; no containment, subset, unordered or partial assertion is substituted.",
+      "Expected authorized paths, plan writing paths, packet scope and persisted authority include tests/test_company_review_separation.py solely because it is now a declared semantic test.",
+      "The capsule's exact tests assertion expects both tests/test_company_engineering_execution.py and tests/test_company_review_separation.py.",
+      "tests/test_company_engineering_execution.py passes.",
+      "No production, runtime, runner, capsule, dependency or governance file is modified."
+    ],
+    "authorized_writable_paths": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "constraints": [
+      "Matched P3C benchmark of the previously measured P2 high-read correction pattern.",
+      "Test expectation correction only.",
+      "Do not modify capsule metadata or tests/test_company_os_capsules.py.",
+      "Do not change implementation behavior.",
+      "Do not weaken exact assertions.",
+      "Do not add dependencies.",
+      "Do not modify canonical main, production simulation code, governance or CEO-reserved controls.",
+      "The runner owns deterministic tests; the model must not run them.",
+      "One developer attempt only."
+    ],
+    "escalate_reasoning": false,
+    "matched_fields_proof": "request_control.json and request_challenger.json differ only in request_id and authorized_branch",
+    "max_developer_attempts": 1,
+    "novel": false,
+    "objective": "Update the exact engineering-execution regression expectations that legitimately change because company-engineering-execution now names tests/test_company_review_separation.py as a semantic test.",
+    "required_tests": [
+      "tests/test_company_engineering_execution.py"
+    ],
+    "resource_profile": "consumer",
+    "review_capability": "code_review, derived by intake; intake code is byte-identical on both arms",
+    "risk": "low",
+    "specialist_domain": "none"
+  },
+  "tool_surface": {
+    "developer_allowed_tools_default": [
+      "Bash",
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep"
+    ],
+    "developer_effective_note": "Bash is withdrawn when the runner owns deterministic tests (model_runs_required_tests false), identically on both arms",
+    "disallowed_tools": [
+      "Task",
+      "WebSearch",
+      "WebFetch"
+    ],
+    "identical_across_arms": true,
+    "reviewer_allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep"
+    ]
+  }
+}

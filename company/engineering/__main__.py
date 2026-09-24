@@ -6,6 +6,7 @@
     python -m company.engineering review-brief --work-order WO --implementer E --state-dir S
     python -m company.engineering review   --work-order WO --attestation-file a.json --state-dir S
     python -m company.engineering gate     --work-order WO --gate-report g.json --state-dir S
+    python -m company.engineering execution-stop --work-order WO --reason R --state-dir S
     python -m company.engineering result   --work-order WO --state-dir S
     python -m company.engineering decide   --work-order WO --decision-file d.json --state-dir S
     python -m company.engineering status   --work-order WO --state-dir S
@@ -61,6 +62,7 @@ from .orchestrator import (
     prepare_review_session,
     publish_result,
     record_decision,
+    record_execution_stop,
     record_gate,
     record_review,
 )
@@ -163,6 +165,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="the commit the gate must describe; default is the developer's reported commit",
     )
 
+    execution_stop = commands.add_parser(
+        "execution-stop",
+        help="record that an external model/backend stopped and require a CEO decision",
+    )
+    _common(execution_stop)
+    execution_stop.add_argument("--reason", required=True)
+
     result = commands.add_parser("result", help="render the CEO page for this job")
     _common(result)
     result.add_argument("--json", action="store_true")
@@ -223,6 +232,7 @@ def _dispatch(args: argparse.Namespace) -> int:
         "review-brief": _review_brief,
         "review": _review,
         "gate": _gate,
+        "execution-stop": _execution_stop,
         "result": _result,
         "decide": _decide,
         "status": _status,
@@ -452,6 +462,26 @@ def _gate(args: argparse.Namespace) -> int:
         }
     )
     return _ADVANCED if moved.state is JobState.READY_FOR_APPROVAL else _STOPPED
+
+
+def _execution_stop(args: argparse.Namespace) -> int:
+    store, order, job = _order_and_job(args)
+    moved, job_pointer = record_execution_stop(
+        store,
+        order,
+        job,
+        reason=args.reason,
+        on=_day(args, dt.date.today()),
+    )
+    _emit(
+        {
+            "work_order_id": order.work_order_id,
+            "state": moved.state.value,
+            "reason": args.reason,
+            "persisted": {"job": job_pointer.to_dict()},
+        }
+    )
+    return _STOPPED
 
 
 def _result(args: argparse.Namespace) -> int:

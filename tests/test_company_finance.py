@@ -96,6 +96,12 @@ from company.finance import (
 from company.runtime.config import load_company_config
 from knowledge.company_os.records import Alternative, Evidence
 
+# Governed, but not part of the control plane. Restated here rather than
+# imported so this required suite keeps its own import surface; every copy is
+# pinned against `company.dashboard.builder.EXTERNAL_CAPSULES` in
+# `tests/test_company_external_engineering_runner.py`.
+EXTERNAL_CAPSULES = {"company-external-engineering-runner"}
+
 PACKAGE_ROOT = Path(__file__).resolve().parents[1] / "company" / "finance"
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -1941,7 +1947,13 @@ def test_the_dependency_closure_reaches_finance(capsules):
     """Via organizational intelligence, which may consume financial evidence."""
     closure = capsules.dependency_closure("company-os-control-plane")
     assert "company-finance" in closure
-    assert closure == tuple(sorted(set(capsules.ids()) - {"company-os-control-plane"}))
+    # The external engineering runner is governed by a capsule but is not a
+    # member of the control plane: it owns a path under a production root, so
+    # an edge reaching it would declare the control plane rests on production.
+    # `company.dashboard.builder.EXTERNAL_CAPSULES` is where that is stated.
+    assert closure == tuple(
+        sorted(set(capsules.ids()) - {"company-os-control-plane"} - EXTERNAL_CAPSULES)
+    )
     org = capsules.get("company-organizational-intelligence")
     assert "company-finance" in org.dependencies
 

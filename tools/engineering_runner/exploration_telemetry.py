@@ -240,6 +240,61 @@ def _iter_result_lines(text: str) -> list[Mapping[str, Any]]:
     return lines
 
 
+def parse_startup_context(text: str) -> dict[str, Any]:
+    """Bounded names from Claude Code's stream-json system/init event.
+
+    This records only the startup surface relevant to context-efficiency
+    auditing: available tool names, MCP server names/status, plugin names,
+    skill names, the selected model and permission mode. It deliberately
+    stores no tool schema bodies or settings payloads.
+    """
+    for line in _iter_result_lines(text):
+        if line.get("type") != "system" or line.get("subtype") != "init":
+            continue
+
+        tools = line.get("tools")
+        tools = (
+            [str(item) for item in tools[:128]]
+            if isinstance(tools, list)
+            else []
+        )
+
+        servers: list[dict[str, str]] = []
+        raw_servers = line.get("mcp_servers")
+        if isinstance(raw_servers, list):
+            for item in raw_servers[:32]:
+                if isinstance(item, Mapping):
+                    servers.append(
+                        {
+                            "name": str(item.get("name", ""))[:160],
+                            "status": str(item.get("status", ""))[:80],
+                        }
+                    )
+
+        plugins = line.get("plugins")
+        plugins = (
+            [str(item)[:160] for item in plugins[:64]]
+            if isinstance(plugins, list)
+            else []
+        )
+        skills = line.get("skills")
+        skills = (
+            [str(item)[:160] for item in skills[:64]]
+            if isinstance(skills, list)
+            else []
+        )
+
+        return {
+            "model": str(line.get("model", ""))[:160],
+            "permission_mode": str(line.get("permissionMode", ""))[:80],
+            "tools": tools,
+            "mcp_servers": servers,
+            "plugins": plugins,
+            "skills": skills,
+        }
+    return {}
+
+
 def split_result_envelope(text: str) -> dict[str, Any]:
     """The final `result` message of a `stream-json` transcript, or the whole
     text parsed as one object - whichever shape `text` actually is.
@@ -502,5 +557,6 @@ __all__ = [
     "files_read_never_changed",
     "files_read_outside_neighborhood",
     "parse_exploration",
+    "parse_startup_context",
     "split_result_envelope",
 ]

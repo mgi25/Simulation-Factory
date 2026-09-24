@@ -134,6 +134,38 @@ class Workspace:
             return False
         return self.git(["merge-base", "--is-ancestor", ancestor, descendant], cwd=cwd).ok
 
+    def tracked_blob_ids(
+        self,
+        cwd: Path,
+        *,
+        roots: Sequence[str] = ("company", "tools", "tests"),
+    ) -> dict[str, str]:
+        """Tracked path -> Git blob id for the requested repository roots.
+
+        Git blob ids are already content-addressed. P4 uses them only on a
+        clean worktree, so they name the exact bytes the repository map would
+        read from disk without reopening every unchanged Python file.
+        """
+        text = self.require_git(
+            ["ls-files", "--stage", "--", *roots],
+            cwd=cwd,
+        )
+        found: dict[str, str] = {}
+        for line in text.splitlines():
+            if "\t" not in line:
+                continue
+            metadata, raw_path = line.split("\t", 1)
+            fields = metadata.split()
+            if len(fields) < 3:
+                continue
+            blob_id = fields[1].strip()
+            stage = fields[2].strip()
+            path = raw_path.strip().strip('"').replace("\\", "/")
+            if stage != "0" or not path.endswith(".py"):
+                continue
+            found[path] = blob_id
+        return found
+
     def changed_paths(self, base: str, head: str, *, cwd: Path) -> tuple[str, ...]:
         """Every path the range touched, both names of a rename included.
 

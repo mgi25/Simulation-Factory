@@ -58,6 +58,18 @@ from .models import (
 )
 
 
+# Capsules that are governed but deliberately outside the control plane's
+# dependency graph. The external engineering runner is a separate program: it
+# owns a path under a production root and imports no Company OS package, which
+# is what `architecture.production_does_not_import_company_os` requires of it.
+# Making it reachable from `company-os-control-plane` would declare that the
+# control plane rests on production - the exact coupling that check forbids -
+# so it is exempted here rather than wired in. It carries a capsule so changes
+# to it get a bounded work order and an independent review; a capsule is an
+# ownership record, and ownership is not membership.
+EXTERNAL_CAPSULES: frozenset[str] = frozenset({"company-external-engineering-runner"})
+
+
 @dataclass(frozen=True)
 class CompanyStatePaths:
     """Explicit canonical-source roots.  The default layout keeps stores separate."""
@@ -724,7 +736,12 @@ class _Reader:
         if control is not None and len(control.dependencies) > 8:
             issues.append(f"company-os-control-plane has {len(control.dependencies)} direct dependencies; maximum is 8")
         if control is not None:
-            unreachable = sorted(set(index.ids()) - {control.id} - set(index.dependency_closure(control.id)))
+            unreachable = sorted(
+                set(index.ids())
+                - {control.id}
+                - EXTERNAL_CAPSULES
+                - set(index.dependency_closure(control.id))
+            )
             if unreachable:
                 issues.append("capsules unreachable from control plane: " + ", ".join(unreachable))
         no_subagents = self.config.permissions.get("bootstrap_defaults", {}).get("no_subagents") is True and \

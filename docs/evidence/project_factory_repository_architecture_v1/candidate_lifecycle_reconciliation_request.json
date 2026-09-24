@@ -1,0 +1,39 @@
+{
+  "request_id": "req-candidate-lifecycle-runtime-history",
+  "objective": "Make objective planning honor persisted append-only candidate status history so work already selected or completed is not selected again.",
+  "requested_by": "engineering_delivery_manager",
+  "requested_on": "2026-09-21",
+  "subsystem_hint": "company/delegation",
+  "capsule_hints": [
+    "company-executive-delegation"
+  ],
+  "scope_ceiling": [
+    "company/delegation/__main__.py",
+    "tests/test_company_objective_planning.py",
+    "tests/test_company_executive_planning.py"
+  ],
+  "acceptance_criteria": [
+    "When a delegation state directory is supplied, planning resolves the effective candidate register from seed candidates plus the latest persisted candidate versions, with the persisted version winning for the same candidate id.",
+    "A candidate whose latest persisted status is selected or completed fails the status_open eligibility check and cannot be selected again.",
+    "A seed candidate with no persisted version remains available exactly as before.",
+    "When no delegation state directory is supplied, existing seed-only planning behavior is unchanged.",
+    "The full plan-run path can be given an explicit state directory without launching a model solely to reconcile candidate status.",
+    "tests/test_company_objective_planning.py and tests/test_company_executive_planning.py pass.",
+    "python -m company.integration check --repo-root . remains ready with all required checks passing."
+  ],
+  "constraints": [
+    "Use the existing DelegationStore and CandidateRegister; do not introduce another persistence mechanism.",
+    "Do not weaken candidate eligibility checks or make non-OPEN candidates selectable.",
+    "Do not modify production simulation code, Company OS authority policy, CEO-reserved actions, or canonical main."
+  ],
+  "authorized_branch": "",
+  "base_commit": "",
+  "max_developer_attempts": 1,
+  "risk": "medium",
+  "reversible": true,
+  "specialist_domain": "",
+  "novel": false,
+  "escalate_reasoning": false,
+  "resource_profile": "consumer",
+  "notes": "Repository Architecture V1 Phase A follow-up from phase_a_discovery_checkpoint_02.md. The purpose is to prevent duplicate model spend on already-completed work."
+}

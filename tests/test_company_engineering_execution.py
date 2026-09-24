@@ -78,6 +78,7 @@ from company.engineering import (
     publish_result,
     readiness_from,
     record_decision,
+    record_execution_stop,
     record_gate,
     record_review,
     verify_all,
@@ -413,6 +414,35 @@ def _drive(tmp_path: Path, *, readiness=GateReadiness.READY, **kwargs):
     return run
 
 
+def test_an_external_execution_stop_is_durable_and_requires_a_ceo_decision(tmp_path):
+    assessment = _assessment(tmp_path)
+    assert assessment.outcome is IntakeOutcome.AUTHORIZED
+    store, execution, _usage_store = _stores(tmp_path / "state")
+    opened = open_job(store, assessment, on=DAY)
+    briefing = prepare_developer_session(
+        store,
+        execution,
+        opened.work_order,
+        opened.job,
+        _config(),
+        on=DAY,
+    )
+
+    moved, pointer = record_execution_stop(
+        store,
+        opened.work_order,
+        briefing.job,
+        reason="provider stopped at its resource ceiling",
+        on=DAY,
+    )
+
+    assert moved.state is JobState.DECISION_REQUIRED
+    assert moved.awaits_ceo is True
+    assert moved.pending_decisions == ("provider stopped at its resource ceiling",)
+    assert store.job(opened.work_order.work_order_id) == moved
+    assert pointer.record_ref
+
+
 # --- 1. intake produces a bounded work order, or stops --------------------
 
 
@@ -422,14 +452,18 @@ def test_a_ceo_objective_produces_a_bounded_work_order(tmp_path):
     order = assessment.work_order
     assert order is not None
     # The CEO named no file. The scope came from the capsule that owns the
-    # subject, plus the one test file that capsule declares - a work order that
+    # subject, plus the test files that capsule declares - a work order that
     # requires a test to pass has to allow writing it.
     assert order.authorized_paths == (
         "company/engineering",
         "tests/test_company_engineering_execution.py",
+        "tests/test_company_read_authority.py",
     )
     assert assessment.derivation.selected_capsule_ids == ("company-engineering-execution",)
-    assert order.required_tests == ("tests/test_company_engineering_execution.py",)
+    assert order.required_tests == (
+        "tests/test_company_engineering_execution.py",
+        "tests/test_company_read_authority.py",
+    )
     assert order.acceptance_criteria
     assert assessment.derivation.criteria_derived is True
 
@@ -517,6 +551,7 @@ def test_the_derived_plan_names_the_stages_the_brief_asks_for(tmp_path):
     assert plan.writing_paths == (
         "company/engineering",
         "tests/test_company_engineering_execution.py",
+        "tests/test_company_read_authority.py",
     )
 
 
@@ -560,6 +595,7 @@ def test_authorized_paths_are_enforced_on_the_packet_scope(tmp_path):
     assert scope.allowed == (
         "company/engineering",
         "tests/test_company_engineering_execution.py",
+        "tests/test_company_read_authority.py",
     )
     assert scope.permits("company/engineering/verify.py")
     assert not scope.permits("company/runtime/packets.py")
@@ -1684,8 +1720,12 @@ def test_the_execution_history_is_append_only_and_provenanced(tmp_path):
     assert authority.may_write == (
         "company/engineering",
         "tests/test_company_engineering_execution.py",
+        "tests/test_company_read_authority.py",
     )
     assert "company/permissions.yaml" in authority.may_not_modify
+    # Read authority is recorded beside write authority now. It was empty on
+    # every snapshot the company produced before the ceiling was derived.
+    assert authority.may_read
 
 
 def test_a_second_write_never_replaces_a_record(tmp_path):
@@ -1814,7 +1854,10 @@ def test_the_engineering_package_is_owned_by_exactly_one_capsule():
     ]
     assert owners == ["company-engineering-execution"]
     capsule = index.get("company-engineering-execution")
-    assert capsule.tests == ("tests/test_company_engineering_execution.py",)
+    assert capsule.tests == (
+        "tests/test_company_engineering_execution.py",
+        "tests/test_company_read_authority.py",
+    )
     assert len(dumps(capsule)) <= 4000
 
 
@@ -2309,6 +2352,9 @@ def test_developer_briefing_carries_a_resource_strategy_artifact(tmp_path):
     assert eff["context"]["narrowed_at"] == "intake"
     assert eff["context"]["ref_count"] == len(briefing.packet.context_refs)
     assert eff["strategy_reason"]
+    assert isinstance(eff["adaptive_routing"]["eligible"], bool)
+    assert eff["adaptive_routing"]["downshift_tier"] == "economy"
+    assert eff["adaptive_routing"]["runtime_requirements"]
 
     # Governance: the artifact carries no authority of any kind. A resource
     # strategy that could name a path would be a second place a scope is set.

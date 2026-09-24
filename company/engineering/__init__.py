@@ -90,6 +90,7 @@ from .orchestrator import (
     prepare_review_session,
     publish_result,
     record_decision,
+    record_execution_stop,
     record_gate,
     record_review,
 )
@@ -224,6 +225,7 @@ __all__ = [
     "publish_result",
     "readiness_from",
     "record_decision",
+    "record_execution_stop",
     "record_gate",
     "record_review",
     "reserved_actions",
