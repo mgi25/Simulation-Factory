@@ -287,7 +287,21 @@ class DependencyGraph:
         return tuple(sorted(item for item in source if not self.is_test(item)))
 
     def relation(self, test: str, path: str) -> DependencyRelation:
-        """How `test` reaches `path`: directly, transitively, or not at all."""
+        """How `test` reaches `path`: directly, transitively, or not statically.
+
+        The third answer is `UNRESOLVED`, not a "no relationship" value, and
+        the difference is the whole subject of this module. A suite with no
+        static path to a module may still exercise it - through a subprocess,
+        a fixture file, a dynamic import, or by reading its source as text.
+        What the import graph can say is that it found no static relationship,
+        which is a statement about the evidence and not about the suite.
+
+        Returning "none" here would let a caller conclude that a declared test
+        does not test what it declares, from a graph that never had grounds
+        for it. `audit_capsule_tests` reports exactly that case as
+        `declared_not_observed`, and calls it a finding rather than a fault
+        for the same reason.
+        """
         clean_test, clean_path = normalise_path(test), normalise_path(path)
         if clean_path in self.direct_dependencies(clean_test):
             return DependencyRelation.DIRECT_STATIC
