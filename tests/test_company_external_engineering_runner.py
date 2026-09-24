@@ -643,7 +643,17 @@ def test_the_runner_is_production_and_is_claimed_by_exactly_one_capsule():
         for owned in capsule.owns_paths
         if owned == "tools" or owned.startswith("tools/")
     )
-    assert claims == [("tools/engineering_runner", "company-external-engineering-runner")]
+    assert claims == [
+        ("tools/engineering_runner", "company-external-engineering-runner"),
+        # P6B. `architecture.governed_subsystem_ownership` found the second
+        # one: `tests/test_company_youtube_end_to_end.py` imports
+        # `tools/youtube_fetch`, so the Company OS contract depends on it, and
+        # it had no owner. The same reasoning as the runner applies to it -
+        # a subsystem nobody owns gets no bounded work order and no
+        # independent review - and the same limit applies too: the claim is on
+        # the package, never on `tools`.
+        ("tools/youtube_fetch", "company-youtube-fetch-client"),
+    ]
 
 
 def test_owning_the_runner_did_not_put_it_inside_the_import_boundary():
@@ -707,7 +717,9 @@ def test_the_external_capsule_exemption_is_stated_once_and_agrees():
     """
     from company.dashboard.builder import EXTERNAL_CAPSULES
 
-    assert EXTERNAL_CAPSULES == frozenset({"company-external-engineering-runner"})
+    assert EXTERNAL_CAPSULES == frozenset(
+        {"company-external-engineering-runner", "company-youtube-fetch-client"}
+    )
     for suite in _RESTATING_SUITES:
         assert _declared_external_capsules(suite) == set(EXTERNAL_CAPSULES), suite
 
