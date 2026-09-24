@@ -1,5 +1,5 @@
 {
-  "fingerprint": "978eb6e34a345865",
+  "fingerprint": "fd2b623c5029084a",
   "requirements": [
     {
       "capsule_ids": [
@@ -7,7 +7,7 @@
       ],
       "origins": [
         "canonical",
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_analytics.py"
     },
@@ -16,7 +16,7 @@
         "company-runtime"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_context_assembly.py"
     },
@@ -26,7 +26,7 @@
       ],
       "origins": [
         "canonical",
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_dashboard.py"
     },
@@ -35,7 +35,7 @@
         "company-executive-delegation"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_delegation.py"
     },
@@ -44,7 +44,7 @@
         "company-runtime"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_efficiency.py"
     },
@@ -53,7 +53,7 @@
         "company-engineering-execution"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_engineering_execution.py"
     },
@@ -62,7 +62,7 @@
         "company-evidence-review"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_evidence_review.py"
     },
@@ -78,7 +78,7 @@
         "company-external-engineering-runner"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_external_engineering_runner.py"
     },
@@ -88,7 +88,7 @@
       ],
       "origins": [
         "canonical",
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_finance.py"
     },
@@ -97,7 +97,7 @@
         "company-finance"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_finance_usage_cost.py"
     },
@@ -106,7 +106,7 @@
         "company-production-integration-gate"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_gate_suite_requirements.py"
     },
@@ -116,7 +116,7 @@
       ],
       "origins": [
         "canonical",
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_integration_gate.py"
     },
@@ -126,7 +126,7 @@
       ],
       "origins": [
         "canonical",
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_org_intelligence.py"
     },
@@ -137,7 +137,7 @@
       ],
       "origins": [
         "canonical",
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_os_ai_platform.py"
     },
@@ -149,7 +149,7 @@
       ],
       "origins": [
         "canonical",
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_os_capsules.py"
     },
@@ -160,7 +160,7 @@
       ],
       "origins": [
         "canonical",
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_os_knowledge.py"
     },
@@ -169,7 +169,7 @@
         "company-research-intelligence"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_os_research.py"
     },
@@ -179,7 +179,7 @@
         "company-research-operations"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_os_research_batches.py"
     },
@@ -189,7 +189,7 @@
         "company-research-operations"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_os_research_ingestion.py"
     },
@@ -198,7 +198,7 @@
         "company-engineering-execution"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_read_authority.py"
     },
@@ -211,7 +211,7 @@
       ],
       "origins": [
         "canonical",
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_runtime.py"
     },
@@ -220,7 +220,7 @@
         "company-runtime"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_typed_evidence_context.py"
     },
@@ -232,7 +232,7 @@
       ],
       "origins": [
         "canonical",
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_workforce.py"
     },
@@ -241,7 +241,7 @@
         "company-youtube-connectivity"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_youtube_connectivity.py"
     },
@@ -250,7 +250,7 @@
         "company-youtube-connectivity"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_youtube_live_findings.py"
     },
@@ -259,7 +259,7 @@
         "company-analytics-experiments"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_company_youtube_studio_ingestion.py"
     },
@@ -268,7 +268,7 @@
         "company-external-engineering-runner"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_engineering_runner_execution_context.py"
     },
@@ -277,7 +277,7 @@
         "company-external-engineering-runner"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_engineering_runner_exploration_report.py"
     },
@@ -286,7 +286,7 @@
         "company-external-engineering-runner"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_engineering_runner_exploration_telemetry.py"
     },
@@ -295,7 +295,7 @@
         "company-external-engineering-runner"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_engineering_runner_repo_map.py"
     },
@@ -304,7 +304,7 @@
         "company-external-engineering-runner"
       ],
       "origins": [
-        "active_capsule"
+        "capsule_contract"
       ],
       "suite": "tests/test_external_engineering_runner.py"
     }

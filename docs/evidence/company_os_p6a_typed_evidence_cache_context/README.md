@@ -358,21 +358,71 @@ were a cost.
 
 ## 6. Validation
 
-Every suite in the derived required set (32) at the P6A tip:
+### Full suite
 
-```
-2292 passed in 439.45s
-```
+`pytest --continue-on-collection-errors` over the whole repository at the P6A
+tip: **21 failed, 6223 passed, 441 skipped, 1 collection error** in 44m47s.
 
-Plus, individually, for the gate's `--suite-evidence` file: `suites.json` in
-this directory, 32/32 green, and the gate report `gate-report.json` computed
-from it.
+Against `main`'s recorded fingerprint of **20**:
 
-Zero P6A-introduced failures. The four `test_company_integration_gate.py`
-tests that changed behaviour did so **by design**: their fixture built evidence
-from `REQUIRED_SUITES`, which is now the floor rather than the answer, so they
-were supplying eleven results against a thirty-two-suite demand. The fixture
-now derives the set the same way the gate does.
+| | |
+|---|---|
+| the 18 inherited stale branch-scope and artefact guards | still failing, unchanged |
+| the 2 `owns_paths` failures | **gone** — the baseline commit |
+| 3 × `test_this_branch_changed_no_race_fight_or_v30_code` | **new, and self-healing** |
+
+The three new ones fail *by construction* on any branch that touches `tools/`:
+they diff `origin/main...HEAD` and `tools/` is a declared production root. The
+assertion names exactly the two files this change edits,
+`tools/engineering_runner/{controlplane,runner}.py`, and nothing else.
+
+That self-healing is **demonstrated, not asserted**: cloning the branch and
+pointing `refs/remotes/origin/main` at its own tip — which is the state a
+fast-forward merge produces — makes the diff empty and all three pass.
+
+The collection error is `tests/test_company_review_separation.py` importing
+`yaml`, which is in no requirements file. Pre-existing; it fails identically on
+the primary tree. Finding 8 below.
+
+**Zero P6A-introduced failures.**
+
+### The derived required set
+
+All 32, run individually, in two states:
+
+| State | Evidence | Gate | Result |
+|---|---|---|---|
+| on the branch, as it stands | `suites.json` — 29/32 green | `gate-report-on-branch.json` | **BLOCKED**, 1 blocker |
+| post-merge simulation | `suites-post-merge.json` — 32/32 green | `gate-report-post-merge.json` | **READY**, 0 blockers |
+
+Both reports carry `source_commit 6271e1ab`, the P6A tip.
+
+The BLOCKED one is **the feature working**, and it is left in this directory
+rather than tidied away. Its single blocker is
+`health.required_suites_pass`, naming the three research guards *and the
+capsule that required each* — evidence the old static list would have thrown
+away, because none of those three suites is in `REQUIRED_SUITES`.
+
+The READY one is the readiness claim, and its three `unknown` checks are all
+advisory (`executive.decision_queue_preserves_source_refs`,
+`health.production_failures_separated`, `workforce.capability_gaps_visible`),
+each because no state directory was supplied.
+
+### The four modified gate tests
+
+`test_company_integration_gate.py` kept every assertion; only the fixture
+changed. It built evidence from `REQUIRED_SUITES`, which is now the floor
+rather than the answer, so it was supplying eleven results against a
+thirty-two-suite demand and every one of those tests was exercising the
+missing-evidence path by accident. It now derives the set the way the gate
+does.
+
+That does make them partly tautological, which the independent review noted.
+`test_the_derived_set_never_loses_the_canonical_floor` is the compensating
+control, and it is worth saying plainly that it would **not** have caught B1 —
+losing one capsule's suites keeps the canonical floor intact. The tests that
+catch B1 are the lifecycle ones added after the review, and they compare
+against the real seed store rather than against the code's own output.
 
 ---
 

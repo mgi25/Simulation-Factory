@@ -12,7 +12,7 @@
     "This report states whether the technical gate conditions are satisfied. It does not authorize production integration: wiring Company OS into production is a separate CEO decision (permissions.yaml, merge_major_architecture_rewrite)."
   ],
   "policy_version": 1,
-  "report_id": "integration-readiness-2026-09-24-a77658c36f404dc1",
+  "report_id": "integration-readiness-2026-09-24-a6200644c71b35ea",
   "required_check_ids": [
     "analytics.causal_overclaim_refused",
     "analytics.competitor_private_metrics_unavailable",
@@ -565,7 +565,7 @@
           "blocker_reason": "",
           "category": "health",
           "check_id": "health.required_suites_pass",
-          "detail": "all 32 required suites reported passing, oldest run 0 day(s) ago; required-set 978eb6e34a345865 (11 canonical, 31 declared by an active capsule, 0 in change scope)",
+          "detail": "all 32 required suites reported passing, oldest run 0 day(s) ago; required-set fd2b623c5029084a (11 canonical, 31 declared by a capsule contract in force, 0 in change scope)",
           "evidence": [
             "tests/test_company_analytics.py",
             "tests/test_company_context_assembly.py",
@@ -578,7 +578,7 @@
           "missing_evidence": [],
           "not_applicable_reason": "",
           "remediation": "",
-          "requirement": "Every suite required by the Company OS contract for this change (32 on this checkout: the 11 canonical subsystem suites plus the tests declared by the active capsules the change touches) is reported passing, on evidence no older than the freshness window.",
+          "requirement": "Every suite required by the Company OS contract for this change (32 on this checkout: the 11 canonical subsystem suites plus the tests declared by every capsule contract in force, plus anything the change scope reaches) is reported passing, on evidence that was observed, and is no older than the freshness window.",
           "status": "pass",
           "version": 1
         },
@@ -753,9 +753,9 @@
     }
   ],
   "source": {
-    "repo_root": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-p6a",
+    "repo_root": "C:\\Users\\mgial\\AppData\\Local\\Temp\\claude\\c--Users-mgial-OneDrive-Documents-projects-Simulation-Factory\\bb4a7821-157f-4620-8df8-b10d98f7186f\\scratchpad\\postmerge",
     "source_branch": "p6a-typed-evidence-cache-context-v1",
-    "source_commit": "b559306ac8429d5a9b528c263e5fff93d0b7148d",
+    "source_commit": "6271e1abf93bd61cad45cc8e2fe89829a55d0dca",
     "state_dir": ""
   }
 }
