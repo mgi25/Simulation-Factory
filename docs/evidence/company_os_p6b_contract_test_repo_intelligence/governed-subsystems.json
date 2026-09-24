@@ -1,0 +1,55 @@
+[
+  {
+    "company_os_tests": [
+      "tests/test_company_bounded_engineering_autonomy.py",
+      "tests/test_company_dependency_graph.py",
+      "tests/test_company_evidence_review.py",
+      "tests/test_company_external_engineering_runner.py"
+    ],
+    "modules": [
+      "tools/engineering_runner/__init__.py",
+      "tools/engineering_runner/__main__.py",
+      "tools/engineering_runner/authorization.py",
+      "tools/engineering_runner/backends.py",
+      "tools/engineering_runner/briefs.py",
+      "tools/engineering_runner/config.py",
+      "tools/engineering_runner/controlplane.py",
+      "tools/engineering_runner/errors.py",
+      "tools/engineering_runner/evidence.py",
+      "tools/engineering_runner/execution_context.py",
+      "tools/engineering_runner/exploration_report.py",
+      "tools/engineering_runner/exploration_telemetry.py",
+      "tools/engineering_runner/process.py",
+      "tools/engineering_runner/queue.py",
+      "tools/engineering_runner/redaction.py",
+      "tools/engineering_runner/repo_map.py",
+      "tools/engineering_runner/resources.py",
+      "tools/engineering_runner/runner.py",
+      "tools/engineering_runner/workspace.py"
+    ],
+    "owning_capsules": [
+      "company-external-engineering-runner"
+    ],
+    "package": "tools/engineering_runner"
+  },
+  {
+    "company_os_tests": [
+      "tests/test_company_youtube_end_to_end.py"
+    ],
+    "modules": [
+      "tools/youtube_fetch/__init__.py",
+      "tools/youtube_fetch/__main__.py",
+      "tools/youtube_fetch/api.py",
+      "tools/youtube_fetch/artifact.py",
+      "tools/youtube_fetch/config.py",
+      "tools/youtube_fetch/errors.py",
+      "tools/youtube_fetch/oauth.py",
+      "tools/youtube_fetch/secrets_.py",
+      "tools/youtube_fetch/transport.py"
+    ],
+    "owning_capsules": [
+      "company-youtube-fetch-client"
+    ],
+    "package": "tools/youtube_fetch"
+  }
+]

@@ -837,3 +837,68 @@ def test_the_runner_does_not_import_the_capsule_layer():
     banned = {"company", "ai_platform", "knowledge", "intelligence"}
     for path in sorted((REPO_ROOT / "tools/engineering_runner").glob("*.py")):
         assert not (_imported_roots(path) & banned), path
+
+
+# --------------------------------------------------------------------------
+# Gate policy: the new condition is required, and it says so out loud
+# --------------------------------------------------------------------------
+
+
+def test_the_new_condition_is_classified_required_in_policy():
+    """P6A's rule: a check may not silently move an architectural condition
+    from advisory to required. The corollary is that a *new* required
+    condition is a `policy.py` diff, not a widened existing check."""
+    from company.integration.policy import ADVISORY_CHECKS, REQUIRED_CHECKS
+
+    assert "architecture.governed_subsystem_ownership" in REQUIRED_CHECKS
+    assert "architecture.governed_subsystem_ownership" not in ADVISORY_CHECKS
+
+
+def test_its_advisory_neighbour_stayed_advisory():
+    """The two conditions say different things and are deliberately not one
+    check. Folding the new one into `subsystem_ownership_bounded` would have
+    promoted an advisory condition with no policy diff - exactly what P6A
+    refused to do, and the reason it left the residual open."""
+    from company.integration.policy import ADVISORY_CHECKS, REQUIRED_CHECKS
+
+    assert "architecture.subsystem_ownership_bounded" in ADVISORY_CHECKS
+    assert "architecture.subsystem_ownership_bounded" not in REQUIRED_CHECKS
+
+
+def test_no_other_check_changed_classification():
+    """The whole required/advisory split, pinned by count, so a later change
+    that moves a condition across the line cannot ride in unnoticed."""
+    from company.integration.policy import ADVISORY_CHECKS, REQUIRED_CHECKS
+
+    assert len(REQUIRED_CHECKS) == 35
+    assert len(ADVISORY_CHECKS) == 4
+    assert not REQUIRED_CHECKS & ADVISORY_CHECKS
+
+
+def test_the_new_check_is_unknown_without_a_capsule_store(repo_scan):
+    """Missing evidence blocks rather than passes. A gate that cannot read the
+    contracts does not know whether a subsystem still has an owner."""
+    from company.integration.checks import _governed_subsystem_ownership
+    from company.integration.model import GateStatus
+
+    class _Inputs:
+        as_of = AS_OF
+
+    check = _governed_subsystem_ownership(_Inputs(), repo_scan, None, None)
+    assert check.status is GateStatus.UNKNOWN
+    assert check.missing_evidence
+
+
+def test_the_gate_report_names_the_graph_it_derived_from(repo_scan, seeds):
+    """Found by review. The report named the required set and not the fourth
+    input the set came from, so a reader disputing it could not see which
+    import graph produced it."""
+    from company.integration.model import GateStatus
+    from company.integration.report import build_report
+    from company.integration.suites import SuiteEvidence
+
+    graph = build_dependency_graph(repo_scan)
+    report = build_report(REPO_ROOT, as_of=AS_OF, scan=repo_scan, suites=SuiteEvidence())
+    detail = report.check("health.required_suites_pass").detail
+    assert graph.fingerprint() in detail
+    assert "observed importing capsule-owned code" in detail

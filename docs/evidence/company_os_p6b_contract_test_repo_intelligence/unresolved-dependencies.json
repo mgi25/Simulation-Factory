@@ -1,0 +1,138 @@
+{
+  "count": 22,
+  "entries": [
+    {
+      "detail": "import_module('company.efficiency.emission')",
+      "line": 236,
+      "path": "company/runtime/session_adapter.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('company.analytics.baseline')",
+      "line": 974,
+      "path": "tests/test_company_analytics.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('sys')",
+      "line": 1880,
+      "path": "tests/test_company_finance.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('json')",
+      "line": 315,
+      "path": "tests/test_company_finance_usage_cost.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('json')",
+      "line": 888,
+      "path": "tests/test_company_finance_usage_cost.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('json')",
+      "line": 902,
+      "path": "tests/test_company_finance_usage_cost.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('json')",
+      "line": 909,
+      "path": "tests/test_company_finance_usage_cost.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('json')",
+      "line": 915,
+      "path": "tests/test_company_finance_usage_cost.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('json')",
+      "line": 924,
+      "path": "tests/test_company_finance_usage_cost.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('sys')",
+      "line": 1024,
+      "path": "tests/test_company_finance_usage_cost.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('company.integration.contracts')",
+      "line": 796,
+      "path": "tests/test_company_integration_gate.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('sys')",
+      "line": 1815,
+      "path": "tests/test_company_org_intelligence.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('json')",
+      "line": 269,
+      "path": "tests/test_company_os_capsules.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('json')",
+      "line": 392,
+      "path": "tests/test_company_os_research.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('json')",
+      "line": 1027,
+      "path": "tests/test_company_os_research.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('json')",
+      "line": 651,
+      "path": "tests/test_company_os_research_batches.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('sys')",
+      "line": 1418,
+      "path": "tests/test_company_workforce.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__(...)",
+      "line": 171,
+      "path": "tests/test_race2_v33_bookends.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('sloped.track')",
+      "line": 291,
+      "path": "tests/test_sloped_course_preview.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('sys')",
+      "line": 373,
+      "path": "tests/test_youtube_fetch.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "import_module(...)",
+      "line": 86,
+      "path": "tools/sloped_fork_lab.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    },
+    {
+      "detail": "__import__('sloped.overlays')",
+      "line": 665,
+      "path": "tools/sloped_v24_hook.py",
+      "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+    }
+  ],
+  "reason": "dynamic imports are recorded, never resolved into edges"
+}

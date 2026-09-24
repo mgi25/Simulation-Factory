@@ -70,6 +70,13 @@ four control-plane contracts it restates.
    There is no filename heuristic anywhere in this module: `test_foo.py` has no
    relationship to `foo.py` unless an import says so.
 
+Rule 2 over-reports in one case, deliberately. If a package's `__init__`
+binds a name that a sibling module also has - `core = 1` beside `core.py` -
+then `from pkg import core` produces both edges, though only one of them runs.
+Deciding which would mean executing the package. The extra edge can only add a
+required suite or a recommended file, never remove one, so the error is in the
+direction the rest of this design already chose.
+
 ## Why the transitive closure is deliberately not a coverage claim
 
 Rule 3 has a consequence worth stating plainly, because it decided the capsule

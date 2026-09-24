@@ -707,6 +707,20 @@ def _governed_subsystem_ownership(inputs, scan, index, config) -> GateCheck:
     here and never becomes one: `sloped/`, `race/`, `engine/` and the rest of
     the simulation tree are intentionally ungoverned, and nothing in the
     contract depends on them.
+
+    ## One shape this cannot resolve, named rather than left to be discovered
+
+    A subsystem here is a package directory, so a Company OS suite importing a
+    *top-level* script - `tools/sloped_fork_lab.py` rather than
+    `tools/youtube_fetch/api.py` - would name the subsystem `tools`, and the
+    capsule layer forbids any capsule claiming `tools`: a claim that wide
+    would hand one work order write authority over every production script in
+    it. The two rules would then be jointly unsatisfiable, and the way out is
+    to move the script into a package or drop the dependency, not to widen the
+    claim. No Company OS suite imports a top-level `tools/` script today, and
+    `architecture.production_tests_independent` is what keeps the general case
+    rare. It is written down here because the remediation line above would
+    otherwise send a reader to do the one thing the guards refuse.
     """
     requirement = (
         "Every production package that a Company OS suite statically imports is "
@@ -1145,13 +1159,22 @@ def _required_suites(inputs, scan, index, config) -> GateCheck:
         "evidence that was observed, and is no older than the freshness window."
     )
     evidence = inputs.suites
+    graph = _graph(scan)
+    # The graph identity belongs in the provenance line for the same reason
+    # `derived_from` does. Two runs over trees whose imports differ demand
+    # different suites, and a reader disputing the set has to be able to see
+    # which import graph produced it. Found by review: the set was named and
+    # the fourth input it came from was not.
     provenance = (
         f"required-set {required.fingerprint()} "
         f"({len(required.by_origin(SuiteOrigin.CANONICAL))} canonical, "
         f"{len(required.by_origin(SuiteOrigin.CAPSULE_CONTRACT))} declared by a "
         f"capsule contract in force, "
-        f"{len(required.by_origin(SuiteOrigin.CHANGE_SCOPE))} in change scope), "
-        f"derived from {len(required.derived_from)} capsule(s)"
+        f"{len(required.by_origin(SuiteOrigin.CHANGE_SCOPE))} in change scope, "
+        f"{len(required.by_origin(SuiteOrigin.DEPENDENCY_OBSERVED))} observed "
+        f"importing capsule-owned code), "
+        f"derived from {len(required.derived_from)} capsule(s) and import graph "
+        f"{graph.fingerprint()} over {len(graph.modules)} module(s)"
     )
 
     if not required.resolved:

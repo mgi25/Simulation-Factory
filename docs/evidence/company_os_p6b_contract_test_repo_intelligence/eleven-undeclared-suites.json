@@ -1,0 +1,361 @@
+{
+  "tests/test_company_bounded_engineering_activation.py": {
+    "capsules_whose_code_it_imports": [
+      "ai-platform",
+      "company-executive-delegation",
+      "company-finance",
+      "company-runtime"
+    ],
+    "declared_by": [],
+    "direct_dependencies": [
+      "ai_platform/__init__.py",
+      "ai_platform/resource_classes.py",
+      "company/delegation/__init__.py",
+      "company/delegation/__main__.py",
+      "company/delegation/actions.py",
+      "company/delegation/authority.py",
+      "company/delegation/errors.py",
+      "company/delegation/objective_lifecycle.py",
+      "company/delegation/objective_report.py",
+      "company/delegation/objectives.py",
+      "company/delegation/operating_mode.py",
+      "company/delegation/pilot.py",
+      "company/delegation/pilot_correction.py",
+      "company/delegation/pilot_integration.py",
+      "company/delegation/policy.py",
+      "company/delegation/promotion.py",
+      "company/finance/__init__.py",
+      "company/finance/money.py",
+      "company/runtime/__init__.py",
+      "company/runtime/config.py"
+    ],
+    "origins": [
+      "dependency_observed"
+    ],
+    "required_now": true,
+    "transitive_dependency_count": 145
+  },
+  "tests/test_company_bounded_engineering_autonomy.py": {
+    "capsules_whose_code_it_imports": [
+      "ai-platform",
+      "company-executive-delegation",
+      "company-external-engineering-runner",
+      "company-finance",
+      "company-runtime"
+    ],
+    "declared_by": [],
+    "direct_dependencies": [
+      "ai_platform/__init__.py",
+      "ai_platform/resource_classes.py",
+      "company/delegation/__init__.py",
+      "company/delegation/actions.py",
+      "company/delegation/authority.py",
+      "company/delegation/candidates.py",
+      "company/delegation/errors.py",
+      "company/delegation/exceptions.py",
+      "company/delegation/objective_lifecycle.py",
+      "company/delegation/objective_report.py",
+      "company/delegation/objectives.py",
+      "company/delegation/operating_mode.py",
+      "company/delegation/pilot.py",
+      "company/delegation/pilot_correction.py",
+      "company/delegation/pilot_integration.py",
+      "company/delegation/policy.py",
+      "company/delegation/promotion.py",
+      "company/delegation/viability.py",
+      "company/finance/__init__.py",
+      "company/finance/money.py",
+      "company/runtime/__init__.py",
+      "company/runtime/config.py",
+      "tools/engineering_runner/__init__.py",
+      "tools/engineering_runner/__main__.py",
+      "tools/engineering_runner/errors.py"
+    ],
+    "origins": [
+      "dependency_observed"
+    ],
+    "required_now": true,
+    "transitive_dependency_count": 159
+  },
+  "tests/test_company_context_expansion.py": {
+    "capsules_whose_code_it_imports": [
+      "ai-platform",
+      "company-runtime"
+    ],
+    "declared_by": [],
+    "direct_dependencies": [
+      "ai_platform/__init__.py",
+      "ai_platform/serde.py",
+      "company/efficiency/__init__.py",
+      "company/runtime/__init__.py"
+    ],
+    "origins": [
+      "dependency_observed"
+    ],
+    "required_now": true,
+    "transitive_dependency_count": 58
+  },
+  "tests/test_company_delegation_pilot.py": {
+    "capsules_whose_code_it_imports": [
+      "ai-platform",
+      "company-executive-delegation",
+      "company-finance",
+      "company-runtime"
+    ],
+    "declared_by": [],
+    "direct_dependencies": [
+      "ai_platform/__init__.py",
+      "ai_platform/resource_classes.py",
+      "company/delegation/__init__.py",
+      "company/delegation/actions.py",
+      "company/delegation/authority.py",
+      "company/delegation/errors.py",
+      "company/delegation/objectives.py",
+      "company/delegation/pilot.py",
+      "company/delegation/pilot_correction.py",
+      "company/delegation/pilot_envelope.py",
+      "company/delegation/pilot_integration.py",
+      "company/delegation/pilot_record.py",
+      "company/delegation/pilot_report.py",
+      "company/delegation/pilot_simulation.py",
+      "company/delegation/policy.py",
+      "company/delegation/record.py",
+      "company/delegation/scenarios.py",
+      "company/delegation/shadow.py",
+      "company/efficiency/__init__.py",
+      "company/efficiency/profile.py",
+      "company/finance/__init__.py",
+      "company/finance/errors.py",
+      "company/finance/money.py",
+      "company/runtime/__init__.py",
+      "company/runtime/config.py"
+    ],
+    "origins": [
+      "dependency_observed"
+    ],
+    "required_now": true,
+    "transitive_dependency_count": 140
+  },
+  "tests/test_company_executable_work_planning.py": {
+    "capsules_whose_code_it_imports": [
+      "ai-platform",
+      "company-executive-delegation",
+      "company-finance",
+      "company-knowledge-capsules",
+      "company-knowledge-store",
+      "company-runtime"
+    ],
+    "declared_by": [],
+    "direct_dependencies": [
+      "ai_platform/__init__.py",
+      "ai_platform/resource_classes.py",
+      "company/delegation/__init__.py",
+      "company/delegation/candidates.py",
+      "company/delegation/discovery.py",
+      "company/delegation/errors.py",
+      "company/delegation/objectives.py",
+      "company/delegation/planning.py",
+      "company/delegation/planning_record.py",
+      "company/delegation/planning_run.py",
+      "company/delegation/viability.py",
+      "company/finance/__init__.py",
+      "company/finance/money.py",
+      "company/runtime/__init__.py",
+      "company/runtime/config.py",
+      "knowledge/__init__.py",
+      "knowledge/company_os/__init__.py",
+      "knowledge/company_os/capsules/__init__.py"
+    ],
+    "origins": [
+      "dependency_observed"
+    ],
+    "required_now": true,
+    "transitive_dependency_count": 133
+  },
+  "tests/test_company_executive_planning.py": {
+    "capsules_whose_code_it_imports": [
+      "ai-platform",
+      "company-executive-delegation",
+      "company-finance",
+      "company-knowledge-capsules",
+      "company-knowledge-store",
+      "company-runtime"
+    ],
+    "declared_by": [],
+    "direct_dependencies": [
+      "ai_platform/__init__.py",
+      "ai_platform/resource_classes.py",
+      "company/delegation/__init__.py",
+      "company/delegation/actions.py",
+      "company/delegation/authority.py",
+      "company/delegation/candidates.py",
+      "company/delegation/discovery.py",
+      "company/delegation/errors.py",
+      "company/delegation/executive.py",
+      "company/delegation/objectives.py",
+      "company/delegation/org.py",
+      "company/delegation/pilot.py",
+      "company/delegation/planning_record.py",
+      "company/delegation/planning_run.py",
+      "company/delegation/policy.py",
+      "company/finance/__init__.py",
+      "company/finance/money.py",
+      "company/runtime/__init__.py",
+      "company/runtime/config.py",
+      "knowledge/__init__.py",
+      "knowledge/company_os/__init__.py",
+      "knowledge/company_os/capsules/__init__.py"
+    ],
+    "origins": [
+      "dependency_observed"
+    ],
+    "required_now": true,
+    "transitive_dependency_count": 136
+  },
+  "tests/test_company_objective_planning.py": {
+    "capsules_whose_code_it_imports": [
+      "ai-platform",
+      "company-engineering-execution",
+      "company-executive-delegation",
+      "company-finance",
+      "company-runtime"
+    ],
+    "declared_by": [],
+    "direct_dependencies": [
+      "ai_platform/__init__.py",
+      "ai_platform/resource_classes.py",
+      "company/delegation/__init__.py",
+      "company/delegation/actions.py",
+      "company/delegation/authority.py",
+      "company/delegation/candidates.py",
+      "company/delegation/errors.py",
+      "company/delegation/objectives.py",
+      "company/delegation/org.py",
+      "company/delegation/planning.py",
+      "company/delegation/planning_record.py",
+      "company/delegation/policy.py",
+      "company/delegation/store.py",
+      "company/engineering/__init__.py",
+      "company/engineering/criteria.py",
+      "company/engineering/errors.py",
+      "company/engineering/intake.py",
+      "company/engineering/orchestrator.py",
+      "company/engineering/store.py",
+      "company/finance/__init__.py",
+      "company/finance/money.py",
+      "company/runtime/__init__.py",
+      "company/runtime/config.py"
+    ],
+    "origins": [
+      "dependency_observed"
+    ],
+    "required_now": true,
+    "transitive_dependency_count": 133
+  },
+  "tests/test_company_review_separation.py": {
+    "capsules_whose_code_it_imports": [
+      "ai-platform",
+      "company-engineering-execution",
+      "company-executive-delegation",
+      "company-runtime"
+    ],
+    "declared_by": [],
+    "direct_dependencies": [
+      "ai_platform/__init__.py",
+      "ai_platform/resource_classes.py",
+      "company/delegation/__init__.py",
+      "company/delegation/actions.py",
+      "company/delegation/authority.py",
+      "company/delegation/org.py",
+      "company/delegation/policy.py",
+      "company/engineering/__init__.py",
+      "company/engineering/intake.py",
+      "company/engineering/work_order.py",
+      "company/runtime/__init__.py",
+      "company/runtime/config.py",
+      "company/runtime/lifecycle.py"
+    ],
+    "origins": [
+      "dependency_observed"
+    ],
+    "required_now": true,
+    "transitive_dependency_count": 133
+  },
+  "tests/test_company_runtime_integration.py": {
+    "capsules_whose_code_it_imports": [
+      "ai-platform",
+      "company-runtime",
+      "company-validation"
+    ],
+    "declared_by": [],
+    "direct_dependencies": [
+      "ai_platform/__init__.py",
+      "ai_platform/serde.py",
+      "company/runtime/__init__.py",
+      "company/runtime/__main__.py",
+      "company/runtime/config.py",
+      "company/runtime/tasks.py",
+      "company/validation/__init__.py",
+      "company/validation/errors.py"
+    ],
+    "origins": [
+      "dependency_observed"
+    ],
+    "required_now": true,
+    "transitive_dependency_count": 50
+  },
+  "tests/test_company_session_execution.py": {
+    "capsules_whose_code_it_imports": [
+      "ai-platform",
+      "company-runtime",
+      "company-validation"
+    ],
+    "declared_by": [],
+    "direct_dependencies": [
+      "ai_platform/__init__.py",
+      "ai_platform/serde.py",
+      "company/efficiency/__init__.py",
+      "company/efficiency/emission.py",
+      "company/runtime/__init__.py",
+      "company/runtime/__main__.py",
+      "company/runtime/config.py",
+      "company/runtime/git_evidence.py",
+      "company/runtime/packets.py",
+      "company/validation/__init__.py",
+      "company/validation/errors.py"
+    ],
+    "origins": [
+      "dependency_observed"
+    ],
+    "required_now": true,
+    "transitive_dependency_count": 60
+  },
+  "tests/test_company_youtube_end_to_end.py": {
+    "capsules_whose_code_it_imports": [
+      "company-analytics-experiments",
+      "company-youtube-connectivity",
+      "company-youtube-fetch-client"
+    ],
+    "declared_by": [
+      "company-youtube-fetch-client"
+    ],
+    "direct_dependencies": [
+      "company/analytics/__init__.py",
+      "company/analytics/errors.py",
+      "company/youtube/__init__.py",
+      "tools/youtube_fetch/__init__.py",
+      "tools/youtube_fetch/api.py",
+      "tools/youtube_fetch/artifact.py",
+      "tools/youtube_fetch/config.py",
+      "tools/youtube_fetch/oauth.py",
+      "tools/youtube_fetch/secrets_.py",
+      "tools/youtube_fetch/transport.py"
+    ],
+    "origins": [
+      "capsule_contract",
+      "dependency_observed"
+    ],
+    "required_now": true,
+    "transitive_dependency_count": 88
+  }
+}
