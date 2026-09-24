@@ -340,26 +340,26 @@ the repeats a session actually makes.
 
 | Measurement | Value |
 |---|---|
-| bundle chars, nothing compressed | 144,781 |
+| bundle chars, nothing compressed | 151,224 |
 | bundle chars, compressed | 7,981 |
-| reduction in chars supplied up front | 94.5% |
+| reduction in chars supplied up front | 94.72% |
 | reads requested / distinct sources | 14 / 7 |
 | loader calls | 7 |
 | reads avoided by reuse | 7 |
-| reuse ratio | 0.467 — hits over *lookups*, and there is one more lookup than there are reads (the deliberate staleness probe). Not 7/14. |
+| reuse ratio | 0.4667 — hits over *lookups*, and there is one more lookup than there are reads (the deliberate staleness probe). Not 7/14. |
 | stale rejections after one source was edited | 1, no unit returned |
 | prefix reuse, same units assembled in reverse | 1.000 (byte-identical) |
 | prefix reuse, appending an evidence unit (sorts last) | 0.981 — the whole previous render is the prefix |
 | prefix reuse, appending another module (mid-order) | **0.325** |
 | prefix reuse, appending another capsule (near the top) | **0.008** |
 
-**What the 94.49% is and is not.** It is the reduction in
-characters *supplied up front*. It is not a reduction in what a session ends up
-reading: an elided body is a pointer, and a session that needs the body expands
-it, paying the difference then. The claim this number supports is "a bundle can
-carry eight sources for 7 KB instead of
-144 KB", not "the task costs
-94.49% less".
+These are the values in `measurements.json` at this commit. The harness
+measures the *live* files, so the byte counts move whenever one of the eight
+measured sources is edited — including by a later commit on this branch. The
+ratios are structural and do not move. Re-run the harness rather than trusting
+the table if the two ever disagree.
+
+**What the 94.72% is and is not.** It is the reduction in characters *supplied up front*. It is not a reduction in what a session ends up reading: an elided body is a pointer, and a session that needs the body expands it, paying the difference then. The claim this number supports is "a bundle can carry 8 sources for 8 KB instead of 151 KB", not "the task costs 94.72% less".
 
 **The ordering defect the measurement found.** With units sorted by
 `kind:source`, the string `"evidence:"` sorts between `"capsule:"` and

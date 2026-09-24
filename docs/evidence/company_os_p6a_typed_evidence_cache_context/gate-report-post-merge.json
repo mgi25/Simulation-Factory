@@ -12,7 +12,7 @@
     "This report states whether the technical gate conditions are satisfied. It does not authorize production integration: wiring Company OS into production is a separate CEO decision (permissions.yaml, merge_major_architecture_rewrite)."
   ],
   "policy_version": 1,
-  "report_id": "integration-readiness-2026-09-24-a6200644c71b35ea",
+  "report_id": "integration-readiness-2026-09-24-b809019098d212e9",
   "required_check_ids": [
     "analytics.causal_overclaim_refused",
     "analytics.competitor_private_metrics_unavailable",
@@ -565,7 +565,7 @@
           "blocker_reason": "",
           "category": "health",
           "check_id": "health.required_suites_pass",
-          "detail": "all 32 required suites reported passing, oldest run 0 day(s) ago; required-set fd2b623c5029084a (11 canonical, 31 declared by a capsule contract in force, 0 in change scope)",
+          "detail": "all 32 required suites reported passing, oldest run 0 day(s) ago; required-set aa3d963058e460bd (11 canonical, 31 declared by a capsule contract in force, 0 in change scope), derived from 22 capsule(s)",
           "evidence": [
             "tests/test_company_analytics.py",
             "tests/test_company_context_assembly.py",
@@ -755,7 +755,7 @@
   "source": {
     "repo_root": "C:\\Users\\mgial\\AppData\\Local\\Temp\\claude\\c--Users-mgial-OneDrive-Documents-projects-Simulation-Factory\\bb4a7821-157f-4620-8df8-b10d98f7186f\\scratchpad\\postmerge",
     "source_branch": "p6a-typed-evidence-cache-context-v1",
-    "source_commit": "6271e1abf93bd61cad45cc8e2fe89829a55d0dca",
+    "source_commit": "4b18b2439406ae344446ec868b15fc3724dac9a0",
     "state_dir": ""
   }
 }

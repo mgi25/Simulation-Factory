@@ -33,12 +33,12 @@
     }
   },
   "context_bytes": {
-    "canonical_chars": 136437,
+    "canonical_chars": 142622,
     "compressed_bundle_chars": 7981,
     "note": "Characters, not tokens. The platform is provider-agnostic by contract, and a token count belongs to one tokenizer.",
-    "reduction_pct": 94.49,
+    "reduction_pct": 94.72,
     "units": 8,
-    "whole_bundle_chars": 144781
+    "whole_bundle_chars": 151224
   },
   "not_measured": [
     "provider token counts (input, output, cache creation, cache read)",
@@ -48,7 +48,7 @@
     "whole-task wall-clock or session count"
   ],
   "read_once": {
-    "canonical_chars_reused": 152691,
+    "canonical_chars_reused": 160301,
     "distinct_sources": 7,
     "hits": 7,
     "loader_calls": 7,
@@ -61,7 +61,7 @@
   },
   "repo_root": "wt-p6a",
   "staleness": {
-    "detail": "source changed since it was cached (cached 490fe4049e1c508d, now 33b5b310670e8069); evicted",
+    "detail": "source changed since it was cached (cached 476ab8598934e8fa, now 33b5b310670e8069); evicted",
     "outcome": "stale",
     "returned_a_unit": false
   }
