@@ -50,6 +50,14 @@ INSUFFICIENT_EVIDENCE  nothing failed, some required evidence is missing
 
 ### The gate does not run its own tests
 
+The required set itself is derived on every run, from four sources: the
+canonical floor, the tests capsule contracts in force declare, the suites a
+change's scope reaches, and - since P6B - every Company OS suite whose own
+imports name a module an in-force capsule owns. The fourth source closed the
+eleven-suite blind spot P6A reported without adding a list to maintain, and
+like the other three it can only widen the set. A caller supplying no
+dependency evidence gets an *unresolved* set rather than a smaller one.
+
 `health.required_suites_pass` is required and its evidence is *supplied*. Two
 reasons, and the second decides it:
 
@@ -78,11 +86,11 @@ that into a pass takes a named reporter and a dated run.
 | `report.py` | Assembly, blockers, rendering |
 | `store.py` | Append-only reports under a caller-supplied directory |
 
-## The nine categories, 34 required and 4 advisory checks
+## The nine categories, 35 required and 4 advisory checks
 
 | Category | Required | Advisory |
 |---|---|---|
-| `architecture` | production does not import Company OS; production tests independent; no runtime import cycle; capsule graph acyclic; capsule graph integrity | subsystem ownership bounded |
+| `architecture` | production does not import Company OS; production tests independent; no runtime import cycle; capsule graph acyclic; capsule graph integrity; governed subsystem ownership | subsystem ownership bounded |
 | `execution` | read authority fails closed; write authority fails closed; authority snapshot immutable; receipt validation enforced; no-subagent runtime lock | — |
 | `data` | private metric boundary; evidence required for claims; missing evidence stays unknown; audit records append-only | — |
 | `workforce` | CEO-reserved actions present; restricted states cannot write production; advisory cannot self-approve | capability gaps visible |
@@ -98,6 +106,23 @@ condition failing would make it unsafe or dishonest to cross the boundary;
 unsafe. A check classified by neither set fails the run rather than
 defaulting, because an unclassified check that quietly stops blocking is the
 same as having no gate.
+
+The `architecture` row is the one place where the two sides look alike, and
+the difference is worth stating because P6B added the required half.
+`subsystem_ownership_bounded` is advisory: a Company OS module no capsule
+claims is a context-selection gap - intake cannot derive a bounded work order
+for it - and nothing about the boundary becomes unsafe.
+`governed_subsystem_ownership` is required: a *production* package that a
+Company OS suite imports is code the contract depends on, and a capsule
+disappearing takes that subsystem's owner, invariants and required suites with
+it while every other check still passes. The first is a gap the gate should
+show; the second is the gate being wrong.
+
+They stay separate checks rather than one widened check, because folding the
+second into the first would promote an advisory condition to required without
+the `policy.py` diff that `GatePolicy`'s own contract demands. That is the rule
+P6A wrote down when it declined to close this residual, and the reason it
+stayed open until there was a general rule worth a policy line.
 
 ## Four kinds of evidence
 

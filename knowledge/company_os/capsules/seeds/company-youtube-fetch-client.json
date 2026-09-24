@@ -1,0 +1,71 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "capability_youtube_oauth",
+    "capability_youtube_api_read",
+    "capability_youtube_artifact_write",
+    "capability_credential_protection"
+  ],
+  "created": "2026-09-24",
+  "decisions": [],
+  "dependencies": [],
+  "experiment_learnings": [],
+  "facts": [],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-youtube-fetch-client",
+  "inputs": [
+    "An operator command, a client configuration naming the requested scopes, and a stored OAuth grant or a fresh authorization code",
+    "The two YouTube APIs over HTTPS, reached with the standard library and no third-party client"
+  ],
+  "invariants": [
+    "A separate program: it imports no Company OS root, so the network-free and no-model checks over those roots keep meaning what they say.",
+    "The two halves meet as a sanitized artifact file, never as a shared import; the artifact format is the whole shared vocabulary.",
+    "No credential leaves this package: the refresh token is protected at rest and no secret, header or query string reaches the artifact.",
+    "An unavailable metric keeps its reason rather than being rounded down to zero, and an incomplete retrieval names the ids that did not return.",
+    "Owning this path is governance responsibility, not production authority. Nothing here merges, deploys, publishes or approves.",
+    "Standard library only, so requirements.txt is untouched by anything this package needs."
+  ],
+  "last_reviewed": "2026-09-24",
+  "may_read": [
+    "tools/youtube_fetch/**",
+    "docs/company_os_v1_youtube_connectivity.md"
+  ],
+  "may_write": [
+    "tools/youtube_fetch/**"
+  ],
+  "must_not_modify": [
+    "company/**",
+    "ai_platform/**",
+    "knowledge/**",
+    "intelligence/**",
+    "tools/engineering_runner/**",
+    "sloped/**"
+  ],
+  "outputs": [
+    "A sanitized YouTube artifact JSON file carrying channel, video and interval-analytics readings plus retrieval completeness",
+    "Secret-free API call telemetry recording that a socket was opened and what it was asked for"
+  ],
+  "owner": "company-os",
+  "owns_paths": [
+    "tools/youtube_fetch"
+  ],
+  "purpose": "Owns the authenticated half of the YouTube evidence path: the separate program that holds the credential, speaks OAuth and HTTPS, and writes the sanitized artifact that company/youtube reads. It exists outside Company OS so the network-free architecture checks over the Company OS roots stay true.",
+  "recheck_on": "2027-09-24",
+  "revalidation_reason": "",
+  "risks": [
+    "tools/ is a declared production root, so the production-import check and the research guards apply to every change made here.",
+    "It is the only package in the repository that may hold a credential, so a logging or error-message change is a possible secret leak.",
+    "Windows DPAPI protects the stored token on Windows only; elsewhere a file-permission protector is used and the weaker guarantee is easy to miss.",
+    "company-youtube-connectivity forbids tools/**, so the two halves of the YouTube path cannot be changed under one capsule by design."
+  ],
+  "source": "company-os-v1-youtube-connectivity",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_youtube_fetch.py",
+    "tests/test_company_youtube_end_to_end.py"
+  ],
+  "title": "YouTube fetch client",
+  "type": "module"
+}

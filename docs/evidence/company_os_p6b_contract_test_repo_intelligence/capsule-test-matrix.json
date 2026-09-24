@@ -1,0 +1,373 @@
+{
+  "capsules": 23,
+  "findings": [
+    {
+      "capsule_id": "ai-platform",
+      "declared": [
+        "tests/test_company_os_ai_platform.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_os_ai_platform.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 30,
+      "observed_not_declared": 38,
+      "observed_transitive": 9,
+      "owned_modules": 7
+    },
+    {
+      "capsule_id": "company-analytics-experiments",
+      "declared": [
+        "tests/test_company_analytics.py",
+        "tests/test_company_youtube_studio_ingestion.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_analytics.py",
+        "tests/test_company_youtube_studio_ingestion.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 6,
+      "observed_not_declared": 10,
+      "observed_transitive": 6,
+      "owned_modules": 26
+    },
+    {
+      "capsule_id": "company-bootstrap-policy",
+      "declared": [
+        "tests/test_company_runtime.py"
+      ],
+      "declared_and_observed": [],
+      "declared_not_observed": [
+        "tests/test_company_runtime.py"
+      ],
+      "observed_direct": 0,
+      "observed_not_declared": 0,
+      "observed_transitive": 0,
+      "owned_modules": 0
+    },
+    {
+      "capsule_id": "company-ceo-dashboard",
+      "declared": [
+        "tests/test_company_dashboard.py",
+        "tests/test_company_os_capsules.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_dashboard.py"
+      ],
+      "declared_not_observed": [
+        "tests/test_company_os_capsules.py"
+      ],
+      "observed_direct": 5,
+      "observed_not_declared": 8,
+      "observed_transitive": 4,
+      "owned_modules": 8
+    },
+    {
+      "capsule_id": "company-engineering-execution",
+      "declared": [
+        "tests/test_company_engineering_execution.py",
+        "tests/test_company_read_authority.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_engineering_execution.py",
+        "tests/test_company_read_authority.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 7,
+      "observed_not_declared": 16,
+      "observed_transitive": 11,
+      "owned_modules": 19
+    },
+    {
+      "capsule_id": "company-evidence-review",
+      "declared": [
+        "tests/test_company_evidence_review.py"
+      ],
+      "declared_and_observed": [],
+      "declared_not_observed": [
+        "tests/test_company_evidence_review.py"
+      ],
+      "observed_direct": 0,
+      "observed_not_declared": 0,
+      "observed_transitive": 0,
+      "owned_modules": 0
+    },
+    {
+      "capsule_id": "company-executive-delegation",
+      "declared": [
+        "tests/test_company_delegation.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_delegation.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 8,
+      "observed_not_declared": 7,
+      "observed_transitive": 0,
+      "owned_modules": 36
+    },
+    {
+      "capsule_id": "company-external-engineering-runner",
+      "declared": [
+        "tests/test_company_external_engineering_runner.py",
+        "tests/test_engineering_runner_execution_context.py",
+        "tests/test_engineering_runner_exploration_report.py",
+        "tests/test_engineering_runner_exploration_telemetry.py",
+        "tests/test_engineering_runner_repo_map.py",
+        "tests/test_external_engineering_runner.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_external_engineering_runner.py",
+        "tests/test_engineering_runner_execution_context.py",
+        "tests/test_engineering_runner_exploration_report.py",
+        "tests/test_engineering_runner_exploration_telemetry.py",
+        "tests/test_engineering_runner_repo_map.py",
+        "tests/test_external_engineering_runner.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 9,
+      "observed_not_declared": 3,
+      "observed_transitive": 0,
+      "owned_modules": 19
+    },
+    {
+      "capsule_id": "company-finance",
+      "declared": [
+        "tests/test_company_finance.py",
+        "tests/test_company_finance_usage_cost.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_finance.py",
+        "tests/test_company_finance_usage_cost.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 10,
+      "observed_not_declared": 16,
+      "observed_transitive": 8,
+      "owned_modules": 19
+    },
+    {
+      "capsule_id": "company-knowledge-capsules",
+      "declared": [
+        "tests/test_company_os_capsules.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_os_capsules.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 19,
+      "observed_not_declared": 35,
+      "observed_transitive": 17,
+      "owned_modules": 7
+    },
+    {
+      "capsule_id": "company-knowledge-store",
+      "declared": [
+        "tests/test_company_os_knowledge.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_os_knowledge.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 25,
+      "observed_not_declared": 37,
+      "observed_transitive": 13,
+      "owned_modules": 5
+    },
+    {
+      "capsule_id": "company-organizational-intelligence",
+      "declared": [
+        "tests/test_company_org_intelligence.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_org_intelligence.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 3,
+      "observed_not_declared": 10,
+      "observed_transitive": 8,
+      "owned_modules": 18
+    },
+    {
+      "capsule_id": "company-os-control-plane",
+      "declared": [
+        "tests/test_company_os_ai_platform.py",
+        "tests/test_company_os_capsules.py",
+        "tests/test_company_os_knowledge.py",
+        "tests/test_company_runtime.py"
+      ],
+      "declared_and_observed": [],
+      "declared_not_observed": [
+        "tests/test_company_os_ai_platform.py",
+        "tests/test_company_os_capsules.py",
+        "tests/test_company_os_knowledge.py",
+        "tests/test_company_runtime.py"
+      ],
+      "observed_direct": 0,
+      "observed_not_declared": 0,
+      "observed_transitive": 0,
+      "owned_modules": 0
+    },
+    {
+      "capsule_id": "company-production-integration-gate",
+      "declared": [
+        "tests/test_company_gate_suite_requirements.py",
+        "tests/test_company_integration_gate.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_gate_suite_requirements.py",
+        "tests/test_company_integration_gate.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 6,
+      "observed_not_declared": 4,
+      "observed_transitive": 0,
+      "owned_modules": 15
+    },
+    {
+      "capsule_id": "company-research-intelligence",
+      "declared": [
+        "tests/test_company_os_research.py",
+        "tests/test_company_os_research_batches.py",
+        "tests/test_company_os_research_ingestion.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_os_research.py",
+        "tests/test_company_os_research_batches.py",
+        "tests/test_company_os_research_ingestion.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 5,
+      "observed_not_declared": 10,
+      "observed_transitive": 8,
+      "owned_modules": 25
+    },
+    {
+      "capsule_id": "company-research-operations",
+      "declared": [
+        "tests/test_company_os_research_batches.py",
+        "tests/test_company_os_research_ingestion.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_os_research_batches.py",
+        "tests/test_company_os_research_ingestion.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 1,
+      "observed_not_declared": 11,
+      "observed_transitive": 12,
+      "owned_modules": 7
+    },
+    {
+      "capsule_id": "company-runtime",
+      "declared": [
+        "tests/test_company_context_assembly.py",
+        "tests/test_company_efficiency.py",
+        "tests/test_company_runtime.py",
+        "tests/test_company_typed_evidence_context.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_context_assembly.py",
+        "tests/test_company_efficiency.py",
+        "tests/test_company_runtime.py",
+        "tests/test_company_typed_evidence_context.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 26,
+      "observed_not_declared": 29,
+      "observed_transitive": 7,
+      "owned_modules": 37
+    },
+    {
+      "capsule_id": "company-validation",
+      "declared": [
+        "tests/test_company_runtime.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_runtime.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 11,
+      "observed_not_declared": 36,
+      "observed_transitive": 26,
+      "owned_modules": 6
+    },
+    {
+      "capsule_id": "company-workforce-capabilities",
+      "declared": [
+        "tests/test_company_workforce.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_workforce.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 4,
+      "observed_not_declared": 18,
+      "observed_transitive": 15,
+      "owned_modules": 6
+    },
+    {
+      "capsule_id": "company-workforce-employment",
+      "declared": [
+        "tests/test_company_workforce.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_workforce.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 2,
+      "observed_not_declared": 18,
+      "observed_transitive": 17,
+      "owned_modules": 8
+    },
+    {
+      "capsule_id": "company-workforce-hiring",
+      "declared": [
+        "tests/test_company_workforce.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_workforce.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 1,
+      "observed_not_declared": 18,
+      "observed_transitive": 18,
+      "owned_modules": 3
+    },
+    {
+      "capsule_id": "company-youtube-connectivity",
+      "declared": [
+        "tests/test_company_youtube_connectivity.py",
+        "tests/test_company_youtube_live_findings.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_youtube_connectivity.py",
+        "tests/test_company_youtube_live_findings.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 3,
+      "observed_not_declared": 1,
+      "observed_transitive": 0,
+      "owned_modules": 8
+    },
+    {
+      "capsule_id": "company-youtube-fetch-client",
+      "declared": [
+        "tests/test_company_youtube_end_to_end.py",
+        "tests/test_youtube_fetch.py"
+      ],
+      "declared_and_observed": [
+        "tests/test_company_youtube_end_to_end.py",
+        "tests/test_youtube_fetch.py"
+      ],
+      "declared_not_observed": [],
+      "observed_direct": 2,
+      "observed_not_declared": 0,
+      "observed_transitive": 0,
+      "owned_modules": 9
+    }
+  ],
+  "graph_fingerprint": "424061ebf85dae78",
+  "owning_python": 20,
+  "without_witness": []
+}

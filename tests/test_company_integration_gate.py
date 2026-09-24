@@ -76,6 +76,7 @@ from company.integration.boundary import (
     production_write_violations,
 )
 from company.integration.checks import GateInputs, GateScan, evaluate
+from company.integration.dependencies import build_dependency_graph
 from company.integration.contracts import integration_still_gated
 from company.integration.sources import (
     COMPANY_OS_ROOTS,
@@ -878,6 +879,21 @@ def a_suite(name: str, *, passed: bool = True, day: int = 17, company_os: bool =
     )
 
 
+_GRAPH: list = []
+
+
+def _repo_graph():
+    """The import graph, built once for this module.
+
+    Cached in a list rather than recomputed because it is a pure function of
+    the checkout and several fixtures want it; building it per call made this
+    file the slowest in the suite.
+    """
+    if not _GRAPH:
+        _GRAPH.append(build_dependency_graph(GateScan.of(REPO_ROOT)))
+    return _GRAPH[0]
+
+
 def required_here(**kwargs) -> tuple[str, ...]:
     """The suites this checkout actually requires, derived the way the gate does.
 
@@ -885,9 +901,16 @@ def required_here(**kwargs) -> tuple[str, ...]:
     derives the rest from the active capsules, so a fixture built from the
     constant would supply eleven results against a thirty-suite demand and
     every test below would be exercising the missing-evidence path by accident.
+
+    The same argument now covers the dependency graph, which P6B made the
+    fourth source. Omitting it does not derive a smaller set quietly - it
+    makes the set *unresolved* - but the effect on a fixture is identical:
+    every test below would silently become a test of the unknown path.
     """
     return resolve_required_suites(
-        CapsuleIndex.load(REPO_ROOT / "knowledge/company_os/capsules/seeds"), **kwargs
+        CapsuleIndex.load(REPO_ROOT / "knowledge/company_os/capsules/seeds"),
+        graph=_repo_graph(),
+        **kwargs,
     ).names()
 
 

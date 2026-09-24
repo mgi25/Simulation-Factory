@@ -127,12 +127,23 @@ class ImportRef:
     `type_checking` marks an import inside `if TYPE_CHECKING:`. It never runs,
     so it is not a runtime dependency, but it is still a coupling worth naming
     separately rather than hiding.
+
+    `names` holds what a `from X import a, b` statement asked for, and is empty
+    for a plain `import X`. It exists because `module` alone cannot tell a
+    package apart from a module inside it: `from company.runtime import
+    capsules` records `company.runtime`, and whether the real dependency is the
+    package or `company/runtime/capsules.py` is decided by whether a file of
+    that name exists. Only a resolver holding the whole module set can answer
+    that, so this records the question rather than guessing the answer here.
+    An alias (`from x import y as z`) contributes `y`, the name being imported,
+    never `z`, which names nothing in the repository.
     """
 
     path: str
     line: int
     module: str
     type_checking: bool = False
+    names: tuple[str, ...] = ()
 
     @property
     def root(self) -> str:
@@ -248,7 +259,15 @@ def _extract_imports(path: str, tree: ast.Module) -> tuple[ImportRef, ...]:
         elif isinstance(node, ast.ImportFrom):
             name = _resolve_from(node, package)
             if name:
-                refs.append(ImportRef(path, node.lineno, name, _within(node.lineno, guarded)))
+                refs.append(
+                    ImportRef(
+                        path,
+                        node.lineno,
+                        name,
+                        _within(node.lineno, guarded),
+                        tuple(alias.name for alias in node.names if alias.name != "*"),
+                    )
+                )
     return tuple(sorted(refs, key=lambda ref: (ref.line, ref.module)))
 
 

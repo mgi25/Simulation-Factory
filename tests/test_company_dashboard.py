@@ -341,14 +341,16 @@ def test_capsule_is_bounded_and_control_plane_stays_at_eight_with_full_closure()
     assert "company-ceo-dashboard" in control.dependencies
     assert "company-research-intelligence" not in control.dependencies
     assert "company-research-intelligence" in index.dependency_closure("company-os-control-plane")
-    # Full closure over the control plane, which the external engineering
-    # runner is deliberately not part of: it owns a path under a production
-    # root, so an edge reaching it would declare the control plane rests on
-    # production. It is governed without being a member.
+    # Full closure over the control plane, which the two external capsules are
+    # deliberately not part of: each owns a path under a production root, so an
+    # edge reaching either would declare the control plane rests on production.
+    # They are governed without being members.
     assert index.dependency_closure("company-os-control-plane") == tuple(
         sorted(set(index.ids()) - {"company-os-control-plane"} - EXTERNAL_CAPSULES)
     )
-    assert EXTERNAL_CAPSULES == frozenset({"company-external-engineering-runner"})
+    assert EXTERNAL_CAPSULES == frozenset(
+        {"company-external-engineering-runner", "company-youtube-fetch-client"}
+    )
     assert _dependency_cycles(index) == ()
     assert index.integrity(repo_root=ROOT) == ()
 

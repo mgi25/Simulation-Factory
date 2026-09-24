@@ -100,7 +100,10 @@ from knowledge.company_os.records import Alternative, Evidence
 # imported so this required suite keeps its own import surface; every copy is
 # pinned against `company.dashboard.builder.EXTERNAL_CAPSULES` in
 # `tests/test_company_external_engineering_runner.py`.
-EXTERNAL_CAPSULES = {"company-external-engineering-runner"}
+EXTERNAL_CAPSULES = {
+    "company-external-engineering-runner",
+    "company-youtube-fetch-client",
+}
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[1] / "company" / "finance"
 REPO_ROOT = Path(__file__).resolve().parents[1]

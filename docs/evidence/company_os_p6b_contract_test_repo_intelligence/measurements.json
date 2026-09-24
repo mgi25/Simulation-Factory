@@ -1,0 +1,117 @@
+{
+  "bounded_queries": [
+    {
+      "gate_impact": {
+        "considered": 735,
+        "returned": 38,
+        "seconds": 0.0008,
+        "truncated": []
+      },
+      "path": "company/runtime/routing.py",
+      "runner_neighborhood": {
+        "considered": 525,
+        "returned": 21,
+        "truncated": [
+          "transitive_tests"
+        ]
+      }
+    },
+    {
+      "gate_impact": {
+        "considered": 735,
+        "returned": 20,
+        "seconds": 0.0001,
+        "truncated": []
+      },
+      "path": "company/integration/suites.py",
+      "runner_neighborhood": {
+        "considered": 525,
+        "returned": 45,
+        "truncated": [
+          "symbols"
+        ]
+      }
+    },
+    {
+      "gate_impact": {
+        "considered": 735,
+        "returned": 94,
+        "seconds": 0.0005,
+        "truncated": [
+          "direct_dependents"
+        ]
+      },
+      "path": "company/runtime/__init__.py",
+      "runner_neighborhood": {
+        "considered": 525,
+        "returned": 39,
+        "truncated": [
+          "dependents",
+          "imports",
+          "tests",
+          "transitive_tests"
+        ]
+      }
+    },
+    {
+      "gate_impact": {
+        "considered": 735,
+        "returned": 13,
+        "seconds": 0.0001,
+        "truncated": []
+      },
+      "path": "tools/engineering_runner/repo_map.py",
+      "runner_neighborhood": {
+        "considered": 525,
+        "returned": 43,
+        "truncated": [
+          "symbols"
+        ]
+      }
+    }
+  ],
+  "change_impact_example": {
+    "changed": [
+      "company/integration/suites.py",
+      "docs/note.md"
+    ],
+    "considered": 525,
+    "dependents": [
+      "company/integration/__init__.py",
+      "company/integration/__main__.py",
+      "company/integration/checks.py",
+      "company/integration/report.py"
+    ],
+    "direct_tests": [
+      "tests/test_company_dependency_graph.py",
+      "tests/test_company_external_engineering_runner.py"
+    ],
+    "transitive_tests": [
+      "tests/test_company_engineering_execution.py",
+      "tests/test_company_gate_suite_requirements.py",
+      "tests/test_company_integration_gate.py",
+      "tests/test_company_youtube_connectivity.py"
+    ],
+    "truncated": [],
+    "unmapped": [
+      "docs/note.md"
+    ]
+  },
+  "graph": {
+    "deterministic_repeat": true,
+    "edges": 4993,
+    "fingerprint": "424061ebf85dae78",
+    "modules": 735,
+    "unresolved": 22
+  },
+  "note": "No provider, token or monetary measurement was taken. P6B ran no paid benchmark, and nothing here is a cost claim.",
+  "runner_map": {
+    "edges": 1932,
+    "manifest_digest": "fbf2f9768e2f8390",
+    "manifest_stale_refused": true,
+    "modules": 525,
+    "production_dependents": 248,
+    "serialized_chars": 3442360,
+    "tests_by_module": 172
+  }
+}

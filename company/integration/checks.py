@@ -52,6 +52,11 @@ from .contracts import (
     reserved_action_drift,
     review_trigger_drift,
 )
+from .dependencies import (
+    DependencyGraph,
+    build_dependency_graph,
+    governed_production_subsystems,
+)
 from .graph import (
     capsule_dependency_graph,
     find_cycles,
@@ -655,6 +660,148 @@ def _ownership(inputs, scan, index, config) -> GateCheck:
     )
 
 
+def _graph(scan: "GateScan") -> DependencyGraph:
+    """The import graph for this scan, built once per scan object.
+
+    Two required checks want it and `GateScan` is already the gate's
+    parse-once cache, so the graph is memoised on it rather than recomputed.
+    It stays a pure function of the scan: same tree, same graph.
+    """
+    cached = getattr(scan, "_dependency_graph", None)
+    if cached is None:
+        cached = build_dependency_graph(scan)
+        object.__setattr__(scan, "_dependency_graph", cached)
+    return cached
+
+
+def _governed_subsystem_ownership(inputs, scan, index, config) -> GateCheck:
+    """Production code a Company OS suite depends on is owned by some capsule.
+
+    ## The gap this closes, and why it is required rather than advisory
+
+    P6A left one way for a capsule to vanish without the gate noticing.
+    Deleting a capsule takes its `owns_paths` with it, so for 21 of the 22 the
+    loss shows up as an unclaimed Company OS module. The exception is
+    `company-external-engineering-runner`: it owns `tools/engineering_runner`,
+    `tools` is a *production* root, and the unclaimed-module scan walks only
+    the four Company OS roots. Delete it and the store stays internally
+    consistent, every module stays claimed, and the gate keeps saying READY
+    about a subsystem whose contract and required suites have just gone.
+
+    The general property, taken from the import graph rather than from a name:
+    a production package that a `test_company*` suite imports is one the
+    Company OS contract depends on, and it must have an owner. Those imports
+    are not deleted when the capsule is, which is what lets this survive the
+    thing it is detecting. Hard-coding the capsule id was the alternative, and
+    it fixes one instance of a class whose next instance is already here -
+    `tools/youtube_fetch` was found by this rule, not by anybody noticing.
+
+    `architecture.subsystem_ownership_bounded` is the advisory neighbour and
+    stays advisory. The two say different things. That one says a Company OS
+    module has no capsule to select as context - a context-selection gap. This
+    one says production code the contract *depends on* has no governance at
+    all, which is the unsafe half of the same shape, and the split is visible
+    in `policy.py` as `GatePolicy` requires.
+
+    Unowned production code that no Company OS suite touches is not a finding
+    here and never becomes one: `sloped/`, `race/`, `engine/` and the rest of
+    the simulation tree are intentionally ungoverned, and nothing in the
+    contract depends on them.
+
+    ## One shape this cannot resolve, named rather than left to be discovered
+
+    A subsystem here is a package directory, so a Company OS suite importing a
+    *top-level* script - `tools/sloped_fork_lab.py` rather than
+    `tools/youtube_fetch/api.py` - would name the subsystem `tools`, and the
+    capsule layer forbids any capsule claiming `tools`: a claim that wide
+    would hand one work order write authority over every production script in
+    it. The two rules would then be jointly unsatisfiable, and the way out is
+    to move the script into a package or drop the dependency, not to widen the
+    claim. No Company OS suite imports a top-level `tools/` script today, and
+    `architecture.production_tests_independent` is what keeps the general case
+    rare. It is written down here because the remediation line above would
+    otherwise send a reader to do the one thing the guards refuse.
+    """
+    requirement = (
+        "Every production package that a Company OS suite statically imports is "
+        "owned by a capsule in force, so a subsystem the contract depends on "
+        "cannot lose its capsule and test contract while the gate reports READY."
+    )
+    if index is None:
+        return _check(
+            "architecture.governed_subsystem_ownership",
+            GateCategory.ARCHITECTURE,
+            GateStatus.UNKNOWN,
+            requirement,
+            "the capsule store could not be read, so no path can be shown to have "
+            "an owner",
+            EvidenceKind.CONTRACT,
+            missing_evidence=("knowledge/company_os/capsules/seeds",),
+            remediation="Make the capsule store readable, then re-run.",
+            evidence_as_of=inputs.as_of,
+        )
+    graph = _graph(scan)
+    if graph.parse_failures:
+        return _check(
+            "architecture.governed_subsystem_ownership",
+            GateCategory.ARCHITECTURE,
+            GateStatus.UNKNOWN,
+            requirement,
+            f"{len(graph.parse_failures)} file(s) did not parse, so the imports "
+            "that would show which production code the contract depends on are "
+            "incomplete",
+            EvidenceKind.CONTRACT,
+            missing_evidence=tuple(graph.parse_failures[:_MAX_NAMED_FINDINGS]),
+            remediation=(
+                "Fix the unparseable files - health.sources_parse names them - "
+                "then re-run."
+            ),
+            evidence_as_of=inputs.as_of,
+        )
+    subsystems = governed_production_subsystems(
+        graph,
+        index,
+        company_os_roots=COMPANY_OS_ROOTS,
+        production_roots=scan.scanned_production_roots,
+    )
+    unowned = [item for item in subsystems if not item.owned]
+    detail = (
+        f"{len(subsystems)} production package(s) are reached by a Company OS suite"
+    )
+    if not unowned:
+        return _check(
+            "architecture.governed_subsystem_ownership",
+            GateCategory.ARCHITECTURE,
+            GateStatus.PASS,
+            requirement,
+            f"{detail}, and every one of them is owned by a capsule in force",
+            EvidenceKind.CONTRACT,
+            evidence=tuple(item.package for item in subsystems),
+            evidence_as_of=inputs.as_of,
+        )
+    named = [item.package for item in unowned][:_MAX_NAMED_FINDINGS]
+    return _check(
+        "architecture.governed_subsystem_ownership",
+        GateCategory.ARCHITECTURE,
+        GateStatus.FAIL,
+        requirement,
+        f"{detail}; {len(unowned)} of them no capsule owns: " + ", ".join(named),
+        EvidenceKind.CONTRACT,
+        evidence=tuple(named),
+        blocker_reason=(
+            f"{len(unowned)} production package(s) the Company OS contract depends "
+            "on have no capsule owner"
+        ),
+        remediation=(
+            "Give each package a capsule that owns it and names a suite, or remove "
+            "the Company OS suite dependency on it. Ownership of a production path "
+            "is governance responsibility, not production authority - see "
+            "company-external-engineering-runner."
+        ),
+        evidence_as_of=inputs.as_of,
+    )
+
+
 # -- execution safety -------------------------------------------------------
 
 
@@ -965,7 +1112,9 @@ def _required_suites(inputs, scan, index, config) -> GateCheck:
        reporter handed over is how supplied evidence disappears;
     5. a required result is older than the freshness window -> `unknown`.
     """
-    required = resolve_required_suites(index, changed_paths=inputs.changed_paths)
+    required = resolve_required_suites(
+        index, changed_paths=inputs.changed_paths, graph=_graph(scan)
+    )
     names = required.names()
 
     # A note on what is deliberately *not* checked here.
@@ -992,9 +1141,16 @@ def _required_suites(inputs, scan, index, config) -> GateCheck:
     # derived from, and they are inside `fingerprint()`. A store that has
     # quietly lost a capsule produces a different fingerprint and a shorter
     # `derived_from`, both of which are in the report - so the loss is a diff
-    # between two runs rather than something a reader has to notice. The real
-    # fix is to make `capsule.tests` a checked claim against the actual
-    # test-to-module dependency, which is P6B.
+    # between two runs rather than something a reader has to notice.
+    #
+    # P6B did the rest, in two places rather than here. `capsule.tests` is now
+    # a claim checked against the real import graph
+    # (`dependencies.audit_capsule_tests`), and the single deletion that left
+    # nothing unclaimed - `company-external-engineering-runner`, whose paths
+    # are under a *production* root - is caught in general by
+    # `architecture.governed_subsystem_ownership`, which is required and says
+    # so in `policy.py`. The reasoning above still holds for why that condition
+    # is a check of its own rather than folded into this one.
     requirement = (
         f"Every suite required by the Company OS contract for this change "
         f"({len(names)} on this checkout: the {len(REQUIRED_SUITES)} canonical "
@@ -1003,13 +1159,22 @@ def _required_suites(inputs, scan, index, config) -> GateCheck:
         "evidence that was observed, and is no older than the freshness window."
     )
     evidence = inputs.suites
+    graph = _graph(scan)
+    # The graph identity belongs in the provenance line for the same reason
+    # `derived_from` does. Two runs over trees whose imports differ demand
+    # different suites, and a reader disputing the set has to be able to see
+    # which import graph produced it. Found by review: the set was named and
+    # the fourth input it came from was not.
     provenance = (
         f"required-set {required.fingerprint()} "
         f"({len(required.by_origin(SuiteOrigin.CANONICAL))} canonical, "
         f"{len(required.by_origin(SuiteOrigin.CAPSULE_CONTRACT))} declared by a "
         f"capsule contract in force, "
-        f"{len(required.by_origin(SuiteOrigin.CHANGE_SCOPE))} in change scope), "
-        f"derived from {len(required.derived_from)} capsule(s)"
+        f"{len(required.by_origin(SuiteOrigin.CHANGE_SCOPE))} in change scope, "
+        f"{len(required.by_origin(SuiteOrigin.DEPENDENCY_OBSERVED))} observed "
+        f"importing capsule-owned code), "
+        f"derived from {len(required.derived_from)} capsule(s) and import graph "
+        f"{graph.fingerprint()} over {len(graph.modules)} module(s)"
     )
 
     if not required.resolved:
@@ -1563,6 +1728,7 @@ _BUILDERS: tuple[Callable[..., GateCheck], ...] = (
     _capsule_acyclic,
     _capsule_integrity,
     _ownership,
+    _governed_subsystem_ownership,
     # execution safety
     _probe_builder(
         "execution.read_authority_fails_closed",

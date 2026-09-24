@@ -1,0 +1,795 @@
+{
+  "advisory_check_ids": [
+    "architecture.subsystem_ownership_bounded",
+    "executive.decision_queue_preserves_source_refs",
+    "health.production_failures_separated",
+    "workforce.capability_gaps_visible"
+  ],
+  "as_of": "2026-09-25",
+  "authorizes_production_integration": false,
+  "blockers": [
+    {
+      "blocker_id": "blocker-health.required_suites_pass",
+      "category": "health",
+      "ceo_decision_required": false,
+      "check_id": "health.required_suites_pass",
+      "evidence": [
+        "tests/test_company_os_research.py",
+        "tests/test_company_os_research_batches.py",
+        "tests/test_company_os_research_ingestion.py"
+      ],
+      "owner": "",
+      "reason": "3 required suite(s) are reported failing, including tests/test_company_os_research.py (capsule_contract; dependency_observed; declared by company-research-intelligence; imports code owned by ai-platform, company-knowledge-store, company-research-intelligence, company-validation), tests/test_company_os_research_batches.py (capsule_contract; dependency_observed; declared by company-research-intelligence, company-research-operations; imports code owned by ai-platform, company-knowledge-capsules, company-knowledge-store, company-research-intelligence, company-research-operations, company-validation)",
+      "remediation": "Fix the failing suite, re-run it, and supply the new result.",
+      "resolution_evidence": [],
+      "resolved": false
+    }
+  ],
+  "notes": [
+    "This report states whether the technical gate conditions are satisfied. It does not authorize production integration: wiring Company OS into production is a separate CEO decision (permissions.yaml, merge_major_architecture_rewrite)."
+  ],
+  "policy_version": 1,
+  "report_id": "integration-readiness-2026-09-25-7f473c5df153ee78",
+  "required_check_ids": [
+    "analytics.causal_overclaim_refused",
+    "analytics.competitor_private_metrics_unavailable",
+    "analytics.learning_requires_results",
+    "architecture.capsule_graph_acyclic",
+    "architecture.capsule_graph_integrity",
+    "architecture.governed_subsystem_ownership",
+    "architecture.no_subsystem_import_cycle",
+    "architecture.production_does_not_import_company_os",
+    "architecture.production_tests_independent",
+    "data.audit_records_append_only",
+    "data.evidence_required_for_claims",
+    "data.missing_evidence_stays_unknown",
+    "data.private_metric_boundary",
+    "execution.authority_snapshot_immutable",
+    "execution.no_subagent_runtime_lock",
+    "execution.read_authority_fails_closed",
+    "execution.receipt_validation_enforced",
+    "execution.write_authority_fails_closed",
+    "executive.dashboard_available",
+    "executive.dashboard_cannot_approve",
+    "executive.missing_and_stale_evidence_visible",
+    "finance.no_autonomous_spend_approval",
+    "finance.recurring_paid_api_spend_reserved",
+    "finance.unknown_is_not_zero",
+    "health.no_network_or_model_dependency",
+    "health.no_new_dependency",
+    "health.required_suites_pass",
+    "health.sources_parse",
+    "production.integration_remains_disabled",
+    "production.no_automatic_production_mutation",
+    "production.no_production_delete_authority",
+    "production.no_publishing_capability",
+    "workforce.advisory_cannot_self_approve",
+    "workforce.ceo_reserved_actions_present",
+    "workforce.restricted_states_cannot_write_production"
+  ],
+  "schema_version": 1,
+  "sections": [
+    {
+      "category": "analytics",
+      "checks": [
+        {
+          "blocker_reason": "",
+          "category": "analytics",
+          "check_id": "analytics.causal_overclaim_refused",
+          "detail": "an uncontrolled comparison over 1000 samples still supports no causal claim and names 2 reasons",
+          "evidence": [
+            "company/analytics/results.py:132"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "An uncontrolled comparison supports no causal claim however large the sample, and the assessment names why.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "analytics",
+          "check_id": "analytics.competitor_private_metrics_unavailable",
+          "detail": "an external reference carrying a private metric name is refused, an uncited one is refused, and a cited public metric name is accepted",
+          "evidence": [
+            "company/analytics/references.py:276"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "An external reference may name public metrics only and must cite the dossier it came from; a competitor's private analytics are not available to us.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "analytics",
+          "check_id": "analytics.learning_requires_results",
+          "detail": "a hypothesis cannot be marked supported without a result to point at, while a proposed one records freely",
+          "evidence": [
+            "company/analytics/learning.py:202"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "Observation and learning stay separate: a hypothesis cannot be marked supported without a result to point at.",
+          "status": "pass",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "category": "architecture",
+      "checks": [
+        {
+          "blocker_reason": "",
+          "category": "architecture",
+          "check_id": "architecture.capsule_graph_acyclic",
+          "detail": "23 capsules, no declared dependency cycle",
+          "evidence": [
+            "knowledge/company_os/capsules/seeds"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "contract",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "The declared capsule dependency graph is acyclic: a capsule that rests on a capsule that rests on it describes a boundary that is not one.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "architecture",
+          "check_id": "architecture.capsule_graph_integrity",
+          "detail": "23 capsules, no integrity problem",
+          "evidence": [
+            "knowledge/company_os/capsules/seeds"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "contract",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "The capsule store holds no dangling dependency, no path claimed by two capsules, no link to a record that is not in the knowledge store, and no pointer that has left the repository.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "architecture",
+          "check_id": "architecture.governed_subsystem_ownership",
+          "detail": "2 production package(s) are reached by a Company OS suite, and every one of them is owned by a capsule in force",
+          "evidence": [
+            "tools/engineering_runner",
+            "tools/youtube_fetch"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "contract",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "Every production package that a Company OS suite statically imports is owned by a capsule in force, so a subsystem the contract depends on cannot lose its capsule and test contract while the gate reports READY.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "architecture",
+          "check_id": "architecture.no_subsystem_import_cycle",
+          "detail": "18 subsystems, no runtime import cycle",
+          "evidence": [],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "repository",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "The Company OS subsystem import graph is acyclic at runtime; imports inside if TYPE_CHECKING are reported but do not count, because they never execute.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "architecture",
+          "check_id": "architecture.production_does_not_import_company_os",
+          "detail": "322 production modules under audio, engine, entities, evaluation, godot, marble3d, modes, powers, production, race, race2, rendering, replay, sloped, tools import no Company OS package",
+          "evidence": [
+            "company/README.md"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "repository",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "No production module imports company, ai_platform, knowledge or intelligence (company/README.md dependency rule).",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "architecture",
+          "check_id": "architecture.production_tests_independent",
+          "detail": "121 production test modules import no Company OS package; the 39 that do are all named test_company*",
+          "evidence": [],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "repository",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "No production test module imports Company OS, so the suite still runs with company/, ai_platform/ and knowledge/ removed.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "architecture",
+          "check_id": "architecture.subsystem_ownership_bounded",
+          "detail": "all 253 Company OS modules are claimed by a capsule",
+          "evidence": [
+            "knowledge/company_os/capsules/seeds"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "contract",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "Every Company OS module is claimed by exactly one capsule, so a session can be given the boundary that owns the file it is about to change.",
+          "status": "pass",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "category": "data",
+      "checks": [
+        {
+          "blocker_reason": "",
+          "category": "data",
+          "check_id": "data.audit_records_append_only",
+          "detail": "a second, different record under an existing id is refused; a correction is a new record that supersedes the old one",
+          "evidence": [
+            "knowledge/company_os/ledger.py:68"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "Recorded history is append-only: a differing record cannot be written under an existing id, so a correction is a new record that supersedes the old one.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "data",
+          "check_id": "data.evidence_required_for_claims",
+          "detail": "a fact with no evidence is refused and a fact citing a document is kept",
+          "evidence": [
+            "knowledge/company_os/records.py"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "A stored claim points at something a second person can check; a record with no evidence cannot be built.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "data",
+          "check_id": "data.missing_evidence_stays_unknown",
+          "detail": "6 of 8 sections report missing over an empty state directory, each naming its gap, and 6 gaps reach the snapshot; no section claims to be complete while it is not",
+          "evidence": [
+            "company/dashboard/builder.py",
+            "company/dashboard/models.py"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "Missing data is reported as missing. An empty subsystem is never reported as zero, healthy or complete.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "data",
+          "check_id": "data.private_metric_boundary",
+          "detail": "'average_percentage_viewed' is refused from a public source and accepted from our own authenticated export (20 private metrics)",
+          "evidence": [
+            "company/analytics/metrics.py:118"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "A private channel analytic can only come from our own authenticated access; no public source may carry one, for our videos or anybody else's.",
+          "status": "pass",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "category": "execution",
+      "checks": [
+        {
+          "blocker_reason": "",
+          "category": "execution",
+          "check_id": "execution.authority_snapshot_immutable",
+          "detail": "the snapshot is frozen, its contract fingerprint refuses a widened copy, and it round-trips through canonical JSON unchanged",
+          "evidence": [
+            "company/runtime/authority.py:38"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "The preparation-time authority snapshot is immutable and self-verifying: it cannot be mutated, a widened copy cannot be constructed, and it round-trips through canonical JSON unchanged.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "execution",
+          "check_id": "execution.no_subagent_runtime_lock",
+          "detail": "all 8 declarations are present, and bootstrap mode fixes the no-subagent switch, and a policy, a contract and a receipt that try to flip it are each refused",
+          "evidence": [
+            "company/constitution.md",
+            "company/permissions.yaml",
+            "company/permissions.yaml",
+            "company/org_registry.yaml",
+            "ai_platform/policy.py:105",
+            "company/runtime/authority.py:218"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "Constitution rule 2 is still represented in all eight places that carry it: the constitution, permissions.yaml twice, the org registry twice, the employee contract schema twice, and the knowledge store.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "execution",
+          "check_id": "execution.read_authority_fails_closed",
+          "detail": "a contract that names no readable path projects to an empty grant, and a named path is carried through unchanged",
+          "evidence": [
+            "company/runtime/authority.py:201"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "Read authority fails closed: a contract that names no readable path grants none, and a named path is carried through unchanged.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "execution",
+          "check_id": "execution.receipt_validation_enforced",
+          "detail": "a receipt outside the schema and a receipt amending the no-subagent rule are both refused, and a well-formed receipt is accepted",
+          "evidence": [
+            "company/runtime/receipts.py:304"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "A returned receipt is validated against a fixed schema: an unknown field is refused rather than ignored, and a receipt cannot amend the no-subagent rule.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "execution",
+          "check_id": "execution.write_authority_fails_closed",
+          "detail": "an empty allow-list permits nothing, a forbidding rule outranks an overlapping allow, and a path inside the allow-list still passes",
+          "evidence": [
+            "company/runtime/path_scope.py:72"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "Write authority fails closed: an empty allow-list permits nothing and a forbidding rule outranks an overlapping allow.",
+          "status": "pass",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "category": "executive",
+      "checks": [
+        {
+          "blocker_reason": "",
+          "category": "executive",
+          "check_id": "executive.dashboard_available",
+          "detail": "the snapshot builds deterministically (company-state-0a0762dd00ca3e67) and the brief renders 34 lines",
+          "evidence": [
+            "company/dashboard/builder.py",
+            "company/dashboard/brief.py"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "The CEO dashboard builds a deterministic snapshot and renders a brief, so the executive view exists before it is needed.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "executive",
+          "check_id": "executive.dashboard_cannot_approve",
+          "detail": "8 dashboard modules expose no approving, spending, hiring, publishing or deploying callable",
+          "evidence": [],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "repository",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "The CEO dashboard exposes no callable that approves, spends, hires, publishes, merges or deploys; it is a view, not a second control plane.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "executive",
+          "check_id": "executive.decision_queue_preserves_source_refs",
+          "detail": "no company state directory was supplied, so the decision queue is empty and the condition is untested rather than satisfied",
+          "evidence": [],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "supplied",
+          "missing_evidence": [
+            "a state directory holding at least one decision: an empty queue proves nothing about what a populated one carries"
+          ],
+          "not_applicable_reason": "",
+          "remediation": "Re-run with --state-dir pointing at the company's records.",
+          "requirement": "Every item in the CEO decision queue keeps a compact reference back to the record it came from, so a decision can be checked rather than believed.",
+          "status": "unknown",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "executive",
+          "check_id": "executive.missing_and_stale_evidence_visible",
+          "detail": "6 of 8 sections report missing over an empty state directory, each naming its gap, and 6 gaps reach the snapshot; no section claims to be complete while it is not",
+          "evidence": [
+            "company/dashboard/builder.py",
+            "company/dashboard/models.py"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "Missing and stale evidence are visible in the executive view rather than absent from it.",
+          "status": "pass",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "category": "finance",
+      "checks": [
+        {
+          "blocker_reason": "",
+          "category": "finance",
+          "check_id": "finance.no_autonomous_spend_approval",
+          "detail": "a spend signed by an automatic marker is refused; approving a spend remains a named human act",
+          "evidence": [
+            "company/finance/common.py:223"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "No subsystem approves its own spend. Finance records the proposal and the evidence; approving it is a named human act.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "finance",
+          "check_id": "finance.recurring_paid_api_spend_reserved",
+          "detail": "large_or_recurring_paid_api_spend is CEO-reserved and new_dependency and production_publish_request are mandatory review triggers",
+          "evidence": [
+            "company/permissions.yaml"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "contract",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "Recurring paid API spend stays CEO-reserved and a new dependency still triggers a mandatory review, so no subsystem can commit the company to a bill.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "finance",
+          "check_id": "finance.unknown_is_not_zero",
+          "detail": "with no records the margin and contribution are unknown and 3 reasons are named",
+          "evidence": [
+            "company/finance/economics.py:168"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "An unmeasured financial figure is unknown, not zero: with nothing recorded there is no margin and no contribution, and the gaps are named.",
+          "status": "pass",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "category": "health",
+      "checks": [
+        {
+          "blocker_reason": "",
+          "category": "health",
+          "check_id": "health.no_network_or_model_dependency",
+          "detail": "253 Company OS modules import none of 30 network or model roots",
+          "evidence": [],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "repository",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "No Company OS module imports a network client or a model SDK. The control plane is deterministic code (constitution rule 4) and reaches nothing.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "health",
+          "check_id": "health.no_new_dependency",
+          "detail": "253 Company OS modules import only stdlib and company, ai_platform, knowledge, intelligence",
+          "evidence": [
+            "company/permissions.yaml",
+            "requirements.txt"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "repository",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "Company OS imports only the standard library and other Company OS roots. A new dependency is a mandatory architecture-and-security review (permissions.yaml) and would tie the control plane to the production dependency tree.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "health",
+          "check_id": "health.production_failures_separated",
+          "detail": "every supplied result is marked as a Company OS suite; no production-environment run was classified either way",
+          "evidence": [],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "supplied",
+          "missing_evidence": [
+            "no result carries company_os=false, so the separation is asserted rather than shown"
+          ],
+          "not_applicable_reason": "",
+          "remediation": "Supply at least one production-environment suite result marked company_os=false.",
+          "requirement": "Failures caused by the production environment are reported separately from Company OS regressions, so a missing render dependency is not read as a defect in the control plane.",
+          "status": "unknown",
+          "version": 1
+        },
+        {
+          "blocker_reason": "3 required suite(s) are reported failing, including tests/test_company_os_research.py (capsule_contract; dependency_observed; declared by company-research-intelligence; imports code owned by ai-platform, company-knowledge-store, company-research-intelligence, company-validation), tests/test_company_os_research_batches.py (capsule_contract; dependency_observed; declared by company-research-intelligence, company-research-operations; imports code owned by ai-platform, company-knowledge-capsules, company-knowledge-store, company-research-intelligence, company-research-operations, company-validation)",
+          "category": "health",
+          "check_id": "health.required_suites_pass",
+          "detail": "tests/test_company_os_research.py failed (1) on 2026-09-25; tests/test_company_os_research_batches.py failed (1) on 2026-09-25; tests/test_company_os_research_ingestion.py failed (1) on 2026-09-25",
+          "evidence": [
+            "tests/test_company_os_research.py",
+            "tests/test_company_os_research_batches.py",
+            "tests/test_company_os_research_ingestion.py"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "supplied",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "Fix the failing suite, re-run it, and supply the new result.",
+          "requirement": "Every suite required by the Company OS contract for this change (45 on this checkout: the 11 canonical subsystem suites plus the tests declared by every capsule contract in force, plus anything the change scope reaches) is reported passing, on evidence that was observed, and is no older than the freshness window.",
+          "status": "fail",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "health",
+          "check_id": "health.sources_parse",
+          "detail": "all 253 Company OS modules parse",
+          "evidence": [
+            "company",
+            "ai_platform",
+            "knowledge",
+            "intelligence"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "repository",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "Every Company OS source file parses. No linter is configured in this repository, so this is the static check that is available, and it is the one the rest of the scanning conditions depend on.",
+          "status": "pass",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "category": "production",
+      "checks": [
+        {
+          "blocker_reason": "",
+          "category": "production",
+          "check_id": "production.integration_remains_disabled",
+          "detail": "Company OS stays unconnected to production execution until the integration gate in docs/company_os_v1_bootstrap.md passes.",
+          "evidence": [
+            "knowledge/company_os/capsules/seeds/company-os-control-plane.json"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "contract",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "The control-plane capsule still states that Company OS stays unconnected to production execution until this gate passes, so the next session reads that before it reads anything else.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "production",
+          "check_id": "production.no_automatic_production_mutation",
+          "detail": "no mutating call in 253 Company OS modules names a constant path under 15 production roots; a path built at runtime is bounded by PathScope instead",
+          "evidence": [
+            "company/runtime/path_scope.py"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "repository",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "No Company OS module writes into a production tree. Stores write only where their caller points them, and no filesystem-mutating call names a constant path under a production root.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "production",
+          "check_id": "production.no_production_delete_authority",
+          "detail": "no delete call in 253 Company OS modules",
+          "evidence": [
+            "company/permissions.yaml"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "repository",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "No Company OS module removes a file or a directory. Every store here is append-only, and delete_important_production_or_company_data is CEO-reserved.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "production",
+          "check_id": "production.no_publishing_capability",
+          "detail": "no network import and no process spawn anywhere in 253 Company OS modules",
+          "evidence": [
+            "company/permissions.yaml"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "repository",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "No Company OS module can publish: it opens no socket and spawns no process. publish_public_video is CEO-reserved, and a shell would be a way around that.",
+          "status": "pass",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "category": "workforce",
+      "checks": [
+        {
+          "blocker_reason": "",
+          "category": "workforce",
+          "check_id": "workforce.advisory_cannot_self_approve",
+          "detail": "an organizational decision signed by the system is refused and a named human approver is accepted",
+          "evidence": [
+            "company/org_intelligence/common.py:147"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "An organizational recommendation cannot be approved by the system that made it; an approver is a named human.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "workforce",
+          "check_id": "workforce.capability_gaps_visible",
+          "detail": "no company state directory was supplied, so there is no coverage to read",
+          "evidence": [],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "supplied",
+          "missing_evidence": [
+            "a workforce store: re-run with --state-dir pointing at the company's records"
+          ],
+          "not_applicable_reason": "",
+          "remediation": "Re-run with --state-dir to evaluate recorded capability coverage.",
+          "requirement": "Capability gaps in the workforce are visible from recorded coverage rather than inferred, so a missing skill reads as missing.",
+          "status": "unknown",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "workforce",
+          "check_id": "workforce.ceo_reserved_actions_present",
+          "detail": "all eight required CEO-reserved actions are present (2 further entries the gate does not require)",
+          "evidence": [
+            "company/permissions.yaml"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "contract",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "The eight CEO-reserved decisions the gate depends on are still reserved in permissions.yaml; the gate reads that list and defines no authority itself.",
+          "status": "pass",
+          "version": 1
+        },
+        {
+          "blocker_reason": "",
+          "category": "workforce",
+          "check_id": "workforce.restricted_states_cannot_write_production",
+          "detail": "3 restricted states are refused production authority and level 5, and a malformed permission file caps authority at observe",
+          "evidence": [
+            "company/workforce/employment.py:319",
+            "company/permissions.yaml"
+          ],
+          "evidence_as_of": "2026-09-25",
+          "evidence_kind": "probe",
+          "missing_evidence": [],
+          "not_applicable_reason": "",
+          "remediation": "",
+          "requirement": "A candidate, shadow or probation employee cannot hold production authority or an autonomy level above the cap permissions.yaml sets for their state.",
+          "status": "pass",
+          "version": 1
+        }
+      ]
+    }
+  ],
+  "source": {
+    "repo_root": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-p6b",
+    "source_branch": "p6b-contract-test-repo-intelligence-v1",
+    "source_commit": "66ab1df6d4672e612a500a6cc8e4989a9be73562",
+    "state_dir": ""
+  }
+}

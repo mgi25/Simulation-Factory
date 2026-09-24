@@ -51,6 +51,18 @@ REQUIRED_CHECKS = frozenset(
         "architecture.no_subsystem_import_cycle",
         "architecture.capsule_graph_acyclic",
         "architecture.capsule_graph_integrity",
+        # P6B. Production code the Company OS contract imports must have a
+        # capsule owner. Required, not advisory, and the reason is the failure
+        # it closes rather than the category it sits in: without it, deleting
+        # `company-external-engineering-runner` removes a subsystem's entire
+        # contract - its owner, its invariants and six required suites - and
+        # every remaining check still passes. A gate that keeps saying READY
+        # while the thing it is gating loses its governance is not reporting a
+        # gap, it is wrong. Its advisory neighbour
+        # `architecture.subsystem_ownership_bounded` stays advisory: an
+        # unclaimed Company OS module is a context-selection gap, and the two
+        # conditions are kept apart so that this line is the visible diff.
+        "architecture.governed_subsystem_ownership",
         # Execution safety: every authority fails closed, and nothing spawns.
         "execution.read_authority_fails_closed",
         "execution.write_authority_fails_closed",

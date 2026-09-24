@@ -30,7 +30,8 @@ import sys
 
 from ai_platform.serde import dumps
 
-from .checks import GateInputs, load_capsule_index
+from .checks import GateInputs, GateScan, load_capsule_index
+from .dependencies import build_dependency_graph
 from .model import Readiness
 from .policy import DEFAULT_POLICY
 from .report import build_report, render_text
@@ -155,7 +156,14 @@ def _required_suites(args: argparse.Namespace) -> int:
         capsule_root=Path(args.capsule_root).resolve() if args.capsule_root else None,
     )
     required = resolve_required_suites(
-        load_capsule_index(inputs), changed_paths=tuple(args.changed_path)
+        load_capsule_index(inputs),
+        changed_paths=tuple(args.changed_path),
+        # The CLI parses the tree for itself rather than leaving the graph out.
+        # Omitting it is a supported call - it produces an unresolved set and
+        # exit 2 - but it would make this command print a *narrower* list than
+        # the gate requires, and a caller scripting `--suite-evidence` off it
+        # would then run less than the gate asks for and call the result green.
+        graph=build_dependency_graph(GateScan.of(inputs.repo_root)),
     )
     undeclared = undeclared_company_os_suites(inputs.repo_root, required)
     if args.json:
@@ -178,8 +186,8 @@ def _required_suites(args: argparse.Namespace) -> int:
             print(f"  UNRESOLVED: {reason}")
         if undeclared:
             print(
-                f"\nnot required, because no capsule declares them ({len(undeclared)}) - "
-                "a gap in the contracts, not in the evidence:"
+                f"\nnot required ({len(undeclared)}): no capsule declares them and "
+                "their imports reach no capsule-owned code:"
             )
             for suite in undeclared:
                 print(f"  {suite}")
