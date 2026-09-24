@@ -1,0 +1,64 @@
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+_____________ test_this_branch_changed_no_race_fight_or_v30_code ______________
+
+    def test_this_branch_changed_no_race_fight_or_v30_code():
+        """The research subsystem is additive: it owns intelligence/ and one test."""
+        import subprocess
+    
+        diff = subprocess.run(
+            ["git", "diff", "--name-status", "origin/main...HEAD"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+        )
+        if diff.returncode != 0:
+            pytest.skip("no origin/main to compare against")
+>       assert _production_changes(diff.stdout) == []
+E       AssertionError: assert [('M', 'tools...repo_map.py')] == []
+E         
+E         Left contains 3 more items, first extra item: ('M', 'tools/engineering_runner/__init__.py')
+E         Use -v to get more diff
+
+tests\test_company_os_research.py:1280: AssertionError
+_____________ test_this_branch_changed_no_race_fight_or_v30_code ______________
+
+    def test_this_branch_changed_no_race_fight_or_v30_code():
+        diff = subprocess.run(
+            ["git", "diff", "--name-status", "origin/main...HEAD"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+        )
+        if diff.returncode != 0:
+            pytest.skip("no origin/main to compare against")
+>       assert _production_changes(diff.stdout) == []
+E       AssertionError: assert [('M', 'tools...repo_map.py')] == []
+E         
+E         Left contains 3 more items, first extra item: ('M', 'tools/engineering_runner/__init__.py')
+E         Use -v to get more diff
+
+tests\test_company_os_research_batches.py:1750: AssertionError
+_____________ test_this_branch_changed_no_race_fight_or_v30_code ______________
+
+    def test_this_branch_changed_no_race_fight_or_v30_code():
+        diff = subprocess.run(
+            ["git", "diff", "--name-status", "origin/main...HEAD"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+        )
+        if diff.returncode != 0:
+            pytest.skip("no origin/main to compare against")
+>       assert _production_changes(diff.stdout) == []
+E       AssertionError: assert [('M', 'tools...repo_map.py')] == []
+E         
+E         Left contains 3 more items, first extra item: ('M', 'tools/engineering_runner/__init__.py')
+E         Use -v to get more diff
+
+tests\test_company_os_research_ingestion.py:1250: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_company_os_research.py::test_this_branch_changed_no_race_fight_or_v30_code
+FAILED tests/test_company_os_research_batches.py::test_this_branch_changed_no_race_fight_or_v30_code
+FAILED tests/test_company_os_research_ingestion.py::test_this_branch_changed_no_race_fight_or_v30_code
+3 failed in 0.64s

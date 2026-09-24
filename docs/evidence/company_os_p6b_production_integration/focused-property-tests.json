@@ -1,0 +1,173 @@
+{
+  "no_subagent": {
+    "count": 30,
+    "status": [
+      "passed"
+    ],
+    "tests": [
+      "test_company_analytics::test_no_subagent_machinery_appears_anywhere",
+      "test_company_context_expansion::test_no_subagent_rule_holds_at_every_expansion_boundary",
+      "test_company_engineering_execution::test_genuine_governance_actions_still_route_to_specialist[Amend the constitution's rule about subagents.]",
+      "test_company_evidence_review::test_the_capsule_seed_carries_no_subagent_switch",
+      "test_company_external_engineering_runner::test_the_no_subagent_invariant_survives_the_new_capsule",
+      "test_company_finance::test_the_no_subagents_rule_is_untouched",
+      "test_company_finance_usage_cost::test_the_no_subagent_invariant_still_refuses_the_record",
+      "test_company_integration_gate::test_no_subagent_drift_is_surfaced_link_by_link",
+      "test_company_integration_gate::test_the_no_subagent_invariant_itself_is_untouched_by_this_package",
+      "test_company_integration_gate::test_the_repository_no_subagent_chain_is_intact",
+      "test_company_org_intelligence::test_a_no_subagent_change_cannot_be_an_ordinary_optimisation",
+      "test_company_org_intelligence::test_a_no_subagent_change_proposal_is_representable_when_ceo_reserved",
+      "test_company_org_intelligence::test_a_no_subagent_change_without_the_ceo_flag_is_refused",
+      "test_company_org_intelligence::test_the_no_subagent_policy_is_where_it_was",
+      "test_company_os_ai_platform::test_no_resource_class_permits_subagents",
+      "test_company_os_capsules::test_the_no_subagent_rule_is_exactly_where_it_was",
+      "test_company_os_research::test_the_no_subagent_rule_is_exactly_where_it_was",
+      "test_company_os_research_batches::test_the_no_subagent_rule_is_exactly_where_it_was",
+      "test_company_os_research_ingestion::test_the_no_subagent_rule_is_exactly_where_it_was",
+      "test_company_read_authority::test_the_no_subagent_invariant_holds_on_both_contracts",
+      "test_company_runtime::test_employee_contract_rejects_subagents",
+      "test_company_runtime::test_no_subagents_false_fails",
+      "test_company_runtime_integration::test_employee_contract_no_subagent_guard_is_part_of_preparation",
+      "test_company_runtime_integration::test_task_execution_no_subagent_guard_is_part_of_preparation",
+      "test_company_session_execution::test_packet_rejects_a_disabled_no_subagent_rule",
+      "test_company_session_execution::test_subagent_use_fails_validation_and_is_never_recorded",
+      "test_company_session_execution::test_the_no_subagent_rule_holds_at_every_link",
+      "test_company_workforce::test_a_proposed_role_keeps_no_subagents_true",
+      "test_company_workforce::test_a_role_violating_the_no_subagent_policy_is_detected",
+      "test_company_workforce::test_the_no_subagent_rule_is_untouched"
+    ]
+  },
+  "protected_surface": {
+    "count": 34,
+    "status": [
+      "passed"
+    ],
+    "tests": [
+      "TestIntegrationTarget::test_a_live_decision_object_refuses_a_protected_branch",
+      "TestIntegrationTarget::test_a_target_cannot_shrink_the_protected_set",
+      "TestIntegrationTarget::test_a_target_naming_a_protected_ref_is_refused[company-os-v1-bootstrap]",
+      "TestIntegrationTarget::test_a_target_naming_a_protected_ref_is_refused[main]",
+      "TestIntegrationTarget::test_a_target_naming_a_protected_ref_is_refused[master]",
+      "TestIntegrationTarget::test_integration_onto_a_protected_ref_reaches_the_ceo[company-os-v1-bootstrap]",
+      "TestIntegrationTarget::test_integration_onto_a_protected_ref_reaches_the_ceo[main]",
+      "TestIntegrationTarget::test_integration_onto_a_protected_ref_reaches_the_ceo[master]",
+      "TestIntegrationTarget::test_main_and_canonical_are_both_protected",
+      "TestThePilotCannotAct::test_main_is_protected_in_source_not_configuration",
+      "test_company_bounded_engineering_autonomy::test_a_protected_ref_is_refused_live[company-os-v1-bootstrap]",
+      "test_company_bounded_engineering_autonomy::test_a_protected_ref_is_refused_live[main]",
+      "test_company_bounded_engineering_autonomy::test_a_protected_ref_is_refused_live[master]",
+      "test_company_bounded_engineering_autonomy::test_never_advanced_is_a_superset_of_protected_refs",
+      "test_company_bounded_engineering_autonomy::test_no_protected_ref_is_ever_a_permitted_destination[company-os-v1-bootstrap]",
+      "test_company_bounded_engineering_autonomy::test_no_protected_ref_is_ever_a_permitted_destination[main]",
+      "test_company_bounded_engineering_autonomy::test_no_protected_ref_is_ever_a_permitted_destination[master]",
+      "test_company_engineering_execution::test_a_deleted_protected_file_is_a_finding",
+      "test_company_engineering_execution::test_a_modified_protected_file_is_detected",
+      "test_company_engineering_execution::test_a_protected_change_escalates_to_the_ceo_rather_than_a_retry",
+      "test_company_engineering_execution::test_a_stored_protected_surface_cannot_drop_a_default_path",
+      "test_company_engineering_execution::test_a_work_order_cannot_authorize_a_protected_path",
+      "test_company_engineering_execution::test_forbidden_and_protected_paths_are_enforced",
+      "test_company_engineering_execution::test_genuine_governance_actions_still_route_to_specialist[Change protected policy so the gate file cannot be hand-edited.]",
+      "test_company_engineering_execution::test_the_default_protected_surface_covers_the_gate_and_the_contracts",
+      "test_company_evidence_review::test_the_protected_surface_is_unchanged_and_still_captured",
+      "test_company_external_engineering_runner::test_the_protected_surface_is_still_digested_for_a_runner_work_order",
+      "test_company_objective_planning::test_every_objective_the_suites_already_submit_stays_specific[Give me a way to check whether the protected governance files have changed since an engineering work order was authorized.]",
+      "test_company_objective_planning::test_every_objective_the_suites_already_submit_stays_specific[Rewrite the governance approval boundary so a protected policy file cannot be changed without a separate reviewer.]",
+      "test_company_objective_planning::test_the_guard_does_not_change_the_answer_for_ordinary_objectives[Give me a way to check whether the protected governance files have changed since an engineering work order was authorized.]",
+      "test_company_read_authority::test_protected_paths_are_still_protected",
+      "test_company_workforce::test_a_sole_provider_is_protected_from_an_archive_recommendation",
+      "test_external_engineering_runner::test_a_deleted_protected_file_is_drift_rather_than_a_gap",
+      "test_external_engineering_runner::test_a_protected_policy_that_drifted_is_a_violation_even_with_a_clean_diff"
+    ]
+  },
+  "graph_properties": {
+    "count": 28,
+    "status": [
+      "passed"
+    ],
+    "tests": [
+      "test_company_dependency_graph::test_a_capsule_owning_no_python_is_not_asked_for_a_witness",
+      "test_company_dependency_graph::test_a_dependency_observed_suite_is_never_described_as_declared",
+      "test_company_dependency_graph::test_a_dynamic_import_is_unresolved_and_never_an_edge",
+      "test_company_dependency_graph::test_a_relative_import_is_an_edge",
+      "test_company_dependency_graph::test_a_relative_import_that_escapes_the_package_is_not_invented",
+      "test_company_dependency_graph::test_a_runner_neighborhood_is_bounded_and_names_its_truncation",
+      "test_company_dependency_graph::test_an_impact_slice_for_an_unknown_path_says_so",
+      "test_company_dependency_graph::test_an_impact_slice_is_bounded_and_says_when_it_is_truncated",
+      "test_company_dependency_graph::test_an_import_cycle_terminates",
+      "test_company_dependency_graph::test_change_impact_answers_the_four_questions",
+      "test_company_dependency_graph::test_change_impact_creates_no_authority",
+      "test_company_dependency_graph::test_change_impact_names_paths_it_has_no_answer_for",
+      "test_company_dependency_graph::test_direct_and_transitive_are_distinguished",
+      "test_company_dependency_graph::test_every_real_capsule_owning_python_has_a_static_witness",
+      "test_company_dependency_graph::test_from_package_import_a_symbol_does_not_invent_a_module",
+      "test_company_dependency_graph::test_from_package_import_module_reaches_the_module",
+      "test_company_dependency_graph::test_the_capsule_budget_is_unchanged",
+      "test_company_dependency_graph::test_the_runner_map_handles_a_cycle",
+      "test_company_dependency_graph::test_the_runner_map_reports_dynamic_imports_rather_than_resolving_them",
+      "test_company_dependency_graph::test_the_runner_map_resolves_a_facade_chain_the_same_way",
+      "test_company_dependency_graph::test_the_two_governed_production_packages_are_found_and_owned",
+      "test_company_dependency_graph::test_there_is_no_filename_heuristic",
+      "test_company_dependency_graph::test_two_modules_with_the_same_terminal_name_stay_apart",
+      "test_company_gate_suite_requirements::test_governed_subsystem_ownership_passes_on_the_real_store",
+      "test_company_integration_gate::test_a_relative_import_resolves_to_the_absolute_name_it_means",
+      "test_company_os_capsules::test_the_capsule_budget_truncates_and_says_so",
+      "test_engineering_runner_repo_map::test_neighborhood_is_bounded_by_its_limits",
+      "test_engineering_runner_repo_map::test_reverse_test_index_resolves_real_imports_not_filenames"
+    ]
+  },
+  "boundary_guards": {
+    "count": 19,
+    "status": [
+      "passed"
+    ],
+    "tests": [
+      "test_company_context_expansion::test_no_subagent_rule_holds_at_every_expansion_boundary",
+      "test_company_delegation::test_the_package_does_not_import_production",
+      "test_company_dependency_graph::test_company_os_does_not_import_the_external_runner",
+      "test_company_dependency_graph::test_the_runner_does_not_even_write_the_control_plane_import_lines",
+      "test_company_dependency_graph::test_the_runner_does_not_import_the_capsule_layer",
+      "test_company_efficiency::test_tool_output_boundary_preserves_raw_output_with_and_without_compression",
+      "test_company_engineering_execution::test_genuine_governance_actions_still_route_to_specialist[Modify the approval boundary so a second reviewer is required.]",
+      "test_company_engineering_execution::test_other_specialist_domains_are_unaffected_by_the_breaking_change_table[Modify the approval boundary so a second reviewer is required.]",
+      "test_company_external_engineering_runner::test_owning_the_runner_did_not_put_it_inside_the_import_boundary",
+      "test_company_integration_gate::test_execution_safety_and_the_production_boundary_hold_today",
+      "test_company_integration_gate::test_this_repository_production_tests_do_not_import_company_os",
+      "test_company_integration_gate::test_this_repository_production_tree_does_not_import_company_os",
+      "test_company_objective_planning::test_every_objective_the_suites_already_submit_stays_specific[Rewrite the governance approval boundary so a protected policy file cannot be changed without a separate reviewer.]",
+      "test_company_os_research::test_a_reference_case_requires_an_originality_boundary",
+      "test_company_os_research_ingestion::test_a_count_that_arrived_as_text_fails_at_the_boundary",
+      "test_company_runtime::test_validation_does_not_import_runtime_implementation_modules",
+      "test_company_session_execution::test_an_explicit_narrow_grant_packages_work_only_inside_its_boundary",
+      "test_company_session_execution::test_company_os_remains_removable_and_production_does_not_import_it",
+      "test_company_youtube_studio_ingestion::test_the_reporting_timezone_moves_the_day_boundary"
+    ]
+  },
+  "authority": {
+    "count": 20,
+    "status": [
+      "passed"
+    ],
+    "tests": [
+      "test_company_bounded_engineering_activation::test_04_an_expired_contract_has_no_authority",
+      "test_company_bounded_engineering_activation::test_05_a_terminal_objective_has_no_authority[blocked]",
+      "test_company_bounded_engineering_activation::test_05_a_terminal_objective_has_no_authority[completed]",
+      "test_company_bounded_engineering_activation::test_05_a_terminal_objective_has_no_authority[escalated]",
+      "test_company_bounded_engineering_activation::test_05_a_terminal_objective_has_no_authority[expired]",
+      "test_company_bounded_engineering_activation::test_05_a_terminal_objective_has_no_authority[failed]",
+      "test_company_bounded_engineering_activation::test_05_a_terminal_objective_has_no_authority[no_executable_work]",
+      "test_company_bounded_engineering_activation::test_05b_a_revoked_contract_has_no_authority",
+      "test_company_context_expansion::test_read_authority_fails_closed_and_never_changes_write_scope",
+      "test_company_delegation::test_a_policy_cannot_grant_a_reserved_action",
+      "test_company_delegation::test_the_canonical_ceo_approval_still_carries_no_merge_authority",
+      "test_company_dependency_graph::test_change_impact_creates_no_authority",
+      "test_company_engineering_execution::test_a_decision_cannot_claim_merge_authority",
+      "test_company_engineering_execution::test_the_reviewer_packet_grants_no_writable_path",
+      "test_company_evidence_review::test_the_chosen_design_grants_no_authority_over_any_evidence_record",
+      "test_company_read_authority::test_a_work_order_with_no_declared_read_scope_grants_none",
+      "test_company_read_authority::test_read_authority_did_not_become_write_authority",
+      "test_company_read_authority::test_the_work_order_now_carries_read_authority",
+      "test_company_session_execution::test_the_default_bootstrap_contract_grants_no_write_authority",
+      "test_external_engineering_runner::test_p3_required_test_context_never_widens_write_authority"
+    ]
+  }
+}

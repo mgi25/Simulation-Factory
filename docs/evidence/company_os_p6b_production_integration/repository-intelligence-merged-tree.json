@@ -1,0 +1,829 @@
+{
+  "edges_added_by_merge": [
+    "tests/test_multiplying_shell.py -> tools/two_team_phase4a_lab.py",
+    "tests/test_multiplying_shell_audio.py -> audio/__init__.py",
+    "tests/test_multiplying_shell_audio.py -> audio/loudness.py",
+    "tests/test_multiplying_shell_audio.py -> audio/wav_io.py"
+  ],
+  "edges_removed_by_merge": [],
+  "merged_tree": {
+    "capsule_audit": {
+      "capsules": 23,
+      "declared_not_observed": {
+        "company-bootstrap-policy": [
+          "tests/test_company_runtime.py"
+        ],
+        "company-ceo-dashboard": [
+          "tests/test_company_os_capsules.py"
+        ],
+        "company-evidence-review": [
+          "tests/test_company_evidence_review.py"
+        ],
+        "company-os-control-plane": [
+          "tests/test_company_os_ai_platform.py",
+          "tests/test_company_os_capsules.py",
+          "tests/test_company_os_knowledge.py",
+          "tests/test_company_runtime.py"
+        ]
+      },
+      "graph_fingerprint": "98bb72f8831d6581",
+      "owning_python": 20,
+      "without_witness": []
+    },
+    "change_scope_probe": {
+      "company_path": {
+        "change_scope_suites": 2,
+        "count": 45,
+        "fingerprint": "f718e132860b4d82"
+      },
+      "production_path": {
+        "change_scope_suites": 0,
+        "count": 45,
+        "fingerprint": "72502df3cfb3cbb7"
+      }
+    },
+    "direct_vs_transitive_example": {
+      "relation": "transitive_static",
+      "target": "company/integration/suites.py",
+      "test": "tests/test_company_gate_suite_requirements.py"
+    },
+    "former_eleven": {
+      "tests/test_company_bounded_engineering_activation.py": true,
+      "tests/test_company_bounded_engineering_autonomy.py": true,
+      "tests/test_company_context_expansion.py": true,
+      "tests/test_company_delegation_pilot.py": true,
+      "tests/test_company_executable_work_planning.py": true,
+      "tests/test_company_executive_planning.py": true,
+      "tests/test_company_objective_planning.py": true,
+      "tests/test_company_review_separation.py": true,
+      "tests/test_company_runtime_integration.py": true,
+      "tests/test_company_session_execution.py": true,
+      "tests/test_company_youtube_end_to_end.py": true
+    },
+    "governed_subsystems": [
+      {
+        "company_os_tests": [
+          "tests/test_company_bounded_engineering_autonomy.py",
+          "tests/test_company_dependency_graph.py",
+          "tests/test_company_evidence_review.py",
+          "tests/test_company_external_engineering_runner.py"
+        ],
+        "modules": [
+          "tools/engineering_runner/__init__.py",
+          "tools/engineering_runner/__main__.py",
+          "tools/engineering_runner/authorization.py",
+          "tools/engineering_runner/backends.py",
+          "tools/engineering_runner/briefs.py",
+          "tools/engineering_runner/config.py",
+          "tools/engineering_runner/controlplane.py",
+          "tools/engineering_runner/errors.py",
+          "tools/engineering_runner/evidence.py",
+          "tools/engineering_runner/execution_context.py",
+          "tools/engineering_runner/exploration_report.py",
+          "tools/engineering_runner/exploration_telemetry.py",
+          "tools/engineering_runner/process.py",
+          "tools/engineering_runner/queue.py",
+          "tools/engineering_runner/redaction.py",
+          "tools/engineering_runner/repo_map.py",
+          "tools/engineering_runner/resources.py",
+          "tools/engineering_runner/runner.py",
+          "tools/engineering_runner/workspace.py"
+        ],
+        "owning_capsules": [
+          "company-external-engineering-runner"
+        ],
+        "package": "tools/engineering_runner"
+      },
+      {
+        "company_os_tests": [
+          "tests/test_company_youtube_end_to_end.py"
+        ],
+        "modules": [
+          "tools/youtube_fetch/__init__.py",
+          "tools/youtube_fetch/__main__.py",
+          "tools/youtube_fetch/api.py",
+          "tools/youtube_fetch/artifact.py",
+          "tools/youtube_fetch/config.py",
+          "tools/youtube_fetch/errors.py",
+          "tools/youtube_fetch/oauth.py",
+          "tools/youtube_fetch/secrets_.py",
+          "tools/youtube_fetch/transport.py"
+        ],
+        "owning_capsules": [
+          "company-youtube-fetch-client"
+        ],
+        "package": "tools/youtube_fetch"
+      }
+    ],
+    "graph": {
+      "absent_production_roots": [],
+      "deterministic": true,
+      "parse_failures": [],
+      "satisfying_scanned": false,
+      "scanned_company_roots": [
+        "company",
+        "ai_platform",
+        "knowledge",
+        "intelligence"
+      ],
+      "scanned_production_roots": [
+        "audio",
+        "engine",
+        "entities",
+        "evaluation",
+        "godot",
+        "marble3d",
+        "modes",
+        "powers",
+        "production",
+        "race",
+        "race2",
+        "rendering",
+        "replay",
+        "sloped",
+        "tools"
+      ],
+      "summary": {
+        "edges": 5000,
+        "fingerprint": "98bb72f8831d6581",
+        "modules": 746,
+        "parse_failures": 0,
+        "test_modules": 166,
+        "unresolved": 22
+      },
+      "type_checking_edges": 15,
+      "unresolved": [
+        {
+          "detail": "import_module('company.efficiency.emission')",
+          "line": 236,
+          "path": "company/runtime/session_adapter.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('company.analytics.baseline')",
+          "line": 974,
+          "path": "tests/test_company_analytics.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('sys')",
+          "line": 1880,
+          "path": "tests/test_company_finance.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 315,
+          "path": "tests/test_company_finance_usage_cost.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 888,
+          "path": "tests/test_company_finance_usage_cost.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 902,
+          "path": "tests/test_company_finance_usage_cost.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 909,
+          "path": "tests/test_company_finance_usage_cost.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 915,
+          "path": "tests/test_company_finance_usage_cost.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 924,
+          "path": "tests/test_company_finance_usage_cost.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('sys')",
+          "line": 1024,
+          "path": "tests/test_company_finance_usage_cost.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('company.integration.contracts')",
+          "line": 796,
+          "path": "tests/test_company_integration_gate.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('sys')",
+          "line": 1815,
+          "path": "tests/test_company_org_intelligence.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 269,
+          "path": "tests/test_company_os_capsules.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 392,
+          "path": "tests/test_company_os_research.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 1027,
+          "path": "tests/test_company_os_research.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 651,
+          "path": "tests/test_company_os_research_batches.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('sys')",
+          "line": 1418,
+          "path": "tests/test_company_workforce.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__(...)",
+          "line": 171,
+          "path": "tests/test_race2_v33_bookends.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('sloped.track')",
+          "line": 291,
+          "path": "tests/test_sloped_course_preview.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('sys')",
+          "line": 373,
+          "path": "tests/test_youtube_fetch.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "import_module(...)",
+          "line": 86,
+          "path": "tools/sloped_fork_lab.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('sloped.overlays')",
+          "line": 665,
+          "path": "tools/sloped_v24_hook.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        }
+      ]
+    },
+    "graph_none_is_unresolved": true,
+    "probes": [
+      {
+        "direct_tests": 2,
+        "path": "company/integration/suites.py",
+        "transitive_tests": 6
+      },
+      {
+        "direct_tests": 3,
+        "path": "company/integration/checks.py",
+        "transitive_tests": 6
+      },
+      {
+        "direct_tests": 1,
+        "path": "company/runtime/routing.py",
+        "transitive_tests": 33
+      },
+      {
+        "direct_tests": 1,
+        "path": "company/runtime/context_cache.py",
+        "transitive_tests": 33
+      },
+      {
+        "direct_tests": 2,
+        "path": "company/delegation/planning.py",
+        "transitive_tests": 8
+      },
+      {
+        "direct_tests": 4,
+        "path": "tools/engineering_runner/repo_map.py",
+        "transitive_tests": 9
+      }
+    ],
+    "relation_members": [
+      "direct_static",
+      "transitive_static",
+      "declared_contract",
+      "declared_not_observed",
+      "observed_not_declared",
+      "unresolved"
+    ],
+    "required": {
+      "by_origin": {
+        "canonical": 11,
+        "capsule_contract": 33,
+        "change_scope": 0,
+        "dependency_observed": 39
+      },
+      "count": 45,
+      "dependency_observed_only": [
+        "tests/test_company_bounded_engineering_activation.py",
+        "tests/test_company_bounded_engineering_autonomy.py",
+        "tests/test_company_context_expansion.py",
+        "tests/test_company_delegation_pilot.py",
+        "tests/test_company_dependency_graph.py",
+        "tests/test_company_executable_work_planning.py",
+        "tests/test_company_executive_planning.py",
+        "tests/test_company_objective_planning.py",
+        "tests/test_company_review_separation.py",
+        "tests/test_company_runtime_integration.py",
+        "tests/test_company_session_execution.py"
+      ],
+      "derived_from": [
+        "ai-platform",
+        "company-analytics-experiments",
+        "company-bootstrap-policy",
+        "company-ceo-dashboard",
+        "company-engineering-execution",
+        "company-evidence-review",
+        "company-executive-delegation",
+        "company-external-engineering-runner",
+        "company-finance",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-organizational-intelligence",
+        "company-os-control-plane",
+        "company-production-integration-gate",
+        "company-research-intelligence",
+        "company-research-operations",
+        "company-runtime",
+        "company-validation",
+        "company-workforce-capabilities",
+        "company-workforce-employment",
+        "company-workforce-hiring",
+        "company-youtube-connectivity",
+        "company-youtube-fetch-client"
+      ],
+      "deterministic": true,
+      "fingerprint": "72502df3cfb3cbb7",
+      "names": [
+        "tests/test_company_analytics.py",
+        "tests/test_company_bounded_engineering_activation.py",
+        "tests/test_company_bounded_engineering_autonomy.py",
+        "tests/test_company_context_assembly.py",
+        "tests/test_company_context_expansion.py",
+        "tests/test_company_dashboard.py",
+        "tests/test_company_delegation.py",
+        "tests/test_company_delegation_pilot.py",
+        "tests/test_company_dependency_graph.py",
+        "tests/test_company_efficiency.py",
+        "tests/test_company_engineering_execution.py",
+        "tests/test_company_evidence_review.py",
+        "tests/test_company_executable_work_planning.py",
+        "tests/test_company_execution_transport.py",
+        "tests/test_company_executive_planning.py",
+        "tests/test_company_external_engineering_runner.py",
+        "tests/test_company_finance.py",
+        "tests/test_company_finance_usage_cost.py",
+        "tests/test_company_gate_suite_requirements.py",
+        "tests/test_company_integration_gate.py",
+        "tests/test_company_objective_planning.py",
+        "tests/test_company_org_intelligence.py",
+        "tests/test_company_os_ai_platform.py",
+        "tests/test_company_os_capsules.py",
+        "tests/test_company_os_knowledge.py",
+        "tests/test_company_os_research.py",
+        "tests/test_company_os_research_batches.py",
+        "tests/test_company_os_research_ingestion.py",
+        "tests/test_company_read_authority.py",
+        "tests/test_company_review_separation.py",
+        "tests/test_company_runtime.py",
+        "tests/test_company_runtime_integration.py",
+        "tests/test_company_session_execution.py",
+        "tests/test_company_typed_evidence_context.py",
+        "tests/test_company_workforce.py",
+        "tests/test_company_youtube_connectivity.py",
+        "tests/test_company_youtube_end_to_end.py",
+        "tests/test_company_youtube_live_findings.py",
+        "tests/test_company_youtube_studio_ingestion.py",
+        "tests/test_engineering_runner_execution_context.py",
+        "tests/test_engineering_runner_exploration_report.py",
+        "tests/test_engineering_runner_exploration_telemetry.py",
+        "tests/test_engineering_runner_repo_map.py",
+        "tests/test_external_engineering_runner.py",
+        "tests/test_youtube_fetch.py"
+      ],
+      "undeclared_company_os_suites": [],
+      "unresolved": []
+    },
+    "runner_repo_map": {
+      "deterministic": true,
+      "module_to_test_edges": 446,
+      "modules": 536,
+      "modules_with_direct_test": 174,
+      "production_dependents_entries": 248
+    },
+    "sha": "5da27cfb723d059d46c560e2d92e38681ba1ce02"
+  },
+  "note": "Recomputed on the actual merged tree, not reused from the P6B archive. Edges are static import relationships, not coverage.",
+  "p6b_parent_for_comparison": {
+    "capsule_audit": {
+      "capsules": 23,
+      "declared_not_observed": {
+        "company-bootstrap-policy": [
+          "tests/test_company_runtime.py"
+        ],
+        "company-ceo-dashboard": [
+          "tests/test_company_os_capsules.py"
+        ],
+        "company-evidence-review": [
+          "tests/test_company_evidence_review.py"
+        ],
+        "company-os-control-plane": [
+          "tests/test_company_os_ai_platform.py",
+          "tests/test_company_os_capsules.py",
+          "tests/test_company_os_knowledge.py",
+          "tests/test_company_runtime.py"
+        ]
+      },
+      "graph_fingerprint": "e43dbbd4d28abac7",
+      "owning_python": 20,
+      "without_witness": []
+    },
+    "governed_subsystems": [
+      {
+        "company_os_tests": [
+          "tests/test_company_bounded_engineering_autonomy.py",
+          "tests/test_company_dependency_graph.py",
+          "tests/test_company_evidence_review.py",
+          "tests/test_company_external_engineering_runner.py"
+        ],
+        "modules": [
+          "tools/engineering_runner/__init__.py",
+          "tools/engineering_runner/__main__.py",
+          "tools/engineering_runner/authorization.py",
+          "tools/engineering_runner/backends.py",
+          "tools/engineering_runner/briefs.py",
+          "tools/engineering_runner/config.py",
+          "tools/engineering_runner/controlplane.py",
+          "tools/engineering_runner/errors.py",
+          "tools/engineering_runner/evidence.py",
+          "tools/engineering_runner/execution_context.py",
+          "tools/engineering_runner/exploration_report.py",
+          "tools/engineering_runner/exploration_telemetry.py",
+          "tools/engineering_runner/process.py",
+          "tools/engineering_runner/queue.py",
+          "tools/engineering_runner/redaction.py",
+          "tools/engineering_runner/repo_map.py",
+          "tools/engineering_runner/resources.py",
+          "tools/engineering_runner/runner.py",
+          "tools/engineering_runner/workspace.py"
+        ],
+        "owning_capsules": [
+          "company-external-engineering-runner"
+        ],
+        "package": "tools/engineering_runner"
+      },
+      {
+        "company_os_tests": [
+          "tests/test_company_youtube_end_to_end.py"
+        ],
+        "modules": [
+          "tools/youtube_fetch/__init__.py",
+          "tools/youtube_fetch/__main__.py",
+          "tools/youtube_fetch/api.py",
+          "tools/youtube_fetch/artifact.py",
+          "tools/youtube_fetch/config.py",
+          "tools/youtube_fetch/errors.py",
+          "tools/youtube_fetch/oauth.py",
+          "tools/youtube_fetch/secrets_.py",
+          "tools/youtube_fetch/transport.py"
+        ],
+        "owning_capsules": [
+          "company-youtube-fetch-client"
+        ],
+        "package": "tools/youtube_fetch"
+      }
+    ],
+    "graph": {
+      "absent_production_roots": [],
+      "deterministic": true,
+      "parse_failures": [],
+      "satisfying_scanned": false,
+      "scanned_company_roots": [
+        "company",
+        "ai_platform",
+        "knowledge",
+        "intelligence"
+      ],
+      "scanned_production_roots": [
+        "audio",
+        "engine",
+        "entities",
+        "evaluation",
+        "godot",
+        "marble3d",
+        "modes",
+        "powers",
+        "production",
+        "race",
+        "race2",
+        "rendering",
+        "replay",
+        "sloped",
+        "tools"
+      ],
+      "summary": {
+        "edges": 4996,
+        "fingerprint": "e43dbbd4d28abac7",
+        "modules": 735,
+        "parse_failures": 0,
+        "test_modules": 160,
+        "unresolved": 22
+      },
+      "type_checking_edges": 15,
+      "unresolved": [
+        {
+          "detail": "import_module('company.efficiency.emission')",
+          "line": 236,
+          "path": "company/runtime/session_adapter.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('company.analytics.baseline')",
+          "line": 974,
+          "path": "tests/test_company_analytics.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('sys')",
+          "line": 1880,
+          "path": "tests/test_company_finance.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 315,
+          "path": "tests/test_company_finance_usage_cost.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 888,
+          "path": "tests/test_company_finance_usage_cost.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 902,
+          "path": "tests/test_company_finance_usage_cost.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 909,
+          "path": "tests/test_company_finance_usage_cost.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 915,
+          "path": "tests/test_company_finance_usage_cost.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 924,
+          "path": "tests/test_company_finance_usage_cost.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('sys')",
+          "line": 1024,
+          "path": "tests/test_company_finance_usage_cost.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('company.integration.contracts')",
+          "line": 796,
+          "path": "tests/test_company_integration_gate.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('sys')",
+          "line": 1815,
+          "path": "tests/test_company_org_intelligence.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 269,
+          "path": "tests/test_company_os_capsules.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 392,
+          "path": "tests/test_company_os_research.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 1027,
+          "path": "tests/test_company_os_research.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('json')",
+          "line": 651,
+          "path": "tests/test_company_os_research_batches.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('sys')",
+          "line": 1418,
+          "path": "tests/test_company_workforce.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__(...)",
+          "line": 171,
+          "path": "tests/test_race2_v33_bookends.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('sloped.track')",
+          "line": 291,
+          "path": "tests/test_sloped_course_preview.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('sys')",
+          "line": 373,
+          "path": "tests/test_youtube_fetch.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "import_module(...)",
+          "line": 86,
+          "path": "tools/sloped_fork_lab.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        },
+        {
+          "detail": "__import__('sloped.overlays')",
+          "line": 665,
+          "path": "tools/sloped_v24_hook.py",
+          "reason": "a dynamic import is resolved at run time; a static graph that guessed its target would assert an edge nobody wrote"
+        }
+      ]
+    },
+    "probes": [
+      {
+        "direct_tests": 2,
+        "path": "company/integration/suites.py",
+        "transitive_tests": 6
+      },
+      {
+        "direct_tests": 3,
+        "path": "company/integration/checks.py",
+        "transitive_tests": 6
+      },
+      {
+        "direct_tests": 1,
+        "path": "company/runtime/routing.py",
+        "transitive_tests": 33
+      },
+      {
+        "direct_tests": 1,
+        "path": "company/runtime/context_cache.py",
+        "transitive_tests": 33
+      },
+      {
+        "direct_tests": 2,
+        "path": "company/delegation/planning.py",
+        "transitive_tests": 8
+      },
+      {
+        "direct_tests": 4,
+        "path": "tools/engineering_runner/repo_map.py",
+        "transitive_tests": 9
+      }
+    ],
+    "required": {
+      "by_origin": {
+        "canonical": 11,
+        "capsule_contract": 33,
+        "change_scope": 0,
+        "dependency_observed": 39
+      },
+      "count": 45,
+      "dependency_observed_only": [
+        "tests/test_company_bounded_engineering_activation.py",
+        "tests/test_company_bounded_engineering_autonomy.py",
+        "tests/test_company_context_expansion.py",
+        "tests/test_company_delegation_pilot.py",
+        "tests/test_company_dependency_graph.py",
+        "tests/test_company_executable_work_planning.py",
+        "tests/test_company_executive_planning.py",
+        "tests/test_company_objective_planning.py",
+        "tests/test_company_review_separation.py",
+        "tests/test_company_runtime_integration.py",
+        "tests/test_company_session_execution.py"
+      ],
+      "derived_from": [
+        "ai-platform",
+        "company-analytics-experiments",
+        "company-bootstrap-policy",
+        "company-ceo-dashboard",
+        "company-engineering-execution",
+        "company-evidence-review",
+        "company-executive-delegation",
+        "company-external-engineering-runner",
+        "company-finance",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-organizational-intelligence",
+        "company-os-control-plane",
+        "company-production-integration-gate",
+        "company-research-intelligence",
+        "company-research-operations",
+        "company-runtime",
+        "company-validation",
+        "company-workforce-capabilities",
+        "company-workforce-employment",
+        "company-workforce-hiring",
+        "company-youtube-connectivity",
+        "company-youtube-fetch-client"
+      ],
+      "deterministic": true,
+      "fingerprint": "72502df3cfb3cbb7",
+      "names": [
+        "tests/test_company_analytics.py",
+        "tests/test_company_bounded_engineering_activation.py",
+        "tests/test_company_bounded_engineering_autonomy.py",
+        "tests/test_company_context_assembly.py",
+        "tests/test_company_context_expansion.py",
+        "tests/test_company_dashboard.py",
+        "tests/test_company_delegation.py",
+        "tests/test_company_delegation_pilot.py",
+        "tests/test_company_dependency_graph.py",
+        "tests/test_company_efficiency.py",
+        "tests/test_company_engineering_execution.py",
+        "tests/test_company_evidence_review.py",
+        "tests/test_company_executable_work_planning.py",
+        "tests/test_company_execution_transport.py",
+        "tests/test_company_executive_planning.py",
+        "tests/test_company_external_engineering_runner.py",
+        "tests/test_company_finance.py",
+        "tests/test_company_finance_usage_cost.py",
+        "tests/test_company_gate_suite_requirements.py",
+        "tests/test_company_integration_gate.py",
+        "tests/test_company_objective_planning.py",
+        "tests/test_company_org_intelligence.py",
+        "tests/test_company_os_ai_platform.py",
+        "tests/test_company_os_capsules.py",
+        "tests/test_company_os_knowledge.py",
+        "tests/test_company_os_research.py",
+        "tests/test_company_os_research_batches.py",
+        "tests/test_company_os_research_ingestion.py",
+        "tests/test_company_read_authority.py",
+        "tests/test_company_review_separation.py",
+        "tests/test_company_runtime.py",
+        "tests/test_company_runtime_integration.py",
+        "tests/test_company_session_execution.py",
+        "tests/test_company_typed_evidence_context.py",
+        "tests/test_company_workforce.py",
+        "tests/test_company_youtube_connectivity.py",
+        "tests/test_company_youtube_end_to_end.py",
+        "tests/test_company_youtube_live_findings.py",
+        "tests/test_company_youtube_studio_ingestion.py",
+        "tests/test_engineering_runner_execution_context.py",
+        "tests/test_engineering_runner_exploration_report.py",
+        "tests/test_engineering_runner_exploration_telemetry.py",
+        "tests/test_engineering_runner_repo_map.py",
+        "tests/test_external_engineering_runner.py",
+        "tests/test_youtube_fetch.py"
+      ],
+      "undeclared_company_os_suites": [],
+      "unresolved": []
+    },
+    "runner_repo_map": {
+      "deterministic": true,
+      "module_to_test_edges": 445,
+      "modules": 525,
+      "modules_with_direct_test": 173,
+      "production_dependents_entries": 248
+    },
+    "sha": "50f42297849364ab6498f894a964d3642cbd9e65"
+  }
+}

@@ -1,0 +1,455 @@
+{
+  "max_age_days": 7,
+  "results": [
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "160 passed, 0 failed, 0 skipped in 5.07s (junit req.test_company_analytics.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 160,
+      "suite": "tests/test_company_analytics.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "63 passed, 0 failed, 0 skipped in 9.38s (junit req.test_company_bounded_engineering_activation.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 63,
+      "suite": "tests/test_company_bounded_engineering_activation.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "72 passed, 0 failed, 0 skipped in 1.99s (junit req.test_company_bounded_engineering_autonomy.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 72,
+      "suite": "tests/test_company_bounded_engineering_autonomy.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "9 passed, 0 failed, 0 skipped in 0.76s (junit req.test_company_context_assembly.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 9,
+      "suite": "tests/test_company_context_assembly.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "17 passed, 0 failed, 0 skipped in 4.06s (junit req.test_company_context_expansion.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 17,
+      "suite": "tests/test_company_context_expansion.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "32 passed, 0 failed, 0 skipped in 4.56s (junit req.test_company_dashboard.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 32,
+      "suite": "tests/test_company_dashboard.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "152 passed, 0 failed, 0 skipped in 5.35s (junit req.test_company_delegation.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 152,
+      "suite": "tests/test_company_delegation.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "159 passed, 0 failed, 0 skipped in 2.53s (junit req.test_company_delegation_pilot.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 159,
+      "suite": "tests/test_company_delegation_pilot.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "54 passed, 0 failed, 0 skipped in 58.70s (junit req.test_company_dependency_graph.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 54,
+      "suite": "tests/test_company_dependency_graph.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "69 passed, 0 failed, 0 skipped in 0.84s (junit req.test_company_efficiency.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 69,
+      "suite": "tests/test_company_efficiency.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "207 passed, 0 failed, 0 skipped in 30.59s (junit req.test_company_engineering_execution.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 207,
+      "suite": "tests/test_company_engineering_execution.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "25 passed, 0 failed, 0 skipped in 17.99s (junit req.test_company_evidence_review.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 25,
+      "suite": "tests/test_company_evidence_review.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "23 passed, 0 failed, 0 skipped in 2.00s (junit req.test_company_executable_work_planning.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 23,
+      "suite": "tests/test_company_executable_work_planning.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "14 passed, 0 failed, 0 skipped in 4.14s (junit req.test_company_execution_transport.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 14,
+      "suite": "tests/test_company_execution_transport.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "73 passed, 0 failed, 0 skipped in 2.07s (junit req.test_company_executive_planning.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 73,
+      "suite": "tests/test_company_executive_planning.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "64 passed, 0 failed, 0 skipped in 5.45s (junit req.test_company_external_engineering_runner.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 64,
+      "suite": "tests/test_company_external_engineering_runner.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "123 passed, 0 failed, 0 skipped in 2.04s (junit req.test_company_finance.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 123,
+      "suite": "tests/test_company_finance.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "48 passed, 0 failed, 0 skipped in 1.18s (junit req.test_company_finance_usage_cost.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 48,
+      "suite": "tests/test_company_finance_usage_cost.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "46 passed, 0 failed, 0 skipped in 83.13s (junit req.test_company_gate_suite_requirements.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 46,
+      "suite": "tests/test_company_gate_suite_requirements.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "89 passed, 0 failed, 0 skipped in 113.12s (junit req.test_company_integration_gate.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 89,
+      "suite": "tests/test_company_integration_gate.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "93 passed, 0 failed, 0 skipped in 0.77s (junit req.test_company_objective_planning.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 93,
+      "suite": "tests/test_company_objective_planning.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "119 passed, 0 failed, 0 skipped in 0.88s (junit req.test_company_org_intelligence.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 119,
+      "suite": "tests/test_company_org_intelligence.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "46 passed, 0 failed, 0 skipped in 0.17s (junit req.test_company_os_ai_platform.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 46,
+      "suite": "tests/test_company_os_ai_platform.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "68 passed, 0 failed, 0 skipped in 0.42s (junit req.test_company_os_capsules.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 68,
+      "suite": "tests/test_company_os_capsules.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "26 passed, 0 failed, 0 skipped in 0.27s (junit req.test_company_os_knowledge.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 26,
+      "suite": "tests/test_company_os_knowledge.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "81 passed, 0 failed, 0 skipped in 0.71s (junit req.test_company_os_research.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 81,
+      "suite": "tests/test_company_os_research.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "118 passed, 0 failed, 0 skipped in 1.02s (junit req.test_company_os_research_batches.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 118,
+      "suite": "tests/test_company_os_research_batches.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "122 passed, 0 failed, 0 skipped in 0.80s (junit req.test_company_os_research_ingestion.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 122,
+      "suite": "tests/test_company_os_research_ingestion.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "34 passed, 0 failed, 0 skipped in 0.47s (junit req.test_company_read_authority.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 34,
+      "suite": "tests/test_company_read_authority.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "32 passed, 0 failed, 0 skipped in 0.58s (junit req.test_company_review_separation.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 32,
+      "suite": "tests/test_company_review_separation.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "22 passed, 0 failed, 0 skipped in 1.25s (junit req.test_company_runtime.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 22,
+      "suite": "tests/test_company_runtime.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "14 passed, 0 failed, 0 skipped in 0.44s (junit req.test_company_runtime_integration.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 14,
+      "suite": "tests/test_company_runtime_integration.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "48 passed, 0 failed, 0 skipped in 2.15s (junit req.test_company_session_execution.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 48,
+      "suite": "tests/test_company_session_execution.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "59 passed, 0 failed, 0 skipped in 0.26s (junit req.test_company_typed_evidence_context.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 59,
+      "suite": "tests/test_company_typed_evidence_context.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "93 passed, 0 failed, 0 skipped in 0.60s (junit req.test_company_workforce.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 93,
+      "suite": "tests/test_company_workforce.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "29 passed, 0 failed, 0 skipped in 17.27s (junit req.test_company_youtube_connectivity.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 29,
+      "suite": "tests/test_company_youtube_connectivity.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "7 passed, 0 failed, 0 skipped in 0.92s (junit req.test_company_youtube_end_to_end.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 7,
+      "suite": "tests/test_company_youtube_end_to_end.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "55 passed, 0 failed, 0 skipped in 0.85s (junit req.test_company_youtube_live_findings.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 55,
+      "suite": "tests/test_company_youtube_live_findings.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "142 passed, 0 failed, 0 skipped in 3.17s (junit req.test_company_youtube_studio_ingestion.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 142,
+      "suite": "tests/test_company_youtube_studio_ingestion.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "40 passed, 0 failed, 0 skipped in 0.53s (junit req.test_engineering_runner_execution_context.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 40,
+      "suite": "tests/test_engineering_runner_execution_context.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "19 passed, 0 failed, 0 skipped in 0.42s (junit req.test_engineering_runner_exploration_report.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 19,
+      "suite": "tests/test_engineering_runner_exploration_report.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "25 passed, 0 failed, 0 skipped in 0.22s (junit req.test_engineering_runner_exploration_telemetry.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 25,
+      "suite": "tests/test_engineering_runner_exploration_telemetry.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "25 passed, 0 failed, 0 skipped in 0.62s (junit req.test_engineering_runner_repo_map.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 25,
+      "suite": "tests/test_engineering_runner_repo_map.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "185 passed, 0 failed, 0 skipped in 356.74s (junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 185,
+      "suite": "tests/test_external_engineering_runner.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "68 passed, 0 failed, 1 skipped in 0.60s (junit req.test_youtube_fetch.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6b-integration-session",
+      "selected": 69,
+      "suite": "tests/test_youtube_fetch.py"
+    }
+  ]
+}
