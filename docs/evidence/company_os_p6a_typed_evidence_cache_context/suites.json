@@ -8,7 +8,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 160,
       "failed": 0,
-      "note": "160 passed in 11.30s",
+      "note": "160 passed in 2.05s",
       "company_os": true
     },
     {
@@ -18,7 +18,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 9,
       "failed": 0,
-      "note": "9 passed in 0.18s",
+      "note": "9 passed in 0.23s",
       "company_os": true
     },
     {
@@ -28,7 +28,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 32,
       "failed": 0,
-      "note": "32 passed in 11.97s",
+      "note": "32 passed in 8.11s",
       "company_os": true
     },
     {
@@ -38,7 +38,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 152,
       "failed": 0,
-      "note": "152 passed in 1.36s",
+      "note": "152 passed in 1.38s",
       "company_os": true
     },
     {
@@ -58,7 +58,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 207,
       "failed": 0,
-      "note": "207 passed in 27.74s",
+      "note": "207 passed in 40.38s",
       "company_os": true
     },
     {
@@ -68,7 +68,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 25,
       "failed": 0,
-      "note": "25 passed in 0.82s",
+      "note": "25 passed in 2.05s",
       "company_os": true
     },
     {
@@ -78,7 +78,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 14,
       "failed": 0,
-      "note": "14 passed in 0.71s",
+      "note": "14 passed in 1.01s",
       "company_os": true
     },
     {
@@ -88,7 +88,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 64,
       "failed": 0,
-      "note": "64 passed in 3.61s",
+      "note": "64 passed in 2.11s",
       "company_os": true
     },
     {
@@ -98,7 +98,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 123,
       "failed": 0,
-      "note": "123 passed in 1.65s",
+      "note": "123 passed in 3.10s",
       "company_os": true
     },
     {
@@ -108,7 +108,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 48,
       "failed": 0,
-      "note": "48 passed in 0.54s",
+      "note": "48 passed in 1.05s",
       "company_os": true
     },
     {
@@ -116,9 +116,9 @@
       "passed": true,
       "observed_on": "2026-09-24",
       "reported_by": "p6a-validation-session",
-      "selected": 27,
+      "selected": 41,
       "failed": 0,
-      "note": "27 passed in 16.18s",
+      "note": "41 passed in 27.39s",
       "company_os": true
     },
     {
@@ -128,7 +128,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 89,
       "failed": 0,
-      "note": "89 passed in 98.92s (0:01:38)",
+      "note": "89 passed in 129.04s (0:02:09)",
       "company_os": true
     },
     {
@@ -138,7 +138,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 119,
       "failed": 0,
-      "note": "119 passed in 0.53s",
+      "note": "119 passed in 0.64s",
       "company_os": true
     },
     {
@@ -148,7 +148,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 46,
       "failed": 0,
-      "note": "46 passed in 0.10s",
+      "note": "46 passed in 0.09s",
       "company_os": true
     },
     {
@@ -158,7 +158,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 68,
       "failed": 0,
-      "note": "68 passed in 0.31s",
+      "note": "68 passed in 0.38s",
       "company_os": true
     },
     {
@@ -168,37 +168,37 @@
       "reported_by": "p6a-validation-session",
       "selected": 26,
       "failed": 0,
-      "note": "26 passed in 0.20s",
+      "note": "26 passed in 0.19s",
       "company_os": true
     },
     {
       "suite": "tests/test_company_os_research.py",
-      "passed": true,
+      "passed": false,
       "observed_on": "2026-09-24",
       "reported_by": "p6a-validation-session",
       "selected": 81,
-      "failed": 0,
-      "note": "81 passed in 0.52s",
+      "failed": 1,
+      "note": "1 failed, 80 passed in 0.65s",
       "company_os": true
     },
     {
       "suite": "tests/test_company_os_research_batches.py",
-      "passed": true,
+      "passed": false,
       "observed_on": "2026-09-24",
       "reported_by": "p6a-validation-session",
       "selected": 118,
-      "failed": 0,
-      "note": "118 passed in 0.79s",
+      "failed": 1,
+      "note": "1 failed, 117 passed in 0.91s",
       "company_os": true
     },
     {
       "suite": "tests/test_company_os_research_ingestion.py",
-      "passed": true,
+      "passed": false,
       "observed_on": "2026-09-24",
       "reported_by": "p6a-validation-session",
       "selected": 122,
-      "failed": 0,
-      "note": "122 passed in 0.62s",
+      "failed": 1,
+      "note": "1 failed, 121 passed in 0.76s",
       "company_os": true
     },
     {
@@ -208,7 +208,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 34,
       "failed": 0,
-      "note": "34 passed in 0.33s",
+      "note": "34 passed in 0.38s",
       "company_os": true
     },
     {
@@ -218,7 +218,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 22,
       "failed": 0,
-      "note": "22 passed in 0.99s",
+      "note": "22 passed in 1.04s",
       "company_os": true
     },
     {
@@ -226,9 +226,9 @@
       "passed": true,
       "observed_on": "2026-09-24",
       "reported_by": "p6a-validation-session",
-      "selected": 48,
+      "selected": 59,
       "failed": 0,
-      "note": "48 passed in 0.15s",
+      "note": "59 passed in 0.18s",
       "company_os": true
     },
     {
@@ -238,7 +238,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 93,
       "failed": 0,
-      "note": "93 passed in 0.42s",
+      "note": "93 passed in 0.54s",
       "company_os": true
     },
     {
@@ -248,7 +248,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 29,
       "failed": 0,
-      "note": "29 passed in 11.82s",
+      "note": "29 passed in 14.99s",
       "company_os": true
     },
     {
@@ -258,7 +258,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 55,
       "failed": 0,
-      "note": "55 passed in 0.66s",
+      "note": "55 passed in 0.73s",
       "company_os": true
     },
     {
@@ -268,7 +268,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 142,
       "failed": 0,
-      "note": "142 passed in 2.57s",
+      "note": "142 passed in 2.98s",
       "company_os": true
     },
     {
@@ -288,7 +288,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 19,
       "failed": 0,
-      "note": "19 passed in 0.26s",
+      "note": "19 passed in 0.28s",
       "company_os": true
     },
     {
@@ -298,7 +298,7 @@
       "reported_by": "p6a-validation-session",
       "selected": 25,
       "failed": 0,
-      "note": "25 passed in 0.27s",
+      "note": "25 passed in 0.29s",
       "company_os": true
     },
     {
@@ -316,9 +316,9 @@
       "passed": true,
       "observed_on": "2026-09-24",
       "reported_by": "p6a-validation-session",
-      "selected": 168,
+      "selected": 184,
       "failed": 0,
-      "note": "168 passed in 273.60s (0:04:33)",
+      "note": "184 passed in 222.28s (0:03:42)",
       "company_os": true
     }
   ]

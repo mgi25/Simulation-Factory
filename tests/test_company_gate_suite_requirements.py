@@ -17,6 +17,7 @@ import ast
 import datetime as dt
 import json
 from pathlib import Path
+import shutil
 
 import pytest
 
@@ -76,7 +77,7 @@ def test_a_suite_declared_only_by_a_capsule_is_still_required(index):
     item = required.get("tests/test_company_os_research_ingestion.py")
     assert item is not None
     assert item.suite not in REQUIRED_SUITES
-    assert SuiteOrigin.ACTIVE_CAPSULE in item.origins
+    assert SuiteOrigin.CAPSULE_CONTRACT in item.origins
     assert "company-research-intelligence" in item.capsule_ids
 
 
@@ -98,7 +99,7 @@ def test_a_suite_required_twice_over_keeps_both_reasons(index):
     item = resolve_required_suites(index).get("tests/test_company_runtime.py")
     assert item is not None
     assert SuiteOrigin.CANONICAL in item.origins
-    assert SuiteOrigin.ACTIVE_CAPSULE in item.origins
+    assert SuiteOrigin.CAPSULE_CONTRACT in item.origins
 
 
 # --------------------------------------------------------------------------
@@ -382,6 +383,198 @@ def test_a_supplied_red_production_suite_still_does_not_block(repo_scan, synthet
     )
     assert report.check("health.required_suites_pass").status is GateStatus.PASS
     assert report.check("health.production_failures_separated").status is GateStatus.PASS
+
+
+# --------------------------------------------------------------------------
+# Which lifecycle states still bind  (independent review, finding B1)
+# --------------------------------------------------------------------------
+
+
+def _seeds_with_status(tmp_path, capsule_id: str, status: str) -> Path:
+    """A copy of the real seeds with one capsule's status changed."""
+    root = tmp_path / f"seeds-{status}"
+    shutil.copytree(SEED_ROOT, root)
+    target = root / f"{capsule_id}.json"
+    data = json.loads(target.read_text(encoding="utf-8"))
+    data["status"] = status
+    target.write_text(
+        json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    return root
+
+
+def test_flagging_a_capsule_for_revalidation_does_not_drop_its_suites(tmp_path, index):
+    """Found by independent review. `flag_capsule_for_revalidation()` is a
+    supported operation; if it removed a capsule's suites from the required
+    set, flagging a capsule would be a way to make the gate stop asking about
+    exactly the subsystem somebody has just said they no longer trust - the P5
+    defect again, reached through the lifecycle instead of a static list.
+    """
+    flagged = resolve_required_suites(
+        CapsuleIndex.load(
+            _seeds_with_status(tmp_path, "company-executive-delegation", "needs_revalidation")
+        )
+    )
+    baseline = resolve_required_suites(index)
+    assert set(baseline.names()) <= set(flagged.names())
+    assert "tests/test_company_delegation.py" in flagged
+
+
+@pytest.mark.parametrize("status", ["retired", "superseded"])
+def test_a_finished_contract_stops_requiring_its_suites(tmp_path, index, status):
+    """The other direction, and the reason `_IN_FORCE` is not just "any state":
+    a contract that has been replaced or retired is not in force."""
+    finished = resolve_required_suites(
+        CapsuleIndex.load(
+            _seeds_with_status(tmp_path, "company-executive-delegation", status)
+        )
+    )
+    assert "tests/test_company_delegation.py" not in finished
+    assert len(finished) < len(resolve_required_suites(index))
+
+
+def test_change_scope_still_reaches_a_finished_contract(tmp_path):
+    """Editing a retired capsule's own code is exactly when its tests matter."""
+    root = _seeds_with_status(tmp_path, "company-executive-delegation", "retired")
+    scoped = resolve_required_suites(
+        CapsuleIndex.load(root), changed_paths=("company/delegation/",)
+    )
+    item = scoped.get("tests/test_company_delegation.py")
+    assert item is not None
+    assert item.origins == (SuiteOrigin.CHANGE_SCOPE,)
+
+
+# --------------------------------------------------------------------------
+# A partial capsule store  (independent review, finding B2)
+# --------------------------------------------------------------------------
+
+
+def test_a_partially_loaded_capsule_store_is_not_treated_as_complete(tmp_path):
+    """Found by independent review. The argument against an *empty* store -
+    that a Company OS checkout has capsules - applies with identical force to
+    one that lost half its files, and stopping at zero left that open.
+
+    `CapsuleIndex.integrity()` with no store and no checkout is a pure
+    structural check over the capsules' own declarations, and a partial store
+    almost always has a capsule depending on one that is no longer there.
+    """
+    partial = tmp_path / "partial"
+    partial.mkdir()
+    shutil.copy(SEED_ROOT / "company-runtime.json", partial / "company-runtime.json")
+    required = resolve_required_suites(CapsuleIndex.load(partial))
+    assert not required.resolved
+    assert any("structurally incomplete" in item for item in required.unresolved)
+
+
+def test_a_partial_store_keeps_the_gate_condition_unknown(repo_scan, tmp_path):
+    partial = tmp_path / "partial"
+    partial.mkdir()
+    shutil.copy(SEED_ROOT / "company-runtime.json", partial / "company-runtime.json")
+    required = resolve_required_suites(CapsuleIndex.load(partial))
+    report = build_report(
+        REPO_ROOT,
+        as_of=AS_OF,
+        scan=repo_scan,
+        suites=SuiteEvidence(tuple(_result(n) for n in required.names())),
+        capsule_root=partial,
+    )
+    check = report.check("health.required_suites_pass")
+    assert check.status is GateStatus.UNKNOWN
+    assert report.readiness is not Readiness.READY
+
+
+def test_the_real_seed_store_is_structurally_complete(index):
+    """The other half: the fix must not make the real repository unresolvable."""
+    required = resolve_required_suites(index)
+    assert required.resolved
+    assert index.integrity() == ()
+
+
+# --------------------------------------------------------------------------
+# A capsule that names something that is not a suite  (review, N1/N2)
+# --------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "reference",
+    [
+        "tests/*.py",
+        "tests/test_company_x.PY",
+        "Tests/test_company_x.py",
+        "docs/validation/company_os_p6a/measure_context_efficiency.py",
+        "tests/./test_company_x.py",
+    ],
+)
+def test_an_unusable_test_reference_is_reported_not_dropped(tmp_path, reference):
+    """Found by independent review. Dropping these silently would let one
+    legal-looking capsule edit remove a suite from the required set with
+    nothing to show for it - and a glob would be worse, becoming a required
+    suite nobody can ever report evidence about."""
+    root = tmp_path / "seeds"
+    root.mkdir()
+    capsule = _capsule_json(
+        "synthetic-odd-tests", owns=["intelligence/research"], tests=[reference]
+    )
+    (root / "synthetic-odd-tests.json").write_text(
+        json.dumps(capsule, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    required = resolve_required_suites(CapsuleIndex.load(root))
+    assert not required.resolved
+    assert any(reference in item for item in required.unresolved)
+    assert reference not in required.names()
+
+
+# --------------------------------------------------------------------------
+# Present, green, and still not evidence  (independent review, N5/N6)
+# --------------------------------------------------------------------------
+
+
+def test_a_green_run_that_selected_no_tests_is_not_evidence(repo_scan, synthetic_seeds):
+    """pytest collected nothing, so "0 failed" is true and proves nothing."""
+    names = resolve_required_suites(CapsuleIndex.load(synthetic_seeds)).names()
+    evidence = SuiteEvidence(
+        tuple(
+            SuiteResult(
+                suite=name,
+                passed=True,
+                observed_on=AS_OF,
+                reported_by="tests/test_company_gate_suite_requirements.py",
+                selected=0,
+            )
+            for name in names
+        )
+    )
+    report = build_report(
+        REPO_ROOT, as_of=AS_OF, scan=repo_scan, suites=evidence, capsule_root=synthetic_seeds
+    )
+    check = report.check("health.required_suites_pass")
+    assert check.status is GateStatus.UNKNOWN
+    assert any("0 tests selected" in item for item in check.missing_evidence)
+
+
+def test_evidence_dated_after_the_run_is_not_evidence(repo_scan, synthetic_seeds):
+    """Staleness is `as_of - observed_on`, so a future date makes the age
+    negative and the freshness window unreachable."""
+    names = resolve_required_suites(CapsuleIndex.load(synthetic_seeds)).names()
+    evidence = SuiteEvidence(
+        tuple(_result(name, day=24) for name in names[1:])
+        + (
+            SuiteResult(
+                suite=names[0],
+                passed=True,
+                observed_on=dt.date(2027, 1, 1),
+                reported_by="tests/test_company_gate_suite_requirements.py",
+                selected=5,
+            ),
+        ),
+        max_age_days=0,
+    )
+    report = build_report(
+        REPO_ROOT, as_of=AS_OF, scan=repo_scan, suites=evidence, capsule_root=synthetic_seeds
+    )
+    check = report.check("health.required_suites_pass")
+    assert check.status is GateStatus.UNKNOWN
+    assert any("after the run date" in item for item in check.missing_evidence)
 
 
 # --------------------------------------------------------------------------

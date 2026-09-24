@@ -97,7 +97,14 @@ def test_an_elided_body_carries_a_pointer_back_to_its_source():
 def test_compression_is_reversible_against_the_canonical_source():
     body = compress(LONG, source="a/b.py")
     assert expand(body, LONG) == LONG
-    assert body.reversible
+
+
+def test_self_contained_distinguishes_whole_from_merely_restorable():
+    """Found by independent review: `reversible` was hardcoded True, which is
+    a check that cannot fail. What is worth knowing is whether the body can be
+    read without going back to the source."""
+    assert compress(SHORT, source="a/b.py").self_contained is True
+    assert compress(LONG, source="a/b.py").self_contained is False
 
 
 def test_expanding_against_a_changed_source_is_refused_not_approximated():
@@ -246,6 +253,7 @@ def test_unit_identity_holds_no_clock_no_absolute_path_and_no_session():
         "content_digest",
         "authority",
         "compression",
+        "elided_span",
     }
     flat = repr(identity)
     assert "C:\\" not in flat and "/Users/" not in flat
@@ -334,7 +342,7 @@ def test_a_second_lookup_of_unchanged_content_is_a_hit():
     cache = ContextCache()
     unit = a_unit()
     cache.put(unit)
-    found = cache.lookup(unit.key(), unit.content_digest)
+    found = cache.lookup(unit.cache_key(), unit.content_digest)
     assert found.outcome is CacheOutcome.HIT
     assert found.unit is unit
     assert cache.stats.hits == 1
@@ -346,11 +354,11 @@ def test_a_changed_source_is_a_stale_rejection_and_evicts():
     cache = ContextCache()
     unit = a_unit()
     cache.put(unit)
-    moved = cache.lookup(unit.key(), content_digest(SHORT + "# edited\n"))
+    moved = cache.lookup(unit.cache_key(), content_digest(SHORT + "# edited\n"))
     assert moved.outcome is CacheOutcome.STALE
     assert moved.unit is None
     assert cache.stats.stale_rejections == 1
-    assert unit.key() not in cache
+    assert unit.cache_key() not in cache
 
 
 def test_a_non_hit_can_never_carry_a_unit():
@@ -374,7 +382,7 @@ def test_read_once_calls_the_loader_exactly_once_for_unchanged_content():
         calls.append(1)
         return a_unit()
 
-    key = a_unit().key()
+    key = a_unit().cache_key()
     digest = content_digest(SHORT)
     first, first_lookup = cache.read_once(key, digest, loader)
     second, second_lookup = cache.read_once(key, digest, loader)
@@ -399,7 +407,7 @@ def test_read_once_re_reads_when_the_source_moved():
         calls.append("b")
         return a_unit(text=edited)
 
-    key = a_unit().key()
+    key = a_unit().cache_key()
     cache.read_once(key, content_digest(SHORT), loader_a)
     unit, lookup = cache.read_once(key, content_digest(edited), loader_b)
     assert calls == ["a", "b"]
@@ -419,7 +427,7 @@ def test_read_once_refuses_a_loader_that_read_different_bytes():
     cache = ContextCache()
     with pytest.raises(LifecycleError, match="changed mid-read"):
         cache.read_once(
-            a_unit().key(), content_digest(SHORT + "x"), lambda: a_unit()
+            a_unit().cache_key(), content_digest(SHORT + "x"), lambda: a_unit()
         )
     assert len(cache) == 0
 
@@ -581,3 +589,142 @@ def test_the_ledger_fingerprint_ignores_insertion_order():
     one.extend(events)
     two.extend(reversed(events))
     assert one.fingerprint() == two.fingerprint()
+
+
+# --------------------------------------------------------------------------
+# From the independent review
+# --------------------------------------------------------------------------
+
+
+def test_lines_are_newline_delimited_and_nothing_else():
+    """Found by independent review. `str.splitlines()` also splits on form
+    feed, vertical tab, the separators, NEL and U+2028/9, so a file containing
+    any of them would be numbered differently here than by an editor, `sed -n`
+    or a pytest node id - and the line range in the marker is the whole reason
+    a compressed body is checkable rather than a summary."""
+    for exotic in ("\f", "\v", "\x1c", "\x1d", "\x1e", "\x85", "\u2028", "\u2029"):
+        text = "\n".join(
+            (f"page{exotic}break" if i == 30 else f"line {i}") for i in range(1, 80)
+        )
+        body = compress(text, source="a/b.py", threshold_chars=10)
+        assert body.full_lines == text.count("\n") + 1, repr(exotic)
+
+
+def test_head_and_tail_are_verbatim_slices_of_crlf_text():
+    crlf = "\r\n".join(f"line {i}" for i in range(1, 200))
+    body = compress(crlf, source="a/b.py")
+    assert crlf.startswith(body.head)
+    assert crlf.endswith(body.tail)
+    assert expand(body, crlf) == crlf
+
+
+def test_the_elided_span_names_real_line_numbers_of_a_real_file():
+    """Reconstruct this repository's own module from its marker."""
+    from pathlib import Path
+
+    relative = "company/integration/suites.py"
+    text = (Path(__file__).resolve().parents[1] / relative).read_text(encoding="utf-8")
+    body = compress(text, source=relative)
+    start, end = body.elided_span
+    lines = text.split("\n")
+    assert "\n".join([body.head] + lines[start - 1 : end] + [body.tail]) == text
+
+
+def test_a_stored_elision_does_not_answer_a_lookup_for_the_whole_file():
+    """Found by independent review. The two share a source and a digest, so
+    nothing was stale - the caller simply received less material than it asked
+    for, counted as a saving."""
+    whole = unit_from_source(
+        LONG,
+        kind=UnitKind.FILE,
+        source="a/b.py",
+        reason="the whole module",
+        authority=UnitAuthority.OBSERVED,
+        compress_over=10 ** 9,
+    )
+    elided = recompress(whole, threshold_chars=200)
+    assert whole.cache_key() != elided.cache_key()
+
+    cache = ContextCache()
+    cache.put(elided)
+    found = cache.lookup(whole.cache_key(), whole.content_digest)
+    assert found.outcome is CacheOutcome.MISS
+    assert found.unit is None
+
+
+def test_two_elisions_with_different_budgets_are_not_the_same_unit():
+    whole = unit_from_source(
+        LONG,
+        kind=UnitKind.FILE,
+        source="a/b.py",
+        reason="the whole module",
+        authority=UnitAuthority.OBSERVED,
+        compress_over=10 ** 9,
+    )
+    small = recompress(whole, threshold_chars=200)
+    from company.runtime.context_units import compress as _compress
+
+    wide = ContextUnit(
+        kind=whole.kind,
+        source=whole.source,
+        reason=whole.reason,
+        authority=whole.authority,
+        body=_compress(LONG, source="a/b.py", head_lines=40, tail_lines=10, threshold_chars=200),
+    )
+    assert small.body.elided_span != wide.body.elided_span
+    assert small.unit_id() != wide.unit_id()
+    assert small.cache_key() != wide.cache_key()
+
+
+def test_the_authority_refusal_survives_a_stale_eviction():
+    """Found by independent review. The guard lived only in the live entry, so
+    a stale eviction - exactly when a source is changing under the task -
+    cleared it along with the value."""
+    cache = ContextCache()
+    cache.put(a_unit(authority=UnitAuthority.OBSERVED))
+    key = a_unit().cache_key()
+    assert cache.lookup(key, content_digest("something else\n")).outcome is CacheOutcome.STALE
+    with pytest.raises(LifecycleError, match="may not change what a unit"):
+        cache.put(a_unit(authority=UnitAuthority.CONTRACT))
+
+
+def test_the_authority_refusal_survives_invalidate():
+    cache = ContextCache()
+    cache.put(a_unit(authority=UnitAuthority.OBSERVED))
+    assert cache.invalidate(a_unit().cache_key())
+    with pytest.raises(LifecycleError, match="may not change what a unit"):
+        cache.put(a_unit(authority=UnitAuthority.CONTRACT))
+
+
+def test_clear_forgets_the_remembered_authority_too():
+    """`clear()` is the one operation that means "this task is over"."""
+    cache = ContextCache()
+    cache.put(a_unit(authority=UnitAuthority.OBSERVED))
+    cache.clear()
+    cache.put(a_unit(authority=UnitAuthority.CONTRACT))
+    assert len(cache) == 1
+
+
+def test_a_caller_can_still_construct_a_contract_unit():
+    """The honest limit of the authority rule, stated as a test.
+
+    No code path *in this package* raises a unit's authority - not
+    `recompress`, not `ContextCache`, not `ContextBundle`. A caller that
+    constructs a `CONTRACT` unit directly, or reaches for
+    `dataclasses.replace`, is asserting authority itself, which is what
+    construction means. The guarantee is about the package, not about Python.
+    """
+    from dataclasses import replace
+
+    promoted = replace(a_unit(authority=UnitAuthority.DERIVED), authority=UnitAuthority.CONTRACT)
+    assert promoted.binding is True
+
+
+def test_the_ledger_names_the_field_that_differs():
+    """Found by independent review: excluding `duration_s` from the identity
+    buys a stable id, not a free retry, and the caller should be able to see
+    which it was."""
+    ledger = EvidenceLedger(attempt_id="wo-p6a-attempt-1")
+    ledger.add(an_event(duration_s=1.0))
+    with pytest.raises(LifecycleError, match="duration_s"):
+        ledger.add(an_event(duration_s=1.5))

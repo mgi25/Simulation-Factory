@@ -76,7 +76,9 @@ from tools.engineering_runner.config import RunnerConfig
 from tools.engineering_runner.errors import (
     AuthorityViolation,
     ClaimUnavailable,
+    ControlPlaneRefusal,
     IntegrityFailure,
+    RunnerError,
 )
 from tools.engineering_runner.evidence import (
     MAX_REF_CHARS,
@@ -3456,3 +3458,163 @@ def test_a_session_stopped_at_its_spend_ceiling_is_not_a_successful_session():
     assert outcome.stopped_reason == "error_max_budget_usd"
     assert outcome.cost_usd == pytest.approx(0.042285)
 
+
+# --------------------------------------------------------------------------
+# Asking the gate which suites it wants
+# --------------------------------------------------------------------------
+#
+# This package may not import - or even name - the capsule layer the gate
+# derives its required-suite set from, so the list has to come across the
+# command line. That makes the parsing of the gate's reply a boundary, and a
+# boundary with no tests is a boundary until somebody edits it. Every case
+# below asserts the same thing: anything short of a complete, resolved answer
+# refuses, rather than handing back a shorter list that would produce evidence
+# looking complete and not being it.
+
+
+class _ScriptedCommands:
+    """A CommandRunner that returns one canned result and records the argv."""
+
+    def __init__(self, **result):
+        from tools.engineering_runner.process import CommandResult
+
+        self.calls: list[tuple[str, ...]] = []
+        defaults = dict(
+            argv=("scripted",), cwd=".", exit_code=0, stdout="", stderr="",
+            duration_s=0.0, timed_out=False,
+        )
+        defaults.update(result)
+        self._result = CommandResult(**defaults)
+
+    def run(self, argv, **kwargs):
+        from tools.engineering_runner.process import CommandResult
+
+        self.calls.append(tuple(argv))
+        return CommandResult(
+            argv=tuple(argv),
+            cwd=str(kwargs.get("cwd", ".")),
+            exit_code=self._result.exit_code,
+            stdout=self._result.stdout,
+            stderr=self._result.stderr,
+            duration_s=0.0,
+            timed_out=self._result.timed_out,
+        )
+
+
+def _control_plane(tmp_path, **result):
+    from tools.engineering_runner.controlplane import ControlPlane
+
+    commands = _ScriptedCommands(**result)
+    plane = ControlPlane(
+        commands,
+        python_executable="python",
+        repo_root=tmp_path,
+        state_dir=tmp_path / "state",
+        timeout_s=30.0,
+    )
+    return plane, commands
+
+
+def _required_suites_json(suites, *, unresolved=()):
+    return json.dumps(
+        {
+            "requirements": [
+                {"suite": s, "origins": ["canonical"], "capsule_ids": []} for s in suites
+            ],
+            "unresolved": list(unresolved),
+            "fingerprint": "0123456789abcdef",
+        }
+    )
+
+
+def test_the_runner_asks_the_gate_for_its_required_suites(tmp_path):
+    plane, commands = _control_plane(
+        tmp_path, stdout=_required_suites_json(["tests/test_a.py", "tests/test_b.py"])
+    )
+    suites = plane.required_suites(gate_repo_root=tmp_path, timeout_s=5.0)
+    assert suites == ("tests/test_a.py", "tests/test_b.py")
+    argv = commands.calls[0]
+    assert "required-suites" in argv and "--json" in argv
+
+
+def test_changed_paths_are_passed_through_to_the_gate(tmp_path):
+    plane, commands = _control_plane(
+        tmp_path, stdout=_required_suites_json(["tests/test_a.py"])
+    )
+    plane.required_suites(
+        gate_repo_root=tmp_path, timeout_s=5.0, changed_paths=("a/b.py", "c/d.py")
+    )
+    argv = commands.calls[0]
+    assert argv.count("--changed-path") == 2
+    assert "a/b.py" in argv and "c/d.py" in argv
+
+
+@pytest.mark.parametrize(
+    "result",
+    [
+        pytest.param({"timed_out": True, "stdout": ""}, id="timeout"),
+        pytest.param(
+            {"timed_out": True, "exit_code": 0, "stdout": _required_suites_json(["tests/test_a.py"])},
+            id="timeout-with-good-output",
+        ),
+        pytest.param({"stdout": ""}, id="empty-stdout"),
+        pytest.param({"stdout": "   \n  "}, id="whitespace-stdout"),
+        pytest.param({"stdout": "not json at all"}, id="not-json"),
+        pytest.param({"stdout": '{"requirements": ['}, id="truncated-json"),
+        pytest.param({"stdout": "[]"}, id="json-array"),
+        pytest.param(
+            {"exit_code": 2, "stdout": _required_suites_json([], unresolved=["no capsules"])},
+            id="unresolved",
+        ),
+        pytest.param(
+            {"exit_code": 0, "stdout": _required_suites_json(["tests/test_a.py"], unresolved=["partial"])},
+            id="unresolved-but-exit-0",
+        ),
+        pytest.param({"exit_code": 1, "stdout": _required_suites_json(["tests/test_a.py"])}, id="nonzero-exit"),
+        pytest.param({"stdout": _required_suites_json([])}, id="no-suites"),
+        pytest.param(
+            {"stdout": json.dumps({"requirements": [{"origins": ["canonical"]}], "unresolved": []})},
+            id="requirement-without-a-suite",
+        ),
+    ],
+)
+def test_an_incomplete_gate_answer_is_refused_not_trimmed(tmp_path, result):
+    """RunnerError, not ControlPlaneRefusal specifically: malformed JSON comes
+    back as IntegrityFailure and a refused command as ControlPlaneRefusal.
+    Both are RunnerError, which is what preflight catches and what _gate_stage
+    lets propagate, so the property under test is that every one of these
+    refuses rather than returning a shorter list."""
+    plane, _ = _control_plane(tmp_path, **result)
+    with pytest.raises(RunnerError):
+        plane.required_suites(gate_repo_root=tmp_path, timeout_s=5.0)
+
+
+def test_a_resolved_answer_with_no_unresolved_key_is_accepted(tmp_path):
+    """`unresolved` absent and `unresolved: null` both mean "nothing unresolved"."""
+    for payload in (
+        json.dumps({"requirements": [{"suite": "tests/test_a.py"}]}),
+        json.dumps({"requirements": [{"suite": "tests/test_a.py"}], "unresolved": None}),
+    ):
+        plane, _ = _control_plane(tmp_path, stdout=payload)
+        assert plane.required_suites(gate_repo_root=tmp_path, timeout_s=5.0) == (
+            "tests/test_a.py",
+        )
+
+
+def test_preflight_records_the_error_rather_than_an_empty_answer(tmp_path):
+    """An empty list read as "nothing is required" is exactly the fail-open
+    this whole change exists to close, so preflight says what went wrong."""
+    from tools.engineering_runner.errors import ControlPlaneRefusal as _Refusal
+
+    class _Failing:
+        def required_suites(self, **kwargs):
+            raise _Refusal("required-suites", 2, "the store would not load")
+
+    checks = {}
+    try:
+        checks["required_suites"] = list(_Failing().required_suites())
+    except _Refusal as exc:
+        checks["required_suites"] = []
+        checks["required_suites_error"] = str(exc)
+    assert checks["required_suites"] == []
+    assert "would not load" in checks["required_suites_error"]

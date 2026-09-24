@@ -150,7 +150,7 @@ def measure(repo_root: Path) -> dict:
     reads = 0
     for relative in READ_SEQUENCE:
         text = _read(repo_root, relative)
-        key = _unit(repo_root, relative, compress_over=1200).key()
+        key = _unit(repo_root, relative, compress_over=1200).cache_key()
         digest = content_digest(text)
         before = cache.stats.loads
         cache.read_once(
@@ -161,7 +161,7 @@ def measure(repo_root: Path) -> dict:
     # What a changed source does: one file is edited mid-task.
     edited_key = _unit(
         repo_root, "company/integration/suites.py", compress_over=1200
-    ).key()
+    ).cache_key()
     stale = cache.lookup(edited_key, content_digest("# a different file\n"))
 
     # Cache stability: the same material, assembled differently, and the same
@@ -169,19 +169,45 @@ def measure(repo_root: Path) -> dict:
     reversed_bundle = ContextBundle(tuple(reversed(compressed.units)))
     reorder = cache_stability(compressed.render(), reversed_bundle.render())
 
-    appended = ContextBundle(
-        compressed.units
-        + (
-            unit_from_source(
-                "a later addition\n",
-                kind=UnitKind.EVIDENCE,
-                source="zzz/appended-last.txt",
-                reason="a unit added after the prefix was built",
-                authority=UnitAuthority.OBSERVED,
-            ),
+    # Three appends, not one. The first is the best case by construction and
+    # reporting only it would be a measurement chosen to flatter the design:
+    # an EVIDENCE unit is the last kind of the last-but-one authority, so it
+    # lands at the end and the whole previous render survives as the prefix.
+    # The other two are what a real task does - it acquires another module, or
+    # another capsule - and they cost the prefix from wherever they land.
+    # Any total order has this property; the order is chosen so the things
+    # that change most often are already at the bottom, not so that nothing
+    # ever lands in the middle.
+    def _appended(source: str, kind: UnitKind, authority: UnitAuthority):
+        return cache_stability(
+            compressed.render(),
+            ContextBundle(
+                compressed.units
+                + (
+                    unit_from_source(
+                        "a later addition\n",
+                        kind=kind,
+                        source=source,
+                        reason="a unit added after the prefix was built",
+                        authority=authority,
+                    ),
+                )
+            ).render(),
         )
-    )
-    growth = cache_stability(compressed.render(), appended.render())
+
+    growth = {
+        "evidence_sorts_last": _appended(
+            "zzz/appended-last.txt", UnitKind.EVIDENCE, UnitAuthority.OBSERVED
+        ).to_dict(),
+        "another_module_mid_order": _appended(
+            "company/runtime/aaa_new_module.py", UnitKind.FILE, UnitAuthority.OBSERVED
+        ).to_dict(),
+        "another_capsule_near_the_top": _appended(
+            "knowledge/company_os/capsules/seeds/aaa-new.json",
+            UnitKind.CAPSULE,
+            UnitAuthority.CONTRACT,
+        ).to_dict(),
+    }
 
     return {
         "repo_root": repo_root.name,
@@ -199,6 +225,11 @@ def measure(repo_root: Path) -> dict:
             ),
         },
         "read_once": {
+            "note": (
+                "reuse_ratio is hits/lookups, and there is one more lookup than "
+                "there are reads: the deliberate staleness probe below. It is "
+                "not 7/14."
+            ),
             "reads_requested": len(READ_SEQUENCE),
             "distinct_sources": len(set(READ_SEQUENCE)),
             "loader_calls": reads,
@@ -216,7 +247,12 @@ def measure(repo_root: Path) -> dict:
         },
         "cache_stability": {
             "reassembled_in_reverse": reorder.to_dict(),
-            "one_unit_appended": growth.to_dict(),
+            "one_unit_appended": growth,
+            "note": (
+                "A provider cache reuses a prefix. Appending is only free when "
+                "the new unit sorts last; a unit that lands mid-order costs the "
+                "prefix from that point on, and no total order avoids that."
+            ),
         },
         "not_measured": [
             "provider token counts (input, output, cache creation, cache read)",

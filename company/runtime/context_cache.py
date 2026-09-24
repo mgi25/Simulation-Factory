@@ -10,10 +10,15 @@ can be handed back instead of read again.
 The tempting cache is keyed by path and invalidated by a timestamp. That cache
 is wrong on exactly the runs that matter: a file rewritten within the same
 second, a worktree switched under a session, a `git checkout` that restores an
-mtime. So the key is `(kind, source, symbol, span)` and the *validator* is the
-content digest of the source. A caller must supply the digest it observed now;
-if it differs from the stored one, the entry is evicted and the answer is a
-miss.
+mtime. So the key is `ContextUnit.cache_key()` - kind, source, symbol, span
+**and which representation of it this is** - and the *validator* is the content
+digest of the source. A caller must supply the digest it observed now; if it
+differs from the stored one, the entry is evicted and the answer is a miss.
+
+Representation belongs in the key because a whole file and an elision of that
+file share a source and a digest. Keying on the bundle slot alone let a stored
+elision answer a lookup for the whole file: nothing was stale, and the caller
+simply got less material than it asked for, counted as a saving.
 
 **A cache miss is preferable to stale evidence.** Everything here is arranged
 so that the failure mode is "read it again" rather than "answer from something
@@ -133,17 +138,31 @@ class ContextCache:
     cross-session store whose invalidation nobody owns.
     """
 
-    entries: dict[str, ContextUnit] = field(default_factory=dict)
+    _entries: dict[str, ContextUnit] = field(default_factory=dict)
+    # What each key was *first* stored as. Kept past eviction on purpose: the
+    # authority refusal below used to live only in the live entry, so a stale
+    # eviction - exactly the moment a source is changing under the task - or an
+    # `invalidate()` cleared the guard along with the value, and the key could
+    # then come back at a higher authority. Authority is a property of the
+    # thing, not of whether we happen to be holding a copy of it.
+    _authority: dict[str, str] = field(default_factory=dict)
     stats: CacheStats = field(default_factory=CacheStats)
 
     def __len__(self) -> int:
-        return len(self.entries)
+        return len(self._entries)
 
     def __contains__(self, key: object) -> bool:
-        return key in self.entries
+        return key in self._entries
+
+    def keys(self) -> tuple[str, ...]:
+        return tuple(sorted(self._entries))
 
     def lookup(self, key: str, observed_digest: str) -> CacheLookup:
         """Ask for a unit, proving what the source says *now*.
+
+        `key` is a `ContextUnit.cache_key()`, so a lookup asks for one
+        *representation* of a source rather than for whatever form of it
+        happens to be held.
 
         `observed_digest` is not optional and has no default. A caller that
         could omit it would be asking the cache to guess, and the guess would
@@ -156,12 +175,12 @@ class ContextCache:
                 f"{key}: a lookup must carry the full SHA-256 of the source as it "
                 "is now; without it the cache cannot tell reuse from staleness"
             )
-        stored = self.entries.get(key)
+        stored = self._entries.get(key)
         if stored is None:
             self.stats.misses += 1
             return CacheLookup(key=key, outcome=CacheOutcome.MISS, detail="not cached")
         if stored.content_digest != observed_digest:
-            del self.entries[key]
+            del self._entries[key]
             self.stats.stale_rejections += 1
             return CacheLookup(
                 key=key,
@@ -183,19 +202,26 @@ class ContextCache:
         Replacing a `contract` unit with an `observed` one at the same key -
         or the reverse - would let the cache decide what binds the session.
         It does not. Re-storing under a different authority is a programming
-        error, and is raised as one.
+        error, and is raised as one, whether or not the entry is still held:
+        the remembered authority survives eviction and `invalidate()`, and only
+        `clear()` forgets it.
+
+        The key is `cache_key()`, not `key()`: a whole file and an elision of
+        it are two representations of one source and must not answer for each
+        other.
         """
         if not isinstance(unit, ContextUnit):
             raise LifecycleError("a context cache stores ContextUnit values")
-        key = unit.key()
-        stored = self.entries.get(key)
-        if stored is not None and stored.authority is not unit.authority:
+        key = unit.cache_key()
+        seen = self._authority.get(key)
+        if seen is not None and seen != unit.authority.value:
             raise LifecycleError(
-                f"{key}: cached as {stored.authority.value} and re-stored as "
+                f"{key}: cached as {seen} and re-stored as "
                 f"{unit.authority.value}. Reuse may not change what a unit is "
                 "allowed to decide."
             )
-        self.entries[key] = unit
+        self._entries[key] = unit
+        self._authority[key] = unit.authority.value
         self.stats.stores += 1
         return unit
 
@@ -215,11 +241,11 @@ class ContextCache:
             return found.unit, found
         unit = loader()
         self.stats.loads += 1
-        if unit.key() != key:
+        if unit.cache_key() != key:
             raise LifecycleError(
                 f"read_once was asked for {key!r} and the loader returned "
-                f"{unit.key()!r}; a cache that stores one thing under another "
-                "thing's name is worse than no cache"
+                f"{unit.cache_key()!r}; a cache that stores one thing under "
+                "another thing's name is worse than no cache"
             )
         if unit.content_digest != observed_digest:
             raise LifecycleError(
@@ -232,14 +258,17 @@ class ContextCache:
         return unit, found
 
     def invalidate(self, key: str) -> bool:
-        return self.entries.pop(key, None) is not None
+        """Drop a cached value. The key's authority is remembered regardless."""
+        return self._entries.pop(key, None) is not None
 
     def clear(self) -> None:
-        self.entries.clear()
+        """Forget everything, including what each key was allowed to decide."""
+        self._entries.clear()
+        self._authority.clear()
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "entries": sorted(self.entries),
+            "entries": list(self.keys()),
             "stats": self.stats.to_dict(),
         }
 

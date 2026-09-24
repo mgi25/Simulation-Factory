@@ -958,16 +958,16 @@ def _required_suites(inputs, scan, index, config) -> GateCheck:
     requirement = (
         f"Every suite required by the Company OS contract for this change "
         f"({len(names)} on this checkout: the {len(REQUIRED_SUITES)} canonical "
-        "subsystem suites plus the tests declared by the active capsules the "
-        "change touches) is reported passing, on evidence no older than the "
-        "freshness window."
+        "subsystem suites plus the tests declared by every capsule contract in "
+        "force, plus anything the change scope reaches) is reported passing, on "
+        "evidence that was observed, and is no older than the freshness window."
     )
     evidence = inputs.suites
     provenance = (
         f"required-set {required.fingerprint()} "
         f"({len(required.by_origin(SuiteOrigin.CANONICAL))} canonical, "
-        f"{len(required.by_origin(SuiteOrigin.ACTIVE_CAPSULE))} declared by an "
-        f"active capsule, "
+        f"{len(required.by_origin(SuiteOrigin.CAPSULE_CONTRACT))} declared by a "
+        f"capsule contract in force, "
         f"{len(required.by_origin(SuiteOrigin.CHANGE_SCOPE))} in change scope)"
     )
 
@@ -989,7 +989,30 @@ def _required_suites(inputs, scan, index, config) -> GateCheck:
             evidence_as_of=inputs.as_of,
         )
 
-    missing = evidence.missing(names)
+    # A result can be present, green and still not be evidence. Two ways, both
+    # pre-existing in the supplied-evidence schema and both made broader by a
+    # broader required set, so they are handled here rather than left:
+    #
+    #   selected == 0 - pytest collected nothing. A run that selected no tests
+    #   proves nothing about the suite, and "0 failed" is true of it.
+    #   observed_on in the future - staleness is `as_of - observed_on`, so a
+    #   future date makes the age negative and the freshness window
+    #   unreachable. Evidence from after the run is not evidence.
+    #
+    # Both are treated as missing rather than failing: nobody has shown the
+    # gate this suite, which is exactly what `missing` means.
+    unobserved = tuple(
+        sorted(
+            item.suite
+            for item in evidence.results
+            if item.suite in required
+            and (
+                (item.passed and item.selected == 0)
+                or item.observed_on > inputs.as_of
+            )
+        )
+    )
+    missing = tuple(sorted(set(evidence.missing(names)) | set(unobserved)))
     if missing:
         return _check(
             "health.required_suites_pass",
@@ -1000,7 +1023,12 @@ def _required_suites(inputs, scan, index, config) -> GateCheck:
             f"{provenance}",
             EvidenceKind.SUPPLIED,
             missing_evidence=tuple(
-                f"no reported run for {suite} ({required.get(suite).reason()})"
+                (
+                    f"{suite} was reported but not observed "
+                    f"({_unobserved_reason(evidence, suite, inputs.as_of)})"
+                    if suite in unobserved
+                    else f"no reported run for {suite} ({required.get(suite).reason()})"
+                )
                 for suite in missing[:8]
             ),
             remediation=(
@@ -1049,9 +1077,9 @@ def _required_suites(inputs, scan, index, config) -> GateCheck:
             evidence=tuple(item.suite for item in unclaimed[:_MAX_NAMED_FINDINGS]),
             blocker_reason=(
                 f"{len(unclaimed)} supplied Company OS suite(s) are reported failing. "
-                "No capsule declares them, so no contract required them - but the "
-                "reporter marked them Company OS and red, and a gate that drops a "
-                "red result it was handed is not reading its evidence."
+                "No contract in force required them - but the reporter marked "
+                "them Company OS and red, and a gate that drops a red result it "
+                "was handed is not reading its evidence."
             ),
             remediation=(
                 "Fix the suite, or mark the result company_os=false if it is a "
@@ -1092,6 +1120,15 @@ def _required_suites(inputs, scan, index, config) -> GateCheck:
         evidence=tuple(item.suite for item in reported[:_MAX_NAMED_FINDINGS]),
         evidence_as_of=min(item.observed_on for item in reported),
     )
+
+
+def _unobserved_reason(evidence: SuiteEvidence, suite: str, as_of: dt.date) -> str:
+    item = evidence.get(suite)
+    if item is None:  # pragma: no cover - only reached via `unobserved`
+        return "no result"
+    if item.observed_on > as_of:
+        return f"observed_on {item.observed_on.isoformat()} is after the run date"
+    return "0 tests selected, so the run proves nothing about the suite"
 
 
 def _production_failures_separated(inputs, scan, index, config) -> GateCheck:

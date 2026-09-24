@@ -44,10 +44,17 @@ sources that each answer a different question:
   own checks depend on. A floor. It is still written down because some of it
   (`tests/test_company_execution_transport.py`) is required by the gate and
   declared by no capsule.
-* **active capsules** (`capsule.tests`) - the tests the Company OS contract
+* **capsules in force** (`capsule.tests`) - the tests the Company OS contract
   itself names. A capsule is the authoritative description of a subsystem; if
-  it says a suite covers it, that suite is evidence the gate needs. Only
-  `status == active` capsules contribute: a retired contract is not in force.
+  it says a suite covers it, that suite is evidence the gate needs.
+
+  "In force" is `active` **and `needs_revalidation`**, and the second one is
+  not an oversight. `flag_capsule_for_revalidation()` is a supported operation;
+  if it removed a capsule's suites from the required set, flagging a capsule
+  would be a way to make the gate stop asking about exactly the subsystem
+  somebody has just said they no longer trust. A contract under suspicion is
+  still the contract. Only `superseded` and `retired` stop contributing, and
+  change scope can still pull those back.
 * **change scope** (`changed_paths`) - the suites a particular change reaches,
   including ones declared by a capsule that is *not* active, and Company OS
   test files the change edits directly.
@@ -60,10 +67,28 @@ dial on it.
 ## Why an underivable set is not an empty set
 
 `RequiredSuites.unresolved` names every reason the set could not be fully
-determined - a capsule index that would not load, most of all. It is not a
-warning. `health.required_suites_pass` answers `unknown` while it is non-empty,
-because "I could not work out what evidence I need" and "I have all the
-evidence I need" must never produce the same verdict.
+determined. It is not a warning. `health.required_suites_pass` answers
+`unknown` while it is non-empty, because "I could not work out what evidence I
+need" and "I have all the evidence I need" must never produce the same verdict.
+
+Four things put an entry there, and the last two were found by review rather
+than by design:
+
+1. the capsule index would not load at all (`None`);
+2. it loaded and holds no capsules - in a Company OS checkout that is a
+   directory that was not found, pointed at the wrong place, or emptied, never
+   a repository that genuinely declares no tests;
+3. it loaded **partially**. The same argument as (2) applies with identical
+   force to a store that lost half its files, and stopping at zero left that
+   open. `CapsuleIndex.integrity()` with no store and no checkout reports
+   dangling dependencies and duplicate path claims from the capsules' own
+   declarations alone - a partial store almost always has a capsule depending
+   on one that is no longer there - so a structurally broken index is refused
+   rather than believed;
+4. a capsule named something in `tests` that is not a usable suite path - a
+   glob, a path outside `tests/`, something that is not a `.py` file. Dropping
+   those silently would let one legal-looking capsule edit remove a suite from
+   the required set with nothing to show for it.
 """
 
 from __future__ import annotations
@@ -260,7 +285,7 @@ class SuiteOrigin(Enum):
     """Why a suite is required. A reader disputing the set disputes an origin."""
 
     CANONICAL = "canonical"
-    ACTIVE_CAPSULE = "active_capsule"
+    CAPSULE_CONTRACT = "capsule_contract"
     CHANGE_SCOPE = "change_scope"
 
 
@@ -269,8 +294,8 @@ class SuiteRequirement:
     """One required suite and the full reason it is required.
 
     `origins` is a tuple rather than a single value because a suite is very
-    often required twice over - canonical *and* declared by an active capsule -
-    and dropping one of the two reasons would make the set look more fragile
+    often required twice over - canonical *and* declared by a capsule contract
+    - and dropping one of the two reasons would make the set look more fragile
     than it is.
     """
 
@@ -374,6 +399,16 @@ class RequiredSuites:
         return to_jsonable(self)
 
 
+# Which capsule lifecycle states still bind. See the module docstring: a
+# capsule flagged for revalidation is under suspicion, which is the last moment
+# you would want to stop running its tests.
+_IN_FORCE: frozenset[RecordStatus] = frozenset(
+    {RecordStatus.ACTIVE, RecordStatus.NEEDS_REVALIDATION}
+)
+
+_GLOB_CHARS = ("*", "?", "[")
+
+
 def _suite_path(reference: str) -> str:
     """The test *file* a capsule reference names, or "" when it names none.
 
@@ -381,10 +416,14 @@ def _suite_path(reference: str) -> str:
     per file, so the node id is dropped. Anything that is not a `.py` file
     under `tests/` is not a suite and is ignored rather than guessed at.
     """
+    if any(char in reference for char in _GLOB_CHARS):
+        return ""
     cleaned = normalise_path(reference)
     if not cleaned.endswith(".py"):
         return ""
     if not cleaned.startswith(TEST_ROOT + "/"):
+        return ""
+    if "/./" in cleaned or "/../" in cleaned:
         return ""
     return cleaned
 
@@ -406,10 +445,11 @@ def resolve_required_suites(
     The same index and the same paths always give the same set, which is what
     lets the result be fingerprinted into a report.
 
-    `index` is `None` when the caller could not load the capsule store, and an
-    *empty* index means the same thing in practice. Neither is treated as "no
-    capsules declare anything": the canonical floor is still returned, and
-    `unresolved` says the contract-declared part is unknown, which keeps
+    `index` is `None` when the caller could not load the capsule store; an
+    *empty* index and a *structurally broken* one mean the same thing in
+    practice. None of the three is treated as "no capsules declare anything":
+    the canonical floor is still returned, and `unresolved` says the
+    contract-declared part is unknown, which keeps
     `health.required_suites_pass` at `unknown`.
     """
     origins: dict[str, list[SuiteOrigin]] = {}
@@ -447,21 +487,36 @@ def resolve_required_suites(
             "Company OS contract are unknown; only the canonical floor is required"
         )
     else:
+        # Structural integrity only: no knowledge store, no checkout, so this
+        # stays a pure function of the index. A partial store shows up here as
+        # a capsule depending on one that is no longer present.
+        broken = index.integrity()
+        if broken:
+            unresolved.append(
+                f"the capsule store is structurally incomplete ({len(broken)} "
+                f"problem(s), first: {broken[0]}), so what the Company OS "
+                "contract requires cannot be read off it"
+            )
         for capsule in index.all():
-            active = capsule.status is RecordStatus.ACTIVE
+            in_force = capsule.status in _IN_FORCE
             in_scope = bool(changed) and any(
                 path_related(owned, path)
                 for owned in capsule.owns_paths
                 for path in changed
             )
-            if not active and not in_scope:
+            if not in_force and not in_scope:
                 continue
             for reference in capsule.tests:
                 suite = _suite_path(reference)
                 if not suite:
+                    unresolved.append(
+                        f"{capsule.id}.tests names {reference!r}, which is not a "
+                        "suite this gate can ask for evidence about; whatever it "
+                        "covers is therefore unrequired"
+                    )
                     continue
-                if active:
-                    require(suite, SuiteOrigin.ACTIVE_CAPSULE, capsule.id)
+                if in_force:
+                    require(suite, SuiteOrigin.CAPSULE_CONTRACT, capsule.id)
                 if in_scope:
                     require(suite, SuiteOrigin.CHANGE_SCOPE, capsule.id)
 

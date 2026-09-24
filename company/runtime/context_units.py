@@ -146,6 +146,23 @@ _KIND_ORDER: dict[UnitKind, int] = {
 }
 
 
+def _lines(text: str) -> list[str]:
+    """Split on newlines, and on nothing else.
+
+    `str.splitlines()` also splits on form feed, vertical tab, the file/group/
+    record separators, NEL and the Unicode line/paragraph separators. A source
+    file containing any of those would then be numbered differently here than
+    by an editor, `sed -n`, a pytest node id or a GitHub permalink - and the
+    line range in the elision marker is the entire reason a compressed body is
+    checkable rather than a summary. A pointer a reader cannot follow is worse
+    than no pointer.
+
+    Splitting on "\n" alone also leaves a "\r" at the end of each line of CRLF
+    text, so the head and tail stay verbatim slices of the original.
+    """
+    return text.split("\n")
+
+
 def content_digest(text: str) -> str:
     """The canonical digest of source text: full SHA-256 over its UTF-8 bytes.
 
@@ -201,9 +218,18 @@ class CompressedBody:
                 )
 
     @property
-    def reversible(self) -> bool:
-        """Always true: every kind here reconstructs exactly from the source."""
-        return True
+    def self_contained(self) -> bool:
+        """True when the body is whole and needs no source to be read.
+
+        The honest distinction, and it is falsifiable. An `ELIDED` body is
+        *restorable*, not self-contained: `expand()` needs the canonical bytes
+        and verifies them against `full_digest` rather than inventing the
+        middle. For a repository file at a known commit those bytes can always
+        be fetched again; for a synthesised repo map or a transient blob they
+        may not be, and then the elided middle is gone for good. Compress
+        those with a threshold that declines, or not at all.
+        """
+        return self.kind is CompressionKind.NONE
 
     @property
     def elided_lines(self) -> int:
@@ -266,7 +292,7 @@ def compress(
             "summary, and a summary cannot be checked"
         )
 
-    lines = text.splitlines()
+    lines = _lines(text)
     digest = content_digest(text)
     whole = CompressedBody(
         source=source,
@@ -283,6 +309,7 @@ def compress(
 
     head = "\n".join(lines[:head_lines])
     tail = "\n".join(lines[len(lines) - tail_lines :]) if tail_lines else ""
+    assert text.startswith(head), "the head must be a verbatim slice"
     elided = CompressedBody(
         source=source,
         kind=CompressionKind.ELIDED,
@@ -385,6 +412,12 @@ class ContextUnit:
             "content_digest": self.content_digest,
             "authority": self.authority.value,
             "compression": self.body.kind.value,
+            # The span too, not only the kind: two elisions of one file made
+            # with different head/tail budgets are different material and must
+            # not share an id.
+            "elided_span": (
+                list(self.body.elided_span) if self.body.elided_span else None
+            ),
         }
 
     def unit_id(self) -> str:
@@ -395,6 +428,23 @@ class ContextUnit:
         span = f"#{self.span[0]}-{self.span[1]}" if self.span else ""
         symbol = f"::{self.symbol}" if self.symbol else ""
         return f"{self.kind.value}:{self.source}{symbol}{span}"
+
+    def cache_key(self) -> str:
+        """Where this unit lives in a cache, including *which form of it*.
+
+        `key()` is the unit's slot in a bundle - one unit per source and span.
+        A cache key must say more. A whole file and an elision of that same
+        file share a slot and a content digest, so keying the cache on `key()`
+        let a `put` of the elided form answer a later lookup for the whole
+        file: digest matched, nothing was stale, and the caller quietly
+        received less material than it asked for. Representation is part of
+        cache identity, which is what `identity()` said all along.
+        """
+        form = self.body.kind.value
+        if self.body.elided_span is not None:
+            start, end = self.body.elided_span
+            form = f"{form}:{start}-{end}"
+        return f"{self.key()}@{form}"
 
     def order_key(self) -> tuple[int, int, str]:
         """Where this unit sits in a bundle: most stable material first.

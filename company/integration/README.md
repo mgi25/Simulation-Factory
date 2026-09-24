@@ -132,7 +132,7 @@ sources:
 | Origin | What it means |
 |---|---|
 | `canonical` | `REQUIRED_SUITES` - the subsystems the gate's own checks depend on. A floor. |
-| `active_capsule` | a suite named in `capsule.tests` of an `active` capsule. The contract asked for it. |
+| `capsule_contract` | a suite named in `capsule.tests` of a capsule **in force** - `active` or `needs_revalidation`. The contract asked for it. A capsule under suspicion is the last one whose tests you would stop running; only `superseded` and `retired` drop out. |
 | `change_scope` | a suite reached by `--changed-path`: a capsule whose owned paths the change touches, or a Company OS test file the change edits. |
 
 `REQUIRED_SUITES` was once the whole answer, and that was a fail-open hole: on
@@ -145,11 +145,19 @@ the hole.
 gate ask for less, because a gate that gets cheaper when you describe the
 change less fully is a gate with a dial on it.
 
-**An underivable set is not an empty set.** If the capsule store cannot be read
-- or holds no capsules, which in a Company OS checkout means the same thing -
-the command exits 2, prints `UNRESOLVED`, and `health.required_suites_pass`
-answers `unknown`. "I could not work out what evidence I need" and "I have all
-the evidence I need" must never produce the same verdict.
+**An underivable set is not an empty set.** Four things leave it unresolved: a
+capsule store that cannot be read; one that holds no capsules; one that is
+*structurally incomplete* (`integrity()` reports a capsule depending on one
+that is no longer there, which is what a half-copied store looks like); and a
+capsule naming something in `tests` that is not a suite path, such as a glob.
+In every case the command exits 2, prints `UNRESOLVED`, and
+`health.required_suites_pass` answers `unknown`. "I could not work out what
+evidence I need" and "I have all the evidence I need" must never produce the
+same verdict.
+
+**Present and green is not observed.** A required result with `selected: 0`, or
+an `observed_on` after the run date, is reported as *missing* rather than
+counted as a pass.
 
 ## Freshness
 

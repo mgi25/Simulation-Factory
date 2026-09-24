@@ -59,28 +59,38 @@ The required set is **derived on every run** by
 | Origin | Question it answers |
 |---|---|
 | `canonical` | which subsystems do the gate's own checks depend on? A floor. |
-| `active_capsule` | which suites does the Company OS contract itself name? Every `tests/` entry of every `status == active` capsule. |
+| `capsule_contract` | which suites does the Company OS contract itself name? Every `tests/` entry of every capsule **in force** — `active` *or* `needs_revalidation`. |
 | `change_scope` | which suites does *this* change reach? Capsules whose owned paths it touches (whatever their status), and Company OS test files it edits. |
 
 On this checkout that is **32 suites**, not 11.
 
-Four properties, each with a test:
+`needs_revalidation` counts, and that is not an oversight — it is
+[B1](#what-the-independent-review-found) below.
+
+Five properties, each with a test:
 
 1. **Scope only widens.** There is no input that makes the gate ask for less.
    A gate that gets cheaper when you describe the change less fully is a gate
    with a dial on it. `test_change_scope_never_shrinks_the_set`.
 2. **An underivable set is not an empty set.** `RequiredSuites.unresolved`
    names every reason the set could not be determined, and
-   `health.required_suites_pass` answers `unknown` while it is non-empty.
-   A capsule store that will not load *and an empty one* both count — in a
-   Company OS checkout they are the same fact.
+   `health.required_suites_pass` answers `unknown` while it is non-empty. Four
+   things put an entry there: an index that would not load, an **empty** one,
+   a **structurally incomplete** one, and a capsule naming something in
+   `tests` that is not a suite path.
 3. **Supplied red evidence is never discarded.** A result the caller marked
    `company_os: true` and reported failing blocks even when no contract named
    that suite.
-4. **The gate still runs nothing.** The resolver imports no `subprocess`, no
+4. **Present and green is not the same as observed.** A required result with
+   `selected == 0` (pytest collected nothing) or an `observed_on` in the
+   future (which makes the freshness window unreachable) is treated as
+   *missing*, not as a pass.
+5. **The gate still runs nothing.** The resolver imports no `subprocess`, no
    `os`, no `pytest`; `test_deriving_the_set_spawns_no_process` parses the
    module and checks its import roots (a text grep finds the word
    `subprocess` in the module's own docstring explaining why it is absent).
+   One filesystem read exists in the module — `undeclared_company_os_suites`,
+   below — and it is reached only from the CLI, never from a check.
 
 ### Regression coverage
 
@@ -93,6 +103,50 @@ are edited:
   and the blocker names both the suite and the capsule that required it;
 * `test_a_capsule_declared_suite_with_no_evidence_is_unknown_not_pass` — the
   other half: silence must not read as green.
+
+### What the independent review found
+
+A separate reviewer session went at this looking for exactly the failure this
+work exists to prevent, and found **two reproduced ways** the gate could still
+say PASS while a relevant suite was missing. Both are fixed, both have a
+regression test naming the review.
+
+**B1 — flagging a capsule for revalidation removed its suites.** The resolver
+took `status is ACTIVE`, and `RecordStatus` also has `needs_revalidation`,
+which `flag_capsule_for_revalidation()` sets. Reproduced: flagging
+`company-executive-delegation` dropped `tests/test_company_delegation.py` from
+the required set with no `unresolved` entry, and the gate then said READY.
+
+That is the P5 defect again, reached through the lifecycle instead of a static
+list — and in one respect worse than the behaviour it replaced, because the
+old list could not shrink at all. The original argument ("a retired contract
+is not in force") is sound for `retired` and `superseded` and **backwards** for
+`needs_revalidation`: a capsule whose description of a subsystem is under
+suspicion is precisely the one whose tests you still want run. `_IN_FORCE` is
+now `{active, needs_revalidation}`, and `SuiteOrigin.ACTIVE_CAPSULE` was
+renamed `CAPSULE_CONTRACT` because the old name had become a lie.
+
+**B2 — a partially loaded capsule store was accepted as complete.** Only
+`len(index) == 0` produced an `unresolved` entry. Reproduced: a directory
+holding 1 of the 22 seeds resolved cleanly, the set fell 32 → 14, and 14 green
+results gave PASS. The argument against an empty store applies with identical
+force to one that lost half its files. `CapsuleIndex.integrity()` — called with
+no knowledge store and no checkout, so the resolver stays pure — reports
+dangling dependencies from the capsules' own declarations, and a partial store
+almost always has one. It now contributes an `unresolved` entry.
+
+Also fixed from the same review, each with a test: a stored *elision* could
+answer a cache lookup for the *whole* file (`cache_key()` now carries the
+representation); the authority refusal was cleared by a stale eviction or
+`invalidate()` (authority is now remembered past both); `compress()` used
+`str.splitlines()`, which also splits on form feed, NEL and U+2028/9, so a file
+containing any of them got line numbers no editor would agree with — and the
+line range is the entire reason an elision is checkable rather than a summary.
+
+The reviewer also confirmed clean: no stale-cache path, 45-input compression
+round trip, 21 change-scope shapes all widening, `missing`/`failing`/`stale`
+all receiving the derived names, and `measurements.json` reproducing byte for
+byte.
 
 ### What the derivation exposed: 11 undeclared Company OS suites
 
@@ -155,8 +209,13 @@ matches (`test_company_external_engineering_runner.py::...`).
 attempt produces, with a **re-derivable** `record_id`.
 
 * `record_id` is a fingerprint over the record's semantic fields, so
-  re-deriving the same observation gives the same id — a retry or a re-export
-  is idempotent rather than doubling the evidence.
+  re-deriving the same observation gives the same id. **Re-exporting a stored
+  record is therefore idempotent; re-*running* an observation is not** — the
+  second run measures a new `duration_s`, the bodies differ, and `add` refuses
+  and names the field. That is deliberate (accepting it would mean silently
+  keeping one of two measurements), but it means excluding `duration_s` from
+  `identity()` buys a stable **id**, not a free retry. A retry that re-measures
+  is a new observation and takes the next `sequence`.
 * `sequence` is *inside* the identity, so two genuinely distinct events that
   describe the same thing (one suite run before the fix and one after) stay two
   records instead of collapsing into one.
@@ -183,8 +242,16 @@ stable per-event id. It does **not** migrate the existing records — see
 **Learning must not create authority.** `UnitAuthority` is `CONTRACT`,
 `OBSERVED` or `DERIVED`. `binding` is a *property* (`authority is CONTRACT`),
 never a settable flag; `recompress` carries authority through and asserts it;
-`ContextCache.put` refuses to re-store a key under a different authority. There
-is no call anywhere in the package that raises a unit's authority.
+`ContextCache.put` refuses to re-store a key under a different authority, and
+that refusal now survives eviction and `invalidate()` — only `clear()`, which
+means "this task is over", forgets it.
+
+The honest limit, stated because the review asked for it: **no code path in
+this package raises a unit's authority.** A caller that constructs a `CONTRACT`
+unit directly, or reaches for `dataclasses.replace`, is asserting authority
+itself, which is what construction means. The guarantee is about the package,
+not about Python, and `test_a_caller_can_still_construct_a_contract_unit`
+records that rather than implying otherwise.
 
 **Identity holds nothing incidental.** `ContextUnit.identity()` is exactly
 `{version, kind, source, span, symbol, content_digest, authority, compression}`
@@ -194,14 +261,29 @@ field set, not a sample.
 
 **Reversible compression.** `compress()` keeps a verbatim head and tail and
 names the exact line range it elided, with the full SHA-256 of the original.
-`expand()` reconstructs from the canonical source and **raises** if that source
-has changed. Compression that would not actually save bytes declines and
-returns the whole body. A compression that would keep no verbatim anchor is
-refused outright — an elision with no anchor is a summary, and a summary cannot
-be checked.
+Lines are split on `"\n"` and nothing else, so the range is the number an
+editor, `sed -n` or a pytest node id would give, and CRLF text keeps its `\r`
+inside the verbatim slices.
 
-**Read-once reuse.** `ContextCache` is keyed by `(kind, source, symbol, span)`
-and validated by content digest. `lookup` requires the digest the caller
+`expand(body, canonical_text)` **verifies** rather than reconstructs: it checks
+the supplied bytes against `full_digest` and returns them, raising if they have
+changed. The caller must be able to fetch the source again. For a repository
+file at a known commit it always can; for a synthesised repo map or a transient
+blob it may not, and `CompressedBody.self_contained` is the property that says
+which is which (`True` only for an uncompressed body). Compress the second kind
+with a threshold that declines, or not at all.
+
+Compression that would not actually save bytes declines and returns the whole
+body. A compression that would keep no verbatim anchor is refused outright — an
+elision with no anchor is a summary, and a summary cannot be checked.
+
+**Read-once reuse.** `ContextCache` is keyed by `ContextUnit.cache_key()` —
+kind, source, symbol, span *and which representation of it this is* — and
+validated by content digest. Representation is in the key because a whole file
+and an elision of it share a source and a digest, so keying on the bundle slot
+alone let a stored elision answer a lookup for the whole file: nothing was
+stale, and the caller simply got less material than it asked for, counted as a
+saving. `lookup` requires the digest the caller
 observed *now*; a mismatch evicts the entry and returns `STALE` with no unit
 attached — `CacheLookup` refuses at construction to carry a unit on a non-hit.
 `misses` and `stale_rejections` are counted separately because they mean
@@ -221,15 +303,18 @@ the repeats a session actually makes.
 
 | Measurement | Value |
 |---|---|
-| bundle chars, nothing compressed | 118,890 |
-| bundle chars, compressed | 8,054 |
-| reduction in chars supplied up front | 93.2% |
+| bundle chars, nothing compressed | 144,781 |
+| bundle chars, compressed | 7,981 |
+| reduction in chars supplied up front | 94.5% |
 | reads requested / distinct sources | 14 / 7 |
 | loader calls | 7 |
-| reads avoided by reuse | 7 (reuse ratio 0.467) |
+| reads avoided by reuse | 7 |
+| reuse ratio | 0.467 — hits over *lookups*, and there is one more lookup than there are reads (the deliberate staleness probe). Not 7/14. |
 | stale rejections after one source was edited | 1, no unit returned |
 | prefix reuse, same units assembled in reverse | 1.000 (byte-identical) |
-| prefix reuse, one unit appended | 0.981 (whole previous render is the prefix) |
+| prefix reuse, appending an evidence unit (sorts last) | 0.981 — the whole previous render is the prefix |
+| prefix reuse, appending another module (mid-order) | **0.325** |
+| prefix reuse, appending another capsule (near the top) | **0.008** |
 
 **What the 93.2% is and is not.** It is the reduction in characters *supplied
 up front*. It is not a reduction in what a session ends up reading: an elided
@@ -245,6 +330,16 @@ bundle now orders by a declared rank — authority (contracts first, derived
 last), then kind, then key — and the same append keeps the entire previous
 render as its prefix. This is the whole reason the brief said *measure* cache
 stability rather than assume it; assuming it would have shipped the 19.4%.
+
+**And the last three rows are why one append number would have been dishonest.**
+The 0.981 case is the *best* case by construction: an evidence unit is the last
+kind, so it lands at the end. The independent review pointed this out, so the
+harness now also measures what a real task does — acquire another module
+(0.325) or another capsule (0.008). **Any total order loses the prefix when a
+unit lands before the end.** The declared order does not prevent that; it
+chooses *which* additions are cheap, by putting the material that changes most
+often at the bottom. A task that picks up a new capsule pays for the whole
+bundle, and that is now on the table rather than in a footnote.
 
 **NOT MEASURED, and not claimed anywhere:**
 
@@ -315,6 +410,19 @@ New, recorded here:
    `--continue-on-collection-errors`. Pre-existing: it fails identically on the
    primary tree. Note that `health.no_new_dependency` passes, so the gate's
    dependency check does not see a test-only undeclared import.
+
+9. **Change scope buys nothing on this checkout, and the runner does not use
+   it.** All 22 seed capsules are in force, so `CHANGE_SCOPE`-via-capsule never
+   fires today — the set is 32 with no scope and 32 with any `--changed-path`.
+   Only an undeclared Company OS test file widens it. And
+   `tools/engineering_runner` passes no `changed_paths` at all, so the runner
+   path never exercises scope. It starts to matter the moment a capsule is
+   flagged, superseded or retired; wiring the runner's `git diff --name-only`
+   into it is P6B-sized, not P6A-sized.
+10. **`CompressedBody` is restorable, not self-contained.** See §4: an elided
+    unit whose canonical source can no longer be produced byte-for-byte has
+    lost its middle. Safe for a repository file at a commit; not safe for a
+    synthesised artefact, and nothing currently stops a caller compressing one.
 
 ### For P6B
 

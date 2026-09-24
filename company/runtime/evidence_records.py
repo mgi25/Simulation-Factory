@@ -43,6 +43,15 @@ different body. That is the one check that makes a derived id useful: an id
 that can be re-derived is only trustworthy if the thing behind it cannot change
 underneath. Re-adding a byte-identical record is a no-op, so an idempotent
 re-export is free.
+
+Note what that does and does not buy, because the two are easy to run
+together. Re-*exporting* a stored record is free. Re-*running* an observation
+is not: the second run measures a new `duration_s`, the bodies differ, and
+`add` refuses and names the field. That is deliberate - accepting it would mean
+silently keeping one of two measurements - but it means excluding `duration_s`
+from `identity()` buys a stable **id**, not a free retry. A retry that
+re-measures is a new observation and takes the next `sequence`. The refusal
+message names every differing field so the caller can see which it was.
 """
 
 from __future__ import annotations
@@ -264,10 +273,16 @@ class EvidenceLedger:
         record_id = record.record_id()
         existing = self.records.get(record_id)
         if existing is not None and existing != record:
+            differing = ", ".join(
+                name
+                for name in type(record).__dataclass_fields__
+                if getattr(existing, name) != getattr(record, name)
+            )
             raise LifecycleError(
                 f"{record_id}: a record with this identity is already held and its "
-                "body differs. A derived id is only useful while what is behind it "
-                "cannot change; store the new observation with the next sequence."
+                f"body differs ({differing}). A derived id is only useful while "
+                "what is behind it cannot change; store the new observation with "
+                "the next sequence."
             )
         self.records[record_id] = record
         return record_id

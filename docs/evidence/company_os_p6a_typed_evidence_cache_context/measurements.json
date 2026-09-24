@@ -1,27 +1,44 @@
 {
   "cache_stability": {
+    "note": "A provider cache reuses a prefix. Appending is only free when the new unit sorts last; a unit that lands mid-order costs the prefix from that point on, and no total order avoids that.",
     "one_unit_appended": {
-      "identical": false,
-      "left_chars": 8054,
-      "ratio": 0.981357,
-      "right_chars": 8207,
-      "shared_prefix_chars": 8054
+      "another_capsule_near_the_top": {
+        "identical": false,
+        "left_chars": 7981,
+        "ratio": 0.007722,
+        "right_chars": 8159,
+        "shared_prefix_chars": 63
+      },
+      "another_module_mid_order": {
+        "identical": false,
+        "left_chars": 7981,
+        "ratio": 0.324773,
+        "right_chars": 8138,
+        "shared_prefix_chars": 2643
+      },
+      "evidence_sorts_last": {
+        "identical": false,
+        "left_chars": 7981,
+        "ratio": 0.98119,
+        "right_chars": 8134,
+        "shared_prefix_chars": 7981
+      }
     },
     "reassembled_in_reverse": {
       "identical": true,
-      "left_chars": 8054,
+      "left_chars": 7981,
       "ratio": 1.0,
-      "right_chars": 8054,
-      "shared_prefix_chars": 8054
+      "right_chars": 7981,
+      "shared_prefix_chars": 7981
     }
   },
   "context_bytes": {
-    "canonical_chars": 111678,
-    "compressed_bundle_chars": 8054,
+    "canonical_chars": 136437,
+    "compressed_bundle_chars": 7981,
     "note": "Characters, not tokens. The platform is provider-agnostic by contract, and a token count belongs to one tokenizer.",
-    "reduction_pct": 93.23,
+    "reduction_pct": 94.49,
     "units": 8,
-    "whole_bundle_chars": 118890
+    "whole_bundle_chars": 144781
   },
   "not_measured": [
     "provider token counts (input, output, cache creation, cache read)",
@@ -31,11 +48,12 @@
     "whole-task wall-clock or session count"
   ],
   "read_once": {
-    "canonical_chars_reused": 125122,
+    "canonical_chars_reused": 152691,
     "distinct_sources": 7,
     "hits": 7,
     "loader_calls": 7,
     "misses": 7,
+    "note": "reuse_ratio is hits/lookups, and there is one more lookup than there are reads: the deliberate staleness probe below. It is not 7/14.",
     "reads_avoided": 7,
     "reads_requested": 14,
     "reuse_ratio": 0.4667,
@@ -43,7 +61,7 @@
   },
   "repo_root": "wt-p6a",
   "staleness": {
-    "detail": "source changed since it was cached (cached 67fb2cb16aa4a134, now 33b5b310670e8069); evicted",
+    "detail": "source changed since it was cached (cached 490fe4049e1c508d, now 33b5b310670e8069); evicted",
     "outcome": "stale",
     "returned_a_unit": false
   }
