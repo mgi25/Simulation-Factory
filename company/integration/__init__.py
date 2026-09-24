@@ -37,6 +37,18 @@ library only.
 """
 
 from .checks import GateInputs, GateScan, evaluate
+from .dependencies import (
+    CapsuleTestAudit,
+    CapsuleTestFinding,
+    DependencyGraph,
+    DependencyRelation,
+    GovernedSubsystem,
+    ImpactSlice,
+    UnresolvedDependency,
+    audit_capsule_tests,
+    build_dependency_graph,
+    governed_production_subsystems,
+)
 from .contracts import (
     REQUIRED_RESERVED_ACTIONS,
     REQUIRED_REVIEW_TRIGGERS,
@@ -101,6 +113,16 @@ from .suites import (
 )
 
 __all__ = [
+    "CapsuleTestAudit",
+    "CapsuleTestFinding",
+    "DependencyGraph",
+    "DependencyRelation",
+    "GovernedSubsystem",
+    "ImpactSlice",
+    "UnresolvedDependency",
+    "audit_capsule_tests",
+    "build_dependency_graph",
+    "governed_production_subsystems",
     "ADVISORY_CHECKS",
     "AUTHORIZATION_NOTE",
     "CEO_DECISION_CHECKS",
