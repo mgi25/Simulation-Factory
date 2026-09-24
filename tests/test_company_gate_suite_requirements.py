@@ -382,7 +382,9 @@ def test_a_supplied_red_company_os_suite_is_not_discarded(repo_scan, synthetic_s
     evidence = SuiteEvidence(
         tuple(
             _result(name)
-            for name in resolve_required_suites(CapsuleIndex.load(synthetic_seeds), graph=graph).names()
+            for name in resolve_required_suites(
+                CapsuleIndex.load(synthetic_seeds), graph=graph
+            ).names()
         )
         + (_result("tests/test_company_youtube_live_findings.py", passed=False),)
     )
@@ -404,7 +406,9 @@ def test_a_supplied_red_production_suite_still_does_not_block(repo_scan, synthet
     evidence = SuiteEvidence(
         tuple(
             _result(name)
-            for name in resolve_required_suites(CapsuleIndex.load(synthetic_seeds), graph=graph).names()
+            for name in resolve_required_suites(
+                CapsuleIndex.load(synthetic_seeds), graph=graph
+            ).names()
         )
         + (
             SuiteResult(
@@ -453,9 +457,10 @@ def test_flagging_a_capsule_for_revalidation_does_not_drop_its_suites(tmp_path, 
     exactly the subsystem somebody has just said they no longer trust - the P5
     defect again, reached through the lifecycle instead of a static list.
     """
-    flagged = resolve_required_suites(CapsuleIndex.load(
-            _seeds_with_status(tmp_path, "company-executive-delegation", "needs_revalidation")
-        ), graph=graph)
+    seeds = _seeds_with_status(
+        tmp_path, "company-executive-delegation", "needs_revalidation"
+    )
+    flagged = resolve_required_suites(CapsuleIndex.load(seeds), graph=graph)
     baseline = resolve_required_suites(index, graph=graph)
     assert set(baseline.names()) <= set(flagged.names())
     assert "tests/test_company_delegation.py" in flagged
@@ -476,9 +481,8 @@ def test_a_finished_contract_stops_requiring_its_suites(tmp_path, index, status,
     A subsystem genuinely being removed takes its tests with it, and a deleted
     test file is not in the graph, so the intended path still works.
     """
-    finished = resolve_required_suites(CapsuleIndex.load(
-            _seeds_with_status(tmp_path, "company-executive-delegation", status)
-        ), graph=graph)
+    seeds = _seeds_with_status(tmp_path, "company-executive-delegation", status)
+    finished = resolve_required_suites(CapsuleIndex.load(seeds), graph=graph)
     item = finished.get("tests/test_company_delegation.py")
     assert item is not None
     assert SuiteOrigin.CAPSULE_CONTRACT not in item.origins
@@ -797,7 +801,9 @@ def test_the_undeclared_list_changes_no_verdict(repo_scan, synthetic_seeds, grap
     evidence = SuiteEvidence(
         tuple(
             _result(name)
-            for name in resolve_required_suites(CapsuleIndex.load(synthetic_seeds), graph=graph).names()
+            for name in resolve_required_suites(
+                CapsuleIndex.load(synthetic_seeds), graph=graph
+            ).names()
         )
     )
     report = build_report(
