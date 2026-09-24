@@ -269,6 +269,11 @@ class ContextCache:
     def to_dict(self) -> dict[str, Any]:
         return {
             "entries": list(self.keys()),
+            # Every key this cache has ever held and what it was allowed to
+            # decide, including keys since evicted - which is the set the
+            # refusal in `put` is enforced against, so a reader of the dump can
+            # see it rather than infer it.
+            "authority": dict(sorted(self._authority.items())),
             "stats": self.stats.to_dict(),
         }
 

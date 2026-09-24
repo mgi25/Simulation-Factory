@@ -44,6 +44,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import textwrap
 import threading
 import time
 from typing import Any, Mapping, Sequence
@@ -3601,20 +3602,117 @@ def test_a_resolved_answer_with_no_unresolved_key_is_accepted(tmp_path):
         )
 
 
-def test_preflight_records_the_error_rather_than_an_empty_answer(tmp_path):
-    """An empty list read as "nothing is required" is exactly the fail-open
-    this whole change exists to close, so preflight says what went wrong."""
-    from tools.engineering_runner.errors import ControlPlaneRefusal as _Refusal
+def test_preflight_asks_the_gate_and_reports_a_refusal(tmp_path, monkeypatch):
+    """Drives `EngineeringRunner.preflight` itself.
 
-    class _Failing:
-        def required_suites(self, **kwargs):
-            raise _Refusal("required-suites", 2, "the store would not load")
+    An earlier version of this test re-implemented the try/except inline and
+    would have passed with `_preflight` deleted, which the independent review
+    caught. This one patches only the control plane and asserts what preflight
+    actually puts in its report: the canonical floor under its own name, and
+    either the derived set or the reason there is none. An empty list quietly
+    standing in for "nothing is required" is the fail-open this whole change
+    exists to close.
+    """
+    from tools.engineering_runner.controlplane import ControlPlane
+    from tools.engineering_runner.evidence import REQUIRED_SUITES as RUNNER_REQUIRED_SUITES
+    from tools.engineering_runner.runner import EngineeringRunner
 
-    checks = {}
-    try:
-        checks["required_suites"] = list(_Failing().required_suites())
-    except _Refusal as exc:
-        checks["required_suites"] = []
-        checks["required_suites_error"] = str(exc)
+    asked: list[dict] = []
+
+    def _ok(self, **kwargs):
+        asked.append(kwargs)
+        return ("tests/test_company_runtime.py", "tests/test_company_delegation.py")
+
+    def _refuse(self, **kwargs):
+        raise ControlPlaneRefusal("required-suites", 2, "the store would not load")
+
+    monkeypatch.setattr(ControlPlane, "required_suites", _ok, raising=False)
+    checks = EngineeringRunner.preflight(_preflight_double(tmp_path))
+    assert checks["canonical_suites"] == list(RUNNER_REQUIRED_SUITES)
+    assert checks["required_suites"] == [
+        "tests/test_company_runtime.py",
+        "tests/test_company_delegation.py",
+    ]
+    assert "required_suites_error" not in checks
+    assert asked and asked[0]["gate_repo_root"] == tmp_path
+
+    monkeypatch.setattr(ControlPlane, "required_suites", _refuse, raising=False)
+    checks = EngineeringRunner.preflight(_preflight_double(tmp_path))
+    assert checks["canonical_suites"] == list(RUNNER_REQUIRED_SUITES)
     assert checks["required_suites"] == []
     assert "would not load" in checks["required_suites_error"]
+
+
+class _PreflightDouble:
+    """Just enough of an EngineeringRunner for `preflight` to run on."""
+
+    def __init__(self, repo_root):
+        from tools.engineering_runner.controlplane import ControlPlane as _CP
+
+        class _Listing:
+            exit_code = 0
+            payload = {"work_orders": []}
+
+        class _Control(_CP):
+            def __init__(self):
+                pass
+
+            def listing(self):
+                return _Listing()
+
+        class _Workspace:
+            def __init__(self, root):
+                self.repo_root = root
+
+            def require_git(self, args):
+                return "deadbee"
+
+            def common_dir(self):
+                return self.repo_root
+
+        class _Config:
+            gate_timeout_s = 30.0
+            backend = "a"
+            reviewer_backend_name = "a"
+
+            def to_dict(self):
+                return {}
+
+        self.config = _Config()
+        self._control = _Control()
+        self._workspace = _Workspace(repo_root)
+
+    def backend(self, name):
+        class _B:
+            @staticmethod
+            def available():
+                return True, "scripted"
+
+        return _B()
+
+
+def _preflight_double(repo_root):
+    return _PreflightDouble(repo_root)
+
+
+def test_the_gate_stage_lets_a_refusal_propagate():
+    """The other call site. A refusal here must abort the run, not be caught
+    and turned into a shorter suite list - there is no `except` around it."""
+    import ast
+    import inspect
+    from tools.engineering_runner.runner import EngineeringRunner
+
+    source = inspect.getsource(EngineeringRunner._gate_stage)
+    tree = ast.parse(textwrap.dedent(source))
+    calls = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "required_suites"
+    ]
+    assert calls, "the gate stage must ask the gate for its required suites"
+    for handler in ast.walk(tree):
+        if isinstance(handler, ast.Try):
+            for call in ast.walk(handler):
+                assert call not in calls, "the refusal must not be swallowed"

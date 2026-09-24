@@ -483,6 +483,112 @@ def test_a_partial_store_keeps_the_gate_condition_unknown(repo_scan, tmp_path):
     assert report.readiness is not Readiness.READY
 
 
+def test_a_capsule_that_quietly_vanishes_changes_the_set_identity(tmp_path):
+    """The residual half of B2, and what is done about it instead.
+
+    `resolve_required_suites` is pure, so the strongest thing it can say about
+    a short store is that it contradicts itself. That misses a *downward
+    closed* subset: delete a leaf capsule and the remainder is still
+    internally consistent — independent review measured 1 in 8 random single
+    deletions resolving cleanly, worst case dropping six required suites with
+    the gate at READY.
+
+    Coupling the check to unclaimed modules would catch 21 of the 22 single
+    deletions, and is deliberately not done: it would move a condition the
+    policy classifies as *advisory* across the required line without the
+    visible `policy.py` diff `GatePolicy`'s own contract demands.
+
+    What is done instead is here. `derived_from` carries the capsule ids the
+    set was read off, and it is inside `fingerprint()`, so a store that has
+    lost a capsule is a different set identity even when the surviving
+    declarations are untouched — a diff between two reports rather than
+    something a reader has to notice. Closing it properly needs `capsule.tests`
+    to become a checked claim against the real test-to-module dependency, which
+    is P6B.
+    """
+    short = tmp_path / "seeds"
+    shutil.copytree(SEED_ROOT, short)
+    (short / "company-external-engineering-runner.json").unlink()
+
+    index = CapsuleIndex.load(short)
+    required = resolve_required_suites(index)
+    baseline = resolve_required_suites(CapsuleIndex.load(SEED_ROOT))
+
+    # The honest part: it still resolves, and it is still six suites short.
+    assert required.resolved
+    assert index.integrity() == ()
+    assert len(baseline) - len(required) == 6
+
+    # The part that makes it visible.
+    assert baseline.fingerprint() != required.fingerprint()
+    assert set(baseline.derived_from) - set(required.derived_from) == {
+        "company-external-engineering-runner"
+    }
+
+
+def test_the_set_identity_moves_when_only_the_capsule_list_moves(tmp_path):
+    """The property `derived_from` exists for: a capsule whose tests are
+    already required by another capsule can be deleted without changing a
+    single suite name, and the set must still not look identical."""
+    short = tmp_path / "seeds"
+    shutil.copytree(SEED_ROOT, short)
+    before = resolve_required_suites(CapsuleIndex.load(short))
+
+    duplicate = _capsule_json(
+        "synthetic-duplicate-cover",
+        owns=["docs/evidence/company_os_p6a_typed_evidence_cache_context"],
+        tests=["tests/test_company_runtime.py"],
+    )
+    (short / "synthetic-duplicate-cover.json").write_text(
+        json.dumps(duplicate, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    after = resolve_required_suites(CapsuleIndex.load(short))
+
+    assert set(after.names()) == set(before.names()), "no suite name moved"
+    assert after.fingerprint() != before.fingerprint()
+    assert "synthetic-duplicate-cover" in after.derived_from
+
+
+def test_the_report_carries_the_number_of_capsules_it_derived_from(repo_scan, index):
+    required = resolve_required_suites(index)
+    report = build_report(
+        REPO_ROOT,
+        as_of=AS_OF,
+        scan=repo_scan,
+        suites=SuiteEvidence(tuple(_result(n) for n in required.names())),
+    )
+    detail = report.check("health.required_suites_pass").detail
+    assert required.fingerprint() in detail
+    assert f"derived from {len(required.derived_from)} capsule(s)" in detail
+
+
+def test_a_red_result_dated_in_the_future_still_fails(repo_scan, synthetic_seeds):
+    """Found by independent review. `unobserved` is evaluated before `failing`,
+    so a red result with a future date would have become UNKNOWN - turning
+    BLOCKED into INSUFFICIENT_EVIDENCE for a reporter who mistyped a date, and
+    bending the one rule that says a red result you were handed is never
+    dropped. Only *passing* results are eligible to be unobserved."""
+    names = resolve_required_suites(CapsuleIndex.load(synthetic_seeds)).names()
+    evidence = SuiteEvidence(
+        tuple(_result(n) for n in names[1:])
+        + (
+            SuiteResult(
+                suite=names[0],
+                passed=False,
+                observed_on=dt.date(2027, 1, 1),
+                reported_by="tests/test_company_gate_suite_requirements.py",
+                selected=3,
+                failed=1,
+            ),
+        )
+    )
+    report = build_report(
+        REPO_ROOT, as_of=AS_OF, scan=repo_scan, suites=evidence, capsule_root=synthetic_seeds
+    )
+    assert report.check("health.required_suites_pass").status is GateStatus.FAIL
+    assert report.readiness is Readiness.BLOCKED
+
+
 def test_the_real_seed_store_is_structurally_complete(index):
     """The other half: the fix must not make the real repository unresolvable."""
     required = resolve_required_suites(index)

@@ -309,7 +309,16 @@ def compress(
 
     head = "\n".join(lines[:head_lines])
     tail = "\n".join(lines[len(lines) - tail_lines :]) if tail_lines else ""
-    assert text.startswith(head), "the head must be a verbatim slice"
+    # Not an `assert`: `python -O` strips those, and this is the property the
+    # elision marker's line range rests on. It is structural given `_lines()`,
+    # so it should never fire - which is the point of checking it where a
+    # future edit to the splitting would be caught.
+    if not text.startswith(head) or not text.endswith(tail):
+        raise LifecycleError(
+            f"{source}: compression produced a head or tail that is not a "
+            "verbatim slice of the source, so the elided line range would not "
+            "describe the original"
+        )
     elided = CompressedBody(
         source=source,
         kind=CompressionKind.ELIDED,

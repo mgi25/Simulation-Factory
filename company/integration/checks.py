@@ -624,12 +624,7 @@ def _ownership(inputs, scan, index, config) -> GateCheck:
             requirement,
             inputs.as_of,
         )
-    owned = [normalise_path(path) for capsule in index.all() for path in capsule.owns_paths]
-    unowned = [
-        module.path
-        for module in scan.company_modules
-        if not any(path_related(claim, module.path) for claim in owned)
-    ]
+    unowned = list(_unclaimed_company_modules(scan, index))
     if not unowned:
         return _check(
             "architecture.subsystem_ownership_bounded",
@@ -661,6 +656,23 @@ def _ownership(inputs, scan, index, config) -> GateCheck:
 
 
 # -- execution safety -------------------------------------------------------
+
+
+def _unclaimed_company_modules(scan, index) -> tuple[str, ...]:
+    """Company OS modules on disk that no capsule in `index` claims.
+
+    Shared by `architecture.subsystem_ownership_bounded`, where it is a
+    context-selection gap, and by `health.required_suites_pass`, where it is
+    something sharper - see `_required_suites`.
+    """
+    if index is None:
+        return ()
+    owned = [normalise_path(path) for capsule in index.all() for path in capsule.owns_paths]
+    return tuple(
+        module.path
+        for module in scan.company_modules
+        if not any(path_related(claim, module.path) for claim in owned)
+    )
 
 
 def _restricted_states(inputs, scan, index, config) -> GateCheck:
@@ -955,6 +967,34 @@ def _required_suites(inputs, scan, index, config) -> GateCheck:
     """
     required = resolve_required_suites(index, changed_paths=inputs.changed_paths)
     names = required.names()
+
+    # A note on what is deliberately *not* checked here.
+    #
+    # `resolve_required_suites` is pure, so the strongest thing it can say
+    # about a partial capsule store is that the store contradicts itself: a
+    # retained capsule depending on a removed one. That catches a half-copied
+    # directory and every multi-file loss measured, but not a *downward
+    # closed* subset - delete a leaf capsule and the remainder is still
+    # internally consistent.
+    #
+    # A capsule that has gone missing also takes its `owns_paths` with it, so
+    # its modules become unclaimed, and coupling this check to that would
+    # catch 21 of the 22 single-capsule deletions. It is not done, for two
+    # reasons. `architecture.subsystem_ownership_bounded` classifies an
+    # unclaimed module as *advisory* - a context-selection gap, not a safety
+    # one - and making it block here would move a condition across the
+    # required/advisory line without the visible diff in `policy.py` that
+    # `GatePolicy`'s own contract demands. It would also conflate "this store
+    # is short" with "this repository has an unowned module", which are
+    # different facts with different remedies.
+    #
+    # What is done instead: `RequiredSuites` carries the capsule ids it
+    # derived from, and they are inside `fingerprint()`. A store that has
+    # quietly lost a capsule produces a different fingerprint and a shorter
+    # `derived_from`, both of which are in the report - so the loss is a diff
+    # between two runs rather than something a reader has to notice. The real
+    # fix is to make `capsule.tests` a checked claim against the actual
+    # test-to-module dependency, which is P6B.
     requirement = (
         f"Every suite required by the Company OS contract for this change "
         f"({len(names)} on this checkout: the {len(REQUIRED_SUITES)} canonical "
@@ -968,7 +1008,8 @@ def _required_suites(inputs, scan, index, config) -> GateCheck:
         f"({len(required.by_origin(SuiteOrigin.CANONICAL))} canonical, "
         f"{len(required.by_origin(SuiteOrigin.CAPSULE_CONTRACT))} declared by a "
         f"capsule contract in force, "
-        f"{len(required.by_origin(SuiteOrigin.CHANGE_SCOPE))} in change scope)"
+        f"{len(required.by_origin(SuiteOrigin.CHANGE_SCOPE))} in change scope), "
+        f"derived from {len(required.derived_from)} capsule(s)"
     )
 
     if not required.resolved:
@@ -982,9 +1023,9 @@ def _required_suites(inputs, scan, index, config) -> GateCheck:
             EvidenceKind.SUPPLIED,
             missing_evidence=tuple(required.unresolved[:8]),
             remediation=(
-                "Make the capsule store readable, then re-run. The required set is "
-                "derived from the active capsules; a gate that cannot read them "
-                "does not know what evidence it is missing."
+                "Make the capsule store readable and complete, then re-run. The "
+                "required set is derived from the capsule contracts; a gate that "
+                "cannot read them all does not know what evidence it is missing."
             ),
             evidence_as_of=inputs.as_of,
         )
@@ -1001,15 +1042,18 @@ def _required_suites(inputs, scan, index, config) -> GateCheck:
     #
     # Both are treated as missing rather than failing: nobody has shown the
     # gate this suite, which is exactly what `missing` means.
+    #
+    # Only *passing* results are eligible. A red result dated in the future is
+    # still a red result, and letting it become `unknown` would turn BLOCKED
+    # into INSUFFICIENT_EVIDENCE for a reporter who mistyped a date - the one
+    # place the "never drop a red result you were handed" rule could bend.
     unobserved = tuple(
         sorted(
             item.suite
             for item in evidence.results
             if item.suite in required
-            and (
-                (item.passed and item.selected == 0)
-                or item.observed_on > inputs.as_of
-            )
+            and item.passed
+            and (item.selected == 0 or item.observed_on > inputs.as_of)
         )
     )
     missing = tuple(sorted(set(evidence.missing(names)) | set(unobserved)))

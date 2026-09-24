@@ -342,6 +342,7 @@ class RequiredSuites:
 
     requirements: tuple[SuiteRequirement, ...] = ()
     unresolved: tuple[str, ...] = ()
+    derived_from: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         for item in self.requirements:
@@ -359,6 +360,7 @@ class RequiredSuites:
             self, "requirements", tuple(sorted(self.requirements, key=lambda r: r.suite))
         )
         object.__setattr__(self, "unresolved", tuple(self.unresolved))
+        object.__setattr__(self, "derived_from", tuple(sorted(set(self.derived_from))))
 
     def __len__(self) -> int:
         return len(self.requirements)
@@ -392,6 +394,12 @@ class RequiredSuites:
             {
                 "requirements": [item.to_dict() for item in self.requirements],
                 "unresolved": list(self.unresolved),
+                # The capsule ids the set was read off, not only the suites it
+                # produced. A capsule can be deleted without changing any
+                # surviving capsule's declarations, so a store that has quietly
+                # lost one is internally consistent; what it is not is the same
+                # store, and this is what says so.
+                "derived_from": list(self.derived_from),
             }
         )
 
@@ -535,6 +543,7 @@ def resolve_required_suites(
             for suite, found in origins.items()
         ),
         unresolved=tuple(unresolved),
+        derived_from=() if index is None else tuple(c.id for c in index.all()),
     )
 
 

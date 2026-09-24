@@ -133,7 +133,42 @@ results gave PASS. The argument against an empty store applies with identical
 force to one that lost half its files. `CapsuleIndex.integrity()` — called with
 no knowledge store and no checkout, so the resolver stays pure — reports
 dangling dependencies from the capsules' own declarations, and a partial store
-almost always has one. It now contributes an `unresolved` entry.
+usually has one. It now contributes an `unresolved` entry.
+
+**"Usually" is measured, and it is not "always".** A *downward closed* subset of
+the dependency graph is internally consistent by construction, so the second
+review pass quantified the residual:
+
+| case | caught |
+|---|---|
+| random half-copies (11 of 22 capsules) | 8/8 |
+| random deletions of 2, 3 or 5 capsules | 40/40 each |
+| **single-capsule stores** | 18 of 22 — `ai-platform`, `company-bootstrap-policy`, `company-validation` and `company-external-engineering-runner` still resolve cleanly |
+| **single-file deletions**, before the `derived_from` change | 17 of 22; worst case dropped **six** required suites at READY |
+| single-file deletions, after | still 17 of 22 — see below |
+
+Coupling the check to unclaimed modules would take that last row to 21 of 22,
+and is **deliberately not done**: `architecture.subsystem_ownership_bounded`
+classifies an unclaimed module as *advisory*, and making it block here would
+move a condition across the required/advisory line without the visible
+`policy.py` diff `GatePolicy`'s own contract demands. It would also conflate
+"this store is short" with "this repository has an unowned module", which are
+different facts with different remedies.
+
+What is done instead: `RequiredSuites.derived_from` carries the capsule ids the
+set was read off, and they are **inside `fingerprint()`**. A store that has lost
+a capsule is a different set identity even when every surviving declaration is
+untouched, the fingerprint and the capsule count are both in the check detail,
+and both archived gate reports carry them. The loss becomes a diff between two
+reports rather than something a reader has to notice.
+
+The one deletion that still slips entirely is
+`company-external-engineering-runner`, which owns only `tools/engineering_runner`
+— a *production* root, not one of the four Company OS roots the scan walks — and
+which nothing depends on. It is named in a test
+(`test_a_capsule_that_quietly_vanishes_changes_the_set_identity`) rather than
+left to be rediscovered. Closing it properly needs `capsule.tests` to become a
+checked claim against the real test-to-module dependency: **P6B**.
 
 Also fixed from the same review, each with a test: a stored *elision* could
 answer a cache lookup for the *whole* file (`cache_key()` now carries the
@@ -254,12 +289,14 @@ not about Python, and `test_a_caller_can_still_construct_a_contract_unit`
 records that rather than implying otherwise.
 
 **Identity holds nothing incidental.** `ContextUnit.identity()` is exactly
-`{version, kind, source, span, symbol, content_digest, authority, compression}`
-— no clock, no absolute path, no session id, no insertion order.
+`{version, kind, source, span, symbol, content_digest, authority, compression,
+elided_span}` — no clock, no absolute path, no session id, no insertion order.
 `test_unit_identity_holds_no_clock_no_absolute_path_and_no_session` asserts the
-field set, not a sample.
+field set, not a sample. (`elided_span` joined it with the cache-key fix below:
+two elisions of one file made with different head and tail budgets are
+different material and must not share an id.)
 
-**Reversible compression.** `compress()` keeps a verbatim head and tail and
+**Restorable compression.** `compress()` keeps a verbatim head and tail and
 names the exact line range it elided, with the full SHA-256 of the original.
 Lines are split on `"\n"` and nothing else, so the range is the number an
 editor, `sed -n` or a pytest node id would give, and CRLF text keeps its `\r`
@@ -316,11 +353,13 @@ the repeats a session actually makes.
 | prefix reuse, appending another module (mid-order) | **0.325** |
 | prefix reuse, appending another capsule (near the top) | **0.008** |
 
-**What the 93.2% is and is not.** It is the reduction in characters *supplied
-up front*. It is not a reduction in what a session ends up reading: an elided
-body is a pointer, and a session that needs the body expands it, paying the
-difference then. The claim this number supports is "a bundle can carry eight
-sources for 8 KB instead of 116 KB", not "the task costs 93% less".
+**What the 94.49% is and is not.** It is the reduction in
+characters *supplied up front*. It is not a reduction in what a session ends up
+reading: an elided body is a pointer, and a session that needs the body expands
+it, paying the difference then. The claim this number supports is "a bundle can
+carry eight sources for 7 KB instead of
+144 KB", not "the task costs
+94.49% less".
 
 **The ordering defect the measurement found.** With units sorted by
 `kind:source`, the string `"evidence:"` sorts between `"capsule:"` and
@@ -408,6 +447,15 @@ advisory (`executive.decision_queue_preserves_source_refs`,
 `health.production_failures_separated`, `workforce.capability_gaps_visible`),
 each because no state directory was supplied.
 
+Two caveats a reader of that file alone would miss, both raised by the review:
+the post-merge pass on those three guards is **vacuous** — an empty diff can
+never trip them — so it is evidence about the guard's construction, not about
+this branch's content; and `gate-report-post-merge.json` read on its own would
+look like a statement about the branch, which it is not. The independent review
+diffed the two reports check by check: all 38 check ids identical, exactly one
+status moved (`health.required_suites_pass`, fail → pass), so nothing else was
+quietly greened by pointing `origin/main` at the tip.
+
 ### The four modified gate tests
 
 `test_company_integration_gate.py` kept every assertion; only the fixture
@@ -435,9 +483,12 @@ Carried forward from P5 and untouched here, because none is required by P6A:
    inherits the broader rule and forbidden wins.
 2. **No named superseded lifecycle state.** `RecordStatus.SUPERSEDED` exists on
    the record model but no capsule uses it, so "this contract was replaced by
-   that one" cannot be stated. P6A's derivation already handles it correctly
-   when it appears (a non-active capsule's tests are not required unless the
-   change touches its paths), but nothing produces it yet.
+   that one" cannot be stated. P6A's derivation handles it correctly when it
+   appears — a capsule that is not *in force* (`superseded` or `retired`, not
+   merely non-active: `needs_revalidation` **is** in force) stops requiring its
+   tests unless the change touches its paths — but nothing produces it yet.
+   Related: nothing checks that a retired capsule's territory is covered by
+   anything else.
 3. **Runner import-guard breadth.** The recursive import guard is narrower than
    the boundary it defends.
 4. **Gate reports are not archived** by default.
