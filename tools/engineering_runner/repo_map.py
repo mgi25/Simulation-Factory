@@ -64,6 +64,7 @@ import hashlib
 import json
 import os
 import re
+from collections import deque
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable, Mapping
@@ -86,7 +87,7 @@ _TOKEN_RE = re.compile(r"[a-zA-Z0-9]+")
 # P4: cache parser/index products only when their source identity proves they
 # belong to the exact repository content being mapped. Increment this if the
 # serialized map semantics change in a way old entries cannot represent.
-REPO_MAP_CACHE_VERSION = 3
+REPO_MAP_CACHE_VERSION = 4
 
 
 @dataclass(frozen=True)
@@ -165,6 +166,11 @@ class ModuleMap:
     lines: int = 0
     is_entry_point: bool = False
     symbols: tuple[SymbolSpan, ...] = ()
+    # `from X import a` written as `X.a`, for the index builder to test against
+    # the real module set. Not shown to a session: see `_imported_modules`.
+    from_names: tuple[str, ...] = ()
+    # Lines holding a dynamic import. Never an edge, always reported.
+    dynamic_import_lines: tuple[int, ...] = ()
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -177,6 +183,8 @@ class ModuleMap:
             "lines": self.lines,
             "is_entry_point": self.is_entry_point,
             "symbols": [symbol.to_dict() for symbol in self.symbols],
+            "from_names": list(self.from_names),
+            "dynamic_import_lines": list(self.dynamic_import_lines),
         }
 
     @classmethod
@@ -191,6 +199,8 @@ class ModuleMap:
             lines=int(data.get("lines", 0)),
             is_entry_point=bool(data.get("is_entry_point", False)),
             symbols=tuple(SymbolSpan.from_dict(s) for s in data.get("symbols", ())),
+            from_names=tuple(str(x) for x in data.get("from_names", ())),
+            dynamic_import_lines=tuple(int(x) for x in data.get("dynamic_import_lines", ())),
         )
 
     def searchable_text(self) -> str:
@@ -215,6 +225,12 @@ class RepoMap:
     """
 
     modules: tuple[ModuleMap, ...]
+    # The canonical direct edge map. `tests_by_module` and
+    # `production_dependents` are views of it; the closures are computed from
+    # it on demand rather than stored, because a serialized transitive closure
+    # over 500 modules is larger than the map it came from and goes stale in
+    # exactly the same way.
+    imports_by_module: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
     tests_by_module: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
     # Module path -> production modules that import it, resolved from real
     # imports the same way `tests_by_module` is. Named `production_dependents`
@@ -228,6 +244,9 @@ class RepoMap:
         return {
             "roots": list(self.roots),
             "modules": [m.to_dict() for m in self.modules],
+            "imports_by_module": {
+                k: list(v) for k, v in sorted(self.imports_by_module.items())
+            },
             "tests_by_module": {k: list(v) for k, v in sorted(self.tests_by_module.items())},
             "production_dependents": {
                 k: list(v) for k, v in sorted(self.production_dependents.items())
@@ -240,6 +259,10 @@ class RepoMap:
     @classmethod
     def from_dict(cls, data: Mapping[str, object]) -> "RepoMap":
         modules = tuple(ModuleMap.from_dict(m) for m in data.get("modules", ()))
+        imports_by_module = {
+            str(k): tuple(str(x) for x in v)
+            for k, v in dict(data.get("imports_by_module", {})).items()
+        }
         tests_by_module = {
             str(k): tuple(str(x) for x in v)
             for k, v in dict(data.get("tests_by_module", {})).items()
@@ -250,6 +273,7 @@ class RepoMap:
         }
         return cls(
             modules=modules,
+            imports_by_module=imports_by_module,
             tests_by_module=tests_by_module,
             production_dependents=production_dependents,
             roots=tuple(str(r) for r in data.get("roots", DEFAULT_ROOTS)),
@@ -268,6 +292,49 @@ class RepoMap:
                 return module
         return None
 
+    # -- the graph ---------------------------------------------------------
+
+    def direct_dependencies(self, path: str) -> tuple[str, ...]:
+        return self.imports_by_module.get(path, ())
+
+    def transitive_dependencies(self, path: str) -> tuple[str, ...]:
+        """Everything `path` reaches through imports, excluding itself."""
+        return _closure(path, self.imports_by_module)
+
+    def direct_dependents(self, path: str) -> tuple[str, ...]:
+        """Everything that imports `path`, tests included."""
+        return _reverse(self.imports_by_module).get(path, ())
+
+    def transitive_dependents(self, path: str) -> tuple[str, ...]:
+        return _closure(path, _reverse(self.imports_by_module))
+
+    def tests_reaching(self, path: str, *, transitive: bool = True) -> tuple[str, ...]:
+        """Test files whose imports statically reach `path`.
+
+        Not "tests that cover `path`". Reaching a module means the suite loads
+        it, which is necessary for testing it and nowhere near sufficient. The
+        distinction is the whole reason this is safe to hand a session as
+        localization and not as a coverage claim.
+        """
+        source = (
+            self.transitive_dependents(path)
+            if transitive
+            else self.direct_dependents(path)
+        )
+        return tuple(sorted(item for item in source if _is_test_path(item)))
+
+    def unresolved_imports(self) -> tuple[str, ...]:
+        """Every dynamic import in the mapped tree, as `path:line`.
+
+        Reported rather than resolved. A map that silently drops what it could
+        not resolve looks exactly like a map with nothing to resolve.
+        """
+        return tuple(
+            f"{module.path}:{line}"
+            for module in self.modules
+            for line in module.dynamic_import_lines
+        )
+
 
 def _dotted_module_name(rel_path: str) -> str:
     dotted = rel_path[:-3] if rel_path.endswith(".py") else rel_path
@@ -277,17 +344,90 @@ def _dotted_module_name(rel_path: str) -> str:
     return dotted
 
 
-def _imported_modules(tree: ast.AST) -> set[str]:
-    """Every dotted module name this file imports, at whatever depth it named."""
-    found: set[str] = set()
+def _package_parts(rel_path: str) -> tuple[str, ...]:
+    """The package a file lives in, as dotted parts.
+
+    `company/runtime/routing.py` and `company/runtime/__init__.py` both live in
+    `company.runtime`: a package's `__init__` is inside the package, not beside
+    it, so a `from . import x` in either resolves the same way.
+    """
+    parts = rel_path.split("/")
+    return tuple(parts[:-1])
+
+
+def _resolve_relative(level: int, module: str, package: tuple[str, ...]) -> str:
+    """`from ..errors import X` in `a/b/c.py` -> `a.errors`, or "" if it escapes.
+
+    A level deeper than the package nesting cannot be resolved against this
+    repository at all; returning "" puts it in `unresolved` rather than
+    inventing a name.
+    """
+    if level > len(package):
+        return ""
+    base = package[: len(package) - level + 1]
+    parts = list(base) + ([module] if module else [])
+    return ".".join(part for part in parts if part)
+
+
+def _imported_modules(tree: ast.AST, package: tuple[str, ...]) -> tuple[set[str], set[str]]:
+    """What this file imports: resolved module names, and `from X import a` candidates.
+
+    Two sets, because they are two different degrees of certainty and the
+    second must not be shown to a reader as if it were the first.
+
+    `modules` holds dotted names that an import statement really named -
+    `import a.b`, `from a.b import X`, and relative forms resolved against
+    `package`. V1-V3 dropped every relative import (`node.level == 0` was the
+    only branch that recorded anything), which is 965 imports in this
+    repository and almost every internal edge in `company/`. That is the bug
+    this signature exists to fix, and why the cache version moved to 4.
+
+    `candidates` holds `X.a` for each `from X import a`. Whether that names a
+    submodule or a class cannot be decided from one file - it depends on
+    whether `X/a.py` exists - so the question is recorded here and answered by
+    the index builder, which holds the whole module set. Keeping them out of
+    `modules` is what stops `neighborhood()` telling a session that
+    `company.integration.GateStatus` is a module it imports.
+    """
+    modules: set[str] = set()
+    candidates: set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for alias in node.names:
-                found.add(alias.name)
+                modules.add(alias.name)
         elif isinstance(node, ast.ImportFrom):
-            if node.level == 0 and node.module:
-                found.add(node.module)
-    return found
+            name = node.module or ""
+            if node.level:
+                name = _resolve_relative(node.level, name, package)
+            if not name:
+                continue
+            modules.add(name)
+            for alias in node.names:
+                if alias.name != "*":
+                    candidates.add(f"{name}.{alias.name}")
+    return modules, candidates
+
+
+_DYNAMIC_IMPORT_CALLS = ("import_module", "__import__")
+
+
+def _dynamic_import_lines(tree: ast.AST) -> tuple[int, ...]:
+    """Lines holding a dynamic import, recorded as unresolvable rather than guessed.
+
+    A literal argument would be resolvable most of the time. It is not
+    resolved, because the one time the guess is wrong the map asserts an edge
+    nobody wrote, and a map that is usually right is not something a gate or a
+    briefing can rest on.
+    """
+    lines: list[int] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        name = func.attr if isinstance(func, ast.Attribute) else getattr(func, "id", "")
+        if name in _DYNAMIC_IMPORT_CALLS:
+            lines.append(node.lineno)
+    return tuple(sorted(set(lines)))
 
 
 _DEF_TYPES = (ast.FunctionDef, ast.AsyncFunctionDef)
@@ -349,7 +489,8 @@ def _module_map_from_text(
     functions = tuple(
         sorted(n.name for n in tree.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)))
     )
-    imports = tuple(sorted(_imported_modules(tree)))
+    imported, candidates = _imported_modules(tree, _package_parts(rel))
+    imports = tuple(sorted(imported))
     docstring = ast.get_docstring(tree) or ""
     doc_line = docstring.strip().splitlines()[0] if docstring.strip() else ""
     entry_point = path.name == "__main__.py" or "main" in functions
@@ -363,6 +504,8 @@ def _module_map_from_text(
         lines=text.count("\n") + 1,
         is_entry_point=entry_point,
         symbols=_symbol_spans(tree),
+        from_names=tuple(sorted(candidates)),
+        dynamic_import_lines=_dynamic_import_lines(tree),
     )
 
 
@@ -379,10 +522,12 @@ def _assemble_repo_map(
     modules: Iterable[ModuleMap], roots: tuple[str, ...]
 ) -> RepoMap:
     modules_t = tuple(sorted(modules, key=lambda module: module.path))
+    edges = _direct_edges(modules_t)
     return RepoMap(
         modules=modules_t,
-        tests_by_module=_reverse_test_index(modules_t),
-        production_dependents=_reverse_production_index(modules_t),
+        imports_by_module=edges,
+        tests_by_module=_reverse_test_index(edges),
+        production_dependents=_reverse_production_index(edges),
         roots=roots,
     )
 
@@ -441,61 +586,116 @@ def _write_cache_object(path: Path, payload: Mapping[str, object]) -> None:
     temporary.replace(path)
 
 
-def _resolve_imports_to_paths(
-    importers: Iterable[ModuleMap], dotted_to_path: Mapping[str, str]
-) -> dict[str, set[str]]:
-    """path -> the paths (from `importers`) whose imports resolve to it.
+# A walk that has expanded this many nodes without terminating has met
+# something pathological. The map is ~520 modules; the bound exists so a
+# bounded answer that says so beats an unbounded one that hangs a session.
+MAX_CLOSURE_EXPANSIONS = 100_000
 
-    Shared by the test index and the production index: both ask "which of
-    these modules imports that module", and differ only in which module set
-    plays which role. Matching is by dotted name, exact or via a package
-    prefix, because importing a package reaches everything under it too.
+
+def _closure(start: str, adjacency: Mapping[str, tuple[str, ...]]) -> tuple[str, ...]:
+    """Everything reachable from `start`, excluding `start`, cycle-safe.
+
+    Breadth-first over a visited set, so the import cycles this repository
+    really contains - a package `__init__` and the modules it re-exports -
+    terminate instead of recursing.
     """
-    index: dict[str, set[str]] = {path: set() for path in dotted_to_path.values()}
-    for importer in importers:
-        for imported in importer.imports:
-            for dotted, path in dotted_to_path.items():
-                if imported == dotted or imported.startswith(dotted + "."):
-                    index[path].add(importer.path)
-    return index
+    seen: set[str] = set()
+    queue: deque[str] = deque(adjacency.get(start, ()))
+    expansions = 0
+    while queue and expansions < MAX_CLOSURE_EXPANSIONS:
+        current = queue.popleft()
+        expansions += 1
+        if current in seen or current == start:
+            continue
+        seen.add(current)
+        queue.extend(adjacency.get(current, ()))
+    return tuple(sorted(seen))
+
+
+def _direct_edges(modules: tuple[ModuleMap, ...]) -> dict[str, tuple[str, ...]]:
+    """importer path -> the repository paths its own import statements reach.
+
+    One graph, from which the test index and the production index are both
+    *views*. V1-V3 computed two reverse indexes independently over the same
+    resolution rule; they could not disagree in principle, but nothing said so,
+    and a third question would have meant a third walk. The edge map is the
+    single answer, and `tests_by_module` and `production_dependents` are two
+    filters over its reverse.
+
+    Three things make an edge, all of them things Python does at import time:
+
+    * the dotted name an import statement resolved to, exactly;
+    * every package above it, because importing `a.b.c` runs `a/__init__.py`
+      and `a/b/__init__.py`;
+    * `X.a` from `from X import a`, when a module of that name exists. This is
+      the case `from company.integration import suites` falls into, and
+      without it a facade import credits only the package.
+
+    Not a filename heuristic. `test_foo.py` has no relationship to `foo.py`
+    here unless an import statement creates one.
+    """
+    dotted_to_path = {_dotted_module_name(m.path): m.path for m in modules}
+    edges: dict[str, set[str]] = {}
+    for module in modules:
+        found: set[str] = set()
+        for imported in module.imports:
+            if imported in dotted_to_path:
+                found.add(dotted_to_path[imported])
+            parts = imported.split(".")
+            for i in range(1, len(parts)):
+                ancestor = ".".join(parts[:i])
+                if ancestor in dotted_to_path:
+                    found.add(dotted_to_path[ancestor])
+        for candidate in module.from_names:
+            if candidate in dotted_to_path:
+                found.add(dotted_to_path[candidate])
+        found.discard(module.path)
+        if found:
+            edges[module.path] = tuple(sorted(found))
+    return dict(sorted(edges.items()))
+
+
+def _reverse(edges: Mapping[str, tuple[str, ...]]) -> dict[str, tuple[str, ...]]:
+    reverse: dict[str, set[str]] = {}
+    for importer, imported in edges.items():
+        for target in imported:
+            reverse.setdefault(target, set()).add(importer)
+    return {k: tuple(sorted(v)) for k, v in sorted(reverse.items())}
+
+
+def _is_test_path(path: str) -> bool:
+    return path.startswith("tests/")
 
 
 def _reverse_test_index(
-    modules: tuple[ModuleMap, ...],
+    edges: Mapping[str, tuple[str, ...]],
 ) -> dict[str, tuple[str, ...]]:
-    """Module path -> the test files that import it, resolved from real imports.
-
-    Deliberately not a filename heuristic (`test_foo.py` "belongs to" `foo.py`)
-    - that guesses, and guesses wrong for a shared module tested from several
-    files or a test file that covers more than its name says. This instead
-    asks each test file what it actually imports and matches by dotted module
-    name, exact or via a package prefix.
-    """
-    production = [m for m in modules if not m.path.startswith("tests/")]
-    dotted_to_path = {_dotted_module_name(m.path): m.path for m in production}
-    tests = [m for m in modules if m.path.startswith("tests/")]
-    index = _resolve_imports_to_paths(tests, dotted_to_path)
-    return {path: tuple(sorted(tests)) for path, tests in index.items() if tests}
+    """Module path -> the test files that import it. A view of `_direct_edges`."""
+    reverse = _reverse(edges)
+    out = {
+        path: tuple(t for t in importers if _is_test_path(t))
+        for path, importers in reverse.items()
+        if not _is_test_path(path)
+    }
+    return {path: tests for path, tests in out.items() if tests}
 
 
 def _reverse_production_index(
-    modules: tuple[ModuleMap, ...],
+    edges: Mapping[str, tuple[str, ...]],
 ) -> dict[str, tuple[str, ...]]:
-    """Module path -> other production modules that import it.
+    """Module path -> other production modules that import it. A view of the same.
 
-    The V1 briefing claimed to help a session find modules that already
-    depend on the files it is authorized to change, but only the test index
-    existed to back that claim - a change's blast radius among *production*
-    callers was invisible. Resolved the same way as the test index and over
-    the same production set, minus self-imports (a module cannot depend on
-    itself in any sense this index means).
+    Named `production_dependents` rather than `callers`: an import is a
+    module-level dependency, not necessarily a call, and the distinction
+    matters to a session deciding whether a change is safe to make silently.
     """
-    production = [m for m in modules if not m.path.startswith("tests/")]
-    dotted_to_path = {_dotted_module_name(m.path): m.path for m in production}
-    index = _resolve_imports_to_paths(production, dotted_to_path)
-    for path, dependents in index.items():
-        dependents.discard(path)
-    return {path: tuple(sorted(dependents)) for path, dependents in index.items() if dependents}
+    reverse = _reverse(edges)
+    out = {
+        path: tuple(d for d in importers if not _is_test_path(d))
+        for path, importers in reverse.items()
+        if not _is_test_path(path)
+    }
+    return {path: dependents for path, dependents in out.items() if dependents}
 
 
 def build_repo_map(repo_root: Path, *, roots: Iterable[str] = DEFAULT_ROOTS) -> RepoMap:
@@ -834,6 +1034,22 @@ class Neighborhood:
     dependents: tuple[str, ...] = ()
     tests: tuple[str, ...] = ()
     entry_points: tuple[str, ...] = ()
+    # Tests that reach this file only through another module. Kept apart from
+    # `tests` because the two are different strengths of evidence and a
+    # session choosing what to run should be able to tell them apart.
+    transitive_tests: tuple[str, ...] = ()
+    considered: int = 0
+    truncated: tuple[str, ...] = ()
+
+    def returned(self) -> int:
+        return (
+            len(self.symbols)
+            + len(self.imports)
+            + len(self.dependents)
+            + len(self.tests)
+            + len(self.transitive_tests)
+            + len(self.entry_points)
+        )
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -844,6 +1060,9 @@ class Neighborhood:
             "dependents": list(self.dependents),
             "tests": list(self.tests),
             "entry_points": list(self.entry_points),
+            "transitive_tests": list(self.transitive_tests),
+            "considered": self.considered,
+            "truncated": list(self.truncated),
         }
 
 
@@ -865,10 +1084,21 @@ def neighborhood(
     """
     module = repo_map.by_path(path)
     if module is None:
-        return Neighborhood(path=path, found=False)
+        return Neighborhood(path=path, found=False, considered=len(repo_map.modules))
     dependents = repo_map.production_dependents.get(path, ())
     entry_points = tuple(
         p for p in dependents if (m := repo_map.by_path(p)) is not None and m.is_entry_point
+    )
+    direct_tests = repo_map.tests_by_module.get(path, ())
+    indirect = tuple(
+        t for t in repo_map.tests_reaching(path, transitive=True) if t not in set(direct_tests)
+    )
+    sized = (
+        ("symbols", module.symbols, symbol_limit),
+        ("imports", module.imports, import_limit),
+        ("dependents", dependents, dependent_limit),
+        ("tests", direct_tests, test_limit),
+        ("transitive_tests", indirect, test_limit),
     )
     return Neighborhood(
         path=path,
@@ -876,9 +1106,232 @@ def neighborhood(
         symbols=module.symbols[:symbol_limit],
         imports=module.imports[:import_limit],
         dependents=dependents[:dependent_limit],
-        tests=repo_map.tests_by_module.get(path, ())[:test_limit],
+        tests=direct_tests[:test_limit],
         entry_points=entry_points[:dependent_limit],
+        transitive_tests=indirect[:test_limit],
+        considered=len(repo_map.modules),
+        # A truncated answer that does not say it is truncated is a wrong
+        # answer: a session told "these are the tests" will not run the others.
+        truncated=tuple(
+            sorted(name for name, values, limit in sized if len(values) > limit)
+        ),
     )
+
+
+@dataclass(frozen=True)
+class ChangeImpact:
+    """What one attempt's changed paths reach, bounded and deterministic.
+
+    Repository intelligence, and nothing more. This may recommend what to read
+    and what to run; it may not decide what is allowed. Nothing here widens an
+    authorized path set, relaxes a read ceiling, or excuses a required suite -
+    `authorization.py` owns all three and does not consult this type. A
+    reviewer handed an impact slice still reviews under the same envelope.
+
+    Every list is capped and `truncated` names the ones that hit the cap,
+    because a session told "these are the tests" will not run the others.
+    """
+
+    changed: tuple[str, ...] = ()
+    unmapped: tuple[str, ...] = ()
+    dependents: tuple[str, ...] = ()
+    direct_tests: tuple[str, ...] = ()
+    transitive_tests: tuple[str, ...] = ()
+    considered: int = 0
+    truncated: tuple[str, ...] = ()
+
+    def returned(self) -> int:
+        return (
+            len(self.dependents) + len(self.direct_tests) + len(self.transitive_tests)
+        )
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "changed": list(self.changed),
+            "unmapped": list(self.unmapped),
+            "dependents": list(self.dependents),
+            "direct_tests": list(self.direct_tests),
+            "transitive_tests": list(self.transitive_tests),
+            "considered": self.considered,
+            "truncated": list(self.truncated),
+        }
+
+
+def change_impact(
+    repo_map: RepoMap,
+    changed_paths: Iterable[str],
+    *,
+    dependent_limit: int = 12,
+    test_limit: int = 12,
+) -> ChangeImpact:
+    """Blast radius for a set of changed paths: dependents, tests, both degrees.
+
+    The runner already knows its real change set - `workspace.changed_paths()`
+    runs `git diff --name-status` and the result reaches the receipt as
+    `files_changed`. Until P6B nothing joined that to the map, so a reviewer
+    was told which files changed and left to work out what else touches them.
+
+    `unmapped` is not padding. A changed path outside the mapped roots - a
+    YAML file, a document, a simulation module - has no import answer, and
+    saying so is different from returning an empty list that reads as "nothing
+    depends on this".
+    """
+    changed = tuple(sorted({str(path).replace("\\", "/") for path in changed_paths if str(path).strip()}))
+    known = [path for path in changed if repo_map.by_path(path) is not None]
+    unmapped = tuple(path for path in changed if path not in set(known))
+
+    dependents: set[str] = set()
+    direct: set[str] = set()
+    indirect: set[str] = set()
+    for path in known:
+        dependents.update(repo_map.production_dependents.get(path, ()))
+        direct.update(repo_map.tests_by_module.get(path, ()))
+        indirect.update(repo_map.tests_reaching(path, transitive=True))
+    dependents.difference_update(changed)
+    indirect.difference_update(direct)
+
+    ordered = (
+        ("dependents", tuple(sorted(dependents)), dependent_limit),
+        ("direct_tests", tuple(sorted(direct)), test_limit),
+        ("transitive_tests", tuple(sorted(indirect)), test_limit),
+    )
+    return ChangeImpact(
+        changed=changed,
+        unmapped=unmapped,
+        dependents=ordered[0][1][:dependent_limit],
+        direct_tests=ordered[1][1][:test_limit],
+        transitive_tests=ordered[2][1][:test_limit],
+        considered=len(repo_map.modules),
+        truncated=tuple(
+            sorted(name for name, values, limit in ordered if len(values) > limit)
+        ),
+    )
+
+
+# The serialized shape of a dependency manifest. Increment when the meaning of
+# a field changes in a way an older reader would get wrong.
+DEPENDENCY_MANIFEST_SCHEMA = "engineering-runner/dependency-manifest"
+DEPENDENCY_MANIFEST_VERSION = 1
+
+
+@dataclass(frozen=True)
+class DependencyManifest:
+    """The graph as a file, with enough identity to refuse it when it is stale.
+
+    A manifest exists because the map is *cached*: the expensive part is the
+    parse, and a session that reuses yesterday's parse against today's tree
+    gets answers about code that is no longer there. Every field below exists
+    to make that detectable rather than silent.
+
+    * `schema` and `version` - an older reader must refuse a newer shape
+      rather than read fields it thinks it understands.
+    * `tree_fingerprint` - the identity of the exact content that was parsed.
+      `matches()` compares it, and a mismatch is a refusal, never a warning.
+    * `roots` - the same tree parsed over different roots is a different
+      manifest, and a narrower one would answer "no dependents" truthfully and
+      uselessly.
+    * `digest` - the identity of the graph itself, so two manifests can be
+      compared without diffing them.
+    * `unresolved` - the dynamic imports that are in the tree and not in the
+      graph. A manifest that dropped them would look complete.
+    """
+
+    schema: str
+    version: int
+    tree_fingerprint: str
+    roots: tuple[str, ...]
+    edges: Mapping[str, tuple[str, ...]]
+    unresolved: tuple[str, ...]
+    module_count: int
+
+    @classmethod
+    def of(cls, repo_map: RepoMap, *, tree_fingerprint: str) -> "DependencyManifest":
+        return cls(
+            schema=DEPENDENCY_MANIFEST_SCHEMA,
+            version=DEPENDENCY_MANIFEST_VERSION,
+            tree_fingerprint=tree_fingerprint,
+            roots=tuple(repo_map.roots),
+            edges={k: tuple(v) for k, v in sorted(repo_map.imports_by_module.items())},
+            unresolved=repo_map.unresolved_imports(),
+            module_count=len(repo_map.modules),
+        )
+
+    def digest(self) -> str:
+        """Content identity of the graph, independent of how it was produced."""
+        payload = json.dumps(
+            {
+                "schema": self.schema,
+                "version": self.version,
+                "roots": list(self.roots),
+                "edges": {k: list(v) for k, v in sorted(self.edges.items())},
+                "unresolved": list(self.unresolved),
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "schema": self.schema,
+            "version": self.version,
+            "tree_fingerprint": self.tree_fingerprint,
+            "roots": list(self.roots),
+            "edges": {k: list(v) for k, v in sorted(self.edges.items())},
+            "unresolved": list(self.unresolved),
+            "module_count": self.module_count,
+            "digest": self.digest(),
+        }
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, object]) -> "DependencyManifest":
+        return cls(
+            schema=str(data.get("schema", "")),
+            version=int(data.get("version", 0)),
+            tree_fingerprint=str(data.get("tree_fingerprint", "")),
+            roots=tuple(str(r) for r in data.get("roots", ())),
+            edges={
+                str(k): tuple(str(x) for x in v)
+                for k, v in dict(data.get("edges", {})).items()
+            },
+            unresolved=tuple(str(x) for x in data.get("unresolved", ())),
+            module_count=int(data.get("module_count", 0)),
+        )
+
+    def matches(self, *, tree_fingerprint: str, roots: Iterable[str]) -> bool:
+        """True only for the exact tree and roots this manifest was built from.
+
+        Fail-closed on every axis at once: a wrong schema, a newer version, a
+        different tree or a different root set all return False, because there
+        is no partial way to be the right manifest.
+        """
+        return (
+            self.schema == DEPENDENCY_MANIFEST_SCHEMA
+            and self.version == DEPENDENCY_MANIFEST_VERSION
+            and bool(self.tree_fingerprint)
+            and self.tree_fingerprint == tree_fingerprint
+            and self.roots == tuple(roots)
+        )
+
+
+def load_dependency_manifest(
+    path: Path, *, tree_fingerprint: str, roots: Iterable[str]
+) -> DependencyManifest | None:
+    """Read a manifest and return it only if it describes this exact tree.
+
+    `None` for missing, unreadable, malformed *and* stale. The caller rebuilds;
+    it never gets a manifest it has to decide whether to trust.
+    """
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return None
+    if not isinstance(data, dict):
+        return None
+    manifest = DependencyManifest.from_dict(data)
+    if not manifest.matches(tree_fingerprint=tree_fingerprint, roots=roots):
+        return None
+    return manifest
 
 
 def build_and_cache(repo_root: Path, cache_path: Path, *, roots: Iterable[str] = DEFAULT_ROOTS) -> RepoMap:
@@ -905,7 +1358,12 @@ def load_or_build(repo_root: Path, cache_path: Path, *, roots: Iterable[str] = D
 
 __all__ = [
     "DEFAULT_ROOTS",
+    "DEPENDENCY_MANIFEST_SCHEMA",
+    "DEPENDENCY_MANIFEST_VERSION",
+    "MAX_CLOSURE_EXPANSIONS",
     "REPO_MAP_CACHE_VERSION",
+    "ChangeImpact",
+    "DependencyManifest",
     "ModuleMap",
     "Neighborhood",
     "QueryHit",
@@ -914,7 +1372,9 @@ __all__ = [
     "SymbolSpan",
     "build_and_cache",
     "build_repo_map",
+    "change_impact",
     "build_repo_map_cached",
+    "load_dependency_manifest",
     "load_or_build",
     "neighborhood",
     "query",

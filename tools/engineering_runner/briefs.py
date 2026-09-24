@@ -42,7 +42,7 @@ from .execution_context import (
     rank_task_spans,
     rank_test_anchors,
 )
-from .repo_map import RepoMap
+from .repo_map import RepoMap, change_impact
 from .resources import ResourceStrategy
 
 
@@ -231,6 +231,55 @@ def developer_execution_context(
     )
 
 
+def _change_impact_block(
+    repo_map: "RepoMap | None", changed_paths: Sequence[str]
+) -> str:
+    """What this attempt's real change set reaches, joined to the import graph.
+
+    The runner has always known its change set - `workspace.changed_paths()`
+    runs `git diff --name-status` and the result arrives here as the receipt's
+    `files_changed` - and until P6B nothing joined it to the map. A reviewer
+    was told which files changed and left to work out, by reading, what else
+    imports them and which suites load them.
+
+    This is a recommendation and says so. It does not widen the authorized
+    path set, does not relax a read ceiling, and does not excuse a required
+    suite: `authorization.py` decides all three and never consults this. A
+    reviewer who reads none of it reviews under exactly the same envelope.
+    """
+    if repo_map is None or not changed_paths:
+        return ""
+    impact = change_impact(repo_map, changed_paths)
+    if not impact.returned() and not impact.unmapped:
+        return ""
+    out = [
+        "## What this change reaches (static imports; not a coverage claim)",
+        "",
+        f"  considered {impact.considered} mapped modules; "
+        f"returned {impact.returned()} references",
+    ]
+    for label, values in (
+        ("imported by", impact.dependents),
+        ("tests importing a changed file", impact.direct_tests),
+        ("tests reaching it through another module", impact.transitive_tests),
+    ):
+        if values:
+            out.append(f"  {label}:")
+            out.extend(f"    - {value}" for value in values)
+    if impact.unmapped:
+        out.append(
+            "  outside the mapped roots, so no import answer exists for them:"
+        )
+        out.extend(f"    - {value}" for value in impact.unmapped)
+    if impact.truncated:
+        out.append(
+            "  truncated (more exist than are listed): "
+            + ", ".join(impact.truncated)
+        )
+    out.append("")
+    return "\n".join(out)
+
+
 def _reviewer_execution_context(
     repo_map: "RepoMap | None", *, envelope: AuthorityEnvelope, changed_paths: Sequence[str]
 ) -> ExecutionContextBundle:
@@ -416,6 +465,7 @@ def review_instructions(
             repo_map, envelope=envelope, changed_paths=changed_paths
         ).render()
     )
+    lines.append(_change_impact_block(repo_map, changed_paths))
     if envelope.review_instructions:
         add("## What a review is, per the work order")
         for item in envelope.review_instructions:
