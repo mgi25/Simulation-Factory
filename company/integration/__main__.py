@@ -35,7 +35,12 @@ from .model import Readiness
 from .policy import DEFAULT_POLICY
 from .report import build_report, render_text
 from .store import ReadinessReportStore
-from .suites import SuiteEvidence, SuiteOrigin, resolve_required_suites
+from .suites import (
+    SuiteEvidence,
+    SuiteOrigin,
+    resolve_required_suites,
+    undeclared_company_os_suites,
+)
 
 
 _EXIT = {
@@ -152,8 +157,18 @@ def _required_suites(args: argparse.Namespace) -> int:
     required = resolve_required_suites(
         load_capsule_index(inputs), changed_paths=tuple(args.changed_path)
     )
+    undeclared = undeclared_company_os_suites(inputs.repo_root, required)
     if args.json:
-        print(dumps({**required.to_dict(), "fingerprint": required.fingerprint()}), end="")
+        print(
+            dumps(
+                {
+                    **required.to_dict(),
+                    "fingerprint": required.fingerprint(),
+                    "undeclared_company_os_suites": list(undeclared),
+                }
+            ),
+            end="",
+        )
     else:
         print(f"required suites ({len(required)}) - set {required.fingerprint()}")
         for item in required:
@@ -161,6 +176,13 @@ def _required_suites(args: argparse.Namespace) -> int:
             print(f"      {item.reason()}")
         for reason in required.unresolved:
             print(f"  UNRESOLVED: {reason}")
+        if undeclared:
+            print(
+                f"\nnot required, because no capsule declares them ({len(undeclared)}) - "
+                "a gap in the contracts, not in the evidence:"
+            )
+            for suite in undeclared:
+                print(f"  {suite}")
     return 0 if required.resolved else 2
 
 

@@ -31,6 +31,7 @@ from company.integration import (
     SuiteResult,
     build_report,
     resolve_required_suites,
+    undeclared_company_os_suites,
 )
 from company.integration.checks import GateScan
 from company.integration.errors import IntegrationGateError
@@ -381,6 +382,66 @@ def test_a_supplied_red_production_suite_still_does_not_block(repo_scan, synthet
     )
     assert report.check("health.required_suites_pass").status is GateStatus.PASS
     assert report.check("health.production_failures_separated").status is GateStatus.PASS
+
+
+# --------------------------------------------------------------------------
+# The gap the derivation makes visible
+# --------------------------------------------------------------------------
+
+
+def test_company_os_tests_that_no_capsule_declares_are_reported(index):
+    """Deriving the required set from the contracts exposes what the contracts
+    do not cover. On this checkout eleven `tests/test_company*.py` files are
+    declared by no capsule, so nothing requires them - a gap in the capsule
+    contracts, not in the gate.
+
+    Asserted as a set relation rather than a count: a capsule that legitimately
+    adopts one of these should make this test greener, not redder.
+    """
+    required = resolve_required_suites(index)
+    undeclared = undeclared_company_os_suites(REPO_ROOT, required)
+    on_disk = {f"tests/{p.name}" for p in (REPO_ROOT / "tests").glob("test_company*.py")}
+    assert set(undeclared) <= on_disk
+    assert set(undeclared).isdisjoint(required.names())
+    assert set(required.names()) | set(undeclared) >= on_disk
+
+
+def test_the_undeclared_list_changes_no_verdict(repo_scan, synthetic_seeds):
+    """It is reported, never required. A file nobody declared is not a
+    contract, and inventing a requirement from a directory listing would make
+    the gate depend on what happens to be on disk."""
+    evidence = SuiteEvidence(
+        tuple(
+            _result(name)
+            for name in resolve_required_suites(
+                CapsuleIndex.load(synthetic_seeds)
+            ).names()
+        )
+    )
+    report = build_report(
+        REPO_ROOT,
+        as_of=AS_OF,
+        scan=repo_scan,
+        suites=evidence,
+        capsule_root=synthetic_seeds,
+    )
+    assert report.check("health.required_suites_pass").status is GateStatus.PASS
+
+
+def test_the_cli_names_the_undeclared_suites(capsys, index):
+    integration_main(["required-suites", "--repo-root", str(REPO_ROOT)])
+    out = capsys.readouterr().out
+    undeclared = undeclared_company_os_suites(
+        REPO_ROOT, resolve_required_suites(index)
+    )
+    if undeclared:
+        assert "no capsule declares them" in out
+        for suite in undeclared:
+            assert suite in out
+
+
+def test_undeclared_suites_on_a_tree_with_no_tests_directory(tmp_path, index):
+    assert undeclared_company_os_suites(tmp_path, resolve_required_suites(index)) == ()
 
 
 # --------------------------------------------------------------------------

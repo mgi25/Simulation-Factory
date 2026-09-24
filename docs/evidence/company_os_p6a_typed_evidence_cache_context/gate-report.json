@@ -12,7 +12,7 @@
     "This report states whether the technical gate conditions are satisfied. It does not authorize production integration: wiring Company OS into production is a separate CEO decision (permissions.yaml, merge_major_architecture_rewrite)."
   ],
   "policy_version": 1,
-  "report_id": "integration-readiness-2026-09-24-2d6df42a3fc5b070",
+  "report_id": "integration-readiness-2026-09-24-a77658c36f404dc1",
   "required_check_ids": [
     "analytics.causal_overclaim_refused",
     "analytics.competitor_private_metrics_unavailable",
@@ -755,7 +755,7 @@
   "source": {
     "repo_root": "C:\\Users\\mgial\\OneDrive\\Documents\\projects\\wt-p6a",
     "source_branch": "p6a-typed-evidence-cache-context-v1",
-    "source_commit": "3f8da0a5b76d4eb94446f7c3fa2e06ac8b3ebf75",
+    "source_commit": "b559306ac8429d5a9b528c263e5fff93d0b7148d",
     "state_dir": ""
   }
 }

@@ -483,6 +483,36 @@ def resolve_required_suites(
     )
 
 
+def undeclared_company_os_suites(
+    repo_root: Path | str, required: RequiredSuites
+) -> tuple[str, ...]:
+    """Company OS test files on disk that no contract asks for.
+
+    Not used by any check, and deliberately so. A test nobody declared is not
+    a test the contract requires, and inventing a requirement from a filename
+    would make the required set depend on what happens to be in a directory
+    rather than on what a capsule says. The gate's verdict stays derived from
+    contracts.
+
+    But an eleven-file blind spot that nothing ever prints is a blind spot
+    that stays. This is the only I/O in the module, it is reached only from
+    `python -m company.integration required-suites`, and what it reports is a
+    gap in the *capsule contracts*, not a failure of the gate.
+    """
+    root = Path(repo_root)
+    tests = root / TEST_ROOT
+    if not tests.is_dir():
+        return ()
+    claimed = set(required.names())
+    return tuple(
+        sorted(
+            f"{TEST_ROOT}/{path.name}"
+            for path in tests.glob(f"{COMPANY_OS_TEST_PREFIX}*.py")
+            if f"{TEST_ROOT}/{path.name}" not in claimed
+        )
+    )
+
+
 __all__ = [
     "DEFAULT_MAX_EVIDENCE_AGE_DAYS",
     "REQUIRED_SUITES",
@@ -492,4 +522,5 @@ __all__ = [
     "SuiteRequirement",
     "SuiteResult",
     "resolve_required_suites",
+    "undeclared_company_os_suites",
 ]

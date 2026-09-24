@@ -94,6 +94,42 @@ are edited:
 * `test_a_capsule_declared_suite_with_no_evidence_is_unknown_not_pass` — the
   other half: silence must not read as green.
 
+### What the derivation exposed: 11 undeclared Company OS suites
+
+Deriving the required set from the contracts immediately showed what the
+contracts do not cover. Eleven `tests/test_company*.py` files on this checkout
+are declared by **no capsule at all**, so nothing requires them:
+
+```
+tests/test_company_bounded_engineering_activation.py
+tests/test_company_bounded_engineering_autonomy.py
+tests/test_company_context_expansion.py
+tests/test_company_delegation_pilot.py
+tests/test_company_executable_work_planning.py
+tests/test_company_executive_planning.py
+tests/test_company_objective_planning.py
+tests/test_company_review_separation.py
+tests/test_company_runtime_integration.py
+tests/test_company_session_execution.py
+tests/test_company_youtube_end_to_end.py
+```
+
+This is **pre-existing** — it is a gap in the capsule contracts, not something
+P6A introduced, and the old static list did not surface it either.
+
+It is **reported, never required**. `undeclared_company_os_suites()` is called
+only from `python -m company.integration required-suites`; no check uses it,
+and `test_the_undeclared_list_changes_no_verdict` pins that. Inventing a
+requirement from a directory listing would make the gate's verdict depend on
+what happens to be on disk rather than on what a capsule says, which is the
+opposite of the property this work is for. It is the only I/O in
+`suites.py`.
+
+Adopting these eleven into the right capsules is a semantic ownership
+judgement of the kind `wo-capsule-ownership-semantic-review` made before. It
+is not P6A's to make, and some of the candidate capsules are near the
+eight-item `tests` limit.
+
 ### How a caller learns the set
 
 ```
@@ -270,6 +306,15 @@ New, recorded here:
 6. **`ContextCache` is not wired into `build_execution_context`.** The runner
    still resolves spans afresh per bundle. The cache is exercised by its own
    suite and by the measurement harness, not by a real runner session.
+7. **Eleven Company OS test files are declared by no capsule** — listed above.
+   Reported by the CLI, adopted by nobody.
+8. **`tests/test_company_review_separation.py` imports `yaml`, which is not in
+   `requirements.txt`** and is not installed in this venv. It is the only
+   importer of `yaml` in the repository. A bare `pytest` run therefore aborts
+   during *collection*, so the whole-suite fingerprint cannot be taken without
+   `--continue-on-collection-errors`. Pre-existing: it fails identically on the
+   primary tree. Note that `health.no_new_dependency` passes, so the gate's
+   dependency check does not see a test-only undeclared import.
 
 ### For P6B
 

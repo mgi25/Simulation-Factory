@@ -97,6 +97,7 @@ from .suites import (
     SuiteRequirement,
     SuiteResult,
     resolve_required_suites,
+    undeclared_company_os_suites,
 )
 
 __all__ = [
@@ -149,5 +150,6 @@ __all__ = [
     "resolve_required_suites",
     "review_trigger_drift",
     "subsystem_import_graph",
+    "undeclared_company_os_suites",
     "type_checking_edges",
 ]
