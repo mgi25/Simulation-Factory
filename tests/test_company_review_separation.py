@@ -24,7 +24,6 @@ import datetime as dt
 from pathlib import Path
 
 import pytest
-import yaml
 
 from ai_platform.resource_classes import Risk
 from company.delegation.actions import ActionType
@@ -68,9 +67,16 @@ def policy(config):
 
 
 @pytest.fixture(scope="module")
-def registry():
-    text = (REPO_ROOT / "company" / "org_registry.yaml").read_text(encoding="utf-8")
-    return yaml.safe_load(text)
+def registry(config):
+    """The same `org_registry.yaml`, parsed once by `load_company_config`.
+
+    Not a second parse: `config.org_registry` is already
+    `load_yaml_subset(.../org_registry.yaml)` - see
+    `company/runtime/config.py`. Re-reading the file through PyYAML added an
+    undeclared dependency for no value the repository-native loader didn't
+    already provide.
+    """
+    return config.org_registry
 
 
 # --- 1. the seat and the employee ------------------------------------------
