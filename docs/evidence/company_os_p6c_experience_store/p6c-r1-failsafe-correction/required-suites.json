@@ -1,0 +1,761 @@
+{
+  "derived_from": [
+    "ai-platform",
+    "company-analytics-experiments",
+    "company-bootstrap-policy",
+    "company-ceo-dashboard",
+    "company-engineering-execution",
+    "company-evidence-review",
+    "company-executive-delegation",
+    "company-experience-store",
+    "company-external-engineering-runner",
+    "company-finance",
+    "company-knowledge-capsules",
+    "company-knowledge-store",
+    "company-organizational-intelligence",
+    "company-os-control-plane",
+    "company-production-integration-gate",
+    "company-research-intelligence",
+    "company-research-operations",
+    "company-runtime",
+    "company-validation",
+    "company-workforce-capabilities",
+    "company-workforce-employment",
+    "company-workforce-hiring",
+    "company-youtube-connectivity",
+    "company-youtube-fetch-client"
+  ],
+  "fingerprint": "f5de72a66d79bb83",
+  "requirements": [
+    {
+      "capsule_ids": [
+        "company-analytics-experiments"
+      ],
+      "dependency_capsule_ids": [
+        "company-analytics-experiments",
+        "company-knowledge-capsules",
+        "company-knowledge-store"
+      ],
+      "origins": [
+        "canonical",
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_analytics.py"
+    },
+    {
+      "capsule_ids": [],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-executive-delegation",
+        "company-finance",
+        "company-runtime"
+      ],
+      "origins": [
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_bounded_engineering_activation.py"
+    },
+    {
+      "capsule_ids": [],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-executive-delegation",
+        "company-external-engineering-runner",
+        "company-finance",
+        "company-runtime"
+      ],
+      "origins": [
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_bounded_engineering_autonomy.py"
+    },
+    {
+      "capsule_ids": [
+        "company-runtime"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-runtime"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_context_assembly.py"
+    },
+    {
+      "capsule_ids": [],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-runtime"
+      ],
+      "origins": [
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_context_expansion.py"
+    },
+    {
+      "capsule_ids": [
+        "company-ceo-dashboard"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-analytics-experiments",
+        "company-ceo-dashboard",
+        "company-finance",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-organizational-intelligence",
+        "company-research-intelligence",
+        "company-runtime",
+        "company-workforce-capabilities",
+        "company-workforce-employment"
+      ],
+      "origins": [
+        "canonical",
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_dashboard.py"
+    },
+    {
+      "capsule_ids": [
+        "company-executive-delegation"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-ceo-dashboard",
+        "company-engineering-execution",
+        "company-executive-delegation",
+        "company-finance",
+        "company-runtime",
+        "company-workforce-capabilities"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_delegation.py"
+    },
+    {
+      "capsule_ids": [],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-executive-delegation",
+        "company-finance",
+        "company-runtime"
+      ],
+      "origins": [
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_delegation_pilot.py"
+    },
+    {
+      "capsule_ids": [],
+      "dependency_capsule_ids": [
+        "company-external-engineering-runner",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-production-integration-gate"
+      ],
+      "origins": [
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_dependency_graph.py"
+    },
+    {
+      "capsule_ids": [
+        "company-runtime"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-runtime"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_efficiency.py"
+    },
+    {
+      "capsule_ids": [
+        "company-engineering-execution"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-ceo-dashboard",
+        "company-engineering-execution",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-production-integration-gate",
+        "company-runtime",
+        "company-validation"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_engineering_execution.py"
+    },
+    {
+      "capsule_ids": [
+        "company-evidence-review"
+      ],
+      "dependency_capsule_ids": [
+        "company-engineering-execution",
+        "company-external-engineering-runner",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-runtime",
+        "company-validation"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_evidence_review.py"
+    },
+    {
+      "capsule_ids": [],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-executive-delegation",
+        "company-finance",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-runtime"
+      ],
+      "origins": [
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_executable_work_planning.py"
+    },
+    {
+      "capsule_ids": [],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-runtime"
+      ],
+      "origins": [
+        "canonical",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_execution_transport.py"
+    },
+    {
+      "capsule_ids": [],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-executive-delegation",
+        "company-finance",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-runtime"
+      ],
+      "origins": [
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_executive_planning.py"
+    },
+    {
+      "capsule_ids": [
+        "company-experience-store"
+      ],
+      "dependency_capsule_ids": [
+        "company-engineering-execution",
+        "company-experience-store",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-production-integration-gate"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_experience_retrieval.py"
+    },
+    {
+      "capsule_ids": [
+        "company-experience-store"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-engineering-execution",
+        "company-experience-store",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-production-integration-gate",
+        "company-runtime"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_experience_store.py"
+    },
+    {
+      "capsule_ids": [
+        "company-external-engineering-runner"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-ceo-dashboard",
+        "company-engineering-execution",
+        "company-experience-store",
+        "company-external-engineering-runner",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-production-integration-gate",
+        "company-runtime"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_external_engineering_runner.py"
+    },
+    {
+      "capsule_ids": [
+        "company-finance"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-finance",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-organizational-intelligence",
+        "company-runtime"
+      ],
+      "origins": [
+        "canonical",
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_finance.py"
+    },
+    {
+      "capsule_ids": [
+        "company-finance"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-finance",
+        "company-knowledge-store",
+        "company-runtime"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_finance_usage_cost.py"
+    },
+    {
+      "capsule_ids": [
+        "company-production-integration-gate"
+      ],
+      "dependency_capsule_ids": [
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-production-integration-gate"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_gate_suite_requirements.py"
+    },
+    {
+      "capsule_ids": [
+        "company-production-integration-gate"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-production-integration-gate",
+        "company-runtime"
+      ],
+      "origins": [
+        "canonical",
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_integration_gate.py"
+    },
+    {
+      "capsule_ids": [],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-engineering-execution",
+        "company-executive-delegation",
+        "company-finance",
+        "company-runtime"
+      ],
+      "origins": [
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_objective_planning.py"
+    },
+    {
+      "capsule_ids": [
+        "company-organizational-intelligence"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-organizational-intelligence",
+        "company-research-intelligence",
+        "company-runtime",
+        "company-workforce-capabilities",
+        "company-workforce-hiring"
+      ],
+      "origins": [
+        "canonical",
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_org_intelligence.py"
+    },
+    {
+      "capsule_ids": [
+        "ai-platform",
+        "company-os-control-plane"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform"
+      ],
+      "origins": [
+        "canonical",
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_os_ai_platform.py"
+    },
+    {
+      "capsule_ids": [
+        "company-ceo-dashboard",
+        "company-knowledge-capsules",
+        "company-os-control-plane"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-validation"
+      ],
+      "origins": [
+        "canonical",
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_os_capsules.py"
+    },
+    {
+      "capsule_ids": [
+        "company-knowledge-store",
+        "company-os-control-plane"
+      ],
+      "dependency_capsule_ids": [
+        "company-knowledge-store"
+      ],
+      "origins": [
+        "canonical",
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_os_knowledge.py"
+    },
+    {
+      "capsule_ids": [
+        "company-research-intelligence"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-knowledge-store",
+        "company-research-intelligence",
+        "company-validation"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_os_research.py"
+    },
+    {
+      "capsule_ids": [
+        "company-research-intelligence",
+        "company-research-operations"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-research-intelligence",
+        "company-research-operations",
+        "company-validation"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_os_research_batches.py"
+    },
+    {
+      "capsule_ids": [
+        "company-research-intelligence",
+        "company-research-operations"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-research-intelligence",
+        "company-validation"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_os_research_ingestion.py"
+    },
+    {
+      "capsule_ids": [
+        "company-engineering-execution"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-engineering-execution",
+        "company-knowledge-capsules",
+        "company-knowledge-store",
+        "company-runtime",
+        "company-validation"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_read_authority.py"
+    },
+    {
+      "capsule_ids": [],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-engineering-execution",
+        "company-executive-delegation",
+        "company-runtime"
+      ],
+      "origins": [
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_review_separation.py"
+    },
+    {
+      "capsule_ids": [
+        "company-bootstrap-policy",
+        "company-os-control-plane",
+        "company-runtime",
+        "company-validation"
+      ],
+      "dependency_capsule_ids": [
+        "company-runtime",
+        "company-validation"
+      ],
+      "origins": [
+        "canonical",
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_runtime.py"
+    },
+    {
+      "capsule_ids": [],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-runtime",
+        "company-validation"
+      ],
+      "origins": [
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_runtime_integration.py"
+    },
+    {
+      "capsule_ids": [],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-runtime",
+        "company-validation"
+      ],
+      "origins": [
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_session_execution.py"
+    },
+    {
+      "capsule_ids": [
+        "company-runtime"
+      ],
+      "dependency_capsule_ids": [
+        "company-runtime"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_typed_evidence_context.py"
+    },
+    {
+      "capsule_ids": [
+        "company-workforce-capabilities",
+        "company-workforce-employment",
+        "company-workforce-hiring"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-knowledge-store",
+        "company-runtime",
+        "company-validation",
+        "company-workforce-capabilities",
+        "company-workforce-employment"
+      ],
+      "origins": [
+        "canonical",
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_workforce.py"
+    },
+    {
+      "capsule_ids": [
+        "company-youtube-connectivity"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-analytics-experiments",
+        "company-knowledge-store",
+        "company-production-integration-gate",
+        "company-youtube-connectivity"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_youtube_connectivity.py"
+    },
+    {
+      "capsule_ids": [
+        "company-youtube-fetch-client"
+      ],
+      "dependency_capsule_ids": [
+        "company-analytics-experiments",
+        "company-youtube-connectivity",
+        "company-youtube-fetch-client"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_youtube_end_to_end.py"
+    },
+    {
+      "capsule_ids": [
+        "company-youtube-connectivity"
+      ],
+      "dependency_capsule_ids": [
+        "ai-platform",
+        "company-analytics-experiments",
+        "company-knowledge-store",
+        "company-youtube-connectivity"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_youtube_live_findings.py"
+    },
+    {
+      "capsule_ids": [
+        "company-analytics-experiments"
+      ],
+      "dependency_capsule_ids": [
+        "company-analytics-experiments",
+        "company-ceo-dashboard",
+        "company-knowledge-capsules",
+        "company-knowledge-store"
+      ],
+      "origins": [
+        "capsule_contract",
+        "dependency_observed"
+      ],
+      "suite": "tests/test_company_youtube_studio_ingestion.py"
+    },
+    {
+      "capsule_ids": [
+        "company-external-engineering-runner"
+      ],
+      "dependency_capsule_ids": [],
+      "origins": [
+        "capsule_contract"
+      ],
+      "suite": "tests/test_engineering_runner_execution_context.py"
+    },
+    {
+      "capsule_ids": [
+        "company-external-engineering-runner"
+      ],
+      "dependency_capsule_ids": [],
+      "origins": [
+        "capsule_contract"
+      ],
+      "suite": "tests/test_engineering_runner_exploration_report.py"
+    },
+    {
+      "capsule_ids": [
+        "company-external-engineering-runner"
+      ],
+      "dependency_capsule_ids": [],
+      "origins": [
+        "capsule_contract"
+      ],
+      "suite": "tests/test_engineering_runner_exploration_telemetry.py"
+    },
+    {
+      "capsule_ids": [
+        "company-external-engineering-runner"
+      ],
+      "dependency_capsule_ids": [],
+      "origins": [
+        "capsule_contract"
+      ],
+      "suite": "tests/test_engineering_runner_repo_map.py"
+    },
+    {
+      "capsule_ids": [
+        "company-external-engineering-runner"
+      ],
+      "dependency_capsule_ids": [],
+      "origins": [
+        "capsule_contract"
+      ],
+      "suite": "tests/test_external_engineering_runner.py"
+    },
+    {
+      "capsule_ids": [
+        "company-youtube-fetch-client"
+      ],
+      "dependency_capsule_ids": [],
+      "origins": [
+        "capsule_contract"
+      ],
+      "suite": "tests/test_youtube_fetch.py"
+    }
+  ],
+  "undeclared_company_os_suites": [],
+  "unresolved": []
+}

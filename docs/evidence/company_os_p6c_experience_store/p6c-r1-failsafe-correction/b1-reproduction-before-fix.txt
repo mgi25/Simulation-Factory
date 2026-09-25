@@ -1,0 +1,102 @@
+# worktree HEAD: e4eb260278be5f5bec2d925ad05315afb0969634
+# tools/ tree:   b0670cd9298bf322f234362181f5dc8227bde247
+# test blobs:    8cc5bc0d0a7f4df6cb70894db2b28142ba80486e 5e8ebfbece019e9f81246172beb1c6638153e11a
+# python:        3.13.0
+
+FFFFFFFFFF...FFFFFFFFFFFFFFFF.                                           [100%]
+================================== FAILURES ===================================
+E   KeyError: slice(None, 4, None)
+tools\engineering_runner\experience.py:244: KeyError: slice(None, 4, None)
+E   AssertionError: {'abstention': '', 'available': True, 'enabled': True, 'files_offered': 2, ...}
+    assert (True is True and True is False)
+tests\test_external_engineering_runner.py:1619: AssertionError: {'abstention': '', 'available': True, 'enabled': True, 'files_offered': 2, ...}
+E   AssertionError: {'abstention': '', 'available': True, 'enabled': True, 'files_offered': 2, ...}
+    assert (True is True and True is False)
+tests\test_external_engineering_runner.py:1619: AssertionError: {'abstention': '', 'available': True, 'enabled': True, 'files_offered': 2, ...}
+E   AssertionError: {'abstention': '', 'available': True, 'enabled': True, 'files_offered': 2, ...}
+    assert (True is True and True is False)
+tests\test_external_engineering_runner.py:1619: AssertionError: {'abstention': '', 'available': True, 'enabled': True, 'files_offered': 2, ...}
+E   AssertionError: {'abstention': '', 'available': True, 'enabled': True, 'files_offered': 2, ...}
+    assert (True is True and True is False)
+tests\test_external_engineering_runner.py:1619: AssertionError: {'abstention': '', 'available': True, 'enabled': True, 'files_offered': 2, ...}
+E   RecursionError: maximum recursion depth exceeded
+tools\engineering_runner\experience.py:162: RecursionError: maximum recursion depth exceeded
+E   RuntimeError: an unforeseen defect in the optional experience path
+tests\test_external_engineering_runner.py:1657: RuntimeError: an unforeseen defect in the optional experience path
+E   RuntimeError: an unforeseen defect in the optional experience path
+tests\test_external_engineering_runner.py:1657: RuntimeError: an unforeseen defect in the optional experience path
+E   AssertionError: OSError: [Errno 28] No space left on device
+    assert 'failed' == 'completed'
+      
+      - completed
+      + failed
+tests\test_external_engineering_runner.py:1615: AssertionError: OSError: [Errno 28] No space left on device
+E   AssertionError: OSError: [Errno 28] No space left on device
+    assert 'failed' == 'completed'
+      
+      - completed
+      + failed
+tests\test_external_engineering_runner.py:1615: AssertionError: OSError: [Errno 28] No space left on device
+E   KeyError: slice(None, 4, None)
+tools\engineering_runner\experience.py:244: KeyError: slice(None, 4, None)
+E   Failed: DID NOT RAISE ExperienceAdviceRejected
+tests\test_engineering_runner_execution_context.py:857: Failed: DID NOT RAISE ExperienceAdviceRejected
+E   Failed: DID NOT RAISE ExperienceAdviceRejected
+tests\test_engineering_runner_execution_context.py:857: Failed: DID NOT RAISE ExperienceAdviceRejected
+E   TypeError: 'int' object is not subscriptable
+tools\engineering_runner\experience.py:244: TypeError: 'int' object is not subscriptable
+E   Failed: DID NOT RAISE ExperienceAdviceRejected
+tests\test_engineering_runner_execution_context.py:857: Failed: DID NOT RAISE ExperienceAdviceRejected
+E   Failed: DID NOT RAISE ExperienceAdviceRejected
+tests\test_engineering_runner_execution_context.py:857: Failed: DID NOT RAISE ExperienceAdviceRejected
+E   Failed: DID NOT RAISE ExperienceAdviceRejected
+tests\test_engineering_runner_execution_context.py:857: Failed: DID NOT RAISE ExperienceAdviceRejected
+E   Failed: DID NOT RAISE ExperienceAdviceRejected
+tests\test_engineering_runner_execution_context.py:857: Failed: DID NOT RAISE ExperienceAdviceRejected
+E   Failed: DID NOT RAISE ExperienceAdviceRejected
+tests\test_engineering_runner_execution_context.py:863: Failed: DID NOT RAISE ExperienceAdviceRejected
+E   Failed: DID NOT RAISE ExperienceAdviceRejected
+tests\test_engineering_runner_execution_context.py:863: Failed: DID NOT RAISE ExperienceAdviceRejected
+E   AssertionError: Regex pattern did not match.
+      Expected regex: '^warnings\\[0\\]\\.lines must be a list of strings, not str'
+      Actual message: '14 warning lines; the producer declares at most 4'
+tests\test_engineering_runner_execution_context.py:863: AssertionError: Regex pattern did not match.
+E   TypeError: 'int' object is not iterable
+tools\engineering_runner\experience.py:249: TypeError: 'int' object is not iterable
+E   Failed: DID NOT RAISE ExperienceAdviceRejected
+tests\test_engineering_runner_execution_context.py:863: Failed: DID NOT RAISE ExperienceAdviceRejected
+E   Failed: DID NOT RAISE ExperienceAdviceRejected
+tests\test_engineering_runner_execution_context.py:863: Failed: DID NOT RAISE ExperienceAdviceRejected
+E   Failed: DID NOT RAISE ExperienceAdviceRejected
+tests\test_engineering_runner_execution_context.py:863: Failed: DID NOT RAISE ExperienceAdviceRejected
+E   Failed: DID NOT RAISE ExperienceAdviceRejected
+tests\test_engineering_runner_execution_context.py:863: Failed: DID NOT RAISE ExperienceAdviceRejected
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+FAILED tests/test_external_engineering_runner.py::test_a_malformed_advisory_runs_the_job_exactly_as_without_advice[why_is_a_mapping-precedents\\[0\\]\\.why must be a list of strings, not dict]
+FAILED tests/test_external_engineering_runner.py::test_a_malformed_advisory_runs_the_job_exactly_as_without_advice[why_is_a_string-precedents\\[0\\]\\.why must be a list of strings, not str]
+FAILED tests/test_external_engineering_runner.py::test_a_malformed_advisory_runs_the_job_exactly_as_without_advice[why_holds_an_object-precedents\\[0\\]\\.why\\[1\\] must be a string, not dict]
+FAILED tests/test_external_engineering_runner.py::test_a_malformed_advisory_runs_the_job_exactly_as_without_advice[lines_is_a_mapping-warnings\\[0\\]\\.lines must be a list of strings, not dict]
+FAILED tests/test_external_engineering_runner.py::test_a_malformed_advisory_runs_the_job_exactly_as_without_advice[lines_holds_an_array-warnings\\[0\\]\\.lines\\[0\\] must be a string, not list]
+FAILED tests/test_external_engineering_runner.py::test_a_malformed_advisory_runs_the_job_exactly_as_without_advice[nested_past_the_recursion_limit-^RecursionError: ]
+FAILED tests/test_external_engineering_runner.py::test_an_unforeseen_parser_or_revalidation_exception_is_absorbed[parse]
+FAILED tests/test_external_engineering_runner.py::test_an_unforeseen_parser_or_revalidation_exception_is_absorbed[revalidate]
+FAILED tests/test_external_engineering_runner.py::test_a_failed_experience_write_is_no_advice_not_a_failed_run[experience-advice.json]
+FAILED tests/test_external_engineering_runner.py::test_a_failed_experience_write_is_no_advice_not_a_failed_run[experience.json]
+FAILED tests/test_engineering_runner_execution_context.py::test_a_precedent_why_that_is_not_a_list_of_strings_is_refused[mapping]
+FAILED tests/test_engineering_runner_execution_context.py::test_a_precedent_why_that_is_not_a_list_of_strings_is_refused[empty-mapping]
+FAILED tests/test_engineering_runner_execution_context.py::test_a_precedent_why_that_is_not_a_list_of_strings_is_refused[bare-string]
+FAILED tests/test_engineering_runner_execution_context.py::test_a_precedent_why_that_is_not_a_list_of_strings_is_refused[integer]
+FAILED tests/test_engineering_runner_execution_context.py::test_a_precedent_why_that_is_not_a_list_of_strings_is_refused[null]
+FAILED tests/test_engineering_runner_execution_context.py::test_a_precedent_why_that_is_not_a_list_of_strings_is_refused[nested-object]
+FAILED tests/test_engineering_runner_execution_context.py::test_a_precedent_why_that_is_not_a_list_of_strings_is_refused[nested-array]
+FAILED tests/test_engineering_runner_execution_context.py::test_a_precedent_why_that_is_not_a_list_of_strings_is_refused[non-string-member]
+FAILED tests/test_engineering_runner_execution_context.py::test_warning_lines_that_are_not_a_list_of_strings_are_refused[mapping]
+FAILED tests/test_engineering_runner_execution_context.py::test_warning_lines_that_are_not_a_list_of_strings_are_refused[empty-mapping]
+FAILED tests/test_engineering_runner_execution_context.py::test_warning_lines_that_are_not_a_list_of_strings_are_refused[bare-string]
+FAILED tests/test_engineering_runner_execution_context.py::test_warning_lines_that_are_not_a_list_of_strings_are_refused[integer]
+FAILED tests/test_engineering_runner_execution_context.py::test_warning_lines_that_are_not_a_list_of_strings_are_refused[null]
+FAILED tests/test_engineering_runner_execution_context.py::test_warning_lines_that_are_not_a_list_of_strings_are_refused[nested-object]
+FAILED tests/test_engineering_runner_execution_context.py::test_warning_lines_that_are_not_a_list_of_strings_are_refused[nested-array]
+FAILED tests/test_engineering_runner_execution_context.py::test_warning_lines_that_are_not_a_list_of_strings_are_refused[non-string-member]
+26 failed, 4 passed in 93.20s (0:01:33)

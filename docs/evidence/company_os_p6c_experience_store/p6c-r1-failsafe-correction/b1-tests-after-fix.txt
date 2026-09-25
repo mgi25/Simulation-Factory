@@ -1,0 +1,8 @@
+# worktree HEAD: 0d697d87e87e1eb4e98585c1f9a4e1a9c4a90238
+# tools/ tree:   463a04a9410df52d260a876cee16ce1f3ad5178e
+# test blobs:    8cc5bc0d0a7f4df6cb70894db2b28142ba80486e 5e8ebfbece019e9f81246172beb1c6638153e11a
+# python:        3.13.0
+
+..............................                                           [100%]
+=================================== PASSES ====================================
+30 passed in 88.51s (0:01:28)

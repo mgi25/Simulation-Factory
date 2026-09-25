@@ -1,0 +1,315 @@
+{
+  "count": 47,
+  "fingerprint": "f5de72a66d79bb83",
+  "red": {
+    "tests/test_company_os_research.py": {
+      "error": 0,
+      "failed": 1,
+      "passed": 80,
+      "skipped": 0
+    },
+    "tests/test_company_os_research_batches.py": {
+      "error": 0,
+      "failed": 1,
+      "passed": 117,
+      "skipped": 0
+    },
+    "tests/test_company_os_research_ingestion.py": {
+      "error": 0,
+      "failed": 1,
+      "passed": 121,
+      "skipped": 0
+    }
+  },
+  "revision": "e4eb260",
+  "suites": {
+    "tests/test_company_analytics.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 160,
+      "skipped": 0
+    },
+    "tests/test_company_bounded_engineering_activation.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 63,
+      "skipped": 0
+    },
+    "tests/test_company_bounded_engineering_autonomy.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 72,
+      "skipped": 0
+    },
+    "tests/test_company_context_assembly.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 9,
+      "skipped": 0
+    },
+    "tests/test_company_context_expansion.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 17,
+      "skipped": 0
+    },
+    "tests/test_company_dashboard.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 32,
+      "skipped": 0
+    },
+    "tests/test_company_delegation.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 152,
+      "skipped": 0
+    },
+    "tests/test_company_delegation_pilot.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 159,
+      "skipped": 0
+    },
+    "tests/test_company_dependency_graph.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 54,
+      "skipped": 0
+    },
+    "tests/test_company_efficiency.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 69,
+      "skipped": 0
+    },
+    "tests/test_company_engineering_execution.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 207,
+      "skipped": 0
+    },
+    "tests/test_company_evidence_review.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 25,
+      "skipped": 0
+    },
+    "tests/test_company_executable_work_planning.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 23,
+      "skipped": 0
+    },
+    "tests/test_company_execution_transport.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 14,
+      "skipped": 0
+    },
+    "tests/test_company_executive_planning.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 73,
+      "skipped": 0
+    },
+    "tests/test_company_experience_retrieval.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 77,
+      "skipped": 0
+    },
+    "tests/test_company_experience_store.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 57,
+      "skipped": 0
+    },
+    "tests/test_company_external_engineering_runner.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 67,
+      "skipped": 0
+    },
+    "tests/test_company_finance.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 123,
+      "skipped": 0
+    },
+    "tests/test_company_finance_usage_cost.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 48,
+      "skipped": 0
+    },
+    "tests/test_company_gate_suite_requirements.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 46,
+      "skipped": 0
+    },
+    "tests/test_company_integration_gate.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 89,
+      "skipped": 0
+    },
+    "tests/test_company_objective_planning.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 93,
+      "skipped": 0
+    },
+    "tests/test_company_org_intelligence.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 119,
+      "skipped": 0
+    },
+    "tests/test_company_os_ai_platform.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 46,
+      "skipped": 0
+    },
+    "tests/test_company_os_capsules.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 68,
+      "skipped": 0
+    },
+    "tests/test_company_os_knowledge.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 26,
+      "skipped": 0
+    },
+    "tests/test_company_os_research.py": {
+      "error": 0,
+      "failed": 1,
+      "passed": 80,
+      "skipped": 0
+    },
+    "tests/test_company_os_research_batches.py": {
+      "error": 0,
+      "failed": 1,
+      "passed": 117,
+      "skipped": 0
+    },
+    "tests/test_company_os_research_ingestion.py": {
+      "error": 0,
+      "failed": 1,
+      "passed": 121,
+      "skipped": 0
+    },
+    "tests/test_company_read_authority.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 34,
+      "skipped": 0
+    },
+    "tests/test_company_review_separation.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 32,
+      "skipped": 0
+    },
+    "tests/test_company_runtime.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 22,
+      "skipped": 0
+    },
+    "tests/test_company_runtime_integration.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 14,
+      "skipped": 0
+    },
+    "tests/test_company_session_execution.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 48,
+      "skipped": 0
+    },
+    "tests/test_company_typed_evidence_context.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 59,
+      "skipped": 0
+    },
+    "tests/test_company_workforce.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 93,
+      "skipped": 0
+    },
+    "tests/test_company_youtube_connectivity.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 29,
+      "skipped": 0
+    },
+    "tests/test_company_youtube_end_to_end.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 7,
+      "skipped": 0
+    },
+    "tests/test_company_youtube_live_findings.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 55,
+      "skipped": 0
+    },
+    "tests/test_company_youtube_studio_ingestion.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 142,
+      "skipped": 0
+    },
+    "tests/test_engineering_runner_execution_context.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 63,
+      "skipped": 0
+    },
+    "tests/test_engineering_runner_exploration_report.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 19,
+      "skipped": 0
+    },
+    "tests/test_engineering_runner_exploration_telemetry.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 25,
+      "skipped": 0
+    },
+    "tests/test_engineering_runner_repo_map.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 25,
+      "skipped": 0
+    },
+    "tests/test_external_engineering_runner.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 190,
+      "skipped": 0
+    },
+    "tests/test_youtube_fetch.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 68,
+      "skipped": 1
+    }
+  },
+  "tests": {
+    "error": 0,
+    "failed": 3,
+    "passed": 3231,
+    "skipped": 1
+  }
+}
