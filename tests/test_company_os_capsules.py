@@ -693,7 +693,7 @@ def test_the_four_staleness_conditions_accumulate_on_one_capsule():
 
 
 def test_the_company_os_seed_capsules_load(seeds):
-    assert len(seeds) == 23
+    assert len(seeds) == 24
     assert seeds.ids() == (
         "ai-platform",
         "company-analytics-experiments",
@@ -702,6 +702,7 @@ def test_the_company_os_seed_capsules_load(seeds):
         "company-engineering-execution",
         "company-evidence-review",
         "company-executive-delegation",
+        "company-experience-store",
         "company-external-engineering-runner",
         "company-finance",
         "company-knowledge-capsules",

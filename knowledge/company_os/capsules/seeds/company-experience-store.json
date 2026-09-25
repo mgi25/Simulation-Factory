@@ -1,0 +1,80 @@
+{
+  "benchmarks": [],
+  "capabilities": [
+    "experience_capture",
+    "precedent_retrieval",
+    "experience_advice"
+  ],
+  "created": "2026-09-25",
+  "decisions": [],
+  "dependencies": [
+    "company-engineering-execution",
+    "company-production-integration-gate",
+    "company-runtime",
+    "company-knowledge-capsules"
+  ],
+  "experiment_learnings": [],
+  "facts": [],
+  "failure_learnings": [],
+  "freshness": "slow_changing",
+  "id": "company-experience-store",
+  "inputs": [
+    "Settled engineering attempts, read from the canonical engineering, execution and resource-usage stores of one state directory",
+    "The current capsule store and P6B's import graph, to anchor an episode at capture and revalidate it at query time"
+  ],
+  "invariants": [
+    "An episode indexes canonical records by pointer and byte digest plus small projections; no canonical record is rewritten or duplicated.",
+    "Decision-time features come from the work order alone; outcomes, resources and governance never enter them.",
+    "Identity derives from canonical pointers: identical content is idempotent, different content under one identity is refused.",
+    "Validity is scoped to capsule contracts, path governance and read-file structure, never to a whole-repository commit.",
+    "Learning never creates authority: advice carries no authority vocabulary and each suggestion is revalidated against current read authority.",
+    "Weak, incompatible, stale or failure-only matches abstain; a correction is a warning and is never scored as success.",
+    "No embedding, model, network or database, and nothing here writes a knowledge record."
+  ],
+  "last_reviewed": "2026-09-25",
+  "may_read": [
+    "company/experience/**",
+    "company/engineering/**",
+    "company/runtime/**",
+    "company/efficiency/**",
+    "company/integration/checks.py",
+    "company/integration/dependencies.py",
+    "knowledge/company_os/capsules/**"
+  ],
+  "may_write": [
+    "company/experience/**"
+  ],
+  "must_not_modify": [
+    "company/engineering/**",
+    "company/runtime/**",
+    "company/integration/**",
+    "knowledge/company_os/records/**",
+    "tools/**",
+    "sloped/**"
+  ],
+  "outputs": [
+    "Immutable experience episodes under the caller's state directory, one file per settled developer attempt",
+    "A bounded, fingerprinted, advisory-only JSON artifact per work order, read by the external runner over its command line"
+  ],
+  "owner": "company-os",
+  "owns_paths": [
+    "company/experience"
+  ],
+  "purpose": "Operational episode history for engineering: captures each settled developer attempt from canonical records, retrieves accepted precedent and correction warnings by structure, abstains when nothing is related, and emits bounded advice that current authority and repository intelligence revalidate.",
+  "recheck_on": "2027-09-25",
+  "revalidation_reason": "",
+  "risks": [
+    "Real history is small and clustered in one subsystem, so replay numbers describe the mechanism more than its benefit.",
+    "Capsule contract edits make related precedents stale by design, so a busy capsule leaves little current history.",
+    "Suggestion revalidation fails closed without P6B's graph, which costs one full parse of the checkout per advisory."
+  ],
+  "source": "company-os-p6c-experience-store",
+  "source_digests": [],
+  "status": "active",
+  "tests": [
+    "tests/test_company_experience_store.py",
+    "tests/test_company_experience_retrieval.py"
+  ],
+  "title": "Experience store",
+  "type": "module"
+}
