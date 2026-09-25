@@ -261,6 +261,25 @@ class RepositoryView:
     def governing_all(self, paths: Iterable[str]) -> tuple[str, ...]:
         return tuple(sorted({cid for path in paths for cid in self.governing(path)}))
 
+    def governing_scope(self, rules: Iterable[str]) -> tuple[str, ...]:
+        """Capsules governing anything inside a *scope* of path rules.
+
+        A task's write scope is often a directory, and sometimes one that
+        contains several owned subtrees; a capsule owning any path inside the
+        scope governs part of the task. `governing` asks the narrower question
+        about one file.
+        """
+        if self.capsules is None:
+            return ()
+        wanted = [normalise_path(rule) for rule in rules if normalise_path(rule)]
+        found = set(self.governing_all(wanted))
+        for capsule in self.capsules.all():
+            if capsule.status in IN_FORCE and any(
+                covers(rule, owned) for rule in wanted for owned in capsule.owns_paths
+            ):
+                found.add(capsule.id)
+        return tuple(sorted(found))
+
     # --- files ----------------------------------------------------------------
 
     def exists(self, path: str) -> bool:

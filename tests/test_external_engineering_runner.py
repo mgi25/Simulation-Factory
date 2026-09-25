@@ -1478,6 +1478,26 @@ def test_an_advisory_carrying_authority_is_dropped_whole(repository):
     assert control.receipts[0]["files_changed"] == ["subject/module.py"]
 
 
+def test_experience_cannot_move_the_adaptive_model_gate():
+    """The economy downshift reads failure-guided compiled spans and nothing
+    the advisory feeds. History may reorder where a session starts reading;
+    it may not choose the model tier that reads it."""
+    import inspect
+    import textwrap
+
+    from tools.engineering_runner.runner import EngineeringRunner
+
+    source = textwrap.dedent(inspect.getsource(EngineeringRunner._adaptive_developer_model))
+    tree = ast.parse(source)
+    read = {
+        node.attr
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name) and node.value.id == "context_bundle"
+    }
+    assert read == {"compiled_spans"}
+    assert "experience" not in source
+
+
 def test_experience_advice_can_be_switched_off(repository):
     control = ExperiencedControlPlane(repository["base"], states=["planning"], advice=_experience_payload())
     backend = ScriptedBackend(edit=_in_scope_edit)

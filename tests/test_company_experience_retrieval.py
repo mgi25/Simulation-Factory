@@ -44,6 +44,7 @@ from company.experience import (
 from company.experience import __main__ as experience_cli
 from company.experience.advice import MAX_ADVICE_CHARS, advice_fingerprint
 from company.experience.model import FindingNote
+from company.experience.capture import verify_pointers
 from company.experience.replay import CorpusSource, replay_fingerprint, run_replay
 from company.experience.repository import capture_provenance
 from company.integration.dependencies import DependencyGraph
@@ -260,11 +261,15 @@ class World:
         return episode
 
     def retrieve(self, query=None, view=None):
+        # Synthetic episodes have no canonical engineering records behind
+        # them, so these ranking tests check pointers alone - by name.
+        # Re-derivation is exercised over real records further down.
         return retrieve(
             query or _query(),
             view or self.view,
             scan=self.store.scan(),
             resolve_source=lambda label: self.source if label == "local" else None,
+            integrity=lambda episode, source, view: verify_pointers(episode, source),
         )
 
     def advise(self, query=None, view=None):
@@ -675,14 +680,15 @@ def test_revalidation_against_this_repositorys_own_p6b_graph(tmp_path):
         read_paths=("company/engineering", "tests"),
         required_tests=("tests/test_company_engineering_execution.py",),
     )
-    result = retrieve(query, view, scan=store.scan(), resolve_source=lambda label: source)
+    pointers_only = lambda episode, src, v: verify_pointers(episode, src)  # noqa: E731 - synthetic records
+    result = retrieve(query, view, scan=store.scan(), resolve_source=lambda label: source, integrity=pointers_only)
     assert result.status == "abstain", "a changed file outside this task's write scope is not repeatable precedent"
     query = _query(
         write_paths=("company/engineering",),
         read_paths=("company/engineering", "tests"),
         required_tests=("tests/test_company_engineering_execution.py",),
     )
-    result = retrieve(query, view, scan=store.scan(), resolve_source=lambda label: source)
+    result = retrieve(query, view, scan=store.scan(), resolve_source=lambda label: source, integrity=pointers_only)
     assert result.status == "precedent"
     advice = build_advice(query, result, view, work_order_fingerprint=_hex("q"), as_of=LATER)
     assert advice["measurement"]["repository_graph"] == "built"
@@ -795,6 +801,28 @@ def test_a_corrupt_episode_is_skipped_and_counted(tmp_path, capsys):
     assert code == 0
     advice = json.loads(capsys.readouterr().out)
     assert advice["measurement"]["store_problems"] == 1
+
+
+def test_an_edited_episode_is_not_served_as_precedent(tmp_path, capsys):
+    """Its identity is untouched, so it decodes; its projection no longer
+    re-derives from the canonical records, so it is not served."""
+    first = _seeded_flow(tmp_path, "wo-exp-a")
+    first.develop()
+    first.review()
+    first.gate()
+    second = _seeded_flow(tmp_path, "wo-exp-b")
+    second.brief(on=flows.LATER)
+    argv = ["suggest", "--state-dir", str(first.state), "--repo-root", str(first.repo), "--work-order", "wo-exp-b"]
+    assert experience_cli.main(argv) == 0
+    assert json.loads(capsys.readouterr().out)["status"] == "precedent"
+    [path] = list((first.state / "experience" / "episodes").rglob("000001.json"))
+    data = json.loads(path.read_text(encoding="utf-8"))
+    data["outcome"]["files_changed"] = ["company/engineering/seed.py"]
+    path.write_text(json.dumps(data), encoding="utf-8")
+    assert experience_cli.main(argv + ["--no-capture"]) == 0
+    advice = json.loads(capsys.readouterr().out)
+    assert advice["status"] == "abstain" and advice["measurement"]["excluded"].get("invalid") == 1
+    assert "company/engineering/seed.py" not in json.dumps(advice["suggested_files"])
 
 
 def test_suggest_refuses_a_work_order_it_cannot_read(tmp_path, capsys):

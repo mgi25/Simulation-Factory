@@ -89,7 +89,7 @@ from typing import Any
 
 from knowledge.company_os.capsules import normalise_path
 
-from .capture import GovernanceFacts, governance_facts, governed_class, verify_pointers
+from .capture import GovernanceFacts, governance_facts, governed_class, rederivation_problems, verify_pointers
 from .model import DecisionFeatures, ExperienceEpisode, PrecedentClass
 from .repository import RepositoryView, Validity, ValidityReport, covers, evaluate_validity
 from .store import ExperienceStore, StoreScan
@@ -273,7 +273,7 @@ def structural_signals(query: ExperienceQuery, episode: ExperienceEpisode, view:
     targets = tuple(normalise_path(p) for p in episode.targets())
     writable = tuple(sorted(p for p in targets if _in_scope(p, query.write_paths)))
     tests = tuple(sorted(set(normalise_path(t) for t in query.required_tests) & set(normalise_path(t) for t in episode.features.required_tests)))
-    ours = set(view.governing_all(query.write_paths))
+    ours = set(view.governing_scope(query.write_paths))
     theirs = set(view.governing_all(targets))
     return MatchSignals(writable_targets=writable, shared_tests=tests, shared_capsules=tuple(sorted(ours & theirs)))
 
@@ -327,14 +327,31 @@ def _above_floor(klass: PrecedentClass, signals: MatchSignals) -> bool:
 # --- retrieval -------------------------------------------------------------------
 
 
+def integrity_problems(episode: ExperienceEpisode, source_dir: Path, view: RepositoryView) -> tuple[str, ...]:
+    """Every reason an episode's evidence cannot be trusted as it stands.
+
+    Pointers first: a changed canonical record makes re-derivation
+    meaningless, and naming the record is the more useful reason. Then the
+    projections themselves must re-derive from those records.
+    """
+    return verify_pointers(episode, source_dir) or rederivation_problems(episode, source_dir, view)
+
+
 def retrieve(
     query: ExperienceQuery,
     view: RepositoryView,
     *,
     scan: StoreScan,
     resolve_source: Callable[[str], Path | None],
+    integrity: Callable[[ExperienceEpisode, Path, RepositoryView], tuple[str, ...]] = integrity_problems,
 ) -> RetrievalResult:
-    """Judge every episode against the query and keep only what earns its place."""
+    """Judge every episode against the query and keep only what earns its place.
+
+    `integrity` is the full check by default and in every production caller.
+    It is a parameter only so a test of ranking logic over synthetic episodes
+    - which have no canonical engineering records to re-derive from - can say
+    by name that it checks pointers alone.
+    """
     if not scan.available:
         return _abstain("experience_unavailable", "; ".join(scan.problems[:2]) or "the experience store is unreadable", scan)
     if not scan.episodes:
@@ -371,7 +388,9 @@ def retrieve(
         incompatible = incompatibilities(query, episode.features)
         source_dir = resolve_source(episode.source)
         pointer_problems = (
-            verify_pointers(episode, source_dir) if source_dir is not None else (f"source {episode.source!r} is not resolvable",)
+            integrity(episode, source_dir, view)
+            if source_dir is not None
+            else (f"source {episode.source!r} is not resolvable",)
         )
         validity = evaluate_validity(episode, view, pointer_problems=pointer_problems)
         judged.append(
@@ -500,6 +519,7 @@ __all__ = [
     "RetrievalResult",
     "import_links",
     "incompatibilities",
+    "integrity_problems",
     "retrieve",
     "retrieve_from",
     "structural_signals",

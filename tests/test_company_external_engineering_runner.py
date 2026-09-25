@@ -1017,7 +1017,7 @@ def test_the_runners_advisory_vocabulary_is_the_producers():
 
 
 def test_the_runner_accepts_what_the_producer_emits_and_computes_the_same_fingerprint(tmp_path):
-    from company.experience import build_advice, retrieve
+    from company.experience import build_advice
     from company.experience.advice import advice_fingerprint, unavailable_advice
     from tools.engineering_runner.experience import ExperienceAdvice, fingerprint as runner_fingerprint
 
@@ -1029,7 +1029,7 @@ def test_the_runner_accepts_what_the_producer_emits_and_computes_the_same_finger
     query = synthetic._query()
     produced = build_advice(
         query,
-        retrieve(query, world.view, scan=world.store.scan(), resolve_source=lambda label: world.source),
+        world.retrieve(query),
         world.view,
         work_order_fingerprint="0123456789abcdef",
         as_of=dt.date(2026, 9, 25),

@@ -12,8 +12,10 @@ that artifact, and it trusts none of it.
 1. **Parses it strictly** (`ExperienceAdvice.parse`): the kind and version the
    producer declares, `advisory_only` true, only the declared top-level keys,
    the declared bounds, a fingerprint that matches, the work order the runner
-   asked about - and no authority vocabulary at any depth. A payload failing
-   any of these is dropped whole; the session runs without advice.
+   asked about, only the declared keys inside every item it reads (a
+   whitelist, so nothing rides inside a suggestion whatever it is called) -
+   and no authority vocabulary at any depth. A payload failing any of these
+   is dropped whole; the session runs without advice.
 2. **Revalidates every item against the envelope** (`revalidate`): a file is
    kept only if this work order's `may_read` covers it and `may_not_read`
    does not, and the runner's own map knows it; a test only if it is not

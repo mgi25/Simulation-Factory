@@ -12,7 +12,7 @@ invariant:
 1. **No authority vocabulary can appear in it.** `AUTHORITY_KEYS` names every
    field an authorization is made of - read and write scopes, forbidden
    paths, required tests, risk, reasoning class, profile, attempts,
-   approval, merge, publish - and `assert_no_authority_keys` walks the whole
+   approval, merge authority, publish - and `assert_no_authority_keys` walks the whole
    payload before it is returned. The runner's reader refuses the same set
    independently, so neither side trusts the other to have checked.
 2. **Every file suggestion is re-checked against the task's current read

@@ -244,6 +244,60 @@ def verify_pointers(episode: ExperienceEpisode, state_dir: str | Path) -> tuple[
     return tuple(problems)
 
 
+# The refusals that mean "today's decoder cannot read a record the capture
+# read", as distinct from "the records now say something else".
+_UNDECODABLE = frozenset({"work_order_undecodable", "records_undecodable"})
+
+
+def rederivation_problems(
+    episode: ExperienceEpisode, state_dir: str | Path, view: RepositoryView
+) -> tuple[str, ...]:
+    """Whether the canonical records still derive exactly this episode.
+
+    The projections in an episode are a cache of what its canonical records
+    say, and a cache is only trustworthy while it can be rebuilt. So retrieval
+    rebuilds each candidate from the records its pointers name and compares
+    content (provenance and source excluded - they describe the capture, not
+    the attempt). A difference means the stored episode no longer says what
+    the records say: an edited episode file, or capture code that has since
+    changed its reading. Either way it is not served.
+
+    One case is deliberately not a problem: a record today's decoder refuses
+    to read. The pointer digests already prove those bytes are the ones the
+    capture read, and the snapshot is what they meant when they were read -
+    which is the reason the snapshot exists. That case returns empty and is
+    visible only as the absence of a re-check.
+    """
+    root = Path(state_dir)
+    try:
+        engineering = EngineeringStore(root)
+        order = engineering.work_order(episode.work_order_id)
+        job = engineering.job(episode.work_order_id)
+    except Exception:  # noqa: BLE001 - see "one case" above
+        return ()
+    if order is None or job is None:
+        return (f"{episode.work_order_id} no longer has a stored work order or job",)
+    cycle = next((c for c in attempt_cycles(job) if c.packet_attempt == episode.packet_attempt), None)
+    if cycle is None:
+        return (f"{episode.work_order_id} no longer records attempt {episode.packet_attempt}",)
+    try:
+        rebuilt = build_episode(
+            root, episode.work_order_id, cycle, view,
+            captured_on=episode.provenance.captured_on, source=episode.source, order=order, job=job,
+        )
+    except CaptureRefused as exc:
+        return () if exc.code in _UNDECODABLE else (f"re-derivation refused: {exc.code}: {exc.detail}",)
+    except (ExperienceError, ValueError, TypeError) as exc:
+        return (f"re-derivation failed: {type(exc).__name__}: {exc}",)
+    if rebuilt.experience_id != episode.experience_id:
+        return (f"the records now derive a different identity ({rebuilt.experience_id})",)
+    if rebuilt.content_fingerprint() != episode.content_fingerprint():
+        stored, derived = episode.content(), rebuilt.content()
+        fields = [key for key in sorted(set(stored) | set(derived)) if stored.get(key) != derived.get(key)]
+        return ("the stored episode does not re-derive from its canonical records (differs in: " + ", ".join(fields) + ")",)
+    return ()
+
+
 def _job_snapshot_ref(state_dir: Path, work_order_id: str, transitions: int) -> str:
     """The stored job snapshot whose history ends exactly at the settling move."""
     directory = state_dir / "engineering" / "jobs" / task_directory_name(work_order_id)
@@ -755,5 +809,6 @@ __all__ = [
     "capture_settled",
     "governance_facts",
     "governed_class",
+    "rederivation_problems",
     "verify_pointers",
 ]
