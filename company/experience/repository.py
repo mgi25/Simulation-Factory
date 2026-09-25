@@ -4,8 +4,9 @@ Two jobs, and they are the same job at two moments. At **capture** it records
 the scoped contract and structural state an episode depended on
 (`capture_provenance`). At **query** it decides whether that state still holds
 (`evaluate_validity`) and revalidates every suggestion against the
-repository as it is now - the current capsule contracts and P6B's current
-import graph - before anything is offered.
+repository as it is now - the current capsule contracts, the files on disk,
+and P6B's import graph whenever a caller supplies one - before anything is
+offered.
 
 ## Validity is scoped, never a whole-repository commit
 
@@ -46,14 +47,28 @@ anchored the same way; whether a test still matters to a task is decided per
 suggestion, from the current import graph, not from a digest of a file that
 every change to the subsystem edits.
 
-## Why the P6B graph is built lazily
+## Why the import graph is supplied, never imported
 
-`build_dependency_graph(GateScan.of(root))` is the one canonical import graph
-- the same one the gate audits capsule tests against, and the same
-resolution rules `tools/engineering_runner/repo_map.py` is pinned to. It parses
-the whole checkout, so it is built only when a query has candidates worth
-revalidating. A failure to build it is recorded and fails *closed*: no file
-or test suggestion is offered without it.
+P6B's canonical graph (`build_dependency_graph(GateScan.of(root))`) lives in
+`company.integration`, and the gate is read by no other Company OS subsystem
+(`tests/test_company_integration_gate.py::test_no_other_company_os_subsystem_
+imports_the_gate`): a subsystem that could reach gate code could reach code
+that produces a readiness verdict. So this package never imports it. A caller
+that holds a graph passes a `graph_builder` - a test, or the replay harness,
+which runs outside Company OS - and three states follow, each honest:
+
+| `graph_state` | means | a suggestion that needs the graph |
+|---|---|---|
+| `built` | the caller supplied a graph and it was built | checked here |
+| `not_supplied` | nobody supplied one | offered with `checked` omitting `import_graph`, so the consumer must check |
+| `failed: ...` | a graph was supplied and could not be built | refused - an attempted check that errored is not a pass |
+
+The consumer in the real flow is the external runner, and it always performs
+the import-graph check itself with its own P6B map (`tools/engineering_runner/
+repo_map.py`, pinned to the same resolution rules), built from the task's own
+worktree - the most current tree there is. So every suggestion that reaches a
+session has been checked against a current import graph exactly once, by the
+component that holds one.
 """
 
 from __future__ import annotations
@@ -274,39 +289,35 @@ class RepositoryView:
 
     @property
     def graph(self) -> Any | None:
-        """The canonical P6B dependency graph, built once, or None with a reason."""
+        """The supplied P6B dependency graph, built once, or None."""
         if not self._graph_built:
             self._graph_built = True
-            try:
-                builder = self.graph_builder or _canonical_graph
-                self._graph = builder(self.repo_root)
-            except Exception as exc:  # noqa: BLE001 - fails closed, see module doc
-                self._graph = None
-                self._graph_error = f"{type(exc).__name__}: {exc}"
+            if self.graph_builder is not None:
+                try:
+                    self._graph = self.graph_builder(self.repo_root)
+                except Exception as exc:  # noqa: BLE001 - fails closed, see module doc
+                    self._graph = None
+                    self._graph_error = f"{type(exc).__name__}: {exc}"
         return self._graph
 
     @property
     def graph_error(self) -> str:
         return self._graph_error
 
+    @property
+    def graph_state(self) -> str:
+        """`built`, `not_supplied`, or `failed: <why>` - see the module docstring."""
+        if self.graph is not None:
+            return "built"
+        if self.graph_builder is None:
+            return "not_supplied"
+        return f"failed: {self._graph_error}"
+
     def modules_under(self, rule: str) -> tuple[str, ...]:
         graph = self.graph
         if graph is None:
             return ()
         return tuple(m for m in graph.modules if covers(rule, m))
-
-
-def _canonical_graph(repo_root: Path) -> Any:
-    """P6B's graph, from P6B's scan. Imported here, where it is needed.
-
-    `company.integration` imports half the control plane; keeping the import
-    inside the builder means an advisory run with no history - the common case
-    on a fresh state directory - never pays for it.
-    """
-    from company.integration.checks import GateScan
-    from company.integration.dependencies import build_dependency_graph
-
-    return build_dependency_graph(GateScan.of(repo_root))
 
 
 # --- capture ---------------------------------------------------------------------

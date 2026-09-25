@@ -30,11 +30,25 @@ them to match would compare today's task against yesterday's contract.
 
 ## Gates before signals
 
-A precedent is **incompatible** - never scored - when it differs from the
-task in risk, reasoning-class ceiling, specialist domain or review capability.
-Those are the routing inputs; a precedent from a lower-risk task is not
-evidence about how to run a higher-risk one, and using it would be learning
-lowering a risk class by the back door.
+A precedent is **incompatible** - never scored - when:
+
+- its **risk** is lower than the task's. A precedent held to less scrutiny
+  than this task needs is not evidence about how to do this task, and using
+  it would be learning lowering a risk class by the back door. The rule is
+  deliberately one-sided: a precedent that passed *more* scrutiny than the
+  task needs is still evidence, and reusing it lowers nothing - the task
+  keeps its own risk, its own review and its own gate;
+- its **reasoning-class ceiling** differs;
+- its **specialist domain** differs - security work is not precedent for
+  routine work, nor the reverse.
+
+`review_capability` is deliberately *not* a gate. The replay over this
+repository's own history showed it splits every precedent at 2026-09-21:
+before review separation every work order asked for `software_architecture`,
+after it most ask for `code_review`. It records a policy change, not the
+nature of the work; the part of it that is about the work - an architecture
+domain - is already in `specialist_domain`. (First replay: 16 of 34
+decisions abstained as incompatible, most on this field alone.)
 
 ## The support floor, and why it is a rule rather than a threshold
 
@@ -87,11 +101,13 @@ MAX_HISTORICAL = 3
 
 # The routing inputs a precedent must share with the task to be compared at all.
 COMPATIBILITY_FIELDS: tuple[str, ...] = (
-    "risk",
     "reasoning_class_ceiling",
     "specialist_domain",
-    "review_capability",
 )
+
+# `ai_platform.resource_classes.Risk`, in ascending order. A precedent's risk
+# must be at least the task's; an unknown value on either side is incompatible.
+RISK_ORDER: tuple[str, ...] = ("low", "medium", "high", "critical")
 
 ABSTENTION_CODES: tuple[str, ...] = (
     "no_history",
@@ -241,6 +257,10 @@ def _in_scope(path: str, rules: Sequence[str]) -> bool:
 
 def incompatibilities(query: ExperienceQuery, features: DecisionFeatures) -> tuple[str, ...]:
     out = []
+    if features.risk not in RISK_ORDER or query.risk not in RISK_ORDER:
+        out.append(f"risk: precedent {features.risk or 'none'}, task {query.risk or 'none'} (unknown)")
+    elif RISK_ORDER.index(features.risk) < RISK_ORDER.index(query.risk):
+        out.append(f"risk: precedent {features.risk} is below task {query.risk}")
     for name in COMPATIBILITY_FIELDS:
         theirs, ours = getattr(features, name), getattr(query, name)
         if theirs != ours:
@@ -473,6 +493,7 @@ def retrieve_from(
 __all__ = [
     "ABSTENTION_CODES",
     "COMPATIBILITY_FIELDS",
+    "RISK_ORDER",
     "Candidate",
     "ExperienceQuery",
     "MatchSignals",

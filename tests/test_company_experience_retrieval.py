@@ -379,15 +379,31 @@ def test_the_same_subsystem_under_a_different_risk_is_incompatible(tmp_path):
     [
         ("reasoning_class_ceiling", "C", "D"),
         ("specialist_domain", "", "security"),
-        ("review_capability", "code_review", "software_architecture"),
+        ("specialist_domain", "security", ""),
     ],
 )
 def test_every_routing_input_must_match(tmp_path, field, precedent, task):
     world = World(tmp_path)
-    kwargs = {"ceiling" if field == "reasoning_class_ceiling" else "specialist" if field == "specialist_domain" else field: precedent}
+    kwargs = {"ceiling" if field == "reasoning_class_ceiling" else "specialist": precedent}
     world.add("wo-past", **kwargs)
     result = world.retrieve(_query(**{field: task}))
     assert result.abstention == "incompatible_only"
+
+
+def test_a_precedent_held_to_more_scrutiny_is_still_precedent(tmp_path):
+    """Risk is one-sided: higher-risk precedent for a lower-risk task is evidence."""
+    world = World(tmp_path)
+    world.add("wo-high", risk="high")
+    assert world.retrieve(_query(risk="medium")).status == "precedent"
+    assert world.retrieve(_query(risk="critical")).abstention == "incompatible_only"
+
+
+def test_review_capability_is_a_policy_record_not_a_gate(tmp_path):
+    """Before 2026-09-21 every work order asked for the architect; that is
+    history of a policy, not a property of the work."""
+    world = World(tmp_path)
+    world.add("wo-pre-separation", review_capability="software_architecture")
+    assert world.retrieve(_query(review_capability="code_review")).status == "precedent"
 
 
 def test_only_stale_experience_abstains_and_is_listed_as_history(tmp_path):
@@ -569,7 +585,7 @@ def test_a_file_missing_from_the_current_graph_is_refused(tmp_path):
     assert {"item": "file:pkg/alpha/helper.py", "reason": "not a module in the current import graph"} in advice["refused"]
 
 
-def test_without_repository_intelligence_nothing_is_suggested(tmp_path):
+def test_a_supplied_graph_that_fails_to_build_refuses_everything(tmp_path):
     world = World(tmp_path)
     world.add("wo-past")
 
@@ -580,8 +596,22 @@ def test_without_repository_intelligence_nothing_is_suggested(tmp_path):
     advice = world.advise(view=view)
     assert advice["status"] == "precedent", "the precedent itself is still worth naming"
     assert advice["suggested_files"] == [] and advice["suggested_tests"] == []
-    assert all("repository intelligence unavailable" in r["reason"] for r in advice["refused"])
-    assert advice["measurement"]["repository_graph"].startswith("unavailable")
+    assert advice["refused"] and all("could not be built" in r["reason"] for r in advice["refused"])
+    assert advice["measurement"]["repository_graph"].startswith("failed")
+
+
+def test_with_no_graph_supplied_the_import_graph_check_is_left_to_the_consumer(tmp_path):
+    """Company OS may not import the gate that owns P6B's graph; the runner,
+    which always graph-checks with its own current map, is told what is left."""
+    world = World(tmp_path)
+    world.add("wo-past", tests=("tests/test_alpha.py", "tests/test_alpha_helper.py"))
+    view = RepositoryView(repo_root=world.repo, capsules=_capsules())
+    advice = world.advise(view=view)
+    assert advice["measurement"]["repository_graph"] == "not_supplied"
+    assert [f["checked"] for f in advice["suggested_files"]] == [["read_authority", "exists"]]
+    assert [t["checked"] for t in advice["suggested_tests"]] == [["read_authority", "exists"]]
+    graphed = world.advise()
+    assert graphed["suggested_files"][0]["checked"] == ["read_authority", "exists", "import_graph"]
 
 
 def test_a_deleted_file_is_refused_even_when_history_used_it(tmp_path):
@@ -605,8 +635,15 @@ def test_a_deleted_changed_file_makes_the_whole_precedent_historical(tmp_path):
 
 
 def test_revalidation_against_this_repositorys_own_p6b_graph(tmp_path):
-    """The canonical graph, built from this checkout by P6B's own builder."""
-    view = RepositoryView.load(ROOT)
+    """The canonical graph, built from this checkout by P6B's own builder.
+
+    Supplied by the test, as any caller outside Company OS may supply it: the
+    experience package itself never imports the gate that owns it.
+    """
+    from company.integration.checks import GateScan
+    from company.integration.dependencies import build_dependency_graph
+
+    view = RepositoryView.load(ROOT, graph_builder=lambda root: build_dependency_graph(GateScan.of(root)))
     assert view.capsules is not None
     source = tmp_path / "state"
     store = ExperienceStore(source)

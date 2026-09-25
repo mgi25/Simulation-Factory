@@ -908,6 +908,21 @@ def test_the_experience_package_holds_no_network_model_embedding_or_database():
         assert "embedding(" not in text and "cosine" not in text
 
 
+def test_the_experience_store_never_imports_the_gate():
+    """The gate reads Company OS and is read by none of it - this package included.
+
+    P6B's import graph lives in `company.integration`; a caller supplies it
+    (`RepositoryView.graph_builder`) rather than this package reaching for it.
+    """
+    for path in sorted(PACKAGE.glob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and node.level == 0:
+                assert not (node.module or "").startswith("company.integration"), path.name
+            elif isinstance(node, ast.Import):
+                assert not any(a.name.startswith("company.integration") for a in node.names), path.name
+
+
 def test_nothing_else_in_company_os_depends_on_the_experience_store():
     roots = [ROOT / name for name in ("company", "ai_platform", "knowledge", "intelligence")]
     for root in roots:

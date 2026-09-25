@@ -9,7 +9,6 @@
   "decisions": [],
   "dependencies": [
     "company-engineering-execution",
-    "company-production-integration-gate",
     "company-runtime",
     "company-knowledge-capsules"
   ],
@@ -20,7 +19,7 @@
   "id": "company-experience-store",
   "inputs": [
     "Settled engineering attempts, read from the canonical engineering, execution and resource-usage stores of one state directory",
-    "The current capsule store and P6B's import graph, to anchor an episode at capture and revalidate it at query time"
+    "The current capsule store, and P6B's import graph when a caller supplies one; the gate that owns that graph is never imported"
   ],
   "invariants": [
     "An episode indexes canonical records by pointer and byte digest plus small projections; no canonical record is rewritten or duplicated.",
@@ -37,8 +36,6 @@
     "company/engineering/**",
     "company/runtime/**",
     "company/efficiency/**",
-    "company/integration/checks.py",
-    "company/integration/dependencies.py",
     "knowledge/company_os/capsules/**"
   ],
   "may_write": [
@@ -66,7 +63,7 @@
   "risks": [
     "Real history is small and clustered in one subsystem, so replay numbers describe the mechanism more than its benefit.",
     "Capsule contract edits make related precedents stale by design, so a busy capsule leaves little current history.",
-    "Suggestion revalidation fails closed without P6B's graph, which costs one full parse of the checkout per advisory."
+    "Without a supplied graph the import-graph check is left to the consumer; the runner always performs it with its own P6B map."
   ],
   "source": "company-os-p6c-experience-store",
   "source_digests": [],

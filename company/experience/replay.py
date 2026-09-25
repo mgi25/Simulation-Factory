@@ -191,6 +191,9 @@ def run_replay(
         suggested_tests = [t["path"] for t in advice["suggested_tests"]]
         changed = set(actual.outcome.files_changed) if actual is not None else set()
         overlap = sorted(set(suggested_files) & changed)
+        top = result.precedents[0].episode if result.precedents else None
+        top_overlap = sorted(set(top.outcome.files_changed) & changed) if top is not None else []
+        top_tests = sorted(set(top.features.required_tests) & set(query.required_tests)) if top is not None else []
         considered_bytes = sum(
             _canonical_bytes(by_label[c.episode.source], c.episode)
             for c in (*result.precedents, *result.warnings, *result.historical)
@@ -227,6 +230,8 @@ def run_replay(
                 "actual_class": actual.engineering_class().value if actual is not None else "not_captured",
                 "actual_files_changed": sorted(changed),
                 "suggested_files_changed_later": overlap,
+                "top1_changed_files_the_task_changed": top_overlap,
+                "top1_shared_required_tests": top_tests,
                 "advice_chars": len(json.dumps(advice, sort_keys=True, separators=(",", ":"))),
                 "considered_history_bytes": considered_bytes,
                 "eligible_history_bytes": eligible_bytes,
@@ -278,6 +283,9 @@ def summarise(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         1 for r in replayed for item in r.get("refused", ()) if "read authority" in item["reason"] or "forbidden" in item["reason"]
     )
     refused_total = sum(len(r.get("refused", ())) for r in replayed)
+    with_outcome = [r for r in precedent if r["actual_class"] != "not_captured"]
+    top_hits = [r for r in with_outcome if r.get("top1_changed_files_the_task_changed")]
+    top_accepted = [r for r in with_outcome if r["actual_class"] == "accepted"]
     warning_rows = [r for r in replayed if r["warnings"]]
     warned_then_corrected = [r for r in warning_rows if r["actual_class"] == "correction"]
     advice_chars = [r["advice_chars"] for r in replayed]
@@ -296,6 +304,9 @@ def summarise(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         "suggested_files_total": suggested_total,
         "suggested_files_later_changed": hit_total,
         "changed_files_in_rows_with_suggestions": changed_total,
+        "precedent_rows_with_captured_outcome": len(with_outcome),
+        "precedent_rows_where_top1_changed_a_file_the_task_changed": len(top_hits),
+        "precedent_rows_where_the_task_ended_accepted": len(top_accepted),
         "rows_with_warnings": len(warning_rows),
         "rows_with_warnings_that_ended_as_corrections": len(warned_then_corrected),
         "candidates_excluded_by_reason": dict(sorted(excluded.items())),

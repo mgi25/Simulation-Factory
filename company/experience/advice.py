@@ -21,9 +21,13 @@ invariant:
    read, is refused and listed as refused. History cannot widen a read scope
    because the check runs against today's grant, not the precedent's.
 3. **Every suggestion is re-checked against the current repository**: the
-   file must exist and, for Python, be a module in P6B's current import graph;
-   a test must still statically reach one of this task's modules. Without the
-   graph nothing is suggested - it fails closed.
+   file must exist, and when a caller supplied P6B's import graph a Python
+   file must be a module in it and a test must still statically reach one of
+   this task's modules. Each item says which checks it passed (`checked`);
+   one without `import_graph` has not been graph-checked here, and the
+   runner - which always graph-checks with its own current P6B map - must do
+   it before anything reaches a session. A graph that was supplied and failed
+   to build refuses everything: an attempted check that errored is not a pass.
 4. **Required tests are never touched.** A suggested test is one the work
    order does *not* already require, offered as a pattern to read; there is no
    field through which a suggestion could remove or replace a required suite,
@@ -118,7 +122,6 @@ AUTHORITY_KEYS: frozenset[str] = frozenset(
         "may_not_read",
         "may_read",
         "may_write",
-        "merge",
         "override",
         "production_write",
         "publish",
@@ -168,35 +171,53 @@ def read_refusal(path: str, query: ExperienceQuery) -> str:
     return ""
 
 
-def _file_refusal(path: str, query: ExperienceQuery, view: RepositoryView) -> str:
-    denied = read_refusal(path, query)
-    if denied:
-        return denied
-    if not view.is_file(path):
-        return "no longer exists"
-    graph = view.graph
-    if graph is None:
-        return "current repository intelligence unavailable" + (f": {view.graph_error}" if view.graph_error else "")
-    if path.endswith(".py") and path not in graph:
-        return "not a module in the current import graph"
-    return ""
+_BASE_CHECKS: tuple[str, ...] = ("read_authority", "exists")
+_GRAPH_CHECKS: tuple[str, ...] = _BASE_CHECKS + ("import_graph",)
 
 
-def _test_refusal(path: str, query: ExperienceQuery, view: RepositoryView, modules: Sequence[str]) -> str:
+def _graph_failure(view: RepositoryView) -> str:
+    state = view.graph_state
+    return f"the supplied import graph could not be built: {state[len('failed: '):]}" if state.startswith("failed") else ""
+
+
+def _file_check(path: str, query: ExperienceQuery, view: RepositoryView) -> tuple[str, tuple[str, ...]]:
+    """Why a file suggestion is refused (or ''), and the checks it passed."""
     denied = read_refusal(path, query)
     if denied:
-        return denied
+        return denied, ()
     if not view.is_file(path):
-        return "no longer exists"
+        return "no longer exists", ()
+    failure = _graph_failure(view)
+    if failure:
+        return failure, ()
+    if view.graph is None:
+        return "", _BASE_CHECKS
+    if path.endswith(".py") and path not in view.graph:
+        return "not a module in the current import graph", ()
+    return "", _GRAPH_CHECKS
+
+
+def _test_check(
+    path: str, query: ExperienceQuery, view: RepositoryView, modules: Sequence[str]
+) -> tuple[str, tuple[str, ...]]:
+    """Why a test suggestion is refused (or ''), and the checks it passed."""
+    denied = read_refusal(path, query)
+    if denied:
+        return denied, ()
+    if not view.is_file(path):
+        return "no longer exists", ()
+    failure = _graph_failure(view)
+    if failure:
+        return failure, ()
     graph = view.graph
     if graph is None:
-        return "current repository intelligence unavailable" + (f": {view.graph_error}" if view.graph_error else "")
+        return "", _BASE_CHECKS
     if path not in graph:
-        return "not a module in the current import graph"
+        return "not a module in the current import graph", ()
     reached = set(graph.modules_reached_by(path, transitive=True))
     if not reached & set(modules):
-        return "no longer statically reaches any module this task acts on"
-    return ""
+        return "no longer statically reaches any module this task acts on", ()
+    return "", _GRAPH_CHECKS
 
 
 def _outcome_line(candidate: Candidate) -> str:
@@ -279,7 +300,7 @@ def build_advice(
     graph_state = "not_needed"
 
     if result.precedents:
-        graph_state = "built" if view.graph is not None else f"unavailable: {view.graph_error}"
+        graph_state = view.graph_state
         modules = task_modules(query, view)
         required = {normalise_path(t) for t in query.required_tests}
         seen_files: dict[str, dict[str, Any]] = {}
@@ -310,11 +331,16 @@ def build_advice(
                     if candidate.experience_id not in seen_files[path]["precedents"]:
                         seen_files[path]["precedents"].append(candidate.experience_id)
                     continue
-                problem = _file_refusal(path, query, view)
+                problem, checked = _file_check(path, query, view)
                 if problem:
                     refuse("file", path, problem)
                     continue
-                seen_files[path] = {"path": path, "reason": reason, "precedents": [candidate.experience_id]}
+                seen_files[path] = {
+                    "path": path,
+                    "reason": reason,
+                    "precedents": [candidate.experience_id],
+                    "checked": list(checked),
+                }
             test_proposals = list(episode.features.required_tests) + list(episode.outcome.tests_passed)
             test_proposals += [p for p in episode.outcome.files_changed if p.startswith("tests/")]
             for raw in test_proposals:
@@ -325,7 +351,7 @@ def build_advice(
                     if candidate.experience_id not in seen_tests[path]["precedents"]:
                         seen_tests[path]["precedents"].append(candidate.experience_id)
                     continue
-                problem = _test_refusal(path, query, view, modules)
+                problem, checked = _test_check(path, query, view, modules)
                 if problem:
                     refuse("test", path, problem)
                     continue
@@ -333,6 +359,7 @@ def build_advice(
                     "path": path,
                     "reason": f"exercised by accepted precedent {episode.work_order_id}; a pattern to read, not a substitute for a required suite",
                     "precedents": [candidate.experience_id],
+                    "checked": list(checked),
                 }
         files = list(seen_files.values())[:MAX_SUGGESTED_FILES]
         tests = list(seen_tests.values())[:MAX_SUGGESTED_TESTS]

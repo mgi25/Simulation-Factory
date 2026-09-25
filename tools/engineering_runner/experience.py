@@ -105,7 +105,6 @@ AUTHORITY_KEYS: frozenset[str] = frozenset(
         "may_not_read",
         "may_read",
         "may_write",
-        "merge",
         "override",
         "production_write",
         "publish",
@@ -121,6 +120,15 @@ AUTHORITY_KEYS: frozenset[str] = frozenset(
         "write_paths",
     }
 )
+
+# The shape of every item the runner reads. A whitelist, not a blacklist: an
+# item carrying any key outside its set is refused with the whole payload, so
+# nothing can ride along inside a suggestion whatever it is called.
+PRECEDENT_KEYS: frozenset[str] = frozenset(
+    {"experience_id", "work_order_id", "packet_attempt", "class", "validity", "settled_on", "outcome", "why", "signals"}
+)
+WARNING_KEYS: frozenset[str] = frozenset({"experience_id", "work_order_id", "class", "lines", "why"})
+SUGGESTION_KEYS: frozenset[str] = frozenset({"path", "reason", "precedents", "checked"})
 
 # The producer's own bounds. A payload over them is not from the producer
 # that declares them, so it is refused rather than trimmed.
@@ -160,7 +168,9 @@ def _authority_keys(value: Any, where: str = "advice") -> tuple[str, ...]:
     return tuple(found)
 
 
-def _items(payload: Mapping[str, Any], key: str, limit: int) -> list[Mapping[str, Any]]:
+def _items(
+    payload: Mapping[str, Any], key: str, limit: int, allowed: frozenset[str] | None = None
+) -> list[Mapping[str, Any]]:
     value = payload.get(key)
     if value is None:
         return []
@@ -168,6 +178,11 @@ def _items(payload: Mapping[str, Any], key: str, limit: int) -> list[Mapping[str
         raise ExperienceAdviceRejected(f"{key} must be a list of objects")
     if len(value) > limit:
         raise ExperienceAdviceRejected(f"{key} holds {len(value)} items; the producer declares at most {limit}")
+    if allowed is not None:
+        for index, item in enumerate(value):
+            stray = sorted(set(item) - allowed)
+            if stray:
+                raise ExperienceAdviceRejected(f"{key}[{index}] carries undeclared field(s): {', '.join(stray)}")
     return value
 
 
@@ -226,16 +241,16 @@ class ExperienceAdvice:
                 _line(item.get("outcome", ""), 160),
                 tuple(_line(reason, 200) for reason in (item.get("why") or ())[:4]),
             )
-            for item in _items(payload, "precedents", MAX_PRECEDENTS)
+            for item in _items(payload, "precedents", MAX_PRECEDENTS, PRECEDENT_KEYS)
         )
-        warning_items = _items(payload, "warnings", MAX_WARNINGS)
+        warning_items = _items(payload, "warnings", MAX_WARNINGS, WARNING_KEYS)
         lines = [_line(line) for item in warning_items for line in (item.get("lines") or ())]
         if len(lines) > MAX_WARNING_LINES:
             raise ExperienceAdviceRejected(f"{len(lines)} warning lines; the producer declares at most {MAX_WARNING_LINES}")
 
         def pairs(key: str, limit: int) -> tuple[tuple[str, str], ...]:
             out = []
-            for item in _items(payload, key, limit):
+            for item in _items(payload, key, limit, SUGGESTION_KEYS):
                 path = str(item.get("path", "")).strip().replace("\\", "/")
                 if not path or path.startswith("/") or ".." in path.split("/") or "\n" in path or len(path) > 200:
                     raise ExperienceAdviceRejected(f"{key} names an unusable path {path!r}")
