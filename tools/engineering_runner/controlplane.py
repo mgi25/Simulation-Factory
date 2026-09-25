@@ -47,6 +47,10 @@ from .process import CommandResult, CommandRunner
 # once so a reader can see the whole surface the execution plane touches.
 ENGINEERING_MODULE = "company.engineering"
 INTEGRATION_MODULE = "company.integration"
+# Advisory only: nothing the runner decides depends on this module's answer,
+# and `experience_advice` below is the one call whose failure is expected to
+# be absorbed rather than surfaced. See `experience.py`.
+EXPERIENCE_MODULE = "company.experience"
 
 # `company.integration.__main__._EXIT`, inverted. The gate CLI's exit code *is*
 # its verdict, and it is the only place the verdict appears as one word: the
@@ -363,6 +367,39 @@ class ControlPlane:
             )
         return suites
 
+    # --- the experience advisory, which may be absent ----------------------
+
+    def experience_advice(self, work_order_id: str) -> dict[str, Any]:
+        """Ask for the experience advisory for one work order, and return its JSON.
+
+        Company OS indexes the state directory's settled attempts and answers
+        with a bounded, fingerprinted, advisory-only artifact. This method
+        only carries it: a non-zero exit, a timeout or a reply that is not a
+        JSON object raises `ControlPlaneRefusal`, and the caller treats every
+        such outcome as "no advice" - never as a reason to stop the job.
+        Parsing and revalidation are `experience.py`'s, not this courier's.
+        """
+        argv = [
+            self._python,
+            "-m",
+            EXPERIENCE_MODULE,
+            "suggest",
+            "--work-order",
+            work_order_id,
+            "--state-dir",
+            str(self._state_dir),
+            "--repo-root",
+            str(self._repo_root),
+            "--json",
+        ]
+        result = self._runner.run(argv, cwd=self._repo_root, timeout_s=self._timeout)
+        command = f"python -m {EXPERIENCE_MODULE} suggest"
+        if result.timed_out or result.exit_code != 0 or not result.stdout.strip():
+            raise ControlPlaneRefusal(
+                command, result.exit_code, result.stderr.strip() or "no advisory was produced"
+            )
+        return _parse_json(result.stdout, command)
+
     # --- internals ---------------------------------------------------------
 
     def _engineering(self, args: Sequence[str]) -> StageReply:
@@ -407,6 +444,7 @@ __all__ = [
     "ADVANCED",
     "GATE_READINESS_BY_EXIT",
     "ENGINEERING_MODULE",
+    "EXPERIENCE_MODULE",
     "INTEGRATION_MODULE",
     "REFUSED",
     "STOPPED",

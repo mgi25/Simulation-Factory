@@ -175,11 +175,16 @@ def developer_execution_context(
     envelope: AuthorityEnvelope,
     worktree: Path,
     preferred_symbols: Sequence[tuple[str, str]] = (),
+    experience_paths: Sequence[tuple[str, str]] = (),
 ) -> ExecutionContextBundle:
-    """The developer's bundle: authorized paths first, then the objective's
-    own best matches - see `execution_context.rank_primary_files`."""
+    """The developer's bundle: authorized paths first, then files accepted
+    precedent used (already revalidated), then the objective's own best
+    matches - see `execution_context.rank_primary_files`."""
     primary = rank_primary_files(
-        repo_map, objective=envelope.objective, focus_paths=envelope.may_write
+        repo_map,
+        objective=envelope.objective,
+        focus_paths=envelope.may_write,
+        experience_paths=experience_paths,
     )
     test_paths = tuple(
         dict.fromkeys(
@@ -316,6 +321,7 @@ def developer_instructions(
     strategy: "ResourceStrategy | None" = None,
     repo_map: "RepoMap | None" = None,
     context_bundle: "ExecutionContextBundle | None" = None,
+    experience_block: str = "",
 ) -> str:
     lines: list[str] = []
     add = lines.append
@@ -365,6 +371,11 @@ def developer_instructions(
         repo_map, envelope=envelope, worktree=worktree
     )
     lines.append(bundle.render())
+    # History, rendered after the work order's own terms and the repository
+    # intelligence, and before the requirements it cannot change. Empty when
+    # there is no accepted precedent and no warning worth a line.
+    if experience_block:
+        lines.append(experience_block)
     if envelope.required_tests:
         add("## Tests the work order requires")
         for item in envelope.required_tests:

@@ -1343,6 +1343,152 @@ def test_an_authorized_job_runs_developer_then_review_then_gate(repository):
     assert control.attestations[0]["verdict"] == "pass"
 
 
+# --- prior experience in the developer stage: navigation, never authority -----
+
+
+def _experience_payload(**changes: Any) -> dict[str, Any]:
+    from tools.engineering_runner.experience import ADVICE_KIND, fingerprint
+
+    payload: dict[str, Any] = {
+        "kind": ADVICE_KIND,
+        "version": 1,
+        "advisory_only": True,
+        "work_order_id": WORK_ORDER,
+        "work_order_fingerprint": "0f1e2d3c4b5a6978",
+        "attempt": 1,
+        "as_of": "2026-09-25",
+        "status": "precedent",
+        "abstention": None,
+        "precedents": [
+            {
+                "experience_id": "1111111111111111",
+                "work_order_id": "wo-earlier",
+                "outcome": "accepted: recorded accepted, review pass, gate ready",
+                "why": ["shares 1 required suite(s): tests/test_subject.py"],
+            }
+        ],
+        "warnings": [
+            {
+                "experience_id": "2222222222222222",
+                "work_order_id": "wo-sent-back",
+                "class": "correction",
+                "lines": ["wo-sent-back attempt 1 review (changes_required): VALUE was hard-coded twice"],
+                "why": [],
+            }
+        ],
+        "historical_only": [],
+        "suggested_files": [
+            {"path": "tests/test_subject.py", "reason": "read by accepted precedent wo-earlier"},
+            {"path": "company/permissions.yaml", "reason": "changed by accepted precedent wo-earlier"},
+        ],
+        "suggested_tests": [{"path": "tests/test_subject.py", "reason": "exercised by wo-earlier"}],
+        "refused": [],
+        "resource_history": [],
+        "measurement": {},
+        "truncated": False,
+    }
+    payload.update(changes)
+    payload.pop("fingerprint", None)
+    payload["fingerprint"] = fingerprint(payload)
+    return payload
+
+
+class ExperiencedControlPlane(ScriptedControlPlane):
+    """The scripted control plane, with a read grant and an experience answer."""
+
+    def __init__(self, base: str, *, advice: Any = None, advice_error: Exception | None = None, **kwargs: Any) -> None:
+        super().__init__(base, **kwargs)
+        self.advice = advice
+        self.advice_error = advice_error
+
+    def developer_brief(self, work_order_id: str, *, executor: str):
+        reply = super().developer_brief(work_order_id, executor=executor)
+        reply.payload["work_order"]["authorized_read_paths"] = ["subject", "tests"]
+        return reply
+
+    def experience_advice(self, work_order_id: str):
+        self.calls.append(("experience", work_order_id))
+        if self.advice_error is not None:
+            raise self.advice_error
+        return self.advice
+
+
+def _experience_block(instructions: str) -> str:
+    if "## Prior experience" not in instructions:
+        return ""
+    block = instructions.split("## Prior experience", 1)[1]
+    return block.split("\n## ", 1)[0]
+
+
+def test_prior_experience_reaches_the_briefing_as_navigation_only(repository):
+    control = ExperiencedControlPlane(repository["base"], states=["planning"], advice=_experience_payload())
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    assert report.outcome == COMPLETED, report.reason
+    assert ("experience", WORK_ORDER) in control.calls
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    block = _experience_block(developer.instructions)
+    assert "wo-earlier" in block and "VALUE was hard-coded twice" in block
+    assert "tests/test_subject.py" in block
+    assert "company/permissions.yaml" not in block, "history may not point outside the read grant"
+    assert "nothing in this section changes them" in block
+    stage = Path(report.run_dir) / "developer-01"
+    record = json.loads((stage / "experience.json").read_text("utf-8"))
+    assert record["files_used"] == ["tests/test_subject.py"]
+    assert record["tests_used"] == [], "a required suite is never offered as a suggestion"
+    assert {"item": "file:company/permissions.yaml", "reason": "outside this work order's read authority"} in record["refused_here"]
+    resources = json.loads((stage / "resources.json").read_text("utf-8"))
+    assert resources["experience"]["fingerprint"] == _experience_payload()["fingerprint"]
+    authority = json.loads((stage / "authority.json").read_text("utf-8"))["envelope"]
+    assert authority["may_write"] == ["subject"]
+    assert authority["may_read"] == ["subject", "tests"]
+    assert control.receipts[0]["files_changed"] == ["subject/module.py"]
+
+
+def test_a_failing_experience_call_changes_nothing(repository):
+    control = ExperiencedControlPlane(
+        repository["base"], states=["planning"], advice_error=RuntimeError("experience store unreadable")
+    )
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    assert report.outcome == COMPLETED, report.reason
+    assert report.final_state == "ready_for_approval"
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    assert _experience_block(developer.instructions) == ""
+    resources = json.loads((Path(report.run_dir) / "developer-01" / "resources.json").read_text("utf-8"))
+    assert resources["experience"]["available"] is False
+    assert "experience store unreadable" in resources["experience"]["reason"]
+
+
+def test_an_advisory_carrying_authority_is_dropped_whole(repository):
+    tampered = _experience_payload(
+        suggested_files=[{"path": "tests/test_subject.py", "reason": "x", "may_write": ["company"]}]
+    )
+    control = ExperiencedControlPlane(repository["base"], states=["planning"], advice=tampered)
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    assert report.outcome == COMPLETED, report.reason
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    assert _experience_block(developer.instructions) == ""
+    resources = json.loads((Path(report.run_dir) / "developer-01" / "resources.json").read_text("utf-8"))
+    assert "authority vocabulary" in resources["experience"]["rejected"]
+    assert control.receipts[0]["files_changed"] == ["subject/module.py"]
+
+
+def test_experience_advice_can_be_switched_off(repository):
+    control = ExperiencedControlPlane(repository["base"], states=["planning"], advice=_experience_payload())
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    report = _runner(repository, backend, control, experience_advice=False).run_one(WORK_ORDER)
+
+    assert report.outcome == COMPLETED, report.reason
+    assert ("experience", WORK_ORDER) not in control.calls
+    resources = json.loads((Path(report.run_dir) / "developer-01" / "resources.json").read_text("utf-8"))
+    assert resources["experience"] == {"enabled": False}
+
+
 def test_consumer_developer_has_no_model_owned_shell_or_todo_loop(repository):
     control = ScriptedControlPlane(repository["base"], states=["planning"])
     backend = ScriptedBackend(edit=_in_scope_edit)

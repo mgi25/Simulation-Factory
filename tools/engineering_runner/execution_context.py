@@ -482,6 +482,7 @@ def rank_primary_files(
     limit: int = 5,
     max_query_fill: int = 2,
     minimum_files: int = 2,
+    experience_paths: Sequence[tuple[str, str]] = (),
 ) -> tuple[tuple[str, str], ...]:
     """The developer-side ranking: authorized paths first, then the objective's
     own best matches, deduplicated and capped.
@@ -506,6 +507,14 @@ def rank_primary_files(
     turned the bundle into padding rather than intelligence. `max_query_fill`
     remains a hard ceiling on the guessed portion regardless of `minimum_files`
     or `limit`.
+
+    `experience_paths` sit between the two: files an accepted precedent for
+    similar work changed or read, already revalidated against this work
+    order's read authority by `experience.revalidate`. They rank after the
+    authorized paths - which are certain - and before the text query, because
+    a file that similar accepted work actually used is better evidence than a
+    token match. They fill the same `minimum_files` budget the query would,
+    so they replace guesses rather than adding to them.
     """
     if repo_map is None:
         return ()
@@ -518,6 +527,13 @@ def rank_primary_files(
             continue
         seen.add(path)
         ranked.append((path, "a path this work order authorizes changing"))
+    for path, reason in experience_paths:
+        if path in seen or len(ranked) >= limit:
+            continue
+        if repo_map.by_path(path) is None:
+            continue
+        seen.add(path)
+        ranked.append((path, reason))
     query_budget = min(
         max_query_fill, max(minimum_files - len(ranked), 0), max(limit - len(ranked), 0)
     )
