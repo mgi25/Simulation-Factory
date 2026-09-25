@@ -1,0 +1,15 @@
+# chunk summary lines, both full runs (same four chunk lists, each test file exactly once)
+
+## merged tree, integrate-p6c-v1 @ c931091, origin/main 4fd5faf
+req: exit=1 wall_s=1014 head=c931091e884c5dedc62379fb616f6d09ef234f5e origin_main=4fd5fafa92767a83afb966c9a2210fdb016fc28d | 3 failed, 3261 passed, 1 skipped in 1011.51s (0:16:51)
+o0: exit=1 wall_s=1063 head=c931091e884c5dedc62379fb616f6d09ef234f5e origin_main=4fd5fafa92767a83afb966c9a2210fdb016fc28d | 1 failed, 1454 passed, 3 skipped in 1061.70s (0:17:41)
+o1: exit=1 wall_s=626 head=c931091e884c5dedc62379fb616f6d09ef234f5e origin_main=4fd5fafa92767a83afb966c9a2210fdb016fc28d | 12 failed, 1101 passed, 142 skipped in 624.38s (0:10:24)
+o2: exit=1 wall_s=624 head=c931091e884c5dedc62379fb616f6d09ef234f5e origin_main=4fd5fafa92767a83afb966c9a2210fdb016fc28d | 5 failed, 1315 passed, 295 skipped, 2 warnings in 623.45s (0:10:23)
+
+## real pushed main @ c931091, origin/main c931091
+req: exit=0 wall_s=684 head=c931091e884c5dedc62379fb616f6d09ef234f5e origin_main=c931091e884c5dedc62379fb616f6d09ef234f5e | 3264 passed, 1 skipped in 683.71s (0:11:23)
+o0: exit=1 wall_s=1005 head=c931091e884c5dedc62379fb616f6d09ef234f5e origin_main=c931091e884c5dedc62379fb616f6d09ef234f5e | 1 failed, 1454 passed, 3 skipped in 1004.10s (0:16:44)
+o1: exit=1 wall_s=298 head=c931091e884c5dedc62379fb616f6d09ef234f5e origin_main=c931091e884c5dedc62379fb616f6d09ef234f5e | 12 failed, 1101 passed, 142 skipped in 296.84s (0:04:56)
+o2: exit=1 wall_s=333 head=c931091e884c5dedc62379fb616f6d09ef234f5e origin_main=c931091e884c5dedc62379fb616f6d09ef234f5e | 5 failed, 1315 passed, 295 skipped, 2 warnings in 332.67s (0:05:32)
+
+chunk files: req = the 47 derived required suites; o0/o1/o2 = the other 121 tests/test_*.py files split alphabetically 42/41/38

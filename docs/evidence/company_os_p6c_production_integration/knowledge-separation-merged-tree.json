@@ -1,0 +1,166 @@
+{
+  "knowledge_records_files": 4,
+  "knowledge_tree_files": 53,
+  "knowledge_tree_identical": true,
+  "source_dirs_untouched": {
+    "repo-exploration-v2": true,
+    "repository-architecture": true
+  },
+  "sources": {
+    "repo-exploration-v2": {
+      "all_advisory_only": true,
+      "capture_counts": {
+        "captured": 1,
+        "created": 1
+      },
+      "capture_exit": 0,
+      "episode_top_level_keys": [
+        "action",
+        "decided_on",
+        "evidence",
+        "experience_id",
+        "features",
+        "notes",
+        "outcome",
+        "packet_attempt",
+        "packet_fingerprint",
+        "provenance",
+        "receipt_fingerprint",
+        "resources",
+        "schema",
+        "settled_on",
+        "source",
+        "work_order_fingerprint",
+        "work_order_id"
+      ],
+      "episodes_listed": 1,
+      "experience_files_written": 1,
+      "experience_record_kinds": [],
+      "knowledge_record_kinds_in_experience": [],
+      "non_experience_state_files": 32,
+      "non_experience_state_identical": true,
+      "recapture_byte_identical": true,
+      "recapture_counts": {
+        "captured": 1,
+        "created": 0
+      },
+      "suggest_exits": [
+        0
+      ],
+      "suggest_status": {
+        "wo-req-repo-exploration-v2-blocked-attempts": [
+          "abstain",
+          "incompatible_only",
+          0
+        ],
+        "wo-req-repo-exploration-v2-blocked-count": [
+          "abstain",
+          "incompatible_only",
+          0
+        ],
+        "wo-req-repo-exploration-v2-blocked-count-2": [
+          "abstain",
+          "no_match",
+          0
+        ]
+      },
+      "work_orders": 3
+    },
+    "repository-architecture": {
+      "all_advisory_only": true,
+      "capture_counts": {
+        "captured": 8,
+        "created": 8,
+        "refused:no_job": 1
+      },
+      "capture_exit": 0,
+      "episode_top_level_keys": [
+        "action",
+        "decided_on",
+        "evidence",
+        "experience_id",
+        "features",
+        "notes",
+        "outcome",
+        "packet_attempt",
+        "packet_fingerprint",
+        "provenance",
+        "receipt_fingerprint",
+        "resources",
+        "schema",
+        "settled_on",
+        "source",
+        "work_order_fingerprint",
+        "work_order_id"
+      ],
+      "episodes_listed": 8,
+      "experience_files_written": 8,
+      "experience_record_kinds": [],
+      "knowledge_record_kinds_in_experience": [],
+      "non_experience_state_files": 177,
+      "non_experience_state_identical": true,
+      "recapture_byte_identical": true,
+      "recapture_counts": {
+        "captured": 8,
+        "created": 0,
+        "refused:no_job": 1
+      },
+      "suggest_exits": [
+        0
+      ],
+      "suggest_status": {
+        "wo-candidate-lifecycle-runtime-history": [
+          "abstain",
+          "no_match",
+          0
+        ],
+        "wo-capsule-ownership-semantic-review": [
+          "precedent",
+          null,
+          1
+        ],
+        "wo-delegation-planning-test-ownership": [
+          "precedent",
+          null,
+          2
+        ],
+        "wo-delegation-planning-test-ownership-v2": [
+          "precedent",
+          null,
+          1
+        ],
+        "wo-token-efficiency-v4-p2-benchmark-contract-correction": [
+          "precedent",
+          null,
+          1
+        ],
+        "wo-token-efficiency-v4-p2-review-test-ownership": [
+          "precedent",
+          null,
+          2
+        ],
+        "wo-token-efficiency-v4-p2-review-test-ownership-v2": [
+          "precedent",
+          null,
+          2
+        ],
+        "wo-token-efficiency-v4-p3-benchmark-contract-correction": [
+          "precedent",
+          null,
+          2
+        ],
+        "wo-token-efficiency-v4-p3c-benchmark-contract-correction": [
+          "precedent",
+          null,
+          1
+        ],
+        "wo-token-efficiency-v4-review-separation-yaml-dependency": [
+          "abstain",
+          "no_match",
+          0
+        ]
+      },
+      "work_orders": 10
+    }
+  }
+}

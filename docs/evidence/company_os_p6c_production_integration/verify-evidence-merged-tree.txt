@@ -1,0 +1,11 @@
+{
+  "checked": [
+    "summary from rows",
+    "replay fingerprint",
+    "repeat fingerprint",
+    "validity-today counts",
+    "validation summary",
+    "source digests"
+  ],
+  "problems": []
+}

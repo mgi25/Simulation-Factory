@@ -1,0 +1,199 @@
+{
+ "focused": {
+  "tests/test_company_dependency_graph.py": {
+   "error": 0,
+   "failed": 0,
+   "passed": 54,
+   "skipped": 0,
+   "time": 22.17
+  },
+  "tests/test_company_efficiency.py": {
+   "error": 0,
+   "failed": 0,
+   "passed": 69,
+   "skipped": 0,
+   "time": 0.31
+  },
+  "tests/test_company_engineering_execution.py": {
+   "error": 0,
+   "failed": 0,
+   "passed": 207,
+   "skipped": 0,
+   "time": 18.67
+  },
+  "tests/test_company_execution_transport.py": {
+   "error": 0,
+   "failed": 0,
+   "passed": 14,
+   "skipped": 0,
+   "time": 0.85
+  },
+  "tests/test_company_experience_retrieval.py": {
+   "error": 0,
+   "failed": 0,
+   "passed": 77,
+   "skipped": 0,
+   "time": 14.5
+  },
+  "tests/test_company_experience_store.py": {
+   "error": 0,
+   "failed": 0,
+   "passed": 57,
+   "skipped": 0,
+   "time": 10.35
+  },
+  "tests/test_company_external_engineering_runner.py": {
+   "error": 0,
+   "failed": 0,
+   "passed": 67,
+   "skipped": 0,
+   "time": 1.42
+  },
+  "tests/test_company_gate_suite_requirements.py": {
+   "error": 0,
+   "failed": 0,
+   "passed": 46,
+   "skipped": 0,
+   "time": 133.0
+  },
+  "tests/test_company_integration_gate.py": {
+   "error": 0,
+   "failed": 0,
+   "passed": 89,
+   "skipped": 0,
+   "time": 293.58
+  },
+  "tests/test_company_os_capsules.py": {
+   "error": 0,
+   "failed": 0,
+   "passed": 68,
+   "skipped": 0,
+   "time": 0.71
+  },
+  "tests/test_company_os_knowledge.py": {
+   "error": 0,
+   "failed": 0,
+   "passed": 26,
+   "skipped": 0,
+   "time": 0.55
+  },
+  "tests/test_company_read_authority.py": {
+   "error": 0,
+   "failed": 0,
+   "passed": 34,
+   "skipped": 0,
+   "time": 0.9
+  },
+  "tests/test_company_typed_evidence_context.py": {
+   "error": 0,
+   "failed": 0,
+   "passed": 59,
+   "skipped": 0,
+   "time": 0.09
+  },
+  "tests/test_engineering_runner_execution_context.py": {
+   "error": 0,
+   "failed": 0,
+   "passed": 80,
+   "skipped": 0,
+   "time": 1.0
+  },
+  "tests/test_external_engineering_runner.py": {
+   "error": 0,
+   "failed": 0,
+   "passed": 203,
+   "skipped": 0,
+   "time": 415.57
+  }
+ },
+ "no_subagent": {
+  "failed": 0,
+  "names": [
+   "passed tests.test_company_analytics::test_no_subagent_machinery_appears_anywhere",
+   "passed tests.test_company_context_expansion::test_no_subagent_rule_holds_at_every_expansion_boundary",
+   "passed tests.test_company_engineering_execution::test_a_receipt_claiming_a_nested_agent_cannot_pass",
+   "passed tests.test_company_engineering_execution::test_genuine_governance_actions_still_route_to_specialist[Amend the constitution's rule about subagents.]",
+   "passed tests.test_company_evidence_review::test_the_capsule_seed_carries_no_subagent_switch",
+   "passed tests.test_company_evidence_review::test_the_work_order_task_still_forbids_nested_agents",
+   "passed tests.test_company_external_engineering_runner::test_the_no_subagent_invariant_survives_the_new_capsule",
+   "passed tests.test_company_finance::test_the_no_subagents_rule_is_untouched",
+   "passed tests.test_company_finance_usage_cost::test_the_no_subagent_invariant_still_refuses_the_record",
+   "passed tests.test_company_integration_gate::test_no_subagent_drift_is_surfaced_link_by_link",
+   "passed tests.test_company_integration_gate::test_the_repository_no_subagent_chain_is_intact",
+   "passed tests.test_company_integration_gate::test_the_no_subagent_invariant_itself_is_untouched_by_this_package",
+   "passed tests.test_company_org_intelligence::test_a_no_subagent_change_cannot_be_an_ordinary_optimisation",
+   "passed tests.test_company_org_intelligence::test_a_no_subagent_change_without_the_ceo_flag_is_refused",
+   "passed tests.test_company_org_intelligence::test_a_no_subagent_change_proposal_is_representable_when_ceo_reserved",
+   "passed tests.test_company_org_intelligence::test_the_no_subagent_policy_is_where_it_was",
+   "passed tests.test_company_os_ai_platform::test_leaving_bootstrap_mode_alone_does_not_unlock_nested_agents",
+   "passed tests.test_company_os_ai_platform::test_a_usage_record_cannot_report_a_nested_agent",
+   "passed tests.test_company_os_ai_platform::test_no_resource_class_permits_subagents",
+   "passed tests.test_company_os_capsules::test_the_no_subagent_rule_is_exactly_where_it_was",
+   "passed tests.test_company_os_research::test_the_no_subagent_rule_is_exactly_where_it_was",
+   "passed tests.test_company_os_research_batches::test_the_no_subagent_rule_is_exactly_where_it_was",
+   "passed tests.test_company_os_research_ingestion::test_the_no_subagent_rule_is_exactly_where_it_was",
+   "passed tests.test_company_read_authority::test_the_no_subagent_invariant_holds_on_both_contracts",
+   "passed tests.test_company_runtime::test_no_subagents_false_fails",
+   "passed tests.test_company_runtime::test_employee_contract_rejects_subagents",
+   "passed tests.test_company_runtime::test_task_execution_rejects_nested_workers[execution0]",
+   "passed tests.test_company_runtime::test_task_execution_rejects_nested_workers[execution1]",
+   "passed tests.test_company_runtime::test_task_execution_rejects_nested_workers[execution2]",
+   "passed tests.test_company_runtime::test_task_execution_rejects_nested_workers[execution3]",
+   "passed tests.test_company_runtime_integration::test_employee_contract_no_subagent_guard_is_part_of_preparation",
+   "passed tests.test_company_runtime_integration::test_task_execution_no_subagent_guard_is_part_of_preparation",
+   "passed tests.test_company_runtime_integration::test_execution_policy_stops_nested_use_before_usage_persistence",
+   "passed tests.test_company_session_execution::test_packet_rejects_a_disabled_no_subagent_rule",
+   "passed tests.test_company_session_execution::test_subagent_use_fails_validation_and_is_never_recorded",
+   "passed tests.test_company_session_execution::test_the_no_subagent_rule_holds_at_every_link",
+   "passed tests.test_company_session_execution::test_bootstrap_contracts_still_reject_a_nested_agent_switch",
+   "passed tests.test_company_workforce::test_a_proposed_role_keeps_no_subagents_true",
+   "passed tests.test_company_workforce::test_a_role_violating_the_no_subagent_policy_is_detected",
+   "passed tests.test_company_workforce::test_the_no_subagent_rule_is_untouched",
+   "passed tests.test_company_youtube_studio_ingestion::test_the_no_nested_agent_invariant_is_untouched",
+   "passed tests.test_external_engineering_runner::test_the_child_environment_drops_the_nested_session_markers"
+  ],
+  "passed": 42,
+  "skipped": 0
+ },
+ "protected_surface": {
+  "failed": 0,
+  "names": [
+   "passed tests.test_company_bounded_engineering_autonomy::test_no_protected_ref_is_ever_a_permitted_destination[company-os-v1-bootstrap]",
+   "passed tests.test_company_bounded_engineering_autonomy::test_no_protected_ref_is_ever_a_permitted_destination[main]",
+   "passed tests.test_company_bounded_engineering_autonomy::test_no_protected_ref_is_ever_a_permitted_destination[master]",
+   "passed tests.test_company_bounded_engineering_autonomy::test_never_advanced_is_a_superset_of_protected_refs",
+   "passed tests.test_company_bounded_engineering_autonomy::test_a_protected_ref_is_refused_live[company-os-v1-bootstrap]",
+   "passed tests.test_company_bounded_engineering_autonomy::test_a_protected_ref_is_refused_live[main]",
+   "passed tests.test_company_bounded_engineering_autonomy::test_a_protected_ref_is_refused_live[master]",
+   "passed tests.test_company_delegation_pilot.TestIntegrationTarget::test_a_target_naming_a_protected_ref_is_refused[company-os-v1-bootstrap]",
+   "passed tests.test_company_delegation_pilot.TestIntegrationTarget::test_a_target_naming_a_protected_ref_is_refused[main]",
+   "passed tests.test_company_delegation_pilot.TestIntegrationTarget::test_a_target_naming_a_protected_ref_is_refused[master]",
+   "passed tests.test_company_delegation_pilot.TestIntegrationTarget::test_main_and_canonical_are_both_protected",
+   "passed tests.test_company_delegation_pilot.TestIntegrationTarget::test_a_target_cannot_shrink_the_protected_set",
+   "passed tests.test_company_delegation_pilot.TestIntegrationTarget::test_integration_onto_a_protected_ref_reaches_the_ceo[company-os-v1-bootstrap]",
+   "passed tests.test_company_delegation_pilot.TestIntegrationTarget::test_integration_onto_a_protected_ref_reaches_the_ceo[main]",
+   "passed tests.test_company_delegation_pilot.TestIntegrationTarget::test_integration_onto_a_protected_ref_reaches_the_ceo[master]",
+   "passed tests.test_company_delegation_pilot.TestIntegrationTarget::test_a_live_decision_object_refuses_a_protected_branch",
+   "passed tests.test_company_delegation_pilot.TestThePilotCannotAct::test_main_is_protected_in_source_not_configuration",
+   "passed tests.test_company_engineering_execution::test_forbidden_and_protected_paths_are_enforced",
+   "passed tests.test_company_engineering_execution::test_a_work_order_cannot_authorize_a_protected_path",
+   "passed tests.test_company_engineering_execution::test_a_modified_protected_file_is_detected",
+   "passed tests.test_company_engineering_execution::test_a_deleted_protected_file_is_a_finding",
+   "passed tests.test_company_engineering_execution::test_the_default_protected_surface_covers_the_gate_and_the_contracts",
+   "passed tests.test_company_engineering_execution::test_a_stored_protected_surface_cannot_drop_a_default_path",
+   "passed tests.test_company_engineering_execution::test_a_protected_change_escalates_to_the_ceo_rather_than_a_retry",
+   "passed tests.test_company_engineering_execution::test_genuine_governance_actions_still_route_to_specialist[Change protected policy so the gate file cannot be hand-edited.]",
+   "passed tests.test_company_evidence_review::test_the_protected_surface_is_unchanged_and_still_captured",
+   "passed tests.test_company_external_engineering_runner::test_the_protected_surface_is_still_digested_for_a_runner_work_order",
+   "passed tests.test_company_objective_planning::test_every_objective_the_suites_already_submit_stays_specific[Give me a way to check whether the protected governance files have changed since an engineering work order was authorized.]",
+   "passed tests.test_company_objective_planning::test_every_objective_the_suites_already_submit_stays_specific[Rewrite the governance approval boundary so a protected policy file cannot be changed without a separate reviewer.]",
+   "passed tests.test_company_objective_planning::test_the_guard_does_not_change_the_answer_for_ordinary_objectives[Give me a way to check whether the protected governance files have changed since an engineering work order was authorized.]",
+   "passed tests.test_company_read_authority::test_protected_paths_are_still_protected",
+   "passed tests.test_company_workforce::test_a_sole_provider_is_protected_from_an_archive_recommendation",
+   "passed tests.test_external_engineering_runner::test_a_protected_policy_that_drifted_is_a_violation_even_with_a_clean_diff",
+   "passed tests.test_external_engineering_runner::test_a_deleted_protected_file_is_drift_rather_than_a_gap"
+  ],
+  "passed": 34,
+  "skipped": 0
+ }
+}

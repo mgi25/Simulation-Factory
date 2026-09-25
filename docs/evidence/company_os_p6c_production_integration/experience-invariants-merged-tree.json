@@ -1,0 +1,412 @@
+{
+ "1 episodes index canonical records, not a second source of truth": {
+  "holds": true,
+  "tests": [
+   {
+    "test": "tests/test_company_experience_store.py::test_capture_follows_the_jobs_own_links_not_positions",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_the_identity_is_derived_from_canonical_pointers_only",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_a_changed_canonical_record_leaves_the_episode_unresolved",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_an_edited_episode_is_not_served_as_precedent",
+    "cases": 1,
+    "result": "passed"
+   }
+  ]
+ },
+ "2 decision-time features separate from outcome": {
+  "holds": true,
+  "tests": [
+   {
+    "test": "tests/test_company_experience_store.py::test_decision_time_and_outcome_fields_are_disjoint",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_the_feature_builder_cannot_see_an_outcome",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_an_outcome_smuggled_into_features_is_refused",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_stored_features_recompute_exactly_from_the_work_order",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_the_future_is_invisible_to_a_decision",
+    "cases": 1,
+    "result": "passed"
+   }
+  ]
+ },
+ "3 observed / estimated / counterfactual provenance explicit": {
+  "holds": true,
+  "tests": [
+   {
+    "test": "tests/test_company_experience_store.py::test_history_refuses_a_counterfactual_measurement",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_a_gap_cannot_be_written_as_a_measurement_or_a_guess_as_an_observation",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_counterfactual_values_live_only_in_labelled_measurements",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_missing_usage_telemetry_stays_unavailable_and_never_becomes_zero",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_reported_provider_usage_is_observed_with_its_values",
+    "cases": 1,
+    "result": "passed"
+   }
+  ]
+ },
+ "4 identical capture is idempotent": {
+  "holds": true,
+  "tests": [
+   {
+    "test": "tests/test_company_experience_store.py::test_duplicate_ingestion_resolves_to_the_same_identity",
+    "cases": 1,
+    "result": "passed"
+   }
+  ]
+ },
+ "5 conflicting duplicate refuses overwrite": {
+  "holds": true,
+  "tests": [
+   {
+    "test": "tests/test_company_experience_store.py::test_a_conflicting_duplicate_is_refused_and_the_stored_episode_kept",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_the_store_is_append_only_with_no_update_or_delete",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_a_stored_id_that_disagrees_with_its_content_is_refused",
+    "cases": 1,
+    "result": "passed"
+   }
+  ]
+ },
+ "6 stale history is not current precedent": {
+  "holds": true,
+  "tests": [
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_only_stale_experience_abstains_and_is_listed_as_history",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_a_capsule_contract_change_makes_relevant_experience_stale",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_a_governance_move_on_an_anchored_path_is_stale",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_a_removed_path_or_retired_capsule_invalidates",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_no_capsule_store_means_invalid_not_current",
+    "cases": 1,
+    "result": "passed"
+   }
+  ]
+ },
+ "7 retrieval deterministic and explainable": {
+  "holds": true,
+  "tests": [
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_retrieval_and_advice_are_deterministic",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_a_related_accepted_episode_is_precedent_and_says_why",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_ties_break_by_recency_then_by_id",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_scan_order_is_deterministic",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_the_replay_is_leave_future_out_labelled_and_repeatable",
+    "cases": 1,
+    "result": "passed"
+   }
+  ]
+ },
+ "8 weak / incompatible history abstains": {
+  "holds": true,
+  "tests": [
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_an_empty_store_abstains_with_no_history",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_an_unrelated_task_abstains",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_the_same_words_in_another_subsystem_abstain",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_the_same_subsystem_under_a_different_risk_is_incompatible",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_every_routing_input_must_match",
+    "cases": 3,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_every_abstention_code_is_declared",
+    "cases": 1,
+    "result": "passed"
+   }
+  ]
+ },
+ "9 corrections / failures are warnings, never success precedent": {
+  "holds": true,
+  "tests": [
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_only_failed_experience_never_becomes_success_precedent",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_a_failure_with_stronger_signals_is_still_only_a_warning",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_a_rejected_attempt_is_a_correction_and_never_accepted",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_a_ceo_approval_keeps_accepted_and_never_promotes_a_correction",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_a_ceo_rejection_downgrades_an_accepted_episode_without_rewriting_it",
+    "cases": 1,
+    "result": "passed"
+   }
+  ]
+ },
+ "10 KnowledgeStore not mutated automatically": {
+  "holds": true,
+  "tests": [
+   {
+    "test": "tests/test_company_experience_store.py::test_capture_and_advice_never_touch_the_knowledge_store",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_no_experience_module_can_write_a_knowledge_record",
+    "cases": 1,
+    "result": "passed"
+   }
+  ]
+ },
+ "11 experience grants no authority": {
+  "holds": true,
+  "tests": [
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_history_cannot_expand_the_read_scope",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_an_empty_read_scope_grants_nothing_whatever_history_says",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_the_advice_carries_no_authority_vocabulary_at_any_depth",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_an_injected_authority_field_is_refused_wherever_it_hides",
+    "cases": 35,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_a_risk_class_cannot_be_lowered_by_precedent",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_the_gate_and_the_engineering_loop_never_read_experience",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_external_engineering_runner.py::test_an_advisory_carrying_authority_is_dropped_whole",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_external_engineering_runner.py::test_experience_cannot_move_the_adaptive_model_gate",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_external_engineering_runner.py::test_prior_experience_reaches_the_briefing_as_navigation_only",
+    "cases": 1,
+    "result": "passed"
+   }
+  ]
+ },
+ "12 missing / corrupt advice degrades to no advice": {
+  "holds": true,
+  "tests": [
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_a_broken_experience_store_degrades_to_no_precedent",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_a_corrupt_episode_is_skipped_and_counted",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_store.py::test_a_corrupt_record_costs_one_episode_and_never_the_scan",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_external_engineering_runner.py::test_a_failing_experience_call_changes_nothing",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_external_engineering_runner.py::test_a_malformed_advisory_runs_the_job_exactly_as_without_advice",
+    "cases": 6,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_external_engineering_runner.py::test_an_unforeseen_parser_or_revalidation_exception_is_absorbed",
+    "cases": 2,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_external_engineering_runner.py::test_a_failed_experience_write_is_no_advice_not_a_failed_run",
+    "cases": 2,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_external_engineering_runner.py::test_process_level_control_is_never_absorbed_as_missing_advice",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_engineering_runner_execution_context.py::test_a_precedent_why_that_is_not_a_list_of_strings_is_refused",
+    "cases": 8,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_engineering_runner_execution_context.py::test_warning_lines_that_are_not_a_list_of_strings_are_refused",
+    "cases": 8,
+    "result": "passed"
+   }
+  ]
+ },
+ "13 current P6B graph / current authority revalidate historical suggestions": {
+  "holds": true,
+  "tests": [
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_revalidation_against_this_repositorys_own_p6b_graph",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_a_test_that_no_longer_reaches_the_task_is_refused",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_a_file_missing_from_the_current_graph_is_refused",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_a_supplied_graph_that_fails_to_build_refuses_everything",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_a_deleted_file_is_refused_even_when_history_used_it",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_an_unauthorized_historical_file_is_refused",
+    "cases": 1,
+    "result": "passed"
+   }
+  ]
+ },
+ "14 experience cannot reduce current required suites": {
+  "holds": true,
+  "tests": [
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_history_cannot_skip_or_replace_a_required_suite",
+    "cases": 1,
+    "result": "passed"
+   },
+   {
+    "test": "tests/test_company_experience_retrieval.py::test_the_gate_and_the_engineering_loop_never_read_experience",
+    "cases": 1,
+    "result": "passed"
+   }
+  ]
+ }
+}

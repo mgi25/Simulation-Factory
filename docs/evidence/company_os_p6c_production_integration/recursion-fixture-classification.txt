@@ -1,0 +1,7 @@
+# Recursion-depth fixture (correction-review residual) - does it reproduce here?
+# test: tests/test_external_engineering_runner.py::test_a_malformed_advisory_runs_the_job_exactly_as_without_advice[nested_past_the_recursion_limit-^RecursionError: ]
+# CPython 3.13.0 (MSC v.1941 64 bit), Windows 11, sys.getrecursionlimit() == 1000, merged tree c931091
+in the full 47-suite run (junit runs/merge/req.xml): PASSED in 7.165s
+parametrised group alone, run 1: 6 passed in 41.13s
+parametrised group alone, run 2: 6 passed in 40.98s
+single node alone: 1 passed in 11.95s

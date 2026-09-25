@@ -1,0 +1,131 @@
+{
+  "detail": {
+    "CONTROL company/experience -> company.*": {
+      "ast": [
+        "company/experience/__main__.py -> company.engineering.store",
+        "company/experience/__main__.py -> company.runtime.execution_store",
+        "company/experience/__main__.py -> company.validation.errors",
+        "company/experience/capture.py -> company.efficiency.store",
+        "company/experience/capture.py -> company.efficiency.telemetry",
+        "company/experience/capture.py -> company.engineering.gate_evidence",
+        "company/experience/capture.py -> company.engineering.lifecycle",
+        "company/experience/capture.py -> company.engineering.review",
+        "company/experience/capture.py -> company.engineering.store",
+        "company/experience/capture.py -> company.runtime.execution_store",
+        "company/experience/capture.py -> company.runtime.state_paths",
+        "company/experience/errors.py -> company.validation.errors",
+        "company/experience/replay.py -> company.engineering.store",
+        "company/experience/repository.py -> company.runtime.git_evidence",
+        "company/experience/store.py -> company.runtime.state_paths"
+      ],
+      "text": [
+        "company/experience/__main__.py: from company.",
+        "company/experience/__main__.py: from company.",
+        "company/experience/__main__.py: from company.",
+        "company/experience/capture.py: from company.",
+        "company/experience/capture.py: from company.",
+        "company/experience/capture.py: from company.",
+        "company/experience/capture.py: from company.",
+        "company/experience/capture.py: from company.",
+        "company/experience/capture.py: from company.",
+        "company/experience/capture.py: from company.",
+        "company/experience/capture.py: from company.",
+        "company/experience/errors.py: from company.",
+        "company/experience/replay.py: from company.",
+        "company/experience/repository.py: from company.",
+        "company/experience/store.py: from company."
+      ]
+    },
+    "CONTROL tools/engineering_runner -> json/subprocess": {
+      "ast": [
+        "tools/engineering_runner/__main__.py -> json",
+        "tools/engineering_runner/briefs.py -> json",
+        "tools/engineering_runner/controlplane.py -> json",
+        "tools/engineering_runner/evidence.py -> json",
+        "tools/engineering_runner/experience.py -> json",
+        "tools/engineering_runner/exploration_report.py -> json",
+        "tools/engineering_runner/exploration_telemetry.py -> json",
+        "tools/engineering_runner/process.py -> subprocess",
+        "tools/engineering_runner/queue.py -> json",
+        "tools/engineering_runner/redaction.py -> json",
+        "tools/engineering_runner/repo_map.py -> json",
+        "tools/engineering_runner/runner.py -> json"
+      ],
+      "text": [
+        "tools/engineering_runner/__main__.py: import json",
+        "tools/engineering_runner/briefs.py: import json",
+        "tools/engineering_runner/controlplane.py: import json",
+        "tools/engineering_runner/evidence.py: import json",
+        "tools/engineering_runner/experience.py: import json",
+        "tools/engineering_runner/exploration_report.py: import json",
+        "tools/engineering_runner/exploration_telemetry.py: import json",
+        "tools/engineering_runner/process.py: import subprocess",
+        "tools/engineering_runner/queue.py: import json",
+        "tools/engineering_runner/redaction.py: import json",
+        "tools/engineering_runner/repo_map.py: import json",
+        "tools/engineering_runner/runner.py: import json"
+      ]
+    },
+    "company (all) -> tools.engineering_runner": {
+      "ast": [],
+      "text": []
+    },
+    "company/experience -> company.integration": {
+      "ast": [],
+      "text": []
+    },
+    "company/experience -> tools.engineering_runner / tools": {
+      "ast": [],
+      "text": []
+    },
+    "runner lines naming a Company OS module (CLI contract only)": {
+      "ast": [],
+      "text": [
+        "tools/engineering_runner/controlplane.py:49: INTEGRATION_MODULE = \"company.integration\"",
+        "tools/engineering_runner/controlplane.py:53: EXPERIENCE_MODULE = \"company.experience\"",
+        "tools/engineering_runner/controlplane.py:55: # `company.integration.__main__._EXIT`, inverted. The gate CLI's exit code *is*",
+        "tools/engineering_runner/controlplane.py:282: `company.integration`'s job on one side and",
+        "tools/engineering_runner/controlplane.py:305: \"company.integration check\", result.exit_code, result.stderr.strip()",
+        "tools/engineering_runner/controlplane.py:310: \"company.integration check\",",
+        "tools/engineering_runner/controlplane.py:314: return result, _parse_json(result.stdout, \"company.integration check\"), readiness",
+        "tools/engineering_runner/experience.py:4: asked across its command line (`python -m company.experience suggest`),",
+        "tools/engineering_runner/repo_map.py:390: `company.integration.GateStatus` is a module it imports.",
+        "tools/engineering_runner/runner.py:19: `company.integration check`"
+      ]
+    },
+    "tools/engineering_runner -> Company OS": {
+      "ast": [],
+      "text": []
+    }
+  },
+  "summary": {
+    "CONTROL company/experience -> company.*": {
+      "ast": 15,
+      "text": 15
+    },
+    "CONTROL tools/engineering_runner -> json/subprocess": {
+      "ast": 12,
+      "text": 12
+    },
+    "company (all) -> tools.engineering_runner": {
+      "ast": 0,
+      "text": 0
+    },
+    "company/experience -> company.integration": {
+      "ast": 0,
+      "text": 0
+    },
+    "company/experience -> tools.engineering_runner / tools": {
+      "ast": 0,
+      "text": 0
+    },
+    "runner lines naming a Company OS module (CLI contract only)": {
+      "ast": 0,
+      "text": 10
+    },
+    "tools/engineering_runner -> Company OS": {
+      "ast": 0,
+      "text": 0
+    }
+  }
+}

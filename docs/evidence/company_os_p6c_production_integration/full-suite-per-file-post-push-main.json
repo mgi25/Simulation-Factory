@@ -1,0 +1,1200 @@
+{
+  "failed_ids": [
+    "tests/test_neon_proof.py::test_a_missing_godot_is_reported_rather_than_raised",
+    "tests/test_race2_v301_stage.py::test_this_branch_changes_no_physics_camera_or_course_module",
+    "tests/test_race2_v30_stage.py::test_this_branch_changes_no_physics_camera_or_course_module",
+    "tests/test_race2_v311_track.py::test_no_locked_package_moved[race2/]",
+    "tests/test_race2_v311_track.py::test_the_branch_changes_only_render_and_measurement",
+    "tests/test_race2_v321_geometry.py::test_the_branch_changes_only_render_and_measurement",
+    "tests/test_race2_v32_final.py::test_no_locked_file_moved[godot/assets/marble_machine/course/race2_track_surface.gd]",
+    "tests/test_race2_v32_final.py::test_no_locked_file_moved[godot/scripts/race2_scene.gd]",
+    "tests/test_race2_v32_final.py::test_no_locked_file_moved[race2/kit.py]",
+    "tests/test_race2_v32_final.py::test_no_locked_file_moved[race2/parts.py]",
+    "tests/test_race2_v32_final.py::test_no_locked_file_moved[race2/race.py]",
+    "tests/test_race2_v32_final.py::test_the_branch_adds_only_presentation",
+    "tests/test_race2_v33_bookends.py::test_the_branch_adds_bookends_and_touches_nothing_else",
+    "tests/test_sloped_v251_world.py::test_every_authored_site_lands_in_at_least_one_frame",
+    "tests/test_sloped_v251_world.py::test_the_analytic_parallax_finds_a_spread_in_every_chase",
+    "tests/test_sloped_v251_world.py::test_the_projector_puts_each_node_in_the_frame_named_for_it",
+    "tests/test_sloped_v251_world.py::test_the_siting_tool_uses_the_scenes_own_edit_map",
+    "tests/test_sloped_v252_world.py::test_the_geometric_parallax_field_is_identical_to_v251s"
+  ],
+  "files": {
+    "tests/test_arena_layout.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 29,
+      "skipped": 0,
+      "time": 13.74
+    },
+    "tests/test_balance.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 37,
+      "skipped": 0,
+      "time": 0.14
+    },
+    "tests/test_battle.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 16,
+      "skipped": 0,
+      "time": 0.11
+    },
+    "tests/test_battle_scoring.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 40,
+      "skipped": 0,
+      "time": 5.78
+    },
+    "tests/test_candidate_curation.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 44,
+      "skipped": 0,
+      "time": 18.7
+    },
+    "tests/test_company_analytics.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 160,
+      "skipped": 0,
+      "time": 1.57
+    },
+    "tests/test_company_bounded_engineering_activation.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 63,
+      "skipped": 0,
+      "time": 0.12
+    },
+    "tests/test_company_bounded_engineering_autonomy.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 72,
+      "skipped": 0,
+      "time": 0.05
+    },
+    "tests/test_company_context_assembly.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 9,
+      "skipped": 0,
+      "time": 0.04
+    },
+    "tests/test_company_context_expansion.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 17,
+      "skipped": 0,
+      "time": 0.94
+    },
+    "tests/test_company_dashboard.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 32,
+      "skipped": 0,
+      "time": 0.49
+    },
+    "tests/test_company_delegation.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 152,
+      "skipped": 0,
+      "time": 0.74
+    },
+    "tests/test_company_delegation_pilot.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 159,
+      "skipped": 0,
+      "time": 0.2
+    },
+    "tests/test_company_dependency_graph.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 54,
+      "skipped": 0,
+      "time": 17.75
+    },
+    "tests/test_company_efficiency.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 69,
+      "skipped": 0,
+      "time": 0.26
+    },
+    "tests/test_company_engineering_execution.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 207,
+      "skipped": 0,
+      "time": 24.48
+    },
+    "tests/test_company_evidence_review.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 25,
+      "skipped": 0,
+      "time": 5.05
+    },
+    "tests/test_company_executable_work_planning.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 23,
+      "skipped": 0,
+      "time": 0.14
+    },
+    "tests/test_company_execution_transport.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 14,
+      "skipped": 0,
+      "time": 0.73
+    },
+    "tests/test_company_executive_planning.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 73,
+      "skipped": 0,
+      "time": 0.05
+    },
+    "tests/test_company_experience_retrieval.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 77,
+      "skipped": 0,
+      "time": 13.22
+    },
+    "tests/test_company_experience_store.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 57,
+      "skipped": 0,
+      "time": 9.21
+    },
+    "tests/test_company_external_engineering_runner.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 67,
+      "skipped": 0,
+      "time": 1.25
+    },
+    "tests/test_company_finance.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 123,
+      "skipped": 0,
+      "time": 0.68
+    },
+    "tests/test_company_finance_usage_cost.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 48,
+      "skipped": 0,
+      "time": 0.52
+    },
+    "tests/test_company_gate_suite_requirements.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 46,
+      "skipped": 0,
+      "time": 79.34
+    },
+    "tests/test_company_integration_gate.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 89,
+      "skipped": 0,
+      "time": 124.04
+    },
+    "tests/test_company_objective_planning.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 93,
+      "skipped": 0,
+      "time": 0.22
+    },
+    "tests/test_company_org_intelligence.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 119,
+      "skipped": 0,
+      "time": 0.34
+    },
+    "tests/test_company_os_ai_platform.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 46,
+      "skipped": 0,
+      "time": 0.0
+    },
+    "tests/test_company_os_capsules.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 68,
+      "skipped": 0,
+      "time": 0.31
+    },
+    "tests/test_company_os_knowledge.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 26,
+      "skipped": 0,
+      "time": 0.16
+    },
+    "tests/test_company_os_research.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 81,
+      "skipped": 0,
+      "time": 0.53
+    },
+    "tests/test_company_os_research_batches.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 118,
+      "skipped": 0,
+      "time": 0.89
+    },
+    "tests/test_company_os_research_ingestion.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 122,
+      "skipped": 0,
+      "time": 0.64
+    },
+    "tests/test_company_read_authority.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 34,
+      "skipped": 0,
+      "time": 0.21
+    },
+    "tests/test_company_review_separation.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 32,
+      "skipped": 0,
+      "time": 0.19
+    },
+    "tests/test_company_runtime.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 22,
+      "skipped": 0,
+      "time": 1.15
+    },
+    "tests/test_company_runtime_integration.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 14,
+      "skipped": 0,
+      "time": 0.25
+    },
+    "tests/test_company_session_execution.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 48,
+      "skipped": 0,
+      "time": 1.96
+    },
+    "tests/test_company_typed_evidence_context.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 59,
+      "skipped": 0,
+      "time": 0.01
+    },
+    "tests/test_company_workforce.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 93,
+      "skipped": 0,
+      "time": 0.25
+    },
+    "tests/test_company_youtube_connectivity.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 29,
+      "skipped": 0,
+      "time": 15.6
+    },
+    "tests/test_company_youtube_end_to_end.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 7,
+      "skipped": 0,
+      "time": 0.52
+    },
+    "tests/test_company_youtube_live_findings.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 55,
+      "skipped": 0,
+      "time": 0.6
+    },
+    "tests/test_company_youtube_studio_ingestion.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 142,
+      "skipped": 0,
+      "time": 2.74
+    },
+    "tests/test_deck_geometry.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 17,
+      "skipped": 0,
+      "time": 0.52
+    },
+    "tests/test_dynamic_entities.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 16,
+      "skipped": 0,
+      "time": 0.02
+    },
+    "tests/test_echo.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 39,
+      "skipped": 0,
+      "time": 0.69
+    },
+    "tests/test_encode.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 59,
+      "skipped": 0,
+      "time": 0.59
+    },
+    "tests/test_engineering_runner_execution_context.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 80,
+      "skipped": 0,
+      "time": 0.65
+    },
+    "tests/test_engineering_runner_exploration_report.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 19,
+      "skipped": 0,
+      "time": 0.3
+    },
+    "tests/test_engineering_runner_exploration_telemetry.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 25,
+      "skipped": 0,
+      "time": 0.11
+    },
+    "tests/test_engineering_runner_repo_map.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 25,
+      "skipped": 0,
+      "time": 0.53
+    },
+    "tests/test_events.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 38,
+      "skipped": 0,
+      "time": 0.89
+    },
+    "tests/test_external_engineering_runner.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 203,
+      "skipped": 0,
+      "time": 369.14
+    },
+    "tests/test_kinetic_obstacles.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 41,
+      "skipped": 0,
+      "time": 24.84
+    },
+    "tests/test_marble3d_contact.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 10,
+      "skipped": 0,
+      "time": 1.88
+    },
+    "tests/test_marble3d_determinism.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 7,
+      "skipped": 0,
+      "time": 10.61
+    },
+    "tests/test_marble3d_friction.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 12,
+      "skipped": 0,
+      "time": 0.18
+    },
+    "tests/test_marble3d_integration.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 11,
+      "skipped": 0,
+      "time": 2.46
+    },
+    "tests/test_marble3d_margins.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 10,
+      "skipped": 0,
+      "time": 1.13
+    },
+    "tests/test_marble3d_mesh.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 19,
+      "skipped": 0,
+      "time": 0.11
+    },
+    "tests/test_marble3d_modules.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 31,
+      "skipped": 0,
+      "time": 0.07
+    },
+    "tests/test_marble3d_presentation.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 25,
+      "skipped": 1,
+      "time": 0.98
+    },
+    "tests/test_marble3d_replay.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 14,
+      "skipped": 0,
+      "time": 0.59
+    },
+    "tests/test_marble3d_simulation.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 16,
+      "skipped": 0,
+      "time": 6.35
+    },
+    "tests/test_marble3d_units.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 12,
+      "skipped": 0,
+      "time": 0.01
+    },
+    "tests/test_marble3d_validation.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 7,
+      "skipped": 0,
+      "time": 0.32
+    },
+    "tests/test_multiplying_shell.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 88,
+      "skipped": 0,
+      "time": 74.69
+    },
+    "tests/test_multiplying_shell_audio.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 62,
+      "skipped": 0,
+      "time": 61.8
+    },
+    "tests/test_multishell_av.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 165,
+      "skipped": 0,
+      "time": 18.48
+    },
+    "tests/test_multishell_production.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 15,
+      "skipped": 0,
+      "time": 0.45
+    },
+    "tests/test_multishell_visual.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 198,
+      "skipped": 0,
+      "time": 8.93
+    },
+    "tests/test_neon_proof.py": {
+      "error": 0,
+      "failed": 1,
+      "passed": 40,
+      "skipped": 0,
+      "time": 1.89
+    },
+    "tests/test_obstacles.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 26,
+      "skipped": 0,
+      "time": 0.32
+    },
+    "tests/test_orbit.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 49,
+      "skipped": 0,
+      "time": 1.15
+    },
+    "tests/test_powers.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 57,
+      "skipped": 0,
+      "time": 0.51
+    },
+    "tests/test_production_delivery.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 38,
+      "skipped": 0,
+      "time": 0.21
+    },
+    "tests/test_production_qc.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 43,
+      "skipped": 0,
+      "time": 0.17
+    },
+    "tests/test_pulse.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 35,
+      "skipped": 0,
+      "time": 0.48
+    },
+    "tests/test_race2_camera.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 9,
+      "skipped": 0,
+      "time": 22.47
+    },
+    "tests/test_race2_cinematography.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 27,
+      "skipped": 1,
+      "time": 626.39
+    },
+    "tests/test_race2_course.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 12,
+      "skipped": 0,
+      "time": 1.45
+    },
+    "tests/test_race2_isolation.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 7,
+      "skipped": 0,
+      "time": 0.85
+    },
+    "tests/test_race2_physics.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 7,
+      "skipped": 0,
+      "time": 60.14
+    },
+    "tests/test_race2_race.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 10,
+      "skipped": 0,
+      "time": 9.51
+    },
+    "tests/test_race2_v29_contained.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 16,
+      "skipped": 1,
+      "time": 9.84
+    },
+    "tests/test_race2_v301_stage.py": {
+      "error": 0,
+      "failed": 1,
+      "passed": 43,
+      "skipped": 1,
+      "time": 12.42
+    },
+    "tests/test_race2_v30_stage.py": {
+      "error": 0,
+      "failed": 1,
+      "passed": 29,
+      "skipped": 1,
+      "time": 12.86
+    },
+    "tests/test_race2_v311_track.py": {
+      "error": 0,
+      "failed": 2,
+      "passed": 45,
+      "skipped": 3,
+      "time": 2.01
+    },
+    "tests/test_race2_v31_readability.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 6,
+      "skipped": 27,
+      "time": 0.03
+    },
+    "tests/test_race2_v321_geometry.py": {
+      "error": 0,
+      "failed": 1,
+      "passed": 22,
+      "skipped": 8,
+      "time": 2.16
+    },
+    "tests/test_race2_v322_audio.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 15,
+      "skipped": 23,
+      "time": 3.47
+    },
+    "tests/test_race2_v32_final.py": {
+      "error": 0,
+      "failed": 6,
+      "passed": 43,
+      "skipped": 7,
+      "time": 1.43
+    },
+    "tests/test_race2_v331_runout.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 31,
+      "skipped": 23,
+      "time": 0.04
+    },
+    "tests/test_race2_v33_bookends.py": {
+      "error": 0,
+      "failed": 1,
+      "passed": 17,
+      "skipped": 8,
+      "time": 13.65
+    },
+    "tests/test_race_analysis.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 36,
+      "skipped": 0,
+      "time": 1.61
+    },
+    "tests/test_race_branching.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 31,
+      "skipped": 0,
+      "time": 6.77
+    },
+    "tests/test_race_course.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 43,
+      "skipped": 0,
+      "time": 0.02
+    },
+    "tests/test_race_manager.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 40,
+      "skipped": 0,
+      "time": 13.47
+    },
+    "tests/test_race_pipeline.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 14,
+      "skipped": 0,
+      "time": 3.16
+    },
+    "tests/test_race_renderer.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 10,
+      "skipped": 0,
+      "time": 4.76
+    },
+    "tests/test_race_replay.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 27,
+      "skipped": 0,
+      "time": 10.21
+    },
+    "tests/test_race_simulation.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 32,
+      "skipped": 0,
+      "time": 0.9
+    },
+    "tests/test_race_telemetry.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 25,
+      "skipped": 0,
+      "time": 2.34
+    },
+    "tests/test_race_visuals.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 49,
+      "skipped": 0,
+      "time": 0.77
+    },
+    "tests/test_render_plan.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 33,
+      "skipped": 0,
+      "time": 0.25
+    },
+    "tests/test_replay.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 7,
+      "skipped": 0,
+      "time": 0.25
+    },
+    "tests/test_shell_escape.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 48,
+      "skipped": 0,
+      "time": 23.08
+    },
+    "tests/test_simulation.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 9,
+      "skipped": 0,
+      "time": 0.03
+    },
+    "tests/test_sloped_apron.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 18,
+      "skipped": 0,
+      "time": 12.68
+    },
+    "tests/test_sloped_bank_slew.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 19,
+      "skipped": 1,
+      "time": 0.17
+    },
+    "tests/test_sloped_cameras.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 16,
+      "skipped": 0,
+      "time": 10.44
+    },
+    "tests/test_sloped_chamberstate.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 19,
+      "skipped": 0,
+      "time": 0.02
+    },
+    "tests/test_sloped_chase.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 33,
+      "skipped": 0,
+      "time": 74.38
+    },
+    "tests/test_sloped_contact.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 7,
+      "skipped": 0,
+      "time": 0.01
+    },
+    "tests/test_sloped_contrast.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 163,
+      "skipped": 0,
+      "time": 0.05
+    },
+    "tests/test_sloped_course_preview.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 38,
+      "skipped": 0,
+      "time": 2.95
+    },
+    "tests/test_sloped_edit.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 0,
+      "skipped": 6,
+      "time": 0.0
+    },
+    "tests/test_sloped_environment.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 42,
+      "skipped": 0,
+      "time": 0.9
+    },
+    "tests/test_sloped_finish_lens.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 0,
+      "skipped": 16,
+      "time": 0.0
+    },
+    "tests/test_sloped_fork_trim.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 19,
+      "skipped": 0,
+      "time": 0.04
+    },
+    "tests/test_sloped_geometry.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 25,
+      "skipped": 0,
+      "time": 0.37
+    },
+    "tests/test_sloped_guards.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 9,
+      "skipped": 0,
+      "time": 0.03
+    },
+    "tests/test_sloped_identity.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 9,
+      "skipped": 0,
+      "time": 1.86
+    },
+    "tests/test_sloped_open_side.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 6,
+      "skipped": 2,
+      "time": 0.12
+    },
+    "tests/test_sloped_race.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 23,
+      "skipped": 0,
+      "time": 71.04
+    },
+    "tests/test_sloped_readability.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 0,
+      "skipped": 16,
+      "time": 0.0
+    },
+    "tests/test_sloped_render.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 7,
+      "skipped": 0,
+      "time": 0.06
+    },
+    "tests/test_sloped_retention.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 0,
+      "skipped": 25,
+      "time": 0.0
+    },
+    "tests/test_sloped_short.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 4,
+      "skipped": 18,
+      "time": 0.17
+    },
+    "tests/test_sloped_shuffle.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 30,
+      "skipped": 0,
+      "time": 0.56
+    },
+    "tests/test_sloped_split.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 33,
+      "skipped": 0,
+      "time": 1.84
+    },
+    "tests/test_sloped_start_kind.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 19,
+      "skipped": 0,
+      "time": 3.07
+    },
+    "tests/test_sloped_start_render.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 6,
+      "skipped": 2,
+      "time": 0.13
+    },
+    "tests/test_sloped_startlab.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 9,
+      "skipped": 0,
+      "time": 0.04
+    },
+    "tests/test_sloped_terrain.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 11,
+      "skipped": 0,
+      "time": 0.1
+    },
+    "tests/test_sloped_trapdoor.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 31,
+      "skipped": 0,
+      "time": 0.57
+    },
+    "tests/test_sloped_v21.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 25,
+      "skipped": 0,
+      "time": 2.89
+    },
+    "tests/test_sloped_v221_finish.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 5,
+      "skipped": 17,
+      "time": 0.02
+    },
+    "tests/test_sloped_v221_integration.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 11,
+      "skipped": 23,
+      "time": 0.04
+    },
+    "tests/test_sloped_v221_preview.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 5,
+      "skipped": 17,
+      "time": 0.63
+    },
+    "tests/test_sloped_v221_shuffle.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 7,
+      "skipped": 11,
+      "time": 0.01
+    },
+    "tests/test_sloped_v22_integration.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 7,
+      "skipped": 17,
+      "time": 0.0
+    },
+    "tests/test_sloped_v22_pacing.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 0,
+      "skipped": 59,
+      "time": 0.0
+    },
+    "tests/test_sloped_v23_env.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 30,
+      "skipped": 1,
+      "time": 0.27
+    },
+    "tests/test_sloped_v23_integration.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 33,
+      "skipped": 0,
+      "time": 0.06
+    },
+    "tests/test_sloped_v23_machine.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 362,
+      "skipped": 1,
+      "time": 0.07
+    },
+    "tests/test_sloped_v24_hook.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 1,
+      "skipped": 17,
+      "time": 0.0
+    },
+    "tests/test_sloped_v24_integration.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 9,
+      "skipped": 27,
+      "time": 0.51
+    },
+    "tests/test_sloped_v24_pacing.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 2,
+      "skipped": 32,
+      "time": 0.0
+    },
+    "tests/test_sloped_v24_payoff.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 31,
+      "skipped": 1,
+      "time": 14.88
+    },
+    "tests/test_sloped_v24_spin.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 15,
+      "skipped": 12,
+      "time": 0.04
+    },
+    "tests/test_sloped_v251_world.py": {
+      "error": 0,
+      "failed": 4,
+      "passed": 34,
+      "skipped": 0,
+      "time": 0.49
+    },
+    "tests/test_sloped_v252_world.py": {
+      "error": 0,
+      "failed": 1,
+      "passed": 39,
+      "skipped": 0,
+      "time": 0.09
+    },
+    "tests/test_sloped_v25_world.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 49,
+      "skipped": 0,
+      "time": 0.5
+    },
+    "tests/test_sloped_v26_integration.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 29,
+      "skipped": 14,
+      "time": 0.42
+    },
+    "tests/test_sloped_widelaunch.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 22,
+      "skipped": 0,
+      "time": 0.29
+    },
+    "tests/test_soundtrack.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 101,
+      "skipped": 0,
+      "time": 89.86
+    },
+    "tests/test_tile_escape.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 40,
+      "skipped": 0,
+      "time": 5.61
+    },
+    "tests/test_tile_escape_phase2.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 58,
+      "skipped": 0,
+      "time": 8.85
+    },
+    "tests/test_tile_escape_phase3.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 49,
+      "skipped": 1,
+      "time": 10.1
+    },
+    "tests/test_tile_escape_phase4.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 65,
+      "skipped": 0,
+      "time": 0.56
+    },
+    "tests/test_tile_escape_phase5.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 74,
+      "skipped": 0,
+      "time": 133.32
+    },
+    "tests/test_tile_escape_phase6.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 45,
+      "skipped": 0,
+      "time": 52.89
+    },
+    "tests/test_toy_proof.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 17,
+      "skipped": 0,
+      "time": 0.34
+    },
+    "tests/test_youtube_fetch.py": {
+      "error": 0,
+      "failed": 0,
+      "passed": 68,
+      "skipped": 1,
+      "time": 0.69
+    }
+  }
+}

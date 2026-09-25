@@ -1,0 +1,475 @@
+{
+  "max_age_days": 7,
+  "results": [
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "160 passed, 0 failed, 0 skipped in 1.57s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 160,
+      "suite": "tests/test_company_analytics.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "63 passed, 0 failed, 0 skipped in 0.12s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 63,
+      "suite": "tests/test_company_bounded_engineering_activation.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "72 passed, 0 failed, 0 skipped in 0.05s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 72,
+      "suite": "tests/test_company_bounded_engineering_autonomy.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "9 passed, 0 failed, 0 skipped in 0.04s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 9,
+      "suite": "tests/test_company_context_assembly.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "17 passed, 0 failed, 0 skipped in 0.94s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 17,
+      "suite": "tests/test_company_context_expansion.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "32 passed, 0 failed, 0 skipped in 0.49s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 32,
+      "suite": "tests/test_company_dashboard.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "152 passed, 0 failed, 0 skipped in 0.74s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 152,
+      "suite": "tests/test_company_delegation.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "159 passed, 0 failed, 0 skipped in 0.20s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 159,
+      "suite": "tests/test_company_delegation_pilot.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "54 passed, 0 failed, 0 skipped in 17.75s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 54,
+      "suite": "tests/test_company_dependency_graph.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "69 passed, 0 failed, 0 skipped in 0.26s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 69,
+      "suite": "tests/test_company_efficiency.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "207 passed, 0 failed, 0 skipped in 24.48s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 207,
+      "suite": "tests/test_company_engineering_execution.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "25 passed, 0 failed, 0 skipped in 5.05s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 25,
+      "suite": "tests/test_company_evidence_review.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "23 passed, 0 failed, 0 skipped in 0.14s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 23,
+      "suite": "tests/test_company_executable_work_planning.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "14 passed, 0 failed, 0 skipped in 0.73s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 14,
+      "suite": "tests/test_company_execution_transport.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "73 passed, 0 failed, 0 skipped in 0.05s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 73,
+      "suite": "tests/test_company_executive_planning.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "77 passed, 0 failed, 0 skipped in 13.22s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 77,
+      "suite": "tests/test_company_experience_retrieval.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "57 passed, 0 failed, 0 skipped in 9.21s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 57,
+      "suite": "tests/test_company_experience_store.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "67 passed, 0 failed, 0 skipped in 1.25s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 67,
+      "suite": "tests/test_company_external_engineering_runner.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "123 passed, 0 failed, 0 skipped in 0.68s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 123,
+      "suite": "tests/test_company_finance.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "48 passed, 0 failed, 0 skipped in 0.52s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 48,
+      "suite": "tests/test_company_finance_usage_cost.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "46 passed, 0 failed, 0 skipped in 79.34s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 46,
+      "suite": "tests/test_company_gate_suite_requirements.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "89 passed, 0 failed, 0 skipped in 124.04s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 89,
+      "suite": "tests/test_company_integration_gate.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "93 passed, 0 failed, 0 skipped in 0.22s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 93,
+      "suite": "tests/test_company_objective_planning.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "119 passed, 0 failed, 0 skipped in 0.34s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 119,
+      "suite": "tests/test_company_org_intelligence.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "46 passed, 0 failed, 0 skipped in 0.00s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 46,
+      "suite": "tests/test_company_os_ai_platform.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "68 passed, 0 failed, 0 skipped in 0.31s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 68,
+      "suite": "tests/test_company_os_capsules.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "26 passed, 0 failed, 0 skipped in 0.16s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 26,
+      "suite": "tests/test_company_os_knowledge.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "81 passed, 0 failed, 0 skipped in 0.53s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 81,
+      "suite": "tests/test_company_os_research.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "118 passed, 0 failed, 0 skipped in 0.89s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 118,
+      "suite": "tests/test_company_os_research_batches.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "122 passed, 0 failed, 0 skipped in 0.64s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 122,
+      "suite": "tests/test_company_os_research_ingestion.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "34 passed, 0 failed, 0 skipped in 0.21s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 34,
+      "suite": "tests/test_company_read_authority.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "32 passed, 0 failed, 0 skipped in 0.19s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 32,
+      "suite": "tests/test_company_review_separation.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "22 passed, 0 failed, 0 skipped in 1.15s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 22,
+      "suite": "tests/test_company_runtime.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "14 passed, 0 failed, 0 skipped in 0.25s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 14,
+      "suite": "tests/test_company_runtime_integration.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "48 passed, 0 failed, 0 skipped in 1.96s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 48,
+      "suite": "tests/test_company_session_execution.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "59 passed, 0 failed, 0 skipped in 0.01s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 59,
+      "suite": "tests/test_company_typed_evidence_context.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "93 passed, 0 failed, 0 skipped in 0.25s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 93,
+      "suite": "tests/test_company_workforce.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "29 passed, 0 failed, 0 skipped in 15.60s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 29,
+      "suite": "tests/test_company_youtube_connectivity.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "7 passed, 0 failed, 0 skipped in 0.52s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 7,
+      "suite": "tests/test_company_youtube_end_to_end.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "55 passed, 0 failed, 0 skipped in 0.60s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 55,
+      "suite": "tests/test_company_youtube_live_findings.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "142 passed, 0 failed, 0 skipped in 2.74s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 142,
+      "suite": "tests/test_company_youtube_studio_ingestion.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "80 passed, 0 failed, 0 skipped in 0.65s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 80,
+      "suite": "tests/test_engineering_runner_execution_context.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "19 passed, 0 failed, 0 skipped in 0.30s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 19,
+      "suite": "tests/test_engineering_runner_exploration_report.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "25 passed, 0 failed, 0 skipped in 0.11s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 25,
+      "suite": "tests/test_engineering_runner_exploration_telemetry.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "25 passed, 0 failed, 0 skipped in 0.53s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 25,
+      "suite": "tests/test_engineering_runner_repo_map.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "203 passed, 0 failed, 0 skipped in 369.14s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 203,
+      "suite": "tests/test_external_engineering_runner.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "68 passed, 0 failed, 1 skipped in 0.69s (real main @ c931091, origin/main c931091; junit req.xml)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-integration-session",
+      "selected": 69,
+      "suite": "tests/test_youtube_fetch.py"
+    }
+  ]
+}

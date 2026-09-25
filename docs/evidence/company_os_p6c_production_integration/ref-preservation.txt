@@ -1,0 +1,20 @@
+# git ls-remote origin, immediately before the integration (after the Phase 0 fetch) and after pushing the merge
+heads before: 124   heads after: 124
+
+## every ref that changed (< before, > after)
+< 4fd5fafa92767a83afb966c9a2210fdb016fc28d	HEAD
+< 4fd5fafa92767a83afb966c9a2210fdb016fc28d	refs/heads/main
+> c931091e884c5dedc62379fb616f6d09ef234f5e	HEAD
+> c931091e884c5dedc62379fb616f6d09ef234f5e	refs/heads/main
+
+## named branches, after
+e4eb260278be5f5bec2d925ad05315afb0969634	refs/heads/p6c-experience-store-v1
+c22a1bed633207b93106c07f6da2f9cd3bcb5a61	refs/heads/p6c-experience-failsafe-fix-v1
+d040dd9cfe64e4d59333afd01d08dd8e84496190	refs/heads/p6b-contract-test-repo-intelligence-v1
+50f42297849364ab6498f894a964d3642cbd9e65	refs/heads/p6b-yaml-dependency-fix-v1
+f2a5aa80e89c4b8dff98673d59473e717cb64d83	refs/heads/p6a-typed-evidence-cache-context-v1
+7861b6b42f7765de988dc122860923fb519ebd5a	refs/heads/p5-runner-ownership-v1
+d7944aaceb901eabf1d962ac77463f47836dc790	refs/heads/p5-read-authority-v1
+adc8a95ffe7eedd78b58d16cc1f8493b5b4a1a4f	refs/heads/p5-evidence-reviewability-v1
+2e7838aa3114060ed0199757aa68101efdaa58e3	refs/heads/category3-two-team-production-v4c
+7a79b153013db8c506c9b31a0a7ff0a7679cedfd	refs/heads/video-test5-prediction-gauntlet

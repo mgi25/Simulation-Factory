@@ -1,0 +1,54 @@
+# B1 probes (probes/b1_probes.py) against the UNFIXED runner: a detached worktree at c22a1be with
+# tools/engineering_runner/{experience,runner}.py checked out from e4eb260 (pre-P6C-R1). Sensitivity check only.
+
+test_nonempty_mapping_why FAILED                                       [  4%]
+test_malformed_warning_lines[lines0-lines must be a list of strings, not dict] FAILED [  9%]
+test_malformed_warning_lines[a bare string-lines must be a list of strings, not str] FAILED [ 14%]
+test_malformed_warning_lines[lines2-lines[1] must be a string, not int] FAILED [ 19%]
+test_unexpected_runtime_error[parse] FAILED                            [ 23%]
+test_unexpected_runtime_error[revalidate] FAILED                       [ 28%]
+test_forced_recursion_error_at_parse FAILED                            [ 33%]
+test_forced_recursion_error_inside_real_parse FAILED                   [ 38%]
+test_genuine_recursion_just_past_the_limit FAILED                      [ 42%]
+test_oserror_writing_artifact[experience-advice.json] FAILED           [ 47%]
+test_oserror_writing_artifact[experience.json] FAILED                  [ 52%]
+test_process_control_propagates[parse-KeyboardInterrupt] PASSED        [ 57%]
+test_process_control_propagates[parse-SystemExit] PASSED               [ 61%]
+test_process_control_propagates[parse-GeneratorExit] PASSED            [ 66%]
+test_process_control_propagates[revalidate-KeyboardInterrupt] PASSED   [ 71%]
+test_process_control_propagates[revalidate-SystemExit] PASSED          [ 76%]
+test_process_control_propagates[revalidate-GeneratorExit] PASSED       [ 80%]
+test_process_control_propagates[write-KeyboardInterrupt] PASSED        [ 85%]
+test_process_control_propagates[write-SystemExit] PASSED               [ 90%]
+test_process_control_propagates[write-GeneratorExit] PASSED            [ 95%]
+test_wellformed_advice_still_used PASSED                               [100%]
+
+## first assertion / exception line of each failure
+test_nonempty_mapping_why
+  E   KeyError: slice(None, 4, None)
+test_unexpected_runtime_error[parse]
+  E       RuntimeError: integration probe: parse blew up
+test_unexpected_runtime_error[revalidate]
+  E       RuntimeError: integration probe: revalidate blew up
+test_forced_recursion_error_at_parse
+  E       RecursionError: maximum recursion depth exceeded (forced by integration probe)
+test_forced_recursion_error_inside_real_parse
+  E       RecursionError: maximum recursion depth exceeded (at _authority_keys, forced)
+test_genuine_recursion_just_past_the_limit
+  E       RecursionError: maximum recursion depth exceeded
+test_oserror_writing_artifact[experience-advice.json]
+  E       AssertionError: PermissionError: [Errno 13] integration probe: access denied: 'C:\\Users\\mgial\\AppData\\Local\\Temp\\pytest-of-mgial\\pytest-1230\\test_oserror_writing_artifact_0\\runner\\runs\\wo-runner-fixture-357374138482\\run-000001\\developer-01\\experience-advice.json'
+test_oserror_writing_artifact[experience.json]
+  E       AssertionError: PermissionError: [Errno 13] integration probe: access denied: 'C:\\Users\\mgial\\AppData\\Local\\Temp\\pytest-of-mgial\\pytest-1230\\test_oserror_writing_artifact_1\\runner\\runs\\wo-runner-fixture-357374138482\\run-000001\\developer-01\\experience.json'
+
+================== 11 failed, 10 passed in 122.57s (0:02:02) ==================
+
+## the three warning-lines cases (header format differs, extracted separately)
+test_malformed_warning_lines[lines0...]
+  E       AssertionError: {'abstention': '', 'available': True, 'enabled': True, 'files_offered': 2, ...}
+test_malformed_warning_lines[a bare string...]
+  E       AssertionError: ExperienceAdviceRejected: 13 warning lines; the producer declares at most 4
+test_malformed_warning_lines[lines2...]
+  E       AssertionError: {'abstention': '', 'available': True, 'enabled': True, 'files_offered': 2, ...}
+  -> mapping and int-member lines were ACCEPTED as advice (available: True); the bare string was split into 13 one-character
+     lines and refused only by the line-count bound, not by shape.

@@ -1,0 +1,6 @@
+HEAD c931091e884c5dedc62379fb616f6d09ef234f5e  origin/main c931091e884c5dedc62379fb616f6d09ef234f5e
+diff origin/main...HEAD entries: 0
+tests/test_company_os_research.py::test_this_branch_changed_no_race_fight_or_v30_code PASSED [ 33%]
+tests/test_company_os_research_batches.py::test_this_branch_changed_no_race_fight_or_v30_code PASSED [ 66%]
+tests/test_company_os_research_ingestion.py::test_this_branch_changed_no_race_fight_or_v30_code PASSED [100%]
+============================== 3 passed in 0.35s ==============================

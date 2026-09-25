@@ -1,0 +1,104 @@
+HEAD c931091e884c5dedc62379fb616f6d09ef234f5e  origin/main 4fd5fafa92767a83afb966c9a2210fdb016fc28d
+tests/test_company_os_research.py::test_this_branch_changed_no_race_fight_or_v30_code FAILED [ 33%]
+tests/test_company_os_research_batches.py::test_this_branch_changed_no_race_fight_or_v30_code FAILED [ 66%]
+tests/test_company_os_research_ingestion.py::test_this_branch_changed_no_race_fight_or_v30_code FAILED [100%]
+E       AssertionError: assert [('M', 'tools/engineering_runner/__main__.py'), ('M', 'tools/engineering_runner/briefs.py'), ('M', 'tools/engineering_runner/config.py'), ('M', 'tools/engineering_runner/controlplane.py'), ('M', 'tools/engineering_runner/execution_context.py'), ('M', 'tools/engineering_runner/runner.py')] == []
+E         
+E         Left contains 6 more items, first extra item: ('M', 'tools/engineering_runner/__main__.py')
+E         
+E         Full diff:
+E         - []
+E         + [
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/__main__.py',
+E         +     ),
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/briefs.py',
+E         +     ),
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/config.py',
+E         +     ),
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/controlplane.py',
+E         +     ),
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/execution_context.py',
+E         +     ),
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/runner.py',
+E         +     ),
+E         + ]
+E       AssertionError: assert [('M', 'tools/engineering_runner/__main__.py'), ('M', 'tools/engineering_runner/briefs.py'), ('M', 'tools/engineering_runner/config.py'), ('M', 'tools/engineering_runner/controlplane.py'), ('M', 'tools/engineering_runner/execution_context.py'), ('M', 'tools/engineering_runner/runner.py')] == []
+E         
+E         Left contains 6 more items, first extra item: ('M', 'tools/engineering_runner/__main__.py')
+E         
+E         Full diff:
+E         - []
+E         + [
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/__main__.py',
+E         +     ),
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/briefs.py',
+E         +     ),
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/config.py',
+E         +     ),
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/controlplane.py',
+E         +     ),
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/execution_context.py',
+E         +     ),
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/runner.py',
+E         +     ),
+E         + ]
+E       AssertionError: assert [('M', 'tools/engineering_runner/__main__.py'), ('M', 'tools/engineering_runner/briefs.py'), ('M', 'tools/engineering_runner/config.py'), ('M', 'tools/engineering_runner/controlplane.py'), ('M', 'tools/engineering_runner/execution_context.py'), ('M', 'tools/engineering_runner/runner.py')] == []
+E         
+E         Left contains 6 more items, first extra item: ('M', 'tools/engineering_runner/__main__.py')
+E         
+E         Full diff:
+E         - []
+E         + [
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/__main__.py',
+E         +     ),
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/briefs.py',
+E         +     ),
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/config.py',
+E         +     ),
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/controlplane.py',
+E         +     ),
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/execution_context.py',
+E         +     ),
+E         +     (
+E         +         'M',
+E         +         'tools/engineering_runner/runner.py',
+E         +     ),
+E         + ]
+FAILED tests/test_company_os_research.py::test_this_branch_changed_no_race_fight_or_v30_code - AssertionError: assert [('M', 'tools/engineering_runner/__main__.py'), ('M', 'tools/engineering_runner/briefs.py'), ('M', 'tools/engineering_runner/config.py'), ('M', 'tools/engineering_runner/controlplane.py'), ('M', 'tools/engineering_runner/execution_context.py'), ('M', 'tools/engineering_runner/runner.py')] == []
+FAILED tests/test_company_os_research_batches.py::test_this_branch_changed_no_race_fight_or_v30_code - AssertionError: assert [('M', 'tools/engineering_runner/__main__.py'), ('M', 'tools/engineering_runner/briefs.py'), ('M', 'tools/engineering_runner/config.py'), ('M', 'tools/engineering_runner/controlplane.py'), ('M', 'tools/engineering_runner/execution_context.py'), ('M', 'tools/engineering_runner/runner.py')] == []
+FAILED tests/test_company_os_research_ingestion.py::test_this_branch_changed_no_race_fight_or_v30_code - AssertionError: assert [('M', 'tools/engineering_runner/__main__.py'), ('M', 'tools/engineering_runner/briefs.py'), ('M', 'tools/engineering_runner/config.py'), ('M', 'tools/engineering_runner/controlplane.py'), ('M', 'tools/engineering_runner/execution_context.py'), ('M', 'tools/engineering_runner/runner.py')] == []
+============================== 3 failed in 0.39s ==============================

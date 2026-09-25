@@ -1,0 +1,122 @@
+PRODUCTION INTEGRATION READINESS: BLOCKED
+report      integration-readiness-2026-09-25-c7264543e865b94a
+as of       2026-09-25
+source      integrate-p6c-v1 c931091e884c5dedc62379fb616f6d09ef234f5e
+policy      v1: 35 required, 4 advisory
+
+checks      36 pass, 1 fail, 2 unknown, 0 not_applicable
+
+BLOCKERS (1)
+  health.required_suites_pass
+    why  3 required suite(s) are reported failing, including tests/test_company_os_research.py (capsule_contract; dependency_observed; declared by company-research-intelligence; imports code owned by ai-platform, company-knowledge-store, company-research-intelligence, company-validation), tests/test_company_os_research_batches.py (capsule_contract; dependency_observed; declared by company-research-intelligence, company-research-operations; imports code owned by ai-platform, company-knowledge-capsules, company-knowledge-store, company-research-intelligence, company-research-operations, company-validation)
+    fix  Fix the failing suite, re-run it, and supply the new result.
+
+ADVISORY (2, not blocking)
+  UNKNOWN  executive.decision_queue_preserves_source_refs
+    no company state directory was supplied, so the decision queue is empty and the condition is untested rather than satisfied
+  UNKNOWN  workforce.capability_gaps_visible
+    no company state directory was supplied, so there is no coverage to read
+
+UNKNOWNS (2)
+  executive.decision_queue_preserves_source_refs (advisory)
+    missing  a state directory holding at least one decision: an empty queue proves nothing about what a populated one carries
+  workforce.capability_gaps_visible (advisory)
+    missing  a workforce store: re-run with --state-dir pointing at the company's records
+
+ANALYTICS
+  PASS     analytics.causal_overclaim_refused (required)
+    an uncontrolled comparison over 1000 samples still supports no causal claim and names 2 reasons
+  PASS     analytics.competitor_private_metrics_unavailable (required)
+    an external reference carrying a private metric name is refused, an uncited one is refused, and a cited public metric name is accepted
+  PASS     analytics.learning_requires_results (required)
+    a hypothesis cannot be marked supported without a result to point at, while a proposed one records freely
+
+ARCHITECTURE
+  PASS     architecture.capsule_graph_acyclic (required)
+    24 capsules, no declared dependency cycle
+  PASS     architecture.capsule_graph_integrity (required)
+    24 capsules, no integrity problem
+  PASS     architecture.governed_subsystem_ownership (required)
+    2 production package(s) are reached by a Company OS suite, and every one of them is owned by a capsule in force
+  PASS     architecture.no_subsystem_import_cycle (required)
+    19 subsystems, no runtime import cycle
+  PASS     architecture.production_does_not_import_company_os (required)
+    328 production modules under audio, engine, entities, evaluation, godot, marble3d, modes, powers, production, race, race2, rendering, replay, sloped, tools import no Company OS package
+  PASS     architecture.production_tests_independent (required)
+    127 production test modules import no Company OS package; the 41 that do are all named test_company*
+  PASS     architecture.subsystem_ownership_bounded (advisory)
+    all 264 Company OS modules are claimed by a capsule
+
+DATA
+  PASS     data.audit_records_append_only (required)
+    a second, different record under an existing id is refused; a correction is a new record that supersedes the old one
+  PASS     data.evidence_required_for_claims (required)
+    a fact with no evidence is refused and a fact citing a document is kept
+  PASS     data.missing_evidence_stays_unknown (required)
+    6 of 8 sections report missing over an empty state directory, each naming its gap, and 6 gaps reach the snapshot; no section claims to be complete while it is not
+  PASS     data.private_metric_boundary (required)
+    'average_percentage_viewed' is refused from a public source and accepted from our own authenticated export (20 private metrics)
+
+EXECUTION
+  PASS     execution.authority_snapshot_immutable (required)
+    the snapshot is frozen, its contract fingerprint refuses a widened copy, and it round-trips through canonical JSON unchanged
+  PASS     execution.no_subagent_runtime_lock (required)
+    all 8 declarations are present, and bootstrap mode fixes the no-subagent switch, and a policy, a contract and a receipt that try to flip it are each refused
+  PASS     execution.read_authority_fails_closed (required)
+    a contract that names no readable path projects to an empty grant, and a named path is carried through unchanged
+  PASS     execution.receipt_validation_enforced (required)
+    a receipt outside the schema and a receipt amending the no-subagent rule are both refused, and a well-formed receipt is accepted
+  PASS     execution.write_authority_fails_closed (required)
+    an empty allow-list permits nothing, a forbidding rule outranks an overlapping allow, and a path inside the allow-list still passes
+
+EXECUTIVE
+  PASS     executive.dashboard_available (required)
+    the snapshot builds deterministically (company-state-1da93612bd343dc3) and the brief renders 34 lines
+  PASS     executive.dashboard_cannot_approve (required)
+    8 dashboard modules expose no approving, spending, hiring, publishing or deploying callable
+  UNKNOWN  executive.decision_queue_preserves_source_refs (advisory)
+    no company state directory was supplied, so the decision queue is empty and the condition is untested rather than satisfied
+  PASS     executive.missing_and_stale_evidence_visible (required)
+    6 of 8 sections report missing over an empty state directory, each naming its gap, and 6 gaps reach the snapshot; no section claims to be complete while it is not
+
+FINANCE
+  PASS     finance.no_autonomous_spend_approval (required)
+    a spend signed by an automatic marker is refused; approving a spend remains a named human act
+  PASS     finance.recurring_paid_api_spend_reserved (required)
+    large_or_recurring_paid_api_spend is CEO-reserved and new_dependency and production_publish_request are mandatory review triggers
+  PASS     finance.unknown_is_not_zero (required)
+    with no records the margin and contribution are unknown and 3 reasons are named
+
+HEALTH
+  PASS     health.no_network_or_model_dependency (required)
+    264 Company OS modules import none of 30 network or model roots
+  PASS     health.no_new_dependency (required)
+    264 Company OS modules import only stdlib and company, ai_platform, knowledge, intelligence
+  PASS     health.production_failures_separated (advisory)
+    6 production-environment suite(s) are classified separately, 0 of them failing and none counted against Company OS
+  FAIL     health.required_suites_pass (required)
+    tests/test_company_os_research.py failed (1) on 2026-09-25; tests/test_company_os_research_batches.py failed (1) on 2026-09-25; tests/test_company_os_research_ingestion.py failed (1) on 2026-09-25
+  PASS     health.sources_parse (required)
+    all 264 Company OS modules parse
+
+PRODUCTION
+  PASS     production.integration_remains_disabled (required)
+    Company OS stays unconnected to production execution until the integration gate in docs/company_os_v1_bootstrap.md passes.
+  PASS     production.no_automatic_production_mutation (required)
+    no mutating call in 264 Company OS modules names a constant path under 15 production roots; a path built at runtime is bounded by PathScope instead
+  PASS     production.no_production_delete_authority (required)
+    no delete call in 264 Company OS modules
+  PASS     production.no_publishing_capability (required)
+    no network import and no process spawn anywhere in 264 Company OS modules
+
+WORKFORCE
+  PASS     workforce.advisory_cannot_self_approve (required)
+    an organizational decision signed by the system is refused and a named human approver is accepted
+  UNKNOWN  workforce.capability_gaps_visible (advisory)
+    no company state directory was supplied, so there is no coverage to read
+  PASS     workforce.ceo_reserved_actions_present (required)
+    all eight required CEO-reserved actions are present (2 further entries the gate does not require)
+  PASS     workforce.restricted_states_cannot_write_production (required)
+    3 restricted states are refused production authority and level 5, and a malformed permission file caps authority at observe
+
+This report states whether the technical gate conditions are satisfied. It does not authorize production integration: wiring Company OS into production is a separate CEO decision (permissions.yaml, merge_major_architecture_rewrite).

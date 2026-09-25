@@ -1,0 +1,49 @@
+{
+ "archived_replay_fingerprint": "3a115b210fdda3d6",
+ "byte_identical_to_archive": {
+  "replay-corpus.json": true,
+  "replay-results.json": false,
+  "replay-summary.md": false,
+  "replay-validity-today.json": true
+ },
+ "capture": {
+  "captured": 24,
+  "class:accepted": 17,
+  "class:correction": 7,
+  "refused:conflict": 1,
+  "refused:no_job": 1,
+  "refused:not_settled": 9,
+  "refused:work_order_undecodable": 2
+ },
+ "corpus_redigest": "verify_evidence.py --projects: 0 problems (verify-evidence-merged-tree.txt)",
+ "differing_leaf_kinds": [
+  ".rows[].latency_ms",
+  ".summary.latency_ms_max",
+  ".summary.latency_ms_median"
+ ],
+ "differing_leaves_vs_archive": 36,
+ "headline": {
+  "abstained": 23,
+  "abstentions_by_code": {
+   "incompatible_only": 10,
+   "no_match": 8,
+   "stale_only": 5
+  },
+  "decisions": 34,
+  "precedent_found": 11,
+  "precedent_rows_where_top1_changed_a_file_the_task_changed": 9,
+  "precedent_rows_with_captured_outcome": 9,
+  "replayed": 34,
+  "rows_with_warnings": 7,
+  "suggestions_refused_by_read_authority": 19,
+  "suggestions_refused_total": 19
+ },
+ "not_claimed": "mechanism evidence only: no token, cost or model-accuracy claim",
+ "repeat_fingerprint": "3a115b210fdda3d6",
+ "replay_fingerprint": "3a115b210fdda3d6",
+ "today": {
+  "current": 4,
+  "stale": 19
+ },
+ "what": "P6C offline replay re-run on the merged tree c931091 with docs/evidence/company_os_p6c_experience_store/replay_harness.py, --out to a scratch directory (the archived P6C evidence was not rewritten). Local, no paid session."
+}
