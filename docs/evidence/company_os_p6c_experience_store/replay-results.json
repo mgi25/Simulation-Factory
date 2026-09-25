@@ -1,0 +1,2013 @@
+{
+  "capture": {
+    "captured": 24,
+    "class:accepted": 17,
+    "class:correction": 7,
+    "refused:conflict": 1,
+    "refused:no_job": 1,
+    "refused:not_settled": 9,
+    "refused:work_order_undecodable": 2
+  },
+  "captured_on": "2026-09-25",
+  "episodes": [
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-18",
+      "experience_id": "4b5cb50b831fbf25",
+      "settled_on": "2026-09-18",
+      "source": "consumer",
+      "work_order_id": "wo-ceo-2026-09-18-attempts-remaining-consumer"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-18",
+      "experience_id": "eedadf348a4a1357",
+      "settled_on": "2026-09-18",
+      "source": "repoexpl",
+      "work_order_id": "wo-ceo-2026-09-18-reviews-completed-repoexpl"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-19",
+      "experience_id": "8ab4e65a6149b442",
+      "settled_on": "2026-09-19",
+      "source": "v3b",
+      "work_order_id": "wo-blocked-attempts-v3b-2"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-19",
+      "experience_id": "173302a7049f77bf",
+      "settled_on": "2026-09-19",
+      "source": "second-dogfood",
+      "work_order_id": "wo-req-ceo-page-attempts-remaining"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-19",
+      "experience_id": "0346de113edb9075",
+      "settled_on": "2026-09-19",
+      "source": "repo-exploration-v2",
+      "work_order_id": "wo-req-repo-exploration-v2-blocked-count-2"
+    },
+    {
+      "attempt": 1,
+      "class": "correction",
+      "decided_on": "2026-09-20",
+      "experience_id": "83786d36f94e3ee1",
+      "settled_on": "2026-09-20",
+      "source": "e2e-pilot",
+      "work_order_id": "wo-req-auth-migration-classifier-ambiguity"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-20",
+      "experience_id": "25ce0bc3612f6373",
+      "settled_on": "2026-09-20",
+      "source": "e2e-pilot-3",
+      "work_order_id": "wo-req-auth-migration-correction-01"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-20",
+      "experience_id": "26b7ccf518897f20",
+      "settled_on": "2026-09-20",
+      "source": "discovery-pilot",
+      "work_order_id": "wo-wo-gate-architecture-subsystem_ownership_bounded"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-21",
+      "experience_id": "572d98947ecb4647",
+      "settled_on": "2026-09-21",
+      "source": "repository-architecture",
+      "work_order_id": "wo-capsule-ownership-semantic-review"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-21",
+      "experience_id": "78b52f1c8f536643",
+      "settled_on": "2026-09-21",
+      "source": "repository-architecture",
+      "work_order_id": "wo-delegation-planning-test-ownership"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-21",
+      "experience_id": "9cdad25344169edd",
+      "settled_on": "2026-09-21",
+      "source": "repository-architecture",
+      "work_order_id": "wo-delegation-planning-test-ownership-v2"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-21",
+      "experience_id": "3ed620712714f52a",
+      "settled_on": "2026-09-21",
+      "source": "repository-architecture",
+      "work_order_id": "wo-token-efficiency-v4-p2-benchmark-contract-correction"
+    },
+    {
+      "attempt": 1,
+      "class": "correction",
+      "decided_on": "2026-09-21",
+      "experience_id": "b430965d1e4cab8a",
+      "settled_on": "2026-09-21",
+      "source": "repository-architecture",
+      "work_order_id": "wo-token-efficiency-v4-p2-review-test-ownership-v2"
+    },
+    {
+      "attempt": 1,
+      "class": "correction",
+      "decided_on": "2026-09-21",
+      "experience_id": "041fd0a615ca260a",
+      "settled_on": "2026-09-21",
+      "source": "repository-architecture",
+      "work_order_id": "wo-token-efficiency-v4-p3-benchmark-contract-correction"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-21",
+      "experience_id": "dfd2b43eda5d5b69",
+      "settled_on": "2026-09-21",
+      "source": "repository-architecture",
+      "work_order_id": "wo-token-efficiency-v4-p3c-benchmark-contract-correction"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-21",
+      "experience_id": "bd28dffe94ac165b",
+      "settled_on": "2026-09-21",
+      "source": "repository-architecture",
+      "work_order_id": "wo-token-efficiency-v4-review-separation-yaml-dependency"
+    },
+    {
+      "attempt": 1,
+      "class": "correction",
+      "decided_on": "2026-09-23",
+      "experience_id": "46392786029b3a1a",
+      "settled_on": "2026-09-23",
+      "source": "p5-evidence-reviewability",
+      "work_order_id": "wo-p5-evidence-reviewability-v1"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-23",
+      "experience_id": "468ba8c92c24d98b",
+      "settled_on": "2026-09-23",
+      "source": "p3c-vs-p5-control",
+      "work_order_id": "wo-req-token-efficiency-v4-p3c-control"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-23",
+      "experience_id": "59ce6b963756e825",
+      "settled_on": "2026-09-23",
+      "source": "p3c-vs-p5-control-b",
+      "work_order_id": "wo-req-token-efficiency-v4-p3c-control-b"
+    },
+    {
+      "attempt": 1,
+      "class": "correction",
+      "decided_on": "2026-09-23",
+      "experience_id": "2144588cf8d0c42c",
+      "settled_on": "2026-09-23",
+      "source": "p3c-vs-p5-challenger",
+      "work_order_id": "wo-req-token-efficiency-v4-p5-challenger"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-23",
+      "experience_id": "5219ff6b42af84b3",
+      "settled_on": "2026-09-23",
+      "source": "p3c-vs-p5-challenger-b",
+      "work_order_id": "wo-req-token-efficiency-v4-p5-challenger-b"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "decided_on": "2026-09-23",
+      "experience_id": "63c9bfab15dd7de8",
+      "settled_on": "2026-09-23",
+      "source": "p3c-vs-p5-challenger-c",
+      "work_order_id": "wo-req-token-efficiency-v4-p5-challenger-c"
+    },
+    {
+      "attempt": 1,
+      "class": "correction",
+      "decided_on": "2026-09-24",
+      "experience_id": "11698c17f9354db4",
+      "settled_on": "2026-09-24",
+      "source": "p5-read-authority",
+      "work_order_id": "wo-p5-read-authority-v1"
+    }
+  ],
+  "repeat_fingerprint": "3a115b210fdda3d6",
+  "replay_fingerprint": "3a115b210fdda3d6",
+  "rows": [
+    {
+      "abstention": "no_match",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "company/engineering/result.py",
+        "tests/test_company_engineering_execution.py"
+      ],
+      "advice_chars": 714,
+      "advice_fingerprint": "1b9fc164feab07d3",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-18",
+      "eligible_history": 0,
+      "eligible_history_bytes": 0,
+      "excluded": {
+        "not_yet_settled": 23
+      },
+      "historical_only": [],
+      "latency_ms": 0.392,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 1,
+      "source": "consumer",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-ceo-2026-09-18-attempts-remaining-consumer"
+    },
+    {
+      "abstention": "no_match",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "company/engineering/store.py",
+        "tests/test_company_engineering_execution.py"
+      ],
+      "advice_chars": 713,
+      "advice_fingerprint": "4a6fcfe11d7db42b",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-18",
+      "eligible_history": 0,
+      "eligible_history_bytes": 0,
+      "excluded": {
+        "not_yet_settled": 23
+      },
+      "historical_only": [],
+      "latency_ms": 0.341,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 1,
+      "source": "repoexpl",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-ceo-2026-09-18-reviews-completed-repoexpl"
+    },
+    {
+      "abstention": "",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "company/engineering/lifecycle.py",
+        "tests/test_company_engineering_execution.py"
+      ],
+      "advice_chars": 3193,
+      "advice_fingerprint": "16f8b2a2b8a52e98",
+      "attempt": 1,
+      "considered_history_bytes": 49698,
+      "decided_on": "2026-09-19",
+      "eligible_history": 2,
+      "eligible_history_bytes": 49698,
+      "excluded": {
+        "not_yet_settled": 21
+      },
+      "historical_only": [],
+      "latency_ms": 40.692,
+      "precedents": [
+        "wo-ceo-2026-09-18-attempts-remaining-consumer",
+        "wo-ceo-2026-09-18-reviews-completed-repoexpl"
+      ],
+      "refused": [
+        {
+          "item": "file:company/engineering/result.py",
+          "reason": "outside this work order's current read authority"
+        },
+        {
+          "item": "file:company/engineering/store.py",
+          "reason": "outside this work order's current read authority"
+        }
+      ],
+      "same_day_excluded": 2,
+      "source": "v3b",
+      "status": "precedent",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "wo-ceo-2026-09-18-attempts-remaining-consumer",
+      "top1_changed_files_the_task_changed": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "top1_shared_required_tests": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "top1_why": [
+        "1 changed file(s) inside this task's write scope: tests/test_company_engineering_execution.py",
+        "shares 1 required suite(s): tests/test_company_engineering_execution.py",
+        "1 change(s) one import away from this task's modules: company/engineering/result.py",
+        "governed by the same capsule(s): company-engineering-execution",
+        "settled 2026-09-18"
+      ],
+      "warnings": [],
+      "work_order_id": "wo-blocked-attempts-v3b-2"
+    },
+    {
+      "abstention": "",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "company/engineering/result.py",
+        "tests/test_company_engineering_execution.py"
+      ],
+      "advice_chars": 3094,
+      "advice_fingerprint": "5df2bc47ae7280f5",
+      "attempt": 1,
+      "considered_history_bytes": 49698,
+      "decided_on": "2026-09-19",
+      "eligible_history": 2,
+      "eligible_history_bytes": 49698,
+      "excluded": {
+        "not_yet_settled": 21
+      },
+      "historical_only": [],
+      "latency_ms": 84.196,
+      "precedents": [
+        "wo-ceo-2026-09-18-attempts-remaining-consumer",
+        "wo-ceo-2026-09-18-reviews-completed-repoexpl"
+      ],
+      "refused": [
+        {
+          "item": "file:company/engineering/result.py",
+          "reason": "outside this work order's current read authority"
+        },
+        {
+          "item": "file:company/engineering/store.py",
+          "reason": "outside this work order's current read authority"
+        }
+      ],
+      "same_day_excluded": 2,
+      "source": "second-dogfood",
+      "status": "precedent",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "wo-ceo-2026-09-18-attempts-remaining-consumer",
+      "top1_changed_files_the_task_changed": [
+        "company/engineering/result.py",
+        "tests/test_company_engineering_execution.py"
+      ],
+      "top1_shared_required_tests": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "top1_why": [
+        "2 changed file(s) inside this task's write scope: company/engineering/result.py, tests/test_company_engineering_execution.py",
+        "shares 1 required suite(s): tests/test_company_engineering_execution.py",
+        "governed by the same capsule(s): company-engineering-execution",
+        "settled 2026-09-18"
+      ],
+      "warnings": [],
+      "work_order_id": "wo-req-ceo-page-attempts-remaining"
+    },
+    {
+      "abstention": "",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "company/engineering/lifecycle.py",
+        "tests/test_company_engineering_execution.py"
+      ],
+      "advice_chars": 3210,
+      "advice_fingerprint": "2055e14ac15c1c5c",
+      "attempt": 1,
+      "considered_history_bytes": 49698,
+      "decided_on": "2026-09-19",
+      "eligible_history": 2,
+      "eligible_history_bytes": 49698,
+      "excluded": {
+        "not_yet_settled": 21
+      },
+      "historical_only": [],
+      "latency_ms": 82.601,
+      "precedents": [
+        "wo-ceo-2026-09-18-attempts-remaining-consumer",
+        "wo-ceo-2026-09-18-reviews-completed-repoexpl"
+      ],
+      "refused": [
+        {
+          "item": "file:company/engineering/result.py",
+          "reason": "outside this work order's current read authority"
+        },
+        {
+          "item": "file:company/engineering/store.py",
+          "reason": "outside this work order's current read authority"
+        }
+      ],
+      "same_day_excluded": 2,
+      "source": "repo-exploration-v2",
+      "status": "precedent",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "wo-ceo-2026-09-18-attempts-remaining-consumer",
+      "top1_changed_files_the_task_changed": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "top1_shared_required_tests": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "top1_why": [
+        "1 changed file(s) inside this task's write scope: tests/test_company_engineering_execution.py",
+        "shares 1 required suite(s): tests/test_company_engineering_execution.py",
+        "1 change(s) one import away from this task's modules: company/engineering/result.py",
+        "governed by the same capsule(s): company-engineering-execution",
+        "settled 2026-09-18"
+      ],
+      "warnings": [],
+      "work_order_id": "wo-req-repo-exploration-v2-blocked-count-2"
+    },
+    {
+      "abstention": "incompatible_only",
+      "actual_class": "correction",
+      "actual_files_changed": [
+        "company/engineering/intake.py",
+        "tests/test_company_engineering_execution.py"
+      ],
+      "advice_chars": 722,
+      "advice_fingerprint": "d053d657ec3cbf48",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-20",
+      "eligible_history": 5,
+      "eligible_history_bytes": 122781,
+      "excluded": {
+        "incompatible": 5,
+        "not_yet_settled": 18
+      },
+      "historical_only": [],
+      "latency_ms": 207.558,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 2,
+      "source": "e2e-pilot",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-req-auth-migration-classifier-ambiguity"
+    },
+    {
+      "abstention": "incompatible_only",
+      "actual_class": "correction",
+      "actual_files_changed": [
+        "company/engineering/intake.py",
+        "tests/test_company_engineering_execution.py"
+      ],
+      "advice_chars": 722,
+      "advice_fingerprint": "d053d657ec3cbf48",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-20",
+      "eligible_history": 5,
+      "eligible_history_bytes": 122781,
+      "excluded": {
+        "incompatible": 5,
+        "not_yet_settled": 18
+      },
+      "historical_only": [],
+      "latency_ms": 189.522,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 2,
+      "source": "e2e-pilot-2",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-req-auth-migration-classifier-ambiguity"
+    },
+    {
+      "abstention": "incompatible_only",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "company/engineering/intake.py",
+        "tests/test_company_engineering_execution.py"
+      ],
+      "advice_chars": 715,
+      "advice_fingerprint": "6370859a27c5a517",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-20",
+      "eligible_history": 5,
+      "eligible_history_bytes": 122781,
+      "excluded": {
+        "incompatible": 5,
+        "not_yet_settled": 18
+      },
+      "historical_only": [],
+      "latency_ms": 200.158,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 2,
+      "source": "e2e-pilot-3",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-req-auth-migration-correction-01"
+    },
+    {
+      "abstention": "incompatible_only",
+      "actual_class": "not_captured",
+      "actual_files_changed": [],
+      "advice_chars": 707,
+      "advice_fingerprint": "0c6e8471d7591ae9",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-20",
+      "eligible_history": 5,
+      "eligible_history_bytes": 122781,
+      "excluded": {
+        "incompatible": 5,
+        "not_yet_settled": 18
+      },
+      "historical_only": [],
+      "latency_ms": 181.841,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 3,
+      "source": "review-separation",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-req-review-routing-probe"
+    },
+    {
+      "abstention": "no_match",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "knowledge/company_os/capsules/seeds/company-knowledge-capsules.json",
+        "knowledge/company_os/capsules/seeds/company-knowledge-store.json",
+        "knowledge/company_os/capsules/seeds/company-workforce-employment.json"
+      ],
+      "advice_chars": 736,
+      "advice_fingerprint": "b541341856f911a3",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-20",
+      "eligible_history": 5,
+      "eligible_history_bytes": 122781,
+      "excluded": {
+        "below_floor": 5,
+        "not_yet_settled": 18
+      },
+      "historical_only": [],
+      "latency_ms": 23.729,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 2,
+      "source": "discovery-pilot",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-wo-gate-architecture-subsystem_ownership_bounded"
+    },
+    {
+      "abstention": "",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "knowledge/company_os/capsules/seeds/company-knowledge-store.json",
+        "knowledge/company_os/capsules/seeds/company-research-intelligence.json",
+        "knowledge/company_os/capsules/seeds/company-workforce-capabilities.json",
+        "tests/test_company_os_capsules.py"
+      ],
+      "advice_chars": 2444,
+      "advice_fingerprint": "42065ea49815011b",
+      "attempt": 1,
+      "considered_history_bytes": 23732,
+      "decided_on": "2026-09-21",
+      "eligible_history": 8,
+      "eligible_history_bytes": 197976,
+      "excluded": {
+        "below_floor": 7,
+        "not_yet_settled": 15
+      },
+      "historical_only": [],
+      "latency_ms": 69.579,
+      "precedents": [
+        "wo-wo-gate-architecture-subsystem_ownership_bounded"
+      ],
+      "refused": [
+        {
+          "item": "file:knowledge/company_os/capsules/seeds/company-knowledge-capsules.json",
+          "reason": "outside this work order's current read authority"
+        },
+        {
+          "item": "file:knowledge/company_os/capsules/seeds/company-knowledge-store.json",
+          "reason": "outside this work order's current read authority"
+        },
+        {
+          "item": "file:knowledge/company_os/capsules/seeds/company-workforce-employment.json",
+          "reason": "outside this work order's current read authority"
+        }
+      ],
+      "same_day_excluded": 7,
+      "source": "repository-architecture",
+      "status": "precedent",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "wo-wo-gate-architecture-subsystem_ownership_bounded",
+      "top1_changed_files_the_task_changed": [
+        "knowledge/company_os/capsules/seeds/company-knowledge-store.json"
+      ],
+      "top1_shared_required_tests": [
+        "tests/test_company_os_capsules.py"
+      ],
+      "top1_why": [
+        "3 changed file(s) inside this task's write scope: knowledge/company_os/capsules/seeds/company-knowledge-capsules.json, knowledge/company_os/capsules/seeds/company-knowledge-store.json, knowledge/company_os/capsules/seeds/company-workforce-employment.json",
+        "shares 1 required suite(s): tests/test_company_os_capsules.py",
+        "governed by the same capsule(s): company-knowledge-capsules",
+        "settled 2026-09-20"
+      ],
+      "warnings": [],
+      "work_order_id": "wo-capsule-ownership-semantic-review"
+    },
+    {
+      "abstention": "no_match",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "knowledge/company_os/capsules/seeds/company-executive-delegation.json",
+        "tests/test_company_os_capsules.py"
+      ],
+      "advice_chars": 722,
+      "advice_fingerprint": "49fdbefb73715ce3",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-21",
+      "eligible_history": 8,
+      "eligible_history_bytes": 197976,
+      "excluded": {
+        "below_floor": 8,
+        "not_yet_settled": 15
+      },
+      "historical_only": [],
+      "latency_ms": 72.689,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 7,
+      "source": "repository-architecture",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-delegation-planning-test-ownership"
+    },
+    {
+      "abstention": "no_match",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "knowledge/company_os/capsules/seeds/company-executive-delegation.json",
+        "tests/test_company_os_capsules.py"
+      ],
+      "advice_chars": 725,
+      "advice_fingerprint": "5b49814c250dad0a",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-21",
+      "eligible_history": 8,
+      "eligible_history_bytes": 197976,
+      "excluded": {
+        "below_floor": 8,
+        "not_yet_settled": 15
+      },
+      "historical_only": [],
+      "latency_ms": 37.241,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 7,
+      "source": "repository-architecture",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-delegation-planning-test-ownership-v2"
+    },
+    {
+      "abstention": "stale_only",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "advice_chars": 1395,
+      "advice_fingerprint": "757b5e6e46f656fd",
+      "attempt": 1,
+      "considered_history_bytes": 73083,
+      "decided_on": "2026-09-21",
+      "eligible_history": 8,
+      "eligible_history_bytes": 197976,
+      "excluded": {
+        "below_floor": 1,
+        "incompatible": 2,
+        "not_yet_settled": 15,
+        "stale": 5
+      },
+      "historical_only": [
+        "wo-req-repo-exploration-v2-blocked-count-2",
+        "wo-req-ceo-page-attempts-remaining",
+        "wo-blocked-attempts-v3b-2"
+      ],
+      "latency_ms": 430.005,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 7,
+      "source": "repository-architecture",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-token-efficiency-v4-p2-benchmark-contract-correction"
+    },
+    {
+      "abstention": "no_match",
+      "actual_class": "correction",
+      "actual_files_changed": [
+        "knowledge/company_os/capsules/seeds/company-engineering-execution.json",
+        "tests/test_company_os_capsules.py"
+      ],
+      "advice_chars": 735,
+      "advice_fingerprint": "b34c780709f61d21",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-21",
+      "eligible_history": 8,
+      "eligible_history_bytes": 197976,
+      "excluded": {
+        "below_floor": 8,
+        "not_yet_settled": 15
+      },
+      "historical_only": [],
+      "latency_ms": 101.361,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 7,
+      "source": "repository-architecture",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-token-efficiency-v4-p2-review-test-ownership-v2"
+    },
+    {
+      "abstention": "stale_only",
+      "actual_class": "correction",
+      "actual_files_changed": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "advice_chars": 1395,
+      "advice_fingerprint": "d6fa687bd99898e2",
+      "attempt": 1,
+      "considered_history_bytes": 73083,
+      "decided_on": "2026-09-21",
+      "eligible_history": 8,
+      "eligible_history_bytes": 197976,
+      "excluded": {
+        "below_floor": 1,
+        "incompatible": 2,
+        "not_yet_settled": 15,
+        "stale": 5
+      },
+      "historical_only": [
+        "wo-req-repo-exploration-v2-blocked-count-2",
+        "wo-req-ceo-page-attempts-remaining",
+        "wo-blocked-attempts-v3b-2"
+      ],
+      "latency_ms": 511.459,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 7,
+      "source": "repository-architecture",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-token-efficiency-v4-p3-benchmark-contract-correction"
+    },
+    {
+      "abstention": "stale_only",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "advice_chars": 1396,
+      "advice_fingerprint": "ce2d3fa3a1ee88de",
+      "attempt": 1,
+      "considered_history_bytes": 73083,
+      "decided_on": "2026-09-21",
+      "eligible_history": 8,
+      "eligible_history_bytes": 197976,
+      "excluded": {
+        "below_floor": 1,
+        "incompatible": 2,
+        "not_yet_settled": 15,
+        "stale": 5
+      },
+      "historical_only": [
+        "wo-req-repo-exploration-v2-blocked-count-2",
+        "wo-req-ceo-page-attempts-remaining",
+        "wo-blocked-attempts-v3b-2"
+      ],
+      "latency_ms": 355.862,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 7,
+      "source": "repository-architecture",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-token-efficiency-v4-p3c-benchmark-contract-correction"
+    },
+    {
+      "abstention": "incompatible_only",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "tests/test_company_review_separation.py"
+      ],
+      "advice_chars": 746,
+      "advice_fingerprint": "d8bccd81d45dcded",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-21",
+      "eligible_history": 8,
+      "eligible_history_bytes": 197976,
+      "excluded": {
+        "below_floor": 7,
+        "incompatible": 1,
+        "not_yet_settled": 15
+      },
+      "historical_only": [],
+      "latency_ms": 69.681,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 7,
+      "source": "repository-architecture",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-token-efficiency-v4-review-separation-yaml-dependency"
+    },
+    {
+      "abstention": "no_match",
+      "actual_class": "not_captured",
+      "actual_files_changed": [],
+      "advice_chars": 719,
+      "advice_fingerprint": "d8cf89adacaa7917",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-23",
+      "eligible_history": 16,
+      "eligible_history_bytes": 410873,
+      "excluded": {
+        "below_floor": 16,
+        "not_yet_settled": 7
+      },
+      "historical_only": [],
+      "latency_ms": 99.657,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 6,
+      "source": "p5-evidence-reviewability",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-p3c-vs-p5-benchmark-attestation"
+    },
+    {
+      "abstention": "no_match",
+      "actual_class": "not_captured",
+      "actual_files_changed": [],
+      "advice_chars": 719,
+      "advice_fingerprint": "d8cf89adacaa7917",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-23",
+      "eligible_history": 16,
+      "eligible_history_bytes": 410873,
+      "excluded": {
+        "below_floor": 16,
+        "not_yet_settled": 7
+      },
+      "historical_only": [],
+      "latency_ms": 87.224,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 6,
+      "source": "p5-evidence-reviewability-closed",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-p3c-vs-p5-benchmark-attestation"
+    },
+    {
+      "abstention": "",
+      "actual_class": "not_captured",
+      "actual_files_changed": [],
+      "advice_chars": 5211,
+      "advice_fingerprint": "e4da2984348b461b",
+      "attempt": 1,
+      "considered_history_bytes": 109419,
+      "decided_on": "2026-09-23",
+      "eligible_history": 16,
+      "eligible_history_bytes": 410873,
+      "excluded": {
+        "below_floor": 12,
+        "not_yet_settled": 7
+      },
+      "historical_only": [],
+      "latency_ms": 120.292,
+      "precedents": [
+        "wo-capsule-ownership-semantic-review",
+        "wo-delegation-planning-test-ownership-v2"
+      ],
+      "refused": [
+        {
+          "item": "file:knowledge/company_os/capsules/seeds/company-knowledge-store.json",
+          "reason": "outside this work order's current read authority"
+        },
+        {
+          "item": "file:knowledge/company_os/capsules/seeds/company-research-intelligence.json",
+          "reason": "outside this work order's current read authority"
+        },
+        {
+          "item": "file:knowledge/company_os/capsules/seeds/company-workforce-capabilities.json",
+          "reason": "outside this work order's current read authority"
+        },
+        {
+          "item": "file:knowledge/company_os/capsules/seeds/company-executive-delegation.json",
+          "reason": "outside this work order's current read authority"
+        },
+        {
+          "item": "test:tests/test_company_delegation.py",
+          "reason": "outside this work order's current read authority"
+        }
+      ],
+      "same_day_excluded": 6,
+      "source": "p5-evidence-reviewability",
+      "status": "precedent",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "wo-capsule-ownership-semantic-review",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [
+        "tests/test_company_os_capsules.py"
+      ],
+      "top1_why": [
+        "1 changed file(s) inside this task's write scope: tests/test_company_os_capsules.py",
+        "shares 1 required suite(s): tests/test_company_os_capsules.py",
+        "governed by the same capsule(s): company-ceo-dashboard, company-knowledge-capsules, company-os-control-plane",
+        "settled 2026-09-21"
+      ],
+      "warnings": [
+        "wo-delegation-planning-test-ownership",
+        "wo-token-efficiency-v4-p2-review-test-ownership-v2"
+      ],
+      "work_order_id": "wo-p5-evidence-reviewability-correction"
+    },
+    {
+      "abstention": "",
+      "actual_class": "not_captured",
+      "actual_files_changed": [],
+      "advice_chars": 5211,
+      "advice_fingerprint": "e4da2984348b461b",
+      "attempt": 1,
+      "considered_history_bytes": 109419,
+      "decided_on": "2026-09-23",
+      "eligible_history": 16,
+      "eligible_history_bytes": 410873,
+      "excluded": {
+        "below_floor": 12,
+        "not_yet_settled": 7
+      },
+      "historical_only": [],
+      "latency_ms": 120.327,
+      "precedents": [
+        "wo-capsule-ownership-semantic-review",
+        "wo-delegation-planning-test-ownership-v2"
+      ],
+      "refused": [
+        {
+          "item": "file:knowledge/company_os/capsules/seeds/company-knowledge-store.json",
+          "reason": "outside this work order's current read authority"
+        },
+        {
+          "item": "file:knowledge/company_os/capsules/seeds/company-research-intelligence.json",
+          "reason": "outside this work order's current read authority"
+        },
+        {
+          "item": "file:knowledge/company_os/capsules/seeds/company-workforce-capabilities.json",
+          "reason": "outside this work order's current read authority"
+        },
+        {
+          "item": "file:knowledge/company_os/capsules/seeds/company-executive-delegation.json",
+          "reason": "outside this work order's current read authority"
+        },
+        {
+          "item": "test:tests/test_company_delegation.py",
+          "reason": "outside this work order's current read authority"
+        }
+      ],
+      "same_day_excluded": 6,
+      "source": "p5-evidence-reviewability-closed",
+      "status": "precedent",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "wo-capsule-ownership-semantic-review",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [
+        "tests/test_company_os_capsules.py"
+      ],
+      "top1_why": [
+        "1 changed file(s) inside this task's write scope: tests/test_company_os_capsules.py",
+        "shares 1 required suite(s): tests/test_company_os_capsules.py",
+        "governed by the same capsule(s): company-ceo-dashboard, company-knowledge-capsules, company-os-control-plane",
+        "settled 2026-09-21"
+      ],
+      "warnings": [
+        "wo-delegation-planning-test-ownership",
+        "wo-token-efficiency-v4-p2-review-test-ownership-v2"
+      ],
+      "work_order_id": "wo-p5-evidence-reviewability-correction"
+    },
+    {
+      "abstention": "incompatible_only",
+      "actual_class": "correction",
+      "actual_files_changed": [
+        "docs/evidence/reviews/README.md",
+        "knowledge/company_os/capsules/seeds/company-evidence-review.json",
+        "knowledge/company_os/capsules/seeds/company-organizational-intelligence.json",
+        "tests/test_company_evidence_review.py",
+        "tests/test_company_os_capsules.py"
+      ],
+      "advice_chars": 708,
+      "advice_fingerprint": "00a2ee97308c39cc",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-23",
+      "eligible_history": 16,
+      "eligible_history_bytes": 410873,
+      "excluded": {
+        "below_floor": 11,
+        "incompatible": 5,
+        "not_yet_settled": 7
+      },
+      "historical_only": [],
+      "latency_ms": 132.434,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 5,
+      "source": "p5-evidence-reviewability",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-p5-evidence-reviewability-v1"
+    },
+    {
+      "abstention": "incompatible_only",
+      "actual_class": "correction",
+      "actual_files_changed": [
+        "docs/evidence/reviews/README.md",
+        "knowledge/company_os/capsules/seeds/company-evidence-review.json",
+        "knowledge/company_os/capsules/seeds/company-organizational-intelligence.json",
+        "tests/test_company_evidence_review.py",
+        "tests/test_company_os_capsules.py"
+      ],
+      "advice_chars": 708,
+      "advice_fingerprint": "00a2ee97308c39cc",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-23",
+      "eligible_history": 16,
+      "eligible_history_bytes": 410873,
+      "excluded": {
+        "below_floor": 11,
+        "incompatible": 5,
+        "not_yet_settled": 7
+      },
+      "historical_only": [],
+      "latency_ms": 148.205,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 5,
+      "source": "p5-evidence-reviewability-closed",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-p5-evidence-reviewability-v1"
+    },
+    {
+      "abstention": "",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "advice_chars": 4757,
+      "advice_fingerprint": "b470a1356aa1fa61",
+      "attempt": 1,
+      "considered_history_bytes": 154405,
+      "decided_on": "2026-09-23",
+      "eligible_history": 16,
+      "eligible_history_bytes": 410873,
+      "excluded": {
+        "below_floor": 6,
+        "incompatible": 2,
+        "not_yet_settled": 7,
+        "stale": 5
+      },
+      "historical_only": [
+        "wo-req-repo-exploration-v2-blocked-count-2",
+        "wo-req-ceo-page-attempts-remaining",
+        "wo-blocked-attempts-v3b-2"
+      ],
+      "latency_ms": 220.806,
+      "precedents": [
+        "wo-token-efficiency-v4-p2-benchmark-contract-correction",
+        "wo-token-efficiency-v4-p3c-benchmark-contract-correction"
+      ],
+      "refused": [],
+      "same_day_excluded": 5,
+      "source": "p3c-vs-p5-control",
+      "status": "precedent",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "wo-token-efficiency-v4-p2-benchmark-contract-correction",
+      "top1_changed_files_the_task_changed": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "top1_shared_required_tests": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "top1_why": [
+        "1 changed file(s) inside this task's write scope: tests/test_company_engineering_execution.py",
+        "shares 1 required suite(s): tests/test_company_engineering_execution.py",
+        "governed by the same capsule(s): company-engineering-execution",
+        "settled 2026-09-21"
+      ],
+      "warnings": [
+        "wo-token-efficiency-v4-p3-benchmark-contract-correction"
+      ],
+      "work_order_id": "wo-req-token-efficiency-v4-p3c-control"
+    },
+    {
+      "abstention": "",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "advice_chars": 4759,
+      "advice_fingerprint": "d15f91d120be5af6",
+      "attempt": 1,
+      "considered_history_bytes": 154405,
+      "decided_on": "2026-09-23",
+      "eligible_history": 16,
+      "eligible_history_bytes": 410873,
+      "excluded": {
+        "below_floor": 6,
+        "incompatible": 2,
+        "not_yet_settled": 7,
+        "stale": 5
+      },
+      "historical_only": [
+        "wo-req-repo-exploration-v2-blocked-count-2",
+        "wo-req-ceo-page-attempts-remaining",
+        "wo-blocked-attempts-v3b-2"
+      ],
+      "latency_ms": 197.997,
+      "precedents": [
+        "wo-token-efficiency-v4-p2-benchmark-contract-correction",
+        "wo-token-efficiency-v4-p3c-benchmark-contract-correction"
+      ],
+      "refused": [],
+      "same_day_excluded": 5,
+      "source": "p3c-vs-p5-control-b",
+      "status": "precedent",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "wo-token-efficiency-v4-p2-benchmark-contract-correction",
+      "top1_changed_files_the_task_changed": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "top1_shared_required_tests": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "top1_why": [
+        "1 changed file(s) inside this task's write scope: tests/test_company_engineering_execution.py",
+        "shares 1 required suite(s): tests/test_company_engineering_execution.py",
+        "governed by the same capsule(s): company-engineering-execution",
+        "settled 2026-09-21"
+      ],
+      "warnings": [
+        "wo-token-efficiency-v4-p3-benchmark-contract-correction"
+      ],
+      "work_order_id": "wo-req-token-efficiency-v4-p3c-control-b"
+    },
+    {
+      "abstention": "",
+      "actual_class": "correction",
+      "actual_files_changed": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "advice_chars": 4759,
+      "advice_fingerprint": "799d4c6e47168d9f",
+      "attempt": 1,
+      "considered_history_bytes": 154405,
+      "decided_on": "2026-09-23",
+      "eligible_history": 16,
+      "eligible_history_bytes": 410873,
+      "excluded": {
+        "below_floor": 6,
+        "incompatible": 2,
+        "not_yet_settled": 7,
+        "stale": 5
+      },
+      "historical_only": [
+        "wo-req-repo-exploration-v2-blocked-count-2",
+        "wo-req-ceo-page-attempts-remaining",
+        "wo-blocked-attempts-v3b-2"
+      ],
+      "latency_ms": 195.713,
+      "precedents": [
+        "wo-token-efficiency-v4-p2-benchmark-contract-correction",
+        "wo-token-efficiency-v4-p3c-benchmark-contract-correction"
+      ],
+      "refused": [],
+      "same_day_excluded": 5,
+      "source": "p3c-vs-p5-challenger",
+      "status": "precedent",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "wo-token-efficiency-v4-p2-benchmark-contract-correction",
+      "top1_changed_files_the_task_changed": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "top1_shared_required_tests": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "top1_why": [
+        "1 changed file(s) inside this task's write scope: tests/test_company_engineering_execution.py",
+        "shares 1 required suite(s): tests/test_company_engineering_execution.py",
+        "governed by the same capsule(s): company-engineering-execution",
+        "settled 2026-09-21"
+      ],
+      "warnings": [
+        "wo-token-efficiency-v4-p3-benchmark-contract-correction"
+      ],
+      "work_order_id": "wo-req-token-efficiency-v4-p5-challenger"
+    },
+    {
+      "abstention": "",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "advice_chars": 4761,
+      "advice_fingerprint": "368d905d3f9c9569",
+      "attempt": 1,
+      "considered_history_bytes": 154405,
+      "decided_on": "2026-09-23",
+      "eligible_history": 16,
+      "eligible_history_bytes": 410873,
+      "excluded": {
+        "below_floor": 6,
+        "incompatible": 2,
+        "not_yet_settled": 7,
+        "stale": 5
+      },
+      "historical_only": [
+        "wo-req-repo-exploration-v2-blocked-count-2",
+        "wo-req-ceo-page-attempts-remaining",
+        "wo-blocked-attempts-v3b-2"
+      ],
+      "latency_ms": 199.391,
+      "precedents": [
+        "wo-token-efficiency-v4-p2-benchmark-contract-correction",
+        "wo-token-efficiency-v4-p3c-benchmark-contract-correction"
+      ],
+      "refused": [],
+      "same_day_excluded": 5,
+      "source": "p3c-vs-p5-challenger-b",
+      "status": "precedent",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "wo-token-efficiency-v4-p2-benchmark-contract-correction",
+      "top1_changed_files_the_task_changed": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "top1_shared_required_tests": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "top1_why": [
+        "1 changed file(s) inside this task's write scope: tests/test_company_engineering_execution.py",
+        "shares 1 required suite(s): tests/test_company_engineering_execution.py",
+        "governed by the same capsule(s): company-engineering-execution",
+        "settled 2026-09-21"
+      ],
+      "warnings": [
+        "wo-token-efficiency-v4-p3-benchmark-contract-correction"
+      ],
+      "work_order_id": "wo-req-token-efficiency-v4-p5-challenger-b"
+    },
+    {
+      "abstention": "",
+      "actual_class": "accepted",
+      "actual_files_changed": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "advice_chars": 4761,
+      "advice_fingerprint": "4c696e632b42067b",
+      "attempt": 1,
+      "considered_history_bytes": 154405,
+      "decided_on": "2026-09-23",
+      "eligible_history": 16,
+      "eligible_history_bytes": 410873,
+      "excluded": {
+        "below_floor": 6,
+        "incompatible": 2,
+        "not_yet_settled": 7,
+        "stale": 5
+      },
+      "historical_only": [
+        "wo-req-repo-exploration-v2-blocked-count-2",
+        "wo-req-ceo-page-attempts-remaining",
+        "wo-blocked-attempts-v3b-2"
+      ],
+      "latency_ms": 201.823,
+      "precedents": [
+        "wo-token-efficiency-v4-p2-benchmark-contract-correction",
+        "wo-token-efficiency-v4-p3c-benchmark-contract-correction"
+      ],
+      "refused": [],
+      "same_day_excluded": 5,
+      "source": "p3c-vs-p5-challenger-c",
+      "status": "precedent",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "wo-token-efficiency-v4-p2-benchmark-contract-correction",
+      "top1_changed_files_the_task_changed": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "top1_shared_required_tests": [
+        "tests/test_company_engineering_execution.py"
+      ],
+      "top1_why": [
+        "1 changed file(s) inside this task's write scope: tests/test_company_engineering_execution.py",
+        "shares 1 required suite(s): tests/test_company_engineering_execution.py",
+        "governed by the same capsule(s): company-engineering-execution",
+        "settled 2026-09-21"
+      ],
+      "warnings": [
+        "wo-token-efficiency-v4-p3-benchmark-contract-correction"
+      ],
+      "work_order_id": "wo-req-token-efficiency-v4-p5-challenger-c"
+    },
+    {
+      "abstention": "stale_only",
+      "actual_class": "not_captured",
+      "actual_files_changed": [],
+      "advice_chars": 1385,
+      "advice_fingerprint": "38e4a8bf05f94da2",
+      "attempt": 1,
+      "considered_history_bytes": 73440,
+      "decided_on": "2026-09-24",
+      "eligible_history": 22,
+      "eligible_history_bytes": 572610,
+      "excluded": {
+        "below_floor": 7,
+        "incompatible": 11,
+        "not_yet_settled": 1,
+        "stale": 4
+      },
+      "historical_only": [
+        "wo-req-repo-exploration-v2-blocked-count-2",
+        "wo-blocked-attempts-v3b-2",
+        "wo-ceo-2026-09-18-attempts-remaining-consumer"
+      ],
+      "latency_ms": 322.947,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 1,
+      "source": "p5-read-authority",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-p5-read-authority-correction-b"
+    },
+    {
+      "abstention": "stale_only",
+      "actual_class": "not_captured",
+      "actual_files_changed": [],
+      "advice_chars": 1013,
+      "advice_fingerprint": "c11e63eed92dc464",
+      "attempt": 1,
+      "considered_history_bytes": 34515,
+      "decided_on": "2026-09-24",
+      "eligible_history": 22,
+      "eligible_history_bytes": 572610,
+      "excluded": {
+        "below_floor": 21,
+        "invalid": 1,
+        "not_yet_settled": 1
+      },
+      "historical_only": [
+        "wo-p5-evidence-reviewability-v1"
+      ],
+      "latency_ms": 64.94,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 1,
+      "source": "p5-read-authority",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-p5-read-authority-evidence-suite"
+    },
+    {
+      "abstention": "incompatible_only",
+      "actual_class": "not_captured",
+      "actual_files_changed": [],
+      "advice_chars": 729,
+      "advice_fingerprint": "0b44b6fda673e7a5",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-24",
+      "eligible_history": 22,
+      "eligible_history_bytes": 572610,
+      "excluded": {
+        "below_floor": 7,
+        "incompatible": 15,
+        "not_yet_settled": 1
+      },
+      "historical_only": [],
+      "latency_ms": 285.937,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 1,
+      "source": "p5-read-authority",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-p5-read-authority-fingerprint"
+    },
+    {
+      "abstention": "incompatible_only",
+      "actual_class": "not_captured",
+      "actual_files_changed": [],
+      "advice_chars": 731,
+      "advice_fingerprint": "e8f9aeedf4e37b1c",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-24",
+      "eligible_history": 22,
+      "eligible_history_bytes": 572610,
+      "excluded": {
+        "below_floor": 7,
+        "incompatible": 15,
+        "not_yet_settled": 1
+      },
+      "historical_only": [],
+      "latency_ms": 298.357,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 1,
+      "source": "p5-read-authority",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-p5-read-authority-fingerprint-b"
+    },
+    {
+      "abstention": "incompatible_only",
+      "actual_class": "correction",
+      "actual_files_changed": [
+        "company/engineering/intake.py",
+        "company/engineering/transport.py",
+        "company/engineering/work_order.py",
+        "knowledge/company_os/capsules/seeds/company-engineering-execution.json",
+        "tests/test_company_engineering_execution.py",
+        "tests/test_company_read_authority.py"
+      ],
+      "advice_chars": 720,
+      "advice_fingerprint": "e4f2e4973defaca5",
+      "attempt": 1,
+      "considered_history_bytes": 0,
+      "decided_on": "2026-09-24",
+      "eligible_history": 22,
+      "eligible_history_bytes": 572610,
+      "excluded": {
+        "below_floor": 1,
+        "incompatible": 21,
+        "not_yet_settled": 1
+      },
+      "historical_only": [],
+      "latency_ms": 385.623,
+      "precedents": [],
+      "refused": [],
+      "same_day_excluded": 0,
+      "source": "p5-read-authority",
+      "status": "abstain",
+      "suggested_files": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "suggested_files_changed_later": [],
+      "suggested_tests": {
+        "basis": "counterfactual",
+        "note": "what the advisory would have offered; no session received it",
+        "value": []
+      },
+      "top1": "",
+      "top1_changed_files_the_task_changed": [],
+      "top1_shared_required_tests": [],
+      "top1_why": [],
+      "warnings": [],
+      "work_order_id": "wo-p5-read-authority-v1"
+    }
+  ],
+  "sources": [
+    "in-git-validation-record",
+    "aiv2-after",
+    "consumer",
+    "repo-exploration-v2",
+    "repoexpl",
+    "second-dogfood",
+    "v3b",
+    "discovery-pilot",
+    "e2e-pilot",
+    "e2e-pilot-2",
+    "e2e-pilot-3",
+    "review-separation",
+    "p5-evidence-reviewability",
+    "p5-evidence-reviewability-closed",
+    "p5-read-authority",
+    "p3c-vs-p5-control",
+    "p3c-vs-p5-control-b",
+    "p3c-vs-p5-challenger",
+    "p3c-vs-p5-challenger-b",
+    "p3c-vs-p5-challenger-c",
+    "repository-architecture"
+  ],
+  "store_problems": [],
+  "summary": {
+    "abstained": 23,
+    "abstentions_by_code": {
+      "incompatible_only": 10,
+      "no_match": 8,
+      "stale_only": 5
+    },
+    "advice_chars_max": 5211,
+    "advice_chars_median": 746,
+    "candidates_excluded_by_reason": {
+      "below_floor": 197,
+      "incompatible": 109,
+      "invalid": 1,
+      "not_yet_settled": 401,
+      "stale": 44
+    },
+    "changed_files_in_rows_with_suggestions": 0,
+    "decisions": 34,
+    "eligible_history_bytes_max": 572610,
+    "latency_ms_max": 511.459,
+    "latency_ms_median": 148.205,
+    "not_replayed": 0,
+    "precedent_found": 11,
+    "precedent_rows_where_the_task_ended_accepted": 8,
+    "precedent_rows_where_top1_changed_a_file_the_task_changed": 9,
+    "precedent_rows_with_captured_outcome": 9,
+    "replayed": 34,
+    "rows_where_a_suggested_file_was_changed": 0,
+    "rows_with_file_suggestions": 0,
+    "rows_with_warnings": 7,
+    "rows_with_warnings_that_ended_as_corrections": 1,
+    "same_day_episodes_excluded_total": 138,
+    "suggested_files_later_changed": 0,
+    "suggested_files_total": 0,
+    "suggestions_refused_by_read_authority": 19,
+    "suggestions_refused_total": 19,
+    "with_eligible_history": 32
+  },
+  "tree_errors": {}
+}

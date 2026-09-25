@@ -1,0 +1,130 @@
+{
+  "sources": [
+    {
+      "label": "in-git-validation-record",
+      "record_bytes": 49775,
+      "record_files": 20,
+      "sha256": "340c863c0c2dedb614dac8c92c81d2c6d73e4c52e7f3c6078d1268b04c32308b"
+    },
+    {
+      "label": "aiv2-after",
+      "record_bytes": 47888,
+      "record_files": 20,
+      "sha256": "a5130f9c3cc7d7ab0056f239f2ea4c4629d5dee39f5a68a4ed0788d214975d1c"
+    },
+    {
+      "label": "consumer",
+      "record_bytes": 59821,
+      "record_files": 24,
+      "sha256": "40cdf60b9554ceccc5c7181f3316bee8fa15712ef95212ded71e7364c996dde3"
+    },
+    {
+      "label": "repo-exploration-v2",
+      "record_bytes": 67948,
+      "record_files": 31,
+      "sha256": "e61fa1b85f3056e5ebeed9c804564d5ff2632a69ab0b4369d5fdea8dab5f285b"
+    },
+    {
+      "label": "repoexpl",
+      "record_bytes": 46835,
+      "record_files": 20,
+      "sha256": "e1a48dc11f50543a7b888de7a98b4a4d2ead58501bb0decaf7dfebeae9a603a7"
+    },
+    {
+      "label": "second-dogfood",
+      "record_bytes": 49591,
+      "record_files": 21,
+      "sha256": "225dce6b944b51ec86926da0a2b1139c7332176aebdf38226ae7c0b633e9919f"
+    },
+    {
+      "label": "v3b",
+      "record_bytes": 54394,
+      "record_files": 24,
+      "sha256": "6ac314c5dcdd0dba8f568d399821e0a8c051eb507b52fdd13ce5f92e12c87c20"
+    },
+    {
+      "label": "discovery-pilot",
+      "record_bytes": 42773,
+      "record_files": 20,
+      "sha256": "954ee5206a1c9132cdd1b543fabce13545930c7345643ffc978137dee9c61481"
+    },
+    {
+      "label": "e2e-pilot",
+      "record_bytes": 45009,
+      "record_files": 18,
+      "sha256": "5bdc71b6f53d264a1f1b060bee40624b19c23e3446892bc7f3e3aab60501dd20"
+    },
+    {
+      "label": "e2e-pilot-2",
+      "record_bytes": 40730,
+      "record_files": 17,
+      "sha256": "8e97032d6cd83ced170e3b449653b1f0cdab0a74ce7abbf4cf211311d18b9d0c"
+    },
+    {
+      "label": "e2e-pilot-3",
+      "record_bytes": 45796,
+      "record_files": 20,
+      "sha256": "eb73916150db3cee5564e4a1ba030bf89e0802f135835a2085f4aec8c47b47d2"
+    },
+    {
+      "label": "review-separation",
+      "record_bytes": 13578,
+      "record_files": 7,
+      "sha256": "85989e52b461cb894eb176830172b9da78f630a45986e341167e24d2176d6a72"
+    },
+    {
+      "label": "p5-evidence-reviewability",
+      "record_bytes": 151597,
+      "record_files": 55,
+      "sha256": "e6ba63a419d91ceec1a5d28ee65e213b7b10e8311b9f1c5605a065f5db840e0f"
+    },
+    {
+      "label": "p5-evidence-reviewability-closed",
+      "record_bytes": 158135,
+      "record_files": 59,
+      "sha256": "6c6a37690334ecf9919184f7e3663176406d3d7d9bf63197453c4a2b3386acdf"
+    },
+    {
+      "label": "p5-read-authority",
+      "record_bytes": 248169,
+      "record_files": 94,
+      "sha256": "a66d43a0b2b913831606ee119998dac450f809d931410ae08d3bdf768e3d2ce2"
+    },
+    {
+      "label": "p3c-vs-p5-control",
+      "record_bytes": 51528,
+      "record_files": 23,
+      "sha256": "70e89c746c8f60bde125a60149af6749d33b12fcf72a7ba12c23cbf1b9c65122"
+    },
+    {
+      "label": "p3c-vs-p5-control-b",
+      "record_bytes": 47432,
+      "record_files": 20,
+      "sha256": "6b8c37562e701abd8e3e3fc5a2265995cff65be2643595b2066a91c031276dba"
+    },
+    {
+      "label": "p3c-vs-p5-challenger",
+      "record_bytes": 45138,
+      "record_files": 18,
+      "sha256": "608dbb0be1250aebb7ac667b64a795b80a160f15a25a460bcacdac04b7c39016"
+    },
+    {
+      "label": "p3c-vs-p5-challenger-b",
+      "record_bytes": 47148,
+      "record_files": 20,
+      "sha256": "690933a51ac99986189cb6e0f1c8c24e301715d66d9c770fd5851e3b0313f49c"
+    },
+    {
+      "label": "p3c-vs-p5-challenger-c",
+      "record_bytes": 45170,
+      "record_files": 20,
+      "sha256": "1bf2267e5b51ceef83ff211be6a0329dec999f99ba3ba6bfa2d39a222a02806f"
+    },
+    {
+      "label": "repository-architecture",
+      "record_bytes": 419641,
+      "record_files": 170,
+      "sha256": "f6fcfc368a30cb1d989e35b0ebab7fed76e370e2a2e623b437c519a2a3c86c54"
+    }
+  ]
+}

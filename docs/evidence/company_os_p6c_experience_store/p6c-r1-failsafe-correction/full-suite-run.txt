@@ -1,0 +1,24 @@
+P6C-R1 full suite, chunked, CPython 3.13.0, worktrees in the local temp directory (not OneDrive).
+Chunks cover all 168 tests/test_*.py files exactly once:
+  A = the 41 files tests/test_company_*.py
+  B = tests/test_external_engineering_runner.py
+  C = the other 126 tests/test_*.py files
+
+correction 0d697d8 (origin/main = 4fd5faf):
+  A: 3 failed, 2841 passed in 421.35s (0:07:01)    [HEAD 0d697d87e87e1eb4e98585c1f9a4e1a9c4a90238 origin/main 4fd5fafa92767a83afb966c9a2210fdb016fc28d start 14:15:47]
+  B: 203 passed in 389.02s (0:06:29)    [HEAD 0d697d87e87e1eb4e98585c1f9a4e1a9c4a90238 origin/main 4fd5fafa92767a83afb966c9a2210fdb016fc28d start 14:15:49]
+  C: 18 failed, 4087 passed, 441 skipped, 2 warnings in 1273.83s (0:21:13)    [HEAD 0d697d87e87e1eb4e98585c1f9a4e1a9c4a90238 origin/main 4fd5fafa92767a83afb966c9a2210fdb016fc28d start 14:15:53]
+  total: 21 failed, 7131 passed, 441 skipped, 0 errors (7593 test cases)
+
+baseline e4eb260, same machine, same session, run straight after (origin/main = 4fd5faf):
+  A: 3 failed, 2841 passed in 318.85s (0:05:18)    [HEAD e4eb260278be5f5bec2d925ad05315afb0969634 origin/main 4fd5fafa92767a83afb966c9a2210fdb016fc28d start 14:37:39]
+  B: 190 passed in 287.81s (0:04:47)    [HEAD e4eb260278be5f5bec2d925ad05315afb0969634 origin/main 4fd5fafa92767a83afb966c9a2210fdb016fc28d start 14:37:41]
+  C: 18 failed, 4070 passed, 441 skipped, 2 warnings in 1125.22s (0:18:45)    [HEAD e4eb260278be5f5bec2d925ad05315afb0969634 origin/main 4fd5fafa92767a83afb966c9a2210fdb016fc28d start 14:37:44]
+  total: 21 failed, 7101 passed, 441 skipped, 0 errors (7563 test cases)
+
+failing node ids: identical sets at both revisions (comm, both directions empty).
+
+research branch-scope guards, modelled: a --shared clone at 0d697d8 with its own
+refs/remotes/origin/main set to 0d697d8 (a fast-forward model; the shared repository's
+origin/main was not touched and is still 4fd5faf). Modelled, not integration proof:
+  321 passed in 16.45s

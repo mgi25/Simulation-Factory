@@ -93,6 +93,11 @@ class RunnerConfig:
     # spend more: the ceilings still bind, because they come from the config's
     # own timeouts as before.
     apply_resource_strategy: bool = True
+    # Whether to ask Company OS for the experience advisory before a developer
+    # session. Advisory in every respect: switching it off makes the briefing
+    # shorter and changes no authority, requirement or gate. On by default
+    # because a missing or broken store already degrades to "no advice".
+    experience_advice: bool = True
     python_executable: str = field(default_factory=lambda: sys.executable)
     remote: str = "origin"
     poll_interval_s: float = 20.0

@@ -144,6 +144,12 @@ def _common(parser: argparse.ArgumentParser) -> None:
         "operator's own settings instead; a debugging seam, not a way to spend "
         "more, since the runner's own timeouts still bind",
     )
+    parser.add_argument(
+        "--no-experience-advice",
+        action="store_true",
+        help="do not ask Company OS for prior-experience advice before a developer "
+        "session; the advice is navigation only, so this changes no authority",
+    )
     parser.add_argument("--python", dest="python_executable", default=sys.executable)
     parser.add_argument("--remote", default="origin")
     parser.add_argument("--poll-interval", type=float, default=20.0)
@@ -189,6 +195,7 @@ def configuration(args: argparse.Namespace) -> RunnerConfig:
         standard_model=args.standard_model,
         strongest_model=args.strongest_model,
         apply_resource_strategy=not args.ignore_resource_strategy,
+        experience_advice=not args.no_experience_advice,
         python_executable=args.python_executable,
         remote=args.remote,
         poll_interval_s=args.poll_interval,

@@ -1,0 +1,124 @@
+{
+  "focused": {
+    "tests/test_company_dependency_graph.py": {
+      "failed": 0,
+      "selected": 54,
+      "source": "chunked run"
+    },
+    "tests/test_company_efficiency.py": {
+      "failed": 0,
+      "selected": 69,
+      "source": "chunked run"
+    },
+    "tests/test_company_engineering_execution.py": {
+      "failed": 0,
+      "selected": 207,
+      "source": "chunked run"
+    },
+    "tests/test_company_experience_retrieval.py": {
+      "failed": 0,
+      "selected": 77,
+      "source": "chunked run"
+    },
+    "tests/test_company_experience_store.py": {
+      "failed": 0,
+      "selected": 57,
+      "source": "chunked run"
+    },
+    "tests/test_company_external_engineering_runner.py": {
+      "failed": 0,
+      "selected": 67,
+      "source": "chunked run"
+    },
+    "tests/test_company_integration_gate.py": {
+      "failed": 0,
+      "selected": 89,
+      "source": "chunked run"
+    },
+    "tests/test_company_os_capsules.py": {
+      "failed": 0,
+      "selected": 68,
+      "source": "chunked run"
+    },
+    "tests/test_company_read_authority.py": {
+      "failed": 0,
+      "selected": 34,
+      "source": "chunked run"
+    },
+    "tests/test_company_session_execution.py": {
+      "failed": 0,
+      "selected": 48,
+      "source": "chunked run"
+    },
+    "tests/test_engineering_runner_execution_context.py": {
+      "failed": 0,
+      "selected": 63,
+      "source": "chunked run"
+    },
+    "tests/test_external_engineering_runner.py": {
+      "failed": 0,
+      "selected": 190,
+      "source": "whole-suite re-run"
+    }
+  },
+  "full_suite_16d5a39": {
+    "baseline_failures_absent": [],
+    "baseline_failures_present": 18,
+    "branch_scope_guards": [
+      "tests/test_company_os_research.py::test_this_branch_changed_no_race_fight_or_v30_code",
+      "tests/test_company_os_research_batches.py::test_this_branch_changed_no_race_fight_or_v30_code",
+      "tests/test_company_os_research_ingestion.py::test_this_branch_changed_no_race_fight_or_v30_code"
+    ],
+    "failed": 22,
+    "failures": 22,
+    "outside_baseline_and_guards": [
+      "tests/test_external_engineering_runner.py::test_the_review_is_adjudicated_against_the_tree_the_work_happened_in"
+    ],
+    "outside_resolved_by_whole_suite_rerun": [
+      "tests/test_external_engineering_runner.py::test_the_review_is_adjudicated_against_the_tree_the_work_happened_in"
+    ],
+    "selected": 7122,
+    "suites": 168
+  },
+  "gate_on_branch": {
+    "blockers": 1,
+    "counts": {
+      "advisory": {
+        "pass": 2,
+        "unknown": 2
+      },
+      "required": {
+        "fail": 1,
+        "pass": 34
+      }
+    },
+    "failing_required": [
+      "health.required_suites_pass"
+    ],
+    "readiness": "BLOCKED",
+    "report_id": "integration-readiness-2026-09-25-a051e1c753a2fa33",
+    "source_commit": "16d5a39cc9d1230f82301850b9195322300b7fd1"
+  },
+  "gate_post_merge_modelled": {
+    "blockers": 0,
+    "counts": {
+      "advisory": {
+        "pass": 2,
+        "unknown": 2
+      },
+      "required": {
+        "pass": 35
+      }
+    },
+    "failing_required": [],
+    "readiness": "READY",
+    "report_id": "integration-readiness-2026-09-25-c4abcf29cb8baa07",
+    "source_commit": "16d5a39cc9d1230f82301850b9195322300b7fd1"
+  },
+  "required_suites": {
+    "count": 47,
+    "fingerprint": "f5de72a66d79bb83",
+    "undeclared_company_os_suites": 0,
+    "unresolved": []
+  }
+}

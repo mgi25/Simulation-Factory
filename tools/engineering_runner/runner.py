@@ -83,6 +83,11 @@ from .briefs import (
     review_instructions,
 )
 from .execution_context import failure_symbol_hints
+from .experience import (
+    ExperienceAdvice,
+    RevalidatedAdvice,
+    revalidate,
+)
 from .repo_map import RepoMap, build_repo_map, build_repo_map_cached
 from .config import RunnerConfig
 from .controlplane import ControlPlane
@@ -893,11 +898,15 @@ class EngineeringRunner:
             )
 
         repo_map, repo_map_cache = self._repo_map(worktree)
+        experience, experience_record = self._experience(
+            work_order_id, envelope, repo_map, stage_dir
+        )
         context_bundle = developer_execution_context(
             repo_map,
             envelope=envelope,
             worktree=worktree,
             preferred_symbols=preferred_symbols,
+            experience_paths=experience.primary() if experience is not None else (),
         )
         applied = self._adaptive_developer_model(
             strategy,
@@ -914,6 +923,7 @@ class EngineeringRunner:
         )
         applied = {
             **applied,
+            "experience": experience_record,
             "repository_map_cache": repo_map_cache,
             "compiled_context": {
                 "artifact": str(context_path),
@@ -949,6 +959,7 @@ class EngineeringRunner:
             strategy=strategy,
             repo_map=repo_map,
             context_bundle=context_bundle,
+            experience_block=experience.render() if experience is not None else "",
         )
         write_text(stage_dir / "instructions.md", instructions)
 
@@ -1540,6 +1551,45 @@ class EngineeringRunner:
             "needs a person to decide whether to continue it."
         )
 
+    def _experience(
+        self,
+        work_order_id: str,
+        envelope: AuthorityEnvelope,
+        repo_map: RepoMap | None,
+        stage_dir: Path,
+    ) -> tuple[RevalidatedAdvice | None, dict[str, Any]]:
+        """Prior-experience advice for this attempt, or none - never a stop.
+
+        Every failure on this path - the command, persisting the advisory,
+        the parse, the revalidation, recording what was used - is recorded
+        and absorbed: experience is navigation for the session, and the job
+        runs exactly as it would without it. What survives is filtered
+        through this envelope, so the advice can only ever point inside what
+        the work order already allows.
+
+        The boundary is `Exception`, deliberately, not a list of the
+        exceptions the parser is expected to raise: that list is what let a
+        KeyError and a RecursionError through (P6C-R1). An unforeseen defect
+        in optional navigation costs the advice, not the job. `BaseException`
+        stays outside it, so KeyboardInterrupt and SystemExit still stop the
+        process.
+        """
+        if not self.config.experience_advice:
+            return None, {"enabled": False}
+        try:
+            payload = self._control.experience_advice(work_order_id)
+        except Exception as exc:  # noqa: BLE001 - absence of advice is not an error
+            return None, {"enabled": True, "available": False, "reason": _brief_reason(exc)}
+        try:
+            write_json(stage_dir / "experience-advice.json", payload)
+            advice = ExperienceAdvice.parse(payload, work_order_id=work_order_id)
+            revalidated = revalidate(advice, envelope, repo_map)
+            record = {"enabled": True, **revalidated.summary()}
+            write_json(stage_dir / "experience.json", record)
+        except Exception as exc:  # noqa: BLE001 - broken advice is no advice, never a stop
+            return None, {"enabled": True, "available": False, "rejected": _brief_reason(exc)}
+        return revalidated, record
+
     def _prior_findings(self, work_order_id: str) -> tuple[str, ...]:
         """What the last review asked for, so a correction attempt can see it."""
         history = self._control.status(work_order_id).payload
@@ -1666,6 +1716,12 @@ def _rejection(
             "is incomplete"
         )
     return str(narrative.get("rejection_reason", "")) or "the session reported a rejection"
+
+
+def _brief_reason(exc: BaseException) -> str:
+    """One line, bounded: enough to see why advice was absent, never a transcript."""
+    text = " ".join(f"{type(exc).__name__}: {exc}".split())
+    return text[:400]
 
 
 def _next_stage_dir(run_dir: Path, role: str) -> Path:

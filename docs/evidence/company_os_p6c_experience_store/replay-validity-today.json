@@ -1,0 +1,234 @@
+{
+  "counts": {
+    "current": 4,
+    "stale": 19
+  },
+  "episodes": [
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture"
+      ],
+      "source": "consumer",
+      "validity": "stale",
+      "work_order_id": "wo-ceo-2026-09-18-attempts-remaining-consumer"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture"
+      ],
+      "source": "repoexpl",
+      "validity": "stale",
+      "work_order_id": "wo-ceo-2026-09-18-reviews-completed-repoexpl"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture"
+      ],
+      "source": "v3b",
+      "validity": "stale",
+      "work_order_id": "wo-blocked-attempts-v3b-2"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture"
+      ],
+      "source": "second-dogfood",
+      "validity": "stale",
+      "work_order_id": "wo-req-ceo-page-attempts-remaining"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture"
+      ],
+      "source": "repo-exploration-v2",
+      "validity": "stale",
+      "work_order_id": "wo-req-repo-exploration-v2-blocked-count-2"
+    },
+    {
+      "attempt": 1,
+      "class": "correction",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture"
+      ],
+      "source": "e2e-pilot",
+      "validity": "stale",
+      "work_order_id": "wo-req-auth-migration-classifier-ambiguity"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture"
+      ],
+      "source": "e2e-pilot-3",
+      "validity": "stale",
+      "work_order_id": "wo-req-auth-migration-correction-01"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [],
+      "source": "discovery-pilot",
+      "validity": "current",
+      "work_order_id": "wo-wo-gate-architecture-subsystem_ownership_bounded"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [],
+      "source": "repository-architecture",
+      "validity": "current",
+      "work_order_id": "wo-capsule-ownership-semantic-review"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [],
+      "source": "repository-architecture",
+      "validity": "current",
+      "work_order_id": "wo-delegation-planning-test-ownership"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [],
+      "source": "repository-architecture",
+      "validity": "current",
+      "work_order_id": "wo-delegation-planning-test-ownership-v2"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture"
+      ],
+      "source": "repository-architecture",
+      "validity": "stale",
+      "work_order_id": "wo-token-efficiency-v4-p2-benchmark-contract-correction"
+    },
+    {
+      "attempt": 1,
+      "class": "correction",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture"
+      ],
+      "source": "repository-architecture",
+      "validity": "stale",
+      "work_order_id": "wo-token-efficiency-v4-p2-review-test-ownership-v2"
+    },
+    {
+      "attempt": 1,
+      "class": "correction",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture"
+      ],
+      "source": "repository-architecture",
+      "validity": "stale",
+      "work_order_id": "wo-token-efficiency-v4-p3-benchmark-contract-correction"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture"
+      ],
+      "source": "repository-architecture",
+      "validity": "stale",
+      "work_order_id": "wo-token-efficiency-v4-p3c-benchmark-contract-correction"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture",
+        "tests/test_company_review_separation.py is governed by nothing (was company-engineering-execution)"
+      ],
+      "source": "repository-architecture",
+      "validity": "stale",
+      "work_order_id": "wo-token-efficiency-v4-review-separation-yaml-dependency"
+    },
+    {
+      "attempt": 1,
+      "class": "correction",
+      "reasons": [
+        "docs/evidence/reviews/README.md is governed by company-evidence-review (was nothing)",
+        "tests/test_company_evidence_review.py is governed by company-evidence-review (was nothing)"
+      ],
+      "source": "p5-evidence-reviewability",
+      "validity": "stale",
+      "work_order_id": "wo-p5-evidence-reviewability-v1"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture"
+      ],
+      "source": "p3c-vs-p5-control",
+      "validity": "stale",
+      "work_order_id": "wo-req-token-efficiency-v4-p3c-control"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture"
+      ],
+      "source": "p3c-vs-p5-control-b",
+      "validity": "stale",
+      "work_order_id": "wo-req-token-efficiency-v4-p3c-control-b"
+    },
+    {
+      "attempt": 1,
+      "class": "correction",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture"
+      ],
+      "source": "p3c-vs-p5-challenger",
+      "validity": "stale",
+      "work_order_id": "wo-req-token-efficiency-v4-p5-challenger"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture"
+      ],
+      "source": "p3c-vs-p5-challenger-b",
+      "validity": "stale",
+      "work_order_id": "wo-req-token-efficiency-v4-p5-challenger-b"
+    },
+    {
+      "attempt": 1,
+      "class": "accepted",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture"
+      ],
+      "source": "p3c-vs-p5-challenger-c",
+      "validity": "stale",
+      "work_order_id": "wo-req-token-efficiency-v4-p5-challenger-c"
+    },
+    {
+      "attempt": 1,
+      "class": "correction",
+      "reasons": [
+        "capsule company-engineering-execution contract changed since capture",
+        "tests/test_company_read_authority.py is governed by company-engineering-execution (was nothing)"
+      ],
+      "source": "p5-read-authority",
+      "validity": "stale",
+      "work_order_id": "wo-p5-read-authority-v1"
+    }
+  ],
+  "judged_against": "the checkout running this script"
+}

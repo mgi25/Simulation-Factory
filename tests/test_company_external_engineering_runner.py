@@ -998,3 +998,60 @@ def test_no_broad_repository_read_claim_is_ever_produced():
     for rule in envelope.may_read:
         assert rule not in (".", "/", "*", "**", "")
     assert envelope.may_read == ("tools/engineering_runner",)
+
+
+# --- the experience advisory: the runner's reader pinned to the producer ------
+
+
+def test_the_runners_advisory_vocabulary_is_the_producers():
+    from company.experience import advice as company_advice
+    from tools.engineering_runner import experience as runner_experience
+
+    assert runner_experience.ADVICE_KIND == company_advice.ADVICE_KIND
+    assert runner_experience.ADVICE_VERSION == company_advice.ADVICE_VERSION
+    assert runner_experience.ADVICE_KEYS == company_advice.ADVICE_KEYS
+    assert runner_experience.AUTHORITY_KEYS == company_advice.AUTHORITY_KEYS
+    assert runner_experience.MAX_FILES == company_advice.MAX_SUGGESTED_FILES
+    assert runner_experience.MAX_TESTS == company_advice.MAX_SUGGESTED_TESTS
+    assert runner_experience.MAX_WARNING_LINES == company_advice.MAX_WARNING_LINES
+
+
+def test_the_runner_accepts_what_the_producer_emits_and_computes_the_same_fingerprint(tmp_path):
+    from company.experience import build_advice
+    from company.experience.advice import advice_fingerprint, unavailable_advice
+    from tools.engineering_runner.experience import ExperienceAdvice, fingerprint as runner_fingerprint
+
+    import test_company_experience_retrieval as synthetic
+
+    world = synthetic.World(tmp_path)
+    world.add("wo-past", changed=("pkg/alpha/core.py", "pkg/alpha/helper.py"))
+    world.add("wo-failed", klass="correction")
+    query = synthetic._query()
+    produced = build_advice(
+        query,
+        world.retrieve(query),
+        world.view,
+        work_order_fingerprint="0123456789abcdef",
+        as_of=dt.date(2026, 9, 25),
+    )
+    # Through the same wire the runner reads: JSON text, as the CLI prints it.
+    payload = json.loads(json.dumps(produced, sort_keys=True, indent=2))
+    assert runner_fingerprint(payload) == advice_fingerprint(payload) == payload["fingerprint"]
+    parsed = ExperienceAdvice.parse(payload, work_order_id=query.work_order_id)
+    assert parsed.status == "precedent"
+    assert [p[0] for p in parsed.precedents] == ["wo-past"]
+    assert {path for path, _ in parsed.files} == {"pkg/alpha/core.py", "pkg/alpha/helper.py"}
+    assert parsed.warnings, "the correction reached the reader as a warning"
+    empty = json.loads(json.dumps(unavailable_advice("wo-x", "0123456789abcdef", 1, as_of=dt.date(2026, 9, 25), reason="none")))
+    assert ExperienceAdvice.parse(empty, work_order_id="wo-x").status == "abstain"
+
+
+def test_the_command_the_runner_calls_is_the_command_that_exists():
+    from company.experience.__main__ import build_parser
+    from tools.engineering_runner.controlplane import EXPERIENCE_MODULE
+
+    assert EXPERIENCE_MODULE == "company.experience"
+    args = build_parser().parse_args(
+        ["suggest", "--work-order", "wo-x", "--state-dir", "s", "--repo-root", ".", "--json"]
+    )
+    assert (args.command, args.work_order, args.state_dir, args.repo_root) == ("suggest", "wo-x", "s", ".")

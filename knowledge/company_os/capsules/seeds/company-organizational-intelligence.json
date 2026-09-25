@@ -11,6 +11,7 @@
     "company-analytics-experiments",
     "company-evidence-review",
     "company-executive-delegation",
+    "company-experience-store",
     "company-finance",
     "company-workforce-capabilities",
     "company-workforce-hiring"
@@ -44,7 +45,8 @@
     "company/workforce/*.py",
     "ai_platform/usage.py",
     "company/finance/*.py",
-    "company/analytics/*.py"
+    "company/analytics/*.py",
+    "company/experience/*.py"
   ],
   "may_write": [
     "company/org_intelligence/*.py"

@@ -715,3 +715,248 @@ def test_to_dict_reports_rendered_chars_and_truncation(tmp_path: Path) -> None:
     data = bundle.to_dict()
     assert data["rendered_chars"] == len(bundle.render())
     assert data["truncated"] is False
+
+
+# --- prior experience: parsed strictly, revalidated here, navigation only ------
+
+import types
+
+import pytest
+
+from tools.engineering_runner.experience import (
+    ADVICE_KIND,
+    AUTHORITY_KEYS,
+    ExperienceAdvice,
+    ExperienceAdviceRejected,
+    fingerprint,
+    revalidate,
+)
+
+_WORK_ORDER = "wo-widgets"
+
+
+def _advice(**changes) -> dict:
+    payload = {
+        "kind": ADVICE_KIND,
+        "version": 1,
+        "advisory_only": True,
+        "work_order_id": _WORK_ORDER,
+        "work_order_fingerprint": "0123456789abcdef",
+        "attempt": 1,
+        "as_of": "2026-09-25",
+        "status": "precedent",
+        "abstention": None,
+        "precedents": [
+            {
+                "experience_id": "1111111111111111",
+                "work_order_id": "wo-earlier",
+                "outcome": "accepted: recorded accepted, review pass, gate ready",
+                "why": ["1 changed file(s) inside this task's write scope: company/widgets/spinner.py"],
+            }
+        ],
+        "warnings": [],
+        "historical_only": [],
+        "suggested_files": [
+            {"path": "company/widgets/spinner.py", "reason": "changed by accepted precedent wo-earlier"},
+            {"path": "tools/actuator/launcher.py", "reason": "read by accepted precedent wo-earlier"},
+        ],
+        "suggested_tests": [
+            {"path": "tests/test_company_widgets_errors.py", "reason": "exercised by accepted precedent wo-earlier"}
+        ],
+        "refused": [],
+        "resource_history": [],
+        "measurement": {},
+        "truncated": False,
+    }
+    payload.update(changes)
+    payload.pop("fingerprint", None)
+    payload["fingerprint"] = fingerprint(payload)
+    return payload
+
+
+def _envelope(**changes):
+    values = dict(
+        may_read=("company/widgets", "tests"),
+        may_not_read=(),
+        may_write=("company/widgets",),
+        required_tests=(),
+    )
+    values.update(changes)
+    return types.SimpleNamespace(**values)
+
+
+def test_a_well_formed_advisory_parses() -> None:
+    advice = ExperienceAdvice.parse(_advice(), work_order_id=_WORK_ORDER)
+    assert advice.status == "precedent"
+    assert [p[0] for p in advice.precedents] == ["wo-earlier"]
+    assert [path for path, _ in advice.files] == ["company/widgets/spinner.py", "tools/actuator/launcher.py"]
+
+
+@pytest.mark.parametrize(
+    "changes, message",
+    [
+        ({"kind": "something_else"}, "not a version-1"),
+        ({"version": 2}, "not a version-1"),
+        ({"advisory_only": False}, "advisory-only"),
+        ({"approved_for_merge": True}, "undeclared field"),
+        ({"work_order_id": "wo-other"}, "answers"),
+        ({"status": "certain"}, "unknown status"),
+        ({"suggested_files": [{"path": "../outside.py", "reason": "x"}]}, "unusable path"),
+        ({"suggested_files": [{"path": f"company/widgets/f{i}.py", "reason": "x"} for i in range(6)]}, "at most 5"),
+    ],
+)
+def test_an_advisory_that_is_not_what_it_claims_is_dropped_whole(changes, message) -> None:
+    with pytest.raises(ExperienceAdviceRejected, match=message):
+        ExperienceAdvice.parse(_advice(**changes), work_order_id=_WORK_ORDER)
+
+
+@pytest.mark.parametrize("key", ["may_write", "may_read", "required_tests", "risk", "reasoning_class", "approve"])
+def test_authority_vocabulary_anywhere_in_an_advisory_is_refused(key: str) -> None:
+    assert key in AUTHORITY_KEYS
+    files = [{"path": "company/widgets/spinner.py", "reason": "x", key: ["company"]}]
+    with pytest.raises(ExperienceAdviceRejected, match="authority vocabulary"):
+        ExperienceAdvice.parse(_advice(suggested_files=files), work_order_id=_WORK_ORDER)
+
+
+def test_a_tampered_advisory_fails_its_fingerprint() -> None:
+    payload = _advice()
+    payload["suggested_files"][0]["path"] = "company/widgets/errors.py"
+    with pytest.raises(ExperienceAdviceRejected, match="fingerprint"):
+        ExperienceAdvice.parse(payload, work_order_id=_WORK_ORDER)
+
+
+# P6C-R1 (B1): `why` and `lines` are what the producer emits - a list of
+# strings - or the payload is refused. Before the correction a mapping `why`
+# was sliced (KeyError, which escaped the runner), a bare string was read one
+# character per reason, and a nested member was stringified into the prompt.
+
+
+def _with_why(why) -> dict:
+    return _advice(precedents=[{**_advice()["precedents"][0], "why": why}])
+
+
+def _with_lines(lines) -> dict:
+    warning = {"experience_id": "2222222222222222", "work_order_id": "wo-sent-back", "class": "correction", "why": []}
+    return _advice(warnings=[{**warning, "lines": lines}])
+
+
+_NOT_A_LIST_OF_STRINGS = [
+    pytest.param({"shares": "a suite"}, r" must be a list of strings, not dict", id="mapping"),
+    pytest.param({}, r" must be a list of strings, not dict", id="empty-mapping"),
+    pytest.param("shares a suite", r" must be a list of strings, not str", id="bare-string"),
+    pytest.param(7, r" must be a list of strings, not int", id="integer"),
+    pytest.param(None, r" must be a list of strings, not NoneType", id="null"),
+    pytest.param(["fine", {"nested": "object"}], r"\[1\] must be a string, not dict", id="nested-object"),
+    pytest.param(["fine", ["nested", "array"]], r"\[1\] must be a string, not list", id="nested-array"),
+    pytest.param(["fine", 3], r"\[1\] must be a string, not int", id="non-string-member"),
+]
+
+
+@pytest.mark.parametrize("why, message", _NOT_A_LIST_OF_STRINGS)
+def test_a_precedent_why_that_is_not_a_list_of_strings_is_refused(why, message) -> None:
+    with pytest.raises(ExperienceAdviceRejected, match=r"^precedents\[0\]\.why" + message):
+        ExperienceAdvice.parse(_with_why(why), work_order_id=_WORK_ORDER)
+
+
+@pytest.mark.parametrize("lines, message", _NOT_A_LIST_OF_STRINGS)
+def test_warning_lines_that_are_not_a_list_of_strings_are_refused(lines, message) -> None:
+    with pytest.raises(ExperienceAdviceRejected, match=r"^warnings\[0\]\.lines" + message):
+        ExperienceAdvice.parse(_with_lines(lines), work_order_id=_WORK_ORDER)
+
+
+def test_well_formed_why_and_lines_keep_their_existing_bounds() -> None:
+    six = [f"reason {index}" for index in range(6)]
+    advice = ExperienceAdvice.parse(_with_why(six), work_order_id=_WORK_ORDER)
+    assert advice.precedents[0][2] == tuple(six[:4]), "why is still read to at most four reasons"
+    assert ExperienceAdvice.parse(_with_lines(["a", "b"]), work_order_id=_WORK_ORDER).warnings == ("a", "b")
+    with pytest.raises(ExperienceAdviceRejected, match="at most 4"):
+        ExperienceAdvice.parse(_with_lines(["a", "b", "c", "d", "e"]), work_order_id=_WORK_ORDER)
+    absent = _advice(precedents=[{k: v for k, v in _advice()["precedents"][0].items() if k != "why"}])
+    assert ExperienceAdvice.parse(absent, work_order_id=_WORK_ORDER).precedents[0][2] == (), "absent reads as none"
+
+
+def test_revalidation_keeps_only_what_this_envelope_may_read(tmp_path: Path) -> None:
+    repo_map = build_repo_map(_sample_repo(tmp_path))
+    advice = ExperienceAdvice.parse(_advice(), work_order_id=_WORK_ORDER)
+    result = revalidate(advice, _envelope(), repo_map)
+    assert [path for path, _ in result.files] == ["company/widgets/spinner.py"]
+    assert ("file:tools/actuator/launcher.py", "outside this work order's read authority") in result.refused
+    assert [path for path, _ in result.tests] == ["tests/test_company_widgets_errors.py"]
+
+
+def test_a_denied_read_outranks_history(tmp_path: Path) -> None:
+    repo_map = build_repo_map(_sample_repo(tmp_path))
+    advice = ExperienceAdvice.parse(_advice(), work_order_id=_WORK_ORDER)
+    result = revalidate(advice, _envelope(may_not_read=("company/widgets/spinner.py",)), repo_map)
+    assert result.files == ()
+    assert ("file:company/widgets/spinner.py", "forbidden to read by this work order") in result.refused
+
+
+def test_an_empty_read_grant_admits_nothing(tmp_path: Path) -> None:
+    repo_map = build_repo_map(_sample_repo(tmp_path))
+    advice = ExperienceAdvice.parse(_advice(), work_order_id=_WORK_ORDER)
+    result = revalidate(advice, _envelope(may_read=()), repo_map)
+    assert result.files == () and result.tests == ()
+
+
+def test_without_a_map_nothing_is_passed_on() -> None:
+    advice = ExperienceAdvice.parse(_advice(), work_order_id=_WORK_ORDER)
+    result = revalidate(advice, _envelope(), None)
+    assert result.files == () and result.tests == ()
+    assert {reason for _, reason in result.refused} <= {
+        "no repository map to check it against",
+        "outside this work order's read authority",
+    }
+
+
+def test_a_required_test_is_never_offered_and_an_unreaching_test_is_refused(tmp_path: Path) -> None:
+    repo_map = build_repo_map(_sample_repo(tmp_path))
+    advice = ExperienceAdvice.parse(_advice(), work_order_id=_WORK_ORDER)
+    required = revalidate(advice, _envelope(required_tests=("tests/test_company_widgets_errors.py",)), repo_map)
+    assert required.tests == ()
+    elsewhere = revalidate(advice, _envelope(may_write=("company/widgets/spinner.py",)), repo_map)
+    assert elsewhere.tests == ()
+    assert (
+        "test:tests/test_company_widgets_errors.py",
+        "does not statically reach a path this work order may change",
+    ) in elsewhere.refused
+
+
+def test_the_rendered_advice_is_bounded_and_says_it_changes_nothing(tmp_path: Path) -> None:
+    repo_map = build_repo_map(_sample_repo(tmp_path))
+    advice = ExperienceAdvice.parse(_advice(), work_order_id=_WORK_ORDER)
+    text = revalidate(advice, _envelope(), repo_map).render()
+    assert "Prior experience" in text and "wo-earlier" in text
+    assert "nothing in this section changes them" in text
+    assert "tools/actuator/launcher.py" not in text
+    assert len(text) <= 1800
+    quiet = ExperienceAdvice.parse(
+        _advice(
+            status="abstain",
+            abstention={"code": "no_match", "detail": "x"},
+            precedents=[],
+            suggested_files=[],
+            suggested_tests=[],
+        ),
+        work_order_id=_WORK_ORDER,
+    )
+    assert revalidate(quiet, _envelope(), repo_map).render() == ""
+
+
+def test_experience_files_rank_after_authorized_paths_and_before_guesses(tmp_path: Path) -> None:
+    repo_map = build_repo_map(_sample_repo(tmp_path))
+    ranked = rank_primary_files(
+        repo_map,
+        objective="spin the widget faster",
+        focus_paths=("company/widgets/errors.py",),
+        experience_paths=(
+            ("company/widgets/spinner.py", "prior experience: changed by accepted precedent"),
+            ("company/widgets/missing.py", "prior experience: gone"),
+        ),
+    )
+    assert ranked[0] == ("company/widgets/errors.py", "a path this work order authorizes changing")
+    assert ranked[1] == ("company/widgets/spinner.py", "prior experience: changed by accepted precedent")
+    assert all(path != "company/widgets/missing.py" for path, _ in ranked)
+    assert len(ranked) == 2, "experience filled the budget a guess would have used"
+    plain = rank_primary_files(repo_map, objective="spin the widget faster", focus_paths=("company/widgets/errors.py",))
+    assert plain[0] == ranked[0]
