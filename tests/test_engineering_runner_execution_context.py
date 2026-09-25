@@ -825,6 +825,56 @@ def test_a_tampered_advisory_fails_its_fingerprint() -> None:
         ExperienceAdvice.parse(payload, work_order_id=_WORK_ORDER)
 
 
+# P6C-R1 (B1): `why` and `lines` are what the producer emits - a list of
+# strings - or the payload is refused. Before the correction a mapping `why`
+# was sliced (KeyError, which escaped the runner), a bare string was read one
+# character per reason, and a nested member was stringified into the prompt.
+
+
+def _with_why(why) -> dict:
+    return _advice(precedents=[{**_advice()["precedents"][0], "why": why}])
+
+
+def _with_lines(lines) -> dict:
+    warning = {"experience_id": "2222222222222222", "work_order_id": "wo-sent-back", "class": "correction", "why": []}
+    return _advice(warnings=[{**warning, "lines": lines}])
+
+
+_NOT_A_LIST_OF_STRINGS = [
+    pytest.param({"shares": "a suite"}, r" must be a list of strings, not dict", id="mapping"),
+    pytest.param({}, r" must be a list of strings, not dict", id="empty-mapping"),
+    pytest.param("shares a suite", r" must be a list of strings, not str", id="bare-string"),
+    pytest.param(7, r" must be a list of strings, not int", id="integer"),
+    pytest.param(None, r" must be a list of strings, not NoneType", id="null"),
+    pytest.param(["fine", {"nested": "object"}], r"\[1\] must be a string, not dict", id="nested-object"),
+    pytest.param(["fine", ["nested", "array"]], r"\[1\] must be a string, not list", id="nested-array"),
+    pytest.param(["fine", 3], r"\[1\] must be a string, not int", id="non-string-member"),
+]
+
+
+@pytest.mark.parametrize("why, message", _NOT_A_LIST_OF_STRINGS)
+def test_a_precedent_why_that_is_not_a_list_of_strings_is_refused(why, message) -> None:
+    with pytest.raises(ExperienceAdviceRejected, match=r"^precedents\[0\]\.why" + message):
+        ExperienceAdvice.parse(_with_why(why), work_order_id=_WORK_ORDER)
+
+
+@pytest.mark.parametrize("lines, message", _NOT_A_LIST_OF_STRINGS)
+def test_warning_lines_that_are_not_a_list_of_strings_are_refused(lines, message) -> None:
+    with pytest.raises(ExperienceAdviceRejected, match=r"^warnings\[0\]\.lines" + message):
+        ExperienceAdvice.parse(_with_lines(lines), work_order_id=_WORK_ORDER)
+
+
+def test_well_formed_why_and_lines_keep_their_existing_bounds() -> None:
+    six = [f"reason {index}" for index in range(6)]
+    advice = ExperienceAdvice.parse(_with_why(six), work_order_id=_WORK_ORDER)
+    assert advice.precedents[0][2] == tuple(six[:4]), "why is still read to at most four reasons"
+    assert ExperienceAdvice.parse(_with_lines(["a", "b"]), work_order_id=_WORK_ORDER).warnings == ("a", "b")
+    with pytest.raises(ExperienceAdviceRejected, match="at most 4"):
+        ExperienceAdvice.parse(_with_lines(["a", "b", "c", "d", "e"]), work_order_id=_WORK_ORDER)
+    absent = _advice(precedents=[{k: v for k, v in _advice()["precedents"][0].items() if k != "why"}])
+    assert ExperienceAdvice.parse(absent, work_order_id=_WORK_ORDER).precedents[0][2] == (), "absent reads as none"
+
+
 def test_revalidation_keeps_only_what_this_envelope_may_read(tmp_path: Path) -> None:
     repo_map = build_repo_map(_sample_repo(tmp_path))
     advice = ExperienceAdvice.parse(_advice(), work_order_id=_WORK_ORDER)

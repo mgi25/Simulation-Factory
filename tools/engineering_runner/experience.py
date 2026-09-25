@@ -13,7 +13,8 @@ that artifact, and it trusts none of it.
    producer declares, `advisory_only` true, only the declared top-level keys,
    the declared bounds, a fingerprint that matches, the work order the runner
    asked about, only the declared keys inside every item it reads (a
-   whitelist, so nothing rides inside a suggestion whatever it is called) -
+   whitelist, so nothing rides inside a suggestion whatever it is called),
+   a list of strings wherever it reads lines of prose (`why`, `lines`) -
    and no authority vocabulary at any depth. A payload failing any of these
    is dropped whole; the session runs without advice.
 2. **Revalidates every item against the envelope** (`revalidate`): a file is
@@ -31,9 +32,11 @@ that artifact, and it trusts none of it.
 
 ## Why a missing or broken advisory is not an error
 
-Experience is an optimisation. The control-plane call, the parse and the
-revalidation each degrade to "no advice" and record why; the developer stage
-proceeds exactly as it did before this module existed.
+Experience is an optimisation. The control-plane call, persisting the
+advisory, the parse and the revalidation each degrade to "no advice" and
+record why - the runner absorbs any `Exception` on that path, not a list of
+the ones this module is expected to raise - and the developer stage proceeds
+exactly as it did before this module existed.
 
 ## Restated vocabulary
 
@@ -188,6 +191,26 @@ def _items(
     return value
 
 
+def _strings(item: Mapping[str, Any], key: str, where: str) -> tuple[str, ...]:
+    """A producer-declared list of strings, checked before anything reads it.
+
+    Absent reads as empty, as every optional field here does. Present, it must
+    be what the producer emits: a list whose members are all strings. A
+    mapping, a bare string, a number, null or a nested member is not coerced
+    into lines of prose - it is a payload from something else, and is refused
+    with the rest of it.
+    """
+    if key not in item:
+        return ()
+    value = item[key]
+    if not isinstance(value, list):
+        raise ExperienceAdviceRejected(f"{where}.{key} must be a list of strings, not {type(value).__name__}")
+    for index, member in enumerate(value):
+        if not isinstance(member, str):
+            raise ExperienceAdviceRejected(f"{where}.{key}[{index}] must be a string, not {type(member).__name__}")
+    return tuple(value)
+
+
 def _line(value: Any, limit: int = 240) -> str:
     text = " ".join(str(value).split())
     return text if len(text) <= limit else text[: limit - 3] + "..."
@@ -241,12 +264,16 @@ class ExperienceAdvice:
             (
                 _line(item.get("work_order_id", ""), 120),
                 _line(item.get("outcome", ""), 160),
-                tuple(_line(reason, 200) for reason in (item.get("why") or ())[:4]),
+                tuple(_line(reason, 200) for reason in _strings(item, "why", f"precedents[{index}]")[:4]),
             )
-            for item in _items(payload, "precedents", MAX_PRECEDENTS, PRECEDENT_KEYS)
+            for index, item in enumerate(_items(payload, "precedents", MAX_PRECEDENTS, PRECEDENT_KEYS))
         )
         warning_items = _items(payload, "warnings", MAX_WARNINGS, WARNING_KEYS)
-        lines = [_line(line) for item in warning_items for line in (item.get("lines") or ())]
+        lines = [
+            _line(line)
+            for index, item in enumerate(warning_items)
+            for line in _strings(item, "lines", f"warnings[{index}]")
+        ]
         if len(lines) > MAX_WARNING_LINES:
             raise ExperienceAdviceRejected(f"{len(lines)} warning lines; the producer declares at most {MAX_WARNING_LINES}")
 

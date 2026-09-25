@@ -42,6 +42,7 @@ import datetime as dt
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import textwrap
@@ -151,6 +152,11 @@ def _git(cwd: Path, *args: str) -> str:
 @pytest.fixture()
 def repository(tmp_path: Path) -> dict[str, Any]:
     """A real repository with a real bare remote, and one commit on main."""
+    return _make_repository(tmp_path)
+
+
+def _make_repository(tmp_path: Path) -> dict[str, Any]:
+    """The `repository` fixture's body, callable where a test needs a second one."""
     origin = tmp_path / "origin.git"
     subprocess.run(["git", "init", "--bare", str(origin)], capture_output=True, check=True)
     repo = tmp_path / "repo"
@@ -1507,6 +1513,233 @@ def test_experience_advice_can_be_switched_off(repository):
     assert ("experience", WORK_ORDER) not in control.calls
     resources = json.loads((Path(report.run_dir) / "developer-01" / "resources.json").read_text("utf-8"))
     assert resources["experience"] == {"enabled": False}
+
+
+# --- P6C-R1 (B1): broken experience is no experience, never a stopped job -----
+#
+# The independent P6C review found two advisories that crashed `run_one`
+# instead of degrading to no advice: a precedent whose `why` is an object
+# (`dict[:4]` raises KeyError, not TypeError, since slices became hashable)
+# and nesting deep enough to exhaust the recursive authority-key scan. Every
+# test below runs the real `EngineeringRunner._experience` path through
+# `run_one`, and asserts not only that nothing escapes but that the developer
+# stage is the one it would have been with the advice switched off.
+
+
+def _deeply_nested(depth: int) -> list[Any]:
+    value: list[Any] = []
+    for _ in range(depth):
+        value = [value]
+    return value
+
+
+def _malformed_experience(case: str) -> dict[str, Any]:
+    precedent = _experience_payload()["precedents"][0]
+    warning = _experience_payload()["warnings"][0]
+    if case == "why_is_a_mapping":
+        return _experience_payload(precedents=[{**precedent, "why": {"shares": "tests/test_subject.py"}}])
+    if case == "why_is_a_string":
+        return _experience_payload(precedents=[{**precedent, "why": "shares a required suite"}])
+    if case == "why_holds_an_object":
+        return _experience_payload(precedents=[{**precedent, "why": ["shares a suite", {"detail": "nested"}]}])
+    if case == "lines_is_a_mapping":
+        return _experience_payload(warnings=[{**warning, "lines": {"VALUE was hard-coded twice": "x"}}])
+    if case == "lines_holds_an_array":
+        return _experience_payload(warnings=[{**warning, "lines": [["VALUE was hard-coded twice"]]}])
+    if case == "nested_past_the_recursion_limit":
+        payload = _experience_payload(measurement={"trace": _deeply_nested(sys.getrecursionlimit() + 500)})
+        # Not a payload only a test could build: the courier's C decoder
+        # accepts it, so `ControlPlane.experience_advice` would hand it over.
+        assert json.loads(json.dumps(payload)) == payload
+        return payload
+    raise AssertionError(case)
+
+
+def _normalised(value: Any, repository: dict[str, Any]) -> Any:
+    """`value` without what two identical runs differ in: where, and the base's id."""
+    tmp = str(repository["tmp"])
+    swaps = ((tmp, "<tmp>"), (tmp.replace("\\", "/"), "<tmp>"), (repository["base"], "<base>"))
+    if isinstance(value, str):
+        for old, new in swaps:
+            value = value.replace(old, new)
+        return value
+    if isinstance(value, Mapping):
+        return {key: _normalised(item, repository) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_normalised(item, repository) for item in value]
+    return value
+
+
+def _developer_view(repository: dict[str, Any], backend: ScriptedBackend, report: Any) -> dict[str, Any]:
+    """Everything the developer stage decided and handed the session.
+
+    The experience record is left out - it is the one thing that is meant to
+    differ - and so is the base diagnostic's wall-clock duration.
+    """
+    stage = Path(report.run_dir) / "developer-01"
+    developer = [item for item in backend.launched if item.role == "developer"][0]
+    resources = json.loads((stage / "resources.json").read_text("utf-8"))
+    resources.pop("experience")
+    resources["base_diagnostic"].pop("duration_s")
+    session = ("role", "model", "allowed_tools", "disallowed_tools", "read_only", "timeout_s", "max_cost")
+    return _normalised(
+        {
+            "outcome": report.outcome,
+            "final_state": report.final_state,
+            "stages": [item.stage for item in report.stages],
+            "session": {name: getattr(developer, name) for name in session},
+            "instructions": developer.instructions,
+            "execution_context": json.loads((stage / "execution-context.json").read_text("utf-8")),
+            "resources": resources,
+            "authority": json.loads((stage / "authority.json").read_text("utf-8")),
+        },
+        repository,
+    )
+
+
+@pytest.fixture(scope="module")
+def without_advice(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Any]:
+    """The developer stage exactly as it runs with experience advice switched off."""
+    repository = _make_repository(tmp_path_factory.mktemp("without-advice"))
+    control = ExperiencedControlPlane(repository["base"], states=["planning"], advice=_experience_payload())
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    report = _runner(repository, backend, control, experience_advice=False).run_one(WORK_ORDER)
+    assert report.outcome == COMPLETED, report.reason
+    return _developer_view(repository, backend, report)
+
+
+def _runs_as_without_advice(
+    repository: dict[str, Any], backend: ScriptedBackend, report: Any, without_advice: dict[str, Any]
+) -> dict[str, Any]:
+    """Assert the run is the no-advice run; return the experience record."""
+    assert report.outcome == COMPLETED, report.reason
+    assert report.final_state == "ready_for_approval"
+    stage = Path(report.run_dir) / "developer-01"
+    record = json.loads((stage / "resources.json").read_text("utf-8"))["experience"]
+    assert record["enabled"] is True and record["available"] is False, record
+    assert 0 < len(record["rejected"]) <= 400, "the reason is bounded, never a traceback"
+    assert not (stage / "experience.json").exists(), "no advice was used, so none is recorded as used"
+
+    view = _developer_view(repository, backend, report)
+    assert _experience_block(view["instructions"]) == "", "no prior-experience block"
+    assert not any(item["reason"].startswith("prior experience") for item in view["execution_context"]["files"])
+    assert view["execution_context"]["files"] == without_advice["execution_context"]["files"]
+    assert view["authority"]["envelope"] == without_advice["authority"]["envelope"]
+    assert view["authority"]["envelope"]["required_tests"] == without_advice["authority"]["envelope"]["required_tests"]
+    assert view["session"]["model"] == without_advice["session"]["model"]
+    assert view["resources"]["adaptive_model_routing"] == without_advice["resources"]["adaptive_model_routing"]
+    assert view == without_advice, "the developer stage is exactly the no-advice one"
+    return record
+
+
+@pytest.mark.parametrize(
+    "case, reason",
+    [
+        ("why_is_a_mapping", r"precedents\[0\]\.why must be a list of strings, not dict"),
+        ("why_is_a_string", r"precedents\[0\]\.why must be a list of strings, not str"),
+        ("why_holds_an_object", r"precedents\[0\]\.why\[1\] must be a string, not dict"),
+        ("lines_is_a_mapping", r"warnings\[0\]\.lines must be a list of strings, not dict"),
+        ("lines_holds_an_array", r"warnings\[0\]\.lines\[0\] must be a string, not list"),
+        ("nested_past_the_recursion_limit", r"^RecursionError: "),
+    ],
+)
+def test_a_malformed_advisory_runs_the_job_exactly_as_without_advice(repository, without_advice, case, reason):
+    control = ExperiencedControlPlane(repository["base"], states=["planning"], advice=_malformed_experience(case))
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    assert ("experience", WORK_ORDER) in control.calls
+    record = _runs_as_without_advice(repository, backend, report, without_advice)
+    assert re.search(reason, record["rejected"]), record["rejected"]
+
+
+def _unforeseen(*args: Any, **kwargs: Any) -> Any:
+    raise RuntimeError("an unforeseen defect in the optional experience path")
+
+
+@pytest.mark.parametrize("seam", ["parse", "revalidate"])
+def test_an_unforeseen_parser_or_revalidation_exception_is_absorbed(repository, without_advice, monkeypatch, seam):
+    """No hand-kept list of expected exceptions: any `Exception` is no advice."""
+    from tools.engineering_runner import runner as runner_module
+
+    if seam == "parse":
+        monkeypatch.setattr(runner_module.ExperienceAdvice, "parse", staticmethod(_unforeseen))
+    else:
+        monkeypatch.setattr(runner_module, "revalidate", _unforeseen)
+    control = ExperiencedControlPlane(repository["base"], states=["planning"], advice=_experience_payload())
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    record = _runs_as_without_advice(repository, backend, report, without_advice)
+    assert record["rejected"] == "RuntimeError: an unforeseen defect in the optional experience path"
+
+
+@pytest.mark.parametrize("artifact", ["experience-advice.json", "experience.json"])
+def test_a_failed_experience_write_is_no_advice_not_a_failed_run(repository, without_advice, monkeypatch, artifact):
+    """Persisting the optional advisory is part of the optional path.
+
+    Before P6C-R1 an OSError here reached `run_one`'s `(RunnerError, OSError)`
+    handler and the run ended RUN_FAILED. A write that fails for the
+    developer stage's own artifacts still does - only these two degrade.
+    """
+    from tools.engineering_runner import runner as runner_module
+
+    real_write_json = runner_module.write_json
+
+    def write_json(path: Path, payload: Mapping[str, Any]) -> Path:
+        if Path(path).name == artifact:
+            raise OSError(28, "No space left on device")
+        return real_write_json(path, payload)
+
+    monkeypatch.setattr(runner_module, "write_json", write_json)
+    control = ExperiencedControlPlane(repository["base"], states=["planning"], advice=_experience_payload())
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    report = _runner(repository, backend, control).run_one(WORK_ORDER)
+
+    record = _runs_as_without_advice(repository, backend, report, without_advice)
+    assert record["rejected"].startswith("OSError: ")
+
+
+class _ProcessControl(BaseException):
+    """Stands in for KeyboardInterrupt/SystemExit without stopping pytest itself."""
+
+
+def test_process_level_control_is_never_absorbed_as_missing_advice(repository, monkeypatch):
+    from tools.engineering_runner import runner as runner_module
+
+    def interrupted(*args: Any, **kwargs: Any) -> Any:
+        raise _ProcessControl()
+
+    monkeypatch.setattr(runner_module.ExperienceAdvice, "parse", staticmethod(interrupted))
+    control = ExperiencedControlPlane(repository["base"], states=["planning"], advice=_experience_payload())
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    with pytest.raises(_ProcessControl):
+        _runner(repository, backend, control).run_one(WORK_ORDER)
+    assert [item for item in backend.launched if item.role == "developer"] == []
+
+
+def test_switched_off_experience_never_reads_even_a_malformed_advisory(repository, without_advice):
+    control = ExperiencedControlPlane(
+        repository["base"], states=["planning"], advice=_malformed_experience("why_is_a_mapping")
+    )
+    backend = ScriptedBackend(edit=_in_scope_edit)
+    report = _runner(repository, backend, control, experience_advice=False).run_one(WORK_ORDER)
+
+    assert report.outcome == COMPLETED, report.reason
+    assert ("experience", WORK_ORDER) not in control.calls
+    stage = Path(report.run_dir) / "developer-01"
+    assert not (stage / "experience-advice.json").exists()
+    assert json.loads((stage / "resources.json").read_text("utf-8"))["experience"] == {"enabled": False}
+    assert _developer_view(repository, backend, report) == without_advice
+
+
+def test_the_no_experience_advice_flag_still_switches_advice_off(repository):
+    from tools.engineering_runner.__main__ import build_parser, configuration
+
+    tmp = repository["tmp"]
+    common = ["run-one", "--repo-root", str(repository["repo"]), "--state-dir", str(tmp / "s"), "--runner-dir", str(tmp / "r")]
+    assert configuration(build_parser().parse_args(common)).experience_advice is True
+    assert configuration(build_parser().parse_args([*common, "--no-experience-advice"])).experience_advice is False
 
 
 def test_consumer_developer_has_no_model_owned_shell_or_todo_loop(repository):

@@ -85,7 +85,6 @@ from .briefs import (
 from .execution_context import failure_symbol_hints
 from .experience import (
     ExperienceAdvice,
-    ExperienceAdviceRejected,
     RevalidatedAdvice,
     revalidate,
 )
@@ -1561,11 +1560,19 @@ class EngineeringRunner:
     ) -> tuple[RevalidatedAdvice | None, dict[str, Any]]:
         """Prior-experience advice for this attempt, or none - never a stop.
 
-        Every failure on this path - the command, the parse, the
-        revalidation - is recorded and absorbed: experience is navigation for
-        the session, and the job runs exactly as it would without it. What
-        survives is filtered through this envelope, so the advice can only
-        ever point inside what the work order already allows.
+        Every failure on this path - the command, persisting the advisory,
+        the parse, the revalidation, recording what was used - is recorded
+        and absorbed: experience is navigation for the session, and the job
+        runs exactly as it would without it. What survives is filtered
+        through this envelope, so the advice can only ever point inside what
+        the work order already allows.
+
+        The boundary is `Exception`, deliberately, not a list of the
+        exceptions the parser is expected to raise: that list is what let a
+        KeyError and a RecursionError through (P6C-R1). An unforeseen defect
+        in optional navigation costs the advice, not the job. `BaseException`
+        stays outside it, so KeyboardInterrupt and SystemExit still stop the
+        process.
         """
         if not self.config.experience_advice:
             return None, {"enabled": False}
@@ -1573,14 +1580,14 @@ class EngineeringRunner:
             payload = self._control.experience_advice(work_order_id)
         except Exception as exc:  # noqa: BLE001 - absence of advice is not an error
             return None, {"enabled": True, "available": False, "reason": _brief_reason(exc)}
-        write_json(stage_dir / "experience-advice.json", payload)
         try:
+            write_json(stage_dir / "experience-advice.json", payload)
             advice = ExperienceAdvice.parse(payload, work_order_id=work_order_id)
             revalidated = revalidate(advice, envelope, repo_map)
-        except (ExperienceAdviceRejected, AttributeError, TypeError, ValueError) as exc:
+            record = {"enabled": True, **revalidated.summary()}
+            write_json(stage_dir / "experience.json", record)
+        except Exception as exc:  # noqa: BLE001 - broken advice is no advice, never a stop
             return None, {"enabled": True, "available": False, "rejected": _brief_reason(exc)}
-        record = {"enabled": True, **revalidated.summary()}
-        write_json(stage_dir / "experience.json", record)
         return revalidated, record
 
     def _prior_findings(self, work_order_id: str) -> tuple[str, ...]:
