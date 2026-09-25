@@ -1,0 +1,11 @@
+full suite, chunked, clone at 16d5a39 (origin/main = 4fd5faf):
+  A: 3 failed, 2841 passed in 21131.69s (5:52:11)
+  B: 1 failed, 321 passed in 21089.64s (5:51:29)
+  C: 18 failed, 3938 passed, 441 skipped, 2 warnings in 22067.50s (6:07:47)
+  runner suite re-run whole, same SHA: 190 passed in 269.77s (0:04:29)
+  research guards with origin/main modelled at the merge: 321 passed in 2.27s
+
+first full run, clone at 304cd3e:
+  A: 4 failed, 2836 passed in 319.22s (0:05:19)
+  B: 1 failed, 320 passed in 266.46s (0:04:26)
+  C: 18 failed, 3938 passed, 441 skipped, 2 warnings in 1111.16s (0:18:31)

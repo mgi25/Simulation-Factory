@@ -1,0 +1,1685 @@
+{
+  "max_age_days": 7,
+  "results": [
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "29 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 29,
+      "suite": "tests/test_arena_layout.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "37 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 37,
+      "suite": "tests/test_balance.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "16 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 16,
+      "suite": "tests/test_battle.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "40 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 40,
+      "suite": "tests/test_battle_scoring.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "44 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 44,
+      "suite": "tests/test_candidate_curation.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "160 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 160,
+      "suite": "tests/test_company_analytics.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "63 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 63,
+      "suite": "tests/test_company_bounded_engineering_activation.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "72 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 72,
+      "suite": "tests/test_company_bounded_engineering_autonomy.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "9 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 9,
+      "suite": "tests/test_company_context_assembly.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "17 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 17,
+      "suite": "tests/test_company_context_expansion.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "32 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 32,
+      "suite": "tests/test_company_dashboard.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "152 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 152,
+      "suite": "tests/test_company_delegation.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "159 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 159,
+      "suite": "tests/test_company_delegation_pilot.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "54 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 54,
+      "suite": "tests/test_company_dependency_graph.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "69 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 69,
+      "suite": "tests/test_company_efficiency.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "207 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 207,
+      "suite": "tests/test_company_engineering_execution.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "25 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 25,
+      "suite": "tests/test_company_evidence_review.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "23 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 23,
+      "suite": "tests/test_company_executable_work_planning.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "14 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 14,
+      "suite": "tests/test_company_execution_transport.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "73 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 73,
+      "suite": "tests/test_company_executive_planning.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "77 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 77,
+      "suite": "tests/test_company_experience_retrieval.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "57 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 57,
+      "suite": "tests/test_company_experience_store.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "67 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 67,
+      "suite": "tests/test_company_external_engineering_runner.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "123 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 123,
+      "suite": "tests/test_company_finance.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "48 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 48,
+      "suite": "tests/test_company_finance_usage_cost.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "46 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 46,
+      "suite": "tests/test_company_gate_suite_requirements.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "89 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 89,
+      "suite": "tests/test_company_integration_gate.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "93 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 93,
+      "suite": "tests/test_company_objective_planning.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "119 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 119,
+      "suite": "tests/test_company_org_intelligence.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "46 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 46,
+      "suite": "tests/test_company_os_ai_platform.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "68 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 68,
+      "suite": "tests/test_company_os_capsules.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "26 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 26,
+      "suite": "tests/test_company_os_knowledge.py"
+    },
+    {
+      "company_os": true,
+      "failed": 1,
+      "note": "80 passed, 1 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 81,
+      "suite": "tests/test_company_os_research.py"
+    },
+    {
+      "company_os": true,
+      "failed": 1,
+      "note": "117 passed, 1 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 118,
+      "suite": "tests/test_company_os_research_batches.py"
+    },
+    {
+      "company_os": true,
+      "failed": 1,
+      "note": "121 passed, 1 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 122,
+      "suite": "tests/test_company_os_research_ingestion.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "34 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 34,
+      "suite": "tests/test_company_read_authority.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "32 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 32,
+      "suite": "tests/test_company_review_separation.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "22 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 22,
+      "suite": "tests/test_company_runtime.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "14 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 14,
+      "suite": "tests/test_company_runtime_integration.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "48 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 48,
+      "suite": "tests/test_company_session_execution.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "59 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 59,
+      "suite": "tests/test_company_typed_evidence_context.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "93 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 93,
+      "suite": "tests/test_company_workforce.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "29 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 29,
+      "suite": "tests/test_company_youtube_connectivity.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "7 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 7,
+      "suite": "tests/test_company_youtube_end_to_end.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "55 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 55,
+      "suite": "tests/test_company_youtube_live_findings.py"
+    },
+    {
+      "company_os": true,
+      "failed": 0,
+      "note": "142 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 142,
+      "suite": "tests/test_company_youtube_studio_ingestion.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "17 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 17,
+      "suite": "tests/test_deck_geometry.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "16 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 16,
+      "suite": "tests/test_dynamic_entities.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "39 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 39,
+      "suite": "tests/test_echo.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "59 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 59,
+      "suite": "tests/test_encode.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "63 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 63,
+      "suite": "tests/test_engineering_runner_execution_context.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "19 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 19,
+      "suite": "tests/test_engineering_runner_exploration_report.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "25 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 25,
+      "suite": "tests/test_engineering_runner_exploration_telemetry.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "25 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 25,
+      "suite": "tests/test_engineering_runner_repo_map.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "38 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 38,
+      "suite": "tests/test_events.py"
+    },
+    {
+      "company_os": false,
+      "failed": 1,
+      "note": "189 passed, 1 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 190,
+      "suite": "tests/test_external_engineering_runner.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "41 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 41,
+      "suite": "tests/test_kinetic_obstacles.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "10 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 10,
+      "suite": "tests/test_marble3d_contact.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "7 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 7,
+      "suite": "tests/test_marble3d_determinism.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "12 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 12,
+      "suite": "tests/test_marble3d_friction.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "11 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 11,
+      "suite": "tests/test_marble3d_integration.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "10 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 10,
+      "suite": "tests/test_marble3d_margins.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "19 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 19,
+      "suite": "tests/test_marble3d_mesh.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "31 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 31,
+      "suite": "tests/test_marble3d_modules.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "25 passed, 0 failed, 1 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 25,
+      "suite": "tests/test_marble3d_presentation.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "14 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 14,
+      "suite": "tests/test_marble3d_replay.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "16 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 16,
+      "suite": "tests/test_marble3d_simulation.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "12 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 12,
+      "suite": "tests/test_marble3d_units.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "7 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 7,
+      "suite": "tests/test_marble3d_validation.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "88 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 88,
+      "suite": "tests/test_multiplying_shell.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "62 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 62,
+      "suite": "tests/test_multiplying_shell_audio.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "165 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 165,
+      "suite": "tests/test_multishell_av.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "15 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 15,
+      "suite": "tests/test_multishell_production.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "198 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 198,
+      "suite": "tests/test_multishell_visual.py"
+    },
+    {
+      "company_os": false,
+      "failed": 1,
+      "note": "40 passed, 1 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 41,
+      "suite": "tests/test_neon_proof.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "26 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 26,
+      "suite": "tests/test_obstacles.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "49 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 49,
+      "suite": "tests/test_orbit.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "57 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 57,
+      "suite": "tests/test_powers.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "38 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 38,
+      "suite": "tests/test_production_delivery.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "43 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 43,
+      "suite": "tests/test_production_qc.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "35 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 35,
+      "suite": "tests/test_pulse.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "9 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 9,
+      "suite": "tests/test_race2_camera.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "27 passed, 0 failed, 1 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 27,
+      "suite": "tests/test_race2_cinematography.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "12 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 12,
+      "suite": "tests/test_race2_course.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "7 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 7,
+      "suite": "tests/test_race2_isolation.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "7 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 7,
+      "suite": "tests/test_race2_physics.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "10 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 10,
+      "suite": "tests/test_race2_race.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "16 passed, 0 failed, 1 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 16,
+      "suite": "tests/test_race2_v29_contained.py"
+    },
+    {
+      "company_os": false,
+      "failed": 1,
+      "note": "43 passed, 1 failed, 1 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 44,
+      "suite": "tests/test_race2_v301_stage.py"
+    },
+    {
+      "company_os": false,
+      "failed": 1,
+      "note": "29 passed, 1 failed, 1 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 30,
+      "suite": "tests/test_race2_v30_stage.py"
+    },
+    {
+      "company_os": false,
+      "failed": 2,
+      "note": "45 passed, 2 failed, 3 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 47,
+      "suite": "tests/test_race2_v311_track.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "6 passed, 0 failed, 27 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 6,
+      "suite": "tests/test_race2_v31_readability.py"
+    },
+    {
+      "company_os": false,
+      "failed": 1,
+      "note": "22 passed, 1 failed, 8 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 23,
+      "suite": "tests/test_race2_v321_geometry.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "15 passed, 0 failed, 23 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 15,
+      "suite": "tests/test_race2_v322_audio.py"
+    },
+    {
+      "company_os": false,
+      "failed": 6,
+      "note": "43 passed, 6 failed, 7 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 49,
+      "suite": "tests/test_race2_v32_final.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "31 passed, 0 failed, 23 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 31,
+      "suite": "tests/test_race2_v331_runout.py"
+    },
+    {
+      "company_os": false,
+      "failed": 1,
+      "note": "17 passed, 1 failed, 8 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 18,
+      "suite": "tests/test_race2_v33_bookends.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "36 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 36,
+      "suite": "tests/test_race_analysis.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "31 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 31,
+      "suite": "tests/test_race_branching.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "43 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 43,
+      "suite": "tests/test_race_course.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "40 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 40,
+      "suite": "tests/test_race_manager.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "14 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 14,
+      "suite": "tests/test_race_pipeline.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "10 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 10,
+      "suite": "tests/test_race_renderer.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "27 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 27,
+      "suite": "tests/test_race_replay.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "32 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 32,
+      "suite": "tests/test_race_simulation.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "25 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 25,
+      "suite": "tests/test_race_telemetry.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "49 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 49,
+      "suite": "tests/test_race_visuals.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "33 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 33,
+      "suite": "tests/test_render_plan.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "7 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 7,
+      "suite": "tests/test_replay.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "48 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 48,
+      "suite": "tests/test_shell_escape.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "9 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 9,
+      "suite": "tests/test_simulation.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "18 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 18,
+      "suite": "tests/test_sloped_apron.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "19 passed, 0 failed, 1 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 19,
+      "suite": "tests/test_sloped_bank_slew.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "16 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 16,
+      "suite": "tests/test_sloped_cameras.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "19 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 19,
+      "suite": "tests/test_sloped_chamberstate.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "33 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 33,
+      "suite": "tests/test_sloped_chase.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "7 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 7,
+      "suite": "tests/test_sloped_contact.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "163 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 163,
+      "suite": "tests/test_sloped_contrast.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "38 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 38,
+      "suite": "tests/test_sloped_course_preview.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "0 passed, 0 failed, 6 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 0,
+      "suite": "tests/test_sloped_edit.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "42 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 42,
+      "suite": "tests/test_sloped_environment.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "0 passed, 0 failed, 16 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 0,
+      "suite": "tests/test_sloped_finish_lens.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "19 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 19,
+      "suite": "tests/test_sloped_fork_trim.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "25 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 25,
+      "suite": "tests/test_sloped_geometry.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "9 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 9,
+      "suite": "tests/test_sloped_guards.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "9 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 9,
+      "suite": "tests/test_sloped_identity.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "6 passed, 0 failed, 2 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 6,
+      "suite": "tests/test_sloped_open_side.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "23 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 23,
+      "suite": "tests/test_sloped_race.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "0 passed, 0 failed, 16 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 0,
+      "suite": "tests/test_sloped_readability.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "7 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 7,
+      "suite": "tests/test_sloped_render.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "0 passed, 0 failed, 25 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 0,
+      "suite": "tests/test_sloped_retention.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "4 passed, 0 failed, 18 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 4,
+      "suite": "tests/test_sloped_short.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "30 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 30,
+      "suite": "tests/test_sloped_shuffle.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "33 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 33,
+      "suite": "tests/test_sloped_split.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "19 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 19,
+      "suite": "tests/test_sloped_start_kind.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "6 passed, 0 failed, 2 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 6,
+      "suite": "tests/test_sloped_start_render.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "9 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 9,
+      "suite": "tests/test_sloped_startlab.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "11 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 11,
+      "suite": "tests/test_sloped_terrain.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "31 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 31,
+      "suite": "tests/test_sloped_trapdoor.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "25 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 25,
+      "suite": "tests/test_sloped_v21.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "5 passed, 0 failed, 17 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 5,
+      "suite": "tests/test_sloped_v221_finish.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "11 passed, 0 failed, 23 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 11,
+      "suite": "tests/test_sloped_v221_integration.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "5 passed, 0 failed, 17 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 5,
+      "suite": "tests/test_sloped_v221_preview.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "7 passed, 0 failed, 11 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 7,
+      "suite": "tests/test_sloped_v221_shuffle.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "7 passed, 0 failed, 17 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 7,
+      "suite": "tests/test_sloped_v22_integration.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "0 passed, 0 failed, 59 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 0,
+      "suite": "tests/test_sloped_v22_pacing.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "30 passed, 0 failed, 1 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 30,
+      "suite": "tests/test_sloped_v23_env.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "33 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 33,
+      "suite": "tests/test_sloped_v23_integration.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "362 passed, 0 failed, 1 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 362,
+      "suite": "tests/test_sloped_v23_machine.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "1 passed, 0 failed, 17 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 1,
+      "suite": "tests/test_sloped_v24_hook.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "9 passed, 0 failed, 27 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 9,
+      "suite": "tests/test_sloped_v24_integration.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "2 passed, 0 failed, 32 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 2,
+      "suite": "tests/test_sloped_v24_pacing.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "31 passed, 0 failed, 1 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 31,
+      "suite": "tests/test_sloped_v24_payoff.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "15 passed, 0 failed, 12 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 15,
+      "suite": "tests/test_sloped_v24_spin.py"
+    },
+    {
+      "company_os": false,
+      "failed": 4,
+      "note": "34 passed, 4 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 38,
+      "suite": "tests/test_sloped_v251_world.py"
+    },
+    {
+      "company_os": false,
+      "failed": 1,
+      "note": "39 passed, 1 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": false,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 40,
+      "suite": "tests/test_sloped_v252_world.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "49 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 49,
+      "suite": "tests/test_sloped_v25_world.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "29 passed, 0 failed, 14 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 29,
+      "suite": "tests/test_sloped_v26_integration.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "22 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 22,
+      "suite": "tests/test_sloped_widelaunch.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "101 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 101,
+      "suite": "tests/test_soundtrack.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "40 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 40,
+      "suite": "tests/test_tile_escape.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "58 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 58,
+      "suite": "tests/test_tile_escape_phase2.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "49 passed, 0 failed, 1 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 49,
+      "suite": "tests/test_tile_escape_phase3.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "65 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 65,
+      "suite": "tests/test_tile_escape_phase4.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "74 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 74,
+      "suite": "tests/test_tile_escape_phase5.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "45 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 45,
+      "suite": "tests/test_tile_escape_phase6.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "17 passed, 0 failed, 0 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 17,
+      "suite": "tests/test_toy_proof.py"
+    },
+    {
+      "company_os": false,
+      "failed": 0,
+      "note": "68 passed, 0 failed, 1 skipped (junit)",
+      "observed_on": "2026-09-25",
+      "passed": true,
+      "reported_by": "p6c-authoring-session-16d5a39",
+      "selected": 68,
+      "suite": "tests/test_youtube_fetch.py"
+    }
+  ]
+}
